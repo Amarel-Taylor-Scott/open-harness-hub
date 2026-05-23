@@ -63,14 +63,14 @@ inputs = {
 ### Claude Code
 
 ```
-/plugin marketplace add taylor-s-amarel/open-harness-hub@dist-published
+/plugin marketplace add Amarel-Taylor-Scott/open-harness-hub@dist-published
 /chat-with-pdf-citations
 ```
 
 ### Cursor / OpenHands / any Agent Skills tool
 
 ```bash
-git clone --branch dist-published https://github.com/taylor-s-amarel/open-harness-hub.git oh
+git clone --branch dist-published https://github.com/Amarel-Taylor-Scott/open-harness-hub.git oh
 cp -r oh/agent-skills/chat-with-pdf-citations ~/.cursor/skills/
 ```
 

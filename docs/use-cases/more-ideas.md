@@ -1,7 +1,7 @@
 # More use cases - ideation roundup
 
-> Grounded in what the Meta Kaggle + production-repo mining has surfaced,
-> plus brainstorm from the broader landscape. Each row is a future
+> Grounded in production-repo ports + landscape research, plus
+> brainstorm from the broader landscape. Each row is a future
 > `docs/use-cases/<slug>.md` recipe.
 
 The original 8 (in this directory):
@@ -95,7 +95,7 @@ and evidence from real-world sources.
 9. `pipeline/deep-research-supervisor-workers` (verified clone)
 10. `pipeline/knowledge-graph-from-corpus` (verified clone - graphrag)
 
-**Strong-signal (in progress with Meta Kaggle Code)**:
+**Strong-signal (next candidates)**:
 11. `pipeline/long-doc-map-reduce-summary`
 12. `pipeline/meeting-transcript-actions-decisions`
 13. `pipeline/synthetic-sft-dpo-gen`

@@ -744,49 +744,20 @@ the manifest.
 
 ## 12. Ingest paths
 
-The catalog grows from three ingest paths:
+The catalog grows from two ingest paths:
 
 1. **Direct contributions.** A contributor opens a PR adding one or
    more manifests under `catalog/`. CI runs schema validation, ref
    resolution, and lint.
-2. **Reference repos.** Curators import patterns from established
-   reference repos (such as `_reference/gemma4_comp` and
-   `_reference/llm-safety-framework`) by hand-extracting the harness /
-   knowledge-pack / pipeline shape and writing a manifest that
-   attributes the source.
-3. **Kaggle harness mining.** A scheduled script (see
-   `scripts/mine_kaggle_harnesses.py`) crawls Kaggle competition notebooks
-   and linked GitHub repos, detects harness / RAG / GREP / tool / pipeline
-   patterns, and emits **draft manifests under `catalog/_inbox/`** for
-   curator review. The mining script:
-
-   - uses Kaggle public metadata (kernels list, competition list,
-     dataset list) via the Kaggle API;
-   - filters to LLM-relevant competitions (Gemma family, LMSYS,
-     reasoning challenges, RAG / retrieval challenges, agent
-     hackathons, image-gen competitions, etc.);
-   - downloads the kernel script bodies;
-   - applies a detector pack (a `rule_pack/grep` + `rule_pack/classifier`
-     in this very catalog) that identifies harness-shaped code: any
-     wrapper around an LLM call that adds preprocessing, RAG,
-     tool-calling, output post-processing, or evaluation;
-   - extracts the wrapper into a draft `harness` manifest, the
-     reusable rules into a draft `rule_pack`, and the orchestration
-     into a draft `pipeline`;
-   - records `attribution.source_url`, `attribution.author`,
-     `attribution.license` and skips kernels whose license is not
-     compatible with redistribution;
-   - emits everything to `catalog/_inbox/{date}-{kernel_id}/` for human
-     review before promotion to `catalog/{type}/`.
-
-Curators are encouraged to file an issue describing a target pattern
-*before* writing the detector, so the mining is purposeful (e.g.,
-"find every RAG-with-citation-graph notebook in 2025-2026 retrieval
-competitions"). The same script can later target Hugging Face Spaces,
-GitHub topic searches, and arXiv code links.
-
-The mining manifest format and detector pack are defined in
-`docs/howto/mine-kaggle-harnesses.md`.
+2. **Reference ports.** Curators hand-port patterns from established,
+   permissively-licensed reference repos (such as
+   `_reference/gemma4_comp` and `_reference/llm-safety-framework`) by
+   extracting the harness / knowledge-pack / pipeline shape and
+   writing a manifest with full upstream attribution
+   (`attribution.source_url`, `attribution.author`,
+   `attribution.license`). License compatibility is verified before
+   the port; sources without a redistribution-compatible license are
+   referenced as inspiration only, not ported.
 
 ---
 

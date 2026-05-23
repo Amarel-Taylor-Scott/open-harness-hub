@@ -30,6 +30,10 @@ The rubric is load-bearing on five things:
 - Not a legal determination engine. The pipeline applies documented policy and surfaces evidence; legal calls stay with humans.
 - Not a moderation policy generator. Policy is the input; the pipeline applies it.
 
+## Related use case
+
+[Human-trafficking signal triage on UGC platforms](human-trafficking-ugc-detection.md) extends this pipeline with a Gemma-4 multimodal stage, Polaris/ILO trafficking indicator rule packs, and a Polaris-hotline referral path — sharing the same CSAM-route safety pattern.
+
 ## Pairing patterns
 
 - `pattern/critical-tier-output-override` ensures CSAM-suspicion + self-harm-intent override any other classifier confidence.

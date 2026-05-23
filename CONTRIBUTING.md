@@ -1,12 +1,12 @@
 # Contributing to Open Harness Hub
 
-Welcome! The hub grows by contributions. There are three ingest paths
+Welcome! The hub grows by contributions. There are two ingest paths
 (see [SPEC §12](taxonomy/SPEC.md#12-ingest-paths)):
 
 1. **Direct PR** — write a manifest by hand.
-2. **Reference port** — generalize a pattern from an existing harness
-   repo into a hub manifest.
-3. **Kaggle harness mining** — run the miner and promote drafts.
+2. **Reference port** — generalize a pattern from an existing
+   permissively-licensed harness repo into a hub manifest, with full
+   upstream attribution.
 
 ## Direct PR workflow
 

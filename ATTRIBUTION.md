@@ -62,10 +62,9 @@ design patterns:
   materiality maps, supply-chain knowledge graphs, drug-interaction
   graphs, DFARS clause flow-down maps
 
-Direct upstream repo URL + author attribution pending — see
-[`docs/outreach/citemind-integration.md`](docs/outreach/citemind-integration.md).
-Marked `lifecycle: experimental` with attribution caveat until the
-CiteMind team confirms.
+Direct upstream repo URL + author attribution pending CiteMind team
+confirmation. Marked `lifecycle: experimental` with attribution caveat
+until the upstream is identified.
 
 License: Apache 2.0 (Gemma 4 weights); upstream CiteMind repo
 license TBD.
@@ -119,8 +118,9 @@ pipeline manifest carries attribution to the specific kernel + author
 | Laura Fink (allunia) | Pulmonary DICOM Preprocessing | 1249 | pipeline/dicom-medical-image-preprocessing |
 | Renoir (itahiro) | DeepSeek-R1-distill-Qwen-7B AIMO 2 | 1399 | pipeline/deepseek-r1-code-interpreter-math |
 
-The full list of attributed kernels is in
-[`docs/research/kaggle-mining-96-kernels-report.md`](docs/research/kaggle-mining-96-kernels-report.md).
+Per-pipeline attribution (source URL, author, license, vote count
+where applicable) lives in the `attribution:` block of each pipeline
+manifest under `catalog/pipelines/`.
 
 ## Reviewer feedback
 

@@ -1,16 +1,33 @@
 # Getting started: assemble a pipeline from a task description
 
-A common ask: "I have a task. The catalog has 493 artifacts. Which ones do I need?"
+A common ask: "I have a task. The catalog has 500+ artifacts. Which ones do I need?"
 
 The catalog ships a scaffolding script that takes a free-text task description, searches the catalog for relevant components, and emits a draft pipeline manifest. The script is meant for two audiences:
 
 1. A developer poking around for the right components.
 2. An LLM agent asked to assemble a pipeline from the catalog (give the agent the JSON output).
 
+## Three search modes
+
+| Flag | Mode | When to use |
+|---|---|---|
+| _(none)_ | **Lexical** — token overlap (default fallback). | Quick local lookup with no sidecar. Works out of the box. |
+| `--semantic` | **Semantic** — cosine similarity against precomputed sentence-transformers embeddings. | When your task description doesn't share keywords with manifest descriptions (e.g. "find code that helps me triage UGC"  →  best hit is `pipeline/platform-content-triage`, no shared tokens). |
+| `--hybrid` | **Hybrid** — `0.55 * semantic + 0.45 * lexical + edge-aware boost`. **Recommended.** Top-pipeline siblings get a `+0.10` boost so components that already ship together surface together. | The default for any non-trivial assembly. |
+
+Semantic + hybrid require the embeddings sidecar to be built once:
+
+```bash
+pip install sentence-transformers
+OH_BUILD_EMBEDDINGS=1 python3 scripts/build_catalog_db.py
+```
+
+Hybrid gracefully falls back to lexical if the sidecar isn't present, so the script is always usable.
+
 ## Quick start
 
 ```bash
-python3 scripts/scaffold_pipeline_from_task.py "Review a vendor invoice for fraud signals + extract line items"
+python3 scripts/scaffold_pipeline_from_task.py --hybrid "Review a vendor invoice for fraud signals + extract line items"
 ```
 
 Output (abridged):
@@ -100,12 +117,33 @@ python3 scripts/validate.py
 # 4. If it has clean+flagged samples, add them to scripts/bench_pipelines.py.
 ```
 
-## When the script is not enough
-
-The script does lexical search (token overlap, no embeddings). For larger catalogs or where semantic search matters, build the derived SQLite + embeddings DB:
+## Real example — human-trafficking UGC triage with Gemma 4
 
 ```bash
-OH_BUILD_EMBEDDINGS=1 python3 scripts/build_catalog_db.py
+python3 scripts/scaffold_pipeline_from_task.py --hybrid \
+  "Detect illicit social media posts related to human trafficking on user-generated content platforms with Gemma 4" \
+  --draft-yaml
 ```
 
-Then query the DB directly or write your own ranker. YAML stays the source of truth; the DB is a derived build artifact, regenerated from the YAML on every push.
+Output picks all the right pieces automatically:
+
+- `persona/trust-and-safety-reviewer`
+- `adapter/gemma-4-26b-vision` (multimodal — handles both post text and attached images)
+- `rule-pack/grep-human-trafficking-ugc-flags` (18 GREP detectors from the Polaris + ILO taxonomies)
+- `rule-pack/classifier-trafficking-signal` (10 Polaris-typology classifier slots, second-stage)
+- `rule-pack/grep-platform-moderation-flags` (kept for the CSAM-route short-circuit)
+- `pattern/two-stage-extract-then-judge`, `pattern/refuse-on-redacted`, `pattern/critical-tier-output-override`
+- `rubric/platform-moderation-quality-v1`
+
+The composer correctly slots the GREP pack as the early triage step and the classifier pack as the second-stage judge — different `family` values flow into different positions in the pipeline. See [Human-trafficking signal triage](../use-cases/human-trafficking-ugc-detection.md) for the full pipeline.
+
+## Underneath: the catalog DB
+
+The script reads from `dist/catalog.sqlite`, a derived SQLite database with three useful tables:
+
+- `artifacts` — id, type, name, description, license, lifecycle, etc. (one row per manifest)
+- `artifacts_fts` — FTS5 full-text index over name + description + tags + industry + capability
+- `edges` — typed adjacency (`uses_rule_pack`, `uses_persona`, `step_ref`, etc.) used for the hybrid-mode edge-aware boost
+- `embeddings` — optional, populated only when `OH_BUILD_EMBEDDINGS=1` is set
+
+YAML stays the source of truth; the DB is a derived build artifact, regenerated from the YAML on every push.

@@ -43,7 +43,7 @@ input
 ```
 
 Different use cases turn different layers on/off. The kitchen-sink
-[`pipeline/everything-research-pipeline`](https://taylor-s-amarel.github.io/open-harness-hub/catalog/pipeline_everything-research-pipeline/)
+[`pipeline/everything-research-pipeline`](https://Amarel-Taylor-Scott.github.io/open-harness-hub/catalog/pipeline_everything-research-pipeline/)
 shows all 22 passes for reference.
 
 ## How to use a recipe
@@ -51,7 +51,7 @@ shows all 22 passes for reference.
 1. **Read the recipe** to see which primitives are needed.
 2. **Install via the Claude Code plugin marketplace**:
    ```
-   /plugin marketplace add taylor-s-amarel/open-harness-hub@dist-published
+   /plugin marketplace add Amarel-Taylor-Scott/open-harness-hub@dist-published
    /plugin install open-harness-hub-skills
    ```
 3. **Or copy a single skill** directly to `~/.claude/skills/`.

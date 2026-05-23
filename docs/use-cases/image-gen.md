@@ -69,7 +69,7 @@ inputs = {
 ### Claude Code
 
 ```
-/plugin marketplace add taylor-s-amarel/open-harness-hub@dist-published
+/plugin marketplace add Amarel-Taylor-Scott/open-harness-hub@dist-published
 /brand-safe-product-photo
 ```
 

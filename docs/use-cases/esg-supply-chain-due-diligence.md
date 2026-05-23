@@ -162,7 +162,7 @@ makes structured red-flag detection work.
 
 ## Reference for proposers of this use case
 
-Catalog: `github.com/taylor-s-amarel/open-harness-hub`. All artifacts
+Catalog: `github.com/Amarel-Taylor-Scott/open-harness-hub`. All artifacts
 listed above validate against `schemas/` and emit to 13 standards
 formats (Croissant, MCP, Agent Skills, HF cards, lm-eval-harness,
 promptfoo, CycloneDX-ML, OpenLineage, C2PA, EU AI Act, SPDX 3.0,

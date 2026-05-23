@@ -61,7 +61,7 @@ inputs = {
 ### Claude Code (educational, not for clinical deployment)
 
 ```
-/plugin marketplace add taylor-s-amarel/open-harness-hub@dist-published
+/plugin marketplace add Amarel-Taylor-Scott/open-harness-hub@dist-published
 /differential-diagnosis
 ```
 

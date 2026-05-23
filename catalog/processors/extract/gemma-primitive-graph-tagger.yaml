@@ -1,0 +1,116 @@
+id: "processor/gemma-primitive-graph-tagger"
+type: processor
+version: "0.1.0"
+name: "Gemma-4 primitive graph tagger"
+description: |
+  Use Gemma 4 (text-only is fine — multimodal optional) to tag every
+  catalog primitive (harness, pattern, processor, rule-pack, persona,
+  rubric, knowledge-pack, adapter, dataset, pipeline) with typed
+  graph edges that make the catalog more searchable.
+
+  Reads a primitive's manifest (name, description, tags, industry,
+  capability) and emits:
+    - typed nodes: { id, kind, label, source_anchor }
+    - typed edges: {
+        src_id: <primitive id>,
+        rel: <edge type>,
+        dst_id: <other primitive id OR vocabulary term>,
+        confidence: 0..1,
+        rationale: "<one-line>"
+      }
+
+  Edge types (kept small on purpose):
+    - related_to           — neighbor primitive (same task domain)
+    - composes_with        — frequently used in the same pipeline
+    - alternative_to       — substitute for the same step
+    - extends              — generalization-of relationship
+    - emits_signal         — output that another primitive consumes
+    - consumes_signal      — input that another primitive emits
+    - mitigates            — anti-pattern / risk this primitive guards against
+    - depends_on_taxonomy  — vocabulary term (industry / capability / modality)
+
+  The output edges are written back into the `edges` table of
+  `dist/catalog.sqlite` (the same table the hybrid-mode scaffold
+  search reads), so:
+    1. Token-poor queries surface the right primitives via semantic
+       neighbors that Gemma 4 declared related.
+    2. The scaffold's edge-aware boost reflects "Gemma thinks these
+       ship together," not just "they share a pipeline manifest."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["compliance", "media", "ai"]
+capability: ["extraction", "classification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "cross_cutting.indexing"
+created: "2026-05-22"
+updated: "2026-05-22"
+
+process_kind: "extract.primitive_graph"
+deterministic: false
+side_effects: "write"
+
+inputs:
+  - name: "manifest"
+    type: "object"
+    description: "The full manifest dict of a single catalog primitive."
+  - name: "peer_manifests"
+    type: "object[]"
+    description: |
+      Optional. A short list of other primitives in the same domain
+      (passed to constrain Gemma's outputs to real IDs). When absent,
+      Gemma may invent IDs and the postprocessor will drop them; the
+      gain is faster runs.
+  - name: "node_types"
+    type: "string[]"
+  - name: "edge_types"
+    type: "string[]"
+outputs:
+  - name: "nodes"
+    type: "object[]"
+  - name: "edges"
+    type: "object[]"
+
+config:
+  default_model_adapter: "adapter/gemma-4-26b-vision"
+  default_edge_types:
+    - "related_to"
+    - "composes_with"
+    - "alternative_to"
+    - "extends"
+    - "emits_signal"
+    - "consumes_signal"
+    - "mitigates"
+    - "depends_on_taxonomy"
+  min_confidence: 0.6
+  closed_id_set: true        # drop edges to IDs not in the catalog
+  prompt_template: |
+    You are tagging a single catalog primitive with graph edges that
+    help other developers find related components. Read the manifest
+    JSON below and emit ONLY edges that you have strong evidence for.
+    Use real IDs from the peer list when possible; never invent IDs.
+
+    MANIFEST:
+    {manifest_json}
+
+    PEER PRIMITIVES (real IDs you may reference):
+    {peer_ids}
+
+    ALLOWED EDGE TYPES:
+    {edge_types_list}
+
+    Respond with a JSON object of shape:
+    {{
+      "nodes": [{{"id": "...", "kind": "...", "label": "...",
+                  "source_anchor": "manifest.id"}}],
+      "edges": [{{"src_id": "<this manifest's id>", "rel": "...",
+                  "dst_id": "...", "confidence": 0..1, "rationale": "..."}}]
+    }}
+
+tags: ["graph", "indexing", "gemma-4", "catalog-builder", "concept-graph"]
+
+related_patterns:
+  - "pattern/concept-graph-from-text"
+  - "pattern/refuse-on-redacted"

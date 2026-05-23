@@ -1,5 +1,11 @@
 # Open Harness Hub
 
+> **Repository history note.** This project previously lived at
+> `github.com/taylor-s-amarel/open-harness-hub`. Its canonical home is now
+> [`github.com/Amarel-Taylor-Scott/open-harness-hub`](https://github.com/Amarel-Taylor-Scott/open-harness-hub).
+> All git history is preserved; the old URL may continue to resolve via
+> GitHub's automatic redirect but new pushes go to the new account.
+
 > A host-agnostic, industry-agnostic catalog of **harnesses**, **knowledge
 > objects**, **logic packs**, **rule packs** (GREP / RAG / classifier /
 > heuristic), **tools**, **pipelines**, **benchmarks**, and **rubrics** for
@@ -62,16 +68,16 @@ Both goals share the same primitives. The catalog is the substrate.
     rules have been LIVE-TESTED — see `data/esg-grep-findings.json`
     and `docs/use-cases/esg-supply-chain-due-diligence.md`.
   - **Kaggle-mined verified pipelines** — 24 verified-evidence shapes
-    each attributed to a real Kaggle kernel or production GitHub
-    repo (LoRA-QLoRA pairwise pref, TF-IDF+LightGBM, DeBERTa,
+    each attributed to a permissively-licensed source repo or
+    competition kernel with explicit author + URL + license in the
+    manifest (LoRA-QLoRA pairwise pref, TF-IDF+LightGBM, DeBERTa,
     Self-RAG concrete, code-act Jupyter, SWE-patch sample-and-
     review, STORM persona curation, deep-research supervisor-
     workers, multi-agent debate, GraphRAG, quantized inference,
     synthetic data gen, perplexity baseline, large-model FAISS
     RAG, multi-model ensemble, LLM-judge essay grading, 20-
     questions agent, plus vLLM batch / AWQ / Qwen-EEDI rerank /
-    DeepSeek-R1 code-interpreter / two-time-retrieval — see
-    `docs/research/kernel-mining-findings.md`).
+    DeepSeek-R1 code-interpreter / two-time-retrieval).
 - **20 named design patterns** (Self-RAG, ReAct, ToT, SoT, Reflexion,
   Self-Refine, Plan-Execute, Orchestrator-Workers, Evaluator-
   Optimizer, Multi-Agent-Debate, Routing, Prompt-Chaining,
@@ -109,18 +115,13 @@ The full list and the `pipeline_kind` vocabulary live in
 
 ## Where new content comes from
 
-Three ingest paths feed the catalog (see `taxonomy/SPEC.md §12`):
+Two ingest paths feed the catalog (see `taxonomy/SPEC.md §12`):
 
 1. **Direct PRs** — a contributor writes a manifest and opens a PR.
-2. **Reference repos** — curators hand-port patterns from established
-   harness/safety repos (e.g. DueCare, llm-safety-framework).
-3. **Kaggle harness mining** — a scheduled crawler reads Kaggle competition
-   notebooks (Gemma hackathon, LMSYS, retrieval challenges, agent
-   competitions, image-gen competitions), detects harness-shaped patterns
-   in the kernel code, and emits draft manifests under
-   `catalog/_inbox/` for curator review. The crawler is itself a
-   pipeline in this catalog — see `scripts/mine_kaggle_harnesses.py` and
-   `docs/howto/mine-kaggle-harnesses.md`.
+2. **Reference ports** — curators hand-port patterns from established
+   permissively-licensed harness/safety repos (e.g. DueCare,
+   llm-safety-framework) with full upstream attribution + license
+   propagation.
 
 ## Quick tour
 
@@ -183,10 +184,9 @@ python3 scripts/demo_vendor_onboarding.py     # kitchen-sink: ESG + AppSec + Leg
 - **MedLabel** (Gemma 4 Good Hackathon 2026) — offline-first
   multilingual medicine-safety AI. Reference shape integrated;
   author confirmation pending.
-- **27 verified-evidence pipelines** mined from 107 top-voted Kaggle
-  kernels across 33 competition families. Each pipeline manifest
-  references its source kernel(s) + author(s) + vote counts. See
-  [`docs/research/kaggle-mining-96-kernels-report.md`](docs/research/kaggle-mining-96-kernels-report.md).
+- **27 verified-evidence pipelines** ported from permissively-licensed
+  competition kernels and production repos. Each pipeline manifest
+  references its source(s) + author(s) + license in the manifest header.
 - **Hassan Gasim's "Docker-Hub-for-harnesses" framing** seeded the
   portable spec at [`docs/spec/HARNESS_HUB_SPEC.md`](docs/spec/HARNESS_HUB_SPEC.md)
   and the peer-registry comparison at

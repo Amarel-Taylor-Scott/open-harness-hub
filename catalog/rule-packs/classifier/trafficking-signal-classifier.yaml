@@ -1,0 +1,119 @@
+id: "rule-pack/classifier-trafficking-signal"
+type: rule-pack
+version: "0.1.0"
+name: "Trafficking-signal classifier (UGC second-stage)"
+description: |
+  Second-stage classifier rules invoked after
+  `rule-pack/grep-human-trafficking-ugc-flags` fires. The GREP pack
+  catches surface-level cues; this classifier pack is a labeled-example
+  bundle for the LLM judge to weigh whether the post fits a
+  recognized trafficking typology (Polaris Project taxonomy of 25
+  types, condensed here to the most-frequent UGC-platform-visible
+  cases).
+
+  Used by `pattern/two-stage-extract-then-judge`: stage-1 extracts
+  every relevant field (advertised service, claimed identity, control
+  markers, transit cues, contact pathway); stage-2 (this pack) scores
+  the extracted JSON against the typology and emits a confidence per
+  typology slot. Composite confidence flowing into
+  `pattern/critical-tier-output-override` controls the routing.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["compliance", "media", "humanitarian", "humanitarian.trafficking"]
+capability: ["classification"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "dated"
+tags: ["trust-and-safety", "trafficking", "anti-trafficking", "polaris"]
+created: "2026-05-22"
+updated: "2026-05-22"
+
+attribution:
+  source_url: "https://polarisproject.org/the-typology-of-modern-slavery/"
+  source_kind: "other"
+  author: "Polaris Project (typology of 25 types of modern slavery)"
+  license: "public-resource"
+
+family: "classifier"
+rules:
+  - id: "sex_trafficking_escort_services"
+    label: "Sex trafficking — escort services (Polaris Type 1)"
+    examples:
+      - "Profile run by third party; victim's communications mediated by 'manager' or 'driver'; transit-circuit advertising (tour 3 cities in 1 week); explicit incall/outcall pricing combined with restricted-movement language"
+      - "Multiple women advertised at one apartment with 24/7 availability and 'no questions / no ID' messaging; rotating new girls weekly"
+    threshold: 0.55
+    severity: "critical"
+    category: "polaris.t1.sex.escort"
+  - id: "sex_trafficking_illicit_massage"
+    label: "Sex trafficking — illicit massage / health / beauty (Polaris Type 3)"
+    examples:
+      - "Storefront masquerading as massage; cash only; no licensed therapists named; lives-on-site staff with limited English; advertised on adult-services boards alongside therapeutic boards"
+      - "Asian-massage classified post with 'new girls weekly' rotating language, 24-hour availability, no website with licensure information"
+    threshold: 0.55
+    severity: "high"
+    category: "polaris.t3.sex.massage"
+  - id: "sex_trafficking_residential_brothel"
+    label: "Sex trafficking — residential brothel (Polaris Type 7)"
+    examples:
+      - "Apartment-based service advertised across multiple platforms with the same photo; controlled scheduling; victim cannot leave between appointments; debt-repayment language in correspondence"
+    threshold: 0.55
+    severity: "high"
+    category: "polaris.t7.sex.residential"
+  - id: "labor_trafficking_domestic_work"
+    label: "Labor trafficking — domestic work (Polaris Type 13)"
+    examples:
+      - "Live-in nanny/housekeeper offer with passport-hold, no off-day, no contract, wages 'paid at end of year'; family-only employer; isolation from compatriot community"
+      - "Au pair listing with visa-sponsored, transport-included, fee deducted from wages, monitored phone access"
+    threshold: 0.55
+    severity: "high"
+    category: "polaris.t13.labor.domestic"
+  - id: "labor_trafficking_agriculture"
+    label: "Labor trafficking — agriculture (Polaris Type 14)"
+    examples:
+      - "Seasonal crop crew recruitment with bundled transport+housing, recruitment-fee debt-bondage language, dorm-style housing locked at night, H-2A contract violations referenced"
+    threshold: 0.55
+    severity: "high"
+    category: "polaris.t14.labor.agriculture"
+  - id: "labor_trafficking_construction"
+    label: "Labor trafficking — construction (Polaris Type 15)"
+    examples:
+      - "Out-of-state recruitment with travel-debt repayment, on-site housing, withheld wages until 'project complete,' ID held by foreman"
+    threshold: 0.55
+    severity: "high"
+    category: "polaris.t15.labor.construction"
+  - id: "labor_trafficking_hospitality_food"
+    label: "Labor trafficking — restaurants / food service (Polaris Type 16)"
+    examples:
+      - "Restaurant-back-of-house hiring with on-site housing, fee for room deducted from wages, passport held, 16+hour shifts, no off-day, recruitment via co-ethnic broker"
+    threshold: 0.55
+    severity: "high"
+    category: "polaris.t16.labor.foodservice"
+  - id: "labor_trafficking_fishing_maritime"
+    label: "Labor trafficking — commercial fishing / maritime (Polaris Type 19)"
+    examples:
+      - "Fishing crew recruitment for IUU vessel; multi-month at-sea, no contract or signed-on-arrival, recruitment-fee deduction, threats to abandon at sea, document retention by captain"
+    threshold: 0.55
+    severity: "critical"
+    category: "polaris.t19.labor.fishing"
+  - id: "victim_disclosure_help_seeking"
+    label: "Victim disclosure / help-seeking — proxy or self"
+    examples:
+      - "First-person statement that the writer is held, trafficked, monitored, or unable to leave; or third-party writing on behalf with corroborating control markers (phone-monitored, passport-held, no off-day)"
+    threshold: 0.40
+    severity: "critical"
+    category: "polaris.victim.disclosure"
+  - id: "csam_suspicion_route_to_ncmec"
+    label: "CSAM suspicion → NCMEC route (NO model classification)"
+    examples:
+      - "Any minor-age dispute signal co-occurring with commercial-sex advertising"
+    threshold: 0.0
+    severity: "critical"
+    category: "ncmec.referral.csam_route"
+    notes: |
+      This rule short-circuits to `pattern/critical-tier-output-override`
+      and assembles an 18 USC 2258A referral packet WITHOUT model
+      classification of suspected CSAM material. The model never
+      describes, scores, or judges suspected CSAM; the moderator-queue
+      assembly is keyword-routed only.

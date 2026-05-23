@@ -13,7 +13,7 @@ short_description: Browse + run the 360+ catalog harnesses across 24 industry ve
 
 # Open Harness Hub — Playground
 
-Pick any pipeline from the [Open Harness Hub](https://github.com/taylor-s-amarel/open-harness-hub)
+Pick any pipeline from the [Open Harness Hub](https://github.com/Amarel-Taylor-Scott/open-harness-hub)
 catalog (363 validated manifests, 24 industry verticals), plug in
 sample data, and watch the DAG execute step-by-step. This Space
 reads pipelines directly from the catalog at runtime.
@@ -92,7 +92,7 @@ Annex IV, SPDX 3.0.
 ## Run locally
 
 ```bash
-git clone https://github.com/taylor-s-amarel/open-harness-hub
+git clone https://github.com/Amarel-Taylor-Scott/open-harness-hub
 cd open-harness-hub
 pip install -r requirements.txt
 python hf-space/app.py

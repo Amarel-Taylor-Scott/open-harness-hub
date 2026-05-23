@@ -53,7 +53,6 @@ open-harness-hub/                         # repo root
 │   ├── build_catalog_pages.py
 │   ├── run_pipeline.py
 │   ├── new.py
-│   ├── mine_kaggle_harnesses.py
 │   ├── db/build_vector_index.py
 │   └── emit/                             # standards emitters
 │       ├── croissant.py

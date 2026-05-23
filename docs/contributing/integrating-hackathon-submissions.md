@@ -200,7 +200,7 @@ author for the catalog port specifically.
 
 ## How to submit
 
-1. Fork [github.com/taylor-s-amarel/open-harness-hub](https://github.com/taylor-s-amarel/open-harness-hub)
+1. Fork [github.com/Amarel-Taylor-Scott/open-harness-hub](https://github.com/Amarel-Taylor-Scott/open-harness-hub)
 2. Create your artifacts in `catalog/personas/...`, `catalog/pipelines/...`, etc.
 3. Run `python scripts/validate.py` - must report `all manifests valid`
 4. Run `python scripts/build_index_page.py` to refresh `docs/INDEX.md`
