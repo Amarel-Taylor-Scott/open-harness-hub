@@ -1,0 +1,55 @@
+id: "processor/skeleton-outliner"
+type: processor
+version: "0.1.0"
+name: "Skeleton outliner (Skeleton-of-Thought)"
+description: |
+  Generate a skeleton (bullet outline) for a long-form output, then
+  return the outline so parallel sub-expansion can fan out per bullet.
+  Used by Skeleton-of-Thought, STORM, and any pattern that benefits
+  from outline-then-expand.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["ai", "media", "education"]
+capability: ["generation", "planning"]
+modality:   ["text"]
+lifecycle:  "experimental"
+lifecycle_position: "pre_api.context_assembly"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "outline.skeleton"
+deterministic: false
+idempotent: true
+streaming: false
+latency_budget_ms: 1500
+
+inputs:
+  - name: "topic"
+    type: "string"
+  - name: "max_sections"
+    type: "integer"
+  - name: "style"
+    type: "enum[wiki, blog, technical_report, executive_summary]"
+  - name: "curated_knowledge"
+    type: "string"
+outputs:
+  - name: "outline"
+    type: "object[]"
+
+side_effects: "external_call"
+on_error: "fallback"
+
+model_targets:
+  - id: "local_model"
+    transport: "ollama"
+    label: "Local model for outlining"
+    role: "Generates the bullet outline for downstream parallel expansion."
+    required: false
+    default: true
+    trust_boundary: "local"
+
+implementations:
+  - kind: "callable"
+    path: "processors.skeleton_outliner.run"

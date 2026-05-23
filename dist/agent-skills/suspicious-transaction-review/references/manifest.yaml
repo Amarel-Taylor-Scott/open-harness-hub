@@ -1,0 +1,112 @@
+id: "pipeline/suspicious-transaction-review"
+type: pipeline
+version: "0.1.0"
+name: "Suspicious Transaction Review"
+description: |
+  Given a transaction bundle (account, recent transactions, related
+  entities), produce a sanctions-first risk review, FATF typology
+  scoring, and a SAR-style narrative DRAFT (never a SAR filing). PHI
+  / financial PII is redacted before any model call; sanctions hits
+  halt the routine review and route to escalation.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["finance", "finance.aml"]
+capability: ["classification", "verification", "tool_use", "safety_gating"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+task: |
+  Review a transaction bundle for suspicious activity. Output a
+  sanctions-first risk review, FATF typology matches with evidence,
+  and a SAR-style narrative draft for BSA officer review.
+pipeline_kind: "classify"
+
+inputs:
+  - name: "account_id"
+    type: "string"
+  - name: "narrative"
+    type: "string"
+  - name: "transactions"
+    type: "TransactionEdge[]"
+  - name: "related_entities"
+    type: "Entity[]"
+
+outputs:
+  - name: "sanctions_hits"
+    type: "SanctionsHit[]"
+  - name: "typology_matches"
+    type: "TypologyMatch[]"
+  - name: "narrative_draft"
+    type: "markdown"
+  - name: "risk_score"
+    type: "number"
+  - name: "escalation"
+    type: "enum[route_to_OFAC, enhanced_due_diligence, monitor, close]"
+
+defaults:
+  persona: "persona/aml-analyst"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/fatf-typologies-sample"
+    - "knowledge-pack/sanctions-list-shape"
+  rule_packs:
+    - "rule-pack/financial-pii-en"
+    - "rule-pack/sanctions-screening"
+    - "rule-pack/aml-typologies-fatf"
+
+steps:
+  - id: "redact_pii"
+    kind: "harness"
+    ref: "harness/redact-pii-text"
+    inputs:
+      text: "$.inputs.narrative"
+
+  - id: "sanctions_screen_entities"
+    kind: "tool"
+    ref: "tool/sanctions-check"
+    inputs:
+      normalized_name: "$.inputs.related_entities[0].normalized_name"
+      lists: ["ofac_sdn", "un_consolidated", "eu_consolidated"]
+      threshold: 0.92
+
+  - id: "graph_query"
+    kind: "tool"
+    ref: "tool/transaction-graph-query"
+    inputs:
+      seed_account: "$.inputs.account_id"
+      direction: "both"
+      max_hops: 2
+      time_window_days: 30
+
+  - id: "typology_score"
+    kind: "rule_pack"
+    ref: "rule-pack/aml-typologies-fatf"
+    inputs:
+      text: "$.steps.redact_pii.output.redacted_text"
+
+  - id: "retrieve_fatf"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/fatf-typologies-sample"
+    inputs:
+      query: "$.steps.redact_pii.output.redacted_text"
+      top_k: 4
+
+  - id: "investigate"
+    kind: "harness"
+    ref: "harness/aml-investigation"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Compose a sanctions-first review, FATF typology matches with cited evidence, and a SAR-style narrative DRAFT. Halt to escalation if any sanctions hit."}]
+      context:
+        - "$.steps.sanctions_screen_entities.output.matches"
+        - "$.steps.graph_query.output"
+        - "$.steps.typology_score.output.fired"
+        - "$.steps.retrieve_fatf.output.docs"
+
+success_criteria:
+  - rubric: "rubric/aml-investigation-v1"
+    threshold: 0.80

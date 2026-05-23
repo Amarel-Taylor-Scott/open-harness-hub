@@ -1,0 +1,48 @@
+id: "pattern/anti-un-cited-extraction"
+type: pattern
+version: "0.1.0"
+name: "Anti-pattern: Un-cited extraction"
+description: "Pipeline extracts fields from a document but the output does not include a (page, span) pointer back to the source. Downstream consumers cannot verify; mistakes propagate silently; the LLM's authoring style smooths over fabrications."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["cross_industry", "compliance", "legal", "healthcare"]
+capability: ["extraction"]
+modality: ["text"]
+lifecycle: "stable"
+trust_boundary: "local"
+created: "2026-05-22"
+updated: "2026-05-22"
+
+when_to_use:
+  - "This is an anti-pattern. Do NOT use it."
+
+structural_shape:
+  - "WRONG: {invoice_total: $4,231, invoice_date: 2026-03-12, vendor: 'ACME'} — no source pointers."
+  - "RIGHT: {invoice_total: {value: $4,231, page: 2, span: [104, 110]}, ...}"
+  - "RIGHT: missing field returns null + reason ('not found' vs 'redacted' vs 'illegible')."
+
+problem: |
+  Un-cited extraction is the difference between 'evidence-grounded' and
+  'narrative-grounded' AI. The model writes confidently from training-data
+  priors when the document is silent — and the downstream consumer can't
+  tell. Compliance audits, medical chart abstraction, contract review, ESG
+  due diligence all silently degrade when extraction is un-cited.
+
+solution: |
+  Every extracted field carries (value, page, span, confidence, reason).
+  Reason is enum: extracted | inferred | redacted | not_found | illegible.
+  Refuse-on-redacted (see related pattern) overrides positive extraction.
+
+implementing_pipelines:
+  - "pipeline/bill-info-extract-fraud-detect-recommend"
+  - "pipeline/citemind-pdf-to-research-wiki"
+
+related_patterns:
+  - "pattern/refuse-on-redacted"
+  - "pattern/local-first-with-cited-answers"
+  - "pattern/two-stage-extract-then-judge"
+
+counter_patterns:
+  - "Use the (value, page, span) envelope on every extraction."
+
+tags: ["anti-pattern", "extraction", "citation", "hallucination"]

@@ -1,0 +1,53 @@
+id: "processor/audit-trace-emitter"
+type: processor
+version: "0.1.0"
+name: "Audit trace emitter"
+description: |
+  Emit a per-step audit trace including hashed input/output, model
+  version, adapter, applied layers, latency, and cost. Writes to a
+  configured sink (local JSONL, Loki, OpenTelemetry, SIEM).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["evaluation"]
+modality:   ["structured"]
+lifecycle:  "stable"
+lifecycle_position: "post_api.audit"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "audit.trace"
+deterministic: true
+idempotent: false
+streaming: true
+latency_budget_ms: 5
+
+inputs:
+  - name: "step_id"
+    type: "string"
+  - name: "input_sha256"
+    type: "string"
+  - name: "output_sha256"
+    type: "string"
+  - name: "adapter_id"
+    type: "artifact_id"
+  - name: "applied_layers"
+    type: "string[]"
+  - name: "ms"
+    type: "number"
+  - name: "cost_usd"
+    type: "number"
+outputs:
+  - name: "trace_id"
+    type: "string"
+
+side_effects: "write"
+on_error: "continue"
+
+implementations:
+  - kind: "callable"
+    path: "processors.audit_trace.run"
+  - kind: "http"
+    url: "https://opentelemetry.example.local/v1/traces"

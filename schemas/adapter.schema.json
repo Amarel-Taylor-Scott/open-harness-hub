@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/adapter.schema.json",
+  "title": "Model adapter manifest",
+  "allOf": [
+    { "$ref": "_common.schema.json#/$defs/envelope" },
+    {
+      "type": "object",
+      "required": ["transport", "capabilities", "auth", "cost_model"],
+      "properties": {
+        "type":          { "const": "adapter" },
+        "transport":     { "$ref": "_common.schema.json#/$defs/modelTransport" },
+        "capabilities":  { "type": "array", "items": { "type": "string" } },
+        "auth":          { "type": "string", "enum": ["none", "api_key", "oauth", "local_only", "byok"] },
+        "cost_model":    { "type": "string", "enum": ["free", "freemium", "paid", "self_hosted"] },
+        "endpoint":      { "type": "string" },
+        "default_model": { "type": "string" }
+      }
+    }
+  ]
+}

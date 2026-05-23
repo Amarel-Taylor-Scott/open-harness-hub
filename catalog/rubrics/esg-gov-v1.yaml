@@ -1,0 +1,56 @@
+id: "rubric/esg-gov-v1"
+type: rubric
+version: "0.1.0"
+name: "ESG governance (G) sub-rubric v1"
+description: |
+  Six-dimension rubric for grading ONLY the governance dimension of
+  a supplier disclosure. Aligned to OECD MNE Guidelines (Chapter II
+  general policies + Chapter VII anti-bribery), UK Bribery Act 2010,
+  US FCPA, EU 2019/1937 (whistleblower), and ISO 37001.
+
+  Use this when you want focused G-grading; use
+  `rubric/esg-supplier-compliance-v1` for combined E+S+G grading.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["esg", "compliance", "finance"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+dimensions:
+  - id: "g_beneficial_ownership"
+    label: "G: UBO disclosure (natural persons named) with no nominee-only structure"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "ubo_table covers ≥ 25% ownership thresholds; no nominee_only chains"
+  - id: "g_anti_bribery_program"
+    label: "G: ISO 37001-equivalent anti-bribery program + facilitation-payment policy"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "abp_policy_ref + facilitation_payment_policy_ref + last_training_date within 12 months"
+  - id: "g_third_party_dd"
+    label: "G: Risk-based due diligence on third-party agents, consultants, distributors"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "third_party_dd_policy_ref + sample_dd_files for top-N intermediaries"
+  - id: "g_whistleblower_channel"
+    label: "G: EU-2019/1937-compliant whistleblower channel (independent, confidential, retaliation-protected)"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "whistleblower_channel_ref + independence_attestation + reports_received_yoy"
+  - id: "g_sanctions_pep_screening"
+    label: "G: Sanctions + PEP screening of counterparties at onboarding + periodic"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "screening_vendor_ref + list_refresh_cadence + sanctions_hits_resolved_count"
+  - id: "g_board_oversight"
+    label: "G: Board-level ESG oversight per CSDDD Art. 26"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "board_committee_charter_ref + ESG_review_cadence_per_year"
+
+scoring_method: "weighted_sum"

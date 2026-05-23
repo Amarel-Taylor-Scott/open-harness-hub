@@ -1,0 +1,55 @@
+id: "processor/structured-to-prose"
+type: processor
+version: "0.1.0"
+name: "Structured JSON → prose normalizer (for GREP-style rule packs)"
+description: |
+  Walk a JSON object and emit one prose-like line per leaf value,
+  flattening dict keys into space-separated labels. The output shape
+  is what GREP-family rule packs (regex on natural-language prose)
+  expect — converting structured supplier disclosures, audit
+  reports, or KYC packets into a form where pattern detection
+  works correctly.
+
+  Without this step, patterns like `\b(passport)\s+(held|retained)`
+  miss "passport_location: Held by the workshop" because the
+  underscore-separated key prevents direct adjacency. The processor
+  emits `passport location: Held by the workshop` — and the pattern
+  fires correctly.
+
+  Used by `pipeline/supplier-policy-grading` between the PII-
+  redaction step and the GREP step.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["esg", "supply_chain", "compliance", "cross_industry"]
+capability: ["format_conversion"]
+modality:   ["text", "structured"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "pre_api.format_convert"
+tags: ["json-to-prose", "grep-prep", "structured-text"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "format_convert.structured_to_prose"
+deterministic: true
+side_effects: "none"
+
+inputs:
+  - name: "data"
+    type: "object"
+  - name: "max_depth"
+    type: "integer"
+  - name: "join_lines"
+    type: "boolean"
+outputs:
+  - name: "prose"
+    type: "string"
+  - name: "lines"
+    type: "string[]"
+
+config:
+  default_max_depth: 8
+  default_join_lines: true
+  key_normalization: "underscore_to_space"
+  line_format: "{label}: {value}"

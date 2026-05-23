@@ -1,0 +1,106 @@
+id: "pipeline/multi-doc-qa-subquestion"
+type: pipeline
+version: "0.1.0"
+name: "Multi-document QA with sub-question decomposition"
+description: |
+  LlamaIndex's SubQuestionQueryEngine pattern in pipeline form. The user
+  asks a compound question; an LLM decomposes it into sub-questions;
+  each sub-question runs its own retrieval; per-sub-question answers
+  are aggregated with citations. Strong for "compare X across N docs"
+  questions where naive RAG fails.
+
+  Chain: persona → grep (input guard) → decompose → per-sub-Q retrieve
+  → per-sub-Q answer → aggregate-cite → output verify.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["retrieval", "reasoning", "verification"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+task: |
+  Decompose a compound question into N sub-questions, run independent
+  retrieval per sub-question, generate per-sub-question answers, and
+  aggregate into a single cited synthesis.
+pipeline_kind: "qa_documents"
+
+inputs:
+  - name: "question"
+    type: "string"
+  - name: "corpus_ref"
+    type: "artifact_id"
+  - name: "max_subquestions"
+    type: "integer"
+outputs:
+  - name: "synthesis"
+    type: "markdown"
+  - name: "per_subquestion"
+    type: "object[]"
+  - name: "citations"
+    type: "Citation[]"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/grep-prompt-injection-heuristics"
+    - "rule-pack/hybrid-retrieval-policy"
+
+steps:
+  - id: "guard_question"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.question" }
+
+  - id: "decompose"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Decompose this compound question into N <= max_subquestions atomic sub-questions, each independently answerable from the corpus. Output as a JSON array of strings."}]
+
+  - id: "retrieve_per_subquestion"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      queries: "$.steps.decompose.output.text"
+      corpus:  "$.inputs.corpus_ref"
+      top_k: 6
+
+  - id: "rerank_per_subquestion"
+    kind: "processor"
+    ref: "processor/cross-encoder-reranker"
+    inputs:
+      query: "$.steps.decompose.output.text"
+      candidates: "$.steps.retrieve_per_subquestion.output.candidates"
+      output_k: 3
+
+  - id: "answer_per_subquestion"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "For each sub-question, answer ONLY from its retrieved chunks. Cite chunks by index. Return as a JSON array of {subq, answer, citations}."}]
+      context: "$.steps.rerank_per_subquestion.output.ranked"
+
+  - id: "aggregate"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Aggregate per-sub-question answers into a single coherent synthesis answering the original question. Preserve every citation. Refuse to answer parts that had no supporting chunks."}]
+      context: "$.steps.answer_per_subquestion.output.text"
+
+  - id: "verify_citation_coverage"
+    kind: "processor"
+    ref: "processor/citation-coverage"
+    inputs:
+      response_markdown: "$.steps.aggregate.output.text"
+
+success_criteria:
+  - rubric: "rubric/research-entity-v1"
+    threshold: 0.75

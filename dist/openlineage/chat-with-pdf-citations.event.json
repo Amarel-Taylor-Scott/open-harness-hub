@@ -1,0 +1,79 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-05-20T17:02:11.974459+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "f4ddaa68-4092-4393-aff4-899c6b7f9ae0",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-05-20T17:02:11.974532+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/chat-with-pdf-citations",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "The canonical \"upload a PDF, ask questions, get cited answers\" pipeline\nused by vercel/ai-chatbot, lobe-chat, codertom/chat-with-pdf, etc. Full\nlayered chain:\n  pdf-to-text \u2192\n  recursive chunker \u2192\n  embedder (local or OpenAI) \u2192\n  hybrid retrieval policy (BM25 + dense + RRF) \u2192\n  cross-encoder reranker \u2192\n  persona (research analyst) \u2192\n  grep (PII guard on retrieved chunks before model sees them) \u2192\n  harness (text-safety-review) \u2192\n  citation-coverage verifier."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../chat-with-pdf-citations.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/chat-with-pdf-citations/output/answer_markdown",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "answer_markdown (markdown)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/chat-with-pdf-citations/output/citations",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "citations (Citation[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/chat-with-pdf-citations/output/retrieved_chunks",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "retrieved_chunks (Chunk[])"
+        }
+      }
+    }
+  ]
+}

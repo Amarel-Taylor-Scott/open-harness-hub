@@ -1,0 +1,53 @@
+id: "rubric/nuclear-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Nuclear safety review quality v1"
+description: "7-dim rubric for NRC 10 CFR + INPO review"
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["nuclear", "nuclear.power", "nuclear.security"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-21"
+updated: "2026-05-21"
+
+dimensions:
+  - id: "acute_safety_findings_first"
+    label: "LCO exceedance / unexplained scram / security breach / SNM discrepancy surfaced FIRST as critical"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "acute findings appear before other findings; severity=critical"
+  - id: "nrc_citation"
+    label: "Each finding cites 10 CFR section + ROP cornerstone"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "regulatory_citation populated per finding (10 CFR Part 20/50/73/74)"
+  - id: "ler_reporting_window"
+    label: "LER reporting — 1h/4h/8h immediate + 60-day written"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "immediate_notification_due + ler_filing_due present + within window"
+  - id: "rop_significance_color"
+    label: "ROP significance Green/White/Yellow/Red assigned + action matrix"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "rop_color + action_matrix_response present"
+  - id: "tech_spec_surveillance"
+    label: "Tech-spec surveillance current + LCO compliance verified"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "surveillance_due_date + lco_status documented"
+  - id: "physical_security_calea_drill"
+    label: "10 CFR 73.55 physical security + Force-on-Force drill current"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "fof_drill_date within 3 years; protected_area_integrity verified"
+  - id: "qa_program_app_b"
+    label: "10 CFR 50 Appendix B QA program — 18 criteria verifiable"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "qa_audit_date within 12 months + corrective_action_status current"
+
+scoring_method: "weighted_sum"

@@ -1,0 +1,253 @@
+id: "pipeline/everything-research-pipeline"
+type: pipeline
+version: "0.1.0"
+name: "Everything research pipeline (kitchen-sink, 22 passes)"
+description: |
+  A comprehensive research pipeline that demonstrates every layer the
+  hub supports — 22 distinct passes from raw input through model call
+  through iterative refinement to delivery.
+
+  This is the reference shape for "production-grade" RAG-with-everything:
+  pre-API the prompt goes through PII redact, prompt-injection guard,
+  abbreviation expansion, intent classification, query decomposition,
+  multi-query expansion, allowlist sanitization, hybrid retrieval,
+  cross-encoder rerank, citation-graph expansion, persona injection,
+  reasoning-framework selection, output-schema directive,
+  context-window packing, LLMLingua compression, cost-ceiling gate, and
+  trace attachment — THEN the LLM is called, THEN post-API the response
+  goes through citation extraction, hallucination scoring, official-source
+  verification, schema validation, self-refine critique loop, audit
+  emission, and delivery formatting.
+
+  Not every use case needs all 22 passes — pick the subset that fits.
+  Use this as a reference for what's possible.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["research", "retrieval", "reasoning", "verification", "evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "mixed"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+task: |
+  Given a research query, run it through every supported pre/post-API pass:
+  redact, guard, expand, classify, decompose, multi-query, sanitize, retrieve
+  (BM25+dense+RRF), rerank, citation-graph expand, persona, framework-select,
+  schema-inject, context-pack, compress, gate, LLM call, parse, hallucination-score,
+  official-source verify, schema-validate, iterative-revise, audit, deliver.
+pipeline_kind: "research_entity"
+
+inputs:
+  - name: "query"
+    type: "string"
+  - name: "user_id"
+    type: "string"
+  - name: "max_iterations"
+    type: "integer"
+  - name: "budget_usd"
+    type: "number"
+outputs:
+  - name: "answer_markdown"
+    type: "markdown"
+  - name: "citations"
+    type: "Citation[]"
+  - name: "confidence_per_claim"
+    type: "object[]"
+  - name: "trace"
+    type: "TraceFrame[]"
+  - name: "audit_record"
+    type: "object"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/common-abbreviations"
+    - "knowledge-pack/iso-country-codes"
+    - "knowledge-pack/owasp-top-10-llm"
+  rule_packs:
+    - "rule-pack/privacy-pii-text-en"
+    - "rule-pack/grep-ai-vendor-keys"
+    - "rule-pack/grep-prompt-injection-heuristics"
+    - "rule-pack/web-search-allowlist-default"
+    - "rule-pack/hybrid-retrieval-policy"
+
+steps:
+  # ── PRE-API: identity, gates, normalization ─────────────────────────
+  - id: "1_cost_gate"
+    kind: "processor"
+    ref: "processor/cost-ceiling-gate"
+    inputs:
+      expected_input_tokens: 8000
+      expected_output_tokens: 2000
+      adapter_ref: "adapter/ollama-default"
+      budget_usd: "$.inputs.budget_usd"
+
+  - id: "2_redact_pii"
+    kind: "harness"
+    ref: "harness/redact-pii-text"
+    inputs: { text: "$.inputs.query" }
+
+  - id: "3_grep_secrets"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-ai-vendor-keys"
+    inputs: { text: "$.steps.2_redact_pii.output.redacted_text" }
+
+  - id: "4_guard_prompt_injection"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.steps.2_redact_pii.output.redacted_text" }
+
+  # ── PRE-API: linguistic + intent ────────────────────────────────────
+  - id: "5_expand_abbreviations"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/common-abbreviations"
+    inputs: { query: "$.steps.2_redact_pii.output.redacted_text", top_k: 5 }
+
+  - id: "6_classify_intent"
+    kind: "processor"
+    ref: "processor/intent-dispatcher"
+    inputs:
+      message: "$.steps.2_redact_pii.output.redacted_text"
+      routes:
+        - { intent: "factual_lookup",    handler: "rag_pipeline" }
+        - { intent: "research_synthesis", handler: "this_pipeline" }
+        - { intent: "compare_entities",  handler: "comparison_pipeline" }
+        - { intent: "out_of_scope",      handler: "polite_refusal" }
+
+  # ── PRE-API: query optimization ─────────────────────────────────────
+  - id: "7_decompose_subquestions"
+    kind: "processor"
+    ref: "processor/sub-question-decomposer"
+    inputs:
+      compound_question: "$.steps.2_redact_pii.output.redacted_text"
+      max_subquestions: 5
+
+  - id: "8_hyde_expand"
+    kind: "processor"
+    ref: "processor/hyde-query-expander"
+    inputs:
+      query: "$.steps.7_decompose_subquestions.output.subquestions"
+
+  # ── PRE-API: retrieval ──────────────────────────────────────────────
+  - id: "9_sanitize_search_query"
+    kind: "rule_pack"
+    ref: "rule-pack/web-search-allowlist-default"
+    inputs: { queries: "$.steps.8_hyde_expand.output.expanded_query" }
+
+  - id: "10_hybrid_retrieve"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.steps.2_redact_pii.output.redacted_text"
+      corpus: "knowledge-pack/owasp-top-10-llm"
+      top_k: 20
+
+  - id: "11_web_search"
+    kind: "tool"
+    ref: "tool/web-search"
+    inputs:
+      query: "$.steps.9_sanitize_search_query.output.sanitized"
+      max_results: 10
+
+  - id: "12_verify_official_sources"
+    kind: "processor"
+    ref: "processor/official-sources-checker"
+    inputs:
+      candidates: "$.steps.11_web_search.output.results"
+      allowlist_pack_ref: "rule-pack/web-search-allowlist-default"
+
+  - id: "13_rerank"
+    kind: "processor"
+    ref: "processor/cross-encoder-reranker"
+    inputs:
+      query: "$.steps.2_redact_pii.output.redacted_text"
+      candidates: "$.steps.10_hybrid_retrieve.output.candidates"
+      output_k: 8
+
+  # ── PRE-API: assembly ───────────────────────────────────────────────
+  - id: "14_select_framework"
+    kind: "processor"
+    ref: "processor/reasoning-framework-selector"
+    inputs:
+      task_description: "$.steps.2_redact_pii.output.redacted_text"
+
+  - id: "15_pack_context"
+    kind: "processor"
+    ref: "processor/context-window-packer"
+    inputs:
+      chunks: "$.steps.13_rerank.output.ranked"
+      token_budget: 6000
+      ordering: "litm_alternating"
+      include_delimiters: true
+
+  - id: "16_compress_context"
+    kind: "processor"
+    ref: "processor/llmlingua-context-compressor"
+    inputs:
+      context: "$.steps.15_pack_context.output.packed_context"
+      instruction: "$.steps.2_redact_pii.output.redacted_text"
+      compression_rate: 0.5
+
+  - id: "17_inject_schema"
+    kind: "processor"
+    ref: "processor/inject-output-schema"
+    inputs:
+      prompt: "$.steps.16_compress_context.output.compressed"
+      schema_ref: "schemas/research_response_envelope"
+      style: "schema_plus_example"
+
+  # ── API: the model call ─────────────────────────────────────────────
+  - id: "18_llm_call"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Answer the user query using ONLY the retrieved context. Use the selected reasoning framework. Conform to the output schema. Cite every factual claim by chunk index."}]
+      context: "$.steps.17_inject_schema.output.augmented_prompt"
+
+  # ── POST-API: parse + verify ────────────────────────────────────────
+  - id: "19_hallucination_score"
+    kind: "processor"
+    ref: "processor/hallucination-scorer"
+    inputs:
+      response: "$.steps.18_llm_call.output.text"
+      prompt: "$.steps.17_inject_schema.output.augmented_prompt"
+      n_samples: 3
+
+  - id: "20_citation_coverage"
+    kind: "processor"
+    ref: "processor/citation-coverage"
+    inputs:
+      response_markdown: "$.steps.18_llm_call.output.text"
+
+  # ── POST-API: iterative refine ──────────────────────────────────────
+  - id: "21_iterative_revise"
+    kind: "processor"
+    ref: "processor/iterative-revise-loop"
+    inputs:
+      initial_prompt: "$.steps.17_inject_schema.output.augmented_prompt"
+      inner_harness_ref: "harness/text-safety-review"
+      verifier_refs:
+        - "processor/citation-coverage"
+        - "processor/hallucination-scorer"
+        - "processor/json-schema-repair"
+      max_iterations: "$.inputs.max_iterations"
+      cost_ceiling_usd: "$.inputs.budget_usd"
+      convergence_policy: "all_pass"
+
+  # ── POST-API: audit + delivery ──────────────────────────────────────
+  - id: "22_audit_trace"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "everything-research-pipeline"
+      adapter_id: "adapter/ollama-default"
+      applied_layers: ["persona", "grep", "rag", "tools", "online", "official_sources"]
+
+success_criteria:
+  - rubric: "rubric/research-entity-v1"
+    threshold: 0.80

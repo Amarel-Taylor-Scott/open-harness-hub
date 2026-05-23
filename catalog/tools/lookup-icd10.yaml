@@ -1,0 +1,45 @@
+id: "tool/lookup-icd10"
+type: tool
+version: "0.1.0"
+name: "ICD-10 lookup"
+description: |
+  Lookup an ICD-10 diagnosis code by code or label substring. Returns
+  code + label + category. Backend-agnostic; intended to bind to a
+  local copy of the WHO ICD-10 release or to an institutional
+  terminology server.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["healthcare", "healthcare.clinical"]
+capability: ["retrieval"]
+modality:   ["text", "structured"]
+lifecycle:  "stable"
+trust_boundary: "local"
+tags: ["icd10", "terminology"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+parameters:
+  type: object
+  properties:
+    query:    { type: "string", description: "ICD-10 code or label substring." }
+    max:      { type: "integer", default: 10 }
+required: ["query"]
+returns:
+  type: object
+  properties:
+    matches:
+      type: array
+      items:
+        type: object
+        properties:
+          code:     { type: "string" }
+          label:    { type: "string" }
+          category: { type: "string" }
+side_effects: "read"
+examples:
+  - input:  { query: "myocardial", max: 3 }
+    output: { matches: [{ "code": "I21.9", "label": "Acute myocardial infarction, unspecified", "category": "cardiovascular" }] }
+implementations:
+  - kind: "callable"
+    path: "tools.lookup_icd10.run"

@@ -1,0 +1,79 @@
+name: "New harness proposal"
+description: "Propose a new harness for the catalog."
+title: "[harness] "
+labels: ["proposal", "harness"]
+body:
+  - type: input
+    id: slug
+    attributes:
+      label: Proposed ID (slug only)
+      placeholder: "text-safety-review"
+    validations: { required: true }
+
+  - type: textarea
+    id: purpose
+    attributes:
+      label: What does this harness do?
+      description: "One-paragraph plain-language description."
+    validations: { required: true }
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options:
+        - model_harness
+        - safety_gate
+        - utility_surface
+    validations: { required: true }
+
+  - type: checkboxes
+    id: applied_layers
+    attributes:
+      label: Applied layers
+      options:
+        - { label: persona }
+        - { label: grep }
+        - { label: rag }
+        - { label: tools }
+        - { label: official_sources }
+        - { label: online }
+        - { label: classifier }
+        - { label: heuristic }
+        - { label: privacy }
+
+  - type: input
+    id: industry
+    attributes:
+      label: Industry / industries
+      placeholder: "healthcare.clinical, cross_industry, …"
+
+  - type: input
+    id: capability
+    attributes:
+      label: Capabilities
+      placeholder: "reasoning, retrieval, safety_gating"
+
+  - type: input
+    id: modality
+    attributes:
+      label: Modalities
+      placeholder: "text, image, audio, …"
+
+  - type: dropdown
+    id: trust_boundary
+    attributes:
+      label: Trust boundary
+      options: [local, hub, external, mixed]
+
+  - type: dropdown
+    id: eu_ai_act_risk
+    attributes:
+      label: EU AI Act risk classification
+      options: [minimal, limited, high_risk, gpai, prohibited, "not applicable"]
+
+  - type: textarea
+    id: model_targets
+    attributes:
+      label: Compatible model targets
+      placeholder: "ollama (default), openai_compatible, anthropic, …"

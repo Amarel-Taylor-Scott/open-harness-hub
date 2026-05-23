@@ -1,0 +1,58 @@
+id: "pattern/skeleton-of-thought"
+type: pattern
+version: "0.1.0"
+name: "Skeleton of Thought (SoT)"
+description: |
+  First generate a SKELETON (bullet outline) of the answer, then expand
+  each bullet IN PARALLEL via separate LLM calls. Stitch the expansions
+  into the final answer. Often used for tasks with a list-shaped output
+  where the bullets are independently expandable.
+authors:
+  - name: "Ning, Lin, Zhang, Wang, Tang (2023)"
+license: "CC-BY-4.0"
+industry:   ["ai"]
+capability: ["generation", "summarization"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+tags: ["reasoning", "sot", "parallel"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+paper_url: "https://arxiv.org/abs/2307.15337"
+paper_citation: "Ning et al. 2023, Skeleton-of-Thought: Large Language Models Can Do Parallel Decoding"
+reference_implementations:
+  - { url: "https://github.com/imagination-research/sot", language: "python" }
+
+structural_shape:
+  - "skeleton_outline (LLM produces N=4-8 bullet titles)"
+  - "for each bullet IN PARALLEL: expand_bullet (separate LLM call)"
+  - "stitch expansions into final answer (deterministic or LLM)"
+
+when_to_use:
+  - "List-shaped outputs (top-N tips, sections of an article)"
+  - "Latency optimization (parallel calls reduce wall-clock time)"
+  - "When the bullets are genuinely independent"
+
+when_not_to_use:
+  - "Tightly-coupled prose where bullets reference each other"
+  - "Single-paragraph answers (no parallelism gain)"
+
+variants:
+  - "SoT-Router: only expand selected bullets, others get a one-liner"
+  - "SoT-with-Critic: each bullet expansion is followed by a critique pass"
+
+counter_patterns:
+  - "pattern/naive-rag"
+
+implementing_pipelines: []
+
+implementing_processors:
+  - "processor/sub-question-decomposer"
+
+tradeoffs:
+  latency: "Up to N× faster (parallelizable) vs single long generation"
+  cost: "Similar total cost as single generation"
+  quality: "Strong for list-shape; weak for tightly-coupled prose"
+  complexity: "Medium — needs robust outline parser"
+  explainability: "High — outline is inspectable"

@@ -1,0 +1,45 @@
+{
+  "vendor_id":      "VND-CLEAN-001",
+  "vendor_name":    "Acme Precision Manufacturing Pte Ltd",
+  "tier":           "T1",
+  "contract_type":  "MSA",
+  "jurisdiction":   "Delaware, USA",
+  "code_language":  "python",
+  "code_framework": "flask",
+  "esg_disclosure": {
+    "supplier_id":   "ACME-T1-0042",
+    "supplier_name": "Acme Precision Manufacturing Pte Ltd",
+    "supplier_tier": "T1",
+    "submitted_at":  "2026-03-15T09:00:00Z",
+    "country":       "Singapore",
+    "iso_country":   "SG",
+    "policies": {
+      "code_of_conduct":            "All workers are recruited locally. No fees; passports remain with the worker. Hours 44/week; overtime is voluntary capped at 12/week.",
+      "anti_bribery":               "ISO 37001 certified. Annual training. Facilitation payments are prohibited.",
+      "whistleblower":              "Independent EthicsPoint channel.",
+      "environment":                "ISO 14001 certified.",
+      "climate_transition":         "SBTi-validated 1.5C target.",
+      "deforestation_due_diligence":"N/A — no EUDR commodities."
+    },
+    "ultimate_beneficial_owners": [
+      {"name": "Lim Wei Ming", "country": "SG", "ownership_pct": 55, "is_pep": false, "is_nominee": false},
+      {"name": "Tan Mei Ling", "country": "SG", "ownership_pct": 30, "is_pep": false, "is_nominee": false}
+    ]
+  },
+  "code_bundle": {
+    "app.py": "import os\nfrom flask import Flask, request, jsonify\nfrom flask_login import login_required\nfrom werkzeug.security import generate_password_hash\nimport psycopg2\nfrom dotenv import load_dotenv\nload_dotenv()\napp = Flask(__name__)\napp.config['SECRET_KEY'] = os.environ['FLASK_SECRET']\n\n@app.route('/api/users', methods=['POST'])\n@login_required\ndef create_user():\n    conn = psycopg2.connect(dsn=os.environ['DATABASE_URL'])\n    cur = conn.cursor()\n    cur.execute('INSERT INTO users (email, pw_hash) VALUES (%s, %s)', (request.json['email'], generate_password_hash(request.json['password'])))\n    conn.commit()\n    return jsonify({'status':'created'}), 201\n"
+  },
+  "contract": {
+    "contract_id":   "MSA-2026-0042",
+    "sections": {
+      "indemnity":   "Each party agrees to indemnify the other for direct damages, subject to the cap on liability in Section 5.",
+      "liability_cap": "EXCEPT FOR breach of confidentiality, IP infringement, gross negligence, willful misconduct, and indemnification, each party's aggregate liability shall not exceed 12 months of fees.",
+      "ip":          "Vendor assigns deliverables; retains pre-existing IP and grants Customer a perpetual royalty-free license.",
+      "data_protection": "GDPR Art. 28-compliant Data Processing Addendum at Schedule B applies.",
+      "audit":       "Customer may, upon 30 days notice, audit Vendor's compliance with security controls once per year.",
+      "compliance":  "Each party warrants compliance with the UK Bribery Act 2010, US FCPA, OECD Anti-Bribery Convention, and OFAC sanctions.",
+      "termination": "Either party may terminate for convenience upon 90 days written notice. Customer shall pay for Services performed.",
+      "assignment":  "Neither party may assign without consent except in connection with merger/acquisition."
+    }
+  }
+}

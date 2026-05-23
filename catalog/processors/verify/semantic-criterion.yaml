@@ -1,0 +1,46 @@
+id: "processor/verify-semantic-criterion"
+type: processor
+version: "0.1.0"
+name: "Semantic-similarity success-criterion evaluator"
+description: |
+  Evaluates one `kind: semantic` success criterion. Computes
+  embedding similarity between the target text and each reference
+  topic in `must_cover`; passes if EVERY topic clears
+  `similarity_threshold`. Implementation uses an embedder adapter
+  (default `adapter/bge-embeddings-local`).
+
+  Use this when regex is too brittle ("output mentions
+  HIPAA-equivalent context" — could be phrased many ways).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["verification", "evaluation", "embedding"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+lifecycle_position: "post_api.verify"
+tags: ["success-criterion", "semantic", "embedding", "verification"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+process_kind: "verify.semantic_criterion"
+deterministic: false
+side_effects: "external_call"
+
+inputs:
+  - name: "target_text"
+    type: "string"
+  - name: "must_cover"
+    type: "string[]"
+  - name: "embedder_ref"
+    type: "artifact_id"
+  - name: "similarity_threshold"
+    type: "number"
+outputs:
+  - name: "pass"
+    type: "boolean"
+  - name: "per_topic_similarity"
+    type: "object"
+  - name: "min_similarity"
+    type: "number"

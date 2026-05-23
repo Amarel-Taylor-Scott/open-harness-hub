@@ -1,0 +1,50 @@
+id: "tool/google-geocode"
+type: tool
+version: "0.1.0"
+name: "Google Maps Geocoding (address → lat/lng)"
+description: |
+  Forward and reverse geocoding via Google Maps Geocoding API.
+  Returns lat/lng + place_id + formatted_address + address_components
+  (street_number / route / locality / admin_area_level_1 / country).
+
+  Requires GOOGLE_MAPS_API_KEY env var. Free tier: ~$0 up to $200/mo.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry", "retail", "real_estate", "transportation"]
+capability: ["verification", "extraction"]
+modality:   ["text", "structured"]
+lifecycle:  "stable"
+trust_boundary: "external"
+tags: ["geocoding", "google-maps", "lat-lng"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+parameters:
+  type: object
+  properties:
+    address:        { type: "string", description: "Forward geocoding: free-form address." }
+    latlng:         { type: "string", description: "Reverse geocoding: 'lat,lng' string." }
+    region:         { type: "string", description: "ccTLD-style region biasing, e.g. 'us'." }
+    language:       { type: "string", default: "en" }
+  oneOf:
+    - { required: ["address"] }
+    - { required: ["latlng"] }
+returns:
+  type: object
+  properties:
+    results:
+      type: array
+      items:
+        type: object
+        properties:
+          place_id:           { type: "string" }
+          formatted_address:  { type: "string" }
+          location:           { type: "object", properties: { lat: {type:"number"}, lng: {type:"number"} } }
+          location_type:      { type: "string", enum: ["ROOFTOP", "RANGE_INTERPOLATED", "GEOMETRIC_CENTER", "APPROXIMATE"] }
+          address_components: { type: "array" }
+    status: { type: "string", enum: ["OK", "ZERO_RESULTS", "OVER_QUERY_LIMIT", "REQUEST_DENIED", "INVALID_REQUEST", "UNKNOWN_ERROR"] }
+side_effects: "external_call"
+implementations:
+  - kind: "callable"
+    path: "tools.google_geocode.run"

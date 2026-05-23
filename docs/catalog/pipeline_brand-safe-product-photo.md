@@ -1,0 +1,176 @@
+# Brand-Safe Product Photo
+
+*pipeline* · `pipeline/brand-safe-product-photo` · v0.1.0 · experimental
+
+Image-generation pipeline that composes a cinematic-photography
+persona, style-reference RAG, lens-physics RAG, GREP guard rules,
+a tool call to a text-to-image model, and an output-safety review.
+Demonstrates that image-gen is a normal citizen of the catalog: it
+uses the same primitives as a text pipeline.
+
+| axis | value |
+|---|---|
+| industry | creative, retail |
+| capability | generation, image_synthesis, safety_gating |
+| modality | image, text |
+| lifecycle | experimental |
+| trust_boundary | mixed |
+| license | MIT |
+
+
+
+## Task
+
+Given a product brief (name, category, brand tone, optional reference
+image), produce a cinematic product photo prompt + image that obeys
+brand-safety rules and produces verifiable lens physics.
+
+**pipeline_kind:** `generate_image`
+
+## Steps
+
+| # | id | kind | ref | when |
+|---|---|---|---|---|
+| 1 | `guard_input` | rule_pack | `rule-pack/grep-prohibited-terms` | — |
+| 2 | `retrieve_style` | knowledge_pack | `knowledge-pack/style-references-cinematic` | — |
+| 3 | `retrieve_physics` | knowledge_pack | `knowledge-pack/lens-physics-primers` | — |
+| 4 | `shape_prompt` | harness | `harness/text-safety-review` | — |
+| 5 | `txt2img` | tool | `tool/txt2img-sdxl` | — |
+| 6 | `review_output` | rule_pack | `rule-pack/grep-output-safety-image` | — |
+
+## Sample runs
+
+### ceramic-mug-noir
+```json
+{
+  "pipeline": "pipeline/brand-safe-product-photo",
+  "scenario": "ceramic-mug-noir",
+  "inputs": {
+    "brief": {
+      "name": "Ceramic mug",
+      "category": "tabletop",
+      "brand_tone": "moody noir",
+      "shot_type": "portrait-85mm",
+      "description": "studio shot of a navy ceramic mug, no logos"
+    }
+  },
+  "trace": [
+    {
+      "step_id": "guard_input",
+      "kind": "rule_pack",
+      "ref": "rule-pack/grep-prohibited-terms",
+      "input": {
+        "text": "studio shot of a navy ceramic mug, no logos"
+      },
+      "output": {
+        "fired": [],
+        "pack": "rule-pack/grep-prohibited-terms"
+      },
+      "ms": 2,
+      "simulated": false
+    },
+    {
+      "step_id": "retrieve_style",
+      "kind": "knowledge_pack",
+      "ref": "knowledge-pack/style-references-cinematic",
+      "input": {
+        "query": "moody noir",
+        "top_k": 4
+      },
+      "output": {
+        "docs": [
+          {
+            "id": "moody-noir",
+            "score": 0.94,
+            "descriptor": "low-key lighting, single hard key light at 45 degrees, deep shadows, monochrome with a single accent color, dramatic chiaroscuro, 35mm lens, f/2.8, ISO 800, atmosphere: tense, contemplative."
+          }
+        ]
+      },
+      "ms": 18,
+      "simulated": false
+    },
+    {
+      "step_id": "retrieve_physics",
+      "kind": "knowledge_pack",
+      "ref": "knowledge-pack/lens-physics-primers",
+      "input": {
+        "query": "portrait-85mm",
+        "top_k": 2
+      },
+      "output": {
+        "docs": [
+          {
+            "id": "portrait-85mm",
+            "score": 0.97,
+            "descriptor": "85mm focal length compresses background, flattering for faces, typical aperture f/1.4-f/2.8 for shallow depth of field, subject distance 2-3m, narrow field of view (~28 degrees)."
+          }
+        ]
+      },
+      "ms": 14,
+      "simulated": false
+    },
+    {
+      "step_id": "shape_prompt",
+      "kind": "harness",
+      "ref": "harness/text-safety-review",
+      "input": {
+        "messages": [
+          {
+            "role": "user",
+            "content": "Compose a cinematic photography prompt for the product."
+          }
+        ]
+      },
+      "output": {
+        "text": "studio product photograph of a navy ceramic mug. 85mm lens, f/2.0, ISO 200. Single hard key light at 45 degrees from upper right; subtle fill from soft bounce on left. Monochrome palette with a single navy accent. Deep shadows in lower third. Subject distance 2.5m. Composition: rule-of-thirds, mug centered on right third. Atmosphere: tense, contemplative."
+      },
+      "ms": 720,
+      "simulated": false
+    },
+    {
+      "step_id": "txt2img",
+      "kind": "tool",
+      "ref": "tool/txt2img-sdxl",
+      "input": {
+        "prompt": "studio product photograph of a navy ceramic mug. 85mm lens, f/2.0, ISO 200. Single hard key light at 45 degrees from upper right...",
+        "negative_prompt": "watermark, logo, signature, low quality, deformed",
+        "width": 1024,
+        "height": 1024
+      },
+      "output": {
+        "image_url": "https://example.com/sample/mug-noir.png",
+        "seed": 42,
+        "model": "sdxl-base-1.0"
+      },
+      "ms": 9120,
+      "simulated": true
+    },
+    {
+      "step_id": "review_output",
+      "kind": "rule_pack",
+      "ref": "rule-pack/grep-output-safety-image",
+      "input": {
+        "image_url": "https://example.com/sample/mug-noir.png"
+      },
+      "output": {
+        "fired": [],
+        "pack": "rule-pack/grep-output-safety-image"
+      },
+      "ms": 220,
+      "simulated": true
+    }
+  ],
+  "output": {
+    "final_prompt": "studio product photograph of a navy ceramic mug. 85mm lens, f/2.0, ISO 200. Single hard key light at 45 degrees from upper right...",
+    "image_url": "https://example.com/sample/mug-noir.png",
+    "safety_report": {
+      "nsfw": 0.01,
+      "watermark_present": false,
+      "celebrity_match": false
+    }
+  },
+  "model": "ollama/llama3.1:8b + sdxl-base-1.0",
+  "frozen_at": "2026-05-19T12:00:00Z",
+  "license": "MIT"
+}
+```

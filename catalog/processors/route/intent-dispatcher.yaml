@@ -1,0 +1,45 @@
+id: "processor/intent-dispatcher"
+type: processor
+version: "0.1.0"
+name: "Intent dispatcher"
+description: |
+  Classify an incoming message into one of N intents and route to the
+  appropriate downstream pipeline. Backend can be a classifier rule
+  pack, a small local model, or a keyword router.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["routing", "classification"]
+modality:   ["text"]
+lifecycle:  "experimental"
+lifecycle_position: "pre_api.classification"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "route.dispatch"
+deterministic: false
+idempotent: true
+streaming: false
+latency_budget_ms: 80
+
+inputs:
+  - name: "message"
+    type: "string"
+  - name: "routes"
+    type: "Route[]"
+outputs:
+  - name: "selected_route"
+    type: "string"
+  - name: "confidence"
+    type: "number"
+  - name: "alternatives"
+    type: "Route[]"
+
+side_effects: "none"
+on_error: "fallback"
+
+implementations:
+  - kind: "callable"
+    path: "processors.intent_dispatcher.run"

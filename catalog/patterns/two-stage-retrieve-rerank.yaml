@@ -1,0 +1,81 @@
+id: "pattern/two-stage-retrieve-rerank"
+type: pattern
+version: "0.1.0"
+name: "Two-stage retrieve + constrained rerank"
+description: |
+  Retrieve K candidates with a cheap embedder (BM25 / dense), then
+  rerank with a stronger but slower model. The reranker can be: a
+  cross-encoder, or an LLM CONSTRAINED to emit only one of the K
+  candidate IDs (via grammar / logits processor). The constrained-
+  LLM variant is what wins EEDI / similar fixed-corpus tasks because
+  the LLM can use rich reasoning but cannot hallucinate an unseen ID.
+
+  Two flavours of "second stage" — pick based on cost / quality
+  budget. The query-refinement variant (two-time retrieval) adds a
+  second retrieve pass after LLM query reformulation.
+authors:
+  - name: "Reimers & Gurevych (2019), takanashihumbert (2024)"
+license: "CC-BY-4.0"
+industry:   ["ai", "education", "scientific_research"]
+capability: ["retrieval", "reranking"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+tags: ["rag", "rerank", "constrained-decoding", "kaggle-verified"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+paper_url: "https://arxiv.org/abs/1908.10084"
+paper_citation: "Reimers & Gurevych 2019, Sentence-BERT; EEDI-AWQ 2024"
+reference_implementations:
+  - { url: "https://www.kaggle.com/code/aerdem4/eedi-qwen32b-vllm-with-logits-processor-zoo", language: "python", framework: "vllm+logits-processor-zoo" }
+  - { url: "https://www.kaggle.com/code/takanashihumbert/eedi-qwen-2-5-32b-awq-two-time-retrieval", language: "python", framework: "vllm" }
+  - { url: "https://github.com/UKPLab/sentence-transformers", language: "python", framework: "sentence-transformers" }
+
+structural_shape:
+  - "stage 1 (fast retrieve):"
+  - "  bm25_or_dense.retrieve(query, k=25)"
+  - "stage 2a (cross-encoder rerank):"
+  - "  cross_encoder.score(query, each_candidate) → top-3"
+  - "or stage 2b (constrained-LLM rerank):"
+  - "  prompt = build_prompt(query, candidate_list)"
+  - "  llm.generate(prompt, logits_processor=AllowedTokens(candidate_ids))"
+  - "  → single candidate ID"
+  - "optional: query-refinement loop (two-time retrieval)"
+  - "  refined_query = llm.summarise(query, first_pass_results)"
+  - "  re-retrieve and merge"
+
+when_to_use:
+  - "Fixed-corpus retrieval where hallucinated IDs are unacceptable (EEDI)"
+  - "When candidate-set size is small enough to fit in one LLM prompt (~50)"
+  - "When you have a budget for both a fast embedder and a strong reranker"
+
+when_not_to_use:
+  - "Open-ended generation where reranking would suppress novel-but-correct outputs"
+  - "When latency budget < 200ms (cross-encoder + LLM call too slow)"
+
+variants:
+  - "Cross-encoder rerank (Sentence-BERT, ColBERT)"
+  - "LLM-as-reranker (constrained decoding)"
+  - "Two-time retrieval (refine query between passes)"
+  - "Multi-vector fusion (RRF over multiple retrievers)"
+
+counter_patterns:
+  - "pattern/naive-rag (single retrieve, no rerank)"
+  - "pattern/rag-fusion (parallel retrieves, RRF; no rerank stage)"
+
+implementing_pipelines:
+  - "pipeline/qwen-vllm-rerank-eedi"
+  - "pipeline/two-time-retrieve-rerank"
+
+implementing_processors:
+  - "processor/cross-encoder-reranker"
+  - "processor/two-time-retrieval"
+  - "processor/vllm-batched-sampling"
+
+tradeoffs:
+  latency: "Higher than naive RAG (extra rerank pass)"
+  cost: "Embedding pass cheap; rerank pass depends on choice"
+  quality: "Substantially better on fixed-corpus tasks; modestly better on open-corpus"
+  complexity: "Medium — two retrieval pipelines + constrained-decoding wiring"
+  explainability: "High — both ranked lists are inspectable"

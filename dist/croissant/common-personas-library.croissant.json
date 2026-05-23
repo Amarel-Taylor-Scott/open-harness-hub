@@ -1,0 +1,146 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/common-personas-library",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Common personas / system-prompt library",
+  "description": "Reusable persona / system-prompt fragments for common roles —\nresearch analyst, code reviewer, customer-support agent, technical\nwriter, translator, tutor, summarizer, fact-checker, plain-language\nrewriter. Each row is a self-contained system prompt the\n`inject.persona` processor or any harness can drop in.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC0-1.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/common-personas-library",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-19",
+  "keywords": [
+    "personas",
+    "system-prompts",
+    "library"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-19",
+  "citation": "Composed by Open Harness Hub contributors. Public domain.",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "common-personas-library__common-personas",
+      "name": "common-personas.jsonl",
+      "description": "Data file backing knowledge pack common-personas-library.",
+      "contentUrl": "knowledge-packs/data/common-personas.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "5396 B",
+      "sha256": "102cfb22ba571210db6ce1bf80678ab16c577418a9ded2a590664ca2749a5c28"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "common-personas-library__records",
+      "name": "common-personas-library__records",
+      "description": "Records parsed from common-personas.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "common-personas-library__records/id",
+          "name": "id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "common-personas-library__common-personas"
+            },
+            "extract": {
+              "column": "id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "common-personas-library__records/role",
+          "name": "role",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "common-personas-library__common-personas"
+            },
+            "extract": {
+              "column": "role"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "common-personas-library__records/tone",
+          "name": "tone",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "common-personas-library__common-personas"
+            },
+            "extract": {
+              "column": "tone"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "common-personas-library__records/prompt",
+          "name": "prompt",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "common-personas-library__common-personas"
+            },
+            "extract": {
+              "column": "prompt"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

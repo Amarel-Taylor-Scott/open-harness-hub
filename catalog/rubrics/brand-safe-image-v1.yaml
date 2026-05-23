@@ -1,0 +1,45 @@
+id: "rubric/brand-safe-image-v1"
+type: rubric
+version: "0.1.0"
+name: "Brand-safe image v1"
+description: |
+  Five-dimension rubric for brand-safe image generation. Used by
+  `pipeline/brand-safe-product-photo`.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["creative", "retail"]
+capability: ["evaluation"]
+modality:   ["image", "text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+dimensions:
+  - id: "brand_safety"
+    label: "No real celebrity / trademark / NSFW content"
+    weight: 0.35
+    scale: "0..1"
+    evidence_required: "post-generation safety pack fires no critical rules"
+  - id: "prompt_obedience"
+    label: "Output matches the brief"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "CLIP-text-similarity over the prompt >= 0.30"
+  - id: "physical_plausibility"
+    label: "Lens / lighting / scale are physically plausible"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "lens-physics descriptors in the prompt are consistent"
+  - id: "watermark_presence"
+    label: "Required brand watermark present (when configured)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "watermark detector returns true OR pipeline has no watermark config"
+  - id: "aesthetic_quality"
+    label: "Aesthetic score above baseline"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "LAION-Aesthetic-v2 >= 5.5"
+scoring_method: "weighted_sum"

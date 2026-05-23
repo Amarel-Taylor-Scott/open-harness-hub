@@ -1,0 +1,62 @@
+id: "pattern/multi-agent-debate"
+type: pattern
+version: "0.1.0"
+name: "Multi-Agent Debate"
+description: |
+  Two or more LLM instances argue different sides of a question, with
+  a judge LLM scoring the arguments. Used for hard reasoning problems
+  where stress-testing a position improves accuracy. Inspired by
+  Du et al. (2023) and Anthropic's debate work.
+authors:
+  - name: "Du, Li, Torralba, Tenenbaum, Mordatch (2023); Irving, Christiano, Amodei (2018)"
+license: "CC-BY-4.0"
+industry:   ["ai"]
+capability: ["reasoning", "evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+tags: ["agent", "debate", "multi-agent"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+paper_url: "https://arxiv.org/abs/2305.14325"
+paper_citation: "Du et al. 2023, Improving Factuality and Reasoning in Language Models through Multiagent Debate"
+reference_implementations:
+  - { url: "https://github.com/microsoft/autogen", language: "python", framework: "autogen" }
+
+structural_shape:
+  - "spawn N=2-3 debater agents with different personas / sides"
+  - "round-1: each debater produces an initial position"
+  - "loop for N rounds:"
+  - "  each debater sees others' last position; refines own argument"
+  - "judge agent reads final positions; scores them"
+  - "return judge's verdict + all transcripts"
+
+when_to_use:
+  - "Controversial / nuanced questions where multiple perspectives improve accuracy"
+  - "Stress-testing a claim or recommendation"
+  - "Research / synthesis tasks where exhaustiveness matters"
+
+when_not_to_use:
+  - "Simple factual lookups"
+  - "Cost-sensitive paths (N debaters × N rounds × LLM calls)"
+
+variants:
+  - "Pairwise debate (2 agents)"
+  - "Round-table (3+ agents)"
+  - "Judge-free: vote among debaters via Borda count"
+
+counter_patterns:
+  - "pattern/orchestrator-workers (parallel independent vs adversarial)"
+
+implementing_pipelines: []
+
+implementing_processors:
+  - "processor/llm-judge"
+
+tradeoffs:
+  latency: "Long — sequential rounds"
+  cost: "High — N agents × N rounds"
+  quality: "Improved on hard reasoning; modest on easy questions"
+  complexity: "High — multi-agent state machine"
+  explainability: "Very high — full debate transcripts inspectable"

@@ -1,0 +1,53 @@
+id: "rubric/telco-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Telco compliance review quality v1"
+description: "7-dim rubric for FCC + CPNI + CALEA + STIR/SHAKEN review"
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["telecommunications", "telecommunications.fcc", "telecommunications.cpni"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-21"
+updated: "2026-05-21"
+
+dimensions:
+  - id: "cpni_breach_response_first"
+    label: "CPNI breaches / 911 outages / CALEA gaps surfaced FIRST as critical"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "acute findings appear before other findings; severity=critical"
+  - id: "regulation_citation"
+    label: "Each finding cites 47 CFR / 47 USC section"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "regulatory_citation populated per finding (47 CFR Part 4/9/64, 47 USC §222, etc.)"
+  - id: "nors_reporting_window"
+    label: "NORS outages — 120-minute initial / 30-day final windows tracked"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "outage_minutes + user_minutes + initial_report_due / final_report_due present"
+  - id: "stir_shaken_attestation"
+    label: "STIR/SHAKEN attestation level (A/B/C) documented + traceback responsiveness"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "attestation_level + traceback_24h_response_rate present"
+  - id: "calea_intercept_readiness"
+    label: "CALEA lawful-intercept capability current + tested"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "calea_capability_current=true + last_test_date within 12 months"
+  - id: "e911_reliability"
+    label: "E911 best-practices certification + ALI-routing tested"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "e911_certification_date populated + ali_accuracy_test within 12 months"
+  - id: "annual_cpni_certification"
+    label: "Annual CPNI certification filed by March 1 + dispute resolution documented"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "cpni_certification_filing_date ≤ March 1 + customer_dispute_log present"
+
+scoring_method: "weighted_sum"

@@ -1,0 +1,90 @@
+id: "rule-pack/grep-esg-governance-red-flags"
+type: rule-pack
+version: "0.1.0"
+name: "ESG governance red-flag detectors (the 'G' of ESG)"
+description: |
+  GREP detectors for the governance dimension: beneficial-ownership
+  opacity, anti-bribery / corruption signals, whistleblower-channel
+  weaknesses, conflict-of-interest, board-independence gaps, audit-
+  trail integrity. Aligned to:
+   - CSDDD Art. 26 (board oversight)
+   - OECD Anti-Bribery Convention
+   - UK Bribery Act 2010 §7 (failure-to-prevent)
+   - US FCPA (anti-bribery + books-and-records)
+   - EU Directive 2019/1937 (whistleblower protection)
+   - Wolfsberg Anti-Bribery & Corruption Principles
+   - ISO 37001 (anti-bribery management systems)
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["esg", "compliance", "finance"]
+capability: ["safety_gating", "classification"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "volatile"
+tags: ["esg", "governance", "anti-bribery", "fcpa", "whistleblower"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+family: "grep"
+rules:
+  - id: "beneficial_ownership_opaque"
+    pattern: "(?i)(ultimate beneficial owner|ubo|shareholder|owner)\\s+(?:unknown|not disclosed|confidential|n[\\.\\/]?a|undisclosed)|nominee\\s+(?:director|shareholder)|shell\\s+(?:company|entity|corporation)|name:\\s*\\(?undisclosed\\)?|is nominee:\\s*True"
+    severity: "high"
+    category: "governance.beneficial_ownership"
+
+  - id: "shell_jurisdiction"
+    pattern: "(?i)(incorporat|register|domicile)\\s+(?:in|at)\\s+(?:cayman|bvi|british virgin|bermuda|seychelles|panama|delaware (?:llc|holding)|nevis)|tax haven"
+    severity: "medium"
+    category: "governance.opaque_jurisdiction"
+
+  - id: "facilitation_payment"
+    pattern: "(?i)(?<!prohibited\\s)(?<!not\\sallowed\\s)(?<!against\\spolicy\\s)(?<!do\\snot\\spermit\\s)(facilitation|grease|expediting)\\s+(?:payment|fee|gift|consideration)(?!.{0,40}(prohibited|forbidden|not\\sallowed|against\\spolicy))|tea money|chai pani"
+    severity: "critical"
+    category: "governance.bribery"
+
+  - id: "third_party_agent_undisclosed"
+    pattern: "(?i)(third[- ]?party|local)\\s+(?:agent|consultant|representative|intermediary)\\s+.*\\b(?:no|without|absent)\\s+(?:due diligence|disclosure|written contract|onboarding)"
+    severity: "high"
+    category: "governance.third_party_risk"
+
+  - id: "conflict_of_interest_undisclosed"
+    pattern: "(?i)conflict[- ]?of[- ]?interest.*(?:not (?:disclosed|reported|declared)|undisclosed|hidden)|related[- ]?party.*(?:not disclosed|undisclosed)"
+    severity: "high"
+    category: "governance.conflict_of_interest"
+
+  - id: "whistleblower_retaliation"
+    pattern: "(?i)(whistleblower|reporter|complainant)\\s+(?:fired|dismissed|reassigned|demoted|harass|retaliat|punish|silenced)|nda.*whistleblow|gag.*employee"
+    severity: "critical"
+    category: "governance.whistleblower_retaliation"
+
+  - id: "no_grievance_mechanism"
+    pattern: "(?i)(no|absent|n[\\.\\/]a)\\s+(?:grievance|complaint|whistleblower|reporting|ethics)\\s+(?:mechanism|hotline|channel|line|process|policy)"
+    severity: "high"
+    category: "governance.no_grievance_mechanism"
+
+  - id: "board_independence_gap"
+    pattern: "(?i)(no|zero|0)\\s+independent\\s+(?:director|board member)|board.*all (?:founders|family|insiders)|founder[- ]?controlled board"
+    severity: "medium"
+    category: "governance.board_independence"
+
+  - id: "audit_trail_gap"
+    pattern: "(?i)(no|missing|not retained|destroyed|incomplete)\\s+(?:audit trail|records|ledger|books|invoice|receipts)\\s+(?:for|covering)|cash[- ]?only payments"
+    severity: "high"
+    category: "governance.audit_trail"
+
+  - id: "tax_avoidance_transfer_pricing"
+    pattern: "(?i)(transfer pricing|royalty)\\s+(?:dispute|aggressive|adjustment).*(?:>|over|exceeds?)\\s+(?:\\$|usd|eur)\\s*\\d|profit shifting|hybrid mismatch"
+    severity: "medium"
+    category: "governance.tax_planning"
+
+  - id: "sanctions_listed_counterparty"
+    pattern: "(?i)(ofac|un sanctions|eu sanctions|hmt sanctions|sdn list|consolidated list)\\s+(?:hit|match|listed)|counterparty\\s+(?:listed|sanctioned|designated)"
+    severity: "critical"
+    category: "governance.sanctions"
+
+  - id: "pep_undisclosed"
+    pattern: "(?i)(politically exposed person|pep)\\s+(?:not (?:screened|disclosed)|undisclosed)|relative.*(?:minister|head of state|government official).*not disclosed"
+    severity: "high"
+    category: "governance.pep_screening"

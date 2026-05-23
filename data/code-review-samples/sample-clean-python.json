@@ -1,0 +1,9 @@
+{
+  "sample_id":   "CR-001-clean",
+  "language":    "python",
+  "framework":   "flask",
+  "description": "Well-written Flask endpoint: parameterized SQL, env-based secret, hashed password storage, CSRF token honored.",
+  "files": {
+    "app.py": "import os\nfrom flask import Flask, request, jsonify\nfrom flask_login import login_required\nfrom werkzeug.security import generate_password_hash\nimport hashlib\nimport secrets\nimport psycopg2\nfrom dotenv import load_dotenv\n\nload_dotenv()\napp = Flask(__name__)\napp.config['SECRET_KEY'] = os.environ['FLASK_SECRET']\n\n@app.route('/api/users', methods=['POST'])\n@login_required\ndef create_user():\n    email = request.json.get('email')\n    password = request.json.get('password')\n    if not email or not password:\n        return jsonify({'error': 'missing fields'}), 400\n    # Parameterized SQL — safe against SQLi (CWE-89)\n    conn = psycopg2.connect(dsn=os.environ['DATABASE_URL'])\n    cur = conn.cursor()\n    cur.execute('INSERT INTO users (email, pw_hash, salt) VALUES (%s, %s, %s)',\n                (email, generate_password_hash(password), secrets.token_hex(16)))\n    conn.commit()\n    return jsonify({'status': 'created'}), 201\n\n@app.route('/api/profile/<int:user_id>')\n@login_required\ndef profile(user_id):\n    # Properly typed url param — no path traversal risk\n    conn = psycopg2.connect(dsn=os.environ['DATABASE_URL'])\n    cur = conn.cursor()\n    cur.execute('SELECT email, created_at FROM users WHERE id = %s', (user_id,))\n    row = cur.fetchone()\n    return jsonify({'email': row[0], 'created_at': row[1].isoformat()})\n"
+  }
+}

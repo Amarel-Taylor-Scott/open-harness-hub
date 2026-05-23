@@ -1,0 +1,68 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-05-20T17:02:11.977690+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "f180db90-343b-443e-9d25-5d0e8ff6969c",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-05-20T17:02:11.977766+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/two-time-retrieve-rerank",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Generic two-pass retrieval pipeline distilled from the EEDI-AWQ\nshape. First-pass: retrieve top-K with the raw query. Refine the\nquery using LLM summary of pass-1. Second-pass: retrieve top-K' with\nthe refined query. Union, dedupe, cross-encoder rerank. Final\noutput ranked candidates.\n\nVerified by Open Harness Hub mining of takanashihumbert \"EEDI Qwen-2.5\n32B AWQ two-time retrieval\" (650 votes). The shape generalises to\nany RAG task where the user's first query is under-specified."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors (port)",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../two-time-retrieve-rerank.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/two-time-retrieve-rerank/output/ranked",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "ranked (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/two-time-retrieve-rerank/output/refined_query",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "refined_query (string)"
+        }
+      }
+    }
+  ]
+}

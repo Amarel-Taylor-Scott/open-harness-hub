@@ -1,0 +1,174 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/spdx-licenses-summary",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "SPDX licenses (summary)",
+  "description": "Sampled summary of common SPDX licenses — permissive, copyleft,\nnon-commercial, public-domain. For each: license_id, category,\none-paragraph summary, redistribution-compatible flag, derivative\nwork permitted flag. Use the full SPDX list at spdx.org/licenses\nfor production.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC0-1.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/spdx-licenses-summary",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-19",
+  "keywords": [
+    "spdx",
+    "licenses",
+    "compliance"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-19",
+  "citation": "SPDX License List (https://spdx.org/licenses/)",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "spdx-licenses-summary__spdx-licenses-summary",
+      "name": "spdx-licenses-summary.jsonl",
+      "description": "Data file backing knowledge pack spdx-licenses-summary.",
+      "contentUrl": "knowledge-packs/data/spdx-licenses-summary.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "5278 B",
+      "sha256": "9f9510d11ecc6be10751375ca581922bcf7757393df261ba7b59df140e378295"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "spdx-licenses-summary__records",
+      "name": "spdx-licenses-summary__records",
+      "description": "Records parsed from spdx-licenses-summary.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "spdx-licenses-summary__records/id",
+          "name": "id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "spdx-licenses-summary__spdx-licenses-summary"
+            },
+            "extract": {
+              "column": "id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "spdx-licenses-summary__records/category",
+          "name": "category",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "spdx-licenses-summary__spdx-licenses-summary"
+            },
+            "extract": {
+              "column": "category"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "spdx-licenses-summary__records/summary",
+          "name": "summary",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "spdx-licenses-summary__spdx-licenses-summary"
+            },
+            "extract": {
+              "column": "summary"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "spdx-licenses-summary__records/redistribute",
+          "name": "redistribute",
+          "dataType": "sc:Boolean",
+          "source": {
+            "fileObject": {
+              "@id": "spdx-licenses-summary__spdx-licenses-summary"
+            },
+            "extract": {
+              "column": "redistribute"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "spdx-licenses-summary__records/derivative_works",
+          "name": "derivative_works",
+          "dataType": "sc:Boolean",
+          "source": {
+            "fileObject": {
+              "@id": "spdx-licenses-summary__spdx-licenses-summary"
+            },
+            "extract": {
+              "column": "derivative_works"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "spdx-licenses-summary__records/patent_grant",
+          "name": "patent_grant",
+          "dataType": "sc:Boolean",
+          "source": {
+            "fileObject": {
+              "@id": "spdx-licenses-summary__spdx-licenses-summary"
+            },
+            "extract": {
+              "column": "patent_grant"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+id: "pattern/orchestrator-workers"
+type: pattern
+version: "0.1.0"
+name: "Orchestrator-Workers"
+description: |
+  A central orchestrator decomposes the task and delegates parallel
+  subtasks to worker agents (sometimes with different personas / tools
+  per worker). Workers return structured results; orchestrator
+  aggregates. Differs from ReAct because workers operate in parallel
+  with isolated contexts.
+authors:
+  - name: "Anthropic cookbook (2024)"
+license: "CC-BY-4.0"
+industry:   ["ai", "cross_industry"]
+capability: ["planning", "agent_loop"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+tags: ["agent", "orchestrator", "multi-agent"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+paper_url: "https://anthropic.com/research/building-effective-agents"
+paper_citation: "Anthropic 2024, Building effective agents (patterns/agents/orchestrator-workers)"
+reference_implementations:
+  - { url: "https://github.com/anthropics/anthropic-cookbook/tree/main/patterns/agents", language: "python" }
+  - { url: "https://github.com/langchain-ai/open_deep_research", language: "python", framework: "langgraph" }
+
+structural_shape:
+  - "orchestrator decomposes task into N parallel subtasks"
+  - "for each subtask in parallel: worker (own context, own tools)"
+  - "workers return structured results"
+  - "orchestrator aggregates → final answer"
+
+when_to_use:
+  - "Independent subtasks that benefit from parallelism (deep research, multi-perspective writing)"
+  - "When each subtask warrants its own specialist persona"
+  - "Reduces context-window pressure (each worker has clean context)"
+
+when_not_to_use:
+  - "Tightly-coupled subtasks where workers need to coordinate mid-task"
+  - "Cost-sensitive paths (N parallel calls multiplies spend)"
+
+variants:
+  - "Supervisor pattern (LangGraph): supervisor LLM routes between workers"
+  - "Hierarchical agent teams: multi-level orchestration"
+  - "Crew (crewAI): role-based agents with structured handoff"
+
+counter_patterns:
+  - "pattern/react"
+
+implementing_pipelines:
+  - "pipeline/deep-research-with-citations"
+
+implementing_processors: []
+
+tradeoffs:
+  latency: "Wall-clock can be SHORTER than ReAct (parallel)"
+  cost: "Higher total ($/run) due to N parallel calls"
+  quality: "Strong for parallelizable tasks; clean per-worker context"
+  complexity: "Medium-high — parallel orchestration"
+  explainability: "High — each worker's output is independently inspectable"

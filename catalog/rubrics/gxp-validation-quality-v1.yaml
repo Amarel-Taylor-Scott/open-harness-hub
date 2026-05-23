@@ -1,0 +1,61 @@
+id: "rubric/gxp-validation-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "GxP validation review quality v1"
+description: |
+  Eight-dimension rubric for grading a GxP system validation review.
+  Used by `pipeline/gxp-validation-review`.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["pharma", "pharma.gxp", "compliance"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-20"
+updated: "2026-05-20"
+
+dimensions:
+  - id: "audit_trail_complete"
+    label: "Audit trail enabled + reviewed per risk-based schedule (21 CFR 11.10(e))"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "audit_trail_status='enabled' AND review_cadence_documented"
+  - id: "alcoa_attributable"
+    label: "Records attributable to individuals (no shared accounts)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "no shared_account / generic_login findings; user lifecycle managed"
+  - id: "alcoa_contemporaneous"
+    label: "Data recorded at the time of work (no backdating / post-hoc alteration)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "no post_hoc_alteration findings; entries within 24h of event"
+  - id: "alcoa_complete"
+    label: "Complete records (no selective retention, no missing audit trail meta-data)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "no manual_transcription_unverified findings; all reanalyses retained"
+  - id: "validation_current"
+    label: "System validated (IQ/OQ/PQ complete; revalidation per change-control)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "validation_status='current'; last_revalidation_date within policy"
+  - id: "signature_compliant"
+    label: "Electronic signatures with meaning (21 CFR 11.50) + 2-factor (21 CFR 11.200)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "no single_factor_signature; signature_meaning populated; biometric or 2-distinct components"
+  - id: "phi_safe"
+    label: "PHI redacted before assessment (HIPAA Safe Harbor)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "rule-pack/phi-hipaa-en fires zero critical hits"
+  - id: "capa_proposed"
+    label: "Every finding has a CAPA + change-control + revalidation timeline"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "non-empty capa, change_control_ref, revalidation_timeline_days fields"
+
+scoring_method: "weighted_sum"

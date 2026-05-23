@@ -1,0 +1,53 @@
+id: "rubric/construction-safety-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Construction safety review quality v1"
+description: "7-dim rubric — Focus Four + competent-person + corrective action"
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["construction", "construction.safety"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-20"
+updated: "2026-05-20"
+
+dimensions:
+  - id: "focus_four_assessed"
+    label: "Each finding mapped to Focus Four hazard category"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "focus_four_category ∈ {falls, struck_by, caught_in, electrocution, other}"
+  - id: "osha_section_cited"
+    label: "OSHA 1926 subpart + section cited"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "osha_1926_section field populated per finding"
+  - id: "imminent_danger_flagged"
+    label: "Imminent-danger conditions flagged as stop-work"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "imminent_danger findings have action='stop_work'"
+  - id: "competent_person_designated"
+    label: "Activities requiring competent person have one designated"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "for activity ∈ {excavation, scaffold, fall, rigging}: competent_person_name populated"
+  - id: "corrective_action_per_finding"
+    label: "Every finding has corrective action with timeline"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "corrective_action + timeline_hours populated per finding"
+  - id: "training_documented"
+    label: "Toolbox talks + JHA + competency-specific training documented"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "training_records populated"
+  - id: "ppe_program_complete"
+    label: "PPE hazard assessment + selection + training documented"
+    weight: 0.05
+    scale: "0..1"
+    evidence_required: "ppe_assessment + ppe_training fields populated"
+
+scoring_method: "weighted_sum"

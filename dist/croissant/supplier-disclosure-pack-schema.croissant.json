@@ -1,0 +1,69 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/dataset/supplier-disclosure-pack-schema",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Supplier disclosure pack schema (canonical input shape)",
+  "description": "Canonical input shape that `pipeline/supplier-policy-grading` and\n`pipeline/deep-tier-supplier-audit` accept as the supplier\ndisclosure pack. Records the JSON Schema of the supplier-submitted\nartifact so compliance teams can prepare their data once and feed\nit into any pipeline in the ESG vertical.\n\nThe pack covers: supplier identity + tier + UBO + geography + sector\n+ policy texts + self-assessment + grievance summary + audit reports\n+ GHG inventory + EUDR-relevant commodities geolocation + worker\nrepresentation. Each section is OPTIONAL — pipelines flag missing\nrequired-for-jurisdiction sections rather than fail.\n\nIncludes 3 sample disclosure packs for testing:\n - sample-T1-tech-supplier-good.json (a well-disclosed T1 supplier)\n - sample-T3-textile-mae-sot-flagged.json (a T3 supplier with\n   forced-labor + corridor red flags)\n - sample-T2-agri-paraguay-mixed.json (a T2 soy supplier with\n   mixed signals: strong S, weak E around deforestation)",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/MIT.html",
+  "url": "https://open-harness-hub.dev/dataset/supplier-disclosure-pack-schema",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-19",
+  "keywords": [
+    "esg",
+    "schema",
+    "supplier-disclosure",
+    "csddd",
+    "csrd"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-19"
+}

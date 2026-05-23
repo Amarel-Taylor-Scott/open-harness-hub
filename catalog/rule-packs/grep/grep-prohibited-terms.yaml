@@ -1,0 +1,42 @@
+id: "rule-pack/grep-prohibited-terms"
+type: rule-pack
+version: "0.1.0"
+name: "Prohibited Terms (image-gen guard rails)"
+description: |
+  GREP guard rail for image-generation pipelines. Blocks prompts that
+  reference real celebrities by name, real trademarks, hate slurs, or
+  explicit sexual content. Severity drives the pipeline's refusal vs
+  rewrite branch.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["creative", "media"]
+capability: ["safety_gating"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+tags: ["image-gen", "guard-rails"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+family: "grep"
+language: "en"
+rules:
+  - id: "celebrity_name_marker"
+    pattern: "(?i)in the (style|likeness) of [A-Z][a-z]+ [A-Z][a-z]+"
+    severity: "high"
+    category: "ip.celebrity_likeness"
+    notes: "Heuristic — flag explicit 'in the likeness of <Proper Name>' phrasing."
+  - id: "trademark_logo"
+    pattern: "(?i)\\b(nike|adidas|coca[- ]cola|disney|marvel|apple|google)\\b.*\\b(logo|swoosh|trademark)\\b"
+    severity: "high"
+    category: "ip.trademark"
+  - id: "explicit_sexual"
+    pattern: "(?i)\\b(nude|naked|nsfw|porn|explicit sexual)\\b"
+    severity: "critical"
+    category: "content.sexual"
+  - id: "hate_slur_placeholder"
+    pattern: "(?i)\\b(<hate-slur-placeholder>)\\b"
+    severity: "critical"
+    category: "content.hate"
+    notes: "Real hate-slur dictionaries are curated under a separate pack with restricted distribution."

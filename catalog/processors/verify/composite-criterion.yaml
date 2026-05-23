@@ -1,0 +1,40 @@
+id: "processor/verify-composite-criterion"
+type: processor
+version: "0.1.0"
+name: "Composite (AND/OR/NOT) success-criterion evaluator"
+description: |
+  Evaluates one `kind: composite` success criterion. Combines child
+  criteria with AND / OR / NOT semantics. Children may themselves be
+  composite — arbitrarily deep nesting allowed. Short-circuits where
+  possible (AND stops at first failure; OR stops at first pass).
+
+  Use to express: '(critical-red-flags-found AND remediation-proposed)
+  OR clean-baseline', 'PHI-redacted AND (rubric-score >= 0.7 OR
+  human-reviewed)', etc.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["verification", "evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "post_api.verify"
+tags: ["success-criterion", "composite", "boolean-logic"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+process_kind: "verify.composite_criterion"
+deterministic: true
+side_effects: "none"
+
+inputs:
+  - name: "op"
+    type: "string"
+  - name: "children"
+    type: "object[]"
+outputs:
+  - name: "pass"
+    type: "boolean"
+  - name: "child_results"
+    type: "object[]"

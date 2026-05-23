@@ -1,0 +1,53 @@
+id: "rubric/election-integrity-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Election integrity review quality v1"
+description: "7-dim rubric"
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["election_integrity", "media"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-21"
+updated: "2026-05-21"
+
+dimensions:
+  - id: "info_disorder_classified"
+    label: "Each finding classified as misinformation / disinformation / malinformation"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "info_disorder_type ∈ {mis, dis, mal} per finding"
+  - id: "authority_cited"
+    label: "Authoritative source (EAC / CISA / SoS / state election office) cited for each correction"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "authority_ref populated per finding"
+  - id: "critical_voter_suppression_surfaced"
+    label: "Voter-suppression vectors (wrong polling place / wrong date / intimidation) surfaced as critical"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "voter_suppression findings tagged critical"
+  - id: "synthetic_media_evidence"
+    label: "Deepfake / synthetic-media claims backed by named indicators (C2PA absence + visual artifacts + metadata anomalies), not bare assertions"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "for synthetic_media findings: ≥2 named indicators OR explicit 'probabilistic, requires forensic verification'"
+  - id: "no_partisan_labeling"
+    label: "Findings non-partisan — no labeling of opinions as misinformation"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "no partisan keywords applied as evidence of misinformation absent factual error"
+  - id: "pii_safety_voter_roll"
+    label: "Voter-roll PII (name + address) protected — never echoed in output"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "rule-pack/grep-election-misinformation-flags voter_roll_pii_leak fires zero hits"
+  - id: "correction_actionable"
+    label: "Each finding includes the user-facing correction (not just 'this is false')"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "correction_text populated; link to authority's verified info"
+
+scoring_method: "weighted_sum"

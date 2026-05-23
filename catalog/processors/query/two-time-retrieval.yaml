@@ -1,0 +1,55 @@
+id: "processor/two-time-retrieval"
+type: processor
+version: "0.1.0"
+name: "Two-time retrieval (refine query, re-retrieve)"
+description: |
+  Retrieve top-K with the raw query, ask an LLM to compose a refined
+  query incorporating what was found, then re-retrieve. Final retrieval
+  set is the second pass (or union of both, deduplicated). Classic
+  Kaggle "EEDI two-time retrieval" shape — boosts recall on math-
+  misconception problems where the right answer needs concept-level
+  reformulation.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["ai", "education"]
+capability: ["retrieval", "reasoning"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+lifecycle_position: "pre_api.rag"
+tags: ["rag", "two-pass", "kaggle-verified"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url:  "https://www.kaggle.com/code/takanashihumbert/eedi-qwen-2-5-32b-awq-two-time-retrieval"
+  source_kind: "kaggle"
+  author:      "takanashihumbert (650 votes)"
+  license:     "Apache-2.0"
+
+process_kind: "transform"
+deterministic: false
+side_effects: "read"
+
+inputs:
+  - name: "query"
+    type: "string"
+  - name: "corpus_ref"
+    type: "artifact_id"
+  - name: "first_pass_k"
+    type: "integer"
+  - name: "second_pass_k"
+    type: "integer"
+outputs:
+  - name: "candidates"
+    type: "object[]"
+  - name: "refined_query"
+    type: "string"
+config:
+  refine_prompt: |
+    Original query: {query}
+    First-pass results:
+    {first_pass_summary}
+    Rewrite the query to better target what the user is actually asking
+    given the concepts surfaced above.

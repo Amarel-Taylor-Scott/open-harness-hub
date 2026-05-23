@@ -1,0 +1,115 @@
+# Controlled vocabulary: knowledge-object leaf types.
+#
+# Harnesses declare which leaf types they CONSUME and EMIT. New leaf types
+# are added by PR and must declare a generic parent.
+
+leaf_types:
+  # ---- rules ----
+  - id: grep_rule
+    parent: rule
+    description: A regex rule with id, severity, category.
+  - id: glob_rule
+    parent: rule
+    description: A filepath or text glob pattern.
+  - id: classifier_rule
+    parent: rule
+    description: A labeled-example rule for lightweight classifiers.
+  - id: heuristic_rule
+    parent: rule
+    description: A deterministic condition → action rule.
+  - id: routing_rule
+    parent: rule
+    description: An input → downstream-artifact dispatch rule.
+
+  # ---- retrieval ----
+  - id: rag_doc
+    parent: knowledge
+    description: A document chunk indexed for retrieval.
+  - id: citation_edge
+    parent: knowledge
+    description: A typed edge in a citation graph.
+
+  # ---- prompts & policies ----
+  - id: persona_block
+    parent: logic
+    description: A persona / system-prompt fragment.
+  - id: prompt_template
+    parent: logic
+    description: A reusable parameterized prompt.
+  - id: response_policy
+    parent: logic
+    description: A policy bounding what the model may say or refuse.
+  - id: fact_template
+    parent: logic
+    description: A structured template for emitting facts.
+
+  # ---- I/O ----
+  - id: envelope_schema
+    parent: schema
+    description: A JSON Schema for a typed I/O envelope.
+  - id: submission_schema
+    parent: schema
+    description: A JSON Schema for hub submission payloads.
+  - id: upload_schema
+    parent: schema
+    description: A JSON Schema for uploaded artifacts.
+
+  # ---- tools ----
+  - id: tool_definition
+    parent: tool
+    description: A function-call definition.
+  - id: tool_example
+    parent: tool
+    description: A golden input/output example for a tool.
+
+  # ---- runtime trace ----
+  - id: reasoning_step
+    parent: trace
+    description: One step of a model's reasoning trace.
+  - id: context_snippet
+    parent: trace
+    description: A bounded snippet of context passed to the model.
+  - id: tool_call
+    parent: trace
+    description: A single tool invocation emitted by the model.
+  - id: tool_observation
+    parent: trace
+    description: The result of a tool invocation, fed back to the model.
+
+  # ---- evaluation ----
+  - id: rubric_dimension
+    parent: evaluation
+    description: One dimension of a rubric.
+  - id: audit_template
+    parent: evaluation
+    description: A template for audit-log rows.
+
+  # ---- extraction outputs ----
+  - id: extracted_fact
+    parent: extraction
+    description: A typed fact extracted from source text.
+  - id: entity_signal
+    parent: extraction
+    description: A signal about a named entity (company, person, place).
+  - id: modus_operandi
+    parent: extraction
+    description: A repeated pattern across multiple cases / records.
+
+  # ---- directories ----
+  - id: contact_directory
+    parent: knowledge
+    description: A directory of contacts (NGOs, hotlines, services).
+
+  # ---- generative / multimodal ----
+  - id: style_reference
+    parent: knowledge
+    description: A style descriptor for generative pipelines (e.g. cinematic-noir).
+  - id: physics_prior
+    parent: knowledge
+    description: A physical prior (lens optics, acoustic, motion).
+  - id: prohibited_term
+    parent: rule
+    description: A term that must never appear in input or output.
+  - id: watermark_spec
+    parent: rule
+    description: A specification for required watermarks on generative outputs.

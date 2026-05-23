@@ -1,0 +1,129 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-05-20T17:02:12.000231+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "a264c856-aed0-4a06-a038-5b51ee9a90bd",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-05-20T17:02:12.000319+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/suspicious-transaction-review",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Given a transaction bundle (account, recent transactions, related\nentities), produce a sanctions-first risk review, FATF typology\nscoring, and a SAR-style narrative DRAFT (never a SAR filing). PHI\n/ financial PII is redacted before any model call; sanctions hits\nhalt the routine review and route to escalation."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../suspicious-transaction-review.yaml"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "knowledge-pack/fatf-typologies-sample",
+      "facets": {
+        "schema": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-1-0/SchemaDatasetFacet.json",
+          "fields": [
+            {
+              "name": "rag_doc",
+              "type": "string"
+            }
+          ]
+        },
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "Sample paraphrased typology chunks for catalog-demo purposes. Real\ndeployments should ingest the latest FATF and FinCEN typology\nreports; this pack anchors the data shape and citation pattern."
+        },
+        "dataSource": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+          "name": "open-harness-hub",
+          "uri": "https://open-harness-hub.dev/knowledge-pack/fatf-typologies-sample"
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/suspicious-transaction-review/output/sanctions_hits",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "sanctions_hits (SanctionsHit[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/suspicious-transaction-review/output/typology_matches",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "typology_matches (TypologyMatch[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/suspicious-transaction-review/output/narrative_draft",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "narrative_draft (markdown)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/suspicious-transaction-review/output/risk_score",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "risk_score (number)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/suspicious-transaction-review/output/escalation",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "escalation (enum[route_to_OFAC, enhanced_due_diligence, monitor, close])"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml jsonschema
+
+      - name: Validate + emit
+        run: |
+          python scripts/validate.py
+          python scripts/build_catalog_index.py
+          python scripts/emit/all.py
+
+      - name: Bundle dist/ archives
+        run: |
+          VERSION=${GITHUB_REF_NAME}
+          tar -czf "open-harness-hub-${VERSION}.tar.gz" dist/
+          (cd dist && zip -r "../open-harness-hub-${VERSION}.zip" .)
+          ls -la *.tar.gz *.zip
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            open-harness-hub-*.tar.gz
+            open-harness-hub-*.zip
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          body: |
+            ## Open Harness Hub ${{ github.ref_name }}
+
+            Standards-conformant bundle of the catalog. Contains:
+
+            - `dist/croissant/`        — Croissant 1.0 JSON-LD for every dataset / knowledge-pack
+            - `dist/mcp/`              — MCP server stubs (Python + TypeScript) + tools.json
+            - `dist/agent-skills/`     — Agent Skills folders + Claude Code plugin marketplace
+            - `dist/hf/model_cards/`   — Hugging Face Model Cards for every harness
+            - `dist/hf/dataset_cards/` — Hugging Face Dataset Cards
+            - `dist/hf/space/`         — HF Space README
+            - `dist/lm-eval-harness/`  — EleutherAI lm-eval-harness task YAML
+            - `dist/promptfoo/`        — promptfoo configs
+            - `dist/aibom/`            — CycloneDX-ML 1.6 AIBOM
+            - `dist/openlineage/`      — OpenLineage v2 event templates
+            - `dist/c2pa/`             — C2PA v2 manifest templates (generative pipelines)
+            - `dist/eu-ai-act/`        — Annex IV dossiers (high-risk artifacts)
+            - `dist/spdx/`             — SPDX 3.0 catalog document
+
+            ### Install as a Claude Code plugin marketplace
+
+            ```
+            /plugin marketplace add ${{ github.repository_owner }}/${{ github.event.repository.name }}@dist-published
+            ```

@@ -1,0 +1,57 @@
+id: "processor/hallucination-scorer"
+type: processor
+version: "0.1.0"
+name: "Hallucination scorer (SelfCheckGPT-style)"
+description: |
+  Score per-sentence hallucination probability by sampling N alternative
+  generations from the same model, then measuring semantic agreement
+  between them. Sentences that vary widely across samples are flagged as
+  likely hallucinations. Based on SelfCheckGPT (Manakul et al. 2023).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["verification", "evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+lifecycle_position: "post_api.evaluation"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "verify.hallucination_score"
+deterministic: false
+idempotent: true
+streaming: false
+latency_budget_ms: 20000
+
+inputs:
+  - name: "response"
+    type: "string"
+  - name: "prompt"
+    type: "string"
+  - name: "n_samples"
+    type: "integer"
+outputs:
+  - name: "per_sentence_scores"
+    type: "object[]"
+  - name: "overall_score"
+    type: "number"
+  - name: "flagged_sentences"
+    type: "string[]"
+
+side_effects: "external_call"
+on_error: "fallback"
+
+model_targets:
+  - id: "same_as_under_review"
+    label: "Same model that produced the response"
+    transport: "ollama"
+    role: "Generate N alternative samples to measure self-consistency"
+    required: true
+    default: true
+    trust_boundary: "local"
+
+implementations:
+  - kind: "callable"
+    path: "processors.hallucination_scorer.run"

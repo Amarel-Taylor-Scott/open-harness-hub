@@ -1,0 +1,53 @@
+id: "rubric/cannabis-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Cannabis compliance review quality v1"
+description: "7-dim rubric for state cannabis + §280E + METRC + FinCEN review"
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["cannabis", "cannabis.cultivation", "cannabis.retail", "cannabis.testing"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-21"
+updated: "2026-05-21"
+
+dimensions:
+  - id: "interstate_280e_first"
+    label: "Interstate transport / §280E / COA / youth packaging surfaced FIRST as critical"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "acute findings appear before others; severity=critical"
+  - id: "regulation_citation"
+    label: "Each finding cites state authority + §280E + FinCEN guidance"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "regulatory_citation populated per finding"
+  - id: "metrc_reconciliation"
+    label: "METRC seed-to-sale reconciled daily + manifests complete"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "metrc_variance + transport_manifest documented"
+  - id: "coa_panels_current"
+    label: "All required COA panels current + within tolerance"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "pesticide + heavy_metal + microbial + potency COA ≤ 12 months"
+  - id: "packaging_compliance"
+    label: "Child-resistant + non-youth-appealing + universal symbol"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "crp_certified=true + youth_appeal=false + universal_symbol=true"
+  - id: "tax_banking"
+    label: "§280E COGS allocation correct + FinCEN SAR/CTR filed"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "cogs_methodology_documented + sar_ctr_filing_log present"
+  - id: "zoning_badge"
+    label: "Buffer-zone distance + agent badge current"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "school_buffer_ft + agent_badge_expiry_date documented"
+
+scoring_method: "weighted_sum"

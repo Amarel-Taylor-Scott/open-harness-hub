@@ -1,0 +1,101 @@
+id: "pipeline/plan-execute-critic-loop"
+type: pipeline
+version: "0.1.0"
+name: "Plan / execute / critic loop"
+description: |
+  The classic agentic pattern: planner LLM drafts a step list, executor
+  runs the steps (with tool calls), critic LLM reviews the trace + re-plans
+  on failure. Iterates until either the goal is achieved or a max-iteration
+  cap is hit. Mirrors langchain-ai/langgraph `examples/plan-and-execute`,
+  Anthropic cookbook `patterns/agents/evaluator-optimizer`, and OpenAI
+  swarm handoff routing.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["planning", "agent_loop", "reasoning"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+task: |
+  Given a goal, repeatedly: PLAN (LLM proposes steps) → EXECUTE (run tools
+  for each step) → CRITIQUE (LLM checks output against goal + flags failures)
+  → either DONE or REPLAN. Caps at max_iterations and emits a full trace.
+pipeline_kind: "plan_and_execute"
+
+inputs:
+  - name: "goal"
+    type: "string"
+  - name: "available_tools"
+    type: "string[]"
+  - name: "max_iterations"
+    type: "integer"
+outputs:
+  - name: "final_output"
+    type: "string"
+  - name: "iterations"
+    type: "object[]"
+  - name: "converged"
+    type: "boolean"
+  - name: "trace"
+    type: "TraceFrame[]"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/grep-prompt-injection-heuristics"
+    - "rule-pack/privacy-pii-text-en"
+
+steps:
+  - id: "redact_goal"
+    kind: "harness"
+    ref: "harness/redact-pii-text"
+    inputs: { text: "$.inputs.goal" }
+
+  - id: "guard_input"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.steps.redact_goal.output.redacted_text" }
+
+  - id: "plan"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Decompose the goal into a numbered step list. Each step must be either (a) a tool call from available_tools, or (b) a reasoning step that takes prior outputs and produces a typed result. Output as JSON: [{step: 1, kind: 'tool'|'reason', ref?, inputs?}]"}]
+      context:
+        - "$.steps.redact_goal.output.redacted_text"
+        - "$.inputs.available_tools"
+
+  - id: "execute_loop"
+    kind: "loop"
+    ref: "processor/cost-ceiling-gate"
+    when: "$.inputs.max_iterations > 0"
+    inputs:
+      expected_input_tokens:  4000
+      expected_output_tokens: 2000
+      adapter_ref:            "adapter/ollama-default"
+      budget_usd:             0.50
+
+  - id: "critique"
+    kind: "processor"
+    ref: "processor/self-refine-critique"
+    inputs:
+      draft: "$.steps.plan.output.text"
+      task:  "$.steps.redact_goal.output.redacted_text"
+      max_iterations: "$.inputs.max_iterations"
+
+  - id: "trace_emit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "plan-execute-critic-loop"
+      applied_layers: ["persona", "grep", "tools"]
+
+success_criteria:
+  - rubric: "rubric/research-entity-v1"
+    threshold: 0.65

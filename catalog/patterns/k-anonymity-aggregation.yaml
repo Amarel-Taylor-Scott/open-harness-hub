@@ -1,0 +1,83 @@
+id: "pattern/k-anonymity-aggregation"
+type: pattern
+version: "0.1.0"
+name: "K-anonymity + HMACed-key cross-organization aggregation"
+description: |
+  Share *aggregated* signal across organizations without revealing
+  per-org provenance. Each org HMACs the key (broker ID, supplier
+  hash, address) with a hub-published salt so the same key produces
+  the same hash everywhere but cannot be reversed. Records are
+  bucketed by (hashed_key, category, time-window). Buckets with
+  `count < k` are dropped — small buckets could be re-identified
+  back to the contributing org. Surviving buckets are signed and
+  published.
+
+  Use whenever cross-org information sharing is required but
+  per-org confidentiality must be preserved: ESG bad-actor patterns,
+  AML mule networks, security threat indicators, fraud rings.
+
+  The k-anonymity threshold is the lever between strong-anonymity
+  (high k, slower signal) vs fast-pattern-surfacing (low k, higher
+  re-identification risk). Differential-privacy extensions add
+  calibrated noise to each bucket count for stronger guarantees.
+authors:
+  - name: "Sweeney (2002), FATF Rec. 18 (information sharing)"
+license: "CC-BY-4.0"
+industry:   ["security", "esg", "compliance", "finance", "cross_industry"]
+capability: ["anonymization", "verification"]
+modality:   ["text", "structured"]
+lifecycle:  "stable"
+trust_boundary: "hub"
+tags: ["k-anonymity", "differential-privacy", "hmac", "cross-org", "FATF-Rec-18"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+paper_url: "https://dataprivacylab.org/dataprivacy/projects/kanonymity/kanonymity.pdf"
+paper_citation: "Sweeney 2002, k-anonymity: a model for protecting privacy; FATF Rec. 18 information-sharing principles"
+reference_implementations:
+  - { url: "https://github.com/google/differential-privacy", language: "go,c++,python", framework: "Google DP" }
+  - { url: "https://github.com/IBM/differential-privacy-library", language: "python", framework: "Diffprivlib" }
+  - { url: "https://github.com/SAP/security-research-relayed", language: "python", framework: "SAP relayed analytics" }
+
+structural_shape:
+  - "per-org pipeline emits records (key, category, severity, ts)"
+  - "key = HMAC-SHA256(hub_salt, raw_identifier) — deterministic across orgs, one-way"
+  - "records bucketed by (key, category, time-window)"
+  - "drop buckets with count < k (k-anonymity gate)"
+  - "optional: add Laplace(0, 1/epsilon) noise to surviving counts (DP)"
+  - "sign + publish surviving buckets"
+  - "consumer queries hub: 'count for (key, category, window)' → aggregate"
+
+when_to_use:
+  - "Cross-org pattern surfacing where per-org provenance must be hidden"
+  - "Coordinated bad-actor signaling (rogue brokers, mule networks, threat actors)"
+  - "Industry-aggregated baselines (sector-average emissions, sector-average wages)"
+
+when_not_to_use:
+  - "Within-org analytics — no cross-org confidentiality concern"
+  - "When small-N is itself the signal (single high-confidence report)"
+  - "Where adversaries can correlate buckets to deanonymize (consider DP or l-diversity)"
+
+variants:
+  - "k-anonymity alone (simplest)"
+  - "k-anonymity + DP noise (stronger guarantees, harder accuracy tradeoff)"
+  - "l-diversity (ensure each bucket has ≥ l distinct sensitive values)"
+  - "t-closeness (sensitive-value distribution ≈ overall distribution)"
+  - "Secure aggregation (cryptographic MPC — strongest, slower)"
+
+counter_patterns:
+  - "pattern/multi-agent-debate (not anonymization-focused)"
+
+implementing_pipelines:
+  - "pipeline/anonymized-illicit-recruitment-pattern-sharing"
+
+implementing_processors:
+  - "processor/redact-pii-text"
+  - "processor/cost-ceiling-gate"
+
+tradeoffs:
+  latency: "Low — single hash + bucket lookup per record"
+  cost: "Low"
+  quality: "k threshold trades anonymity for signal-recovery time"
+  complexity: "Medium — needs hub-published salt + audit trail of bucket drops"
+  explainability: "High — counts are exact (or DP-bounded); identifiers are demonstrably one-way"

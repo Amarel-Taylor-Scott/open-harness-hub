@@ -1,0 +1,98 @@
+id: "pipeline/qwen-vllm-rerank-eedi"
+type: pipeline
+version: "0.1.0"
+name: "Qwen-32B vLLM retrieval-rerank with logits-processor constraints"
+description: |
+  Two-stage retrieval pipeline that won EEDI Mining Misconceptions:
+  1. Embedding-based retrieve top-K candidate misconceptions
+  2. Constrain a Qwen-32B-AWQ vLLM call to emit ONLY one of the K
+     candidate IDs (via logits-processor-zoo AllowedTokens) — the LLM
+     reranks among a fixed candidate set, never hallucinates an unseen
+     ID. Optionally two-time retrieval first to refine the query.
+
+  Verified by Open Harness Hub mining: jagatkiran Qwen14B-Retrieval-
+  Qwen32B-logits-processor-zoo (672 votes, EEDI), aerdem4 Eedi-Qwen32B-
+  vllm-with-logits-processor-zoo (594 votes, EEDI), takanashihumbert
+  Eedi-Qwen-2.5-32B-AWQ-two-time-retrieval (650 votes), anhvth226 EEDI-
+  11-21-14B (686 votes). Confirmed 4-of-4 across top EEDI kernels.
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "education"]
+capability: ["retrieval", "reranking", "reasoning"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "pre_api.rag"
+tags: ["rag", "qwen", "vllm", "logits-processor-zoo", "kaggle-verified"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url:  "https://www.kaggle.com/competitions/eedi-mining-misconceptions-in-mathematics"
+  source_kind: "kaggle"
+  author:      "jagatkiran (672), aerdem4 (594), takanashihumbert (650), anhvth226 (686)"
+  license:     "Apache-2.0"
+
+task: |
+  Given a math problem + a list of candidate misconception IDs (≈2.5k),
+  retrieve the top-25 candidates via embedding, then constrain a Qwen-
+  32B-AWQ vLLM call (or 14B for cheaper) to output the single best ID.
+pipeline_kind: "retrieval_rerank"
+
+inputs:
+  - name: "problem"
+    type: "string"
+  - name: "candidate_corpus_ref"
+    type: "artifact_id"
+outputs:
+  - name: "best_misconception_id"
+    type: "string"
+  - name: "retrieved_candidates"
+    type: "object[]"
+  - name: "rerank_logprobs"
+    type: "object"
+
+defaults:
+  persona: "persona/fact-checker"
+  model_adapter: "adapter/vllm-awq-local"
+  rule_packs:
+    - "rule-pack/hybrid-retrieval-policy"
+
+steps:
+  - id: "guard"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.problem" }
+
+  - id: "two_time_retrieve"
+    kind: "processor"
+    ref: "processor/two-time-retrieval"
+    inputs:
+      query:           "$.inputs.problem"
+      corpus_ref:      "$.inputs.candidate_corpus_ref"
+      first_pass_k:    25
+      second_pass_k:   25
+
+  - id: "rerank_with_constraint"
+    kind: "processor"
+    ref: "processor/vllm-batched-sampling"
+    inputs:
+      prompts:
+        - "Problem: {problem}\nCandidates:\n{candidates_block}\nReturn the single best candidate ID."
+      sampling_params:
+        temperature: 0.0
+        max_tokens: 8
+      logits_processors:
+        - kind: "AllowedTokens"
+          tokens: "$.steps.two_time_retrieve.output.candidates"
+      model_adapter_ref: "adapter/vllm-awq-local"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "qwen-vllm-rerank-eedi"
+      applied_layers: ["rag", "rerank"]
+
+success_criteria: []

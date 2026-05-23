@@ -1,0 +1,65 @@
+id: "pattern/raft-retrieval-aug-finetune"
+type: pattern
+version: "0.1.0"
+name: "RAFT (Retrieval-Augmented Fine-Tuning)"
+description: |
+  Fine-tune an LLM on (question, retrieved_docs_including_distractors,
+  reasoning_chain, gold_answer) tuples so the model learns to USE the
+  retrieved docs at inference time AND ignore distractors. Bridges
+  the gap between pure RAG (no model training) and pure fine-tuning
+  (no retrieval). Substantially better domain Q&A vs either alone.
+authors:
+  - name: "Zhang, Patil, Jain, Tu, Ganesan, Jiao, Liu, Stoica, Mao (2024)"
+license: "CC-BY-4.0"
+industry:   ["ai", "cross_industry"]
+capability: ["retrieval", "reasoning"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+tags: ["raft", "fine-tuning", "rag", "domain-adaptation"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+paper_url: "https://arxiv.org/abs/2403.10131"
+paper_citation: "Zhang et al. 2024, RAFT: Adapting Language Model to Domain Specific RAG"
+reference_implementations:
+  - { url: "https://github.com/ShishirPatil/gorilla", language: "python", framework: "gorilla-raft" }
+
+structural_shape:
+  - "for each (question, gold_answer) in domain dataset:"
+  - "  retrieved_docs = retrieve(question, k=N+M)  # N gold + M distractors"
+  - "  reasoning_chain = generate_cot(question, retrieved_docs, gold_answer)"
+  - "  training_example = (question, retrieved_docs, reasoning_chain, gold_answer)"
+  - "fine-tune LLM on training_examples"
+  - "at inference: retrieve top-K, prompt model with (question, docs, CoT prompt)"
+
+when_to_use:
+  - "Domain-specific Q&A with a stable corpus"
+  - "Have enough labeled (question, answer) pairs (~1k-10k)"
+  - "Pure RAG hits a quality ceiling on the domain"
+
+when_not_to_use:
+  - "Corpus changes daily — fine-tuned model goes stale"
+  - "Insufficient training data (< 1k examples)"
+  - "Cost of fine-tune + serving fine-tuned model > frontier-LLM RAG"
+
+variants:
+  - "RAFT with distractors (the original)"
+  - "RAFT without distractors (degenerate — just RAG-style fine-tune)"
+  - "RAFT-DPO (preference-tune on which document is more useful)"
+
+counter_patterns:
+  - "pattern/naive-rag (pure RAG, no fine-tune)"
+  - "pattern/qwen-vllm-rerank-eedi (RAG + constrained decoding, no fine-tune)"
+
+implementing_pipelines:
+  - "pipeline/lora-qlora-pairwise-pref-finetune"
+
+implementing_processors: []
+
+tradeoffs:
+  latency:    "Inference latency same as RAG (fine-tuned model + retrieval)"
+  cost:       "Up-front: fine-tune cost (GPU hours). Ongoing: serving cost (you host a fine-tuned model)."
+  quality:    "Higher than pure RAG on domain Q&A; lower than RAG on out-of-domain"
+  complexity: "High — requires labeled data + fine-tune pipeline + eval set"
+  explainability: "Lower — model has internalized some retrieval signals"

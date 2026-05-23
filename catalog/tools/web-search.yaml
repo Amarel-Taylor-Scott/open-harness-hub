@@ -1,0 +1,50 @@
+id: "tool/web-search"
+type: tool
+version: "0.1.0"
+name: "Web Search"
+description: |
+  Generic web search tool. Backend-agnostic — implementations include
+  Brave, Serper, DuckDuckGo, or a self-hosted SearXNG.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["retrieval"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "external"
+tags: ["search", "retrieval", "tool"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+parameters:
+  type: object
+  properties:
+    query:       { type: "string" }
+    max_results: { type: "integer", default: 10 }
+    site:        { type: "string", description: "Optional site: filter." }
+    language:    { type: "string", description: "ISO 639-1 language code." }
+  required: ["query"]
+returns:
+  type: object
+  properties:
+    results:
+      type: array
+      items:
+        type: object
+        properties:
+          url:     { type: "string" }
+          title:   { type: "string" }
+          snippet: { type: "string" }
+          score:   { type: "number" }
+side_effects: "external_call"
+examples:
+  - input:  { query: "ILO forced labor indicators", max_results: 5 }
+    output:
+      results:
+        - { url: "https://example.org/ilo-indicators", title: "ILO forced labour indicators", snippet: "ILO defines 11 indicators..." }
+implementations:
+  - kind: "openapi"
+    url: "https://api.search.brave.com/res/v1/web/search"
+  - kind: "callable"
+    path: "tools.web_search.run"

@@ -1,0 +1,61 @@
+id: "pattern/rag-fusion"
+type: pattern
+version: "0.1.0"
+name: "RAG-Fusion"
+description: |
+  Generate N rewrites of the user query, run retrieval for each, and
+  fuse the ranked lists via Reciprocal Rank Fusion. Outperforms single-
+  query retrieval when the user's wording differs from the corpus's.
+authors:
+  - name: "Adrian Raudaschl (2023)"
+license: "CC-BY-4.0"
+industry:   ["ai", "cross_industry"]
+capability: ["retrieval"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+tags: ["rag", "fusion", "rrf"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+paper_url: "https://github.com/Raudaschl/rag-fusion"
+paper_citation: "Raudaschl 2023 (blog + reference impl)"
+reference_implementations:
+  - { url: "https://github.com/Raudaschl/rag-fusion", language: "python" }
+  - { url: "https://github.com/superlinear-ai/raglite", language: "python" }
+
+structural_shape:
+  - "generate N=4 query rewrites (LLM)"
+  - "run independent retrieval for each rewrite (parallel)"
+  - "merge ranked lists via Reciprocal Rank Fusion (k=60)"
+  - "take top-k from merged list"
+  - "generate answer"
+
+when_to_use:
+  - "Vocabulary mismatch between user phrasing and corpus"
+  - "Multi-faceted questions where different rewrites surface different aspects"
+  - "Recall is more important than minimum latency"
+
+when_not_to_use:
+  - "Very narrow domains where rewrites add little"
+  - "Latency-critical paths (N retrievals in parallel still cost time)"
+
+variants:
+  - "Multi-query retriever (LangChain): N parallel retrievals, dedupe via similarity"
+  - "Multi-vector retriever (LlamaIndex): index multiple representations per chunk"
+
+counter_patterns:
+  - "pattern/naive-rag"
+  - "pattern/hyde"
+
+implementing_pipelines: []
+
+implementing_processors:
+  - "processor/cross-encoder-reranker"
+
+tradeoffs:
+  latency: "2-3× naive due to N parallel retrievals + LLM rewrite step"
+  cost: "1.5-2× naive (extra rewrite call + N retrievals)"
+  quality: "Higher recall on vocabulary-mismatched queries"
+  complexity: "Low-medium (well-defined fusion math)"
+  explainability: "Inspectable via per-rewrite retrieval logs"

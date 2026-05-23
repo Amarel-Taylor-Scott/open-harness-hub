@@ -1,0 +1,53 @@
+id: "rubric/citemind-citation-fidelity-v1"
+type: rubric
+version: "0.1.0"
+name: "CiteMind citation-fidelity rubric v1"
+description: "7-dim rubric for evaluating source-grounded answers from a research-wiki pipeline (CiteMind shape)."
+authors: [{ name: "CiteMind team (upstream)" }, { name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["education", "research", "compliance"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-21"
+updated: "2026-05-21"
+
+dimensions:
+  - id: "citation_present"
+    label: "Every factual claim carries a (page, span) citation"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "claims_with_citation / total_claims ≥ 0.95"
+  - id: "citation_accurate"
+    label: "Cited page actually supports the claim"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "spot-check N=10 citations against PDF spans"
+  - id: "refusal_on_missing"
+    label: "Refuses to answer when document is silent (no fabrication)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "refusal_rate on out-of-document questions ≥ 0.95"
+  - id: "concept_graph_anchored"
+    label: "Every graph node + edge carries a source anchor"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "un_anchored_nodes_pct ≤ 5"
+  - id: "ocr_recall"
+    label: "OCR fallback recovers text from scanned pages"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "embedded_text_extraction_yield_pct + ocr_yield_pct combined ≥ 95"
+  - id: "local_only_traffic"
+    label: "No outbound traffic in default config (privacy posture)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "network_egress_in_default_mode = 0 (verified via offline test)"
+  - id: "persistence_across_sessions"
+    label: "Wiki pages + graph survive app restart with full anchors intact"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "restart_test passes; nodes_lost_on_restart = 0"
+
+scoring_method: "weighted_sum"

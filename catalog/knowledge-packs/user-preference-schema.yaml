@@ -1,0 +1,40 @@
+id: "knowledge-pack/user-preference-schema"
+type: knowledge-pack
+version: "0.1.0"
+name: "User preference schema (canonical shape for personal assistants)"
+description: |
+  Canonical schema for storing user preferences that personal-
+  assistant harnesses load before taking action. Covers:
+   - Communication tone preferences (formal / casual / terse / warm)
+   - Scheduling rules (no-meeting hours, focus blocks, time-zone)
+   - Privacy rules (what is shareable with whom)
+   - Delegation rules (who can act on user's behalf for what)
+   - Tool autonomy (autonomous / review-required / never)
+   - Recurring tasks + commitments
+
+  The schema is portable — same shape works across email / chat /
+  calendar / personal-RAG harnesses.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["personal_productivity", "cross_industry"]
+capability: ["retrieval"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "volatile"
+tags: ["user-preferences", "personal-assistant", "privacy", "delegation"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+content_types:
+  - rag_doc
+files:
+  - path: "data/personal-assistant-pack/preference-schema-and-defaults.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+provenance:
+  sources: ["Composite of common personal-assistant preference patterns"]
+  collected_through: "2026-05-20"
+  note: "Schema + recommended defaults. Real instances replace defaults with user-specific values."

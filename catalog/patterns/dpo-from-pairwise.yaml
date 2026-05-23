@@ -1,0 +1,46 @@
+id: "pattern/dpo-from-pairwise"
+type: pattern
+version: "0.1.0"
+name: "Direct Preference Optimization (DPO) from pairwise preferences"
+description: "Skip explicit reward modeling + PPO; directly optimize policy against pairwise (chosen, rejected) preferences via a closed-form log-likelihood loss. Trains with the same compute as SFT — no reward model, no rollouts, no KL penalty machinery."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["cross_industry"]
+capability: ["generation"]
+modality: ["text"]
+lifecycle: "stable"
+trust_boundary: "local"
+created: "2026-05-22"
+updated: "2026-05-22"
+
+paper_url: "https://arxiv.org/abs/2305.18290"
+paper_citation: "Rafailov et al. (2023) — Direct Preference Optimization: Your Language Model is Secretly a Reward Model"
+
+when_to_use:
+  - "Pairwise preference data (chosen/rejected) already exists or is cheap to collect."
+  - "Compute budget too small for full RLHF (reward model + PPO with rollouts)."
+  - "Quality gap from PPO is not justified given budget."
+
+structural_shape:
+  - "Collect or curate pairwise preference dataset: (prompt, y_chosen, y_rejected)."
+  - "Load policy π_θ (the model being trained) + reference π_ref (frozen copy of SFT)."
+  - "Loss: -log σ(β·(log π_θ(y_chosen|x)/π_ref(y_chosen|x) - log π_θ(y_rejected|x)/π_ref(y_rejected|x)))"
+  - "Train with AdamW; β controls deviation from reference (typically 0.1-0.5)."
+  - "Standard SFT compute footprint — no rollouts, no reward model, no value head."
+  - "Pair with LoRA/QLoRA for memory efficiency."
+
+variants:
+  - "IPO (Identity Preference Optimization): drops sigmoid; more stable when preferences are deterministic."
+  - "KTO (Kahneman-Tversky Optimization): point-wise preferences only (no pairs needed)."
+  - "ORPO (Odds Ratio Preference Optimization): combines SFT + preference into single loss, no reference model."
+  - "SimPO (Simple Preference Optimization): length-normalized DPO without reference model."
+
+implementing_pipelines:
+  - "pipeline/lora-qlora-pairwise-pref-finetune"
+
+related_patterns:
+  - "pattern/peft-lora-adapter-insertion"
+  - "pattern/qlora-4bit-finetune"
+  - "pattern/raft-retrieval-aug-finetune"
+
+tags: ["dpo", "rlhf-alternative", "preference-learning", "finetune"]

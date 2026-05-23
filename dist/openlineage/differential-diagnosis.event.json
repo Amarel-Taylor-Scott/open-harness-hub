@@ -1,0 +1,122 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-05-20T17:02:11.998824+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "d251d19b-14a9-4d28-8561-33b443ae6fda",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-05-20T17:02:11.998907+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/differential-diagnosis",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Educational decision-support pipeline. Given (presentation, history,\nexam) text, returns a ranked differential diagnosis with cited\nguideline sections, ICD-10 code candidates, and red-flag\nescalation. PHI is redacted before any model call.\n\nNot a substitute for a licensed clinician. Intended as a\nreproducible reference instance for the catalog."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../differential-diagnosis.yaml"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "knowledge-pack/clinical-guidelines-sample",
+      "facets": {
+        "schema": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-1-0/SchemaDatasetFacet.json",
+          "fields": [
+            {
+              "name": "rag_doc",
+              "type": "string"
+            },
+            {
+              "name": "citation_edge",
+              "type": "string"
+            }
+          ]
+        },
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "Sample chunks of clinical-guideline language for catalog-demo\npurposes. Each chunk has a stable section reference so a\ncitation-first persona can cite by section. Use authoritative\nfull-text guidelines (ACC/AHA, NICE, RCP, WHO) for production."
+        },
+        "dataSource": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+          "name": "open-harness-hub",
+          "uri": "https://open-harness-hub.dev/knowledge-pack/clinical-guidelines-sample"
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/differential-diagnosis/output/red_flag",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "red_flag (string|null)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/differential-diagnosis/output/differentials",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "differentials (Differential[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/differential-diagnosis/output/next_steps",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "next_steps (string[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/differential-diagnosis/output/citations",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "citations (Citation[])"
+        }
+      }
+    }
+  ]
+}

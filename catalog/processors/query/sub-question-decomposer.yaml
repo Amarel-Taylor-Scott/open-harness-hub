@@ -1,0 +1,58 @@
+id: "processor/sub-question-decomposer"
+type: processor
+version: "0.1.0"
+name: "Sub-question decomposer"
+description: |
+  Break a compound question into N atomic sub-questions, each
+  independently answerable. Used by `pipeline/multi-doc-qa-subquestion`
+  and similar LlamaIndex SubQuestionQueryEngine flows.
+
+  Returns the sub-question list + a small dependency graph (e.g. Q3
+  depends on Q1's answer). The pipeline runtime can then schedule
+  retrieval / answering with the right ordering.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["reasoning"]
+modality:   ["text"]
+lifecycle:  "beta"
+lifecycle_position: "pre_api.query_sanitization"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "query.decompose"
+deterministic: false
+idempotent: true
+streaming: false
+latency_budget_ms: 1500
+
+inputs:
+  - name: "compound_question"
+    type: "string"
+  - name: "max_subquestions"
+    type: "integer"
+  - name: "domain_hint"
+    type: "string"
+outputs:
+  - name: "subquestions"
+    type: "string[]"
+  - name: "dependency_graph"
+    type: "object"
+
+side_effects: "external_call"
+on_error: "fallback"
+
+model_targets:
+  - id: "local_small_model"
+    label: "Local small model for decomposition"
+    transport: "ollama"
+    role: "Fast decomposition; quality is secondary."
+    required: false
+    default: true
+    trust_boundary: "local"
+
+implementations:
+  - kind: "callable"
+    path: "processors.sub_question_decomposer.run"

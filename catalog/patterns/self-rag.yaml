@@ -1,0 +1,69 @@
+id: "pattern/self-rag"
+type: pattern
+version: "0.1.0"
+name: "Self-RAG"
+description: |
+  Reflection-token retrieval-augmented generation. The model first
+  decides whether to retrieve at all, then grades each retrieved
+  document for relevance, generates an answer grounded in accepted
+  documents, then grades the answer for factual support. Iterates if
+  support is low. Distinct from naive RAG because every retrieval is
+  graded; distinct from CRAG because CRAG uses a three-state grader.
+authors:
+  - name: "Asai, Wu, Wang, Sil, Hajishirzi (2023)"
+license: "CC-BY-4.0"
+industry:   ["ai", "cross_industry"]
+capability: ["retrieval", "reasoning", "verification"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+tags: ["rag", "self-rag", "reflection-tokens"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+paper_url: "https://arxiv.org/abs/2310.11511"
+paper_citation: "Asai et al. 2023, Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection"
+reference_implementations:
+  - { url: "https://github.com/AkariAsai/self-rag", language: "python", framework: "transformers" }
+  - { url: "https://langchain-ai.github.io/langgraph/tutorials/rag/langgraph_self_rag/", language: "python", framework: "langgraph" }
+
+structural_shape:
+  - "decide_retrieve (LLM emits `Retrieve` reflection token or not)"
+  - "retrieve N candidates"
+  - "per_doc_grade (LLM emits `Relevant` / `Irrelevant` per doc; drop irrelevant)"
+  - "generate_with_grounding (LLM produces answer with chunk-index citations)"
+  - "grade_answer_support (LLM emits `Supported` / `Partially Supported` / `Not Supported`)"
+  - "if support low → revise prompt with grader feedback; iterate (max_iter cap)"
+
+when_to_use:
+  - "Long-form QA where retrieved chunks vary in relevance"
+  - "Factual grounding is more important than fluency"
+  - "Variable-difficulty queries where naive RAG over-/under-retrieves"
+
+when_not_to_use:
+  - "Simple lookups where one shot of naive RAG works"
+  - "Latency-sensitive paths — each reflection adds an LLM call"
+  - "When retrieval source is known to be uniformly high-relevance (skip the grading step)"
+
+variants:
+  - "Corrective-RAG (CRAG): three-state grader (correct/incorrect/ambiguous) with web-fallback"
+  - "Active-RAG: explicit retrieve-or-not decision per turn"
+  - "FLARE: forward-looking active retrieval (decide at every generation step)"
+
+counter_patterns:
+  - "pattern/naive-rag (single-shot retrieve-then-generate)"
+
+implementing_pipelines: []
+# Planned: pipeline/self-rag-grade-and-revise (in the next pipeline batch)
+
+implementing_processors:
+  - "processor/iterative-revise-loop"
+  - "processor/citation-coverage"
+  - "processor/hallucination-scorer"
+
+tradeoffs:
+  latency: "3-5× naive RAG (1-3 extra LLM calls)"
+  cost: "3-5× naive RAG"
+  quality: "Significantly higher factual support; better abstention on weak evidence"
+  complexity: "Medium — adds two grading steps + a revise loop"
+  explainability: "Higher than naive RAG (reflection tokens are inspectable)"

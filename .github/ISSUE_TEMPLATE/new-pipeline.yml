@@ -1,0 +1,55 @@
+name: "New pipeline proposal"
+description: "Propose a new pipeline (DAG composing harnesses + rule packs + tools + processors)."
+title: "[pipeline] "
+labels: ["proposal", "pipeline"]
+body:
+  - type: input
+    id: slug
+    attributes:
+      label: Proposed ID (slug only)
+      placeholder: "research-entity"
+    validations: { required: true }
+
+  - type: textarea
+    id: task
+    attributes:
+      label: Task
+      description: "One-sentence goal of this pipeline."
+    validations: { required: true }
+
+  - type: dropdown
+    id: pipeline_kind
+    attributes:
+      label: Pipeline kind
+      options:
+        - research_entity
+        - verify_data
+        - format_response
+        - classify
+        - extract
+        - summarize
+        - translate
+        - generate_text
+        - generate_image
+        - generate_audio
+        - generate_video
+        - redact
+        - route
+        - evaluate
+        - agent_loop
+        - other
+
+  - type: input
+    id: industry
+    attributes:
+      label: Industry / industries
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Sketch the steps
+      description: "Bullet list of step id → kind → ref"
+      placeholder: |
+        - redact → harness → harness/redact-pii-text
+        - retrieve → knowledge_pack → knowledge-pack/...
+        - reason → harness → harness/text-safety-review

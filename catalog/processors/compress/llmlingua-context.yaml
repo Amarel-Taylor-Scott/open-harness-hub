@@ -1,0 +1,50 @@
+id: "processor/llmlingua-context-compressor"
+type: processor
+version: "0.1.0"
+name: "LLMLingua context compressor"
+description: |
+  Compress long context (retrieved RAG chunks or prior conversation turns)
+  by selectively pruning low-information tokens before the model sees
+  them. Implementations include LLMLingua, LongLLMLingua, and
+  Selective-Context.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["format_conversion"]
+modality:   ["text"]
+lifecycle:  "experimental"
+lifecycle_position: "pre_api.context_assembly"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "compress.llmlingua"
+deterministic: false
+idempotent: true
+streaming: false
+latency_budget_ms: 800
+
+inputs:
+  - name: "context"
+    type: "string"
+  - name: "instruction"
+    type: "string"
+  - name: "compression_rate"
+    type: "number"
+outputs:
+  - name: "compressed"
+    type: "string"
+  - name: "original_tokens"
+    type: "integer"
+  - name: "compressed_tokens"
+    type: "integer"
+  - name: "ratio"
+    type: "number"
+
+side_effects: "none"
+on_error: "fallback"
+
+implementations:
+  - kind: "callable"
+    path: "processors.llmlingua_context.run"

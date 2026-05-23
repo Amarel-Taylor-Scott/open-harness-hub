@@ -1,0 +1,59 @@
+id: "pattern/hyde"
+type: pattern
+version: "0.1.0"
+name: "HyDE (Hypothetical Document Embeddings)"
+description: |
+  Generate a hypothetical answer to the query (allowing hallucination),
+  then embed THAT answer instead of (or alongside) the query, and retrieve
+  against the embedding. Reduces query-document vocabulary gap because
+  the model's hallucinated answer is in the same "register" as real
+  source documents.
+authors:
+  - name: "Gao, Ma, Lin, Callan (2022)"
+license: "CC-BY-4.0"
+industry:   ["ai", "cross_industry"]
+capability: ["retrieval"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+tags: ["rag", "hyde"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+paper_url: "https://arxiv.org/abs/2212.10496"
+paper_citation: "Gao et al. 2022, Precise Zero-Shot Dense Retrieval without Relevance Labels"
+
+structural_shape:
+  - "generate hypothetical answer to the query (LLM)"
+  - "embed the hypothetical answer"
+  - "retrieve real documents against the hypothetical-answer embedding"
+  - "(optional) also embed the original query; concat ranks"
+  - "answer using the retrieved real documents"
+
+when_to_use:
+  - "Questions where the model has weak vocabulary overlap with the corpus"
+  - "Zero-shot retrieval over a new corpus you haven't fine-tuned an embedder on"
+  - "Long-tail / specialty domains where queries are short and answers are dense"
+
+when_not_to_use:
+  - "Domains where hallucinated answers are systematically misleading (medical / legal)"
+  - "Latency budget tight — adds one LLM call before retrieval"
+
+variants:
+  - "Multi-HyDE: generate N hypothetical answers, fuse via RRF"
+  - "Step-back HyDE: generate an abstract version of the answer first"
+
+counter_patterns:
+  - "pattern/naive-rag"
+
+implementing_pipelines: []
+
+implementing_processors:
+  - "processor/hyde-query-expander"
+
+tradeoffs:
+  latency: "+1 LLM call per query"
+  cost: "+1 small-model call (fine to use a cheap model for the hypothetical)"
+  quality: "Higher recall on novel queries"
+  complexity: "Low (single extra step)"
+  explainability: "Medium — easy to inspect the hypothetical answer"

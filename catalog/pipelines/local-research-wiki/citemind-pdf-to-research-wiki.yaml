@@ -1,0 +1,89 @@
+id: "pipeline/citemind-pdf-to-research-wiki"
+type: pipeline
+version: "0.1.0"
+name: "Local PDF → research wiki + concept graph (CiteMind shape)"
+description: "Local-first pipeline that turns a single PDF (paper / textbook chapter / report) into a persistent study workspace: OCR-aware indexing, hybrid retrieval, RAG chat with citations, generated wiki pages, study guides, and a concept graph — all on local storage with Ollama/Gemma. Port of the CiteMind hackathon submission (Tauri 2 + React 19 + Rust + SQLite)."
+authors: [{ name: "CiteMind team (upstream)" }, { name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["education", "compliance", "privacy"]
+capability:  ["retrieval", "extraction", "evaluation", "format_conversion"]
+modality:    ["text"]
+lifecycle:   "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+tags: ["local-first", "gemma", "ollama", "rag", "citemind", "concept-graph", "education"]
+created: "2026-05-21"
+updated: "2026-05-21"
+
+attribution:
+  source_url: "https://huggingface.co/spaces"
+  source_kind: "huggingface"
+  author: "CiteMind team (Gemma 4 Good Hackathon submission)"
+  license: "TBD — see upstream repo"
+  note: "Catalog port of the CiteMind architecture; upstream attribution + repo URL pending direct outreach. Marked experimental until upstream confirms."
+
+task: "Turn a PDF into a persistent local research wiki with cited answers + concept graph."
+pipeline_kind: "synthesis"
+
+inputs:
+  - name: "pdf_path"
+    type: "string"
+  - name: "user_query"
+    type: "string"
+outputs:
+  - name: "cited_answer"
+    type: "object"
+  - name: "wiki_pages"
+    type: "object[]"
+  - name: "concept_graph"
+    type: "object"
+  - name: "study_guide"
+    type: "object"
+
+defaults:
+  persona: "persona/local-first-research-tutor"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/citemind-architecture-reference"
+
+steps:
+  - id: "pdf_extract"
+    kind: "processor"
+    ref: "processor/pdf-extract-with-ocr-fallback"
+    inputs: { pdf_path: "$.inputs.pdf_path" }
+  - id: "page_aware_chunk"
+    kind: "processor"
+    ref: "processor/page-aware-chunker"
+    inputs: { pages: "$.steps.pdf_extract.output.pages", target_tokens: 800, overlap: 120 }
+  - id: "embed_local"
+    kind: "processor"
+    ref: "processor/local-embedder"
+    inputs: { chunks: "$.steps.page_aware_chunk.output.chunks" }
+  - id: "hybrid_retrieve"
+    kind: "processor"
+    ref: "processor/hybrid-bm25-vector-retrieve"
+    inputs: { query: "$.inputs.user_query", embeddings: "$.steps.embed_local.output.embeddings", top_k: 8 }
+  - id: "cited_answer"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.hybrid_retrieve.output.context"
+      rubric_ref: "rubric/citemind-citation-fidelity-v1"
+  - id: "wiki_generate"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.steps.page_aware_chunk.output.chunks" }
+  - id: "concept_graph"
+    kind: "processor"
+    ref: "processor/concept-graph-extractor"
+    inputs: { wiki_pages: "$.steps.wiki_generate.output.lines" }
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "citemind-pdf-to-research-wiki"
+      applied_layers: ["pdf_ocr", "page_chunk", "local_embed", "hybrid_retrieve", "rag_judge", "wiki_gen", "concept_graph"]
+
+success_criteria:
+  - rubric: "rubric/citemind-citation-fidelity-v1"
+    threshold: 0.6

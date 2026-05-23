@@ -1,0 +1,41 @@
+
+=== Defense DFARS / CMMC (pipeline/dfars-cmmc-compliance-review) ===
+
+  sample-clean.json                                        C: 0  H: 0  M: 0  L: 0
+
+  sample-flagged.json                                      C: 6  H: 3  M: 0  L: 0
+      [critical ] no_cmmc_level_assigned                   defense.cmmc.no_level
+      [critical ] dfars_7012_breach_unreported             defense.cyber.dfars_7012_breach
+      [critical ] section_889_telecom                      defense.sec_889.covered_telecom
+      [critical ] counterfeit_part_indicator               defense.counterfeit_parts.indicator
+      [critical ] sam_exclusion_hit                        defense.sam.exclusion
+      [critical ] itar_unlicensed_transfer                 defense.itar.unlicensed
+      [high     ] buy_american_noncompliance               defense.buy_american
+      [high     ] nist_800_171_gap                         defense.nist_800_171.gap
+      [high     ] as5553_no_inspection                     defense.counterfeit_parts.no_as5553
+
+=== Election Integrity (pipeline/election-misinformation-review) ===
+
+  sample-clean.json                                        C: 0  H: 0  M: 0  L: 0
+
+  sample-flagged.json                                      C: 2  H: 4  M: 0  L: 0
+      [critical ] wrong_polling_place_claim                election.wrong_polling_place
+      [high     ] voter_id_misinformation                  election.voter_id_misinformation
+      [high     ] deepfake_artifact_keyword                election.deepfake_artifact
+      [high     ] coordinated_inauthentic_behavior         election.cib
+      [critical ] voter_intimidation_text                  election.voter_intimidation
+      [high     ] incorrect_eligibility_claim              election.fake_eligibility
+
+=== Water Utility SDWA / LCRR (pipeline/water-utility-compliance-review) ===
+
+  sample-clean.json                                        C: 0  H: 0  M: 0  L: 0
+
+  sample-flagged.json                                      C: 5  H: 3  M: 0  L: 0
+      [critical ] e_coli_mcl_violation                     water.acute.e_coli
+      [critical ] nitrate_above_mcl                        water.acute.nitrate
+      [critical ] lcrr_inventory_missing                   water.lcrr.no_inventory
+      [critical ] pn_tier_1_missed                         water.public_notification.tier_1_missed
+      [high     ] awia_rra_overdue                         water.awia.rra_overdue
+      [critical ] scada_default_credentials                water.scada.default_credentials
+      [high     ] ccr_missing                              water.ccr.missing
+      [high     ] tt_violation_filtration                  water.tt.filtration

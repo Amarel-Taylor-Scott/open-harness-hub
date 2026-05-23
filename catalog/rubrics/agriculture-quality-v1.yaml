@@ -1,0 +1,53 @@
+id: "rubric/agriculture-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Agriculture compliance review quality v1"
+description: "7-dim rubric for FSMA + USDA NOP + GlobalGAP review"
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["agriculture_compliance", "agriculture_compliance.fsma", "agriculture_compliance.organic"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-21"
+updated: "2026-05-21"
+
+dimensions:
+  - id: "acute_food_safety_first"
+    label: "Pesticide violation / E. coli exceedance / child-labor / organic commingling surfaced FIRST as critical"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "acute findings appear before other findings; severity=critical"
+  - id: "regulation_citation"
+    label: "Each finding cites 21 CFR / 7 CFR / FIFRA section"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "regulatory_citation populated per finding (21 CFR 112, 7 CFR 205, 40 CFR 180)"
+  - id: "rei_phi_mrl_compliance"
+    label: "REI / PHI / MRL evaluated against pesticide application + harvest dates"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "rei_clearance_date + phi_clearance_date + mrl_check_status documented"
+  - id: "agricultural_water_testing"
+    label: "Pre-harvest water microbial testing + corrective action"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "water_test_date + ec_geometric_mean ≤ 126 + stv ≤ 410 documented"
+  - id: "organic_integrity"
+    label: "OSP current + split-op segregation + 3-year clean field"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "osp_certifier + last_audit_date within 12 months + segregation_documented"
+  - id: "worker_h_and_s"
+    label: "Worker training + child-labor compliance + WPS"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "wps_training_date + minor_age_verification + heat_illness_plan present"
+  - id: "traceability_recall"
+    label: "Lot-level traceability + recall plan tested"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "lot_codes + recall_drill_date within 12 months documented"
+
+scoring_method: "weighted_sum"

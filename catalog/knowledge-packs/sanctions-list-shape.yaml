@@ -1,0 +1,32 @@
+id: "knowledge-pack/sanctions-list-shape"
+type: knowledge-pack
+version: "0.1.0"
+name: "Sanctions list (shape, with placeholder entries)"
+description: |
+  Reference SHAPE for sanctions list integration. Real data must be
+  pulled from OFAC, UN, EU, HMT, or the institution's licensed
+  provider; this pack illustrates the row schema, not the entries.
+  Each row is an entity (individual or organization) with
+  normalized name, source list, listing date, and aliases.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC0-1.0"
+industry:   ["finance", "finance.aml", "finance.kyc"]
+capability: ["retrieval", "verification"]
+modality:   ["structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "volatile"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+content_types:
+  - entity_signal
+files:
+  - path: "data/sanctions-shape.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+provenance:
+  sources: ["Synthetic placeholder rows. Use OFAC SDN / UN / EU lists in production."]
+  collected_through: "2026-04-30"

@@ -1,0 +1,66 @@
+id: "pipeline/who-surgical-safety-gate"
+type: pipeline
+version: "0.1.0"
+name: "WHO Surgical Safety Checklist gate (Sign In before induction)"
+description: "Apply the WHO SSC Sign In gate to a pre-induction packet. If any required item is unverified OR any NO-GO is triggered, halt and emit NO-GO."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["healthcare", "compliance"]
+capability: ["safety_gating", "evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+tags: ["who-ssc", "surgery", "go-nogo"]
+created: "2026-05-21"
+updated: "2026-05-21"
+
+attribution:
+  source_url: "https://www.who.int/teams/integrated-health-services/patient-safety/research/safe-surgery"
+  source_kind: "other"
+  author: "WHO Guidelines for Safe Surgery 2009 (composite)"
+  license: "CC-BY-4.0"
+
+task: "Apply WHO Surgical Safety Checklist Sign In before induction."
+pipeline_kind: "review"
+
+inputs:
+  - name: "preinduction_packet"
+    type: "string|object"
+outputs:
+  - name: "verdict"
+    type: "string"
+  - name: "items"
+    type: "object[]"
+  - name: "nogo_triggers"
+    type: "string[]"
+
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/technician-checklists"
+
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.preinduction_packet" }
+  - id: "checklist_gate"
+    kind: "processor"
+    ref: "processor/checklist-evaluator"
+    inputs:
+      candidate: "$.steps.structured_to_prose.output.prose"
+      checklist_id: "who-ssc"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "who-surgical-safety-gate"
+      applied_layers: ["structured_to_prose", "checklist_evaluator"]
+
+success_criteria:
+  - kind: deterministic
+    target: "$.steps.checklist_gate.output.verdict"
+    op: "=="
+    value: "go"
+    severity: "critical"
+    label: "WHO SSC checklist gate must return GO"

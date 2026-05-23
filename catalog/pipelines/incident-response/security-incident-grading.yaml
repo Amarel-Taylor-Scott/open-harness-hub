@@ -1,0 +1,76 @@
+id: "pipeline/security-incident-grading"
+type: pipeline
+version: "0.1.0"
+name: "Security incident write-up grading (CTI + AppSec chained)"
+description: |
+  Chains threat-intel IOC review + AppSec code review on incident
+  write-ups: extracts IOCs/TTPs from the report AND grades any
+  attached code-of-concern for known vulnerabilities.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["security", "threat_intelligence", "security.appsec"]
+capability: ["extraction", "verification", "evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.compound_review"
+tags: ["security", "incident", "cti", "appsec", "compound"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+task: |
+  Grade a security-incident write-up: extract IOCs + TTPs, evaluate
+  attached code for known weaknesses, aggregate a response grade.
+pipeline_kind: "compound_review"
+
+inputs:
+  - name: "incident_packet"
+    type: "object"
+outputs:
+  - name: "grade"
+    type: "number"
+  - name: "cti_verdict"
+    type: "object"
+  - name: "appsec_verdict"
+    type: "object"
+
+defaults:
+  persona: "persona/threat-intel-analyst"
+
+steps:
+  - id: "cti_review"
+    kind: "pipeline"
+    ref: "pipeline/threat-intel-ioc-review"
+    inputs:
+      report_text:    "$.inputs.incident_packet.report"
+      incident_class: "$.inputs.incident_packet.class"
+
+  - id: "appsec_review"
+    kind: "pipeline"
+    ref: "pipeline/code-security-review"
+    inputs:
+      code_bundle: "$.inputs.incident_packet.code_of_concern"
+      language:    "$.inputs.incident_packet.code_language"
+      framework:   "$.inputs.incident_packet.code_framework"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "security-incident-grading"
+      applied_layers: ["cti_review", "appsec_review"]
+
+success_criteria:
+  - kind: deterministic
+    label: "CTI sub-pipeline passed"
+    target: "$.steps.cti_review.output.sub_aggregate"
+    op: "is_truthy"
+    value: null
+    severity: high
+  - kind: deterministic
+    label: "AppSec sub-pipeline passed"
+    target: "$.steps.appsec_review.output.sub_aggregate"
+    op: "is_truthy"
+    value: null
+    severity: critical

@@ -1,0 +1,75 @@
+id: "pipeline/quantized-llm-inference"
+type: pipeline
+version: "0.1.0"
+name: "Quantized LLM inference (4-bit BitsAndBytes)"
+description: |
+  Inference-only path: load a 7-70B LLM with 4-bit BitsAndBytes
+  quantization, run generation with controlled sampling kwargs and a
+  chat template. The lightest production shape — no LoRA, no fine-tune,
+  just memory-efficient inference for production deployments.
+
+  Verified across 5+ Kaggle kernels: cdeotte/starter-code-for-llama-8b,
+  itahiro/perplexity-baseline-phi-2-gemma-7b-it, richolson/{add-it-up,mash-it-up},
+  aatiffraz/prompt-prediction-w-mixtral-mistral7b-gemma-llama.
+authors:
+  - name: "Open Harness Hub contributors (port from Kaggle community)"
+license: "MIT"
+industry:   ["ai", "cross_industry"]
+capability: ["generation", "classification"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url: "https://www.kaggle.com/code/cdeotte/starter-code-for-llama-8b-llm-lb-0-750"
+  source_kind: "kaggle"
+  author: "Multiple Kaggle authors (cdeotte, itahiro, richolson, aatiffraz)"
+  license: "Apache-2.0"
+
+task: |
+  Load a 7-70B LLM with 4-bit quantization and run inference with a
+  defined chat template + generation kwargs.
+pipeline_kind: "inference"
+
+inputs:
+  - name: "model_name"
+    type: "string"
+  - name: "prompt"
+    type: "string"
+  - name: "max_new_tokens"
+    type: "integer"
+  - name: "temperature"
+    type: "number"
+outputs:
+  - name: "generated_text"
+    type: "string"
+  - name: "tokens_used"
+    type: "integer"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+
+steps:
+  - id: "guard"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.prompt" }
+
+  - id: "infer"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "$.inputs.prompt"}]
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "quantized-llm-inference"
+      applied_layers: ["model_call"]
+
+success_criteria: []

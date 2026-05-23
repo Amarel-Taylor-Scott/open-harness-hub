@@ -1,0 +1,132 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/style-references-cinematic",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Cinematic style references",
+  "description": "Curated style descriptors for cinematic product / scene photography.\nEach entry is a textual descriptor of a style — lighting, color\npalette, composition, atmosphere — with attribution to the public\nreference it generalizes.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC-BY-4.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/style-references-cinematic",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-19",
+  "keywords": [
+    "style-reference",
+    "image-gen",
+    "cinematic"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-19",
+  "citation": "Public domain photography references; Editorial photography books",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "style-references-cinematic__cinematic",
+      "name": "cinematic.jsonl",
+      "description": "Data file backing knowledge pack style-references-cinematic.",
+      "contentUrl": "knowledge-packs/data/cinematic.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "1126 B",
+      "sha256": "900b89194cd38c10c1dca81ca84e61ab313fd60dfbbdcd203541d13235c8baea"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "style-references-cinematic__records",
+      "name": "style-references-cinematic__records",
+      "description": "Records parsed from cinematic.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "style-references-cinematic__records/id",
+          "name": "id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "style-references-cinematic__cinematic"
+            },
+            "extract": {
+              "column": "id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "style-references-cinematic__records/label",
+          "name": "label",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "style-references-cinematic__cinematic"
+            },
+            "extract": {
+              "column": "label"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "style-references-cinematic__records/descriptor",
+          "name": "descriptor",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "style-references-cinematic__cinematic"
+            },
+            "extract": {
+              "column": "descriptor"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

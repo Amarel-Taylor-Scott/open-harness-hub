@@ -1,0 +1,34 @@
+id: "dataset/threat-intel-samples"
+type: dataset
+version: "0.1.0"
+name: "Synthetic threat-intelligence report samples"
+description: |
+  Synthetic CTI report samples for testing
+  `pipeline/threat-intel-ioc-review`. Includes IOCs (file hashes,
+  IPs, domains, URLs, mutexes, CVEs, ATT&CK technique IDs, BTC
+  addresses) drawn from textbook examples — NOT real-world
+  indicators of compromise.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["security", "threat_intelligence"]
+capability: ["evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["security", "cti", "ioc", "mitre-attack", "synthetic"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+splits:
+  test:
+    rows: 1
+    path: "data/threat-intel-samples/"
+record_schema: "schemas/cti-report.schema.json"
+provenance:
+  origin:            "Fully synthetic — IOCs are textbook examples, NOT live"
+  collected_by:      "Open Harness Hub contributors"
+  collected_through: "2026-05-20"
+  license:           "MIT"
+  anonymization:     "fully synthetic; no real adversary or victim data"

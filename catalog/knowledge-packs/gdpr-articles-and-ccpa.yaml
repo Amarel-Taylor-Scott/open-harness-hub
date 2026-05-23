@@ -1,0 +1,47 @@
+id: "knowledge-pack/gdpr-articles-and-ccpa"
+type: knowledge-pack
+version: "0.1.0"
+name: "GDPR articles + CCPA/CPRA + e-Privacy"
+description: |
+  Composite educational extracts of:
+   - EU GDPR (Regulation 2016/679) — Articles 5 / 6 / 7 / 9 /
+     12-22 (data subject rights) / 25 (privacy by design) / 30
+     (records of processing) / 32 (security) / 33-34 (breach) /
+     35 (DPIA) / 44-49 (transfers) / 82 (compensation) / 83
+     (administrative fines)
+   - CCPA (Cal. Civ. Code §1798.100 et seq.) + CPRA amendments
+   - EU e-Privacy Directive (cookies + e-marketing)
+   - EDPB Guidelines on DSAR (2022)
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry:   ["privacy", "privacy.gdpr", "privacy.ccpa", "privacy.dsar", "compliance"]
+capability: ["retrieval", "verification"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "dated"
+tags: ["gdpr", "ccpa", "cpra", "e-privacy", "edpb"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+content_types:
+  - rag_doc
+  - citation_edge
+files:
+  - path: "data/gdpr-pack/gdpr-articles.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    embedder: "adapter/bge-embeddings-local"
+    chunk_tokens: 384
+    overlap_tokens: 48
+provenance:
+  sources:
+    - "EU GDPR (Reg. 2016/679) (composite extracts)"
+    - "CCPA/CPRA (Cal. Civ. Code §1798.100) (composite)"
+    - "EU e-Privacy Directive (composite)"
+    - "EDPB Guidelines 01/2022 on DSAR (composite)"
+  collected_through: "2026-04-30"
+  note: "Composite educational extracts; not authoritative legal text."

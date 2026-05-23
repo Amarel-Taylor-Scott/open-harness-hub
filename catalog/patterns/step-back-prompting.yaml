@@ -1,0 +1,59 @@
+id: "pattern/step-back-prompting"
+type: pattern
+version: "0.1.0"
+name: "Step-Back Prompting"
+description: |
+  Before answering, the model is prompted to derive a MORE ABSTRACT
+  question that captures the essence of the user's question. Retrieval
+  and reasoning then happen against the abstract question; the model
+  applies the resulting principle to the specific case. Strong for
+  reasoning tasks where the surface form of the question obscures the
+  underlying concept.
+authors:
+  - name: "Zheng, Mishra, Chen, Cheng, Chi, Le, Zhou (2023)"
+license: "CC-BY-4.0"
+industry:   ["ai"]
+capability: ["reasoning", "retrieval"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+tags: ["reasoning", "step-back"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+paper_url: "https://arxiv.org/abs/2310.06117"
+paper_citation: "Zheng et al. 2023, Take a Step Back: Evoking Reasoning via Abstraction in Large Language Models"
+
+structural_shape:
+  - "generate step-back / abstract version of the question (LLM)"
+  - "retrieve documents for both abstract AND concrete questions"
+  - "compose context (abstract principle + concrete details)"
+  - "answer the original concrete question grounded in the principle"
+
+when_to_use:
+  - "STEM reasoning, math, physics"
+  - "Legal / policy questions where general principles drive specific answers"
+  - "When chain-of-thought alone gets distracted by question surface details"
+
+when_not_to_use:
+  - "Direct factual lookups where abstraction doesn't help"
+  - "Latency-tight paths"
+
+variants:
+  - "Chain-of-Verification (CoVe): generate verification questions, answer each, then final answer"
+  - "Plan-and-Solve: outline a plan first, then execute"
+
+counter_patterns:
+  - "pattern/naive-rag"
+
+implementing_pipelines: []
+
+implementing_processors:
+  - "processor/sub-question-decomposer"
+
+tradeoffs:
+  latency: "+1-2 LLM calls"
+  cost: "+1-2 calls"
+  quality: "Higher on multi-step reasoning tasks"
+  complexity: "Low"
+  explainability: "Higher — the abstract step is inspectable"

@@ -1,0 +1,87 @@
+id: "pipeline/blip-clip-image-to-prompt"
+type: pipeline
+version: "0.1.0"
+name: "BLIP + CLIP Interrogator image-to-prompt"
+description: |
+  Generate a prompt that would re-create a given image. Combines:
+  (1) BLIP captioning model for high-level description, (2) CLIP
+  Interrogator for matching against curated artist / style / medium
+  vocabulary, (3) embeddings cosine-similarity to confirm prompt
+  fidelity to original image. The winning Kaggle shape for the
+  Stable Diffusion Image-to-Prompts competition.
+
+  Verified by Open Harness Hub mining: leonidkulyk LB 0.45836
+  BLIP+CLIP CLIP-Interrogator (732 votes), inversion Calculating
+  Stable Diffusion Prompt Embeddings (617 votes), burhanuddinlatsaheb
+  Text-to-Image Generation (570 votes — uses the same BLIP+CLIP
+  combo). Confirmed across 3 top kernels.
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "creative", "creative.image"]
+capability: ["extraction", "generation", "retrieval"]
+modality:   ["image", "text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "api.image_to_text"
+tags: ["blip", "clip", "clip-interrogator", "stable-diffusion", "kaggle-verified"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+attribution:
+  source_url:  "https://www.kaggle.com/competitions/stable-diffusion-image-to-prompts"
+  source_kind: "kaggle"
+  author:      "leonidkulyk (732), inversion (617), burhanuddinlatsaheb (570)"
+  license:     "Apache-2.0"
+
+task: "Given a Stable-Diffusion-generated image, recover an approximate prompt + verify via embedding similarity."
+pipeline_kind: "extraction"
+
+inputs:
+  - name: "image"
+    type: "artifact_id"
+  - name: "vocab_pack_ref"
+    type: "artifact_id"
+outputs:
+  - name: "predicted_prompt"
+    type: "string"
+  - name: "similarity_score"
+    type: "number"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/bge-embeddings-local"
+
+steps:
+  - id: "guard"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.image" }
+  - id: "caption_with_blip"
+    kind: "processor"
+    ref: "processor/embedder-minilm"
+    inputs:
+      image:   "$.inputs.image"
+      model:   "Salesforce/blip-image-captioning-large"
+  - id: "clip_interrogate"
+    kind: "processor"
+    ref: "processor/cross-encoder-reranker"
+    inputs:
+      query: "$.steps.caption_with_blip.output"
+      candidates: "$.inputs.vocab_pack_ref"
+      output_k: 10
+  - id: "verify_cosine"
+    kind: "processor"
+    ref: "processor/multi-vector-fusion"
+    inputs:
+      ranked_lists: "$.steps.clip_interrogate.output"
+      method: "weighted_sum"
+      k: 1
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "blip-clip-image-to-prompt"
+      applied_layers: ["caption", "interrogate", "verify"]
+
+success_criteria: []

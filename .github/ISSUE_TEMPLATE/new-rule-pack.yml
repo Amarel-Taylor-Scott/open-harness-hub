@@ -1,0 +1,43 @@
+name: "New rule-pack proposal"
+description: "Propose a new modular rule pack (GREP, RAG, classifier, heuristic, online-search, privacy, etc.)."
+title: "[rule-pack] "
+labels: ["proposal", "rule-pack"]
+body:
+  - type: input
+    id: slug
+    attributes:
+      label: Proposed slug
+      placeholder: "phi-hipaa-en"
+    validations: { required: true }
+
+  - type: dropdown
+    id: family
+    attributes:
+      label: Rule family
+      options:
+        - grep
+        - glob
+        - classifier
+        - heuristic
+        - rag
+        - citation
+        - online_search
+        - privacy
+        - schema
+        - routing
+    validations: { required: true }
+
+  - type: input
+    id: industry
+    attributes:
+      label: Industry tags
+
+  - type: textarea
+    id: sample_rules
+    attributes:
+      label: Sample rules (id + label + pattern/condition)
+      placeholder: |
+        - id: email
+          pattern: "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}"
+          severity: high
+          category: pii.contact

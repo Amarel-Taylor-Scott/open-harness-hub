@@ -1,0 +1,146 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/mitre-attack-sample",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "MITRE ATT&CK techniques (sample)",
+  "description": "Sample of MITRE ATT&CK Enterprise tactics + techniques. Each row\ncarries the technique ID, name, tactic, and a one-paragraph\ndescription. Use the canonical MITRE source at attack.mitre.org for\nproduction — this is a 30-row sample illustrating the row shape.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC-BY-4.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/mitre-attack-sample",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-19",
+  "keywords": [
+    "mitre",
+    "attack",
+    "threat-intel"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-19",
+  "citation": "MITRE ATT&CK Enterprise v15 (https://attack.mitre.org/)",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "mitre-attack-sample__mitre-attack-sample",
+      "name": "mitre-attack-sample.jsonl",
+      "description": "Data file backing knowledge pack mitre-attack-sample.",
+      "contentUrl": "knowledge-packs/data/mitre-attack-sample.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "6192 B",
+      "sha256": "b47a8f14821e9a1bf771c83233648d91c7adae5ee8e47e80b1888b2d419e6cd0"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "mitre-attack-sample__records",
+      "name": "mitre-attack-sample__records",
+      "description": "Records parsed from mitre-attack-sample.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "mitre-attack-sample__records/technique_id",
+          "name": "technique_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "mitre-attack-sample__mitre-attack-sample"
+            },
+            "extract": {
+              "column": "technique_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "mitre-attack-sample__records/name",
+          "name": "name",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "mitre-attack-sample__mitre-attack-sample"
+            },
+            "extract": {
+              "column": "name"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "mitre-attack-sample__records/tactic",
+          "name": "tactic",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "mitre-attack-sample__mitre-attack-sample"
+            },
+            "extract": {
+              "column": "tactic"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "mitre-attack-sample__records/description",
+          "name": "description",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "mitre-attack-sample__mitre-attack-sample"
+            },
+            "extract": {
+              "column": "description"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

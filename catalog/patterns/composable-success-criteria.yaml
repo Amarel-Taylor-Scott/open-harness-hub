@@ -1,0 +1,88 @@
+id: "pattern/composable-success-criteria"
+type: pattern
+version: "0.1.0"
+name: "Composable success criteria (regex + semantic + LLM-judge + deterministic + tool + composite)"
+description: |
+  Treat success criteria as first-class composable artifacts rather
+  than a single rubric+threshold check. Six concrete criterion kinds
+  combine via AND / OR / NOT into arbitrary boolean expressions.
+  This lets pipelines express realistic acceptance bars without
+  shoehorning everything into one rubric.
+
+  The six kinds:
+   1. **rubric**       (legacy) — judge against rubric, require score
+                       >= threshold
+   2. **regex**        — target text matches (or must not match) a pattern
+   3. **semantic**     — embedding similarity covers all required topics
+                       above a threshold
+   4. **llm_judge**    — adapter-backed LLM grades + threshold compare
+   5. **deterministic**— compare a target value to an expected via
+                       op (>, >=, <, <=, ==, !=, in, not_in, is_truthy,
+                       is_falsy)
+   6. **tool_validate**— invoke a tool (JSON schema validator, unit-test
+                       runner, IBAN checker, axe-core a11y) and pass
+                       iff the tool returns success
+   7. **composite**    — AND / OR / NOT of any of the above (nestable)
+
+  Each criterion declares a SEVERITY (critical / high / medium / low)
+  so the aggregate pass-fail can be weighted; the pipeline runner
+  emits per-criterion results in the trace.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry:   ["cross_industry", "ai", "compliance"]
+capability: ["verification", "evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "beta"
+trust_boundary: "mixed"
+tags: ["success-criteria", "composable", "evaluator", "boolean-logic"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+paper_url: "https://arxiv.org/abs/2306.05685"
+paper_citation: "Zheng et al. 2023, Judging LLM-as-a-Judge"
+reference_implementations:
+  - { url: "https://github.com/promptfoo/promptfoo", language: "typescript", framework: "promptfoo asserts/g-eval/judges" }
+  - { url: "https://github.com/openai/evals", language: "python", framework: "openai evals registry" }
+  - { url: "https://github.com/EleutherAI/lm-evaluation-harness", language: "python", framework: "lm-eval-harness" }
+
+structural_shape:
+  - "pipeline.success_criteria = [criterion+]"
+  - "criterion: { kind, ...kind-specific-fields, severity, label }"
+  - "runner walks list, evaluates each, emits per-criterion record"
+  - "aggregate pass = AND(all criteria pass) by default"
+  - "composite criteria nest arbitrarily"
+
+when_to_use:
+  - "Real-world pipelines whose acceptance bar is multi-dimensional"
+  - "When regex is too brittle and rubric is too coarse"
+  - "Mixed deterministic + judgment-based bars (e.g. 'JSON schema valid AND rubric >= 0.7 AND no PII leaked')"
+
+when_not_to_use:
+  - "Single-rubric grading suffices — overhead not worth it"
+  - "Acceptance bar is fully deterministic (just write the check inline)"
+
+variants:
+  - "Severity-weighted aggregate (any critical-tier failure = overall fail)"
+  - "Threshold escalation (LLM-judge → frontier LLM if score is borderline)"
+  - "Self-consistency criteria (LLM judges N times, majority must pass)"
+
+counter_patterns:
+  - "pattern/evaluator-optimizer (uses a single judge in a tight loop)"
+
+implementing_pipelines: []
+
+implementing_processors:
+  - "processor/verify-regex-criterion"
+  - "processor/verify-semantic-criterion"
+  - "processor/verify-llm-judge-criterion"
+  - "processor/verify-deterministic-criterion"
+  - "processor/verify-tool-validate-criterion"
+  - "processor/verify-composite-criterion"
+
+tradeoffs:
+  latency:        "regex/deterministic ≈ free; semantic + LLM-judge add embedding + adapter calls; tool depends on the tool"
+  cost:           "no LLM cost for regex/deterministic/composite; LLM cost only when llm_judge kind fires"
+  quality:        "mixed criteria catch failure modes a single rubric misses"
+  complexity:     "Medium — needs a runner that walks the list and resolves $-paths"
+  explainability: "High — per-criterion pass/fail with the exact target value + comparison"

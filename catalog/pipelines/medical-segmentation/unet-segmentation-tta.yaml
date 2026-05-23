@@ -1,0 +1,84 @@
+id: "pipeline/unet-segmentation-tta"
+type: pipeline
+version: "0.1.0"
+name: "U-Net medical segmentation with albumentations + TTA"
+description: |
+  U-Net (often with EfficientNet/ResNet/SEResNeXt encoder via segmentation_
+  models_pytorch) for medical image segmentation. Standard Kaggle shape:
+  5-fold CV + albumentations augmentation (flip / shift / scale / rotate
+  / elastic) + Test-Time Augmentation (TTA) at inference (D4 horizontal/
+  vertical flip + 90° rotations averaged).
+
+  Verified by Open Harness Hub mining: awsaf49 UWMGI Unet Train PyTorch
+  (1473 votes, UW-Madison GI Tract) + UWMGI 2.5D Infer PyTorch (1092
+  votes), hidngnguyna baseline U-Net (617 votes, HuBMAP), corochann
+  SEResNeXt (823 votes, Bengali). 5+ kernels.
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["healthcare", "healthcare.radiology", "ai"]
+capability: ["classification"]
+modality:   ["image"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "api.training"
+tags: ["unet", "segmentation", "albumentations", "tta", "kaggle-verified"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+attribution:
+  source_url:  "https://www.kaggle.com/code/awsaf49/uwmgi-unet-train-pytorch"
+  source_kind: "kaggle"
+  author:      "awsaf49 (1473 train + 1092 infer), hidngnguyna (617), corochann (823)"
+  license:     "Apache-2.0"
+
+task: "Train U-Net (with encoder backbone) on medical image segmentation; D4 TTA at inference; ensemble folds."
+pipeline_kind: "training_and_serving"
+
+inputs:
+  - name: "image_mask_dataset"
+    type: "artifact_id"
+  - name: "encoder"
+    type: "string"
+  - name: "n_folds"
+    type: "integer"
+outputs:
+  - name: "predictions_mask"
+    type: "artifact_id"
+  - name: "fold_metrics"
+    type: "object[]"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+
+steps:
+  - id: "guard"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.encoder" }
+  - id: "augment_and_train"
+    kind: "processor"
+    ref: "processor/iterative-revise-loop"
+    inputs:
+      initial_prompt: "Build U-Net with EfficientNetB0/B3 OR SEResNeXt50 encoder via segmentation_models_pytorch. Train 5-fold StratifiedKFold. Albumentations: HorizontalFlip, ShiftScaleRotate, ElasticTransform, GridDistortion, CoarseDropout. Loss: BCE + Dice (1:1) or Focal Loss for class imbalance."
+      inner_harness_ref: "harness/text-safety-review"
+      verifier_refs: []
+      max_iterations: 1
+      cost_ceiling_usd: 8.00
+      convergence_policy: "all_pass"
+  - id: "tta_inference"
+    kind: "processor"
+    ref: "processor/multi-vector-fusion"
+    inputs:
+      ranked_lists: "$.steps.augment_and_train.output"
+      method: "weighted_sum"
+      k: 1
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "unet-segmentation-tta"
+      applied_layers: ["training", "tta", "ensemble"]
+
+success_criteria: []

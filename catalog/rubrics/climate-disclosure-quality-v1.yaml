@@ -1,0 +1,72 @@
+id: "rubric/climate-disclosure-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Climate disclosure quality v1 (TCFD/ISSB/ESRS aligned)"
+description: |
+  Ten-dimension rubric for grading a corporate climate disclosure
+  against TCFD recommendations, ISSB IFRS S2 paragraphs, and
+  ESRS E1 disclosure requirements.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["climate", "esg", "finance", "compliance"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-20"
+updated: "2026-05-20"
+
+dimensions:
+  - id: "governance_board"
+    label: "Board oversight described per TCFD Gov-a"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "board_committee_charter_ref + climate review cadence ≥ semi-annual"
+  - id: "governance_management"
+    label: "Management's climate-risk role described per TCFD Gov-b"
+    weight: 0.05
+    scale: "0..1"
+    evidence_required: "management_position_ref + link_to_remuneration"
+  - id: "risks_categorized"
+    label: "Risks separated by transition vs physical AND time horizon"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "risk_register with transition_vs_physical + short/medium/long_term horizon labels"
+  - id: "scenario_analysis"
+    label: "1.5°C / 2°C scenario analysis performed (TCFD Str-c)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "scenario_analysis_ref OR explicit 'not performed' finding"
+  - id: "scope_1_2_3_complete"
+    label: "Scope 1+2+3 GHG inventory complete (ISSB §29)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "scope_1, scope_2_location, scope_2_market all populated; scope_3 covers all 15 categories or each excluded category has justification"
+  - id: "third_party_assurance"
+    label: "Third-party assurance of GHG inventory"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "external_assurance_ref + assurance level (limited / reasonable)"
+  - id: "transition_plan"
+    label: "1.5°C-aligned transition plan per CSDDD Art. 13 / ESRS E1-1"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "transition_plan_ref + alignment_with_paris_agreement statement"
+  - id: "sbti_validation"
+    label: "Targets validated by SBTi (or equivalent)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "sbti_validation_date OR explicit non-commitment justification"
+  - id: "materiality_assessment"
+    label: "Double-materiality assessment performed per ESRS"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "materiality_assessment_ref + stakeholder_engagement_process"
+  - id: "no_greenwashing_language"
+    label: "Disclosure avoids over-claim language without evidence"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "'carbon-neutral' / 'net-zero' claims backed by SBTi + offset disclosure"
+
+scoring_method: "weighted_sum"

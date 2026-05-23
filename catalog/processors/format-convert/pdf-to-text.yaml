@@ -1,0 +1,45 @@
+id: "processor/pdf-to-text"
+type: processor
+version: "0.1.0"
+name: "PDF to text"
+description: |
+  Convert a PDF (extractable layer + optional OCR fallback) into plain
+  text with page breaks preserved. Returns text plus per-page byte
+  offsets so downstream chunkers can attribute chunks back to pages.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["format_conversion"]
+modality:   ["text"]
+lifecycle:  "beta"
+lifecycle_position: "pre_api.input_gating"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "format_convert.pdf_to_text"
+deterministic: false
+idempotent: true
+streaming: false
+latency_budget_ms: 5000
+
+inputs:
+  - name: "pdf_bytes"
+    type: "bytes"
+outputs:
+  - name: "text"
+    type: "string"
+  - name: "pages"
+    type: "PageOffset[]"
+  - name: "needs_ocr"
+    type: "boolean"
+
+side_effects: "none"
+on_error: "raise"
+
+implementations:
+  - kind: "callable"
+    path: "processors.pdf_to_text.run"
+  - kind: "docker"
+    image: "ghcr.io/openhh/pdf-to-text:0.1"

@@ -1,0 +1,46 @@
+id: "processor/recursive-character-chunker"
+type: processor
+version: "0.1.0"
+name: "Recursive character chunker"
+description: |
+  Split text into chunks using a recursive character splitter
+  (LangChain-style) that prefers paragraph → sentence → word
+  boundaries. Returns chunks with overlap + per-chunk byte offsets so
+  citations can point back to the source.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["format_conversion"]
+modality:   ["text"]
+lifecycle:  "stable"
+lifecycle_position: "cross_cutting.composition"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "chunk.recursive"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 200
+
+inputs:
+  - name: "text"
+    type: "string"
+  - name: "chunk_size"
+    type: "integer"
+  - name: "chunk_overlap"
+    type: "integer"
+  - name: "separators"
+    type: "string[]"
+outputs:
+  - name: "chunks"
+    type: "Chunk[]"
+
+side_effects: "none"
+on_error: "raise"
+
+implementations:
+  - kind: "callable"
+    path: "processors.recursive_chunker.run"

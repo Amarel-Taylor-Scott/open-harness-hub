@@ -1,0 +1,56 @@
+id: "processor/persona-set-generator"
+type: processor
+version: "0.1.0"
+name: "Persona-set generator (STORM)"
+description: |
+  Spawn N personas with distinct perspectives on a topic. Used by
+  STORM's multi-perspective curation and by multi-agent debate
+  pipelines. Each persona carries a role, an angle, prior knowledge
+  cues, and a few biased priors the simulated dialogue can surface.
+
+  Verified by Open Harness Hub clone:
+  `stanford-oval/storm/knowledge_storm/storm_wiki/modules/persona_generator.py`.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["ai", "media", "education"]
+capability: ["generation", "planning"]
+modality:   ["text"]
+lifecycle:  "experimental"
+lifecycle_position: "pre_api.context_assembly"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "select.persona_set"
+deterministic: false
+idempotent: true
+streaming: false
+latency_budget_ms: 2000
+
+inputs:
+  - name: "topic"
+    type: "string"
+  - name: "n_personas"
+    type: "integer"
+  - name: "max_personas"
+    type: "integer"
+outputs:
+  - name: "personas"
+    type: "object[]"
+
+side_effects: "external_call"
+on_error: "fallback"
+
+model_targets:
+  - id: "local_model"
+    transport: "ollama"
+    label: "Small local model"
+    role: "Persona ideation; quality of variety > quality of prose."
+    required: false
+    default: true
+    trust_boundary: "local"
+
+implementations:
+  - kind: "callable"
+    path: "processors.persona_set_generator.run"

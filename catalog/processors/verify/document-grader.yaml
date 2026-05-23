@@ -1,0 +1,60 @@
+id: "processor/document-grader"
+type: processor
+version: "0.1.0"
+name: "Per-document relevance grader (Self-RAG)"
+description: |
+  Score each retrieved document for relevance to the user query. Emits
+  per-doc grade ∈ {relevant, irrelevant, ambiguous} with a confidence
+  score. Used by Self-RAG and CRAG to filter or trigger fallback.
+
+  Verified by Open Harness Hub clone: pattern shows up in Self-RAG's
+  reflection-token approach and is the canonical first step of
+  Corrective-RAG.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["ai", "cross_industry"]
+capability: ["verification", "classification"]
+modality:   ["text"]
+lifecycle:  "experimental"
+lifecycle_position: "pre_api.context_assembly"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "verify.document_relevance"
+deterministic: false
+idempotent: true
+streaming: false
+latency_budget_ms: 500
+
+inputs:
+  - name: "query"
+    type: "string"
+  - name: "documents"
+    type: "Document[]"
+outputs:
+  - name: "graded"
+    type: "object[]"
+  - name: "relevant"
+    type: "Document[]"
+  - name: "irrelevant"
+    type: "Document[]"
+  - name: "all_irrelevant"
+    type: "boolean"
+
+side_effects: "external_call"
+on_error: "fallback"
+
+model_targets:
+  - id: "small_local_grader"
+    label: "Small local model"
+    transport: "ollama"
+    role: "Fast per-doc grading; doesn't need a frontier judge."
+    required: false
+    default: true
+    trust_boundary: "local"
+
+implementations:
+  - kind: "callable"
+    path: "processors.document_grader.run"

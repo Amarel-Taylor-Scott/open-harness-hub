@@ -1,0 +1,58 @@
+id: "rubric/transfer-pricing-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Transfer-pricing review quality v1"
+description: "8-dim rubric"
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["tax", "tax.transfer_pricing", "finance"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-20"
+updated: "2026-05-20"
+
+dimensions:
+  - id: "method_selected_justified"
+    label: "Best Method (US) / Most Appropriate Method (OECD) selected with rationale"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "tp_method ∈ {CUP, RPM, CPM, TNMM, PSM} + method_selection_rationale populated"
+  - id: "comparables_quality"
+    label: "Benchmarking study uses adequate comparables (≥5 typically; reject high-error)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "comparable_count ≥ 5 OR justification for exception; rejection criteria documented"
+  - id: "dempe_aligned"
+    label: "Intangibles returns align with DEMPE functions + control of risk"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "for intangibles: dempe_function_analysis + risk_control_party populated"
+  - id: "documentation_complete"
+    label: "Master File + Local File + (if applicable) CbCR prepared and filed"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "master_file_ref + local_file_ref + (cbcr_ref if MNE > €750M)"
+  - id: "pillar_two_evaluated"
+    label: "Pillar Two ETR by jurisdiction; top-up calculated where < 15%"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "for each jurisdiction: ETR + SBIE + top_up_tax_due populated"
+  - id: "financial_tx_arm_length"
+    label: "Intercompany financial transactions priced at arm's length (loans / guarantees / cash pools)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "for financial transactions: credit_rating + arms_length_spread populated"
+  - id: "no_loss_lrd"
+    label: "LRDs not loss-making absent extraordinary circumstances"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "for LRD entities: operating margin within arms_length_range OR documented exception"
+  - id: "pe_risk_evaluated"
+    label: "Permanent establishment risk evaluated for cross-border arrangements"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "pe_risk_assessment populated for cross-border value-driving activities"
+
+scoring_method: "weighted_sum"

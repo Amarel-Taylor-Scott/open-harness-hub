@@ -1,0 +1,111 @@
+id: "pipeline/knowledge-graph-from-corpus"
+type: pipeline
+version: "0.1.0"
+name: "GraphRAG: knowledge-graph from corpus + global/local query"
+description: |
+  Microsoft GraphRAG pattern. Extract entities + relationships from
+  documents into a graph; build community summaries via Leiden
+  clustering; query via local (ego-network), global (map-reduce over
+  communities), or DRIFT (primer + follow-up hybrid).
+
+  Verified by Open Harness Hub clone:
+  `microsoft/graphrag/packages/graphrag/graphrag/query/structured_search/`
+  contains `local_search/`, `global_search/`, `drift_search/` modules.
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "cross_industry"]
+capability: ["retrieval", "reasoning", "extraction"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url: "https://github.com/microsoft/graphrag"
+  source_kind: "github"
+  author: "Microsoft Research"
+  license: "MIT"
+
+task: |
+  Given a corpus, build a knowledge graph (entities + relationships +
+  community summaries); answer queries via local / global / DRIFT search.
+pipeline_kind: "knowledge_graph"
+
+inputs:
+  - name: "corpus_ref"
+    type: "artifact_id"
+  - name: "query"
+    type: "string"
+  - name: "search_mode"
+    type: "enum[local, global, drift]"
+
+outputs:
+  - name: "answer"
+    type: "markdown"
+  - name: "subgraph"
+    type: "object"
+  - name: "communities_used"
+    type: "string[]"
+  - name: "citations"
+    type: "Citation[]"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/grep-prompt-injection-heuristics"
+
+steps:
+  - id: "extract_entities_and_edges"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Extract (entity, entity_type, attributes) and (subject, relationship, object, evidence_chunk) tuples from each document chunk. Output as typed JSON."}]
+      context: "$.inputs.corpus_ref"
+
+  - id: "build_communities"
+    kind: "processor"
+    ref: "processor/community-summary-mapreduce"
+    when: "$.inputs.search_mode in ['global', 'drift']"
+    inputs:
+      graph: "$.steps.extract_entities_and_edges.output.text"
+
+  - id: "local_search"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    when: "$.inputs.search_mode == 'local'"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Find entities matching the query; build 1-hop ego-network context; answer with cited entities."}]
+      context: "$.steps.extract_entities_and_edges.output.text"
+
+  - id: "global_search"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    when: "$.inputs.search_mode == 'global'"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Map: per-community partial answer. Reduce: combine partial answers, deduplicate, cite communities."}]
+      context: "$.steps.build_communities.output.summaries"
+
+  - id: "drift_search"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    when: "$.inputs.search_mode == 'drift'"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Primer pass over community summaries. Generate follow-up questions. Hybrid local + global search for follow-ups. Reduce."}]
+      context: "$.steps.build_communities.output.summaries"
+
+  - id: "verify_citations"
+    kind: "processor"
+    ref: "processor/citation-coverage"
+    inputs:
+      response_markdown: "$.steps.local_search.output.text || $.steps.global_search.output.text || $.steps.drift_search.output.text"
+
+success_criteria:
+  - rubric: "rubric/research-entity-v1"
+    threshold: 0.75

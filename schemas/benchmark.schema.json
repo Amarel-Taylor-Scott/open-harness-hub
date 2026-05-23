@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/benchmark.schema.json",
+  "title": "Benchmark manifest",
+  "description": "A pipeline run against a labeled test set with a rubric.",
+  "allOf": [
+    { "$ref": "_common.schema.json#/$defs/envelope" },
+    {
+      "type": "object",
+      "required": ["pipeline", "dataset", "rubric", "judge", "model_arms", "headline_metric"],
+      "properties": {
+        "type":     { "const": "benchmark" },
+        "pipeline": { "$ref": "_common.schema.json#/$defs/artifactId" },
+        "dataset":  { "$ref": "_common.schema.json#/$defs/artifactId" },
+        "rubric":   { "$ref": "_common.schema.json#/$defs/artifactId" },
+        "judge":    { "type": "string", "enum": ["deterministic", "local_model", "frontier_judge", "human"] },
+        "model_arms": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["label", "adapter_ref"],
+            "properties": {
+              "label":            { "type": "string" },
+              "adapter_ref":      { "$ref": "_common.schema.json#/$defs/artifactId" },
+              "harness_override": { "$ref": "_common.schema.json#/$defs/artifactId" },
+              "rule_pack_override": { "type": "array", "items": { "$ref": "_common.schema.json#/$defs/artifactId" } }
+            }
+          }
+        },
+        "headline_metric": { "type": "string" },
+        "reproducibility": {
+          "type": "object",
+          "properties": {
+            "commit_sha":      { "type": "string" },
+            "dataset_version": { "type": "string" },
+            "run_date":        { "type": "string", "format": "date" },
+            "hardware":        { "type": "string" },
+            "seed":            { "type": "integer" }
+          }
+        },
+        "report": {
+          "type": "object",
+          "properties": {
+            "output":  { "type": "string" },
+            "summary": { "type": "string" }
+          }
+        }
+      }
+    }
+  ]
+}

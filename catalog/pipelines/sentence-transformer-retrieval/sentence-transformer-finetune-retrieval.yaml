@@ -1,0 +1,88 @@
+id: "pipeline/sentence-transformer-finetune-retrieval"
+type: pipeline
+version: "0.1.0"
+name: "Sentence-transformer fine-tune for retrieval / ranking"
+description: |
+  Fine-tune a sentence-transformer (Sentence-BERT family) on
+  (query, positive, negative) triplets using MultipleNegativesRankingLoss
+  or CosineSimilarityLoss. Embeds documents into a dense space,
+  retrieves by cosine similarity. The dominant Kaggle shape for
+  retrieval-style competitions on educational content + curriculum
+  matching + semantic search.
+
+  Verified by Open Harness Hub mining: yuiwai LECR-stsb-roberta-base
+  (420 votes, Learning Equality Curriculum Recommendations), yuiwai
+  all-MiniLM-L6-v2-tuning (401 votes, LECR), karakasatarik 0.459
+  single-model-inference w/ postprocessing (375 votes, LECR),
+  leonidkulyk BLIP+CLIP interrogator (732 votes, SD image-to-prompts
+  — uses sentence-transformer fine-tune). 7+ kernels in our 43-kernel
+  corpus use sentence-transformers.
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "education", "scientific_research"]
+capability: ["retrieval", "embedding", "reranking"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "api.training"
+tags: ["sentence-transformers", "retrieval", "embedding", "fine-tune", "kaggle-verified"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+attribution:
+  source_url:  "https://www.kaggle.com/competitions/learning-equality-curriculum-recommendations"
+  source_kind: "kaggle"
+  author:      "yuiwai (420 + 401), karakasatarik (375), leonidkulyk (732) — Learning Equality + SD image-to-prompts"
+  license:     "Apache-2.0"
+
+task: "Fine-tune a sentence-transformer on (query, positive, negative) triplets; serve dense retrieval at inference."
+pipeline_kind: "training_and_serving"
+
+inputs:
+  - name: "triplets_dataset"
+    type: "artifact_id"
+  - name: "base_model"
+    type: "string"
+  - name: "epochs"
+    type: "integer"
+outputs:
+  - name: "finetuned_model"
+    type: "artifact_id"
+  - name: "eval_metrics"
+    type: "object"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/bge-embeddings-local"
+
+steps:
+  - id: "guard"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.base_model" }
+  - id: "train"
+    kind: "processor"
+    ref: "processor/iterative-revise-loop"
+    inputs:
+      initial_prompt: "Fine-tune sentence-transformer with MultipleNegativesRankingLoss. Batch size 16-32. Warmup 10%."
+      inner_harness_ref: "harness/text-safety-review"
+      verifier_refs: []
+      max_iterations: 3
+      cost_ceiling_usd: 5.00
+      convergence_policy: "all_pass"
+  - id: "retrieve_and_rerank"
+    kind: "processor"
+    ref: "processor/cross-encoder-reranker"
+    inputs:
+      query:      "$.inputs.triplets_dataset"
+      candidates: "$.steps.train.output"
+      output_k:   10
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "sentence-transformer-finetune-retrieval"
+      applied_layers: ["training", "retrieval", "reranking"]
+
+success_criteria: []

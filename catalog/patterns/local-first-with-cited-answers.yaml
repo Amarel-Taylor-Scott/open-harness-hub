@@ -1,0 +1,71 @@
+id: "pattern/local-first-with-cited-answers"
+type: pattern
+version: "0.1.0"
+name: "Local-first with cited answers"
+description: "Privacy-preserving RAG pattern: all PDF content + chunks + embeddings + chat history live on the user's machine; model inference goes through a local provider (e.g. Ollama) by default; every answer surfaces (page, span) citations. Cloud is opt-in via explicit API key. Generalizes from CiteMind (PDF research wiki) to any vertical where uploads to a hosted model are politically, legally, or culturally unacceptable."
+authors: [{ name: "CiteMind team (upstream)" }, { name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["education", "privacy", "compliance", "healthcare", "defense", "legal"]
+capability:  ["retrieval", "safety_gating"]
+modality:    ["text"]
+lifecycle:   "beta"
+trust_boundary: "local"
+created: "2026-05-21"
+updated: "2026-05-21"
+
+attribution:
+  source_url: "https://huggingface.co/spaces"
+  source_kind: "huggingface"
+  author: "CiteMind team (Gemma 4 Good Hackathon, composite)"
+  license: "TBD — pending upstream confirmation"
+
+when_to_use:
+  - "Documents the user cannot or will not upload to a hosted model (private health records, legal filings, defense materials, unpublished research)."
+  - "Low-connectivity or air-gapped environments."
+  - "Regulated industries that require audit trails proving data did not leave the perimeter."
+  - "Use cases where citation-back-to-page is a UX requirement, not a nice-to-have."
+
+structural_shape:
+  - "step 1 — local file ingest (PDF / structured doc) writes to local store"
+  - "step 2 — OCR-aware page-chunked indexing with local embedder"
+  - "step 3 — hybrid BM25 + vector retrieval"
+  - "step 4 — model inference via local provider (Ollama / llama.cpp / etc.); cloud is opt-in"
+  - "step 5 — every answer carries (page, span) citation; un-cited claims are flagged"
+  - "step 6 — audit trace stays local"
+
+problem: |
+  Hosted-chatbot RAG defaults leak document content to third-party model
+  providers. For privacy-sensitive, regulated, or air-gapped work this is
+  disqualifying. At the same time, users + auditors require evidence-grounded
+  answers — claims with no source pointer are worse than "I don't know."
+  The local-first + cited-answer pattern resolves both by keeping all state
+  on the user's machine + insisting every answer surface a (page, span)
+  citation.
+
+solution: |
+  Treat the local store as authoritative state: document, chunks, embeddings,
+  chat history, generated outputs, audit trail. Route all model calls
+  through a local provider by default (Ollama / llama.cpp / mlx). Make
+  cloud access opt-in via explicit API key configuration. Enforce a
+  contract that every model output carries a citation pointer (page +
+  span) that links back to the source — UN-cited claims are flagged as
+  ungrounded, not rendered as authoritative content.
+
+examples:
+  - context: "Refugee Inkasso letter review (Bill_info AI vertical)"
+    application: "Document never leaves the laptop; every classification carries the source paragraph that triggered it."
+  - context: "BSL-4 lab biosafety SOP study (Biosecurity vertical)"
+    application: "SOPs cannot be shared outside the registered entity; tutor runs on local hardware, cites BMBL section + page."
+  - context: "Defense DFARS contract clause review (Defense vertical)"
+    application: "Contract text is CUI; tutor runs on local-air-gapped workstation; answer cites DFARS section."
+
+implementing_pipelines:
+  - "pipeline/citemind-pdf-to-research-wiki"
+  - "pipeline/bill-info-extract-fraud-detect-recommend"
+
+related_patterns:
+  - "pattern/refuse-on-redacted"
+  - "pattern/two-stage-extract-then-judge"
+  - "pattern/critical-tier-output-override"
+
+tags: ["local-first", "rag", "citation", "privacy"]

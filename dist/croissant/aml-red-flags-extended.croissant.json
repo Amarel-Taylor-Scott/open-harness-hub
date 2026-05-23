@@ -1,0 +1,147 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/aml-red-flags-extended",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "AML red flags (extended)",
+  "description": "Extended catalog of anti-money-laundering red flags drawn from FATF\nguidance, FinCEN advisories, and Wolfsberg principles. Complements\n`knowledge-pack/fatf-typologies-sample` with finer-grained\nobservable indicators (transaction pattern, behavioral, document,\ngeographic) for use in AML pipelines.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC-BY-4.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/aml-red-flags-extended",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-19",
+  "keywords": [
+    "aml",
+    "red-flags",
+    "fatf",
+    "wolfsberg"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-19",
+  "citation": "FATF Recommendations (composite); FinCEN advisories (composite); Wolfsberg AML Principles (composite)",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "aml-red-flags-extended__aml-red-flags-extended",
+      "name": "aml-red-flags-extended.jsonl",
+      "description": "Data file backing knowledge pack aml-red-flags-extended.",
+      "contentUrl": "knowledge-packs/data/aml-red-flags-extended.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "6517 B",
+      "sha256": "c8f94c537093cac538d35f4dacca2bf39696fdd6422347a4e7d5e6360d75b5cc"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "aml-red-flags-extended__records",
+      "name": "aml-red-flags-extended__records",
+      "description": "Records parsed from aml-red-flags-extended.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "aml-red-flags-extended__records/id",
+          "name": "id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "aml-red-flags-extended__aml-red-flags-extended"
+            },
+            "extract": {
+              "column": "id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "aml-red-flags-extended__records/category",
+          "name": "category",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "aml-red-flags-extended__aml-red-flags-extended"
+            },
+            "extract": {
+              "column": "category"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "aml-red-flags-extended__records/label",
+          "name": "label",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "aml-red-flags-extended__aml-red-flags-extended"
+            },
+            "extract": {
+              "column": "label"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "aml-red-flags-extended__records/indicator",
+          "name": "indicator",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "aml-red-flags-extended__aml-red-flags-extended"
+            },
+            "extract": {
+              "column": "indicator"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

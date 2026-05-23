@@ -1,0 +1,65 @@
+id: "processor/action-sampler-multi-rollout"
+type: processor
+version: "0.1.0"
+name: "Action sampler — N parallel rollouts"
+description: |
+  Sample N independent action trajectories for an agent task; return
+  the trajectories + final-state candidates for downstream judging.
+  The N candidates can be reviewed by a separate judge processor to
+  pick the best.
+
+  Verified by Open Harness Hub clone:
+  `SWE-agent/sweagent/agent/action_sampler.py`.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["ai", "software"]
+capability: ["agent_loop", "planning"]
+modality:   ["text", "code"]
+lifecycle:  "experimental"
+lifecycle_position: "api.tool_call"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "sample.n_rollouts"
+deterministic: false
+idempotent: true
+streaming: false
+latency_budget_ms: 60000
+
+inputs:
+  - name: "task"
+    type: "string"
+  - name: "n_samples"
+    type: "integer"
+  - name: "max_actions_per_sample"
+    type: "integer"
+  - name: "sandbox_image"
+    type: "string"
+outputs:
+  - name: "trajectories"
+    type: "object[]"
+  - name: "final_states"
+    type: "object[]"
+  - name: "patches"
+    type: "string[]"
+
+side_effects: "external_call"
+on_error: "fallback"
+retry:
+  max_attempts: 1
+  backoff: "none"
+
+model_targets:
+  - id: "code_model"
+    transport: "ollama"
+    label: "Code-generation model"
+    role: "Generates the agent's action trajectories (file edits + shell commands)."
+    required: true
+    default: true
+    trust_boundary: "local"
+
+implementations:
+  - kind: "callable"
+    path: "processors.action_sampler.run"

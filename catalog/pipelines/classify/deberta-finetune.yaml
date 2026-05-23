@@ -1,0 +1,74 @@
+id: "pipeline/deberta-finetune-classification"
+type: pattern
+version: "0.1.0"
+name: "DeBERTa-v3-large fine-tune for closed-set classification"
+description: |
+  DeBERTa-v3-large fine-tuning shape used as the heavy half of nearly
+  every top Kaggle LLM-classification submission since 2023. Combined
+  with `pipeline/tfidf-lightgbm-text-classification` as a stacked
+  ensemble for the final leaderboard score.
+
+  Verified by Open Harness Hub Meta Kaggle deep mining: top kernels
+  across `llm-detect-ai-generated-text`, `llm-classification-finetuning`,
+  `h2oai-predict-the-llm` use this exact stack.
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "cross_industry"]
+capability: ["classification"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url: "https://www.kaggle.com/competitions/h2oai-predict-the-llm"
+  source_kind: "kaggle"
+  author: "Multiple Kaggle competition top-public-kernel authors"
+  license: "Apache-2.0"
+
+reference_implementations:
+  - url: "https://www.kaggle.com/code/mustafakeser4/train-detectai-distilroberta-0-927"
+    notes: "87 votes — DistilRoBERTa baseline"
+  - url: "https://www.kaggle.com/code/ihebch/h2o-ai-predict-the-llm-deberta-v3-large"
+    notes: "35 votes — DeBERTa-v3-large reference"
+
+structural_shape:
+  - "Load DeBERTa-v3-large (or -base for faster iteration)"
+  - "Tokenize with a max_length of 512-2048 (varies by competition)"
+  - "Replace classification head with N-class head (or regression head for ordinal)"
+  - "Fine-tune with AdamW + linear warmup + cosine decay; 2-4 epochs"
+  - "K-fold cross-validation (5-fold typical) for OOF probabilities"
+  - "(optional) Pseudo-label confident test rows; re-train one more epoch"
+  - "Calibrate via Platt scaling or temperature scaling"
+  - "Ensemble across fold seeds + (optionally) other backbone families"
+
+when_to_use:
+  - "Closed-set classification with 1k-100k training rows"
+  - "Sequence length under 2048 tokens"
+  - "Quality matters more than inference latency"
+  - "Mid-tier GPU available (DeBERTa-v3-large fits in 16-24 GB)"
+
+when_not_to_use:
+  - "Very short text (under 50 tokens) — TF-IDF often matches"
+  - "Generation tasks"
+  - "Very long documents (over 2048 tokens) — use chunking + aggregation"
+
+variants:
+  - "DistilBERT / DistilRoBERTa for faster inference"
+  - "DeBERTa-v3-base for resource-constrained settings"
+  - "ELECTRA / Longformer for longer sequences"
+
+counter_patterns:
+  - "Full LLM fine-tune (better for generation, often worse for classification)"
+
+implementing_pipelines: []
+implementing_processors: []
+
+tradeoffs:
+  latency: "Hours for fine-tune; ~10 ms per inference"
+  cost: "Single GPU; ~$2-10 cloud-hour for training"
+  quality: "Top of leaderboard on most text-classification tasks"
+  complexity: "Low-medium — standard transformers + Trainer"
+  explainability: "Low — attention visualization at best"

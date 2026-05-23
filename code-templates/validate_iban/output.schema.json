@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "validate_iban output",
+  "type": "object",
+  "required": ["iban", "valid", "reasons"],
+  "properties": {
+    "iban": { "type": "string" },
+    "valid": { "type": "boolean" },
+    "reasons": { "type": "array", "items": { "type": "string" } },
+    "country": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
+}

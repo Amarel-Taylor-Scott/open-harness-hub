@@ -1,0 +1,233 @@
+# Open Harness Hub
+
+> **Repository history note.** This project previously lived at
+> `github.com/taylor-s-amarel/open-harness-hub`. Its canonical home is now
+> [`github.com/Amarel-Taylor-Scott/open-harness-hub`](https://github.com/Amarel-Taylor-Scott/open-harness-hub).
+> All git history is preserved; the old URL may continue to resolve via
+> GitHub's automatic redirect but new pushes go to the new account.
+
+> A host-agnostic, industry-agnostic catalog of **harnesses**, **knowledge
+> objects**, **logic packs**, **rule packs** (GREP / RAG / classifier /
+> heuristic), **tools**, **pipelines**, **benchmarks**, and **rubrics** for
+> building, evaluating, and shipping AI-assisted systems.
+
+The hub is a **specification + content catalog + static site**. You can run
+it from a clone, browse it on GitHub Pages, embed it as a Hugging Face Space,
+or deploy it to Vercel / Netlify / Cloudflare Pages without changes.
+
+## What this is
+
+The Open Harness Hub gives you a standard way to describe and combine the
+modular pieces of a real AI pipeline:
+
+| Layer | Primitive | What it is |
+|---|---|---|
+| **Knowledge** | knowledge pack | A typed bundle of *facts* — RAG corpus, fact tables, contact directories, citation graphs. |
+| **Logic** | logic pack | A typed bundle of *behavior* — prompt templates, tool registries, schemas, rubrics, response policies. |
+| **Rules** | rule pack | A modular bundle of one rule family — GREP regex, glob patterns, classifier rules, heuristic rules, RAG retrieval rules. |
+| **Tools** | tool | A function-call definition with example payloads and a backing implementation contract. |
+| **Models** | model adapter | A provider-neutral transport (local Gemma, Ollama, OpenAI-compatible, Anthropic, Gemini, HF endpoint, frontier API, callable, none). |
+| **Personas** | persona | A character or role frame the model adopts at the start of a workflow. |
+| **Harnesses** | harness | A named, repeatable workflow around a model or trust boundary. Declares applied layers, packs consumed/emitted, model targets, input/output verification, and privacy boundaries. |
+| **Pipelines** | pipeline | A DAG of harnesses + rule packs + tools that completes a specific task. |
+| **Benchmarks** | benchmark | A pipeline run against a labeled test set with a rubric and a judge, producing a comparable score. |
+| **Rubrics** | rubric | An evaluation contract — dimensions, weights, scoring scale, and the evidence each grade requires. |
+| **Datasets** | dataset | A typed collection of inputs, outputs, and labels with provenance. |
+| **Schemas** | schema | A typed I/O contract shared across artifacts. |
+
+Every artifact is described by a small YAML manifest validated against a
+JSON Schema in `schemas/`. The static site reads the catalog and renders a
+browsable, searchable index.
+
+## The two big goals
+
+1. **Help people work out a benchmark for any task.** Pick a pipeline,
+   plug in a dataset, declare a rubric, choose a judge — get a comparable
+   score across models, harness configurations, and rule packs.
+2. **Help people work out a tool for any task.** Pick the right modular
+   primitives — a harness, a few rule packs, a tool registry, a knowledge
+   pack — and compose them into a pipeline that solves a real problem.
+
+Both goals share the same primitives. The catalog is the substrate.
+
+## Catalog status (v0.3.0)
+
+- **172 artifacts**, all validating against the schemas.
+- **14 artifact types**: harness · pipeline · benchmark · rule-pack ·
+  knowledge-pack · logic-pack · tool · persona · adapter · rubric ·
+  dataset · schema · processor · pattern.
+- **2 deep verticals shipped**:
+  - **ESG / Supply-Chain Due Diligence** — full E + S + G coverage,
+    12 jurisdictions (EU CSDDD + CSRD + EUDR + Conflict Minerals,
+    UK MSA, German LkSG, French Loi Vigilance, Norway Åpenhetsloven,
+    Swiss CO 964j, Netherlands CLDD, CA SB 657, US UFLPA + Tariff
+    Act §307, Canada S-211, Australia MSA, Japan METI), 13 GREP-
+    rule languages, 4 rubrics (combined + sub-rubrics E/S/G),
+    3 pipelines, k-anonymity cross-org pattern, CBP-WRO tool, 3
+    synthetic disclosure samples, regression benchmark. The GREP
+    rules have been LIVE-TESTED — see `data/esg-grep-findings.json`
+    and `docs/use-cases/esg-supply-chain-due-diligence.md`.
+  - **Kaggle-mined verified pipelines** — 24 verified-evidence shapes
+    each attributed to a permissively-licensed source repo or
+    competition kernel with explicit author + URL + license in the
+    manifest (LoRA-QLoRA pairwise pref, TF-IDF+LightGBM, DeBERTa,
+    Self-RAG concrete, code-act Jupyter, SWE-patch sample-and-
+    review, STORM persona curation, deep-research supervisor-
+    workers, multi-agent debate, GraphRAG, quantized inference,
+    synthetic data gen, perplexity baseline, large-model FAISS
+    RAG, multi-model ensemble, LLM-judge essay grading, 20-
+    questions agent, plus vLLM batch / AWQ / Qwen-EEDI rerank /
+    DeepSeek-R1 code-interpreter / two-time-retrieval).
+- **20 named design patterns** (Self-RAG, ReAct, ToT, SoT, Reflexion,
+  Self-Refine, Plan-Execute, Orchestrator-Workers, Evaluator-
+  Optimizer, Multi-Agent-Debate, Routing, Prompt-Chaining,
+  Naive/Corrective/Fusion RAG, HyDE, Step-Back, Two-Stage-Retrieve-
+  Rerank, K-Anonymity-Aggregation).
+- **10 zero-LLM-cost code templates** (extract_email/url/phone,
+  normalize_date, validate_iban with mod-97, count_tokens,
+  fuzzy_jaro_winkler, cosine_sim, sha256_hash).
+- **5 model adapters**: Ollama-default, vLLM-AWQ-local, BGE-embeddings-
+  local, OpenAI-embeddings, SDXL-local, Anthropic-Claude-Sonnet,
+  Anthropic-Claude-Opus, OpenAI-GPT-frontier, Google-Gemini.
+- **13 emitters** under `scripts/emit/`: Croissant, MCP, Agent
+  Skills, HF cards, lm-eval-harness, promptfoo, CycloneDX-ML,
+  OpenLineage, C2PA, EU AI Act, SPDX 3.0, JSON-LD, DPV.
+
+## What lives in the catalog
+
+The hub hosts every shape of pipeline that can be built by composing the
+primitives above:
+
+- **Research an entity** — sourced one-page profile of a company / person / place.
+- **Verify data** — claim + corpus → supports / contradicts / no-evidence.
+- **Format response** — coerce model output into a strict typed envelope.
+- **Classify / extract / summarize / translate / redact / route.**
+- **Agent loops** — plan + tool-call + verify + reflect.
+- **Generate text** — free-form text generation with a defined harness.
+- **Generate image** — prompt-shaping + style RAG + guard GREP rules + output-safety review.
+- **Generate audio and video** — same primitive stack, different tools.
+- **System-prompt / persona library** — reusable role frames.
+- **RAG / GREP / classifier / heuristic libraries** — curated rule packs ready to plug in.
+- **Tool library** — function-call schemas, MCP servers, OpenAPI ops.
+
+The full list and the `pipeline_kind` vocabulary live in
+`taxonomy/SPEC.md §11`.
+
+## Where new content comes from
+
+Two ingest paths feed the catalog (see `taxonomy/SPEC.md §12`):
+
+1. **Direct PRs** — a contributor writes a manifest and opens a PR.
+2. **Reference ports** — curators hand-port patterns from established
+   permissively-licensed harness/safety repos (e.g. DueCare,
+   llm-safety-framework) with full upstream attribution + license
+   propagation.
+
+## Quick tour
+
+- **`taxonomy/SPEC.md`** — the controlled vocabulary and field definitions.
+  Start here.
+- **`schemas/`** — JSON Schemas that every manifest must validate against.
+- **`vocabularies/`** — controlled lists (industries, capabilities,
+  modalities, trust boundaries, lifecycle stages).
+- **`catalog/`** — the actual content. One YAML per artifact, organized by
+  type (`catalog/harnesses/`, `catalog/rule-packs/`, etc.).
+- **`examples/`** — worked end-to-end examples. `examples/migrant-worker-safety/`
+  is a generic instance of the reference DueCare safety harness ecosystem.
+- **`docs/`** — MkDocs source for the published site.
+- **`scripts/`** — `validate.py` (run schemas across the catalog),
+  `build_catalog_pages.py` (turn manifests into doc pages), `new.py`
+  (scaffold a new artifact).
+
+## CLI — `oh-hub`
+
+The ergonomic catalog interface. Works for humans + for AI agents
+(Claude Code / Cursor / Aider — invoke as a sub-process and the
+output is structured).
+
+```bash
+python scripts/oh_hub.py stats                         # catalog summary
+python scripts/oh_hub.py list pipeline                 # list by type
+python scripts/oh_hub.py describe persona/esg-auditor  # full describe + deps
+python scripts/oh_hub.py search forced-labor           # fuzzy search
+python scripts/oh_hub.py depends pipeline/supplier-policy-grading
+python scripts/oh_hub.py industries esg                # filter by industry
+python scripts/oh_hub.py validate                      # run validator
+python scripts/oh_hub.py run pipeline/X --inputs input.json
+python scripts/oh_hub.py emit persona/esg-auditor mcp  # emit to MCP / Croissant / etc.
+```
+
+11 demo scripts are pre-baked end-to-end runs (every vertical):
+
+```bash
+python3 scripts/demo_esg_pipeline.py          # ESG / CSDDD supplier grading
+python3 scripts/demo_radiology_pipeline.py    # RADS / Fleischner report grading
+python3 scripts/demo_contract_pipeline.py     # contract clause review
+python3 scripts/demo_appsec_pipeline.py       # CWE secret + vuln detection
+python3 scripts/demo_new_verticals.py         # GxP + climate + threat-intel
+python3 scripts/demo_v3_verticals.py          # GDPR + HR + trade
+python3 scripts/demo_v4_verticals.py          # real estate + M&A + aviation + food safety
+python3 scripts/demo_v5_verticals.py          # construction + NERC CIP + maritime + tax
+python3 scripts/demo_v6_verticals.py          # defense + election integrity + water utility
+python3 scripts/demo_more_verticals.py        # insurance + academic + gov benefits
+python3 scripts/demo_vendor_onboarding.py     # kitchen-sink: ESG + AppSec + Legal
+```
+
+## Notable integrations
+
+- **Bill_info AI** (Sviatoslav Grabovsky, Gemma 4 Good Hackathon —
+  Impact Track: Digital Equity & Inclusivity) — refugee bureaucracy
+  translation with Verbraucherzentrale-grounded fraud detection.
+  Three reusable design patterns extracted: `two-stage-extract-then-judge`,
+  `critical-tier-output-override`, `refuse-on-redacted`. Live demo:
+  [Svityk/bill-info-ai](https://huggingface.co/spaces/Svityk/bill-info-ai).
+- **MedLabel** (Gemma 4 Good Hackathon 2026) — offline-first
+  multilingual medicine-safety AI. Reference shape integrated;
+  author confirmation pending.
+- **27 verified-evidence pipelines** ported from permissively-licensed
+  competition kernels and production repos. Each pipeline manifest
+  references its source(s) + author(s) + license in the manifest header.
+- **Hassan Gasim's "Docker-Hub-for-harnesses" framing** seeded the
+  portable spec at [`docs/spec/HARNESS_HUB_SPEC.md`](docs/spec/HARNESS_HUB_SPEC.md)
+  and the peer-registry comparison at
+  [`docs/comparison/peer-registries.md`](docs/comparison/peer-registries.md).
+
+Full attribution log: [`ATTRIBUTION.md`](ATTRIBUTION.md).
+
+## Run the site locally
+
+```bash
+pip install mkdocs-material mkdocs-awesome-pages-plugin jsonschema pyyaml
+python scripts/validate.py        # validate every manifest
+python scripts/build_catalog_pages.py   # generate docs/catalog/*.md
+mkdocs serve                      # http://127.0.0.1:8000
+```
+
+## Deploy targets (host-agnostic)
+
+The same `mkdocs build` output deploys unchanged to:
+
+- **GitHub Pages** — `.github/workflows/pages.yml` builds and publishes on push to `main`.
+- **Hugging Face Spaces** — `hf-space/README.md` carries the HF frontmatter; serve `site/` as static.
+- **Vercel** — `vercel.json` runs `mkdocs build` and serves `site/`.
+- **Netlify** — `netlify.toml` does the same.
+- **Cloudflare Pages** — same build, same output directory.
+
+Pick one or all four; the build is identical.
+
+## Reference inheritance
+
+The reference for the harness/knowledge/pipeline pattern is Taylor Amarel's
+DueCare safety ecosystem ([`TaylorAmarelTech/gemma4_comp`](https://github.com/TaylorAmarelTech/gemma4_comp))
+plus the LLM Safety Framework ([`TaylorAmarelTech/llm-safety-framework`](https://github.com/TaylorAmarelTech/llm-safety-framework)).
+Those repos are cloned into `_reference/` for offline study; nothing under
+`_reference/` is republished here.
+
+The taxonomy generalizes the DueCare contract — `HarnessSpec`,
+`HarnessLogicPath`, `HarnessModelTarget`, `HarnessPackContract`,
+`KnowledgeObject` — to apply across any industry: healthcare, finance,
+legal, manufacturing, retail, education, gov, security, climate, and so on.
+
+## License
+
+MIT. See `LICENSE`.

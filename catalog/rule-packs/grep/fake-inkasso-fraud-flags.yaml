@@ -1,0 +1,79 @@
+id: "rule-pack/grep-fake-inkasso-fraud-flags"
+type: rule-pack
+version: "0.1.0"
+name: "Fake-Inkasso fraud-detection GREP pack (Verbraucherzentrale 10-indicator taxonomy)"
+description: |
+  GREP detectors for the 10 Verbraucherzentrale Fake-Inkasso
+  indicators. Used by `pipeline/bill-info-extract-fraud-detect-recommend`
+  as a deterministic FIRST PASS before the LLM-based fraud-detect
+  call — fires hard-rule indicators that the LLM call then weights
+  + classifies.
+
+  Sourced from Sviatoslav Grabovsky's Bill_info AI (Bill_info AI on
+  Hugging Face Spaces) which uses these indicators across both the
+  Gemma 4 26B fraud-detect call AND a deterministic business_rules
+  layer.
+authors:
+  - name: "Open Harness Hub contributors (port of Bill_info AI)"
+license: "MIT"
+industry:   ["bureaucracy_translation", "bureaucracy_translation.fraud_screening", "humanitarian", "humanitarian.refugee"]
+capability: ["safety_gating", "classification"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "volatile"
+tags: ["fake-inkasso", "verbraucherzentrale", "fraud-detection", "germany", "refugee-protection"]
+created: "2026-05-21"
+updated: "2026-05-21"
+
+family: "grep"
+rules:
+  # ---------- CRITICAL TIER (any one alone may justify likely_scam) ----------
+  - id: "foreign_iban_non_dach"
+    pattern: "(?i)\\b(?:IBAN[:\\s]*)?(?:PL|CZ|SK|LV|LT|EE|HU|RO|BG|HR|SI|GR|MT|CY|TR|UA|RU|BY|RS|MK|AL|BA|ME|MD)\\d{2}\\s*[A-Z0-9 ]{8,30}"
+    severity: "critical"
+    category: "fake_inkasso.iban.foreign_non_dach"
+  - id: "private_person_recipient"
+    pattern: "(?i)(?:empfänger|recipient|payee|payment\\s+to)[:\\s]+(?:herr|frau|mr|mrs|ms)\\s+[A-ZÄÖÜ][a-zäöüß]+\\s+[A-ZÄÖÜ][a-zäöüß]+(?!.{0,200}(?:gmbh|ag|kg|ohg|ug|gbr|inkasso\\s+(?:gmbh|ag|company|firma)))"
+    severity: "critical"
+    category: "fake_inkasso.recipient.private_person"
+  - id: "legal_threats_first_letter"
+    pattern: "(?i)(?:gerichtsvollzieher|gerichtliche\\s+schritte|zwangsvollstreckung|schufa[- ]?eintrag|haftbefehl|pfändung)(?!.{0,300}(?:zweite\\s+mahnung|letzte\\s+mahnung|nach\\s+der\\s+dritten|mahnbescheid\\s+vom))"
+    severity: "critical"
+    category: "fake_inkasso.legal_threats.no_prior_mahnung"
+  - id: "extreme_deadline_24_72h"
+    pattern: "(?i)(?:zahlungsfrist|frist|deadline|bis\\s+spätestens)[:\\s]+(?:24|48|72)\\s*(?:stunden|hours|h\\b)|innerhalb\\s+(?:von\\s+)?(?:24|48|72)\\s*(?:stunden|hours)"
+    severity: "critical"
+    category: "fake_inkasso.deadline.extreme_24_72h"
+
+  # ---------- SUPPORTING TIER (multiple → suspicious / likely_scam) ----------
+  - id: "missing_handelsregister"
+    pattern: "(?i)inkasso(?:firma|gmbh|ag|dienst)[\\s\\S]{0,500}?(?!.{0,400}(?:hrb\\s*\\d+|hra\\s*\\d+|handelsregister|amtsgericht\\s+\\w+|rdg[- ]?registriert|aufsichtsbehörde))"
+    severity: "medium"
+    category: "fake_inkasso.missing_handelsregister"
+  - id: "unclear_creditor"
+    pattern: "(?i)(?:gläubiger|creditor|original[- ]?creditor)[:\\s]*(?:n[\\.\\/]?a|unbekannt|nicht\\s+angegeben|\\s*[-_]+\\s*$|\\s*\\?+\\s*$)"
+    severity: "medium"
+    category: "fake_inkasso.unclear_creditor"
+  - id: "dubious_excess_fees"
+    pattern: "(?i)(?:bearbeitungsgebühr|express[- ]?versand|express[- ]?versandkosten|sondergebühr|expressbearbeitung|sofort[- ]?gebühr)[:\\s]+(?:€|EUR)?\\s*(?:[1-9]\\d{2,}|[2-9]\\d{1})"
+    severity: "medium"
+    category: "fake_inkasso.dubious_excess_fees"
+  - id: "phantom_company_name"
+    pattern: "(?i)(?:forderungsmanagement|inkassodienst|rechtsabteilung|forderungsstelle|mahnstelle)(?!\\s+\\w+\\s+(?:gmbh|ag|kg))"
+    severity: "medium"
+    category: "fake_inkasso.phantom_company_name"
+  - id: "premium_phone_number"
+    pattern: "(?i)(?:tel(?:efon)?|phone|hotline)[:\\s]+(?:0?900\\s?\\d+|0?180\\s?\\d+|\\+49[- ]?900[- ]?\\d+)"
+    severity: "medium"
+    category: "fake_inkasso.premium_phone"
+  - id: "letzte_mahnung_first_letter"
+    pattern: "(?i)\\bletzte\\s+mahnung\\b|\\bfinal\\s+(?:reminder|notice)\\b|\\bsofortige\\s+(?:zahlung|maßnahmen)\\b"
+    severity: "medium"
+    category: "fake_inkasso.pressure_tactics"
+
+  # ---------- COMPOSITE: any 2+ supporting + 0 critical = suspicious ----------
+  - id: "missing_aufsichtsbehoerde"
+    pattern: "(?i)inkasso[\\s\\S]{0,500}?(?!.{0,400}aufsichtsbehörde\\s+(?:oberlandesgericht|olg|landesjustiz))"
+    severity: "low"
+    category: "fake_inkasso.missing_aufsichtsbehoerde"

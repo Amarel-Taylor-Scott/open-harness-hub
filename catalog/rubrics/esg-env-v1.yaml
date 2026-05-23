@@ -1,0 +1,50 @@
+id: "rubric/esg-env-v1"
+type: rubric
+version: "0.1.0"
+name: "ESG environmental (E) sub-rubric v1"
+description: |
+  Five-dimension rubric for grading ONLY the environmental dimension
+  of a supplier disclosure. Aligned to CSRD ESRS E1-E5, EUDR, and
+  CSDDD Art. 13 (climate transition plan).
+
+  Use this when you want focused E-grading; use
+  `rubric/esg-supplier-compliance-v1` for combined E+S+G grading.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["esg", "supply_chain", "compliance", "climate"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+dimensions:
+  - id: "e1_climate_transition"
+    label: "ESRS E1: climate transition plan + Scope 1/2/3 inventory"
+    weight: 0.30
+    scale: "0..1"
+    evidence_required: "transition_plan_ref + ghg_inventory.scope_1/2/3 with boundary"
+  - id: "e2_pollution"
+    label: "ESRS E2: pollution control (air / water / soil / substances of concern)"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "pollutant_register + discharge_permit_refs"
+  - id: "e3_water_marine"
+    label: "ESRS E3: water + marine resources (consumption, withdrawal, water-stress sourcing)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "water_withdrawal_by_basin + aqueduct_baseline_water_stress flag"
+  - id: "e4_biodiversity"
+    label: "ESRS E4: biodiversity + ecosystems (KBA / protected area / deforestation)"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "site_locations + KBA_distance_km + EUDR_compliance flag"
+  - id: "e5_circular"
+    label: "ESRS E5: resource use + circular economy"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "material_inflows/outflows + recycled_content_pct + take-back_program_ref"
+
+scoring_method: "weighted_sum"

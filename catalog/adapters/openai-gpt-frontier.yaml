@@ -1,0 +1,29 @@
+id: "adapter/openai-gpt-frontier"
+type: adapter
+version: "0.1.0"
+name: "OpenAI frontier-class chat + tool-use"
+description: |
+  OpenAI's frontier-class chat + tool-use adapter, configured for
+  the latest GPT model at instantiation time. Use as one of the
+  frontier arms in cross-vendor benchmarks; useful when comparing
+  Claude vs GPT vs Gemini for the same pipeline.
+
+  Requires `OPENAI_API_KEY`.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["ai", "cross_industry"]
+capability: ["generation", "dialogue", "tool_use", "reasoning"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "external"
+tags: ["openai", "gpt", "frontier", "tool-use"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+transport:    "openai_compatible"
+capabilities: ["text_generation", "chat", "tool_use", "long_context", "vision"]
+auth:         "api_key"
+cost_model:   "paid"
+endpoint:     "https://api.openai.com/v1"
+default_model: "gpt-5"

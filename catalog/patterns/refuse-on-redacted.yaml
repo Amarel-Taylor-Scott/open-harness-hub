@@ -1,0 +1,82 @@
+id: "pattern/refuse-on-redacted"
+type: pattern
+version: "0.1.0"
+name: "Refuse-on-redacted (null over hallucination on missing fields)"
+description: |
+  When an input field is missing, redacted, or unreadable, return
+  `null` (or its user-language equivalent — 'unknown' / 'невідомо'
+  / 'unbekannt') rather than hallucinating a plausible value.
+  Prevents the most dangerous failure mode in document-extraction
+  pipelines: confident invented numbers, dates, names that the user
+  treats as authoritative because the model returned them.
+
+  Bill_info AI achieves 100% refusal accuracy on 7 redacted documents
+  in its 28-document eval set. The pattern requires: explicit
+  schema-level support for null on every field; system prompt with
+  anti-hallucination instructions; downstream UI that renders null
+  as a user-language "unknown" rather than as zero or empty string
+  (which would look like a real value).
+
+  Published in Sviatoslav Grabovsky's Bill_info AI (Gemma 4 Good
+  Hackathon, Impact Track — Digital Equity & Inclusivity).
+authors:
+  - name: "Sviatoslav Grabovsky (Bill_info AI), Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry:   ["ai", "cross_industry", "bureaucracy_translation", "healthcare", "finance"]
+capability: ["safety_gating", "verification", "extraction"]
+modality:   ["text", "image"]
+lifecycle:  "beta"
+trust_boundary: "local"
+tags: ["safety", "refusal", "anti-hallucination", "vulnerable-users", "hackathon-verified"]
+created: "2026-05-21"
+updated: "2026-05-21"
+
+paper_url: "https://huggingface.co/spaces/Svityk/bill-info-ai"
+paper_citation: "Sviatoslav Grabovsky 2026, Bill_info AI — Refuse-on-Redacted design pattern (Gemma 4 Good Hackathon)"
+reference_implementations:
+  - { url: "https://github.com/Svityk/bill-info-ai", language: "python", framework: "gemma-4 + structured-json-schema" }
+
+structural_shape:
+  - "schema: every field is Optional[T] (null is a valid value)"
+  - "system_prompt: 'For any field that is missing, redacted, or unreadable in the input, return null. NEVER invent a value.'"
+  - "extracted = llm.extract(input, schema_with_null)"
+  - "validate that all redacted-looking fields returned null"
+  - "ui_render(null) → user-language 'unknown' (NOT '' or 0)"
+
+when_to_use:
+  - "Document-extraction pipelines where users treat returned values as authoritative"
+  - "Vulnerable / time-stressed users (refugees, patients, applicants under pressure)"
+  - "High-cost-of-error domains (finance / medical / legal)"
+  - "Compliance settings where hallucinated values create false audit trails"
+
+when_not_to_use:
+  - "Creative / generative tasks where 'fill in the blank' is expected"
+  - "Recommender / suggestion settings where best-guesses are explicitly suggestions"
+  - "When the downstream consumer doesn't render null distinctly (and would silently treat null as a real value)"
+
+variants:
+  - "Hard refusal (Bill_info AI baseline): null on any non-extractable field"
+  - "Confidence-tagged: return value + confidence; downstream renders low-conf differently"
+  - "Refuse + ask: return null + prompt the user to upload a clearer image"
+  - "Refuse + alternative path: null on the field + suggest a manual-verification step"
+
+counter_patterns:
+  - "Default-value-on-missing (returns 0 or empty string) — silently fabricates"
+  - "Best-guess extraction — confident hallucination"
+
+implementing_pipelines:
+  - "pipeline/bill-info-extract-fraud-detect-recommend"
+  - "pipeline/radiology-report-grading"
+  - "pipeline/insurance-claim-review"
+  - "pipeline/benefits-adjudication-review"
+
+implementing_processors:
+  - "processor/redact-pii-text"
+  - "processor/verify-deterministic-criterion"
+
+tradeoffs:
+  latency:    "Zero — schema-level + system-prompt instruction"
+  cost:       "Zero — no extra LLM call"
+  quality:    "Substantially safer on redacted / unclear inputs (100% refusal in Bill_info AI eval, prevents user-trust-breaking hallucinations)"
+  complexity: "Low — schema design + system prompt + UI null rendering"
+  explainability: "High — null is auditably different from any value"

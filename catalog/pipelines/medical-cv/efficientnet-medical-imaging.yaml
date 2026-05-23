@@ -1,0 +1,85 @@
+id: "pipeline/efficientnet-medical-imaging"
+type: pipeline
+version: "0.1.0"
+name: "EfficientNet for medical imaging classification + segmentation"
+description: |
+  EfficientNet-B0 / B3 backbone + custom head for medical-imaging
+  competitions: skin lesion (ISIC), brain activity (EEG-as-image),
+  histopathology (HuBMAP), spine MRI (RSNA Lumbar). Uses timm or
+  segmentation-models-pytorch for pre-trained checkpoints; 5-fold
+  CV; image augmentation via albumentations.
+
+  Verified by Open Harness Hub mining: cdeotte EfficientNetB0 starter
+  (1564 votes, HMS Harmful Brain Activity), motono0223 ISIC PyTorch
+  baseline (794 votes, EfficientNet + timm), hidngnguyna baseline
+  U-Net + EfficientNet (617 votes, HuBMAP), awsaf49 HMS-HBAC KerasCV
+  (1733 votes — KerasCV variant of the same shape).
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["healthcare", "healthcare.radiology", "ai"]
+capability: ["classification"]
+modality:   ["image"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "api.training"
+tags: ["efficientnet", "timm", "medical-imaging", "kaggle-verified"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+attribution:
+  source_url:  "https://www.kaggle.com/competitions/hms-harmful-brain-activity-classification"
+  source_kind: "kaggle"
+  author:      "cdeotte (1564), awsaf49 (1733), motono0223 (794), hidngnguyna (617)"
+  license:     "Apache-2.0"
+
+task: "Train EfficientNet (B0/B3) on medical imaging task; 5-fold CV + TTA at inference."
+pipeline_kind: "training_and_serving"
+
+inputs:
+  - name: "image_dataset"
+    type: "artifact_id"
+  - name: "backbone"
+    type: "string"
+  - name: "n_folds"
+    type: "integer"
+outputs:
+  - name: "fold_metrics"
+    type: "object[]"
+  - name: "predictions"
+    type: "number[]"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+
+steps:
+  - id: "guard"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.backbone" }
+  - id: "augment_and_train"
+    kind: "processor"
+    ref: "processor/iterative-revise-loop"
+    inputs:
+      initial_prompt: "Train EfficientNet (B0 to B5 via timm). Use albumentations for augmentation (RandomBrightness, ShiftScaleRotate, RandomCrop). 5-fold StratifiedKFold. AdamW + CosineAnnealingLR."
+      inner_harness_ref: "harness/text-safety-review"
+      verifier_refs: []
+      max_iterations: 1
+      cost_ceiling_usd: 5.00
+      convergence_policy: "all_pass"
+  - id: "fold_ensemble"
+    kind: "processor"
+    ref: "processor/multi-vector-fusion"
+    inputs:
+      ranked_lists: "$.steps.augment_and_train.output"
+      method: "weighted_sum"
+      k: 1
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "efficientnet-medical-imaging"
+      applied_layers: ["training", "ensemble"]
+
+success_criteria: []

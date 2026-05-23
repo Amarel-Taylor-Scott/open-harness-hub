@@ -1,0 +1,56 @@
+id: "processor/context-window-packer"
+type: processor
+version: "0.1.0"
+name: "Context-window packer (Lost-in-the-middle aware)"
+description: |
+  Reorganize retrieved chunks into the model's context window so the
+  most important content lands at the BEGINNING and END of the window
+  (Liu et al. 2023 "Lost in the Middle"). Also enforces:
+    - token budget cap
+    - per-source dedup
+    - chunk-priority ordering (rerank score → recency → source authority)
+    - explicit chunk delimiters with index labels for citation
+  Returns the packed context string + chunk-index → source map.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["retrieval"]
+modality:   ["text"]
+lifecycle:  "beta"
+lifecycle_position: "pre_api.context_assembly"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "assemble.context_window_pack"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 50
+
+inputs:
+  - name: "chunks"
+    type: "Chunk[]"
+  - name: "token_budget"
+    type: "integer"
+  - name: "ordering"
+    type: "enum[score_desc, litm_alternating, recency_desc, authority_desc]"
+  - name: "include_delimiters"
+    type: "boolean"
+outputs:
+  - name: "packed_context"
+    type: "string"
+  - name: "chunk_index_map"
+    type: "object[]"
+  - name: "dropped_chunks"
+    type: "Chunk[]"
+  - name: "actual_tokens"
+    type: "integer"
+
+side_effects: "none"
+on_error: "raise"
+
+implementations:
+  - kind: "callable"
+    path: "processors.context_window_packer.run"

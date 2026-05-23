@@ -1,0 +1,50 @@
+id: "tool/sanctions-check"
+type: tool
+version: "0.1.0"
+name: "Sanctions list check"
+description: |
+  Check a normalized entity name against one or more sanctions lists
+  (OFAC SDN, UN Consolidated, EU Consolidated, HMT, or institutional
+  PEP). Returns matches above the configured fuzz threshold.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["finance", "finance.aml", "finance.kyc"]
+capability: ["verification", "safety_gating"]
+modality:   ["text", "structured"]
+lifecycle:  "stable"
+trust_boundary: "local"
+tags: ["sanctions", "kyc", "aml"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+parameters:
+  type: object
+  properties:
+    normalized_name: { type: "string" }
+    lists:
+      type: array
+      items: { type: "string", enum: ["ofac_sdn", "un_consolidated", "eu_consolidated", "hmt", "institution_pep"] }
+    threshold:       { type: "number", default: 0.92, description: "Jaro-Winkler fuzz threshold." }
+  required: ["normalized_name", "lists"]
+returns:
+  type: object
+  properties:
+    matches:
+      type: array
+      items:
+        type: object
+        properties:
+          entity_id:    { type: "string" }
+          name:         { type: "string" }
+          source_list:  { type: "string" }
+          score:        { type: "number" }
+          listed_on:    { type: "string", format: "date" }
+          program:      { type: "string" }
+side_effects: "read"
+examples:
+  - input:  { normalized_name: "placeholder name 1", lists: ["ofac_sdn"], threshold: 0.90 }
+    output: { matches: [{ "entity_id": "PLACEHOLDER-001", "name": "PLACEHOLDER NAME 1", "source_list": "ofac_sdn", "score": 1.0, "listed_on": "2024-01-15", "program": "GENERIC-PROGRAM" }] }
+implementations:
+  - kind: "callable"
+    path: "tools.sanctions_check.run"

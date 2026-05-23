@@ -1,0 +1,127 @@
+{
+  "pipeline": "pipeline/suspicious-transaction-review",
+  "scenario": "structuring-vignette",
+  "_synthetic_note": "Composite scenario. Not a real account or entity. Placeholder IDs only.",
+  "inputs": {
+    "account_id": "ACCT-PLACEHOLDER-001",
+    "narrative": "Account opened 90 days ago by Customer X. Stated purpose: small business. In the past 14 days, twelve cash deposits of $9,500 each across three branches, followed by a single outgoing wire of $114,000 to a new beneficiary.",
+    "transactions": [
+      { "src": "CUST-PLACEHOLDER-X", "dst": "ACCT-PLACEHOLDER-001", "amount_usd": 9500, "ts": "2026-05-05T10:00:00Z", "kind": "cash" },
+      { "src": "CUST-PLACEHOLDER-X", "dst": "ACCT-PLACEHOLDER-001", "amount_usd": 9500, "ts": "2026-05-05T15:00:00Z", "kind": "cash" },
+      { "src": "CUST-PLACEHOLDER-X", "dst": "ACCT-PLACEHOLDER-001", "amount_usd": 9500, "ts": "2026-05-08T11:00:00Z", "kind": "cash" },
+      { "src": "ACCT-PLACEHOLDER-001", "dst": "ENT-PLACEHOLDER-Y", "amount_usd": 114000, "ts": "2026-05-18T09:00:00Z", "kind": "wire" }
+    ],
+    "related_entities": [
+      { "entity_id": "ENT-PLACEHOLDER-Y", "name": "Placeholder Beneficiary Y", "normalized_name": "placeholder beneficiary y", "country": "XX" }
+    ]
+  },
+  "trace": [
+    {
+      "step_id": "redact_pii",
+      "kind": "harness",
+      "ref": "harness/redact-pii-text",
+      "input":  { "text": "Account opened 90 days ago by Customer X. Stated purpose: small business. In the past 14 days, twelve cash deposits of $9,500 each across three branches, followed by a single outgoing wire of $114,000 to a new beneficiary." },
+      "output": { "redacted_text": "Account opened 90 days ago by Customer X. Stated purpose: small business. In the past 14 days, twelve cash deposits of $9,500 each across three branches, followed by a single outgoing wire of $114,000 to a new beneficiary.", "audit": [] },
+      "ms": 5,
+      "simulated": false
+    },
+    {
+      "step_id": "sanctions_screen_entities",
+      "kind": "tool",
+      "ref": "tool/sanctions-check",
+      "input":  { "normalized_name": "placeholder beneficiary y", "lists": ["ofac_sdn", "un_consolidated", "eu_consolidated"], "threshold": 0.92 },
+      "output": { "matches": [] },
+      "ms": 28,
+      "simulated": false
+    },
+    {
+      "step_id": "graph_query",
+      "kind": "tool",
+      "ref": "tool/transaction-graph-query",
+      "input":  { "seed_account": "ACCT-PLACEHOLDER-001", "direction": "both", "max_hops": 2, "time_window_days": 30 },
+      "output": {
+        "nodes": [
+          { "id": "ACCT-PLACEHOLDER-001", "kind": "account", "country": "US", "risk_score": 0.62 },
+          { "id": "CUST-PLACEHOLDER-X",   "kind": "entity",  "country": "US", "risk_score": 0.48 },
+          { "id": "ENT-PLACEHOLDER-Y",    "kind": "entity",  "country": "XX", "risk_score": 0.71 }
+        ],
+        "edges": [
+          { "src": "CUST-PLACEHOLDER-X", "dst": "ACCT-PLACEHOLDER-001", "amount_usd": 9500,   "ts": "2026-05-05T10:00:00Z", "kind": "cash" },
+          { "src": "CUST-PLACEHOLDER-X", "dst": "ACCT-PLACEHOLDER-001", "amount_usd": 9500,   "ts": "2026-05-08T11:00:00Z", "kind": "cash" },
+          { "src": "ACCT-PLACEHOLDER-001", "dst": "ENT-PLACEHOLDER-Y", "amount_usd": 114000, "ts": "2026-05-18T09:00:00Z", "kind": "wire" }
+        ]
+      },
+      "ms": 42,
+      "simulated": false
+    },
+    {
+      "step_id": "typology_score",
+      "kind": "rule_pack",
+      "ref": "rule-pack/aml-typologies-fatf",
+      "input":  { "text": "twelve cash deposits of $9,500 each across three branches, followed by a single outgoing wire of $114,000" },
+      "output": {
+        "fired": [
+          { "rule_id": "structuring_under_threshold", "severity": "high" }
+        ],
+        "pack": "rule-pack/aml-typologies-fatf"
+      },
+      "ms": 6,
+      "simulated": false
+    },
+    {
+      "step_id": "retrieve_fatf",
+      "kind": "knowledge_pack",
+      "ref": "knowledge-pack/fatf-typologies-sample",
+      "input":  { "query": "structuring smurfing reporting threshold cash deposits", "top_k": 4 },
+      "output": {
+        "docs": [
+          { "id": "fatf-structuring-§2.1", "score": 0.95,
+            "text": "Structuring (also smurfing) describes the breakdown of large transactions into smaller amounts to avoid currency-transaction reporting thresholds..." }
+        ]
+      },
+      "ms": 19,
+      "simulated": false
+    },
+    {
+      "step_id": "investigate",
+      "kind": "harness",
+      "ref": "harness/aml-investigation",
+      "input":  { "messages": [ { "role": "user", "content": "Compose a sanctions-first review, FATF typology matches with cited evidence, and a SAR-style narrative DRAFT. Halt to escalation if any sanctions hit." } ] },
+      "output": {
+        "sanctions_hits": [],
+        "typology_matches": [
+          {
+            "typology_id": "structuring_under_threshold",
+            "fatf_section": "fatf-structuring-§2.1",
+            "supports": [
+              "12 cash deposits of $9,500 across 3 branches in 14 days",
+              "single outgoing wire of $114,000 to new beneficiary same week"
+            ],
+            "argues_against": [],
+            "evidence_edges": [
+              "CUST-PLACEHOLDER-X→ACCT-PLACEHOLDER-001 cash 9500 (3 of 12 shown)",
+              "ACCT-PLACEHOLDER-001→ENT-PLACEHOLDER-Y wire 114000"
+            ]
+          }
+        ],
+        "narrative_draft": "## DRAFT — Suspicious Activity Narrative\n\nAccount ACCT-PLACEHOLDER-001 received 12 cash deposits of approximately $9,500 each across three branches in a 14-day window, an aggregate of approximately $114,000. Immediately following the deposit series, the account initiated a single outgoing wire of $114,000 to a new beneficiary (ENT-PLACEHOLDER-Y) located in country XX with no prior relationship to the account.\n\nThis pattern matches FATF Typologies §2.1 (Structuring/Smurfing), characterized by cash deposits below the $10,000 currency-transaction-reporting threshold followed by a single concentrated outgoing transfer. The pattern does not, by itself, establish intent; it matches a known typology.\n\nNo sanctions hits were identified for related entities at the configured threshold.\n\n### Recommended next steps\n- Enhanced due diligence on ACCT-PLACEHOLDER-001 and beneficiary ENT-PLACEHOLDER-Y.\n- Confirm stated business purpose against deposit pattern.\n- BSA officer review for SAR filing decision.\n\n*This narrative is a DRAFT for BSA officer review and is NOT a SAR filing.*",
+        "risk_score": 0.74,
+        "escalation": "enhanced_due_diligence"
+      },
+      "ms": 1820,
+      "simulated": false
+    }
+  ],
+  "output": {
+    "sanctions_hits": [],
+    "typology_matches": [
+      { "typology_id": "structuring_under_threshold", "fatf_section": "fatf-structuring-§2.1" }
+    ],
+    "narrative_draft": "## DRAFT — Suspicious Activity Narrative\n\nAccount ACCT-PLACEHOLDER-001 received 12 cash deposits of approximately $9,500 each across three branches in a 14-day window...",
+    "risk_score": 0.74,
+    "escalation": "enhanced_due_diligence"
+  },
+  "model": "ollama/llama3.1:8b",
+  "frozen_at": "2026-05-19T14:00:00Z",
+  "license": "MIT"
+}

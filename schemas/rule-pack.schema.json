@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/rule-pack.schema.json",
+  "title": "Rule pack manifest",
+  "description": "A modular bundle of one rule family.",
+  "allOf": [
+    { "$ref": "_common.schema.json#/$defs/envelope" },
+    {
+      "type": "object",
+      "required": ["family"],
+      "properties": {
+        "type":     { "const": "rule-pack" },
+        "family":   { "type": "string", "enum": ["grep", "glob", "classifier", "heuristic", "rag", "citation", "online_search", "privacy", "schema", "routing"] },
+        "language": { "type": "string", "description": "ISO 639-1 language code (text rule packs) or omitted." },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id"],
+            "properties": {
+              "id":          { "type": "string" },
+              "pattern":     { "type": "string" },
+              "label":       { "type": "string" },
+              "examples":    { "type": "array" },
+              "threshold":   { "type": "number" },
+              "severity":    { "type": "string", "enum": ["info", "low", "medium", "high", "critical"] },
+              "category":    { "type": "string" },
+              "notes":       { "type": "string" },
+              "applies_to":  { "type": "array", "items": { "type": "string" } },
+              "fires_what":  { "type": "string" },
+              "condition":   { "type": "string" },
+              "action":      { "type": "string" }
+            }
+          }
+        },
+        "files": {
+          "type": "array",
+          "description": "For families (e.g. rag, citation) where rules live in separate data files.",
+          "items": {
+            "type": "object",
+            "required": ["path"],
+            "properties": {
+              "path":   { "type": "string" },
+              "schema": { "type": "string" },
+              "format": { "type": "string", "enum": ["jsonl", "yaml", "csv", "md", "json"] }
+            }
+          }
+        },
+        "indexing": {
+          "type": "object",
+          "description": "RAG-specific. Index spec for retrieval.",
+          "properties": {
+            "bm25":  { "type": "boolean" },
+            "dense": {
+              "type": "object",
+              "properties": {
+                "enabled":  { "type": "boolean" },
+                "embedder": { "type": "string" },
+                "dims":     { "type": "integer" }
+              }
+            },
+            "rrf":   { "type": "boolean" }
+          }
+        }
+      }
+    }
+  ]
+}

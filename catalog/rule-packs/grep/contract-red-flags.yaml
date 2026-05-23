@@ -1,0 +1,87 @@
+id: "rule-pack/grep-contract-red-flags"
+type: rule-pack
+version: "0.1.0"
+name: "Commercial contract red-flag detectors"
+description: |
+  GREP detectors for the 10 highest-leverage contract red-flag
+  patterns: uncapped indemnity, unlimited liability, pre-existing
+  IP assignment, unilateral termination, asymmetric caps, missing
+  DPA, missing audit rights, missing anti-bribery, change-of-
+  control without consent, narrow force-majeure.
+
+  These trigger reviews — they are not definitive flags. Pair with
+  `pipeline/contract-clause-review` for full grading.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["legal", "legal.contract", "legal.compliance"]
+capability: ["safety_gating", "classification"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "volatile"
+tags: ["legal", "contract", "indemnity", "ip-assignment", "dpa", "anti-bribery"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+family: "grep"
+rules:
+  - id: "uncapped_indemnity"
+    pattern: "(?is)indemnif\\w*.{0,200}(without limitation|unlimited|no cap|uncapped|any and all (?:damages|losses))(?!.{0,200}(cap|limited|maximum))"
+    severity: "critical"
+    category: "legal.uncapped_indemnity"
+
+  - id: "unlimited_liability"
+    pattern: "(?is)(liability|liable)\\s+(?:shall be |is )?(?:unlimited|without limit|without limitation)(?!.{0,200}(except|other than|carve[- ]?out))"
+    severity: "critical"
+    category: "legal.unlimited_liability"
+
+  - id: "ip_assignment_preexisting"
+    pattern: "(?is)assign(?:s|ment)?\\s+(?:to\\s+\\w+\\s+)?(?:all|any)\\s+(?:right.{0,30}intellectual property|intellectual property)(?:.{0,200}including.{0,40}pre[- ]?existing|.{0,200}pre[- ]?existing IP)(?!.{0,400}(except.*pre[- ]?existing|retain.*pre[- ]?existing|license[- ]?back))"
+    severity: "critical"
+    category: "legal.ip_assignment_preexisting"
+
+  - id: "termination_short_notice"
+    pattern: "(?is)terminat\\w*\\s+(?:for convenience|at will|at any time)\\s+upon\\s+(?:[1-9](?:days?)?|[1-2][0-9]\\s*days?)\\s+(?:'|written)?\\s*notice(?!.{0,400}(wind[- ]?down|pay for|expenses incurred))"
+    severity: "high"
+    category: "legal.termination_short_notice"
+
+  - id: "no_audit_rights"
+    pattern: "(?is)(no audit rights|customer may not audit|audit (?:is )?(?:prohibited|not (?:permitted|allowed)))|compliance\\s+is\\s+solely\\s+as\\s+represented"
+    severity: "high"
+    category: "legal.no_audit_rights"
+
+  - id: "missing_anti_bribery_warranty"
+    pattern: "(?is)\\b(no anti[- ]?bribery|no FCPA|no sanctions (?:representation|warranty))\\b|\\bdoes not (?:make|provide).{0,40}(?:anti[- ]?bribery|FCPA|sanctions)"
+    severity: "high"
+    category: "legal.missing_anti_bribery"
+
+  - id: "free_assignment"
+    pattern: "(?is)may (?:freely )?assign.{0,80}(?:without|no)\\s+(?:notice|consent|approval)(?!.{0,200}(merger|acquisition|sale of substantially all))"
+    severity: "high"
+    category: "legal.free_assignment"
+
+  - id: "force_majeure_narrow"
+    pattern: "(?is)force majeure.{0,300}\\bonly\\b|force majeure.{0,300}(acts of god and war|act of god and war)(?!.{0,200}(pandemic|epidemic|supply[- ]?chain|cyber))"
+    severity: "medium"
+    category: "legal.force_majeure_narrow"
+
+  - id: "missing_dpa"
+    pattern: "(?is)(process|processing).{0,40}personal data(?!.{0,800}(DPA|data processing addendum|Article 28|Art\\.?\\s*28|GDPR))"
+    severity: "critical"
+    category: "legal.missing_dpa"
+
+  - id: "asymmetric_cap"
+    pattern: "(?is)Vendor.{0,200}(liability|liable).{0,100}\\$?\\s*[\\d,]+\\s+(?:in aggregate)?.{0,300}Customer.{0,200}(liability|liable).{0,80}(unlimited|without limit)"
+    severity: "critical"
+    category: "legal.asymmetric_cap"
+
+  - id: "auto_renewal_short_window"
+    pattern: "(?is)auto[- ]?renew\\w*.{0,100}(unless.{0,40}notice.{0,40}(\\d{1,2})\\s*days)(?:[\\s\\S]{0,40}(30|60|90))?"
+    severity: "medium"
+    category: "legal.auto_renewal_short_window"
+
+  - id: "exclusivity_perpetual"
+    pattern: "(?is)(exclusive|sole)\\s+(?:supplier|provider|distributor).{0,200}perpetual|perpetual exclusivity"
+    severity: "high"
+    category: "legal.perpetual_exclusivity"

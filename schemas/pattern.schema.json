@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/pattern.schema.json",
+  "title": "Design pattern manifest",
+  "description": "An abstract named pipeline shape that concrete pipelines instantiate (e.g. Self-RAG, ReAct, Tree-of-Thoughts). Patterns capture the KNOWLEDGE about a shape; concrete pipelines and processors implement it.",
+  "allOf": [
+    { "$ref": "_common.schema.json#/$defs/envelope" },
+    {
+      "type": "object",
+      "required": ["structural_shape", "when_to_use"],
+      "properties": {
+        "type": { "const": "pattern" },
+
+        "paper_url": {
+          "type": "string",
+          "description": "URL to the canonical paper or original write-up."
+        },
+        "paper_citation": {
+          "type": "string",
+          "description": "Author / year / title in plain text."
+        },
+        "reference_implementations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["url"],
+            "properties": {
+              "url":         { "type": "string", "format": "uri" },
+              "language":    { "type": "string" },
+              "framework":   { "type": "string" },
+              "notes":       { "type": "string" }
+            }
+          }
+        },
+        "structural_shape": {
+          "type": "array",
+          "description": "Ordered abstract steps in the pattern. Use generic verbs; concrete pipelines pin down the implementations.",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "when_to_use": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "when_not_to_use": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "variants": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "counter_patterns": {
+          "type": "array",
+          "description": "Named patterns this one contrasts with.",
+          "items": { "type": "string" }
+        },
+        "implementing_pipelines": {
+          "type": "array",
+          "items": { "$ref": "_common.schema.json#/$defs/artifactId" }
+        },
+        "implementing_processors": {
+          "type": "array",
+          "items": { "$ref": "_common.schema.json#/$defs/artifactId" }
+        },
+        "tradeoffs": {
+          "type": "object",
+          "description": "Quick-glance tradeoff notes.",
+          "properties": {
+            "latency":     { "type": "string" },
+            "cost":        { "type": "string" },
+            "quality":     { "type": "string" },
+            "complexity":  { "type": "string" },
+            "explainability": { "type": "string" }
+          }
+        }
+      }
+    }
+  ]
+}

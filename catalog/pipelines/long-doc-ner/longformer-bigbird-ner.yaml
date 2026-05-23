@@ -1,0 +1,85 @@
+id: "pipeline/longformer-bigbird-ner"
+type: pipeline
+version: "0.1.0"
+name: "Long-document NER with LongFormer / BigBird"
+description: |
+  Token-classification NER on documents longer than the 512-token
+  BERT limit. Uses LongFormer (sliding-window attention) or BigBird
+  (sparse attention) to handle 4096-16384 token inputs. The
+  dominant Kaggle shape for argumentative-essay-element extraction
+  + long-document NER tasks.
+
+  Verified by Open Harness Hub mining: cdeotte TensorFlow-LongFormer-NER
+  (1350 votes, Feedback Prize 2021), abhishek two-longformers-are-better-
+  than-1 (1323 votes — ensemble of two LongFormers), cdeotte PyTorch-
+  BigBird-NER (977 votes). 3 of the top kernels on the Feedback
+  Prize 2021 competition follow this exact shape.
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "education", "media"]
+capability: ["extraction", "classification"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "api.classification"
+tags: ["longformer", "bigbird", "ner", "long-document", "kaggle-verified"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+attribution:
+  source_url:  "https://www.kaggle.com/competitions/feedback-prize-2021"
+  source_kind: "kaggle"
+  author:      "cdeotte (1350 LongFormer + 977 BigBird), abhishek (1323 two-LongFormers ensemble)"
+  license:     "Apache-2.0"
+
+task: "Train a LongFormer or BigBird token-classification model on long-document NER labels."
+pipeline_kind: "training_and_serving"
+
+inputs:
+  - name: "ner_dataset"
+    type: "artifact_id"
+  - name: "base_model"
+    type: "string"
+  - name: "max_length"
+    type: "integer"
+outputs:
+  - name: "finetuned_model"
+    type: "artifact_id"
+  - name: "eval_metrics"
+    type: "object"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+
+steps:
+  - id: "guard"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.base_model" }
+  - id: "train"
+    kind: "processor"
+    ref: "processor/iterative-revise-loop"
+    inputs:
+      initial_prompt: "Fine-tune LongFormer (4096 tokens) or BigBird (4096 tokens) for token classification. Use seqeval for evaluation."
+      inner_harness_ref: "harness/text-safety-review"
+      verifier_refs: []
+      max_iterations: 3
+      cost_ceiling_usd: 10.00
+      convergence_policy: "all_pass"
+  - id: "ensemble"
+    kind: "processor"
+    ref: "processor/multi-vector-fusion"
+    inputs:
+      ranked_lists: "$.steps.train.output"
+      method: "weighted_sum"
+      k: 1
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "longformer-bigbird-ner"
+      applied_layers: ["training", "classification", "ensemble"]
+
+success_criteria: []

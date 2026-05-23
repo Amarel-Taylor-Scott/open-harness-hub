@@ -1,0 +1,37 @@
+id: "knowledge-pack/gov-benefits-rules"
+type: knowledge-pack
+version: "0.1.0"
+name: "Government benefits program rules (SNAP / Medicaid / UI / SSI)"
+description: |
+  Composite educational reference of the major US federal benefits
+  programs' eligibility rules: SNAP (7 CFR 273), Medicaid (42 CFR +
+  state plan), Unemployment Insurance (state UI manuals), SSI/SSDI
+  (20 CFR / POMS), TANF (45 CFR 260-265).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry:   ["government", "government.benefits", "compliance"]
+capability: ["retrieval", "verification"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "dated"
+tags: ["government", "benefits", "snap", "medicaid", "ssi", "tanf", "ui"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+content_types:
+  - rag_doc
+files:
+  - path: "data/gov-benefits-pack/program-rules.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+provenance:
+  sources:
+    - "USDA FNS SNAP Policy Handbook (composite)"
+    - "CMS Medicaid State Plan templates (composite)"
+    - "SSA POMS / 20 CFR (composite)"
+    - "DOL UI Program Letters (composite)"
+  collected_through: "2026-04-30"
+  note: "Composite educational extracts; state programs vary."

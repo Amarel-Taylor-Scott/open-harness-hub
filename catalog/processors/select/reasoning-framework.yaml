@@ -1,0 +1,57 @@
+id: "processor/reasoning-framework-selector"
+type: processor
+version: "0.1.0"
+name: "Reasoning framework selector"
+description: |
+  Pick a reasoning framework (CoT / ReAct / Tree-of-Thoughts /
+  Skeleton-of-Thought / Program-of-Thought / Self-Consistency / none)
+  based on the task profile. Cheap heuristic up front; can also call a
+  small classifier model.
+
+  Selector heuristics:
+    - CoT for multi-step math / logic, deterministic answer expected
+    - Self-Consistency on top of CoT for arithmetic / olympiad-level
+    - ReAct for tool-use loops
+    - Tree-of-Thoughts for exploratory planning with branching
+    - SoT for parallelizable structured outputs (lists, tables, code skeletons)
+    - PoT for problems best expressed as Python
+    - none for simple lookup / classification
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry", "ai"]
+capability: ["routing", "classification"]
+modality:   ["text"]
+lifecycle:  "experimental"
+lifecycle_position: "pre_api.context_assembly"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "select.reasoning_framework"
+deterministic: false
+idempotent: true
+streaming: false
+latency_budget_ms: 100
+
+inputs:
+  - name: "task_description"
+    type: "string"
+  - name: "available_tools"
+    type: "string[]"
+  - name: "output_schema_ref"
+    type: "artifact_id"
+outputs:
+  - name: "selected_framework"
+    type: "enum[cot, self_consistency, react, tree_of_thoughts, skeleton_of_thought, program_of_thought, none]"
+  - name: "framework_prompt_prefix"
+    type: "string"
+  - name: "rationale"
+    type: "string"
+
+side_effects: "none"
+on_error: "fallback"
+
+implementations:
+  - kind: "callable"
+    path: "processors.reasoning_framework_selector.run"

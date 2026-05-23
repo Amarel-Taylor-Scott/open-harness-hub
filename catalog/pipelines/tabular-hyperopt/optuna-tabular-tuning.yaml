@@ -1,0 +1,71 @@
+id: "pipeline/optuna-tabular-tuning"
+type: pipeline
+version: "0.1.0"
+name: "Optuna hyperparameter tuning for tabular models"
+description: |
+  Optuna-driven hyperparameter optimization for LGB / XGB / CatBoost.
+  TPESampler over typical search space (lr, num_leaves/max_depth,
+  n_estimators, subsample, colsample, reg_alpha, reg_lambda).
+  N_trials 50-200 with pruning. Trial objective = K-fold CV metric.
+
+  Verified by Open Harness Hub mining: suvroo PS4E7 Optuna|XGBoost
+  (205 votes — explicit Optuna in title), gusthema TFDF (1717 votes
+  with k-fold CV), greysky Home Credit baseline (1397 votes).
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "finance", "scientific_research"]
+capability: ["evaluation", "classification"]
+modality:   ["structured"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "api.tuning"
+tags: ["optuna", "hyperparameter", "tpe", "tabular", "kaggle-verified"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+attribution:
+  source_url:  "https://www.kaggle.com/code/suvroo/ps4e7-optuna-xgboost-klib"
+  source_kind: "kaggle"
+  author:      "suvroo (205 votes)"
+  license:     "Apache-2.0"
+
+task: "Run Optuna study to find best hyperparameters; return best params + CV score."
+pipeline_kind: "hyperparameter_tuning"
+
+inputs:
+  - name: "tabular_dataset"
+    type: "artifact_id"
+  - name: "n_trials"
+    type: "integer"
+  - name: "n_folds"
+    type: "integer"
+outputs:
+  - name: "best_params"
+    type: "object"
+  - name: "best_cv_score"
+    type: "number"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+
+steps:
+  - id: "search"
+    kind: "processor"
+    ref: "processor/iterative-revise-loop"
+    inputs:
+      initial_prompt: "Run Optuna TPESampler over N trials (50-200) with median pruner; objective = K-fold CV metric"
+      inner_harness_ref: "harness/text-safety-review"
+      verifier_refs: []
+      max_iterations: 1
+      cost_ceiling_usd: 3.00
+      convergence_policy: "all_pass"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "optuna-tabular-tuning"
+      applied_layers: ["hyperparameter_search"]
+
+success_criteria: []

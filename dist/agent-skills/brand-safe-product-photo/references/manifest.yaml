@@ -1,0 +1,100 @@
+id: "pipeline/brand-safe-product-photo"
+type: pipeline
+version: "0.1.0"
+name: "Brand-Safe Product Photo"
+description: |
+  Image-generation pipeline that composes a cinematic-photography
+  persona, style-reference RAG, lens-physics RAG, GREP guard rules,
+  a tool call to a text-to-image model, and an output-safety review.
+  Demonstrates that image-gen is a normal citizen of the catalog: it
+  uses the same primitives as a text pipeline.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["creative", "retail"]
+capability: ["generation", "image_synthesis", "safety_gating"]
+modality:   ["image", "text"]
+lifecycle:  "experimental"
+trust_boundary: "mixed"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+task: |
+  Given a product brief (name, category, brand tone, optional reference
+  image), produce a cinematic product photo prompt + image that obeys
+  brand-safety rules and produces verifiable lens physics.
+pipeline_kind: "generate_image"
+
+inputs:
+  - name: "brief"
+    schema: "schemas/product_brief.json"
+  - name: "reference_image"
+    type: "image"
+
+outputs:
+  - name: "final_prompt"
+    type: "string"
+  - name: "image_url"
+    type: "string"
+  - name: "safety_report"
+    type: "json"
+
+defaults:
+  persona: "persona/cinematic-product-photographer"
+  model_adapter: "adapter/sdxl-local"
+
+steps:
+  - id: "guard_input"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prohibited-terms"
+    inputs: { text: "$.inputs.brief.description" }
+
+  - id: "retrieve_style"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/style-references-cinematic"
+    inputs:
+      query: "$.inputs.brief.brand_tone"
+      top_k: 4
+
+  - id: "retrieve_physics"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/lens-physics-primers"
+    inputs:
+      query: "$.inputs.brief.shot_type"
+      top_k: 2
+
+  - id: "shape_prompt"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Compose a cinematic photography prompt for the product. Include lens, lighting, aperture, color palette, and composition. Use only retrieved style + physics packs; do not invent brands or celebrity references."}]
+      context:
+        - "$.steps.retrieve_style.output.docs"
+        - "$.steps.retrieve_physics.output.docs"
+
+  - id: "txt2img"
+    kind: "tool"
+    ref: "tool/txt2img-sdxl"
+    inputs:
+      prompt: "$.steps.shape_prompt.output.text"
+      negative_prompt: "watermark, logo, signature, low quality, deformed"
+      width: 1024
+      height: 1024
+
+  - id: "review_output"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-output-safety-image"
+    inputs:
+      image_url: "$.steps.txt2img.output.image_url"
+
+output_safety_packs:
+  - "rule-pack/grep-output-safety-image"
+style_packs:
+  - "knowledge-pack/style-references-cinematic"
+physics_packs:
+  - "knowledge-pack/lens-physics-primers"
+
+success_criteria:
+  - rubric: "rubric/brand-safe-image-v1"
+    threshold: 0.80

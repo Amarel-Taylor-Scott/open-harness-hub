@@ -1,0 +1,53 @@
+id: "rubric/food-safety-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Food safety review quality v1"
+description: "7-dim rubric"
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["food_safety", "food_safety.fsma", "food_safety.haccp"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-20"
+updated: "2026-05-20"
+
+dimensions:
+  - id: "fsma_rule_cited"
+    label: "Each finding cites the specific FSMA rule (21 CFR 117 / FSVP / 112 / 1 Subpart O / 121 / FSMA-204)"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "fsma_rule_id field populated per finding"
+  - id: "haccp_principle_cited"
+    label: "Each finding maps to the relevant HACCP principle (1-7)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "haccp_principle ∈ {1..7} per finding"
+  - id: "ccp_deviations_documented"
+    label: "CCP deviations have documented corrective actions + affected-product evaluation"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "for each ccp_deviation finding: corrective_action + affected_product fields populated"
+  - id: "recall_class_assigned"
+    label: "Recall events classified Class I / II / III with rationale"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "recall_class field for any recall event"
+  - id: "fsvp_for_imports"
+    label: "Foreign-supplier verification documented for imports"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "for any foreign supplier: fsvp_verification_activities + supplier_evaluation populated"
+  - id: "traceability_fsma_204"
+    label: "Traceability records meet FSMA-204 KDEs/CTEs for FTL foods"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "for FTL foods: cte_kde_records populated for each tracked event"
+  - id: "training_current"
+    label: "PCQI / qualified-individual training current; sanitation team trained"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "pcqi_training_current=true AND sanitation_training_current=true"
+
+scoring_method: "weighted_sum"

@@ -1,0 +1,74 @@
+id: "rule-pack/grep-private-key-blocks"
+type: rule-pack
+version: "0.1.0"
+name: "Private key block detectors"
+description: |
+  Detection patterns for PEM-encoded private keys (RSA, EC, DSA,
+  OpenSSH, PGP) and modern formats (Age, Sigstore). Any match is a
+  critical-severity hit — full revocation + key rotation required.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["security", "cross_industry"]
+capability: ["anonymization", "safety_gating"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["secrets", "private-keys", "pem"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+family: "grep"
+rules:
+  - id: "pem_rsa_private"
+    pattern: "-----BEGIN RSA PRIVATE KEY-----"
+    severity: "critical"
+    category: "secret.private_key"
+
+  - id: "pem_ec_private"
+    pattern: "-----BEGIN EC PRIVATE KEY-----"
+    severity: "critical"
+    category: "secret.private_key"
+
+  - id: "pem_dsa_private"
+    pattern: "-----BEGIN DSA PRIVATE KEY-----"
+    severity: "critical"
+    category: "secret.private_key"
+
+  - id: "pem_openssh_private"
+    pattern: "-----BEGIN OPENSSH PRIVATE KEY-----"
+    severity: "critical"
+    category: "secret.private_key"
+
+  - id: "pem_generic_private"
+    pattern: "-----BEGIN PRIVATE KEY-----"
+    severity: "critical"
+    category: "secret.private_key"
+    notes: "PKCS#8 generic private key header — covers any algorithm."
+
+  - id: "pgp_private_block"
+    pattern: "-----BEGIN PGP PRIVATE KEY BLOCK-----"
+    severity: "critical"
+    category: "secret.private_key"
+
+  - id: "age_secret_key"
+    pattern: "\\bAGE-SECRET-KEY-1[QPZRY9X8GF2TVDW0S3JN54KHCE6MUA7L]{58}\\b"
+    severity: "critical"
+    category: "secret.age"
+
+  - id: "ssh_pem_encrypted"
+    pattern: "-----BEGIN ENCRYPTED PRIVATE KEY-----"
+    severity: "critical"
+    category: "secret.private_key"
+
+  - id: "jwt_signing_key_marker"
+    pattern: "(?i)(signing[_\\-]?key|jwt[_\\-]?secret)\\s*[:=]\\s*[\"'][A-Za-z0-9+/=]{32,}[\"']"
+    severity: "high"
+    category: "secret.signing"
+
+  - id: "id_rsa_filename_reference"
+    pattern: "\\b(id_rsa|id_ed25519|id_ecdsa|id_dsa)(?:\\.pub)?\\b"
+    severity: "medium"
+    category: "secret.private_key"
+    notes: "Filename reference — may or may not be a leak. Inspect surrounding context."

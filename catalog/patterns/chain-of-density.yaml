@@ -1,0 +1,62 @@
+id: "pattern/chain-of-density"
+type: pattern
+version: "0.1.0"
+name: "Chain-of-Density (iterative dense summarization)"
+description: |
+  Iteratively compress a summary by N rounds: each round the model
+  identifies a missing entity / fact from the source and rewrites the
+  summary to include it WHILE keeping length constant. After N
+  rounds the summary is denser (more facts per word) without
+  becoming longer. Useful for executive abstracts of long documents.
+authors:
+  - name: "Adams, Fabbri, Ladhak, Lehman, Elhadad (2023)"
+license: "CC-BY-4.0"
+industry:   ["ai", "media", "cross_industry"]
+capability: ["summarization", "reasoning"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+tags: ["summarization", "compression", "executive-summary"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+paper_url: "https://arxiv.org/abs/2309.04269"
+paper_citation: "Adams et al. 2023, From Sparse to Dense: GPT-4 Summarization with Chain of Density Prompting"
+reference_implementations:
+  - { url: "https://github.com/griptape-ai/griptape", language: "python", framework: "griptape" }
+
+structural_shape:
+  - "initial = llm.summarize(doc, target_length=L)"
+  - "for i in range(N):"
+  - "  missing_entity = llm.identify_missing(doc, current_summary)"
+  - "  new_summary = llm.densify(current_summary, missing_entity, keep_length=L)"
+  - "return current_summary  # denser at same length"
+
+when_to_use:
+  - "Executive-summary use case where length is constrained"
+  - "Want the model to surface non-obvious entities/facts"
+  - "Source document is long (10k+ tokens)"
+
+when_not_to_use:
+  - "Free-form summarization (just ask once)"
+  - "Source already short"
+  - "Quality bar already met after first pass"
+
+variants:
+  - "CoD with N=5 (the paper's default)"
+  - "CoD with explicit entity-type targeting (people / dates / dollars)"
+
+counter_patterns:
+  - "pattern/skeleton-of-thought (parallel decomposition, not iterative density)"
+
+implementing_pipelines: []
+
+implementing_processors:
+  - "processor/iterative-revise-loop"
+
+tradeoffs:
+  latency:    "Higher — N+1 LLM calls"
+  cost:       "Higher — N+1 LLM calls"
+  quality:    "Substantially denser summaries; better human-preference on executive abstracts"
+  complexity: "Low — straightforward to implement"
+  explainability: "High — per-iteration the added entity is inspectable"

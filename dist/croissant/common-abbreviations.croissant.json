@@ -1,0 +1,131 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/common-abbreviations",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Common abbreviations (cross-industry sample)",
+  "description": "Sampled abbreviations and acronyms across healthcare, finance,\nlegal, security, and technology, with expansions and a context tag.\nDesigned for the `expand.abbreviation` processor to look up\ndomain-specific expansions before retrieval or model call.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC0-1.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/common-abbreviations",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-19",
+  "keywords": [
+    "abbreviations",
+    "glossary"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-19",
+  "citation": "Public-domain glossaries",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "common-abbreviations__common-abbreviations",
+      "name": "common-abbreviations.jsonl",
+      "description": "Data file backing knowledge pack common-abbreviations.",
+      "contentUrl": "knowledge-packs/data/common-abbreviations.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "5045 B",
+      "sha256": "977dcc8ddddc9bae957dd169e0241c2452b03e77fea9f5798326ff55ef2aef65"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "common-abbreviations__records",
+      "name": "common-abbreviations__records",
+      "description": "Records parsed from common-abbreviations.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "common-abbreviations__records/abbr",
+          "name": "abbr",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "common-abbreviations__common-abbreviations"
+            },
+            "extract": {
+              "column": "abbr"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "common-abbreviations__records/expansion",
+          "name": "expansion",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "common-abbreviations__common-abbreviations"
+            },
+            "extract": {
+              "column": "expansion"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "common-abbreviations__records/domain",
+          "name": "domain",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "common-abbreviations__common-abbreviations"
+            },
+            "extract": {
+              "column": "domain"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

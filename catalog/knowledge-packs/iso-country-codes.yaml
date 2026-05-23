@@ -1,0 +1,32 @@
+id: "knowledge-pack/iso-country-codes"
+type: knowledge-pack
+version: "0.1.0"
+name: "ISO 3166 country codes (sample)"
+description: |
+  ISO 3166-1 alpha-2, alpha-3, numeric codes plus region and a coarse
+  FATF risk hint. Useful for KYC, transaction-graph queries, and
+  cross-border-flow analysis. Sample subset; full list (~250 entries)
+  drops in at production time.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC0-1.0"
+industry:   ["cross_industry", "finance", "humanitarian"]
+capability: ["retrieval", "verification"]
+modality:   ["text", "structured"]
+lifecycle:  "stable"
+trust_boundary: "local"
+freshness:  "dated"
+tags: ["iso-3166", "country-codes"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+content_types:
+  - rag_doc
+files:
+  - path: "data/iso-country-codes.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+provenance:
+  sources: ["ISO 3166-1 (public); FATF risk hints are illustrative."]
+  collected_through: "2026-04-30"

@@ -1,0 +1,46 @@
+id: "pattern/anti-silent-tool-failure"
+type: pattern
+version: "0.1.0"
+name: "Anti-pattern: Silent tool failure (empty result == success)"
+description: "Tool returns an empty list or null on error; the calling agent treats empty as 'nothing found' and continues. Sanctions lookup that times out returns []; agent reports 'no matches' + approves the customer. The blast radius is enormous."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["cross_industry", "compliance"]
+capability: ["safety_gating"]
+modality: ["text", "structured"]
+lifecycle: "stable"
+trust_boundary: "local"
+created: "2026-05-22"
+updated: "2026-05-22"
+
+when_to_use:
+  - "This is an anti-pattern. Do NOT use it."
+
+structural_shape:
+  - "WRONG: def sanctions_check(name): try: ...; except: return []  # silent"
+  - "RIGHT: tool returns {status: ok|degraded|error, result: ..., error: ...}."
+  - "RIGHT: caller MUST inspect status; degraded/error trigger fallback OR refusal."
+  - "RIGHT: degraded results are watermarked in audit trace as 'unverified'."
+
+problem: |
+  Sanctions / OFAC / KYC / drug-interaction / CVE-database lookups whose
+  network call fails will return empty under naive error handling. The
+  pipeline treats 'empty' as 'cleared.' This is a critical safety violation
+  in finance + healthcare + cyber where 'cleared' has real consequences.
+
+solution: |
+  Make every tool return a status envelope: status ∈ {ok, degraded, error}.
+  Callers must branch on status: ok → proceed; degraded → log + watermark
+  + continue with reduced confidence; error → refuse OR escalate. Surface
+  the status to the user + into the audit trace.
+
+implementing_pipelines: []
+
+related_patterns:
+  - "pattern/refuse-on-redacted"
+  - "pattern/critical-tier-output-override"
+
+counter_patterns:
+  - "Tool envelope status field; explicit caller branching."
+
+tags: ["anti-pattern", "tool", "error-handling", "safety"]

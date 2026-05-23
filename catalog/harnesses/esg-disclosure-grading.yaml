@@ -1,0 +1,101 @@
+id: "harness/esg-disclosure-grading"
+type: harness
+version: "0.1.0"
+name: "ESG Disclosure Grading harness"
+description: |
+  Wraps the ESG supplier-policy-grading flow as a reusable harness
+  with persona + GREP + RAG + tools layers. Targets local-Ollama or
+  Anthropic/OpenAI for the judge model arm; emits citation-first
+  findings with CSDDD article + ILO indicator + national-law links.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["esg", "supply_chain", "compliance"]
+capability: ["evaluation", "verification", "retrieval", "reasoning"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["esg", "csddd", "harness"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+kind: "model_harness"
+tier: "primary"
+applied_layers: [persona, grep, rag, tools]
+consumes: [grep_rule, rag_doc, persona_block, response_policy]
+emits: [reasoning_step, context_snippet]
+logic_paths:
+  - id: "grade_supplier_disclosure"
+    label: "supplier-pack → red flags → CSDDD citations → grade + remediation"
+    entrypoints: ["/api/esg/grade"]
+    steps:
+      - "structured-to-prose normalize"
+      - "redact PII per HIPAA Safe Harbor + DPV"
+      - "fire S+E+G GREP packs"
+      - "RAG against CSDDD + corridors + lead-company code"
+      - "judge against esg-supplier-compliance rubric"
+      - "propose Art-10 remediation with milestones"
+      - "emit audit trace per CSDDD Art-26"
+    consumes: [grep_rule, rag_doc, persona_block, response_policy]
+    emits: [reasoning_step, context_snippet]
+    model_call: "required"
+    verification:
+      - "every severity ≥ medium finding has ILO indicator + CSDDD article + national-law citations"
+      - "no PII in quoted grievance snippets"
+      - "CSDDD-Art.10 right-of-reply path proposed"
+knowledge_packs:
+  - id: "csddd"
+    label: "CSDDD + ILO + national-laws regulatory pack"
+    kind: knowledge_pack
+    types: [rag_doc, citation_edge]
+    required: true
+    trust_boundary: "local"
+    freshness: "dated"
+logic_packs:
+  - id: "persona_default"
+    label: "ESG auditor persona"
+    kind: logic_pack
+    types: [persona_block]
+    required: true
+  - id: "response_policy"
+    label: "no-accusation-without-pattern response policy"
+    kind: logic_pack
+    types: [response_policy]
+    required: true
+model_io:
+  input:  "{disclosure: object, supplier_tier: string, lead_code_ref: artifact_id}"
+  output: "{grade: number, findings: object[], remediation_paths: object[]}"
+model_targets:
+  - id: "local_ollama"
+    label: "Local Ollama"
+    transport: "ollama"
+    role: "Default local grading; reproducible without API keys."
+    capabilities: [text_generation, chat]
+    required: false
+    default: true
+    trust_boundary: "local"
+  - id: "anthropic_judge"
+    label: "Anthropic Claude Sonnet (frontier judge)"
+    transport: "anthropic"
+    role: "Optional frontier-class judge for high-stakes assessments."
+    capabilities: [text_generation, chat, long_context]
+    required: false
+    default: false
+    trust_boundary: "external"
+input_verification:
+  - "redact PII before model call"
+  - "reject input larger than 256 KB"
+  - "halt on CBP WRO / UFLPA hit on counterparty"
+output_verification:
+  - "every finding has ILO indicator OR CSDDD article citation"
+  - "no PII leaked in quoted snippets"
+  - "rubric/esg-supplier-compliance-v1 score recorded"
+privacy_boundaries:
+  raw_input:      "stays local to the running pipeline"
+  derived_output: "may sync to hub only after anonymization gate"
+  external_calls: "only if model_target.trust_boundary == external AND user opted in"
+contributes_to:
+  - "pipeline/supplier-policy-grading"
+  - "pipeline/deep-tier-supplier-audit"
+  - "pipeline/full-vendor-due-diligence"

@@ -1,0 +1,48 @@
+id: "processor/phone-normalize-e164"
+type: processor
+version: "0.1.0"
+name: "Phone number normalize → E.164 (Google libphonenumber)"
+description: |
+  Parse free-form phone numbers into E.164 international format
+  (+CCNNNNNNNNNNNN) using Google libphonenumber conventions.
+  Returns the E.164 string + country code + number type (mobile /
+  fixed-line / VoIP / toll-free) + validity boolean. Handles
+  common formatting variants (spaces, dashes, parens, country
+  codes spelled out, extensions).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["format_conversion", "verification"]
+modality:   ["text", "structured"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "pre_api.format_convert"
+tags: ["phone", "e164", "libphonenumber", "enrichment"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+process_kind: "format_convert.phone_e164"
+deterministic: true
+side_effects: "none"
+
+inputs:
+  - name: "phone_text"
+    type: "string"
+  - name: "country_hint"
+    type: "string"
+outputs:
+  - name: "e164"
+    type: "string"
+  - name: "country_code"
+    type: "string"
+  - name: "number_type"
+    type: "string"
+  - name: "is_valid"
+    type: "boolean"
+  - name: "extension"
+    type: "string"
+
+config:
+  default_country: "US"
+  number_types: ["mobile", "fixed_line", "fixed_line_or_mobile", "toll_free", "premium_rate", "shared_cost", "voip", "personal_number", "pager", "uan", "voicemail"]

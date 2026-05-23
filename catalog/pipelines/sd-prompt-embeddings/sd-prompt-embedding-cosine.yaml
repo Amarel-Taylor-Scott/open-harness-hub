@@ -1,0 +1,81 @@
+id: "pipeline/sd-prompt-embedding-cosine"
+type: pipeline
+version: "0.1.0"
+name: "Stable-Diffusion prompt embedding + cosine evaluation"
+description: |
+  Embed Stable-Diffusion prompts using sentence-transformers, compare
+  candidate prompts against gold prompts via cosine similarity. The
+  standard scoring approach for prompt-recovery competitions where
+  the metric is mean cosine similarity (Σ cos(predicted_embed,
+  gold_embed) / N).
+
+  Verified by Open Harness Hub mining: inversion Calculating Stable
+  Diffusion Prompt Embeddings (617 votes), leonidkulyk BLIP+CLIP (732
+  votes — uses sentence-transformer embeddings for scoring).
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "creative", "creative.image"]
+capability: ["evaluation", "embedding"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "post_api.evaluation"
+tags: ["stable-diffusion", "prompt", "embedding", "cosine", "kaggle-verified"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+attribution:
+  source_url:  "https://www.kaggle.com/code/inversion/calculating-stable-diffusion-prompt-embeddings"
+  source_kind: "kaggle"
+  author:      "inversion (617 votes)"
+  license:     "Apache-2.0"
+
+task: "Embed candidate + gold prompts via sentence-transformer; return mean cosine similarity."
+pipeline_kind: "evaluation"
+
+inputs:
+  - name: "candidate_prompts"
+    type: "string[]"
+  - name: "gold_prompts"
+    type: "string[]"
+  - name: "embedder_ref"
+    type: "artifact_id"
+outputs:
+  - name: "mean_cosine_similarity"
+    type: "number"
+  - name: "per_example_similarities"
+    type: "number[]"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/bge-embeddings-local"
+
+steps:
+  - id: "embed_candidates"
+    kind: "processor"
+    ref: "processor/embedder-minilm"
+    inputs:
+      texts: "$.inputs.candidate_prompts"
+      adapter_ref: "$.inputs.embedder_ref"
+  - id: "embed_gold"
+    kind: "processor"
+    ref: "processor/embedder-minilm"
+    inputs:
+      texts: "$.inputs.gold_prompts"
+      adapter_ref: "$.inputs.embedder_ref"
+  - id: "cosine_score"
+    kind: "processor"
+    ref: "processor/multi-vector-fusion"
+    inputs:
+      ranked_lists: ["$.steps.embed_candidates.output", "$.steps.embed_gold.output"]
+      method: "weighted_sum"
+      k: 0
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "sd-prompt-embedding-cosine"
+      applied_layers: ["embedding", "evaluation"]
+
+success_criteria: []

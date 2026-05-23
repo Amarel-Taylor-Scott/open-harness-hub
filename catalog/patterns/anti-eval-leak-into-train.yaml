@@ -1,0 +1,47 @@
+id: "pattern/anti-eval-leak-into-train"
+type: pattern
+version: "0.1.0"
+name: "Anti-pattern: Evaluation set leaked into training data"
+description: "Benchmark records (or close paraphrases) end up in training corpus — fine-tune, RAG index, exemplar set. Reported scores inflate; downstream consumer cannot trust the benchmark; eval becomes marketing instead of measurement."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["cross_industry"]
+capability: ["evaluation"]
+modality: ["text"]
+lifecycle: "stable"
+trust_boundary: "local"
+created: "2026-05-22"
+updated: "2026-05-22"
+
+when_to_use:
+  - "This is an anti-pattern. Do NOT use it."
+
+structural_shape:
+  - "WRONG: scrape Common Crawl → train → benchmark on HumanEval/MMLU/GSM8K (high overlap → inflated scores)."
+  - "RIGHT: hold out eval set BEFORE any training data construction; document hash + decontaminate."
+  - "RIGHT: rotate eval sets quarterly; use industry-specific held-out splits the model has demonstrably not seen."
+
+problem: |
+  Industry-standard benchmarks (HumanEval, MMLU, GSM8K, MATH, ARC, etc.)
+  are widely scraped + memorized by frontier models. RAG indexes built
+  from internet content silently re-introduce eval contamination at
+  retrieval time. Fine-tuning datasets purchased from data vendors may
+  contain unannounced overlaps. The reported number is no longer the
+  number you can ship against.
+
+solution: |
+  Maintain a held-out 'private eval' set that no model has been trained
+  on + that is never published. Decontaminate training data against this
+  set (n-gram + embedding match). For deployed pipelines, run regression
+  evals on customer-private data the foundation model couldn't have seen.
+  Treat public benchmark scores as floor, not ceiling.
+
+implementing_pipelines: []
+
+related_patterns:
+  - "pattern/composable-success-criteria"
+
+counter_patterns:
+  - "Held-out private eval. Quarterly rotation. Decontamination report."
+
+tags: ["anti-pattern", "data-leak", "benchmark", "contamination", "eval"]

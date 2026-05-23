@@ -1,0 +1,146 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/owasp-top-10-llm",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "OWASP Top 10 for LLM Applications (2025)",
+  "description": "OWASP Top 10 risks for LLM-based applications — prompt injection,\ninsecure output handling, training-data poisoning, model DoS, supply\nchain, sensitive disclosure, plugin design, excessive agency,\noverreliance, model theft. Used by red-team harnesses and security\nevaluation pipelines.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC-BY-4.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/owasp-top-10-llm",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-19",
+  "keywords": [
+    "owasp",
+    "llm-safety",
+    "security"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-19",
+  "citation": "OWASP Top 10 for LLM Applications (https://owasp.org/www-project-top-10-for-large-language-model-applications/)",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "owasp-top-10-llm__owasp-top-10-llm",
+      "name": "owasp-top-10-llm.jsonl",
+      "description": "Data file backing knowledge pack owasp-top-10-llm.",
+      "contentUrl": "knowledge-packs/data/owasp-top-10-llm.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "2944 B",
+      "sha256": "6b1d81c4a7940e7e3670a921d63264b452afd4415b547c37a30f28965d9595d0"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "owasp-top-10-llm__records",
+      "name": "owasp-top-10-llm__records",
+      "description": "Records parsed from owasp-top-10-llm.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "owasp-top-10-llm__records/id",
+          "name": "id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "owasp-top-10-llm__owasp-top-10-llm"
+            },
+            "extract": {
+              "column": "id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "owasp-top-10-llm__records/title",
+          "name": "title",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "owasp-top-10-llm__owasp-top-10-llm"
+            },
+            "extract": {
+              "column": "title"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "owasp-top-10-llm__records/description",
+          "name": "description",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "owasp-top-10-llm__owasp-top-10-llm"
+            },
+            "extract": {
+              "column": "description"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "owasp-top-10-llm__records/mitigations",
+          "name": "mitigations",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "owasp-top-10-llm__owasp-top-10-llm"
+            },
+            "extract": {
+              "column": "mitigations"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

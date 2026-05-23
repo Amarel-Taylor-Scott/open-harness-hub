@@ -1,0 +1,64 @@
+id: "pattern/routing"
+type: pattern
+version: "0.1.0"
+name: "Routing"
+description: |
+  Classify the input and dispatch to the appropriate specialized
+  sub-pipeline. A classifier (LLM, embedder + threshold, or rule pack)
+  picks a route; the chosen sub-pipeline handles the task. Decouples
+  one front door from N specialized backends.
+authors:
+  - name: "Anthropic cookbook (2024)"
+license: "CC-BY-4.0"
+industry:   ["ai", "cross_industry"]
+capability: ["routing", "classification"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+tags: ["agent", "routing", "dispatch"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+paper_url: "https://anthropic.com/research/building-effective-agents"
+paper_citation: "Anthropic 2024, Building effective agents (patterns/agents/routing)"
+reference_implementations:
+  - { url: "https://github.com/aurelio-labs/semantic-router", language: "python" }
+  - { url: "https://github.com/anthropics/anthropic-cookbook/tree/main/patterns/agents", language: "python" }
+
+structural_shape:
+  - "encode utterance (embedder or LLM classifier)"
+  - "compare against route exemplars (semantic + BM25 hybrid)"
+  - "select route (top-1 or top-k)"
+  - "dispatch to the selected sub-pipeline"
+  - "(optional) collect feedback to refine route exemplars over time"
+
+when_to_use:
+  - "One front door, multiple specialist backends (customer support, IT helpdesk, etc.)"
+  - "Different models / personas / tools per intent"
+  - "Cost optimization (route easy queries to cheap model, hard to expensive)"
+
+when_not_to_use:
+  - "Single-purpose pipeline (no routing needed)"
+  - "When the classifier is the bottleneck for accuracy"
+
+variants:
+  - "LLM-classifier routing (Anthropic cookbook routing)"
+  - "Semantic routing (semantic-router: encoder + cosine)"
+  - "Hybrid routing (semantic + BM25 fusion)"
+  - "Routing-with-fallback: if confidence low, hand off to a general agent"
+
+counter_patterns:
+  - "pattern/orchestrator-workers (parallel decomposition vs single dispatch)"
+
+implementing_pipelines:
+  - "pipeline/email-triage-and-draft"
+
+implementing_processors:
+  - "processor/intent-dispatcher"
+
+tradeoffs:
+  latency: "+1 small classifier call"
+  cost: "+small classifier cost (often $0.0001 / query)"
+  quality: "Strong gains when routes are well-separated"
+  complexity: "Low-medium"
+  explainability: "High — classifier output is inspectable"

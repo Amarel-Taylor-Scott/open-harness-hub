@@ -1,0 +1,92 @@
+id: "rule-pack/grep-prompt-injection-heuristics"
+type: rule-pack
+version: "0.1.0"
+name: "Prompt-injection heuristic detectors"
+description: |
+  Heuristic regex patterns that flag likely prompt-injection attempts
+  in input, retrieved documents, or tool results. Inspired by garak
+  probe families (`promptinject`, `latentinjection`, `ansiescape`,
+  `encoding`, `dan`) and LLM Guard's `PromptInjection` scanner.
+
+  These are FAST FIRST-PASS heuristics; pair with a small-model
+  classifier (`processor/prompt-injection-detector`) for robust
+  defense. False positives are common; use to TRIGGER a review or
+  paraphrase, not to block outright.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["security", "ai", "cross_industry"]
+capability: ["safety_gating", "classification"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "volatile"
+tags: ["prompt-injection", "jailbreak", "garak-aligned"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+family: "grep"
+rules:
+  - id: "ignore_previous_instructions"
+    pattern: "(?i)ignore (the (?:previous|prior|above) )?(?:instructions|prompt|message|directive|system|context)"
+    severity: "high"
+    category: "prompt_injection.override"
+
+  - id: "you_are_now_role_override"
+    pattern: "(?i)you (?:are|will be|must be) (?:now |henceforth )?(?:a|an|the) [a-z]+ (?:that|who) (?:will|must|can|is allowed to)"
+    severity: "medium"
+    category: "prompt_injection.role_play"
+
+  - id: "dan_jailbreak"
+    pattern: "(?i)\\b(DAN|do anything now|developer mode|jailbreak|liberate)\\b"
+    severity: "high"
+    category: "prompt_injection.jailbreak"
+
+  - id: "system_prompt_leak_request"
+    pattern: "(?i)(repeat|reveal|tell me|show me|print|output) (the |your )?(?:system prompt|initial prompt|instructions|previous instructions)"
+    severity: "high"
+    category: "prompt_injection.leak"
+
+  - id: "encoding_attack_base64"
+    pattern: "(?i)decode (the |this )?base64.{0,40}?(then|and) (execute|follow|do|perform)"
+    severity: "high"
+    category: "prompt_injection.encoding"
+
+  - id: "ansi_escape_injection"
+    pattern: "\\x1b\\[[0-9;]*[A-Za-z]"
+    severity: "high"
+    category: "prompt_injection.terminal_escape"
+    notes: "Garak `ansiescape` probe — ANSI codes can hide payloads in terminal-rendered output."
+
+  - id: "invisible_unicode_tag_chars"
+    pattern: "[\\u{E0000}-\\u{E007F}]"
+    severity: "critical"
+    category: "prompt_injection.invisible_unicode"
+    notes: "Unicode tag block — used for invisible-text exfiltration / latent prompt injection."
+
+  - id: "zero_width_characters"
+    pattern: "[\\u200b\\u200c\\u200d\\u2060\\ufeff]"
+    severity: "medium"
+    category: "prompt_injection.steganography"
+
+  - id: "indirect_injection_markdown"
+    pattern: "(?i)\\[.*?\\]\\(.*?(?:ignore|reveal|system prompt|disregard).*?\\)"
+    severity: "medium"
+    category: "prompt_injection.markdown"
+
+  - id: "tool_invocation_in_doc"
+    pattern: "(?i)<tool[\\s_-]?(?:call|use)>|\\{\\{\\s*tool\\s*\\(.*\\)\\s*\\}\\}"
+    severity: "high"
+    category: "prompt_injection.tool_invocation"
+    notes: "Retrieved documents shouldn't carry tool-invocation markup."
+
+  - id: "grandma_attack"
+    pattern: "(?i)(grandma|grandmother) (used to|would) (tell|recite|sing) (me )?(.{0,40}?)(napalm|virus|exploit|password|seed phrase)"
+    severity: "high"
+    category: "prompt_injection.social_engineering"
+    notes: "Garak `grandma` probe pattern."
+
+  - id: "instruction_injection_keyword_list"
+    pattern: "(?i)(ignore|disregard|forget|override) (above|previous|all) (instructions|rules|context|constraints)"
+    severity: "high"
+    category: "prompt_injection.override"

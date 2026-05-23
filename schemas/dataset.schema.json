@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/dataset.schema.json",
+  "title": "Dataset manifest",
+  "allOf": [
+    { "$ref": "_common.schema.json#/$defs/envelope" },
+    {
+      "type": "object",
+      "required": ["splits"],
+      "properties": {
+        "type":   { "const": "dataset" },
+        "splits": {
+          "type": "object",
+          "properties": {
+            "train": { "type": "object" },
+            "val":   { "type": "object" },
+            "test":  { "type": "object" }
+          },
+          "additionalProperties": true
+        },
+        "record_schema": { "type": "string" },
+        "provenance": {
+          "type": "object",
+          "properties": {
+            "origin":            { "type": "string" },
+            "collected_by":      { "type": "string" },
+            "collected_through": { "type": "string", "format": "date" },
+            "license":           { "type": "string" },
+            "anonymization":     { "type": "string" }
+          }
+        }
+      }
+    }
+  ]
+}

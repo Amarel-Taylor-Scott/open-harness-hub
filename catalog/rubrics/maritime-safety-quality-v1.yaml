@@ -1,0 +1,53 @@
+id: "rubric/maritime-safety-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Maritime safety review quality v1"
+description: "7-dim rubric"
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["maritime", "maritime.safety"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-20"
+updated: "2026-05-20"
+
+dimensions:
+  - id: "imo_regulation_cited"
+    label: "Each finding cites IMO convention + chapter + regulation"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "convention + chapter + regulation populated per finding"
+  - id: "detainable_vs_observation"
+    label: "Findings classified detainable vs observation"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "classification ∈ {detainable, observation, record_gap}"
+  - id: "lsa_radio_current"
+    label: "Life-saving + radio equipment within service intervals"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "for LSA + radio items: next_service_date populated and within window"
+  - id: "ism_doc_smc_valid"
+    label: "DOC + SMC + DPA all valid + designated"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "doc_status + smc_status + dpa_name populated; not expired"
+  - id: "marpol_records_complete"
+    label: "Oil + garbage + ballast water record books gapless"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "for each record book: no gaps; entries match operational events"
+  - id: "stcw_crew_qualified"
+    label: "Crew certificates valid + work-rest hours MLC-compliant"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "for each crew member: cert_valid + work_rest_compliant"
+  - id: "corrective_action_proposed"
+    label: "Every detainable / observation has corrective action + timeline"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "corrective_action + timeline populated"
+
+scoring_method: "weighted_sum"

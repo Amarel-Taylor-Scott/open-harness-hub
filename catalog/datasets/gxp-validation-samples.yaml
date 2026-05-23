@@ -1,0 +1,44 @@
+id: "dataset/gxp-validation-samples"
+type: dataset
+version: "0.1.0"
+name: "Synthetic GxP validation samples (3 cases)"
+description: |
+  Three synthetic GxP-validated-system packets for testing
+  `pipeline/gxp-validation-review`. Fully synthetic.
+
+  Cases:
+   - sample-validated-LIMS.json — fully compliant LIMS: audit trail
+     on + reviewed quarterly, individual accounts, IQ/OQ/PQ current,
+     2-factor signatures, ALCOA+ reviewed. Expected high grade.
+   - sample-flagged-MES.json — MES with multiple critical findings:
+     audit trail disabled on batch records, shared 'operator-night'
+     account, OQ incomplete on a production module, single-factor
+     signatures, backup-as-archive, post-hoc backdated alteration.
+     Expected many critical findings.
+   - sample-mixed-CTMS.json — CTMS mixed: audit trail enabled but
+     not reviewed quarterly per risk-based schedule, uncontrolled
+     blank CRF templates, batch-approved changes. Mixed signals.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["pharma", "pharma.gxp", "healthcare.pharmacy", "compliance"]
+capability: ["evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["pharma", "gxp", "21-cfr-11", "synthetic", "validation"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+splits:
+  test:
+    rows: 3
+    path: "data/gxp-samples/"
+record_schema: "schemas/gxp-validation-packet.schema.json"
+provenance:
+  origin:            "Fully synthetic — no real validated-system data"
+  collected_by:      "Open Harness Hub contributors"
+  collected_through: "2026-05-20"
+  license:           "MIT"
+  anonymization:     "fully synthetic; no real pharma facility data"

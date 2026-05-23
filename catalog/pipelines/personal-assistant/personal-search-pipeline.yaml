@@ -1,0 +1,72 @@
+id: "pipeline/personal-search-pipeline"
+type: pipeline
+version: "0.1.0"
+name: "Personal corpus search pipeline (RAG over user's own data)"
+description: |
+  Concrete pipeline wrapping `harness/personal-corpus-search` for
+  answering user queries from their own files / notes / emails /
+  calendar / contacts. Local-first; opt-in for hosted models.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["personal_productivity", "cross_industry"]
+capability: ["retrieval", "reasoning", "memory"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.personal_search"
+tags: ["personal-rag", "search", "memory"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+task: "Search the user's personal corpus + emit cited answer."
+pipeline_kind: "rag"
+
+inputs:
+  - name: "user_id"
+    type: "string"
+  - name: "query"
+    type: "string"
+  - name: "scope"
+    type: "string[]"
+outputs:
+  - name: "answer"
+    type: "string"
+  - name: "citations"
+    type: "object[]"
+  - name: "source_uris"
+    type: "string[]"
+
+defaults:
+  persona: "persona/personal-assistant"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/grep-personal-info-leakage"
+  knowledge_packs:
+    - "knowledge-pack/user-preference-schema"
+
+steps:
+  - id: "load_prefs"
+    kind: "processor"
+    ref: "processor/preference-loader"
+    inputs:
+      user_id: "$.inputs.user_id"
+      scope:   "privacy"
+  - id: "search"
+    kind: "harness"
+    ref: "harness/personal-corpus-search"
+    inputs:
+      user_id: "$.inputs.user_id"
+      query:   "$.inputs.query"
+      scope:   "$.inputs.scope"
+  - id: "leakage_check"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-personal-info-leakage"
+    inputs:
+      text: "$.steps.search.output.answer"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "personal-search-pipeline"
+      applied_layers: ["persona", "memory", "rag", "leakage_check"]

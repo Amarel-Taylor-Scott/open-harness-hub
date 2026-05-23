@@ -1,0 +1,57 @@
+id: "tool/mitre-attack-mapper"
+type: tool
+version: "0.1.0"
+name: "MITRE ATT&CK technique mapper"
+description: |
+  Map free-text TTPs to MITRE ATT&CK technique IDs (T1234.xxx).
+  Returns the matched technique + tactic + sub-techniques + KEV
+  status if any associated CVE is on the CISA Known Exploited
+  Vulnerabilities catalog.
+
+  Uses the latest ATT&CK Enterprise matrix snapshot bundled at
+  knowledge-pack/mitre-attack-sample. For live ATT&CK STIX feed,
+  configure `mitre_navigator_endpoint` env var.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["security", "threat_intelligence", "threat_intelligence.ttp"]
+capability: ["verification", "extraction"]
+modality:   ["text", "structured"]
+lifecycle:  "stable"
+trust_boundary: "local"
+tags: ["mitre-attack", "cti", "stix", "navigator", "kev"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+parameters:
+  type: object
+  properties:
+    ttp_text:        { type: "string", description: "Free-text TTP description, e.g. 'lateral movement via WMI'." }
+    return_subtechs: { type: "boolean", default: true }
+    check_kev:       { type: "boolean", default: true, description: "Cross-check any T-id's associated CVEs against CISA KEV." }
+    threshold:       { type: "number",  default: 0.70 }
+  required: ["ttp_text"]
+returns:
+  type: object
+  properties:
+    matches:
+      type: array
+      items:
+        type: object
+        properties:
+          technique_id:   { type: "string" }
+          technique_name: { type: "string" }
+          tactic:         { type: "string" }
+          score:          { type: "number" }
+          kev_status:     { type: "string", enum: ["none", "in_kev", "associated_cve_in_kev"] }
+    best_match:    { type: "object" }
+side_effects: "read"
+examples:
+  - input:  { ttp_text: "lateral movement via Windows Management Instrumentation" }
+    output:
+      matches:
+        - { technique_id: "T1047", technique_name: "Windows Management Instrumentation", tactic: "Execution", score: 0.92, kev_status: "none" }
+      best_match: { technique_id: "T1047", technique_name: "Windows Management Instrumentation", tactic: "Execution", score: 0.92 }
+implementations:
+  - kind: "callable"
+    path: "tools.mitre_attack_mapper.run"

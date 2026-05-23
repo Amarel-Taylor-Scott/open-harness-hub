@@ -1,0 +1,50 @@
+id: "rubric/academic-integrity-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Academic integrity review quality v1"
+description: |
+  Six-dimension rubric for grading an academic-integrity review.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["education", "education.higher", "compliance"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-20"
+updated: "2026-05-20"
+
+dimensions:
+  - id: "violation_class_typed"
+    label: "Findings typed: plagiarism / AI-generated / fabricated-citation / collusion / self-plagiarism"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "violation_class field populated for each finding"
+  - id: "evidence_cited"
+    label: "Every finding cites source/detector evidence"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "non-empty source_doc_id OR ai_detector_id OR citation_lookup_id"
+  - id: "multi_detector_agreement"
+    label: "AI-misuse findings require ≥2 independent detectors agreeing"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "for AI-class findings: detectors_agreeing ≥ 2 OR explicit ai_artefact_phrase"
+  - id: "due_process_respected"
+    label: "Student given response window before adverse determination"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "response_window_days populated; student_invited_to_respond=true"
+  - id: "pii_safe"
+    label: "Student PII redacted before LLM review"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "processor/redact-pii-text fired; zero PII hits in output"
+  - id: "sanction_proportional"
+    label: "Recommended sanction follows institutional policy + violation severity"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "recommended_sanction matches severity table per institution policy"
+
+scoring_method: "weighted_sum"

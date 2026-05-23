@@ -1,0 +1,47 @@
+id: "pattern/qlora-4bit-finetune"
+type: pattern
+version: "0.1.0"
+name: "QLoRA 4-bit fine-tune"
+description: "Load base model in 4-bit NF4 quantization + freeze + insert LoRA adapters that train in BF16/FP16. Enables fine-tuning a 70B model on a single 48GB GPU (or 24GB with aggressive offload). De-quantize on-the-fly during forward pass; gradients flow only into LoRA adapters."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["cross_industry"]
+capability: ["generation"]
+modality: ["text"]
+lifecycle: "stable"
+trust_boundary: "local"
+created: "2026-05-22"
+updated: "2026-05-22"
+
+paper_url: "https://arxiv.org/abs/2305.14314"
+paper_citation: "Dettmers et al. (2023) — QLoRA: Efficient Finetuning of Quantized LLMs"
+
+when_to_use:
+  - "Fine-tuning a 30B-70B model on a single GPU."
+  - "Datasets of 1k-100k examples where full fine-tune would over-fit anyway."
+  - "Sequential domain adaptation where memory cost > quality gain from FP16."
+
+structural_shape:
+  - "Quantize base model to 4-bit NF4 (normal float 4-bit, optimized for normal-distributed weights)."
+  - "Double-quantize the per-block quantization constants (saves ~0.5 bit/param)."
+  - "Page optimizer state to CPU on OOM (paged Adam)."
+  - "Wrap target modules with LoRA adapters (BF16/FP16)."
+  - "Forward: de-quantize block → matmul in BF16 → add LoRA delta → store result."
+  - "Backward: only LoRA matrices receive gradients."
+  - "Adapter checkpoint is small (~100-500 MB for 70B); base stays untouched."
+
+variants:
+  - "8-bit LoRA: less memory-efficient but smaller quality gap."
+  - "GPTQ + LoRA: alternative quantization scheme; slightly faster inference."
+  - "AWQ + LoRA: activation-aware quantization; preserves salient channels."
+
+implementing_pipelines:
+  - "pipeline/lora-qlora-pairwise-pref-finetune"
+  - "pipeline/quantized-llm-inference"
+
+related_patterns:
+  - "pattern/peft-lora-adapter-insertion"
+  - "pattern/dpo-from-pairwise"
+  - "pattern/lora-merge-and-deploy"
+
+tags: ["qlora", "4-bit", "nf4", "finetune", "memory-efficient"]

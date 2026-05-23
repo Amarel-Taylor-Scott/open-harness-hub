@@ -1,0 +1,47 @@
+id: "processor/cost-meter"
+type: processor
+version: "0.1.0"
+name: "Cost meter"
+description: |
+  Emit per-call USD cost accounting given (adapter_ref, input_tokens,
+  output_tokens, cached_tokens). Resolves the adapter's pricing card,
+  multiplies, and writes a metering row to the configured sink.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["evaluation"]
+modality:   ["structured"]
+lifecycle:  "stable"
+lifecycle_position: "post_api.audit"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "meter.cost"
+deterministic: true
+idempotent: false
+streaming: true
+latency_budget_ms: 3
+
+inputs:
+  - name: "adapter_ref"
+    type: "artifact_id"
+  - name: "input_tokens"
+    type: "integer"
+  - name: "output_tokens"
+    type: "integer"
+  - name: "cached_tokens"
+    type: "integer"
+outputs:
+  - name: "cost_usd"
+    type: "number"
+  - name: "breakdown"
+    type: "object"
+
+side_effects: "write"
+on_error: "continue"
+
+implementations:
+  - kind: "callable"
+    path: "processors.cost_meter.run"

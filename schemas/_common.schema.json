@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/_common.schema.json",
+  "title": "Common envelope for Open Harness Hub artifacts",
+  "description": "Shared $defs referenced by every artifact-type schema.",
+  "$defs": {
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "maxLength": 64
+    },
+    "artifactId": {
+      "type": "string",
+      "pattern": "^(harness|pipeline|benchmark|rule-pack|knowledge-pack|logic-pack|tool|persona|adapter|rubric|dataset|schema|processor|pattern)/[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?(\\+[0-9A-Za-z.-]+)?$"
+    },
+    "isoDate": {
+      "type": "string",
+      "format": "date"
+    },
+    "author": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name":  { "type": "string" },
+        "url":   { "type": "string", "format": "uri" },
+        "email": { "type": "string", "format": "email" }
+      },
+      "additionalProperties": false
+    },
+    "envelope": {
+      "type": "object",
+      "required": ["id", "type", "version", "name", "description", "license", "lifecycle"],
+      "properties": {
+        "id":          { "$ref": "#/$defs/artifactId" },
+        "type":        { "type": "string", "enum": ["harness", "pipeline", "benchmark", "rule-pack", "knowledge-pack", "logic-pack", "tool", "persona", "adapter", "rubric", "dataset", "schema", "processor", "pattern"] },
+        "version":     { "$ref": "#/$defs/semver" },
+        "name":        { "type": "string", "minLength": 1, "maxLength": 128 },
+        "description": { "type": "string", "minLength": 1 },
+        "authors":     { "type": "array", "items": { "$ref": "#/$defs/author" } },
+        "license":     { "type": "string", "minLength": 1 },
+        "industry":    { "type": "array", "items": { "type": "string" } },
+        "capability":  { "type": "array", "items": { "type": "string" } },
+        "modality":    { "type": "array", "items": { "type": "string" } },
+        "lifecycle":   { "type": "string", "enum": ["experimental", "beta", "stable", "deprecated"] },
+        "lifecycle_position": {
+          "type": "string",
+          "description": "Where the artifact sits in the request lifecycle. See vocabularies/lifecycle-position.yaml.",
+          "pattern": "^(pre_api|api|post_api|cross_cutting)(\\.[a-z_]+)?$"
+        },
+        "trust_boundary": { "type": "string", "enum": ["local", "hub", "external", "mixed"] },
+        "freshness":   { "type": "string", "enum": ["stable", "volatile", "dated"] },
+        "eu_ai_act_risk": {
+          "type": "string",
+          "description": "EU AI Act risk classification. See SPEC §18 standards alignment.",
+          "enum": ["prohibited", "high_risk", "limited", "minimal", "gpai"]
+        },
+        "nist_ai_rmf_controls": {
+          "type": "array",
+          "description": "NIST AI RMF control IDs this artifact contributes to (e.g. 'GOVERN-1.1', 'MAP-3.2').",
+          "items": { "type": "string" }
+        },
+        "iso_42001_controls": {
+          "type": "array",
+          "description": "ISO/IEC 42001 control IDs this artifact contributes to (e.g. 'A.6.2.4').",
+          "items": { "type": "string" }
+        },
+        "data_protection": {
+          "type": "object",
+          "description": "DPV-aligned data-protection metadata. Replaces / augments free-form privacy_boundaries.",
+          "properties": {
+            "data_categories":              { "type": "array", "items": { "type": "string" }, "description": "DPV PersonalDataCategory IRIs (e.g. 'dpv:Identifying', 'dpv:MedicalHealth')." },
+            "hipaa_safe_harbor_categories": { "type": "array", "items": { "type": "string", "pattern": "^hsh:(0[1-9]|1[0-8])$" } },
+            "purposes":                     { "type": "array", "items": { "type": "string" }, "description": "DPV Purpose IRIs." },
+            "legal_basis":                  { "type": "array", "items": { "type": "string" }, "description": "DPV LegalBasis IRIs." }
+          },
+          "additionalProperties": true
+        },
+        "links": {
+          "type": "object",
+          "properties": {
+            "source":   { "type": "string" },
+            "homepage": { "type": "string" },
+            "paper":    { "type": "string" },
+            "kaggle":   { "type": "string" },
+            "huggingface": { "type": "string" }
+          },
+          "additionalProperties": true
+        },
+        "tags":        { "type": "array", "items": { "type": "string" } },
+        "created":     { "$ref": "#/$defs/isoDate" },
+        "updated":     { "$ref": "#/$defs/isoDate" },
+        "superseded_by": { "$ref": "#/$defs/artifactId" },
+        "deprecated_on": { "$ref": "#/$defs/isoDate" },
+        "attribution": {
+          "type": "object",
+          "description": "When an artifact was mined or imported from an external source.",
+          "properties": {
+            "source_url":  { "type": "string", "format": "uri" },
+            "source_kind": { "type": "string", "enum": ["kaggle", "github", "huggingface", "arxiv", "manual", "other"] },
+            "author":      { "type": "string" },
+            "license":     { "type": "string" }
+          }
+        }
+      }
+    },
+    "modelCall": {
+      "type": "string",
+      "enum": ["none", "optional", "hybrid", "required", "external_optional"]
+    },
+    "modelTransport": {
+      "type": "string",
+      "enum": [
+        "none",
+        "callable",
+        "transformers",
+        "unsloth",
+        "llama_cpp",
+        "ollama",
+        "vllm",
+        "openai_compatible",
+        "anthropic",
+        "google_gemini",
+        "hf_inference_endpoint",
+        "frontier_api",
+        "gemma_runtime",
+        "local_only"
+      ]
+    },
+    "appliedLayer": {
+      "type": "string",
+      "enum": ["persona", "grep", "rag", "tools", "official_sources", "online", "classifier", "heuristic", "privacy"]
+    },
+    "logicPath": {
+      "type": "object",
+      "required": ["id", "label", "steps", "model_call"],
+      "properties": {
+        "id":          { "type": "string" },
+        "label":       { "type": "string" },
+        "entrypoints": { "type": "array", "items": { "type": "string" } },
+        "steps":       { "type": "array", "items": { "type": "string" } },
+        "consumes":    { "type": "array", "items": { "type": "string" } },
+        "emits":       { "type": "array", "items": { "type": "string" } },
+        "model_call":  { "$ref": "#/$defs/modelCall" },
+        "verification": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "modelTarget": {
+      "type": "object",
+      "required": ["id", "transport", "role"],
+      "properties": {
+        "id":            { "type": "string" },
+        "label":         { "type": "string" },
+        "transport":     { "$ref": "#/$defs/modelTransport" },
+        "role":          { "type": "string" },
+        "capabilities":  { "type": "array", "items": { "type": "string" } },
+        "required":      { "type": "boolean" },
+        "default":       { "type": "boolean" },
+        "trust_boundary": { "type": "string", "enum": ["local", "hub", "external", "mixed"] }
+      },
+      "additionalProperties": false
+    },
+    "packContract": {
+      "type": "object",
+      "required": ["id", "label", "kind", "types"],
+      "properties": {
+        "id":            { "type": "string" },
+        "label":         { "type": "string" },
+        "kind":          { "type": "string", "enum": ["knowledge_pack", "logic_pack"] },
+        "types":         { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "required":      { "type": "boolean" },
+        "trust_boundary": { "type": "string", "enum": ["local", "hub", "external", "mixed"] },
+        "freshness":     { "type": "string", "enum": ["stable", "volatile", "dated"] }
+      },
+      "additionalProperties": false
+    }
+  }
+}

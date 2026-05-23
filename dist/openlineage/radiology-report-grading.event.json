@@ -1,0 +1,101 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-05-20T17:02:11.985317+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "829f9163-2b58-4576-ba5f-66e3ff494d51",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-05-20T17:02:11.985351+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/radiology-report-grading",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Grade a radiology report against `rubric/radiology-report-quality-\nv1`. The pipeline reuses the SAME primitives as the ESG grading\npipeline:\n 1. `processor/structured-to-prose` \u2014 flatten any structured input\n 2. `processor/redact-pii-text` + `rule-pack/phi-hipaa-en` \u2014\n    strip PHI\n 3. `rule-pack/grep-radiology-report-red-flags` \u2014 incidental\n    findings + missing-RADS + Fleischner non-compliance heuristics\n 4. RAG against `knowledge-pack/radiology-acrac-fleischner`\n 5. `processor/llm-judge` against the rubric\n 6. `processor/audit-trace-emitter` for record-keeping\n\nDemonstrates the architecture's cross-vertical reusability: the\nexact same harness/GREP/RAG/judge chain that grades ESG supplier\ndisclosures also grades radiology reports \u2014 only the rubric,\nknowledge pack, and rule pack change."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../radiology-report-grading.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/radiology-report-grading/output/grade",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "grade (number)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/radiology-report-grading/output/findings",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "findings (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/radiology-report-grading/output/missing_rads",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "missing_rads (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/radiology-report-grading/output/missing_followups",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "missing_followups (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/radiology-report-grading/output/trace",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "trace (object[])"
+        }
+      }
+    }
+  ]
+}

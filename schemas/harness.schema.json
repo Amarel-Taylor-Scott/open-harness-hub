@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/harness.schema.json",
+  "title": "Harness manifest",
+  "description": "A named, repeatable workflow around a model or trust boundary.",
+  "allOf": [
+    { "$ref": "_common.schema.json#/$defs/envelope" },
+    {
+      "type": "object",
+      "required": ["kind", "tier", "applied_layers", "model_targets", "privacy_boundaries"],
+      "properties": {
+        "type":         { "const": "harness" },
+        "kind":         { "type": "string", "enum": ["model_harness", "safety_gate", "utility_surface"] },
+        "tier":         { "type": "string", "enum": ["primary", "secondary"] },
+        "applied_layers": {
+          "type": "array",
+          "items": { "$ref": "_common.schema.json#/$defs/appliedLayer" },
+          "uniqueItems": true
+        },
+        "consumes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Knowledge-object leaf types the harness reads. Must appear in vocabularies/leaf-types.yaml."
+        },
+        "emits": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Knowledge-object leaf types the harness produces."
+        },
+        "logic_paths": {
+          "type": "array",
+          "items": { "$ref": "_common.schema.json#/$defs/logicPath" }
+        },
+        "knowledge_packs": {
+          "type": "array",
+          "items": {
+            "allOf": [
+              { "$ref": "_common.schema.json#/$defs/packContract" },
+              { "properties": { "kind": { "const": "knowledge_pack" } } }
+            ]
+          }
+        },
+        "logic_packs": {
+          "type": "array",
+          "items": {
+            "allOf": [
+              { "$ref": "_common.schema.json#/$defs/packContract" },
+              { "properties": { "kind": { "const": "logic_pack" } } }
+            ]
+          }
+        },
+        "model_io": {
+          "type": "object",
+          "properties": {
+            "input":     { "type": "string" },
+            "output":    { "type": "string" },
+            "transport": { "$ref": "_common.schema.json#/$defs/modelTransport" }
+          }
+        },
+        "model_targets": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "_common.schema.json#/$defs/modelTarget" }
+        },
+        "input_verification":  { "type": "array", "items": { "type": "string" } },
+        "output_verification": { "type": "array", "items": { "type": "string" } },
+        "privacy_boundaries": {
+          "type": "object",
+          "required": ["raw_input"],
+          "properties": {
+            "raw_input":      { "type": "string" },
+            "derived_output": { "type": "string" },
+            "external_calls": { "type": "string" }
+          },
+          "additionalProperties": true
+        },
+        "contributes_to": {
+          "type": "array",
+          "items": { "$ref": "_common.schema.json#/$defs/artifactId" }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/rubric.schema.json",
+  "title": "Rubric manifest",
+  "allOf": [
+    { "$ref": "_common.schema.json#/$defs/envelope" },
+    {
+      "type": "object",
+      "required": ["dimensions", "scoring_method"],
+      "properties": {
+        "type":       { "const": "rubric" },
+        "dimensions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "label", "weight", "scale"],
+            "properties": {
+              "id":                { "type": "string" },
+              "label":             { "type": "string" },
+              "weight":            { "type": "number" },
+              "scale":             { "type": "string" },
+              "evidence_required": { "type": "string" }
+            }
+          }
+        },
+        "scoring_method": { "type": "string", "enum": ["weighted_sum", "min", "gating", "custom"] },
+        "examples": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "grade":    { "type": "number" },
+              "response": { "type": "string" },
+              "notes":    { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

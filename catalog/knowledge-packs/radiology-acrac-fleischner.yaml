@@ -1,0 +1,63 @@
+id: "knowledge-pack/radiology-acrac-fleischner"
+type: knowledge-pack
+version: "0.1.0"
+name: "ACR Appropriateness Criteria + Fleischner + ACR RADS rubrics"
+description: |
+  Composite, educational extracts of radiology citation backbone:
+
+   - ACR Appropriateness Criteria (selected high-volume topics):
+     headache, low back pain, acute abdominal pain, suspected
+     pulmonary embolism, pulmonary nodule incidental.
+   - Fleischner Society 2017 guidelines for pulmonary nodule
+     management (solid + sub-solid, single + multiple).
+   - ACR Reporting and Data Systems (RADS):
+     * BI-RADS 6th ed. (breast: 0-6 + density categories a-d)
+     * LI-RADS v2018 (liver: LR-1 → LR-5, LR-M, LR-TIV)
+     * TI-RADS ACR (thyroid: TR1-TR5)
+     * O-RADS US + MRI (ovarian/adnexal)
+     * PI-RADS v2.1 (prostate MRI)
+     * Lung-RADS 1.1 (lung cancer screening)
+     * NI-RADS (head & neck post-treatment)
+   - RSNA reporting templates (structured-reporting standard).
+   - Common abbreviations + impression language conventions.
+
+  Composite educational extracts; clinical use requires the radiologist's
+  professional judgment + access to the authoritative current ACR/RSNA
+  publications.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry:   ["healthcare", "healthcare.radiology", "healthcare.clinical"]
+capability: ["retrieval", "verification"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "dated"
+tags: ["radiology", "acrac", "fleischner", "bi-rads", "li-rads", "ti-rads", "o-rads", "pi-rads", "lung-rads"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+content_types:
+  - rag_doc
+  - citation_edge
+files:
+  - path: "data/radiology-pack/acrac-selected.jsonl"
+    format: "jsonl"
+  - path: "data/radiology-pack/fleischner-2017.jsonl"
+    format: "jsonl"
+  - path: "data/radiology-pack/rads-scoring.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    embedder: "adapter/bge-embeddings-local"
+    chunk_tokens: 384
+    overlap_tokens: 48
+provenance:
+  sources:
+    - "ACR Appropriateness Criteria (composite educational extracts)"
+    - "Fleischner Society 2017 incidental pulmonary nodule guidelines (composite)"
+    - "ACR BI-RADS / LI-RADS / TI-RADS / O-RADS / PI-RADS / Lung-RADS / NI-RADS (composite)"
+    - "RSNA RadReport structured-reporting templates (composite)"
+  collected_through: "2026-04-30"
+  note: "Composite educational extracts; not authoritative clinical text."

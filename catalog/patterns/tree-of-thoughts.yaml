@@ -1,0 +1,63 @@
+id: "pattern/tree-of-thoughts"
+type: pattern
+version: "0.1.0"
+name: "Tree of Thoughts (ToT)"
+description: |
+  At each reasoning step, propose N candidate "thoughts", value/vote
+  each, and expand the best ones via BFS or DFS. Backtrack on dead-ends.
+  Generalizes chain-of-thought from a single chain to a tree, allowing
+  exploration of multiple reasoning paths.
+authors:
+  - name: "Yao, Yu, Zhao, Shafran, Griffiths, Cao, Narasimhan (2023)"
+license: "CC-BY-4.0"
+industry:   ["ai"]
+capability: ["reasoning", "planning"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+tags: ["reasoning", "tree-of-thoughts", "search"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+paper_url: "https://arxiv.org/abs/2305.10601"
+paper_citation: "Yao et al. 2023, Tree of Thoughts: Deliberate Problem Solving with Large Language Models"
+reference_implementations:
+  - { url: "https://github.com/princeton-nlp/tree-of-thought-llm", language: "python" }
+  - { url: "https://github.com/kyegomez/tree-of-thoughts", language: "python" }
+
+structural_shape:
+  - "propose N candidate thoughts at the current node"
+  - "value/vote each candidate (LLM scores them)"
+  - "select top-k for expansion (BFS) or best (DFS)"
+  - "expand selected nodes into new candidates"
+  - "backtrack when a branch dead-ends"
+  - "return path to highest-valued terminal node"
+
+when_to_use:
+  - "Multi-step planning problems (Game of 24, crossword, puzzle solving)"
+  - "When CoT fails because the first thought commits to a wrong path"
+  - "Olympiad-level math / logic"
+
+when_not_to_use:
+  - "Cost-sensitive paths (exponential blow-up in LLM calls)"
+  - "Tasks where a single chain works fine"
+
+variants:
+  - "Graph of Thoughts (GoT): allow merging branches"
+  - "Beam-of-Thoughts: maintain k best at every step"
+  - "Monte-Carlo Tree of Thoughts: rollout-based valuation"
+
+counter_patterns:
+  - "pattern/self-refine"
+
+implementing_pipelines: []
+
+implementing_processors:
+  - "processor/iterative-revise-loop"
+
+tradeoffs:
+  latency: "10-100× chain-of-thought (depth × branching)"
+  cost: "10-100× CoT"
+  quality: "Significantly higher on hard search problems"
+  complexity: "High — needs tree controller + value function"
+  explainability: "High — every node is inspectable"

@@ -1,0 +1,63 @@
+id: "processor/cross-encoder-reranker"
+type: processor
+version: "0.1.0"
+name: "Cross-encoder reranker"
+description: |
+  Re-rank a list of retrieved candidates with a cross-encoder model
+  (BAAI/bge-reranker-base, Cohere rerank-v3, or similar). Takes top-N
+  candidates from a hybrid retriever and returns the top-K most
+  relevant to the query. Typically used between hybrid retrieval and
+  context-window assembly.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry", "ai"]
+capability: ["retrieval"]
+modality:   ["text"]
+lifecycle:  "beta"
+lifecycle_position: "pre_api.context_assembly"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "rerank.cross_encoder"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 200
+
+inputs:
+  - name: "query"
+    type: "string"
+  - name: "candidates"
+    type: "Chunk[]"
+  - name: "output_k"
+    type: "integer"
+outputs:
+  - name: "ranked"
+    type: "Chunk[]"
+  - name: "scores"
+    type: "number[]"
+
+side_effects: "none"
+on_error: "fallback"
+
+model_targets:
+  - id: "bge_reranker_local"
+    label: "Local BGE reranker (default)"
+    transport: "transformers"
+    role: "Cross-encoder rerank; runs on CPU for the base variant."
+    required: false
+    default: true
+    trust_boundary: "local"
+  - id: "cohere_rerank"
+    label: "Cohere Rerank (paid)"
+    transport: "openai_compatible"
+    role: "Strong hosted reranker; requires COHERE_API_KEY."
+    required: false
+    default: false
+    trust_boundary: "external"
+
+implementations:
+  - kind: "callable"
+    path: "processors.cross_encoder_rerank.run"

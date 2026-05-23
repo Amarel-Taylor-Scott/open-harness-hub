@@ -1,0 +1,60 @@
+id: "pattern/prompt-chaining"
+type: pattern
+version: "0.1.0"
+name: "Prompt Chaining"
+description: |
+  Break a task into a SEQUENCE of LLM calls where each call's output is
+  the next call's input. The simplest agent pattern — no tools, no
+  loops, no routing — just a linear chain. Useful when a task is too
+  complex for one prompt but doesn't need agency.
+authors:
+  - name: "Anthropic cookbook (2024)"
+license: "CC-BY-4.0"
+industry:   ["ai", "cross_industry"]
+capability: ["generation", "reasoning"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+tags: ["chain", "prompt-chaining"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+paper_url: "https://anthropic.com/research/building-effective-agents"
+paper_citation: "Anthropic 2024, Building effective agents (patterns/agents/prompt-chaining)"
+
+structural_shape:
+  - "call_1 produces output_1"
+  - "call_2 consumes output_1 → output_2"
+  - "..."
+  - "call_N consumes output_{N-1} → final"
+
+when_to_use:
+  - "Multi-step task where each step is well-defined"
+  - "Want each step's output inspectable / cacheable"
+  - "Cheaper than one giant prompt because each step is focused"
+
+when_not_to_use:
+  - "Steps need to interact dynamically (use ReAct or Plan-and-Execute)"
+  - "Single complex prompt actually works (don't over-engineer)"
+
+variants:
+  - "Sequential chain (LangChain SequentialChain)"
+  - "Conditional chain (branching based on output of previous step)"
+  - "Map-Reduce: parallel map then reduce"
+
+counter_patterns:
+  - "pattern/react (interleaved reasoning + acting)"
+  - "pattern/plan-and-execute (separate planning phase)"
+
+implementing_pipelines:
+  - "pipeline/research-entity"
+  - "pipeline/email-triage-and-draft"
+
+implementing_processors: []
+
+tradeoffs:
+  latency: "Sum of step latencies"
+  cost: "Sum of step costs"
+  quality: "Strong for well-decomposable tasks"
+  complexity: "Lowest of any agent pattern"
+  explainability: "Highest — every step is independently inspectable"

@@ -1,0 +1,55 @@
+id: "rubric/code-security-review-v1"
+type: rubric
+version: "0.1.0"
+name: "Code security review v1"
+description: |
+  Seven-dimension rubric for grading an AppSec code review.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["security", "security.appsec", "software"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-20"
+updated: "2026-05-20"
+
+dimensions:
+  - id: "critical_vulns_surfaced"
+    label: "All critical-tier vulnerabilities identified (RCE, SQLi, secrets-in-code)"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "every CWE-94/CWE-89/CWE-78/CWE-798 detection has a finding with attack vector"
+  - id: "every_finding_cited"
+    label: "Every finding cites a CWE / OWASP / CVE identifier"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "for each finding ≥ medium: non-empty (cwe_id OR owasp_category OR cve_id)"
+  - id: "attack_vector_described"
+    label: "Findings describe pre-conditions + payload + impact (no 'looks unsafe')"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "for each critical/high finding: attack_vector + impact populated"
+  - id: "fix_proposed"
+    label: "Every finding has a concrete fix (parameterized query / version bump / safer library)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "non-empty proposed_fix field for each finding ≥ medium"
+  - id: "no_false_positive_smells"
+    label: "Code smells separated from real vulnerabilities (smells = low, not critical)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "findings labeled 'code_smell' have severity ≤ low"
+  - id: "secrets_check"
+    label: "No production-credentials in code (AWS keys, API tokens, JWT, private keys)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "rule-pack/grep-code-vulnerabilities secrets.* hits get critical severity"
+  - id: "license_compat"
+    label: "License-compatibility issues identified (GPL/AGPL in proprietary code, missing attribution)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "license_check_result populated; flagged on incompat"
+
+scoring_method: "weighted_sum"

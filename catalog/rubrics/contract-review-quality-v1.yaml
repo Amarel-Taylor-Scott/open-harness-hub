@@ -1,0 +1,61 @@
+id: "rubric/contract-review-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Contract review quality v1"
+description: |
+  Eight-dimension rubric for grading a commercial-contract review.
+  Used by `pipeline/contract-clause-review`.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["legal", "legal.contract", "legal.compliance"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-20"
+updated: "2026-05-20"
+
+dimensions:
+  - id: "critical_red_flags_surfaced"
+    label: "All critical-tier clauses identified"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "uncapped indemnity / unlimited liability / IP-assignment-of-pre-existing / missing DPA detected when present"
+  - id: "every_redflag_cited"
+    label: "Every red-flag cites the playbook clause family"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "for each finding ≥ medium: non-empty playbook_clause_id"
+  - id: "redline_proposed"
+    label: "Every red-flag has a concrete proposed redline (suggested replacement language)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "non-empty redline field for each finding ≥ medium"
+  - id: "missing_clauses_flagged"
+    label: "Expected-but-absent clauses are flagged (DPA, audit rights, anti-bribery for in-scope contract types)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "expected_missing_clauses surfaced based on contract_type taxonomy"
+  - id: "no_definitive_legal_conclusion"
+    label: "Output describes risk, not enforceability"
+    weight: 0.05
+    scale: "0..1"
+    evidence_required: "no 'unenforceable' / 'void' / 'illegal' assertions without authority citations"
+  - id: "pii_safe"
+    label: "PII / privileged-content redacted before LLM call"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "processor/redact-pii-text invoked; zero PII in output"
+  - id: "severity_tier_consistent"
+    label: "Severity tier matches the playbook risk tiers"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "playbook_severity_tier matches the finding's severity field"
+  - id: "review_actionable"
+    label: "Output is actionable for the contract owner — no over-flagging benign clauses"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "false_positive_rate vs gold-set ≤ 0.1"
+
+scoring_method: "weighted_sum"

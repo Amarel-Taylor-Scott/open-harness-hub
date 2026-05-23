@@ -1,0 +1,127 @@
+id: "pipeline/self-rag-grade-and-revise"
+type: pipeline
+version: "0.1.0"
+name: "Self-RAG: grade-and-revise (concrete implementation)"
+description: |
+  Concrete pipeline implementing `pattern/self-rag`. Retrieve → per-doc
+  relevance grader → rewrite-query loop on irrelevant retrieval →
+  generate with grounding → answer-support grader → iterate up to
+  max_iterations on low support.
+
+  Verified by Open Harness Hub deep mining: the LangGraph reference
+  implementation at `langchain-ai/langgraph/tutorials/rag/langgraph_self_rag/`
+  + Akari Asai's canonical implementation at
+  `AkariAsai/self-rag/retrieval_lm/run_short_form.py` (both cloned).
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "cross_industry"]
+capability: ["retrieval", "reasoning", "verification"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url: "https://github.com/AkariAsai/self-rag"
+  source_kind: "github"
+  author: "Asai, Wu, Wang, Sil, Hajishirzi"
+  license: "MIT"
+
+task: |
+  Given a user question and a corpus, produce a cited answer with the
+  Self-RAG reflection-token pattern: graded retrieval, graded answer
+  support, bounded iteration on failure.
+pipeline_kind: "rag_iterative"
+
+inputs:
+  - name: "question"
+    type: "string"
+  - name: "corpus_ref"
+    type: "artifact_id"
+  - name: "max_iterations"
+    type: "integer"
+
+outputs:
+  - name: "final_answer"
+    type: "markdown"
+  - name: "citations"
+    type: "Citation[]"
+  - name: "iterations"
+    type: "object[]"
+  - name: "converged"
+    type: "boolean"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/hybrid-retrieval-policy"
+    - "rule-pack/grep-prompt-injection-heuristics"
+
+steps:
+  - id: "decide_retrieve"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Does this question require external retrieval to answer reliably? Output `YES` or `NO` only."}]
+
+  - id: "retrieve"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    when: "$.steps.decide_retrieve.output.text == 'YES'"
+    inputs:
+      query: "$.inputs.question"
+      corpus: "$.inputs.corpus_ref"
+      top_k: 8
+
+  - id: "grade_documents"
+    kind: "processor"
+    ref: "processor/document-grader"
+    when: "$.steps.decide_retrieve.output.text == 'YES'"
+    inputs:
+      query: "$.inputs.question"
+      documents: "$.steps.retrieve.output.candidates"
+
+  - id: "rewrite_query_if_irrelevant"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    when: "$.steps.grade_documents.output.all_irrelevant"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "All retrieved documents were graded irrelevant. Rewrite the user's question to surface different vocabulary that might better match the corpus."}]
+
+  - id: "generate"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Answer the user's question using ONLY the relevant retrieved documents. Cite each chunk by index. Refuse to assert anything not supported by the chunks."}]
+      context: "$.steps.grade_documents.output.relevant"
+
+  - id: "grade_answer_support"
+    kind: "processor"
+    ref: "processor/hallucination-scorer"
+    inputs:
+      response: "$.steps.generate.output.text"
+      prompt: "$.inputs.question"
+      n_samples: 3
+
+  - id: "iterate_if_unsupported"
+    kind: "processor"
+    ref: "processor/iterative-revise-loop"
+    when: "$.steps.grade_answer_support.output.overall_score < 0.6"
+    inputs:
+      initial_prompt: "$.inputs.question"
+      inner_harness_ref: "harness/text-safety-review"
+      verifier_refs:
+        - "processor/citation-coverage"
+        - "processor/hallucination-scorer"
+      max_iterations: "$.inputs.max_iterations"
+      convergence_policy: "all_pass"
+
+success_criteria:
+  - rubric: "rubric/research-entity-v1"
+    threshold: 0.80

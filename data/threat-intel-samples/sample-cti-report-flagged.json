@@ -1,0 +1,6 @@
+{
+  "report_id": "CTI-2026-0419",
+  "incident_class": "ransomware_intrusion",
+  "title": "Intrusion via phishing → Cobalt Strike → Conti ransomware",
+  "narrative": "On 2026-04-12 the SOC detected suspicious outbound traffic from finance.acme.example to 185.220.101.45 over HTTPS on port 443. Initial access was via spear-phishing (T1566.001 — Phishing: Spearphishing Attachment) carrying a malicious LNK file (SHA256: a3f5b1c92e4d76098f8b2a4c1e5d3b67890123456789abcdef0123456789abcdef). The LNK loader resolved hxxps://malicious-c2[.]top/payload (defanged) and downloaded a Cobalt Strike beacon (md5: 5f4dcc3b5aa765d61d8327deb882cf99). Lateral movement used WMI (T1047) + Pass-the-Hash (T1550.002). Two domain controllers exhibited Mutex Global\\msseces_2024 indicating Cobalt Strike artefact. Encryption module (sha1: da39a3ee5e6b4b0d3255bfef95601890afd80709) deployed via PsExec (T1569.002). Bitcoin ransom address: 1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa. CVE-2024-12345 exploited for privilege escalation. Detection: SIGMA rule pattern matching the WMI process tree + Cobalt Strike default sleep jitter."
+}

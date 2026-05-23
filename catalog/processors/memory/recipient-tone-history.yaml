@@ -1,0 +1,43 @@
+id: "processor/recipient-tone-history"
+type: processor
+version: "0.1.0"
+name: "Recipient tone-history loader"
+description: |
+  Load the user's prior N email / chat exchanges with a specific
+  recipient, summarize the tone signals (formality, length,
+  warmth, sign-off style), and emit a tone-profile that downstream
+  draft-generation steps consult. Avoids drafting in the wrong
+  register (formal to a longtime peer, casual to a board member).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["personal_productivity"]
+capability: ["memory", "extraction"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "pre_api.tone_load"
+tags: ["email", "tone-matching", "memory"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+process_kind: "memory.tone_history"
+deterministic: false
+side_effects: "read"
+
+inputs:
+  - name: "recipient_id"
+    type: "string"
+  - name: "history_window"
+    type: "integer"
+outputs:
+  - name: "tone_profile"
+    type: "object"
+  - name: "sample_exchanges"
+    type: "string[]"
+  - name: "confidence"
+    type: "number"
+
+config:
+  default_window: 5
+  tone_dimensions: ["formality", "length", "warmth", "directness", "sign_off_style", "primary_language"]

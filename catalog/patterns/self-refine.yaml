@@ -1,0 +1,58 @@
+id: "pattern/self-refine"
+type: pattern
+version: "0.1.0"
+name: "Self-Refine"
+description: |
+  Single critique-and-revise pair. The model drafts an answer, then
+  critiques its own draft against a rubric, then revises. One iteration
+  by default; can be looped. Simpler than Reflexion (no memory store
+  across attempts) and Constitutional-AI (no fixed critique principles).
+authors:
+  - name: "Madaan, Tandon, Gupta, Hallinan, Gao, Wiegreffe, Alon, Dziri, Prabhumoye, Yang, Welleck, Majumder, Gupta, Yazdanbakhsh, Clark (2023)"
+license: "CC-BY-4.0"
+industry:   ["ai", "cross_industry"]
+capability: ["reasoning", "verification"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+tags: ["reasoning", "self-refine", "critique"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+paper_url: "https://arxiv.org/abs/2303.17651"
+paper_citation: "Madaan et al. 2023, Self-Refine: Iterative Refinement with Self-Feedback"
+
+structural_shape:
+  - "draft an initial answer"
+  - "self_critique (same model evaluates own draft against rubric)"
+  - "revise based on critique"
+  - "(optional) loop until convergence or max_iter"
+
+when_to_use:
+  - "Generation tasks with measurable quality (clarity, format, citations)"
+  - "Single-shot improvement is sufficient (no need for Reflexion's memory)"
+  - "Same model is strong enough to critique itself"
+
+when_not_to_use:
+  - "Tasks where the model is reliably good in one shot"
+  - "When critique would benefit from a different model (use cross-model judge)"
+
+variants:
+  - "Adversarial self-refine: model attacks its own draft from a critic role"
+  - "Constitutional AI self-revise: critique against a fixed principles list"
+
+counter_patterns:
+  - "pattern/reflexion (adds memory across attempts)"
+
+implementing_pipelines: []
+
+implementing_processors:
+  - "processor/self-refine-critique"
+  - "processor/iterative-revise-loop"
+
+tradeoffs:
+  latency: "2-3× single-shot"
+  cost: "2-3× single-shot"
+  quality: "Modest lift on most tasks; significant on writing / coding"
+  complexity: "Low — minimal extra infrastructure"
+  explainability: "Medium — critique is visible"

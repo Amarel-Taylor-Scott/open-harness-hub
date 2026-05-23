@@ -1,0 +1,61 @@
+id: "rubric/benefits-adjudication-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Benefits adjudication quality v1"
+description: |
+  Eight-dimension rubric for grading a benefits-eligibility
+  adjudication.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["government", "government.benefits", "compliance"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-20"
+updated: "2026-05-20"
+
+dimensions:
+  - id: "rule_cited"
+    label: "Every determination cites the exact CFR / state-plan / POMS section"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "non-empty rule_id (e.g. '7 CFR 273.9' or 'POMS SI 01130.100')"
+  - id: "income_classified"
+    label: "Income classified countable vs excluded per program rule"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "income_table with each line tagged countable/excluded"
+  - id: "no_unprovable_deny"
+    label: "Deny only with clear-rule support; ambiguous cases use generous interpretation"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "if denied: clear rule citation; if cured-cure-period offered before deny"
+  - id: "documentation_cure_offered"
+    label: "Missing-documentation denials list what's missing + offer cure period"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "missing_docs list + cure_period_days populated when denied"
+  - id: "pii_safe"
+    label: "PII / SSN / banking redacted before LLM call"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "rule-pack/grep-benefits-eligibility-flags ssn_unredacted hits = 0 in output"
+  - id: "appeal_rights_attached"
+    label: "Adverse determinations include appeal rights + deadline"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "appeal_rights field populated with deadline + contact"
+  - id: "disposition_path_clear"
+    label: "Disposition is one of: approve / approve-with-condition / deny-with-appeal / refer"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "disposition ∈ allowed values"
+  - id: "ada_accommodation"
+    label: "ADA / language / accessibility needs noted + accommodation path described"
+    weight: 0.05
+    scale: "0..1"
+    evidence_required: "ada_accommodation_noted=true OR not_applicable_with_reason"
+
+scoring_method: "weighted_sum"

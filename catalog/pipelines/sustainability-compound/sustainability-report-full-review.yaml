@@ -1,0 +1,78 @@
+id: "pipeline/sustainability-report-full-review"
+type: pipeline
+version: "0.1.0"
+name: "Sustainability report full review (Climate + ESG-S + ESG-G chained)"
+description: |
+  Chains 3 sub-pipelines for a comprehensive sustainability-report
+  audit: climate-disclosure-review + (a subset of) supplier-policy-
+  grading focused on social + (a subset of) governance. Aggregates
+  the per-dimension verdicts into a single report grade.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["climate", "esg", "compliance", "finance"]
+capability: ["evaluation", "verification"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.compound_review"
+tags: ["esg", "climate", "tcfd", "csrd", "compound"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+task: |
+  Run a corporate sustainability report through climate-disclosure +
+  ESG-supplier-grading review in one workflow.
+pipeline_kind: "compound_review"
+
+inputs:
+  - name: "sustainability_report"
+    type: "object"
+outputs:
+  - name: "report_grade"
+    type: "number"
+  - name: "climate_verdict"
+    type: "object"
+  - name: "esg_verdict"
+    type: "object"
+
+defaults:
+  persona: "persona/climate-risk-analyst"
+
+steps:
+  - id: "climate_review"
+    kind: "pipeline"
+    ref: "pipeline/climate-disclosure-review"
+    inputs:
+      disclosure:     "$.inputs.sustainability_report.climate_section"
+      company_sector: "$.inputs.sustainability_report.sector"
+      fiscal_year:    "$.inputs.sustainability_report.fiscal_year"
+
+  - id: "esg_review"
+    kind: "pipeline"
+    ref: "pipeline/supplier-policy-grading"
+    inputs:
+      supplier_disclosure_pack: "$.inputs.sustainability_report.esg_section"
+      supplier_tier:            "T1"
+      lead_company_code_ref:    "knowledge-pack/lead-company-code-stub"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "sustainability-report-full-review"
+      applied_layers: ["climate_review", "esg_review"]
+
+success_criteria:
+  - kind: deterministic
+    label: "climate sub-pipeline passed"
+    target: "$.steps.climate_review.output.sub_aggregate"
+    op: "is_truthy"
+    value: null
+    severity: high
+  - kind: deterministic
+    label: "ESG sub-pipeline passed"
+    target: "$.steps.esg_review.output.sub_aggregate"
+    op: "is_truthy"
+    value: null
+    severity: high

@@ -1,0 +1,90 @@
+id: "rule-pack/grep-gxp-data-integrity-red-flags"
+type: rule-pack
+version: "0.1.0"
+name: "GxP data-integrity red-flag detectors (21-CFR-11 / ALCOA+)"
+description: |
+  GREP detectors for the highest-leverage 21-CFR-11 + ALCOA+ data-
+  integrity violations: missing audit trails, shared accounts, post-
+  hoc record alteration, validation gaps, missing electronic-
+  signature meaning, missing reason-for-change, manual data
+  transcription without verification. Pair with
+  `pipeline/gxp-validation-review`.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["pharma", "pharma.gxp", "compliance"]
+capability: ["safety_gating", "classification", "verification"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "volatile"
+tags: ["pharma", "gxp", "21-cfr-11", "alcoa", "data-integrity"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+family: "grep"
+rules:
+  - id: "audit_trail_disabled"
+    pattern: "(?i)audit[- ]?trail\\s+(?:disabled|turned\\s+off|switched\\s+off|not\\s+(?:enabled|configured|active)|n[\\.\\/]?a)|disable.*audit.{0,20}trail"
+    severity: "critical"
+    category: "gxp.audit_trail.disabled"
+
+  - id: "shared_account"
+    pattern: "(?i)(?:(?<!no\\s)(?<!none\\s)(?<!zero\\s)(shared|generic|group|admin)\\s+(?:account|login|userid|user[- ]?id|credentials)\\s+(?:is\\s+used|in\\s+(?:production|prod)|are\\s+used|for\\s+(?:operations|operators))|operators?[\\s\\S]{0,40}?use\\s+a?\\s*shared\\s+account|account\\s+is\\s+shared|using\\s+admin\\s+(?:account\\s+)?to\\s+(?:sign|approve|review))"
+    severity: "critical"
+    category: "gxp.shared_account"
+
+  - id: "post_hoc_alteration"
+    pattern: "(?i)(modify|update|alter|edit|correct).*(?:past|prior|previous|already[- ]?(?:signed|approved|locked))\\s+record|backdat\\w*|retrospective\\s+(?:entry|update)|overwriting\\s+(?:the\\s+)?original"
+    severity: "critical"
+    category: "gxp.post_hoc_alteration"
+
+  - id: "validation_missing"
+    pattern: "(?i)(not[- ]?validated|validation\\s+(?:not\\s+(?:performed|complete)|pending|outdated)|production\\s+use\\s+without\\s+(?:IQ|OQ|PQ)\\s+complete)"
+    severity: "high"
+    category: "gxp.validation.missing"
+
+  - id: "missing_reason_for_change"
+    pattern: "(?i)(change|modification|edit|amendment)\\s+without\\s+(?:reason|justification|change\\s+control|capa)|reason\\s+for\\s+change\\s*[:=]\\s*(?:''|\"\"|n[\\.\\/]?a|none|blank)"
+    severity: "high"
+    category: "gxp.reason_for_change.missing"
+
+  - id: "missing_signature_meaning"
+    pattern: "(?i)e[- ]?signature.{0,80}without\\s+(?:meaning|purpose|review|approval|authorship)|signature\\s+meaning\\s*[:=]\\s*(?:n[\\.\\/]?a|none|''|\"\")"
+    severity: "high"
+    category: "gxp.signature.no_meaning"
+
+  - id: "single_factor_signature"
+    pattern: "(?i)e[- ]?signature\\s+via\\s+password\\s+only|single[- ]?factor\\s+signature|password[- ]only\\s+signing"
+    severity: "high"
+    category: "gxp.signature.single_factor"
+
+  - id: "manual_transcription_unverified"
+    pattern: "(?i)(manual|hand)\\s+(?:transcription|entry|re[- ]?keying)\\s+(?:from|of)\\s+(?:instrument|paper|raw\\s+data)(?!.{0,80}(verified|double[- ]?checked|two[- ]?person))"
+    severity: "medium"
+    category: "gxp.manual_transcription.unverified"
+
+  - id: "backup_treated_as_archive"
+    pattern: "(?i)backup\\s+(?:is|serves\\s+as|acts\\s+as|replaces)\\s+archive|no\\s+separate\\s+archive"
+    severity: "medium"
+    category: "gxp.backup_not_archive"
+
+  - id: "dynamic_record_static_export"
+    pattern: "(?i)dynamic\\s+record\\s+(?:exported|archived)\\s+as\\s+(?:pdf|static|image)(?!.{0,80}(original\\s+retained|raw\\s+data\\s+preserved))"
+    severity: "high"
+    category: "gxp.dynamic_record_flattened"
+
+  - id: "test_data_in_production"
+    pattern: "(?i)test\\s+data\\s+in\\s+(?:production|live|prod)|prod.*populated\\s+with\\s+test"
+    severity: "medium"
+    category: "gxp.test_data_in_prod"
+
+  - id: "unrestricted_blank_template"
+    pattern: "(?i)blank\\s+(?:record|template|form)\\s+(?:not\\s+(?:numbered|controlled)|freely\\s+available)|uncontrolled\\s+(?:blank|template)"
+    severity: "medium"
+    category: "gxp.uncontrolled_template"
+
+  - id: "missing_audit_trail_review"
+    pattern: "(?i)audit[- ]?trail\\s+(?:not\\s+reviewed|review\\s+(?:not\\s+performed|skipped|deferred))|audit[- ]?trail\\s+review\\s*[:=]\\s*(?:n[\\.\\/]?a|none|blank)"
+    severity: "high"
+    category: "gxp.audit_trail.unreviewed"

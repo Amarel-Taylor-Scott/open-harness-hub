@@ -1,0 +1,60 @@
+id: "rubric/gdpr-dsar-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "GDPR DSAR fulfillment quality v1"
+description: |
+  Eight-dimension rubric for grading a GDPR DSAR fulfillment.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["privacy", "privacy.gdpr", "privacy.dsar", "compliance"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-20"
+updated: "2026-05-20"
+
+dimensions:
+  - id: "identity_verified"
+    label: "Requester identity verified before fulfillment"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "identity_verification_method populated; verification_completed_at timestamp"
+  - id: "statutory_deadline_met"
+    label: "Response within 1 month + 2-month extension (Art. 12)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "response_date - request_date ≤ 30 days OR extension_notice_sent_within_30_days"
+  - id: "data_categories_disclosed"
+    label: "All required Art. 15 fields disclosed (purposes / categories / recipients / retention / sources / automated DM)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "8/8 Art. 15(1) sub-items populated"
+  - id: "lawful_basis_cited"
+    label: "Lawful basis (Art. 6) cited for each processing purpose"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "lawful_basis ∈ Art. 6 list for each purpose"
+  - id: "special_category_handled"
+    label: "Special-category data (Art. 9) has explicit consent or Art. 9(2) basis"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "for any Art. 9 data: explicit_consent_ref OR art_9_2_basis populated"
+  - id: "transfers_safeguarded"
+    label: "International transfers under SCCs / BCRs / adequacy / Art. 49 derogations"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "transfer_safeguard ∈ {SCC, BCR, adequacy, Art_49_derogation, no_transfer}"
+  - id: "free_of_charge"
+    label: "No unlawful charge for the first DSAR"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "fee_charged = 0 OR repetitive_request_documented"
+  - id: "complaint_path"
+    label: "Response includes right-to-complain to supervisory authority + DPA contact"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "complaint_authority_contact populated"
+
+scoring_method: "weighted_sum"

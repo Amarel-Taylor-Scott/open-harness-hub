@@ -1,0 +1,34 @@
+
+============================================================================
+  sample-ct-abdomen-flagged.json
+  modality: CT  •  body_part: abdomen_pelvis  •  risk: moderate
+============================================================================
+  steps: 7  •  total ms: 15.4
+  PII detected & redacted: 2
+  rule findings by severity:  C: 0  H: 2  M: 5  L: 1
+
+  rule-pack/grep-radiology-report-red-flags:
+    [high     ] thyroid_nodule_without_tirads              radiology.missing_rads.thyroid
+    [medium   ] liver_observation_without_lirads           radiology.missing_rads.liver
+    [high     ] pulm_nodule_without_fleischner_followup    radiology.missing_followup.pulm_nodule
+    [medium   ] adrenal_incidentaloma_without_workup       radiology.incidental.adrenal
+    [low      ] renal_lesion_without_bosniak               radiology.missing_rads.renal
+    [medium   ] definitive_without_differential            radiology.definitive_without_differential
+    [medium   ] no_comparison_when_prior_available         radiology.missing_comparison
+    [medium   ] impression_lacks_recommendation            radiology.missing_recommendation
+
+============================================================================
+  sample-ct-chest-good.json
+  modality: CT  •  body_part: chest  •  risk: low
+============================================================================
+  steps: 7  •  total ms: 9.0
+  PII detected & redacted: 0
+  rule findings by severity:  C: 0  H: 0  M: 0  L: 0
+
+============================================================================
+  sample-mammo-screening-mixed.json
+  modality: Mammography  •  body_part: breast  •  risk: average
+============================================================================
+  steps: 7  •  total ms: 4.7
+  PII detected & redacted: 0
+  rule findings by severity:  C: 0  H: 0  M: 0  L: 0

@@ -1,0 +1,81 @@
+id: "pipeline/large-model-faiss-rag"
+type: pipeline
+version: "0.1.0"
+name: "Large-model FAISS RAG (Platypus2-70b style)"
+description: |
+  Use a large (70B-class) instruction-tuned model with FAISS-indexed
+  Wikipedia retrieval. The "go big or go home" Kaggle pattern that
+  wins multi-choice-with-context competitions.
+
+  Verified by Open Harness Hub mining of simjeg's "Platypus2-70B with
+  Wikipedia RAG" (1248 votes) on kaggle-llm-science-exam.
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "scientific_research", "education"]
+capability: ["retrieval", "reasoning", "classification"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url: "https://www.kaggle.com/code/simjeg/platypus2-70b-with-wikipedia-rag"
+  source_kind: "kaggle"
+  author: "simjeg (1248 votes)"
+  license: "Apache-2.0"
+
+task: |
+  Given a multiple-choice question + a Wikipedia-class corpus, FAISS-
+  retrieve top-k context chunks, prompt a 70B-class instruction-tuned
+  model to pick the answer, ensemble across seeds for calibrated probs.
+pipeline_kind: "qa_multichoice_rag"
+
+inputs:
+  - name: "question"
+    type: "string"
+  - name: "answer_choices"
+    type: "string[]"
+  - name: "corpus_ref"
+    type: "artifact_id"
+outputs:
+  - name: "predicted_answer"
+    type: "string"
+  - name: "confidence"
+    type: "number"
+  - name: "retrieved_context"
+    type: "string"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/hybrid-retrieval-policy"
+
+steps:
+  - id: "retrieve"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.inputs.question"
+      corpus: "$.inputs.corpus_ref"
+      top_k: 5
+
+  - id: "rerank"
+    kind: "processor"
+    ref: "processor/cross-encoder-reranker"
+    inputs:
+      query: "$.inputs.question"
+      candidates: "$.steps.retrieve.output.candidates"
+      output_k: 3
+
+  - id: "answer"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Pick the most-likely answer (A/B/C/D/E) using retrieved context. Output the letter + 1-sentence rationale."}]
+      context: "$.steps.rerank.output.ranked"
+
+success_criteria: []

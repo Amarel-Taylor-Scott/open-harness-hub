@@ -1,0 +1,51 @@
+id: "tool/txt2img-sdxl"
+type: tool
+version: "0.1.0"
+name: "Text-to-Image (SDXL)"
+description: |
+  Generic SDXL text-to-image tool. Backend-agnostic — implementations
+  include local Diffusers, Replicate, Hugging Face Inference, fal.ai,
+  Together, or a custom OpenAPI endpoint.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["creative"]
+capability: ["image_synthesis"]
+modality:   ["text", "image"]
+lifecycle:  "stable"
+trust_boundary: "external"
+tags: ["image-gen", "sdxl"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+parameters:
+  type: object
+  properties:
+    prompt:          { type: "string" }
+    negative_prompt: { type: "string" }
+    width:           { type: "integer", default: 1024 }
+    height:          { type: "integer", default: 1024 }
+    steps:           { type: "integer", default: 30 }
+    guidance_scale:  { type: "number",  default: 7.5 }
+    seed:            { type: "integer" }
+  required: ["prompt"]
+returns:
+  type: object
+  properties:
+    image_url: { type: "string" }
+    seed:      { type: "integer" }
+    model:     { type: "string" }
+side_effects: "external_call"
+examples:
+  - input:
+      prompt: "studio product photo of a ceramic mug, 50mm lens, f/2.8, soft key light, navy background, minimalist"
+      negative_prompt: "watermark, logo, signature, low quality"
+    output:
+      image_url: "https://cdn.example.com/img/abc123.png"
+      seed: 42
+      model: "sdxl-base-1.0"
+implementations:
+  - kind: "openapi"
+    url:  "https://api.fal.ai/sdxl"
+  - kind: "callable"
+    path: "tools.txt2img_sdxl.run"

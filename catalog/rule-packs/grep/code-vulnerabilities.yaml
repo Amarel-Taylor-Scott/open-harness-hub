@@ -1,0 +1,193 @@
+id: "rule-pack/grep-code-vulnerabilities"
+type: rule-pack
+version: "0.1.0"
+name: "Code vulnerability + secret-detection GREP pack"
+description: |
+  GREP detectors for the highest-leverage source-code vulnerabilities
+  + hardcoded secrets + dangerous-function calls. Pair with
+  `pipeline/code-security-review`. Cite each rule with its CWE.
+
+  Covers (cross-language: Python / JS / TS / Java / Go / shell):
+   - **Secrets** (CWE-798): AWS keys, generic API tokens, JWT,
+     private keys, Slack tokens, GitHub tokens
+   - **Injection** (CWE-89 / CWE-78): SQL string concat, shell
+     command via os.system / subprocess shell=True
+   - **Deserialization** (CWE-502): pickle.loads on untrusted input
+   - **Code execution** (CWE-94): eval, exec, Function() in JS
+   - **XSS** (CWE-79): innerHTML / dangerouslySetInnerHTML
+   - **Cryptography** (CWE-327 / CWE-326): MD5, SHA1, DES, RC4 for
+     security; weak random.random for tokens
+   - **Auth** (CWE-306 / CWE-287): missing @login_required, blank
+     password defaults
+   - **SSRF** (CWE-918): requests.get(user_url)
+   - **Path traversal** (CWE-22): open(user_path) without check
+   - **CSRF** (CWE-352): missing csrf_token in forms
+
+  These TRIGGER review, not block — paired with a real SAST tool
+  (Semgrep, Bandit, Snyk Code) for authoritative scanning.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["security", "security.appsec", "software"]
+capability: ["safety_gating", "classification", "verification"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "volatile"
+tags: ["security", "sast", "cwe", "owasp", "secrets", "injection"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+family: "grep"
+rules:
+  # ---------- Secrets in code (CWE-798) ----------
+  - id: "aws_access_key_id"
+    pattern: "(?i)\\b(AKIA|ASIA)[A-Z0-9]{16}\\b"
+    severity: "critical"
+    category: "secrets.aws.access_key"
+
+  - id: "aws_secret_key"
+    pattern: "(?i)aws_secret_access_key\\s*[:=]\\s*['\"]?[A-Za-z0-9/+=]{40}['\"]?"
+    severity: "critical"
+    category: "secrets.aws.secret_key"
+
+  - id: "generic_api_token"
+    pattern: "(?i)(api[_-]?key|api[_-]?token|access[_-]?token|secret[_-]?token)\\s*[:=]\\s*['\"]?[A-Za-z0-9_\\-]{16,}['\"]?(?!\\s*(?:\\$\\{|os\\.environ|process\\.env|\\.env|REDACTED|placeholder|example|<\\w+>))"
+    severity: "critical"
+    category: "secrets.generic.token"
+
+  - id: "private_key_block"
+    pattern: "-----BEGIN (RSA |EC |OPENSSH |DSA |ENCRYPTED |PGP )?PRIVATE KEY-----"
+    severity: "critical"
+    category: "secrets.private_key"
+
+  - id: "jwt_token_in_code"
+    pattern: "\\beyJ[A-Za-z0-9_\\-]+\\.eyJ[A-Za-z0-9_\\-]+\\.[A-Za-z0-9_\\-]+\\b"
+    severity: "high"
+    category: "secrets.jwt"
+
+  - id: "slack_token"
+    pattern: "(xox[baprs]-[A-Za-z0-9-]{10,})"
+    severity: "critical"
+    category: "secrets.slack"
+
+  - id: "github_pat"
+    pattern: "ghp_[A-Za-z0-9]{30,}"
+    severity: "critical"
+    category: "secrets.github"
+
+  # ---------- SQL injection (CWE-89) ----------
+  - id: "sqli_python_format"
+    pattern: "(?i)(execute|cursor\\.execute|raw_sql)\\(\\s*['\"][^'\"]*%[sd][^'\"]*['\"]\\s*%"
+    severity: "critical"
+    category: "injection.sql.python_percent"
+
+  - id: "sqli_python_fstring"
+    pattern: "(?i)(execute|cursor\\.execute|raw_sql)\\(\\s*f['\"](?:[^'\"\\\\]|\\\\.)*?\\{(?:user|input|request|param|name|email|q|search)"
+    severity: "critical"
+    category: "injection.sql.python_fstring"
+
+  - id: "sqli_js_concat"
+    pattern: "(?i)(query|exec(?:sql)?|raw)\\([\\s\\S]{0,80}?['\"`]\\s*\\+\\s*(req\\.|request\\.|input|user)"
+    severity: "critical"
+    category: "injection.sql.js_concat"
+
+  # ---------- Command injection (CWE-78) ----------
+  - id: "cmd_injection_shell_true"
+    pattern: "(?i)subprocess\\.(?:run|Popen|call|check_(?:call|output))\\([^)]*shell\\s*=\\s*True"
+    severity: "high"
+    category: "injection.cmd.subprocess_shell_true"
+
+  - id: "cmd_injection_os_system"
+    pattern: "(?i)os\\.system\\([\\s\\S]{0,80}?\\+\\s*(?:user|input|request|param)"
+    severity: "critical"
+    category: "injection.cmd.os_system_with_input"
+
+  # ---------- Deserialization (CWE-502) ----------
+  - id: "pickle_loads_untrusted"
+    pattern: "(?i)pickle\\.loads?\\([^)]*(?:request|user|input|body|payload|message)"
+    severity: "critical"
+    category: "deserialization.pickle"
+
+  - id: "yaml_unsafe_load"
+    pattern: "(?i)yaml\\.load\\([^)]*(?!Loader\\s*=\\s*SafeLoader|Loader\\s*=\\s*yaml\\.SafeLoader)"
+    severity: "high"
+    category: "deserialization.yaml"
+
+  # ---------- Code execution (CWE-94) ----------
+  - id: "eval_in_python"
+    pattern: "(?i)\\b(eval|exec)\\([\\s\\S]{0,80}?(?:user|input|request|param|content)"
+    severity: "critical"
+    category: "code_execution.eval"
+
+  - id: "function_constructor_js"
+    pattern: "(?i)new Function\\(|Function\\(['\"`]"
+    severity: "high"
+    category: "code_execution.function_constructor"
+
+  # ---------- XSS (CWE-79) ----------
+  - id: "xss_innerhtml"
+    pattern: "(?i)\\.innerHTML\\s*=\\s*(?:[^;]*?(?:user|input|request|param|response))"
+    severity: "high"
+    category: "xss.innerhtml"
+
+  - id: "xss_dangerously_set"
+    pattern: "(?i)dangerouslySetInnerHTML\\s*[:=]\\s*\\{"
+    severity: "medium"
+    category: "xss.react_dangerous_html"
+
+  # ---------- Weak crypto (CWE-327 / CWE-326) ----------
+  - id: "weak_hash_md5"
+    pattern: "(?i)\\bhashlib\\.md5\\b|\\bcrypto\\.createHash\\(['\"]md5['\"]\\)|MessageDigest\\.getInstance\\(['\"]MD5['\"]\\)"
+    severity: "medium"
+    category: "crypto.weak_hash.md5"
+
+  - id: "weak_hash_sha1"
+    pattern: "(?i)\\bhashlib\\.sha1\\b|crypto\\.createHash\\(['\"]sha1['\"]\\)"
+    severity: "medium"
+    category: "crypto.weak_hash.sha1"
+
+  - id: "weak_random_for_token"
+    pattern: "(?i)\\brandom\\.random\\b[\\s\\S]{0,80}?(?:token|password|key|secret|nonce|session)"
+    severity: "high"
+    category: "crypto.weak_random_for_token"
+
+  - id: "weak_cipher_des_rc4"
+    pattern: "(?i)\\b(DES|RC4|Blowfish|TripleDES)\\b.{0,40}(?:cipher|encrypt|decrypt)"
+    severity: "high"
+    category: "crypto.weak_cipher"
+
+  # ---------- Auth (CWE-306 / CWE-287) ----------
+  - id: "missing_auth_decorator_django"
+    pattern: "(?i)def\\s+\\w+\\(request[\\s\\S]{0,300}?(?:return\\s+(?:HttpResponse|JsonResponse|render)|@require_GET|@require_POST)(?<!@login_required\\b)"
+    severity: "low"
+    category: "auth.missing_decorator_heuristic"
+
+  - id: "default_password_blank"
+    pattern: "(?i)(password|pwd|pass)\\s*[:=]\\s*['\"]['\"]"
+    severity: "high"
+    category: "auth.blank_password_default"
+
+  # ---------- SSRF (CWE-918) ----------
+  - id: "ssrf_requests_get_user_url"
+    pattern: "(?i)requests\\.(get|post|put|delete|patch)\\(\\s*(?:url\\s*=\\s*)?(?:user|input|request|param)"
+    severity: "high"
+    category: "ssrf.requests_user_controlled"
+
+  # ---------- Path traversal (CWE-22) ----------
+  - id: "path_traversal_open"
+    pattern: "(?i)open\\(\\s*(?:user|input|request|param|filename)[\\s\\S]{0,40}?,\\s*['\"]r['\"]"
+    severity: "medium"
+    category: "path_traversal.open_user_path"
+
+  # ---------- CSRF (CWE-352) ----------
+  - id: "csrf_exempt_marker"
+    pattern: "(?i)@csrf_exempt|csrfmiddlewaretoken\\s*[:=]\\s*['\"]?'?\\bnull\\b'?['\"]?|csrf\\s*[:=]\\s*false"
+    severity: "high"
+    category: "csrf.exempted"
+
+  # ---------- Debug mode in prod (CWE-489) ----------
+  - id: "debug_true_in_prod_config"
+    pattern: "(?i)\\bDEBUG\\s*=\\s*True\\b"
+    severity: "medium"
+    category: "config.debug_true"

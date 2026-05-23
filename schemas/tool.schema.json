@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/tool.schema.json",
+  "title": "Tool manifest",
+  "description": "A function-call definition usable by any model that supports tool use.",
+  "allOf": [
+    { "$ref": "_common.schema.json#/$defs/envelope" },
+    {
+      "type": "object",
+      "required": ["parameters", "returns", "side_effects"],
+      "properties": {
+        "type":         { "const": "tool" },
+        "parameters":   { "type": "object" },
+        "returns":      { "type": "object" },
+        "side_effects": { "type": "string", "enum": ["none", "read", "write", "external_call"] },
+        "examples": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["input", "output"],
+            "properties": {
+              "input":  { "type": "object" },
+              "output": { "type": "object" },
+              "notes":  { "type": "string" }
+            }
+          }
+        },
+        "implementations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["kind"],
+            "properties": {
+              "kind":     { "type": "string", "enum": ["openapi", "callable", "shell", "mcp", "http"] },
+              "url":      { "type": "string" },
+              "path":     { "type": "string" },
+              "command":  { "type": "string" },
+              "language": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

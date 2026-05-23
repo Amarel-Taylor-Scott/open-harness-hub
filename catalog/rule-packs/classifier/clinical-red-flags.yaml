@@ -1,0 +1,77 @@
+id: "rule-pack/clinical-red-flags"
+type: rule-pack
+version: "0.1.0"
+name: "Clinical red flags"
+description: |
+  A classifier rule pack of presenting-symptom patterns that require
+  immediate clinical evaluation. Fires inside the clinical-decision-
+  support harness BEFORE differential reasoning, so the assistant's
+  first sentence can flag the red flag.
+
+  Educational baseline; covered entities should layer
+  institution-specific rules and update against the latest guidelines.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["healthcare", "healthcare.clinical"]
+capability: ["classification", "safety_gating"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "volatile"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+family: "classifier"
+language: "en"
+rules:
+  - id: "chest_pain_with_radiation"
+    label: "Chest pain with radiation to jaw, arm, or back"
+    examples:
+      - "crushing chest pain radiating to left arm"
+      - "pressure-like chest pain with jaw discomfort"
+      - "tearing chest pain to back"
+    threshold: 0.70
+    severity: "critical"
+    category: "red_flag.acs_or_dissection"
+  - id: "sudden_severe_headache"
+    label: "Thunderclap headache"
+    examples:
+      - "worst headache of my life sudden onset"
+      - "thunderclap headache with neck stiffness"
+    threshold: 0.75
+    severity: "critical"
+    category: "red_flag.sah"
+  - id: "focal_neuro_deficit"
+    label: "Focal neurological deficit"
+    examples:
+      - "right arm weakness new today"
+      - "facial droop with slurred speech"
+      - "sudden vision loss in one eye"
+    threshold: 0.70
+    severity: "critical"
+    category: "red_flag.stroke"
+  - id: "anaphylaxis_pattern"
+    label: "Anaphylaxis (airway + skin + circulatory)"
+    examples:
+      - "hives plus throat swelling after peanut"
+      - "wheezing and dizziness after bee sting"
+    threshold: 0.65
+    severity: "critical"
+    category: "red_flag.anaphylaxis"
+  - id: "pregnancy_bleeding_acute"
+    label: "Acute bleeding in pregnancy"
+    examples:
+      - "30 weeks pregnant heavy vaginal bleeding"
+      - "first trimester severe abdominal pain with bleeding"
+    threshold: 0.70
+    severity: "critical"
+    category: "red_flag.ob_emergency"
+  - id: "suicide_intent_active"
+    label: "Active suicidal ideation with plan"
+    examples:
+      - "thinking of ending my life and I have the means"
+      - "made a plan to harm myself tonight"
+    threshold: 0.80
+    severity: "critical"
+    category: "red_flag.psych_emergency"

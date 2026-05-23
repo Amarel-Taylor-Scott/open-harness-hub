@@ -1,0 +1,59 @@
+id: "processor/self-refine-critique"
+type: processor
+version: "0.1.0"
+name: "Self-Refine critique loop"
+description: |
+  Critique-and-revise loop (Madaan et al. 2023). The same model first
+  drafts an answer, then critiques its own draft against a rubric,
+  then revises. Iterates up to `max_iterations`. Useful when a single
+  pass produces verbose or weakly-grounded output.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["reasoning", "evaluation"]
+modality:   ["text"]
+lifecycle:  "beta"
+lifecycle_position: "post_api.evaluation"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "critique.self"
+deterministic: false
+idempotent: true
+streaming: false
+latency_budget_ms: 30000
+
+inputs:
+  - name: "draft"
+    type: "string"
+  - name: "task"
+    type: "string"
+  - name: "rubric_ref"
+    type: "artifact_id"
+  - name: "max_iterations"
+    type: "integer"
+outputs:
+  - name: "final"
+    type: "string"
+  - name: "iterations"
+    type: "object[]"
+  - name: "converged"
+    type: "boolean"
+
+side_effects: "external_call"
+on_error: "fallback"
+
+model_targets:
+  - id: "same_or_stronger"
+    label: "Same or stronger model for self-critique"
+    transport: "ollama"
+    role: "Generates critique + revision"
+    required: true
+    default: true
+    trust_boundary: "local"
+
+implementations:
+  - kind: "callable"
+    path: "processors.self_refine.run"

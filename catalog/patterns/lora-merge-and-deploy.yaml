@@ -1,0 +1,43 @@
+id: "pattern/lora-merge-and-deploy"
+type: pattern
+version: "0.1.0"
+name: "LoRA merge + deploy (or hot-swap)"
+description: "Two production deployment shapes for LoRA-trained models: (a) merge the LoRA delta into base weights once + serve as a single monolithic model — zero adapter overhead per request, no multi-tenant routing; or (b) keep the adapter separate + hot-swap per request — single base instance serves N task-specific tenants with cheap adapter switching. Pick by latency target + tenancy model."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["cross_industry"]
+capability: ["serving", "generation"]
+modality: ["text"]
+lifecycle: "stable"
+trust_boundary: "local"
+created: "2026-05-22"
+updated: "2026-05-22"
+
+when_to_use:
+  - "Merge-and-deploy: single-tenant production where latency matters + only one adapter per server."
+  - "Hot-swap: multi-tenant SaaS where each customer/use-case has its own adapter against a shared base."
+  - "Hybrid: merge a 'house-style' base adapter + hot-swap per-customer adapters on top."
+
+structural_shape:
+  - "MERGE variant: W' = W + (α/r)·B·A computed once at deploy time."
+  - "MERGE result is a single weight tensor identical-shape to original base; standard inference stack works unmodified."
+  - "MERGE tradeoff: must redeploy the entire base to update; cannot revert without keeping original."
+  - "HOT-SWAP variant: load base once into GPU; load N adapter checkpoints into CPU/disk."
+  - "Per-request: read adapter pointer from request, apply (α/r)·B·A delta in-place or on a side path."
+  - "HOT-SWAP needs serving stack support (vLLM multi-LoRA, S-LoRA, PEFT serve)."
+  - "HOT-SWAP tradeoff: small per-request latency overhead (5-15%); but cheap to add new adapters."
+
+variants:
+  - "Multi-LoRA in batch: pack N adapter requests into a single forward pass (vLLM)."
+  - "S-LoRA: serve thousands of adapters with unified GPU memory."
+  - "LoRAX (Predibase): production multi-LoRA serving with dynamic loading."
+
+implementing_pipelines:
+  - "pipeline/quantized-llm-inference"
+
+related_patterns:
+  - "pattern/peft-lora-adapter-insertion"
+  - "pattern/qlora-4bit-finetune"
+  - "pattern/routing"
+
+tags: ["lora", "deployment", "serving", "multi-tenant", "hot-swap"]

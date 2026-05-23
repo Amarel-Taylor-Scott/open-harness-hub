@@ -1,0 +1,48 @@
+id: "rubric/aviation-safety-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Aviation safety report quality v1"
+description: "6-dim rubric (HFACS-anchored, blame-free)"
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["aviation", "aviation.safety"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-20"
+updated: "2026-05-20"
+
+dimensions:
+  - id: "hfacs_levels_assigned"
+    label: "HFACS classification at all 4 levels (org / supervision / preconditions / acts)"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "non-empty hfacs_level field on every contributing factor"
+  - id: "ntsb_taxonomy_cited"
+    label: "NTSB cause category cited"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "ntsb_category populated"
+  - id: "icao_cited_if_international"
+    label: "ICAO Annex 13 referenced if international flight"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "if international: icao_annex_13_compliant boolean populated"
+  - id: "no_blame_personnel"
+    label: "Report focuses on system + not on individual blame"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "individuals anonymized (PIC / F/O / ATC); no personal-blame language"
+  - id: "corrective_action_proposed"
+    label: "Every contributing factor has a corrective action proposed"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "corrective_action populated per factor"
+  - id: "asap_protection_assessed"
+    label: "ASAP protection eligibility assessed when employee-reported"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "asap_eligibility ∈ {protected, exception_applies, not_applicable}"
+
+scoring_method: "weighted_sum"

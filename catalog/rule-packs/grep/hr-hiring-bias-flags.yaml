@@ -1,0 +1,77 @@
+id: "rule-pack/grep-hr-hiring-bias-flags"
+type: rule-pack
+version: "0.1.0"
+name: "HR hiring bias detectors (Title VII / ADA / ADEA / EEOC)"
+description: |
+  GREP detectors for biased language in job postings + screening
+  questions. Each rule cites the protected-class statute. TRIGGER
+  review — never autoreject; recommend neutral language.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["hr", "hr.hiring", "compliance"]
+capability: ["safety_gating", "classification"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "volatile"
+tags: ["hr", "eeoc", "hiring-bias", "gendered-language"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+family: "grep"
+rules:
+  - id: "gendered_terms"
+    pattern: "(?i)\\b(rockstar|ninja|guru|wizard|chairman|chairwoman|salesman|saleswoman|stewardess|fireman|policeman|manpower|brotherhood|workmanship|man[- ]?hour|man[- ]?made|he/his (?!and )|gentleman'?s)\\b"
+    severity: "high"
+    category: "hr.bias.gendered_language"
+
+  - id: "age_proxies"
+    pattern: "(?i)\\b(digital native|recent grad(?:uate)?|young dynamic team|fresh|energetic team|culture fit(?:\\s+match)?|cultural fit\\s+match)\\b"
+    severity: "high"
+    category: "hr.bias.age_proxy.adea"
+
+  - id: "ableist_must_be_able"
+    pattern: "(?i)must\\s+be\\s+able\\s+to\\s+(?:lift|stand|walk|see|hear|speak|drive)(?!.{0,200}(?:essential\\s+function|reasonable\\s+accommodation))"
+    severity: "medium"
+    category: "hr.bias.ableist.ada"
+
+  - id: "discriminate_explicit_class"
+    pattern: "(?i)(?:looking\\s+for|seeking|prefer)\\s+(?:a\\s+)?(?:woman|man|female|male|young|old|christian|muslim|hindu|jewish|atheist|white|black|asian|latino|hispanic|disabled|able[- ]?bodied|us\\s+citizen)\\b"
+    severity: "critical"
+    category: "hr.bias.explicit_class_preference"
+
+  - id: "national_origin_proxy"
+    pattern: "(?i)\\bnative\\s+(?:english\\s+)?speaker(?!.{0,80}fluent|.{0,80}c[12])|us[- ]?based\\s+only(?!.{0,80}(?:work\\s+authorization|h1b|sponsor))"
+    severity: "high"
+    category: "hr.bias.national_origin"
+
+  - id: "pregnancy_proxy"
+    pattern: "(?i)(?:no\\s+plans?\\s+for\\s+children|family\\s+commitments\\s+(?:must\\s+not|won'?t)\\s+(?:interfere|conflict))"
+    severity: "critical"
+    category: "hr.bias.pregnancy.pwfa"
+
+  - id: "salary_history_question"
+    pattern: "(?i)(?:what\\s+(?:was|is)\\s+your\\s+(?:current|prior|previous|last)\\s+(?:salary|pay|comp|compensation)|previous\\s+salary\\s+history)"
+    severity: "medium"
+    category: "hr.bias.salary_history.equal_pay_act"
+
+  - id: "genetic_question"
+    pattern: "(?i)(?:family\\s+(?:medical|health)\\s+history|genetic\\s+(?:condition|disease|disposition))(?!.{0,200}(?:essential\\s+function|reasonable\\s+accommodation|legal\\s+basis))"
+    severity: "critical"
+    category: "hr.bias.genetic.gina"
+
+  - id: "criminal_history_blanket"
+    pattern: "(?i)(?:must\\s+have|require)\\s+(?:no|clean)\\s+criminal\\s+(?:history|record)(?!.{0,200}(?:essential\\s+function|individualized\\s+assessment|ban[- ]?the[- ]?box))"
+    severity: "medium"
+    category: "hr.bias.criminal_history.blanket"
+
+  - id: "no_eeo_statement"
+    pattern: "(?i)\\b(?:no|absent)\\s+(?:eeo|equal\\s+(?:opportunity|employment))\\s+statement\\b|posting\\s+lacks\\s+eeo"
+    severity: "high"
+    category: "hr.bias.no_eeo_statement"
+
+  - id: "degree_required_unjustified"
+    pattern: "(?i)(?:bachelor'?s|master'?s|degree)\\s+required(?!.{0,400}(?:equivalent\\s+experience|or\\s+equivalent|relevant\\s+experience|degree\\s+or\\s+\\d\\s*years))"
+    severity: "low"
+    category: "hr.bias.degree_unjustified"

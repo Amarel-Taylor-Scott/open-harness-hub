@@ -1,0 +1,67 @@
+
+=== Real Estate DD (pipeline/real-estate-dd-review) ===
+
+  sample-clean.json                                        C: 0  H: 0  M: 0  L: 0
+
+  sample-flagged.json                                      C: 4  H: 6  M: 1  L: 0
+      [critical ] open_permit                            real_estate.title.open_permit
+      [critical ] unrecorded_transfer                    real_estate.title.unrecorded
+      [high     ] mechanics_lien                         real_estate.title.mechanics_lien
+      [critical ] environmental_rec                      real_estate.environmental.rec
+      [high     ] vapor_intrusion                        real_estate.environmental.vapor_intrusion
+      [high     ] asbestos_lead_paint                    real_estate.environmental.acm_lbp
+      [high     ] unpermitted_alteration                 real_estate.zoning.unpermitted_alteration
+      [critical ] co_expired                             real_estate.zoning.no_co
+      [high     ] pending_litigation                     real_estate.title.pending_litigation
+      [high     ] foundation_issue                       real_estate.structural.foundation
+      [medium   ] ada_noncompliance                      real_estate.accessibility.ada
+
+=== M&A DD (pipeline/ma-dd-review) ===
+
+  sample-clean.json                                        C: 0  H: 0  M: 0  L: 0
+
+  sample-flagged.json                                      C: 5  H: 5  M: 3  L: 0
+      [critical ] change_of_control_acceleration         ma.legal.cof_acceleration
+      [high     ] customer_concentration                 ma.customer.concentration
+      [high     ] non_assignable_customer_contract       ma.customer.non_assignable
+      [critical ] open_ip_litigation                     ma.ip.open_litigation
+      [high     ] open_source_gpl_in_proprietary         ma.ip.copyleft_in_proprietary
+      [critical ] undisclosed_tax_liability              ma.tax.undisclosed_liability
+      [high     ] key_person_no_retention                ma.hr.key_person_attrition
+      [medium   ] accrued_pto_undisclosed                ma.hr.accrued_pto
+      [high     ] warn_act_exposure                      ma.hr.warn_exposure
+      [critical ] regulatory_enforcement_action          ma.legal.regulatory_enforcement
+      [critical ] going_concern_qualification            ma.financial.going_concern
+      [medium   ] working_capital_off_target             ma.financial.working_capital
+      [medium   ] ebitda_adjustment_aggressive           ma.financial.ebitda_adjustment
+
+=== Aviation Safety (pipeline/aviation-safety-review) ===
+
+  sample-clean.json                                        C: 0  H: 0  M: 0  L: 0
+
+  sample-flagged.json                                      C: 4  H: 5  M: 0  L: 1
+      [critical ] cfit_indicator                         aviation.cfit
+      [critical ] loci_indicator                         aviation.loc_i
+      [critical ] fuel_exhaustion                        aviation.fuel
+      [high     ] runway_incursion                       aviation.runway_incursion
+      [high     ] no_sms_documentation                   aviation.sms_missing
+      [high     ] ground_school_lapsed                   aviation.training_lapsed
+      [critical ] maint_log_gap                          aviation.maintenance_gap
+      [high     ] crew_fatigue                           aviation.fatigue
+      [high     ] weather_decision                       aviation.weather_decision
+      [low      ] missed_pirep                           aviation.no_pirep
+
+=== Food Safety (FSMA) (pipeline/food-safety-review) ===
+
+  sample-clean.json                                        C: 0  H: 0  M: 0  L: 0
+
+  sample-flagged.json                                      C: 5  H: 3  M: 1  L: 0
+      [critical ] ccp_deviation_not_documented           food_safety.haccp.ccp_deviation
+      [critical ] haccp_plan_missing                     food_safety.haccp.no_plan
+      [critical ] fsvp_missing                           food_safety.fsma.fsvp_missing
+      [critical ] recall_class_i                         food_safety.recall.class_i
+      [critical ] pathogen_positive                      food_safety.pathogen
+      [high     ] ftl_no_traceability                    food_safety.fsma.no_traceability
+      [high     ] sanitation_failure                     food_safety.sanitation
+      [high     ] allergen_cross_contact                 food_safety.allergen
+      [medium   ] training_lapsed                        food_safety.training_lapsed

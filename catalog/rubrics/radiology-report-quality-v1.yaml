@@ -1,0 +1,61 @@
+id: "rubric/radiology-report-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Radiology report quality v1"
+description: |
+  Seven-dimension rubric for grading a radiology report. Used by
+  `pipeline/radiology-report-grading`.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["healthcare", "healthcare.radiology"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-20"
+updated: "2026-05-20"
+
+dimensions:
+  - id: "structure_compliant"
+    label: "Report follows standard structure (history, technique, comparison, findings, impression, recommendation)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "all 6 sections present and non-empty"
+  - id: "phi_safe"
+    label: "No unredacted PHI (HIPAA Safe Harbor 18 identifiers)"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "rule-pack/phi-hipaa-en fires zero critical hits on the report text"
+  - id: "rads_scored"
+    label: "Every applicable finding has its RADS score (BI/LI/TI/O/PI/Lung-RADS as appropriate)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "no `radiology.missing_rads.*` rule fires"
+  - id: "incidentals_followed_up"
+    label: "Every incidental finding has a follow-up recommendation with timeline"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "no `radiology.missing_followup.*` or `radiology.incidental.*` rule fires"
+  - id: "fleischner_compliant"
+    label: "Pulmonary-nodule recommendations match Fleischner 2017"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "follow-up timing matches the Fleischner cell for size + solidity + risk"
+  - id: "hedged_appropriately"
+    label: "Non-pathognomonic findings use hedged language; pathognomonic findings are definitive"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "no `radiology.definitive_without_differential` rule fires when differential warranted"
+  - id: "comparison_addressed"
+    label: "If a prior is available, report addresses interval change explicitly"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "no `radiology.missing_comparison` rule fires"
+  - id: "impression_actionable"
+    label: "Impression ends with an explicit recommendation or next-step"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "no `radiology.missing_recommendation` rule fires"
+
+scoring_method: "weighted_sum"

@@ -1,0 +1,64 @@
+id: "pattern/plan-and-execute"
+type: pattern
+version: "0.1.0"
+name: "Plan-and-Execute"
+description: |
+  Separate planning from execution. A planner LLM produces an explicit
+  step list; an executor (often a different / cheaper model) runs each
+  step. After execution, a re-planner can update the plan based on
+  results. Distinct from ReAct because ReAct interleaves reasoning
+  with each action; here planning happens up-front.
+authors:
+  - name: "Wang, Hu, Cao, Lyu, Mu, Zhang, Cui (2023, multiple variants)"
+license: "CC-BY-4.0"
+industry:   ["ai", "cross_industry"]
+capability: ["planning", "agent_loop"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+tags: ["agent", "plan-execute"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+paper_url: "https://arxiv.org/abs/2305.04091"
+paper_citation: "Wang et al. 2023, Plan-and-Solve Prompting (Plan-and-Execute variants in langgraph/autogen/openai-swarm)"
+reference_implementations:
+  - { url: "https://github.com/langchain-ai/langgraph/tree/main/examples/plan-and-execute", language: "python", framework: "langgraph" }
+
+structural_shape:
+  - "planner (strong LLM) produces step list"
+  - "loop: execute next step (executor model + tool calls)"
+  - "  observation appended"
+  - "  if step failed: re-plan from current state"
+  - "stop when plan complete OR max_iter hit"
+
+when_to_use:
+  - "Multi-step workflows where the plan benefits from an up-front view"
+  - "Cost-optimizing: use a strong model for planning, a cheaper one for execution"
+  - "Long-horizon tasks (a plan provides scaffolding)"
+
+when_not_to_use:
+  - "Highly interactive tasks where the plan must change every step (use ReAct)"
+  - "Trivially-short tasks (one tool call suffices)"
+
+variants:
+  - "Plan-Execute-Critic: add a critic that vetoes / re-plans on failure"
+  - "Hierarchical Plan: planner outputs sub-goals, each sub-goal gets its own sub-plan"
+  - "OpenAI Swarm handoff: planner hands off to specialist agents"
+
+counter_patterns:
+  - "pattern/react"
+
+implementing_pipelines:
+  - "pipeline/plan-execute-critic-loop"
+
+implementing_processors:
+  - "processor/iterative-revise-loop"
+  - "processor/cost-ceiling-gate"
+
+tradeoffs:
+  latency: "Plan-up-front + sequential execution"
+  cost: "Often cheaper than ReAct (cheap executor model)"
+  quality: "Strong for long-horizon tasks"
+  complexity: "Medium"
+  explainability: "Very high — explicit plan is inspectable"

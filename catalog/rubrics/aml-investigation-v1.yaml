@@ -1,0 +1,50 @@
+id: "rubric/aml-investigation-v1"
+type: rubric
+version: "0.1.0"
+name: "AML investigation v1"
+description: |
+  Six-dimension rubric for AML-investigation outputs. Used by
+  `pipeline/suspicious-transaction-review`.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["finance", "finance.aml"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+dimensions:
+  - id: "sanctions_first"
+    label: "Sanctions hits surface BEFORE typology scoring"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "narrative's first finding is the sanctions hit when one fires; escalation = route_to_OFAC"
+  - id: "typology_correct"
+    label: "Typology matches align with gold labels"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "typology_matches set contains the gold typology ID"
+  - id: "evidence_cited"
+    label: "Every typology match cites at least one transaction edge AND one FATF section"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "non-empty (edges, sections) tuples on every match"
+  - id: "no_intent_assertions"
+    label: "Narrative describes patterns; does not assert intent"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "no language asserting purpose or motive of named individuals"
+  - id: "pii_safety"
+    label: "No financial PII in narrative"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "rule-pack/financial-pii-en fires zero critical hits on output"
+  - id: "escalation_correct"
+    label: "Escalation routing matches policy"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "escalation field matches policy table for sanctions / typology / PEP combinations"
+scoring_method: "weighted_sum"

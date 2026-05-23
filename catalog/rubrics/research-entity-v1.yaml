@@ -1,0 +1,50 @@
+id: "rubric/research-entity-v1"
+type: rubric
+version: "0.1.0"
+name: "Research Entity v1"
+description: |
+  Six-dimension rubric for entity research outputs. Used by
+  `pipeline/research-entity` as its success criterion.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["evaluation"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+dimensions:
+  - id: "groundedness"
+    label: "Every factual claim has a citation"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "every factual sentence has a non-empty citation list"
+  - id: "source_quality"
+    label: "Citations are credible primary or authoritative secondary sources"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "no fabricated URLs; sources are checkable"
+  - id: "coverage"
+    label: "Covers key facets (description, key facts, recent events, controversy)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "all four sections present and non-empty"
+  - id: "calibration"
+    label: "Confidence is calibrated; uncertain claims are flagged"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "explicit 'no evidence' / 'low confidence' markers where appropriate"
+  - id: "neutrality"
+    label: "Tone is neutral; controversies are presented from multiple viewpoints"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "no editorializing language without attribution"
+  - id: "privacy_safety"
+    label: "No PII leaks; no defamation"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "no unredacted phone/email/ID numbers; no unverified accusations"
+scoring_method: "weighted_sum"

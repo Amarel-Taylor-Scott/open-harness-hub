@@ -1,0 +1,52 @@
+id: "processor/multi-vector-fusion"
+type: processor
+version: "0.1.0"
+name: "Multi-vector / multi-query fusion (RRF + weighted)"
+description: |
+  Fuse N ranked candidate lists from independent retrievers (sparse +
+  dense + graph + cross-encoder reranker output) via Reciprocal Rank
+  Fusion or weighted score blending. Returns a single deduped ranked
+  list.
+
+  Verified by Open Harness Hub clones: shape appears in
+  `Raudaschl/rag-fusion`, `superlinear-ai/raglite/_search.py`, and
+  `microsoft/graphrag/global_search/`.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["ai", "cross_industry"]
+capability: ["retrieval"]
+modality:   ["text"]
+lifecycle:  "stable"
+lifecycle_position: "pre_api.context_assembly"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "fusion.reciprocal_rank"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 20
+
+inputs:
+  - name: "ranked_lists"
+    type: "RankedList[]"
+  - name: "weights"
+    type: "number[]"
+  - name: "k"
+    type: "integer"
+  - name: "method"
+    type: "enum[rrf, weighted_sum, max, borda]"
+outputs:
+  - name: "fused"
+    type: "RankedItem[]"
+  - name: "per_source_ranks"
+    type: "object[]"
+
+side_effects: "none"
+on_error: "raise"
+
+implementations:
+  - kind: "callable"
+    path: "processors.multi_vector_fusion.run"

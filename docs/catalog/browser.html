@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open Harness Hub — Catalog Browser</title>
+<style>
+  :root {
+    --bg:        #f7f6f1;
+    --panel:    #ffffff;
+    --line:    #ddd8c9;
+    --line-soft: #e8e4d7;
+    --ink:    #0e1116;
+    --ink-2:    #2a2d34;
+    --ink-3:    #5b5f68;
+    --ink-4:    #8a8e97;
+    --accent:    #198a8a;
+    --accent-bg: #e8f3f3;
+    --ember:    #b85a3e;
+    --ember-bg: #fae8e0;
+    --good:    #4a8c4a;
+    --good-bg:    #e6f1e6;
+    --warn:    #b08a3a;
+    --warn-bg:    #f5ecd6;
+    --card-r:    8px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif; color: var(--ink); background: var(--bg); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code, pre, .mono { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+  header {
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+    padding: 14px 24px;
+    display: flex; align-items: baseline; gap: 24px; flex-wrap: wrap;
+  }
+  header h1 { font-size: 18px; margin: 0; font-weight: 600; }
+  header .meta { color: var(--ink-3); font-size: 13px; }
+  header .meta b { color: var(--ink); }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    min-height: calc(100vh - 56px);
+  }
+  .side {
+    background: var(--panel);
+    border-right: 1px solid var(--line);
+    padding: 16px;
+    overflow-y: auto;
+    max-height: calc(100vh - 56px);
+    position: sticky; top: 0;
+  }
+  .main {
+    padding: 16px 24px;
+  }
+  .side h2 {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-3);
+    margin: 14px 0 6px 0;
+  }
+  .side h2:first-child { margin-top: 0; }
+  .facet-list { list-style: none; padding: 0; margin: 0; font-size: 13px; }
+  .facet-list li {
+    display: flex; align-items: center; gap: 6px;
+    padding: 3px 6px; border-radius: 4px; cursor: pointer;
+    color: var(--ink-2);
+  }
+  .facet-list li:hover { background: var(--line-soft); }
+  .facet-list li.active { background: var(--accent-bg); color: var(--accent); font-weight: 600; }
+  .facet-list li .count { margin-left: auto; color: var(--ink-4); font-size: 11px; }
+  .facet-list li.active .count { color: var(--accent); }
+  .facet-list li.indent { padding-left: 18px; font-size: 12px; }
+
+  input[type="search"] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 14px;
+    background: var(--bg);
+    font-family: inherit;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  input[type="search"]:focus { outline: none; border-color: var(--accent); background: var(--panel); }
+
+  .toolbar {
+    display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+    border-bottom: 1px solid var(--line-soft); padding-bottom: 12px; margin-bottom: 16px;
+  }
+  .toolbar .count { color: var(--ink-3); font-size: 13px; }
+  .toolbar button {
+    border: 1px solid var(--line); background: var(--panel); padding: 5px 10px;
+    border-radius: 4px; font: inherit; font-size: 12px; cursor: pointer; color: var(--ink-2);
+  }
+  .toolbar button:hover { border-color: var(--accent); color: var(--accent); }
+  .toolbar .view-toggle { display: inline-flex; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+  .toolbar .view-toggle button { border: 0; border-right: 1px solid var(--line); border-radius: 0; }
+  .toolbar .view-toggle button:last-child { border-right: 0; }
+  .toolbar .view-toggle button.active { background: var(--accent); color: white; }
+
+  /* Card grid */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 12px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: var(--card-r); padding: 14px 16px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .card .title-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .card h3 { margin: 0; font-size: 14px; font-weight: 600; }
+  .card .id { font-size: 11px; color: var(--ink-4); }
+  .card .desc { font-size: 13px; color: var(--ink-2); line-height: 1.45; margin: 0;
+                display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .card .chips { display: flex; gap: 4px; flex-wrap: wrap; }
+
+  .chip { font-size: 10.5px; padding: 2px 7px; border-radius: 999px; line-height: 1.5;
+          background: var(--line-soft); color: var(--ink-2); }
+  .chip.type-harness        { background: var(--accent-bg); color: var(--accent); }
+  .chip.type-pipeline       { background: #ede2f5;   color: #6b3e91; }
+  .chip.type-benchmark      { background: #ffefd6;   color: #8c5a00; }
+  .chip.type-rule-pack      { background: var(--ember-bg); color: var(--ember); }
+  .chip.type-tool           { background: #e5f0fc;   color: #2563a8; }
+  .chip.type-persona        { background: var(--good-bg); color: var(--good); }
+  .chip.type-adapter        { background: #f0e8d6;   color: #6d5a1a; }
+  .chip.type-rubric         { background: var(--warn-bg); color: var(--warn); }
+  .chip.type-knowledge-pack { background: #e3eef0;   color: #2a6973; }
+  .chip.type-logic-pack     { background: #ece8e0;   color: #5a4b2c; }
+  .chip.type-dataset        { background: #efe2db;   color: #7a4a30; }
+  .chip.stage-pre_api       { background: #e5f0fc; color: #1e5fa3; }
+  .chip.stage-api           { background: #e8f3f3; color: #167070; }
+  .chip.stage-post_api      { background: #fae8e0; color: #a04a30; }
+  .chip.stage-cross_cutting { background: #ece8e0; color: #5a4b2c; }
+  .chip.lifecycle           { font-style: italic; }
+
+  .tree { font-size: 13px; line-height: 1.6; }
+  .tree details { margin-left: 0; }
+  .tree details > summary { cursor: pointer; padding: 2px 6px; border-radius: 4px;
+                            list-style: none; display: flex; align-items: center; gap: 6px; }
+  .tree details > summary:hover { background: var(--line-soft); }
+  .tree details > summary::-webkit-details-marker { display: none; }
+  .tree details > summary::before { content: "▸"; color: var(--ink-4); display: inline-block; width: 12px; transition: transform 0.1s; }
+  .tree details[open] > summary::before { transform: rotate(90deg); }
+  .tree details details { margin-left: 18px; }
+  .tree .leaf { margin-left: 30px; padding: 2px 0; font-size: 12.5px; color: var(--ink-2); }
+  .tree .leaf:hover { color: var(--accent); }
+  .tree .count { color: var(--ink-4); font-size: 11px; margin-left: 6px; }
+
+  .empty { padding: 60px 0; text-align: center; color: var(--ink-3); }
+  .empty h2 { color: var(--ink); margin-bottom: 8px; }
+
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(14, 17, 22, 0.5);
+    display: none; align-items: center; justify-content: center; z-index: 100;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: var(--panel); border-radius: 10px; max-width: 800px; width: 90vw;
+    max-height: 85vh; overflow: auto; padding: 24px 28px; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+  .modal h2 { margin: 0 0 8px 0; font-size: 18px; }
+  .modal .id { font-family: "JetBrains Mono", monospace; color: var(--ink-3); font-size: 12px; margin-bottom: 12px; }
+  .modal pre { background: var(--bg); padding: 10px 12px; border-radius: 6px; font-size: 12px; overflow-x: auto; }
+  .modal .close { position: absolute; top: 12px; right: 16px; background: transparent; border: 0; font-size: 20px; cursor: pointer; color: var(--ink-3); }
+  .modal table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 13px; }
+  .modal th, .modal td { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--line-soft); }
+  .modal th { color: var(--ink-3); font-weight: 600; font-size: 11px; text-transform: uppercase; }
+
+  @media (max-width: 720px) {
+    .layout { grid-template-columns: 1fr; }
+    .side { position: static; max-height: none; border-right: 0; border-bottom: 1px solid var(--line); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Open Harness Hub — Catalog</h1>
+  <div class="meta">
+    <b id="m-total">0</b> artifacts ·
+    <b id="m-pre_api">0</b> pre-api ·
+    <b id="m-api">0</b> api ·
+    <b id="m-post_api">0</b> post-api ·
+    <b id="m-cross">0</b> cross-cutting
+  </div>
+  <div style="margin-left:auto"><a href="../index.html">← back to docs</a></div>
+</header>
+
+<div class="layout">
+
+  <aside class="side">
+    <input type="search" id="search" placeholder="Search artifacts…" autocomplete="off">
+
+    <h2>Lifecycle stage</h2>
+    <ul class="facet-list" id="facet-stage"></ul>
+
+    <h2>Type</h2>
+    <ul class="facet-list" id="facet-type"></ul>
+
+    <h2>Industry</h2>
+    <ul class="facet-list" id="facet-industry"></ul>
+
+    <h2>Capability</h2>
+    <ul class="facet-list" id="facet-capability"></ul>
+
+    <h2>Modality</h2>
+    <ul class="facet-list" id="facet-modality"></ul>
+
+    <h2>Maturity</h2>
+    <ul class="facet-list" id="facet-lifecycle"></ul>
+  </aside>
+
+  <main class="main">
+    <div class="toolbar">
+      <div class="count"><b id="count-shown">0</b> shown</div>
+      <button id="clear-filters">Clear filters</button>
+      <div class="view-toggle" role="tablist">
+        <button id="view-cards" class="active" data-view="cards">Cards</button>
+        <button id="view-tree" data-view="tree">Tree</button>
+      </div>
+    </div>
+    <div id="results-cards" class="grid"></div>
+    <div id="results-tree" class="tree" style="display:none"></div>
+    <div id="empty" class="empty" style="display:none">
+      <h2>No artifacts match these filters.</h2>
+      <p>Try clearing one or more facets, or change the search term.</p>
+    </div>
+  </main>
+
+</div>
+
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal" id="modal">
+    <button class="close" id="modal-close">×</button>
+    <h2 id="modal-name"></h2>
+    <div class="id" id="modal-id"></div>
+    <p id="modal-desc"></p>
+    <table>
+      <tbody id="modal-meta"></tbody>
+    </table>
+    <div id="modal-refs"></div>
+  </div>
+</div>
+
+<script>
+// ───────────────────────────────────────────────────────────────────
+//  Catalog browser — vanilla JS, no build step. Reads ./index.json.
+// ───────────────────────────────────────────────────────────────────
+
+const state = {
+  data: null,
+  filters: { stage: null, type: null, industry: null, capability: null, modality: null, lifecycle: null },
+  search: "",
+  view: "cards",
+};
+
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+async function load() {
+  const url = new URL("./index.json", document.baseURI).toString();
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Failed to load ${url}: ${res.status}`);
+  state.data = await res.json();
+  initFacets();
+  render();
+}
+
+function initFacets() {
+  const m = state.data._meta;
+  $("#m-total").textContent      = m.total;
+  $("#m-pre_api").textContent    = m.by_stage.pre_api || 0;
+  $("#m-api").textContent        = m.by_stage.api || 0;
+  $("#m-post_api").textContent   = m.by_stage.post_api || 0;
+  $("#m-cross").textContent      = m.by_stage.cross_cutting || 0;
+
+  renderFacet("facet-stage",      "stage",      m.by_stage);
+  renderFacet("facet-type",       "type",       m.by_type);
+  renderFacet("facet-industry",   "industry",   m.by_industry);
+  renderFacet("facet-capability", "capability", m.by_capability);
+  renderFacet("facet-modality",   "modality",   m.by_modality);
+  renderFacet("facet-lifecycle",  "lifecycle",  m.by_lifecycle);
+
+  $("#search").addEventListener("input", (e) => {
+    state.search = e.target.value.toLowerCase().trim();
+    render();
+  });
+  $("#clear-filters").addEventListener("click", () => {
+    Object.keys(state.filters).forEach((k) => (state.filters[k] = null));
+    state.search = "";
+    $("#search").value = "";
+    render();
+  });
+  $$(".view-toggle button").forEach((b) => {
+    b.addEventListener("click", () => {
+      state.view = b.dataset.view;
+      $$(".view-toggle button").forEach((x) => x.classList.toggle("active", x === b));
+      render();
+    });
+  });
+  $("#modal-close").addEventListener("click", () => $("#modal-backdrop").classList.remove("open"));
+  $("#modal-backdrop").addEventListener("click", (e) => {
+    if (e.target === $("#modal-backdrop")) $("#modal-backdrop").classList.remove("open");
+  });
+}
+
+function renderFacet(elId, facetKey, counts) {
+  const ul = document.getElementById(elId);
+  ul.innerHTML = "";
+  Object.entries(counts).forEach(([value, count]) => {
+    const li = document.createElement("li");
+    if (facetKey === "industry" && value.includes(".")) li.classList.add("indent");
+    const label = document.createElement("span");
+    label.textContent = value;
+    const c = document.createElement("span");
+    c.className = "count";
+    c.textContent = count;
+    li.append(label, c);
+    li.addEventListener("click", () => {
+      state.filters[facetKey] = state.filters[facetKey] === value ? null : value;
+      updateFacetActiveStates();
+      render();
+    });
+    li.dataset.facet = facetKey;
+    li.dataset.value = value;
+    ul.appendChild(li);
+  });
+}
+
+function updateFacetActiveStates() {
+  $$(".facet-list li").forEach((li) => {
+    li.classList.toggle("active", state.filters[li.dataset.facet] === li.dataset.value);
+  });
+}
+
+function filteredRows() {
+  return state.data.rows.filter((r) => {
+    if (state.filters.stage      && r.lifecycle_stage !== state.filters.stage)        return false;
+    if (state.filters.type       && r.type !== state.filters.type)                     return false;
+    if (state.filters.industry   && !(r.industry || []).includes(state.filters.industry))    return false;
+    if (state.filters.capability && !(r.capability || []).includes(state.filters.capability)) return false;
+    if (state.filters.modality   && !(r.modality || []).includes(state.filters.modality))    return false;
+    if (state.filters.lifecycle  && r.lifecycle !== state.filters.lifecycle)           return false;
+    if (state.search) {
+      const blob = (r.id + " " + r.name + " " + r.description + " " + (r.tags || []).join(" ")).toLowerCase();
+      if (!blob.includes(state.search)) return false;
+    }
+    return true;
+  });
+}
+
+function render() {
+  const rows = filteredRows();
+  $("#count-shown").textContent = rows.length;
+  const empty = rows.length === 0;
+  $("#empty").style.display = empty ? "" : "none";
+  $("#results-cards").style.display = (state.view === "cards" && !empty) ? "" : "none";
+  $("#results-tree").style.display  = (state.view === "tree"  && !empty) ? "" : "none";
+  if (state.view === "cards") renderCards(rows);
+  else                          renderTree(rows);
+}
+
+function chip(text, klass) {
+  const span = document.createElement("span");
+  span.className = "chip " + (klass || "");
+  span.textContent = text;
+  return span;
+}
+
+function renderCards(rows) {
+  const grid = $("#results-cards");
+  grid.innerHTML = "";
+  rows.forEach((r) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.addEventListener("click", () => openModal(r));
+
+    const titleRow = document.createElement("div");
+    titleRow.className = "title-row";
+    const h3 = document.createElement("h3");
+    h3.textContent = r.name;
+    const id = document.createElement("span");
+    id.className = "id";
+    id.textContent = r.id;
+    titleRow.append(h3, id);
+
+    const chips = document.createElement("div");
+    chips.className = "chips";
+    chips.append(
+      chip(r.type,             "type-" + r.type),
+      chip(r.lifecycle_position, "stage-" + r.lifecycle_stage),
+      chip(r.lifecycle,        "lifecycle"),
+    );
+    (r.industry || []).slice(0, 3).forEach((i) => chips.append(chip(i)));
+
+    const desc = document.createElement("p");
+    desc.className = "desc";
+    desc.textContent = r.description;
+
+    card.append(titleRow, chips, desc);
+    grid.appendChild(card);
+  });
+}
+
+function renderTree(rows) {
+  const wrap = $("#results-tree");
+  wrap.innerHTML = "";
+
+  // Group by stage → position → type → industry → ids
+  const groups = {};
+  rows.forEach((r) => {
+    const stage = r.lifecycle_stage;
+    const pos = r.lifecycle_position;
+    const type = r.type;
+    const inds = (r.industry && r.industry.length) ? r.industry : ["cross_industry"];
+    inds.forEach((ind) => {
+      groups[stage] = groups[stage] || {};
+      groups[stage][pos] = groups[stage][pos] || {};
+      groups[stage][pos][type] = groups[stage][pos][type] || {};
+      groups[stage][pos][type][ind] = groups[stage][pos][type][ind] || [];
+      if (!groups[stage][pos][type][ind].find((x) => x.id === r.id)) groups[stage][pos][type][ind].push(r);
+    });
+  });
+
+  const order = ["pre_api", "api", "post_api", "cross_cutting"];
+  order.forEach((stage) => {
+    if (!groups[stage]) return;
+    const stageEl = document.createElement("details");
+    stageEl.open = true;
+    const stageSum = document.createElement("summary");
+    stageSum.innerHTML = `<b>${stage}</b>`;
+    const stageCount = Object.values(groups[stage]).reduce((acc, byType) =>
+      acc + Object.values(byType).reduce((a, byInd) =>
+        a + Object.values(byInd).reduce((b, list) => b + list.length, 0), 0), 0);
+    const c = document.createElement("span"); c.className = "count"; c.textContent = `(${stageCount})`;
+    stageSum.appendChild(c);
+    stageEl.appendChild(stageSum);
+
+    Object.entries(groups[stage]).forEach(([pos, byType]) => {
+      const posEl = document.createElement("details");
+      posEl.open = true;
+      const posSum = document.createElement("summary");
+      posSum.innerHTML = `<code>${pos}</code>`;
+      posEl.appendChild(posSum);
+
+      Object.entries(byType).forEach(([type, byInd]) => {
+        const typeEl = document.createElement("details");
+        const typeSum = document.createElement("summary");
+        const typeChip = chip(type, "type-" + type);
+        typeSum.appendChild(typeChip);
+        typeEl.appendChild(typeSum);
+
+        Object.entries(byInd).forEach(([ind, list]) => {
+          const indEl = document.createElement("details");
+          const indSum = document.createElement("summary");
+          indSum.innerHTML = `<i>${ind}</i> <span class="count">(${list.length})</span>`;
+          indEl.appendChild(indSum);
+          list.forEach((r) => {
+            const leaf = document.createElement("div");
+            leaf.className = "leaf";
+            leaf.innerHTML = `<code>${r.id}</code> — ${r.name}`;
+            leaf.style.cursor = "pointer";
+            leaf.addEventListener("click", () => openModal(r));
+            indEl.appendChild(leaf);
+          });
+          typeEl.appendChild(indEl);
+        });
+        posEl.appendChild(typeEl);
+      });
+      stageEl.appendChild(posEl);
+    });
+    wrap.appendChild(stageEl);
+  });
+}
+
+function openModal(r) {
+  $("#modal-name").textContent = r.name;
+  $("#modal-id").textContent = r.id + " · v" + r.version;
+  $("#modal-desc").textContent = r.description;
+  const meta = $("#modal-meta");
+  meta.innerHTML = "";
+  const fields = [
+    ["type", r.type],
+    ["lifecycle position", r.lifecycle_position],
+    ["lifecycle (maturity)", r.lifecycle],
+    ["trust boundary", r.trust_boundary],
+    ["industry", (r.industry || []).join(", ")],
+    ["capability", (r.capability || []).join(", ")],
+    ["modality", (r.modality || []).join(", ")],
+    ["tags", (r.tags || []).join(", ")],
+    ["family (rule-pack)", r.family],
+    ["pipeline_kind", r.pipeline_kind],
+    ["applied_layers", (r.applied_layers || []).join(", ")],
+    ["consumes", (r.consumes || []).join(", ")],
+    ["emits", (r.emits || []).join(", ")],
+    ["steps refs", (r.step_refs || []).join(", ")],
+    ["source path", r.path],
+  ];
+  fields.forEach(([k, v]) => {
+    if (!v) return;
+    const tr = document.createElement("tr");
+    const th = document.createElement("th"); th.textContent = k;
+    const td = document.createElement("td"); td.textContent = v;
+    tr.append(th, td);
+    meta.appendChild(tr);
+  });
+  $("#modal-backdrop").classList.add("open");
+}
+
+load().catch((err) => {
+  document.body.innerHTML = `<div style="padding:40px"><h2>Failed to load index.json</h2><pre>${err.message}</pre><p>Run <code>python scripts/build_catalog_index.py</code> first.</p></div>`;
+});
+</script>
+
+</body>
+</html>

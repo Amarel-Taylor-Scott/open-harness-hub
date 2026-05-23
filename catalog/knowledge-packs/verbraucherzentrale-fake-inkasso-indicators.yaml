@@ -1,0 +1,73 @@
+id: "knowledge-pack/verbraucherzentrale-fake-inkasso-indicators"
+type: knowledge-pack
+version: "0.1.0"
+name: "Verbraucherzentrale Fake-Inkasso indicators (10-criterion taxonomy)"
+description: |
+  Composite educational reference of the Verbraucherzentrale's
+  published Fake-Inkasso indicators. Used by Sviatoslav Grabovsky's
+  Bill_info AI to classify German payment demands as legitimate /
+  suspicious / likely-scam.
+
+  Source authority: Verbraucherzentrale Brandenburg Schwarzliste
+  Inkasso (~191,000 page views in a single year; 400 reported
+  fake-Inkasso letters in 2022) + sibling Verbraucherzentrale
+  publications.
+
+  Criterion tiers:
+  - **CRITICAL** (any one alone may justify likely_scam):
+     (1) foreign IBAN (non-DE/AT/CH)
+     (2) private-person recipient (vs. registered company)
+     (3) legal threats (Schufa, Gerichtsvollzieher) in a FIRST letter
+     (4) extreme 24-72 hour deadline
+  - **SUPPORTING** (multiple → suspicious / likely_scam):
+     (5) missing regulatory information
+     (6) unclear / unnamed creditor
+     (7) dubious / surprising fees
+     (8) phantom company names
+     (9) premium phone numbers
+     (10) pressure tactics ("letzte Mahnung" in a first letter)
+
+  Three-level classification:
+  - **legitimate**: no UI change (no false alarms on real Inkasso)
+  - **suspicious**: yellow advisory + verification step prepended
+    to recommendations
+  - **likely_scam**: red banner + recommendations completely
+    overridden to "do not pay, verify via Verbraucherzentrale,
+    save as evidence"
+authors:
+  - name: "Open Harness Hub contributors (port of Bill_info AI)"
+license: "CC-BY-4.0"
+industry:   ["bureaucracy_translation", "bureaucracy_translation.fraud_screening", "humanitarian", "humanitarian.refugee"]
+capability: ["retrieval", "classification", "verification"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "dated"
+tags: ["verbraucherzentrale", "inkasso", "fake-inkasso", "fraud-detection", "germany", "kaggle-hackathon-verified"]
+created: "2026-05-21"
+updated: "2026-05-21"
+
+attribution:
+  source_url:  "https://huggingface.co/spaces/Svityk/bill-info-ai"
+  source_kind: "huggingface"
+  author:      "Sviatoslav Grabovsky (Bill_info AI, Gemma 4 Good Hackathon — 96% extraction / 100% refusal on 28-doc eval)"
+  license:     "Apache-2.0"
+
+content_types:
+  - rag_doc
+files:
+  - path: "data/bill-info-pack/verbraucherzentrale-fake-inkasso.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    embedder: "adapter/bge-embeddings-local"
+    chunk_tokens: 384
+    overlap_tokens: 48
+provenance:
+  sources:
+    - "Verbraucherzentrale Brandenburg Schwarzliste Inkasso (composite educational extracts)"
+    - "Sviatoslav Grabovsky's Bill_info AI implementation (huggingface.co/spaces/Svityk/bill-info-ai)"
+    - "Verbraucherzentrale Fake-Inkasso publications (composite)"
+  collected_through: "2026-05-21"
+  note: "Composite educational extracts; check current Verbraucherzentrale publications for live indicators. The Schwarzliste Inkasso is the authoritative source for naming-and-shaming actual fake-Inkasso companies."

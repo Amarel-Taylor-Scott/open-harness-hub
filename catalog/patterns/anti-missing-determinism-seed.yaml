@@ -1,0 +1,47 @@
+id: "pattern/anti-missing-determinism-seed"
+type: pattern
+version: "0.1.0"
+name: "Anti-pattern: Missing determinism / seed control"
+description: "Pipeline reports a finding 'pesticide REI violation' on Tuesday + clean on Wednesday for the same input. Temperature > 0, no seed, no run-id, no model-version pin. Disagreements between runs cannot be diagnosed: was it the input, the model, the temperature, the sampling, the load balancer?"
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["cross_industry"]
+capability: ["evaluation"]
+modality: ["text"]
+lifecycle: "stable"
+trust_boundary: "local"
+created: "2026-05-22"
+updated: "2026-05-22"
+
+when_to_use:
+  - "This is an anti-pattern. Do NOT use it for high-consequence pipelines."
+
+structural_shape:
+  - "WRONG: openai.chat(model='gpt-4', temperature=0.7) — no seed, ambient model alias, free temperature."
+  - "RIGHT: openai.chat(model='gpt-4-2024-08-06', temperature=0, seed=42) + log model version returned by API."
+  - "RIGHT: audit trace stores: input hash, model version, decode params, seed, timestamp, request id."
+
+problem: |
+  Non-deterministic outputs in regulated / safety-critical pipelines mean
+  the same input can produce different findings on consecutive runs. Audit
+  cannot reproduce the original verdict. Regression testing is impossible
+  (every flake looks like a real regression). Diff-based review becomes
+  noise.
+
+solution: |
+  For decisions a human will rely on, pin model version (not alias),
+  temperature=0, top_p=1, seed=fixed, and log everything in the audit
+  trace. For creative / brainstorm steps that need diversity, separate
+  those into explicit 'non-deterministic by design' steps with a
+  documented diversity rubric instead of unmanaged randomness.
+
+implementing_pipelines: []
+
+related_patterns:
+  - "pattern/composable-success-criteria"
+  - "pattern/two-stage-extract-then-judge"
+
+counter_patterns:
+  - "Pin model version + seed; log version returned by API."
+
+tags: ["anti-pattern", "determinism", "reproducibility", "seed", "audit"]

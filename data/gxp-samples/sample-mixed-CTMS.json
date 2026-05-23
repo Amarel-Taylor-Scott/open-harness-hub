@@ -1,0 +1,30 @@
+{
+  "system_id":     "CTMS-PROD-08",
+  "system_class":  "GxP-GCP",
+  "description":   "Clinical Trial Management System, mixed compliance — audit trail enabled but reviewed annually rather than per risk-based schedule.",
+  "audit_trail_status": "enabled",
+  "audit_trail_review": {
+    "cadence":             "audit-trail review not performed in the past 12 months on the patient-randomization module",
+    "last_review_date":    "2025-04-12",
+    "findings_resolved":   0,
+    "findings_open":       3
+  },
+  "user_lifecycle": {
+    "shared_accounts":     "none on production; one shared account on the validation environment for training purposes",
+    "account_review_cadence": "annual",
+    "termination_response_sla_hours": 24
+  },
+  "validation_status":     "current",
+  "last_revalidation_date":"2025-08-01",
+  "change_control":        "every change recorded with reason; some changes batch-approved at end of week rather than at the time the change applies",
+  "electronic_signatures": {
+    "factors":            "2 (password + SAML SSO MFA)",
+    "meaning_captured":   true,
+    "biometric":          false
+  },
+  "data_integrity": {
+    "alcoa_review_completed":     "partial",
+    "test_data_in_production":    "DEV branch contains test data; PROD verified clean",
+    "uncontrolled_blank_template":"blank CRF templates available on shared drive; uncontrolled"
+  }
+}

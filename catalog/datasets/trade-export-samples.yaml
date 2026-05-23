@@ -1,0 +1,37 @@
+id: "dataset/trade-export-samples"
+type: dataset
+version: "0.1.0"
+name: "Synthetic trade-export transaction samples"
+description: |
+  Two synthetic exports:
+   - clean: standard laptops to Singapore, EAR99, B-list destination,
+     no Entity-list hits, no license required. Expected 0 hits.
+   - flagged: Iran destination, Russia onward via HK transshipment,
+     Entity List hit, ITAR technical data, deemed-export to H-1B,
+     OFAC SDN match on freight forwarder, surveillance tech to MoI,
+     dual-use to MEU, cash payment, no end-user cert. Expected many
+     critical hits.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["trade", "trade.eccn", "trade.itar", "trade.sanctions", "compliance"]
+capability: ["evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["trade", "ear", "itar", "synthetic"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+splits:
+  test:
+    rows: 2
+    path: "data/trade-samples/"
+record_schema: "schemas/trade-export.schema.json"
+provenance:
+  origin: "Fully synthetic"
+  collected_by: "Open Harness Hub contributors"
+  collected_through: "2026-05-20"
+  license: "MIT"
+  anonymization: "fully synthetic"

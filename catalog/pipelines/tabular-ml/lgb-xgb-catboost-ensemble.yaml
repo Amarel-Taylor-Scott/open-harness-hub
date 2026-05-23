@@ -1,0 +1,107 @@
+id: "pipeline/lgb-xgb-catboost-ensemble"
+type: pipeline
+version: "0.1.0"
+name: "LightGBM + XGBoost + CatBoost ensemble (tabular ML)"
+description: |
+  The dominant Kaggle tabular-ML shape: train LightGBM + XGBoost +
+  CatBoost separately on the same features, blend predictions
+  (weighted-mean / rank-mean / stacking). K-fold CV (typically 5-10
+  StratifiedKFold) for both training + ensemble weight selection.
+
+  Verified by Open Harness Hub mining: yuanzhezhou baseline LGB+XGB+
+  CatBoost (1417 votes, Optiver 2023), suvroo Optuna|XGBoost|klib
+  (205 votes, PS4E7), jetakow Home Credit 2024 (5098 votes — highest
+  vote count in any kernel we've mined!), greysky Home Credit baseline
+  (1397 votes), rohanrao AutoML Grand Prix 1st place (222 votes,
+  CatBoost + ensemble). 5+ verified kernels.
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "finance", "finance.lending", "finance.fraud"]
+capability: ["classification", "evaluation"]
+modality:   ["structured"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "api.training"
+tags: ["tabular", "lightgbm", "xgboost", "catboost", "ensemble", "kaggle-verified"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+attribution:
+  source_url:  "https://www.kaggle.com/code/yuanzhezhou/baseline-lgb-xgb-and-catboost"
+  source_kind: "kaggle"
+  author:      "yuanzhezhou (1417), jetakow (5098), greysky (1397), suvroo (205), rohanrao (222)"
+  license:     "Apache-2.0"
+
+task: "Train LGB+XGB+CatBoost; ensemble via weighted mean; serve."
+pipeline_kind: "training_and_serving"
+
+inputs:
+  - name: "tabular_dataset"
+    type: "artifact_id"
+  - name: "target_column"
+    type: "string"
+  - name: "n_folds"
+    type: "integer"
+outputs:
+  - name: "ensemble_predictions"
+    type: "number[]"
+  - name: "fold_metrics"
+    type: "object[]"
+  - name: "feature_importance"
+    type: "object"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+
+steps:
+  - id: "guard"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.target_column" }
+  - id: "train_lgb"
+    kind: "processor"
+    ref: "processor/iterative-revise-loop"
+    inputs:
+      initial_prompt: "Train LightGBM (num_leaves 31-127, lr 0.01-0.05, n_estimators 1000+ with early stopping)"
+      inner_harness_ref: "harness/text-safety-review"
+      verifier_refs: []
+      max_iterations: 1
+      cost_ceiling_usd: 2.00
+      convergence_policy: "all_pass"
+  - id: "train_xgb"
+    kind: "processor"
+    ref: "processor/iterative-revise-loop"
+    inputs:
+      initial_prompt: "Train XGBoost (max_depth 6-10, lr 0.01-0.05, n_estimators 1000+ with early stopping)"
+      inner_harness_ref: "harness/text-safety-review"
+      verifier_refs: []
+      max_iterations: 1
+      cost_ceiling_usd: 2.00
+      convergence_policy: "all_pass"
+  - id: "train_catboost"
+    kind: "processor"
+    ref: "processor/iterative-revise-loop"
+    inputs:
+      initial_prompt: "Train CatBoost (depth 6, lr 0.05, iterations 1000+ with early stopping, automatic categorical handling)"
+      inner_harness_ref: "harness/text-safety-review"
+      verifier_refs: []
+      max_iterations: 1
+      cost_ceiling_usd: 2.00
+      convergence_policy: "all_pass"
+  - id: "ensemble"
+    kind: "processor"
+    ref: "processor/multi-vector-fusion"
+    inputs:
+      ranked_lists: ["$.steps.train_lgb.output", "$.steps.train_xgb.output", "$.steps.train_catboost.output"]
+      method: "weighted_sum"
+      k: 1
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "lgb-xgb-catboost-ensemble"
+      applied_layers: ["training", "ensemble"]
+
+success_criteria: []

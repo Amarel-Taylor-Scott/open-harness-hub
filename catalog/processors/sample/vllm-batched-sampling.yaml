@@ -1,0 +1,57 @@
+id: "processor/vllm-batched-sampling"
+type: processor
+version: "0.1.0"
+name: "vLLM batched sampling (SamplingParams + logits processors)"
+description: |
+  Issue an LLM batch through vLLM's `LLM.generate` (or
+  `llm.chat`) with `SamplingParams`. Optional `logits_processors`
+  (e.g. logits-processor-zoo: SuppressTokens, FixedTokenBias,
+  AllowedTokens) constrain output structure server-side.
+
+  Concrete pattern from EEDI Qwen-14B/32B kernels and AIMO-2
+  DeepSeek-R1-distill kernels — same shape, swappable model.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["ai"]
+capability: ["serving", "generation"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "api.generation"
+tags: ["vllm", "batched", "logits-processor-zoo", "kaggle-verified"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url:  "https://github.com/NVIDIA/logits-processor-zoo"
+  source_kind: "github"
+  author:      "NVIDIA logits-processor-zoo + vLLM contributors"
+  license:     "Apache-2.0"
+
+process_kind: "transform"
+deterministic: false
+side_effects: "external_call"
+
+inputs:
+  - name: "prompts"
+    type: "string[]"
+  - name: "sampling_params"
+    type: "object"
+  - name: "logits_processors"
+    type: "object[]"
+  - name: "model_adapter_ref"
+    type: "artifact_id"
+outputs:
+  - name: "completions"
+    type: "object[]"
+  - name: "token_logprobs"
+    type: "object[]"
+
+config:
+  default_sampling:
+    temperature: 0.0
+    top_p:       1.0
+    max_tokens:  1024
+    n:           1
+  enable_prefix_caching: true

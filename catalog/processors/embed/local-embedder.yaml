@@ -1,0 +1,32 @@
+id: "processor/local-embedder"
+type: processor
+version: "0.1.0"
+name: "Local embedder (Ollama / nomic / mxbai)"
+description: "Embed text chunks via a local embedding model (Ollama nomic-embed-text / mxbai-embed-large / etc.). No network round-trip; embeddings stored locally."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["education", "research", "compliance", "privacy"]
+capability:  ["extraction", "retrieval"]
+modality:    ["text"]
+lifecycle:   "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.embed"
+created: "2026-05-21"
+updated: "2026-05-21"
+
+process_kind: "embed.local"
+deterministic: true
+side_effects: "none"
+
+inputs:
+  - name: "chunks"
+    type: "object[]"
+  - name: "model"
+    type: "string"
+outputs:
+  - name: "embeddings"
+    type: "object[]"
+config:
+  default_model: "ollama:nomic-embed-text"
+  batch_size: 64
+tags: ["embedder", "local", "ollama", "nomic"]

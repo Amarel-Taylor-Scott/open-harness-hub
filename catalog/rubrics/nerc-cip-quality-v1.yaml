@@ -1,0 +1,53 @@
+id: "rubric/nerc-cip-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "NERC CIP compliance review quality v1"
+description: "7-dim rubric"
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["energy", "energy.grid", "security"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-20"
+updated: "2026-05-20"
+
+dimensions:
+  - id: "impact_tier_assigned"
+    label: "BES Cyber System impact tier (H / M / L) assigned per CIP-002"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "impact_tier ∈ {high, medium, low} per BES Cyber System"
+  - id: "standard_requirement_cited"
+    label: "Each finding cites specific CIP standard + requirement number"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "cip_standard + requirement_number populated per finding"
+  - id: "esp_complete"
+    label: "ESP defined for every BES Cyber System with EAPs documented"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "esp_id + eap_list populated per applicable Cyber System"
+  - id: "psp_complete"
+    label: "PSP defined for every High + Medium asset; monitoring + visitor log"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "psp_status populated; visitor_log retention ≥ 90 days"
+  - id: "patch_management_current"
+    label: "Patch evaluation + implementation within 35-day windows (CIP-007 R2)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "patch_eval_days ≤ 35 OR mitigation_plan_ref populated"
+  - id: "remediation_plan"
+    label: "Each finding has remediation plan + target date"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "remediation_plan + target_date per finding"
+  - id: "evidence_retention"
+    label: "Evidence retention windows met (90 days / 1 cal yr / 3 yr audit cycle)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "evidence_retention_window populated per evidence type"
+
+scoring_method: "weighted_sum"

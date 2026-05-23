@@ -1,0 +1,32 @@
+id: "knowledge-pack/drug-interactions-sample"
+type: knowledge-pack
+version: "0.1.0"
+name: "Drug-drug interactions (sample, educational)"
+description: |
+  Composite paraphrases of well-known drug-drug interaction patterns
+  for educational reference. NOT a substitute for an authoritative
+  database (e.g. RxNorm + Lexicomp + Micromedex). Each entry carries
+  drugA / drugB / severity / mechanism / management.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry:   ["healthcare", "healthcare.pharmacy", "healthcare.clinical"]
+capability: ["retrieval", "verification"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "dated"
+tags: ["pharmacy", "ddi", "drug-interactions"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+content_types:
+  - rag_doc
+files:
+  - path: "data/drug-interactions.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+provenance:
+  sources: ["Composite paraphrases of public drug-interaction references."]
+  collected_through: "2026-04-30"

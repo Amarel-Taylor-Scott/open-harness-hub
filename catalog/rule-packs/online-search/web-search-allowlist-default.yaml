@@ -1,0 +1,75 @@
+id: "rule-pack/web-search-allowlist-default"
+type: rule-pack
+version: "0.1.0"
+name: "Web search allowlist (default)"
+description: |
+  Default online-search rule pack. Allowlist of trusted public-source
+  domains, per-source freshness windows, query sanitization rules,
+  and a small blocklist of dangerous source patterns. Designed to be
+  composed into any pipeline that does outbound web search.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["retrieval", "safety_gating"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "external"
+freshness:  "stable"
+tags: ["online-search", "allowlist", "policy"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+family: "online_search"
+rules:
+  - id: "allow_official_gov"
+    label: "Official government domains"
+    pattern: "*.gov OR *.gov.* OR *.gob.* OR *.gouv.*"
+    severity: "info"
+    category: "allowlist.government"
+    notes: "Treat as authoritative for jurisdictional facts."
+
+  - id: "allow_ig_orgs"
+    label: "Intergovernmental organisations"
+    pattern: "ilo.org OR un.org OR who.int OR worldbank.org OR imf.org OR iom.int OR unodc.org OR oecd.org"
+    severity: "info"
+    category: "allowlist.intergovernmental"
+
+  - id: "allow_academic"
+    label: "Academic and research"
+    pattern: "*.edu OR *.ac.* OR arxiv.org OR nature.com OR science.org OR pubmed.ncbi.nlm.nih.gov"
+    severity: "info"
+    category: "allowlist.academic"
+
+  - id: "allow_major_news"
+    label: "Major news outlets (cross-check required)"
+    pattern: "reuters.com OR apnews.com OR bbc.com OR bbc.co.uk OR ft.com OR economist.com OR npr.org OR theguardian.com"
+    severity: "low"
+    category: "allowlist.news"
+    notes: "Always cross-check with a primary source before publishing."
+
+  - id: "block_known_misinformation_pattern"
+    label: "Block known misinformation domains"
+    pattern: "<misinfo-domains-placeholder>"
+    severity: "high"
+    category: "blocklist.misinformation"
+    notes: "Real list maintained as a separate restricted pack; this is the placeholder."
+
+  - id: "sanitize_pii_in_query"
+    label: "Strip PII before sending query"
+    condition: "ANY pii_regex matches"
+    action: "redact_then_rewrite"
+    severity: "critical"
+    category: "policy.privacy"
+
+  - id: "freshness_window_default"
+    label: "Default freshness window"
+    pattern: "30d"
+    category: "policy.freshness"
+    notes: "Override per pipeline."
+
+  - id: "min_corroboration"
+    label: "Minimum independent corroboration for controversial claims"
+    pattern: "3"
+    severity: "high"
+    category: "policy.corroboration"

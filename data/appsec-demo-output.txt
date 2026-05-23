@@ -1,0 +1,59 @@
+
+============================================================================
+  sample-clean-python.json
+  language: python  •  framework: flask
+  description: Well-written Flask endpoint: parameterized SQL, env-based secret, hashed password storage,
+============================================================================
+  steps: 6  •  total ms: 15.0
+  vuln findings: C: 0  H: 0  M: 0  L: 0
+
+  success_criteria:
+    ✅ deterministic  no production secrets in code
+    ✅ composite      no critical-severity vulnerabilities OR all have fixes 
+  aggregate_pass: True
+
+============================================================================
+  sample-mixed-js.json
+  language: javascript  •  framework: express+react
+  description: Mixed Express + React with innerHTML XSS, hardcoded JWT, eval call, but also some paramete
+============================================================================
+  steps: 6  •  total ms: 2.7
+  vuln findings: C: 0  H: 3  M: 1  L: 0
+
+  rule-pack/grep-code-vulnerabilities:
+    [high     ] jwt_token_in_code                      secrets.jwt
+    [high     ] function_constructor_js                code_execution.function_constructor
+    [high     ] xss_innerhtml                          xss.innerhtml
+    [medium   ] xss_dangerously_set                    xss.react_dangerous_html
+
+  success_criteria:
+    ✅ deterministic  no production secrets in code
+    ✅ composite      no critical-severity vulnerabilities OR all have fixes 
+  aggregate_pass: True
+
+============================================================================
+  sample-vulnerable-python.json
+  language: python  •  framework: django
+  description: Django view with hardcoded AWS secrets, SQL string concat, MD5 password hash, pickle deser
+============================================================================
+  steps: 6  •  total ms: 2.9
+  vuln findings: C: 5  H: 4  M: 2  L: 1
+
+  rule-pack/grep-code-vulnerabilities:
+    [critical ] aws_access_key_id                      secrets.aws.access_key
+    [critical ] aws_secret_key                         secrets.aws.secret_key
+    [critical ] private_key_block                      secrets.private_key
+    [critical ] slack_token                            secrets.slack
+    [critical ] github_pat                             secrets.github
+    [high     ] cmd_injection_shell_true               injection.cmd.subprocess_shell_true
+    [medium   ] weak_hash_md5                          crypto.weak_hash.md5
+    [low      ] missing_auth_decorator_django          auth.missing_decorator_heuristic
+    [high     ] default_password_blank                 auth.blank_password_default
+    [high     ] ssrf_requests_get_user_url             ssrf.requests_user_controlled
+    [high     ] csrf_exempt_marker                     csrf.exempted
+    [medium   ] debug_true_in_prod_config              config.debug_true
+
+  success_criteria:
+    ✅ deterministic  no production secrets in code
+    ✅ composite      no critical-severity vulnerabilities OR all have fixes 
+  aggregate_pass: True

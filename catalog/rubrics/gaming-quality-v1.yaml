@@ -1,0 +1,53 @@
+id: "rubric/gaming-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Gaming AML + responsible-gambling review quality v1"
+description: "7-dim rubric for gaming compliance review"
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["gaming", "gaming.aml", "gaming.responsible"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-21"
+updated: "2026-05-21"
+
+dimensions:
+  - id: "self_exclusion_violation_first"
+    label: "Self-exclusion violations / structuring / match-fixing surfaced FIRST as critical"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "acute findings appear before other findings; severity=critical"
+  - id: "bsa_citation"
+    label: "Each finding cites 31 CFR / state RG regulation"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "regulatory_citation populated per finding (31 CFR §1021, UKGC LCCP, state RG, etc.)"
+  - id: "ctr_sar_filing_window"
+    label: "CTRC + SAR-C filings within deadlines (15 / 30 days)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "filing_due_date present + within window for each reportable transaction"
+  - id: "source_of_funds_evidence"
+    label: "SOF / SOW evidence collected for high-risk patrons + PEPs"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "sof_documentation_present=true OR relationship_terminated=true for triggers"
+  - id: "responsible_gambling_interaction"
+    label: "Customer interaction + affordability check triggered at threshold"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "interaction_log_date present at affordability trigger"
+  - id: "junket_edd"
+    label: "Junket operator + patron EDD documented"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "junket_license + junket_patron_kyc + cmir_filings present"
+  - id: "annual_program_review"
+    label: "Annual AML program review by independent + RG audit completed"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "aml_independent_test_date + rg_audit_date within 12 months"
+
+scoring_method: "weighted_sum"

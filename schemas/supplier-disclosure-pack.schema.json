@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/supplier-disclosure-pack.schema.json",
+  "title": "Supplier disclosure pack",
+  "description": "Canonical shape of a supplier-submitted disclosure pack ingested by pipeline/supplier-policy-grading and pipeline/deep-tier-supplier-audit.",
+  "type": "object",
+  "required": ["supplier_id", "supplier_name", "supplier_tier", "submitted_at"],
+  "properties": {
+    "supplier_id":   { "type": "string", "description": "Supplier identifier inside the lead-company's registry." },
+    "supplier_name": { "type": "string" },
+    "supplier_tier": { "type": "string", "enum": ["T1", "T2", "T3", "T4", "T5+"], "description": "Tier relative to the lead company (T1 = direct supplier)." },
+    "submitted_at":  { "type": "string", "format": "date-time" },
+    "country":       { "type": "string", "description": "ISO 3166-1 alpha-2 country code of the primary operating site." },
+    "iso_country":   { "type": "string", "pattern": "^[A-Z]{2}$" },
+    "sites": {
+      "type": "array",
+      "description": "Operating sites (factory, farm, mine, etc.) — required for EUDR commodities and water/biodiversity rubrics.",
+      "items": {
+        "type": "object",
+        "required": ["site_id", "country"],
+        "properties": {
+          "site_id":     { "type": "string" },
+          "country":     { "type": "string" },
+          "lat":         { "type": "number", "minimum": -90, "maximum": 90 },
+          "lon":         { "type": "number", "minimum": -180, "maximum": 180 },
+          "h3_index":    { "type": "string" },
+          "primary_activity": { "type": "string" }
+        }
+      }
+    },
+    "ultimate_beneficial_owners": {
+      "type": "array",
+      "description": "Required for governance rubric — UBO ≥ 25% ownership thresholds.",
+      "items": {
+        "type": "object",
+        "required": ["name", "ownership_pct"],
+        "properties": {
+          "name":           { "type": "string" },
+          "country":        { "type": "string" },
+          "ownership_pct":  { "type": "number", "minimum": 0, "maximum": 100 },
+          "is_pep":         { "type": "boolean" },
+          "is_nominee":     { "type": "boolean", "description": "True if this UBO is itself a nominee — chain must be resolved further." }
+        }
+      }
+    },
+    "sectors": {
+      "type": "array",
+      "description": "Product sectors / commodities (used to up-weight against knowledge-pack/high-risk-corridors-and-sectors).",
+      "items": { "type": "string" }
+    },
+    "policies": {
+      "type": "object",
+      "description": "Supplier-submitted policy texts. Each entry is a (label, free-form text OR PDF reference).",
+      "additionalProperties": true,
+      "properties": {
+        "code_of_conduct":       { "type": "string" },
+        "anti_bribery":          { "type": "string" },
+        "whistleblower":         { "type": "string" },
+        "human_rights":          { "type": "string" },
+        "environment":           { "type": "string" },
+        "climate_transition":    { "type": "string" },
+        "deforestation_due_diligence": { "type": "string" }
+      }
+    },
+    "self_assessment_answers": {
+      "type": "object",
+      "description": "Structured self-assessment Q&A. Open vocabulary — keys map to rubric dimensions.",
+      "additionalProperties": true
+    },
+    "grievance_summary": {
+      "type": "object",
+      "description": "Aggregate grievance-channel statistics + sample (PII-redacted) transcripts.",
+      "properties": {
+        "channel_ref":           { "type": "string" },
+        "independence_attestation_ref": { "type": "string" },
+        "reports_received_yoy":  { "type": "integer", "minimum": 0 },
+        "resolution_time_p50_days": { "type": "number" },
+        "sample_transcripts_redacted": {
+          "type": "array",
+          "items": { "type": "string", "description": "MUST be PII-redacted upstream." }
+        }
+      }
+    },
+    "audit_reports": {
+      "type": "array",
+      "description": "Third-party audit reports (SMETA, BSCI, SA8000, ETI, Better Work, etc.).",
+      "items": {
+        "type": "object",
+        "required": ["audit_id", "auditor", "date"],
+        "properties": {
+          "audit_id":  { "type": "string" },
+          "auditor":   { "type": "string" },
+          "scheme":    { "type": "string", "examples": ["SMETA", "BSCI", "SA8000", "ETI", "Better Work"] },
+          "date":      { "type": "string", "format": "date" },
+          "findings":  { "type": "array", "items": { "type": "object" } }
+        }
+      }
+    },
+    "ghg_inventory": {
+      "type": "object",
+      "description": "GHG Protocol-style inventory for ESRS E1 / TCFD alignment.",
+      "properties": {
+        "scope_1_tco2e": { "type": "number" },
+        "scope_2_tco2e": { "type": "number" },
+        "scope_2_method": { "type": "string", "enum": ["location-based", "market-based"] },
+        "scope_3_by_category": {
+          "type": "object",
+          "description": "Categories 1-15 — explicit nulls flag excluded categories.",
+          "additionalProperties": { "type": ["number", "null"] }
+        },
+        "boundary":        { "type": "string" },
+        "transition_plan_ref": { "type": "string" }
+      }
+    },
+    "eudr_commodities": {
+      "type": "array",
+      "description": "For EUDR-relevant commodities (cattle, cocoa, coffee, palm-oil, rubber, soy, wood).",
+      "items": {
+        "type": "object",
+        "required": ["commodity", "geolocation_ref"],
+        "properties": {
+          "commodity":         { "type": "string" },
+          "geolocation_ref":   { "type": "string", "description": "Reference to plot-level geolocation file." },
+          "dds_reference":     { "type": "string" }
+        }
+      }
+    },
+    "worker_representation": {
+      "type": "object",
+      "description": "Freedom of association + collective bargaining (ILO C87 + C98).",
+      "properties": {
+        "union_presence":     { "type": "boolean" },
+        "union_name":         { "type": "string" },
+        "worker_council":     { "type": "boolean" },
+        "cba_coverage_pct":   { "type": "number", "minimum": 0, "maximum": 100 }
+      }
+    },
+    "lead_company_code_of_conduct_ref": {
+      "type": "string",
+      "description": "Reference to the lead company's code-of-conduct artifact in the catalog (knowledge-pack/...)."
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,122 @@
+id: "pipeline/full-vendor-due-diligence"
+type: pipeline
+version: "0.1.0"
+name: "Full vendor due-diligence (ESG + AppSec + Legal — kitchen-sink)"
+description: |
+  Cross-vertical kitchen-sink pipeline. Accepts a vendor onboarding
+  packet containing (a) ESG/supply-chain disclosure, (b) representative
+  code bundle, (c) draft MSA, and runs each through its specialized
+  grading pipeline. Aggregates the three vertical grades into a
+  single onboarding verdict + composite success-criteria that
+  require all three sub-pipelines to pass.
+
+  Demonstrates that pipelines can be chained — the `pipeline` step
+  kind invokes a sub-pipeline with resolved inputs.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry", "compliance", "supply_chain", "security", "legal"]
+capability: ["evaluation", "verification", "reasoning"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.compound_review"
+tags: ["kitchen-sink", "vendor-onboarding", "cross-vertical", "esg", "appsec", "legal"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+task: |
+  Run a vendor onboarding packet through ESG + AppSec + Legal review
+  in one workflow. Surface vertical-level findings + overall verdict.
+pipeline_kind: "compound_review"
+
+inputs:
+  - name: "vendor_packet"
+    type: "object"
+outputs:
+  - name: "verdict"
+    type: "object"
+  - name: "esg_verdict"
+    type: "object"
+  - name: "appsec_verdict"
+    type: "object"
+  - name: "legal_verdict"
+    type: "object"
+
+defaults:
+  persona: "persona/research-analyst"
+
+steps:
+  - id: "esg_review"
+    kind: "pipeline"
+    ref: "pipeline/supplier-policy-grading"
+    inputs:
+      supplier_disclosure_pack: "$.inputs.vendor_packet.esg_disclosure"
+      supplier_tier:            "$.inputs.vendor_packet.tier"
+      lead_company_code_ref:    "knowledge-pack/lead-company-code-stub"
+
+  - id: "appsec_review"
+    kind: "pipeline"
+    ref: "pipeline/code-security-review"
+    inputs:
+      code_bundle: "$.inputs.vendor_packet.code_bundle"
+      language:    "$.inputs.vendor_packet.code_language"
+      framework:   "$.inputs.vendor_packet.code_framework"
+
+  - id: "legal_review"
+    kind: "pipeline"
+    ref: "pipeline/contract-clause-review"
+    inputs:
+      contract_text:             "$.inputs.vendor_packet.contract"
+      contract_type:             "$.inputs.vendor_packet.contract_type"
+      jurisdiction:              "$.inputs.vendor_packet.jurisdiction"
+      lead_company_playbook_ref: "knowledge-pack/contract-law-clauses"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "full-vendor-due-diligence"
+      applied_layers: ["esg_review", "appsec_review", "legal_review"]
+
+success_criteria:
+  - kind: deterministic
+    label: "ESG sub-pipeline passed all its criteria"
+    target: "$.steps.esg_review.output.sub_aggregate"
+    op: "is_truthy"
+    value: null
+    severity: high
+
+  - kind: deterministic
+    label: "AppSec sub-pipeline passed all its criteria"
+    target: "$.steps.appsec_review.output.sub_aggregate"
+    op: "is_truthy"
+    value: null
+    severity: critical
+
+  - kind: deterministic
+    label: "Legal sub-pipeline passed all its criteria"
+    target: "$.steps.legal_review.output.sub_aggregate"
+    op: "is_truthy"
+    value: null
+    severity: high
+
+  - kind: composite
+    label: "at most ONE vertical may have any findings (i.e. 2 of 3 must be totally clean)"
+    op: "OR"
+    children:
+      - kind: deterministic
+        target: "$.steps.esg_review.output.sub_findings_total"
+        op: "=="
+        value: 0
+      - kind: composite
+        op: "AND"
+        children:
+          - kind: deterministic
+            target: "$.steps.appsec_review.output.sub_findings_total"
+            op: "=="
+            value: 0
+          - kind: deterministic
+            target: "$.steps.legal_review.output.sub_findings_total"
+            op: "=="
+            value: 0

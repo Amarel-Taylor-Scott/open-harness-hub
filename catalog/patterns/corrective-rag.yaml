@@ -1,0 +1,65 @@
+id: "pattern/corrective-rag"
+type: pattern
+version: "0.1.0"
+name: "Corrective RAG (CRAG)"
+description: |
+  RAG with a three-state retrieval evaluator. After initial retrieval,
+  an evaluator classifies the retrieval as {correct, incorrect,
+  ambiguous}. Correct → strip-and-recompose; incorrect → fall back to
+  web search; ambiguous → both. The evaluator's three-state output
+  prevents the "no relevant doc found" failure mode that breaks naive RAG.
+authors:
+  - name: "Yan, Gan, Mao, Ni, Liu, Wang, Wei (2024)"
+license: "CC-BY-4.0"
+industry:   ["ai", "cross_industry"]
+capability: ["retrieval", "verification"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "external"
+tags: ["rag", "crag", "corrective-rag"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+paper_url: "https://arxiv.org/abs/2401.15884"
+paper_citation: "Yan et al. 2024, Corrective Retrieval Augmented Generation"
+reference_implementations:
+  - { url: "https://github.com/Nagi-ovo/CRAG-Ollama-Chat", language: "python" }
+  - { url: "https://github.com/aws-samples/simplified-corrective-rag", language: "python" }
+
+structural_shape:
+  - "retrieve N candidates"
+  - "retrieval_evaluator (LLM emits correct | incorrect | ambiguous)"
+  - "if correct: knowledge_strip (extract relevant strips, drop noise)"
+  - "if incorrect: web_search fallback → re-evaluate"
+  - "if ambiguous: do BOTH paths and concatenate"
+  - "knowledge_refine (decompose strips into atomic facts)"
+  - "generate answer with refined knowledge"
+
+when_to_use:
+  - "Variable corpus quality (some queries have great matches, others none)"
+  - "Knowledge is fast-moving — web fallback bridges the freshness gap"
+  - "Acceptable to call external search when local fails"
+
+when_not_to_use:
+  - "Air-gapped deployments (web fallback unavailable)"
+  - "Trust-boundary-sensitive (financial / clinical) where web cannot be queried"
+
+variants:
+  - "Self-RAG (reflection tokens instead of explicit evaluator)"
+  - "Recursive CRAG (iterate the evaluator-refiner chain)"
+
+counter_patterns:
+  - "pattern/naive-rag"
+
+implementing_pipelines:
+  - "pipeline/deep-research-with-citations"
+
+implementing_processors:
+  - "processor/iterative-revise-loop"
+
+tradeoffs:
+  latency: "2-4× naive (evaluator + possible web fallback)"
+  cost: "2-4× naive; web-fallback adds external API cost"
+  quality: "High — explicitly recovers from bad retrieval"
+  complexity: "Medium — three-state branching"
+  explainability: "Explicit evaluator decisions are auditable"

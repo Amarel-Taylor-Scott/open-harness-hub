@@ -1,0 +1,53 @@
+id: "rubric/rcra-waste-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "RCRA hazardous waste review quality v1"
+description: "7-dim rubric for 40 CFR 260-279 + e-Manifest + DOT HMR review"
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["waste", "waste.rcra_tsdf", "waste.generator", "waste.universal"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-21"
+updated: "2026-05-21"
+
+dimensions:
+  - id: "miscategorized_accumulation_incompat_first"
+    label: "Miscategorized generator / accumulation exceeded / incompatible co-storage / LDR missing surfaced FIRST as critical"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "acute findings appear before others; severity=critical"
+  - id: "regulation_citation"
+    label: "Each finding cites 40 CFR Parts 260-279 section + DOT 172 + e-Manifest"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "regulatory_citation populated per finding"
+  - id: "generator_status"
+    label: "Generator status (VSQG/SQG/LQG) verified against monthly generation"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "monthly_kg + generator_status documented + thresholds applied"
+  - id: "accumulation_marking"
+    label: "Accumulation time ≤ 90/180 day + container marked + dated"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "container_age + start_date + marking_present documented"
+  - id: "manifest_ldr"
+    label: "Manifest + LDR notification + 3-year retention complete"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "manifest_number + ldr_attached + retention_period documented"
+  - id: "containment_inspection"
+    label: "Tank secondary containment + weekly inspection log gap-free"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "secondary_containment=true + inspection_log_dates contiguous"
+  - id: "dot_training_contingency"
+    label: "DOT 172.704 hazmat-trained signatory + contingency w/ LEPC"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "training_cert_date within 3 yr + lepc_coordination_date documented"
+
+scoring_method: "weighted_sum"

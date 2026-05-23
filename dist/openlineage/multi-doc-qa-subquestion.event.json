@@ -1,0 +1,79 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-05-20T17:02:11.989451+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "1fe0384e-b735-48c1-97fa-8d0800987969",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-05-20T17:02:11.989483+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/multi-doc-qa-subquestion",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "LlamaIndex's SubQuestionQueryEngine pattern in pipeline form. The user\nasks a compound question; an LLM decomposes it into sub-questions;\neach sub-question runs its own retrieval; per-sub-question answers\nare aggregated with citations. Strong for \"compare X across N docs\"\nquestions where naive RAG fails.\n\nChain: persona \u2192 grep (input guard) \u2192 decompose \u2192 per-sub-Q retrieve\n\u2192 per-sub-Q answer \u2192 aggregate-cite \u2192 output verify."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../multi-doc-qa-subquestion.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/multi-doc-qa-subquestion/output/synthesis",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "synthesis (markdown)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/multi-doc-qa-subquestion/output/per_subquestion",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "per_subquestion (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/multi-doc-qa-subquestion/output/citations",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "citations (Citation[])"
+        }
+      }
+    }
+  ]
+}

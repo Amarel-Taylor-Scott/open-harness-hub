@@ -1,0 +1,87 @@
+id: "pipeline/bidirectional-lstm-sequence-prediction"
+type: pipeline
+version: "0.1.0"
+name: "Bidirectional LSTM for sequence prediction (time-series / text)"
+description: |
+  Stacked Bidirectional LSTM for sequence-to-sequence or sequence-
+  to-label prediction. Standard Kaggle approach for: ventilator
+  pressure prediction, classic NLP toxic comment classification,
+  signal classification, EEG time-series. Often combined with 1D-CNN
+  for local feature extraction before recurrent layers.
+
+  Verified by Open Harness Hub mining: theoviel Deep Learning Starter
+  Simple LSTM (1166 votes, Ventilator Pressure Prediction), tenffe
+  finetune of TensorFlow Bidirectional LSTM (668 votes, same comp),
+  tanulsingh077 Deep Learning For NLP Zero To Transformers + BERT
+  (6394 votes!, Jigsaw Multilingual Toxic), rhtsingh Utilizing
+  Transformer Representations Efficiently (1247 votes, CommonLit
+  Readability — has 1D-CNN + LSTM head).
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "healthcare"]
+capability: ["classification", "extraction"]
+modality:   ["text", "structured"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "api.training"
+tags: ["lstm", "bidirectional", "time-series", "kaggle-verified"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+attribution:
+  source_url:  "https://www.kaggle.com/code/theoviel/deep-learning-starter-simple-lstm"
+  source_kind: "kaggle"
+  author:      "theoviel (1166), tanulsingh077 (6394), rhtsingh (1247), tenffe (668)"
+  license:     "Apache-2.0"
+
+task: "Train stacked bidirectional LSTM (often + 1D-CNN front-end) for sequence-to-* tasks."
+pipeline_kind: "training_and_serving"
+
+inputs:
+  - name: "sequence_dataset"
+    type: "artifact_id"
+  - name: "hidden_dim"
+    type: "integer"
+  - name: "n_layers"
+    type: "integer"
+outputs:
+  - name: "predictions"
+    type: "number[]"
+  - name: "model_artifact"
+    type: "artifact_id"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+
+steps:
+  - id: "guard"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.sequence_dataset" }
+  - id: "train"
+    kind: "processor"
+    ref: "processor/iterative-revise-loop"
+    inputs:
+      initial_prompt: "Build Bidirectional LSTM (2-4 layers, hidden 128-256) + optional 1D-CNN front-end. Dropout 0.3-0.5. Adam lr=1e-3 with CosineAnnealingLR. 5-fold StratifiedKFold."
+      inner_harness_ref: "harness/text-safety-review"
+      verifier_refs: []
+      max_iterations: 1
+      cost_ceiling_usd: 4.00
+      convergence_policy: "all_pass"
+  - id: "ensemble_folds"
+    kind: "processor"
+    ref: "processor/multi-vector-fusion"
+    inputs:
+      ranked_lists: "$.steps.train.output"
+      method: "weighted_sum"
+      k: 1
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "bidirectional-lstm-sequence-prediction"
+      applied_layers: ["training", "ensemble"]
+
+success_criteria: []

@@ -1,0 +1,53 @@
+id: "processor/embedder-minilm"
+type: processor
+version: "0.1.0"
+name: "Text embedder (MiniLM-L6-v2)"
+description: |
+  Generate 384-dimensional text embeddings using
+  `sentence-transformers/all-MiniLM-L6-v2`. Suitable for catalog
+  semantic search, RAG retrieval, and de-duplication. Replace with a
+  higher-dim embedder for production semantic retrieval.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["embedding"]
+modality:   ["text"]
+lifecycle:  "stable"
+lifecycle_position: "cross_cutting.composition"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "embed.text"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 50
+
+inputs:
+  - name: "texts"
+    type: "string[]"
+outputs:
+  - name: "embeddings"
+    type: "f32[D]"
+  - name: "dim"
+    type: "integer"
+  - name: "model"
+    type: "string"
+
+side_effects: "none"
+on_error: "raise"
+
+model_targets:
+  - id: "minilm_local"
+    label: "Local sentence-transformers MiniLM-L6-v2"
+    transport: "transformers"
+    role: "Default; runs entirely on host."
+    required: false
+    default: true
+    trust_boundary: "local"
+
+implementations:
+  - kind: "callable"
+    path: "processors.embedder_minilm.run"

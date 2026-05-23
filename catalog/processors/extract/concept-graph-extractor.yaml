@@ -1,0 +1,37 @@
+id: "processor/concept-graph-extractor"
+type: processor
+version: "0.1.0"
+name: "Concept graph extractor"
+description: "Extract typed concept-graph nodes + edges from chunked text. Node types: concept, term, person, dataset, method, equation. Edge types: depends_on, cited_by, sub_concept, contradicts, defined_in. Each node + edge carries a (page, span) source anchor."
+authors: [{ name: "CiteMind team (upstream)" }, { name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["education", "research", "esg", "compliance", "healthcare"]
+capability:  ["extraction"]
+modality:    ["text", "structured"]
+lifecycle:   "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.extract"
+created: "2026-05-21"
+updated: "2026-05-21"
+
+process_kind: "extract.concept_graph"
+deterministic: false
+side_effects: "none"
+
+inputs:
+  - name: "wiki_pages"
+    type: "object[]"
+  - name: "node_types"
+    type: "string[]"
+  - name: "edge_types"
+    type: "string[]"
+outputs:
+  - name: "nodes"
+    type: "object[]"
+  - name: "edges"
+    type: "object[]"
+config:
+  default_node_types: ["concept", "term", "person", "dataset", "method", "equation"]
+  default_edge_types: ["depends_on", "cited_by", "sub_concept", "contradicts", "defined_in"]
+  cite_required: true
+tags: ["concept-graph", "extractor", "citemind"]

@@ -1,0 +1,86 @@
+id: "pipeline/llm-judge-essay-grading"
+type: pipeline
+version: "0.1.0"
+name: "LLM-judge essay grading (with adversarial prompt prefix)"
+description: |
+  Run a frontier LLM as judge on candidate essays, using a few-shot
+  prompt with adversarial prefix patterns to discourage gaming. The
+  "you can't please them all" pattern: grade strictly, refuse to
+  inflate scores under social-engineering pressure.
+
+  Verified by Open Harness Hub mining of richolson's "Mash It Up" (561
+  votes), "Add It Up!" (333 votes), and jiprud's "Essays - simple
+  submission" (484 votes) on llms-you-cant-please-them-all.
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "education"]
+capability: ["evaluation", "reasoning"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url: "https://www.kaggle.com/competitions/llms-you-cant-please-them-all"
+  source_kind: "kaggle"
+  author: "Rich Olson (mash-it-up 561, add-it-up 333), Jiri Prudky (484)"
+  license: "Apache-2.0"
+
+task: |
+  Given an essay + rubric, produce a grade (numeric or rubric-aligned)
+  with concrete justifications. Robust to adversarial-prompt prefixes
+  trying to inflate the score.
+pipeline_kind: "evaluation"
+
+inputs:
+  - name: "essay"
+    type: "string"
+  - name: "rubric_ref"
+    type: "artifact_id"
+  - name: "n_judges"
+    type: "integer"
+outputs:
+  - name: "grade"
+    type: "number"
+  - name: "justifications"
+    type: "string[]"
+  - name: "judge_variance"
+    type: "number"
+
+defaults:
+  persona: "persona/fact-checker"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/grep-prompt-injection-heuristics"
+
+steps:
+  - id: "guard"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.essay" }
+
+  - id: "judge"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.inputs.essay"
+      rubric_ref: "$.inputs.rubric_ref"
+
+  - id: "ensemble_across_seeds"
+    kind: "processor"
+    ref: "processor/self-consistency-sampler"
+    inputs:
+      prompt: "$.inputs.essay"
+      n_samples: "$.inputs.n_judges"
+      temperature: 0.0
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "llm-judge-essay-grading"
+      applied_layers: ["judge", "ensemble"]
+
+success_criteria: []

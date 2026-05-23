@@ -1,0 +1,68 @@
+id: "rule-pack/grep-benefits-eligibility-flags"
+type: rule-pack
+version: "0.1.0"
+name: "Benefits-eligibility red-flag detectors (SNAP / Medicaid / UI)"
+description: |
+  GREP detectors for the highest-leverage benefits-eligibility
+  signals: countable-income markers above thresholds, asset
+  deemers, undisclosed household members, immigration-status
+  questions, missing documentation, possible duplicate enrollment.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["government", "government.benefits", "compliance"]
+capability: ["safety_gating", "classification"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "volatile"
+tags: ["government", "benefits", "snap", "medicaid", "ssn-flag"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+family: "grep"
+rules:
+  - id: "high_countable_income"
+    pattern: "(?i)(monthly|gross|wage|salary)\\s+income\\s*[:=]\\s*\\$?\\s*([4-9]\\d{3,}|\\d{5,})"
+    severity: "medium"
+    category: "benefits.income.high_countable"
+
+  - id: "asset_above_resource_limit"
+    pattern: "(?i)(asset|resource|bank\\s+account|savings)\\s+total\\s*[:=]\\s*\\$?\\s*([4-9]\\d{3,}|\\d{5,})"
+    severity: "medium"
+    category: "benefits.asset.above_limit"
+
+  - id: "undisclosed_household_member"
+    pattern: "(?i)(other|additional|undisclosed)\\s+(?:adult|household\\s+member|person)\\s+(?:living|residing)\\s+at\\s+(?:address|residence|premises)|did\\s+not\\s+disclose\\s+household\\s+member"
+    severity: "high"
+    category: "benefits.household.undisclosed_member"
+
+  - id: "missing_documentation"
+    pattern: "(?i)(?:no|missing|absent|not provided)\\s+(?:proof|documentation|verification)\\s+of\\s+(?:income|residence|identity|household|disability|citizenship)"
+    severity: "low"
+    category: "benefits.documentation.missing"
+
+  - id: "duplicate_enrollment_pattern"
+    pattern: "(?i)(prior|existing|active)\\s+(?:enrollment|case)\\s+(?:in\\s+)?(?:another|other)\\s+(?:state|jurisdiction|county)|two\\s+(?:active|open)\\s+(?:cases|enrollments)"
+    severity: "high"
+    category: "benefits.duplicate_enrollment"
+
+  - id: "able_bodied_work_req"
+    pattern: "(?i)(?:no|absent)\\s+(?:work|training|community\\s+service)\\s+(?:participation|hours)|did\\s+not\\s+meet\\s+(?:ABAWD|work)\\s+(?:requirement|hours)"
+    severity: "medium"
+    category: "benefits.work_requirement.unmet"
+
+  - id: "ssn_unredacted"
+    pattern: "(?<!\\d)\\d{3}-\\d{2}-\\d{4}(?!\\d)"
+    severity: "high"
+    category: "phi.ssn_unredacted"
+
+  - id: "self_employment_unreported"
+    pattern: "(?i)self[- ]?employ\\w+.{0,80}(?:not reported|unreported|n[\\.\\/]?a)|gig\\s+income.{0,80}(?:not reported|unreported)"
+    severity: "high"
+    category: "benefits.income.self_employment_unreported"
+
+  - id: "fraud_warrant_outstanding"
+    pattern: "(?i)(?:fraud|public assistance fraud|welfare fraud)\\s+(?:warrant|investigation|indictment).{0,80}(?:outstanding|pending|active)"
+    severity: "critical"
+    category: "benefits.fraud.warrant_outstanding"

@@ -1,0 +1,53 @@
+id: "processor/inject-output-schema"
+type: processor
+version: "0.1.0"
+name: "Inject output schema directive"
+description: |
+  Render a target JSON Schema (or Pydantic model) into the prompt as
+  an instruction the model is asked to follow. Pairs with
+  `processor/json-schema-repair` on the response side: if the model's
+  output doesn't conform, the loop processor can re-prompt with the
+  validation error appended.
+
+  Three injection styles:
+    - `schema_only`: bare JSON Schema in a fenced code block.
+    - `schema_plus_example`: schema + a minimal conforming example.
+    - `constrained_grammar_marker`: hints for outlines / xgrammar /
+      llama.cpp grammar-constrained decoding.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry", "ai"]
+capability: ["format_conversion"]
+modality:   ["text", "structured"]
+lifecycle:  "beta"
+lifecycle_position: "pre_api.context_assembly"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "inject.output_schema"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 5
+
+inputs:
+  - name: "prompt"
+    type: "string"
+  - name: "schema_ref"
+    type: "artifact_id"
+  - name: "style"
+    type: "enum[schema_only, schema_plus_example, constrained_grammar_marker]"
+outputs:
+  - name: "augmented_prompt"
+    type: "string"
+  - name: "constraint_marker"
+    type: "string"
+
+side_effects: "none"
+on_error: "raise"
+
+implementations:
+  - kind: "callable"
+    path: "processors.inject_output_schema.run"

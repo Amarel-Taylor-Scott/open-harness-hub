@@ -1,0 +1,50 @@
+id: "pattern/peft-lora-adapter-insertion"
+type: pattern
+version: "0.1.0"
+name: "PEFT LoRA adapter insertion"
+description: "Train tiny low-rank decomposition matrices A∈R^(d×r), B∈R^(r×d) inserted alongside frozen base weights W. Forward pass becomes W·x + B·A·x. Only A + B are trained; base stays frozen. Adapter weights are ~1% of base; multiple task adapters can be hot-swapped against one base model in memory."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["cross_industry"]
+capability: ["generation"]
+modality: ["text"]
+lifecycle: "stable"
+trust_boundary: "local"
+created: "2026-05-22"
+updated: "2026-05-22"
+
+paper_url: "https://arxiv.org/abs/2106.09685"
+paper_citation: "Hu et al. (2021) — LoRA: Low-Rank Adaptation of Large Language Models"
+
+when_to_use:
+  - "Domain-specific fine-tune where full-model SFT is too expensive (VRAM, time, dataset size)."
+  - "Multi-task deployment: one base model + many small adapters served from a single GPU."
+  - "Where the team needs to ship updated adapters frequently without re-distributing the base."
+
+structural_shape:
+  - "Choose target modules (typically q_proj + v_proj; some add k_proj, o_proj, gate_proj)."
+  - "Pick rank r (typically 8/16/32/64) + alpha (typically 2r) + dropout (0.05-0.1)."
+  - "Freeze all base weights; init A ∈ R^(d×r) with Gaussian, B ∈ R^(r×d) with zeros."
+  - "Forward: y = W·x + (α/r)·B·A·x"
+  - "Backward: only A + B receive gradients (~1% of base params)."
+  - "Save adapter weights separately (~50-500 MB) from base."
+  - "At serve time: load base once, swap adapter per request."
+
+variants:
+  - "QLoRA: 4-bit-quantize base + LoRA on top (single-GPU 70B finetune)."
+  - "DoRA (Weight-Decomposed LoRA): decompose into magnitude + direction; train both."
+  - "rsLoRA: rank-stabilized α scaling (α = LoRA·√r)."
+  - "VeRA: shared low-rank matrices + trainable scaling vectors."
+
+implementing_pipelines:
+  - "pipeline/lora-qlora-pairwise-pref-finetune"
+
+related_patterns:
+  - "pattern/qlora-4bit-finetune"
+  - "pattern/dpo-from-pairwise"
+  - "pattern/lora-merge-and-deploy"
+
+counter_patterns:
+  - "Full fine-tune is the obvious counter-pattern when you can afford it + want maximum quality."
+
+tags: ["lora", "peft", "finetune", "low-rank", "parameter-efficient"]

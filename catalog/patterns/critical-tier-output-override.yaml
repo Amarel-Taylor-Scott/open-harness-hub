@@ -1,0 +1,89 @@
+id: "pattern/critical-tier-output-override"
+type: pattern
+version: "0.1.0"
+name: "Critical-tier output override (one dominant message on critical finding)"
+description: |
+  When a classifier / judge step finds a critical-tier issue, every
+  user-facing output component is FORCED into one consistent message
+  rather than mixing the issue with the original task output. This
+  is architectural control over which message dominates the screen,
+  not a model decision.
+
+  Counters the "mixed message" failure mode: a single-stream LLM
+  generates "pay if the amount is correct" + "this might be a scam"
+  in the same response. A stressed user picks the more action-oriented
+  advice and gets defrauded. Architectural override forces ONE
+  dominant message.
+
+  Bill_info AI is the reference implementation: on `likely_scam`
+  classification, the urgency banner → red, recommendations → ["do
+  not pay", "verify via Verbraucherzentrale", "save as evidence"],
+  reply draft → empty. The user sees ONE coherent anti-scam screen.
+
+  Published in Sviatoslav Grabovsky's Bill_info AI (Gemma 4 Good
+  Hackathon).
+authors:
+  - name: "Sviatoslav Grabovsky (Bill_info AI), Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry:   ["ai", "cross_industry", "bureaucracy_translation", "humanitarian", "compliance"]
+capability: ["safety_gating", "verification"]
+modality:   ["text", "structured"]
+lifecycle:  "beta"
+trust_boundary: "local"
+tags: ["safety", "override", "fraud-detection", "vulnerable-users", "hackathon-verified"]
+created: "2026-05-21"
+updated: "2026-05-21"
+
+paper_url: "https://huggingface.co/spaces/Svityk/bill-info-ai"
+paper_citation: "Sviatoslav Grabovsky 2026, Bill_info AI — Critical-Tier Output Override design pattern (Gemma 4 Good Hackathon)"
+reference_implementations:
+  - { url: "https://github.com/Svityk/bill-info-ai", language: "python", framework: "gemma-4 + ui-component-override" }
+
+structural_shape:
+  - "classification = llm.judge(context, taxonomy)"
+  - "if classification == 'critical_tier':"
+  - "    # OVERRIDE every UI component into ONE consistent message"
+  - "    urgency_banner    = 'red'"
+  - "    top_action        = anti_critical_action"
+  - "    recommended_steps = anti_critical_steps"
+  - "    reply_draft       = ''  # explicitly empty"
+  - "    verification_step = REQUIRED"
+  - "else:"
+  - "    # normal output assembly"
+
+when_to_use:
+  - "Vulnerable users + high-stakes findings (fraud → financial loss; toxic medication interaction → death; safety-critical RCE → breach)"
+  - "Multi-component UI that could mix conflicting messages on the same screen"
+  - "Audit trail required — explicit override = explicit decision"
+
+when_not_to_use:
+  - "Single-message outputs where there's nothing to override (just block the request)"
+  - "Low-stakes findings where weighing pros/cons is appropriate (the user CAN make a nuanced decision)"
+  - "Where the user benefits from seeing the conflict explicitly (research / academic settings)"
+
+variants:
+  - "Hard override (Bill_info AI baseline): all components forced"
+  - "Soft override (yellow advisory): prepend warning, do not replace original output"
+  - "Tiered override: critical → hard; high → soft; medium → footnote"
+  - "Multi-language override: ensure the override message is in the user's language, not just the system default"
+
+counter_patterns:
+  - "Single-stream LLM 'just generate the whole response in one prompt' — produces mixed messages"
+  - "RAG-on-warning (retrieve warning text) without forcing UI override — user still sees mixed content"
+
+implementing_pipelines:
+  - "pipeline/bill-info-extract-fraud-detect-recommend"
+  - "pipeline/anonymized-illicit-recruitment-pattern-sharing"
+  - "pipeline/radiology-report-grading"
+  - "pipeline/contract-clause-review"
+
+implementing_processors:
+  - "processor/verify-composite-criterion"
+  - "processor/escalate-human-review"
+
+tradeoffs:
+  latency:    "Negligible — the override is a post-processing step"
+  cost:       "Zero — no extra LLM call"
+  quality:    "Substantially safer on critical findings — no mixed messaging to stressed users"
+  complexity: "Medium — needs clear ownership of which UI component the override controls"
+  explainability: "Very high — the override is a single deterministic rule + the triggering indicator is traceable"

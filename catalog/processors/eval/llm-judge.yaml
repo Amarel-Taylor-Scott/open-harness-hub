@@ -1,0 +1,67 @@
+id: "processor/llm-judge"
+type: processor
+version: "0.1.0"
+name: "LLM-as-judge"
+description: |
+  Generic LLM-as-judge wrapper. Given (candidate response, rubric,
+  context), returns a per-dimension score with rationale and a
+  weighted-sum overall score. Independent of the model under review —
+  the judge sits outside that model's reasoning trace.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["evaluation"]
+modality:   ["text"]
+lifecycle:  "beta"
+lifecycle_position: "post_api.evaluation"
+trust_boundary: "mixed"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "eval.rubric_llm_judge"
+deterministic: false
+idempotent: true
+streaming: false
+latency_budget_ms: 8000
+
+inputs:
+  - name: "candidate"
+    type: "string"
+  - name: "rubric_ref"
+    type: "artifact_id"
+  - name: "context"
+    type: "KnowledgeObject[]"
+outputs:
+  - name: "dimension_scores"
+    type: "DimensionScore[]"
+  - name: "overall"
+    type: "number"
+  - name: "rationale"
+    type: "string"
+
+side_effects: "external_call"
+on_error: "fallback"
+retry:
+  max_attempts: 2
+  backoff: "exponential"
+
+model_targets:
+  - id: "frontier_judge"
+    label: "Frontier judge (Anthropic / OpenAI / Gemini)"
+    transport: "anthropic"
+    role: "Default judge when external API keys are configured."
+    required: false
+    default: true
+    trust_boundary: "external"
+  - id: "local_judge"
+    label: "Local model judge"
+    transport: "ollama"
+    role: "Fallback when external is not available."
+    required: false
+    default: false
+    trust_boundary: "local"
+
+implementations:
+  - kind: "callable"
+    path: "processors.llm_judge.run"

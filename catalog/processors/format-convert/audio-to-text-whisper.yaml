@@ -1,0 +1,55 @@
+id: "processor/audio-to-text-whisper"
+type: processor
+version: "0.1.0"
+name: "Audio to text (Whisper)"
+description: |
+  Speech-to-text via a Whisper-family model. Returns transcript +
+  per-segment timestamps + detected language. Wraps `openai-whisper`,
+  `faster-whisper`, or `distil-whisper` based on the implementation
+  chosen at runtime.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["format_conversion", "translation"]
+modality:   ["audio", "text"]
+lifecycle:  "beta"
+lifecycle_position: "pre_api.input_gating"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "format_convert.audio_to_text"
+deterministic: false
+idempotent: true
+streaming: true
+latency_budget_ms: 30000
+
+inputs:
+  - name: "audio"
+    type: "bytes|url"
+  - name: "language_hint"
+    type: "string"
+outputs:
+  - name: "transcript"
+    type: "string"
+  - name: "segments"
+    type: "Segment[]"
+  - name: "detected_language"
+    type: "string"
+
+side_effects: "none"
+on_error: "raise"
+
+model_targets:
+  - id: "whisper_local"
+    label: "Local faster-whisper"
+    transport: "transformers"
+    role: "Default — runs locally; audio never leaves the host."
+    required: false
+    default: true
+    trust_boundary: "local"
+
+implementations:
+  - kind: "callable"
+    path: "processors.audio_to_text.run"

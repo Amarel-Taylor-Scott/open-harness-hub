@@ -1,0 +1,55 @@
+id: "rubric/insurance-claim-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Insurance claim review quality v1"
+description: |
+  Seven-dimension rubric for grading an insurance claim review.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["insurance", "insurance.claims", "insurance.fraud", "finance"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-20"
+updated: "2026-05-20"
+
+dimensions:
+  - id: "critical_indicators_surfaced"
+    label: "All critical-tier fraud indicators identified"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "every recent-coverage-change / claimant-watchlist / photo-metadata / phantom-damage hit surfaced"
+  - id: "indicator_typed"
+    label: "Indicators typed by NAIC category"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "non-empty naic_category for each finding"
+  - id: "no_determination_from_single_signal"
+    label: "Disposition based on indicator pattern, not single signal"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "if disposition='deny', ≥2 indicators OR documented investigator evidence"
+  - id: "disposition_path"
+    label: "Recommend explicit disposition (pay-clean / pay-with-reservation / SIU / IFB-notify)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "non-empty disposition field with one of the allowed values"
+  - id: "pii_safe"
+    label: "PII redacted before LLM call (no SSN/DOB/medical PII)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "processor/redact-pii-text fired; ssn_in_claim_body finds zero hits in output"
+  - id: "soft_vs_hard_fraud_separated"
+    label: "Soft fraud (exaggeration) labeled distinctly from hard fraud (staged)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "fraud_type ∈ {soft, hard, both} for each adverse finding"
+  - id: "coverage_verified"
+    label: "Coverage in force at loss date verified before adjudication"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "policy_status='in_force' AND loss_date <= policy_end_date"
+
+scoring_method: "weighted_sum"

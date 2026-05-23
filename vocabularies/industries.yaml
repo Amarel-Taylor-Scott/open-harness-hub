@@ -1,0 +1,523 @@
+# Controlled vocabulary: industries.
+#
+# Open list. New industries are added by PR. Sub-industries are dot-separated
+# (e.g., `healthcare.radiology`, `finance.aml`, `legal.immigration`).
+#
+# An artifact may declare one or many industries.
+
+industries:
+  - id: healthcare
+    label: Healthcare & life sciences
+    sub:
+      - id: healthcare.clinical
+        label: Clinical decision support
+      - id: healthcare.radiology
+        label: Radiology
+      - id: healthcare.pharmacy
+        label: Pharmacy & medication safety
+      - id: healthcare.payer
+        label: Payer / claims
+      - id: healthcare.public_health
+        label: Public health
+  - id: finance
+    label: Finance & banking
+    sub:
+      - id: finance.aml
+        label: Anti-money-laundering & sanctions
+      - id: finance.fraud
+        label: Fraud detection
+      - id: finance.kyc
+        label: KYC / onboarding
+      - id: finance.trading
+        label: Trading & markets
+      - id: finance.lending
+        label: Lending & underwriting
+  - id: legal
+    label: Legal
+    sub:
+      - id: legal.contract
+        label: Contract review
+      - id: legal.litigation
+        label: Litigation support
+      - id: legal.immigration
+        label: Immigration & labor mobility
+      - id: legal.ip
+        label: IP & trademark
+      - id: legal.compliance
+        label: Regulatory compliance
+  - id: education
+    label: Education
+    sub:
+      - id: education.k12
+        label: K-12
+      - id: education.higher
+        label: Higher education
+      - id: education.workforce
+        label: Workforce training
+      - id: education.tutoring
+        label: Tutoring & study aids
+  - id: government
+    label: Government & public sector
+    sub:
+      - id: government.benefits
+        label: Benefits administration
+      - id: government.permitting
+        label: Permitting & licensing
+      - id: government.regulatory
+        label: Regulatory review
+      - id: government.foia
+        label: FOIA / records
+  - id: retail
+    label: Retail & e-commerce
+    sub:
+      - id: retail.merchandising
+        label: Merchandising
+      - id: retail.support
+        label: Customer support
+      - id: retail.search
+        label: Product search & recommendation
+  - id: manufacturing
+    label: Manufacturing & industrial
+    sub:
+      - id: manufacturing.qa
+        label: Quality assurance
+      - id: manufacturing.supplychain
+        label: Supply chain
+      - id: manufacturing.maintenance
+        label: Predictive maintenance
+  - id: media
+    label: Media & publishing
+    sub:
+      - id: media.editorial
+        label: Editorial
+      - id: media.factcheck
+        label: Fact-checking & verification
+      - id: media.distribution
+        label: Distribution & moderation
+  - id: security
+    label: Security
+    sub:
+      - id: security.offensive
+        label: Red team / offensive
+      - id: security.defensive
+        label: Defensive / SOC
+      - id: security.appsec
+        label: AppSec / code review
+      - id: security.fraud
+        label: Identity & fraud
+  - id: climate
+    label: Climate, energy & sustainability
+  - id: privacy
+    label: Privacy & data protection
+    sub:
+      - id: privacy.gdpr
+        label: EU GDPR
+      - id: privacy.ccpa
+        label: California CCPA / CPRA
+      - id: privacy.dsar
+        label: Data Subject Access Request fulfillment
+      - id: privacy.pia
+        label: Privacy Impact Assessment / DPIA
+  - id: hr
+    label: Human Resources & people operations
+    sub:
+      - id: hr.hiring
+        label: Hiring & recruiting (EEOC / ADA / Title VII)
+      - id: hr.performance
+        label: Performance reviews & disciplinary
+      - id: hr.compensation
+        label: Compensation & pay-equity
+  - id: trade
+    label: International trade & export control
+    sub:
+      - id: trade.hts
+        label: HTS classification (US Harmonized Tariff Schedule)
+      - id: trade.eccn
+        label: ECCN classification (Export Control Classification Number)
+      - id: trade.itar
+        label: ITAR (International Traffic in Arms Regulations)
+      - id: trade.sanctions
+        label: Sanctions screening (OFAC / EU / UN)
+  - id: pharma
+    label: Pharmaceutical & life sciences
+    sub:
+      - id: pharma.gxp
+        label: GxP (GMP/GCP/GLP/GVP) electronic-records validation
+      - id: pharma.clinical
+        label: Clinical trials operations
+      - id: pharma.manufacturing
+        label: Drug manufacturing
+      - id: pharma.pv
+        label: Pharmacovigilance
+  - id: threat_intelligence
+    label: Cybersecurity threat intelligence
+    sub:
+      - id: threat_intelligence.ioc
+        label: Indicator-of-compromise verification
+      - id: threat_intelligence.ttp
+        label: TTP mapping (MITRE ATT&CK)
+      - id: threat_intelligence.attribution
+        label: Threat-actor attribution
+  - id: insurance
+    label: Insurance underwriting & claims
+    sub:
+      - id: insurance.claims
+        label: Claims processing
+      - id: insurance.fraud
+        label: Fraud detection
+      - id: insurance.underwriting
+        label: Underwriting
+  - id: esg
+    label: ESG, sustainability reporting & supply chain due diligence
+    sub:
+      - id: esg.csddd
+        label: EU CSDDD (Corporate Sustainability Due Diligence)
+      - id: esg.modern_slavery
+        label: Modern Slavery Act compliance
+      - id: esg.cdp
+        label: Climate Disclosure Project / carbon
+      - id: esg.csrd
+        label: EU CSRD (Corporate Sustainability Reporting)
+  - id: supply_chain
+    label: Supply chain & deep-tier supplier networks
+    sub:
+      - id: supply_chain.due_diligence
+        label: Supply chain due diligence
+      - id: supply_chain.audit
+        label: Supplier audit
+  - id: sustainability
+    label: Sustainability (general)
+  - id: compliance
+    label: Compliance & regulatory governance (cross-domain)
+  - id: agriculture
+    label: Agriculture & food systems
+  - id: energy
+    label: Energy
+    sub:
+      - id: energy.grid
+        label: Electric grid integrity (NERC CIP)
+      - id: energy.oil_gas
+        label: Oil & gas (pipeline / refinery)
+  - id: construction
+    label: Construction safety & permits
+    sub:
+      - id: construction.safety
+        label: Construction safety (OSHA / ANSI Z10)
+      - id: construction.permitting
+        label: Permitting & code compliance
+  - id: maritime
+    label: Maritime & shipping
+    sub:
+      - id: maritime.safety
+        label: Maritime safety (IMO / SOLAS / MARPOL / ISM)
+      - id: maritime.port_security
+        label: Port security (ISPS Code)
+  - id: food
+    label: Food production + retail (HACCP, FDA Food Code)
+    sub:
+      - id: food.safety
+        label: Food safety (HACCP / Codex)
+      - id: food.retail
+        label: Food retail (FDA Food Code)
+  - id: mining
+    label: Mining (surface + underground)
+    sub:
+      - id: mining.underground
+        label: Underground mining (MSHA 30 CFR 75)
+      - id: mining.surface
+        label: Surface mining
+  - id: infrastructure
+    label: Infrastructure (bridges, tunnels, elevators, boilers, HVAC, roofing)
+    sub:
+      - id: infrastructure.bridge
+        label: Bridge inspection (NBIS / FHWA)
+      - id: infrastructure.tunnel
+        label: Tunnel safety (NFPA 502)
+      - id: infrastructure.elevator
+        label: Elevator (ASME A17.1)
+      - id: infrastructure.boiler
+        label: Boiler (NBIC NB-23)
+      - id: infrastructure.hvac
+        label: HVAC commissioning (ASHRAE)
+      - id: infrastructure.roofing
+        label: Roofing (FM 4471)
+  - id: cyber
+    label: Cybersecurity (SOC, pentest, IR)
+    sub:
+      - id: cyber.soc
+        label: Security Operations Center (NIST 800-61)
+      - id: cyber.pentest
+        label: Penetration testing (PTES + OWASP)
+  - id: aviation
+    label: Aviation (flight crew + maintenance)
+    sub:
+      - id: aviation.flight_crew
+        label: Flight crew (FAA Part 91/121)
+      - id: aviation.maintenance
+        label: Maintenance (FAA Part 43/145)
+  - id: transportation
+    label: Transportation (trucking + rail + maritime ops)
+    sub:
+      - id: transportation.trucking
+        label: Trucking (FMCSA + CVSA)
+      - id: transportation.rail
+        label: Rail (FRA 49 CFR 215/232)
+      - id: transportation.maritime
+        label: Maritime ops (IMO STCW)
+  - id: environmental
+    label: Environmental (water + wastewater)
+    sub:
+      - id: environmental.water
+        label: Drinking water (SDWA)
+      - id: environmental.wastewater
+        label: Wastewater (NPDES)
+  - id: it
+    label: IT operations (data center, ITIL)
+    sub:
+      - id: it.datacenter
+        label: Data center operations (ITIL + Uptime Tier)
+  - id: sre
+    label: Site Reliability Engineering
+    sub:
+      - id: sre.oncall
+        label: On-call + incident response
+  - id: research
+    label: Research (animal welfare, human subjects)
+    sub:
+      - id: research.animal_welfare
+        label: Animal welfare (IACUC)
+  - id: ehs
+    label: Environmental Health + Safety
+    sub:
+      - id: ehs.audit
+        label: EHS audit (OSHA JHA)
+  - id: telecom
+    label: Telecom field (alias for telecommunications)
+    sub:
+      - id: telecom.field
+        label: Tower climb (ANSI A10.48)
+  - id: space
+    label: Space launch + spacecraft operations
+    sub:
+      - id: space.launch
+        label: Commercial space launch (FAA Part 450)
+      - id: space.export_control
+        label: Space ITAR / EAR export control
+      - id: space.orbital
+        label: Orbital debris + conjunction
+  - id: cannabis
+    label: Cannabis (US state + federal regulatory)
+    sub:
+      - id: cannabis.cultivation
+        label: Cultivation + manufacturing license
+      - id: cannabis.retail
+        label: Dispensary + delivery retail
+      - id: cannabis.testing
+        label: Testing lab + COA + METRC
+  - id: biosecurity
+    label: Biosecurity / select agents / biosafety
+    sub:
+      - id: biosecurity.select_agent
+        label: HHS/CDC select agent (42 CFR 73)
+      - id: biosecurity.bsl
+        label: BSL-3/BSL-4 containment (BMBL)
+      - id: biosecurity.durc
+        label: Dual-use research of concern + P3CO
+  - id: ai_governance
+    label: AI governance + conformity (EU AI Act, NIST AI RMF, ISO 42001)
+    sub:
+      - id: ai_governance.eu_act
+        label: EU AI Act high-risk + GPAI
+      - id: ai_governance.nist_rmf
+        label: NIST AI RMF Govern/Map/Measure/Manage
+      - id: ai_governance.iso_42001
+        label: ISO/IEC 42001 AIMS
+  - id: waste
+    label: Waste management (RCRA Subtitle C + Universal)
+    sub:
+      - id: waste.rcra_tsdf
+        label: RCRA TSDF (40 CFR 264/265)
+      - id: waste.generator
+        label: Hazardous waste generator (40 CFR 262)
+      - id: waste.universal
+        label: Universal waste + used oil (40 CFR 273/279)
+  - id: tax
+    label: Tax compliance
+    sub:
+      - id: tax.transfer_pricing
+        label: Transfer pricing (OECD BEPS / Section 482)
+      - id: tax.indirect
+        label: Indirect tax (VAT / GST / sales+use)
+      - id: tax.crypto
+        label: Crypto asset tax reporting
+  - id: telecommunications
+    label: Telecommunications
+    sub:
+      - id: telecommunications.fcc
+        label: FCC Part 47 compliance
+      - id: telecommunications.cpni
+        label: CPNI (Customer Proprietary Network Information)
+      - id: telecommunications.cybersec
+        label: Telco cyber (CALEA / TRAI)
+  - id: gaming
+    label: Gaming / gambling integrity
+    sub:
+      - id: gaming.aml
+        label: Gaming AML / suspicious activity
+      - id: gaming.responsible_gambling
+        label: Responsible gambling / self-exclusion
+      - id: gaming.responsible
+        label: Responsible gambling (alias)
+      - id: gaming.licensing
+        label: Gaming licensing compliance
+  - id: nuclear
+    label: Nuclear safety
+    sub:
+      - id: nuclear.nrc
+        label: US NRC 10 CFR
+      - id: nuclear.power
+        label: Nuclear power reactor operations
+      - id: nuclear.iaea
+        label: IAEA safeguards
+      - id: nuclear.security
+        label: Nuclear security + critical-infrastructure cyber
+  - id: agriculture_compliance
+    label: Agriculture & food production compliance
+    sub:
+      - id: agriculture_compliance.gap
+        label: Good Agricultural Practices (USDA + GlobalGAP)
+      - id: agriculture_compliance.usda
+        label: USDA inspection / labeling
+      - id: agriculture_compliance.fsma
+        label: FSMA Produce Safety Rule (21 CFR 112)
+      - id: agriculture_compliance.organic
+        label: Organic certification (NOP / EU 2018/848)
+  - id: customs
+    label: Customs brokerage & import compliance
+    sub:
+      - id: customs.entry
+        label: Customs entry filing
+      - id: customs.tariff
+        label: HTS classification (customs side)
+      - id: customs.fta
+        label: Free Trade Agreement utilisation
+  - id: transportation
+    label: Transportation & logistics
+  - id: real_estate
+    label: Real estate & construction
+    sub:
+      - id: real_estate.due_diligence
+        label: Property due diligence (title / environmental / structural / zoning)
+      - id: real_estate.underwriting
+        label: Underwriting (commercial / residential)
+  - id: m_and_a
+    label: Mergers & Acquisitions
+    sub:
+      - id: m_and_a.due_diligence
+        label: M&A due diligence (financial / legal / IP / customer / HR / tax)
+      - id: m_and_a.integration
+        label: Post-merger integration
+  - id: aviation
+    label: Aviation
+    sub:
+      - id: aviation.safety
+        label: Aviation safety (NTSB / FAA / ICAO / SMS / ASAP)
+      - id: aviation.maintenance
+        label: Maintenance & airworthiness
+  - id: food_safety
+    label: Food safety & food supply chain
+    sub:
+      - id: food_safety.fsma
+        label: FDA FSMA (Food Safety Modernization Act)
+      - id: food_safety.haccp
+        label: HACCP (Hazard Analysis Critical Control Point)
+      - id: food_safety.recall
+        label: Recall management
+  - id: hospitality
+    label: Hospitality & travel
+  - id: nonprofit
+    label: Nonprofit & civic
+  - id: bureaucracy_translation
+    label: Bureaucracy translation for vulnerable populations
+    sub:
+      - id: bureaucracy_translation.payment_letters
+        label: Payment letter / Inkasso / Mahnung translation
+      - id: bureaucracy_translation.benefits_forms
+        label: Benefits-form translation & advice
+      - id: bureaucracy_translation.fraud_screening
+        label: Document fraud screening (e.g. fake Inkasso)
+  - id: humanitarian
+    label: Humanitarian & migrant protection
+    sub:
+      - id: humanitarian.trafficking
+        label: Anti-trafficking & forced-labor
+      - id: humanitarian.refugee
+        label: Refugee & displacement
+      - id: humanitarian.disaster
+        label: Disaster response
+  - id: defense
+    label: Defense & intelligence
+    sub:
+      - id: defense.dfars
+        label: DFARS / DoD acquisition compliance
+      - id: defense.counterfeit_parts
+        label: Counterfeit parts detection (SAE AS5553)
+      - id: defense.cmmc
+        label: CMMC 2.0 cybersecurity maturity
+  - id: election_integrity
+    label: Election integrity & political process
+    sub:
+      - id: election_integrity.misinformation
+        label: Misinformation / disinformation detection
+      - id: election_integrity.deepfake
+        label: Deepfake / synthetic-media detection
+      - id: election_integrity.voter_registration
+        label: Voter-registration record validation
+  - id: water_utility
+    label: Water utility & drinking water safety
+    sub:
+      - id: water_utility.lcr
+        label: Lead and Copper Rule (LCR / LCRR)
+      - id: water_utility.sdwa
+        label: Safe Drinking Water Act compliance
+      - id: water_utility.scada
+        label: Water utility SCADA cybersecurity (AWIA)
+  - id: scientific_research
+    label: Scientific research
+    sub:
+      - id: scientific_research.bio
+        label: Life sciences research
+      - id: scientific_research.physical
+        label: Physical sciences research
+      - id: scientific_research.social
+        label: Social sciences research
+  - id: software
+    label: Software & developer tools
+    sub:
+      - id: software.codegen
+        label: Code generation
+      - id: software.codereview
+        label: Code review
+      - id: software.devops
+        label: DevOps / SRE
+      - id: software.docs
+        label: Developer docs
+  - id: creative
+    label: Creative & entertainment
+    sub:
+      - id: creative.image
+        label: Image generation
+      - id: creative.video
+        label: Video generation
+      - id: creative.audio
+        label: Audio / music generation
+      - id: creative.writing
+        label: Creative writing
+      - id: creative.game
+        label: Game design
+  - id: personal_productivity
+    label: Personal productivity & assistants
+  - id: ai
+    label: AI / ML systems & tooling (a "vertical" only in the sense that AI itself is a domain — eg LLM red teaming, model evals, RAG infrastructure).
+  - id: cross_industry
+    label: Cross-industry (not tied to one domain)

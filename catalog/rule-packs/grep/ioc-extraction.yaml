@@ -1,0 +1,98 @@
+id: "rule-pack/grep-ioc-extraction"
+type: rule-pack
+version: "0.1.0"
+name: "IOC extraction GREP pack (file hashes / domains / IPs / URLs)"
+description: |
+  Extracts indicators-of-compromise from threat-intel reports,
+  incident write-ups, sandbox outputs. Output IOCs feed into
+  `pipeline/threat-intel-ioc-review` for verification + ATT&CK
+  TTP mapping.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["security", "threat_intelligence"]
+capability: ["extraction", "classification"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["security", "ioc", "stix", "mitre-attack"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+family: "grep"
+rules:
+  - id: "md5_hash"
+    pattern: "\\b[a-fA-F0-9]{32}\\b"
+    severity: "medium"
+    category: "ioc.hash.md5"
+
+  - id: "sha1_hash"
+    pattern: "\\b[a-fA-F0-9]{40}\\b"
+    severity: "medium"
+    category: "ioc.hash.sha1"
+
+  - id: "sha256_hash"
+    pattern: "\\b[a-fA-F0-9]{64}\\b"
+    severity: "high"
+    category: "ioc.hash.sha256"
+
+  - id: "ipv4_address"
+    pattern: "(?<!\\d)(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?!\\d)"
+    severity: "medium"
+    category: "ioc.network.ipv4"
+
+  - id: "defanged_ipv4"
+    pattern: "(?<!\\w)(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\[\\.\\]){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?!\\w)"
+    severity: "medium"
+    category: "ioc.network.ipv4.defanged"
+
+  - id: "domain_with_tld"
+    pattern: "\\b(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+(?:com|net|org|io|co|ru|cn|onion|biz|info|xyz|top|tk|cf|ml|ga)\\b"
+    severity: "medium"
+    category: "ioc.network.domain"
+
+  - id: "defanged_domain"
+    pattern: "\\b[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\[\\.\\][a-zA-Z0-9-]+)+\\b"
+    severity: "medium"
+    category: "ioc.network.domain.defanged"
+
+  - id: "url_http"
+    pattern: "https?://[^\\s\"<>]+"
+    severity: "medium"
+    category: "ioc.network.url"
+
+  - id: "defanged_url"
+    pattern: "hxxps?://[^\\s\"<>]+|https?\\[://\\]"
+    severity: "medium"
+    category: "ioc.network.url.defanged"
+
+  - id: "registry_key"
+    pattern: "(?i)HK(LM|CU|CR|U|CC)\\\\[^\\s\"'<>]+"
+    severity: "medium"
+    category: "ioc.host.registry_key"
+
+  - id: "windows_mutex"
+    pattern: "(?i)\\bGlobal\\\\[a-zA-Z0-9_-]{8,}\\b|\\bLocal\\\\[a-zA-Z0-9_-]{8,}\\b"
+    severity: "medium"
+    category: "ioc.host.mutex"
+
+  - id: "cve_id"
+    pattern: "CVE-(?:1999|2[0-9]{3})-\\d{4,7}"
+    severity: "high"
+    category: "ioc.vuln.cve"
+
+  - id: "mitre_technique_id"
+    pattern: "\\bT\\d{4}(?:\\.\\d{3})?\\b"
+    severity: "medium"
+    category: "ioc.mitre.technique"
+
+  - id: "yara_rule_header"
+    pattern: "(?i)\\brule\\s+[A-Za-z0-9_]+\\s*\\{"
+    severity: "medium"
+    category: "ioc.detection.yara"
+
+  - id: "bitcoin_address"
+    pattern: "\\b(?:[13][a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-z0-9]{39,59})\\b"
+    severity: "medium"
+    category: "ioc.payment.btc_address"

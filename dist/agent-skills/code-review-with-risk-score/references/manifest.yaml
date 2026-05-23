@@ -1,0 +1,115 @@
+id: "pipeline/code-review-with-risk-score"
+type: pipeline
+version: "0.1.0"
+name: "Code review with risk score"
+description: |
+  Full layered code-review pipeline. Composes:
+    persona (senior engineer) →
+    grep (secret-leak guards on the diff) →
+    classifier (clinical-style red-flag screen for OWASP categories) →
+    knowledge-pack (OWASP Top 10 for LLM Apps + MITRE ATT&CK as RAG) →
+    tool (lint runner) →
+    harness (text-safety-review with citation requirements) →
+    rubric (per-claim severity scoring).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["software", "software.codereview", "security"]
+capability: ["reasoning", "code_synthesis", "verification", "safety_gating"]
+modality:   ["text", "code"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+task: |
+  Given a diff (or file contents), produce: (1) a per-finding code-review
+  comment list with file:line, (2) a numeric risk score 0-10 per finding,
+  (3) cited rule (OWASP / CWE / MITRE) for each finding, (4) an overall
+  diff verdict (approve / request-changes / block).
+pipeline_kind: "review_code"
+
+inputs:
+  - name: "diff_text"
+    type: "string"
+  - name: "language_hint"
+    type: "string"
+outputs:
+  - name: "findings"
+    type: "Finding[]"
+  - name: "overall_verdict"
+    type: "enum[approve, request_changes, block]"
+  - name: "overall_risk_score"
+    type: "number"
+
+defaults:
+  persona: "persona/code-consultant"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/owasp-top-10-llm"
+    - "knowledge-pack/mitre-attack-sample"
+  rule_packs:
+    - "rule-pack/grep-cloud-secrets"
+    - "rule-pack/grep-ai-vendor-keys"
+    - "rule-pack/grep-vcs-platform-pats"
+    - "rule-pack/grep-private-key-blocks"
+    - "rule-pack/grep-prompt-injection-heuristics"
+
+steps:
+  - id: "grep_secrets_cloud"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-cloud-secrets"
+    inputs: { text: "$.inputs.diff_text" }
+
+  - id: "grep_secrets_ai"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-ai-vendor-keys"
+    inputs: { text: "$.inputs.diff_text" }
+
+  - id: "grep_secrets_vcs"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-vcs-platform-pats"
+    inputs: { text: "$.inputs.diff_text" }
+
+  - id: "grep_private_keys"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-private-key-blocks"
+    inputs: { text: "$.inputs.diff_text" }
+
+  - id: "retrieve_owasp_context"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/owasp-top-10-llm"
+    inputs:
+      query: "$.inputs.diff_text"
+      top_k: 5
+
+  - id: "retrieve_attack_context"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/mitre-attack-sample"
+    inputs:
+      query: "$.inputs.diff_text"
+      top_k: 5
+
+  - id: "review"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Review this diff. For each finding: file:line, severity, OWASP/CWE/MITRE citation, specific fix proposal. Then give an overall verdict and risk score 0-10."}]
+      context:
+        - "$.steps.grep_secrets_cloud.output.fired"
+        - "$.steps.grep_secrets_ai.output.fired"
+        - "$.steps.grep_secrets_vcs.output.fired"
+        - "$.steps.grep_private_keys.output.fired"
+        - "$.steps.retrieve_owasp_context.output.docs"
+        - "$.steps.retrieve_attack_context.output.docs"
+
+  - id: "verify_citations"
+    kind: "processor"
+    ref: "processor/citation-coverage"
+    inputs:
+      response_markdown: "$.steps.review.output.text"
+
+success_criteria:
+  - rubric: "rubric/clinical-grounded-response-v1"
+    threshold: 0.70

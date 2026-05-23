@@ -1,0 +1,36 @@
+id: "dataset/gdpr-dsar-samples"
+type: dataset
+version: "0.1.0"
+name: "Synthetic GDPR DSAR samples"
+description: |
+  Two synthetic DSARs:
+   - clean: identity verified, 14-day response, all Art. 15 fields,
+     no-transfer, free of charge. Expected 0 hits.
+   - flagged: 2.5 months past deadline, no identity verification,
+     no lawful basis, US transfer without SCC, $25 charge, erasure
+     refused without basis, special-category without art 9(2),
+     breach notification delayed. Expected many critical hits.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["privacy", "privacy.gdpr", "privacy.dsar", "compliance"]
+capability: ["evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["gdpr", "dsar", "synthetic"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+splits:
+  test:
+    rows: 2
+    path: "data/gdpr-samples/"
+record_schema: "schemas/dsar.schema.json"
+provenance:
+  origin: "Fully synthetic"
+  collected_by: "Open Harness Hub contributors"
+  collected_through: "2026-05-20"
+  license: "MIT"
+  anonymization: "fully synthetic"

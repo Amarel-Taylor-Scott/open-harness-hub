@@ -1,0 +1,43 @@
+id: "processor/citation-coverage"
+type: processor
+version: "0.1.0"
+name: "Citation coverage verifier"
+description: |
+  Verify that every factual sentence in a response carries at least
+  one citation marker (e.g. `[1]`, `[smith-2026]`). Returns coverage
+  ratio and a list of uncited sentences for re-prompt.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["verification"]
+modality:   ["text"]
+lifecycle:  "beta"
+lifecycle_position: "post_api.evaluation"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "verify.citation_coverage"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 80
+
+inputs:
+  - name: "response_markdown"
+    type: "string"
+outputs:
+  - name: "coverage"
+    type: "number"
+  - name: "uncited_sentences"
+    type: "string[]"
+  - name: "passes"
+    type: "boolean"
+
+side_effects: "none"
+on_error: "continue"
+
+implementations:
+  - kind: "callable"
+    path: "processors.citation_coverage.run"

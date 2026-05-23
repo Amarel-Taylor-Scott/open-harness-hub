@@ -1,0 +1,18 @@
+# Controlled vocabulary: trust boundaries.
+#
+# Where the data lives, and what crosses which line. Every artifact that
+# touches input or makes an outbound call MUST declare a trust boundary.
+
+trust_boundaries:
+  - id: local
+    label: Local — stays on the user's machine, never leaves the process.
+  - id: hub
+    label: Hub — content may be synced to the public Open Harness Hub.
+      Implies anonymization gate before sync.
+  - id: external
+    label: External — content is sent to a third party (model provider,
+      search engine, MCP server, OpenAPI endpoint).
+  - id: mixed
+    label: Mixed — different parts of the artifact have different boundaries
+      (raw stays local, derived metadata goes external). Document the split
+      explicitly in `privacy_boundaries`.

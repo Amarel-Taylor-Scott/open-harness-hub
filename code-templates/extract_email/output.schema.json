@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/code-templates/extract_email/output.schema.json",
+  "title": "extract_email output",
+  "type": "object",
+  "required": ["emails", "count"],
+  "properties": {
+    "emails": {
+      "type": "array",
+      "items": { "type": "string", "format": "email" },
+      "uniqueItems": true
+    },
+    "count": { "type": "integer", "minimum": 0 }
+  },
+  "additionalProperties": false
+}

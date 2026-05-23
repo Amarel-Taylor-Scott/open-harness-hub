@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "extract_phone_e164 output",
+  "type": "object",
+  "required": ["phones_e164", "count"],
+  "properties": {
+    "phones_e164": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^\\+[1-9]\\d{7,14}$" },
+      "uniqueItems": true
+    },
+    "count": { "type": "integer", "minimum": 0 }
+  },
+  "additionalProperties": false
+}

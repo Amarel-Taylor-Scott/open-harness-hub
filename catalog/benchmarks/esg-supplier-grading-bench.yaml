@@ -1,0 +1,57 @@
+id: "benchmark/esg-supplier-grading-bench"
+type: benchmark
+version: "0.1.0"
+name: "ESG supplier-grading benchmark v1"
+description: |
+  Runs `pipeline/supplier-policy-grading` against the synthetic
+  supplier disclosure pack test set (3 representative cases: a well-
+  disclosed T1 tech supplier; a T3 textile supplier in Mae Sot with
+  forced-labor + corridor red flags; a T2 Paraguay soy supplier with
+  mixed signals — strong S, weak E around deforestation).
+
+  Scores under `rubric/esg-supplier-compliance-v1` and reports per-
+  dimension breakdown so reviewers can see WHERE a model arm
+  succeeds vs fails (E vs S vs G vs cross-cutting), not just the
+  headline weighted-sum.
+
+  Used as a regression gate for the ESG vertical: any change to
+  rule-pack/grep-esg-* or the persona must keep headline metric
+  within ±0.05 of baseline.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["esg", "supply_chain", "compliance"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+tags: ["esg", "regression-gate"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+pipeline: "pipeline/supplier-policy-grading"
+dataset:  "dataset/supplier-disclosure-pack-schema"
+rubric:   "rubric/esg-supplier-compliance-v1"
+judge:    "local_model"
+model_arms:
+  - label:       "ollama-llama3-8b-default"
+    adapter_ref: "adapter/ollama-default"
+  - label:       "vllm-qwen2.5-32b-awq"
+    adapter_ref: "adapter/vllm-awq-local"
+headline_metric: "rubric_score_weighted_sum"
+
+reproducibility:
+  commit_sha:      "TBD"
+  dataset_version: "0.1.0"
+  run_date:        "2026-05-19"
+  hardware:        "Apple M1 (16GB) for ollama arm; T4 16GB for vLLM arm"
+  seed:            42
+
+report:
+  output:  "reports/esg-supplier-grading-bench/"
+  summary: |
+    For each model arm × test case: report per-dimension scores (12
+    rubric dimensions, grouped into E / S / G / cross-cutting),
+    confusion vs gold labels, retrieval-coverage of cited articles,
+    and time-to-grade. Surface dimension-level regressions when
+    rerunning against new pipeline versions.

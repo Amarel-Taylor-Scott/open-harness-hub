@@ -1,0 +1,67 @@
+id: "pattern/source-document-to-persistent-knowledge-layer"
+type: pattern
+version: "0.1.0"
+name: "Source document → persistent knowledge layer"
+description: "Architectural pattern: instead of treating each chat turn as ephemeral, encode the source document as a long-lived knowledge layer (wiki pages + concept graph + study guide + bookmarks + notes) stored in a local DB. The chat becomes a thin UI on top of this layer rather than the layer itself. Generalizes from CiteMind (PDF) to compliance audit notes, regulatory frameworks, supply-chain disclosures."
+authors: [{ name: "CiteMind team (upstream)" }, { name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["education", "compliance", "esg", "research", "legal"]
+capability:  ["extraction", "retrieval", "format_conversion"]
+modality:    ["text"]
+lifecycle:   "beta"
+trust_boundary: "local"
+created: "2026-05-21"
+updated: "2026-05-21"
+
+attribution:
+  source_url: "https://huggingface.co/spaces"
+  source_kind: "huggingface"
+  author: "CiteMind team (Gemma 4 Good Hackathon, composite)"
+  license: "TBD — pending upstream confirmation"
+
+when_to_use:
+  - "Documents the user returns to repeatedly — textbooks, regulatory frameworks, contracts, scientific papers."
+  - "Workflows where each chat turn alone is insufficient — research, due diligence, audit, study."
+  - "Where collaborators need to share the structured layer (wiki, graph, notes) not just the chat history."
+
+structural_shape:
+  - "step 1 — ingest source document into local store (chunks + embeddings + page anchors)"
+  - "step 2 — extract structured artifacts: section summaries, key terms, claims, methods, equations, people, datasets, relationships"
+  - "step 3 — persist structured artifacts as wiki pages + concept graph + study guide"
+  - "step 4 — chat becomes a thin UI over the persistent layer — answers reference the same artifacts"
+  - "step 5 — user-generated annotations (bookmarks + notes) accumulate onto the layer"
+  - "step 6 — assistant + tools share state; subsequent sessions resume the structured layer"
+
+problem: |
+  "Chat with PDF" implementations discard the model's structured understanding
+  of the document at the end of each session — every new question re-derives
+  the same concept map from scratch. For users who return to a document
+  repeatedly (researchers, students, auditors, lawyers), this wastes both
+  human and model effort + prevents the formation of shared, citable
+  artifacts the team can rely on.
+
+solution: |
+  Encode the source document as a *persistent knowledge layer* in a local
+  database: wiki pages, concept graph nodes + edges, study guide, key term
+  glossary, bookmarks, notes, chat history. Each artifact carries a source
+  pointer (page + span). The chat becomes a thin UI surfacing the layer +
+  letting the user extend it; the model's role is to populate + maintain
+  the layer rather than answer one-off questions in isolation. Subsequent
+  sessions resume the layer rather than starting from scratch.
+
+examples:
+  - context: "Researcher studying a textbook chapter over multiple weeks"
+    application: "Concept graph accumulates as terms + claims + methods are extracted; user adds personal notes against nodes."
+  - context: "Compliance auditor working through 40 CFR Part 261 + 262 + 263"
+    application: "Each part becomes a wiki page with cross-references via concept graph; auditor can trace e.g. 'LDR' across all three."
+  - context: "ESG team reviewing a CSDDD-compliance disclosure"
+    application: "Disclosed facts become graph nodes; gaps + claims-without-evidence are visible as un-anchored nodes."
+
+implementing_pipelines:
+  - "pipeline/citemind-pdf-to-research-wiki"
+
+related_patterns:
+  - "pattern/local-first-with-cited-answers"
+  - "pattern/concept-graph-from-text"
+
+tags: ["knowledge-layer", "persistent", "wiki", "graph"]

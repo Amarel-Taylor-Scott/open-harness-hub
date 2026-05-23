@@ -1,0 +1,53 @@
+# Controlled vocabulary: lifecycle position.
+#
+# Where an artifact sits in the request lifecycle. Single dot-separated
+# string. Stage is required; role is recommended.
+#
+# An artifact's lifecycle_position is INDEPENDENT of its lifecycle
+# (experimental/beta/stable/deprecated). One is "where in the flow",
+# the other is "how mature".
+#
+# Suggested values:
+
+lifecycle_position:
+  - id: pre_api
+    label: Pre-API call — input shaping and gating before the model is invoked.
+    roles:
+      - id: pre_api.input_gating
+        label: Input gating — PII / secrets / prohibited-term gates.
+      - id: pre_api.context_assembly
+        label: Context assembly — persona, RAG retrieval, prompt templating, knowledge packs.
+      - id: pre_api.classification
+        label: Classification — red flags, typology pre-scoring, routing.
+      - id: pre_api.query_sanitization
+        label: Query sanitization — outbound search query rewriting and allowlist.
+
+  - id: api
+    label: API call — the model invocation and its tool calls.
+    roles:
+      - id: api.model_call
+        label: Model call — adapter + harness wrapping the model call.
+      - id: api.tool_call
+        label: Tool call — function-call tools invoked by the model.
+
+  - id: post_api
+    label: Post-API call — output processing, safety, evaluation, audit.
+    roles:
+      - id: post_api.output_safety
+        label: Output safety — NSFW, IP, watermark, citation-coverage screens.
+      - id: post_api.format_coercion
+        label: Format coercion — JSON repair, schema validation, structured-output verification.
+      - id: post_api.evaluation
+        label: Evaluation — rubrics, judges, scoring.
+      - id: post_api.audit
+        label: Audit — trace formatting, audit-log emission, provenance attachment.
+
+  - id: cross_cutting
+    label: Cross-cutting — used at multiple lifecycle stages.
+    roles:
+      - id: cross_cutting.composition
+        label: Composition — pipelines that compose pre/api/post artifacts.
+      - id: cross_cutting.evaluation
+        label: Evaluation — benchmarks that compose pipelines + datasets + rubrics.
+      - id: cross_cutting.data
+        label: Data — datasets and shared schemas.

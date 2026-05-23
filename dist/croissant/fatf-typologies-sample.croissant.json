@@ -1,0 +1,144 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/fatf-typologies-sample",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "FATF typologies (sample chunks)",
+  "description": "Sample paraphrased typology chunks for catalog-demo purposes. Real\ndeployments should ingest the latest FATF and FinCEN typology\nreports; this pack anchors the data shape and citation pattern.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC-BY-4.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/fatf-typologies-sample",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-19",
+  "keywords": [
+    "retrieval"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-19",
+  "citation": "Composite paraphrases of public FATF typology reports",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "fatf-typologies-sample__fatf-typologies",
+      "name": "fatf-typologies.jsonl",
+      "description": "Data file backing knowledge pack fatf-typologies-sample.",
+      "contentUrl": "knowledge-packs/data/fatf-typologies.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "1701 B",
+      "sha256": "c2664da1b70792a6682ea05ae4339b2631a86e9933f74d547d15026b11a2ac1b"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "fatf-typologies-sample__records",
+      "name": "fatf-typologies-sample__records",
+      "description": "Records parsed from fatf-typologies.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "fatf-typologies-sample__records/id",
+          "name": "id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "fatf-typologies-sample__fatf-typologies"
+            },
+            "extract": {
+              "column": "id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "fatf-typologies-sample__records/report",
+          "name": "report",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "fatf-typologies-sample__fatf-typologies"
+            },
+            "extract": {
+              "column": "report"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "fatf-typologies-sample__records/section",
+          "name": "section",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "fatf-typologies-sample__fatf-typologies"
+            },
+            "extract": {
+              "column": "section"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "fatf-typologies-sample__records/text",
+          "name": "text",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "fatf-typologies-sample__fatf-typologies"
+            },
+            "extract": {
+              "column": "text"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

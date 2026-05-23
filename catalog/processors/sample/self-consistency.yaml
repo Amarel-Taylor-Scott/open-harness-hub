@@ -1,0 +1,63 @@
+id: "processor/self-consistency-sampler"
+type: processor
+version: "0.1.0"
+name: "Self-consistency sampler"
+description: |
+  Run N parallel samples of a chain-of-thought reasoning prompt, then
+  majority-vote on the final answer (Wang et al. 2023). Robust to
+  arithmetic and reasoning errors that a single sample would miss.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["reasoning", "evaluation"]
+modality:   ["text"]
+lifecycle:  "beta"
+lifecycle_position: "post_api.evaluation"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "sample.self_consistency"
+deterministic: false
+idempotent: true
+streaming: false
+latency_budget_ms: 15000
+
+inputs:
+  - name: "prompt"
+    type: "string"
+  - name: "n_samples"
+    type: "integer"
+  - name: "temperature"
+    type: "number"
+  - name: "answer_extractor"
+    type: "string"
+outputs:
+  - name: "final_answer"
+    type: "string"
+  - name: "vote_distribution"
+    type: "object"
+  - name: "samples"
+    type: "string[]"
+  - name: "confidence"
+    type: "number"
+
+side_effects: "external_call"
+on_error: "fallback"
+retry:
+  max_attempts: 2
+  backoff: "exponential"
+
+model_targets:
+  - id: "primary"
+    label: "Primary model under evaluation"
+    transport: "ollama"
+    role: "Generates N samples in parallel"
+    required: true
+    default: true
+    trust_boundary: "local"
+
+implementations:
+  - kind: "callable"
+    path: "processors.self_consistency.run"

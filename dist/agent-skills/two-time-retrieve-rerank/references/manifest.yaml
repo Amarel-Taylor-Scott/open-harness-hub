@@ -1,0 +1,81 @@
+id: "pipeline/two-time-retrieve-rerank"
+type: pipeline
+version: "0.1.0"
+name: "Two-time retrieval + cross-encoder rerank"
+description: |
+  Generic two-pass retrieval pipeline distilled from the EEDI-AWQ
+  shape. First-pass: retrieve top-K with the raw query. Refine the
+  query using LLM summary of pass-1. Second-pass: retrieve top-K' with
+  the refined query. Union, dedupe, cross-encoder rerank. Final
+  output ranked candidates.
+
+  Verified by Open Harness Hub mining of takanashihumbert "EEDI Qwen-2.5
+  32B AWQ two-time retrieval" (650 votes). The shape generalises to
+  any RAG task where the user's first query is under-specified.
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "education", "scientific_research"]
+capability: ["retrieval", "reranking"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+lifecycle_position: "pre_api.rag"
+tags: ["rag", "two-pass", "cross-encoder", "kaggle-verified"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url:  "https://www.kaggle.com/code/takanashihumbert/eedi-qwen-2-5-32b-awq-two-time-retrieval"
+  source_kind: "kaggle"
+  author:      "takanashihumbert (650 votes)"
+  license:     "Apache-2.0"
+
+task: |
+  Two-pass retrieval over a corpus, with LLM-driven query refinement
+  between passes and cross-encoder rerank at the end.
+pipeline_kind: "rag"
+
+inputs:
+  - name: "query"
+    type: "string"
+  - name: "corpus_ref"
+    type: "artifact_id"
+  - name: "final_k"
+    type: "integer"
+outputs:
+  - name: "ranked"
+    type: "object[]"
+  - name: "refined_query"
+    type: "string"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+
+steps:
+  - id: "two_time"
+    kind: "processor"
+    ref: "processor/two-time-retrieval"
+    inputs:
+      query:         "$.inputs.query"
+      corpus_ref:    "$.inputs.corpus_ref"
+      first_pass_k:  25
+      second_pass_k: 25
+
+  - id: "rerank"
+    kind: "processor"
+    ref: "processor/cross-encoder-reranker"
+    inputs:
+      query:      "$.steps.two_time.output.refined_query"
+      candidates: "$.steps.two_time.output.candidates"
+      output_k:   "$.inputs.final_k"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "two-time-retrieve-rerank"
+      applied_layers: ["rag", "rerank"]
+
+success_criteria: []

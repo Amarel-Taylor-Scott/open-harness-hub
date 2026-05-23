@@ -1,0 +1,48 @@
+
+=== GxP Validation Review ===
+
+  sample-flagged-MES.json                                  C: 3  H: 4  M: 1  L: 0  total 8
+      [critical ] audit_trail_disabled                 gxp.audit_trail.disabled
+      [critical ] shared_account                       gxp.shared_account
+      [critical ] post_hoc_alteration                  gxp.post_hoc_alteration
+      [high     ] validation_missing                   gxp.validation.missing
+      [high     ] missing_reason_for_change            gxp.reason_for_change.missing
+      [high     ] missing_signature_meaning            gxp.signature.no_meaning
+      [high     ] single_factor_signature              gxp.signature.single_factor
+      [medium   ] backup_treated_as_archive            gxp.backup_not_archive
+
+  sample-mixed-CTMS.json                                   C: 0  H: 1  M: 2  L: 0  total 3
+      [medium   ] test_data_in_production              gxp.test_data_in_prod
+      [medium   ] unrestricted_blank_template          gxp.uncontrolled_template
+      [high     ] missing_audit_trail_review           gxp.audit_trail.unreviewed
+
+  sample-validated-LIMS.json                               C: 0  H: 0  M: 0  L: 0  total 0
+
+=== Climate Disclosure Review ===
+
+  sample-disclosure-flagged.json                           C: 2  H: 5  M: 2  L: 0  total 9
+      [critical ] scope_3_not_measured                 climate.scope_3.not_measured
+      [critical ] no_transition_plan                   climate.no_transition_plan
+      [high     ] no_sbti_commitment                   climate.no_sbti
+      [high     ] no_board_oversight                   climate.governance.no_board
+      [high     ] no_scenario_analysis                 climate.no_scenario_analysis
+      [medium   ] no_third_party_assurance             climate.no_assurance
+      [medium   ] scope_2_market_only                  climate.scope_2.market_only
+      [high     ] transition_risk_not_assessed         climate.transition_risk.unassessed
+      [high     ] physical_risk_not_assessed           climate.physical_risk.unassessed
+
+  sample-disclosure-good.json                              C: 0  H: 0  M: 1  L: 0  total 1
+      [medium   ] offsetting_without_disclosure        climate.offset_only_pathway
+
+=== Threat-Intel IOC + TTP Review ===
+
+  sample-cti-report-flagged.json                           C: 0  H: 1  M: 8  L: 0  total 9
+      [medium   ] md5_hash                             ioc.hash.md5
+      [medium   ] sha1_hash                            ioc.hash.sha1
+      [medium   ] ipv4_address                         ioc.network.ipv4
+      [medium   ] defanged_domain                      ioc.network.domain.defanged
+      [medium   ] defanged_url                         ioc.network.url.defanged
+      [medium   ] windows_mutex                        ioc.host.mutex
+      [high     ] cve_id                               ioc.vuln.cve
+      [medium   ] mitre_technique_id                   ioc.mitre.technique
+      [medium   ] bitcoin_address                      ioc.payment.btc_address

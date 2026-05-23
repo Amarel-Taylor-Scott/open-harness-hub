@@ -1,0 +1,45 @@
+id: "processor/verify-regex-criterion"
+type: processor
+version: "0.1.0"
+name: "Regex success-criterion evaluator"
+description: |
+  Evaluates one `kind: regex` success criterion. Given a target
+  path (resolved from the pipeline trace) + a pattern + a
+  `must_match` flag, returns a pass/fail record with the matched
+  span (if any).
+
+  Use in `success_criteria:` lists alongside other criterion kinds
+  (semantic / llm_judge / deterministic / tool_validate / composite).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["verification", "evaluation"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "post_api.verify"
+tags: ["success-criterion", "regex", "verification"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+process_kind: "verify.regex_criterion"
+deterministic: true
+side_effects: "none"
+
+inputs:
+  - name: "target_text"
+    type: "string"
+  - name: "pattern"
+    type: "string"
+  - name: "must_match"
+    type: "boolean"
+  - name: "case_insensitive"
+    type: "boolean"
+outputs:
+  - name: "pass"
+    type: "boolean"
+  - name: "match"
+    type: "string|null"
+  - name: "match_count"
+    type: "integer"

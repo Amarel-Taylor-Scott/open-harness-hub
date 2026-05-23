@@ -1,0 +1,201 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/sanctions-list-shape",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Sanctions list (shape, with placeholder entries)",
+  "description": "Reference SHAPE for sanctions list integration. Real data must be\npulled from OFAC, UN, EU, HMT, or the institution's licensed\nprovider; this pack illustrates the row schema, not the entries.\nEach row is an entity (individual or organization) with\nnormalized name, source list, listing date, and aliases.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC0-1.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/sanctions-list-shape",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-19",
+  "keywords": [
+    "retrieval",
+    "verification"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-19",
+  "citation": "Synthetic placeholder rows. Use OFAC SDN / UN / EU lists in production.",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "sanctions-list-shape__sanctions-shape",
+      "name": "sanctions-shape.jsonl",
+      "description": "Data file backing knowledge pack sanctions-list-shape.",
+      "contentUrl": "knowledge-packs/data/sanctions-shape.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "717 B",
+      "sha256": "28ca43a931df4103c728f4db0ab0fe4b3edf0896ee75d54d2f00ac9da7341381"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "sanctions-list-shape__records",
+      "name": "sanctions-list-shape__records",
+      "description": "Records parsed from sanctions-shape.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "sanctions-list-shape__records/entity_id",
+          "name": "entity_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "sanctions-list-shape__sanctions-shape"
+            },
+            "extract": {
+              "column": "entity_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "sanctions-list-shape__records/kind",
+          "name": "kind",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "sanctions-list-shape__sanctions-shape"
+            },
+            "extract": {
+              "column": "kind"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "sanctions-list-shape__records/name",
+          "name": "name",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "sanctions-list-shape__sanctions-shape"
+            },
+            "extract": {
+              "column": "name"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "sanctions-list-shape__records/normalized_name",
+          "name": "normalized_name",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "sanctions-list-shape__sanctions-shape"
+            },
+            "extract": {
+              "column": "normalized_name"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "sanctions-list-shape__records/aliases",
+          "name": "aliases",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "sanctions-list-shape__sanctions-shape"
+            },
+            "extract": {
+              "column": "aliases"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "sanctions-list-shape__records/source_list",
+          "name": "source_list",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "sanctions-list-shape__sanctions-shape"
+            },
+            "extract": {
+              "column": "source_list"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "sanctions-list-shape__records/listed_on",
+          "name": "listed_on",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "sanctions-list-shape__sanctions-shape"
+            },
+            "extract": {
+              "column": "listed_on"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "sanctions-list-shape__records/program",
+          "name": "program",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "sanctions-list-shape__sanctions-shape"
+            },
+            "extract": {
+              "column": "program"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

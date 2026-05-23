@@ -1,0 +1,71 @@
+id: "processor/checklist-evaluator"
+type: processor
+version: "0.1.0"
+name: "Checklist evaluator (GO/NO-GO)"
+description: "Reads a named procedural checklist (knowledge-pack/technician-checklists record) plus a candidate input, returns per-item disposition (verified|unverified|nogo) + overall verdict (go|nogo). NO-GO triggers override otherwise-clean inputs."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["compliance", "healthcare", "aviation", "energy", "construction"]
+capability: ["safety_gating", "evaluation", "extraction"]
+modality:   ["text", "structured"]
+lifecycle:  "beta"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+created: "2026-05-21"
+updated: "2026-05-21"
+
+family: "deterministic"
+process_kind: "evaluation.checklist_gate"
+deterministic: true
+side_effects: "none"
+inputs:
+  - name: "candidate"
+    type: "string|object"
+    description: "Free-text narrative or structured evidence packet to evaluate"
+  - name: "checklist_id"
+    type: "string"
+    description: "id within knowledge-pack/technician-checklists (e.g. who-ssc, faa-before-takeoff, msha-preshift)"
+
+outputs:
+  - name: "verdict"
+    type: "string"
+    description: "go | nogo"
+  - name: "items"
+    type: "object[]"
+    description: "[{step_id, status: verified|unverified|nogo, evidence: '...'}]"
+  - name: "nogo_triggers"
+    type: "string[]"
+    description: "List of triggered NO-GO conditions"
+  - name: "checklist_version"
+    type: "string"
+
+algorithm: |
+  1. Load checklist record by checklist_id from
+     knowledge-pack/technician-checklists.
+  2. For each step in checklist.steps:
+       - keyword-presence match in candidate (case-insensitive token match
+         on procedural keywords from the step text)
+       - if matched → status: verified; else status: unverified
+  3. For each trigger in checklist.go_nogo:
+       - keyword-presence match in candidate; if matched → record trigger
+         in nogo_triggers
+  4. Verdict:
+       - nogo if (any nogo_trigger fired) OR (count(unverified) ≥ ceil(0.5 *
+         total_steps))
+       - else go
+  5. Emit items[] + nogo_triggers + verdict + checklist version
+
+  NOTE: deterministic, no model inference. Designed to be paired with
+  processor/llm-judge which evaluates the candidate's narrative quality, but
+  the checklist verdict OVERRIDES the judge — a high-quality narrative that
+  triggers a NO-GO is still NO-GO.
+
+required_artifacts:
+  - "knowledge-pack/technician-checklists"
+
+related:
+  - "pattern/go-nogo-checklist-gate"
+  - "processor/llm-judge"
+  - "processor/audit-trace-emitter"
+
+tags: ["deterministic", "gate", "human-performance"]

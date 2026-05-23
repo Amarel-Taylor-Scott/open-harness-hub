@@ -1,0 +1,91 @@
+id: "rule-pack/hybrid-retrieval-policy"
+type: rule-pack
+version: "0.1.0"
+name: "Hybrid retrieval policy (BM25 + dense + RRF)"
+description: |
+  A RAG retrieval policy pack: BM25 sparse + dense vector + Reciprocal
+  Rank Fusion + optional cross-encoder reranking + 1-hop citation
+  graph expansion. Pipelines and harnesses reference this pack to keep
+  retrieval behaviour consistent across the catalog.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["retrieval"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["rag", "hybrid-retrieval", "rrf", "bm25", "dense"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+family: "rag"
+rules:
+  - id: "bm25_default"
+    label: "BM25 sparse retrieval"
+    pattern: "bm25(k1=1.2, b=0.75)"
+    severity: "info"
+    category: "retrieval.sparse"
+    notes: "Always run BM25; cheap, strong baseline."
+
+  - id: "dense_optional"
+    label: "Dense retrieval via configured embedder"
+    pattern: "dense(embedder='processor/embedder-minilm', top_k=20)"
+    severity: "info"
+    category: "retrieval.dense"
+    notes: "Run dense retrieval in parallel when an embedder is configured."
+
+  - id: "rrf_merge"
+    label: "Reciprocal Rank Fusion merge"
+    pattern: "rrf(k=60, top_k=10)"
+    severity: "info"
+    category: "retrieval.fusion"
+    notes: "Merge BM25 + dense ranked lists by RRF (Cormack et al. 2009)."
+
+  - id: "rerank_optional"
+    label: "Cross-encoder reranker"
+    pattern: "rerank(model='processor/cross-encoder-reranker', top_k=10, output_k=5)"
+    severity: "info"
+    category: "retrieval.rerank"
+    notes: "Apply reranker on the top-10 candidates if a reranker is configured."
+
+  - id: "citation_graph_expand"
+    label: "1-hop citation graph expansion"
+    pattern: "citation_graph(hops=1, max_expand=5)"
+    severity: "info"
+    category: "retrieval.graph"
+    notes: "Pull in 1-hop citation neighbours for the top-k retrieved docs."
+
+  - id: "redact_chunks_if_pii"
+    label: "Redact PII in retrieved chunks before model sees them"
+    pattern: "redact(rule_pack='rule-pack/privacy-pii-text-en')"
+    severity: "high"
+    category: "retrieval.safety"
+    notes: "Defense against indirect prompt injection / PII leakage from corpus."
+
+  - id: "freshness_window_default"
+    label: "Default freshness window"
+    pattern: "freshness_days=180"
+    severity: "info"
+    category: "retrieval.freshness"
+    notes: "Skip documents older than 180 days when `freshness: dated`."
+
+  - id: "top_k_default"
+    label: "Default top-k after all stages"
+    pattern: "top_k=10"
+    severity: "info"
+    category: "retrieval.budget"
+
+  - id: "max_chunk_tokens_default"
+    label: "Default max chunk tokens"
+    pattern: "max_chunk_tokens=512"
+    severity: "info"
+    category: "retrieval.budget"
+
+  - id: "min_score_threshold"
+    label: "Drop low-similarity chunks"
+    pattern: "min_score=0.30"
+    severity: "low"
+    category: "retrieval.quality"
+    notes: "Avoid feeding semantically-distant context that distracts the model."

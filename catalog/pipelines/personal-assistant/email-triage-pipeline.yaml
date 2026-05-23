@@ -1,0 +1,89 @@
+id: "pipeline/email-triage-pipeline"
+type: pipeline
+version: "0.1.0"
+name: "Email triage pipeline (preference-loaded, tone-matched, leakage-checked)"
+description: |
+  Concrete pipeline wrapping `harness/email-triage-and-draft`.
+  Loads user prefs + recipient tone → triages each thread → drafts
+  replies → leakage-checks each draft → returns thread decisions.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["personal_productivity", "cross_industry"]
+capability: ["dialogue", "summarization", "routing", "memory"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.email_triage"
+tags: ["email", "inbox-zero", "personal-assistant"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+task: "Triage inbox + draft replies + leakage-check each draft."
+pipeline_kind: "agent_loop"
+
+inputs:
+  - name: "user_id"
+    type: "string"
+  - name: "inbox"
+    type: "object[]"
+outputs:
+  - name: "thread_decisions"
+    type: "object[]"
+  - name: "drafts"
+    type: "object[]"
+  - name: "leakage_audit"
+    type: "object[]"
+
+defaults:
+  persona: "persona/inbox-zero-coach"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/grep-personal-info-leakage"
+  knowledge_packs:
+    - "knowledge-pack/user-preference-schema"
+
+steps:
+  - id: "load_prefs"
+    kind: "processor"
+    ref: "processor/preference-loader"
+    inputs:
+      user_id: "$.inputs.user_id"
+      scope:   "communication"
+  - id: "load_tone_history"
+    kind: "processor"
+    ref: "processor/recipient-tone-history"
+    inputs:
+      recipient_id: "$.inputs.inbox"
+      history_window: 5
+  - id: "triage_and_draft"
+    kind: "harness"
+    ref: "harness/email-triage-and-draft"
+    inputs:
+      user_id: "$.inputs.user_id"
+      inbox:   "$.inputs.inbox"
+  - id: "leakage_check"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-personal-info-leakage"
+    inputs:
+      text: "$.steps.triage_and_draft.output.drafts"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "email-triage-pipeline"
+      applied_layers: ["persona", "memory", "tone_match", "draft", "leakage_check"]
+
+success_criteria:
+  - kind: deterministic
+    label: "no critical personal-info leakage in drafts"
+    target: "$.steps.leakage_check.output.hit_count"
+    op: "=="
+    value: 0
+    severity: critical
+  - kind: deterministic
+    label: "preferences loaded"
+    target: "$.steps.load_prefs.output.preferences"
+    op: "is_truthy"
+    value: null
+    severity: high

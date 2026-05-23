@@ -1,0 +1,57 @@
+id: "processor/hyde-query-expander"
+type: processor
+version: "0.1.0"
+name: "HyDE query expander"
+description: |
+  Hypothetical Document Embeddings (HyDE): generate a hypothetical
+  *answer* to the user's query, then embed that hypothetical answer
+  for retrieval instead of (or in addition to) the original query.
+  Often improves recall on questions that don't share vocabulary
+  with the source documents.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["retrieval", "generation"]
+modality:   ["text"]
+lifecycle:  "beta"
+lifecycle_position: "pre_api.query_sanitization"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "query.hyde"
+deterministic: false
+idempotent: true
+streaming: false
+latency_budget_ms: 1500
+
+inputs:
+  - name: "query"
+    type: "string"
+  - name: "domain_hint"
+    type: "string"
+outputs:
+  - name: "hypothetical_answer"
+    type: "string"
+  - name: "expanded_query"
+    type: "string"
+
+side_effects: "external_call"
+on_error: "fallback"
+
+model_targets:
+  - id: "local_small_model"
+    label: "Small local model for HyDE generation"
+    transport: "ollama"
+    role: "Fast generation of a hypothetical answer; quality is secondary to recall."
+    required: false
+    default: true
+    trust_boundary: "local"
+
+implementations:
+  - kind: "callable"
+    path: "processors.hyde.run"
+
+  - kind: "openapi"
+    url: "https://api.example.com/hyde"

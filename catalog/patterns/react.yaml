@@ -1,0 +1,67 @@
+id: "pattern/react"
+type: pattern
+version: "0.1.0"
+name: "ReAct (Reason + Act)"
+description: |
+  Interleave reasoning steps with tool calls. At each step the model
+  emits one of: Thought (free-form reasoning), Action (tool call),
+  Observation (tool result fed back). Loop until the model emits a
+  Finish action. The canonical agentic loop.
+authors:
+  - name: "Yao, Zhao, Yu, Du, Shafran, Narasimhan, Cao (2022)"
+license: "CC-BY-4.0"
+industry:   ["ai", "cross_industry"]
+capability: ["reasoning", "tool_use", "agent_loop"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "mixed"
+tags: ["agent", "react", "tool-use"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+paper_url: "https://arxiv.org/abs/2210.03629"
+paper_citation: "Yao et al. 2022, ReAct: Synergizing Reasoning and Acting in Language Models"
+reference_implementations:
+  - { url: "https://github.com/langchain-ai/langgraph/tree/main/examples", language: "python", framework: "langgraph" }
+  - { url: "https://github.com/Alibaba-NLP/DeepResearch", language: "python" }
+
+structural_shape:
+  - "system prompt: ReAct format directive (Thought / Action / Observation)"
+  - "loop:"
+  - "  model emits Thought + Action"
+  - "  runtime executes Action (tool call)"
+  - "  Observation appended to context"
+  - "  break when Action == Finish"
+  - "return final answer"
+
+when_to_use:
+  - "Agentic workflows with explicit tool calls"
+  - "When you want the reasoning trace inspectable"
+  - "Multi-step interactive tasks (web research, code-act)"
+
+when_not_to_use:
+  - "Single-shot Q&A where no tools are needed"
+  - "When inference cost is paramount (each step is an LLM call)"
+
+variants:
+  - "ReAct with reflection: append self-reflection between steps (Reflexion)"
+  - "Multi-trajectory ReAct: sample N rollouts, vote (Alibaba DeepResearch)"
+  - "Code-Act: Action is Python code executed in a sandbox (OpenInterpreter)"
+  - "PoT (Program-of-Thought): Action is always code"
+
+counter_patterns:
+  - "pattern/plan-and-execute (separate planning from execution)"
+
+implementing_pipelines:
+  - "pipeline/plan-execute-critic-loop"
+
+implementing_processors:
+  - "processor/iterative-revise-loop"
+  - "processor/cost-ceiling-gate"
+
+tradeoffs:
+  latency: "Variable — N×model latency, N often 3-10"
+  cost: "Variable — N×model cost"
+  quality: "Strong for tool-heavy tasks"
+  complexity: "Medium — needs reliable parsing of Thought/Action"
+  explainability: "High — full trace is inspectable"

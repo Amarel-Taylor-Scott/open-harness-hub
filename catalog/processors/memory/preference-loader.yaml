@@ -1,0 +1,45 @@
+id: "processor/preference-loader"
+type: processor
+version: "0.1.0"
+name: "User preference loader"
+description: |
+  Load the user's preference file from
+  `knowledge-pack/user-preference-schema` (or per-user overrides),
+  resolve any inheritance from defaults, and emit a structured
+  preference object that downstream steps can consult.
+
+  Used at the start of any personal-assistant harness execution
+  to ensure preferences are HONORED, not assumed.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["personal_productivity", "cross_industry"]
+capability: ["memory", "retrieval"]
+modality:   ["text", "structured"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "pre_api.preference_load"
+tags: ["preferences", "memory", "personal-assistant"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+process_kind: "memory.preference_load"
+deterministic: true
+side_effects: "read"
+
+inputs:
+  - name: "user_id"
+    type: "string"
+  - name: "scope"
+    type: "string"
+outputs:
+  - name: "preferences"
+    type: "object"
+  - name: "applicable_rules"
+    type: "object[]"
+  - name: "loaded_at"
+    type: "string"
+
+config:
+  default_pack: "knowledge-pack/user-preference-schema"
+  scopes: ["communication", "scheduling", "work_life", "privacy", "tool_autonomy", "recurring", "delegation", "information_processing"]

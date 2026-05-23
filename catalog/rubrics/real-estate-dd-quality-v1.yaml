@@ -1,0 +1,54 @@
+id: "rubric/real-estate-dd-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Real-estate DD review quality v1"
+description: "7-dim rubric"
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["real_estate", "real_estate.due_diligence"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-20"
+updated: "2026-05-20"
+
+dimensions:
+  - id: "title_exceptions_enumerated"
+    label: "All Schedule B-II exceptions analyzed + cure path proposed"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "non-empty exceptions_table; cure_path field per item"
+  - id: "phase_i_recs_classified"
+    label: "RECs / CRECs / HRECs / de minimis correctly classified per ASTM E1527-21"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "rec_class field per environmental finding"
+  - id: "structural_findings_actioned"
+    label: "Structural findings tied to repair cost + timeline"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "cost_estimate + timeline_months per finding"
+  - id: "zoning_compliance_verified"
+    label: "Current use confirmed compliant with zoning; variances current"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "zoning_check_result + variance_status populated"
+  - id: "co_status_verified"
+    label: "Certificate of Occupancy verified current + matches actual use"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "co_status ∈ {current, expired, missing} + co_use_matches_actual_use boolean"
+  - id: "lease_rent_roll_reviewed"
+    label: "Rent roll reconciled to lease abstracts + estoppel certificates"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "rent_roll_total ≈ lease_abstract_total within 2%; estoppel_certificates_received per tenant"
+  - id: "action_path_clear"
+    label: "Final disposition: cure-required / cure-optional / accept-with-disclosure / re-trade / walk"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "disposition_path ∈ allowed values"
+
+scoring_method: "weighted_sum"

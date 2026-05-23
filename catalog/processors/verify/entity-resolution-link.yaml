@@ -1,0 +1,61 @@
+id: "processor/entity-resolution-link"
+type: processor
+version: "0.1.0"
+name: "Entity resolution: cluster records into entities"
+description: |
+  Given N records, cluster those that refer to the same real-world
+  entity (person, organization, address). Combines:
+   1. Blocking on canonical fields (zip, last name initial, alpha-2
+      country)
+   2. Pairwise similarity using Jaro-Winkler (names), Levenshtein
+      (addresses), exact match (emails / SSN / IDs)
+   3. Active record linkage with a learned threshold
+   4. Transitive closure into entity clusters
+
+  Outputs cluster IDs + per-cluster confidence + record-pairs above
+  the merge threshold.
+
+  Implements the Fellegi-Sunter (1969) probabilistic record-linkage
+  model with modern blocking + locality-sensitive hashing.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry", "finance", "healthcare", "government", "compliance"]
+capability: ["verification", "extraction", "classification"]
+modality:   ["text", "structured"]
+lifecycle:  "beta"
+trust_boundary: "local"
+lifecycle_position: "post_api.entity_resolution"
+tags: ["entity-resolution", "dedupe", "record-linkage", "fellegi-sunter"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+process_kind: "verify.entity_resolution"
+deterministic: false
+side_effects: "none"
+
+inputs:
+  - name: "records"
+    type: "object[]"
+  - name: "blocking_keys"
+    type: "string[]"
+  - name: "similarity_threshold"
+    type: "number"
+outputs:
+  - name: "clusters"
+    type: "object[]"
+  - name: "merge_pairs"
+    type: "object[]"
+  - name: "singletons"
+    type: "object[]"
+
+config:
+  default_blocking_keys: ["postal_code", "country_iso2", "last_name_first_letter"]
+  default_threshold: 0.88
+  similarity_metrics:
+    name:    "jaro_winkler"
+    address: "levenshtein"
+    email:   "exact"
+    phone:   "e164_exact"
+    dob:     "exact"
+    id:      "exact"

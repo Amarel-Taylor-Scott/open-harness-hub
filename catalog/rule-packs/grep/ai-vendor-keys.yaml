@@ -1,0 +1,109 @@
+id: "rule-pack/grep-ai-vendor-keys"
+type: rule-pack
+version: "0.1.0"
+name: "AI vendor API key detectors"
+description: |
+  Detection patterns for API keys issued by major LLM / AI vendors —
+  Anthropic, OpenAI, Hugging Face, Cohere, Replicate, Mistral, Groq,
+  Together, fal, Perplexity, Voyage, NVIDIA NIM. The highest-current-risk
+  category given how many AI projects accidentally commit these keys.
+
+  Treat every hit as critical and run a key-revocation step
+  immediately. Most vendors also have programmatic revocation endpoints
+  (Anthropic `/v1/admin/api-keys/{id}`, OpenAI `/v1/api-keys/{id}`).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["security", "ai"]
+capability: ["anonymization", "safety_gating"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "volatile"
+tags: ["secrets", "ai-vendor-keys", "leak-prevention"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+family: "grep"
+rules:
+  - id: "anthropic_api_key"
+    pattern: "\\bsk-ant-api03-[A-Za-z0-9_\\-]{95}\\b"
+    severity: "critical"
+    category: "secret.anthropic"
+    notes: "Anthropic Claude API key (current format)."
+
+  - id: "anthropic_admin_key"
+    pattern: "\\bsk-ant-admin01-[A-Za-z0-9_\\-]{95}\\b"
+    severity: "critical"
+    category: "secret.anthropic"
+    notes: "Anthropic admin key — broader scope than runtime API key."
+
+  - id: "openai_api_key_legacy"
+    pattern: "\\bsk-[A-Za-z0-9]{48}\\b"
+    severity: "critical"
+    category: "secret.openai"
+    notes: "OpenAI API key (legacy / pre-project format)."
+
+  - id: "openai_project_key"
+    pattern: "\\bsk-proj-[A-Za-z0-9_\\-]{60,}\\b"
+    severity: "critical"
+    category: "secret.openai"
+    notes: "OpenAI project-scoped key (`sk-proj-`)."
+
+  - id: "openai_admin_key"
+    pattern: "\\bsk-admin-[A-Za-z0-9_\\-]{60,}\\b"
+    severity: "critical"
+    category: "secret.openai"
+
+  - id: "huggingface_token"
+    pattern: "\\bhf_[A-Za-z]{34}\\b"
+    severity: "critical"
+    category: "secret.huggingface"
+    notes: "Hugging Face user / org access token."
+
+  - id: "cohere_api_key"
+    pattern: "\\b[A-Za-z0-9]{40}\\b"
+    severity: "low"
+    category: "secret.cohere"
+    notes: "Cohere keys are 40 alphanumerics — high false-positive rate; combine with context (e.g. cohere.com URL)."
+
+  - id: "replicate_api_token"
+    pattern: "\\br8_[A-Za-z0-9]{37}\\b"
+    severity: "critical"
+    category: "secret.replicate"
+
+  - id: "groq_api_key"
+    pattern: "\\bgsk_[A-Za-z0-9]{52}\\b"
+    severity: "critical"
+    category: "secret.groq"
+
+  - id: "together_api_key"
+    pattern: "\\btogether_[A-Za-z0-9]{40,}\\b"
+    severity: "high"
+    category: "secret.together"
+
+  - id: "fal_key"
+    pattern: "\\bfal-[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}:[A-Fa-f0-9]+\\b"
+    severity: "critical"
+    category: "secret.fal"
+
+  - id: "perplexity_key"
+    pattern: "\\bpplx-[A-Za-z0-9]{48,}\\b"
+    severity: "critical"
+    category: "secret.perplexity"
+
+  - id: "voyage_key"
+    pattern: "\\bpa-[A-Za-z0-9_\\-]{43}\\b"
+    severity: "critical"
+    category: "secret.voyage"
+
+  - id: "nvidia_nim_key"
+    pattern: "\\bnvapi-[A-Za-z0-9_\\-]{60,}\\b"
+    severity: "critical"
+    category: "secret.nvidia"
+
+  - id: "mistral_key"
+    pattern: "(?i)mistral(.{0,12})?[A-Za-z0-9]{32}"
+    severity: "high"
+    category: "secret.mistral"
+    notes: "Mistral keys are 32-char alphanumerics; require context."

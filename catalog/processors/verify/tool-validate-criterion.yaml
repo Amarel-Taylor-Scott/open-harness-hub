@@ -1,0 +1,44 @@
+id: "processor/verify-tool-validate-criterion"
+type: processor
+version: "0.1.0"
+name: "Tool-validation success-criterion evaluator"
+description: |
+  Evaluates one `kind: tool_validate` success criterion. Invokes
+  an external tool (e.g. `tool/json-schema-validator`,
+  `tool/run-unit-tests`, `tool/iban-checker`) against the target.
+  Passes iff the tool returns success.
+
+  Use for: 'output validates against schemas/X.schema.json',
+  'generated code passes pytest', 'extracted IBAN passes mod-97',
+  'rendered HTML passes axe-core accessibility audit'.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["verification", "evaluation", "tool_use"]
+modality:   ["text", "structured"]
+lifecycle:  "beta"
+trust_boundary: "local"
+lifecycle_position: "post_api.verify"
+tags: ["success-criterion", "tool", "schema-validation"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+process_kind: "verify.tool_validate_criterion"
+deterministic: true
+side_effects: "external_call"
+
+inputs:
+  - name: "tool_ref"
+    type: "artifact_id"
+  - name: "target"
+    type: "any"
+  - name: "params"
+    type: "object"
+outputs:
+  - name: "pass"
+    type: "boolean"
+  - name: "tool_output"
+    type: "object"
+  - name: "tool_error"
+    type: "string|null"

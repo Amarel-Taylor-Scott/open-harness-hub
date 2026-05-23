@@ -1,0 +1,73 @@
+id: "pipeline/multi-model-judging-ensemble"
+type: pipeline
+version: "0.1.0"
+name: "Multi-model judging ensemble"
+description: |
+  Run inference across N different LLMs (e.g. Mixtral / Mistral-7B /
+  Gemma-7B / Llama-3-8B), score each model's prediction with a
+  perplexity baseline, then majority-vote or weighted-blend for final
+  output.
+
+  Verified by Open Harness Hub mining of aatiffraz's
+  "Prompt Prediction w/ Mixtral/Mistral7B/Gemma/Llama" (640 votes).
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai"]
+capability: ["reasoning", "evaluation"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url: "https://www.kaggle.com/code/aatiffraz/prompt-prediction-w-mixtral-mistral7b-gemma-llama"
+  source_kind: "kaggle"
+  author: "Aatif Fraz (640 votes)"
+  license: "Apache-2.0"
+
+task: |
+  Run N small-to-mid LLMs on the same prompt, score each with
+  perplexity baseline or judge, weighted-blend for final answer.
+pipeline_kind: "ensemble"
+
+inputs:
+  - name: "prompt"
+    type: "string"
+  - name: "models"
+    type: "artifact_id[]"
+outputs:
+  - name: "final_answer"
+    type: "string"
+  - name: "per_model"
+    type: "object[]"
+  - name: "confidence"
+    type: "number"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+
+steps:
+  - id: "guard"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.prompt" }
+
+  - id: "per_model_inference"
+    kind: "processor"
+    ref: "processor/action-sampler-multi-rollout"
+    inputs:
+      task: "$.inputs.prompt"
+      n_samples: 4
+
+  - id: "blend"
+    kind: "processor"
+    ref: "processor/multi-vector-fusion"
+    inputs:
+      ranked_lists: "$.steps.per_model_inference.output.final_states"
+      method: "weighted_sum"
+      k: 1
+
+success_criteria: []

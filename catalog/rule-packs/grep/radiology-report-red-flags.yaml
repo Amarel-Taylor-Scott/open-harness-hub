@@ -1,0 +1,90 @@
+id: "rule-pack/grep-radiology-report-red-flags"
+type: rule-pack
+version: "0.1.0"
+name: "Radiology report quality + incidental-findings red flags"
+description: |
+  GREP detectors for radiology-report quality and incidental-finding
+  follow-up gaps. Designed to be run AFTER `rule-pack/privacy-phi-
+  hipaa-en` redaction. Pair with `pipeline/radiology-report-grading`.
+
+  Categories:
+   - **incidental-findings**: thyroid / adrenal / renal / pulmonary
+     nodules flagged without follow-up recommendation
+   - **missing-RADS-score**: report describes a finding in a system
+     that has a RADS (BI-/LI-/TI-/O-/PI-/Lung-) but omits the score
+   - **definitive-without-differential**: report uses "is" rather
+     than hedged "consistent with" for non-pathognomonic findings
+   - **missing-comparison**: prior available but not compared
+   - **fleischner-noncompliance**: pulmonary nodule >= 6 mm without
+     correct Fleischner follow-up timing
+
+  Heuristic — TRIGGER review, not block.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["healthcare", "healthcare.radiology"]
+capability: ["safety_gating", "classification", "verification"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "volatile"
+tags: ["radiology", "incidental-findings", "rads", "fleischner", "quality"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+family: "grep"
+rules:
+  - id: "thyroid_nodule_without_tirads"
+    pattern: "(?is)thyroid.{0,30}nodule(?!.{0,400}\\b(TR\\s?[1-5]|TIRADS|TI-RADS)\\b)"
+    severity: "high"
+    category: "radiology.missing_rads.thyroid"
+
+  - id: "breast_mass_without_birads"
+    pattern: "(?is)\\b(breast)\\b.{0,80}\\b(mass|lesion)\\b(?!.{0,1200}\\b(BIRADS|BI-RADS|BI\\s*RADS\\s*[0-6])\\b)(?!.{0,1200}(suspicious calc|microcalcifications.*BIRADS))"
+    severity: "high"
+    category: "radiology.missing_rads.breast"
+
+  - id: "liver_observation_without_lirads"
+    pattern: "(?is)(?<!no\\s)(?<!no\\sincidental\\s)(?<!without\\s)(?<!absent\\s)(?<!negative\\sfor\\s)\\b(liver|hepatic)\\b(?![\\s,;]+(?:unremarkable|normal|spleen|adrenals)).{0,40}(observation|lesion|mass|nodule)(?<!no\\sincidental\\sliver\\slesion)(?!\\s+(?:noted|present|seen)\\.)(?!.{0,800}\\b(LI-RADS|LIRADS|LR-[12345M]|LR\\s*TIV)\\b)"
+    severity: "medium"
+    category: "radiology.missing_rads.liver"
+
+  - id: "pulm_nodule_without_fleischner_followup"
+    pattern: "(?is)(?:(\\d+(?:\\.\\d+)?\\s*mm)\\b\\s+\\b(?:sub-solid|solid|ground-glass|part-solid|ggn)?\\s*pulmonary\\s+nodule|pulmonary\\s+nodule\\b.{0,80}?(\\d+(?:\\.\\d+)?\\s*mm))(?!.{0,800}(fleischner|follow[- ]?up|month|year|baseline|no\\s+routine|annual\\s+screening|stable|lung[- ]?rads|cT\\s+at\\s+\\d))"
+    severity: "high"
+    category: "radiology.missing_followup.pulm_nodule"
+
+  - id: "adrenal_incidentaloma_without_workup"
+    pattern: "(?is)adrenal.{0,30}(mass|nodule|incidentaloma)(?!.{0,400}(< ?10\\s*HU|hounsfield|adrenal[- ]?protocol|chromaffin|aldosterone|cortisol|follow[- ]?up))"
+    severity: "medium"
+    category: "radiology.incidental.adrenal"
+
+  - id: "renal_lesion_without_bosniak"
+    pattern: "(?is)renal.{0,30}(cyst|mass|lesion)(?!.{0,400}\\bbosniak\\b)"
+    severity: "low"
+    category: "radiology.missing_rads.renal"
+
+  - id: "definitive_without_differential"
+    pattern: "(?is)\\b(is|are)\\s+(?:a |an )?(?:metastasis|adenocarcinoma|hcc|hepatocellular|sarcoidosis|lymphoma|tuberculosis|aspergilloma|invasive carcinoma)(?!.{0,200}(differential|consider|consistent with|likely|favor))"
+    severity: "medium"
+    category: "radiology.definitive_without_differential"
+
+  - id: "no_comparison_when_prior_available"
+    pattern: "(?is)(prior\\s+(?:study|exam|imaging|CT|MRI)\\s+(?:available|on file|in system))(?!.{0,400}\\b(comparison|compared|stable|interval|changed|unchanged|prior\\s+study\\s+(?:reviewed|compared))\\b)"
+    severity: "medium"
+    category: "radiology.missing_comparison"
+
+  - id: "impression_lacks_recommendation"
+    pattern: "(?is)\\bimpression\\b\\s*[:\\.]?(?:(?!\\brecommend|\\bsuggest|\\bnext\\b|\\bfollow[- ]?up|further evaluation|consider|workup)[\\s\\S]){50,800}\\Z"
+    severity: "medium"
+    category: "radiology.missing_recommendation"
+
+  - id: "phi_unredacted_signature_block"
+    pattern: "(?i)(MRN|medical record number|date of birth|dob)[: ]\\s*[A-Z0-9-]+"
+    severity: "critical"
+    category: "phi.unredacted"
+
+  - id: "lung_nodule_below_fleischner_threshold_no_disposition"
+    pattern: "(?is)pulmonary\\s+nodule.{0,80}([0-5](?:\\.\\d+)?\\s*mm)(?!.{0,400}(no follow-up|routine|benign|monitor|baseline))"
+    severity: "low"
+    category: "radiology.fleischner.small_nodule_disposition"

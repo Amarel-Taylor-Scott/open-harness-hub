@@ -1,0 +1,70 @@
+id: "pattern/diamond-model-attribution"
+type: pattern
+version: "0.1.0"
+name: "Diamond Model attribution (CTI threat-actor analysis)"
+description: |
+  Classical CTI threat-actor attribution framework. An incident is
+  analyzed across 4 vertices: Adversary (who) + Capability (how) +
+  Infrastructure (with what) + Victim (against whom). Each vertex
+  is corroborated independently; attribution requires ≥2 vertices
+  with high-confidence evidence.
+
+  Counters the "single-IOC attribution" failure mode where one
+  hash or one domain leads to a published attribution claim.
+authors:
+  - name: "Caltagirone, Pendergast, Betz (2013)"
+license: "CC-BY-4.0"
+industry:   ["security", "threat_intelligence"]
+capability: ["reasoning", "verification", "evaluation"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "mixed"
+tags: ["cti", "diamond-model", "attribution", "mitre-attack"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+paper_url: "https://www.activeresponse.org/wp-content/uploads/2013/07/diamond.pdf"
+paper_citation: "Caltagirone, Pendergast, Betz 2013, The Diamond Model of Intrusion Analysis"
+reference_implementations:
+  - { url: "https://github.com/threatconnect-inc/threatconnect-python", language: "python", framework: "threatconnect" }
+
+structural_shape:
+  - "vertex_adversary = extract_actor_indicators(report)"
+  - "vertex_capability = extract_TTPs_to_ATTACK(report)"
+  - "vertex_infrastructure = extract_iocs_typed(report)"
+  - "vertex_victim = extract_target_industry_org_geography(report)"
+  - "for each vertex:"
+  - "  rate_confidence(Admiralty A-F × 1-6)"
+  - "  corroborate_with_external_intel(vertex)"
+  - "attribution_strength = count(vertices with confidence ≥ high)"
+  - "if attribution_strength >= 2: emit attribution_claim with confidence"
+  - "else: emit 'insufficient_corroboration'"
+
+when_to_use:
+  - "Threat-actor attribution claims in CTI reports"
+  - "Cross-incident correlation (linking unrelated IRs to one actor)"
+
+when_not_to_use:
+  - "IOC enrichment alone (no actor claim needed)"
+  - "Reactive incident response (focus on containment, not attribution)"
+
+variants:
+  - "Diamond + ATT&CK Navigator overlay"
+  - "Diamond + Kill Chain phase per finding"
+  - "Diamond-extended with Sociopolitical + Technology meta-vertices"
+
+counter_patterns:
+  - "pattern/k-anonymity-aggregation (anonymized signal sharing, not attribution)"
+
+implementing_pipelines:
+  - "pipeline/threat-intel-ioc-review"
+
+implementing_processors:
+  - "processor/audit-trace-emitter"
+
+tradeoffs:
+  latency:    "Higher — 4-vertex corroboration"
+  cost:       "Higher — N external-intel lookups per vertex"
+  quality:    "Substantially lower false-attribution rate vs single-IOC claims"
+  complexity: "Medium — requires external intel sources or community feeds"
+  explainability: "Very high — each vertex + confidence inspectable"

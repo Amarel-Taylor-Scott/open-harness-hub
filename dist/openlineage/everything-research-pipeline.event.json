@@ -1,0 +1,129 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-05-20T17:02:11.975644+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "fca6a213-7b43-4a3d-b600-7b2f2559fb23",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-05-20T17:02:11.975717+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/everything-research-pipeline",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "A comprehensive research pipeline that demonstrates every layer the\nhub supports \u2014 22 distinct passes from raw input through model call\nthrough iterative refinement to delivery.\n\nThis is the reference shape for \"production-grade\" RAG-with-everything:\npre-API the prompt goes through PII redact, prompt-injection guard,\nabbreviation expansion, intent classification, query decomposition,\nmulti-query expansion, allowlist sanitization, hybrid retrieval,\ncross-encoder rerank, citation-graph expansion, persona injection,\nreasoning-framework selection, output-schema directive,\ncontext-window packing, LLMLingua compression, cost-ceiling gate, and\ntrace attachment \u2014 THEN the LLM is called, THEN post-API the response\ngoes through citation extraction, hallucination scoring, official-source\nverification, schema validation, self-refine critique loop, audit\nemission, and delivery formatting.\n\nNot every use case needs all 22 passes \u2014 pick the subset that fits.\nUse this as a reference for what's possible."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../everything-research-pipeline.yaml"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "knowledge-pack/common-abbreviations",
+      "facets": {
+        "schema": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-1-0/SchemaDatasetFacet.json",
+          "fields": [
+            {
+              "name": "rag_doc",
+              "type": "string"
+            }
+          ]
+        },
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "Sampled abbreviations and acronyms across healthcare, finance,\nlegal, security, and technology, with expansions and a context tag.\nDesigned for the `expand.abbreviation` processor to look up\ndomain-specific expansions before retrieval or model call."
+        },
+        "dataSource": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+          "name": "open-harness-hub",
+          "uri": "https://open-harness-hub.dev/knowledge-pack/common-abbreviations"
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/everything-research-pipeline/output/answer_markdown",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "answer_markdown (markdown)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/everything-research-pipeline/output/citations",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "citations (Citation[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/everything-research-pipeline/output/confidence_per_claim",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "confidence_per_claim (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/everything-research-pipeline/output/trace",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "trace (TraceFrame[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/everything-research-pipeline/output/audit_record",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "audit_record (object)"
+        }
+      }
+    }
+  ]
+}

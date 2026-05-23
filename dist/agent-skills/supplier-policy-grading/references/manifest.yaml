@@ -1,0 +1,152 @@
+id: "pipeline/supplier-policy-grading"
+type: pipeline
+version: "0.1.0"
+name: "Supplier policy & disclosure grading (CSDDD-aligned)"
+description: |
+  End-to-end pipeline for grading supplier-submitted policy texts and
+  self-assessments against the EU CSDDD, ILO forced-labor indicators,
+  and the lead company's code of conduct. The compliance team submits
+  a supplier disclosure pack (policy PDF + self-assessment +
+  grievance summary); the pipeline returns structured findings with
+  severity, citation, supplier tier, recommended remediation, and
+  CSDDD-Art.10 right-of-reply path.
+
+  Inspired by reviewer feedback on the DueCare ecosystem that
+  identified ESG / supply-chain due diligence as a natural extension
+  of the "harness-is-the-lift" architecture.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["esg", "supply_chain", "compliance"]
+capability: ["evaluation", "extraction", "verification"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.grading"
+tags: ["esg", "csddd", "ilo", "supply-chain", "modern-slavery"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url:  "https://eur-lex.europa.eu/eli/dir/2024/1760/oj"
+  source_kind: "other"
+  author:      "EU CSDDD + ILO indicators (composite)"
+  license:     "CC-BY-4.0"
+
+task: |
+  Given a supplier disclosure pack (policy text, self-assessment,
+  grievance summary, optional audit reports), produce a per-section
+  grading against the ESG supplier compliance rubric, with citations
+  to ILO indicators / CSDDD articles / lead-company code of conduct.
+pipeline_kind: "grading"
+
+inputs:
+  - name: "supplier_disclosure_pack"
+    type: "object"
+  - name: "supplier_tier"
+    type: "string"
+  - name: "lead_company_code_ref"
+    type: "artifact_id"
+outputs:
+  - name: "grade"
+    type: "number"
+  - name: "findings"
+    type: "object[]"
+  - name: "remediation_paths"
+    type: "object[]"
+  - name: "trace"
+    type: "object[]"
+
+defaults:
+  persona: "persona/esg-auditor"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/grep-esg-forced-labor-red-flags"
+    - "rule-pack/grep-esg-environmental-red-flags"
+    - "rule-pack/grep-esg-governance-red-flags"
+    - "rule-pack/privacy-pii-text-en"
+
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs:
+      data: "$.inputs.supplier_disclosure_pack"
+
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs:
+      text: "$.steps.structured_to_prose.output.prose"
+
+  - id: "grep_social_red_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-esg-forced-labor-red-flags"
+    inputs:
+      text: "$.steps.redact_pii.output.text"
+
+  - id: "grep_environmental_red_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-esg-environmental-red-flags"
+    inputs:
+      text: "$.steps.redact_pii.output.text"
+
+  - id: "grep_governance_red_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-esg-governance-red-flags"
+    inputs:
+      text: "$.steps.redact_pii.output.text"
+
+  - id: "rag_against_global_pack"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.steps.grep_social_red_flags.output.hits"
+      corpus: "knowledge-pack/csddd-and-forced-labor-indicators"
+      top_k: 12
+
+  - id: "rag_against_corridors"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.inputs.supplier_disclosure_pack.sectors"
+      corpus: "knowledge-pack/high-risk-corridors-and-sectors"
+      top_k: 6
+
+  - id: "rag_against_lead_code"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.steps.grep_social_red_flags.output.hits"
+      corpus: "$.inputs.lead_company_code_ref"
+      top_k: 4
+
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.redact_pii.output.text"
+      rubric_ref: "rubric/esg-supplier-compliance-v1"
+
+  - id: "propose_remediation"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "system", "content": "{{persona.esg-auditor}}"},
+         {"role": "user",   "content": "Propose CSDDD-Art.10 remediation for each finding with severity ≥ medium. Include: corrective action, supplier right of reply, 60-day milestone."}]
+      context:
+        red_flags: "$.steps.grep_red_flags.output.hits"
+        csddd:     "$.steps.rag_against_csddd.output"
+        lead_code: "$.steps.rag_against_lead_code.output"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "supplier-policy-grading"
+      applied_layers: ["persona", "grep", "rag", "judge"]
+
+success_criteria:
+  - rubric:    "rubric/esg-supplier-compliance-v1"
+    threshold: 0.7

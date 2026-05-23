@@ -1,0 +1,36 @@
+id: "rule-pack/grep-output-safety-image"
+type: rule-pack
+version: "0.1.0"
+name: "Image-output safety checks"
+description: |
+  Post-generation safety check pack for image outputs. Pairs of
+  (detector-call, threshold) plus a watermark presence check. Designed
+  to be called by an image-gen pipeline AFTER the txt2img tool returns.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["creative", "media"]
+capability: ["safety_gating"]
+modality:   ["image"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+family: "heuristic"
+rules:
+  - id: "nsfw_classifier_threshold"
+    label: "NSFW classifier confidence under 0.10"
+    condition: "nsfw_classifier(image) < 0.10"
+    action: "pass"
+    severity: "critical"
+  - id: "celebrity_face_match"
+    label: "No known-celebrity face match"
+    condition: "celebrity_face_match(image, registry='public_celebrities') == false"
+    action: "pass"
+    severity: "high"
+  - id: "watermark_present"
+    label: "Required brand watermark present"
+    condition: "watermark_detector(image, brand=$.context.brand) == true"
+    action: "pass"
+    severity: "medium"

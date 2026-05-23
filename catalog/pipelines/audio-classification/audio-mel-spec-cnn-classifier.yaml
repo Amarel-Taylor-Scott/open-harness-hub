@@ -1,0 +1,84 @@
+id: "pipeline/audio-mel-spec-cnn-classifier"
+type: pipeline
+version: "0.1.0"
+name: "Audio classification via mel-spectrogram + CNN (KerasCV / EfficientNet)"
+description: |
+  Convert audio to mel-spectrograms (librosa or torchaudio), treat as
+  images, train a CNN backbone (EfficientNet / ResNet via KerasCV or
+  timm). Standard Kaggle approach for bird-call ID, urban sound
+  classification, infant cry detection, equipment fault detection.
+  Audio-specific augmentation: SpecAugment (frequency + time masking),
+  pitch shift, time stretch.
+
+  Verified by Open Harness Hub mining: awsaf49 BirdCLEF24 KerasCV
+  starter (659 votes train + 364 votes infer, BirdCLEF 2024) — uses
+  mel spectrogram + KerasCV CNN.
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "scientific_research", "scientific_research.bio"]
+capability: ["classification"]
+modality:   ["audio"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "api.training"
+tags: ["audio", "mel-spectrogram", "kerascv", "efficientnet", "kaggle-verified"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+attribution:
+  source_url:  "https://www.kaggle.com/code/awsaf49/birdclef24-kerascv-starter-train"
+  source_kind: "kaggle"
+  author:      "awsaf49 (659 train + 364 infer votes, BirdCLEF 2024)"
+  license:     "Apache-2.0"
+
+task: "Convert audio to mel-spectrograms, train CNN backbone, classify."
+pipeline_kind: "training_and_serving"
+
+inputs:
+  - name: "audio_dataset"
+    type: "artifact_id"
+  - name: "backbone"
+    type: "string"
+  - name: "sr"
+    type: "integer"
+outputs:
+  - name: "predictions"
+    type: "object[]"
+  - name: "model_artifact"
+    type: "artifact_id"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+
+steps:
+  - id: "guard"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.backbone" }
+  - id: "spectrogram_train"
+    kind: "processor"
+    ref: "processor/iterative-revise-loop"
+    inputs:
+      initial_prompt: "Convert audio (sr=32000) → mel-spectrogram via librosa or torchaudio. Train EfficientNetB0/B1 on mel-spec images. Augmentations: SpecAugment (time + freq masking), pitch shift ±2 semitones, time stretch ±10%."
+      inner_harness_ref: "harness/text-safety-review"
+      verifier_refs: []
+      max_iterations: 1
+      cost_ceiling_usd: 5.00
+      convergence_policy: "all_pass"
+  - id: "ensemble_folds"
+    kind: "processor"
+    ref: "processor/multi-vector-fusion"
+    inputs:
+      ranked_lists: "$.steps.spectrogram_train.output"
+      method: "weighted_sum"
+      k: 1
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "audio-mel-spec-cnn-classifier"
+      applied_layers: ["audio_to_spec", "training", "ensemble"]
+
+success_criteria: []

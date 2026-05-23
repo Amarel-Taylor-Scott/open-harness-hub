@@ -1,0 +1,53 @@
+id: "rubric/ai-governance-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "AI governance audit review quality v1"
+description: "7-dim rubric for EU AI Act + NIST AI RMF + ISO 42001 + GDPR Art 22 review"
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["ai_governance", "ai_governance.eu_act", "ai_governance.nist_rmf", "ai_governance.iso_42001"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-21"
+updated: "2026-05-21"
+
+dimensions:
+  - id: "prohibited_high_risk_first"
+    label: "Prohibited practice / Annex III without CE / Art 22 violation / serious incident unreported surfaced FIRST as critical"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "acute findings appear before others; severity=critical"
+  - id: "regulation_citation"
+    label: "Each finding cites EU AI Act article + GDPR + NIST RMF function + ISO 42001 control"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "regulatory_citation populated per finding"
+  - id: "conformity_assessment"
+    label: "Annex III high-risk has Art 43 conformity + CE marking + EU DoC"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "conformity_module + ce_marking_date + doc_date documented"
+  - id: "art10_art14"
+    label: "Art 10 data governance statement + Art 14 human oversight documented"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "data_governance_doc + human_oversight_measures present"
+  - id: "gpai_art53"
+    label: "GPAI model documented per Art 53 transparency summary"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "art53_transparency_summary_url present when GPAI used"
+  - id: "art12_logs_art73_incidents"
+    label: "Art 12 logs ≥ 6 mo + Art 73 serious incident reporting ≤ 15 days"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "log_retention_months ≥ 6 + incident_reporting_log present"
+  - id: "aims_fria"
+    label: "ISO 42001 AIMS w/ signed policy + FRIA published for public-sector"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "iso42001_policy_signed_by + fria_publication_date documented"
+
+scoring_method: "weighted_sum"

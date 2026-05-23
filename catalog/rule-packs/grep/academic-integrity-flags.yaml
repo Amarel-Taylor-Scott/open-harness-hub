@@ -1,0 +1,67 @@
+id: "rule-pack/grep-academic-integrity-flags"
+type: rule-pack
+version: "0.1.0"
+name: "Academic integrity red-flag detectors (plagiarism / AI / fabricated citations)"
+description: |
+  Heuristic detectors for academic integrity violations. Designed
+  to TRIGGER deep review (similarity check + AI detector + citation
+  DB lookup) — not to determine guilt directly.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["education", "education.higher", "compliance"]
+capability: ["safety_gating", "classification"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "volatile"
+tags: ["academic-integrity", "plagiarism", "ai-detection"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+family: "grep"
+rules:
+  - id: "as_an_ai_language_model"
+    pattern: "(?i)\\bas an ai (?:language )?model\\b|\\bas a large language model\\b|i'm an ai\\b|i am an ai\\b"
+    severity: "critical"
+    category: "academic_integrity.ai_artefact_phrase"
+
+  - id: "i_cannot_provide_personal_opinion"
+    pattern: "(?i)i (?:cannot|do not have the ability to|am unable to) (?:provide|express|hold) (?:a personal|personal|my own) (?:opinion|view)"
+    severity: "high"
+    category: "academic_integrity.ai_canned_disclaimer"
+
+  - id: "ai_safe_response_disclaimer"
+    pattern: "(?i)it'?s important to note that|please note that|it is worth (?:noting|mentioning) that"
+    severity: "low"
+    category: "academic_integrity.ai_filler_phrase"
+
+  - id: "future_knowledge_cutoff"
+    pattern: "(?i)(?:my|knowledge) (?:training|knowledge) cutoff (?:is|was)|as of (?:my|the) (?:last|training) update"
+    severity: "critical"
+    category: "academic_integrity.ai_self_reference"
+
+  - id: "fabricated_doi"
+    pattern: "(?i)10\\.\\d{4,9}/[-._;()/:A-Z0-9]+"
+    severity: "low"
+    category: "academic_integrity.candidate_doi"
+
+  - id: "fabricated_arxiv"
+    pattern: "(?i)arxiv:\\s*\\d{4}\\.\\d{4,5}(?:v\\d+)?|arxiv\\.org/abs/\\d{4}\\.\\d{4,5}"
+    severity: "low"
+    category: "academic_integrity.candidate_arxiv"
+
+  - id: "block_quote_no_attribution"
+    pattern: "(?:^|\\n)\\s{4,}[A-Z][^\\n]{200,}(?!.{0,80}(\\(\\w+,?\\s*\\d{4}\\)|\\bcited\\b|\\baccording\\sto\\b))"
+    severity: "medium"
+    category: "academic_integrity.block_quote_no_cite"
+
+  - id: "repeated_filler_phrase"
+    pattern: "(?i)(in conclusion|to summarize|in summary|moreover|furthermore|additionally|in addition)\\b[\\s\\S]{0,400}(in conclusion|to summarize|in summary|moreover|furthermore|additionally|in addition)\\b"
+    severity: "low"
+    category: "academic_integrity.ai_filler_pattern"
+
+  - id: "perfect_paragraph_lengths"
+    pattern: "(?:^|\\n)([A-Z][^\\n]{180,260}\\.)\\n([A-Z][^\\n]{180,260}\\.)\\n([A-Z][^\\n]{180,260}\\.)"
+    severity: "low"
+    category: "academic_integrity.suspicious_paragraph_uniformity"

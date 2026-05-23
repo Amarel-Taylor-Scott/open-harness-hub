@@ -1,0 +1,39 @@
+id: "tool/json-schema-validator"
+type: tool
+version: "0.1.0"
+name: "JSON Schema 2020-12 validator"
+description: |
+  Validates a candidate JSON object against a JSON Schema 2020-12
+  document. Used by `processor/verify-tool-validate-criterion` to
+  enforce structural acceptance bars on pipeline outputs.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["verification", "format_conversion"]
+modality:   ["structured"]
+lifecycle:  "stable"
+trust_boundary: "local"
+tags: ["json-schema", "validation"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+parameters:
+  type: object
+  properties:
+    target:      { description: "Candidate JSON value to validate." }
+    schema_path: { type: "string", description: "Path to schema file relative to repo root." }
+  required: ["target", "schema_path"]
+returns:
+  type: object
+  properties:
+    pass:           { type: "boolean" }
+    errors:         { type: "array", items: { type: "object" } }
+    error_count:    { type: "integer" }
+side_effects: "read"
+examples:
+  - input:  { target: { "id": "p", "version": "0.1.0", "name": "x", "description": "y", "license": "MIT", "lifecycle": "stable" }, schema_path: "schemas/pipeline.schema.json" }
+    output: { pass: false, errors: [{ path: ".type", message: "required property missing" }], error_count: 1 }
+implementations:
+  - kind: "callable"
+    path: "tools.json_schema_validator.run"

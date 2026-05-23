@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/processor.schema.json",
+  "title": "Processor manifest",
+  "description": "A typed, repeatable transformation invoked by the pipeline runtime (not by the model). Generic slot for pre/post-API processes that aren't harnesses, tools, or pure rule packs.",
+  "allOf": [
+    { "$ref": "_common.schema.json#/$defs/envelope" },
+    {
+      "type": "object",
+      "required": ["process_kind", "inputs", "outputs", "side_effects"],
+      "properties": {
+        "type": { "const": "processor" },
+
+        "process_kind": {
+          "type": "string",
+          "description": "Open vocabulary — see SPEC §16.",
+          "examples": [
+            "format_convert.pdf_to_text", "format_convert.audio_to_text",
+            "redact.pii_text", "redact.phi_hipaa",
+            "gate.prompt_injection", "gate.cost_ceiling",
+            "classify.intent", "route.dispatch",
+            "assemble.prompt_template", "retrieve.hybrid", "rerank.cross_encoder",
+            "query.rewrite", "query.sanitize",
+            "policy.identity", "policy.consent",
+            "call.judge",
+            "parse.tool_calls", "parse.json", "parse.citations",
+            "coerce.json_repair", "coerce.schema_validate", "coerce.constrained_grammar",
+            "safety.nsfw_image", "safety.celebrity_likeness", "safety.pii_rescan",
+            "verify.citation_coverage", "verify.factual_consistency",
+            "eval.rubric_deterministic", "eval.rubric_llm_judge", "eval.pairwise",
+            "augment.translate", "augment.tts",
+            "memory.write_conversational", "memory.write_kb",
+            "cache.write_response", "index.update_vector",
+            "escalate.human", "escalate.different_model",
+            "audit.trace", "audit.cost", "audit.compliance",
+            "report.markdown", "report.pdf",
+            "deliver.email", "deliver.webhook",
+            "chunk.fixed", "chunk.semantic", "embed.text", "embed.image",
+            "parallel.fan_out", "parallel.fan_in", "loop.until_convergence"
+          ]
+        },
+
+        "deterministic":      { "type": "boolean", "description": "Same input → same output." },
+        "idempotent":         { "type": "boolean", "description": "Safe to retry." },
+        "streaming":          { "type": "boolean", "description": "Operates on a stream rather than full input." },
+        "latency_budget_ms":  { "type": "integer", "minimum": 0 },
+
+        "inputs":  {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name":   { "type": "string" },
+              "type":   { "type": "string" },
+              "schema": { "type": "string" }
+            }
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name":   { "type": "string" },
+              "type":   { "type": "string" },
+              "schema": { "type": "string" }
+            }
+          }
+        },
+
+        "side_effects": { "type": "string", "enum": ["none", "read", "write", "external_call"] },
+        "on_error":     { "type": "string", "enum": ["raise", "retry", "fallback", "continue"] },
+        "retry": {
+          "type": "object",
+          "properties": {
+            "max_attempts": { "type": "integer", "minimum": 1 },
+            "backoff":      { "type": "string", "enum": ["none", "linear", "exponential"] }
+          }
+        },
+
+        "model_targets": {
+          "type": "array",
+          "description": "Only set when the processor itself wraps an LLM call (e.g., processor/llm-judge).",
+          "items": { "$ref": "_common.schema.json#/$defs/modelTarget" }
+        },
+
+        "implementations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["kind"],
+            "properties": {
+              "kind":     { "type": "string", "enum": ["callable", "shell", "http", "openapi", "mcp", "docker", "wasm"] },
+              "path":     { "type": "string" },
+              "command":  { "type": "string" },
+              "url":      { "type": "string" },
+              "image":    { "type": "string" },
+              "language": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

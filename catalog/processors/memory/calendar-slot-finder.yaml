@@ -1,0 +1,54 @@
+id: "processor/calendar-slot-finder"
+type: processor
+version: "0.1.0"
+name: "Calendar slot finder (preference-aware)"
+description: |
+  Given the user's calendar + their preferences (no-meeting hours,
+  focus blocks, preferred meeting hours), find N candidate slots
+  for a new meeting. Honors duration, time-zone, attendee
+  availability, and the user's hard rules.
+
+  Refuses to suggest slots in no-meeting windows unless the
+  caller has explicitly authorized override.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["personal_productivity"]
+capability: ["reasoning", "memory"]
+modality:   ["structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.scheduling"
+tags: ["calendar", "scheduling", "personal-assistant"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+process_kind: "scheduling.slot_finder"
+deterministic: true
+side_effects: "read"
+
+inputs:
+  - name: "user_calendar_window"
+    type: "object"
+  - name: "duration_minutes"
+    type: "integer"
+  - name: "attendees"
+    type: "string[]"
+  - name: "user_preferences"
+    type: "object"
+  - name: "allow_override"
+    type: "boolean"
+outputs:
+  - name: "candidate_slots"
+    type: "object[]"
+  - name: "preference_violations"
+    type: "object[]"
+  - name: "rationale"
+    type: "string"
+
+config:
+  default_n_candidates: 5
+  default_window_days: 14
+  buffer_minutes: 15
+  honor_focus_blocks: true
+  honor_no_meeting_hours: true

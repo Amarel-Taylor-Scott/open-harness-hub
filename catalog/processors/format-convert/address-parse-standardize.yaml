@@ -1,0 +1,48 @@
+id: "processor/address-parse-standardize"
+type: processor
+version: "0.1.0"
+name: "Address parse + standardize (USPS Pub 28 / libpostal)"
+description: |
+  Parse a free-form postal address into components (street_number,
+  street_name, suite, city, state, postal_code, country) and
+  standardize them to USPS Pub 28 + libpostal conventions. Handles
+  international addresses via libpostal's CRF parser.
+
+  Output components are normalized: state → 2-letter abbrev,
+  street_type expanded then re-abbreviated, suite/apt normalized.
+  Used as a pre-step for geocoding + dedup + USPS deliverable check.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["format_conversion", "extraction"]
+modality:   ["text", "structured"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "pre_api.format_convert"
+tags: ["address", "usps", "libpostal", "enrichment"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+process_kind: "format_convert.address_standardize"
+deterministic: true
+side_effects: "none"
+
+inputs:
+  - name: "address_text"
+    type: "string"
+  - name: "country_hint"
+    type: "string"
+outputs:
+  - name: "components"
+    type: "object"
+  - name: "standardized_one_line"
+    type: "string"
+  - name: "country_iso2"
+    type: "string"
+  - name: "confidence"
+    type: "number"
+
+config:
+  parser_backend: "libpostal"
+  fallback_regex: "(?:(?P<num>\\d+)\\s+)?(?P<street>[^,]+?)(?:,\\s*(?P<unit>(?:apt|suite|#)\\s*[\\w-]+))?,\\s*(?P<city>[^,]+),\\s*(?P<state>[A-Z]{2})\\s+(?P<zip>\\d{5}(?:-\\d{4})?)"

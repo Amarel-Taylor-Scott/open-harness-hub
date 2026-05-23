@@ -1,0 +1,130 @@
+id: "pipeline/chat-with-pdf-citations"
+type: pipeline
+version: "0.1.0"
+name: "Chat with PDF (with citations)"
+description: |
+  The canonical "upload a PDF, ask questions, get cited answers" pipeline
+  used by vercel/ai-chatbot, lobe-chat, codertom/chat-with-pdf, etc. Full
+  layered chain:
+    pdf-to-text →
+    recursive chunker →
+    embedder (local or OpenAI) →
+    hybrid retrieval policy (BM25 + dense + RRF) →
+    cross-encoder reranker →
+    persona (research analyst) →
+    grep (PII guard on retrieved chunks before model sees them) →
+    harness (text-safety-review) →
+    citation-coverage verifier.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["retrieval", "reasoning", "verification"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+task: |
+  Given an uploaded PDF and a user question, retrieve the most relevant
+  passages via hybrid retrieval + rerank, then produce a cited answer.
+pipeline_kind: "qa_attachment"
+
+inputs:
+  - name: "pdf_bytes"
+    type: "bytes"
+  - name: "question"
+    type: "string"
+outputs:
+  - name: "answer_markdown"
+    type: "markdown"
+  - name: "citations"
+    type: "Citation[]"
+  - name: "retrieved_chunks"
+    type: "Chunk[]"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs: []
+  rule_packs:
+    - "rule-pack/hybrid-retrieval-policy"
+    - "rule-pack/privacy-pii-text-en"
+    - "rule-pack/grep-prompt-injection-heuristics"
+
+steps:
+  - id: "pdf_to_text"
+    kind: "processor"
+    ref: "processor/pdf-to-text"
+    inputs:
+      pdf_bytes: "$.inputs.pdf_bytes"
+
+  - id: "chunk"
+    kind: "processor"
+    ref: "processor/recursive-character-chunker"
+    inputs:
+      text: "$.steps.pdf_to_text.output.text"
+      chunk_size: 1000
+      chunk_overlap: 200
+      separators: ["\n\n", "\n", ". ", " "]
+
+  - id: "embed"
+    kind: "processor"
+    ref: "processor/embedder-minilm"
+    inputs:
+      texts: "$.steps.chunk.output.chunks"
+
+  - id: "embed_query"
+    kind: "processor"
+    ref: "processor/embedder-minilm"
+    inputs:
+      texts: ["$.inputs.question"]
+
+  - id: "retrieve"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.inputs.question"
+      query_vector: "$.steps.embed_query.output.embeddings[0]"
+      doc_vectors:  "$.steps.embed.output.embeddings"
+      docs:         "$.steps.chunk.output.chunks"
+      top_k: 20
+
+  - id: "rerank"
+    kind: "processor"
+    ref: "processor/cross-encoder-reranker"
+    inputs:
+      query: "$.inputs.question"
+      candidates: "$.steps.retrieve.output.candidates"
+      output_k: 5
+
+  - id: "guard_chunks"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs:
+      text: "$.steps.rerank.output.ranked"
+
+  - id: "redact_chunks_pii"
+    kind: "rule_pack"
+    ref: "rule-pack/privacy-pii-text-en"
+    inputs:
+      text: "$.steps.rerank.output.ranked"
+
+  - id: "answer"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Answer the question using ONLY the retrieved chunks. Cite each chunk by its index. Refuse to answer if no chunk supports the claim."}]
+      context: "$.steps.rerank.output.ranked"
+
+  - id: "verify_citation_coverage"
+    kind: "processor"
+    ref: "processor/citation-coverage"
+    inputs:
+      response_markdown: "$.steps.answer.output.text"
+
+success_criteria:
+  - rubric: "rubric/research-entity-v1"
+    threshold: 0.70

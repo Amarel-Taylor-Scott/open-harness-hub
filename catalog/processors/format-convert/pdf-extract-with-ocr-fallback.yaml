@@ -1,0 +1,32 @@
+id: "processor/pdf-extract-with-ocr-fallback"
+type: processor
+version: "0.1.0"
+name: "PDF extract with OCR fallback (CiteMind shape)"
+description: "Extract embedded PDF text page by page; fall back to OCR (Tesseract / PaddleOCR / similar) for pages whose embedded-text yield is below threshold (scanned pages, image-heavy figures)."
+authors: [{ name: "CiteMind team (upstream)" }, { name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["education", "compliance", "legal", "research"]
+capability:  ["format_conversion", "extraction"]
+modality:    ["text"]
+lifecycle:   "experimental"
+trust_boundary: "local"
+lifecycle_position: "pre_api.format_convert"
+created: "2026-05-21"
+updated: "2026-05-21"
+
+process_kind: "format_convert.pdf_ocr_fallback"
+deterministic: true
+side_effects: "read"
+
+inputs:
+  - name: "pdf_path"
+    type: "string"
+  - name: "ocr_fallback_threshold_chars"
+    type: "integer"
+outputs:
+  - name: "pages"
+    type: "object[]"
+config:
+  default_ocr_fallback_threshold_chars: 32
+  ocr_engine: "tesseract"
+tags: ["pdf", "ocr", "page-aware", "citemind"]

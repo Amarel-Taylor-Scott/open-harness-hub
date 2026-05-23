@@ -1,0 +1,72 @@
+id: "rule-pack/aml-typologies-fatf"
+type: rule-pack
+version: "0.1.0"
+name: "FATF AML typologies (sampled)"
+description: |
+  Classifier rules for common FATF-aligned AML typologies. Each rule
+  is a labeled-example bundle the AML harness uses to score a
+  transaction sequence against known patterns (structuring / smurfing,
+  layering through shell entities, trade-based laundering, etc.).
+  Reference for educational use; institutions should layer
+  jurisdiction-specific red flags on top.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["finance", "finance.aml"]
+capability: ["classification"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "dated"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+family: "classifier"
+rules:
+  - id: "structuring_under_threshold"
+    label: "Structuring (smurfing) under a reporting threshold"
+    examples:
+      - "12 cash deposits of $9,500 within 7 days from one customer"
+      - "multiple deposits just below the $10,000 CTR threshold across affiliated branches"
+    threshold: 0.65
+    severity: "high"
+    category: "fatf.placement"
+  - id: "layering_via_shell"
+    label: "Rapid layering through related shell entities"
+    examples:
+      - "wire to Entity B → onward wire same day to Entity C with no apparent business purpose"
+      - "circular fund movement across three related corporate accounts in 48 hours"
+    threshold: 0.65
+    severity: "high"
+    category: "fatf.layering"
+  - id: "trade_based_value_mismatch"
+    label: "Trade-based laundering — invoice value mismatch"
+    examples:
+      - "invoice price 4x prevailing market for commodity X with same-day wire"
+      - "round-tripping payments tied to under-invoiced imports"
+    threshold: 0.55
+    severity: "medium"
+    category: "fatf.tbml"
+  - id: "high_risk_corridor"
+    label: "Cross-border flow through high-risk jurisdiction"
+    examples:
+      - "USD wire to a beneficiary in a FATF black/grey-list jurisdiction"
+      - "remittance corridor with no prior account history and no stated purpose"
+    threshold: 0.55
+    severity: "medium"
+    category: "fatf.geographic"
+  - id: "rapid_in_rapid_out"
+    label: "Funds pass through with no apparent economic purpose"
+    examples:
+      - "inflow $250k from new counterparty followed by outflow $245k within 24h"
+      - "account balance returns to baseline within one business cycle"
+    threshold: 0.60
+    severity: "medium"
+    category: "fatf.layering"
+  - id: "round_dollar_pattern"
+    label: "Improbable round-dollar transaction series"
+    examples:
+      - "ten outgoing wires of exactly $50,000 each within one week"
+    threshold: 0.50
+    severity: "low"
+    category: "fatf.placement"

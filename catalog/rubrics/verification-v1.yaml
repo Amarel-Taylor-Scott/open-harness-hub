@@ -1,0 +1,40 @@
+id: "rubric/verification-v1"
+type: rubric
+version: "0.1.0"
+name: "Verification v1"
+description: |
+  Four-dimension rubric for fact-verification outputs. Used by
+  `pipeline/verify-claim-against-corpus`.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry", "media"]
+capability: ["evaluation"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+dimensions:
+  - id: "correct_verdict"
+    label: "Verdict matches gold label"
+    weight: 0.40
+    scale: "0..1"
+    evidence_required: "verdict in {supports, contradicts, no_evidence}"
+  - id: "citation_quality"
+    label: "Citations point at the right passage"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "every cited passage exists and is relevant"
+  - id: "calibration"
+    label: "Confidence matches actual accuracy"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "Brier-style calibration over the eval set"
+  - id: "abstention_when_thin"
+    label: "Abstains from controversial claims under-corroborated"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "no support/contradict verdict with fewer than 2 independent sources"
+scoring_method: "weighted_sum"

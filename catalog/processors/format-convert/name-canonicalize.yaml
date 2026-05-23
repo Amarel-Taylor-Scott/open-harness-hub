@@ -1,0 +1,56 @@
+id: "processor/name-canonicalize"
+type: processor
+version: "0.1.0"
+name: "Person-name canonicalize (Western + East-Asian)"
+description: |
+  Canonicalize a person name string into structured components:
+  given_name, family_name, middle_names, suffix, honorific. Handles
+  the East-Asian convention where family name comes first; Spanish
+  / Portuguese double-family-name; Arabic / Hebrew patronymics;
+  honorifics (Dr / Sir / Hon). Output Title-Cases each component.
+
+  NEVER assigns gender from name (this is a known bias trap).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["format_conversion", "extraction"]
+modality:   ["text", "structured"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "pre_api.format_convert"
+tags: ["name", "canonicalize", "international", "enrichment"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+process_kind: "format_convert.name_canonicalize"
+deterministic: true
+side_effects: "none"
+
+inputs:
+  - name: "raw_name"
+    type: "string"
+  - name: "name_culture_hint"
+    type: "string"
+outputs:
+  - name: "given_name"
+    type: "string"
+  - name: "family_name"
+    type: "string"
+  - name: "middle_names"
+    type: "string[]"
+  - name: "suffix"
+    type: "string"
+  - name: "honorific"
+    type: "string"
+  - name: "display_name"
+    type: "string"
+  - name: "key_for_dedupe"
+    type: "string"
+
+config:
+  case_normalization: "title_case"
+  name_culture_options: ["western", "east_asian", "spanish_portuguese", "arabic", "hebrew", "indian"]
+  honorifics: ["Mr", "Mrs", "Ms", "Mx", "Dr", "Prof", "Sir", "Dame", "Lord", "Lady", "Hon", "Rev"]
+  generation_suffixes: ["Jr", "Sr", "II", "III", "IV", "Esq", "MD", "PhD", "JD", "CPA"]
+  never_infer_gender: true

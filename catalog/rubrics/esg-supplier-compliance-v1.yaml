@@ -1,0 +1,108 @@
+id: "rubric/esg-supplier-compliance-v1"
+type: rubric
+version: "0.2.0"
+name: "ESG supplier compliance v1 (full E + S + G)"
+description: |
+  Twelve-dimension rubric for grading supplier-submitted policy texts,
+  self-assessments, and grievance transcripts against the CSDDD, the
+  ILO forced-labor indicators, the major national supply-chain laws,
+  CSRD ESRS environmental disclosures, and the lead company's code
+  of conduct. Separates the **E**, **S**, and **G** dimensions
+  explicitly so a supplier can score high on one and be flagged on
+  another.
+
+  Used by `pipeline/supplier-policy-grading` and `pipeline/deep-tier-
+  supplier-audit`. For tighter sub-domain grading use the
+  per-dimension rubrics `rubric/esg-env-v1`, `rubric/esg-social-v1`,
+  `rubric/esg-gov-v1`.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["esg", "supply_chain", "compliance"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+dimensions:
+  # ---------- Social (S) ----------
+  - id: "s_indicators_grounded"
+    label: "S: Every social finding cites an ILO indicator + CSDDD article + national law"
+    weight: 0.12
+    scale: "0..1"
+    evidence_required: "for each finding (severity ≥ medium) on the social dimension: non-empty (ilo_indicator_id, csddd_article_id, national_law_id) triple"
+  - id: "s_no_accusation_without_pattern"
+    label: "S: No accusation of forced labor from a single indicator"
+    weight: 0.06
+    scale: "0..1"
+    evidence_required: "either ≥2 ILO indicators OR audit-team direct observation; otherwise label = 'risk flag', not 'violation'"
+  - id: "s_grievance_pii_safe"
+    label: "S: Worker grievance transcripts are PII-redacted before quotation"
+    weight: 0.06
+    scale: "0..1"
+    evidence_required: "rule-pack/privacy-pii-text-en fires zero critical hits on quoted snippets"
+
+  # ---------- Environmental (E) ----------
+  - id: "e_csrd_esrs_aligned"
+    label: "E: Environmental findings reference ESRS E1-E5 (climate / pollution / water / biodiversity / circular)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "for each environmental finding: non-empty ESRS topical standard id"
+  - id: "e_transition_plan_present"
+    label: "E: Supplier has a CSDDD Art. 13 transition plan OR a documented gap"
+    weight: 0.06
+    scale: "0..1"
+    evidence_required: "transition_plan_ref OR explicit 'no_transition_plan' audit finding with severity"
+  - id: "e_scope_3_complete"
+    label: "E: Scope-3 GHG categories 1-15 boundary defined; significant exclusions flagged"
+    weight: 0.06
+    scale: "0..1"
+    evidence_required: "ghg_boundary table covers categories 1-15; any 'excluded' category has a rationale"
+  - id: "e_deforestation_check"
+    label: "E: EUDR-relevant commodities have due-diligence statement + geolocation"
+    weight: 0.06
+    scale: "0..1"
+    evidence_required: "for cattle/cocoa/coffee/palm-oil/rubber/soy/wood: geolocation + DDS reference"
+
+  # ---------- Governance (G) ----------
+  - id: "g_beneficial_ownership"
+    label: "G: Ultimate beneficial owners disclosed; no nominee-only structure"
+    weight: 0.08
+    scale: "0..1"
+    evidence_required: "ubo list with natural-person names + ownership %; flag if nominee_only"
+  - id: "g_anti_bribery_program"
+    label: "G: ISO 37001-equivalent anti-bribery program + facilitation-payment policy"
+    weight: 0.06
+    scale: "0..1"
+    evidence_required: "abp_policy_ref + facilitation_payment_policy_ref non-empty"
+  - id: "g_whistleblower_channel"
+    label: "G: Independent, EU-2019/1937-compliant whistleblower channel"
+    weight: 0.06
+    scale: "0..1"
+    evidence_required: "whistleblower_channel_ref + independence_attestation_ref"
+
+  # ---------- Cross-cutting ----------
+  - id: "x_tier_traced"
+    label: "X: Each finding is tied to its supplier tier (T1/T2/T3/T4+)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "supplier_tier set + supplier_registry_node_id resolved"
+  - id: "x_remediation_path"
+    label: "X: Each finding has a CSDDD Art. 10 remediation path with milestones"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "non-empty remediation field (corrective action + supplier right of reply + 30-90 day milestone)"
+  - id: "x_high_risk_corridor_uplift"
+    label: "X: Sourcing from high-risk corridors triggers heightened review"
+    weight: 0.04
+    scale: "0..1"
+    evidence_required: "if knowledge-pack/high-risk-corridors-and-sectors hits → escalation = 'heightened_review'"
+  - id: "x_lead_policy_alignment"
+    label: "X: Findings reference the lead company's code of conduct section"
+    weight: 0.04
+    scale: "0..1"
+    evidence_required: "non-empty code_of_conduct_section field"
+
+scoring_method: "weighted_sum"

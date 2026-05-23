@@ -1,0 +1,67 @@
+{
+  "claim_generator": "open_harness_hub/brand-safe-product-photo@0.1.0",
+  "claim_generator_info": [
+    {
+      "name": "Open Harness Hub",
+      "version": "0.1.0"
+    }
+  ],
+  "title": "Brand-Safe Product Photo",
+  "format": "image/png",
+  "instance_id": "urn:uuid:00000000-0000-0000-0000-000000000000",
+  "thumbnail": {
+    "format": "image/jpeg",
+    "identifier": "thumb.jpg"
+  },
+  "assertions": [
+    {
+      "label": "c2pa.actions",
+      "data": {
+        "actions": [
+          {
+            "action": "c2pa.created",
+            "when": "2026-05-20T17:02:14.620983+00:00",
+            "softwareAgent": {
+              "name": "Brand-Safe Product Photo",
+              "version": "0.1.0"
+            },
+            "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia"
+          }
+        ]
+      }
+    },
+    {
+      "label": "c2pa.training-mining",
+      "data": {
+        "entries": {
+          "c2pa.ai_generative_training": {
+            "use": "allowed",
+            "notice": "Pipeline `pipeline/brand-safe-product-photo` uses tool `tool/txt2img-sdxl` and obeys the hub's output_safety_packs."
+          },
+          "c2pa.ai_inference": {
+            "use": "allowed"
+          }
+        }
+      }
+    },
+    {
+      "label": "ohh.pipeline_provenance",
+      "data": {
+        "pipeline_id": "pipeline/brand-safe-product-photo",
+        "pipeline_version": "0.1.0",
+        "synth_tool": "tool/txt2img-sdxl",
+        "output_safety_packs": [
+          "rule-pack/grep-output-safety-image"
+        ],
+        "style_packs": [
+          "knowledge-pack/style-references-cinematic"
+        ],
+        "physics_packs": [
+          "knowledge-pack/lens-physics-primers"
+        ],
+        "license": "MIT",
+        "trust_boundary": "mixed"
+      }
+    }
+  ]
+}

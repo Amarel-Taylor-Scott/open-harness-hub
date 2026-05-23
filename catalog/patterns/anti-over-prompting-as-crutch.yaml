@@ -1,0 +1,47 @@
+id: "pattern/anti-over-prompting-as-crutch"
+type: pattern
+version: "0.1.0"
+name: "Anti-pattern: 5,000-token system prompt as a crutch"
+description: "Workarounds for missing structured infrastructure get stuffed into the system prompt: 'always cite sources,' 'never invent data,' 'use these 47 industry terms,' 'follow this 12-step process,' 'reject if X'. The prompt becomes a brittle DSL the model parses inconsistently."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["cross_industry"]
+capability: ["generation"]
+modality: ["text"]
+lifecycle: "stable"
+trust_boundary: "local"
+created: "2026-05-22"
+updated: "2026-05-22"
+
+when_to_use:
+  - "This is an anti-pattern. Do NOT use it."
+
+structural_shape:
+  - "WRONG: 5,000-token system prompt with retrieved data + persona + rules + examples + format constraints + safety rules + tool descriptions all inline."
+  - "RIGHT: persona artifact (short hard_rules + system_prompt); retrieval as separate step; rules as rule-pack; format constraints as JSON schema."
+
+problem: |
+  Long system prompts: (a) inflate per-call cost + latency, (b) increase
+  context window pressure on inputs that matter, (c) get parsed
+  inconsistently (later rules override earlier; long lists dilute
+  attention), (d) become un-versionable / un-auditable strings copy-pasted
+  across pipelines, (e) hide what the system actually does behind prose.
+
+solution: |
+  Decompose the prompt into typed artifacts the catalog already has:
+  persona (role + hard_rules), rule-pack (deterministic detectors),
+  rubric (scoring dims), tool definitions (typed signatures), retrieval
+  step (factual grounding). The system prompt becomes ~200 tokens that
+  reference those artifacts. Pipelines become inspectable.
+
+implementing_pipelines: []
+
+related_patterns:
+  - "pattern/two-stage-extract-then-judge"
+  - "pattern/critical-tier-output-override"
+  - "pattern/composable-success-criteria"
+
+counter_patterns:
+  - "Decompose into persona / rule-pack / rubric / tool artifacts."
+
+tags: ["anti-pattern", "prompt", "context-bloat", "brittle"]

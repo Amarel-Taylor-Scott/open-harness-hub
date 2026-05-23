@@ -1,0 +1,52 @@
+id: "tool/usps-address-validator"
+type: tool
+version: "0.1.0"
+name: "USPS address validation"
+description: |
+  Proxy to the USPS Address Information API. Given a US address,
+  returns: standardized form, ZIP+4, deliverability, DPV (Delivery
+  Point Validation) status, RDI (Residential Delivery Indicator).
+  Use to confirm an address is mailable before accepting it into a
+  customer / shipping record.
+
+  Requires USPS_USER_ID env var (free tier: 5 requests/sec).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry", "retail", "finance", "government"]
+capability: ["verification"]
+modality:   ["text", "structured"]
+lifecycle:  "stable"
+trust_boundary: "external"
+tags: ["usps", "address", "validation", "shipping"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+parameters:
+  type: object
+  properties:
+    street_1:   { type: "string" }
+    street_2:   { type: "string" }
+    city:       { type: "string" }
+    state:      { type: "string" }
+    zip5:       { type: "string" }
+  required: ["street_1"]
+returns:
+  type: object
+  properties:
+    standardized:
+      type: object
+      properties:
+        street_1: { type: "string" }
+        street_2: { type: "string" }
+        city:     { type: "string" }
+        state:    { type: "string" }
+        zip5:     { type: "string" }
+        zip4:     { type: "string" }
+    deliverable:  { type: "boolean" }
+    dpv_code:     { type: "string", enum: ["Y", "D", "S", "N"] }
+    rdi:          { type: "string", enum: ["residential", "commercial", "unknown"] }
+side_effects: "external_call"
+implementations:
+  - kind: "callable"
+    path: "tools.usps_address_validator.run"

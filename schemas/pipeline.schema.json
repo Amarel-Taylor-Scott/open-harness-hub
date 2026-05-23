@@ -1,0 +1,184 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/pipeline.schema.json",
+  "title": "Pipeline manifest",
+  "description": "A DAG of harness/rule-pack/tool calls that completes one specific task.",
+  "allOf": [
+    { "$ref": "_common.schema.json#/$defs/envelope" },
+    {
+      "type": "object",
+      "required": ["task", "pipeline_kind", "steps"],
+      "properties": {
+        "type":          { "const": "pipeline" },
+        "task":          { "type": "string", "minLength": 1 },
+        "pipeline_kind": {
+          "type": "string",
+          "description": "Open vocabulary — see SPEC §11.",
+          "examples": [
+            "research_entity", "verify_data", "format_response",
+            "classify", "extract", "summarize", "translate",
+            "generate_text", "generate_image", "generate_audio", "generate_video",
+            "redact", "route", "evaluate", "agent_loop",
+            "system_prompt", "rag_pack", "grep_pack", "tool_pack"
+          ]
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name":   { "type": "string" },
+              "type":   { "type": "string" },
+              "schema": { "type": "string" }
+            }
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name":   { "type": "string" },
+              "type":   { "type": "string" },
+              "schema": { "type": "string" }
+            }
+          }
+        },
+        "defaults": {
+          "type": "object",
+          "properties": {
+            "persona":         { "$ref": "_common.schema.json#/$defs/artifactId" },
+            "model_adapter":   { "$ref": "_common.schema.json#/$defs/artifactId" },
+            "knowledge_packs": { "type": "array", "items": { "$ref": "_common.schema.json#/$defs/artifactId" } },
+            "rule_packs":      { "type": "array", "items": { "$ref": "_common.schema.json#/$defs/artifactId" } }
+          }
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "kind", "ref"],
+            "properties": {
+              "id":       { "type": "string" },
+              "kind":     { "type": "string", "enum": ["harness", "rule_pack", "tool", "adapter", "branch", "loop", "knowledge_pack", "processor", "embedder", "chunker", "format_convert", "format_coerce", "cache", "memory", "judge", "escalate", "dispatch", "parallel", "report", "deliver", "pipeline"] },
+              "ref":      { "type": "string" },
+              "inputs":   { "type": "object" },
+              "when":     { "type": "string" },
+              "on_error": { "type": "string" }
+            }
+          }
+        },
+        "success_criteria": {
+          "type": "array",
+          "description": "Pluggable success criteria. Each item is one of: rubric (legacy), regex, semantic, llm_judge, deterministic, tool_validate, composite. The runner walks the list and reports per-criterion pass/fail plus an aggregate pass.",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "description": "Legacy/default: judge candidate against rubric, require score >= threshold.",
+                "required": ["rubric", "threshold"],
+                "properties": {
+                  "kind":      { "const": "rubric" },
+                  "rubric":    { "$ref": "_common.schema.json#/$defs/artifactId" },
+                  "threshold": { "type": "number" },
+                  "severity":  { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+                  "label":     { "type": "string" }
+                }
+              },
+              {
+                "type": "object",
+                "required": ["kind", "target", "pattern"],
+                "properties": {
+                  "kind":        { "const": "regex" },
+                  "target":      { "type": "string", "description": "$-path into trace, e.g. $.output.text" },
+                  "pattern":     { "type": "string" },
+                  "must_match":  { "type": "boolean", "default": true },
+                  "case_insensitive": { "type": "boolean", "default": true },
+                  "severity":    { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+                  "label":       { "type": "string" }
+                }
+              },
+              {
+                "type": "object",
+                "required": ["kind", "target", "must_cover"],
+                "properties": {
+                  "kind":        { "const": "semantic" },
+                  "target":      { "type": "string" },
+                  "must_cover":  { "type": "array", "items": { "type": "string" }, "minItems": 1, "description": "Reference topics — embedding similarity to each must clear similarity_threshold." },
+                  "embedder":    { "$ref": "_common.schema.json#/$defs/artifactId" },
+                  "similarity_threshold": { "type": "number", "default": 0.6 },
+                  "severity":    { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+                  "label":       { "type": "string" }
+                }
+              },
+              {
+                "type": "object",
+                "required": ["kind", "target"],
+                "properties": {
+                  "kind":         { "const": "llm_judge" },
+                  "target":       { "type": "string" },
+                  "rubric":       { "$ref": "_common.schema.json#/$defs/artifactId" },
+                  "judge_adapter":{ "$ref": "_common.schema.json#/$defs/artifactId" },
+                  "prompt":       { "type": "string", "description": "Optional custom prompt; otherwise derived from rubric." },
+                  "threshold":    { "type": "number" },
+                  "severity":     { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+                  "label":        { "type": "string" }
+                }
+              },
+              {
+                "type": "object",
+                "required": ["kind", "target", "op", "value"],
+                "properties": {
+                  "kind":     { "const": "deterministic" },
+                  "target":   { "type": "string" },
+                  "op":       { "type": "string", "enum": [">", ">=", "<", "<=", "==", "!=", "in", "not_in", "is_truthy", "is_falsy"] },
+                  "value":    {},
+                  "severity": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+                  "label":    { "type": "string" }
+                }
+              },
+              {
+                "type": "object",
+                "required": ["kind", "tool"],
+                "properties": {
+                  "kind":     { "const": "tool_validate" },
+                  "tool":     { "$ref": "_common.schema.json#/$defs/artifactId" },
+                  "target":   { "type": "string" },
+                  "params":   { "type": "object" },
+                  "severity": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+                  "label":    { "type": "string" }
+                }
+              },
+              {
+                "type": "object",
+                "required": ["kind", "op", "children"],
+                "properties": {
+                  "kind":     { "const": "composite" },
+                  "op":       { "type": "string", "enum": ["AND", "OR", "NOT"] },
+                  "children": { "type": "array", "items": {} },
+                  "label":    { "type": "string" }
+                }
+              }
+            ]
+          }
+        },
+        "output_safety_packs": {
+          "type": "array",
+          "items": { "$ref": "_common.schema.json#/$defs/artifactId" },
+          "description": "Required when modality includes image/audio/video. Rule packs that screen the generated artifact."
+        },
+        "style_packs": {
+          "type": "array",
+          "items": { "$ref": "_common.schema.json#/$defs/artifactId" }
+        },
+        "physics_packs": {
+          "type": "array",
+          "items": { "$ref": "_common.schema.json#/$defs/artifactId" }
+        }
+      }
+    }
+  ]
+}

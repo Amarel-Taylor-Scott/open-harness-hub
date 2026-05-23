@@ -1,0 +1,81 @@
+id: "rule-pack/grep-vcs-platform-pats"
+type: rule-pack
+version: "0.1.0"
+name: "VCS platform PATs (GitHub, GitLab, Bitbucket, Atlassian)"
+description: |
+  Detection patterns for Personal Access Tokens issued by code-hosting
+  platforms. Each vendor uses a stable prefix (`ghp_`, `gho_`, `ghu_`,
+  `ghs_`, `ghr_` for GitHub; `glpat-` for GitLab; `ATATT3` for
+  Atlassian/Jira; `BBDC-` for Bitbucket Cloud).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["security", "software"]
+capability: ["anonymization", "safety_gating"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["secrets", "vcs", "pat"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+family: "grep"
+rules:
+  - id: "github_pat_classic"
+    pattern: "\\bghp_[A-Za-z0-9]{36,}\\b"
+    severity: "critical"
+    category: "secret.github"
+    notes: "GitHub classic personal access token."
+
+  - id: "github_pat_finegrained"
+    pattern: "\\bgithub_pat_[A-Za-z0-9]{22}_[A-Za-z0-9]{59}\\b"
+    severity: "critical"
+    category: "secret.github"
+    notes: "GitHub fine-grained PAT."
+
+  - id: "github_oauth_token"
+    pattern: "\\bgho_[A-Za-z0-9]{36,}\\b"
+    severity: "critical"
+    category: "secret.github"
+
+  - id: "github_user_to_server"
+    pattern: "\\bghu_[A-Za-z0-9]{36,}\\b"
+    severity: "critical"
+    category: "secret.github"
+
+  - id: "github_server_to_server"
+    pattern: "\\bghs_[A-Za-z0-9]{36,}\\b"
+    severity: "critical"
+    category: "secret.github"
+
+  - id: "github_refresh"
+    pattern: "\\bghr_[A-Za-z0-9]{76}\\b"
+    severity: "high"
+    category: "secret.github"
+
+  - id: "gitlab_pat"
+    pattern: "\\bglpat-[A-Za-z0-9_\\-]{20}\\b"
+    severity: "critical"
+    category: "secret.gitlab"
+
+  - id: "atlassian_token"
+    pattern: "\\bATATT3[A-Za-z0-9_=\\-]{180,}\\b"
+    severity: "critical"
+    category: "secret.atlassian"
+    notes: "Atlassian / Jira / Confluence API token."
+
+  - id: "bitbucket_app_password"
+    pattern: "\\bBBDC-[A-Za-z0-9+/=]{40,}\\b"
+    severity: "high"
+    category: "secret.bitbucket"
+
+  - id: "npm_token"
+    pattern: "\\bnpm_[A-Za-z0-9]{36}\\b"
+    severity: "critical"
+    category: "secret.npm"
+
+  - id: "pypi_token"
+    pattern: "\\bpypi-AgEIcHlwaS5vcmcC[A-Za-z0-9_\\-]+\\b"
+    severity: "critical"
+    category: "secret.pypi"

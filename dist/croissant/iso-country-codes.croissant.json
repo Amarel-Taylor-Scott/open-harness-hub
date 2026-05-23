@@ -1,0 +1,173 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/iso-country-codes",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "ISO 3166 country codes (sample)",
+  "description": "ISO 3166-1 alpha-2, alpha-3, numeric codes plus region and a coarse\nFATF risk hint. Useful for KYC, transaction-graph queries, and\ncross-border-flow analysis. Sample subset; full list (~250 entries)\ndrops in at production time.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC0-1.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/iso-country-codes",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-19",
+  "keywords": [
+    "iso-3166",
+    "country-codes"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-19",
+  "citation": "ISO 3166-1 (public); FATF risk hints are illustrative.",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "iso-country-codes__iso-country-codes",
+      "name": "iso-country-codes.jsonl",
+      "description": "Data file backing knowledge pack iso-country-codes.",
+      "contentUrl": "knowledge-packs/data/iso-country-codes.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "3501 B",
+      "sha256": "e92b1cbc609614b440e01bf38e17f591fd2e0f4d4f9f282afd7d031e54435834"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "iso-country-codes__records",
+      "name": "iso-country-codes__records",
+      "description": "Records parsed from iso-country-codes.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "iso-country-codes__records/alpha2",
+          "name": "alpha2",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "iso-country-codes__iso-country-codes"
+            },
+            "extract": {
+              "column": "alpha2"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "iso-country-codes__records/alpha3",
+          "name": "alpha3",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "iso-country-codes__iso-country-codes"
+            },
+            "extract": {
+              "column": "alpha3"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "iso-country-codes__records/numeric",
+          "name": "numeric",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "iso-country-codes__iso-country-codes"
+            },
+            "extract": {
+              "column": "numeric"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "iso-country-codes__records/name",
+          "name": "name",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "iso-country-codes__iso-country-codes"
+            },
+            "extract": {
+              "column": "name"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "iso-country-codes__records/region",
+          "name": "region",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "iso-country-codes__iso-country-codes"
+            },
+            "extract": {
+              "column": "region"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "iso-country-codes__records/fatf_risk_hint",
+          "name": "fatf_risk_hint",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "iso-country-codes__iso-country-codes"
+            },
+            "extract": {
+              "column": "fatf_risk_hint"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+id: "dataset/hr-posting-samples"
+type: dataset
+version: "0.1.0"
+name: "Synthetic HR job-posting samples"
+description: |
+  Two synthetic job postings:
+   - clean: senior backend engineer, EEO statement, ADA contact,
+     fluency or equivalent. Expected 0 hits.
+   - flagged: 'rockstar' / 'ninja' / 'young dynamic team' / 'gentleman's
+     club' / native English speaker / US citizen only / salaryman /
+     previous salary / family medical history / blanket criminal /
+     degree-required-no-equivalent. Expected many hits.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["hr", "hr.hiring", "compliance"]
+capability: ["evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["hr", "eeoc", "synthetic"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+splits:
+  test:
+    rows: 2
+    path: "data/hr-samples/"
+record_schema: "schemas/job-posting.schema.json"
+provenance:
+  origin: "Fully synthetic"
+  collected_by: "Open Harness Hub contributors"
+  collected_through: "2026-05-20"
+  license: "MIT"
+  anonymization: "fully synthetic"

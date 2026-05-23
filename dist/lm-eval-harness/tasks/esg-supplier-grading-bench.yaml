@@ -1,0 +1,111 @@
+# Auto-generated from Open Harness Hub manifest `benchmark/esg-supplier-grading-bench` v0.1.0.
+# Edit the source manifest at catalog/benchmarks/esg-supplier-grading-bench.yaml and re-run
+# `python scripts/emit/lm_eval_harness.py`.
+task: esg-supplier-grading-bench
+tag:
+- esg
+- evaluation
+- regression-gate
+description: 'Runs `pipeline/supplier-policy-grading` against the synthetic
+
+  supplier disclosure pack test set (3 representative cases: a well-
+
+  disclosed T1 tech supplier; a T3 textile supplier in Mae Sot with
+
+  forced-labor + corridor red flags; a T2 Paraguay soy supplier with
+
+  mixed signals — strong S, weak E around deforestation).
+
+
+  Scores under `rubric/esg-supplier-compliance-v1` and reports per-
+
+  dimension breakdown so reviewers can see WHERE a model arm
+
+  succeeds vs fails (E vs S vs G vs cross-cutting), not just the
+
+  headline weighted-sum.
+
+
+  Used as a regression gate for the ESG vertical: any change to
+
+  rule-pack/grep-esg-* or the persona must keep headline metric
+
+  within ±0.05 of baseline.'
+dataset_path: open-harness-hub/supplier-disclosure-pack-schema
+dataset_name: null
+output_type: generate_until
+training_split: train
+validation_split: val
+test_split: test
+doc_to_text: '# Persona: persona/esg-auditor
+
+
+  {{prompt}}'
+doc_to_target: '{{ideal}}'
+generation_kwargs:
+  max_gen_toks: 512
+  temperature: 0.0
+  top_p: 1.0
+  until:
+  - '
+
+
+    '
+metric_list:
+- metric: s_indicators_grounded
+  aggregation: mean
+  higher_is_better: true
+- metric: s_no_accusation_without_pattern
+  aggregation: mean
+  higher_is_better: true
+- metric: s_grievance_pii_safe
+  aggregation: mean
+  higher_is_better: true
+- metric: e_csrd_esrs_aligned
+  aggregation: mean
+  higher_is_better: true
+- metric: e_transition_plan_present
+  aggregation: mean
+  higher_is_better: true
+- metric: e_scope_3_complete
+  aggregation: mean
+  higher_is_better: true
+- metric: e_deforestation_check
+  aggregation: mean
+  higher_is_better: true
+- metric: g_beneficial_ownership
+  aggregation: mean
+  higher_is_better: true
+- metric: g_anti_bribery_program
+  aggregation: mean
+  higher_is_better: true
+- metric: g_whistleblower_channel
+  aggregation: mean
+  higher_is_better: true
+- metric: x_tier_traced
+  aggregation: mean
+  higher_is_better: true
+- metric: x_remediation_path
+  aggregation: mean
+  higher_is_better: true
+- metric: x_high_risk_corridor_uplift
+  aggregation: mean
+  higher_is_better: true
+- metric: x_lead_policy_alignment
+  aggregation: mean
+  higher_is_better: true
+- metric: weighted_rubric_score
+  aggregation: mean
+  higher_is_better: true
+num_fewshot: 0
+metadata:
+  version: 0.1.0
+  open_harness_hub_id: benchmark/esg-supplier-grading-bench
+  rubric: rubric/esg-supplier-compliance-v1
+  pipeline: pipeline/supplier-policy-grading
+  reproducibility:
+    commit_sha: TBD
+    dataset_version: 0.1.0
+    run_date: '2026-05-19'
+    hardware: Apple M1 (16GB) for ollama arm; T4 16GB for vLLM arm
+    seed: 42

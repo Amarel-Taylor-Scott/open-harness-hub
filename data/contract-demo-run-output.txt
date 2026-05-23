@@ -1,0 +1,33 @@
+
+============================================================================
+  sample-msa-clean.json
+  type: MSA  •  jurisdiction: Delaware, USA
+  parties: Lead Company Inc., Vendor Corp.
+============================================================================
+  steps: 6  •  total ms: 28.4
+  red-flag findings: C: 0  H: 0  M: 0  L: 0
+
+============================================================================
+  sample-nda-mixed.json
+  type: NDA  •  jurisdiction: New York, USA
+  parties: Lead Company Inc., Other Side Corp.
+============================================================================
+  steps: 6  •  total ms: 1.0
+  red-flag findings: C: 0  H: 0  M: 0  L: 0
+
+============================================================================
+  sample-vendor-flagged.json
+  type: vendor_agreement  •  jurisdiction: California, USA
+  parties: Lead Company Inc., Aggressive Vendor LLC
+============================================================================
+  steps: 6  •  total ms: 2.0
+  red-flag findings: C: 3  H: 3  M: 1  L: 0
+
+  rule-pack/grep-contract-red-flags:
+    [critical ] unlimited_liability              legal.unlimited_liability
+    [critical ] ip_assignment_preexisting        legal.ip_assignment_preexisting
+    [high     ] no_audit_rights                  legal.no_audit_rights
+    [high     ] missing_anti_bribery_warranty    legal.missing_anti_bribery
+    [high     ] free_assignment                  legal.free_assignment
+    [medium   ] force_majeure_narrow             legal.force_majeure_narrow
+    [critical ] asymmetric_cap                   legal.asymmetric_cap

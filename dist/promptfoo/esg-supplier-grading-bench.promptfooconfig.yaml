@@ -1,0 +1,123 @@
+# Auto-generated from Open Harness Hub `benchmark/esg-supplier-grading-bench` v0.1.0.
+# Re-run `python scripts/emit/promptfoo.py` after editing the source manifest.
+description: 'Runs `pipeline/supplier-policy-grading` against the synthetic
+
+  supplier disclosure pack test set (3 representative cases: a well-
+
+  disclosed T1 tech supplier; a T3 textile supplier in Mae Sot with
+
+  forced-labor + corridor red flags; a T2 Paraguay soy supplier with
+
+  mixed signals — strong S, weak E around deforestation).
+
+
+  Scores under `rubric/esg-supplier-compliance-v1` and reports per-
+
+  dimension breakdown so reviewers can see WHERE a model arm
+
+  succeeds vs fails (E vs S vs G vs cross-cutting), not just the
+
+  headline weighted-sum.
+
+
+  Used as a regression gate for the ESG vertical: any change to
+
+  rule-pack/grep-esg-* or the persona must keep headline metric
+
+  within ±0.05 of baseline.'
+prompts:
+- '{{prompt}}'
+providers:
+- id: ollama:llama3.1:8b
+  label: ollama-llama3-8b-default
+  config:
+    apiBaseUrl: http://localhost:11434
+- id: openai:chat:Qwen/Qwen2.5-32B-Instruct-AWQ
+  label: vllm-qwen2.5-32b-awq
+  config:
+    apiBaseUrl: http://localhost:8000
+defaultTest:
+  assert:
+  - type: llm-rubric
+    value: 'S: Every social finding cites an ILO indicator + CSDDD article + national law. for each finding (severity ≥ medium)
+      on the social dimension: non-empty (ilo_indicator_id, csddd_article_id, national_law_id) triple'
+    metric: s_indicators_grounded
+    weight: 0.12
+  - type: llm-rubric
+    value: 'S: No accusation of forced labor from a single indicator. either ≥2 ILO indicators OR audit-team direct observation;
+      otherwise label = ''risk flag'', not ''violation'''
+    metric: s_no_accusation_without_pattern
+    weight: 0.06
+  - type: llm-rubric
+    value: 'S: Worker grievance transcripts are PII-redacted before quotation. rule-pack/privacy-pii-text-en fires zero critical
+      hits on quoted snippets'
+    metric: s_grievance_pii_safe
+    weight: 0.06
+  - type: llm-rubric
+    value: 'E: Environmental findings reference ESRS E1-E5 (climate / pollution / water / biodiversity / circular). for each
+      environmental finding: non-empty ESRS topical standard id'
+    metric: e_csrd_esrs_aligned
+    weight: 0.1
+  - type: llm-rubric
+    value: 'E: Supplier has a CSDDD Art. 13 transition plan OR a documented gap. transition_plan_ref OR explicit ''no_transition_plan''
+      audit finding with severity'
+    metric: e_transition_plan_present
+    weight: 0.06
+  - type: llm-rubric
+    value: 'E: Scope-3 GHG categories 1-15 boundary defined; significant exclusions flagged. ghg_boundary table covers categories
+      1-15; any ''excluded'' category has a rationale'
+    metric: e_scope_3_complete
+    weight: 0.06
+  - type: llm-rubric
+    value: 'E: EUDR-relevant commodities have due-diligence statement + geolocation. for cattle/cocoa/coffee/palm-oil/rubber/soy/wood:
+      geolocation + DDS reference'
+    metric: e_deforestation_check
+    weight: 0.06
+  - type: llm-rubric
+    value: 'G: Ultimate beneficial owners disclosed; no nominee-only structure. ubo list with natural-person names + ownership
+      %; flag if nominee_only'
+    metric: g_beneficial_ownership
+    weight: 0.08
+  - type: llm-rubric
+    value: 'G: ISO 37001-equivalent anti-bribery program + facilitation-payment policy. abp_policy_ref + facilitation_payment_policy_ref
+      non-empty'
+    metric: g_anti_bribery_program
+    weight: 0.06
+  - type: llm-rubric
+    value: 'G: Independent, EU-2019/1937-compliant whistleblower channel. whistleblower_channel_ref + independence_attestation_ref'
+    metric: g_whistleblower_channel
+    weight: 0.06
+  - type: llm-rubric
+    value: 'X: Each finding is tied to its supplier tier (T1/T2/T3/T4+). supplier_tier set + supplier_registry_node_id resolved'
+    metric: x_tier_traced
+    weight: 0.1
+  - type: llm-rubric
+    value: 'X: Each finding has a CSDDD Art. 10 remediation path with milestones. non-empty remediation field (corrective
+      action + supplier right of reply + 30-90 day milestone)'
+    metric: x_remediation_path
+    weight: 0.1
+  - type: llm-rubric
+    value: 'X: Sourcing from high-risk corridors triggers heightened review. if knowledge-pack/high-risk-corridors-and-sectors
+      hits → escalation = ''heightened_review'''
+    metric: x_high_risk_corridor_uplift
+    weight: 0.04
+  - type: llm-rubric
+    value: 'X: Findings reference the lead company''s code of conduct section. non-empty code_of_conduct_section field'
+    metric: x_lead_policy_alignment
+    weight: 0.04
+tests:
+- description: Sample row 0 from dataset/supplier-disclosure-pack-schema
+  vars:
+    prompt: 'TODO: replace with rows from dataset'
+outputPath: ./reports/esg-supplier-grading-bench.json
+writeLatestResults: true
+metadata:
+  open_harness_hub_id: benchmark/esg-supplier-grading-bench
+  version: 0.1.0
+  headline_metric: rubric_score_weighted_sum
+  reproducibility:
+    commit_sha: TBD
+    dataset_version: 0.1.0
+    run_date: '2026-05-19'
+    hardware: Apple M1 (16GB) for ollama arm; T4 16GB for vLLM arm
+    seed: 42

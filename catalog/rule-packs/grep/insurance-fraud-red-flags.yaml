@@ -1,0 +1,83 @@
+id: "rule-pack/grep-insurance-fraud-red-flags"
+type: rule-pack
+version: "0.1.0"
+name: "Insurance claim fraud red-flag detectors (NAIC + CAIF)"
+description: |
+  GREP detectors for the highest-leverage insurance-claim fraud
+  red flags drawn from NAIC fraud-fighter handbook + Coalition
+  Against Insurance Fraud indicators. Pair with
+  `pipeline/insurance-claim-review`.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["insurance", "insurance.claims", "insurance.fraud", "finance"]
+capability: ["safety_gating", "classification"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "volatile"
+tags: ["insurance", "fraud", "naic"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+family: "grep"
+rules:
+  - id: "recent_coverage_change"
+    pattern: "(?i)(coverage\\s+(?:increased|upgraded|added|amended)|policy\\s+(?:increased|upgraded|amended))\\s+(?:within|less than|fewer than)\\s+\\d{1,3}\\s*(?:day|week|month)s?\\s+(?:before|prior to|of)\\s+(?:loss|incident|claim)"
+    severity: "critical"
+    category: "insurance.fraud.recent_coverage_change"
+
+  - id: "loss_at_renewal"
+    pattern: "(?i)loss\\s+(?:occurred|reported)\\s+(?:within|less than)\\s+\\d{1,3}\\s+days?\\s+(?:of|after|before)\\s+(?:policy\\s+)?renewal"
+    severity: "high"
+    category: "insurance.fraud.loss_at_renewal"
+
+  - id: "claimant_on_fraud_watchlist"
+    pattern: "(?i)claimant\\s+on\\s+(?:internal\\s+)?fraud\\s+(?:watch[- ]?list|flag\\s+list)|prior\\s+(?:fraud\\s+)?claim\\s+(?:filed|reported)\\s+(?:by|against)\\s+claimant"
+    severity: "critical"
+    category: "insurance.fraud.claimant_watchlist"
+
+  - id: "conflicting_witness"
+    pattern: "(?i)witness\\s+statements?\\s+(?:conflict|contradict|inconsistent|disagree)|two\\s+(?:different|conflicting)\\s+accounts\\s+of\\s+(?:loss|incident)"
+    severity: "high"
+    category: "insurance.fraud.conflicting_witness"
+
+  - id: "photos_predate_loss"
+    pattern: "(?i)photos?\\s+(?:pre[- ]?date|predating|taken before|exif\\s+date\\s+(?:before|prior))\\s+(?:reported|alleged)\\s+(?:loss|incident)|metadata\\s+(?:shows|indicates)\\s+(?:photo|image)\\s+predating"
+    severity: "critical"
+    category: "insurance.fraud.photo_metadata"
+
+  - id: "inflated_invoice"
+    pattern: "(?i)(?:repair|invoice|estimate)\\s+(?:significantly\\s+)?(?:above|exceeds)\\s+(?:market|industry|book)\\s+(?:rate|value)\\s+by\\s+\\d{1,3}\\s*%|(\\d{2,3})x\\s+market\\s+rate"
+    severity: "high"
+    category: "insurance.fraud.inflated_invoice"
+
+  - id: "shop_on_flag_list"
+    pattern: "(?i)(?:repair\\s+shop|provider|vendor)\\s+(?:on|flagged on)\\s+(?:internal\\s+)?(?:flag\\s+list|preferred\\s+list\\s+suspended|watchlist)"
+    severity: "high"
+    category: "insurance.fraud.provider_flagged"
+
+  - id: "missing_police_report"
+    pattern: "(?i)(?:no|absent|not\\s+filed|n[\\.\\/]?a)\\s+police\\s+report(?!.{0,120}(minor|under\\s+\\$\\d|under\\s+threshold|state\\s+does\\s+not\\s+require))"
+    severity: "medium"
+    category: "insurance.fraud.no_police_report"
+
+  - id: "claimant_relationship_to_witness"
+    pattern: "(?i)witness\\s+(?:is|was)\\s+(?:family|spouse|relative|business partner|employee|landlord)\\s+of\\s+claimant"
+    severity: "medium"
+    category: "insurance.fraud.witness_relationship"
+
+  - id: "ssn_in_claim_body"
+    pattern: "(?<!\\d)\\d{3}-\\d{2}-\\d{4}(?!\\d)"
+    severity: "high"
+    category: "phi.ssn_unredacted"
+
+  - id: "phantom_damage_pattern"
+    pattern: "(?i)damage\\s+(?:not\\s+consistent|inconsistent)\\s+with\\s+(?:reported|alleged)\\s+(?:loss|incident)|damage\\s+(?:appears|seems)\\s+pre[- ]?existing"
+    severity: "critical"
+    category: "insurance.fraud.phantom_damage"
+
+  - id: "multiple_claims_short_window"
+    pattern: "(?i)(\\d+|\\bmultiple\\b|several)\\s+(?:prior\\s+)?claims?\\s+(?:filed|submitted)\\s+(?:by|from)\\s+(?:same\\s+(?:claimant|policyholder)|claimant)\\s+(?:within|in)\\s+(?:past\\s+)?\\d+\\s*(?:day|week|month|year)s?"
+    severity: "high"
+    category: "insurance.fraud.serial_claims"

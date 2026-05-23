@@ -1,0 +1,59 @@
+id: "processor/official-sources-checker"
+type: processor
+version: "0.1.0"
+name: "Official-sources analyzer"
+description: |
+  Verify retrieved candidates against an allowlist of authoritative
+  sources (gov, intergovernmental, academic, standards bodies).
+  Returns per-candidate flags:
+    - is_official: bool
+    - authority_tier: enum [primary, secondary, tertiary, blog, unknown]
+    - jurisdiction_match: did the source's jurisdiction match the
+      query's geographic scope?
+    - freshness_ok: source date within the requested window?
+    - cross_referenced: does another official source corroborate?
+  Pairs naturally with `rule-pack/web-search-allowlist-default` and
+  the DueCare `official_sources` layer pattern.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry", "media", "government", "healthcare", "finance"]
+capability: ["verification"]
+modality:   ["text"]
+lifecycle:  "experimental"
+lifecycle_position: "post_api.evaluation"
+trust_boundary: "external"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "verify.official_sources"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 1500
+
+inputs:
+  - name: "candidates"
+    type: "SearchResult[]"
+  - name: "jurisdiction_hint"
+    type: "string"
+  - name: "freshness_window_days"
+    type: "integer"
+  - name: "allowlist_pack_ref"
+    type: "artifact_id"
+outputs:
+  - name: "annotated_candidates"
+    type: "AnnotatedSearchResult[]"
+  - name: "accepted"
+    type: "AnnotatedSearchResult[]"
+  - name: "rejected"
+    type: "AnnotatedSearchResult[]"
+  - name: "summary"
+    type: "object"
+
+side_effects: "external_call"
+on_error: "fallback"
+
+implementations:
+  - kind: "callable"
+    path: "processors.official_sources_checker.run"

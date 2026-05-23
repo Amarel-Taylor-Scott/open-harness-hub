@@ -1,0 +1,83 @@
+id: "rule-pack/grep-gdpr-dsar-red-flags"
+type: rule-pack
+version: "0.1.0"
+name: "GDPR DSAR red-flag detectors"
+description: |
+  GREP detectors for GDPR Data Subject Access Request handling
+  red flags: missing identity verification, missing-lawful-basis,
+  unlawful erasure refusal, missing transfer safeguards, missing
+  breach-notification trace, dark-pattern consent.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["privacy", "privacy.gdpr", "privacy.dsar", "compliance"]
+capability: ["safety_gating", "classification"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "volatile"
+tags: ["gdpr", "dsar", "ccpa", "privacy"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+family: "grep"
+rules:
+  - id: "missing_identity_verification"
+    pattern: "(?i)(?:no|absent|skipped|not performed)\\s+identity\\s+verification|identity\\s+verification\\s*[:=]\\s*(?:none|skipped|n[\\.\\/]?a)"
+    severity: "critical"
+    category: "gdpr.dsar.no_id_verification"
+
+  - id: "missing_lawful_basis"
+    pattern: "(?i)(?:no|absent)\\s+lawful\\s+basis(?:\\s+identified)?|lawful\\s+basis\\s*[:=]\\s*(?:n[\\.\\/]?a|none|unclear|to\\s+be\\s+determined)"
+    severity: "critical"
+    category: "gdpr.lawful_basis.missing"
+
+  - id: "deadline_missed"
+    pattern: "(?i)dsar\\s+(?:response|fulfillment)\\s+(?:delayed|missed\\s+deadline|past\\s+(?:1|one)[- ]?month|past\\s+statutory\\s+deadline)"
+    severity: "high"
+    category: "gdpr.dsar.deadline_missed"
+
+  - id: "unlawful_charge"
+    pattern: "(?i)dsar\\s+(?:fee|charge)\\s*[:=]\\s*\\$?[\\d.,]+|charged\\s+(?:the\\s+)?(?:subject|consumer)\\s+for\\s+(?:dsar|access\\s+request)"
+    severity: "high"
+    category: "gdpr.dsar.unlawful_charge"
+
+  - id: "special_category_without_basis"
+    pattern: "(?i)(?:processing|collected|stored)\\s+(?:health|biometric|genetic|racial|ethnic|political|religious|sexual\\s+orientation|trade[- ]?union)(?!.{0,400}(?:art\\.?\\s*9\\(2\\)|explicit\\s+consent|vital\\s+interest|public\\s+health))"
+    severity: "critical"
+    category: "gdpr.special_category.no_basis"
+
+  - id: "transfer_without_safeguard"
+    pattern: "(?i)transfer\\s+(?:to|outside)\\s+(?:eu|eea)(?!.{0,400}(?:scc|sccs|standard\\s+contractual\\s+clauses|bcr|binding\\s+corporate\\s+rules|adequacy\\s+decision|art\\.?\\s*49))"
+    severity: "high"
+    category: "gdpr.transfer.no_safeguard"
+
+  - id: "breach_notification_late"
+    pattern: "(?i)breach\\s+notification\\s+(?:delayed|over\\s+72\\s*hours|past\\s+72\\s*hours|outside\\s+statutory\\s+window)"
+    severity: "high"
+    category: "gdpr.breach.notification_late"
+
+  - id: "dark_pattern_consent"
+    pattern: "(?i)(pre[- ]?ticked|pre[- ]?selected)\\s+(?:consent|opt[- ]?in)|consent\\s+bundled\\s+with\\s+(?:tos|terms|other\\s+consent)|cannot\\s+(?:opt\\s+out|withdraw)|consent\\s+(?:irrevocable|cannot\\s+be\\s+withdrawn)"
+    severity: "high"
+    category: "gdpr.consent.dark_pattern"
+
+  - id: "no_dpo_appointed"
+    pattern: "(?i)(?:no|absent)\\s+(?:dpo|data\\s+protection\\s+officer)\\s+appointed|dpo\\s*[:=]\\s*(?:none|n[\\.\\/]?a|to\\s+be\\s+appointed)"
+    severity: "medium"
+    category: "gdpr.dpo.not_appointed"
+
+  - id: "erasure_refused_without_basis"
+    pattern: "(?i)erasure\\s+(?:request\\s+)?(?:refused|denied)(?!.{0,400}(?:art\\.?\\s*17\\(3\\)|legal\\s+obligation|legal\\s+hold|public\\s+interest|legal\\s+claim|freedom\\s+of\\s+expression|archiving|research))"
+    severity: "high"
+    category: "gdpr.erasure.refusal_without_basis"
+
+  - id: "missing_dpia"
+    pattern: "(?i)(?:no|absent|not\\s+performed)\\s+dpia(?!.{0,300}(?:not\\s+required|low\\s+risk|justified))|dpia\\s*[:=]\\s*(?:none|n[\\.\\/]?a|to\\s+be\\s+done)"
+    severity: "medium"
+    category: "gdpr.dpia.missing"
+
+  - id: "automated_decision_no_disclosure"
+    pattern: "(?i)automated\\s+decision[- ]?making(?!.{0,400}(?:logic|significance|consequences|disclosure|art\\.?\\s*22))"
+    severity: "medium"
+    category: "gdpr.automated_decision.no_disclosure"

@@ -1,0 +1,47 @@
+id: "dataset/contract-samples"
+type: dataset
+version: "0.1.0"
+name: "Synthetic commercial contract samples (3 cases)"
+description: |
+  Three synthetic commercial contracts for testing
+  `pipeline/contract-clause-review`. Fully synthetic — no real
+  contract data.
+
+  Cases:
+   - sample-msa-clean.json — well-drafted MSA with all critical
+     clauses present (capped indemnity with carve-outs, mutual
+     liability cap, DPA attached, audit rights, anti-bribery
+     warranty, 90-day termination with wind-down, symmetric
+     assignment, broad force-majeure). Expected high grade.
+   - sample-vendor-flagged.json — aggressive vendor agreement
+     with 9 red flags (uncapped indemnity to vendor, $10k
+     vendor cap vs unlimited customer liability, IP assignment
+     of pre-existing IP, no residuals, no DPA, no audit rights,
+     no anti-bribery, 5-day termination, free vendor assignment,
+     narrow force-majeure). Expected highly flagged.
+   - sample-nda-mixed.json — NDA missing residuals clause + 5y
+     term (long but not red-flag). Mixed signals.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["legal", "legal.contract", "legal.compliance"]
+capability: ["evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["legal", "contract", "synthetic", "nda", "msa"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+splits:
+  test:
+    rows: 3
+    path: "data/contract-samples/"
+record_schema: "schemas/contract.schema.json"
+provenance:
+  origin:            "Fully synthetic — no real contract data"
+  collected_by:      "Open Harness Hub contributors"
+  collected_through: "2026-05-20"
+  license:           "MIT"
+  anonymization:     "fully synthetic; no real entities"

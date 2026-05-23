@@ -1,0 +1,73 @@
+id: "processor/iterative-revise-loop"
+type: processor
+version: "0.1.0"
+name: "Iterative revise loop"
+description: |
+  The "send the response back to the LLM with accumulating context" primitive.
+  Loops:
+    1. Run an inner harness call.
+    2. Run one or more verification processors on the response.
+    3. If any verifier fails (citation coverage, schema, factuality,
+       safety), append the failure as additional context and call the
+       inner harness again.
+    4. Stop when (a) all verifiers pass, (b) max_iterations hit, or
+       (c) cost ceiling breached.
+
+  This is the key primitive for self-correction loops: Self-Refine,
+  Constitutional-AI critique-revise, Self-RAG retrieve-then-judge,
+  Corrective-RAG with knowledge refinement, Reflexion. Distinct from
+  `processor/self-refine-critique` (which is a single critique-revise
+  pair); this primitive is the GENERIC LOOP that any verifier list can
+  drive.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["reasoning", "verification", "agent_loop"]
+modality:   ["text"]
+lifecycle:  "experimental"
+lifecycle_position: "cross_cutting.composition"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "loop.until_convergence"
+deterministic: false
+idempotent: true
+streaming: false
+latency_budget_ms: 60000
+
+inputs:
+  - name: "initial_prompt"
+    type: "string"
+  - name: "inner_harness_ref"
+    type: "artifact_id"
+  - name: "verifier_refs"
+    type: "artifact_id[]"
+  - name: "max_iterations"
+    type: "integer"
+  - name: "cost_ceiling_usd"
+    type: "number"
+  - name: "convergence_policy"
+    type: "enum[all_pass, majority_pass, weighted_score]"
+outputs:
+  - name: "final_response"
+    type: "string"
+  - name: "iterations"
+    type: "object[]"
+  - name: "converged"
+    type: "boolean"
+  - name: "verifier_history"
+    type: "object[]"
+  - name: "total_cost_usd"
+    type: "number"
+
+side_effects: "external_call"
+on_error: "fallback"
+retry:
+  max_attempts: 1
+  backoff: "none"
+
+implementations:
+  - kind: "callable"
+    path: "processors.iterative_revise_loop.run"

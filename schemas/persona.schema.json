@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/persona.schema.json",
+  "title": "Persona manifest",
+  "allOf": [
+    { "$ref": "_common.schema.json#/$defs/envelope" },
+    {
+      "type": "object",
+      "required": ["system_prompt", "role"],
+      "properties": {
+        "type":          { "const": "persona" },
+        "system_prompt": { "type": "string", "minLength": 1 },
+        "role":          { "type": "string" },
+        "domain":        { "type": "array", "items": { "type": "string" } },
+        "tone":          { "type": "string" },
+        "refusal_style": { "type": "string" },
+        "extends":       { "$ref": "_common.schema.json#/$defs/artifactId" }
+      }
+    }
+  ]
+}

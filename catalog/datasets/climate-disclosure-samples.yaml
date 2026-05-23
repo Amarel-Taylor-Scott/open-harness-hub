@@ -1,0 +1,39 @@
+id: "dataset/climate-disclosure-samples"
+type: dataset
+version: "0.1.0"
+name: "Synthetic climate disclosure samples (2 cases)"
+description: |
+  Two synthetic corporate climate disclosures for testing
+  `pipeline/climate-disclosure-review`:
+   - sample-disclosure-good.json — Acme Corp, manufacturing, board
+     oversight quarterly + 1.5C-aligned transition plan + SBTi
+     validated + Scope 3 all 15 categories + ISAE 3410 assurance.
+     Expected ~1 finding (offsetting language without disclosure).
+   - sample-disclosure-flagged.json — Generic Industries, extractive,
+     no board oversight + no transition plan + no Scope 3 + no SBTi
+     + no scenario analysis + offset-only pathway. Expected ~9
+     findings (2 critical / 5 high / 2 medium).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["climate", "esg", "finance"]
+capability: ["evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["climate", "tcfd", "synthetic"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+splits:
+  test:
+    rows: 2
+    path: "data/climate-samples/"
+record_schema: "schemas/climate-disclosure.schema.json"
+provenance:
+  origin:            "Fully synthetic — no real corporate data"
+  collected_by:      "Open Harness Hub contributors"
+  collected_through: "2026-05-20"
+  license:           "MIT"
+  anonymization:     "fully synthetic; no real company info"

@@ -1,0 +1,53 @@
+id: "rubric/space-launch-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Space launch + range safety review quality v1"
+description: "7-dim rubric for FAA Part 450 / range safety / ITAR / orbital review"
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["space", "space.launch", "space.export_control", "space.orbital"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-21"
+updated: "2026-05-21"
+
+dimensions:
+  - id: "ec_fsa_fts_first"
+    label: "Ec exceedance / missing FSA / unqualified FTS / ITAR breach surfaced FIRST as critical"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "acute findings appear before others; severity=critical"
+  - id: "part_450_citation"
+    label: "Each finding cites 14 CFR Part 450 section + NASA-STD-8719.25"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "regulatory_citation populated per finding"
+  - id: "ec_within_threshold"
+    label: "Expected casualty Ec ≤ 1e-4 collective + ≤ 1e-6 individual"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "ec_collective + ec_individual values reported + compared to threshold"
+  - id: "fts_qualification"
+    label: "AFTS qualified per RCC 319-19 + two-string voting"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "fts_qualification_date + voting_logic documented"
+  - id: "itar_ear_export"
+    label: "ITAR USML XV / EAR 9A515 export controls satisfied (TAA + CCATS)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "taa_number + ccats_classification documented"
+  - id: "orbital_disposal"
+    label: "25-year LEO disposal rule satisfied"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "post_mission_disposal plan documented + orbital_lifetime ≤ 25 yr"
+  - id: "ground_safety_mpl"
+    label: "Two-person propellant ops + MPL insurance on file"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "two_person_verification_logged=true; mpl_insurance_bond_on_file=true"
+
+scoring_method: "weighted_sum"

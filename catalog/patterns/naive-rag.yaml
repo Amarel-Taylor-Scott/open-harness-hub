@@ -1,0 +1,62 @@
+id: "pattern/naive-rag"
+type: pattern
+version: "0.1.0"
+name: "Naive RAG"
+description: |
+  Single-shot retrieval-augmented generation: embed query, retrieve
+  top-k chunks, concatenate into the prompt, generate. The baseline
+  every other RAG variant compares against.
+authors:
+  - name: "Lewis et al. (2020)"
+license: "CC-BY-4.0"
+industry:   ["ai", "cross_industry"]
+capability: ["retrieval", "generation"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+tags: ["rag", "baseline"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+paper_url: "https://arxiv.org/abs/2005.11401"
+paper_citation: "Lewis et al. 2020, Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks"
+
+structural_shape:
+  - "embed query"
+  - "retrieve top-k from vector store (or BM25)"
+  - "concatenate chunks into prompt context"
+  - "generate answer"
+
+when_to_use:
+  - "Q&A over a homogeneous, well-organized corpus"
+  - "Latency budget is tight"
+  - "As a baseline before adopting any variant"
+
+when_not_to_use:
+  - "Retrieval quality is variable across queries"
+  - "Long-form / multi-hop questions"
+  - "When factual grounding must be auditable"
+
+variants:
+  - "Hybrid RAG: BM25 + dense + RRF"
+  - "Reranker RAG: add cross-encoder rerank"
+  - "Parent-document RAG: retrieve child chunks, return parent docs"
+
+counter_patterns:
+  - "pattern/self-rag"
+  - "pattern/corrective-rag"
+
+implementing_pipelines:
+  - "pipeline/chat-with-pdf-citations"
+  - "pipeline/verify-claim-against-corpus"
+
+implementing_processors:
+  - "processor/embedder-minilm"
+  - "processor/cross-encoder-reranker"
+
+tradeoffs:
+  latency: "Lowest of any RAG variant"
+  cost: "Lowest"
+  quality: "Strong on simple lookup; weak on multi-hop / variable retrieval"
+  complexity: "Lowest"
+  explainability: "Citations only as good as retrieval quality"

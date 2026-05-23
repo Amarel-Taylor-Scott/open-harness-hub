@@ -1,0 +1,84 @@
+id: "pattern/two-stage-extract-then-judge"
+type: pattern
+version: "0.1.0"
+name: "Two-stage extract-then-judge (separate calls for extraction + classification)"
+description: |
+  Use two separate LLM calls instead of one combined call: the first
+  extracts every relevant structured field, the second classifies /
+  judges given the extracted context. Costs more than a combined call
+  but measurably improves both extraction accuracy AND judgment
+  quality — focused criteria do not compete with extraction for the
+  model's attention.
+
+  Reverses the "one prompt does everything" anti-pattern. Particularly
+  valuable when the judgment task has its own taxonomy (e.g.
+  Verbraucherzentrale 10-indicator fraud taxonomy) that benefits from
+  100% of the model's reasoning budget rather than sharing it with
+  field-extraction parsing.
+
+  Published in Sviatoslav Grabovsky's Bill_info AI (Gemma 4 Good
+  Hackathon): 96% extraction success + 95.8% field accuracy + 100%
+  redacted-field refusal across a 28-document evaluation set.
+authors:
+  - name: "Sviatoslav Grabovsky (Bill_info AI), Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry:   ["ai", "cross_industry", "bureaucracy_translation", "humanitarian"]
+capability: ["reasoning", "extraction", "classification", "verification"]
+modality:   ["text", "image"]
+lifecycle:  "beta"
+trust_boundary: "mixed"
+tags: ["two-stage", "extract-then-judge", "fraud-detection", "hackathon-verified"]
+created: "2026-05-21"
+updated: "2026-05-21"
+
+paper_url: "https://huggingface.co/spaces/Svityk/bill-info-ai"
+paper_citation: "Sviatoslav Grabovsky 2026, Bill_info AI — Photo-to-Action Bureaucracy Translator for Refugees (Gemma 4 Good Hackathon)"
+reference_implementations:
+  - { url: "https://github.com/Svityk/bill-info-ai", language: "python", framework: "gemma-4 + ollama + huggingface-space" }
+
+structural_shape:
+  - "stage 1 — extract:"
+  - "  fields = llm.extract(input, schema=StructuredFieldsSchema)"
+  - "  validate fields deterministically (dates / sums / consistency)"
+  - "stage 2 — judge:"
+  - "  context = (fields, validation_results, optional pre-fired GREP indicators)"
+  - "  classification = llm.judge(context, taxonomy=DomainTaxonomy)"
+  - "  classification carries cited evidence per indicator"
+
+when_to_use:
+  - "Multi-step pipelines where extraction + judgment are both non-trivial"
+  - "Domain has a published taxonomy that benefits from focused attention (fraud indicators, ICD codes, ECCN classifications)"
+  - "Audit / explainability matters — separate stages = separate traces"
+  - "Cost of an extra LLM call is dominated by the quality lift"
+
+when_not_to_use:
+  - "Simple input where one prompt suffices (single-field extraction, single classification)"
+  - "Latency-critical paths where one combined call meets the bar"
+  - "Cost-constrained paths where two calls double the spend without payoff"
+
+variants:
+  - "extract + judge (Bill_info AI baseline)"
+  - "extract + judge + critique (3-call with self-critique stage)"
+  - "extract + parallel judges (one call per indicator family — more parallelism, more cost)"
+  - "extract + judge + override (4-call: separate output-override stage on critical findings)"
+
+counter_patterns:
+  - "pattern/composable-success-criteria (criterion-by-criterion verification — orthogonal)"
+  - "Single-prompt 'just ask for everything in one call' — fast but loses focus"
+
+implementing_pipelines:
+  - "pipeline/bill-info-extract-fraud-detect-recommend"
+  - "pipeline/supplier-policy-grading"
+  - "pipeline/radiology-report-grading"
+  - "pipeline/contract-clause-review"
+
+implementing_processors:
+  - "processor/iterative-revise-loop"
+  - "processor/llm-judge"
+
+tradeoffs:
+  latency:    "Higher — 2 LLM calls vs 1 (Bill_info AI: 8.5s average local)"
+  cost:       "~2× per request"
+  quality:    "Measurably better on both extraction AND classification (96% extract + 100% redacted refusal in Bill_info AI eval)"
+  complexity: "Low-medium — clear stage boundaries + structured passing context"
+  explainability: "High — per-stage trace is inspectable; judgment evidence cited separately from extraction"

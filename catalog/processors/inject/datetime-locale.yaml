@@ -1,0 +1,48 @@
+id: "processor/inject-datetime-locale"
+type: processor
+version: "0.1.0"
+name: "Inject datetime + locale into prompt"
+description: |
+  Replace placeholders like `{{now}}`, `{{today}}`, `{{user_timezone}}`,
+  `{{user_locale}}`, `{{user_currency}}` in the prompt template with the
+  actual values at request time. Fixes the "stale knowledge cutoff" issue
+  where the model otherwise has no idea what today's date is.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["format_conversion"]
+modality:   ["text"]
+lifecycle:  "stable"
+lifecycle_position: "pre_api.context_assembly"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "inject.datetime"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 2
+
+inputs:
+  - name: "prompt_template"
+    type: "string"
+  - name: "user_timezone"
+    type: "string"
+  - name: "user_locale"
+    type: "string"
+  - name: "user_currency"
+    type: "string"
+outputs:
+  - name: "prompt"
+    type: "string"
+  - name: "injected"
+    type: "object"
+
+side_effects: "none"
+on_error: "raise"
+
+implementations:
+  - kind: "callable"
+    path: "processors.inject_datetime_locale.run"

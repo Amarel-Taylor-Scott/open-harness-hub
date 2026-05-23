@@ -1,0 +1,117 @@
+id: "pipeline/deep-tier-supplier-audit"
+type: pipeline
+version: "0.1.0"
+name: "Deep-tier (T1→T4+) supplier audit with traceability"
+description: |
+  Multi-step audit pipeline that walks a supplier graph from tier-1
+  (direct supplier) down to tier-3 and tier-4+ (raw-material origin
+  / sub-sub-contractors). At each tier:
+   1. Resolve supplier identity against the supplier registry.
+   2. Run `pipeline/supplier-policy-grading` on that tier's disclosure.
+   3. Identify audit-gaps (typically appear at T≥3).
+   4. Surface high-risk-corridor flags (Xinjiang, Mae Sot, Sialkot, etc.).
+   5. Aggregate findings, route the highest-severity to the
+      compliance team, the rest to the supplier-of-record for
+      remediation.
+
+  This is the shape EU CSDDD Art. 5 mandates as of 2026 — "risk-based
+  due diligence covering the entire chain of activities, including
+  established business relationships."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["esg", "supply_chain", "compliance"]
+capability: ["evaluation", "extraction", "verification", "agent_loop"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.audit_loop"
+tags: ["esg", "csddd", "tier-3", "tier-4", "supply-chain", "deep-audit"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url:  "https://eur-lex.europa.eu/eli/dir/2024/1760/oj"
+  source_kind: "other"
+  author:      "EU CSDDD Art. 5"
+  license:     "CC-BY-4.0"
+
+task: |
+  Given a tier-1 supplier ID + a supplier-graph reference, traverse
+  down to tier 4+, grade each tier's disclosures, surface audit-gaps
+  and high-risk-corridor flags, return a chain-wide compliance
+  report.
+pipeline_kind: "agent_loop"
+
+inputs:
+  - name: "tier1_supplier_id"
+    type: "string"
+  - name: "supplier_graph_ref"
+    type: "artifact_id"
+  - name: "max_depth"
+    type: "integer"
+  - name: "lead_company_code_ref"
+    type: "artifact_id"
+outputs:
+  - name: "chain_report"
+    type: "object"
+  - name: "findings_by_tier"
+    type: "object[]"
+  - name: "audit_gaps"
+    type: "object[]"
+  - name: "high_risk_corridor_flags"
+    type: "object[]"
+
+defaults:
+  persona: "persona/esg-auditor"
+  model_adapter: "adapter/ollama-default"
+
+steps:
+  - id: "guard"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.tier1_supplier_id" }
+
+  - id: "walk_chain"
+    kind: "processor"
+    ref: "processor/iterative-revise-loop"
+    inputs:
+      initial_prompt: |
+        Walk the supplier graph from tier 1 to tier {{max_depth}}.
+        For each tier:
+         - Resolve supplier ID against the registry.
+         - Run pipeline/supplier-policy-grading.
+         - Surface audit_gaps and corridor flags.
+        Halt when max_depth reached OR every leaf is graded.
+      inner_harness_ref: "harness/text-safety-review"
+      verifier_refs:
+        - "rubric/esg-supplier-compliance-v1"
+      max_iterations: "$.inputs.max_depth"
+      cost_ceiling_usd: 2.50
+      convergence_policy: "all_pass"
+
+  - id: "aggregate_audit_gaps"
+    kind: "processor"
+    ref: "processor/multi-vector-fusion"
+    inputs:
+      ranked_lists: "$.steps.walk_chain.output"
+      method: "weighted_sum"
+      k: 0
+
+  - id: "escalate_high_severity"
+    kind: "processor"
+    ref: "processor/escalate-human-review"
+    inputs:
+      finding_set: "$.steps.aggregate_audit_gaps.output"
+      severity_threshold: "high"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "deep-tier-supplier-audit"
+      applied_layers: ["persona", "grep", "rag", "judge", "agent_loop"]
+
+success_criteria:
+  - rubric:    "rubric/esg-supplier-compliance-v1"
+    threshold: 0.6

@@ -1,0 +1,159 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/iso-currency-codes",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "ISO 4217 currency codes",
+  "description": "ISO 4217 three-letter currency codes with name, numeric code, and\nminor-unit precision. Useful for finance pipelines that need to\nvalidate currency strings or normalize amounts. Sample subset; the\nfull ISO 4217 list (~180 codes) drops in here at production time.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC0-1.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/iso-currency-codes",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-19",
+  "keywords": [
+    "iso-4217",
+    "currency"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-19",
+  "citation": "ISO 4217 (public)",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "iso-currency-codes__iso-currency-codes",
+      "name": "iso-currency-codes.jsonl",
+      "description": "Data file backing knowledge pack iso-currency-codes.",
+      "contentUrl": "knowledge-packs/data/iso-currency-codes.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "2848 B",
+      "sha256": "59d97458e6f7af78a1cb66fd11d5f79bf4f3f803fdb676a95f114e0c4217a8bf"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "iso-currency-codes__records",
+      "name": "iso-currency-codes__records",
+      "description": "Records parsed from iso-currency-codes.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "iso-currency-codes__records/code",
+          "name": "code",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "iso-currency-codes__iso-currency-codes"
+            },
+            "extract": {
+              "column": "code"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "iso-currency-codes__records/name",
+          "name": "name",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "iso-currency-codes__iso-currency-codes"
+            },
+            "extract": {
+              "column": "name"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "iso-currency-codes__records/numeric",
+          "name": "numeric",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "iso-currency-codes__iso-currency-codes"
+            },
+            "extract": {
+              "column": "numeric"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "iso-currency-codes__records/minor_units",
+          "name": "minor_units",
+          "dataType": "sc:Integer",
+          "source": {
+            "fileObject": {
+              "@id": "iso-currency-codes__iso-currency-codes"
+            },
+            "extract": {
+              "column": "minor_units"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "iso-currency-codes__records/countries",
+          "name": "countries",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "iso-currency-codes__iso-currency-codes"
+            },
+            "extract": {
+              "column": "countries"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

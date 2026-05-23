@@ -1,0 +1,48 @@
+id: "processor/iso-country-normalize"
+type: processor
+version: "0.1.0"
+name: "ISO country code normalize (alpha-2 / alpha-3 / numeric / name)"
+description: |
+  Resolve any country reference — alpha-2, alpha-3, numeric, English
+  name, French name, common alias — to canonical ISO 3166-1 codes.
+  Returns alpha-2, alpha-3, numeric, English short name, and the
+  ISO 3166-2 sub-division code if a region was specified.
+
+  Backed by the ISO 3166 data bundled at knowledge-pack/iso-country-codes.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["format_conversion", "verification"]
+modality:   ["text", "structured"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "pre_api.format_convert"
+tags: ["iso-3166", "country", "enrichment"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+process_kind: "format_convert.iso_country_normalize"
+deterministic: true
+side_effects: "none"
+
+inputs:
+  - name: "country_text"
+    type: "string"
+outputs:
+  - name: "alpha_2"
+    type: "string"
+  - name: "alpha_3"
+    type: "string"
+  - name: "numeric"
+    type: "string"
+  - name: "english_short_name"
+    type: "string"
+  - name: "iso_3166_2_region"
+    type: "string"
+  - name: "is_valid"
+    type: "boolean"
+
+config:
+  reference_pack: "knowledge-pack/iso-country-codes"
+  also_accept: ["alpha-2", "alpha-3", "numeric", "english_name", "french_name", "iso-3166-2", "common_alias"]

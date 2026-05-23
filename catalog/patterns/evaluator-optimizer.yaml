@@ -1,0 +1,64 @@
+id: "pattern/evaluator-optimizer"
+type: pattern
+version: "0.1.0"
+name: "Evaluator-Optimizer"
+description: |
+  One LLM call generates a candidate output; a second LLM (or processor)
+  evaluates against a rubric and provides specific feedback; the
+  generator revises. Loops until the evaluator passes. Distinguishes
+  itself from Self-Refine by using a SEPARATE evaluator (often a
+  stronger model) and a SPECIFIC rubric.
+authors:
+  - name: "Anthropic cookbook (2024)"
+license: "CC-BY-4.0"
+industry:   ["ai", "cross_industry"]
+capability: ["reasoning", "evaluation"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+tags: ["agent", "evaluator-optimizer", "judge"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+paper_url: "https://anthropic.com/research/building-effective-agents"
+paper_citation: "Anthropic 2024, Building effective agents (patterns/agents/evaluator-optimizer)"
+reference_implementations:
+  - { url: "https://github.com/anthropics/anthropic-cookbook/tree/main/patterns/agents", language: "python" }
+
+structural_shape:
+  - "generator produces candidate output"
+  - "evaluator scores against rubric AND emits specific actionable feedback"
+  - "if pass → return"
+  - "if fail → generator revises with feedback in context"
+  - "loop bounded by max_iter / cost ceiling"
+
+when_to_use:
+  - "Tasks with measurable quality criteria (translation quality, code passing tests)"
+  - "Iterative refinement is cheaper than one-shot perfection"
+  - "Different models for generation vs evaluation (Anthropic Sonnet generates, Opus judges)"
+
+when_not_to_use:
+  - "No clear evaluation criteria"
+  - "Single-shot is reliably high quality"
+
+variants:
+  - "Self-evaluator (Self-Refine): same model evaluates"
+  - "Adversarial-evaluator: stronger / cheaper model attacks the output"
+  - "Human-in-loop evaluator: humans provide feedback signal"
+
+counter_patterns:
+  - "pattern/self-refine (same model self-evaluates)"
+
+implementing_pipelines: []
+
+implementing_processors:
+  - "processor/iterative-revise-loop"
+  - "processor/llm-judge"
+  - "processor/self-refine-critique"
+
+tradeoffs:
+  latency: "max_iter × (generator + evaluator)"
+  cost: "max_iter × (generator + evaluator) — can be optimized by using cheap generator + expensive evaluator"
+  quality: "Strong when rubric is well-defined"
+  complexity: "Medium"
+  explainability: "Very high — evaluator feedback is human-readable"

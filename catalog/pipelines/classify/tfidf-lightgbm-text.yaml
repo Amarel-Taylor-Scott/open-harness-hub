@@ -1,0 +1,78 @@
+id: "pipeline/tfidf-lightgbm-text-classification"
+type: pattern
+version: "0.1.0"
+name: "TF-IDF + LightGBM text classification"
+description: |
+  The non-LLM baseline that consistently wins or co-wins Kaggle text-
+  classification competitions. Char- and word-ngram TF-IDF feature
+  extraction → LightGBM (often stacked with SGDClassifier / MultinomialNB)
+  → calibrated probability.
+
+  Verified by Open Harness Hub Meta Kaggle deep mining: top kernels of
+  `llm-detect-ai-generated-text` all use this stack, often as the lead
+  baseline before any DeBERTa fine-tune is added.
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "cross_industry", "media"]
+capability: ["classification"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url: "https://www.kaggle.com/competitions/llm-detect-ai-generated-text"
+  source_kind: "kaggle"
+  author: "LLM-Detect-AI-Generated-Text top-voted-kernel authors"
+  license: "Apache-2.0"
+
+reference_implementations:
+  - url: "https://www.kaggle.com/code/awsaf49/detect-fake-text-kerasnlp-tf-torch-jax-train"
+    language: "python"
+    notes: "1500 votes — KerasNLP + LightGBM baseline"
+  - url: "https://www.kaggle.com/code/batprem/llm-daigt-analyse-edge-cases"
+    language: "python"
+    notes: "973 votes — TF-IDF + LGBM analysis"
+  - url: "https://www.kaggle.com/code/datafan07/train-your-own-tokenizer"
+    language: "python"
+    notes: "729 votes — custom BPE tokenizer + TF-IDF"
+
+structural_shape:
+  - "Train BPE / char-level tokenizer on the training corpus (optional)"
+  - "Char-ngram TF-IDF (analyzer='char', ngram_range=(2,5))"
+  - "Word-ngram TF-IDF (analyzer='word', ngram_range=(1,2))"
+  - "Stack: SGDClassifier + MultinomialNB + LightGBM"
+  - "Calibrated probability via cross-validated platt scaling or isotonic"
+  - "(optional) DeBERTa-v3-large residual on top of the calibrated baseline"
+
+when_to_use:
+  - "Closed-set text classification with abundant labeled data"
+  - "Latency-critical paths (inference is microseconds per text)"
+  - "When you need a strong baseline before considering LLM-based approaches"
+  - "Resource-constrained environments (CPU-only, mobile)"
+
+when_not_to_use:
+  - "Few-shot / zero-shot tasks (no training data)"
+  - "Open-ended generation"
+  - "When the labels themselves require reasoning (use LLM zero-shot or fine-tune)"
+
+variants:
+  - "FastText embedding + LightGBM"
+  - "BPE tokenizer + Linear-SVC (faster training, similar accuracy)"
+  - "TF-IDF + Logistic Regression (simpler, often within 1-2pp of LightGBM)"
+
+counter_patterns:
+  - "Full LLM fine-tune (more expensive, sometimes worse)"
+  - "Zero-shot LLM classification (lower quality on long-tail labels)"
+
+implementing_pipelines: []
+implementing_processors: []
+
+tradeoffs:
+  latency: "Microseconds per text at inference"
+  cost: "Pennies for full-corpus training on CPU; near-zero inference"
+  quality: "Strong baseline; often within 1-3pp of full DeBERTa fine-tune"
+  complexity: "Low"
+  explainability: "High — feature importances are inspectable"

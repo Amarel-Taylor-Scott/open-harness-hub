@@ -1,0 +1,39 @@
+id: "dataset/gov-benefits-samples"
+type: dataset
+version: "0.1.0"
+name: "Synthetic SNAP application samples"
+description: |
+  Two synthetic SNAP applications:
+   - sample-snap-app-clean.json — 3-person household with minor
+     children, $1850 gross income (below 130% poverty for HH of 3),
+     ID + paystub + residence + school enrollment all verified.
+     Expected ~0 hits.
+   - sample-snap-app-flagged.json — 1-person household with
+     undisclosed adult, $4800 gross income (over threshold),
+     unreported self-employment, $6800 in bank (over resource limit),
+     ABAWD with only 12 hours/month, active case in another state,
+     outstanding fraud warrant. Expected many hits.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["government", "government.benefits"]
+capability: ["evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["government", "synthetic", "snap", "benefits"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+splits:
+  test:
+    rows: 2
+    path: "data/gov-benefits-samples/"
+record_schema: "schemas/benefits-application.schema.json"
+provenance:
+  origin:            "Fully synthetic — no real application data"
+  collected_by:      "Open Harness Hub contributors"
+  collected_through: "2026-05-20"
+  license:           "MIT"
+  anonymization:     "fully synthetic"

@@ -1,0 +1,60 @@
+id: "pipeline/verify-claim-against-corpus"
+type: pipeline
+version: "0.1.0"
+name: "Verify Claim Against Corpus"
+description: |
+  Given a claim and a corpus, return supports / contradicts /
+  no-evidence with cited passages and a confidence score.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry", "media"]
+capability: ["verification", "retrieval", "reasoning"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+task: |
+  Given a claim (string) and a corpus (knowledge-pack ref), return a
+  verdict in {supports, contradicts, no_evidence}, citations, and a
+  calibrated confidence.
+pipeline_kind: "verify_data"
+
+inputs:
+  - name: "claim"
+    type: "string"
+  - name: "corpus"
+    type: "artifact_id"
+outputs:
+  - name: "verdict"
+    type: "enum[supports, contradicts, no_evidence]"
+  - name: "citations"
+    type: "Citation[]"
+  - name: "confidence"
+    type: "number"
+
+defaults:
+  persona: "persona/fact-checker"
+  model_adapter: "adapter/ollama-default"
+
+steps:
+  - id: "retrieve"
+    kind: "knowledge_pack"
+    ref: "$.inputs.corpus"
+    inputs:
+      query: "$.inputs.claim"
+      top_k: 8
+
+  - id: "judge"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "For each retrieved passage, decide: supports, contradicts, neutral. Then output a final verdict + confidence. Cite passages by ID."}]
+      context: "$.steps.retrieve.output.docs"
+
+success_criteria:
+  - rubric: "rubric/verification-v1"
+    threshold: 0.70

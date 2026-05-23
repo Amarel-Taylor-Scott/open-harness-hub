@@ -1,0 +1,84 @@
+id: "pipeline/lora-qlora-pairwise-pref-finetune"
+type: pattern
+version: "0.1.0"
+name: "LoRA + QLoRA pairwise-preference fine-tune (Gemma-2-9b 4-bit)"
+description: |
+  Production-verified fine-tune shape for the LMSYS / WSDM Chatbot
+  Arena class of pairwise-preference competitions. Load Gemma-2-9b
+  with 4-bit BitsAndBytes quantization, attach a PEFT LoRA adapter,
+  fine-tune SFTTrainer on (prompt, response_A, response_B) → A/B/tie
+  triples. Inference: same loaded model + classifier head over the
+  three classes.
+
+  Verified by the Open Harness Hub Meta Kaggle deep miner: 3 of 9
+  pulled WSDM-Cup top-voted kernels match this exact stack
+  (transformers + peft + bitsandbytes + trl).
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "cross_industry"]
+capability: ["classification", "evaluation"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url: "https://www.kaggle.com/competitions/wsdm-cup-multilingual-chatbot-arena"
+  source_kind: "kaggle"
+  author: "WSDM Cup 2024 top public-kernel authors"
+  license: "Apache-2.0"
+
+paper_url: ""
+paper_citation: "Verified by Meta Kaggle deep mining (2026-05-19): top kernels by mbmmurad / takaito / takamichitoda all use this exact stack."
+reference_implementations:
+  - url: "https://www.kaggle.com/code/mbmmurad/gemma-2-9b-4-bit-qlora-lb-0-63"
+    language: "python"
+    framework: "transformers + peft + bitsandbytes + trl"
+    notes: "Gemma-2-9B 4-bit QLoRA, LB 0.63"
+  - url: "https://www.kaggle.com/code/takaito/wsdm-cup-lb-0-684-only-gemma-2-9b-4-bit"
+    language: "python"
+    framework: "transformers + peft + bitsandbytes + trl"
+    notes: "WSDM Cup LB 0.684 — single-model approach"
+  - url: "https://www.kaggle.com/code/takamichitoda/wsdm-apply-previous-lmsys-solution"
+    language: "python"
+    framework: "transformers + peft + bitsandbytes"
+    notes: "Apply previous LMSYS solution to WSDM"
+
+structural_shape:
+  - "Load base Gemma-2-9b with BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=bfloat16)"
+  - "Wrap with LoraConfig (r=16-64, target_modules: q,k,v,o + gate,up,down)"
+  - "Tokenize training triples with chat-template"
+  - "SFTTrainer with max_seq_length 2048-4096, gradient_checkpointing"
+  - "Inference: same loaded model, score classifier head over A/B/tie"
+  - "(optional) ensemble across k-fold seeds for calibrated probability"
+
+when_to_use:
+  - "Pairwise-preference competitions or production tasks"
+  - "Limited GPU memory (4-bit fits Gemma-2-9b on a single 24 GB GPU)"
+  - "Need calibrated probability over 3 classes"
+
+when_not_to_use:
+  - "Generation tasks (this trains a CLASSIFIER head, not a generator)"
+  - "When you need the underlying preference reasoning (use DPO instead)"
+
+variants:
+  - "Same shape with Llama-3-8b / Qwen-2.5-7b instead of Gemma-2-9b"
+  - "DPO instead of SFT for direct preference optimization"
+  - "ORPO single-stage preference + SFT in one loss"
+
+counter_patterns:
+  - "Full-precision fine-tune (slower, more memory)"
+  - "Frozen-model embedding + classifier (cheaper but lower ceiling)"
+
+implementing_pipelines: []
+
+implementing_processors: []
+
+tradeoffs:
+  latency: "Hours-to-days training; sub-second inference per pair"
+  cost: "Single GPU 24 GB; ~$5-20 cloud-hour for training"
+  quality: "Top of Kaggle leaderboard on this task class"
+  complexity: "Medium — standard transformers + peft stack"
+  explainability: "Lower than rule-based; can be paired with attention visualization"

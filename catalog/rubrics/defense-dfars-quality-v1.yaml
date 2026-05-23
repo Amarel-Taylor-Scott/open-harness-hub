@@ -1,0 +1,53 @@
+id: "rubric/defense-dfars-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Defense DFARS/CMMC review quality v1"
+description: "7-dim rubric"
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["defense", "defense.dfars", "defense.cmmc"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-21"
+updated: "2026-05-21"
+
+dimensions:
+  - id: "cmmc_level_correct"
+    label: "CMMC level assigned matches data sensitivity (FCI=L1, CDI=L2, critical-CDI=L3)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "cmmc_level ∈ {1,2,3}; matched to data classification"
+  - id: "dfars_clauses_flowed_down"
+    label: "DFARS clauses 7012/7019/7020 flowed down to subcontractors"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "subcontract_clauses include 252.204-7012 + 7019 + 7020"
+  - id: "section_889_attested"
+    label: "Section 889 covered-telecom representation in SAM.gov"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "sec_889_rep ∈ {does_not_use, uses_but_excepted, n_a}"
+  - id: "counterfeit_parts_program"
+    label: "SAE AS5553 / AS6081 counterfeit-parts program implemented"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "counterfeit_parts_program_ref populated; authorized-distributor policy"
+  - id: "sam_exclusion_clear"
+    label: "Supplier + subcontractors checked against SAM.gov exclusions"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "sam_exclusion_check_date within 90 days; no hits"
+  - id: "itar_handled_correctly"
+    label: "ITAR-controlled data has DSP-5 / TAA / MLA license + deemed-export check"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "itar_license_ref OR no_itar_data; deemed_export_check populated"
+  - id: "nist_800_171_implemented"
+    label: "NIST SP 800-171 controls implemented + SPRS score current"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "sprs_score_date within 3 years; gap_list populated for non-implemented"
+
+scoring_method: "weighted_sum"

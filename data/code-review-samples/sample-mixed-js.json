@@ -1,0 +1,10 @@
+{
+  "sample_id":   "CR-003-mixed-js",
+  "language":    "javascript",
+  "framework":   "express+react",
+  "description": "Mixed Express + React with innerHTML XSS, hardcoded JWT, eval call, but also some parameterized queries.",
+  "files": {
+    "server.js": "const express = require('express');\nconst app = express();\nconst mysql = require('mysql2/promise');\nconst pool = mysql.createPool({\n  host: process.env.DB_HOST,\n  user: process.env.DB_USER,\n  password: process.env.DB_PASSWORD,\n  database: 'app'\n});\n\nconst DEMO_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4iLCJpYXQiOjE1MTYyMzkwMjJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';\n\napp.get('/api/search', async (req, res) => {\n  const q = req.query.q;\n  const sql = `SELECT * FROM products WHERE name LIKE '${q}'`;\n  const [rows] = await pool.query(sql);\n  res.json(rows);\n});\n\napp.get('/api/lookup', async (req, res) => {\n  const id = req.query.id;\n  const [rows] = await pool.query('SELECT * FROM products WHERE id = ?', [id]);\n  res.json(rows);\n});\n\napp.get('/api/run', (req, res) => {\n  const code = req.query.code;\n  const fn = new Function(code);\n  res.send(String(fn()));\n});\n",
+    "App.jsx": "import React from 'react';\n\nexport function ProductDescription({html}) {\n  return <div dangerouslySetInnerHTML={{__html: html}} />;\n}\n\nexport function UnsafeFeed({items}) {\n  React.useEffect(() => {\n    const el = document.getElementById('feed');\n    el.innerHTML = items.map(i => `<li>${i.user_supplied}</li>`).join('');\n  }, [items]);\n  return <ul id='feed' />;\n}\n"
+  }
+}

@@ -1,0 +1,50 @@
+id: "pattern/anti-no-audit-trace"
+type: pattern
+version: "0.1.0"
+name: "Anti-pattern: No audit trace"
+description: "Pipeline returns a verdict (approved / denied / NO-GO / critical-finding) without logging which step produced it, which model arm answered, which evidence was retrieved, what prompts were used, which rubric version applied. Regulators ask 'how did you decide' and the answer is 'GPT said so.'"
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["cross_industry", "compliance"]
+capability: ["evaluation", "safety_gating"]
+modality: ["text"]
+lifecycle: "stable"
+trust_boundary: "local"
+created: "2026-05-22"
+updated: "2026-05-22"
+
+when_to_use:
+  - "This is an anti-pattern. Do NOT use it in any pipeline with regulatory or contractual exposure."
+
+structural_shape:
+  - "WRONG: pipeline returns {verdict: 'approved', score: 0.83} with nothing else."
+  - "RIGHT: pipeline returns {verdict, score, trace: [{step_id, ref, inputs, output, ts, model_version, duration_ms, layer}], rubric_version, knowledge_pack_version, rule_pack_versions, run_id}."
+
+problem: |
+  Without a trace, a regulator / customer / internal audit cannot
+  reconstruct the decision. The pipeline has no defense against 'why did
+  you deny this loan / report this transaction / refuse to fly / fail this
+  PSSR.' The pipeline operator carries unbounded liability + cannot
+  satisfy GDPR Art 22, EU AI Act Art 12, SR 11-7 (banks), 21 CFR Part 11,
+  ISO/IEC 42001.
+
+solution: |
+  Every pipeline must end with processor/audit-trace-emitter capturing:
+  step_id, ref (artifact id), inputs (hashed if PII), output, timestamp,
+  model_version, duration_ms, applied_layers, rubric_version,
+  knowledge_pack_version, rule_pack_versions, run_id. Persist locally for
+  the regulatory retention window (3 yrs / 7 yrs / 10 yrs by domain).
+
+implementing_pipelines:
+  - "pipeline/water-utility-compliance-review"
+  - "pipeline/contract-clause-review"
+  - "pipeline/citemind-pdf-to-research-wiki"
+
+related_patterns:
+  - "pattern/go-nogo-checklist-gate"
+  - "pattern/critical-tier-output-override"
+
+counter_patterns:
+  - "Every pipeline ends with processor/audit-trace-emitter."
+
+tags: ["anti-pattern", "audit", "compliance", "regulatory", "gdpr-art-22", "eu-ai-act"]

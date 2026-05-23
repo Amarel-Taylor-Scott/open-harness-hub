@@ -1,0 +1,37 @@
+id: "knowledge-pack/insurance-fraud-typologies"
+type: knowledge-pack
+version: "0.1.0"
+name: "Insurance fraud typologies (NAIC + CAIF + ABI)"
+description: |
+  Composite reference of insurance-fraud typologies and red-flag
+  indicators across personal auto, property, workers-comp, and
+  health insurance. Sourced from NAIC Fraud Section + Coalition
+  Against Insurance Fraud (CAIF) + UK Association of British
+  Insurers (ABI) Insurance Fraud Bureau bulletins.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry:   ["insurance", "insurance.claims", "insurance.fraud", "finance"]
+capability: ["retrieval", "verification"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "volatile"
+tags: ["insurance", "fraud", "naic", "caif", "abi"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+content_types:
+  - rag_doc
+files:
+  - path: "data/insurance-pack/typologies.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+provenance:
+  sources:
+    - "NAIC Insurance Fraud handbook (composite extracts)"
+    - "Coalition Against Insurance Fraud bulletins (composite)"
+    - "UK ABI Insurance Fraud Bureau typologies (composite)"
+  collected_through: "2026-04-30"
+  note: "Composite educational extracts."

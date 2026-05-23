@@ -1,0 +1,107 @@
+id: "harness/email-triage-and-draft"
+type: harness
+version: "0.1.0"
+name: "Email Triage + Draft harness (preference-aware, tone-matched)"
+description: |
+  Email-handling harness: loads user preferences + recipient tone
+  history, triages each thread (do-now/delegate/defer/drop),
+  drafts reply candidates matching the recipient's tone, and
+  gates output through the personal-info-leakage rule pack
+  before showing drafts to the user.
+
+  Default tool autonomy: review-required for sends; autonomous
+  for calendar holds. Never autonomous on first-time recipients.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["personal_productivity", "cross_industry"]
+capability: ["dialogue", "summarization", "routing", "memory"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["email", "inbox-zero", "preference-aware", "personal-assistant"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+kind: "model_harness"
+tier: "primary"
+applied_layers: [persona, privacy, grep, tools]
+consumes: [persona_block, tool_definition, rag_doc]
+emits: [reasoning_step, context_snippet]
+logic_paths:
+  - id: "triage_and_draft_reply"
+    label: "inbox → preferences loaded → recipient tone loaded → triage → draft → leakage check"
+    entrypoints: ["/api/email/triage"]
+    steps:
+      - "load user preferences (processor/preference-loader)"
+      - "for each thread:"
+      - "  load recipient tone history (processor/recipient-tone-history)"
+      - "  classify (do-now/delegate/defer/drop)"
+      - "  if reply needed: draft (tone-matched)"
+      - "  run rule-pack/grep-personal-info-leakage on draft"
+      - "  if violation: redact OR halt for user input"
+      - "  enforce CC rules (pref-cc-rules)"
+      - "  enforce after-hours-send rule (pref-no-work-after)"
+      - "emit per-thread {classification, draft, leakage_check_result, eta_to_send}"
+    consumes: [persona_block, tool_definition, rag_doc]
+    emits: [reasoning_step, context_snippet]
+    model_call: "required"
+    verification:
+      - "draft tone matches the recipient's prior thread style"
+      - "no personal-info-leakage critical hits in any draft"
+      - "after-7pm sends auto-queue to next morning"
+      - "CC rules honored"
+knowledge_packs:
+  - id: "user_prefs"
+    label: "User preference pack"
+    kind: knowledge_pack
+    types: [rag_doc]
+    required: true
+    trust_boundary: "local"
+    freshness: "volatile"
+logic_packs:
+  - id: "persona_default"
+    label: "Inbox-zero-coach persona"
+    kind: logic_pack
+    types: [persona_block]
+    required: true
+  - id: "response_policy"
+    label: "No-autonomous-send response policy"
+    kind: logic_pack
+    types: [response_policy]
+    required: true
+model_io:
+  input:  "{user_id: string, inbox: object[]}"
+  output: "{thread_decisions: object[], drafts: object[], leakage_audit: object[]}"
+model_targets:
+  - id: "local_ollama"
+    label: "Local Ollama"
+    transport: "ollama"
+    role: "Default local triage + draft."
+    capabilities: [text_generation, chat]
+    required: false
+    default: true
+    trust_boundary: "local"
+  - id: "anthropic_claude"
+    label: "Anthropic Claude (for nuanced tone-matching)"
+    transport: "anthropic"
+    role: "Optional frontier model for nuanced tone matching."
+    capabilities: [text_generation, chat, long_context]
+    required: false
+    default: false
+    trust_boundary: "external"
+input_verification:
+  - "user preferences loaded BEFORE first action"
+  - "no autonomous send on first-time recipient"
+  - "no email body > 64 KB"
+output_verification:
+  - "rule-pack/grep-personal-info-leakage critical hits = 0 in any draft"
+  - "tone-match-confidence >= 0.6 for first-pass drafts"
+  - "after-hours-send rule honored"
+privacy_boundaries:
+  raw_input:      "stays local to the assistant process"
+  derived_output: "user reviews drafts before any send"
+  external_calls: "only if model_target.trust_boundary == external AND user opted in (e.g. ANTHROPIC_API_KEY set)"
+contributes_to:
+  - "pipeline/email-triage-pipeline"

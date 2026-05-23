@@ -1,0 +1,51 @@
+id: "rubric/threat-intel-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Threat intelligence report quality v1"
+description: |
+  Six-dimension rubric for grading a CTI report against the
+  diamond-model + ATT&CK navigator + Admiralty-confidence scheme.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["security", "threat_intelligence"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-20"
+updated: "2026-05-20"
+
+dimensions:
+  - id: "iocs_extracted_typed"
+    label: "IOCs extracted and typed (hash/domain/ipv4/url/cve)"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "non-empty IOCs per type; each tied to a type label"
+  - id: "ttp_attack_mapped"
+    label: "TTPs mapped to MITRE ATT&CK technique IDs"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "every TTP claim has T-id; technique active in current ATT&CK"
+  - id: "confidence_rated"
+    label: "Each finding has confidence rating (Admiralty or low/med/high)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "non-empty confidence field on every finding"
+  - id: "no_attribution_single_signal"
+    label: "Attribution backed by diamond-model corroboration"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "≥2 of (Adversary, Capability, Infrastructure, Victim) corroborating signals"
+  - id: "false_positive_check"
+    label: "IOCs vetted against tier-1 infrastructure false-positive lists"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "no Tier-1 CDN / DNS infrastructure flagged as C2"
+  - id: "actionability"
+    label: "Findings include detection / response recommendation"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "non-empty detection_rule (Yara/Sigma/Suricata/SPL) + response_action"
+
+scoring_method: "weighted_sum"

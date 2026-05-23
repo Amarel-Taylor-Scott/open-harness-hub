@@ -1,0 +1,46 @@
+
+==============================================================================
+  sample-vendor-clean.json
+  vendor: Acme Precision Manufacturing Pte Ltd  •  tier: T1  •  jurisdiction: Delaware, USA
+==============================================================================
+
+  [esg_review    ] pipeline/supplier-policy-grading            steps=11  findings=0  pass=True
+      ✅ rubric         rubric
+
+  [appsec_review ] pipeline/code-security-review               steps=6  findings=0  pass=True
+      ✅ deterministic  no production secrets in code
+      ✅ composite      no critical-severity vulnerabilities OR all have fixes 
+
+  [legal_review  ] pipeline/contract-clause-review             steps=6  findings=0  pass=True
+      ✅ rubric         rubric
+
+  AGGREGATE
+    ✅ [high     ] ESG sub-pipeline passed all its criteria
+    ✅ [critical ] AppSec sub-pipeline passed all its criteria
+    ✅ [high     ] Legal sub-pipeline passed all its criteria
+    ✅ [-        ] at most ONE vertical may have any findings (i.e. 2 of 3 must be t
+
+  overall_pass: True
+
+==============================================================================
+  sample-vendor-flagged.json
+  vendor: Aggressive Vendor LLC (subsidiary of Eastern Border Workshop)  •  tier: T3  •  jurisdiction: California, USA
+==============================================================================
+
+  [esg_review    ] pipeline/supplier-policy-grading            steps=11  findings=5  pass=True
+      ✅ rubric         rubric
+
+  [appsec_review ] pipeline/code-security-review               steps=6  findings=10  pass=True
+      ✅ deterministic  no production secrets in code
+      ✅ composite      no critical-severity vulnerabilities OR all have fixes 
+
+  [legal_review  ] pipeline/contract-clause-review             steps=6  findings=7  pass=True
+      ✅ rubric         rubric
+
+  AGGREGATE
+    ✅ [high     ] ESG sub-pipeline passed all its criteria
+    ✅ [critical ] AppSec sub-pipeline passed all its criteria
+    ✅ [high     ] Legal sub-pipeline passed all its criteria
+    ❌ [-        ] at most ONE vertical may have any findings (i.e. 2 of 3 must be t
+
+  overall_pass: False

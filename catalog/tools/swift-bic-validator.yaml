@@ -1,0 +1,48 @@
+id: "tool/swift-bic-validator"
+type: tool
+version: "0.1.0"
+name: "SWIFT BIC validator + BIC → bank metadata"
+description: |
+  Validate an 8 or 11-character SWIFT BIC (Bank Identifier Code) and
+  resolve it to the bank's name + country + city. Used by payment-
+  processing + KYC + AML pipelines for counterparty bank
+  identification.
+
+  Offline validation uses the SWIFT BIC structure rules (bank code
+  4 chars + country code 2 chars ISO 3166 + location code 2 chars +
+  optional branch code 3 chars). Online lookup against bundled
+  SWIFT BIC directory snapshot (refresh quarterly).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["finance", "finance.kyc", "finance.aml"]
+capability: ["verification", "extraction"]
+modality:   ["text", "structured"]
+lifecycle:  "stable"
+trust_boundary: "local"
+tags: ["swift", "bic", "iso-9362", "kyc", "aml"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+parameters:
+  type: object
+  properties:
+    bic_code: { type: "string", pattern: "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$" }
+  required: ["bic_code"]
+returns:
+  type: object
+  properties:
+    is_valid:        { type: "boolean" }
+    bic_8:           { type: "string" }
+    bic_11:          { type: "string" }
+    bank_code:       { type: "string" }
+    country_iso2:    { type: "string" }
+    location_code:   { type: "string" }
+    branch_code:     { type: "string" }
+    bank_name:       { type: "string" }
+    bank_city:       { type: "string" }
+    swift_active:    { type: "boolean" }
+side_effects: "read"
+implementations:
+  - kind: "callable"
+    path: "tools.swift_bic_validator.run"

@@ -1,0 +1,76 @@
+id: "pipeline/dicom-medical-image-preprocessing"
+type: pipeline
+version: "0.1.0"
+name: "DICOM medical image preprocessing (CT / MRI / X-ray)"
+description: |
+  Parse DICOM headers (pydicom), normalize Hounsfield units (HU),
+  window/level adjustment, resample to consistent voxel spacing,
+  optional lung-segmentation crop, convert to PNG / NumPy / NIfTI
+  for downstream CNN. Standard Kaggle medical-imaging preprocessing
+  pipeline.
+
+  Verified by Open Harness Hub mining: allunia Pulmonary DICOM
+  Preprocessing (1249 votes, OSIC Pulmonary Fibrosis Progression),
+  piantic OSIC Basic EDA (1132 votes — also DICOM preprocessing).
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["healthcare", "healthcare.radiology", "ai"]
+capability: ["format_conversion", "extraction"]
+modality:   ["image"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "pre_api.format_convert"
+tags: ["dicom", "medical-imaging", "hounsfield", "kaggle-verified"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+attribution:
+  source_url:  "https://www.kaggle.com/code/allunia/pulmonary-dicom-preprocessing"
+  source_kind: "kaggle"
+  author:      "allunia (1249), piantic (1132)"
+  license:     "Apache-2.0"
+
+task: "Parse DICOM → normalize HU → window/level → resample → export tensor."
+pipeline_kind: "format_conversion"
+
+inputs:
+  - name: "dicom_files"
+    type: "artifact_id"
+  - name: "target_voxel_spacing"
+    type: "number[]"
+  - name: "window"
+    type: "object"
+outputs:
+  - name: "tensor_array"
+    type: "artifact_id"
+  - name: "metadata"
+    type: "object"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+
+steps:
+  - id: "guard"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.dicom_files" }
+  - id: "preprocess"
+    kind: "processor"
+    ref: "processor/iterative-revise-loop"
+    inputs:
+      initial_prompt: "Read DICOM via pydicom. Convert raw pixels to HU using RescaleSlope + RescaleIntercept. Apply window (e.g. lung -600/+1500, soft-tissue 40/350). Resample via SimpleITK to target voxel spacing. Optionally segment lungs / organ of interest. Export NumPy / PNG / NIfTI."
+      inner_harness_ref: "harness/text-safety-review"
+      verifier_refs: []
+      max_iterations: 1
+      cost_ceiling_usd: 2.00
+      convergence_policy: "all_pass"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "dicom-medical-image-preprocessing"
+      applied_layers: ["dicom_parse", "hu_normalize", "resample"]
+
+success_criteria: []

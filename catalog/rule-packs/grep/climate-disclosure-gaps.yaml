@@ -1,0 +1,88 @@
+id: "rule-pack/grep-climate-disclosure-gaps"
+type: rule-pack
+version: "0.1.0"
+name: "Climate disclosure gap detectors (TCFD / ISSB / ESRS E1)"
+description: |
+  GREP detectors for the highest-leverage climate-disclosure gaps:
+  missing Scope-3 categories, missing transition plan, board-
+  oversight silence, no 2C scenario analysis, no SBTi commitment,
+  missing assurance, market-based-only Scope 2.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["climate", "esg", "finance", "compliance"]
+capability: ["safety_gating", "classification", "verification"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "volatile"
+tags: ["climate", "tcfd", "issb", "esrs", "scope-3", "sbti"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+family: "grep"
+rules:
+  - id: "scope_3_not_measured"
+    pattern: "(?i)scope\\s*3[\\s\\S]{0,80}?(?:not\\s+measured|not\\s+(?:disclosed|reported|calculated)|excluded|\\bN/A\\b|not\\s+applicable|out\\s+of\\s+scope)"
+    severity: "critical"
+    category: "climate.scope_3.not_measured"
+
+  - id: "scope_3_categories_partial"
+    pattern: "(?i)(?:only\\s+(?:categor(?:y|ies))|measured\\s+only\\s+categor(?:y|ies))\\s+\\d+(?:\\s*[-,+]\\s*\\d+)*(?!.{0,200}all\\s+15)"
+    severity: "high"
+    category: "climate.scope_3.partial"
+
+  - id: "no_transition_plan"
+    pattern: "(?i)(no|absent|none)\\s+(?:climate\\s+)?(?:transition|net[- ]?zero|decarbon)\\s+plan|transition\\s+plan\\s*[:=]\\s*(?:\\bN/A\\b|none|not\\s+applicable|in\\s+progress)"
+    severity: "critical"
+    category: "climate.no_transition_plan"
+
+  - id: "no_sbti_commitment"
+    pattern: "(?i)(no|not|absent)\\s+sbti(?:\\s+(?:committed|validated|target))?|sbti\\s*[:=]\\s*(?:no|none|not\\s+committed|\\bN/A\\b|not\\s+applicable|withdrew|removed)"
+    severity: "high"
+    category: "climate.no_sbti"
+
+  - id: "no_board_oversight"
+    pattern: "(?i)board\\s+(?:does not|has no|provides no|no formal)\\s+(?:climate|oversight|review)|climate.{0,40}not\\s+on\\s+the\\s+board\\s+agenda"
+    severity: "high"
+    category: "climate.governance.no_board"
+
+  - id: "no_scenario_analysis"
+    pattern: "(?i)(no|not (?:performed|conducted)|absent|n[\\.\\/]?a)\\s+scenario\\s+analys(?:is|es)|2[°°c]?c\\s+scenario\\s+not\\s+analyzed|1\\.5\\s*°?c\\s+scenario\\s+not"
+    severity: "high"
+    category: "climate.no_scenario_analysis"
+
+  - id: "no_third_party_assurance"
+    pattern: "(?i)(no|not|unassured|unverified)\\s+(?:third[- ]?party|independent|external)\\s+(?:verification|assurance|audit)\\s+(?:of\\s+)?(?:ghg|emissions|climate|scope)|self[- ]?reported.{0,40}(?:not\\s+verified|no\\s+assurance)"
+    severity: "medium"
+    category: "climate.no_assurance"
+
+  - id: "scope_2_market_only"
+    pattern: "(?i)scope\\s*2\\s+(?:market[- ]?based)\\s+only(?!.{0,80}location[- ]?based)|location[- ]?based\\s+(?:not\\s+reported|excluded|n[\\.\\/]?a)"
+    severity: "medium"
+    category: "climate.scope_2.market_only"
+
+  - id: "transition_risk_not_assessed"
+    pattern: "(?i)transition\\s+risk\\s+(?:not\\s+(?:assessed|considered|identified|material)|out\\s+of\\s+scope|n[\\.\\/]?a)"
+    severity: "high"
+    category: "climate.transition_risk.unassessed"
+
+  - id: "physical_risk_not_assessed"
+    pattern: "(?i)physical\\s+(?:climate\\s+)?risk\\s+(?:not\\s+(?:assessed|considered|identified|material)|out\\s+of\\s+scope|n[\\.\\/]?a)"
+    severity: "high"
+    category: "climate.physical_risk.unassessed"
+
+  - id: "no_targets_set"
+    pattern: "(?i)(no|absent|not\\s+set)\\s+(?:climate|ghg|emissions?)\\s+targets?|targets?\\s*[:=]\\s*(?:none|n[\\.\\/]?a|to\\s+be\\s+set)"
+    severity: "high"
+    category: "climate.no_targets"
+
+  - id: "offsetting_without_disclosure"
+    pattern: "(?i)(net[- ]?zero|carbon[- ]?neutral)(?!.{0,400}(offsets?|removal|sbti|residual\\s+\\d|10%))|achieve\\s+net[- ]?zero\\s+(?:via|through|by)\\s+offsets?\\s+only"
+    severity: "medium"
+    category: "climate.offset_only_pathway"
+
+  - id: "missing_methodology"
+    pattern: "(?i)methodology\\s*[:=]\\s*(?:n[\\.\\/]?a|none|undisclosed)|emissions\\s+calculation\\s+method(?:ology)?\\s+(?:not\\s+disclosed|unknown)"
+    severity: "medium"
+    category: "climate.no_methodology"

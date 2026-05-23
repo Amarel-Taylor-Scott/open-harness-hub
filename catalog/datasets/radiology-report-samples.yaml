@@ -1,0 +1,46 @@
+id: "dataset/radiology-report-samples"
+type: dataset
+version: "0.1.0"
+name: "Synthetic radiology report samples (3 cases, fully synthetic)"
+description: |
+  Three synthetic radiology reports for testing
+  `pipeline/radiology-report-grading`. Fully synthetic — no real
+  patient data.
+
+  Cases:
+   - sample-ct-chest-good.json — well-structured CT chest with
+     proper Fleischner-compliant disposition (expected high grade)
+   - sample-ct-abdomen-flagged.json — CT abdomen/pelvis with
+     MULTIPLE quality issues: unredacted PHI (MRN + DOB), thyroid
+     nodule without TI-RADS, adrenal mass without workup, lytic
+     lesion with definitive "is a metastasis" without differential,
+     sub-solid pulm nodule without Fleischner follow-up, prior
+     available but no comparison addressed, impression lacks
+     recommendation
+   - sample-mammo-screening-mixed.json — mammography with proper
+     BI-RADS scoring + recommendation, comparison addressed; good
+     case overall
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["healthcare", "healthcare.radiology"]
+capability: ["evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["radiology", "synthetic", "rads", "fleischner", "hipaa"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+splits:
+  test:
+    rows: 3
+    path: "data/radiology-samples/"
+record_schema: "schemas/radiology-report.schema.json"
+provenance:
+  origin:            "Fully synthetic — no real radiology data"
+  collected_by:      "Open Harness Hub contributors"
+  collected_through: "2026-05-20"
+  license:           "MIT"
+  anonymization:     "fully synthetic; no real patient or facility info"

@@ -1,0 +1,134 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-05-20T17:02:11.976583+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "0a2a62bb-0b8b-4935-a8b8-1025069c1981",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-05-20T17:02:11.976650+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/code-review-with-risk-score",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Full layered code-review pipeline. Composes:\n  persona (senior engineer) \u2192\n  grep (secret-leak guards on the diff) \u2192\n  classifier (clinical-style red-flag screen for OWASP categories) \u2192\n  knowledge-pack (OWASP Top 10 for LLM Apps + MITRE ATT&CK as RAG) \u2192\n  tool (lint runner) \u2192\n  harness (text-safety-review with citation requirements) \u2192\n  rubric (per-claim severity scoring)."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../code-review-with-risk-score.yaml"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "knowledge-pack/owasp-top-10-llm",
+      "facets": {
+        "schema": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-1-0/SchemaDatasetFacet.json",
+          "fields": [
+            {
+              "name": "rag_doc",
+              "type": "string"
+            }
+          ]
+        },
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "OWASP Top 10 risks for LLM-based applications \u2014 prompt injection,\ninsecure output handling, training-data poisoning, model DoS, supply\nchain, sensitive disclosure, plugin design, excessive agency,\noverreliance, model theft. Used by red-team harnesses and security\nevaluation pipelines."
+        },
+        "dataSource": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+          "name": "open-harness-hub",
+          "uri": "https://open-harness-hub.dev/knowledge-pack/owasp-top-10-llm"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "knowledge-pack/mitre-attack-sample",
+      "facets": {
+        "schema": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-1-0/SchemaDatasetFacet.json",
+          "fields": [
+            {
+              "name": "rag_doc",
+              "type": "string"
+            }
+          ]
+        },
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "Sample of MITRE ATT&CK Enterprise tactics + techniques. Each row\ncarries the technique ID, name, tactic, and a one-paragraph\ndescription. Use the canonical MITRE source at attack.mitre.org for\nproduction \u2014 this is a 30-row sample illustrating the row shape."
+        },
+        "dataSource": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+          "name": "open-harness-hub",
+          "uri": "https://open-harness-hub.dev/knowledge-pack/mitre-attack-sample"
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/code-review-with-risk-score/output/findings",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "findings (Finding[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/code-review-with-risk-score/output/overall_verdict",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "overall_verdict (enum[approve, request_changes, block])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/code-review-with-risk-score/output/overall_risk_score",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "overall_risk_score (number)"
+        }
+      }
+    }
+  ]
+}

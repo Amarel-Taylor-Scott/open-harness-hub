@@ -1,0 +1,59 @@
+id: "rubric/trade-compliance-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Trade compliance review quality v1"
+description: "8-dim rubric for grading export-control reviews."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["trade", "trade.eccn", "trade.itar", "trade.sanctions", "compliance"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-20"
+updated: "2026-05-20"
+
+dimensions:
+  - id: "classification_correct"
+    label: "ECCN / USML category / EAR99 / HTS subheading correctly identified"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "non-empty (eccn OR usml OR ear99) + (hts_chapter + heading)"
+  - id: "jurisdiction_determined"
+    label: "Jurisdiction (BIS-EAR vs DDTC-ITAR vs ATF vs neither) determined"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "jurisdiction field populated"
+  - id: "destination_screening"
+    label: "Destination + country group identified; embargoed destinations halted"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "destination_country_group populated; embargo check performed"
+  - id: "end_user_screening"
+    label: "End-user screened against Entity / SDN / MEU / Unverified / 1260H lists"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "screening_lists_checked + screening_hit boolean populated"
+  - id: "end_use_evaluated"
+    label: "End-use evaluated against prohibited end-uses (WMD, military intel, mass surveillance)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "end_use_statement + prohibited_end_use_check populated"
+  - id: "deemed_export_check"
+    label: "Foreign-national access flagged + appropriate licensing applied"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "deemed_export_check_completed boolean populated"
+  - id: "license_or_exemption_cited"
+    label: "Required license / license exception / exemption cited (or none required justified)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "license_required boolean + license_or_exemption_ref populated"
+  - id: "audit_trail_complete"
+    label: "Audit trail records every decision + reviewer + timestamp"
+    weight: 0.05
+    scale: "0..1"
+    evidence_required: "audit_trail_ref populated"
+
+scoring_method: "weighted_sum"

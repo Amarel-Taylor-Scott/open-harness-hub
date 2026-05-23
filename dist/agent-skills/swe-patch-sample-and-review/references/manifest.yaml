@@ -1,0 +1,88 @@
+id: "pipeline/swe-patch-sample-and-review"
+type: pipeline
+version: "0.1.0"
+name: "SWE-agent: sample N patches + reviewer judges"
+description: |
+  The princeton-nlp/SWE-agent pattern. Given a bug report + repo: sample
+  N action-rollouts (each producing a candidate patch via file-edit + run-
+  test loop), then a reviewer model judges the N candidates and picks
+  the best patch.
+
+  Verified by Open Harness Hub clone: SWE-agent's
+  `sweagent/agent/{agents,reviewer,history_processors,action_sampler}.py`
+  implements exactly this.
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "software", "software.codereview"]
+capability: ["reasoning", "code_synthesis", "agent_loop"]
+modality:   ["text", "code"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url: "https://github.com/SWE-agent/SWE-agent"
+  source_kind: "github"
+  author: "Yang, Jimenez et al. (Princeton NLP)"
+  license: "MIT"
+
+task: |
+  Given a bug report + repo path, sample N candidate patches, run tests
+  on each, then have a reviewer model pick the best one.
+pipeline_kind: "code_patch_search"
+
+inputs:
+  - name: "bug_report"
+    type: "string"
+  - name: "repo_path"
+    type: "string"
+  - name: "n_samples"
+    type: "integer"
+outputs:
+  - name: "best_patch"
+    type: "string"
+  - name: "candidates"
+    type: "object[]"
+  - name: "reviewer_decision"
+    type: "object"
+
+defaults:
+  persona: "persona/code-consultant"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/grep-prompt-injection-heuristics"
+    - "rule-pack/grep-cloud-secrets"
+
+steps:
+  - id: "guard_bug"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.bug_report" }
+
+  - id: "sample_candidates"
+    kind: "processor"
+    ref: "processor/action-sampler-multi-rollout"
+    inputs:
+      task: "$.inputs.bug_report"
+      n_samples: "$.inputs.n_samples"
+      max_actions_per_sample: 30
+
+  - id: "reviewer_judge"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidates: "$.steps.sample_candidates.output.patches"
+      rubric_ref: "rubric/research-entity-v1"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "swe-patch-sample-and-review"
+      applied_layers: ["persona", "tools", "execute", "judge"]
+
+success_criteria:
+  - rubric: "rubric/research-entity-v1"
+    threshold: 0.70

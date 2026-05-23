@@ -1,0 +1,50 @@
+id: "pattern/anti-single-model-no-fallback"
+type: pattern
+version: "0.1.0"
+name: "Anti-pattern: Single-model dependency with no fallback"
+description: "Pipeline hard-codes one model adapter. Production fails entirely when the model has an outage, rate-limit, region-block, deprecation, or quality regression. No graceful degradation, no second-best path."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["cross_industry"]
+capability: ["generation"]
+modality: ["text"]
+lifecycle: "stable"
+trust_boundary: "local"
+created: "2026-05-22"
+updated: "2026-05-22"
+
+when_to_use:
+  - "This is an anti-pattern. Do NOT use it."
+
+structural_shape:
+  - "WRONG: model_adapter: 'adapter/openai-gpt-frontier' (hard-coded, no fallback)."
+  - "RIGHT: model_adapter chain: [primary, secondary_open_weights, deterministic_baseline]."
+  - "RIGHT: per-step fallback policy with explicit quality degradation logged."
+
+problem: |
+  Single-model dependency creates SPOFs: an outage at OpenAI/Anthropic, a
+  cost spike, a deprecation, a region geo-block, or a quality regression
+  on a model version takes the whole pipeline down. Worse, the catalog
+  already saw this with the LLM judge: without an open-weights / deterministic
+  fallback, the judge step would fail in any offline environment.
+
+solution: |
+  Configure each model-using step with a fallback chain. Order: (1) primary
+  (frontier or specialist), (2) open-weights local (Llama 3.3 / Mistral /
+  Qwen / Phi-4), (3) deterministic baseline (rule-based or rubric-only
+  scoring). Pipeline degrades gracefully + logs which arm produced the
+  output for audit. See scripts/eval_judge_arms.py for the pattern.
+
+implementing_pipelines:
+  - "pipeline/supplier-policy-grading"
+  - "pipeline/contract-clause-review"
+
+related_patterns:
+  - "pattern/routing"
+  - "pattern/refuse-on-redacted"
+  - "pattern/composable-success-criteria"
+
+counter_patterns:
+  - "Open-weights fallback: adapter/ollama-default + deterministic baseline always available."
+
+tags: ["anti-pattern", "single-point-of-failure", "fallback", "resilience"]

@@ -1,0 +1,144 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/clinical-guidelines-sample",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Clinical guidelines (sample chunks)",
+  "description": "Sample chunks of clinical-guideline language for catalog-demo\npurposes. Each chunk has a stable section reference so a\ncitation-first persona can cite by section. Use authoritative\nfull-text guidelines (ACC/AHA, NICE, RCP, WHO) for production.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC-BY-4.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/clinical-guidelines-sample",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-19",
+  "keywords": [
+    "retrieval"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-19",
+  "citation": "Composite paraphrases of public clinical guidelines",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "clinical-guidelines-sample__clinical-guidelines",
+      "name": "clinical-guidelines.jsonl",
+      "description": "Data file backing knowledge pack clinical-guidelines-sample.",
+      "contentUrl": "knowledge-packs/data/clinical-guidelines.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "2193 B",
+      "sha256": "3834fa9751ecef8bf6792efee707be5b976a832e9bca8a6c2d1a24a24a0a9ea6"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "clinical-guidelines-sample__records",
+      "name": "clinical-guidelines-sample__records",
+      "description": "Records parsed from clinical-guidelines.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "clinical-guidelines-sample__records/id",
+          "name": "id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "clinical-guidelines-sample__clinical-guidelines"
+            },
+            "extract": {
+              "column": "id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "clinical-guidelines-sample__records/guideline",
+          "name": "guideline",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "clinical-guidelines-sample__clinical-guidelines"
+            },
+            "extract": {
+              "column": "guideline"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "clinical-guidelines-sample__records/section",
+          "name": "section",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "clinical-guidelines-sample__clinical-guidelines"
+            },
+            "extract": {
+              "column": "section"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "clinical-guidelines-sample__records/text",
+          "name": "text",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "clinical-guidelines-sample__clinical-guidelines"
+            },
+            "extract": {
+              "column": "text"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

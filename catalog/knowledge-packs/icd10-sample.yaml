@@ -1,0 +1,31 @@
+id: "knowledge-pack/icd10-sample"
+type: knowledge-pack
+version: "0.1.0"
+name: "ICD-10 sample"
+description: |
+  Sampled subset of ICD-10 diagnosis codes for catalog-demo purposes.
+  Use the public, full ICD-10 release for any production deployment;
+  this pack exists to anchor the data shape, not to be authoritative.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC0-1.0"
+industry:   ["healthcare", "healthcare.clinical"]
+capability: ["retrieval"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "dated"
+tags: ["icd10", "codes"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+content_types:
+  - rag_doc
+files:
+  - path: "data/icd10-sample.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+provenance:
+  sources: ["WHO ICD-10 public release"]
+  collected_through: "2026-04-30"

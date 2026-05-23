@@ -1,0 +1,50 @@
+id: "processor/date-parse-multiformat"
+type: processor
+version: "0.1.0"
+name: "Date parse multi-format → ISO 8601"
+description: |
+  Parse any date string in 50+ common formats (MM/DD/YYYY, DD/MM/YYYY,
+  YYYY-MM-DD, Mar 5 2025, 5-Mar-25, 1709589600 epoch, ISO 8601
+  fragments, RFC 2822) into a normalized ISO 8601 datetime. Resolves
+  ambiguous M/D order using locale hint. Preserves timezone if
+  given, defaults to UTC otherwise.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["format_conversion", "extraction"]
+modality:   ["text", "structured"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "pre_api.format_convert"
+tags: ["date", "iso-8601", "enrichment"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+process_kind: "format_convert.date_parse"
+deterministic: true
+side_effects: "none"
+
+inputs:
+  - name: "date_text"
+    type: "string"
+  - name: "locale_hint"
+    type: "string"
+  - name: "tz_hint"
+    type: "string"
+outputs:
+  - name: "iso_8601"
+    type: "string"
+  - name: "epoch_unix"
+    type: "integer"
+  - name: "year_month_day"
+    type: "string"
+  - name: "is_valid"
+    type: "boolean"
+  - name: "ambiguity_warning"
+    type: "string"
+
+config:
+  default_locale: "en_US"
+  default_tz: "UTC"
+  supported_format_count: 52

@@ -1,0 +1,46 @@
+id: "processor/prompt-injection-detector"
+type: processor
+version: "0.1.0"
+name: "Prompt-injection detector"
+description: |
+  Detect prompt-injection / jailbreak attempts in user input,
+  retrieved documents, or tool results. Two-tier: a fast regex /
+  classifier first pass plus an optional small-model classifier
+  second pass.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry", "security"]
+capability: ["safety_gating", "classification"]
+modality:   ["text"]
+lifecycle:  "experimental"
+lifecycle_position: "pre_api.input_gating"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "gate.prompt_injection"
+deterministic: false
+idempotent: true
+streaming: false
+latency_budget_ms: 80
+
+inputs:
+  - name: "text"
+    type: "string"
+  - name: "source"
+    type: "enum[user, retrieved_doc, tool_result, system]"
+outputs:
+  - name: "score"
+    type: "number"
+  - name: "patterns_fired"
+    type: "string[]"
+  - name: "allow"
+    type: "boolean"
+
+side_effects: "none"
+on_error: "raise"
+
+implementations:
+  - kind: "callable"
+    path: "processors.prompt_injection.run"

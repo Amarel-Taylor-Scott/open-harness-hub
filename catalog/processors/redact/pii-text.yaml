@@ -1,0 +1,79 @@
+id: "processor/redact-pii-text"
+type: processor
+version: "0.1.0"
+name: "Redact PII from text (English-centric, MS Presidio-compatible)"
+description: |
+  Strip PII from free-form text before downstream LLM calls or
+  hub sharing. Detects: email, phone, IBAN, SSN, passport,
+  national-ID, full names (NER), street addresses, dates of birth,
+  medical record numbers, and the 18 HIPAA Safe Harbor identifiers.
+
+  Drop-in replacement for raw text in any pipeline whose
+  `lifecycle_position` ≥ pre_api. Replaces detected entities with
+  `[REDACTED:<TYPE>]` placeholders; preserves text shape so downstream
+  parsing still works.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry", "healthcare", "finance", "esg"]
+capability: ["anonymization", "safety_gating"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "pre_api.redact"
+tags: ["pii", "redaction", "hipaa", "presidio", "dpv"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "redact.pii_text"
+deterministic: false
+side_effects: "none"
+
+inputs:
+  - name: "text"
+    type: "string"
+  - name: "entity_types"
+    type: "string[]"
+  - name: "replacement_style"
+    type: "string"
+outputs:
+  - name: "text"
+    type: "string"
+  - name: "detected_entities"
+    type: "object[]"
+  - name: "entity_counts_by_type"
+    type: "object"
+config:
+  default_entity_types:
+    - "EMAIL_ADDRESS"
+    - "PHONE_NUMBER"
+    - "IBAN_CODE"
+    - "US_SSN"
+    - "US_PASSPORT"
+    - "CREDIT_CARD"
+    - "PERSON"
+    - "LOCATION"
+    - "DATE_OF_BIRTH"
+    - "MEDICAL_LICENSE"
+    - "MEDICAL_RECORD_NUMBER"
+  default_replacement_style: "type_token"   # [REDACTED:EMAIL]
+  presidio_compatible: true
+  hipaa_safe_harbor_categories:
+    - "hsh:01"
+    - "hsh:02"
+    - "hsh:03"
+    - "hsh:04"
+    - "hsh:05"
+    - "hsh:06"
+    - "hsh:07"
+    - "hsh:08"
+    - "hsh:09"
+    - "hsh:10"
+    - "hsh:11"
+    - "hsh:12"
+    - "hsh:13"
+    - "hsh:14"
+    - "hsh:15"
+    - "hsh:16"
+    - "hsh:17"
+    - "hsh:18"

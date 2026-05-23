@@ -1,0 +1,58 @@
+id: "rubric/ma-dd-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "M&A DD review quality v1"
+description: "8-dim rubric across the 6 DD streams + materiality + disposition"
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["m_and_a", "m_and_a.due_diligence", "legal", "finance"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-20"
+updated: "2026-05-20"
+
+dimensions:
+  - id: "stream_typed"
+    label: "Every finding tagged with stream (financial/legal/ip/customer/hr/tax)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "stream field populated per finding"
+  - id: "materiality_quantified"
+    label: "Material findings quantified in $ + multiple"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "for severity ≥ high: dollar_impact + ebitda_multiple_impact populated"
+  - id: "deal_killers_surfaced"
+    label: "Critical deal-killers surfaced first (COC accel, customer concentration, open IP litig, undisclosed tax > $1M, regulatory enforcement, going concern)"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "critical findings appear at top of report"
+  - id: "rw_vs_structure_classified"
+    label: "Findings classified as R&W-coverable vs deal-structure required"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "rw_or_structure field populated; r&w-excluded items flagged"
+  - id: "remediation_path"
+    label: "Disposition (clean / cure-required / re-trade / escrow / walk) per finding"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "disposition ∈ allowed values"
+  - id: "no_legal_conclusion_without_authority"
+    label: "Risk-described, not enforceability-asserted"
+    weight: 0.05
+    scale: "0..1"
+    evidence_required: "no 'unenforceable' / 'void' assertions without citation"
+  - id: "pii_safe"
+    label: "PII / privileged content redacted before LLM call"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "processor/redact-pii-text fired; zero PII hits in output"
+  - id: "report_actionable"
+    label: "Output is actionable: total $ adjustment + escrow request + key conditions"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "summary table with total_purchase_price_adjustment + escrow_holdback + key_closing_conditions"
+
+scoring_method: "weighted_sum"

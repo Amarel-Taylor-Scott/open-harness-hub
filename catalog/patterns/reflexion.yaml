@@ -1,0 +1,64 @@
+id: "pattern/reflexion"
+type: pattern
+version: "0.1.0"
+name: "Reflexion"
+description: |
+  Add a verbal self-reflection step after each failed attempt. The
+  reflection is appended to memory and shown to the model on the next
+  attempt. Bounded by `max_iters`. Captures the "I should have tried
+  X next time" insight that improves performance on subsequent
+  attempts without weight updates.
+authors:
+  - name: "Shinn, Cassano, Berman, Gopinath, Narasimhan, Yao (2023)"
+license: "CC-BY-4.0"
+industry:   ["ai"]
+capability: ["reasoning", "agent_loop"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+tags: ["agent", "reflexion", "memory"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+paper_url: "https://arxiv.org/abs/2303.11366"
+paper_citation: "Shinn et al. 2023, Reflexion: Language Agents with Verbal Reinforcement Learning"
+reference_implementations:
+  - { url: "https://github.com/noahshinn/reflexion", language: "python" }
+
+structural_shape:
+  - "attempt task with current memory"
+  - "evaluator scores attempt (success / failure)"
+  - "on failure:"
+  - "  verbal_reflect (LLM writes a self-reflection on what went wrong)"
+  - "  append reflection to episodic memory"
+  - "  retry (bounded by max_iters)"
+  - "return successful attempt OR last attempt + accumulated reflections"
+
+when_to_use:
+  - "Tasks with explicit success criteria (compile-test, eval rubric, unit test)"
+  - "Multi-shot allowed (latency budget supports N retries)"
+  - "Long-horizon tasks where the model is likely to make mistakes early"
+
+when_not_to_use:
+  - "No clear success/failure signal"
+  - "Single-shot requirement"
+
+variants:
+  - "Self-Refine (single critique-revise pair, no memory)"
+  - "Reflexion + RL: use reflection as reward signal for RL fine-tuning"
+
+counter_patterns:
+  - "pattern/self-refine"
+
+implementing_pipelines: []
+
+implementing_processors:
+  - "processor/iterative-revise-loop"
+  - "processor/self-refine-critique"
+
+tradeoffs:
+  latency: "max_iters × single-shot"
+  cost: "max_iters × single-shot"
+  quality: "Significantly higher on coding tasks"
+  complexity: "Medium — needs eval signal + memory store"
+  explainability: "High — reflections are human-readable"

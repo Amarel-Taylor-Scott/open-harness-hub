@@ -1,0 +1,47 @@
+id: "processor/memory-conversational-store"
+type: processor
+version: "0.1.0"
+name: "Conversational memory store"
+description: |
+  Read / write conversational memory keyed by (user_id, session_id).
+  Stores the last N turns plus a compressed summary for older turns.
+  Pluggable backend: SQLite (default), Redis, Postgres, or DynamoDB.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["memory"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+lifecycle_position: "cross_cutting.composition"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "memory.write_conversational"
+deterministic: false
+idempotent: false
+streaming: false
+latency_budget_ms: 20
+
+inputs:
+  - name: "user_id"
+    type: "string"
+  - name: "session_id"
+    type: "string"
+  - name: "op"
+    type: "enum[read, append, summarize, clear]"
+  - name: "turn"
+    type: "Turn"
+outputs:
+  - name: "turns"
+    type: "Turn[]"
+  - name: "summary"
+    type: "string"
+
+side_effects: "write"
+on_error: "raise"
+
+implementations:
+  - kind: "callable"
+    path: "processors.memory_conversational.run"

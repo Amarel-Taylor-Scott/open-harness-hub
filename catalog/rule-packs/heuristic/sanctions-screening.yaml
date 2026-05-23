@@ -1,0 +1,54 @@
+id: "rule-pack/sanctions-screening"
+type: rule-pack
+version: "0.1.0"
+name: "Sanctions screening (deterministic)"
+description: |
+  Heuristic rule pack for sanctions screening. Each rule is a
+  condition that pairs a normalized entity name (or fuzzy match) with
+  a sanctions list and a fuzz threshold. The harness pre-normalizes
+  the entity (transliterate, fold case, strip honorifics) before
+  evaluating. Backed by a sanctions-list knowledge pack.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["finance", "finance.aml", "finance.kyc"]
+capability: ["safety_gating", "verification"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "volatile"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+family: "heuristic"
+rules:
+  - id: "ofac_sdn_exact"
+    label: "Exact match against OFAC SDN"
+    condition: "fuzzy_match(entity.normalized_name, list='ofac_sdn') >= 1.00"
+    action: "halt_and_escalate"
+    severity: "critical"
+  - id: "ofac_sdn_fuzzy"
+    label: "Fuzzy match against OFAC SDN (Jaro-Winkler ≥ 0.92)"
+    condition: "fuzzy_match(entity.normalized_name, list='ofac_sdn') >= 0.92"
+    action: "halt_and_escalate"
+    severity: "high"
+  - id: "un_consolidated_list"
+    label: "Match against UN Consolidated Sanctions list"
+    condition: "fuzzy_match(entity.normalized_name, list='un_consolidated') >= 0.92"
+    action: "halt_and_escalate"
+    severity: "high"
+  - id: "eu_sanctions_list"
+    label: "Match against EU Consolidated Sanctions list"
+    condition: "fuzzy_match(entity.normalized_name, list='eu_consolidated') >= 0.92"
+    action: "halt_and_escalate"
+    severity: "high"
+  - id: "pep_list"
+    label: "Politically Exposed Person hit (institution's PEP list)"
+    condition: "fuzzy_match(entity.normalized_name, list='institution_pep') >= 0.92"
+    action: "enhanced_due_diligence"
+    severity: "medium"
+  - id: "adverse_media_negative"
+    label: "Adverse media negative finding above threshold"
+    condition: "adverse_media_score(entity.normalized_name) >= 0.75"
+    action: "enhanced_due_diligence"
+    severity: "medium"

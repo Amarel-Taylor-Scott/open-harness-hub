@@ -1,0 +1,131 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/icd10-sample",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "ICD-10 sample",
+  "description": "Sampled subset of ICD-10 diagnosis codes for catalog-demo purposes.\nUse the public, full ICD-10 release for any production deployment;\nthis pack exists to anchor the data shape, not to be authoritative.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC0-1.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/icd10-sample",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-19",
+  "keywords": [
+    "icd10",
+    "codes"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-19",
+  "citation": "WHO ICD-10 public release",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "icd10-sample__icd10-sample",
+      "name": "icd10-sample.jsonl",
+      "description": "Data file backing knowledge pack icd10-sample.",
+      "contentUrl": "knowledge-packs/data/icd10-sample.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "1338 B",
+      "sha256": "bdcfd8ec36128b9356f7266c69eaaa5e9e521a64e1c06df9b4eabcddd081f0ee"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "icd10-sample__records",
+      "name": "icd10-sample__records",
+      "description": "Records parsed from icd10-sample.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "icd10-sample__records/code",
+          "name": "code",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "icd10-sample__icd10-sample"
+            },
+            "extract": {
+              "column": "code"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "icd10-sample__records/label",
+          "name": "label",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "icd10-sample__icd10-sample"
+            },
+            "extract": {
+              "column": "label"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "icd10-sample__records/category",
+          "name": "category",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "icd10-sample__icd10-sample"
+            },
+            "extract": {
+              "column": "category"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

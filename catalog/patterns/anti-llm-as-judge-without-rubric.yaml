@@ -1,0 +1,47 @@
+id: "pattern/anti-llm-as-judge-without-rubric"
+type: pattern
+version: "0.1.0"
+name: "Anti-pattern: LLM-as-judge without rubric"
+description: "Asking an LLM 'is this output good?' with no rubric, no scoring dimensions, no calibration set. Scores drift by model version, sampling temperature, even prompt order. The judge becomes a different judge every release."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["cross_industry"]
+capability: ["evaluation"]
+modality: ["text"]
+lifecycle: "stable"
+trust_boundary: "local"
+created: "2026-05-22"
+updated: "2026-05-22"
+
+when_to_use:
+  - "This is an anti-pattern. Do NOT use it."
+
+structural_shape:
+  - "WRONG: prompt = 'Rate this answer 1-10' → log score → ship."
+  - "RIGHT: define rubric (dimensions + weights + evidence_required) → calibrate on golden set → log per-dimension score + verbatim citations → version the rubric."
+  - "RIGHT: pin judge model + temperature + decode params; bump rubric version on any change."
+
+problem: |
+  Free-form LLM scoring has no shared scale: a 7/10 today and a 7/10 next
+  month may mean different things if the model swapped, the temperature
+  changed, or the prompt was reordered. Worse, asymmetric prompt phrasing
+  ("rate strictly" vs "rate generously") moves the median by 2+ points.
+  Without a rubric the score is unauditable + non-comparable across runs.
+
+solution: |
+  Always pair LLM judging with an explicit rubric artifact (catalog
+  `rubric/*`): dimensions, weights, evidence_required per dimension,
+  scoring_method. Calibrate against a held-out golden set on first
+  introduction and on any judge-model bump. Version the rubric so old
+  scores remain interpretable.
+
+implementing_pipelines: []
+
+related_patterns:
+  - "pattern/composable-success-criteria"
+  - "pattern/two-stage-extract-then-judge"
+
+counter_patterns:
+  - "Use rubric/* artifacts. See e.g. rubric/contract-review-quality-v1."
+
+tags: ["anti-pattern", "judge", "evaluation", "drift"]

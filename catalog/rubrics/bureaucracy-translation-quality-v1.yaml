@@ -1,0 +1,69 @@
+id: "rubric/bureaucracy-translation-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Bureaucracy translation + fraud-screen quality v1"
+description: |
+  Ten-dimension rubric for grading a bureaucracy-translation pipeline
+  output (e.g. Bill_info AI). Anchored in the Bill_info AI eval set
+  (28 documents, 96% extraction, 100% redacted-field refusal,
+  three-level fraud classification).
+authors:
+  - name: "Open Harness Hub contributors (port of Bill_info AI eval)"
+license: "MIT"
+industry:   ["bureaucracy_translation", "humanitarian", "compliance"]
+capability: ["evaluation"]
+modality:   ["text", "image", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+tags: ["bill-info-ai", "bureaucracy", "refugee", "verbraucherzentrale"]
+created: "2026-05-21"
+updated: "2026-05-21"
+
+dimensions:
+  - id: "next_24h_action_present"
+    label: "Output starts with ONE concrete next-24h action (visible in the first 10 seconds)"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "first_action_block populated; positioned before detail; specific verb + timeframe"
+  - id: "extraction_field_accuracy"
+    label: "Structured field extraction accuracy ≥ 95% (Bill_info AI baseline: 95.8%)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "field_accuracy_score >= 0.95 across (amount, deadline, recipient, sender, iban, creditor)"
+  - id: "redacted_field_refusal"
+    label: "Redacted / unreadable fields return null (no hallucination)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "for any non-extractable field: returned_value = null; user_facing_value = 'unknown' in user language"
+  - id: "fraud_classification_three_level"
+    label: "Fraud classification one of {legitimate, suspicious, likely_scam} with cited indicators"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "classification field + indicators[] with cited Verbraucherzentrale tier (critical/supporting)"
+  - id: "critical_override_enforced"
+    label: "On likely_scam: red banner + recommendations completely overridden to anti-scam"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "if classification='likely_scam': urgency_banner='red'; recommended_steps = [do_not_pay, verify_via_authority, save_as_evidence]; reply_draft is empty"
+  - id: "consumer_authority_cited"
+    label: "Cites the relevant consumer-protection authority for the jurisdiction (Verbraucherzentrale DE / CFPB US / etc.)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "non-empty consumer_authority_ref + link to authority's official fraud-check page"
+  - id: "translation_appropriate"
+    label: "User-language explanation is calm, non-patronising, action-first"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "tone_check passes; no jargon untranslated; action-block first"
+  - id: "validation_layer_visible"
+    label: "Deterministic business-rule violations surfaced openly (not silently fabricated)"
+    weight: 0.05
+    scale: "0..1"
+    evidence_required: "validation_errors[] populated when applicable; output marks low_confidence when inconsistent"
+  - id: "reply_draft_in_original_language"
+    label: "Ready-to-send reply draft in the document's original language"
+    weight: 0.05
+    scale: "0..1"
+    evidence_required: "reply_draft populated in document's source language for legitimate / suspicious classes"
+
+scoring_method: "weighted_sum"

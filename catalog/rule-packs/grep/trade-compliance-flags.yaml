@@ -1,0 +1,83 @@
+id: "rule-pack/grep-trade-compliance-flags"
+type: rule-pack
+version: "0.1.0"
+name: "Trade compliance red-flag detectors (HTS / ECCN / ITAR / OFAC)"
+description: |
+  GREP detectors for export-control red flags: dual-use technology
+  to embargoed destinations, missing end-user diligence, ITAR
+  technical data outside licensed scope, deemed-export
+  signals, customer requesting EAR99 mis-classification.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["trade", "trade.eccn", "trade.itar", "trade.sanctions", "compliance"]
+capability: ["safety_gating", "classification"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "volatile"
+tags: ["trade", "ear", "itar", "ofac", "export-control"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+family: "grep"
+rules:
+  - id: "embargoed_destination"
+    pattern: "(?i)\\b(cuba|iran|north korea|dprk|syria|crimea|donetsk|luhansk|sudan|south sudan|venezuela)\\b\\s+(?:destination|customer|end[- ]?user|shipment|export)"
+    severity: "critical"
+    category: "trade.embargoed_destination"
+
+  - id: "entity_list_hit"
+    pattern: "(?i)(?:bis\\s+)?entity\\s+list\\s+(?:hit|match|listed)|denied\\s+persons\\s+list|unverified\\s+list|military\\s+end\\s+user|section\\s+1260h\\s+listed"
+    severity: "critical"
+    category: "trade.entity_list"
+
+  - id: "ofac_sdn_hit"
+    pattern: "(?i)ofac\\s+(?:sdn|sectoral|consolidated)\\s+(?:hit|match|listed)|specially\\s+designated\\s+nationals"
+    severity: "critical"
+    category: "trade.ofac_sdn"
+
+  - id: "itar_technical_data"
+    pattern: "(?i)itar\\s+(?:controlled\\s+)?technical\\s+data(?!.{0,200}(?:tata|technical\\s+assistance\\s+agreement|exemption|license\\s+approved))"
+    severity: "critical"
+    category: "trade.itar.technical_data"
+
+  - id: "deemed_export_signal"
+    pattern: "(?i)(?:foreign\\s+national|non[- ]?us\\s+person|h1b|opt|j1)\\s+(?:has\\s+access\\s+to|will\\s+receive|granted\\s+access\\s+to)\\s+(?:controlled|eccn|itar)"
+    severity: "high"
+    category: "trade.deemed_export"
+
+  - id: "ear99_self_certification"
+    pattern: "(?i)customer\\s+states\\s+(?:item\\s+is\\s+)?ear99|self[- ]?certif(?:y|ied|ication)\\s+as\\s+ear99(?!.{0,200}(?:verified|reviewed|cleared\\s+by\\s+(?:trade|compliance)))"
+    severity: "medium"
+    category: "trade.ear99_unverified"
+
+  - id: "red_flag_indicators"
+    pattern: "(?i)(?:customer\\s+(?:declines|refuses)\\s+(?:to\\s+identify|end[- ]?use|end[- ]?user)|cash\\s+payment\\s+(?:unusual|abnormal)|routing\\s+(?:via|through)\\s+(?:transshipment|free\\s+zone|hong\\s+kong|uae))"
+    severity: "high"
+    category: "trade.bis_red_flag_indicator"
+
+  - id: "diversion_signal"
+    pattern: "(?i)(?:onward\\s+shipment\\s+to|re[- ]?export\\s+to|destined\\s+for|ultimate\\s+destination)\\s+(?:russia|china|iran|north\\s+korea|cuba|syria|venezuela)(?!.{0,200}(?:license|exemption))"
+    severity: "critical"
+    category: "trade.diversion"
+
+  - id: "encryption_classification_missing"
+    pattern: "(?i)encryption\\s+(?:functionality|module|library)(?!.{0,200}(?:cclasif|eccn\\s+5[ad]00[24]|tsu\\s+exemption|enc\\s+exemption|filed\\s+with\\s+bis))"
+    severity: "medium"
+    category: "trade.encryption_unclassified"
+
+  - id: "dual_use_to_military_end_user"
+    pattern: "(?i)dual[- ]?use\\s+(?:item|technology)\\s+(?:to|for)\\s+(?:military\\s+end\\s+user|defense\\s+ministry|armed\\s+forces)"
+    severity: "critical"
+    category: "trade.dual_use_meu"
+
+  - id: "missing_end_user_certification"
+    pattern: "(?i)(?:no|absent|n[\\.\\/]?a)\\s+(?:end[- ]?user|end[- ]?use)\\s+(?:certification|statement|declaration)"
+    severity: "high"
+    category: "trade.no_end_user_cert"
+
+  - id: "human_rights_concern"
+    pattern: "(?i)(?:surveillance|biometric|facial[- ]?recognition|spyware|exploit\\s+marketplace)\\s+(?:technology|item)\\s+(?:to|for)\\s+(?:government|law\\s+enforcement|ministry)(?!.{0,200}(?:human\\s+rights\\s+screening|us\\s+state\\s+department\\s+review))"
+    severity: "high"
+    category: "trade.human_rights_screening"

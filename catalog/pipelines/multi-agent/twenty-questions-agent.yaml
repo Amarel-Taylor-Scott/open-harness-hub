@@ -1,0 +1,82 @@
+id: "pipeline/twenty-questions-agent"
+type: pipeline
+version: "0.1.0"
+name: "20-questions agent (Akinator-style)"
+description: |
+  An agent that plays 20 Questions — asks yes/no questions to narrow
+  down a hidden concept. Uses a candidate set + binary-search-style
+  question generation. The classic agent-game pattern with a clear
+  win condition.
+
+  Verified by Open Harness Hub mining of ryanholbrook's "LLM 20
+  Questions Starter Notebook" (1420 votes) + cdeotte's "Starter Code
+  for Llama 8B LLM" (447 votes).
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "education"]
+capability: ["reasoning", "agent_loop"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url: "https://www.kaggle.com/competitions/llm-20-questions"
+  source_kind: "kaggle"
+  author: "Ryan Holbrook (1420 votes), Chris Deotte (447 votes)"
+  license: "Apache-2.0"
+
+task: |
+  Two agents play 20 Questions: questioner asks yes/no questions to
+  narrow down a hidden concept; answerer responds based on the hidden
+  target. Track candidate set and use binary-search question selection.
+pipeline_kind: "agent_loop"
+
+inputs:
+  - name: "hidden_concept"
+    type: "string"
+  - name: "candidate_set"
+    type: "string[]"
+  - name: "max_questions"
+    type: "integer"
+outputs:
+  - name: "guesses"
+    type: "string[]"
+  - name: "questions_used"
+    type: "integer"
+  - name: "won"
+    type: "boolean"
+  - name: "transcript"
+    type: "object[]"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+
+steps:
+  - id: "guard"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.hidden_concept" }
+
+  - id: "play"
+    kind: "processor"
+    ref: "processor/iterative-revise-loop"
+    inputs:
+      initial_prompt: "Play 20 Questions. Use binary search to halve the candidate set each turn."
+      inner_harness_ref: "harness/text-safety-review"
+      verifier_refs: []
+      max_iterations: "$.inputs.max_questions"
+      cost_ceiling_usd: 0.50
+      convergence_policy: "all_pass"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "twenty-questions-agent"
+      applied_layers: ["agent_loop"]
+
+success_criteria: []

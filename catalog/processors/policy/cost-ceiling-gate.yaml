@@ -1,0 +1,49 @@
+id: "processor/cost-ceiling-gate"
+type: processor
+version: "0.1.0"
+name: "Cost ceiling gate"
+description: |
+  Reject a pipeline run if the predicted USD cost exceeds the budget
+  configured for the calling pipeline / user. Uses token-count
+  estimates + adapter pricing to predict cost.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["safety_gating"]
+modality:   ["structured"]
+lifecycle:  "beta"
+lifecycle_position: "pre_api.input_gating"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "gate.cost_ceiling"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 5
+
+inputs:
+  - name: "expected_input_tokens"
+    type: "integer"
+  - name: "expected_output_tokens"
+    type: "integer"
+  - name: "adapter_ref"
+    type: "artifact_id"
+  - name: "budget_usd"
+    type: "number"
+outputs:
+  - name: "allowed"
+    type: "boolean"
+  - name: "predicted_cost_usd"
+    type: "number"
+  - name: "reason"
+    type: "string"
+
+side_effects: "none"
+on_error: "raise"
+
+implementations:
+  - kind: "callable"
+    path: "processors.cost_ceiling_gate.run"

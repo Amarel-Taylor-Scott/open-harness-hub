@@ -1,0 +1,54 @@
+id: "tool/transaction-graph-query"
+type: tool
+version: "0.1.0"
+name: "Transaction graph query"
+description: |
+  Query a transaction-graph store for one-hop or multi-hop paths
+  between accounts / entities. Used by AML harnesses to find shell
+  layering, circular flows, and rapid-in-rapid-out patterns.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["finance", "finance.aml"]
+capability: ["retrieval", "reasoning"]
+modality:   ["structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+parameters:
+  type: object
+  properties:
+    seed_account:  { type: "string" }
+    direction:     { type: "string", enum: ["in", "out", "both"], default: "both" }
+    max_hops:      { type: "integer", default: 2 }
+    time_window_days: { type: "integer", default: 14 }
+    min_amount_usd: { type: "number", default: 0 }
+  required: ["seed_account"]
+returns:
+  type: object
+  properties:
+    nodes:
+      type: array
+      items:
+        type: object
+        properties:
+          id:           { type: "string" }
+          kind:         { type: "string", enum: ["account", "entity", "vessel"] }
+          country:      { type: "string" }
+          risk_score:   { type: "number" }
+    edges:
+      type: array
+      items:
+        type: object
+        properties:
+          src:          { type: "string" }
+          dst:          { type: "string" }
+          amount_usd:   { type: "number" }
+          ts:           { type: "string", format: "date-time" }
+          kind:         { type: "string", enum: ["wire", "ach", "card", "cash", "internal"] }
+side_effects: "read"
+implementations:
+  - kind: "callable"
+    path: "tools.transaction_graph_query.run"

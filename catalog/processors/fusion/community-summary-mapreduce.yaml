@@ -1,0 +1,59 @@
+id: "processor/community-summary-mapreduce"
+type: processor
+version: "0.1.0"
+name: "Community-summary map-reduce (GraphRAG global)"
+description: |
+  Per-community map step (LLM summarizes each Leiden community), then
+  reduce step combines partial answers across communities. The core
+  primitive of GraphRAG's global-search mode.
+
+  Verified by Open Harness Hub clone:
+  `microsoft/graphrag/packages/graphrag/graphrag/query/structured_search/global_search/`.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["ai", "cross_industry"]
+capability: ["summarization", "retrieval"]
+modality:   ["text"]
+lifecycle:  "experimental"
+lifecycle_position: "cross_cutting.composition"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "fusion.community_mapreduce"
+deterministic: false
+idempotent: true
+streaming: false
+latency_budget_ms: 30000
+
+inputs:
+  - name: "graph"
+    type: "object"
+  - name: "query"
+    type: "string"
+  - name: "community_level"
+    type: "integer"
+outputs:
+  - name: "summaries"
+    type: "object[]"
+  - name: "reduced_answer"
+    type: "markdown"
+  - name: "communities_used"
+    type: "string[]"
+
+side_effects: "external_call"
+on_error: "fallback"
+
+model_targets:
+  - id: "small_local_summarizer"
+    label: "Small local model"
+    transport: "ollama"
+    role: "Per-community summarization + final reduce."
+    required: false
+    default: true
+    trust_boundary: "local"
+
+implementations:
+  - kind: "callable"
+    path: "processors.community_summary_mapreduce.run"

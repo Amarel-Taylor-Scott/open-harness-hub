@@ -1,0 +1,28 @@
+id: "adapter/openai-embeddings"
+type: adapter
+version: "0.1.0"
+name: "OpenAI embeddings (text-embedding-3-small/large)"
+description: |
+  OpenAI-compatible embeddings adapter. Defaults to
+  text-embedding-3-small (1536-dim, $0.02 / 1M tokens). Set
+  OPENAI_API_KEY at runtime. Works against the OpenAI API directly,
+  Azure OpenAI, or any OpenAI-compatible endpoint (Together, Groq,
+  Anyscale, vLLM, etc.) by overriding the endpoint.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry", "ai"]
+capability: ["embedding"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "external"
+tags: ["openai", "embeddings"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+transport: "openai_compatible"
+capabilities: ["embedding"]
+auth: "api_key"
+cost_model: "paid"
+endpoint: "https://api.openai.com/v1"
+default_model: "text-embedding-3-small"

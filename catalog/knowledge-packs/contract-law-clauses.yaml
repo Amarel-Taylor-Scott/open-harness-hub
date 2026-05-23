@@ -1,0 +1,59 @@
+id: "knowledge-pack/contract-law-clauses"
+type: knowledge-pack
+version: "0.1.0"
+name: "Commercial contract clause library (composite educational)"
+description: |
+  Composite, educational reference of common commercial contract
+  clauses with: standard market language, common red-flag variants,
+  why each red flag matters, and a suggested redline. Covers the
+  10 highest-leverage clause families:
+
+   1. Indemnification + limitation of liability (caps, carve-outs,
+      mutual vs unilateral)
+   2. IP assignment + pre-existing IP carve-outs + license-back
+   3. Confidentiality + residual-knowledge clause
+   4. Termination (for-cause, for-convenience, change-of-control)
+   5. Data-processing addendum + sub-processor consent + audit
+      rights
+   6. Anti-bribery + sanctions + export-control compliance
+   7. Warranties + disclaimers
+   8. Payment terms + late-payment interest
+   9. Governing law + jurisdiction + arbitration (seat, rules,
+      carve-outs)
+  10. Force majeure (post-COVID standard scope)
+
+  Composite educational extracts; clause review requires the lead
+  company's playbook + jurisdiction-specific counsel.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry:   ["legal", "legal.contract", "legal.compliance"]
+capability: ["retrieval", "verification"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "dated"
+tags: ["legal", "contract", "clause-library", "redline", "playbook"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+content_types:
+  - rag_doc
+  - citation_edge
+files:
+  - path: "data/contract-pack/clauses.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    embedder: "adapter/bge-embeddings-local"
+    chunk_tokens: 384
+    overlap_tokens: 48
+provenance:
+  sources:
+    - "Composite of common commercial-contract patterns (NDA / MSA / SOW / DPA)"
+    - "GDPR Art. 28 sub-processor requirements"
+    - "UK Bribery Act 2010 §7"
+    - "US FCPA"
+  collected_through: "2026-04-30"
+  note: "Composite educational extracts; not legal advice."

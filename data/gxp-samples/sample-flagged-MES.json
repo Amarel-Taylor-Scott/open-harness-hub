@@ -1,0 +1,25 @@
+{
+  "system_id":     "MES-PROD-04",
+  "system_class":  "GxP",
+  "description":   "Manufacturing Execution System in production, multiple data-integrity issues uncovered during inspection prep.",
+  "audit_trail_status": "audit-trail disabled on the batch-record entry module to improve performance",
+  "user_lifecycle": {
+    "shared_accounts":   "operators on the night shift use a shared account 'operator-night' because individual provisioning slows changeovers",
+    "account_review_cadence": "annual",
+    "termination_response_sla_hours": 168
+  },
+  "validation_status":     "production use without OQ complete on the recent module upgrade — IQ done, OQ pending",
+  "change_control":        "change applied directly to production without reason for change documented; reason for change: blank",
+  "electronic_signatures": {
+    "factors":            "1 (password only)",
+    "meaning_captured":   false,
+    "biometric":          false,
+    "notes":              "e-signature via password only; signature meaning: N/A"
+  },
+  "data_integrity": {
+    "manual_transcription":     "manual transcription from instrument readouts to MES, not verified by second person",
+    "backup_treated_as_archive":"backup serves as archive — no separate archive system",
+    "post_hoc_alteration":      "QA modified previous already-signed batch record without change control; backdated entry",
+    "dynamic_record_handling":  "dynamic chromatography record exported as PDF and static archived — raw data not retained"
+  }
+}

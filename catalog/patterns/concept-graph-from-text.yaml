@@ -1,0 +1,69 @@
+id: "pattern/concept-graph-from-text"
+type: pattern
+version: "0.1.0"
+name: "Concept graph from text"
+description: "Promote relationships between entities mentioned in source text to first-class graph nodes + edges. Each node + edge is source-anchored (page, span). Generalizes from CiteMind's Book Wiki concept graph to ESG materiality maps, supply-chain knowledge graphs, regulatory-framework cross-reference graphs, drug-interaction graphs."
+authors: [{ name: "CiteMind team (upstream)" }, { name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["education", "esg", "supply_chain", "compliance", "research", "healthcare"]
+capability:  ["extraction", "retrieval"]
+modality:    ["text", "structured"]
+lifecycle:   "beta"
+trust_boundary: "local"
+created: "2026-05-21"
+updated: "2026-05-21"
+
+attribution:
+  source_url: "https://huggingface.co/spaces"
+  source_kind: "huggingface"
+  author: "CiteMind team (Gemma 4 Good Hackathon, composite)"
+  license: "TBD — pending upstream confirmation"
+
+when_to_use:
+  - "Documents whose value comes from the relationships between entities (not just the entities themselves)."
+  - "Workflows that need to ask 'what depends on X' / 'what cites Y' / 'how does A connect to B'."
+  - "Visual exploration UIs where a graph view + page links are more useful than flat search."
+
+structural_shape:
+  - "step 1 — entity extraction from chunks (concepts, terms, people, datasets, methods, equations)"
+  - "step 2 — relationship extraction with type (depends_on, cited_by, sub_concept, contradicts, defined_in)"
+  - "step 3 — each node + edge carries a (page, span) citation"
+  - "step 4 — graph stored in local DB with bi-directional links + edge weights"
+  - "step 5 — query API: neighbors_of(node), shortest_path(a, b), subgraph_by_topic(t)"
+  - "step 6 — visualization layer (frontend) renders selected subgraphs with citation hovers"
+
+problem: |
+  Text-only retrieval misses the relational structure of a document. A reader
+  asking "which paragraph methods feed which claims" or "which clauses
+  cross-reference §382" gets back chunks, not a graph. The reader has to
+  reconstruct the relationships manually every time.
+
+solution: |
+  Treat relationships as first-class entities, not as a side effect of
+  free-text mention. Extract typed edges (depends_on, cited_by, sub_concept,
+  contradicts, defined_in) from each chunk + persist them with source
+  anchors. Expose the graph as a queryable object: neighbors, shortest paths,
+  subgraphs. Render the graph as a UI surface so the reader can explore
+  the document's structure visually — without losing the citation pointer.
+
+examples:
+  - context: "Textbook chapter on convex optimization (CiteMind original)"
+    application: "Concepts (Lagrangian, dual, KKT) become nodes; methods (gradient, interior-point) link to claims via cited theorems."
+  - context: "CSDDD disclosure with 47 supplier facts (ESG vertical)"
+    application: "Suppliers + sub-tier suppliers + commodities + jurisdictions become nodes; sourcing relationships + audit findings + WRO entities become edges."
+  - context: "Drug-interaction reference (medicine-safety vertical)"
+    application: "Drugs + metabolic enzymes + interaction severities become nodes; mechanism + clinical-evidence-level become edge attributes."
+  - context: "DFARS / DoD contract clause review (defense vertical)"
+    application: "Clauses + flow-down requirements + CUI definitions become nodes; required-when relationships become edges."
+
+implementing_pipelines:
+  - "pipeline/citemind-pdf-to-research-wiki"
+
+related_patterns:
+  - "pattern/source-document-to-persistent-knowledge-layer"
+  - "pattern/two-stage-extract-then-judge"
+
+implementing_processors:
+  - "processor/concept-graph-extractor"
+
+tags: ["knowledge-graph", "concept-graph", "relationships", "visualization"]

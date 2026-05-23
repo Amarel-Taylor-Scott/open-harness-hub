@@ -1,0 +1,41 @@
+id: "adapter/vllm-awq-local"
+type: adapter
+version: "0.1.0"
+name: "Local vLLM engine with AWQ-quantized weights"
+description: |
+  Adapter for serving a local LLM via vLLM with AWQ (Activation-aware
+  Weight Quantization) weights. Used in the Kaggle "EEDI" and "AIMO 2"
+  competitions to fit Qwen-32B / DeepSeek-R1-distill-Qwen-7B / QwQ-32B
+  on a single T4 / L4 / A10 with high throughput. AWQ ≈ 4-bit but
+  preserves activation statistics → less perplexity drop than
+  bitsandbytes nf4.
+
+  Verified by Open Harness Hub mining: itahiro DeepSeek-R1-distill-7B
+  (1399 votes, AIMO 2), mbmmurad QwQ-32B-preview (1097 votes),
+  yekenot DeepSeek-R1-distill-7B-awq (1087 votes), aerdem4 EEDI Qwen32B
+  vLLM (594 votes), takanashihumbert EEDI Qwen-2.5-32B-AWQ (650 votes).
+  Confirmed pattern in 7 of 35 mined kernels.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["ai"]
+capability: ["serving"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+tags: ["vllm", "awq", "local", "kaggle-verified"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url:  "https://github.com/vllm-project/vllm"
+  source_kind: "github"
+  author:      "vLLM contributors"
+  license:     "Apache-2.0"
+
+transport:   "vllm"
+capabilities: ["text_generation", "chat", "batched_generation", "logits_processors", "tool_use"]
+auth:        "local_only"
+cost_model:  "self_hosted"
+endpoint:    "http://localhost:8000"
+default_model: "Qwen/Qwen2.5-32B-Instruct-AWQ"

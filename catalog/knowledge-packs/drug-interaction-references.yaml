@@ -1,0 +1,50 @@
+id: "knowledge-pack/drug-interaction-references"
+type: knowledge-pack
+version: "0.1.0"
+name: "Drug-drug interaction references (DrugBank / RxNorm / FDA Orange Book / DailyMed)"
+description: |
+  Composite educational reference of drug-drug interaction sources
+  for use by `pipeline/medlabel-photo-to-warning` and similar
+  medicine-safety AI pipelines.
+
+  This is a STUB knowledge pack — the actual production drug-
+  interaction database requires licensing from authoritative
+  pharmacology sources (DrugBank, Micromedex, Lexicomp, Stockley's
+  Drug Interactions). The catalog's role is the shape + the
+  attribution + the citation requirement (every severe interaction
+  finding MUST cite the authoritative source).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry:   ["healthcare", "healthcare.pharmacy"]
+capability: ["retrieval", "verification"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "dated"
+tags: ["drug-interactions", "medlabel", "pharmacy", "patient-safety"]
+created: "2026-05-21"
+updated: "2026-05-21"
+
+attribution:
+  source_url:  "https://go.drugbank.com/"
+  source_kind: "other"
+  author:      "Composite educational extracts; production use requires licensed pharmacology database"
+  license:     "Educational use only; check upstream licensing"
+
+content_types:
+  - rag_doc
+files:
+  - path: "data/medlabel-pack/drug-interaction-examples.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+provenance:
+  sources:
+    - "DrugBank Online (educational; requires academic / commercial license for production)"
+    - "RxNorm (NIH NLM — public)"
+    - "FDA Orange Book (public)"
+    - "DailyMed labels (public, FDA)"
+    - "Stockley's Drug Interactions (commercial reference)"
+  collected_through: "2026-05-21"
+  note: "Production deployments must use a licensed, regularly-updated drug-interaction database. This stub provides the SHAPE — not authoritative content."

@@ -1,0 +1,53 @@
+id: "rubric/water-utility-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Water utility compliance review quality v1"
+description: "7-dim rubric"
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["water_utility", "water_utility.sdwa", "water_utility.lcr"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-21"
+updated: "2026-05-21"
+
+dimensions:
+  - id: "acute_health_risk_first"
+    label: "Acute violations (E. coli / nitrate / lead-AL / Tier 1 PN missed) surfaced FIRST as critical"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "acute_health_findings appear before other findings in report; severity=critical"
+  - id: "npdwr_citation"
+    label: "Each violation cites 40 CFR section + MCL/TT/MR class"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "cfr_section + violation_class ∈ {MCL,MRDL,TT,M&R,PN} per finding"
+  - id: "public_notification_tier"
+    label: "Public Notification tier assigned + deadline within window"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "pn_tier ∈ {1,2,3} + pn_delivery_method + deadline"
+  - id: "lcrr_inventory_status"
+    label: "Lead-service-line inventory + publication date verified"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "lsli_published_date populated; covers full distribution"
+  - id: "awia_rra_erp_current"
+    label: "AWIA RRA + ERP within 5-year cycle for systems > 3,300 people"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "rra_certification_date + erp_certification_date within 5 years"
+  - id: "scada_cyber_baseline"
+    label: "SCADA / OT cyber-baseline addressed (default creds changed, MFA, segmentation)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "scada_default_credentials_changed=true; mfa_remote_access=true; ot_it_segmentation_documented"
+  - id: "ccr_published"
+    label: "Annual CCR published by July 1; covers prior year + all detected contaminants"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "ccr_publication_date ≤ July 1; coverage_year matches prior year"
+
+scoring_method: "weighted_sum"

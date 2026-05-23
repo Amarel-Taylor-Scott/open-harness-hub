@@ -1,0 +1,69 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/dataset/radiology-report-samples",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Synthetic radiology report samples (3 cases, fully synthetic)",
+  "description": "Three synthetic radiology reports for testing\n`pipeline/radiology-report-grading`. Fully synthetic — no real\npatient data.\n\nCases:\n - sample-ct-chest-good.json — well-structured CT chest with\n   proper Fleischner-compliant disposition (expected high grade)\n - sample-ct-abdomen-flagged.json — CT abdomen/pelvis with\n   MULTIPLE quality issues: unredacted PHI (MRN + DOB), thyroid\n   nodule without TI-RADS, adrenal mass without workup, lytic\n   lesion with definitive \"is a metastasis\" without differential,\n   sub-solid pulm nodule without Fleischner follow-up, prior\n   available but no comparison addressed, impression lacks\n   recommendation\n - sample-mammo-screening-mixed.json — mammography with proper\n   BI-RADS scoring + recommendation, comparison addressed; good\n   case overall",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/MIT.html",
+  "url": "https://open-harness-hub.dev/dataset/radiology-report-samples",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-20",
+  "keywords": [
+    "radiology",
+    "synthetic",
+    "rads",
+    "fleischner",
+    "hipaa"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-20"
+}

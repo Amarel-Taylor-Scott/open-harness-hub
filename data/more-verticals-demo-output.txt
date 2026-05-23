@@ -1,0 +1,32 @@
+
+=== Insurance Claim Review (pipeline/insurance-claim-review) ===
+
+  sample-claim-clean.json                                  C: 0  H: 0  M: 0  L: 0
+
+  sample-claim-flagged.json                                C: 2  H: 2  M: 1  L: 0
+      [critical ] recent_coverage_change               insurance.fraud.recent_coverage_change
+      [high     ] conflicting_witness                  insurance.fraud.conflicting_witness
+      [critical ] photos_predate_loss                  insurance.fraud.photo_metadata
+      [medium   ] missing_police_report                insurance.fraud.no_police_report
+      [high     ] multiple_claims_short_window         insurance.fraud.serial_claims
+
+=== Academic Integrity Review (pipeline/academic-integrity-review) ===
+
+  sample-essay-clean.json                                  C: 0  H: 0  M: 0  L: 0
+
+  sample-essay-flagged.json                                C: 1  H: 0  M: 0  L: 3
+      [critical ] as_an_ai_language_model              academic_integrity.ai_artefact_phrase
+      [low      ] ai_safe_response_disclaimer          academic_integrity.ai_filler_phrase
+      [low      ] fabricated_doi                       academic_integrity.candidate_doi
+      [low      ] repeated_filler_phrase               academic_integrity.ai_filler_pattern
+
+=== Government Benefits Adjudication (pipeline/benefits-adjudication-review) ===
+
+  sample-snap-app-clean.json                               C: 0  H: 0  M: 0  L: 0
+
+  sample-snap-app-flagged.json                             C: 1  H: 3  M: 1  L: 0
+      [medium   ] asset_above_resource_limit           benefits.asset.above_limit
+      [high     ] undisclosed_household_member         benefits.household.undisclosed_member
+      [high     ] duplicate_enrollment_pattern         benefits.duplicate_enrollment
+      [high     ] self_employment_unreported           benefits.income.self_employment_unreported
+      [critical ] fraud_warrant_outstanding            benefits.fraud.warrant_outstanding

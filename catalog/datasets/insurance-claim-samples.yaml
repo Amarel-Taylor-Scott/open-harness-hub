@@ -1,0 +1,36 @@
+id: "dataset/insurance-claim-samples"
+type: dataset
+version: "0.1.0"
+name: "Synthetic insurance claim samples"
+description: |
+  Two synthetic insurance claims:
+   - sample-claim-clean.json — straightforward rear-end auto claim
+     with police report, witness, repair estimate. Expected ~0 hits.
+   - sample-claim-flagged.json — property fire with coverage
+     increase 12 days before loss, no police report, conflicting
+     witnesses, photos pre-date loss, 3 prior claims, IFB warrant
+     outstanding. Expected many critical hits.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["insurance", "insurance.claims", "insurance.fraud", "finance"]
+capability: ["evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["insurance", "synthetic", "claims"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+splits:
+  test:
+    rows: 2
+    path: "data/insurance-samples/"
+record_schema: "schemas/insurance-claim.schema.json"
+provenance:
+  origin:            "Fully synthetic — no real claim data"
+  collected_by:      "Open Harness Hub contributors"
+  collected_through: "2026-05-20"
+  license:           "MIT"
+  anonymization:     "fully synthetic"

@@ -1,0 +1,55 @@
+id: "rubric/hr-hiring-compliance-v1"
+type: rubric
+version: "0.1.0"
+name: "HR hiring compliance review quality v1"
+description: |
+  Seven-dimension rubric for grading a hiring-compliance review.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["hr", "hr.hiring", "compliance"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-20"
+updated: "2026-05-20"
+
+dimensions:
+  - id: "protected_class_typed"
+    label: "Each finding identifies protected class + statute"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "non-empty (protected_class, statute) tuple per finding"
+  - id: "disparate_type_separated"
+    label: "Disparate treatment vs disparate impact labeled distinctly"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "finding.type ∈ {treatment, impact}; impact findings include 4/5ths-rule calculation"
+  - id: "remediation_language_proposed"
+    label: "Each red-flag has proposed neutral replacement language"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "non-empty proposed_replacement field"
+  - id: "no_overreach"
+    label: "Findings are real biases, not over-flagging neutral words"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "false_positive_rate ≤ 0.1 against gold-set"
+  - id: "eeo_statement_check"
+    label: "EEO statement + ADA accommodation contact present in posting"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "eeo_statement_present + ada_accommodation_contact populated"
+  - id: "essential_functions_documented"
+    label: "Physical / cognitive requirements tied to essential functions (ADA)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "every 'must be able to' clause has essential_function_id reference"
+  - id: "individualized_assessment_path"
+    label: "Criminal-history / credit-history checks use individualized assessment"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "if criminal_check enabled: individualized_assessment_documented per EEOC Green factors"
+
+scoring_method: "weighted_sum"

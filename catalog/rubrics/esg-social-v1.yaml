@@ -1,0 +1,56 @@
+id: "rubric/esg-social-v1"
+type: rubric
+version: "0.1.0"
+name: "ESG social (S) sub-rubric v1"
+description: |
+  Six-dimension rubric for grading ONLY the social dimension of a
+  supplier disclosure. Aligned to ILO 11 forced-labor indicators,
+  CSRD ESRS S1 (own workforce) + S2 (value-chain workers), and
+  ILO core conventions (29, 87, 98, 100, 105, 111, 138, 182).
+
+  Use this when you want focused S-grading; use
+  `rubric/esg-supplier-compliance-v1` for combined E+S+G grading.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["esg", "supply_chain", "compliance", "humanitarian"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+dimensions:
+  - id: "s_forced_labor_indicators"
+    label: "S: ILO 11 forced-labor indicators (severity + pattern-of-indicators)"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "for each tier audited: indicator_count by severity; ≥2 indicators in same tier = pattern flag"
+  - id: "s_child_labor_check"
+    label: "S: Child-labor screening (ILO C138 + C182) with age-verification process"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "age_verification_policy_ref + sample audit of dorms / lines"
+  - id: "s_freedom_of_association"
+    label: "S: Freedom of association + collective bargaining (ILO C87 + C98)"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "union_presence OR worker_council_ref OR documented_alternative_grievance"
+  - id: "s_living_wage"
+    label: "S: Wages meet living-wage benchmark (Anker / WageIndicator)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "wage_data_by_role vs living_wage_benchmark for jurisdiction"
+  - id: "s_grievance_mechanism_effective"
+    label: "S: Grievance mechanism is independent, accessible, and demonstrably used"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "grievance_channel_ref + cases_received_count_yoy + resolution_time_p50"
+  - id: "s_high_risk_corridor_uplift"
+    label: "S: Sourcing from corridors with documented forced-labor risk → heightened review"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "if knowledge-pack/high-risk-corridors-and-sectors hits → on-the-ground audit within 12 months"
+
+scoring_method: "weighted_sum"

@@ -1,0 +1,51 @@
+id: "processor/runtime-tool-selector"
+type: processor
+version: "0.1.0"
+name: "Runtime tool selector (Toolformer / pydantic-ai)"
+description: |
+  Given a user query + a large registry of tools, semantically select
+  the top-K most likely-relevant tools to expose to the model. Avoids
+  overflowing the context window with every tool definition when only
+  a few apply.
+
+  Verified by Open Harness Hub clone: implemented at
+  `pydantic/pydantic-ai/_tool_search.py` (Toolformer-style).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["ai", "cross_industry"]
+capability: ["routing", "retrieval"]
+modality:   ["text"]
+lifecycle:  "experimental"
+lifecycle_position: "pre_api.context_assembly"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "select.tools_top_k"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 50
+
+inputs:
+  - name: "query"
+    type: "string"
+  - name: "tool_registry"
+    type: "Tool[]"
+  - name: "top_k"
+    type: "integer"
+  - name: "method"
+    type: "enum[semantic, bm25, hybrid, llm_classifier]"
+outputs:
+  - name: "selected_tools"
+    type: "Tool[]"
+  - name: "scores"
+    type: "number[]"
+
+side_effects: "none"
+on_error: "fallback"
+
+implementations:
+  - kind: "callable"
+    path: "processors.runtime_tool_selector.run"

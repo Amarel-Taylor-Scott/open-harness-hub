@@ -1,0 +1,48 @@
+id: "processor/verify-llm-judge-criterion"
+type: processor
+version: "0.1.0"
+name: "LLM-as-judge success-criterion evaluator"
+description: |
+  Evaluates one `kind: llm_judge` success criterion. Wraps
+  `processor/llm-judge` but with an explicit pass/fail threshold
+  and a clear criterion label. The judge adapter is configurable
+  (default: deterministic baseline; override with
+  judge_adapter=adapter/anthropic-claude-sonnet for frontier
+  grading).
+
+  Returns the judge's score AND the pass-vs-threshold boolean.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["verification", "evaluation"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "mixed"
+lifecycle_position: "post_api.verify"
+tags: ["success-criterion", "llm-judge", "verification"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+process_kind: "verify.llm_judge_criterion"
+deterministic: false
+side_effects: "external_call"
+
+inputs:
+  - name: "target_text"
+    type: "string"
+  - name: "rubric_ref"
+    type: "artifact_id"
+  - name: "judge_adapter_ref"
+    type: "artifact_id"
+  - name: "threshold"
+    type: "number"
+  - name: "custom_prompt"
+    type: "string"
+outputs:
+  - name: "pass"
+    type: "boolean"
+  - name: "score"
+    type: "number"
+  - name: "rationale"
+    type: "string"

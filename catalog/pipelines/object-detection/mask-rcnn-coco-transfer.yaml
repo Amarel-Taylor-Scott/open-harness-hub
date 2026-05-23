@@ -1,0 +1,73 @@
+id: "pipeline/mask-rcnn-coco-transfer"
+type: pipeline
+version: "0.1.0"
+name: "Mask-RCNN with COCO transfer learning (instance segmentation + detection)"
+description: |
+  Mask-RCNN with ResNet-50-FPN backbone, COCO-pretrained weights as
+  starting checkpoint, fine-tuned on domain-specific instance
+  segmentation / detection task. Classic transfer-learning recipe for
+  small-medical-dataset detection (pneumonia, polyps, lesions).
+
+  Verified by Open Harness Hub mining: hmendonca Mask-RCNN and COCO
+  transfer learning LB:0.155 (1194 votes, RSNA Pneumonia Detection
+  Challenge).
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["healthcare", "healthcare.radiology", "ai"]
+capability: ["classification"]
+modality:   ["image"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "api.training"
+tags: ["mask-rcnn", "object-detection", "coco-transfer", "kaggle-verified"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+attribution:
+  source_url:  "https://www.kaggle.com/code/hmendonca/mask-rcnn-and-coco-transfer-learning-lb-0-155"
+  source_kind: "kaggle"
+  author:      "hmendonca (1194 votes)"
+  license:     "Apache-2.0"
+
+task: "Fine-tune Mask-RCNN (COCO-pretrained) on domain-specific object detection / instance segmentation."
+pipeline_kind: "training_and_serving"
+
+inputs:
+  - name: "coco_format_dataset"
+    type: "artifact_id"
+  - name: "n_classes"
+    type: "integer"
+outputs:
+  - name: "predictions"
+    type: "object[]"
+  - name: "model_artifact"
+    type: "artifact_id"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+
+steps:
+  - id: "guard"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.coco_format_dataset" }
+  - id: "train"
+    kind: "processor"
+    ref: "processor/iterative-revise-loop"
+    inputs:
+      initial_prompt: "Build torchvision maskrcnn_resnet50_fpn(pretrained=True). Replace box + mask predictor heads to n_classes. Train: SGD lr=0.005, momentum=0.9, weight_decay=0.0005, 10-20 epochs, lr scheduler step every 3 epochs."
+      inner_harness_ref: "harness/text-safety-review"
+      verifier_refs: []
+      max_iterations: 1
+      cost_ceiling_usd: 8.00
+      convergence_policy: "all_pass"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "mask-rcnn-coco-transfer"
+      applied_layers: ["training"]
+
+success_criteria: []

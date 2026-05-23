@@ -1,0 +1,61 @@
+id: "pattern/personal-preference-layer"
+type: pattern
+version: "0.1.0"
+name: "Personal preference layer"
+description: "Treat individual user preferences as a first-class layer on top of any pipeline. The layer loads a preference knowledge pack at run-start, applies it to the persona system prompt, runs a personal-style GREP rule pack against generated output before delivery, and refuses to ship output that violates a hard-strictness preference. Preferences are stored locally, versioned, forkable."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["cross_industry"]
+capability: ["safety_gating", "evaluation"]
+modality: ["text"]
+lifecycle: "beta"
+trust_boundary: "local"
+created: "2026-05-22"
+updated: "2026-05-22"
+
+when_to_use:
+  - "Recurring LLM-assisted work where the same person reviews every output and has stable preferences (code review, writing, research, email drafting)."
+  - "Teams sharing a base persona but with per-member stylistic overlays."
+  - "Workflows where the cost of re-correcting the same style mistake exceeds the cost of encoding it."
+
+structural_shape:
+  - "step 1: load knowledge-pack/personal-preferences-template (forked + edited per user)"
+  - "step 2: inject preferences into the persona system prompt as 'user-specific overrides take precedence'"
+  - "step 3: run the pipeline normally"
+  - "step 4: apply rule-pack/grep-personal-style-flags to the candidate output"
+  - "step 5: if any HARD-strictness preference fires, regenerate or refuse + surface the violation"
+  - "step 6: log applied + violated preferences to audit trace"
+
+problem: |
+  Generic LLM output reflects vendor-default style: marketing-speak,
+  hedging, trailing summaries, em dashes, narrative recaps. The user
+  edits the same patterns out of every response. Each session re-litigates
+  the same preference. Worse, multi-user teams cannot share a base persona
+  without flattening per-member differences.
+
+solution: |
+  Make personal preferences a first-class knowledge pack + rule pack pair.
+  The knowledge pack is the data (each preference has scope + strictness +
+  rationale). The rule pack is the enforcement (regex that catches
+  violations). The pattern is the assembly: load preferences into the
+  persona prompt at run-start, gate output with the rule pack at the end.
+  Each user forks the template and edits it; teams can share a base while
+  letting individuals override.
+
+examples:
+  - context: "Personal coding reviewer (catalog persona)"
+    application: "User has 'prefer editing existing files' as hard preference. Persona refuses to scaffold parallel files."
+  - context: "Personal writing companion"
+    application: "User has 'no em dashes' as hard preference. GREP rule fires on em dash, persona regenerates with commas."
+  - context: "Team of three reviewers sharing one harness"
+    application: "Base persona + three preference packs. Each reviewer's output is gated against their own pack."
+
+implementing_pipelines:
+  - "pipeline/personal-code-review-with-preferences"
+
+related_patterns:
+  - "pattern/critical-tier-output-override"
+  - "pattern/composable-success-criteria"
+  - "pattern/refuse-on-redacted"
+
+tags: ["personal", "preferences", "style", "forkable"]

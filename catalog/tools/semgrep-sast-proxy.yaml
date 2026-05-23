@@ -1,0 +1,55 @@
+id: "tool/semgrep-sast-proxy"
+type: tool
+version: "0.1.0"
+name: "Semgrep SAST proxy (CWE-tagged code findings)"
+description: |
+  Proxy to Semgrep CLI for static-analysis code scanning. Used by
+  `pipeline/code-security-review` to corroborate GREP findings with
+  a real SAST tool that has community-maintained rules and proper
+  AST analysis. Returns CWE-tagged findings with file:line refs.
+
+  Implementation defers to local semgrep CLI; no network egress.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["security", "security.appsec", "software"]
+capability: ["verification", "classification"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+tags: ["semgrep", "sast", "cwe"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+parameters:
+  type: object
+  properties:
+    target_path:    { type: "string", description: "File or directory to scan." }
+    config:         { type: "string", description: "Semgrep config: 'auto' OR 'p/security-audit' OR custom rule file path.", default: "p/security-audit" }
+    severity_filter: { type: "array", items: { type: "string", enum: ["INFO","WARNING","ERROR"] } }
+  required: ["target_path"]
+returns:
+  type: object
+  properties:
+    findings:
+      type: array
+      items:
+        type: object
+        properties:
+          rule_id:    { type: "string" }
+          cwe:        { type: "string" }
+          owasp:      { type: "string" }
+          severity:   { type: "string" }
+          file:       { type: "string" }
+          start_line: { type: "integer" }
+          end_line:   { type: "integer" }
+          message:    { type: "string" }
+    finding_count: { type: "integer" }
+    elapsed_ms:    { type: "integer" }
+side_effects: "read"
+examples:
+  - input:  { target_path: "src/", config: "p/security-audit" }
+    output: { findings: [{ rule_id: "python.lang.security.audit.exec-use.exec-use", cwe: "CWE-95", owasp: "A03:2021", severity: "ERROR", file: "src/views.py", start_line: 42, end_line: 42, message: "Detected eval() with user input" }], finding_count: 1, elapsed_ms: 1850 }
+implementations:
+  - kind: "callable"
+    path: "tools.semgrep_sast_proxy.run"

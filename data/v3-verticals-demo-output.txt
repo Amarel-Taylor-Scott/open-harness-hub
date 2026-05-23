@@ -1,0 +1,42 @@
+
+=== GDPR DSAR Review (pipeline/gdpr-dsar-review) ===
+
+  sample-dsar-clean.json                                   C: 0  H: 0  M: 0  L: 0
+
+  sample-dsar-flagged.json                                 C: 2  H: 3  M: 0  L: 0
+      [critical ] missing_identity_verification        gdpr.dsar.no_id_verification
+      [critical ] missing_lawful_basis                 gdpr.lawful_basis.missing
+      [high     ] deadline_missed                      gdpr.dsar.deadline_missed
+      [high     ] breach_notification_late             gdpr.breach.notification_late
+      [high     ] erasure_refused_without_basis        gdpr.erasure.refusal_without_basis
+
+=== HR Hiring Compliance Review (pipeline/hr-hiring-compliance-review) ===
+
+  sample-posting-clean.json                                C: 0  H: 0  M: 0  L: 0
+
+  sample-posting-flagged.json                              C: 2  H: 4  M: 3  L: 1
+      [high     ] gendered_terms                       hr.bias.gendered_language
+      [high     ] age_proxies                          hr.bias.age_proxy.adea
+      [medium   ] ableist_must_be_able                 hr.bias.ableist.ada
+      [critical ] discriminate_explicit_class          hr.bias.explicit_class_preference
+      [high     ] national_origin_proxy                hr.bias.national_origin
+      [medium   ] salary_history_question              hr.bias.salary_history.equal_pay_act
+      [critical ] genetic_question                     hr.bias.genetic.gina
+      [medium   ] criminal_history_blanket             hr.bias.criminal_history.blanket
+      [high     ] no_eeo_statement                     hr.bias.no_eeo_statement
+      [low      ] degree_required_unjustified          hr.bias.degree_unjustified
+
+=== Trade Compliance Review (pipeline/trade-compliance-review) ===
+
+  sample-export-clean.json                                 C: 0  H: 0  M: 0  L: 0
+
+  sample-export-flagged.json                               C: 6  H: 2  M: 1  L: 0
+      [critical ] embargoed_destination                trade.embargoed_destination
+      [critical ] entity_list_hit                      trade.entity_list
+      [critical ] ofac_sdn_hit                         trade.ofac_sdn
+      [critical ] itar_technical_data                  trade.itar.technical_data
+      [high     ] red_flag_indicators                  trade.bis_red_flag_indicator
+      [critical ] diversion_signal                     trade.diversion
+      [medium   ] encryption_classification_missing    trade.encryption_unclassified
+      [critical ] dual_use_to_military_end_user        trade.dual_use_meu
+      [high     ] missing_end_user_certification       trade.no_end_user_cert

@@ -1,0 +1,50 @@
+id: "processor/nsfw-image-classifier"
+type: processor
+version: "0.1.0"
+name: "NSFW image classifier"
+description: |
+  Lightweight NSFW image classifier (CLIP-based zero-shot or a
+  fine-tuned head). Returns probability of NSFW content; pipelines
+  bind to a threshold via the calling rule pack.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["creative", "media"]
+capability: ["safety_gating"]
+modality:   ["image"]
+lifecycle:  "beta"
+lifecycle_position: "post_api.output_safety"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "safety.nsfw_image"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 300
+
+inputs:
+  - name: "image"
+    type: "bytes|url"
+outputs:
+  - name: "nsfw_score"
+    type: "number"
+  - name: "classes"
+    type: "ClassScore[]"
+
+side_effects: "none"
+on_error: "raise"
+
+model_targets:
+  - id: "clip_local"
+    label: "Local CLIP zero-shot"
+    transport: "transformers"
+    role: "Default; image bytes stay on host."
+    required: false
+    default: true
+    trust_boundary: "local"
+
+implementations:
+  - kind: "callable"
+    path: "processors.nsfw_image.run"

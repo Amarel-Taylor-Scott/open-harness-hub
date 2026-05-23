@@ -1,0 +1,86 @@
+id: "pattern/go-nogo-checklist-gate"
+type: pattern
+version: "0.1.0"
+name: "GO/NO-GO checklist gate"
+description: "Wrap a candidate action with an explicit checklist whose unmet items hard-gate the action. Models the human-performance discipline that real-world surgical teams, flight crews, mine examiners, and refinery start-up reviewers use: do not proceed unless every required item is verified, AND any item meeting a NO-GO trigger blocks the action regardless of model confidence. Reusable across any high-consequence pipeline (medical, aerospace, energy, finance, infra)."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["compliance", "healthcare", "aviation", "energy", "construction", "finance"]
+capability: ["safety_gating", "evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "beta"
+trust_boundary: "local"
+created: "2026-05-21"
+updated: "2026-05-21"
+
+attribution:
+  source_url: "https://www.who.int/teams/integrated-health-services/patient-safety/research/safe-surgery"
+  source_kind: "other"
+  author: "WHO Safe Surgery checklist + FAA AC 120-71B + OSHA JHA + NFPA 70E (composite human-performance literature)"
+  license: "CC-BY-4.0"
+
+when_to_use:
+  - "Any pipeline whose output triggers a high-consequence action (medical, aerospace, energy, finance closing, infra startup)."
+  - "Where regulators or insurers demand a named procedural checklist (WHO SSC, FAA before-takeoff, MSHA pre-shift, PSSR, TRID, KYC)."
+  - "Where a deterministic gate is needed alongside (not instead of) LLM judging."
+
+structural_shape:
+  - "step 1 — collect prerequisite evidence (LLM + retrieval + tool calls)"
+  - "step 2 — processor/checklist-evaluator reads named checklist + emits {item_id, status, evidence_ref}"
+  - "step 3 — verdict = nogo if (any nogo_trigger fired) OR (≥50% of required items unverified); else go"
+  - "step 4 — if nogo, emit explicit NO-GO reason; do NOT proceed to action step"
+  - "step 5 — audit trace with checklist version + per-item disposition"
+
+problem: |
+  Pipelines that produce an action (administer anesthesia, push code, release batch,
+  approve loan) need a deterministic gate that proves the prerequisites have been
+  verified. Letting the LLM judge whether prerequisites are met is unsafe — the model
+  may hallucinate confirmation. Real human-performance practice (WHO SSC, FAA before-
+  takeoff, AORN counts, MSHA pre-shift) uses an explicit, named, source-cited
+  checklist whose unmet items are a hard NO-GO regardless of other context.
+
+solution: |
+  Encode the checklist as a structured artifact with:
+    - id, source_citation, named steps
+    - each step has a verification_method (visual/test/document/witness) + a
+      required boolean
+    - go_nogo: list of trigger conditions that hard-block on match
+  Pipeline structure:
+    step 1: collect prerequisite evidence (LLM + retrieval + tool calls)
+    step 2: processor/checklist-evaluator reads checklist + collected evidence,
+            emits {item_id, status: verified|unverified|nogo, evidence_ref}
+    step 3: if any required item is unverified OR any NO-GO triggered →
+            halt + emit explicit "NO-GO: <reason>" output; do NOT proceed
+            to the action step
+    step 4: optional human attestation on borderline items
+    step 5: emit audit trace with checklist version + per-item disposition
+
+  Critical: NO-GO trigger overrides model confidence — even high-confidence
+  "all clear" from the judge cannot release a NO-GO item.
+
+examples:
+  - context: "Pre-surgical readiness gate before anesthesia induction"
+    checklist: "WHO Surgical Safety Checklist (Sign In)"
+    nogo_example: "Pulse oximeter not functioning = NO-GO induction, even if anesthesiologist asserts ready"
+  - context: "Aircraft before-takeoff release"
+    checklist: "FAA AFM Before-Takeoff Checklist"
+    nogo_example: "Mag drop > 175 RPM = NO-GO, taxi back"
+  - context: "Refinery unit start-up after maintenance"
+    checklist: "29 CFR 1910.119(i) PSSR"
+    nogo_example: "Open Category-A punch-list item = NO startup, even if ops insists"
+  - context: "Loan closing release"
+    checklist: "TRID Loan Estimate + Closing Disclosure"
+    nogo_example: "CD timing miss = re-issue + restart 3-day clock; NO closing"
+
+implementing_pipelines:
+  - "pipeline/who-surgical-safety-gate"
+  - "pipeline/faa-preflight-gate"
+  - "pipeline/msha-preshift-exam"
+  - "pipeline/pssr-startup-gate"
+
+related_patterns:
+  - "pattern/critical-tier-output-override"
+  - "pattern/refuse-on-redacted"
+  - "pattern/two-stage-extract-then-judge"
+
+tags: ["human-performance", "high-reliability", "go-nogo", "deterministic-gate"]

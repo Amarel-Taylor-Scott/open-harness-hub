@@ -1,0 +1,57 @@
+id: "tool/opencorporates-lookup"
+type: tool
+version: "0.1.0"
+name: "OpenCorporates company lookup"
+description: |
+  Look up a company in the OpenCorporates global registry (220M+
+  legal entities). Returns: jurisdiction code, incorporation date,
+  company status, registered address, officers, beneficial-ownership
+  filings where disclosed. Used by ESG / KYC / vendor-onboarding
+  pipelines to verify a counterparty is a real legal entity.
+
+  Free tier: 50 queries/day. Requires OPENCORPORATES_API_KEY for
+  higher tiers.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["finance", "finance.kyc", "compliance", "esg", "supply_chain"]
+capability: ["verification", "retrieval"]
+modality:   ["text", "structured"]
+lifecycle:  "stable"
+trust_boundary: "external"
+tags: ["opencorporates", "kyc", "ubo", "company-registry"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+parameters:
+  type: object
+  properties:
+    company_name:        { type: "string" }
+    jurisdiction_code:   { type: "string", description: "ISO 3166 + sub-division, e.g. 'us_de' for Delaware, 'gb' for UK." }
+    company_number:      { type: "string", description: "Exact lookup if known." }
+    include_officers:    { type: "boolean", default: true }
+    include_filings:     { type: "boolean", default: false }
+  oneOf:
+    - { required: ["company_name"] }
+    - { required: ["company_number", "jurisdiction_code"] }
+returns:
+  type: object
+  properties:
+    results:
+      type: array
+      items:
+        type: object
+        properties:
+          company_number:    { type: "string" }
+          name:              { type: "string" }
+          jurisdiction_code: { type: "string" }
+          incorporation_date: { type: "string", format: "date" }
+          status:             { type: "string" }
+          company_type:       { type: "string" }
+          registered_address: { type: "string" }
+          officers:           { type: "array" }
+    total_count: { type: "integer" }
+side_effects: "external_call"
+implementations:
+  - kind: "callable"
+    path: "tools.opencorporates_lookup.run"

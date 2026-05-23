@@ -1,0 +1,98 @@
+id: "harness/contract-redline"
+type: harness
+version: "0.1.0"
+name: "Contract Clause Redlining harness"
+description: |
+  Playbook-cite-first harness for commercial contract review. Surfaces
+  red-flag clauses + proposes concrete redline language + cites the
+  playbook clause family for every finding.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["legal", "legal.contract", "legal.compliance"]
+capability: ["evaluation", "extraction", "verification", "reasoning"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["legal", "contract", "redline", "playbook", "harness"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+kind: "model_harness"
+tier: "primary"
+applied_layers: [persona, privacy, grep, rag, tools]
+consumes: [grep_rule, rag_doc, persona_block, response_policy]
+emits: [reasoning_step, context_snippet]
+logic_paths:
+  - id: "review_contract"
+    label: "contract → red flags → playbook citations → redline proposals"
+    entrypoints: ["/api/legal/review"]
+    steps:
+      - "structured-to-prose"
+      - "PII redact"
+      - "contract-red-flags GREP"
+      - "RAG against contract-law-clauses playbook"
+      - "judge against contract-review-quality rubric"
+      - "emit suggested redline language per finding"
+      - "audit trace"
+    consumes: [grep_rule, rag_doc, persona_block, response_policy]
+    emits: [reasoning_step, context_snippet]
+    model_call: "required"
+    verification:
+      - "every red-flag has redline + playbook citation + severity"
+      - "no PII / privileged content in output"
+      - "no definitive 'unenforceable' assertions"
+knowledge_packs:
+  - id: "contract_clauses"
+    label: "Commercial contract clause library + lead-company playbook"
+    kind: knowledge_pack
+    types: [rag_doc, citation_edge]
+    required: true
+    trust_boundary: "local"
+    freshness: "dated"
+logic_packs:
+  - id: "persona_default"
+    label: "In-house counsel cite-first persona"
+    kind: logic_pack
+    types: [persona_block]
+    required: true
+  - id: "response_policy"
+    label: "Describe-risk-not-enforceability response policy"
+    kind: logic_pack
+    types: [response_policy]
+    required: true
+model_io:
+  input:  "{contract_text: string|object, contract_type: string, jurisdiction: string}"
+  output: "{grade: number, red_flags: object[], missing_clauses: object[], proposed_redlines: object[]}"
+model_targets:
+  - id: "local_ollama"
+    label: "Local Ollama"
+    transport: "ollama"
+    role: "Default local review."
+    capabilities: [text_generation, chat]
+    required: false
+    default: true
+    trust_boundary: "local"
+  - id: "anthropic_opus"
+    label: "Anthropic Claude Opus (deep reasoning)"
+    transport: "anthropic"
+    role: "Optional Opus model for complex multi-clause review."
+    capabilities: [text_generation, chat, long_context, deep_reasoning]
+    required: false
+    default: false
+    trust_boundary: "external"
+input_verification:
+  - "redact PII / privileged content before model call"
+  - "reject input larger than 512 KB"
+output_verification:
+  - "every red-flag has playbook_clause_id citation"
+  - "every red-flag has proposed_redline field"
+  - "no 'unenforceable' / 'illegal' assertions without authority"
+privacy_boundaries:
+  raw_input:      "stays local; subject to attorney-client privilege"
+  derived_output: "may sync to hub only with explicit privilege waiver"
+  external_calls: "only if model_target.trust_boundary == external AND user opted in"
+contributes_to:
+  - "pipeline/contract-clause-review"
+  - "pipeline/full-vendor-due-diligence"

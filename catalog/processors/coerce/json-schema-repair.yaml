@@ -1,0 +1,45 @@
+id: "processor/json-schema-repair"
+type: processor
+version: "0.1.0"
+name: "JSON Schema repair + validate"
+description: |
+  Parse and repair JSON inside a model response, then validate against
+  a JSON Schema. On failure, returns `valid: false` plus the schema
+  errors so the upstream harness can re-prompt with the diff.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["format_conversion", "verification"]
+modality:   ["text", "structured"]
+lifecycle:  "beta"
+lifecycle_position: "post_api.format_coercion"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+process_kind: "coerce.json_repair"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 30
+
+inputs:
+  - name: "candidate"
+    type: "string"
+  - name: "schema_ref"
+    type: "artifact_id"
+outputs:
+  - name: "parsed"
+    type: "object"
+  - name: "valid"
+    type: "boolean"
+  - name: "errors"
+    type: "ValidationError[]"
+
+side_effects: "none"
+on_error: "continue"
+
+implementations:
+  - kind: "callable"
+    path: "processors.json_schema_repair.run"

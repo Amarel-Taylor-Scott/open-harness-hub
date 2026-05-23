@@ -1,0 +1,51 @@
+id: "pattern/anti-no-pii-redact-before-model"
+type: pattern
+version: "0.1.0"
+name: "Anti-pattern: PII reaches the model without redaction"
+description: "Sending PHI / SSN / financial PII / credentials directly into a hosted LLM call. Even when the model 'doesn't store data,' the data is on the wire + in the provider's transient logs + may be replayed in incident response. Violates HIPAA, GDPR Art 5, GLBA. Not survivable in regulated industries."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["cross_industry", "healthcare", "finance", "privacy", "compliance"]
+capability: ["safety_gating"]
+modality: ["text"]
+lifecycle: "stable"
+trust_boundary: "local"
+created: "2026-05-22"
+updated: "2026-05-22"
+
+when_to_use:
+  - "This is an anti-pattern. Do NOT use it."
+
+structural_shape:
+  - "WRONG: candidate = raw_invoice_text; result = openai.chat(candidate)"
+  - "RIGHT: redacted = processor/redact-pii-text(candidate); result = openai.chat(redacted)"
+  - "RIGHT: maintain PII map separately; reattach symbols in final user-visible output if needed."
+
+problem: |
+  Hosted LLMs are external systems regardless of provider promises. PHI
+  / SSN / financial PII / credentials in the prompt are: (a) at-rest in
+  request logs even when transient; (b) potentially replayed in incident
+  response; (c) audit-trail discoverable; (d) covered by regulatory
+  notification regimes if exposed.
+
+solution: |
+  Add processor/redact-pii-text as a mandatory step BEFORE any hosted-model
+  call in regulated pipelines. Detect + replace PII with stable symbols
+  ([NAME_001], [SSN_001], [DOB_001]). Keep the original-to-symbol map in
+  local storage. Reattach only in the final user-visible response, not in
+  intermediate model calls. Pair with the local-first pattern when the
+  document cannot leave the perimeter at all.
+
+implementing_pipelines:
+  - "pipeline/water-utility-compliance-review"
+  - "pipeline/bill-info-extract-fraud-detect-recommend"
+  - "pipeline/contract-clause-review"
+
+related_patterns:
+  - "pattern/local-first-with-cited-answers"
+  - "pattern/refuse-on-redacted"
+
+counter_patterns:
+  - "Use processor/redact-pii-text before every hosted-model invocation."
+
+tags: ["anti-pattern", "pii", "phi", "redaction", "privacy", "hipaa", "gdpr"]

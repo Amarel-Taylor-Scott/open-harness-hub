@@ -1,0 +1,78 @@
+id: "pipeline/nerc-cip-compliance-review"
+type: pipeline
+version: "0.1.0"
+name: "NERC CIP compliance review (Bulk Electric System cyber)"
+description: "Vertical 19."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["energy", "energy.grid", "security"]
+capability: ["evaluation", "extraction", "verification"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+tags: ["energy", "nerc", "cip"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+attribution:
+  source_url: "https://www.nerc.com/pa/Stand/Pages/CIPStandards.aspx"
+  source_kind: "other"
+  author: "NERC CIP-002 through CIP-014 (composite)"
+  license: "CC-BY-4.0"
+
+task: "Review BES cyber assets + ESP/PSP + access management against NERC CIP."
+pipeline_kind: "review"
+
+inputs:
+  - name: "bes_packet"
+    type: "string|object"
+outputs:
+  - name: "grade"
+    type: "number"
+  - name: "findings"
+    type: "object[]"
+  - name: "impact_tier"
+    type: "string"
+
+defaults:
+  persona: "persona/nerc-cip-analyst"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/grep-nerc-cip-flags"
+  knowledge_packs:
+    - "knowledge-pack/nerc-cip-standards"
+
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.bes_packet" }
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+  - id: "grep_red_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-nerc-cip-flags"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+  - id: "rag_against_cip"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs: { query: "$.steps.grep_red_flags.output.fired", corpus: "knowledge-pack/nerc-cip-standards", top_k: 6 }
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.redact_pii.output.text"
+      rubric_ref: "rubric/nerc-cip-quality-v1"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "nerc-cip-compliance-review"
+      applied_layers: ["persona", "pii_redact", "grep", "rag", "judge"]
+
+success_criteria:
+  - rubric: "rubric/nerc-cip-quality-v1"
+    threshold: 0.6

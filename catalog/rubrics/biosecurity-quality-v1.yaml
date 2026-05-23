@@ -1,0 +1,53 @@
+id: "rubric/biosecurity-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Biosecurity / select agent review quality v1"
+description: "7-dim rubric for 42 CFR 73 + BMBL 6e + DURC/P3CO review"
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["biosecurity", "biosecurity.select_agent", "biosecurity.bsl", "biosecurity.durc"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-21"
+updated: "2026-05-21"
+
+dimensions:
+  - id: "access_inventory_release_first"
+    label: "Unescorted access / inventory variance / unreported release / DURC bypass surfaced FIRST as critical"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "acute findings appear before others; severity=critical"
+  - id: "regulation_citation"
+    label: "Each finding cites 42 CFR 73 + BMBL section + DURC framework"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "regulatory_citation populated per finding"
+  - id: "sra_personnel"
+    label: "All personnel hold active FBI SRA + suitability"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "sra_status_log present; restricted_person_check=clear"
+  - id: "form_4_inventory"
+    label: "CDC Form 4 inventory reconciled weekly with dual-key access"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "form4_reconciliation_date + dual_key_compliance=true"
+  - id: "bsc_hepa_containment"
+    label: "BSC annual cert + HEPA leak test current"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "bsc_cert_date within 12 months + hepa_pao_test ≤ 12 months"
+  - id: "durc_p3co_review"
+    label: "Gain-of-function / DURC experiments cleared by IRE + P3CO"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "ire_review_date + p3co_status documented when applicable"
+  - id: "transfer_release_reporting"
+    label: "Form 2 transfer auth + Form 3 release reporting within 7 days"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "form2_auth_number present per transfer + form3_filing within 7d"
+
+scoring_method: "weighted_sum"

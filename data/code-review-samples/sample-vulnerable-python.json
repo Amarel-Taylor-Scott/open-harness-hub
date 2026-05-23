@@ -1,0 +1,11 @@
+{
+  "sample_id":   "CR-002-flagged",
+  "language":    "python",
+  "framework":   "django",
+  "description": "Django view with hardcoded AWS secrets, SQL string concat, MD5 password hash, pickle deserialization of user input, eval of user-controlled string, DEBUG=True in prod.",
+  "files": {
+    "settings.py": "DEBUG = True\nAWS_ACCESS_KEY_ID = 'AKIAIOSFODNN7EXAMPLE'\naws_secret_access_key = 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'\nGITHUB_TOKEN = 'ghp_aBcDeFgHiJkLmNoPqRsTuVwXyZ123456789'\nSLACK_TOKEN = 'xoxb-1234567890-abc-def-ghi-jkl-mnopqrstuvwxyz12345678'\nDATABASE_PASSWORD = 'admin123'\npassword = ''\n",
+    "views.py": "import hashlib\nimport pickle\nimport os\nimport subprocess\nfrom django.shortcuts import render, HttpResponse\nfrom django.views.decorators.csrf import csrf_exempt\nimport requests\nfrom django.db import connection\n\n@csrf_exempt\ndef user_search(request):\n    name = request.GET.get('name', '')\n    with connection.cursor() as cur:\n        cur.execute(f\"SELECT * FROM users WHERE name = '{name}'\")\n        rows = cur.fetchall()\n    return HttpResponse(str(rows))\n\ndef profile_image(request):\n    user_url = request.GET.get('url')\n    r = requests.get(user_url)\n    return HttpResponse(r.content, content_type='image/png')\n\ndef run_calc(request):\n    expr = request.GET.get('expr')\n    result = eval(expr)\n    return HttpResponse(str(result))\n\ndef hash_pw(password):\n    return hashlib.md5(password.encode()).hexdigest()\n\ndef restore_session(request):\n    blob = request.body\n    session = pickle.loads(blob)\n    return HttpResponse(repr(session))\n\ndef export(request):\n    fmt = request.GET.get('fmt', 'csv')\n    subprocess.run(f'./export.sh {fmt}', shell=True)\n    return HttpResponse('ok')\n",
+    "BEGIN_KEY.pem": "-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n-----END RSA PRIVATE KEY-----\n"
+  }
+}

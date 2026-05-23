@@ -1,0 +1,44 @@
+
+============================================================================
+  sample-T1-tech-supplier-good.json
+  supplier: Acme Precision Manufacturing Pte Ltd  •  tier: T1  •  country: SG
+============================================================================
+  steps: 11  •  total ms: 213.6
+  findings by severity:  C: 0  H: 0  M: 0  L: 0
+  findings by dimension: S: 0  E: 0  G: 0
+
+============================================================================
+  sample-T2-agri-paraguay-mixed.json
+  supplier: Agro del Norte S.A.  •  tier: T2  •  country: PY
+============================================================================
+  steps: 11  •  total ms: 40.6
+  findings by severity:  C: 0  H: 2  M: 0  L: 0
+  findings by dimension: S: 0  E: 2  G: 0
+
+  rule-pack/grep-esg-environmental-red-flags:
+    [high     ] land_clearing_legacy                   environmental.deforestation_legacy
+    [high     ] near_protected_area                    environmental.biodiversity_proximity
+
+============================================================================
+  sample-T3-textile-mae-sot-flagged.json
+  supplier: Eastern Border Textile Workshop (informal)  •  tier: T3  •  country: TH
+============================================================================
+  steps: 11  •  total ms: 19.5
+  findings by severity:  C: 3  H: 5  M: 2  L: 0
+  findings by dimension: S: 8  E: 1  G: 1
+
+  rule-pack/grep-esg-forced-labor-red-flags:
+    [critical ] passport_retention                     ilo.retention_of_identity_documents
+    [high     ] recruitment_fee_abuse                  ilo.debt_bondage
+    [high     ] wage_withholding                       ilo.withholding_of_wages
+    [critical ] restricted_movement_dormitory          ilo.restriction_of_movement
+    [medium   ] excessive_overtime                     ilo.excessive_overtime
+    [high     ] isolation_unfree_communication         ilo.isolation
+    [medium   ] audit_gap_tier_3_4                     supply_chain.audit_gap_tier_3_4
+    [high     ] abusive_overtime_consent               ilo.excessive_overtime.consent
+
+  rule-pack/grep-esg-environmental-red-flags:
+    [critical ] untreated_dye_effluent                 environmental.water_pollution.textile_dye
+
+  rule-pack/grep-esg-governance-red-flags:
+    [high     ] beneficial_ownership_opaque            governance.beneficial_ownership

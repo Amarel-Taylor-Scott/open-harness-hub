@@ -1,0 +1,35 @@
+id: "processor/page-aware-chunker"
+type: processor
+version: "0.1.0"
+name: "Page-aware chunker"
+description: "Split page-extracted text into ~800-token chunks with 120-token overlap; preserve the (page, span) coordinates on every chunk so downstream answers can cite back to the page + span."
+authors: [{ name: "CiteMind team (upstream)" }, { name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["education", "research", "compliance"]
+capability:  ["format_conversion", "extraction"]
+modality:    ["text"]
+lifecycle:   "experimental"
+trust_boundary: "local"
+lifecycle_position: "pre_api.format_convert"
+created: "2026-05-21"
+updated: "2026-05-21"
+
+process_kind: "format_convert.page_aware_chunk"
+deterministic: true
+side_effects: "none"
+
+inputs:
+  - name: "pages"
+    type: "object[]"
+  - name: "target_tokens"
+    type: "integer"
+  - name: "overlap"
+    type: "integer"
+outputs:
+  - name: "chunks"
+    type: "object[]"
+config:
+  default_target_tokens: 800
+  default_overlap: 120
+  preserve_anchors: true
+tags: ["chunker", "page-aware", "citemind"]

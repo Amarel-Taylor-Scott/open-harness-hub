@@ -1,0 +1,72 @@
+id: "rule-pack/grep-personal-info-leakage"
+type: rule-pack
+version: "0.1.0"
+name: "Personal-info leakage detectors (assistant drafts → wrong audience)"
+description: |
+  GREP detectors that fire when a personal-assistant DRAFT is about
+  to be sent to a recipient and contains content the user has
+  marked private (salary / health / family conflict / mental
+  health / performance review).
+
+  Used by `harness/email-triage-and-draft` as the output-safety
+  pack — fires AFTER the LLM drafts, BEFORE the user is shown the
+  draft (or before any autonomous send).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["personal_productivity", "cross_industry"]
+capability: ["safety_gating", "anonymization"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "volatile"
+tags: ["personal", "privacy", "leakage-prevention", "assistant"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+family: "grep"
+rules:
+  - id: "salary_in_draft"
+    pattern: "(?i)(my salary|i\\s+(?:earn|make)\\s+\\$?[\\d,]+|my comp(?:ensation)?\\s+(?:is|was)|my (?:base|total) (?:comp(?:ensation)?|pay))"
+    severity: "critical"
+    category: "personal.privacy.salary"
+
+  - id: "health_in_draft"
+    pattern: "(?i)(my\\s+(?:health|medical|surgery|diagnosis|condition|treatment|therapy|medication|prescription)|i'?m\\s+seeing\\s+(?:a\\s+)?(?:therapist|psychiatrist|specialist))"
+    severity: "high"
+    category: "personal.privacy.health"
+
+  - id: "mental_health"
+    pattern: "(?i)(my\\s+(?:depression|anxiety|burnout|panic\\s+attack)|mental\\s+health\\s+leave)"
+    severity: "high"
+    category: "personal.privacy.mental_health"
+
+  - id: "family_conflict"
+    pattern: "(?i)(my\\s+(?:divorce|separation|custody|estrang(?:ed|ement))|family\\s+conflict)"
+    severity: "high"
+    category: "personal.privacy.family"
+
+  - id: "performance_review_disclosure"
+    pattern: "(?i)(my\\s+(?:last\\s+)?performance\\s+review|my\\s+rating\\s+(?:was|is)|i\\s+received\\s+a\\s+pip|my\\s+performance\\s+improvement\\s+plan)"
+    severity: "high"
+    category: "personal.privacy.performance"
+
+  - id: "wrong_audience_for_internal"
+    pattern: "(?i)(internal\\s+only|confidential|do\\s+not\\s+share|under\\s+nda)\\s+[\\s\\S]{0,200}@(?:gmail|yahoo|outlook|hotmail|icloud)\\.com"
+    severity: "critical"
+    category: "personal.privacy.wrong_audience"
+
+  - id: "ex_employer_in_draft"
+    pattern: "(?i)(at\\s+my\\s+(?:former|previous|prior|last|ex[- ]?employer)|when\\s+i\\s+(?:was|worked)\\s+at\\s+[A-Z][a-zA-Z]+)"
+    severity: "medium"
+    category: "personal.privacy.ex_employer"
+
+  - id: "compensation_negotiation"
+    pattern: "(?i)(i'?m\\s+(?:negotiating|exploring)\\s+(?:another|other)\\s+(?:offer|opportunity)|considering\\s+leaving|interview\\s+at\\s+[A-Z][a-zA-Z]+)"
+    severity: "critical"
+    category: "personal.privacy.job_search"
+
+  - id: "weekend_or_after_hours_send"
+    pattern: "(?i)(scheduled\\s+to\\s+send|sending\\s+(?:on|at))\\s+(saturday|sunday|after\\s+(?:7|8|9|10|11)\\s*pm|before\\s+(?:6|7|8)\\s*am)"
+    severity: "low"
+    category: "personal.policy.after_hours_send"

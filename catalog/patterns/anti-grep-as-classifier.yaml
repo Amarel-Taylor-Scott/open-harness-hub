@@ -1,0 +1,48 @@
+id: "pattern/anti-grep-as-classifier"
+type: pattern
+version: "0.1.0"
+name: "Anti-pattern: GREP regex as a classifier"
+description: "Stretching pattern-match rules to classify intent / sentiment / risk / topic when the signal is semantic, not lexical. Regex catches the surface form ('passport held') but misses synonyms ('document retained', 'ID locked away'). Becomes a Frankenstein of 200 alternations with corner cases that break each other."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["cross_industry"]
+capability: ["classification", "safety_gating"]
+modality: ["text"]
+lifecycle: "stable"
+trust_boundary: "local"
+created: "2026-05-22"
+updated: "2026-05-22"
+
+when_to_use:
+  - "This is an anti-pattern when the signal is semantic."
+  - "GREP is appropriate for surface-form detectors with low ambiguity (regex on '47 CFR §64.2009', ISO date format, IBAN check digit). Use it there."
+
+structural_shape:
+  - "WRONG: 50-line regex pack trying to catch 'employee morale issues' across 5 industries."
+  - "RIGHT: embed candidate + reference exemplars + use cosine threshold OR small classifier."
+  - "RIGHT: semantic success_criterion (kind: semantic) with must_cover topics."
+
+problem: |
+  Regex is brittle for semantic problems. Adding negative lookbehinds and
+  context-required matchers patches one false positive but introduces two
+  others. The rule pack grows to hundreds of rules + becomes un-maintainable.
+  The catalog already has examples where this trap caught us (false positive
+  on 'no shared accounts', 'no findings', 'environmental rec'... etc.).
+
+solution: |
+  Use GREP for surface-form signals (named entities, dates, regulatory
+  citations, structured tokens). For semantic classification, switch to:
+  (a) embedding + cosine similarity against exemplar set; or (b) small
+  classifier (fasttext / distilbert / NLI zero-shot); or (c) two-stage
+  LLM extract-then-judge with rubric.
+
+implementing_pipelines: []
+
+related_patterns:
+  - "pattern/composable-success-criteria"
+  - "pattern/two-stage-extract-then-judge"
+
+counter_patterns:
+  - "Use kind: semantic in success_criteria (see schemas/pipeline.schema.json)."
+
+tags: ["anti-pattern", "grep", "regex", "classification", "brittle"]

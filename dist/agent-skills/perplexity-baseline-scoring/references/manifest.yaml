@@ -1,0 +1,67 @@
+id: "pipeline/perplexity-baseline-scoring"
+type: pipeline
+version: "0.1.0"
+name: "Perplexity-baseline scoring"
+description: |
+  Score candidate answers by their perplexity under a reference LLM.
+  Lower perplexity = better fit. Used as a baseline for
+  prompt-recovery, AI-text-detection, and any task where "fluency
+  under a fixed prior" is a useful signal.
+
+  Verified by Open Harness Hub mining of itahiro's "Perplexity
+  Baseline [Phi-2, Gemma-7b-it]" (1005 votes) on llm-prompt-recovery.
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai"]
+capability: ["evaluation", "classification"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url: "https://www.kaggle.com/code/itahiro/perplexity-baseline-phi-2-gemma-7b-it"
+  source_kind: "kaggle"
+  author: "Renoir (itahiro, 1005 votes)"
+  license: "Apache-2.0"
+
+task: |
+  Given a list of candidate texts and a reference LLM, compute
+  per-candidate perplexity. Lower is "better fit under the reference
+  prior." Useful for AI-text detection, prompt recovery, scoring.
+pipeline_kind: "evaluation"
+
+inputs:
+  - name: "candidates"
+    type: "string[]"
+  - name: "reference_model"
+    type: "artifact_id"
+outputs:
+  - name: "scores"
+    type: "object[]"
+  - name: "ranking"
+    type: "string[]"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+
+steps:
+  - id: "score_each"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Compute log-likelihood of each candidate under the reference model; return perplexity = exp(-mean_logprob)."}]
+
+  - id: "rank"
+    kind: "processor"
+    ref: "processor/multi-vector-fusion"
+    inputs:
+      ranked_lists: "$.steps.score_each.output.text"
+      method: "weighted_sum"
+      k: 0
+
+success_criteria: []
