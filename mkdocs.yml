@@ -1,5 +1,5 @@
 site_name: Open Harness Hub
-site_description: Host-agnostic catalog of harnesses, knowledge objects, logic & rule packs, tools, pipelines, and benchmarks. 383 manifests across 24 industry-grading verticals.
+site_description: Host-agnostic catalog of harnesses, knowledge objects, logic and rule packs, tools, pipelines, and benchmarks. 4,241 component definitions across many industry and workflow surfaces.
 site_url: https://Amarel-Taylor-Scott.github.io/open-harness-hub/
 repo_url: https://github.com/Amarel-Taylor-Scott/open-harness-hub
 repo_name: Amarel-Taylor-Scott/open-harness-hub
@@ -72,7 +72,7 @@ nav:
   - Get started:
     - Run a pipeline locally: howto/run-pipeline.md
     - Assemble a pipeline from a task: howto/llm-assemble-pipeline-from-task.md
-    - Add an artifact: howto/add-artifact.md
+    - Add a component: howto/add-component.md
     - Deploy the hub: howto/deploy.md
     - Integrate a hackathon submission: contributing/integrating-hackathon-submissions.md
 
@@ -81,6 +81,9 @@ nav:
     - More ideas (30+): use-cases/more-ideas.md
     - Personal LLM companion: use-cases/personal-llm-companion.md
     - Illicit content + platform moderation: use-cases/illicit-content-detection.md
+    - Cost-aware pipeline generation: use-cases/cost-aware-pipeline-generation.md
+    - LLM pipeline SaaS blueprint: use-cases/llm-pipeline-saas-blueprint.md
+    - Local sentence-to-pipeline demo: use-cases/local-sentence-to-pipeline-demo.md
     - Human-trafficking signal triage (UGC, Gemma-4): use-cases/human-trafficking-ugc-detection.md
     - Document to knowledge graph: use-cases/document-to-knowledge-graph.md
     - Local-first research wiki: use-cases/local-first-research-wiki.md
@@ -95,6 +98,9 @@ nav:
     - ESG supply-chain DD: use-cases/esg-supply-chain-due-diligence.md
     - Refugee bureaucracy translation: use-cases/refugee-bureaucracy-translation.md
 
+  - Strategy:
+    - Product market monetization brief: strategy/product-market-monetization-brief.md
+
   - Catalog:
     - Index: catalog/index.md
     - Browse (interactive): catalog/browser.html
@@ -104,17 +110,126 @@ nav:
     - Harness Hub spec: spec/HARNESS_HUB_SPEC.md
     - Vocabularies: reference/vocabularies.md
     - Schemas: reference/schemas.md
+    - Codex operating guide:
+      - Overview: codex/index.md
+      - Billion component goal: codex/billion-component-goal.md
+      - Million object goal: codex/million-object-goal.md
+      - No magic values: codex/no-magic-values.md
+      - Daily production targets: codex/daily-production-targets.md
+      - Speed guardrails: codex/speed-guardrails.md
+      - Claude agent efficiency: codex/claude-agent-efficiency.md
+      - Object factory workflow: codex/object-factory-workflow.md
+      - Quality gates: codex/quality-gates.md
+      - Multi-day goal runbook: codex/multi-day-goal-runbook.md
+      - Autonomous session runbook: codex/autonomous-session-runbook.md
     - Overview: concepts/overview.md
     - Taxonomy: concepts/taxonomy.md
     - Layers & primitives: concepts/layers.md
     - Pre/post-API processes: concepts/pre-post-api.md
     - Multimodal pipelines: concepts/multimodal.md
+    - Primitive platform backend: architecture/primitive-platform-backend.md
+    - SaaS operating platform: architecture/saas-operating-platform.md
+    - North star platform architecture: architecture/north-star-platform-architecture.md
+    - 100M component infrastructure: architecture/hundred-million-component-infrastructure.md
+    - Database-backed component store: architecture/database-backed-component-store.md
+    - Component store candidate load plan: architecture/component-store-candidate-load-plan.md
+    - Off-the-shelf component pipelines: architecture/off-the-shelf-component-pipelines.md
+    - Component template load plan: architecture/component-template-load-plan.md
+    - Promotion decision load plan: architecture/promotion-decision-load-plan.md
+    - Approved component promotion plan: architecture/approved-component-promotion-plan.md
+    - Dedupe resolution plan: architecture/dedupe-resolution-plan.md
+    - Content approval plan: architecture/content-approval-plan.md
+    - Component CDC versioning: architecture/component-cdc-versioning.md
+    - Promotion CDC bridge plan: architecture/promotion-cdc-bridge-plan.md
+    - Approved promotion smoke test: architecture/approved-promotion-smoke-test.md
+    - Daily thousand component factory: architecture/daily-thousand-component-factory.md
+    - Daily partition load audit: architecture/daily-partition-load-audit.md
+    - Daily showcase pipeline factory: architecture/daily-showcase-pipeline-factory.md
+    - Showcase candidate coverage: architecture/showcase-candidate-coverage.md
+    - Showcase gap feedback loop: architecture/showcase-gap-feedback-loop.md
+    - Daily component production run: architecture/daily-component-production-run.md
+    - Daily production scheduler: architecture/daily-production-scheduler.md
+    - Daily stage ledger: architecture/daily-stage-ledger.md
+    - Duplicate collapse report: architecture/duplicate-collapse-report.md
+    - Daily promotion readiness: architecture/daily-promotion-readiness.md
+    - Index coverage repair: architecture/index-coverage-repair.md
+    - Daily embedding execution: architecture/daily-embedding-execution.md
+    - Local embedding worker contract: architecture/local-embedding-worker-contract.md
+    - Local hash embedding worker: architecture/local-hash-embedding-worker.md
+    - Pgvector embedding load plan: architecture/pgvector-embedding-load-plan.md
+      - Embedding committed load audit: architecture/embedding-committed-load-audit.md
+      - Local pgvector embedding smoke: architecture/local-pgvector-embedding-smoke.md
+      - Edge AI semantic gap guardrails: research/edge-ai-semantic-gap-guardrail-components.md
+      - Theory to component factory: research/theory-to-component-factory.md
+      - Theory batch governance bridge: research/theory-batch-governance-bridge.md
+      - Theory vector readiness to pgvector: research/theory-vector-readiness-to-pgvector.md
+      - Theory local Postgres smoke: research/theory-local-postgres-smoke.md
+    - Low-cost hosting plan: architecture/low-cost-hosting-plan.md
+    - Hybrid Postgres BigQuery hosting: architecture/hybrid-postgres-bigquery-hosting.md
+    - Incremental catalog builds: architecture/incremental-catalog-builds.md
+    - Fast factory closeout: architecture/fast-factory-closeout.md
+    - Model runtime, training, and federated sharing: architecture/model-runtime-training-and-federated-sharing-components.md
+    - Partitioned index deltas: architecture/partitioned-index-deltas.md
+    - Partition registry replay audits: architecture/partition-registry-replay-audits.md
+    - Promotion index deltas: architecture/promotion-index-deltas.md
+    - Object factory worker fleet: architecture/object-factory-worker-fleet.md
+    - Containerized object factory orchestration: architecture/containerized-object-factory-orchestration.md
+    - Source governance + entity resolution: architecture/source-governance-and-entity-resolution.md
+    - Hybrid label dimensional search: architecture/hybrid-label-dimensional-search.md
+    - Use case seed label rows: architecture/use-case-seed-label-dimension-rows.md
+    - Use case seed entity refs: architecture/use-case-seed-entity-ref-rows.md
+    - Use case seed embedding buckets: architecture/use-case-seed-embedding-buckets.md
+    - Embedding execution plan: architecture/embedding-execution-plan.md
+    - Vector readiness audit: architecture/vector-readiness-audit.md
+    - Source surface seed row emission: architecture/source-surface-seed-row-emission.md
+    - Source surface scan partitions: architecture/source-surface-scan-partitions.md
+    - Public source scan job emission: architecture/public-source-scan-job-emission.md
+    - Public source job replay runner: architecture/public-source-job-replay-runner.md
+    - Public source replay row emission: architecture/public-source-replay-row-emission.md
+    - Public source load plan: architecture/public-source-load-plan.md
+    - Source surface execution summary: architecture/source-surface-execution-summary.md
+    - Staged versus committed load audit: architecture/staged-vs-committed-load-audit.md
+    - Postgres load execution and audit: architecture/postgres-load-execution-and-audit.md
+    - Specialized model card scan jobs: architecture/specialized-model-card-scan-jobs.md
+    - Specialized model card row emission: architecture/specialized-model-card-row-emission.md
+    - Specialized model card load plan: architecture/specialized-model-card-load-plan.md
+    - Generated object storage: architecture/generated-object-storage.md
+    - Object counts + DB bootstrap: architecture/object-counts-and-db-bootstrap.md
+    - Postgres pgvector bootstrap: architecture/postgres-pgvector-bootstrap.md
+    - Bulk generated object loads: architecture/bulk-generated-object-loads.md
+    - Canonical factory row coverage: architecture/canonical-factory-row-coverage.md
+    - Agentic orchestration harnesses: architecture/agentic-orchestration-harnesses.md
+    - Multimodal public service harnesses: architecture/multimodal-public-service-harnesses.md
+    - Trajectory fragment cache: architecture/trajectory-fragment-cache.md
+    - Signed knowledge network: architecture/signed-knowledge-network.md
+    - Procedure knowledge objects: architecture/procedure-knowledge-objects.md
+    - Costed blueprint route matrix: architecture/costed-blueprint-route-matrix.md
+    - Local blueprint output records: architecture/local-blueprint-output-records.md
+    - Local blueprint record persistence: architecture/local-blueprint-record-persistence.md
+    - Expert email + grounded verification: architecture/expert-email-and-grounded-verification.md
+    - Verification packet persistence: architecture/verification-packet-record-persistence.md
+    - Resumable object comparison jobs: architecture/resumable-object-comparison-jobs.md
+    - Hybrid comparison blocking: architecture/hybrid-comparison-blocking.md
     - Database representations: concepts/databases.md
     - Industry-agnostic pattern: architecture/industry-agnostic-pattern.md
     - Peer registries: comparison/peer-registries.md
+    - Google Agent Builder comparison: comparison/google-agent-builder.md
+    - Workflow builder inspiration: comparison/workflow-builders.md
     - Playground & sample runs: concepts/playground.md
     - Standards landscape: research/standards-landscape.md
     - Claude Code skills overlap: research/claude-code-skills.md
+    - Capability gap discovery browsers: research/capability-gap-discovery-browsers.md
+    - Primitive source surface map: research/primitive-source-surface-map.md
+    - Esoteric industry source surfaces: research/esoteric-industry-source-surfaces.md
+    - Community moderation knowledge objects: research/community-moderation-knowledge-objects.md
+    - Specialized model signal surfaces: research/specialized-model-signal-surfaces.md
+    - Public source blueprint catalog: research/public-source-blueprint-catalog.md
+    - Occupation to procedure objects: research/occupation-to-procedure-objects.md
+    - Standards regulatory source map: research/standards-regulatory-source-map.md
+    - Agent workflow system intake: research/agent-workflow-system-reference-intake.md
+    - Task marketplace archetype intake: research/task-marketplace-archetype-intake.md
+    - Candidate primitive promotion scoring: research/candidate-primitive-promotion-scoring.md
+    - Cross-domain use case seed surfaces: research/cross-domain-use-case-seed-surfaces.md
     - GitHub hosting plan: research/github-hosting.md
     - Antigravity 2.0 ingest plan: research/antigravity-ingest.md
 
