@@ -1,0 +1,79 @@
+id: "pattern/terse-output-budget"
+type: pattern
+version: "0.1.0"
+name: "Terse-output budget (cap and shrink what the model writes)"
+description: |
+  Constrain output length so the model returns only what the task needs,
+  cutting output tokens — usually the more expensive side of a call — without
+  losing correctness.
+
+  Models default to verbose, hedged, explanatory prose. For most production
+  tasks (classification, extraction, routing, structured answers) that prose
+  is pure cost. This pattern sets an explicit output budget and shapes the
+  response policy to fit it.
+
+  Budget levers (compose as needed):
+   1. **hard cap** — max_tokens / max output chars enforced by the runtime.
+   2. **answer-only response policy** — instruction + format that forbids
+      preamble, restatement, and meta-commentary.
+   3. **decoding profile** — stop sequences and (where available) length
+      penalty tuned to end the response promptly.
+   4. **summarize-then-return** — for tasks that need reasoning, think
+      internally / in a scratch field, return only the conclusion.
+   5. **field-scoped output** — return just the requested fields, not a
+      narrative around them.
+
+  Pair every budget with a rubric or success criterion so brevity never
+  silently drops required content; emit tokens_out_before/after in the trace.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry:   ["cross_industry", "ai"]
+capability: ["generation", "governance", "routing"]
+modality:   ["text", "structured"]
+lifecycle:  "beta"
+trust_boundary: "mixed"
+tags: ["token-efficiency", "cost-savings", "output-tokens", "response-policy", "brevity"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+reference_implementations:
+  - { url: "https://platform.openai.com/docs/api-reference/chat/create", language: "any", framework: "max_tokens + stop sequences", notes: "hard output budget at the API layer" }
+  - { url: "https://huggingface.co/docs/transformers/main_classes/text_generation", language: "python", framework: "transformers GenerationConfig (max_new_tokens, length_penalty, eos)", notes: "Apache-2.0" }
+
+structural_shape:
+  - "declare an output budget (max tokens / chars) and a response policy"
+  - "render an answer-only instruction (no preamble / restatement)"
+  - "set decoding profile: max_new_tokens, stop sequences, length penalty"
+  - "call the model"
+  - "validate output against a brevity-aware success criterion"
+  - "record tokens_out_before vs tokens_out_after"
+
+when_to_use:
+  - "Classification / extraction / routing where the answer is short"
+  - "High-volume pipelines where output tokens dominate cost"
+  - "Latency-sensitive UX (shorter completions stream faster)"
+  - "Downstream consumers want a value, not an essay"
+
+when_not_to_use:
+  - "Tasks that genuinely need long-form reasoning in the output"
+  - "User-facing chat where explanation is the product"
+  - "When truncation would cut required content — widen the budget instead"
+
+variants:
+  - "Hidden-reasoning: reason in a private scratch field, return only the answer"
+  - "Tiered budget: short by default, expand on explicit user request"
+  - "Stop-sequence framing (return between sentinels, hard-stop after)"
+
+counter_patterns:
+  - "anti-over-prompting-as-crutch (verbose instructions that invite verbose output)"
+
+implementing_pipelines: []
+implementing_processors: []
+
+tradeoffs:
+  latency:        "lower — fewer output tokens means faster completion"
+  cost:           "primary win — output tokens are typically priced higher than input"
+  quality:        "neutral-to-positive when paired with a rubric; risk of dropped content if over-tightened"
+  complexity:     "Low — mostly response policy + decoding config"
+  explainability: "High — budget and tokens-out delta are explicit in the trace"

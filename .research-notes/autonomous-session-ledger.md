@@ -14,12 +14,12 @@ Started: 2026-05-26
 
 ## Backlog (new component families requested this session)
 
-- **I/O efficiency & format control** — captured in goal doc (cycle 1);
-  concrete seed components pending (cycle 2):
-  - token-efficiency: input-token compression / context pruning;
-  - output reduction: terse-output / max-char|token budgeting;
-  - output-format: strict JSON / Markdown / CSV / char-count / typed envelope
-    with a validate-or-repair step.
+- **I/O efficiency & format control** — captured in goal doc (cycle 1); seed
+  patterns shipped (cycle 2). Still pending: executable processors + a
+  logic-pack/tool (e.g. json-envelope validator) and benchmarks for each.
+  - [x] `pattern/input-token-compression`
+  - [x] `pattern/terse-output-budget`
+  - [x] `pattern/strict-output-format-contract`
 - Kaggle competition corpus → use-case + `pasted challenge → expected flow`
   builder benchmarks.
 
@@ -28,6 +28,7 @@ Started: 2026-05-26
 | # | path | change | validation | commit |
 |---|------|--------|------------|--------|
 | 1 | P0 hygiene | `.gitignore`; billion-component goal, no-magic-values rules, autonomous runbook docs + wiring (CLAUDE/AGENTS/mkdocs/goal prompt) | catalog untouched → still green (full run earlier: all 4,347 valid) | see branch log |
+| 2 | I/O efficiency & format control (backlog) | 3 patterns: `input-token-compression`, `terse-output-budget`, `strict-output-format-contract` | validate + global-ref-check green (3/3) | see branch log |
 
 ## Notes / pre-existing working state (not authored this session)
 

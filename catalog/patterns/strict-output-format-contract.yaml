@@ -1,0 +1,81 @@
+id: "pattern/strict-output-format-contract"
+type: pattern
+version: "0.1.0"
+name: "Strict output-format contract (request, constrain, and validate-or-repair a response shape)"
+description: |
+  Make the model return a response in a specific, declared shape — strict JSON
+  (against a schema), Markdown, a table, CSV, a fixed character/word count, or
+  a typed envelope — and guarantee the shape with a validator rather than
+  hoping the prompt was obeyed.
+
+  "Ask nicely in the prompt" is not a contract: models drift, add prose around
+  JSON, or violate the schema under load. This pattern treats the output shape
+  as a contract enforced at three layers, strongest first:
+
+   1. **constrained decoding** (best) — grammar / JSON-schema constrained
+      generation or provider function-calling, so invalid tokens cannot be
+      produced (Outlines, guidance, llama.cpp GBNF, OpenAI structured outputs).
+   2. **format instruction + exemplar** — render the target schema and a
+      worked example into the prompt as a fallback when the runtime cannot
+      constrain decoding.
+   3. **validate-or-repair** (always) — parse and validate the output against
+      the contract; on failure, run a bounded repair (re-ask with the error,
+      or deterministic fix-up), and reject after N attempts.
+
+  Contracts supported: JSON-schema object, enum/single-value, Markdown
+  section skeleton, table/CSV with a column spec, and an exact char/word
+  budget. The validator's pass/fail and any repair attempts go in the trace.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry:   ["cross_industry", "ai"]
+capability: ["format_conversion", "verification", "generation"]
+modality:   ["text", "structured"]
+lifecycle:  "beta"
+trust_boundary: "mixed"
+tags: ["output-format", "structured-output", "json-schema", "validate-or-repair", "typed-envelope"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+reference_implementations:
+  - { url: "https://github.com/dottxt-ai/outlines", language: "python", framework: "Outlines (regex/JSON-schema constrained decoding)", notes: "Apache-2.0" }
+  - { url: "https://github.com/guidance-ai/guidance", language: "python", framework: "guidance (constrained generation)", notes: "MIT" }
+  - { url: "https://github.com/jxnl/instructor", language: "python", framework: "instructor (Pydantic-validated LLM outputs + retries)", notes: "MIT" }
+  - { url: "https://platform.openai.com/docs/guides/structured-outputs", language: "any", framework: "OpenAI structured outputs / function calling", notes: "schema-constrained responses" }
+
+structural_shape:
+  - "declare the output contract (json_schema | enum | markdown | table | csv | char_budget | envelope)"
+  - "if the runtime supports it, constrain decoding to the contract"
+  - "else render the schema + an exemplar into the prompt"
+  - "call the model"
+  - "parse + validate the output against the contract"
+  - "on failure: bounded repair (re-ask with the validation error) up to N tries"
+  - "emit valid output or a typed failure; record validation + repair attempts"
+
+when_to_use:
+  - "Model output feeds another program (must parse deterministically)"
+  - "Strict JSON / typed envelope required by a downstream API or DB"
+  - "UI needs predictable Markdown / table structure"
+  - "A hard character or word count is part of the spec (UI fields, SMS, labels)"
+
+when_not_to_use:
+  - "Free-form conversational output is the product"
+  - "The shape is trivial and a downstream parser already tolerates drift"
+
+variants:
+  - "Constrained decoding only (no repair needed when the grammar guarantees shape)"
+  - "Two-stage: generate freely, then a cheap model coerces into the contract"
+  - "Envelope-wrapping: payload + metadata (confidence, citations, refusal flag)"
+
+counter_patterns:
+  - "anti-llm-as-judge-without-rubric (trusting unstructured output without a contract)"
+
+implementing_pipelines: []
+implementing_processors: []
+
+tradeoffs:
+  latency:        "constrained decoding ≈ free; validate-or-repair adds a retry only on failure"
+  cost:           "low; repair retries cost extra only when validation fails"
+  quality:        "high reliability — downstream never receives an unparseable response"
+  complexity:     "Medium — needs a validator per contract kind and a bounded repair loop"
+  explainability: "High — validation result and repair attempts are explicit in the trace"
