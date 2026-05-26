@@ -1,0 +1,54 @@
+# ---------------------------------------------------------------------------
+# Open Harness Hub .gitignore
+#
+# Goal: never accidentally stage generated factory output, local reference
+# clones, or OS/tooling cruft. Curated, published outputs are negated back in.
+#
+# Note: already-tracked files stay tracked regardless of these rules. To add a
+# new file under an ignored path on purpose, use `git add -f <path>`.
+# ---------------------------------------------------------------------------
+
+# --- OS / editor cruft ---
+.DS_Store
+Thumbs.db
+*~
+.idea/
+.vscode/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# --- MkDocs build output ---
+/site/
+
+# --- Local reference repos ---
+# Cloned for offline study only; NEVER republished (AGENTS.md hard rule).
+# Tracked gitlink pointers remain; their working-tree contents stay out.
+/_reference/
+
+# --- Generated factory output (dist/) ---
+# Ignored by default so daily run scratch (which can reach gigabytes) is never
+# staged by accident. Curated, published emitter products are negated back in
+# below. Keep this negation list as the single source of truth for "which dist
+# outputs are products, not scratch" (see docs/codex/no-magic-values.md).
+/dist/*
+!/dist/agent-skills/
+!/dist/aibom/
+!/dist/c2pa/
+!/dist/croissant/
+!/dist/hf/
+!/dist/lm-eval-harness/
+!/dist/mcp/
+!/dist/openlineage/
+!/dist/promptfoo/
+!/dist/spdx/
+!/dist/catalog.sqlite
