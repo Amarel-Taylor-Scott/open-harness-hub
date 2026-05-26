@@ -9,7 +9,7 @@ Started: 2026-05-26
 
 - [x] `.gitignore` added — stop staging `dist/` scratch + `_reference/` clones + OS cruft
 - [ ] README hand-typed counts (`172 components / v0.3.0`) → generated + drift-checked stats block
-- [ ] `scripts/_config.py` + dedupe the `384` / model-ID literals into one definition
+- [~] `scripts/_config.py` created (single source: embedding dim + model registry + canonical paths); flagship `pgvector_embedding_load_plan.py` refactored. Remaining: ~6 more `scripts/db/*.py` with `384` literals + scattered model-ID strings to migrate.
 - [ ] finish `manifest`/`primitive` → `component` vocabulary rename in user-facing prose
 
 ## Backlog (new component families requested this session)
@@ -29,6 +29,7 @@ Started: 2026-05-26
 |---|------|--------|------------|--------|
 | 1 | P0 hygiene | `.gitignore`; billion-component goal, no-magic-values rules, autonomous runbook docs + wiring (CLAUDE/AGENTS/mkdocs/goal prompt) | catalog untouched → still green (full run earlier: all 4,347 valid) | see branch log |
 | 2 | I/O efficiency & format control (backlog) | 3 patterns: `input-token-compression`, `terse-output-budget`, `strict-output-format-contract` | validate + global-ref-check green (3/3) | see branch log |
+| 3 | no-magic-values P0 | `scripts/_config.py` (single source: embedding dim, model registry, paths) + refactor flagship `pgvector_embedding_load_plan.py` (`pgvector_type()`; killed parallel `vector(384)` literal) | self-test 256/0 rows; message derives `vector(N)`; no stray `384` in file | see branch log |
 
 ## Notes / pre-existing working state (not authored this session)
 
