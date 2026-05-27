@@ -1,0 +1,110 @@
+id: "tool/object-embedding-batch-loader"
+type: tool
+version: "0.1.0"
+name: "Object embedding batch loader"
+description: |
+  Loads object_embedding rows into the pgvector-enabled Postgres store defined
+  in db/postgres/schema.sql. Reads a JSONL file of pre-computed embedding
+  work items (subject_id, subject_type, embedding_model, text, text_hash,
+  embedding vector) and issues deterministic UPSERT SQL targeting the
+  object_embedding table with its UNIQUE constraint on
+  (subject_id, subject_type, embedding_model, text_hash).
+
+  Validates that the vector dimension of each row matches the declared schema
+  dimension before loading. Rows with mismatched dimensions, missing required
+  fields, or NULL embeddings are routed to a rejected JSONL sidecar with
+  reasons, ensuring only structurally complete embeddings reach the store.
+  Emits a load audit summary with accepted/rejected counts per embedding model.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["embedding", "retrieval", "serving", "governance"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags:
+  - pgvector
+  - postgres
+  - embeddings
+  - batch-load
+  - object-embedding
+  - vector-search
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  required: ["embedding_rows_jsonl", "output_dir"]
+  properties:
+    embedding_rows_jsonl:
+      type: string
+      description: >
+        Path to JSONL file where each line is an object_embedding row with
+        fields: embedding_id, subject_id, subject_type, embedding_model,
+        text_hash, text, embedding (float array), metadata (optional).
+    output_dir:
+      type: string
+      description: Directory path for the generated SQL load script and audit sidecars.
+    schema_vector_dim:
+      type: integer
+      description: >
+        Expected vector dimension from the target table definition.
+        Defaults to 384 (local MiniLM baseline). Rows with a different
+        dimension are rejected.
+    run_id:
+      type: string
+      description: Optional run identifier included in the audit summary row.
+    dry_run:
+      type: boolean
+      description: >
+        When true, validates rows and emits the audit summary without
+        writing the SQL load script. Defaults to false.
+
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    input_rows:
+      type: integer
+    accepted_rows:
+      type: integer
+    rejected_rows:
+      type: integer
+    models_seen:
+      type: array
+      items:
+        type: string
+    files:
+      type: object
+      description: >
+        Paths produced: sql_load_script, rejected_jsonl, audit_summary_jsonl.
+
+side_effects: "write"
+
+examples:
+  - input:
+      embedding_rows_jsonl: "dist/embedding-worker/2026-05-26/stored-vector-rows.jsonl"
+      output_dir: "dist/object-embedding-batch-loader/2026-05-26"
+      schema_vector_dim: 384
+      run_id: "run-2026-05-26-001"
+    output:
+      ok: true
+      input_rows: 1024
+      accepted_rows: 1020
+      rejected_rows: 4
+      models_seen: ["all-MiniLM-L6-v2"]
+      files:
+        sql_load_script: "dist/object-embedding-batch-loader/2026-05-26/load.sql"
+        rejected_jsonl: "dist/object-embedding-batch-loader/2026-05-26/rejected.jsonl"
+        audit_summary_jsonl: "dist/object-embedding-batch-loader/2026-05-26/audit.jsonl"
+
+implementations:
+  - kind: "callable"
+    path: "scripts.db.object_embedding_batch_loader.load_embeddings"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.object_embedding_batch_loader"

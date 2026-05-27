@@ -1,0 +1,164 @@
+id: "tool/model-route-gateway"
+type: tool
+version: "0.1.0"
+name: "Model route gateway"
+description: |
+  Provider-neutral model dispatch layer. Accepts a model registry
+  configuration listing local (Ollama, llama.cpp, vLLM), OpenAI-
+  compatible, managed (Anthropic, Gemini), and tenant-key endpoints.
+  Selects the target route based on requested capability, trust
+  boundary, latency hint, and available credentials, then forwards
+  the request using the matching transport. Returns a unified
+  response envelope regardless of provider.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "cross_industry", "software.devops"]
+capability: ["routing", "serving", "tool_use"]
+modality: ["text", "multimodal"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "pre_api.routing"
+tags: ["gateway", "model-registry", "provider-neutral", "routing", "tenant-key"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  required: ["request", "model_registry"]
+  properties:
+    request:
+      type: object
+      description: >
+        Unified chat/completion request body. Must include at minimum
+        a messages array or prompt string.
+      properties:
+        messages:
+          type: array
+          items: { type: object }
+        prompt:
+          type: string
+        capability_hint:
+          type: string
+          description: >
+            Capability tag the caller needs (e.g. "tool_use",
+            "vision", "long_context"). Used to filter registry entries.
+        trust_boundary:
+          type: string
+          enum: ["local", "hub", "external", "mixed"]
+        latency_hint:
+          type: string
+          enum: ["realtime", "interactive", "batch"]
+        max_tokens:
+          type: integer
+    model_registry:
+      type: array
+      description: >
+        Ordered list of candidate routes. Gateway tries them in
+        priority order; first healthy match wins.
+      items:
+        type: object
+        required: ["id", "transport"]
+        properties:
+          id:
+            type: string
+          transport:
+            type: string
+            enum:
+              - callable
+              - transformers
+              - llama_cpp
+              - ollama
+              - vllm
+              - openai_compatible
+              - anthropic
+              - google_gemini
+              - hf_inference_endpoint
+              - frontier_api
+          endpoint:
+            type: string
+          model:
+            type: string
+          api_key_env:
+            type: string
+            description: >
+              Name of the environment variable holding the API key
+              (e.g. "OPENAI_API_KEY"). Absent for local routes.
+          capability_tags:
+            type: array
+            items: { type: string }
+          trust_boundary:
+            type: string
+            enum: ["local", "hub", "external", "mixed"]
+          priority:
+            type: integer
+            description: Lower is higher priority.
+    fallback_policy:
+      type: string
+      enum: ["fail_fast", "try_next", "local_only_fallback"]
+      default: "try_next"
+
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    route_used:
+      type: string
+      description: Registry entry id of the route that served the request.
+    transport:
+      type: string
+    response:
+      type: object
+      description: Provider-normalized response envelope.
+    latency_ms:
+      type: integer
+    error:
+      type: string
+
+side_effects: "external_call"
+
+examples:
+  - input:
+      request:
+        messages:
+          - role: user
+            content: "Summarize this paragraph."
+        capability_hint: "generation"
+        trust_boundary: "local"
+      model_registry:
+        - id: "local/ollama-llama3"
+          transport: "ollama"
+          endpoint: "http://localhost:11434"
+          model: "llama3"
+          capability_tags: ["generation"]
+          trust_boundary: "local"
+          priority: 1
+        - id: "cloud/openai-gpt4o"
+          transport: "openai_compatible"
+          endpoint: "https://api.openai.com/v1"
+          model: "gpt-4o"
+          api_key_env: "OPENAI_API_KEY"
+          capability_tags: ["generation", "tool_use", "vision"]
+          trust_boundary: "external"
+          priority: 2
+      fallback_policy: "try_next"
+    output:
+      ok: true
+      route_used: "local/ollama-llama3"
+      transport: "ollama"
+      response:
+        choices:
+          - message:
+              role: assistant
+              content: "Here is the summary..."
+      latency_ms: 320
+    notes: "Local route matched first; cloud route not contacted."
+
+implementations:
+  - kind: callable
+    language: python
+    path: "src/middleware/model_route_gateway.py"
+  - kind: http
+    url: "http://localhost:8080/v1/gateway/route"
