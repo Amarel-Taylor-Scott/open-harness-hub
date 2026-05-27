@@ -1,141 +1,142 @@
-# /goal: Scale Open Harness Hub Toward Billions Of Components
+# /goal: Build Open Harness Hub — capability-lift components, for hours
 
-You are Codex working in Open Harness Hub.
+You are an autonomous agent (Codex or Claude Code) working in Open Harness Hub.
+Run for **hours or days**. **There is no terminal state and no early stop** —
+the resilience contract is [`.codex/prompts/direction.md`](direction.md). Never
+wait for permission between steps; on any block, error, or completed phase,
+switch paths or advance to the next one and keep producing durable, validated
+repo changes (not suggestions). The only things that end a run are an explicit
+human interrupt or a hard safety violation you must not work around.
 
 ## Mission
 
-Expand this repository toward a validated, fully vectorized registry of
-**thousands of millions** of reusable AI pipeline components and subcomponents
-— procedure components, signed knowledge components, source surfaces, tools,
-RAG packs, rubrics, benchmarks, deployment blueprints, and runtime patterns —
-reachable by hybrid search and through an easy conversational builder. The
-headline interaction: a user pastes an LLM challenge or use-case description
-and gets back a working, costed, deployable flow.
+Build a portable, database-backed registry **and** an easy conversational
+builder of reusable AI-pipeline components, reachable by hybrid search. The
+headline interaction: a user pastes a task / use-case / LLM challenge and gets
+back a working, costed, deployable flow composed from existing components.
 
-One million validated components is the proven floor
-(`docs/codex/million-object-goal.md`); the north star is
-`docs/codex/billion-component-goal.md`. For long unattended sessions, follow
-`docs/codex/autonomous-session-runbook.md`: small validated batches, switch
-paths when blocked, never stop.
+**The single canonical goal is [`docs/codex/master-goal.md`](../../docs/codex/master-goal.md).**
+Read it first; it reconciles and supersedes the older goal docs and defines the
+phases (P0 reconcile → P1 foundation → P2 component MVPs → P3 paste-to-flow
+builder → P4 full MVP → P5 scale), the six supervisor gates, and the loop.
 
-## Read First
+## The admission bar (read before generating anything)
 
-1. `AGENTS.md`
-2. `README.md`
-3. `taxonomy/SPEC.md`
-4. `docs/codex/billion-component-goal.md`
-5. `docs/codex/million-object-goal.md`
-6. `docs/codex/autonomous-session-runbook.md`
-7. `docs/codex/no-magic-values.md`
-8. `docs/codex/object-factory-workflow.md`
-9. `docs/codex/quality-gates.md`
-10. `docs/codex/multi-day-goal-runbook.md`
-11. `docs/architecture/source-governance-and-entity-resolution.md`
-12. `docs/architecture/low-cost-hosting-plan.md`
-13. `docs/architecture/object-factory-worker-fleet.md`
-14. `docs/codex/speed-guardrails.md`
+A component earns a place **only if it lifts capability beyond a bare LLM** —
+lets a model do what it cannot do reliably alone (grounded facts, deterministic
+checks, retrieval, domain rules, multi-step verification). Operational test: a
+benchmark delta `pipeline_score − bare_model_score` meaningfully **> 0**. If a
+frontier model already does it zero-shot, **it does not belong** — do not
+generate it, do not catalog it (this includes templated clones and general dev
+resources). The highest lift is in esoteric, specialized, verifiable arenas.
+Report **useful-promoted/day, not generated/day**. See the non-goals in
+`docs/about/project.md`.
 
-## Operating Rules
+## Read first
 
-- Make durable repo changes, not only suggestions, unless explicitly asked to brainstorm.
-- Add small, coherent, validated batches.
-- Use knowledge packs and JSONL for high-volume component rows.
-- Add tools and pipelines that can generate more components later.
-- Normalize raw source material before publishing: source governance, entity linking, fuzzy dedupe, and index record emission.
-- Prefer dedicated object factory workers for source ingest, Markdown conversion, document digestion, sensitive-data gates, LLM polishing, verification, labeling, dedupe, cost metering, and publish review.
-- Route model work through provider-neutral wrappers so jobs can use local models, OpenAI-compatible endpoints, managed APIs, or tenant-provided keys.
-- Preserve provenance, licensing, trust boundaries, privacy boundaries, and freshness.
-- Do not store real PII, secrets, confidential data, or proprietary job-posting dumps.
-- Do not republish anything under `_reference/`.
-- Default to database-first incremental ingestion for high-volume work. Full validation and full catalog page rebuilds are release gates, not the daily scaling loop.
-- Prefer focused validation and selected page rendering for changed public definitions; use JSONL, load plans, index deltas, and Postgres/pgvector audits for large batches.
-- Vectorize everything promotable: every promoted row carries a real embedding from a declared model + dimension drawn from one config source; placeholder vectors block promotion. Make all of it reachable by hybrid (keyword + vector + graph + facet) search.
-- No magic values: never hand-type a value that must be updated in more than one place. Repo-state counts/versions are computed; shared values (embedding dimension, model IDs, thresholds, paths, type/row-family lists) get one definition and are imported/read everywhere. See `docs/codex/no-magic-values.md`.
-- Treat Kaggle competitions (LLM usage, tuning, RAG, eval, multimodal, tabular) as the use-case + builder-test corpus: each becomes a use-case and a `pasted challenge -> expected component flow` benchmark. Permissive licenses only; carry author + URL + license; route uncertain sources to review tickets.
+1. [`docs/codex/master-goal.md`](../../docs/codex/master-goal.md) — canonical goal, phases, gates, loop
+2. `AGENTS.md` and `CLAUDE.md` — conventions + hard rules
+3. `.research-notes/autonomous-session-ledger.md` — current state; resume here
+4. `docs/codex/no-magic-values.md` — single-source-of-truth discipline
+5. `taxonomy/SPEC.md` — vocabulary + field definitions
+6. `docs/codex/autonomous-session-runbook.md` — the in-session loop engine
 
-## Default Batch
+## The loop (repeat ~20–45 min/cycle; never stop on a block)
 
-Each work cycle should create or improve:
+```
+ORIENT   read the session ledger; pick the highest-value UNBLOCKED menu item
+PLAN     state the one batch this cycle produces (one path)
+BUILD    durable change — full row families; real embeddings for promotable rows
+VALIDATE fast path on CHANGED paths only (gates 1–2 inline)
+RECORD   append a ledger line: counts (generated/staged/committed/vectorized) +
+         yield (useful-promoted) + validation result
+BRANCH   blocked? switch to another menu path; note roadblock + fallback; do NOT stop
+REPEAT
+```
 
-1. one architecture/research/use-case doc;
-2. one knowledge pack;
-3. one seed JSONL data file;
-4. one to three tools;
-5. one pipeline;
-6. optional rubric/benchmark;
-7. MkDocs nav entry if the doc is user-facing.
+## The six supervisor gates (a batch failing any gate is not counted)
 
-For ingestion or factory work, include these stages unless there is a clear reason not to:
+1. **Green build** — `python3 scripts/validate.py <changed paths>` exits 0.
+2. **Stats fresh** — `python3 scripts/build_readme_stats.py --check` passes.
+3. **Novelty/dedupe** — `python3 scripts/factory/capability_lift_gate.py` (SimHash/LSH); reject near-duplicates.
+4. **Capability-lift** — same gate: lift floor + filler markers; only count rows that clear the bar.
+5. **Provenance** — every promotable row carries `source_url` + `license` + `author`; uncertain → review ticket.
+6. **Vectorization** — no promotion without a REAL embedding (see "Embeddings", below); hash vectors are staging-only.
 
-1. source governance routing;
-2. component factory job routing;
-3. page/document to Markdown conversion when needed;
-4. sensitive-data and publication safety gates;
-5. normalized object schema;
-6. entity recognition/linking;
-7. fuzzy dedupe clustering;
-8. keyword/vector/graph/facet index record emission;
-9. review ticket routing.
+## Work-path menu (priority-ordered; always pick the highest UNBLOCKED item)
+
+Warm start — current state (2026-05-27): validator green; catalog 2,397 YAML
+(530 curated + 1,867 candidates); vector store builds over all of them with the
+offline **hash placeholder** backend (0 promotable embeddings); the flexible
+embedding provider (`scripts/embeddings.py`) and the local showcase server
+(`scripts/serve_builder.py`) exist.
+
+- **P1 — make embeddings real (highest value).** The route is wired and
+  one switch away. Set a backend and re-embed:
+  ```bash
+  # local model (needs sentence-transformers):
+  OH_EMBED_BACKEND=local-st OH_EMBED_MODEL=all-MiniLM-L6-v2 python3 -m scripts.db.build_vector_store build
+  # OR hosted / cloud (OpenAI-compatible, incl. Ollama/vLLM):
+  OH_EMBED_BACKEND=http-openai OH_EMBED_BASE_URL=… OH_EMBED_API_KEY=… OH_EMBED_MODEL=text-embedding-3-small python3 -m scripts.db.build_vector_store build
+  ```
+  Then run `scripts/db/vector_readiness_audit.py` and confirm promotion is
+  unblocked only for real vectors. NEVER fake vectors to pass the gate.
+- **P2 — capability-lift component MVPs (wedge first).** Build families in the
+  regulated/esoteric wedge (ESG/CSDDD, GxP, customs, sanctions, food/water),
+  each shipped with a rubric + a benchmark proving a positive bare-vs-pipeline
+  delta. Token-efficiency / strict-output families compound across domains.
+- **P3 — the paste-to-flow builder.** Improve `scripts/serve_builder.py`
+  (hybrid retrieval → assembly honoring wiring rules → cost estimate → optional
+  local-model polish). Maintain a builder benchmark (`pasted task → expected
+  component flow`) from the Kaggle corpus.
+- **Hygiene/throughput fallbacks (always unblocked):** tune the cull
+  (`capability_lift_gate.py`), add SimHash/LSH to the factory dedup so a batch
+  > ~1–2k stops hanging, finish the `manifest/primitive/artifact → component`
+  rename (prose + the `artifacts` table in `dist/catalog.sqlite`), generate
+  showcase pipelines/rubrics/benchmarks, add source-surface seeds.
+
+## Operating rules
+
+- Make durable, validated repo changes; small coherent batches; end each cycle green or roll back.
+- Route ALL model + embedding work through the provider-neutral resolvers
+  (`scripts/embeddings.py`, `scripts/model_routes.py`) so jobs run local now and
+  hosted/cloud later by env var only — never hardcode a provider or key.
+- No magic values — counts/dims/model-IDs/paths/thresholds/versions have one
+  source (`docs/codex/no-magic-values.md`); repo-state counts are computed.
+- Preserve provenance, license, trust + privacy boundaries, freshness.
+- No real PII/secrets/proprietary dumps — synthetic/public metadata only.
+- Do not republish `_reference/`. No new insurance work.
+- Promotion boundary: no tenant-visible row with open/high-risk review,
+  placeholder embeddings, unresolved provenance, or volatile facts without CDC.
+- High-volume rows live in JSONL staging + Postgres/pgvector load plans, not new static files.
 
 ## Validation
 
-For release snapshots, broad schema/vocabulary changes, or final full-check requests, run:
-
 ```bash
-python3 scripts/validate.py
-python3 scripts/build_component_id_index.py
-python3 scripts/build_catalog_pages.py
+# daily fast path (changed paths only):
+python3 scripts/validate.py <changed catalog paths>
+python3 scripts/build_component_id_index.py --update <changed paths>
+python3 scripts/build_catalog_pages.py --paths <changed paths> --update-index
+python3 scripts/factory/capability_lift_gate.py            # cull/usefulness report
+# release gate (schema/vocab/broad changes only):
+python3 scripts/validate.py && python3 scripts/build_readme_stats.py --check
 ```
 
-For normal daily factory turns, run focused validation on changed public definitions and selected page rendering:
+## Embeddings & models (local now, cloud later)
 
-```bash
-python3 scripts/validate.py <changed catalog yaml paths>
-python3 scripts/build_catalog_pages.py --paths <changed catalog yaml paths> --update-index
-```
+- Embeddings: `scripts/embeddings.py` — `OH_EMBED_BACKEND` = auto | local-st |
+  http-openai | hash; `OH_EMBED_MODEL` / `OH_EMBED_BASE_URL` / `OH_EMBED_API_KEY`.
+  Hash is offline placeholder (non-promotable). Model→dim lives in
+  `scripts/_config.py` (no scattered literals).
+- LLM/chat (builder polish, labeling): `scripts/model_routes.py` — `OH_LLM_*`;
+  defaults to a local Gemma via Ollama, degrades to deterministic output if no
+  model is reachable. Optional, never the source of truth.
 
-Report which path was used, the component definition count when available, generated/staged/committed database counts, and any validation/build failures.
+## Per-cycle report — then immediately continue (never stop)
 
-## Expansion Priorities
-
-Prioritize components by:
-
-`usefulness x demand x complexity x time_savings x frequency_of_deployment x not_solved_by_out_of_box_llms x cost_savings x deployment_management_value x model_swap_value`
-
-Look for capability gaps where:
-
-`capability_spike ~= verifiability x training_attention x data_coverage x economic_value`
-
-## Source Surfaces
-
-Strong source surfaces include:
-
-- occupation taxonomies: O*NET, ESCO, BLS ORS, SOC, ISCO;
-- public facts: CDC, Federal Register, Regulations.gov, Data.gov, data.europa.eu, EUR-Lex;
-- research: OpenAlex, Semantic Scholar, arXiv, PubMed, Crossref, Papers With Code, Kaggle;
-- software and workflow ecosystems: GitHub, package registries, MCP servers, ComfyUI workflows, n8n, Flowise, Dify, Langflow;
-- agent and skill ecosystems: OpenClaw, Claude Code skill repositories, Hermes-style agent systems, CrewAI, LangGraph, AutoGen, Dify, Flowise, n8n, ComfyUI;
-- risk and compliance: NVD, MITRE, OWASP, sanctions lists, SEC EDGAR, openFDA, ClinicalTrials.gov;
-- government and verified publishers: agencies, standards bodies, public forms, archived pages, signed knowledge feeds.
-
-## Hosting Bias
-
-Start with the cheapest working product shape:
-
-- static docs on GitHub Pages or Cloudflare Pages;
-- API and workers on Render for speed;
-- Postgres plus pgvector for canonical data, keyword search, and first vector search;
-- object storage for raw snapshots and generated assets;
-- Redis or managed queue for scan, embed, eval, and pricing jobs;
-- split heavy tools into Cloud Run, cloud functions, or container workers only when needed;
-- add BigQuery or ClickHouse later for telemetry, cost traces, ranking, and billing analytics.
-
-## Expected Closeout
-
-Final response should state:
-
-- what changed;
-- which files matter;
-- validation result;
-- catalog page rebuild result;
-- next logical factory area.
+This is a ledger entry, **not** an ending. After writing it, begin the next
+cycle without pausing or asking. Each entry states: what changed; which files
+matter; which path (fast vs release gate) was used; the component count;
+generated/staged/committed/**vectorized** counts and the **useful-promoted**
+yield; validation + gate results; and the next move — which you then start
+immediately. "Done" only ever means "pick the next highest-value unblocked item."

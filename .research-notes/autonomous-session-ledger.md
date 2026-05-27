@@ -29,6 +29,28 @@ Started: 2026-05-26
   12-factor already done; flesh out the DevOps pipeline section with a review
   harness + rubric/benchmark.
 
+## 2026-05-27 session — capability-lift gate + reconciliation
+
+Driven by a project/business review. Theme: the binding constraint is
+**usefulness + foundation + consistency, not throughput**. "Useful" defined
+(owner steer) as **capability lift over a bare LLM** — a benchmark delta
+(`pipeline − bare model`) > 0 — with the project non-goals promoted to
+admission filters. New canonical goal: `docs/codex/master-goal.md`.
+
+| # | path | change | validation |
+|---|------|--------|------------|
+| 10 | `scripts/validate.py` | fix RED build: `check_refs` no longer resolves `type/slug` strings inside `examples` (false positive on illustrative namespaces like `pipeline/gdpr-review`). | full validate RED→green (rc=0) |
+| 11 | `docs/codex/master-goal.md` (new), `docs/codex/index.md`, `docs/about/project.md` | single canonical long-horizon goal (P0 reconcile → P1 foundation → P2 component MVPs → P3 paste-to-flow builder → P4 full MVP → P5 scale); 6 supervisor gates; yield = useful-promoted/day; wired index as canonical; added capability-lift non-goal. Refreshed stale README stats. | `build_readme_stats.py --check` fresh |
+| 12 | `scripts/factory/capability_lift_gate.py` (new) | capability-lift + SimHash/LSH novelty gate over manifests. Cull triggers: hard filler markers (scale-expansion / boilerplate / numeric clone / fabricated model), near-duplicate, near-empty lift floor. **Never deletes git-tracked**; referential-integrity reprieve prevents dangling refs. Applied: **culled 1,980 untracked filler** (catalog 4,377→2,397 yaml; 530 tracked untouched). | self-test green; full validate stays green (rc=0); 0 tracked deleted |
+| 13 | `docs/strategy/product-market-monetization-brief.md` | expanded: capability-lift positioning, named competitive landscape, GTM wedge (regulated compliance), defended moat, OSS-ecosystem ingestion as a source surface, concrete pricing tiers, risk mitigations, reality anchor to phases. | n/a (doc) |
+
+**P1 embeddings remain blocked in this sandbox:** no `pip`/`numpy`/
+`sentence-transformers` and no install path. The route is wired and one command
+away (`scripts/_config.py` registry → `python3 -m scripts.db.build_vector_store
+build` with sentence-transformers, or a hosted route). Did **not** fake vectors
+(promotion boundary). Switched paths per the runbook: shipped the gate +
+reconciliation instead. P1 is the next session's first move once deps exist.
+
 ## Cycle log
 
 | # | path | change | validation | commit |
@@ -72,7 +94,7 @@ Started: 2026-05-26
 ## Database object reality (queried 2026-05-26, answering "how many objects in the DB")
 
 - **Committed/queryable** (`dist/catalog.sqlite`): **505 objects, 1,024 edges, 0 embeddings** (FTS5 lexical search works; vector search empty).
-- **Source catalog (YAML manifests, validated):** 4,350 (512 committed to git, 3,838 machine-generated candidates pending).
+- **Source catalog (YAML manifests, validated):** 2,397 (530 committed to git, 1,867 candidates) — down from 4,377 after the 2026-05-27 capability-lift cull removed 1,980 untracked filler (`dist/reports/capability-lift-gate.json` is the audit record).
 - **Generated candidate rows (staged JSONL in `dist/`):** ~1.78M+ lines across row-family files — generated factory output, **not loaded** into any DB.
 - **Live Postgres committed rows:** 0 — `db/postgres/schema.sql` is 36-table DDL + load plans only; no running DB.
 - **Vector-search-ready embeddings:** 0 (needs `sentence-transformers` + `OH_BUILD_EMBEDDINGS=1`, or the pgvector load path executed).

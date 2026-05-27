@@ -32,27 +32,26 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import math
 import re
 import sqlite3
 import tempfile
 from pathlib import Path
-from typing import Callable, Iterable
+from typing import Iterable
 
 import yaml
 
 from scripts._config import CATALOG_DIR, DIST_DIR
+from scripts.embeddings import (
+    HASH_DIM, HASH_MODEL_ID, content_hash, hash_embed, resolve_backend,
+)
 
-# --- Embedding models registered in this store ------------------------------
-# (model_id -> dim). Multiple may coexist per object; the store is multi-dim by
-# design (dim is stored per row), unlike a single fixed pgvector(384) column.
-HASH_MODEL = "hash-bow-v1"
-HASH_DIM = 256
-REAL_MODEL = "all-MiniLM-L6-v2"  # used only if sentence-transformers is present
+# Embedding backend selection is centralized in scripts/embeddings.py and is
+# env-driven (local-st | http-openai | hash), so the same build moves from
+# offline-local to hosted-cloud with no code change. HASH_MODEL is the offline
+# default model id; multiple models may coexist per object (dim stored per row).
+HASH_MODEL = HASH_MODEL_ID
 
 DEFAULT_STORE = DIST_DIR / "vector-store" / "catalog-vectors.sqlite"
-
-TOKEN_RE = re.compile(r"[a-z0-9][a-z0-9_.+-]{1,40}")
 
 # --- Regex label rules (deterministic; assignment_method='regex') -----------
 # label_set, label, pattern. These are exact, filterable signals that live
@@ -72,36 +71,15 @@ REGEX_LABEL_RULES: list[tuple[str, str, re.Pattern[str]]] = [
 
 
 # --- Embedders --------------------------------------------------------------
-def hash_embed(text: str, dim: int = HASH_DIM) -> list[float]:
-    """Deterministic signed feature-hashing bag-of-words, L2-normalized."""
-    vec = [0.0] * dim
-    for tok in TOKEN_RE.findall(text.lower()):
-        h = hashlib.sha1(tok.encode("utf-8")).digest()
-        idx = int.from_bytes(h[:4], "big") % dim
-        sign = 1.0 if (h[4] & 1) else -1.0
-        vec[idx] += sign
-    norm = math.sqrt(sum(v * v for v in vec))
-    return [v / norm for v in vec] if norm else vec
-
-
-def get_embedder(model: str) -> tuple[Callable[[str], list[float]], int]:
-    """Return (embed_fn, dim). Falls back to the hash embedder offline."""
-    if model == REAL_MODEL:
-        try:
-            from sentence_transformers import SentenceTransformer  # type: ignore
-
-            st = SentenceTransformer(model)
-            dim = int(st.get_sentence_embedding_dimension())
-            return (lambda t: [float(x) for x in st.encode(t, normalize_embeddings=True)], dim)
-        except Exception:
-            # No model available — degrade to the offline hash embedder.
-            return (hash_embed, HASH_DIM)
-    return (hash_embed, HASH_DIM)
+# The embedder is resolved via scripts.embeddings.resolve_backend (env-driven).
+# hash_embed is re-exported above for any caller that wants the raw offline
+# function; build()/search() use the resolved backend so a hash fallback can
+# never masquerade as a real model in the stored rows.
 
 
 def is_placeholder(model: str) -> bool:
-    """Hash vectors are placeholders (block promotion); real model vectors are not."""
-    return model == HASH_MODEL
+    """Back-compat shim: hash-family model ids are placeholders (block promotion)."""
+    return model == HASH_MODEL or model.startswith("hash")
 
 
 # --- Store ------------------------------------------------------------------
@@ -190,22 +168,31 @@ def llm_label(doc: dict, model_route_id: str) -> list[dict]:
 
 
 def build(store: Path = DEFAULT_STORE, model: str = HASH_MODEL, limit: int | None = None) -> dict:
-    embed, dim = get_embedder(model)
-    placeholder = 1 if is_placeholder(model) else 0
+    backend = resolve_backend(model=model)
+    placeholder = 0 if backend.promotable else 1
     con = _connect(store)
     n_emb = n_lab = n_obj = 0
     try:
+        # Full rebuild: clear THIS model's embeddings and the regenerable regex
+        # labels first, so components culled/removed from the catalog do not
+        # linger as stale rows. Other models' embeddings and non-regex
+        # (llm/human/classifier) labels are preserved.
+        if limit is None:
+            con.execute("DELETE FROM object_embedding WHERE embedding_model=?", (backend.model_id,))
+            con.execute("DELETE FROM label_assignment WHERE assignment_method='regex'")
         for doc in iter_components(limit=limit):
             sid, stype = doc["id"], doc["type"]
             text = _doc_text(doc)
-            thash = hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
-            emb_id = hashlib.sha1(f"{sid}|{model}|{thash}".encode()).hexdigest()[:20]
-            vec = embed(text)
+            thash = content_hash(text)[:16]
+            # Store the backend's TRUE model id — a hash fallback can never be
+            # recorded as a real model and slip past the promotion gate.
+            emb_id = hashlib.sha1(f"{sid}|{backend.model_id}|{thash}".encode()).hexdigest()[:20]
+            vec = backend.embed_one(text)
             con.execute(
                 "INSERT OR REPLACE INTO object_embedding "
                 "(embedding_id, subject_id, subject_type, embedding_model, dim, is_placeholder, text_hash, text, embedding) "
                 "VALUES (?,?,?,?,?,?,?,?,?)",
-                (emb_id, sid, stype, model, dim, placeholder, thash, text,
+                (emb_id, sid, stype, backend.model_id, backend.dim, placeholder, thash, text,
                  __import__("json").dumps(vec)),
             )
             n_emb += 1
@@ -224,8 +211,10 @@ def build(store: Path = DEFAULT_STORE, model: str = HASH_MODEL, limit: int | Non
     finally:
         con.close()
     return {
-        "store": str(store), "embedding_model": model, "dim": dim,
-        "is_placeholder": bool(placeholder), "objects": n_obj,
+        "store": str(store), "requested_model": model,
+        "embedding_model": backend.model_id, "backend": backend.name,
+        "dim": backend.dim, "is_placeholder": not backend.promotable,
+        "promotable": backend.promotable, "objects": n_obj,
         "embeddings": n_emb, "labels": n_lab,
     }
 
@@ -237,12 +226,12 @@ def _cosine(a: list[float], b: list[float]) -> float:
 def search(query: str, store: Path = DEFAULT_STORE, model: str = HASH_MODEL,
            k: int = 5, type_filter: str | None = None, label_filter: str | None = None) -> list[dict]:
     import json
-    embed, _ = get_embedder(model)
-    qv = embed(query)
+    backend = resolve_backend(model=model)
+    qv = backend.embed_one(query)
     con = sqlite3.connect(store)
     try:
         sql = "SELECT subject_id, subject_type, embedding FROM object_embedding WHERE embedding_model=?"
-        params: list = [model]
+        params: list = [backend.model_id]
         if type_filter:
             sql += " AND subject_type=?"
             params.append(type_filter)
