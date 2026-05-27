@@ -74,6 +74,7 @@ Catalog now 2,411 validated (530 curated + candidates). Vector store rebuilt
   helper so any Python lib exposes callables as OHH tool/processor components.
   See `docs/spec/python-component-standard.md`.
 - More capability-lift verticals; real embeddings (P1) to fix semantic retrieval.
+- **Deterministic code-edit family** (high priority; the "small models can't do exact-match patch" objection): structured/line-anchored/AST patch-apply as a *deterministic processor*, plus a verify-and-repair harness gate — move edit reliability OUT of the model so a cheap model can drive it. Pairs with the cost-routing principle: orchestration has a coherence floor (capable model or deterministic routing), narrow well-scoped sub-tasks route to small/local models.
 
 ## Cycle log
 
