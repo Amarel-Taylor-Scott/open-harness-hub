@@ -22,6 +22,12 @@ Started: 2026-05-26
   - [x] `pattern/strict-output-format-contract`
 - Kaggle competition corpus → use-case + `pasted challenge → expected flow`
   builder benchmarks.
+- **Trending-repos-as-components + DevOps section** (user request, 2026-05-26):
+  seeded cycle 5. Relevance triage of 10 repos done; **CloakBrowser excluded**
+  (bot-detection evasion — not operationalized). Remaining: catalog
+  academic-research-skills (skill/pipeline), ViMax (video-synthesis),
+  12-factor already done; flesh out the DevOps pipeline section with a review
+  harness + rubric/benchmark.
 
 ## Cycle log
 
@@ -31,6 +37,7 @@ Started: 2026-05-26
 | 2 | I/O efficiency & format control (backlog) | 3 patterns: `input-token-compression`, `terse-output-budget`, `strict-output-format-contract` | validate + global-ref-check green (3/3) | see branch log |
 | 3 | no-magic-values P0 | `scripts/_config.py` (single source: embedding dim, model registry, paths) + refactor flagship `pgvector_embedding_load_plan.py` (`pgvector_type()`; killed parallel `vector(384)` literal) | self-test 256/0 rows; message derives `vector(N)`; no stray `384` in file | see branch log |
 | 4 | no-magic-values P0 | `scripts/build_readme_stats.py` generates README catalog-stats block (manifests by type, sqlite objects/edges/embeddings=0, emitters); replaced hand-typed "172 / v0.3.0" | generator runs; `--check` fresh (exit 0) | see branch log |
+| 5 | trending-repos-as-components + DevOps section | `pattern/twelve-factor-agent`; tools `codegraph-code-graph-query`, `agentmemory-persistent-memory`, `supertonic-tts`; new `catalog/pipelines/devops/` section + `pipeline/codegraph-assisted-code-review` (composes the 2 tools). **CloakBrowser excluded** (bot-detection evasion). | validate 5/5 + global-ref-check on pipeline green | see branch log |
 
 ## Database object reality (queried 2026-05-26, answering "how many objects in the DB")
 
