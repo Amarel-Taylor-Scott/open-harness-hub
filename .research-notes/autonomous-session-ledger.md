@@ -51,6 +51,30 @@ build` with sentence-transformers, or a hosted route). Did **not** fake vectors
 (promotion boundary). Switched paths per the runbook: shipped the gate +
 reconciliation instead. P1 is the next session's first move once deps exist.
 
+### 2026-05-27 (continued) — providers, showcase, verticals, launcher, SWOT
+
+| # | path | change | commit |
+|---|------|--------|--------|
+| 14 | `scripts/embeddings.py`, `scripts/model_routes.py`, `scripts/serve_builder.py`, `build_vector_store.py` | flexible embedding provider (local-st/http-openai/hash, env-driven, fixes a hash-masquerade bug + stale-row pruning); provider-neutral LLM route (Gemma/Ollama); zero-dep paste-to-flow showcase site; resilient `goal.md`+`direction.md`+`.claude/commands/`. | 17013a2, 214ecf3 |
+| 15 | `catalog/{knowledge-packs,tools/api,processors/standardization,rubrics,pipelines/public-data-grounding}/…` | **public-data grounding vertical**: US Census ACS + geocoder + Federal Register API tools, geo-FIPS + tabular-schema standardizers, census-grounded verification pipeline + rubric (+ ACS fact file). | 12ab950 |
+| 16 | `catalog/tools/image-safety/…`, `catalog/rubrics/generated-image-safety-quality.yaml`, `catalog/pipelines/image-generation/guarded-image-generation.yaml` | **guarded image-generation vertical**: prompt-safety screen + NudeNet NSFW filter + malformed-anatomy (6-finger) detector + aesthetic/quality scorer + composing pipeline + rubric. Validates green. | (this batch) |
+| 17 | `scripts/serve_showcase.sh` | one-command local launcher: server + Gemma (auto-detect Ollama tag) + `trycloudflare.com` quick tunnel, graceful fallbacks. | (this batch) |
+| 18 | `docs/strategy/competitive-swot.md` | SWOT + competitor matrix (Zapier/IFTTT/Make/n8n/Vertex/Bedrock/LangChain/Dify/HF) — the unserved capability-lift middle layer; honest "combination-moat only bites once populated". | (this batch) |
+
+Catalog now 2,411 validated (530 curated + candidates). Vector store rebuilt
+(still hash placeholder; image queries underperform until P1 real embeddings).
+
+**Backlog queued for `/goal` (do not lose):**
+- **Premium pipeline grader/advisor** (user idea): a runnable tool that grades a
+  pipeline on best-practice + cost-savings (wiring rules, rules-before-model,
+  eval coverage, provenance, vectorization) and emits tips. Pattern exists in
+  `capability_lift_gate.py`. Ship as `scripts/grade_pipeline.py` +
+  `tool/pipeline-best-practice-grader` (premium) + `rubric/pipeline-best-practices`.
+- **Python-library → component standard** (user idea): a convention + reference
+  helper so any Python lib exposes callables as OHH tool/processor components.
+  See `docs/spec/python-component-standard.md`.
+- More capability-lift verticals; real embeddings (P1) to fix semantic retrieval.
+
 ## Cycle log
 
 | # | path | change | validation | commit |

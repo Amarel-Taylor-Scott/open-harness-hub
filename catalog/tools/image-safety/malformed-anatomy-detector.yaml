@@ -1,0 +1,73 @@
+id: "tool/malformed-anatomy-detector"
+type: tool
+version: "0.1.0"
+name: "Malformed anatomy detector (extra fingers / limbs / faces)"
+description: |
+  Flags the characteristic anatomical distortions of diffusion output: wrong
+  finger counts, extra/merged limbs, duplicated or warped faces. Returns the
+  detected defects and a pass/fail so the pipeline can reject or regenerate.
+
+  Capability lift: the generator itself does not know its hands are wrong; this
+  post-generation check (hand/pose landmark counting + an anomaly classifier)
+  catches the most common quality failure that makes generated images unusable.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["media", "cross_industry"]
+capability: ["classification", "verification"]
+modality: ["image"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["image-quality", "anatomy", "six-fingers", "distortion", "filter", "github-component"]
+created: "2026-05-27"
+updated: "2026-05-27"
+
+attribution:
+  source_url: "https://github.com/google-ai-edge/mediapipe"
+  source_kind: "other"
+  author: "MediaPipe hand/pose landmarks + anomaly heuristics (composite)"
+  license: "Apache-2.0"
+
+parameters:
+  type: object
+  required: ["image"]
+  properties:
+    image:
+      type: string
+      description: "Image path, URL, or base64."
+    checks:
+      type: array
+      items: { type: string, enum: ["finger_count", "limb_count", "face_count", "symmetry"] }
+      description: "Which anatomical checks to run. Default: all."
+    max_defects:
+      type: integer
+      description: "Fail if defect count exceeds this. Default 0."
+
+returns:
+  type: object
+  properties:
+    passes: { type: boolean }
+    defects:
+      type: array
+      items:
+        type: object
+        properties:
+          kind: { type: string }
+          detail: { type: string }
+          confidence: { type: number }
+
+side_effects: "read"
+
+examples:
+  - input: { image: "out/portrait_12.png", checks: ["finger_count", "face_count"] }
+    output:
+      passes: false
+      defects: [ { kind: "finger_count", detail: "right hand: 6 fingers", confidence: 0.83 } ]
+    notes: "Failing images are regenerated or routed to review, not delivered."
+
+implementations:
+  - kind: callable
+    language: python
+    path: "src/tools/malformed_anatomy_detector.py"
+    notes: "Hand/pose landmark counting (MediaPipe) + simple anomaly rules; extendable with a trained malformed-anatomy classifier."

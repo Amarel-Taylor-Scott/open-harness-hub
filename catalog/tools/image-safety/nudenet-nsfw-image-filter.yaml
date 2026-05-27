@@ -1,0 +1,66 @@
+id: "tool/nudenet-nsfw-image-filter"
+type: tool
+version: "0.1.0"
+name: "NudeNet NSFW image filter"
+description: |
+  Classifies a generated image for explicit/illicit content and returns
+  per-class scores + a pass/block decision against a threshold. Wraps the
+  open-source NudeNet detector.
+
+  Capability lift: a diffusion model has no built-in content gate; this tool is
+  the post-generation safety filter that blocks illicit output before it
+  reaches a user. Source-governed — verify and propagate the upstream license of
+  the version you bundle.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["media", "security", "cross_industry"]
+capability: ["classification", "safety_gating", "safety"]
+modality: ["image"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["image-safety", "nsfw", "content-filter", "nudenet", "github-component"]
+created: "2026-05-27"
+updated: "2026-05-27"
+
+attribution:
+  source_url: "https://github.com/notAI-tech/NudeNet"
+  source_kind: "other"
+  author: "notAI-tech (NudeNet)"
+  license: "see-upstream"
+
+parameters:
+  type: object
+  required: ["image"]
+  properties:
+    image:
+      type: string
+      description: "Image path, URL, or base64."
+    block_threshold:
+      type: number
+      description: "Block if any unsafe class score >= this. Default 0.5."
+    unsafe_classes:
+      type: array
+      items: { type: string }
+      description: "Classes that count as unsafe (defaults to NudeNet explicit classes)."
+
+returns:
+  type: object
+  properties:
+    is_safe: { type: boolean }
+    scores: { type: object, description: "class -> score" }
+    blocked_by: { type: array, items: { type: string } }
+
+side_effects: "read"
+
+examples:
+  - input: { image: "out/gen_0007.png", block_threshold: 0.5 }
+    output: { is_safe: true, scores: { "FEMALE_BREAST_EXPOSED": 0.02 }, blocked_by: [] }
+    notes: "Safe image passes; route blocked images to review, never auto-publish."
+
+implementations:
+  - kind: callable
+    language: python
+    path: "src/tools/nudenet_nsfw_image_filter.py"
+    notes: "Loads NudeNet; verify the upstream license/version before bundling or hosting."
