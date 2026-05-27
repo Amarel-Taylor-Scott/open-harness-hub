@@ -32,6 +32,12 @@ say(){ printf '\033[38;2;251;119;20m%s\033[0m\n' "$*"; }
 warn(){ printf '\033[33m%s\033[0m\n' "$*"; }
 
 # --- 1. Gemma via Ollama (OpenAI-compatible) -------------------------------
+# Auto-start a local Ollama if it's installed but not already serving.
+if ! curl -sf "${OLLAMA_URL}/api/tags" -o /tmp/ohh_tags.json 2>/dev/null && command -v ollama >/dev/null 2>&1; then
+  say "Starting Ollama (ollama serve)…"
+  nohup ollama serve >/tmp/ohh_ollama.log 2>&1 &
+  for _ in $(seq 1 20); do curl -sf "${OLLAMA_URL}/api/tags" -o /tmp/ohh_tags.json 2>/dev/null && break; sleep 0.5; done
+fi
 LLM_OK=0
 if curl -sf "${OLLAMA_URL}/api/tags" -o /tmp/ohh_tags.json 2>/dev/null; then
   LLM_OK=1
@@ -90,21 +96,39 @@ for _ in $(seq 1 40); do curl -sf "http://127.0.0.1:${PORT}/api/health" >/dev/nu
 say "Local:  http://127.0.0.1:${PORT}"
 
 # --- 4. public trycloudflare.com tunnel ------------------------------------
-if [ "$TUNNEL" = 1 ]; then
-  if command -v cloudflared >/dev/null 2>&1; then
-    say "Opening a public trycloudflare.com tunnel… (Ctrl-C to stop everything)"
-    cloudflared tunnel --url "http://localhost:${PORT}" --no-autoupdate 2>&1 \
-      | tee /tmp/ohh_tunnel.log | grep --line-buffered -Eo 'https://[a-z0-9-]+\.trycloudflare\.com' \
-      | while read -r u; do say "PUBLIC URL → $u   (send this to your tester)"; done &
-    TUN=$!
-    wait "$SRV"
+if [ "$TUNNEL" = 1 ] && command -v cloudflared >/dev/null 2>&1; then
+  say "Opening a public trycloudflare.com tunnel… (Ctrl-C stops everything)"
+  : > /tmp/ohh_tunnel.log
+  cloudflared tunnel --url "http://localhost:${PORT}" --no-autoupdate >/tmp/ohh_tunnel.log 2>&1 &
+  TUN=$!
+  URL=""
+  for _ in $(seq 1 60); do
+    URL=$(grep -Eo 'https://[a-z0-9.-]+\.trycloudflare\.com' /tmp/ohh_tunnel.log | head -1)
+    [ -n "$URL" ] && break
+    sleep 1
+  done
+  if [ -n "$URL" ]; then
+    mkdir -p dist; echo "$URL" > dist/showcase-tunnel-url.txt
+    say ""
+    say "═══════════════════════════════════════════════════════════════"
+    say "  PUBLIC URL  →  $URL"
+    say "  send this to your tester · saved to dist/showcase-tunnel-url.txt"
+    say "═══════════════════════════════════════════════════════════════"
   else
-    warn "cloudflared not found — serving locally only."
-    warn "Install it, then re-run:  brew install cloudflared   (macOS)"
-    warn "  or download: https://github.com/cloudflare/cloudflared/releases/latest"
-    warn "  then:  cloudflared tunnel --url http://localhost:${PORT}"
-    wait "$SRV"
+    warn "Tunnel started but no URL yet — tail /tmp/ohh_tunnel.log (it may still come up)."
   fi
+  wait "$TUN"
+elif [ "$TUNNEL" = 1 ]; then
+  warn "──────────────────────────────────────────────────────────────────────"
+  warn "  No public URL: 'cloudflared' is not installed. Install it (Linux,"
+  warn "  no sudo) then re-run this script:"
+  warn "    mkdir -p ~/.local/bin && curl -L \\"
+  warn "      https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 \\"
+  warn "      -o ~/.local/bin/cloudflared && chmod +x ~/.local/bin/cloudflared"
+  warn "    export PATH=\"\$HOME/.local/bin:\$PATH\""
+  warn "  The site is live locally at http://127.0.0.1:${PORT} in the meantime."
+  warn "──────────────────────────────────────────────────────────────────────"
+  wait "$SRV"
 else
   wait "$SRV"
 fi
