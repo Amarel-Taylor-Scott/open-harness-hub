@@ -158,8 +158,10 @@ def llm_narrative(task: str, flow: dict, cost: dict) -> tuple[str, bool]:
               "rules/retrieval run before the model to cut cost, and how to swap the model. "
               "Then give two one-line refinements (cheaper / stricter). Do not invent components.")
     user = f"Task: {task}\n\nAssembled components:\n{comp_lines}\n\nBalanced cost ~{cost['balanced']['per_task_usd']}/task."
-    text = route.complete(system, user, max_tokens=500)
-    return (text, True) if text else (deterministic_narrative(task, flow, cost), False)
+    # Headroom matters: reasoning models (e.g. Gemma 4) spend tokens "thinking"
+    # before any visible content, so a low cap returns an empty answer.
+    text = route.complete(system, user, max_tokens=2048)
+    return (text.strip(), True) if text and text.strip() else (deterministic_narrative(task, flow, cost), False)
 
 
 def build_flow(task: str, index: Index) -> dict:

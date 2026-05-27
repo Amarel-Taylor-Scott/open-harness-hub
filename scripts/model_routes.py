@@ -55,7 +55,7 @@ class ChatRoute:
         except Exception:
             return False
 
-    def complete(self, system: str, user: str, *, max_tokens: int = 600,
+    def complete(self, system: str, user: str, *, max_tokens: int = 2048,
                  temperature: float = 0.2) -> str | None:
         """Return assistant text, or None on any failure (caller falls back)."""
         if self.name == "none" or not self.base_url:
