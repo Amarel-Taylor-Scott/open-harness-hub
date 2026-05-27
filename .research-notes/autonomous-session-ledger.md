@@ -47,6 +47,18 @@ Started: 2026-05-26
 - codegraph: nodes=code symbols, edges=calls/imports, SQLite+FTS5, MCP ops (search/context/callers/impact/trace), NO embeddings. We: nodes=components, edges=refs (`harvest_refs`), same SQLite+FTS5 substrate (`catalog.sqlite`), now the same ops via `catalog_graph.py`. **Our edge over it:** we add vector + label layers (`build_vector_store.py`) = true hybrid (graph+vector+FTS5+facet); codegraph is structural+FTS5 only.
 - Next codegraph-inspired steps: expose `catalog_graph` ops over the MCP emitter (cheap agent navigation), incremental rebuild + staleness (codegraph file-watcher; we have `--check-fresh`), tag inferred/similarity edges `provenance: heuristic` vs declared.
 
+| 9 | prompt-tooling source surface (worked example) | `tool/prompt-master-prompt-optimizer` (nidhinjs/prompt-master, MIT, attribution) — ties to token-efficiency + output-format families | validate ok | see branch log |
+
+### Throughput reality (answering 10k–50k components/day)
+- Measured: a **1,000-seed partition with all 10 row families = ~31s** (22s CPU). A **10,000 monolithic run hung >27 min** (batch dedup is non-linear) and was killed.
+- ⇒ **10k–50k/day is achievable via PARTITIONED runs** (10–50 × 1k ≈ 5–25 min), NOT a monolithic call and NOT agent hand-authoring. Repo already has partition tooling (`source_surface_partition_planner`, `daily_partition_load_audit`, `partition_registry_replay`).
+- **Bottleneck to fix:** make the batch-dedup stage scale (SimHash/LSH blocking) so a single batch can exceed ~1–2k without O(n²) blowup. Capture-and-improve-the-incremental-path per CLAUDE.md.
+- Honest tiering still applies: these are **generated candidates** (JSONL staging), not promoted/committed components. Promotion stays gated (review, real embeddings, provenance).
+
+### Prompt-tooling as a source surface (the scalable path for "thousands of prompt repos")
+- Do NOT hand-catalog thousands of repos. Route them through source governance: license-filter (permissive only), fetch metadata (not bulk copyrighted text), normalize, fuzzy-dedupe, attribute (source_url/author/license), embed, route uncertain → review ticket.
+- prompt-master itself is a rich vein: its 35 anti-patterns → `pattern/anti-*`; 12 templates → logic-packs; token-efficiency audit → reinforces the token-efficiency family. Mine the KNOWLEDGE, reference the repo.
+
 ### Swarm notes
 - Parallel-safe model worked: each agent created only new files in its own dir, never edited shared files, never ran git; lead serialized commits + re-validation. Zero conflicts.
 - **Loose end:** `logic-pack/frontend/builder-prompt-templates` registers 4 prompt-template `.yaml` files under `logic/frontend/builder-prompt-templates/` that are NOT authored yet — valid skeleton (catalog defs are contracts), author the prompt files next.
