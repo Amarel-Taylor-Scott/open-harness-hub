@@ -1,0 +1,103 @@
+id: "pipeline/census-grounded-demographic-verification"
+type: pipeline
+version: "0.1.0"
+name: "Census-grounded demographic verification"
+description: |
+  Verifies a natural-language demographic/economic claim about a US place
+  against authoritative Census ACS data and returns supports / contradicts /
+  no-evidence with the exact figure and a citation.
+
+  Worked example of the public-data-grounding pattern: deterministic
+  standardization (address/place → FIPS) and an authoritative API call run
+  BEFORE the model; the model only judges the claim against the fetched figure.
+  Capability lift over a bare LLM: the answer carries a real, current,
+  cited number instead of a hallucinated one.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["government", "finance", "cross_industry"]
+capability: ["verification", "retrieval", "extraction"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "volatile"
+tags: ["census", "grounding", "verification", "public-data", "citation", "showcase"]
+created: "2026-05-27"
+updated: "2026-05-27"
+
+attribution:
+  source_url: "https://www.census.gov/data/developers/data-sets/acs-5year.html"
+  source_kind: "other"
+  author: "U.S. Census Bureau"
+  license: "public-domain"
+
+task: |
+  Given a demographic/economic claim about a US place (and optionally an
+  address), resolve the geography, fetch the authoritative ACS figure, and
+  return supports/contradicts/no-evidence with the figure and a citation.
+pipeline_kind: "verification"
+
+inputs:
+  - name: "claim"
+    type: "string"
+  - name: "place_or_address"
+    type: "string"
+  - name: "year"
+    type: "integer"
+outputs:
+  - name: "verdict"
+    type: "string"
+  - name: "figure"
+    type: "object"
+  - name: "citation"
+    type: "object"
+  - name: "trace"
+    type: "object[]"
+
+defaults:
+  knowledge_pack: "knowledge-pack/us-census-api-reference"
+
+steps:
+  - id: "geocode"
+    kind: "tool"
+    ref: "tool/us-census-geocoder-api"
+    inputs:
+      address: "$.inputs.place_or_address"
+      return_type: "geographies"
+    when: "$.inputs.place_or_address contains a street address"
+
+  - id: "resolve_geo"
+    kind: "processor"
+    ref: "processor/geo-fips-normalizer"
+    inputs:
+      geography_text: "$.inputs.place_or_address"
+      parent_state: "$.steps.geocode.output.geographies.state"
+
+  - id: "fetch_acs"
+    kind: "tool"
+    ref: "tool/us-census-acs-api"
+    inputs:
+      year: "$.inputs.year"
+      dataset: "acs/acs5"
+      variables: ["NAME", "B19013_001E", "B01003_001E"]
+      for_geography: "$.steps.resolve_geo.output.for_clause"
+      in_geography: "$.steps.resolve_geo.output.in_clause"
+
+  - id: "judge_claim"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.inputs.claim"
+      evidence: "$.steps.fetch_acs.output.rows"
+      rubric_ref: "rubric/census-grounded-answer-quality"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "census-grounded-demographic-verification"
+      applied_layers: ["geocode", "standardize", "api", "judge"]
+
+success_criteria:
+  - rubric: "rubric/census-grounded-answer-quality"
+    threshold: 0.8

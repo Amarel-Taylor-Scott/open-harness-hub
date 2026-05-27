@@ -1,0 +1,58 @@
+id: "processor/geo-fips-normalizer"
+type: processor
+version: "0.1.0"
+name: "Geographic identifier → FIPS normalizer"
+description: |
+  Deterministic standardization of free-text US geography references (state
+  names/abbreviations, county names, place names, ZIP/ZCTA) into canonical FIPS
+  codes and the Census `for`/`in` clauses that `tool/us-census-acs-api` needs.
+
+  Capability lift: a bare LLM guesses FIPS codes and mangles the for/in clause
+  syntax. This processor resolves them deterministically (no model call), so the
+  downstream API call is correct and replayable.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["government", "cross_industry"]
+capability: ["format_conversion", "extraction"]
+modality: ["structured", "spatial"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["standardization", "fips", "geography", "census", "normalize", "no-llm"]
+created: "2026-05-27"
+updated: "2026-05-27"
+
+process_kind: "normalize.geo_fips"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 50
+
+inputs:
+  - name: "geography_text"
+    type: "string"
+  - name: "geo_level"
+    type: "string"
+  - name: "parent_state"
+    type: "string"
+outputs:
+  - name: "fips"
+    type: "string"
+  - name: "for_clause"
+    type: "string"
+  - name: "in_clause"
+    type: "string"
+  - name: "canonical_name"
+    type: "string"
+  - name: "unresolved"
+    type: "boolean"
+
+side_effects: "none"
+on_error: "continue"
+
+implementations:
+  - kind: callable
+    language: python
+    path: "src/processors/geo_fips_normalizer.py"
+    notes: "Lookup against the Census FIPS/gazetteer tables; emits unresolved=true for ambiguous input (route to review), never a guessed code."

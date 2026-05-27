@@ -1,0 +1,50 @@
+id: "knowledge-pack/us-census-api-reference"
+type: knowledge-pack
+version: "0.1.0"
+name: "US Census API reference (ACS variables + geography hierarchy)"
+description: |
+  Grounding facts a bare LLM does not hold reliably: the exact American
+  Community Survey (ACS) variable codes (e.g. B19013_001E = median household
+  income, B01003_001E = total population) and the Census geography hierarchy +
+  `for`/`in` clause syntax used by the Census Data API.
+
+  Capability lift: models hallucinate variable codes and current figures.
+  Pairing this reference with `tool/us-census-acs-api` lets a pipeline fetch the
+  authoritative, current value and cite it, instead of guessing.
+
+  Geography hierarchy (coarse → fine): us → region → division → state → county →
+  county subdivision → tract → block group → block; plus place, ZCTA,
+  congressional district, and metropolitan/micropolitan statistical area (CBSA).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["government", "cross_industry"]
+capability: ["retrieval", "verification"]
+modality: ["structured", "tabular"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "stable"
+tags: ["census", "acs", "public-data", "grounding", "facts", "api-reference"]
+created: "2026-05-27"
+updated: "2026-05-27"
+
+attribution:
+  source_url: "https://www.census.gov/data/developers/data-sets.html"
+  source_kind: "other"
+  author: "U.S. Census Bureau"
+  license: "public-domain"
+
+content_types: ["fact_table", "reference_doc"]
+files:
+  - path: "data/census-pack/acs-key-variables.jsonl"
+    content_type: "fact_table"
+    format: "jsonl"
+    description: "Key ACS variable codes + the geography levels and their for/in clauses."
+provenance:
+  source_url: "https://api.census.gov/data.html"
+  publisher: "U.S. Census Bureau"
+  license: "public-domain"
+  freshness: "stable"
+indexing:
+  keyword: true
+  vector: true
