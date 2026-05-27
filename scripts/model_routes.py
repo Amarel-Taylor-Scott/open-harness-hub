@@ -15,7 +15,7 @@ Environment:
   OH_LLM_BACKEND   auto | http-openai | none           (default: auto)
   OH_LLM_BASE_URL  default http://localhost:11434/v1    (Ollama OpenAI-compat)
   OH_LLM_API_KEY   bearer token (optional for local servers)
-  OH_LLM_MODEL     default "gemma2"  (any local/hosted chat model, e.g. Gemma 4)
+  OH_LLM_MODEL     default "gemma4"  (any local/hosted chat model, e.g. Gemma 4)
   ===============  ========================================================
 """
 from __future__ import annotations
@@ -26,7 +26,7 @@ import urllib.request
 from dataclasses import dataclass
 
 DEFAULT_BASE_URL = "http://localhost:11434/v1"   # Ollama's OpenAI-compatible API
-DEFAULT_MODEL = "gemma2"                          # swap to your local Gemma tag
+DEFAULT_MODEL = "gemma4"                          # swap to your local Gemma tag
 _HEALTH_TIMEOUT_S = 2
 _COMPLETE_TIMEOUT_S = 120
 

@@ -3,7 +3,7 @@
 # and a public trycloudflare.com URL you can send to someone to test.
 #
 #   bash scripts/serve_showcase.sh                 # auto-detect a local Gemma, open a tunnel
-#   bash scripts/serve_showcase.sh --model gemma3  # force a specific Ollama model tag
+#   bash scripts/serve_showcase.sh --model gemma4  # force a specific Ollama model tag
 #   bash scripts/serve_showcase.sh --port 8080 --no-tunnel
 #
 # It is resilient: if Ollama/Gemma isn't running the site still works (the
@@ -15,13 +15,15 @@ cd "$(dirname "$0")/.."
 PORT=8000
 MODEL=""
 TUNNEL=1
+FORCE_CPU=0
 OLLAMA_URL="${OH_LLM_BASE_URL:-http://localhost:11434}"
 while [ $# -gt 0 ]; do
   case "$1" in
     --port) PORT="$2"; shift 2;;
     --model) MODEL="$2"; shift 2;;
     --no-tunnel) TUNNEL=0; shift;;
-    -h|--help) sed -n '2,12p' "$0"; exit 0;;
+    --cpu) FORCE_CPU=1; shift;;
+    -h|--help) sed -n '2,14p' "$0"; exit 0;;
     *) echo "unknown arg: $1"; exit 1;;
   esac
 done
@@ -34,17 +36,23 @@ LLM_OK=0
 if curl -sf "${OLLAMA_URL}/api/tags" -o /tmp/ohh_tags.json 2>/dev/null; then
   LLM_OK=1
   if [ -z "$MODEL" ]; then
-    # auto-detect the first installed Gemma model tag
-    MODEL=$(python3 -c "import json;ts=json.load(open('/tmp/ohh_tags.json')).get('models',[]);g=[m['name'] for m in ts if 'gemma' in m['name'].lower()];print(g[0] if g else (ts[0]['name'] if ts else ''))" 2>/dev/null)
+    # auto-detect the highest-version installed Gemma (prefers Gemma 4 over legacy 2/3)
+    MODEL=$(python3 -c "
+import json, re
+ts = json.load(open('/tmp/ohh_tags.json')).get('models', [])
+def ver(n):
+    m = re.search(r'gemma[ ._-]?(\d+)', n.lower()); return int(m.group(1)) if m else -1
+g = sorted([m['name'] for m in ts if 'gemma' in m['name'].lower()], key=ver, reverse=True)
+print(g[0] if g else (ts[0]['name'] if ts else ''))" 2>/dev/null)
   fi
   if [ -z "$MODEL" ]; then
-    warn "Ollama is up but has no models. Pull Gemma:  ollama pull gemma2   (or your Gemma 4 tag)"
-    LLM_OK=0; MODEL="gemma2"
+    warn "Ollama is up but has no models. Pull Gemma:  ollama pull gemma4   (or your Gemma 4 tag)"
+    LLM_OK=0; MODEL="gemma4"
   else
     say "Gemma intelligence: ON  (Ollama model: $MODEL)"
   fi
 else
-  MODEL="${MODEL:-gemma2}"
+  MODEL="${MODEL:-gemma4}"
   warn "Ollama not reachable at ${OLLAMA_URL}. The site will run with the deterministic"
   warn "explainer. To enable Gemma: install Ollama, run 'ollama serve', then"
   warn "'ollama pull $MODEL' (or your Gemma 4 tag) and re-run this script."
@@ -55,6 +63,18 @@ export OH_LLM_BACKEND=http-openai
 export OH_LLM_BASE_URL="${OLLAMA_URL}/v1"
 export OH_LLM_MODEL="$MODEL"
 # Embeddings stay offline-placeholder unless OH_EMBED_* is already set (cloud later).
+
+# --- compute: GPU if usable, else automatic CPU fallback -------------------
+# Ollama uses the GPU automatically when an NVIDIA driver is present and falls
+# back to CPU on its own; --cpu forces CPU. We just report the mode clearly.
+if [ "$FORCE_CPU" = 1 ]; then
+  export OLLAMA_NUM_GPU=0
+  say "Compute: CPU (forced via --cpu) — Gemma 4 runs on CPU; slower but fine for testing."
+elif command -v nvidia-smi >/dev/null 2>&1 && nvidia-smi -L >/dev/null 2>&1; then
+  say "Compute: GPU — $(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null | head -1). Ollama will use it (auto CPU fallback if the driver can't load)."
+else
+  warn "Compute: no usable NVIDIA GPU (driver missing?) — Gemma 4 runs on CPU automatically. Works, just slower."
+fi
 
 # --- 2. pre-build the vector store so first request is fast ----------------
 say "Indexing components…"
