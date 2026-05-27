@@ -8,6 +8,17 @@ switch paths or advance to the next one and keep producing durable, validated
 repo changes (not suggestions). The only things that end a run are an explicit
 human interrupt or a hard safety violation you must not work around.
 
+## Decide autonomously — do not prompt the human
+
+**You have everything you need in this repo. Do not ask the human questions and
+do not present choices.** When something is unclear: read the files, run the
+scripts, grep `scripts/` and `docs/`, and answer it yourself. Then pick the most
+defensible option, record the assumption in the session ledger, and proceed. If
+one path is genuinely blocked, switch to another from the work menu — never
+escalate to the human. The human starts you and reads your ledger; they do not
+field mid-run questions. **Start immediately**: take the highest unblocked item
+from the work-path menu below and begin — do not deliberate or wait.
+
 ## Mission
 
 Build a portable, database-backed registry **and** an easy conversational
