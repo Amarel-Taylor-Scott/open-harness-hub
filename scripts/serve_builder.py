@@ -35,10 +35,23 @@ from scripts.model_routes import resolve_route
 
 _TOKEN_RE = re.compile(r"[a-z0-9][a-z0-9_.+-]{1,40}")
 # Order in which an assembled flow is presented (rough pre-LLM -> model -> post).
-FLOW_ORDER = [
-    "persona", "knowledge-pack", "rule-pack", "tool", "processor", "harness",
-    "adapter", "logic-pack", "pattern", "pipeline", "rubric", "benchmark", "dataset",
-]
+# Stage-ordered flow (input → … → output). Each component type maps to a stage.
+STAGE_ORDER = ["Persona", "Knowledge / RAG", "Rules (deterministic)", "Tools",
+               "Processors", "Model (harness)", "Backbone pipeline", "Evaluate"]
+TYPE_STAGE = {
+    "persona": "Persona",
+    "knowledge-pack": "Knowledge / RAG", "logic-pack": "Knowledge / RAG",
+    "rule-pack": "Rules (deterministic)",
+    "tool": "Tools",
+    "processor": "Processors", "pattern": "Processors",
+    "harness": "Model (harness)", "adapter": "Model (harness)",
+    "pipeline": "Backbone pipeline",
+    "rubric": "Evaluate", "benchmark": "Evaluate", "dataset": "Evaluate",
+}
+# Caps for a COHERENT flow — one persona, one model harness, one backbone, etc.
+STAGE_CAPS = {"persona": 1, "knowledge-pack": 2, "logic-pack": 1, "rule-pack": 2,
+              "tool": 2, "processor": 1, "pattern": 1, "harness": 1, "adapter": 1,
+              "pipeline": 1, "rubric": 1, "benchmark": 1, "dataset": 1}
 ROLE_BLURB = {
     "persona": "frames the role the model adopts",
     "knowledge-pack": "grounds answers in citeable facts (retrieval)",
@@ -54,10 +67,19 @@ ROLE_BLURB = {
     "benchmark": "proves the capability lift vs a bare model",
     "dataset": "labeled inputs/outputs for evaluation",
 }
+# Stopwords: matching on these ("and/for/the/risk") produced nonsense selections.
+STOPWORDS = {
+    "the", "and", "for", "with", "that", "this", "from", "into", "your", "you", "are",
+    "use", "using", "get", "via", "per", "out", "all", "any", "can", "has", "have",
+    "of", "to", "in", "on", "is", "it", "as", "by", "or", "be", "at", "we", "an", "a",
+    "task", "build", "make", "create", "run", "then", "when", "each", "its", "their",
+    "based", "given", "following", "appropriate", "most", "more", "less",
+}
+RELEVANCE_FLOOR = 0.18  # below this a candidate is off-topic noise — drop it
 
 
 def _tokens(text: str) -> set[str]:
-    return set(_TOKEN_RE.findall(text.lower()))
+    return {t for t in _TOKEN_RE.findall(text.lower()) if len(t) >= 3 and t not in STOPWORDS}
 
 
 class Index:
@@ -94,90 +116,212 @@ class Index:
                 "vec": json.loads(emb), "labels": self.labels.get(sid, []),
             })
 
-    def search(self, task: str, k: int = 40) -> list[dict]:
+    def search(self, task: str, k: int = 24) -> list[dict]:
         qtok = _tokens(task)
         qvec = self.backend.embed_one(task)
+        semantic = self.backend.promotable  # real embeddings → trust the vector
         out = []
         for it in self.items:
-            lex = len(qtok & it["tokens"]) / (len(qtok) + 1)         # keyword overlap
-            vec = sum(a * b for a, b in zip(qvec, it["vec"]))         # cosine (both L2)
-            lab = 0.05 * len(set(it["labels"]) & qtok)               # label boost
-            score = 0.6 * lex + 0.35 * max(0.0, vec) + lab
-            if score > 0:
-                shared = sorted(qtok & it["tokens"])[:6]
-                out.append({**{x: it[x] for x in ("id", "type", "name", "desc", "labels")},
-                            "score": round(score, 4), "matched": shared})
+            lex = len(qtok & it["tokens"]) / (len(qtok) + 1)         # stopword-filtered overlap
+            vec = max(0.0, sum(a * b for a, b in zip(qvec, it["vec"])))  # cosine (both L2)
+            lab = 0.04 * len(set(it["labels"]) & qtok)               # label boost
+            # With real embeddings the vector leads; offline (hash) lean on keywords.
+            score = (0.72 * vec + 0.24 * lex + lab) if semantic else (0.30 * vec + 0.65 * lex + lab)
+            shared = sorted(qtok & it["tokens"])[:6]
+            out.append({**{x: it[x] for x in ("id", "type", "name", "desc", "labels")},
+                        "score": round(score, 4), "vec": round(vec, 4), "matched": shared})
         out.sort(key=lambda r: r["score"], reverse=True)
         return out[:k]
 
 
-def assemble_flow(candidates: list[dict]) -> dict:
-    by_type: dict[str, list[dict]] = {}
-    for c in candidates:
-        by_type.setdefault(c["type"], []).append(c)
-    caps = {"persona": 1, "knowledge-pack": 2, "rule-pack": 2, "tool": 3, "processor": 2,
-            "harness": 2, "adapter": 1, "logic-pack": 1, "pattern": 2, "pipeline": 1,
-            "rubric": 1, "benchmark": 1, "dataset": 1}
-    flow = []
-    for t in FLOW_ORDER:
-        for c in by_type.get(t, [])[:caps.get(t, 1)]:
-            flow.append({**c, "role": ROLE_BLURB.get(t, "")})
-    return {"steps": flow, "by_type_counts": {t: len(v) for t, v in sorted(by_type.items())}}
+def _coherent_select(candidates: list[dict]) -> list[dict]:
+    """Deterministic fallback: relevance floor + per-type caps, ordered by stage."""
+    kept_by_type: dict[str, list[dict]] = {}
+    for c in sorted(candidates, key=lambda r: r["score"], reverse=True):
+        if c["score"] < RELEVANCE_FLOOR:
+            continue
+        bucket = kept_by_type.setdefault(c["type"], [])
+        if len(bucket) < STAGE_CAPS.get(c["type"], 1):
+            bucket.append(c)
+    flat = [c for t in TYPE_STAGE for c in kept_by_type.get(t, [])]
+    return [{**c, "stage": TYPE_STAGE.get(c["type"], "Processors"),
+             "role": ROLE_BLURB.get(c["type"], "")} for c in flat]
 
 
-def estimate_cost(flow: dict) -> dict:
-    n_model = sum(1 for s in flow["steps"] if s["type"] in {"harness", "pipeline"})
-    n_rules = sum(1 for s in flow["steps"] if s["type"] in {"rule-pack", "processor"})
+def _parse_keep(raw: str) -> list[str]:
+    import re as _re
+    m = _re.search(r"\{.*\}", raw, _re.DOTALL)
+    if not m:
+        return []
+    try:
+        obj = json.loads(m.group(0))
+        return [str(x) for x in (obj.get("keep") or []) if isinstance(x, str)]
+    except Exception:
+        return []
+
+
+def orchestrate(task: str, candidates: list[dict], route) -> tuple[list[dict], list[dict], bool]:
+    """Pick the coherent, on-topic subset. An LLM prunes off-domain candidates
+    (e.g. a drug-interaction pack for an ESG task) and one-of-each-stage; falls
+    back to deterministic selection. Returns (kept, dropped, used_llm)."""
+    floored = [c for c in candidates if c["score"] >= RELEVANCE_FLOOR]
+    deterministic = _coherent_select(candidates)
+
+    def _det_result():
+        kept_ids = {c["id"] for c in deterministic}
+        dropped = [{"id": c["id"], "name": c["name"], "type": c["type"]}
+                   for c in candidates if c["id"] not in kept_ids][:8]
+        return deterministic, dropped, False
+
+    if not floored or not route.health():
+        return _det_result()
+
+    listing = "\n".join(f"- {c['id']} [{c['type']}] {c['name']}" for c in floored)
+    system = (
+        "You are the Open Harness Hub orchestrator. From the CANDIDATES, keep ONLY components "
+        "genuinely relevant to the user's task and DROP off-domain ones (wrong industry, modality, "
+        "or purpose). Build ONE coherent pipeline: at most one persona, one model harness, one "
+        "backbone pipeline, 1-2 knowledge packs, 1-2 rule packs, 1-2 tools, one rubric. "
+        "Return ONLY JSON: {\"keep\":[\"id\",...],\"drop\":[{\"id\":\"id\",\"why\":\"...\"}]}. "
+        "Use only ids from the list."
+    )
+    keep_ids = _parse_keep(route.complete(system, f"Task: {task}\n\nCANDIDATES:\n{listing}", max_tokens=2048) or "")
+    if not keep_ids:
+        return _det_result()
+
+    by_id = {c["id"]: c for c in candidates}
+    chosen, counts = [], {}
+    for cid in keep_ids:
+        c = by_id.get(cid)
+        if not c or counts.get(c["type"], 0) >= STAGE_CAPS.get(c["type"], 1):
+            continue
+        counts[c["type"]] = counts.get(c["type"], 0) + 1
+        chosen.append({**c, "stage": TYPE_STAGE.get(c["type"], "Processors"),
+                       "role": ROLE_BLURB.get(c["type"], "")})
+    if not chosen:
+        return _det_result()
+    chosen.sort(key=lambda c: STAGE_ORDER.index(c["stage"]) if c["stage"] in STAGE_ORDER else 99)
+    kept_ids = {c["id"] for c in chosen}
+    dropped = [{"id": c["id"], "name": c["name"], "type": c["type"]}
+               for c in floored if c["id"] not in kept_ids][:8]
+    return chosen, dropped, True
+
+
+def flowchart(kept: list[dict]) -> list[dict]:
+    """Group kept components into ordered stages: Input → … → Output."""
+    chart = [{"stage": "Input", "components": [
+        {"id": "user task", "type": "input", "name": "User task", "role": "plain-language description"}]}]
+    for stage in STAGE_ORDER:
+        comps = [{"id": c["id"], "type": c["type"], "name": c["name"], "role": c["role"]}
+                 for c in kept if c.get("stage") == stage]
+        if comps:
+            chart.append({"stage": stage, "components": comps})
+    chart.append({"stage": "Output", "components": [
+        {"id": "result", "type": "output", "name": "Costed, deployable flow", "role": "validated result + trace"}]})
+    return chart
+
+
+def estimate_cost(kept: list[dict]) -> dict:
+    n_model = sum(1 for s in kept if s["type"] in {"harness", "pipeline", "adapter"})
+    n_rules = sum(1 for s in kept if s["type"] in {"rule-pack", "processor"})
     return {
-        "cheap":    {"per_task_usd": "0.00–0.02", "how": f"local model + {n_rules} deterministic gate(s) run first; model only on the residual"},
-        "balanced": {"per_task_usd": "0.01–0.10", "how": f"small hosted model for {n_model} model step(s); rules/retrieval pre-filter"},
+        "cheap":    {"per_task_usd": "0.00–0.02", "how": f"local model + {n_rules} deterministic gate(s) first; model only on the residual"},
+        "balanced": {"per_task_usd": "0.01–0.10", "how": f"small hosted model for {max(1, n_model)} model step(s); rules/retrieval pre-filter"},
         "quality":  {"per_task_usd": "0.10–0.60", "how": "frontier model on the final step; full retrieval + review gate"},
         "note": "Illustrative; calibrate against real runs. Rules/retrieval before the model is the main lever.",
     }
 
 
-def deterministic_narrative(task: str, flow: dict, cost: dict) -> str:
-    parts = [f"For your task, I composed a flow of {len(flow['steps'])} components:"]
-    for s in flow["steps"]:
-        parts.append(f" • {s['type']}/{s['id'].split('/')[-1]} — {s['role']}.")
-    parts.append("Deterministic rules and retrieval run before the model to cut cost; "
-                 "swap the model via the adapter without touching the rest. "
-                 f"Estimated cost ~{cost['balanced']['per_task_usd']} per task (balanced). "
-                 "Refine with: \"make it cheaper\" (force local model + more rules-first) or "
-                 "\"stricter\" (add a review gate + tighter rubric).")
+def deterministic_narrative(task: str, kept: list[dict], cost: dict) -> str:
+    parts = [f"Composed a coherent flow of {len(kept)} components:"]
+    for s in kept:
+        parts.append(f" • [{s.get('stage', '')}] {s['type']}/{s['id'].split('/')[-1]} — {s['role']}.")
+    parts.append("Deterministic rules and retrieval run before the model to cut cost; swap the "
+                 f"model via the harness/adapter. Estimated ~{cost['balanced']['per_task_usd']}/task "
+                 "(balanced). Refine: \"cheaper\" (local model + more rules-first) or "
+                 "\"stricter\" (review gate + tighter rubric).")
     return "\n".join(parts)
 
 
-def llm_narrative(task: str, flow: dict, cost: dict) -> tuple[str, bool]:
+def llm_narrative(task: str, kept: list[dict], cost: dict) -> tuple[str, bool]:
     route = resolve_route()
-    if not route.health():
-        return deterministic_narrative(task, flow, cost), False
-    comp_lines = "\n".join(f"- {s['type']}/{s['id'].split('/')[-1]}: {s['role']}" for s in flow["steps"])
-    system = ("You are the Open Harness Hub builder. Explain, in 4–6 sentences, the assembled "
-              "pipeline of EXISTING components for the user's task: what each layer does, why "
-              "rules/retrieval run before the model to cut cost, and how to swap the model. "
-              "Then give two one-line refinements (cheaper / stricter). Do not invent components.")
-    user = f"Task: {task}\n\nAssembled components:\n{comp_lines}\n\nBalanced cost ~{cost['balanced']['per_task_usd']}/task."
-    # Headroom matters: reasoning models (e.g. Gemma 4) spend tokens "thinking"
-    # before any visible content, so a low cap returns an empty answer.
+    if not route.health() or not kept:
+        return deterministic_narrative(task, kept, cost), False
+    comp_lines = "\n".join(f"- [{s.get('stage', '')}] {s['type']}/{s['id'].split('/')[-1]}: {s['role']}" for s in kept)
+    system = ("You are the Open Harness Hub builder. In 4-6 sentences, explain the assembled "
+              "pipeline of these EXISTING components for the task: the flow from input through "
+              "persona, retrieval, deterministic rules, tools, the model harness, to evaluation; "
+              "why rules/retrieval run before the model to cut cost; and how to swap the model. "
+              "Then two one-line refinements (cheaper / stricter). Mention ONLY the listed components.")
+    user = f"Task: {task}\n\nFlow (in order):\n{comp_lines}\n\nBalanced cost ~{cost['balanced']['per_task_usd']}/task."
     text = route.complete(system, user, max_tokens=2048)
-    return (text.strip(), True) if text and text.strip() else (deterministic_narrative(task, flow, cost), False)
+    return (text.strip(), True) if text and text.strip() else (deterministic_narrative(task, kept, cost), False)
 
 
 def build_flow(task: str, index: Index) -> dict:
-    candidates = index.search(task, k=40)
-    flow = assemble_flow(candidates)
-    cost = estimate_cost(flow)
-    narrative, llm_used = llm_narrative(task, flow, cost)
+    route = resolve_route()
+    candidates = index.search(task, k=24)
+    kept, dropped, sel_llm = orchestrate(task, candidates, route)
+    cost = estimate_cost(kept)
+    narrative, narr_llm = llm_narrative(task, kept, cost)
     return {
         "task": task,
-        "flow": flow,
+        "flow": {"steps": kept, "stages": flowchart(kept), "dropped": dropped},
         "cost": cost,
         "narrative": narrative,
-        "llm_used": llm_used,
-        "top_matches": candidates[:8],
+        "llm_used": (sel_llm or narr_llm),
+        "selection_by_model": sel_llm,
         "embedding": describe_backend(),
     }
+
+
+# --------------------------------------------------------------------------- #
+# Export / standardize: assembled flow -> portable OHH pipeline component
+# --------------------------------------------------------------------------- #
+_STEP_KIND = {
+    "knowledge-pack": "knowledge_pack", "logic-pack": "knowledge_pack",
+    "rule-pack": "rule_pack", "tool": "tool", "processor": "processor",
+    "harness": "harness", "adapter": "adapter", "pipeline": "pipeline",
+}
+
+
+def _slugify(text: str) -> str:
+    return (re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")[:48].strip("-")) or "assembled-flow"
+
+
+def export_flow(result: dict) -> dict:
+    """Standardize the assembled flow as a portable Open Harness Hub *pipeline*
+    component — the catalog's canonical format — so a builder output round-trips
+    back into the registry as a reusable, schema-validatable component. Per-
+    component exports (MCP, Croissant, HF card, SPDX, …) live in scripts/emit/."""
+    task = result["task"]
+    steps, defaults, success = [], {}, []
+    for c in result["flow"]["steps"]:
+        t = c["type"]
+        if t == "persona":
+            defaults["persona"] = c["id"]
+        elif t == "rubric":
+            success.append({"rubric": c["id"], "threshold": 0.7})
+        elif t in _STEP_KIND:
+            steps.append({"id": c["id"].split("/")[-1], "kind": _STEP_KIND[t], "ref": c["id"]})
+    spec = {
+        "id": f"pipeline/{_slugify(task)}",
+        "type": "pipeline",
+        "version": "0.1.0",
+        "name": f"Assembled flow: {task[:56]}",
+        "description": f"Auto-assembled by the Open Harness Hub builder for: {task}",
+        "authors": [{"name": "Open Harness Hub builder"}],
+        "license": "MIT",
+        "tags": ["assembled", "builder-export"],
+        "task": task,
+        "pipeline_kind": "assembled",
+        "steps": steps or [{"id": "review", "kind": "harness", "ref": "harness/text-safety-review"}],
+    }
+    if defaults:
+        spec["defaults"] = defaults
+    if success:
+        spec["success_criteria"] = success
+    return spec
 
 
 # --------------------------------------------------------------------------- #
@@ -204,6 +348,12 @@ button:disabled{opacity:.5;cursor:wait}
 .badge{font-size:11px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--acc);min-width:118px}
 .sid{font-weight:600}.role{color:var(--mut);font-size:13.5px}
 .matched{color:var(--good);font-size:12px}
+.fc{display:flex;flex-direction:column}
+.stage{border:1px solid var(--line);border-radius:9px;padding:8px 12px;background:#11161d}
+.stage>.lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--acc);margin-bottom:5px}
+.stage .comp{font-size:13.5px;padding:3px 0}.stage .comp .cn{font-weight:600}.stage .comp .ci{color:var(--mut);font-size:12px}
+.arrow{align-self:center;color:var(--mut);font-size:15px;margin:3px 0}
+.dropped{color:var(--mut);font-size:12.5px;margin-top:10px;border-top:1px dashed var(--line);padding-top:8px}
 .costs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .cost{border:1px solid var(--line);border-radius:9px;padding:10px}.cost b{color:var(--acc)}
 pre.narr{white-space:pre-wrap;background:transparent;color:var(--fg);margin:0;font:inherit}
@@ -235,13 +385,22 @@ async function build(){const t=task.value.trim();if(!t)return;go.disabled=true;s
  try{const r=await (await fetch('/api/build?task='+encodeURIComponent(t))).json();render(r)}catch(e){out.innerHTML='<div class=card>Error: '+esc(''+e)+'</div>'}
  go.disabled=false;status.textContent='';}
 function render(r){let h='';
- h+='<div class=card><h3>Assembled flow ('+r.flow.steps.length+' components)</h3>';
- r.flow.steps.forEach(s=>{h+='<div class=step><span class=badge>'+esc(s.type)+'</span><div><div class=sid>'+esc(s.name)+' <span class=muted>'+esc(s.id)+'</span></div><div class=role>'+esc(s.role)+(s.matched&&s.matched.length?' · <span class=matched>matches: '+s.matched.map(esc).join(', ')+'</span>':'')+'</div></div></div>'});
+ h+='<div class=card><h3>Pipeline flow '+(r.selection_by_model?'<span class=muted>(orchestrated by local model)</span>':'<span class=muted>(deterministic)</span>')+'</h3><div class=fc>';
+ r.flow.stages.forEach((st,i)=>{
+   h+='<div class=stage><div class=lbl>'+esc(st.stage)+'</div>';
+   st.components.forEach(c=>{h+='<div class=comp><span class=cn>'+esc(c.name)+'</span> <span class=ci>'+esc(c.id)+'</span><div class=role>'+esc(c.role||'')+'</div></div>'});
+   h+='</div>';
+   if(i<r.flow.stages.length-1)h+='<div class=arrow>↓</div>';
+ });
  h+='</div>';
+ if(r.flow.dropped&&r.flow.dropped.length){h+='<div class=dropped>Pruned as off-topic: '+r.flow.dropped.map(d=>esc(d.id||d)).join(', ')+'</div>';}
+ h+='</div>';
+ var et=encodeURIComponent(r.task);
+ h+='<div class=card><h3>Export &amp; standardize</h3><a href="/api/export?format=yaml&task='+et+'">⬇ Open Harness Hub pipeline (YAML)</a> · <a href="/api/export?format=json&task='+et+'">JSON</a><div class=muted style=margin-top:6px>Standard catalog format — round-trips into the registry as a reusable component. Per-component exports (MCP · Croissant · HF card · SPDX · lm-eval · …) via scripts/emit/.</div></div>';
  h+='<div class=card><h3>Cost profile (per task)</h3><div class=costs>';
  ['cheap','balanced','quality'].forEach(k=>{h+='<div class=cost><b>'+k+'</b><br>$'+esc(r.cost[k].per_task_usd)+'<br><span class=muted>'+esc(r.cost[k].how)+'</span></div>'});
  h+='</div><div class=muted style=margin-top:8px>'+esc(r.cost.note)+'</div></div>';
- h+='<div class=card><h3>Why this flow '+(r.llm_used?'<span class=muted>(explained by local model)</span>':'<span class=muted>(deterministic)</span>')+'</h3><pre class=narr>'+esc(r.narrative)+'</pre></div>';
+ h+='<div class=card><h3>Why this flow '+(r.llm_used?'<span class=muted>(local model)</span>':'<span class=muted>(deterministic)</span>')+'</h3><pre class=narr>'+esc(r.narrative)+'</pre></div>';
  out.innerHTML=h;}
 go.onclick=build;health();
 </script></body></html>"""
@@ -274,6 +433,26 @@ class Handler(BaseHTTPRequestHandler):
                 return
             result = build_flow(task, self.index)
             self._send(200, json.dumps(result).encode(), "application/json")
+        elif parsed.path == "/api/export":
+            qs = parse_qs(parsed.query)
+            task = (qs.get("task") or [""])[0]
+            fmt = (qs.get("format") or ["yaml"])[0]
+            if not task.strip():
+                self._send(400, b'{"error":"task required"}', "application/json")
+                return
+            spec = export_flow(build_flow(task, self.index))
+            slug = spec["id"].split("/")[-1]
+            if fmt == "json":
+                self._send(200, json.dumps(spec, indent=2).encode(), "application/json")
+            else:
+                import yaml as _yaml
+                body = _yaml.safe_dump(spec, sort_keys=False, allow_unicode=True).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "text/yaml; charset=utf-8")
+                self.send_header("Content-Disposition", f'attachment; filename="{slug}.yaml"')
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
         else:
             self._send(404, b"not found", "text/plain")
 
@@ -293,17 +472,20 @@ def serve(port: int = 8000) -> None:
 def _self_test() -> int:
     idx = Index()
     assert idx.items, "no components loaded"
-    res = build_flow("screen suppliers for forced labor and cite regulations", idx)
+    res = build_flow("screen supplier disclosures for forced labor and cite regulations", idx)
     assert res["flow"]["steps"], "empty flow"
     assert res["cost"]["balanced"]["per_task_usd"]
     print(json.dumps({
         "ok": True, "components": len(idx.items),
         "embedding_backend": idx.backend.name, "promotable": idx.backend.promotable,
-        "flow_size": len(res["flow"]["steps"]),
-        "llm_used": res["llm_used"],
-        "flow_types": res["flow"]["by_type_counts"],
-        "top": [f"{m['type']}/{m['id'].split('/')[-1]} ({m['score']})" for m in res["top_matches"][:5]],
+        "selection_by_model": res["selection_by_model"], "llm_used": res["llm_used"],
+        "stages": [s["stage"] for s in res["flow"]["stages"]],
+        "kept": [f"{s['type']}/{s['id'].split('/')[-1]}" for s in res["flow"]["steps"]],
+        "dropped": [d["id"] for d in res["flow"]["dropped"]],
     }, indent=2))
+    spec = export_flow(res)
+    assert spec["type"] == "pipeline" and spec["steps"], "export produced no pipeline"
+    print("export OK → pipeline/" + spec["id"].split("/")[-1] + " with " + str(len(spec["steps"])) + " steps")
     return 0
 
 
