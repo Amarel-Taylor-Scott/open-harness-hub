@@ -33,6 +33,28 @@ button:disabled{opacity:.5;cursor:wait}
 pre.narr{white-space:pre-wrap;background:transparent;color:var(--fg);margin:0;font:inherit}
 .muted{color:var(--mut);font-size:12.5px}h3{margin:0 0 8px;font-size:15px}
 a{color:var(--acc)}
+.legend{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 2px}
+.legend .lgh{width:100%;font-size:12px;color:var(--mut);margin-bottom:2px}
+.legend .lg{font-size:11px;display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:16px;padding:2px 9px;background:var(--panel);cursor:help}
+.legend .sw{width:10px;height:10px;border-radius:3px;display:inline-block}
+.dag{display:flex;flex-direction:column;align-items:center;margin:8px 0 2px}
+.node{width:min(560px,100%);background:#11161d;border:1px solid var(--line);border-left:5px solid var(--nc,#8b949e);border-radius:10px;padding:9px 13px}
+.node .pl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--nc,#8b949e)}
+.node .nn{font-weight:600;font-size:14px;margin-top:1px}
+.node .ni{color:var(--mut);font-size:11.5px;font-family:ui-monospace,SFMono-Regular,monospace}
+.node .nr{color:var(--mut);font-size:12.5px;margin-top:2px}
+.node .sub{display:inline-block;font-size:10px;font-weight:700;color:#0d1117;border-radius:5px;padding:0 6px;margin-left:7px;vertical-align:1px}
+.wire{width:2px;height:18px;background:var(--line);position:relative}
+.wire:after{content:"▼";position:absolute;bottom:-6px;left:-5px;color:var(--line);font-size:10px}
+.cond{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;width:min(560px,100%)}
+.cond .node{flex:1 1 210px;width:auto}
+.combine{font-size:11.5px;font-weight:700;color:var(--acc);border:1px dashed var(--acc);border-radius:16px;padding:3px 13px;margin-top:7px}
+.combine small{color:var(--mut);font-weight:400}
+.leafrow{display:flex;gap:7px;align-items:center;width:min(560px,100%);margin:7px 0 0 32px}
+.leafrow .node{flex:1;width:auto}
+.leafarm{color:var(--mut);font-size:17px;line-height:1}
+.node.leaf{border-style:dashed;opacity:.92}
+.node.leaf .pl:after{content:" · leaf · off critical path";color:var(--mut);font-weight:400;text-transform:none;letter-spacing:0}
 </style></head><body>
 <header><h1>Open Harness Hub <span style="color:var(--acc)">·</span> paste a task, get a flow</h1>
 <div style="margin:6px 0 2px;font-size:13.5px"><a href="/" style="color:var(--acc);font-weight:600;margin-right:14px;text-decoration:none">Build a flow</a><a href="/browse" style="color:var(--acc);font-weight:600;text-decoration:none">Browse components →</a></div>
@@ -42,16 +64,22 @@ a{color:var(--acc)}
 <div class=chips id=examples></div>
 <div class=row><button id=go>Build pipeline</button><span class=muted id=status></span></div>
 <div id=banner></div>
+<div class=legend id=legend></div>
 <div id=out></div>
 </main>
 <script>
 const EX=["Detect human-trafficking indicators in a recruitment ad and route to the right hotline with citations",
 "Screen a labor-recruitment contract for modern-slavery and debt-bondage red flags against ILO indicators",
 "Flag predatory overcharging and illegal recruitment fees in a migrant worker's pay statement",
+"Inspect a building permit: flag approved-vs-actual floor count and missing engineer sign-off, route to the building official",
 "Aggregate beneficial ownership under the OFAC 50% Rule to decide if an unlisted entity is blocked",
 "Classify a CVE: derive its CVSS v3.1 vector and map it to the correct CWE",
 "Triage acute malnutrition from MUAC and bilateral oedema under the CMAM protocol",
-"Validate an HGVS variant string and map it to current ClinVar clinical significance"];
+"Validate an HGVS variant string and map it to current ClinVar clinical significance",
+"Guide a blind user with on-device vision: describe the scene, read text with offline OCR, warn of hazards",
+"Build an offline village tutor in Marathi on a low-end phone with no internet",
+"Give offline disaster-survival first aid (flood, fire, earthquake, CPR) when the network is down",
+"Route an on-device model request: try local CPU, then a local-GPU server, else a cloud model"];
 const exDiv=document.getElementById('examples');
 EX.forEach(t=>{const c=document.createElement('span');c.className='chip';c.textContent=t;c.onclick=()=>{task.value=t;build()};exDiv.appendChild(c)});
 const task=document.getElementById('task'),go=document.getElementById('go'),out=document.getElementById('out'),status=document.getElementById('status'),banner=document.getElementById('banner');
@@ -68,16 +96,31 @@ async function build(){const t=task.value.trim();if(!t)return;go.disabled=true;s
    render(await resp.json());
  }catch(e){out.innerHTML='<div class=card>Error: '+esc(''+e)+'<div class=muted style=margin-top:6px>If this says "stale", your browser tab is pointing at an old (ephemeral) tunnel URL — reload the current one.</div></div>'}
  go.disabled=false;status.textContent='';}
+const STAGE_COLOR={"Input":"#8b949e","Knowledge Corpus":"#3fb950","If Statements":"#d29922","Actions":"#fb7714","Flow / Loops":"#a371f7","Stop/End":"#f85149","Output":"#58a6ff"};
+async function loadMeta(){try{const p=await(await fetch('/api/primitives')).json();
+  let h='<span class=lgh>The 7 primitives — every component is one of these (hover for subtypes):</span>';
+  p.forEach(x=>{const col=STAGE_COLOR[x.stage]||'#8b949e';const subs=(x.subtypes&&x.subtypes.length)?(' — subtypes: '+x.subtypes.join(', ')):'';
+    h+='<span class=lg title="'+esc((x.description||'')+subs)+'"><span class=sw style="background:'+col+'"></span>'+esc(x.label)+'</span>';});
+  document.getElementById('legend').innerHTML=h;}catch(e){}}
+function node(c,stage){const col=STAGE_COLOR[stage]||'#8b949e';
+  const showId=c.id&&c.id!=='result'&&String(c.id).indexOf('input-')!==0;
+  return '<div class="node'+(c.branch==='leaf'?' leaf':'')+'" style="--nc:'+col+'"><div class=pl>'+esc(stage)+(c.subtype?'<span class=sub style="background:'+col+'">'+esc(c.subtype)+'</span>':'')+'</div><div class=nn>'+esc(c.name)+'</div>'+(showId?'<div class=ni>'+esc(c.id)+'</div>':'')+(c.role?'<div class=nr>'+esc(c.role)+'</div>':'')+'</div>';}
+function dag(stages){let h='';stages.forEach((st,i)=>{
+  const mains=st.components.filter(c=>c.branch!=='leaf'),leaves=st.components.filter(c=>c.branch==='leaf');
+  if(st.combine&&mains.length>=2){
+    h+='<div class=cond>'+mains.map(c=>node(c,st.stage)).join('')+'</div>';
+    h+='<div class=combine>'+esc(st.combine)+' <small>— if any condition matches, run the next action</small></div>';
+  }else{mains.forEach((c,j)=>{h+=node(c,st.stage);if(j<mains.length-1)h+='<div class=wire></div>';});}
+  leaves.forEach(c=>{h+='<div class=leafrow><span class=leafarm>↳</span>'+node(c,st.stage)+'</div>';});
+  if(i<stages.length-1)h+='<div class=wire></div>';
+ });return h;}
 function render(r){let h='';
- h+='<div class=card><h3>Pipeline flow '+(r.selection_by_model?'<span class=muted>(orchestrated by local model)</span>':'<span class=muted>(deterministic)</span>')+'</h3><div class=fc>';
- r.flow.stages.forEach((st,i)=>{
-   h+='<div class=stage><div class=lbl>'+esc(st.stage)+'</div>';
-   st.components.forEach(c=>{h+='<div class=comp><span class=cn>'+esc(c.name)+'</span> <span class=ci>'+esc(c.id)+'</span><div class=role>'+esc(c.role||'')+'</div></div>'});
-   h+='</div>';
-   if(i<r.flow.stages.length-1)h+='<div class=arrow>↓</div>';
- });
- h+='</div>';
+ h+='<div class=card><h3>Pipeline flow '+(r.selection_by_model?'<span class=muted>(orchestrated by local model)</span>':'<span class=muted>(deterministic)</span>')+'</h3>';
+ h+='<div class=muted style="margin:-2px 0 8px">Built for your task: '+esc(r.task)+'</div>';
+ h+='<div class=dag>'+dag(r.flow.stages)+'</div>';
  if(r.flow.dropped&&r.flow.dropped.length){h+='<div class=dropped>Pruned as off-topic: '+r.flow.dropped.map(d=>esc(d.id||d)).join(', ')+'</div>';}
+ const an=r.flow.analysis||{};const un=an.undermatched||[],ov=an.overmatched||[];
+ if(un.length||ov.length){h+='<div class=dropped>'+un.map(u=>'⚠ under-matched: '+esc(u)).concat(ov.map(o=>'⚠ over-matched: '+esc(o))).join('<br>')+'</div>';}
  h+='</div>';
  var et=encodeURIComponent(r.task);
  h+='<div class=card><h3>Export &amp; standardize</h3><a href="/api/export?format=yaml&task='+et+TQ+'">⬇ Open Harness Hub pipeline (YAML)</a> · <a href="/api/export?format=json&task='+et+TQ+'">JSON</a><div class=muted style=margin-top:6px>Standard catalog format — round-trips into the registry as a reusable component. Per-component exports (MCP · Croissant · HF card · SPDX · lm-eval · …) via scripts/emit/.</div></div>';
@@ -86,7 +129,7 @@ function render(r){let h='';
  h+='</div><div class=muted style=margin-top:8px>'+esc(r.cost.note)+'</div></div>';
  h+='<div class=card><h3>Why this flow '+(r.llm_used?'<span class=muted>(local model)</span>':'<span class=muted>(deterministic)</span>')+'</h3><pre class=narr>'+esc(r.narrative)+'</pre></div>';
  out.innerHTML=h;}
-go.onclick=build;health();
+go.onclick=build;health();loadMeta();
 </script></body></html>"""
 
 

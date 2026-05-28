@@ -11,7 +11,7 @@ import re
 
 from scripts.embeddings import describe_backend
 from scripts.model_routes import resolve_route
-from scripts.primitives import STAGE_ORDER, label_for_type, stage_for_type
+from scripts.primitives import STAGE_ORDER, IfStatement, label_for_type, stage_for_type
 from scripts.showcase.index import Index
 
 # Per-stage assembly caps (functional config, keyed by schema type).
@@ -98,17 +98,131 @@ def orchestrate(task: str, candidates: list[dict], route) -> tuple[list[dict], l
     return chosen, dropped, True
 
 
-def flowchart(kept: list[dict]) -> list[dict]:
-    """Group kept components into ordered stages: Input → … → Output."""
-    chart = [{"stage": "Input", "components": [
-        {"id": "user task", "type": "input", "name": "User task", "role": "plain-language description"}]}]
+# --- Input/Output inference + node typing (so the diagram models the RUNTIME
+# flow — the recruitment ad / pay statement it consumes — not the build query) -
+_INPUT_CUES = [
+    r"\btriage\s+([\w'’/+%-]+(?:\s+[\w'’/+%-]+){0,3})",
+    r"\b(?:screen|classify|validate|analy[sz]e|review|parse|read|extract)\s+(?:a|an|the)?\s*([\w'’/+%-]+(?:\s+[\w'’/+%-]+){0,3})",
+    r"\bin\s+(?:a|an|the)\s+([\w'’/+%-]+(?:\s+[\w'’/+%-]+){0,3})",
+    r"\bfrom\s+(?:a|an|the)?\s*([\w'’/+%-]+(?:\s+[\w'’/+%-]+){0,3})",
+    r"\bif\s+(?:a|an|the)\s+([\w'’/+%-]+(?:\s+[\w'’/+%-]+){0,3})",
+]
+_INPUT_STOP = {"and", "or", "to", "for", "with", "under", "against", "that", "which", "into", "by",
+               "is", "are", "be", "then", "so", "using", "via", "on", "at", "of", "from", "in",
+               "a", "an", "the", "its", "it"}
+_LEAF_KEYWORDS = ("escalate", "human-review", "human_review", "review-queue", "review_queue",
+                  "notify", "alert", "audit", "handoff", "page-on-call", "log-")
+
+
+def infer_input(task: str) -> dict:
+    """The artifact the assembled pipeline CONSUMES at runtime (the recruitment
+    ad / pay statement / variant string), not the plain-language task itself."""
+    low = task.lower()
+    artifact = ""
+    for pat in _INPUT_CUES:
+        m = re.search(pat, low)
+        if not m:
+            continue
+        s, e = m.span(1)
+        out: list[str] = []
+        for w in task[s:e].split():
+            if w.lower().strip(".,:;") in _INPUT_STOP:
+                break
+            out.append(w)
+        cand = " ".join(out).strip(" -.,:;")
+        if len(cand) >= 3:
+            artifact = cand
+            break
+    if not artifact:
+        return {"id": "input-text", "type": "input", "name": "Input text",
+                "role": "the text/document the pipeline runs on", "branch": "main", "subtype": "Input"}
+    a = artifact.lower()
+    itype = ("string" if "string" in a else
+             "record" if any(k in a for k in ("entity", "record", "variant", "cve", "ownership")) else
+             "image" if any(k in a for k in ("image", "photo", "scan", "x-ray", "xray")) else
+             "document" if any(k in a for k in ("ad", "statement", "contract", "document", "report",
+                                                "post", "letter", "disclosure", "circular", "form", "permit")) else
+             "text")
+    name = artifact if artifact[:1].isupper() else artifact[:1].upper() + artifact[1:]
+    return {"id": "input-" + (re.sub(r"[^a-z0-9]+", "-", a).strip("-")[:40] or "text"),
+            "type": "input", "name": name,
+            "role": f"input {itype} — what the pipeline runs on at runtime",
+            "branch": "main", "subtype": f"Input · {itype}"}
+
+
+def _is_leaf(c: dict) -> bool:
+    """Side-effect actions (escalation, review queue, notify, log) are leaves OFF
+    the critical path, not inline transforms."""
+    blob = (c.get("id", "") + " " + c.get("name", "")).lower()
+    return any(k in blob for k in _LEAF_KEYWORDS)
+
+
+def _subtype(c: dict) -> str:
+    """Precise primitive subtype for the diagram (so escalation is not mislabeled
+    a generic 'Transform')."""
+    t, blob = c["type"], (c.get("id", "") + " " + c.get("name", "")).lower()
+    if t == "persona":
+        return "Add Persona"
+    if t in ("rule-pack", "logic-pack"):
+        return ("Classifier" if "classifier" in blob else
+                "GREP / regex" if ("grep" in blob or "regex" in blob) else "Condition")
+    if t in ("knowledge-pack", "dataset"):
+        return "Dataset" if t == "dataset" else "Knowledge Corpus"
+    if t == "pipeline":
+        return "Sub-pipeline"
+    if t == "pattern":
+        return ("Routing" if "rout" in blob else "Parallel" if "parallel" in blob
+                else "Loop" if "loop" in blob else "Flow")
+    if t in ("harness", "adapter"):
+        return "Model harness"
+    if t == "rubric":
+        return "Evaluate · rubric"
+    if t == "benchmark":
+        return "Evaluate · benchmark"
+    if t == "processor":
+        if any(k in blob for k in ("escalate", "human-review", "human_review", "handoff")):
+            return "Escalate → human"
+        if any(k in blob for k in ("webhook", "post", "request", "http", "api", "emit", "publish")):
+            return "Execute / Webhook"
+        if any(k in blob for k in ("notify", "alert", "email", "sms")):
+            return "Notify"
+        if any(k in blob for k in ("log", "audit")):
+            return "Log / Audit"
+        return "Transform"
+    return label_for_type(t)
+
+
+def _output_name(task: str) -> str:
+    low = task.lower()
+    if "rout" in low or "hotline" in low:
+        return "Routed decision + citations"
+    if "classif" in low or "map it" in low:
+        return "Classification + citations"
+    if any(k in low for k in ("flag", "detect", "screen", "indicator")):
+        return "Findings + citations"
+    if "valid" in low:
+        return "Validation result"
+    return "Result + trace"
+
+
+def flowchart(task: str, kept: list[dict]) -> list[dict]:
+    """Ordered stages Input → … → Output, each node tagged with a precise subtype
+    and main/leaf branch, and grouped If Statements marked with how they combine
+    (default ANY/OR) to gate the downstream action."""
+    chart = [{"stage": "Input", "components": [infer_input(task)]}]
     for stage in STAGE_ORDER:
-        comps = [{"id": c["id"], "type": c["type"], "name": c["name"], "role": c["role"]}
+        comps = [{"id": c["id"], "type": c["type"], "name": c["name"], "role": c["role"],
+                  "subtype": _subtype(c), "branch": "leaf" if _is_leaf(c) else "main"}
                  for c in kept if c.get("stage") == stage]
-        if comps:
-            chart.append({"stage": stage, "components": comps})
+        if not comps:
+            continue
+        band: dict = {"stage": stage, "components": comps}
+        if stage == IfStatement.stage and sum(1 for x in comps if x["branch"] == "main") >= 2:
+            band["combine"] = "ANY (OR)"  # default: if ANY condition matches, the THEN action runs
+        chart.append(band)
     chart.append({"stage": "Output", "components": [
-        {"id": "result", "type": "output", "name": "Costed, deployable flow", "role": "validated result + trace"}]})
+        {"id": "result", "type": "output", "name": _output_name(task),
+         "role": "validated result + trace", "subtype": "Output", "branch": "main"}]})
     return chart
 
 
@@ -207,7 +321,7 @@ def build_flow(task: str, index: Index) -> dict:
     narrative, narr_llm = llm_narrative(task, kept, cost)
     result = {
         "task": task,
-        "flow": {"steps": kept, "stages": flowchart(kept), "dropped": dropped, "analysis": analysis},
+        "flow": {"steps": kept, "stages": flowchart(task, kept), "dropped": dropped, "analysis": analysis},
         "cost": cost,
         "narrative": narrative,
         "llm_used": (sel_llm or narr_llm),

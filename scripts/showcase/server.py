@@ -93,6 +93,22 @@ class Handler(BaseHTTPRequestHandler):
                        "labels": {t: label_for_type(t) for t in counts},
                        "matched": len(res), "results": res[:limit]}
             self._send(200, json.dumps(payload).encode(), "application/json")
+        elif parsed.path == "/api/primitives":
+            from scripts.primitives import PRIMITIVE_CLASSES
+
+            def _subs(c) -> list[str]:
+                s = getattr(c, "subtypes", None)
+                if isinstance(s, dict):
+                    return list(s.keys())
+                if isinstance(s, (list, tuple)):
+                    return list(s)
+                return []
+
+            payload = [{"kind": c.kind, "label": getattr(c, "label", c.kind),
+                        "stage": getattr(c, "stage", ""), "description": getattr(c, "description", ""),
+                        "subtypes": _subs(c), "schema_types": list(getattr(c, "schema_types", ()))}
+                       for c in PRIMITIVE_CLASSES]
+            self._send(200, json.dumps(payload).encode(), "application/json")
         else:
             self._send(404, b"not found", "text/plain")
 
