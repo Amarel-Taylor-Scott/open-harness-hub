@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from collections import Counter
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
@@ -17,6 +18,13 @@ from scripts.showcase.pages import BROWSE_HTML, HTML
 
 class Handler(BaseHTTPRequestHandler):
     index: Index = None  # type: ignore
+    token: str = ""  # if set, the compute endpoints require it (?token= or X-OHH-Token header)
+
+    def _authed(self, parsed) -> bool:
+        if not self.token:
+            return True
+        supplied = (parse_qs(parsed.query).get("token") or [None])[0] or self.headers.get("X-OHH-Token")
+        return supplied == self.token
 
     def _send(self, code: int, body: bytes, ctype: str) -> None:
         self.send_response(code)
@@ -36,12 +44,18 @@ class Handler(BaseHTTPRequestHandler):
                        "llm": route.summary(), "llm_reachable": route.health()}
             self._send(200, json.dumps(payload).encode(), "application/json")
         elif parsed.path == "/api/build":
+            if not self._authed(parsed):
+                self._send(401, b'{"error":"token required"}', "application/json")
+                return
             task = (parse_qs(parsed.query).get("task") or [""])[0]
             if not task.strip():
                 self._send(400, b'{"error":"task required"}', "application/json")
                 return
             self._send(200, json.dumps(build_flow(task, self.index)).encode(), "application/json")
         elif parsed.path == "/api/export":
+            if not self._authed(parsed):
+                self._send(401, b'{"error":"token required"}', "application/json")
+                return
             qs = parse_qs(parsed.query)
             task = (qs.get("task") or [""])[0]
             fmt = (qs.get("format") or ["yaml"])[0]
@@ -88,10 +102,12 @@ class Handler(BaseHTTPRequestHandler):
 
 def serve(port: int = 8000) -> None:
     Handler.index = Index()
+    Handler.token = os.environ.get("OH_SHOWCASE_TOKEN", "")
     httpd = ThreadingHTTPServer(("127.0.0.1", port), Handler)
+    gate = "token-gated" if Handler.token else "OPEN (set OH_SHOWCASE_TOKEN to gate)"
     print(f"Open Harness Hub showcase → http://127.0.0.1:{port}  "
           f"({len(Handler.index.items)} components, embeddings={Handler.index.backend.name}, "
-          f"promotable={Handler.index.backend.promotable})")
+          f"promotable={Handler.index.backend.promotable}, /api/build {gate})")
     try:
         httpd.serve_forever()
     finally:

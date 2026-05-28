@@ -31,6 +31,15 @@ done
 say(){ printf '\033[38;2;251;119;20m%s\033[0m\n' "$*"; }
 warn(){ printf '\033[33m%s\033[0m\n' "$*"; }
 
+# --- access token: gate the compute endpoints (/api/build, /api/export) -----
+# Persisted so the public URL + token stay stable across restarts. Pin your own
+# with OH_SHOWCASE_TOKEN=…; delete dist/showcase-token.txt to rotate it.
+mkdir -p dist
+TOKEN="${OH_SHOWCASE_TOKEN:-$(cat dist/showcase-token.txt 2>/dev/null || true)}"
+[ -n "$TOKEN" ] || TOKEN="$(python3 -c 'import secrets;print(secrets.token_urlsafe(12))')"
+printf '%s\n' "$TOKEN" > dist/showcase-token.txt
+export OH_SHOWCASE_TOKEN="$TOKEN"
+
 # --- 1. Gemma via Ollama (OpenAI-compatible) -------------------------------
 # Auto-start a local Ollama if it's installed but not already serving.
 if ! curl -sf "${OLLAMA_URL}/api/tags" -o /tmp/ohh_tags.json 2>/dev/null && command -v ollama >/dev/null 2>&1; then
@@ -98,37 +107,61 @@ say "Indexing components…"
 python3 -m scripts.db.build_vector_store build ${OH_EMBED_MODEL:+--model "$OH_EMBED_MODEL"} >/dev/null 2>&1 || true
 
 # --- 3. start the showcase server ------------------------------------------
+# free the port (replace any prior server) — the persistent tunnel is left alone
+{ fuser -k "${PORT}/tcp" 2>/dev/null || lsof -ti:"${PORT}" 2>/dev/null | xargs -r kill 2>/dev/null; }; sleep 0.5
 python3 -m scripts.showcase --port "$PORT" &
 SRV=$!
-cleanup(){ kill "$SRV" "${TUN:-}" 2>/dev/null; }
+# The server is ours to manage. The tunnel is intentionally left running on exit
+# so its public URL stays STABLE across server restarts (no churn for testers);
+# a later launch reuses it. Stop it explicitly with: pkill -f 'cloudflared tunnel'
+cleanup(){ kill "$SRV" 2>/dev/null; }
 trap cleanup INT TERM EXIT
 # wait until it answers
 for _ in $(seq 1 40); do curl -sf "http://127.0.0.1:${PORT}/api/health" >/dev/null 2>&1 && break; sleep 0.25; done
 say "Local:  http://127.0.0.1:${PORT}"
 
 # --- 4. public trycloudflare.com tunnel ------------------------------------
+TUNNEL_MATCH="cloudflared tunnel --url http://localhost:${PORT}"
 if [ "$TUNNEL" = 1 ] && command -v cloudflared >/dev/null 2>&1; then
-  say "Opening a public trycloudflare.com tunnel… (Ctrl-C stops everything)"
-  : > /tmp/ohh_tunnel.log
-  cloudflared tunnel --url "http://localhost:${PORT}" --no-autoupdate >/tmp/ohh_tunnel.log 2>&1 &
-  TUN=$!
-  URL=""
-  for _ in $(seq 1 60); do
-    URL=$(grep -Eo 'https://[a-z0-9.-]+\.trycloudflare\.com' /tmp/ohh_tunnel.log | head -1)
-    [ -n "$URL" ] && break
-    sleep 1
-  done
-  if [ -n "$URL" ]; then
-    mkdir -p dist; echo "$URL" > dist/showcase-tunnel-url.txt
+  EXIST_URL="$(cat dist/showcase-tunnel-url.txt 2>/dev/null || true)"
+  # Reuse an already-running tunnel for this port if its URL still answers — keeps
+  # the public URL identical across server restarts (no dead-tab churn for testers).
+  if pgrep -f "$TUNNEL_MATCH" >/dev/null 2>&1 && [ -n "$EXIST_URL" ] \
+     && curl -sf --max-time 8 "${EXIST_URL}/api/health" >/dev/null 2>&1; then
     say ""
     say "═══════════════════════════════════════════════════════════════"
-    say "  PUBLIC URL  →  $URL"
-    say "  send this to your tester · saved to dist/showcase-tunnel-url.txt"
+    printf '%s\n' "${EXIST_URL}/?token=${TOKEN}" > dist/showcase-share-url.txt
+    say "  PUBLIC URL  →  ${EXIST_URL}/?token=${TOKEN}"
+    say "  reused tunnel · STABLE across restarts · token-gated · dist/showcase-share-url.txt"
     say "═══════════════════════════════════════════════════════════════"
   else
-    warn "Tunnel started but no URL yet — tail /tmp/ohh_tunnel.log (it may still come up)."
+    pkill -f "$TUNNEL_MATCH" 2>/dev/null || true   # clear a dead tunnel for this port
+    say "Opening a persistent trycloudflare.com tunnel… (survives server restarts)"
+    : > /tmp/ohh_tunnel.log
+    # setsid + disown so the tunnel is NOT in this script's process group and
+    # outlives it — that is what keeps the URL stable when only the server restarts.
+    setsid cloudflared tunnel --url "http://localhost:${PORT}" --no-autoupdate \
+      >/tmp/ohh_tunnel.log 2>&1 < /dev/null &
+    disown 2>/dev/null || true
+    URL=""
+    for _ in $(seq 1 60); do
+      URL=$(grep -Eo 'https://[a-z0-9.-]+\.trycloudflare\.com' /tmp/ohh_tunnel.log | head -1)
+      [ -n "$URL" ] && break
+      sleep 1
+    done
+    if [ -n "$URL" ]; then
+      mkdir -p dist; echo "$URL" > dist/showcase-tunnel-url.txt
+      say ""
+      say "═══════════════════════════════════════════════════════════════"
+      printf '%s\n' "${URL}/?token=${TOKEN}" > dist/showcase-share-url.txt
+      say "  PUBLIC URL  →  ${URL}/?token=${TOKEN}"
+      say "  persistent · survives server restarts · token-gated · dist/showcase-share-url.txt"
+      say "═══════════════════════════════════════════════════════════════"
+    else
+      warn "Tunnel started but no URL yet — tail /tmp/ohh_tunnel.log (it may still come up)."
+    fi
   fi
-  wait "$TUN"
+  wait "$SRV"
 elif [ "$TUNNEL" = 1 ]; then
   warn "──────────────────────────────────────────────────────────────────────"
   warn "  No public URL: 'cloudflared' is not installed. Install it (Linux,"

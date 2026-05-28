@@ -55,11 +55,13 @@ const EX=["Detect human-trafficking indicators in a recruitment ad and route to 
 const exDiv=document.getElementById('examples');
 EX.forEach(t=>{const c=document.createElement('span');c.className='chip';c.textContent=t;c.onclick=()=>{task.value=t;build()};exDiv.appendChild(c)});
 const task=document.getElementById('task'),go=document.getElementById('go'),out=document.getElementById('out'),status=document.getElementById('status'),banner=document.getElementById('banner');
+const TOKEN=new URLSearchParams(location.search).get('token')||'';const TQ=TOKEN?('&token='+encodeURIComponent(TOKEN)):'';
 async function health(){try{const h=await (await fetch('/api/health')).json();
  banner.innerHTML='<div class=banner>'+(h.embedding.promotable?'✓ semantic embeddings active ('+h.embedding.embedding_model+')':'⚠ offline <b>placeholder</b> embeddings ('+h.embedding.embedding_model+') — hybrid keyword+label search is doing the work; set OH_EMBED_* for semantic ranking.')+' · '+h.components+' components · model polish: '+(h.llm_reachable?('on ('+h.llm.model+')'):'off (deterministic)')+'</div>';}catch(e){}}
 function esc(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
 async function build(){const t=task.value.trim();if(!t)return;go.disabled=true;status.textContent='retrieving + assembling…';out.innerHTML='';
- try{const resp=await fetch('/api/build?task='+encodeURIComponent(t));
+ try{const resp=await fetch('/api/build?task='+encodeURIComponent(t)+TQ);
+   if(resp.status===401)throw new Error('this demo link needs its access token — open the full URL you were sent (…?token=…)');
    if(!resp.ok)throw new Error('server returned HTTP '+resp.status);
    const ct=resp.headers.get('content-type')||'';
    if(ct.indexOf('application/json')<0)throw new Error('stale tab — this tunnel URL is no longer served; reload the current URL');
@@ -78,7 +80,7 @@ function render(r){let h='';
  if(r.flow.dropped&&r.flow.dropped.length){h+='<div class=dropped>Pruned as off-topic: '+r.flow.dropped.map(d=>esc(d.id||d)).join(', ')+'</div>';}
  h+='</div>';
  var et=encodeURIComponent(r.task);
- h+='<div class=card><h3>Export &amp; standardize</h3><a href="/api/export?format=yaml&task='+et+'">⬇ Open Harness Hub pipeline (YAML)</a> · <a href="/api/export?format=json&task='+et+'">JSON</a><div class=muted style=margin-top:6px>Standard catalog format — round-trips into the registry as a reusable component. Per-component exports (MCP · Croissant · HF card · SPDX · lm-eval · …) via scripts/emit/.</div></div>';
+ h+='<div class=card><h3>Export &amp; standardize</h3><a href="/api/export?format=yaml&task='+et+TQ+'">⬇ Open Harness Hub pipeline (YAML)</a> · <a href="/api/export?format=json&task='+et+TQ+'">JSON</a><div class=muted style=margin-top:6px>Standard catalog format — round-trips into the registry as a reusable component. Per-component exports (MCP · Croissant · HF card · SPDX · lm-eval · …) via scripts/emit/.</div></div>';
  h+='<div class=card><h3>Cost profile (per task)</h3><div class=costs>';
  ['cheap','balanced','quality'].forEach(k=>{h+='<div class=cost><b>'+k+'</b><br>$'+esc(r.cost[k].per_task_usd)+'<br><span class=muted>'+esc(r.cost[k].how)+'</span></div>'});
  h+='</div><div class=muted style=margin-top:8px>'+esc(r.cost.note)+'</div></div>';
