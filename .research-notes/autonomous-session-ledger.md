@@ -73,8 +73,10 @@ Catalog now 2,411 validated (530 curated + candidates). Vector store rebuilt
 - **Python-library → component standard** (user idea): a convention + reference
   helper so any Python lib exposes callables as OHH tool/processor components.
   See `docs/spec/python-component-standard.md`.
-- More capability-lift verticals; real embeddings (P1) to fix semantic retrieval.
+- ✅ **DONE 2026-05-28 — real embeddings (P1)** via Ollama (`all-minilm`, 384-dim, GPU); semantic retrieval live in the showcase (`embed=all-minilm promotable=True`). Next: more capability-lift verticals.
 - **Deterministic code-edit family** (high priority; the "small models can't do exact-match patch" objection): structured/line-anchored/AST patch-apply as a *deterministic processor*, plus a verify-and-repair harness gate — move edit reliability OUT of the model so a cheap model can drive it. Pairs with the cost-routing principle: orchestration has a coherence floor (capable model or deterministic routing), narrow well-scoped sub-tasks route to small/local models.
+- **Supervisor / model-babysits-model loops** (user idea): automate the manual "babysitting/herding/re-wording" of even frontier models — evaluator-optimizer, critic/verify-and-repair, escalation-on-low-confidence, multi-model cross-check/debate. The *supervisor* runs on a capable model (coherence floor) or a deterministic checker; the *worker* can be cheaper. Seeds exist (patterns reflexion / self-refine / evaluator-optimizer / multi-agent-debate; `processor/llm-judge`). Ship as a reusable supervisor harness + rubric + benchmark proving fewer-failures vs unsupervised.
+- **Model-efficiency knowledge corpus** (user idea, DS4 news): governed knowledge-pack of quantization / KV-cache / runtime strategies (asymmetric MoE quant, KV-offload-to-disk, no-PyTorch runtimes like DS4) so the builder can recommend cost/latency strategies for the "make it cheaper / run it local" refinement. Source via news/governed scraping (permissive, attributed) — feeds the cost-routing layer, not a model replacement claim.
 
 ## Cycle log
 
