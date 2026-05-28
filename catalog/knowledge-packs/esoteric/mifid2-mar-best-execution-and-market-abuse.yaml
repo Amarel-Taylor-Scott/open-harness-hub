@@ -1,0 +1,56 @@
+id: knowledge-pack/mifid2-mar-best-execution-and-market-abuse
+type: knowledge-pack
+version: 0.1.0
+name: Mifid2 Mar Best Execution And Market Abuse
+description: 'Capability-lift knowledge pack for an esoteric area LLMs handle poorly.
+  Gap: blur MiFID II RTS 27/28/22 and MAR insider-list/STOR/PDMR thresholds; cite
+  repealed RTS Grounded in ESMA MiFID II/MiFIR RTS + MAR Reg 596/2014 (EUR-Lex) via
+  rag_vector retrieval. Lift: dense frequently-amended field-level obligations conflated
+  across regimes'
+authors:
+- name: Open Harness Hub capability-gap factory
+license: CC-BY-4.0
+industry:
+- finance
+- compliance
+capability:
+- retrieval
+- verification
+modality:
+- structured
+- text
+lifecycle: experimental
+trust_boundary: external
+freshness: volatile
+tags:
+- capability-lift
+- esoteric
+- knowledge-pack
+- rag_vector
+- ingestion-target
+created: '2026-05-28'
+updated: '2026-05-28'
+attribution:
+  source_url: ESMA MiFID II/MiFIR RTS + MAR Reg 596/2014 (EUR-Lex)
+  source_kind: other
+  author: ESMA MiFID II/MiFIR RTS + MAR Reg 596/2014 (EUR-Lex)
+  license: see-source
+content_types:
+- fact_table
+- reference_doc
+retrieval:
+- rag_vector
+files:
+- path: data/esoteric-packs/mifid2-mar-best-execution-and-market-abuse.jsonl
+  format: jsonl
+  content_type: fact_table
+  schema: capability-gap seed (real facts where stable; else ingestion contract)
+indexing:
+  bm25: true
+  dense:
+    model: all-MiniLM-L6-v2
+provenance:
+  sources:
+  - ESMA MiFID II/MiFIR RTS + MAR Reg 596/2014 (EUR-Lex)
+  collected_through: '2026-05-28'
+  collected_by: capability-gap factory

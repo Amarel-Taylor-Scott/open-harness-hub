@@ -1,0 +1,58 @@
+id: knowledge-pack/epa-608-refrigerant-handling-rules
+type: knowledge-pack
+version: 0.1.0
+name: Epa 608 Refrigerant Handling Rules
+description: 'Capability-lift knowledge pack for an esoteric area LLMs handle poorly.
+  Gap: conflate refrigerant classes, recovery vacuum levels, leak-rate triggers, 608
+  cert scope Grounded in EPA 40 CFR 82 Subpart F + Section 608 fact sheets (public
+  domain) via rag_vector retrieval. Lift: exact numeric thresholds, version-dated;
+  wrong = EPA violation'
+authors:
+- name: Open Harness Hub capability-gap factory
+license: CC-BY-4.0
+industry:
+- trade
+- supply_chain
+- construction
+- infrastructure
+capability:
+- retrieval
+- verification
+modality:
+- structured
+- text
+lifecycle: experimental
+trust_boundary: external
+freshness: volatile
+tags:
+- capability-lift
+- esoteric
+- knowledge-pack
+- rag_vector
+- ingestion-target
+created: '2026-05-28'
+updated: '2026-05-28'
+attribution:
+  source_url: EPA 40 CFR 82 Subpart F + Section 608 fact sheets (public domain)
+  source_kind: other
+  author: EPA 40 CFR 82 Subpart F + Section 608 fact sheets (public domain)
+  license: see-source
+content_types:
+- fact_table
+- reference_doc
+retrieval:
+- rag_vector
+files:
+- path: data/esoteric-packs/epa-608-refrigerant-handling-rules.jsonl
+  format: jsonl
+  content_type: fact_table
+  schema: capability-gap seed (real facts where stable; else ingestion contract)
+indexing:
+  bm25: true
+  dense:
+    model: all-MiniLM-L6-v2
+provenance:
+  sources:
+  - EPA 40 CFR 82 Subpart F + Section 608 fact sheets (public domain)
+  collected_through: '2026-05-28'
+  collected_by: capability-gap factory

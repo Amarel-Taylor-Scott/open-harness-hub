@@ -105,6 +105,12 @@ New backlog (queued for `/goal` + the scout):
 - **Builder UX** (carryover): provenance/trust surfacing, streaming, interactive refine, real cost calibration, builder benchmark, KP retrieval-typing.
 - **Continuous parallel discovery**: cron the scout per cluster; periodically run the multi-agent burst for breadth.
 
+### Capability-valley discovery axis (Karpathy framework, user 2026-05-28)
+`capability_spike = verifiability × training_attention × data_coverage × economic_value` (already the goal-doc formula). The **highest-lift, least-served gaps are the VALLEYS** — domains where those factors are LOW, so frontier R&D ignores them: migrant labor, developing-country labor codes & governance, refugee/asylum + statelessness, under-resourced languages, informal/remittance economy, low-resource public health, artisanal mining, smallholder agriculture. Inverts the formula into a targeting heuristic AND a digital-equity mission (the DueCare/migrant-safety heritage). DONE: 10 valley gaps seeded (`data/capability-gaps/valleys-2026-05-28.jsonl`) → packs generated. The scout/loop should explicitly scout valley clusters, and the lift score should up-weight low-economic-value/low-data-coverage domains.
+
+### DONE 2026-05-28b — esoteric capability-lift corpus (55 KPs)
+`scripts/factory/knowledge_pack_factory.py` turns discovered gaps into valid, **retrieval-typed**, source-governed catalog KPs (schema gained an optional `retrieval` enum: rag_vector|regex|keyword|exact_id|classifier|graph). Emitted **55 packs** to `catalog/knowledge-packs/esoteric/` (6 with real public-fact seeds: CWE Top-25, OFAC 50% rule, APWA 811 colors, ICS forms, DEA schedules, TLS suites; 49 honest ingestion contracts with declared authoritative sources — never fabricated facts; seeds in `data/esoteric-packs/`). All 55 validate green and PASS the capability-lift gate (cull 0). Next: governed ingestion to populate the contract packs; rebuild vector store so the builder surfaces them.
+
 ## Cycle log
 
 | # | path | change | validation | commit |

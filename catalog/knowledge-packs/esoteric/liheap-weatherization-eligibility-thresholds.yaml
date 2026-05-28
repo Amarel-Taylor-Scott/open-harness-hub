@@ -1,0 +1,55 @@
+id: knowledge-pack/liheap-weatherization-eligibility-thresholds
+type: knowledge-pack
+version: 0.1.0
+name: Liheap Weatherization Eligibility Thresholds
+description: 'Capability-lift knowledge pack for an esoteric area LLMs handle poorly.
+  Gap: lack current LIHEAP/WAP income limits, categorical eligibility, per-unit caps
+  Grounded in HHS LIHEAP Action Transmittals + DOE WAP WPN notices (public domain)
+  via exact_id retrieval. Lift: annually-indexed volatile thresholds; models emit
+  stale numbers confidently'
+authors:
+- name: Open Harness Hub capability-gap factory
+license: CC-BY-4.0
+industry:
+- government
+capability:
+- retrieval
+- verification
+modality:
+- structured
+- text
+lifecycle: experimental
+trust_boundary: external
+freshness: volatile
+tags:
+- capability-lift
+- esoteric
+- knowledge-pack
+- exact_id
+- ingestion-target
+created: '2026-05-28'
+updated: '2026-05-28'
+attribution:
+  source_url: HHS LIHEAP Action Transmittals + DOE WAP WPN notices (public domain)
+  source_kind: other
+  author: HHS LIHEAP Action Transmittals + DOE WAP WPN notices (public domain)
+  license: see-source
+content_types:
+- fact_table
+- reference_doc
+retrieval:
+- exact_id
+files:
+- path: data/esoteric-packs/liheap-weatherization-eligibility-thresholds.jsonl
+  format: jsonl
+  content_type: fact_table
+  schema: capability-gap seed (real facts where stable; else ingestion contract)
+indexing:
+  bm25: true
+  dense:
+    model: all-MiniLM-L6-v2
+provenance:
+  sources:
+  - HHS LIHEAP Action Transmittals + DOE WAP WPN notices (public domain)
+  collected_through: '2026-05-28'
+  collected_by: capability-gap factory

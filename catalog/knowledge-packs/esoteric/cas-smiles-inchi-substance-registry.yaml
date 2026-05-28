@@ -1,0 +1,55 @@
+id: knowledge-pack/cas-smiles-inchi-substance-registry
+type: knowledge-pack
+version: 0.1.0
+name: Cas Smiles Inchi Substance Registry
+description: 'Capability-lift knowledge pack for an esoteric area LLMs handle poorly.
+  Gap: wrong CAS numbers, invalid/non-canonical SMILES/InChI, miscomputed InChIKeys
+  Grounded in PubChem (public domain) + EPA CompTox + IUPAC InChI via exact_id retrieval.
+  Lift: machine-validatable identifiers (InChIKey hashes, SMILES parseability) not
+  derivable'
+authors:
+- name: Open Harness Hub capability-gap factory
+license: CC-BY-4.0
+industry:
+- manufacturing
+capability:
+- retrieval
+- verification
+modality:
+- structured
+- text
+lifecycle: experimental
+trust_boundary: external
+freshness: volatile
+tags:
+- capability-lift
+- esoteric
+- knowledge-pack
+- exact_id
+- ingestion-target
+created: '2026-05-28'
+updated: '2026-05-28'
+attribution:
+  source_url: PubChem (public domain) + EPA CompTox + IUPAC InChI
+  source_kind: other
+  author: PubChem (public domain) + EPA CompTox + IUPAC InChI
+  license: see-source
+content_types:
+- fact_table
+- reference_doc
+retrieval:
+- exact_id
+files:
+- path: data/esoteric-packs/cas-smiles-inchi-substance-registry.jsonl
+  format: jsonl
+  content_type: fact_table
+  schema: capability-gap seed (real facts where stable; else ingestion contract)
+indexing:
+  bm25: true
+  dense:
+    model: all-MiniLM-L6-v2
+provenance:
+  sources:
+  - PubChem (public domain) + EPA CompTox + IUPAC InChI
+  collected_through: '2026-05-28'
+  collected_by: capability-gap factory

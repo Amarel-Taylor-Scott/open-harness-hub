@@ -1,0 +1,57 @@
+id: knowledge-pack/unhcr-asylum-rsd-procedures-by-country
+type: knowledge-pack
+version: 0.1.0
+name: Unhcr Asylum Rsd Procedures By Country
+description: 'Capability-lift knowledge pack for an esoteric area LLMs handle poorly.
+  Gap: LLMs invent refugee status determination steps, appeal timelines, and documentary
+  requirements that vary sharply by country of asylum Grounded in UNHCR RSD procedural
+  standards + country operations guidance (UNHCR, reusable) via rag_vector retrieval.
+  Lift: procedure-heavy, country-specific, low-resource population; no automated success
+  signal so models lag — classic valley with high humanitarian stakes'
+authors:
+- name: Open Harness Hub capability-gap factory
+license: CC-BY-4.0
+industry:
+- cross_industry
+capability:
+- retrieval
+- verification
+modality:
+- structured
+- text
+lifecycle: experimental
+trust_boundary: external
+freshness: volatile
+tags:
+- capability-lift
+- esoteric
+- knowledge-pack
+- rag_vector
+- ingestion-target
+created: '2026-05-28'
+updated: '2026-05-28'
+attribution:
+  source_url: UNHCR RSD procedural standards + country operations guidance (UNHCR,
+    reusable)
+  source_kind: other
+  author: UNHCR RSD procedural standards + country operations guidance (UNHCR, reusable)
+  license: see-source
+content_types:
+- fact_table
+- reference_doc
+retrieval:
+- rag_vector
+files:
+- path: data/esoteric-packs/unhcr-asylum-rsd-procedures-by-country.jsonl
+  format: jsonl
+  content_type: fact_table
+  schema: capability-gap seed (real facts where stable; else ingestion contract)
+indexing:
+  bm25: true
+  dense:
+    model: all-MiniLM-L6-v2
+provenance:
+  sources:
+  - UNHCR RSD procedural standards + country operations guidance (UNHCR, reusable)
+  collected_through: '2026-05-28'
+  collected_by: capability-gap factory
