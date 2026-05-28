@@ -84,7 +84,8 @@ fi
 
 # --- real semantic embeddings via Ollama (else offline hash placeholders) ---
 if command -v ollama >/dev/null 2>&1 && curl -sf "${OLLAMA_URL}/api/tags" >/dev/null 2>&1; then
-  EMBED_MODEL="all-minilm"
+  # Stronger 768-dim default; override with OH_EMBED_MODEL (all-minilm, bge, hosted, …).
+  EMBED_MODEL="${OH_EMBED_MODEL:-nomic-embed-text}"
   ollama list 2>/dev/null | grep -q "$EMBED_MODEL" || { say "Pulling embedding model $EMBED_MODEL…"; ollama pull "$EMBED_MODEL" >/dev/null 2>&1; }
   export OH_EMBED_BACKEND=http-openai OH_EMBED_BASE_URL="${OLLAMA_URL}/v1" OH_EMBED_API_KEY=ollama OH_EMBED_MODEL="$EMBED_MODEL"
   say "Embeddings: REAL — $EMBED_MODEL via Ollama (semantic search)"

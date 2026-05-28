@@ -25,6 +25,7 @@ import json
 import math
 import re
 import sqlite3
+import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -312,7 +313,15 @@ def export_flow(result: dict) -> dict:
         "description": f"Auto-assembled by the Open Harness Hub builder for: {task}",
         "authors": [{"name": "Open Harness Hub builder"}],
         "license": "MIT",
+        "industry": ["cross_industry"],
+        "capability": ["reasoning", "retrieval"],
+        "modality": ["text"],
+        "lifecycle": "experimental",
+        "trust_boundary": "local",
+        "freshness": "volatile",
         "tags": ["assembled", "builder-export"],
+        "created": time.strftime("%Y-%m-%d"),
+        "updated": time.strftime("%Y-%m-%d"),
         "task": task,
         "pipeline_kind": "assembled",
         "steps": steps or [{"id": "review", "kind": "harness", "ref": "harness/text-safety-review"}],
