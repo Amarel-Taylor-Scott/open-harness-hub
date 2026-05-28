@@ -171,7 +171,7 @@ def build(store: Path = DEFAULT_STORE, model: str = HASH_MODEL, limit: int | Non
     backend = resolve_backend(model=model)
     placeholder = 0 if backend.promotable else 1
     con = _connect(store)
-    n_emb = n_lab = n_obj = 0
+    n_emb = n_lab = n_obj = n_fail = 0
     try:
         # Full rebuild: clear THIS model's embeddings and the regenerable regex
         # labels first, so components culled/removed from the catalog do not
@@ -182,12 +182,17 @@ def build(store: Path = DEFAULT_STORE, model: str = HASH_MODEL, limit: int | Non
             con.execute("DELETE FROM label_assignment WHERE assignment_method='regex'")
         for doc in iter_components(limit=limit):
             sid, stype = doc["id"], doc["type"]
-            text = _doc_text(doc)
+            text = _doc_text(doc) or sid  # never embed empty text (some providers 400 on it)
             thash = content_hash(text)[:16]
             # Store the backend's TRUE model id — a hash fallback can never be
             # recorded as a real model and slip past the promotion gate.
             emb_id = hashlib.sha1(f"{sid}|{backend.model_id}|{thash}".encode()).hexdigest()[:20]
-            vec = backend.embed_one(text)
+            # One bad doc/provider hiccup must not abort a 2,400-doc build.
+            try:
+                vec = backend.embed_one(text)
+            except Exception:
+                n_fail += 1
+                continue
             con.execute(
                 "INSERT OR REPLACE INTO object_embedding "
                 "(embedding_id, subject_id, subject_type, embedding_model, dim, is_placeholder, text_hash, text, embedding) "

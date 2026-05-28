@@ -37,6 +37,8 @@ DEFAULT_EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 EMBEDDING_MODELS: dict[str, int] = {
     "all-MiniLM-L6-v2": 384,            # sentence-transformers, local default
     "bge-small-en-v1.5": 384,           # local alternative, same dimension
+    "all-minilm": 384,                  # Ollama tag (served via /v1/embeddings)
+    "nomic-embed-text": 768,            # Ollama tag, stronger 768-dim option
     "text-embedding-3-small": 1536,     # OpenAI-compatible hosted route
     "text-embedding-ada-002": 1536,     # legacy OpenAI-compatible route
 }

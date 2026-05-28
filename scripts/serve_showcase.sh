@@ -82,9 +82,19 @@ else
   warn "Compute: no usable NVIDIA GPU (driver missing?) — Gemma 4 runs on CPU automatically. Works, just slower."
 fi
 
+# --- real semantic embeddings via Ollama (else offline hash placeholders) ---
+if command -v ollama >/dev/null 2>&1 && curl -sf "${OLLAMA_URL}/api/tags" >/dev/null 2>&1; then
+  EMBED_MODEL="all-minilm"
+  ollama list 2>/dev/null | grep -q "$EMBED_MODEL" || { say "Pulling embedding model $EMBED_MODEL…"; ollama pull "$EMBED_MODEL" >/dev/null 2>&1; }
+  export OH_EMBED_BACKEND=http-openai OH_EMBED_BASE_URL="${OLLAMA_URL}/v1" OH_EMBED_API_KEY=ollama OH_EMBED_MODEL="$EMBED_MODEL"
+  say "Embeddings: REAL — $EMBED_MODEL via Ollama (semantic search)"
+else
+  warn "Embeddings: offline hash placeholders — keyword/label search only (start Ollama for semantic)."
+fi
+
 # --- 2. pre-build the vector store so first request is fast ----------------
 say "Indexing components…"
-python3 -m scripts.db.build_vector_store build >/dev/null 2>&1 || true
+python3 -m scripts.db.build_vector_store build ${OH_EMBED_MODEL:+--model "$OH_EMBED_MODEL"} >/dev/null 2>&1 || true
 
 # --- 3. start the showcase server ------------------------------------------
 python3 -m scripts.serve_builder --port "$PORT" &
