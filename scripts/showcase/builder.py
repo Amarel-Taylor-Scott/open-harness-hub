@@ -11,7 +11,7 @@ import re
 
 from scripts.embeddings import describe_backend
 from scripts.model_routes import resolve_route
-from scripts.primitives import STAGE_ORDER, IfStatement, label_for_type, stage_for_type
+from scripts.primitives import STAGE_ORDER, Conditional, label_for_type, stage_for_type
 from scripts.showcase.index import Index
 
 # Per-stage assembly caps (functional config, keyed by schema type).
@@ -207,8 +207,8 @@ def _output_name(task: str) -> str:
 
 def flowchart(task: str, kept: list[dict]) -> list[dict]:
     """Ordered stages Input → … → Output, each node tagged with a precise subtype
-    and main/leaf branch, and grouped If Statements marked with how they combine
-    (default ANY/OR) to gate the downstream action."""
+    and main/leaf branch, and grouped Conditions joined by an explicit Logical
+    Operator node (default OR) that gates the downstream action."""
     chart = [{"stage": "Input", "components": [infer_input(task)]}]
     for stage in STAGE_ORDER:
         comps = [{"id": c["id"], "type": c["type"], "name": c["name"], "role": c["role"],
@@ -217,8 +217,12 @@ def flowchart(task: str, kept: list[dict]) -> list[dict]:
         if not comps:
             continue
         band: dict = {"stage": stage, "components": comps}
-        if stage == IfStatement.stage and sum(1 for x in comps if x["branch"] == "main") >= 2:
-            band["combine"] = "ANY (OR)"  # default: if ANY condition matches, the THEN action runs
+        if stage == Conditional.stage and sum(1 for x in comps if x["branch"] == "main") >= 2:
+            # 2+ conditions are joined by an explicit Logical Operator node (a distinct
+            # Conditional subtype), default OR — if ANY matches, the THEN action runs.
+            band["operator"] = {"type": "operator", "op": "OR", "name": "OR",
+                                "subtype": "Logical Operator", "branch": "operator",
+                                "role": "if ANY condition matches, run the next action"}
         chart.append(band)
     chart.append({"stage": "Output", "components": [
         {"id": "result", "type": "output", "name": _output_name(task),

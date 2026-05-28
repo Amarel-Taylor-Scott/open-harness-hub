@@ -97,6 +97,9 @@ class Handler(BaseHTTPRequestHandler):
             from scripts.primitives import PRIMITIVE_CLASSES
 
             def _subs(c) -> list[str]:
+                ns = getattr(c, "node_subtypes", None)  # display-only node subtypes (e.g. Conditional)
+                if ns:
+                    return list(ns)
                 s = getattr(c, "subtypes", None)
                 if isinstance(s, dict):
                     return list(s.keys())

@@ -55,6 +55,9 @@ a{color:var(--acc)}
 .leafarm{color:var(--mut);font-size:17px;line-height:1}
 .node.leaf{border-style:dashed;opacity:.92}
 .node.leaf .pl:after{content:" · leaf · off critical path";color:var(--mut);font-weight:400;text-transform:none;letter-spacing:0}
+.node.op{width:auto;min-width:170px;max-width:340px;text-align:center;border:2px solid var(--nc);border-radius:24px;background:#1a1408;padding:7px 16px}
+.node.op .nn{font-size:16px;margin-top:0}
+.node.op .pl{color:var(--nc)}
 </style></head><body>
 <header><h1>Open Harness Hub <span style="color:var(--acc)">·</span> paste a task, get a flow</h1>
 <div style="margin:6px 0 2px;font-size:13.5px"><a href="/" style="color:var(--acc);font-weight:600;margin-right:14px;text-decoration:none">Build a flow</a><a href="/browse" style="color:var(--acc);font-weight:600;text-decoration:none">Browse components →</a></div>
@@ -96,7 +99,7 @@ async function build(){const t=task.value.trim();if(!t)return;go.disabled=true;s
    render(await resp.json());
  }catch(e){out.innerHTML='<div class=card>Error: '+esc(''+e)+'<div class=muted style=margin-top:6px>If this says "stale", your browser tab is pointing at an old (ephemeral) tunnel URL — reload the current one.</div></div>'}
  go.disabled=false;status.textContent='';}
-const STAGE_COLOR={"Input":"#8b949e","Knowledge Corpus":"#3fb950","If Statements":"#d29922","Actions":"#fb7714","Flow / Loops":"#a371f7","Stop/End":"#f85149","Output":"#58a6ff"};
+const STAGE_COLOR={"Input":"#8b949e","Knowledge Corpus":"#3fb950","Conditional":"#d29922","Actions":"#fb7714","Flow / Loops":"#a371f7","Stop/End":"#f85149","Output":"#58a6ff"};
 async function loadMeta(){try{const p=await(await fetch('/api/primitives')).json();
   let h='<span class=lgh>The 7 primitives — every component is one of these (hover for subtypes):</span>';
   p.forEach(x=>{const col=STAGE_COLOR[x.stage]||'#8b949e';const subs=(x.subtypes&&x.subtypes.length)?(' — subtypes: '+x.subtypes.join(', ')):'';
@@ -105,11 +108,12 @@ async function loadMeta(){try{const p=await(await fetch('/api/primitives')).json
 function node(c,stage){const col=STAGE_COLOR[stage]||'#8b949e';
   const showId=c.id&&c.id!=='result'&&String(c.id).indexOf('input-')!==0;
   return '<div class="node'+(c.branch==='leaf'?' leaf':'')+'" style="--nc:'+col+'"><div class=pl>'+esc(stage)+(c.subtype?'<span class=sub style="background:'+col+'">'+esc(c.subtype)+'</span>':'')+'</div><div class=nn>'+esc(c.name)+'</div>'+(showId?'<div class=ni>'+esc(c.id)+'</div>':'')+(c.role?'<div class=nr>'+esc(c.role)+'</div>':'')+'</div>';}
+function opNode(op){return '<div class="node op" style="--nc:#e3b341"><div class=pl>Logical Operator</div><div class=nn>◇ '+esc(op.op||op.name||'OR')+'</div>'+(op.role?'<div class=nr>'+esc(op.role)+'</div>':'')+'</div>';}
 function dag(stages){let h='';stages.forEach((st,i)=>{
   const mains=st.components.filter(c=>c.branch!=='leaf'),leaves=st.components.filter(c=>c.branch==='leaf');
-  if(st.combine&&mains.length>=2){
+  if(st.operator&&mains.length>=2){
     h+='<div class=cond>'+mains.map(c=>node(c,st.stage)).join('')+'</div>';
-    h+='<div class=combine>'+esc(st.combine)+' <small>— if any condition matches, run the next action</small></div>';
+    h+='<div class=wire></div>'+opNode(st.operator);
   }else{mains.forEach((c,j)=>{h+=node(c,st.stage);if(j<mains.length-1)h+='<div class=wire></div>';});}
   leaves.forEach(c=>{h+='<div class=leafrow><span class=leafarm>↳</span>'+node(c,st.stage)+'</div>';});
   if(i<stages.length-1)h+='<div class=wire></div>';
