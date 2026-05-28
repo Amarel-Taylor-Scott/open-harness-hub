@@ -150,15 +150,22 @@ def _coherent_select(candidates: list[dict]) -> list[dict]:
 
 
 def _parse_keep(raw: str) -> list[str]:
-    import re as _re
-    m = _re.search(r"\{.*\}", raw, _re.DOTALL)
-    if not m:
+    """Tolerant: extract kept ids even if a verbose/reasoning model truncated the
+    JSON mid-array (the cause of the silent orchestration collapse)."""
+    if not raw:
         return []
     try:
-        obj = json.loads(m.group(0))
-        return [str(x) for x in (obj.get("keep") or []) if isinstance(x, str)]
+        m = re.search(r"\{.*\}", raw, re.DOTALL)
+        if m:
+            ids = [str(x) for x in (json.loads(m.group(0)).get("keep") or []) if isinstance(x, str)]
+            if ids:
+                return ids
     except Exception:
-        return []
+        pass
+    # Fallback: pull the "keep" array body even if the object never closed,
+    # then harvest component-id-shaped strings.
+    km = re.search(r'"keep"\s*:\s*\[(.*?)(?:\]|$)', raw, re.DOTALL)
+    return re.findall(r'"([a-z0-9-]+/[a-z0-9-]+)"', km.group(1) if km else raw)
 
 
 def orchestrate(task: str, candidates: list[dict], route) -> tuple[list[dict], list[dict], bool]:
@@ -183,7 +190,8 @@ def orchestrate(task: str, candidates: list[dict], route) -> tuple[list[dict], l
         "genuinely relevant to the user's task and DROP off-domain ones (wrong industry, modality, "
         "or purpose). Build ONE coherent pipeline: at most one persona, one model harness, one "
         "backbone pipeline, 1-2 knowledge packs, 1-2 rule packs, 1-2 tools, one rubric. "
-        "Return ONLY JSON: {\"keep\":[\"id\",...],\"drop\":[{\"id\":\"id\",\"why\":\"...\"}]}. "
+        "Return ONLY compact JSON with a SINGLE key and NO explanations: "
+        "{\"keep\":[\"id\",\"id\",...]}. Do not include a 'drop' list or any prose. "
         "Use only ids from the list."
     )
     keep_ids = _parse_keep(route.complete(system, f"Task: {task}\n\nCANDIDATES:\n{listing}", max_tokens=2048) or "")
@@ -259,15 +267,61 @@ def llm_narrative(task: str, kept: list[dict], cost: dict) -> tuple[str, bool]:
     return (text.strip(), True) if text and text.strip() else (deterministic_narrative(task, kept, cost), False)
 
 
+def _stratified_pool(index: "Index", task: str) -> list[dict]:
+    """Candidate pool that GUARANTEES per-type representation, so a flood of
+    near-duplicate top scorers can't starve whole stages (the cause of a RAG
+    task getting an ESG backbone, or a missing model/trust boundary)."""
+    flat = index.search(task, k=60)
+    by_type: dict[str, list[dict]] = {}
+    for c in flat:
+        by_type.setdefault(c["type"], []).append(c)
+    pool, seen = [], set()
+    for c in flat[:18]:                       # strongest overall
+        if c["id"] not in seen:
+            pool.append(c); seen.add(c["id"])
+    for cs in by_type.values():               # + top-3 of EVERY type
+        for c in cs[:3]:
+            if c["id"] not in seen:
+                pool.append(c); seen.add(c["id"])
+    return pool
+
+
+def analyze_match(kept: list[dict], pool: list[dict]) -> dict:
+    """Detect UNDER-match (a needed stage was available but unselected) and
+    OVER-match (a stage exceeds its cap / redundant components)."""
+    present = {c["stage"] for c in kept}
+    pool_types = {c["type"] for c in pool}
+    under = []
+    if not (present & {"Model (harness)", "Backbone pipeline"}) and ({"harness", "pipeline"} & pool_types):
+        under.append("Model boundary — a harness/pipeline was available but not selected")
+    if "Evaluate" not in present and "rubric" in pool_types:
+        under.append("Evaluate — a rubric was available but not selected")
+    if "Knowledge / RAG" not in present and ("knowledge-pack" in pool_types):
+        under.append("Knowledge — a knowledge/RAG pack was available but not selected")
+    counts: dict[str, int] = {}
+    for c in kept:
+        counts[c["type"]] = counts.get(c["type"], 0) + 1
+    over = [f"{t} ×{n}" for t, n in counts.items() if n > STAGE_CAPS.get(t, 1)]
+    return {"undermatched": under, "overmatched": over, "stage_coverage": sorted(present)}
+
+
 def build_flow(task: str, index: Index) -> dict:
     route = resolve_route()
-    candidates = index.search(task, k=24)
-    kept, dropped, sel_llm = orchestrate(task, candidates, route)
+    pool = _stratified_pool(index, task)
+    kept, dropped, sel_llm = orchestrate(task, pool, route)
+    # Back-fill a model boundary if the pool had one but selection skipped it.
+    if not any(c.get("stage") in ("Model (harness)", "Backbone pipeline") for c in kept):
+        for c in pool:
+            if c["type"] in ("pipeline", "harness"):
+                kept.append({**c, "stage": TYPE_STAGE[c["type"]], "role": ROLE_BLURB.get(c["type"], "")})
+                break
+        kept.sort(key=lambda c: STAGE_ORDER.index(c["stage"]) if c.get("stage") in STAGE_ORDER else 99)
     cost = estimate_cost(kept)
+    analysis = analyze_match(kept, pool)
     narrative, narr_llm = llm_narrative(task, kept, cost)
     return {
         "task": task,
-        "flow": {"steps": kept, "stages": flowchart(kept), "dropped": dropped},
+        "flow": {"steps": kept, "stages": flowchart(kept), "dropped": dropped, "analysis": analysis},
         "cost": cost,
         "narrative": narrative,
         "llm_used": (sel_llm or narr_llm),

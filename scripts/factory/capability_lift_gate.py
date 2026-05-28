@@ -425,8 +425,9 @@ def apply_cull(report: dict[str, Any], root: Path) -> dict[str, Any]:
         if target.exists():
             target.unlink()
             deleted.append(d["path"])
-    # prune now-empty dirs under catalog/
-    for p in sorted(CATALOG.rglob("*"), reverse=True):
+    # prune now-empty dirs under the SCANNED root (not the module-global CATALOG,
+    # which would touch unrelated dirs when --root points elsewhere)
+    for p in sorted(root.rglob("*"), reverse=True):
         if p.is_dir() and not any(p.iterdir()):
             p.rmdir()
     return {"deleted": len(deleted), "skipped_tracked": len(skipped_tracked)}

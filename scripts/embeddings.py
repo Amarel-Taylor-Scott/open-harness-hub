@@ -161,9 +161,12 @@ def resolve_backend(model: str | None = None, backend: str | None = None) -> Emb
     dim_env = os.environ.get("OH_EMBED_DIM")
     dim_override = int(dim_env) if dim_env else None
 
-    # A hash-style model id always selects the hash backend (preserve its id).
-    if backend == "hash" or model_id == HASH_MODEL_ID or model_id.startswith("hash"):
-        return _hash_backend(model_id if model_id.startswith("hash") else HASH_MODEL_ID)
+    # The hash backend is selected explicitly or by a recognized hash model id —
+    # NOT by any id that merely starts with "hash" (that silently masked a real
+    # model like "hash2vec" as the non-promotable placeholder).
+    is_hash_id = model_id == HASH_MODEL_ID or model_id.startswith("hash-bow")
+    if backend == "hash" or is_hash_id:
+        return _hash_backend(model_id if is_hash_id else HASH_MODEL_ID)
     if backend == "local-st":
         return _local_st_backend(model_id)
     if backend == "http-openai":
