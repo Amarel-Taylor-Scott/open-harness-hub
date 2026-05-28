@@ -13,7 +13,16 @@ The product is not a pile of static definitions. It is a component network:
 - post-LLM components: verification, scoring, review queues, CDC propagation, signed publisher updates, deployment blueprints;
 - runtimes: local Python, Docker, Render workers, Cloud Run, Kubernetes, MCP servers, pgvector, BigQuery/ClickHouse telemetry, object storage.
 
-Use "components" and "subcomponents" in new prose and user-facing docs. Avoid introducing new uses of "artifact", "manifest", or "primitive" unless you are quoting an existing schema, filename, or legacy phrase.
+Use "components" and "subcomponents" in new prose and user-facing docs. Avoid introducing new uses of "artifact" or "manifest" unless quoting an existing schema, filename, or legacy phrase. ("Primitive" IS canonical for the seven-primitive model — Input · Knowledge Corpus · If Statement · Action · Loop · Stop/End · Output; see `docs/concepts/component-taxonomy-and-stages.md`.) Product vocabulary: **Knowledge Corpus** (not "knowledge pack"), **If Statement** (not "rule pack"/"logic pack"), **Action** (a persona/tool/processor/harness/rubric is an Action). Version lives in metadata, never in names or IDs.
+
+## Capability-Gap Framework (canonical — read before deciding what to build/collect)
+
+We build for the **negative space** — where base models lack capability — not the head of the distribution. Two load-bearing rules:
+
+- **Two-axis admission:** a component must lift (`pipeline_score − bare_model_score > 0`) AND the lift must be **structural** (won't close when the next model ships), not transient. Single source of the taxonomy (lift_reason → durability_class, mechanisms, retrievability tiers, decay_signal): `scripts/eval/reason_codes.py` — never re-define these enums elsewhere. Sorter: `scripts/eval/durable_gap_harness.py`.
+- **Screen before you collect:** cheap Stage-1 gap screen (`scripts/acquisition/gap_screen.py`, weighted toward MODEL-INDEPENDENT signals so the model can't draw its own map) → expensive Stage-2 confirm on a sample. The owner feeds research areas at `data/research-queue/areas.jsonl` → `scripts/acquisition/research_queue.py` ranks them.
+
+Canonical reading: `docs/concepts/capability-valleys.md`, `docs/strategy/north-stars.md` (+ `corpus-acquisition-grid-spec.md`, `gap-detection-screen-spec.md`, `external-research-brief-2026-05-28.md`). Governance/provenance is the external moat; the lift bar is the internal selection criterion.
 
 ## Default Fast Path
 
