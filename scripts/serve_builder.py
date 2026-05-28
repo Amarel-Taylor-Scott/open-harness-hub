@@ -305,7 +305,13 @@ def analyze_match(kept: list[dict], pool: list[dict]) -> dict:
     return {"undermatched": under, "overmatched": over, "stage_coverage": sorted(present)}
 
 
+_FLOW_CACHE: dict[str, dict] = {}  # task -> result; the two LLM calls are the slow part
+
+
 def build_flow(task: str, index: Index) -> dict:
+    cache_key = " ".join(task.lower().split())
+    if cache_key in _FLOW_CACHE:
+        return {**_FLOW_CACHE[cache_key], "cached": True}
     route = resolve_route()
     pool = _stratified_pool(index, task)
     kept, dropped, sel_llm = orchestrate(task, pool, route)
@@ -319,7 +325,7 @@ def build_flow(task: str, index: Index) -> dict:
     cost = estimate_cost(kept)
     analysis = analyze_match(kept, pool)
     narrative, narr_llm = llm_narrative(task, kept, cost)
-    return {
+    result = {
         "task": task,
         "flow": {"steps": kept, "stages": flowchart(kept), "dropped": dropped, "analysis": analysis},
         "cost": cost,
@@ -327,7 +333,12 @@ def build_flow(task: str, index: Index) -> dict:
         "llm_used": (sel_llm or narr_llm),
         "selection_by_model": sel_llm,
         "embedding": describe_backend(),
+        "cached": False,
     }
+    if len(_FLOW_CACHE) > 500:  # bounded
+        _FLOW_CACHE.clear()
+    _FLOW_CACHE[cache_key] = result
+    return result
 
 
 # --------------------------------------------------------------------------- #
@@ -434,13 +445,13 @@ a{color:var(--acc)}
 <div id=out></div>
 </main>
 <script>
-const EX=["Screen migrant-worker recruitment fees against ILO fair-recruitment rules and flag debt-bondage risk",
-"Classify a CVE: derive its CVSS v3.1 vector and map it to the correct CWE",
+const EX=["Detect human-trafficking indicators in a recruitment ad and route to the right hotline with citations",
+"Screen a labor-recruitment contract for modern-slavery and debt-bondage red flags against ILO indicators",
+"Flag predatory overcharging and illegal recruitment fees in a migrant worker's pay statement",
 "Aggregate beneficial ownership under the OFAC 50% Rule to decide if an unlisted entity is blocked",
-"Validate an HGVS variant string and map it to current ClinVar clinical significance",
+"Classify a CVE: derive its CVSS v3.1 vector and map it to the correct CWE",
 "Triage acute malnutrition from MUAC and bilateral oedema under the CMAM protocol",
-"Decode an OBD-II trouble code and derive the ISO 26262 ASIL from severity/exposure/controllability",
-"Classify a US import's HTS subheading and check for any active antidumping order"];
+"Validate an HGVS variant string and map it to current ClinVar clinical significance"];
 const exDiv=document.getElementById('examples');
 EX.forEach(t=>{const c=document.createElement('span');c.className='chip';c.textContent=t;c.onclick=()=>{task.value=t;build()};exDiv.appendChild(c)});
 const task=document.getElementById('task'),go=document.getElementById('go'),out=document.getElementById('out'),status=document.getElementById('status'),banner=document.getElementById('banner');

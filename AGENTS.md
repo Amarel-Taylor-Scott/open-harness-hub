@@ -62,6 +62,10 @@ Read [`README.md`](README.md) first, then [`taxonomy/SPEC.md`](taxonomy/SPEC.md)
   `from __future__ import annotations`).
 - **Slug format**: lowercase-with-dashes, ≤ 64 chars.
 - **Component IDs**: `{type}/{slug}`. Immutable once published.
+- **No version in names or IDs.** Version lives only in the `version` metadata
+  field (semver). Never put `-v1`/`-v2`/`v1` in a slug or name. Existing `-v1`
+  ids are a careful-migration target (renaming a published id breaks refs, so
+  migrate with a CDC/alias, never silently).
 - **License**: MIT for code-shaped components; CC-BY-4.0 for data-shaped.
 - **Industry tags** are OPEN. Sub-industries are dot-separated
   (`healthcare.radiology`, `finance.aml`).

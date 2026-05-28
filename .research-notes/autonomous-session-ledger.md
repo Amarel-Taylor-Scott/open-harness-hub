@@ -111,6 +111,17 @@ New backlog (queued for `/goal` + the scout):
 ### DONE 2026-05-28b — esoteric capability-lift corpus (55 KPs)
 `scripts/factory/knowledge_pack_factory.py` turns discovered gaps into valid, **retrieval-typed**, source-governed catalog KPs (schema gained an optional `retrieval` enum: rag_vector|regex|keyword|exact_id|classifier|graph). Emitted **55 packs** to `catalog/knowledge-packs/esoteric/` (6 with real public-fact seeds: CWE Top-25, OFAC 50% rule, APWA 811 colors, ICS forms, DEA schedules, TLS suites; 49 honest ingestion contracts with declared authoritative sources — never fabricated facts; seeds in `data/esoteric-packs/`). All 55 validate green and PASS the capability-lift gate (cull 0). Next: governed ingestion to populate the contract packs; rebuild vector store so the builder surfaces them.
 
+### DONE 2026-05-28c — corpus to 100 + multi-page showcase
+Wave-2 parallel discovery (3 more agents) → 45 new gaps (`discovered-wave2-2026-05-28.jsonl`): 15 deep valleys, 15 paper-anchored failure modes (PopQA/FreshQA/CODATA/MuSiQue/negation/ALCE/FEVER), 15 Kaggle-anchored (EEDI/AIMO/LMSYS/DAIGT/RSNA/BirdCLEF/Optiver/Ribonanza), all with verified permissive sources (licensing pitfalls flagged: avoid SNOMED/ICD-10-ND). Factory → **100 esoteric KPs total**, all validate + pass lift gate. Showcase is now **multi-page**: `/browse` + `/api/components` (search + type facets + nav); esoteric example prompts.
+
+### Product backlog (user articulation 2026-05-28)
+- **Four value props** (formalize as `docs/strategy/value-propositions.md`): (1) VALLEYS — capability-gap KPs where Karpathy factors are low (migrant labor, developing-country law/governance, under-AI'd economies); (2) STREAMLINED building — flexibility, verifiability, updatability; (3) COST — token/model-size reduction + tool suggestions (gate components, synonym/CJK/slang/ASD-STE100 packs); (4) TRACKING — I/O, recommendations, improvement, **drift**. Deployment = MAX FLEXIBILITY: run on our platform (Pro) OR BYO platform; our cloud models OR their models; MVP first; if we capture full I/O (platform or data-sharing) → track data + drift and share it.
+- **Advanced multi-source gap discovery**: extend `capability_gap_scout` into source adapters — Kaggle, arXiv/papers, **GitHub profiles/repos**, and **feed-in arbitrary text (LinkedIn posts / pasted content)** → extract gaps. Parallel fan-out (the agent-burst) + the standing scout = the "insane gap-finding" engine. Add `--text/--from-file` mode.
+- **Prompt-pack families** (source-governed intake): image/video generation prompt packs (GitHub + image-gen sites), coding prompt packs (GitHub, Claude Code, tools) — each a capability-lift pack with attribution; mine knowledge, reference repos.
+- **Governed ingestion** to populate the 94 ingestion-contract KPs from their declared authoritative sources (license-filtered, attributed).
+- **Diagram/workflow page** (dedicated) beyond the build-page flowchart; provenance/trust surfacing.
+- **PathNav.ai**: consume the registry + builder + MCP for life-goal agent-pipeline building.
+
 ## Cycle log
 
 | # | path | change | validation | commit |
