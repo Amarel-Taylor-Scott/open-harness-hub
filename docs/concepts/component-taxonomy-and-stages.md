@@ -110,6 +110,50 @@ status). Declared by a pipeline's `outputs`.
 | `benchmark` | A pipeline run vs a labeled set with a rubric + judge → comparable score. | Evaluate |
 | `dataset` | Typed inputs/outputs/labels with provenance. | Evaluate |
 
+## Conditions (IF) and Actions (THEN) — decoupled
+
+A "rule" is fundamentally **IF condition THEN action**. For composability we keep
+the two halves as separate, recombinable pieces — one condition can drive many
+actions; one action can be triggered by many conditions.
+
+- **Condition (IF)** — a predicate over the working text/state:
+  - `text contains Y` (keyword), `text matches /…/` (regex),
+  - `text is similar to X` (vector similarity ≥ threshold),
+  - `classifier(text) = Z`, or a structured/graph check.
+  Conditions are the matching half of a `rule-pack` (a rule pack = a set of
+  `{when: <condition>, then: <action ref>}`).
+
+- **Action (THEN)** — what fires when a condition is true. Actions compose:
+  - **Retrieve** facts from a Knowledge Corpus (keyword / regex / RAG),
+  - **Rerank / prioritize** retrieved results,
+  - **Compress / polish** with a small model (e.g. Gemma 4),
+  - **Transform** text (format, redact, normalize) — a `processor`,
+  - **Execute** code / call an API / fetch / extract — a `tool`,
+  - **Post / request** — HTTP call-out, fire a webhook, push a notification,
+  - **Evaluate** — score against a rubric / judge,
+  - **Monitor** — watch a source or metric and re-trigger on change,
+  - **Loop / branch / parallel** — control flow over sub-steps (the pipeline
+    step kinds `loop`, `branch`, `parallel`),
+  - route, gate, escalate, or call the main model via a `harness`.
+
+Action categories by execution model: retrieve/rerank/transform/evaluate are
+text-operations; execute/post-request/webhook/monitor are code-executing (need
+credentials, rate limits, sandboxing); loop/branch/parallel are control flow.
+
+This separation is why an Action like "retrieve by keyword then rerank" is built
+from small reusable pieces rather than baked into one monolithic rule. (Schema
+note: `rule-pack` rules currently carry `when`/`then`; formalizing standalone
+`condition` and `action` leaf types is a queued refinement.)
+
+## Knowledge Corpus (the fact store)
+
+"Knowledge pack" = **Knowledge Corpus** in product language (the schema `type`
+stays `knowledge-pack` for back-compat). A corpus is typed by **how it is
+queried** — its `retrieval` triggers: `keyword`, `regex`, `rag_vector`,
+`exact_id`, `classifier`, `graph` (a corpus may support several). Static
+(versioned fixed set) or dynamic (fetched/extended by an Action). The Action
+"search this keyword corpus and pull down X" is the THEN that consumes the corpus.
+
 ## Execution model (orthogonal classification — by what runs)
 
 Every component falls into exactly one of three execution classes. This is
