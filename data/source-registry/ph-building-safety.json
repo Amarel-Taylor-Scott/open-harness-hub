@@ -1,0 +1,203 @@
+{
+  "_meta": {
+    "schema_version": "1.0",
+    "cell": {
+      "jurisdiction": "PH",
+      "sub_national": ["NCR", "Region III", "Angeles City, Pampanga"],
+      "industry": "construction-building-safety",
+      "source_type": "primary_regulator",
+      "publisher_type_mix": ["government_primary", "government_social", "expert"],
+      "use_case": ["violation-detection", "permit-verification", "routing-to-authority"]
+    },
+    "created": "2026-05-28",
+    "created_by": "sub-agent/source-discoverer",
+    "half_life_warning": "Regulatory facts in this file are VOLATILE BY DESIGN. Treat every entry as a dated snapshot; re-verify on cadence. All URLs marked [verify] have not been confirmed against a live source in this session.",
+    "cdc_required": true,
+    "tier4_note": "LGU-level building-permit ledgers and on-the-ground enforcement practice are predominantly tier-4 (offline counter records, Facebook pages of city/municipal engineering offices, WhatsApp circulars among contractors). Automated harvesting does NOT close this; route to the local Office of the Building Official (OBO) or a licensed structural engineer (PRC-registered) for signed capture.",
+    "safety_stance": "DETECTION and ROUTING with citations only. No evasion of codes or permits. No PII stored. This registry supports flagging approved-floor-count vs actual, missing licensed-engineer sign-off, and occupancy/structural red flags — then routing to the building official / authority."
+  },
+  "sources": [
+    {
+      "id": "ph-bs-001",
+      "publisher": "Department of Public Works and Highways (DPWH)",
+      "publisher_abbr": "DPWH",
+      "publisher_type": "government_primary",
+      "base_url": "https://www.dpwh.gov.ph [verify]",
+      "issuance_types": [
+        "Department Orders",
+        "Guidelines and Standards (structural load, seismic)",
+        "National Structural Code of the Philippines (NSCP) adoption issuances",
+        "Infrastructure design standards circulars"
+      ],
+      "access_method": "PDF download from directory listing; no clean API known [verify]",
+      "format": "PDF (some scanned image-PDF — OCR required)",
+      "has_delta_feed": false,
+      "cadence": "irregular; major updates tied to NSCP revision cycles [verify]",
+      "tier": 3,
+      "cdc_needs": "Manual re-check on each NSCP edition release and DPWH DO cycle; no delta feed — full-page diff required",
+      "notes": "DPWH oversees national structural and infrastructure standards. The National Structural Code of the Philippines (NSCP) — published by ASEP (Association of Structural Engineers of the Philippines) [verify] — is the technical backbone for allowable floor loads, seismic zone factors, and structural adequacy. NSCP 7th edition [verify edition number and year] is the current reference. DPWH does not directly issue building permits (that is LGU/OBO authority) but sets the technical standards that OBOs are required to apply under PD 1096 IRR."
+    },
+    {
+      "id": "ph-bs-002",
+      "publisher": "Department of the Interior and Local Government (DILG)",
+      "publisher_abbr": "DILG",
+      "publisher_type": "government_primary",
+      "base_url": "https://www.dilg.gov.ph [verify]",
+      "issuance_types": [
+        "Memorandum Circulars (MC)",
+        "Joint Circulars with DPWH and DICT on LGU compliance",
+        "Guidelines on LGU Building Official appointments",
+        "Directives on post-disaster building inspection protocols"
+      ],
+      "access_method": "PDF listings on dilg.gov.ph; no structured API known [verify]",
+      "format": "PDF",
+      "has_delta_feed": false,
+      "cadence": "irregular; event-driven (post-disaster, major policy reform)",
+      "tier": 3,
+      "cdc_needs": "Full-page diff on MCs page; no feed — monitor issuance list page for changes",
+      "notes": "DILG supervises LGUs and can issue directives binding on city/municipal engineering offices and Offices of the Building Official. After a major collapse, DILG typically issues a memorandum ordering inspections nationwide. These are often the most operationally relevant issuances for detecting systemic violation patterns across jurisdictions. DILG Facebook page (facebook.com/DILG.Philippines [verify]) is used for public announcements and may carry material ahead of the website — tier 4 channel."
+    },
+    {
+      "id": "ph-bs-003",
+      "publisher": "Office of the Building Official (OBO) — Local Government Unit level",
+      "publisher_abbr": "OBO/LGU",
+      "publisher_type": "government_primary",
+      "base_url": null,
+      "issuance_types": [
+        "Building permits (BP) — approved floor count, occupancy classification",
+        "Certificate of Occupancy (CO)",
+        "Stop-Work Orders (SWO)",
+        "Notices of Violation (NOV)",
+        "Building inspection records",
+        "Fire safety clearance coordination records [BUREAU OF FIRE PROTECTION]"
+      ],
+      "access_method": "COUNTER ONLY — most LGU OBOs have no public digital portal for permit record lookup as of 2025 [verify]; some metro LGUs have partial online verification systems",
+      "format": "Paper ledger / internal electronic record; not publicly addressable",
+      "has_delta_feed": false,
+      "cadence": "Continuous (per permit application); no public feed",
+      "tier": 4,
+      "cdc_needs": "NOT applicable via automation — requires in-person FOI request or formal query to the LGU OBO; human-router path only",
+      "notes": "This is the most operationally critical source for detecting approved-floor-count vs actual-floor-count discrepancies (the Angeles City collapse scenario). The building permit issued by the LGU OBO specifies the approved number of stories/floors. The gap between the approved permit and as-built reality is the primary red flag. However, this data is overwhelmingly tier-4: no national permit database is publicly queryable [verify]; some cities have begun digitization but completeness is low [verify]. A licensed structural engineer or OBO staff member performing a site visit is the authoritative verification path. Route to: the LGU's Office of the Building Official, the Philippine Institute of Certified Public Accountants for permit fees in question [check], or the DPWH regional office overseeing the LGU.",
+      "human_router_required": true,
+      "routing_authority": "LGU Office of the Building Official; DPWH Regional Office; DILG (for systemic LGU non-compliance)"
+    },
+    {
+      "id": "ph-bs-004",
+      "publisher": "Professional Regulation Commission (PRC) — Board of Civil Engineering / Board of Architecture",
+      "publisher_abbr": "PRC",
+      "publisher_type": "government_primary",
+      "base_url": "https://www.prc.gov.ph [verify]",
+      "issuance_types": [
+        "Licensed Civil Engineer registry (publicly queryable) [verify]",
+        "Licensed Architect registry",
+        "Licensed Structural Engineer designation [verify — check if 'structural engineer' is a separate PRC-regulated specialty or a sub-specialty of civil engineering in PH]",
+        "Suspension/revocation orders for PRC-licensed professionals",
+        "Resolutions on professional standards"
+      ],
+      "access_method": "Online verification portal for license status [verify URL and coverage]; PDF resolutions on prc.gov.ph",
+      "format": "Web query (license verification); PDF (resolutions)",
+      "has_delta_feed": false,
+      "cadence": "License registry: near-real-time for suspensions/revocations [verify]; resolutions: periodic",
+      "tier": 2,
+      "cdc_needs": "Periodic re-check of license status for specific professionals cited in permits; monitor for revocation orders; no bulk delta feed known [verify]",
+      "notes": "Under PD 1096 and the IRR, building permit applications above a certain floor count or structural complexity require sign-off by a licensed structural engineer and/or architect. The PRC registry is the authoritative source for verifying whether the signing professional holds a valid, unsuspended license. This is an accountability_or_license signal: a model cannot hold or verify a PRC license — only the PRC registry can. A permit signed by a lapsed or revoked license is itself a red flag. PRC license verification should be a mandatory gate in the If Statement (rule) component for high-rise building permit screening."
+    },
+    {
+      "id": "ph-bs-005",
+      "publisher": "National Building Code of the Philippines (PD 1096) and Implementing Rules and Regulations (IRR)",
+      "publisher_abbr": "PD1096/IRR",
+      "publisher_type": "government_primary",
+      "base_url": "https://www.dpwh.gov.ph [verify — PD 1096 text; also on lawphil.net and chan robles virtual law library]",
+      "issuance_types": [
+        "Presidential Decree 1096 (1977) — base statute [public domain]",
+        "IRR of PD 1096 — implementing rules [verify current revision date]",
+        "DPWH Department Orders that amend or supplement the IRR",
+        "Referential technical standards (NSCP, NFPA, ASTM adoption)"
+      ],
+      "access_method": "PDF — lawphil.net, chan robles, DPWH; no structured API; text is in English",
+      "format": "PDF / HTML (secondary aggregators lawphil.net, chan robles)",
+      "has_delta_feed": false,
+      "cadence": "PD 1096 is stable (1977); IRR amendments are event-driven — check DPWH DOs [verify last IRR amendment date]",
+      "tier": 3,
+      "cdc_needs": "Monitor DPWH DO page for IRR amendments; the base PD 1096 text is stable but IRR Section references shift with revisions — version every extract",
+      "notes": "PD 1096 and its IRR are the primary legal basis for building permits, floor-count approval, occupancy classification, and licensed professional requirements in the Philippines. Key provisions for violation detection: Section 301 (permit requirement) [verify], Section 307 (Certificate of Occupancy) [verify], Section 207 (duties of the Building Official) [verify], Rule VIII on structural requirements [verify rule numbering in current IRR]. The IRR specifies which floor counts / use categories require a licensed structural engineer's signature. Any detection If Statement citing these must include the specific section number AND the IRR version date — regulatory facts are volatile and clause numbers shift between revisions. This source is tier-3: the text exists on stable public URLs but requires OCR or structured extraction; secondary aggregators (lawphil.net) provide searchable HTML."
+    },
+    {
+      "id": "ph-bs-006",
+      "publisher": "Bureau of Fire Protection (BFP)",
+      "publisher_abbr": "BFP",
+      "publisher_type": "government_primary",
+      "base_url": "https://bfp.gov.ph [verify]",
+      "issuance_types": [
+        "Fire Safety Inspection Certificates (FSIC)",
+        "Fire Code of the Philippines (RA 9514) implementing rules [verify]",
+        "BFP circulars on occupancy/high-rise fire safety requirements"
+      ],
+      "access_method": "PDF on bfp.gov.ph; FSIC verification is counter-level [verify if any online lookup exists]",
+      "format": "PDF (circulars); counter record (FSICs)",
+      "has_delta_feed": false,
+      "cadence": "FSIC: per-building annual; circulars: irregular",
+      "tier": "3-4",
+      "cdc_needs": "Monitor BFP circulars page; individual FSIC verification requires human-router / OBO coordination",
+      "notes": "The Fire Code (RA 9514 and its IRR [verify]) requires a valid FSIC as a prerequisite for Certificate of Occupancy and for buildings above certain occupancy thresholds. An illegally added floor may not have been inspected for fire safety. BFP coordination is a required gate in the routing action: flag missing or expired FSIC alongside the floor-count discrepancy. BFP also maintains Facebook presence (facebook.com/BFPOfficial [verify]) for public announcements — tier-4 channel not suitable for automated harvesting."
+    },
+    {
+      "id": "ph-bs-007",
+      "publisher": "Department of Labor and Employment (DOLE) — Occupational Safety and Health Center (OSHC)",
+      "publisher_abbr": "DOLE/OSHC",
+      "publisher_type": "government_primary",
+      "base_url": "https://oshc.dole.gov.ph [verify]",
+      "issuance_types": [
+        "Occupational Safety and Health Standards (OSHS) — RA 11058 IRR",
+        "Department Order 198 (s. 2018) — implementing RA 11058 [verify DO number]",
+        "Construction safety guidelines",
+        "Toolbox talk / safety officer accreditation requirements"
+      ],
+      "access_method": "PDF on oshc.dole.gov.ph and dole.gov.ph; paginated listing; no API",
+      "format": "PDF",
+      "has_delta_feed": false,
+      "cadence": "OSHS amendments: infrequent but material; monitor DOLE DO page",
+      "tier": 3,
+      "cdc_needs": "Monitor DOLE DO issuance list for OSHS-related amendments",
+      "notes": "RA 11058 (Occupational Safety and Health Standards) and its IRR (DO 198 s. 2018 [verify]) require construction sites above certain size to have an accredited safety officer. Workers trapped in a collapse with no certified safety officer on site is a compound violation: building code violation (floor count) + OSH violation (safety officer requirement, emergency procedures). The OSHC/DOLE channel is relevant for routing worker-safety aspects of a building collapse investigation to the correct authority (DOLE regional office) alongside the building-code routing (OBO/DPWH)."
+    },
+    {
+      "id": "ph-bs-008",
+      "publisher": "LGU City/Municipal Engineering Office + OBO Social Media (Facebook pages)",
+      "publisher_abbr": "LGU-FB",
+      "publisher_type": "government_social",
+      "base_url": null,
+      "issuance_types": [
+        "Informal stop-work announcements",
+        "Permit denial notices (sometimes posted)",
+        "Local construction activity notices",
+        "Mayor's office announcements on building violations"
+      ],
+      "access_method": "Facebook page (login-walled for scraping; publicly viewable in browser); WhatsApp broadcast to contractors",
+      "format": "Social post (image, text, video); screenshot-forwarded circular",
+      "has_delta_feed": false,
+      "cadence": "Continuous / event-driven; ephemeral",
+      "tier": 4,
+      "cdc_needs": "NOT applicable via automation — monitor via human subscriber; posts can be edited/deleted without notice; no canonical record",
+      "notes": "In practice, informal enforcement announcements, local stop-work orders, and permit-related notices for many Philippine LGUs are first (and sometimes only) published on the local government's Facebook page or via WhatsApp group chats of the local engineers/contractors network. This is the canonical tier-4 channel: crawler-inaccessible for bulk harvesting, ephemeral, editable. A verified-publisher path (a licensed structural engineer or OBO staff member who is a subscriber) is required to convert this channel into a citable fact. The human-router component must explicitly handle this channel with signed capture and provenance.",
+      "human_router_required": true,
+      "routing_authority": "LGU OBO staff; licensed civil/structural engineer with local relationships"
+    }
+  ],
+  "durability_assessment": {
+    "primary_lift_reasons": [
+      "embodiment_required",
+      "accountability_or_license",
+      "no_addressable_source",
+      "volatile_fact"
+    ],
+    "durability_class": "structural",
+    "retrievability_tier_range": "2-5",
+    "dominant_mechanisms": [
+      "channel_inaccessibility",
+      "sparse_data"
+    ],
+    "gap_durability_score_estimate": 5.0,
+    "rationale": "LGU building-permit records (approved floor count) are overwhelmingly tier-4 or tier-5 (counter-only / human site visit). PRC license verification is tier-2 (usable but no delta feed). The base law text (PD 1096) is tier-3 but volatile via IRR amendments. On-the-ground practice (what the OBO actually enforces, informal price of compliance) is tacit local knowledge — never written. All primary lift reasons are structural. The gap will not close when the next model ships because the authoritative source of floor-count approval is a paper ledger at a counter, and only a body (licensed engineer site visit) can verify the as-built count."
+  }
+}
