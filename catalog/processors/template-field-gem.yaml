@@ -1,0 +1,92 @@
+id: "processor/template-field-gem"
+type: processor
+version: "0.1.0"
+name: "Template field gem — parse {{field}} placeholders and drive one-shot agentic tasks"
+description: |
+  Pre-LLM processor implementing the Trove "gem" (no-code local agentic task)
+  pattern. Parses a prompt template containing {{field_name}} placeholders,
+  resolves the fields from a user-provided context object, and assembles the
+  final prompt ready for a one-shot LLM call. Supports:
+
+    - Simple scalar substitution: {{user_name}}, {{date}}, {{task}}
+    - Conditional fields: {{?optional_field}} (omitted if not present in context)
+    - Iteration fields: {{each:items}} ... {{/each}} (repeats block per item)
+    - Nested path resolution: {{user.address.city}}
+
+  A "gem" in Trove is a prompt template + context object that together define
+  a complete, self-contained agentic task — no code required. This processor
+  is the engine that activates a gem: it takes the raw template and context,
+  resolves all placeholders, validates that required fields are present, and
+  emits the assembled prompt. If required fields are missing it raises a
+  structured error listing the missing field names, not a model hallucination.
+
+  CAPABILITY LIFT (structural): without a template engine, each agentic task
+  requires custom code or manual prompt assembly. The model cannot reliably
+  assemble multi-field prompts from a context object without hallucinating
+  field values or omitting required fields. A deterministic template engine
+  guarantees exact field substitution. lift_reason: deterministic_guarantee;
+  mechanism: sub_token (string interpolation is below the token boundary —
+  the model cannot do it reliably).
+
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["ai", "cross_industry"]
+capability: ["agent_loop", "format_conversion", "verification"]
+modality:   ["text", "structured"]
+lifecycle:  "stable"
+lifecycle_position: "pre_api"
+trust_boundary: "local"
+created: "2026-05-28"
+updated: "2026-05-28"
+
+attribution:
+  source_url: "https://github.com/google-gemini/gemma-cookbook"
+  source_kind: "github"
+  author: "Trove no-code local agentic gem framework (Gemma community)"
+  license: "MIT"
+
+tags:
+  - "on-device"
+  - "offline"
+  - "template"
+  - "placeholder"
+  - "gem"
+  - "no-code"
+  - "agentic"
+  - "one-shot"
+  - "deterministic"
+  - "prompt-assembly"
+  - "trove"
+  - "structural-lift"
+
+process_kind: "format_convert.template_render"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 50
+
+inputs:
+  - name: "template"
+    type: "string"
+  - name: "context"
+    type: "object"
+  - name: "strict_mode"
+    type: "boolean"
+outputs:
+  - name: "assembled_prompt"
+    type: "string"
+  - name: "resolved_fields"
+    type: "string[]"
+  - name: "missing_fields"
+    type: "string[]"
+  - name: "conditional_fields_omitted"
+    type: "string[]"
+
+side_effects: "none"
+on_error: "raise"
+
+implementations:
+  - kind: "callable"
+    path: "scripts.processors.template_field_gem.run"
+    language: "python"

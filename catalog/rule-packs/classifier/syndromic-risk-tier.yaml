@@ -1,0 +1,116 @@
+id: "rule-pack/syndromic-risk-tier"
+type: rule-pack
+version: "0.1.0"
+name: "Syndromic risk-tier classifier (Green / Yellow / Red escalation)"
+description: |
+  Classifier rule pack for offline syndromic triage. Evaluates a structured
+  symptom bundle (syndrome label, case count, alert threshold ratio, severity
+  flags) produced by the AfyaEdge intake processor and emits a risk tier:
+
+    Green  — below alert threshold; monitor, no immediate escalation.
+    Yellow — at or approaching alert threshold (≥50% of threshold); notify
+             district health officer within 24 hours.
+    Red    — at or exceeding alert threshold, or any priority-1 syndrome
+             regardless of count (e.g. acute haemorrhagic fever, meningitis
+             with ≥2 cases in same locality); immediate MoH notification
+             required and sync queued on reconnect.
+
+  Rules apply the WHO IDSR 3rd edition alert thresholds encoded in the
+  syndromic-surveillance-case-definitions Knowledge Corpus. The rule pack
+  is deterministic — no LLM sampling involved in tier assignment.
+
+  DEFENSIVE INGESTION CONTRACT:
+  - Tier decisions are decision-SUPPORT outputs, not clinical diagnoses.
+  - A "Green" tier never means "no disease" — it means below notification
+    threshold at time of assessment.
+  - Any pipeline consuming this rule pack MUST surface: "Tier assignment
+    is a surveillance aid only. Consult a trained health officer. Report
+    suspected outbreaks per your country's IDSR obligations."
+  - The rule pack does not handle laboratory confirmation; it operates on
+    syndromic case counts only.
+
+  CAPABILITY LIFT (structural): deterministic tier assignment from symptom
+  counts prevents the model from producing inconsistent escalation decisions
+  — a base LLM will produce different thresholds on different runs for the
+  same inputs. This is a sub_token arithmetic guarantee (comparing counts
+  to thresholds). lift_reason: deterministic_guarantee; mechanism: sub_token.
+
+authors:
+  - name: "Open Harness Hub contributors"
+license: "Apache-2.0"
+industry:   ["healthcare.public_health", "public_safety", "government.regulatory"]
+capability: ["classification", "safety_gating", "routing"]
+modality:   ["structured", "text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness: "stable"
+created: "2026-05-28"
+updated: "2026-05-28"
+
+attribution:
+  source_url: "https://www.who.int/publications/i/item/9789241549738"
+  source_kind: "other"
+  author: "WHO IDSR 3rd edition alert threshold logic (public domain); AfyaEdge offline triage pattern"
+  license: "Apache-2.0"
+
+tags:
+  - "offline"
+  - "on-device"
+  - "syndromic-surveillance"
+  - "triage"
+  - "risk-tier"
+  - "green-yellow-red"
+  - "escalation"
+  - "deterministic"
+  - "who"
+  - "idsr"
+  - "global-south"
+  - "field-epidemiology"
+  - "defensive"
+  - "structural-lift"
+  - "afyaedge"
+
+family: "classifier"
+language: "en"
+rules:
+  - id: "priority1_syndrome_immediate"
+    label: "Priority-1 syndrome (any count) — immediate Red"
+    condition: "case.syndrome_label IN ['acute_haemorrhagic_fever', 'human_rabies', 'polio'] AND case.count >= 1"
+    action: "assign_tier_red"
+    severity: "critical"
+    category: "tier.red.priority1"
+
+  - id: "meningitis_cluster_red"
+    label: "Meningitis syndrome cluster (≥2 in same locality, 7 days)"
+    condition: "case.syndrome_label == 'meningitis_syndrome' AND case.rolling_7d_count >= 2 AND case.same_locality == true"
+    action: "assign_tier_red"
+    severity: "critical"
+    category: "tier.red.cluster"
+
+  - id: "threshold_exceeded_red"
+    label: "Case count exceeds WHO IDSR alert threshold"
+    condition: "case.threshold_ratio >= 1.0"
+    action: "assign_tier_red"
+    severity: "high"
+    category: "tier.red.threshold"
+
+  - id: "threshold_approaching_yellow"
+    label: "Case count approaching threshold (≥50% of threshold)"
+    condition: "case.threshold_ratio >= 0.5 AND case.threshold_ratio < 1.0"
+    action: "assign_tier_yellow"
+    severity: "medium"
+    category: "tier.yellow.approaching"
+
+  - id: "severity_flag_yellow"
+    label: "Severe outcome flagged in case bundle (death, ICU, referral)"
+    condition: "case.severe_outcome_flag == true AND case.threshold_ratio < 1.0"
+    action: "assign_tier_yellow"
+    severity: "medium"
+    category: "tier.yellow.severity"
+
+  - id: "below_threshold_green"
+    label: "Below threshold and no severity flags"
+    condition: "case.threshold_ratio < 0.5 AND case.severe_outcome_flag == false AND case.syndrome_label NOT IN ['acute_haemorrhagic_fever', 'human_rabies', 'polio']"
+    action: "assign_tier_green"
+    severity: "low"
+    category: "tier.green"
