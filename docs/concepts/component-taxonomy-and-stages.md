@@ -5,6 +5,39 @@ it sits in a pipeline**. These labels are canonical — the conversational build
 the `/browse` page, docs, and emitters all use them. (Schema field names in
 `schemas/` are the storage contract; these are the human/product labels.)
 
+## The seven primitives (the foundation)
+
+Everything in a pipeline reduces to **seven primitives**, and they all extend one
+**generic shell** — `scripts/primitives/base.py::Primitive` — whose contract is
+compatible with the pipeline object: `run(po) -> po`. Every catalog component
+`type` is a subtype/extension of exactly one primitive. The folder structure
+mirrors this taxonomy: **one file per primitive** under `scripts/primitives/`,
+each owning its own label/stage/description (the single source — there are no
+magic-string label tables elsewhere; product labels are derived via
+`label_for_type` / `stage_for_type`).
+
+1. **Input** — the payload to work on.
+2. **Knowledge Corpus** — a store of facts, queried by a trigger.
+3. **If Statement** — the condition (the IF), kept separate from the THEN.
+4. **Action** — anything that *does* something (the THEN) — incl. add-persona, model-call, evaluate.
+5. **Loop** — control flow / iteration over sub-steps.
+6. **Stop / End** — halt early on a guard / terminal condition.
+7. **Output** — finalize the result + trace.
+
+| Primitive | File | Schema `type`(s) — subtypes | Notes |
+|---|---|---|---|
+| **Input** | `input.py` | (pipeline `inputs`) | text · document · HTML · PDF · image · combination |
+| **Knowledge Corpus** | `knowledge_corpus.py` | `knowledge-pack`, `dataset` | typed by `retrieval`: keyword / regex / rag / exact-id / classifier / graph; static or dynamic |
+| **If Statement** | `if_statement.py` | `rule-pack`, `logic-pack` | the IF: contains-Y · matches /…/ · similar-to-X · classifier=Z · graph |
+| **Action** | `action.py` | `persona`, `tool`, `processor`, `harness`, `adapter`, `rubric`, `benchmark` | persona = add-persona · tool = execute/call · processor = transform · harness = model-call · adapter = model-transport · rubric = evaluate |
+| **Loop** | `loop.py` | `pattern`, `pipeline` | for-each · while · branch · parallel · map-reduce; pipeline orchestrates |
+| **Stop / End** | `stop_end.py` | (structural) | guard / terminal halt |
+| **Output** | `output.py` | (structural) | result + trace into the pipeline object |
+
+Schema `type` keys are internal storage names; the user only ever sees the
+primitive/product labels. The "stages" below are a conventional *arrangement* of
+these primitives for a typical task — the primitives are the foundation.
+
 A pipeline is a left-to-right flow of stages. Each stage is filled by one or
 more component *types*. Not every pipeline uses every stage.
 
@@ -33,9 +66,9 @@ counsel"). Sets stance and voice; holds **no** volatile facts.
 - **Component type:** `persona`.
 
 ### 4. Knowledge (triggered)
-Add **facts** to the working context. Knowledge is pulled from **Knowledge Corpus
-components** and is fired by a **trigger**. The trigger is declared on the
-knowledge pack's `retrieval` field (a pack may support several):
+Add **facts** to the working context. Knowledge is pulled from a **Knowledge
+Corpus** and is fired by a **trigger**. The trigger is declared on the Knowledge
+Corpus's `retrieval` field (a corpus may support several):
 
 | Trigger (`retrieval`) | Fires when… | Example |
 |---|---|---|
@@ -94,21 +127,21 @@ status). Declared by a pipeline's `outputs`.
 
 ## Component types at a glance (consistent definitions)
 
-| Type | One-line definition | Stage |
+| Schema `type` (storage) | Product label · one-line definition | Primitive |
 |---|---|---|
-| `persona` | A role/voice frame the model adopts. No facts. | Persona |
-| `knowledge-pack` | A typed Knowledge Corpus of facts, with a declared `retrieval` trigger; static or dynamically fetched. | Knowledge |
-| `logic-pack` | A typed bundle of behavior (prompt templates, schemas, response policy). | Knowledge / Model |
-| `rule-pack` | One deterministic rule family (GREP/glob/classifier/heuristic/routing/RAG-policy). | Rules |
-| `tool` | Takes an action (API/code/fetch/extract) or advanced preprocessing; returns a result. | Tools / Input Formatting |
-| `processor` | Deterministic transform, no model call (input formatting OR post-processing). | Input Formatting / Post-process |
-| `harness` | Runs a model behind a trust boundary; declares model_targets + packs. | Model |
-| `adapter` | Provider-neutral model transport (swap local↔hosted). | Model |
-| `pipeline` | A DAG of the above that completes a task end to end. | Backbone |
-| `pattern` | A reusable workflow shape (ReAct, Self-RAG, refuse-on-redacted…). | (cross-cutting) |
-| `rubric` | An evaluation contract: dimensions, weights, scoring method, evidence. | Evaluate |
-| `benchmark` | A pipeline run vs a labeled set with a rubric + judge → comparable score. | Evaluate |
-| `dataset` | Typed inputs/outputs/labels with provenance. | Evaluate |
+| `persona` | **Action: Add Persona** — frames the role/voice (no facts) | Action |
+| `knowledge-pack` | **Knowledge Corpus** — facts with a `retrieval` trigger; static or dynamic | Knowledge Corpus |
+| `dataset` | **Knowledge Corpus (Dataset)** — labeled inputs/outputs/labels with provenance | Knowledge Corpus |
+| `rule-pack` | **If Statement** — one condition family (keyword/regex/similarity/classifier/routing) | If Statement |
+| `logic-pack` | **If Statement** — conditional prompt/schema/response policy | If Statement |
+| `tool` | **Action: Execute/Call** — code / API / fetch / extract / post / webhook | Action |
+| `processor` | **Action: Transform** — deterministic text op (format/redact/rerank/compress) | Action |
+| `harness` | **Action: Model Call** — runs the model behind a trust boundary | Action |
+| `adapter` | **Action: Model Transport** — swap local↔hosted | Action |
+| `rubric` | **Action: Evaluate** — score against a contract | Action |
+| `benchmark` | **Action: Benchmark** — comparable score vs a bare model | Action |
+| `pipeline` | **Pipeline** — orchestrates a DAG end to end | Loop |
+| `pattern` | **Loop / Flow** — reusable shape (loop / branch / parallel) | Loop |
 
 ## Conditions (IF) and Actions (THEN) — decoupled
 
@@ -147,12 +180,12 @@ note: `rule-pack` rules currently carry `when`/`then`; formalizing standalone
 
 ## Knowledge Corpus (the fact store)
 
-"Knowledge pack" = **Knowledge Corpus** in product language (the schema `type`
-stays `knowledge-pack` for back-compat). A corpus is typed by **how it is
-queried** — its `retrieval` triggers: `keyword`, `regex`, `rag_vector`,
-`exact_id`, `classifier`, `graph` (a corpus may support several). Static
-(versioned fixed set) or dynamic (fetched/extended by an Action). The Action
-"search this keyword corpus and pull down X" is the THEN that consumes the corpus.
+The product term is **Knowledge Corpus** (the schema `type` key stays
+`knowledge-pack` for back-compat storage only — never shown to users). A corpus
+is typed by **how it is queried** — its `retrieval` triggers: `keyword`, `regex`,
+`rag_vector`, `exact_id`, `classifier`, `graph` (a corpus may support several).
+Static (versioned fixed set) or dynamic (fetched/extended by an Action). The
+Action "search this keyword corpus and pull down X" is the THEN that consumes it.
 
 ## Execution model (orthogonal classification — by what runs)
 

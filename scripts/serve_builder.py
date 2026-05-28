@@ -33,42 +33,18 @@ from urllib.parse import parse_qs, urlparse
 from scripts.db import build_vector_store as vs
 from scripts.embeddings import describe_backend, resolve_backend
 from scripts.model_routes import resolve_route
+from scripts.primitives import STAGE_ORDER, label_for_type, stage_for_type
 
 _TOKEN_RE = re.compile(r"[a-z0-9][a-z0-9_.+-]{1,40}")
 # Order in which an assembled flow is presented (rough pre-LLM -> model -> post).
 # Stage-ordered flow (input → … → output). Each component type maps to a stage.
-# Canonical stages — see docs/concepts/component-taxonomy-and-stages.md
-STAGE_ORDER = ["Input Formatting", "Persona", "Knowledge", "Rules", "Tools",
-               "Model (harness)", "Backbone pipeline", "Post-process", "Evaluate"]
-TYPE_STAGE = {
-    "persona": "Persona",
-    "knowledge-pack": "Knowledge", "logic-pack": "Knowledge",
-    "rule-pack": "Rules",
-    "tool": "Tools",
-    "processor": "Input Formatting", "pattern": "Post-process",
-    "harness": "Model (harness)", "adapter": "Model (harness)",
-    "pipeline": "Backbone pipeline",
-    "rubric": "Evaluate", "benchmark": "Evaluate", "dataset": "Evaluate",
-}
-# Caps for a COHERENT flow — one persona, one model harness, one backbone, etc.
+# Stage labels, per-component labels, and descriptions are DERIVED from the seven
+# primitives (scripts/primitives/) via STAGE_ORDER / stage_for_type / label_for_type
+# / describe_type — single source, no magic-string dicts here. Only the per-stage
+# assembly caps (functional config, keyed by schema type) live locally:
 STAGE_CAPS = {"persona": 1, "knowledge-pack": 2, "logic-pack": 1, "rule-pack": 2,
               "tool": 2, "processor": 1, "pattern": 1, "harness": 1, "adapter": 1,
               "pipeline": 1, "rubric": 1, "benchmark": 1, "dataset": 1}
-ROLE_BLURB = {
-    "persona": "frames the role/voice the model adopts — holds no facts",
-    "knowledge-pack": "knowledge corpus of facts, queried by keyword / regex / vector (RAG)",
-    "rule-pack": "IF conditions (contains Y · matches /…/ · similar to X) that trigger actions",
-    "tool": "ACTION: execute code · call an API · fetch · extract · post · webhook",
-    "processor": "text ACTION (no model): format · normalize · redact · rerank · compress",
-    "harness": "runs the model behind a trust boundary",
-    "adapter": "provider-neutral model transport — swap local↔hosted (e.g. Gemma 4)",
-    "logic-pack": "prompt templates / schemas / response policy",
-    "pattern": "reusable workflow shape (incl. loop / branch / parallel)",
-    "pipeline": "an end-to-end backbone you can deploy",
-    "rubric": "evaluation contract — dimensions, weights, scoring",
-    "benchmark": "proves the capability lift vs a bare model",
-    "dataset": "labeled inputs/outputs for evaluation",
-}
 # Stopwords: matching on these ("and/for/the/risk") produced nonsense selections.
 STOPWORDS = {
     "the", "and", "for", "with", "that", "this", "from", "into", "your", "you", "are",
@@ -145,9 +121,8 @@ def _coherent_select(candidates: list[dict]) -> list[dict]:
         bucket = kept_by_type.setdefault(c["type"], [])
         if len(bucket) < STAGE_CAPS.get(c["type"], 1):
             bucket.append(c)
-    flat = [c for t in TYPE_STAGE for c in kept_by_type.get(t, [])]
-    return [{**c, "stage": TYPE_STAGE.get(c["type"], "Processors"),
-             "role": ROLE_BLURB.get(c["type"], "")} for c in flat]
+    flat = [c for t in STAGE_CAPS for c in kept_by_type.get(t, [])]
+    return [{**c, "stage": stage_for_type(c["type"]), "role": label_for_type(c["type"])} for c in flat]
 
 
 def _parse_keep(raw: str) -> list[str]:
@@ -206,8 +181,7 @@ def orchestrate(task: str, candidates: list[dict], route) -> tuple[list[dict], l
         if not c or counts.get(c["type"], 0) >= STAGE_CAPS.get(c["type"], 1):
             continue
         counts[c["type"]] = counts.get(c["type"], 0) + 1
-        chosen.append({**c, "stage": TYPE_STAGE.get(c["type"], "Processors"),
-                       "role": ROLE_BLURB.get(c["type"], "")})
+        chosen.append({**c, "stage": stage_for_type(c["type"]), "role": label_for_type(c["type"])})
     if not chosen:
         return _det_result()
     chosen.sort(key=lambda c: STAGE_ORDER.index(c["stage"]) if c["stage"] in STAGE_ORDER else 99)
@@ -320,7 +294,7 @@ def build_flow(task: str, index: Index) -> dict:
     if not any(c.get("stage") in ("Model (harness)", "Backbone pipeline") for c in kept):
         for c in pool:
             if c["type"] in ("pipeline", "harness"):
-                kept.append({**c, "stage": TYPE_STAGE[c["type"]], "role": ROLE_BLURB.get(c["type"], "")})
+                kept.append({**c, "stage": stage_for_type(c["type"]), "role": label_for_type(c["type"])})
                 break
         kept.sort(key=lambda c: STAGE_ORDER.index(c["stage"]) if c.get("stage") in STAGE_ORDER else 99)
     cost = estimate_cost(kept)
@@ -521,17 +495,17 @@ input{width:100%;background:var(--panel);color:var(--fg);border:1px solid var(--
 let TYPE='';
 const q=document.getElementById('q'),types=document.getElementById('types'),list=document.getElementById('list'),status=document.getElementById('status'),count=document.getElementById('count');
 function esc(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
-let T=null;
+let T=null,L={};
 async function load(){
  const url='/api/components?limit=300'+(TYPE?('&type='+encodeURIComponent(TYPE)):'')+(q.value.trim()?('&q='+encodeURIComponent(q.value.trim())):'');
  const r=await (await fetch(url)).json();
- if(!T){T=r.by_type;count.textContent=r.total+' components across '+Object.keys(T).length+' types';renderChips()}
+ if(!T){T=r.by_type;L=r.labels||{};count.textContent=r.total+' components';renderChips()}
  status.textContent=r.matched+' match'+(r.matched===1?'':'es')+(r.matched>r.results.length?(' (showing '+r.results.length+')'):'');
- list.innerHTML=r.results.map(c=>'<div class=item><div><span class=badge>'+esc(c.type)+'</span><span class=nm>'+esc(c.name)+'</span> <span class=cid>'+esc(c.id)+'</span></div>'+(c.desc?'<div class=ds>'+esc(c.desc)+'</div>':'')+'</div>').join('');
+ list.innerHTML=r.results.map(c=>'<div class=item><div><span class=badge>'+esc(c.label||c.type)+'</span><span class=nm>'+esc(c.name)+'</span> <span class=cid>'+esc(c.id)+'</span></div>'+(c.desc?'<div class=ds>'+esc(c.desc)+'</div>':'')+'</div>').join('');
 }
 function renderChips(){
  let h='<span class="chip'+(TYPE===''?' on':'')+'" data-t="">all</span>';
- Object.keys(T).sort().forEach(t=>{h+='<span class="chip'+(TYPE===t?' on':'')+'" data-t="'+t+'">'+esc(t)+' '+T[t]+'</span>'});
+ Object.keys(T).sort().forEach(t=>{h+='<span class="chip'+(TYPE===t?' on':'')+'" data-t="'+t+'">'+esc(L[t]||t)+' '+T[t]+'</span>'});
  types.innerHTML=h;
  [...types.querySelectorAll('.chip')].forEach(c=>c.onclick=()=>{TYPE=c.dataset.t;renderChips();load()});
 }
@@ -596,11 +570,14 @@ class Handler(BaseHTTPRequestHandler):
             typ = (qs.get("type") or [""])[0]
             limit = int((qs.get("limit") or ["300"])[0])
             items = self.index.items
-            res = [{"id": it["id"], "type": it["type"], "name": it["name"], "desc": it["desc"][:160]}
+            res = [{"id": it["id"], "type": it["type"], "label": label_for_type(it["type"]),
+                    "name": it["name"], "desc": it["desc"][:160]}
                    for it in items
                    if (not typ or it["type"] == typ)
                    and (not q or q in it["name"].lower() or q in it["id"].lower() or q in it["desc"].lower())]
-            payload = {"total": len(items), "by_type": dict(sorted(Counter(i["type"] for i in items).items())),
+            counts = dict(sorted(Counter(i["type"] for i in items).items()))
+            payload = {"total": len(items), "by_type": counts,
+                       "labels": {t: label_for_type(t) for t in counts},
                        "matched": len(res), "results": res[:limit]}
             self._send(200, json.dumps(payload).encode(), "application/json")
         else:
