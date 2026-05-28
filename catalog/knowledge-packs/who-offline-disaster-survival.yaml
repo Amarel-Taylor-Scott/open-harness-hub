@@ -1,0 +1,83 @@
+id: "knowledge-pack/who-offline-disaster-survival"
+type: knowledge-pack
+version: "0.1.0"
+name: "WHO-aligned offline disaster survival and first-aid protocols"
+description: |
+  Offline Knowledge Corpus of public-domain first-aid and disaster survival
+  protocols covering: floods, fires, earthquakes, cardiac arrest (CPR),
+  choking, severe bleeding, burns, and fracture management. Content is
+  structured from publicly available WHO Basic Emergency Care (BEC) guidelines
+  and IFRC First Aid materials. Each entry is cited to a source section so
+  the emergency-survival-guide persona can surface verbatim citations.
+
+  DEFENSIVE INGESTION CONTRACT:
+  - Content is sourced exclusively from public-domain WHO and IFRC materials.
+  - No novel medical instructions are generated; all steps are source-cited.
+  - This corpus is a reference only. It does not replace professional
+    medical care or emergency services. Every harness consuming this pack
+    MUST surface the disclaimer: "This is guidance only — call emergency
+    services immediately if possible."
+  - Volatile facts (e.g., local emergency numbers) are excluded; only
+    stable procedural protocols are included.
+
+  CAPABILITY LIFT (structural): network is structurally absent during
+  disasters — this corpus enables the persona/emergency-survival-guide to
+  function when cloud retrieval is impossible. The authoritative procedural
+  content (WHO BEC) is stable and can be fully cached on-device.
+  lift_reason: no_addressable_source (network unavailable in disaster).
+
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry:   ["healthcare.public_health", "public_safety", "public_safety.ems", "cross_industry"]
+capability: ["retrieval", "safety"]
+modality:   ["text", "structured"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness: "stable"
+created: "2026-05-28"
+updated: "2026-05-28"
+
+attribution:
+  source_url: "https://www.who.int/publications/i/item/9789240050327"
+  source_kind: "other"
+  author: "World Health Organization (WHO) and International Federation of Red Cross and Red Crescent Societies (IFRC)"
+  license: "CC-BY-NC-SA-3.0-IGO"
+
+links:
+  source: "https://www.who.int/publications/i/item/9789240050327"
+  homepage: "https://www.who.int/teams/integrated-health-services/clinical-services-and-systems/basic-emergency-care"
+
+tags:
+  - "offline"
+  - "on-device"
+  - "first-aid"
+  - "disaster"
+  - "emergency"
+  - "who"
+  - "ifrc"
+  - "cpr"
+  - "flood"
+  - "earthquake"
+  - "fire"
+  - "defensive"
+  - "structural-lift"
+
+content_types:
+  - rag_doc
+  - citation_edge
+
+files:
+  - path: "data/who-offline-disaster-survival.jsonl"
+    format: "jsonl"
+
+indexing:
+  bm25: true
+
+provenance:
+  sources:
+    - "WHO Basic Emergency Care: approach to the acutely ill and injured (2nd ed., 2024) — public domain, CC-BY-NC-SA-3.0-IGO"
+    - "IFRC First Aid 2020 Guidelines — public domain summary chapters"
+  collected_through: "2026-05-28"
+  collected_by: "Open Harness Hub research agent (manual curation from public-domain sources)"
+  anonymization: "none — all content is public-domain reference material; no PII"

@@ -1,0 +1,88 @@
+id: "knowledge-pack/low-resource-language-tutoring"
+type: knowledge-pack
+version: "0.1.0"
+name: "Low-resource-language tutoring scaffold (Marathi, Swahili, Twi — school subjects)"
+description: |
+  Knowledge Corpus scaffold for tutoring school subjects (mathematics,
+  science, basic literacy) in low-resource languages including Marathi,
+  Swahili, and Twi. Provides key concept glossaries, worked example
+  templates, and curriculum alignment notes for standard primary/secondary
+  curricula in Maharashtra (India), East Africa, and West Africa respectively.
+  Designed to run entirely on-device; no cloud dependency.
+
+  HONEST INGESTION CONTRACT:
+  - Coverage is partial and curriculum-approximate. This corpus MUST be
+    presented to students as supplementary, not authoritative.
+  - Subject-matter experts for each language community should review and
+    extend entries before production use.
+  - Entries that are uncertain are flagged with "coverage: partial".
+  - No proprietary curriculum content is included; all entries derive from
+    public-domain syllabi and open educational resources.
+
+  CAPABILITY LIFT (structural): frontier models have sparse training data
+  for low-resource languages, especially in school-subject domains. Marathi
+  STEM vocabulary, Twi arithmetic terminology, and Swahili science glossaries
+  are not well represented in public LLM training corpora. This corpus
+  provides the vocabulary layer that a base model lacks — the gap is
+  structural because it cannot close by scaling the model without acquiring
+  the missing training data (sparse_data mechanism). The corpus is an
+  on-device retrieval source available when network is absent.
+  lift_reason: no_addressable_source (offline) + sparse_data mechanism.
+
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry:   ["education", "education.k12", "education.tutoring"]
+capability: ["retrieval", "translation", "reasoning"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness: "stable"
+created: "2026-05-28"
+updated: "2026-05-28"
+
+attribution:
+  source_url: "https://github.com/google-gemini/gemma-cookbook"
+  source_kind: "github"
+  author: "GemMate / Offline Village Study Helper (Gemma community); Maharashtra State Board curriculum (public domain); East Africa national curricula open syllabi; Ghana Education Service open syllabi"
+  license: "CC-BY-4.0"
+
+links:
+  homepage: "https://www.mscepune.in/"
+
+tags:
+  - "on-device"
+  - "offline"
+  - "low-resource-language"
+  - "marathi"
+  - "swahili"
+  - "twi"
+  - "global-south"
+  - "tutoring"
+  - "education"
+  - "sparse-data"
+  - "structural-lift"
+  - "gemma"
+
+content_types:
+  - rag_doc
+
+files:
+  - path: "data/low-resource-language-tutoring.jsonl"
+    format: "jsonl"
+
+indexing:
+  bm25: true
+  dense:
+    model: "nomic-embed-text-v1.5"
+    dimensions: 768
+
+provenance:
+  sources:
+    - "Maharashtra State Board of Secondary and Higher Secondary Education — public syllabus (open access)"
+    - "Kenya Institute of Curriculum Development — primary curriculum frameworks (open access)"
+    - "Ghana Education Service — national primary school curriculum (open access)"
+    - "Open educational resources in Marathi, Swahili, and Twi curated from Wikipedia, Wikibooks, and public-domain school texts"
+  collected_through: "2026-05-28"
+  collected_by: "Open Harness Hub research agent (manual curation from public-domain syllabi)"
+  anonymization: "none — all content is public-domain educational material; no PII"

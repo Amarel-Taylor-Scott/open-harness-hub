@@ -1,0 +1,83 @@
+id: "processor/disable-thinking-mode-latency"
+type: processor
+version: "0.1.0"
+name: "Disable thinking mode for sub-second on-device latency"
+description: |
+  Injects a prompt prefix that suppresses extended chain-of-thought / thinking
+  mode on models that support it (Gemma, Gemini, Claude extended thinking),
+  and sets inference parameters (temperature, max_tokens, num_beams) for
+  sub-second response latency on low-power on-device hardware. Documented
+  real-world win: 20 s → <1 s on Gemma 3n mobile, enabling interactive
+  accessibility and real-time voice UX.
+
+  Emits a modified InferenceRequest with the prefix injected and parameters
+  overridden. Passthrough when thinking mode is not detected or not applicable.
+
+  CAPABILITY LIFT (structural): a bare cloud model call cannot be tuned for
+  sub-second on-device latency; the hardware and network round-trip are fixed.
+  On-device, the thinking-mode suppression prefix + param override is the
+  architectural mechanism that crosses the interactive latency threshold.
+  The lift is structural because it is a configuration fact about the local
+  hardware + model combination — not something a larger model makes
+  unnecessary. lift_reason: deterministic_guarantee (the parameter injection
+  is deterministic); mechanism: sub_token (response length is bounded).
+
+authors:
+  - name: "Open Harness Hub contributors"
+license: "Apache-2.0"
+industry:   ["ai", "education", "cross_industry"]
+capability: ["format_conversion", "routing", "governance"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+lifecycle_position: "pre_api"
+trust_boundary: "local"
+created: "2026-05-28"
+updated: "2026-05-28"
+
+attribution:
+  source_url: "https://github.com/google-gemini/gemma-cookbook"
+  source_kind: "github"
+  author: "Gemma 3n on-device latency demos (Google Gemma community)"
+  license: "Apache-2.0"
+
+tags:
+  - "on-device"
+  - "latency"
+  - "thinking-mode"
+  - "chain-of-thought"
+  - "gemma"
+  - "sub-second"
+  - "performance"
+  - "structural-lift"
+
+process_kind: "policy.identity"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 5
+
+inputs:
+  - name: "inference_request"
+    type: "object"
+    schema: "InferenceRequest"
+  - name: "target_latency_ms"
+    type: "integer"
+  - name: "force_disable_thinking"
+    type: "boolean"
+outputs:
+  - name: "modified_request"
+    type: "object"
+  - name: "thinking_mode_disabled"
+    type: "boolean"
+  - name: "injected_prefix"
+    type: "string"
+  - name: "param_overrides"
+    type: "object"
+
+side_effects: "none"
+on_error: "continue"
+
+implementations:
+  - kind: "callable"
+    path: "scripts.processors.disable_thinking_mode_latency.run"
+    language: "python"

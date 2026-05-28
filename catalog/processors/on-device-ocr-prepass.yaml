@@ -1,0 +1,84 @@
+id: "processor/on-device-ocr-prepass"
+type: processor
+version: "0.1.0"
+name: "On-device OCR pre-pass (ML Kit / TFLite, offline, deterministic text extraction)"
+description: |
+  Runs on-device optical character recognition (e.g. Google ML Kit Text
+  Recognition, TFLite OCR, or Tesseract) against an image before passing
+  input to the language model. The extracted text is appended to the model
+  prompt as a structured ```ocr_text block, giving the model a deterministic
+  high-accuracy text signal rather than relying on its own vision-token
+  decoding. Also emits bounding-box metadata for downstream spatial reasoning.
+
+  CAPABILITY LIFT (structural): small on-device vision-language models have
+  significantly lower text recognition accuracy than purpose-built OCR engines
+  (especially for handwriting, low-contrast text, non-Latin scripts). The OCR
+  engine is a deterministic verifier — it cannot hallucinate characters the
+  way a VLM can. This is a durable lift: OCR engines outperform VLM vision
+  tokens on sub-token-level character accuracy by design (sub_token mechanism),
+  and the advantage is structural because the failure is architectural (VLM
+  tokenisation is lossy for character-level text). lift_reason:
+  deterministic_guarantee; mechanism: sub_token.
+
+authors:
+  - name: "Open Harness Hub contributors"
+license: "Apache-2.0"
+industry:   ["education", "healthcare.public_health", "ai", "cross_industry"]
+capability: ["extraction", "format_conversion", "verification"]
+modality:   ["image", "text", "structured"]
+lifecycle:  "experimental"
+lifecycle_position: "pre_api"
+trust_boundary: "local"
+created: "2026-05-28"
+updated: "2026-05-28"
+
+attribution:
+  source_url: "https://github.com/google-gemini/gemma-cookbook"
+  source_kind: "github"
+  author: "Gemma 3n on-device vision demos (Google Gemma community + ML Kit)"
+  license: "Apache-2.0"
+
+tags:
+  - "on-device"
+  - "offline"
+  - "ocr"
+  - "ml-kit"
+  - "tesseract"
+  - "tflite"
+  - "pre-pass"
+  - "deterministic"
+  - "structural-lift"
+  - "sub-token"
+
+process_kind: "format_convert.pdf_to_text"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 800
+
+inputs:
+  - name: "image_bytes"
+    type: "bytes"
+  - name: "language_hint"
+    type: "string"
+  - name: "engine"
+    type: "string"
+outputs:
+  - name: "ocr_text"
+    type: "string"
+  - name: "bounding_boxes"
+    type: "object[]"
+  - name: "confidence"
+    type: "number"
+  - name: "engine_used"
+    type: "string"
+  - name: "prompt_block"
+    type: "string"
+
+side_effects: "none"
+on_error: "raise"
+
+implementations:
+  - kind: "callable"
+    path: "scripts.processors.on_device_ocr_prepass.run"
+    language: "python"
