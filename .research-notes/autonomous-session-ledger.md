@@ -93,6 +93,18 @@ Catalog now 2,411 validated (530 curated + candidates). Vector store rebuilt
 8. **Builder benchmark** (pasted task → expected component set) with a visible regression score (master-goal P3).
 9. **Supervisor / verify-and-repair stage** baked into assembled flows (the model-babysits-model idea).
 
+### 2026-05-28 full-power review cycle (DONE + new backlog)
+DONE: parallel discovery fleet (5 sub-agents) → **45 vetted capability-gap KP candidates** persisted to `data/capability-gaps/discovered-2026-05-28.jsonl`; standing `scripts/factory/capability_gap_scout.py` (LLM-assisted, dedup-aware, priority-scored — the 24/7 single-process discovery engine); fixed the **silent orchestration collapse** + stratified retrieval + under/over-match detection + 2 code-review safety bugs; `docs/strategy/executive-review-rubrics.md` (8 C-suite grading rubrics + current grades) and `docs/strategy/competitive-positioning-deep-dive.md` (compete+integrate per player).
+
+New backlog (queued for `/goal` + the scout):
+- **Generate the 45 discovered KPs**, prioritizing exact_id/graph high-lift ones (CVE/CWE, FDA 510k, OFAC 50%, HTS+AD/CVD, HGVS/ClinVar, CAS/SMILES, IANA/RFC, VA combined-ratings, IATA DG, ICS/NIMS, …).
+- **Conditional model-call gate** (user): a `gate` component/pattern — "only spend a model call if these deterministic conditions are NOT met"; generalize the cost-gate family into a reusable skip-the-model gate.
+- **Token-saving language packs** (user): synonym-compression + multilingual/CJK keyword substitution to cut tokens; controlled-language packs incl. **ASD-STE100 (Simplified Technical English)** as output-shaping capability-lift components with a validator. Fits the token-efficiency + output-format families. Also **slang / community-lexicon packs** (user): community/domain slang evolves faster than models retrain, so a fast-refreshed slang KP (`keyword`/`exact_id`, dated, provenance to the community source) is high-lift — and a prime target for the scout's continuous refresh.
+- **First-class MCP server** (user): promote `scripts/emit/mcp_server.py` from emitter to a running endpoint exposing search/build/export so any agent (Claude/Cursor/…) consumes the registry. The agent-access protocol = MCP.
+- **PathNav.ai integration** (user project): serve PathNav's life-goal agent-pipeline building via the registry + builder + MCP + export; KPs/grep/regex/exact-match components for goal alignment (agents + humans).
+- **Builder UX** (carryover): provenance/trust surfacing, streaming, interactive refine, real cost calibration, builder benchmark, KP retrieval-typing.
+- **Continuous parallel discovery**: cron the scout per cluster; periodically run the multi-agent burst for breadth.
+
 ## Cycle log
 
 | # | path | change | validation | commit |
