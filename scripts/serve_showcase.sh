@@ -98,7 +98,7 @@ say "Indexing components…"
 python3 -m scripts.db.build_vector_store build ${OH_EMBED_MODEL:+--model "$OH_EMBED_MODEL"} >/dev/null 2>&1 || true
 
 # --- 3. start the showcase server ------------------------------------------
-python3 -m scripts.serve_builder --port "$PORT" &
+python3 -m scripts.showcase --port "$PORT" &
 SRV=$!
 cleanup(){ kill "$SRV" "${TUN:-}" 2>/dev/null; }
 trap cleanup INT TERM EXIT
