@@ -177,3 +177,48 @@ Wave-2 parallel discovery (3 more agents) → 45 new gaps (`discovered-wave2-202
   (machine-generated `scale*/` candidates, the in-flight `manifest→component`
   rename, in-flight `mkdocs.yml` nav work). These are **left untouched**;
   this session commits only files it authored/edited, by explicit path.
+
+## 2026-05-28 — capability-gap framework + corpus-acquisition spine (7-brief arc)
+
+Owner delivered a 7-message research arc (failure mechanisms → spike formula +
+adversarial durability → channel/medium architectural gap → retrievability
+spectrum → transient-vs-durable reason codes → two consolidated build briefs →
+gap-detection screen) plus: "document this, set north stars, let me feed areas to
+a swarm." Shipped this session (all self-tests green; commits fb14e75 + this):
+
+- **De-monolithed** `serve_builder.py` (632 lines) → `scripts/showcase/` package
+  (pages/index/builder/export/server + shim); stage names = the 7 primitives.
+- **Showcase security + stability:** token-gated `/api/build` + `/api/export`
+  (`OH_SHOWCASE_TOKEN`); persistent + reused trycloudflare tunnel (no URL churn);
+  share URL+token in `dist/showcase-share-url.txt`. Verified 401/200 via public URL.
+- **Two-axis lift gate** (single source `scripts/eval/reason_codes.py`): 13
+  lift_reason→durability_class, 7 mechanisms, 5 retrievability tiers, decay_signal.
+  `scripts/eval/durable_gap_harness.py` (transient/structural sorter);
+  `candidate_promotion_scorer` durability factor. Concept: `docs/concepts/capability-valleys.md`.
+- **Corpus-acquisition spine** `scripts/acquisition/`: `cell_priority.py` (grid
+  cell schema + value function = lift gate lifted one level), `gap_screen.py`
+  (Stage-1 screen, model-independence safeguard), `research_queue.py` (intake →
+  screen → priority → ranked queue). Owner intake at `data/research-queue/areas.jsonl`.
+- **Strategy docs:** `north-stars.md`, `external-research-brief-2026-05-28.md`,
+  `corpus-acquisition-grid-spec.md`, `gap-detection-screen-spec.md`.
+- **Memory:** negative-space-corpus-aggregation, two-axis-lift-gate,
+  governance-is-the-product, showcase-ops (+ MEMORY.md).
+
+### Backlog (briefs' §9/§10 — next loop cycles)
+- **Coding:** (1) add `lift_reason/durability_class/decay_signal/last_lift_eval` as
+  component schema fields + a re-benchmark job that flips decay_signal on new base
+  models; (2) Source-Discoverer → per-cell source registry + two reference
+  harvesters: Tier-1 OFAC SLS delta, Tier-2/3 DOLE issuances; (3) CDC-Monitor with
+  BSP Circular 1230 / CSDDD-Omnibus as revocation fixtures; (4) C2PA-style signed
+  manifests + W3C VC/DID identity, surface provenance/freshness/signer in the UI;
+  (5) first-class MCP server vs spec RC 2026-07-28 + register as a subregistry;
+  (6) coverage instrument + wire query-miss logs live; (7) Tier-4 Human-Router
+  stubs; (8) wire one wedge benchmark (LegalBench/PRBench subset) into the gate.
+- **Earlier-queued (open):** AGENTS.md hard-rule vocabulary sweep (rule pack→If
+  Statement, knowledge pack→Knowledge Corpus, processor→Action); governed ingestion
+  for contract KPs; gate components; token-saving/multilingual/slang/ASD-STE100
+  language packs; PathNav; image/video/coding prompt-pack families; stable named CF
+  tunnel (needs CF creds).
+- **CEO (owner):** lead with governance; wedge = sanctions (primary) + EU-AI-Act
+  docs (second), CSDDD → showcase only; land one paid design partner on a public
+  yardstick; recruit verified publishers per top cell.
