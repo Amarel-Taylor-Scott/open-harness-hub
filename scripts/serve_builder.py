@@ -37,14 +37,15 @@ from scripts.model_routes import resolve_route
 _TOKEN_RE = re.compile(r"[a-z0-9][a-z0-9_.+-]{1,40}")
 # Order in which an assembled flow is presented (rough pre-LLM -> model -> post).
 # Stage-ordered flow (input → … → output). Each component type maps to a stage.
-STAGE_ORDER = ["Persona", "Knowledge / RAG", "Rules (deterministic)", "Tools",
-               "Processors", "Model (harness)", "Backbone pipeline", "Evaluate"]
+# Canonical stages — see docs/concepts/component-taxonomy-and-stages.md
+STAGE_ORDER = ["Input Formatting", "Persona", "Knowledge", "Rules", "Tools",
+               "Model (harness)", "Backbone pipeline", "Post-process", "Evaluate"]
 TYPE_STAGE = {
     "persona": "Persona",
-    "knowledge-pack": "Knowledge / RAG", "logic-pack": "Knowledge / RAG",
-    "rule-pack": "Rules (deterministic)",
+    "knowledge-pack": "Knowledge", "logic-pack": "Knowledge",
+    "rule-pack": "Rules",
     "tool": "Tools",
-    "processor": "Processors", "pattern": "Processors",
+    "processor": "Input Formatting", "pattern": "Post-process",
     "harness": "Model (harness)", "adapter": "Model (harness)",
     "pipeline": "Backbone pipeline",
     "rubric": "Evaluate", "benchmark": "Evaluate", "dataset": "Evaluate",
@@ -54,17 +55,17 @@ STAGE_CAPS = {"persona": 1, "knowledge-pack": 2, "logic-pack": 1, "rule-pack": 2
               "tool": 2, "processor": 1, "pattern": 1, "harness": 1, "adapter": 1,
               "pipeline": 1, "rubric": 1, "benchmark": 1, "dataset": 1}
 ROLE_BLURB = {
-    "persona": "frames the role the model adopts",
-    "knowledge-pack": "grounds answers in citeable facts (retrieval)",
-    "rule-pack": "deterministic checks/filters applied before the model",
-    "tool": "function-call capability the model invokes",
-    "processor": "deterministic pre/post transform (no model call)",
+    "persona": "frames the role/voice the model adopts (no facts)",
+    "knowledge-pack": "adds facts via a trigger (RAG / exact-id / regex / keyword)",
+    "rule-pack": "deterministic text rules applied before the model",
+    "tool": "takes an action (API / code / fetch / extract) or advanced preprocessing",
+    "processor": "deterministic transform, no model call (formatting)",
     "harness": "runs the model behind a trust boundary",
-    "adapter": "model transport — swap local <-> hosted here",
+    "adapter": "provider-neutral model transport — swap local↔hosted",
     "logic-pack": "prompts / schemas / response policy",
     "pattern": "reusable workflow shape",
     "pipeline": "an end-to-end backbone you can deploy",
-    "rubric": "scores the output (the benchmark contract)",
+    "rubric": "scores the output (the evaluation contract)",
     "benchmark": "proves the capability lift vs a bare model",
     "dataset": "labeled inputs/outputs for evaluation",
 }
@@ -459,7 +460,12 @@ async function health(){try{const h=await (await fetch('/api/health')).json();
  banner.innerHTML='<div class=banner>'+(h.embedding.promotable?'✓ semantic embeddings active ('+h.embedding.embedding_model+')':'⚠ offline <b>placeholder</b> embeddings ('+h.embedding.embedding_model+') — hybrid keyword+label search is doing the work; set OH_EMBED_* for semantic ranking.')+' · '+h.components+' components · model polish: '+(h.llm_reachable?('on ('+h.llm.model+')'):'off (deterministic)')+'</div>';}catch(e){}}
 function esc(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
 async function build(){const t=task.value.trim();if(!t)return;go.disabled=true;status.textContent='retrieving + assembling…';out.innerHTML='';
- try{const r=await (await fetch('/api/build?task='+encodeURIComponent(t))).json();render(r)}catch(e){out.innerHTML='<div class=card>Error: '+esc(''+e)+'</div>'}
+ try{const resp=await fetch('/api/build?task='+encodeURIComponent(t));
+   if(!resp.ok)throw new Error('server returned HTTP '+resp.status);
+   const ct=resp.headers.get('content-type')||'';
+   if(ct.indexOf('application/json')<0)throw new Error('stale tab — this tunnel URL is no longer served; reload the current URL');
+   render(await resp.json());
+ }catch(e){out.innerHTML='<div class=card>Error: '+esc(''+e)+'<div class=muted style=margin-top:6px>If this says "stale", your browser tab is pointing at an old (ephemeral) tunnel URL — reload the current one.</div></div>'}
  go.disabled=false;status.textContent='';}
 function render(r){let h='';
  h+='<div class=card><h3>Pipeline flow '+(r.selection_by_model?'<span class=muted>(orchestrated by local model)</span>':'<span class=muted>(deterministic)</span>')+'</h3><div class=fc>';
