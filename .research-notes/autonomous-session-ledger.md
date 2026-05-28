@@ -78,6 +78,21 @@ Catalog now 2,411 validated (530 curated + candidates). Vector store rebuilt
 - **Supervisor / model-babysits-model loops** (user idea): automate the manual "babysitting/herding/re-wording" of even frontier models — evaluator-optimizer, critic/verify-and-repair, escalation-on-low-confidence, multi-model cross-check/debate. The *supervisor* runs on a capable model (coherence floor) or a deterministic checker; the *worker* can be cheaper. Seeds exist (patterns reflexion / self-refine / evaluator-optimizer / multi-agent-debate; `processor/llm-judge`). Ship as a reusable supervisor harness + rubric + benchmark proving fewer-failures vs unsupervised.
 - **Model-efficiency knowledge corpus** (user idea, DS4 news): governed knowledge-pack of quantization / KV-cache / runtime strategies (asymmetric MoE quant, KV-offload-to-disk, no-PyTorch runtimes like DS4) so the builder can recommend cost/latency strategies for the "make it cheaper / run it local" refinement. Source via news/governed scraping (permissive, attributed) — feeds the cost-routing layer, not a model replacement claim.
 
+### Knowledge-pack enhancements (queued 2026-05-28)
+- **KP retrieval/trigger typing** (user idea): add a `retrieval` field to knowledge-packs — enum `rag_vector | regex | keyword | exact_id | classifier | graph` — so each pack declares HOW it is consumed; surface it in the builder + flowchart (e.g. "Knowledge (RAG)" vs "Knowledge (regex/keyword)"). Schema + vocab + backfill existing KPs.
+- **More esoteric capability-lift knowledge packs**: specialized/long-tail domains where base models are weak (the generation priority; each clears the capability-lift bar with a benchmark).
+
+### Builder / showcase UX roadmap (queued 2026-05-28, from live review)
+1. **Provenance/trust surfacing** per component (license · source · freshness · trust_boundary) in the flowchart — the governance moat made visible. Needs the store to carry these fields (extend build_vector_store rows) — separation of concerns: store enrichment vs. UI.
+2. **Gap detection + abstract components**: when a stage has no on-domain match, say so and offer an *abstract/proposed* component (evidence-backed: paper/post, confidence + provenance, maturity = abstract→proposed→experimental→validated). New `maturity` field.
+3. **Interactive refinement**: wire "cheaper"/"stricter" as buttons that rebuild with a refinement flag (not just text).
+4. **Per-stage alternatives + swap** (registry value = alternatives + tradeoffs).
+5. **Real cost calibration** from component `cost_model` + the model-registry pricing (replace illustrative ranges).
+6. **Latency/QoL**: merge the two Gemma calls (select + narrate) into one; stream stages; cache build results per task (response-cache component).
+7. **Wiring-rule validation surfaced** (rule-pack reaches model via harness; draw trust boundaries).
+8. **Builder benchmark** (pasted task → expected component set) with a visible regression score (master-goal P3).
+9. **Supervisor / verify-and-repair stage** baked into assembled flows (the model-babysits-model idea).
+
 ## Cycle log
 
 | # | path | change | validation | commit |
