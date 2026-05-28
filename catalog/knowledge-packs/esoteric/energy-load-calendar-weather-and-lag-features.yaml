@@ -1,0 +1,58 @@
+id: knowledge-pack/energy-load-calendar-weather-and-lag-features
+type: knowledge-pack
+version: 0.1.0
+name: Energy Load Calendar Weather And Lag Features
+description: 'Capability-lift knowledge pack for an esoteric area LLMs handle poorly.
+  Gap: prosumer load/solar needs calendar/holiday/weather/irradiance + lag/rolling
+  + hierarchical structure Grounded in Enefit prosumer + weather/holiday calendars
+  (CC) + M5 hierarchical sales (CC) via regex retrieval. Lift: winning forecasts GBDT
+  over engineered lag/calendar/weather (+M5 reconciliation); feature component lifts
+  MAE'
+authors:
+- name: Open Harness Hub capability-gap factory
+license: CC-BY-4.0
+industry:
+- energy
+capability:
+- retrieval
+- verification
+modality:
+- structured
+- text
+lifecycle: experimental
+trust_boundary: external
+freshness: volatile
+tags:
+- capability-lift
+- esoteric
+- knowledge-pack
+- regex
+- ingestion-target
+created: '2026-05-28'
+updated: '2026-05-28'
+attribution:
+  source_url: Enefit prosumer + weather/holiday calendars (CC) + M5 hierarchical sales
+    (CC)
+  source_kind: other
+  author: Enefit prosumer + weather/holiday calendars (CC) + M5 hierarchical sales
+    (CC)
+  license: see-source
+content_types:
+- fact_table
+- reference_doc
+retrieval:
+- regex
+files:
+- path: data/esoteric-packs/energy-load-calendar-weather-and-lag-features.jsonl
+  format: jsonl
+  content_type: fact_table
+  schema: capability-gap seed (real facts where stable; else ingestion contract)
+indexing:
+  bm25: true
+  dense:
+    model: all-MiniLM-L6-v2
+provenance:
+  sources:
+  - Enefit prosumer + weather/holiday calendars (CC) + M5 hierarchical sales (CC)
+  collected_through: '2026-05-28'
+  collected_by: capability-gap factory

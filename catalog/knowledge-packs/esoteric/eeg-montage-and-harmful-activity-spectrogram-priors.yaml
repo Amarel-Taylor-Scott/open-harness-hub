@@ -1,0 +1,58 @@
+id: knowledge-pack/eeg-montage-and-harmful-activity-spectrogram-priors
+type: knowledge-pack
+version: 0.1.0
+name: Eeg Montage And Harmful Activity Spectrogram Priors
+description: 'Capability-lift knowledge pack for an esoteric area LLMs handle poorly.
+  Gap: harmful-activity patterns live in multichannel time-frequency; no montage/band/spectrogram
+  features Grounded in HMS EEG/spectrogram + expert labels (CC) + 10-20 montage +
+  ACNS defs (public) via classifier retrieval. Lift: won w/ spectrogram CNNs over
+  standardized montages calibrated to rater votes (KL-div); montage+schema enables
+  it'
+authors:
+- name: Open Harness Hub capability-gap factory
+license: CC-BY-4.0
+industry:
+- healthcare
+- pharma
+capability:
+- retrieval
+- verification
+modality:
+- structured
+- text
+lifecycle: experimental
+trust_boundary: external
+freshness: volatile
+tags:
+- capability-lift
+- esoteric
+- knowledge-pack
+- classifier
+- ingestion-target
+created: '2026-05-28'
+updated: '2026-05-28'
+attribution:
+  source_url: HMS EEG/spectrogram + expert labels (CC) + 10-20 montage + ACNS defs
+    (public)
+  source_kind: other
+  author: HMS EEG/spectrogram + expert labels (CC) + 10-20 montage + ACNS defs (public)
+  license: see-source
+content_types:
+- fact_table
+- reference_doc
+retrieval:
+- classifier
+files:
+- path: data/esoteric-packs/eeg-montage-and-harmful-activity-spectrogram-priors.jsonl
+  format: jsonl
+  content_type: fact_table
+  schema: capability-gap seed (real facts where stable; else ingestion contract)
+indexing:
+  bm25: true
+  dense:
+    model: all-MiniLM-L6-v2
+provenance:
+  sources:
+  - HMS EEG/spectrogram + expert labels (CC) + 10-20 montage + ACNS defs (public)
+  collected_through: '2026-05-28'
+  collected_by: capability-gap factory

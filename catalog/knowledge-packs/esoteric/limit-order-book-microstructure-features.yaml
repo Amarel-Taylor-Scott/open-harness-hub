@@ -1,0 +1,60 @@
+id: knowledge-pack/limit-order-book-microstructure-features
+type: knowledge-pack
+version: 0.1.0
+name: Limit Order Book Microstructure Features
+description: 'Capability-lift knowledge pack for an esoteric area LLMs handle poorly.
+  Gap: closing-auction/vol forecasting needs WAP, imbalance, spread, book pressure,
+  realized-vol + no-leakage time Grounded in Optiver order-book/auction datasets (CC)
+  + microstructure feature defs (quant lit) via regex retrieval. Lift: won by GBDT/NN
+  over hand-engineered LOB features w/ leakage-safe folds (MAE); feature lib + guards
+  = lift'
+authors:
+- name: Open Harness Hub capability-gap factory
+license: CC-BY-4.0
+industry:
+- finance
+- compliance
+capability:
+- retrieval
+- verification
+modality:
+- structured
+- text
+lifecycle: experimental
+trust_boundary: external
+freshness: volatile
+tags:
+- capability-lift
+- esoteric
+- knowledge-pack
+- regex
+- ingestion-target
+created: '2026-05-28'
+updated: '2026-05-28'
+attribution:
+  source_url: Optiver order-book/auction datasets (CC) + microstructure feature defs
+    (quant lit)
+  source_kind: other
+  author: Optiver order-book/auction datasets (CC) + microstructure feature defs (quant
+    lit)
+  license: see-source
+content_types:
+- fact_table
+- reference_doc
+retrieval:
+- regex
+files:
+- path: data/esoteric-packs/limit-order-book-microstructure-features.jsonl
+  format: jsonl
+  content_type: fact_table
+  schema: capability-gap seed (real facts where stable; else ingestion contract)
+indexing:
+  bm25: true
+  dense:
+    model: all-MiniLM-L6-v2
+provenance:
+  sources:
+  - Optiver order-book/auction datasets (CC) + microstructure feature defs (quant
+    lit)
+  collected_through: '2026-05-28'
+  collected_by: capability-gap factory

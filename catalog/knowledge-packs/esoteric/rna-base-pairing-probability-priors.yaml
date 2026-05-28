@@ -1,0 +1,59 @@
+id: knowledge-pack/rna-base-pairing-probability-priors
+type: knowledge-pack
+version: 0.1.0
+name: Rna Base Pairing Probability Priors
+description: 'Capability-lift knowledge pack for an esoteric area LLMs handle poorly.
+  Gap: per-nucleotide reactivity depends on base-pairing structure (stems/loops/BPP);
+  LLM can''t fold Grounded in Stanford Ribonanza reactivity (CC) + RNA secondary-structure/BPP
+  conventions (ViennaRNA-style, public) via graph retrieval. Lift: winning fed BPP
+  matrices + structure-aware attention (MAE); BPP/structure-prior encodes the pairing
+  graph'
+authors:
+- name: Open Harness Hub capability-gap factory
+license: CC-BY-4.0
+industry:
+- cross_industry
+capability:
+- retrieval
+- verification
+modality:
+- structured
+- text
+lifecycle: experimental
+trust_boundary: external
+freshness: volatile
+tags:
+- capability-lift
+- esoteric
+- knowledge-pack
+- graph
+- ingestion-target
+created: '2026-05-28'
+updated: '2026-05-28'
+attribution:
+  source_url: Stanford Ribonanza reactivity (CC) + RNA secondary-structure/BPP conventions
+    (ViennaRNA-style, public)
+  source_kind: other
+  author: Stanford Ribonanza reactivity (CC) + RNA secondary-structure/BPP conventions
+    (ViennaRNA-style, public)
+  license: see-source
+content_types:
+- fact_table
+- reference_doc
+retrieval:
+- graph
+files:
+- path: data/esoteric-packs/rna-base-pairing-probability-priors.jsonl
+  format: jsonl
+  content_type: fact_table
+  schema: capability-gap seed (real facts where stable; else ingestion contract)
+indexing:
+  bm25: true
+  dense:
+    model: all-MiniLM-L6-v2
+provenance:
+  sources:
+  - Stanford Ribonanza reactivity (CC) + RNA secondary-structure/BPP conventions (ViennaRNA-style,
+    public)
+  collected_through: '2026-05-28'
+  collected_by: capability-gap factory

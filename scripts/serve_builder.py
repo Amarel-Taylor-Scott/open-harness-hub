@@ -424,6 +424,7 @@ pre.narr{white-space:pre-wrap;background:transparent;color:var(--fg);margin:0;fo
 a{color:var(--acc)}
 </style></head><body>
 <header><h1>Open Harness Hub <span style="color:var(--acc)">·</span> paste a task, get a flow</h1>
+<div style="margin:6px 0 2px;font-size:13.5px"><a href="/" style="color:var(--acc);font-weight:600;margin-right:14px;text-decoration:none">Build a flow</a><a href="/browse" style="color:var(--acc);font-weight:600;text-decoration:none">Browse components →</a></div>
 <div class=sub>Describe a task in plain language. The builder hybrid-searches the component registry and assembles a costed, deployable pipeline of existing components.</div></header>
 <main>
 <textarea id=task placeholder="e.g. Screen supplier disclosures for forced-labor risk, cite the relevant regulations, and route high-risk cases to human review."></textarea>
@@ -433,11 +434,13 @@ a{color:var(--acc)}
 <div id=out></div>
 </main>
 <script>
-const EX=["Screen supplier disclosures for forced-labor risk and cite the regulations",
-"Turn a maintenance SOP into an AI checklist with a deterministic safety gate",
-"Grade essays with an LLM judge and a rubric, with citations",
-"Extract structured fields from contracts and flag risky clauses",
-"Build a RAG pipeline over policy docs that refuses when evidence is missing"];
+const EX=["Screen migrant-worker recruitment fees against ILO fair-recruitment rules and flag debt-bondage risk",
+"Classify a CVE: derive its CVSS v3.1 vector and map it to the correct CWE",
+"Aggregate beneficial ownership under the OFAC 50% Rule to decide if an unlisted entity is blocked",
+"Validate an HGVS variant string and map it to current ClinVar clinical significance",
+"Triage acute malnutrition from MUAC and bilateral oedema under the CMAM protocol",
+"Decode an OBD-II trouble code and derive the ISO 26262 ASIL from severity/exposure/controllability",
+"Classify a US import's HTS subheading and check for any active antidumping order"];
 const exDiv=document.getElementById('examples');
 EX.forEach(t=>{const c=document.createElement('span');c.className='chip';c.textContent=t;c.onclick=()=>{task.value=t;build()};exDiv.appendChild(c)});
 const task=document.getElementById('task'),go=document.getElementById('go'),out=document.getElementById('out'),status=document.getElementById('status'),banner=document.getElementById('banner');
@@ -466,6 +469,57 @@ function render(r){let h='';
  h+='<div class=card><h3>Why this flow '+(r.llm_used?'<span class=muted>(local model)</span>':'<span class=muted>(deterministic)</span>')+'</h3><pre class=narr>'+esc(r.narrative)+'</pre></div>';
  out.innerHTML=h;}
 go.onclick=build;health();
+</script></body></html>"""
+
+
+BROWSE_HTML = """<!doctype html><html lang=en><head><meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>Open Harness Hub — browse components</title>
+<style>
+:root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--fg:#e6edf3;--mut:#8b949e;--acc:#fb7714;--good:#3fb950}
+*{box-sizing:border-box}body{margin:0;font:15px/1.55 -apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--fg)}
+header{padding:24px 22px 8px;max-width:1000px;margin:0 auto}h1{font-size:21px;margin:0 0 4px}
+.nav{margin:6px 0 2px;font-size:13.5px}.nav a{color:var(--acc);text-decoration:none;font-weight:600;margin-right:14px}
+.sub{color:var(--mut);font-size:13.5px}
+main{max-width:1000px;margin:0 auto;padding:10px 22px 60px}
+input{width:100%;background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:10px 12px;font:inherit}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.chip{font-size:12px;color:var(--mut);border:1px solid var(--line);border-radius:18px;padding:3px 10px;cursor:pointer;background:var(--panel)}
+.chip.on{color:#1a1300;background:var(--acc);border-color:var(--acc);font-weight:650}
+.muted{color:var(--mut);font-size:12.5px;margin:8px 0}
+.item{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:9px 12px;margin:7px 0}
+.badge{display:inline-block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--acc);border:1px solid var(--line);border-radius:5px;padding:1px 6px;margin-right:8px}
+.nm{font-weight:600}.cid{color:var(--mut);font-size:12px}.ds{color:var(--mut);font-size:13px;margin-top:3px}
+</style></head><body>
+<header><h1>Open Harness Hub <span style="color:var(--acc)">·</span> browse components</h1>
+<div class=nav><a href="/">← Build a flow</a><a href="/browse">Browse</a></div>
+<div class=sub id=count>loading…</div></header>
+<main>
+<input id=q placeholder="Search components by name, id, or description…">
+<div class=chips id=types></div>
+<div class=muted id=status></div>
+<div id=list></div>
+</main>
+<script>
+let TYPE='';
+const q=document.getElementById('q'),types=document.getElementById('types'),list=document.getElementById('list'),status=document.getElementById('status'),count=document.getElementById('count');
+function esc(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+let T=null;
+async function load(){
+ const url='/api/components?limit=300'+(TYPE?('&type='+encodeURIComponent(TYPE)):'')+(q.value.trim()?('&q='+encodeURIComponent(q.value.trim())):'');
+ const r=await (await fetch(url)).json();
+ if(!T){T=r.by_type;count.textContent=r.total+' components across '+Object.keys(T).length+' types';renderChips()}
+ status.textContent=r.matched+' match'+(r.matched===1?'':'es')+(r.matched>r.results.length?(' (showing '+r.results.length+')'):'');
+ list.innerHTML=r.results.map(c=>'<div class=item><div><span class=badge>'+esc(c.type)+'</span><span class=nm>'+esc(c.name)+'</span> <span class=cid>'+esc(c.id)+'</span></div>'+(c.desc?'<div class=ds>'+esc(c.desc)+'</div>':'')+'</div>').join('');
+}
+function renderChips(){
+ let h='<span class="chip'+(TYPE===''?' on':'')+'" data-t="">all</span>';
+ Object.keys(T).sort().forEach(t=>{h+='<span class="chip'+(TYPE===t?' on':'')+'" data-t="'+t+'">'+esc(t)+' '+T[t]+'</span>'});
+ types.innerHTML=h;
+ [...types.querySelectorAll('.chip')].forEach(c=>c.onclick=()=>{TYPE=c.dataset.t;renderChips();load()});
+}
+let deb;q.oninput=()=>{clearTimeout(deb);deb=setTimeout(load,180)};
+load();
 </script></body></html>"""
 
 
@@ -516,6 +570,22 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_header("Content-Length", str(len(body)))
                 self.end_headers()
                 self.wfile.write(body)
+        elif parsed.path == "/browse":
+            self._send(200, BROWSE_HTML.encode("utf-8"), "text/html; charset=utf-8")
+        elif parsed.path == "/api/components":
+            from collections import Counter
+            qs = parse_qs(parsed.query)
+            q = (qs.get("q") or [""])[0].lower()
+            typ = (qs.get("type") or [""])[0]
+            limit = int((qs.get("limit") or ["300"])[0])
+            items = self.index.items
+            res = [{"id": it["id"], "type": it["type"], "name": it["name"], "desc": it["desc"][:160]}
+                   for it in items
+                   if (not typ or it["type"] == typ)
+                   and (not q or q in it["name"].lower() or q in it["id"].lower() or q in it["desc"].lower())]
+            payload = {"total": len(items), "by_type": dict(sorted(Counter(i["type"] for i in items).items())),
+                       "matched": len(res), "results": res[:limit]}
+            self._send(200, json.dumps(payload).encode(), "application/json")
         else:
             self._send(404, b"not found", "text/plain")
 

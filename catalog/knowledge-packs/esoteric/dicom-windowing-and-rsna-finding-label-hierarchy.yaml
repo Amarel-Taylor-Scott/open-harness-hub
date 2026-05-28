@@ -1,0 +1,58 @@
+id: knowledge-pack/dicom-windowing-and-rsna-finding-label-hierarchy
+type: knowledge-pack
+version: 0.1.0
+name: Dicom Windowing And Rsna Finding Label Hierarchy
+description: 'Capability-lift knowledge pack for an esoteric area LLMs handle poorly.
+  Gap: CT/MR findings need DICOM windowing, slice-volume context, hierarchical label
+  schema Grounded in RSNA DICOM + label hierarchies (research/CC) + HU window presets
+  + finding ontologies (public) via classifier retrieval. Lift: winners depended on
+  windowing + hierarchy-aware heads (weighted log-loss); component encodes the structure'
+authors:
+- name: Open Harness Hub capability-gap factory
+license: CC-BY-4.0
+industry:
+- cross_industry
+capability:
+- retrieval
+- verification
+modality:
+- structured
+- text
+lifecycle: experimental
+trust_boundary: external
+freshness: volatile
+tags:
+- capability-lift
+- esoteric
+- knowledge-pack
+- classifier
+- ingestion-target
+created: '2026-05-28'
+updated: '2026-05-28'
+attribution:
+  source_url: RSNA DICOM + label hierarchies (research/CC) + HU window presets + finding
+    ontologies (public)
+  source_kind: other
+  author: RSNA DICOM + label hierarchies (research/CC) + HU window presets + finding
+    ontologies (public)
+  license: see-source
+content_types:
+- fact_table
+- reference_doc
+retrieval:
+- classifier
+files:
+- path: data/esoteric-packs/dicom-windowing-and-rsna-finding-label-hierarchy.jsonl
+  format: jsonl
+  content_type: fact_table
+  schema: capability-gap seed (real facts where stable; else ingestion contract)
+indexing:
+  bm25: true
+  dense:
+    model: all-MiniLM-L6-v2
+provenance:
+  sources:
+  - RSNA DICOM + label hierarchies (research/CC) + HU window presets + finding ontologies
+    (public)
+  collected_through: '2026-05-28'
+  collected_by: capability-gap factory

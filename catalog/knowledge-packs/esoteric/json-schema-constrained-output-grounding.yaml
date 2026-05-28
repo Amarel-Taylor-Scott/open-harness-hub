@@ -1,0 +1,55 @@
+id: knowledge-pack/json-schema-constrained-output-grounding
+type: knowledge-pack
+version: 0.1.0
+name: Json Schema Constrained Output Grounding
+description: 'Capability-lift knowledge pack for an esoteric area LLMs handle poorly.
+  Gap: schema-invalid JSON (missing required, wrong types/enums); reasoning degrades
+  under format constraints Grounded in JSON Schema Store + JSONSchemaBench (2501.10868)
+  via regex retrieval. Lift: JSONSchemaBench: unconstrained LLMs fail hard schemas;
+  retrieve+validate enforces adherence'
+authors:
+- name: Open Harness Hub capability-gap factory
+license: CC-BY-4.0
+industry:
+- cross_industry
+capability:
+- retrieval
+- verification
+modality:
+- structured
+- text
+lifecycle: experimental
+trust_boundary: external
+freshness: volatile
+tags:
+- capability-lift
+- esoteric
+- knowledge-pack
+- regex
+- ingestion-target
+created: '2026-05-28'
+updated: '2026-05-28'
+attribution:
+  source_url: JSON Schema Store + JSONSchemaBench (2501.10868)
+  source_kind: other
+  author: JSON Schema Store + JSONSchemaBench (2501.10868)
+  license: see-source
+content_types:
+- fact_table
+- reference_doc
+retrieval:
+- regex
+files:
+- path: data/esoteric-packs/json-schema-constrained-output-grounding.jsonl
+  format: jsonl
+  content_type: fact_table
+  schema: capability-gap seed (real facts where stable; else ingestion contract)
+indexing:
+  bm25: true
+  dense:
+    model: all-MiniLM-L6-v2
+provenance:
+  sources:
+  - JSON Schema Store + JSONSchemaBench (2501.10868)
+  collected_through: '2026-05-28'
+  collected_by: capability-gap factory
