@@ -193,16 +193,96 @@ def _subtype(c: dict) -> str:
 
 
 def _output_name(task: str) -> str:
+    """The runtime OUTPUT, shaped by task type — a detection task answers yes/no, an
+    extraction task returns fields, a grading task a score (each with cited indicators)."""
     low = task.lower()
+    if any(k in low for k in ("detect", "indicator", "exploitation", "trafficking", "abuse",
+                              "fraud", "violation", "is there", "whether")):
+        return "Decision: yes / no + cited indicators"
+    if any(k in low for k in ("flag", "screen", "risk of")):
+        return "Decision: flag / clear + cited indicators"
     if "rout" in low or "hotline" in low:
         return "Routed decision + citations"
-    if "classif" in low or "map it" in low:
+    if "classif" in low or "map it" in low or "tier" in low:
         return "Classification + citations"
-    if any(k in low for k in ("flag", "detect", "screen", "indicator")):
-        return "Findings + citations"
-    if "valid" in low:
-        return "Validation result"
-    return "Result + trace"
+    if any(k in low for k in ("extract", "line item", "read ", "parse", "into a", "csv", "fields")):
+        return "Extracted fields (JSON) + citations"
+    if any(k in low for k in ("grad", "score", "rubric", "rate ")):
+        return "Score + rationale + citations"
+    if "valid" in low or "verif" in low or "reconcile" in low:
+        return "Validation result (pass / fail) + reasons"
+    return "Findings (JSON) + citations"
+
+
+def harness_recipe(task: str, kept: list[dict]) -> list[dict]:
+    """The anatomy of ONE governed model call — the ordered THEN steps that run once the
+    triage gate routes an input in. Real catalog components are SLOTTED where they exist
+    (persona, regex/GREP rule-pack, RAG corpus, tools, the right-sized harness, the rubric);
+    the remaining steps are deterministic built-ins (compress, injection-check, JSON
+    verify/recover, retry loop). This is what makes the lift governed + cheap, not a single
+    raw model call. Order mirrors the canonical detect/extract/grade harness."""
+    by_type: dict[str, list[dict]] = {}
+    for c in kept:
+        by_type.setdefault(c["type"], []).append(c)
+
+    def first(*types):
+        for t in types:
+            if by_type.get(t):
+                return by_type[t][0]
+        return None
+
+    persona = first("persona")
+    regex = first("rule-pack", "logic-pack")
+    corpus = first("knowledge-pack", "dataset")
+    tool = first("tool")
+    harness = first("harness", "adapter", "pipeline")
+    rubric = first("rubric", "benchmark")
+    loop = first("pattern")
+
+    def step(phase: str, tier: str, k: str, name: str, role: str, comp: dict | None = None) -> dict:
+        # phase: pre | call | post ; tier: always | default | optional
+        d = {"phase": phase, "tier": tier, "k": k, "name": name, "role": role, "builtin": comp is None}
+        if comp:
+            d["ref"] = f"{comp['type']}/{comp['id'].split('/')[-1]}"
+        return d
+
+    # Composition law (the owner's rule): an Input, a model Call, and the pre-/post-call phases
+    # are ALWAYS present (even when a step is a no-op). The trigger gate, persona, regex/corpus
+    # context, RAG retrieval and token reduction are DEFAULTS — on every pipeline unless there is a
+    # serious reason to drop one. Real catalog components are slotted where they exist; the rest are
+    # deterministic built-ins. This is what makes the lift governed + cheap, not a raw model call.
+    recipe = [
+        step("pre", "default", "conditional", "Trigger gate — does the input qualify?",
+             "cheap check that the input meets the conditions for the full harness; else short-circuit", regex),
+        step("pre", "default", "action", "Add persona / system prompt",
+             "frame the model as the right domain expert", persona),
+        step("pre", "default", "conditional", "Add context — regex / knowledge corpus",
+             "deterministic pattern extraction + exact-match facts", regex),
+        step("pre", "default", "knowledge", "Add context — RAG retrieval",
+             "retrieve cited facts from the governed corpus", corpus),
+    ]
+    if tool:
+        recipe.append(step("pre", "optional", "action", "Call tools",
+                           "structured tool calls for steps the model shouldn't guess", tool))
+    recipe += [
+        step("pre", "optional", "action", "Check online facts / search",
+             "verify volatile facts against a live source"),
+        step("pre", "default", "action", "Token reduction — format · prioritize · compress",
+             "salient evidence first; compress to cut tokens & cost"),
+        step("pre", "default", "stop", "Prompt-injection check",
+             "block if the input tries to extract or override the system prompt"),
+        step("call", "always", "action", "Call the right-sized model",
+             "smallest model that clears the bar, with the assembled system prompt", harness),
+        step("post", "always", "conditional", "Check output",
+             "validate against the expected answer shape"),
+        step("post", "default", "conditional", "Verify JSON (recover if malformed)",
+             "parse; if non-JSON, repair / reformat once"),
+        step("post", "default", "conditional", "Re-verify",
+             "second pass on the recovered output", rubric),
+        step("post", "always", "loop", "If not OK → retry with changes (≤3)",
+             "re-run with targeted fixes until it passes, else escalate", loop),
+    ]
+    return recipe
 
 
 def flowchart(task: str, kept: list[dict]) -> list[dict]:
@@ -226,7 +306,8 @@ def flowchart(task: str, kept: list[dict]) -> list[dict]:
         chart.append(band)
     chart.append({"stage": "Output", "components": [
         {"id": "result", "type": "output", "name": _output_name(task),
-         "role": "validated result + trace", "subtype": "Output", "branch": "main"}]})
+         "role": "decision (binary / number / string) + metadata + the full runtime object (replayable trace)",
+         "subtype": "Output", "branch": "main"}]})
     return chart
 
 
@@ -325,7 +406,8 @@ def build_flow(task: str, index: Index) -> dict:
     narrative, narr_llm = llm_narrative(task, kept, cost)
     result = {
         "task": task,
-        "flow": {"steps": kept, "stages": flowchart(task, kept), "dropped": dropped, "analysis": analysis},
+        "flow": {"steps": kept, "stages": flowchart(task, kept), "recipe": harness_recipe(task, kept),
+                 "dropped": dropped, "analysis": analysis},
         "cost": cost,
         "narrative": narrative,
         "llm_used": (sel_llm or narr_llm),

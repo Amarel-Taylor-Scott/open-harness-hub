@@ -205,18 +205,27 @@
 
   // ---------------- PREVIEW (PPreview) ----------------
   var BUILD_STEPS = ["Parsing the task", "Retrieving vetted components", "Assembling the flow", "Costing & measuring lift"];
-  var FLOW_ROWS = [
-    ["input", "Supplier list", "⌖ csv · 1,247 rows · processed one item per iteration"],
-    ["conditional", "High-risk tier gate", "◈ regex + rule-pack · when tier ≥ 2 → route to review"],
-    ["op", "OR — merge branches", "◇ combines the sanctions + sector-risk screens"],
-    ["knowledge", "CSDDD article corpus", "⛁ RAG (vector) + exact-id · 13 langs · token-compressed context"],
-    ["action", "Cite-first ESG counsel", "⚡ persona + deterministic citation gate · 1 model call"],
-    ["loop", "QA / rubric evaluation", "↻ scores vs rubric · re-runs the call until it passes (≤3)"],
-    ["output", "Graded dossier", "⎘ PDF + JSON-LD · every claim cited"]
+  // canonical governed-model-call recipe (offline sample / fallback). Mirrors builder.py
+  // harness_recipe: phase = pre|call|post, tier = always|default|optional.
+  var STATIC_RECIPE = [
+    { phase: "pre", tier: "default", k: "conditional", name: "Trigger gate — does the input qualify?", role: "cheap check the input meets conditions; else short-circuit", builtin: true },
+    { phase: "pre", tier: "default", k: "action", name: "Add persona / system prompt", role: "domain-expert framing", ref: "persona/esg-counsel" },
+    { phase: "pre", tier: "default", k: "conditional", name: "Add context — regex / knowledge corpus", role: "deterministic pattern + exact-match facts", ref: "rule-pack/tier-risk-gate" },
+    { phase: "pre", tier: "default", k: "knowledge", name: "Add context — RAG retrieval", role: "cited facts from the governed corpus", ref: "knowledge-corpus/csddd-articles" },
+    { phase: "pre", tier: "optional", k: "action", name: "Call tools", role: "structured calls the model shouldn't guess", builtin: true },
+    { phase: "pre", tier: "optional", k: "action", name: "Check online facts / search", role: "verify volatile facts live", builtin: true },
+    { phase: "pre", tier: "default", k: "action", name: "Token reduction — format · prioritize · compress", role: "salient first; cut tokens & cost", builtin: true },
+    { phase: "pre", tier: "default", k: "stop", name: "Prompt-injection check", role: "block system-prompt extraction / override", builtin: true },
+    { phase: "call", tier: "always", k: "action", name: "Call the right-sized model", role: "smallest model that clears the bar + system prompt", ref: "harness/esg-cite-first" },
+    { phase: "post", tier: "always", k: "conditional", name: "Check output", role: "validate the answer shape", builtin: true },
+    { phase: "post", tier: "default", k: "conditional", name: "Verify JSON (recover if malformed)", role: "parse; repair once if non-JSON", builtin: true },
+    { phase: "post", tier: "default", k: "conditional", name: "Re-verify", role: "second pass vs the rubric", ref: "rubric/supplier-grade" },
+    { phase: "post", tier: "always", k: "loop", name: "If not OK → retry with changes (≤3)", role: "targeted fixes until it passes, else escalate", ref: "pattern/rubric-refine" }
   ];
   var previewTimer = null;
   function primKey(stage) { var k = String(stage || "").toLowerCase().split(/[\s/]/)[0]; return PRIMS[k] ? k : "action"; }
-  // one flow row. level 1 = nested ("then" branch) under the preceding Conditional. tag = IF/THEN chip.
+  var _CHIP = { IF: "oh-badge--warn", ALWAYS: "oh-badge--verified", DEFAULT: "oh-badge--lift", OPTIONAL: "oh-badge--muted" };
+  // one flow row. level 1 = nested under a phase header. tag = a chip (ALWAYS/DEFAULT/OPTIONAL/IF).
   function flowRowHtml(prim, name, sub, level, tag) {
     var isOp = prim === "op";
     var glyph = isOp ? "◇" : (PRIMS[prim] ? PRIMS[prim].glyph : "•");
@@ -225,40 +234,53 @@
     var wrap = level ? "position:relative;margin-left:11px;border-left:2px solid var(--line);padding-left:19px"
                      : "position:relative";
     var arm = level ? '<span style="position:absolute;left:0;top:17px;color:var(--fg-faint);font-size:12px">↳</span>' : "";
-    var chip = tag ? '<span class="oh-badge ' + (tag === "IF" ? "oh-badge--warn" : "oh-badge--muted") +
-      '" style="padding:1px 6px;margin-right:6px;font-family:var(--font-mono);font-size:9.5px">' + tag + "</span>" : "";
+    var chip = tag ? '<span class="oh-badge ' + (_CHIP[tag] || "oh-badge--muted") +
+      '" style="padding:1px 6px;margin-right:6px;font-family:var(--font-mono);font-size:9.5px">' + esc(tag) + "</span>" : "";
     return '<div style="' + wrap + '">' + arm +
       '<div style="display:flex;align-items:flex-start;gap:11px;padding:9px 0;border-bottom:1px solid var(--line)">' +
       '<span style="width:24px;height:24px;border-radius:' + (isOp ? "50%" : "6px") + ';flex:0 0 auto;display:grid;place-items:center;font-size:12px;' + swatch + '">' + glyph + "</span>" +
       '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--fg)">' + chip + esc(name) + "</div>" +
       '<div style="font-family:var(--font-mono);font-size:10.5px;color:var(--fg-muted);margin-top:2px;line-height:1.4">' + esc(sub) + "</div></div></div></div>";
   }
-  // render ordered [primKey,name,sub] steps as a TREE: a Conditional opens an indented "then" branch
-  // that Knowledge/Action/Loop/Operator steps nest inside (e.g. "if tier≥2 → then add RAG context, then cite").
-  function renderFlowRows(rows) {
-    var html = "", inBranch = false;
-    rows.forEach(function (r) {
-      var prim = r[0];
-      if (prim === "input" || prim === "output" || prim === "stop") { inBranch = false; html += flowRowHtml(prim, r[1], r[2], 0, null); }
-      else if (prim === "conditional") { inBranch = true; html += flowRowHtml(prim, r[1], r[2], 0, "IF"); }
-      else { html += flowRowHtml(prim, r[1], r[2], inBranch ? 1 : 0, inBranch ? "THEN" : null); }
+  function stageComp(stages, key) {
+    for (var i = 0; i < stages.length; i++) {
+      if (primKey(stages[i].stage) === key) { var cs = stages[i].components || []; if (cs.length) return cs[0]; }
+    }
+    return null;
+  }
+  var _TIERTAG = { always: "ALWAYS", default: "DEFAULT", optional: "OPTIONAL" };
+  var _PHASES = [["pre", "Pre-model-call"], ["call", "Model call"], ["post", "Post-model-call"]];
+  // Input (always) → phase-grouped recipe (pre/call/post; defaults nested) → Output (always; + metadata + runtime object)
+  function recipePanel(head, inputName, inputRole, recipe, outName, outRole) {
+    var html = '<div class="oh-cc-id mono" style="margin-bottom:10px">assembled flow · ' + head + "</div>";
+    html += flowRowHtml("input", inputName, inputRole, 0, "ALWAYS");
+    _PHASES.forEach(function (ph) {
+      var steps = recipe.filter(function (s) { return (s.phase || "pre") === ph[0]; });
+      if (!steps.length) return;
+      html += '<div style="margin:10px 0 1px 30px;font:10px/1.4 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--fg-faint)">' + ph[1] + "</div>";
+      steps.forEach(function (s) {
+        var sub = (s.ref ? s.ref : (s.role || "")) + (s.builtin ? " · built-in" : "");
+        html += flowRowHtml(s.k, s.name, sub, 1, _TIERTAG[s.tier] || null);
+      });
     });
+    html += flowRowHtml("output", outName, outRole, 0, "ALWAYS");
     return html;
   }
   function realFlowPanel(d) {
-    var rows = [], stages = (d.flow && d.flow.stages) || [];
-    stages.forEach(function (st) {
-      var key = primKey(st.stage);
-      (st.components || []).forEach(function (c) { rows.push([key, c.name, PRIMS[key].label + (c.role ? " · " + c.role : "")]); });
-      if (st.operator) rows.push(["op", "OR — merge branches", "Logical operator"]);
-    });
+    var flow = d.flow || {}, stages = flow.stages || [];
+    var recipe = (flow.recipe && flow.recipe.length) ? flow.recipe : STATIC_RECIPE;
+    var inputC = stageComp(stages, "input"), outC = stageComp(stages, "output");
     var costUsd = d.cost && d.cost.balanced && d.cost.balanced.per_task_usd;
-    var head = rows.length + " steps" + (costUsd != null ? " · est. $" + costUsd + " / run" : "") + (d.llm_used ? " · model-assembled" : " · deterministic selection");
-    return '<div class="oh-cc-id mono" style="margin-bottom:10px">assembled flow · ' + head + "</div>" + renderFlowRows(rows);
+    var head = (recipe.length + 2) + " steps" + (costUsd != null ? " · est. $" + costUsd + " / run" : "") + (d.llm_used ? " · model-assembled" : " · deterministic selection");
+    return recipePanel(head,
+      inputC ? inputC.name : "Input", (inputC && inputC.role) ? inputC.role : "what the pipeline runs on at runtime",
+      recipe,
+      outC ? outC.name : "Findings (JSON) + citations", (outC && outC.role) ? outC.role : "decision + metadata + full runtime object (replayable trace)");
   }
   function staticFlowPanel() {
-    var head = '6 steps · ▲ +0.41 lift · $$ est. / run <span class="oh-badge oh-badge--muted" style="padding:1px 6px">sample</span>';
-    return '<div class="oh-cc-id mono" style="margin-bottom:10px">assembled flow · ' + head + "</div>" + renderFlowRows(FLOW_ROWS);
+    var head = (STATIC_RECIPE.length + 2) + ' steps · ▲ +0.41 lift · $$ est. / run <span class="oh-badge oh-badge--muted" style="padding:1px 6px">sample</span>';
+    return recipePanel(head, "Recruitment ad / supplier doc", "the text/document the pipeline runs on",
+      STATIC_RECIPE, "Decision: yes / no + cited indicators", "decision + metadata + full runtime object (replayable trace)");
   }
   function renderPreview() {
     var page = $("#preview-page"); if (!page) return;
