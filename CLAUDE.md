@@ -119,6 +119,19 @@ one place. At scale, a value typed twice is a value that drifts.
 
 Full rules, examples, and remediation: `docs/codex/no-magic-values.md`.
 
+## Change Verification (warrant before change)
+
+Every update or design change carries a **warrant** before it is committed — one of: **clear user
+intent** (cite it in the commit/ledger), **≥2 independent agreeing sources**, or **an established repo
+principle**. Match the bar to the blast radius: trivial/reversible → a principle suffices; **design /
+brand / strategy / vocabulary / pricing / product-structure → clear user intent OR strong corroboration,
+NEVER a unilateral single-agent call**; irreversible / outward-facing → explicit intent + confirmation.
+"It's green" is necessary, not sufficient. Exceptions (small + reversible) are allowed but **recorded in
+the ledger**. Verifiers — and the autonomous loop — check the *warrant*, not just that it passed; when a
+decision supersedes an earlier one, update/delete the stale artifact in the **same** change (no orphaned
+contradictions); a memory/doc that names a file or flag is a claim about a past state — re-verify it
+before relying on it. Full contract: `docs/codex/change-verification-contract.md`.
+
 ## Promotion Boundary
 
 Candidate-table load readiness is not active publication readiness.

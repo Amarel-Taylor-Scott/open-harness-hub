@@ -53,6 +53,10 @@ Commit each green increment with a clear message. Never the same lane twice runn
    determinism; no insurance domains, no real PII/secrets; never republish `_reference/`.
 
 ## Validation gates (don't record "done" until green)
+- **Warrant** (`docs/codex/change-verification-contract.md`): every change cites one — clear user intent,
+  ≥2 agreeing sources, or an established principle. Design/brand/strategy needs intent or strong
+  corroboration, never a unilateral call. The verifier checks the warrant, not just green; "green" alone
+  is not a warrant. Record the warrant in the commit + ledger; record held/rejected changes too.
 - Fast-path: `python3 scripts/validate.py <changed>` → `build_component_id_index.py --update <changed>`
   → `build_catalog_pages.py --paths <changed> --update-index` → `build_component_id_index.py --check-fresh`.
 - `node --check` every touched web file; both products `/api/health` = 200; the relevant
