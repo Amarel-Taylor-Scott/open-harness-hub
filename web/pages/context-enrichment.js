@@ -53,6 +53,24 @@
     }).join("");
   }
 
+  // the four surfaces an open agent actually ingests context through (the Repomix-proven pattern)
+  var SURFACES = [
+    ["MCP server", "Live-serve to Claude Code / Cursor", "The default — MCP is the convergence point. Tier-negotiated, CDC-fresh, metered."],
+    ["Packed file · llms.txt", "Download or paste, no integration", "Works with any subscription. The freezable surface — take the tier and go."],
+    ["Skill / plugin", "Installable corpus + tools unit", "Distribute a governed corpus and its tools as one installable Claude Code skill."],
+    ["CLAUDE.md fragment", "Always-loaded, near-zero token", "The distilled tier for stable knowledge that must survive compaction — conventions, glossary."]
+  ];
+  function surfaceCards() {
+    return SURFACES.map(function (s, i) {
+      return '<div class="pt-panel" style="text-align:left">' +
+        '<div style="display:flex;align-items:baseline;gap:7px;margin-bottom:4px">' +
+        '<span style="width:18px;height:18px;border-radius:5px;flex:0 0 auto;display:grid;place-items:center;background:var(--accent-weak);color:var(--accent);border:1px solid color-mix(in srgb, var(--accent) 30%, var(--line));font-size:10px;font-weight:700">' + (i + 1) + "</span>" +
+        '<span style="font-weight:700;color:var(--fg);font-size:13.5px">' + s[0] + "</span></div>" +
+        '<div style="font-size:12.5px;color:var(--fg);margin-bottom:3px">' + s[1] + "</div>" +
+        '<div style="font-size:12px;color:var(--fg-muted);line-height:1.5">' + s[2] + "</div></div>";
+    }).join("");
+  }
+
   function navHtml(ctx) {
     return [["/context-enrichment", "Overview"], ["/docs", "The 7 layers"], ["/pricing", "Pricing"], ["/trust", "Trust"]].map(function (p) {
       return '<a data-nav="' + p[0] + '"' + (p[0] === "/context-enrichment" ? ' style="color:var(--fg);font-weight:600"' : "") + ">" + ctx.esc(p[1]) + "</a>";
@@ -85,6 +103,10 @@
 
       '<h3 style="font-family:var(--font-display);margin:26px 0 10px">What it does</h3>' +
       '<div class="pt-grid-3">' + capCards() + "</div>" +
+
+      '<h3 style="font-family:var(--font-display);margin:26px 0 8px">How your agent consumes it</h3>' +
+      '<div style="font-size:13px;color:var(--fg-muted);line-height:1.6;margin-bottom:10px">The output isn’t an answer — it’s your governed corpus rendered into whichever shape your agent ingests, at whichever tier you pay for.</div>' +
+      '<div class="pt-grid-3">' + surfaceCards() + "</div>" +
 
       '<div class="oh-state-msg" style="margin-top:26px;background:var(--accent-weak);border:1px solid color-mix(in srgb, var(--accent) 30%, var(--line));border-radius:var(--r-md);padding:16px 18px;display:block">' +
       '<div style="font-weight:600;color:var(--fg);margin-bottom:4px">Same substrate, a different surface</div>' +

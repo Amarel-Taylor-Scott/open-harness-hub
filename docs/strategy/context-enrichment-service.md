@@ -1,66 +1,99 @@
 # Context Enrichment as a Service (CEaaS) — product spec
 
-CEaaS is a **content + corpus** service, not a pipeline builder (that's Open Harness Hub — see
+CEaaS is a **content + corpus refinery**, not a pipeline builder (that's Open Harness Hub — see
 [[two-services-shared-infrastructure.md]]). You give it content (or use our unique governed corpora);
-it makes that content **token-efficient, governed, and agent-ready**, hosts it in tiers, and serves it
-straight into open-ended agentic workflows (Claude Code, MCP clients, any agent loop).
+it refines that content into **token-efficiency tiers**, hosts them (or hands them back), and feeds
+the corpora + tools into whatever open-ended agent you already run (Claude Code, Cursor, any MCP
+client). *OHH is a governed factory for pipelines; CEaaS is a refinery-plus-CDN for agent fuel.* Both
+burn the same crude (ingestion, compression, embedding, governance, clusters); they sell different
+refined products.
 
-## The three content tiers
+## The whitespace (why this is a category, not a feature)
 
-Every corpus/document is hosted in three tiers; a user pulls the tier their budget and task want, or
-**downloads** it to run locally / air-gapped.
+The tooling exists — but only as **scattered, single-shot, local CLIs**. **Repomix** is the clearest
+proof of the raw→compressed tier: Tree-sitter compression strips function bodies while preserving
+signatures for **~70% token reduction**, with per-file token counts, Secretlint scanning, and an MCP
+server (`pack_codebase` / `pack_remote_repository`) — it already ships an official Claude Code plugin.
+Its neighbors — **gitingest** (Python), **code2prompt** (power CLI), **yek** (speed), **Repo Prompt**
+(GUI) — all converge on **MCP**, and **llms.txt / llms-full.txt** is the emerging doc-tier standard
+for the same job. **Nobody hosts the tiers as governed, downloadable, freshness-tracked artifacts and
+serves them to open agents.** That is CEaaS's opening — the governed, hosted, measured version of what
+the CLIs do once, locally, ungoverned.
 
-| Tier | What it is | Produced by (shared backend components) | When to use |
+## Three tiers = three distinct techniques = three SKUs
+
+Each tier is a *different mechanism*, which is exactly why they productize as separate SKUs:
+
+| Tier | Technique | Mechanism (shared-backend component) | Numbers |
 |---|---|---|---|
-| **Raw** | the canonical, full-fidelity source, governed + cited | the connectors + source registry + normalization | audit, exact-quote, ground truth |
-| **Compressed** | token-reduced, **lift-preserving** form | `summarize.llmlingua` (LLMLingua) · `extractive-span-selector` · chunkers | the default working form fed to a model |
-| **Hyper-efficient** | maximally token-dense: distilled facts + cached prefixes for hot paths | `memory/*` (distilled · reflect) · `cache/*` (prompt-prefix · semantic · KV) | high-volume / latency-critical agent loops |
+| **Raw** | hosted full fidelity | object store + source registry + connectors | source of truth; freezable export |
+| **Compressed — structural** | strip bodies, keep signatures | `compress.structural` (Repomix/Tree-sitter) | ~70% on code, structure lossless |
+| **Compressed — learned** | token-classification compression | `summarize.llmlingua` (LLMLingua-2) | 2–5× (general 5–20×, up to ~95%); 3–6× faster than v1 |
+| **Hyper-efficient** | distilled facts + cache-shaped packaging | `memory/*` (Mem0/Hindsight) + `cache/*` | provider cache ~90% + context engine 40–60%; cache-shaping compounds |
 
-Each tier carries provenance back to **raw** — the hyper-efficient tier is never an unsourced claim;
-it traces to the canonical source. Compression is admitted only where it **preserves measured lift**
-(and we report the breakeven honestly — LLMLingua only pays off in a matched length/ratio/hardware
-window).
+The hyper-efficient tier is where value compounds: extracted facts/observations **packaged onto a
+cacheable prefix**, so the provider prompt cache (~90% off input at a high hit rate) does the rest —
+worth far more than raw compression alone. (There's even an autonomous "active context compression"
+result: 22.7% reduction, up to 57% on individual tasks, at identical accuracy.)
 
-## Token-efficiency metering (the product's headline metric)
+## The four consumption surfaces (this is the product design)
 
-For every corpus and tier CEaaS reports **tokens-in → tokens-out** and the **lift retained** at that
-compression, measured by a *separate* evaluator (no component grades its own work). That number is
-both the value prop ("4× fewer tokens, lift retained") and the **billing basis**: per query, per GB
-hosted, per refresh — the consumption motion the context-layer market rewards
-([[context-layer-pmf.md]]).
+The mistake would be shipping CEaaS as "an API." To put corpora + tools into open-ended agents, you
+meet them **where they actually ingest context** — the four-surface pattern Repomix already proves:
 
-## Agentic serving — the open-ended workflow hook
+1. **MCP server** (`deliver.mcp_serve`) — live-serve the corpus/tool to Claude Code, Cursor, any MCP
+   client. The default surface (MCP is the convergence point); tier-negotiated, CDC-fresh, metered.
+2. **Packed file / llms.txt** (`deliver.llms_txt`) — download or paste the tier directly. Works with
+   any subscription, **no integration**. The freezable surface.
+3. **Claude Code skill / plugin** (`deliver.skill_package`) — distribute the corpus + tools as one
+   installable governed unit (Repomix ships exactly this).
+4. **CLAUDE.md fragment** (`deliver.claudemd`) — the always-loaded, **near-zero-token** distilled tier
+   for stable knowledge that must survive compaction (conventions, glossary).
 
-The differentiator vs. a plain compression library: CEaaS **serves the governed corpora + tools into
-agents**, not just files. Via **MCP endpoints** (built on the existing MCP bridge), a Claude Code user
-or any agent loop gets:
-- the **unique governed knowledge corpora** (primary-source, cited, CDC-fresh) as a retrievable tool;
-- the governed **tools/processors** (the catalog's Actions) the agent can call;
-- the tier negotiation (ask for compressed by default; hyper-efficient on hot paths; raw for audit).
+**CEaaS's output isn't an answer — it's a governed corpus rendered into whichever of those four shapes
+the user's agent consumes, at whichever efficiency tier they pay for.**
 
-So an open-ended agent doesn't carry a giant context or a stale dump — it pulls token-dense, governed,
-cited context and tools on demand. That is the "analyst keeps only the few distilled pages on the desk"
-model ([[../concepts/context-layer-and-the-desk.md]]) delivered *as a service to someone else's agent*.
+## Pricing logic (falls out of freezable-vs-recurring)
+
+- **Raw + Compressed** are downloadable → **freezable**: one-time or storage-priced. A static download
+  is yours forever.
+- **Hyper-efficient, live-served and kept fresh against a dynamic corpus** → **recurring**, because a
+  static download *can't stay current*. That CDC/freshness obligation is the recurring-revenue moat.
+
+This is the same freezable-vs-recurring boundary as the rest of the product
+([[monetization-mechanisms.md]]): you only pay-forever for what must stay live.
+
+## Measured fidelity per tier (the moat — and the honest caution)
+
+Compress too aggressively and you **destroy the model's ability to reason** — the failure mode every
+context-optimization guide flags. CEaaS lives or dies on **measured fidelity per tier**: every
+artifact ships a **published quality delta** (raw → compressed → hyper-efficient) from
+`verify.compression_fidelity` — "did this tier preserve enough?" — scored by a *separate* evaluator,
+never self-graded. That guarantee is what turns "we compressed your docs" into a trustworthy service
+rather than a gamble. It is the **same engine and the same moat as OHH's lift gate** — the shared
+measurement engine extended from "does the pipeline lift?" to "did the tier preserve?".
 
 ## Built on the shared backend (reuse, not rebuild)
 
-CEaaS adds **no new engine** — it's a surface + a meter + MCP endpoints over the same substrate OHH
-uses: the compression/memory/cache components, the governed corpora, the connectors, the lift/eval
-harness, the vector store, the workers. A better compressor or a fresher corpus shipped for OHH is
-instantly a better CEaaS tier. This is why the data plane is attribute-level
-([[../codex/schema-extensibility.md]]): a new tier metric (e.g. `token_savings_ratio`) is a
-`dimension-record` both services read, never a per-service column.
+CEaaS adds **no new engine** — a surface + a meter + the four emitters over the same substrate OHH
+uses (compression/memory/cache components, governed corpora, connectors, the lift/fidelity harness,
+the vector store, the workers). A better compressor or a fresher corpus shipped for OHH is instantly a
+better CEaaS tier. This is why the data plane is attribute-level
+([[../codex/schema-extensibility.md]]): a new tier metric (e.g. `token_savings_ratio`,
+`fidelity_delta`) is a `dimension-record` both services read, never a per-service column.
 
-## Governance (the moat, on every tier)
+## The join (one object, two doors)
 
-Provenance + lineage on raw → compressed → hyper-efficient; CDC freshness + revocation on the live
-corpora; signed attestations on the hosted artifacts; self-hostable / air-gappable downloads (the Onyx
-pattern). The compressed and hyper-efficient tiers are governed derivations, not lossy guesses — that's
-what separates CEaaS from "run LLMLingua yourself."
+A **Knowledge Corpus or tool, produced and governed once**, is consumed two ways: wire it into a
+bounded OHH pipeline, **or** serve it via CEaaS into an open-ended agent. Same object, same provenance
+trail, same lift + compression-fidelity scores — two consumption models, two GTM motions, one backend.
+OHH monetizes governed *pipelines*; CEaaS monetizes governed *fuel*. The foundry and measurement
+engine feed both, so **every component we mint is sellable through either door.**
 
 ## Status (honest)
 
-Spec-level. The compression/memory/cache/connector **components are validated definitions** (lifecycle
-experimental). Implementation work to make CEaaS real: the tier pipeline
-(raw→compressed→hyper-efficient, hosted + downloadable) on the shared workers, the MCP serving
-endpoint, and the token-efficiency meter. None of it forks the backend.
+Spec-level. The tier/surface/fidelity **components are seeded as governed definitions** (this turn —
+`scripts/seed/ceaas_components.py`; lifecycle experimental). Implementation to make CEaaS real: the
+tier pipeline (raw→compressed→hyper-efficient, hosted + downloadable) on the shared workers, the MCP
+serving endpoint, the four emitters, and the token-efficiency + fidelity meter. None of it forks the
+backend.

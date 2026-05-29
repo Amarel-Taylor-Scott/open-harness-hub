@@ -1,0 +1,45 @@
+id: processor/emit-llms-txt
+type: processor
+version: 0.1.0
+name: Emit llms.txt
+description: Render a governed corpus as llms.txt / llms-full.txt (the emerging doc-tier standard) — download
+  or paste into any agent, no integration. The freezable consumption surface.
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+capability:
+- format_conversion
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- ceaas
+- consumption-surface
+created: '2026-05-29'
+updated: '2026-05-29'
+attribution:
+  source_kind: manual
+  author: Open Harness Hub — Context Enrichment as a Service (CEaaS)
+  license: MIT
+process_kind: deliver.llms_txt
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: corpus
+  type: object
+outputs:
+- name: llms_txt
+  type: object
+side_effects: none
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.deliver.emit_llms_txt.run
+  language: python
+links:
+  source: docs/strategy/context-enrichment-service.md

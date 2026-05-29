@@ -1,0 +1,48 @@
+id: processor/serve-mcp-corpus
+type: processor
+version: 0.1.0
+name: Serve corpus over MCP
+description: Live-serve a governed corpus + its tools over MCP to Claude Code / Cursor / any agent loop
+  — the default surface (MCP is the convergence point). Tier-negotiated, CDC-fresh, metered.
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+capability:
+- tool_use
+- retrieval
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- ceaas
+- consumption-surface
+created: '2026-05-29'
+updated: '2026-05-29'
+attribution:
+  source_kind: manual
+  author: Open Harness Hub — Context Enrichment as a Service (CEaaS)
+  license: MIT
+process_kind: deliver.mcp_serve
+deterministic: false
+idempotent: true
+streaming: false
+inputs:
+- name: corpus
+  type: object
+- name: tools
+  type: object
+outputs:
+- name: mcp_endpoint
+  type: object
+side_effects: external_call
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.deliver.serve_mcp_corpus.run
+  language: python
+links:
+  source: docs/strategy/context-enrichment-service.md

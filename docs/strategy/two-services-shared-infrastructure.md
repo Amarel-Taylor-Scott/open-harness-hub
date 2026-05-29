@@ -30,6 +30,43 @@ and tools inside their *own* agent — not a pipeline they operate on our surfac
 (working brand **"Context Enrichment"**; distinctive marks for later: *Strata · Substrate · Carrel*).
 Full spec: [[context-enrichment-service.md]].
 
+## One screen — the shared platform
+
+```
+   builders ──▶ ┌──────────────────────────┐   ┌──────────────────────────┐ ◀── agent devs
+                │  OPEN HARNESS HUB         │   │ CONTEXT ENRICHMENT (CEaaS)│   (Claude Code,
+                │  bounded                  │   │ unbounded                 │    Cursor, any
+                │  • assemble DAG · run/trace│   │ • ingest content/corpora  │    MCP client)
+                │  • registry · I/O rules   │   │ • tier: raw→compressed→   │
+                │  • monitor + LIFT gate    │   │     hyper-efficient        │
+                │                           │   │ • host / download          │
+                │  sells: governed PIPELINES│   │ • 4 surfaces: MCP · llms.txt│
+                │                           │   │     · skill · CLAUDE.md     │
+                │                           │   │  sells: governed FUEL       │
+                └────────────┬─────────────┘   └─────────────┬──────────────┘
+                             │      two doors, one object     │
+                             ▼                                ▼
+                   ┌─────────────────────  THE JOIN  ─────────────────────┐
+                   │  a governed Knowledge Corpus / tool — minted ONCE,    │
+                   │  one provenance trail, one lift + fidelity score.     │
+                   │  Wire it into a bounded pipeline, OR serve it to an    │
+                   │  open agent. Every component is sellable through either│
+                   │  door.                                                 │
+                   └───────────────────────────┬──────────────────────────┘
+                                                ▼
+   ┌─────────────────────────  SHARED INFRASTRUCTURE PLANE  ──────────────────────────┐
+   │  compute     K8s clusters · worker fleet · vLLM embed/inference · autoscaling     │
+   │  engine      foundry (gap-mine + generate) · MEASUREMENT (lift + tier-fidelity)   │
+   │  ingestion   connectors · source registry · normalization                        │
+   │  storage     object store (raw) · pgvector (retrieval) · tiered-artifact store    │
+   │  governance  provenance / AIBOM · citations · CDC / freshness · MCP plumbing      │
+   │  billing     usage metering (per query · per GB · per refresh)                    │
+   └──────────────────────────────────────────────────────────────────────────────────┘
+```
+
+The expensive parts are one set, shared. Only the two storefronts on top — and the consumption /
+billing model — differ. The **join** is a single governed object consumed two ways.
+
 ## The shared infrastructure plane (the substrate both ride on)
 
 | Shared (one source of truth, never forked) | Detail |
