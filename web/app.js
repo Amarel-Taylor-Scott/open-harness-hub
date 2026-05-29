@@ -207,29 +207,29 @@
 
   // ---------------- PREVIEW (PPreview) ----------------
   var BUILD_STEPS = ["Parsing the task", "Retrieving vetted components", "Assembling the flow", "Costing & measuring lift"];
-  // canonical governed-model-call recipe (offline sample / fallback). Mirrors builder.py
-  // harness_recipe: phase = gate|pre|call|post, tier = always|default|optional, level = 0|1.
+  // canonical governed-model-call recipe (offline sample / fallback). Mirrors builder.py harness_recipe:
+  // phase = gate|enrich|polish|verify_query|call|response, tier = always|default|optional, level 1.
   var STATIC_RECIPE = [
-    { phase: "gate", tier: "default", level: 0, k: "conditional", name: "Trigger gate — does the input qualify?", role: "run the harness only if the input clears the gate", builtin: true },
     { phase: "gate", tier: "default", level: 1, k: "conditional", name: "Pattern packs — qualify", role: "combinable keyword/regex packs that admit the input", ref: "rule-pack/trafficking-indicators" },
     { phase: "gate", tier: "optional", level: 1, k: "stop", name: "Anti-pattern packs — disqualify", role: "combinable packs that screen the input out (false-positive guards)", builtin: true },
-    { phase: "pre", tier: "default", level: 1, k: "action", name: "Add persona", role: "the role / expertise the model adopts", ref: "persona/exploitation-analyst" },
-    { phase: "pre", tier: "default", level: 1, k: "action", name: "Build the system prompt", role: "instructions + constraints + cite-or-abstain (separate from persona)", builtin: true },
-    { phase: "pre", tier: "optional", level: 1, k: "action", name: "R0 · Query transform", role: "close the query↔doc gap", builtin: true, options: ["none", "HyDE", "Query2Doc", "multi-query / RAG-fusion", "decompose", "step-back", "self-query filter"], "default": "none (HyDE for short queries)" },
-    { phase: "pre", tier: "default", level: 1, k: "knowledge", name: "R1 · Retrieve", role: "pull candidate facts from the governed corpus", ref: "knowledge-corpus/recruitment-law", options: ["BM25 / keyword", "regex / fuzzy", "exact-id", "dense / RAG (vector)", "SPLADE", "ColBERT", "hybrid"], "default": "hybrid (BM25 + dense)" },
-    { phase: "pre", tier: "optional", level: 1, k: "action", name: "R2 · Chunk", role: "split sources into retrievable units (index-time)", builtin: true, options: ["fixed + overlap", "recursive-character", "page / structure-aware", "parent-child", "sentence-window", "semantic"], "default": "recursive-character" },
-    { phase: "pre", tier: "default", level: 1, k: "action", name: "R3 · Rerank / fuse", role: "merge legs then rescore the top-k", ref: "processor/cross-encoder-reranker", options: ["RRF", "convex (weighted)", "DBSF", "cross-encoder", "ColBERT", "LLM-rerank", "none"], "default": "RRF → cross-encoder" },
-    { phase: "pre", tier: "optional", level: 1, k: "knowledge", name: "R4 · Summarize / compress", role: "shrink context to salient cited spans", builtin: true, options: ["none", "extractive", "contextual compression", "abstractive"], "default": "none → extractive" },
-    { phase: "pre", tier: "default", level: 1, k: "action", name: "R5 · Select · order · de-conflict", role: "top-k, dedupe, source-precedence, flag contradictions", builtin: true, options: ["top-1", "top-3", "top-k", "MMR (diversity)", "dedupe", "source-precedence", "recency"], "default": "top-k + dedupe + source-precedence" },
-    { phase: "pre", tier: "default", level: 1, k: "action", name: "R6 · Place context in prompt", role: "mitigate 'lost in the middle'", builtin: true, options: ["concat", "edge (first + last)", "structured / delimited + source tags", "instructions-last"], "default": "structured + edge + instructions-last" },
-    { phase: "pre", tier: "optional", level: 1, k: "action", name: "Few-shot exemplars", role: "examples for format / reasoning", builtin: true, options: ["zero-shot", "static k", "dynamic / kNN", "CoT exemplars"], "default": "zero-shot" },
-    { phase: "pre", tier: "default", level: 1, k: "conditional", name: "Output schema", role: "the typed JSON envelope", builtin: true, options: ["free text", "JSON schema in prompt", "constrained / grammar decoding"], "default": "JSON schema in prompt" },
-    { phase: "pre", tier: "default", level: 1, k: "stop", name: "Prompt-injection check", role: "block system-prompt extraction / override", builtin: true, options: ["delimit + role-separate", "heuristic / classifier screen", "sanitize retrieved content"], "default": "delimit + screen" },
+    { phase: "enrich", tier: "default", level: 1, k: "action", name: "Add persona", role: "the role / expertise the model adopts", ref: "persona/exploitation-analyst" },
+    { phase: "enrich", tier: "default", level: 1, k: "action", name: "Build the system prompt", role: "instructions + constraints + cite-or-abstain (separate from persona)", builtin: true },
+    { phase: "enrich", tier: "optional", level: 1, k: "action", name: "Query transform", role: "close the query↔doc gap", builtin: true, options: ["none", "HyDE", "Query2Doc", "multi-query / RAG-fusion", "decompose", "step-back", "self-query filter"], "default": "none (HyDE for short queries)" },
+    { phase: "enrich", tier: "default", level: 1, k: "knowledge", name: "Retrieve", role: "pull candidate facts from the governed corpus", ref: "knowledge-corpus/recruitment-law", options: ["BM25 / keyword", "regex / fuzzy", "exact-id", "dense / RAG (vector)", "SPLADE", "ColBERT", "hybrid"], "default": "hybrid (BM25 + dense)" },
+    { phase: "enrich", tier: "optional", level: 1, k: "action", name: "Chunk", role: "split sources into retrievable units (index-time)", builtin: true, options: ["fixed + overlap", "recursive-character", "page / structure-aware", "parent-child", "sentence-window", "semantic"], "default": "recursive-character" },
+    { phase: "enrich", tier: "default", level: 1, k: "action", name: "Rerank / fuse", role: "merge legs then rescore the top-k", ref: "processor/cross-encoder-reranker", options: ["RRF", "convex (weighted)", "DBSF", "cross-encoder", "ColBERT", "LLM-rerank", "none"], "default": "RRF → cross-encoder" },
+    { phase: "enrich", tier: "optional", level: 1, k: "action", name: "Check online facts / search", role: "verify volatile facts against a live source", builtin: true },
+    { phase: "enrich", tier: "optional", level: 1, k: "action", name: "Few-shot exemplars", role: "examples for format / reasoning", builtin: true, options: ["zero-shot", "static k", "dynamic / kNN", "CoT exemplars"], "default": "zero-shot" },
+    { phase: "enrich", tier: "default", level: 1, k: "conditional", name: "Output schema", role: "the typed JSON envelope the response is verified against", builtin: true, options: ["free text", "JSON schema in prompt", "constrained / grammar decoding"], "default": "JSON schema in prompt" },
+    { phase: "polish", tier: "optional", level: 1, k: "knowledge", name: "Summarize / compress", role: "shrink context to salient cited spans (cut tokens)", builtin: true, options: ["none", "extractive", "contextual compression", "abstractive"], "default": "none → extractive" },
+    { phase: "polish", tier: "default", level: 1, k: "action", name: "Select · order · de-conflict", role: "top-k, dedupe, source-precedence, flag contradictions", builtin: true, options: ["top-1", "top-3", "top-k", "MMR (diversity)", "dedupe", "source-precedence", "recency"], "default": "top-k + dedupe + source-precedence" },
+    { phase: "polish", tier: "default", level: 1, k: "action", name: "Place context in prompt", role: "mitigate 'lost in the middle'", builtin: true, options: ["concat", "edge (first + last)", "structured / delimited + source tags", "instructions-last"], "default": "structured + edge + instructions-last" },
+    { phase: "verify_query", tier: "default", level: 1, k: "stop", name: "Prompt-injection check", role: "block system-prompt extraction / override", builtin: true, options: ["delimit + role-separate", "heuristic / classifier screen", "sanitize retrieved content"], "default": "delimit + screen" },
     { phase: "call", tier: "always", level: 1, k: "action", name: "Call the right-sized model", role: "smallest model that clears the bar + system prompt", ref: "harness/cite-first" },
-    { phase: "post", tier: "always", level: 1, k: "conditional", name: "Check output", role: "validate the answer shape", builtin: true },
-    { phase: "post", tier: "default", level: 1, k: "conditional", name: "Verify JSON (recover if malformed)", role: "parse; repair once if non-JSON", builtin: true },
-    { phase: "post", tier: "default", level: 1, k: "conditional", name: "Re-verify", role: "second pass vs the rubric", ref: "rubric/exploitation-grade" },
-    { phase: "post", tier: "always", level: 1, k: "loop", name: "If not OK → retry with changes (≤3)", role: "targeted fixes until it passes, else escalate", ref: "pattern/refine-loop" }
+    { phase: "response", tier: "always", level: 1, k: "conditional", name: "Check output", role: "validate the answer shape", builtin: true },
+    { phase: "response", tier: "default", level: 1, k: "conditional", name: "Verify JSON (recover if malformed)", role: "parse; repair once if non-JSON", builtin: true },
+    { phase: "response", tier: "default", level: 1, k: "conditional", name: "Re-verify", role: "second pass vs the rubric", ref: "rubric/exploitation-grade" },
+    { phase: "response", tier: "always", level: 1, k: "loop", name: "If not OK → retry with changes (≤3)", role: "targeted fixes until it passes, else escalate", ref: "pattern/refine-loop" }
   ];
   var previewTimer = null;
   function primKey(stage) { var k = String(stage || "").toLowerCase().split(/[\s/]/)[0]; return PRIMS[k] ? k : "action"; }
@@ -240,8 +240,8 @@
     var glyph = isOp ? "◇" : (PRIMS[prim] ? PRIMS[prim].glyph : "•");
     var swatch = isOp ? "background:transparent;border:2px solid var(--operator);color:var(--operator)"
                       : "background:var(" + (PRIMS[prim] ? PRIMS[prim].v : "--p-action") + ");color:#fff;border:none";
-    var wrap = level ? "position:relative;margin-left:12px;border-left:1px solid var(--line);padding-left:20px"
-                     : "position:relative";
+    var wrap = (level ? "position:relative;margin-left:12px;border-left:1px solid var(--line);padding-left:20px" : "position:relative")
+             + (tag === "OPTIONAL" ? ";opacity:.6" : "");   // dim optional steps so the default path stands out
     // tier/relationship chip is RIGHT-aligned + spaced so it never butts the name
     var chip = tag ? '<span class="oh-badge ' + (_CHIP[tag] || "oh-badge--muted") +
       '" style="flex:0 0 auto;margin-left:10px;padding:1px 7px;font-family:var(--font-mono);font-size:9px;letter-spacing:.03em">' + esc(tag) + "</span>" : "";
@@ -264,7 +264,7 @@
     return null;
   }
   var _TIERTAG = { always: "ALWAYS", default: "DEFAULT", optional: "OPTIONAL" };
-  var _PHASE_LABEL = { pre: "Pre-model-call", call: "Model call", post: "Post-model-call" };
+  var _PHASE_LABEL = { gate: "Trigger gate", enrich: "Query enrichment", polish: "Query polishing", verify_query: "Query verification", call: "Model call", response: "Model response" };
   // Input(L0) → Trigger gate(L0) + its pattern/anti-pattern packs(L1) → Pre/Model/Post phase
   // groups → Output(L0). Each step carries its own level + phase (the backend decides indentation).
   function recipePanel(head, inputName, inputRole, recipe, outName, outRole) {
@@ -273,8 +273,10 @@
     var lastPhase = "";
     recipe.forEach(function (s) {
       var ph = s.phase || "pre";
-      if (ph !== lastPhase && _PHASE_LABEL[ph]) {   // gate has no header — the gate row stands at L0
-        html += '<div style="margin:11px 0 1px 30px;font:10px/1.4 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--fg-faint)">' + _PHASE_LABEL[ph] + "</div>";
+      if (ph !== lastPhase && _PHASE_LABEL[ph]) {   // a clear section divider per phase
+        html += '<div style="display:flex;align-items:center;gap:8px;margin:18px 0 6px">' +
+          '<span style="font:700 10px/1.4 var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)">' + _PHASE_LABEL[ph] + "</span>" +
+          '<span style="flex:1;height:1px;background:var(--line)"></span></div>';
       }
       lastPhase = ph;
       var sub = (s.ref ? s.ref : (s.role || "")) + (s.builtin ? " · built-in" : "");
@@ -306,52 +308,70 @@
       '<div style="display:flex;gap:9px"><button class="oh-btn oh-btn--primary" data-nav="/signup">Sign up free →</button>' +
       '<button class="oh-btn oh-btn--ghost" data-nav="/signin">Sign in</button></div></div>';
   }
+  // per-task preview state so re-entering /preview never restarts the animation or re-fetches
+  var _preview = { task: null, state: "idle", data: null };
+  function previewHead(resolved, task) {
+    return '<div class="pt-page-head" style="margin-bottom:14px"><h1>' + (resolved ? "Your flow is ready" : "Building your flow…") +
+      '</h1><div class="sub mono" style="font-family:var(--font-mono);color:var(--fg-muted)">“' + esc(task.slice(0, 90)) + '”</div></div>';
+  }
+  function checklistHtml(doneCount, resolved, secsVal) {
+    var html = '<div class="pt-panel" style="padding:4px 16px">';
+    BUILD_STEPS.forEach(function (s, i) {
+      var active = (i === doneCount && !resolved);
+      var mark = i < doneCount ? "✓" : active ? "◌" : "·";
+      var mcol = i < doneCount ? "var(--success)" : active ? "var(--accent)" : "var(--fg-faint)";
+      var col = (i <= doneCount) ? "var(--fg)" : "var(--fg-faint)";
+      var clock = (active && i === BUILD_STEPS.length - 1) ? ' <span style="color:var(--fg-faint)">(' + secsVal + "s)</span>" : "";
+      var border = i < BUILD_STEPS.length - 1 ? ";border-bottom:1px solid var(--line)" : "";
+      html += '<div style="display:flex;align-items:center;gap:9px;padding:8px 0;font-size:13px;color:' + col + border + '">' +
+        '<span style="width:13px;text-align:center;color:' + mcol + '">' + mark + "</span>" + s + clock +
+        '<span style="margin-left:auto">' + (i < doneCount ? '<span class="oh-badge oh-badge--lift" style="padding:1px 7px">done</span>'
+          : active ? '<span class="oh-badge oh-badge--muted" style="padding:1px 7px">working…</span>' : "") + "</span></div>";
+    });
+    return html + "</div>";
+  }
+  function previewResultHtml(task, flowData) {
+    var inner = flowData ? realFlowPanel(flowData) : staticFlowPanel();
+    return previewHead(true, task) + checklistHtml(BUILD_STEPS.length, true, 0) +
+      '<div class="pt-panel" style="margin-top:16px">' + inner + "</div>" + signupCard();
+  }
   function renderPreview() {
     var page = $("#preview-page"); if (!page) return;
-    clearTimeout(previewTimer);
     var task = state.task || "grade suppliers against CSDDD";
-    var started = new Date().getTime();
-    var step = 0, flowData = null, flowState = "pending";
+    // IDEMPOTENT: re-entering /preview for an already-built task re-renders the result instantly —
+    // no animation restart, no re-fetch (this is what was causing the "recycle / start over").
+    if (_preview.task === task && _preview.state === "loaded") { page.innerHTML = previewResultHtml(task, _preview.data); return; }
+    if (_preview.task === task && _preview.state === "fallback") { page.innerHTML = previewResultHtml(task, null); return; }
+    if (_preview.task === task && _preview.state === "pending") return;  // already building this task
+    clearTimeout(previewTimer);
+    _preview = { task: task, state: "pending", data: null };
+    var started = new Date().getTime(), step = 0;
     function secs() { return Math.round((new Date().getTime() - started) / 1000); }
     logEvent("assembling flow · " + task.slice(0, 48));
-    // narrate=0 → skip the prose LLM call (preview doesn't show it) → roughly half the latency
     fetch("/api/build?task=" + encodeURIComponent(task) + "&narrate=0" + (token() ? "&token=" + encodeURIComponent(token()) : ""))
       .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
       .then(function (d) {
-        flowData = d; flowState = "loaded"; clearTimeout(previewTimer);
+        if (_preview.task !== task) return;   // task changed mid-flight — ignore stale result
+        _preview.state = "loaded"; _preview.data = d; clearTimeout(previewTimer);
         var n = (d.flow && d.flow.recipe) ? (d.flow.recipe.length + 2) : "?";
         logEvent("flow ready · " + n + " steps · " + secs() + "s" + (d.llm_used ? " · AI-selected" : " · deterministic"), "ok");
-        paint();
+        page.innerHTML = previewResultHtml(task, d);
       })
-      .catch(function () { flowState = "fallback"; clearTimeout(previewTimer); logEvent("build service unreachable — showing sample flow", "warn"); paint(); });
-    function paint() {
-      var resolved = flowState !== "pending";
-      // steps 0..N-1 animate on the timer, but the LAST step only completes when the REAL result
-      // is back — the progress is wired to the actual /api/build, never a fake 'done'.
-      var doneCount = resolved ? BUILD_STEPS.length : Math.min(step, BUILD_STEPS.length - 1);
-      var html = '<div class="pt-page-head"><h1>' + (resolved ? "Your flow is ready" : "Building your flow…") +
-        '</h1><div class="sub mono" style="font-family:var(--font-mono)">“' + esc(task.slice(0, 80)) + '”</div></div>';
-      html += '<div class="pt-panel">';
-      BUILD_STEPS.forEach(function (s, i) {
-        var active = (i === doneCount && !resolved);
-        var mark = i < doneCount ? "✓ " : active ? "◌ " : "· ";
-        var col = (i <= doneCount) ? "var(--fg)" : "var(--fg-faint)";
-        var clock = (active && i === BUILD_STEPS.length - 1) ? ' <span style="color:var(--fg-faint)">(' + secs() + "s)</span>" : "";
-        html += '<div class="pt-setting-row" style="padding:9px 0"><div class="info"><div class="t" style="color:' + col + '">' + mark + s + clock + "</div></div>" +
-          (i < doneCount ? '<span class="oh-badge oh-badge--lift" style="padding:2px 7px">done</span>'
-            : active ? '<span class="oh-badge oh-badge--muted" style="padding:2px 7px">working…</span>' : "") + "</div>";
+      .catch(function () {
+        if (_preview.task !== task) return;
+        _preview.state = "fallback"; clearTimeout(previewTimer);
+        logEvent("build service unreachable — showing sample flow", "warn");
+        page.innerHTML = previewResultHtml(task, null);
       });
-      html += "</div>";
-      if (resolved) {
-        var inner = (flowState === "loaded" && flowData) ? realFlowPanel(flowData) : staticFlowPanel();
-        html += '<div class="pt-panel" style="margin-top:12px">' + inner + "</div>" + signupCard();
-      } else {
-        html += '<div class="oh-state-msg" style="margin-top:12px;display:flex;gap:10px;align-items:center;color:var(--fg-muted);font-size:12.5px;border:1px solid var(--line);border-radius:var(--r-md);padding:12px 14px">' +
-          "◌ Contacting the model and assembling the governed flow — the first build can take a moment." +
-          '<span style="margin-left:auto;font-family:var(--font-mono);color:var(--fg-faint)">' + secs() + "s</span></div>";
-      }
-      page.innerHTML = html;
-      if (!resolved) { step = Math.min(step + 1, BUILD_STEPS.length - 1); previewTimer = setTimeout(paint, 700); }
+    function paint() {
+      if (_preview.state !== "pending") return;   // resolved — stop the animation loop
+      var doneCount = Math.min(step, BUILD_STEPS.length - 1);
+      page.innerHTML = previewHead(false, task) + checklistHtml(doneCount, false, secs()) +
+        '<div class="oh-state-msg" style="margin-top:12px;display:flex;gap:10px;align-items:center;color:var(--fg-muted);font-size:12.5px;border:1px solid var(--line);border-radius:var(--r-md);padding:12px 14px">' +
+        "◌ Contacting the model and assembling the governed flow — the first build can take a moment." +
+        '<span style="margin-left:auto;font-family:var(--font-mono);color:var(--fg-faint)">' + secs() + "s</span></div>";
+      step = Math.min(step + 1, BUILD_STEPS.length - 1);
+      previewTimer = setTimeout(paint, 700);
     }
     paint();
   }

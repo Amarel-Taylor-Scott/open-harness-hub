@@ -260,71 +260,75 @@ def harness_recipe(task: str, kept: list[dict]) -> list[dict]:
     # retrieval sub-pipeline R0–R6 (query-transform → retrieve[method] → chunk → rerank/fuse →
     # summarize → select/order/de-conflict → place) + prompt steps each expose swappable method
     # `options` with a recommended `default`. Full menu + bundles: docs/concepts/retrieval-and-prompt-taxonomy.md.
+    # Six clear phases (owner's model): Trigger gate → Query enrichment (ADD info/persona/context) →
+    # Query polishing (REDUCE tokens + arrange) → Query verification → Model call → Model response.
     recipe = [
-        step("gate", "default", 0, "conditional", "Trigger gate — does the input qualify?",
-             "run the harness only if the input clears the gate; else short-circuit (cheap)"),
+        # ---- TRIGGER GATE (qualify the input or short-circuit) ----
         step("gate", "default", 1, "conditional", "Pattern packs — qualify",
              "combinable keyword / regex pattern packs that ADMIT the input", pattern_pack),
         step("gate", "optional", 1, "stop", "Anti-pattern packs — disqualify",
              "combinable packs that screen the input OUT (false-positive guards)", antipattern_pack),
-        step("pre", "default", 1, "action", "Add persona",
+        # ---- QUERY ENRICHMENT (add new information, persona, retrieved context) ----
+        step("enrich", "default", 1, "action", "Add persona",
              "the role / expertise the model adopts (role only)", persona),
-        step("pre", "default", 1, "action", "Build the system prompt",
-             "task instructions + constraints + cite-or-abstain — SEPARATE from the persona"),
-        # --- retrieval sub-pipeline R0–R6 (each slot a swappable component) ---
-        step("pre", "optional", 1, "action", "R0 · Query transform",
+        step("enrich", "default", 1, "action", "Build the system prompt",
+             "task instructions + constraints + cite-or-abstain — separate from the persona"),
+        step("enrich", "optional", 1, "action", "Query transform",
              "reshape the query to close the query↔doc gap", None,
              ["none", "HyDE", "Query2Doc", "multi-query / RAG-fusion", "decompose", "step-back", "self-query filter"],
              "none (HyDE for short queries)"),
-        step("pre", "default", 1, "knowledge", "R1 · Retrieve",
+        step("enrich", "default", 1, "knowledge", "Retrieve",
              "pull candidate facts from the governed corpus", corpus,
              ["BM25 / keyword", "regex / fuzzy", "exact-id", "dense / RAG (vector)", "SPLADE", "ColBERT", "hybrid"],
              "hybrid (BM25 + dense)"),
-        step("pre", "optional", 1, "action", "R2 · Chunk",
+        step("enrich", "optional", 1, "action", "Chunk",
              "split sources into retrievable units (index-time)", None,
              ["fixed + overlap", "recursive-character", "page / structure-aware", "parent-child", "sentence-window", "semantic"],
              "recursive-character"),
-        step("pre", "default", 1, "action", "R3 · Rerank / fuse",
+        step("enrich", "default", 1, "action", "Rerank / fuse",
              "merge legs then rescore the top-k with a cross-encoder", None,
              ["RRF", "convex (weighted)", "DBSF", "cross-encoder", "ColBERT", "LLM-rerank", "none"],
              "RRF → cross-encoder"),
-        step("pre", "optional", 1, "knowledge", "R4 · Summarize / compress",
-             "shrink context to the salient cited spans", None,
-             ["none", "extractive", "contextual compression", "abstractive"], "none → extractive"),
-        step("pre", "default", 1, "action", "R5 · Select · order · de-conflict",
-             "top-k, dedupe, recency / source-precedence, flag contradictions", None,
-             ["top-1", "top-3", "top-k", "MMR (diversity)", "dedupe", "source-precedence", "recency"],
-             "top-k + dedupe + source-precedence"),
-        step("pre", "default", 1, "action", "R6 · Place context in prompt",
-             "where context sits — mitigates 'lost in the middle'", None,
-             ["concat", "edge (first + last)", "structured / delimited + source tags", "instructions-last"],
-             "structured + edge + instructions-last"),
-        # --- finalize the prompt ---
-        step("pre", "optional", 1, "action", "Few-shot exemplars",
+        step("enrich", "optional", 1, "action", "Check online facts / search",
+             "verify volatile facts against a live source"),
+        step("enrich", "optional", 1, "action", "Few-shot exemplars",
              "examples for format / reasoning", None,
              ["zero-shot", "static k", "dynamic / kNN", "CoT exemplars"], "zero-shot"),
-        step("pre", "default", 1, "conditional", "Output schema",
-             "the typed JSON envelope the post-step verifies against", None,
+        step("enrich", "default", 1, "conditional", "Output schema",
+             "the typed JSON envelope the response is verified against", None,
              ["free text", "JSON schema in prompt", "constrained / grammar decoding"], "JSON schema in prompt"),
     ]
     if tool:
-        recipe.append(step("pre", "optional", 1, "action", "Call tools",
+        recipe.append(step("enrich", "optional", 1, "action", "Call tools",
                            "structured tool calls for steps the model shouldn't guess", tool))
     recipe += [
-        step("pre", "optional", 1, "action", "Check online facts / search",
-             "verify volatile facts against a live source"),
-        step("pre", "default", 1, "stop", "Prompt-injection check",
+        # ---- QUERY POLISHING (reduce tokens, order, place) ----
+        step("polish", "optional", 1, "knowledge", "Summarize / compress",
+             "shrink context to the salient cited spans (cut tokens)", None,
+             ["none", "extractive", "contextual compression", "abstractive"], "none → extractive"),
+        step("polish", "default", 1, "action", "Select · order · de-conflict",
+             "top-k, dedupe, recency / source-precedence, flag contradictions", None,
+             ["top-1", "top-3", "top-k", "MMR (diversity)", "dedupe", "source-precedence", "recency"],
+             "top-k + dedupe + source-precedence"),
+        step("polish", "default", 1, "action", "Place context in prompt",
+             "where context sits — mitigates 'lost in the middle'", None,
+             ["concat", "edge (first + last)", "structured / delimited + source tags", "instructions-last"],
+             "structured + edge + instructions-last"),
+        # ---- QUERY VERIFICATION (check the assembled query before sending) ----
+        step("verify_query", "default", 1, "stop", "Prompt-injection check",
              "block if the input tries to extract or override the system prompt", None,
              ["delimit + role-separate", "heuristic / classifier screen", "sanitize retrieved content"], "delimit + screen"),
+        # ---- MODEL CALL ----
         step("call", "always", 1, "action", "Call the right-sized model",
              "smallest model that clears the bar, with persona + system prompt + retrieved context", harness),
-        step("post", "always", 1, "conditional", "Check output",
+        # ---- MODEL RESPONSE (receive + verify) ----
+        step("response", "always", 1, "conditional", "Check output",
              "validate against the expected answer shape"),
-        step("post", "default", 1, "conditional", "Verify JSON (recover if malformed)",
+        step("response", "default", 1, "conditional", "Verify JSON (recover if malformed)",
              "parse; if non-JSON, repair / reformat once"),
-        step("post", "default", 1, "conditional", "Re-verify",
+        step("response", "default", 1, "conditional", "Re-verify",
              "second pass on the recovered output", rubric),
-        step("post", "always", 1, "loop", "If not OK → retry with changes (≤3)",
+        step("response", "always", 1, "loop", "If not OK → retry with changes (≤3)",
              "re-run with targeted fixes until it passes, else escalate", loop),
     ]
     return recipe
