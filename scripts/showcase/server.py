@@ -8,12 +8,21 @@ from collections import Counter
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
+from pathlib import Path
+
 from scripts.model_routes import resolve_route
 from scripts.primitives import label_for_type
 from scripts.showcase.builder import build_flow
 from scripts.showcase.export import export_flow
 from scripts.showcase.index import Index
 from scripts.showcase.pages import BROWSE_HTML, HTML
+
+# The product front-end (the Claude Design handoff implementation). Served at root;
+# the classic paste-to-flow UI stays reachable at /classic. See web/README.md.
+WEB_DIR = Path(__file__).resolve().parents[2] / "web"
+_STATIC_TYPES = {".html": "text/html; charset=utf-8", ".js": "application/javascript; charset=utf-8",
+                 ".css": "text/css; charset=utf-8", ".svg": "image/svg+xml", ".json": "application/json",
+                 ".png": "image/png", ".woff2": "font/woff2", ".ico": "image/x-icon", ".map": "application/json"}
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -33,10 +42,26 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _serve_static(self, rel: str) -> bool:
+        """Serve a file from web/ (the product front-end). Returns False if missing/unsafe."""
+        base = WEB_DIR.resolve()
+        target = (base / rel.lstrip("/")).resolve()
+        if not (target == base or base in target.parents) or not target.is_file():
+            return False
+        self._send(200, target.read_bytes(), _STATIC_TYPES.get(target.suffix, "application/octet-stream"))
+        return True
+
     def do_GET(self) -> None:  # noqa: N802
         parsed = urlparse(self.path)
         if parsed.path in ("/", "/index.html"):
-            self._send(200, HTML.encode("utf-8"), "text/html; charset=utf-8")
+            if self._serve_static("index.html"):
+                return
+            self._send(200, HTML.encode("utf-8"), "text/html; charset=utf-8")  # fallback if web/ absent
+        elif parsed.path in ("/app.js", "/data.js") or parsed.path.startswith("/styles/") or parsed.path.startswith("/pages/"):
+            if not self._serve_static(parsed.path):
+                self._send(404, b"not found", "text/plain")
+        elif parsed.path == "/classic":
+            self._send(200, HTML.encode("utf-8"), "text/html; charset=utf-8")  # the classic paste-to-flow UI
         elif parsed.path == "/api/health":
             route = resolve_route()
             payload = {"embedding": self.index.backend.provenance(),
