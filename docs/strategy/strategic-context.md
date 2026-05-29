@@ -8,8 +8,8 @@ re-architect" rule), and lists only the smallest remaining steps. Detail lives i
 
 ## The canonical positioning (unchanged — already committed)
 - **One line:** *"Verified, current, provable context — for the agent you already run."*
-- **The wedge sentence:** *"Most platforms check your docs are current. We check your docs are correct —
-  against the source of truth."*
+- **The wedge sentence:** *"Most platforms keep your docs CURRENT. We CONTINUOUSLY verify they are CORRECT —
+  cross-checked against external authoritative sources, hunting for contradictions before your agent cites them."*
 - **The verified bundle (the moat — nobody sells all three):** **provenance** (signed origin, C2PA +
   attestation registry) + **verification** (adversarial check vs the authority + HITL ← the differentiator)
   + **freshness** (track the source, flag stale/contradicted).

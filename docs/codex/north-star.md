@@ -11,9 +11,10 @@ Composer + LangGraph/Dify/n8n close that — orchestration/actions/governance ar
 the two things they structurally won't be:
 1. **Genuinely open** — real OSS, self-hostable, free for the long tail, works with the agent you already
    run. (OHH = distribution + developer goodwill + the consumption surface for verified corpora.)
-2. **Verified context, upstream** — *"they check your docs are CURRENT; we check your docs are RIGHT
-   against the source of truth."* Adversarial verification + freshness + provenance + oracle publishers,
-   fed into ANY agent. (CEaaS = the moat + the monetization.)
+2. **Verified context, upstream** — *"Most platforms keep your docs CURRENT. We CONTINUOUSLY verify they are
+   CORRECT — cross-checked against external authoritative sources, hunting for contradictions before your
+   agent cites them."* Adversarial verification + freshness + provenance + oracle publishers, fed into ANY
+   agent. (CEaaS = the moat + the monetization.)
 
 **Beachhead:** sanctions & export controls (OFAC/BIS/EU) — rules that change faster than anyone re-indexes,
 where stale is a *legal event*, and the lists are already public + machine-readable.

@@ -25,8 +25,9 @@ is an enterprise *funnel*, not an open product). **So: OHH = the open funnel + t
 verified corpora (distribution + developer goodwill); CEaaS = the headline business. The product is the
 verified FUEL, not the harness.**
 
-**The wedge line (memorize):** *"They check your docs are CURRENT; we check your docs are RIGHT against the
-source of truth."* Their compliance ("validate everything is current") = completeness + recency of the
+**The wedge line (memorize):** *"Most platforms keep your docs CURRENT. We CONTINUOUSLY verify they are
+CORRECT — cross-checked against external authoritative sources, hunting for contradictions before your agent
+cites them."* Their compliance ("validate everything is current") = completeness + recency of the
 *customer's own* docs — NOT tracking the external authority and flagging when internal context contradicts or
 lags it. They ground in whatever corpus you supply; they do not verify it's correct against external truth,
 keep external regulated corpora current as a product, offer oracle-signed shared corpora, or reconcile
