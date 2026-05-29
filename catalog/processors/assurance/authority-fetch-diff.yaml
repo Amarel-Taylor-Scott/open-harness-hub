@@ -1,0 +1,104 @@
+id: "processor/authority-fetch-diff"
+type: processor
+version: "0.1.0"
+name: "Authority fetch diff (fetch the cited authoritative URL and diff it against the internal claim)"
+description: |
+  CONTEXT-ASSURANCE component. A BROWSER / HTTP tool: it FETCHES the cited
+  authoritative source at its URL and DIFFS the fetched content against the
+  internal claim that cites it, to detect that the claim is STALE (the authority
+  changed) or CONTRADICTED (the authority never said it). Where
+  processor/corpus-freshness-diff watches a registered source by hash over time,
+  this tool performs the on-demand point check at verification time: "go read the
+  page the answer cites, right now, and see whether it still supports the claim".
+
+  EXTERNAL BY CONSTRUCTION (honest framing): this tool dereferences an external
+  URL, so it declares trust_boundary external and side_effects external_call. The
+  URL fetched is the one CITED by the claim or carried on its source_record — the
+  manifest does not embed any specific authoritative URL. Fetch policy (allowed
+  schemes/hosts, redirect and size limits, timeout, robots posture) is governed
+  runtime configuration, not baked in here.
+
+  Procedure (over governed inputs):
+    1. Resolve the cited authoritative URL from the claim's source_record
+       (publisher, source_url, prior content_hash / effective_date — see
+       schemas/source-record.schema.json).
+    2. Fetch the live content under the governed fetch policy and compute its
+       current content_hash and, where the source exposes one, its effective_date.
+    3. Diff against the claim:
+         - freshness — compare the live content_hash / effective_date to the
+           value recorded when the claim was derived; a change outside the
+           declared window means the claim may be stale.
+         - support — check whether the live content still asserts the field the
+           claim relies on, or contradicts it. Stance is one of:
+           supports | contradicts | not_found | unreachable.
+    4. Emit a diff verdict with the warrant (observed hash / date deltas, the
+       fetched snippet bound to the field) and open a review_ticket when the
+       live authority is stale-relative, contradicts the claim, no longer
+       contains the cited field (not_found), or is unreachable.
+
+  HONEST ABOUT LIMITS: a fetched page reflects what the authority publishes at
+  fetch time; transient unavailability or a moved URL yields unreachable /
+  not_found rather than a silent pass — the tool defaults to flagging, never to
+  assuming the claim is fine. It establishes agreement with ONE cited authority;
+  breadth across independent sources is the job of
+  processor/multi-source-corroborate.
+
+  GOVERNANCE (honest framing): this is a governed DEFINITION of a fetch-and-diff
+  tool, not a measured-lift claim. It describes what is fetched (the cited URL),
+  the freshness and support diffs, and the deterministic warrant per verdict. It
+  does NOT assert a populated detection number and does NOT invent authoritative
+  URLs — the URL comes from the claim's own citation.
+
+authors:
+  - name: "Open Harness Hub contributors"
+license: "Apache-2.0"
+industry:   ["cross_industry", "ai", "government.regulatory", "finance"]
+capability: ["verification", "governance"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+lifecycle_position: "post_api.audit"
+trust_boundary: "external"
+freshness: "volatile"
+created: "2026-05-29"
+updated: "2026-05-29"
+
+tags:
+  - "context-assurance"
+  - "browser-tool"
+  - "fetch-and-diff"
+  - "cited-source"
+  - "freshness"
+  - "contradiction-detection"
+  - "stale-context"
+  - "verified-corpus-commons"
+  - "governance"
+
+process_kind: "verify.authority_fetch"
+deterministic: false
+idempotent: true
+streaming: false
+latency_budget_ms: 12000
+
+inputs:
+  - name: "claim"
+    type: "object"
+  - name: "source_record"
+    type: "object"
+    schema: "source-record.schema.json"
+  - name: "freshness_window_days"
+    type: "integer"
+outputs:
+  - name: "diff_verdict"
+    type: "string"
+  - name: "source_change"
+    type: "object"
+  - name: "support_stance"
+    type: "string"
+  - name: "review_ticket"
+    type: "object"
+
+side_effects: "external_call"
+on_error: "fallback"
+retry:
+  max_attempts: 3
+  backoff: "exponential"
