@@ -157,6 +157,33 @@ recommendation, pricing, and pipeline-generation; cost/performance analytics.
 **Enterprise:** BYO-cloud/VPC/air-gapped deployment packages; support, compliance
 review, and custom benchmark packages.
 
+### Build-on-demand & demand capture (recurring revenue for the long tail)
+
+The export is the commodity — a user who describes a task, gets a blueprint, and
+self-hosts it should be able to leave for free; that is the funnel, not the
+business. Recurring revenue comes from the two things an export *can't* freeze:
+
+- **The live / governed layer** — code-executing components (tools, harnesses,
+  adapters, hosted pipelines) and **dynamic** Knowledge Corpora with
+  CDC/freshness/revocation. These decay the moment the user disconnects, which is
+  what justifies a subscription. This is the existing **execution-class boundary**
+  doubling as the pricing boundary: `text-operation` + `static-information`
+  components are freezable (free/funnel); `code-executing` + dynamic-corpus are
+  live (recurring).
+- **Build-on-demand** — when a user needs a component the catalog lacks, that wall
+  is captured as a **capability-request**: a typed empty slot at maturity
+  `abstract` (*not* a new component type — see
+  [`component-taxonomy-and-stages.md`](../concepts/component-taxonomy-and-stages.md)).
+  A premium agent researches candidate sources and builds it; it becomes a real
+  component only after passing the capability-lift gate. A **community build** is
+  the alternative supply path: a contributor who builds and shares a
+  capability-request earns **credits when the shared component passes the gate**,
+  feeding the premium-component marketplace.
+
+Demand is aggregated (`demand_count`) so the most-requested gaps are built first;
+the same signal ranks the acquisition queue. Session detail + schema status:
+[`docs/codex/handoff-2026-05-28-capability-requests.md`](../codex/handoff-2026-05-28-capability-requests.md).
+
 ### Pricing & packaging (illustrative anchors, validate against real runs)
 
 | Tier | Who | Indicative price | Includes |
@@ -165,7 +192,7 @@ review, and custom benchmark packages.
 | **Pro** | solo builders, consultants | ~$29–49 / seat / mo | private workspace, task-to-blueprint, costed plans, hybrid search, monthly usage credits |
 | **Team** | agencies, product teams | ~$199–499 / mo | private registry, more credits, eval + review scaffolding, collaboration, ratings/telemetry |
 | **Enterprise** | regulated orgs | custom | private tenant index, BYO-cloud/VPC/air-gap, verified publishing, audit export, SSO, support, compliance packages |
-| **Usage add-ons** | all paid | metered | source scans, embeddings, eval runs, media gen, managed ingestion jobs |
+| **Usage add-ons** | all paid | metered | source scans, embeddings, eval runs, media gen, managed ingestion jobs, **build-on-demand component builds** |
 
 ## Cost Advantage
 

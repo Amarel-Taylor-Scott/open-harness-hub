@@ -222,3 +222,26 @@ a swarm." Shipped this session (all self-tests green; commits fb14e75 + this):
 - **CEO (owner):** lead with governance; wedge = sanctions (primary) + EU-AI-Act
   docs (second), CSDDD → showcase only; land one paid design partner on a public
   yardstick; recruit verified publishers per top cell.
+
+---
+## 2026-05-29 — /polish pass 1 (collision-aware; review-agent workflow still running)
+
+**Context:** workflow `ohh-frontend-buildout` Build phase done (14 screen modules live, all
+`node --check` green, manifest populated, full app serving behind the Cloudflare tunnel). The
+UX-review agent is STILL running and owns `web/pages/*.js` → this pass deliberately avoids
+editing pages to not clobber its fixes.
+
+**Done this pass (collision-free):**
+- Committed the two completed strategy docs: `acquihire-roadmap.md` (443 ln), `inference-time-capability-watch.md` (459 ln).
+- Read-only dead-link audit (nav targets vs registered routes): 35 exact routes + 5 param
+  patterns + 31 distinct nav targets.
+
+**Punch-list for next pass (after the review agent finishes — fix in web/pages, no collision):**
+- `/docs` → dead (Docs genuinely unbuilt; in landing nav + govern.js). FIX: register a graceful
+  `/docs` stub page (or repoint to the repo) so the primary nav never 404s.
+- `/solutions` (index) → flagged not-registered by sdg.js; VERIFY sdg.js registers `/solutions`
+  (list) in addition to `/solutions/:n` (detail). The `/solutions/'+esc(String(n` hit is a
+  FALSE POSITIVE (dynamic `navigate("/solutions/"+n)` → matches `:n`).
+
+**Decision:** do not edit `web/pages/*.js` while the review agent runs (last-write-wins would
+clobber). Integrate reviewed pages + apply this punch-list on the completion notification.
