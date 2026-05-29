@@ -10,8 +10,12 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Core deps always; scale extras (Celery, Prometheus, OTel) only when INSTALL_PLATFORM=1 — keeps the
+# default image light (see requirements-platform.txt, docs/architecture/backend-services-and-platform.md).
+ARG INSTALL_PLATFORM=0
+COPY requirements.txt requirements-platform.txt ./
+RUN pip install --no-cache-dir -r requirements.txt \
+ && if [ "$INSTALL_PLATFORM" = "1" ]; then pip install --no-cache-dir -r requirements-platform.txt; fi
 
 COPY . .
 

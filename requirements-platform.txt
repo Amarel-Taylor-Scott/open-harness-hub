@@ -1,0 +1,10 @@
+# Scale / platform extras — OPT-IN. The core image installs only requirements.txt (the platform runs
+# light by default: RedisQueue + the built-in worker — see docs/architecture/cloud-architecture.md).
+# Build them in with: docker build --build-arg INSTALL_PLATFORM=1   (infra/docker-compose.platform.yml does this).
+celery[redis]>=5.3            # opt-in worker/beat adapter — services/worker/celery_app.py
+prometheus-client>=0.20       # /metrics for the telemetry contract — services/platform/_shared/telemetry.py
+opentelemetry-sdk>=1.25       # traces: enqueue -> worker -> store
+opentelemetry-exporter-otlp>=1.25
+flower>=2.0                   # Celery monitoring UI (optional)
+# Airflow / Cloud Composer runs as a MANAGED scheduler (Composer) or its own container — NOT installed
+# into the app image. Point it at infra/airflow/dags/.

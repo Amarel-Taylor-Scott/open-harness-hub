@@ -1,0 +1,80 @@
+# Full local platform mirroring the cloud topology: TWO product services over the SHARED PLATFORM
+# plane + the data tier + observability. Builds the image WITH scale extras (INSTALL_PLATFORM=1:
+# Celery, Prometheus, OTel). See docs/architecture/backend-services-and-platform.md + services/registry.yaml.
+#
+#   docker compose -f infra/docker-compose.platform.yml up --build
+#
+# (For the minimal stack — just postgres+redis+web+worker — use infra/docker-compose.yml instead.)
+name: ohh-platform
+
+x-app-build: &app-build
+  build: { context: .., dockerfile: Dockerfile, args: { INSTALL_PLATFORM: "1" } }
+
+x-data-env: &data-env
+  DATABASE_URL: "postgresql://ohh:ohh@postgres:5432/ohh"
+  REDIS_URL: "redis://redis:6379/0"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
+
+services:
+  # --- data tier ---------------------------------------------------------------------------------
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment: { POSTGRES_USER: ohh, POSTGRES_PASSWORD: ohh, POSTGRES_DB: ohh }
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U ohh"], interval: 5s, timeout: 3s, retries: 12 }
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+  minio:                                   # object store (raw + tiered artifacts) — the R2/S3 local analog
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    environment: { MINIO_ROOT_USER: ohh, MINIO_ROOT_PASSWORD: ohh-secret }
+    ports: ["9000:9000", "9001:9001"]
+    volumes: ["miniodata:/data"]
+
+  # --- product services (request tier — the two doors) -------------------------------------------
+  harness-hub-api:
+    <<: *app-build
+    command: ["python", "-m", "services.products.harness_hub.entrypoint", "--port", "8000"]
+    ports: ["8000:8000", "9101:9101"]
+    environment: { <<: *data-env, OH_METRICS_PORT: "9101" }
+    depends_on: { postgres: { condition: service_healthy }, redis: { condition: service_started } }
+  context-enrichment-api:
+    <<: *app-build
+    command: ["python", "-m", "services.products.context_enrichment.entrypoint", "--port", "8001"]
+    ports: ["8001:8001", "9102:9102"]
+    environment: { <<: *data-env, OH_METRICS_PORT: "9102" }
+    depends_on: { postgres: { condition: service_healthy }, redis: { condition: service_started } }
+
+  # --- async tier (Celery adapter — opt-in; default is scripts.foundry.worker --serve) -----------
+  worker:
+    <<: *app-build
+    command: ["celery", "-A", "services.worker.celery_app", "worker", "-Q", "foundry,ingest,enrich,measure", "-l", "info"]
+    environment: *data-env
+    depends_on: { postgres: { condition: service_healthy }, redis: { condition: service_started } }
+  beat:                                    # the scheduled tier (Celery beat; or run Airflow/Composer instead)
+    <<: *app-build
+    command: ["celery", "-A", "services.worker.celery_app", "beat", "-l", "info"]
+    environment: *data-env
+    depends_on: { redis: { condition: service_started } }
+
+  # --- observability -----------------------------------------------------------------------------
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    command: ["--config=/etc/otelcol/config.yaml"]
+    volumes: ["./observability/otel-collector.yaml:/etc/otelcol/config.yaml:ro"]
+    ports: ["4317:4317", "8889:8889"]
+  prometheus:
+    image: prom/prometheus:latest
+    volumes: ["./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro"]
+    ports: ["9090:9090"]
+  grafana:
+    image: grafana/grafana:latest
+    environment: { GF_SECURITY_ADMIN_PASSWORD: ohh }
+    ports: ["3000:3000"]
+    depends_on: { prometheus: { condition: service_started } }
+
+volumes:
+  pgdata: {}
+  miniodata: {}
