@@ -206,21 +206,25 @@
   // ---------------- PREVIEW (PPreview) ----------------
   var BUILD_STEPS = ["Parsing the task", "Retrieving vetted components", "Assembling the flow", "Costing & measuring lift"];
   // canonical governed-model-call recipe (offline sample / fallback). Mirrors builder.py
-  // harness_recipe: phase = pre|call|post, tier = always|default|optional.
+  // harness_recipe: phase = gate|pre|call|post, tier = always|default|optional, level = 0|1.
   var STATIC_RECIPE = [
-    { phase: "pre", tier: "default", k: "conditional", name: "Trigger gate — does the input qualify?", role: "cheap check the input meets conditions; else short-circuit", builtin: true },
-    { phase: "pre", tier: "default", k: "action", name: "Add persona / system prompt", role: "domain-expert framing", ref: "persona/esg-counsel" },
-    { phase: "pre", tier: "default", k: "conditional", name: "Add context — regex / knowledge corpus", role: "deterministic pattern + exact-match facts", ref: "rule-pack/tier-risk-gate" },
-    { phase: "pre", tier: "default", k: "knowledge", name: "Add context — RAG retrieval", role: "cited facts from the governed corpus", ref: "knowledge-corpus/csddd-articles" },
-    { phase: "pre", tier: "optional", k: "action", name: "Call tools", role: "structured calls the model shouldn't guess", builtin: true },
-    { phase: "pre", tier: "optional", k: "action", name: "Check online facts / search", role: "verify volatile facts live", builtin: true },
-    { phase: "pre", tier: "default", k: "action", name: "Token reduction — format · prioritize · compress", role: "salient first; cut tokens & cost", builtin: true },
-    { phase: "pre", tier: "default", k: "stop", name: "Prompt-injection check", role: "block system-prompt extraction / override", builtin: true },
-    { phase: "call", tier: "always", k: "action", name: "Call the right-sized model", role: "smallest model that clears the bar + system prompt", ref: "harness/esg-cite-first" },
-    { phase: "post", tier: "always", k: "conditional", name: "Check output", role: "validate the answer shape", builtin: true },
-    { phase: "post", tier: "default", k: "conditional", name: "Verify JSON (recover if malformed)", role: "parse; repair once if non-JSON", builtin: true },
-    { phase: "post", tier: "default", k: "conditional", name: "Re-verify", role: "second pass vs the rubric", ref: "rubric/supplier-grade" },
-    { phase: "post", tier: "always", k: "loop", name: "If not OK → retry with changes (≤3)", role: "targeted fixes until it passes, else escalate", ref: "pattern/rubric-refine" }
+    { phase: "gate", tier: "default", level: 0, k: "conditional", name: "Trigger gate — does the input qualify?", role: "run the harness only if the input clears the gate", builtin: true },
+    { phase: "gate", tier: "default", level: 1, k: "conditional", name: "Pattern packs — qualify", role: "combinable keyword/regex packs that admit the input", ref: "rule-pack/trafficking-indicators" },
+    { phase: "gate", tier: "optional", level: 1, k: "stop", name: "Anti-pattern packs — disqualify", role: "combinable packs that screen the input out (false-positive guards)", builtin: true },
+    { phase: "pre", tier: "default", level: 1, k: "action", name: "Add persona", role: "the role / expertise the model adopts", ref: "persona/exploitation-analyst" },
+    { phase: "pre", tier: "default", level: 1, k: "action", name: "Build the system prompt", role: "instructions, constraints + output schema (separate from persona)", builtin: true },
+    { phase: "pre", tier: "default", level: 1, k: "knowledge", name: "Knowledge retrieval — keyword match", role: "exact keyword lookups over the corpus", ref: "knowledge-corpus/trafficking-indicators" },
+    { phase: "pre", tier: "optional", level: 1, k: "knowledge", name: "Knowledge retrieval — regex", role: "pattern extraction over corpus / input", builtin: true },
+    { phase: "pre", tier: "default", level: 1, k: "knowledge", name: "Knowledge retrieval — RAG (vector)", role: "semantic retrieval of cited facts", ref: "knowledge-corpus/recruitment-law" },
+    { phase: "pre", tier: "optional", level: 1, k: "knowledge", name: "Knowledge ranking", role: "re-rank retrieved facts by relevance", builtin: true },
+    { phase: "pre", tier: "optional", level: 1, k: "knowledge", name: "Knowledge summarizing", role: "compress context to salient cited spans", builtin: true },
+    { phase: "pre", tier: "default", level: 1, k: "action", name: "Token reduction — format · prioritize · compress", role: "salient first; cut tokens & cost", builtin: true },
+    { phase: "pre", tier: "default", level: 1, k: "stop", name: "Prompt-injection check", role: "block system-prompt extraction / override", builtin: true },
+    { phase: "call", tier: "always", level: 1, k: "action", name: "Call the right-sized model", role: "smallest model that clears the bar + system prompt", ref: "harness/cite-first" },
+    { phase: "post", tier: "always", level: 1, k: "conditional", name: "Check output", role: "validate the answer shape", builtin: true },
+    { phase: "post", tier: "default", level: 1, k: "conditional", name: "Verify JSON (recover if malformed)", role: "parse; repair once if non-JSON", builtin: true },
+    { phase: "post", tier: "default", level: 1, k: "conditional", name: "Re-verify", role: "second pass vs the rubric", ref: "rubric/exploitation-grade" },
+    { phase: "post", tier: "always", level: 1, k: "loop", name: "If not OK → retry with changes (≤3)", role: "targeted fixes until it passes, else escalate", ref: "pattern/refine-loop" }
   ];
   var previewTimer = null;
   function primKey(stage) { var k = String(stage || "").toLowerCase().split(/[\s/]/)[0]; return PRIMS[k] ? k : "action"; }
@@ -231,16 +235,17 @@
     var glyph = isOp ? "◇" : (PRIMS[prim] ? PRIMS[prim].glyph : "•");
     var swatch = isOp ? "background:transparent;border:2px solid var(--operator);color:var(--operator)"
                       : "background:var(" + (PRIMS[prim] ? PRIMS[prim].v : "--p-action") + ");color:#fff;border:none";
-    var wrap = level ? "position:relative;margin-left:11px;border-left:2px solid var(--line);padding-left:19px"
+    var wrap = level ? "position:relative;margin-left:12px;border-left:1px solid var(--line);padding-left:20px"
                      : "position:relative";
-    var arm = level ? '<span style="position:absolute;left:0;top:17px;color:var(--fg-faint);font-size:12px">↳</span>' : "";
+    // tier/relationship chip is RIGHT-aligned + spaced so it never butts the name
     var chip = tag ? '<span class="oh-badge ' + (_CHIP[tag] || "oh-badge--muted") +
-      '" style="padding:1px 6px;margin-right:6px;font-family:var(--font-mono);font-size:9.5px">' + esc(tag) + "</span>" : "";
-    return '<div style="' + wrap + '">' + arm +
-      '<div style="display:flex;align-items:flex-start;gap:11px;padding:9px 0;border-bottom:1px solid var(--line)">' +
+      '" style="flex:0 0 auto;margin-left:10px;padding:1px 7px;font-family:var(--font-mono);font-size:9px;letter-spacing:.03em">' + esc(tag) + "</span>" : "";
+    return '<div style="' + wrap + '">' +
+      '<div style="display:flex;align-items:center;gap:11px;padding:8px 2px;border-bottom:1px solid var(--line)">' +
       '<span style="width:24px;height:24px;border-radius:' + (isOp ? "50%" : "6px") + ';flex:0 0 auto;display:grid;place-items:center;font-size:12px;' + swatch + '">' + glyph + "</span>" +
-      '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--fg)">' + chip + esc(name) + "</div>" +
-      '<div style="font-family:var(--font-mono);font-size:10.5px;color:var(--fg-muted);margin-top:2px;line-height:1.4">' + esc(sub) + "</div></div></div></div>";
+      '<div style="flex:1;min-width:0">' +
+      '<div style="display:flex;align-items:center"><span style="flex:1;min-width:0;font-size:13px;font-weight:600;color:var(--fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(name) + "</span>" + chip + "</div>" +
+      '<div style="font-family:var(--font-mono);font-size:10px;color:var(--fg-faint);margin-top:1px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(sub) + "</div></div></div></div>";
   }
   function stageComp(stages, key) {
     for (var i = 0; i < stages.length; i++) {
@@ -249,19 +254,21 @@
     return null;
   }
   var _TIERTAG = { always: "ALWAYS", default: "DEFAULT", optional: "OPTIONAL" };
-  var _PHASES = [["pre", "Pre-model-call"], ["call", "Model call"], ["post", "Post-model-call"]];
-  // Input (always) → phase-grouped recipe (pre/call/post; defaults nested) → Output (always; + metadata + runtime object)
+  var _PHASE_LABEL = { pre: "Pre-model-call", call: "Model call", post: "Post-model-call" };
+  // Input(L0) → Trigger gate(L0) + its pattern/anti-pattern packs(L1) → Pre/Model/Post phase
+  // groups → Output(L0). Each step carries its own level + phase (the backend decides indentation).
   function recipePanel(head, inputName, inputRole, recipe, outName, outRole) {
     var html = '<div class="oh-cc-id mono" style="margin-bottom:10px">assembled flow · ' + head + "</div>";
     html += flowRowHtml("input", inputName, inputRole, 0, "ALWAYS");
-    _PHASES.forEach(function (ph) {
-      var steps = recipe.filter(function (s) { return (s.phase || "pre") === ph[0]; });
-      if (!steps.length) return;
-      html += '<div style="margin:10px 0 1px 30px;font:10px/1.4 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--fg-faint)">' + ph[1] + "</div>";
-      steps.forEach(function (s) {
-        var sub = (s.ref ? s.ref : (s.role || "")) + (s.builtin ? " · built-in" : "");
-        html += flowRowHtml(s.k, s.name, sub, 1, _TIERTAG[s.tier] || null);
-      });
+    var lastPhase = "";
+    recipe.forEach(function (s) {
+      var ph = s.phase || "pre";
+      if (ph !== lastPhase && _PHASE_LABEL[ph]) {   // gate has no header — the gate row stands at L0
+        html += '<div style="margin:11px 0 1px 30px;font:10px/1.4 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--fg-faint)">' + _PHASE_LABEL[ph] + "</div>";
+      }
+      lastPhase = ph;
+      var sub = (s.ref ? s.ref : (s.role || "")) + (s.builtin ? " · built-in" : "");
+      html += flowRowHtml(s.k, s.name, sub, s.level || 0, _TIERTAG[s.tier] || null);
     });
     html += flowRowHtml("output", outName, outRole, 0, "ALWAYS");
     return html;
@@ -271,7 +278,7 @@
     var recipe = (flow.recipe && flow.recipe.length) ? flow.recipe : STATIC_RECIPE;
     var inputC = stageComp(stages, "input"), outC = stageComp(stages, "output");
     var costUsd = d.cost && d.cost.balanced && d.cost.balanced.per_task_usd;
-    var head = (recipe.length + 2) + " steps" + (costUsd != null ? " · est. $" + costUsd + " / run" : "") + (d.llm_used ? " · model-assembled" : " · deterministic selection");
+    var head = (recipe.length + 2) + " steps" + (costUsd != null ? " · est. $" + costUsd + " / run" : "") + (d.llm_used ? " · AI-selected components" : " · deterministic selection");
     return recipePanel(head,
       inputC ? inputC.name : "Input", (inputC && inputC.role) ? inputC.role : "what the pipeline runs on at runtime",
       recipe,
@@ -324,7 +331,7 @@
     ["d", "Answer-Engine Teal"], ["e", "Blueprint Terminal"], ["f", "Ledger / Governance"], ["g", "Hacker Terminal"], ["h", "Enterprise Slate"]];
   function buildSwitcher() {
     var box = document.createElement("div");
-    box.setAttribute("style", "position:fixed;left:14px;bottom:14px;z-index:50;display:flex;gap:6px;align-items:center;" +
+    box.setAttribute("style", "position:fixed;right:14px;bottom:50px;z-index:50;display:flex;gap:6px;align-items:center;" +
       "background:var(--panel);border:1px solid var(--line);border-radius:var(--r-pill);padding:5px 8px;box-shadow:var(--e2);font-size:12px");
     var sel = document.createElement("select");
     sel.setAttribute("aria-label", "Design scheme");
@@ -342,6 +349,53 @@
     document.body.appendChild(box);
     var obs = new MutationObserver(function () { tog.textContent = lbl(); });
     obs.observe($("#root"), { attributes: true, attributeFilter: ["class"] });
+  }
+
+  // ---------------- activity log (a visible bottom console of what the app is doing) ----------------
+  var ACTIVITY = [], _actEls = null;
+  function _ts() { var d = new Date(); function p(n) { return ("0" + n).slice(-2); } return p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds()); }
+  function _lvlDot(l) { var c = l === "error" ? "--danger" : l === "ok" ? "--success" : l === "warn" ? "--warning" : "--accent"; return '<span style="color:var(' + c + ')">●</span> '; }
+  function logEvent(msg, level) {
+    ACTIVITY.push({ t: _ts(), msg: String(msg), level: level || "info" });
+    if (ACTIVITY.length > 200) ACTIVITY.shift();
+    renderActivity();
+  }
+  function renderActivity() {
+    if (!_actEls) return;
+    var last = ACTIVITY[ACTIVITY.length - 1];
+    _actEls.latest.innerHTML = last ? ('<span style="color:var(--fg-faint)">' + last.t + "</span> " + _lvlDot(last.level) + esc(last.msg))
+      : '<span style="color:var(--fg-faint)">activity log — build &amp; navigation events appear here</span>';
+    _actEls.count.textContent = ACTIVITY.length || "";
+    _actEls.count.style.display = ACTIVITY.length ? "inline-block" : "none";
+    if (_actEls.open) {
+      _actEls.list.innerHTML = ACTIVITY.slice().reverse().map(function (e) {
+        return '<div style="padding:2px 0;color:var(--fg-muted)"><span style="color:var(--fg-faint)">' + e.t + "</span> " + _lvlDot(e.level) + esc(e.msg) + "</div>";
+      }).join("");
+    }
+  }
+  function buildActivityLog() {
+    var bar = document.createElement("div");
+    bar.setAttribute("style", "position:fixed;left:0;right:0;bottom:0;z-index:45;background:var(--panel);border-top:1px solid var(--line);font:11.5px/1.5 var(--font-mono)");
+    var list = document.createElement("div");
+    list.setAttribute("style", "display:none;max-height:168px;overflow-y:auto;padding:8px 16px;border-bottom:1px solid var(--line)");
+    var head = document.createElement("div");
+    head.setAttribute("style", "display:flex;align-items:center;gap:10px;padding:7px 16px;cursor:pointer");
+    var label = document.createElement("span");
+    label.setAttribute("style", "display:flex;align-items:center;gap:6px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;font-size:10px;color:var(--fg-muted);flex:0 0 auto");
+    var caret = document.createElement("span"); caret.textContent = "▴";
+    label.appendChild(caret); label.appendChild(document.createTextNode("Activity"));
+    var count = document.createElement("span");
+    count.setAttribute("style", "font-size:9px;background:var(--accent-weak);color:var(--accent);border-radius:999px;padding:0 6px;flex:0 0 auto");
+    var latest = document.createElement("span");
+    latest.setAttribute("style", "flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--fg)");
+    head.appendChild(label); head.appendChild(count); head.appendChild(latest);
+    bar.appendChild(list); bar.appendChild(head);
+    document.body.appendChild(bar);
+    document.body.style.paddingBottom = "44px";
+    _actEls = { list: list, latest: latest, count: count, open: false };
+    function setOpen(o) { _actEls.open = o; list.style.display = o ? "block" : "none"; caret.textContent = o ? "▾" : "▴"; try { localStorage.setItem("ohp-activity-open", o ? "1" : "0"); } catch (e) {} renderActivity(); }
+    head.addEventListener("click", function () { setOpen(!_actEls.open); });
+    setOpen((function () { try { return localStorage.getItem("ohp-activity-open") === "1"; } catch (e) { return false; } })());
   }
 
   // ---------------- global nav delegation ----------------
@@ -365,10 +419,11 @@
 
   // ---------------- boot ----------------
   window.OHH = window.OHH || {};
-  Object.assign(window.OHH, { register: register, navigate: navigate, toast: toast, PRIMS: PRIMS, MODALITIES: MODALITIES, esc: esc, renderRoute: renderRoute, state: state });
+  Object.assign(window.OHH, { register: register, navigate: navigate, toast: toast, log: logEvent, PRIMS: PRIMS, MODALITIES: MODALITIES, esc: esc, renderRoute: renderRoute, state: state });
   applyScheme();
   initLanding();
   buildSwitcher();
+  buildActivityLog();
   window.addEventListener("hashchange", renderRoute);
-  loadPages(function () { renderRoute(); });
+  loadPages(function () { logEvent(ACTIVITY.length ? "screens loaded" : "ready"); renderRoute(); });
 })();

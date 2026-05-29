@@ -232,54 +232,68 @@ def harness_recipe(task: str, kept: list[dict]) -> list[dict]:
         return None
 
     persona = first("persona")
-    regex = first("rule-pack", "logic-pack")
+    rule_packs = (by_type.get("rule-pack") or []) + (by_type.get("logic-pack") or [])
+    pattern_pack = rule_packs[0] if rule_packs else None
+    antipattern_pack = rule_packs[1] if len(rule_packs) > 1 else None
     corpus = first("knowledge-pack", "dataset")
     tool = first("tool")
-    harness = first("harness", "adapter", "pipeline")
+    harness = first("harness", "adapter")   # a model harness/adapter — NOT a pipeline (a sub-flow isn't "the model")
     rubric = first("rubric", "benchmark")
     loop = first("pattern")
 
-    def step(phase: str, tier: str, k: str, name: str, role: str, comp: dict | None = None) -> dict:
-        # phase: pre | call | post ; tier: always | default | optional
-        d = {"phase": phase, "tier": tier, "k": k, "name": name, "role": role, "builtin": comp is None}
+    def step(phase: str, tier: str, level: int, k: str, name: str, role: str, comp: dict | None = None) -> dict:
+        # phase: gate|pre|call|post ; tier: always|default|optional ; level: 0 (structural) | 1 (nested)
+        d = {"phase": phase, "tier": tier, "level": level, "k": k, "name": name, "role": role, "builtin": comp is None}
         if comp:
             d["ref"] = f"{comp['type']}/{comp['id'].split('/')[-1]}"
         return d
 
-    # Composition law (the owner's rule): an Input, a model Call, and the pre-/post-call phases
-    # are ALWAYS present (even when a step is a no-op). The trigger gate, persona, regex/corpus
-    # context, RAG retrieval and token reduction are DEFAULTS — on every pipeline unless there is a
-    # serious reason to drop one. Real catalog components are slotted where they exist; the rest are
-    # deterministic built-ins. This is what makes the lift governed + cheap, not a raw model call.
+    # Composition law (owner's rule): Input + a model Call + the pre/post phases are ALWAYS present
+    # (even as no-ops). The trigger gate sits at the INPUT's level (a structural admit/deny) and is
+    # COMPOSED of combinable pattern packs (qualify) + anti-pattern packs (disqualify). Persona and the
+    # system prompt are SEPARATE steps. Knowledge retrieval is split by method (keyword · regex · RAG)
+    # with optional ranking + summarizing. Real components are slotted; the rest are deterministic built-ins.
     recipe = [
-        step("pre", "default", "conditional", "Trigger gate — does the input qualify?",
-             "cheap check that the input meets the conditions for the full harness; else short-circuit", regex),
-        step("pre", "default", "action", "Add persona / system prompt",
-             "frame the model as the right domain expert", persona),
-        step("pre", "default", "conditional", "Add context — regex / knowledge corpus",
-             "deterministic pattern extraction + exact-match facts", regex),
-        step("pre", "default", "knowledge", "Add context — RAG retrieval",
-             "retrieve cited facts from the governed corpus", corpus),
+        step("gate", "default", 0, "conditional", "Trigger gate — does the input qualify?",
+             "run the harness only if the input clears the gate; else short-circuit (cheap)"),
+        step("gate", "default", 1, "conditional", "Pattern packs — qualify",
+             "combinable keyword / regex pattern packs that ADMIT the input", pattern_pack),
+        step("gate", "optional", 1, "stop", "Anti-pattern packs — disqualify",
+             "combinable packs that screen the input OUT (false-positive guards)", antipattern_pack),
+        step("pre", "default", 1, "action", "Add persona",
+             "the role / expertise the model adopts (role only)", persona),
+        step("pre", "default", 1, "action", "Build the system prompt",
+             "task instructions, constraints, and the output schema — SEPARATE from the persona"),
+        step("pre", "default", 1, "knowledge", "Knowledge retrieval — keyword match",
+             "exact keyword lookups over the governed corpus", corpus),
+        step("pre", "optional", 1, "knowledge", "Knowledge retrieval — regex",
+             "pattern extraction over the corpus / input", pattern_pack),
+        step("pre", "default", 1, "knowledge", "Knowledge retrieval — RAG (vector)",
+             "semantic retrieval of cited facts", corpus),
+        step("pre", "optional", 1, "knowledge", "Knowledge ranking",
+             "re-rank retrieved facts by relevance before they enter the prompt"),
+        step("pre", "optional", 1, "knowledge", "Knowledge summarizing",
+             "compress retrieved context to the salient cited spans"),
     ]
     if tool:
-        recipe.append(step("pre", "optional", "action", "Call tools",
+        recipe.append(step("pre", "optional", 1, "action", "Call tools",
                            "structured tool calls for steps the model shouldn't guess", tool))
     recipe += [
-        step("pre", "optional", "action", "Check online facts / search",
+        step("pre", "optional", 1, "action", "Check online facts / search",
              "verify volatile facts against a live source"),
-        step("pre", "default", "action", "Token reduction — format · prioritize · compress",
-             "salient evidence first; compress to cut tokens & cost"),
-        step("pre", "default", "stop", "Prompt-injection check",
+        step("pre", "default", 1, "action", "Token reduction — format · prioritize · compress",
+             "order salient evidence first; compress to cut tokens & cost"),
+        step("pre", "default", 1, "stop", "Prompt-injection check",
              "block if the input tries to extract or override the system prompt"),
-        step("call", "always", "action", "Call the right-sized model",
-             "smallest model that clears the bar, with the assembled system prompt", harness),
-        step("post", "always", "conditional", "Check output",
+        step("call", "always", 1, "action", "Call the right-sized model",
+             "smallest model that clears the bar, with persona + system prompt + retrieved context", harness),
+        step("post", "always", 1, "conditional", "Check output",
              "validate against the expected answer shape"),
-        step("post", "default", "conditional", "Verify JSON (recover if malformed)",
+        step("post", "default", 1, "conditional", "Verify JSON (recover if malformed)",
              "parse; if non-JSON, repair / reformat once"),
-        step("post", "default", "conditional", "Re-verify",
+        step("post", "default", 1, "conditional", "Re-verify",
              "second pass on the recovered output", rubric),
-        step("post", "always", "loop", "If not OK → retry with changes (≤3)",
+        step("post", "always", 1, "loop", "If not OK → retry with changes (≤3)",
              "re-run with targeted fixes until it passes, else escalate", loop),
     ]
     return recipe
