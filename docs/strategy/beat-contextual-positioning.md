@@ -64,6 +64,26 @@ differs**, and that is the moat:
 3. **Make the artifact a compliance deliverable** — portable AIBOM/EU-AI-Act/measured-fidelity records
    for AML, GxP, customs, food/water safety. The deliverable is the provable audit trail, not the chat.
 
+## Sit UPSTREAM — the real play (be the layer they buy FROM)
+The strongest frame isn't "beat Contextual," it's **"be the verified-corpus layer Contextual and
+everyone else buys from."** Three stances, all viable, none a head-on RAG fight:
+1. **Supplier INTO their customers (primary).** Their customers ingest their *own* data and can't
+   manufacture verified regulatory corpora. We push signed, current, verified corpora into the customer's
+   Contextual datastore via the **same ingest API** (exactly how AP / CB Insights publish into Snowflake).
+   They keep the answer faithful to the corpus; **we guarantee the corpus is right.** Rides their sales motion.
+2. **Customer OF Contextual (de-risk).** For any end-user answering *we* do, run our verified corpora
+   through *their* RAG/GLM rather than rebuild RAG 2.0. Buy the commodity (retrieval+generation), keep the
+   value (verification+freshness+provenance). Kills the temptation to over-build what they're funded to win.
+3. **Neutral arms-dealer above ALL RAG (long game).** The same verified corpus feeds Contextual,
+   Snowflake, Databricks, raw pgvector, **and** Claude Code. Never pick which RAG wins — supply them all.
+   The **verified-ore supplier**; profit from everyone's growth.
+
+**Strategic logic in one line:** competing on RAG = losing; **sitting upstream = we win when they win,
+and when anyone else wins.** **Moat (not the tech):** (a) oracle-publisher *relationships* (a regulator/NGO
+signing our corpus isn't cloned overnight), (b) the operational muscle of adversarial verification + HITL,
+(c) depth in domains they'd never prioritize. Guard: never let one platform's ingest API be the only
+channel (that's why stance 3 exists).
+
 ## The demand is real (RAG-failure sentiment)
 - **62%** of enterprise RAG deployments hit hallucination incidents **at least weekly**.
 - **58%** update their vector indexes **monthly or less** (a bot recommended a wire-transfer limit a

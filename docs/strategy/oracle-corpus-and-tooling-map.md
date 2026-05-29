@@ -59,6 +59,32 @@ A genuinely verified corpus = **three jobs, and nobody sells all three together:
 5. **Cross-source reconciliation + HITL** — when authorities conflict (agri-food double-submission),
    reconcile + escalate to a human — turning fragmentation into the value.
 
+## D2. Ranked wedge shortlist — pick the beachhead
+**Selection test (apply to any candidate domain):** authoritative truth (an oracle body) · changes
+faster than anyone re-indexes · expensive to be wrong · fragmented/esoteric · an auditor on the other
+side · absent from the data marketplaces — **plus** ease of landing the first oracle publisher.
+**Meta-pattern:** *the best wedges are rules/lists that change faster than anyone re-indexes them, where
+being stale is a **legal event**.* Sanctions is that pattern at its most extreme.
+
+| Rank | Wedge (oracle bodies) | Cadence | Stale = | Auditor/buyer | Absent from mktpl | Ease to START |
+|---|---|---|---|---|---|---|
+| **1 ★ beachhead** | **Sanctions & export controls** (OFAC SDN, BIS EAR, EU consolidated, UN) | **several×/week** | **federal/criminal violation** | trade-compliance/legal (budget+fear) | yes | **highest — lists already PUBLIC + machine-readable; "publisher" = the gov feed, no relationship to land first** |
+| 2 | Tax & transfer pricing (IRS, OECD BEPS, national + treaties) | constant | penalties | corporate tax (pays already) | yes | high (public, fragmented) |
+| 3 | Pharma/GxP labeling & PV (FDA, EMA, ICH; DailyMed, Orange Book) | frequent | recall / patient-safety | QA/RA auditor | yes | med (some structured feeds) |
+| 4 | Cyber/GRC controls mapping (NIST 800-53/CSF, ISO 27001, PCI-DSS, CMMC) | periodic | audit failure | CISO/GRC (funded) | yes | med (cross-walk = reconciliation value) |
+| 5 | Privacy-law patchwork (GDPR, CCPA, US state sprawl) | fast | fines | DPO/legal (everyone needs it — horizontal) | partial | med |
+| 6 | Government contracting (FAR/DFARS clauses) | frequent | False Claims Act | contracting/legal | yes | med (niche) |
+| ✦ social-impact twin | **Immigration / work-authorization** (USCIS, DOL prevailing-wage/visa) | frequent | I-9/visa violation | employer compliance (budget) | yes | high — the **enterprise-paying twin of migrant-worker** protection: the commons + the cause fund each other |
+
+**Beachhead = Sanctions & export controls.** It's the selection test at its extreme *and* the easiest
+start: the authoritative lists (OFAC SDN/Consolidated, BIS Entity List, EU/UN) are **already published
+machine-readable**, so the "first oracle publisher" is the government's existing feed — no signing
+relationship to land before we add value (continuous freshness-diff + adversarial integrity + C2PA
+provenance + ingest into Contextual/Snowflake/raw-pgvector/Claude Code). The demo writes itself: a
+**stale sanctions list cited as current is a federal violation**, not an embarrassment — the
+wire-transfer-limit failure with legal teeth. The social-impact twin (immigration/work-auth) connects
+the mission (labor rights) to a budgeted compliance buyer.
+
 ## E. Distribution & the real frontier
 The channel for "governed corpora served to agents" is the **data-cloud marketplaces** (Snowflake lists AP,
 USA Today, CB Insights as AI-ready providers; Databricks/Google equivalents). They are the channel **and**
