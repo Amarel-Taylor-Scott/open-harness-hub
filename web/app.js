@@ -288,8 +288,8 @@
         html += '<div class="oh-state-msg" style="margin-top:12px;background:var(--accent-weak);border:1px solid color-mix(in srgb, var(--accent) 30%, var(--line));border-radius:var(--r-md);padding:15px 16px;display:block">' +
           '<div style="font-weight:600;color:var(--fg);margin-bottom:4px">Sign up to run it or download the bundle</div>' +
           '<div style="font-size:12.5px;color:var(--fg-muted);margin-bottom:13px;line-height:1.5">Create a free account to run this flow (simulate or live), open it in the builder, or export the open-spec bundle. The spec &amp; export are free.</div>' +
-          '<div style="display:flex;gap:9px"><button class="oh-btn oh-btn--primary" data-nav="/app">Sign up free →</button>' +
-          '<button class="oh-btn oh-btn--ghost" data-nav="/app">Sign in</button></div></div>';
+          '<div style="display:flex;gap:9px"><button class="oh-btn oh-btn--primary" data-nav="/signup">Sign up free →</button>' +
+          '<button class="oh-btn oh-btn--ghost" data-nav="/signin">Sign in</button></div></div>';
       }
       page.innerHTML = html;
       if (!done) { step += 1; previewTimer = setTimeout(paint, 700); }
