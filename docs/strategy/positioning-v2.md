@@ -15,6 +15,30 @@ orthogonal to whoever has the slickest orchestration:
 2. **Verified context, upstream** — the service that checks the *corpus* against authoritative truth, kept
    current, with provenance — feeding *any* agent, including Contextual itself.
 
+**Sharpened (from Contextual's own docs, May 2026):** their actions are confirmed side-effecting
+(webhook → send-email; "Task Execution" = API write actions), and they ship the *full* builder + governance
+(RBAC, model-armor, observability) + model-agnostic. So **OHH cannot win as "a better builder"** — it would
+lose to Agent Composer *and* the OSS builder crowd (LangGraph, Dify, n8n, Flowise). OHH's differentiation has
+narrowed to **ONE** thing Contextual structurally won't be: **genuinely open** — real OSS, self-hostable,
+free for the long tail, working with the agent the developer already runs (their "free trial + model-agnostic"
+is an enterprise *funnel*, not an open product). **So: OHH = the open funnel + the consumption surface for
+verified corpora (distribution + developer goodwill); CEaaS = the headline business. The product is the
+verified FUEL, not the harness.**
+
+**The wedge line (memorize):** *"They check your docs are CURRENT; we check your docs are RIGHT against the
+source of truth."* Their compliance ("validate everything is current") = completeness + recency of the
+*customer's own* docs — NOT tracking the external authority and flagging when internal context contradicts or
+lags it. They ground in whatever corpus you supply; they do not verify it's correct against external truth,
+keep external regulated corpora current as a product, offer oracle-signed shared corpora, or reconcile
+conflicting authorities. **That one sentence is the whole business.**
+
+**Confirmed at the source (their docs):** the shared "global datastores" are **demo-only** (read-only,
+"Demo" badge, not for production); everything real is **customer-provided + per-tenant isolated** (connectors
+/ upload / Documents API). So there is **no production shared corpus, no cross-customer sharing, no
+marketplace, no oracle-publisher path** — the verified-corpus-commons gap is now *documented*, not inferred.
+Their architecture even has an Enterprise-Knowledge layer at the bottom that **must be fed** with no shared-
+corpus answer of their own — the exact slot we supply (strengthens the upstream + acquisition logic).
+
 ## Name + tagline (no rename)
 **Open Harness Hub** (`openharnesshub.com`) — **the harness layer that powers trustworthy agents.**
 Bridge to "agent" in language/SEO (*"Power your agents with governed harnesses"* / *"harnesses for agents
@@ -39,7 +63,9 @@ Harness.io.) The verified-context product and the umbrella/company brand remain 
 - **Profile:** Kiela (RAG co-inventor) + Singh; ~$100M (Nvidia/Bezos/Snowflake/HSBC); ~51–100 ppl; Qualcomm
   + HSBC; **bring-your-own-data, per-tenant isolated, not trained on** (confirmed). Best-in-class engine +
   now a full agent platform.
-- **Don't fight where they're strong:** RAG quality, orchestration, the grounded model, the no-code builder.
+- **Don't fight where they're strong (ALL confirmed):** RAG quality, orchestration, the grounded model, the
+  no-code builder, **side-effecting actions (incl. API writes), governance (RBAC / model-armor / observability),
+  and model-agnostic model choice.** Pitching against any of these loses — they have them.
 - **Learn, don't rebuild:** adopt their eval rigor (RAG 2.0 / FACTS / the **LMUnit** pattern) + attribution
   conventions (makes us integrable *and* acquirable); **wrap** their Component APIs as governed adapters
   ([[competitor-contextual-ai.md]]).
