@@ -102,12 +102,17 @@ is a stronger story than either alone: the acquirer gets the context-layer subst
 ## Shipped this turn vs. next (honest)
 
 **Shipped:** this decision record; the CEaaS product spec ([[context-enrichment-service.md]]); the
-schema-extensibility codex ([[../codex/schema-extensibility.md]]); `web/products.js` (two-product
-config + host resolver — single source of truth for both brands); the `/context-enrichment` landing
-surface (CEaaS's home, reusing the shared backend); a cross-link between the two services.
+schema-extensibility codex ([[../codex/schema-extensibility.md]]); **separate per-product front-end
+folders** — `web/harness-hub/` and `web/context-enrichment/`, each self-contained, with the backend
+selecting the folder by `OH_PRODUCT` (`server.py`); both products live behind their own tunnels
+(`scripts/serve_two_products.sh`); the backend service layer ([[../architecture/backend-services-and-platform.md]]).
+
+> Note: an earlier draft shared one `web/` folder with a `products.js` brand toggle. That caused
+> "confusion between the two product surfaces" and was **replaced** by the per-folder split above — the
+> front-end is per-product; only the backend is shared.
 
 **Next (deployment, not forks):** (a) the CEaaS **content-tier pipeline** (raw→compressed→hyper-efficient,
 hosted + downloadable) on the shared workers; (b) the CEaaS **MCP serving endpoint** that drops the
 governed corpora + tools into Claude Code / open agent loops; (c) the shared **K8s/worker** deployment
-the two services share; (d) rebrand the shared surface headers via `OHH.brand()` (touches ~17 files —
-one reviewed pass, keep the live OHH surface green).
+the two services share; (d) the CEaaS **teal** sibling accent (a brand-scope within `dir-s` — same
+typography, accent only; NOT a theme-direction change).
