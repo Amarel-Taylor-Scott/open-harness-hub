@@ -1,0 +1,50 @@
+id: processor/cache-write
+type: processor
+version: 0.1.0
+name: Cache response
+description: Cache the result keyed by the (task, components, inputs) hash so identical runs return instantly
+  and at near-zero cost. Platform-actions (on-platform) bucket.
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+capability:
+- memory
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- action-bucket
+- platform
+- on-platform
+created: '2026-05-29'
+updated: '2026-05-29'
+attribution:
+  source_kind: manual
+  author: Open Harness Hub action-bucket taxonomy
+  license: MIT
+process_kind: cache.write_response
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: key
+  type: object
+- name: result
+  type: object
+- name: ttl
+  type: object
+outputs:
+- name: cached
+  type: object
+side_effects: write
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.platform.cache_write.run
+  language: python
+links:
+  source: docs/concepts/component-taxonomy-and-stages.md

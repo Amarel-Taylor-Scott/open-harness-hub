@@ -1,0 +1,49 @@
+id: processor/register-component
+type: processor
+version: 0.1.0
+name: Register as component
+description: Register a validated result (a fact, list, sub-flow) as a reusable, versioned component /
+  Knowledge Corpus entry in the platform registry, with provenance — a run's output becomes a building
+  block. Platform-actions (on-platform) bucket.
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+capability:
+- governance
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- action-bucket
+- platform
+- on-platform
+created: '2026-05-29'
+updated: '2026-05-29'
+attribution:
+  source_kind: manual
+  author: Open Harness Hub action-bucket taxonomy
+  license: MIT
+process_kind: platform.register_component
+deterministic: false
+idempotent: true
+streaming: false
+inputs:
+- name: result
+  type: object
+- name: manifest
+  type: object
+outputs:
+- name: component_id
+  type: object
+side_effects: write
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.platform.register_component.run
+  language: python
+links:
+  source: docs/concepts/component-taxonomy-and-stages.md

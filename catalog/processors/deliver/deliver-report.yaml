@@ -1,0 +1,49 @@
+id: processor/deliver-report
+type: processor
+version: 0.1.0
+name: Report deliver (md / pdf)
+description: Render the result into a shareable report (Markdown / PDF, with citations) and deliver it.
+  The render is deterministic; the delivery is outbound. Deliver / emit (outbound) bucket.
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+capability:
+- routing
+- format_conversion
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- action-bucket
+- deliver
+- outbound
+created: '2026-05-29'
+updated: '2026-05-29'
+attribution:
+  source_kind: manual
+  author: Open Harness Hub action-bucket taxonomy
+  license: MIT
+process_kind: report.pdf
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: result
+  type: object
+- name: format
+  type: object
+outputs:
+- name: document_uri
+  type: object
+side_effects: external_call
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.deliver.deliver_report.run
+  language: python
+links:
+  source: docs/concepts/component-taxonomy-and-stages.md

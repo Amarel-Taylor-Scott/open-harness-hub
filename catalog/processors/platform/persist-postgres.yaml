@@ -1,0 +1,48 @@
+id: processor/persist-postgres
+type: processor
+version: 0.1.0
+name: Upsert to postgres table
+description: Upsert structured result rows into a governed postgres table, idempotent by content hash,
+  for query + reporting. Platform-actions (on-platform) bucket.
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+capability:
+- serving
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- action-bucket
+- platform
+- on-platform
+created: '2026-05-29'
+updated: '2026-05-29'
+attribution:
+  source_kind: manual
+  author: Open Harness Hub action-bucket taxonomy
+  license: MIT
+process_kind: platform.postgres_upsert
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: rows
+  type: object
+- name: table
+  type: object
+outputs:
+- name: upserted
+  type: object
+side_effects: write
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.platform.persist_postgres.run
+  language: python
+links:
+  source: docs/concepts/component-taxonomy-and-stages.md

@@ -1,0 +1,50 @@
+id: processor/deliver-email
+type: processor
+version: 0.1.0
+name: Email deliver
+description: Render the result into an email template and send to recipients. Outbound. Deliver / emit
+  bucket.
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+capability:
+- routing
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- action-bucket
+- deliver
+- outbound
+created: '2026-05-29'
+updated: '2026-05-29'
+attribution:
+  source_kind: manual
+  author: Open Harness Hub action-bucket taxonomy
+  license: MIT
+process_kind: deliver.email
+deterministic: false
+idempotent: true
+streaming: false
+inputs:
+- name: result
+  type: object
+- name: recipients
+  type: object
+- name: template
+  type: object
+outputs:
+- name: message_id
+  type: object
+side_effects: external_call
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.deliver.deliver_email.run
+  language: python
+links:
+  source: docs/concepts/component-taxonomy-and-stages.md
