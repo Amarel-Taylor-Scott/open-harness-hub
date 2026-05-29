@@ -1,0 +1,64 @@
+# Argo Workflows — the orchestration layer for the SCHEDULED BATCH DAG (needs Argo installed).
+# Use this when you want per-partition fan-out, retries, and a visual DAG of the day's run.
+# (The continuous/streaming path is KEDA + the worker — worker.yaml. Pick Temporal instead of
+# Argo if you need long-running durable sagas; Argo is the K8s-native fit for this batch DAG.)
+#
+# The intra-partition stages (gap→source→construct→standardize→novelty→measure→gate→load) run
+# IN-PROCESS inside `run_partition`, so Argo orchestrates ACROSS partitions (the fleet). Each
+# partition step is one container run; production passes a real --partition/area slice.
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: foundry-pipeline
+  namespace: openharnesshub
+spec:
+  entrypoint: run-day
+  arguments:
+    parameters:
+      - name: partitions
+        value: '["esg-csddd","ph-aml","building-safety"]'   # prod: emitted from the research queue
+  templates:
+    - name: run-day
+      dag:
+        tasks:
+          - name: fan-out
+            template: run-partition
+            arguments:
+              parameters: [{ name: partition, value: "{{item}}" }]
+            withParam: "{{workflow.parameters.partitions}}"
+          - name: summarize
+            template: summarize
+            dependencies: [fan-out]
+
+    - name: run-partition
+      inputs:
+        parameters: [{ name: partition }]
+      retryStrategy:
+        limit: "2"
+        retryPolicy: OnError
+      container:
+        image: ghcr.io/Amarel-Taylor-Scott/openharnesshub:latest
+        # prod: `seeds --run --partition {{inputs.parameters.partition}}` (per-partition arg = extension point)
+        command: ["python", "-m", "scripts.foundry.seeds", "--run"]
+        envFrom:
+          - configMapRef: { name: ohh-config }
+          - secretRef: { name: ohh-secrets }
+
+    - name: summarize
+      container:
+        image: ghcr.io/Amarel-Taylor-Scott/openharnesshub:latest
+        # reports the funnel for the run (promoted, never generated)
+        command: ["python", "-c", "print('foundry day complete — see data/foundry-ledger.jsonl')"]
+---
+# Daily trigger for the batch DAG (alternative to the ohh-daily-factory CronJob).
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  name: foundry-daily
+  namespace: openharnesshub
+spec:
+  schedule: "0 6 * * *"
+  concurrencyPolicy: Forbid
+  workflowSpec:
+    workflowTemplateRef:
+      name: foundry-pipeline

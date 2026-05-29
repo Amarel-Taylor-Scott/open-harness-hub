@@ -1,0 +1,89 @@
+# cron: the scheduled loops (freshness · demand · decay). Each is the same image with a
+# different command. The daily factory can ALSO run as an Argo CronWorkflow (argo-foundry.yaml)
+# when you want per-partition fan-out + visibility; these CronJobs are the simple form.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ohh-daily-factory
+  namespace: openharnesshub
+spec:
+  schedule: "0 6 * * *"                   # daily — generate + measure + gate a batch
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: factory
+              image: ghcr.io/Amarel-Taylor-Scott/openharnesshub:latest
+              command: ["python", "-m", "scripts.foundry.seeds", "--run"]
+              envFrom:
+                - configMapRef: { name: ohh-config }
+                - secretRef: { name: ohh-secrets }
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ohh-scraper-refresh
+  namespace: openharnesshub
+spec:
+  schedule: "0 */6 * * *"                 # every 6h — re-scrape sources, emit CDC/freshness
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: scraper
+              image: ghcr.io/Amarel-Taylor-Scott/openharnesshub:latest
+              command: ["python", "-m", "scripts.foundry.scrapers", "--refresh"]
+              envFrom:
+                - configMapRef: { name: ohh-config }
+                - secretRef: { name: ohh-secrets }
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ohh-demand-mining
+  namespace: openharnesshub
+spec:
+  schedule: "30 6 * * *"                  # mine user interactions → capability-requests + research areas
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: demand
+              image: ghcr.io/Amarel-Taylor-Scott/openharnesshub:latest
+              # In prod, point --mine at the DB-backed interaction sink (not a file).
+              command: ["python", "-m", "scripts.foundry.interactions", "--mine", "/data/interactions.jsonl"]
+              envFrom:
+                - configMapRef: { name: ohh-config }
+                - secretRef: { name: ohh-secrets }
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ohh-decay-rebench
+  namespace: openharnesshub
+spec:
+  schedule: "0 7 * * 1"                   # weekly — re-benchmark promoted lifts vs the current base model
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: rebench
+              image: ghcr.io/Amarel-Taylor-Scott/openharnesshub:latest
+              # TODO: a `--rebench` entrypoint that re-measures promoted components against the new
+              # model and flips decay_signal → decaying when lift erodes. Placeholder = the e2e gate.
+              command: ["python", "-m", "scripts.foundry.pipeline", "--self-test"]
+              envFrom:
+                - configMapRef: { name: ohh-config }
+                - secretRef: { name: ohh-secrets }

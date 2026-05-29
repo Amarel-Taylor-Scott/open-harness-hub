@@ -1,0 +1,47 @@
+# worker: the async tier — pulls partition jobs off Redis and runs the foundry.
+# KEDA autoscales it on QUEUE DEPTH (scale-to-zero → N), the right primitive for the
+# bursty 10×1k fan-out. This is the "Celery-like" layer, kept light: queues.RedisQueue
+# + worker.Worker (retry + dead-letter), no heavyweight framework required.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ohh-foundry-worker
+  namespace: openharnesshub
+spec:
+  replicas: 0                       # KEDA owns the replica count
+  selector:
+    matchLabels: { app: ohh-foundry-worker }
+  template:
+    metadata:
+      labels: { app: ohh-foundry-worker }
+    spec:
+      containers:
+        - name: worker
+          image: ghcr.io/Amarel-Taylor-Scott/openharnesshub:latest
+          command: ["python", "-m", "scripts.foundry.worker", "--serve"]   # consumes queues.from_env()
+          envFrom:
+            - configMapRef: { name: ohh-config }
+            - secretRef: { name: ohh-secrets }     # OLLAMA_API_KEY, REDIS_URL, DATABASE_URL
+          resources:
+            requests: { cpu: "250m", memory: "512Mi" }
+            limits: { cpu: "2", memory: "2Gi" }
+---
+# Requires KEDA installed (keda.sh). Scales the worker on the Redis job-list length.
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: ohh-foundry-worker
+  namespace: openharnesshub
+spec:
+  scaleTargetRef:
+    name: ohh-foundry-worker
+  minReplicaCount: 0                # idle ⇒ no workers (cost)
+  maxReplicaCount: 20
+  pollingInterval: 15
+  cooldownPeriod: 120
+  triggers:
+    - type: redis
+      metadata:
+        address: ohh-redis:6379     # in-cluster broker (or a managed Redis address)
+        listName: "ohh:foundry:jobs"   # matches FOUNDRY_QUEUE_KEY / queues.DEFAULT_QUEUE_KEY
+        listLength: "10"            # ~1 worker per 10 queued partition jobs

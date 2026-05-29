@@ -1,0 +1,51 @@
+# web: the request tier (product UI/API; the Gradio playground as a placeholder today)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ohh-web
+  namespace: openharnesshub
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: ohh-web }
+  template:
+    metadata:
+      labels: { app: ohh-web }
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/Amarel-Taylor-Scott/openharnesshub:latest   # built from the root Dockerfile
+          command: ["python", "hf-space/app.py"]                      # placeholder for the product UI/API
+          ports: [{ containerPort: 7860 }]
+          envFrom:
+            - configMapRef: { name: ohh-config }
+            - secretRef: { name: ohh-secrets }
+          readinessProbe:
+            httpGet: { path: /, port: 7860 }
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests: { cpu: "100m", memory: "256Mi" }
+            limits: { cpu: "1", memory: "1Gi" }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ohh-web
+  namespace: openharnesshub
+spec:
+  selector: { app: ohh-web }
+  ports: [{ port: 80, targetPort: 7860 }]
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ohh-web
+  namespace: openharnesshub
+spec:
+  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: ohh-web }
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource: { name: cpu, target: { type: Utilization, averageUtilization: 70 } }

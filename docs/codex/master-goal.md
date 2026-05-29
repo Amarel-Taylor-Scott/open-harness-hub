@@ -183,5 +183,10 @@ for the section noted; they must not restate strategy that conflicts here:
 - `autonomous-session-runbook.md` → the in-session engine (the loop).
 - `speed-guardrails.md` / `quality-gates.md` → gate detail (supervisors 1–6).
 - `object-factory-workflow.md` → the factory spine (P1/P5).
+- `foundry-build-loop.md` → the **runnable P1–P2 build loop**: the evidence-driven
+  factory now implemented in `scripts/foundry/` (gap→source→construct→standardize→
+  novelty→measure→gate→stage_load). Promote real, evidence-gated components; the
+  metric is **promoted** (gate-cleared), never generated. This is the concrete loop
+  the `goal` skill should run for P1–P2.
 
 If any appendix contradicts this page, this page is correct — update the appendix.
