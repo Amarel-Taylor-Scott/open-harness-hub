@@ -1,0 +1,49 @@
+id: processor/simhash-dedupe
+type: processor
+version: 0.1.0
+name: SimHash / LSH de-duplicate
+description: 'Remove near-duplicate chunks (SimHash fingerprint + exact-hash) that waste context budget
+  before placement. Deterministic and cheap; threshold-tuned. Freezable.
+
+
+  Retrieval/prompt taxonomy step R5 (see docs/concepts/retrieval-and-prompt-taxonomy.md). One swappable
+  method-component for the governed-model-call recipe; lift is measured at the pipeline level, not on
+  this component.'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+- ai
+capability:
+- verification
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- retrieval-taxonomy
+- step-r5
+- rag
+- freezable
+created: '2026-05-29'
+updated: '2026-05-29'
+process_kind: select.dedupe_simhash
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: candidates
+  type: object
+- name: threshold
+  type: object
+outputs:
+- name: deduped
+  type: object
+side_effects: none
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.retrieval.simhash_dedupe.run
+  language: python

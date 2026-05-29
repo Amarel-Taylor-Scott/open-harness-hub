@@ -1,0 +1,50 @@
+id: processor/extractive-span-selector
+type: processor
+version: 0.1.0
+name: Extractive span selector
+description: 'Deterministically select the query-relevant spans from reranked chunks — cheap, faithful,
+  keeps the EXACT citable text (no paraphrase). Preferred compression for governed pipelines (freezable).
+
+
+  Retrieval/prompt taxonomy step R4 (see docs/concepts/retrieval-and-prompt-taxonomy.md). One swappable
+  method-component for the governed-model-call recipe; lift is measured at the pipeline level, not on
+  this component.'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+- ai
+capability:
+- summarization
+- extraction
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- retrieval-taxonomy
+- step-r4
+- rag
+- freezable
+created: '2026-05-29'
+updated: '2026-05-29'
+process_kind: summarize.extractive
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: chunks
+  type: object
+- name: query
+  type: object
+outputs:
+- name: spans
+  type: object
+side_effects: none
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.retrieval.extractive_span_selector.run
+  language: python

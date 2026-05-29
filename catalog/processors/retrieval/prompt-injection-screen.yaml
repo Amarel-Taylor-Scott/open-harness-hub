@@ -1,0 +1,50 @@
+id: processor/prompt-injection-screen
+type: processor
+version: 0.1.0
+name: Prompt-injection screen
+description: 'A guard before the model call: block (and route to review) if the input tries to extract
+  or override the system prompt, or carries injection riding in retrieved chunks. Delimit + role-separate
+  + heuristic/classifier screen. For governed pipelines, halt-on-detect, don''t proceed.
+
+
+  Retrieval/prompt taxonomy step P5 (see docs/concepts/retrieval-and-prompt-taxonomy.md). One swappable
+  method-component for the governed-model-call recipe; lift is measured at the pipeline level, not on
+  this component.'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+- ai
+capability:
+- safety_gating
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- retrieval-taxonomy
+- step-p5
+- rag
+- freezable
+created: '2026-05-29'
+updated: '2026-05-29'
+process_kind: gate.prompt_injection
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: input
+  type: object
+outputs:
+- name: safe
+  type: object
+- name: reason
+  type: object
+side_effects: none
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.retrieval.prompt_injection_screen.run
+  language: python

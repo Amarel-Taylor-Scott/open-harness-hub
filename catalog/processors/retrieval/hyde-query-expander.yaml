@@ -1,0 +1,49 @@
+id: processor/hyde-query-expander
+type: processor
+version: 0.1.0
+name: HyDE query expander
+description: 'Generate a hypothetical answer-document with the model and embed it to bridge the short-query↔long-doc
+  gap for dense retrieval. Strong zero-shot recall lift; one LLM call + hallucination risk, so reserve
+  for short/conversational queries against long technical corpora.
+
+
+  Retrieval/prompt taxonomy step R0 (see docs/concepts/retrieval-and-prompt-taxonomy.md). One swappable
+  method-component for the governed-model-call recipe; lift is measured at the pipeline level, not on
+  this component.'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+- ai
+capability:
+- generation
+- retrieval
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- retrieval-taxonomy
+- step-r0
+- rag
+- model-assisted
+created: '2026-05-29'
+updated: '2026-05-29'
+process_kind: query.hyde
+deterministic: false
+idempotent: true
+streaming: false
+inputs:
+- name: query
+  type: object
+outputs:
+- name: expanded_query
+  type: object
+side_effects: external_call
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.retrieval.hyde_query_expander.run
+  language: python

@@ -1,0 +1,53 @@
+id: processor/system-prompt-builder
+type: processor
+version: 0.1.0
+name: System-prompt builder
+description: 'Assemble the instruction contract — task, hard constraints, the grounding/citation requirement,
+  and an explicit abstention policy (''if the corpus doesn''t support it, say so'') — SEPARATE from the
+  persona. The cite-or-abstain contract is what converts retrieval into governed output.
+
+
+  Retrieval/prompt taxonomy step P2 (see docs/concepts/retrieval-and-prompt-taxonomy.md). One swappable
+  method-component for the governed-model-call recipe; lift is measured at the pipeline level, not on
+  this component.'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+- ai
+capability:
+- generation
+- governance
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- retrieval-taxonomy
+- step-p2
+- rag
+- freezable
+created: '2026-05-29'
+updated: '2026-05-29'
+process_kind: assemble.prompt_template
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: task
+  type: object
+- name: constraints
+  type: object
+- name: schema
+  type: object
+outputs:
+- name: system_prompt
+  type: object
+side_effects: none
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.retrieval.system_prompt_builder.run
+  language: python

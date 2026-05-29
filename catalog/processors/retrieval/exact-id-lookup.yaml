@@ -1,0 +1,49 @@
+id: processor/exact-id-lookup
+type: processor
+version: 0.1.0
+name: Exact-identifier lookup
+description: 'Deterministic hit on a structured identifier (CVE/NDC/FIPS/K-number/SKU/statute section).
+  Only fires when the id is present, but when it does it is exact — the governance-grade retrieval leg.
+
+
+  Retrieval/prompt taxonomy step R1 (see docs/concepts/retrieval-and-prompt-taxonomy.md). One swappable
+  method-component for the governed-model-call recipe; lift is measured at the pipeline level, not on
+  this component.'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+- ai
+capability:
+- retrieval
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- retrieval-taxonomy
+- step-r1
+- rag
+- freezable
+created: '2026-05-29'
+updated: '2026-05-29'
+process_kind: retrieve.exact_id
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: identifier
+  type: object
+- name: corpus
+  type: object
+outputs:
+- name: match
+  type: object
+side_effects: read
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.retrieval.exact_id_lookup.run
+  language: python
