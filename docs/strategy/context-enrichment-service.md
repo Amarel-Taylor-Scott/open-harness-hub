@@ -8,6 +8,25 @@ client). *OHH is a governed factory for pipelines; CEaaS is a refinery-plus-CDN 
 burn the same crude (ingestion, compression, embedding, governance, clusters); they sell different
 refined products.
 
+## Scope: enrichment + management (lead with enrichment — it's the novel wedge)
+
+CEaaS spans **both faces of the context layer**, and they're not equally novel:
+
+- **Context enrichment (the novel wedge — the headline):** making the content itself denser and
+  trustworthy — the raw→compressed→hyper-efficient **tiers**, structural + learned **compression**,
+  **distillation**, and the **measured-fidelity-per-tier** guarantee. This is the part nobody hosts as
+  a governed service, so it leads the brand and the positioning.
+- **Context management (the established surround — table stakes):** managing the *lifecycle* of what
+  reaches the window — **memory** (recall/reflect/confidence), **retrieval** (vector/lexical/hybrid/
+  graph), **freshness/CDC**, **caching**, and window-budget paging (the OS-memory / "what stays on the
+  desk" model — [[../concepts/context-layer-and-the-desk.md]]). Mem0/Letta/Hindsight/MemGPT already
+  occupy this; we cover it because an agent needs both, but we don't claim novelty here.
+
+Both are already in the catalog (`scripts/seed/context_layer_components.py` = management: memory ·
+cache · retrieval · connectors; `scripts/seed/ceaas_components.py` = enrichment: tiers · surfaces ·
+fidelity). **Sell the enrichment; deliver the management.** The wedge is "governed, measured-fidelity
+enrichment"; management is what makes it usable end-to-end.
+
 ## The whitespace (why this is a category, not a feature)
 
 The tooling exists — but only as **scattered, single-shot, local CLIs**. **Repomix** is the clearest
