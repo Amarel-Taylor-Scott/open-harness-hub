@@ -1,0 +1,46 @@
+# freshness-cron: CDC poll — runs scripts.ingest.freshness --check --enqueue on a schedule.
+#
+# Every 6 hours it fetches every registered official/gov source, hashes the content,
+# detects changes (content_hash mismatch → "changed" CDC event), and enqueues a
+# re-ingest job for the foundry worker fleet to consume. The worker Deployment + KEDA
+# ScaledObject (infra/k8s/worker.yaml) drain those jobs automatically.
+#
+# Style mirrors infra/k8s/cron.yaml (ohh-scraper-refresh / ohh-daily-factory).
+# Apply alongside core.yaml (namespace + config + secret):
+#
+#   kubectl apply -f infra/k8s/core.yaml
+#   kubectl apply -f infra/k8s/freshness-cron.yaml
+#   kubectl apply -f infra/k8s/worker.yaml        # the consumer
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ohh-freshness-cron
+  namespace: openharnesshub
+spec:
+  schedule: "0 */6 * * *"              # every 6 hours — poll official/gov sources for changes
+  concurrencyPolicy: Forbid            # never overlap runs (idempotent but wasteful)
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      # Retry up to 2 times on transient network errors before giving up for this slot.
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: freshness-cron
+              image: ghcr.io/Amarel-Taylor-Scott/openharnesshub:latest
+              command:
+                - python
+                - -m
+                - scripts.ingest.freshness
+                - --check
+                - --enqueue
+              envFrom:
+                - configMapRef: { name: ohh-config }
+                - secretRef: { name: ohh-secrets }
+              # Modest resources — this is a network-I/O job, not compute-heavy.
+              resources:
+                requests: { cpu: "100m", memory: "256Mi" }
+                limits: { cpu: "500m", memory: "512Mi" }

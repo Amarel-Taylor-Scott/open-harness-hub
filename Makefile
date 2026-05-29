@@ -1,6 +1,6 @@
 # Open Harness Hub — dev shortcuts. Local runs need ZERO services (sqlite); the same
 # commands run in cloud against Postgres+Redis purely by env (see .env.example).
-.PHONY: help bootstrap test e2e foundry worker demand scrape dev-up dev-down
+.PHONY: help bootstrap test e2e foundry worker demand scrape ingest freshness ingest-health ingest-loop dev-up dev-down
 
 help:
 	@echo "bootstrap  - pip install runtime deps"
@@ -10,6 +10,10 @@ help:
 	@echo "worker     - run the queue worker (--serve; sqlite queue local, redis in cloud)"
 	@echo "demand     - mine logged user interactions -> capability-requests + research areas"
 	@echo "scrape     - refresh registered sources (live; needs network + data/source-registry.jsonl)"
+	@echo "ingest        - feed EVERY registered official source into the governed corpus (live)"
+	@echo "freshness     - poll sources for changes (CDC) + enqueue reingest jobs (live)"
+	@echo "ingest-health - reachability + parseability check of all source URLs (live)"
+	@echo "ingest-loop   - run the freshness->feed loop forever (sidecar; sqlite local, postgres+redis cloud)"
 	@echo "dev-up     - full local stack mirroring cloud (postgres+pgvector + redis + web + worker)"
 
 bootstrap:
@@ -37,6 +41,18 @@ demand:
 
 scrape:
 	python -m scripts.foundry.scrapers --refresh
+
+ingest:
+	python3 -m scripts.ingest.feed --all
+
+freshness:
+	python3 -m scripts.ingest.freshness --check --enqueue
+
+ingest-health:
+	python3 -m scripts.ingest.health --check
+
+ingest-loop:
+	python3 -m scripts.ingest.run --loop
 
 dev-up:
 	docker compose -f infra/docker-compose.yml up --build

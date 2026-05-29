@@ -1,0 +1,82 @@
+# Corpus-ingestion services — freshness-cron + ingest-worker.
+#
+# These services complement infra/docker-compose.yml (Postgres + Redis + web + worker).
+# Run BOTH files together for the full ingestion stack:
+#
+#   docker compose -f infra/docker-compose.yml -f infra/ingest-compose.yml up --build
+#
+# Or, for a quick LOCAL run without any services (sqlite / in-process queue):
+#
+#   python3 -m scripts.ingest.feed --all           # feed all registered sources once
+#   python3 -m scripts.ingest.freshness --check --enqueue  # CDC poll + enqueue re-ingest
+#   python3 -m scripts.ingest.health --check       # reachability + parse check
+#   python3 -m scripts.foundry.worker --serve      # consume reingest jobs
+#
+# The env contract is IDENTICAL to docker-compose.yml — same OH_STORE_BACKEND / DATABASE_URL /
+# REDIS_URL / FOUNDRY_QUEUE_KEY — so these services just add to the existing topology.
+
+services:
+
+  # ── freshness-cron ──────────────────────────────────────────────────────────
+  # Polls every registered official/gov source for content changes (CDC).
+  # On a change it enqueues a re-ingest job consumed by ingest-worker.
+  # Runs on a configurable interval (default: every 6 hours, matching the cloud CronJob).
+  # The loop is a simple shell while-true so the container never exits between runs.
+  freshness-cron:
+    build: { context: .., dockerfile: Dockerfile }
+    command:
+      - /bin/sh
+      - -c
+      - |
+        echo "[freshness-cron] starting loop (interval $${INGEST_FRESHNESS_INTERVAL_S:-21600}s)"; \
+        while true; do \
+          echo "[freshness-cron] $(date -u +%Y-%m-%dT%H:%M:%SZ) — poll + enqueue"; \
+          python -m scripts.ingest.freshness --check --enqueue; \
+          echo "[freshness-cron] sleeping $${INGEST_FRESHNESS_INTERVAL_S:-21600}s"; \
+          sleep $${INGEST_FRESHNESS_INTERVAL_S:-21600}; \
+        done
+    env_file: ["../.env"]
+    environment:
+      # Cloud backends — match docker-compose.yml so this file composes cleanly.
+      DATABASE_URL: "postgresql://ohh:ohh@postgres:5432/ohh"
+      REDIS_URL: "redis://redis:6379/0"
+      FOUNDRY_QUEUE_KEY: "ohh:foundry:jobs"
+      # Override to speed up local testing (e.g. INGEST_FRESHNESS_INTERVAL_S=60).
+      INGEST_FRESHNESS_INTERVAL_S: "21600"
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_started }
+    restart: unless-stopped
+
+  # ── ingest-worker ───────────────────────────────────────────────────────────
+  # Consumes the reingest jobs enqueued by freshness-cron and feeds the corpus.
+  # Runs scripts.foundry.worker --serve (same command as the existing `worker` service
+  # in docker-compose.yml; this is a dedicated replica for ingest traffic so the main
+  # foundry worker isn't starved by CDC re-feeds).
+  ingest-worker:
+    build: { context: .., dockerfile: Dockerfile }
+    command: ["python", "-m", "scripts.foundry.worker", "--serve"]
+    env_file: ["../.env"]
+    environment:
+      DATABASE_URL: "postgresql://ohh:ohh@postgres:5432/ohh"
+      REDIS_URL: "redis://redis:6379/0"
+      FOUNDRY_QUEUE_KEY: "ohh:foundry:jobs"
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_started }
+    restart: unless-stopped
+
+# ── notes ────────────────────────────────────────────────────────────────────
+# The postgres + redis services are defined in infra/docker-compose.yml.
+# Docker Compose merges the service graphs when you pass -f twice, so the
+# freshness-cron and ingest-worker services pick up those backends automatically.
+#
+# To run only the ingestion stack against an EXTERNAL Postgres + Redis (e.g. Neon + Upstash),
+# override DATABASE_URL and REDIS_URL in .env and run:
+#
+#   docker compose -f infra/ingest-compose.yml up --build
+#
+# The services will skip the healthcheck depends_on for the missing postgres/redis services
+# only when run standalone; pass actual reachable URLs in that case.
+#
+# Cloud equivalent: infra/k8s/freshness-cron.yaml (CronJob) + infra/k8s/worker.yaml (Deployment).
