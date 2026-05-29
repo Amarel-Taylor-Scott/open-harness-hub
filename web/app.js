@@ -215,36 +215,50 @@
     ["output", "Graded dossier", "⎘ PDF + JSON-LD · every claim cited"]
   ];
   var previewTimer = null;
-  function primForStage(stage) { var k = String(stage || "").toLowerCase().split(/[\s/]/)[0]; return PRIMS[k] || PRIMS.action; }
-  function flowRow(glyph, swatch, radius, border, name, sub) {
-    return '<div style="display:flex;align-items:flex-start;gap:11px;padding:9px 0;border-bottom:' + border + '">' +
-      '<span style="width:24px;height:24px;border-radius:' + radius + ';flex:0 0 auto;display:grid;place-items:center;font-size:12px;' + swatch + '">' + glyph + "</span>" +
-      '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--fg)">' + esc(name) + "</div>" +
-      '<div style="font-family:var(--font-mono);font-size:10.5px;color:var(--fg-muted);margin-top:2px;line-height:1.4">' + esc(sub) + "</div></div></div>";
+  function primKey(stage) { var k = String(stage || "").toLowerCase().split(/[\s/]/)[0]; return PRIMS[k] ? k : "action"; }
+  // one flow row. level 1 = nested ("then" branch) under the preceding Conditional. tag = IF/THEN chip.
+  function flowRowHtml(prim, name, sub, level, tag) {
+    var isOp = prim === "op";
+    var glyph = isOp ? "◇" : (PRIMS[prim] ? PRIMS[prim].glyph : "•");
+    var swatch = isOp ? "background:transparent;border:2px solid var(--operator);color:var(--operator)"
+                      : "background:var(" + (PRIMS[prim] ? PRIMS[prim].v : "--p-action") + ");color:#fff;border:none";
+    var wrap = level ? "position:relative;margin-left:11px;border-left:2px solid var(--line);padding-left:19px"
+                     : "position:relative";
+    var arm = level ? '<span style="position:absolute;left:0;top:17px;color:var(--fg-faint);font-size:12px">↳</span>' : "";
+    var chip = tag ? '<span class="oh-badge ' + (tag === "IF" ? "oh-badge--warn" : "oh-badge--muted") +
+      '" style="padding:1px 6px;margin-right:6px;font-family:var(--font-mono);font-size:9.5px">' + tag + "</span>" : "";
+    return '<div style="' + wrap + '">' + arm +
+      '<div style="display:flex;align-items:flex-start;gap:11px;padding:9px 0;border-bottom:1px solid var(--line)">' +
+      '<span style="width:24px;height:24px;border-radius:' + (isOp ? "50%" : "6px") + ';flex:0 0 auto;display:grid;place-items:center;font-size:12px;' + swatch + '">' + glyph + "</span>" +
+      '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--fg)">' + chip + esc(name) + "</div>" +
+      '<div style="font-family:var(--font-mono);font-size:10.5px;color:var(--fg-muted);margin-top:2px;line-height:1.4">' + esc(sub) + "</div></div></div></div>";
+  }
+  // render ordered [primKey,name,sub] steps as a TREE: a Conditional opens an indented "then" branch
+  // that Knowledge/Action/Loop/Operator steps nest inside (e.g. "if tier≥2 → then add RAG context, then cite").
+  function renderFlowRows(rows) {
+    var html = "", inBranch = false;
+    rows.forEach(function (r) {
+      var prim = r[0];
+      if (prim === "input" || prim === "output" || prim === "stop") { inBranch = false; html += flowRowHtml(prim, r[1], r[2], 0, null); }
+      else if (prim === "conditional") { inBranch = true; html += flowRowHtml(prim, r[1], r[2], 0, "IF"); }
+      else { html += flowRowHtml(prim, r[1], r[2], inBranch ? 1 : 0, inBranch ? "THEN" : null); }
+    });
+    return html;
   }
   function realFlowPanel(d) {
     var rows = [], stages = (d.flow && d.flow.stages) || [];
     stages.forEach(function (st) {
-      (st.components || []).forEach(function (c) {
-        var p = primForStage(st.stage);
-        rows.push([p.glyph, "background:var(" + p.v + ");color:#fff;border:none", "6px", c.name, p.label + (c.role ? " · " + c.role : "")]);
-      });
-      if (st.operator) rows.push(["◇", "background:transparent;border:2px solid var(--operator);color:var(--operator)", "50%", "OR — merge branches", "Logical operator"]);
+      var key = primKey(st.stage);
+      (st.components || []).forEach(function (c) { rows.push([key, c.name, PRIMS[key].label + (c.role ? " · " + c.role : "")]); });
+      if (st.operator) rows.push(["op", "OR — merge branches", "Logical operator"]);
     });
     var costUsd = d.cost && d.cost.balanced && d.cost.balanced.per_task_usd;
     var head = rows.length + " steps" + (costUsd != null ? " · est. $" + costUsd + " / run" : "") + (d.llm_used ? " · model-assembled" : " · deterministic selection");
-    var html = '<div class="oh-cc-id mono" style="margin-bottom:10px">assembled flow · ' + head + "</div>";
-    rows.forEach(function (r, i) { html += flowRow(r[0], r[1], r[2], i < rows.length - 1 ? "1px solid var(--line)" : "none", r[3], r[4]); });
-    return html;
+    return '<div class="oh-cc-id mono" style="margin-bottom:10px">assembled flow · ' + head + "</div>" + renderFlowRows(rows);
   }
   function staticFlowPanel() {
-    var html = '<div class="oh-cc-id mono" style="margin-bottom:10px">assembled flow · 6 components · ▲ +0.41 lift · $$ est. / run <span class="oh-badge oh-badge--muted" style="padding:1px 6px">sample</span></div>';
-    FLOW_ROWS.forEach(function (r, i) {
-      var isOp = r[0] === "op", glyph = isOp ? "◇" : PRIMS[r[0]].glyph;
-      var swatch = isOp ? "background:transparent;border:2px solid var(--operator);color:var(--operator)" : "background:var(" + PRIMS[r[0]].v + ");color:#fff;border:none";
-      html += flowRow(glyph, swatch, isOp ? "50%" : "6px", i < FLOW_ROWS.length - 1 ? "1px solid var(--line)" : "none", r[1], r[2]);
-    });
-    return html;
+    var head = '6 steps · ▲ +0.41 lift · $$ est. / run <span class="oh-badge oh-badge--muted" style="padding:1px 6px">sample</span>';
+    return '<div class="oh-cc-id mono" style="margin-bottom:10px">assembled flow · ' + head + "</div>" + renderFlowRows(FLOW_ROWS);
   }
   function renderPreview() {
     var page = $("#preview-page"); if (!page) return;
