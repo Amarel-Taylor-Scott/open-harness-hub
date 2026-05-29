@@ -5,13 +5,18 @@ Also checks:
   - every `ref` field points to an existing component id;
   - every leaf type referenced is in vocabularies/leaf-types.yaml;
   - industry / capability / modality / lifecycle tags are in their vocabularies;
-  - pipeline DAGs have no cycles or dangling step refs.
+  - pipeline DAGs have no cycles or dangling step refs;
+  - (release scope) every `implementations[].path` callable contract that points
+    at an in-repo module actually resolves — a catalog that declares an
+    executable `kind: callable` path must not point at a module that does not
+    exist. Reported as a warning by default; `--check-impl-paths` makes it fatal.
 
 Exit code is non-zero on the first failure.
 """
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import re
 import sys
@@ -181,6 +186,109 @@ def check_refs(manifest: dict, known_ids: set[str], errors: list[str]) -> None:
     walk(manifest)
 
 
+# Only `tool` and `processor` schemas carry an `implementations[]` array whose
+# entries can declare an executable callable. Keep this in sync with those
+# schemas' `implementations.items.properties.kind` enums — both list "callable".
+_CALLABLE_IMPL_KIND = "callable"
+
+
+def _in_repo_top_levels() -> set[str]:
+    """Top-level Python package/module names that live in *this* repository.
+
+    A callable `path` like `scripts.processors.cache.cache_exact.run` is an
+    in-repo contract we can resolve; a path like `tools.web_search.run`,
+    `anthropic.Anthropic.messages.create`, or `src/middleware/...` is a
+    descriptive / third-party contract whose module is *not* shipped here and
+    must not be resolved (resolving it would always fail for reasons unrelated
+    to a broken stub). We detect "in-repo" structurally — a top-level segment
+    is ours iff a directory `<ROOT>/<seg>` or a module `<ROOT>/<seg>.py` exists
+    — rather than hard-coding a namespace list (no-magic-values).
+    """
+    out: set[str] = set()
+    for child in ROOT.iterdir():
+        if child.is_dir() and (child / "__init__.py").exists():
+            out.add(child.name)
+        elif child.is_file() and child.suffix == ".py":
+            out.add(child.stem)
+    return out
+
+
+def _ensure_root_importable() -> None:
+    """Put the repo root on sys.path so in-repo packages (e.g. `scripts`) import.
+
+    When this file runs as `python3 scripts/validate.py`, `sys.path[0]` is the
+    *scripts/* directory, not the repo root, so `import scripts` (and any other
+    top-level repo package) would fail under `importlib.util.find_spec` even
+    though the package exists. Insert ROOT once, idempotently; running as a
+    module already has ROOT on the path so this is a no-op there.
+    """
+    root = str(ROOT)
+    if root not in sys.path:
+        sys.path.insert(0, root)
+
+
+def _callable_path_resolves(path: str) -> tuple[bool, str]:
+    """Return (ok, reason) for a dotted callable path's *module* (and attr).
+
+    `importlib.util.find_spec` only locates the module — it does not import or
+    execute it, so this is side-effect-free and safe to run in CI. We try the
+    longest module prefix first (treating the final dotted segment as a callable
+    attribute, e.g. `…structural_compress.run`); if that module exists we accept
+    it (we do not import to confirm the attribute, since that would run code).
+    If the prefix module is absent we fall back to treating the whole dotted
+    path as a module (some paths point straight at a module, no attribute).
+    """
+    candidates: list[str] = []
+    if "." in path:
+        module, _attr = path.rsplit(".", 1)
+        candidates.append(module)
+    candidates.append(path)
+    for module in candidates:
+        try:
+            spec = importlib.util.find_spec(module)
+        except (ImportError, ValueError, AttributeError, TypeError) as exc:
+            # ModuleNotFoundError (a subclass of ImportError) is raised when a
+            # *parent* package is missing; treat every locate failure as "not
+            # this candidate" and try the next, never crash the validator.
+            spec = None
+            last = f"{type(exc).__name__}: {exc}"
+        else:
+            last = "module not found"
+        if spec is not None:
+            return True, "resolves"
+    return False, last
+
+
+def check_impl_paths(manifest: dict, in_repo: set[str], errors: list[str]) -> None:
+    """Flag `implementations[].path` callables whose in-repo module is missing.
+
+    Only `kind: callable` entries with a `path` are checked, and only when the
+    path's first dotted segment names a package/module that lives in this repo.
+    Descriptive or third-party callable paths (whose top-level package is not
+    shipped here) are skipped — exactly the way `examples` are skipped in
+    `check_refs` — because they are contracts, not in-repo wiring.
+    """
+    impls = manifest.get("implementations")
+    if not isinstance(impls, list):
+        return
+    for idx, impl in enumerate(impls):
+        if not isinstance(impl, dict):
+            continue
+        if impl.get("kind") != _CALLABLE_IMPL_KIND:
+            continue
+        path = impl.get("path")
+        if not isinstance(path, str) or not path:
+            continue
+        top = path.split(".", 1)[0]
+        if top not in in_repo:
+            continue  # third-party / descriptive contract, not ours to resolve
+        ok, reason = _callable_path_resolves(path)
+        if not ok:
+            errors.append(
+                f"  implementations[{idx}].path {path!r} does not resolve ({reason})"
+            )
+
+
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Validate Open Harness Hub manifests.")
     parser.add_argument(
@@ -197,6 +305,16 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--no-component-id-cache",
         action="store_true",
         help="Do not use dist/catalog-component-ids.json for selected-path global ref checks.",
+    )
+    parser.add_argument(
+        "--check-impl-paths",
+        action="store_true",
+        help=(
+            "Make a dangling in-repo implementations[].path callable a hard "
+            "failure. Without this flag the resolver still runs during release "
+            "scope (full run or --global-ref-check) but only warns, so the "
+            "current tree's not-yet-built stubs do not block the build."
+        ),
     )
     return parser.parse_args(argv)
 
@@ -238,6 +356,15 @@ def main(argv: list[str] | None = None) -> int:
     if args.paths and not run_ref_check:
         print("  note: global cross-component ref check skipped; use --global-ref-check for release validation")
     failures = 0
+    # In-repo callable-path resolution is release-scope (full run or
+    # --global-ref-check), like the cross-component ref check. Resolve the set
+    # of in-repo top-level packages once. Dangling in-repo callables are fatal
+    # only under --check-impl-paths; otherwise they are collected as warnings so
+    # not-yet-built stubs in the current tree do not block the build.
+    in_repo = _in_repo_top_levels() if run_ref_check else set()
+    if in_repo:
+        _ensure_root_importable()
+    impl_path_warnings: list[str] = []
 
     for path, manifest in manifests:
         rel = path.relative_to(ROOT)
@@ -274,6 +401,13 @@ def main(argv: list[str] | None = None) -> int:
             check_refs(manifest, known_ids, ref_errors)
             msg_errors.extend(ref_errors)
 
+            impl_errors: list[str] = []
+            check_impl_paths(manifest, in_repo, impl_errors)
+            if args.check_impl_paths:
+                msg_errors.extend(impl_errors)
+            else:
+                impl_path_warnings.extend(f"  {rel}\n  {line.lstrip()}" for line in impl_errors)
+
         if msg_errors:
             print(f"FAIL {rel}")
             for line in msg_errors:
@@ -281,6 +415,15 @@ def main(argv: list[str] | None = None) -> int:
             failures += 1
         else:
             print(f"  ok {rel}")
+
+    if impl_path_warnings:
+        print(
+            f"\nwarning: {len(impl_path_warnings)} in-repo implementations[].path "
+            "callable(s) do not resolve (not-yet-built stubs); pass "
+            "--check-impl-paths to make these fatal:"
+        )
+        for line in impl_path_warnings:
+            print(line)
 
     if failures:
         print(f"\n{failures} manifest(s) failed validation.")

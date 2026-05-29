@@ -49,6 +49,15 @@ CATALOG = ROOT / "catalog"
 # the main lever — a raw model adapter legitimately scores low on capability
 # lift (it is a transport, not a capability) and must not be culled for that.
 DEFAULT_LIFT_FLOOR = 0.20          # below this => effectively empty => cull
+# Single source for the "this is a heuristic, not a measurement" banner stamped on
+# every emitted decision + the report root. ``lift_score`` is a weighted sum of
+# structural/provenance/eval/domain SIGNALS used as a near-empty / filler prefilter;
+# it is NOT a measured pipeline-vs-bare delta. Stamping this on the published artifact
+# stops dist/reports/ readers (incl. acquirer diligence) quoting the score as a gain.
+HEURISTIC_NOTE = (
+    "heuristic prefilter quality score (weighted sum of the 'signals' below), "
+    "NOT a measured pipeline-vs-bare capability lift"
+)
 DEFAULT_SIMHASH_BITS = 64
 DEFAULT_LSH_BANDS = 4              # 4 x 16-bit bands over a 64-bit simhash
 DEFAULT_HAMMING_MAX = 3           # <= this distance within a band => near-dup
@@ -359,7 +368,14 @@ def run_gate(
             "path": str(path.relative_to(root)),
             "id": m.get("id"),
             "type": m.get("type"),
-            "lift": round(lift, 3),
+            # NOT measured capability lift. This is the structural/provenance
+            # PRE-FILTER heuristic from ``lift_score`` (the weighted sum of the
+            # ``signals`` below). Measured pipeline-vs-bare deltas live on the
+            # candidate ``lift`` dict produced by Stage 5 / scripts.foundry.gate,
+            # never here. Field renamed from "lift" so diligence readers of
+            # dist/reports/ cannot quote it as a measured gain — see HEURISTIC_NOTE.
+            "heuristic_quality_score": round(lift, 3),
+            "this_is_not_measured_lift": HEURISTIC_NOTE,
             "signals": {k: round(v, 3) for k, v in signals.items()},
             "filler_markers": marks,
             "tracked": is_tracked,
@@ -400,6 +416,9 @@ def run_gate(
         root_label = str(root)
     return {
         "root": root_label,
+        # Top-level banner so a reader of dist/reports/ cannot mistake the
+        # per-decision ``heuristic_quality_score`` for a measured capability gain.
+        "score_meaning": HEURISTIC_NOTE,
         "lift_floor": lift_floor,
         "total": len(decisions),
         "keep": len(kept),

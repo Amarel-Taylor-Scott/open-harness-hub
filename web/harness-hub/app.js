@@ -16,6 +16,50 @@
   };
   var MODALITIES = [["text", "Text", "⌶"], ["image", "Image", "◰"], ["audio", "Audio", "◵"], ["video", "Video", "▷"]];
 
+  // ---------------- canonical marketing nav (single source — exposed on window.OHH) ----------------
+  // The marketing header (wordmark + top nav + Sign in / Get started) is otherwise hand-duplicated
+  // across index.html and every web/pages/*.js shell, and the copies have already drifted (the
+  // landing shows Compare while sub-pages drop it and add Workspace). To kill that drift the list
+  // and the header HTML are defined ONCE here and read everywhere via OHH.MKT_NAV / OHH.mktHeader().
+  // Canonical order is the landing header in index.html. No-magic-values: the wordmark mark SVG is
+  // part of the same duplicated header, so it lives here too (OHH.MKT_MARK_SVG) rather than being
+  // re-pasted per file. Pages opt in by replacing their local mktHeader()/MKT_NAV with these.
+  var MKT_MARK_SVG = '<span class="oh-mark" aria-hidden="true">' +
+    '<svg width="18" height="18" viewBox="0 0 18 18" fill="none">' +
+    '<rect x="1" y="6" width="6" height="6" rx="1.4" fill="currentColor" />' +
+    '<path d="M9 9h3.5" stroke="currentColor" stroke-width="1.4" />' +
+    '<rect x="11" y="3" width="6" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.4" transform="rotate(45 14 6)" />' +
+    '</svg></span>';
+  // [route, label] — keep in sync with the <nav> in index.html (the landing is the source of truth).
+  var MKT_NAV = [
+    ["/pipelines", "Explore"],
+    ["/compare",   "Compare"],
+    ["/solutions", "SDG solutions"],
+    ["/pricing",   "Pricing"],
+    ["/docs",      "Docs"],
+    ["/trust",     "Trust"]
+  ];
+  // The full marketing header. `active` is the route of the current page (e.g. "/trust"); the
+  // matching link is emphasised. Right side carries Sign in (ghost) + Get started (primary CTA),
+  // wrapped in the same flex group the catalog header already uses.
+  function mktHeader(active) {
+    var nav = MKT_NAV.map(function (p) {
+      var on = p[0] === active;
+      return '<a data-nav="' + esc(p[0]) + '"' +
+        (on ? ' style="color:var(--fg);font-weight:600"' : "") +
+        ">" + esc(p[1]) + "</a>";
+    }).join("");
+    return '<header class="pt-mkt-top">' +
+      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MKT_MARK_SVG + " Open Harness Hub</div>" +
+      "<nav>" + nav + "</nav>" +
+      '<span class="pt-spacer"></span>' +
+      '<div style="display:flex;gap:9px">' +
+      '<button class="oh-btn oh-btn--ghost oh-btn--sm" data-nav="/signin">Sign in</button>' +
+      '<button class="oh-btn oh-btn--primary oh-btn--sm" data-nav="/signup">Get started</button>' +
+      "</div>" +
+    "</header>";
+  }
+
   var EX_BY_MOD = {
     text: [
       "Detect human-exploitation indicators in a Hong Kong → Philippines recruitment ad",
@@ -516,7 +560,8 @@
 
   // ---------------- boot ----------------
   window.OHH = window.OHH || {};
-  Object.assign(window.OHH, { register: register, navigate: navigate, toast: toast, log: logEvent, PRIMS: PRIMS, MODALITIES: MODALITIES, esc: esc, renderRoute: renderRoute, state: state });
+  Object.assign(window.OHH, { register: register, navigate: navigate, toast: toast, log: logEvent, PRIMS: PRIMS, MODALITIES: MODALITIES, esc: esc, renderRoute: renderRoute, state: state,
+    MKT_NAV: MKT_NAV, MKT_MARK_SVG: MKT_MARK_SVG, mktHeader: mktHeader });
   applyScheme();
   initLanding();
   buildSwitcher();
