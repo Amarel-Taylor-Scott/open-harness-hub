@@ -1,0 +1,52 @@
+id: processor/drug-interaction-checker
+type: processor
+version: 0.1.0
+name: Drug-interaction checker
+description: 'Deterministic lookup of every drug pair in a medication list against a governed interaction
+  corpus (e.g. warfarin × azole-antifungals → CYP2C9 → major). Returns severity-tiered hits with the corpus
+  citation + a prescriber-flag action — never a model guess about safety.
+
+
+  Clinical decision-SUPPORT component — DEFENSIVE only: grounds on a governed corpus, fires a deterministic
+  gate, and/or routes to a clinician; never autonomous medical advice. Lift is measured at the pipeline
+  level.'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- healthcare
+capability:
+- verification
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- clinical
+- decision-support
+- deterministic-gate
+- freezable
+- governed
+created: '2026-05-29'
+updated: '2026-05-29'
+process_kind: verify.drug_interaction
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: med_list
+  type: object
+- name: interaction_corpus
+  type: object
+outputs:
+- name: interactions
+  type: object
+- name: severity
+  type: object
+side_effects: read
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.clinical.drug_interaction_checker.run
+  language: python

@@ -1,0 +1,54 @@
+id: processor/clinical-redflag-screen
+type: processor
+version: 0.1.0
+name: Clinical red-flag screen
+description: 'Deterministic pattern screen over a clinical note + vitals for time-critical RED-FLAG syndromes
+  (ACS: chest pain + radiation + diaphoresis; sepsis: qSOFA; stroke: FAST; PE). On a fired flag it ESCALATES
+  to a clinician and forbids reassurance — decision-support, not a diagnosis. The bare model''s most dangerous
+  failure is missing these; this gate catches them with no model call.
+
+
+  Clinical decision-SUPPORT component — DEFENSIVE only: grounds on a governed corpus, fires a deterministic
+  gate, and/or routes to a clinician; never autonomous medical advice. Lift is measured at the pipeline
+  level.'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- healthcare
+capability:
+- safety_gating
+- classification
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- clinical
+- decision-support
+- deterministic-gate
+- freezable
+- governed
+created: '2026-05-29'
+updated: '2026-05-29'
+process_kind: gate.clinical_redflag
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: note
+  type: object
+- name: vitals
+  type: object
+outputs:
+- name: red_flags
+  type: object
+- name: escalate
+  type: object
+side_effects: none
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.clinical.clinical_redflag_screen.run
+  language: python

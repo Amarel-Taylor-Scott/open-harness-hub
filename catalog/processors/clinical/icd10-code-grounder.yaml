@@ -1,0 +1,53 @@
+id: processor/icd10-code-grounder
+type: processor
+version: 0.1.0
+name: ICD-10 code grounder
+description: 'Resolve each candidate diagnosis to an ICD-10-CM code via exact-id lookup against a terminology
+  corpus and link it to the documented evidence span. Undocumented diagnoses are left UNCODED (abstain)
+  — eliminates the bare model''s habit of fabricating plausible-but-wrong codes.
+
+
+  Clinical decision-SUPPORT component — DEFENSIVE only: grounds on a governed corpus, fires a deterministic
+  gate, and/or routes to a clinician; never autonomous medical advice. Lift is measured at the pipeline
+  level.'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- healthcare
+capability:
+- extraction
+- verification
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- clinical
+- decision-support
+- deterministic-gate
+- freezable
+- governed
+created: '2026-05-29'
+updated: '2026-05-29'
+process_kind: coerce.icd_ground
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: diagnoses
+  type: object
+- name: terminology_corpus
+  type: object
+outputs:
+- name: codes
+  type: object
+- name: abstained
+  type: object
+side_effects: read
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.clinical.icd10_code_grounder.run
+  language: python
