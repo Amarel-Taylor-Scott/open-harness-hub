@@ -22,6 +22,7 @@ import argparse
 import json
 import time
 from collections import deque
+from pathlib import Path
 from typing import Any, Callable, Protocol, runtime_checkable
 
 from scripts.foundry.contracts import Candidate
@@ -70,7 +71,16 @@ class InMemoryQueue:
 
 
 def _default_foundry() -> Foundry:
-    """A foundry with the offline local scout; `route` wiring happens per-job in the worker."""
+    """A foundry with a REAL source scout: the live `WebSourceScout` over the source
+    registry (`data/source-registry.jsonl`) when present, else the offline LocalSourceScout.
+    (`route` wiring happens per-job in the worker.)"""
+    from scripts.foundry.scrapers import DEFAULT_REGISTRY, WebSourceScout
+    reg = Path(DEFAULT_REGISTRY)
+    if reg.exists():
+        registry = [json.loads(ln) for ln in reg.read_text(encoding="utf-8").splitlines()
+                    if ln.strip() and not ln.startswith("#")]
+        if registry:
+            return Foundry(sources=SourceStage(WebSourceScout(registry)))
     return Foundry(sources=SourceStage(LocalSourceScout()))
 
 

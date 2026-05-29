@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import time
 from collections import Counter, defaultdict
@@ -117,6 +118,30 @@ class JsonlSink:
         if not self.path.exists():
             return []
         return [json.loads(ln) for ln in self.path.read_text(encoding="utf-8").splitlines() if ln.strip()]
+
+
+class StoreSink:
+    """Persist interactions to the foundry Store (DB) — the production sink. Same `Store`
+    that holds the row families, so interactions live in the experience DB, not a file."""
+
+    def __init__(self, store: Any, *, table: str = "interaction_record") -> None:
+        self.store = store
+        self.table = table
+
+    def write(self, record: dict) -> None:
+        self.store.write(self.table, [record])
+
+    def read(self) -> list[dict]:
+        return self.store.read(self.table, limit=100000)
+
+
+def sink_from_env() -> Sink:
+    """Pick the interaction sink: the Store (DB) when configured, else a local JSONL file —
+    the same local→cloud switch as everything else (env only)."""
+    if os.environ.get("DATABASE_URL") or os.environ.get("OH_STORE"):
+        from scripts.foundry.store import from_env as store_from_env
+        return StoreSink(store_from_env())
+    return JsonlSink(os.environ.get("OH_INTERACTIONS_PATH", "dist/interactions.jsonl"))
 
 
 class InteractionLog:
@@ -251,6 +276,17 @@ def _self_test() -> int:
         log.log(Interaction(kind="search", query="hello", ts="t", consent=True))
         check("consented interaction stored (redacted)", len(sink.read()) == 1 and sink.read()[0]["query"] == "hello")
 
+        # StoreSink → the DB, and DemandMiner reads demand back out of it (no file placeholder)
+        from scripts.foundry.store import SqliteStore
+        st = SqliteStore(Path(tmp) / "ix.sqlite")
+        slog = InteractionLog(StoreSink(st))
+        for i in range(3):
+            slog.log(Interaction(kind="search", query="EUDR polygon validator", ts=f"t{i}",
+                                 result={"zero_result": True}, consent=True))
+        check("StoreSink persists interactions to the DB", st.count("interaction_record") == 3)
+        mined = DemandMiner().mine(StoreSink(st).read())
+        check("demand mined from the DB store", any(u["query"] == "eudr polygon validator" for u in mined["unmet"]), str(mined["unmet"]))
+
     # demand mining: an unmet, repeated, zero-result query ⇒ capability-request + area
     ixs = []
     for i in range(3):
@@ -282,12 +318,18 @@ def _main(argv: list[str] | None = None) -> int:
     import argparse
     p = argparse.ArgumentParser(description="Foundry interactions — log + mine user demand.")
     p.add_argument("--self-test", action="store_true")
-    p.add_argument("--mine", help="path to an interactions JSONL sink to mine for demand")
+    p.add_argument("--mine", nargs="?", const="store", default=None,
+                   help="mine demand: `--mine` reads the DB store; `--mine PATH` reads a JSONL sink")
     args = p.parse_args(argv)
     if args.self_test:
         return _self_test()
-    if args.mine:
-        out = DemandMiner().mine(JsonlSink(args.mine).read())
+    if args.mine is not None:
+        if args.mine == "store":
+            from scripts.foundry.store import from_env as store_from_env
+            recs = store_from_env().read("interaction_record", limit=100000)
+        else:
+            recs = JsonlSink(args.mine).read()
+        out = DemandMiner().mine(recs)
         print(json.dumps({"unmet": len(out["unmet"]),
                           "capability_requests": out["capability_requests"],
                           "research_queue": out["research_queue"],

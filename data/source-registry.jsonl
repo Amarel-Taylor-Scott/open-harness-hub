@@ -1,0 +1,19 @@
+# Source registry — gap-keyword → authoritative source (read by scripts.foundry.scrapers.WebSourceScout
+# and by the worker's default foundry). One JSON object per line; '#' lines are comments.
+#
+# How matching works: WebSourceScout.find() lowercases (gap.summary + source_hints + industry) and
+# matches an entry if ANY of its `keywords` is a substring. So key on the gov domain and/or industry
+# from data/research-queue/areas.jsonl. Live scrape needs network; offline the fetch fails closed.
+#
+# `gov: true` ⇒ publisher_class=public_authority ⇒ openness.classify = OPEN content; a `freshness:volatile`
+# corpus is then billed as live_subscription delivery by access.py (the maintained feed is the product).
+#
+# NOTE on parsing: the default parse_facts() strips tags + splits on blank lines — good for HTML/text
+# pages. JSON APIs (eCFR versioner) parse as one blob and want a per-source parser (see the capstone's
+# custom json parse); they're registered here as verified-fetchable targets, flagged `"format": "json"`.
+{"keywords": ["ecfr.gov", "code of federal regulations", "cfr ", "federal regulation"], "url": "https://www.ecfr.gov/api/versioner/v1/titles.json", "author": "U.S. Government (eCFR)", "license": "Public domain (U.S. Government work)", "source_kind": "regulation", "gov": true, "format": "json", "name": "U.S. Code of Federal Regulations — titles + amendment dates (eCFR)", "verified_fetch": "2026-05-28 capstone"}
+{"keywords": ["bsp.gov.ph", "amlc.gov.ph", "financial-crime"], "url": "https://www.bsp.gov.ph/SitePages/Regulations/Issuances.aspx", "author": "Bangko Sentral ng Pilipinas", "license": "Government work (PH)", "source_kind": "regulation", "gov": true, "industry": ["financial-crime"], "name": "BSP regulatory issuances (PH AML / covered-person rules)"}
+{"keywords": ["dole.gov.ph", "labor"], "url": "https://www.dole.gov.ph/issuances/", "author": "Department of Labor and Employment (PH)", "license": "Government work (PH)", "source_kind": "regulation", "gov": true, "industry": ["labor"], "name": "DOLE labor advisories & department orders"}
+{"keywords": ["oshc.dole.gov.ph", "bwc.dole.gov.ph", "occupational-safety"], "url": "https://oshc.dole.gov.ph/", "author": "Occupational Safety and Health Center (PH)", "license": "Government work (PH)", "source_kind": "regulation", "gov": true, "industry": ["occupational-safety"], "name": "PH OSH Standards (RA 11058) — OSHC"}
+{"keywords": ["ofac.treasury.gov", "sanctions"], "url": "https://ofac.treasury.gov/recent-actions", "author": "U.S. Treasury OFAC", "license": "Public domain (U.S. Government work)", "source_kind": "regulation", "gov": true, "industry": ["sanctions"], "name": "OFAC recent actions (sanctions list deltas)"}
+{"keywords": ["eur-lex.europa.eu", "ai-governance", "eu ai act"], "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689", "author": "European Union (EUR-Lex)", "license": "© European Union, reuse authorised (Decision 2011/833/EU)", "source_kind": "regulation", "gov": true, "industry": ["ai-governance"], "name": "Regulation (EU) 2024/1689 — EU AI Act (consolidated)"}

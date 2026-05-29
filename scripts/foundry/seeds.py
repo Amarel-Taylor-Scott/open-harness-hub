@@ -228,6 +228,25 @@ def run_cycle(*, areas_path: str | Path = AREAS_PATH, ledger_path: str | Path = 
 # --------------------------------------------------------------------------- #
 # self-test (offline)
 # --------------------------------------------------------------------------- #
+def enqueue_partitions(*, areas_path: str | Path = AREAS_PATH, queue=None, with_fixture: bool = False) -> int:
+    """Put one partition job per research-queue area onto the queue (the web tier / cron does
+    this; workers drain it). Closes the enqueue → worker → store loop. Returns jobs enqueued."""
+    from scripts.foundry.queues import from_env as queue_from_env
+
+    q = queue if queue is not None else queue_from_env()
+    n = 0
+    if with_fixture:   # a guaranteed-promoting partition for smoke-testing the worker
+        from scripts.foundry.pipeline import _fixture
+        q.enqueue({"partition": "fixture-esg-csddd", "kind": "synthetic_demo",
+                   "gaps": [c.gap for c in _fixture()[1]]})
+        n += 1
+    for cand in load_areas(areas_path):
+        gap = cand.gap
+        q.enqueue({"partition": gap.get("id", "area").replace("gap/", ""), "kind": "real", "gaps": [gap]})
+        n += 1
+    return n
+
+
 def _self_test() -> int:
     import tempfile
 
@@ -257,6 +276,13 @@ def _self_test() -> int:
                                     "confident_hallucination": 0.1}) + "\n", encoding="utf-8")
         seeds = load_areas(ap)
         check("load_areas skips comments/blanks → 2 gaps", len(seeds) == 2, str(len(seeds)))
+
+        # enqueue: one partition job per area (+ optional fixture) onto the queue
+        from scripts.foundry.worker import InMemoryQueue
+        q = InMemoryQueue()
+        n = enqueue_partitions(areas_path=ap, queue=q, with_fixture=True)
+        check("enqueue_partitions: a job per area + the fixture", n == len(seeds) + 1 and len(q) == n, f"n={n} depth={len(q)}")
+        check("enqueued jobs carry gaps", (q.pull() or {}).get("gaps") is not None)
 
         # LocalSourceScout finds a permissive local source + loads facts
         src_file = Path(tmp) / "aml.jsonl"
@@ -298,11 +324,20 @@ def _main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description="Foundry seeds — real research-queue cycle + ledger.")
     p.add_argument("--self-test", action="store_true")
     p.add_argument("--run", action="store_true", help="run one real cycle and append to the ledger")
+    p.add_argument("--enqueue", action="store_true", help="enqueue one partition job per research-queue area")
+    p.add_argument("--with-fixture", action="store_true", help="(with --enqueue) also enqueue the fixture partition")
     p.add_argument("--areas", default=str(AREAS_PATH))
     p.add_argument("--ledger", default=str(LEDGER_PATH))
     args = p.parse_args(argv)
     if args.self_test:
         return _self_test()
+    if args.enqueue:
+        from scripts.foundry.queues import from_env as queue_from_env
+        q = queue_from_env()
+        n = enqueue_partitions(areas_path=args.areas, queue=q, with_fixture=args.with_fixture)
+        print(json.dumps({"enqueued": n, "queue": type(q).__name__,
+                          "depth": q.depth() if hasattr(q, "depth") else None}))
+        return 0
     if args.run:
         lines = run_cycle(areas_path=args.areas, ledger_path=args.ledger)
         for ln in lines:
