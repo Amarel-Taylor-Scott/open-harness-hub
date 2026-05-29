@@ -24,6 +24,12 @@ _STATIC_TYPES = {".html": "text/html; charset=utf-8", ".js": "application/javasc
                  ".css": "text/css; charset=utf-8", ".svg": "image/svg+xml", ".json": "application/json",
                  ".png": "image/png", ".woff2": "font/woff2", ".ico": "image/x-icon", ".map": "application/json"}
 
+# A server instance can pin ONE product (OH_PRODUCT=harness-hub | context-enrichment); index.html is
+# then served with window.__OH_PRODUCT__ injected so a tunnel / domain resolves to that brand without a
+# ?product= query param (the two-products model — see web/products.js, scripts/serve_two_products.sh).
+# Empty = unpinned (the front-end resolves by hostname, then default).
+OH_PRODUCT = os.environ.get("OH_PRODUCT", "").strip()
+
 
 class Handler(BaseHTTPRequestHandler):
     index: Index = None  # type: ignore
@@ -53,10 +59,24 @@ class Handler(BaseHTTPRequestHandler):
         self._send(200, target.read_bytes(), _STATIC_TYPES.get(target.suffix, "application/octet-stream"))
         return True
 
+    def _serve_index(self) -> bool:
+        """Serve web/index.html, injecting window.__OH_PRODUCT__ when this instance pins a product
+        (OH_PRODUCT env). Lets a tunnel resolve to one brand with no query param. Plain static if unpinned."""
+        target = (WEB_DIR.resolve() / "index.html")
+        if not target.is_file():
+            return False
+        if not OH_PRODUCT:
+            return self._serve_static("index.html")
+        html = target.read_text(encoding="utf-8")
+        inject = "<script>window.__OH_PRODUCT__=%s</script>\n<script src=\"products.js\"></script>" % json.dumps(OH_PRODUCT)
+        html = html.replace('<script src="products.js"></script>', inject, 1)
+        self._send(200, html.encode("utf-8"), "text/html; charset=utf-8")
+        return True
+
     def do_GET(self) -> None:  # noqa: N802
         parsed = urlparse(self.path)
         if parsed.path in ("/", "/index.html"):
-            if self._serve_static("index.html"):
+            if self._serve_index():
                 return
             self._send(200, HTML.encode("utf-8"), "text/html; charset=utf-8")  # fallback if web/ absent
         elif parsed.path in ("/app.js", "/data.js", "/products.js") or parsed.path.startswith("/styles/") or parsed.path.startswith("/pages/"):

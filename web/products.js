@@ -35,9 +35,11 @@
   };
   var DEFAULT_ID = "harness-hub";
 
-  // Resolve the active product: explicit ?product= override (preview) → hostname → default.
+  // Resolve the active product: server pin (window.__OH_PRODUCT__, set per domain/tunnel) →
+  // explicit ?product= override (preview) → hostname → default.
   function resolveId() {
     try {
+      if (window.__OH_PRODUCT__ && PRODUCTS[window.__OH_PRODUCT__]) return window.__OH_PRODUCT__;
       var q = (window.location.search || "");
       var m = q.match(/[?&]product=([a-z0-9-]+)/);
       if (m && PRODUCTS[m[1]]) return m[1];

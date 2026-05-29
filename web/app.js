@@ -519,6 +519,17 @@
   Object.assign(window.OHH, { register: register, navigate: navigate, toast: toast, log: logEvent, PRIMS: PRIMS, MODALITIES: MODALITIES, esc: esc, renderRoute: renderRoute, state: state });
   applyScheme();
   initLanding();
+  // Pinned-product landing: a tunnel/domain pinned to a non-default product (e.g. Context Enrichment,
+  // via window.__OH_PRODUCT__) opens ITS home, not the Open Harness Hub builder. Set the route + hide
+  // the static landing up front — done BEFORE the hashchange listener so no premature render fires;
+  // the boot renderRoute() below paints the real page. Only forced on initial load (empty hash).
+  (function () {
+    var home = (window.OHH && OHH.product && OHH.product().home) || "/";
+    if (home !== "/" && (!location.hash || location.hash === "#" || location.hash === "#/")) {
+      location.hash = "#" + home;
+      Array.prototype.forEach.call(document.querySelectorAll("#root > [data-route]"), function (el) { el.style.display = "none"; });
+    }
+  })();
   buildSwitcher();
   buildActivityLog();
   window.addEventListener("hashchange", renderRoute);
