@@ -383,6 +383,26 @@ def harness_recipe(task: str, kept: list[dict]) -> list[dict]:
               "data store + view", "dashboard widget", "cache", "conversational memory"],
              "run store (trace)"),
     ]
+    # No placeholders: wire each built-in step to its canonical REAL catalog component where one
+    # exists (single source: catalog/processors/{retrieval,deliver,platform}/). See
+    # docs/concepts/recipe-component-map.md.
+    canon = {
+        "Build the system prompt": "processor/system-prompt-builder",
+        "Query transform": "processor/hyde-query-expander",
+        "Chunk": "processor/recursive-character-chunker",
+        "Rerank / fuse": "processor/cross-encoder-reranker",
+        "Summarize / compress": "processor/extractive-span-selector",
+        "Select · order · de-conflict": "processor/source-precedence-select",
+        "Render the model-query template": "processor/context-placer-edge",
+        "Prompt-injection check": "processor/prompt-injection-screen",
+        "Verify JSON (recover if malformed)": "processor/json-repair-coerce",
+        "Deliver / emit": "processor/deliver-return",
+        "Persist to platform storage": "processor/persist-run-store",
+    }
+    for s in recipe:
+        if s.get("builtin") and s["name"] in canon:
+            s["ref"] = canon[s["name"]]
+            s["builtin"] = False
     return recipe
 
 

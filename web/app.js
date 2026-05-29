@@ -234,6 +234,19 @@
     { phase: "deliver", tier: "default", level: 1, k: "action", name: "Deliver / emit", role: "send the result OUTBOUND to a destination", builtin: true, options: ["return to caller", "webhook", "email", "SMS", "report (md / pdf)", "notify / alert", "escalate → human"], "default": "return to caller" },
     { phase: "platform", tier: "optional", level: 1, k: "action", name: "Persist to platform storage", role: "save the result + trace on-platform for reuse, search & monitoring", builtin: true, options: ["run store (trace)", "object store", "pgvector index", "postgres table", "component registry", "data store + view", "dashboard widget", "cache", "conversational memory"], "default": "run store (trace)" }
   ];
+  // No placeholders: wire each built-in sample step to its canonical real component (mirrors
+  // scripts/showcase/builder.py::harness_recipe canon; see docs/concepts/recipe-component-map.md).
+  (function () {
+    var canon = {
+      "Build the system prompt": "processor/system-prompt-builder", "Query transform": "processor/hyde-query-expander",
+      "Chunk": "processor/recursive-character-chunker", "Rerank / fuse": "processor/cross-encoder-reranker",
+      "Summarize / compress": "processor/extractive-span-selector", "Select · order · de-conflict": "processor/source-precedence-select",
+      "Render the model-query template": "processor/context-placer-edge", "Prompt-injection check": "processor/prompt-injection-screen",
+      "Verify JSON (recover if malformed)": "processor/json-repair-coerce", "Deliver / emit": "processor/deliver-return",
+      "Persist to platform storage": "processor/persist-run-store"
+    };
+    STATIC_RECIPE.forEach(function (s) { if (!s.ref && canon[s.name]) { s.ref = canon[s.name]; s.builtin = false; } });
+  })();
   var previewTimer = null;
   function primKey(stage) { var k = String(stage || "").toLowerCase().split(/[\s/]/)[0]; return PRIMS[k] ? k : "action"; }
   var _CHIP = { IF: "oh-badge--warn", ALWAYS: "oh-badge--verified", DEFAULT: "oh-badge--lift", OPTIONAL: "oh-badge--muted", META: "oh-badge--muted" };
