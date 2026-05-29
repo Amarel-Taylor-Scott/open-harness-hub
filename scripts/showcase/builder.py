@@ -488,31 +488,44 @@ def build_flow(task: str, index: Index, narrate: bool = True) -> dict:
     cache_key = ("brief::" if not narrate else "") + " ".join(task.lower().split())
     if cache_key in _FLOW_CACHE:
         return {**_FLOW_CACHE[cache_key], "cached": True}
+    from scripts.showcase.jsonlog import Trace
+    tr = Trace("build")
+    tr.add("build.start", task=task[:120])
     route = resolve_route()
     pool = _stratified_pool(index, task)
+    tr.add("retrieve.pool", level="ok", candidates=len(pool), embedding=describe_backend().get("backend"))
     kept, dropped, sel_llm = orchestrate(task, pool, route)
+    tr.add("orchestrate", level="ok", selected=len(kept), dropped=len(dropped),
+           selection=("model" if sel_llm else "deterministic"))
     # Back-fill a model boundary (by TYPE) if the pool had one but selection skipped it.
     if not any(c["type"] in ("harness", "pipeline") for c in kept):
         for c in pool:
             if c["type"] in ("pipeline", "harness"):
                 kept.append({**c, "stage": stage_for_type(c["type"]), "role": label_for_type(c["type"])})
+                tr.add("backfill.model_boundary", level="warn", added=c["id"])
                 break
         kept.sort(key=lambda c: STAGE_ORDER.index(c["stage"]) if c.get("stage") in STAGE_ORDER else 99)
     cost = estimate_cost(kept)
+    recipe = harness_recipe(task, kept)
+    tr.add("assemble.recipe", level="ok", recipe_steps=len(recipe), components=len(kept),
+           cost_per_task=cost["balanced"]["per_task_usd"])
     analysis = analyze_match(kept, pool)
     if narrate:
         narrative, narr_llm = llm_narrative(task, kept, cost)
     else:
         narrative, narr_llm = deterministic_narrative(task, kept, cost), False
+    tr.add("build.done", level="ok", output=_output_name(task), output_type=_output_type(task),
+           llm_used=(sel_llm or narr_llm))
     result = {
         "task": task,
-        "flow": {"steps": kept, "stages": flowchart(task, kept), "recipe": harness_recipe(task, kept),
+        "flow": {"steps": kept, "stages": flowchart(task, kept), "recipe": recipe,
                  "dropped": dropped, "analysis": analysis},
         "cost": cost,
         "narrative": narrative,
         "llm_used": (sel_llm or narr_llm),
         "selection_by_model": sel_llm,
         "embedding": describe_backend(),
+        "log": tr.events,
         "cached": False,
     }
     if len(_FLOW_CACHE) > 500:  # bounded

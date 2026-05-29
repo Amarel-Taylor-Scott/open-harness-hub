@@ -325,7 +325,7 @@
   function pillBadge(cls, txt) {
     return '<span class="oh-badge ' + cls + '" style="text-transform:uppercase;letter-spacing:.05em;font-size:9.5px;padding:3px 8px">' + txt + "</span>";
   }
-  function checklistHtml(doneCount, resolved, secsVal) {
+  function checklistHtml(doneCount, resolved, secsVal, details) {
     var html = '<div class="pt-panel" style="padding:6px 16px 12px">';
     BUILD_STEPS.forEach(function (s, i) {
       var done = i < doneCount, active = (i === doneCount && !resolved);
@@ -335,16 +335,28 @@
       var clock = (active && i === BUILD_STEPS.length - 1) ? ' <span style="color:var(--fg-faint);font-family:var(--font-mono)">(' + secsVal + "s)</span>" : "";
       var badge = done ? pillBadge("oh-badge--lift", "done") : active ? pillBadge("oh-badge--muted", "working…") : "";
       var prog = '<div class="oh-prog ' + (done ? "is-done" : active ? "is-indet" : "") + '" style="margin-top:8px"><i></i></div>';
+      var detail = (details && details[i]) ? '<div style="font-family:var(--font-mono);font-size:10px;color:var(--fg-faint);margin-top:5px">' + esc(details[i]) + "</div>" : "";
       html += '<div style="padding:10px 0' + (i < BUILD_STEPS.length - 1 ? ";border-bottom:1px solid var(--line)" : "") + '">' +
         '<div style="display:flex;align-items:center;gap:9px;font-size:13px;color:' + col + '">' +
         '<span style="width:13px;text-align:center;color:' + mcol + '">' + mark + "</span>" +
-        '<span style="flex:1">' + s + clock + "</span>" + badge + "</div>" + prog + "</div>";
+        '<span style="flex:1">' + s + clock + "</span>" + badge + "</div>" + prog + detail + "</div>";
     });
     return html + "</div>";
   }
+  // per-step detail derived from the backend's structured log (what each step actually did)
+  function buildDetails(d) {
+    var by = {}; ((d && d.log) || []).forEach(function (e) { by[e.event] = e; });
+    var pool = by["retrieve.pool"], asm = by["assemble.recipe"], done = by["build.done"];
+    return [
+      "task parsed → output type " + ((done && done.output_type) || "structured"),
+      pool ? (pool.candidates + " candidate components scanned · embedding=" + (pool.embedding || "?")) : "",
+      asm ? (asm.components + " components · " + asm.recipe_steps + " recipe steps") : "",
+      asm ? ("est. $" + asm.cost_per_task + " / run · " + ((done && done.llm_used) ? "AI-selected" : "deterministic")) : ""
+    ];
+  }
   function previewResultHtml(task, flowData) {
     var inner = flowData ? realFlowPanel(flowData) : staticFlowPanel();
-    return previewHead(true, task) + checklistHtml(BUILD_STEPS.length, true, 0) +
+    return previewHead(true, task) + checklistHtml(BUILD_STEPS.length, true, 0, buildDetails(flowData)) +
       '<div class="pt-panel" style="margin-top:16px">' + inner + "</div>" + signupCard();
   }
   function renderPreview() {
@@ -366,6 +378,7 @@
         if (_preview.task !== task) return;   // task changed mid-flight — ignore stale result
         _preview.state = "loaded"; _preview.data = d; clearTimeout(previewTimer);
         var n = (d.flow && d.flow.recipe) ? (d.flow.recipe.length + 2) : "?";
+        (d.log || []).forEach(function (e) { logRecord(e); });   // stream the backend's structured events to the console
         logEvent("flow ready · " + n + " steps · " + secs() + "s" + (d.llm_used ? " · AI-selected" : " · deterministic"), "ok");
         page.innerHTML = previewResultHtml(task, d);
       })
@@ -421,6 +434,14 @@
     ACTIVITY.push({ t: _ts(), msg: String(msg), level: level || "info" });
     if (ACTIVITY.length > 200) ACTIVITY.shift();
     renderActivity();
+  }
+  // render a STRUCTURED backend record ({event, level, ms, ...fields}) as a console line
+  function logRecord(rec) {
+    if (!rec || !rec.event) return;
+    var skip = { event: 1, level: 1, ts: 1, request: 1 };
+    var parts = [];
+    Object.keys(rec).forEach(function (k) { if (!skip[k]) parts.push(k + "=" + rec[k]); });
+    logEvent(rec.event + (parts.length ? " · " + parts.join(" ") : ""), rec.level || "info");
   }
   function renderActivity() {
     if (!_actEls) return;
