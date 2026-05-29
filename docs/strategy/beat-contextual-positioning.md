@@ -84,6 +84,31 @@ signing our corpus isn't cloned overnight), (b) the operational muscle of advers
 (c) depth in domains they'd never prioritize. Guard: never let one platform's ingest API be the only
 channel (that's why stance 3 exists).
 
+## Orchestration is TABLE STAKES — the moat is orthogonal (+ the naming call)
+**Factual correction — do NOT anchor here:** Contextual shipped **Agent Composer (Jan 2026)** — multi-step
+reasoning, a tool library (plan / retrieve / ingest / act / eval / memory), guardrails, stateful context.
+**They are building the harness/orchestration layer.** So "we have logic + actions, they only retrieve" is
+**eroding** — it must NOT be the pitch. (Update from the Jan-2026 launch: Agent Composer ships a
+**Task Execution** pre-built agent that *executes API write actions across enterprise systems*, plus
+multi-tool orchestration, three build paths (pre-built / from-prompt / drag-drop canvas), and it's
+**model-agnostic** — so even "we have actions, they don't" is eroding. Their actions stay curated and
+grounding-centric inside their context layer; *general* automation is still Composio/Make/MCP — but do
+NOT pitch "they only retrieve" or "we orchestrate, they don't." Build-UX + orchestration + actions are
+now table stakes they have.)
+**The durable moat is ORTHOGONAL to orchestration** — the two things they structurally won't match:
+(1) **open / portable / low-end** (OHH for the devs they treat as a funnel), and (2) **verified context**
+(CEaaS checking the corpus vs authoritative truth). Orchestration is becoming commodity; *whose context is
+provably correct* is not.
+
+**Naming (the call): keep "Open Harness Hub" — do NOT rename to "Open Agent Hub."** The whole two-product
+split depends on the harness-vs-agent line (OHH = the *bounded, governed harness*; CEaaS serves verified
+context *into* open agents); "Open Agent Hub" collapses it and drops us into the most crowded, commoditizing
+category (LangGraph/CrewAI/AutoGPT). "Harness" is distinctive + precise for technical buyers (and "eval
+harness"/"agent harness" are established terms — lineage, not liability). **But use "agent" in taglines /
+positioning / SEO** for findability — distinctive name for the *what*, popular word for *discoverability*:
+e.g. *"Open Harness Hub — governed agents you can actually trust"* / "the governance layer for agents."
+Bridge term when "harness" needs a gloss: **"governed agents."** Reversible (brand is config).
+
 ## The demand is real (RAG-failure sentiment)
 - **62%** of enterprise RAG deployments hit hallucination incidents **at least weekly**.
 - **58%** update their vector indexes **monthly or less** (a bot recommended a wire-transfer limit a
