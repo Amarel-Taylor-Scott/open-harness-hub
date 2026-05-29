@@ -214,14 +214,17 @@
     { phase: "gate", tier: "default", level: 1, k: "conditional", name: "Pattern packs — qualify", role: "combinable keyword/regex packs that admit the input", ref: "rule-pack/trafficking-indicators" },
     { phase: "gate", tier: "optional", level: 1, k: "stop", name: "Anti-pattern packs — disqualify", role: "combinable packs that screen the input out (false-positive guards)", builtin: true },
     { phase: "pre", tier: "default", level: 1, k: "action", name: "Add persona", role: "the role / expertise the model adopts", ref: "persona/exploitation-analyst" },
-    { phase: "pre", tier: "default", level: 1, k: "action", name: "Build the system prompt", role: "instructions, constraints + output schema (separate from persona)", builtin: true },
-    { phase: "pre", tier: "default", level: 1, k: "knowledge", name: "Knowledge retrieval — keyword match", role: "exact keyword lookups over the corpus", ref: "knowledge-corpus/trafficking-indicators" },
-    { phase: "pre", tier: "optional", level: 1, k: "knowledge", name: "Knowledge retrieval — regex", role: "pattern extraction over corpus / input", builtin: true },
-    { phase: "pre", tier: "default", level: 1, k: "knowledge", name: "Knowledge retrieval — RAG (vector)", role: "semantic retrieval of cited facts", ref: "knowledge-corpus/recruitment-law" },
-    { phase: "pre", tier: "optional", level: 1, k: "knowledge", name: "Knowledge ranking", role: "re-rank retrieved facts by relevance", builtin: true },
-    { phase: "pre", tier: "optional", level: 1, k: "knowledge", name: "Knowledge summarizing", role: "compress context to salient cited spans", builtin: true },
-    { phase: "pre", tier: "default", level: 1, k: "action", name: "Token reduction — format · prioritize · compress", role: "salient first; cut tokens & cost", builtin: true },
-    { phase: "pre", tier: "default", level: 1, k: "stop", name: "Prompt-injection check", role: "block system-prompt extraction / override", builtin: true },
+    { phase: "pre", tier: "default", level: 1, k: "action", name: "Build the system prompt", role: "instructions + constraints + cite-or-abstain (separate from persona)", builtin: true },
+    { phase: "pre", tier: "optional", level: 1, k: "action", name: "R0 · Query transform", role: "close the query↔doc gap", builtin: true, options: ["none", "HyDE", "Query2Doc", "multi-query / RAG-fusion", "decompose", "step-back", "self-query filter"], "default": "none (HyDE for short queries)" },
+    { phase: "pre", tier: "default", level: 1, k: "knowledge", name: "R1 · Retrieve", role: "pull candidate facts from the governed corpus", ref: "knowledge-corpus/recruitment-law", options: ["BM25 / keyword", "regex / fuzzy", "exact-id", "dense / RAG (vector)", "SPLADE", "ColBERT", "hybrid"], "default": "hybrid (BM25 + dense)" },
+    { phase: "pre", tier: "optional", level: 1, k: "action", name: "R2 · Chunk", role: "split sources into retrievable units (index-time)", builtin: true, options: ["fixed + overlap", "recursive-character", "page / structure-aware", "parent-child", "sentence-window", "semantic"], "default": "recursive-character" },
+    { phase: "pre", tier: "default", level: 1, k: "action", name: "R3 · Rerank / fuse", role: "merge legs then rescore the top-k", ref: "processor/cross-encoder-reranker", options: ["RRF", "convex (weighted)", "DBSF", "cross-encoder", "ColBERT", "LLM-rerank", "none"], "default": "RRF → cross-encoder" },
+    { phase: "pre", tier: "optional", level: 1, k: "knowledge", name: "R4 · Summarize / compress", role: "shrink context to salient cited spans", builtin: true, options: ["none", "extractive", "contextual compression", "abstractive"], "default": "none → extractive" },
+    { phase: "pre", tier: "default", level: 1, k: "action", name: "R5 · Select · order · de-conflict", role: "top-k, dedupe, source-precedence, flag contradictions", builtin: true, options: ["top-1", "top-3", "top-k", "MMR (diversity)", "dedupe", "source-precedence", "recency"], "default": "top-k + dedupe + source-precedence" },
+    { phase: "pre", tier: "default", level: 1, k: "action", name: "R6 · Place context in prompt", role: "mitigate 'lost in the middle'", builtin: true, options: ["concat", "edge (first + last)", "structured / delimited + source tags", "instructions-last"], "default": "structured + edge + instructions-last" },
+    { phase: "pre", tier: "optional", level: 1, k: "action", name: "Few-shot exemplars", role: "examples for format / reasoning", builtin: true, options: ["zero-shot", "static k", "dynamic / kNN", "CoT exemplars"], "default": "zero-shot" },
+    { phase: "pre", tier: "default", level: 1, k: "conditional", name: "Output schema", role: "the typed JSON envelope", builtin: true, options: ["free text", "JSON schema in prompt", "constrained / grammar decoding"], "default": "JSON schema in prompt" },
+    { phase: "pre", tier: "default", level: 1, k: "stop", name: "Prompt-injection check", role: "block system-prompt extraction / override", builtin: true, options: ["delimit + role-separate", "heuristic / classifier screen", "sanitize retrieved content"], "default": "delimit + screen" },
     { phase: "call", tier: "always", level: 1, k: "action", name: "Call the right-sized model", role: "smallest model that clears the bar + system prompt", ref: "harness/cite-first" },
     { phase: "post", tier: "always", level: 1, k: "conditional", name: "Check output", role: "validate the answer shape", builtin: true },
     { phase: "post", tier: "default", level: 1, k: "conditional", name: "Verify JSON (recover if malformed)", role: "parse; repair once if non-JSON", builtin: true },
@@ -232,7 +235,7 @@
   function primKey(stage) { var k = String(stage || "").toLowerCase().split(/[\s/]/)[0]; return PRIMS[k] ? k : "action"; }
   var _CHIP = { IF: "oh-badge--warn", ALWAYS: "oh-badge--verified", DEFAULT: "oh-badge--lift", OPTIONAL: "oh-badge--muted" };
   // one flow row. level 1 = nested under a phase header. tag = a chip (ALWAYS/DEFAULT/OPTIONAL/IF).
-  function flowRowHtml(prim, name, sub, level, tag) {
+  function flowRowHtml(prim, name, sub, level, tag, opts, defOpt) {
     var isOp = prim === "op";
     var glyph = isOp ? "◇" : (PRIMS[prim] ? PRIMS[prim].glyph : "•");
     var swatch = isOp ? "background:transparent;border:2px solid var(--operator);color:var(--operator)"
@@ -242,12 +245,17 @@
     // tier/relationship chip is RIGHT-aligned + spaced so it never butts the name
     var chip = tag ? '<span class="oh-badge ' + (_CHIP[tag] || "oh-badge--muted") +
       '" style="flex:0 0 auto;margin-left:10px;padding:1px 7px;font-family:var(--font-mono);font-size:9px;letter-spacing:.03em">' + esc(tag) + "</span>" : "";
+    // swappable method options for this slot — the chosen DEFAULT is highlighted
+    var optsLine = (opts && opts.length)
+      ? '<div style="font-family:var(--font-mono);font-size:9.5px;color:var(--fg-faint);margin-top:3px;line-height:1.6">' +
+        opts.map(function (o) { return (o === defOpt) ? '<span style="color:var(--accent);font-weight:600">' + esc(o) + " ◂</span>" : esc(o); }).join("  ·  ") + "</div>"
+      : "";
     return '<div style="' + wrap + '">' +
-      '<div style="display:flex;align-items:center;gap:11px;padding:8px 2px;border-bottom:1px solid var(--line)">' +
-      '<span style="width:24px;height:24px;border-radius:' + (isOp ? "50%" : "6px") + ';flex:0 0 auto;display:grid;place-items:center;font-size:12px;' + swatch + '">' + glyph + "</span>" +
+      '<div style="display:flex;align-items:flex-start;gap:11px;padding:8px 2px;border-bottom:1px solid var(--line)">' +
+      '<span style="margin-top:1px;width:24px;height:24px;border-radius:' + (isOp ? "50%" : "6px") + ';flex:0 0 auto;display:grid;place-items:center;font-size:12px;' + swatch + '">' + glyph + "</span>" +
       '<div style="flex:1;min-width:0">' +
       '<div style="display:flex;align-items:center"><span style="flex:1;min-width:0;font-size:13px;font-weight:600;color:var(--fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(name) + "</span>" + chip + "</div>" +
-      '<div style="font-family:var(--font-mono);font-size:10px;color:var(--fg-faint);margin-top:1px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(sub) + "</div></div></div></div>";
+      '<div style="font-family:var(--font-mono);font-size:10px;color:var(--fg-faint);margin-top:1px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(sub) + "</div>" + optsLine + "</div></div></div>";
   }
   function stageComp(stages, key) {
     for (var i = 0; i < stages.length; i++) {
@@ -270,7 +278,7 @@
       }
       lastPhase = ph;
       var sub = (s.ref ? s.ref : (s.role || "")) + (s.builtin ? " · built-in" : "");
-      html += flowRowHtml(s.k, s.name, sub, s.level || 0, _TIERTAG[s.tier] || null);
+      html += flowRowHtml(s.k, s.name, sub, s.level || 0, _TIERTAG[s.tier] || null, s.options, s.default);
     });
     html += flowRowHtml("output", outName, outRole, 0, "ALWAYS");
     return html;

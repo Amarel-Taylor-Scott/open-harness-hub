@@ -241,18 +241,25 @@ def harness_recipe(task: str, kept: list[dict]) -> list[dict]:
     rubric = first("rubric", "benchmark")
     loop = first("pattern")
 
-    def step(phase: str, tier: str, level: int, k: str, name: str, role: str, comp: dict | None = None) -> dict:
+    def step(phase: str, tier: str, level: int, k: str, name: str, role: str,
+             comp: dict | None = None, options: list | None = None, default_opt: str | None = None) -> dict:
         # phase: gate|pre|call|post ; tier: always|default|optional ; level: 0 (structural) | 1 (nested)
+        # options = the swappable method components for this slot; default_opt = the recommended one.
         d = {"phase": phase, "tier": tier, "level": level, "k": k, "name": name, "role": role, "builtin": comp is None}
         if comp:
             d["ref"] = f"{comp['type']}/{comp['id'].split('/')[-1]}"
+        if options:
+            d["options"] = options
+        if default_opt:
+            d["default"] = default_opt
         return d
 
-    # Composition law (owner's rule): Input + a model Call + the pre/post phases are ALWAYS present
-    # (even as no-ops). The trigger gate sits at the INPUT's level (a structural admit/deny) and is
-    # COMPOSED of combinable pattern packs (qualify) + anti-pattern packs (disqualify). Persona and the
-    # system prompt are SEPARATE steps. Knowledge retrieval is split by method (keyword · regex · RAG)
-    # with optional ranking + summarizing. Real components are slotted; the rest are deterministic built-ins.
+    # Composition law (owner's rule): Input + a model Call + the pre/post phases are ALWAYS present.
+    # The trigger gate sits at the INPUT's level (structural admit/deny), composed of combinable pattern
+    # packs (qualify) + anti-pattern packs (disqualify). Persona and system prompt are SEPARATE. The
+    # retrieval sub-pipeline R0–R6 (query-transform → retrieve[method] → chunk → rerank/fuse →
+    # summarize → select/order/de-conflict → place) + prompt steps each expose swappable method
+    # `options` with a recommended `default`. Full menu + bundles: docs/concepts/retrieval-and-prompt-taxonomy.md.
     recipe = [
         step("gate", "default", 0, "conditional", "Trigger gate — does the input qualify?",
              "run the harness only if the input clears the gate; else short-circuit (cheap)"),
@@ -263,17 +270,42 @@ def harness_recipe(task: str, kept: list[dict]) -> list[dict]:
         step("pre", "default", 1, "action", "Add persona",
              "the role / expertise the model adopts (role only)", persona),
         step("pre", "default", 1, "action", "Build the system prompt",
-             "task instructions, constraints, and the output schema — SEPARATE from the persona"),
-        step("pre", "default", 1, "knowledge", "Knowledge retrieval — keyword match",
-             "exact keyword lookups over the governed corpus", corpus),
-        step("pre", "optional", 1, "knowledge", "Knowledge retrieval — regex",
-             "pattern extraction over the corpus / input", pattern_pack),
-        step("pre", "default", 1, "knowledge", "Knowledge retrieval — RAG (vector)",
-             "semantic retrieval of cited facts", corpus),
-        step("pre", "optional", 1, "knowledge", "Knowledge ranking",
-             "re-rank retrieved facts by relevance before they enter the prompt"),
-        step("pre", "optional", 1, "knowledge", "Knowledge summarizing",
-             "compress retrieved context to the salient cited spans"),
+             "task instructions + constraints + cite-or-abstain — SEPARATE from the persona"),
+        # --- retrieval sub-pipeline R0–R6 (each slot a swappable component) ---
+        step("pre", "optional", 1, "action", "R0 · Query transform",
+             "reshape the query to close the query↔doc gap", None,
+             ["none", "HyDE", "Query2Doc", "multi-query / RAG-fusion", "decompose", "step-back", "self-query filter"],
+             "none (HyDE for short queries)"),
+        step("pre", "default", 1, "knowledge", "R1 · Retrieve",
+             "pull candidate facts from the governed corpus", corpus,
+             ["BM25 / keyword", "regex / fuzzy", "exact-id", "dense / RAG (vector)", "SPLADE", "ColBERT", "hybrid"],
+             "hybrid (BM25 + dense)"),
+        step("pre", "optional", 1, "action", "R2 · Chunk",
+             "split sources into retrievable units (index-time)", None,
+             ["fixed + overlap", "recursive-character", "page / structure-aware", "parent-child", "sentence-window", "semantic"],
+             "recursive-character"),
+        step("pre", "default", 1, "action", "R3 · Rerank / fuse",
+             "merge legs then rescore the top-k with a cross-encoder", None,
+             ["RRF", "convex (weighted)", "DBSF", "cross-encoder", "ColBERT", "LLM-rerank", "none"],
+             "RRF → cross-encoder"),
+        step("pre", "optional", 1, "knowledge", "R4 · Summarize / compress",
+             "shrink context to the salient cited spans", None,
+             ["none", "extractive", "contextual compression", "abstractive"], "none → extractive"),
+        step("pre", "default", 1, "action", "R5 · Select · order · de-conflict",
+             "top-k, dedupe, recency / source-precedence, flag contradictions", None,
+             ["top-1", "top-3", "top-k", "MMR (diversity)", "dedupe", "source-precedence", "recency"],
+             "top-k + dedupe + source-precedence"),
+        step("pre", "default", 1, "action", "R6 · Place context in prompt",
+             "where context sits — mitigates 'lost in the middle'", None,
+             ["concat", "edge (first + last)", "structured / delimited + source tags", "instructions-last"],
+             "structured + edge + instructions-last"),
+        # --- finalize the prompt ---
+        step("pre", "optional", 1, "action", "Few-shot exemplars",
+             "examples for format / reasoning", None,
+             ["zero-shot", "static k", "dynamic / kNN", "CoT exemplars"], "zero-shot"),
+        step("pre", "default", 1, "conditional", "Output schema",
+             "the typed JSON envelope the post-step verifies against", None,
+             ["free text", "JSON schema in prompt", "constrained / grammar decoding"], "JSON schema in prompt"),
     ]
     if tool:
         recipe.append(step("pre", "optional", 1, "action", "Call tools",
@@ -281,10 +313,9 @@ def harness_recipe(task: str, kept: list[dict]) -> list[dict]:
     recipe += [
         step("pre", "optional", 1, "action", "Check online facts / search",
              "verify volatile facts against a live source"),
-        step("pre", "default", 1, "action", "Token reduction — format · prioritize · compress",
-             "order salient evidence first; compress to cut tokens & cost"),
         step("pre", "default", 1, "stop", "Prompt-injection check",
-             "block if the input tries to extract or override the system prompt"),
+             "block if the input tries to extract or override the system prompt", None,
+             ["delimit + role-separate", "heuristic / classifier screen", "sanitize retrieved content"], "delimit + screen"),
         step("call", "always", 1, "action", "Call the right-sized model",
              "smallest model that clears the bar, with persona + system prompt + retrieved context", harness),
         step("post", "always", 1, "conditional", "Check output",
