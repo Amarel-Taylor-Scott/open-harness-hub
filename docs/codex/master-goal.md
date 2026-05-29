@@ -5,6 +5,12 @@
 > the project, without re-deriving strategy. It reconciles and supersedes the
 > fragmented goal docs — see *Reconciliation map* at the bottom. When this doc
 > and any other goal/runbook doc disagree, **this doc wins**; fix the other.
+>
+> **North Star v2 (2026-05-29):** the program has crystallized to **two products** — OHH (the open,
+> governed harness *funnel*) + a verified-context service (the *business*), wedge *"we verify your docs are
+> RIGHT, not just current."* This component-registry mission is the **substrate**; the current product focus
+> + execution sequence (M1–M5) live in **[north-star.md](north-star.md)** — it leads on *what to build
+> first*; this doc leads on the substrate + usefulness bar.
 
 ## Mission (one sentence)
 
