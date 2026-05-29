@@ -30,6 +30,7 @@ from scripts.foundry.model_route import wire as wire_route
 from scripts.foundry.pipeline import Foundry
 from scripts.foundry.seeds import LEDGER_PATH, LocalSourceScout, _env, append_ledger
 from scripts.foundry.sources import SourceStage
+from scripts.foundry.store import from_env as store_from_env
 
 _MAX_RETRIES = 2
 
@@ -78,10 +79,11 @@ class Worker:
 
     def __init__(self, *, foundry_factory: Callable[[], Foundry] = _default_foundry,
                  queue: Queue | None = None, ledger_path: Any = LEDGER_PATH,
-                 max_retries: int = _MAX_RETRIES, now_s: float | None = None) -> None:
+                 store: Any = None, max_retries: int = _MAX_RETRIES, now_s: float | None = None) -> None:
         self.foundry_factory = foundry_factory
         self.queue = queue or InMemoryQueue()
         self.ledger_path = ledger_path
+        self.store = store   # a foundry.store.Store; None ⇒ skip persistence (tests/dry runs)
         self.max_retries = max_retries
         self._now_s = now_s
 
@@ -98,6 +100,11 @@ class Worker:
             seeds = [Candidate(gap=g) for g in (job.get("gaps") or [])]
             partition = job.get("partition", "")
             result = foundry.run_partition(seeds, partition=partition)
+            # persist the promoted row families (sqlite local / postgres cloud) — the experience DB
+            if self.store is not None:
+                for family, fam_rows in (result.get("rows") or {}).items():
+                    if fam_rows:
+                        self.store.write(family, fam_rows)
             line = append_ledger(
                 self.ledger_path, kind=job.get("kind", "real"), partition=partition,
                 result=result, date=time.strftime("%Y-%m-%d", time.gmtime(self._now_s)),
@@ -156,6 +163,16 @@ def _self_test() -> int:
         check("worker promoted components (offline measure)", line and line["promoted"] >= 1, str(line.get("promoted")))
         check("empty queue ⇒ process_one None", w.process_one() is None)
 
+        # the worker PERSISTS promoted row families to the store (a real DB) — "saves to a DB"
+        from scripts.foundry.store import SqliteStore
+        st = SqliteStore(Path(tmp) / "store.sqlite")
+        q3 = InMemoryQueue()
+        q3.enqueue({"partition": "esg", "kind": "synthetic_demo", "gaps": [c.gap for c in _fixture()[1]]})
+        Worker(foundry_factory=lambda: _fixture()[0], queue=q3, ledger_path=Path(tmp) / "l4.jsonl",
+               store=st, now_s=0).process_one()
+        check("worker persists row families to the store", st.count("normalized_object") >= 1, str(st.count("normalized_object")))
+        check("store persists index_record (openness/delivery columns)", st.count("index_record") >= 1)
+
         # retry + dead-letter on a poison job
         bad = InMemoryQueue()
         bad.enqueue({"partition": "boom", "gaps": "not-a-list"})   # gaps wrong type ⇒ raises
@@ -197,13 +214,11 @@ def _main(argv: list[str] | None = None) -> int:
     if args.demo:
         return _demo()
     if args.serve:
-        # Production: pull from Redis (REDIS_URL). KEDA scales this on the queue's LLEN.
+        # local: durable SqliteQueue + SqliteStore; cloud: RedisQueue + Postgres — env-selected.
         from scripts.foundry.queues import from_env as queue_from_env
         q = queue_from_env()
-        if q is None:
-            print(json.dumps({"processed": 0, "note": "set REDIS_URL (+ pip install redis) for production --serve"}))
-            return 0
-        print(json.dumps({"processed": Worker(queue=q).serve()}))
+        n = Worker(queue=q, store=store_from_env()).serve()
+        print(json.dumps({"processed": n, "queue": type(q).__name__, "store": store_from_env().backend}))
         return 0
     p.print_help()
     return 0

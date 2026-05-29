@@ -1,0 +1,52 @@
+# Local dev that MIRRORS the cloud topology (render.yaml / infra/k8s) 1:1.
+# Same image, same commands, same env contract — only DATABASE_URL / REDIS_URL differ.
+# Locally you can also run with ZERO services (the foundry falls back to sqlite); this
+# compose file brings up the *cloud-equivalent* Postgres+pgvector and Redis for parity.
+#
+#   docker compose -f infra/docker-compose.yml up --build      # full local stack
+#   (or just: `python -m scripts.foundry.pipeline --self-test` — no services needed)
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16           # Postgres WITH pgvector — same as managed (Neon/Cloud SQL)
+    environment:
+      POSTGRES_USER: ohh
+      POSTGRES_PASSWORD: ohh
+      POSTGRES_DB: ohh
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ohh"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  redis:
+    image: redis:7-alpine                   # the job broker — same as managed Redis in cloud
+    ports: ["6379:6379"]
+
+  web:
+    build: { context: .., dockerfile: Dockerfile }
+    command: ["python", "hf-space/app.py"]  # request tier (product UI/API later)
+    ports: ["7860:7860"]
+    env_file: ["../.env"]
+    environment:
+      DATABASE_URL: "postgresql://ohh:ohh@postgres:5432/ohh"
+      REDIS_URL: "redis://redis:6379/0"
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_started }
+
+  worker:
+    build: { context: .., dockerfile: Dockerfile }
+    command: ["python", "-m", "scripts.foundry.worker", "--serve"]   # async tier (KEDA-scaled in cloud)
+    env_file: ["../.env"]
+    environment:
+      DATABASE_URL: "postgresql://ohh:ohh@postgres:5432/ohh"
+      REDIS_URL: "redis://redis:6379/0"
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_started }
+
+volumes:
+  pgdata: {}
