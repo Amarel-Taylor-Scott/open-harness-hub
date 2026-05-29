@@ -1,0 +1,46 @@
+id: processor/cache-kv-reuse
+type: processor
+version: 0.1.0
+name: KV-cache reuse
+description: KV-cache reuse across calls (LMCache-style) for self-hosted inference — up to ~7x faster
+  time-to-first-token on shared prefixes.
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+capability:
+- memory
+- serving
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- context-layer
+- cache
+created: '2026-05-29'
+updated: '2026-05-29'
+attribution:
+  source_kind: manual
+  author: Open Harness Hub context-layer taxonomy
+  license: MIT
+process_kind: cache.kv_reuse
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: prefix
+  type: object
+outputs:
+- name: kv
+  type: object
+side_effects: read
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.cache.cache_kv_reuse.run
+  language: python
+links:
+  source: docs/strategy/context-layer-pmf.md

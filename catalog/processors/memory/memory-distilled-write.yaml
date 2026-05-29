@@ -1,0 +1,45 @@
+id: processor/memory-distilled-write
+type: processor
+version: 0.1.0
+name: Distilled memory write
+description: 'Distill a conversation/run into durable facts (Mem0-style selective extraction — ~1.8k tokens/convo)
+  and write them to the memory store: stores what was LEARNED, not raw history.'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+capability:
+- memory
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- context-layer
+- memory
+created: '2026-05-29'
+updated: '2026-05-29'
+attribution:
+  source_kind: manual
+  author: Open Harness Hub context-layer taxonomy
+  license: MIT
+process_kind: memory.write_kb
+deterministic: false
+idempotent: true
+streaming: false
+inputs:
+- name: turns
+  type: object
+outputs:
+- name: facts
+  type: object
+side_effects: write
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.memory.memory_distilled_write.run
+  language: python
+links:
+  source: docs/strategy/context-layer-pmf.md

@@ -1,0 +1,50 @@
+id: processor/mcp-confluence-connector
+type: processor
+version: 0.1.0
+name: MCP connector — Confluence
+description: 'MCP connector to Confluence (human-readable docs): permission-aware retrieval that pulls
+  prose context on demand into a governed corpus. Cloud = official Atlassian MCP; Data Center = community
+  server.'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+capability:
+- retrieval
+- tool_use
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- context-layer
+- connector
+- mcp
+created: '2026-05-29'
+updated: '2026-05-29'
+attribution:
+  source_kind: manual
+  author: Open Harness Hub context-layer taxonomy
+  license: MIT
+process_kind: connect.mcp_confluence
+deterministic: false
+idempotent: true
+streaming: false
+inputs:
+- name: space
+  type: object
+- name: query
+  type: object
+outputs:
+- name: pages
+  type: object
+side_effects: external_call
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.connectors.mcp_confluence_connector.run
+  language: python
+links:
+  source: docs/strategy/context-layer-pmf.md

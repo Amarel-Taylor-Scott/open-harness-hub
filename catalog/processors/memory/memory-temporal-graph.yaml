@@ -1,0 +1,46 @@
+id: processor/memory-temporal-graph
+type: processor
+version: 0.1.0
+name: Temporal-graph memory
+description: Write facts into a TEMPORAL knowledge graph (Zep/Graphiti-style) with validity intervals
+  — answers 'what was true when' and supersedes facts as they change.
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+capability:
+- memory
+- governance
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- context-layer
+- memory
+created: '2026-05-29'
+updated: '2026-05-29'
+attribution:
+  source_kind: manual
+  author: Open Harness Hub context-layer taxonomy
+  license: MIT
+process_kind: memory.temporal_graph
+deterministic: false
+idempotent: true
+streaming: false
+inputs:
+- name: event
+  type: object
+outputs:
+- name: graph_delta
+  type: object
+side_effects: write
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.memory.memory_temporal_graph.run
+  language: python
+links:
+  source: docs/strategy/context-layer-pmf.md
