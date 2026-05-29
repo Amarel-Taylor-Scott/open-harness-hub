@@ -231,7 +231,8 @@
     { phase: "verify_response", tier: "default", level: 1, k: "conditional", name: "Re-verify", role: "second pass vs the rubric", ref: "rubric/exploitation-grade" },
     { phase: "postprocess", tier: "always", level: 1, k: "loop", name: "If not OK → retry with changes (≤3)", role: "if verification fails, retry with fixes until it passes, else escalate", ref: "pattern/refine-loop" },
     { phase: "postprocess", tier: "always", level: 1, k: "action", name: "Compose result + citations + metadata", role: "extract the decision, attach citations + run metadata, assemble the runtime object", builtin: true },
-    { phase: "postprocess", tier: "optional", level: 1, k: "action", name: "Deliver / emit", role: "route the validated result onward", builtin: true, options: ["return", "webhook", "report (md / pdf)", "audit log", "escalate → human"], "default": "return" }
+    { phase: "deliver", tier: "default", level: 1, k: "action", name: "Deliver / emit", role: "send the result OUTBOUND to a destination", builtin: true, options: ["return to caller", "webhook", "email", "SMS", "report (md / pdf)", "notify / alert", "escalate → human"], "default": "return to caller" },
+    { phase: "platform", tier: "optional", level: 1, k: "action", name: "Persist to platform storage", role: "save the result + trace on-platform for reuse, search & monitoring", builtin: true, options: ["run store (trace)", "object store", "pgvector index", "postgres table", "component registry", "data store + view", "dashboard widget", "cache", "conversational memory"], "default": "run store (trace)" }
   ];
   var previewTimer = null;
   function primKey(stage) { var k = String(stage || "").toLowerCase().split(/[\s/]/)[0]; return PRIMS[k] ? k : "action"; }
@@ -266,7 +267,7 @@
     return null;
   }
   var _TIERTAG = { always: "ALWAYS", default: "DEFAULT", optional: "OPTIONAL" };
-  var _PHASE_LABEL = { gate: "Trigger gate", enrich: "Model query enrichment", polish: "Model query polishing", verify_query: "Model query verification", call: "Model call", verify_response: "Model response verification", postprocess: "Model response post-processing" };
+  var _PHASE_LABEL = { gate: "Trigger gate", enrich: "Model query enrichment", polish: "Model query polishing", verify_query: "Model query verification", call: "Model call", verify_response: "Model response verification", postprocess: "Model response post-processing", deliver: "Deliver / emit", platform: "Platform actions" };
   // Input(L0) → Trigger gate(L0) + its pattern/anti-pattern packs(L1) → Pre/Model/Post phase
   // groups → Output(L0). Each step carries its own level + phase (the backend decides indentation).
   function recipePanel(head, inputName, inputRole, recipe, outName, outType) {

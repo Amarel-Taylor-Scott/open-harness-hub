@@ -366,14 +366,22 @@ def harness_recipe(task: str, kept: list[dict]) -> list[dict]:
              "parse; if non-JSON, repair / reformat once"),
         step("verify_response", "default", 1, "conditional", "Re-verify",
              "second pass on the recovered output (vs the rubric)", rubric),
-        # ---- MODEL RESPONSE POST-PROCESSING (turn the verified response into the output) ----
+        # ---- MODEL RESPONSE POST-PROCESSING (compose the verified response into the result) ----
         step("postprocess", "always", 1, "loop", "If not OK → retry with changes (≤3)",
              "if verification fails, re-run with targeted fixes until it passes, else escalate", loop),
         step("postprocess", "always", 1, "action", "Compose result + citations + metadata",
              "extract the decision, attach per-claim citations + run metadata, assemble the full runtime object"),
-        step("postprocess", "optional", 1, "action", "Deliver / emit",
-             "route the validated result onward", None,
-             ["return", "webhook", "report (md / pdf)", "audit log", "escalate → human"], "return"),
+        # ---- DELIVER / EMIT (all OUTBOUND actions — leave the platform) ----
+        step("deliver", "default", 1, "action", "Deliver / emit",
+             "send the result OUTBOUND to a destination", None,
+             ["return to caller", "webhook", "email", "SMS", "report (md / pdf)", "notify / alert", "escalate → human"],
+             "return to caller"),
+        # ---- PLATFORM ACTIONS (persist / register ON the platform — no external send) ----
+        step("platform", "optional", 1, "action", "Persist to platform storage",
+             "save the result + trace on-platform for reuse, search, and monitoring", None,
+             ["run store (trace)", "object store", "pgvector index", "postgres table", "component registry",
+              "data store + view", "dashboard widget", "cache", "conversational memory"],
+             "run store (trace)"),
     ]
     return recipe
 
