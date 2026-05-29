@@ -62,10 +62,38 @@
     '<rect x="11" y="3" width="6" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.4" transform="rotate(45 14 6)" />' +
     '</svg></span>';
 
+  // Canonical marketing nav items — matches index.html landing header
+  var MKT_NAV = [
+    ['/pipelines', 'Explore'],
+    ['/solutions', 'SDG solutions'],
+    ['/app',       'Workspace'],
+    ['/pricing',   'Pricing'],
+    ['/docs',      'Docs'],
+    ['/trust',     'Trust']
+  ];
+
+  function mktNavHtml(activeWho) {
+    var links = MKT_NAV.map(function (p) {
+      return '<a data-nav="' + p[0] + '">' + p[1] + '</a>';
+    }).join('');
+    var audienceLinks = [
+      ['governments', 'Governments'],
+      ['builders', 'Builders'],
+      ['lawyers', 'Lawyers'],
+      ['regulators', 'Regulators']
+    ].map(function (pair) {
+      return '<a data-nav="/for/' + pair[0] + '"' +
+        (pair[0] === activeWho ? ' style="color:var(--fg);font-weight:600"' : '') +
+        '>' + pair[1] + '</a>';
+    }).join('');
+    return links + '<span class="pt-filter-sep"></span>' + audienceLinks;
+  }
+
   function renderNotFound(ctx) {
     return '<div class="pt-mkt pt-view">' +
       '<header class="pt-mkt-top">' +
-      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG + ' OpenHarnessHub</div>' +
+      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG + ' Open Harness Hub</div>' +
+      '<nav>' + MKT_NAV.map(function (p) { return '<a data-nav="' + p[0] + '">' + p[1] + '</a>'; }).join('') + '</nav>' +
       '<span class="pt-spacer"></span>' +
       '<button class="oh-btn oh-btn--ghost oh-btn--sm" data-nav="/signin">Sign in</button>' +
       '</header>' +
@@ -87,18 +115,16 @@
     var u = who && USECASES[who];
     if (!u) return renderNotFound(ctx);
 
-    var navLinks = [
+    var audienceNavHtml = "";
+    [
       ["governments", "Governments"],
       ["builders", "Builders"],
       ["lawyers", "Lawyers"],
       ["regulators", "Regulators"]
-    ];
-
-    var navHtml = "";
-    navLinks.forEach(function (pair) {
-      navHtml += '<a data-nav="/for/' + ctx.esc(pair[0]) + '" style="' +
-        (pair[0] === who ? "color:var(--fg);font-weight:600;" : "") +
-        '">' + ctx.esc(pair[1]) + "</a>";
+    ].forEach(function (pair) {
+      audienceNavHtml += '<a data-nav="/for/' + ctx.esc(pair[0]) + '"' +
+        (pair[0] === who ? ' style="color:var(--fg);font-weight:600"' : '') +
+        '>' + ctx.esc(pair[1]) + "</a>";
     });
 
     var pointsHtml = "";
@@ -109,13 +135,17 @@
         "</div>";
     });
 
+    var mainNavHtml = MKT_NAV.map(function (p) {
+      return '<a data-nav="' + p[0] + '">' + p[1] + '</a>';
+    }).join('') + '<span class="pt-filter-sep" style="height:16px;width:1px;background:var(--line);display:inline-block;margin:0 8px;vertical-align:middle"></span>' + audienceNavHtml;
+
     return '<div class="pt-mkt pt-view">' +
       '<header class="pt-mkt-top">' +
-      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG + " OpenHarnessHub</div>" +
-      "<nav>" + navHtml + "</nav>" +
+      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG + ' Open Harness Hub</div>' +
+      '<nav>' + mainNavHtml + '</nav>' +
       '<span class="pt-spacer"></span>' +
       '<button class="oh-btn oh-btn--ghost oh-btn--sm" data-nav="/signin">Sign in</button>' +
-      "</header>" +
+      '</header>' +
       '<div class="pt-mkt-body">' +
       '<section class="pt-hero">' +
       '<div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:14px">' +

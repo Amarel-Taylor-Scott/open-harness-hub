@@ -5,15 +5,56 @@
 (function () {
   "use strict";
 
-  /* Copy of the RUN_STEPS array from the prototype — never pull from ctx.data. */
-  var RUN_STEPS = [
-    { step: "01", k: "input",       ref: "inputs/supplier-roster",         tok: "—",     cost: "—",       ms: "4ms",   model: false, err: false },
-    { step: "02", k: "conditional", ref: "conditional/tier-risk-gate",     tok: "—",     cost: "—",       ms: "2ms",   model: false, err: false },
-    { step: "03", k: "knowledge",   ref: "knowledge-corpus/csddd-articles", tok: "2.1k", cost: "$0.0021", ms: "380ms", model: false, err: false },
-    { step: "04", k: "action",      ref: "harness/esg-cite-first",          tok: "5.8k", cost: "$0.0279", ms: "",      model: true,  err: true  },
-    { step: "05", k: "loop",        ref: "rubric/qa-eval",                  tok: "0.4k", cost: "$0.0008", ms: "95ms",  model: false, err: false },
-    { step: "06", k: "output",      ref: "outputs/csddd-dossier",           tok: "0.5k", cost: "$0.0012", ms: "120ms", model: false, err: false },
+  /* Trace metadata: per-step timing/cost/token info that cannot be derived from
+     the flow graph alone. The `ref` is always derived from PFLOW at runtime so
+     the two sources can never drift. model/err flags mark the harness call. */
+  var RUN_META = [
+    { step: "01", k: "input",       tok: "—",     cost: "—",       ms: "4ms",   model: false, err: false },
+    { step: "02", k: "conditional", tok: "—",     cost: "—",       ms: "2ms",   model: false, err: false },
+    { step: "03", k: "knowledge",   tok: "2.1k",  cost: "$0.0021", ms: "380ms", model: false, err: false },
+    { step: "04", k: "action",      tok: "5.8k",  cost: "$0.0279", ms: "",      model: true,  err: true  },
+    { step: "05", k: "loop",        tok: "0.4k",  cost: "$0.0008", ms: "95ms",  model: false, err: false },
+    { step: "06", k: "output",      tok: "0.5k",  cost: "$0.0012", ms: "120ms", model: false, err: false },
   ];
+
+  /* Derive RUN_STEPS from PFLOW (single source of truth for node refs/order).
+     Falls back to static refs when PFLOW is unavailable. */
+  var STATIC_REFS = [
+    "inputs/supplier-roster",
+    "conditional/tier-risk-gate",
+    "knowledge-corpus/csddd-articles",
+    "harness/esg-cite-first",
+    "pattern/rubric-refine",
+    "outputs/csddd-dossier"
+  ];
+
+  /* Linearised execution order of PFLOW node ids — matches RUN_META index. */
+  var PFLOW_ORDER = ["input", "ct", "kc", "act", "ev", "out"];
+
+  function buildRunSteps(data) {
+    var nodes = (data && data.PFLOW && data.PFLOW.nodes) ? data.PFLOW.nodes : [];
+    var nodeMap = {};
+    for (var i = 0; i < nodes.length; i++) { nodeMap[nodes[i].id] = nodes[i]; }
+    var steps = [];
+    for (var mi = 0; mi < RUN_META.length; mi++) {
+      var meta = RUN_META[mi];
+      var node = nodeMap[PFLOW_ORDER[mi]];
+      steps.push({
+        step:  meta.step,
+        k:     meta.k,
+        ref:   node ? node.ref : STATIC_REFS[mi],
+        tok:   meta.tok,
+        cost:  meta.cost,
+        ms:    meta.ms,
+        model: meta.model,
+        err:   meta.err
+      });
+    }
+    return steps;
+  }
+
+  /* Populated with live data in onMount; render() uses the static fallback. */
+  var RUN_STEPS = buildRunSteps(null);
 
   /* ------------------------------------------------------------------
      render(ctx) — returns the page HTML string (static, no interactivity)
@@ -124,6 +165,9 @@
   function onMount(host, ctx) {
     var PRIMS = ctx.PRIMS;
     var toast = ctx.toast;
+
+    /* Rebuild RUN_STEPS from live PFLOW data so refs never drift from data.js */
+    RUN_STEPS = buildRunSteps(ctx.data);
 
     /* State */
     var doneCount = 0;     /* how many steps are visible */

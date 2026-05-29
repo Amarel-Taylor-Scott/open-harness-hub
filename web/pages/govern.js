@@ -9,6 +9,39 @@
   /* =====================================================================
      SHARED HELPERS
      ===================================================================== */
+
+  // Canonical marketing wordmark — matches index.html + sdg.js + landings.js
+  var MARK_SVG = '<span class="oh-mark" aria-hidden="true">' +
+    '<svg width="18" height="18" viewBox="0 0 18 18" fill="none">' +
+    '<rect x="1" y="6" width="6" height="6" rx="1.4" fill="currentColor" />' +
+    '<path d="M9 9h3.5" stroke="currentColor" stroke-width="1.4" />' +
+    '<rect x="11" y="3" width="6" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.4" transform="rotate(45 14 6)" />' +
+    '</svg></span>';
+
+  // Canonical marketing nav items — matches index.html landing header
+  var MKT_NAV = [
+    ['/pipelines', 'Explore'],
+    ['/solutions', 'SDG solutions'],
+    ['/app',       'Workspace'],
+    ['/pricing',   'Pricing'],
+    ['/docs',      'Docs'],
+    ['/trust',     'Trust']
+  ];
+
+  function mktHeader(activeRoute) {
+    var navItems = MKT_NAV.map(function (p) {
+      var active = p[0] === activeRoute;
+      return '<a data-nav="' + p[0] + '"' +
+        (active ? ' style="color:var(--fg);font-weight:600"' : '') +
+        '>' + p[1] + '</a>';
+    }).join('');
+    return '<header class="pt-mkt-top">' +
+      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG + ' Open Harness Hub</div>' +
+      '<nav>' + navItems + '</nav>' +
+      '<span class="pt-spacer"></span>' +
+      '<button class="oh-btn oh-btn--ghost oh-btn--sm" data-nav="/signin">Sign in</button>' +
+    '</header>';
+  }
   function mkSwitch(on) {
     return '<span class="pt-switch' + (on ? ' on' : '') + '" role="switch" aria-checked="' + (on ? 'true' : 'false') + '"><i></i></span>';
   }
@@ -45,17 +78,7 @@
     }).join('');
 
     return '<div class="pt-mkt pt-view">' +
-      '<header class="pt-mkt-top">' +
-        '<div class="oh-wordmark" data-nav="/" style="cursor:pointer;font-family:var(--font-display);font-weight:700;font-size:15px;color:var(--fg)">Open Harness Hub</div>' +
-        '<nav>' +
-          '<a data-nav="/pipelines">Explore</a>' +
-          '<a data-nav="/pricing">Pricing</a>' +
-          '<a data-nav="/trust" style="color:var(--fg);font-weight:600">Trust</a>' +
-          '<a data-nav="/solutions">SDG solutions</a>' +
-        '</nav>' +
-        '<span style="flex:1"></span>' +
-        '<button class="oh-btn oh-btn--ghost oh-btn--sm" data-nav="/signin">Sign in</button>' +
-      '</header>' +
+      mktHeader('/trust') +
       '<div class="pt-mkt-body">' +
         '<div class="pt-page wide pt-view">' +
           '<div class="pt-page-head">' +
@@ -347,7 +370,7 @@
 
           '<div class="pt-panel" style="margin-top:14px">' +
             '<div class="oh-cc-id" style="font-family:var(--font-mono);font-size:10px;color:var(--fg-faint);margin-bottom:4px">local agent → ecosystem</div>' +
-            '<p style="font-size:12.5px;color:var(--fg-muted);margin:0 0 8px;line-height:1.5">Configure how your Local Agent communicates with the OpenHarnessHub agent when publishing. Private data never leaves; only the fact/page/repo you choose, plus its provenance.</p>' +
+            '<p style="font-size:12.5px;color:var(--fg-muted);margin:0 0 8px;line-height:1.5">Configure how your Local Agent communicates with the Open Harness Hub agent when publishing. Private data never leaves; only the fact/page/repo you choose, plus its provenance.</p>' +
             '<div class="pt-setting-row">' +
               '<div class="info">' +
                 '<div class="t">Let my Local Agent publish</div>' +

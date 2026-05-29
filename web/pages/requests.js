@@ -1,5 +1,6 @@
 /* Open Harness Hub — requests / contribute module
-   Ports: PRequests (/requests), PRequestDetail (/requests/:id), PContribute (/contribute)
+   Ports: PRequests (/requests), PRequestNew (/requests/new),
+          PRequestDetail (/requests/:id), PContribute (/contribute)
    Source: proto-wide.jsx (PRequests, PRequestDetail, PContribute)
    Style: proto-wide.css, proto-deep.css, proto-admin.css, proto.css atoms
    No framework, no build step — vanilla ES5-style, self-registering via OHH.register. */
@@ -117,12 +118,11 @@
   }
 
   function onMountRequests(host, ctx) {
-    /* "+ Request a capability" — demand capture. No standalone form page exists,
-       so confirm the intent rather than navigating into a phantom /requests/:id. */
+    /* "+ Request a capability" — navigates to the real form page. */
     var newReqBtn = host.querySelector("#ohh-new-request");
     if (newReqBtn) {
       newReqBtn.addEventListener("click", function () {
-        ctx.toast("Describe the capability you need — we'll screen it for lift");
+        ctx.navigate("/requests/new");
       });
     }
 
@@ -146,6 +146,159 @@
   }
 
   /* ------------------------------------------------------------------ */
+  /* PRequestNew — /requests/new                                          */
+  /* ------------------------------------------------------------------ */
+
+  var DOMAIN_OPTIONS = [
+    ["", "— pick a domain —"],
+    ["esg", "ESG / sustainability"],
+    ["aml-compliance", "AML / sanctions / compliance"],
+    ["healthcare", "Healthcare / GxP"],
+    ["legal", "Legal / contracts"],
+    ["finance", "Finance / accounting"],
+    ["supply-chain", "Supply chain"],
+    ["hr-labour", "HR / labour rights"],
+    ["general", "General / other"]
+  ];
+
+  function renderRequestNew(ctx) {
+    var e = ctx.esc;
+
+    var domainOptions = "";
+    for (var i = 0; i < DOMAIN_OPTIONS.length; i++) {
+      var opt = DOMAIN_OPTIONS[i];
+      domainOptions += '<option value="' + e(opt[0]) + '">' + e(opt[1]) + '</option>';
+    }
+
+    return (
+      '<div class="pt-page pt-view">' +
+        '<div class="pt-crumb" style="margin-bottom:14px">' +
+          '<a data-nav="/requests" style="cursor:pointer">Requests</a>' +
+          '<span class="sep">/</span>' +
+          '<b>New request</b>' +
+        '</div>' +
+        '<div class="pt-page-head">' +
+          '<h1>Request a capability</h1>' +
+          '<div class="sub">Describe what you need. We screen it for structural lift — if a component would measurably help the model do something it can&apos;t do alone, we research and build it.</div>' +
+        '</div>' +
+
+        '<div id="ohh-req-form-wrap">' +
+          '<div class="pt-panel" style="max-width:600px">' +
+
+            /* Title field */
+            '<div class="pt-field">' +
+              '<label for="ohh-req-title">Capability title <span style="color:var(--danger)">*</span></label>' +
+              '<input id="ohh-req-title" placeholder="e.g. Conflict-minerals (3TG) tracer" maxlength="120" autocomplete="off" />' +
+              '<div class="pt-field-hint" id="ohh-req-title-hint" style="color:var(--danger);font-size:11.5px;margin-top:4px;display:none">Please enter a title (at least 10 characters).</div>' +
+            '</div>' +
+
+            /* Domain field */
+            '<div class="pt-field">' +
+              '<label for="ohh-req-domain">Domain <span style="color:var(--danger)">*</span></label>' +
+              '<select id="ohh-req-domain" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--panel);color:var(--fg);font-family:inherit;font-size:14px">' +
+                domainOptions +
+              '</select>' +
+              '<div class="pt-field-hint" id="ohh-req-domain-hint" style="color:var(--danger);font-size:11.5px;margin-top:4px;display:none">Please select a domain.</div>' +
+            '</div>' +
+
+            /* Why field */
+            '<div class="pt-field">' +
+              '<label for="ohh-req-why">Why does a bare model fall short? <span style="color:var(--danger)">*</span></label>' +
+              '<textarea id="ohh-req-why" rows="3" placeholder="What does the model get wrong or miss without this component? The structural gap you&apos;re seeing…" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--panel);color:var(--fg);font-family:inherit;font-size:14px;resize:vertical;box-sizing:border-box"></textarea>' +
+              '<div class="pt-field-hint" id="ohh-req-why-hint" style="color:var(--danger);font-size:11.5px;margin-top:4px;display:none">Please describe the gap (at least 20 characters).</div>' +
+            '</div>' +
+
+            /* Example field */
+            '<div class="pt-field">' +
+              '<label for="ohh-req-example">A concrete example</label>' +
+              '<textarea id="ohh-req-example" rows="2" placeholder="e.g. &ldquo;I need to trace 3TG minerals from supplier to smelter using OECD sourcing guidance&rdquo;" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--panel);color:var(--fg);font-family:inherit;font-size:14px;resize:vertical;box-sizing:border-box"></textarea>' +
+            '</div>' +
+
+            '<div style="display:flex;gap:10px;margin-top:6px">' +
+              '<button class="oh-btn oh-btn--primary" id="ohh-req-submit">Submit request</button>' +
+              '<button class="oh-btn oh-btn--ghost" data-nav="/requests">Cancel</button>' +
+            '</div>' +
+
+          '</div>' +
+        '</div>' +
+
+        /* Confirmation state — hidden until submit */
+        '<div id="ohh-req-confirm" style="display:none;max-width:600px">' +
+          '<div class="oh-state-msg" style="background:color-mix(in srgb,var(--success) 8%,transparent);border:1px solid color-mix(in srgb,var(--success) 30%,var(--line));border-radius:var(--r-md);padding:18px 20px;display:block">' +
+            '<div style="font-weight:700;color:var(--fg);margin-bottom:6px">&#x2713; Request submitted</div>' +
+            '<div style="font-size:13px;color:var(--fg-muted);line-height:1.55;margin-bottom:14px">' +
+              'We&apos;ll screen it for structural lift against the two-axis gate. ' +
+              'If it passes, it enters the research queue. ' +
+              'Vote it up on the requests board to signal demand.' +
+            '</div>' +
+            '<div style="display:flex;gap:10px">' +
+              '<button class="oh-btn oh-btn--primary oh-btn--sm" data-nav="/requests">View all requests →</button>' +
+              '<button class="oh-btn oh-btn--ghost oh-btn--sm" id="ohh-req-another">Submit another</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+
+      '</div>'
+    );
+  }
+
+  function onMountRequestNew(host, ctx) {
+    var formWrap   = host.querySelector("#ohh-req-form-wrap");
+    var confirmEl  = host.querySelector("#ohh-req-confirm");
+    var submitBtn  = host.querySelector("#ohh-req-submit");
+    var anotherBtn = host.querySelector("#ohh-req-another");
+
+    var titleEl   = host.querySelector("#ohh-req-title");
+    var domainEl  = host.querySelector("#ohh-req-domain");
+    var whyEl     = host.querySelector("#ohh-req-why");
+
+    var titleHint  = host.querySelector("#ohh-req-title-hint");
+    var domainHint = host.querySelector("#ohh-req-domain-hint");
+    var whyHint    = host.querySelector("#ohh-req-why-hint");
+
+    function setHint(el, show) {
+      if (el) el.style.display = show ? "" : "none";
+    }
+
+    function validate() {
+      var titleOk  = titleEl  && titleEl.value.trim().length >= 10;
+      var domainOk = domainEl && domainEl.value !== "";
+      var whyOk    = whyEl    && whyEl.value.trim().length >= 20;
+
+      setHint(titleHint,  !titleOk);
+      setHint(domainHint, !domainOk);
+      setHint(whyHint,    !whyOk);
+
+      return titleOk && domainOk && whyOk;
+    }
+
+    /* Clear hint on input */
+    if (titleEl)  titleEl.addEventListener("input",  function () { setHint(titleHint,  false); });
+    if (domainEl) domainEl.addEventListener("change", function () { setHint(domainHint, false); });
+    if (whyEl)    whyEl.addEventListener("input",    function () { setHint(whyHint,    false); });
+
+    if (submitBtn) {
+      submitBtn.addEventListener("click", function () {
+        if (!validate()) return;
+        /* Show confirmation, hide form */
+        if (formWrap)  formWrap.style.display  = "none";
+        if (confirmEl) confirmEl.style.display = "";
+      });
+    }
+
+    if (anotherBtn) {
+      anotherBtn.addEventListener("click", function () {
+        /* Reset form and show it again */
+        if (titleEl)  titleEl.value  = "";
+        if (domainEl) domainEl.value = "";
+        if (whyEl)    whyEl.value    = "";
+        if (formWrap)  formWrap.style.display  = "";
+        if (confirmEl) confirmEl.style.display = "none";
+      });
+    }
+  }
+
+  /* ------------------------------------------------------------------ */
   /* PRequestDetail — /requests/:id                                       */
   /* ------------------------------------------------------------------ */
 
@@ -163,16 +316,29 @@
       );
     }
 
-    /* Use known detail data; fall back to a synthetic record when the id is unknown */
+    /* Use known detail data; show a clear not-found state for unknown ids — never
+       synthesise a phantom record that renders a misleading detail view. */
     var d = REQ_DETAIL[id];
     if (!d) {
-      d = {
-        title:   id,
-        votes:   0,
-        type:    "unknown",
-        status:  "requested",
-        sources: "—"
-      };
+      return (
+        '<div class="pt-page pt-view">' +
+          '<div class="pt-crumb" style="margin-bottom:14px">' +
+            '<a data-nav="/requests" style="cursor:pointer">Requests</a>' +
+            '<span class="sep">/</span>' +
+            '<b>' + e(id) + '</b>' +
+          '</div>' +
+          '<div class="pt-page-head"><h1>Request not found</h1>' +
+            '<div class="sub">' +
+              'No capability request with ID <span style="font-family:var(--font-mono)">' + e(id) + '</span> exists. ' +
+              'It may have been promoted or the link is incorrect.' +
+            '</div>' +
+          '</div>' +
+          '<div style="display:flex;gap:10px;margin-top:8px">' +
+            '<button class="oh-btn oh-btn--primary" data-nav="/requests/new">+ Request a capability</button>' +
+            '<button class="oh-btn oh-btn--ghost" data-nav="/requests">← All requests</button>' +
+          '</div>' +
+        '</div>'
+      );
     }
 
     return (
@@ -293,6 +459,9 @@
   /* ------------------------------------------------------------------ */
 
   OHH.register("/requests", renderRequests, onMountRequests, { theme: "dark" });
+  /* /requests/new MUST be registered before /requests/:id so the literal "new"
+     segment is matched first; the router tests routes in registration order. */
+  OHH.register("/requests/new", renderRequestNew, onMountRequestNew, { theme: "dark" });
   OHH.register("/requests/:id", renderRequestDetail, onMountRequestDetail, { theme: "dark" });
   OHH.register("/contribute", renderContribute, onMountContribute, { theme: "dark" });
 

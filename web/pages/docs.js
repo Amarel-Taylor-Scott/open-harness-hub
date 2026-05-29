@@ -38,7 +38,7 @@
   ];
 
   function navHtml(ctx) {
-    var items = [["/pipelines", "Explore"], ["/solutions", "SDG solutions"], ["/pricing", "Pricing"], ["/trust", "Trust"], ["/docs", "Docs"]];
+    var items = [["/pipelines", "Explore"], ["/solutions", "SDG solutions"], ["/app", "Workspace"], ["/pricing", "Pricing"], ["/docs", "Docs"], ["/trust", "Trust"]];
     return items.map(function (p) {
       return '<a data-nav="' + p[0] + '"' + (p[0] === "/docs" ? ' style="color:var(--fg);font-weight:600"' : "") + ">" + ctx.esc(p[1]) + "</a>";
     }).join("");
@@ -63,7 +63,7 @@
   function render(ctx) {
     return '<div class="pt-mkt pt-view">' +
       '<header class="pt-mkt-top">' +
-      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG + " OpenHarnessHub</div>" +
+      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG + ' Open Harness Hub</div>' +
       "<nav>" + navHtml(ctx) + "</nav>" +
       '<span class="pt-spacer"></span>' +
       '<button class="oh-btn oh-btn--ghost oh-btn--sm" data-nav="/signin">Sign in</button>' +

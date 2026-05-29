@@ -48,24 +48,34 @@
     17: [['Cross-standard ESG pack', 'raw metrics', 'GRI / ESRS / ISSB mapped pack'], ['Data-sharing agreement check', 'contracts', 'compliance + risk'], ['Multi-framework crosswalk', 'one disclosure', 'mapped to N frameworks']],
   };
 
+  var MARK_SVG = '<span class="oh-mark" aria-hidden="true">' +
+    '<svg width="18" height="18" viewBox="0 0 18 18" fill="none">' +
+    '<rect x="1" y="6" width="6" height="6" rx="1.4" fill="currentColor" />' +
+    '<path d="M9 9h3.5" stroke="currentColor" stroke-width="1.4" />' +
+    '<rect x="11" y="3" width="6" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.4" transform="rotate(45 14 6)" />' +
+    '</svg></span>';
+
+  // Canonical marketing nav items — matches index.html landing header
+  var MKT_NAV = [
+    ['/pipelines',  'Explore'],
+    ['/solutions',  'SDG solutions'],
+    ['/app',        'Workspace'],
+    ['/pricing',    'Pricing'],
+    ['/docs',       'Docs'],
+    ['/trust',      'Trust']
+  ];
+
   // ---- shared marketing header HTML ----
-  function mktHeader(esc) {
+  function mktHeader(esc, activeRoute) {
+    var navItems = MKT_NAV.map(function (p) {
+      var active = p[0] === activeRoute;
+      return '<a data-nav="' + p[0] + '"' +
+        (active ? ' style="color:var(--fg);font-weight:600"' : '') +
+        '>' + p[1] + '</a>';
+    }).join('');
     return '<header class="pt-mkt-top">' +
-      '<div class="oh-wordmark" data-nav="/">' +
-        '<span class="oh-mark" aria-hidden="true">' +
-          '<svg width="18" height="18" viewBox="0 0 18 18" fill="none">' +
-            '<rect x="1" y="6" width="6" height="6" rx="1.4" fill="currentColor" />' +
-            '<path d="M9 9h3.5" stroke="currentColor" stroke-width="1.4" />' +
-            '<rect x="11" y="3" width="6" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.4" transform="rotate(45 14 6)" />' +
-          '</svg>' +
-        '</span> OpenHarnessHub' +
-      '</div>' +
-      '<nav>' +
-        '<a data-nav="/pipelines">Explore</a>' +
-        '<a data-nav="/solutions">SDG solutions</a>' +
-        '<a data-nav="/app">Workspace</a>' +
-        '<a data-nav="/pricing">Pricing</a>' +
-      '</nav>' +
+      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG + ' Open Harness Hub</div>' +
+      '<nav>' + navItems + '</nav>' +
       '<span class="pt-spacer"></span>' +
       '<button class="oh-btn oh-btn--ghost oh-btn--sm" data-nav="/signin">Sign in</button>' +
     '</header>';
@@ -90,7 +100,7 @@
     });
 
     return '<div class="pt-mkt pt-view">' +
-      mktHeader(esc) +
+      mktHeader(esc, '/solutions') +
       '<div class="pt-mkt-body">' +
         '<div class="pt-page wide">' +
           '<div class="pt-page-head">' +
@@ -120,7 +130,7 @@
     // not-found state
     if (!s) {
       return '<div class="pt-mkt pt-view">' +
-        mktHeader(esc) +
+        mktHeader(esc, '/solutions') +
         '<div class="pt-mkt-body">' +
           '<div class="pt-page">' +
             '<div class="pt-page-head"><h1>Unknown goal</h1><div class="sub">Goal ' + esc(String(ctx.params.n || '?')) + ' is not one of the 17 SDGs.</div></div>' +
@@ -154,7 +164,7 @@
     }
 
     return '<div class="pt-mkt pt-view">' +
-      mktHeader(esc) +
+      mktHeader(esc, '/solutions') +
       '<div class="pt-mkt-body">' +
         '<div class="pt-page wide">' +
           '<div class="pt-crumb" style="margin-bottom:14px">' +

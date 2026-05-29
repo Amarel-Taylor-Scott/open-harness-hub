@@ -1,0 +1,178 @@
+id: "pipeline/nscp-structural-load-coefficient-verify"
+type: pipeline
+version: "0.1.0"
+name: "NSCP / ASCE 7 structural load-coefficient verifier"
+description: |
+  Verify the edition-specific numeric coefficients in a structural design
+  submittal (load-combination equations, importance / seismic-zone factors,
+  strength-reduction phi factors, allowable-stress increases) against an
+  authoritative constants corpus rather than the model's memory. Base models
+  confidently misquote these life-safety numbers because they blend
+  ASCE 7 / AISC 360 / ACI 318 / Eurocode / NSCP editions — a confident-wrong
+  failure that is deterministically checkable against the published tables.
+
+  This is a Cheap exact-id / keyword-first bundle (Bundle C) with a verify
+  spine: the structural-design-code-constants Knowledge Corpus is queried by
+  exact_id (e.g. "ASCE 7-22 load combo 2", "ACI 318 phi flexure", "NSCP 2015
+  seismic zone 4 Z"), every cited coefficient is checked for citation
+  coverage, and a deterministic gate requires that the submittal's numbers
+  match the edition the design claims. The pipeline does NOT perform the
+  structural-adequacy assessment itself — that is a tier-5 licensed-engineer
+  on-site act; it flags coefficient mismatches and routes them. Detection and
+  citation only; no PII.
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["construction.permitting", "infrastructure", "manufacturing"]
+capability: ["extraction", "retrieval", "verification"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+lifecycle_position: "api.review"
+freshness: "volatile"
+tags: ["building-safety", "structural-code", "nscp", "asce7", "load-combination", "exact-id-rag", "negative-space"]
+created: "2026-05-29"
+updated: "2026-05-29"
+attribution:
+  source_url: "https://www.dpwh.gov.ph"
+  source_kind: "other"
+  author: "NSCP (ASEP) + ASCE 7 / AISC 360 / ACI 318 public load combinations + Eurocode factor tables"
+  license: "see-source"
+task: "Verify the edition-specific load-combination equations and load / phi / seismic-zone coefficients cited in a structural design submittal against the authoritative structural-design-code-constants corpus, by exact-id lookup, and flag any coefficient that does not match the claimed code edition — with a citation to the published table."
+pipeline_kind: "verify_data"
+inputs:
+  - name: "submittal"
+    type: "string|object"
+    schema: "claimed_code_edition (e.g. NSCP 2015 / ASCE 7-22), cited_load_combinations[], cited_coefficients[] {symbol, value, context}, building_use_category, seismic_zone"
+outputs:
+  - name: "coefficient_findings"
+    type: "object[]"
+    schema: "{symbol, claimed_value, authoritative_value, edition, match, citation, severity}"
+  - name: "decision"
+    type: "string"
+    schema: "one of: coefficients_consistent | mismatch_flagged | unverifiable_edition"
+  - name: "score"
+    type: "number"
+defaults:
+  persona: "persona/building-code-reviewer"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/structural-design-code-constants"
+  rule_packs:
+    - "rule-pack/grep-building-code-inspection-flags"
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.submittal" }
+  - id: "injection_gate"
+    kind: "processor"
+    ref: "processor/prompt-injection-detector"
+    inputs:
+      text: "$.steps.structured_to_prose.output.prose"
+      source: "user"
+  # ── Conditional (IF): grep the cited symbols / combo labels ────────
+  - id: "grep_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-building-code-inspection-flags"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+  # ── Knowledge retrieval: exact_id lookup of the authoritative numbers ─
+  - id: "lookup_constants"
+    kind: "processor"
+    ref: "processor/two-time-retrieval"
+    inputs:
+      query: "$.steps.grep_flags.output.fired"
+      corpus_ref: "knowledge-pack/structural-design-code-constants"
+      first_pass_k: 12
+      second_pass_k: 8
+  # ── Verify the constants came from authoritative standards bodies ──
+  - id: "verify_sources"
+    kind: "processor"
+    ref: "processor/official-sources-checker"
+    inputs:
+      candidates: "$.steps.lookup_constants.output.candidates"
+      jurisdiction_hint: "PH"
+      freshness_window_days: 1825
+      allowlist_pack_ref: "rule-pack/grep-building-code-inspection-flags"
+  # ── Action (model call): compare claimed vs authoritative per symbol ─
+  - id: "compare_harness"
+    kind: "harness"
+    ref: "harness/building-code-inspection-review"
+    inputs:
+      packet: "$.steps.structured_to_prose.output.prose"
+      context: "$.steps.verify_sources.output.accepted"
+      refined_query: "$.steps.lookup_constants.output.refined_query"
+  - id: "dedupe_findings"
+    kind: "processor"
+    ref: "processor/finding-deduplicator"
+    inputs: { trace: "$.steps.compare_harness.output", config: {} }
+  - id: "calibrate_severity"
+    kind: "processor"
+    ref: "processor/severity-calibrator"
+    inputs: { trace: "$.steps.dedupe_findings.output.result", config: {} }
+  # ── Verify: each coefficient finding cites a published table ───────
+  - id: "citation_coverage"
+    kind: "processor"
+    ref: "processor/citation-coverage"
+    inputs: { response_markdown: "$.steps.calibrate_severity.output.result" }
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.calibrate_severity.output.result"
+      rubric_ref: "rubric/building-code-inspection-quality-v1"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "nscp-structural-load-coefficient-verify"
+      applied_layers: ["heuristic", "grep", "rag", "official_sources", "persona", "classifier"]
+success_criteria:
+  - rubric: "rubric/building-code-inspection-quality-v1"
+    threshold: 0.66
+  - kind: "deterministic"
+    target: "$.steps.injection_gate.output.allow"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "submittal text passed injection screen before any constant was retrieved"
+  - kind: "deterministic"
+    target: "$.steps.citation_coverage.output.passes"
+    op: "=="
+    value: true
+    severity: "critical"
+    label: "every flagged coefficient cites the authoritative published table (no model-memory numbers)"
+worked_example:
+  input:
+    claimed_code_edition: "NSCP 2015 (7th ed.) [verify edition/year]"
+    building_use_category: "office, occupancy importance category II"
+    seismic_zone: "Zone 4 (Region III / Clark–Angeles area) [verify per NSCP zone map]"
+    cited_load_combinations:
+      - "U = 1.4D"
+      - "U = 1.2D + 1.6L + 0.5(Lr or R)"
+    cited_coefficients:
+      - { symbol: "phi (flexure, tension-controlled)", value: 0.90, context: "RC beam design [ACI 318-style]" }
+      - { symbol: "Z (seismic zone factor)", value: 0.20, context: "labeled Zone 4" }
+  expected_output:
+    decision: "mismatch_flagged"
+    coefficient_findings:
+      - symbol: "phi (flexure, tension-controlled)"
+        claimed_value: 0.90
+        authoritative_value: 0.90
+        edition: "ACI 318 / NSCP RC provisions [verify edition]"
+        match: true
+        citation: "structural-design-code-constants: phi flexure tension-controlled [verify table ref]"
+        severity: "low"
+      - symbol: "Z (seismic zone factor)"
+        claimed_value: 0.20
+        authoritative_value: 0.40
+        edition: "NSCP 2015 seismic zone factor table [verify]"
+        match: false
+        citation: "structural-design-code-constants: NSCP Zone 4 Z = 0.40 [verify exact value/edition]"
+        severity: "critical"
+        note: "Submittal labels the site Zone 4 but applies Z=0.20 (a Zone 2 value). Coefficient does not match the claimed zone; route for licensed-engineer correction."
+    metadata:
+      lift_reasons: ["volatile_fact", "sparse_data"]
+      durability_class: "structural"
+      mechanism: "edition-specific numeric coefficients the base model interpolates incorrectly across ASCE7/ACI318/Eurocode/NSCP; deterministically checkable against published tables"
+      scope_note: "Detects coefficient mismatch only; structural adequacy is a tier-5 licensed-engineer on-site assessment, out of scope."
+      safety_stance: "detection + citation only; no PII"

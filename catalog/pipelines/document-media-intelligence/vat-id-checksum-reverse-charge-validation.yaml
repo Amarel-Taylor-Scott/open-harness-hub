@@ -1,0 +1,165 @@
+id: "pipeline/vat-id-checksum-reverse-charge-validation"
+type: pipeline
+version: "0.1.0"
+name: "Cross-border VAT-ID checksum + reverse-charge applicability validation"
+description: |
+  Negative-space task: deciding whether an intra-EU B2B invoice was correctly
+  issued under the VAT reverse-charge mechanism is a deterministic rule the
+  model gets wrong because it (a) cannot reliably run the per-country VAT-ID
+  checksum (each member state has its own check-digit algorithm), (b)
+  hallucinates whether a reverse-charge note is required, and (c) cannot keep
+  a country's standard VAT rate straight across a long context. This pipeline
+  pins the supplier/customer VAT-IDs to a deterministic format+checksum check,
+  retrieves the controlling reverse-charge criteria from a governed corpus,
+  and verifies the invoice carries the mandatory "reverse charge" wording when
+  the conditions hold — refusing to bless an invoice that fails the formal
+  test rather than fluently approving it.
+
+  Capability lift is structural: VAT-ID checksums and the reverse-charge
+  decision are formal rules with a single correct answer, and a deterministic
+  checker beats a stochastic model on them by construction — the lift survives
+  model upgrades and costs no model tokens.
+
+  Bundle: High-precision regulated RAG (taxonomy Bundle B) — exact-id +
+  field-weighted retrieval over the VAT framework corpus, cite-or-abstain
+  output, and deterministic post-call verification gates.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["tax.indirect", "finance.fraud", "procurement.contracting"]
+capability: ["verification", "extraction", "evaluation", "retrieval"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "stable"
+tags: ["document-media-intelligence", "vat", "reverse-charge", "checksum", "cross-border", "deterministic-gate", "structural-lift", "bundle-b"]
+created: "2026-05-29"
+updated: "2026-05-29"
+task: |
+  Given an intra-EU B2B invoice (digital or scanned), extract supplier and
+  customer VAT identification numbers, country codes, place-of-supply, and the
+  presence/absence of a reverse-charge note; deterministically validate each
+  VAT-ID's national checksum; retrieve the controlling reverse-charge criteria;
+  and emit a verdict (reverse_charge_correct | missing_reverse_charge_note |
+  invalid_vat_id | not_reverse_charge) with the cited criterion and the exact
+  VAT-ID(s) that failed.
+pipeline_kind: "verify_data"
+inputs:
+  - name: "invoice"
+    type: "string|object"
+outputs:
+  - name: "verdict"
+    type: "string"
+  - name: "vat_id_checks"
+    type: "object[]"
+  - name: "reverse_charge_required"
+    type: "boolean"
+  - name: "cited_criteria"
+    type: "object[]"
+  - name: "findings"
+    type: "object[]"
+defaults:
+  persona: "persona/vat-invoice-auditor"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs: ["knowledge-pack/tax-vat-invoice-audit-frameworks"]
+  rule_packs: ["rule-pack/grep-tax-vat-invoice-audit-flags", "rule-pack/rag-tax-vat-invoice-audit-retrieval-policy"]
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.invoice" }
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+  # --- normalize the two country codes deterministically (ISO 3166) ---
+  - id: "normalize_countries"
+    kind: "processor"
+    ref: "processor/iso-country-normalize"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+  # --- KNOWLEDGE: grep VAT flags then retrieve the controlling criteria ---
+  - id: "grep_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-tax-vat-invoice-audit-flags"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+  - id: "retrieve_criteria"
+    kind: "rule_pack"
+    ref: "rule-pack/rag-tax-vat-invoice-audit-retrieval-policy"
+    inputs: { query: "$.steps.grep_flags.output.fired", corpus: "knowledge-pack/tax-vat-invoice-audit-frameworks", top_k: 10 }
+  - id: "normalize_evidence"
+    kind: "processor"
+    ref: "processor/packet-evidence-normalizer"
+    inputs: { trace: "$.steps.retrieve_criteria.output", config: {} }
+  # --- DETERMINISTIC: build the VAT-ID checksum + reverse-charge control matrix ---
+  - id: "vat_control_matrix"
+    kind: "processor"
+    ref: "processor/control-matrix-builder"
+    inputs: { trace: "$.steps.normalize_evidence.output.result", config: { checks: ["supplier_vat_id national checksum valid", "customer_vat_id national checksum valid", "supplier_country != customer_country (intra-EU)", "reverse_charge_note present when intra-EU B2B"] } }
+  # --- ACTION (model call): classify the verdict, cite-or-abstain on the criteria ---
+  - id: "review_harness"
+    kind: "harness"
+    ref: "harness/tax-vat-invoice-audit-review"
+    inputs:
+      packet: "$.steps.redact_pii.output.text"
+      context: "$.steps.retrieve_criteria.output.passages"
+      evidence: "$.steps.normalize_evidence.output.result"
+      controls: "$.steps.vat_control_matrix.output.result"
+  - id: "calibrate_severity"
+    kind: "processor"
+    ref: "processor/severity-calibrator"
+    inputs: { trace: "$.steps.review_harness.output", config: {} }
+  - id: "check_citations"
+    kind: "processor"
+    ref: "processor/citation-span-checker"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+  # --- DETERMINISTIC GATE: both VAT-IDs must pass their national checksum ---
+  - id: "verify_vat_checksums"
+    kind: "processor"
+    ref: "processor/verify-deterministic-criterion"
+    inputs:
+      target_value: "$.steps.vat_control_matrix.output.result.all_vat_ids_valid"
+      op: "is_truthy"
+      value: null
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.calibrate_severity.output.result"
+      rubric_ref: "rubric/tax-vat-invoice-audit-quality-v1"
+  - id: "redaction_audit"
+    kind: "processor"
+    ref: "processor/packet-redaction-audit"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+  - id: "summary"
+    kind: "processor"
+    ref: "processor/review-summary-composer"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+success_criteria:
+  - rubric: "rubric/tax-vat-invoice-audit-quality-v1"
+    threshold: 0.70
+  - kind: "deterministic"
+    label: "every cited criterion resolves to a real span (cite-or-abstain enforced)"
+    target: "$.steps.check_citations.output.result.pass"
+    op: "=="
+    value: true
+    severity: "high"
+  - kind: "composite"
+    label: "verdict is consistent with the deterministic VAT-ID checksum result"
+    op: "OR"
+    children:
+      - kind: "deterministic"
+        target: "$.steps.verify_vat_checksums.output.pass"
+        op: "=="
+        value: true
+      - kind: "regex"
+        target: "$.steps.review_harness.output"
+        pattern: "invalid_vat_id|invalid vat"
+        must_match: true
+        severity: "high"
+  - kind: "deterministic"
+    label: "publication redaction audit passes"
+    target: "$.steps.redaction_audit.output.result.pass"
+    op: "=="
+    value: true
+    severity: "high"

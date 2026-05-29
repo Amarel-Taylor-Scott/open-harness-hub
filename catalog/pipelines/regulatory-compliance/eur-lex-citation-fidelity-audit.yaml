@@ -1,0 +1,173 @@
+id: "pipeline/eur-lex-citation-fidelity-audit"
+type: pipeline
+version: "0.1.0"
+name: "EUR-Lex citation-fidelity audit for compliance memos"
+description: |
+  Audits a regulatory compliance memo's citations to EUR-Lex instruments
+  (e.g. "Art 9 Reg (EU) 2024/1689", "Art 35 GDPR") for fidelity: does each cited
+  article actually exist, and does its text support the claim the memo attaches
+  to it? Returns per-citation supported / unsupported / misattributed /
+  not-found, with the retrieved authoritative passage and a corrected citation
+  when the article number is wrong.
+
+  Negative-space task: a bare LLM invents plausible-looking article numbers and
+  attaches real-sounding obligations to the wrong provision — the classic
+  fabricated-legal-citation failure that is unacceptable in a regulated filing.
+  This pipeline runs a citation-fidelity bundle: it extracts each citation,
+  retrieves the controlling article text from the AI Act / governance corpus,
+  and runs a chain-of-verification pass that must quote the supporting span or
+  downgrade the citation — every claim is re-checked against the primary text
+  rather than trusted.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai_governance", "ai_governance.eu_act", "legal.compliance", "government.regulatory"]
+capability: ["verification", "retrieval", "evaluation", "extraction"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "post_api.evaluation"
+freshness: "dated"
+tags: ["eur-lex", "citation-fidelity", "ai-act", "gdpr", "hallucinated-citation", "chain-of-verification"]
+created: "2026-05-29"
+updated: "2026-05-29"
+
+attribution:
+  source_url: "https://eur-lex.europa.eu/"
+  source_kind: "other"
+  author: "European Union (EUR-Lex)"
+  license: "other"
+
+task: "Audit each EUR-Lex citation in a compliance memo for fidelity (exists + supports the claim), returning supported/unsupported/misattributed/not-found with the authoritative passage and a corrected citation where needed."
+pipeline_kind: "evaluate"
+
+inputs:
+  - name: "compliance_memo"
+    type: "string|object"
+
+outputs:
+  - name: "citation_findings"
+    type: "object[]"
+  - name: "fidelity_score"
+    type: "number"
+  - name: "uncited_claims"
+    type: "string[]"
+  - name: "corrected_citations"
+    type: "object[]"
+
+defaults:
+  persona: "persona/rag-citation-auditor"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs: ["knowledge-pack/ai-governance-frameworks", "knowledge-pack/legal-interpretation-canons"]
+
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.compliance_memo" }
+  - id: "extract_citations"
+    kind: "processor"
+    ref: "processor/entity-resolution-link"
+    inputs:
+      records: "$.steps.structured_to_prose.output.prose"
+      blocking_keys: ["instrument", "article", "annex"]
+      similarity_threshold: 0.85
+  - id: "retrieve_article_text"
+    kind: "processor"
+    ref: "processor/hybrid-bm25-vector-retrieve"
+    inputs:
+      query: "$.steps.extract_citations.output.clusters"
+      corpus: "knowledge-pack/ai-governance-frameworks"
+      top_k: 20
+  - id: "rerank_passages"
+    kind: "processor"
+    ref: "processor/cross-encoder-reranker"
+    inputs:
+      query: "$.steps.extract_citations.output.clusters"
+      candidates: "$.steps.retrieve_article_text.output.passages"
+      top_k: 6
+  - id: "verify_citations"
+    kind: "loop"
+    ref: "pattern/chain-of-verification"
+    inputs:
+      claims: "$.steps.structured_to_prose.output.prose"
+      citations: "$.steps.extract_citations.output.clusters"
+      authoritative_passages: "$.steps.rerank_passages.output.passages"
+  - id: "citation_coverage"
+    kind: "processor"
+    ref: "processor/citation-coverage"
+    inputs: { response_markdown: "$.steps.structured_to_prose.output.prose" }
+  - id: "official_sources"
+    kind: "processor"
+    ref: "processor/official-sources-checker"
+    inputs:
+      candidates: "$.steps.rerank_passages.output.passages"
+      jurisdiction_hint: "EU"
+      freshness_window_days: 3650
+      allowlist_pack_ref: "rule-pack/web-search-allowlist-default"
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.verify_citations.output"
+      rubric_ref: "rubric/rag-citation-audit-quality-v1"
+  - id: "summary"
+    kind: "processor"
+    ref: "processor/review-summary-composer"
+    inputs: { trace: "$.steps.grade.output.result", config: {} }
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "eur-lex-citation-fidelity-audit"
+      applied_layers: ["extract_citations", "rag", "rerank", "chain_of_verification", "citation_coverage", "official_sources", "judge"]
+
+success_criteria:
+  - rubric: "rubric/rag-citation-audit-quality-v1"
+    threshold: 0.75
+  - kind: "deterministic"
+    target: "$.steps.official_sources.output.summary.all_primary"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "Every authoritative passage used to judge a citation is from a primary EU source."
+  - kind: "deterministic"
+    target: "$.fidelity_score"
+    op: ">="
+    value: 0
+    severity: "medium"
+    label: "A fidelity score is always emitted (no silent pass)."
+
+worked_example:
+  input:
+    compliance_memo:
+      title: "AI Act readiness memo — ResumeRank"
+      body: >
+        Our system is high-risk under Annex III. We have a risk-management
+        system as required by Article 9. A data protection impact assessment is
+        mandatory under Article 27 of the AI Act. Human oversight is addressed
+        per Article 14. We rely on Article 6(3) to argue the system is not
+        high-risk because it performs a narrow procedural task.
+  expected_output:
+    fidelity_score: 0.6
+    citation_findings:
+      - citation: "Article 9 (Reg (EU) 2024/1689)"
+        verdict: "supported"
+        supporting_span: "providers shall establish, implement, document and maintain a risk management system ... [Art 9(1)]"
+      - citation: "Article 27 — 'DPIA mandatory under the AI Act'"
+        verdict: "misattributed"
+        note: "Art 27 of the AI Act is the fundamental-rights impact assessment (FRIA); the DPIA obligation is GDPR Art 35, not AI Act Art 27."
+        supporting_span: "deployers ... shall perform an assessment of the impact on fundamental rights ... [Art 27]"
+        corrected_citation: "DPIA → Art 35 GDPR; FRIA → Art 27 AI Act"
+      - citation: "Article 14 (human oversight)"
+        verdict: "supported"
+        supporting_span: "High-risk AI systems shall be designed ... to be effectively overseen by natural persons ... [Art 14(1)]"
+      - citation: "Article 6(3) (not high-risk — narrow procedural task)"
+        verdict: "supported_with_caveat"
+        supporting_span: "an AI system ... shall not be considered high-risk where it does not pose a significant risk ... e.g. intended to perform a narrow procedural task [Art 6(3)]"
+        note: "Art 6(3) exemption is unavailable where the system profiles natural persons — applies to this hiring use; flag for human review."
+    uncited_claims:
+      - "We have a risk-management system (asserted but no internal evidence cited)."
+    corrected_citations:
+      - wrong: "DPIA mandatory under AI Act Art 27"
+        correct: "DPIA → GDPR Art 35; AI Act Art 27 governs the FRIA"

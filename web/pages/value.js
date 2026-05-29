@@ -218,7 +218,7 @@
           '<div class="pt-cert">' +
             '<div class="pt-seal">✓</div>' +
             '<h3>Provenance attestation</h3>' +
-            '<div class="by">Verified by OpenHarnessHub</div>' +
+            '<div class="by">Verified by Open Harness Hub</div>' +
             '<div class="crow"><span class="k">Flow</span><span class="v">csddd-grade</span></div>' +
             '<div class="crow"><span class="k">Sourced as of</span><span class="v">2026-05-28</span></div>' +
             '<div class="crow"><span class="k">Valid through</span><span class="v">2026-08-26</span></div>' +

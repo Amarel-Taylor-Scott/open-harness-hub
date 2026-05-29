@@ -5,14 +5,16 @@
 (function () {
   "use strict";
 
-  // ---- shared: inline wordmark (mirrors oh-wordmark + oh-mark in oh-components.css) ----
+  // ---- shared: inline wordmark — canonical SVG mark + spaced product name ----
+  var AUTH_MARK_SVG = '<span class="oh-mark" aria-hidden="true">' +
+    '<svg width="18" height="18" viewBox="0 0 18 18" fill="none">' +
+    '<rect x="1" y="6" width="6" height="6" rx="1.4" fill="currentColor" />' +
+    '<path d="M9 9h3.5" stroke="currentColor" stroke-width="1.4" />' +
+    '<rect x="11" y="3" width="6" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.4" transform="rotate(45 14 6)" />' +
+    '</svg></span>';
+
   function wordmarkHTML() {
-    return (
-      '<div class="oh-wordmark" style="font-family:var(--font-display);font-weight:700;font-size:18px;' +
-      'letter-spacing:-.01em;color:var(--fg);display:inline-flex;align-items:center;gap:9px">' +
-      '<span class="oh-mark" style="width:18px;height:18px;display:inline-grid;place-items:center;color:var(--accent)">⬡</span>' +
-      "OpenHarnessHub</div>"
-    );
+    return '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + AUTH_MARK_SVG + ' Open Harness Hub</div>';
   }
 
   // ---- shared: step-progress strip (pt-steps / pt-step from proto-deep.css) ----

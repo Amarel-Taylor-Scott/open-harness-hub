@@ -1,0 +1,225 @@
+id: "pipeline/ph-floor-count-permit-discrepancy-detect"
+type: pipeline
+version: "0.1.0"
+name: "PH floor-count / permit discrepancy detector (PD 1096)"
+description: |
+  Defensive detection + routing for Philippine building-permit violations,
+  grounded in the PH building-safety source registry
+  (data/source-registry/ph-building-safety.json) and the Angeles City collapse
+  fixture. Given a building case packet (address, reported as-built floor
+  count, permit-record fields obtained by a human router from the LGU Office
+  of the Building Official, PRC license number on the permit, Certificate of
+  Occupancy and Fire Safety Inspection Certificate status), the pipeline flags:
+  approved-floor-count vs reported-floor-count excess, missing PRC-licensed
+  structural-engineer sign-off, occupied-without-Certificate-of-Occupancy, and
+  missing/expired FSIC — then routes each flag to the correct authority (OBO,
+  DPWH Regional Office, PRC, BFP) with PD 1096 / RA 9514 citations.
+
+  This is a High-precision legal RAG bundle (Bundle B): an exact-id + dense leg
+  over the National Building Permit / Occupancy corpus, official-source
+  verification of every retrieved clause, per-claim citation coverage, and a
+  hard abstain gate. The dispositive as-built floor count is tier-5
+  (human-on-site) and the approved floor count is tier-4 (OBO counter record);
+  when the approved count is not human-verified the pipeline MUST emit
+  PERMIT_RECORD_UNVERIFIABLE and route to a human rather than infer a number
+  from the model. No evasion guidance; detection and routing with citations
+  only; no occupant/worker/owner PII stored.
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["construction.permitting", "government.permitting", "infrastructure"]
+capability: ["extraction", "retrieval", "verification", "routing"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+lifecycle_position: "api.review"
+freshness: "volatile"
+eu_ai_act_risk: "high_risk"
+tags: ["building-safety", "philippines", "pd-1096", "permit-verification", "violation-detection", "negative-space", "high-precision-legal-rag"]
+created: "2026-05-29"
+updated: "2026-05-29"
+attribution:
+  source_url: "https://www.dpwh.gov.ph"
+  source_kind: "other"
+  author: "PD 1096 (National Building Code of the Philippines) + IRR; DPWH/DILG/OBO/PRC/BFP (per data/source-registry/ph-building-safety.json)"
+  license: "see-source"
+task: "Detect Philippine building-permit red flags (approved-vs-actual floor count, missing licensed-engineer sign-off, occupied-without-CO, missing/expired FSIC) on a building case packet and route each flag to the correct authority with PD 1096 / RA 9514 citations; abstain when the approved floor count is not human-verified."
+pipeline_kind: "review"
+inputs:
+  - name: "case_packet"
+    type: "string|object"
+    schema: "address, reported_floor_count, approved_floor_count (nullable; human-router from OBO), occupancy_status, licensed_engineer_prc_no, certificate_of_occupancy_status, fsic_status, tip_source"
+outputs:
+  - name: "flags"
+    type: "object[]"
+    schema: "{code, severity, citation[], route_to, confidence, evidence_ids}"
+  - name: "routing_packet"
+    type: "object"
+  - name: "abstained"
+    type: "boolean"
+  - name: "score"
+    type: "number"
+defaults:
+  persona: "persona/building-code-reviewer"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/national-building-permit-and-occupancy-procedures-low-digitization"
+    - "knowledge-pack/building-code-inspection-frameworks"
+  rule_packs:
+    - "rule-pack/grep-building-code-inspection-flags"
+    - "rule-pack/rag-building-code-inspection-retrieval-policy"
+steps:
+  # ── Input formatting ──────────────────────────────────────────────
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.case_packet" }
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+  # ── Trigger gate: block injection riding in the tip/packet text ────
+  - id: "injection_gate"
+    kind: "processor"
+    ref: "processor/prompt-injection-detector"
+    inputs:
+      text: "$.steps.redact_pii.output.text"
+      source: "user"
+  - id: "normalize_evidence"
+    kind: "processor"
+    ref: "processor/packet-evidence-normalizer"
+    inputs: { trace: "$.steps.redact_pii.output", config: {} }
+  # ── Conditional (IF): deterministic permit/floor-count red flags ───
+  - id: "grep_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-building-code-inspection-flags"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+  # ── Knowledge retrieval: exact statute clauses (Bundle B) ──────────
+  - id: "retrieve_code"
+    kind: "rule_pack"
+    ref: "rule-pack/rag-building-code-inspection-retrieval-policy"
+    inputs:
+      query: "$.steps.grep_flags.output.fired"
+      corpus: "knowledge-pack/national-building-permit-and-occupancy-procedures-low-digitization"
+      top_k: 10
+  # ── Verify retrieved clauses come from authoritative gov sources ───
+  - id: "verify_sources"
+    kind: "processor"
+    ref: "processor/official-sources-checker"
+    inputs:
+      candidates: "$.steps.retrieve_code.output.passages"
+      jurisdiction_hint: "PH"
+      freshness_window_days: 365
+      allowlist_pack_ref: "rule-pack/rag-building-code-inspection-retrieval-policy"
+  # ── Action (model call): build the cited flag set behind a boundary ─
+  - id: "review_harness"
+    kind: "harness"
+    ref: "harness/building-code-inspection-review"
+    inputs:
+      packet: "$.steps.redact_pii.output.text"
+      context: "$.steps.verify_sources.output.accepted"
+      evidence: "$.steps.normalize_evidence.output.result"
+  - id: "dedupe_findings"
+    kind: "processor"
+    ref: "processor/finding-deduplicator"
+    inputs: { trace: "$.steps.review_harness.output", config: {} }
+  - id: "calibrate_severity"
+    kind: "processor"
+    ref: "processor/severity-calibrator"
+    inputs: { trace: "$.steps.dedupe_findings.output.result", config: {} }
+  # ── Verify: every flag's clause claim must carry a citation ────────
+  - id: "citation_coverage"
+    kind: "processor"
+    ref: "processor/citation-coverage"
+    inputs: { response_markdown: "$.steps.calibrate_severity.output.result" }
+  # ── Action: route each flag to OBO / DPWH / PRC / BFP ──────────────
+  - id: "route_owner"
+    kind: "processor"
+    ref: "processor/remediation-owner-router"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+  # ── Stop/End + human router: tier-4/5 + compound life-safety flag ──
+  - id: "escalate_human"
+    kind: "processor"
+    ref: "processor/escalate-human-review"
+    inputs:
+      case_id: "$.steps.normalize_evidence.output.result.case_id"
+      reason: "PERMIT_RECORD_UNVERIFIABLE or compound life-safety flag (FLOOR_COUNT_EXCESS + OCCUPIED_WITHOUT_CO): approved count is tier-4 (OBO counter) and as-built count tier-5 (human site visit); confirm flag inputs before issuing routing packet."
+      severity: "critical"
+      payload: "$.steps.route_owner.output.result"
+  - id: "redaction_audit"
+    kind: "processor"
+    ref: "processor/packet-redaction-audit"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.calibrate_severity.output.result"
+      rubric_ref: "rubric/building-code-inspection-quality-v1"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "ph-floor-count-permit-discrepancy-detect"
+      applied_layers: ["privacy", "heuristic", "grep", "rag", "official_sources", "persona", "classifier"]
+success_criteria:
+  - rubric: "rubric/building-code-inspection-quality-v1"
+    threshold: 0.68
+  - kind: "deterministic"
+    target: "$.steps.injection_gate.output.allow"
+    op: "=="
+    value: true
+    severity: "critical"
+    label: "input passed prompt-injection screen before any clause was retrieved"
+  - kind: "deterministic"
+    target: "$.steps.citation_coverage.output.passes"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "every flag's statutory claim carries a PD 1096 / RA 9514 citation"
+  - kind: "deterministic"
+    target: "$.steps.redaction_audit.output.result.pass"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "no occupant/worker/owner PII leaks into the routing packet"
+worked_example:
+  input:
+    address: "Block redacted, Angeles City, Pampanga, Region III"
+    approved_floor_count: 9
+    reported_floor_count: 10
+    occupancy_status: "occupied"
+    licensed_engineer_prc_no: null
+    certificate_of_occupancy_status: "absent_for_10th_floor"
+    fsic_status: "absent_for_10th_floor"
+    tip_source: "collapse incident report (under investigation by LGU/DPWH/DILG)"
+  expected_output:
+    abstained: false
+    flags:
+      - code: "FLOOR_COUNT_EXCESS"
+        severity: "critical"
+        citation: ["PD 1096 Sec. 301 (permit required for construction) [verify clause vs current IRR]", "PD 1096 Sec. 208 (Building Official Stop-Work authority) [verify]"]
+        route_to: "LGU Office of the Building Official; DPWH Regional Office III"
+        confidence: "medium"
+        note: "approved=9, reported as-built=10; as-built count requires tier-5 human site verification."
+      - code: "MISSING_LICENSED_ENGINEER_SIGN_OFF"
+        severity: "high"
+        citation: ["PD 1096 IRR structural sign-off threshold for high-rise [verify rule/section + IRR version]"]
+        route_to: "PRC Board of Civil Engineering (license verification); LGU OBO"
+      - code: "OCCUPIED_WITHOUT_CO"
+        severity: "critical"
+        citation: ["PD 1096 Sec. 307 (Certificate of Occupancy required before use) [verify]"]
+        route_to: "LGU OBO"
+      - code: "MISSING_OR_EXPIRED_FIRE_SAFETY_CERTIFICATE"
+        severity: "high"
+        citation: ["RA 9514 (Fire Code of the Philippines) IRR — FSIC prerequisite for occupancy [verify section + threshold]"]
+        route_to: "Bureau of Fire Protection (BFP) district office"
+    routing_packet:
+      escalated_to_human: true
+      escalation_reason: "compound life-safety flag (FLOOR_COUNT_EXCESS + OCCUPIED_WITHOUT_CO); approved count tier-4, as-built tier-5"
+      disclosure: "All clause numbers flagged [verify] pending re-ingestion of current IRR version; routing packet is confidence:low until OBO permit copy and licensed-engineer site assessment are obtained."
+    metadata:
+      jurisdiction: "PH × construction-building-safety"
+      lift_reasons: ["embodiment_required", "accountability_or_license", "no_addressable_source", "volatile_fact"]
+      durability_class: "structural"
+      source_registry: "data/source-registry/ph-building-safety.json"
+      safety_stance: "detection + routing + citations only; abstain on unverifiable approved floor count; no PII stored"

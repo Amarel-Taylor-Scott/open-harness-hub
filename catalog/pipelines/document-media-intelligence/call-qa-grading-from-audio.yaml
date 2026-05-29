@@ -1,0 +1,142 @@
+id: "pipeline/call-qa-grading-from-audio"
+type: pipeline
+version: "0.1.0"
+name: "Call-QA grading from audio with cited transcript spans + required-disclosure gate"
+description: |
+  Negative-space task: grading a recorded support/collections/sales call
+  against a QA rubric. A bare LLM handed a raw audio file (or even a
+  transcript) produces a plausible score with no audit trail, drifts on
+  whether a MANDATORY disclosure was actually spoken, and cites nothing —
+  so the score cannot be defended in a dispute or a regulator review. This
+  pipeline transcribes deterministically with Whisper (segments +
+  timestamps), redacts PII before the model, retrieves the controlling QA
+  criteria, grades each rubric dimension with the model REQUIRED to quote the
+  verbatim transcript span that justifies it, and runs a deterministic gate
+  that fails the call when a required-disclosure phrase is absent from the
+  transcript — regardless of what the model scored.
+
+  Capability lift is structural: the durable lift is grounding (every score
+  tied to a quoted span) + a deterministic disclosure check (a phrase is
+  present in the transcript or it is not — one correct answer). Both survive
+  model upgrades; the transcription, redaction, retrieval, and disclosure
+  check are freezable and cost no model tokens beyond the single grading call.
+
+  Bundle: Standard hybrid RAG over the QA-criteria corpus (taxonomy Bundle A)
+  fronted by an audio→text Input-Formatting step and closed by grounded,
+  cited grading with deterministic verification.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["retail.support", "customer_success.escalation", "finance.fraud"]
+capability: ["evaluation", "extraction", "verification", "retrieval"]
+modality: ["audio", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "stable"
+tags: ["document-media-intelligence", "call-qa", "speech-to-text", "whisper", "grounded-grading", "required-disclosure", "structural-lift", "bundle-a"]
+created: "2026-05-29"
+updated: "2026-05-29"
+task: |
+  Given a recorded customer call (audio) and the applicable QA rubric, produce
+  a per-dimension QA score where every dimension's rating is justified by a
+  verbatim quoted transcript span with its timestamp, and a pass/fail gate on
+  whether the agent spoke the required disclosure(s). Output: dimension scores
+  + cited spans + disclosure verdict (disclosed | missing_required_disclosure)
+  + overall grade.
+pipeline_kind: "evaluate"
+inputs:
+  - name: "call_audio"
+    type: "bytes|url"
+  - name: "required_disclosures"
+    type: "string[]"
+outputs:
+  - name: "dimension_scores"
+    type: "object[]"
+  - name: "cited_spans"
+    type: "object[]"
+  - name: "disclosure_verdict"
+    type: "string"
+  - name: "overall_grade"
+    type: "number"
+  - name: "findings"
+    type: "object[]"
+defaults:
+  persona: "persona/customer-escalation-reviewer"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs: ["knowledge-pack/customer-escalation-quality-frameworks"]
+  rule_packs: ["rule-pack/grep-customer-escalation-quality-flags", "rule-pack/rag-customer-escalation-quality-retrieval-policy"]
+steps:
+  # --- INPUT FORMATTING: deterministic transcription (segments + timestamps) ---
+  - id: "transcribe"
+    kind: "processor"
+    ref: "processor/audio-to-text-whisper"
+    inputs: { audio: "$.inputs.call_audio", language_hint: "auto" }
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.transcribe.output.transcript" }
+  # --- KNOWLEDGE: grep QA triage flags then retrieve the controlling criteria ---
+  - id: "grep_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-customer-escalation-quality-flags"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+  - id: "retrieve_criteria"
+    kind: "rule_pack"
+    ref: "rule-pack/rag-customer-escalation-quality-retrieval-policy"
+    inputs: { query: "$.steps.grep_flags.output.fired", corpus: "knowledge-pack/customer-escalation-quality-frameworks", top_k: 8 }
+  # --- DETERMINISTIC: required-disclosure phrase presence over the transcript ---
+  - id: "disclosure_check"
+    kind: "processor"
+    ref: "processor/verify-regex-criterion"
+    inputs:
+      target: "$.steps.redact_pii.output.text"
+      pattern: "this call (is|may be) (being )?(monitored|recorded)"
+      must_match: true
+      case_insensitive: true
+  # --- ACTION (model call): grade each dimension, REQUIRED to quote spans ---
+  - id: "grade_harness"
+    kind: "harness"
+    ref: "harness/customer-escalation-quality-review"
+    inputs:
+      packet: "$.steps.redact_pii.output.text"
+      context: "$.steps.retrieve_criteria.output.passages"
+  # --- POST: verify the grading actually cited transcript spans ---
+  - id: "check_citations"
+    kind: "processor"
+    ref: "processor/citation-span-checker"
+    inputs: { trace: "$.steps.grade_harness.output", config: {} }
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.grade_harness.output.findings"
+      rubric_ref: "rubric/customer-escalation-quality-quality-v1"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "call-qa-grading-from-audio"
+      applied_layers: ["transcribe", "privacy", "grep", "rag", "disclosure_check", "grade_harness", "citation_check", "judge"]
+success_criteria:
+  - rubric: "rubric/customer-escalation-quality-quality-v1"
+    threshold: 0.65
+  - kind: "deterministic"
+    label: "every dimension rating is justified by a quoted transcript span"
+    target: "$.steps.check_citations.output.result.pass"
+    op: "=="
+    value: true
+    severity: "high"
+  - kind: "composite"
+    label: "required call-recording disclosure was spoken OR the call is flagged for it"
+    op: "OR"
+    children:
+      - kind: "deterministic"
+        target: "$.steps.disclosure_check.output.pass"
+        op: "=="
+        value: true
+      - kind: "regex"
+        target: "$.steps.grade_harness.output"
+        pattern: "missing.{0,20}disclosure|disclosure.{0,20}(missing|absent|not)"
+        must_match: true
+        severity: "high"

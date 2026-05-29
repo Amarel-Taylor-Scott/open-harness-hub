@@ -7,10 +7,45 @@
 (function () {
   "use strict";
 
+  // Canonical marketing wordmark + nav (matches index.html / sdg.js / govern.js)
+  var MARK_SVG_CATALOG = '<span class="oh-mark" aria-hidden="true">' +
+    '<svg width="18" height="18" viewBox="0 0 18 18" fill="none">' +
+    '<rect x="1" y="6" width="6" height="6" rx="1.4" fill="currentColor" />' +
+    '<path d="M9 9h3.5" stroke="currentColor" stroke-width="1.4" />' +
+    '<rect x="11" y="3" width="6" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.4" transform="rotate(45 14 6)" />' +
+    '</svg></span>';
+
+  var MKT_NAV_CATALOG = [
+    ['/pipelines', 'Explore'],
+    ['/solutions', 'SDG solutions'],
+    ['/app',       'Workspace'],
+    ['/pricing',   'Pricing'],
+    ['/docs',      'Docs'],
+    ['/trust',     'Trust']
+  ];
+
+  function mktHeaderCatalog(activeRoute) {
+    var navItems = MKT_NAV_CATALOG.map(function (p) {
+      var active = p[0] === activeRoute;
+      return '<a data-nav="' + p[0] + '"' +
+        (active ? ' style="color:var(--fg);font-weight:600"' : '') +
+        '>' + p[1] + '</a>';
+    }).join('');
+    return '<header class="pt-mkt-top">' +
+      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG_CATALOG + ' Open Harness Hub</div>' +
+      '<nav>' + navItems + '</nav>' +
+      '<span class="pt-spacer"></span>' +
+      '<div style="display:flex;gap:9px">' +
+      '<button class="oh-btn oh-btn--ghost oh-btn--sm" data-nav="/signin">Sign in</button>' +
+      '<button class="oh-btn oh-btn--primary oh-btn--sm" data-nav="/signup">Get started</button>' +
+      '</div>' +
+    '</header>';
+  }
+
   var PRIM_ORDER = ["input", "conditional", "knowledge", "action", "loop", "stop", "output"];
 
   var OWN_LABELS = [
-    ["free", "Free · OpenHarnessHub"],
+    ["free", "Free · Open Harness Hub"],
     ["premium", "Premium · OHH (subscription)"],
     ["community-free", "Community · free"],
     ["community-paid", "Community · paid"]
@@ -627,18 +662,7 @@
     }
 
     var html = '<div class="pt-mkt pt-view">' +
-      '<header class="pt-mkt-top">' +
-      '<span style="font-family:var(--font-display);font-size:17px;font-weight:700;color:var(--fg);cursor:pointer" data-nav="/">➹ OHH</span>' +
-      '<nav>' +
-      '<a data-nav="/pipelines">Explore</a>' +
-      '<a data-nav="/pricing" style="color:var(--fg);font-weight:600">Pricing</a>' +
-      '<a data-nav="/app">App</a>' +
-      '</nav>' +
-      '<div style="margin-left:auto;display:flex;gap:9px">' +
-      '<button class="oh-btn oh-btn--ghost oh-btn--sm" data-nav="/signin">Sign in</button>' +
-      '<button class="oh-btn oh-btn--primary oh-btn--sm" data-nav="/signup">Get started</button>' +
-      '</div>' +
-      '</header>' +
+      mktHeaderCatalog('/pricing') +
       '<div class="pt-mkt-body">' +
       '<div class="pt-page wide pt-view">' +
       '<div class="pt-page-head">' +

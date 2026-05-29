@@ -59,7 +59,7 @@
           '<span class="plus">+</span>' +
           '<div class="seg"><span class="v">34</span><span class="k">governed, filling gaps</span></div>' +
           '<span class="covbar"><span class="priv" style="width:26%"></span><span class="pub" style="width:74%"></span></span>' +
-          '<span style="font-size:11.5px;color:var(--fg-muted)">26% your IP · 74% from OpenHarnessHub</span>' +
+          '<span style="font-size:11.5px;color:var(--fg-muted)">26% your IP · 74% from Open Harness Hub</span>' +
         "</div>" +
 
         '<div class="pt-toolbar">' +
@@ -128,7 +128,7 @@
         "</div>" +
 
         '<div class="pt-zone governed">' +
-          '<div class="zh">OpenHarnessHub<span class="tag">governed</span></div>' +
+          '<div class="zh">Open Harness Hub<span class="tag">governed</span></div>' +
           '<div class="zsub">Vetted catalog · lift-gated · provenance</div>' +
           '<div class="pt-mcpnode"><span class="ic">⚡</span><span class="nm">Governed components<small>1,284 promoted · ▲ measured lift</small></span></div>' +
           '<div class="pt-mcpnode"><span class="ic">⛁</span><span class="nm">Knowledge corpora<small>CSDDD · OFAC · GxP · ✔ sourced</small></span></div>' +
@@ -157,7 +157,7 @@
       '<div class="pt-dash-grid">' +
 
         '<div class="pt-panel">' +
-          '<div class="oh-cc-id mono" style="margin-bottom:4px">OpenHarnessHub as an MCP server</div>' +
+          '<div class="oh-cc-id mono" style="margin-bottom:4px">Open Harness Hub as an MCP server</div>' +
           '<p style="font-size:12.5px;color:var(--fg-muted);margin:0 0 12px;line-height:1.5">Point your own agent here to pull governed components &amp; knowledge into local flows.</p>' +
           '<div class="pt-codeblock">' + mcpConfig + "</div>" +
           '<button class="oh-btn oh-btn--ghost oh-btn--sm" style="margin-top:12px" data-act="copy-mcp">⧉ Copy config</button>' +
@@ -165,7 +165,7 @@
 
         '<div class="pt-panel">' +
           '<div class="oh-cc-id mono" style="margin-bottom:4px">Your sources as MCP servers</div>' +
-          '<p style="font-size:12.5px;color:var(--fg-muted);margin:0 0 8px;line-height:1.5">Register local servers OpenHarnessHub agents query to ground answers — data stays local.</p>' +
+          '<p style="font-size:12.5px;color:var(--fg-muted);margin:0 0 8px;line-height:1.5">Register local servers Open Harness Hub agents query to ground answers — data stays local.</p>' +
           '<div class="pt-srv">' +
             '<span class="dot" style="background:var(--success)"></span>' +
             '<span class="nm">Filesystem · SOPs<small>mcp://local/files</small></span>' +
@@ -196,7 +196,7 @@
       '<div class="pt-page wide pt-view">' +
         '<div class="pt-page-head">' +
           "<h1>Connect — local-first, bridged by MCP</h1>" +
-          '<div class="sub">Keep proprietary context in your environment. Your agents source it locally and call OpenHarnessHub over MCP to fill the gaps — only queries &amp; governed components cross the line, never your data.</div>' +
+          '<div class="sub">Keep proprietary context in your environment. Your agents source it locally and call Open Harness Hub over MCP to fill the gaps — only queries &amp; governed components cross the line, never your data.</div>' +
         "</div>" +
         bridgeHtml +
         crossLine +
