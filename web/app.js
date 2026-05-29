@@ -136,6 +136,7 @@
     } else if (notFound) {
       notFound.style.display = "";
     }
+    logEvent("view · " + route);
     window.scrollTo(0, 0);
   }
 
@@ -159,6 +160,7 @@
       return;
     }
     setTask(v);
+    logEvent('build requested · "' + v.slice(0, 40) + (v.length > 40 ? "…" : "") + '"');
     navigate(state.loggedIn ? "/build" : "/preview");
   }
   function renderChips() {
@@ -289,39 +291,59 @@
     return recipePanel(head, "Recruitment ad / supplier doc", "the text/document the pipeline runs on",
       STATIC_RECIPE, "Decision: yes / no + cited indicators", "decision + metadata + full runtime object (replayable trace)");
   }
+  function signupCard() {
+    return '<div class="oh-state-msg" style="margin-top:12px;background:var(--accent-weak);border:1px solid color-mix(in srgb, var(--accent) 30%, var(--line));border-radius:var(--r-md);padding:15px 16px;display:block">' +
+      '<div style="font-weight:600;color:var(--fg);margin-bottom:4px">Sign up to run it or download the bundle</div>' +
+      '<div style="font-size:12.5px;color:var(--fg-muted);margin-bottom:13px;line-height:1.5">Create a free account to run this flow (simulate or live), open it in the builder, or export the open-spec bundle. The spec &amp; export are free.</div>' +
+      '<div style="display:flex;gap:9px"><button class="oh-btn oh-btn--primary" data-nav="/signup">Sign up free →</button>' +
+      '<button class="oh-btn oh-btn--ghost" data-nav="/signin">Sign in</button></div></div>';
+  }
   function renderPreview() {
     var page = $("#preview-page"); if (!page) return;
     clearTimeout(previewTimer);
     var task = state.task || "grade suppliers against CSDDD";
+    var started = new Date().getTime();
     var step = 0, flowData = null, flowState = "pending";
-    fetch("/api/build?task=" + encodeURIComponent(task) + (token() ? "&token=" + encodeURIComponent(token()) : ""))
+    function secs() { return Math.round((new Date().getTime() - started) / 1000); }
+    logEvent("assembling flow · " + task.slice(0, 48));
+    // narrate=0 → skip the prose LLM call (preview doesn't show it) → roughly half the latency
+    fetch("/api/build?task=" + encodeURIComponent(task) + "&narrate=0" + (token() ? "&token=" + encodeURIComponent(token()) : ""))
       .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
-      .then(function (d) { flowData = d; flowState = "loaded"; if (step >= BUILD_STEPS.length) paint(); })
-      .catch(function () { flowState = "fallback"; if (step >= BUILD_STEPS.length) paint(); });
+      .then(function (d) {
+        flowData = d; flowState = "loaded"; clearTimeout(previewTimer);
+        var n = (d.flow && d.flow.recipe) ? (d.flow.recipe.length + 2) : "?";
+        logEvent("flow ready · " + n + " steps · " + secs() + "s" + (d.llm_used ? " · AI-selected" : " · deterministic"), "ok");
+        paint();
+      })
+      .catch(function () { flowState = "fallback"; clearTimeout(previewTimer); logEvent("build service unreachable — showing sample flow", "warn"); paint(); });
     function paint() {
-      var done = step >= BUILD_STEPS.length;
-      var html = '<div class="pt-page-head"><h1>' + (done ? "Your flow is ready" : "Building your flow…") +
+      var resolved = flowState !== "pending";
+      // steps 0..N-1 animate on the timer, but the LAST step only completes when the REAL result
+      // is back — the progress is wired to the actual /api/build, never a fake 'done'.
+      var doneCount = resolved ? BUILD_STEPS.length : Math.min(step, BUILD_STEPS.length - 1);
+      var html = '<div class="pt-page-head"><h1>' + (resolved ? "Your flow is ready" : "Building your flow…") +
         '</h1><div class="sub mono" style="font-family:var(--font-mono)">“' + esc(task.slice(0, 80)) + '”</div></div>';
       html += '<div class="pt-panel">';
       BUILD_STEPS.forEach(function (s, i) {
-        var mark = i < step ? "✓ " : i === step ? "◌ " : "· ", col = i < step ? "var(--fg)" : "var(--fg-faint)";
-        html += '<div class="pt-setting-row" style="padding:9px 0"><div class="info"><div class="t" style="color:' + col + '">' + mark + s + "</div></div>" +
-          (i < step ? '<span class="oh-badge oh-badge--lift" style="padding:2px 7px">done</span>' : "") + "</div>";
+        var active = (i === doneCount && !resolved);
+        var mark = i < doneCount ? "✓ " : active ? "◌ " : "· ";
+        var col = (i <= doneCount) ? "var(--fg)" : "var(--fg-faint)";
+        var clock = (active && i === BUILD_STEPS.length - 1) ? ' <span style="color:var(--fg-faint)">(' + secs() + "s)</span>" : "";
+        html += '<div class="pt-setting-row" style="padding:9px 0"><div class="info"><div class="t" style="color:' + col + '">' + mark + s + clock + "</div></div>" +
+          (i < doneCount ? '<span class="oh-badge oh-badge--lift" style="padding:2px 7px">done</span>'
+            : active ? '<span class="oh-badge oh-badge--muted" style="padding:2px 7px">working…</span>' : "") + "</div>";
       });
       html += "</div>";
-      if (done) {
-        var inner = flowState === "loaded" && flowData ? realFlowPanel(flowData)
-          : flowState === "fallback" ? staticFlowPanel()
-          : '<div class="oh-skel-line" style="width:60%"></div><div class="oh-skel-line" style="width:80%;margin-top:8px"></div><div class="oh-skel-line" style="width:45%;margin-top:8px"></div>';
-        html += '<div class="pt-panel" style="margin-top:12px">' + inner + "</div>";
-        html += '<div class="oh-state-msg" style="margin-top:12px;background:var(--accent-weak);border:1px solid color-mix(in srgb, var(--accent) 30%, var(--line));border-radius:var(--r-md);padding:15px 16px;display:block">' +
-          '<div style="font-weight:600;color:var(--fg);margin-bottom:4px">Sign up to run it or download the bundle</div>' +
-          '<div style="font-size:12.5px;color:var(--fg-muted);margin-bottom:13px;line-height:1.5">Create a free account to run this flow (simulate or live), open it in the builder, or export the open-spec bundle. The spec &amp; export are free.</div>' +
-          '<div style="display:flex;gap:9px"><button class="oh-btn oh-btn--primary" data-nav="/signup">Sign up free →</button>' +
-          '<button class="oh-btn oh-btn--ghost" data-nav="/signin">Sign in</button></div></div>';
+      if (resolved) {
+        var inner = (flowState === "loaded" && flowData) ? realFlowPanel(flowData) : staticFlowPanel();
+        html += '<div class="pt-panel" style="margin-top:12px">' + inner + "</div>" + signupCard();
+      } else {
+        html += '<div class="oh-state-msg" style="margin-top:12px;display:flex;gap:10px;align-items:center;color:var(--fg-muted);font-size:12.5px;border:1px solid var(--line);border-radius:var(--r-md);padding:12px 14px">' +
+          "◌ Contacting the model and assembling the governed flow — the first build can take a moment." +
+          '<span style="margin-left:auto;font-family:var(--font-mono);color:var(--fg-faint)">' + secs() + "s</span></div>";
       }
       page.innerHTML = html;
-      if (!done) { step += 1; previewTimer = setTimeout(paint, 700); }
+      if (!resolved) { step = Math.min(step + 1, BUILD_STEPS.length - 1); previewTimer = setTimeout(paint, 700); }
     }
     paint();
   }

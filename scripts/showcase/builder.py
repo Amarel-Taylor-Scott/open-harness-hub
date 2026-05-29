@@ -401,8 +401,10 @@ def analyze_match(kept: list[dict], pool: list[dict]) -> dict:
             "stage_coverage": sorted({c["stage"] for c in kept})}
 
 
-def build_flow(task: str, index: Index) -> dict:
-    cache_key = " ".join(task.lower().split())
+def build_flow(task: str, index: Index, narrate: bool = True) -> dict:
+    # narrate=False skips the (second) narrative LLM call — the preview doesn't show the prose,
+    # so this ~halves first-build latency. Selection (orchestrate) still runs.
+    cache_key = ("brief::" if not narrate else "") + " ".join(task.lower().split())
     if cache_key in _FLOW_CACHE:
         return {**_FLOW_CACHE[cache_key], "cached": True}
     route = resolve_route()
@@ -417,7 +419,10 @@ def build_flow(task: str, index: Index) -> dict:
         kept.sort(key=lambda c: STAGE_ORDER.index(c["stage"]) if c.get("stage") in STAGE_ORDER else 99)
     cost = estimate_cost(kept)
     analysis = analyze_match(kept, pool)
-    narrative, narr_llm = llm_narrative(task, kept, cost)
+    if narrate:
+        narrative, narr_llm = llm_narrative(task, kept, cost)
+    else:
+        narrative, narr_llm = deterministic_narrative(task, kept, cost), False
     result = {
         "task": task,
         "flow": {"steps": kept, "stages": flowchart(task, kept), "recipe": harness_recipe(task, kept),

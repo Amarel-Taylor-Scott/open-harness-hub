@@ -72,11 +72,13 @@ class Handler(BaseHTTPRequestHandler):
             if not self._authed(parsed):
                 self._send(401, b'{"error":"token required"}', "application/json")
                 return
-            task = (parse_qs(parsed.query).get("task") or [""])[0]
+            qs = parse_qs(parsed.query)
+            task = (qs.get("task") or [""])[0]
             if not task.strip():
                 self._send(400, b'{"error":"task required"}', "application/json")
                 return
-            self._send(200, json.dumps(build_flow(task, self.index)).encode(), "application/json")
+            narrate = (qs.get("narrate") or ["1"])[0] != "0"   # preview passes narrate=0 → skip the prose LLM call
+            self._send(200, json.dumps(build_flow(task, self.index, narrate=narrate)).encode(), "application/json")
         elif parsed.path == "/api/export":
             if not self._authed(parsed):
                 self._send(401, b'{"error":"token required"}', "application/json")
