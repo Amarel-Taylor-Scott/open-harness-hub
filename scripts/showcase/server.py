@@ -59,7 +59,7 @@ class Handler(BaseHTTPRequestHandler):
             if self._serve_static("index.html"):
                 return
             self._send(200, HTML.encode("utf-8"), "text/html; charset=utf-8")  # fallback if web/ absent
-        elif parsed.path in ("/app.js", "/data.js") or parsed.path.startswith("/styles/") or parsed.path.startswith("/pages/"):
+        elif parsed.path in ("/app.js", "/data.js", "/products.js") or parsed.path.startswith("/styles/") or parsed.path.startswith("/pages/"):
             if not self._serve_static(parsed.path):
                 self._send(404, b"not found", "text/plain")
         elif parsed.path == "/classic":

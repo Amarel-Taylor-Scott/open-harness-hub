@@ -60,6 +60,26 @@
     }).join("");
   }
 
+  // the 7-layer context stack → OHH's real component coverage (docs/concepts/context-layer-and-the-desk.md)
+  var LAYERS = [
+    ["1", "Raw documentation", "MCP connectors — Confluence · GitLab · Postgres + source registry"],
+    ["2", "Contextualized docs", "retrieval — chunkers · BM25 · dense · hybrid · exact-id · graph-RAG"],
+    ["3", "Compressed docs", "LLMLingua compress · extractive spans · distilled memory · prompt/semantic/KV cache"],
+    ["4", "Sync", "freshness scrapers + change-data-capture / revocation"],
+    ["5", "Adversarial", "prompt-injection screen · trust boundaries · read-only scoping"],
+    ["6", "Verification", "citation-span check · cross-encoder rerank · rubrics · measured-lift eval"],
+    ["7", "Tool clusters", "the governed recipe + foundry · model adapters · deliver + platform buckets"]
+  ];
+
+  function ctxLayers() {
+    return LAYERS.map(function (l) {
+      return '<div style="display:flex;align-items:baseline;gap:10px;padding:7px 0;border-bottom:1px solid var(--line)">' +
+        '<span style="width:20px;height:20px;border-radius:6px;flex:0 0 auto;display:grid;place-items:center;background:var(--accent-weak);color:var(--accent);border:1px solid color-mix(in srgb, var(--accent) 30%, var(--line));font-size:11px;font-weight:700">' + l[0] + "</span>" +
+        '<div style="min-width:128px;font-weight:600;color:var(--fg);font-size:13px">' + l[1] + "</div>" +
+        '<div style="color:var(--fg-muted);font-size:12.5px;line-height:1.5">' + l[2] + "</div></div>";
+    }).join("");
+  }
+
   function render(ctx) {
     return '<div class="pt-mkt pt-view">' +
       '<header class="pt-mkt-top">' +
@@ -77,6 +97,11 @@
 
       '<h3 style="font-family:var(--font-display);margin:22px 0 10px">The seven-primitive grammar</h3>' +
       '<div class="pt-panel">' + primLegend() + "</div>" +
+
+      '<h3 style="font-family:var(--font-display);margin:26px 0 10px">The context layer — the analyst’s desk</h3>' +
+      '<div class="pt-panel">' +
+      '<div style="font-size:13px;color:var(--fg-muted);line-height:1.6;margin-bottom:10px">The model is an analyst at a desk; the context window is the desk — small and expensive, easily buried. Open Harness Hub keeps only the few distilled, cited pages that matter on it, and proves the result lifts over the bare model. It covers all seven layers of the context stack with real, governed components:</div>' +
+      ctxLayers() + "</div>" +
 
       '<h3 style="font-family:var(--font-display);margin:26px 0 10px">Open & free <span class="oh-badge oh-badge--verified" style="vertical-align:middle"><span class="gl">✔</span> Apache-2.0</span></h3>' +
       '<div class="pt-grid-3" style="text-align:left">' + panels(OPEN) + "</div>" +
