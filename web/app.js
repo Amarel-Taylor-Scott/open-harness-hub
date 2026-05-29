@@ -235,7 +235,7 @@
   ];
   var previewTimer = null;
   function primKey(stage) { var k = String(stage || "").toLowerCase().split(/[\s/]/)[0]; return PRIMS[k] ? k : "action"; }
-  var _CHIP = { IF: "oh-badge--warn", ALWAYS: "oh-badge--verified", DEFAULT: "oh-badge--lift", OPTIONAL: "oh-badge--muted" };
+  var _CHIP = { IF: "oh-badge--warn", ALWAYS: "oh-badge--verified", DEFAULT: "oh-badge--lift", OPTIONAL: "oh-badge--muted", META: "oh-badge--muted" };
   // one flow row. level 1 = nested under a phase header. tag = a chip (ALWAYS/DEFAULT/OPTIONAL/IF).
   function flowRowHtml(prim, name, sub, level, tag, opts, defOpt) {
     var isOp = prim === "op";
@@ -246,7 +246,7 @@
              + (tag === "OPTIONAL" ? ";opacity:.6" : "");   // dim optional steps so the default path stands out
     // tier/relationship chip is RIGHT-aligned + spaced so it never butts the name
     var chip = tag ? '<span class="oh-badge ' + (_CHIP[tag] || "oh-badge--muted") +
-      '" style="flex:0 0 auto;margin-left:10px;padding:1px 7px;font-family:var(--font-mono);font-size:9px;letter-spacing:.03em">' + esc(tag) + "</span>" : "";
+      '" style="flex:0 0 auto;margin-left:10px;text-transform:uppercase;letter-spacing:.05em;font-size:9.5px;padding:3px 8px">' + esc(tag) + "</span>" : "";
     // swappable method options for this slot — the chosen DEFAULT is highlighted
     var optsLine = (opts && opts.length)
       ? '<div style="font-family:var(--font-mono);font-size:9.5px;color:var(--fg-faint);margin-top:3px;line-height:1.6">' +
@@ -269,7 +269,7 @@
   var _PHASE_LABEL = { gate: "Trigger gate", enrich: "Model query enrichment", polish: "Model query polishing", verify_query: "Model query verification", call: "Model call", verify_response: "Model response verification", postprocess: "Model response post-processing" };
   // Input(L0) → Trigger gate(L0) + its pattern/anti-pattern packs(L1) → Pre/Model/Post phase
   // groups → Output(L0). Each step carries its own level + phase (the backend decides indentation).
-  function recipePanel(head, inputName, inputRole, recipe, outName, outRole) {
+  function recipePanel(head, inputName, inputRole, recipe, outName, outType) {
     var html = '<div class="oh-cc-id mono" style="margin-bottom:10px">assembled flow · ' + head + "</div>";
     html += flowRowHtml("input", inputName, inputRole, 0, "ALWAYS");
     var lastPhase = "";
@@ -284,7 +284,13 @@
       var sub = (s.ref ? s.ref : (s.role || "")) + (s.builtin ? " · built-in" : "");
       html += flowRowHtml(s.k, s.name, sub, s.level || 0, _TIERTAG[s.tier] || null, s.options, s.default);
     });
-    html += flowRowHtml("output", outName, outRole, 0, "ALWAYS");
+    // OUTPUT: the clear, typed decision at top level; cited indicators + the runtime object are INDENTED metadata
+    html += '<div style="display:flex;align-items:center;gap:8px;margin:18px 0 6px">' +
+      '<span style="font:700 10px/1.4 var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)">Output</span>' +
+      '<span style="flex:1;height:1px;background:var(--line)"></span></div>';
+    html += flowRowHtml("output", outName, "output type · " + (outType || "structured"), 0, "ALWAYS");
+    html += flowRowHtml("output", "Cited indicators", "per-claim citations into the governed corpus", 1, "META");
+    html += flowRowHtml("output", "Full runtime object", "replayable trace — every step, cost & citation", 1, "META");
     return html;
   }
   function realFlowPanel(d) {
@@ -296,12 +302,12 @@
     return recipePanel(head,
       inputC ? inputC.name : "Input", (inputC && inputC.role) ? inputC.role : "what the pipeline runs on at runtime",
       recipe,
-      outC ? outC.name : "Findings (JSON) + citations", (outC && outC.role) ? outC.role : "decision + metadata + full runtime object (replayable trace)");
+      outC ? outC.name : "Decision", (outC && outC.output_type) ? outC.output_type : "structured (JSON)");
   }
   function staticFlowPanel() {
     var head = (STATIC_RECIPE.length + 2) + ' steps · ▲ +0.41 lift · $$ est. / run <span class="oh-badge oh-badge--muted" style="padding:1px 6px">sample</span>';
-    return recipePanel(head, "Recruitment ad / supplier doc", "the text/document the pipeline runs on",
-      STATIC_RECIPE, "Decision: yes / no + cited indicators", "decision + metadata + full runtime object (replayable trace)");
+    return recipePanel(head, "Recruitment ad", "the document the pipeline runs on at runtime",
+      STATIC_RECIPE, "Decision: yes / no", "binary (yes / no)");
   }
   function signupCard() {
     return '<div class="oh-state-msg" style="margin-top:12px;background:var(--accent-weak);border:1px solid color-mix(in srgb, var(--accent) 30%, var(--line));border-radius:var(--r-md);padding:15px 16px;display:block">' +
@@ -316,19 +322,23 @@
     return '<div class="pt-page-head" style="margin-bottom:14px"><h1>' + (resolved ? "Your flow is ready" : "Building your flow…") +
       '</h1><div class="sub mono" style="font-family:var(--font-mono);color:var(--fg-muted)">“' + esc(task.slice(0, 90)) + '”</div></div>';
   }
+  function pillBadge(cls, txt) {
+    return '<span class="oh-badge ' + cls + '" style="text-transform:uppercase;letter-spacing:.05em;font-size:9.5px;padding:3px 8px">' + txt + "</span>";
+  }
   function checklistHtml(doneCount, resolved, secsVal) {
-    var html = '<div class="pt-panel" style="padding:4px 16px">';
+    var html = '<div class="pt-panel" style="padding:6px 16px 12px">';
     BUILD_STEPS.forEach(function (s, i) {
-      var active = (i === doneCount && !resolved);
-      var mark = i < doneCount ? "✓" : active ? "◌" : "·";
-      var mcol = i < doneCount ? "var(--success)" : active ? "var(--accent)" : "var(--fg-faint)";
+      var done = i < doneCount, active = (i === doneCount && !resolved);
+      var mark = done ? "✓" : active ? "◌" : "·";
+      var mcol = done ? "var(--success)" : active ? "var(--accent)" : "var(--fg-faint)";
       var col = (i <= doneCount) ? "var(--fg)" : "var(--fg-faint)";
-      var clock = (active && i === BUILD_STEPS.length - 1) ? ' <span style="color:var(--fg-faint)">(' + secsVal + "s)</span>" : "";
-      var border = i < BUILD_STEPS.length - 1 ? ";border-bottom:1px solid var(--line)" : "";
-      html += '<div style="display:flex;align-items:center;gap:9px;padding:8px 0;font-size:13px;color:' + col + border + '">' +
-        '<span style="width:13px;text-align:center;color:' + mcol + '">' + mark + "</span>" + s + clock +
-        '<span style="margin-left:auto">' + (i < doneCount ? '<span class="oh-badge oh-badge--lift" style="padding:1px 7px">done</span>'
-          : active ? '<span class="oh-badge oh-badge--muted" style="padding:1px 7px">working…</span>' : "") + "</span></div>";
+      var clock = (active && i === BUILD_STEPS.length - 1) ? ' <span style="color:var(--fg-faint);font-family:var(--font-mono)">(' + secsVal + "s)</span>" : "";
+      var badge = done ? pillBadge("oh-badge--lift", "done") : active ? pillBadge("oh-badge--muted", "working…") : "";
+      var prog = '<div class="oh-prog ' + (done ? "is-done" : active ? "is-indet" : "") + '" style="margin-top:8px"><i></i></div>';
+      html += '<div style="padding:10px 0' + (i < BUILD_STEPS.length - 1 ? ";border-bottom:1px solid var(--line)" : "") + '">' +
+        '<div style="display:flex;align-items:center;gap:9px;font-size:13px;color:' + col + '">' +
+        '<span style="width:13px;text-align:center;color:' + mcol + '">' + mark + "</span>" +
+        '<span style="flex:1">' + s + clock + "</span>" + badge + "</div>" + prog + "</div>";
     });
     return html + "</div>";
   }

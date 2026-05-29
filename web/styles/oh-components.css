@@ -353,3 +353,11 @@
 .oh-note li { font-size: 12.5px; line-height: 1.55; color: var(--fg); margin-bottom: 6px; }
 .oh-note li b { color: var(--accent); font-weight: 600; }
 .oh-note li.risk b { color: var(--danger); }
+
+/* ---- step progress bars (build checklist) + badge centering ---------------- */
+@keyframes oh-prog-indet { 0% { left: -45%; } 100% { left: 100%; } }
+.oh-prog { position: relative; height: 5px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.oh-prog > i { position: absolute; top: 0; bottom: 0; left: 0; width: 0; border-radius: 999px; background: var(--accent); transition: width .35s var(--ease); display: block; }
+.oh-prog.is-done > i { width: 100%; background: var(--success); }
+.oh-prog.is-indet > i { width: 45%; animation: oh-prog-indet 1.05s var(--ease) infinite; }
+.oh-badge { display: inline-flex; align-items: center; justify-content: center; line-height: 1; }

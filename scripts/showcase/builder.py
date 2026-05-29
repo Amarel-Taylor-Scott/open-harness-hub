@@ -112,6 +112,16 @@ _INPUT_STOP = {"and", "or", "to", "for", "with", "under", "against", "that", "wh
                "a", "an", "the", "its", "it"}
 _LEAF_KEYWORDS = ("escalate", "human-review", "human_review", "review-queue", "review_queue",
                   "notify", "alert", "audit", "handoff", "page-on-call", "log-")
+# Document/object nouns the pipeline CONSUMES — used to name the Input from the task's actual object
+# (e.g. "recruitment ad"), so we don't grab a place name like "Hong Kong". Longest-first so
+# "advertisement" wins over "ad". Word-bounded (\bad\b won't fire inside "read").
+_DOC_NOUNS = ["advertisement", "deposition", "disclosure", "transcript", "application", "statement",
+              "recording", "agreement", "complaint", "circular", "document", "footage", "contract",
+              "dictation", "minutes", "listing", "posting", "invoice", "receipt", "dossier", "message",
+              "packet", "report", "letter", "filing", "permit", "review", "record", "resume", "memo",
+              "advert", "claim", "email", "video", "image", "photo", "scan", "form", "post", "note",
+              "call", "clip", "mou", "ad"]
+_DOC_RE = re.compile(r"\b([a-z][a-z'’-]+\s+)?(" + "|".join(_DOC_NOUNS) + r")s?\b")
 
 
 def infer_input(task: str) -> dict:
@@ -119,7 +129,15 @@ def infer_input(task: str) -> dict:
     ad / pay statement / variant string), not the plain-language task itself."""
     low = task.lower()
     artifact = ""
-    for pat in _INPUT_CUES:
+    # 1) prefer the document/object the pipeline CONSUMES (e.g. "recruitment ad"), from the LAST
+    #    doc-noun in the task (tasks usually end with their object) — avoids grabbing a place name.
+    dms = list(_DOC_RE.finditer(low))
+    if dms:
+        m = dms[-1]
+        noun, pre = m.group(2), (m.group(1) or "").strip()
+        artifact = (pre + " " + noun) if (pre and pre not in _INPUT_STOP and len(pre) > 2) else noun
+    # 2) else fall back to verb/preposition cues
+    for pat in ([] if artifact else _INPUT_CUES):
         m = re.search(pat, low)
         if not m:
             continue
@@ -193,25 +211,43 @@ def _subtype(c: dict) -> str:
 
 
 def _output_name(task: str) -> str:
-    """The runtime OUTPUT, shaped by task type — a detection task answers yes/no, an
-    extraction task returns fields, a grading task a score (each with cited indicators)."""
+    """The runtime OUTPUT DECISION only (the typed result). Cited indicators + the full runtime
+    object are metadata attached alongside (see flowchart), NOT part of the decision label."""
     low = task.lower()
     if any(k in low for k in ("detect", "indicator", "exploitation", "trafficking", "abuse",
                               "fraud", "violation", "is there", "whether")):
-        return "Decision: yes / no + cited indicators"
+        return "Decision: yes / no"
     if any(k in low for k in ("flag", "screen", "risk of")):
-        return "Decision: flag / clear + cited indicators"
+        return "Decision: flag / clear"
     if "rout" in low or "hotline" in low:
-        return "Routed decision + citations"
+        return "Routed decision"
     if "classif" in low or "map it" in low or "tier" in low:
-        return "Classification + citations"
+        return "Classification (label)"
     if any(k in low for k in ("extract", "line item", "read ", "parse", "into a", "csv", "fields")):
-        return "Extracted fields (JSON) + citations"
+        return "Extracted fields"
     if any(k in low for k in ("grad", "score", "rubric", "rate ")):
-        return "Score + rationale + citations"
+        return "Score"
     if "valid" in low or "verif" in low or "reconcile" in low:
-        return "Validation result (pass / fail) + reasons"
-    return "Findings (JSON) + citations"
+        return "Validation result: pass / fail"
+    return "Findings"
+
+
+def _output_type(task: str) -> str:
+    """The output's data TYPE, so the contract is explicit: binary | categorical | numeric | structured."""
+    low = task.lower()
+    # mirror _output_name's priority so the type and the decision label always agree
+    if any(k in low for k in ("detect", "indicator", "exploitation", "trafficking", "abuse", "fraud",
+                              "violation", "is there", "whether", "flag", "screen", "risk of")):
+        return "binary (yes / no)"
+    if any(k in low for k in ("extract", "line item", "read ", "parse", "into a", "csv", "fields")):
+        return "structured (JSON)"
+    if "classif" in low or "tier" in low or "rout" in low or "map it" in low:
+        return "categorical (label)"
+    if any(k in low for k in ("grad", "score", "rate ", "coefficient", "count")):
+        return "numeric"
+    if "valid" in low or "verif" in low or "reconcile" in low:
+        return "binary (pass / fail)"
+    return "structured (JSON)"
 
 
 def harness_recipe(task: str, kept: list[dict]) -> list[dict]:
@@ -310,8 +346,10 @@ def harness_recipe(task: str, kept: list[dict]) -> list[dict]:
              "top-k, dedupe, recency / source-precedence, flag contradictions", None,
              ["top-1", "top-3", "top-k", "MMR (diversity)", "dedupe", "source-precedence", "recency"],
              "top-k + dedupe + source-precedence"),
-        step("polish", "default", 1, "action", "Place context in prompt",
-             "where context sits — mitigates 'lost in the middle'", None,
+        step("polish", "default", 1, "action", "Render the model-query template",
+             "assemble the populated query template (slots filled across enrichment, not just here) into the "
+             "final prompt; the placement policy decides where each block sits — mitigates 'lost in the middle'. "
+             "Template spec: docs/concepts/model-query-template.md", None,
              ["concat", "edge (first + last)", "structured / delimited + source tags", "instructions-last"],
              "structured + edge + instructions-last"),
         # ---- QUERY VERIFICATION (check the assembled query before sending) ----
@@ -361,7 +399,9 @@ def flowchart(task: str, kept: list[dict]) -> list[dict]:
         chart.append(band)
     chart.append({"stage": "Output", "components": [
         {"id": "result", "type": "output", "name": _output_name(task),
-         "role": "decision (binary / number / string) + metadata + the full runtime object (replayable trace)",
+         "output_type": _output_type(task),
+         "role": "the typed decision; cited indicators + the full runtime object are attached as metadata",
+         "meta": ["Cited indicators", "Full runtime object (replayable trace)"],
          "subtype": "Output", "branch": "main"}]})
     return chart
 
