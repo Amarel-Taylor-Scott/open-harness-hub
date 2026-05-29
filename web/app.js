@@ -226,10 +226,12 @@
     { phase: "polish", tier: "default", level: 1, k: "action", name: "Place context in prompt", role: "mitigate 'lost in the middle'", builtin: true, options: ["concat", "edge (first + last)", "structured / delimited + source tags", "instructions-last"], "default": "structured + edge + instructions-last" },
     { phase: "verify_query", tier: "default", level: 1, k: "stop", name: "Prompt-injection check", role: "block system-prompt extraction / override", builtin: true, options: ["delimit + role-separate", "heuristic / classifier screen", "sanitize retrieved content"], "default": "delimit + screen" },
     { phase: "call", tier: "always", level: 1, k: "action", name: "Call the right-sized model", role: "smallest model that clears the bar + system prompt", ref: "harness/cite-first" },
-    { phase: "response", tier: "always", level: 1, k: "conditional", name: "Check output", role: "validate the answer shape", builtin: true },
-    { phase: "response", tier: "default", level: 1, k: "conditional", name: "Verify JSON (recover if malformed)", role: "parse; repair once if non-JSON", builtin: true },
-    { phase: "response", tier: "default", level: 1, k: "conditional", name: "Re-verify", role: "second pass vs the rubric", ref: "rubric/exploitation-grade" },
-    { phase: "response", tier: "always", level: 1, k: "loop", name: "If not OK → retry with changes (≤3)", role: "targeted fixes until it passes, else escalate", ref: "pattern/refine-loop" }
+    { phase: "verify_response", tier: "always", level: 1, k: "conditional", name: "Check output", role: "validate the response against the expected answer shape", builtin: true },
+    { phase: "verify_response", tier: "default", level: 1, k: "conditional", name: "Verify JSON (recover if malformed)", role: "parse; repair once if non-JSON", builtin: true },
+    { phase: "verify_response", tier: "default", level: 1, k: "conditional", name: "Re-verify", role: "second pass vs the rubric", ref: "rubric/exploitation-grade" },
+    { phase: "postprocess", tier: "always", level: 1, k: "loop", name: "If not OK → retry with changes (≤3)", role: "if verification fails, retry with fixes until it passes, else escalate", ref: "pattern/refine-loop" },
+    { phase: "postprocess", tier: "always", level: 1, k: "action", name: "Compose result + citations + metadata", role: "extract the decision, attach citations + run metadata, assemble the runtime object", builtin: true },
+    { phase: "postprocess", tier: "optional", level: 1, k: "action", name: "Deliver / emit", role: "route the validated result onward", builtin: true, options: ["return", "webhook", "report (md / pdf)", "audit log", "escalate → human"], "default": "return" }
   ];
   var previewTimer = null;
   function primKey(stage) { var k = String(stage || "").toLowerCase().split(/[\s/]/)[0]; return PRIMS[k] ? k : "action"; }
@@ -264,7 +266,7 @@
     return null;
   }
   var _TIERTAG = { always: "ALWAYS", default: "DEFAULT", optional: "OPTIONAL" };
-  var _PHASE_LABEL = { gate: "Trigger gate", enrich: "Query enrichment", polish: "Query polishing", verify_query: "Query verification", call: "Model call", response: "Model response" };
+  var _PHASE_LABEL = { gate: "Trigger gate", enrich: "Model query enrichment", polish: "Model query polishing", verify_query: "Model query verification", call: "Model call", verify_response: "Model response verification", postprocess: "Model response post-processing" };
   // Input(L0) → Trigger gate(L0) + its pattern/anti-pattern packs(L1) → Pre/Model/Post phase
   // groups → Output(L0). Each step carries its own level + phase (the backend decides indentation).
   function recipePanel(head, inputName, inputRole, recipe, outName, outRole) {

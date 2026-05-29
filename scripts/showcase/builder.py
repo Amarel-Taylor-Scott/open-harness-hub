@@ -321,15 +321,21 @@ def harness_recipe(task: str, kept: list[dict]) -> list[dict]:
         # ---- MODEL CALL ----
         step("call", "always", 1, "action", "Call the right-sized model",
              "smallest model that clears the bar, with persona + system prompt + retrieved context", harness),
-        # ---- MODEL RESPONSE (receive + verify) ----
-        step("response", "always", 1, "conditional", "Check output",
-             "validate against the expected answer shape"),
-        step("response", "default", 1, "conditional", "Verify JSON (recover if malformed)",
+        # ---- MODEL RESPONSE VERIFICATION (is the raw response valid?) ----
+        step("verify_response", "always", 1, "conditional", "Check output",
+             "validate the response against the expected answer shape"),
+        step("verify_response", "default", 1, "conditional", "Verify JSON (recover if malformed)",
              "parse; if non-JSON, repair / reformat once"),
-        step("response", "default", 1, "conditional", "Re-verify",
-             "second pass on the recovered output", rubric),
-        step("response", "always", 1, "loop", "If not OK → retry with changes (≤3)",
-             "re-run with targeted fixes until it passes, else escalate", loop),
+        step("verify_response", "default", 1, "conditional", "Re-verify",
+             "second pass on the recovered output (vs the rubric)", rubric),
+        # ---- MODEL RESPONSE POST-PROCESSING (turn the verified response into the output) ----
+        step("postprocess", "always", 1, "loop", "If not OK → retry with changes (≤3)",
+             "if verification fails, re-run with targeted fixes until it passes, else escalate", loop),
+        step("postprocess", "always", 1, "action", "Compose result + citations + metadata",
+             "extract the decision, attach per-claim citations + run metadata, assemble the full runtime object"),
+        step("postprocess", "optional", 1, "action", "Deliver / emit",
+             "route the validated result onward", None,
+             ["return", "webhook", "report (md / pdf)", "audit log", "escalate → human"], "return"),
     ]
     return recipe
 
