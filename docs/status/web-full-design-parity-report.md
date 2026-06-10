@@ -118,6 +118,25 @@ Wired (REAL, with honest fallback when a service is down — the kit never fabri
 - Video: `journey-4-teleon.mp4` (88s · 25 chapters · recorded through the tunnel); brief:
   `docs/status/teleon-demo.md`.
 
+## Addendum 2026-06-10 (carbon-copy pass) — Teleon's lifecycle is REAL + the whole family gated
+
+- **`scripts/teleon_local_runtime.py` (:9430, registry-declared)**: the demo-grade REAL execution
+  plane — four deterministic capabilities (date normalizer, PII redactor, JSON guard, citation
+  formatter) whose "Build" actually executes the example suite NOW: per-example receipts
+  (input/output hashes, µs timing), the promotion gate applied to the REAL pass-rate
+  (≥0.90 promoted), version bumps, restart-safe state. Runs are session-gated through the
+  identity service (registry-service pattern). Self-test covers the full lifecycle, including
+  two real implementation bugs it caught (phone-prefix regex, case-sensitive citations).
+- **Teleon pages live** (recorded patches + `teleon-live.js`): Capabilities table + rollup,
+  the Build result (real gate decision/score/version), dashboard stats + activity, usage —
+  all real with honest fallbacks. `teleon_gate.mjs` extended to 18 checks — **18/18 locally AND
+  through the public tunnel** (fix found: identity validate endpoint is `session/validate`).
+- **Family surfaces gate** (`e2e/family_surfaces_gate.mjs`): all 21 makeHub hubs render
+  console-clean with working browse grids; private-preview banners match `products.js`
+  per-entity (13 private / 8 live + OHH gated separately by its 46-route audit); both internal
+  planes + the Design Acceptance Scorecard render; and a REAL registry install on a live hub
+  (search → install → workspace round-trip, session-gated). 6/6 rolled-up checks green.
+
 ## Decisions (recorded; revisit when deepening the wiring)
 
 - The OHH logged-in console pages (`/build` confirm, `/results` tiers, `/flow` canvas) keep their

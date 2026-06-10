@@ -133,6 +133,42 @@ for (const mode of ['logged-out', 'signed-in']) {
   await page.waitForTimeout(1800);
   check('real key revoked (row gone)', await page.evaluate(() => !/just now/.test(document.body.innerText)));
 
+  // ---- the LOCAL capability runtime (REAL deterministic execution + promotion gate) ----
+  await page.evaluate(() => { window.location.hash = '/app'; });
+  await page.waitForTimeout(1600);
+  const capsLive = await page.evaluate(() => ({
+    live: /Date normalizer|Citation formatter/.test(document.body.innerText),
+    fixture: /State usury-rate finder/.test(document.body.innerText),
+  }));
+  check('capabilities table = the REAL runtime state', capsLive.live && !capsLive.fixture, JSON.stringify(capsLive));
+
+  await page.evaluate(() => { window.location.hash = '/runs'; });
+  await page.waitForTimeout(1200);
+  await page.locator('button:has-text("Build capability")').first().click();
+  await page.waitForTimeout(6500); // designed lifecycle animation + the real run
+  const runResult = await page.evaluate(() => ({
+    text: (document.querySelector('.tln-result') || {}).innerText || '',
+    lastRun: window.TeleonLive && TeleonLive.lastRun(),
+  }));
+  check('Build REALLY executes (gate decision + real score on screen)',
+    /score 1(\.0)? · 4\/4 examples/.test(runResult.text) && runResult.lastRun && runResult.lastRun.decision === 'promoted',
+    runResult.text.slice(0, 120));
+  await page.screenshot({ path: join(OUT, 'teleon-real-run.png') });
+
+  const receipts = await page.evaluate(async () => {
+    const r = window.TeleonLive && TeleonLive.lastRun();
+    if (!r) return null;
+    const res = await fetch(`/api/teleon/teleon/evidence?run_id=${encodeURIComponent(r.run_id)}`);
+    const d = await res.json();
+    return d.receipts && d.receipts.length;
+  });
+  check('receipts persisted for the run (4 examples, hashed)', receipts === 4, String(receipts));
+
+  await page.evaluate(() => { window.location.hash = '/dashboard'; });
+  await page.waitForTimeout(1400);
+  check('dashboard stats live (real promotions recorded)',
+    await page.evaluate(() => /Promotions · recorded/.test(document.body.innerText)));
+
   // registry + analytics seams on this origin
   const seams = await page.evaluate(async () => ({
     reg: await fetch('/registry/healthz').then((r) => r.status).catch(() => 0),

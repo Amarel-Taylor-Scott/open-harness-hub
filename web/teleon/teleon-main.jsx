@@ -264,17 +264,18 @@ const CAPS = [
 const STATUS_BADGE = { promoted: 'oh-badge--verified', candidate: 'oh-badge--warn', 'rolled-back': 'oh-badge--muted' };
 
 function Capabilities() {
+  const CAPS_SRC = (window.TeleonLive && TeleonLive.capabilities()) || CAPS;  // real runtime rows
   return (
     <div className="ohs-page">
       <OhPageHead eyebrow="Workspace" title="Capabilities"
         sub="Each capability ships only after it clears your success criteria — or rolls back."
         actions={<button className="oh-btn oh-btn--primary" onClick={() => navigate('/runs')}>+ New capability</button>} />
-      <OhRollup items={[['Capabilities', CAPS.length], ['Promoted', CAPS.filter((c) => c[2] === 'promoted').length], ['In eval', 1], ['Avg score', '0.90']]} />
+      <OhRollup items={(window.TeleonLive && TeleonLive.capRollup()) || [['Capabilities', CAPS.length], ['Promoted', CAPS.filter((c) => c[2] === 'promoted').length], ['In eval', 1], ['Avg score', '0.90']]} />
       <div className="oh-card oh-card--pad">
         <table className="oh-table">
           <thead><tr><th>Capability</th><th>Status</th><th>Eval score</th><th>Version</th><th></th></tr></thead>
           <tbody>
-            {CAPS.map(([id, name, st, score, ver]) => (
+            {((window.TeleonLive && TeleonLive.capabilities()) || CAPS).map(([id, name, st, score, ver]) => (
               <tr key={id}>
                 <td>{name}</td>
                 <td><span className={'oh-badge ' + STATUS_BADGE[st] + ' oh-badge--sm'}>{st}</span></td>
@@ -308,7 +309,7 @@ function Runs() {
             {['cites the live statute', 'covers all 50 states', 're-checks on change'].map((g, i) => <button key={g} className={i === 0 ? 'on' : ''}>{g}</button>)}
           </div>
         </label>
-        <button className="oh-btn oh-btn--primary" onClick={() => { setPhase('running'); setStep(0); }} disabled={phase === 'running'}>
+        <button className="oh-btn oh-btn--primary" onClick={() => { setPhase('running'); setStep(0); if (window.TeleonLive) TeleonLive.run(); }} disabled={phase === 'running'}>
           {phase === 'idle' ? 'Build capability →' : phase === 'running' ? 'Building…' : 'Rebuild'}
         </button>
       </div>
@@ -321,7 +322,7 @@ function Runs() {
               </div>
             ))}
           </div>
-          {phase === 'done' && <div className="tln-result"><span className="oh-badge oh-badge--verified">✔ shipped · passed your criteria</span><span className="mono">version 13 live</span></div>}
+          {phase === 'done' && (() => { const r = window.TeleonLive && TeleonLive.lastRun(); if (!r) return <div className="tln-result"><span className="oh-badge oh-badge--verified">✔ shipped · passed your criteria</span><span className="mono">version 13 live</span></div>; return <div className="tln-result">{r.decision === 'promoted' ? <span className="oh-badge oh-badge--verified">✔ shipped · passed your criteria</span> : <span className="oh-badge oh-badge--warn">held · gate not cleared</span>}<span className="mono">version {r.version} {r.decision === 'promoted' ? 'live' : 'in eval'} · score {r.score} · {r.passed}/{r.total} examples</span></div>; })()}
         </div>
       )}
     </div>
@@ -340,6 +341,8 @@ function SimplePage({ title, eyebrow, sub, note }) {
 /* ===================== ROOT ===================== */
 function App() {
   const route = useHashRoute();
+  const [, tlTick] = React.useState(0);  // live seam: re-render when the real runtime answers
+  React.useEffect(() => (window.TeleonLive ? TeleonLive.onReady(() => tlTick((t) => t + 1)) : undefined), []);
   const [theme, toggle] = useSiteTheme('teleon-theme');
   const rootCls = 'oh dir-s theme-' + theme + ' oh-site tln';
   const rootStyle = { '--accent': ACCENT };
@@ -372,8 +375,8 @@ function App() {
 
   let page;
   if (route === '/dashboard') page = <OhDashboard
-    stats={[['Capabilities', 4], ['Promotions · 30d', '38'], ['Rollbacks', '6'], ['Avg score', '0.90']]}
-    activity={[
+    stats={(window.TeleonLive && TeleonLive.stats()) || [['Capabilities', 4], ['Promotions · 30d', '38'], ['Rollbacks', '6'], ['Avg score', '0.90']]}
+    activity={(window.TeleonLive && TeleonLive.activity()) || [
       { icon: '✓', text: 'State usury-rate finder promoted · 0.96', when: '1h ago' },
       { icon: '⊕', text: 'New capability build started', when: '4h ago' },
       { icon: '↻', text: 'Red-team prompts rolled back', when: '1d ago' },
@@ -396,8 +399,8 @@ function App() {
   else if (route === '/registry') page = <SimplePage eyebrow="Library" title="Library" sub="Ready-made skills, templates and tests from the open hubs." note="Teleon draws from OpenHarnessHub / OpenSkillsHub / OpenToolsHub. The building blocks you’ve added show up here and feed every new capability." />;
   else if (route === '/billing') page = <OhBilling plan={{ name: 'Team', desc: 'Up to 25 capabilities · shared eval compute', price: '$249', per: '/mo', usagePct: 62, usageLabel: 'Eval compute used' }}
       invoices={[['May 1, 2026', '$249.00', 'Paid'], ['Apr 1, 2026', '$249.00', 'Paid'], ['Mar 1, 2026', '$249.00', 'Paid']]} />;
-  else if (route === '/usage') page = <OhUsage rollup={[['Runs · 30d', '4,120'], ['Promotions', '38'], ['Rollbacks', '6'], ['Eval hrs', '212']]}
-      metrics={[
+  else if (route === '/usage') page = <OhUsage rollup={((window.TeleonLive && TeleonLive.usage()) || {}).rollup || [['Runs · 30d', '4,120'], ['Promotions', '38'], ['Rollbacks', '6'], ['Eval hrs', '212']]}
+      metrics={((window.TeleonLive && TeleonLive.usage()) || {}).metrics || [
         { k: 'Lifecycle runs', v: '4,120', bars: [.4, .5, .45, .6, .7, .65, .9], hiLast: true },
         { k: 'Eval compute (hrs)', v: '212', bars: [.5, .55, .5, .6, .58, .7, .8], hiLast: true },
       ]} />;

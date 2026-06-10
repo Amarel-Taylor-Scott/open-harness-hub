@@ -86,6 +86,9 @@ def _seam_proxies() -> list[tuple[str, str, int]]:
     events = _local_service_port("local_event_tracking_service")
     if events:
         table.append(("/analytics/", "/analytics", events))
+    teleon_runtime = _local_service_port("teleon_local_runtime")
+    if teleon_runtime:
+        table.append(("/api/teleon/", "", teleon_runtime))
     live_ops = _local_service_port("baltor_admin_demo_server")
     if live_ops:
         for prefix in ("/api/demo/", "/api/context/", "/api/dev/", "/api/fleet",

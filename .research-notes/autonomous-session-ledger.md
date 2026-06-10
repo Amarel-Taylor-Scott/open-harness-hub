@@ -1976,3 +1976,26 @@ key reveal + live ⌘K palette); manifest regenerated (84 chapters / 4 videos). 
 docs/status/teleon-demo.md (real-vs-designed split: runtime surfaces stay designed previews —
 the PurposeTask engine is the separate greenfield build). Regression gates all green: port
 --check (116 files / 4 apps), family, bundle wiring, walker 27/27, OHH public gate 10/10.
+
+## 2026-06-11 — Carbon-copy pass: Teleon lifecycle REAL + every family surface gated + 6 videos
+
+**Warrant: direct user intent** ("fix all things that are not wired up so the video is a carbon
+copy of what a user sees; same process + videos for all other surfaces"). (1) NEW
+scripts/teleon_local_runtime.py (:9430, registry-declared, session-gated via identity
+session/validate — endpoint name was the one integration bug): four REAL deterministic
+capabilities; "Build capability" executes the example suite NOW (receipts: input/output hashes +
+µs timing; promotion gate on the real pass-rate; version bumps; restart-safe state); self-test
+caught two real impl bugs (phone-prefix regex, case-sensitive citations) — fixed honestly.
+(2) web/teleon/teleon-live.js + 9 recorded patches: Capabilities table/rollup, Build result (real
+gate decision/score/version), dashboard stats+activity, usage — all live with honest fallbacks;
+teleon_gate extended to 18 checks → 18/18 LOCAL AND PUBLIC TUNNEL. (3) NEW
+e2e/family_surfaces_gate.mjs: all 21 makeHub hubs console-clean with working browse; banner
+counts match products.js per-entity (13 private / 8 live; OHH covered by its own 46-route gate);
+inference-gateway + template-registry + Design Acceptance Scorecard clean; one REAL registry
+install (search → install → workspace) on opencontexthub — 6/6. (4) SIX journey videos
+re-recorded (0 frictions): teleon now shows the REAL lifecycle on camera (frame-verified:
+"version 4 live · score 1 · 4/4 examples"), journey-5 open-hubs grand tour (8 live hubs + os2t
+convert + orh + REAL install frame-verified), journey-6 private bench (13 banners) + planes +
+scorecard; manifest regenerated (6 videos / 134 chapters). Docs: teleon-demo + parity report
+updated. Remaining designed-by-design: OHH run console + billing/checkout emulation + Teleon
+evidence/library copy pages — captioned on camera, recorded in the parity report.

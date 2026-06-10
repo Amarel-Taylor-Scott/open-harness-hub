@@ -285,16 +285,24 @@ async function teleonJourney(page, h, base) {
   await h.click('button:has-text("Create"), button[type="submit"]', 'Real register → onboarding → session');
   await h.pause(3600);
 
-  await h.nav('#/dashboard', 'The console — capabilities, runs, evidence', 1900);
-  await h.scrollTour(2);
+  await h.nav('#/app', 'Capabilities — the REAL runtime state: status from a real promotion gate', 2000);
+  await h.scrollTour(1, 1100);
+  await h.nav('#/runs', 'Build a capability — this executes FOR REAL (deterministic examples, receipts)');
+  await h.pause(800);
+  await h.click('button:has-text("Build capability")', 'Building — every example runs now; the gate scores the real pass-rate');
+  await h.pause(6200);
+  await h.hud('Shipped by the REAL gate — real score, real version bump, receipts on disk');
+  await h.pause(2600);
+  await h.nav('#/app', 'The capability table updates from the run that just happened', 2200);
+  await h.nav('#/dashboard', 'The console — REAL counters from your recorded runs', 1900);
+  await h.scrollTour(1, 1100);
   await page.keyboard.press('Control+k');
   await h.pause(900);
   await h.hud('⌘K — the command palette, on every app surface');
   await h.pause(1600);
   await page.keyboard.press('Escape');
-  await h.nav('#/runs', 'Runs — designed preview (the PurposeTask runtime is the separate build)', 1900);
-  await h.nav('#/evidence', 'Evidence ledger — designed preview, captioned honestly', 1900);
-  await h.nav('#/registry', 'Capability registry', 1700);
+  await h.nav('#/evidence', 'Evidence — what was tried, how it scored, why it shipped', 1700);
+  await h.nav('#/registry', 'Library — building blocks drawn from the open hubs', 1600);
 
   await h.nav('#/keys', 'Configuration — API keys');
   await h.click('button:has-text("+ Create key")', 'Minting a REAL API key on the teleon realm');
@@ -303,7 +311,7 @@ async function teleonJourney(page, h, base) {
   await h.pause(2400);
   await h.click('tr:has-text("just now") a:has-text("Revoke")', 'Real revocation — gone immediately', { optional: true, settleMs: 1800 });
   await h.nav('#/team', 'Team', 1500);
-  await h.nav('#/usage', 'Usage metering', 1500);
+  await h.nav('#/usage', 'Usage — REAL recorded runs and execution time', 1700);
   await h.nav('#/billing', 'Billing — plan & invoices (payment EMULATED, no charges)', 1900);
   await h.nav('#/audit', 'Audit log', 1600);
   await h.nav('#/settings', 'Settings', 1500);
@@ -315,8 +323,93 @@ async function teleonJourney(page, h, base) {
 
   await h.go(base.url.replace(/\/?(\?[^#]*)?(#.*)?$/, '') + '/Teleon%20PurposeTask%20Control%20Tower.html', 'The PurposeTask Control Tower — operator view (designed prototype)', 3000);
   await h.scrollTour(3);
-  await h.hud('Teleon — verified end to end: real accounts, real keys, honest runtime previews');
+  await h.hud('Teleon — real accounts, real keys, and a REAL capability lifecycle: build → gate → ship');
   await h.pause(2400);
+}
+
+/* ============ JOURNEY 5 — the OPEN HUBS grand tour (8 live makeHub registries + depth) ============ */
+async function liveHubsJourney(page, h) {
+  const { readdirSync, readFileSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const bundle = join(HERE, '..', 'dist', 'sites', 'openharness-design');
+  const folders = readdirSync(bundle, { withFileTypes: true })
+    .filter((d) => d.isDirectory() && /^open.+hub$|^openskilltotool$/.test(d.name) && d.name !== 'openharnesshub')
+    .map((d) => d.name).sort();
+  const products = readFileSync(join(bundle, 'shared', 'products.js'), 'utf-8');
+  const live = folders.filter((f) => {
+    const at = products.indexOf(`'../${f}/`);
+    return at !== -1 && !/status: 'private'/.test(products.slice(Math.max(0, at - 600), at + 600));
+  });
+  const entry = (f) => readdirSync(join(bundle, f)).find((x) => / Prototype\.html$/.test(x));
+  const base = 'http://127.0.0.1:8002';
+
+  await h.go(`${base}/${encodeURIComponent(live[0])}/${encodeURIComponent(entry(live[0]))}`,
+    `The open registries — ${live.length} live hubs, every one rendered by ONE engine`, 3600);
+  for (const f of live) {
+    await h.go(`${base}/${encodeURIComponent(f)}/${encodeURIComponent(entry(f))}`, `${f} — landing`, 2600);
+    await h.scrollTour(1, 1000);
+    await h.nav('#/browse', `${f} — browse the registry`, 1500);
+  }
+
+  await h.go(`${base}/openskilltotool/${encodeURIComponent(entry('openskilltotool'))}#/architecture`,
+    'OpenSkillToTool — bespoke depth: the conversion architecture', 3200);
+  await h.scrollTour(2);
+  await h.nav('#/convert', 'The convert wizard', 2200);
+
+  await h.go(`${base}/openreviewhub/${encodeURIComponent(entry('openreviewhub'))}#/browse`,
+    'OpenReviewHub — governed reviews', 3200);
+  await h.click('.oh-card', 'A review entry', { optional: true, settleMs: 2200 });
+
+  await h.go(`${base}/opencontexthub/${encodeURIComponent(entry('opencontexthub'))}#/signup`,
+    'OpenContextHub — a REAL account + a REAL install', 3000);
+  await h.type('input[type="email"], input[placeholder*="mail" i]', `tour-${Date.now()}@example.test`);
+  await h.type('input[type="password"]', 'tour-passphrase');
+  await h.click('button:has-text("Create"), button[type="submit"]', 'Real realm sign-up');
+  await h.pause(3400);
+  await h.nav('#/browse', 'Pick an entry', 1600);
+  await h.click('.oh-card', 'The entry — provenance, signing, install', { optional: true, settleMs: 2000 });
+  await page.evaluate(async () => {
+    const entries = await window.OHRegistry.search('opencontexthub', '');
+    if (entries && entries.length) await window.OHRegistry.install('opencontexthub', entries[0]);
+  });
+  await h.nav('#/installed', 'Installed — the REAL workspace row from the registry service', 2200);
+  await h.hud('The open funnel: 8 live registries + the OpenHarnessHub product, one design system, real accounts everywhere');
+  await h.pause(2400);
+}
+
+/* ============ JOURNEY 6 — the PRIVATE BENCH + internal planes + the scorecard ============ */
+async function benchJourney(page, h) {
+  const { readdirSync, readFileSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const bundle = join(HERE, '..', 'dist', 'sites', 'openharness-design');
+  const folders = readdirSync(bundle, { withFileTypes: true })
+    .filter((d) => d.isDirectory() && /^open.+hub$/.test(d.name))
+    .map((d) => d.name).sort();
+  const products = readFileSync(join(bundle, 'shared', 'products.js'), 'utf-8');
+  const bench = folders.filter((f) => {
+    const at = products.indexOf(`'../${f}/`);
+    return at !== -1 && /status: 'private'/.test(products.slice(Math.max(0, at - 600), at + 600));
+  });
+  const entry = (f) => readdirSync(join(bundle, f)).find((x) => / Prototype\.html$/.test(x));
+  const base = 'http://127.0.0.1:8002';
+
+  await h.go(`${base}/Demo%20Control%20Tower.html`, 'The operator index — and behind it, the PRIVATE BENCH', 3200);
+  await h.scrollTour(2);
+  await h.hud(`${bench.length} private-bench registries — muted accent + “Private preview” banner until the owner flips them live`);
+  for (const f of bench) {
+    await h.go(`${base}/${encodeURIComponent(f)}/${encodeURIComponent(entry(f))}`, `${f} — private preview`, 2200);
+  }
+  await h.go(`${base}/inference-gateway/${encodeURIComponent('Shared Inference Gateway.html')}`,
+    'Shared Inference Gateway — the internal routing plane', 3000);
+  await h.scrollTour(2);
+  await h.go(`${base}/template-registry/${encodeURIComponent('Shared Template Registry.html')}`,
+    'Shared Template Registry — the internal template plane', 3000);
+  await h.scrollTour(2);
+  await h.go(`${base}/design/${encodeURIComponent('Design Acceptance Scorecard.html')}`,
+    'The Design Acceptance Scorecard — the branded-house consistency gate', 3000);
+  await h.scrollTour(3);
+  await h.hud('The whole family: 24+ surfaces, one design system, verified end to end');
+  await h.pause(2600);
 }
 
 /* =====================  runner  ===================== */
@@ -326,7 +419,9 @@ const JOURNEYS = [
   { id: 'journey-1-openharnesshub', title: `Open Harness Hub — ${base.public ? 'PUBLIC URL' : 'local'}: landing → live build → live registry → sign-up → live canvas + real export → configuration`, fn: (p, h) => ohhJourney(p, h, base) },
   { id: 'journey-2-baltor', title: 'Baltor — landing → sign-up → console → emulated billing → LIVE pipeline on the real event bus', fn: baltorJourney },
   { id: 'journey-3-portfolio-hub', title: 'AI Done Right → Control Tower → OpenContextHub — real account + REAL key mint/revoke', fn: portfolioJourney },
-  { id: 'journey-4-teleon', title: `Teleon — ${tBase.public ? 'PUBLIC URL' : 'local'}: landing → sign-up → console + ⌘K → REAL key lifecycle → account pages → tower`, fn: (p, h) => teleonJourney(p, h, tBase) },
+  { id: 'journey-4-teleon', title: `Teleon — ${tBase.public ? 'PUBLIC URL' : 'local'}: landing → sign-up → REAL capability build (gate + receipts) → REAL key lifecycle → tower`, fn: (p, h) => teleonJourney(p, h, tBase) },
+  { id: 'journey-5-open-hubs', title: 'The open registries — 8 live hubs (one engine) + bespoke depth + a REAL install', fn: liveHubsJourney },
+  { id: 'journey-6-private-bench', title: 'The private bench (13 hubs) + internal planes + the Design Acceptance Scorecard', fn: benchJourney },
 ];
 
 console.log(`native video: ${HAS_NATIVE_VIDEO ? 'ON (webm + mp4)' : 'OFF — webm only'} · ${SIZE.width}×${SIZE.height} · OHH: ${base.host}${base.public ? ' (PUBLIC)' : ''} · Teleon: ${tBase.host}${tBase.public ? ' (PUBLIC)' : ''}\n`);

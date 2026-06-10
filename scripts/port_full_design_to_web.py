@@ -74,6 +74,78 @@ _SHARED_REF = re.compile(r"\.\./shared/([A-Za-z0-9._-]+)")
 # Recorded live-data seam patches (the ONLY divergence from verbatim site code).
 # Shape: app → file → list of (old, new). Old strings must match EXACTLY once.
 PATCHES: dict[str, dict[str, list[tuple[str, str]]]] = {
+    "teleon": {
+        "teleon-main.jsx": [
+            # the whole app re-renders when the REAL runtime's data lands (web/teleon/teleon-live.js)
+            (
+                "function App() {\n"
+                "  const route = useHashRoute();\n"
+                "  const [theme, toggle] = useSiteTheme('teleon-theme');",
+                "function App() {\n"
+                "  const route = useHashRoute();\n"
+                "  const [, tlTick] = React.useState(0);  // live seam: re-render when the real runtime answers\n"
+                "  React.useEffect(() => (window.TeleonLive ? TeleonLive.onReady(() => tlTick((t) => t + 1)) : undefined), []);\n"
+                "  const [theme, toggle] = useSiteTheme('teleon-theme');",
+            ),
+            # the Capabilities table = the runtime's REAL capability state (status from the real gate)
+            (
+                "function Capabilities() {\n  return (",
+                "function Capabilities() {\n"
+                "  const CAPS_SRC = (window.TeleonLive && TeleonLive.capabilities()) || CAPS;  // real runtime rows\n"
+                "  return (",
+            ),
+            (
+                "      <OhRollup items={[['Capabilities', CAPS.length], ['Promoted', CAPS.filter((c) => c[2] === 'promoted').length], ['In eval', 1], ['Avg score', '0.90']]} />",
+                "      <OhRollup items={(window.TeleonLive && TeleonLive.capRollup()) || [['Capabilities', CAPS.length], ['Promoted', CAPS.filter((c) => c[2] === 'promoted').length], ['In eval', 1], ['Avg score', '0.90']]} />",
+            ),
+            (
+                "            {CAPS.map(([id, name, st, score, ver]) => (",
+                "            {((window.TeleonLive && TeleonLive.capabilities()) || CAPS).map(([id, name, st, score, ver]) => (",
+            ),
+            # "Build capability" REALLY executes a run (deterministic examples + receipts) while
+            # the designed lifecycle animation plays
+            (
+                "        <button className=\"oh-btn oh-btn--primary\" onClick={() => { setPhase('running'); setStep(0); }} disabled={phase === 'running'}>",
+                "        <button className=\"oh-btn oh-btn--primary\" onClick={() => { setPhase('running'); setStep(0); if (window.TeleonLive) TeleonLive.run(); }} disabled={phase === 'running'}>",
+            ),
+            # the result row reports the REAL gate decision, version and score when a run happened
+            (
+                "          {phase === 'done' && <div className=\"tln-result\"><span className=\"oh-badge oh-badge--verified\">✔ shipped · passed your criteria</span><span className=\"mono\">version 13 live</span></div>}",
+                "          {phase === 'done' && (() => { const r = window.TeleonLive && TeleonLive.lastRun(); if (!r) return <div className=\"tln-result\"><span className=\"oh-badge oh-badge--verified\">✔ shipped · passed your criteria</span><span className=\"mono\">version 13 live</span></div>; return <div className=\"tln-result\">{r.decision === 'promoted' ? <span className=\"oh-badge oh-badge--verified\">✔ shipped · passed your criteria</span> : <span className=\"oh-badge oh-badge--warn\">held · gate not cleared</span>}<span className=\"mono\">version {r.version} {r.decision === 'promoted' ? 'live' : 'in eval'} · score {r.score} · {r.passed}/{r.total} examples</span></div>; })()}",
+            ),
+            # dashboard stats + activity from the real runtime/account when present
+            (
+                "    stats={[['Capabilities', 4], ['Promotions · 30d', '38'], ['Rollbacks', '6'], ['Avg score', '0.90']]}",
+                "    stats={(window.TeleonLive && TeleonLive.stats()) || [['Capabilities', 4], ['Promotions · 30d', '38'], ['Rollbacks', '6'], ['Avg score', '0.90']]}",
+            ),
+            (
+                "    activity={[\n"
+                "      { icon: '✓', text: 'State usury-rate finder promoted · 0.96', when: '1h ago' },\n"
+                "      { icon: '⊕', text: 'New capability build started', when: '4h ago' },\n"
+                "      { icon: '↻', text: 'Red-team prompts rolled back', when: '1d ago' },\n"
+                "      { icon: '◷', text: 'Invoice paid · $249.00', when: '5d ago' },\n"
+                "    ]}",
+                "    activity={(window.TeleonLive && TeleonLive.activity()) || [\n"
+                "      { icon: '✓', text: 'State usury-rate finder promoted · 0.96', when: '1h ago' },\n"
+                "      { icon: '⊕', text: 'New capability build started', when: '4h ago' },\n"
+                "      { icon: '↻', text: 'Red-team prompts rolled back', when: '1d ago' },\n"
+                "      { icon: '◷', text: 'Invoice paid · $249.00', when: '5d ago' },\n"
+                "    ]}",
+            ),
+            (
+                "  else if (route === '/usage') page = <OhUsage rollup={[['Runs · 30d', '4,120'], ['Promotions', '38'], ['Rollbacks', '6'], ['Eval hrs', '212']]}\n"
+                "      metrics={[\n"
+                "        { k: 'Lifecycle runs', v: '4,120', bars: [.4, .5, .45, .6, .7, .65, .9], hiLast: true },\n"
+                "        { k: 'Eval compute (hrs)', v: '212', bars: [.5, .55, .5, .6, .58, .7, .8], hiLast: true },\n"
+                "      ]} />;",
+                "  else if (route === '/usage') page = <OhUsage rollup={((window.TeleonLive && TeleonLive.usage()) || {}).rollup || [['Runs · 30d', '4,120'], ['Promotions', '38'], ['Rollbacks', '6'], ['Eval hrs', '212']]}\n"
+                "      metrics={((window.TeleonLive && TeleonLive.usage()) || {}).metrics || [\n"
+                "        { k: 'Lifecycle runs', v: '4,120', bars: [.4, .5, .45, .6, .7, .65, .9], hiLast: true },\n"
+                "        { k: 'Eval compute (hrs)', v: '212', bars: [.5, .55, .5, .6, .58, .7, .8], hiLast: true },\n"
+                "      ]} />;",
+            ),
+        ],
+    },
     "harness-hub": {
         "proto-main.jsx": [
             # the app shell's /flow and /run breadcrumbs carry the LIVE flow name when one exists
@@ -267,7 +339,7 @@ PATCHES: dict[str, dict[str, list[tuple[str, str]]]] = {
 }
 
 # Hand-authored (NOT generated) seam files an app's index.html must load.
-EXTRA_ENTRY_SCRIPTS = {"harness-hub": ["ohh-live.js"]}
+EXTRA_ENTRY_SCRIPTS = {"harness-hub": ["ohh-live.js"], "teleon": ["teleon-live.js"]}
 
 APPS: dict[str, dict] = {
     "context-is-everything": {
@@ -295,6 +367,9 @@ APPS: dict[str, dict] = {
         "code": ["teleon-main.jsx", "teleon.css"],
         "html": ["Teleon PurposeTask Control Tower.html"],
     },
+    # NOTE: teleon's live-data patches live in PATCHES["teleon"] — the LOCAL capability runtime
+    # (scripts/teleon_local_runtime.py) really executes deterministic capabilities with receipts
+    # and a real promotion gate; the site's fixtures remain the honest fallback.
     "harness-hub": {
         "folder": "openharnesshub",
         "entry": "OpenHarnessHub Prototype.html",

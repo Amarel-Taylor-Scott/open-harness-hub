@@ -930,6 +930,41 @@
       "notes": "web/teleon = the full-design Teleon surface transplanted by scripts/port_full_design_to_web.py (kit seams: same-origin identity/registry/analytics). The PurposeTask runtime itself is the separate greenfield build (prompts/teleon-build-kit.md); the site's deep runtime surfaces remain designed prototypes, captioned as such."
     },
     {
+      "service_id": "teleon_local_runtime",
+      "display_name": "Teleon local capability runtime (REAL deterministic execution + receipts + promotion gate)",
+      "owner": "teleon",
+      "port": 9430,
+      "process_group": "teleon_local_runtime",
+      "start_command": [
+        "python3",
+        "scripts/teleon_local_runtime.py"
+      ],
+      "stop_command": null,
+      "health_url": "http://127.0.0.1:9430/healthz",
+      "ready_url": "http://127.0.0.1:9430/healthz",
+      "public_routes": [
+        "/api/teleon/*/capabilities",
+        "/api/teleon/*/evidence"
+      ],
+      "private_routes": [
+        "/api/teleon/*/runs"
+      ],
+      "env_file": null,
+      "allowed_consumers": [
+        "browser_user",
+        "teleon_app"
+      ],
+      "auth_mode": "session_gated_mutations",
+      "data_classes": [
+        "synthetic_demo_data"
+      ],
+      "logs_path": "dist/local-services/teleon_local_runtime.log",
+      "screenshot_required": false,
+      "trycloudflare_required": false,
+      "status": "active_local",
+      "notes": "Demo-grade REAL execution plane for the Teleon site: seeded deterministic capabilities run for real (receipts with hashes/timing; promotion gate on the real pass-rate; restart-safe state under dist/local-services-state/teleon-runtime/). Runs are session-gated via the identity service (registry_local_service pattern). The full PurposeTask runtime remains the separate greenfield build."
+    },
+    {
       "service_id": "baltor_admin_demo_server",
       "display_name": "Baltor live-ops backend (event bus, pipeline runs, context gateway, admin demo APIs)",
       "owner": "baltor",

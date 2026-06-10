@@ -22,13 +22,19 @@ Parity: front page matches `screens/04-teleon.png` (differences = the `teleon_he
 Video: `artifacts/e2e/videos/journey-4-teleon.mp4` (88s, 25 chapters, recorded through the
 tunnel; manifest in `docs/status/user-journey-videos.md`).
 
-## What is real vs. designed (honest split)
+## What is real vs. designed (honest split — updated after the carbon-copy pass)
 
-- **Real:** every route, per-realm accounts/sessions (disk-persisted), API-key mint/revoke
-  (hash-only at rest), registry + analytics seams, the A/B engine with URL forcing, ⌘K, themes.
-- **Designed preview (captioned):** the runtime surfaces (runs, evidence ledger, capability
-  registry data) and billing — the PurposeTask runtime itself is the separate greenfield build
-  (`prompts/teleon-build-kit.md`); this site is its front door, on the shared kit.
+- **Real:** every route; per-realm accounts/sessions (disk-persisted); API-key mint/revoke
+  (hash-only at rest); registry + analytics seams; the A/B engine with URL forcing; ⌘K; themes;
+  **and the capability lifecycle** — `scripts/teleon_local_runtime.py` really executes the
+  seeded deterministic capabilities ("Build capability" runs the example suite NOW: receipts
+  with hashes/timing, the promotion gate applied to the real pass-rate, version bumps), and the
+  Capabilities table, dashboard counters, and usage all read that real state (18/18 gate, local
+  + public tunnel).
+- **Designed (by design, not simulation):** the evidence/library pages are copy pages in the
+  spec; billing/checkout is EMULATED (captioned — no charges). The full PurposeTask runtime
+  (model-calling, self-adapting) remains the separate greenfield build
+  (`prompts/teleon-build-kit.md`); the local runtime is its honest deterministic demo plane.
 
 ## Ops
 
