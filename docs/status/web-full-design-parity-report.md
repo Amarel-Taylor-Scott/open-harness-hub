@@ -137,6 +137,22 @@ Wired (REAL, with honest fallback when a service is down — the kit never fabri
   planes + the Design Acceptance Scorecard render; and a REAL registry install on a live hub
   (search → install → workspace round-trip, session-gated). 6/6 rolled-up checks green.
 
+## Addendum 2026-06-11 — every website fully wired + a video per website (29)
+
+- **OWNER DIRECTION (recorded in `architecture/identity_realm_registry.json` law):** every
+  surface — private bench included — carries a working LOCAL registration realm for self-use;
+  `products.js` keeps bench status `private` (banner + muted accent) and bench realms are not
+  exposed on public tunnels until a hub is flipped live. 13 bench realms added (25 total);
+  identity runtime check still PASSES (its live-realm drift gate is layer-scoped).
+- **Registry catalogs**: already seeded for ALL hubs from the bundle's entries arrays (verified:
+  bench hubs serve real entries; e.g. openroutinghub 6).
+- **Family gate v2**: every one of the 21 hubs now passes render + browse + **REAL sign-up on its
+  own realm + REAL key mint + REAL install→workspace** (6/6 rolled-up checks).
+- **29 videos — one per website** (manifest regenerated): 4 product journeys (OHH + Teleon via
+  their public URLs) + parent/tower/scorecard + 2 family tours + **21 per-hub cuts** + 2 internal
+  planes. Frame-verified highlight: a private-bench hub (OpenRoutingHub, banner visible) minting
+  a real shown-once key — wired for self-use while staying visually private.
+
 ## Decisions (recorded; revisit when deepening the wiring)
 
 - The OHH logged-in console pages (`/build` confirm, `/results` tiers, `/flow` canvas) keep their

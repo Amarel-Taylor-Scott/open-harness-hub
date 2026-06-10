@@ -72,13 +72,42 @@ for (const folder of hubFolders) {
   await page.evaluate(() => { window.location.hash = '/browse'; });
   await page.waitForTimeout(900);
   const browse = await page.evaluate(() => document.querySelectorAll('.oh-card, .ohub-grid > *').length);
-  const ok = landing.len > 300 && errs.length === 0 && browse > 0;
-  hubResults.push({ folder, ok, banner: landing.banner, browse, errs: errs.slice(0, 2) });
+
+  // FULLY WIRED on every hub (owner-directed 2026-06-11): real per-realm signup, real key
+  // mint, real install→workspace — bench hubs included (their realms are LOCAL-only)
+  await page.evaluate(() => { window.location.hash = '/signup'; });
+  await page.waitForTimeout(1100);
+  await page.locator('input[type="email"], input[placeholder*="mail" i]').first().fill(`family-${folder}-${Date.now()}@example.test`).catch(() => {});
+  await page.locator('input[type="password"]').first().fill('family-gate-pass').catch(() => {});
+  await page.locator('button:has-text("Create"), button[type="submit"]').first().click().catch(() => {});
+  await page.waitForTimeout(3200);
+  const wired = await page.evaluate(async (realm) => {
+    const sess = (() => { try { return JSON.parse(localStorage.getItem('oh-session-' + realm) || 'null'); } catch (e) { return null; } })();
+    const out = { session: !!(sess && sess.session_id), mint: false, install: false };
+    if (!out.session) return out;
+    try {
+      const mint = await window.OHIdentity.mintKey(realm, ['read']);
+      out.mint = !!(mint && mint.status === 201 && mint.body && mint.body.api_key);
+    } catch (e) {}
+    try {
+      const entries = await window.OHRegistry.search(realm, '');
+      if (entries && entries.length) {
+        const res = await window.OHRegistry.install(realm, entries[0]);
+        const ws = res.ok ? await window.OHRegistry.workspace(realm) : null;
+        out.install = !!(ws && ws.installed && ws.installed.length >= 1);
+      }
+    } catch (e) {}
+    return out;
+  }, folder);
+
+  const ok = landing.len > 300 && errs.length === 0 && browse > 0 && wired.session && wired.mint && wired.install;
+  hubResults.push({ folder, ok, banner: landing.banner, browse, wired, errs: errs.slice(0, 2) });
   if (landing.banner) banners += 1;
-  if (!ok) check(`${folder}: renders + browse + console-clean`, false, `${errs[0] || 'len:' + landing.len + ' browse:' + browse}`);
+  if (!ok) check(`${folder}: renders + browse + signup + mint + install`, false,
+    `${errs[0] || ''} wired=${JSON.stringify(wired)} browse:${browse}`);
   await page.close();
 }
-check(`all ${hubFolders.length} hubs render console-clean with a working browse grid`, hubResults.every((h) => h.ok),
+check(`all ${hubFolders.length} hubs FULLY WIRED (render + browse + real signup + real key + real install)`, hubResults.every((h) => h.ok),
   hubResults.filter((h) => !h.ok).map((h) => h.folder).join(', '));
 check(`private-preview banners match products.js (${expectedPrivate} private / ${expectedLive} live)`,
   banners === expectedPrivate, `saw ${banners} banners`);

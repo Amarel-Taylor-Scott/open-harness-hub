@@ -13,7 +13,7 @@
 
 import { chromium } from 'playwright';
 import { finalizeNativeVideo, DIRS, HAS_NATIVE_VIDEO } from './gate_common.mjs';
-import { writeFileSync, readFileSync, existsSync } from 'node:fs';
+import { writeFileSync, readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -412,16 +412,94 @@ async function benchJourney(page, h) {
   await h.pause(2600);
 }
 
+/* ============ per-WEBSITE journeys: every hub + plane gets its own video ============ */
+function familySurfaces() {
+  const bundle = join(HERE, '..', 'dist', 'sites', 'openharness-design');
+  const folders = readdirSync(bundle, { withFileTypes: true })
+    .filter((d) => d.isDirectory() && /^open.+hub$|^openskilltotool$/.test(d.name) && d.name !== 'openharnesshub')
+    .map((d) => d.name).sort();
+  const products = readFileSync(join(bundle, 'shared', 'products.js'), 'utf-8');
+  return folders.map((folder) => {
+    const at = products.indexOf(`'../${folder}/`);
+    const isPrivate = at !== -1 && /status: 'private'/.test(products.slice(Math.max(0, at - 600), at + 600));
+    const entry = readdirSync(join(bundle, folder)).find((x) => / Prototype\.html$/.test(x));
+    const wordmark = (products.slice(Math.max(0, at - 600), at + 600).match(/wordmark: '([^']+)'/) || [null, folder])[1];
+    return { folder, entry, isPrivate, wordmark };
+  });
+}
+
+function hubJourney({ folder, entry, isPrivate, wordmark }) {
+  return async (page, h) => {
+    const base = 'http://127.0.0.1:8002';
+    const email = `site-${folder}-${Date.now()}@example.test`;
+    await h.go(`${base}/${encodeURIComponent(folder)}/${encodeURIComponent(entry)}`,
+      isPrivate
+        ? `${wordmark} — private bench (local self-use realm; stays private until flipped live)`
+        : `${wordmark} — open registry (live)`, 3400);
+    await h.scrollTour(2, 1200);
+    await h.nav('#/browse', 'Browse the registry', 1600);
+    await h.click('.oh-card', 'An entry — provenance, signing, install command', { optional: true, settleMs: 2000 });
+    await h.nav('#/signup', 'A REAL account on this site’s own identity realm (no SSO)');
+    await h.type('input[type="email"], input[placeholder*="mail" i]', email);
+    await h.type('input[type="password"]', 'site-passphrase');
+    await h.click('button:has-text("Create"), button[type="submit"]', 'Real register → session');
+    await h.pause(3200);
+    await page.evaluate(async (realm) => {
+      const entries = await window.OHRegistry.search(realm, '');
+      if (entries && entries.length) await window.OHRegistry.install(realm, entries[0]);
+    }, folder).catch(() => {});
+    await h.nav('#/installed', 'Installed — the REAL workspace row from the registry service', 2000);
+    await h.nav('#/keys', 'API keys');
+    await h.click('button:has-text("+ Create key")', 'Minting a REAL key (shown once, hash-only at rest)', { settleMs: 2400 });
+    await h.pause(1800);
+    await h.nav('#/billing', 'Billing (EMULATED — no charges)', 1700);
+    await h.hud(`${wordmark} — fully wired: real account, real workspace, real keys`);
+    await h.pause(2000);
+  };
+}
+
+async function parentJourney(page, h) {
+  await h.go('http://127.0.0.1:8002/', 'AI Done Right — the parent portfolio (2 products + 21 open registries)', 3800);
+  for (const section of ['Thesis', 'Architecture', 'Portfolio', 'Proof', 'How it fits']) {
+    await h.click(page.locator('nav a', { hasText: section }), section, { optional: true, settleMs: 1400 });
+  }
+  await h.click('button[title*="theme" i], button[aria-label*="theme" i], button:has-text("☾")', 'One design system — light and dark', { optional: true, settleMs: 1300 });
+  await h.go('http://127.0.0.1:8002/Demo%20Control%20Tower.html', 'The Demo Control Tower — every surface, its URLs, and live health', 3000);
+  await h.scrollTour(3);
+  await h.click('button:has-text("Run health check"), button:has-text("health")', 'A live health sweep across the family', { optional: true, settleMs: 3200 });
+  await h.go('http://127.0.0.1:8002/design/Design%20Acceptance%20Scorecard.html', 'The Design Acceptance Scorecard — the branded-house gate', 2800);
+  await h.scrollTour(3);
+  await h.hud('AI Done Right — one portfolio, one design system, verified end to end');
+  await h.pause(2200);
+}
+
+function planeJourney(folder, entry, title) {
+  return async (page, h) => {
+    await h.go(`http://127.0.0.1:8002/${encodeURIComponent(folder)}/${encodeURIComponent(entry)}`, title, 3400);
+    await h.scrollTour(4, 1400);
+    await h.hud(title.split(' — ')[0] + ' — an internal shared plane of the portfolio');
+    await h.pause(2000);
+  };
+}
+
 /* =====================  runner  ===================== */
 const base = await ohhBase();
 const tBase = await teleonBase();
+const SURFACES = familySurfaces();
 const JOURNEYS = [
   { id: 'journey-1-openharnesshub', title: `Open Harness Hub — ${base.public ? 'PUBLIC URL' : 'local'}: landing → live build → live registry → sign-up → live canvas + real export → configuration`, fn: (p, h) => ohhJourney(p, h, base) },
   { id: 'journey-2-baltor', title: 'Baltor — landing → sign-up → console → emulated billing → LIVE pipeline on the real event bus', fn: baltorJourney },
-  { id: 'journey-3-portfolio-hub', title: 'AI Done Right → Control Tower → OpenContextHub — real account + REAL key mint/revoke', fn: portfolioJourney },
+  { id: 'journey-3-aidoneright', title: 'AI Done Right — the parent portfolio, the Demo Control Tower (live health), and the scorecard', fn: parentJourney },
   { id: 'journey-4-teleon', title: `Teleon — ${tBase.public ? 'PUBLIC URL' : 'local'}: landing → sign-up → REAL capability build (gate + receipts) → REAL key lifecycle → tower`, fn: (p, h) => teleonJourney(p, h, tBase) },
-  { id: 'journey-5-open-hubs', title: 'The open registries — 8 live hubs (one engine) + bespoke depth + a REAL install', fn: liveHubsJourney },
-  { id: 'journey-6-private-bench', title: 'The private bench (13 hubs) + internal planes + the Design Acceptance Scorecard', fn: benchJourney },
+  { id: 'journey-5-open-hubs', title: 'Tour — the live open registries (one engine) + bespoke depth + a REAL install', fn: liveHubsJourney },
+  { id: 'journey-6-private-bench', title: 'Tour — the private bench + internal planes + the Design Acceptance Scorecard', fn: benchJourney },
+  ...SURFACES.map((s) => ({
+    id: `site-${s.folder}`,
+    title: `${s.wordmark} — ${s.isPrivate ? 'private bench (local self-use)' : 'live open registry'}: fully wired (real account · workspace · keys)`,
+    fn: hubJourney(s),
+  })),
+  { id: 'site-inference-gateway', title: 'Shared Inference Gateway — the internal routing plane', fn: planeJourney('inference-gateway', 'Shared Inference Gateway.html', 'Shared Inference Gateway — portable preferences, receipts, routing') },
+  { id: 'site-template-registry', title: 'Shared Template Registry — the internal template plane', fn: planeJourney('template-registry', 'Shared Template Registry.html', 'Shared Template Registry — the 14-section shell + mixins') },
 ];
 
 console.log(`native video: ${HAS_NATIVE_VIDEO ? 'ON (webm + mp4)' : 'OFF — webm only'} · ${SIZE.width}×${SIZE.height} · OHH: ${base.host}${base.public ? ' (PUBLIC)' : ''} · Teleon: ${tBase.host}${tBase.public ? ' (PUBLIC)' : ''}\n`);

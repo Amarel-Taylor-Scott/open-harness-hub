@@ -1,60 +1,59 @@
-# User-journey videos — the wired full-design family
+# User-journey videos — every website in the family
 
-Generated 2026-06-10T20:10:31.350Z by `e2e/record_user_journeys.mjs` (1600×900; the OpenHarnessHub
-and Teleon cuts record THROUGH THEIR PUBLIC TUNNEL URLS). Files in `artifacts/e2e/videos/`
-(webm + mp4). GENERATED from `artifacts/e2e/reports/user-journeys.json` — regenerate, don't
-hand-edit.
+Generated 2026-06-10T20:51:58.392Z by `e2e/record_user_journeys.mjs` (1600×900; OHH + Teleon record
+THROUGH THEIR PUBLIC TUNNEL URLS). Files in `artifacts/e2e/videos/` (webm + mp4). GENERATED
+from `artifacts/e2e/reports/user-journeys.json` — regenerate, don't hand-edit.
 
-Honesty rules on camera: REAL seams exercised for real (per-realm sign-up, /api/build, the live
-registry, the REAL Teleon capability lifecycle — deterministic execution, receipts, promotion
-gate — real installs, key mint/revoke, the live event bus, ⌘K, A/B variants); the few designed
-surfaces are captioned as such (run console, emulated billing/checkout, copy pages).
+29 videos: 6 product/tour journeys + 23 per-website cuts (every Open*Hub —
+private bench included — plus the internal planes). Every per-site cut shows the FULLY WIRED
+loop on that site's own identity realm: browse → REAL sign-up → REAL install in the workspace →
+REAL API-key mint (shown once) → billing (EMULATED caption). Honest captions throughout.
 
 ## Open Harness Hub — PUBLIC URL: landing → live build → live registry → sign-up → live canvas + real export → configuration
 
-`artifacts/e2e/videos/journey-1-openharnesshub.mp4` · 106s · 25 chapters · recorded against `expansion-cat-manual-podcasts.trycloudflare.com`
+`artifacts/e2e/videos/journey-1-openharnesshub.mp4` · 108s · 25 chapters · against `expansion-cat-manual-podcasts.trycloudflare.com`
 
 | t | chapter |
 |---|---|
-| 6s | OpenHarnessHub.io — live on the public link: expansion-cat-manual-podcasts.trycloudflare.com |
+| 7s | OpenHarnessHub.io — live on the public link: expansion-cat-manual-podcasts.trycloudflare.com |
 | 12s | Describe a task — the REAL backend assembles a governed pipeline |
 | 15s | Build → /api/build assembles from 2,400+ governed components |
 | 22s | The REAL assembled flow — live components, recipe phases, real cost. No invented lift numbers. |
-| 29s | Explore — the live registry: 2,400+ real components |
-| 31s | Search and facets run over the real catalog |
-| 36s | A real component — license, lifecycle, provenance from the catalog |
-| 44s | Create a REAL account — per-realm identity, no SSO, no fake sessions |
-| 48s | The identity service registers, onboards, and mints a session |
-| 55s | The workspace — “recent flows” is YOUR real build history |
-| 61s | Confirm the task and constraints |
-| 63s | Assemble — live backend build |
-| 68s | Three REAL cost tiers — cheap / balanced / quality, from the live cost model. Lift: honestly “unproven”. |
-| 70s | The flow canvas — the REAL build in the designed topology |
-| 74s | Every node is a real catalog component — click to inspect |
-| 77s | Swap alternatives are the build’s REAL dropped candidates, ranked by match |
-| 79s | Deploy → downloads the REAL open-spec YAML bundle |
-| 82s | Run console (designed simulation — captioned, not faked) |
-| 87s | Foundry — distillation & verification tooling |
-| 89s | Governance — provenance, signing, review gates |
-| 92s | Checkout — the commercial surface (payment EMULATED, no charges) |
-| 95s | Plans & upgrade (emulated) |
-| 97s | Configuration — workspace settings |
-| 101s | Dark mode — same surface, dark tokens |
-| 106s | OpenHarnessHub — fully wired: live registry, live builds, real accounts, real exports |
+| 28s | Explore — the live registry: 2,400+ real components |
+| 32s | Search and facets run over the real catalog |
+| 37s | A real component — license, lifecycle, provenance from the catalog |
+| 46s | Create a REAL account — per-realm identity, no SSO, no fake sessions |
+| 49s | The identity service registers, onboards, and mints a session |
+| 56s | The workspace — “recent flows” is YOUR real build history |
+| 62s | Confirm the task and constraints |
+| 64s | Assemble — live backend build |
+| 69s | Three REAL cost tiers — cheap / balanced / quality, from the live cost model. Lift: honestly “unproven”. |
+| 71s | The flow canvas — the REAL build in the designed topology |
+| 76s | Every node is a real catalog component — click to inspect |
+| 78s | Swap alternatives are the build’s REAL dropped candidates, ranked by match |
+| 81s | Deploy → downloads the REAL open-spec YAML bundle |
+| 84s | Run console (designed simulation — captioned, not faked) |
+| 89s | Foundry — distillation & verification tooling |
+| 91s | Governance — provenance, signing, review gates |
+| 94s | Checkout — the commercial surface (payment EMULATED, no charges) |
+| 97s | Plans & upgrade (emulated) |
+| 99s | Configuration — workspace settings |
+| 103s | Dark mode — same surface, dark tokens |
+| 108s | OpenHarnessHub — fully wired: live registry, live builds, real accounts, real exports |
 
 ## Baltor — landing → sign-up → console → emulated billing → LIVE pipeline on the real event bus
 
-`artifacts/e2e/videos/journey-2-baltor.mp4` · 84s · 17 chapters · recorded against `127.0.0.1`
+`artifacts/e2e/videos/journey-2-baltor.mp4` · 84s · 17 chapters
 
 | t | chapter |
 |---|---|
 | 5s | Baltor — context assurance (the paid product) |
-| 13s | Why context — the thesis |
-| 16s | The Context Engine — six governed stages + verification rail |
-| 22s | Case studies |
+| 12s | Why context — the thesis |
+| 15s | The Context Engine — six governed stages + verification rail |
+| 21s | Case studies |
 | 24s | Pricing |
 | 26s | A REAL Baltor account — its own identity realm (no SSO) |
-| 31s | Real register → onboarding → session |
+| 30s | Real register → onboarding → session |
 | 38s | The console — corpora, freshness, serving health |
 | 44s | Governed corpora — raw / compressed / hyper tiers |
 | 45s | Inside a corpus — tiers, freshness, citations |
@@ -66,103 +65,97 @@ surfaces are captioned as such (run console, emulated billing/checkout, copy pag
 | 66s | Run Full Pipeline — a REAL run, streaming real events and receipts |
 | 84s | Baltor — real console, real events, honest billing emulation |
 
-## AI Done Right → Control Tower → OpenContextHub — real account + REAL key mint/revoke
+## AI Done Right — the parent portfolio, the Demo Control Tower (live health), and the scorecard
 
-`artifacts/e2e/videos/journey-3-portfolio-hub.mp4` · 62s · 17 chapters · recorded against `127.0.0.1`
+`artifacts/e2e/videos/journey-3-aidoneright.mp4` · 41s · 11 chapters
 
 | t | chapter |
 |---|---|
-| 5s | AI Done Right — the parent portfolio (2 products + 21 open hubs) |
+| 5s | AI Done Right — the parent portfolio (2 products + 21 open registries) |
 | 6s | Thesis |
 | 8s | Architecture |
 | 10s | Portfolio |
 | 12s | Proof |
-| 14s | One design system, light and dark |
-| 19s | The Demo Control Tower — operator index over all 24 surfaces |
-| 30s | An open registry — OpenContextHub (21 hubs, one engine) |
-| 36s | Browsing registry entries |
-| 38s | A REAL account on the hub — separate identity realm |
-| 43s | Sign up — real realm session |
-| 49s | Configuration — API keys |
-| 50s | Minting a REAL API key (the service stores only a hash) |
-| 55s | The raw key appears exactly once — copy it now |
-| 57s | Real revocation — gone from the realm immediately |
-| 61s | Hub billing (emulated) |
-| 62s | One portfolio: parent → tower → hubs — real accounts, real keys, one design system |
+| 15s | How it fits |
+| 17s | One design system — light and dark |
+| 22s | The Demo Control Tower — every surface, its URLs, and live health |
+| 28s | A live health sweep across the family |
+| 35s | The Design Acceptance Scorecard — the branded-house gate |
+| 41s | AI Done Right — one portfolio, one design system, verified end to end |
 
 ## Teleon — PUBLIC URL: landing → sign-up → REAL capability build (gate + receipts) → REAL key lifecycle → tower
 
-`artifacts/e2e/videos/journey-4-teleon.mp4` · 107s · 29 chapters · recorded against `national-horizontal-rankings-katrina.trycloudflare.com`
+`artifacts/e2e/videos/journey-4-teleon.mp4` · 108s · 29 chapters · against `national-horizontal-rankings-katrina.trycloudflare.com`
 
 | t | chapter |
 |---|---|
-| 6s | Teleon.dev — live on the public link: national-horizontal-rankings-katrina.trycloudflare.com |
-| 7s | Capabilities, not code — the hero ships with live A/B variants (see the chip) |
-| 12s | How it works |
-| 16s | Case studies |
+| 7s | Teleon.dev — live on the public link: national-horizontal-rankings-katrina.trycloudflare.com |
+| 8s | Capabilities, not code — the hero ships with live A/B variants (see the chip) |
+| 13s | How it works |
+| 17s | Case studies |
 | 19s | Pricing |
-| 21s | Docs |
-| 23s | Create a REAL account — Teleon has its own identity realm (no SSO) |
-| 27s | Real register → onboarding → session |
-| 35s | Capabilities — the REAL runtime state: status from a real promotion gate |
-| 39s | Build a capability — this executes FOR REAL (deterministic examples, receipts) |
+| 22s | Docs |
+| 24s | Create a REAL account — Teleon has its own identity realm (no SSO) |
+| 28s | Real register → onboarding → session |
+| 36s | Capabilities — the REAL runtime state: status from a real promotion gate |
+| 40s | Build a capability — this executes FOR REAL (deterministic examples, receipts) |
 | 41s | Building — every example runs now; the gate scores the real pass-rate |
-| 49s | Shipped by the REAL gate — real score, real version bump, receipts on disk |
-| 54s | The capability table updates from the run that just happened |
+| 50s | Shipped by the REAL gate — real score, real version bump, receipts on disk |
+| 55s | The capability table updates from the run that just happened |
 | 57s | The console — REAL counters from your recorded runs |
 | 61s | ⌘K — the command palette, on every app surface |
 | 64s | Evidence — what was tried, how it scored, why it shipped |
-| 66s | Library — building blocks drawn from the open hubs |
-| 68s | Configuration — API keys |
-| 69s | Minting a REAL API key on the teleon realm |
+| 67s | Library — building blocks drawn from the open hubs |
+| 69s | Configuration — API keys |
+| 70s | Minting a REAL API key on the teleon realm |
 | 74s | The raw key is shown exactly once — the service stores only a hash |
-| 76s | Real revocation — gone immediately |
-| 80s | Team |
-| 82s | Usage — REAL recorded runs and execution time |
-| 85s | Billing — plan & invoices (payment EMULATED, no charges) |
-| 87s | Audit log |
-| 90s | Settings |
-| 93s | Dark mode — same tokens, dark theme |
-| 101s | The PurposeTask Control Tower — operator view (designed prototype) |
-| 107s | Teleon — real accounts, real keys, and a REAL capability lifecycle: build → gate → ship |
+| 77s | Real revocation — gone immediately |
+| 81s | Team |
+| 83s | Usage — REAL recorded runs and execution time |
+| 86s | Billing — plan & invoices (payment EMULATED, no charges) |
+| 88s | Audit log |
+| 91s | Settings |
+| 94s | Dark mode — same tokens, dark theme |
+| 102s | The PurposeTask Control Tower — operator view (designed prototype) |
+| 108s | Teleon — real accounts, real keys, and a REAL capability lifecycle: build → gate → ship |
 
-## The open registries — 8 live hubs (one engine) + bespoke depth + a REAL install
+## Tour — the live open registries (one engine) + bespoke depth + a REAL install
 
-`artifacts/e2e/videos/journey-5-open-hubs.mp4` · 104s · 27 chapters · recorded against `127.0.0.1`
+`artifacts/e2e/videos/journey-5-open-hubs.mp4` · 107s · 27 chapters
 
 | t | chapter |
 |---|---|
-| 4s | The open registries — 8 live hubs, every one rendered by ONE engine |
-| 8s | openbenchmarkhub — landing |
-| 12s | openbenchmarkhub — browse the registry |
-| 16s | opencompressionhub — landing |
-| 20s | opencompressionhub — browse the registry |
-| 23s | opencontexthub — landing |
-| 28s | opencontexthub — browse the registry |
-| 31s | openmcphub — landing |
-| 36s | openmcphub — browse the registry |
-| 39s | openreviewhub — landing |
-| 43s | openreviewhub — browse the registry |
-| 47s | openskillshub — landing |
-| 51s | openskillshub — browse the registry |
-| 55s | openskilltotool — landing |
-| 59s | openskilltotool — browse the registry |
-| 62s | opentoolshub — landing |
-| 67s | opentoolshub — browse the registry |
-| 71s | OpenSkillToTool — bespoke depth: the conversion architecture |
-| 77s | The convert wizard |
-| 81s | OpenReviewHub — governed reviews |
-| 82s | A review entry |
-| 88s | OpenContextHub — a REAL account + a REAL install |
-| 91s | Real realm sign-up |
-| 98s | Pick an entry |
-| 99s | The entry — provenance, signing, install |
-| 104s | Installed — the REAL workspace row from the registry service |
-| 104s | The open funnel: 8 live registries + the OpenHarnessHub product, one design system, real accounts everywhere |
+| 6s | The open registries — 8 live hubs, every one rendered by ONE engine |
+| 10s | openbenchmarkhub — landing |
+| 15s | openbenchmarkhub — browse the registry |
+| 18s | opencompressionhub — landing |
+| 22s | opencompressionhub — browse the registry |
+| 26s | opencontexthub — landing |
+| 30s | opencontexthub — browse the registry |
+| 34s | openmcphub — landing |
+| 38s | openmcphub — browse the registry |
+| 42s | openreviewhub — landing |
+| 46s | openreviewhub — browse the registry |
+| 50s | openskillshub — landing |
+| 54s | openskillshub — browse the registry |
+| 57s | openskilltotool — landing |
+| 62s | openskilltotool — browse the registry |
+| 65s | opentoolshub — landing |
+| 70s | opentoolshub — browse the registry |
+| 74s | OpenSkillToTool — bespoke depth: the conversion architecture |
+| 80s | The convert wizard |
+| 84s | OpenReviewHub — governed reviews |
+| 85s | A review entry |
+| 91s | OpenContextHub — a REAL account + a REAL install |
+| 94s | Real realm sign-up |
+| 101s | Pick an entry |
+| 102s | The entry — provenance, signing, install |
+| 107s | Installed — the REAL workspace row from the registry service |
+| 107s | The open funnel: 8 live registries + the OpenHarnessHub product, one design system, real accounts everywhere |
 
-## The private bench (13 hubs) + internal planes + the Design Acceptance Scorecard
+## Tour — the private bench + internal planes + the Design Acceptance Scorecard
 
-`artifacts/e2e/videos/journey-6-private-bench.mp4` · 72s · 19 chapters · recorded against `127.0.0.1`
+`artifacts/e2e/videos/journey-6-private-bench.mp4` · 72s · 19 chapters
 
 | t | chapter |
 |---|---|
@@ -176,13 +169,388 @@ surfaces are captioned as such (run console, emulated billing/checkout, copy pag
 | 26s | openoptimizationhub — private preview |
 | 29s | openreceipthub — private preview |
 | 32s | openreconciliationhub — private preview |
-| 35s | openroutinghub — private preview |
-| 38s | opensandboxhub — private preview |
+| 36s | openroutinghub — private preview |
+| 39s | opensandboxhub — private preview |
 | 42s | openstatehub — private preview |
 | 45s | opentemplateshub — private preview |
 | 48s | openverificationhub — private preview |
-| 51s | Shared Inference Gateway — the internal routing plane |
+| 52s | Shared Inference Gateway — the internal routing plane |
 | 59s | Shared Template Registry — the internal template plane |
 | 66s | The Design Acceptance Scorecard — the branded-house consistency gate |
 | 72s | The whole family: 24+ surfaces, one design system, verified end to end |
+
+## OpenAgentHub.io — private bench (local self-use): fully wired (real account · workspace · keys)
+
+`artifacts/e2e/videos/site-openagenthub.mp4` · 35s · 10 chapters
+
+| t | chapter |
+|---|---|
+| 4s | OpenAgentHub.io — private bench (local self-use realm; stays private until flipped live) |
+| 10s | Browse the registry |
+| 11s | An entry — provenance, signing, install command |
+| 15s | A REAL account on this site’s own identity realm (no SSO) |
+| 18s | Real register → session |
+| 25s | Installed — the REAL workspace row from the registry service |
+| 27s | API keys |
+| 28s | Minting a REAL key (shown once, hash-only at rest) |
+| 34s | Billing (EMULATED — no charges) |
+| 35s | OpenAgentHub.io — fully wired: real account, real workspace, real keys |
+
+## OpenBenchmarkHub.io — live open registry: fully wired (real account · workspace · keys)
+
+`artifacts/e2e/videos/site-openbenchmarkhub.mp4` · 35s · 10 chapters
+
+| t | chapter |
+|---|---|
+| 4s | OpenBenchmarkHub.io — open registry (live) |
+| 10s | Browse the registry |
+| 11s | An entry — provenance, signing, install command |
+| 15s | A REAL account on this site’s own identity realm (no SSO) |
+| 18s | Real register → session |
+| 25s | Installed — the REAL workspace row from the registry service |
+| 27s | API keys |
+| 28s | Minting a REAL key (shown once, hash-only at rest) |
+| 35s | Billing (EMULATED — no charges) |
+| 35s | OpenBenchmarkHub.io — fully wired: real account, real workspace, real keys |
+
+## OpenCompressionHub.io — live open registry: fully wired (real account · workspace · keys)
+
+`artifacts/e2e/videos/site-opencompressionhub.mp4` · 35s · 10 chapters
+
+| t | chapter |
+|---|---|
+| 4s | OpenCompressionHub.io — open registry (live) |
+| 10s | Browse the registry |
+| 11s | An entry — provenance, signing, install command |
+| 15s | A REAL account on this site’s own identity realm (no SSO) |
+| 18s | Real register → session |
+| 25s | Installed — the REAL workspace row from the registry service |
+| 27s | API keys |
+| 28s | Minting a REAL key (shown once, hash-only at rest) |
+| 35s | Billing (EMULATED — no charges) |
+| 35s | OpenCompressionHub.io — fully wired: real account, real workspace, real keys |
+
+## Teleon.dev — live open registry: fully wired (real account · workspace · keys)
+
+`artifacts/e2e/videos/site-opencontexthub.mp4` · 36s · 10 chapters
+
+| t | chapter |
+|---|---|
+| 4s | Teleon.dev — open registry (live) |
+| 10s | Browse the registry |
+| 11s | An entry — provenance, signing, install command |
+| 15s | A REAL account on this site’s own identity realm (no SSO) |
+| 18s | Real register → session |
+| 25s | Installed — the REAL workspace row from the registry service |
+| 28s | API keys |
+| 28s | Minting a REAL key (shown once, hash-only at rest) |
+| 35s | Billing (EMULATED — no charges) |
+| 36s | Teleon.dev — fully wired: real account, real workspace, real keys |
+
+## OpenEndpointHub.io — private bench (local self-use): fully wired (real account · workspace · keys)
+
+`artifacts/e2e/videos/site-openendpointhub.mp4` · 36s · 10 chapters
+
+| t | chapter |
+|---|---|
+| 4s | OpenEndpointHub.io — private bench (local self-use realm; stays private until flipped live) |
+| 10s | Browse the registry |
+| 11s | An entry — provenance, signing, install command |
+| 15s | A REAL account on this site’s own identity realm (no SSO) |
+| 18s | Real register → session |
+| 25s | Installed — the REAL workspace row from the registry service |
+| 27s | API keys |
+| 28s | Minting a REAL key (shown once, hash-only at rest) |
+| 35s | Billing (EMULATED — no charges) |
+| 36s | OpenEndpointHub.io — fully wired: real account, real workspace, real keys |
+
+## OpenEnrichmentHub.io — private bench (local self-use): fully wired (real account · workspace · keys)
+
+`artifacts/e2e/videos/site-openenrichmenthub.mp4` · 36s · 10 chapters
+
+| t | chapter |
+|---|---|
+| 4s | OpenEnrichmentHub.io — private bench (local self-use realm; stays private until flipped live) |
+| 10s | Browse the registry |
+| 11s | An entry — provenance, signing, install command |
+| 15s | A REAL account on this site’s own identity realm (no SSO) |
+| 18s | Real register → session |
+| 25s | Installed — the REAL workspace row from the registry service |
+| 28s | API keys |
+| 28s | Minting a REAL key (shown once, hash-only at rest) |
+| 35s | Billing (EMULATED — no charges) |
+| 36s | OpenEnrichmentHub.io — fully wired: real account, real workspace, real keys |
+
+## OpenEnvHub.io — private bench (local self-use): fully wired (real account · workspace · keys)
+
+`artifacts/e2e/videos/site-openenvhub.mp4` · 35s · 10 chapters
+
+| t | chapter |
+|---|---|
+| 4s | OpenEnvHub.io — private bench (local self-use realm; stays private until flipped live) |
+| 10s | Browse the registry |
+| 11s | An entry — provenance, signing, install command |
+| 15s | A REAL account on this site’s own identity realm (no SSO) |
+| 18s | Real register → session |
+| 25s | Installed — the REAL workspace row from the registry service |
+| 27s | API keys |
+| 28s | Minting a REAL key (shown once, hash-only at rest) |
+| 34s | Billing (EMULATED — no charges) |
+| 35s | OpenEnvHub.io — fully wired: real account, real workspace, real keys |
+
+## OpenHardeningHub.io — private bench (local self-use): fully wired (real account · workspace · keys)
+
+`artifacts/e2e/videos/site-openhardeninghub.mp4` · 35s · 10 chapters
+
+| t | chapter |
+|---|---|
+| 4s | OpenHardeningHub.io — private bench (local self-use realm; stays private until flipped live) |
+| 10s | Browse the registry |
+| 11s | An entry — provenance, signing, install command |
+| 15s | A REAL account on this site’s own identity realm (no SSO) |
+| 18s | Real register → session |
+| 25s | Installed — the REAL workspace row from the registry service |
+| 27s | API keys |
+| 28s | Minting a REAL key (shown once, hash-only at rest) |
+| 35s | Billing (EMULATED — no charges) |
+| 35s | OpenHardeningHub.io — fully wired: real account, real workspace, real keys |
+
+## OpenHarnessHub.io — live open registry: fully wired (real account · workspace · keys)
+
+`artifacts/e2e/videos/site-openmcphub.mp4` · 35s · 10 chapters
+
+| t | chapter |
+|---|---|
+| 4s | OpenHarnessHub.io — open registry (live) |
+| 10s | Browse the registry |
+| 11s | An entry — provenance, signing, install command |
+| 15s | A REAL account on this site’s own identity realm (no SSO) |
+| 18s | Real register → session |
+| 25s | Installed — the REAL workspace row from the registry service |
+| 27s | API keys |
+| 28s | Minting a REAL key (shown once, hash-only at rest) |
+| 34s | Billing (EMULATED — no charges) |
+| 35s | OpenHarnessHub.io — fully wired: real account, real workspace, real keys |
+
+## OpenOptimizationHub.io — private bench (local self-use): fully wired (real account · workspace · keys)
+
+`artifacts/e2e/videos/site-openoptimizationhub.mp4` · 37s · 10 chapters
+
+| t | chapter |
+|---|---|
+| 5s | OpenOptimizationHub.io — private bench (local self-use realm; stays private until flipped live) |
+| 11s | Browse the registry |
+| 12s | An entry — provenance, signing, install command |
+| 16s | A REAL account on this site’s own identity realm (no SSO) |
+| 19s | Real register → session |
+| 26s | Installed — the REAL workspace row from the registry service |
+| 29s | API keys |
+| 29s | Minting a REAL key (shown once, hash-only at rest) |
+| 36s | Billing (EMULATED — no charges) |
+| 37s | OpenOptimizationHub.io — fully wired: real account, real workspace, real keys |
+
+## OpenReceiptHub.io — private bench (local self-use): fully wired (real account · workspace · keys)
+
+`artifacts/e2e/videos/site-openreceipthub.mp4` · 35s · 10 chapters
+
+| t | chapter |
+|---|---|
+| 4s | OpenReceiptHub.io — private bench (local self-use realm; stays private until flipped live) |
+| 10s | Browse the registry |
+| 11s | An entry — provenance, signing, install command |
+| 15s | A REAL account on this site’s own identity realm (no SSO) |
+| 18s | Real register → session |
+| 25s | Installed — the REAL workspace row from the registry service |
+| 27s | API keys |
+| 28s | Minting a REAL key (shown once, hash-only at rest) |
+| 35s | Billing (EMULATED — no charges) |
+| 35s | OpenReceiptHub.io — fully wired: real account, real workspace, real keys |
+
+## OpenReconciliationHub.io — private bench (local self-use): fully wired (real account · workspace · keys)
+
+`artifacts/e2e/videos/site-openreconciliationhub.mp4` · 36s · 10 chapters
+
+| t | chapter |
+|---|---|
+| 4s | OpenReconciliationHub.io — private bench (local self-use realm; stays private until flipped live) |
+| 10s | Browse the registry |
+| 11s | An entry — provenance, signing, install command |
+| 15s | A REAL account on this site’s own identity realm (no SSO) |
+| 18s | Real register → session |
+| 26s | Installed — the REAL workspace row from the registry service |
+| 28s | API keys |
+| 28s | Minting a REAL key (shown once, hash-only at rest) |
+| 35s | Billing (EMULATED — no charges) |
+| 36s | OpenReconciliationHub.io — fully wired: real account, real workspace, real keys |
+
+## OpenReviewHub.io — live open registry: fully wired (real account · workspace · keys)
+
+`artifacts/e2e/videos/site-openreviewhub.mp4` · 35s · 10 chapters
+
+| t | chapter |
+|---|---|
+| 4s | OpenReviewHub.io — open registry (live) |
+| 10s | Browse the registry |
+| 11s | An entry — provenance, signing, install command |
+| 15s | A REAL account on this site’s own identity realm (no SSO) |
+| 18s | Real register → session |
+| 25s | Installed — the REAL workspace row from the registry service |
+| 27s | API keys |
+| 28s | Minting a REAL key (shown once, hash-only at rest) |
+| 34s | Billing (EMULATED — no charges) |
+| 35s | OpenReviewHub.io — fully wired: real account, real workspace, real keys |
+
+## OpenRoutingHub.io — private bench (local self-use): fully wired (real account · workspace · keys)
+
+`artifacts/e2e/videos/site-openroutinghub.mp4` · 35s · 10 chapters
+
+| t | chapter |
+|---|---|
+| 4s | OpenRoutingHub.io — private bench (local self-use realm; stays private until flipped live) |
+| 10s | Browse the registry |
+| 11s | An entry — provenance, signing, install command |
+| 15s | A REAL account on this site’s own identity realm (no SSO) |
+| 18s | Real register → session |
+| 25s | Installed — the REAL workspace row from the registry service |
+| 27s | API keys |
+| 28s | Minting a REAL key (shown once, hash-only at rest) |
+| 35s | Billing (EMULATED — no charges) |
+| 35s | OpenRoutingHub.io — fully wired: real account, real workspace, real keys |
+
+## OpenSandboxHub.io — private bench (local self-use): fully wired (real account · workspace · keys)
+
+`artifacts/e2e/videos/site-opensandboxhub.mp4` · 35s · 10 chapters
+
+| t | chapter |
+|---|---|
+| 4s | OpenSandboxHub.io — private bench (local self-use realm; stays private until flipped live) |
+| 10s | Browse the registry |
+| 11s | An entry — provenance, signing, install command |
+| 15s | A REAL account on this site’s own identity realm (no SSO) |
+| 18s | Real register → session |
+| 25s | Installed — the REAL workspace row from the registry service |
+| 27s | API keys |
+| 28s | Minting a REAL key (shown once, hash-only at rest) |
+| 35s | Billing (EMULATED — no charges) |
+| 35s | OpenSandboxHub.io — fully wired: real account, real workspace, real keys |
+
+## OpenContextHub.io — live open registry: fully wired (real account · workspace · keys)
+
+`artifacts/e2e/videos/site-openskillshub.mp4` · 35s · 10 chapters
+
+| t | chapter |
+|---|---|
+| 4s | OpenContextHub.io — open registry (live) |
+| 10s | Browse the registry |
+| 11s | An entry — provenance, signing, install command |
+| 15s | A REAL account on this site’s own identity realm (no SSO) |
+| 18s | Real register → session |
+| 25s | Installed — the REAL workspace row from the registry service |
+| 27s | API keys |
+| 28s | Minting a REAL key (shown once, hash-only at rest) |
+| 35s | Billing (EMULATED — no charges) |
+| 35s | OpenContextHub.io — fully wired: real account, real workspace, real keys |
+
+## OpenToolsHub.io — live open registry: fully wired (real account · workspace · keys)
+
+`artifacts/e2e/videos/site-openskilltotool.mp4` · 35s · 10 chapters
+
+| t | chapter |
+|---|---|
+| 4s | OpenToolsHub.io — open registry (live) |
+| 10s | Browse the registry |
+| 11s | An entry — provenance, signing, install command |
+| 15s | A REAL account on this site’s own identity realm (no SSO) |
+| 18s | Real register → session |
+| 25s | Installed — the REAL workspace row from the registry service |
+| 27s | API keys |
+| 28s | Minting a REAL key (shown once, hash-only at rest) |
+| 34s | Billing (EMULATED — no charges) |
+| 35s | OpenToolsHub.io — fully wired: real account, real workspace, real keys |
+
+## OpenStateHub.io — private bench (local self-use): fully wired (real account · workspace · keys)
+
+`artifacts/e2e/videos/site-openstatehub.mp4` · 35s · 10 chapters
+
+| t | chapter |
+|---|---|
+| 4s | OpenStateHub.io — private bench (local self-use realm; stays private until flipped live) |
+| 10s | Browse the registry |
+| 11s | An entry — provenance, signing, install command |
+| 15s | A REAL account on this site’s own identity realm (no SSO) |
+| 18s | Real register → session |
+| 25s | Installed — the REAL workspace row from the registry service |
+| 27s | API keys |
+| 28s | Minting a REAL key (shown once, hash-only at rest) |
+| 35s | Billing (EMULATED — no charges) |
+| 35s | OpenStateHub.io — fully wired: real account, real workspace, real keys |
+
+## OpenTemplatesHub.io — private bench (local self-use): fully wired (real account · workspace · keys)
+
+`artifacts/e2e/videos/site-opentemplateshub.mp4` · 37s · 10 chapters
+
+| t | chapter |
+|---|---|
+| 4s | OpenTemplatesHub.io — private bench (local self-use realm; stays private until flipped live) |
+| 10s | Browse the registry |
+| 11s | An entry — provenance, signing, install command |
+| 15s | A REAL account on this site’s own identity realm (no SSO) |
+| 19s | Real register → session |
+| 27s | Installed — the REAL workspace row from the registry service |
+| 29s | API keys |
+| 30s | Minting a REAL key (shown once, hash-only at rest) |
+| 36s | Billing (EMULATED — no charges) |
+| 37s | OpenTemplatesHub.io — fully wired: real account, real workspace, real keys |
+
+## OpenSkillsHub.io — live open registry: fully wired (real account · workspace · keys)
+
+`artifacts/e2e/videos/site-opentoolshub.mp4` · 37s · 10 chapters
+
+| t | chapter |
+|---|---|
+| 5s | OpenSkillsHub.io — open registry (live) |
+| 11s | Browse the registry |
+| 11s | An entry — provenance, signing, install command |
+| 16s | A REAL account on this site’s own identity realm (no SSO) |
+| 20s | Real register → session |
+| 27s | Installed — the REAL workspace row from the registry service |
+| 29s | API keys |
+| 30s | Minting a REAL key (shown once, hash-only at rest) |
+| 37s | Billing (EMULATED — no charges) |
+| 37s | OpenSkillsHub.io — fully wired: real account, real workspace, real keys |
+
+## OpenVerificationHub.io — private bench (local self-use): fully wired (real account · workspace · keys)
+
+`artifacts/e2e/videos/site-openverificationhub.mp4` · 37s · 10 chapters
+
+| t | chapter |
+|---|---|
+| 4s | OpenVerificationHub.io — private bench (local self-use realm; stays private until flipped live) |
+| 10s | Browse the registry |
+| 11s | An entry — provenance, signing, install command |
+| 15s | A REAL account on this site’s own identity realm (no SSO) |
+| 19s | Real register → session |
+| 27s | Installed — the REAL workspace row from the registry service |
+| 29s | API keys |
+| 30s | Minting a REAL key (shown once, hash-only at rest) |
+| 36s | Billing (EMULATED — no charges) |
+| 37s | OpenVerificationHub.io — fully wired: real account, real workspace, real keys |
+
+## Shared Inference Gateway — the internal routing plane
+
+`artifacts/e2e/videos/site-inference-gateway.mp4` · 11s · 2 chapters
+
+| t | chapter |
+|---|---|
+| 4s | Shared Inference Gateway — portable preferences, receipts, routing |
+| 11s | Shared Inference Gateway — an internal shared plane of the portfolio |
+
+## Shared Template Registry — the internal template plane
+
+`artifacts/e2e/videos/site-template-registry.mp4` · 11s · 2 chapters
+
+| t | chapter |
+|---|---|
+| 4s | Shared Template Registry — the 14-section shell + mixins |
+| 11s | Shared Template Registry — an internal shared plane of the portfolio |
 

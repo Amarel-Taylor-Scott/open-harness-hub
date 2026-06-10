@@ -1999,3 +1999,19 @@ convert + orh + REAL install frame-verified), journey-6 private bench (13 banner
 scorecard; manifest regenerated (6 videos / 134 chapters). Docs: teleon-demo + parity report
 updated. Remaining designed-by-design: OHH run console + billing/checkout emulation + Teleon
 evidence/library copy pages — captioned on camera, recorded in the parity report.
+
+## 2026-06-11 (cont.) — Every website fully wired + 29 per-website videos
+
+**Warrant: direct user intent** ("only 6 videos? we have many more websites; ALL should be fully
+wired and available — we will sign up ourselves"). (1) 13 private-bench identity realms added
+(25 total) — realm-registry LAW updated citing the owner direction (local self-use realms; bench
+stays status:'private' in products.js; bench realms never on public tunnels until flipped live);
+identity service restarted, runtime check PASS (live-realm drift gate is layer-scoped, both
+directions hold). Registry catalogs confirmed seeded for all hubs (bench serves real entries).
+(2) family_surfaces_gate v2: ALL 21 hubs now gate on render + browse + REAL per-realm signup +
+REAL key mint + REAL install→workspace — 6/6 PASS. (3) Recorder v3: 29 videos, one per WEBSITE
+(4 product journeys incl. OHH+Teleon via public tunnels, parent+tower+scorecard, 2 family tours,
+21 per-hub fully-wired cuts, 2 internal planes) — 0 frictions, 0 console errors across the whole
+batch; manifest regenerated (29 videos / 342 chapters). Frame-verified: OpenRoutingHub (PRIVATE
+PREVIEW banner visible) minting a real shown-once ak_openroutinghub_… key. Public regression
+after service restarts: OHH gate 10/10, Teleon gate 18/18 (both via tunnels).
