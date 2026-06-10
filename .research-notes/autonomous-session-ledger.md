@@ -2027,3 +2027,20 @@ no dangerous untracked names (only secret-hygiene CHECK scripts); dist/ sensitiv
 (tokens, identity stores) already ignored. Remaining dirty lines = _reference/ submodule
 content pointers only (their commits live inside the submodules). Resolves the 2026-06-09
 codebase review's biggest risk (everything-uncommitted).
+
+## 2026-06-11 (model plane) — Hash/deterministic fallbacks OFF; real embeddings + LLM ON
+
+**Warrant: direct user intent** ("are things actually running... backend should be using LLMs,
+embeddings, RAG"). Honest finding: services were REAL but model-dependent paths ran in their
+designed fallbacks (hash-bow embeddings promotable:false; llm_used:false deterministic
+selection). Local Ollama was already installed with batiai/gemma4-e2b:q4; pulled
+nomic-embed-text (274MB). Wrote .env (gitignored) per .env.example: OH_LLM_* → local Ollama
+OpenAI-compat; OH_EMBED_BACKEND=http-openai → nomic-embed-text 768-dim (promotable:true; a prior
+session's 2,523-row nomic vector store was already on disk — servers had simply never been
+started with the env). All four app servers restarted on the real plane. PROOF: /api/health
+{embedding: nomic-768 promotable true, llm_reachable true}; fresh build → llm_used TRUE,
+selection_by_model TRUE, real gemma narrative. Honest cost: cold build 2m22s on CPU (selection +
+narrative) — demo task pre-warmed; ohh_public_gate polling 45→150s. Gates re-green ×2 (OHH
+10/10, Teleon 18/18 via tunnels; first re-run had transient cold-latency failures, clean on
+verify). Cloud upgrade = .env edit only (OpenRouter/Ollama-cloud: OH_LLM_BASE_URL + OH_LLM_API_KEY
++ OH_LLM_MODEL; same for OH_EMBED_*) — key requested from owner.

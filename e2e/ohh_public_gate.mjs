@@ -42,7 +42,7 @@ check('display font is Hanken Grotesk', /Hanken Grotesk/i.test(await page.evalua
 await page.locator('textarea').first().fill('screen supplier disclosures for forced labor and cite the exact regulations');
 await page.locator('.pt-hero button.oh-btn--primary, button:has-text("Build")').first().click();
 let live = false;
-for (let i = 0; i < 45; i += 1) {
+for (let i = 0; i < 150; i += 1) {  // cold LLM-selection builds on local CPU need headroom
   await page.waitForTimeout(1000);
   const s = await page.evaluate(() => ({
     done: /Your governed flow is ready/.test(document.body.innerText),
