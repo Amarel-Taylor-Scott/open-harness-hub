@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor — Consumption</title>
+<link rel="stylesheet" href="./stage-detail.css?v=consumption-dom-1" />
+<style>
+  body.focused-stage .page { width: min(100%, 1180px); display: grid; grid-template-rows: auto auto auto auto; gap: 16px; align-content: center; }
+  .focused-canvas { height: auto; min-height: 500px; }
+  .stage-diagram { --flow-gap: clamp(10px, 1.4vw, 18px); min-height: 500px; padding: 22px clamp(18px,3vw,34px) 28px; display: grid; grid-template-rows: auto 1fr; gap: 28px; }
+  .diagram-labels { display: grid; grid-template-columns: minmax(235px,.9fr) minmax(260px,1fr) minmax(260px,1fr); gap: clamp(18px,3vw,44px); text-align: center; }
+  .diagram-labels b { display:block; color:#64748b; font-size:11px; text-transform:uppercase; letter-spacing:.12em; }
+  .diagram-labels span { display:block; margin-top:4px; color:#7f8794; font-size:12px; font-weight:650; }
+  .diagram-body { display:grid; grid-template-columns:minmax(235px,.9fr) minmax(44px,.12fr) minmax(260px,1fr) minmax(44px,.12fr) minmax(260px,1fr); column-gap:var(--flow-gap); align-items:center; }
+  .pack-card,.gateway-card,.consumer-card { border:1px solid #3a4454; border-radius:14px; background:rgba(12,16,22,.9); box-shadow:0 20px 40px rgba(0,0,0,.22); width:100%; min-height:336px; padding:22px; position:relative; z-index:2; }
+  .pack-card h2,.gateway-card h2,.consumer-card h2 { margin:0 0 18px; font-size:17px; line-height:1.1; }
+  .pack-stack,.rows { display:grid; gap:13px; }
+  .pack-row,.row { min-height:54px; border-radius:8px; background:rgba(255,255,255,.035); display:grid; grid-template-columns:42px 1fr; align-items:center; gap:12px; padding:9px 11px; }
+  .pack-row { grid-template-columns:1fr; border-left:3px solid var(--accent,#64748b); }
+  .pack-row b { display:block; color:#e7ebf0; font-size:13px; }
+  .pack-row span,.row span { color:#b7c0cc; font-size:12.5px; line-height:1.3; }
+  .badge { width:30px; height:30px; border-radius:9px; display:inline-flex; align-items:center; justify-content:center; background:var(--accent,#64748b); color:#071017; font-weight:900; }
+  .line-stack { display:grid; grid-template-rows:repeat(4,54px); gap:13px; align-items:center; min-width:44px; margin-inline:calc(var(--flow-gap)*-1); padding-inline:var(--flow-gap); z-index:1; }
+  .line-stack.in { grid-template-rows:repeat(3,54px); padding-top:31px; padding-bottom:31px; }
+  .flow-line { --accent:#64748b; display:block; position:relative; width:calc(100% + (var(--flow-gap)*2)); height:1px; margin-inline:calc(var(--flow-gap)*-1); background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 58%,transparent),color-mix(in srgb,var(--accent) 18%,transparent)); }
+  .flow-line::after,.flow-line .packet { content:""; position:absolute; top:50%; width:8px; height:8px; border-radius:999px; background:var(--accent); transform:translateY(-50%); box-shadow:0 0 14px color-mix(in srgb,var(--accent) 56%,transparent); }
+  .flow-line::after { right:0; }
+  .flow-line .packet { left:14%; width:7px; height:7px; opacity:0; animation:packet 3.8s linear infinite; animation-delay:var(--delay,0s); }
+  .receipt { margin-top:15px; border:1px solid rgba(100,116,139,.34); border-radius:10px; background:rgba(100,116,139,.055); padding:12px; color:#cbd3df; font-size:12.5px; line-height:1.35; }
+  .consumer-row { grid-template-columns:46px 1fr; }
+  .consumer-icon { width:34px; height:34px; border-radius:10px; border:1px solid color-mix(in srgb,var(--accent,#64748b) 56%,#262d38); background:color-mix(in srgb,var(--accent,#64748b) 20%,#10151d); color:color-mix(in srgb,var(--accent,#64748b) 82%,#fff); display:inline-flex; align-items:center; justify-content:center; font-weight:900; font-size:11px; }
+  @keyframes packet { 0%{left:14%;opacity:0} 18%{opacity:.88} 84%{opacity:.88} 100%{left:100%;opacity:0} }
+  @media (prefers-reduced-motion: reduce) { .flow-line .packet{animation:none;left:72%;opacity:.55} }
+  @media (max-width:900px) { .stage-diagram{min-height:0}.diagram-labels{display:none}.diagram-body{grid-template-columns:1fr;gap:16px}.line-stack{display:none} }
+</style>
+</head>
+<body class="focused-stage">
+<main class="page">
+  <nav class="nav"><a href="../context-stages.html">All stages</a><a href="../context-engine-hero.html">Main flow</a></nav>
+  <section class="focused-shell" style="--stage:var(--source)">
+    <header class="focused-head">
+      <div class="focused-title"><div class="eyebrow">05 · Delivery</div><h1>Consumption</h1><p>Claude, Cursor, context layers, internal workflows, and dashboards receive the same governed context pack with policy decisions, receipts, and controlled expansion.</p></div>
+      <div class="focused-metrics"><div><span>Packs served</span><b>248</b></div><div><span>Expansions</span><b>31</b></div><div><span>Denied</span><b>4</b></div><div><span>Audit</span><b>On</b></div></div>
+    </header>
+    <div class="focused-canvas"><div class="stage-diagram">
+      <div class="diagram-labels"><div><b>Governed pack</b><span>task-ready context with handles</span></div><div><b>Delivery controls</b><span>policy / expansion / receipt</span></div><div><b>Consumers</b><span>tools, people, workflows, context layers</span></div></div>
+      <div class="diagram-body">
+        <section class="pack-card"><h2>Governed context pack</h2><div class="pack-stack">
+          <div class="pack-row" style="--accent:#64748b"><b>implementation_pack</b><span>requirements, decisions, code pointers, risks, tests</span></div>
+          <div class="pack-row" style="--accent:#a47ef7"><b>source handles</b><span>expandable only when policy allows</span></div>
+          <div class="pack-row" style="--accent:#d9ae61"><b>context receipt</b><span>freshness, lineage, TTL, conflicts, user, purpose</span></div>
+        </div></section>
+        <div class="line-stack in"><span class="flow-line" style="--accent:#64748b;--delay:-.2s"><i class="packet"></i></span><span class="flow-line" style="--accent:#a47ef7;--delay:-1.2s"><i class="packet"></i></span><span class="flow-line" style="--accent:#d9ae61;--delay:-2.1s"><i class="packet"></i></span></div>
+        <section class="gateway-card"><h2>Delivery controls</h2><div class="rows">
+          <div class="row" style="--accent:#32c786"><i class="badge">A</i><span>Check identity, purpose, source ACL, and expansion rights before serving.</span></div>
+          <div class="row" style="--accent:#4c8df6"><i class="badge">M</i><span>Expose through MCP/API without handing consumers raw source dumps by default.</span></div>
+          <div class="row" style="--accent:#d9ae61"><i class="badge">R</i><span>Record what was served, what was expanded, and which policy decision applied.</span></div>
+        </div><div class="receipt">Consumption is not just delivery. It is governed delivery with traceability.</div></section>
+        <div class="line-stack"><span class="flow-line" style="--accent:#64748b;--delay:-.4s"><i class="packet"></i></span><span class="flow-line" style="--accent:#4c8df6;--delay:-1.1s"><i class="packet"></i></span><span class="flow-line" style="--accent:#a47ef7;--delay:-1.9s"><i class="packet"></i></span><span class="flow-line" style="--accent:#32c786;--delay:-2.6s"><i class="packet"></i></span></div>
+        <section class="consumer-card"><h2>Consumers</h2><div class="rows">
+          <div class="row consumer-row" style="--accent:#64748b"><i class="consumer-icon">CL</i><span>Claude Code or coding assistants receive implementation/review packs.</span></div>
+          <div class="row consumer-row" style="--accent:#4c8df6"><i class="consumer-icon">CU</i><span>Cursor, CI, or internal tools consume the same pack contract.</span></div>
+          <div class="row consumer-row" style="--accent:#a47ef7"><i class="consumer-icon">DX</i><span>Dashboards expose receipts, traces, and context quality to humans.</span></div>
+          <div class="row consumer-row" style="--accent:#32c786"><i class="consumer-icon">API</i><span>Other context layers can request compact packs or expand approved handles.</span></div>
+        </div></section>
+      </div>
+    </div></div>
+    <div class="stage-assurance-card"><div class="assurance-title"><b>Continuous Verification + Adversarial Validation</b><span>Universal assurance layer</span></div><p>During consumption, Baltor verifies that the user and consumer may receive the pack, that freshness is acceptable, and that every expansion is audited.</p><div class="assurance-tags"><span>ACL before model</span><span>MCP/API</span><span>receipts</span><span>audit trail</span></div></div>
+  </section>
+  <section class="focused-explainer"><article><b>What this stage does</b><p>It serves context packs to tools and people through policy-aware interfaces, not raw uncontrolled source dumps.</p></article><article><b>Concrete example</b><p>Claude Code receives a review pack, expands an approved GitLab source handle, and Baltor records the policy decision and receipt.</p></article><article><b>Why it matters</b><p>The same verified pack can support coding tools, dashboards, workflows, and context layers while keeping lineage and access controls intact.</p></article></section>
+  <div class="stage-links"><a href="./source.html">Source</a><a href="./reconciliation.html">Reconciliation</a><a href="./anti-fragility.html">Anti-Fragility</a><a href="./enhancement.html">Enhancement</a><a href="./optimization.html">Optimization</a><a class="is-current" href="./consumption.html">Consumption</a></div>
+</main>
+</body>
+</html>

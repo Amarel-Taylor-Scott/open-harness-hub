@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor · Upload &amp; Ingestion (projection-only)</title>
+<meta name="description" content="Stage 1 of one Baltor pipeline run: raw sources become normalized SourceArtifacts — losslessly, with every raw_ref preserved and a source handle on each." />
+<style>
+  :root {
+    --bg:#07090c; --panel:#10151d; --panel2:#0c1118; --line:#262d38; --ink:#f5f7fa;
+    --muted:#a0a9b8; --source:#64748b; --green:#32c786; --blue:#4c8df6; --amber:#d9ae61;
+    --violet:#a47ef7; --bad:#f0616d; --stage:var(--source);
+  }
+  * { box-sizing:border-box; }
+  html,body { margin:0; min-height:100%; background:var(--bg); color:var(--ink);
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased; }
+  body { padding:22px;
+    background:
+      radial-gradient(circle at 10% -4%, color-mix(in srgb, var(--stage) 9%, transparent), transparent 36%),
+      radial-gradient(circle at 92% 108%, rgba(164,126,247,.06), transparent 40%), var(--bg); }
+  a { color:inherit; text-decoration:none; }
+  .page { width:min(100%, 1180px); margin:0 auto; display:grid; gap:16px; }
+
+  /* stepper */
+  .stepper { display:flex; flex-wrap:wrap; gap:6px; border:1px solid var(--line);
+    background:rgba(16,21,29,.7); border-radius:14px; padding:10px; align-items:center; }
+  .step { display:flex; align-items:center; gap:8px; padding:7px 11px; border-radius:10px;
+    border:1px solid transparent; color:var(--muted); font-size:12px; font-weight:700; white-space:nowrap; }
+  .step .n { font-size:10px; opacity:.7; }
+  .step:hover { border-color:var(--line); color:var(--ink); }
+  .step.current { color:var(--ink); border-color:color-mix(in srgb, var(--stage) 60%, var(--line));
+    background:linear-gradient(140deg, color-mix(in srgb, var(--stage) 16%, transparent), transparent 70%); }
+  .step.sep { color:var(--source); opacity:.4; padding:0 1px; }
+  .prevnext { display:flex; gap:8px; margin-left:auto; }
+  .pn { border:1px solid var(--line); border-radius:999px; padding:6px 12px; font-size:12px; font-weight:800;
+    color:var(--muted); }
+  .pn:hover { color:var(--ink); border-color:var(--stage); }
+  .pn[aria-disabled="true"] { opacity:.3; pointer-events:none; }
+
+  /* header */
+  .head { border:1px solid var(--line); background:rgba(16,21,29,.88); border-radius:16px; padding:20px 22px;
+    display:grid; grid-template-columns:minmax(0,1fr) auto; gap:16px; align-items:end;
+    box-shadow:0 22px 44px rgba(0,0,0,.4); }
+  .eyebrow { color:var(--stage); font-size:11px; font-weight:850; text-transform:uppercase; letter-spacing:.11em; }
+  h1 { margin:6px 0 0; font-size:clamp(26px,3.4vw,40px); line-height:1; }
+  .head p { margin:10px 0 0; max-width:760px; color:var(--muted); font-size:14px; line-height:1.5; }
+  .controls { display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
+  button { background:var(--stage); color:#06090d; border:0; border-radius:10px; padding:10px 16px;
+    font-weight:800; cursor:pointer; font-size:13px; font-family:inherit; }
+  button:disabled { opacity:.5; cursor:wait; }
+  .status { font-size:12px; color:var(--muted); }
+  .runid { font-size:11px; color:var(--source); }
+
+  .law { border:1px solid color-mix(in srgb, var(--amber) 26%, var(--line));
+    background:linear-gradient(140deg, color-mix(in srgb, var(--amber) 7%, transparent), transparent 60%);
+    border-radius:12px; padding:12px 16px; color:var(--muted); font-size:12.5px; line-height:1.5; }
+  .law b { color:var(--amber); }
+
+  main { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:14px; }
+  .panel { border:1px solid var(--line); background:rgba(16,21,29,.86); border-radius:14px; padding:16px;
+    box-shadow:0 16px 34px rgba(0,0,0,.3); }
+  .panel.wide { grid-column:1/-1; }
+  .panel.lossless { border-color:color-mix(in srgb, var(--bad) 30%, var(--line));
+    background:linear-gradient(150deg, color-mix(in srgb, var(--bad) 7%, transparent), transparent 55%), rgba(16,21,29,.86); }
+  .panel h2 { margin:0 0 4px; font-size:13px; color:var(--ink); letter-spacing:.02em; }
+  .panel .cap { margin:0 0 12px; font-size:11.5px; color:var(--muted); }
+  .panel.lossless h2 { color:var(--bad); }
+
+  .row { display:flex; justify-content:space-between; gap:10px; padding:6px 0; border-bottom:1px dashed var(--line); }
+  .row:last-child { border-bottom:0; }
+  .k { color:var(--muted); }
+  .mut { color:var(--muted); }
+  .src { color:var(--source); }
+  code { color:var(--blue); word-break:break-all; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12px; }
+  .pill { display:inline-block; padding:1px 8px; border-radius:999px; font-size:11px; font-weight:700; }
+  .pill.ok { background:color-mix(in srgb, var(--green) 16%, transparent); color:var(--green); }
+  .pill.held { background:color-mix(in srgb, var(--bad) 16%, transparent); color:var(--bad); }
+  .pill.warn { background:color-mix(in srgb, var(--amber) 16%, transparent); color:var(--amber); }
+  .item { padding:8px 10px; border:1px solid var(--line); border-radius:10px; margin-bottom:8px; background:rgba(12,17,24,.7); }
+  .item:last-child { margin-bottom:0; }
+  .item .t { font-size:13px; }
+  .item .m { font-size:11.5px; color:var(--muted); margin-top:3px; }
+  pre { white-space:pre-wrap; word-break:break-word; max-height:240px; overflow:auto; margin:6px 0 0;
+    color:var(--muted); background:var(--panel2); border:1px solid var(--line); border-radius:8px; padding:10px; font-size:12px; }
+  .state { color:var(--muted); font-style:italic; font-size:12.5px; padding:6px 0; }
+  .state.error { color:var(--bad); font-style:normal; }
+  .state.degraded { color:var(--amber); font-style:normal; }
+  .legend { font-size:11px; color:var(--source); margin-top:2px; }
+  @media (max-width:900px){ main{grid-template-columns:1fr;} .head{grid-template-columns:1fr;} .controls{align-items:flex-start;} }
+</style>
+</head>
+<body>
+<main class="page">
+
+  <!-- 7-stage pipeline stepper (current = upload) -->
+  <nav class="stepper" aria-label="Pipeline stages">
+    <a class="step current" href="./upload.html" aria-current="step"><span class="n">1</span> Upload</a>
+    <span class="step sep">→</span>
+    <a class="step" href="./decomposition.html"><span class="n">2</span> Decomposition</a>
+    <span class="step sep">→</span>
+    <a class="step" href="./reconciliation.html"><span class="n">3</span> Reconciliation</a>
+    <span class="step sep">→</span>
+    <a class="step" href="./enhancement.html"><span class="n">4</span> Enhancement</a>
+    <span class="step sep">→</span>
+    <a class="step" href="./optimization.html"><span class="n">5</span> Optimization</a>
+    <span class="step sep">→</span>
+    <a class="step" href="./verification.html"><span class="n">6</span> Verification</a>
+    <span class="step sep">→</span>
+    <a class="step" href="./consumption.html"><span class="n">7</span> Consumption</a>
+    <span class="prevnext">
+      <a class="pn" id="prev" aria-disabled="true">‹ Prev</a>
+      <a class="pn" id="next" href="./decomposition.html">Next ›</a>
+    </span>
+  </nav>
+
+  <header class="head">
+    <div>
+      <div class="eyebrow">Stage 1 · Raw ingress</div>
+      <h1>Upload &amp; Ingestion</h1>
+      <p>Raw sources (CFPB regulation text, FAQ, complaint narratives) become normalized
+         <code>SourceArtifact</code>s. Each one carries a stable <b>source handle</b> and keeps its
+         <b>raw_ref</b> untouched. This page is a projection over one real pipeline run — it computes no truth,
+         it reads <code>/api/pipeline/upload</code>.</p>
+    </div>
+    <div class="controls">
+      <button id="run">Run / Refresh</button>
+      <span class="status" id="status">idle</span>
+      <span class="runid" id="runid"></span>
+    </div>
+  </header>
+
+  <div class="law">
+    <b>Lossless law:</b> ingestion normalizes but never replaces. The raw bytes/reference
+    (<code>raw_ref</code>) and the source handle survive every later stage — nothing answer-bearing is
+    dropped on the way in. "Cleaned up" means a new derived layer beside the original, never an overwrite.
+  </div>
+
+  <main id="panels">
+    <div class="panel wide"><div class="state" id="boot">— click Run / Refresh —</div></div>
+  </main>
+</main>
+
+<script>
+/* PROJECTION ONLY — this page fetches the read-only API and RENDERS. It computes, stores, and
+   mutates NO truth. It fetches ONLY /api/pipeline/* . No client-side persistence of truth, no secrets. */
+const TENANT = "demo", CORPUS = "cfpb";
+const QS = "?tenant=" + encodeURIComponent(TENANT) + "&corpus=" + encodeURIComponent(CORPUS);
+const EP = {
+  overview: "/api/pipeline/overview" + QS,
+  upload:   "/api/pipeline/upload" + QS,
+};
+const panels = document.getElementById("panels");
+const statusEl = document.getElementById("status");
+const runidEl = document.getElementById("runid");
+
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function panel(title, cap, cls){ const d=document.createElement("div"); d.className="panel"+(cls?(" "+cls):"");
+  const h=document.createElement("h2"); h.textContent=title; d.appendChild(h);
+  if(cap){ const c=document.createElement("p"); c.className="cap"; c.textContent=cap; d.appendChild(c); }
+  panels.appendChild(d); return d; }
+function wide(t,c,cls){ const d=panel(t,c,(cls?cls+" ":"")+"wide"); return d; }
+function row(p,k,v){ const r=document.createElement("div"); r.className="row";
+  r.innerHTML=`<span class="k">${esc(k)}</span><span>${v}</span>`; p.appendChild(r); }
+function state(p,msg,kind){ const e=document.createElement("div"); e.className="state"+(kind?(" "+kind):"");
+  e.textContent=msg; p.appendChild(e); return e; }
+function item(p, html){ const d=document.createElement("div"); d.className="item"; d.innerHTML=html; p.appendChild(d); }
+
+async function getJSON(url){ const r=await fetch(url); if(!r.ok && r.status>=500) throw new Error("HTTP "+r.status); return r.json(); }
+
+async function run(){
+  const btn=document.getElementById("run"); btn.disabled=true; statusEl.textContent="loading…";
+  [...panels.querySelectorAll(".panel")].forEach(e=>e.remove());
+  const loadingPanel = wide("Loading", null); state(loadingPanel, "fetching projection from /api/pipeline/upload …", "loading");
+  let ov=null, up=null, degraded=false;
+  try {
+    [ov, up] = await Promise.all([
+      getJSON(EP.overview).catch(()=>{ degraded=true; return null; }),
+      getJSON(EP.upload),
+    ]);
+  } catch(e){
+    [...panels.querySelectorAll(".panel")].forEach(x=>x.remove());
+    const p=wide("Error", "the projection API did not answer"); state(p, "error loading /api/pipeline/upload: "+e, "error");
+    statusEl.textContent="error"; btn.disabled=false; return;
+  }
+  [...panels.querySelectorAll(".panel")].forEach(e=>e.remove());
+  render(ov, up, degraded);
+  statusEl.textContent = degraded ? "projected · overview degraded" : "projected · read-only";
+  btn.disabled=false;
+}
+
+function render(ov, up, degraded){
+  up = up || {};
+  const sources = up.sources || [];
+  const lineage = up.lineage || [];
+  runidEl.textContent = ov && ov.run_id ? ("run " + ov.run_id) : "";
+
+  // Overview strip (degrades gracefully)
+  let p = wide("Run overview", "the 7 stages of this run, with lossless counters");
+  if (degraded || !ov) { state(p, "overview projection unavailable — stage data below still rendered (degraded)", "degraded"); }
+  else {
+    row(p, "run_id", `<code>${esc(ov.run_id||"-")}</code>`);
+    (ov.stages||[]).forEach(s=>{
+      row(p, esc(s.name||s.id),
+        `<span class="mut">in ${s.in_count??"–"} · out ${s.out_count??"–"} · `
+        + `<span class="src">held ${s.held_out_count??0}</span> · <span class="src">rej ${s.rejected_count??0}</span></span> `
+        + `<span class="pill ${s.status==="ok"||s.status==="done"?"ok":"warn"}">${esc(s.status||"?")}</span>`);
+    });
+  }
+
+  // INPUT panel — raw sources as received
+  p = panel("INPUT · raw sources", "what the run received, before normalization");
+  if (!sources.length) { state(p, "no sources in this run (empty)", "empty"); }
+  sources.forEach(s=>{
+    item(p, `<div class="t"><code>${esc(s.source_id||"")}</code> <span class="pill warn">${esc(s.source_type||"source")}</span></div>`
+      + `<div class="m">raw_ref: <code>${esc(s.raw_ref||"(none)")}</code></div>`);
+  });
+
+  // OUTPUT panel — normalized SourceArtifacts (derived) + their source handles
+  p = panel("OUTPUT · normalized SourceArtifacts", "the derived layer — a new artifact, not an overwrite");
+  if (!sources.length) { state(p, "nothing normalized yet (empty)", "empty"); }
+  sources.forEach(s=>{
+    const n = s.normalized || {};
+    const handles = s.source_handles || [];
+    item(p, `<div class="t"><code>${esc(s.source_id||"")}</code> → <span class="pill ok">normalized</span></div>`
+      + `<div class="m">${esc(n.title || n.summary || n.kind || "normalized SourceArtifact")}</div>`
+      + `<div class="m">source handles: ${handles.length ? handles.map(h=>`<code>${esc(h)}</code>`).join(" ") : "<span class='src'>(none)</span>"}</div>`);
+  });
+
+  // LOSSLESS panel — raw_ref preserved, nothing dropped
+  p = panel("LOSSLESS · preserved originals", "every raw_ref is retained beside its derived artifact", "lossless");
+  const preserved = sources.filter(s=>s.raw_ref);
+  row(p, "raw_refs preserved", `${preserved.length} / ${sources.length}`);
+  row(p, "dropped on ingest", `<span class="pill ok">0 — none</span>`);
+  if (!preserved.length) state(p, "no raw_ref preserved in this run (empty)", "empty");
+  preserved.forEach(s=>{
+    item(p, `<div class="t"><span class="pill ok">preserved</span> <code>${esc(s.source_id||"")}</code></div>`
+      + `<div class="m">raw_ref kept: <code>${esc(s.raw_ref)}</code></div>`);
+  });
+  p.appendChild(Object.assign(document.createElement("div"), {className:"legend",
+    textContent:"Held out / omitted later ≠ deleted. The raw layer above is rehydratable at any stage."}));
+
+  // Source-handle + lineage panel
+  p = wide("Source handles · lineage", "the ctx:// handles and the receipt/lineage trail for this stage");
+  const allHandles = sources.flatMap(s=>s.source_handles||[]);
+  row(p, "source handles", allHandles.length);
+  if (allHandles.length) allHandles.forEach(h=>row(p, "", `<code>${esc(h)}</code>`));
+  row(p, "lineage entries", lineage.length);
+  if (!lineage.length) state(p, "no lineage projected (empty)", "empty");
+  lineage.forEach(l=>{
+    if (typeof l === "string") row(p, "", `<code>${esc(l)}</code>`);
+    else row(p, esc(l.step||l.rel||"step"), `<code>${esc(l.id||l.ref||l.receipt_id||"-")}</code> <span class="mut">${esc(l.note||"")}</span>`);
+  });
+
+  // Raw projection (audit)
+  p = wide("Raw projection (audit)", "exactly what /api/pipeline/upload returned");
+  const pre=document.createElement("pre"); pre.textContent=JSON.stringify(up,null,2); p.appendChild(pre);
+}
+
+document.getElementById("run").addEventListener("click", run);
+run();
+</script>
+</body>
+</html>

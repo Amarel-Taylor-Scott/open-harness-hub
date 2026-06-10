@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor — Source Systems</title>
+<link rel="stylesheet" href="./stage-detail.css?v=source-dom-2" />
+<style>
+  body.focused-stage .page {
+    width: min(100%, 1180px);
+    display: grid;
+    grid-template-rows: auto auto auto auto;
+    gap: 16px;
+    align-content: center;
+  }
+
+  .focused-shell {
+    border: 1px solid #262d38;
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(16,21,29,.92);
+    box-shadow: 0 24px 48px rgba(0,0,0,.58);
+  }
+
+  .focused-head {
+    min-height: 108px;
+    padding: 24px 28px 22px;
+    border-bottom: 1px solid #262d38;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .focused-title {
+    max-width: 640px;
+    min-width: 0;
+  }
+
+  .focused-title h1 {
+    margin: 8px 0 0;
+    font-size: 28px;
+    line-height: 1.05;
+  }
+
+  .focused-title p {
+    margin: 8px 0 0;
+    color: #a0a9b8;
+    font-size: 15px;
+    line-height: 1.38;
+  }
+
+  .focused-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(86px, max-content));
+    border: 1px solid #262d38;
+    border-radius: 8px;
+    background: rgba(255,255,255,.02);
+    padding: 10px 14px;
+    min-width: 520px;
+    justify-content: space-between;
+  }
+
+  .focused-metrics div { padding: 0 10px; }
+  .focused-metrics span {
+    display: block;
+    color: #687386;
+    font-size: 10px;
+    font-weight: 850;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+  }
+  .focused-metrics b {
+    display: block;
+    margin-top: 2px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 16px;
+  }
+
+  .focused-canvas {
+    position: relative;
+    min-height: 500px;
+    height: auto;
+    margin: 0 16px 16px;
+    border: 1px solid #262d38;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #040609;
+    box-shadow: inset 0 0 24px rgba(0,0,0,.55);
+  }
+
+  .focused-canvas canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .source-diagram {
+    --flow-gap: clamp(12px, 1.8vw, 26px);
+    min-height: 500px;
+    padding: 22px clamp(18px, 3vw, 34px) 28px;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 28px;
+  }
+
+  .diagram-labels {
+    display: grid;
+    grid-template-columns: minmax(190px, .78fr) minmax(260px, 1fr) minmax(270px, .95fr);
+    gap: clamp(28px, 5vw, 74px);
+    text-align: center;
+  }
+
+  .diagram-labels b {
+    display: block;
+    color: #687386;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+  }
+
+  .diagram-labels span {
+    display: block;
+    margin-top: 4px;
+    color: #7f8794;
+    font-size: 12px;
+    font-weight: 650;
+  }
+
+  .diagram-body {
+    position: relative;
+    display: grid;
+    grid-template-columns:
+      minmax(190px, .78fr)
+      minmax(54px, .16fr)
+      minmax(300px, 1fr)
+      minmax(54px, .16fr)
+      minmax(300px, 1fr);
+    gap: 0;
+    column-gap: var(--flow-gap);
+    align-items: center;
+  }
+
+  .provider-stack,
+  .intake-card,
+  .registry-card {
+    position: relative;
+    z-index: 2;
+  }
+
+  .provider-stack {
+    display: grid;
+    grid-template-rows: repeat(4, 54px);
+    gap: 18px;
+    min-height: 388px;
+    align-content: center;
+  }
+
+  .line-stack {
+    display: grid;
+    align-items: center;
+    min-width: 54px;
+    margin-inline: calc(var(--flow-gap) * -1);
+    padding-inline: var(--flow-gap);
+    position: relative;
+    z-index: 1;
+  }
+
+  .line-stack.ingress {
+    align-self: stretch;
+    grid-template-rows: repeat(4, 54px);
+    gap: 18px;
+    padding-top: 59px;
+    padding-bottom: 59px;
+  }
+
+  .line-stack.egress {
+    align-self: stretch;
+    grid-template-rows: repeat(4, 54px);
+    gap: 18px;
+    padding-top: 59px;
+    padding-bottom: 59px;
+  }
+
+  .flow-line {
+    --accent: #64748b;
+    position: relative;
+    display: block;
+    height: 1px;
+    width: calc(100% + (var(--flow-gap) * 2));
+    margin-inline: calc(var(--flow-gap) * -1);
+    background: linear-gradient(90deg,
+      color-mix(in srgb, var(--accent) 62%, transparent),
+      color-mix(in srgb, var(--accent) 22%, transparent));
+    opacity: .78;
+  }
+
+  .flow-line::before,
+  .flow-line::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--accent);
+    transform: translateY(-50%);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+
+  .flow-line::before { left: 0; }
+  .flow-line::after { right: 0; }
+
+  .line-stack.ingress .flow-line::before {
+    display: none;
+  }
+
+  .flow-line .packet {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--accent);
+    transform: translateY(-50%);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 60%, transparent);
+    animation: sourcePacket 3.4s linear infinite;
+    animation-delay: var(--delay, 0s);
+  }
+
+  .line-stack.ingress .flow-line .packet {
+    animation-name: ingressPacket;
+  }
+
+  .provider-card {
+    --accent: #64748b;
+    height: 54px;
+    border: 1px solid color-mix(in srgb, var(--accent) 58%, #262d38);
+    border-radius: 10px;
+    background: rgba(12,16,22,.86);
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 10px 13px;
+    color: #e7ebf0;
+    font-weight: 800;
+    font-size: 14px;
+    position: relative;
+  }
+
+  .provider-icon,
+  .type-badge {
+    background: var(--accent);
+    color: #071017;
+    border-radius: 7px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    font-weight: 900;
+  }
+
+  .provider-icon {
+    width: 31px;
+    height: 31px;
+    font-size: 10px;
+  }
+
+  .intake-card,
+  .registry-card {
+    border: 1px solid #3a4454;
+    border-radius: 14px;
+    background: rgba(12,16,22,.88);
+    padding: 22px;
+    box-shadow: 0 20px 40px rgba(0,0,0,.22);
+    width: 100%;
+    min-height: 388px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .intake-card h2,
+  .registry-card h2 {
+    margin: 0 0 18px;
+    font-size: 17px;
+    line-height: 1.1;
+    letter-spacing: 0;
+  }
+
+  .intake-rows,
+  .registry-rows {
+    display: grid;
+    gap: 18px;
+    width: 100%;
+  }
+
+  .intake-row,
+  .registry-row {
+    min-height: 54px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.035);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px;
+    min-width: 0;
+  }
+
+  .intake-row span,
+  .registry-row span {
+    min-width: 0;
+    color: #b7c0cc;
+    font-size: clamp(11px, 1vw, 13px);
+    line-height: 1.25;
+    white-space: normal;
+  }
+
+  .type-badge {
+    min-width: 54px;
+    height: 24px;
+    padding: 0 8px;
+    font-size: 10px;
+  }
+
+  .intake-note,
+  .registry-note {
+    margin: 16px 0 0;
+    color: #a0a9b8;
+    font-size: 12px;
+    font-weight: 750;
+    line-height: 1.35;
+  }
+
+  .registry-note strong {
+    display: block;
+    color: #e7ebf0;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .connector {
+    --accent: #64748b;
+    --top: 50%;
+    position: absolute;
+    left: calc((100% - clamp(44px, 8vw, 108px)) * .16);
+    right: calc((100% - clamp(44px, 8vw, 108px)) * .50);
+    top: var(--top);
+    height: 1px;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 55%, transparent), color-mix(in srgb, var(--accent) 18%, transparent));
+    transform: translateY(-50%);
+    z-index: 1;
+    overflow: visible;
+  }
+
+  .connector::before,
+  .connector::after,
+  .connector .packet {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--accent);
+    transform: translateY(-50%);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 15%, transparent);
+  }
+
+  .connector::before { left: 0; }
+  .connector::after { right: 0; }
+
+  .connector .packet {
+    left: 0;
+    width: 7px;
+    height: 7px;
+    box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 60%, transparent);
+    animation: sourcePacket 3.2s linear infinite;
+    animation-delay: var(--delay, 0s);
+  }
+
+  .registry-connector {
+    position: absolute;
+    left: calc(66.66% - clamp(14px, 2vw, 28px));
+    right: calc(33.33% - clamp(14px, 2vw, 28px));
+    top: 50%;
+    height: 1px;
+    background: rgba(100,116,139,.22);
+    z-index: 1;
+  }
+
+  .connector,
+  .registry-connector {
+    display: none;
+  }
+
+  .registry-connector::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: #64748b;
+    transform: translateY(-50%);
+    box-shadow: 0 0 14px rgba(100,116,139,.6);
+    animation: registryPacket 3.6s linear infinite;
+  }
+
+  .provider-card::after {
+    content: "";
+    position: absolute;
+    right: -5px;
+    top: 50%;
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background: var(--accent);
+    transform: translateY(-50%);
+    opacity: .38;
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 28%, transparent);
+    animation: nodePulse 2.4s ease-in-out infinite;
+  }
+
+  .intake-row::after,
+  .registry-row::after {
+    content: "";
+    margin-left: auto;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--accent, #64748b) 72%, #ffffff);
+    opacity: .22;
+    animation: softBlink 2.8s ease-in-out infinite;
+  }
+
+  @keyframes sourcePacket {
+    0% { left: 0; opacity: 0; }
+    12% { opacity: .95; }
+    88% { opacity: .95; }
+    100% { left: 100%; opacity: 0; }
+  }
+
+  @keyframes ingressPacket {
+    0% { left: 16%; opacity: 0; }
+    12% { opacity: 0; }
+    24% { opacity: .88; }
+    88% { opacity: .88; }
+    100% { left: 100%; opacity: 0; }
+  }
+
+  @keyframes registryPacket {
+    0% { left: 0; opacity: 0; }
+    18% { opacity: .85; }
+    88% { opacity: .85; }
+    100% { left: 100%; opacity: 0; }
+  }
+
+  @keyframes nodePulse {
+    0%, 100% { opacity: .24; box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 12%, transparent); }
+    50% { opacity: .72; box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent) 8%, transparent); }
+  }
+
+  @keyframes softBlink {
+    0%, 100% { opacity: .16; }
+    50% { opacity: .52; }
+  }
+
+  @media (max-width: 900px) {
+    .source-diagram { min-height: 0; gap: 16px; }
+    .diagram-labels,
+    .diagram-body { grid-template-columns: 1fr; text-align: left; }
+    .diagram-labels { display: none; }
+    .provider-stack { min-height: 0; grid-template-rows: none; gap: 16px; }
+    .connector,
+    .registry-connector,
+    .line-stack { display: none; }
+    .provider-card::after { display: none; }
+  }
+
+  @media (max-width: 900px) {
+    .focused-head { display: grid; grid-template-columns: 1fr; }
+    .focused-metrics { min-width: 0; grid-template-columns: repeat(2, 1fr); }
+    .focused-canvas { min-height: 0; }
+  }
+</style>
+</head>
+<body class="focused-stage source-focus">
+<main class="page">
+  <nav class="nav">
+    <a href="../context-stages.html">All stages</a>
+    <a href="../context-engine-hero.html">Main flow</a>
+  </nav>
+
+  <section class="focused-shell" style="--stage:var(--source)">
+    <header class="focused-head">
+      <div class="focused-title">
+        <div class="eyebrow">00 · Raw ingress</div>
+        <h1>Source Systems</h1>
+        <p>Raw tools and already-contextualized graph providers enter Baltor together. Source systems can feed CodeGraph, DocGraph, and OrgGraph projections, while Baltor preserves every event with permissions, timestamps, hashes, and expandable source handles before any claim is trusted.</p>
+      </div>
+      <div class="focused-metrics" aria-label="Source systems metrics">
+        <div><span>Providers watched</span><b>4</b></div>
+        <div><span>Triggers active</span><b>Live</b></div>
+        <div><span>Handles captured</span><b>248</b></div>
+        <div><span>Trust state</span><b>Raw</b></div>
+      </div>
+    </header>
+
+    <div class="focused-canvas">
+      <div class="source-diagram">
+        <div class="diagram-labels" aria-hidden="true">
+          <div><b>Source systems</b><span>Confluence / Git platforms / Datadog / other</span></div>
+          <div><b>Source intake gateway</b><span>raw sources / graph sources / live triggers</span></div>
+          <div><b>Context source registry</b><span>CodeGraph / DocGraph / OrgGraph / raw handles</span></div>
+        </div>
+
+        <div class="diagram-body">
+          <div class="provider-stack" aria-label="Source providers">
+            <div class="provider-card" style="--accent:#38bdf8"><span class="provider-icon">CF</span><span>Confluence</span></div>
+            <div class="provider-card" style="--accent:#f59e0b"><span class="provider-icon">GT</span><span>Git Platforms</span></div>
+            <div class="provider-card" style="--accent:#a47ef7"><span class="provider-icon">DD</span><span>Datadog</span></div>
+            <div class="provider-card" style="--accent:#32c786"><span class="provider-icon">OT</span><span>Other</span></div>
+          </div>
+
+          <div class="line-stack ingress" aria-hidden="true">
+            <span class="flow-line" style="--accent:#38bdf8; --delay:-.1s"><i class="packet"></i></span>
+            <span class="flow-line" style="--accent:#f59e0b; --delay:-.9s"><i class="packet"></i></span>
+            <span class="flow-line" style="--accent:#a47ef7; --delay:-1.8s"><i class="packet"></i></span>
+            <span class="flow-line" style="--accent:#32c786; --delay:-2.5s"><i class="packet"></i></span>
+          </div>
+
+          <section class="intake-card" aria-label="Source intake gateway">
+            <h2>Source intake gateway</h2>
+            <div class="intake-rows">
+              <div class="intake-row" style="--accent:#64748b"><span class="type-badge" style="--accent:#64748b">RAW</span><span>Files, docs, tickets, and events</span></div>
+              <div class="intake-row" style="--accent:#4c8df6"><span class="type-badge" style="--accent:#4c8df6">GRAPH</span><span>Code, doc, and org graph inputs</span></div>
+              <div class="intake-row" style="--accent:#d9ae61"><span class="type-badge" style="--accent:#d9ae61">LIVE</span><span>Webhooks, APIs, and MCP tools</span></div>
+              <div class="intake-row" style="--accent:#32c786"><span class="type-badge" style="--accent:#32c786">INDEX</span><span>RAG, vector, catalog, and lineage indexes</span></div>
+            </div>
+            <p class="intake-note">Attach ACL, timestamp, source hash, and provenance.</p>
+          </section>
+
+          <div class="line-stack egress" aria-hidden="true">
+            <span class="flow-line" style="--accent:#64748b; --delay:-.4s"><i class="packet"></i></span>
+            <span class="flow-line" style="--accent:#4c8df6; --delay:-1.1s"><i class="packet"></i></span>
+            <span class="flow-line" style="--accent:#32c786; --delay:-1.9s"><i class="packet"></i></span>
+            <span class="flow-line" style="--accent:#d9ae61; --delay:-2.6s"><i class="packet"></i></span>
+          </div>
+
+          <section class="registry-card" aria-label="Context source registry">
+            <h2>Context source registry</h2>
+            <div class="registry-rows">
+              <div class="registry-row" style="--accent:#4c8df6"><span class="type-badge" style="--accent:#4c8df6">CODE</span><span>CodeGraph reality</span></div>
+              <div class="registry-row" style="--accent:#64748b"><span class="type-badge" style="--accent:#64748b">DOC</span><span>DocGraph decisions</span></div>
+              <div class="registry-row" style="--accent:#32c786"><span class="type-badge" style="--accent:#32c786">ORG</span><span>OrgGraph ownership</span></div>
+              <div class="registry-row" style="--accent:#d9ae61"><span class="type-badge" style="--accent:#d9ae61">RAW</span><span>Source handles</span></div>
+            </div>
+            <p class="registry-note"><strong>Handles issued</strong>Available for reconciliation.</p>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage-assurance-card">
+      <div class="assurance-title">
+        <b>Continuous Verification + Adversarial Validation</b>
+        <span>Universal assurance layer</span>
+      </div>
+      <p>At ingress, Baltor checks whether each source and trigger can be resolved, who may access it, when it last changed, whether it carries untrusted instructions, and which handle can expand it later.</p>
+      <div class="assurance-tags">
+        <span>ACL before model</span>
+        <span>source handles</span>
+        <span>trigger provenance</span>
+        <span>content hashes</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="focused-explainer" aria-label="Source Systems stage explanation">
+    <article>
+      <b>What this stage does</b>
+      <p>It accepts raw sources and already-contextualized projections: CodeGraph for implementation reality, DocGraph for stated decisions and documentation, and OrgGraph for owners, approvals, access, and affected teams.</p>
+    </article>
+    <article>
+      <b>Concrete example</b>
+      <p>A Confluence ADR enters DocGraph, a GitLab MR enters CodeGraph, a Datadog incident creates live operational context, and ownership updates enter OrgGraph. Baltor preserves each as linked evidence.</p>
+    </article>
+    <article>
+      <b>Why it matters</b>
+      <p>The next stages can reconcile code reality, documented intent, and organizational ownership because ingress does not collapse them into one anonymous index. Each graph remains specialized and source-linked.</p>
+    </article>
+  </section>
+
+  <div class="stage-links">
+    <a class="is-current" href="./source.html">Source</a>
+    <a href="./reconciliation.html">Reconciliation</a>
+    <a href="./anti-fragility.html">Anti-Fragility</a>
+    <a href="./enhancement.html">Enhancement</a>
+    <a href="./optimization.html">Optimization</a>
+    <a href="./consumption.html">Consumption</a>
+  </div>
+</main>
+</body>
+</html>

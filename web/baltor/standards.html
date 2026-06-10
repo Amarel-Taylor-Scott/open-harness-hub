@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor · Standards System</title>
+<style>
+  :root { --bg:#0d1117; --panel:#161b22; --line:#21262d; --fg:#e6edf3; --mut:#8b949e; --ok:#3fb950; --warn:#d29922; --bad:#f85149; --acc:#58a6ff; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  header { padding:14px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  h1 { font-size:15px; margin:0; font-weight:600; }
+  .sub { color:var(--mut); font-size:12px; }
+  button { background:var(--acc); color:#0d1117; border:0; border-radius:6px; padding:8px 14px; font-weight:700; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:wait; }
+  main { display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:12px; padding:16px; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:12px; }
+  .panel h2 { font-size:12px; margin:0 0 8px; color:var(--acc); text-transform:uppercase; letter-spacing:.04em; }
+  .row { display:flex; justify-content:space-between; gap:8px; padding:2px 0; border-bottom:1px dashed var(--line); }
+  .mut { color:var(--mut); }
+  .pill { display:inline-block; padding:1px 7px; border-radius:999px; font-size:11px; }
+  .pill.ok { background:rgba(63,185,80,.15); color:var(--ok); }
+  .pill.warn { background:rgba(210,153,34,.15); color:var(--warn); }
+  .pill.bad { background:rgba(248,81,73,.15); color:var(--bad); }
+  code { color:var(--acc); word-break:break-all; }
+  .hint { color:var(--mut); font-size:11px; }
+  .state { color:var(--mut); font-size:11px; font-style:italic; }
+  .state.err { color:var(--bad); font-style:normal; }
+  pre { white-space:pre-wrap; word-break:break-word; max-height:240px; overflow:auto; margin:0; color:var(--mut); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Baltor · Standards System</h1>
+  <span class="sub">25-pattern registry · templates · routines · miner report · compliance · projection-only (this page computes no truth; it reads the API)</span>
+  <button id="run">Refresh from /api/standards</button>
+  <span id="status" class="sub"></span>
+</header>
+<main id="panels">
+  <div class="panel"><h2>Loading</h2><div id="boot" class="state">Fetching the standards projection from /api/standards/* …</div></div>
+</main>
+
+<script>
+// Projection only: fetch the Standards API and RENDER. No truth is computed, stored, or mutated here.
+// Every fetch targets /api/standards/* — no other origin, no durable write, no secret.
+const API = {
+  patterns:  "/api/standards/patterns",
+  templates: "/api/standards/templates",
+  routines:  "/api/standards/routines",
+  waivers:   "/api/standards/waivers",
+  maturity:  "/api/standards/maturity",
+  preview:   "/api/standards/generate-preview",
+  miner:     "/api/standards/maturity",      // pattern miner report is projected from the maturity matrix
+  sections:  "/api/standards/maturity",      // new-code compliance + opportunities + risks come from maturity gaps
+};
+const panels = document.getElementById("panels");
+const statusEl = document.getElementById("status");
+
+function panel(title){ const d=document.createElement("div"); d.className="panel"; const h=document.createElement("h2"); h.textContent=title; d.appendChild(h); panels.appendChild(d); return d; }
+function row(p,k,v){ const r=document.createElement("div"); r.className="row"; r.innerHTML=`<span class="mut">${k}</span><span>${v}</span>`; p.appendChild(r); }
+function list(p,items){ if(!items||!items.length){ row(p,"(none)",""); return; } items.forEach(t=>{ const r=document.createElement("div"); r.className="row"; r.innerHTML=t; p.appendChild(r); }); }
+function unavail(p,note){ const d=document.createElement("div"); d.className="state"; d.textContent = "not produced yet — "+(note||"sibling lane pending"); p.appendChild(d); }
+function errState(p,msg){ const d=document.createElement("div"); d.className="state err"; d.textContent = "error: "+msg; p.appendChild(d); }
+
+async function getJSON(url){ const res = await fetch(url); if(!res.ok && res.status!==200){ throw new Error(url+" -> "+res.status); } return res.json(); }
+
+async function run(){
+  const btn=document.getElementById("run"); btn.disabled=true; statusEl.textContent="loading…";
+  [...panels.querySelectorAll(".panel")].forEach(e=>e.remove());
+  // settle all projections; render each independently so one missing file can't blank the page.
+  const keys = ["patterns","templates","routines","waivers","maturity","miner","sections"];
+  const results = await Promise.allSettled(keys.map(k=>getJSON(API[k])));
+  const data = {}; keys.forEach((k,i)=>{ data[k] = results[i].status==="fulfilled" ? results[i].value : {__error: String(results[i].reason)}; });
+  // generate-preview is a DRY-RUN read; failure is non-fatal.
+  try { data.preview = await getJSON(API.preview); } catch(e){ data.preview = {__error:String(e)}; }
+  render(data);
+  const errs = keys.filter(k=>data[k] && data[k].__error).length;
+  statusEl.textContent = errs ? `loaded · ${errs} endpoint(s) errored` : "loaded · projection-only";
+  btn.disabled=false;
+}
+
+function render(d){
+  // Pattern registry
+  let p=panel("Pattern registry");
+  if(d.patterns.__error){ errState(p,d.patterns.__error); }
+  else if(d.patterns.available===false){ unavail(p,d.patterns.note); }
+  else { row(p,"patterns",d.patterns.total??0);
+    list(p,(d.patterns.patterns||[]).map(x=>`<code>${x.pattern_id||"?"}</code> <span class="pill ${x.status==='active'?'ok':'warn'}">${x.status||"?"}</span> <span class="mut">${x.example_count??0} ex</span>`)); }
+
+  // Standards catalog (an overview roll-up of the standards system)
+  p=panel("Standards catalog");
+  row(p,"patterns", d.patterns.total??(d.patterns.__error?"err":"—"));
+  row(p,"templates", d.templates.total??(d.templates.__error?"err":"—"));
+  row(p,"routines", d.routines.total??(d.routines.__error?"err":"—"));
+  row(p,"waivers", d.waivers.total??(d.waivers.__error?"err":"—"));
+
+  // Template catalog
+  p=panel("Template catalog");
+  if(d.templates.__error){ errState(p,d.templates.__error); }
+  else if(d.templates.available===false){ unavail(p,d.templates.note); }
+  else { row(p,"templates",d.templates.total??0);
+    list(p,(d.templates.templates||[]).map(x=>`<code>${x.template_id||"?"}</code> <span class="mut">→ ${x.pattern_id||"?"}</span> <span class="mut">${x.produces||""}</span>`)); }
+
+  // Routine library
+  p=panel("Routine library");
+  if(d.routines.__error){ errState(p,d.routines.__error); }
+  else if(d.routines.available===false){ unavail(p,d.routines.note); }
+  else { row(p,"routines",d.routines.total??0);
+    list(p,(d.routines.routines||[]).map(x=>`<code>${x.routine_id||"?"}</code> <span class="mut">${(x.steps||[]).length} steps</span>`)); }
+
+  // Waivers
+  p=panel("Waivers");
+  if(d.waivers.__error){ errState(p,d.waivers.__error); }
+  else if(d.waivers.available===false){ unavail(p,d.waivers.note); }
+  else { row(p,"active waivers",d.waivers.total??0);
+    list(p,(d.waivers.waivers||[]).map(x=>`<span class="pill warn">waiver</span> <code>${x.target||"?"}</code><br><span class="mut">${x.pattern_id||""}: ${x.reason||""}</span>`)); }
+
+  // Pattern miner report (projected from the maturity matrix)
+  p=panel("Pattern miner report");
+  if(d.miner.__error){ errState(p,d.miner.__error); }
+  else if(d.miner.available===false){ unavail(p,d.miner.note); }
+  else { const rows=d.miner.patterns||[]; const withEx=rows.filter(x=>(x.example_count||0)>0).length;
+    row(p,"patterns scanned",rows.length); row(p,"patterns with examples",withEx);
+    list(p,rows.map(x=>`<code>${x.pattern_id||"?"}</code> <span class="mut">${x.example_count??0} examples · ${x.status||""}</span>`)); }
+
+  // New-code compliance (maturity status roll-up)
+  p=panel("New-code compliance");
+  if(d.maturity.__error){ errState(p,d.maturity.__error); }
+  else if(d.maturity.available===false){ unavail(p,d.maturity.note); }
+  else { const rows=d.maturity.patterns||[]; const compliant=rows.filter(x=>x.status==="active"||x.status==="m10_complete").length;
+    row(p,"patterns",rows.length); row(p,"compliant",`${compliant}/${rows.length}`);
+    list(p,rows.filter(x=>x.status!=="active"&&x.status!=="m10_complete").map(x=>`<code>${x.pattern_id||"?"}</code> <span class="pill warn">${x.status||"?"}</span>`)); }
+
+  // Examples (concrete in-repo examples carried on each pattern)
+  p=panel("Examples");
+  if(d.patterns.__error){ errState(p,d.patterns.__error); }
+  else if(d.patterns.available===false){ unavail(p,d.patterns.note); }
+  else { const ex=[]; (d.patterns.patterns||[]).forEach(x=>(x.examples||[]).slice(0,3).forEach(e=>ex.push(`<code>${e}</code> <span class="mut">${x.pattern_id||""}</span>`)));
+    list(p,ex.slice(0,40)); }
+
+  // Opportunities (maturity gaps = where the standard isn't met yet)
+  p=panel("Opportunities");
+  if(d.sections.__error){ errState(p,d.sections.__error); }
+  else if(d.sections.available===false){ unavail(p,d.sections.note); }
+  else { const gaps=[]; (d.sections.patterns||[]).forEach(x=>(x.known_gaps||[]).forEach(g=>gaps.push(`<span class="mut">${x.pattern_id||""}: ${g}</span>`)));
+    list(p,gaps.length?gaps:["<span class='mut'>no open gaps reported</span>"]); }
+
+  // Risks (patterns that are non-compliant / waived = standing risk)
+  p=panel("Risks");
+  if(d.maturity.__error){ errState(p,d.maturity.__error); }
+  else if(d.maturity.available===false){ unavail(p,d.maturity.note); }
+  else { const risky=(d.maturity.patterns||[]).filter(x=>x.status!=="active"&&x.status!=="m10_complete");
+    const waived=(d.waivers && d.waivers.available!==false)?(d.waivers.waivers||[]).length:0;
+    row(p,"non-compliant patterns",risky.length); row(p,"active waivers",waived);
+    list(p,risky.map(x=>`<span class="pill bad">risk</span> <code>${x.pattern_id||"?"}</code> <span class="mut">${x.status||""}</span>`)); }
+
+  // Generate preview (DRY-RUN; writes nothing)
+  p=panel("Generate preview (dry-run · writes nothing)");
+  if(d.preview.__error){ errState(p,d.preview.__error); }
+  else { row(p,"dry_run", String(d.preview.dry_run)); row(p,"generator", `<code>${d.preview.generator||"—"}</code>`);
+    if(d.preview.available===false){ unavail(p,d.preview.note); }
+    list(p,(d.preview.would_create||[]).map(w=>`<span class="mut">would create</span> <code>${w.path||"?"}</code> <span class="pill ${w.written?'bad':'ok'}">written: ${String(w.written)}</span>`)); }
+}
+
+document.getElementById("run").addEventListener("click", run);
+run();
+</script>
+</body>
+</html>

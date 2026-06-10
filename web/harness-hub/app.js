@@ -39,6 +39,10 @@
     ["/docs",      "Docs"],
     ["/trust",     "Trust"]
   ];
+  var FAMILY_LINKS = [
+    ["https://baltor.ai", "Baltor"],
+    ["https://aidoneright.dev", "AI Done Right"]
+  ];
   // The full marketing header. `active` is the route of the current page (e.g. "/trust"); the
   // matching link is emphasised. Right side carries Sign in (ghost) + Get started (primary CTA),
   // wrapped in the same flex group the catalog header already uses.
@@ -49,9 +53,12 @@
         (on ? ' style="color:var(--fg);font-weight:600"' : "") +
         ">" + esc(p[1]) + "</a>";
     }).join("");
+    var family = FAMILY_LINKS.map(function (p) {
+      return '<a href="' + esc(p[0]) + '">' + esc(p[1]) + "</a>";
+    }).join("");
     return '<header class="pt-mkt-top">' +
       '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MKT_MARK_SVG + " Open Harness Hub</div>" +
-      "<nav>" + nav + "</nav>" +
+      "<nav>" + nav + family + "</nav>" +
       '<span class="pt-spacer"></span>' +
       '<div style="display:flex;gap:9px">' +
       '<button class="oh-btn oh-btn--ghost oh-btn--sm" data-nav="/signin">Sign in</button>' +
@@ -158,6 +165,14 @@
   }
   function renderRoute() {
     var route = currentRoute();
+    // analytics beacon: one page event per route render (graceful no-op when the plane is down);
+    // landing also enters the builder_cta A/B (exposure auto-emitted once per session)
+    if (window.OHEvents) {
+      try {
+        window.OHEvents.page(route, { hash: location.hash });
+        if (route === "/") { window.OHEvents.variant("builder_cta", ["A", "B"]); }
+      } catch (e) {}
+    }
     var statics = $$("#root > [data-route]");
     var staticEl = null, notFound = null;
     statics.forEach(function (el) {
@@ -185,10 +200,13 @@
   }
 
   // ---------------- toast ----------------
+  // concurrent toasts STACK upward instead of overlapping (E2E self-review finding: two
+  // toasts on the same spot rendered garbled text in the portal recording)
   function toast(msg) {
     var t = document.createElement("div");
     t.className = "oh-toast"; t.textContent = msg;
-    t.setAttribute("style", "position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:80;" +
+    var offset = 24 + document.querySelectorAll(".oh-toast").length * 44;
+    t.setAttribute("style", "position:fixed;left:50%;bottom:" + offset + "px;transform:translateX(-50%);z-index:80;" +
       "background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:var(--r-pill);font-size:13px;box-shadow:var(--e2)");
     document.body.appendChild(t);
     setTimeout(function () { t.style.opacity = "0"; t.style.transition = "opacity .3s"; }, 2200);
@@ -205,6 +223,8 @@
     }
     setTask(v);
     logEvent('build requested · "' + v.slice(0, 40) + (v.length > 40 ? "…" : "") + '"');
+    // A/B conversion: the builder CTA fired (paired with the landing exposure in renderRoute)
+    if (window.OHEvents) { try { window.OHEvents.conversion("builder_cta", "build_requested"); } catch (e) {} }
     navigate(state.loggedIn ? "/build" : "/preview");
   }
   function renderChips() {
@@ -561,7 +581,7 @@
   // ---------------- boot ----------------
   window.OHH = window.OHH || {};
   Object.assign(window.OHH, { register: register, navigate: navigate, toast: toast, log: logEvent, PRIMS: PRIMS, MODALITIES: MODALITIES, esc: esc, renderRoute: renderRoute, state: state,
-    MKT_NAV: MKT_NAV, MKT_MARK_SVG: MKT_MARK_SVG, mktHeader: mktHeader });
+    MKT_NAV: MKT_NAV, FAMILY_LINKS: FAMILY_LINKS, MKT_MARK_SVG: MKT_MARK_SVG, mktHeader: mktHeader });
   applyScheme();
   initLanding();
   buildSwitcher();

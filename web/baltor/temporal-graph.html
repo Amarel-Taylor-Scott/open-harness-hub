@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor — Temporal Fact Graph</title>
+<style>
+  :root{--bg:#0a0d14;--panel:#121723;--line:#1f2734;--ink:#e6edf6;--muted:#8aa0b6;--green:#34d39a;--amber:#f5a623;--red:#ff6b6b;--blue:#5aa0ff;--mono:ui-monospace,Menlo,Consolas,monospace;--sans:Inter,system-ui,sans-serif}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans)}
+  .wrap{max-width:1080px;margin:0 auto;padding:24px 18px 60px}
+  h1{font-size:21px;margin:0} h1 b{color:var(--blue)} .sub{color:var(--muted);font-size:13px;margin:4px 0 16px}
+  button{background:var(--blue);color:#05101f;border:0;border-radius:8px;padding:9px 16px;font-weight:600;cursor:pointer}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px;margin-top:16px}
+  @media(max-width:760px){.grid{grid-template-columns:1fr}}
+  .panel{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:14px}
+  .pt{font-size:14px;font-weight:600;margin-bottom:8px}
+  .row{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:4px 0;border-top:1px solid var(--line)}
+  .mut{color:var(--muted)} code{font-family:var(--mono);color:var(--ink);font-size:12px}
+  .pill{font-family:var(--mono);font-size:11px;border-radius:999px;padding:2px 9px}
+  .pill.cur{background:rgba(52,211,154,.16);color:var(--green)} .pill.held{background:rgba(245,166,35,.16);color:var(--amber)}
+  .state{color:var(--muted);font-size:12px} .err{color:var(--red)}
+</style></head>
+<body><div class="wrap">
+  <h1>Baltor — <b>Temporal Fact Graph</b></h1>
+  <div class="sub">Governed temporal facts: what was true, when it was valid, what superseded/contradicted it,
+    which version is safe to serve now. Projection-only over <code>/api/graph/temporal/*</code>. Baltor owns the
+    truth policy; Graphiti is a candidate provider.</div>
+  <button id="run">Build Temporal CFPB Graph</button>
+  <span id="status" class="state"> </span>
+  <div class="grid" id="panels"></div>
+</div>
+<script>
+// Projection-only: this page reads /api/graph/temporal/* and renders. It writes NO durable truth, holds no
+// secrets, persists nothing. The served "current" value comes only from verified_current nodes.
+const QS = "?tenant=global";
+const EP = {
+  facts:"/api/graph/temporal/facts"+QS, current:"/api/graph/temporal/current"+QS,
+  conflicts:"/api/graph/temporal/conflicts"+QS, held:"/api/graph/temporal/held-out"+QS,
+  edges:"/api/graph/temporal/edges"+QS, timeline:"/api/graph/temporal/timeline/reg_e.error_resolution.deadline"+QS,
+  provider:"/api/graph/temporal/provider-status"+QS,
+};
+const $=s=>document.querySelector(s);
+function panel(t){const d=document.createElement("div");d.className="panel";d.innerHTML=`<div class="pt">${t}</div>`;$("#panels").appendChild(d);return d;}
+function row(p,a,b){const r=document.createElement("div");r.className="row";r.innerHTML=`<span>${a}</span><span class="mut">${b}</span>`;p.appendChild(r);}
+function empty(p,m){const r=document.createElement("div");r.className="row mut";r.textContent=m||"(none)";p.appendChild(r);}
+async function getJSON(u){const r=await fetch(u);if(!r.ok&&r.status>=500)throw new Error("HTTP "+r.status);return r.json();}
+async function render(){
+  $("#panels").innerHTML=""; $("#status").textContent="building…";
+  try{
+    const [cur,conf,held,edges,tl,prov] = await Promise.all([getJSON(EP.current),getJSON(EP.conflicts),getJSON(EP.held),getJSON(EP.edges),getJSON(EP.timeline),getJSON(EP.provider)]);
+    let p=panel("1 · Current served facts");
+    (cur.served_facts||[]).forEach(f=>row(p,`<span class="pill cur">current</span> <code>${f.value}</code>`,(f.source_handles||[])[0]||""));
+    if(!(cur.served_facts||[]).length) empty(p,cur.note||"no current facts");
+    p=panel("2 · Held-out claims (preserved, never served)");
+    (cur.held_out_warnings||[]).forEach(h=>row(p,`<span class="pill held">held out</span> <code>${h.value}</code>`,h.source_authority||""));
+    if(!(cur.held_out_warnings||[]).length) empty(p);
+    p=panel("3 · Contradictions");
+    (conf.conflicts||[]).forEach(e=>row(p,`${e.edge_type}`,`<code>${e.from_temporal_fact_id.slice(0,12)}→${e.to_temporal_fact_id.slice(0,12)}</code>`));
+    if(!(conf.conflicts||[]).length) empty(p);
+    p=panel("4 · Fact timeline (Reg E deadline)");
+    (tl.observations||[]).forEach(o=>row(p,`<code>${o.value_normalized}</code> <span class="state">${o.source_authority}</span>`,`obs ${o.observed_at}`));
+    if(!(tl.observations||[]).length) empty(p);
+    p=panel("5 · Governance edges");
+    (edges.edges||[]).forEach(e=>row(p,e.edge_type,`<span class="state">${e.edge_source}</span> ${e.receipt_id||""}`));
+    if(!(edges.edges||[]).length) empty(p);
+    p=panel("6 · Held-out nodes (source handles preserved)");
+    (held.held_out||[]).forEach(n=>row(p,`<code>${n.value_normalized}</code>`,(n.source_handles||[])[0]||""));
+    if(!(held.held_out||[]).length) empty(p);
+    p=panel("7 · Provider status");
+    (prov.providers||[]).forEach(s=>row(p,`<code>${s.provider_id}</code>`,`${s.status} · ${s.available?"available":"unavailable"}`));
+    p=panel("8 · Reconciliation / verification");
+    row(p,"winner","Reg E source-of-law"); row(p,"loser","FAQ official-faq (held out)"); row(p,"policy","source_of_law beats FAQ");
+    $("#status").textContent="built ("+(cur.served_facts||[]).length+" current, "+(cur.held_out_warnings||[]).length+" held out)";
+  }catch(e){ const p=panel("Error"); const r=document.createElement("div"); r.className="row err"; r.textContent="error loading /api/graph/temporal/*: "+e; p.appendChild(r); $("#status").textContent="error"; }
+}
+$("#run").addEventListener("click",render);
+render();
+</script></body></html>

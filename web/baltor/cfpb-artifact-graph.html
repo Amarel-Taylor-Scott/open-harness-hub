@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor — CFPB Artifact Graph</title>
+<style>
+  :root{--bg:#07090c;--panel:#0e131d;--line:#1f2734;--ink:#e6edf6;--muted:#8aa0b6;--green:#34d39a;--amber:#f5a623;--red:#ff6b6b;--blue:#5aa0ff;
+        --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--sans:Inter,system-ui,sans-serif}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13px}
+  .wrap{max-width:1240px;margin:0 auto;padding:16px}
+  header{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+  h1{font-size:17px;margin:0} h1 b{color:var(--blue)} .sub{color:var(--muted);font-size:12px}
+  button{font-family:var(--sans);font-size:13px;background:#123;color:var(--blue);border:1px solid #2a557f;border-radius:8px;padding:8px 16px;cursor:pointer}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
+  .card h2{font-size:12px;margin:0 0 8px;color:var(--blue);text-transform:uppercase;letter-spacing:.04em}
+  .kv{display:flex;justify-content:space-between;border-bottom:1px solid #131a26;padding:3px 0;font-family:var(--mono);font-size:12px}
+  .kv span:last-child{color:var(--ink)} .kv span:first-child{color:var(--muted)}
+  .pill{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);margin:2px}
+  .ok{color:var(--green)} .warn{color:var(--amber)} .bad{color:var(--red)}
+  pre{background:#0a0e16;border:1px solid var(--line);border-radius:8px;padding:10px;overflow:auto;max-height:320px;
+      font-family:var(--mono);font-size:11px;line-height:1.5;white-space:pre-wrap;word-break:break-word;margin:0}
+  a{color:var(--blue);text-decoration:none}
+  .note{color:var(--muted);font-size:12px;margin:8px 0}
+  table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px}
+  td,th{text-align:left;padding:3px 6px;border-bottom:1px solid #131a26} th{color:var(--muted)}
+</style></head>
+<body><div class="wrap">
+  <header>
+    <h1>Baltor — <b>CFPB Artifact Graph</b></h1>
+    <div class="sub">builder-grade, inspectable: ingest → source graph → decomposition → store → vectorize → deterministic graph → conflicts → reconciliation → receipt. The ledger is the source of truth; this page is a projection. <a href="/integrate">← guided demo</a> · <a href="/dev">dev</a> · <a href="/raw">raw</a></div>
+  </header>
+  <div style="margin:14px 0"><button id="run">Build CFPB Artifact Graph</button> <span id="status" class="note"></span></div>
+  <div id="panels" class="grid"></div>
+<script>
+const $=s=>document.querySelector(s);
+const TOKEN=new URLSearchParams(location.search).get('token')||'';
+const tok=u=>TOKEN?(u+(u.includes('?')?'&':'?')+'token='+encodeURIComponent(TOKEN)):u;
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+function card(title, html){ return `<div class="card"><h2>${title}</h2>${html}</div>`; }
+function kvs(obj){ return Object.entries(obj||{}).map(([k,v])=>`<div class="kv"><span>${esc(k)}</span><span>${esc(typeof v==='object'?JSON.stringify(v):v)}</span></div>`).join(''); }
+function render(d){
+  const p=[];
+  // 1 Ingestion + 3 Storage counts
+  p.push(card('1 · Ingestion + Storage', kvs({tenant:d.tenant_id, run_id:d.run_id, stages:(d.stages||[]).length})+kvs(d.counts)));
+  // 2 Decomposition: counts by type
+  p.push(card('2 · Decomposition (artifacts by type)', kvs(d.artifact_counts_by_type)));
+  // 4 Vectorization
+  const vp=d.vector_provider||{};
+  p.push(card('4 · Vectorization', kvs({provider:vp.provider, model:vp.model, version:vp.version, dimensions:vp.dimensions, vectorized:d.vectorized})));
+  // 5 Deterministic graph
+  p.push(card('5 · Deterministic graph (edges by type)', kvs(d.graph_layers)));
+  // 6 LLM candidate layer (placeholder)
+  p.push(card('6 · LLM candidate layer', `<div class="note">Optional enricher seam — LLMs PROPOSE candidate entities/relations/conflicts (edge_source=llm, promotion_eligible=false, requires_verification). None promoted in this deterministic run.</div>`));
+  // 7 Conflicts
+  const cf=(d.conflicts||[]).map(c=>`<tr><td>${esc(c.conflict_type)}</td><td>${esc(c.detector)}</td><td class="${c.status==='reconciled'?'ok':'warn'}">${esc(c.status)}</td></tr>`).join('');
+  p.push(card('7 · Conflicts', `<table><tr><th>type</th><th>detector</th><th>status</th></tr>${cf||'<tr><td>none</td></tr>'}</table>`));
+  // 8 Reconciliation
+  const rc=(d.reconciliations||[]).map(r=>`<div class="kv"><span>${esc(r.decision)}</span><span>win: ${esc((r.winning_artifact_id||'').split(':').pop())}</span></div><div class="note">${esc(r.rationale)}</div>`).join('');
+  p.push(card('8 · Reconciliation', rc||'<div class="note">none</div>'));
+  // 9 Final context pack
+  const fcp=d.final_context_pack||{};
+  p.push(card('9 · Final context pack', kvs({included:(fcp.included||[]).length, held_out:(fcp.held_out||[]).length, winning:JSON.stringify(fcp.winning||{})})+
+    `<div class="note ok">included (promotable/reconciled): ${(fcp.included||[]).length}</div><div class="note warn">held out (lower-authority/unresolved): ${(fcp.held_out||[]).map(x=>esc(x.split(':').pop())).join(', ')||'none'}</div>`));
+  // 10 Receipt
+  p.push(card('10 · Receipt', `<pre>${esc(JSON.stringify(d.receipt,null,2))}</pre>`));
+  // Drill-down for one atomic fact
+  const dd=d.drilldown||{};
+  if(dd.artifact){
+    const a=dd.artifact;
+    p.push(card('Drill-down · one atomic fact', kvs({artifact_id:a.artifact_id.split(':').pop(), type:a.artifact_type, claim_status:a.claim_status, promotion_eligible:a.promotion_eligible, content_hash:a.content_hash})+
+      `<div class="note">source handles: ${(a.source_handles_json||[]).map(esc).join(', ')}</div>`+
+      `<div class="note">graph neighbours: ${(dd.neighbors||[]).map(n=>esc(n.edge_type)).join(', ')}</div>`+
+      `<div class="note">nearest vectors: ${(dd.nearest||[]).map(n=>esc(n.artifact_id.split(':').pop())+'('+n.score+')').join(', ')}</div>`+
+      `<div class="note ${dd.in_pack?'ok':'warn'}">in final pack: ${dd.in_pack}</div>`));
+  }
+  $('#panels').innerHTML=p.join('');
+}
+$('#run').addEventListener('click',async()=>{
+  $('#status').textContent='building…';
+  try{
+    const r=await fetch(tok('/api/demo/cfpb-artifact-graph'),{method:'POST'});
+    if(r.status===401){ $('#status').innerHTML='🔒 needs <code>?token=…</code> to build (viewing works without it).'; return; }
+    const d=await r.json();
+    $('#status').innerHTML=`<span class="ok">built</span> · run ${esc(d.run_id)} · ${d.counts.artifacts} artifacts · ${d.counts.edges} edges · ${d.counts.vectors} vectors · ${d.counts.conflicts} conflict(s) · ${d.counts.reconciliations} reconciled`;
+    render(d);
+  }catch(e){ $('#status').innerHTML='<span class="bad">error: '+esc(e.message)+'</span>'; }
+});
+</script></body></html>

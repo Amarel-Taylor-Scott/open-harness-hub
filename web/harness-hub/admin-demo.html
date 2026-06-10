@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor | Context Control Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/styles/oh-tokens.css" />
+<link rel="stylesheet" href="/styles/oh-components.css" />
+<link rel="stylesheet" href="/styles/admin-demo.css?v=20260601-sources-route" />
+</head>
+<body class="admin-demo" data-admin-view="home">
+  <header class="ad-topbar">
+    <a class="ad-brand" href="/">
+      <span class="ad-mark" aria-hidden="true"></span>
+      <span>Baltor</span>
+    </a>
+    <nav aria-label="Admin demo navigation">
+      <a href="/admin-demo">Context control</a>
+      <a href="/">Product home</a>
+      <a href="/how-it-works.html">Architecture</a>
+      <a href="https://aidoneright.dev/gtm-launch-guide.html">Launch guide</a>
+    </nav>
+  </header>
+
+  <main class="ad-shell">
+    <section class="ad-hero">
+      <div class="ad-flow-cards" aria-label="Context control sections">
+        <a class="ad-flow-card" href="/admin-demo/sources" data-view-link="sources">
+          <span class="ad-flow-step">01</span>
+          <strong>Load data</strong>
+          <small>Connect folders, upload files, and define source ownership.</small>
+          <span class="ad-flow-meta" id="homeSources">No sources yet</span>
+        </a>
+        <a class="ad-flow-card" href="/admin-demo/monitoring" data-view-link="monitoring">
+          <span class="ad-flow-step">02</span>
+          <strong>Processing</strong>
+          <small>Watch sync, extraction, graphing, verification, and ETA.</small>
+          <span class="ad-flow-meta" id="homeProcessing">No active run</span>
+        </a>
+        <a class="ad-flow-card" href="/admin-demo/outputs" data-view-link="outputs">
+          <span class="ad-flow-step">03</span>
+          <strong>Outputs</strong>
+          <small>Open verification queues, graph results, claims, and serving packs.</small>
+          <span class="ad-flow-meta" id="homeOutputs">Waiting for run</span>
+        </a>
+        <a class="ad-flow-card" href="/admin-demo/download" data-view-link="download">
+          <span class="ad-flow-step">04</span>
+          <strong>Download</strong>
+          <small>Export text packs, RAG records, graph data, and audit packets.</small>
+          <span class="ad-flow-meta" id="homeDownload">No package yet</span>
+        </a>
+        <a class="ad-flow-card" href="/admin-demo/explore" data-view-link="explore">
+          <span class="ad-flow-step">05</span>
+          <strong>Explore context</strong>
+          <small>Browse the graph, inspect facts, and chat against the RAG package.</small>
+          <span class="ad-flow-meta" id="homeExplore">No index yet</span>
+        </a>
+        <a class="ad-flow-card" href="/admin-demo/testing" data-view-link="testing">
+          <span class="ad-flow-step">06</span>
+          <strong>Integration testing</strong>
+          <small>Validate connectors, serving APIs, exports, queues, and model routes.</small>
+          <span class="ad-flow-meta" id="homeTesting">Not tested</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="ad-intake" data-view-section="sources" hidden>
+      <div class="ad-panel ad-intake-panel">
+        <div class="ad-panel-head">
+          <div>
+            <p class="ad-kicker">Sources</p>
+            <h2>Load and organize data before processing starts.</h2>
+          </div>
+          <button class="ad-button ad-button-secondary" id="sampleBtn" type="button">Load sample file</button>
+        </div>
+
+        <div class="ad-source-grid" aria-label="Context sources">
+          <label class="ad-source-card ad-source-card-primary" id="dropZone">
+            <input id="fileInput" type="file" multiple accept=".txt,.md,.csv,.json,.yaml,.yml,.zip,.pdf,.docx" />
+            <span class="ad-source-icon">UP</span>
+            <strong>Upload files</strong>
+            <small>Documents, markdown, JSON, CSV, YAML, ZIP bundles</small>
+          </label>
+          <button class="ad-source-card" type="button" data-connector="Google Drive">
+            <span class="ad-source-icon">GD</span>
+            <strong>Google Drive</strong>
+            <small>Folder sync connector</small>
+          </button>
+          <button class="ad-source-card" type="button" data-connector="SharePoint">
+            <span class="ad-source-icon">SP</span>
+            <strong>SharePoint</strong>
+            <small>Policy and knowledge libraries</small>
+          </button>
+          <button class="ad-source-card" type="button" data-connector="Git / S3">
+            <span class="ad-source-icon">S3</span>
+            <strong>Git / S3</strong>
+            <small>Repos, archives, object stores</small>
+          </button>
+        </div>
+
+        <div class="ad-selected">
+          <div class="ad-selected-head">
+            <span>Selected sources</span>
+            <strong id="sourceCount">0</strong>
+          </div>
+          <div id="sourceList" class="ad-source-list"></div>
+        </div>
+
+        <details class="ad-raw">
+          <summary>Raw text fallback</summary>
+          <textarea id="contextInput" spellcheck="false" placeholder="Paste extracted text only when a file or connector is not available."></textarea>
+        </details>
+
+        <div class="ad-actions">
+          <button class="ad-button ad-button-primary" id="analyzeBtn" type="button">Start context run</button>
+          <span id="statusLine" class="ad-status">Idle</span>
+        </div>
+      </div>
+
+      <aside class="ad-panel ad-summary" aria-live="polite">
+        <p class="ad-kicker">Run summary</p>
+        <div class="ad-run-card" id="runCard">
+          <div class="ad-run-row">
+            <span>Run</span>
+            <strong id="runId">not started</strong>
+          </div>
+          <div class="ad-progress" aria-label="Run progress">
+            <span id="runProgressBar"></span>
+          </div>
+          <div class="ad-run-row">
+            <span id="runEta">ETA: -</span>
+            <button class="ad-link-button" id="copyRunBtn" type="button">Copy link</button>
+          </div>
+        </div>
+        <div class="ad-metrics" id="metrics"></div>
+        <div class="ad-sync-panel">
+          <div class="ad-selected-head">
+            <span>Source sync</span>
+            <strong id="syncCount">0</strong>
+          </div>
+          <div id="syncList" class="ad-sync-list"></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="ad-grid" data-view-section="monitoring" hidden>
+      <div class="ad-panel">
+        <div class="ad-panel-head ad-panel-head-tight">
+          <h2>Processing pipeline</h2>
+          <span class="ad-tag">simulated</span>
+        </div>
+        <div class="ad-stage-list" id="workerPlan"></div>
+      </div>
+
+      <div class="ad-panel">
+        <div class="ad-panel-head ad-panel-head-tight">
+          <h2>Knowledge graph</h2>
+          <span class="ad-tag" id="graphCount">0 nodes</span>
+        </div>
+        <div class="ad-graph-wrap">
+          <svg id="graphSvg" viewBox="0 0 720 300" role="img" aria-label="Extracted context graph"></svg>
+        </div>
+      </div>
+
+      <div class="ad-panel ad-serving-panel">
+        <div class="ad-panel-head ad-panel-head-tight">
+          <h2>Worker hierarchy</h2>
+          <span class="ad-tag">cost control</span>
+        </div>
+        <div class="ad-worker-tiers">
+          <div><strong>Deterministic</strong><p>Hashing, diff, chunking, dates, numbers, citations, source policy.</p></div>
+          <div><strong>Small models</strong><p>Summaries, entities, claim extraction, document classification.</p></div>
+          <div><strong>Medium models</strong><p>Claim normalization, evidence matching, graph edges, reconciliation candidates.</p></div>
+          <div><strong>Hermes / OpenClaw</strong><p>Investigate unresolved cases, adversarially test, then compile reusable deterministic procedures.</p></div>
+        </div>
+      </div>
+
+      <div class="ad-panel ad-serving-panel">
+        <div class="ad-panel-head ad-panel-head-tight">
+          <h2>Model routing</h2>
+          <span class="ad-tag" id="modelRouteCount">0 routes</span>
+        </div>
+        <div class="ad-route-list" id="modelRouteList"></div>
+      </div>
+
+      <div class="ad-panel ad-serving-panel">
+        <div class="ad-panel-head ad-panel-head-tight">
+          <h2>Run economics</h2>
+          <span class="ad-tag">planning estimate</span>
+        </div>
+        <div class="ad-cost-layout">
+          <div class="ad-cost-total">
+            <span>Estimated run cost</span>
+            <strong id="costTotal">$0.00</strong>
+            <small id="costBudget">0% of $5 demo ceiling</small>
+          </div>
+          <div class="ad-cost-lines" id="costLineItems"></div>
+          <ul class="ad-cost-guardrails" id="costGuardrails"></ul>
+        </div>
+      </div>
+
+      <div class="ad-panel ad-serving-panel">
+        <div class="ad-panel-head ad-panel-head-tight">
+          <h2>Queue controls</h2>
+          <span class="ad-tag" id="queueControlCount">0 tasks</span>
+        </div>
+        <div class="ad-queue-dashboard">
+          <div class="ad-queue-summary" id="queueSummary"></div>
+          <div class="ad-queue-list" id="queueTaskList"></div>
+          <div class="ad-queue-playbook" id="queueActionPlaybook" aria-label="Queue action playbook"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ad-results" data-view-section="outputs" hidden>
+      <div class="ad-panel ad-serving-panel">
+        <div class="ad-panel-head ad-panel-head-tight">
+          <h2>Serving packages</h2>
+          <span class="ad-tag" id="servingCount">0 packs</span>
+        </div>
+        <div class="ad-serving-grid" id="servingList"></div>
+      </div>
+
+      <div class="ad-panel">
+        <div class="ad-panel-head ad-panel-head-tight">
+          <h2>Verification queue</h2>
+          <span class="ad-tag" id="fragileCount">0</span>
+        </div>
+        <div class="ad-list" id="fragileList"></div>
+      </div>
+
+      <div class="ad-panel">
+        <div class="ad-panel-head ad-panel-head-tight">
+          <h2>Automated refresh jobs</h2>
+          <span class="ad-tag" id="updateCount">0</span>
+        </div>
+        <div class="ad-list" id="updateList"></div>
+      </div>
+
+      <div class="ad-panel">
+        <div class="ad-panel-head ad-panel-head-tight">
+          <h2>Extracted claims</h2>
+          <span class="ad-tag" id="claimCount">0</span>
+        </div>
+        <div class="ad-list" id="claimList"></div>
+      </div>
+    </section>
+
+    <section class="ad-download" data-view-section="download" hidden>
+      <div class="ad-panel ad-serving-panel">
+        <div class="ad-panel-head ad-panel-head-tight">
+          <h2>Download context package</h2>
+          <span class="ad-tag">demo exports</span>
+        </div>
+        <div class="ad-serving-grid">
+          <div class="ad-serving-card"><div><strong>Text pack</strong><span>JSON</span></div><p>Current facts with optional provenance history.</p><small id="exportTextState">Run a context analysis first.</small><button type="button" data-export-kind="text" disabled>Export</button></div>
+          <div class="ad-serving-card"><div><strong>RAG records</strong><span>JSONL</span></div><p>Chunks, metadata, citations, and freshness fields.</p><small id="exportRagState">Use for vector and keyword stores.</small><button type="button" data-export-kind="rag" disabled>Export</button></div>
+          <div class="ad-serving-card"><div><strong>Graph data</strong><span>GraphML</span></div><p>Entities, claims, source links, and procedure edges.</p><small id="exportGraphState">Use for hybrid retrieval.</small><button type="button" data-export-kind="graph" disabled>Export</button></div>
+          <div class="ad-serving-card"><div><strong>Audit packet</strong><span>ZIP</span></div><p>Diffs, worker traces, approvals, and source history.</p><small id="exportAuditState">Use for review workflows.</small><button type="button" data-export-kind="audit" disabled>Export</button></div>
+        </div>
+        <div class="ad-export-manifest">
+          <div class="ad-pane-head">
+            <strong>Serving manifest</strong>
+            <button type="button" data-export-kind="manifest" disabled>Export manifest</button>
+          </div>
+          <pre id="exportManifestPreview">Run a context analysis to generate package endpoints and governance metadata.</pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="ad-explore" data-view-section="explore" hidden>
+      <div class="ad-panel ad-serving-panel">
+        <div class="ad-panel-head ad-panel-head-tight">
+          <h2>Explore context</h2>
+          <span class="ad-tag">graph + RAG</span>
+        </div>
+        <div class="ad-explore-layout">
+          <div class="ad-explore-pane">
+            <div class="ad-pane-head">
+              <strong>Context graph</strong>
+              <span id="exploreGraphStats">No run</span>
+            </div>
+            <p id="exploreGraphState">Open entities, claims, source links, supporting evidence, and provenance paths from the processed corpus.</p>
+            <div class="ad-mini-map" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+          <div class="ad-explore-pane">
+            <div class="ad-pane-head">
+              <strong>Data browser</strong>
+              <span id="exploreDataStats">Waiting</span>
+            </div>
+            <p>Filter chunks, facts, source versions, and adoption history without opening the processing console.</p>
+            <div class="ad-fact-browser" id="exploreFactList">
+              <div class="ad-empty-source">Run processing to browse extracted facts.</div>
+            </div>
+          </div>
+          <div class="ad-explore-pane ad-chat-pane">
+            <div class="ad-pane-head">
+              <strong>RAG chat</strong>
+              <span id="exploreRagStats">No index</span>
+            </div>
+            <div class="ad-chat-message" id="exploreChatAnswer">Ask a question against the generated context package after a run completes.</div>
+            <form class="ad-chat-form" id="exploreChatForm">
+              <input id="exploreChatInput" type="search" autocomplete="off" placeholder="Ask about verified context..." />
+              <button class="ad-button ad-button-secondary" type="submit">Ask</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ad-testing" data-view-section="testing" hidden>
+      <div class="ad-panel ad-serving-panel">
+        <div class="ad-panel-head ad-panel-head-tight">
+          <h2>Integration testing</h2>
+          <span class="ad-tag">readiness checks</span>
+        </div>
+        <div class="ad-test-grid">
+          <div><strong>Connectors</strong><span id="testConnectors">Drive, SharePoint, Git, S3, URL crawl</span></div>
+          <div><strong>Workers</strong><span id="testWorkers">Queues, retries, priority routing, model fallback</span></div>
+          <div><strong>Serving</strong><span id="testServing">Text, RAG, graph, audit, API contracts</span></div>
+          <div><strong>Governance</strong><span id="testGovernance">Source trust, provenance, approval gates, cache scope</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="/admin-demo.js"></script>
+</body>
+</html>

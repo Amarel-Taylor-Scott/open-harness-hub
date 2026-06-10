@@ -1,0 +1,78 @@
+{
+  "created_at": "1970-01-01T00:00:00Z",
+  "kind": "baltor.review-queue.v1",
+  "note": "steward reviews routed by the context-object swarm; decisions are demo-local (no canonical mutation, no server) \u2014 applying a fix is a separate human/policy-gated step",
+  "open_count": 2,
+  "reviews": [
+    {
+      "corpus": "acme",
+      "corpus_label": "Acme Billing (synthetic, offline)",
+      "decision_options": [
+        "approve",
+        "reject",
+        "needs_more_info"
+      ],
+      "proposed_patch": {
+        "applied": false,
+        "authority": "obj-adr-014",
+        "from_value": 3,
+        "op": "update_claim",
+        "predicate": "max_retries",
+        "reason": "align obj-runbook with authoritative obj-adr-014 (=5); requires human/policy approval before apply",
+        "subject_id": "obj-runbook",
+        "to_value": 5
+      },
+      "request": {
+        "created_at": "1970-01-01T00:00:00Z",
+        "evidence": [
+          "ctx://acme-billing/decisions/ADR-014-billing-retry-policy.md#decision",
+          "ctx://acme-billing/docs/billing-runbook.md#retry-policy",
+          "ctx://acme-billing/repo/billing/retry.py#L9-L13"
+        ],
+        "kind": "baltor.steward-review-request.v1",
+        "owner": "obj-billing-team",
+        "requested_by": "context_object_swarm",
+        "review_request_id": "rr-4f8b9ada7bd49159",
+        "risk": "high",
+        "status": "open",
+        "subject": "obj-runbook",
+        "trigger": "high_conflict_claim"
+      }
+    },
+    {
+      "corpus": "cfpb",
+      "corpus_label": "CFPB sample (synthetic, offline)",
+      "decision_options": [
+        "approve",
+        "reject",
+        "needs_more_info"
+      ],
+      "proposed_patch": {
+        "applied": false,
+        "authority": "obj-rege",
+        "from_value": 30,
+        "op": "update_claim",
+        "predicate": "error_resolution_days",
+        "reason": "align obj-faq with authoritative obj-rege (=10); requires human/policy approval before apply",
+        "subject_id": "obj-faq",
+        "to_value": 10
+      },
+      "request": {
+        "created_at": "1970-01-01T00:00:00Z",
+        "evidence": [
+          "ctx://cfpb-sample/docs/disputes-faq.md#timeline",
+          "ctx://cfpb-sample/regs/RegE-error-resolution.md#decision",
+          "ctx://cfpb-sample/sop/dispute_sla.py#L5-L7"
+        ],
+        "kind": "baltor.steward-review-request.v1",
+        "owner": "obj-disputes-team",
+        "requested_by": "context_object_swarm",
+        "review_request_id": "rr-941a164ccbd77994",
+        "risk": "high",
+        "status": "open",
+        "subject": "obj-faq",
+        "trigger": "high_conflict_claim"
+      }
+    }
+  ]
+}

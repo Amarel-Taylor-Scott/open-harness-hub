@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor — Human Review Queue</title>
+<style>
+  :root{
+    --bg:#0a0d14; --panel:#121723; --panel2:#0e131d; --line:#1f2734; --ink:#e6edf6; --muted:#8aa0b6;
+    --gold:#e9b949; --emerald:#34d39a; --blue:#5aa0ff; --purple:#a98bff; --red:#ff6b6b; --amber:#f5a623;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; --sans:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 70% -10%,#13203a 0%,var(--bg) 55%);color:var(--ink);font-family:var(--sans);line-height:1.45}
+  header{display:flex;align-items:center;gap:16px;padding:18px 24px;border-bottom:1px solid var(--line)}
+  .brand{font-weight:700}.brand .dot{color:var(--gold)}
+  .sub{color:var(--muted);font-size:13px}
+  a.back{margin-left:auto;color:var(--blue);text-decoration:none;font-size:13px}
+  main{max-width:980px;margin:0 auto;padding:22px 24px 60px}
+  .count{color:var(--muted);font-size:14px;margin:4px 2px 18px}
+  .card{border:1px solid var(--line);background:linear-gradient(180deg,var(--panel),var(--panel2));border-radius:14px;padding:16px;margin-bottom:14px}
+  .card.flagged{border-color:#5a4a1f}
+  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .risk{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;border-radius:99px;padding:3px 9px;color:#0a0d14;background:var(--amber)}
+  .risk.high{background:var(--red);color:#fff}
+  .risk.critical{background:#b3001b;color:#fff}
+  h3{margin:0;font-size:15px}
+  .corpus{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:3px 9px}
+  .meta{color:var(--muted);font-size:12.5px;margin:9px 0}
+  .meta b{color:var(--ink);font-weight:600}
+  .patch{font-family:var(--mono);font-size:12.5px;background:#0c1320;border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:9px 0}
+  .patch .arrow{color:var(--gold)}
+  .patch .na{color:var(--emerald)}
+  .handles{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+  .handle{font-family:var(--mono);font-size:11px;color:var(--blue);background:#0b1626;border:1px solid #1b2c44;border-radius:6px;padding:3px 7px;word-break:break-all}
+  .btns{display:flex;gap:8px;margin-top:10px}
+  button{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 13px;cursor:pointer;font-size:13px}
+  button.approve:hover{border-color:var(--emerald)} button.reject:hover{border-color:var(--red)} button.info:hover{border-color:var(--blue)}
+  .decided{margin-top:11px;border-top:1px solid var(--line);padding-top:10px;font-family:var(--mono);font-size:11.5px;color:var(--emerald);white-space:pre-wrap}
+  .note{color:var(--muted);font-size:12px;margin-top:24px;text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="brand">Baltor<span class="dot">.</span> Human Review Queue</div>
+    <div class="sub">cases the automation must not decide alone — routed by the context-object swarm</div>
+  </div>
+  <a class="back" href="demo-console.html">← demo console</a>
+</header>
+<main>
+  <div class="count" id="count">Loading queue…</div>
+  <div id="queue"></div>
+  <div class="note" id="footnote"></div>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+let Q = null;
+
+async function load(){
+  try{
+    const r = await fetch('review-queue.json', {cache:'no-store'});
+    if(!r.ok) throw new Error(r.status);
+    Q = await r.json();
+  }catch(e){
+    $('#count').innerHTML = `Could not load <code>review-queue.json</code> (${e}). Serve this folder over HTTP `+
+      `(<code>python3 -m http.server</code> in <code>web/baltor/</code>).`;
+    return;
+  }
+  render();
+}
+
+function render(){
+  const open = Q.reviews.filter(rv => rv.request.status === 'open');
+  $('#count').innerHTML = `<b style="color:var(--ink)">${open.length}</b> open review(s) · decisions here are demo-local (no canonical mutation)`;
+  $('#queue').innerHTML = Q.reviews.map((rv,i) => {
+    const rr = rv.request, p = rv.proposed_patch;
+    const handles = (rr.evidence||[]).map(h=>`<span class="handle">${h}</span>`).join('');
+    const patch = p ? `proposed: <b>${p.predicate}</b> <span class="arrow">${p.from_value} → ${p.to_value}</span> `+
+      `(authority ${p.authority}) · <span class="na">applied=${p.applied}</span>` : 'no patch';
+    return `<div class="card flagged" data-i="${i}">
+      <div class="row">
+        <span class="risk ${rr.risk}">${rr.risk}</span>
+        <h3>${rr.subject}</h3>
+        <span class="corpus">${rv.corpus_label}</span>
+      </div>
+      <div class="meta">trigger: <b>${rr.trigger}</b> · owner: <b>${rr.owner||'unassigned'}</b> · requested_by: ${rr.requested_by} · id: ${rr.review_request_id}</div>
+      <div class="patch">${patch}</div>
+      <div class="handles">${handles}</div>
+      <div class="btns">
+        ${rv.decision_options.map(o => `<button class="${o==='approve'?'approve':o==='reject'?'reject':'info'}" data-i="${i}" data-d="${o}">${o.replace('_',' ')}</button>`).join('')}
+      </div>
+      <div class="decided" id="decided-${i}" style="display:none"></div>
+    </div>`;
+  }).join('');
+  document.querySelectorAll('.btns button').forEach(b => b.addEventListener('click', () => decide(+b.dataset.i, b.dataset.d)));
+  $('#footnote').textContent = Q.note || '';
+}
+
+function decide(i, decision){
+  const rv = Q.reviews[i], rr = rv.request;
+  // record a demo-local steward-review-decision (NO canonical mutation, no server)
+  const rec = {
+    kind: 'baltor.steward-review-decision.v1',
+    review_request_id: rr.review_request_id,
+    subject: rr.subject, decision,
+    applies_patch: decision === 'approve' ? rv.proposed_patch : null,
+    decided_by: 'demo-user', note: 'demo-local decision — applying the patch is a separate gated step',
+  };
+  const el = $('#decided-' + i);
+  el.style.display = 'block';
+  el.textContent = `✓ recorded (demo-local): ${decision}\n` + JSON.stringify(rec, null, 2);
+}
+load();
+</script>
+</body>
+</html>

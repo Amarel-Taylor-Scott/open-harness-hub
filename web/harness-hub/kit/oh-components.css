@@ -1,0 +1,499 @@
+/* ============================================================
+   Open Harness Hub — component layer
+   Every atom designed once; all values come from oh-tokens.css.
+   Artifact roots are sized to the artboard via inline width/height
+   from app.jsx; these styles fill that frame.
+   ============================================================ */
+
+.oh { box-sizing: border-box; }
+.oh *, .oh *::before, .oh *::after { box-sizing: border-box; }
+.oh .mono { font-family: var(--font-mono); font-feature-settings: "tnum" 1; }
+
+/* ---- accessibility foundation: visible focus, never color-alone, motion ---- */
+.oh :focus-visible,
+.oh-sw button:focus-visible,
+.oh-sw-opt:focus-visible {
+  outline: 2px solid var(--accent, #2563eb); outline-offset: 2px; border-radius: 4px;
+}
+.oh button, .oh a, .oh [role="button"], .oh-chip, .oh-legend-chip { cursor: pointer; }
+@media (prefers-reduced-motion: reduce) {
+  .oh *, .oh-sw *, .oh-sw-trigger .cv { transition: none !important; animation: none !important; }
+}
+.oh .eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--fg-muted);
+}
+
+/* ---- buttons ---- */
+.oh-btn {
+  font-family: var(--font-sans); font-size: 14px; font-weight: 650;
+  border-radius: var(--r-md); border: 1px solid transparent;
+  padding: 10px 18px; cursor: pointer; line-height: 1; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 8px; transition: all .12s var(--ease);
+}
+.oh-btn--primary { background: var(--accent); color: var(--accent-ink); }
+.oh-btn--ghost { background: transparent; color: var(--fg); border-color: var(--line); }
+.oh-btn--sm { padding: 7px 12px; font-size: 13px; }
+
+/* ---- card primitive: ONE canonical surface for every card & panel ----
+   Use `.oh-card` for the surface; add `--pad` for default padding and
+   `--interactive` for the hover-lift affordance on clickable cards.
+   Per-site card classes (.ce-card, .cie-* cards) compose these tokens. */
+/* `.pt-panel` (OHH) is a compatibility alias of the canonical surface. */
+.oh-card,
+.pt-panel {
+  border: 1px solid var(--line); background: var(--panel); border-radius: var(--r-lg);
+}
+.oh-card--pad,
+.pt-panel { padding: var(--pad-card); }
+.oh-card--interactive { transition: border-color .14s var(--ease), transform .14s var(--ease), box-shadow .14s var(--ease); }
+.oh-card--interactive:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+  transform: translateY(-2px); box-shadow: var(--e2);
+}
+
+/* ---- canonical scale: ONE type/space/chrome scale shared by every site ----
+   Sites differ ONLY by accent color (token scope). Padding, font sizes, chrome
+   dimensions and the display face are identical everywhere. */
+.oh {
+  --fs-eyebrow: 11px;   --ls-eyebrow: .14em;
+  --fs-h1: clamp(34px, 4.6vw, 52px);
+  --fs-h2: clamp(26px, 3.2vw, 34px);
+  --fs-h3: 19px;
+  --fs-page-title: 30px;
+  --fs-lead: 18px;      --lh-lead: 1.58;
+  --fs-body: 15px;      --lh-body: 1.6;
+  --fs-small: 13px;
+  --pad-card: 22px;
+  --pad-panel: 28px;
+  --h-topbar: 64px;
+  --maxw-site: 1120px;
+  /* ---- canonical body-layout scaffolds (shared by every site) ---- */
+  --w-sidebar: 240px;
+  --maxw-page: 1120px;
+  --maxw-page-wide: 1340px;
+  --gap-split: 18px;
+}
+/* shared body-layout primitives — same scaffolds across products (color aside) */
+.oh-shell { display: grid; grid-template-columns: var(--w-sidebar) 1fr; min-height: 100vh; }
+.oh-page { max-width: var(--maxw-page); margin: 0 auto; padding: 34px 36px 64px; }
+.oh-page--wide { max-width: var(--maxw-page-wide); }
+.oh-split { display: grid; gap: var(--gap-split); align-items: start; }
+.oh-split--rail { grid-template-columns: 320px 1fr; }   /* T-view: rail + canvas */
+.oh-split--even { grid-template-columns: 1fr 1fr; }
+@media (max-width: 1000px) { .oh-split, .oh-split--rail, .oh-split--even { grid-template-columns: 1fr; } }
+
+/* ---- canonical form / component primitives (one definition for the whole family) ----
+   Per-site twins (.ce-*, .pt-*) should migrate onto these so they can never drift. */
+.oh-pagehead { margin-bottom: 22px; }
+.oh-pagehead h1 { font-family: var(--font-display); font-size: var(--fs-page-title); font-weight: 800; letter-spacing: -.02em; color: var(--fg); margin: 8px 0 0; }
+.oh-pagehead .sub { font-size: 14.5px; line-height: 1.45; color: var(--fg-muted); margin-top: 10px; max-width: 64ch; }
+
+.oh-tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin-bottom: 22px; }
+.oh-tab { padding: 10px 16px; background: transparent; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px;
+          font-family: inherit; font-size: 13.5px; font-weight: 600; color: var(--fg-muted); cursor: pointer; }
+.oh-tab:hover { color: var(--fg); }
+.oh-tab.on { color: var(--accent); border-bottom-color: var(--accent); }
+
+.oh-seg { display: inline-flex; padding: 3px; gap: 3px; background: var(--bg-subtle); border: 1px solid var(--line); border-radius: var(--r-pill); }
+.oh-seg button { padding: 6px 13px; border: none; border-radius: var(--r-pill); background: transparent; font-family: inherit;
+                 font-size: 12.5px; font-weight: 600; color: var(--fg-muted); cursor: pointer; }
+.oh-seg button.on { background: var(--panel); color: var(--accent); box-shadow: var(--e1); }
+
+.oh-switch { width: 40px; height: 23px; border-radius: 999px; border: none; background: var(--line-strong); position: relative; cursor: pointer; transition: background .15s; padding: 0; flex: 0 0 auto; }
+.oh-switch i { position: absolute; top: 2px; left: 2px; width: 19px; height: 19px; border-radius: 50%; background: #fff; transition: transform .15s; }
+.oh-switch.on { background: var(--accent); }
+.oh-switch.on i { transform: translateX(17px); }
+
+.oh-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.oh-table th { text-align: left; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+               color: var(--fg-faint); padding: 0 12px 10px; border-bottom: 1px solid var(--line); }
+.oh-table td { padding: 12px; border-bottom: 1px solid var(--line); color: var(--fg); vertical-align: middle; }
+.oh-table tr:last-child td { border-bottom: none; }
+
+.oh-setrow { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 15px 0; border-bottom: 1px solid var(--line); }
+.oh-setrow:last-child { border-bottom: none; }
+.oh-setrow .info .t { font-size: 14px; font-weight: 600; color: var(--fg); }
+.oh-setrow .info .d { font-size: 12.5px; color: var(--fg-muted); margin-top: 3px; line-height: 1.45; }
+
+.oh-meter { height: 8px; border-radius: 999px; background: var(--bg-subtle); overflow: hidden; }
+.oh-meter > i { display: block; height: 100%; border-radius: 999px; background: var(--accent); transition: width .5s var(--ease); }
+
+.oh-code { background: var(--bg-subtle); border: 1px solid var(--line); border-radius: var(--r-md); font-family: var(--font-mono);
+           font-size: 12.5px; line-height: 1.75; color: var(--fg); padding: 18px 20px; overflow-x: auto; }
+
+.oh-banner { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-radius: var(--r-md);
+             border: 1px solid var(--line); border-left: 3px solid var(--accent); background: var(--accent-weak);
+             font-size: 13px; line-height: 1.45; color: var(--fg); }
+
+.oh-stat { border: 1px solid var(--line); border-radius: var(--r-md); background: var(--panel); padding: 16px 18px; }
+.oh-stat .v { font-family: var(--font-display); font-size: 26px; font-weight: 800; letter-spacing: -.02em; color: var(--fg); }
+.oh-stat .k { font-size: 12px; color: var(--fg-muted); margin-top: 3px; }
+/* shared label + heading primitives */
+.oh-eyebrow { font-family: var(--font-display); font-size: var(--fs-eyebrow); font-weight: 700;
+              letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--accent); }
+.oh-section-label { font-family: var(--font-display); font-size: 13px; font-weight: 700; letter-spacing: .05em;
+                    text-transform: uppercase; color: var(--fg-faint); display: flex; align-items: center; gap: 14px; }
+.oh-section-label::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+.oh-h1 { font-family: var(--font-display); font-size: var(--fs-h1); line-height: 1.05; letter-spacing: -.03em; font-weight: 800; color: var(--fg); margin: 0; text-wrap: balance; }
+.oh-h2 { font-family: var(--font-display); font-size: var(--fs-h2); line-height: 1.1; letter-spacing: -.025em; font-weight: 800; color: var(--fg); margin: 0; text-wrap: balance; }
+.oh-lead { font-size: var(--fs-lead); line-height: var(--lh-lead); color: var(--fg-muted); }
+
+/* ---- shared interactive + account-layer primitives ----
+   Tabs, tables, segmented control, form fields, switch and the settings/billing/
+   usage "setrow". Defined ONCE here; every product (Baltor/OHH/CIE) uses these
+   classes directly so account, billing and usage layouts are identical house-wide. */
+.oh-tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin-bottom: 22px; }
+.oh-tab { padding: 10px 16px; background: transparent; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px;
+          font-family: inherit; font-size: var(--fs-small); font-weight: 600; color: var(--fg-muted); cursor: pointer; }
+.oh-tab:hover { color: var(--fg); }
+.oh-tab.on { color: var(--accent); border-bottom-color: var(--accent); }
+
+.oh-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.oh-table th { text-align: left; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+               color: var(--fg-faint); padding: 0 12px 10px; border-bottom: 1px solid var(--line); }
+.oh-table td { padding: 12px; border-bottom: 1px solid var(--line); color: var(--fg); vertical-align: middle; }
+.oh-table tr:last-child td { border-bottom: none; }
+
+.oh-segment { display: inline-flex; padding: 3px; gap: 3px; background: var(--bg-subtle); border: 1px solid var(--line); border-radius: var(--r-pill); }
+.oh-segment button { padding: 6px 13px; border: none; border-radius: var(--r-pill); background: transparent; font-family: inherit;
+                     font-size: 12.5px; font-weight: 600; color: var(--fg-muted); cursor: pointer; }
+.oh-segment button.on { background: var(--panel); color: var(--accent); box-shadow: var(--e1); }
+
+.oh-field { display: block; margin-bottom: 16px; }
+.oh-field > span { display: block; font-size: 12.5px; font-weight: 600; color: var(--fg-muted); margin-bottom: 7px; }
+.oh-field input, .oh-field textarea, .oh-field select { width: 100%; box-sizing: border-box; font-family: inherit; font-size: 14px;
+              color: var(--fg); background: var(--bg); border: 1px solid var(--line-strong); border-radius: var(--r-md); padding: 11px 13px; }
+.oh-field input:focus, .oh-field textarea:focus, .oh-field select:focus { outline: none; border-color: var(--accent); }
+.oh-input { font-family: inherit; font-size: 13.5px; color: var(--fg); background: var(--bg); border: 1px solid var(--line-strong);
+            border-radius: var(--r-md); padding: 8px 11px; min-width: 240px; }
+.oh-input:focus { outline: none; border-color: var(--accent); }
+/* keyboard users still get a visible ring on inputs (mouse focus keeps the clean border) */
+.oh-input:focus-visible, .oh-field input:focus-visible, .oh-field textarea:focus-visible, .oh-field select:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.oh-setrow { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 15px 0; border-bottom: 1px solid var(--line); }
+.oh-setrow:last-child { border-bottom: none; }
+.oh-setrow .info { min-width: 0; }
+.oh-setrow .info .t { font-size: 14px; font-weight: 600; color: var(--fg); }
+.oh-setrow .info .d { font-size: 12.5px; color: var(--fg-muted); margin-top: 3px; line-height: 1.45; }
+.oh-setrow .ctrl { flex: 0 0 auto; }
+
+/* ============================================================
+   MARKETING SHELL + HERO ENTRY BOX  (artifact ①)
+   ============================================================ */
+.oh-mkt { width: 100%; height: 100%; display: flex; flex-direction: column;
+          background: var(--bg); overflow: hidden; position: relative; }
+.oh-topbar {
+  display: flex; align-items: center; gap: 28px;
+  padding: 0 36px; height: 60px; flex: 0 0 auto;
+  border-bottom: 1px solid var(--line); background: var(--bg);
+}
+.oh-wordmark {
+  font-family: var(--font-display); font-weight: 700; font-size: 18px;
+  letter-spacing: -.01em; color: var(--fg); display: flex; align-items: center; gap: 9px;
+}
+.oh-mark {
+  width: 18px; height: 18px; display: inline-grid; place-items: center;
+  color: var(--accent);
+}
+.oh-nav { display: flex; align-items: center; gap: 22px; margin-left: 8px; }
+.oh-nav a { font-size: 13.5px; color: var(--fg-muted); text-decoration: none; font-weight: 500; }
+.oh-nav a:hover { color: var(--fg); }
+.oh-topbar-spacer { flex: 1; }
+
+.oh-hero {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 0 40px 64px; text-align: center;
+  background:
+    radial-gradient(120% 90% at 50% 0%, var(--bg-subtle) 0%, transparent 55%);
+}
+.oh-hero-title {
+  font-family: var(--font-display); font-weight: 700; font-size: 50px;
+  line-height: 1.05; letter-spacing: -.022em; color: var(--fg); margin: 0 0 14px;
+  white-space: nowrap;
+}
+.oh-hero-sub {
+  font-size: 17px; line-height: 1.5; color: var(--fg-muted);
+  max-width: 540px; margin: 0 auto 34px; text-wrap: balance;
+}
+.oh-entrybox {
+  width: 100%; max-width: 660px; background: var(--panel);
+  border: 1px solid var(--line-strong); border-radius: var(--r-lg);
+  box-shadow: var(--e2); padding: 18px 18px 14px; text-align: left;
+  transition: border-color .15s var(--ease), box-shadow .15s var(--ease);
+}
+.oh-entrybox:focus-within { border-color: var(--accent); }
+.oh-entry-text {
+  font-family: var(--font-sans); font-size: 16.5px; line-height: 1.5;
+  color: var(--fg-faint); min-height: 58px;
+}
+.oh-entry-row { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+.oh-entry-tools { display: flex; align-items: center; gap: 8px; }
+.oh-constraint-add {
+  font-size: 13px; color: var(--fg-muted); display: inline-flex; align-items: center; gap: 6px;
+  border: 1px dashed var(--line-strong); border-radius: var(--r-pill); padding: 5px 11px; cursor: pointer;
+}
+.oh-kbd {
+  font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted);
+  border: 1px solid var(--line); border-radius: 5px; padding: 2px 6px; background: var(--bg-subtle);
+}
+.oh-chips { display: flex; flex-wrap: wrap; gap: 9px; justify-content: center;
+            max-width: 620px; margin: 22px auto 0; }
+.oh-chip {
+  font-size: 13.5px; color: var(--fg); background: var(--panel);
+  border: 1px solid var(--line); border-radius: var(--r-pill);
+  padding: 7px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
+  transition: border-color .12s, color .12s;
+}
+.oh-chip:hover { border-color: var(--accent); color: var(--accent); }
+.oh-chip .tri { color: var(--accent); }
+.oh-quietlinks { margin-top: 30px; display: flex; gap: 8px; align-items: center;
+                 font-size: 13px; color: var(--fg-muted); }
+.oh-quietlinks a { color: var(--fg-muted); text-decoration: none; }
+.oh-quietlinks a:hover { color: var(--fg); }
+.oh-quietlinks .dot { opacity: .5; }
+.oh-howstrip {
+  flex: 0 0 auto; border-top: 1px solid var(--line); background: var(--bg-subtle);
+  display: flex; align-items: center; justify-content: center; gap: 0;
+  padding: 16px 40px; font-size: 12.5px; color: var(--fg-muted);
+}
+.oh-howstrip .step { display: inline-flex; align-items: center; gap: 8px; padding: 0 18px; }
+.oh-howstrip .step b { color: var(--fg); font-weight: 600; }
+.oh-howstrip .arr { color: var(--fg-faint); }
+
+/* ============================================================
+   BUILDER RESULTS — three costed options  (artifact ②)
+   ============================================================ */
+.oh-app { width: 100%; height: 100%; background: var(--bg); overflow: hidden;
+          display: flex; flex-direction: column; }
+.oh-appbar {
+  height: 52px; flex: 0 0 auto; display: flex; align-items: center; gap: 18px;
+  padding: 0 24px; border-bottom: 1px solid var(--line); background: var(--panel);
+}
+.oh-cmdk {
+  flex: 1; max-width: 360px; height: 32px; border: 1px solid var(--line);
+  border-radius: var(--r-sm); background: var(--bg-subtle); display: flex;
+  align-items: center; gap: 8px; padding: 0 10px; font-size: 13px; color: var(--fg-faint);
+}
+.oh-cmdk .oh-kbd { margin-left: auto; }
+.oh-results-head { padding: 26px 32px 6px; }
+.oh-results-head h2 { font-family: var(--font-display); font-size: 22px; font-weight: 700;
+                      letter-spacing: -.01em; margin: 0 0 4px; color: var(--fg); }
+.oh-results-head .task { font-size: 14px; color: var(--fg-muted); display: flex; align-items: center; gap: 8px; }
+.oh-results-head .task .mono { color: var(--fg); }
+.oh-results-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; padding: 18px 32px 28px; }
+.oh-result {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-lg);
+  padding: 16px; display: flex; flex-direction: column; gap: 13px; position: relative;
+}
+.oh-result--rec { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.oh-result-tierrow { display: flex; align-items: center; justify-content: space-between; }
+.oh-tier { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+           color: var(--fg-muted); }
+.oh-tier--rec { color: var(--accent); }
+.oh-rec-badge { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+                color: var(--accent-ink); background: var(--accent); padding: 3px 7px; border-radius: var(--r-pill); }
+.oh-result .count { font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--fg); }
+.oh-result-lift { display: flex; flex-direction: column; gap: 1px; }
+.oh-result-lift .big { font-family: var(--font-display); font-size: 30px; font-weight: 700; color: var(--success);
+                       line-height: 1; letter-spacing: -.01em; }
+.oh-result-lift .sub { font-size: 11px; color: var(--fg-muted); }
+.oh-result-src { font-size: 12.5px; color: var(--fg-muted); line-height: 1.4; }
+.oh-result-src b { color: var(--fg); font-weight: 600; }
+.oh-result-cost { display: flex; align-items: center; justify-content: space-between; gap: 8px;
+                  padding-top: 9px; border-top: 1px dashed var(--line); font-size: 11.5px; color: var(--fg-faint); }
+.oh-result-cost .mono { font-family: var(--font-mono); color: var(--fg-muted); }
+.oh-result-cost .freeze { color: var(--verified); font-weight: 600; }
+.oh-minidag {
+  background: var(--bg-subtle); border: 1px solid var(--line); border-radius: var(--r-md);
+  padding: 16px 12px; display: flex; align-items: center; justify-content: center;
+  gap: 7px; flex-wrap: wrap; min-height: 92px;
+}
+.oh-mininode {
+  width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center;
+  font-size: 13px; color: #fff; position: relative; flex: 0 0 auto;
+}
+.oh-mininode.is-op { border-radius: 50%; background: transparent !important;
+  border: 2px solid var(--operator); color: var(--operator); width: 24px; height: 24px; }
+.oh-miniedge { width: 12px; height: 1.5px; background: var(--line-strong); flex: 0 0 auto; }
+.oh-result-stats { display: flex; flex-direction: column; gap: 9px; }
+.oh-statline { display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
+.oh-statline .lbl { color: var(--fg-muted); }
+.oh-statline .val { color: var(--fg); font-weight: 600; }
+
+/* ============================================================
+   BADGES & CHIPS  (the trust/meaning layer)
+   ============================================================ */
+.oh-badge {
+  display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500;
+  line-height: 1; padding: 4px 9px; border-radius: var(--r-pill);
+  border: 1px solid var(--line); color: var(--fg-muted); white-space: nowrap;
+}
+.oh-badge .gl { font-size: 12px; }
+.oh-badge.mono { font-family: var(--font-mono); font-size: 11.5px; }
+.oh-badge--lift { color: var(--success); border-color: color-mix(in srgb, var(--success) 35%, transparent);
+                  background: color-mix(in srgb, var(--success) 9%, transparent); font-weight: 600; }
+.oh-badge--verified { color: var(--verified); border-color: color-mix(in srgb, var(--verified) 38%, transparent);
+                      background: color-mix(in srgb, var(--verified) 10%, transparent); }
+.oh-badge--warn { color: var(--warning); border-color: color-mix(in srgb, var(--warning) 38%, transparent);
+                  background: color-mix(in srgb, var(--warning) 10%, transparent); }
+.oh-badge--danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 38%, transparent);
+                    background: color-mix(in srgb, var(--danger) 10%, transparent); }
+.oh-badge--muted { color: var(--fg-faint); }
+.oh-badge--stable { color: var(--fg-muted); }
+.oh-execdot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; display: inline-block; }
+
+/* ============================================================
+   COMPONENT CARD + BADGE SYSTEM  (artifact ③)
+   ============================================================ */
+.oh-card-stage { width: 100%; height: 100%; background: var(--bg); overflow: hidden;
+                 padding: 28px; display: flex; flex-direction: column; gap: 20px; }
+.oh-card-stage .stage-head { display: flex; align-items: baseline; justify-content: space-between; }
+.oh-card-stage .stage-head h3 { font-family: var(--font-display); font-size: 17px; font-weight: 700;
+                                 margin: 0; color: var(--fg); }
+.oh-card-stage .stage-head span { font-size: 12.5px; color: var(--fg-muted); }
+
+.oh-comp-card {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-lg);
+  box-shadow: var(--e1); padding: 16px 17px; width: 360px; flex: 0 0 auto;
+  border-top: 3px solid var(--p-action);
+  transition: border-color .12s, box-shadow .12s, transform .12s;
+}
+.oh-comp-card:hover { box-shadow: var(--e2); }
+.oh-cc-top { display: flex; align-items: center; gap: 8px; margin-bottom: 11px; }
+.oh-cc-prim { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700;
+              letter-spacing: .08em; text-transform: uppercase; color: var(--p-action); }
+.oh-cc-prim .sub { color: var(--fg-muted); font-weight: 600; }
+.oh-cc-top .spacer { flex: 1; }
+.oh-cc-kebab { color: var(--fg-faint); cursor: pointer; font-size: 15px; line-height: 1; }
+.oh-cc-name { font-family: var(--font-display); font-size: 19px; font-weight: 650; letter-spacing: -.01em;
+              color: var(--fg); margin: 0 0 3px; }
+.oh-cc-id { font-family: var(--font-mono); font-size: 12px; color: var(--fg-faint);
+            display: flex; align-items: center; gap: 6px; margin-bottom: 9px; white-space: nowrap; }
+.oh-cc-id .copy { opacity: .6; }
+.oh-cc-desc { font-size: 13.5px; line-height: 1.5; color: var(--fg-muted); margin: 0 0 13px;
+              display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.oh-cc-divider { height: 1px; background: var(--line); margin: 0 -17px 12px; }
+.oh-cc-badges { display: flex; flex-wrap: wrap; gap: 7px; }
+
+/* badge-system legend grid */
+.oh-badgesys { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 28px; }
+.oh-badgesys .grp { display: flex; flex-direction: column; gap: 8px; }
+.oh-badgesys .grp .gh { font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+                        color: var(--fg-faint); }
+.oh-badgesys .grp .row { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* ============================================================
+   DAG CANVAS + LEGEND + NODES + OPERATOR  (artifact ④)
+   ============================================================ */
+.oh-canvas-stage { width: 100%; height: 100%; background: var(--bg); overflow: hidden;
+                   display: flex; flex-direction: column; }
+.oh-legend-bar {
+  flex: 0 0 auto; display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+  padding: 12px 20px; border-bottom: 1px solid var(--line); background: var(--panel);
+}
+.oh-legend-bar .lt { font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+                     color: var(--fg-faint); margin-right: 4px; }
+.oh-legend-chip {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500;
+  color: var(--fg); border: 1px solid var(--line); border-radius: var(--r-pill);
+  padding: 4px 10px 4px 6px; cursor: help; background: var(--panel-2);
+}
+.oh-legend-chip .sw { width: 14px; height: 14px; border-radius: 4px; display: grid; place-items: center;
+                      font-size: 9px; color: #fff; flex: 0 0 auto; }
+.oh-legend-chip.is-op .sw { border-radius: 50%; background: transparent !important;
+  border: 1.5px solid var(--operator); color: var(--operator); }
+
+/* ---- FLOW canvas: coordinate-positioned nodes + drawn wiring ---- */
+.oh-flow {
+  flex: 1; position: relative; overflow: hidden;
+  background:
+    radial-gradient(circle at 1px 1px, var(--line) 1px, transparent 0) 0 0 / 22px 22px;
+  background-color: var(--bg-subtle);
+}
+.oh-flow-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible;
+               pointer-events: none; z-index: 0; }
+.oh-fnode {
+  position: absolute; width: 198px; height: 84px; background: var(--panel);
+  border: 1px solid var(--line); border-left: 4px solid var(--nodehue, var(--p-input));
+  border-radius: var(--r-node); box-shadow: var(--e1); padding: 9px 12px; z-index: 1; overflow: hidden;
+}
+.oh-fnode .ftop { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; min-width: 0; }
+.oh-fnode .fp { font-size: 9px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--nodehue);
+                white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.oh-fnode .fsp { flex: 1 1 auto; }
+.oh-fnode .fsub { font-size: 8.5px; font-family: var(--font-mono); color: var(--fg-muted);
+                  border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; flex: 0 0 auto; }
+.oh-fnode .flift { font-size: 10px; font-weight: 700; color: var(--success); flex: 0 0 auto; }
+.oh-fnode .fn { font-size: 12.5px; font-weight: 600; color: var(--fg); line-height: 1.25; margin-bottom: 1px;
+                white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.oh-fnode .fid { font-family: var(--font-mono); font-size: 9.5px; color: var(--fg-faint);
+                 white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.oh-fnode .ff { font-family: var(--font-mono); font-size: 9.5px; color: var(--fg-muted);
+                white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 3px; }
+.oh-fop {
+  position: absolute; height: 38px; padding: 0 14px; border: 2px solid var(--operator);
+  border-radius: var(--r-pill); background: var(--panel); color: var(--operator);
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  font-size: 11px; font-weight: 700; z-index: 1;
+}
+.oh-flbl {
+  position: absolute; z-index: 1; font-size: 9px; font-weight: 600; letter-spacing: .02em;
+  background: var(--bg-subtle); padding: 1px 6px; border-radius: var(--r-pill);
+  white-space: nowrap; transform: translateX(-50%);
+}
+.oh-flbl.loop { color: var(--p-loop); border: 1px solid color-mix(in srgb, var(--p-loop) 40%, transparent); }
+.oh-flbl.pass { color: var(--success); }
+.oh-fcall {
+  position: absolute; z-index: 1; font-size: 8.5px; font-weight: 700; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--accent); background: var(--accent-weak);
+  border-radius: var(--r-pill); padding: 2px 7px; white-space: nowrap;
+}
+.oh-edge-note { font-size: 11px; color: var(--fg-faint); align-self: center; font-style: italic; }
+.oh-validity {
+  position: absolute; bottom: 16px; left: 26px; right: 26px;
+  display: flex; align-items: center; gap: 9px; font-size: 12px; color: var(--success);
+  background: var(--panel); border: 1px solid color-mix(in srgb, var(--success) 30%, var(--line));
+  border-radius: var(--r-md); padding: 8px 12px;
+}
+
+/* ============================================================
+   COMPARISON & RECOMMENDATION  (scored rubric)
+   ============================================================ */
+.oh-cmp { width: 100%; height: 100%; background: var(--bg); overflow: hidden;
+          padding: 34px 38px; display: flex; flex-direction: column; gap: 22px; }
+.oh-cmp h2 { font-family: var(--font-display); font-size: 26px; font-weight: 700;
+             letter-spacing: -.015em; margin: 0; color: var(--fg); }
+.oh-cmp .sub { font-size: 14px; color: var(--fg-muted); margin-top: 4px; }
+.oh-cmp-body { display: grid; grid-template-columns: 1.55fr 1fr; gap: 30px; align-items: start; }
+
+.oh-rubric { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.oh-rubric th, .oh-rubric td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.oh-rubric thead th { font-size: 11px; font-weight: 700; letter-spacing: .04em; color: var(--fg-muted);
+                      text-transform: uppercase; border-bottom: 1px solid var(--line-strong); }
+.oh-rubric .pr { color: var(--fg); font-weight: 500; width: 38%; }
+.oh-rubric .pr small { display: block; color: var(--fg-faint); font-weight: 400; font-size: 11px; margin-top: 1px; }
+.oh-rubric td.sc { text-align: center; font-family: var(--font-mono); font-weight: 600; width: 14%; }
+.oh-rubric tfoot td { font-weight: 700; color: var(--fg); border-top: 2px solid var(--line-strong); border-bottom: none; }
+.oh-rubric tfoot td.sc { color: var(--accent); }
+.oh-sccell { display: inline-flex; align-items: center; gap: 6px; justify-content: center; }
+.oh-scdots { display: inline-flex; gap: 2px; }
+.oh-scdot { width: 5px; height: 5px; border-radius: 50%; background: var(--line-strong); }
+.oh-scdot.on { background: var(--accent); }
+.oh-col-win { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+
+.oh-cmp-aside { display: flex; flex-direction: column; gap: 16px; }
+.oh-pick { background: var(--panel); border: 1px solid var(--accent); border-radius: var(--r-lg);
+           padding: 16px 18px; box-shadow: 0 0 0 1px var(--accent); }
+.oh-pick .tag { font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+                color: var(--accent); }
+.oh-pick h3 { font-family: var(--font-display); font-size: 19px; font-weight: 700; margin: 5px 0 8px; color: var(--fg); }
+.oh-pick p { font-size: 13px; line-height: 1.55; color: var(--fg-muted); margin: 0; }
+.oh-note { border: 1px solid var(--line); border-radius: var(--r-md); padding: 13px 15px; background: var(--panel-2); }
+.oh-note h4 { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+              color: var(--fg-muted); margin: 0 0 8px; }
+.oh-note ul { margin: 0; padding-left: 16px; }
+.oh-note li { font-size: 12.5px; line-height: 1.55; color: var(--fg); margin-bottom: 6px; }
+.oh-note li b { color: var(--accent); font-weight: 600; }
+.oh-note li.risk b { color: var(--danger); }

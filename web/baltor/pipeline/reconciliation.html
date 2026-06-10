@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor · Pipeline · Conflict &amp; Reconciliation</title>
+<meta name="description" content="Stage 3 of the Baltor pipeline: conflicting candidate values are resolved by a deterministic AUTHORITY rule. The winner is served; the loser is held out (preserved), never deleted." />
+<style>
+  :root { --bg:#0d1117; --panel:#161b22; --line:#21262d; --fg:#e6edf3; --mut:#8b949e; --ok:#3fb950; --warn:#d29922; --bad:#f85149; --acc:#58a6ff; --violet:#a47ef7; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  header { padding:14px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  h1 { font-size:15px; margin:0; font-weight:600; }
+  .sub { color:var(--mut); font-size:12px; }
+  button { background:var(--acc); color:#0d1117; border:0; border-radius:6px; padding:8px 14px; font-weight:700; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:wait; }
+  /* pipeline stepper */
+  nav.stepper { display:flex; gap:6px; flex-wrap:wrap; padding:10px 18px; border-bottom:1px solid var(--line); background:rgba(22,27,34,.6); }
+  nav.stepper a { color:var(--mut); text-decoration:none; font-size:11px; padding:5px 9px; border:1px solid var(--line); border-radius:999px; white-space:nowrap; }
+  nav.stepper a:hover { color:var(--fg); border-color:var(--acc); }
+  nav.stepper a.current { color:#0d1117; background:var(--acc); border-color:var(--acc); font-weight:800; }
+  nav.stepper a.current.lossless { background:var(--violet); border-color:var(--violet); }
+  nav.stepper .step-no { opacity:.6; margin-right:4px; }
+  .prevnext { display:flex; gap:8px; align-items:center; margin-left:auto; }
+  .prevnext a { color:var(--acc); text-decoration:none; font-size:12px; }
+  main { display:grid; grid-template-columns:repeat(auto-fill,minmax(360px,1fr)); gap:12px; padding:16px; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:12px; }
+  .panel h2 { font-size:12px; margin:0 0 8px; color:var(--acc); text-transform:uppercase; letter-spacing:.04em; }
+  .panel.lossless { border-color:color-mix(in srgb,var(--violet) 40%,var(--line)); }
+  .panel.lossless h2 { color:var(--violet); }
+  .wide { grid-column:1/-1; }
+  .row { display:flex; justify-content:space-between; gap:8px; padding:3px 0; border-bottom:1px dashed var(--line); }
+  .mut { color:var(--mut); }
+  .pill { display:inline-block; padding:1px 7px; border-radius:999px; font-size:11px; }
+  .pill.ok { background:rgba(63,185,80,.15); color:var(--ok); }
+  .pill.warn { background:rgba(210,153,34,.15); color:var(--warn); }
+  .pill.held { background:rgba(164,126,247,.16); color:var(--violet); }
+  .pill.bad { background:rgba(248,81,73,.13); color:var(--bad); }
+  code { color:var(--acc); word-break:break-all; }
+  .hint { color:var(--mut); font-size:11px; }
+  .empty { color:var(--mut); font-style:italic; }
+  .winner { color:var(--ok); font-weight:700; }
+  .loser { color:var(--violet); text-decoration:line-through; text-decoration-color:rgba(164,126,247,.5); }
+  .vs { display:grid; grid-template-columns:1fr auto 1fr; gap:8px; align-items:center; padding:6px 0; border-bottom:1px dashed var(--line); }
+  .vs .arrow { color:var(--mut); }
+  .legend { padding:0 18px 8px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Baltor · Conflict &amp; Reconciliation</h1>
+  <span class="sub">Stage 3 of 7 · projection-only (this page computes no truth; it reads /api/pipeline/*)</span>
+  <button id="run">Run / Refresh</button>
+  <span id="status" class="sub"></span>
+</header>
+
+<nav class="stepper" id="stepper" aria-label="Pipeline stages"></nav>
+
+<div class="legend hint">
+  Conflicting candidate values are resolved by a <strong>deterministic AUTHORITY rule</strong>, not by recency or vote.
+  The winner (e.g. <span class="winner">"10 business days"</span>) is served; the loser (e.g. <span class="loser">"30 days"</span>)
+  is <span class="pill held">held out</span> &mdash; preserved with its source handle and the rule + receipt, never deleted (lossless).
+</div>
+
+<main id="panels">
+  <div class="panel wide" id="banner"><span class="empty">— click Run / Refresh —</span></div>
+</main>
+
+<script>
+// Projection only: this page fetches the read-only pipeline projection API and RENDERS it.
+// It computes, stores, and mutates NO truth. It fetches ONLY /api/pipeline/* . No client-side truth storage.
+const TENANT = "demo", CORPUS = "cfpb";
+const QS = "?tenant=" + TENANT + "&corpus=" + CORPUS;
+const EP = {
+  overview:       "/api/pipeline/overview" + QS,
+  reconciliation: "/api/pipeline/reconciliation" + QS,
+};
+
+// The 7 canonical stages (shared stepper). This page is "reconciliation".
+const STAGES = [
+  ["upload",         "Upload",          "01"],
+  ["decomposition",  "Decomposition",   "02"],
+  ["reconciliation", "Reconciliation",  "03"],
+  ["enhancement",    "Enhancement",     "04"],
+  ["optimization",   "Optimization",    "05"],
+  ["verification",   "Verification",    "06"],
+  ["consumption",    "Consumption",     "07"],
+];
+const HERE = "reconciliation";
+
+const panels = document.getElementById("panels");
+const statusEl = document.getElementById("status");
+
+function esc(s){ return String(s==null?"":s).replace(/[&<>]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+function panel(title, cls){ const d=document.createElement("div"); d.className="panel"+(cls?(" "+cls):""); const h=document.createElement("h2"); h.textContent=title; d.appendChild(h); panels.appendChild(d); return d; }
+function wide(title, cls){ return panel(title, "wide"+(cls?(" "+cls):"")); }
+function row(p,k,v){ const r=document.createElement("div"); r.className="row"; r.innerHTML=`<span class="mut">${esc(k)}</span><span>${v}</span>`; p.appendChild(r); }
+function empty(p,msg){ const e=document.createElement("div"); e.className="empty"; e.textContent=msg||"(none)"; p.appendChild(e); }
+
+function buildStepper(){
+  const nav = document.getElementById("stepper");
+  const idx = STAGES.findIndex(s => s[0] === HERE);
+  STAGES.forEach(([id,name,no]) => {
+    const a = document.createElement("a");
+    a.href = "./" + id + ".html";
+    a.innerHTML = `<span class="step-no">${no}</span>${esc(name)}`;
+    if (id === HERE) a.className = "current lossless";
+    nav.appendChild(a);
+  });
+  const pn = document.createElement("div"); pn.className = "prevnext";
+  if (idx > 0) { const a=document.createElement("a"); a.href="./"+STAGES[idx-1][0]+".html"; a.textContent="‹ prev"; pn.appendChild(a); }
+  if (idx < STAGES.length-1) { const a=document.createElement("a"); a.href="./"+STAGES[idx+1][0]+".html"; a.textContent="next ›"; pn.appendChild(a); }
+  nav.appendChild(pn);
+}
+
+async function getJSON(url){ const r = await fetch(url); if(!r.ok && r.status>=500) throw new Error("HTTP "+r.status); return r.json(); }
+
+async function run(){
+  const btn=document.getElementById("run"); btn.disabled=true; statusEl.textContent="loading…";
+  [...panels.querySelectorAll(".panel")].forEach(e=>e.remove());
+  const wait = wide("Loading"); empty(wait, "loading reconciliation projection…");
+  try {
+    const [ov, rec] = await Promise.all([
+      getJSON(EP.overview).catch(()=>({})),  // overview is best-effort; degrade gracefully
+      getJSON(EP.reconciliation),
+    ]);
+    [...panels.querySelectorAll(".panel")].forEach(e=>e.remove());
+    render(ov, rec);
+    statusEl.textContent = "projected · read-only";
+  } catch(e){
+    [...panels.querySelectorAll(".panel")].forEach(e=>e.remove());
+    const p = wide("Error"); empty(p, "error loading reconciliation projection: " + e);
+    statusEl.textContent = "error";
+  }
+  btn.disabled=false;
+}
+
+function render(ov, rec){
+  const conflicts = (rec && rec.conflicts) || [];
+
+  // run context (from overview, degrade if absent)
+  let p = wide("Run · this stage");
+  row(p, "run_id", `<code>${esc((ov&&ov.run_id)||"—")}</code>`);
+  const st = ((ov&&ov.stages)||[]).find(s => s.id === HERE) || {};
+  row(p, "conflicts in", st.in_count ?? conflicts.length);
+  row(p, "decisions out", st.out_count ?? conflicts.length);
+  row(p, "values held out", st.held_out_count ?? conflicts.filter(c=>c.decision&&c.decision.held_out_value!=null).length);
+
+  if (!conflicts.length) { const e = wide("Empty"); empty(e, "no conflicts in this run (every fact had a single authoritative value)"); return; }
+
+  // INPUT panel — the competing candidate values for each conflicting fact
+  p = panel("Input · conflicting candidates");
+  conflicts.forEach(c => {
+    const cand = c.candidates || [];
+    row(p, esc(c.fact_key||"fact"), `<span class="pill warn">${cand.length} candidates</span>`);
+    cand.forEach(x => {
+      const r=document.createElement("div"); r.className="row";
+      r.innerHTML = `<span class="mut">↳ <code>${esc(x.source||"")}</code> <span class="hint">authority ${esc(x.authority!=null?x.authority:"—")}</span></span><span>${esc(x.value)}</span>`;
+      p.appendChild(r);
+    });
+  });
+
+  // OUTPUT panel — the deterministic authority decision (winner served)
+  p = panel("Output · authority decision (served)");
+  conflicts.forEach(c => {
+    const d = c.decision || {};
+    const v = document.createElement("div"); v.className="vs";
+    v.innerHTML = `<span class="winner">${esc(d.winner!=null?d.winner:"—")}</span>`
+      + `<span class="arrow">←&nbsp;wins</span>`
+      + `<span class="hint">${esc(c.fact_key||"")}</span>`;
+    p.appendChild(v);
+    row(p, "rule", `<span class="pill ok">${esc(d.rule||"authority")}</span>`);
+    row(p, "receipt", `<code>${esc(d.receipt_id||"—")}</code>`);
+  });
+
+  // LOSSLESS panel — the held-out losing value, preserved with the rule + receipt (never deleted)
+  p = panel("Held out · preserved losers (lossless)", "lossless");
+  row(p, "law", `omitted from the answer ≠ deleted · held out, never forgotten`);
+  let anyHeld = false;
+  conflicts.forEach(c => {
+    const d = c.decision || {};
+    if (d.held_out_value == null) return;
+    anyHeld = true;
+    const v = document.createElement("div"); v.className="vs";
+    v.innerHTML = `<span class="loser">${esc(d.held_out_value)}</span>`
+      + `<span class="arrow">held&nbsp;out</span>`
+      + `<span class="hint">${esc(c.fact_key||"")} · lost to authority</span>`;
+    p.appendChild(v);
+    // the source handle of the losing candidate is preserved
+    const loser = (c.candidates||[]).find(x => String(x.value) === String(d.held_out_value));
+    row(p, `${'<span class="pill held">held out</span>'} source`, `<code>${esc((loser&&loser.source)||"—")}</code>`);
+    row(p, "preserved by rule", esc(d.rule||"authority"));
+    row(p, "receipt (rollback path)", `<code>${esc(d.receipt_id||"—")}</code>`);
+  });
+  if (!anyHeld) empty(p, "no losing values to hold out (decisions were uncontested)");
+
+  // SOURCE-HANDLE / LINEAGE panel
+  p = panel("Source handles · lineage");
+  const handles = [];
+  conflicts.forEach(c => (c.candidates||[]).forEach(x => { if (x.source) handles.push(x.source); }));
+  row(p, "distinct source handles", new Set(handles).size);
+  if (!handles.length) empty(p, "no source handles"); else [...new Set(handles)].forEach(h => row(p, "", `<code>${esc(h)}</code>`));
+  const receipts = conflicts.map(c => (c.decision||{}).receipt_id).filter(Boolean);
+  row(p, "decision receipts", receipts.length);
+  receipts.forEach(rid => row(p, "", `<code>${esc(rid)}</code>`));
+}
+
+buildStepper();
+document.getElementById("run").addEventListener("click", run);
+run();
+</script>
+</body>
+</html>

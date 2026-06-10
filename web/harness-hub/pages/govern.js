@@ -21,11 +21,15 @@
   // Canonical marketing nav items — matches index.html landing header
   var MKT_NAV = [
     ['/pipelines', 'Explore'],
+    ['/compare',   'Compare'],
     ['/solutions', 'SDG solutions'],
-    ['/app',       'Workspace'],
     ['/pricing',   'Pricing'],
     ['/docs',      'Docs'],
     ['/trust',     'Trust']
+  ];
+  var FAMILY_LINKS = [
+    ['https://baltor.ai', 'Baltor'],
+    ['https://aidoneright.dev', 'AI Done Right']
   ];
 
   function mktHeader(activeRoute) {
@@ -35,9 +39,12 @@
         (active ? ' style="color:var(--fg);font-weight:600"' : '') +
         '>' + p[1] + '</a>';
     }).join('');
+    var familyLinks = FAMILY_LINKS.map(function (p) {
+      return '<a href="' + p[0] + '">' + p[1] + '</a>';
+    }).join('');
     return '<header class="pt-mkt-top">' +
       '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG + ' Open Harness Hub</div>' +
-      '<nav>' + navItems + '</nav>' +
+      '<nav>' + navItems + familyLinks + '</nav>' +
       '<span class="pt-spacer"></span>' +
       '<button class="oh-btn oh-btn--ghost oh-btn--sm" data-nav="/signin">Sign in</button>' +
     '</header>';

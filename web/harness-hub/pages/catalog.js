@@ -17,11 +17,15 @@
 
   var MKT_NAV_CATALOG = [
     ['/pipelines', 'Explore'],
+    ['/compare',   'Compare'],
     ['/solutions', 'SDG solutions'],
-    ['/app',       'Workspace'],
     ['/pricing',   'Pricing'],
     ['/docs',      'Docs'],
     ['/trust',     'Trust']
+  ];
+  var FAMILY_LINKS_CATALOG = [
+    ['https://baltor.ai', 'Baltor'],
+    ['https://aidoneright.dev', 'AI Done Right']
   ];
 
   function mktHeaderCatalog(activeRoute) {
@@ -31,9 +35,12 @@
         (active ? ' style="color:var(--fg);font-weight:600"' : '') +
         '>' + p[1] + '</a>';
     }).join('');
+    var familyLinks = FAMILY_LINKS_CATALOG.map(function (p) {
+      return '<a href="' + p[0] + '">' + p[1] + '</a>';
+    }).join('');
     return '<header class="pt-mkt-top">' +
       '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG_CATALOG + ' Open Harness Hub</div>' +
-      '<nav>' + navItems + '</nav>' +
+      '<nav>' + navItems + familyLinks + '</nav>' +
       '<span class="pt-spacer"></span>' +
       '<div style="display:flex;gap:9px">' +
       '<button class="oh-btn oh-btn--ghost oh-btn--sm" data-nav="/signin">Sign in</button>' +

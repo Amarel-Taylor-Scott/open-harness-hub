@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor · Pipeline · Enhancement</title>
+<meta name="description" content="Stage 4 of the Baltor pipeline: reconciled facts are enriched with linked entities, fragility/freshness classes, and deterministic graph edges. Low-confidence enrichments are held out, not served." />
+<style>
+  :root { --bg:#0d1117; --panel:#161b22; --line:#21262d; --fg:#e6edf3; --mut:#8b949e; --ok:#3fb950; --warn:#d29922; --bad:#f85149; --acc:#58a6ff; --violet:#a47ef7; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  header { padding:14px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  h1 { font-size:15px; margin:0; font-weight:600; }
+  .sub { color:var(--mut); font-size:12px; }
+  button { background:var(--acc); color:#0d1117; border:0; border-radius:6px; padding:8px 14px; font-weight:700; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:wait; }
+  /* pipeline stepper */
+  nav.stepper { display:flex; gap:6px; flex-wrap:wrap; padding:10px 18px; border-bottom:1px solid var(--line); background:rgba(22,27,34,.6); }
+  nav.stepper a { color:var(--mut); text-decoration:none; font-size:11px; padding:5px 9px; border:1px solid var(--line); border-radius:999px; white-space:nowrap; }
+  nav.stepper a:hover { color:var(--fg); border-color:var(--acc); }
+  nav.stepper a.current { color:#0d1117; background:var(--acc); border-color:var(--acc); font-weight:800; }
+  nav.stepper a.current.lossless { background:var(--violet); border-color:var(--violet); }
+  nav.stepper .step-no { opacity:.6; margin-right:4px; }
+  .prevnext { display:flex; gap:8px; align-items:center; margin-left:auto; }
+  .prevnext a { color:var(--acc); text-decoration:none; font-size:12px; }
+  main { display:grid; grid-template-columns:repeat(auto-fill,minmax(360px,1fr)); gap:12px; padding:16px; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:12px; }
+  .panel h2 { font-size:12px; margin:0 0 8px; color:var(--acc); text-transform:uppercase; letter-spacing:.04em; }
+  .panel.lossless { border-color:color-mix(in srgb,var(--violet) 40%,var(--line)); }
+  .panel.lossless h2 { color:var(--violet); }
+  .wide { grid-column:1/-1; }
+  .row { display:flex; justify-content:space-between; gap:8px; padding:3px 0; border-bottom:1px dashed var(--line); }
+  .mut { color:var(--mut); }
+  .pill { display:inline-block; padding:1px 7px; border-radius:999px; font-size:11px; }
+  .pill.ok { background:rgba(63,185,80,.15); color:var(--ok); }
+  .pill.warn { background:rgba(210,153,34,.15); color:var(--warn); }
+  .pill.held { background:rgba(164,126,247,.16); color:var(--violet); }
+  .pill.bad { background:rgba(248,81,73,.13); color:var(--bad); }
+  .pill.stable { background:rgba(63,185,80,.15); color:var(--ok); }
+  .pill.volatile { background:rgba(210,153,34,.15); color:var(--warn); }
+  code { color:var(--acc); word-break:break-all; }
+  .hint { color:var(--mut); font-size:11px; }
+  .empty { color:var(--mut); font-style:italic; }
+  .edge { display:grid; grid-template-columns:1fr auto 1fr; gap:8px; align-items:center; padding:4px 0; border-bottom:1px dashed var(--line); }
+  .edge .rel { color:var(--violet); font-size:11px; }
+  .legend { padding:0 18px 8px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Baltor · Enhancement</h1>
+  <span class="sub">Stage 4 of 7 · projection-only (this page computes no truth; it reads /api/pipeline/*)</span>
+  <button id="run">Run / Refresh</button>
+  <span id="status" class="sub"></span>
+</header>
+
+<nav class="stepper" id="stepper" aria-label="Pipeline stages"></nav>
+
+<div class="legend hint">
+  Reconciled facts are <strong>enriched</strong>: linked to canonical entities, classified by
+  <span class="pill volatile">volatility</span>/freshness (when must this be re-verified?), and connected by
+  <strong>deterministic graph edges</strong>. Enrichments below a confidence floor are
+  <span class="pill held">held out</span> &mdash; preserved with their source handle, never served as fact (lossless).
+</div>
+
+<main id="panels">
+  <div class="panel wide" id="banner"><span class="empty">— click Run / Refresh —</span></div>
+</main>
+
+<script>
+// Projection only: this page fetches the read-only pipeline projection API and RENDERS it.
+// It computes, stores, and mutates NO truth. It fetches ONLY /api/pipeline/* . No client-side truth storage.
+const TENANT = "demo", CORPUS = "cfpb";
+const QS = "?tenant=" + TENANT + "&corpus=" + CORPUS;
+const EP = {
+  overview:    "/api/pipeline/overview" + QS,
+  enhancement: "/api/pipeline/enhancement" + QS,
+};
+
+// The 7 canonical stages (shared stepper). This page is "enhancement".
+const STAGES = [
+  ["upload",         "Upload",          "01"],
+  ["decomposition",  "Decomposition",   "02"],
+  ["reconciliation", "Reconciliation",  "03"],
+  ["enhancement",    "Enhancement",     "04"],
+  ["optimization",   "Optimization",    "05"],
+  ["verification",   "Verification",    "06"],
+  ["consumption",    "Consumption",     "07"],
+];
+const HERE = "enhancement";
+
+const panels = document.getElementById("panels");
+const statusEl = document.getElementById("status");
+
+function esc(s){ return String(s==null?"":s).replace(/[&<>]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+function panel(title, cls){ const d=document.createElement("div"); d.className="panel"+(cls?(" "+cls):""); const h=document.createElement("h2"); h.textContent=title; d.appendChild(h); panels.appendChild(d); return d; }
+function wide(title, cls){ return panel(title, "wide"+(cls?(" "+cls):"")); }
+function row(p,k,v){ const r=document.createElement("div"); r.className="row"; r.innerHTML=`<span class="mut">${esc(k)}</span><span>${v}</span>`; p.appendChild(r); }
+function empty(p,msg){ const e=document.createElement("div"); e.className="empty"; e.textContent=msg||"(none)"; p.appendChild(e); }
+function volPill(v){ const cls = /volatile|fragile|high/i.test(String(v))?"volatile":(/stable|low|static/i.test(String(v))?"stable":"warn"); return `<span class="pill ${cls}">${esc(v||"—")}</span>`; }
+function handleOf(e){ return e.source_handle || e.source || e.id || ""; }
+
+function buildStepper(){
+  const nav = document.getElementById("stepper");
+  const idx = STAGES.findIndex(s => s[0] === HERE);
+  STAGES.forEach(([id,name,no]) => {
+    const a = document.createElement("a");
+    a.href = "./" + id + ".html";
+    a.innerHTML = `<span class="step-no">${no}</span>${esc(name)}`;
+    if (id === HERE) a.className = "current lossless";
+    nav.appendChild(a);
+  });
+  const pn = document.createElement("div"); pn.className = "prevnext";
+  if (idx > 0) { const a=document.createElement("a"); a.href="./"+STAGES[idx-1][0]+".html"; a.textContent="‹ prev"; pn.appendChild(a); }
+  if (idx < STAGES.length-1) { const a=document.createElement("a"); a.href="./"+STAGES[idx+1][0]+".html"; a.textContent="next ›"; pn.appendChild(a); }
+  nav.appendChild(pn);
+}
+
+async function getJSON(url){ const r = await fetch(url); if(!r.ok && r.status>=500) throw new Error("HTTP "+r.status); return r.json(); }
+
+async function run(){
+  const btn=document.getElementById("run"); btn.disabled=true; statusEl.textContent="loading…";
+  [...panels.querySelectorAll(".panel")].forEach(e=>e.remove());
+  const wait = wide("Loading"); empty(wait, "loading enhancement projection…");
+  try {
+    const [ov, enh] = await Promise.all([
+      getJSON(EP.overview).catch(()=>({})),  // overview is best-effort; degrade gracefully
+      getJSON(EP.enhancement),
+    ]);
+    [...panels.querySelectorAll(".panel")].forEach(e=>e.remove());
+    render(ov, enh);
+    statusEl.textContent = "projected · read-only";
+  } catch(e){
+    [...panels.querySelectorAll(".panel")].forEach(e=>e.remove());
+    const p = wide("Error"); empty(p, "error loading enhancement projection: " + e);
+    statusEl.textContent = "error";
+  }
+  btn.disabled=false;
+}
+
+function render(ov, enh){
+  const entities = (enh && enh.entities) || [];
+  const fragility = (enh && enh.fragility) || [];
+  const edges = (enh && enh.graph_edges) || [];
+  const held = (enh && enh.held_out) || [];   // optional: enrichments below the confidence floor
+
+  // run context (from overview, degrade if absent)
+  let p = wide("Run · this stage");
+  row(p, "run_id", `<code>${esc((ov&&ov.run_id)||"—")}</code>`);
+  const st = ((ov&&ov.stages)||[]).find(s => s.id === HERE) || {};
+  row(p, "facts in", st.in_count ?? "—");
+  row(p, "enrichments out", st.out_count ?? (entities.length + edges.length));
+  row(p, "enrichments held out", st.held_out_count ?? held.length);
+
+  if (!entities.length && !fragility.length && !edges.length) {
+    const e = wide("Empty"); empty(e, "no enrichments in this run (facts had no linkable entities, fragility, or edges)"); return;
+  }
+
+  // INPUT panel — the reconciled facts being enriched (by id / handle)
+  p = panel("Input · facts to enrich");
+  const factIds = new Set();
+  fragility.forEach(f => factIds.add(f.fact_id));
+  edges.forEach(e => { factIds.add(e.src); factIds.add(e.dst); });
+  row(p, "facts referenced", factIds.size);
+  if (!factIds.size) empty(p, "no facts referenced"); else [...factIds].filter(Boolean).forEach(id => row(p, "", `<code>${esc(id)}</code>`));
+
+  // OUTPUT panel A — linked entities
+  p = panel("Output · linked entities");
+  row(p, "entities", entities.length);
+  if (!entities.length) empty(p, "no entities linked");
+  entities.forEach(e => {
+    const r=document.createElement("div"); r.className="row";
+    const label = e.name || e.label || e.value || e.id || "entity";
+    r.innerHTML = `<span><code>${esc(e.id||label)}</code><br><span class="mut">${esc(e.type||e.kind||"")}</span></span><span>${esc(label)}</span>`;
+    p.appendChild(r);
+  });
+
+  // OUTPUT panel B — fragility / freshness (volatility class + next verify)
+  p = panel("Output · fragility &amp; freshness");
+  row(p, "classified facts", fragility.length);
+  if (!fragility.length) empty(p, "no fragility classes");
+  fragility.forEach(f => {
+    const r=document.createElement("div"); r.className="row";
+    r.innerHTML = `<span><code>${esc(f.fact_id)}</code> ${volPill(f.volatility_class)}</span><span class="mut">re-verify ${esc(f.next_verify_at||"—")}</span>`;
+    p.appendChild(r);
+  });
+
+  // OUTPUT panel C — deterministic graph edges enriching the facts
+  p = panel("Output · graph edges (deterministic)");
+  row(p, "edges", edges.length);
+  if (!edges.length) empty(p, "no graph edges");
+  edges.forEach(e => {
+    const d=document.createElement("div"); d.className="edge";
+    d.innerHTML = `<span><code>${esc(e.src)}</code></span><span class="rel">—${esc(e.rel)}→</span><span><code>${esc(e.dst)}</code></span>`;
+    p.appendChild(d);
+  });
+
+  // LOSSLESS panel — enrichments held out (below the confidence floor), preserved not deleted
+  p = panel("Held out · low-confidence enrichments (lossless)", "lossless");
+  row(p, "law", `omitted from the answer ≠ deleted · held out, never forgotten`);
+  row(p, "held out", held.length);
+  if (!held.length) {
+    empty(p, "no enrichments held out — but volatile facts below are flagged, not promoted as permanent fact");
+    // even with no explicit held_out, volatile facts are the "fragile, hold-for-reverify" surface
+    fragility.filter(f => /volatile|fragile|high/i.test(String(f.volatility_class))).forEach(f =>
+      row(p, `${'<span class="pill held">fragile</span>'} <code>${esc(f.fact_id)}</code>`, `<span class="mut">re-verify by ${esc(f.next_verify_at||"—")}</span>`));
+  } else {
+    held.forEach(h => {
+      const r=document.createElement("div"); r.className="row";
+      r.innerHTML = `<span>${'<span class="pill held">held out</span>'} <code>${esc(handleOf(h))}</code><br><span class="mut">${esc(h.reason||h.text||"")}</span></span>`;
+      p.appendChild(r);
+    });
+  }
+
+  // SOURCE-HANDLE / LINEAGE panel
+  p = panel("Source handles · lineage");
+  const handles = [];
+  entities.forEach(e => { const h=handleOf(e); if (h) handles.push(h); });
+  held.forEach(h => { const x=handleOf(h); if (x) handles.push(x); });
+  row(p, "distinct source handles", new Set(handles).size);
+  if (!handles.length) empty(p, "source handles flow from upstream reconciliation/decomposition"); else [...new Set(handles)].forEach(h => row(p, "", `<code>${esc(h)}</code>`));
+  row(p, "lineage", "enrichment ← reconciliation ← decomposition ← upload");
+}
+
+buildStepper();
+document.getElementById("run").addEventListener("click", run);
+run();
+</script>
+</body>
+</html>

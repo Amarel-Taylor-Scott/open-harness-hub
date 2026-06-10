@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor — Dev Flywheel</title>
+<style>
+  /* Dark ops surface (docs/standards/DESIGN.md); DEV view uses a blue accent to distinguish it from
+     the emerald ops/admin dashboard. */
+  :root{
+    --bg:#0a0d14; --panel:#121723; --panel2:#0e131d; --line:#1f2734; --ink:#e6edf6; --muted:#8aa0b6;
+    --blue:#5aa0ff; --emerald:#34d39a; --amber:#f5a623; --red:#ff6b6b; --purple:#a98bff;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --max:1180px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.45}
+  .wrap{max-width:var(--max);margin:0 auto;padding:20px 18px 60px}
+  header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:4px}
+  h1{font-size:19px;margin:0;letter-spacing:.2px}
+  h1 b{color:var(--blue)}
+  .sub{color:var(--muted);font-size:12.5px}
+  .right{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .badge{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:3px 9px;color:var(--muted)}
+  .badge.live{color:var(--emerald);border-color:#1c5a44}
+  .badge.stale{color:var(--amber);border-color:#5a4420}
+  .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0 18px}
+  .metric{border:1px solid var(--line);background:var(--panel);border-radius:11px;padding:11px 13px}
+  .ml{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+  .mv{font-family:var(--mono);font-size:22px;margin-top:5px}
+  .mv.good{color:var(--emerald)} .mv.bad{color:var(--red)} .mv.blue{color:var(--blue)}
+  .ms{font-size:11px;color:var(--muted);margin-top:2px}
+  .grid2{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
+  @media(max-width:900px){.grid2{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}}
+  .card{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:14px;margin-bottom:14px}
+  .card h2{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:0 0 11px}
+  /* proofs grid */
+  .proofs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
+  .proof{display:flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--panel2);border-radius:8px;padding:6px 8px;font-family:var(--mono);font-size:11px;cursor:default}
+  .proof .dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--emerald)}
+  .proof.bad{border-color:#5a2424;background:#1b1113}
+  .proof.bad .dot{background:var(--red)}
+  .proof .lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  /* history sparkbars */
+  .spark{display:flex;align-items:flex-end;gap:3px;height:64px;margin-top:4px}
+  .bar{flex:1;background:var(--blue);border-radius:2px 2px 0 0;min-height:2px;opacity:.85}
+  .bar.red{background:var(--red)}
+  /* timeline */
+  .pass{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+  .pass:last-child{border-bottom:0}
+  .pass .pid{font-family:var(--mono);color:var(--blue);font-size:12px;min-width:34px}
+  .pass .pmeta{font-size:11px;color:var(--muted)}
+  /* backlog */
+  .bk{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px dashed var(--line)}
+  .bk:last-child{border-bottom:0}
+  .tag{font-family:var(--mono);font-size:10px;border-radius:5px;padding:2px 6px;flex:none}
+  .tag.done{color:var(--emerald);background:#10241c}
+  .tag.parked{color:var(--amber);background:#241c0e}
+  .tag.open{color:var(--blue);background:#10192a}
+  .sec{font-family:var(--mono);font-size:10px;color:var(--muted);flex:none;min-width:74px}
+  footer{margin-top:18px;color:var(--muted);font-size:11px}
+  code{font-family:var(--mono)}
+  a{color:var(--blue);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Baltor — <b>Dev Flywheel</b></h1>
+      <div class="sub">the builder's view — proof health, flywheel ticks, pass history &amp; backlog. (Separate from the ops <a href="/dashboard">/dashboard</a>.)</div>
+    </div>
+    <div class="right">
+      <span class="badge" id="refresh">polling…</span>
+      <span class="badge" id="tickage">—</span>
+    </div>
+  </header>
+
+  <div class="metrics">
+    <div class="metric"><div class="ml">Flywheel</div><div class="mv" id="m-fly">—</div><div class="ms" id="m-fly-s">proof contracts</div></div>
+    <div class="metric"><div class="ml">Connected engines</div><div class="mv blue" id="m-eng">—</div><div class="ms">emit onto one bus</div></div>
+    <div class="metric"><div class="ml">Review pack</div><div class="mv" id="m-rev">—</div><div class="ms" id="m-rev-s">independent checks</div></div>
+    <div class="metric"><div class="ml">Passes shipped</div><div class="mv blue" id="m-pass">—</div><div class="ms" id="m-pass-s">receipts</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Flywheel proofs <span id="proofs-count" class="sub"></span></h2>
+    <div class="proofs" id="proofs"></div>
+  </div>
+
+  <div class="card">
+    <h2>Pipeline runtime <span id="pipe-sum" class="sub"></span></h2>
+    <div class="proofs" id="pipelines"></div>
+    <div class="sub" id="pipe-runs" style="margin-top:11px"></div>
+  </div>
+
+  <div class="card">
+    <h2>Durable runtime <span id="dur-mode" class="sub"></span></h2>
+    <div class="proofs" id="durable-q"></div>
+    <div class="sub" id="durable-meta" style="margin-top:11px"></div>
+  </div>
+
+  <div class="card">
+    <h2>Context &amp; tool registry <span id="reg-total" class="sub"></span></h2>
+    <div class="proofs" id="registry"></div>
+    <div class="sub" id="mcp" style="margin-top:11px"></div>
+  </div>
+
+  <div class="grid2">
+    <div>
+      <div class="card">
+        <h2>Development timeline (newest first)</h2>
+        <div id="passes"></div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <h2>Flywheel ticks (green / total)</h2>
+        <div class="spark" id="spark"></div>
+        <div class="sub" id="spark-s" style="margin-top:6px"></div>
+      </div>
+      <div class="card">
+        <h2>Backlog</h2>
+        <div id="backlog"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer id="prov">reads: .agent/flywheel-health.jsonl · .agent/baltor-goal-loop-log.md · research/future-ideas.md · review-pack — API same-origin (<code>/api/dev/status</code>)</footer>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => (s==null?'':String(s)).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function ago(ts){
+  if(!ts) return '—';
+  const t = Date.parse(ts.replace(' ','T')); if(isNaN(t)) return ts;
+  const s = Math.max(0,(Date.now()-t)/1000);
+  if(s<90) return Math.round(s)+'s ago';
+  if(s<5400) return Math.round(s/60)+'m ago';
+  return Math.round(s/3600)+'h ago';
+}
+function render(d){
+  const fw = d.flywheel;
+  // metrics
+  if(fw){
+    $('#m-fly').textContent = `${fw.green_count}/${fw.total}`;
+    $('#m-fly').className = 'mv ' + (fw.all_green ? 'good':'bad');
+    $('#m-fly-s').textContent = fw.all_green ? 'all green' : `${fw.red.length} RED: ${fw.red.join(', ')}`;
+    const stale = fw.ts && (Date.now()-Date.parse(fw.ts.replace(' ','T')))/1000 > 1200;
+    $('#tickage').textContent = 'last tick ' + ago(fw.ts);
+    $('#tickage').className = 'badge ' + (stale ? 'stale':'live');
+  }
+  $('#m-eng').textContent = (d.engines && d.engines.phrase) ? d.engines.phrase.replace(' modules CONNECTED','') : '—';
+  const rv = d.review || {};
+  $('#m-rev').textContent = (rv.passed!=null) ? `${rv.passed}/${rv.total}` : '—';
+  $('#m-rev').className = 'mv ' + (rv.passed!=null && rv.passed===rv.total ? 'good':'');
+  $('#m-rev-s').textContent = rv.verdict ? rv.verdict.replace(/[^\x00-\x7F]/g,'').trim() : 'independent checks';
+  $('#m-pass').textContent = (d.passes||[]).length ? (d.passes[0].id || (d.passes.length)) : '—';
+  $('#m-pass-s').textContent = (d.passes||[]).length ? `latest of ${d.passes.length} shown` : 'receipts';
+
+  // proofs grid (failures first — parser already sorts)
+  const proofs = (fw && fw.proofs) || [];
+  $('#proofs-count').textContent = proofs.length ? `(${proofs.filter(p=>p.ok).length}/${proofs.length})` : '';
+  $('#proofs').innerHTML = proofs.map(p =>
+    `<div class="proof ${p.ok?'':'bad'}" title="${esc(p.detail)}"><span class="dot"></span><span class="lbl">${esc(p.label)}</span></div>`
+  ).join('') || '<span class="sub">no flywheel record yet — run scripts/baltor_flywheel.py --once</span>';
+
+  // history sparkbars
+  const hist = d.history || [];
+  const maxT = Math.max(1, ...hist.map(h=>h.total||0));
+  $('#spark').innerHTML = hist.map(h => {
+    const pct = Math.round(100*((h.green_count||0)/maxT));
+    return `<div class="bar ${h.all_green?'':'red'}" style="height:${Math.max(3,pct)}%" title="${esc(h.ts)} — ${h.green_count}/${h.total}"></div>`;
+  }).join('') || '<span class="sub">no ticks yet</span>';
+  $('#spark-s').textContent = hist.length ? `${hist.length} recent ticks · oldest ${ago(hist[0].ts)} → newest ${ago(hist[hist.length-1].ts)}` : '';
+
+  // timeline
+  $('#passes').innerHTML = (d.passes||[]).map(p =>
+    `<div class="pass"><div class="pid">${esc(p.id||'·')}</div><div><div>${esc(p.title)}</div><div class="pmeta">${esc(p.date||'')}</div></div></div>`
+  ).join('') || '<span class="sub">no passes recorded</span>';
+
+  // backlog
+  $('#backlog').innerHTML = (d.backlog||[]).map(b => {
+    const sec = (b.section||'').split('—')[0].trim().slice(0,10);
+    return `<div class="bk"><span class="sec">${esc(sec)}</span><span class="tag ${b.status}">${b.status}</span><span>${esc(b.title)}</span></div>`;
+  }).join('') || '<span class="sub">no backlog items</span>';
+
+  // context & tool registry (the substrate made visible) + MCP
+  const reg = d.registry || {types:{}, total:0, type_count:0};
+  $('#reg-total').textContent = `(${reg.total} components · ${reg.type_count} types)`;
+  $('#registry').innerHTML = Object.entries(reg.types||{}).sort((a,b)=>b[1]-a[1]).map(([k,v])=>
+    `<div class="proof" title="${esc(k)}"><span class="dot" style="background:var(--blue)"></span><span class="lbl">${esc(k)} · <b>${v}</b></span></div>`
+  ).join('') || '<span class="sub">no catalog found</span>';
+  const mcp = d.mcp || {servers:[], count:0};
+  $('#mcp').innerHTML = `<b>MCP / gateway bridges:</b> ${mcp.count} — ${(mcp.servers||[]).map(esc).join(', ')||'none'} · manifest scanner ${mcp.scanner?'✓ wired':'—'}`;
+
+  // pipeline runtime (projection from the run ledger — source of truth)
+  const pr = d.pipelines || {registered:[], active:0, experimental:0};
+  $('#pipe-sum').textContent = `(${pr.active} active · ${pr.experimental} experimental · ${(pr.overview&&pr.overview.artifacts)||0} artifacts)`;
+  $('#pipelines').innerHTML = (pr.registered||[]).map(p=>{
+    const col = p.status==='active'?'var(--emerald)':(p.status==='experimental'?'var(--amber)':'var(--muted)');
+    return `<div class="proof" title="${esc(p.status)}"><span class="dot" style="background:${col}"></span><span class="lbl">${esc(p.ref)}</span></div>`;
+  }).join('') || '<span class="sub">no pipelines</span>';
+  const rb = (pr.overview&&pr.overview.runs_by_status)||{};
+  const recent = (pr.recent_runs||[]).slice(0,5).map(r=>`${esc(r.run_id)} ${esc(r.pipeline_version)} ${esc(r.tenant_id)}:${esc(r.status)}`).join(' · ');
+  $('#pipe-runs').innerHTML = `<b>runs:</b> ${Object.entries(rb).map(([k,v])=>k+' '+v).join(' · ')||'none'}${recent?' — '+recent:''}`;
+
+  // durable runtime (projection from the durable store — the source of truth, not the dashboard)
+  const du = d.durable || {mode:'off', queues:{}, events:0};
+  const statusColor = du.status==='ok'?'var(--emerald)':(du.status==='off'?'var(--muted)':'var(--red)');
+  $('#dur-mode').innerHTML = `(<span style="color:${statusColor}">${esc(du.mode)} · ${esc(du.status)}</span> · ${du.events} durable events)`;
+  const lanes = Object.entries(du.queues||{});
+  $('#durable-q').innerHTML = lanes.length ? lanes.map(([q,st])=>{
+    const dead = (st.dead||0)>0 ? ` <b style="color:var(--red)">dlq ${st.dead}</b>` : '';
+    return `<div class="proof" title="${esc(q)}"><span class="dot" style="background:${(st.dead||0)>0?'var(--red)':'var(--amber)'}"></span><span class="lbl">${esc(q.replace('flywheel.',''))} · q${st.queued||0}/c${st.claimed||0}/done${st.done||0}${dead}</span></div>`;
+  }).join('') : '<span class="sub">no durable jobs yet — POST /api/dev/enqueue</span>';
+  $('#durable-meta').innerHTML = `<b>durable db:</b> <code>${esc(du.db||'—')}</code>` + (du.error?` · <span style="color:var(--red)">error: ${esc(du.error)}</span>`:' · no errors');
+}
+async function tick(){
+  try{
+    const r = await fetch('/api/dev/status', {cache:'no-store'});
+    const d = await r.json();
+    render(d);
+    $('#refresh').textContent = 'live · refreshed ' + new Date().toLocaleTimeString();
+    $('#refresh').className = 'badge live';
+  }catch(e){
+    $('#refresh').textContent = 'offline (serve via baltor_admin_demo_server.py)';
+    $('#refresh').className = 'badge stale';
+  }
+}
+tick(); setInterval(tick, 5000);
+</script>
+</body>
+</html>

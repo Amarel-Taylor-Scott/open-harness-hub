@@ -7,6 +7,13 @@ target codebase") this is a **no-build static front-end** — plain HTML + one v
 file + the prototype's own CSS, ported verbatim. No Node toolchain, deployable as static
 files or behind the existing showcase server.
 
+Open Harness Hub is the open builder/catalog surface in the three-site platform story:
+**AI Done Right** is the parent platform site, **Baltor** is the paid context-control
+product, and **Open Harness Hub** is the open funnel for governed harnesses that can consume
+Baltor context when live verified facts are needed. Keep OHH navigation linked to both
+family sites so users understand when they are building a workflow versus subscribing to or
+serving verified context.
+
 The locked design direction is **Scheme S · Harness House** (Space Grotesk display · Inter
 UI · JetBrains Mono · refined-ember accent coupled to the Action primitive · verified-teal
 moat color). The bottom-left switcher previews all 9 directions (A–H, S) × light/dark.

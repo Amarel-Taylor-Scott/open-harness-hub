@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor · Shared LLM Plane (Inference Gateway · projection-only)</title>
+<meta name="description" content="A read-only projection over the live /api/inference/* Shared LLM Plane: the provider graph, free-endpoint due-diligence, preference coverage and health. Model output is a CANDIDATE, never served truth; no keys are ever exposed. This page computes no truth." />
+<style>
+  :root { --bg:#0d1117; --panel:#161b22; --line:#21262d; --fg:#e6edf3; --mut:#8b949e; --ok:#3fb950; --warn:#d29922; --bad:#f85149; --acc:#58a6ff; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  header { padding:14px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  h1 { font-size:15px; margin:0; font-weight:600; }
+  .sub { color:var(--mut); font-size:12px; }
+  .banner { padding:8px 18px; background:rgba(88,166,255,.08); border-bottom:1px solid var(--line); color:var(--mut); font-size:12px; }
+  .banner strong { color:var(--acc); }
+  button { background:var(--acc); color:#0d1117; border:0; border-radius:6px; padding:8px 14px; font-weight:700; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:wait; }
+  label { color:var(--mut); font-size:11px; text-transform:uppercase; letter-spacing:.04em; display:block; margin:0 0 4px; }
+  textarea { background:#0d1117; color:var(--fg); border:1px solid var(--line); border-radius:6px; padding:7px 10px; font:inherit; width:100%; min-height:90px; resize:vertical; white-space:pre; }
+  main { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:12px; padding:16px; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:12px; }
+  .panel h2 { font-size:12px; margin:0 0 8px; color:var(--acc); text-transform:uppercase; letter-spacing:.04em; }
+  .wide { grid-column:1/-1; }
+  .row { display:flex; justify-content:space-between; gap:8px; padding:3px 0; border-bottom:1px dashed var(--line); }
+  .mut { color:var(--mut); }
+  .pill { display:inline-block; padding:1px 7px; border-radius:999px; font-size:11px; }
+  .pill.ok { background:rgba(63,185,80,.15); color:var(--ok); }
+  .pill.warn { background:rgba(210,153,34,.15); color:var(--warn); }
+  .pill.bad { background:rgba(248,81,73,.13); color:var(--bad); }
+  code { color:var(--acc); word-break:break-all; }
+  .empty { color:var(--mut); font-style:italic; }
+  .err { color:var(--bad); }
+  pre { white-space:pre-wrap; word-break:break-word; max-height:280px; overflow:auto; margin:8px 0 0; color:var(--mut); background:#0d1117; border:1px solid var(--line); border-radius:6px; padding:8px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Shared LLM Plane <span class="sub">· Inference Gateway / OIPS · projection-only</span></h1>
+  <span class="sub">All model/embedding calls route through one governed plane.</span>
+</header>
+<div class="banner">
+  <strong>Projection only.</strong> This page reads the live <code>/api/inference/*</code> API and renders it — it computes no truth.
+  Model output is a <strong>CANDIDATE</strong>, never served truth; every provider shows only a <code>has_secret_ref</code> boolean — <strong>no key is ever exposed</strong>.
+</div>
+<main>
+  <section class="panel"><h2>Providers (numeric-coded)</h2><div id="providers" class="empty">loading…</div></section>
+  <section class="panel"><h2>Health (offline-honest)</h2><div id="health" class="empty">loading…</div></section>
+  <section class="panel"><h2>Free / limited endpoints (due-diligence)</h2><div id="free" class="empty">loading…</div></section>
+  <section class="panel"><h2>Preference coverage</h2><div id="prefs" class="empty">loading…</div></section>
+  <section class="panel wide">
+    <h2>structured-local — candidate output, never truth</h2>
+    <p class="mut">Runs the deterministic LOCAL STUB through the gateway and shows the <code>ModelInvocationReceipt</code> (what actually executed + the fallback trail). The output is labelled a candidate.</p>
+    <label for="layers">InferencePreference layers (JSON array)</label>
+    <textarea id="layers">[{"preference_id":"demo","model_class_preference":{"tier_code":400,"specialization_codes":[300]},"allowed_provider_nodes":["model.local_stub@v1"],"disallowed_provider_nodes":[],"fallback_policy":{},"data_policy":{}}]</textarea>
+    <p><button id="run">Run structured-local</button></p>
+    <div id="infer" class="empty">no run yet</div>
+  </section>
+</main>
+<script>
+const j = (o) => JSON.stringify(o, null, 2);
+async function getj(path){ const r = await fetch(path); return { ok:r.ok, code:r.status, body: await r.json() }; }
+function rows(el, pairs){ el.innerHTML = pairs.map(([k,v]) => `<div class="row"><span class="mut">${k}</span><span>${v}</span></div>`).join("") || '<span class="empty">none</span>'; }
+
+async function load(){
+  try {
+    const p = await getj("/api/inference/providers");
+    rows(document.getElementById("providers"), (p.body.providers||[]).map(x =>
+      [`<code>${x.node_id}</code>`, `tier ${x.tier_code} · <span class="pill ${x.external?'warn':'ok'}">${x.external?'external':'local'}</span> · key:${x.has_secret_ref?'ref':'—'}`]));
+    const h = await getj("/api/inference/health");
+    rows(document.getElementById("health"), (h.body.health||[]).map(x =>
+      [`<code>${x.provider_node_id}</code>`, `<span class="pill ${x.status==='healthy_local'?'ok':'warn'}">${x.status}</span> · live_checked:${x.live_checked}`]));
+    const f = await getj("/api/inference/free-endpoints");
+    rows(document.getElementById("free"), (f.body.free_endpoints||[]).map(x =>
+      [`<code>${x.endpoint_id||x.name||'?'}</code>`, `<span class="pill ${x.disposition==='quarantine'?'bad':'warn'}">${x.class_label||x.disposition||'candidate'}</span> · truth:${x.is_truth}`]));
+    const pr = await getj("/api/inference/preferences");
+    const fams = (pr.body.families||pr.body.object_families||[]);
+    rows(document.getElementById("prefs"), [
+      ["by_reference_only", String(pr.body.by_reference_only)],
+      ["inline_raw_forbidden", String(pr.body.inline_raw_preference_forbidden)],
+      ["families", String(fams.length||0)]]);
+  } catch (e) { document.getElementById("providers").innerHTML = `<span class="err">${e}</span>`; }
+}
+document.getElementById("run").addEventListener("click", async () => {
+  const btn = document.getElementById("run"); const out = document.getElementById("infer");
+  btn.disabled = true; out.className = ""; out.textContent = "running…";
+  try {
+    let layers; try { layers = JSON.parse(document.getElementById("layers").value); } catch (e) { out.innerHTML = `<span class="err">invalid JSON: ${e}</span>`; btn.disabled=false; return; }
+    const r = await fetch("/api/inference/structured-local", { method:"POST", headers:{"content-type":"application/json"},
+      body: JSON.stringify({ object_id:"demo.object", preference_layers:layers, input_text:"hello plane" }) });
+    const b = await r.json();
+    out.innerHTML = `<div class="row"><span class="mut">is_truth</span><span class="pill ${b.is_truth?'bad':'ok'}">${b.is_truth}</span></div>` +
+      `<div class="row"><span class="mut">executed</span><span><code>${(b.receipt||{}).selected_provider_node_id||'?'}</code></span></div>` +
+      `<pre>${j(b)}</pre>`;
+  } catch (e) { out.innerHTML = `<span class="err">${e}</span>`; }
+  btn.disabled = false;
+});
+load();
+</script>
+</body>
+</html>
