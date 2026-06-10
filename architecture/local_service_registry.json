@@ -892,6 +892,44 @@
       "status": "active_local"
     },
     {
+      "service_id": "teleon_app",
+      "display_name": "Teleon.dev full-design app (purpose-driven runtime site, wired kit seams)",
+      "owner": "teleon",
+      "port": 8003,
+      "process_group": "teleon_app",
+      "env": {
+        "OH_PRODUCT": "teleon"
+      },
+      "start_command": [
+        "python3",
+        "-m",
+        "scripts.showcase",
+        "--port",
+        "8003"
+      ],
+      "stop_command": null,
+      "health_url": "http://127.0.0.1:8003/api/health",
+      "ready_url": "http://127.0.0.1:8003/api/health",
+      "public_routes": [
+        "/"
+      ],
+      "private_routes": [],
+      "env_file": null,
+      "allowed_consumers": [
+        "browser_user",
+        "demo_reviewer"
+      ],
+      "auth_mode": "anonymous_demo_read",
+      "data_classes": [
+        "public"
+      ],
+      "logs_path": "dist/local-services/teleon_app.log",
+      "screenshot_required": false,
+      "trycloudflare_required": false,
+      "status": "active_local",
+      "notes": "web/teleon = the full-design Teleon surface transplanted by scripts/port_full_design_to_web.py (kit seams: same-origin identity/registry/analytics). The PurposeTask runtime itself is the separate greenfield build (prompts/teleon-build-kit.md); the site's deep runtime surfaces remain designed prototypes, captioned as such."
+    },
+    {
       "service_id": "baltor_admin_demo_server",
       "display_name": "Baltor live-ops backend (event bus, pipeline runs, context gateway, admin demo APIs)",
       "owner": "baltor",

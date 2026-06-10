@@ -103,6 +103,21 @@ Wired (REAL, with honest fallback when a service is down — the kit never fabri
   remain held by design with reasons recorded in `architecture/local_service_registry.json`
   (owner-gated portfolio items — none are in the OHH demo path).
 
+## Addendum 2026-06-10 (Teleon pass) — the fourth wired app, verified publicly
+
+- **web/teleon** (`teleon_app` :8003, `OH_PRODUCT=teleon`): the cleanest kit-reference surface,
+  transplanted with the same generated pipeline (entry → index.html, kit copies byte-identical,
+  seams injected; the PurposeTask Control Tower page ported alongside). No legacy page existed.
+- **`e2e/teleon_gate.mjs` 14/14, locally AND against the public tunnel**: 27/27 routes ×2 modes
+  console-clean · REAL `teleon`-realm sign-up · REAL key mint (shown-once) + revoke · registry
+  200 / beacon 202 · `?exp=teleon_hero:D` forcing · theme toggle · ⌘K (app shell) · tower clean.
+- Parity vs `screens/04-teleon.png`: exact; deltas = `teleon_hero`/`teleon_landing` variants (the
+  A/B chip shows the active variant by design). Gate-authoring notes: URL forcing lives in the
+  engine's in-memory overrides (assert `OHExp.variant()`, not localStorage); the palette mounts
+  in the app shell, not the marketing landing.
+- Video: `journey-4-teleon.mp4` (88s · 25 chapters · recorded through the tunnel); brief:
+  `docs/status/teleon-demo.md`.
+
 ## Decisions (recorded; revisit when deepening the wiring)
 
 - The OHH logged-in console pages (`/build` confirm, `/results` tiers, `/flow` canvas) keep their

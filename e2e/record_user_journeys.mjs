@@ -27,18 +27,20 @@ function readDist(name) {
   return existsSync(p) ? readFileSync(p, 'utf-8').trim() : '';
 }
 const TOKEN = readDist('showcase-token.txt');
-const OHH_SHARE = readDist('showcase-share-url-harness-hub.txt');
 
-// the OHH journey records through the PUBLIC tunnel when it answers; honest local fallback
-async function ohhBase() {
-  if (OHH_SHARE) {
+// product journeys record through their PUBLIC tunnel when it answers; honest local fallback
+async function publicBase(shareFile, localUrl) {
+  const share = readDist(shareFile);
+  if (share) {
     try {
-      const res = await fetch(new URL(OHH_SHARE).origin + '/api/health', { signal: AbortSignal.timeout(8000) });
-      if (res.ok) return { url: OHH_SHARE, public: true, host: new URL(OHH_SHARE).host };
+      const res = await fetch(new URL(share).origin + '/api/health', { signal: AbortSignal.timeout(8000) });
+      if (res.ok) return { url: share, public: true, host: new URL(share).host };
     } catch (e) { /* tunnel down */ }
   }
-  return { url: `http://127.0.0.1:8000/?token=${encodeURIComponent(TOKEN)}`, public: false, host: '127.0.0.1:8000' };
+  return { url: localUrl, public: false, host: new URL(localUrl).host };
 }
+const ohhBase = () => publicBase('showcase-share-url-harness-hub.txt', `http://127.0.0.1:8000/?token=${encodeURIComponent(TOKEN)}`);
+const teleonBase = () => publicBase('showcase-share-url-teleon.txt', 'http://127.0.0.1:8003/');
 
 async function launchRecorder() {
   const browser = await chromium.launch({ channel: 'chrome', headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage'] });
@@ -262,15 +264,72 @@ async function portfolioJourney(page, h) {
   await h.pause(2400);
 }
 
+/* ============ JOURNEY 4 — Teleon through the PUBLIC URL (runtime SaaS, kit reference) ============ */
+async function teleonJourney(page, h, base) {
+  const email = `journey-teleon-${Date.now()}@example.test`;
+  await h.go(base.url, base.public
+    ? `Teleon.dev — live on the public link: ${base.host}`
+    : 'Teleon.dev — the purpose-driven runtime', 4000);
+  await h.hud('Capabilities, not code — the hero ships with live A/B variants (see the chip)');
+  await h.scrollTour(3);
+  for (const section of ['How it works', 'Lifecycle', 'Where it fits']) {
+    await h.click(page.locator('nav a', { hasText: section }), section, { optional: true, settleMs: 1500 });
+  }
+  await h.nav('#/cases', 'Case studies', 1600);
+  await h.nav('#/pricing', 'Pricing', 1700);
+  await h.nav('#/docs', 'Docs', 1600);
+
+  await h.nav('#/signup', 'Create a REAL account — Teleon has its own identity realm (no SSO)');
+  await h.type('input[type="email"], input[placeholder*="mail" i]', email);
+  await h.type('input[type="password"]', 'journey-passphrase-4');
+  await h.click('button:has-text("Create"), button[type="submit"]', 'Real register → onboarding → session');
+  await h.pause(3600);
+
+  await h.nav('#/dashboard', 'The console — capabilities, runs, evidence', 1900);
+  await h.scrollTour(2);
+  await page.keyboard.press('Control+k');
+  await h.pause(900);
+  await h.hud('⌘K — the command palette, on every app surface');
+  await h.pause(1600);
+  await page.keyboard.press('Escape');
+  await h.nav('#/runs', 'Runs — designed preview (the PurposeTask runtime is the separate build)', 1900);
+  await h.nav('#/evidence', 'Evidence ledger — designed preview, captioned honestly', 1900);
+  await h.nav('#/registry', 'Capability registry', 1700);
+
+  await h.nav('#/keys', 'Configuration — API keys');
+  await h.click('button:has-text("+ Create key")', 'Minting a REAL API key on the teleon realm');
+  await h.pause(2400);
+  await h.hud('The raw key is shown exactly once — the service stores only a hash');
+  await h.pause(2400);
+  await h.click('tr:has-text("just now") a:has-text("Revoke")', 'Real revocation — gone immediately', { optional: true, settleMs: 1800 });
+  await h.nav('#/team', 'Team', 1500);
+  await h.nav('#/usage', 'Usage metering', 1500);
+  await h.nav('#/billing', 'Billing — plan & invoices (payment EMULATED, no charges)', 1900);
+  await h.nav('#/audit', 'Audit log', 1600);
+  await h.nav('#/settings', 'Settings', 1500);
+
+  const toggle = page.locator('button[title*="theme" i], button[aria-label*="theme" i], button:has-text("☾")').first();
+  if (await toggle.count()) { await toggle.click(); await h.pause(700); }
+  await h.nav('#/', 'Dark mode — same tokens, dark theme', 1900);
+  await h.scrollTour(2);
+
+  await h.go(base.url.replace(/\/?(\?[^#]*)?(#.*)?$/, '') + '/Teleon%20PurposeTask%20Control%20Tower.html', 'The PurposeTask Control Tower — operator view (designed prototype)', 3000);
+  await h.scrollTour(3);
+  await h.hud('Teleon — verified end to end: real accounts, real keys, honest runtime previews');
+  await h.pause(2400);
+}
+
 /* =====================  runner  ===================== */
 const base = await ohhBase();
+const tBase = await teleonBase();
 const JOURNEYS = [
   { id: 'journey-1-openharnesshub', title: `Open Harness Hub — ${base.public ? 'PUBLIC URL' : 'local'}: landing → live build → live registry → sign-up → live canvas + real export → configuration`, fn: (p, h) => ohhJourney(p, h, base) },
   { id: 'journey-2-baltor', title: 'Baltor — landing → sign-up → console → emulated billing → LIVE pipeline on the real event bus', fn: baltorJourney },
   { id: 'journey-3-portfolio-hub', title: 'AI Done Right → Control Tower → OpenContextHub — real account + REAL key mint/revoke', fn: portfolioJourney },
+  { id: 'journey-4-teleon', title: `Teleon — ${tBase.public ? 'PUBLIC URL' : 'local'}: landing → sign-up → console + ⌘K → REAL key lifecycle → account pages → tower`, fn: (p, h) => teleonJourney(p, h, tBase) },
 ];
 
-console.log(`native video: ${HAS_NATIVE_VIDEO ? 'ON (webm + mp4)' : 'OFF — webm only'} · ${SIZE.width}×${SIZE.height} · OHH base: ${base.host}${base.public ? ' (PUBLIC)' : ''}\n`);
+console.log(`native video: ${HAS_NATIVE_VIDEO ? 'ON (webm + mp4)' : 'OFF — webm only'} · ${SIZE.width}×${SIZE.height} · OHH: ${base.host}${base.public ? ' (PUBLIC)' : ''} · Teleon: ${tBase.host}${tBase.public ? ' (PUBLIC)' : ''}\n`);
 for (const j of JOURNEYS) {
   console.log(`=== recording ${j.id} ===`);
   const { browser, context } = await launchRecorder();
@@ -291,7 +350,8 @@ for (const j of JOURNEYS) {
   await browser.close();
   const out = await finalizeNativeVideo(handle, j.id);
   results.push({
-    id: j.id, title: j.title, base: j.id.includes('openharnesshub') ? base.host : '127.0.0.1',
+    id: j.id, title: j.title,
+    base: j.id.includes('openharnesshub') ? base.host : j.id.includes('teleon') ? tBase.host : '127.0.0.1',
     video: out, duration_s: h.chapters.length ? h.chapters[h.chapters.length - 1].at_s : 0,
     chapters: h.chapters, frictions: h.frictions, console_errors: consoleErrors.slice(0, 10),
   });

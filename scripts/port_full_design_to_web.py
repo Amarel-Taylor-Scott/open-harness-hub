@@ -289,6 +289,12 @@ APPS: dict[str, dict] = {
         # the entry's prototype filename is gone (it became index.html) — keep logo links working
         "self_link_rewrites": [("Context Enrichment Prototype.html", "index.html")],
     },
+    "teleon": {
+        "folder": "teleon",
+        "entry": "Teleon Prototype.html",
+        "code": ["teleon-main.jsx", "teleon.css"],
+        "html": ["Teleon PurposeTask Control Tower.html"],
+    },
     "harness-hub": {
         "folder": "openharnesshub",
         "entry": "OpenHarnessHub Prototype.html",

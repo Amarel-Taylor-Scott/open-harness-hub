@@ -1958,3 +1958,21 @@ checkout EMULATED captions), Baltor live-pipeline + portfolio key-lifecycle cuts
 manifest regenerated (59 chapters); frames verified (canvas + tiers). Gates all green: port
 --check (102 files), walker 27/27, route audit 46/46×2, PUBLIC investor gate 10/10, bundle
 wiring, services health.
+
+## 2026-06-10 (late night) — Teleon: fourth wired app, verified publicly, journey video
+
+**Warrant: direct user intent** ("full end to end verification polishing and video generation of
+teleon"). web/teleon ported via the generated pipeline (14 files: entry→index.html, 9 kit files
+byte-identical, seams injected; PurposeTask Control Tower alongside); teleon_app :8003 registered
+(OH_PRODUCT=teleon) and started; fresh cloudflared tunnel
+(dist/showcase-share-url-teleon.txt). e2e/teleon_gate.mjs — 14/14 BOTH locally and against the
+PUBLIC URL: 27/27 routes ×2 modes console-clean, REAL teleon-realm signup + session, REAL key
+mint (ak_teleon_… shown-once) + real revoke via the kit OhApiKeys seam, registry 200, beacon 202,
+?exp=teleon_hero:D forcing (gate lesson: overrides are in-memory — assert OHExp.variant()),
+theme toggle, ⌘K in the app shell (not the marketing landing), tower clean. Parity vs
+screens/04-teleon.png exact (deltas = hero/landing experiment variants, chip shows the active
+one). journey-4-teleon.mp4 recorded THROUGH the tunnel (88s, 25 chapters; frames verified: real
+key reveal + live ⌘K palette); manifest regenerated (84 chapters / 4 videos). Docs:
+docs/status/teleon-demo.md (real-vs-designed split: runtime surfaces stay designed previews —
+the PurposeTask engine is the separate greenfield build). Regression gates all green: port
+--check (116 files / 4 apps), family, bundle wiring, walker 27/27, OHH public gate 10/10.

@@ -1,4 +1,4 @@
-# web/ — three product front-ends, one shared backend
+# web/ — four product front-ends, one shared backend
 
 Each product has its **own self-contained front-end folder**. Only the **backend** is shared
 (`scripts/` — the engine, the catalog, the `/api/*` endpoints). See
@@ -29,6 +29,9 @@ web/
   baltor/                  Baltor — full ce-* surface (marketing + docs + app console + 25+ guided
                            demo/deep-dive pages) + the legacy live-ops pages, now working on this
                            origin through the seam proxy.
+  teleon/                  Teleon — the kit-reference runtime site (teleon-main.jsx) + the
+                           PurposeTask Control Tower page (:8003, teleon_app). Real accounts/keys
+                           via the kit seams; runtime surfaces are designed previews, captioned.
   vendor/                  Pinned React/ReactDOM/Babel UMD runtime (one copy, served at /vendor/;
                            hashes match the prototypes' SRI pins — see vendor/README.md).
 ```
