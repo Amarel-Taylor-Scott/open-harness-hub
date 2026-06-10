@@ -75,6 +75,28 @@ _SHARED_REF = re.compile(r"\.\./shared/([A-Za-z0-9._-]+)")
 # Shape: app → file → list of (old, new). Old strings must match EXACTLY once.
 PATCHES: dict[str, dict[str, list[tuple[str, str]]]] = {
     "harness-hub": {
+        "proto-main.jsx": [
+            # A REAL realm session (sign-in/sign-up through the identity seam) puts the app into
+            # signed-in mode. The bridge only REFLECTS real state — it never fabricates a session,
+            # and the prototype's own ohp-auth demo flag keeps working unchanged.
+            (
+                "  const setLoggedIn = (v) => { setLoggedInRaw(v); try { localStorage.setItem('ohp-auth', v ? '1' : '0'); } catch (e) {} };\n"
+                "  const store = React.useMemo(() => ({ task, setTask, toast, loggedIn, setLoggedIn }), [task, toast, loggedIn]);",
+                "  const setLoggedIn = (v) => { setLoggedInRaw(v); try { localStorage.setItem('ohp-auth', v ? '1' : '0'); } catch (e) {} };\n"
+                "  React.useEffect(() => {  // live seam: real realm session ⇒ app mode (reflects real state only)\n"
+                "    const sync = () => {\n"
+                "      try {\n"
+                "        const s = window.OHIdentity && OHIdentity.session(OHIdentity.realmOf(OHH_BRAND));\n"
+                "        if (s && s.session_id) setLoggedIn(true);\n"
+                "      } catch (e) {}\n"
+                "    };\n"
+                "    sync();\n"
+                "    window.addEventListener('hashchange', sync);\n"
+                "    return () => window.removeEventListener('hashchange', sync);\n"
+                "  }, []);\n"
+                "  const store = React.useMemo(() => ({ task, setTask, toast, loggedIn, setLoggedIn }), [task, toast, loggedIn]);",
+            ),
+        ],
         "proto-pages-build.jsx": [
             # PPreview kicks the REAL /api/build (web/harness-hub/ohh-live.js) and re-renders
             # when it lands. Honest fallback: backend silent → the designed exemplar stays.

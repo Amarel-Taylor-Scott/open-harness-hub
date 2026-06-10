@@ -560,26 +560,79 @@ function OhDashboard({ greeting, sub, feature, stats, activity, quick, plan }) {
 
 // keys: [{name, prefix, created, lastUsed}]
 function OhApiKeys({ keys }) {
-  const list = keys || [
+  const fixtures = keys || [
     { name: 'Production', prefix: 'sk_live_9f2c', created: 'Mar 4, 2026', lastUsed: '2h ago' },
     { name: 'CI', prefix: 'sk_live_3b71', created: 'Feb 1, 2026', lastUsed: '1d ago' },
     { name: 'Local dev', prefix: 'sk_test_a1f0', created: 'Jan 12, 2026', lastUsed: '3w ago' },
   ];
+  // Live seam (same honesty contract as OhAuth): "+ Create key" mints a REAL key through the
+  // realm identity service when this origin holds a real realm session; signed out or service
+  // down → an honest note, never a fabricated key. The raw key is shown exactly once (the
+  // service never persists it — oh-identity.js mintKey). Fixture rows are design data; minted
+  // rows are real and individually revocable.
+  const realm = React.useMemo(() => {
+    try {
+      for (let i = 0; i < localStorage.length; i += 1) {
+        const k = localStorage.key(i);
+        if (k && k.indexOf('oh-session-') === 0) {
+          const s = JSON.parse(localStorage.getItem(k) || 'null');
+          if (s && s.session_id) return k.slice('oh-session-'.length);
+        }
+      }
+    } catch (e) {}
+    return null;
+  }, []);
+  const [minted, setMinted] = React.useState([]);
+  const [reveal, setReveal] = React.useState(null);
+  const [busy, setBusy] = React.useState(false);
+  const [note, setNote] = React.useState('');
+  const mint = async () => {
+    if (busy) return;
+    if (!window.OHIdentity || !realm) {
+      setNote('Sign in first — keys are minted against your real account (no simulated keys).');
+      return;
+    }
+    setBusy(true); setNote('');
+    try {
+      const r = await window.OHIdentity.mintKey(realm, ['read']);
+      if (r && r.status === 201 && r.body && r.body.api_key) {
+        setReveal(r.body.api_key);
+        setMinted((m) => [{ id: r.body.key_id, name: 'Minted via console', prefix: r.body.prefix || r.body.api_key.slice(0, 12), created: 'just now', lastUsed: '—', real: true }, ...m]);
+      } else {
+        setNote((r && r.body && r.body.error) || 'mint failed — no key was created');
+      }
+    } catch (e) { setNote('identity service unreachable — no key was created'); }
+    setBusy(false);
+  };
+  const revoke = async (k) => {
+    try {
+      const r = await window.OHIdentity.revokeKey(realm, k.id);
+      if (r && (r.status === 200 || r.status === 202)) setMinted((m) => m.filter((x) => x.id !== k.id));
+    } catch (e) {}
+  };
+  const list = [...minted, ...fixtures];
   return (
     <div className="ohs-page">
       <OhPageHead eyebrow="Developers" title="API keys" sub="Create and manage the keys your agents authenticate with."
-        actions={<button className="oh-btn oh-btn--primary">+ Create key</button>} />
+        actions={<button className="oh-btn oh-btn--primary" disabled={busy} onClick={mint}>{busy ? 'Creating…' : '+ Create key'}</button>} />
+      {reveal && (
+        <div className="oh-card oh-card--pad" style={{ marginBottom: 18 }}>
+          <div className="ohs-meter-row"><span>New key minted — copy it now; it is shown only once.</span><span className="mono">{realm}</span></div>
+          <div className="ohs-hint mono" style={{ userSelect: 'all', wordBreak: 'break-all' }}>{reveal}</div>
+        </div>
+      )}
+      {note && <div className="ohs-hint mono" style={{ marginBottom: 12 }}>{note}</div>}
       <div className="oh-card oh-card--pad">
         <table className="oh-table">
           <thead><tr><th>Name</th><th>Key</th><th>Created</th><th>Last used</th><th></th></tr></thead>
           <tbody>
             {list.map((k, i) => (
-              <tr key={i}>
-                <td>{k.name}</td>
+              <tr key={k.real ? k.id : 'fx' + i}>
+                <td>{k.name}{k.real && <span className="oh-badge oh-badge--verified oh-badge--sm" style={{ marginLeft: 8 }}>real</span>}</td>
                 <td className="mono">{k.prefix}••••••••</td>
                 <td className="mono">{k.created}</td>
                 <td className="mono">{k.lastUsed}</td>
-                <td style={{ textAlign: 'right' }}><a className="ohs-navlink ohs-danger">Revoke</a></td>
+                <td style={{ textAlign: 'right' }}><a className="ohs-navlink ohs-danger" onClick={k.real ? () => revoke(k) : undefined}>Revoke</a></td>
               </tr>
             ))}
           </tbody>

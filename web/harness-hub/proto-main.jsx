@@ -235,6 +235,17 @@ function App() {
   const effective = override || autoTheme;
   const [loggedIn, setLoggedInRaw] = React.useState(() => { try { return localStorage.getItem('ohp-auth') === '1'; } catch (e) { return false; } });
   const setLoggedIn = (v) => { setLoggedInRaw(v); try { localStorage.setItem('ohp-auth', v ? '1' : '0'); } catch (e) {} };
+  React.useEffect(() => {  // live seam: real realm session ⇒ app mode (reflects real state only)
+    const sync = () => {
+      try {
+        const s = window.OHIdentity && OHIdentity.session(OHIdentity.realmOf(OHH_BRAND));
+        if (s && s.session_id) setLoggedIn(true);
+      } catch (e) {}
+    };
+    sync();
+    window.addEventListener('hashchange', sync);
+    return () => window.removeEventListener('hashchange', sync);
+  }, []);
   const store = React.useMemo(() => ({ task, setTask, toast, loggedIn, setLoggedIn }), [task, toast, loggedIn]);
 
   let body;

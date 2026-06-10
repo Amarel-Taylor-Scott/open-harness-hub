@@ -1896,3 +1896,21 @@ products.js; broken 13 reference; A/B variant deltas = the sticky experiments en
 handoff freshness, showcase self-test. Lossless: old front pages = legacy.html; every legacy
 functional URL intact. Next: precompiled-JSX production toolchain; deepen logged-in OHH console
 wiring (build/results/flow live); registry-backed hub browse.
+
+## 2026-06-10 (later) — User-journey videos + key-mint/app-mode wiring deepenings
+
+**Warrant: direct user intent** ("improve further + generate videos of a user going through every
+step and page — landing → browsing → sign up → payment (emulated) → product use → configuration").
+Recorded THREE narrated journey videos (e2e/record_user_journeys.mjs on gate_common's native
+recorder + static ffmpeg → artifacts/e2e/videos/journey-{1-openharnesshub,2-baltor,
+3-portfolio-hub}.{mp4,webm}; 71 HUD chapters; manifest docs/status/user-journey-videos.md is
+GENERATED from the run report). Honesty rules on camera: REAL seams exercised for real (per-realm
+sign-up on three different realms, /api/build live preview, Run Full Pipeline streaming the real
+event bus with receipts/lift, API-key mint with shown-once reveal + real revoke); designed
+simulations captioned as such (sample tiers, EMULATED billing). Frame-verified key moments.
+Improvements shipped to make the journeys real: (1) kit OhApiKeys wired at the bundle source to
+OHIdentity.mintKey/revokeKey (OhAuth's honesty contract; fixtures stay design data); (2) recorded
+proto-main patch bridging a REAL realm session → OHH app mode (reflects real state only). All
+gates re-green after re-port: port --check byte-identical (102 files), bundle wiring check, port
+self-test, e2e walk 27/27, 0 frictions across all three recordings. Known benign: dashboard SSE
+501 by design (polling fallback covers it; one stray 404 in J2 did not reproduce on re-walk).

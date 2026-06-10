@@ -51,6 +51,22 @@ Wired (REAL, with honest fallback when a service is down — the kit never fabri
   live dashboard's documented polling fallback covers it (deduped client-side). Direct
   `baltor_admin_demo_server` origin still serves SSE.
 
+## Addendum 2026-06-10 (later) — journey videos + two wiring deepenings
+
+- **Recorded user-journey videos** (`e2e/record_user_journeys.mjs` → `artifacts/e2e/videos/`,
+  manifest `docs/status/user-journey-videos.md`): full lifecycle per app — landing → browsing →
+  REAL per-realm sign-up → emulated billing (captioned EMULATED) → product use (REAL `/api/build`
+  preview · REAL pipeline run on the live event bus) → configuration (REAL API-key mint/revoke on
+  an open hub). Frame-verified: live preview steps/cost, signed-in dark workspace, streaming
+  pipeline events (+0.5769 lift run), shown-once key reveal (`ak_opencontexthub_…`).
+- **Kit `OhApiKeys` wired at the bundle source** (same honesty contract as OhAuth): "+ Create key"
+  mints through `OHIdentity.mintKey` against the signed-in realm; one-time raw-key reveal; minted
+  rows individually revocable; fixture rows stay design data; signed-out / service-down → honest
+  note, never a fabricated key. (makeHub's own hub console keys page was already live-wired.)
+- **Real-session → app-mode bridge** (recorded patch, `proto-main.jsx`): a real OHH realm session
+  flips the proto's signed-in mode on mount/route-change. Reflects real state only — the
+  prototype's `ohp-auth` demo flag keeps working; no fake sessions.
+
 ## Decisions (recorded; revisit when deepening the wiring)
 
 - The OHH logged-in console pages (`/build` confirm, `/results` tiers, `/flow` canvas) keep their
