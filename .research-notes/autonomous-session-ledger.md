@@ -2015,3 +2015,15 @@ REAL key mint + REAL install→workspace — 6/6 PASS. (3) Recorder v3: 29 video
 batch; manifest regenerated (29 videos / 342 chapters). Frame-verified: OpenRoutingHub (PRIVATE
 PREVIEW banner visible) minting a real shown-once ak_openroutinghub_… key. Public regression
 after service restarts: OHH gate 10/10, Teleon gate 18/18 (both via tunnels).
+
+## 2026-06-11 (consolidation) — Working tree committed in full
+
+**Warrant: direct user intent** ("commit everything"). 29 per-website videos finished earlier
+(manifest 29/342); this commit consolidates ALL outstanding work since 2026-05-29: 11,226 files
+(1.21M insertions) — docs, catalog, scripts, src/ (teleon+baltor), schemas, architecture, e2e,
+db seeds, infra, FULLDESIGNDETAILS design-handoff source (76 reference PNGs). .agent/ runtime
+state (146MB pids/loop-ledgers) permanently gitignored, never committed. Pre-commit safety scan:
+no dangerous untracked names (only secret-hygiene CHECK scripts); dist/ sensitive state
+(tokens, identity stores) already ignored. Remaining dirty lines = _reference/ submodule
+content pointers only (their commits live inside the submodules). Resolves the 2026-06-09
+codebase review's biggest risk (everything-uncommitted).
