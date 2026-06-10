@@ -10,13 +10,19 @@
 // Out: e2e/artifacts/full-design/<app>-*.png + report.json (exit 1 on any failure)
 
 import { chromium } from 'playwright';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT = join(HERE, 'artifacts', 'full-design');
 mkdirSync(OUT, { recursive: true });
+
+// the showcase compute endpoints (/api/build) are token-gated when OH_SHOWCASE_TOKEN is set —
+// carry the recorded share token exactly like a share-link recipient (persists to localStorage)
+const TOKEN_FILE = join(HERE, '..', 'dist', 'showcase-token.txt');
+const SHARE_TOKEN = process.env.OHH_TOKEN || (existsSync(TOKEN_FILE) ? readFileSync(TOKEN_FILE, 'utf-8').trim() : '');
+const tokenQs = SHARE_TOKEN ? `?token=${encodeURIComponent(SHARE_TOKEN)}` : '';
 
 const APPS = [
   // routes = prototype route maps (ce-main.jsx / proto-main.jsx); cie is a single-page parent
@@ -70,8 +76,8 @@ for (const { app, base, brand, routes, themed } of APPS) {
   console.log(`\n=== ${app} (${base}) ===`);
   const { ctx, page } = await freshPage(browser, app);
 
-  // 1) front page renders the full design
-  await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
+  // 1) front page renders the full design (token only matters on harness-hub's build seam)
+  await page.goto(base + '/' + (app === 'harness-hub' ? tokenQs : ''), { waitUntil: 'domcontentloaded' });
   await settle(page, 2600);
   const rendered = await page.evaluate(() => document.body.innerText.length > 200);
   check(`${app}: front page renders`, rendered);
@@ -173,7 +179,7 @@ for (const { app, base, brand, routes, themed } of APPS) {
 {
   console.log('\n=== seam: /api/build live preview (harness-hub) ===');
   const { ctx, page } = await freshPage(browser, 'build-seam');
-  await page.goto('http://127.0.0.1:8000/#/', { waitUntil: 'domcontentloaded' });
+  await page.goto('http://127.0.0.1:8000/' + tokenQs + '#/', { waitUntil: 'domcontentloaded' });
   await settle(page, 2600);
   const entry = page.locator('textarea').first();
   if (await entry.count()) {

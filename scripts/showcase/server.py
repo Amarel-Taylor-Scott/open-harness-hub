@@ -97,6 +97,50 @@ def _seam_proxies() -> list[tuple[str, str, int]]:
 
 _SEAM_PROXIES = _seam_proxies()
 
+_GOVERNANCE_CACHE: dict[str, dict] | None = None
+_GOVERNANCE_LOCK = __import__("threading").Lock()
+
+
+def _governance_metadata() -> dict[str, dict]:
+    """Real per-component governance fields from the catalog YAMLs (license, provenance,
+    lifecycle, industry, modality), keyed by component id. Built once, lazily — the embedding
+    store the Index reads doesn't carry these, and the front-end must never invent them.
+    The build sweeps every catalog YAML (~30s pure-python / a few s with libyaml), so it runs
+    under a lock and serve() pre-warms it on a background thread — the port binds immediately
+    and concurrent requests wait on the one build instead of racing it."""
+    global _GOVERNANCE_CACHE
+    if _GOVERNANCE_CACHE is not None:
+        return _GOVERNANCE_CACHE
+    import yaml as _yaml
+    loader = getattr(_yaml, "CSafeLoader", _yaml.SafeLoader)
+    with _GOVERNANCE_LOCK:
+        if _GOVERNANCE_CACHE is not None:  # built while we waited
+            return _GOVERNANCE_CACHE
+        out: dict[str, dict] = {}
+        first = lambda v: (v[0] if isinstance(v, list) and v else v) or None  # noqa: E731
+        for path in (_REPO_DIR / "catalog").rglob("*.yaml"):
+            try:
+                doc = _yaml.load(path.read_text(encoding="utf-8"), Loader=loader)
+            except Exception:
+                continue
+            if not isinstance(doc, dict) or not doc.get("id"):
+                continue
+            prov = doc.get("provenance") or {}
+            sources = prov.get("sources") if isinstance(prov, dict) else None
+            meta = {
+                "license": doc.get("license"),
+                "lifecycle": doc.get("lifecycle"),
+                "industry": first(doc.get("industry")),
+                "modality": first(doc.get("modality")),
+                # 'sourced' ONLY when the catalog actually records provenance sources
+                "prov": "sourced" if sources else None,
+                "src": (str(sources[0])[:60] if sources else None),
+                "verified": (prov.get("collected_through") if isinstance(prov, dict) else None),
+            }
+            out[str(doc["id"])] = {k: v for k, v in meta.items() if v is not None}
+        _GOVERNANCE_CACHE = out
+        return out
+
 
 def _seam_for(path: str) -> tuple[str, int] | None:
     """The (strip_prefix, port) seam owning this path, if any. A prefix without a trailing slash
@@ -334,8 +378,10 @@ class Handler(BaseHTTPRequestHandler):
             typ = (qs.get("type") or [""])[0]
             limit = int((qs.get("limit") or ["300"])[0])
             items = self.index.items
+            governance = _governance_metadata()
             res = [{"id": it["id"], "type": it["type"], "label": label_for_type(it["type"]),
-                    "name": it["name"], "desc": it["desc"][:160]}
+                    "name": it["name"], "desc": it["desc"][:160],
+                    "labels": it.get("labels", []), **governance.get(it["id"], {})}
                    for it in items
                    if (not typ or it["type"] == typ)
                    and (not q or q in it["name"].lower() or q in it["id"].lower() or q in it["desc"].lower())]
@@ -395,6 +441,9 @@ class Handler(BaseHTTPRequestHandler):
 def serve(port: int = 8000) -> None:
     Handler.index = Index()
     Handler.token = os.environ.get("OH_SHOWCASE_TOKEN", "")
+    # pre-warm the catalog governance cache off-thread: the port binds immediately and the
+    # first /api/components hit never pays the ~seconds-long catalog sweep
+    __import__("threading").Thread(target=_governance_metadata, daemon=True).start()
     httpd = ThreadingHTTPServer(("127.0.0.1", port), Handler)
     gate = "token-gated" if Handler.token else "OPEN (set OH_SHOWCASE_TOKEN to gate)"
     seams = sorted({port for _, _, port in _SEAM_PROXIES})

@@ -97,6 +97,55 @@ PATCHES: dict[str, dict[str, list[tuple[str, str]]]] = {
                 "  const store = React.useMemo(() => ({ task, setTask, toast, loggedIn, setLoggedIn }), [task, toast, loggedIn]);",
             ),
         ],
+        "proto-catalog.jsx": [
+            # Browse re-renders when the REAL catalog (2,400+ components via /api/components)
+            # hydrates the design's COMPONENTS/BY_SLUG globals (web/harness-hub/ohh-live.js).
+            (
+                "  const isP = kind === 'pipeline';",
+                "  const [, liveTick] = React.useState(0);  // live seam: re-render when the real catalog hydrates\n"
+                "  React.useEffect(() => (window.OHHLive && OHHLive.onCatalog ? OHHLive.onCatalog(() => liveTick((t) => t + 1)) : undefined), []);\n"
+                "  const isP = kind === 'pipeline';",
+            ),
+            (
+                "  const c = BY_SLUG[slug];\n  if (!c) return <PNotFound />;",
+                "  const [, liveTick] = React.useState(0);  // live seam: BY_SLUG hydrates from the real catalog\n"
+                "  React.useEffect(() => (window.OHHLive && OHHLive.onCatalog ? OHHLive.onCatalog(() => liveTick((t) => t + 1)) : undefined), []);\n"
+                "  const c = BY_SLUG[slug];\n  if (!c) return <PNotFound />;",
+            ),
+            # Honesty on live data: a pipeline with NO measured lift never shows a fabricated
+            # lift bar (the fixture default was `c.lift || 0.4`) — it gets the unproven state.
+            (
+                "          {c.kind === 'pipeline' ? <>\n"
+                "            <div className=\"oh-cc-id mono\" style={{ marginBottom: 10 }}>capability lift</div>\n"
+                "            <div className=\"oh-lb-row\"><div className=\"oh-lb-label\">bare model <b>0.42</b></div><div className=\"oh-lb-track\"><div className=\"oh-lb-fill bare\" style={{ width: '42%' }} /></div></div>\n"
+                "            <div className=\"oh-lb-row\"><div className=\"oh-lb-label\">this pipeline <b>{(0.42 + (c.lift || 0.4)).toFixed(2)}</b></div><div className=\"oh-lb-track\"><div className=\"oh-lb-fill pipe\" style={{ width: `${(0.42 + (c.lift || 0.4)) * 100}%` }} /></div></div>\n"
+                "            <div className=\"oh-lift-delta\"><span className=\"big\" style={{ fontSize: 24 }}>▲ +{(c.lift || 0.4).toFixed(2)}</span></div>\n"
+                "          </> : <>",
+                "          {c.kind === 'pipeline' && typeof c.lift !== 'number' ? <>\n"
+                "            <div className=\"oh-cc-id mono\" style={{ marginBottom: 10 }}>capability lift</div>\n"
+                "            <span className=\"oh-badge oh-badge--muted\">— unproven</span>\n"
+                "            <p className=\"pt-muted\" style={{ fontSize: 13, lineHeight: 1.55, marginTop: 10 }}>Not yet measured — lift lands when the eval harness runs this pipeline against its benchmark. No number is shown until it is real.</p>\n"
+                "          </> : c.kind === 'pipeline' ? <>\n"
+                "            <div className=\"oh-cc-id mono\" style={{ marginBottom: 10 }}>capability lift</div>\n"
+                "            <div className=\"oh-lb-row\"><div className=\"oh-lb-label\">bare model <b>0.42</b></div><div className=\"oh-lb-track\"><div className=\"oh-lb-fill bare\" style={{ width: '42%' }} /></div></div>\n"
+                "            <div className=\"oh-lb-row\"><div className=\"oh-lb-label\">this pipeline <b>{(0.42 + (c.lift || 0.4)).toFixed(2)}</b></div><div className=\"oh-lb-track\"><div className=\"oh-lb-fill pipe\" style={{ width: `${(0.42 + (c.lift || 0.4)) * 100}%` }} /></div></div>\n"
+                "            <div className=\"oh-lift-delta\"><span className=\"big\" style={{ fontSize: 24 }}>▲ +{(c.lift || 0.4).toFixed(2)}</span></div>\n"
+                "          </> : <>",
+            ),
+            # Real provenance fields when the catalog records them; fixture exemplars otherwise.
+            (
+                "<div>source · <span className=\"mono\" style={{ color: 'var(--fg)' }}>{c.industry === 'ESG' ? 'eur-lex.europa.eu' : 'registry-verified'}</span></div>",
+                "<div>source · <span className=\"mono\" style={{ color: 'var(--fg)' }}>{c.src || (c.industry === 'ESG' ? 'eur-lex.europa.eu' : 'registry-verified')}</span></div>",
+            ),
+            (
+                "<div>last-verified · <span className=\"mono\" style={{ color: 'var(--fg)' }}>2026-05-21</span></div>",
+                "<div>last-verified · <span className=\"mono\" style={{ color: 'var(--fg)' }}>{c.verifiedDate || '2026-05-21'}</span></div>",
+            ),
+            (
+                "<span className=\"oh-badge mono\">{COST_LABEL[c.cost] || c.cost}</span>",
+                "<span className=\"oh-badge mono\">{COST_LABEL[c.cost] || c.cost || '—'}</span>",
+            ),
+        ],
         "proto-pages-build.jsx": [
             # PPreview kicks the REAL /api/build (web/harness-hub/ohh-live.js) and re-renders
             # when it lands. Honest fallback: backend silent → the designed exemplar stays.

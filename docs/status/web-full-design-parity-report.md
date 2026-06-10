@@ -67,6 +67,23 @@ Wired (REAL, with honest fallback when a service is down — the kit never fabri
   flips the proto's signed-in mode on mount/route-change. Reflects real state only — the
   prototype's `ohp-auth` demo flag keeps working; no fake sessions.
 
+## Addendum 2026-06-10 (OHH investor pass) — live catalog + a tunnel-only bug fixed at source
+
+- **OHH browse/detail wired to the REAL registry**: `/api/components` now carries the catalog
+  YAMLs' real governance fields (license/lifecycle/industry/modality/provenance — 2,664 rows,
+  cached with a locked background pre-warm); `ohh-live.js` hydrates the design's
+  COMPONENTS/BY_SLUG globals (2,411 rows, 1,771 components + pipelines) with recorded re-render
+  patches. Honesty patches: live pipelines without measured lift render “— unproven” (the fixture
+  default would have fabricated `+0.40`), provenance/cost cells show real values or “—”.
+- **D6 — falsy same-origin override (found ONLY by the public gate):** `oh-identity.js#base()`
+  used `window.OHH_IDENTITY_BASE || DEFAULT` — the injected `''` (same-origin) is falsy, so auth
+  silently fell back to `127.0.0.1:9410`: fine locally, CORS-dead through a tunnel. Fixed at the
+  bundle source (`== null` check). Lesson recorded: tunnel-origin verification is part of the
+  definition of done for seams.
+- **Public investor gate green**: `e2e/ohh_public_gate.mjs` 10/10 and the full route audit
+  (46/46 ×2 modes) against the live trycloudflare URL; brief:
+  `docs/status/openharnesshub-investor-demo.md`.
+
 ## Decisions (recorded; revisit when deepening the wiring)
 
 - The OHH logged-in console pages (`/build` confirm, `/results` tiers, `/flow` canvas) keep their

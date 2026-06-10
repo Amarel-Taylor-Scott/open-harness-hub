@@ -8,6 +8,8 @@ function PBrowse({ kind = 'component' }) {
   const [prims, setPrims] = React.useState({});
   const [owners, setOwners] = React.useState({});
   const [mod, setMod] = React.useState('text');
+  const [, liveTick] = React.useState(0);  // live seam: re-render when the real catalog hydrates
+  React.useEffect(() => (window.OHHLive && OHHLive.onCatalog ? OHHLive.onCatalog(() => liveTick((t) => t + 1)) : undefined), []);
   const isP = kind === 'pipeline';
   const anyPrim = Object.values(prims).some(Boolean);
   const anyOwner = Object.values(owners).some(Boolean);
@@ -69,6 +71,8 @@ function PBrowse({ kind = 'component' }) {
 /* ---------------- COMPONENT DETAIL ---------------- */
 function PDetail({ slug }) {
   const { toast } = React.useContext(StoreCtx);
+  const [, liveTick] = React.useState(0);  // live seam: BY_SLUG hydrates from the real catalog
+  React.useEffect(() => (window.OHHLive && OHHLive.onCatalog ? OHHLive.onCatalog(() => liveTick((t) => t + 1)) : undefined), []);
   const c = BY_SLUG[slug];
   if (!c) return <PNotFound />;
   const p = PRIMS[c.primitive];
@@ -97,7 +101,11 @@ function PDetail({ slug }) {
 
       <div className="pt-grid-3" style={{ marginTop: 18 }}>
         <div className="pt-panel">
-          {c.kind === 'pipeline' ? <>
+          {c.kind === 'pipeline' && typeof c.lift !== 'number' ? <>
+            <div className="oh-cc-id mono" style={{ marginBottom: 10 }}>capability lift</div>
+            <span className="oh-badge oh-badge--muted">— unproven</span>
+            <p className="pt-muted" style={{ fontSize: 13, lineHeight: 1.55, marginTop: 10 }}>Not yet measured — lift lands when the eval harness runs this pipeline against its benchmark. No number is shown until it is real.</p>
+          </> : c.kind === 'pipeline' ? <>
             <div className="oh-cc-id mono" style={{ marginBottom: 10 }}>capability lift</div>
             <div className="oh-lb-row"><div className="oh-lb-label">bare model <b>0.42</b></div><div className="oh-lb-track"><div className="oh-lb-fill bare" style={{ width: '42%' }} /></div></div>
             <div className="oh-lb-row"><div className="oh-lb-label">this pipeline <b>{(0.42 + (c.lift || 0.4)).toFixed(2)}</b></div><div className="oh-lb-track"><div className="oh-lb-fill pipe" style={{ width: `${(0.42 + (c.lift || 0.4)) * 100}%` }} /></div></div>
@@ -111,15 +119,15 @@ function PDetail({ slug }) {
           <div className="oh-cc-id mono" style={{ marginBottom: 10 }}>provenance</div>
           {blocked ? <div className="oh-state-msg blocked"><span className="gl">⚠</span><span><b>Unsourced.</b> Missing source URL + license — routed to review before it can be cited.</span></div>
             : <div style={{ fontSize: 13, color: 'var(--fg-muted)', lineHeight: 1.7 }}>
-              <div>source · <span className="mono" style={{ color: 'var(--fg)' }}>{c.industry === 'ESG' ? 'eur-lex.europa.eu' : 'registry-verified'}</span></div>
+              <div>source · <span className="mono" style={{ color: 'var(--fg)' }}>{c.src || (c.industry === 'ESG' ? 'eur-lex.europa.eu' : 'registry-verified')}</span></div>
               <div>license · <span className="mono" style={{ color: 'var(--fg)' }}>{c.license}</span></div>
-              <div>last-verified · <span className="mono" style={{ color: 'var(--fg)' }}>2026-05-21</span></div>
+              <div>last-verified · <span className="mono" style={{ color: 'var(--fg)' }}>{c.verifiedDate || '2026-05-21'}</span></div>
             </div>}
         </div>
         <div className="pt-panel">
           <div className="oh-cc-id mono" style={{ marginBottom: 10 }}>cost &amp; portability</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
-            <div className="oh-statline"><span style={{ color: 'var(--fg-muted)', fontSize: 13 }}>cost band</span><span className="oh-badge mono">{COST_LABEL[c.cost] || c.cost}</span></div>
+            <div className="oh-statline"><span style={{ color: 'var(--fg-muted)', fontSize: 13 }}>cost band</span><span className="oh-badge mono">{COST_LABEL[c.cost] || c.cost || '—'}</span></div>
             <div className="oh-statline"><span style={{ color: 'var(--fg-muted)', fontSize: 13 }}>recurring</span>
               <span className={'oh-badge ' + (c.recurring ? '' : 'oh-badge--verified')}>{c.recurring ? '↻ per model call' : '⌂ freezable · $0'}</span></div>
             <div className="oh-statline"><span style={{ color: 'var(--fg-muted)', fontSize: 13 }}>lifecycle</span><span className="oh-badge oh-badge--stable">◆ {c.lifecycle}</span></div>

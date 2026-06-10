@@ -8,7 +8,9 @@
 (function () {
   "use strict";
   var DEFAULT_BASE = "http://127.0.0.1:9410";
-  function base() { return String(window.OHH_IDENTITY_BASE || DEFAULT_BASE).replace(/\/+$/, ""); }
+  // '' is a VALID override (same-origin, used by the wired web/ apps behind tunnels) — only
+  // undefined/null fall back to the local default, so don't use `||` here.
+  function base() { var b = window.OHH_IDENTITY_BASE; return String(b == null ? DEFAULT_BASE : b).replace(/\/+$/, ""); }
   function rid() { return "web_" + Math.random().toString(16).slice(2, 14); }
   // brand → realm id (matches the identity realm registry / products.js entity key)
   function realmOf(brand) {

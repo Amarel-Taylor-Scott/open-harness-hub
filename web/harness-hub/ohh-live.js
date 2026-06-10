@@ -35,7 +35,62 @@
     return step.branch && step.branch !== "main" ? "optional" : "default";
   }
 
+  // ---- live catalog: hydrate the design's COMPONENTS/BY_SLUG globals with the REAL registry ----
+  var catalogListeners = [];
+  var catalogLive = false;
+  function mapItem(it) {
+    var type = it.type;
+    var kind = (type === "harness" || type === "pipeline" || type === "pattern") ? "pipeline" : "component";
+    return {
+      slug: it.id, id: it.id, primitive: KIND[type] || "action", type: type,
+      name: it.name, desc: it.desc, kind: kind,
+      owner: "free", // the open OpenHarnessHub catalog — every live row is the free registry
+      modality: it.modality || "text",
+      industry: it.industry || ((it.labels && it.labels[0]) || ""),
+      license: it.license, lifecycle: it.lifecycle || "experimental",
+      // honesty: prov/src/verified ONLY when the catalog records real provenance; lift/cost are
+      // NEVER invented — the design renders "— unproven" / "—" states for them.
+      prov: it.prov, src: it.src, verifiedDate: it.verified,
+      recurring: type === "harness" || type === "pipeline" || type === "adapter",
+      exec: (type === "tool" || type === "processor" || type === "adapter" || type === "harness" || type === "pipeline") ? "code" : "static",
+      live: true,
+    };
+  }
+  function hydrate(rows) {
+    var target = window.COMPONENTS;
+    if (!target || !window.BY_SLUG) return false; // design store not loaded yet
+    var mapped = rows.map(mapItem);
+    target.length = 0;
+    Array.prototype.push.apply(target, mapped);
+    Object.keys(window.BY_SLUG).forEach(function (k) { delete window.BY_SLUG[k]; });
+    mapped.forEach(function (c) { window.BY_SLUG[c.slug] = c; });
+    catalogLive = true;
+    catalogListeners.forEach(function (fn) { try { fn(); } catch (e) {} });
+    return true;
+  }
+  function loadCatalog() {
+    fetch("/api/components?limit=3000")
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d || !d.results || !d.results.length) return; // honest fallback: design data stays
+        var tries = 0;
+        (function attempt() {
+          if (hydrate(d.results) || tries > 200) return;
+          tries += 1; setTimeout(attempt, 60); // the babel-compiled store loads after this file
+        }());
+      })
+      .catch(function () {});
+  }
+  loadCatalog();
+
   window.OHHLive = {
+    // live-catalog surface: pages subscribe to re-render when the real registry hydrates
+    catalogLive: function () { return catalogLive; },
+    onCatalog: function (fn) {
+      catalogListeners.push(fn);
+      if (catalogLive) { try { fn(); } catch (e) {} }
+      return function () { catalogListeners = catalogListeners.filter(function (x) { return x !== fn; }); };
+    },
     // one in-flight/settled build per task; never rejects (honest fallback = null)
     build: function (task) {
       var t = String(task || "").trim();

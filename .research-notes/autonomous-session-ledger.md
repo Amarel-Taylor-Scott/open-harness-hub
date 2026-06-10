@@ -1914,3 +1914,26 @@ proto-main patch bridging a REAL realm session → OHH app mode (reflects real s
 gates re-green after re-port: port --check byte-identical (102 files), bundle wiring check, port
 self-test, e2e walk 27/27, 0 frictions across all three recordings. Known benign: dashboard SSE
 501 by design (polling fallback covers it; one stray 404 in J2 did not reproduce on re-walk).
+
+## 2026-06-10 (evening) — OpenHarnessHub investor-ready: live catalog + public tunnel, verified
+
+**Warrant: direct user intent** ("focus on OpenHarnessHub.io, get it fully working, cloudflare URL
+for an investor; EVERYTHING front end to backend"). Shipped: (1) OHH browse/detail wired to the
+REAL registry — /api/components now serves the catalog YAMLs' real governance metadata
+(license/lifecycle/industry/modality/provenance; 2,664-row cache, CSafeLoader 2.7s, locked
+background pre-warm after a 31.9s pure-python sweep broke server start once — fixed), ohh-live.js
+hydrates COMPONENTS/BY_SLUG in place (2,411 rows), recorded honesty patches (live pipelines show
+"— unproven", never the fixture's fabricated +0.40; real provenance/source/verified-date cells).
+(2) Token-gated :8000 (OH_SHOWCASE_TOKEN from dist/showcase-token.txt; 401 verified) + fresh
+detached cloudflared tunnel (stale api.trycloudflare.com record replaced; URL files refreshed).
+(3) Verified AGAINST THE PUBLIC URL: e2e/ohh_route_audit.mjs 46/46 logged-out + 46/46 logged-in,
+zero console errors; e2e/ohh_public_gate.mjs 10/10 (REAL build through the tunnel, live catalog,
+REAL realm signup + session, workspace, identity/registry seams, beacon 202, console clean).
+(4) Backend sweep PASS: identity runtime (realm isolation, restart-safe), registry backend
+(promotion gate, separation of duties), services health; events self-test skipped honestly (port
+in use by the live service — its health + 202 ingest verified instead). (5) REAL BUG found ONLY
+by the tunnel gate and fixed at bundle source: oh-identity base() treated the injected '' (same-
+origin) as falsy → auth fell back to 127.0.0.1 (fine locally, CORS-dead publicly). Walker now
+carries the share token like a link recipient; all local gates re-green (27/27, port --check).
+Investor brief + ops runbook: docs/status/openharnesshub-investor-demo.md. Share URL in
+dist/showcase-share-url-harness-hub.txt.
