@@ -84,6 +84,25 @@ Wired (REAL, with honest fallback when a service is down — the kit never fabri
   (46/46 ×2 modes) against the live trycloudflare URL; brief:
   `docs/status/openharnesshub-investor-demo.md`.
 
+## Addendum 2026-06-10 (late) — the remaining designed-sample surfaces are now LIVE
+
+- `/results` tier cards = the REAL cheap/balanced/quality cost tiers (per-task USD + "how" from
+  the cost model; real component/knowledge/conditional counts; lift honestly "— unproven").
+- `/flow` canvas = the REAL build poured into the designed topology (every node a real catalog
+  component; live crumbs incl. the app shell's; the OR/AND operator from the build; node drawer
+  inspects the real component; swap list = the build's REAL dropped candidates by match score).
+- **Deploy** downloads the REAL open-spec YAML bundle (`/api/export`).
+- Workspace "recent flows" = the browser's REAL build history (localStorage; never fabricated).
+- The logged-out preview CTA goes through REAL `/signup` (the fake `setLoggedIn(true)` bypass is
+  patched out).
+- Still designed-by-intent (captioned in the demo videos): the run console trace, billing /
+  checkout / upgrade (payment EMULATED), workspace telemetry widgets.
+- Demo videos v2 (1600×900): the OHH journey records THROUGH THE PUBLIC TUNNEL URL; manifest
+  regenerated. Backend systems: every active registry service verified up (identity, registry,
+  events, live-ops, 3 app servers, portfolio statics, bundle preview); the five `held` services
+  remain held by design with reasons recorded in `architecture/local_service_registry.json`
+  (owner-gated portfolio items — none are in the OHH demo path).
+
 ## Decisions (recorded; revisit when deepening the wiring)
 
 - The OHH logged-in console pages (`/build` confirm, `/results` tiers, `/flow` canvas) keep their

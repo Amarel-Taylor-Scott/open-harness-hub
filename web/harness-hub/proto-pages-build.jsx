@@ -227,14 +227,14 @@ function PResults() {
         <div className="sub">Each adds vetted components &amp; knowledge for more lift — cost barely moves, because most lift is <span className="mono">freezable</span> (zero recurring).</div>
       </div>
       <div className="pt-grid-3">
-        {TIERS.map((t) => (
+        {((window.OHHLive && OHHLive.tiers()) || TIERS).map((t) => (
           <div key={t.tier} className={'oh-result' + (t.rec ? ' oh-result--rec' : '')}>
             <div className="oh-result-tierrow">
               <span className={'oh-tier' + (t.rec ? ' oh-tier--rec' : '')}>{t.tier}</span>
               {t.rec && <span className="oh-rec-badge">Recommended</span>}
             </div>
             {loading ? <div className="oh-minidag"><span className="oh-skel-line" style={{ width: '70%' }} /></div> : <MiniStrip dag={t.dag} />}
-            <div className="oh-result-lift"><span className="big">▲ {t.lift}</span><span className="sub">capability lift vs a bare model</span></div>
+            <div className="oh-result-lift">{t.lift ? <span className="big">▲ {t.lift}</span> : <span className="oh-badge oh-badge--muted">— unproven</span>}<span className="sub">capability lift vs a bare model</span></div>
             <div className="oh-result-src">{t.comps} · <b>{t.packs}</b> doing the lift</div>
             <div className="oh-cc-badges"><span className="oh-badge oh-badge--verified"><span className="gl">✔</span> {t.gov}</span></div>
             <div className="oh-result-cost"><span className="mono">{t.cost} · {t.lat}</span><span className="freeze">{t.freeze}</span></div>
@@ -251,9 +251,10 @@ const pbez = (a, b) => { const dx = Math.max(26, Math.abs(b.x - a.x) * 0.5); ret
 function PFlow() {
   const { toast } = React.useContext(StoreCtx);
   const [sel, setSel] = React.useState(null);
-  const N = Object.fromEntries(PFLOW.nodes.map((n) => [n.id, n]));
+  const FLOWSRC = (window.OHHLive && OHHLive.flowSlots()) || PFLOW;  // live seam: the REAL build in the designed canvas
+  const N = Object.fromEntries(FLOWSRC.nodes.map((n) => [n.id, n]));
   const R = (n) => ({ x: n.x + PFW, y: n.y + PFH / 2 }), L = (n) => ({ x: n.x, y: n.y + PFH / 2 }), B = (n) => ({ x: n.x + PFW / 2, y: n.y + PFH });
-  const op = PFLOW.op, opL = { x: op.x, y: op.y + op.h / 2 }, opR = { x: op.x + op.w, y: op.y + op.h / 2 };
+  const op = FLOWSRC.op, opL = { x: op.x, y: op.y + op.h / 2 }, opR = { x: op.x + op.w, y: op.y + op.h / 2 };
   const fwd = [[R(N.input), L(N.ct)], [R(N.input), L(N.ca)], [R(N.ct), opL], [R(N.ca), opL], [opR, L(N.kc)], [R(N.kc), L(N.act)], [R(N.act), L(N.ev)]];
   const evB = B(N.ev), actB = B(N.act);
   const loop = `M${evB.x},${evB.y} C${evB.x},${evB.y + 62} ${actB.x},${actB.y + 62} ${actB.x},${actB.y}`;
@@ -262,13 +263,13 @@ function PFlow() {
   return (
     <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
       <div className="pt-flow-toolbar">
-        <span className="pt-crumb"><b>flow/csddd-grade</b><span className="oh-badge oh-badge--lift" style={{ marginLeft: 6 }}>▲ +0.41</span></span>
+        <span className="pt-crumb"><b>{(window.OHHLive && OHHLive.flowName()) || 'flow/csddd-grade'}</b>{!(window.OHHLive && OHHLive.flow()) && <span className="oh-badge oh-badge--lift" style={{ marginLeft: 6 }}>▲ +0.41</span>}</span>
         <span className="pt-spacer" />
         <select className="pt-select" defaultValue="gpt-class" title="Model swap"><option value="gpt-class">model: gpt-class</option><option>claude-class</option><option>local · llama</option></select>
         <button className="oh-btn oh-btn--ghost oh-btn--sm" onClick={() => navigate('/run')}>▶ Run</button>
         <button className="oh-btn oh-btn--ghost oh-btn--sm" onClick={() => toast('Cost table opened')}>Cost</button>
-        <button className="oh-btn oh-btn--ghost oh-btn--sm" onClick={() => toast('Flow saved · flow/csddd-grade')}>Save</button>
-        <button className="oh-btn oh-btn--primary oh-btn--sm" onClick={() => toast('Deploy bundle generated')}>Deploy</button>
+        <button className="oh-btn oh-btn--ghost oh-btn--sm" onClick={() => toast('Flow saved · ' + ((window.OHHLive && OHHLive.flowName()) || 'flow/csddd-grade'))}>Save</button>
+        <button className="oh-btn oh-btn--primary oh-btn--sm" onClick={() => { if (window.OHHLive && OHHLive.flow() && OHHLive.exportYaml()) { toast('Deploy bundle exported · open-spec YAML'); } else { toast('Deploy bundle generated'); } }}>Deploy</button>
       </div>
       <div className="pt-flow-wrap" style={{ flex: 1, minHeight: 0 }}>
         <div className="pt-flow-canvas-host oh-flow" style={{ position: 'relative' }}>
@@ -279,7 +280,7 @@ function PFlow() {
               <path d={pbez(R(N.ev), L(N.out))} fill="none" stroke="var(--success)" strokeWidth="1.6" markerEnd="url(#pah)" />
               <path d={loop} fill="none" stroke="var(--p-loop)" strokeWidth="1.75" strokeDasharray="5 3" markerEnd="url(#pah)" />
             </svg>
-            {PFLOW.nodes.map((n) => {
+            {FLOWSRC.nodes.map((n) => {
               const p = PRIMS[n.k];
               return (
                 <div key={n.id} className="oh-fnode" onClick={() => setSel(n.id)}
@@ -289,7 +290,7 @@ function PFlow() {
                 </div>
               );
             })}
-            <div className="oh-fop" style={{ left: op.x, top: op.y, width: op.w, height: op.h }}>◇ OR</div>
+            <div className="oh-fop" style={{ left: op.x, top: op.y, width: op.w, height: op.h }}>◇ {FLOWSRC.opLabel || 'OR'}</div>
             <span className="oh-fcall" style={{ left: N.act.x + PFW / 2, top: N.act.y - 24, transform: 'translateX(-50%)' }}>1 model call / item</span>
             <span className="oh-flbl loop" style={{ left: (evB.x + actB.x) / 2, top: evB.y + 48 }}>↻ refine · same call ×N</span>
           </div>
@@ -309,15 +310,15 @@ function PFlow() {
                 <p style={{ fontSize: 13, color: 'var(--fg-muted)', lineHeight: 1.5, margin: 0 }}>{comp.desc}</p>
                 <button className="oh-btn oh-btn--ghost oh-btn--sm" style={{ justifyContent: 'center' }} onClick={() => navigate('/c/' + comp.slug)}>Open component →</button>
               </> : <p style={{ fontSize: 13, color: 'var(--fg-muted)' }}>Structural input node.</p>}
-              {ALTS[sel] && <>
+              {(() => { const __alts = (window.OHHLive && OHHLive.flow()) ? OHHLive.alts(sel, selNode) : ALTS[sel]; return __alts && <>
                 <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.09em', textTransform: 'uppercase', color: 'var(--fg-faint)', marginTop: 4 }}>Swap — alternatives by lift</div>
-                {ALTS[sel].map((a) => (
+                {__alts.map((a) => (
                   <div key={a.name} className="pt-alt" style={a.on ? { borderColor: 'var(--accent)' } : null} onClick={() => { if (!a.on) toast('Swapped → ' + a.name); }}>
                     <span className="nm">{a.name}<small>{a.meta}</small></span>
                     {a.on ? <span className="oh-badge oh-badge--lift" style={{ padding: '2px 7px' }}>in use</span> : <span style={{ fontSize: 11, color: 'var(--accent)' }}>swap</span>}
                   </div>
                 ))}
-              </>}
+              </>; })()}
             </div>
           </aside>
         )}
@@ -516,7 +517,7 @@ function PPreview() {
                 <div className="pt-pv-cta">
                   <h3>Sign up to run it — or download the bundle</h3>
                   <p>Create a free account to run this flow (simulate or live), open it in the builder, or export the open-spec bundle. The spec &amp; export are free.</p>
-                  <button className="oh-btn oh-btn--primary" onClick={() => { setLoggedIn(true); navigate('/onboarding'); }}>Sign up free →</button>
+                  <button className="oh-btn oh-btn--primary" onClick={() => navigate('/signup')}>Sign up free →</button>
                   <button className="oh-btn oh-btn--ghost" onClick={() => navigate('/signin')}>Sign in</button>
                 </div>
               </aside>

@@ -1,21 +1,53 @@
 // e2e/record_user_journeys.mjs — narrated VIDEO recordings of complete user journeys through the
-// three wired full-design apps (web/ transplant): landing → browsing → REAL sign-up → emulated
-// payment → product use (REAL /api/build · live event bus · REAL API-key mint) → configuration.
+// wired full-design apps. v2: 1600×900, tighter pacing, and the OpenHarnessHub cut is recorded
+// THROUGH THE PUBLIC TUNNEL URL (exactly what a link recipient sees), covering the live surfaces:
+// real 2,400+-component catalog (search · facets · governance detail), real /api/build preview,
+// real tier costs, the LIVE flow canvas with real swap alternatives, a REAL open-spec YAML
+// export, real per-realm sign-up, and the workspace's real build history.
 //
-// Honesty rules carried into the videos: real seams are exercised for real (identity, build,
-// events, key mint); surfaces that are designed simulations are CAPTIONED as such — the HUD
-// never claims fixture data is live.
+// Honesty rules carried into the videos: real seams are exercised for real; designed simulations
+// are CAPTIONED as such — the HUD never claims fixture data is live.
 //
 // Run:  node e2e/record_user_journeys.mjs            (services up: scripts/start_local_services.py)
 // Out:  artifacts/e2e/videos/journey-*.{webm,mp4} + reports/user-journeys.json
-//       (mp4 via the repo's static ffmpeg — gate_common.finalizeNativeVideo)
 
-import { launchGate, finalizeNativeVideo, DIRS, HAS_NATIVE_VIDEO } from './gate_common.mjs';
-import { writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { chromium } from 'playwright';
+import { finalizeNativeVideo, DIRS, HAS_NATIVE_VIDEO } from './gate_common.mjs';
+import { writeFileSync, readFileSync, existsSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
+const HERE = dirname(fileURLToPath(import.meta.url));
+const SIZE = { width: 1600, height: 900 };
 const EXPECTED_CONSOLE = [/in-browser Babel transformer/i, /React DevTools/i];
 const results = [];
+
+function readDist(name) {
+  const p = join(HERE, '..', 'dist', name);
+  return existsSync(p) ? readFileSync(p, 'utf-8').trim() : '';
+}
+const TOKEN = readDist('showcase-token.txt');
+const OHH_SHARE = readDist('showcase-share-url-harness-hub.txt');
+
+// the OHH journey records through the PUBLIC tunnel when it answers; honest local fallback
+async function ohhBase() {
+  if (OHH_SHARE) {
+    try {
+      const res = await fetch(new URL(OHH_SHARE).origin + '/api/health', { signal: AbortSignal.timeout(8000) });
+      if (res.ok) return { url: OHH_SHARE, public: true, host: new URL(OHH_SHARE).host };
+    } catch (e) { /* tunnel down */ }
+  }
+  return { url: `http://127.0.0.1:8000/?token=${encodeURIComponent(TOKEN)}`, public: false, host: '127.0.0.1:8000' };
+}
+
+async function launchRecorder() {
+  const browser = await chromium.launch({ channel: 'chrome', headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage'] });
+  const context = await browser.newContext({
+    viewport: SIZE, acceptDownloads: true,
+    ...(HAS_NATIVE_VIDEO ? { recordVideo: { dir: DIRS.videos, size: SIZE } } : {}),
+  });
+  return { browser, context };
+}
 
 function helpers(page, journey) {
   const t0 = Date.now();
@@ -30,10 +62,10 @@ function helpers(page, journey) {
       if (!el) {
         el = document.createElement('div');
         el.id = '__journey_hud';
-        el.style.cssText = 'position:fixed;left:50%;bottom:26px;transform:translateX(-50%);'
-          + 'z-index:2147483647;background:rgba(10,10,14,.88);color:#fff;'
-          + 'font:600 15px/1.45 "Hanken Grotesk",system-ui,sans-serif;padding:10px 20px;'
-          + 'border-radius:999px;box-shadow:0 8px 28px rgba(0,0,0,.4);max-width:78%;'
+        el.style.cssText = 'position:fixed;left:50%;bottom:30px;transform:translateX(-50%);'
+          + 'z-index:2147483647;background:rgba(10,10,14,.9);color:#fff;'
+          + 'font:600 16px/1.45 "Hanken Grotesk",system-ui,sans-serif;padding:11px 22px;'
+          + 'border-radius:999px;box-shadow:0 8px 28px rgba(0,0,0,.4);max-width:74%;'
           + 'text-align:center;pointer-events:none;letter-spacing:.01em';
         document.body.appendChild(el);
       }
@@ -43,20 +75,18 @@ function helpers(page, journey) {
 
   const pause = (ms) => page.waitForTimeout(ms);
 
-  // full page load (Babel recompiles) — settle generously, then restore the HUD
-  async function go(url, caption, settleMs = 3200) {
+  async function go(url, caption, settleMs = 3000) {
     await page.goto(url, { waitUntil: 'domcontentloaded' });
     await pause(settleMs);
     if (caption) await hud(caption);
-    await pause(900);
+    await pause(800);
   }
 
-  // SPA route hop (no reload, HUD survives)
-  async function nav(hash, caption, settleMs = 1500) {
+  async function nav(hash, caption, settleMs = 1300) {
     await page.evaluate((h) => { window.location.hash = h; }, hash);
     await pause(settleMs);
     if (caption) await hud(caption);
-    await pause(900);
+    await pause(800);
   }
 
   async function spotlight(locator) {
@@ -64,13 +94,13 @@ function helpers(page, journey) {
       await locator.evaluate((el) => {
         el.style.outline = '3px solid rgba(255,170,60,.9)';
         el.style.outlineOffset = '3px';
-        setTimeout(() => { el.style.outline = ''; el.style.outlineOffset = ''; }, 1200);
+        setTimeout(() => { el.style.outline = ''; el.style.outlineOffset = ''; }, 1100);
       });
-      await pause(650);
+      await pause(550);
     } catch (e) { /* decorative only */ }
   }
 
-  async function click(sel, caption, { optional = false, settleMs = 1500 } = {}) {
+  async function click(sel, caption, { optional = false, settleMs = 1300 } = {}) {
     const loc = typeof sel === 'string' ? page.locator(sel).first() : sel.first();
     if (!(await loc.count())) {
       if (!optional) frictions.push({ at_s: stamp(), missing: String(sel), note: caption });
@@ -88,180 +118,162 @@ function helpers(page, journey) {
     const loc = page.locator(sel).first();
     await loc.scrollIntoViewIfNeeded().catch(() => {});
     await loc.click({ timeout: 6000 });
-    await page.keyboard.type(text, { delay: 26 });
-    await pause(500);
+    await page.keyboard.type(text, { delay: 22 });
+    await pause(400);
   }
 
-  // unhurried top-to-bottom read of the current page, then back up
-  async function scrollTour(beats = 4, beatMs = 1500) {
+  async function scrollTour(beats = 3, beatMs = 1300) {
     for (let i = 0; i < beats; i += 1) {
-      await page.mouse.wheel(0, 640);
+      await page.mouse.wheel(0, 700);
       await pause(beatMs);
     }
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
-    await pause(1200);
+    await pause(1000);
   }
 
   return { hud, go, nav, click, type, scrollTour, pause, chapters, frictions, journey };
 }
 
-/* =====================  JOURNEY 1 — Open Harness Hub (full lifecycle)  ===================== */
-async function ohhJourney(page, h) {
+/* ============ JOURNEY 1 — OpenHarnessHub through the PUBLIC URL (full lifecycle) ============ */
+async function ohhJourney(page, h, base) {
   const email = `journey-ohh-${Date.now()}@example.test`;
-  await h.go('http://127.0.0.1:8000/', 'Open Harness Hub — landing on the homepage', 4200);
+  await h.go(base.url, base.public
+    ? `OpenHarnessHub.io — live on the public link: ${base.host}`
+    : 'OpenHarnessHub.io — landing (local)', 4000);
   await h.scrollTour(3);
-  await h.click(page.getByText('Image', { exact: true }), 'Browsing the modality examples — image, audio, video pipelines', { optional: true });
-  await h.click(page.getByText('Audio', { exact: true }), null, { optional: true });
-  await h.click(page.getByText('Text', { exact: true }), null, { optional: true });
+  await h.click(page.getByText('Image', { exact: true }), 'Pipelines for every modality — image, audio, video', { optional: true, settleMs: 900 });
+  await h.click(page.getByText('Audio', { exact: true }), null, { optional: true, settleMs: 900 });
+  await h.click(page.getByText('Text', { exact: true }), null, { optional: true, settleMs: 700 });
 
-  await h.hud('Describing a task — the backend assembles a governed pipeline for it');
+  await h.hud('Describe a task — the REAL backend assembles a governed pipeline');
   await h.type('.pt-hero textarea, textarea', 'screen supplier disclosures for forced labor and cite the exact regulations');
-  await h.click('.pt-hero button.oh-btn--primary, button:has-text("Build")', 'Build → the REAL /api/build endpoint assembles the flow');
-  await h.pause(4500); // 4-step assembly animation while the real build lands
-  await h.hud('The preview shows the REAL assembled flow — live components, stages, and cost (no made-up lift numbers)');
-  await h.scrollTour(4, 1700);
+  await h.click('.pt-hero button.oh-btn--primary, button:has-text("Build")', 'Build → /api/build assembles from 2,400+ governed components');
+  await h.pause(4200);
+  await h.hud('The REAL assembled flow — live components, recipe phases, real cost. No invented lift numbers.');
+  await h.scrollTour(3, 1500);
 
-  await h.nav('#/pipelines', 'Browsing the catalog — components, knowledge corpora, governed pipelines');
-  await h.scrollTour(2);
-  await h.click('.pt-cards-grid .oh-cc, .pt-cards-grid > *', 'Opening a component — lift, provenance, license, lifecycle', { optional: true, settleMs: 2200 });
-  await h.scrollTour(2);
-  await h.nav('#/compare', 'Comparing pipelines side by side');
-  await h.scrollTour(2);
-  await h.nav('#/sdg', 'SDG solution tracks', 1800);
-  await h.nav('#/cases', 'Case studies');
-  await h.nav('#/pricing', 'Pricing — the spec and exports are free; sign up to run flows', 1800);
+  await h.nav('#/components', 'Explore — the live registry: 2,400+ real components');
+  await h.pause(1400);
+  await h.hud('Search and facets run over the real catalog');
+  await h.type('.pt-search input', 'sanctions');
+  await h.pause(1600);
+  await page.locator('.pt-search input').first().fill('');
+  await h.pause(900);
+  await h.click('.pt-cards-grid .oh-comp-card', 'A real component — license, lifecycle, provenance from the catalog', { settleMs: 2000 });
   await h.scrollTour(2);
 
-  await h.nav('#/signup', 'Creating a REAL account — the per-realm identity service (no SSO, no fake sessions)');
+  await h.nav('#/signup', 'Create a REAL account — per-realm identity, no SSO, no fake sessions');
   await h.type('input[type="email"], input[placeholder*="mail" i]', email);
   await h.type('input[type="password"]', 'journey-passphrase-1');
-  await h.click('button:has-text("Create"), button[type="submit"]', 'Sign up — the identity service registers, onboards, and mints a session');
-  await h.pause(3800);
+  await h.click('button:has-text("Create"), button[type="submit"]', 'The identity service registers, onboards, and mints a session');
+  await h.pause(3600);
 
-  await h.nav('#/dashboards', 'Signed in — the workspace, now in app mode (real session detected)');
+  await h.nav('#/app', 'The workspace — “recent flows” is YOUR real build history');
   await h.scrollTour(2);
-  await h.nav('#/build', 'Product use — confirming the parsed task and constraints');
-  await h.pause(1200);
-  await h.click('button:has-text("Assemble flow")', 'Assemble — the live backend builds while the console animates');
-  await h.pause(3200);
-  await h.hud('Three costed tier options (designed sample tiers)');
-  await h.pause(1800);
-  await h.click('button:has-text("Open flow")', 'The interactive flow canvas — nodes, gates, and the model boundary');
-  await h.pause(2000);
-  await h.click('.pt-flow-toolbar button:has-text("Run"), button:has-text("▶ Run")', 'Run console (designed simulation of a run)', { optional: true, settleMs: 2600 });
-  await h.scrollTour(2);
-
-  await h.nav('#/foundry', 'Foundry console — distillation & verification tooling', 2000);
-  await h.nav('#/govern', 'Governance — provenance, signing, review gates', 2000);
-  await h.nav('#/settings', 'Configuration — workspace settings');
-  await h.scrollTour(2);
-  await page.evaluate(() => localStorage.setItem('ohp-mode', 'dark'));
-  await h.go('http://127.0.0.1:8000/#/', 'Dark mode — the same surface on dark tokens', 3600);
-  await h.scrollTour(2);
-  await h.hud('Open Harness Hub journey complete — landing → browse → real sign-up → live build → configuration');
+  await h.nav('#/build', 'Confirm the task and constraints');
+  await h.pause(1000);
+  await h.click('button:has-text("Assemble flow")', 'Assemble — live backend build');
+  await h.pause(3000);
+  await h.hud('Three REAL cost tiers — cheap / balanced / quality, from the live cost model. Lift: honestly “unproven”.');
   await h.pause(2200);
+  await h.click('button:has-text("Open flow")', 'The flow canvas — the REAL build in the designed topology');
+  await h.pause(2200);
+  await h.click('.oh-fnode >> nth=4', 'Every node is a real catalog component — click to inspect', { optional: true, settleMs: 1600 });
+  await h.hud('Swap alternatives are the build’s REAL dropped candidates, ranked by match');
+  await h.pause(2200);
+  await h.click('button:has-text("Deploy")', 'Deploy → downloads the REAL open-spec YAML bundle', { settleMs: 2400 });
+  await h.click('button:has-text("▶ Run"), .pt-flow-toolbar button:has-text("Run")', 'Run console (designed simulation — captioned, not faked)', { optional: true, settleMs: 2200 });
+
+  await h.nav('#/foundry', 'Foundry — distillation & verification tooling', 1700);
+  await h.nav('#/govern', 'Governance — provenance, signing, review gates', 1700);
+  await h.nav('#/checkout', 'Checkout — the commercial surface (payment EMULATED, no charges)', 1900);
+  await h.nav('#/upgrade', 'Plans & upgrade (emulated)', 1700);
+  await h.nav('#/settings', 'Configuration — workspace settings', 1500);
+  await page.evaluate(() => localStorage.setItem('ohp-mode', 'dark'));
+  await h.go(base.url.includes('#') ? base.url : base.url + '#/', 'Dark mode — same surface, dark tokens', 3400);
+  await h.scrollTour(2);
+  await h.hud('OpenHarnessHub — fully wired: live registry, live builds, real accounts, real exports');
+  await h.pause(2400);
 }
 
-/* =====================  JOURNEY 2 — Baltor (full lifecycle + live ops)  ===================== */
+/* ============ JOURNEY 2 — Baltor (console + LIVE pipeline on the real event bus) ============ */
 async function baltorJourney(page, h) {
   const email = `journey-baltor-${Date.now()}@example.test`;
-  await h.go('http://127.0.0.1:8001/', 'Baltor — landing on the homepage (context assurance)', 4200);
-  await h.scrollTour(4);
-  await h.nav('#/why', 'Why context — the thesis', 2000);
-  await h.scrollTour(2);
-  await h.nav('#/engine', 'The Context Engine — six governed stages with a verification rail', 2400);
-  await h.pause(4000); // the animated engine
-  await h.scrollTour(2);
-  await h.nav('#/cases', 'Case studies');
-  await h.click('.oh-card a, .ohs-case-card, .oh-card', 'Opening a case study', { optional: true, settleMs: 2200 });
-  await h.nav('#/docs', 'Docs — integration surface', 1800);
-  await h.nav('#/pricing', 'Pricing — plans before sign-up', 1800);
-  await h.scrollTour(2);
+  await h.go('http://127.0.0.1:8001/', 'Baltor — context assurance (the paid product)', 3800);
+  await h.scrollTour(3);
+  await h.nav('#/why', 'Why context — the thesis', 1700);
+  await h.nav('#/engine', 'The Context Engine — six governed stages + verification rail', 2200);
+  await h.pause(3600);
+  await h.nav('#/cases', 'Case studies', 1500);
+  await h.nav('#/pricing', 'Pricing', 1600);
 
-  await h.nav('#/signup', 'Creating a REAL Baltor account (its own identity realm — separate from OHH, no SSO)');
+  await h.nav('#/signup', 'A REAL Baltor account — its own identity realm (no SSO)');
   await h.type('input[type="email"], input[placeholder*="mail" i]', email);
   await h.type('input[type="password"]', 'journey-passphrase-2');
-  await h.click('button:has-text("Create"), button[type="submit"]', 'Sign up — real register → onboarding → session');
-  await h.pause(3800);
+  await h.click('button:has-text("Create"), button[type="submit"]', 'Real register → onboarding → session');
+  await h.pause(3400);
 
-  await h.nav('#/dashboard', 'The console — corpora, freshness, serving health', 2200);
+  await h.nav('#/dashboard', 'The console — corpora, freshness, serving health', 1900);
   await h.scrollTour(2);
-  await h.nav('#/sources', 'Sources — what feeds the corpus', 2000);
-  await h.nav('#/ingest', 'Connecting a source', 2000);
-  await h.nav('#/corpora', 'Governed corpora — raw, compressed, hyper-efficient tiers', 2000);
-  await h.click('.oh-card', 'Opening a corpus — tiers, freshness, citations', { optional: true, settleMs: 2400 });
+  await h.nav('#/corpora', 'Governed corpora — raw / compressed / hyper tiers', 1700);
+  await h.click('.oh-card', 'Inside a corpus — tiers, freshness, citations', { optional: true, settleMs: 1900 });
+  await h.nav('#/serve', 'Serving context packages to agents', 1700);
+  await h.nav('#/verify', 'Verification — claims checked against live sources', 1700);
+  await h.nav('#/audit', 'The audit log', 1600);
+  await h.nav('#/billing', 'Billing — plan & invoices (payment EMULATED, no charges)', 1900);
   await h.scrollTour(2);
-  await h.nav('#/serve', 'Serving context packages to agents', 2000);
-  await h.nav('#/verify', 'Verification — every claim checked against live sources', 2000);
-  await h.nav('#/governance', 'Governance — provenance and policy', 2000);
-  await h.nav('#/audit', 'The audit log — every serve and reconciliation', 2000);
 
-  await h.nav('#/billing', 'Billing — plan, invoices, payment (EMULATED — no real charges)', 2200);
+  await h.go('http://127.0.0.1:8001/dashboard.html', 'Live ops — the REAL event bus behind the product', 3200);
+  await h.click('#run', 'Run Full Pipeline — a REAL run, streaming real events and receipts');
+  await h.pause(13000);
   await h.scrollTour(2);
-  await h.click('button:has-text("Manage plan")', 'Managing the plan (emulated checkout)', { optional: true });
-  await h.nav('#/settings', 'Configuration — workspace settings', 1800);
-  await h.nav('#/usage', 'Usage metering', 1800);
-
-  await h.go('http://127.0.0.1:8001/Baltor%20CFPB%20Guided%20Demo.html', 'A guided demo — CFPB regulatory context, end to end', 3600);
-  await h.scrollTour(4, 1700);
-
-  await h.go('http://127.0.0.1:8001/dashboard.html', 'Live ops — the REAL event bus behind the product', 3600);
-  await h.click('#run', 'Run Full Pipeline — a REAL pipeline run, streaming real events');
-  await h.pause(14000); // real events stream in
-  await h.scrollTour(2);
-  await h.hud('Baltor journey complete — landing → browse → real sign-up → emulated billing → console → live pipeline');
+  await h.hud('Baltor — real console, real events, honest billing emulation');
   await h.pause(2200);
 }
 
-/* ============  JOURNEY 3 — AI Done Right portfolio + hub (config: REAL key mint)  ============ */
+/* ====== JOURNEY 3 — AI Done Right → Control Tower → open hub (REAL key lifecycle) ====== */
 async function portfolioJourney(page, h) {
   const email = `journey-hub-${Date.now()}@example.test`;
-  await h.go('http://127.0.0.1:8002/', 'AI Done Right — the parent portfolio', 4200);
-  for (const section of ['Thesis', 'Architecture', 'Portfolio', 'Proof', 'How it fits']) {
-    await h.click(page.locator('nav a', { hasText: section }), `${section}`, { optional: true, settleMs: 1700 });
+  await h.go('http://127.0.0.1:8002/', 'AI Done Right — the parent portfolio (2 products + 21 open hubs)', 3800);
+  for (const section of ['Thesis', 'Architecture', 'Portfolio', 'Proof']) {
+    await h.click(page.locator('nav a', { hasText: section }), section, { optional: true, settleMs: 1400 });
   }
-  await h.click('button[title*="theme" i], button[aria-label*="theme" i], button:has-text("☾")', 'Dark mode across the family', { optional: true, settleMs: 1400 });
-  await h.click('button[title*="theme" i], button[aria-label*="theme" i], button:has-text("☀")', null, { optional: true, settleMs: 900 });
+  await h.click('button[title*="theme" i], button[aria-label*="theme" i], button:has-text("☾")', 'One design system, light and dark', { optional: true, settleMs: 1200 });
 
-  await h.go('http://127.0.0.1:8002/Demo%20Control%20Tower.html', 'The Demo Control Tower — operator index over all 24 surfaces', 3200);
+  await h.go('http://127.0.0.1:8002/Demo%20Control%20Tower.html', 'The Demo Control Tower — operator index over all 24 surfaces', 2800);
   await h.scrollTour(3);
-  await h.click('button:has-text("Run health check"), .dct-health, button:has-text("health")', 'Running the live health sweep', { optional: true, settleMs: 3500 });
 
-  await h.go('http://127.0.0.1:8002/opencontexthub/OpenContextHub%20Prototype.html', 'Into an open registry — OpenContextHub (one of 21 hubs from a single engine)', 4200);
-  await h.scrollTour(3);
-  await h.nav('#/browse', 'Browsing registry entries', 2200);
-  await h.click('.ohub-grid .oh-card, .oh-card', 'An entry — provenance, signing, install command', { optional: true, settleMs: 2200 });
-  await h.nav('#/pricing', 'Hub pricing', 1800);
-
-  await h.nav('#/signup', 'A REAL account on the hub — its own separate identity realm');
+  await h.go('http://127.0.0.1:8002/opencontexthub/OpenContextHub%20Prototype.html', 'An open registry — OpenContextHub (21 hubs, one engine)', 3800);
+  await h.scrollTour(2);
+  await h.nav('#/browse', 'Browsing registry entries', 1900);
+  await h.nav('#/signup', 'A REAL account on the hub — separate identity realm');
   await h.type('input[type="email"], input[placeholder*="mail" i]', email);
   await h.type('input[type="password"]', 'journey-passphrase-3');
   await h.click('button:has-text("Create"), button[type="submit"]', 'Sign up — real realm session');
-  await h.pause(3800);
-
+  await h.pause(3400);
   await h.nav('#/keys', 'Configuration — API keys');
-  await h.click('button:has-text("+ Create key")', 'Minting a REAL API key through the identity service');
-  await h.pause(2600);
-  await h.hud('The raw key is shown exactly once — the service stores only a hash');
-  await h.pause(2600);
-  await h.click('a:has-text("Revoke")', 'Revoking it — real revocation, gone from the realm', { optional: true, settleMs: 2200 });
-  await h.nav('#/billing', 'Hub billing (emulated)', 2000);
-  await h.nav('#/settings', 'Hub settings', 1800);
-  await h.hud('Portfolio journey complete — parent → control tower → open hub → real account → real key lifecycle');
-  await h.pause(2200);
+  await h.click('button:has-text("+ Create key")', 'Minting a REAL API key (the service stores only a hash)');
+  await h.pause(2400);
+  await h.hud('The raw key appears exactly once — copy it now');
+  await h.pause(2400);
+  await h.click('a:has-text("Revoke")', 'Real revocation — gone from the realm immediately', { optional: true, settleMs: 1900 });
+  await h.nav('#/billing', 'Hub billing (emulated)', 1600);
+  await h.hud('One portfolio: parent → tower → hubs — real accounts, real keys, one design system');
+  await h.pause(2400);
 }
 
 /* =====================  runner  ===================== */
+const base = await ohhBase();
 const JOURNEYS = [
-  { id: 'journey-1-openharnesshub', title: 'Open Harness Hub — landing → browse → sign-up → live build → configuration', fn: ohhJourney },
-  { id: 'journey-2-baltor', title: 'Baltor — landing → browse → sign-up → emulated billing → console → LIVE pipeline', fn: baltorJourney },
-  { id: 'journey-3-portfolio-hub', title: 'AI Done Right → Control Tower → OpenContextHub — real account + REAL key mint', fn: portfolioJourney },
+  { id: 'journey-1-openharnesshub', title: `Open Harness Hub — ${base.public ? 'PUBLIC URL' : 'local'}: landing → live build → live registry → sign-up → live canvas + real export → configuration`, fn: (p, h) => ohhJourney(p, h, base) },
+  { id: 'journey-2-baltor', title: 'Baltor — landing → sign-up → console → emulated billing → LIVE pipeline on the real event bus', fn: baltorJourney },
+  { id: 'journey-3-portfolio-hub', title: 'AI Done Right → Control Tower → OpenContextHub — real account + REAL key mint/revoke', fn: portfolioJourney },
 ];
 
-console.log(`native video: ${HAS_NATIVE_VIDEO ? 'ON (webm + mp4)' : 'OFF — webm only'}\n`);
+console.log(`native video: ${HAS_NATIVE_VIDEO ? 'ON (webm + mp4)' : 'OFF — webm only'} · ${SIZE.width}×${SIZE.height} · OHH base: ${base.host}${base.public ? ' (PUBLIC)' : ''}\n`);
 for (const j of JOURNEYS) {
   console.log(`=== recording ${j.id} ===`);
-  const { browser, context } = await launchGate();
+  const { browser, context } = await launchRecorder();
   const page = await context.newPage();
   const consoleErrors = [];
   page.on('console', (m) => { if (m.type() === 'error' && !EXPECTED_CONSOLE.some((re) => re.test(m.text()))) consoleErrors.push(m.text()); });
@@ -279,14 +291,14 @@ for (const j of JOURNEYS) {
   await browser.close();
   const out = await finalizeNativeVideo(handle, j.id);
   results.push({
-    id: j.id, title: j.title,
+    id: j.id, title: j.title, base: j.id.includes('openharnesshub') ? base.host : '127.0.0.1',
     video: out, duration_s: h.chapters.length ? h.chapters[h.chapters.length - 1].at_s : 0,
     chapters: h.chapters, frictions: h.frictions, console_errors: consoleErrors.slice(0, 10),
   });
   console.log(`  [done] ${out ? (out.mp4 || out.webm) : 'NO VIDEO'} · ${h.chapters.length} chapters · ${h.frictions.length} frictions · ${consoleErrors.length} console errors`);
 }
 
-writeFileSync(join(DIRS.reports, 'user-journeys.json'), JSON.stringify({ generated_at: new Date().toISOString(), results }, null, 1));
+writeFileSync(join(DIRS.reports, 'user-journeys.json'), JSON.stringify({ generated_at: new Date().toISOString(), size: SIZE, results }, null, 1));
 const bad = results.filter((r) => !r.video || r.frictions.some((f) => f.fatal));
 console.log(`\n${bad.length ? 'FAIL' : 'PASS'} — ${results.length} journey videos → ${DIRS.videos}`);
 process.exit(bad.length ? 1 : 0);

@@ -264,8 +264,8 @@ function App() {
     let page, crumb, bare = false;
     if (route === '/build') { page = <PBuild />; crumb = 'Build'; }
     else if (route === '/results') { page = <PResults />; crumb = ['Build', 'Results']; }
-    else if (route === '/flow') { page = <PFlow />; crumb = 'flow/csddd-grade'; bare = true; }
-    else if (route === '/run') { page = <PRun />; crumb = ['flow/csddd-grade', 'Run']; }
+    else if (route === '/flow') { page = <PFlow />; crumb = (window.OHHLive && OHHLive.flowName()) || 'flow/csddd-grade'; bare = true; }
+    else if (route === '/run') { page = <PRun />; crumb = [(window.OHHLive && OHHLive.flowName()) || 'flow/csddd-grade', 'Run']; }
     else if (route === '/pipelines') { page = <PBrowse kind="pipeline" />; crumb = 'Explore pipelines'; }
     else if (route === '/components') { page = <PBrowse kind="component" />; crumb = 'Explore components'; }
     else if (route === '/app') { page = <PDashboard />; crumb = 'Workspace'; }

@@ -1937,3 +1937,24 @@ origin) as falsy → auth fell back to 127.0.0.1 (fine locally, CORS-dead public
 carries the share token like a link recipient; all local gates re-green (27/27, port --check).
 Investor brief + ops runbook: docs/status/openharnesshub-investor-demo.md. Share URL in
 dist/showcase-share-url-harness-hub.txt.
+
+## 2026-06-10 (night) — OHH designed-sample gaps closed + v2 public-URL demo videos
+
+**Warrant: direct user intent** ("fix all of these, better video demos, all backend systems
+working/emulated locally"). LIVE now (recorded patches + ohh-live v3, all honest-fallback):
+/results = REAL cheap/balanced/quality tiers (real per-task USD + how + counts; lift "— unproven");
+/flow = the REAL build in the designed canvas topology (real components per node incl. shell
+crumbs + OR operator; drawer inspects the real component; swap list = the build's REAL dropped
+candidates by match); Deploy = REAL /api/export YAML download; workspace recent-flows = REAL
+browser build history; preview CTA → real /signup (fake setLoggedIn bypass removed). Fixed during
+verification: stage components are step OBJECTS not id strings (flowSlots normalizes); the app
+shell's own /flow //run fixture crumbs. Backend systems: all active registry services verified up
+(identity/registry/events/live-ops/3 apps/portfolio/bundle preview, check_local_services_health
+PASS); 5 held services stay held by design (reasons in the registry; none in the demo path);
+events self-test port-collision noted (live service health + 202 ingest verified instead).
+v2 demo videos (1600×900, tighter pacing): journey-1 recorded THROUGH THE PUBLIC TUNNEL URL
+(25 chapters incl. live registry search, live canvas, real export download, real history,
+checkout EMULATED captions), Baltor live-pipeline + portfolio key-lifecycle cuts re-recorded;
+manifest regenerated (59 chapters); frames verified (canvas + tiers). Gates all green: port
+--check (102 files), walker 27/27, route audit 46/46×2, PUBLIC investor gate 10/10, bundle
+wiring, services health.

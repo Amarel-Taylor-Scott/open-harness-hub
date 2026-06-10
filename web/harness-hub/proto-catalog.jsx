@@ -143,7 +143,7 @@ function PDetail({ slug }) {
 /* ---------------- WORKSPACE DASHBOARD ---------------- */
 function PDashboard() {
   const { task, setTask, toast } = React.useContext(StoreCtx);
-  const flows = [
+  const flows = (window.OHHLive && OHHLive.recentFlows()) || [
     ['CSDDD supplier grading', 'flow/csddd-grade', '▲ +0.41', '6 comp · $$'],
     ['Contract renewal-risk review', 'flow/renewal-risk', '▲ +0.33', '5 comp · $$'],
   ];

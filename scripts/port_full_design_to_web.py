@@ -76,6 +76,15 @@ _SHARED_REF = re.compile(r"\.\./shared/([A-Za-z0-9._-]+)")
 PATCHES: dict[str, dict[str, list[tuple[str, str]]]] = {
     "harness-hub": {
         "proto-main.jsx": [
+            # the app shell's /flow and /run breadcrumbs carry the LIVE flow name when one exists
+            (
+                "    else if (route === '/flow') { page = <PFlow />; crumb = 'flow/csddd-grade'; bare = true; }",
+                "    else if (route === '/flow') { page = <PFlow />; crumb = (window.OHHLive && OHHLive.flowName()) || 'flow/csddd-grade'; bare = true; }",
+            ),
+            (
+                "    else if (route === '/run') { page = <PRun />; crumb = ['flow/csddd-grade', 'Run']; }",
+                "    else if (route === '/run') { page = <PRun />; crumb = [(window.OHHLive && OHHLive.flowName()) || 'flow/csddd-grade', 'Run']; }",
+            ),
             # A REAL realm session (sign-in/sign-up through the identity seam) puts the app into
             # signed-in mode. The bridge only REFLECTS real state — it never fabricates a session,
             # and the prototype's own ohp-auth demo flag keeps working unchanged.
@@ -145,6 +154,17 @@ PATCHES: dict[str, dict[str, list[tuple[str, str]]]] = {
                 "<span className=\"oh-badge mono\">{COST_LABEL[c.cost] || c.cost}</span>",
                 "<span className=\"oh-badge mono\">{COST_LABEL[c.cost] || c.cost || '—'}</span>",
             ),
+            # workspace "recent flows" = the browser's REAL build history when it exists
+            (
+                "  const flows = [\n"
+                "    ['CSDDD supplier grading', 'flow/csddd-grade', '▲ +0.41', '6 comp · $$'],\n"
+                "    ['Contract renewal-risk review', 'flow/renewal-risk', '▲ +0.33', '5 comp · $$'],\n"
+                "  ];",
+                "  const flows = (window.OHHLive && OHHLive.recentFlows()) || [\n"
+                "    ['CSDDD supplier grading', 'flow/csddd-grade', '▲ +0.41', '6 comp · $$'],\n"
+                "    ['Contract renewal-risk review', 'flow/renewal-risk', '▲ +0.33', '5 comp · $$'],\n"
+                "  ];",
+            ),
         ],
         "proto-pages-build.jsx": [
             # PPreview kicks the REAL /api/build (web/harness-hub/ohh-live.js) and re-renders
@@ -180,6 +200,67 @@ PATCHES: dict[str, dict[str, list[tuple[str, str]]]] = {
             (
                 '<div className="row"><span className="k">Assembly</span><span className="v">model-built</span></div>',
                 '<div className="row"><span className="k">Assembly</span><span className="v">{(LIVEPV && OHHLive.assembly()) || \'model-built\'}</span></div>',
+            ),
+            # /results — the three tier cards become the REAL cost tiers (cheap/balanced/quality)
+            # when a live build exists; live cards carry lift:null → the unproven badge renders.
+            (
+                "        {TIERS.map((t) => (",
+                "        {((window.OHHLive && OHHLive.tiers()) || TIERS).map((t) => (",
+            ),
+            (
+                '            <div className="oh-result-lift"><span className="big">▲ {t.lift}</span><span className="sub">capability lift vs a bare model</span></div>',
+                '            <div className="oh-result-lift">{t.lift ? <span className="big">▲ {t.lift}</span> : <span className="oh-badge oh-badge--muted">— unproven</span>}<span className="sub">capability lift vs a bare model</span></div>',
+            ),
+            # /flow — the canvas renders the REAL build poured into the designed slots; the
+            # fixture lift badge and name appear only in design mode.
+            (
+                "  const N = Object.fromEntries(PFLOW.nodes.map((n) => [n.id, n]));",
+                "  const FLOWSRC = (window.OHHLive && OHHLive.flowSlots()) || PFLOW;  // live seam: the REAL build in the designed canvas\n"
+                "  const N = Object.fromEntries(FLOWSRC.nodes.map((n) => [n.id, n]));",
+            ),
+            (
+                "  const op = PFLOW.op, opL = { x: op.x, y: op.y + op.h / 2 }, opR = { x: op.x + op.w, y: op.y + op.h / 2 };",
+                "  const op = FLOWSRC.op, opL = { x: op.x, y: op.y + op.h / 2 }, opR = { x: op.x + op.w, y: op.y + op.h / 2 };",
+            ),
+            (
+                "            {PFLOW.nodes.map((n) => {",
+                "            {FLOWSRC.nodes.map((n) => {",
+            ),
+            (
+                '        <span className="pt-crumb"><b>flow/csddd-grade</b><span className="oh-badge oh-badge--lift" style={{ marginLeft: 6 }}>▲ +0.41</span></span>',
+                '        <span className="pt-crumb"><b>{(window.OHHLive && OHHLive.flowName()) || \'flow/csddd-grade\'}</b>{!(window.OHHLive && OHHLive.flow()) && <span className="oh-badge oh-badge--lift" style={{ marginLeft: 6 }}>▲ +0.41</span>}</span>',
+            ),
+            (
+                '            <div className="oh-fop" style={{ left: op.x, top: op.y, width: op.w, height: op.h }}>◇ OR</div>',
+                '            <div className="oh-fop" style={{ left: op.x, top: op.y, width: op.w, height: op.h }}>◇ {FLOWSRC.opLabel || \'OR\'}</div>',
+            ),
+            # the drawer's swap list: REAL alternatives (the build's dropped candidates of the
+            # same primitive kind) when live; the designed exemplar list otherwise.
+            (
+                "              {ALTS[sel] && <>",
+                "              {(() => { const __alts = (window.OHHLive && OHHLive.flow()) ? OHHLive.alts(sel, selNode) : ALTS[sel]; return __alts && <>",
+            ),
+            (
+                "                {ALTS[sel].map((a) => (",
+                "                {__alts.map((a) => (",
+            ),
+            (
+                "              </>}\n            </div>\n          </aside>",
+                "              </>; })()}\n            </div>\n          </aside>",
+            ),
+            (
+                "        <button className=\"oh-btn oh-btn--ghost oh-btn--sm\" onClick={() => toast('Flow saved · flow/csddd-grade')}>Save</button>",
+                "        <button className=\"oh-btn oh-btn--ghost oh-btn--sm\" onClick={() => toast('Flow saved · ' + ((window.OHHLive && OHHLive.flowName()) || 'flow/csddd-grade'))}>Save</button>",
+            ),
+            # Deploy exports the REAL open-spec YAML bundle (/api/export) when a live build exists.
+            (
+                "        <button className=\"oh-btn oh-btn--primary oh-btn--sm\" onClick={() => toast('Deploy bundle generated')}>Deploy</button>",
+                "        <button className=\"oh-btn oh-btn--primary oh-btn--sm\" onClick={() => { if (window.OHHLive && OHHLive.flow() && OHHLive.exportYaml()) { toast('Deploy bundle exported · open-spec YAML'); } else { toast('Deploy bundle generated'); } }}>Deploy</button>",
+            ),
+            # the logged-out preview CTA goes through REAL sign-up — never a faked session flag
+            (
+                "<button className=\"oh-btn oh-btn--primary\" onClick={() => { setLoggedIn(true); navigate('/onboarding'); }}>Sign up free →</button>",
+                "<button className=\"oh-btn oh-btn--primary\" onClick={() => navigate('/signup')}>Sign up free →</button>",
             ),
         ],
     },
