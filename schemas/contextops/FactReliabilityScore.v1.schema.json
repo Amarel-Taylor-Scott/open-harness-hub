@@ -1,0 +1,119 @@
+{
+  "$id": "contextops/FactReliabilityScore.v1",
+  "title": "FactReliabilityScore.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "A deterministic reliability score over a verified FACT (as opposed to SourceReliabilityScore, which scores a source). It rolls up the fact's verification history \u2014 how many independent sources confirmed it, how fresh the last verification is, its contradiction history, the authority of its winning source \u2014 into a composite the consumption layer can use to decide whether a cached fact is trustworthy enough to serve or must be re-verified first. It is a derived signal, not a fact: served_as_truth is pinned [false]. Same inputs \u2192 same score, every run. Deterministic when scored_at is injected.",
+  "required": [
+    "schema_version",
+    "score_id",
+    "fact_key",
+    "tenant_id",
+    "source_scope",
+    "factors",
+    "confirming_source_count",
+    "winning_authority_rank",
+    "composite_score",
+    "served_as_truth",
+    "last_verified_at",
+    "scored_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": [
+        "FactReliabilityScore.v1"
+      ]
+    },
+    "score_id": {
+      "type": "string",
+      "description": "content-addressed over (fact_key, factors, confirming_source_count); version in metadata, never in the id"
+    },
+    "fact_key": {
+      "type": "string",
+      "description": "the fact this score is about"
+    },
+    "tenant_id": {
+      "type": "string"
+    },
+    "source_scope": {
+      "type": "string",
+      "enum": [
+        "global_public",
+        "tenant_private",
+        "tenant_shared",
+        "system_reference"
+      ]
+    },
+    "factors": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "the per-factor fact-reliability signals (each 0..1); the composite is derived from these",
+      "required": [
+        "source_authority",
+        "freshness",
+        "cross_source_agreement",
+        "contradiction_history",
+        "verification_recency"
+      ],
+      "properties": {
+        "source_authority": {
+          "type": "number",
+          "description": "authority of the winning source (source-of-law high, FAQ low)"
+        },
+        "freshness": {
+          "type": "number",
+          "description": "how recently the fact was verified relative to its volatility"
+        },
+        "cross_source_agreement": {
+          "type": "number",
+          "description": "degree of independent-source agreement"
+        },
+        "contradiction_history": {
+          "type": "number",
+          "description": "1.0 = never contradicted; lower as contradictions accumulate"
+        },
+        "verification_recency": {
+          "type": "number",
+          "description": "decays as last_verified_at recedes past the refresh horizon"
+        }
+      }
+    },
+    "confirming_source_count": {
+      "type": "integer",
+      "description": "how many independent sources confirmed this fact (1 is weak unless single_official_source_ok)"
+    },
+    "winning_authority_rank": {
+      "type": "integer",
+      "description": "the authority rank of the source that won reconciliation for this fact"
+    },
+    "composite_score": {
+      "type": "number",
+      "description": "the derived 0..1 fact-reliability composite (deterministic function of factors)"
+    },
+    "serve_recommendation": {
+      "type": "string",
+      "enum": [
+        "serve_cached",
+        "reverify_before_serve",
+        "do_not_serve"
+      ],
+      "description": "what the consumption layer should do \u2014 derived from the composite + freshness"
+    },
+    "served_as_truth": {
+      "type": "boolean",
+      "enum": [
+        false
+      ],
+      "description": "pinned false \u2014 a reliability score informs serving, it is never itself the served fact"
+    },
+    "last_verified_at": {
+      "type": "integer",
+      "description": "INJECTED epoch seconds of the last verification (no wall-clock)"
+    },
+    "scored_at": {
+      "type": "string",
+      "description": "injected time; deterministic when injected"
+    }
+  }
+}

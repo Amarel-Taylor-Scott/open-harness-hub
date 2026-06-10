@@ -1,13 +1,13 @@
 # Using our own platform (dogfooding plan)
 
-We build Open Harness Hub and Context Enrichment with Claude Code over this repo. The most credible
+We build Open Harness Hub and Baltor with Claude Code over this repo. The most credible
 proof that the two products solve a real problem is that **we use them on ourselves**: serve our own
 governed docs into our agent, mine our own capability gaps with the foundry, run the `/evolve` loop as
 the build engine, and gate every change through the change-verification contract. This doc is the
 concrete adoption plan — *what works today, what needs the planned services, and the near-term step to
 turn each one on.*
 
-It is deliberately honest. Several of these are **wired and running**; one (the CEaaS enrichment tier)
+It is deliberately honest. Several of these are **wired and running**; one (the Baltor enrichment tier)
 is `status: planned` in [services/registry.yaml](../../services/registry.yaml) and is described as a
 near-term step, not a shipped capability. Where a thing is seeded-but-not-implemented, this doc says so.
 
@@ -21,23 +21,23 @@ our own development. Status claims are checked against the live service map, not
 
 | # | What we adopt | Which product | Runs today? | Near-term step to turn it on |
 |---|---|---|---|---|
-| 1 | Serve repo docs/tools to Claude Code over MCP | CEaaS (delivery surface) | **Partial** — `dist/mcp/` emits today; CEaaS-tiered corpus is planned | Wire a repo `.mcp.json` to the emitted server; then point it at the CEaaS tier |
+| 1 | Serve repo docs/tools to Claude Code over MCP | Baltor (delivery surface) | **Partial** — `dist/mcp/` emits today; Baltor-tiered corpus is planned | Wire a repo `.mcp.json` to the emitted server; then point it at the Baltor tier |
 | 2 | Run the foundry for our own component needs | OHH backend (`foundry`) | **Yes** — `foundry` is `active`, contracts self-test passes | Seed our build-gaps into the research queue; promote on lift |
 | 3 | `/evolve` loop as our build engine | Both (umbrella) | **Yes** — `.claude/commands/evolve.md` is a live skill | Pair with `/loop` or `/schedule` for unattended runs |
 | 4 | The change-verification contract as our review gate | Platform discipline | **Yes** — a documented gate enforced by the verifier role | Keep tagging warrants in every commit + ledger line |
-| 5 | The lift/fidelity harness as our own quality bar | `measurement` (`active`) + CEaaS fidelity (`planned`) | **Lift: yes. Fidelity: seeded only** | Implement `verify.compression_fidelity` to score #1's tiers |
+| 5 | The lift/fidelity harness as our own quality bar | `measurement` (`active`) + Baltor fidelity (`planned`) | **Lift: yes. Fidelity: seeded only** | Implement `verify.compression_fidelity` to score #1's tiers |
 
-The through-line: **we are our own first CEaaS tenant and our own first foundry customer.** Every gap we
+The through-line: **we are our own first Baltor tenant and our own first foundry customer.** Every gap we
 hit building the platform is a gap to mine; every doc we feed our agent is a corpus to tier and govern.
 
 ---
 
-## 1 · Serve our repo docs + tools to Claude Code via MCP (CEaaS delivery surface)
+## 1 · Serve our repo docs + tools to Claude Code via MCP (Baltor delivery surface)
 
 **The goal.** Our agent (Claude Code on this repo) should get token-dense, governed, *cited* context
-and callable tools dropped straight in — exactly the CEaaS pitch ("serve the governed corpora + tools
+and callable tools dropped straight in — exactly the Baltor pitch ("serve the governed corpora + tools
 into open-ended agentic workflows", [[../strategy/context-enrichment-service.md]]). Dogfooding it means
-*we* are the open agent the four CEaaS surfaces target: **MCP server · llms.txt · skill/plugin ·
+*we* are the open agent the four Baltor surfaces target: **MCP server · llms.txt · skill/plugin ·
 CLAUDE.md fragment**.
 
 **What works today.** The MCP emitter is real and runnable:
@@ -49,16 +49,16 @@ python3 scripts/emit/mcp_server.py     # → dist/mcp/{tools.json, server.py, se
 It walks every `tool/*` and the model-safe `processor/*` components (deterministic/idempotent, no
 escalation/delivery/audit side effects) and emits a working MCP server stub plus the JSON-RPC
 `tools/list` response. This is the `deliver.mcp_serve` surface in component form — the same surface
-CEaaS sells — already producing a server from our catalog.
+Baltor sells — already producing a server from our catalog.
 
 **What does *not* exist yet (be honest):**
 
 - This repo has **no `.mcp.json`**, so our own Claude Code is not yet consuming that server. The
   emitter produces the artifact; nothing wires it back into our agent loop.
-- The emitter serves **catalog tools**, not a **CEaaS-tiered corpus of our repo docs**
-  (raw → compressed → hyper-efficient). The CEaaS `enrichment` service that builds those tiers is
+- The emitter serves **catalog tools**, not a **Baltor-tiered corpus of our repo docs**
+  (raw → compressed → hyper-efficient). The Baltor `enrichment` service that builds those tiers is
   `status: planned` in [services/registry.yaml](../../services/registry.yaml) — its components are
-  *seeded* (`scripts/seed/ceaas_components.py`: `serve-mcp-corpus`, `emit-llms-txt`,
+  *seeded* (`scripts/seed/baltor_components.py`: `serve-mcp-corpus`, `emit-llms-txt`,
   `package-agent-skill`, `emit-claudemd-fragment`, `structural-compress`) but the tier pipeline that
   turns `docs/` into those tiers has no entrypoint.
 
@@ -82,7 +82,7 @@ CEaaS sells — already producing a server from our catalog.
 
 **Why this is the strongest dogfood.** If serving our own docs to our own agent measurably reduces the
 tokens we burn re-reading files (and the fidelity harness proves the compressed tier preserved enough),
-that *is* the CEaaS value proposition demonstrated on the builders who'd be most skeptical of it.
+that *is* the Baltor value proposition demonstrated on the builders who'd be most skeptical of it.
 
 ---
 
@@ -196,7 +196,7 @@ our own docs from drifting the way the README count once did
 
 ## 5 · The lift / fidelity harness as our own quality bar
 
-**The goal.** The product admits components **only on measured lift**, and CEaaS lives or dies on
+**The goal.** The product admits components **only on measured lift**, and Baltor lives or dies on
 **measured fidelity per tier** — *the same shared measurement engine, two questions* ("does the pipeline
 lift?" / "did the tier preserve?", [[../strategy/context-enrichment-service.md]]). Dogfooding it means
 our internal quality decisions use that engine, not vibes.
@@ -209,8 +209,8 @@ metric, externally validated. So when we build a component *for ourselves* (sect
 lift the same way.
 
 **What is seeded but not implemented (be honest).** `verify.compression_fidelity` — the per-tier "did
-this tier preserve enough?" evaluator that the CEaaS moat depends on — exists **only as a seeded
-component definition** in `scripts/seed/ceaas_components.py` (`compression-fidelity-check`). There is
+this tier preserve enough?" evaluator that the Baltor moat depends on — exists **only as a seeded
+component definition** in `scripts/seed/baltor_components.py` (`compression-fidelity-check`). There is
 **no implementation** under `scripts/verification/` or `scripts/eval/` yet. Until there is, we cannot
 publish a fidelity delta on the tiers from section 1 — and per our own promotion boundary
 ([[../codex/master-goal.md]]), an unmeasured tier is staging-only, not tenant-visible.
@@ -234,12 +234,12 @@ The five surfaces compose into one self-hosting loop:
    the gap isn't real.
 4. The **measurement** engine (§5) scores that lift the way the product promises; the fidelity half is
    the near-term build that unblocks the tiers.
-5. Our own governed docs flow back to our agent through the **CEaaS delivery surfaces** (§1), so we
+5. Our own governed docs flow back to our agent through the **Baltor delivery surfaces** (§1), so we
    develop the platform *using the platform's context layer.*
 
 **The honest scorecard.** Today: `/evolve`, the contract, the foundry mechanism, the lift harness, and
 the MCP emitter all run. The gaps to close — each a near-term step above — are the **`.mcp.json` wiring**,
-the **CEaaS tier pipeline entrypoint** (`enrichment` is `planned`), and the **`verify.compression_fidelity`
+the **Baltor tier pipeline entrypoint** (`enrichment` is `planned`), and the **`verify.compression_fidelity`
 implementation**. None forks the backend; each is a deployment of code that already lives in `scripts/`.
 When all five run on us, "two products, one backend" stops being an architecture diagram and becomes our
 own daily workflow — which is the most credible thing we can show an acquirer or a user.
@@ -247,7 +247,7 @@ own daily workflow — which is the most credible thing we can show an acquirer 
 ## Related
 
 - [[../strategy/two-services-shared-infrastructure.md]] — the two-products/one-backend decision.
-- [[../strategy/context-enrichment-service.md]] — the CEaaS spec (the four delivery surfaces, the tiers).
+- [[../strategy/context-enrichment-service.md]] — the Baltor spec (the four delivery surfaces, the tiers).
 - [[../codex/change-verification-contract.md]] — the review gate (§4).
 - [[../codex/master-goal.md]] — the capability-lift bar and the evidence-driven foundry (§2).
 - [[../concepts/context-layer-and-the-desk.md]] — the context-layer model §1 serves us through.

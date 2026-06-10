@@ -1,0 +1,37 @@
+id: "knowledge-pack/dedupe-resolution-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Dedupe resolution patterns"
+description: "Resolution actions, review boundaries, and load-order checks for clearing generated component candidates through fuzzy dedupe without approving content automatically."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["evaluation", "governance", "routing", "verification"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "dedupe", "entity-resolution", "review-gate", "postgres", "quality-index"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+content_types:
+  - "dedupe_resolution_check"
+files:
+  - path: "catalog/knowledge-packs/data/dedupe-resolution-patterns/checks.jsonl"
+    format: "jsonl"
+    schema: "dedupe_resolution_check"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["id", "check_type", "description", "required_tables", "required_fields", "failure_route"]
+provenance:
+  sources:
+    - "Open Harness Hub dedupe cluster schema"
+    - "Open Harness Hub active component promotion plan"
+  collected_through: "2026-05-26"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "dedupe metadata only"

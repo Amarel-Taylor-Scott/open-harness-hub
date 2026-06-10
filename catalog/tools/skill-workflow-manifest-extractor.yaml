@@ -1,0 +1,68 @@
+id: "tool/skill-workflow-manifest-extractor"
+type: tool
+version: "0.1.0"
+name: "Skill workflow manifest extractor"
+description: "Extracts SKILL.md files, workflow JSON, agent configs, node graphs, tool permissions, scripts, model routes, and marketplace metadata from reference repositories."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["extraction", "classification", "governance", "safety"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "dated"
+tags: ["skills", "workflow-import", "agent-frameworks", "manifest-extraction", "permissions"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    reference_path:
+      type: string
+    source_system:
+      type: object
+    extract_types:
+      type: array
+      items:
+        type: string
+    safety_policy:
+      type: object
+  required: ["reference_path", "source_system"]
+returns:
+  type: object
+  properties:
+    extracted_manifests:
+      type: array
+      items:
+        type: object
+    permission_findings:
+      type: array
+      items:
+        type: object
+    candidate_primitives:
+      type: array
+      items:
+        type: object
+    review_tickets:
+      type: array
+      items:
+        type: object
+side_effects: "read"
+examples:
+  - input:
+      reference_path: "_reference/trailofbits-skills"
+      source_system:
+        id: "trailofbits-skills"
+      extract_types: ["skill_md", "plugin_manifest", "scripts"]
+    output:
+      extracted_manifests: []
+      permission_findings: []
+      candidate_primitives: []
+      review_tickets: []
+implementations:
+  - kind: "callable"
+    path: "tools.skill_workflow_manifest_extractor.run"
+  - kind: "mcp"
+    path: "mcp/skill_workflows.extract"

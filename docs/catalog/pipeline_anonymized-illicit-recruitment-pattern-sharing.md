@@ -50,9 +50,9 @@ org's compliance team.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `redact_to_indicator` | processor | `processor/redact-pii-text` | — |
-| 2 | `hash_broker_id` | processor | `processor/audit-trace-emitter` | — |
-| 3 | `k_anonymity_gate` | processor | `processor/cost-ceiling-gate` | — |
-| 4 | `query_hub` | tool | `tool/web-search` | — |
-| 5 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `redact_to_indicator` | processor | `processor/redact-pii-text` | - |
+| 2 | `hash_broker_id` | processor | `processor/audit-trace-emitter` | - |
+| 3 | `k_anonymity_gate` | processor | `processor/cost-ceiling-gate` | - |
+| 4 | `query_hub` | tool | `tool/web-search` | - |
+| 5 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

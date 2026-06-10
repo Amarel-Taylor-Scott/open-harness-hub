@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/context/lineage-manifest.schema.json",
+  "title": "Lineage manifest",
+  "description": "The two-surface contract for a context object: a COMPACT lineage summary the LLM reads inline (lineage_summary_for_llm + counts), and the FULL chain of custody (source locators, parser runs, compression runs, verification runs, policy decisions, receipts) for stewards, auditors, and debugging. Models the W3C PROV entity→activity→agent shape and OpenLineage run/job/dataset facets. Raw expansion is policy-gated, not automatic.",
+  "type": "object",
+  "required": ["kind", "lineage_manifest_id", "object_ref"],
+  "properties": {
+    "kind": { "type": "string", "const": "baltor.lineage-manifest.v1" },
+    "lineage_manifest_id": { "type": "string" },
+    "object_ref": { "type": "string", "description": "the context object / claim / pack / receipt this manifest belongs to" },
+    "compact_summary": { "type": "string", "description": "one-line provenance summary safe to inline" },
+    "lineage_summary_for_llm": { "type": "string", "description": "the digestible 'built from X, Y, Z' line the LLM sees" },
+    "source_count": { "type": "integer", "minimum": 0 },
+    "artifact_count": { "type": "integer", "minimum": 0 },
+    "activity_count": { "type": "integer", "minimum": 0 },
+    "input_refs": { "type": "array", "items": { "type": "string" } },
+    "activity_refs": { "type": "array", "items": { "type": "string" } },
+    "output_refs": { "type": "array", "items": { "type": "string" } },
+    "raw_artifact_refs": { "type": "array", "items": { "type": "string" } },
+    "source_locator_refs": { "type": "array", "items": { "type": "string" } },
+    "parser_runs": { "type": "array", "items": { "type": "string" } },
+    "compression_runs": { "type": "array", "items": { "type": "string" } },
+    "verification_runs": { "type": "array", "items": { "type": "string" } },
+    "policy_decisions": { "type": "array", "items": { "type": "string" } },
+    "receipts": { "type": "array", "items": { "type": "string" } },
+    "raw_expansion_available": { "type": "boolean" },
+    "expansion_policy": {
+      "type": "string",
+      "enum": ["allowed", "allowed_with_approval", "denied", "restricted_sources_present"]
+    },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": true
+}

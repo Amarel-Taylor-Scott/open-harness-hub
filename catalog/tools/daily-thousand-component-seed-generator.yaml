@@ -1,0 +1,67 @@
+id: "tool/daily-thousand-component-seed-generator"
+type: tool
+version: "0.1.0"
+name: "Daily thousand component seed generator"
+description: "Generates 1,000 database-backed component candidate seeds from curated industry/source-surface matrices and exports normalized object, label, entity, embedding, dedupe, review, and index JSONL rows."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["generation", "retrieval", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.scale"
+tags: ["components", "daily-factory", "database-backed", "source-surfaces", "pgvector", "review-gate"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    output_dir:
+      type: string
+    target_count:
+      type: integer
+    matrix:
+      type: string
+      enum: ["core", "expanded", "combined"]
+  required: ["output_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    target_count:
+      type: integer
+    seed_count:
+      type: integer
+    matrix:
+      type: string
+    matrix_surface_count:
+      type: integer
+    row_counts:
+      type: object
+    row_family_paths:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      output_dir: "dist/daily-component-batch/2026-05-26"
+      target_count: 1000
+      matrix: "core"
+    output:
+      ok: true
+      seed_count: 1000
+      matrix: "core"
+      row_counts:
+        normalized_object: 1000
+        index_record: 5000
+        object_embedding: 1000
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.daily_thousand_component_seeds.run_daily_batch"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.factory.daily_thousand_component_seeds"

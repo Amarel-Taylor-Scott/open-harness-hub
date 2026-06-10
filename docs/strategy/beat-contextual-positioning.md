@@ -97,11 +97,11 @@ NOT pitch "they only retrieve" or "we orchestrate, they don't." Build-UX + orche
 now table stakes they have.)
 **The durable moat is ORTHOGONAL to orchestration** — the two things they structurally won't match:
 (1) **open / portable / low-end** (OHH for the devs they treat as a funnel), and (2) **verified context**
-(CEaaS checking the corpus vs authoritative truth). Orchestration is becoming commodity; *whose context is
+(Baltor checking the corpus vs authoritative truth). Orchestration is becoming commodity; *whose context is
 provably correct* is not.
 
 **Naming (the call): keep "Open Harness Hub" — do NOT rename to "Open Agent Hub."** The whole two-product
-split depends on the harness-vs-agent line (OHH = the *bounded, governed harness*; CEaaS serves verified
+split depends on the harness-vs-agent line (OHH = the *bounded, governed harness*; Baltor serves verified
 context *into* open agents); "Open Agent Hub" collapses it and drops us into the most crowded, commoditizing
 category (LangGraph/CrewAI/AutoGPT). "Harness" is distinctive + precise for technical buyers (and "eval
 harness"/"agent harness" are established terms — lineage, not liability). **But use "agent" in taglines /

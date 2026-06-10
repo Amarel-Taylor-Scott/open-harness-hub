@@ -1,0 +1,71 @@
+{
+  "$id": "inference/InferencePreference.v1",
+  "title": "InferencePreference.v1",
+  "type": "object",
+  "additionalProperties": true,
+  "description": "OPEN INFERENCE PREFERENCE SPEC (OIPS): an object's portable, runtime-agnostic LLM/model preference \u2014 desired tier+specialization, allowed/disallowed provider NODES (not display names), data/budget/latency policy, and fallback policy. The object declares INTENT; the Inference Gateway decides execution; the ModelInvocationReceipt records reality. Preferences carry secret_ref, never raw keys.",
+  "required": [
+    "preference_id",
+    "scope",
+    "object_id",
+    "task_intent",
+    "model_class_preference",
+    "allowed_provider_nodes",
+    "disallowed_provider_nodes",
+    "fallback_policy",
+    "data_policy",
+    "budget_policy",
+    "latency_policy",
+    "provenance_required",
+    "evaluation_policy"
+  ],
+  "properties": {
+    "preference_id": {
+      "type": "string"
+    },
+    "scope": {
+      "type": "string"
+    },
+    "object_id": {
+      "type": "string"
+    },
+    "task_intent": {
+      "type": "string"
+    },
+    "model_class_preference": {
+      "type": "object",
+      "description": "{tier_code|tier, specialization_codes|specialization[], minimum_context_window_tokens?, structured_output_required?, tool_calling_required?}"
+    },
+    "allowed_provider_nodes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "disallowed_provider_nodes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "fallback_policy": {
+      "type": "object"
+    },
+    "data_policy": {
+      "type": "object",
+      "description": "{data_class, external_llm_allowed, training_use_forbidden, region_policy, customer_byok_preferred}"
+    },
+    "budget_policy": {
+      "type": "object"
+    },
+    "latency_policy": {
+      "type": "object"
+    },
+    "provenance_required": {
+      "type": "boolean"
+    },
+    "evaluation_policy": {
+      "type": "object"
+    }
+  }
+}

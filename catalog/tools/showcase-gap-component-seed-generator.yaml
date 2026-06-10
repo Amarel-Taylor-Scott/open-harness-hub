@@ -1,0 +1,54 @@
+id: "tool/showcase-gap-component-seed-generator"
+type: tool
+version: "0.1.0"
+name: "Showcase gap component seed generator"
+description: "Converts missing or partial showcase pipeline coverage requests into targeted database-backed component candidate rows with labels, dimensions, entity refs, embeddings, review tickets, and index records."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["generation", "planning", "retrieval", "governance"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.product"
+tags: ["showcase-pipelines", "coverage", "component-candidates", "gap-analysis", "daily-factory"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    missing_requests:
+      type: string
+    output_dir:
+      type: string
+  required: ["missing_requests", "output_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    missing_request_count:
+      type: integer
+    seed_count:
+      type: integer
+    row_counts:
+      type: object
+    row_family_paths:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      missing_requests: "dist/showcase-candidate-coverage/2026-05-28/missing-component-requests.jsonl"
+      output_dir: "dist/showcase-gap-components/2026-05-28"
+    output:
+      ok: true
+      seed_count: 4
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.showcase_gap_component_seeds.generate_gap_component_rows"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.factory.showcase_gap_component_seeds"

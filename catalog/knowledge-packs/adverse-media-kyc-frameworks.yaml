@@ -1,0 +1,30 @@
+id: "knowledge-pack/adverse-media-kyc-frameworks"
+type: knowledge-pack
+version: "0.1.0"
+name: "Adverse Media KYC frameworks"
+description: "Composite context pack for adverse media kyc reviews, including evidence, escalation, and remediation controls."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "CC-BY-4.0"
+industry: ["finance.kyc", "finance.aml"]
+capability: ["retrieval", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "dated"
+tags: ["adverse-media-kyc", "expansion-v3"]
+created: "2026-05-24"
+updated: "2026-05-24"
+content_types: ["rag_doc", "checklist", "control_summary", "evidence_matrix"]
+files:
+  - path: "data/adverse-media-kyc/frameworks.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    enabled: true
+    embedder: "adapter/nomic-embed-text-v15"
+provenance:
+  sources: ["Adverse Media KYC control checklist", "Adverse Media KYC evidence matrix", "Adverse Media KYC escalation playbook", "Adverse Media KYC remediation tracker"]
+  collected_through: "2026-05-24"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "composite educational summaries only"

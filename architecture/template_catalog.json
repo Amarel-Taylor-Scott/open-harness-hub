@@ -1,0 +1,242 @@
+{
+  "version": "1.0.0",
+  "note": "Component templates for the Baltor Context Engine factory. A template is a manifest + a files/ tree of {{variable}} placeholders that scripts/generate_from_template.py renders into a NEW component conforming to a standard in standard_catalog.json. The 7 'active' templates are fully built (real template_path with files/); the rest are 'candidate' with a planned template_path and the standard they will target. This catalog is the single source for which templates exist; generate_from_template.py reads it. status_enum gates whether a template can be generated.",
+  "status_enum": ["candidate", "active", "deprecated"],
+  "templates": [
+    {
+      "template_id": "ingestion.source_adapter.v1",
+      "standard_id": "standard.source_adapter.v1",
+      "template_path": "templates/ingestion/source_adapter.v1/template.json",
+      "output_paths": ["scripts/ingest/{{source_family}}.py", "scripts/check_{{source_family}}_adapter.py", "docs/ingestion/{{source_family}}.md"],
+      "variables": ["source_family", "source_type", "parser_provider", "title", "owner"],
+      "required_commands_after_generation": [
+        "python3 scripts/check_{{source_family}}_adapter.py --self-test",
+        "python3 scripts/validate.py scripts/ingest/{{source_family}}.py"
+      ],
+      "required_registry_updates": [
+        "architecture/contract_registry.json#source_types += {{source_type}}",
+        "architecture/section_maturity_matrix.json sections += {{source_family}} (category ingestion)"
+      ],
+      "required_docs": ["docs/ingestion/{{source_family}}.md"],
+      "required_proofs": ["scripts/check_{{source_family}}_adapter.py"],
+      "status": "active"
+    },
+    {
+      "template_id": "worker.command_handler.v1",
+      "standard_id": "standard.durable_command.v1",
+      "template_path": "templates/worker/command_handler.v1/template.json",
+      "output_paths": ["scripts/handlers/{{handler_name}}.py", "scripts/check_{{handler_name}}_handler.py", "docs/runtime/{{handler_name}}.md"],
+      "variables": ["handler_name", "command_type", "queue_name", "title", "owner"],
+      "required_commands_after_generation": [
+        "python3 scripts/check_{{handler_name}}_handler.py --self-test"
+      ],
+      "required_registry_updates": [
+        "architecture/contract_registry.json#command_types += {{command_type}}",
+        "architecture/contract_registry.json#queue_names += {{queue_name}}"
+      ],
+      "required_docs": ["docs/runtime/{{handler_name}}.md"],
+      "required_proofs": ["scripts/check_{{handler_name}}_handler.py"],
+      "status": "active"
+    },
+    {
+      "template_id": "api.projection_route.v1",
+      "standard_id": "standard.api_projection.v1",
+      "template_path": "templates/api/projection_route.v1/template.json",
+      "output_paths": ["scripts/api_{{area}}_handler.py", "scripts/check_{{area}}_api.py", "docs/api/{{area}}.md"],
+      "variables": ["area", "route_path", "returns_contract", "title", "owner"],
+      "required_commands_after_generation": [
+        "python3 scripts/check_{{area}}_api.py --self-test"
+      ],
+      "required_registry_updates": [
+        "architecture/contract_registry.json#api_routes += GET {{route_path}} (projection_only:true, owner scripts/api_{{area}}_handler.py)"
+      ],
+      "required_docs": ["docs/api/{{area}}.md"],
+      "required_proofs": ["scripts/check_{{area}}_api.py"],
+      "status": "active"
+    },
+    {
+      "template_id": "ui.projection_page.v1",
+      "standard_id": "standard.ui_projection.v1",
+      "template_path": "templates/ui/projection_page.v1/template.json",
+      "output_paths": ["web/baltor/{{page}}.html", "scripts/check_{{page}}_ui.py", "docs/ui/{{page}}.md"],
+      "variables": ["page", "api_endpoint", "title", "owner"],
+      "required_commands_after_generation": [
+        "python3 scripts/check_{{page}}_ui.py --self-test"
+      ],
+      "required_registry_updates": [
+        "architecture/section_maturity_matrix.json ui_pages += web/baltor/{{page}}.html"
+      ],
+      "required_docs": ["docs/ui/{{page}}.md"],
+      "required_proofs": ["scripts/check_{{page}}_ui.py"],
+      "status": "active"
+    },
+    {
+      "template_id": "provider.adapter.v1",
+      "standard_id": "standard.provider_adapter.v1",
+      "template_path": "templates/provider/adapter.v1/template.json",
+      "output_paths": ["scripts/adapters/{{adapter_name}}.py", "scripts/check_{{adapter_name}}_adapter.py", "docs/adapters/{{adapter_name}}.md"],
+      "variables": ["adapter_name", "port_name", "capability", "title", "owner"],
+      "required_commands_after_generation": [
+        "python3 scripts/check_{{adapter_name}}_adapter.py --self-test"
+      ],
+      "required_registry_updates": [
+        "architecture/external_capability_catalog.json += {{capability}} ({{adapter_name}})"
+      ],
+      "required_docs": ["docs/adapters/{{adapter_name}}.md"],
+      "required_proofs": ["scripts/check_{{adapter_name}}_adapter.py"],
+      "status": "active"
+    },
+    {
+      "template_id": "proof.self_test.v1",
+      "standard_id": "standard.proof_script.v1",
+      "template_path": "templates/proof/self_test.v1/template.json",
+      "output_paths": ["scripts/check_{{proof_name}}.py"],
+      "variables": ["proof_name", "title", "owner", "subject_module"],
+      "required_commands_after_generation": [
+        "python3 scripts/check_{{proof_name}}.py --self-test"
+      ],
+      "required_registry_updates": [
+        "scripts/baltor_flywheel.py PROOF_MODULES += (scripts/check_{{proof_name}}.py, {{proof_name}})"
+      ],
+      "required_docs": [],
+      "required_proofs": ["scripts/check_{{proof_name}}.py"],
+      "status": "active"
+    },
+    {
+      "template_id": "docs.section_page.v1",
+      "standard_id": "standard.docs_page.v1",
+      "template_path": "templates/docs/section_page.v1/template.json",
+      "output_paths": ["docs/{{area}}/{{section}}.md"],
+      "variables": ["area", "section", "title", "owner"],
+      "required_commands_after_generation": [
+        "python3 scripts/check_documentation_coverage.py --self-test"
+      ],
+      "required_registry_updates": [
+        "architecture/section_maturity_matrix.json docs += docs/{{area}}/{{section}}.md"
+      ],
+      "required_docs": ["docs/{{area}}/{{section}}.md"],
+      "required_proofs": [],
+      "status": "active"
+    },
+    {
+      "template_id": "ingestion.sync_loop.v1",
+      "standard_id": "standard.ingestion_sync.v1",
+      "template_path": "templates/ingestion/sync_loop.v1/template.json",
+      "output_paths": ["scripts/ingest/{{source_family}}_feed.py", "scripts/check_{{source_family}}_sync.py", "docs/ingestion/{{source_family}}-sync.md"],
+      "variables": ["source_family", "title", "owner"],
+      "required_commands_after_generation": ["python3 scripts/check_{{source_family}}_sync.py --self-test"],
+      "required_registry_updates": ["architecture/contract_registry.json#queue_names += ingest.{{source_family}}"],
+      "required_docs": ["docs/ingestion/{{source_family}}-sync.md"],
+      "required_proofs": ["scripts/check_{{source_family}}_sync.py"],
+      "status": "candidate"
+    },
+    {
+      "template_id": "worker.claim_loop.v1",
+      "standard_id": "standard.worker_claim_loop.v1",
+      "template_path": "templates/worker/claim_loop.v1/template.json",
+      "output_paths": ["scripts/{{worker_name}}_worker.py", "scripts/check_{{worker_name}}_worker.py", "docs/runtime/{{worker_name}}-worker.md"],
+      "variables": ["worker_name", "queue_name", "title", "owner"],
+      "required_commands_after_generation": ["python3 scripts/check_{{worker_name}}_worker.py --self-test"],
+      "required_registry_updates": ["architecture/contract_registry.json#queue_names += {{queue_name}}"],
+      "required_docs": ["docs/runtime/{{worker_name}}-worker.md"],
+      "required_proofs": ["scripts/check_{{worker_name}}_worker.py"],
+      "status": "candidate"
+    },
+    {
+      "template_id": "runtime.processor.v1",
+      "standard_id": "standard.processor.v1",
+      "template_path": "templates/runtime/processor.v1/template.json",
+      "output_paths": ["scripts/runtime/processors/{{processor_name}}.py", "scripts/check_{{processor_name}}_processor.py", "docs/runtime/{{processor_name}}-processor.md"],
+      "variables": ["processor_name", "processor_id", "title", "owner"],
+      "required_commands_after_generation": ["python3 scripts/check_{{processor_name}}_processor.py --self-test"],
+      "required_registry_updates": ["architecture/contract_registry.json#processor_ids += {{processor_id}}"],
+      "required_docs": ["docs/runtime/{{processor_name}}-processor.md"],
+      "required_proofs": ["scripts/check_{{processor_name}}_processor.py"],
+      "status": "candidate"
+    },
+    {
+      "template_id": "contract.schema.v1",
+      "standard_id": "standard.contract_schema.v1",
+      "template_path": "templates/contract/schema.v1/template.json",
+      "output_paths": ["schemas/{{area}}/{{contract_name}}.v1.json", "scripts/check_{{contract_name}}_schema.py", "docs/contracts/{{contract_name}}.md"],
+      "variables": ["area", "contract_name", "title", "owner"],
+      "required_commands_after_generation": ["python3 scripts/check_{{contract_name}}_schema.py --self-test"],
+      "required_registry_updates": ["architecture/contract_registry.json#artifact_types += {{contract_name}}.v1"],
+      "required_docs": ["docs/contracts/{{contract_name}}.md"],
+      "required_proofs": ["scripts/check_{{contract_name}}_schema.py"],
+      "status": "candidate"
+    },
+    {
+      "template_id": "artifact.object.v1",
+      "standard_id": "standard.artifact_object.v1",
+      "template_path": "templates/artifact/object.v1/template.json",
+      "output_paths": ["scripts/artifacts/{{artifact_name}}.py", "scripts/check_{{artifact_name}}_artifact.py", "docs/artifacts/{{artifact_name}}.md"],
+      "variables": ["artifact_name", "artifact_type", "title", "owner"],
+      "required_commands_after_generation": ["python3 scripts/check_{{artifact_name}}_artifact.py --self-test"],
+      "required_registry_updates": ["architecture/contract_registry.json#artifact_types += {{artifact_type}}"],
+      "required_docs": ["docs/artifacts/{{artifact_name}}.md"],
+      "required_proofs": ["scripts/check_{{artifact_name}}_artifact.py"],
+      "status": "candidate"
+    },
+    {
+      "template_id": "optimization.candidate.v1",
+      "standard_id": "standard.optimization_candidate.v1",
+      "template_path": "templates/optimization/candidate.v1/template.json",
+      "output_paths": ["scripts/runtime/optimizers/{{optimizer_name}}.py", "scripts/check_{{optimizer_name}}_optimizer.py", "docs/runtime/{{optimizer_name}}-optimizer.md"],
+      "variables": ["optimizer_name", "title", "owner"],
+      "required_commands_after_generation": ["python3 scripts/check_{{optimizer_name}}_optimizer.py --self-test"],
+      "required_registry_updates": ["architecture/section_maturity_matrix.json sections += {{optimizer_name}} (category runtime)"],
+      "required_docs": ["docs/runtime/{{optimizer_name}}-optimizer.md"],
+      "required_proofs": ["scripts/check_{{optimizer_name}}_optimizer.py"],
+      "status": "candidate"
+    },
+    {
+      "template_id": "reconciliation.decision.v1",
+      "standard_id": "standard.reconciliation_decision.v1",
+      "template_path": "templates/reconciliation/decision.v1/template.json",
+      "output_paths": ["scripts/artifact_graph/{{rule_name}}_reconciler.py", "scripts/check_{{rule_name}}_reconciliation.py", "docs/runtime/{{rule_name}}-reconciliation.md"],
+      "variables": ["rule_name", "title", "owner"],
+      "required_commands_after_generation": ["python3 scripts/check_{{rule_name}}_reconciliation.py --self-test"],
+      "required_registry_updates": ["architecture/section_maturity_matrix.json sections += {{rule_name}} (category runtime)"],
+      "required_docs": ["docs/runtime/{{rule_name}}-reconciliation.md"],
+      "required_proofs": ["scripts/check_{{rule_name}}_reconciliation.py"],
+      "status": "candidate"
+    },
+    {
+      "template_id": "watchtower.task.v1",
+      "standard_id": "standard.watchtower_task.v1",
+      "template_path": "templates/watchtower/task.v1/template.json",
+      "output_paths": ["scripts/context_workers/{{task_name}}_watchtower.py", "scripts/check_{{task_name}}_watchtower.py", "docs/runtime/{{task_name}}-watchtower.md"],
+      "variables": ["task_name", "freshness_bound", "title", "owner"],
+      "required_commands_after_generation": ["python3 scripts/check_{{task_name}}_watchtower.py --self-test"],
+      "required_registry_updates": ["architecture/section_maturity_matrix.json sections += {{task_name}} (category runtime)"],
+      "required_docs": ["docs/runtime/{{task_name}}-watchtower.md"],
+      "required_proofs": ["scripts/check_{{task_name}}_watchtower.py"],
+      "status": "candidate"
+    },
+    {
+      "template_id": "tenant.isolation_guard.v1",
+      "standard_id": "standard.tenant_isolation.v1",
+      "template_path": "templates/tenant/isolation_guard.v1/template.json",
+      "output_paths": ["scripts/check_{{guard_name}}_tenant_isolation.py", "docs/runtime/{{guard_name}}-tenant-isolation.md"],
+      "variables": ["guard_name", "title", "owner"],
+      "required_commands_after_generation": ["python3 scripts/check_{{guard_name}}_tenant_isolation.py --self-test"],
+      "required_registry_updates": [],
+      "required_docs": ["docs/runtime/{{guard_name}}-tenant-isolation.md"],
+      "required_proofs": ["scripts/check_{{guard_name}}_tenant_isolation.py"],
+      "status": "candidate"
+    },
+    {
+      "template_id": "review.pack.v1",
+      "standard_id": "standard.review_pack.v1",
+      "template_path": "templates/review/pack.v1/template.json",
+      "output_paths": ["scripts/{{pack_name}}_review_pack.py", "scripts/check_{{pack_name}}_review_pack.py", "docs/runtime/{{pack_name}}-review-pack.md"],
+      "variables": ["pack_name", "title", "owner"],
+      "required_commands_after_generation": ["python3 scripts/check_{{pack_name}}_review_pack.py --self-test"],
+      "required_registry_updates": ["architecture/section_maturity_matrix.json sections += {{pack_name}} (category runtime)"],
+      "required_docs": ["docs/runtime/{{pack_name}}-review-pack.md"],
+      "required_proofs": ["scripts/check_{{pack_name}}_review_pack.py"],
+      "status": "candidate"
+    }
+  ]
+}

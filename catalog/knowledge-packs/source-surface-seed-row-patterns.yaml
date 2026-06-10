@@ -1,0 +1,39 @@
+id: "knowledge-pack/source-surface-seed-row-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Source surface seed row patterns"
+description: "Patterns for converting esoteric industry source-surface seeds into canonical factory row families for search, comparison, review, embedding backfill, and promotion."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["automotive", "energy", "manufacturing", "construction", "government", "cross_industry"]
+capability: ["extraction", "classification", "retrieval", "governance", "evaluation"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.product"
+tags: ["source-surfaces", "candidate-primitives", "factory-rows", "entity-refs", "embedding-buckets"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types:
+  - "source_surface_row_pattern"
+  - "candidate_primitive_mapping"
+  - "entity_ref_mapping"
+  - "object_embedding_mapping"
+files:
+  - path: "catalog/knowledge-packs/data/source-surface-seed-row-patterns/rows.jsonl"
+    format: "jsonl"
+    schema: "source-surface-seed-row-pattern"
+indexing:
+  bm25: true
+  dense:
+    recommended_model: "sentence-transformers/all-MiniLM-L6-v2"
+provenance:
+  sources:
+    - "Open Harness Hub source surface seed row exporter"
+    - "Open Harness Hub esoteric industry source surfaces"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "Synthetic source-surface row mappings only; no real PII or proprietary source material."

@@ -1,0 +1,66 @@
+{
+  "name": "TryCloudflare",
+  "pass_threshold": 80,
+  "items": [
+    {
+      "rubric_id": "tcf.detect",
+      "description": "cloudflared existence detected",
+      "weight": 15,
+      "blocker": true,
+      "evidence_required": "cloudflared --version",
+      "proof_script": "scripts/check_portfolio_trycloudflare_rubric.py",
+      "pass_condition": "presence recorded",
+      "fail_message": "not detected"
+    },
+    {
+      "rubric_id": "tcf.no_fake",
+      "description": "No fake public URLs",
+      "weight": 25,
+      "blocker": true,
+      "evidence_required": "urls.json",
+      "proof_script": "scripts/check_portfolio_trycloudflare_rubric.py",
+      "pass_condition": "urls are real trycloudflare.com or MISSING/FAILED",
+      "fail_message": "fake url present"
+    },
+    {
+      "rubric_id": "tcf.manifests",
+      "description": "URL manifests written (json/md/txt)",
+      "weight": 20,
+      "blocker": true,
+      "evidence_required": "dist/portfolio-share-urls.*",
+      "proof_script": "scripts/check_portfolio_trycloudflare_rubric.py",
+      "pass_condition": "manifests present",
+      "fail_message": "manifests missing"
+    },
+    {
+      "rubric_id": "tcf.caveat",
+      "description": "TryCloudflare temporary-URL caveat documented",
+      "weight": 15,
+      "blocker": false,
+      "evidence_required": "docs",
+      "proof_script": "scripts/check_portfolio_trycloudflare_rubric.py",
+      "pass_condition": "caveat in docs",
+      "fail_message": "caveat missing"
+    },
+    {
+      "rubric_id": "tcf.exact_pids",
+      "description": "Exact tunnel PID cleanup",
+      "weight": 10,
+      "blocker": true,
+      "evidence_required": "tunnel-pids.json",
+      "proof_script": "scripts/check_portfolio_trycloudflare_rubric.py",
+      "pass_condition": "no pkill",
+      "fail_message": "broad pkill"
+    },
+    {
+      "rubric_id": "tcf.honest_missing",
+      "description": "Missing/failed cloudflared is an honest non-fatal state",
+      "weight": 15,
+      "blocker": true,
+      "evidence_required": "manifest",
+      "proof_script": "scripts/check_portfolio_trycloudflare_rubric.py",
+      "pass_condition": "honest state recorded",
+      "fail_message": "fake/silent"
+    }
+  ]
+}

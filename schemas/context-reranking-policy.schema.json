@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/context-reranking-policy.schema.json",
+  "title": "Context reranking policy",
+  "description": "Source-aware policy for reranking retrieval candidates before context-pack assembly.",
+  "type": "object",
+  "required": ["kind", "reranking_policy_id", "score_formula", "pipeline", "created_at"],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "baltor.context-reranking-policy.v1"
+    },
+    "reranking_policy_id": {
+      "type": "string"
+    },
+    "score_formula": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "pipeline": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["stage", "slot", "action"],
+        "properties": {
+          "stage": { "type": "integer", "minimum": 0, "maximum": 6 },
+          "slot": { "type": "string" },
+          "action": { "type": "string" },
+          "candidate_limit": { "type": "integer", "minimum": 1 }
+        },
+        "additionalProperties": true
+      }
+    },
+    "escalation_triggers": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

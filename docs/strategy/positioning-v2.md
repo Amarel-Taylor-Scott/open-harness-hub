@@ -1,5 +1,10 @@
 # Positioning v2 (canonical) — name · value prop · competitive stance
 
+> **Naming is now locked** ([[brand-architecture.md]], 2026-05-29): the paid SaaS this doc calls
+> "CEaaS / verified-context SaaS / Name TBD" is **Baltor.ai** (in prose: **Baltor**); the company/mission
+> is **Context is Everything**; **Open Harness Hub** keeps its name. This doc owns *positioning*; brand
+> identity/messaging lives in [[brand-architecture.md]].
+
 The single throughline that consolidates the strategy. Deep-dives feed this doc; don't duplicate them:
 [[beat-contextual-positioning.md]] (competitor profile + wedges + upstream), [[competitor-contextual-ai.md]]
 (the engine/Agent-Composer analysis), [[oracle-corpus-and-tooling-map.md]] (the commons + beachhead),
@@ -22,7 +27,7 @@ lose to Agent Composer *and* the OSS builder crowd (LangGraph, Dify, n8n, Flowis
 narrowed to **ONE** thing Contextual structurally won't be: **genuinely open** — real OSS, self-hostable,
 free for the long tail, working with the agent the developer already runs (their "free trial + model-agnostic"
 is an enterprise *funnel*, not an open product). **So: OHH = the open funnel + the consumption surface for
-verified corpora (distribution + developer goodwill); CEaaS = the headline business. The product is the
+verified corpora (distribution + developer goodwill); Baltor = the headline business. The product is the
 verified FUEL, not the harness.**
 
 **The wedge line (memorize):** *"Most platforms keep your docs CURRENT. We CONTINUOUSLY verify they are
@@ -40,23 +45,24 @@ marketplace, no oracle-publisher path** — the verified-corpus-commons gap is n
 Their architecture even has an Enterprise-Knowledge layer at the bottom that **must be fed** with no shared-
 corpus answer of their own — the exact slot we supply (strengthens the upstream + acquisition logic).
 
-## Name + tagline (no rename)
+## Name + tagline (LOCKED — see [[brand-architecture.md]])
 **Open Harness Hub** (`openharnesshub.com`) — **the harness layer that powers trustworthy agents.**
 Bridge to "agent" in language/SEO (*"Power your agents with governed harnesses"* / *"harnesses for agents
 you can trust"*), never by renaming (that collapses the harness-vs-agent line the two-product split needs,
 and drops us into the commoditizing agent category). The metaphor *is* the pitch: a harness reins in
 powerful behavior → **governed agents you can trust.** (Own the full mark; "harness" alone collides with
-Harness.io.) The verified-context product and the umbrella/company brand remain **open naming questions.**
+Harness.io.) The verified-context product is **Baltor.ai** (prose: **Baltor**) and the company/mission is
+**Context is Everything** — both now locked; only trademark/domain clearance remains open.
 
 ## The two products (one governed object, two doors)
 - **Open Harness Hub — the bounded, governed harness** (free/OSS funnel + low-end wedge). Assemble + monitor
   a governed pipeline of seven primitives; components admitted only on **measured lift**; **open, portable,
   works with the agent you already run** (Claude Code/Codex). *Value prop:* "the open, governed harness
   layer for agents — buildable, measurable, yours."
-- **Context Enrichment / verified-context SaaS — the moat** (recurring). **Verified, current, provable
-  context:** corpora cross-checked vs authoritative truth, freshness/CDC, C2PA provenance + oracle
-  publishers, HITL on conflicts, compliance artifacts — served into any agent. *Value prop:* "Verified,
-  current, provable context — for the agent you already run." (Name TBD.)
+- **Baltor — the moat** (recurring; the verified-context SaaS, modules Verify · Corpus · Compress).
+  **Verified, current, provable context:** corpora cross-checked vs authoritative truth, freshness/CDC,
+  C2PA provenance + oracle publishers, HITL on conflicts, compliance artifacts — served into any agent.
+  *Value prop:* "Verified, current, provable context — for the agent you already run."
 - **The join:** one governed corpus/tool, minted + scored once (lift + fidelity), consumed two ways — wired
   into a bounded harness, or served as fuel into an open agent.
 
@@ -84,7 +90,7 @@ Harness.io.) The verified-context product and the umbrella/company brand remain 
 ## The crisp one-liners
 - **Company:** "The open harness layer + verified context for trustworthy agents."
 - **OHH:** "Power your agents with governed harnesses." (free, open, portable, measured.)
-- **Verified-context SaaS:** "Verified, current, provable context — for the agent you already run." (the moat.)
+- **Baltor:** "Verified, current, provable context — for the agent you already run." (the moat.)
 
 ## What we DON'T claim (honesty guards)
 We don't claim to out-RAG Contextual, to have novel orchestration, or measured-lift we haven't run

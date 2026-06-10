@@ -1,0 +1,74 @@
+id: "tool/edge-micro-model-authorization-router"
+type: tool
+version: "0.1.0"
+name: "Edge micro-model authorization router"
+description: "Routes edge AI prompt, tool, and decoded-span checks through a cheap local micro-model first, escalating to the main model only when severity or uncertainty requires it."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "security.defensive", "cross_industry"]
+capability: ["routing", "safety_gating", "classification", "planning"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "api.routing"
+tags: ["edge-ai", "micro-model", "authorization", "cost-control", "latency"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    candidate_action:
+      type: object
+    decoded_segments:
+      type: array
+      items:
+        type: object
+    device_profile:
+      type: object
+    policy:
+      type: object
+  required: ["candidate_action", "device_profile"]
+returns:
+  type: object
+  properties:
+    route:
+      type: string
+    confidence:
+      type: number
+    estimated_latency_ms:
+      type: integer
+    estimated_energy_class:
+      type: string
+    escalation_reason:
+      type: string
+    audit_ref:
+      type: string
+side_effects: "read"
+examples:
+  - input:
+      candidate_action:
+        kind: "decode_and_summarize"
+        risk_tier: "medium"
+      decoded_segments:
+        - decoded_text_hash: "sha256:decoded-example"
+          safety_findings: ["dual_use_security_language"]
+      device_profile:
+        class: "midrange_mobile"
+        main_model_loaded: true
+      policy:
+        escalate_when_uncertain: true
+    output:
+      route: "main_model_escalation"
+      confidence: 0.62
+      estimated_latency_ms: 95
+      estimated_energy_class: "low"
+      escalation_reason: "medium risk decoded segment with moderate confidence"
+      audit_ref: "audit://edge-micro-model-router/example"
+implementations:
+  - kind: "callable"
+    path: "tools.edge_micro_model_authorization_router.run"
+  - kind: "mcp"
+    path: "mcp/edge.authorization_router"

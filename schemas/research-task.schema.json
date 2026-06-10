@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/research-task.schema.json",
+  "title": "Research task",
+  "description": "Queueable research, verification, archive, or reconciliation task emitted by workers.",
+  "type": "object",
+  "required": ["task_id", "task_type", "tenant_id", "state", "lane", "priority", "payload"],
+  "properties": {
+    "task_id": { "type": "string" },
+    "task_type": { "$ref": "_common.schema.json#/$defs/researchTaskType" },
+    "tenant_id": { "type": "string" },
+    "run_id": { "type": "string" },
+    "fact_id": { "type": "string" },
+    "source_record_id": { "type": "string" },
+    "parent_task_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "state": { "$ref": "_common.schema.json#/$defs/objectState" },
+    "state_history": {
+      "type": "array",
+      "items": { "$ref": "_common.schema.json#/$defs/stateEvent" }
+    },
+    "lane": { "$ref": "_common.schema.json#/$defs/queueLane" },
+    "priority": { "$ref": "_common.schema.json#/$defs/queuePriority" },
+    "priority_signals": { "$ref": "_common.schema.json#/$defs/prioritySignals" },
+    "queue_policy": { "$ref": "_common.schema.json#/$defs/queuePolicy" },
+    "cost_estimate": { "$ref": "_common.schema.json#/$defs/costEstimate" },
+    "budget_policy": { "$ref": "_common.schema.json#/$defs/budgetPolicy" },
+    "payload": {
+      "type": "object",
+      "description": "Task-specific inputs. Store secrets in a vault and pass references, not values."
+    },
+    "outputs": { "type": "object" },
+    "attempts": { "type": "integer", "minimum": 0 },
+    "max_attempts": { "type": "integer", "minimum": 0 },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "not_before": { "type": "string", "format": "date-time" },
+    "deadline_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": true
+}

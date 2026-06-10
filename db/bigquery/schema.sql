@@ -8,7 +8,7 @@
 
 CREATE SCHEMA IF NOT EXISTS open_harness_hub;
 
-CREATE TABLE IF NOT EXISTS open_harness_hub.artifact (
+CREATE TABLE IF NOT EXISTS open_harness_hub.component (
   id              STRING NOT NULL,
   type            STRING NOT NULL,
   version         STRING NOT NULL,
@@ -63,7 +63,7 @@ CLUSTER BY pack_id, leaf_type;
 
 CREATE TABLE IF NOT EXISTS open_harness_hub.run (
   run_id        STRING NOT NULL,
-  artifact_id   STRING NOT NULL,
+  component_id   STRING NOT NULL,
   started_at    TIMESTAMP NOT NULL,
   finished_at   TIMESTAMP,
   status        STRING NOT NULL,
@@ -75,11 +75,11 @@ CREATE TABLE IF NOT EXISTS open_harness_hub.run (
   trust_boundary STRING
 )
 PARTITION BY DATE(started_at)
-CLUSTER BY artifact_id, status;
+CLUSTER BY component_id, status;
 
 -- Useful queries:
 --   -- catalog growth over time
---   SELECT DATE(ingested_at) day, COUNT(*) FROM open_harness_hub.artifact GROUP BY 1 ORDER BY 1;
+--   SELECT DATE(ingested_at) day, COUNT(*) FROM open_harness_hub.component GROUP BY 1 ORDER BY 1;
 --
 --   -- spend by adapter over the last 30 days
 --   SELECT adapter_id, SUM(cost_usd) FROM open_harness_hub.run

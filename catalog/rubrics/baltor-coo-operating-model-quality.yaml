@@ -1,0 +1,48 @@
+id: "rubric/baltor-coo-operating-model-quality"
+type: rubric
+version: "0.1.0"
+name: "Baltor COO operating model quality"
+description: "COO rubric for operating Baltor reliably across teams, workflows, queues, connectors, and customer deployments."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["software", "sre"]
+capability: ["evaluation", "planning", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["baltor", "coo", "operations", "workflow"]
+created: "2026-06-02"
+updated: "2026-06-02"
+dimensions:
+  - id: "repeatable_delivery"
+    label: "Implementation can be deployed, configured, and supported repeatedly without founder-only intervention"
+    weight: 0.20
+    scale: "0.0-1.0"
+    evidence_required: "Runbooks, connector setup flow, health checks, rollback, onboarding checklists, and support playbooks exist."
+  - id: "workflow_fit"
+    label: "Context packs fit existing developer and reviewer workflows without forcing a new work surface"
+    weight: 0.18
+    scale: "0.0-1.0"
+    evidence_required: "MCP, CLI, PR/MR comments, CI checks, and minimal web console paths are documented and tested."
+  - id: "queue_observability"
+    label: "Sync, refresh, fragile-context, and worker queues are observable and operationally manageable"
+    weight: 0.17
+    scale: "0.0-1.0"
+    evidence_required: "Pending jobs, stale jobs, throughput, failed jobs, active workers, and retry policy are visible."
+  - id: "change_management"
+    label: "Schema, connector, policy, and pack-template changes have controlled rollout and compatibility plans"
+    weight: 0.15
+    scale: "0.0-1.0"
+    evidence_required: "Versioning, migration notes, feature flags, compatibility tests, and customer communication plans exist."
+  - id: "cloud_operations"
+    label: "Cloud hosting model supports multi-tenant or dedicated deployments with reliable monitoring"
+    weight: 0.15
+    scale: "0.0-1.0"
+    evidence_required: "Service health, latency, storage growth, connector sync status, queue drain time, and SLOs are tracked."
+  - id: "customer_success_handoff"
+    label: "Operational insights can be handed to customer success and support without engineering-only interpretation"
+    weight: 0.15
+    scale: "0.0-1.0"
+    evidence_required: "Dashboards and reports explain pack usefulness, stale context, blocked sources, and adoption friction."
+scoring_method: "weighted_sum"

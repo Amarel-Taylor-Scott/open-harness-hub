@@ -1,0 +1,38 @@
+id: "knowledge-pack/staged-vs-committed-load-audit-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Staged versus committed load audit patterns"
+description: "Relation-level checks for comparing staged object-factory bulk-load counts against canonical Postgres and pgvector row counts after load execution."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "evaluation", "retrieval", "serving", "verification"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["postgres", "pgvector", "load-audit", "object-counts", "bulk-load", "verification"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types:
+  - "load_audit_check"
+  - "postgres_count_reconciliation"
+files:
+  - path: "catalog/knowledge-packs/data/staged-vs-committed-load-audit-patterns/checks.jsonl"
+    format: "jsonl"
+    schema: "load_audit_check"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["relation_name", "staged_family", "description", "mismatch_action"]
+provenance:
+  sources:
+    - "db/postgres/object_count_report.sql"
+    - "Open Harness Hub bulk load manifests"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "count reconciliation metadata only; no source bodies or PII"

@@ -1,0 +1,55 @@
+id: "rubric/bridge-inspection-review-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Bridge Inspection Review review quality v1"
+description: "Benchmarkable rubric for bridge inspection review review outputs."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["infrastructure.bridge", "government.regulatory"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["bridge-inspection-review", "expansion-v4"]
+created: "2026-05-24"
+updated: "2026-05-24"
+dimensions:
+  - id: "domain_coverage"
+    label: "Domain coverage"
+    weight: 0.20
+    scale: "0.0-1.0"
+    evidence_required: "All domain-specific review areas and non-applicable areas are addressed."
+  - id: "evidence_grounding"
+    label: "Evidence grounding"
+    weight: 0.30
+    scale: "0.0-1.0"
+    evidence_required: "Findings cite packet evidence, rule ids, or retrieved context ids."
+  - id: "severity_confidence"
+    label: "Severity and confidence calibration"
+    weight: 0.18
+    scale: "0.0-1.0"
+    evidence_required: "Severity reflects impact and confidence separately from missing evidence."
+  - id: "evidence_gap_quality"
+    label: "Evidence gap quality"
+    weight: 0.12
+    scale: "0.0-1.0"
+    evidence_required: "Missing components are named with reason and resolution path."
+  - id: "actionability"
+    label: "Actionability"
+    weight: 0.12
+    scale: "0.0-1.0"
+    evidence_required: "Remediation identifies owner role, due trigger, and verification method."
+  - id: "auditability"
+    label: "Auditability"
+    weight: 0.08
+    scale: "0.0-1.0"
+    evidence_required: "Trace records processor outputs, retrieved context ids, redaction status, and benchmark metadata."
+scoring_method: "weighted_sum"
+examples:
+  - grade: 0.92
+    response: "Grounded findings with evidence ids, evidence gaps, calibrated severity, and actionable remediation."
+    notes: "Benchmark pass."
+  - grade: 0.28
+    response: "Generic summary with no citations, missing components, or escalation path."
+    notes: "Benchmark fail."

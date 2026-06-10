@@ -75,7 +75,7 @@ This is **not a rewrite** — it is the natural next step from where the repo al
 [[cloud-architecture.md]] and [[backend-services-and-platform.md]] already mandate a
 swappable `Queue` protocol (`scripts/foundry/queues.py`, default `RedisQueue`), a
 stateless worker (`scripts/foundry/worker.py`, pull/run_partition/ack + retry +
-dead-letter), one container image per service-role, and KEDA-on-queue-depth at Phase 2.
+explicit failed-permanently state), one container image per service-role, and KEDA-on-queue-depth at Phase 2.
 The **gap** is that there is exactly **one** queue today
 (`DEFAULT_QUEUE_KEY = "ohh:foundry:jobs"`) and the per-component execution signals are
 *carried but not yet used as a routing key*. This doc closes that gap.
@@ -159,7 +159,7 @@ maps to a concrete dispatch decision:
 | `trust_boundary` (`local`/`hub`/`external`/`mixed`) | `external`/`mixed` → **sandboxed-untrusted** isolation tier; `local`/`hub` → standard container. **The one signal that picks per-component isolation.** |
 | `deterministic` | `true` → safe for replay/memoization (the worker contract assumes converge-on-replay; OHH already has this via content-hashing + the resumable funnel ledger). |
 | `idempotent` | `true` → safe **at-least-once** on cheap FaaS / aggressive retry; `false` → exactly-once-leaning worker queue + once-only handling (the Step Functions Standard-vs-Express distinction). |
-| `on_error` / `retry` (`max_attempts`, `backoff`) | The queue's retry / dead-letter policy per job (already implemented in `worker.py`). |
+| `on_error` / `retry` (`max_attempts`, `backoff`) | The queue's retry and explicit terminal/hold policy per job: `approval_required`, `budget_blocked`, or `failed_permanently`. |
 | `model_targets` (when the processor wraps an LLM call) | Forces **gpu** / **external-metered** and binds the per-job `model_call_budget`. |
 | `implementations.kind` (`callable`/`shell`/`http`/`openapi`/`mcp`/`docker`/`wasm`) | Selects the executor *within* a pool: `wasm`/`docker` are the natural sandbox runtimes for **sandboxed-untrusted**; `http`/`openapi`/`mcp` are external calls (→ **external-metered**). |
 

@@ -1,0 +1,420 @@
+{
+  "version": "1.0",
+  "note": "Per-bucket tool/port policy. CanonicalFactStore + ConsumptionService are forbidden to all but the gated reconciliation/native_export/human paths.",
+  "policies": [
+    {
+      "bucket_id": "control_plane",
+      "allowed_ports": [
+        "DurableStorePort"
+      ],
+      "forbidden_ports": [
+        "BrowserProviderPort",
+        "CodegenAgentProviderPort",
+        "LLMGatewayPort",
+        "MemoryProviderPort",
+        "ModelProviderPort",
+        "ObjectStorePort",
+        "ParserProviderPort",
+        "ResearchAgentProviderPort",
+        "SandboxProviderPort",
+        "SourceDiscoveryProviderPort",
+        "VectorProviderPort"
+      ],
+      "secret_access": false,
+      "tenant_data_access": false,
+      "can_write_canonical_fact_store": false,
+      "object_store_access": false
+    },
+    {
+      "bucket_id": "open_ended_agent",
+      "allowed_ports": [
+        "LLMGatewayPort",
+        "ResearchAgentProviderPort",
+        "SourceDiscoveryProviderPort",
+        "CodegenAgentProviderPort",
+        "MemoryProviderPort",
+        "SandboxProviderPort",
+        "ObjectStorePort"
+      ],
+      "forbidden_ports": [
+        "BrowserProviderPort",
+        "DurableStorePort",
+        "ModelProviderPort",
+        "ParserProviderPort",
+        "VectorProviderPort"
+      ],
+      "secret_access": false,
+      "tenant_data_access": true,
+      "can_write_canonical_fact_store": false,
+      "object_store_access": true
+    },
+    {
+      "bucket_id": "browser",
+      "allowed_ports": [
+        "BrowserProviderPort",
+        "ObjectStorePort"
+      ],
+      "forbidden_ports": [
+        "CodegenAgentProviderPort",
+        "DurableStorePort",
+        "LLMGatewayPort",
+        "MemoryProviderPort",
+        "ModelProviderPort",
+        "ParserProviderPort",
+        "ResearchAgentProviderPort",
+        "SandboxProviderPort",
+        "SourceDiscoveryProviderPort",
+        "VectorProviderPort"
+      ],
+      "secret_access": false,
+      "tenant_data_access": true,
+      "can_write_canonical_fact_store": false,
+      "object_store_access": true
+    },
+    {
+      "bucket_id": "utility",
+      "allowed_ports": [
+        "ObjectStorePort",
+        "DurableStorePort"
+      ],
+      "forbidden_ports": [
+        "BrowserProviderPort",
+        "CodegenAgentProviderPort",
+        "LLMGatewayPort",
+        "MemoryProviderPort",
+        "ModelProviderPort",
+        "ParserProviderPort",
+        "ResearchAgentProviderPort",
+        "SandboxProviderPort",
+        "SourceDiscoveryProviderPort",
+        "VectorProviderPort"
+      ],
+      "secret_access": false,
+      "tenant_data_access": false,
+      "can_write_canonical_fact_store": false,
+      "object_store_access": true
+    },
+    {
+      "bucket_id": "ingestion_sync",
+      "allowed_ports": [
+        "ParserProviderPort",
+        "ObjectStorePort",
+        "DurableStorePort"
+      ],
+      "forbidden_ports": [
+        "BrowserProviderPort",
+        "CodegenAgentProviderPort",
+        "LLMGatewayPort",
+        "MemoryProviderPort",
+        "ModelProviderPort",
+        "ResearchAgentProviderPort",
+        "SandboxProviderPort",
+        "SourceDiscoveryProviderPort",
+        "VectorProviderPort"
+      ],
+      "secret_access": false,
+      "tenant_data_access": true,
+      "can_write_canonical_fact_store": false,
+      "object_store_access": true
+    },
+    {
+      "bucket_id": "parser_document",
+      "allowed_ports": [
+        "ParserProviderPort",
+        "ObjectStorePort"
+      ],
+      "forbidden_ports": [
+        "BrowserProviderPort",
+        "CodegenAgentProviderPort",
+        "DurableStorePort",
+        "LLMGatewayPort",
+        "MemoryProviderPort",
+        "ModelProviderPort",
+        "ResearchAgentProviderPort",
+        "SandboxProviderPort",
+        "SourceDiscoveryProviderPort",
+        "VectorProviderPort"
+      ],
+      "secret_access": false,
+      "tenant_data_access": false,
+      "can_write_canonical_fact_store": false,
+      "object_store_access": true
+    },
+    {
+      "bucket_id": "decomposition_text_understanding",
+      "allowed_ports": [
+        "LLMGatewayPort",
+        "ObjectStorePort"
+      ],
+      "forbidden_ports": [
+        "BrowserProviderPort",
+        "CodegenAgentProviderPort",
+        "DurableStorePort",
+        "MemoryProviderPort",
+        "ModelProviderPort",
+        "ParserProviderPort",
+        "ResearchAgentProviderPort",
+        "SandboxProviderPort",
+        "SourceDiscoveryProviderPort",
+        "VectorProviderPort"
+      ],
+      "secret_access": false,
+      "tenant_data_access": false,
+      "can_write_canonical_fact_store": false,
+      "object_store_access": true
+    },
+    {
+      "bucket_id": "verification_fact_check",
+      "allowed_ports": [
+        "LLMGatewayPort",
+        "ObjectStorePort",
+        "DurableStorePort"
+      ],
+      "forbidden_ports": [
+        "BrowserProviderPort",
+        "CodegenAgentProviderPort",
+        "MemoryProviderPort",
+        "ModelProviderPort",
+        "ParserProviderPort",
+        "ResearchAgentProviderPort",
+        "SandboxProviderPort",
+        "SourceDiscoveryProviderPort",
+        "VectorProviderPort"
+      ],
+      "secret_access": false,
+      "tenant_data_access": false,
+      "can_write_canonical_fact_store": false,
+      "object_store_access": true
+    },
+    {
+      "bucket_id": "reconciliation_policy",
+      "allowed_ports": [
+        "DurableStorePort",
+        "ObjectStorePort"
+      ],
+      "forbidden_ports": [
+        "BrowserProviderPort",
+        "CodegenAgentProviderPort",
+        "LLMGatewayPort",
+        "MemoryProviderPort",
+        "ModelProviderPort",
+        "ParserProviderPort",
+        "ResearchAgentProviderPort",
+        "SandboxProviderPort",
+        "SourceDiscoveryProviderPort",
+        "VectorProviderPort"
+      ],
+      "secret_access": false,
+      "tenant_data_access": false,
+      "can_write_canonical_fact_store": true,
+      "object_store_access": true
+    },
+    {
+      "bucket_id": "model_inference",
+      "allowed_ports": [
+        "LLMGatewayPort",
+        "ModelProviderPort",
+        "ObjectStorePort"
+      ],
+      "forbidden_ports": [
+        "BrowserProviderPort",
+        "CodegenAgentProviderPort",
+        "DurableStorePort",
+        "MemoryProviderPort",
+        "ParserProviderPort",
+        "ResearchAgentProviderPort",
+        "SandboxProviderPort",
+        "SourceDiscoveryProviderPort",
+        "VectorProviderPort"
+      ],
+      "secret_access": false,
+      "tenant_data_access": false,
+      "can_write_canonical_fact_store": false,
+      "object_store_access": true
+    },
+    {
+      "bucket_id": "cpu_gpu_compute",
+      "allowed_ports": [
+        "ModelProviderPort",
+        "VectorProviderPort",
+        "ObjectStorePort"
+      ],
+      "forbidden_ports": [
+        "BrowserProviderPort",
+        "CodegenAgentProviderPort",
+        "DurableStorePort",
+        "LLMGatewayPort",
+        "MemoryProviderPort",
+        "ParserProviderPort",
+        "ResearchAgentProviderPort",
+        "SandboxProviderPort",
+        "SourceDiscoveryProviderPort"
+      ],
+      "secret_access": false,
+      "tenant_data_access": false,
+      "can_write_canonical_fact_store": false,
+      "object_store_access": true
+    },
+    {
+      "bucket_id": "vector_graph",
+      "allowed_ports": [
+        "VectorProviderPort",
+        "ObjectStorePort",
+        "DurableStorePort"
+      ],
+      "forbidden_ports": [
+        "BrowserProviderPort",
+        "CodegenAgentProviderPort",
+        "LLMGatewayPort",
+        "MemoryProviderPort",
+        "ModelProviderPort",
+        "ParserProviderPort",
+        "ResearchAgentProviderPort",
+        "SandboxProviderPort",
+        "SourceDiscoveryProviderPort"
+      ],
+      "secret_access": false,
+      "tenant_data_access": false,
+      "can_write_canonical_fact_store": false,
+      "object_store_access": true
+    },
+    {
+      "bucket_id": "optimization_evaluation",
+      "allowed_ports": [
+        "LLMGatewayPort",
+        "ModelProviderPort",
+        "ObjectStorePort"
+      ],
+      "forbidden_ports": [
+        "BrowserProviderPort",
+        "CodegenAgentProviderPort",
+        "DurableStorePort",
+        "MemoryProviderPort",
+        "ParserProviderPort",
+        "ResearchAgentProviderPort",
+        "SandboxProviderPort",
+        "SourceDiscoveryProviderPort",
+        "VectorProviderPort"
+      ],
+      "secret_access": false,
+      "tenant_data_access": false,
+      "can_write_canonical_fact_store": false,
+      "object_store_access": true
+    },
+    {
+      "bucket_id": "distillation_determinism",
+      "allowed_ports": [
+        "LLMGatewayPort",
+        "ObjectStorePort",
+        "DurableStorePort"
+      ],
+      "forbidden_ports": [
+        "BrowserProviderPort",
+        "CodegenAgentProviderPort",
+        "MemoryProviderPort",
+        "ModelProviderPort",
+        "ParserProviderPort",
+        "ResearchAgentProviderPort",
+        "SandboxProviderPort",
+        "SourceDiscoveryProviderPort",
+        "VectorProviderPort"
+      ],
+      "secret_access": false,
+      "tenant_data_access": false,
+      "can_write_canonical_fact_store": false,
+      "object_store_access": true
+    },
+    {
+      "bucket_id": "memory_context",
+      "allowed_ports": [
+        "MemoryProviderPort",
+        "ObjectStorePort"
+      ],
+      "forbidden_ports": [
+        "BrowserProviderPort",
+        "CodegenAgentProviderPort",
+        "DurableStorePort",
+        "LLMGatewayPort",
+        "ModelProviderPort",
+        "ParserProviderPort",
+        "ResearchAgentProviderPort",
+        "SandboxProviderPort",
+        "SourceDiscoveryProviderPort",
+        "VectorProviderPort"
+      ],
+      "secret_access": false,
+      "tenant_data_access": true,
+      "can_write_canonical_fact_store": false,
+      "object_store_access": true
+    },
+    {
+      "bucket_id": "native_export",
+      "allowed_ports": [
+        "ObjectStorePort",
+        "DurableStorePort"
+      ],
+      "forbidden_ports": [
+        "BrowserProviderPort",
+        "CodegenAgentProviderPort",
+        "LLMGatewayPort",
+        "MemoryProviderPort",
+        "ModelProviderPort",
+        "ParserProviderPort",
+        "ResearchAgentProviderPort",
+        "SandboxProviderPort",
+        "SourceDiscoveryProviderPort",
+        "VectorProviderPort"
+      ],
+      "secret_access": false,
+      "tenant_data_access": false,
+      "can_write_canonical_fact_store": true,
+      "object_store_access": true
+    },
+    {
+      "bucket_id": "observability_monitoring",
+      "allowed_ports": [
+        "DurableStorePort"
+      ],
+      "forbidden_ports": [
+        "BrowserProviderPort",
+        "CodegenAgentProviderPort",
+        "LLMGatewayPort",
+        "MemoryProviderPort",
+        "ModelProviderPort",
+        "ObjectStorePort",
+        "ParserProviderPort",
+        "ResearchAgentProviderPort",
+        "SandboxProviderPort",
+        "SourceDiscoveryProviderPort",
+        "VectorProviderPort"
+      ],
+      "secret_access": false,
+      "tenant_data_access": false,
+      "can_write_canonical_fact_store": false,
+      "object_store_access": false
+    },
+    {
+      "bucket_id": "human_review_signoff",
+      "allowed_ports": [
+        "DurableStorePort"
+      ],
+      "forbidden_ports": [
+        "BrowserProviderPort",
+        "CodegenAgentProviderPort",
+        "LLMGatewayPort",
+        "MemoryProviderPort",
+        "ModelProviderPort",
+        "ObjectStorePort",
+        "ParserProviderPort",
+        "ResearchAgentProviderPort",
+        "SandboxProviderPort",
+        "SourceDiscoveryProviderPort",
+        "VectorProviderPort"
+      ],
+      "secret_access": false,
+      "tenant_data_access": true,
+      "can_write_canonical_fact_store": true,
+      "object_store_access": false
+    }
+  ]
+}

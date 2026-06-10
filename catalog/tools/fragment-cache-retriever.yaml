@@ -1,0 +1,53 @@
+id: "tool/fragment-cache-retriever"
+type: tool
+version: "0.1.0"
+name: "Fragment cache retriever"
+description: "Retrieves candidate trajectory fragments by task signature, labels, keyword search, vector similarity, graph edges, privacy boundary, license, and verification status."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "serving", "governance"]
+modality: ["text", "structured", "code"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.cache"
+tags: ["trajectory-cache", "fragment-retrieval", "pgvector", "hybrid-search", "cost-optimization"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    request_signature:
+      type: string
+    query_text:
+      type: string
+    labels:
+      type: array
+      items: { type: string }
+    privacy_boundary:
+      type: string
+    max_candidates:
+      type: integer
+  required: ["request_signature", "query_text"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    candidates:
+      type: array
+      items: { type: object }
+    retrieval_stats:
+      type: object
+side_effects: "read"
+examples:
+  - input:
+      request_signature: "task/generate-fastapi-cors-app"
+      query_text: "create a FastAPI service with CORS and health check"
+      max_candidates: 8
+    output:
+      ok: true
+      candidates: []

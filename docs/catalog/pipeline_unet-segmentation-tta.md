@@ -34,8 +34,8 @@ Train U-Net (with encoder backbone) on medical image segmentation; D4 TTA at inf
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `augment_and_train` | processor | `processor/iterative-revise-loop` | — |
-| 3 | `tta_inference` | processor | `processor/multi-vector-fusion` | — |
-| 4 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `augment_and_train` | processor | `processor/iterative-revise-loop` | - |
+| 3 | `tta_inference` | processor | `processor/multi-vector-fusion` | - |
+| 4 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

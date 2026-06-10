@@ -1,0 +1,84 @@
+id: "tool/containerized-search-runtime"
+type: tool
+version: "0.1.0"
+name: "Containerized search runtime"
+description: "Describes and launches a containerized search worker for crawling, rendering, indexing, hybrid retrieval, reranking, or private search workloads that exceed a simple API/function boundary."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "tool_use", "planning"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+tags: ["search", "container", "docker", "kubernetes", "crawler", "hybrid-retrieval", "saas"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    image:
+      type: string
+      description: "Container image reference or build target."
+    mode:
+      type: string
+      enum: ["crawl", "render", "index", "query", "rerank", "hybrid"]
+    resources:
+      type: object
+      description: "CPU, memory, GPU, disk, network, and concurrency requirements."
+    storage:
+      type: object
+      description: "Object store, volume, cache, queue, vector index, and database bindings."
+    network_policy:
+      type: object
+      description: "Egress allowlists, proxy settings, VPC/subnet, and private DNS requirements."
+    secrets:
+      type: array
+      items:
+        type: string
+      description: "Secret references only; never raw credentials."
+    runtime_target:
+      type: string
+      description: "docker-compose, kubernetes, ecs, cloud-run, jobs, batch, or nomad."
+  required: ["image", "mode"]
+returns:
+  type: object
+  properties:
+    runtime_plan:
+      type: object
+    manifests:
+      type: array
+      items:
+        type: object
+    cost_dimensions:
+      type: array
+      items:
+        type: string
+    security_notes:
+      type: array
+      items:
+        type: string
+side_effects: "write"
+examples:
+  - input:
+      image: "ghcr.io/example/search-worker:latest"
+      mode: "hybrid"
+      runtime_target: "kubernetes"
+      resources:
+        cpu: "2"
+        memory: "4Gi"
+      secrets: ["secret/search-api-key"]
+    output:
+      runtime_plan:
+        target: "kubernetes"
+        workload: "search-worker"
+      manifests: []
+      cost_dimensions: ["cpu_hours", "memory_gb_hours", "egress_gb", "storage_gb", "index_build_minutes"]
+      security_notes: ["Use secret references and egress allowlists."]
+implementations:
+  - kind: "shell"
+    command: "docker run"
+  - kind: "mcp"
+    path: "mcp/container.plan_search_runtime"

@@ -1,0 +1,85 @@
+{
+  "valid": {
+    "schema_version": "ConsensusRun.v1",
+    "consensus_run_id": "cons-cfpb-01",
+    "tenant_id": "acme",
+    "source_scope": "global_public",
+    "workflow_id": "cfpb.reconcile",
+    "step_id": "deadline_conflict.reg-e-vs-faq",
+    "per_model_outputs": [
+      {"model_id": "anthropic.claude-opus", "model_version": "4.8", "provider_id": "anthropic", "llm_trace_id": "llmtrace-001", "proposed_decision": "winner=reg-e-10day"},
+      {"model_id": "anthropic.claude-sonnet", "model_version": "4.5", "provider_id": "anthropic", "llm_trace_id": "llmtrace-002", "proposed_decision": "winner=faq-30"}
+    ],
+    "agreement_score": 0.5,
+    "disagreement_clusters": [
+      {"decision": "winner=reg-e-10day", "model_ids": ["anthropic.claude-opus"]},
+      {"decision": "winner=faq-30", "model_ids": ["anthropic.claude-sonnet"]}
+    ],
+    "final_label": "winner=reg-e-10day, faq-30 held_out",
+    "label_source": "deterministic_validator",
+    "consensus_only_is_not_truth": true,
+    "routed_to_review": true,
+    "adjudication_record_id": "adj-cfpb-01",
+    "source_handles": ["ctx://public/source/ecfr/12-CFR-1005.11#para.c.1.i"],
+    "created_at": "2026-06-05T00:00:00Z"
+  },
+  "valid_full_agreement_still_not_truth": {
+    "schema_version": "ConsensusRun.v1",
+    "consensus_run_id": "cons-cfpb-02",
+    "tenant_id": "acme",
+    "source_scope": "global_public",
+    "workflow_id": "cfpb.reconcile",
+    "step_id": "deadline_conflict.reg-e-vs-faq",
+    "per_model_outputs": [
+      {"model_id": "anthropic.claude-opus", "llm_trace_id": "llmtrace-003", "proposed_decision": "winner=faq-30"},
+      {"model_id": "anthropic.claude-sonnet", "llm_trace_id": "llmtrace-004", "proposed_decision": "winner=faq-30"}
+    ],
+    "agreement_score": 1.0,
+    "disagreement_clusters": [],
+    "final_label": "winner=reg-e-10day, faq-30 held_out",
+    "label_source": "authority_policy",
+    "consensus_only_is_not_truth": true,
+    "routed_to_review": false,
+    "source_handles": ["ctx://public/source/ecfr/12-CFR-1005.11#para.c.1.i"],
+    "created_at": "2026-06-05T00:00:00Z"
+  },
+  "invalid_label_source_consensus": {
+    "schema_version": "ConsensusRun.v1",
+    "consensus_run_id": "cons-bad-1",
+    "tenant_id": "acme",
+    "source_scope": "global_public",
+    "workflow_id": "cfpb.reconcile",
+    "step_id": "x",
+    "per_model_outputs": [
+      {"model_id": "m1", "llm_trace_id": "t1", "proposed_decision": "winner=faq-30"},
+      {"model_id": "m2", "llm_trace_id": "t2", "proposed_decision": "winner=faq-30"}
+    ],
+    "agreement_score": 1.0,
+    "disagreement_clusters": [],
+    "final_label": "winner=faq-30",
+    "label_source": "majority",
+    "consensus_only_is_not_truth": true,
+    "routed_to_review": false,
+    "source_handles": ["ctx://x#y"],
+    "created_at": "2026-06-05T00:00:00Z"
+  },
+  "invalid_consensus_is_truth": {
+    "schema_version": "ConsensusRun.v1",
+    "consensus_run_id": "cons-bad-2",
+    "tenant_id": "acme",
+    "source_scope": "global_public",
+    "workflow_id": "cfpb.reconcile",
+    "step_id": "x",
+    "per_model_outputs": [
+      {"model_id": "m1", "llm_trace_id": "t1", "proposed_decision": "winner=faq-30"}
+    ],
+    "agreement_score": 1.0,
+    "disagreement_clusters": [],
+    "final_label": "winner=faq-30",
+    "label_source": "deterministic_validator",
+    "consensus_only_is_not_truth": false,
+    "routed_to_review": false,
+    "source_handles": ["ctx://x#y"],
+    "created_at": "2026-06-05T00:00:00Z"
+  }
+}

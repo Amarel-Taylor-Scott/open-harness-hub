@@ -33,8 +33,8 @@ ready JSONL.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `spawn_seeds` | harness | `harness/text-safety-review` | — |
-| 2 | `expand_pairs` | processor | `processor/persona-set-generator` | — |
-| 3 | `filter_diversity` | processor | `processor/multi-vector-fusion` | — |
-| 4 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `spawn_seeds` | harness | `harness/text-safety-review` | - |
+| 2 | `expand_pairs` | processor | `processor/persona-set-generator` | - |
+| 3 | `filter_diversity` | processor | `processor/multi-vector-fusion` | - |
+| 4 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

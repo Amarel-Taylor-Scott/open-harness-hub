@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Scaffold a new artifact manifest.
+"""Scaffold a new component manifest.
 
 Usage:
   python scripts/new.py harness my-new-thing

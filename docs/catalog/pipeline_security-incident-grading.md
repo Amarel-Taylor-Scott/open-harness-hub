@@ -28,7 +28,7 @@ attached code for known weaknesses, aggregate a response grade.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `cti_review` | pipeline | `pipeline/threat-intel-ioc-review` | — |
-| 2 | `appsec_review` | pipeline | `pipeline/code-security-review` | — |
-| 3 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `cti_review` | pipeline | `pipeline/threat-intel-ioc-review` | - |
+| 2 | `appsec_review` | pipeline | `pipeline/code-security-review` | - |
+| 3 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

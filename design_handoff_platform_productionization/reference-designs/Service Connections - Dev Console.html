@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"></meta>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+<title>Service Connections — Dev Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"></link>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"></link>
+<link rel="stylesheet" href="shared/oh-tokens.css"></link>
+<style>
+  html, body { margin: 0; min-height: 100%; }
+  body.oh { background: var(--bg); color: var(--fg); font-family: var(--font-display); -webkit-font-smoothing: antialiased; }
+  .svc { max-width: 1120px; margin: 0 auto; padding: 0 28px 80px; }
+
+  .svc-top { display: flex; align-items: center; gap: 14px; padding: 18px 0 14px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .svc-mark { width: 27px; height: 27px; border-radius: 7px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 800; font-size: 13px; }
+  .svc-brand { font-weight: 800; font-size: 15px; letter-spacing: -.02em; }
+  .svc-brand small { display: block; font-weight: 500; font-size: 11px; color: var(--fg-faint); }
+  .svc-top .sp { flex: 1; }
+  .svc-ctl { display: flex; align-items: center; gap: 8px; }
+  .svc-ctl label { font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-faint); }
+  .svc-ctl input { font-family: var(--font-mono); font-size: 11.5px; color: var(--fg); background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 6px 9px; width: 250px; }
+  .mode { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; letter-spacing: .05em; border-radius: 999px; padding: 4px 11px; border: 1px solid var(--line); }
+  .mode.live { color: var(--success); border-color: color-mix(in srgb, var(--success) 36%, var(--line)); }
+  .mode.simulated { color: var(--warning); border-color: color-mix(in srgb, var(--warning) 36%, var(--line)); }
+
+  .simbar { display: flex; gap: 10px; align-items: baseline; margin-top: 14px; padding: 11px 16px; border: 1px solid color-mix(in srgb, var(--warning) 36%, var(--line)); background: color-mix(in srgb, var(--warning) 8%, var(--panel)); border-radius: var(--r-md); font-size: 12.5px; color: var(--fg-muted); line-height: 1.5; }
+  .simbar b { color: var(--warning); font-weight: 700; }
+  .simbar code { font-family: var(--font-mono); font-size: 11px; color: var(--fg); }
+
+  .grid { display: grid; grid-template-columns: 420px 1fr; gap: 18px; margin-top: 22px; align-items: start; }
+  @media (max-width: 920px) { .grid { grid-template-columns: 1fr; } }
+  .grid > div { min-width: 0; }
+  .tablewrap { overflow-x: auto; }
+  .panel { border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--panel); }
+  .panel + .panel { margin-top: 16px; }
+  .panel-h { display: flex; align-items: baseline; gap: 10px; padding: 13px 18px; border-bottom: 1px solid var(--line); }
+  .panel-h h2 { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin: 0; }
+  .panel-h .n { margin-left: auto; font-family: var(--font-mono); font-size: 10.5px; color: var(--fg-faint); }
+  .panel-b { padding: 16px 18px; }
+
+  .fld { display: grid; gap: 5px; margin-bottom: 12px; }
+  .fld label { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--fg-faint); }
+  .fld select, .fld input { font: inherit; font-size: 13.5px; color: var(--fg); background: var(--bg-subtle); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 9px 11px; }
+  .fld input:focus, .fld select:focus { outline: none; border-color: var(--accent); }
+  .pair { display: grid; grid-template-columns: 1fr 28px 1fr; gap: 8px; align-items: end; }
+  .pair .arrow { text-align: center; color: var(--fg-faint); font-size: 15px; padding-bottom: 10px; }
+  .scopes { display: flex; flex-wrap: wrap; gap: 6px; }
+  .scopes button { font-family: var(--font-mono); font-size: 10.5px; color: var(--fg-muted); background: var(--bg-subtle); border: 1px solid var(--line); border-radius: 5px; padding: 4px 9px; cursor: pointer; }
+  .scopes button.on { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); background: var(--accent-weak); }
+  .btn { font: inherit; font-size: 13.5px; font-weight: 700; color: var(--accent-ink); background: var(--accent); border: none; border-radius: var(--r-md); padding: 10px 16px; cursor: pointer; }
+  .btn:disabled { opacity: .55; cursor: default; }
+  .err { font-size: 12.5px; color: var(--danger); margin-top: 10px; line-height: 1.45; }
+
+  .raw { margin-top: 14px; border: 1px solid color-mix(in srgb, var(--verified) 40%, var(--line)); background: color-mix(in srgb, var(--verified) 7%, var(--bg-subtle)); border-radius: var(--r-md); padding: 12px 15px; }
+  .raw .k { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--verified); }
+  .raw .key { font-family: var(--font-mono); font-size: 12.5px; color: var(--fg); margin-top: 6px; word-break: break-all; }
+  .raw .note { font-size: 11.5px; color: var(--fg-muted); margin-top: 6px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th { text-align: left; font-size: 9.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-faint); padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  td { padding: 9px 8px; border-bottom: 1px solid var(--line); color: var(--fg-muted); vertical-align: middle; }
+  td.mono { font-family: var(--font-mono); font-size: 11px; }
+  .dir { font-family: var(--font-mono); font-size: 11.5px; color: var(--fg); font-weight: 600; white-space: nowrap; }
+  .dir i { font-style: normal; color: var(--accent); }
+  .sc { font-family: var(--font-mono); font-size: 10px; color: var(--fg-muted); border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; margin-right: 4px; white-space: nowrap; }
+  td .rev { font: inherit; font-size: 11.5px; color: var(--danger); background: none; border: 1px solid var(--line); border-radius: var(--r-sm); padding: 3px 9px; cursor: pointer; }
+
+  .vr { margin-top: 12px; font-size: 13px; }
+  .vr.ok { color: var(--success); } .vr.bad { color: var(--danger); }
+
+  .log { display: grid; max-height: 300px; overflow: auto; }
+  .log-row { display: flex; gap: 9px; align-items: baseline; padding: 7px 0; border-bottom: 1px solid var(--line); font-family: var(--font-mono); font-size: 10.5px; color: var(--fg-muted); }
+  .log-row:last-child { border-bottom: none; }
+  .log-row .st { font-weight: 600; width: 30px; flex: 0 0 auto; }
+  .log-row .st.ok { color: var(--success); } .log-row .st.bad { color: var(--danger); }
+  .log-row .op { color: var(--fg); font-weight: 600; width: 100px; flex: 0 0 auto; }
+  .log-row .sim { color: var(--warning); }
+  .log-row .rid { color: var(--fg-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hint { font-size: 12px; color: var(--fg-faint); line-height: 1.55; margin-top: 12px; }
+  .hint code { font-family: var(--font-mono); font-size: 10.5px; color: var(--fg-muted); }
+</style>
+</head>
+<body class="oh dir-s theme-dark">
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="shared/oh-service-auth.js"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+const { REALMS, SCOPES } = OhServiceAuth;
+
+function App() {
+  const [base, setBase] = useState(localStorage.getItem('aidr.base.svc') || 'http://localhost:9410/api/identity');
+  const [mode, setMode] = useState('unknown');
+  const [log, setLog] = useState([]);
+  const [viewRealm, setViewRealm] = useState('baltor');
+  const [conns, setConns] = useState([]);
+  const pushLog = useCallback((r) => setLog((l) => [r, ...l].slice(0, 60)), []);
+
+  const ref = useRef(null);
+  if (!ref.current) ref.current = OhServiceAuth.makeServiceAuthClient({ base, onLog: pushLog });
+  const sac = ref.current;
+
+  const loadConns = useCallback(async (realm) => {
+    const r = await sac.connections(realm);
+    setMode(sac.mode);
+    if (r.ok) setConns((r.data && r.data.connections) || []);
+  }, []);
+
+  useEffect(() => { (async () => {
+    sac.setBase(base); localStorage.setItem('aidr.base.svc', base);
+    await sac.probe(); setMode(sac.mode);
+    loadConns(viewRealm);
+  })(); }, [base]);
+  useEffect(() => { loadConns(viewRealm); }, [viewRealm]);
+
+  return (
+    <div className="svc">
+      <header className="svc-top">
+        <div className="svc-mark">A</div>
+        <div className="svc-brand">Service connections<small>service↔service dev tokens · /api/identity/&lt;realm&gt;/service/*</small></div>
+        <div className="sp"></div>
+        <div className="svc-ctl">
+          <label>backend</label>
+          <input value={base} onChange={(e) => setBase(e.target.value)} spellCheck="false" />
+        </div>
+        <span className={'mode ' + mode}>{mode === 'live' ? '● live backend' : mode === 'simulated' ? '○ simulated' : '… probing'}</span>
+      </header>
+
+      {mode === 'simulated' &&
+        <div className="simbar"><b>SIMULATED · CONTRACT PROPOSAL.</b><span>The <code>/service/*</code> routes are the remaining Phase-1 slice in <code>identity_local_service.py</code> — not implemented there yet. This console runs the proposed contract in-tab (nothing persists, nothing pretends to be real). The endpoint map to align lives in <code>shared/oh-service-auth.js</code>.</span></div>}
+
+      <div className="grid">
+        <div>
+          <Handshake sac={sac} onMinted={() => loadConns(viewRealm)} />
+          <Verify sac={sac} />
+        </div>
+        <div>
+          <div className="panel">
+            <div className="panel-h">
+              <h2>Connections</h2>
+              <span className="n">viewing as:&nbsp;</span>
+              <select value={viewRealm} onChange={(e) => setViewRealm(e.target.value)}
+                      style={{ font: 'inherit', fontSize: 12, color: 'var(--fg)', background: 'var(--bg-subtle)', border: '1px solid var(--line)', borderRadius: 'var(--r-sm)', padding: '4px 8px' }}>
+                {REALMS.map((r) => <option key={r} value={r}>{r}</option>)}
+              </select>
+            </div>
+            <div className="panel-b">
+              <div className="tablewrap">
+              <table>
+                <thead><tr><th>Direction</th><th>Scopes</th><th>Created</th><th>Receipt</th><th></th></tr></thead>
+                <tbody>
+                  {conns.length === 0 && <tr><td colSpan="5" style={{ color: 'var(--fg-faint)' }}>No active connections involve {viewRealm}. Mint one on the left.</td></tr>}
+                  {conns.map((c) => (
+                    <tr key={c.id}>
+                      <td><span className="dir">{c.from} <i>→</i> {c.to}</span></td>
+                      <td>{(c.scopes || []).map((s) => <span className="sc" key={s}>{s}</span>)}</td>
+                      <td className="mono">{(c.created || '').slice(0, 10)}</td>
+                      <td className="mono">{c.receipt || '—'}</td>
+                      <td><button className="rev" onClick={async () => { await sac.revoke(viewRealm, c.id); loadConns(viewRealm); }}>Revoke</button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              </div>
+              <div className="hint">A connection is one-directional: <code>from → to</code> with explicit scopes. Baltor⇄Teleon needs two handshakes — that asymmetry is the audit trail working as intended.</div>
+            </div>
+          </div>
+
+          <div className="panel">
+            <div className="panel-h"><h2>Request log</h2><span className="n">X-AIDR-Request-Id</span></div>
+            <div className="panel-b log">
+              {log.length === 0 && <div className="hint">Every call lands here with the request id the backend writes to its audit JSONL.</div>}
+              {log.map((r, i) => (
+                <div className="log-row" key={i}>
+                  <span className={'st ' + (r.ok ? 'ok' : 'bad')}>{r.status}</span>
+                  <span className="op">{r.op}</span>
+                  <span>{r.who}</span>
+                  {r.simulated && <span className="sim">sim</span>}
+                  <span className="rid">{r.requestId}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Handshake({ sac, onMinted }) {
+  const [from, setFrom] = useState('baltor');
+  const [to, setTo] = useState('teleon');
+  const [secret, setSecret] = useState('');
+  const [scopes, setScopes] = useState(['llm:invoke']);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState(null);
+  const [raw, setRaw] = useState(null);
+  const [receipt, setReceipt] = useState(null);
+
+  const toggle = (s) => setScopes((x) => x.includes(s) ? x.filter((y) => y !== s) : [...x, s]);
+
+  async function submit(e) {
+    e.preventDefault(); setBusy(true); setErr(null); setRaw(null);
+    const r = await sac.handshake(from, secret, { to, scopes });
+    setBusy(false);
+    if (!r.ok) return setErr((r.data && r.data.error) || ('failed (' + r.status + ')'));
+    setRaw(r.data.token || null); setReceipt(r.data.receipt || null);
+    onMinted();
+  }
+
+  return (
+    <div className="panel">
+      <div className="panel-h"><h2>Handshake — mint a dev token</h2></div>
+      <div className="panel-b">
+        <form onSubmit={submit}>
+          <div className="pair">
+            <div className="fld"><label>Caller (from)</label>
+              <select value={from} onChange={(e) => setFrom(e.target.value)}>{REALMS.map((r) => <option key={r}>{r}</option>)}</select></div>
+            <div className="arrow">→</div>
+            <div className="fld"><label>Target (to)</label>
+              <select value={to} onChange={(e) => setTo(e.target.value)}>{REALMS.map((r) => <option key={r}>{r}</option>)}</select></div>
+          </div>
+          <div className="fld">
+            <label>{from}'s service secret</label>
+            <input type="password" required value={secret} onChange={(e) => setSecret(e.target.value)} placeholder="from the service's own env — never shared across realms" />
+          </div>
+          <div className="fld">
+            <label>Scopes</label>
+            <div className="scopes">
+              {SCOPES.map((s) => <button type="button" key={s} className={scopes.includes(s) ? 'on' : ''} onClick={() => toggle(s)}>{s}</button>)}
+            </div>
+          </div>
+          <button className="btn" disabled={busy || scopes.length === 0}>{busy ? 'Working…' : 'Mint scoped token →'}</button>
+          {err && <div className="err">{err}</div>}
+        </form>
+        {raw &&
+          <div className="raw">
+            <div className="k">Raw token — shown exactly once · receipt {receipt}</div>
+            <div className="key">{raw}</div>
+            <div className="note">Hash-only on the server. Give it to <b>{from}</b>'s deployment env; <b>{to}</b> verifies it per call. Revoke + re-handshake to rotate.</div>
+          </div>}
+      </div>
+    </div>
+  );
+}
+
+function Verify({ sac }) {
+  const [to, setTo] = useState('teleon');
+  const [token, setToken] = useState('');
+  const [res, setRes] = useState(null);
+  async function submit(e) {
+    e.preventDefault();
+    const r = await sac.verify(to, token);
+    setRes(r.ok ? r.data : { valid: false, error: r.data && r.data.error });
+  }
+  return (
+    <div className="panel">
+      <div className="panel-h"><h2>Verify — what the target runs per call</h2></div>
+      <div className="panel-b">
+        <form onSubmit={submit}>
+          <div className="fld"><label>Target service</label>
+            <select value={to} onChange={(e) => setTo(e.target.value)}>{REALMS.map((r) => <option key={r}>{r}</option>)}</select></div>
+          <div className="fld"><label>Token</label>
+            <input required value={token} onChange={(e) => setToken(e.target.value)} placeholder="svt_…" spellCheck="false" /></div>
+          <button className="btn" disabled={!token}>Verify</button>
+        </form>
+        {res && (res.valid
+          ? <div className="vr ok">✓ valid — {res.from} → {res.to} · scopes: {(res.scopes || []).join(', ')}</div>
+          : <div className="vr bad">✗ not valid for {to}{res.error ? ' — ' + res.error : ''}</div>)}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

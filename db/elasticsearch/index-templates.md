@@ -8,10 +8,13 @@ Use Elasticsearch (or OpenSearch, the API-compatible fork) when:
   Reciprocal Rank Fusion.
 - You already run Elastic for logs and want a single search backend.
 
-## Index: `oh-artifact`
+## Index: `oh-component`
 
-One doc per artifact. Searchable by name, description, tags, and the
+One doc per component. Searchable by name, description, tags, and the
 full manifest body.
+
+The `dims` and `similarity` values below are backend render targets from
+`scripts.db.vector_config_registry`; do not update them independently.
 
 ```json
 {
@@ -59,6 +62,8 @@ full manifest body.
 
 One doc per knowledge leaf — RAG retrieval target.
 
+The same registry export owns the knowledge vector dimensions and similarity.
+
 ```json
 {
   "mappings": {
@@ -85,7 +90,7 @@ POST oh-knowledge/_search
   "rank": { "rrf": { "window_size": 50, "rank_constant": 60 } },
   "query":      { "match": { "text": { "query": "thunderclap headache" } } },
   "knn":        { "field": "embedding",
-                  "query_vector": [/* 384 floats */],
+                  "query_vector": [/* DEFAULT_EMBEDDING_DIMENSIONS floats */],
                   "k": 10, "num_candidates": 100,
                   "filter": { "term": { "industry": "healthcare.clinical" } } }
 }
@@ -96,7 +101,7 @@ POST oh-knowledge/_search
 `scripts/db/load_elasticsearch.py` (TBA) walks every manifest under
 `catalog/`, computes embeddings via the configured processor
 (`processor/embedder-minilm` by default), and bulk-indexes to
-`oh-artifact` + `oh-knowledge`. Idempotent on re-run.
+`oh-component` + `oh-knowledge`. Idempotent on re-run.
 
 ## OpenSearch differences
 

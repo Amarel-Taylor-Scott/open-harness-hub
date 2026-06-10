@@ -1,0 +1,16 @@
+kind: baltor.alias-pack.v1
+id: alias_pack.legacy-oracle-migration
+name: Legacy Oracle Migration (DEPRECATED)
+audience: legacy
+version: "1.0.0"
+extends: alias_pack.default
+# Deprecation MAP only: records the OLD "Oracle" wording each canonical concept replaces, so old
+# links/docs/screenshots can be migrated. These are status:deprecated and are NEVER rendered on new
+# surfaces — the alias_resolver's blocked-term governance skips any value containing "oracle".
+# This file is the ONE allowlisted place "oracle" may appear (see scripts/check_no_oracle_copy.py).
+aliases:
+  object.context_pack:           { label: "Oracle Answer",        status: deprecated, replaced_by: "Context Pack" }
+  object.context_receipt:        { label: "Oracle Certificate",   status: deprecated, replaced_by: "Context Receipt" }
+  rail.continuous_verification:  { label: "Oracle Verification",  status: deprecated, replaced_by: "Continuous Verification + Adversarial Validation" }
+  stage.optimization:            { label: "Oracle Compression",   status: deprecated, replaced_by: "Optimization" }
+  stage.source_systems:          { label: "Automated Context Oracle", status: deprecated, replaced_by: "Source Systems" }

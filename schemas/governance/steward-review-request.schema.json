@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/governance/steward-review-request.schema.json",
+  "title": "Steward review request",
+  "description": "A human-review ticket raised when automation must not decide alone (high-conflict claim, restricted expansion, memory promotion, stale pack used for a write action, low-confidence parser artifact, generated-wiki-vs-code conflict, policy exception).",
+  "type": "object",
+  "required": ["kind", "review_request_id", "trigger", "subject", "risk", "created_at"],
+  "properties": {
+    "kind": { "type": "string", "const": "baltor.steward-review-request.v1" },
+    "review_request_id": { "type": "string" },
+    "trigger": { "type": "string", "enum": ["high_conflict_claim", "restricted_expansion", "memory_promotion", "stale_pack_for_write", "low_confidence_parser_artifact", "wiki_vs_code_conflict", "policy_exception"] },
+    "subject": { "type": "string", "description": "the object/handle/pack under review" },
+    "risk": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+    "requested_by": { "type": "string" },
+    "evidence": { "type": "array", "items": { "type": "string" } },
+    "status": { "type": "string", "enum": ["open", "approved", "rejected", "needs_more_info"] },
+    "created_at": { "type": "string" }
+  },
+  "additionalProperties": true
+}

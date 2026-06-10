@@ -1,4 +1,4 @@
-"""Open Harness Hub — the open-funnel developer CLI (``oh-ce``).
+"""Open Harness Hub — the open-funnel developer CLI (``oh-baltor``).
 
 This package is **M5 of the north-star wave** (``docs/codex/north-star.md`` §"The
 execution sequence" — *"Open funnel polish … a dev installs, builds a governed
@@ -14,7 +14,7 @@ a developer does at the seam where they hand verified context to their own agent
   * ``verify`` — run the multi-source corroborator on a claim + its sources and
     print the verdict (the "we check your docs are RIGHT" wedge as a one-liner).
   * ``tiers``  — show the raw/compressed/hyper-efficient token counts + measured
-    fidelity for a corpus (the CEaaS density story, runnable offline).
+    fidelity for a corpus (the Baltor density story, runnable offline).
 
 It owns **no** product logic of its own — every subcommand delegates to
 ``scripts.enrichment.serve`` / ``scripts.enrichment.tier_pipeline`` /
@@ -22,6 +22,6 @@ It owns **no** product logic of its own — every subcommand delegates to
 small JSON, writes only to stdout (no network, no hidden filesystem writes).
 
 Public entrypoint:
-    python3 -m scripts.cli.oh_ce --help
-    python3 scripts/cli/oh_ce.py --selftest
+    python3 -m scripts.cli.oh_baltor --help
+    python3 scripts/cli/oh_baltor.py --selftest
 """

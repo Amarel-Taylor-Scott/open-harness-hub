@@ -1,0 +1,18 @@
+{
+  "$id": "resources/ResourceBinding.v1",
+  "title": "ResourceBinding.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "Resolves a ResourceRef to a concrete provisioned resource at runtime. Holds the physical handle ONLY as an opaque, environment-resolved reference (physical_ref) plus a secret_ref/key_ref — never a raw connection string or raw key inline. Bindings live in the resource registry, not in business objects.",
+  "required": ["binding_id", "resource_ref", "physical_ref", "provider"],
+  "properties": {
+    "binding_id": {"type": "string"},
+    "resource_ref": {"type": "string"},
+    "physical_ref": {"type": "string", "description": "opaque handle resolved from environment/secret store; not a raw DSN"},
+    "provider": {"type": "string"},
+    "secret_ref": {"type": ["string", "null"]},
+    "key_ref": {"type": ["string", "null"]},
+    "region": {"type": ["string", "null"]},
+    "active": {"type": "boolean"}
+  }
+}

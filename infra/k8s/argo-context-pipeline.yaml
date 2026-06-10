@@ -1,0 +1,59 @@
+# Argo WorkflowTemplate for a bounded Context Fidelity run.
+# Use this when you want a visible K8s-native container workflow. Production
+# should replace the ConfigMap-mounted sample input with object-storage fetches
+# or a preloaded PVC path.
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: context-fidelity-pipeline
+  namespace: openharnesshub
+spec:
+  entrypoint: context-pass
+  arguments:
+    parameters:
+      - name: run_id
+        value: "{{workflow.uid}}"
+  templates:
+    - name: context-pass
+      dag:
+        tasks:
+          - name: chunk
+            template: inline-pass
+          - name: keywords
+            dependencies: [chunk]
+            template: summarize
+          - name: entities
+            dependencies: [chunk]
+            template: summarize
+          - name: claims
+            dependencies: [chunk]
+            template: summarize
+          - name: graph
+            dependencies: [entities, claims]
+            template: summarize
+          - name: verify
+            dependencies: [graph]
+            template: summarize
+
+    - name: inline-pass
+      retryStrategy:
+        limit: "2"
+        retryPolicy: OnError
+      container:
+        image: ghcr.io/Amarel-Taylor-Scott/openharnesshub:latest
+        command: ["python", "-m", "scripts.context_workers.runner", "--run-inline-pass", "/inputs/context.txt"]
+        envFrom:
+          - configMapRef: { name: ohh-config }
+          - secretRef: { name: ohh-secrets }
+        volumeMounts:
+          - { name: context-input, mountPath: /inputs }
+
+    - name: summarize
+      container:
+        image: alpine:3.23
+        command: ["sh", "-c", "echo context stage complete"]
+
+  volumes:
+    - name: context-input
+      configMap:
+        name: context-demo-input

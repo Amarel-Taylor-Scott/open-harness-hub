@@ -1,0 +1,17 @@
+{
+  "kind": "baltor.decision-receipt.v1",
+  "id": "drcpt.context-rot.0001",
+  "decision_context_id": "dctx.context-rot.refresh-decision.0001",
+  "decision": "refresh",
+  "reason": "Upstream OFAC SDN content hash changed since cache (CDC); the sanctions pack must be rebuilt before serving to avoid citing a stale list.",
+  "evidence_used": ["ctx://ofac/sdn", "ctx://baltor/pack/sanctions-screening"],
+  "actions_proposed": ["enqueue pack_refresh_job", "mark pack stale"],
+  "actions_taken": ["enqueue pack_refresh_job"],
+  "actions_blocked": ["serve current pack"],
+  "policy_decision": "block",
+  "confidence": 0.92,
+  "human_review": false,
+  "next_trigger": "pack_refresh_completed",
+  "lineage": {"flywheel_id": "flywheel.context-rot", "run_id": "run.context-rot.0001"},
+  "created_at": "2026-06-04T00:00:05Z"
+}

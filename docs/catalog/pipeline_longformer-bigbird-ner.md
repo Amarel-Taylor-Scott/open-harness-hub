@@ -35,8 +35,8 @@ Train a LongFormer or BigBird token-classification model on long-document NER la
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `train` | processor | `processor/iterative-revise-loop` | — |
-| 3 | `ensemble` | processor | `processor/multi-vector-fusion` | — |
-| 4 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `train` | processor | `processor/iterative-revise-loop` | - |
+| 3 | `ensemble` | processor | `processor/multi-vector-fusion` | - |
+| 4 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

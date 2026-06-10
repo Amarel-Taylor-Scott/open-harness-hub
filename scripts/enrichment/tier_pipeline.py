@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""CEaaS tier orchestrator — compose the REAL processors into the three tiers.
+"""Baltor tier orchestrator — compose the REAL processors into the three tiers.
 
 This is the implementation the Context-Enrichment-as-a-Service spec
 (``docs/strategy/context-enrichment-service.md`` §"Status") names as the thing
-that makes CEaaS real: *"the tier pipeline (raw→compressed→hyper-efficient,
+that makes Baltor real: *"the tier pipeline (raw→compressed→hyper-efficient,
 hosted + downloadable) on the shared workers."* It takes one governed object's
 content and refines it into the three token-efficiency tiers, then — for every
 non-raw tier — calls the **separate** fidelity evaluator so each tier ships a
@@ -12,7 +12,7 @@ non-raw tier — calls the **separate** fidelity evaluator so each tier ships a
 It owns **no** compression logic of its own. The tiers are assembled from the
 already-shipped, already-self-tested processors so the same components the
 build/monitor product (OHH) mints are the components the enrichment product
-(CEaaS) sells:
+(Baltor) sells:
 
   * **raw**            — hosted full fidelity (passthrough; the source of truth).
   * **compressed**     — ``scripts.processors.compression.structural_compress.run``
@@ -27,7 +27,7 @@ build/monitor product (OHH) mints are the components the enrichment product
                          the tier ordering provable. It is **NOT** the eventual
                          mechanism — see "Seams" below.
 
-Per the CEaaS spec's three-SKU table, the eventual hyper-efficient tier is
+Per the Baltor spec's three-SKU table, the eventual hyper-efficient tier is
 *"distilled facts + cache-shaped packaging"* (``memory/*`` extraction +
 ``cache/*`` prefix-shaping, where provider prompt-cache compounds the savings),
 optionally fed by the *learned* compressor (``summarize.llmlingua`` / LLMLingua-2).
@@ -135,7 +135,7 @@ HYPER_EFFICIENT_SEAMS: tuple[str, ...] = (
     "than shrink surface form; the spec's true hyper-efficient mechanism.",
     "cache-shaped packaging — cache/*: pack the distilled tier onto a cacheable "
     "prefix so the provider prompt cache (~90% off input at a high hit rate) "
-    "compounds the savings. This is where CEaaS value compounds.",
+    "compounds the savings. This is where Baltor value compounds.",
 )
 
 #: process_kind for this composite step (open vocab per SPEC §16 / routing doc §4).
@@ -258,7 +258,7 @@ def _hyper_efficient(content: str, *, language: str | None) -> dict[str, Any]:
 
 
 def run(content: str, *, language: str | None = None) -> dict[str, Any]:
-    """Refine ``content`` into the three CEaaS tiers, with measured fidelity.
+    """Refine ``content`` into the three Baltor tiers, with measured fidelity.
 
     Args:
       content:  the governed object's full-fidelity text. Required, ``str``.
@@ -338,7 +338,7 @@ def run(content: str, *, language: str | None = None) -> dict[str, Any]:
 # signature, methods, AND repeated structure (sibling getters) so the
 # hyper-efficient dedupe pass has something real to collapse.
 _PY_SAMPLE = '''\
-"""Token-budget planner for the CEaaS serving path."""
+"""Token-budget planner for the Baltor serving path."""
 import math
 from typing import Any
 

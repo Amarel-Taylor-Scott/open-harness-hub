@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "note": "PUBLIC-CLAIM SAFETY POLICY for the sales/lead-proof system. SINGLE SOURCE for src/baltor/sales/claim_guard.py. Core rule: distinguish 'appears risky / requires review' from 'illegal'. Never publish a legal conclusion or a public accusation against a named real company without recorded legal review + approval. Diagnostics describe observed answer patterns; they are NOT legal advice.",
+  "forbidden_legal_conclusion_terms": [
+    "illegal", "is illegal", "unlawful", "breaking the law", "broke the law", "violates the law",
+    "violation of law", "criminal", "negligent", "guilty", "legally liable", "commits fraud", "fraudulent"
+  ],
+  "soften_map": {
+    "illegal": "appears potentially non-compliant",
+    "is illegal": "appears potentially non-compliant",
+    "unlawful": "appears potentially non-compliant",
+    "breaking the law": "appears potentially non-compliant",
+    "violates the law": "appears inconsistent with applicable guidance",
+    "violates": "appears inconsistent with",
+    "negligent": "high-risk",
+    "guilty": "appears to show a high-risk pattern",
+    "guarantees": "states"
+  },
+  "preferred_safe_terms": [
+    "appears", "appears unsafe", "potentially non-compliant", "requires review",
+    "high-risk answer pattern", "should be escalated", "source-grounding recommended"
+  ],
+  "regulated_categories_requiring_legal_review": [
+    "illegal_or_potentially_noncompliant_advice", "unsafe_financial_guidance",
+    "wage_deduction_or_employment_law_boundary", "credit_repair_misinformation",
+    "debt_collection_misinformation", "loan_eligibility_misinformation", "health", "legal"
+  ],
+  "named_real_company_public_claim": "forbidden_unless_reviewed_and_approved",
+  "default_public_claim_safe": false,
+  "product_message_guardrails": {
+    "baltor_must_not_claim": ["legal advice", "guarantees compliance", "they are breaking the law"],
+    "teleon_must_not_claim": ["replaces Kubernetes", "replaces cloud functions", "deploy agents in minutes", "Vercel for agents"]
+  }
+}

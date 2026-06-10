@@ -1,0 +1,12 @@
+{
+  "$id": "EventEnvelope.v1", "title": "EventEnvelope.v1 (CloudEvents 1.0)", "type": "object", "additionalProperties": true,
+  "required": ["specversion","id","source","type","time","datacontenttype","subject","tenant_id","run_id","data"],
+  "properties": {
+    "specversion": {"type": "string", "enum": ["1.0"]}, "id": {"type": "string"}, "source": {"type": "string"},
+    "type": {"type": "string"}, "time": {"type": "string"},
+    "datacontenttype": {"type": "string", "enum": ["application/json"]}, "subject": {"type": "string"},
+    "baltor_schema": {"type": "string"}, "tenant_id": {"type": "string"}, "run_id": {"type": "string"},
+    "correlation_id": {"type": "string"}, "causation_id": {"type": "string"}, "trace_id": {"type": "string"},
+    "data": {"type": "object"}
+  }
+}

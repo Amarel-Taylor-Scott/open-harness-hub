@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"></meta>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+<title>AIDR Standards — Production Handbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"></link>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"></link>
+<link rel="stylesheet" href="shared/oh-tokens.css"></link>
+<style>
+  html, body { margin: 0; }
+  body.oh { background: var(--bg); color: var(--fg); font-family: var(--font-display); -webkit-font-smoothing: antialiased; }
+  .doc { max-width: 920px; margin: 0 auto; padding: 0 32px 96px; }
+  .doc-top { display: flex; align-items: center; gap: 12px; padding: 22px 0 18px; border-bottom: 1px solid var(--line); }
+  .doc-mark { width: 28px; height: 28px; border-radius: 7px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 800; font-size: 13px; }
+  .doc-brand { font-weight: 800; font-size: 15px; letter-spacing: -.02em; }
+  .doc-brand small { display: block; font-weight: 500; font-size: 11px; color: var(--fg-faint); }
+  .doc-top .sp { flex: 1; }
+  .doc-date { font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; background: var(--panel); }
+  .eyebrow { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-top: 44px; }
+  h1 { font-size: 32px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; margin: 12px 0 0; max-width: 26ch; }
+  .lede { font-size: 15.5px; line-height: 1.65; color: var(--fg-muted); margin: 16px 0 0; max-width: 64ch; text-wrap: pretty; }
+  .lede b { color: var(--fg); font-weight: 600; }
+  h2 { font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin: 54px 0 0; padding-bottom: 12px; border-bottom: 1px solid var(--line); display: flex; align-items: baseline; gap: 12px; }
+  h2 .n { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); font-weight: 600; }
+  p { font-size: 14px; line-height: 1.65; color: var(--fg-muted); margin: 12px 0 0; max-width: 70ch; text-wrap: pretty; }
+  code { font-family: var(--font-mono); font-size: .92em; background: var(--bg-subtle); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
+
+  .std { border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--panel); padding: 16px 20px; margin-top: 12px; display: grid; grid-template-columns: 56px 1fr auto; gap: 16px; align-items: start; }
+  .std .id { font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--accent); padding-top: 2px; }
+  .std .t { font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
+  .std .d { font-size: 13px; line-height: 1.55; color: var(--fg-muted); margin-top: 5px; max-width: 64ch; }
+  .std .d b { color: var(--fg); font-weight: 600; }
+  .std .proof { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); margin-top: 8px; }
+  .std .proof b { color: var(--verified); font-weight: 600; }
+  .st { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
+  .st.ok { color: var(--success); border-color: color-mix(in srgb, var(--success) 32%, var(--line)); }
+  .st.part { color: var(--warning); border-color: color-mix(in srgb, var(--warning) 32%, var(--line)); }
+  .st.prop { color: var(--fg-faint); }
+
+  ol.queue { margin: 16px 0 0; padding: 0 0 0 2px; list-style: none; counter-reset: q; }
+  ol.queue li { font-size: 13.5px; line-height: 1.6; color: var(--fg-muted); padding: 10px 0 10px 34px; position: relative; border-bottom: 1px solid var(--line); max-width: 72ch; counter-increment: q; }
+  ol.queue li:last-child { border-bottom: none; }
+  ol.queue li::before { content: counter(q); position: absolute; left: 0; top: 9px; width: 22px; height: 22px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--line)); color: var(--accent); font-family: var(--font-mono); font-size: 11px; font-weight: 600; display: grid; place-items: center; }
+  ol.queue b { color: var(--fg); font-weight: 600; }
+
+  .foot { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12px; color: var(--fg-faint); line-height: 1.6; }
+  .foot b { color: var(--fg-muted); font-weight: 600; }
+  @media (max-width: 680px) { .std { grid-template-columns: 1fr; gap: 8px; } }
+</style>
+</head>
+<body class="oh dir-s theme-light">
+<div class="doc">
+
+  <header class="doc-top">
+    <div class="doc-mark">A</div>
+    <div class="doc-brand">AI Done Right<small>internal · engineering standards</small></div>
+    <div class="sp"></div>
+    <div class="doc-date">pass 4 · 2026-06-09</div>
+  </header>
+
+  <div class="eyebrow">Frameworks · policies · standardizations</div>
+  <h1>The production handbook: ten standards, each with its proof.</h1>
+  <p class="lede">Everything the portfolio adopts from design to monitoring, in one place. Each standard names its <b>rule</b>, its <b>enforcing check</b>, and its honest <b>status</b> — adopted, partial, or proposed. The canonical text (full contracts) lives in <code>production/standards/STANDARDS.md</code>; the pipeline that enforces S4–S7 ships as <code>production/ci/github-actions.yaml</code>. Nothing below claims green without naming what proves it.</p>
+
+  <h2><span class="n">01</span> The standards</h2>
+
+  <div class="std">
+    <span class="id">S1</span>
+    <div>
+      <div class="t">Design system — branded house</div>
+      <div class="d">Tokens-only color/scale, <code>.oh-card</code> physics everywhere, one accent per brand, zero overflow, light+dark + console clean.</div>
+      <div class="proof">proof → <b>Design Acceptance Scorecard</b> · hex-lint · scrollWidth probe</div>
+    </div>
+    <span class="st ok">adopted</span>
+  </div>
+
+  <div class="std">
+    <span class="id">S2</span>
+    <div>
+      <div class="t">Mode Protocol — simulated vs real actions</div>
+      <div class="d">Every backend client has exactly <b>live / simulated / unknown</b> modes; simulated is clearly flagged in every record + an amber banner with the real start command; a real action is never silently faked. Reference: <code>oh-identity.js</code>, <code>oh-service-auth.js</code>.</div>
+      <div class="proof">proof → kill-backend contract test: mode flips, banner renders, records flagged</div>
+    </div>
+    <span class="st ok">adopted</span>
+  </div>
+
+  <div class="std">
+    <span class="id">S3</span>
+    <div>
+      <div class="t">API &amp; auth conventions</div>
+      <div class="d">Paths <code>/api/&lt;plane&gt;/&lt;realm&gt;/…</code> · <code>X-AIDR-Request-Id</code> everywhere · errors <code>{"error":…}</code> · raw secrets shown exactly once, hash-only storage · <code>SERVICE_&lt;ID&gt;_SECRET</code> per realm · one-directional scoped handshakes · no SSO, cross-realm rejected.</div>
+      <div class="proof">proof → check_identity_local_service_runtime 27/27 pattern · ENDPOINTS-map contract tests</div>
+    </div>
+    <span class="st part">partial</span>
+  </div>
+
+  <div class="std">
+    <span class="id">S4</span>
+    <div>
+      <div class="t">Testing pyramid</div>
+      <div class="d">Proof modules (backend) → contract tests (the live/simulated seam) → Playwright surface smokes (golden paths + structural probes) → <b>held-out checks that prove the negative</b> (cross-realm rejected, revoked key fails). A pass is named checks with counts, never "tests pass".</div>
+      <div class="proof">proof → CI test stage runs all four layers</div>
+    </div>
+    <span class="st part">partial</span>
+  </div>
+
+  <div class="std">
+    <span class="id">S5</span>
+    <div>
+      <div class="t">CI/CD pipeline</div>
+      <div class="d">One shape for every deployable: <b>lint → test → build (precompiled JSX) → package (SBOM + cosign, digest-pinned) → deploy → smoke</b>. Conventional commits, semver per service. Deploy refuses unsigned images; smoke curls every <code>/health</code> and fails loud.</div>
+      <div class="proof">proof → the workflow file itself + required-checks branch rule</div>
+    </div>
+    <span class="st prop">proposed</span>
+  </div>
+
+  <div class="std">
+    <span class="id">S6</span>
+    <div>
+      <div class="t">Distribution — the container thesis on our own artifacts</div>
+      <div class="d">Digest-pinned pulls in every doc, CycloneDX SBOM + cosign signature + provenance per image, hub release pages reuse the registry provenance panel, <code>status:'private'</code> enforced server-side.</div>
+      <div class="proof">proof → cosign verify gate in package stage · unpinned-pull doc check</div>
+    </div>
+    <span class="st prop">proposed</span>
+  </div>
+
+  <div class="std">
+    <span class="id">S7</span>
+    <div>
+      <div class="t">Monitoring &amp; observability</div>
+      <div class="d"><code>/health</code> per service · append-only audit JSONL with request-id correlation · one events plane for analytics + A/B (anon ids, never PII) · Control Tower Deployments lane shows version/digest/health per running container · <code>OhStatus</code> renders from real health aggregation.</div>
+      <div class="proof">proof → CI smoke stage · events round-trip test (emit → summary increments)</div>
+    </div>
+    <span class="st part">partial</span>
+  </div>
+
+  <div class="std">
+    <span class="id">S8</span>
+    <div>
+      <div class="t">Secrets &amp; security policy</div>
+      <div class="d">No fake secrets, no provider bypasses: unset key = 501 with instructions. <code>.env.example</code> only, gitleaks in lint, least-privilege scopes by default, dev-crypto (blake2b) flagged and never called production. Real argon2/OAuth/SSO stays owner-gated.</div>
+      <div class="proof">proof → gitleaks · 501-behavior contract tests</div>
+    </div>
+    <span class="st ok">adopted</span>
+  </div>
+
+  <div class="std">
+    <span class="id">S9</span>
+    <div>
+      <div class="t">Releases &amp; flip-to-public</div>
+      <div class="d">Opening a hub stays a one-line event across all three layers: <code>products.js</code> (brand/banner) ⇄ terraform surfaces map (DNS/tunnel) ⇄ service secrets. One key, one diff.</div>
+      <div class="proof">proof → three-map drift check (registry-drift-gate pattern, extended)</div>
+    </div>
+    <span class="st part">partial</span>
+  </div>
+
+  <div class="std">
+    <span class="id">S10</span>
+    <div>
+      <div class="t">Documentation &amp; honesty policy</div>
+      <div class="d">README per folder, stable G-numbered gap ledger, pass log per increment. "SIMULATED", "CONTRACT PROPOSAL" and "skeleton — never applied" are part of the deliverable. Claims name their proof or say "not run here".</div>
+      <div class="proof">proof → status fields in STANDARDS.md · README-presence check</div>
+    </div>
+    <span class="st ok">adopted</span>
+  </div>
+
+  <h2><span class="n">02</span> Adoption queue (ordered, one per pass)</h2>
+  <ol class="queue">
+    <li><b>Playwright smokes</b> for the two shipped consoles — their golden paths (register→keys, handshake→verify→revoke) are already defined by the verifier scripts.</li>
+    <li><b>Mode Protocol extraction</b> — one shared <code>oh-plane-client.js</code> base so events/LLM clients inherit probe/modes/request-ids instead of copying them.</li>
+    <li><b>Land the CI workflow</b> in the real repo — lint + test first; package signing when the first container builds.</li>
+    <li><b>S9 drift check</b> — products.js ⇄ terraform ⇄ service-secrets agreement.</li>
+    <li><b>Control Tower Deployments lane</b> — the visible face of S7.</li>
+  </ol>
+
+  <div class="foot">
+    <b>Self-evaluation.</b> Improved: the portfolio now has one named standard per lifecycle stage, each with an enforcing check — and the two already-shipped consoles retroactively comply (S2, S3). Deliberately honest: S5/S6 are "proposed" until the pipeline runs green in the real repo and the first image is signed. Full contracts: <code>production/standards/STANDARDS.md</code>.
+  </div>
+
+</div>
+</body>
+</html>

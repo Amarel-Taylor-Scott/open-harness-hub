@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/entity-record.schema.json",
+  "title": "Entity record",
+  "description": "Canonical entity shape for linking people, organizations, laws, tools, models, occupations, datasets, jurisdictions, and concepts across source records and catalog objects.",
+  "type": "object",
+  "required": ["entity_id", "entity_type", "canonical_name"],
+  "properties": {
+    "entity_id": { "type": "string" },
+    "entity_type": {
+      "type": "string",
+      "enum": [
+        "person",
+        "organization",
+        "government_agency",
+        "law_or_regulation",
+        "standard",
+        "occupation",
+        "skill",
+        "tool",
+        "software_package",
+        "model",
+        "dataset",
+        "paper",
+        "vulnerability",
+        "jurisdiction",
+        "place",
+        "concept",
+        "workflow",
+        "source"
+      ]
+    },
+    "canonical_name": { "type": "string" },
+    "aliases": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "identifiers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["scheme", "value"],
+        "properties": {
+          "scheme": { "type": "string" },
+          "value": { "type": "string" },
+          "url": { "type": "string" }
+        }
+      }
+    },
+    "description": { "type": "string" },
+    "source_record_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "state": { "$ref": "_common.schema.json#/$defs/objectState" },
+    "state_history": {
+      "type": "array",
+      "items": { "$ref": "_common.schema.json#/$defs/stateEvent" }
+    },
+    "supporting_source_count": { "type": "integer", "minimum": 0 },
+    "last_verified_at": { "type": "string", "format": "date-time" },
+    "refresh_policy": { "type": "string" },
+    "priority_signals": { "$ref": "_common.schema.json#/$defs/prioritySignals" },
+    "queue_policy": { "$ref": "_common.schema.json#/$defs/queuePolicy" },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "review_status": { "type": "string" }
+  }
+}

@@ -1,0 +1,71 @@
+id: "tool/inbound-email-review-digester"
+type: tool
+version: "0.1.0"
+name: "Inbound email review digester"
+description: "Converts authorized expert email replies into structured review evidence, source records, normalized objects, citations, rankings, dissent notes, and review tickets while stripping quoted text and sensitive data."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "government", "humanitarian", "legal", "cross_industry"]
+capability: ["extraction", "verification", "governance", "format_conversion"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+tags: ["email-digest", "expert-review", "knowledge-object", "pii-screening", "review-evidence"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    inbound_message:
+      type: object
+    campaign:
+      type: object
+    digest_policy:
+      type: object
+    pii_policy:
+      type: object
+  required: ["inbound_message", "campaign", "digest_policy"]
+returns:
+  type: object
+  properties:
+    source_record:
+      type: object
+    normalized_objects:
+      type: array
+      items:
+        type: object
+    evidence_spans:
+      type: array
+      items:
+        type: object
+    review_tickets:
+      type: array
+      items:
+        type: object
+    warnings:
+      type: array
+      items:
+        type: string
+side_effects: "write"
+examples:
+  - input:
+      inbound_message:
+        message_id: "example"
+        body: "Agree, but only for the listed jurisdiction."
+      campaign:
+        campaign_id: "expert-review-campaign-example"
+      digest_policy:
+        strip_quoted_text: true
+        emit_raw_body: false
+    output:
+      source_record: {}
+      normalized_objects: []
+      evidence_spans: []
+      review_tickets: []
+      warnings: ["Example only; raw email body omitted."]
+implementations:
+  - kind: "mcp"
+    path: "mcp/expert_review.digest_inbound_email"

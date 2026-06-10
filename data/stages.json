@@ -1,0 +1,19 @@
+{
+  "note": "Stages keyed by STABLE canonical ids. canonical_label is the default; audience-facing copy (label/subtitle/description) is resolved at render time via scripts/alias_resolver.py + data/alias-packs/*. Do NOT embed audience copy here.",
+  "stages": [
+    {"id": "stage.source_systems", "canonical_label": "Source Systems", "color_token": "slate", "visual_behavior": "clustered_raw_chunks", "page": "stages/source.html",
+     "workflows": ["flywheel-source-refresh", "flywheel-document-decomposition"], "backend_modules": ["parser_manager", "repo_directory_manager", "scraping_manager", "api_repo"]},
+    {"id": "stage.reconciliation", "canonical_label": "Reconciliation", "color_token": "indigo", "visual_behavior": "align_clusters", "page": "stages/reconciliation.html",
+     "workflows": ["flywheel-reconciliation"], "backend_modules": ["verification_engine"]},
+    {"id": "stage.anti_fragility", "canonical_label": "Anti-Fragility", "color_token": "blue", "visual_behavior": "stabilize_fragments", "page": "stages/anti-fragility.html",
+     "workflows": ["flywheel-anti-fragility", "flywheel-context-rot"], "backend_modules": ["context_rot_manager"]},
+    {"id": "stage.enhancement", "canonical_label": "Enhancement", "color_token": "teal", "visual_behavior": "attach_satellites", "page": "stages/enhancement.html",
+     "workflows": ["flywheel-enhancement"], "backend_modules": ["enhancement_engine", "api_repo"]},
+    {"id": "stage.optimization", "canonical_label": "Optimization", "color_token": "green", "visual_behavior": "compress_to_packs", "page": "stages/optimization.html",
+     "workflows": ["flywheel-optimization", "flywheel-pack-quality"], "backend_modules": ["pack_builder"]},
+    {"id": "stage.consumption", "canonical_label": "Consumption", "color_token": "emerald", "visual_behavior": "ready_packs", "page": "stages/consumption.html",
+     "workflows": ["flywheel-consumption"], "backend_modules": ["mcp_gateway", "api_manager"]},
+    {"id": "rail.continuous_verification", "canonical_label": "Continuous Verification + Adversarial Validation", "color_token": "amber", "visual_behavior": "rail_under_pipeline", "page": "stages/verification.html",
+     "workflows": ["flywheel-verification"], "backend_modules": ["verification_engine", "policy_engine"]}
+  ]
+}

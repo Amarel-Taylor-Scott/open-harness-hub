@@ -1,0 +1,66 @@
+{
+  "name": "Technical Launch",
+  "pass_threshold": 100,
+  "items": [
+    {
+      "rubric_id": "tech.build",
+      "description": "Static build succeeds",
+      "weight": 15,
+      "blocker": true,
+      "evidence_required": "dist/sites + manifest",
+      "proof_script": "scripts/check_portfolio_technical_launch_rubric.py",
+      "pass_condition": "build manifest present",
+      "fail_message": "build failed"
+    },
+    {
+      "rubric_id": "tech.ports",
+      "description": "Ports 9101-9104 + hub 9100 configured",
+      "weight": 15,
+      "blocker": true,
+      "evidence_required": "portfolio_lib PORTS",
+      "proof_script": "scripts/check_portfolio_technical_launch_rubric.py",
+      "pass_condition": "ports unique + correct",
+      "fail_message": "port config wrong"
+    },
+    {
+      "rubric_id": "tech.serve_self_test",
+      "description": "serve script self-test passes",
+      "weight": 20,
+      "blocker": true,
+      "evidence_required": "serve --self-test",
+      "proof_script": "scripts/serve_portfolio_sites.py",
+      "pass_condition": "serve config valid",
+      "fail_message": "serve self-test failed"
+    },
+    {
+      "rubric_id": "tech.exact_pids",
+      "description": "Exact-PID shutdown only (no broad pkill)",
+      "weight": 20,
+      "blocker": true,
+      "evidence_required": "serve source",
+      "proof_script": "scripts/check_portfolio_technical_launch_rubric.py",
+      "pass_condition": "no pkill; pids.json written",
+      "fail_message": "broad pkill used"
+    },
+    {
+      "rubric_id": "tech.logs_manifests",
+      "description": "Per-site logs + URL manifests",
+      "weight": 15,
+      "blocker": true,
+      "evidence_required": ".agent/portfolio-sites/*",
+      "proof_script": "scripts/check_portfolio_technical_launch_rubric.py",
+      "pass_condition": "log + manifest paths defined",
+      "fail_message": "logs/manifests missing"
+    },
+    {
+      "rubric_id": "tech.full_stack_table",
+      "description": "Full-stack proof prints SITE table",
+      "weight": 15,
+      "blocker": true,
+      "evidence_required": "full stack proof",
+      "proof_script": "scripts/check_portfolio_launch_full_stack.py",
+      "pass_condition": "table printed",
+      "fail_message": "no table"
+    }
+  ]
+}

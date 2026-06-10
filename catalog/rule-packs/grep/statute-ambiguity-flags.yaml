@@ -1,0 +1,843 @@
+id: rule-pack/grep-statute-ambiguity-flags
+type: rule-pack
+version: 0.1.0
+name: Statute / regulation ambiguity GREP red-flag detectors
+description: "Regex heuristics that fire on the most common drafting failures in\n\
+  statutes, regulations, ordinances, and agency rules:\n\n - vague qualifiers (\"\
+  reasonable\", \"appropriate\", \"as soon as\n   practicable\", \"substantial\")\n\
+  \ - undefined enumerations with no closing catch-all\n - broken cross-references\
+  \ (\"\xA7X\" with no \xA7X in the same act)\n - retroactivity ambiguity (\"applies\
+  \ to all\" without effective\n   date scoping)\n - missing severability / effective-date\
+  \ markers\n - circular definitions (a defined term that uses the same word in\n\
+  \   its own definition)\n - scope-creep verbs (\"includes but is not limited to\"\
+  \ inside\n   a definition)\n - shall/may/will inconsistency\n - English-only \"\
+  as defined elsewhere\" forward-references\n\nFAST first-pass heuristics \u2014 they\
+  \ flag passages for the\n`persona/legal-clarity-analyst` to interpret, never determine\n\
+  interpretation themselves.\n"
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- legal
+- legal.compliance
+- government
+- government.regulatory
+capability:
+- safety_gating
+- classification
+- extraction
+modality:
+- text
+lifecycle: experimental
+trust_boundary: local
+freshness: stable
+tags:
+- law
+- statute
+- drafting
+- ambiguity
+- grep
+created: '2026-05-24'
+updated: '2026-05-25'
+family: grep
+language: en
+rules:
+- id: vague_qualifier_reasonable
+  pattern: (?i)\b(reasonable|reasonably|reasonableness)\b
+  severity: medium
+  category: drafting.vague_qualifier
+- id: vague_qualifier_appropriate
+  pattern: (?i)\b(appropriate|appropriately|as appropriate)\b
+  severity: medium
+  category: drafting.vague_qualifier
+- id: vague_qualifier_practicable
+  pattern: (?i)\b(practicable|as soon as practicable|reasonably practicable|insofar
+    as practicable)\b
+  severity: medium
+  category: drafting.vague_qualifier
+- id: vague_qualifier_substantial
+  pattern: (?i)\b(substantial|substantially|in substantial part|materially)\b
+  severity: medium
+  category: drafting.vague_qualifier
+- id: vague_qualifier_undue
+  pattern: (?i)\b(undue|undue hardship|undue burden|unreasonable)\b
+  severity: medium
+  category: drafting.vague_qualifier
+- id: open_enumeration_includes_but
+  pattern: (?i)\b(includes? but (is|are) not limited to|including without limitation|such
+    as)\b
+  severity: medium
+  category: drafting.open_enumeration
+- id: shall_may_inconsistency
+  pattern: (?i)\b(shall|may|must|will|should)\b.{0,200}?\b(shall|may|must|will|should)\b
+  severity: low
+  category: drafting.modal_verb_consistency
+- id: broken_section_xref
+  pattern: (?i)\b(section|subsection|paragraph|clause|art\.?|article)\s+\d+(\([a-z0-9]+\))*
+  severity: low
+  category: drafting.cross_reference_to_verify
+- id: retroactivity_ambiguity
+  pattern: (?i)\bapplies?\s+to\s+(all|any)\s+(persons?|transactions?|acts?|conduct|filings?)\b(?!.{0,80}\b(after|on
+    or after|prior to|before)\b)
+  severity: high
+  category: drafting.retroactivity_ambiguity
+- id: missing_effective_date_marker
+  pattern: (?i)\b(this (act|chapter|section|subchapter|title|regulation|rule))\b(?!.{0,500}\beffective\b)
+  severity: high
+  category: drafting.missing_effective_date
+- id: missing_severability_marker
+  pattern: (?i)\bif (any|a) (provision|section|subsection|clause)\b(?!.{0,200}\b(invalid|unconstitutional|unenforceable|severable)\b)
+  severity: medium
+  category: drafting.severability_check
+- id: circular_definition_marker
+  pattern: (?i)"([A-Z][a-z]+)"\\s+means.{0,200}\\b\\1\\b
+  severity: high
+  category: drafting.circular_definition
+- id: forward_reference
+  pattern: (?i)\bas defined (elsewhere|herein|below|hereinafter|in this (chapter|title|subchapter))\b
+  severity: medium
+  category: drafting.forward_reference
+- id: deadline_unclear
+  pattern: (?i)\b(promptly|immediately|forthwith|without delay|as soon as)\b
+  severity: medium
+  category: drafting.deadline_unclear
+- id: delegation_open
+  pattern: (?i)\b(the (secretary|administrator|commissioner|director|agency|authority))
+    (may|shall) (issue|promulgate|adopt|make) (rules?|regulations?|standards?)\b
+  severity: low
+  category: drafting.delegation_to_verify
+- id: scope_creep_includes
+  pattern: (?i)"[A-Z][a-z]+"\\s+(means|shall mean)\\s+.{0,200}\\b(and includes any
+    other|or any similar|or any related)\\b
+  severity: high
+  category: drafting.definitional_scope_creep
+- id: unconstitutional_red_flag_prior_restraint
+  pattern: (?i)\b(may not (be |)?(publish|distribute|broadcast|disseminate|post)|prohibited
+    from (publishing|distributing|broadcasting|disseminating))\b
+  severity: critical
+  category: constitutional.prior_restraint_risk
+- id: due_process_no_hearing
+  pattern: (?i)\b(without (notice|a hearing|opportunity to be heard|judicial review)|summarily
+    (revoked?|terminated?|forfeited?))\b
+  severity: critical
+  category: constitutional.due_process_risk
+- id: scale_expansion_v1_critical_signal_01
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_02
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_03
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_04
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_05
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_06
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_07
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_08
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_09
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_10
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_11
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_12
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_13
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_14
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_15
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_16
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_17
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_18
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_19
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_20
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_21
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_22
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_23
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_24
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_25
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_26
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_27
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_28
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_29
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_30
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_31
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_32
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_33
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_34
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_35
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_36
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_37
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_38
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_39
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_40
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}statute.{0,24}ambiguity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v2_unsupported_material_claim_001
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_002
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_003
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_004
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_005
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_006
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_007
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_008
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_009
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_010
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_011
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_012
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_013
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_014
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_015
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_016
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_017
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_018
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_019
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_020
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_021
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_022
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_023
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_024
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_025
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_026
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_027
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_028
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_029
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_030
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_031
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_032
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_033
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_034
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_035
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_036
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_037
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_038
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_039
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_040
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_041
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_042
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_043
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_044
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_045
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_046
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_047
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_048
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_049
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_050
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_051
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_052
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_053
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_054
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_055
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_056
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_057
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_058
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_059
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_060
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_061
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_062
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_063
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_064
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_065
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_066
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_067
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_068
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_069
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_070
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_071
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_072
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_073
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_074
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_075
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_076
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_077
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_078
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_079
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_080
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_statute_ambiguity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-statute-ambiguity-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.

@@ -10,8 +10,8 @@ give away the defensible part**. Builds on [[../strategy/two-services-shared-inf
 LIVE** — verified, current, provenanced, HITL'd, hosted — *because a static download structurally can't
 replicate it.* The defensible part is the *live verification layer*; it is **never** free.
 
-## The line (OHH free/OSS tier vs CEaaS paywall)
-| FREE — OHH OSS tier (funnel + low-end wedge) | PAID — CEaaS / governed layer (moat, recurring) |
+## The line (OHH free/OSS tier vs Baltor paywall)
+| FREE — OHH OSS tier (funnel + low-end wedge) | PAID — Baltor / governed layer (moat, recurring) |
 |---|---|
 | Harness + seven-primitive grammar + components + basic flows/pipelines | **Verified / current corpora** — cross-checked vs authoritative truth + cross-corpus |
 | SDK/CLI + export emitters (SPDX · C2PA · CycloneDX/AIBOM) | **Freshness / CDC / regulatory-diff** (the live layer — can't be frozen) |
@@ -26,11 +26,11 @@ stakes, not a wedge** — and solo-dev is low-WTP / high-support, easy to get st
 low-end wedge is **open + portable + governed + works with the agent you already run (Claude Code/Codex)**
 — the three things Contextual structurally **won't** do because each undercuts "build on us + our GLM."
 Free tools/flows/components are the funnel, the community, **and the data exhaust** that reveals which
-verified corpora people actually need (which feeds CEaaS).
+verified corpora people actually need (which feeds Baltor).
 
 ## Three non-overlapping channels (they don't cannibalize)
 1. **Low-end devs** (OHH free/OSS) — funnel + community + demand signal.
-2. **CEaaS verification SaaS** — the recurring moat, fed by what OHH usage reveals.
+2. **Baltor verification SaaS** — the recurring moat, fed by what OHH usage reveals.
 3. **Upstream supplier** — feeding verified corpora into Contextual/Snowflake/Databricks/Claude Code
    ([[beat-contextual-positioning.md]] "sit upstream"). Distinct buyers, distinct motions.
 

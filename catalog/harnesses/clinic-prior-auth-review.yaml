@@ -1,0 +1,47 @@
+id: "harness/clinic-prior-auth-review"
+type: harness
+version: "0.1.0"
+name: "Clinic Prior Authorization review harness"
+description: "Harness for clinic prior authorization review with redaction, retrieval, rule flags, reusable processors, and judge scoring."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["healthcare.clinical", "healthcare.payer"]
+capability: ["evaluation", "retrieval", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["clinic-prior-auth", "expansion-v3"]
+created: "2026-05-24"
+updated: "2026-05-24"
+kind: "model_harness"
+tier: "primary"
+applied_layers: ["persona", "grep", "rag", "privacy"]
+knowledge_packs:
+  - id: "frameworks"
+    label: "Clinic Prior Authorization framework summaries"
+    kind: "knowledge_pack"
+    types: ["rag_doc", "checklist", "control_summary", "evidence_matrix"]
+    required: true
+    trust_boundary: "local"
+    freshness: "dated"
+model_targets:
+  - id: "review_model"
+    label: "Local or hosted review model"
+    transport: "ollama"
+    role: "packet reviewer"
+    capabilities: ["reasoning", "summarization"]
+    required: true
+    default: true
+    trust_boundary: "local"
+model_io:
+  input: "packet text or structured packet converted to prose"
+  output: "findings, score, citations, evidence gaps, and remediation checklist"
+  transport: "ollama"
+input_verification: ["redact direct identifiers", "normalize evidence items before retrieval"]
+output_verification: ["citation span check passes", "severity calibration applied", "redaction audit passes"]
+privacy_boundaries:
+  raw_input: "Raw packet remains local unless deployment configures an external adapter."
+  derived_output: "Outputs may contain sensitive operational details and require redaction before publication."
+  external_calls: "No external calls are required by this harness."
+contributes_to: ["pipeline/clinic-prior-auth-review"]

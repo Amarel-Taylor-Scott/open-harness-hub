@@ -1,0 +1,47 @@
+id: "knowledge-pack/specialized-model-card-scan-job-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Specialized model card scan job patterns"
+description: "Queue-stage patterns for turning task-specific model cards and model repositories into governed object-factory jobs and reusable primitive candidates."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["healthcare", "finance", "legal", "software.devops", "media", "security", "privacy", "government", "cross_industry"]
+capability: ["retrieval", "extraction", "classification", "evaluation", "routing", "governance", "embedding"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "pre_api.ingest"
+tags: ["huggingface", "model-cards", "object-factory", "worker-jobs", "queue-ready", "specialized-models"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+domain: "specialized model card object factory"
+facts:
+  - "Task-specific model cards can be expanded into queue-ready jobs that mine reusable task context without downloading model weights."
+  - "The scan lifecycle parses model metadata, normalizes task context, links datasets and evaluations, deduplicates candidates, emits index records, and routes high-risk outputs to review."
+  - "The emitted jobs are public-metadata-derived and carry excluded-scope, license, privacy, and high-impact review policy."
+sources:
+  - title: "Specialized model card scan job stages"
+    path: "catalog/knowledge-packs/data/specialized-model-card-scan-job-patterns/job-types.jsonl"
+content_types:
+  - "object_factory_job_type"
+  - "scan_lifecycle"
+  - "review_route"
+files:
+  - path: "catalog/knowledge-packs/data/specialized-model-card-scan-job-patterns/job-types.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    recommended: true
+    fields: ["job_type", "purpose", "expected_outputs", "worker_class"]
+provenance:
+  sources:
+    - "catalog/knowledge-packs/data/specialized-model-signal-surfaces/models.jsonl"
+    - "scripts/factory/specialized_model_card_scan_jobs.py"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "public model metadata only; no model weights, private training data, or PII copied"
+

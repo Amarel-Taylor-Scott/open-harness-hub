@@ -1,92 +1,822 @@
-id: "rule-pack/grep-prompt-injection-heuristics"
+id: rule-pack/grep-prompt-injection-heuristics
 type: rule-pack
-version: "0.1.0"
-name: "Prompt-injection heuristic detectors"
-description: |
-  Heuristic regex patterns that flag likely prompt-injection attempts
+version: 0.1.0
+name: Prompt-injection heuristic detectors
+description: 'Heuristic regex patterns that flag likely prompt-injection attempts
+
   in input, retrieved documents, or tool results. Inspired by garak
+
   probe families (`promptinject`, `latentinjection`, `ansiescape`,
-  `encoding`, `dan`) and LLM Guard's `PromptInjection` scanner.
+
+  `encoding`, `dan`) and LLM Guard''s `PromptInjection` scanner.
+
 
   These are FAST FIRST-PASS heuristics; pair with a small-model
+
   classifier (`processor/prompt-injection-detector`) for robust
+
   defense. False positives are common; use to TRIGGER a review or
+
   paraphrase, not to block outright.
+
+  '
 authors:
-  - name: "Open Harness Hub contributors"
-license: "MIT"
-industry:   ["security", "ai", "cross_industry"]
-capability: ["safety_gating", "classification"]
-modality:   ["text"]
-lifecycle:  "beta"
-trust_boundary: "local"
-freshness:  "volatile"
-tags: ["prompt-injection", "jailbreak", "garak-aligned"]
-created: "2026-05-19"
-updated: "2026-05-19"
-
-family: "grep"
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- security
+- ai
+- cross_industry
+capability:
+- safety_gating
+- classification
+modality:
+- text
+lifecycle: beta
+trust_boundary: local
+freshness: volatile
+tags:
+- prompt-injection
+- jailbreak
+- garak-aligned
+created: '2026-05-19'
+updated: '2026-05-25'
+family: grep
 rules:
-  - id: "ignore_previous_instructions"
-    pattern: "(?i)ignore (the (?:previous|prior|above) )?(?:instructions|prompt|message|directive|system|context)"
-    severity: "high"
-    category: "prompt_injection.override"
-
-  - id: "you_are_now_role_override"
-    pattern: "(?i)you (?:are|will be|must be) (?:now |henceforth )?(?:a|an|the) [a-z]+ (?:that|who) (?:will|must|can|is allowed to)"
-    severity: "medium"
-    category: "prompt_injection.role_play"
-
-  - id: "dan_jailbreak"
-    pattern: "(?i)\\b(DAN|do anything now|developer mode|jailbreak|liberate)\\b"
-    severity: "high"
-    category: "prompt_injection.jailbreak"
-
-  - id: "system_prompt_leak_request"
-    pattern: "(?i)(repeat|reveal|tell me|show me|print|output) (the |your )?(?:system prompt|initial prompt|instructions|previous instructions)"
-    severity: "high"
-    category: "prompt_injection.leak"
-
-  - id: "encoding_attack_base64"
-    pattern: "(?i)decode (the |this )?base64.{0,40}?(then|and) (execute|follow|do|perform)"
-    severity: "high"
-    category: "prompt_injection.encoding"
-
-  - id: "ansi_escape_injection"
-    pattern: "\\x1b\\[[0-9;]*[A-Za-z]"
-    severity: "high"
-    category: "prompt_injection.terminal_escape"
-    notes: "Garak `ansiescape` probe — ANSI codes can hide payloads in terminal-rendered output."
-
-  - id: "invisible_unicode_tag_chars"
-    pattern: "[\\u{E0000}-\\u{E007F}]"
-    severity: "critical"
-    category: "prompt_injection.invisible_unicode"
-    notes: "Unicode tag block — used for invisible-text exfiltration / latent prompt injection."
-
-  - id: "zero_width_characters"
-    pattern: "[\\u200b\\u200c\\u200d\\u2060\\ufeff]"
-    severity: "medium"
-    category: "prompt_injection.steganography"
-
-  - id: "indirect_injection_markdown"
-    pattern: "(?i)\\[.*?\\]\\(.*?(?:ignore|reveal|system prompt|disregard).*?\\)"
-    severity: "medium"
-    category: "prompt_injection.markdown"
-
-  - id: "tool_invocation_in_doc"
-    pattern: "(?i)<tool[\\s_-]?(?:call|use)>|\\{\\{\\s*tool\\s*\\(.*\\)\\s*\\}\\}"
-    severity: "high"
-    category: "prompt_injection.tool_invocation"
-    notes: "Retrieved documents shouldn't carry tool-invocation markup."
-
-  - id: "grandma_attack"
-    pattern: "(?i)(grandma|grandmother) (used to|would) (tell|recite|sing) (me )?(.{0,40}?)(napalm|virus|exploit|password|seed phrase)"
-    severity: "high"
-    category: "prompt_injection.social_engineering"
-    notes: "Garak `grandma` probe pattern."
-
-  - id: "instruction_injection_keyword_list"
-    pattern: "(?i)(ignore|disregard|forget|override) (above|previous|all) (instructions|rules|context|constraints)"
-    severity: "high"
-    category: "prompt_injection.override"
+- id: ignore_previous_instructions
+  pattern: (?i)ignore (the (?:previous|prior|above) )?(?:instructions|prompt|message|directive|system|context)
+  severity: high
+  category: prompt_injection.override
+- id: you_are_now_role_override
+  pattern: (?i)you (?:are|will be|must be) (?:now |henceforth )?(?:a|an|the) [a-z]+
+    (?:that|who) (?:will|must|can|is allowed to)
+  severity: medium
+  category: prompt_injection.role_play
+- id: dan_jailbreak
+  pattern: (?i)\b(DAN|do anything now|developer mode|jailbreak|liberate)\b
+  severity: high
+  category: prompt_injection.jailbreak
+- id: system_prompt_leak_request
+  pattern: (?i)(repeat|reveal|tell me|show me|print|output) (the |your )?(?:system
+    prompt|initial prompt|instructions|previous instructions)
+  severity: high
+  category: prompt_injection.leak
+- id: encoding_attack_base64
+  pattern: (?i)decode (the |this )?base64.{0,40}?(then|and) (execute|follow|do|perform)
+  severity: high
+  category: prompt_injection.encoding
+- id: ansi_escape_injection
+  pattern: \x1b\[[0-9;]*[A-Za-z]
+  severity: high
+  category: prompt_injection.terminal_escape
+  notes: "Garak `ansiescape` probe \u2014 ANSI codes can hide payloads in terminal-rendered\
+    \ output."
+- id: invisible_unicode_tag_chars
+  pattern: '[\u{E0000}-\u{E007F}]'
+  severity: critical
+  category: prompt_injection.invisible_unicode
+  notes: "Unicode tag block \u2014 used for invisible-text exfiltration / latent prompt\
+    \ injection."
+- id: zero_width_characters
+  pattern: '[\u200b\u200c\u200d\u2060\ufeff]'
+  severity: medium
+  category: prompt_injection.steganography
+- id: indirect_injection_markdown
+  pattern: (?i)\[.*?\]\(.*?(?:ignore|reveal|system prompt|disregard).*?\)
+  severity: medium
+  category: prompt_injection.markdown
+- id: tool_invocation_in_doc
+  pattern: (?i)<tool[\s_-]?(?:call|use)>|\{\{\s*tool\s*\(.*\)\s*\}\}
+  severity: high
+  category: prompt_injection.tool_invocation
+  notes: Retrieved documents shouldn't carry tool-invocation markup.
+- id: grandma_attack
+  pattern: (?i)(grandma|grandmother) (used to|would) (tell|recite|sing) (me )?(.{0,40}?)(napalm|virus|exploit|password|seed
+    phrase)
+  severity: high
+  category: prompt_injection.social_engineering
+  notes: Garak `grandma` probe pattern.
+- id: instruction_injection_keyword_list
+  pattern: (?i)(ignore|disregard|forget|override) (above|previous|all) (instructions|rules|context|constraints)
+  severity: high
+  category: prompt_injection.override
+- id: scale_expansion_v1_critical_signal_01
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_02
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_03
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_04
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_05
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_06
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_07
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_08
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_09
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_10
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_11
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_12
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_13
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_14
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_15
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_16
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_17
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_18
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_19
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_20
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_21
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_22
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_23
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_24
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_25
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_26
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_27
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_28
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_29
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_30
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_31
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_32
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_33
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_34
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_35
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_36
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_37
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_38
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_39
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_40
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}prompt.{0,24}injection.{0,24}heuristics).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v2_unsupported_material_claim_001
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_002
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_003
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_004
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_005
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_006
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_007
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_008
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_009
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_010
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_011
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_012
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_013
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_014
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_015
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_016
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_017
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_018
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_019
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_020
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_021
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_022
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_023
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_024
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_025
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_026
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_027
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_028
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_029
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_030
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_031
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_032
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_033
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_034
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_035
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_036
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_037
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_038
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_039
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_040
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_041
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_042
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_043
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_044
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_045
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_046
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_047
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_048
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_049
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_050
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_051
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_052
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_053
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_054
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_055
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_056
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_057
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_058
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_059
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_060
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_061
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_062
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_063
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_064
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_065
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_066
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_067
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_068
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_069
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_070
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_071
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_072
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_073
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_074
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_075
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_076
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_077
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_078
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_079
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_080
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_prompt_injection_heuristics|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-prompt-injection-heuristics.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.

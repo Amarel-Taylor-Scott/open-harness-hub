@@ -1,0 +1,35 @@
+id: "benchmark/cookie-consent-audit-bench"
+type: benchmark
+version: "0.1.0"
+name: "Cookie Consent Audit benchmark"
+description: "Synthetic benchmark for cookie consent audit review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["privacy.gdpr", "marketing_ops.consent"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["cookie-consent-audit", "expansion-v5"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/cookie-consent-audit-review"
+dataset: "dataset/cookie-consent-audit-samples"
+rubric: "rubric/cookie-consent-audit-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/cookie-consent-audit-review"
+    rule_pack_override: ["rule-pack/grep-cookie-consent-audit-flags", "rule-pack/rag-cookie-consent-audit-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 23
+report:
+  output: "dist/benchmarks/cookie-consent-audit/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

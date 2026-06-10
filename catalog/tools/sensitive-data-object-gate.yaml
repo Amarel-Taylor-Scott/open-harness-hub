@@ -1,0 +1,81 @@
+id: "tool/sensitive-data-object-gate"
+type: tool
+version: "0.1.0"
+name: "Sensitive data object gate"
+description: "Screens source markdown and candidate objects for PII, secrets, confidential data, unsafe content, tenant-private material, and publication risks before model calls or catalog publishing."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["anonymization", "safety", "safety_gating", "governance", "verification"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "pre_api.safety"
+tags: ["privacy", "pii", "redaction", "secrets", "object-factory", "publication-gate"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    source_record:
+      type: object
+    markdown_pointer:
+      type: string
+    candidate_objects:
+      type: array
+      items:
+        type: object
+    tenant_policy:
+      type: object
+    publication_policy:
+      type: object
+  required: ["candidate_objects"]
+returns:
+  type: object
+  properties:
+    allowed_for_external_model:
+      type: boolean
+    allowed_for_publication:
+      type: boolean
+    redacted_markdown_pointer:
+      type: string
+    redacted_objects:
+      type: array
+      items:
+        type: object
+    findings:
+      type: array
+      items:
+        type: object
+    review_tickets:
+      type: array
+      items:
+        type: object
+side_effects: "write"
+examples:
+  - input:
+      candidate_objects:
+        - type: "procedure_step"
+          text: "Check applicant identity document."
+      tenant_policy:
+        redact_before_external_model: true
+      publication_policy:
+        public_catalog: true
+    output:
+      allowed_for_external_model: true
+      allowed_for_publication: true
+      redacted_markdown_pointer: ""
+      redacted_objects:
+        - type: "procedure_step"
+          text: "Check applicant identity document."
+      findings: []
+      review_tickets: []
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.object_factory_workers.screen_sensitive_data"
+    language: "python"
+  - kind: "mcp"
+    path: "mcp/privacy.screen_candidate_objects"

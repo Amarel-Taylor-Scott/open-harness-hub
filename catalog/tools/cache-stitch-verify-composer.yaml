@@ -1,0 +1,56 @@
+id: "tool/cache-stitch-verify-composer"
+type: tool
+version: "0.1.0"
+name: "Cache stitch verify composer"
+description: "Composes retrieved trajectory fragments into a plan, tool-call draft, code patch, or response skeleton, then routes it through schema, test, rubric, citation, and privacy verification before reuse."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["evaluation", "verification", "serving"]
+modality: ["text", "structured", "code"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.cache"
+tags: ["trajectory-cache", "stitching", "verification", "cheap-composition", "fallback-model"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    request:
+      type: object
+    candidates:
+      type: array
+      items: { type: object }
+    verifier_policy:
+      type: object
+    fallback_policy:
+      type: object
+  required: ["request", "candidates", "verifier_policy"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    composition:
+      type: object
+    selected_fragment_ids:
+      type: array
+      items: { type: string }
+    fallback_model_required:
+      type: boolean
+    verifier_status:
+      type: string
+side_effects: "none"
+examples:
+  - input:
+      request: { task_signature: "task/example" }
+      candidates: []
+      verifier_policy: { require_tests: true }
+    output:
+      ok: false
+      fallback_model_required: true
+      verifier_status: "no_candidates"

@@ -38,8 +38,8 @@ Fine-tune a sentence-transformer on (query, positive, negative) triplets; serve 
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `train` | processor | `processor/iterative-revise-loop` | — |
-| 3 | `retrieve_and_rerank` | processor | `processor/cross-encoder-reranker` | — |
-| 4 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `train` | processor | `processor/iterative-revise-loop` | - |
+| 3 | `retrieve_and_rerank` | processor | `processor/cross-encoder-reranker` | - |
+| 4 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

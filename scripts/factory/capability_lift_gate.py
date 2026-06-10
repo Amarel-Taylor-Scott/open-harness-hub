@@ -3,7 +3,9 @@
 
 Admission bar (``docs/codex/master-goal.md``): a component is useful **iff it
 lets a model do something it cannot do reliably alone.** This gate turns that
-bar into a deterministic, stdlib-only decision over catalog YAML manifests:
+bar into a deterministic decision over catalog manifests. Runtime/default
+catalog scans prefer database-shaped row exports; YAML remains a seed/export
+bootstrap fallback:
 
   1. **Capability-lift score** (0..1) from structural + provenance + evaluation
      + domain-specificity signals, with a HARD floor (``--lift-floor``). The
@@ -27,6 +29,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
@@ -42,6 +45,11 @@ except ImportError:  # pragma: no cover
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 CATALOG = ROOT / "catalog"
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts._config import OH_CATALOG_ROW_DIR_ENV
+from scripts.db.catalog_row_source import iter_components_from_rows, resolve_catalog_row_dir
 
 # --- tunables (single source; no magic literals scattered downstream) --------
 # Filler is culled primarily on explicit markers (HARD_FILLER_MARKS) and
@@ -87,7 +95,46 @@ HARD_FILLER_MARKS = {
 # --------------------------------------------------------------------------- #
 # loading
 # --------------------------------------------------------------------------- #
-def load_manifests(root: Path) -> list[tuple[Path, dict]]:
+def _resolve_gate_row_dir(root: Path, row_dir: Path | str | None = None) -> Path | None:
+    """Resolve database rows for normal catalog scans, not temporary roots."""
+    if row_dir is not None or os.environ.get(OH_CATALOG_ROW_DIR_ENV):
+        return resolve_catalog_row_dir(row_dir)
+    try:
+        if root.resolve() == CATALOG.resolve():
+            return resolve_catalog_row_dir()
+    except OSError:
+        return None
+    return None
+
+
+def _component_source_path(source_path: str, component_id: str) -> Path:
+    if source_path.startswith("db://"):
+        return ROOT / ".catalog-db-rows" / f"{component_id.replace('/', '__')}.yaml"
+    path = Path(source_path)
+    return path if path.is_absolute() else ROOT / path
+
+
+def _display_path(path: Path, root: Path) -> str:
+    try:
+        return str(path.relative_to(root))
+    except ValueError:
+        try:
+            return str(path.relative_to(ROOT))
+        except ValueError:
+            return str(path)
+
+
+def load_manifests(root: Path, row_dir: Path | str | None = None) -> tuple[list[tuple[Path, dict]], str]:
+    resolved_row_dir = _resolve_gate_row_dir(root, row_dir)
+    if resolved_row_dir is not None:
+        return [
+            (
+                _component_source_path(component.source_path, component.id),
+                component.manifest,
+            )
+            for component in iter_components_from_rows(resolved_row_dir)
+        ], "database_rows"
+
     out: list[tuple[Path, dict]] = []
     for path in sorted(root.rglob("*.yaml")):
         if "_inbox" in path.parts:
@@ -98,7 +145,7 @@ def load_manifests(root: Path) -> list[tuple[Path, dict]]:
             continue
         if isinstance(data, dict) and "type" in data:
             out.append((path, data))
-    return out
+    return out, "catalog_yaml_seed_export"
 
 
 def git_tracked_set() -> set[Path]:
@@ -335,12 +382,13 @@ def find_near_duplicates(
 def run_gate(
     root: Path,
     *,
+    row_dir: Path | str | None = None,
     lift_floor: float = DEFAULT_LIFT_FLOOR,
     bits: int = DEFAULT_SIMHASH_BITS,
     n_bands: int = DEFAULT_LSH_BANDS,
     hamming_max: int = DEFAULT_HAMMING_MAX,
 ) -> dict[str, Any]:
-    manifests = load_manifests(root)
+    manifests, catalog_source = load_manifests(root, row_dir=row_dir)
     tracked = git_tracked_set()
 
     scored = []
@@ -360,12 +408,12 @@ def run_gate(
         if hard:
             reasons.append("filler markers: " + ", ".join(hard))
         if path in dupe_of:
-            reasons.append(f"near-duplicate of {dupe_of[path].relative_to(root)}")
+            reasons.append(f"near-duplicate of {_display_path(dupe_of[path], root)}")
         if lift < lift_floor:
             reasons.append(f"capability-lift {lift:.2f} < floor {lift_floor:.2f} (near-empty)")
         is_tracked = path.resolve() in tracked
         decisions.append({
-            "path": str(path.relative_to(root)),
+            "path": _display_path(path, root),
             "id": m.get("id"),
             "type": m.get("type"),
             # NOT measured capability lift. This is the structural/provenance
@@ -416,6 +464,8 @@ def run_gate(
         root_label = str(root)
     return {
         "root": root_label,
+        "catalog_source": catalog_source,
+        "row_dir": str(_resolve_gate_row_dir(root, row_dir)) if catalog_source == "database_rows" else None,
         # Top-level banner so a reader of dist/reports/ cannot mistake the
         # per-decision ``heuristic_quality_score`` for a measured capability gain.
         "score_meaning": HEURISTIC_NOTE,
@@ -497,6 +547,12 @@ def _self_test() -> int:
 def _main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Capability-lift + novelty gate for catalog manifests.")
     parser.add_argument("--root", default=str(CATALOG), help="Catalog root to scan (default: catalog/).")
+    parser.add_argument(
+        "--row-dir",
+        type=Path,
+        default=os.environ.get(OH_CATALOG_ROW_DIR_ENV),
+        help="Database-shaped catalog row directory. Defaults to OH_CATALOG_ROW_DIR or the bridge export for catalog/ scans.",
+    )
     parser.add_argument("--lift-floor", type=float, default=DEFAULT_LIFT_FLOOR)
     parser.add_argument("--hamming-max", type=int, default=DEFAULT_HAMMING_MAX)
     parser.add_argument("--report", help="Write the full per-manifest report JSON here.")
@@ -507,7 +563,7 @@ def _main(argv: list[str] | None = None) -> int:
         return _self_test()
 
     root = Path(args.root).resolve()
-    report = run_gate(root, lift_floor=args.lift_floor, hamming_max=args.hamming_max)
+    report = run_gate(root, row_dir=args.row_dir, lift_floor=args.lift_floor, hamming_max=args.hamming_max)
     summary = {k: v for k, v in report.items() if k != "decisions"}
     print(json.dumps(summary, indent=2))
 
@@ -517,9 +573,14 @@ def _main(argv: list[str] | None = None) -> int:
         print(f"\nfull report -> {args.report}")
 
     if args.apply:
+        if report.get("catalog_source") == "database_rows":
+            sys.stderr.write("--apply is disabled for database-row scans; export review decisions instead.\n")
+            return 2
         result = apply_cull(report, root)
         print(f"\nAPPLIED cull: deleted {result['deleted']} untracked files; "
               f"skipped {result['skipped_tracked']} tracked (curated, never deleted).")
+    elif report.get("catalog_source") == "database_rows":
+        print("\n(dry run over database rows — review/export decisions; --apply is file-scan only)")
     else:
         print("\n(dry run — re-run with --apply to delete culled UNTRACKED files)")
     return 0

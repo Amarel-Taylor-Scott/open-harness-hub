@@ -1,0 +1,31 @@
+id: "knowledge-pack/pipeline-generation-scenarios"
+type: knowledge-pack
+version: "0.1.0"
+name: "Cost-aware pipeline generation scenarios"
+description: "Synthetic scenario prompts and expected planning constraints for generating safe, cost-bounded moderation and review pipelines."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "CC-BY-4.0"
+industry: ["ai", "media", "compliance", "humanitarian"]
+capability: ["planning", "evaluation", "routing"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["pipeline-generation", "cost-aware", "moderation", "scenario-tests"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types: ["scenario_prompt", "expected_pipeline_constraints", "cost_band"]
+files:
+  - path: "data/pipeline-generation-scenarios/scenario-prompts.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    enabled: true
+    embedder: "processor/local-embedder"
+provenance:
+  sources: ["Open Harness Hub synthetic scenario design"]
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "fully synthetic; no real users, workers, children, or platform posts"

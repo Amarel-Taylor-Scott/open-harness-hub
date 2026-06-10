@@ -1,0 +1,35 @@
+id: "benchmark/water-main-break-response-bench"
+type: benchmark
+version: "0.1.0"
+name: "Water Main Break Response benchmark"
+description: "Synthetic benchmark for water main break response review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["water_utility.sdwa", "environmental.water"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["water-main-break-response", "expansion-v6"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/water-main-break-response-review"
+dataset: "dataset/water-main-break-response-samples"
+rubric: "rubric/water-main-break-response-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/water-main-break-response-review"
+    rule_pack_override: ["rule-pack/grep-water-main-break-response-flags", "rule-pack/rag-water-main-break-response-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 29
+report:
+  output: "dist/benchmarks/water-main-break-response/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

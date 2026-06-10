@@ -177,7 +177,7 @@ manuals.
 Citations: Parent-child —
 <https://medium.com/@seahorse.technologies.sl/parent-child-chunking-in-langchain-for-advanced-rag-e7c37171995a>,
 <https://kuriko-iwai.com/research/rag-chunking-strategies-technical-guide>;
-Sentence-window — <https://pixion.co/blog/rag-strategies-context-enrichment>.
+Sentence-window — <https://pixion.co/blog/rag-strategies-baltor>.
 (Catalog components implementing this step: `processor/recursive-character-chunker`,
 `processor/page-aware-chunker`.)
 
@@ -246,8 +246,8 @@ extractive (no model tokens) and preserves the exact spans citations point at;
 reserve abstractive summarization for when token budget genuinely forces it,
 because paraphrase erodes the provenance the product depends on.
 
-Citations: context-enrichment/compression —
-<https://pixion.co/blog/rag-strategies-context-enrichment>; reranking-as-compression
+Citations: baltor/compression —
+<https://pixion.co/blog/rag-strategies-baltor>; reranking-as-compression
 context —
 <https://bigdataboutique.com/blog/rag-reranking-improving-retrieval-quality-with-cross-encoders>.
 
@@ -298,9 +298,9 @@ citation and provenance possible (value-prop 2), and edge placement +
 instructions-last directly mitigate the well-documented mid-context attention
 drop.
 
-Citations: assembly/placement is treated across the hybrid + context-enrichment
+Citations: assembly/placement is treated across the hybrid + baltor
 sources — <https://app.ailog.fr/en/blog/guides/hybrid-retrieval-fusion>,
-<https://pixion.co/blog/rag-strategies-context-enrichment>.
+<https://pixion.co/blog/rag-strategies-baltor>.
 
 ---
 

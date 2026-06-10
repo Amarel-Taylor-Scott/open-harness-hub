@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/context-pack-builder.schema.json",
+  "title": "Context pack builder",
+  "description": "Contract for a pack builder that converts retrieved objects, artifacts, and relationships into task-specific agent context packs.",
+  "type": "object",
+  "required": ["kind", "builder_id", "pack_types", "inputs", "outputs", "created_at"],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "baltor.context-pack-builder.v1"
+    },
+    "builder_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "pack_types": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": ["implementation_pack", "review_pack", "debugging_pack", "incident_pack", "architecture_pack", "ticket_pack", "release_pack", "customer_pack", "compliance_pack", "clinical_summary_pack", "financial_risk_pack", "security_triage_pack", "legal_matter_pack", "supply_chain_trace_pack", "custom"]
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "context_objects": { "type": "boolean" },
+        "context_versions": { "type": "boolean" },
+        "context_artifacts": { "type": "boolean" },
+        "context_relationships": { "type": "boolean" },
+        "context_events": { "type": "boolean" },
+        "source_handles": { "type": "boolean" },
+        "runtime_context": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "outputs": {
+      "type": "object",
+      "properties": {
+        "context_pack_kind": { "type": "string" },
+        "requires_source_handles": { "type": "boolean" },
+        "records_lineage_event": { "type": "boolean" },
+        "records_retrieval_trace": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "policy": {
+      "type": "object",
+      "properties": {
+        "acl_filter_required": { "type": "boolean" },
+        "redaction_before_delivery": { "type": "boolean" },
+        "conflict_detection_required": { "type": "boolean" },
+        "source_precedence_required": { "type": "boolean" },
+        "raw_source_dump_allowed": { "type": "boolean" },
+        "token_budget_required": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "evaluation": {
+      "type": "object",
+      "properties": {
+        "source_recall_required": { "type": "boolean" },
+        "citation_coverage_required": { "type": "boolean" },
+        "token_budget_checked": { "type": "boolean" },
+        "stale_source_checked": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

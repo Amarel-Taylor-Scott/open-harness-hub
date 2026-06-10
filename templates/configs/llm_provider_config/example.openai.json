@@ -1,0 +1,12 @@
+{
+  "schema": "schemas/config/llm_provider_config.v1.schema.json",
+  "version": "v1",
+  "owner": "llm-gateway",
+  "environment_scope": "production",
+  "config_type": "llm_provider_config",
+  "provider_id": "openai",
+  "api_key_ref": "env://OPENAI_API_KEY",
+  "emulator": "stub_completion",
+  "fallback": "local_stub",
+  "notes": "Filled-in example for the OpenAI provider behind the gateway. The key is referenced via env://OPENAI_API_KEY (matching scripts/llm_gateway/secrets.py); when unset the provider is simply UNAVAILABLE and the gateway falls back to local_stub, so proofs stay offline and green."
+}

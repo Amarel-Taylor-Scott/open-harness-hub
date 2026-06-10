@@ -1,0 +1,54 @@
+kind: baltor.flywheel-workflow.v1
+name: Agent Decision Flywheel
+flywheel_id: flywheel.agent-decision
+stage: Continuous Verification + Adversarial Validation rail
+purpose: An L5 AI-agent decision loop. The agent proposes/chooses bounded actions ONLY inside a DecisionContext and emits a DecisionReceipt; durable workflows/queues/policy own execution, retries, replay, and audit.
+triggers:
+  - context_rot_detected
+  - source_conflict_found
+  - enhancement_candidate_found
+  - backend_tool_regression
+  - human_review_needed
+decision_context:
+  required: true
+  schema: schemas/flywheel/decision-context.schema.json
+  example: fixtures/flywheel/agent-decision-context.example.json
+  notes: agent acts only within allowed_tools/policy/risk/budgets/stop_conditions; never from unbounded context
+inputs:
+  - decision_context
+  - evidence_handles
+  - candidate_actions
+steps:
+  - load + validate the DecisionContext
+  - gather evidence via allowed_tools only
+  - decide within constraints + stop_conditions
+  - emit a DecisionReceipt (decision, reason, evidence_used, actions proposed/taken/blocked, policy_decision)
+  - hand chosen actions to the durable workflow/queue (agent does NOT execute side effects directly)
+queue_messages:
+  - proposed_action
+  - human_review_ticket
+outputs:
+  - DecisionReceipt
+  - proposed_action
+receipts_emitted:
+  - DecisionReceipt
+metrics:
+  - decision_context_completeness
+  - receipt_completeness
+  - policy_compliance
+  - agent_success_rate
+failure_modes:
+  - decision_context invalid or expired
+  - confidence below threshold
+  - stop_condition hit mid-decision
+fallback_strategy: on low confidence or a hit stop_condition, propose no action and route to human review
+human_review_triggers:
+  - policy_decision == human_review
+  - confidence below 0.6
+suggested_runtime: control-plane agent runner inside a durable workflow step (no autonomous execution)
+candidate_backend_tools:
+  - Pydantic AI
+  - LangGraph
+  - OPA
+harness_refs:
+  - fixtures/harness/agent-decision-context.harness.json

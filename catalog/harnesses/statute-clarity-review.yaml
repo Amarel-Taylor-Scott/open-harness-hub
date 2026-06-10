@@ -1,0 +1,93 @@
+id: "harness/statute-clarity-review"
+type: harness
+version: "0.1.0"
+name: "Statute / regulation clarity review harness"
+description: |
+  Wraps the statute-clarity review flow as a reusable harness with
+  persona + GREP + RAG + tools layers. Targets local-Ollama or
+  Anthropic/OpenAI for the judge model arm. Emits citation-first
+  findings tagged with canon name, severity, suggested redline, and
+  cited authority.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["legal", "legal.compliance", "government", "government.regulatory"]
+capability: ["evaluation", "verification", "retrieval", "reasoning"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["law", "statute", "interpretation", "harness"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+kind: "model_harness"
+tier: "primary"
+applied_layers: [persona, grep, rag, tools]
+consumes: [grep_rule, rag_doc, persona_block, response_policy]
+emits: [reasoning_step, context_snippet, extracted_fact]
+logic_paths:
+  - id: "review_statute_clarity"
+    label: "statute text → ambiguity flags → canon analysis → grade + redlines"
+    entrypoints: ["/api/law/review"]
+    steps:
+      - "normalize statute text + extract section structure"
+      - "fire ambiguity GREP pack"
+      - "RAG against canons-of-construction pack"
+      - "judge per statute-clarity-v1 rubric"
+      - "propose smallest-fix redlines per finding"
+      - "emit audit trace"
+    consumes: [grep_rule, rag_doc, persona_block, response_policy]
+    emits: [reasoning_step, context_snippet, extracted_fact]
+    model_call: "required"
+    verification:
+      - "every finding cites canon name OR drafting-failure category"
+      - "every finding quotes the exact text being analyzed"
+      - "every finding has a suggested redline OR explicit 'requires policy decision'"
+knowledge_packs:
+  - id: "canons"
+    label: "Canons of construction + drafting-failure taxonomy"
+    kind: knowledge_pack
+    types: [rag_doc, citation_edge]
+    required: true
+    trust_boundary: "local"
+    freshness: "dated"
+logic_packs:
+  - id: "persona_default"
+    label: "Legal Clarity Analyst persona"
+    kind: logic_pack
+    types: [persona_block]
+    required: true
+model_io:
+  input:  "{statute_text: string, jurisdiction: string, statute_type: enum}"
+  output: "{grade: number, findings: object[], suggested_redlines: object[]}"
+model_targets:
+  - id: "local_ollama"
+    label: "Local Ollama"
+    transport: "ollama"
+    role: "Default local review; reproducible without API keys."
+    capabilities: [text_generation, chat]
+    required: false
+    default: true
+    trust_boundary: "local"
+  - id: "anthropic_judge"
+    label: "Anthropic Claude Sonnet (frontier judge)"
+    transport: "anthropic"
+    role: "Optional frontier-class judge for legislative-counsel review."
+    capabilities: [text_generation, chat, long_context]
+    required: false
+    default: false
+    trust_boundary: "external"
+input_verification:
+  - "reject input larger than 512 KB"
+  - "reject privileged-marker text ('attorney-client privileged', 'work product')"
+output_verification:
+  - "every finding cites a canon OR a drafting-failure category"
+  - "no legal-advice phrasing ('you will win', 'this is unconstitutional') — interpretation-risk framing only"
+  - "rubric/statute-clarity-v1 score recorded"
+privacy_boundaries:
+  raw_input:      "stays local to the running pipeline"
+  derived_output: "may sync to hub if statute text is public-law"
+  external_calls: "only if model_target.trust_boundary == external AND user opted in"
+contributes_to:
+  - "pipeline/statute-clarity-review"

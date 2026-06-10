@@ -1,0 +1,38 @@
+id: "knowledge-pack/component-cdc-versioning-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Component CDC versioning patterns"
+description: "Canonical hash, source refresh, signature, review routing, and index emission checks for database-backed component change tracking."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "verification", "retrieval", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.versioning"
+tags: ["components", "cdc", "versioning", "hashing", "signed-publishers", "postgres", "pgvector"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+content_types:
+  - "component_cdc_check"
+files:
+  - path: "catalog/knowledge-packs/data/component-cdc-versioning-patterns/checks.jsonl"
+    format: "jsonl"
+    schema: "component_cdc_check"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["id", "check_type", "description", "required_tables", "required_fields", "failure_route"]
+provenance:
+  sources:
+    - "Open Harness Hub Postgres component schema"
+    - "Open Harness Hub source governance and entity resolution architecture"
+    - "Open Harness Hub public fact archive versioning pipeline"
+  collected_through: "2026-05-26"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "component lifecycle metadata only"

@@ -1,0 +1,38 @@
+id: "knowledge-pack/use-case-seed-entity-ref-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Use case seed entity ref patterns"
+description: "Patterns for promoting flexible use-case seed labels, inputs, outputs, stages, and risk tiers into canonical entities and object_entity_ref graph rows."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "finance", "legal", "media", "creative", "energy", "healthcare", "cross_industry"]
+capability: ["extraction", "retrieval", "classification", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.product"
+tags: ["use-case-seeds", "entity-resolution", "graph-search", "comparison-blocking", "hybrid-search"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types:
+  - "canonical_entity_pattern"
+  - "object_entity_ref_pattern"
+  - "graph_index_edge_pattern"
+files:
+  - path: "catalog/knowledge-packs/data/use-case-seed-entity-ref-patterns/rows.jsonl"
+    format: "jsonl"
+    schema: "use-case-seed-entity-ref-pattern"
+indexing:
+  bm25: true
+  dense:
+    recommended_model: "sentence-transformers/all-MiniLM-L6-v2"
+provenance:
+  sources:
+    - "Open Harness Hub use-case seed row exporter"
+    - "Open Harness Hub source governance and entity resolution architecture"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "Synthetic entity-linking patterns only; insurance scope is excluded."

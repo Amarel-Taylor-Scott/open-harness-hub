@@ -1,0 +1,70 @@
+id: "tool/use-case-seed-row-exporter"
+type: tool
+version: "0.1.0"
+name: "Use case seed row exporter"
+description: "Exports cross-domain use-case seeds into candidate primitive, canonical_entity, object_entity_ref, label_assignment, dimension_value, object_embedding, dedupe, review_ticket, and index_record JSONL row families."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "finance", "legal", "media", "creative", "energy", "healthcare", "cross_industry"]
+capability: ["classification", "extraction", "retrieval", "routing", "governance"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+tags: ["use-case-seeds", "label-records", "dimension-records", "entity-refs", "object-embeddings", "jsonl", "hybrid-search"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    seeds:
+      type: array
+      items:
+        type: object
+    output_dir:
+      type: string
+    excluded_scopes:
+      type: array
+      items:
+        type: string
+  required: ["seeds"]
+returns:
+  type: object
+  properties:
+    output_dir:
+      type: string
+    row_counts:
+      type: object
+    files:
+      type: array
+      items:
+        type: string
+    row_family_paths:
+      type: object
+    warnings:
+      type: array
+      items:
+        type: string
+side_effects: "write"
+examples:
+  - input:
+      seeds:
+        - id: "animal-hospital-workflow-builder"
+          domain: "animal_hospital"
+          risk_tier: "high"
+      excluded_scopes: ["insurance"]
+    output:
+      row_counts:
+        normalized_object: 1
+        canonical_entity: 5
+        object_entity_ref: 5
+        object_embedding: 1
+      warnings: ["Insurance-related seeds are excluded by default."]
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.use_case_seed_rows.export_seed_rows"
+    language: "python"
+  - kind: "mcp"
+    path: "mcp/factory.export_use_case_seed_rows"

@@ -1,0 +1,462 @@
+{
+  "version": "1.0",
+  "purpose": "Canonical COMPANY boundary model for the portfolio (owner-directed 2026-06-06). Consolidates the portfolio/data/identity/integration/deployment boundaries into ONE single source (no-magic-values) read by scripts/check_company_portfolio_boundaries.py. Sits ALONGSIDE architecture/portfolio_dependency_law.json (the import law); the two MUST agree (owned_runtime_surfaces == package_roots; allowed_integrations == may_depend_on) \u2014 the proof asserts no contradiction.",
+  "holding_company": "contextiseverything",
+  "principle": "Co-located for latency/dev-speed \u00b7 contract-separated for product clarity \u00b7 account-separated for security/spinout \u00b7 data-separated for trust \u00b7 brand-separated for customer clarity.",
+  "located_close_means": [
+    "same cloud region (low-latency Baltor\u2192Teleon calls)",
+    "private connectivity (PrivateLink / Private Service Connect / VPC peering / mesh \u2014 not public internet in prod)",
+    "shared identity ROOT + separate service identities (no shared god token)",
+    "shared observability SCHEMA (CloudEvents/OTel) + separate telemetry STORES",
+    "shared local development + separate deployability"
+  ],
+  "repo_evolution_phases": [
+    "Phase 1 (now): monorepo with hard boundaries \u2014 src/teleon, src/baltor, src/openharnesshub + the enforced import law",
+    "Phase 2: separate packages, same repo \u2014 shared-contracts holds NO business logic",
+    "Phase 3: separate repos/orgs once the API contracts stabilize (do not rush the split)"
+  ],
+  "companies": {
+    "contextiseverything": {
+      "company_id": "contextiseverything",
+      "role": "holding company / portfolio / studio",
+      "display_name": "AI Done Right",
+      "tagline": "Context. Capability. Proof.",
+      "working_name": "AI Done Right (parent / holding company; domain aidoneright.dev) \u2014 brand clearance PENDING (see domain_brand_risk_register.json). Superseded prior name: ContextIsEverything Group / Labs (preserved as rollback target in architecture/brand.json).",
+      "product_boundary": "portfolio strategy \u00b7 brand architecture \u00b7 research \u00b7 shared standards \u00b7 OSS governance \u00b7 IP coordination \u00b7 early incubation \u00b7 cross-company integration contracts",
+      "website_domains": [
+        "aidoneright.dev",
+        "aidoneright.ai"
+      ],
+      "owned_runtime_surfaces": [],
+      "owned_data_types": [
+        "brand_docs",
+        "research_docs",
+        "portfolio_docs",
+        "ip_strategy",
+        "investor_docs"
+      ],
+      "forbidden_data_types": [
+        "customer_data",
+        "canonical_fact",
+        "context_response_served_facts",
+        "reconciliation_decision",
+        "customer_context_truth",
+        "context_truth",
+        "runtime_telemetry",
+        "capability_task_run",
+        "runtime_secrets"
+      ],
+      "allowed_integrations": [],
+      "shared_contracts": [],
+      "deployment_profile": "static site + an internal portfolio dashboard (NOT a runtime; owns no runtime code)",
+      "local_dev_port": 9000,
+      "cloud_account_strategy": "parent org root + shared-services account; no product runtime",
+      "separation_level": "brand+legal parent"
+    },
+    "teleon": {
+      "company_id": "teleon",
+      "role": "purpose-driven runtime SaaS",
+      "product_boundary": "CapabilityTask/PurposeTask runtime \u00b7 runtime selection \u00b7 candidate paths \u00b7 evaluation scorecards \u00b7 promotion/rollback gates \u00b7 TaskOrientation \u00b7 staff/customer assurance dashboard \u00b7 Teleon Lift (import existing functions/K8s)",
+      "website_domains": [
+        "teleon.dev"
+      ],
+      "owned_runtime_surfaces": [
+        "src/teleon"
+      ],
+      "owned_data_types": [
+        "capability_task_spec",
+        "task_run",
+        "runtime_decision",
+        "scorecard",
+        "promotion_receipt",
+        "rollback_receipt",
+        "execution_telemetry",
+        "resource_plan",
+        "task_orientation",
+        "imported_workload"
+      ],
+      "forbidden_data_types": [
+        "canonical_fact",
+        "context_response_served_facts",
+        "reconciliation_decision",
+        "customer_context_truth",
+        "customer_data",
+        "raw_customer_payload_by_default"
+      ],
+      "allowed_integrations": [
+        "openharnesshub"
+      ],
+      "shared_contracts": [
+        "capability_task_spec",
+        "skill_manifest",
+        "harness_manifest",
+        "cloudevents_envelope",
+        "otel_fields"
+      ],
+      "deployment_profile": "hosted/private/embedded/OSS-local; same region as Baltor; separate account + separate DB",
+      "local_dev_port": 9400,
+      "cloud_account_strategy": "teleon-dev + teleon-prod projects/accounts under the parent org",
+      "separation_level": "separable product company"
+    },
+    "baltor": {
+      "company_id": "baltor",
+      "role": "governed-context applied product (a TENANT of Teleon)",
+      "product_boundary": "context ingestion \u00b7 source handles \u00b7 decomposition \u00b7 atomic facts \u00b7 held-out allegations \u00b7 conflict detection \u00b7 reconciliation \u00b7 freshness \u00b7 verification \u00b7 optimization \u00b7 native sidecars \u00b7 receipts \u00b7 safe consumption \u00b7 customer workflows",
+      "website_domains": [
+        "baltor.ai"
+      ],
+      "owned_runtime_surfaces": [
+        "src/baltor"
+      ],
+      "owned_data_types": [
+        "source_artifact",
+        "context_object",
+        "atomic_fact",
+        "held_out_allegation",
+        "reconciliation_decision",
+        "verification_receipt",
+        "context_response_served_facts",
+        "native_sidecar",
+        "customer_data",
+        "tenant_policy",
+        "canonical_fact",
+        "customer_context_truth"
+      ],
+      "forbidden_data_types": [
+        "generic_runtime_control_plane"
+      ],
+      "allowed_integrations": [
+        "teleon",
+        "openharnesshub"
+      ],
+      "shared_contracts": [
+        "capability_task_spec",
+        "cloudevents_envelope",
+        "otel_fields"
+      ],
+      "deployment_profile": "hosted demo + private pilot \u2192 customer VPC / regulated / air-gapped; same region as Teleon; separate account + separate DB",
+      "local_dev_port": 9307,
+      "cloud_account_strategy": "baltor-dev + baltor-prod accounts under the parent org",
+      "separation_level": "separable product company"
+    },
+    "openharnesshub": {
+      "company_id": "openharnesshub",
+      "role": "open harness ecosystem (OSS-first) \u2014 the PROOF layer",
+      "product_boundary": "harnesses \u00b7 rubrics \u00b7 eval packs \u00b7 fixtures \u00b7 templates \u00b7 datasets \u00b7 conformance packs \u00b7 benchmark packs",
+      "website_domains": [
+        "openharnesshub.io",
+        "openharnesshub.org (legacy redirect)"
+      ],
+      "owned_runtime_surfaces": [
+        "src/openharnesshub"
+      ],
+      "owned_data_types": [
+        "harness",
+        "rubric",
+        "eval_pack",
+        "fixture",
+        "template",
+        "dataset",
+        "conformance_pack",
+        "benchmark_pack",
+        "capability_task_spec"
+      ],
+      "forbidden_data_types": [
+        "customer_data",
+        "canonical_fact",
+        "context_response_served_facts",
+        "reconciliation_decision",
+        "customer_context_truth",
+        "context_truth",
+        "runtime_secrets"
+      ],
+      "allowed_integrations": [],
+      "shared_contracts": [
+        "capability_task_spec",
+        "skill_manifest",
+        "harness_manifest"
+      ],
+      "deployment_profile": "static registry + GitHub \u2192 searchable registry/SkillGraph; OSS",
+      "local_dev_port": 9500,
+      "cloud_account_strategy": "ohh-prod project/account under the parent org",
+      "separation_level": "open ecosystem"
+    },
+    "opencontexthub": {
+      "company_id": "opencontexthub",
+      "role": "open context registry (OSS-first)",
+      "product_boundary": "context artifacts \u00b7 context packs \u00b7 context schemas \u00b7 source-handle maps \u00b7 decomposition maps \u00b7 native sidecar examples \u00b7 context fixtures",
+      "website_domains": [
+        "opencontexthub.io"
+      ],
+      "owned_runtime_surfaces": [],
+      "owned_data_types": [
+        "context_artifact",
+        "context_pack",
+        "context_schema",
+        "source_handle_map",
+        "decomposition_map",
+        "native_sidecar_example",
+        "context_fixture"
+      ],
+      "forbidden_data_types": [
+        "canonical_fact",
+        "context_response_served_facts",
+        "reconciliation_decision",
+        "customer_context_truth",
+        "customer_data",
+        "context_truth",
+        "runtime_secrets"
+      ],
+      "allowed_integrations": [],
+      "shared_contracts": [
+        "capability_task_spec"
+      ],
+      "deployment_profile": "static registry + GitHub \u2192 searchable graph; OSS; same parent org, separate account",
+      "local_dev_port": 9501,
+      "cloud_account_strategy": "open-hub-family project/account under the parent org",
+      "separation_level": "open ecosystem"
+    },
+    "openskillshub": {
+      "company_id": "openskillshub",
+      "role": "open skill graph (OSS-first)",
+      "product_boundary": "skills \u00b7 playbooks \u00b7 workflows \u00b7 SKILL.md packages \u00b7 agent instructions \u00b7 skill provenance/dedup",
+      "website_domains": [
+        "openskillshub.io"
+      ],
+      "owned_runtime_surfaces": [],
+      "owned_data_types": [
+        "skill",
+        "playbook",
+        "workflow",
+        "skill_md_package",
+        "agent_instruction",
+        "skill_provenance"
+      ],
+      "forbidden_data_types": [
+        "canonical_fact",
+        "context_response_served_facts",
+        "reconciliation_decision",
+        "customer_context_truth",
+        "customer_data",
+        "context_truth",
+        "runtime_secrets"
+      ],
+      "allowed_integrations": [],
+      "shared_contracts": [
+        "capability_task_spec"
+      ],
+      "deployment_profile": "static registry + GitHub \u2192 searchable graph; OSS; same parent org, separate account",
+      "local_dev_port": 9502,
+      "cloud_account_strategy": "open-hub-family project/account under the parent org",
+      "separation_level": "open ecosystem"
+    },
+    "opentoolshub": {
+      "company_id": "opentoolshub",
+      "role": "open tool graph (OSS-first)",
+      "product_boundary": "executable tools \u00b7 MCP servers \u00b7 APIs \u00b7 CLIs \u00b7 adapters \u00b7 workers \u00b7 visibility/gating metadata",
+      "website_domains": [
+        "opentoolshub.io"
+      ],
+      "owned_runtime_surfaces": [],
+      "owned_data_types": [
+        "executable_tool",
+        "mcp_server",
+        "api_tool",
+        "cli_tool",
+        "adapter_tool",
+        "worker_tool",
+        "tool_visibility_metadata"
+      ],
+      "forbidden_data_types": [
+        "canonical_fact",
+        "context_response_served_facts",
+        "reconciliation_decision",
+        "customer_context_truth",
+        "customer_data",
+        "context_truth",
+        "runtime_secrets"
+      ],
+      "allowed_integrations": [],
+      "shared_contracts": [
+        "capability_task_spec"
+      ],
+      "deployment_profile": "static registry + GitHub \u2192 searchable graph; OSS; same parent org, separate account",
+      "local_dev_port": 9503,
+      "cloud_account_strategy": "open-hub-family project/account under the parent org",
+      "separation_level": "open ecosystem"
+    },
+    "openbenchmarkhub": {
+      "company_id": "openbenchmarkhub",
+      "role": "open benchmark intelligence (OSS-first) \u2014 defines WHAT to measure",
+      "product_boundary": "benchmark definitions \u00b7 benchmark cards \u00b7 metric definitions \u00b7 datasets/tasks \u00b7 result records \u00b7 leaderboards \u00b7 suitability reports \u00b7 contamination/risk \u00b7 benchmark\u2192capability maps",
+      "working_name": "openbenchmarkhub (.io) \u2014 brand_status: proposed_unverified, clearance pending",
+      "website_domains": [
+        "openbenchmarkhub.io"
+      ],
+      "owned_runtime_surfaces": [],
+      "owned_data_types": [
+        "benchmark_artifact",
+        "benchmark_card",
+        "benchmark_metric",
+        "benchmark_result",
+        "benchmark_leaderboard",
+        "benchmark_suitability_report",
+        "benchmark_to_capability_map"
+      ],
+      "forbidden_data_types": [
+        "canonical_fact",
+        "context_response_served_facts",
+        "reconciliation_decision",
+        "customer_context_truth",
+        "customer_data",
+        "context_truth",
+        "runtime_secrets"
+      ],
+      "allowed_integrations": [],
+      "shared_contracts": [
+        "capability_task_spec"
+      ],
+      "deployment_profile": "static registry + GitHub \u2192 searchable graph; OSS; same parent org, separate account",
+      "local_dev_port": 9504,
+      "cloud_account_strategy": "open-hub-family project/account under the parent org",
+      "separation_level": "open ecosystem"
+    },
+    "openmcphub": {
+      "company_id": "openmcphub",
+      "role": "open MCP server intelligence (OSS-first) \u2014 discovery/risk/conformance",
+      "product_boundary": "MCP server registry \u00b7 MCP tool schema metadata \u00b7 MCP risk/trust scoring \u00b7 MCP conformance \u00b7 install profiles \u00b7 permissions/scopes \u00b7 secret policy \u00b7 provenance \u00b7 sandbox policy",
+      "working_name": "openmcphub (.io) \u2014 brand_status: proposed_unverified, clearance pending",
+      "website_domains": [
+        "openmcphub.io"
+      ],
+      "owned_runtime_surfaces": [],
+      "owned_data_types": [
+        "mcp_server_artifact",
+        "mcp_tool_artifact",
+        "mcp_conformance_report",
+        "mcp_risk_report",
+        "mcp_install_profile",
+        "mcp_visibility_policy"
+      ],
+      "forbidden_data_types": [
+        "canonical_fact",
+        "context_response_served_facts",
+        "reconciliation_decision",
+        "customer_context_truth",
+        "customer_data",
+        "context_truth",
+        "runtime_secrets"
+      ],
+      "allowed_integrations": [],
+      "shared_contracts": [
+        "capability_task_spec"
+      ],
+      "deployment_profile": "static registry + GitHub \u2192 searchable graph; OSS; same parent org, separate account",
+      "local_dev_port": 9505,
+      "cloud_account_strategy": "open-hub-family project/account under the parent org",
+      "separation_level": "open ecosystem"
+    },
+    "opencompressionhub": {
+      "company_id": "opencompressionhub",
+      "role": "open compression + context-budget intelligence (OSS-first)",
+      "product_boundary": "context compression \u00b7 tool-output/log compression \u00b7 repo packing \u00b7 prompt compression \u00b7 RAG compression \u00b7 token-cost diagnostics \u00b7 compression fidelity benchmarks \u00b7 context-budget policies",
+      "working_name": "opencompressionhub (.io) \u2014 brand_status: proposed_unverified, clearance pending",
+      "website_domains": [
+        "opencompressionhub.io"
+      ],
+      "owned_runtime_surfaces": [],
+      "owned_data_types": [
+        "compression_candidate",
+        "compression_run",
+        "compression_scorecard",
+        "context_budget_policy",
+        "context_waste_report",
+        "tool_output_projection"
+      ],
+      "forbidden_data_types": [
+        "canonical_fact",
+        "context_response_served_facts",
+        "reconciliation_decision",
+        "customer_context_truth",
+        "customer_data",
+        "context_truth",
+        "runtime_secrets"
+      ],
+      "allowed_integrations": [],
+      "shared_contracts": [
+        "capability_task_spec"
+      ],
+      "deployment_profile": "static registry + GitHub \u2192 searchable graph; OSS; same parent org, separate account",
+      "local_dev_port": 9506,
+      "cloud_account_strategy": "open-hub-family project/account under the parent org",
+      "separation_level": "open ecosystem"
+    }
+  },
+  "shared_foundation": {
+    "shared": [
+      "SSO/identity root",
+      "billing/account system",
+      "audit-log vocabulary",
+      "observability vocabulary (CloudEvents/OTel)",
+      "status-page framework",
+      "docs theme",
+      "design system",
+      "legal templates",
+      "the shared specs (CTS / SkillManifest / HarnessManifest)"
+    ],
+    "never_shared": [
+      "production database",
+      "customer data store",
+      "tenant config",
+      "runtime secrets",
+      "execution worker pools",
+      "product APIs",
+      "product dashboards",
+      "billing meters",
+      "god token"
+    ]
+  },
+  "sensitive_truth_types": [
+    "canonical_fact",
+    "context_response_served_facts",
+    "reconciliation_decision",
+    "customer_context_truth",
+    "customer_data"
+  ],
+  "_sensitive_note": "These belong to EXACTLY ONE company (Baltor) and must appear in every other company's forbidden_data_types. Teleon returns evidence/candidate/result; it never owns or writes Baltor truth.",
+  "shared_internal_layers": [
+    "Shared I/O + Resource Spine",
+    "Shared Inference Gateway (OIPS)",
+    "Shared Sandbox Gateway",
+    "Shared Template Registry",
+    "Context Efficiency Spine (NEW \u2014 internal: symbol/docs/compression/usage-metering before whole-file/whole-repo/raw-output reads)",
+    "Shared Policy Gate"
+  ],
+  "future_optional_hubs": [
+    {
+      "name": "OpenPolicyHub.io",
+      "status": "held",
+      "reason": "policy packs (OPA/Rego/CEL, boundary/data/visibility/tool/model policies) \u2014 keep internal (Shared Policy Gate) until it becomes a lead-gen surface"
+    },
+    {
+      "name": "OpenGuardrailHub.io",
+      "status": "held",
+      "reason": "chatbot guardrail benchmarks/packs \u2014 implement first as a section under OpenBenchmarkHub + Baltor; overlaps both"
+    },
+    {
+      "name": "OpenDatasetHub.io",
+      "status": "held",
+      "reason": "datasets live under OpenContextHub (context) / OpenBenchmarkHub (benchmark) / OpenHarnessHub (fixtures); a separate hub is too broad"
+    },
+    {
+      "name": "OpenEvalHub.io",
+      "status": "rejected",
+      "reason": "overlaps OpenHarnessHub (machinery) + OpenBenchmarkHub (definitions/results)"
+    },
+    {
+      "name": "OpenAgentHub.io",
+      "status": "rejected",
+      "reason": "too generic/crowded; conflicts with Teleon/OpenSkills/OpenTools"
+    }
+  ]
+}

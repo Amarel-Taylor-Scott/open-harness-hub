@@ -1,0 +1,243 @@
+{
+  "version": "1.0",
+  "note": "Model provider graph \u2014 nodes + numeric edges. Runtime branches on node_id + numeric codes, NEVER on display strings. Every external node REQUIRES_SECRET_REF + REQUIRES_LOCAL_EQUIVALENT; the offline default is model.local_stub@v1.",
+  "offline_default_node": "model.local_stub@v1",
+  "nodes": [
+    {
+      "node_id": "model.local_stub@v1",
+      "tier_code": 100,
+      "specialization_codes": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        1100
+      ],
+      "status_code": 100,
+      "secret_ref": null,
+      "local_equivalent": "model.local_stub@v1",
+      "external": false,
+      "display": "local deterministic stub",
+      "adapter_style": "deterministic_stub"
+    },
+    {
+      "node_id": "model.local_openai_compatible@candidate",
+      "tier_code": 300,
+      "specialization_codes": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        1000,
+        1100
+      ],
+      "status_code": 200,
+      "secret_ref": "secret://local/openai_compatible",
+      "local_equivalent": "model.local_stub@v1",
+      "external": false,
+      "display": "local OpenAI-compatible (Ollama/vLLM)",
+      "adapter_style": "openai_compatible"
+    },
+    {
+      "node_id": "model.openai.frontier@candidate",
+      "tier_code": 500,
+      "specialization_codes": [
+        300,
+        400,
+        500,
+        600,
+        1000,
+        1100
+      ],
+      "status_code": 200,
+      "secret_ref": "secret://provider/openai",
+      "local_equivalent": "model.local_stub@v1",
+      "external": true,
+      "display": "OpenAI frontier",
+      "adapter_style": "openai_compatible"
+    },
+    {
+      "node_id": "model.anthropic.frontier@candidate",
+      "tier_code": 600,
+      "specialization_codes": [
+        300,
+        400,
+        500,
+        600,
+        1000,
+        1100
+      ],
+      "status_code": 200,
+      "secret_ref": "secret://provider/anthropic",
+      "local_equivalent": "model.local_stub@v1",
+      "external": true,
+      "display": "Anthropic frontier reasoning",
+      "adapter_style": "anthropic_messages"
+    },
+    {
+      "node_id": "model.google.frontier@candidate",
+      "tier_code": 500,
+      "specialization_codes": [
+        300,
+        400,
+        500,
+        900,
+        1000,
+        1100
+      ],
+      "status_code": 200,
+      "secret_ref": "secret://provider/google",
+      "local_equivalent": "model.local_stub@v1",
+      "external": true,
+      "display": "Google Gemini frontier",
+      "adapter_style": "openai_compatible"
+    },
+    {
+      "node_id": "model.customer_private.frontier@candidate",
+      "tier_code": 700,
+      "specialization_codes": [
+        300,
+        400,
+        500,
+        600,
+        1100
+      ],
+      "status_code": 200,
+      "secret_ref": "secret://customer/byok",
+      "local_equivalent": "model.local_stub@v1",
+      "external": false,
+      "display": "customer-private (BYOK)",
+      "adapter_style": "openai_compatible"
+    },
+    {
+      "node_id": "embedding.local_hash@v1",
+      "tier_code": 100,
+      "specialization_codes": [
+        700
+      ],
+      "status_code": 100,
+      "secret_ref": null,
+      "local_equivalent": "embedding.local_hash@v1",
+      "external": false,
+      "display": "local deterministic embeddings",
+      "adapter_style": "deterministic_stub"
+    },
+    {
+      "node_id": "judge.local_deterministic@v1",
+      "tier_code": 100,
+      "specialization_codes": [
+        600
+      ],
+      "status_code": 100,
+      "secret_ref": null,
+      "local_equivalent": "judge.local_deterministic@v1",
+      "external": false,
+      "display": "local deterministic judge",
+      "adapter_style": "deterministic_stub"
+    },
+    {
+      "node_id": "model.fireworks@candidate",
+      "tier_code": 500,
+      "specialization_codes": [
+        300,
+        400,
+        500,
+        1000,
+        1100
+      ],
+      "status_code": 200,
+      "secret_ref": "secret://provider/fireworks",
+      "local_equivalent": "model.local_stub@v1",
+      "external": true,
+      "display": "Fireworks AI inference (candidate)",
+      "adapter_style": "openai_compatible"
+    },
+    {
+      "node_id": "model.ollama_cloud@candidate",
+      "tier_code": 400,
+      "specialization_codes": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        1000,
+        1100
+      ],
+      "status_code": 200,
+      "secret_ref": "secret://provider/ollama_cloud",
+      "local_equivalent": "model.local_stub@v1",
+      "external": true,
+      "display": "Ollama Cloud (free-tier rate-limited; candidate)",
+      "adapter_style": "openai_compatible"
+    },
+    {
+      "node_id": "model.ollama_local@candidate",
+      "tier_code": 300,
+      "specialization_codes": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        1000,
+        1100
+      ],
+      "status_code": 200,
+      "secret_ref": null,
+      "local_equivalent": "model.local_stub@v1",
+      "external": false,
+      "display": "Ollama local \u2014 OpenAI-compatible localhost (candidate)",
+      "adapter_style": "openai_compatible"
+    }
+  ],
+  "edges": [
+    {
+      "from": "model.openai.frontier@candidate",
+      "edge_type_code": 1300,
+      "to": "model.anthropic.frontier@candidate"
+    },
+    {
+      "from": "model.anthropic.frontier@candidate",
+      "edge_type_code": 1300,
+      "to": "model.google.frontier@candidate"
+    },
+    {
+      "from": "model.google.frontier@candidate",
+      "edge_type_code": 1300,
+      "to": "model.local_openai_compatible@candidate"
+    },
+    {
+      "from": "model.local_openai_compatible@candidate",
+      "edge_type_code": 1300,
+      "to": "model.local_stub@v1"
+    },
+    {
+      "from": "model.openai.frontier@candidate",
+      "edge_type_code": 1900,
+      "to": "model.openai.frontier@candidate"
+    },
+    {
+      "from": "model.openai.frontier@candidate",
+      "edge_type_code": 2000,
+      "to": "model.local_stub@v1"
+    },
+    {
+      "from": "model.fireworks@candidate",
+      "edge_type_code": 1300,
+      "to": "model.local_stub@v1"
+    },
+    {
+      "from": "model.ollama_cloud@candidate",
+      "edge_type_code": 1300,
+      "to": "model.ollama_local@candidate"
+    },
+    {
+      "from": "model.ollama_local@candidate",
+      "edge_type_code": 1300,
+      "to": "model.local_stub@v1"
+    }
+  ]
+}

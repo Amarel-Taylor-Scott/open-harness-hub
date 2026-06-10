@@ -12,8 +12,8 @@ Extends [[cloud-architecture.md]] (the 4-tier request/async/scheduled/data model
    ┌──────────────────────────────┐      ┌──────────────────────────────┐
    │  PRODUCT SERVICE: harness-hub │      │ PRODUCT SERVICE: context-     │   ← request tier
    │  serves web/harness-hub/ +    │      │ enrichment — serves           │     (one per product,
-   │  OHH API (build · monitor)    │      │ web/context-enrichment/ +     │      OH_PRODUCT-pinned)
-   │  EMBER                        │      │ CEaaS API + MCP serve · TEAL  │
+   │  OHH API (build · monitor)    │      │ web/baltor/ +     │      OH_PRODUCT-pinned)
+   │  EMBER                        │      │ Baltor API + MCP serve · TEAL  │
    └───────────────┬──────────────┘      └───────────────┬──────────────┘
                    │   both call the SAME shared platform │
                    ▼                                      ▼
@@ -38,11 +38,11 @@ two doors — same provenance, same lift/fidelity scores ([[../strategy/context-
 | Service | Tier | Owns (`scripts/`) | Entry / command | Talks to | Scale |
 |---|---|---|---|---|---|
 | **harness-hub** (product) | request | `showcase` (web) | `services/products/harness_hub` → `python -m scripts.showcase` (`OH_PRODUCT=harness-hub`) | enqueue→queue; read→retrieval/db | RPS / HPA |
-| **context-enrichment** (product) | request | `showcase` (web) + MCP serve | `services/products/context_enrichment` (`OH_PRODUCT=context-enrichment`) | enqueue→queue; read→retrieval/enrichment | RPS / HPA |
+| **baltor** (product) | request | `showcase` (web) + MCP serve | `services/products/baltor` (`OH_PRODUCT=baltor`) | enqueue→queue; read→retrieval/enrichment | RPS / HPA |
 | **ingestion** | async/sched | `ingest`, `acquisition` | `scripts.ingest.feed` / `.freshness` / `.health` / `.run` | source bus → normalize → store | KEDA on queue |
 | **foundry** | async | `foundry`, `factory` | `scripts.foundry.worker --serve` (`Foundry.run_partition`) | queue ⇄ measurement, store | KEDA on queue depth |
 | **measurement** | async | `eval`, `verification` | `scripts.eval.*` (lift), `verify.compression_fidelity` (tier fidelity) | called by foundry/enrichment | job |
-| **enrichment** (CEaaS) | async | `processors/{compression,memory,cache,retrieval}` | tier pipeline: structural/learned compress · distill · cache · embed | queue ⇄ store, retrieval | KEDA |
+| **enrichment** (Baltor) | async | `processors/{compression,memory,cache,retrieval}` | tier pipeline: structural/learned compress · distill · cache · embed | queue ⇄ store, retrieval | KEDA |
 | **retrieval** | request/async | `db` (vector), `processors/retrieval` | vector/lexical/hybrid/graph query | reads pgvector | RPS |
 | **governance** | async/sched | `db` (promotion/CDC), `_publish` | promotion readiness · CDC · provenance · signing | event bus, store | job |
 | **worker** | async | — (runs platform jobs) | `scripts.foundry.worker --serve` or `services/worker` (Celery) | pulls queue | KEDA scale-to-zero |
@@ -70,7 +70,8 @@ in `infra/k8s/`. Product services differ only by `OH_PRODUCT` (folder + brand) �
 
 Honors [[cloud-architecture.md]]: **a queue + worker tier is non-negotiable; heavy frameworks are
 earned, not day-one.** So:
-- **Default (low-ops):** `RedisQueue` + the built-in worker loop (retry/dead-letter) + Render/Cloud-Run
+- **Default (low-ops):** `RedisQueue` + the built-in worker loop with explicit
+  retry, `approval_required`, `budget_blocked`, and `failed_permanently` states + Render/Cloud-Run
   cron. Runs the whole platform with one dep.
 - **Celery adapter (scale/monitoring):** `services/worker/celery_app.py` — broker=Redis, **queues per
   concern**, beat for periodic. Opt-in; satisfies the same `Queue` role. Use when you want Celery's
@@ -97,7 +98,7 @@ enqueue→done across services.
 scripts/        IMPLEMENTATION — libraries by concern (foundry, ingest, eval, db, processors…). Unchanged.
 services/       SERVICE LAYER — one folder per service: entrypoint + contract + README. Imports scripts/,
                 never moves it. registry.yaml is the single source of truth for the service map.
-  products/{harness_hub,context_enrichment}/   the two product (request-tier) doors
+  products/{harness_hub,baltor}/   the two product (request-tier) doors
   platform/{ingestion,foundry,measurement,enrichment,retrieval,governance}/  the shared plane
   platform/_shared/telemetry.py                the cross-cutting telemetry contract
   worker/        the async-tier worker + Celery adapter

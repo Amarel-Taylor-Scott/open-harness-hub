@@ -1,0 +1,67 @@
+id: "tool/index-coverage-repair-planner"
+type: tool
+version: "0.1.0"
+name: "Index coverage repair planner"
+description: "Audits staged component candidates for missing keyword, vector, graph, facet, and quality index records and emits side-effect-free repair JSONL."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "governance", "verification", "planning"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.indexing"
+tags: ["components", "index-coverage", "repair", "daily-factory", "hybrid-search"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    normalized_objects_jsonl:
+      type: string
+    existing_index_records_jsonl:
+      type: string
+    object_embeddings_jsonl:
+      type: string
+    object_entity_refs_jsonl:
+      type: string
+    output_dir:
+      type: string
+    run_id:
+      type: string
+    required_kind:
+      type: array
+      items:
+        type: string
+  required: ["normalized_objects_jsonl", "existing_index_records_jsonl", "output_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    counts:
+      type: object
+    files:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      normalized_objects_jsonl: "dist/model-ops-daily-runs/2026-05-26/load-audit/merged-jsonl/normalized-objects.jsonl"
+      existing_index_records_jsonl: "dist/model-ops-daily-runs/2026-05-26/load-audit/merged-jsonl/index-records.jsonl"
+      object_embeddings_jsonl: "dist/model-ops-daily-runs/2026-05-26/load-audit/merged-jsonl/object-embeddings.jsonl"
+      object_entity_refs_jsonl: "dist/model-ops-daily-runs/2026-05-26/load-audit/merged-jsonl/object-entity-refs.jsonl"
+      output_dir: "dist/model-ops-daily-runs/2026-05-26/index-coverage-repair"
+    output:
+      ok: true
+      counts:
+        normalized_objects: 1000
+        missing_index_records_emitted: 0
+implementations:
+  - kind: "callable"
+    path: "scripts.db.index_coverage_repair_plan.build_index_coverage_repair_plan"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.index_coverage_repair_plan"

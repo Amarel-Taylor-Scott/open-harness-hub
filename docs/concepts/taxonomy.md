@@ -3,7 +3,7 @@
 The canonical taxonomy is in [`taxonomy/SPEC.md`](../reference/spec.md).
 This page summarizes it.
 
-## Artifact types
+## Component types
 
 | Type | Layer | Purpose |
 |---|---|---|
@@ -33,13 +33,13 @@ This page summarizes it.
 | `online_search` | Allowlist / blocklist / per-source policy + sanitization + freshness. |
 | `privacy` | PII detection + redaction recipes. |
 | `schema` | JSON Schemas / Pydantic equivalents enforced at I/O boundaries. |
-| `routing` | Input → downstream artifact dispatch. |
+| `routing` | Input → downstream component dispatch. |
 
 ## Cross-cutting vocabularies
 
 - **Industry** - open list. Sub-industries are dot-separated
   (`healthcare.radiology`, `finance.aml`).
-- **Capability** - what the artifact does
+- **Capability** - what the component does
   (classification / extraction / retrieval / safety_gating / …).
 - **Modality** - text / image / audio / video / code / structured / tabular.
 - **Trust boundary** - local / hub / external / mixed.

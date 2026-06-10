@@ -1,0 +1,68 @@
+id: "rubric/statute-clarity-v1"
+type: rubric
+version: "0.1.0"
+name: "Statute / regulation clarity & interpretation-risk rubric v1"
+description: |
+  Five-dimension rubric for grading how clearly a statute, regulation,
+  ordinance, or agency rule is drafted, and how much interpretation
+  risk it carries. Use against statutory text BEFORE enactment for
+  legislative-counsel review, or AFTER enactment for risk assessment.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["legal", "legal.compliance", "government", "government.regulatory"]
+capability: ["evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-24"
+updated: "2026-05-24"
+
+dimensions:
+  - id: "definitional_clarity"
+    label: "Every operative term defined; no circularity; no scope/operative mismatch"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "list of operative terms with definition_section pointer OR 'undefined+common-law-meaning' annotation"
+
+  - id: "cross_reference_integrity"
+    label: "All §/Art./paragraph cross-references resolve; no pointers to repealed sections"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "cross-reference resolution table"
+
+  - id: "canon_robustness"
+    label: "Drafting survives common canons (ejusdem generis, expressio unius, surplusage, absurdity) without unintended narrowing/expansion"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "per-canon assessment with at-risk passages quoted"
+
+  - id: "procedural_completeness"
+    label: "Effective date present; retroactivity scoped; severability present (if multi-section); enforcement procedure stated"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "checklist with section pointers"
+
+  - id: "constitutional_robustness"
+    label: "No facial prior-restraint, due-process, equal-protection, or major-questions exposure (US federal); jurisdiction-equivalents elsewhere"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "constitutional-concerns list with cited doctrine"
+
+  - id: "plain_language_accessibility"
+    label: "Operative provisions readable by the regulated population without specialist counsel; defined terms used consistently"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "Flesch-Kincaid grade + sentence-length distribution + jargon-density score"
+
+scoring_method: "weighted_sum"
+examples:
+  - grade: 1.0
+    response: "Every operative term defined; all xrefs resolve; canons applied without narrowing; effective date + severability present; no constitutional flags; FK grade ≤ 12."
+    notes: "Best — production-ready draft."
+  - grade: 0.5
+    response: "Most terms defined; one broken xref; ejusdem generis narrows operative §5 in a way drafters likely didn't intend; severability missing; no constitutional concerns."
+    notes: "Adequate — fixable in markup."
+  - grade: 0.0
+    response: "Multiple undefined operative verbs; circular definition; missing effective date; facial prior-restraint risk; FK grade ≥ 18."
+    notes: "Worst — needs full re-draft before enactment."

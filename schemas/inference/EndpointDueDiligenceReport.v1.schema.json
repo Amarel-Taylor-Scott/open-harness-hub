@@ -1,0 +1,25 @@
+{
+  "$id": "inference/EndpointDueDiligenceReport.v1",
+  "title": "EndpointDueDiligenceReport.v1",
+  "type": "object",
+  "additionalProperties": true,
+  "description": "The intelligence engine's per-endpoint due-diligence verdict: classification (numeric class_code), risk score across dimensions, the recommended promotion phase (capped by policy + risk + official-docs presence), and the governed uses (teleon_use/baltor_use, allowed data class, executable gating). Advisory metadata — is_truth is always false; Baltor never treats this (or any model output) as truth.",
+  "required": ["endpoint_id", "class_code", "class_label", "risk_score", "risk_dimensions", "recommended_phase", "teleon_use", "baltor_use", "executable", "allowed_data_class", "reasons", "is_truth"],
+  "properties": {
+    "endpoint_id": {"type": "string"},
+    "class_code": {"type": "integer"},
+    "class_label": {"type": "string"},
+    "risk_score": {"type": "integer", "description": "0 (low) .. 100 (high)"},
+    "risk_dimensions": {"type": "object", "description": "per-dimension 0..100 (official_docs_confidence inverted into risk, tos_risk, data_retention_risk, free_tier_stability, rate_limit_clarity, key_custody_risk, secret_handling_risk, prompt_logging_risk, intermediary_risk, production_suitability)"},
+    "recommended_phase": {"type": "integer", "description": "-1 rejected .. 5 production_with_policy; -> promotion_phases"},
+    "teleon_use": {"type": "string"},
+    "baltor_use": {"type": "string"},
+    "executable": {"type": "string"},
+    "allowed_data_class": {"type": "string", "enum": ["none", "public", "synthetic", "internal", "customer_sensitive"]},
+    "raw_key_detected": {"type": "boolean"},
+    "is_inference_provider": {"type": "boolean"},
+    "provider_node_proposal": {"type": ["object", "null"], "description": "a PROPOSED model_provider_graph node (status candidate) — NOT written to the graph; agents propose, Baltor disposes"},
+    "reasons": {"type": "array", "items": {"type": "string"}},
+    "is_truth": {"type": "boolean", "const": false}
+  }
+}

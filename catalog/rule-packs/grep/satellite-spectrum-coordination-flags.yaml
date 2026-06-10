@@ -1,0 +1,796 @@
+id: rule-pack/grep-satellite-spectrum-coordination-flags
+type: rule-pack
+version: 0.1.0
+name: Satellite Spectrum Coordination grep flags
+description: Ten local triage detectors for satellite spectrum coordination packets.
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- space.orbital
+- telecommunications.fcc
+capability:
+- safety_gating
+- classification
+modality:
+- text
+lifecycle: experimental
+trust_boundary: local
+freshness: stable
+tags:
+- satellite-spectrum-coordination
+- expansion-v6
+created: '2026-05-24'
+updated: '2026-05-25'
+family: grep
+rules:
+- id: interference_risk
+  pattern: (?i)interference.{0,36}risk
+  severity: critical
+  category: satellite_spectrum_coordination.interference_risk
+  notes: Composite detector for satellite spectrum coordination review triage.
+- id: filing_missing
+  pattern: (?i)filing.{0,36}missing
+  severity: critical
+  category: satellite_spectrum_coordination.filing_missing
+  notes: Composite detector for satellite spectrum coordination review triage.
+- id: coordination_absent
+  pattern: (?i)coordination.{0,36}absent
+  severity: high
+  category: satellite_spectrum_coordination.coordination_absent
+  notes: Composite detector for satellite spectrum coordination review triage.
+- id: epfd_limit
+  pattern: (?i)epfd.{0,36}limit
+  severity: high
+  category: satellite_spectrum_coordination.epfd_limit
+  notes: Composite detector for satellite spectrum coordination review triage.
+- id: frequency_conflict
+  pattern: (?i)frequency.{0,36}conflict
+  severity: high
+  category: satellite_spectrum_coordination.frequency_conflict
+  notes: Composite detector for satellite spectrum coordination review triage.
+- id: earth_station
+  pattern: (?i)earth.{0,36}station
+  severity: high
+  category: satellite_spectrum_coordination.earth_station
+  notes: Composite detector for satellite spectrum coordination review triage.
+- id: ITU_notice
+  pattern: (?i)ITU.{0,36}notice
+  severity: medium
+  category: satellite_spectrum_coordination.ITU_notice
+  notes: Composite detector for satellite spectrum coordination review triage.
+- id: license_condition
+  pattern: (?i)license.{0,36}condition
+  severity: medium
+  category: satellite_spectrum_coordination.license_condition
+  notes: Composite detector for satellite spectrum coordination review triage.
+- id: out_of_band
+  pattern: (?i)out.{0,36}of.{0,36}band
+  severity: medium
+  category: satellite_spectrum_coordination.out_of_band
+  notes: Composite detector for satellite spectrum coordination review triage.
+- id: mitigation_plan
+  pattern: (?i)mitigation.{0,36}plan
+  severity: medium
+  category: satellite_spectrum_coordination.mitigation_plan
+  notes: Composite detector for satellite spectrum coordination review triage.
+- id: scale_expansion_v1_critical_signal_01
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_02
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_03
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_04
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_05
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_06
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_07
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_08
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_09
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_10
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_11
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_12
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_13
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_14
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_15
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_16
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_17
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_18
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_19
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_20
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_21
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_22
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_23
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_24
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_25
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_26
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_27
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_28
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_29
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_30
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_31
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_32
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_33
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_34
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_35
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_36
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_37
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_38
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_39
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_40
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}satellite.{0,24}spectrum.{0,24}coordination.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v2_unsupported_material_claim_001
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_002
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_003
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_004
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_005
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_006
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_007
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_008
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_009
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_010
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_011
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_012
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_013
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_014
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_015
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_016
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_017
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_018
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_019
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_020
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_021
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_022
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_023
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_024
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_025
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_026
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_027
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_028
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_029
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_030
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_031
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_032
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_033
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_034
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_035
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_036
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_037
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_038
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_039
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_040
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_041
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_042
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_043
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_044
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_045
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_046
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_047
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_048
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_049
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_050
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_051
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_052
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_053
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_054
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_055
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_056
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_057
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_058
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_059
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_060
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_061
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_062
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_063
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_064
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_065
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_066
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_067
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_068
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_069
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_070
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_071
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_072
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_073
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_074
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_075
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_076
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_077
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_078
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_079
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_080
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_satellite_spectrum_coordination_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-satellite-spectrum-coordination-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.

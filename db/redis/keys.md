@@ -7,12 +7,12 @@ Redis holds derived views and per-request data.
 ## Keys
 
 ```
-artifact:<id>                            STRING  — JSON manifest
-artifact:by_type:<type>                  SET     — set of artifact ids
-artifact:by_industry:<industry>          SET     — set of artifact ids
-artifact:by_capability:<capability>      SET     — set of artifact ids
-artifact:by_modality:<modality>          SET     — set of artifact ids
-artifact:by_tag:<tag>                    SET     — set of artifact ids
+component:<id>                            STRING  — JSON manifest
+component:by_type:<type>                  SET     — set of component ids
+component:by_industry:<industry>          SET     — set of component ids
+component:by_capability:<capability>      SET     — set of component ids
+component:by_modality:<modality>          SET     — set of component ids
+component:by_tag:<tag>                    SET     — set of component ids
 
 rule:<pack_id>:<rule_id>                 STRING  — JSON rule body
 rule:by_pack:<pack_id>                   SET     — set of rule ids
@@ -29,11 +29,11 @@ run:by_pipeline:<pipeline_id>            ZSET    — score = started_at_ms
 
 ## TTLs
 
-- `artifact:<id>` — 1 hour (refreshed from authoritative store on miss).
+- `component:<id>` — 1 hour (refreshed from authoritative store on miss).
 - `run:<run_id>` — 7 days (after which run lives only in cold storage).
 
 ## Cluster vs single
 
 Use Redis Cluster only if you need horizontal scale. For most catalogs,
-a single Redis instance is enough. The `artifact:by_*` SET sizes scale
-with catalog size — even 100k artifacts fit easily.
+a single Redis instance is enough. The `component:by_*` SET sizes scale
+with catalog size — even 100k components fit easily.

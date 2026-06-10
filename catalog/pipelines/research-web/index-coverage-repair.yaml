@@ -1,0 +1,90 @@
+id: "pipeline/index-coverage-repair"
+type: pipeline
+version: "0.1.0"
+name: "Index coverage repair"
+description: "Audits staged component candidate batches and emits missing hybrid-search index records before promotion readiness or database loading."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "governance", "verification", "planning"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.indexing"
+tags: ["components", "index-coverage", "repair", "daily-factory", "hybrid-search", "pgvector"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Find missing keyword, vector, graph, facet, or quality index records in staged component rows and produce repair JSONL without mutating a database."
+pipeline_kind: "research_web.index_coverage_repair"
+inputs:
+  - name: "normalized_objects_jsonl"
+    type: "string"
+  - name: "existing_index_records_jsonl"
+    type: "string"
+  - name: "object_embeddings_jsonl"
+    type: "string"
+  - name: "object_entity_refs_jsonl"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "index_coverage_repair_plan"
+    type: "json"
+  - name: "missing_index_records"
+    type: "jsonl"
+  - name: "index_coverage"
+    type: "jsonl"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/index-coverage-repair-patterns"
+steps:
+  - id: "load-index-coverage-patterns"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/index-coverage-repair-patterns"
+    inputs:
+      query: "index coverage missing keyword vector graph facet quality repair"
+      top_k: 20
+  - id: "plan-index-coverage-repair"
+    kind: "tool"
+    ref: "tool/index-coverage-repair-planner"
+    inputs:
+      normalized_objects_jsonl: "$.inputs.normalized_objects_jsonl"
+      existing_index_records_jsonl: "$.inputs.existing_index_records_jsonl"
+      object_embeddings_jsonl: "$.inputs.object_embeddings_jsonl"
+      object_entity_refs_jsonl: "$.inputs.object_entity_refs_jsonl"
+      output_dir: "$.inputs.output_dir"
+      run_id: "$.inputs.run_id"
+  - id: "route-repair-output"
+    kind: "tool"
+    ref: "tool/object-factory-job-router"
+    inputs:
+      reason: "Missing index records should be repaired or reviewed before active component promotion."
+      excluded_scopes: ["insurance"]
+success_criteria:
+  - kind: "deterministic"
+    target: "$.index_coverage_repair_plan.counts.normalized_objects"
+    op: ">"
+    value: 0
+    severity: "high"
+    label: "The repair plan inspected staged component rows."
+  - kind: "deterministic"
+    target: "$.index_coverage_repair_plan.counts.missing_index_records_emitted"
+    op: ">="
+    value: 0
+    severity: "high"
+    label: "The repair plan reports missing index record count."
+  - kind: "semantic"
+    target: "$.index_coverage_repair_plan"
+    must_cover:
+      - "keyword index"
+      - "vector index"
+      - "graph index"
+      - "facet index"
+      - "quality index"
+      - "no database side effects"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Repair output preserves the hybrid-search proof boundary."

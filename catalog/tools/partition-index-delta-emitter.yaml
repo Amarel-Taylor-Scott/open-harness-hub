@@ -1,0 +1,71 @@
+id: "tool/partition-index-delta-emitter"
+type: tool
+version: "0.1.0"
+name: "Partition index delta emitter"
+description: "Emits partition manifests and append-only index delta JSONL from high-volume normalized-object shards without generating one catalog page per object."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "format_conversion", "governance", "serving"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.indexing"
+tags: ["partition", "index-delta", "jsonl", "million-primitives", "incremental-build"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    input_path:
+      type: string
+    partition_id:
+      type: string
+    output_dir:
+      type: string
+    run_id:
+      type: string
+    source_surface_id:
+      type: string
+    tenant_id:
+      type: string
+    emit:
+      type: array
+      items:
+        type: string
+  required: ["input_path", "partition_id", "output_dir"]
+returns:
+  type: object
+  properties:
+    partition_manifest_path:
+      type: string
+    index_delta_path:
+      type: string
+    partition_manifest:
+      type: object
+    deltas_emitted:
+      type: integer
+side_effects: "write"
+examples:
+  - input:
+      input_path: "catalog/knowledge-packs/data/partitioned-index-delta-patterns/example-normalized-objects.jsonl"
+      partition_id: "demo/research-web/000001"
+      output_dir: "dist/index-deltas/demo"
+      emit: ["keyword", "facet"]
+    output:
+      partition_manifest_path: "dist/index-deltas/demo/partition-manifest.json"
+      index_delta_path: "dist/index-deltas/demo/index-deltas.jsonl"
+      partition_manifest:
+        partition_id: "demo/research-web/000001"
+        object_count: 2
+      deltas_emitted: 4
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.index_delta_emitter.emit_index_delta"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.factory.index_delta_emitter"
+

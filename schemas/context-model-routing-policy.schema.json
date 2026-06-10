@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/context-model-routing-policy.schema.json",
+  "title": "Context model routing policy",
+  "description": "Risk-based escalation policy for selecting model capability tiers without hard-coding provider brands.",
+  "type": "object",
+  "required": ["kind", "routing_policy_id", "score_formula", "thresholds", "created_at"],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "baltor.context-model-routing-policy.v1"
+    },
+    "routing_policy_id": {
+      "type": "string"
+    },
+    "score_formula": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "thresholds": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["min", "max", "route"],
+        "properties": {
+          "min": { "type": "number", "minimum": 0, "maximum": 1 },
+          "max": { "type": "number", "minimum": 0, "maximum": 1 },
+          "route": { "type": "string" },
+          "action": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "escalation_triggers": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

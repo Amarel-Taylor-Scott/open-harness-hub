@@ -105,6 +105,35 @@ KEDA scaling **on queue depth** (not CPU) is the right primitive for the foundry
   is already a replayable audit record) → a metrics/telemetry store (the repo anticipates
   BigQuery/ClickHouse telemetry).
 
+## Edge option — Cloudflare (AI Gateway · Workers AI · Vectorize)
+
+Cloudflare's AI stack fits **because the engine is already provider-neutral** — Store / Queue /
+Embedder / model-route are `from_env()` selectors, so Cloudflare is an *adapter or an env var*,
+never a rewrite. Adopt it for the edge/cost wins; keep the governed core portable (portability
+is the moat + the BYO-cloud/air-gap enterprise story — don't lock the data layer to any vendor).
+
+| Cloudflare service | What it buys us | How it plugs in | Verdict |
+|---|---|---|---|
+| **AI Gateway** | One proxy in front of every model provider: caching, rate-limit, **multi-provider fallback**, per-request cost + analytics | `OH_LLM_BASE_URL` / `OH_EMBED_BASE_URL` → the gateway (it's OpenAI-compatible). **Works today, env-only, zero code.** Its per-request cost/usage is exactly the `hosted_call`/`data_query` billable events `access.py` meters. | **Adopt now** — turns the cost-governance section from aspiration into a dashboard. |
+| **Workers AI** | Serverless **edge inference** for small / router / embedding models — no GPU ops, global low latency | `OH_LLM_BACKEND=http-openai` + `OH_LLM_BASE_URL=<workers-ai>` for the *right-sized* model step; `OH_EMBED_*` for embeddings. Mostly env-only. | **Adopt for embeddings + small/router models** — it *is* the "smallest model that clears the bar" recipe step + the narrow-task-to-cheap-model thesis. Frontier calls still route to hosted providers. |
+| **Vectorize** | Managed, globally-distributed vector index | A pluggable vector-store/Embedder adapter (the `Index` / `build_vector_store` layer is already swappable). | **Complementary, add at search-scale** — an *edge read layer for the OPEN/public corpus search*; **pgvector (Neon/Cloud SQL) stays the transactional governed store** co-located with the relational row families + provenance. Don't split governance across two stores. |
+| **Pages / Workers** | Edge-serve static assets globally | The product front-end (`web/`) is **no-build static** — a native Pages fit; `/api/*` proxies to the request tier. | **Adopt for the front-end.** |
+| **R2** | S3-compatible object store (export bundles, raw scraped content, signed attestations) | Already the Phase-1 object store in the mapping above. | **Already planned.** |
+| **Cloudflare Queues / Durable Objects** | Managed broker / stateful coordination | Behind the `Queue` protocol (`queues.from_env()`), an alternative to Redis/SQS. | **Adapter, optional** — Redis/SQS already cover Phase 1–2. |
+
+Net: **AI Gateway + Workers AI (embeddings & small models) + Pages + R2 are an immediate, low-risk
+Phase-1.5** that cuts model cost/latency and makes metering real; **Vectorize + Queues are
+adapters to add when public-search or broker scale demands.** Keep pgvector as the governed
+system-of-record so the moat (provenance, CDC, signing) stays in one transactional place.
+
+```bash
+# AI Gateway in front of the existing OpenAI-compatible route — no code change:
+export OH_LLM_BACKEND=http-openai
+export OH_LLM_BASE_URL="https://gateway.ai.cloudflare.com/v1/<acct>/<gw>/workers-ai/v1"
+export OH_LLM_API_KEY="…"            # cached, rate-limited, multi-provider fallback, metered
+export OH_EMBED_BASE_URL="https://gateway.ai.cloudflare.com/v1/<acct>/<gw>/workers-ai/v1"
+```
+
 ## The decision
 
 **Start Phase 1** (Render/Cloud Run web + a queue + workers + Neon pgvector + R2) — it

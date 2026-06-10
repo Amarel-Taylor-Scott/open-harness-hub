@@ -25,12 +25,12 @@ Turn a PDF into a persistent local research wiki with cited answers + concept gr
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `pdf_extract` | processor | `processor/pdf-extract-with-ocr-fallback` | — |
-| 2 | `page_aware_chunk` | processor | `processor/page-aware-chunker` | — |
-| 3 | `embed_local` | processor | `processor/local-embedder` | — |
-| 4 | `hybrid_retrieve` | processor | `processor/hybrid-bm25-vector-retrieve` | — |
-| 5 | `cited_answer` | processor | `processor/llm-judge` | — |
-| 6 | `wiki_generate` | processor | `processor/structured-to-prose` | — |
-| 7 | `concept_graph` | processor | `processor/concept-graph-extractor` | — |
-| 8 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `pdf_extract` | processor | `processor/pdf-extract-with-ocr-fallback` | - |
+| 2 | `page_aware_chunk` | processor | `processor/page-aware-chunker` | - |
+| 3 | `embed_local` | processor | `processor/local-embedder` | - |
+| 4 | `hybrid_retrieve` | processor | `processor/hybrid-bm25-vector-retrieve` | - |
+| 5 | `cited_answer` | processor | `processor/llm-judge` | - |
+| 6 | `wiki_generate` | processor | `processor/structured-to-prose` | - |
+| 7 | `concept_graph` | processor | `processor/concept-graph-extractor` | - |
+| 8 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

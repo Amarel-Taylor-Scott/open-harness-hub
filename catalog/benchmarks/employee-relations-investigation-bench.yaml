@@ -1,0 +1,35 @@
+id: "benchmark/employee-relations-investigation-bench"
+type: benchmark
+version: "0.1.0"
+name: "Employee Relations Investigation benchmark"
+description: "Synthetic benchmark for employee relations investigation review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["hr.performance", "hr.hiring"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["employee-relations-investigation", "expansion-v5"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/employee-relations-investigation-review"
+dataset: "dataset/employee-relations-investigation-samples"
+rubric: "rubric/employee-relations-investigation-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/employee-relations-investigation-review"
+    rule_pack_override: ["rule-pack/grep-employee-relations-investigation-flags", "rule-pack/rag-employee-relations-investigation-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 23
+report:
+  output: "dist/benchmarks/employee-relations-investigation/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

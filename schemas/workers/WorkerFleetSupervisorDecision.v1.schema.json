@@ -1,0 +1,52 @@
+{
+  "$id": "workers/WorkerFleetSupervisorDecision.v1",
+  "title": "WorkerFleetSupervisorDecision",
+  "description": "A supervisor capacity decision (spawn / use_existing / batch_wait / batch_dispatch / reclaim / fallback).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "decision_id": {
+      "type": "string"
+    },
+    "capability_id": {
+      "type": "string"
+    },
+    "case": {
+      "type": "string"
+    },
+    "action": {
+      "type": "string"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "spawn_count": {
+      "type": "number"
+    },
+    "batch_size": {
+      "type": "number"
+    },
+    "task_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "worker_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "created_at": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "decision_id",
+    "capability_id",
+    "case",
+    "action",
+    "created_at"
+  ]
+}

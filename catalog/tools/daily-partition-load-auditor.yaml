@@ -1,0 +1,66 @@
+id: "tool/daily-partition-load-auditor"
+type: tool
+version: "0.1.0"
+name: "Daily partition load auditor"
+description: "Merges one or more daily component candidate partitions, deduplicates rows by canonical table primary keys, runs relationship preflight, emits bulk COPY files, and creates a staged-versus-committed load audit."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "retrieval", "serving", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "daily-factory", "postgres", "pgvector", "bulk-load", "dedupe", "audit"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    partition:
+      type: array
+      items: { type: string }
+    output_dir:
+      type: string
+    run_id:
+      type: string
+  required: ["partition", "output_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    output_dir:
+      type: string
+    load_plan_manifest:
+      type: string
+    staged_audit:
+      type: string
+    merge_report:
+      type: object
+    preflight:
+      type: object
+    bulk_manifest:
+      type: object
+    audit_status:
+      type: string
+side_effects: "write"
+examples:
+  - input:
+      partition:
+        - "dist/daily-component-batch/2026-05-26"
+        - "dist/daily-component-batch/2026-05-27"
+      output_dir: "dist/daily-component-batch-load-audit/2026-05-26_to_2026-05-27"
+      run_id: "daily-2026-05-26-to-2026-05-27"
+    output:
+      ok: true
+      audit_status: "staged_only"
+implementations:
+  - kind: "callable"
+    path: "scripts.db.daily_partition_load_audit.build_daily_partition_load_audit"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.daily_partition_load_audit"

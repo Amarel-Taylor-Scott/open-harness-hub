@@ -1,0 +1,168 @@
+id: "rubric/baltor-business-object-governance-quality"
+type: rubric
+version: "0.1.0"
+name: "Baltor business object governance quality"
+description: "Rubric for requiring contracts, schemas, layouts, diagrams, context rules, relationships, dimensions, lifecycle, and auditability for every important business or database object."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["software", "data_governance", "finance", "ai_governance"]
+capability: ["evaluation", "governance", "verification", "planning"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+tags: ["baltor", "business-objects", "database-objects", "contracts", "schemas", "diagrams"]
+created: "2026-06-02"
+updated: "2026-06-02"
+dimensions:
+  - id: "0.1"
+    label: "Gate: every money, identity, permission, context, lineage, source, action, or customer-visible object has an owner"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Review object_governance_profile rows for owner_team, steward, object_family, and lifecycle."
+  - id: "0.2"
+    label: "Gate: every important object type has required contracts, schemas, context rules, and audit events"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Inspect required_contracts, required_schemas, required_context_rules, and required_events."
+  - id: "1.1"
+    label: "Account objects define tenant, workspace, user, team, role, membership, invitation, entitlement, and isolation rules"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Check account-management profiles, identity diagrams, role contracts, and membership lifecycle rules."
+  - id: "1.2"
+    label: "Account objects include layouts for admin detail, user detail, membership lists, audit, and support views"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Review object_layout_profile rows for account-management object types."
+  - id: "1.3"
+    label: "Account objects declare source precedence between identity provider, local account records, billing state, and support overrides"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Inspect source_precedence object_context_rule rows and policy contracts."
+  - id: "2.1"
+    label: "Billing objects define billing account, subscription, plan, usage meter, invoice, credit, payment, and price snapshot contracts"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Review billing object profiles, billing contracts, usage event schemas, and invoice diagrams."
+  - id: "2.2"
+    label: "Billing objects separate customer-visible billable usage from internal cost telemetry"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Inspect usage schemas, billing context rules, cost analytics mappings, and invoice masks."
+  - id: "2.3"
+    label: "Billing objects record price snapshots, entitlements, contract overrides, revenue boundaries, and audit lineage"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Check price_snapshot records, entitlement relationships, billing flow diagrams, and audit events."
+  - id: "3.1"
+    label: "Context objects define object, version, relationship, assertion, dimension, artifact, pack, and lineage rules"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Inspect context object profiles, context contracts, schema profiles, and lineage diagrams."
+  - id: "3.2"
+    label: "Context objects require source handles, freshness labels, source precedence, conflict handling, and policy decisions"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Review object_context_rule rows for required_context, freshness, source_precedence, masking, and lineage."
+  - id: "3.3"
+    label: "Context objects support document, long attribute, graph, vector metadata, event, and wide columnar schema profiles"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Check object_schema_profile rows for each schema_kind and promoted index policy."
+  - id: "4.1"
+    label: "Flow objects define workflow, flow, run, step, approval, queue, retry, fallback, and human-review contracts"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Inspect flow object profiles, DAG diagrams, state-machine diagrams, and event contracts."
+  - id: "4.2"
+    label: "Flow objects record model, tool, ranker, transformer, mask, policy, and source versions used by each step"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Review step-run contracts, trace events, lineage policy, and context pack links."
+  - id: "4.3"
+    label: "Flow objects distinguish deterministic, model-assisted, human-review, retry, fallback, and write-action steps"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Inspect flow schemas, approval gates, tool classes, and failure-mode maps."
+  - id: "5.1"
+    label: "Connection objects define source connection, connector, credential binding, OAuth grant, MCP server, webhook, sync job, and source scope"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Review connection object profiles, trust-boundary diagrams, credential lifecycle, and sync contracts."
+  - id: "5.2"
+    label: "Connection objects declare read/write scopes, mirror/index/link-only modes, freshness expectations, and credential expiry behavior"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Inspect source_scope rules, connector policy, sync freshness rules, and action separation."
+  - id: "5.3"
+    label: "Connection objects include security-boundary, sync-topology, and failure-mode diagrams"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Review object_architecture_diagram rows for connection object types."
+  - id: "6.1"
+    label: "Process objects define ingestion, normalization, reranking, pack building, refresh, feedback, evaluation, and deployment processes"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Inspect process object profiles, input/output contracts, sequence diagrams, and observability rules."
+  - id: "6.2"
+    label: "Process objects declare transformer contracts, policy gates, emitted events, metrics, failure modes, and idempotency rules"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Review object_contract rows, context_transformer_contract rows, context rules, and retry policy."
+  - id: "7.1"
+    label: "Database objects define tables, views, materialized views, indexes, event streams, partitions, vector indexes, graph indexes, and object storage prefixes"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Inspect database object profiles, storage-mapping diagrams, schema profiles, and source-of-truth maps."
+  - id: "7.2"
+    label: "Database objects distinguish source of truth, derived, rebuildable, append-only, cached, and analytical records"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Review database_mapping, lifecycle rules, retention rules, and index derivation flow."
+  - id: "7.3"
+    label: "Database objects define tenant isolation, retention, tombstone/purge behavior, promoted indexes, and analytics mappings"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Inspect policy contracts, schema evolution policy, object_context_rule rows, and architecture diagrams."
+  - id: "8.1"
+    label: "Layouts are defined for admin, developer, customer, list, graph, timeline, audit, billing, support, mobile, and export views where applicable"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Check object_layout_profile coverage and masks for each object family."
+  - id: "8.2"
+    label: "Layouts hide schema complexity while preserving source handles, freshness, policy state, audit, and next actions"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Review UI layout sections, actions, masks, accessibility fields, and evidence visibility."
+  - id: "9.1"
+    label: "Diagrams cover lifecycle, relationship, data flow, state machine, storage mapping, security boundary, billing flow, and deployment where applicable"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Inspect object_architecture_diagram rows and confirm diagrams are current and linked to object types."
+  - id: "9.2"
+    label: "Diagrams are stored as versioned reviewable context objects or database-backed text, not only slide decks"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Check diagram_format, diagram_text or URI, version, related_objects, and source_handles."
+  - id: "10.1"
+    label: "Required context rules define what must be loaded before create, read, update, delete, render, bill, sync, retrieve, pack, and export actions"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Inspect object_context_rule applies_to_actions and condition/requirement payloads."
+  - id: "10.2"
+    label: "Forbidden context rules define what must not appear in model prompts, local memory, exports, invoices, support views, or customer dashboards"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Review forbidden_context, masking, retention, and export rules for sensitive object families."
+  - id: "11.1"
+    label: "Rubrics apply to every object family and can be evaluated with evidence packets and dimension scores"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Check required_rubrics, rubric_evaluation, rubric_dimension_score, and failed dimension reports."
+  - id: "11.2"
+    label: "Object governance packages are database-backed and exportable to YAML/Markdown for review and portability"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Review import/export flow, component bindings, object_governance_profile rows, and static documentation."
+scoring_method: "weighted_sum"

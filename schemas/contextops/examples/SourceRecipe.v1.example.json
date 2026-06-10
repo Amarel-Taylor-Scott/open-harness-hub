@@ -1,0 +1,77 @@
+{
+  "valid": {
+    "schema_version": "SourceRecipe.v1",
+    "recipe_id": "srecipe-ecfr-1005-11-7a8b9c0d",
+    "tenant_id": "acme",
+    "source_scope": "global_public",
+    "fact_key": "cfpb.error_resolution.investigation_deadline",
+    "source_handle": "ctx://public/source/ecfr/12-CFR-1005.11#para.c.1.i",
+    "derived_from_report_id": "sdr-cfpb-deadline-4d5e6f7a",
+    "authority": {
+      "source_type": "regulation",
+      "authority_rank": 90,
+      "officialness": "official"
+    },
+    "access": {
+      "method": "fixture",
+      "locator": "fixtures/cfpb/ecfr-1005-11.html",
+      "retry_policy": "exponential_backoff",
+      "rate_limit_per_min": 30
+    },
+    "cross_source": {
+      "policy": "single_official_source_ok",
+      "min_independent_sources": 1
+    },
+    "watch_triggers": ["scheduled", "source_change"],
+    "parser_provider": "parser.stub@v1",
+    "expected_output_schema": "fact_assertion_candidate",
+    "reliability_score_id": "srs-ecfr-1005-11-5e6f7a8b",
+    "created_at": "2026-06-05T00:00:00Z"
+  },
+  "invalid_missing_cross_source": {
+    "schema_version": "SourceRecipe.v1",
+    "recipe_id": "srecipe-bad-1",
+    "tenant_id": "acme",
+    "source_scope": "global_public",
+    "fact_key": "cfpb.error_resolution.investigation_deadline",
+    "source_handle": "ctx://public/source/ecfr/12-CFR-1005.11",
+    "authority": {
+      "source_type": "regulation",
+      "authority_rank": 90,
+      "officialness": "official"
+    },
+    "access": {
+      "method": "fixture",
+      "locator": "fixtures/cfpb/ecfr-1005-11.html",
+      "retry_policy": "none"
+    },
+    "watch_triggers": ["scheduled"],
+    "expected_output_schema": "fact_assertion_candidate",
+    "created_at": "2026-06-05T00:00:00Z"
+  },
+  "invalid_bad_watch_trigger": {
+    "schema_version": "SourceRecipe.v1",
+    "recipe_id": "srecipe-bad-2",
+    "tenant_id": "acme",
+    "source_scope": "global_public",
+    "fact_key": "cfpb.error_resolution.investigation_deadline",
+    "source_handle": "ctx://public/source/ecfr/12-CFR-1005.11",
+    "authority": {
+      "source_type": "regulation",
+      "authority_rank": 90,
+      "officialness": "official"
+    },
+    "access": {
+      "method": "fixture",
+      "locator": "fixtures/cfpb/ecfr-1005-11.html",
+      "retry_policy": "none"
+    },
+    "cross_source": {
+      "policy": "single_official_source_ok",
+      "min_independent_sources": 1
+    },
+    "watch_triggers": ["whenever"],
+    "expected_output_schema": "fact_assertion_candidate",
+    "created_at": "2026-06-05T00:00:00Z"
+  }
+}

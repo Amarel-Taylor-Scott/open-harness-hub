@@ -1,0 +1,93 @@
+id: "tool/factory-jsonl-bulk-copy-loader"
+type: tool
+version: "0.1.0"
+name: "Factory JSONL bulk COPY loader"
+description: "Exports validated factory JSONL shards into table-shaped CSV files and a psql load script that uses temporary staging tables and upserts for high-volume Postgres loads."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "retrieval", "serving", "evaluation"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["postgres", "bulk-load", "csv", "jsonl", "psql", "million-primitives"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    output_dir:
+      type: string
+    load_sql_name:
+      type: string
+    source_records:
+      type: array
+      items: { type: string }
+    normalized_objects:
+      type: array
+      items: { type: string }
+    promotion_decisions:
+      type: array
+      items: { type: string }
+    index_records:
+      type: array
+      items: { type: string }
+    canonical_entities:
+      type: array
+      items: { type: string }
+    object_entity_refs:
+      type: array
+      items: { type: string }
+    dedupe_clusters:
+      type: array
+      items: { type: string }
+    review_tickets:
+      type: array
+      items: { type: string }
+    label_assignments:
+      type: array
+      items: { type: string }
+    dimension_values:
+      type: array
+      items: { type: string }
+    object_embeddings:
+      type: array
+      items: { type: string }
+  required: ["output_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    output_dir:
+      type: string
+    load_sql:
+      type: string
+    csv_paths:
+      type: object
+    counts:
+      type: object
+    load_command:
+      type: string
+side_effects: "write"
+examples:
+  - input:
+      source_records: ["catalog/knowledge-packs/data/task-marketplace-archetype-patterns/source-records.jsonl"]
+      normalized_objects: ["catalog/knowledge-packs/data/task-marketplace-archetype-patterns/archetype-patterns.jsonl"]
+      canonical_entities: ["catalog/knowledge-packs/data/canonical-factory-row-patterns/canonical-entities.jsonl"]
+      object_entity_refs: ["catalog/knowledge-packs/data/canonical-factory-row-patterns/object-entity-refs.jsonl"]
+      output_dir: "dist/bulk/factory-load"
+    output:
+      ok: true
+      output_dir: "dist/bulk/factory-load"
+      load_sql: "dist/bulk/factory-load/load.sql"
+implementations:
+  - kind: "callable"
+    path: "scripts.db.factory_jsonl_bulk_copy.export_bulk"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.factory_jsonl_bulk_copy"

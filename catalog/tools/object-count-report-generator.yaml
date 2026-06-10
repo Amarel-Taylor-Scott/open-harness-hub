@@ -1,0 +1,59 @@
+id: "tool/object-count-report-generator"
+type: tool
+version: "0.1.0"
+name: "Object count report generator"
+description: "Reports curated manifest counts separately from staged generated object counts so million-object progress is not confused with YAML manifest volume."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "retrieval", "evaluation"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["object-counts", "postgres", "jsonl", "metrics", "million-primitives"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    jsonl:
+      type: array
+      description: "Repeated type=path inputs for staged JSONL shards."
+      items: { type: string }
+    catalog_id_index:
+      type: string
+    output:
+      type: string
+    run_id:
+      type: string
+returns:
+  type: object
+  properties:
+    catalog:
+      type: object
+    generated_objects:
+      type: object
+    canonical_store:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      jsonl:
+        - "source_record=catalog/knowledge-packs/data/task-marketplace-archetype-patterns/source-records.jsonl"
+        - "normalized_object=catalog/knowledge-packs/data/task-marketplace-archetype-patterns/archetype-patterns.jsonl"
+      output: "dist/reports/object-count-report.json"
+    output:
+      catalog:
+        manifest_count: 4095
+      generated_objects:
+        total_staged_rows: 8
+implementations:
+  - kind: "callable"
+    path: "scripts.db.object_count_report.build_report"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.object_count_report"

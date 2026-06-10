@@ -1,0 +1,85 @@
+id: "tool/source-surface-execution-summary-reporter"
+type: tool
+version: "0.1.0"
+name: "Source surface execution summary reporter"
+description: "Aggregates source-surface partitions, worker jobs, replay records, generated row families, promotion decisions, review tickets, and bulk-load readiness into a single multi-day run summary."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["government", "software", "media", "construction", "energy", "finance", "healthcare", "cross_industry"]
+capability: ["governance", "evaluation", "retrieval", "routing", "serving"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["source-surfaces", "execution-summary", "object-counts", "load-readiness", "review-gates"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    partitions_jsonl:
+      type: string
+    jobs_jsonl:
+      type: string
+    replay_records_jsonl:
+      type: string
+    row_dir:
+      type: string
+    load_plan_manifest:
+      type: string
+    catalog_id_index:
+      type: string
+    output:
+      type: string
+    run_id:
+      type: string
+  required: ["partitions_jsonl"]
+returns:
+  type: object
+  properties:
+    catalog:
+      type: object
+    source_surfaces:
+      type: object
+    partitions:
+      type: object
+    jobs:
+      type: object
+    generated_rows:
+      type: object
+    promotion:
+      type: object
+    review:
+      type: object
+    load_readiness:
+      type: object
+    safety:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      partitions_jsonl: "dist/source-surface-scan-partitions/seed/source-surface-scan-partitions.jsonl"
+      jobs_jsonl: "dist/source-surface-scan-partitions/seed/jobs/public-source-scan-jobs.jsonl"
+      replay_records_jsonl: "dist/source-surface-scan-partitions/seed/replay/job-run-records.jsonl"
+      row_dir: "dist/source-surface-scan-partitions/seed/rows"
+      load_plan_manifest: "dist/source-surface-scan-partitions/seed/load-plan/load-plan-manifest.json"
+      output: "dist/source-surface-scan-partitions/seed/execution-summary.json"
+    output:
+      source_surfaces:
+        count: 10
+      partitions:
+        count: 155
+      generated_rows:
+        total: 20049
+      load_readiness:
+        preflight_ok: true
+        bulk_ok: true
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.source_surface_execution_summary.summarize_source_surface_execution"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.factory.source_surface_execution_summary"

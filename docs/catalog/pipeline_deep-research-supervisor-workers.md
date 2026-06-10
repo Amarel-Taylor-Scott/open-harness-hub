@@ -34,12 +34,12 @@ report with citations.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `redact_query` | harness | `harness/redact-pii-text` | — |
-| 2 | `clarify` | harness | `harness/text-safety-review` | — |
-| 3 | `brief_writer` | harness | `harness/text-safety-review` | — |
-| 4 | `decompose_to_workers` | processor | `processor/sub-question-decomposer` | — |
-| 5 | `dispatch_workers` | harness | `harness/text-safety-review` | — |
-| 6 | `compress_notes` | processor | `processor/llmlingua-context-compressor` | — |
-| 7 | `write_report` | harness | `harness/text-safety-review` | — |
-| 8 | `verify_citations` | processor | `processor/citation-coverage` | — |
+| 1 | `redact_query` | harness | `harness/redact-pii-text` | - |
+| 2 | `clarify` | harness | `harness/text-safety-review` | - |
+| 3 | `brief_writer` | harness | `harness/text-safety-review` | - |
+| 4 | `decompose_to_workers` | processor | `processor/sub-question-decomposer` | - |
+| 5 | `dispatch_workers` | harness | `harness/text-safety-review` | - |
+| 6 | `compress_notes` | processor | `processor/llmlingua-context-compressor` | - |
+| 7 | `write_report` | harness | `harness/text-safety-review` | - |
+| 8 | `verify_citations` | processor | `processor/citation-coverage` | - |
 

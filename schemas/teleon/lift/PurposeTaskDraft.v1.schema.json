@@ -1,0 +1,20 @@
+{
+  "$id": "teleon/lift/PurposeTaskDraft.v1", "title": "PurposeTaskDraft.v1", "type": "object", "additionalProperties": false,
+  "description": "An INFERRED purpose for an imported workload — a DRAFT, never authoritative. requires_human_review is ALWAYS true: a human must confirm purpose + boundaries before Teleon may manage the workload. confidence (0..1) reflects how many weak signals (name/tags/triggers/repo/runtime-class) agree. baseline_implementation_id/rollback_target point at the preserved legacy implementation.",
+  "required": ["schema_version", "name", "source_workload_id", "confidence", "inferred_from", "purpose_summary", "input_candidate_schema", "output_candidate_schema", "connected_systems", "success_criteria_draft", "requires_human_review", "baseline_implementation_id", "rollback_target"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["PurposeTaskDraft.v1"]},
+    "name": {"type": "string"},
+    "source_workload_id": {"type": "string"},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "inferred_from": {"type": "array", "items": {"type": "string"}},
+    "purpose_summary": {"type": "string", "description": "human-reviewable inferred purpose, marked (DRAFT — confirm)"},
+    "input_candidate_schema": {"type": "object"},
+    "output_candidate_schema": {"type": "object"},
+    "connected_systems": {"type": "array", "items": {"type": "string"}},
+    "success_criteria_draft": {"type": "array", "items": {"type": "string"}},
+    "requires_human_review": {"type": "boolean", "const": true, "description": "ALWAYS true — inferred purpose is never authoritative"},
+    "baseline_implementation_id": {"type": "string"},
+    "rollback_target": {"type": "string"}
+  }
+}

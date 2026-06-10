@@ -1,0 +1,21 @@
+{
+  "$id": "benchmarks/BenchmarkResult.v1",
+  "title": "BenchmarkResult.v1",
+  "type": "object",
+  "additionalProperties": true,
+  "description": "A recorded run of a benchmark against a system-under-test. EVIDENCE only: is_truth is always false and a result cannot by itself promote a candidate or become served truth (promotion needs the policy gates + receipts + source handles + task-specific scorecards). Records the actual model/runtime, cost, and reproducibility.",
+  "required": ["result_id", "benchmark_id", "system_under_test", "scorecard", "is_truth", "created_at"],
+  "properties": {
+    "result_id": {"type": "string"},
+    "benchmark_id": {"type": "string"},
+    "system_under_test": {"type": "string"},
+    "model_or_runtime": {"type": ["string", "null"]},
+    "scorecard": {"type": "object"},
+    "cost": {"type": ["object", "null"]},
+    "reproducibility": {"type": ["object", "null"], "description": "{local_reproducible, requires_cloud}"},
+    "receipts": {"type": "array"},
+    "promotion_authority": {"type": "boolean", "const": false, "description": "a benchmark result is never a promotion authority"},
+    "is_truth": {"type": "boolean", "const": false},
+    "created_at": {"type": "string"}
+  }
+}

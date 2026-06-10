@@ -1,0 +1,40 @@
+id: "knowledge-pack/task-marketplace-archetype-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Task marketplace archetype patterns"
+description: "Synthetic task-marketplace metadata patterns for deriving reusable workflow primitives, skill bundles, acceptance criteria, and human-in-loop review gates without storing raw listings or personal data."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["extraction", "planning", "governance", "evaluation", "routing"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "hub"
+freshness: "stable"
+lifecycle_position: "pre_api.source_intake"
+tags: ["task-marketplace", "workflows", "human-in-the-loop", "source-governance", "million-primitives"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types:
+  - "task_marketplace_source_record"
+  - "task_archetype_pattern"
+files:
+  - path: "catalog/knowledge-packs/data/task-marketplace-archetype-patterns/source-records.jsonl"
+    schema: "schemas/source-record.schema.json"
+    format: "jsonl"
+  - path: "catalog/knowledge-packs/data/task-marketplace-archetype-patterns/archetype-patterns.jsonl"
+    schema: "schemas/normalized-object-record.schema.json"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    fields: ["title", "body.problem_statement", "body.skills", "body.workflow_steps", "body.acceptance_criteria"]
+provenance:
+  sources:
+    - "Synthetic marketplace task archetypes based on common public task categories"
+    - "Open Harness Hub primitive source surface map"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "Synthetic metadata only; no raw marketplace listings, worker/client PII, private messages, or proprietary job-posting dumps."

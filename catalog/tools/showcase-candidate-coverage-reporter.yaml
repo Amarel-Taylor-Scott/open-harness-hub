@@ -1,0 +1,65 @@
+id: "tool/showcase-candidate-coverage-reporter"
+type: tool
+version: "0.1.0"
+name: "Showcase candidate coverage reporter"
+description: "Scores daily showcase pipeline template steps against staged component candidate rows and emits coverage rows plus missing-component generation requests."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["planning", "retrieval", "evaluation", "governance"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.product"
+tags: ["showcase-pipelines", "coverage", "component-candidates", "gap-analysis", "daily-factory"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    template_dir:
+      type: string
+    normalized_objects:
+      type: string
+    output_dir:
+      type: string
+    top_k:
+      type: integer
+  required: ["template_dir", "normalized_objects", "output_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    template_count:
+      type: integer
+    candidate_count:
+      type: integer
+    step_count:
+      type: integer
+    covered_steps:
+      type: integer
+    partial_steps:
+      type: integer
+    missing_steps:
+      type: integer
+    missing_request_count:
+      type: integer
+side_effects: "write"
+examples:
+  - input:
+      template_dir: "dist/daily-showcase-pipelines/2026-05-28/templates"
+      normalized_objects: "dist/daily-component-batch-load-audit/2026-05-26_to_2026-05-27/merged-jsonl/normalized-objects.jsonl"
+      output_dir: "dist/showcase-candidate-coverage/2026-05-28"
+    output:
+      ok: true
+      template_count: 10
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.showcase_candidate_coverage.build_showcase_coverage"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.factory.showcase_candidate_coverage"

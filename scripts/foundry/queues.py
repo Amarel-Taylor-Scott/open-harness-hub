@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Foundry queues — the broker adapter (the "Celery layer", kept light).
 
-`worker.py` already provides the worker loop + retry + dead-letter + a `Queue`
+`worker.py` already provides the worker loop + retry + permanent-failure routing + a `Queue`
 **protocol**, so the broker is a thin, swappable adapter — NOT a reason to adopt a heavy
 framework. Recommended default: a **Redis-list `RedisQueue`** (one dep, pairs natively
 with KEDA's Redis scaler — autoscale workers on list length). Celery / RQ / arq / SQS /
@@ -18,20 +18,43 @@ from __future__ import annotations
 import json
 import os
 import sqlite3
+import time
 from pathlib import Path
 from typing import Any
 
 DEFAULT_QUEUE_KEY = "ohh:foundry:jobs"
+GOVERNED_QUEUE_STATES = {"approval_required", "budget_blocked", "failed_permanently"}
+
+
+def _job_without_queue_private_fields(job: dict) -> dict:
+    return {k: v for k, v in job.items() if not str(k).startswith("_")}
+
+
+def _merge_nested_dict(target: dict, updates: dict) -> dict:
+    for key, value in updates.items():
+        if isinstance(value, dict) and isinstance(target.get(key), dict):
+            target[key] = _merge_nested_dict(dict(target[key]), value)
+        else:
+            target[key] = value
+    return target
 
 
 class RedisQueue:
     """Redis-list queue implementing `worker.Queue`. KEDA scales the worker fleet on
-    `LLEN(key)`; nack re-queues; dead-letter goes to ``{key}:dead`` for inspection."""
+    `LLEN(key)`; nack re-queues; permanently failed jobs go to
+    ``{key}:failed-permanently`` for inspection.
+
+    Budget governance uses separate lists so approval-required work is resumable
+    and budget-blocked work is not mixed with malformed or permanently failed
+    jobs.
+    """
 
     def __init__(self, client: Any, key: str = DEFAULT_QUEUE_KEY) -> None:
         self.client = client
         self.key = key
-        self.dead_key = key + ":dead"
+        self.failed_permanently_key = key + ":failed-permanently"
+        self.approval_required_key = key + ":approval-required"
+        self.budget_blocked_key = key + ":budget-blocked"
 
     @staticmethod
     def _dec(raw: Any) -> str:
@@ -51,10 +74,82 @@ class RedisQueue:
         self.client.rpush(self.key, json.dumps(job))
 
     def dead_letter(self, job: dict) -> None:
-        self.client.rpush(self.dead_key, json.dumps(job))
+        """Compatibility alias; new code should call fail_permanently()."""
+        self.fail_permanently(job)
+
+    def fail_permanently(self, job: dict) -> None:
+        self.client.rpush(self.failed_permanently_key, json.dumps(job))
+
+    def hold(self, job: dict) -> None:
+        """Compatibility alias; new code should call hold_for_approval()."""
+        self.hold_for_approval(job)
+
+    def hold_for_approval(self, job: dict) -> None:
+        self.client.rpush(self.approval_required_key, json.dumps(job))
+
+    def block(self, job: dict) -> None:
+        """Compatibility alias; new code should call block_for_budget()."""
+        self.block_for_budget(job)
+
+    def block_for_budget(self, job: dict) -> None:
+        self.client.rpush(self.budget_blocked_key, json.dumps(job))
+
+    def _state_key(self, status: str) -> str:
+        if status == "pending":
+            return self.key
+        if status == "approval_required":
+            return self.approval_required_key
+        if status == "budget_blocked":
+            return self.budget_blocked_key
+        if status == "failed_permanently":
+            return self.failed_permanently_key
+        raise ValueError(f"unsupported queue status: {status}")
 
     def depth(self) -> int:
         return int(self.client.llen(self.key))
+
+    def stats(self) -> dict[str, int]:
+        return {
+            "pending": int(self.client.llen(self.key)),
+            "approval_required": int(self.client.llen(self.approval_required_key)),
+            "budget_blocked": int(self.client.llen(self.budget_blocked_key)),
+            "failed_permanently": int(self.client.llen(self.failed_permanently_key)),
+        }
+
+    def list_jobs(self, status: str, *, limit: int = 50) -> list[dict]:
+        key = self._state_key(status)
+        if not callable(getattr(self.client, "lrange", None)):
+            return []
+        raw_items = self.client.lrange(key, 0, max(limit - 1, 0))
+        jobs = []
+        for raw in raw_items:
+            try:
+                jobs.append(json.loads(self._dec(raw)))
+            except json.JSONDecodeError:
+                jobs.append({"_raw": self._dec(raw)})
+        return jobs
+
+    def requeue_job(self, job_id: str, *, from_status: str, updates: dict | None = None) -> dict | None:
+        key = self._state_key(from_status)
+        if not callable(getattr(self.client, "lrange", None)) or not callable(getattr(self.client, "lrem", None)):
+            return None
+        for raw in self.client.lrange(key, 0, -1):
+            body = self._dec(raw)
+            try:
+                job = json.loads(body)
+            except json.JSONDecodeError:
+                continue
+            if str(job.get("job_id") or "") != str(job_id):
+                continue
+            removed = int(self.client.lrem(key, 1, raw))
+            if removed <= 0:
+                return None
+            job = _merge_nested_dict(_job_without_queue_private_fields(job), updates or {})
+            job["requeued_at"] = int(time.time())
+            job["requeued_from_status"] = from_status
+            self.enqueue(job)
+            return job
+        return None
 
 
 class SqliteQueue:
@@ -92,7 +187,7 @@ class SqliteQueue:
             c.execute("UPDATE jobs SET status='processing' WHERE seq=?", (seq,))
             c.execute("COMMIT")
             job = json.loads(body)
-            job["_seq"] = seq   # so ack/nack/dead_letter can target this row
+            job["_seq"] = seq   # so ack/retry/failure routing can target this row
             return job
         finally:
             c.close()
@@ -102,15 +197,39 @@ class SqliteQueue:
         c.execute("DELETE FROM jobs WHERE seq=?", (job.get("_seq"),))
         c.close()
 
-    def nack(self, job: dict) -> None:   # persist _attempts so retry/dead-letter survives re-pull
+    def nack(self, job: dict) -> None:   # persist _attempts so retry state survives re-pull
         body = {k: v for k, v in job.items() if k != "_seq"}
         c = self._con()
         c.execute("UPDATE jobs SET status='pending', body=? WHERE seq=?", (json.dumps(body), job.get("_seq")))
         c.close()
 
     def dead_letter(self, job: dict) -> None:
+        """Compatibility alias; new code should call fail_permanently()."""
+        self.fail_permanently(job)
+
+    def fail_permanently(self, job: dict) -> None:
         c = self._con()
-        c.execute("UPDATE jobs SET status='dead' WHERE seq=?", (job.get("_seq"),))
+        c.execute("UPDATE jobs SET status='failed_permanently' WHERE seq=?", (job.get("_seq"),))
+        c.close()
+
+    def hold(self, job: dict) -> None:
+        """Compatibility alias; new code should call hold_for_approval()."""
+        self.hold_for_approval(job)
+
+    def hold_for_approval(self, job: dict) -> None:
+        body = {k: v for k, v in job.items() if k != "_seq"}
+        c = self._con()
+        c.execute("UPDATE jobs SET status='approval_required', body=? WHERE seq=?", (json.dumps(body), job.get("_seq")))
+        c.close()
+
+    def block(self, job: dict) -> None:
+        """Compatibility alias; new code should call block_for_budget()."""
+        self.block_for_budget(job)
+
+    def block_for_budget(self, job: dict) -> None:
+        body = {k: v for k, v in job.items() if k != "_seq"}
+        c = self._con()
+        c.execute("UPDATE jobs SET status='budget_blocked', body=? WHERE seq=?", (json.dumps(body), job.get("_seq")))
         c.close()
 
     def depth(self) -> int:
@@ -118,6 +237,64 @@ class SqliteQueue:
         n = c.execute("SELECT COUNT(*) FROM jobs WHERE qkey=? AND status='pending'", (self.key,)).fetchone()[0]
         c.close()
         return int(n)
+
+    def count(self, status: str) -> int:
+        c = self._con()
+        n = c.execute("SELECT COUNT(*) FROM jobs WHERE qkey=? AND status=?", (self.key, status)).fetchone()[0]
+        c.close()
+        return int(n)
+
+    def stats(self) -> dict[str, int]:
+        return {
+            "pending": self.count("pending"),
+            "processing": self.count("processing"),
+            "approval_required": self.count("approval_required"),
+            "budget_blocked": self.count("budget_blocked"),
+            "failed_permanently": self.count("failed_permanently"),
+        }
+
+    def list_jobs(self, status: str, *, limit: int = 50) -> list[dict]:
+        c = self._con()
+        rows = c.execute(
+            "SELECT seq, body FROM jobs WHERE qkey=? AND status=? ORDER BY seq LIMIT ?",
+            (self.key, status, int(limit)),
+        ).fetchall()
+        c.close()
+        jobs = []
+        for seq, body in rows:
+            try:
+                job = json.loads(body)
+            except json.JSONDecodeError:
+                job = {"_raw": body}
+            job["_seq"] = seq
+            jobs.append(job)
+        return jobs
+
+    def requeue_job(self, job_id: str, *, from_status: str, updates: dict | None = None) -> dict | None:
+        c = self._con()
+        try:
+            c.execute("BEGIN IMMEDIATE")
+            rows = c.execute(
+                "SELECT seq, body FROM jobs WHERE qkey=? AND status=? ORDER BY seq",
+                (self.key, from_status),
+            ).fetchall()
+            for seq, body in rows:
+                try:
+                    job = json.loads(body)
+                except json.JSONDecodeError:
+                    continue
+                if str(job.get("job_id") or "") != str(job_id):
+                    continue
+                job = _merge_nested_dict(_job_without_queue_private_fields(job), updates or {})
+                job["requeued_at"] = int(time.time())
+                job["requeued_from_status"] = from_status
+                c.execute("UPDATE jobs SET status='pending', body=? WHERE seq=?", (json.dumps(job), seq))
+                c.execute("COMMIT")
+                return job
+            c.execute("COMMIT")
+            return None
+        finally:
+            c.close()
 
 
 def from_env(key: str | None = None):
@@ -160,6 +337,24 @@ def _self_test() -> int:
         def llen(self, k: str) -> int:
             return len(self.store.get(k) or [])
 
+        def lrange(self, k: str, start: int, end: int):
+            lst = self.store.get(k) or []
+            if end == -1:
+                return list(lst[start:])
+            return list(lst[start:end + 1])
+
+        def lrem(self, k: str, count: int, v: str) -> int:
+            lst = self.store.get(k) or []
+            removed = 0
+            kept = []
+            for item in lst:
+                if item == v and (count <= 0 or removed < count):
+                    removed += 1
+                    continue
+                kept.append(item)
+            self.store[k] = kept
+            return removed
+
     r = FakeRedis()
     q = RedisQueue(r, key="t:jobs")
     q.enqueue({"partition": "a"})
@@ -172,8 +367,21 @@ def _self_test() -> int:
     check("nack re-queues", q.depth() == 1)
     q.pull()
     check("queue drained", q.depth() == 0 and q.pull() is None)
-    q.dead_letter({"partition": "poison"})
-    check("dead-letter goes to {key}:dead", r.llen("t:jobs:dead") == 1)
+    q.fail_permanently({"partition": "malformed"})
+    check("failed jobs go to {key}:failed-permanently", r.llen("t:jobs:failed-permanently") == 1)
+    q.hold_for_approval({"partition": "approval"})
+    q.block_for_budget({"partition": "budget"})
+    check("approval-required jobs go to {key}:approval-required", r.llen("t:jobs:approval-required") == 1)
+    check("budget-blocked jobs go to {key}:budget-blocked", r.llen("t:jobs:budget-blocked") == 1)
+    check("redis stats include explicit governance queues", q.stats()["approval_required"] == 1 and q.stats()["budget_blocked"] == 1)
+    q.hold_for_approval({"job_id": "approve-me", "budget_policy": {"action": "require_approval"}})
+    check("redis lists approval-required jobs", q.list_jobs("approval_required")[0]["partition"] == "approval")
+    approved = q.requeue_job(
+        "approve-me",
+        from_status="approval_required",
+        updates={"budget_override_approved": True, "budget_policy": {"approved": True}},
+    )
+    check("redis requeues approved job", approved and approved["budget_override_approved"] and q.depth() == 1)
 
     # satisfies the worker.Queue protocol
     from scripts.foundry.worker import Queue, Worker
@@ -203,6 +411,23 @@ def _self_test() -> int:
         check("sqlite queue durable across instances", SqliteQueue(qp, key="t").depth() == 1)
         j2 = SqliteQueue(qp, key="t").pull(); SqliteQueue(qp, key="t").nack(j2)
         check("nack re-queues durably", SqliteQueue(qp, key="t").depth() == 1)
+        j3 = SqliteQueue(qp, key="t").pull(); SqliteQueue(qp, key="t").hold_for_approval(j3)
+        check("approval-required jobs persist explicitly", SqliteQueue(qp, key="t").stats()["approval_required"] == 1)
+        sq2 = SqliteQueue(qp, key="t")
+        sq2.enqueue({"partition": "budget-block"})
+        j4 = sq2.pull(); sq2.block_for_budget(j4)
+        check("budget-blocked jobs persist explicitly", SqliteQueue(qp, key="t").stats()["budget_blocked"] == 1)
+        sq3 = SqliteQueue(qp, key="t")
+        sq3.enqueue({"job_id": "approve-sqlite", "budget_policy": {"action": "require_approval"}})
+        j5 = sq3.pull(); sq3.hold_for_approval(j5)
+        approval_rows = sq3.list_jobs("approval_required")
+        check("sqlite lists approval-required jobs", any(row.get("job_id") == "approve-sqlite" for row in approval_rows))
+        approved_sqlite = sq3.requeue_job(
+            "approve-sqlite",
+            from_status="approval_required",
+            updates={"budget_override_approved": True, "budget_policy": {"approved": True}},
+        )
+        check("sqlite requeues approved job", approved_sqlite and sq3.depth() == 1)
 
     # from_env without REDIS_URL ⇒ a durable SqliteQueue (NEVER None — local dev has a real queue)
     saved = os.environ.pop("REDIS_URL", None)

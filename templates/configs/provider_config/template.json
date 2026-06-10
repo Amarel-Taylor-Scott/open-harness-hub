@@ -1,0 +1,12 @@
+{
+  "schema": "schemas/config/provider_config.v1.schema.json",
+  "version": "v1",
+  "owner": "platform-providers",
+  "environment_scope": "all",
+  "config_type": "provider_config",
+  "provider_id": "<provider_id>",
+  "credentials_ref": "env://PROVIDER_API_KEY",
+  "emulator": "<deterministic offline stand-in, e.g. local_stub>",
+  "fallback": "<fallback provider_id used when this provider is unavailable>",
+  "notes": "Every provider config declares an emulator (offline stand-in for deterministic proofs) AND a fallback provider, so a missing real provider degrades gracefully instead of crashing. credentials_ref is a secret REFERENCE, never a raw key."
+}

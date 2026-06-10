@@ -9,7 +9,15 @@ import time
 from pathlib import Path
 from typing import Any
 
-from scripts._config import DEFAULT_EMBEDDING_DIMENSIONS, pgvector_type
+from scripts._config import (
+    DEFAULT_EMBEDDING_DIMENSIONS,
+    PGVECTOR_LOAD_PLAN_ACCEPTED_ROWS_FILENAME,
+    PGVECTOR_LOAD_PLAN_REJECTED_ROWS_FILENAME,
+    PGVECTOR_LOAD_PLAN_RUN_ID,
+    PGVECTOR_LOAD_PLAN_SQL_FILENAME,
+    PGVECTOR_LOAD_PLAN_SUMMARY_FILENAME,
+    pgvector_type,
+)
 
 # Canonical pgvector dimension is defined once in scripts/_config.py; do not
 # re-type the number here (see docs/codex/no-magic-values.md).
@@ -127,7 +135,7 @@ def build_pgvector_embedding_load_plan(
     *,
     stored_vectors_jsonl: str | Path,
     output_dir: str | Path | None = None,
-    run_id: str = "pgvector-embedding-load-plan",
+    run_id: str = PGVECTOR_LOAD_PLAN_RUN_ID,
     source_embedding_rows_jsonl: str | Path | None = None,
     schema_dimensions: int = DEFAULT_SCHEMA_DIMENSIONS,
 ) -> dict[str, Any]:
@@ -178,10 +186,10 @@ def build_pgvector_embedding_load_plan(
         statements.append(_embedding_insert(row, text))
 
     statements.append("COMMIT;\n")
-    sql_path = out / "object-embedding-load.sql"
-    accepted_path = out / "accepted-object-embedding-load-rows.jsonl"
-    rejected_path = out / "rejected-object-embedding-load-rows.jsonl"
-    summary_path = out / "pgvector-embedding-load-plan-summary.json"
+    sql_path = out / PGVECTOR_LOAD_PLAN_SQL_FILENAME
+    accepted_path = out / PGVECTOR_LOAD_PLAN_ACCEPTED_ROWS_FILENAME
+    rejected_path = out / PGVECTOR_LOAD_PLAN_REJECTED_ROWS_FILENAME
+    summary_path = out / PGVECTOR_LOAD_PLAN_SUMMARY_FILENAME
     sql_path.parent.mkdir(parents=True, exist_ok=True)
     sql_path.write_text("\n".join(statements), encoding="utf-8")
     _write_jsonl(accepted_path, accepted_rows)
@@ -236,7 +244,7 @@ def _self_test() -> int:
             stored_vectors_jsonl=stored,
             source_embedding_rows_jsonl=source,
             output_dir=tmp,
-            run_id="pgvector-embedding-load-plan-self-test",
+            run_id=f"{PGVECTOR_LOAD_PLAN_RUN_ID}-self-test",
         )
         assert result["accepted_rows"] > 0
         assert result["rejected_rows"] == 0
@@ -255,7 +263,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--stored-vectors-jsonl")
     parser.add_argument("--source-embedding-rows-jsonl")
     parser.add_argument("--output-dir")
-    parser.add_argument("--run-id", default="pgvector-embedding-load-plan")
+    parser.add_argument("--run-id", default=PGVECTOR_LOAD_PLAN_RUN_ID)
     parser.add_argument("--schema-dimensions", type=int, default=DEFAULT_SCHEMA_DIMENSIONS)
     args = parser.parse_args(argv)
     if args.self_test:

@@ -1,0 +1,43 @@
+{
+  "$id": "agents/AgentRunRequest.v1",
+  "title": "AgentRunRequest.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "A governed request to run a bounded agent on the shared agentic-bot plane (OpenClaw/Hermes-style runtimes are CANDIDATES behind harness_provider; the deterministic local emulator is the correctness invariant). Deny-by-default: an explicit allowed_tools/allowed_skills allowlist plus a forbidden_tools denylist, a sandbox_policy, a secret_policy (refs only — never values), a memory_policy, bounded max_steps + wall-clock timeout_ms, and require_receipt to force an AgentRunReceipt. The agent DISCOVERS/ACTS and PROPOSES; Baltor STORES/VERIFIES/RECONCILES — the run's output is never served truth. No raw secrets: pass env:// refs in secret_policy, never inline credentials; scope the input by reference (input_ref) when large or sensitive.",
+  "required": [
+    "schema_version",
+    "run_id",
+    "product_id",
+    "tenant_id",
+    "agent_profile_id",
+    "harness_provider",
+    "allowed_tools",
+    "allowed_skills",
+    "forbidden_tools",
+    "sandbox_policy",
+    "secret_policy",
+    "memory_policy",
+    "max_steps",
+    "timeout_ms",
+    "require_receipt"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "description": "contract version, e.g. v1"},
+    "run_id": {"type": "string", "description": "caller-assigned idempotency/correlation id for this run"},
+    "product_id": {"type": "string", "description": "owning product (e.g. baltor) submitting the run through the shared plane"},
+    "tenant_id": {"type": "string", "description": "owning tenant; tenant-private lineage never becomes global"},
+    "agent_profile_id": {"type": "string", "description": "id of the agent profile/persona being run (bounded role, not an open-ended self-rewrite)"},
+    "harness_provider": {"type": "string", "description": "id of the agent-runtime/harness to provision onto (resolves to a runtime; OpenClaw/Hermes-style runtimes are candidates, local_emulator@v1 is the active correctness invariant)"},
+    "input_ref": {"type": ["string", "null"], "description": "ResourceRef-style handle to the task input (preferred over inline); exactly one of input_ref or input is expected"},
+    "input": {"type": ["object", "string", "null"], "description": "inline task input when small + non-sensitive; exactly one of input_ref or input is expected"},
+    "allowed_tools": {"type": "array", "items": {"type": "string"}, "description": "explicit tool allowlist (deny-by-default — a tool not listed here cannot be invoked)"},
+    "allowed_skills": {"type": "array", "items": {"type": "string"}, "description": "explicit skill allowlist (progressive disclosure; agent-created skills enter as candidates, never auto-active)"},
+    "forbidden_tools": {"type": "array", "items": {"type": "string"}, "description": "explicit tool denylist; a tool here is rejected even if it appears in allowed_tools"},
+    "sandbox_policy": {"type": "object", "description": "an AgentSandboxPolicy.v1 by value (required/isolation_level/network_policy/no_host_exec_by_default) — deny-by-default execution boundary"},
+    "secret_policy": {"type": "object", "description": "an AgentSecretPolicy-style object: secret references only (env://<NAME>), NEVER secret values; resolved only at the runtime boundary by an authorized resolver"},
+    "memory_policy": {"type": "object", "description": "an AgentMemoryPolicy.v1 by value (scope/cross_tenant=false/writes_allowed) — cross-tenant memory is forbidden"},
+    "max_steps": {"type": "integer", "minimum": 1, "description": "hard upper bound on agent steps (deny-by-default bound)"},
+    "timeout_ms": {"type": "integer", "minimum": 1, "description": "hard wall-clock budget for the whole run in milliseconds"},
+    "require_receipt": {"type": "boolean", "description": "when true, the run MUST emit an AgentRunReceipt or be treated as unavailable"}
+  }
+}

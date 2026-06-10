@@ -1,0 +1,37 @@
+id: "knowledge-pack/partition-replay-audit-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Partition replay audit patterns"
+description: "Seed patterns for auditing partition registries and replaying index deltas so high-volume object ingestion can prove additive updates are equivalent to rebuilding affected index state."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "evaluation", "governance", "serving"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.indexing"
+tags: ["partition", "index-delta", "replay", "registry", "audit", "ten-million-primitives"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types:
+  - "partition-replay-audit-pattern"
+  - "incremental-index-quality-gate"
+files:
+  - path: "catalog/knowledge-packs/data/partition-replay-audit-patterns/replay-audit-patterns.jsonl"
+    schema: "schemas/normalized-object-record.schema.json"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    fields: ["name", "description", "quality_gate", "failure_modes"]
+provenance:
+  sources:
+    - "Open Harness Hub partitioned index delta architecture"
+    - "Open Harness Hub incremental catalog build architecture"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "Synthetic operational patterns only; no tenant data."

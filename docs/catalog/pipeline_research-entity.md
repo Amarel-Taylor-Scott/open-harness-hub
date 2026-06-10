@@ -29,12 +29,12 @@ cited; PII is redacted before any external call.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `redact_query` | harness | `harness/redact-pii-text` | — |
-| 2 | `plan` | harness | `harness/text-safety-review` | — |
-| 3 | `search` | tool | `tool/web-search` | — |
-| 4 | `verify_sources` | harness | `harness/text-safety-review` | — |
-| 5 | `extract_facts` | harness | `harness/text-safety-review` | — |
-| 6 | `compose` | harness | `harness/text-safety-review` | — |
+| 1 | `redact_query` | harness | `harness/redact-pii-text` | - |
+| 2 | `plan` | harness | `harness/text-safety-review` | - |
+| 3 | `search` | tool | `tool/web-search` | - |
+| 4 | `verify_sources` | harness | `harness/text-safety-review` | - |
+| 5 | `extract_facts` | harness | `harness/text-safety-review` | - |
+| 6 | `compose` | harness | `harness/text-safety-review` | - |
 
 ## Sample runs
 

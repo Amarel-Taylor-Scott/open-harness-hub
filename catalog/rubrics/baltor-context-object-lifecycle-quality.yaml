@@ -1,0 +1,123 @@
+id: "rubric/baltor-context-object-lifecycle-quality"
+type: rubric
+version: "0.1.0"
+name: "Baltor context object lifecycle quality"
+description: "Hierarchical rubric for lifecycle management of source objects, tools, masks, transformers, rubrics, artifacts, dimensions, relationships, and packs."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["software", "data_governance", "ai_governance"]
+capability: ["evaluation", "governance", "verification"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+tags: ["baltor", "context-object-lifecycle", "lineage", "versioning"]
+created: "2026-06-02"
+updated: "2026-06-02"
+dimensions:
+  - id: "1.1"
+    label: "Identity: every object has a stable URI, component ID or native ID, tenant, kind, and source mapping"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Review object IDs, source IDs, tenant isolation, kind/subkind, and source URL or handle."
+  - id: "1.2"
+    label: "Identity: tools, rubrics, masks, transformers, prompts, schemas, and processors can be represented as context objects"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Inspect registry examples and context-object records for each component class."
+  - id: "1.3"
+    label: "Identity: current state is a pointer, not a mutation of immutable versions"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Check current_version_id, immutable content hashes, and version history."
+  - id: "2.1"
+    label: "Versioning: raw snapshots, normalized versions, chunks, claims, summaries, embeddings, and packs are immutable"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Inspect content hashes, derived_from links, storage URIs, and no-overwrite behavior."
+  - id: "2.2"
+    label: "Versioning: schema, mask, transformer, model, prompt, and policy versions are captured when outputs are generated"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Review lineage events and artifact metadata for pipeline/model/prompt/schema/policy versions."
+  - id: "2.3"
+    label: "Versioning: bitemporal windows distinguish source truth, system observation, recording, and indexing"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Check valid_from, valid_to, observed_at, recorded_at, indexed_at, and source_updated_at."
+  - id: "3.1"
+    label: "Relationships: relationship types are registered with semantics, directionality, confidence, evidence, and validity windows"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Inspect relationship registry, edges, evidence handles, confidence values, and temporal filters."
+  - id: "3.2"
+    label: "Relationships: n-ary endpoint relationships model approvals, incidents, transactions, meetings, and policy exceptions"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Review relationship endpoint arrays, roles, event objects, and examples."
+  - id: "3.3"
+    label: "Relationships: high-cardinality relationships are queryable without bloating object documents"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Check edge tables, graph indexes, pagination, traversal limits, and materialized views."
+  - id: "4.1"
+    label: "Dimensions: dimension definitions include namespace, value type, normalized range, aggregation, interpretation, and owner"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Inspect dimension_definitions and examples for risk, authority, freshness, verifiability, and sensitivity."
+  - id: "4.2"
+    label: "Dimensions: dimension values include scope, confidence, evidence, method, assessed time, and validity"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Review dimension_values records and pack-level dimension summaries."
+  - id: "4.3"
+    label: "Dimensions: conflicting assessments can coexist and be reconciled without overwriting history"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Check multiple values by scope/method, human overrides, and conflict resolution lineage."
+  - id: "5.1"
+    label: "Artifacts: derived artifacts are separated from sources and carry authority, freshness, token count, and lineage"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Inspect chunks, claims, summaries, repo wikis, embeddings, and context packs."
+  - id: "5.2"
+    label: "Artifacts: embeddings are treated as sensitive derived data with model/version and privacy controls"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Review embedding registry, local/cloud storage policy, ACLs, and deletion/retention behavior."
+  - id: "5.3"
+    label: "Artifacts: context packs are composed context objects with source relationships and retrieval/compression lineage"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Check pack object record, pack body, source edges, retrieval event, compression event, and feedback links."
+  - id: "6.1"
+    label: "Policy: object lifecycle includes classification, ACL, retention, redaction, local-sync, and model-destination controls"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Inspect security facets, policy decisions, redactions, retention fields, and model routing policy."
+  - id: "6.2"
+    label: "Policy: delete, purge, tombstone, legal hold, and retention expiration are represented explicitly"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Review lifecycle states, tombstones, purge policy, legal-hold examples, and audit events."
+  - id: "7.1"
+    label: "Usage: retrieval, expansion, agent use, feedback, correction, and outcome events link back to the object"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Inspect retrieval_events, feedback_events, context_trace, and outcome dashboards."
+  - id: "7.2"
+    label: "Usage: object utility can be measured by reuse, accepted changes, prevented errors, cost, latency, and user trust"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Review utility dimensions, usage analytics, customer reports, and eval outcomes."
+  - id: "8.1"
+    label: "Evolution: new object kinds, facets, dimensions, relationships, masks, and transformers can be added without fragile migrations"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Check additive schema patterns, extension registries, adapter boundaries, and compatibility tests."
+  - id: "8.2"
+    label: "Evolution: components can be deprecated, superseded, aliased, and migrated with lineage"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Review superseded_by, aliases, migration records, deprecation dates, and downstream compatibility."
+scoring_method: "weighted_sum"

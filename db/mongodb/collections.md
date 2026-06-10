@@ -1,7 +1,7 @@
 # MongoDB collections — Open Harness Hub
 
-The document-store mapping uses one collection per artifact `type`. The
-`_id` of every document is the artifact `id`. The full manifest is the
+The document-store mapping uses one collection per component `type`. The
+`_id` of every document is the component `id`. The full manifest is the
 document body.
 
 | Collection | Document body |

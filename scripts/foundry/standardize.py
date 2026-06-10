@@ -30,8 +30,10 @@ import hashlib
 import json
 import re
 import time
+from pathlib import Path
 from typing import Any
 
+from scripts.db.catalog_row_source import iter_components_from_rows, resolve_catalog_row_dir
 from scripts.foundry.contracts import LEGAL_TARGET_TYPES, BaseStage, Candidate, FoundryContext
 from scripts.foundry.novelty import normalize_source_url
 
@@ -117,6 +119,38 @@ def schema_valid(body: dict) -> tuple[bool, list[str]]:
     errors = sorted(validator.iter_errors(body), key=lambda e: list(e.path))
     msgs = [f"{'/'.join(map(str, e.path)) or '<root>'}: {e.message}" for e in errors[:5]]
     return (not errors), msgs
+
+
+def sample_manifest_for_schema_validation(row_dir: Path | str | None = None) -> tuple[Path | str | None, dict | None, str]:
+    """Return a known-good manifest from database rows, with YAML fallback.
+
+    Foundry standardization should not need operational catalog YAML access just
+    to prove the canonical validator works. Hosted/database-backed smokes pass a
+    row directory; local static checks still fall back to seed/export manifests.
+    """
+    resolved_row_dir = resolve_catalog_row_dir(row_dir)
+    if resolved_row_dir is not None:
+        preferred_types = ("knowledge-pack", "rule-pack", "tool", "persona")
+        components = iter_components_from_rows(resolved_row_dir)
+        for component_type in preferred_types:
+            for component in components:
+                if component.type == component_type:
+                    return component.source_path or component.id, component.manifest, "database_rows"
+        if components:
+            component = components[0]
+            return component.source_path or component.id, component.manifest, "database_rows"
+
+    repo = Path(__file__).resolve().parents[2]
+    for component_type in ("knowledge-pack", "rule-pack", "tool", "persona"):
+        for path in sorted((repo / "catalog").rglob("*.yaml")):
+            try:
+                import yaml
+                value = yaml.safe_load(path.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            if isinstance(value, dict) and value.get("type") == component_type:
+                return path, value, "catalog_yaml_seed_export"
+    return None, None, "missing"
 
 
 # --------------------------------------------------------------------------- #
@@ -219,26 +253,14 @@ def _self_test() -> int:
     ok_unknown, _ = schema_valid({"type": "capability-request"})
     check("no schema for non-component type", not ok_unknown)
 
-    # validate against a REAL committed manifest to prove we reuse the canonical schemas
-    from pathlib import Path
-    repo = Path(__file__).resolve().parents[2]
-    sample = None
-    for t in ("knowledge-pack", "rule-pack", "tool", "persona"):
-        hits = sorted((repo / "catalog").rglob("*.yaml"))
-        for p in hits:
-            try:
-                import yaml
-                d = yaml.safe_load(p.read_text(encoding="utf-8"))
-            except Exception:
-                continue
-            if isinstance(d, dict) and d.get("type") == t:
-                sample = (p, d)
-                break
-        if sample:
-            break
+    # validate against a REAL catalog manifest to prove we reuse the canonical schemas.
+    # Database rows are preferred; YAML is retained as local seed/export fallback.
+    sample_path, sample_body, sample_source = sample_manifest_for_schema_validation()
+    sample = (sample_path, sample_body) if sample_body else None
     if sample:
         ok_real, errs_real = schema_valid(sample[1])
-        check(f"real committed {sample[1]['type']} validates ({sample[0].name})", ok_real, str(errs_real))
+        sample_name = sample[0].name if isinstance(sample[0], Path) else str(sample[0])
+        check(f"real {sample_source} {sample[1]['type']} validates ({sample_name})", ok_real, str(errs_real))
     else:
         print("  [skip] no committed manifest found to validate against")
 

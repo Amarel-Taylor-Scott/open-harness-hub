@@ -1,0 +1,35 @@
+id: "benchmark/contract-obligation-tracking-bench"
+type: benchmark
+version: "0.1.0"
+name: "Contract Obligation Tracking benchmark"
+description: "Synthetic benchmark for contract obligation tracking review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["legal.contract", "procurement.contracting"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["contract-obligation-tracking", "expansion-v5"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/contract-obligation-tracking-review"
+dataset: "dataset/contract-obligation-tracking-samples"
+rubric: "rubric/contract-obligation-tracking-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/contract-obligation-tracking-review"
+    rule_pack_override: ["rule-pack/grep-contract-obligation-tracking-flags", "rule-pack/rag-contract-obligation-tracking-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 23
+report:
+  output: "dist/benchmarks/contract-obligation-tracking/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

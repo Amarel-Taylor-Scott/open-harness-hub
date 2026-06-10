@@ -35,10 +35,10 @@ Train LGB+XGB+CatBoost; ensemble via weighted mean; serve.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `train_lgb` | processor | `processor/iterative-revise-loop` | — |
-| 3 | `train_xgb` | processor | `processor/iterative-revise-loop` | — |
-| 4 | `train_catboost` | processor | `processor/iterative-revise-loop` | — |
-| 5 | `ensemble` | processor | `processor/multi-vector-fusion` | — |
-| 6 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `train_lgb` | processor | `processor/iterative-revise-loop` | - |
+| 3 | `train_xgb` | processor | `processor/iterative-revise-loop` | - |
+| 4 | `train_catboost` | processor | `processor/iterative-revise-loop` | - |
+| 5 | `ensemble` | processor | `processor/multi-vector-fusion` | - |
+| 6 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

@@ -1,0 +1,55 @@
+id: "tool/component-pipeline-template-expander"
+type: tool
+version: "0.1.0"
+name: "Component pipeline template expander"
+description: "Expands a plain-language task into a reusable pre-LLM, LLM, post-LLM, and control-flow component pipeline template."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["planning", "routing", "serving", "verification"]
+modality: ["structured", "text", "image", "audio", "video"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.orchestration"
+tags: ["components", "pipeline-template", "pre-llm", "llm", "post-llm", "control-flow"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    task:
+      type: string
+    cost_profile:
+      type: string
+      enum: ["cheap", "balanced", "quality", "local_first"]
+    output_path:
+      type: string
+  required: ["task"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    template_id:
+      type: string
+    task_family:
+      type: string
+    steps:
+      type: array
+side_effects: "write"
+examples:
+  - input:
+      task: "Build a cheap pipeline to flag social media content related to worker exploitation from a photo and description."
+      cost_profile: "cheap"
+    output:
+      ok: true
+      task_family: "content_moderation"
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.component_pipeline_template_expander.expand_component_pipeline_template"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.factory.component_pipeline_template_expander"

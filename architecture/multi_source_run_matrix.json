@@ -1,0 +1,98 @@
+{
+  "version": "1.0",
+  "note": "Per-source-TYPE run matrix for scripts/runtime/source_consumption.run_source_to_consumption. Each consumable row must reach a schema-valid served ContextResponse through normalize→verify→optimize→consumption-readiness→serve; each CANDIDATE row (parser unavailable) and the unknown row must return consumable:false with a non_consumable_reason and is NEVER served as fact. The regression proof (scripts/check_multi_source_regression.py) runs every row through the orchestrator and asserts it matches expected_consumption_status. Owner: scripts/runtime/source_consumption.py.",
+  "rows": [
+    {
+      "row_id": "cfpb_structured_json",
+      "source_type": "api",
+      "description": "Structured official CFPB-style complaint record (the original reference domain, now generic).",
+      "tenant_id": "demo",
+      "source_id": "cfpb-api",
+      "scope": "global_public",
+      "authority": "official",
+      "payload": [
+        {"complaint_id": "C1", "product": "Credit card", "deadline_days": 10, "consumer_complaint_narrative": "Charged twice for one purchase. No refund yet."}
+      ],
+      "consumable": true,
+      "expected_consumption_status": "served",
+      "expected_non_consumable_reason": "",
+      "expect_min_served_facts": 1,
+      "expect_allegations_held_out": true
+    },
+    {
+      "row_id": "generic_json",
+      "source_type": "json",
+      "description": "Arbitrary structured JSON object — proves the path is domain-agnostic, not CFPB-specific.",
+      "tenant_id": "demo",
+      "source_id": "gen-json-1",
+      "scope": "global_public",
+      "authority": "official",
+      "payload": {"deadline_days": 10, "product": "Credit card", "narrative": "They charged twice. No refund."},
+      "consumable": true,
+      "expected_consumption_status": "served",
+      "expected_non_consumable_reason": "",
+      "expect_min_served_facts": 1,
+      "expect_allegations_held_out": true
+    },
+    {
+      "row_id": "csv_table",
+      "source_type": "csv",
+      "description": "Tenant-private CSV export — structured columns become facts; the free-text note is held out; handles stay tenant-scoped (no global leak).",
+      "tenant_id": "acme",
+      "source_id": "export-1",
+      "scope": "tenant_private",
+      "authority": "customer_private",
+      "payload": "id,amount,note\n1,35,Unfair fee charged. No refund yet.\n",
+      "consumable": true,
+      "expected_consumption_status": "served",
+      "expected_non_consumable_reason": "",
+      "expect_min_served_facts": 1,
+      "expect_allegations_held_out": true
+    },
+    {
+      "row_id": "webhook_json",
+      "source_type": "webhook",
+      "description": "Inbound webhook JSON (alias of the json adapter) — structured event fields become tenant-scoped facts.",
+      "tenant_id": "acme",
+      "source_id": "wh-1",
+      "scope": "tenant_private",
+      "authority": "customer_private",
+      "payload": {"event": "complaint.created", "deadline_days": 10, "amount": 35},
+      "consumable": true,
+      "expected_consumption_status": "served",
+      "expected_non_consumable_reason": "",
+      "expect_min_served_facts": 1,
+      "expect_allegations_held_out": false
+    },
+    {
+      "row_id": "html_page",
+      "source_type": "html",
+      "description": "CANDIDATE source: HTML parser is a cataloged candidate (no local extractor). Raw stored; NON-consumable; no claim served.",
+      "tenant_id": "demo",
+      "source_id": "page-1",
+      "scope": "global_public",
+      "authority": "unknown",
+      "payload": "<html><body><h1>Reg E</h1><p>10 business days</p></body></html>",
+      "consumable": false,
+      "expected_consumption_status": "non_consumable",
+      "expected_non_consumable_reason": "parser_unavailable",
+      "expect_min_served_facts": 0,
+      "expect_allegations_held_out": false
+    },
+    {
+      "row_id": "pdf_document",
+      "source_type": "pdf",
+      "description": "CANDIDATE source: PDF parser (Docling) is a cataloged candidate (no local extractor). Raw stored; NON-consumable; never a faked parse.",
+      "tenant_id": "demo",
+      "source_id": "reg.pdf",
+      "scope": "global_public",
+      "authority": "official",
+      "payload": "%PDF-1.4 fake bytes representing a regulatory PDF",
+      "consumable": false,
+      "expected_consumption_status": "non_consumable",
+      "expected_non_consumable_reason": "parser_unavailable",
+      "expect_min_served_facts": 0,
+      "expect_allegations_held_out": false
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "version": "1.0",
+  "classes": [
+    {
+      "class_id": "tiny_cpu",
+      "cpu_request": "100m",
+      "memory_request": "128Mi",
+      "gpu_required": false,
+      "concurrency_default": 8,
+      "timeout_default_s": 30,
+      "max_replicas_local": 2,
+      "max_replicas_k8s": 20,
+      "autoscale_signal": "queue_depth",
+      "notes": "cheap micro-workers"
+    },
+    {
+      "class_id": "standard_cpu",
+      "cpu_request": "500m",
+      "memory_request": "512Mi",
+      "gpu_required": false,
+      "concurrency_default": 4,
+      "timeout_default_s": 120,
+      "max_replicas_local": 2,
+      "max_replicas_k8s": 40,
+      "autoscale_signal": "queue_depth_oldest_age",
+      "notes": "default"
+    },
+    {
+      "class_id": "high_cpu",
+      "cpu_request": "2",
+      "memory_request": "2Gi",
+      "gpu_required": false,
+      "concurrency_default": 2,
+      "timeout_default_s": 300,
+      "max_replicas_local": 1,
+      "max_replicas_k8s": 20,
+      "autoscale_signal": "queue_depth_oldest_age",
+      "notes": "parsing/large batch"
+    },
+    {
+      "class_id": "high_memory",
+      "cpu_request": "1",
+      "memory_request": "8Gi",
+      "gpu_required": false,
+      "concurrency_default": 1,
+      "timeout_default_s": 300,
+      "max_replicas_local": 1,
+      "max_replicas_k8s": 10,
+      "autoscale_signal": "oldest_message_age",
+      "notes": "large docs/graph builds"
+    },
+    {
+      "class_id": "browser_cpu",
+      "cpu_request": "1",
+      "memory_request": "2Gi",
+      "gpu_required": false,
+      "concurrency_default": 2,
+      "timeout_default_s": 180,
+      "max_replicas_local": 1,
+      "max_replicas_k8s": 15,
+      "autoscale_signal": "queue_depth",
+      "notes": "sandboxed browser context; per-domain rate limits"
+    },
+    {
+      "class_id": "io_bound",
+      "cpu_request": "250m",
+      "memory_request": "256Mi",
+      "gpu_required": false,
+      "concurrency_default": 16,
+      "timeout_default_s": 60,
+      "max_replicas_local": 3,
+      "max_replicas_k8s": 60,
+      "autoscale_signal": "queue_depth",
+      "notes": "network/IO-bound; high concurrency"
+    },
+    {
+      "class_id": "gpu_small",
+      "cpu_request": "1",
+      "memory_request": "4Gi",
+      "gpu_required": true,
+      "concurrency_default": 1,
+      "timeout_default_s": 300,
+      "max_replicas_local": 0,
+      "max_replicas_k8s": 8,
+      "autoscale_signal": "gpu_util_and_queue",
+      "notes": "gpu_l4/a10"
+    },
+    {
+      "class_id": "gpu_medium",
+      "cpu_request": "2",
+      "memory_request": "8Gi",
+      "gpu_required": true,
+      "concurrency_default": 1,
+      "timeout_default_s": 600,
+      "max_replicas_local": 0,
+      "max_replicas_k8s": 6,
+      "autoscale_signal": "gpu_util_and_queue",
+      "notes": "gpu_a10/l4 batch"
+    },
+    {
+      "class_id": "gpu_large",
+      "cpu_request": "4",
+      "memory_request": "16Gi",
+      "gpu_required": true,
+      "concurrency_default": 1,
+      "timeout_default_s": 1200,
+      "max_replicas_local": 0,
+      "max_replicas_k8s": 4,
+      "autoscale_signal": "gpu_util_and_queue",
+      "notes": "gpu_h100 large inference"
+    },
+    {
+      "class_id": "sandboxed_agent",
+      "cpu_request": "1",
+      "memory_request": "2Gi",
+      "gpu_required": false,
+      "concurrency_default": 1,
+      "timeout_default_s": 1800,
+      "max_replicas_local": 1,
+      "max_replicas_k8s": 8,
+      "autoscale_signal": "queue_depth",
+      "notes": "network allowlist; sandboxed fs; review required; long timeout; low concurrency"
+    },
+    {
+      "class_id": "human_review",
+      "cpu_request": "100m",
+      "memory_request": "128Mi",
+      "gpu_required": false,
+      "concurrency_default": 1,
+      "timeout_default_s": 86400,
+      "max_replicas_local": 1,
+      "max_replicas_k8s": 4,
+      "autoscale_signal": "manual",
+      "notes": "human-in-the-loop; long timeout"
+    },
+    {
+      "class_id": "control_plane",
+      "cpu_request": "100m",
+      "memory_request": "128Mi",
+      "gpu_required": false,
+      "concurrency_default": 1,
+      "timeout_default_s": 60,
+      "max_replicas_local": 1,
+      "max_replicas_k8s": 1,
+      "autoscale_signal": "singleton",
+      "notes": "leader-elected/singleton"
+    }
+  ]
+}

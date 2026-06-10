@@ -1,0 +1,73 @@
+id: "tool/cloud-runtime-pricing-lookup"
+type: tool
+version: "0.1.0"
+name: "Active cloud runtime pricing lookup"
+description: "Fetches or normalizes current cloud/runtime pricing for compute, storage, queues, vector indexes, network egress, observability, and managed inference endpoints."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "cross_industry"]
+capability: ["tool_use", "evaluation"]
+modality: ["structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "volatile"
+tags: ["pricing", "cloud", "terraform", "runtime", "saas"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    cloud:
+      type: string
+      description: "Cloud provider or local runtime family."
+    region:
+      type: string
+    resources:
+      type: array
+      items:
+        type: object
+    usage_shape:
+      type: object
+  required: ["cloud", "resources"]
+returns:
+  type: object
+  properties:
+    snapshot_id:
+      type: string
+    collected_at:
+      type: string
+    line_items:
+      type: array
+      items:
+        type: object
+    monthly_estimate:
+      type: object
+    assumptions:
+      type: array
+      items:
+        type: string
+side_effects: "external_call"
+examples:
+  - input:
+      cloud: "aws"
+      region: "us-east-1"
+      resources:
+        - kind: "queue"
+          count: 1
+        - kind: "object_storage"
+          gb: 10
+    output:
+      snapshot_id: "runtime-pricing-example"
+      collected_at: "2026-05-25T00:00:00Z"
+      line_items: []
+      monthly_estimate:
+        currency: "USD"
+        amount: null
+      assumptions: ["Example shape only; live lookup required before production use."]
+implementations:
+  - kind: "callable"
+    path: "tools.cloud_runtime_pricing_lookup.run"
+  - kind: "mcp"
+    path: "mcp/pricing.lookup_cloud_runtime"

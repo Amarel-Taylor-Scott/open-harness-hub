@@ -1,0 +1,17 @@
+{
+  "$id": "experiments/PathDefinition.v1", "title": "PathDefinition.v1", "type": "object", "additionalProperties": false,
+  "description": "One executable PATH for a capability_slot in the parallel-path experiment engine. A path is a named way to satisfy a capability (e.g. 'reconciliation.answer') with a fixed input_contract -> output_contract. mode declares its standing: 'baseline' is the currently-served truth path; 'candidate'/'shadow'/'canary' are challengers run on the SAME input as the baseline but NEVER served as truth; 'fallback' is the safe path; 'deprecated' is retired. A candidate carries promotion_criteria (the gates it must pass) and a rollback_target (the path the engine reverts to) so a promotion is always reversible — a candidate without a rollback_target is not promotable. The path itself names contracts only; the actual run is performed by a caller-supplied runner so the engine stays pure/deterministic with all inputs injected.",
+  "required": ["schema_version", "path_id", "capability_slot", "input_contract", "output_contract", "mode", "promotion_criteria", "rollback_target", "defined_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["PathDefinition.v1"]},
+    "path_id": {"type": "string", "description": "stable id of this path (e.g. content/version hash suffix; never truncation-only)"},
+    "capability_slot": {"type": "string", "description": "the capability this path satisfies (paths competing for promotion share a capability_slot)"},
+    "input_contract": {"type": "string", "description": "the schema ref the path consumes (e.g. 'consumption/ConsumptionRequest.v1'); challengers MUST share the baseline's input_contract"},
+    "output_contract": {"type": "string", "description": "the schema ref the path produces (e.g. 'consumption/ContextResponse.v1'); a candidate must match the baseline's output_contract to be promotable"},
+    "mode": {"type": "string", "enum": ["baseline", "candidate", "shadow", "canary", "fallback", "deprecated"], "description": "the path's standing; only 'baseline' (and an executed 'fallback') ever serves truth"},
+    "promotion_criteria": {"type": "string", "description": "id/ref of the PathPromotionDecision criteria this candidate must satisfy (cost ceiling, equivalence, handle-coverage, held-out, safety)"},
+    "rollback_target": {"type": "string", "description": "REQUIRED — the path_id the engine reverts to if this path is promoted then fails; without it the path is not lossless/promotable"},
+    "description": {"type": "string", "description": "human note on what this path does and why it challenges the baseline"},
+    "defined_at": {"type": "string", "description": "injected time the path was defined (deterministic, no wall-clock)"}
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "pipeline_id": "unstructured_doc_tree",
+  "pipeline_version": "v1",
+  "status": "active",
+  "description": "Unstructured document -> recursive ContextObject tree (pages/paragraphs/tables/figures/OCR spans) with ctx:// fragment handles. Runs END-TO-END offline behind a CannedParser; real Docling/PyMuPDF/Unstructured slot behind parser.document_tree's ParserProvider seam (unstructured_pdf_docling@v0 stays the experimental real-dep variant).",
+  "input_schema": "RawDocument.v1",
+  "output_schema": "DocumentTree.v1",
+  "partition_key": "tenant_id",
+  "idempotency_key_template": "{tenant_id}:{source_id}:{document_version}:{pipeline_id}:{pipeline_version}",
+  "isolation": "shared",
+  "steps": [
+    {"step_id": "source", "processor": "source.canned_document@v1", "queue": "pipeline.doc.source",
+     "outputs": ["RawDocument.v1"]},
+    {"step_id": "parse", "processor": "parser.document_tree@v1", "queue": "pipeline.doc.parse",
+     "inputs": ["RawDocument.v1"], "outputs": ["DocumentTree.v1"], "depends_on": ["source"]}
+  ],
+  "gates": ["document_tree_has_addressable_leaves"]
+}

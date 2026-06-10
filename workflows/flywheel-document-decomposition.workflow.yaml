@@ -1,0 +1,62 @@
+kind: baltor.flywheel-workflow.v1
+name: Document Decomposition Flywheel
+flywheel_id: flywheel.document-decomposition
+stage: Source Systems
+purpose: Turn a raw document (e.g. a 1,000-page PDF) into a recursive tree of addressable, typed context objects before reconciliation. Implemented offline by scripts/ingest/document_decompose.py; the heavy byte-parse is the ParserProvider seam.
+triggers:
+  - document_uploaded
+  - parser_version_changed
+  - source_hash_changed
+  - low_confidence_parse
+  - reparse_requested
+inputs:
+  - raw_file
+  - source_snapshot
+  - parser_policy
+steps:
+  - source snapshot + content hash
+  - file inspection + safety scan
+  - page split
+  - layout region detection
+  - text / table / figure / diagram / OCR extraction
+  - source-handle assignment (ctx://.../#page=..&block=..)
+  - normalize into the recursive ContextObject tree
+  - parser quality scoring
+  - emit reconciliation-ready objects
+queue_messages:
+  - page_parse
+  - table_extract
+  - figure_extract
+  - ocr_retry
+  - document_parse_merge
+outputs:
+  - DocumentObject
+  - PageObject
+  - TableObject
+  - FigureObject
+  - OCRSpan
+  - SourceHandle
+  - ParserQualityScore
+  - RotSignal
+receipts_emitted:
+  - ParserRunReceipt
+metrics:
+  - parser_confidence
+  - ocr_confidence
+  - source_handle_validity
+  - decomposition_completeness
+failure_modes:
+  - parser dependency unavailable (ParserProvider seam)
+  - low OCR confidence
+  - table extraction conflict
+fallback_strategy: route low-confidence nodes to steward review; retry with the fallback parser (Unstructured)
+human_review_triggers:
+  - ocr_confidence_low
+  - table_extraction_conflict
+suggested_runtime: worker-plane Jobs, per-page fan-out (KEDA/Argo)
+candidate_backend_tools:
+  - Docling
+  - Unstructured
+  - LiteParse
+harness_refs:
+  - fixtures/harness/document-decomposition.harness.json

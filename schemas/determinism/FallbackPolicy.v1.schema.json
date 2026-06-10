@@ -1,0 +1,28 @@
+{
+  "$id": "determinism/FallbackPolicy.v1", "title": "FallbackPolicy.v1", "type": "object", "additionalProperties": false,
+  "description": "The named deterministic-first-then-fallback policy a rule references. It encodes the M7 contract: the deterministic rule runs FIRST on its scope; on a trigger (low confidence / unknown / out-of-distribution / abstain / schema mismatch) control falls back to the single LLMGateway, a human reviewer, the existing deterministic authority, or a hold-out — and the fallback is RECORDED (fallback_recorded pinned true) so those cases feed future mining. Every active rule MUST reference a fallback policy; a 'never_fallback' target is forbidden by the enum. Deterministic when created_at is injected.",
+  "required": ["schema_version", "policy_id", "tenant_id", "scope", "default_fallback_target", "triggers", "fallback_recorded", "feeds_future_mining", "created_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["FallbackPolicy.v1"]},
+    "policy_id": {"type": "string", "description": "content-addressed id; deterministic"},
+    "tenant_id": {"type": "string"},
+    "scope": {"type": "string", "description": "where this policy applies"},
+    "default_fallback_target": {"type": "string", "enum": ["llm_gateway", "human_review", "hold_out", "deterministic_authority"], "description": "where uncertain cases go; 'never_fallback' is NOT an allowed value — every rule must have a real fallback"},
+    "triggers": {
+      "type": "array",
+      "description": "the conditions that activate the fallback; at least one required",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["trigger", "fallback_target"],
+        "properties": {
+          "trigger": {"type": "string", "enum": ["low_confidence", "unknown_inputs", "out_of_distribution", "rule_abstains", "schema_mismatch"]},
+          "fallback_target": {"type": "string", "enum": ["llm_gateway", "human_review", "hold_out", "deterministic_authority"]}
+        }
+      }
+    },
+    "confidence_threshold": {"type": "number", "description": "below this rule confidence the low_confidence trigger fires; optional"},
+    "fallback_recorded": {"type": "boolean", "enum": [true], "description": "structurally pinned true: every fallback is recorded as a trace"},
+    "feeds_future_mining": {"type": "boolean", "enum": [true], "description": "structurally pinned true: recorded fallback cases become future mining input"},
+    "created_at": {"type": "string", "description": "injected time; deterministic when injected"}
+  }
+}

@@ -1,0 +1,74 @@
+id: "tool/verification-packet-jsonl-exporter"
+type: tool
+version: "0.1.0"
+name: "Verification packet JSONL exporter"
+description: "Exports expert-review, grounded-search, and multi-model verification packets into canonical source_record, normalized_object, canonical_entity, object_entity_ref, dedupe_cluster, review_ticket, and index_record JSONL row families."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "government", "humanitarian", "legal", "healthcare", "cross_industry"]
+capability: ["verification", "format_conversion", "retrieval", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+tags: ["verification-packet", "expert-review", "grounded-search", "jsonl", "postgres", "pgvector"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    verification_packet:
+      type: object
+    inbound_digest:
+      type: object
+      description: "Optional output from the inbound email review digester."
+    output_dir:
+      type: string
+      description: "Directory where split JSONL row-family shards should be written."
+    include_raw_messages:
+      type: boolean
+      description: "When false, raw email/search material and personal reviewer identifiers are omitted."
+  required: ["verification_packet"]
+returns:
+  type: object
+  properties:
+    output_dir:
+      type: string
+    row_counts:
+      type: object
+    files:
+      type: array
+      items:
+        type: string
+    row_family_paths:
+      type: object
+      description: "Map of canonical row family name to emitted JSONL path."
+    warnings:
+      type: array
+      items:
+        type: string
+side_effects: "write"
+examples:
+  - input:
+      verification_packet:
+        knowledge_object_id: "knowledge-object/example"
+        claim: "Example fact needs verification."
+        risk_tier: "high"
+        decision: "hold_for_review"
+      include_raw_messages: false
+    output:
+      output_dir: "dist/verification-records/example"
+      row_counts:
+        source_record: 1
+      files: ["source-records.jsonl"]
+      row_family_paths:
+        source_record: "dist/verification-records/example/source-records.jsonl"
+      warnings: ["Raw messages and personal reviewer identifiers were not exported."]
+implementations:
+  - kind: "callable"
+    path: "scripts.verification.verification_packet_to_factory_jsonl.export_verification_packet"
+    language: "python"
+  - kind: "mcp"
+    path: "mcp/verification.export_packet_jsonl"

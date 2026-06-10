@@ -1,0 +1,71 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/verbraucherzentrale-fake-inkasso-indicators",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Verbraucherzentrale Fake-Inkasso indicators (10-criterion taxonomy)",
+  "description": "Composite educational reference of the Verbraucherzentrale's\npublished Fake-Inkasso indicators. Used by Sviatoslav Grabovsky's\nBill_info AI to classify German payment demands as legitimate /\nsuspicious / likely-scam.\n\nSource authority: Verbraucherzentrale Brandenburg Schwarzliste\nInkasso (~191,000 page views in a single year; 400 reported\nfake-Inkasso letters in 2022) + sibling Verbraucherzentrale\npublications.\n\nCriterion tiers:\n- **CRITICAL** (any one alone may justify likely_scam):\n   (1) foreign IBAN (non-DE/AT/CH)\n   (2) private-person recipient (vs. registered company)\n   (3) legal threats (Schufa, Gerichtsvollzieher) in a FIRST letter\n   (4) extreme 24-72 hour deadline\n- **SUPPORTING** (multiple → suspicious / likely_scam):\n   (5) missing regulatory information\n   (6) unclear / unnamed creditor\n   (7) dubious / surprising fees\n   (8) phantom company names\n   (9) premium phone numbers\n   (10) pressure tactics (\"letzte Mahnung\" in a first letter)\n\nThree-level classification:\n- **legitimate**: no UI change (no false alarms on real Inkasso)\n- **suspicious**: yellow advisory + verification step prepended\n  to recommendations\n- **likely_scam**: red banner + recommendations completely\n  overridden to \"do not pay, verify via Verbraucherzentrale,\n  save as evidence\"",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC-BY-4.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/verbraucherzentrale-fake-inkasso-indicators",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors (port of Bill_info AI)"
+    }
+  ],
+  "datePublished": "2026-05-21",
+  "keywords": [
+    "verbraucherzentrale",
+    "inkasso",
+    "fake-inkasso",
+    "fraud-detection",
+    "germany",
+    "kaggle-hackathon-verified"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-21",
+  "citation": "Verbraucherzentrale Brandenburg Schwarzliste Inkasso (composite educational extracts); Sviatoslav Grabovsky's Bill_info AI implementation (huggingface.co/spaces/Svityk/bill-info-ai); Verbraucherzentrale Fake-Inkasso publications (composite)"
+}

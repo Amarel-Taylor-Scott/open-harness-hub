@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Seed the Context-Enrichment-as-a-Service (CEaaS) governed components
+"""Seed the Context-Enrichment-as-a-Service (Baltor) governed components
 (docs/strategy/context-enrichment-service.md): the content TIERS, the four CONSUMPTION SURFACES
 agents actually ingest through, and the measured-FIDELITY check that is the moat.
 
-CEaaS refines content into raw -> compressed -> hyper-efficient tiers, hosts/serves them, and feeds
+Baltor refines content into raw -> compressed -> hyper-efficient tiers, hosts/serves them, and feeds
 governed corpora + tools into open agent loops (Claude Code / MCP). These are GOVERNED wrappers over
 the proven DIY tooling (Repomix structural compression, LLMLingua-2 learned compression, Mem0/Hindsight
 distillation, MCP/llms.txt surfaces) — the hosted, measured, freshness-tracked version nobody ships yet.
 
-    python3 -m scripts.seed.ceaas_components
+    python3 -m scripts.seed.baltor_components
     python3 scripts/validate.py catalog/processors/compression/*.yaml catalog/processors/deliver/*.yaml catalog/processors/verify/*.yaml
 """
 from __future__ import annotations
@@ -16,7 +16,7 @@ from __future__ import annotations
 from scripts.seed.component_seed import processor, write_batch
 
 DOC = "docs/strategy/context-enrichment-service.md"
-LABEL = "Open Harness Hub — Context Enrichment as a Service (CEaaS)"
+LABEL = "Open Harness Hub — Baltor"
 
 # COMPRESSION TIER — structural flavor (the learned flavor is retrieval/llmlingua-compress).
 COMPRESSION = [
@@ -61,10 +61,10 @@ def main() -> int:
     def mk(specs, tags, prefix):
         return [processor(*c, tags=tags, source_doc=DOC, source_label=LABEL, impl_prefix=prefix) for c in specs]
     n = 0
-    n += len(write_batch("catalog/processors/compression", mk(COMPRESSION, ("ceaas", "compression", "tier"), "scripts.processors.compression")))
-    n += len(write_batch("catalog/processors/deliver", mk(DELIVER, ("ceaas", "consumption-surface"), "scripts.processors.deliver")))
-    n += len(write_batch("catalog/processors/verify", mk(VERIFY, ("ceaas", "fidelity", "governance"), "scripts.processors.verify")))
-    print(f"wrote {n} CEaaS components (compression tier + 4 consumption surfaces + fidelity check)")
+    n += len(write_batch("catalog/processors/compression", mk(COMPRESSION, ("baltor", "compression", "tier"), "scripts.processors.compression")))
+    n += len(write_batch("catalog/processors/deliver", mk(DELIVER, ("baltor", "consumption-surface"), "scripts.processors.deliver")))
+    n += len(write_batch("catalog/processors/verify", mk(VERIFY, ("baltor", "fidelity", "governance"), "scripts.processors.verify")))
+    print(f"wrote {n} Baltor components (compression tier + 4 consumption surfaces + fidelity check)")
     return 0
 
 

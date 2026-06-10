@@ -1,6 +1,6 @@
 """Open Harness Hub — product service (request tier). Serves web/harness-hub/ + the OHH API.
 
-Same shared backend as Context Enrichment; this door differs only by OH_PRODUCT (front-end folder +
+Same shared backend as Baltor; this door differs only by OH_PRODUCT (front-end folder +
 brand). Thin by design: pin the product, wire telemetry, hand off to the shared server.
 
     python -m services.products.harness_hub.entrypoint --port 8000

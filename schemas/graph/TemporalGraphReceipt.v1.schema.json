@@ -1,0 +1,44 @@
+{
+  "$id": "graph/TemporalGraphReceipt.v1",
+  "title": "TemporalGraphReceipt",
+  "description": "Receipt for a temporal-graph build/reconcile/project op.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "receipt_id": {
+      "type": "string"
+    },
+    "op": {
+      "type": "string"
+    },
+    "tenant_id": {
+      "type": "string"
+    },
+    "node_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "edge_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "policy_id": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "content_hash": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "receipt_id",
+    "op",
+    "created_at"
+  ]
+}

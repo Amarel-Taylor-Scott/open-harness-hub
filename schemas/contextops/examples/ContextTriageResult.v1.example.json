@@ -1,0 +1,59 @@
+{
+  "valid": {
+    "schema_version": "ContextTriageResult.v1",
+    "triage_id": "triage-cfpb-faq30-1a2b3c4d",
+    "tenant_id": "acme",
+    "source_scope": "global_public",
+    "fact_key": "cfpb.error_resolution.investigation_deadline",
+    "claim_text": "The bank has 30 days to investigate a disputed transaction.",
+    "source_handle": "ctx://public/source/cfpb-faq/error-resolution#q12",
+    "lane": "needs_reconciliation",
+    "needs_action": true,
+    "rationale": "agency FAQ ('30 days') conflicts with the source-of-law value; lower authority than Reg E — route to reconciliation",
+    "authority_rank": 20,
+    "fragility_signal": "deadline",
+    "recommended_command": "contextops.research",
+    "serves_truth": false,
+    "triaged_at": "2026-06-05T00:00:00Z"
+  },
+  "valid_no_action": {
+    "schema_version": "ContextTriageResult.v1",
+    "triage_id": "triage-rege-10day-5e6f7a8b",
+    "tenant_id": "acme",
+    "source_scope": "global_public",
+    "fact_key": "cfpb.error_resolution.investigation_deadline",
+    "claim_text": "A financial institution shall complete its investigation within 10 business days.",
+    "source_handle": "ctx://public/source/ecfr/12-CFR-1005.11#para.c.1.i",
+    "lane": "is_high_value_reusable_fact",
+    "needs_action": false,
+    "rationale": "source-of-law value, high authority, already verified — no action; keep as the reusable canonical input",
+    "authority_rank": 90,
+    "recommended_command": "none",
+    "serves_truth": false,
+    "triaged_at": "2026-06-05T00:00:00Z"
+  },
+  "invalid_bad_lane": {
+    "schema_version": "ContextTriageResult.v1",
+    "triage_id": "triage-bad-1",
+    "tenant_id": "acme",
+    "source_scope": "global_public",
+    "fact_key": "cfpb.error_resolution.investigation_deadline",
+    "lane": "looks_fine",
+    "needs_action": true,
+    "rationale": "x",
+    "serves_truth": false,
+    "triaged_at": "2026-06-05T00:00:00Z"
+  },
+  "invalid_serves_truth": {
+    "schema_version": "ContextTriageResult.v1",
+    "triage_id": "triage-bad-2",
+    "tenant_id": "acme",
+    "source_scope": "global_public",
+    "fact_key": "cfpb.error_resolution.investigation_deadline",
+    "lane": "needs_verification",
+    "needs_action": true,
+    "rationale": "x",
+    "serves_truth": true,
+    "triaged_at": "2026-06-05T00:00:00Z"
+  }
+}

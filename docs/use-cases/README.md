@@ -12,13 +12,13 @@ Two products ride one shared backend ([[../strategy/two-services-shared-infrastr
 
 - **Open Harness Hub (OHH)** — assemble and monitor a *bounded* governed
   pipeline, with rules around input and output. Sells governed **pipelines**.
-- **Context Enrichment / CEaaS** — refine content into token-efficiency tiers
+- **Baltor / Baltor** — refine content into token-efficiency tiers
   (raw → compressed → hyper-efficient) and serve governed corpora + tools into
   whatever *open-ended* agent you already run. Sells governed **fuel**.
   ([[../strategy/context-enrichment-service.md]].)
 
 A Knowledge Corpus or Action is minted **once**, with one provenance trail and
-one lift/fidelity score, then wired into an OHH pipeline **or** served by CEaaS.
+one lift/fidelity score, then wired into an OHH pipeline **or** served by Baltor.
 Same object, two consumption models — that is the "join."
 
 ## The admission bar these use cases share
@@ -42,7 +42,7 @@ Two honesty rules govern every claim below:
   self-graded ([[../design/value-propositions.md]],
   [[../concepts/context-layer-and-the-desk.md]]). A single *component* shows
   "where it fits," not a number.
-- **CEaaS's analogue is fidelity-per-tier** — every refined tier ships a
+- **Baltor's analogue is fidelity-per-tier** — every refined tier ships a
   published quality delta (raw → compressed → hyper-efficient) from a separate
   evaluator. Same measurement engine as OHH's lift gate, extended from "does the
   pipeline lift?" to "did the tier preserve enough?" ([[../strategy/context-enrichment-service.md]].)
@@ -60,11 +60,11 @@ not a fabricated value.
 | 2 | EUDR / deep-tier supply-chain due diligence | OHH | Volatile multi-jurisdiction law + non-English red-flags below the fluent surface | `unaddressable_source`, `sparse_data` |
 | 3 | Clinical differential support | OHH | Needs an accountable licensed signer; coded vocabulary (ICD-10) | `accountability_license`, `coded_vocabulary` |
 | 4 | Refugee-bureaucracy translation | OHH | Forms/circulars in closed channels; controlled output the model paraphrases away | `closed_channel_access`, `anti_fluency` |
-| 5 | Governed code-context served into Claude Code | CEaaS | Raw repo blows the window; un-governed compression destroys reasoning | fidelity-per-tier (enrichment wedge) |
-| 6 | Live-fresh regulatory corpus served to any agent | CEaaS | A static download can't stay current; freshness is the recurring obligation | freshness / CDC (management surround) |
+| 5 | Governed code-context served into Claude Code | Baltor | Raw repo blows the window; un-governed compression destroys reasoning | fidelity-per-tier (enrichment wedge) |
+| 6 | Live-fresh regulatory corpus served to any agent | Baltor | A static download can't stay current; freshness is the recurring obligation | freshness / CDC (management surround) |
 
-Entries 1–4 are OHH (bounded pipelines); 5–6 are CEaaS (governed fuel into open
-agents). The detail recipes for the OHH cases live next to this file; the CEaaS
+Entries 1–4 are OHH (bounded pipelines); 5–6 are Baltor (governed fuel into open
+agents). The detail recipes for the OHH cases live next to this file; the Baltor
 cases are specified against [[../strategy/context-enrichment-service.md]] (status
 below).
 
@@ -200,7 +200,7 @@ the corpus — measured paired on a held-out set of real (synthetic-PII-only)
 forms. The lift is structural: it comes from grounding + the abstain gate, not
 from a bigger model.
 
-### 5 · Governed code-context served into Claude Code (CEaaS)
+### 5 · Governed code-context served into Claude Code (Baltor)
 
 **The task.** Drop token-dense, *governed* context for a specific codebase
 straight into an open agent loop — Claude Code, Cursor, any MCP client — so the
@@ -214,7 +214,7 @@ too aggressively and you destroy the model's ability to reason**
 ([[../strategy/context-enrichment-service.md]]). There is no provenance, no
 freshness, and no proof the compressed tier preserved enough.
 
-**The served corpus (CEaaS).** CEaaS hosts the codebase as three tiers built on
+**The served corpus (Baltor).** Baltor hosts the codebase as three tiers built on
 the *same* shared compression/memory/cache components OHH uses:
 **raw** (object store + source registry), **compressed-structural** (strip
 function bodies, keep signatures — the Tree-sitter technique Repomix proves at
@@ -230,18 +230,18 @@ quality delta** from `verify.compression_fidelity`, scored by a *separate*
 evaluator ("did this tier preserve enough to answer correctly?") — never
 self-graded. The ~70% structural figure above is the **mechanism's** documented
 reduction (Repomix/Tree-sitter), *not* a fidelity guarantee; the guarantee is the
-measured delta CEaaS publishes per tier. The recurring-revenue obligation is
+measured delta Baltor publishes per tier. The recurring-revenue obligation is
 keeping a live corpus fresh — a static download can't.
 
 **Status (honest).** Spec-level. The tier / surface / fidelity **components are
-seeded as governed definitions** (`scripts/seed/ceaas_components.py`, lifecycle
-experimental); the `context-enrichment` web surface is live, but the
+seeded as governed definitions** (`scripts/seed/baltor_components.py`, lifecycle
+experimental); the `baltor` web surface is live, but the
 `enrichment` platform service is **`status: planned`** in
 [`services/registry.yaml`](../../services/registry.yaml) — the tier pipeline, the
 MCP serving endpoint, the four emitters, and the fidelity meter are not yet
 implemented. Do not read the ~70% number as a shipped product metric.
 
-### 6 · Live-fresh regulatory corpus served to any agent (CEaaS)
+### 6 · Live-fresh regulatory corpus served to any agent (Baltor)
 
 **The task.** Serve a *volatile* governed knowledge base — e.g. the EUDR / CSDDD
 regulatory corpus that already backs use case 2 — into an arbitrary agent loop,
@@ -253,8 +253,8 @@ current. A frozen download is stale the moment a jurisdiction amends a rule; the
 model then cites a repealed clause with full confidence. Freshness, not
 compression, is the binding constraint here.
 
-**The served corpus (CEaaS).** The *same* governed Knowledge Corpus minted for
-the OHH pipeline (use case 2) is served through CEaaS's MCP surface with CDC /
+**The served corpus (Baltor).** The *same* governed Knowledge Corpus minted for
+the OHH pipeline (use case 2) is served through Baltor's MCP surface with CDC /
 freshness tracking — the "context management" surround
 ([[../strategy/context-enrichment-service.md]], [[../concepts/context-layer-and-the-desk.md]]).
 This is the literal "two doors, one object": one provenance trail, one
@@ -272,7 +272,7 @@ use case 5 — the CDC/freshness serving path is specified, not yet shipped.
 
 ## How these map back to the two doors
 
-| | OHH (bounded pipeline) | CEaaS (governed fuel) |
+| | OHH (bounded pipeline) | Baltor (governed fuel) |
 |---|---|---|
 | **Buyer** | builders / applied teams operating a pipeline | agent builders / Claude Code users enriching *their own* agent |
 | **Sells** | governed **pipelines** | governed **fuel** (tiers + corpora + tools) |
@@ -300,7 +300,7 @@ the other, which is why the data plane is attribute-level, not column-level
   and indicators from public NGO/UN/regulatory materials, routed with citations to
   the right authority. No evasion guidance; no real PII — synthetic/public metadata
   only ([[../concepts/capability-valleys.md]]).
-- **Not** shipped where marked `planned`. The two CEaaS cases are spec-level
+- **Not** shipped where marked `planned`. The two Baltor cases are spec-level
   against [[../strategy/context-enrichment-service.md]] and
   [`services/registry.yaml`](../../services/registry.yaml); their components are
   seeded, the serving path is not yet implemented.
@@ -314,7 +314,7 @@ the other, which is why the data plane is attribute-level, not column-level
 - [[../codex/master-goal.md]] — the capability-lift bar as a hard admission floor.
 - [[../strategy/two-services-shared-infrastructure.md]],
   [[../strategy/context-enrichment-service.md]] — the two-products-one-backend
-  decision and the CEaaS spec.
+  decision and the Baltor spec.
 - [[../design/value-propositions.md]] — the promise every surface must say.
 
 ---
@@ -322,7 +322,7 @@ the other, which is why the data plane is attribute-level, not column-level
 *Warrant: user-intent — the owner's brief for this doc ("a use-case index + 4–6
 concrete use cases spanning BOTH products… each tied to the capability-lift
 bar," drawing on "anti-trafficking recruitment screening, EUDR deforestation,
-clinical triage + a CEaaS one (governed code-context served into Claude Code)").
+clinical triage + a Baltor one (governed code-context served into Claude Code)").
 Corroboration — the cited repo worked examples
 ([human-trafficking-ugc-detection.md](human-trafficking-ugc-detection.md),
 [esg-supply-chain-due-diligence.md](esg-supply-chain-due-diligence.md) incl. the

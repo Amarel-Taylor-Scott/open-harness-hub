@@ -1,0 +1,63 @@
+id: "tool/pgvector-embedding-load-planner"
+type: tool
+version: "0.1.0"
+name: "Pgvector embedding load planner"
+description: "Converts stored embedding vector JSONL rows into reviewable Postgres pgvector load SQL with accepted and rejected row evidence."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["embedding", "retrieval", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["embeddings", "vector-search", "pgvector", "postgres", "daily-factory", "load-plan"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    stored_vectors_jsonl:
+      type: string
+    source_embedding_rows_jsonl:
+      type: string
+    output_dir:
+      type: string
+    run_id:
+      type: string
+    schema_dimensions:
+      type: integer
+  required: ["stored_vectors_jsonl", "source_embedding_rows_jsonl", "output_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    input_stored_vector_rows:
+      type: integer
+    accepted_rows:
+      type: integer
+    rejected_rows:
+      type: integer
+    files:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      stored_vectors_jsonl: "dist/local-hash-embedding-worker/2026-05-31/stored-vector-rows.jsonl"
+      source_embedding_rows_jsonl: "dist/daily-production-runs/2026-05-31/load-audit/merged-jsonl/object-embeddings.jsonl"
+      output_dir: "dist/pgvector-embedding-load-plan/2026-05-31"
+    output:
+      ok: true
+      input_stored_vector_rows: 256
+      accepted_rows: 256
+      rejected_rows: 0
+implementations:
+  - kind: "callable"
+    path: "scripts.db.pgvector_embedding_load_plan.build_pgvector_embedding_load_plan"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.pgvector_embedding_load_plan"

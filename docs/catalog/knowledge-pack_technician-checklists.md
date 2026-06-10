@@ -1,4 +1,4 @@
-# Technician checklists — 50 industry procedural artifacts
+# Technician checklists — 50 industry procedural components
 
 *knowledge-pack* · `knowledge-pack/technician-checklists` · v0.1.0 · beta
 

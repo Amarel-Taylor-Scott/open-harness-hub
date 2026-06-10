@@ -1,0 +1,60 @@
+id: "tool/daily-showcase-pipeline-generator"
+type: tool
+version: "0.1.0"
+name: "Daily showcase pipeline generator"
+description: "Generates 5 to 25 review-ready component pipeline templates per day from curated scenario seeds and emits a Postgres component-template load plan."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["planning", "routing", "evaluation", "governance"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.product"
+tags: ["showcase-pipelines", "daily-factory", "component-templates", "postgres", "review-gate"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    scenario_path:
+      type: string
+    output_dir:
+      type: string
+    count:
+      type: integer
+    run_id:
+      type: string
+  required: ["output_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    showcase_template_count:
+      type: integer
+    template_step_count:
+      type: integer
+    template_paths:
+      type: array
+    load_plan:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      scenario_path: "catalog/knowledge-packs/data/daily-showcase-pipeline-patterns/showcase-scenarios.jsonl"
+      output_dir: "dist/daily-showcase-pipelines/2026-05-28"
+      count: 10
+      run_id: "daily-2026-05-28"
+    output:
+      ok: true
+      showcase_template_count: 10
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.daily_showcase_pipeline_templates.generate_showcase_templates"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.factory.daily_showcase_pipeline_templates"

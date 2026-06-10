@@ -1,0 +1,72 @@
+id: "tool/job-description-work-atom-extractor"
+type: tool
+version: "0.1.0"
+name: "Job description work atom extractor"
+description: "Extracts tasks, review questions, fact dependencies, evidence requirements, decision gates, tools, skills, outputs, risk controls, and eval rubrics from job descriptions or occupation profiles."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "hr", "cross_industry"]
+capability: ["extraction", "format_conversion", "planning", "evaluation"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "dated"
+tags: ["job-descriptions", "work-atoms", "procedure-objects", "questions", "rubrics"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    occupation_profile:
+      type: object
+    job_description:
+      type: object
+    extraction_schema:
+      type: object
+    domain_hints:
+      type: array
+      items:
+        type: string
+  required: ["extraction_schema"]
+returns:
+  type: object
+  properties:
+    work_atoms:
+      type: array
+      items:
+        type: object
+    candidate_primitives:
+      type: array
+      items:
+        type: object
+    missing_context:
+      type: array
+      items:
+        type: string
+    provenance:
+      type: object
+side_effects: "none"
+examples:
+  - input:
+      job_description:
+        title: "AML Alert Analyst"
+        text: "Review transaction monitoring alerts, document findings, and escalate potentially suspicious activity."
+      extraction_schema:
+        fields: ["task", "review_question", "evidence_requirement", "output_component"]
+    output:
+      work_atoms:
+        - type: "task"
+          text: "Review transaction monitoring alerts."
+        - type: "output_component"
+          text: "Document findings."
+      candidate_primitives: []
+      missing_context: []
+      provenance:
+        source: "example"
+implementations:
+  - kind: "callable"
+    path: "tools.job_description_work_atom_extractor.run"
+  - kind: "mcp"
+    path: "mcp/work_atoms.extract"

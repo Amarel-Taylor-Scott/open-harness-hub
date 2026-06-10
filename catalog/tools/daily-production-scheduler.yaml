@@ -1,0 +1,62 @@
+id: "tool/daily-production-scheduler"
+type: tool
+version: "0.1.0"
+name: "Daily production scheduler"
+description: "Compares daily production run summaries, reports trend metrics, and recommends the next component factory run without executing generation."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["planning", "governance", "evaluation", "generation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.scale"
+tags: ["components", "daily-factory", "scheduler", "production-report", "coverage", "dedupe"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    runs_root:
+      type: string
+    output_dir:
+      type: string
+    next_run_date:
+      type: string
+    max_target:
+      type: integer
+  required: ["runs_root", "output_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    run_count:
+      type: integer
+    totals:
+      type: object
+    averages:
+      type: object
+    next_run_recommendation:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      runs_root: "dist/daily-production-runs"
+      output_dir: "dist/daily-production-schedule/2026-05-29"
+      max_target: 5000
+    output:
+      ok: true
+      run_count: 1
+      next_run_recommendation:
+        target_count: 2500
+        matrix: "combined"
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.daily_production_scheduler.build_daily_schedule_report"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.factory.daily_production_scheduler"

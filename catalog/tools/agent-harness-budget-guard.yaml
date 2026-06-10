@@ -1,0 +1,57 @@
+id: "tool/agent-harness-budget-guard"
+type: tool
+version: "0.1.0"
+name: "Agent harness budget guard"
+description: "Evaluates token, wall-clock, model-spend, tool-permission, and retry budgets before a long-running agentic harness continues."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "evaluation", "serving"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.orchestration"
+tags: ["agentic-harness", "budget", "spend-control", "goal-runtime", "safety"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    goal_id:
+      type: string
+    token_budget:
+      type: integer
+    spend_budget_usd:
+      type: number
+    wall_clock_budget_minutes:
+      type: integer
+    retry_budget:
+      type: integer
+    observed_usage:
+      type: object
+    requested_permissions:
+      type: array
+      items: { type: string }
+  required: ["goal_id", "observed_usage"]
+returns:
+  type: object
+  properties:
+    ok_to_continue:
+      type: boolean
+    reasons:
+      type: array
+      items: { type: string }
+    escalation_required:
+      type: boolean
+side_effects: "none"
+examples:
+  - input:
+      goal_id: "goal/scale-open-harness-hub"
+      spend_budget_usd: 25
+      observed_usage: { spend_usd: 3.42, retries: 1 }
+    output:
+      ok_to_continue: true
+      escalation_required: false

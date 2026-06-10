@@ -1,0 +1,35 @@
+id: "benchmark/grant-peer-review-bench"
+type: benchmark
+version: "0.1.0"
+name: "Grant Peer Review benchmark"
+description: "Synthetic benchmark for grant peer review review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["scientific_research.social", "education.higher"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["grant-peer-review", "expansion-v6"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/grant-peer-review-review"
+dataset: "dataset/grant-peer-review-samples"
+rubric: "rubric/grant-peer-review-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/grant-peer-review-review"
+    rule_pack_override: ["rule-pack/grep-grant-peer-review-flags", "rule-pack/rag-grant-peer-review-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 29
+report:
+  output: "dist/benchmarks/grant-peer-review/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

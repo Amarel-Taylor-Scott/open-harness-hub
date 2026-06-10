@@ -1,0 +1,21 @@
+{
+  "version": "1.0",
+  "note": "Execution-backend pricebook = CONFIGURATION, never hardcoded in business logic. The selector reads relative cost from here; pricing changes are a config edit, not a code change. Unknown prices use placeholders with confidence='low'. Costs are RELATIVE/illustrative units for offline ranking — replace with real quotes (confidence='high') before any production cost decision.",
+  "currency": "relative-unit",
+  "backends": {
+    "local_function_emulator@v1": {"request_cost": 0.0, "duration_cost_per_s": 0.0, "idle_cost_per_s": 0.0, "confidence": "high", "source": "offline (no external cost)", "last_reviewed_at": "2026-06-06"},
+    "local_subprocess@v1": {"request_cost": 0.0, "duration_cost_per_s": 0.01, "idle_cost_per_s": 0.0, "confidence": "high", "source": "local compute", "last_reviewed_at": "2026-06-06"},
+    "gcp_cloud_run_function@candidate": {"request_cost": 0.02, "duration_cost_per_s": 0.05, "idle_cost_per_s": 0.0, "confidence": "low", "source": "placeholder — replace with real quote", "last_reviewed_at": "2026-06-06"},
+    "aws_lambda@candidate": {"request_cost": 0.02, "duration_cost_per_s": 0.05, "idle_cost_per_s": 0.0, "confidence": "low", "source": "placeholder", "last_reviewed_at": "2026-06-06"},
+    "azure_function@candidate": {"request_cost": 0.02, "duration_cost_per_s": 0.05, "idle_cost_per_s": 0.0, "confidence": "low", "source": "placeholder", "last_reviewed_at": "2026-06-06"},
+    "gcp_cloud_function@candidate": {"request_cost": 0.02, "duration_cost_per_s": 0.05, "idle_cost_per_s": 0.0, "confidence": "low", "source": "placeholder — cloud-agnostic serverless peer", "last_reviewed_at": "2026-06-06"},
+    "cloudflare_workers@candidate": {"request_cost": 0.01, "duration_cost_per_s": 0.03, "idle_cost_per_s": 0.0, "confidence": "low", "source": "placeholder — cloud-agnostic serverless peer", "last_reviewed_at": "2026-06-06"},
+    "openfaas_knative@candidate": {"request_cost": 0.0, "duration_cost_per_s": 0.03, "idle_cost_per_s": 0.01, "confidence": "low", "source": "placeholder — self-hosted serverless (OpenFaaS/Knative)", "last_reviewed_at": "2026-06-06"},
+    "k8s_deployment_worker@candidate": {"request_cost": 0.0, "duration_cost_per_s": 0.03, "idle_cost_per_s": 0.02, "confidence": "low", "source": "placeholder — node + idle warm cost", "last_reviewed_at": "2026-06-06"},
+    "k8s_job@candidate": {"request_cost": 0.0, "duration_cost_per_s": 0.03, "idle_cost_per_s": 0.0, "confidence": "low", "source": "placeholder", "last_reviewed_at": "2026-06-06"},
+    "cloud_run_job@candidate": {"request_cost": 0.01, "duration_cost_per_s": 0.04, "idle_cost_per_s": 0.0, "confidence": "low", "source": "placeholder", "last_reviewed_at": "2026-06-06"},
+    "browser_pool@candidate": {"request_cost": 0.0, "duration_cost_per_s": 0.06, "idle_cost_per_s": 0.04, "confidence": "low", "source": "placeholder", "last_reviewed_at": "2026-06-06"},
+    "gpu_pool@candidate": {"request_cost": 0.0, "duration_cost_per_s": 0.5, "idle_cost_per_s": 0.3, "confidence": "low", "source": "placeholder — GPU", "last_reviewed_at": "2026-06-06"},
+    "sandbox_worker@candidate": {"request_cost": 0.0, "duration_cost_per_s": 0.04, "idle_cost_per_s": 0.0, "confidence": "low", "source": "placeholder", "last_reviewed_at": "2026-06-06"}
+  }
+}

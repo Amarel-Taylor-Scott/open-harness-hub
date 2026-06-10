@@ -2,7 +2,65 @@
 
 This file is for Claude Code, Claude desktop/browser agents, and any Claude 4.x/4.8/4.7-style workflow that opens this repository. Follow `AGENTS.md` first; this file adds speed and organization rules for scaling Open Harness Hub.
 
+## Portfolio (owner-decided 2026-06-06; updated 2026-06-09 — read FIRST)
+
+Current parent display brand: **AI Done Right** (`aidoneright.dev`), tagline
+**"AI, done right."** The prior ContextIsEverything language is preserved as
+founding thesis and legacy path context, not as the parent display brand. The
+high-fidelity Claude Code Max handoff lives in
+`dist/sites/openharness-design/`: start with `START-HERE-CLAUDE-CODE.md`, then
+`README.md`, `CLAUDE-CODE.md`, and `HANDOFF.md`.
+
+Current design-family snapshot: parent + **Baltor** + **Teleon** + **22
+Open*Hubs** (9 live open registries + 13 private-bench registries; the count is
+computed by the family check, never hand-counted — don't trust this prose over
+`scripts/check_ai_done_right_surface_family.py`). The private bench includes the
+complete Baltor method spine (OpenReconciliationHub, OpenHardeningHub,
+OpenEnrichmentHub, OpenOptimizationHub, OpenVerificationHub) and
+OpenRoutingHub (model-routing policy; owner-proposed 2026-06-09). The owner-directed Codex loop for
+this family is `docs/codex/ai-done-right-family-polish-goal.md`. The
+parser-safe `/goal` entrypoint is
+`/goal follow the instructions in docs/goals/aidoneright-portfolio-loop.md`.
+Run `python3 scripts/check_ai_done_right_surface_family.py --self-test` before
+trusting or editing family-surface counts. Run
+`python3 scripts/check_handoff_docs_freshness.py --self-test` before handing the
+bundle to another agent.
+
+Service-to-service auth is an active architecture track. Read
+`docs/architecture/service-auth-and-consumption-model.md` before implementing
+API keys, service accounts, delegated calls, private-bench enforcement, or
+cross-service consumption. For local testing without paid cloud, read
+`docs/architecture/local-dev-tunnels-and-auth.md` and run
+`python3 scripts/check_local_dev_tunnel_auth_runtime.py --self-test`.
+
+Canonical portfolio architecture remains:
+`docs/strategy/teleon-baltor-openharnesshub-portfolio.md`.
+
+A holding company owns three product layers. **Teleon** (`teleon.dev`, domain owned) = the purpose-driven,
+eval-gated, self-adaptive compute **runtime SaaS** — it owns PurposeTask/CapabilityTask, runtime selection,
+evidence ledger, promotion/policy gates, boundary approvals, adapters, the assurance dashboard. **Baltor**
+(`baltor.ai`) = the applied, customer-facing context product, **powered by Teleon** (a tenant). **OpenHarnessHub**
+= the open ecosystem (evals/harnesses/templates/skills) + the **open CapabilityTask spec (CTS)**.
+
+- **Architectural law (enforced by `scripts/check_portfolio_dependency_law.py` over
+  `architecture/portfolio_dependency_law.json`):** Baltor → Teleon → OpenHarnessHub, **never the reverse**.
+  Teleon must never import Baltor; OpenHarnessHub imports neither. PurposeTask is **Teleon**, not a Baltor
+  subsystem — generic runtime code is being extracted `src/baltor/` → `src/teleon/` incrementally (lossless;
+  see the law file's `migration_status`).
+- **Naming:** product = **Teleon**; staff dashboard = **Teleon Control Tower**; customer dashboard =
+  **Capability Assurance Portal**; object = **PurposeTask** (formal/spec synonym **CapabilityTask**). Brand
+  doc: `docs/strategy/teleon-naming-and-domain.md`. ("Purpose Runtime"/"Anneal"/"Cairn"/"OCTS" are superseded.)
+  Teleon's control & trust plane is a **separate greenfield TS build**: `prompts/teleon-build-kit.md`.
+- **Hosting:** Teleon + Baltor deploy **same region/private network** (low Baltor→Teleon latency) but stay
+  **separable** (separate service/data/identity/IaC + a versioned API + graceful local fallback).
+
 ## North Star
+
+Active `/goal` runs are now Baltor-first. Read
+`docs/codex/baltor-clean-context.md` and
+`docs/codex/baltor-autonomous-goal.md` before older factory-scale context. The
+component registry remains the substrate; Baltor context control is the product
+focus.
 
 Build a database-backed registry of reusable AI pipeline components and subcomponents that can scale from thousands to millions of rows without turning every row into a public static file.
 
@@ -131,6 +189,19 @@ the ledger**. Verifiers — and the autonomous loop — check the *warrant*, not
 decision supersedes an earlier one, update/delete the stale artifact in the **same** change (no orphaned
 contradictions); a memory/doc that names a file or flag is a claim about a past state — re-verify it
 before relying on it. Full contract: `docs/codex/change-verification-contract.md`.
+
+## Lossless Distillation (distillation is never replacement)
+
+**Distillation is never replacement.** Any distillation, decomposition, compression, optimization,
+reconciliation, promotion, or LLM→deterministic-rule conversion creates a new **versioned** derived
+layer while PRESERVING the raw layer, intermediates, lineage, source handles, held-out items, rejected
+candidates, model/tool traces, configs, receipts, and a rollback target. Omitted / held-out / rejected /
+superseded ≠ deleted. No destructive overwrite, irreversible compression, lossy promotion of truth-bearing
+facts, or a winner without lineage to the losers. Compression may shrink the text surface only if
+answer-critical facts + source handles + held-out warnings survive; tenant-private lineage never becomes
+global. Run side-by-side before promotion, shadow new rules, monitor after, and prove rehydration. Carry
+the **LOSSLESS DISTILLATION CLAUSE** in every workflow prompt. Full law:
+`docs/codex/lossless-distillation.md`.
 
 ## Promotion Boundary
 

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""CEaaS SERVE — render one governed corpus into the agent consumption surfaces.
+"""Baltor SERVE — render one governed corpus into the agent consumption surfaces.
 
 This is **M3** of the north-star wave: *serve a governed corpus into an agent via
 the consumption surfaces.* The build/monitor product (OHH) mints + scores a
-governed object once; CEaaS serves that **same** object into whatever the user's
-agent ingests. Per the CEaaS dogfood case study
+governed object once; Baltor serves that **same** object into whatever the user's
+agent ingests. Per the Baltor dogfood case study
 (``docs/case-studies/ceaas-context-for-claude-code.md`` §3) and the standards
 audit's drift-#1 remediation (``docs/strategy/standards-conformance-audit.md`` §3
 — *"Implement … emit_llms_txt … the deterministic and cheap one … is the natural
@@ -202,7 +202,7 @@ SERVE_SEAMS: tuple[str, ...] = (
     "generated server stub (dist/mcp/server.py) pointed at these handlers.",
     "metering — per-request token/fidelity metering (the recurring-revenue meter) "
     "is declared in the descriptor's billing block but not enforced here; it is the "
-    "CEaaS meter seam (services/registry.yaml enrichment service is status: planned).",
+    "Baltor meter seam (services/registry.yaml enrichment service is status: planned).",
     "freshness/CDC — re-serving when the governed corpus changes (the recurring "
     "obligation that makes the live tier non-freezable) is a seam; this call serves "
     "a point-in-time snapshot of the corpus passed in.",
@@ -700,7 +700,7 @@ def serve_descriptor(corpus: Any, tools: Any = None) -> dict[str, Any]:
     for doc in _documents(corpus):
         doc_id = str(doc.get("doc_id") or "").strip() or "doc"
         resource: dict[str, Any] = {
-            "uri": f"ceaas://{corpus['corpus_id']}/{doc_id}",
+            "uri": f"baltor://{corpus['corpus_id']}/{doc_id}",
             "name": _escape_inline(doc.get("title") or doc_id),
             "description": _escape_inline(doc.get("notes") or ""),
             "mimeType": "text/markdown",
@@ -721,7 +721,7 @@ def serve_descriptor(corpus: Any, tools: Any = None) -> dict[str, Any]:
     return {
         "protocolVersion": MCP_PROTOCOL_VERSION,
         "serverInfo": {
-            "name": "ceaas-corpus-server",
+            "name": "baltor-corpus-server",
             "corpusId": corpus["corpus_id"],
             "title": _escape_inline(corpus.get("title") or corpus["corpus_id"]),
             "license": corpus.get("license"),
@@ -815,7 +815,7 @@ def run(
 _SAMPLE_CORPUS: dict[str, Any] = {
     "corpus_id": "ohh-serve-demo",
     "title": "Open Harness Hub — serving demo corpus",
-    "summary": "A tiny governed corpus used to prove the CEaaS serving surfaces.",
+    "summary": "A tiny governed corpus used to prove the Baltor serving surfaces.",
     "license": "MIT",
     "provenance": {
         "signer": "openharnesshub.com (demo oracle)",
@@ -832,7 +832,7 @@ _SAMPLE_CORPUS: dict[str, Any] = {
             "notes": "How the token budget is planned per tier.",
             "lifecycle": "experimental",
             "content": (
-                '"""Token-budget planner for the CEaaS serving path."""\n'
+                '"""Token-budget planner for the Baltor serving path."""\n'
                 "from typing import Any\n\n\n"
                 "SAFETY_MARGIN = 0.1\n\n\n"
                 "def plan_budget(window: int, *, reserve: int = 0) -> int:\n"
@@ -1016,7 +1016,7 @@ def _selftest() -> None:
     assert len(desc["resources"]) == len(_SAMPLE_CORPUS["documents"]), \
         "descriptor must list one resource per governed document"
     res0 = desc["resources"][0]
-    assert res0["uri"] == "ceaas://ohh-serve-demo/tier-planner", "resource URI must namespace corpus+doc"
+    assert res0["uri"] == "baltor://ohh-serve-demo/tier-planner", "resource URI must namespace corpus+doc"
     assert res0["_meta"]["ohh:sourceUrl"] == "https://openharnesshub.com/docs/tier-planner", \
         "each resource must carry its source-url provenance anchor"
     # Tools listed, both input shapes normalized to MCP Tool objects.

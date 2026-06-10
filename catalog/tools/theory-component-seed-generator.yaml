@@ -1,0 +1,67 @@
+id: "tool/theory-component-seed-generator"
+type: tool
+version: "0.1.0"
+name: "Theory component seed generator"
+description: "Expands technical theories, postmortems, and architecture critiques into database-backed component candidate rows with labels, dimensions, entity refs, embeddings, review tickets, and index records."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "security.defensive", "cross_industry"]
+capability: ["generation", "planning", "governance", "retrieval"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.scale"
+tags: ["theory-to-components", "daily-factory", "component-candidates", "postmortems", "pgvector"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    theory_seeds:
+      type: string
+    output_dir:
+      type: string
+    target_count:
+      type: integer
+    run_id:
+      type: string
+  required: ["theory_seeds", "output_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    theory_seed_count:
+      type: integer
+    seed_count:
+      type: integer
+    high_risk_seed_count:
+      type: integer
+    row_counts:
+      type: object
+    row_family_paths:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      theory_seeds: "catalog/knowledge-packs/data/theory-to-component-patterns/theory-seeds.jsonl"
+      output_dir: "dist/theory-component-batch/2026-05-26"
+      target_count: 1000
+      run_id: "theory-components-2026-05-26"
+    output:
+      ok: true
+      theory_seed_count: 5
+      seed_count: 1000
+      row_counts:
+        normalized_object: 1000
+        index_record: 5000
+        object_embedding: 1000
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.theory_component_seeds.run_theory_component_batch"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.factory.theory_component_seeds"

@@ -1,0 +1,35 @@
+id: "benchmark/pharma-batch-record-review-bench"
+type: benchmark
+version: "0.1.0"
+name: "Pharma Batch Record Review benchmark"
+description: "Synthetic benchmark for pharma batch record review review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["pharma.manufacturing", "pharma.gxp"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["pharma-batch-record-review", "expansion-v7"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/pharma-batch-record-review-review"
+dataset: "dataset/pharma-batch-record-review-samples"
+rubric: "rubric/pharma-batch-record-review-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/pharma-batch-record-review-review"
+    rule_pack_override: ["rule-pack/grep-pharma-batch-record-review-flags", "rule-pack/rag-pharma-batch-record-review-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 31
+report:
+  output: "dist/benchmarks/pharma-batch-record-review/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

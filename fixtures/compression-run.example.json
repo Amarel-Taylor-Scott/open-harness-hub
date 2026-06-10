@@ -1,0 +1,147 @@
+{
+  "all_source_handles": [
+    "ctx://acme-billing/decisions/ADR-014-billing-retry-policy.md#decision",
+    "ctx://acme-billing/docs/billing-runbook.md#retry-policy",
+    "ctx://acme-billing/org/OWNERS.md#billing-team",
+    "ctx://acme-billing/wiki/billing-retries#section-2"
+  ],
+  "compact_summary": "ADR-014: the payment-submit client uses at most 5 retries with full-jitter exponential backoff. The payment-submit client retries up to 3 times on transient failures. billing-service is owned by billing-team; escalation via billing-oncall.",
+  "compression_run_id": "comprun-7891ffda1fdd1108",
+  "created_at": "1970-01-01T00:00:00Z",
+  "deterministic": true,
+  "digest": [
+    {
+      "ref": "adr-014",
+      "source_handles": [
+        "ctx://acme-billing/decisions/ADR-014-billing-retry-policy.md#decision"
+      ],
+      "text": "ADR-014: the payment-submit client uses at most 5 retries with full-jitter exponential backoff."
+    },
+    {
+      "ref": "runbook",
+      "source_handles": [
+        "ctx://acme-billing/docs/billing-runbook.md#retry-policy",
+        "ctx://acme-billing/wiki/billing-retries#section-2"
+      ],
+      "text": "The payment-submit client retries up to 3 times on transient failures."
+    },
+    {
+      "ref": "owners",
+      "source_handles": [
+        "ctx://acme-billing/org/OWNERS.md#billing-team"
+      ],
+      "text": "billing-service is owned by billing-team; escalation via billing-oncall."
+    }
+  ],
+  "dropped_refs": [
+    {
+      "duplicate_of": "runbook",
+      "reason": "near_duplicate",
+      "ref": "wiki",
+      "source_handles": [
+        "ctx://acme-billing/wiki/billing-retries#section-2"
+      ]
+    }
+  ],
+  "input_refs": [
+    "adr-014",
+    "runbook",
+    "wiki",
+    "owners"
+  ],
+  "keyphrases": [
+    "billing",
+    "client",
+    "payment",
+    "retries",
+    "submit",
+    "014",
+    "adr",
+    "authoritative"
+  ],
+  "kind": "baltor.compression-run.v1",
+  "llm_used": false,
+  "method_chain": [
+    {
+      "config": {
+        "chars_per_token": 4,
+        "max_tokens": 512
+      },
+      "deterministic": true,
+      "method": "token_budget",
+      "note": "tiktoken in prod",
+      "tool": "char-ratio(stdlib)"
+    },
+    {
+      "deterministic": true,
+      "method": "boilerplate_removal",
+      "note": "trafilatura/jusText in prod",
+      "tool": "regex(stdlib)"
+    },
+    {
+      "config": {
+        "near_dup_ratio": 0.9
+      },
+      "deterministic": true,
+      "dropped": 1,
+      "method": "dedupe_near_duplicates",
+      "note": "datasketch MinHash / RapidFuzz in prod",
+      "tool": "difflib.SequenceMatcher(stdlib)"
+    },
+    {
+      "config": {
+        "k": 8
+      },
+      "deterministic": true,
+      "method": "keyphrase_extraction",
+      "note": "YAKE/RAKE/PyTextRank in prod",
+      "tool": "tf(stdlib)"
+    },
+    {
+      "config": {
+        "query": "retry ceiling retries"
+      },
+      "deterministic": true,
+      "method": "query_focused_ranking",
+      "note": "rank-bm25/TF-IDF in prod",
+      "tool": "bm25-lite(stdlib)"
+    },
+    {
+      "config": {
+        "max_tokens": 512
+      },
+      "deterministic": true,
+      "method": "extractive_selection",
+      "note": "sumy/LexRank/TextRank in prod",
+      "tool": "budget-greedy(stdlib)"
+    }
+  ],
+  "query": "retry ceiling retries",
+  "retained_refs": [
+    {
+      "ref": "adr-014",
+      "source_handles": [
+        "ctx://acme-billing/decisions/ADR-014-billing-retry-policy.md#decision"
+      ]
+    },
+    {
+      "ref": "runbook",
+      "source_handles": [
+        "ctx://acme-billing/docs/billing-runbook.md#retry-policy",
+        "ctx://acme-billing/wiki/billing-retries#section-2"
+      ]
+    },
+    {
+      "ref": "owners",
+      "source_handles": [
+        "ctx://acme-billing/org/OWNERS.md#billing-team"
+      ]
+    }
+  ],
+  "token_budget": {
+    "estimated_after": 59,
+    "estimated_before": 95,
+    "max_tokens": 512,
+    "tokenizer": "char-ratio(stdlib)"
+  }
+}

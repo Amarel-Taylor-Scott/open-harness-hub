@@ -1,0 +1,56 @@
+/* =============================================================================
+   openreviewhub/orh.css — review-report surface for OpenReviewHub.io.
+   Composes shared tokens + .oh-* primitives only; accent (purple) set inline by
+   the hub root. Adds the artifact-under-review header, the axis scorecard, and
+   the claim → evidence → verdict ledger shown on every entry-detail page.
+   ============================================================================= */
+
+.orh-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--fg-faint); display: block; margin-bottom: 12px; }
+.orh-section { margin-top: 16px; }
+
+/* artifact under review */
+.orh-target { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.orh-kind { font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--accent);
+  background: var(--accent-weak); border-radius: var(--r-pill); padding: 3px 9px; }
+.orh-target-ref { font-size: 13px; font-weight: 600; color: var(--fg); margin-top: 9px; overflow-wrap: anywhere; }
+.orh-target-sub { font-size: 12px; color: var(--fg-faint); margin-top: 4px; }
+.orh-verdict { flex: 0 0 auto; font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: .02em;
+  text-transform: uppercase; padding: 6px 12px; border-radius: var(--r-pill); white-space: nowrap; }
+.orh-verdict.reproduced { color: var(--success); background: color-mix(in oklab, var(--success) 14%, transparent); }
+.orh-verdict.partial { color: var(--warn, #b7791f); background: color-mix(in oklab, var(--warn, #b7791f) 14%, transparent); }
+.orh-verdict.failed { color: var(--danger, #c0392b); background: color-mix(in oklab, var(--danger, #c0392b) 13%, transparent); }
+
+/* axis scorecard */
+.orh-axes { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; }
+.orh-axis-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 7px; }
+.orh-axis-name { font-size: 13px; font-weight: 600; color: var(--fg); }
+.orh-axis-pct { font-size: 12.5px; font-weight: 700; color: var(--accent); }
+.orh-bar { height: 7px; border-radius: var(--r-pill); background: var(--bg-subtle); border: 1px solid var(--line); overflow: hidden; }
+.orh-bar > i { display: block; height: 100%; background: var(--accent); border-radius: var(--r-pill); }
+.orh-axis-note { font-size: 11.5px; color: var(--fg-muted); margin-top: 6px; line-height: 1.45; }
+
+/* claims ledger */
+.orh-claims { width: 100%; border-collapse: collapse; font-size: 13px; }
+.orh-claims th { text-align: left; font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+  color: var(--fg-faint); padding: 0 12px 9px; border-bottom: 1px solid var(--line); }
+.orh-claims td { padding: 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.orh-claims tr:last-child td { border-bottom: none; }
+.orh-claims .cl { color: var(--fg); font-weight: 500; width: 32%; }
+.orh-claims .ev { color: var(--fg-muted); line-height: 1.5; }
+.orh-vchip { font-family: var(--font-mono); font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
+  padding: 3px 8px; border-radius: var(--r-pill); white-space: nowrap; }
+.orh-vchip.reproduced, .orh-vchip.verified { color: var(--success); background: color-mix(in oklab, var(--success) 14%, transparent); }
+.orh-vchip.partial { color: var(--warn, #b7791f); background: color-mix(in oklab, var(--warn, #b7791f) 14%, transparent); }
+.orh-vchip.failed { color: var(--danger, #c0392b); background: color-mix(in oklab, var(--danger, #c0392b) 13%, transparent); }
+
+/* method & scope */
+.orh-method { font-size: 13.5px; line-height: 1.6; color: var(--fg-muted); margin: 0 0 14px; max-width: 70ch; }
+.orh-scope { display: grid; grid-template-columns: 96px 1fr; gap: 14px; padding-top: 13px; border-top: 1px solid var(--line); }
+.orh-scope-k { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .03em; color: var(--fg-faint); }
+.orh-scope-v { font-size: 13px; line-height: 1.55; color: var(--fg-muted); }
+
+@media (max-width: 680px) {
+  .orh-axes { grid-template-columns: 1fr; }
+  .orh-target { flex-direction: column; align-items: flex-start; }
+  .orh-claims .cl { width: auto; }
+}

@@ -1,0 +1,25 @@
+{
+  "capability_slot": "observability_provider",
+  "adapter_id": "observability.baltor_local_trace@v1",
+  "description": "ContextOperationSpan[] -> SpanTree. The provider DESCRIBES what happened in a context operation; it never decides truth. Langfuse/Phoenix/LangSmith are candidate primaries behind the same contract. Held-out + governance facets propagate; spans are immutable.",
+  "input": {
+    "schema": "ContextOperationSpan",
+    "spans": [
+      {"span_id": "s1", "parent_id": null, "operation": "pipeline.run", "status": "ok", "occurred_at": "2026-06-06T00:00:01Z", "correlation_id": "corr-1"},
+      {"span_id": "s2", "parent_id": "s1", "operation": "reconciliation.find_contradictions", "status": "ok", "occurred_at": "2026-06-06T00:00:02Z", "object_ref": "obj-runbook", "correlation_id": "corr-1"},
+      {"span_id": "s3", "parent_id": "s1", "operation": "verification.check", "status": "held_out", "occurred_at": "2026-06-06T00:00:03Z", "correlation_id": "corr-1", "governance": {"held_out": true, "claim_status": "allegation"}}
+    ]
+  },
+  "output": {
+    "schema": "SpanTree",
+    "span_count": 3,
+    "correlation_id": "corr-1",
+    "root": {
+      "span_id": "s1", "operation": "pipeline.run", "status": "ok", "held_out": false,
+      "children": [
+        {"span_id": "s2", "operation": "reconciliation.find_contradictions", "status": "ok", "held_out": false, "children": []},
+        {"span_id": "s3", "operation": "verification.check", "status": "held_out", "held_out": true, "governance": {"held_out": true, "claim_status": "allegation"}, "children": []}
+      ]
+    }
+  }
+}

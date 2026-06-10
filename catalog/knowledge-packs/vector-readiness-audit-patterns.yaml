@@ -1,0 +1,37 @@
+id: "knowledge-pack/vector-readiness-audit-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Vector readiness audit patterns"
+description: "Reusable checks for reconciling planned embedding completion rows with stored vector records before pgvector, BigQuery vector search, or hybrid retrieval indexes are considered ready."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "embedding", "governance", "evaluation", "verification"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["embeddings", "vector-search", "pgvector", "bigquery-vector-search", "audit", "readiness"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+content_types:
+  - "vector_readiness_check"
+files:
+  - path: "catalog/knowledge-packs/data/vector-readiness-audit-patterns/checks.jsonl"
+    format: "jsonl"
+    schema: "vector_readiness_check"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["id", "label", "use_when", "failure_route"]
+provenance:
+  sources:
+    - "Open Harness Hub embedding execution plan"
+    - "Open Harness Hub pgvector and hybrid search architecture"
+  collected_through: "2026-05-26"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "audit metadata only; no raw embedding text"

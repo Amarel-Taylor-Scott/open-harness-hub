@@ -15,7 +15,7 @@
 
 ## Primitives used
 
-| Layer | Artifact |
+| Layer | Component |
 |---|---|
 | Privacy | `rule-pack/financial-pii-en` (IBAN, SWIFT, PAN+Luhn, SSN/EIN, account#) |
 | Sanctions | `rule-pack/sanctions-screening` (OFAC SDN, UN, EU, HMT, PEP lists) |

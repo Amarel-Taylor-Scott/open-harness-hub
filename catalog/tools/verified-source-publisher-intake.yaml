@@ -1,0 +1,74 @@
+id: "tool/verified-source-publisher-intake"
+type: tool
+version: "0.1.0"
+name: "Verified source publisher intake"
+description: "Accepts signed or reviewed publisher submissions for authoritative facts, laws, policies, schemas, updates, and primitive definitions."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "government", "legal", "cross_industry"]
+capability: ["verification", "governance", "retrieval"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "volatile"
+tags: ["verified-sources", "publisher-intake", "laws", "facts", "primitive-database"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    publisher:
+      type: object
+    submission:
+      type: object
+    verification:
+      type: object
+      description: "DNS, signature, repository attestation, manual review, or delegated authority proof."
+    effective_date:
+      type: string
+    license:
+      type: string
+  required: ["publisher", "submission", "verification"]
+returns:
+  type: object
+  properties:
+    intake_id:
+      type: string
+    verification_status:
+      type: string
+      enum: ["accepted", "rejected", "needs_review"]
+    normalized_records:
+      type: array
+      items:
+        type: object
+    provenance:
+      type: object
+    review_notes:
+      type: array
+      items:
+        type: string
+side_effects: "write"
+examples:
+  - input:
+      publisher:
+        id: "example-agency"
+        publisher_type: "government"
+      submission:
+        source_url: "https://example.gov/policy.json"
+      verification:
+        method: "dns"
+      license: "public-domain"
+    output:
+      intake_id: "verified-source-example"
+      verification_status: "needs_review"
+      normalized_records: []
+      provenance:
+        publisher_id: "example-agency"
+      review_notes: ["Example only."]
+implementations:
+  - kind: "callable"
+    path: "tools.verified_source_publisher_intake.run"
+  - kind: "mcp"
+    path: "mcp/verified_sources.intake"

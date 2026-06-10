@@ -1,0 +1,67 @@
+id: "tool/procedure-object-normalizer"
+type: tool
+version: "0.1.0"
+name: "Procedure object normalizer"
+description: "Converts SOPs, checklists, alert playbooks, review scripts, policy tables, and training notes into structured procedure knowledge objects."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "finance.aml", "cross_industry"]
+capability: ["extraction", "format_conversion", "governance", "retrieval"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "dated"
+tags: ["procedure-objects", "checklists", "questions", "sop", "alert-review"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    source_document:
+      type: object
+    target_domain:
+      type: string
+    object_types:
+      type: array
+      items:
+        type: string
+    policy_defaults:
+      type: object
+  required: ["source_document", "target_domain"]
+returns:
+  type: object
+  properties:
+    procedure_objects:
+      type: array
+      items:
+        type: object
+    unresolved_items:
+      type: array
+      items:
+        type: object
+    review_notes:
+      type: array
+      items:
+        type: string
+side_effects: "none"
+examples:
+  - input:
+      target_domain: "finance.aml"
+      source_document:
+        title: "AML alert review checklist"
+        text: "Screen sanctions before typology scoring. Confirm whether activity matches the customer profile."
+    output:
+      procedure_objects:
+        - object_type: "checklist_item"
+          instruction: "Screen sanctions before typology scoring."
+        - object_type: "review_question"
+          prompt: "Does the activity match the customer profile?"
+      unresolved_items: []
+      review_notes: []
+implementations:
+  - kind: "callable"
+    path: "tools.procedure_object_normalizer.run"
+  - kind: "mcp"
+    path: "mcp/procedure_objects.normalize"

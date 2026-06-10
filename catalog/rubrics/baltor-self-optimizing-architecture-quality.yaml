@@ -1,0 +1,88 @@
+id: "rubric/baltor-self-optimizing-architecture-quality"
+type: rubric
+version: "0.1.0"
+name: "Baltor self optimizing architecture quality"
+description: "Overlay rubric for feedback-driven retrieval, reranking, routing, compression, freshness, policy, and cost optimization in Baltor."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["software", "ai_governance", "sre"]
+capability: ["evaluation", "routing", "reranking", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+tags: ["baltor", "self-optimizing", "reranking", "feedback", "architecture"]
+created: "2026-06-02"
+updated: "2026-06-02"
+dimensions:
+  - id: "telemetry_completeness"
+    label: "System captures enough retrieval, ranking, compression, policy, cost, latency, and outcome telemetry to improve itself"
+    weight: 0.08
+    scale: "0.0-1.0"
+    evidence_required: "Inspect events for query, candidates, returned items, ranker scores, token counts, policy decisions, latency, cost, and feedback."
+  - id: "feedback_to_labels"
+    label: "Human and agent feedback becomes structured labels for retrieval, reranking, freshness, and context-pack quality"
+    weight: 0.08
+    scale: "0.0-1.0"
+    evidence_required: "Review feedback schema, label taxonomy, accepted corrections, stale/wrong/missing markers, and training export path."
+  - id: "evaluation_harness"
+    label: "System maintains eval cases with expected sources, required claims, prohibited content, and outcome thresholds"
+    weight: 0.08
+    scale: "0.0-1.0"
+    evidence_required: "Check eval manifests, regression runs, source recall, citation coverage, policy violations, and pack usefulness metrics."
+  - id: "reranking_stack"
+    label: "Reranking supports deterministic ranking, cross-encoder ranking, learned rerankers, LoRA-adapted rankers, and fallback paths"
+    weight: 0.08
+    scale: "0.0-1.0"
+    evidence_required: "Review BM25/vector fusion, RRF/MMR, cross-encoder or LLM rerankers, LoRA/ranker registry, feature logs, and fallbacks."
+  - id: "model_routing"
+    label: "Model selection is based on task, uncertainty, risk, privacy, cost, latency, and disagreement rather than fixed model prestige"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Inspect model registry, routing policy, escalation score, privacy constraints, budget limits, and human-review path."
+  - id: "cost_aware_optimization"
+    label: "Optimization reduces unnecessary tokens, calls, embeddings, reranks, raw expansions, and storage while preserving quality"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Check token budgets, cache hit rates, compression ratios, model tier choices, cost dashboards, and quality guardrails."
+  - id: "freshness_optimization"
+    label: "Refresh work is prioritized by fragility, impact, source volatility, usage frequency, and downstream risk"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Review refresh queues, TTL policy, source-change subscriptions, revalidation outcomes, and stale-pack invalidation."
+  - id: "policy_optimization"
+    label: "Policy warnings, denials, redactions, and raw-source expansions improve masks, retrieval filters, and user guidance"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Inspect policy event feedback, mask tuning, denied-source analysis, redaction outcomes, and approval workflow."
+  - id: "adaptive_compression"
+    label: "Context compression adapts to task, role, token budget, source authority, claim density, and evidence requirements"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Review pack templates, claim selection, source-handle retention, compression evals, and expansion suggestions."
+  - id: "safe_experimentation"
+    label: "Optimization experiments are versioned, measured, reversible, and isolated from high-risk production workflows"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Check A/B plans, canaries, rollback, shadow runs, approval gates, and risk-class exclusions."
+  - id: "local_cloud_learning_boundary"
+    label: "Private local memory, encrypted sync, and company-readable context produce learning signals without violating privacy boundaries"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Review local-only embeddings, encrypted event logs, opt-in promotion, anonymized feedback, and org-readable tiers."
+  - id: "drift_detection"
+    label: "System detects retrieval, schema, source, policy, model, embedding, and user-behavior drift"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Inspect drift metrics, baseline comparisons, source coverage reports, model output checks, and alert thresholds."
+  - id: "human_in_the_loop"
+    label: "High-risk, unresolved, or disputed optimizations escalate to accountable human review"
+    weight: 0.06
+    scale: "0.0-1.0"
+    evidence_required: "Check review queues, approver roles, decisions, evidence packets, and post-review learning records."
+  - id: "optimization_lineage"
+    label: "Every optimization change can be traced to data, feedback, eval results, experiments, and approval decisions"
+    weight: 0.08
+    scale: "0.0-1.0"
+    evidence_required: "Review lineage events, training datasets, ranker versions, model versions, prompt versions, and deployment records."
+scoring_method: "weighted_sum"

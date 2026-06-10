@@ -1,0 +1,851 @@
+id: rule-pack/rag-finance-lending-fairness-retrieval-policy
+type: rule-pack
+version: 0.1.0
+name: Finance Lending Fairness RAG retrieval policy
+description: Retrieval and citation policy for grounding finance lending fairness
+  reviews in local framework packs.
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- finance
+- finance.lending
+- compliance
+capability:
+- retrieval
+- verification
+modality:
+- text
+lifecycle: experimental
+trust_boundary: local
+freshness: stable
+tags:
+- finance-lending-fairness
+- synthetic-expansion
+created: '2026-05-24'
+updated: '2026-05-25'
+family: rag
+indexing:
+  bm25: true
+  dense:
+    enabled: true
+    embedder: adapter/nomic-embed-text-v15
+    dims: 768
+  rrf: true
+rules:
+- id: cite_framework_pack
+  condition: review finding references a control, deadline, evidence item, or policy
+    exception
+  action: retrieve at least two passages from knowledge-pack/finance-lending-fairness-frameworks
+    and cite the passage identifiers in the finding
+  severity: high
+- id: prefer_current_local_policy
+  condition: local policy and generic framework both match
+  action: rank local policy excerpts ahead of generic framework summaries and note
+    the precedence
+  severity: medium
+- id: refuse_ungrounded_legal_conclusion
+  condition: answer would make a definitive legal or regulatory conclusion without
+    retrieved evidence
+  action: emit an evidence gap finding instead of a definitive conclusion
+  severity: high
+- id: scale_expansion_v1_evidence_matrix_01
+  condition: evidence matrix is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve evidence matrix context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_escalation_path_02
+  condition: escalation path is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve escalation path context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_benchmark_trace_03
+  condition: benchmark trace is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve benchmark trace context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_packet_policy_04
+  condition: packet policy is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve packet policy context and record source ids before
+    emitting the review output
+  severity: high
+- id: scale_expansion_v1_gap_split_05
+  condition: gap split is needed to support a finding, recommendation, citation, or
+    benchmark trace
+  action: retrieve or preserve gap split context and record source ids before emitting
+    the review output
+  severity: medium
+- id: scale_expansion_v1_material_claim_06
+  condition: material claim is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve material claim context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_redaction_gate_07
+  condition: redaction gate is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve redaction gate context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_control_context_08
+  condition: control context is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve control context context and record source ids before
+    emitting the review output
+  severity: high
+- id: scale_expansion_v1_evidence_matrix_09
+  condition: evidence matrix is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve evidence matrix context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_escalation_path_10
+  condition: escalation path is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve escalation path context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_benchmark_trace_11
+  condition: benchmark trace is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve benchmark trace context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_packet_policy_12
+  condition: packet policy is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve packet policy context and record source ids before
+    emitting the review output
+  severity: high
+- id: scale_expansion_v1_gap_split_13
+  condition: gap split is needed to support a finding, recommendation, citation, or
+    benchmark trace
+  action: retrieve or preserve gap split context and record source ids before emitting
+    the review output
+  severity: medium
+- id: scale_expansion_v1_material_claim_14
+  condition: material claim is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve material claim context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_redaction_gate_15
+  condition: redaction gate is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve redaction gate context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_control_context_16
+  condition: control context is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve control context context and record source ids before
+    emitting the review output
+  severity: high
+- id: scale_expansion_v1_evidence_matrix_17
+  condition: evidence matrix is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve evidence matrix context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_escalation_path_18
+  condition: escalation path is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve escalation path context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_benchmark_trace_19
+  condition: benchmark trace is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve benchmark trace context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_packet_policy_20
+  condition: packet policy is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve packet policy context and record source ids before
+    emitting the review output
+  severity: high
+- id: scale_expansion_v1_gap_split_21
+  condition: gap split is needed to support a finding, recommendation, citation, or
+    benchmark trace
+  action: retrieve or preserve gap split context and record source ids before emitting
+    the review output
+  severity: medium
+- id: scale_expansion_v1_material_claim_22
+  condition: material claim is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve material claim context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_redaction_gate_23
+  condition: redaction gate is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve redaction gate context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_control_context_24
+  condition: control context is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve control context context and record source ids before
+    emitting the review output
+  severity: high
+- id: scale_expansion_v1_evidence_matrix_25
+  condition: evidence matrix is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve evidence matrix context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_escalation_path_26
+  condition: escalation path is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve escalation path context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_benchmark_trace_27
+  condition: benchmark trace is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve benchmark trace context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_packet_policy_28
+  condition: packet policy is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve packet policy context and record source ids before
+    emitting the review output
+  severity: high
+- id: scale_expansion_v1_gap_split_29
+  condition: gap split is needed to support a finding, recommendation, citation, or
+    benchmark trace
+  action: retrieve or preserve gap split context and record source ids before emitting
+    the review output
+  severity: medium
+- id: scale_expansion_v1_material_claim_30
+  condition: material claim is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve material claim context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_redaction_gate_31
+  condition: redaction gate is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve redaction gate context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_control_context_32
+  condition: control context is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve control context context and record source ids before
+    emitting the review output
+  severity: high
+- id: scale_expansion_v1_evidence_matrix_33
+  condition: evidence matrix is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve evidence matrix context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_escalation_path_34
+  condition: escalation path is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve escalation path context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_benchmark_trace_35
+  condition: benchmark trace is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve benchmark trace context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_packet_policy_36
+  condition: packet policy is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve packet policy context and record source ids before
+    emitting the review output
+  severity: high
+- id: scale_expansion_v1_gap_split_37
+  condition: gap split is needed to support a finding, recommendation, citation, or
+    benchmark trace
+  action: retrieve or preserve gap split context and record source ids before emitting
+    the review output
+  severity: medium
+- id: scale_expansion_v1_material_claim_38
+  condition: material claim is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve material claim context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_redaction_gate_39
+  condition: redaction gate is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve redaction gate context and record source ids before
+    emitting the review output
+  severity: medium
+- id: scale_expansion_v1_control_context_40
+  condition: control context is needed to support a finding, recommendation, citation,
+    or benchmark trace
+  action: retrieve or preserve control context context and record source ids before
+    emitting the review output
+  severity: high
+- id: scale_expansion_v2_evidence_matrix_001
+  condition: evidence matrix context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite evidence matrix context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: low
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.evidence_matrix
+- id: scale_expansion_v2_source_freshness_002
+  condition: source freshness context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite source freshness context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.source_freshness
+- id: scale_expansion_v2_policy_exception_003
+  condition: policy exception context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite policy exception context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.policy_exception
+- id: scale_expansion_v2_owner_routing_004
+  condition: owner routing context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite owner routing context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.owner_routing
+- id: scale_expansion_v2_redaction_gate_005
+  condition: redaction gate context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite redaction gate context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.redaction_gate
+- id: scale_expansion_v2_citation_support_006
+  condition: citation support context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite citation support context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: low
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.citation_support
+- id: scale_expansion_v2_benchmark_trace_007
+  condition: benchmark trace context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite benchmark trace context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.benchmark_trace
+- id: scale_expansion_v2_control_crosswalk_008
+  condition: control crosswalk context is required to support a material finding,
+    remediation, citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite control crosswalk context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.control_crosswalk
+- id: scale_expansion_v2_packet_completeness_009
+  condition: packet completeness context is required to support a material finding,
+    remediation, citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite packet completeness context with source ids
+    before emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.packet_completeness
+- id: scale_expansion_v2_human_escalation_010
+  condition: human escalation context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite human escalation context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.human_escalation
+- id: scale_expansion_v2_tool_permission_011
+  condition: tool permission context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite tool permission context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: low
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.tool_permission
+- id: scale_expansion_v2_data_lineage_012
+  condition: data lineage context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite data lineage context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.data_lineage
+- id: scale_expansion_v2_negative_fixture_013
+  condition: negative fixture context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite negative fixture context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.negative_fixture
+- id: scale_expansion_v2_counter_evidence_014
+  condition: counter evidence context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite counter evidence context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.counter_evidence
+- id: scale_expansion_v2_deadline_obligation_015
+  condition: deadline obligation context is required to support a material finding,
+    remediation, citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite deadline obligation context with source ids
+    before emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.deadline_obligation
+- id: scale_expansion_v2_risk_threshold_016
+  condition: risk threshold context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite risk threshold context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: low
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.risk_threshold
+- id: scale_expansion_v2_decision_record_017
+  condition: decision record context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite decision record context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.decision_record
+- id: scale_expansion_v2_appeal_path_018
+  condition: appeal path context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite appeal path context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.appeal_path
+- id: scale_expansion_v2_retrieval_boundary_019
+  condition: retrieval boundary context is required to support a material finding,
+    remediation, citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite retrieval boundary context with source ids
+    before emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.retrieval_boundary
+- id: scale_expansion_v2_gap_taxonomy_020
+  condition: gap taxonomy context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite gap taxonomy context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.gap_taxonomy
+- id: scale_expansion_v2_evidence_matrix_021
+  condition: evidence matrix context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite evidence matrix context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: low
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.evidence_matrix
+- id: scale_expansion_v2_source_freshness_022
+  condition: source freshness context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite source freshness context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.source_freshness
+- id: scale_expansion_v2_policy_exception_023
+  condition: policy exception context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite policy exception context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.policy_exception
+- id: scale_expansion_v2_owner_routing_024
+  condition: owner routing context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite owner routing context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.owner_routing
+- id: scale_expansion_v2_redaction_gate_025
+  condition: redaction gate context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite redaction gate context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.redaction_gate
+- id: scale_expansion_v2_citation_support_026
+  condition: citation support context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite citation support context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: low
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.citation_support
+- id: scale_expansion_v2_benchmark_trace_027
+  condition: benchmark trace context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite benchmark trace context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.benchmark_trace
+- id: scale_expansion_v2_control_crosswalk_028
+  condition: control crosswalk context is required to support a material finding,
+    remediation, citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite control crosswalk context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.control_crosswalk
+- id: scale_expansion_v2_packet_completeness_029
+  condition: packet completeness context is required to support a material finding,
+    remediation, citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite packet completeness context with source ids
+    before emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.packet_completeness
+- id: scale_expansion_v2_human_escalation_030
+  condition: human escalation context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite human escalation context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.human_escalation
+- id: scale_expansion_v2_tool_permission_031
+  condition: tool permission context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite tool permission context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: low
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.tool_permission
+- id: scale_expansion_v2_data_lineage_032
+  condition: data lineage context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite data lineage context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.data_lineage
+- id: scale_expansion_v2_negative_fixture_033
+  condition: negative fixture context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite negative fixture context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.negative_fixture
+- id: scale_expansion_v2_counter_evidence_034
+  condition: counter evidence context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite counter evidence context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.counter_evidence
+- id: scale_expansion_v2_deadline_obligation_035
+  condition: deadline obligation context is required to support a material finding,
+    remediation, citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite deadline obligation context with source ids
+    before emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.deadline_obligation
+- id: scale_expansion_v2_risk_threshold_036
+  condition: risk threshold context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite risk threshold context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: low
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.risk_threshold
+- id: scale_expansion_v2_decision_record_037
+  condition: decision record context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite decision record context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.decision_record
+- id: scale_expansion_v2_appeal_path_038
+  condition: appeal path context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite appeal path context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.appeal_path
+- id: scale_expansion_v2_retrieval_boundary_039
+  condition: retrieval boundary context is required to support a material finding,
+    remediation, citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite retrieval boundary context with source ids
+    before emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.retrieval_boundary
+- id: scale_expansion_v2_gap_taxonomy_040
+  condition: gap taxonomy context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite gap taxonomy context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.gap_taxonomy
+- id: scale_expansion_v2_evidence_matrix_041
+  condition: evidence matrix context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite evidence matrix context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: low
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.evidence_matrix
+- id: scale_expansion_v2_source_freshness_042
+  condition: source freshness context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite source freshness context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.source_freshness
+- id: scale_expansion_v2_policy_exception_043
+  condition: policy exception context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite policy exception context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.policy_exception
+- id: scale_expansion_v2_owner_routing_044
+  condition: owner routing context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite owner routing context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.owner_routing
+- id: scale_expansion_v2_redaction_gate_045
+  condition: redaction gate context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite redaction gate context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.redaction_gate
+- id: scale_expansion_v2_citation_support_046
+  condition: citation support context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite citation support context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: low
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.citation_support
+- id: scale_expansion_v2_benchmark_trace_047
+  condition: benchmark trace context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite benchmark trace context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.benchmark_trace
+- id: scale_expansion_v2_control_crosswalk_048
+  condition: control crosswalk context is required to support a material finding,
+    remediation, citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite control crosswalk context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.control_crosswalk
+- id: scale_expansion_v2_packet_completeness_049
+  condition: packet completeness context is required to support a material finding,
+    remediation, citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite packet completeness context with source ids
+    before emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.packet_completeness
+- id: scale_expansion_v2_human_escalation_050
+  condition: human escalation context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite human escalation context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.human_escalation
+- id: scale_expansion_v2_tool_permission_051
+  condition: tool permission context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite tool permission context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: low
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.tool_permission
+- id: scale_expansion_v2_data_lineage_052
+  condition: data lineage context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite data lineage context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.data_lineage
+- id: scale_expansion_v2_negative_fixture_053
+  condition: negative fixture context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite negative fixture context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.negative_fixture
+- id: scale_expansion_v2_counter_evidence_054
+  condition: counter evidence context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite counter evidence context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.counter_evidence
+- id: scale_expansion_v2_deadline_obligation_055
+  condition: deadline obligation context is required to support a material finding,
+    remediation, citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite deadline obligation context with source ids
+    before emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.deadline_obligation
+- id: scale_expansion_v2_risk_threshold_056
+  condition: risk threshold context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite risk threshold context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: low
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.risk_threshold
+- id: scale_expansion_v2_decision_record_057
+  condition: decision record context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite decision record context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.decision_record
+- id: scale_expansion_v2_appeal_path_058
+  condition: appeal path context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite appeal path context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.appeal_path
+- id: scale_expansion_v2_retrieval_boundary_059
+  condition: retrieval boundary context is required to support a material finding,
+    remediation, citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite retrieval boundary context with source ids
+    before emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.retrieval_boundary
+- id: scale_expansion_v2_gap_taxonomy_060
+  condition: gap taxonomy context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite gap taxonomy context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.gap_taxonomy
+- id: scale_expansion_v2_evidence_matrix_061
+  condition: evidence matrix context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite evidence matrix context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: low
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.evidence_matrix
+- id: scale_expansion_v2_source_freshness_062
+  condition: source freshness context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite source freshness context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.source_freshness
+- id: scale_expansion_v2_policy_exception_063
+  condition: policy exception context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite policy exception context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.policy_exception
+- id: scale_expansion_v2_owner_routing_064
+  condition: owner routing context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite owner routing context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.owner_routing
+- id: scale_expansion_v2_redaction_gate_065
+  condition: redaction gate context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite redaction gate context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.redaction_gate
+- id: scale_expansion_v2_citation_support_066
+  condition: citation support context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite citation support context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: low
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.citation_support
+- id: scale_expansion_v2_benchmark_trace_067
+  condition: benchmark trace context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite benchmark trace context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.benchmark_trace
+- id: scale_expansion_v2_control_crosswalk_068
+  condition: control crosswalk context is required to support a material finding,
+    remediation, citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite control crosswalk context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.control_crosswalk
+- id: scale_expansion_v2_packet_completeness_069
+  condition: packet completeness context is required to support a material finding,
+    remediation, citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite packet completeness context with source ids
+    before emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.packet_completeness
+- id: scale_expansion_v2_human_escalation_070
+  condition: human escalation context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite human escalation context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.human_escalation
+- id: scale_expansion_v2_tool_permission_071
+  condition: tool permission context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite tool permission context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: low
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.tool_permission
+- id: scale_expansion_v2_data_lineage_072
+  condition: data lineage context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite data lineage context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.data_lineage
+- id: scale_expansion_v2_negative_fixture_073
+  condition: negative fixture context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite negative fixture context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.negative_fixture
+- id: scale_expansion_v2_counter_evidence_074
+  condition: counter evidence context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite counter evidence context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.counter_evidence
+- id: scale_expansion_v2_deadline_obligation_075
+  condition: deadline obligation context is required to support a material finding,
+    remediation, citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite deadline obligation context with source ids
+    before emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.deadline_obligation
+- id: scale_expansion_v2_risk_threshold_076
+  condition: risk threshold context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite risk threshold context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: low
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.risk_threshold
+- id: scale_expansion_v2_decision_record_077
+  condition: decision record context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite decision record context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.decision_record
+- id: scale_expansion_v2_appeal_path_078
+  condition: appeal path context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite appeal path context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: medium
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.appeal_path
+- id: scale_expansion_v2_retrieval_boundary_079
+  condition: retrieval boundary context is required to support a material finding,
+    remediation, citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite retrieval boundary context with source ids
+    before emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.retrieval_boundary
+- id: scale_expansion_v2_gap_taxonomy_080
+  condition: gap taxonomy context is required to support a material finding, remediation,
+    citation, benchmark trace, or escalation decision
+  action: retrieve, preserve, and cite gap taxonomy context with source ids before
+    emitting final output for rag-finance-lending-fairness-retrieval-policy
+  severity: high
+  category: rag-finance-lending-fairness-retrieval-policy.scale_expansion_v2.gap_taxonomy

@@ -1,0 +1,13 @@
+{
+  "schema": "schemas/config/source_connector_config.v1.schema.json",
+  "version": "v1",
+  "owner": "ingestion",
+  "environment_scope": "all",
+  "config_type": "source_connector_config",
+  "tenant_scope": "global_public",
+  "source_class": "cfpb_structured",
+  "auth_ref": "env://CFPB_API_TOKEN",
+  "fallback_fixture": "scripts/runtime/builtin_processors.py#source.cfpb_fixture",
+  "sync_policy_ref": "templates/configs/sync_policy/example.cfpb.json",
+  "notes": "Filled-in example for the proven CFPB structured connector. The token is referenced by env://, never embedded; the deterministic fixture lets every proof run offline."
+}

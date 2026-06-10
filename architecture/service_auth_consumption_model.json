@@ -1,0 +1,697 @@
+{
+  "version": "1.0",
+  "status": "draft",
+  "updated": "2026-06-09",
+  "source_doc": "docs/architecture/service-auth-and-consumption-model.md",
+  "service_registry": "services/registry.yaml",
+  "governance_law": {
+    "api_keys_internal_forbidden": "API keys are allowed for external SDKs, CLIs, and publisher clients; internal service-to-service calls use service accounts and short-lived tokens.",
+    "no_shared_god_token": "Each service has a distinct service account; no credential is shared across all services.",
+    "tenant_authorization_required": "Authentication is insufficient; service calls must authorize tenant, object, action, purpose, scope, and data class before data access.",
+    "private_bench_server_side_required": "Private-first hub access must be enforced server-side in production; prototype banners are not security controls.",
+    "audit_or_receipt_required": "Every privileged cross-service request emits an audit event or receipt with a correlation id."
+  },
+  "allowed_auth_methods": {
+    "user_session": "OIDC/SSO-backed browser session for humans.",
+    "external_api_key": "Scoped key for customer SDKs, CLIs, publishers, and webhooks; hash-only at rest.",
+    "oauth_client_credentials": "OAuth 2.0 client credentials for confidential clients acting as themselves.",
+    "internal_service_token": "Short-lived service token minted for a service account and audience.",
+    "mtls_spiffe": "mTLS/SPIFFE or equivalent cloud workload identity for production service-to-service calls.",
+    "queue_identity": "Worker identity authorized for specific queues and job kinds.",
+    "datastore_workload_identity": "Least-privilege cloud/IAM/workload identity for datastore access.",
+    "signed_webhook": "Signed source webhook or connector OAuth grant."
+  },
+  "token_requirements": {
+    "service_tokens_must_include": [
+      "iss",
+      "sub",
+      "aud",
+      "exp",
+      "tenant_id",
+      "scope",
+      "purpose",
+      "correlation_id"
+    ],
+    "api_key_records_must_include": [
+      "hash",
+      "prefix",
+      "tenant_id",
+      "workspace_id",
+      "scopes",
+      "created_by",
+      "created_at",
+      "expires_at",
+      "last_used_at",
+      "revoked_at"
+    ],
+    "raw_secret_literals_forbidden": [
+      "api_key",
+      "client_secret",
+      "password",
+      "private_key",
+      "secret",
+      "token"
+    ]
+  },
+  "service_accounts": [
+    {
+      "service": "harness-hub",
+      "account_id": "svc-harness-hub",
+      "identity_type": "product_service",
+      "credential_strategy": {
+        "local": "internal_service_token",
+        "production": "mtls_spiffe"
+      },
+      "external_auth": [
+        "user_session",
+        "external_api_key"
+      ],
+      "base_scopes": [
+        "tenant:read",
+        "registry:read",
+        "foundry:enqueue"
+      ],
+      "data_classes": [
+        "public",
+        "internal_non_sensitive"
+      ],
+      "audit_events": [
+        "product_request",
+        "registry_read",
+        "job_enqueued"
+      ]
+    },
+    {
+      "service": "baltor",
+      "account_id": "svc-baltor",
+      "identity_type": "product_service",
+      "credential_strategy": {
+        "local": "internal_service_token",
+        "production": "mtls_spiffe"
+      },
+      "external_auth": [
+        "user_session",
+        "external_api_key"
+      ],
+      "base_scopes": [
+        "tenant:read",
+        "context:read",
+        "context:serve",
+        "context:verify",
+        "enrichment:enqueue",
+        "ingestion:enqueue"
+      ],
+      "data_classes": [
+        "public",
+        "internal_non_sensitive",
+        "tenant_private",
+        "regulated"
+      ],
+      "audit_events": [
+        "context_request",
+        "context_receipt",
+        "job_enqueued",
+        "policy_decision"
+      ]
+    },
+    {
+      "service": "context-is-everything",
+      "account_id": "svc-context-is-everything",
+      "identity_type": "product_service",
+      "credential_strategy": {
+        "local": "none_static_preview",
+        "production": "user_session_if_console_enabled"
+      },
+      "external_auth": [],
+      "base_scopes": [
+        "portfolio:read"
+      ],
+      "data_classes": [
+        "public"
+      ],
+      "audit_events": [
+        "portfolio_projection_view"
+      ]
+    },
+    {
+      "service": "ingestion",
+      "account_id": "svc-ingestion",
+      "identity_type": "platform_worker",
+      "credential_strategy": {
+        "local": "queue_identity",
+        "production": "mtls_spiffe"
+      },
+      "external_auth": [
+        "signed_webhook"
+      ],
+      "base_scopes": [
+        "source:read",
+        "source:normalize",
+        "event:emit"
+      ],
+      "data_classes": [
+        "public",
+        "internal_non_sensitive",
+        "tenant_private"
+      ],
+      "audit_events": [
+        "source_event_received",
+        "source_normalized"
+      ]
+    },
+    {
+      "service": "foundry",
+      "account_id": "svc-foundry",
+      "identity_type": "platform_worker",
+      "credential_strategy": {
+        "local": "queue_identity",
+        "production": "mtls_spiffe"
+      },
+      "external_auth": [],
+      "base_scopes": [
+        "candidate:create",
+        "measurement:call",
+        "event:emit"
+      ],
+      "data_classes": [
+        "public",
+        "internal_non_sensitive"
+      ],
+      "audit_events": [
+        "candidate_loaded",
+        "measurement_requested"
+      ]
+    },
+    {
+      "service": "measurement",
+      "account_id": "svc-measurement",
+      "identity_type": "platform_worker",
+      "credential_strategy": {
+        "local": "queue_identity",
+        "production": "mtls_spiffe"
+      },
+      "external_auth": [],
+      "base_scopes": [
+        "measurement:run",
+        "verification:run",
+        "scorecard:write"
+      ],
+      "data_classes": [
+        "public",
+        "internal_non_sensitive"
+      ],
+      "audit_events": [
+        "measurement_run",
+        "scorecard_written"
+      ]
+    },
+    {
+      "service": "enrichment",
+      "account_id": "svc-enrichment",
+      "identity_type": "platform_worker",
+      "credential_strategy": {
+        "local": "queue_identity",
+        "production": "mtls_spiffe"
+      },
+      "external_auth": [],
+      "base_scopes": [
+        "context:enrich",
+        "compression:run",
+        "memory:read",
+        "retrieval:read",
+        "measurement:call"
+      ],
+      "data_classes": [
+        "public",
+        "internal_non_sensitive",
+        "tenant_private",
+        "regulated"
+      ],
+      "audit_events": [
+        "context_enriched",
+        "tier_built",
+        "measurement_requested"
+      ]
+    },
+    {
+      "service": "retrieval",
+      "account_id": "svc-retrieval",
+      "identity_type": "platform_request",
+      "credential_strategy": {
+        "local": "internal_service_token",
+        "production": "mtls_spiffe"
+      },
+      "external_auth": [],
+      "base_scopes": [
+        "retrieval:read",
+        "vector:read",
+        "graph:read"
+      ],
+      "data_classes": [
+        "public",
+        "internal_non_sensitive",
+        "tenant_private",
+        "regulated"
+      ],
+      "audit_events": [
+        "retrieval_query",
+        "vector_read"
+      ]
+    },
+    {
+      "service": "governance",
+      "account_id": "svc-governance",
+      "identity_type": "platform_scheduled",
+      "credential_strategy": {
+        "local": "queue_identity",
+        "production": "mtls_spiffe"
+      },
+      "external_auth": [],
+      "base_scopes": [
+        "promotion:read",
+        "promotion:write",
+        "cdc:emit",
+        "provenance:sign"
+      ],
+      "data_classes": [
+        "public",
+        "internal_non_sensitive",
+        "tenant_private"
+      ],
+      "audit_events": [
+        "promotion_decision",
+        "cdc_emitted",
+        "provenance_signed"
+      ]
+    },
+    {
+      "service": "worker",
+      "account_id": "svc-worker",
+      "identity_type": "infra_worker",
+      "credential_strategy": {
+        "local": "queue_identity",
+        "production": "mtls_spiffe"
+      },
+      "external_auth": [],
+      "base_scopes": [
+        "queue:consume",
+        "job:run"
+      ],
+      "data_classes": [
+        "public",
+        "internal_non_sensitive",
+        "tenant_private"
+      ],
+      "audit_events": [
+        "job_started",
+        "job_finished",
+        "job_failed"
+      ]
+    },
+    {
+      "service": "scheduler",
+      "account_id": "svc-scheduler",
+      "identity_type": "infra_scheduler",
+      "credential_strategy": {
+        "local": "internal_service_token",
+        "production": "mtls_spiffe"
+      },
+      "external_auth": [],
+      "base_scopes": [
+        "schedule:trigger",
+        "queue:enqueue"
+      ],
+      "data_classes": [
+        "public",
+        "internal_non_sensitive"
+      ],
+      "audit_events": [
+        "scheduled_job_triggered"
+      ]
+    },
+    {
+      "service": "identity",
+      "account_id": "svc-identity",
+      "identity_type": "platform_service",
+      "credential_strategy": {
+        "local": "internal_service_token",
+        "production": "mtls_spiffe"
+      },
+      "external_auth": [
+        "user_session",
+        "external_api_key"
+      ],
+      "base_scopes": [
+        "identity:register",
+        "identity:login",
+        "identity:session_validate",
+        "identity:api_key_verify"
+      ],
+      "data_classes": [
+        "account_metadata_non_sensitive"
+      ],
+      "audit_events": [
+        "register",
+        "login",
+        "session_validate",
+        "api_key_mint",
+        "api_key_verify",
+        "api_key_revoke"
+      ]
+    }
+  ],
+  "service_edges": [
+    {
+      "caller": "harness-hub",
+      "callee": "retrieval",
+      "channel": "sync_read",
+      "auth_method": "internal_service_token",
+      "production_binding": "mtls_spiffe",
+      "scopes": [
+        "retrieval:read"
+      ],
+      "authorization_checks": [
+        "tenant_id",
+        "route_purpose",
+        "data_class"
+      ],
+      "receipt": "platform_access_audit"
+    },
+    {
+      "caller": "harness-hub",
+      "callee": "foundry",
+      "channel": "enqueue",
+      "auth_method": "internal_service_token",
+      "production_binding": "mtls_spiffe",
+      "scopes": [
+        "foundry:enqueue"
+      ],
+      "authorization_checks": [
+        "tenant_id",
+        "job_kind",
+        "budget_policy"
+      ],
+      "receipt": "queued_job_receipt"
+    },
+    {
+      "caller": "baltor",
+      "callee": "retrieval",
+      "channel": "sync_read",
+      "auth_method": "internal_service_token",
+      "production_binding": "mtls_spiffe",
+      "scopes": [
+        "retrieval:read",
+        "context:read"
+      ],
+      "authorization_checks": [
+        "tenant_id",
+        "purpose",
+        "data_class",
+        "freshness_policy"
+      ],
+      "receipt": "context_access_receipt"
+    },
+    {
+      "caller": "baltor",
+      "callee": "enrichment",
+      "channel": "sync_read",
+      "auth_method": "internal_service_token",
+      "production_binding": "mtls_spiffe",
+      "scopes": [
+        "context:enrich"
+      ],
+      "authorization_checks": [
+        "tenant_id",
+        "purpose",
+        "data_class",
+        "policy_decision"
+      ],
+      "receipt": "context_access_receipt"
+    },
+    {
+      "caller": "baltor",
+      "callee": "enrichment",
+      "channel": "enqueue",
+      "auth_method": "internal_service_token",
+      "production_binding": "mtls_spiffe",
+      "scopes": [
+        "enrichment:enqueue"
+      ],
+      "authorization_checks": [
+        "tenant_id",
+        "job_kind",
+        "approval_policy"
+      ],
+      "receipt": "queued_job_receipt"
+    },
+    {
+      "caller": "baltor",
+      "callee": "ingestion",
+      "channel": "enqueue",
+      "auth_method": "internal_service_token",
+      "production_binding": "mtls_spiffe",
+      "scopes": [
+        "ingestion:enqueue"
+      ],
+      "authorization_checks": [
+        "tenant_id",
+        "source_grant",
+        "approval_policy"
+      ],
+      "receipt": "queued_job_receipt"
+    },
+    {
+      "caller": "foundry",
+      "callee": "measurement",
+      "channel": "call",
+      "auth_method": "internal_service_token",
+      "production_binding": "mtls_spiffe",
+      "scopes": [
+        "measurement:run"
+      ],
+      "authorization_checks": [
+        "tenant_id",
+        "candidate_id",
+        "eval_policy"
+      ],
+      "receipt": "measurement_receipt"
+    },
+    {
+      "caller": "foundry",
+      "callee": "event_bus",
+      "channel": "event_emit",
+      "auth_method": "internal_service_token",
+      "production_binding": "mtls_spiffe",
+      "scopes": [
+        "event:emit"
+      ],
+      "authorization_checks": [
+        "event_type",
+        "tenant_id",
+        "candidate_id"
+      ],
+      "receipt": "event_audit"
+    },
+    {
+      "caller": "enrichment",
+      "callee": "measurement",
+      "channel": "call",
+      "auth_method": "internal_service_token",
+      "production_binding": "mtls_spiffe",
+      "scopes": [
+        "measurement:run",
+        "verification:run"
+      ],
+      "authorization_checks": [
+        "tenant_id",
+        "context_object_id",
+        "eval_policy"
+      ],
+      "receipt": "measurement_receipt"
+    },
+    {
+      "caller": "enrichment",
+      "callee": "event_bus",
+      "channel": "event_emit",
+      "auth_method": "internal_service_token",
+      "production_binding": "mtls_spiffe",
+      "scopes": [
+        "event:emit"
+      ],
+      "authorization_checks": [
+        "event_type",
+        "tenant_id",
+        "context_object_id"
+      ],
+      "receipt": "event_audit"
+    },
+    {
+      "caller": "ingestion",
+      "callee": "event_bus",
+      "channel": "event_emit",
+      "auth_method": "internal_service_token",
+      "production_binding": "mtls_spiffe",
+      "scopes": [
+        "event:emit"
+      ],
+      "authorization_checks": [
+        "event_type",
+        "tenant_id"
+      ],
+      "receipt": "event_audit"
+    },
+    {
+      "caller": "governance",
+      "callee": "event_bus",
+      "channel": "event_emit",
+      "auth_method": "internal_service_token",
+      "production_binding": "mtls_spiffe",
+      "scopes": [
+        "cdc:emit"
+      ],
+      "authorization_checks": [
+        "event_type",
+        "tenant_id"
+      ],
+      "receipt": "event_audit"
+    },
+    {
+      "caller": "retrieval",
+      "callee": "postgres_pgvector",
+      "channel": "datastore_read",
+      "auth_method": "datastore_workload_identity",
+      "production_binding": "cloud_iam_or_mtls_spiffe",
+      "scopes": [
+        "vector:read"
+      ],
+      "authorization_checks": [
+        "tenant_id",
+        "table_policy",
+        "data_class"
+      ],
+      "receipt": "datastore_read_audit"
+    },
+    {
+      "caller": "harness-hub",
+      "callee": "identity",
+      "channel": "sync_read",
+      "auth_method": "internal_service_token",
+      "production_binding": "mtls_spiffe",
+      "scopes": [
+        "identity:session_validate",
+        "identity:api_key_verify"
+      ],
+      "authorization_checks": [
+        "tenant_id",
+        "route_purpose",
+        "data_class"
+      ],
+      "receipt": "identity_access_audit"
+    },
+    {
+      "caller": "baltor",
+      "callee": "identity",
+      "channel": "sync_read",
+      "auth_method": "internal_service_token",
+      "production_binding": "mtls_spiffe",
+      "scopes": [
+        "identity:session_validate",
+        "identity:api_key_verify"
+      ],
+      "authorization_checks": [
+        "tenant_id",
+        "route_purpose",
+        "data_class"
+      ],
+      "receipt": "identity_access_audit"
+    }
+  ],
+  "external_edges": [
+    {
+      "caller": "browser_user",
+      "callee": "product_api",
+      "auth_method": "user_session",
+      "authorization_checks": [
+        "tenant_id",
+        "role",
+        "route",
+        "object_id",
+        "csrf"
+      ],
+      "receipt": "request_audit"
+    },
+    {
+      "caller": "customer_sdk_or_cli",
+      "callee": "product_api",
+      "auth_method": "external_api_key",
+      "authorization_checks": [
+        "tenant_id",
+        "key_scope",
+        "quota",
+        "data_class"
+      ],
+      "receipt": "api_key_usage_audit"
+    },
+    {
+      "caller": "webhook_source",
+      "callee": "ingestion",
+      "auth_method": "signed_webhook",
+      "authorization_checks": [
+        "tenant_id",
+        "connector_grant",
+        "replay_window"
+      ],
+      "receipt": "source_event_receipt"
+    },
+    {
+      "caller": "browser_user",
+      "callee": "identity",
+      "auth_method": "user_session",
+      "authorization_checks": [
+        "realm_id",
+        "route",
+        "csrf"
+      ],
+      "receipt": "identity_audit"
+    }
+  ],
+  "implementation_phases": [
+    {
+      "phase": "prototype_honesty",
+      "requires": [
+        "no_fake_secrets",
+        "private_first_labeled_not_enforced",
+        "account_pages_marked_simulated"
+      ]
+    },
+    {
+      "phase": "local_mvp",
+      "requires": [
+        "local_signed_dev_tokens",
+        "api_key_hash_storage",
+        "tenant_scope_middleware",
+        "cross_service_audit_events"
+      ]
+    },
+    {
+      "phase": "production_saas",
+      "requires": [
+        "oidc_sso",
+        "oauth_client_credentials",
+        "mtls_spiffe_or_cloud_workload_identity",
+        "secret_manager",
+        "per_service_accounts"
+      ]
+    },
+    {
+      "phase": "enterprise",
+      "requires": [
+        "customer_managed_idp",
+        "scim",
+        "audit_export",
+        "private_connectivity",
+        "service_dependency_drift_checks"
+      ]
+    }
+  ]
+}

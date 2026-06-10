@@ -1,0 +1,40 @@
+id: "knowledge-pack/hybrid-postgres-bigquery-hosting-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Hybrid Postgres BigQuery hosting patterns"
+description: "Low-cost hosting patterns for keeping Open Harness Hub product state in Postgres/pgvector while using object storage and BigQuery for cold shards, vector analytics, cost traces, ranking, and trajectory-fragment cache analysis."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "retrieval", "serving", "evaluation"]
+modality: ["text", "structured", "tabular"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "dated"
+lifecycle_position: "cross_cutting.hosting"
+tags: ["postgres", "pgvector", "bigquery", "vector-search", "object-storage", "low-cost-hosting"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types:
+  - "hosting_pattern"
+  - "cost_control_pattern"
+  - "warehouse_tier_pattern"
+files:
+  - path: "catalog/knowledge-packs/data/hybrid-postgres-bigquery-hosting-patterns/patterns.jsonl"
+    format: "jsonl"
+    schema: "hybrid-hosting-pattern"
+indexing:
+  bm25: true
+  dense:
+    recommended_model: "sentence-transformers/all-MiniLM-L6-v2"
+provenance:
+  sources:
+    - "https://docs.cloud.google.com/bigquery/docs/vector-index"
+    - "https://cloud.google.com/bigquery/docs/vector-search-intro"
+    - "https://docs.cloud.google.com/bigquery/docs/best-practices-costs"
+    - "https://docs.cloud.google.com/sql/docs/postgres/ai-overview"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "No personal data; architecture and cost-control patterns only."

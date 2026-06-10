@@ -1,0 +1,23 @@
+{
+  "$id": "blackboard/BlackboardCompressionReport.v1",
+  "title": "BlackboardCompressionReport.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "The receipt for losslessly compressing a converged blackboard (entries_before -> entries_after). Compression shrinks the entry surface ONLY if answer-critical lineage survives: source_handles_preserved and held_out_preserved are pinned const true — compression may NEVER drop provenance handles or held-out items (lossless distillation law; omitted/held-out != deleted). fidelity_note records the human-readable retention argument. Compression produces a new versioned derived layer; the raw entries + lineage remain rehydratable.",
+  "required": [
+    "blackboard_id",
+    "entries_before",
+    "entries_after",
+    "source_handles_preserved",
+    "held_out_preserved",
+    "fidelity_note"
+  ],
+  "properties": {
+    "blackboard_id": {"type": "string", "description": "the blackboard that was compressed"},
+    "entries_before": {"type": "integer", "minimum": 0, "description": "entry count before compression"},
+    "entries_after": {"type": "integer", "minimum": 0, "description": "entry count after compression (the derived layer; raw entries remain rehydratable)"},
+    "source_handles_preserved": {"type": "boolean", "const": true, "description": "ALWAYS true — compression must preserve every source/provenance handle; dropping handles is forbidden by the lossless distillation law"},
+    "held_out_preserved": {"type": "boolean", "const": true, "description": "ALWAYS true — compression must preserve held-out/minority/rejected items; omitted != deleted"},
+    "fidelity_note": {"type": "string", "description": "human-readable retention argument: what was merged, what was kept, why answer-critical facts survive"}
+  }
+}

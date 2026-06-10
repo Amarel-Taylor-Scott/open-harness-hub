@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"></meta>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+<title>Ops, Pro-Forma &amp; GTM — Pass 11</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"></link>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"></link>
+<link rel="stylesheet" href="shared/oh-tokens.css"></link>
+<style>
+  html, body { margin: 0; }
+  body.oh { background: var(--bg); color: var(--fg); font-family: var(--font-display); -webkit-font-smoothing: antialiased; }
+  .doc { max-width: 940px; margin: 0 auto; padding: 0 32px 96px; }
+  .doc-top { display: flex; align-items: center; gap: 12px; padding: 22px 0 18px; border-bottom: 1px solid var(--line); }
+  .doc-mark { width: 28px; height: 28px; border-radius: 7px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 800; font-size: 13px; }
+  .doc-brand { font-weight: 800; font-size: 15px; letter-spacing: -.02em; }
+  .doc-brand small { display: block; font-weight: 500; font-size: 11px; color: var(--fg-faint); }
+  .doc-top .sp { flex: 1; }
+  .doc-date { font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; background: var(--panel); }
+  .eyebrow { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-top: 44px; }
+  h1 { font-size: 32px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; margin: 12px 0 0; max-width: 26ch; }
+  .lede { font-size: 15.5px; line-height: 1.65; color: var(--fg-muted); margin: 16px 0 0; max-width: 66ch; text-wrap: pretty; }
+  .lede b { color: var(--fg); font-weight: 600; }
+  h2 { font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin: 54px 0 0; padding-bottom: 12px; border-bottom: 1px solid var(--line); display: flex; align-items: baseline; gap: 12px; }
+  h2 .n { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); font-weight: 600; }
+  p { font-size: 14px; line-height: 1.65; color: var(--fg-muted); margin: 12px 0 0; max-width: 70ch; text-wrap: pretty; }
+  p b { color: var(--fg); font-weight: 600; }
+  code { font-family: var(--font-mono); font-size: .92em; background: var(--bg-subtle); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 16px; }
+  th { text-align: left; font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-faint); padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: top; line-height: 1.5; color: var(--fg-muted); }
+  td .tt { color: var(--fg); font-weight: 600; }
+  td.num { font-family: var(--font-mono); font-size: 11.5px; white-space: nowrap; }
+  .callout { border: 1px solid color-mix(in srgb, var(--verified) 36%, var(--line)); background: color-mix(in srgb, var(--verified) 7%, var(--panel)); border-radius: var(--r-lg); padding: 16px 20px; margin-top: 18px; font-size: 14px; line-height: 1.6; color: var(--fg-muted); max-width: 72ch; }
+  .callout b { color: var(--fg); }
+  .warn { border: 1px solid color-mix(in srgb, var(--warning) 36%, var(--line)); background: color-mix(in srgb, var(--warning) 7%, var(--panel)); border-radius: var(--r-md); padding: 12px 16px; margin-top: 14px; font-size: 12.5px; line-height: 1.55; color: var(--fg-muted); max-width: 74ch; }
+  .warn b { color: var(--warning); }
+  ol.chan { margin: 14px 0 0; padding: 0; list-style: none; counter-reset: c; }
+  ol.chan li { font-size: 13.5px; line-height: 1.6; color: var(--fg-muted); padding: 11px 0 11px 36px; position: relative; border-bottom: 1px solid var(--line); max-width: 76ch; counter-increment: c; }
+  ol.chan li:last-child { border-bottom: none; }
+  ol.chan li::before { content: counter(c); position: absolute; left: 0; top: 10px; width: 23px; height: 23px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--line)); color: var(--accent); font-family: var(--font-mono); font-size: 11px; font-weight: 600; display: grid; place-items: center; }
+  ol.chan b { color: var(--fg); font-weight: 600; }
+  ol.chan .m { display: block; font-family: var(--font-mono); font-size: 10.5px; color: var(--fg-faint); margin-top: 3px; }
+  .foot { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12px; color: var(--fg-faint); line-height: 1.6; }
+  .foot b { color: var(--fg-muted); font-weight: 600; }
+</style>
+</head>
+<body class="oh dir-s theme-light">
+<div class="doc">
+
+  <header class="doc-top">
+    <div class="doc-mark">A</div>
+    <div class="doc-brand">AI Done Right<small>internal · operations + pro-forma + GTM</small></div>
+    <div class="sp"></div>
+    <div class="doc-date">pass 11 · 2026-06-09</div>
+  </header>
+
+  <div class="eyebrow">Ops handbook · startup economics · marketing</div>
+  <h1>The company can't die of infrastructure. Now make it live on revenue.</h1>
+  <p class="lede">Pass 11 consolidates the operational system into one handbook (<code>production/OPERATIONS.md</code>: pipeline, deploy, infra, runbooks, cadences) and adds the money layer: a pro-forma cost model by stage, expense/revenue scenarios with stated assumptions, and the GTM plan where <b>every channel ships with its funnel events wired before effort scales</b>. Canonical: <code>business/PRO-FORMA.md</code> · <code>business/MARKETING.md</code>.</p>
+
+  <h2><span class="n">01</span> Operations, consolidated</h2>
+  <p>One index now maps the whole system — CI (Actions → <code>just</code> stages only), the self-orienting deploy, the manifest, vault, monitoring ladder, growth ladder — plus the operating cadences (<b>weekly:</b> bench + funnel review · <b>monthly:</b> actuals vs pro-forma, ceiling breaches need recorded decisions · <b>every level change:</b> re-run the scenario math) and the short runbook list: tunnel died, unhealthy deploy, rollback (append-only state means code rollbacks never corrupt data), leaked secret (revoke + re-mint by design), cost spike (receipts attribute spend per key).</p>
+
+  <h2><span class="n">02</span> Cost structure by stage (pro-forma, monthly)</h2>
+  <table>
+    <thead><tr><th>Stage</th><th>Infra</th><th>Tooling</th><th>Total burn</th><th>Gate to next</th></tr></thead>
+    <tbody>
+      <tr><td class="tt">0 · now (L0/L1)</td><td class="num">$0</td><td class="num">~$10–20</td><td class="num">≈$10–20</td><td>any external user needs uptime</td></tr>
+      <tr><td class="tt">1 · first users (L2)</td><td class="num">$9.49–24</td><td class="num">$0–25</td><td class="num">≈$15–50</td><td>first revenue</td></tr>
+      <tr><td class="tt">2 · first revenue</td><td class="num">$50–200</td><td class="num">$50–100 + Stripe %</td><td class="num">≈$100–300</td><td>measured S-F/S-C triggers</td></tr>
+      <tr><td class="tt">3 · growth</td><td class="num">$500–2k</td><td class="num">$100–300</td><td class="num">≈$600–2,500</td><td>MRR must already cover it — or we don't enter</td></tr>
+    </tbody>
+  </table>
+  <div class="warn"><b>Domain reality check.</b> The 21 hub <code>.io</code> domains cost ~$35–60/yr <i>each</i> (~$700–1,250/yr). Decision: hubs live as subdomains until each earns its flip — <b>buy the .io at its launch event, not before.</b> Core three domains ≈ $100/yr total.</div>
+  <div class="warn"><b>Biggest assumption on the page:</b> founder-operated until revenue justifies payroll. Infrastructure is deliberately the small line; founder time is the real burn.</div>
+
+  <h2><span class="n">03</span> Revenue scenarios @ month 12 (assumptions stated, to validate)</h2>
+  <p>Pricing hypotheses: Baltor/Teleon Team <b>$99/mo</b>, Growth <b>$499/mo</b>, enterprise self-host $2k+ (S-E: ~$0 infra for us), hubs free (funnel), LLM plane metered at cost + 20–30% (receipts are the meter — shipped). Funnel assumptions: visitor→signup 2% · signup→activate 40% · activate→paid 7% (3–15% range) · blended ACV $150/mo · churn 3%/mo.</p>
+  <table>
+    <thead><tr><th>Scenario</th><th>Hub visitors/mo</th><th>Paying customers</th><th>MRR</th><th>Monthly cost</th><th>Margin</th></tr></thead>
+    <tbody>
+      <tr><td class="tt">Conservative</td><td class="num">5,000</td><td class="num">3–4</td><td class="num">~$500</td><td class="num">$50</td><td class="num">90%</td></tr>
+      <tr><td class="tt">Base</td><td class="num">20,000</td><td class="num">11–12</td><td class="num">~$1,700</td><td class="num">$150</td><td class="num">91%</td></tr>
+      <tr><td class="tt">Optimistic</td><td class="num">75,000</td><td class="num">40+</td><td class="num">~$6,300</td><td class="num">$400</td><td class="num">94%</td></tr>
+    </tbody>
+  </table>
+  <div class="callout"><b>Break-even on infrastructure: one paying customer.</b> That's the payoff of the ladder discipline — fixed costs stay under one seat of revenue until growth is <i>measured</i>. Unit economics are computable from receipts we already emit: LLM gross margin per key, infra cost per active realm, CAC ≈ $0 while channels stay organic.</div>
+
+  <h2><span class="n">04</span> GTM — channels in adoption order</h2>
+  <ol class="chan">
+    <li><b>The hub content engine (SEO, programmatic).</b> 21 registries × every entry = indexable pages with real utility — and nobody else's directory pages carry receipts. The moat channel.<span class="m">measure: discover events per hub · entries indexed</span></li>
+    <li><b>Launch events.</b> Every private→live hub flip is a launch (Show HN, PH, r/selfhosted, MCP communities). 12 private-bench hubs = <b>a year of launch cadence already sitting in the repo.</b><span class="m">measure: visitor spike + signup conversion per launch</span></li>
+    <li><b>Container distribution as marketing.</b> ghcr/Docker Hub with SBOM + cosign badges; READMEs are landing pages; <code>docker pull</code> is the CTA; awesome-lists + MCP directories.<span class="m">measure: pulls · verified-deployment handshakes</span></li>
+    <li><b>Founder-technical content.</b> The receipts thesis writes itself: held-out conflicts, verified-corpus vs grounded-answer. 1–2 posts/mo.<span class="m">measure: engage events by referrer</span></li>
+    <li><b>Paid (gated).</b> Only after the organic baseline exists; needs its own pro-forma line (budget cap, CPL target, kill threshold) before a dollar moves.</li>
+  </ol>
+  <p><b>The demo is the marketing:</b> every page routes to "watch it run" — the guided demos and run consoles are the conversion engine; A/B on hero/CTA/demo-first via OHExp, whose exposure/conversion events already have a real sink.</p>
+
+  <div class="foot">
+    <b>Self-evaluation.</b> Improved: the operational system has one index with cadences and runbooks; the startup has a falsifiable money model (every number an assumption with a review cadence, receipts making unit economics computable); marketing is a measured system, not vibes. Honest: revenue scenarios are illustrative until the first 10 customers price-test them; payroll is excluded and said so. The handoff folder remains stale vs root (re-copy at final handoff).
+  </div>
+
+</div>
+</body>
+</html>

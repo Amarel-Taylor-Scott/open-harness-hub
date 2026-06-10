@@ -1,0 +1,83 @@
+id: "pipeline/local-sentence-to-pipeline-demo"
+type: pipeline
+version: "0.1.0"
+name: "Local sentence-to-pipeline demo"
+description: "Runs the downloadable local demo path: turn a plain-language request into costed LLM pipeline options with guardrails, eval kits, A/B cost-quality testing, and deployment bundle placeholders."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["planning", "generation", "evaluation", "governance"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.product"
+tags: ["local-demo", "sentence-to-pipeline", "guardrails", "eval-kits", "cost-testing"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Convert a user sentence into cheap, balanced, and quality-first pipeline blueprints with guardrail and eval registry recommendations."
+pipeline_kind: "meta_build.local_blueprint_demo"
+inputs:
+  - name: "prompt"
+    type: "string"
+  - name: "simulate"
+    type: "boolean"
+  - name: "cost_policy"
+    type: "object"
+outputs:
+  - name: "task_parse"
+    type: "json"
+  - name: "options"
+    type: "array"
+  - name: "deployment_bundle"
+    type: "json"
+  - name: "eval_plan"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/local-demo-verified-fact-patterns"
+    - "knowledge-pack/llm-pipeline-saas-blueprints"
+steps:
+  - id: "run-local-blueprint"
+    kind: "tool"
+    ref: "tool/sentence-to-pipeline-blueprint-runner"
+    inputs:
+      prompt: "$.inputs.prompt"
+      simulate: "$.inputs.simulate"
+  - id: "recommend-full-blueprint"
+    kind: "pipeline"
+    ref: "pipeline/llm-pipeline-saas-blueprint"
+    inputs:
+      task_prompt: "$.inputs.prompt"
+      budget: "$.inputs.cost_policy"
+  - id: "screen-multimodal-safety"
+    kind: "tool"
+    ref: "tool/multimodal-safety-screen"
+    inputs:
+      reason: "High-risk image plus text workflows require safety and review routing before model classification."
+  - id: "cost-ab-test"
+    kind: "processor"
+    ref: "processor/cost-ceiling-gate"
+    inputs:
+      budget_usd: "$.inputs.cost_policy.max_usd"
+success_criteria:
+  - kind: "semantic"
+    target: "$.options"
+    must_cover:
+      - "cheap option"
+      - "balanced option"
+      - "quality-first option"
+      - "guardrails"
+      - "eval kit"
+      - "cost estimate"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Local demo emits costed blueprint options."
+  - kind: "deterministic"
+    target: "$.deployment_bundle"
+    op: "is_truthy"
+    value: true
+    severity: "medium"
+    label: "Deployment bundle placeholder is emitted."

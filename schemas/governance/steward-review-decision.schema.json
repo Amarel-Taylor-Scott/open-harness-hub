@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/governance/steward-review-decision.schema.json",
+  "title": "Steward review decision",
+  "description": "A human steward's ruling on a steward-review-request: approve / reject / needs_more_info, with reviewer, reason, and (optional) conditions. Links back to the request id for the audit trail.",
+  "type": "object",
+  "required": ["kind", "decision_id", "review_request_id", "decision", "reviewer", "decided_at"],
+  "properties": {
+    "kind": { "type": "string", "const": "baltor.steward-review-decision.v1" },
+    "decision_id": { "type": "string" },
+    "review_request_id": { "type": "string", "description": "the steward-review-request this rules on" },
+    "decision": { "type": "string", "enum": ["approve", "reject", "needs_more_info"] },
+    "reviewer": { "type": "string" },
+    "reason": { "type": "string" },
+    "conditions": { "type": "array", "items": { "type": "string" }, "description": "conditions attached to an approval" },
+    "decided_at": { "type": "string" }
+  },
+  "additionalProperties": true
+}

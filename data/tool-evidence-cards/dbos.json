@@ -1,0 +1,20 @@
+{
+  "kind": "baltor.tool-evidence-card.v1",
+  "id": "tool.dbos",
+  "name": "DBOS",
+  "capability": "durable_workflow_engine",
+  "github_url": "https://github.com/dbos-inc",
+  "license": "MIT",
+  "hosting": "self_hosted",
+  "free_noncommercial": "yes_oss",
+  "local_demo_fit": "high",
+  "regulated_fit": "high",
+  "adapter_complexity": "low",
+  "security_notes": "checkpoints workflow state in the existing Postgres — no extra trust boundary",
+  "strengths": ["zero extra infra for a Postgres/pgvector stack", "durable execution + queues"],
+  "weaknesses": ["younger than Temporal for very large fleets"],
+  "fallbacks": ["Temporal"],
+  "decision": "adopt",
+  "evidence": [{"source": "research/backend-tool-verification.md", "note": "primary durable engine; Temporal fallback for dedicated durable-execution servers"}],
+  "last_evaluated_at": "2026-06-04"
+}

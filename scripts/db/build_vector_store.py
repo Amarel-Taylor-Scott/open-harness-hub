@@ -12,16 +12,17 @@ families (db/postgres/schema.sql) so the same shape works locally and hosted:
 
 Embedder selection is pluggable and offline-first:
 
-  * "all-MiniLM-L6-v2" (384) when sentence-transformers is installed -> real
+  * the registered local sentence-transformers default when installed -> real
     semantic vectors (promotable).
-  * "hash-bow-v1" (256) deterministic feature-hashing bag-of-words -> the
-    offline default. STAGING ONLY: placeholder vectors block promotion
+  * the registered hash fallback deterministic feature-hashing bag-of-words ->
+    the offline default. STAGING ONLY: placeholder vectors block promotion
     (docs/codex/billion-component-goal.md). Good enough to prove the plumbing
     and run hybrid search with no numpy.
 
 Output goes to dist/vector-store/catalog-vectors.sqlite (gitignored derived
-data; the YAML catalog stays the source of truth). Search is pure-stdlib cosine
-KNN with type/label filters, so it runs anywhere.
+data). Hosted builds should read database-exported rows with --row-dir; YAML
+mode remains a local seed/export bootstrap fallback. Search is pure-stdlib
+cosine KNN with type/label filters, so it runs anywhere.
 
 Usage:
   python3 -m scripts.db.build_vector_store build [--limit N] [--model hash-bow-v1]
@@ -34,13 +35,19 @@ import argparse
 import hashlib
 import re
 import sqlite3
+import sys
 import tempfile
 from pathlib import Path
 from typing import Iterable
 
 import yaml
 
+ROOT = Path(__file__).resolve().parent.parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 from scripts._config import CATALOG_DIR, DIST_DIR
+from scripts.db.catalog_row_source import iter_components_from_rows, resolve_catalog_row_dir, row_source_status
 from scripts.embeddings import (
     HASH_DIM, HASH_MODEL_ID, content_hash, hash_embed, resolve_backend,
 )
@@ -111,6 +118,10 @@ CREATE TABLE IF NOT EXISTS label_assignment (
 );
 CREATE INDEX IF NOT EXISTS idx_emb_model ON object_embedding(embedding_model);
 CREATE INDEX IF NOT EXISTS idx_label_method ON label_assignment(assignment_method);
+CREATE TABLE IF NOT EXISTS vector_store_metadata (
+  key        TEXT PRIMARY KEY,
+  value_json TEXT NOT NULL
+);
 """
 
 
@@ -121,8 +132,22 @@ def _connect(store: Path) -> sqlite3.Connection:
     return con
 
 
-def iter_components(limit: int | None = None) -> Iterable[dict]:
+def iter_components(limit: int | None = None, row_dir: Path | None = None) -> Iterable[dict]:
     n = 0
+    row_dir = resolve_catalog_row_dir(row_dir)
+
+    if row_dir is not None:
+        for component in iter_components_from_rows(row_dir):
+            doc = dict(component.manifest)
+            doc["_path"] = component.source_path
+            doc["_source"] = "database_rows"
+            doc["_database_refs"] = component.database_refs
+            yield doc
+            n += 1
+            if limit and n >= limit:
+                return
+        return
+
     for p in sorted(CATALOG_DIR.rglob("*.yaml")):
         try:
             doc = yaml.safe_load(p.read_text(encoding="utf-8"))
@@ -167,7 +192,14 @@ def llm_label(doc: dict, model_route_id: str) -> list[dict]:
     raise NotImplementedError("wire a provider-neutral model route to enable LLM labels")
 
 
-def build(store: Path = DEFAULT_STORE, model: str = HASH_MODEL, limit: int | None = None) -> dict:
+def build(
+    store: Path = DEFAULT_STORE,
+    model: str = HASH_MODEL,
+    limit: int | None = None,
+    row_dir: Path | None = None,
+) -> dict:
+    resolved_row_dir = resolve_catalog_row_dir(row_dir)
+    source_status = row_source_status(resolved_row_dir) if resolved_row_dir is not None else None
     backend = resolve_backend(model=model)
     placeholder = 0 if backend.promotable else 1
     con = _connect(store)
@@ -180,7 +212,18 @@ def build(store: Path = DEFAULT_STORE, model: str = HASH_MODEL, limit: int | Non
         if limit is None:
             con.execute("DELETE FROM object_embedding WHERE embedding_model=?", (backend.model_id,))
             con.execute("DELETE FROM label_assignment WHERE assignment_method='regex'")
-        for doc in iter_components(limit=limit):
+        con.execute(
+            "INSERT OR REPLACE INTO vector_store_metadata (key, value_json) VALUES (?, ?)",
+            (
+                "source",
+                __import__("json").dumps({
+                    "catalog_source": "database_rows" if resolved_row_dir is not None else "catalog_yaml_seed_export",
+                    "row_dir": str(resolved_row_dir) if resolved_row_dir is not None else "",
+                    "row_source_status": source_status,
+                }, sort_keys=True),
+            ),
+        )
+        for doc in iter_components(limit=limit, row_dir=row_dir):
             sid, stype = doc["id"], doc["type"]
             text = _doc_text(doc) or sid  # never embed empty text (some providers 400 on it)
             thash = content_hash(text)[:16]
@@ -221,6 +264,8 @@ def build(store: Path = DEFAULT_STORE, model: str = HASH_MODEL, limit: int | Non
         "dim": backend.dim, "is_placeholder": not backend.promotable,
         "promotable": backend.promotable, "objects": n_obj,
         "embeddings": n_emb, "labels": n_lab,
+        "catalog_source": "database_rows" if resolved_row_dir is not None else "catalog_yaml_seed_export",
+        "row_source_status": source_status,
     }
 
 
@@ -254,16 +299,16 @@ def search(query: str, store: Path = DEFAULT_STORE, model: str = HASH_MODEL,
     return scored[:k]
 
 
-def _self_test() -> int:
+def _self_test(row_dir: Path | None = None) -> int:
     import json
     with tempfile.TemporaryDirectory() as tmp:
         store = Path(tmp) / "vs.sqlite"
         # Build over a slice of the real catalog with the offline hash model.
-        rep = build(store=store, model=HASH_MODEL, limit=400)
+        rep = build(store=store, model=HASH_MODEL, limit=400, row_dir=row_dir)
         assert rep["embeddings"] > 0 and rep["labels"] > 0, rep
 
         # Multi-embedding: a second model for the same objects must coexist.
-        rep2 = build(store=store, model="hash-bow-v2-demo", limit=400)
+        rep2 = build(store=store, model="hash-bow-v2-demo", limit=400, row_dir=row_dir)
         con = sqlite3.connect(store)
         models = {r[0] for r in con.execute("SELECT DISTINCT embedding_model FROM object_embedding")}
         methods = {r[0] for r in con.execute("SELECT DISTINCT assignment_method FROM label_assignment")}
@@ -286,6 +331,7 @@ def main(argv: list[str] | None = None) -> int:
     import json
     p = argparse.ArgumentParser(description="Multi-embedding, multi-label catalog vector store.")
     p.add_argument("--self-test", action="store_true")
+    p.add_argument("--row-dir", type=Path)
     sub = p.add_subparsers(dest="cmd")
     b = sub.add_parser("build")
     b.add_argument("--store", default=str(DEFAULT_STORE))
@@ -301,9 +347,9 @@ def main(argv: list[str] | None = None) -> int:
     args = p.parse_args(argv)
 
     if args.self_test:
-        return _self_test()
+        return _self_test(row_dir=args.row_dir)
     if args.cmd == "build":
-        print(json.dumps(build(store=Path(args.store), model=args.model, limit=args.limit), indent=2))
+        print(json.dumps(build(store=Path(args.store), model=args.model, limit=args.limit, row_dir=args.row_dir), indent=2))
         return 0
     if args.cmd == "search":
         hits = search(args.query, store=Path(args.store), model=args.model, k=args.k,

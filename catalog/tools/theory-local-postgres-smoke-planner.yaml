@@ -1,0 +1,73 @@
+id: "tool/theory-local-postgres-smoke-planner"
+type: tool
+version: "0.1.0"
+name: "Theory local Postgres smoke planner"
+description: "Emits reviewed local pgvector commands to apply theory-derived candidate rows and vectors, export committed counts, and rerun committed-load audits without executing them."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "security.defensive", "cross_industry"]
+capability: ["governance", "embedding", "planning", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["theory-to-components", "postgres", "pgvector", "smoke-test", "operator-review"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    theory_batch_summary:
+      type: string
+    theory_load_audit_summary:
+      type: string
+    pgvector_load_plan_summary:
+      type: string
+    embedding_execution_plan:
+      type: string
+    vector_readiness_summary:
+      type: string
+    output_dir:
+      type: string
+    run_id:
+      type: string
+  required:
+    - "theory_batch_summary"
+    - "theory_load_audit_summary"
+    - "pgvector_load_plan_summary"
+    - "embedding_execution_plan"
+    - "vector_readiness_summary"
+    - "output_dir"
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    readiness:
+      type: object
+    commands:
+      type: array
+    files:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      theory_batch_summary: "dist/theory-component-batch/2026-05-26/theory-component-batch-summary.json"
+      theory_load_audit_summary: "dist/theory-component-batch-load-audit/2026-05-26/summary.json"
+      pgvector_load_plan_summary: "dist/theory-pgvector-embedding-load-plan/2026-05-26/pgvector-embedding-load-plan-summary.json"
+      output_dir: "dist/theory-local-postgres-smoke/2026-05-26"
+    output:
+      ok: true
+      readiness:
+        candidate_rows: 1000
+        vector_accepted_rows: 1000
+        safe_to_apply_locally: true
+implementations:
+  - kind: "callable"
+    path: "scripts.db.theory_local_postgres_smoke_plan.build_theory_local_postgres_smoke_plan"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.theory_local_postgres_smoke_plan"

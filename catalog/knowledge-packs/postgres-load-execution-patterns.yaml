@@ -1,0 +1,39 @@
+id: "knowledge-pack/postgres-load-execution-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Postgres load execution patterns"
+description: "Step contracts for applying a generated object-factory load plan to local, Render, or managed Postgres with pgvector, then counting and auditing committed rows."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "retrieval", "serving", "evaluation", "verification"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["postgres", "pgvector", "load-execution", "render", "docker-compose", "object-counts"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types:
+  - "postgres_load_execution_step"
+  - "pgvector_load_audit_step"
+files:
+  - path: "catalog/knowledge-packs/data/postgres-load-execution-patterns/steps.jsonl"
+    format: "jsonl"
+    schema: "postgres_load_execution_step"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["step", "description", "command_shape", "side_effect"]
+provenance:
+  sources:
+    - "db/postgres/schema.sql"
+    - "db/postgres/object_count_report.sql"
+    - "infra/postgres/docker-compose.pgvector.yml"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "execution metadata only; no database credentials or source bodies"

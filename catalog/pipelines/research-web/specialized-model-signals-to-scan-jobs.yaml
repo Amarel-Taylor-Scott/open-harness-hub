@@ -1,0 +1,104 @@
+id: "pipeline/specialized-model-signals-to-scan-jobs"
+type: pipeline
+version: "0.1.0"
+name: "Specialized model signals to scan jobs"
+description: "Turns specialized model signal rows into resumable object-factory jobs that mine model-card context into reusable primitive candidates without downloading model weights."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["healthcare", "finance", "legal", "software.devops", "media", "security", "privacy", "government", "cross_industry"]
+capability: ["retrieval", "extraction", "classification", "evaluation", "routing", "governance", "embedding"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "pre_api.ingest"
+tags: ["huggingface", "model-cards", "object-factory", "container-workers", "queue-ready", "specialized-models"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Emit queue-ready model-card scan jobs and shard manifests from specialized model signal rows, with governance and excluded-scope policy attached to every job."
+pipeline_kind: "research_web.specialized_model_card_scan_job_emission"
+inputs:
+  - name: "model_signals"
+    type: "array"
+  - name: "scan_policy"
+    type: "object"
+  - name: "excluded_scopes"
+    type: "array"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "job_count"
+    type: "integer"
+  - name: "job_counts_by_type"
+    type: "json"
+  - name: "shard_manifests"
+    type: "jsonl"
+  - name: "scan_jobs"
+    type: "jsonl"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/specialized-model-signal-surfaces"
+    - "knowledge-pack/specialized-model-card-scan-job-patterns"
+steps:
+  - id: "govern-specialized-model-signal-batch"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record:
+        source_type: "specialized_model_signal_batch"
+        license: "source_specific"
+        privacy_boundary: "public_model_metadata_only"
+      source_policy:
+        excluded_scopes: "$.inputs.excluded_scopes"
+        require_license: true
+        forbid_private_source_bodies: true
+        forbid_model_weight_download: true
+        require_redaction_before_external_model: true
+  - id: "emit-model-card-scan-jobs"
+    kind: "tool"
+    ref: "tool/specialized-model-card-scan-job-emitter"
+    inputs:
+      model_signals: "$.inputs.model_signals"
+      output_dir: "$.inputs.output_dir"
+      tenant_id: "tenant-public-catalog"
+      scan_policy: "$.inputs.scan_policy"
+      excluded_scopes: "$.inputs.excluded_scopes"
+  - id: "route-emitted-model-card-jobs"
+    kind: "tool"
+    ref: "tool/object-factory-job-router"
+    inputs:
+      job_manifest: "$.steps.emit-model-card-scan-jobs.files"
+      worker_registry:
+        model_repo_discovery: "container.worker.model_repo_discovery"
+        model_card_snapshot: "container.worker.model_card_snapshot"
+        model_metadata_parse: "container.worker.model_metadata_parse"
+        task_context_normalize: "container.worker.task_context_normalize"
+        dataset_eval_linking: "container.worker.dataset_eval_linking"
+        entity_linking: "container.worker.entity_linking"
+        fuzzy_dedupe: "container.worker.dedupe"
+        primitive_index: "container.worker.index"
+        publish_review: "container.worker.review"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.job_count"
+    op: ">"
+    value: 0
+    severity: "high"
+    label: "At least one specialized model-card object-factory job is emitted."
+  - kind: "semantic"
+    target: "$.job_counts_by_type"
+    must_cover:
+      - "model_repo_discovery"
+      - "model_card_snapshot"
+      - "model_metadata_parse"
+      - "task_context_normalize"
+      - "dataset_eval_linking"
+      - "entity_linking"
+      - "fuzzy_dedupe"
+      - "primitive_index"
+      - "publish_review"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "The emitted job plan covers the full specialized model-card scan lifecycle."

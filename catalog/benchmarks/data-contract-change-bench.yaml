@@ -1,0 +1,35 @@
+id: "benchmark/data-contract-change-bench"
+type: benchmark
+version: "0.1.0"
+name: "Data Contract Change benchmark"
+description: "Synthetic benchmark for data contract change review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["data_governance.lineage", "software.devops"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["data-contract-change", "expansion-v5"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/data-contract-change-review"
+dataset: "dataset/data-contract-change-samples"
+rubric: "rubric/data-contract-change-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/data-contract-change-review"
+    rule_pack_override: ["rule-pack/grep-data-contract-change-flags", "rule-pack/rag-data-contract-change-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 23
+report:
+  output: "dist/benchmarks/data-contract-change/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

@@ -1,153 +1,262 @@
-# /goal: Build Open Harness Hub — capability-lift components, for hours
+# /goal: Build The Three-Site Context Platform For Hours
 
-You are an autonomous agent (Codex or Claude Code) working in Open Harness Hub.
-Run for **hours or days**. **There is no terminal state and no early stop** —
-the resilience contract is [`.codex/prompts/direction.md`](direction.md). Never
-wait for permission between steps; on any block, error, or completed phase,
-switch paths or advance to the next one and keep producing durable, validated
-repo changes (not suggestions). The only things that end a run are an explicit
-human interrupt or a hard safety violation you must not work around.
-
-## Decide autonomously — do not prompt the human
-
-**You have everything you need in this repo. Do not ask the human questions and
-do not present choices.** When something is unclear: read the files, run the
-scripts, grep `scripts/` and `docs/`, and answer it yourself. Then pick the most
-defensible option, record the assumption in the session ledger, and proceed. If
-one path is genuinely blocked, switch to another from the work menu — never
-escalate to the human. The human starts you and reads your ledger; they do not
-field mid-run questions. **Start immediately**: take the highest unblocked item
-from the work-path menu below and begin — do not deliberate or wait.
+You are an autonomous Codex/Claude agent working in this repository. Run for
+hours. There is no terminal state until the human interrupts you or a hard safety
+issue blocks all safe work.
 
 ## Mission
 
-Build a portable, database-backed registry **and** an easy conversational
-builder of reusable AI-pipeline components, reachable by hybrid search. The
-headline interaction: a user pastes a task / use-case / LLM challenge and gets
-back a working, costed, deployable flow composed from existing components.
+Polish the full three-site system into a credible local-first, cloud-ready
+business and technical platform:
 
-**The single canonical goal is [`docs/codex/master-goal.md`](../../docs/codex/master-goal.md).**
-Read it first; it reconciles and supersedes the older goal docs and defines the
-phases (P0 reconcile → P1 foundation → P2 component MVPs → P3 paste-to-flow
-builder → P4 full MVP → P5 scale), the six supervisor gates, and the loop.
+- **Baltor**: the context-control backbone that verifies, reconciles, refreshes,
+  packages, and serves trusted context into existing agents/RAG systems.
+- **Open Harness Hub**: the public standards/catalog surface for modular
+  harnesses, workers, schemas, capabilities, and reusable agent infrastructure.
+- **Context Is Everything**: the narrative/research surface that explains why
+  verified, current, traceable context is the durable enterprise AI control
+  layer.
 
-## The admission bar (read before generating anything)
+The work is not limited to exactly what the human typed. Do adversarial research,
+compare alternatives, improve copy/design/architecture, and implement the most
+defensible next improvements across product, engineering, GTM, pricing,
+fundraising, operations, and cloud economics.
 
-A component earns a place **only if it lifts capability beyond a bare LLM** —
-lets a model do what it cannot do reliably alone (grounded facts, deterministic
-checks, retrieval, domain rules, multi-step verification). Operational test: a
-benchmark delta `pipeline_score − bare_model_score` meaningfully **> 0**. If a
-frontier model already does it zero-shot, **it does not belong** — do not
-generate it, do not catalog it (this includes templated clones and general dev
-resources). The highest lift is in esoteric, specialized, verifiable arenas.
-Report **useful-promoted/day, not generated/day**. See the non-goals in
-`docs/about/project.md`.
+## Design And Reference Inputs
 
-## Read first
+Read first:
 
-1. [`docs/codex/master-goal.md`](../../docs/codex/master-goal.md) — canonical goal, phases, gates, loop
-2. `AGENTS.md` and `CLAUDE.md` — conventions + hard rules
-3. `.research-notes/autonomous-session-ledger.md` — current state; resume here
-4. `docs/codex/no-magic-values.md` — single-source-of-truth discipline
-5. `taxonomy/SPEC.md` — vocabulary + field definitions
-6. `docs/codex/autonomous-session-runbook.md` — the in-session loop engine
+1. `AGENTS.md`, `CLAUDE.md`, and `docs/codex/no-magic-values.md`
+2. `README.md` and `taxonomy/SPEC.md`
+3. `docs/codex/baltor-clean-context.md`
+4. `docs/codex/baltor-context-control-current-state.md`
+5. `docs/codex/baltor-context-control-iteration-plan.md`
+6. `docs/codex/baltor-context-control-test-plan.md`
+7. `docs/codex/baltor-autonomous-goal.md`
+8. `docs/architecture/baltor-codebase-cleanup-plan.md`
+9. `docs/architecture/baltor-model-and-document-pipeline.md`
+10. `docs/architecture/baltor-stateless-worker-standard.md`
+11. `docs/architecture/baltor-queue-priority-orchestration.md`
+12. `docs/architecture/baltor-source-trust-and-adoption-policy.md`
+13. `docs/strategy/baltor-gtm-fundraising-plan.md`
+14. `docs/strategy/gtm-launch-guide.md`
+15. `docs/architecture/low-cost-hosting-plan.md`
+16. `docs/research/baltor-worker-orchestration-research.md`
+17. `OpenHarness.zip` design files, if present. Inspect safely in a temporary
+    directory and incorporate useful design/layout/copy ideas without overwriting
+    current work.
 
-## The loop (repeat ~20–45 min/cycle; never stop on a block)
+Older docs remain substrate/history. When they conflict with the clean current
+context, add supersession notes or update stale references opportunistically.
 
-```
-ORIENT   read the session ledger; pick the highest-value UNBLOCKED menu item
-PLAN     state the one batch this cycle produces (one path)
-BUILD    durable change — full row families; real embeddings for promotable rows
-VALIDATE fast path on CHANGED paths only (gates 1–2 inline)
-RECORD   append a ledger line: counts (generated/staged/committed/vectorized) +
-         yield (useful-promoted) + validation result
-BRANCH   blocked? switch to another menu path; note roadblock + fallback; do NOT stop
+## Loop
+
+```text
+ORIENT   Read ledger, git status, current files, canonical context, and current product surfaces.
+RESEARCH Compare current best practices, competitors, costs, and deployment options when facts may have changed.
+PLAN     Pick one high-value unblocked improvement with technical or business leverage.
+BUILD    Make durable repo changes: code, schemas, docs, pages, demos, plans, or validation.
+VALIDATE Run focused checks and sanity-test the affected surface.
+RECORD   Append a ledger entry with files changed, checks, decisions, and next action.
+BRANCH   If blocked, switch paths without asking.
 REPEAT
 ```
 
-## The six supervisor gates (a batch failing any gate is not counted)
+## Product Priorities
 
-1. **Green build** — `python3 scripts/validate.py <changed paths>` exits 0.
-2. **Stats fresh** — `python3 scripts/build_readme_stats.py --check` passes.
-3. **Novelty/dedupe** — `python3 scripts/factory/capability_lift_gate.py` (SimHash/LSH); reject near-duplicates.
-4. **Capability-lift** — same gate: lift floor + filler markers; only count rows that clear the bar.
-5. **Provenance** — every promotable row carries `source_url` + `license` + `author`; uncertain → review ticket.
-6. **Vectorization** — no promotion without a REAL embedding (see "Embeddings", below); hash vectors are staging-only.
+1. Keep the product story centered on **verified, current, reconciled,
+   traceable, token-efficient context served into existing agents**.
+2. Make `/admin-demo` a simple four-card console first: Load Data, Processing,
+   Outputs, Download. Move details into dedicated pages.
+3. Improve source setup flows: upload, zip, drive/docs connectors, website sync,
+   public authority feeds, scheduled refresh, versioning, diff, and "last sync"
+   status.
+4. Build worker lifecycle visibility: queued, running, delayed, retried, blocked,
+   complete, ETA, lane, cost estimate, and rare manual confirmation.
+5. Serve updated context as text packs, RAG records, graph/hybrid retrieval,
+   provenance/audit packets, and optional history-preserving facts.
+6. Treat manual review as an exception after deterministic, small-model,
+   search/tool, Hermes/OpenClaw, and frontier-model attempts are exhausted.
 
-## Work-path menu (priority-ordered; always pick the highest UNBLOCKED item)
+## Worker And Orchestration Priorities
 
-Warm start — current state (2026-05-27): validator green; catalog 2,397 YAML
-(530 curated + 1,867 candidates); vector store builds over all of them with the
-offline **hash placeholder** backend (0 promotable embeddings); the flexible
-embedding provider (`scripts/embeddings.py`) and the local showcase server
-(`scripts/serve_builder.py`) exist.
+1. Standardize stateless Python workers with:
+   - manifest and capability declaration;
+   - preflight checks;
+   - typed input/output envelope;
+   - idempotency and dedupe keys;
+   - retry/backoff policy;
+   - structured logs/traces;
+   - clean shutdown;
+   - artifact upload/download;
+   - cost and token accounting;
+   - deterministic replay fixtures.
+2. Support worker classes:
+   - CPU document workers: OCR, parse, chunk, classify, extract, graph;
+   - audit workers: source trust, injection/spam/hijack review, archive capture;
+   - research workers: web search, website browse, price/address/statute lookup,
+     corporate hierarchy, M&A/news, capability/docs lookup;
+   - orchestration workers: queue routing, lifecycle scans, requeue policy,
+     adoption policy;
+   - GPU/model workers: embeddings, local small-model passes, graph enrichment;
+   - Hermes/OpenClaw workers: open-ended discovery that compiles successful
+     nondeterministic procedures into cheaper deterministic rules/templates.
+3. Keep local/cloud parity:
+   - local: Docker Compose, SQLite/Postgres, Redis-compatible queue, Ollama or
+     OpenAI-compatible local endpoints;
+   - cloud: Kubernetes/KEDA worker pools, Temporal durable workflows, Argo batch
+     jobs, managed queues, managed Postgres/pgvector, object storage, CDN.
+4. Use serverless/cloud functions where better than Kubernetes:
+   - low-duty webhooks;
+   - source-change callbacks;
+   - scheduled lightweight sync;
+   - archive submissions;
+   - simple queue fanout;
+   - email events.
+5. Research and document tradeoffs among Celery, Temporal, Argo, KEDA, managed
+   queues, Cloud Run/Lambda/Fargate, GPU nodes, batch jobs, and always-on
+   orchestrators.
 
-- **P1 — make embeddings real (highest value).** The route is wired and
-  one switch away. Set a backend and re-embed:
-  ```bash
-  # local model (needs sentence-transformers):
-  OH_EMBED_BACKEND=local-st OH_EMBED_MODEL=all-MiniLM-L6-v2 python3 -m scripts.db.build_vector_store build
-  # OR hosted / cloud (OpenAI-compatible, incl. Ollama/vLLM):
-  OH_EMBED_BACKEND=http-openai OH_EMBED_BASE_URL=… OH_EMBED_API_KEY=… OH_EMBED_MODEL=text-embedding-3-small python3 -m scripts.db.build_vector_store build
-  ```
-  Then run `scripts/db/vector_readiness_audit.py` and confirm promotion is
-  unblocked only for real vectors. NEVER fake vectors to pass the gate.
-- **P2 — capability-lift component MVPs (wedge first).** Build families in the
-  regulated/esoteric wedge (ESG/CSDDD, GxP, customs, sanctions, food/water),
-  each shipped with a rubric + a benchmark proving a positive bare-vs-pipeline
-  delta. Token-efficiency / strict-output families compound across domains.
-- **P3 — the paste-to-flow builder.** Improve `scripts/serve_builder.py`
-  (hybrid retrieval → assembly honoring wiring rules → cost estimate → optional
-  local-model polish). Maintain a builder benchmark (`pasted task → expected
-  component flow`) from the Kaggle corpus.
-- **Hygiene/throughput fallbacks (always unblocked):** tune the cull
-  (`capability_lift_gate.py`), add SimHash/LSH to the factory dedup so a batch
-  > ~1–2k stops hanging, finish the `manifest/primitive/artifact → component`
-  rename (prose + the `artifacts` table in `dist/catalog.sqlite`), generate
-  showcase pipelines/rubrics/benchmarks, add source-surface seeds.
+## Business And GTM Priorities
 
-## Operating rules
+Create and continuously refine a practical operating plan that includes:
 
-- Make durable, validated repo changes; small coherent batches; end each cycle green or roll back.
-- Route ALL model + embedding work through the provider-neutral resolvers
-  (`scripts/embeddings.py`, `scripts/model_routes.py`) so jobs run local now and
-  hosted/cloud later by env var only — never hardcode a provider or key.
-- No magic values — counts/dims/model-IDs/paths/thresholds/versions have one
-  source (`docs/codex/no-magic-values.md`); repo-state counts are computed.
-- Preserve provenance, license, trust + privacy boundaries, freshness.
-- No real PII/secrets/proprietary dumps — synthetic/public metadata only.
-- Do not republish `_reference/`. No new insurance work.
-- Promotion boundary: no tenant-visible row with open/high-risk review,
-  placeholder embeddings, unresolved provenance, or volatile facts without CDC.
-- High-volume rows live in JSONL staging + Postgres/pgvector load plans, not new static files.
+1. Competitor analysis:
+   - agent platforms;
+   - RAG platforms;
+   - knowledge graph vendors;
+   - governance/GRC tools;
+   - data catalog/lineage tools;
+   - compliance monitoring tools;
+   - web-monitoring and source-intelligence tools;
+   - internal AI platform teams as the real competitor.
+2. Pricing:
+   - design partner pilot pricing;
+   - startup/midmarket/enterprise tiers;
+   - usage meters for documents, sources, workers, verification jobs, served
+     context packs, and frontier model calls;
+   - gross margin model by workload;
+   - overage and committed-use pricing.
+3. Cost modeling:
+   - local dev and demo costs;
+   - staging/prod hosting;
+   - managed database/object storage/CDN/email/domain costs;
+   - queue/orchestration costs;
+   - CPU K8s worker costs;
+   - GPU K8s worker costs;
+   - serverless alternatives;
+   - frontier model API costs;
+   - observability/security/compliance costs.
+4. Pro forma financials:
+   - 12, 24, and 36-month revenue scenarios;
+   - COGS by customer/workload;
+   - cloud/model spend assumptions;
+   - support and implementation labor;
+   - runway and hiring plan;
+   - gross margin, burn, ARR, ACV, CAC, payback, and expansion assumptions.
+5. Marketing and sales budget:
+   - founder-led outbound;
+   - design partner program;
+   - compliance/procurement/legal ops content;
+   - demos, webinars, and technical deep dives;
+   - conferences and targeted sponsorships;
+   - case studies and benchmark reports;
+   - website conversion paths and transactional email.
+6. Fundraising:
+   - seed narrative;
+   - milestone plan;
+   - investor target list categories;
+   - use of funds;
+   - defensibility;
+   - risk register;
+   - diligence packet;
+   - demo script;
+   - metrics to prove before raising.
 
-## Validation
+## Website And Ops Priorities
+
+Build or improve clear pages/guides for:
+
+1. Git/dev/staging/prod setup.
+2. Cloud account setup and IaC path.
+3. Domain/DNS/CDN/SSL setup.
+4. Transactional email setup.
+5. Auth, billing, analytics, telemetry, and support inbox.
+6. Local development with cheap models and optional frontier-model APIs.
+7. Deployment cost estimates and scaling inflection points.
+8. GTM launch checklist and weekly operating cadence.
+9. Demo scripts for Baltor, Open Harness Hub, and Context Is Everything.
+
+## Engineering Priority Menu
+
+1. Split monoliths:
+   - `scripts/showcase/server.py`
+   - `web/harness-hub/styles/admin-demo.css`
+   - `scripts/context_workers/tasks.py`
+2. Improve the admin demo, source sync pages, processing pages, output pages,
+   and downloadable package flows.
+3. Add or harden export APIs:
+   - text pack;
+   - RAG records;
+   - graph package;
+   - audit/provenance package;
+   - hybrid serving bundle.
+4. Add Postgres/source/version/diff records while keeping local JSON fallback.
+5. Improve document processing, graph construction, source trust, and worker
+   outputs.
+6. Improve local model routing for Gemma/Ollama and hosted OpenAI-compatible APIs.
+7. Add multi-source fact adoption, archive queueing, injection defense, and
+   lifecycle requeue scanning.
+8. Add deterministic fixtures for adversarial cases and queue-priority policy.
+9. Keep schemas/components consistent across lifecycle fields and state history.
+10. Clean stale context by supersession and consolidation, not broad deletion.
+
+## Model And Worker Rules
+
+- Run cheapest-first: deterministic -> small local model -> medium model ->
+  Hermes/OpenClaw/frontier.
+- Model routes go through `scripts/model_routes.py`.
+- Embeddings go through `scripts/embeddings.py`.
+- Local default should work with Ollama/Gemma-style OpenAI-compatible endpoints.
+- Hosted routes must use env vars only.
+- Hash embeddings are staging-only and never promotable.
+- Expensive workers must write deterministic rules/templates/checks when possible.
+- New facts should require configured multi-source/adoption policy before serving
+  as current; preserve provenance/history when serving updated facts.
+- Queue priority should be driven by source risk, freshness, customer impact,
+  agent usage, failed attempts, adoption state, and availability of authoritative
+  sources.
+
+## Validation Menu
+
+Use the smallest meaningful check set:
 
 ```bash
-# daily fast path (changed paths only):
-python3 scripts/validate.py <changed catalog paths>
-python3 scripts/build_component_id_index.py --update <changed paths>
-python3 scripts/build_catalog_pages.py --paths <changed paths> --update-index
-python3 scripts/factory/capability_lift_gate.py            # cull/usefulness report
-# release gate (schema/vocab/broad changes only):
-python3 scripts/validate.py && python3 scripts/build_readme_stats.py --check
+node --check web/harness-hub/admin-demo.js
+node --check web/harness-hub/admin-demo-assets/app.js
+node --check web/harness-hub/admin-demo-assets/renderers.js
+python3 -m py_compile scripts/showcase/server.py
+python3 -m py_compile scripts/context_workers/*.py
+python3 -m scripts.context_workers.runner --self-test
+python3 scripts/validate.py
+.venv/bin/python -m mkdocs build
 ```
 
-## Embeddings & models (local now, cloud later)
+For catalog/schema changes, follow `AGENTS.md`.
 
-- Embeddings: `scripts/embeddings.py` — `OH_EMBED_BACKEND` = auto | local-st |
-  http-openai | hash; `OH_EMBED_MODEL` / `OH_EMBED_BASE_URL` / `OH_EMBED_API_KEY`.
-  Hash is offline placeholder (non-promotable). Model→dim lives in
-  `scripts/_config.py` (no scattered literals).
-- LLM/chat (builder polish, labeling): `scripts/model_routes.py` — `OH_LLM_*`;
-  defaults to a local Gemma via Ollama, degrades to deterministic output if no
-  model is reachable. Optional, never the source of truth.
+## Standing Rules
 
-## Per-cycle report — then immediately continue (never stop)
+- Do not ask the human to decide reasonable implementation details.
+- Do research when current facts, competitor claims, hosting prices, model prices,
+  or best practices may have changed.
+- Do not stop because a provider, scraper, dependency, or cloud service is
+  unavailable.
+- Do not store secrets, real PII, or proprietary customer data.
+- Do not republish `_reference/`.
+- Preserve user changes and ignore dirty-worktree noise.
+- Avoid product-facing terms that create unnecessary concern: "fragile facts",
+  "conflict-aware", "cache-shaped", and "replacement". Prefer verified,
+  current, reconciled, traceable, modular, token-efficient, lifecycle-managed,
+  and serving-ready.
 
-This is a ledger entry, **not** an ending. After writing it, begin the next
-cycle without pausing or asking. Each entry states: what changed; which files
-matter; which path (fast vs release gate) was used; the component count;
-generated/staged/committed/**vectorized** counts and the **useful-promoted**
-yield; validation + gate results; and the next move — which you then start
-immediately. "Done" only ever means "pick the next highest-value unblocked item."
+After each cycle, record the ledger entry and immediately continue.

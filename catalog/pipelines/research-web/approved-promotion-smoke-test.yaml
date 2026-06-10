@@ -1,0 +1,70 @@
+id: "pipeline/approved-promotion-smoke-test"
+type: pipeline
+version: "0.1.0"
+name: "Approved promotion smoke test"
+description: "Runs a synthetic approved candidate through active component promotion, component versioning, CDC, index projection, and review-ticket routing."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "verification", "evaluation", "retrieval"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.testing"
+tags: ["components", "promotion", "cdc", "smoke-test", "postgres", "review-gate"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Prove that an approved component candidate can flow through active component publication, component versioning, CDC rows, index projection, and review routing."
+pipeline_kind: "research_web.approved_promotion_smoke_test"
+inputs:
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "approved_promotion_smoke_plan"
+    type: "json"
+  - name: "components_csv"
+    type: "csv"
+  - name: "component_versions_csv"
+    type: "csv"
+  - name: "component_change_events"
+    type: "jsonl"
+  - name: "component_change_index_records"
+    type: "jsonl"
+  - name: "component_change_review_tickets"
+    type: "jsonl"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/approved-promotion-smoke-patterns"
+steps:
+  - id: "load-smoke-checks"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/approved-promotion-smoke-patterns"
+    inputs:
+      query: "approved component promotion cdc smoke test index review"
+      top_k: 20
+  - id: "run-approved-promotion-smoke"
+    kind: "tool"
+    ref: "tool/approved-promotion-smoke-planner"
+    inputs:
+      output_dir: "$.inputs.output_dir"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.approved_promotion_smoke_plan.ok"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "The synthetic approved promotion smoke path passes."
+  - kind: "semantic"
+    target: "$.approved_promotion_smoke_plan"
+    must_cover:
+      - "approved component"
+      - "component version"
+      - "component change event"
+      - "index record"
+      - "review ticket"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Smoke output covers the complete lifecycle path."

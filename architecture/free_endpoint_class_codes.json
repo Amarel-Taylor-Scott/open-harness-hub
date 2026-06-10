@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "note": "Free/limited LLM endpoint + repo CLASS codes (single source of truth). The intelligence engine branches on these NUMERIC codes, never on display strings. Codes >= quarantine_floor are quarantine (rejected). Shared with both the endpoint registry and the gateway-repo watchlist.",
+  "quarantine_floor": 900,
+  "classes": [
+    {"code": 100, "label": "official_free_limited_provider", "kind": "endpoint", "desc": "An official provider with a documented free/limited tier (e.g. GitHub Models, Groq). Candidate prototype resource, NOT production infrastructure."},
+    {"code": 200, "label": "official_trial_credit_provider", "kind": "endpoint", "desc": "Official provider whose 'free' is time/credit-limited trial credit (not a durable free tier)."},
+    {"code": 300, "label": "official_paid_required_provider", "kind": "endpoint", "desc": "Official provider that requires payment/credit purchase; NOT free by default (e.g. Together AI). Do not list as free."},
+    {"code": 400, "label": "inference_aggregator", "kind": "endpoint", "desc": "An official aggregator offering many providers behind one endpoint, including free variants (e.g. OpenRouter free models, Hugging Face Inference Providers). Intermediary risk: verify routing + data handling."},
+    {"code": 500, "label": "self_hosted_gateway", "kind": "repo", "desc": "A self-hostable OpenAI-compatible proxy/gateway repo aggregating official free tiers. LAB CANDIDATE only: useful pattern, NOT trusted infrastructure; self-host with dev-only keys after security review."},
+    {"code": 600, "label": "discovery_list", "kind": "repo", "desc": "An awesome-list / catalog of free LLM APIs. METADATA ONLY: feeds discovery; every row must be reverified against official provider docs before activation."},
+    {"code": 700, "label": "browser_agent_runtime", "kind": "runtime", "desc": "A browser/WebContainer agent runtime (e.g. ClawLess). NOT an LLM endpoint. A Teleon Sandbox/runtime candidate; never an inference provider; no production keys/data until secret-handling review."},
+    {"code": 900, "label": "shared_key_repo_quarantine", "kind": "quarantine", "desc": "Repo distributing shared/free/leaked provider keys, or marketing 'unlimited'/'bypass'. QUARANTINE: never an approved provider."},
+    {"code": 910, "label": "reverse_engineered_quarantine", "kind": "quarantine", "desc": "Reverse-engineered/unofficial access to a chatbot or provider. QUARANTINE."},
+    {"code": 990, "label": "unknown_quarantine", "kind": "quarantine", "desc": "Claims a free endpoint but lacks official docs / has unclear data retention. QUARANTINE until officially documented; cannot reach candidate."}
+  ],
+  "promotion_phases": [
+    {"phase": -1, "label": "rejected", "desc": "Quarantined; never used."},
+    {"phase": 0, "label": "discovery_only", "desc": "Metadata in OpenToolsHub. No keys, no live calls, no production use."},
+    {"phase": 1, "label": "local_conformance", "desc": "Local stub provider: validate API shape, response normalization, ModelInvocationReceipt."},
+    {"phase": 2, "label": "dev_only_live_key", "desc": "Dev-only key, hard provider-side spend caps, no customer/private data, rate-limit aware, receipts required."},
+    {"phase": 3, "label": "candidate_teleon_provider", "desc": "Usable by Teleon PurposeTasks in candidate/shadow mode. Not serving production outputs."},
+    {"phase": 4, "label": "approved_non_sensitive", "desc": "Allowed for public/synthetic/non-sensitive tasks. Still not canonical for governed-context truth."},
+    {"phase": 5, "label": "production_with_policy", "desc": "Requires official paid/prod terms + security + privacy review + observability + fallback + clear retention stance."}
+  ],
+  "data_classes": ["public", "synthetic", "internal", "customer_sensitive"]
+}

@@ -33,8 +33,8 @@ Embed candidate + gold prompts via sentence-transformer; return mean cosine simi
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `embed_candidates` | processor | `processor/embedder-minilm` | — |
-| 2 | `embed_gold` | processor | `processor/embedder-minilm` | — |
-| 3 | `cosine_score` | processor | `processor/multi-vector-fusion` | — |
-| 4 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `embed_candidates` | processor | `processor/embedder-minilm` | - |
+| 2 | `embed_gold` | processor | `processor/embedder-minilm` | - |
+| 3 | `cosine_score` | processor | `processor/multi-vector-fusion` | - |
+| 4 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

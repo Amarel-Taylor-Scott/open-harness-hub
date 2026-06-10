@@ -34,7 +34,7 @@ between passes and cross-encoder rerank at the end.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `two_time` | processor | `processor/two-time-retrieval` | — |
-| 2 | `rerank` | processor | `processor/cross-encoder-reranker` | — |
-| 3 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `two_time` | processor | `processor/two-time-retrieval` | - |
+| 2 | `rerank` | processor | `processor/cross-encoder-reranker` | - |
+| 3 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

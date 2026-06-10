@@ -1,0 +1,25 @@
+{
+  "$id": "native/NativeDiff.v1", "title": "NativeDiff.v1", "type": "object", "additionalProperties": false,
+  "description": "The auditable record of every VERIFIED value change a schema_preserving projection applied to the native output. The original is never overwritten — the diff is what makes a same-schema value change (e.g. '30 days' -> '10 business days') reversible and accountable. Each changed field carries its path, old_value, new_value, the decision, and a receipt_id: a value may change ONLY when verified, and NO change is allowed without a receipt. An empty changed_fields array is the normal case for passthrough/sidecar modes (nothing was altered). Lossless distillation: old_value is preserved here, never erased.",
+  "required": ["schema_version", "source_hash", "changed_fields", "created_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["NativeDiff.v1"]},
+    "diff_id": {"type": "string"},
+    "source_hash": {"type": "string"},
+    "output_mode": {"type": "string", "enum": ["native_passthrough", "native_passthrough_with_sidecar", "schema_preserving", "schema_preserving_with_sidecar", "annotated_native", "baltor_native", "dual", "compare"]},
+    "tenant_id": {"type": "string"},
+    "source_id": {"type": "string"},
+    "changed_fields": {"type": "array", "items": {"type": "object", "additionalProperties": false,
+      "required": ["path", "old_value", "new_value", "decision", "receipt_id"],
+      "properties": {
+        "path": {"type": "string"},
+        "old_value": {"type": "string"},
+        "new_value": {"type": "string"},
+        "decision": {"type": "string", "enum": ["verified_correction", "reconciled", "normalized", "redacted"]},
+        "receipt_id": {"type": "string"},
+        "source_handle": {"type": "string"},
+        "rollback_target": {"type": "string"}
+      }}},
+    "created_at": {"type": "string"}
+  }
+}

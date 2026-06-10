@@ -1,0 +1,45 @@
+id: "rubric/launch-readiness-gate-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Launch Readiness Gate review quality v1"
+description: "Evaluation rubric for grounded launch readiness gate reviews."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["product_management.launch", "marketing_ops.claims"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["launch-readiness-gate", "use-case-expansion"]
+created: "2026-05-24"
+updated: "2026-05-24"
+dimensions:
+  - id: "domain_coverage"
+    label: "Domain coverage"
+    weight: 0.25
+    scale: "0.0-1.0"
+    evidence_required: "All required review domains are addressed or explicitly marked not applicable."
+  - id: "evidence_grounding"
+    label: "Evidence grounding"
+    weight: 0.30
+    scale: "0.0-1.0"
+    evidence_required: "Material findings cite packet evidence, grep triggers, or retrieved context."
+  - id: "severity_calibration"
+    label: "Severity calibration"
+    weight: 0.20
+    scale: "0.0-1.0"
+    evidence_required: "Severity aligns with operational, legal, safety, or customer impact."
+  - id: "actionability"
+    label: "Actionability"
+    weight: 0.25
+    scale: "0.0-1.0"
+    evidence_required: "Recommendations identify owner, component, decision gate, and verification method."
+scoring_method: "weighted_sum"
+examples:
+  - grade: 0.88
+    response: "Cited, prioritized findings with explicit evidence gaps and remediation owners."
+    notes: "Strong operational review."
+  - grade: 0.35
+    response: "Generic summary with uncited risks and no next actions."
+    notes: "Insufficient for governed workflow."

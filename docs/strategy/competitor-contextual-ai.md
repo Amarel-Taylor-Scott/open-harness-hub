@@ -64,7 +64,7 @@ verified-by-a-signed-publisher. A different sense than OHH's verified corpus.
 
 Only ingestion-side enrichment exists: Parse "infer[s] document hierarchy and add[s] positional
 metadata to each chunk." There is **no raw → compressed → hyper-efficient tiering with measured
-fidelity-per-tier** — i.e. **no analog to OHH's CEaaS.** No MCP/llms.txt "serve into open
+fidelity-per-tier** — i.e. **no analog to OHH's Baltor.** No MCP/llms.txt "serve into open
 agents" door.
 
 ### (3) MEASURED LIFT vs a bare model (paired pipeline − bare, separate evaluator)? **NO — not in OHH's sense.**
@@ -150,20 +150,20 @@ OHH's moat layer.
 
 ---
 
-## Table B — Contextual Agent Composer + domain agents vs OHH governed domain pipelines + CEaaS
+## Table B — Contextual Agent Composer + domain agents vs OHH governed domain pipelines + Baltor
 
 OHH's agent-shape surface is broad: **420 pipeline YAMLs across 281 distinct domain folders**
 (aviation-safety, building-code, clinical-coding, biosecurity, adverse-media-kyc, csrd,
 chemical-sds, …) vs Contextual's ~5–8 gallery demos — but **largely DEFINITIONS** (minimal
 executor; no per-domain measured eval attached to most).
 
-| Axis | Contextual (Agent Composer + Material-Science demo) | OHH (governed domain pipelines + CEaaS) | Verdict |
+| Axis | Contextual (Agent Composer + Material-Science demo) | OHH (governed domain pipelines + Baltor) | Verdict |
 |---|---|---|---|
 | **Builder surface** | Low/no-code visual builder; "arbitrary computational graphs"; Static Workflows + Agentic Research Steps; prompt-to-agent + drag-drop; "completely model agnostic"; one-click feedback optimization | Seven-primitive composition grammar (Input · Knowledge Corpus · If Statement/Conditional · Action · Loop · Stop/End · Output); every component a subtype of exactly one primitive (`scripts/primitives/*`) | **OVERLAP (shape).** Both "build a cited multi-step agent." Contextual = freer builder + better UX. OHH = explicit **grammar + admission gate + abstain/route discipline**. |
 | **The corpus** | **Ingested PUBLIC docs as platform showcase** (7,500+ arXiv; 3GPP via `download_3gpp` CLI). Bring-your-own; ships empty; filled with customer data | **38 verified sources** in `data/source-registry.jsonl` (35 gov/standards: eCFR, OFAC, EU AI Act, BSP, DOLE/OSHC PH, UN/ILO/WHO/FAO/IEC), each with explicit license (US-gov PD ×14, PH-gov ×9, UN/EU/ILO terms) + `source_kind` (regulation 20 / standard 7 / dataset 6 / guidance 5) + `gov` + `verified_fetch`; 440 Knowledge-Corpus manifests | **NO OVERLAP.** Contextual sells the *platform*; OHH sells the **verified content**. (Honest: OHH's registry is **small, not thousands** — early but real.) |
 | **Admission gate** | **Grounding/faithfulness + workflow time-savings** (8hr→20min). Material-Science doc: **"no comparison baseline or capability lift analysis."** Benchmarks vs rival vendors, never vs bare model | **Two-axis measured lift**: must LIFT (`pipeline_score − bare_model_score > 0`) AND be **structural/durable** (`scripts/eval/reason_codes.py`: 13 lift_reasons = 7 structural + 5 transient + 1 mixed; 7 mechanisms; 5 retrievability tiers; 3 durability classes; `gap_durability_score 0..5`) | **NO OVERLAP — OHH's core wedge.** Contextual measures **answer quality**; OHH measures **lift + whether it survives the next model.** |
 | **Negative-space reach** | Clean RAG over **addressable corpora (tiers 1–3)** | Same-shaped worked example deliberately in **tiers 4–5** the architecture can't reach | **NO OVERLAP.** See worked example below. |
-| **Enrichment / serving** | Ingestion metadata only; no tiering; single closed door (enterprise sales) | **CEaaS**: raw → compressed → hyper-efficient tiers w/ measured fidelity-per-tier; 4 surfaces (MCP / llms.txt / Claude-Code skill / CLAUDE.md) | **NO ANALOG.** (Honest: CEaaS is **spec-level** — see real-vs-planned.) |
+| **Enrichment / serving** | Ingestion metadata only; no tiering; single closed door (enterprise sales) | **Baltor**: raw → compressed → hyper-efficient tiers w/ measured fidelity-per-tier; 4 surfaces (MCP / llms.txt / Claude-Code skill / CLAUDE.md) | **NO ANALOG.** (Honest: Baltor is **spec-level** — see real-vs-planned.) |
 | **Governance** | Enterprise **ACCESS control** (SSO/RBAC, query-time entitlements) over the customer's **private** docs (Qualcomm: millions of pages, 24h ingestion). No signed publishers, no provenance of public data, no CDC/revocation | Provenance + signed publishers + open-core + **EU-AI-Act tagging** (`eu_ai_act_risk`, high_risk on building-safety) + accountable-signer framing (`scripts/foundry/openness.py`, `docs/strategy/open-core-model.md`) | **NO OVERLAP.** Contextual governs *access to your data*; OHH governs *the content's provenance/freshness/revocation.* |
 | **Openness** | Closed SaaS; only LMUnit open-sourced; proprietary visual builder = lock-in | Open protocol/schemas/engine/grammar + externally-published gov content + public-good carve-out; commercial = OHH's own verified RAG DBs + custom tools + live layer | **NO OVERLAP.** Portability/no-lock-in is a real enterprise objection to a single-vendor closed stack. |
 
@@ -194,7 +194,7 @@ Knowledge-Corpus + If-Statement (**abstain when unverifiable, never infer**) + A
    revocation, targeted where base models lack capability. Contextual governs *private-doc
    access*, never *public-content provenance.* This is the **biggest white space.**
 3. **Seven-primitive open grammar + open-core protocol** vs a closed proprietary builder.
-4. **Enrichment tiers + two-doors (CEaaS)** — one governed object, two doors (bounded OHH
+4. **Enrichment tiers + two-doors (Baltor)** — one governed object, two doors (bounded OHH
    pipeline OR open-agent fuel via MCP/llms.txt). No Contextual analog.
 
 ### Honest risks
@@ -218,7 +218,7 @@ Knowledge-Corpus + If-Statement (**abstain when unverifiable, never infer**) + A
   implemented. **But: 0 catalog YAMLs carry `measured_lift`/`pipeline_score`/`bare_model_score`
   fields** (verified by grep); the 4,377-row `capability_lift_gate.py` pass (kept 2,397 / culled
   1,980 at lift_floor 0.2) is an explicit **heuristic prefilter** (`heuristic_quality_score`),
-  NOT paired measurement; CEaaS is **spec-level** (two real scripts —
+  NOT paired measurement; Baltor is **spec-level** (two real scripts —
   `structural_compress.py` ~70% on code + `compression_fidelity_check.py` deterministic-proxy
   fidelity 0..1 — but the tier pipeline, MCP endpoint, 4 emitters, and meter are **not built**).
   **Framing rule: claim the lift MECHANISM and the DURABILITY taxonomy as real; do NOT claim
@@ -282,5 +282,5 @@ open protocol + enrichment tiers/two-doors.
 - `scripts/factory/capability_lift_gate.py` + `dist/reports/capability-lift-gate.json` (total 4,377 / keep 2,397 / cull 1,980 @ lift_floor 0.2) · `scripts/foundry/measure.py` · `scripts/foundry/skillsbench.py` · `scripts/eval_judge_arms.py` · `scripts/run_pipeline.py`
 - `schemas/processor.schema.json` (166 processor manifests) · `catalog/processors/verify/` · `catalog/processors/retrieval/` · `catalog/adapters/` (no contextual adapter yet) · 420 pipeline YAMLs · 440 Knowledge-Corpus manifests · 0 catalog YAMLs carry measured-lift fields (grep)
 - `data/source-registry.jsonl` (38 verified sources: 35 gov; regulation 20 / standard 7 / dataset 6 / guidance 5) · `catalog/pipelines/building-occupational-safety-ph/` (5 pipelines)
-- `scripts/seed/ceaas_components.py` · `scripts/processors/compression/structural_compress.py` · `scripts/processors/verify/compression_fidelity_check.py`
+- `scripts/seed/baltor_components.py` · `scripts/processors/compression/structural_compress.py` · `scripts/processors/verify/compression_fidelity_check.py`
 - `docs/strategy/context-enrichment-service.md` · `docs/strategy/two-services-shared-infrastructure.md` · `docs/strategy/open-core-model.md` · `docs/strategy/building-safety-dev-countries-worked-example.md` · `docs/concepts/component-taxonomy-and-stages.md` · `docs/strategy/competitive-positioning-deep-dive.md` (covers iPaaS/cloud/dev-hubs, NOT Contextual)

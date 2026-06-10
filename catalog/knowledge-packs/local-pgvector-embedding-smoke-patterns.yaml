@@ -1,0 +1,38 @@
+id: "knowledge-pack/local-pgvector-embedding-smoke-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Local pgvector embedding smoke patterns"
+description: "Checks for local Docker pgvector smoke plans that apply embedding load SQL, export committed counts, and rerun vector readiness audits."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["embedding", "retrieval", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["embeddings", "vector-search", "pgvector", "postgres", "docker", "daily-factory", "smoke-test"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+content_types:
+  - "local_pgvector_embedding_smoke_check"
+files:
+  - path: "catalog/knowledge-packs/data/local-pgvector-embedding-smoke-patterns/checks.jsonl"
+    format: "jsonl"
+    schema: "local_pgvector_embedding_smoke_check"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["id", "description", "required_outputs", "failure_route"]
+provenance:
+  sources:
+    - "Open Harness Hub local pgvector embedding smoke planner"
+    - "Open Harness Hub pgvector embedding load planner"
+    - "Open Harness Hub embedding committed load audit"
+  collected_through: "2026-05-26"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "synthetic operational checks only"

@@ -1,0 +1,24 @@
+{
+  "$id": "distillation/InformationRetentionReport.v1", "title": "InformationRetentionReport.v1", "type": "object", "additionalProperties": false,
+  "description": "The lossless audit for one transform/run: did the system retain everything it must? Counts the inputs/outputs/held-out/rejected, measures source-handle coverage (must be 1.0 — 100% — for served artifacts), counts dropped source handles (must be 0 to be promotable), counts orphaned inputs/outputs (0 or explained), and records whether raw rehydration passed and lineage is complete. lossy_transform_declared marks a deliberately lossy text-surface compression; it must NOT be allowed (lossy_transform_allowed false) for truth-bearing facts. safe_to_promote is the conjunction of all the lossless gates and is enforced by check_information_retention_report.",
+  "required": ["schema_version", "run_id", "tenant_id", "input_count", "output_count", "held_out_count", "rejected_count", "source_handle_coverage", "dropped_source_handle_count", "orphaned_input_count", "orphaned_output_count", "raw_rehydration_passed", "lineage_complete", "lossy_transform_declared", "lossy_transform_allowed", "safe_to_promote"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["InformationRetentionReport.v1"]},
+    "run_id": {"type": "string", "description": "the DistillationRun this report audits"},
+    "tenant_id": {"type": "string"},
+    "input_count": {"type": "integer"},
+    "output_count": {"type": "integer"},
+    "held_out_count": {"type": "integer", "description": "items held out by the transform; >0 is fine, they remain rehydratable"},
+    "rejected_count": {"type": "integer"},
+    "source_handle_coverage": {"type": "number", "description": "fraction of served outputs with a resolvable source handle; must be 1.0 for a promotable served artifact"},
+    "dropped_source_handle_count": {"type": "integer", "description": "source handles lost across the transform; must be 0 to be promotable"},
+    "orphaned_input_count": {"type": "integer", "description": "inputs with no output lineage; 0 or explained"},
+    "orphaned_output_count": {"type": "integer", "description": "outputs with no input lineage; 0 or explained"},
+    "raw_rehydration_passed": {"type": "boolean", "description": "outputs walk back to the raw layer"},
+    "lineage_complete": {"type": "boolean", "description": "every required lineage link resolved, no empty handle"},
+    "lossy_transform_declared": {"type": "boolean", "description": "the transform deliberately shrank the text surface"},
+    "lossy_transform_allowed": {"type": "boolean", "description": "MUST be false for truth-bearing facts; a lossy declared transform on truth that is allowed is rejected"},
+    "safe_to_promote": {"type": "boolean", "description": "the conjunction: coverage 1.0 AND 0 dropped handles AND raw_rehydration_passed AND lineage_complete AND NOT (lossy declared AND allowed on truth)"},
+    "notes": {"type": "string"}
+  }
+}

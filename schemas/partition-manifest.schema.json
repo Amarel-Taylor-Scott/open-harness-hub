@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/partition-manifest.schema.json",
+  "title": "Partition manifest",
+  "description": "Metadata for a shard of high-volume source-derived objects and its derived index deltas.",
+  "type": "object",
+  "required": ["partition_id", "partition_kind", "run_id", "object_count", "shard_paths", "created", "content_hash"],
+  "properties": {
+    "partition_id": { "type": "string" },
+    "partition_kind": {
+      "type": "string",
+      "enum": ["source_objects", "normalized_objects", "labels", "dimensions", "index_records", "review_tickets", "embeddings", "graph_edges"]
+    },
+    "run_id": { "type": "string" },
+    "source_surface_id": { "type": "string" },
+    "tenant_id": { "type": "string" },
+    "object_count": { "type": "integer", "minimum": 0 },
+    "shard_paths": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "index_delta_paths": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "schema_versions": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "content_hash": { "type": "string" },
+    "created": { "type": "string", "format": "date-time" },
+    "updated": { "type": "string", "format": "date-time" },
+    "trust_boundary": { "type": "string", "enum": ["local", "hub", "external", "mixed"] },
+    "privacy_summary": {
+      "type": "object",
+      "properties": {
+        "contains_pii": { "type": "boolean" },
+        "redacted": { "type": "boolean" },
+        "publication_allowed": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "quality_summary": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}
+

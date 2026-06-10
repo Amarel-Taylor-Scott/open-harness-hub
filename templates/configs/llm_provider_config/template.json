@@ -1,0 +1,12 @@
+{
+  "schema": "schemas/config/llm_provider_config.v1.schema.json",
+  "version": "v1",
+  "owner": "llm-gateway",
+  "environment_scope": "all",
+  "config_type": "llm_provider_config",
+  "provider_id": "<provider_id>",
+  "api_key_ref": "env://OPENAI_API_KEY",
+  "emulator": "<deterministic offline stub, e.g. stub_completion>",
+  "fallback": "<fallback provider_id, e.g. local_stub>",
+  "notes": "api_key_ref is ALWAYS a secret reference (env://… or secret://…) resolved at runtime by SecretsResolver — NEVER a raw key. The vendor SDK is imported only behind the LLM gateway. emulator + fallback guarantee an offline, deterministic path when the real provider is unavailable."
+}

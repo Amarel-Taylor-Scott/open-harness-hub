@@ -33,11 +33,11 @@ escalation and ICD-10 code candidates.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `redact_phi` | harness | `harness/redact-pii-text` | — |
-| 2 | `red_flag_screen` | rule_pack | `rule-pack/clinical-red-flags` | — |
-| 3 | `retrieve_guidelines` | knowledge_pack | `knowledge-pack/clinical-guidelines-sample` | — |
-| 4 | `lookup_codes` | tool | `tool/lookup-icd10` | — |
-| 5 | `reason` | harness | `harness/clinical-decision-support` | — |
+| 1 | `redact_phi` | harness | `harness/redact-pii-text` | - |
+| 2 | `red_flag_screen` | rule_pack | `rule-pack/clinical-red-flags` | - |
+| 3 | `retrieve_guidelines` | knowledge_pack | `knowledge-pack/clinical-guidelines-sample` | - |
+| 4 | `lookup_codes` | tool | `tool/lookup-icd10` | - |
+| 5 | `reason` | harness | `harness/clinical-decision-support` | - |
 
 ## Sample runs
 

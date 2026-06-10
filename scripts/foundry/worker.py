@@ -4,7 +4,7 @@
 
 The web tier enqueues **partition jobs**; workers pull them and run
 `Foundry.run_partition` (auto-wiring a live model route from env when present),
-append the funnel ledger, and ack — with retry/dead-letter on failure. This is the
+append the funnel ledger, and ack — with retry/permanent-failure routing on failure. This is the
 unit that scales: Phase 1 = a Render/Cloud-Run background worker; Phase 2 = a K8s
 Deployment with **KEDA autoscaling on queue depth** (scale-to-zero). One container,
 two commands (web vs `--serve`).
@@ -49,7 +49,7 @@ class InMemoryQueue:
 
     def __init__(self) -> None:
         self._q: deque[dict] = deque()
-        self.dead: list[dict] = []
+        self.failed_permanently: list[dict] = []
 
     def enqueue(self, job: dict) -> None:
         self._q.append(job)
@@ -64,7 +64,11 @@ class InMemoryQueue:
         self._q.append(job)
 
     def dead_letter(self, job: dict) -> None:
-        self.dead.append(job)
+        """Compatibility alias; new code should call fail_permanently()."""
+        self.fail_permanently(job)
+
+    def fail_permanently(self, job: dict) -> None:
+        self.failed_permanently.append(job)
 
     def __len__(self) -> int:
         return len(self._q)
@@ -127,9 +131,13 @@ class Worker:
             if job["_attempts"] <= self.max_retries:
                 self.queue.nack(job)
             else:
-                dl = getattr(self.queue, "dead_letter", None)
-                if callable(dl):
-                    dl(job)
+                fail = getattr(self.queue, "fail_permanently", None)
+                if callable(fail):
+                    fail(job)
+                else:
+                    dl = getattr(self.queue, "dead_letter", None)
+                    if callable(dl):
+                        dl(job)
             return {"error": repr(exc), "partition": job.get("partition", ""), "attempts": job["_attempts"]}
 
     def serve(self, *, max_jobs: int | None = None) -> int:
@@ -183,15 +191,15 @@ def _self_test() -> int:
         check("worker persists row families to the store", st.count("normalized_object") >= 1, str(st.count("normalized_object")))
         check("store persists index_record (openness/delivery columns)", st.count("index_record") >= 1)
 
-        # retry + dead-letter on a poison job
+        # retry + permanent-failure state on a malformed job
         bad = InMemoryQueue()
         bad.enqueue({"partition": "boom", "gaps": "not-a-list"})   # gaps wrong type ⇒ raises
         bw = Worker(queue=bad, ledger_path=Path(tmp) / "l2.jsonl", max_retries=1, now_s=0)
         r1 = bw.process_one()
         check("poison job errors (not a crash)", r1 and "error" in r1, str(r1))
         check("poison job re-queued for retry", len(bad) == 1)
-        bw.process_one()   # 2nd attempt > max_retries ⇒ dead-letter
-        check("poison job dead-lettered after retries", len(bad.dead) == 1 and len(bad) == 0)
+        bw.process_one()   # 2nd attempt > max_retries => failed_permanently
+        check("malformed job failed permanently after retries", len(bad.failed_permanently) == 1 and len(bad) == 0)
 
         # serve drains multiple jobs
         q2 = InMemoryQueue()

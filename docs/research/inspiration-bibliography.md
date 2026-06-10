@@ -3,7 +3,7 @@
 **Warrant: corroboration — the cited works themselves.** This is a *curated* bibliography, not a
 literature survey: each entry gives **one line on the idea** and **one line on the exact platform
 design choice it informs**. It exists so an agent or reviewer can trace any load-bearing decision in
-Open Harness Hub / Context Enrichment back to the public work that justifies it — and so we never
+Open Harness Hub / Baltor back to the public work that justifies it — and so we never
 present a borrowed result as our own. Numbers below are **as reported by the cited authors**; we
 admit no technique on its press release — every one is re-measured under our own lift/fidelity gate
 before promotion (see the honesty rule at the bottom).
@@ -30,7 +30,7 @@ We did not invent the context layer — we are building the *governed, measured-
 ### Mem0 — "Building Production-Ready AI Agents with Scalable Long-Term Memory" / Hindsight (recall-network memory)
 - **Idea.** Don't store raw chat history — **extract and store the distilled facts/observations**, so
   each retained token carries more signal; recall the few that matter, reflect, score confidence.
-- **Design choice it informs.** The **hyper-efficient tier** of Context Enrichment is Mem0/Hindsight
+- **Design choice it informs.** The **hyper-efficient tier** of Baltor is Mem0/Hindsight
   shaped: distilled facts/observations **packaged onto a cacheable prefix** so the provider prompt
   cache does the heavy lifting ([[context-enrichment-service]]). It maps to "store what was *learned*,
   not raw history" — the `memory/distilled · reflect · confidence` family on the shared backend
@@ -62,7 +62,7 @@ We did not invent the context layer — we are building the *governed, measured-
 - **Design choice it informs.** The **structural** compression lane (`compress.structural`) and the
   *four delivery surfaces* (MCP · packed file/llms.txt · skill · CLAUDE.md fragment) are modeled
   directly on Repomix's proven shape; the whitespace is that **nobody hosts the tiers as governed,
-  fresh, measured artifacts** — that gap is Context Enrichment's opening ([[context-enrichment-service]]).
+  fresh, measured artifacts** — that gap is Baltor's opening ([[context-enrichment-service]]).
 
 ---
 
@@ -95,7 +95,7 @@ We did not invent the context layer — we are building the *governed, measured-
 - **Idea.** An **open protocol** for feeding tools and context to any agent — the converging standard
   that lets a corpus/tool be served to Claude Code, Cursor, or any MCP client without a bespoke
   integration.
-- **Design choice it informs.** MCP is the **default delivery surface** for Context Enrichment
+- **Design choice it informs.** MCP is the **default delivery surface** for Baltor
   (`deliver.mcp_serve`) and OHH's connector layer (`/connect`, Confluence/GitLab/Postgres connectors)
   ([[context-enrichment-service]], [[two-services-shared-infrastructure]]). The **deliberate caveat,
   corroborated by the research:** *"MCP moves context, it does not produce it"* (Gartner's read that
@@ -198,7 +198,7 @@ We did not invent the context layer — we are building the *governed, measured-
 No work above is adopted on its headline. Each technique becomes a **governed component only after a
 *reproduced* lift over the *right* baseline on a held-out split, scored by a separate evaluator** —
 the same `pipeline_score − bare_model_score` gate the whole registry runs on, and the same
-measured-fidelity guarantee Context Enrichment lives on ([[../codex/master-goal]],
+measured-fidelity guarantee Baltor lives on ([[../codex/master-goal]],
 [[value-propositions]]). Transient gains (better sampling, cheaper adapters) are tagged transient and
 their decay is watched; the durable value sits in the **governed corpus, the measured composition
 facts, the safety gate, and the assembler** — none of which a bigger model or a faster decoder

@@ -1,0 +1,190 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/daily-factory-stage-contracts",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Daily factory stage contracts",
+  "description": "Stage contracts for resumable daily component factory runs, including expected summary files, prerequisites, and deterministic resume commands.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC-BY-4.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/daily-factory-stage-contracts",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-26",
+  "keywords": [
+    "components",
+    "daily-factory",
+    "resume",
+    "stage-ledger",
+    "load-audit"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-26",
+  "citation": "docs/codex/million-object-goal.md; docs/codex/object-factory-workflow.md; scripts/factory/daily_production_run.py; scripts/db/daily_partition_load_audit.py",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "daily-factory-stage-contracts__stages",
+      "name": "stages.jsonl",
+      "description": "Data file backing knowledge pack daily-factory-stage-contracts.",
+      "contentUrl": "data/daily-factory-stage-contracts/stages.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "3786 B",
+      "sha256": "c6a06ed124641ab9757b94546c4a65d276f5a43a1b45c10c1f7384c4335202e1"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "daily-factory-stage-contracts__records",
+      "name": "daily-factory-stage-contracts__records",
+      "description": "Records parsed from stages.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "daily-factory-stage-contracts__records/stage_id",
+          "name": "stage_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "daily-factory-stage-contracts__stages"
+            },
+            "extract": {
+              "column": "stage_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "daily-factory-stage-contracts__records/name",
+          "name": "name",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "daily-factory-stage-contracts__stages"
+            },
+            "extract": {
+              "column": "name"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "daily-factory-stage-contracts__records/summary_path_key",
+          "name": "summary_path_key",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "daily-factory-stage-contracts__stages"
+            },
+            "extract": {
+              "column": "summary_path_key"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "daily-factory-stage-contracts__records/required_for_closeout",
+          "name": "required_for_closeout",
+          "dataType": "sc:Boolean",
+          "source": {
+            "fileObject": {
+              "@id": "daily-factory-stage-contracts__stages"
+            },
+            "extract": {
+              "column": "required_for_closeout"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "daily-factory-stage-contracts__records/resume_command_template",
+          "name": "resume_command_template",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "daily-factory-stage-contracts__stages"
+            },
+            "extract": {
+              "column": "resume_command_template"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "daily-factory-stage-contracts__records/prerequisite_stage_ids",
+          "name": "prerequisite_stage_ids",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "daily-factory-stage-contracts__stages"
+            },
+            "extract": {
+              "column": "prerequisite_stage_ids"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "daily-factory-stage-contracts__records/expected_path",
+          "name": "expected_path",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "daily-factory-stage-contracts__stages"
+            },
+            "extract": {
+              "column": "expected_path"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

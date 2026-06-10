@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor · {{title}}</title>
+<style>
+  :root { --bg:#0d1117; --panel:#161b22; --line:#21262d; --fg:#e6edf3; --mut:#8b949e; --ok:#3fb950; --warn:#d29922; --acc:#58a6ff; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  header { padding:14px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  h1 { font-size:15px; margin:0; font-weight:600; }
+  .sub { color:var(--mut); font-size:12px; }
+  button { background:var(--acc); color:#0d1117; border:0; border-radius:6px; padding:8px 14px; font-weight:700; cursor:pointer; }
+  main { display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:12px; padding:16px; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:12px; }
+  .panel h2 { font-size:12px; margin:0 0 8px; color:var(--acc); text-transform:uppercase; letter-spacing:.04em; }
+  .row { display:flex; justify-content:space-between; gap:8px; padding:2px 0; border-bottom:1px dashed var(--line); }
+  .mut { color:var(--mut); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Baltor · {{title}}</h1>
+  <span class="sub">projection-only (this page computes no truth; it reads the API)</span>
+  <button id="run">Load</button>
+  <span id="status" class="sub"></span>
+</header>
+<main id="panels">
+  <div class="panel"><h2>{{title}}</h2><div id="out" class="mut">— click Load —</div></div>
+</main>
+
+<script>
+// PROJECTION ONLY: fetch the API and RENDER. No truth is computed, stored, or mutated here. No secrets.
+// TODO(stub): map the {{returns_contract}} fields into panels once the endpoint is wired.
+const ENDPOINT = "{{api_endpoint}}";  // a registered projection route
+const panels = document.getElementById("panels");
+const statusEl = document.getElementById("status");
+
+function row(p,k,v){ const r=document.createElement("div"); r.className="row"; r.innerHTML=`<span class="mut">${k}</span><span>${v}</span>`; p.appendChild(r); }
+
+async function run(){
+  const btn=document.getElementById("run"); btn.disabled=true; statusEl.textContent="loading…";
+  try {
+    const resp = await (await fetch(ENDPOINT)).json();
+    const out = document.getElementById("out"); out.textContent="";
+    // TODO(stub): render resp fields here.
+    row(out.parentElement, "endpoint", ENDPOINT);
+    row(out.parentElement, "keys", Object.keys(resp || {}).join(", ") || "(none)");
+    statusEl.textContent="ok";
+  } catch (e) { statusEl.textContent="error: "+e; }
+  btn.disabled=false;
+}
+document.getElementById("run").addEventListener("click", run);
+</script>
+</body>
+</html>

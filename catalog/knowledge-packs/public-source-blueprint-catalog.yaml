@@ -1,0 +1,38 @@
+id: "knowledge-pack/public-source-blueprint-catalog"
+type: knowledge-pack
+version: "0.1.0"
+name: "Public source blueprint catalog"
+description: "Blueprint seeds for scanning public source families across automotive, employment agency, plumbing/HVAC, woodworking, offshore oil and gas, and environmental review verticals."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["automotive", "energy", "manufacturing", "construction", "government", "cross_industry"]
+capability: ["retrieval", "extraction", "classification", "governance", "evaluation"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "volatile"
+lifecycle_position: "pre_api.ingest"
+tags: ["public-sources", "source-blueprints", "scraping", "archive-capture", "esoteric-industries"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types:
+  - "public_source_blueprint"
+  - "source_governance_plan"
+  - "scraper_normalizer_plan"
+files:
+  - path: "catalog/knowledge-packs/data/public-source-blueprint-catalog/blueprints.jsonl"
+    format: "jsonl"
+    schema: "public-source-blueprint"
+indexing:
+  bm25: true
+  dense:
+    recommended_model: "sentence-transformers/all-MiniLM-L6-v2"
+provenance:
+  sources:
+    - "Open Harness Hub contributor-authored public source blueprint seeds"
+    - "Open Harness Hub esoteric industry source surfaces"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "Blueprint metadata only; no scraped source bodies, real PII, proprietary manuals, or confidential records."

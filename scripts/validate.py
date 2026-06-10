@@ -5,6 +5,7 @@ Also checks:
   - every `ref` field points to an existing component id;
   - every leaf type referenced is in vocabularies/leaf-types.yaml;
   - industry / capability / modality / lifecycle tags are in their vocabularies;
+  - prompt_abi.cache_scope values are in vocabularies/cache-scopes.yaml;
   - pipeline DAGs have no cycles or dangling step refs;
   - (release scope) every `implementations[].path` callable contract that points
     at an in-repo module actually resolves — a catalog that declares an
@@ -38,10 +39,23 @@ except ImportError:
 
 
 ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 SCHEMAS = ROOT / "schemas"
 CATALOG = ROOT / "catalog"
 VOCABS = ROOT / "vocabularies"
 COMPONENT_ID_INDEX = ROOT / "dist" / "catalog-component-ids.json"
+MANIFEST_BRIDGE_DIR = ROOT / "dist" / "catalog-manifest-bridge"
+MANIFEST_BRIDGE_RECORDS = MANIFEST_BRIDGE_DIR / "manifest_import_records.jsonl"
+SCHEMA_SQL = ROOT / "db" / "postgres" / "schema.sql"
+DB_SEEDS = ROOT / "db" / "seeds"
+DRIFT_WARNING_SAMPLE_LIMIT = 5
+
+from scripts._config import (
+    OBJECT_GOVERNANCE_PACKAGE_TABLES,
+    OBJECT_GOVERNANCE_REQUIRED_FAMILIES,
+    OBJECT_GOVERNANCE_RUBRIC_ID,
+)
 
 TYPE_TO_SCHEMA = {
     "harness":        "harness.schema.json",
@@ -289,6 +303,222 @@ def check_impl_paths(manifest: dict, in_repo: set[str], errors: list[str]) -> No
             )
 
 
+def _catalog_manifest_paths() -> list[Path]:
+    return [
+        path
+        for path in CATALOG.rglob("*.yaml")
+        if "_inbox" not in path.parts and "data" not in path.parts
+    ]
+
+
+def _manifest_bridge_warnings() -> list[str]:
+    manifests = _catalog_manifest_paths()
+    if not manifests:
+        return []
+    if not MANIFEST_BRIDGE_RECORDS.exists():
+        return [
+            (
+                "database-backed catalog drift: manifest bridge records are "
+                f"missing at {MANIFEST_BRIDGE_RECORDS.relative_to(ROOT)}; "
+                "run scripts/db/catalog_manifest_bridge.py before treating YAML "
+                "manifests as imported operational rows."
+            )
+        ]
+
+    bridge_mtime = MANIFEST_BRIDGE_RECORDS.stat().st_mtime_ns
+    stale = [
+        path.relative_to(ROOT)
+        for path in manifests
+        if path.stat().st_mtime_ns > bridge_mtime
+    ]
+    if not stale:
+        return []
+    sample = ", ".join(str(path) for path in stale[:DRIFT_WARNING_SAMPLE_LIMIT])
+    return [
+        (
+            "database-backed catalog drift: "
+            f"{len(stale)} catalog manifest(s) are newer than "
+            f"{MANIFEST_BRIDGE_RECORDS.relative_to(ROOT)}; refresh the bridge "
+            f"output. Sample: {sample}"
+        )
+    ]
+
+
+def _hardcoded_setting_warnings() -> list[str]:
+    try:
+        from scripts.audit_context_storage import audit_hardcoded_settings
+    except Exception as exc:  # pragma: no cover - defensive release warning.
+        return [f"hard-coded setting drift audit unavailable: {type(exc).__name__}: {exc}"]
+
+    report = audit_hardcoded_settings()
+    warnings: list[str] = []
+    if report.get("unregistered_repeated_model_literal_count", 0):
+        warnings.append(
+            "hard-coded setting drift: "
+            f"{report['unregistered_repeated_model_literal_count']} unregistered "
+            "repeated model literal group(s) should move to scripts._config or "
+            "setting_profile rows."
+        )
+    if report.get("unregistered_repeated_backend_literal_count", 0):
+        warnings.append(
+            "hard-coded setting drift: "
+            f"{report['unregistered_repeated_backend_literal_count']} unregistered "
+            "repeated backend literal group(s) should move to scripts._config or "
+            "setting_profile rows."
+        )
+    if report.get("repeated_vector_dimension_count", 0):
+        warnings.append(
+            "hard-coded setting drift: "
+            f"{report['repeated_vector_dimension_count']} repeated unregistered "
+            "vector dimension group(s) should use the shared embedding/vector "
+            "profile registry."
+        )
+    if report.get("private_runtime_setting_resolver_bypass_count", 0):
+        warnings.append(
+            "hard-coded setting drift: "
+            f"{report['private_runtime_setting_resolver_bypass_count']} private "
+            "runtime setting resolver bypass(es) should use "
+            "scripts.db.runtime_settings.runtime_setting."
+        )
+
+    candidates = report.get("migration_candidates") or []
+    for candidate in candidates[:DRIFT_WARNING_SAMPLE_LIMIT]:
+        locations = candidate.get("first_locations") or []
+        first = locations[0] if locations else {}
+        location = f"{first.get('path')}:{first.get('line')}" if first else "unknown"
+        warnings.append(
+            "  setting migration candidate: "
+            f"{candidate.get('kind')} {candidate.get('value')!r} "
+            f"({candidate.get('occurrences')} occurrences; first {location})"
+        )
+    return warnings
+
+
+def _schema_table_present(schema_text: str, table_name: str) -> bool:
+    pattern = rf"CREATE\s+TABLE\s+IF\s+NOT\s+EXISTS\s+{re.escape(table_name)}\b"
+    return re.search(pattern, schema_text, re.IGNORECASE) is not None
+
+
+def _object_governance_package_warnings(known_ids: set[str]) -> list[str]:
+    if not SCHEMA_SQL.exists():
+        return [f"object governance package drift: missing {SCHEMA_SQL.relative_to(ROOT)}"]
+
+    schema_text = SCHEMA_SQL.read_text(encoding="utf-8")
+    missing_tables = [
+        table for table in OBJECT_GOVERNANCE_PACKAGE_TABLES
+        if not _schema_table_present(schema_text, table)
+    ]
+    warnings: list[str] = []
+    if missing_tables:
+        warnings.append(
+            "object governance package drift: canonical schema is missing "
+            f"expected table(s): {', '.join(missing_tables)}"
+        )
+
+    try:
+        from scripts.db.object_governance_view_probe import probe_object_governance_views
+    except Exception as exc:  # pragma: no cover - defensive release warning.
+        warnings.append(
+            "object governance package drift: operational view check unavailable: "
+            f"{type(exc).__name__}: {exc}"
+        )
+    else:
+        view_probe = probe_object_governance_views(schema_sql=SCHEMA_SQL)
+        missing_views = [
+            str(view.get("name"))
+            for view in view_probe.get("schema_views", [])
+            if not view.get("present")
+        ]
+        if missing_views:
+            warnings.append(
+                "object governance package drift: canonical schema is missing "
+                f"expected operational view(s): {', '.join(missing_views)}"
+            )
+
+    if OBJECT_GOVERNANCE_RUBRIC_ID not in known_ids:
+        warnings.append(
+            "object governance package drift: required review rubric "
+            f"{OBJECT_GOVERNANCE_RUBRIC_ID!r} is not present in the catalog."
+        )
+
+    package_row_candidates: list[Path] = []
+    seed_bases = (
+        ROOT / "seed",
+        ROOT / "seeds",
+        DB_SEEDS,
+        MANIFEST_BRIDGE_DIR,
+    )
+    for base in seed_bases:
+        if not base.exists():
+            continue
+        package_row_candidates.extend(
+            path for path in base.rglob("*")
+            if path.is_file() and "object_governance" in path.name
+        )
+
+    if not package_row_candidates:
+        warnings.append(
+            "object governance package drift: governance tables/rubric exist, "
+            "but no object_governance seed/export row artifacts were found for "
+            f"required families: {', '.join(OBJECT_GOVERNANCE_REQUIRED_FAMILIES)}."
+        )
+    else:
+        profile_families: set[str] = set()
+        for path in package_row_candidates:
+            if path.name != "object_governance_profile.jsonl":
+                continue
+            try:
+                lines = path.read_text(encoding="utf-8").splitlines()
+            except OSError:
+                continue
+            for line in lines:
+                if not line.strip():
+                    continue
+                try:
+                    row = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                family = row.get("object_family")
+                if isinstance(family, str) and family:
+                    profile_families.add(family)
+        if profile_families:
+            missing_families = [
+                family for family in OBJECT_GOVERNANCE_REQUIRED_FAMILIES
+                if family not in profile_families
+            ]
+            if missing_families:
+                warnings.append(
+                    "object governance package drift: profile seed/export rows "
+                    "are missing required object family baseline(s): "
+                    f"{', '.join(missing_families)}."
+                )
+        try:
+            from scripts.db.object_governance_registry import package_seed_coverage_errors
+        except Exception as exc:  # pragma: no cover - defensive release warning.
+            warnings.append(
+                "object governance package drift: seed coverage check unavailable: "
+                f"{type(exc).__name__}: {exc}"
+            )
+        else:
+            for error in package_seed_coverage_errors():
+                warnings.append(f"object governance package drift: {error}")
+    return warnings
+
+
+def collect_release_drift_warnings(known_ids: set[str]) -> list[str]:
+    """Return warning-first release drift findings.
+
+    These checks intentionally do not change the validation exit code yet.
+    They make database-backed migration drift, hard-coded setting drift, and
+    object-governance package gaps visible before later promotion to gates.
+    """
+    warnings: list[str] = []
+    warnings.extend(_manifest_bridge_warnings())
+    warnings.extend(_hardcoded_setting_warnings())
+    warnings.extend(_object_governance_package_warnings(known_ids))
+    return warnings
+
+
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Validate Open Harness Hub manifests.")
     parser.add_argument(
@@ -316,6 +546,14 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "current tree's not-yet-built stubs do not block the build."
         ),
     )
+    parser.add_argument(
+        "--skip-drift-warnings",
+        action="store_true",
+        help=(
+            "Skip non-fatal release-scope drift warnings for database-backed "
+            "migration state, hard-coded settings, and object-governance packages."
+        ),
+    )
     return parser.parse_args(argv)
 
 
@@ -326,6 +564,7 @@ def main(argv: list[str] | None = None) -> int:
     capabilities = load_vocab("capabilities")
     modalities  = load_vocab("modalities")
     leaf_types  = load_vocab("leaf-types")
+    cache_scopes = load_vocab("cache-scopes")
 
     if args.paths:
         selected_paths = [(ROOT / p).resolve() if not Path(p).is_absolute() else Path(p).resolve() for p in args.paths]
@@ -395,6 +634,11 @@ def main(argv: list[str] | None = None) -> int:
         for lt in manifest.get("emits", []) or []:
             if leaf_types and lt not in leaf_types:
                 msg_errors.append(f"  emits/{lt} not in vocabularies/leaf-types.yaml")
+        prompt_abi = manifest.get("prompt_abi")
+        if isinstance(prompt_abi, dict):
+            cache_scope = prompt_abi.get("cache_scope")
+            if cache_scope and cache_scopes and cache_scope not in cache_scopes:
+                msg_errors.append(f"  prompt_abi.cache_scope/{cache_scope} not in vocabularies/cache-scopes.yaml")
 
         if run_ref_check:
             ref_errors: list[str] = []
@@ -424,6 +668,16 @@ def main(argv: list[str] | None = None) -> int:
         )
         for line in impl_path_warnings:
             print(line)
+
+    if run_ref_check and not args.skip_drift_warnings:
+        drift_warnings = collect_release_drift_warnings(known_ids)
+        if drift_warnings:
+            print(
+                "\nwarning: release drift findings are advisory for now; "
+                "resolve or baseline them before promoting to hard gates:"
+            )
+            for warning in drift_warnings:
+                print(f"  {warning}")
 
     if failures:
         print(f"\n{failures} manifest(s) failed validation.")

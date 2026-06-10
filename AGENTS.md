@@ -11,6 +11,9 @@ host-agnostic (GitHub Pages, Hugging Face Spaces, Vercel, Netlify,
 Cloudflare Pages) and industry-agnostic.
 
 Read [`README.md`](README.md) first, then [`taxonomy/SPEC.md`](taxonomy/SPEC.md).
+For Baltor-specific work, also keep
+[`docs/codex/baltor-always-in-memory-context.md`](docs/codex/baltor-always-in-memory-context.md)
+loaded as the compact product and architecture anchor.
 
 ## Layout
 

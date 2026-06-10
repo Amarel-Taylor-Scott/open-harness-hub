@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "note": "Files over the fail budget (governed scope) must be listed here with a split target + deadline pass. check_monolith_allowlist.py fails on a NEW over-budget file outside this list.",
+  "governed_globs": ["scripts/runtime/*.py", "scripts/artifact_graph/*.py", "scripts/llm_gateway/*.py", "scripts/llm_gateway/providers/*.py", "scripts/security/*.py", "scripts/pipeline_runtime/*.py", "scripts/baltor_admin_demo_server.py", "scripts/baltor_flywheel.py", "scripts/flywheel_worker.py", "src/baltor/**/*.py"],
+  "allowlist": [
+    {"path": "scripts/baltor_admin_demo_server.py", "current_lines": 5445, "budget": "api_server:750", "reason": "legacy demo/admin HTTP server (routes + pages + projections in one file)",
+     "target_split": ["src/baltor/api/server.py", "src/baltor/api/routes/dev.py", "src/baltor/api/routes/runtime.py", "src/baltor/api/routes/demos.py", "src/baltor/api/projections/"],
+     "deadline_pass": "C36", "owner": "baltor-runtime"}
+  ]
+}

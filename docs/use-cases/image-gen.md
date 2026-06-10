@@ -15,7 +15,7 @@
 
 ## Primitives used
 
-| Layer | Artifact |
+| Layer | Component |
 |---|---|
 | Input guard | `rule-pack/grep-prohibited-terms` (celebs, trademarks, NSFW) |
 | Style RAG | `knowledge-pack/style-references-cinematic` |

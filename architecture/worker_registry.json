@@ -1,0 +1,102 @@
+{
+  "version": "1.0",
+  "note": "Existing Baltor workers classified into buckets. status: active|candidate.",
+  "workers": [
+    {
+      "worker_id": "flywheel_worker",
+      "bucket_id": "control_plane",
+      "module": "scripts/flywheel_worker.py",
+      "command_types": [
+        "pipeline.run_step",
+        "pipeline.run",
+        "pipeline.step"
+      ],
+      "queue": "flywheel.commands.default",
+      "resource_class": "control_plane",
+      "determinism": "high",
+      "status": "active",
+      "note": "durable command dispatcher/runner (control plane); context.consume is owned by consumption_service, tenant.doc by tenant_ingest"
+    },
+    {
+      "worker_id": "durable_store",
+      "bucket_id": "control_plane",
+      "module": "scripts/durable_store.py",
+      "command_types": [],
+      "queue": "runtime.commands",
+      "resource_class": "control_plane",
+      "determinism": "high",
+      "status": "active",
+      "note": "durable event log + lease queue + retry/DLQ + outbox substrate"
+    },
+    {
+      "worker_id": "tenant_ingest",
+      "bucket_id": "ingestion_sync",
+      "module": "scripts/ingest/tenant_ingest.py",
+      "command_types": [
+        "tenant.doc"
+      ],
+      "queue": "ingest.tenant",
+      "resource_class": "io_bound",
+      "determinism": "high",
+      "status": "active"
+    },
+    {
+      "worker_id": "consumption_service",
+      "bucket_id": "native_export",
+      "module": "scripts/runtime/consumption.py",
+      "command_types": [
+        "context.consume"
+      ],
+      "queue": "flywheel.commands.default",
+      "resource_class": "standard_cpu",
+      "determinism": "high",
+      "status": "active",
+      "note": "serves ContextResponse ONLY past verification+optimization+consumption gates"
+    },
+    {
+      "worker_id": "optimization_harness",
+      "bucket_id": "optimization_evaluation",
+      "module": "scripts/runtime/optimization.py",
+      "command_types": [],
+      "queue": "optimize.bakeoff",
+      "resource_class": "standard_cpu",
+      "determinism": "model_dependent",
+      "status": "active"
+    },
+    {
+      "worker_id": "verification_gate",
+      "bucket_id": "verification_fact_check",
+      "module": "scripts/runtime/verification_gate.py",
+      "command_types": [],
+      "queue": "verify.gate",
+      "resource_class": "standard_cpu",
+      "determinism": "high",
+      "status": "active"
+    },
+    {
+      "worker_id": "reconciliation",
+      "bucket_id": "reconciliation_policy",
+      "module": "scripts/artifact_graph/reconciliation.py",
+      "command_types": [],
+      "queue": "reconcile.authority",
+      "resource_class": "standard_cpu",
+      "determinism": "high",
+      "status": "active",
+      "note": "deterministic authority"
+    },
+    {
+      "worker_id": "contextops_research_stub",
+      "bucket_id": "open_ended_agent",
+      "module": "src/baltor/contextops/research_stub.py",
+      "command_types": [
+        "agent.research",
+        "agent.source_discovery"
+      ],
+      "queue": "agent.research.open_ended",
+      "resource_class": "sandboxed_agent",
+      "determinism": "non_deterministic",
+      "status": "active",
+      "note": "local_stub proposes SourceDiscoveryReport (serves_truth=False)"
+    }
+  ]
+}

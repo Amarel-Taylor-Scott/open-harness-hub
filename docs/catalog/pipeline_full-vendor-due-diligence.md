@@ -34,8 +34,8 @@ in one workflow. Surface vertical-level findings + overall verdict.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `esg_review` | pipeline | `pipeline/supplier-policy-grading` | — |
-| 2 | `appsec_review` | pipeline | `pipeline/code-security-review` | — |
-| 3 | `legal_review` | pipeline | `pipeline/contract-clause-review` | — |
-| 4 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `esg_review` | pipeline | `pipeline/supplier-policy-grading` | - |
+| 2 | `appsec_review` | pipeline | `pipeline/code-security-review` | - |
+| 3 | `legal_review` | pipeline | `pipeline/contract-clause-review` | - |
+| 4 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

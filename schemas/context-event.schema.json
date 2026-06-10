@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/context-event.schema.json",
+  "title": "Context event",
+  "description": "Append-only lineage, history, audit, and retrieval event for context object fabric operations.",
+  "type": "object",
+  "required": ["kind", "context_event_id", "event_type", "occurred_at"],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "baltor.context-event.v1"
+    },
+    "context_event_id": {
+      "type": "string"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": ["DISCOVERED", "FETCHED", "NORMALIZED", "CLASSIFIED", "PERMISSIONED", "CHUNKED", "EMBEDDED", "LINKED", "SUMMARIZED", "INDEXED", "RETRIEVED", "SERVED", "EXPANDED", "VALIDATED", "CORRECTED", "SUPERSEDED", "RETIRED", "TOMBSTONED", "FEEDBACK_RECEIVED", "POLICY_DENIED", "CUSTOM"]
+    },
+    "object_id": {
+      "type": "string"
+    },
+    "input_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "output_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "actor": {
+      "type": "string"
+    },
+    "activity": {
+      "type": "string"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "job_name": {
+      "type": "string"
+    },
+    "trace_id": {
+      "type": "string"
+    },
+    "span_id": {
+      "type": "string"
+    },
+    "policy_decision": {
+      "type": "string",
+      "enum": ["allow", "deny", "redact", "ask", "unknown"]
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

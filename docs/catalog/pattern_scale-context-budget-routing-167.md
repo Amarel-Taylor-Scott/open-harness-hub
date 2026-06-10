@@ -1,0 +1,18 @@
+# Scale Context Budget Routing 167
+
+*pattern* · `pattern/scale-context-budget-routing-167` · v0.1.0 · experimental
+
+Reusable design pattern for context budget routing workflows across regulated and operational AI systems.
+
+| axis | value |
+|---|---|
+| industry | cross_industry |
+| capability | research, evaluation |
+| modality | text, structured |
+| lifecycle | experimental |
+| trust_boundary | hub |
+| freshness | stable |
+| license | CC-BY-4.0 |
+
+
+

@@ -1,0 +1,190 @@
+"""src.teleon.purpose_tasks.purpose_task — minimal PurposeTask controller (PoC) over the built Parallel-Path Engine.
+
+A PurposeTask is declared by INTENT, not code:
+    {task_id, purpose, capability_slot, input_contract, output_contract,
+     success_criteria, promotion_criteria, current_impl_id, alternatives, rollback_target}
+
+`provision` binds the highest-priority implementation for the task's capability_slot FROM a registry (the
+provision-by-capability surface — no per-task wiring code). `run_current` runs the cheap deterministic hot
+path. `evaluate_health` checks the result against success_criteria. `adapt` (on drift) runs the next candidate
+implementation SIDE-BY-SIDE against the current one via the governed Parallel-Path Engine and promotes ONLY on a
+passing PathPromotionDecision, keeping the prior implementation as a fallback (rollback_target). Agents PROPOSE;
+the gate DISPOSES. Pure + deterministic (all inputs injected: registry, input_snapshot, now). No LLM in the hot
+path; no second runtime/ledger/registry; a candidate is never served before promotion.
+"""
+from __future__ import annotations
+
+from typing import Any, Callable
+
+from src.teleon.experiments import parallel_paths as _pp
+from src.teleon.experiments import path_comparator as _pc
+from src.teleon.experiments import path_promotion as _ppr
+
+#: registry shape: {capability_slot: [{"impl_id": str, "priority": int|float, "handler": Callable[[input], RunnerResult]}]}
+#: handler returns a RunnerResult dict: {output, output_contract, cost, latency_ms, error, source_handles, ...}
+Registry = dict[str, list[dict[str, Any]]]
+
+
+def _impls(registry: Registry, slot: str) -> list[dict[str, Any]]:
+    impls = registry.get(slot) or []
+    if not impls:
+        raise ValueError(f"no implementation registered for capability_slot {slot!r}")
+    # provision-by-capability: order by NUMERIC priority (desc), stable by impl_id — not by hard-coded choice.
+    return sorted(impls, key=lambda i: (-float(i.get("priority", 0)), i["impl_id"]))
+
+
+def provision(spec: dict[str, Any], registry: Registry) -> dict[str, Any]:
+    """Bind an implementation for spec['capability_slot'] by numeric priority. Returns an updated spec with
+    current_impl_id + alternatives. No code is written per task — selection is by capability + priority."""
+    ordered = _impls(registry, spec["capability_slot"])
+    out = dict(spec)
+    out["current_impl_id"] = ordered[0]["impl_id"]
+    out["alternatives"] = [i["impl_id"] for i in ordered[1:]]
+    out.setdefault("rollback_target", "")   # '' = no promotion yet (kept a string for PurposeTaskSpec.v1)
+    return out
+
+
+def _guarded_call(impl: dict[str, Any], input_snapshot: Any, output_contract: str = "") -> dict[str, Any]:
+    """Run ONE implementation's handler, converting a RAISED exception or a non-RunnerResult return into a
+    structured failure result (output '', error set, crashed=True) instead of propagating. Shared by the guarded
+    hot path AND the side-by-side adapt runner, so neither can be crashed — or fooled into a fabricated success —
+    by a misbehaving implementation. Pure + deterministic."""
+    try:
+        res = impl["handler"](input_snapshot)
+    except Exception as e:                       # never propagate → convert to a scored failure / drift signal
+        return {"output": "", "output_contract": output_contract, "cost": float(impl.get("error_cost", 0.0)),
+                "latency_ms": 0, "error": {"type": type(e).__name__, "message": str(e)}, "source_handles": [],
+                "impl_id": impl.get("impl_id"), "crashed": True}
+    if not isinstance(res, dict):                # a non-RunnerResult is a contract breach, not a fabricated success
+        return {"output": "", "output_contract": output_contract, "cost": 0.0, "latency_ms": 0,
+                "error": {"type": "ContractError", "message": "handler did not return a RunnerResult dict"},
+                "source_handles": [], "impl_id": impl.get("impl_id"), "crashed": True}
+    return res
+
+
+def _runner(registry: Registry, slot: str) -> Callable[[dict[str, Any], Any], dict[str, Any]]:
+    by_id = {i["impl_id"]: i for i in registry[slot]}
+
+    def runner(path: dict[str, Any], input_snapshot: Any) -> dict[str, Any]:
+        # GUARDED: a crashing / non-compliant impl becomes a scored failure result — it never aborts the
+        # side-by-side run (a crashing baseline still lets a healthy candidate be judged + promoted).
+        return _guarded_call(by_id[path["path_id"]], input_snapshot, path.get("output_contract", ""))
+
+    return runner
+
+
+def run_current(spec: dict[str, Any], registry: Registry, input_snapshot: Any) -> dict[str, Any]:
+    """Run the cheap deterministic hot path = the currently-bound implementation. No LLM, no side-by-side.
+    Assumes a well-behaved handler (returns a RunnerResult); use run_current_guarded for untrusted handlers."""
+    by_id = {i["impl_id"]: i for i in registry[spec["capability_slot"]]}
+    return by_id[spec["current_impl_id"]]["handler"](input_snapshot)
+
+
+def run_current_guarded(spec: dict[str, Any], registry: Registry, input_snapshot: Any) -> dict[str, Any]:
+    """ROBUST hot-path entry: run the bound implementation but NEVER let a misbehaving handler crash the
+    controller or fabricate a success. A handler that RAISES (bug, timeout, resource error) or returns a
+    non-RunnerResult is converted into a structured DRIFT result — `output=''`, `error` set, `crashed=True`,
+    `source_handles=[]` — so evaluate_health flags drift (`meets=False`) and adapt/rollback can respond. A raised
+    or broken handler can therefore never look like a served answer. Pure + deterministic (no now/IO of its own).
+
+    The hot path stays cheap on the happy path (delegates to the handler directly); the guard only shapes failure."""
+    slot = spec["capability_slot"]
+    impl = {i["impl_id"]: i for i in registry[slot]}[spec["current_impl_id"]]
+    return _guarded_call(impl, input_snapshot, spec.get("output_contract", ""))
+
+
+def evaluate_health(result: dict[str, Any], success_criteria: dict[str, Any], *,
+                    held_out_strings: tuple[str, ...] = ()) -> dict[str, Any]:
+    """Deterministic health check of a hot-path result vs success_criteria. Returns {meets, drift:[dims]}."""
+    drift: list[str] = []
+    if result.get("error"):
+        drift.append("error")
+    max_cost = success_criteria.get("max_cost")
+    if max_cost is not None and float(result.get("cost", 0.0)) > float(max_cost):
+        drift.append("cost")
+    min_cov = success_criteria.get("min_source_handles")
+    if min_cov is not None and len(result.get("source_handles") or []) < int(min_cov):
+        drift.append("source_handles")
+    text = str(result.get("output", ""))
+    for needle in held_out_strings:
+        if needle in text:
+            drift.append("held_out_leak")
+            break
+    return {"meets": not drift, "drift": drift}
+
+
+def adapt(spec: dict[str, Any], registry: Registry, input_snapshot: Any, *, now: str,
+          promotion_criteria: dict[str, Any], candidate_impl_id: str | None = None,
+          held_out_strings: tuple[str, ...] = ()) -> dict[str, Any]:
+    """Self-adapt on drift: run the next candidate implementation SIDE-BY-SIDE vs the current one through the
+    Parallel-Path Engine and promote ONLY on a passing PathPromotionDecision. The prior impl is kept as a
+    fallback (rollback_target). A candidate is NEVER served before promotion. Returns
+    {promoted, decision, run, report, served_path_id, spec}."""
+    slot = spec["capability_slot"]
+    candidate_id = candidate_impl_id or (spec.get("alternatives") or [None])[0]
+    if candidate_id is None:
+        return {"promoted": False, "reason": "no alternative implementation to try",
+                "served_path_id": spec["current_impl_id"], "spec": dict(spec)}
+
+    runner = _runner(registry, slot)
+    oc = spec["output_contract"]
+    baseline_path = {"path_id": spec["current_impl_id"], "mode": "baseline", "output_contract": oc}
+    candidate_path = {"path_id": candidate_id, "mode": "candidate", "output_contract": oc}
+
+    run = _pp.run_parallel(slot, input_snapshot, baseline_path, [candidate_path], runner=runner, now=now)
+    report = _pc.compare(run, now=now, held_out_strings=list(held_out_strings))
+
+    # cost gate computed from the run (candidate must not be more expensive than the baseline, with tolerance)
+    base_cost = float(run["baseline_result"]["cost"])
+    cand_cost = float(run["candidate_results"][0]["cost"])
+    tol = float(promotion_criteria.get("cost_tolerance", 0.0))
+    cost_ok = cand_cost <= base_cost * (1.0 + tol)
+
+    decision = _ppr.decide(report, promotion_criteria, candidate_path_id=candidate_id, now=now,
+                           cost_acceptable=cost_ok)
+    promoted = _ppr.is_promote_authorized(decision)
+
+    new_spec = dict(spec)
+    if promoted:
+        # promote the candidate; keep the PRIOR current impl as a fallback alternative (rollback_target).
+        prior = spec["current_impl_id"]
+        new_spec["current_impl_id"] = candidate_id
+        new_spec["alternatives"] = [prior] + [a for a in spec.get("alternatives", []) if a != candidate_id]
+        new_spec["rollback_target"] = decision["rollback_target"]
+
+    return {"promoted": promoted, "decision": decision, "run": run, "report": report,
+            "served_path_id": run["served_path_id"], "spec": new_spec}
+
+
+def rollback(spec: dict[str, Any], registry: Registry, *, to: str | None = None) -> dict[str, Any]:
+    """Revert the bound implementation to a preserved rollback target — promotion is ALWAYS reversible.
+
+    `to` overrides spec['rollback_target'] (roll back to any earlier registered impl, not just the last). The
+    currently-served implementation is DEMOTED to the front of `alternatives`, never deleted (lossless — it stays
+    re-promotable through `adapt` + the gate). The pending rollback_target is consumed (set to ''); a future
+    promotion records a new one.
+
+    Fails CLOSED — returns rolled_back=False with the spec UNCHANGED (never blanks current_impl_id) when:
+      * there is no rollback target (nothing recorded and no `to`),
+      * the target is not a registered implementation for the slot,
+      * the target is already the current implementation (no-op).
+    Pure + deterministic (no I/O, no now)."""
+    slot = spec["capability_slot"]
+    registered = {i["impl_id"] for i in (registry.get(slot) or [])}
+    target = to or spec.get("rollback_target") or ""
+    current = spec.get("current_impl_id")
+    if not target:
+        return {"rolled_back": False, "reason": "no rollback target recorded", "spec": dict(spec)}
+    if target not in registered:
+        return {"rolled_back": False, "reason": f"rollback target {target!r} is not a registered implementation",
+                "spec": dict(spec)}
+    if target == current:
+        return {"rolled_back": False, "reason": "already serving the rollback target", "spec": dict(spec)}
+    new_spec = dict(spec)
+    new_spec["current_impl_id"] = target
+    # demote the regressed impl to the FRONT of alternatives (lossless + first to be re-tried by adapt); drop the
+    # target from alternatives (it is current now); dedup, stable order.
+    prior_alts = [a for a in spec.get("alternatives", []) if a not in (target, current)]
+    new_spec["alternatives"] = ([current] + prior_alts) if current else prior_alts
+    new_spec["rollback_target"] = ""   # pending rollback consumed; the next promotion records a fresh target
+    return {"rolled_back": True, "from": current, "to": target, "spec": new_spec}

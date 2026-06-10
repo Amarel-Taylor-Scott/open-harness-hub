@@ -1,0 +1,37 @@
+{
+  "$id": "blackboard/GovernedBlackboardEntry.v1",
+  "title": "GovernedBlackboardEntry.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "The Baltor GOVERNANCE wrapper around one BlackboardEntry: the seam where Teleon's working state meets Baltor's served-truth governance. It NEVER makes the entry truth (serves_truth is pinned const false); it records the governance verdict ABOUT the entry so Baltor can decide promotion separately. claim_status spans candidate | verified | conflicting | held_out | stale (a swarm entry is born candidate; it can be verified, found conflicting, held out, or go stale — none of those is auto-served). authority_rank is the numeric reconciliation weight; verification_status/held_out_reason/freshness_policy/temporal_validity carry the governance metadata; promotion_eligible is the explicit, auditable gate (a swarm conclusion is promotable only when Baltor's checks pass — verified + non-conflicting + fresh + sourced). receipt_refs[] and source_handles[] tie the verdict to worker receipts and upstream provenance; tenant_scope keeps governance tenant-isolated.",
+  "required": [
+    "entry_id",
+    "blackboard_id",
+    "authority_rank",
+    "claim_status",
+    "verification_status",
+    "held_out_reason",
+    "freshness_policy",
+    "temporal_validity",
+    "tenant_scope",
+    "promotion_eligible",
+    "receipt_refs",
+    "source_handles",
+    "serves_truth"
+  ],
+  "properties": {
+    "entry_id": {"type": "string", "description": "the BlackboardEntry this governance verdict wraps"},
+    "blackboard_id": {"type": "string", "description": "the blackboard the wrapped entry belongs to"},
+    "authority_rank": {"type": "integer", "minimum": 0, "description": "numeric authority weight used during reconciliation (higher wins conflicts); graph data, not a display label"},
+    "claim_status": {"type": "string", "enum": ["candidate", "verified", "conflicting", "held_out", "stale"], "description": "Baltor's governance status for the claim: born candidate; may become verified, conflicting, held_out, or stale — none is auto-served truth"},
+    "verification_status": {"type": "string", "description": "governance verification state/verdict for the claim (e.g. unverified | passed | failed | needs_review)"},
+    "held_out_reason": {"type": "string", "description": "if held out, why (minority finding, rejected candidate, unresolved conflict); empty when not held out — held_out != deleted"},
+    "freshness_policy": {"type": "string", "description": "the freshness/CDC policy governing how stale this claim may get before re-verification"},
+    "temporal_validity": {"type": "string", "description": "the temporal validity window for the claim (when it is/was true), e.g. an ISO interval or 'as_of' marker"},
+    "tenant_scope": {"type": "string", "description": "owning tenant; governance and lineage stay tenant-isolated and never become global"},
+    "promotion_eligible": {"type": "boolean", "description": "explicit, auditable gate: true ONLY when Baltor's checks pass (verified + non-conflicting + fresh + sourced); candidate != active, benchmark != promotion"},
+    "receipt_refs": {"type": "array", "items": {"type": "string"}, "description": "BlackboardWorkerReceipt ids (and other receipt refs) backing this verdict — provenance for the governance decision"},
+    "source_handles": {"type": "array", "items": {"type": "string"}, "description": "upstream provenance handles (ctx:// or doc#section) for the wrapped claim — a governed claim is never sourceless"},
+    "serves_truth": {"type": "boolean", "const": false, "description": "ALWAYS false — wrapping for governance never itself makes the entry served truth; serving is a separate gated step keyed off promotion_eligible"}
+  }
+}

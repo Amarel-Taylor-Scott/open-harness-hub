@@ -1,0 +1,56 @@
+id: "pattern/anti-vague-task-prompt"
+type: pattern
+version: "0.1.0"
+name: "Anti-pattern: vague task prompt"
+description: "Sending an LLM a task without a concrete objective, deliverable scope, or success signal. The model guesses the format, length, tone, and depth, producing inconsistent outputs that cannot be evaluated deterministically."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "CC-BY-4.0"
+industry: ["cross_industry"]
+capability: ["generation"]
+modality: ["text"]
+lifecycle: "stable"
+trust_boundary: "local"
+created: "2026-05-26"
+updated: "2026-05-26"
+
+attribution:
+  source_url: "https://github.com/nidhinjs/prompt-master"
+  source_kind: github
+  author: "nidhinjs"
+  license: "MIT"
+
+when_to_use:
+  - "This is an anti-pattern. Do NOT use it."
+
+structural_shape:
+  - "WRONG: 'Write a summary of this document.' — no length, no audience, no format, no pass/fail criterion."
+  - "RIGHT: specify task-brief fields — role, objective, deliverable, constraints (word-limit, format), success criteria, and an explicit refusal condition."
+  - "RIGHT: use a task-brief prompt template (see logic-pack/prompt-template-library) that enforces these slots before the call is made."
+
+problem: |
+  Vague prompts produce outputs that shift with model version, sampling
+  temperature, and even time-of-day batching. Downstream consumers
+  cannot set deterministic acceptance gates. Reviewers cannot audit
+  whether the model did what was intended. Credit for a successful run
+  cannot be assigned, and blame for a failure run cannot be isolated,
+  because the specification was never recorded.
+
+solution: |
+  Every task prompt must bind: (1) role — who the model acts as;
+  (2) objective — one-sentence concrete task; (3) deliverable — format
+  and length budget; (4) constraints — what to exclude or refuse;
+  (5) success criteria — the condition under which the output is
+  acceptable. Encode these as a typed task-brief template stored in a
+  logic-pack, not as free-form prose in the system prompt.
+
+implementing_pipelines: []
+
+related_patterns:
+  - "pattern/composable-success-criteria"
+  - "pattern/anti-over-prompting-as-crutch"
+  - "pattern/strict-output-format-contract"
+
+counter_patterns:
+  - "Bind all five task-brief slots; store as versioned template in logic-pack/prompt-template-library."
+
+tags: ["anti-pattern", "prompt", "vague-task", "credit-killing", "evaluation"]

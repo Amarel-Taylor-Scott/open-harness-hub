@@ -6,6 +6,10 @@
 > without waiting for permission between steps and without stopping when one
 > path is blocked.
 >
+> **2026-05-31 update:** active `/goal` runs should now start from
+> `docs/codex/baltor-clean-context.md` and
+> `docs/codex/baltor-autonomous-goal.md`. The loop mechanics below still apply.
+>
 > Pace and daily mix come from `daily-production-targets.md`; multi-day state
 > comes from `multi-day-goal-runbook.md`; speed rules from
 > `speed-guardrails.md`. This page is the in-session engine that ties them

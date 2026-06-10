@@ -1,0 +1,30 @@
+id: "knowledge-pack/public-health-outbreak-triage-frameworks"
+type: knowledge-pack
+version: "0.1.0"
+name: "Public Health Outbreak Triage frameworks"
+description: "Composite context pack for public health outbreak triage reviews, including evidence, escalation, and remediation controls."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "CC-BY-4.0"
+industry: ["healthcare.public_health", "government.regulatory"]
+capability: ["retrieval", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "dated"
+tags: ["public-health-outbreak-triage", "expansion-v3"]
+created: "2026-05-24"
+updated: "2026-05-24"
+content_types: ["rag_doc", "checklist", "control_summary", "evidence_matrix"]
+files:
+  - path: "data/public-health-outbreak-triage/frameworks.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    enabled: true
+    embedder: "adapter/nomic-embed-text-v15"
+provenance:
+  sources: ["Public Health Outbreak Triage control checklist", "Public Health Outbreak Triage evidence matrix", "Public Health Outbreak Triage escalation playbook", "Public Health Outbreak Triage remediation tracker"]
+  collected_through: "2026-05-24"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "composite educational summaries only"

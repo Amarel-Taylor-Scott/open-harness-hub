@@ -1,0 +1,30 @@
+{
+  "version": "1.0",
+  "note": "Shared Resource Spine — numeric taxonomy + rules for declaring shared resources. Business logic references resources through ResourceRef/ResourceBinding/DataResourceSpec, never raw table/bucket/path names or raw keys. Runtime branches on these NUMERIC codes, never display strings. SINGLE SOURCE for src/teleon/resources/resource_ref.py.",
+  "ownership_modes": [
+    {"code": 100, "label": "external_existing", "desc": "Pre-existing resource we only reference (never create/destroy).", "requires": []},
+    {"code": 200, "label": "managed_persistent", "desc": "We own a long-lived resource.", "requires": ["owner", "retention_class"]},
+    {"code": 300, "label": "managed_ephemeral", "desc": "We own a short-lived resource that must be cleaned up.", "requires": ["ttl_seconds"]},
+    {"code": 400, "label": "pipeline_temp", "desc": "Scratch resource for one pipeline run; auto-expire.", "requires": ["ttl_seconds"]},
+    {"code": 500, "label": "tenant_dedicated", "desc": "Persistent resource isolated to a tenant.", "requires": ["owner", "retention_class", "tenant_id"]}
+  ],
+  "resource_kinds": [
+    {"code": 100, "label": "relational_table", "examples": ["postgres table"]},
+    {"code": 200, "label": "object_bucket", "examples": ["s3/gcs bucket"]},
+    {"code": 300, "label": "queue", "examples": ["lease queue", "pubsub topic"]},
+    {"code": 400, "label": "vector_index", "examples": ["pgvector", "qdrant collection"]},
+    {"code": 500, "label": "graph_store", "examples": ["graphiti/falkordb graph"]},
+    {"code": 600, "label": "sandbox_volume", "examples": ["sandbox scratch volume"]},
+    {"code": 700, "label": "temp_dataset", "examples": ["staging jsonl", "scratch dataset"]},
+    {"code": 800, "label": "blob_object", "examples": ["single large artifact / payload body"]},
+    {"code": 900, "label": "analytics_table", "examples": ["bigquery", "clickhouse"]}
+  ],
+  "rules": {
+    "no_raw_table_or_bucket_in_business_logic": true,
+    "no_raw_secret_in_spec": "use secret_ref (secret://) / key_ref (key://) only",
+    "temporary_requires_ttl": "ownership 300/400 require ttl_seconds",
+    "persistent_requires_owner_and_retention": "ownership 200/500 require owner + retention_class",
+    "cloud_requires_local_equivalent": "provider != 'local' requires local_equivalent (offline golden path) or ProviderUnavailableResult",
+    "logical_name_required": "every spec/ref carries a logical_name; physical handle lives in the ResourceBinding"
+  }
+}

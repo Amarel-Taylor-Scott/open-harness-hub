@@ -1,0 +1,91 @@
+{
+  "answer": "5 (per obj-adr-014, confidence 0.98). NOTE: a contradiction exists \u2014 obj-retry-py says 5; obj-runbook says 3 [superseded] [stale]. The authority is obj-adr-014; the disagreeing source is stale/superseded and should be fixed.",
+  "answer_value": 5,
+  "authority": {
+    "confidence": 0.98,
+    "staleness": "fresh",
+    "subject_id": "obj-adr-014",
+    "value": 5
+  },
+  "contradictions": [
+    {
+      "authority": {
+        "confidence": 0.98,
+        "staleness": "fresh",
+        "subject_id": "obj-adr-014",
+        "value": 5
+      },
+      "conflicting": [
+        {
+          "confidence": 0.95,
+          "staleness": "fresh",
+          "subject_id": "obj-retry-py",
+          "superseded": false,
+          "value": 5
+        },
+        {
+          "confidence": 0.4,
+          "staleness": "stale",
+          "subject_id": "obj-runbook",
+          "superseded": true,
+          "value": 3
+        }
+      ],
+      "kind": "assertion",
+      "predicate": "max_retries",
+      "resolved": false,
+      "source_handles": [
+        "ctx://acme-billing/decisions/ADR-014-billing-retry-policy.md#decision",
+        "ctx://acme-billing/docs/billing-runbook.md#retry-policy",
+        "ctx://acme-billing/repo/billing/retry.py#L9-L13"
+      ]
+    }
+  ],
+  "created_at": "1970-01-01T00:00:00Z",
+  "deterministic": true,
+  "interrogation_run_id": "gir-f7be23f5e3972273",
+  "kind": "baltor.graph-interrogation-run.v1",
+  "model_used": false,
+  "objects_consulted": [
+    "obj-adr-014",
+    "obj-bill-782",
+    "obj-billing-api",
+    "obj-inc-2026-04",
+    "obj-retry-py",
+    "obj-runbook",
+    "obj-test-retry"
+  ],
+  "paths_used": [
+    [
+      "obj-bill-782",
+      "obj-adr-014"
+    ],
+    [
+      "obj-inc-2026-04",
+      "obj-adr-014"
+    ],
+    [
+      "obj-retry-py",
+      "obj-adr-014"
+    ],
+    [
+      "obj-runbook",
+      "obj-adr-014"
+    ],
+    [
+      "obj-test-retry",
+      "obj-retry-py",
+      "obj-adr-014"
+    ]
+  ],
+  "question": "What is the retry ceiling / how many retries are allowed?",
+  "source_handles": [
+    "ctx://acme-billing/decisions/ADR-014-billing-retry-policy.md#decision",
+    "ctx://acme-billing/docs/billing-runbook.md#retry-policy",
+    "ctx://acme-billing/repo/billing/retry.py#L9-L13"
+  ],
+  "suggested_next_query": "swarm-verify obj-adr-014 to close the 'max_retries' contradiction",
+  "swarm_reason": "unresolved contradiction on 'max_retries': authority obj-adr-014=5 but obj-retry-py=5, obj-runbook=3 still disagree on disk",
+  "swarm_recommended": true,
+  "uncertainty": "medium"
+}

@@ -1,0 +1,91 @@
+id: "tool/wshobson-agents-skill-marketplace"
+type: tool
+version: "0.1.0"
+name: "wshobson/agents multi-harness skill marketplace"
+description: |
+  A curated collection of Claude Code agent configurations, multi-agent
+  harnesses, and reusable skill definitions maintained as a community
+  marketplace. Each agent or harness is declared as a structured YAML/JSON
+  manifest that can be loaded into Claude Code sessions or composed into
+  larger workflows. Covers harness archetypes such as breadth scouts,
+  depth analysts, code-review agents, documentation writers, and test
+  generators, each with declared capabilities and prompt strategies.
+
+  Integration contract for the wshobson/agents repository; covers skill
+  loading, agent spawning, and marketplace browse/search operations.
+  Reference/integration contract only; verify upstream license before
+  bundling.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["ai", "software.devops", "cross_industry"]
+capability: ["agent_loop", "routing", "planning", "tool_use"]
+modality:   ["code", "text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "external"
+tags:
+  - "multi-agent"
+  - "skill-marketplace"
+  - "claude-code"
+  - "agent-harness"
+  - "agent-library"
+created: "2026-05-26"
+updated: "2026-05-26"
+attribution:
+  source_url: "https://github.com/wshobson/agents"
+  source_kind: "github"
+  author: "wshobson"
+
+parameters:
+  type: object
+  properties:
+    op:
+      type: string
+      enum: ["list", "load", "spawn"]
+      description: "Marketplace operation: list available agents, load a skill manifest, or spawn an agent session."
+    agent_id:
+      type: string
+      description: "Agent/skill identifier from the marketplace (required for op=load or op=spawn)."
+    query:
+      type: string
+      description: "Free-text search query for op=list."
+    task:
+      type: string
+      description: "Task to pass to the spawned agent (op=spawn)."
+  required: ["op"]
+returns:
+  type: object
+  properties:
+    agents:
+      type: array
+      description: "Matched agent manifests (op=list)."
+      items:
+        type: object
+        properties:
+          id:           { type: "string" }
+          name:         { type: "string" }
+          capabilities: { type: "array", items: { type: "string" } }
+          modality:     { type: "array", items: { type: "string" } }
+    manifest:
+      type: object
+      description: "Loaded skill manifest (op=load)."
+    session:
+      type: object
+      description: "Spawned session info (op=spawn)."
+      properties:
+        session_id: { type: "string" }
+        status:     { type: "string" }
+side_effects: "external_call"
+examples:
+  - input:  { op: "list", query: "code review" }
+    output:
+      agents:
+        - { id: "code-review-agent", name: "Code Review Agent", capabilities: ["code_synthesis", "governance"], modality: ["code", "text"] }
+  - input:  { op: "spawn", agent_id: "breadth-scout", task: "catalog new AI harnesses from GitHub" }
+    output:
+      session: { session_id: "ws-breadth-01", status: "running" }
+implementations:
+  - kind: "shell"
+    command: "claude-agents marketplace {{op}} --agent {{agent_id}}"
+  - kind: "mcp"
+    path: "agents-marketplace-mcp"

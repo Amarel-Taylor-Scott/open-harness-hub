@@ -26,7 +26,7 @@ tech. Picks favor cost-awareness and avoiding lock-in; swap freely as scale dict
 |---|---|---|---|
 | **Inference + serving** | **vLLM on Kubernetes; MCP as the protocol** | LlamaIndex (retrieval), LangGraph/CrewAI (agents) | vLLM serves embeddings *and* generation; MCP is the convergence point for feeding agents |
 | **Caching** | **provider prompt cache → semantic cache; LiteLLM gateway** | GPTCache, Redis LangCache, LMCache | prompt cache ~90% off input + context engine 40–60% — **free before you build anything** |
-| **Hyper-efficient / memory** | **Mem0 (distilled) + cache-shaped packaging** | Hindsight (recall-network), Zep/Graphiti (temporal) | value compounds when the dense artifact lands on a cacheable prefix |
+| **Hyper-efficient / memory** | **Mem0 (distilled) + token-efficient packaging** | Hindsight (recall-network), Zep/Graphiti (temporal) | value compounds when the dense artifact lands on a cacheable prefix |
 
 **Substrate:** Kubernetes + Karpenter (autoscaling GPU nodes) · Ray (distributed embed/generate) ·
 Postgres doubling as pgvector.
@@ -49,7 +49,7 @@ S3 still wins for FedRAMP/HIPAA + complex lifecycle + multi-region (the regulate
 AI runs Cloudflare's catalog, **not arbitrary vLLM GPU at scale**.
 
 **The answer is a data-gravity-aware hybrid:**
-- **Edge / storage / serving** (the CDN-like CEaaS surface) → **Cloudflare R2 + Workers + free CDN.**
+- **Edge / storage / serving** (the CDN-like Baltor surface) → **Cloudflare R2 + Workers + free CDN.**
   Zero egress on every download and MCP serve.
 - **Heavy GPU** (vLLM, embedding at scale, the foundry, measurement) → a **GPU cloud co-located with
   its data** — a hyperscaler if the wedge needs FedRAMP/HIPAA, or a specialized GPU provider (Modal,
@@ -68,7 +68,7 @@ The two phrasings are two faces, not two products:
 - **Context-layer face** — sells **governed context products**: corpora turned into retrievable,
   provenance-bearing, freshness-tracked context for open agents. The gap is explicit: no RAG platform
   solves the upstream **data-governance** problem; **MCP moves context, it does not produce it**
-  (Gartner: 60% of MCP-only agentic projects fail by 2028 without a consistent layer beneath). CEaaS
+  (Gartner: 60% of MCP-only agentic projects fail by 2028 without a consistent layer beneath). Baltor
   *produces* that layer for the open-agent world — the part nobody hosts.
 
 **Pricing boundary (falls out of the architecture):** raw + compressed are **freezable** (download,

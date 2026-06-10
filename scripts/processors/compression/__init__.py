@@ -1,8 +1,8 @@
-"""Open Harness Hub — context-compression processors (CEaaS enrichment tier).
+"""Open Harness Hub — context-compression processors (Baltor enrichment tier).
 
 This package holds the deterministic implementations behind the
 `catalog/processors/compression/` manifests — the *Compressed* tier of the
-Context Enrichment service (see `docs/strategy/context-enrichment-service.md`).
+Baltor service (see `docs/strategy/context-enrichment-service.md`).
 
 Each manifest's `implementations[].path` resolves to a `run(...)` callable here.
 

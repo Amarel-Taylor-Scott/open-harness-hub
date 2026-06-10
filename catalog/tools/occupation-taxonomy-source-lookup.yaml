@@ -1,0 +1,70 @@
+id: "tool/occupation-taxonomy-source-lookup"
+type: tool
+version: "0.1.0"
+name: "Occupation taxonomy source lookup"
+description: "Looks up occupation profiles, tasks, skills, knowledge, abilities, work context, requirements, and source mappings from O*NET, ESCO, BLS ORS, or compatible occupation taxonomies."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "hr", "education", "cross_industry"]
+capability: ["retrieval", "verification", "extraction"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "volatile"
+tags: ["occupations", "onet", "esco", "bls-ors", "soc", "isco", "job-descriptions"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    occupation_query:
+      type: string
+    source_ids:
+      type: array
+      items:
+        type: string
+    locale:
+      type: string
+    include:
+      type: array
+      items:
+        type: string
+  required: ["occupation_query"]
+returns:
+  type: object
+  properties:
+    occupations:
+      type: array
+      items:
+        type: object
+    source_records:
+      type: array
+      items:
+        type: object
+    crosswalks:
+      type: array
+      items:
+        type: object
+    provenance:
+      type: object
+side_effects: "external_call"
+examples:
+  - input:
+      occupation_query: "AML analyst"
+      source_ids: ["onet", "esco", "bls-ors"]
+      include: ["tasks", "skills", "knowledge", "requirements"]
+    output:
+      occupations: []
+      source_records: []
+      crosswalks: []
+      provenance:
+        note: "Example only; provider response omitted."
+implementations:
+  - kind: "callable"
+    path: "tools.occupation_taxonomy_source_lookup.run"
+  - kind: "mcp"
+    path: "mcp/occupations.lookup"
+  - kind: "http"
+    url: "https://services.onetcenter.org/ws/"

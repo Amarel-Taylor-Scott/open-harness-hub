@@ -1,0 +1,111 @@
+{
+  "version": "1.0",
+  "purpose": "Per-source_class ingestion maturity. Honest ladder of how far each connector has gone from 'no folder' to 'anti-bypass proven'. A connector may NOT claim a rung it cannot prove: a maturity level above m6_proof requires a proof script that exists; api/csv/json/webhook are M8 (proven by check_multi_source_ingestion); pdf/html are candidate (parser is a cataloged candidate → explicit non-consumable, never faked); markdown_folder/local_folder_batch are at m4 (lane B is building the impl this batch — main agent bumps after its proof lands); obsidian_vault/customer_database are candidate (fixture-contract only).",
+  "maturity_model": {
+    "m0_absent": "no folder/entry for this source_class",
+    "m1_folder": "catalog entry exists, no contract",
+    "m2_contract": "SourceArtifact/Receipt/Sync contracts cover it",
+    "m3_port": "behind SourceAdapterPort (describe/plan/scan/fetch/normalize/health)",
+    "m4_local_fixture_or_stub_exists": "a deterministic local fixture or stub adapter exists; contract is exercisable",
+    "m5_integrated": "wired into the registry + sync planner + artifact store path",
+    "m6_proof": "a registered proof exercises the connector end-to-end",
+    "m7_api": "reachable via an ingest API/CLI route",
+    "m8_ui": "proven by an end-to-end multi-source ingestion proof (current top rung for active connectors)",
+    "m9_antibypass": "anti-bypass enforced (no connector writes served facts; tenant_private never updates global_public; idempotency enforced)",
+    "m10_complete": "m9 + UI/operator surface + CDC/revocation handling",
+    "candidate": "real parser/driver is a cataloged candidate; stores raw NON-consumable, never fakes truth"
+  },
+  "status_enum": ["m0_absent", "m1_folder", "m2_contract", "m3_port", "m4_local_fixture_or_stub_exists", "m5_integrated", "m6_proof", "m7_api", "m8_ui", "m9_antibypass", "m10_complete", "candidate"],
+  "source_classes": [
+    {
+      "source_class": "cfpb_structured",
+      "adapter_id": "source.cfpb_structured@v1",
+      "status": "m8_ui",
+      "proof_scripts": ["scripts/check_multi_source_ingestion.py"],
+      "fallback_fixture": "scripts/runtime/builtin_processors.py#source.cfpb_fixture",
+      "known_gaps": [],
+      "note": "the proven beachhead; structured fields → promotion-eligible facts, free-text → held-out allegations"
+    },
+    {
+      "source_class": "json_document",
+      "adapter_id": "source.generic_json_file@v1",
+      "status": "m8_ui",
+      "proof_scripts": ["scripts/check_multi_source_ingestion.py"],
+      "fallback_fixture": "inline JSON (JsonAdapter, stdlib)",
+      "known_gaps": [],
+      "note": "JSON-pointer handles; deterministic per-field hashes"
+    },
+    {
+      "source_class": "csv_table",
+      "adapter_id": "source.csv_table@v1",
+      "status": "m8_ui",
+      "proof_scripts": ["scripts/check_multi_source_ingestion.py"],
+      "fallback_fixture": "inline CSV (CsvAdapter, stdlib)",
+      "known_gaps": [],
+      "note": "per-cell handles ctx://tenant/.../source/...#row.<n>.col.<col>"
+    },
+    {
+      "source_class": "webhook_json",
+      "adapter_id": "source.webhook_json@v1",
+      "status": "m8_ui",
+      "proof_scripts": ["scripts/check_multi_source_ingestion.py"],
+      "fallback_fixture": "inline JSON payload (webhook→JsonAdapter)",
+      "known_gaps": ["duplicate-delivery idempotency receipt path is contract-defined; end-to-end push proof sequenced next"],
+      "note": "push-mode; routes through JsonAdapter"
+    },
+    {
+      "source_class": "html_page",
+      "adapter_id": "source.html_page@candidate",
+      "status": "candidate",
+      "proof_scripts": ["scripts/check_multi_source_ingestion.py"],
+      "fallback_fixture": "schemas/ingestion/fixtures/html_page.fixture.html",
+      "known_gaps": ["real cleaner is the scraping_manager slot (crawl4ai/scrapy) — candidate; UnavailableParserAdapter stores raw NON-consumable, never fakes a parse"],
+      "note": "candidate"
+    },
+    {
+      "source_class": "pdf_document",
+      "adapter_id": "source.pdf_document@candidate",
+      "status": "candidate",
+      "proof_scripts": ["scripts/check_multi_source_ingestion.py"],
+      "fallback_fixture": "schemas/ingestion/fixtures/pdf_document.fixture.txt",
+      "known_gaps": ["real extractor is the parser_manager slot (Docling/Unstructured) — candidate; raw stored NON-consumable, never faked"],
+      "note": "candidate"
+    },
+    {
+      "source_class": "markdown_folder",
+      "adapter_id": "source.markdown_folder@v1",
+      "status": "m4_local_fixture_or_stub_exists",
+      "proof_scripts": ["scripts/check_ingestion_contracts.py"],
+      "fallback_fixture": "schemas/ingestion/fixtures/markdown_folder.fixture.md",
+      "known_gaps": ["lane B is building the markdown adapter + its proof this batch; main agent bumps to m6+ after it lands"],
+      "note": "contract-ready; impl in flight (lane B)"
+    },
+    {
+      "source_class": "local_folder_batch",
+      "adapter_id": "source.local_folder_batch@v1",
+      "status": "m4_local_fixture_or_stub_exists",
+      "proof_scripts": ["scripts/check_ingestion_contracts.py"],
+      "fallback_fixture": "schemas/ingestion/fixtures/local_folder_batch.fixture.json",
+      "known_gaps": ["lane B is building the folder-batch adapter + its proof this batch; main agent bumps after it lands"],
+      "note": "contract-ready; impl in flight (lane B)"
+    },
+    {
+      "source_class": "obsidian_vault",
+      "adapter_id": "source.obsidian_vault@candidate",
+      "status": "candidate",
+      "proof_scripts": ["scripts/check_ingestion_connector_catalog.py"],
+      "fallback_fixture": "schemas/ingestion/fixtures/markdown_folder.fixture.md",
+      "known_gaps": ["note-link graph is LINEAGE only, never served truth; replacement repos (boxpositron/markdown-vault, benmaster82/Kwipu) are catalogued candidates behind the port — never pip-installed/executed"],
+      "note": "candidate"
+    },
+    {
+      "source_class": "customer_database",
+      "adapter_id": "source.customer_database@candidate",
+      "status": "candidate",
+      "proof_scripts": ["scripts/check_ingestion_connector_catalog.py"],
+      "fallback_fixture": "schemas/ingestion/fixtures/customer_database.fixture.json",
+      "known_gaps": ["real DB driver is a future adapter behind the port; tenant_private ONLY — a customer DB never updates global_public; CDC watermark contract defined, end-to-end proof sequenced next"],
+      "note": "candidate"
+    }
+  ]
+}

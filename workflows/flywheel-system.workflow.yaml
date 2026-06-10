@@ -1,0 +1,57 @@
+kind: baltor.flywheel-workflow.v1
+name: System Flywheel
+flywheel_id: flywheel.system
+stage: all
+purpose: The L0 operating loop — a source change flows through capture/decompose → reconcile → anti-fragility → enhance → verify → optimize → consume, then observe → evaluate → improve → refresh.
+triggers:
+  - source_event
+  - scheduled_sweep
+  - eval_regression
+  - human_override
+inputs:
+  - source_handles
+  - context_objects
+  - context_packs
+  - eval_results
+steps:
+  - capture and decompose source changes
+  - reconcile entities and surface contradictions
+  - harden fragile values into refreshable objects (anti-fragility)
+  - enhance with graph/metadata/external context
+  - verify claims against authoritative sources (rail)
+  - optimize into the smallest safe context pack
+  - serve to the consumer with a receipt
+  - observe + evaluate served packs
+  - feed eval results back to improve selection/compression
+  - refresh source/context on change (CDC)
+queue_messages:
+  - source_event
+  - pack_refresh_job
+  - eval_job
+outputs:
+  - ContextPack
+  - ContextReceipt
+  - RotSignal
+  - EvalScore
+receipts_emitted:
+  - ContextReceipt
+metrics:
+  - pack_token_efficiency
+  - claim_correctness
+  - rot_detection
+  - agent_success_rate
+failure_modes:
+  - upstream source unreachable
+  - verifier disagreement
+  - eval pipeline failure
+fallback_strategy: serve last-known-good pack with a freshness warning; route blocking flags to human review
+human_review_triggers:
+  - would_be_violation
+  - contradiction_found
+suggested_runtime: control-plane orchestrator + worker-plane fan-out (durable engine)
+candidate_backend_tools:
+  - DBOS
+  - Temporal
+  - Langfuse
+harness_refs:
+  - fixtures/harness/context-for-ticket.harness.json

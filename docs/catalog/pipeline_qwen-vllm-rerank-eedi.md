@@ -38,8 +38,8 @@ retrieve the top-25 candidates via embedding, then constrain a Qwen-
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `two_time_retrieve` | processor | `processor/two-time-retrieval` | — |
-| 3 | `rerank_with_constraint` | processor | `processor/vllm-batched-sampling` | — |
-| 4 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `two_time_retrieve` | processor | `processor/two-time-retrieval` | - |
+| 3 | `rerank_with_constraint` | processor | `processor/vllm-batched-sampling` | - |
+| 4 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

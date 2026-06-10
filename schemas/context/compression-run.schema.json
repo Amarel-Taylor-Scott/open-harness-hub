@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/context/compression-run.schema.json",
+  "title": "Compression run",
+  "description": "An auditable record of one context-compression pass. Compression is deterministic-first (token budget, boilerplate removal, near-duplicate collapse, keyphrase/keyword, query-focused ranking, extractive selection); an LLM summarizer is an optional, recorded escalation (llm_used=true). Reversibility is a hard contract: every retained item keeps its ctx:// source handles, and every dropped item records WHY and (for near-dups) which canonical item absorbed its handles — so the compact pack expands back to source.",
+  "type": "object",
+  "required": ["kind", "compression_run_id", "input_refs", "retained_refs", "method_chain", "created_at"],
+  "properties": {
+    "kind": { "type": "string", "const": "baltor.compression-run.v1" },
+    "compression_run_id": { "type": "string" },
+    "input_refs": { "type": "array", "items": { "type": ["string", "null"] } },
+    "retained_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source_handles"],
+        "properties": {
+          "ref": { "type": ["string", "null"] },
+          "source_handles": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^ctx://" } }
+        },
+        "additionalProperties": true
+      }
+    },
+    "dropped_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["reason"],
+        "properties": {
+          "ref": { "type": ["string", "null"] },
+          "reason": { "type": "string", "enum": ["near_duplicate", "exact_duplicate", "over_token_budget", "boilerplate", "below_relevance", "policy_blocked"] },
+          "duplicate_of": { "type": ["string", "null"] },
+          "source_handles": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": true
+      }
+    },
+    "method_chain": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["method", "deterministic"],
+        "properties": {
+          "method": { "type": "string" },
+          "tool": { "type": "string" },
+          "deterministic": { "type": "boolean" },
+          "config": { "type": "object", "additionalProperties": true }
+        },
+        "additionalProperties": true
+      }
+    },
+    "keyphrases": { "type": "array", "items": { "type": "string" } },
+    "compact_summary": { "type": "string" },
+    "digest": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+    "all_source_handles": { "type": "array", "items": { "type": "string" } },
+    "token_budget": {
+      "type": "object",
+      "properties": {
+        "max_tokens": { "type": "integer", "minimum": 0 },
+        "tokenizer": { "type": "string" },
+        "estimated_before": { "type": "integer", "minimum": 0 },
+        "estimated_after": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": true
+    },
+    "deterministic": { "type": "boolean" },
+    "llm_used": { "type": "boolean" },
+    "lineage_manifest_ref": { "type": ["string", "null"] },
+    "query": { "type": ["string", "null"] },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": true
+}

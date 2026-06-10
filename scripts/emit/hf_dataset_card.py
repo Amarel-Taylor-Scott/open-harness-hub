@@ -143,7 +143,7 @@ def render(manifest: dict, manifest_path: Path) -> str:
     body.append("}")
     body.append("```")
     body.append("")
-    body.append(f"License: `{manifest.get('license', 'MIT')}`. Hub artifact: `{manifest['id']}`.")
+    body.append(f"License: `{manifest.get('license', 'MIT')}`. Hub component: `{manifest['id']}`.")
 
     return "\n".join(body) + "\n"
 

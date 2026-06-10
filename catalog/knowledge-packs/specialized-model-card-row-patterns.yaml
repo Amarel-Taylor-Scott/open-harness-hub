@@ -1,0 +1,47 @@
+id: "knowledge-pack/specialized-model-card-row-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Specialized model card row patterns"
+description: "Canonical row-family patterns for converting specialized model-card scan jobs into loadable JSONL rows for Postgres, pgvector, hybrid search, dedupe, and review workflows."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["healthcare", "finance", "legal", "software.devops", "media", "security", "privacy", "government", "cross_industry"]
+capability: ["extraction", "classification", "retrieval", "evaluation", "routing", "governance", "embedding"]
+modality: ["structured", "text", "image"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.factory"
+tags: ["huggingface", "model-cards", "row-families", "jsonl", "pgvector", "bulk-load", "review-routing"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+domain: "specialized model card row emission"
+facts:
+  - "Specialized model-card scan jobs can be converted into canonical source, object, entity, dedupe, label, dimension, embedding, index, and review rows."
+  - "The generated rows preserve public metadata boundaries and do not download model weights or store private training data."
+  - "High-impact model-derived primitives should route to review before promotion."
+sources:
+  - title: "Specialized model-card row family patterns"
+    path: "catalog/knowledge-packs/data/specialized-model-card-row-patterns/row-families.jsonl"
+content_types:
+  - "row_family_pattern"
+  - "object_factory_contract"
+  - "review_route"
+files:
+  - path: "catalog/knowledge-packs/data/specialized-model-card-row-patterns/row-families.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    recommended: true
+    fields: ["row_family", "purpose", "default_schema"]
+provenance:
+  sources:
+    - "scripts/factory/specialized_model_card_rows.py"
+    - "dist/specialized-model-card-rows/seed"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "public model metadata only; no model weights, private training data, PII, or source bodies copied"
+

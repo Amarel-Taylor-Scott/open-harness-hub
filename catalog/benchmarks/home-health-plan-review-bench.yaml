@@ -1,0 +1,35 @@
+id: "benchmark/home-health-plan-review-bench"
+type: benchmark
+version: "0.1.0"
+name: "Home Health Plan Review benchmark"
+description: "Synthetic benchmark for home health plan review review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["healthcare.clinical", "healthcare.payer"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["home-health-plan-review", "expansion-v6"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/home-health-plan-review-review"
+dataset: "dataset/home-health-plan-review-samples"
+rubric: "rubric/home-health-plan-review-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/home-health-plan-review-review"
+    rule_pack_override: ["rule-pack/grep-home-health-plan-review-flags", "rule-pack/rag-home-health-plan-review-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 29
+report:
+  output: "dist/benchmarks/home-health-plan-review/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

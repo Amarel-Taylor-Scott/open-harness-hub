@@ -1,0 +1,76 @@
+id: "tool/factory-jsonl-relationship-preflight"
+type: tool
+version: "0.1.0"
+name: "Factory JSONL relationship preflight"
+description: "Checks generated-object JSONL shards for missing local source, object, entity, dedupe, label, dimension, review-ticket, and embedding references before a Postgres bulk load."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "retrieval", "evaluation"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.quality_gate"
+tags: ["jsonl", "postgres", "preflight", "entity-resolution", "dedupe", "million-primitives"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    source_records:
+      type: array
+      items: { type: string }
+    normalized_objects:
+      type: array
+      items: { type: string }
+    canonical_entities:
+      type: array
+      items: { type: string }
+    object_entity_refs:
+      type: array
+      items: { type: string }
+    dedupe_clusters:
+      type: array
+      items: { type: string }
+    review_tickets:
+      type: array
+      items: { type: string }
+    label_assignments:
+      type: array
+      items: { type: string }
+    dimension_values:
+      type: array
+      items: { type: string }
+    object_embeddings:
+      type: array
+      items: { type: string }
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    counts:
+      type: object
+    issue_count:
+      type: integer
+    issues:
+      type: array
+side_effects: "none"
+examples:
+  - input:
+      source_records: ["catalog/knowledge-packs/data/canonical-factory-row-patterns/source-records.jsonl"]
+      normalized_objects: ["catalog/knowledge-packs/data/canonical-factory-row-patterns/normalized-objects.jsonl"]
+      canonical_entities: ["catalog/knowledge-packs/data/canonical-factory-row-patterns/canonical-entities.jsonl"]
+      object_entity_refs: ["catalog/knowledge-packs/data/canonical-factory-row-patterns/object-entity-refs.jsonl"]
+    output:
+      ok: true
+      issue_count: 0
+implementations:
+  - kind: "callable"
+    path: "scripts.db.factory_jsonl_relationship_preflight.preflight"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.factory_jsonl_relationship_preflight"

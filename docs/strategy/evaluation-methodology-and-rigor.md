@@ -88,7 +88,7 @@ A delta produced this way conflates "the component supplies knowledge the model 
    each `correct_answer` and the grounding text the pipeline will receive. If the answer is *verbatim
    present* in the grounding, the task tests copying, not lift — flag it `open_book_trivial` and exclude
    it from the headline delta (it can stay as a separate "extraction-fidelity" metric, which is what
-   the CEaaS fidelity check actually wants — see gap 3).
+   the Baltor fidelity check actually wants — see gap 3).
 2. **Closed-book baseline parity.** The bare baseline must face the *same* question with *no* grounding
    (it already does) — but the **gold** must be derivable independently of the grounding the pipeline
    sees, e.g. answer drawn from a held-out portion of the source the pipeline is **not** given, or a
@@ -98,18 +98,18 @@ A delta produced this way conflates "the component supplies knowledge the model 
    couldn't?" (lift) is a different measurement from "did the compressed tier preserve the answer?"
    (fidelity). The current synth measures something between the two and labels it lift.
 
-### 3. `verify.compression_fidelity` — the CEaaS moat — has zero implementation
+### 3. `verify.compression_fidelity` — the Baltor moat — has zero implementation
 
 **Code.** [[context-enrichment-service]] names `verify.compression_fidelity` "the moat … the same
 engine and the same moat as OHH's lift gate," scored by "a *separate* evaluator, never self-graded."
-The only thing that exists is a **seed definition** — `scripts/seed/ceaas_components.py` emits a
+The only thing that exists is a **seed definition** — `scripts/seed/baltor_components.py` emits a
 catalog component `("compression-fidelity-check", …, "verify.compression_fidelity", …)`. There is no
 `scripts/.../verify/compression_fidelity.py`, no fidelity scorer, no published `fidelity_delta` on any
-artifact. (`scripts/seed/ceaas_components.py` `Status (honest)` already concedes this; this doc makes
+artifact. (`scripts/seed/baltor_components.py` `Status (honest)` already concedes this; this doc makes
 the diligence consequence explicit.)
 
 **Why it matters for diligence.** The measured-fidelity-per-tier guarantee is the *stated* differentiator
-of the entire CEaaS product ([[two-services-shared-infrastructure]]). An acquirer pricing the
+of the entire Baltor product ([[two-services-shared-infrastructure]]). An acquirer pricing the
 enrichment wedge will ask to see one fidelity number on one tier. Today the answer is "it's a seeded
 definition." Worse, gap 1 (self-grading) and gap 2 (open-book) would apply to it *by construction* the
 moment it is implemented naively, because it would reuse the same single-route engine.
@@ -253,9 +253,9 @@ Fix in this order; each is a separate engine item (this doc only specifies the r
    knows how much to trust the automated judge. An uncalibrated judge is an unquantified error bar on
    *every* delta. This is the step that converts "the model said 0.83" into "the judge agrees with
    humans at κ=…, so 0.83 ± …".
-6. **`verify.compression_fidelity` implementation (gap 3)** — build the CEaaS moat *on top of* the
+6. **`verify.compression_fidelity` implementation (gap 3)** — build the Baltor moat *on top of* the
    hardened engine (1–4 done), with separate-evaluator scoring, a published `fidelity_delta` per tier,
-   and a CI. Re-label the CEaaS pitch "planned" until it ships.
+   and a CI. Re-label the Baltor pitch "planned" until it ships.
 
 ## The single, enforceable rule this doc adds
 

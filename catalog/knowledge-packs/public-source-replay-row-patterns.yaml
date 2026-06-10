@@ -1,0 +1,33 @@
+id: "knowledge-pack/public-source-replay-row-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Public source replay row patterns"
+description: "Patterns for converting public-source replay records into canonical row-family JSONL shards for validation, preflight, and Postgres/pgvector bulk loading."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["automotive", "energy", "manufacturing", "construction", "government", "cross_industry"]
+capability: ["extraction", "classification", "retrieval", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.factory"
+tags: ["public-sources", "row-families", "jsonl", "preflight", "pgvector"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+domain: "object-factory public-source row emission"
+facts:
+  - "Replay row emission turns queued job metadata into schema-shaped row families without fetching source bodies."
+  - "Generated rows should pass JSON Schema checks and relationship preflight before bulk loading."
+  - "Real workers can later replace generated candidate bodies while preserving the same row-family contracts."
+sources:
+  - title: "Public source replay row patterns"
+    path: "catalog/knowledge-packs/data/public-source-replay-row-patterns/rows.jsonl"
+content_types:
+  - "row_emission_pattern"
+  - "source_record"
+  - "normalized_object"
+  - "index_record"
+  - "review_ticket"

@@ -1,11 +1,16 @@
 # North Star (v2, 2026-05-29) — the goal + the execution sequence
 
+> **Active run note (2026-05-31):** use
+> [`baltor-clean-context.md`](baltor-clean-context.md) and
+> [`baltor-autonomous-goal.md`](baltor-autonomous-goal.md) as the clean current
+> context for `/goal`. This page remains useful strategic substrate.
+
 Sharpens [[master-goal.md]]'s "database-backed component registry" mission into the **product focus** the
 strategy crystallized to this session (canonical positioning: `docs/strategy/positioning-v2.md`). The
 component network is the *substrate*; this is *what we sell and build first*.
 
 ## The one goal
-**OHH = the open, governed harness funnel; the verified-context service (CEaaS) = the business.** The
+**OHH = the open, governed harness funnel; the verified-context service (Baltor) = the business.** The
 product is **verified FUEL**, not the harness. We do NOT win as "a better builder" (Contextual's Agent
 Composer + LangGraph/Dify/n8n close that — orchestration/actions/governance are table stakes). We win on
 the two things they structurally won't be:
@@ -14,7 +19,7 @@ the two things they structurally won't be:
 2. **Verified context, upstream** — *"Most platforms keep your docs CURRENT. We CONTINUOUSLY verify they are
    CORRECT — cross-checked against external authoritative sources, hunting for contradictions before your
    agent cites them."* Adversarial verification + freshness + provenance + oracle publishers, fed into ANY
-   agent. (CEaaS = the moat + the monetization.)
+   agent. (Baltor = the moat + the monetization.)
 
 **Beachhead:** sanctions & export controls (OFAC/BIS/EU) — rules that change faster than anyone re-indexes,
 where stale is a *legal event*, and the lists are already public + machine-readable.
@@ -27,7 +32,7 @@ Each milestone has a **done bar = real code, self-tested, demoable, warrant-gate
 - **M2 · Sanctions beachhead, end-to-end** — ingest OFAC SDN / BIS / EU consolidated → freshness-diff
   (detect list change) → flag internal context that lags/contradicts the current list → emit provenance.
   **Done bar:** the "stale sanctions list = a federal violation" demo runs offline on a bundled fixture.
-- **M3 · CEaaS productization** — the tier pipeline (raw→compressed→hyper-efficient, real) → **serve** into
+- **M3 · Baltor productization** — the tier pipeline (raw→compressed→hyper-efficient, real) → **serve** into
   an agent via the four surfaces (MCP · llms.txt · skill · CLAUDE.md) → consumption metering. **Done bar:**
   a governed corpus is served into Claude Code in tiered form with a fidelity record.
 - **M4 · Measured-lift / fidelity harness** — the credibility + the differentiator (currently THIN): a

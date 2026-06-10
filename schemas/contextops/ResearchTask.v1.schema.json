@@ -1,0 +1,139 @@
+{
+  "$id": "contextops/ResearchTask.v1",
+  "title": "ResearchTask.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "A single bounded research assignment commissioned FROM a needs_action ContextTriageResult. It tells a bounded open-ended agent (research.local_stub, or a candidate provider) WHAT to find \u2014 the fact_key, the question, the authority bar it must meet, and the BOUNDS it must stay inside (max steps, allowed access, offline/no-secrets). The agent DISCOVERS and PROPOSES; this task can never instruct the agent to serve or promote a fact. produces is pinned to source_discovery_report \u2014 research output is candidate sources, never truth. Deterministic when created_at is injected.",
+  "required": [
+    "schema_version",
+    "task_id",
+    "tenant_id",
+    "source_scope",
+    "triage_id",
+    "fact_key",
+    "question",
+    "authority_bar",
+    "bounds",
+    "produces",
+    "agent_may_serve_truth",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": [
+        "ResearchTask.v1"
+      ]
+    },
+    "task_id": {
+      "type": "string",
+      "description": "content-addressed over (triage_id, fact_key, question); version in metadata, never in the id"
+    },
+    "tenant_id": {
+      "type": "string"
+    },
+    "source_scope": {
+      "type": "string",
+      "enum": [
+        "global_public",
+        "tenant_private",
+        "tenant_shared",
+        "system_reference"
+      ]
+    },
+    "triage_id": {
+      "type": "string",
+      "description": "the ContextTriageResult that warranted this research (lineage back-link)"
+    },
+    "fact_key": {
+      "type": "string"
+    },
+    "question": {
+      "type": "string",
+      "description": "the precise question the agent must answer with discovered SOURCES (not its own knowledge)"
+    },
+    "authority_bar": {
+      "type": "string",
+      "enum": [
+        "source_of_law",
+        "official_agency",
+        "primary_source",
+        "secondary_confirmation_ok",
+        "any_attributable"
+      ],
+      "description": "the minimum authority the discovered source(s) must meet to be acceptable"
+    },
+    "bounds": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "the hard bounds the bounded agent runs inside \u2014 the agent may not exceed these",
+      "required": [
+        "max_steps",
+        "allowed_access",
+        "offline",
+        "secrets_allowed"
+      ],
+      "properties": {
+        "max_steps": {
+          "type": "integer",
+          "description": "step budget; an agent past budget aborts and reports partial"
+        },
+        "allowed_access": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "fixture",
+              "http_get_allowlisted",
+              "api_allowlisted",
+              "local_file"
+            ]
+          },
+          "description": "the ONLY access methods this research may use (allowlisted; default fixture-only in the lean core)"
+        },
+        "offline": {
+          "type": "boolean",
+          "description": "true in the lean core \u2014 research.local_stub is deterministic and never calls out"
+        },
+        "secrets_allowed": {
+          "type": "boolean",
+          "enum": [
+            false
+          ],
+          "description": "pinned false \u2014 a research task never carries or grants secrets"
+        }
+      }
+    },
+    "assigned_provider": {
+      "type": "string",
+      "description": "the research_agent_provider adapter id (e.g. research.local_stub@v1); candidate providers are catalog stubs that do not call out"
+    },
+    "produces": {
+      "type": "string",
+      "enum": [
+        "source_discovery_report"
+      ],
+      "description": "pinned \u2014 research produces a SourceDiscoveryReport (candidate sources), NEVER a fact / canonical truth"
+    },
+    "agent_may_serve_truth": {
+      "type": "boolean",
+      "enum": [
+        false
+      ],
+      "description": "pinned false \u2014 the invariant: agents discover and propose, they never serve or promote truth"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "normal",
+        "high",
+        "urgent"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "description": "injected time; deterministic when injected"
+    }
+  }
+}

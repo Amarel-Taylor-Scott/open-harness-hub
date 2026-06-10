@@ -1,0 +1,71 @@
+id: "processor/draft-manifest-yaml-emitter"
+type: processor
+version: "0.1.0"
+name: "Draft manifest YAML emitter + validator-loop"
+description: |
+  Takes a draft manifest (as a Python dict or JSON object emitted by
+  `harness/draft-manifest-author`), writes it to
+  `catalog/_inbox/{type}/{slug}.yaml` with stable YAML formatting,
+  and runs `scripts/validate.py` against the single file.
+
+  Behavior:
+   - On validation pass: file written; returns success + file path.
+   - On validation fail: file written to `catalog/_inbox/_failed/{type}/{slug}.yaml`
+     with a sibling `.errors.json` listing every validation error,
+     PLUS a structured error report so `harness/draft-manifest-author`
+     can revise and retry.
+   - Slug-collision check: if a file already exists at the target
+     path OR the id collides with an existing live catalog entry,
+     emit fails and the structured report includes the conflict
+     details.
+
+  Idempotent + deterministic when the input dict is identical
+  (modulo YAML key ordering, which the emitter normalizes).
+
+  Hard rule: NEVER writes to live `catalog/{type}/` directly. Only
+  `catalog/_inbox/` (and the `_failed/` subdir on validation failure).
+  Curator promotes from `_inbox/` to live after review.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["software", "software.docs", "ai", "cross_industry"]
+capability: ["format_conversion", "verification"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+tags: ["meta", "manifest-author", "validator", "inbox", "yaml-emitter"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+process_kind: "coerce.schema_validate"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 5000
+
+inputs:
+  - name: "draft_manifest"
+    type: "object"
+  - name: "target_type"
+    type: "string"
+  - name: "target_slug"
+    type: "string"
+  - name: "overwrite_inbox"
+    type: "boolean"
+outputs:
+  - name: "written_path"
+    type: "string"
+  - name: "validation_status"
+    type: "string"
+  - name: "validation_errors"
+    type: "object[]"
+  - name: "id_collision_with_live"
+    type: "boolean"
+
+side_effects: "write"
+on_error: "raise"
+
+implementations:
+  - kind: "callable"
+    path: "scripts.processors.draft_manifest_yaml_emitter.run"
+    language: "python"

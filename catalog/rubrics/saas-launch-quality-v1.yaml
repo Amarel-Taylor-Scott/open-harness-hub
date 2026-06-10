@@ -1,0 +1,80 @@
+id: "rubric/saas-launch-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "SaaS launch readiness rubric v1"
+description: |
+  Eight-dimension rubric for grading the LAUNCH READINESS and
+  CLARITY of a SaaS / micro-SaaS / AI-app landing-page + launch
+  materials. Grades signal quality and corpus-norm alignment, NOT
+  predicted launch success.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["software", "creative", "cross_industry"]
+capability: ["evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-24"
+updated: "2026-05-24"
+
+dimensions:
+  - id: "tagline_clarity"
+    label: "5-second test: who, what, why-different in one sentence"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "tagline quoted + assessed against AI-as-value / buzzword / vague-platform-for patterns"
+
+  - id: "icp_specificity"
+    label: "One named persona with a job-to-be-done; no kitchen-sink ICP"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "ICP statement quoted + persona-count check"
+
+  - id: "value_prop_concrete"
+    label: "Feature lines state outcomes (with numbers when claiming time/money savings), not capabilities"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "per-feature outcome-vs-capability table"
+
+  - id: "pricing_clarity"
+    label: "Pricing visible; tier differentiators clear; trial terms unambiguous"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "pricing table + trial-terms check + contact-sales-only count"
+
+  - id: "social_proof_quality"
+    label: "Logos are real customers (linked or case-study-backed); testimonials are named + company + role"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "logo-strip verification + testimonial completeness table"
+
+  - id: "demo_or_product"
+    label: "Working product or live demo accessible; no waitlist-only launches without product visible"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "demo URL / signup-flow check / waitlist-marker presence"
+
+  - id: "competitive_honesty"
+    label: "Competitive positioning is honest (named alternatives, no strawmen) OR explicit category creation argument"
+    weight: 0.05
+    scale: "0..1"
+    evidence_required: "comparison-table check OR 'no competitor mentioned' note"
+
+  - id: "ai_specific_credibility"
+    label: "(If AI product) accuracy / evaluation / human-in-the-loop disclosed where stakes warrant; no model-as-differentiator"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "AI-credibility checklist with stakes assessment"
+
+scoring_method: "weighted_sum"
+examples:
+  - grade: 1.0
+    response: "Tagline names ICP + job + differentiator in 9 words; one specific persona; outcomes with numbers; transparent pricing; named-customer logos; live demo on landing; honest competitive table; accuracy / human-in-loop section for AI features."
+    notes: "PH-launch-ready; high signal quality."
+  - grade: 0.5
+    response: "Tagline is AI-powered platform for teams; ICP is 'for marketers and developers'; mix of outcomes and capabilities; pricing visible but no trial terms; placeholder logos; video demo only; 'no other tool like this' competitive line; AI features without accuracy mention."
+    notes: "Soft launch; fix tagline + ICP + accuracy before PH."
+  - grade: 0.0
+    response: "Generic 'revolutionize your workflow' tagline; no ICP; pure capability list; 'contact us for pricing'; no proof; no demo; 'leading' / 'world-class' throughout; no AI accuracy disclosure."
+    notes: "Pre-launch landing page only; not ready."

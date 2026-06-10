@@ -8,7 +8,7 @@ contributors and authors who want their work in the registry.
 ## Why port your submission?
 
 - **Visibility**: every `oh-hub search <topic>` and `oh-hub describe`
-  command surfaces matching artifacts to anyone using the catalog
+  command surfaces matching components to anyone using the catalog
 - **Standards-format publication**: one YAML manifest emits to
   Croissant, MCP, Agent Skills, HF model+dataset cards, lm-eval-
   harness, promptfoo, CycloneDX-ML, OpenLineage, C2PA, EU AI Act
@@ -18,7 +18,7 @@ contributors and authors who want their work in the registry.
   Two-Stage-Extract-Then-Judge pattern from Bill_info AI now
   references ESG, radiology, contract review, AppSec, and the
   MedLabel medicine-safety pipeline)
-- **Citation graph**: every artifact carries an `attribution` block
+- **Citation graph**: every component carries an `attribution` block
   with your name + URL + license - discovery and credit are linked
 
 ## The 7-step integration recipe
@@ -162,7 +162,7 @@ for the template.
 ## Bonus: extract reusable design patterns
 
 If your submission has an architectural insight that generalizes
-beyond the specific use case, ship it as a `pattern/` artifact. The
+beyond the specific use case, ship it as a `pattern/` component. The
 3 patterns Bill_info AI shipped:
 
 - **Two-Stage Extract-Then-Judge** - separate extraction + judgment
@@ -201,7 +201,7 @@ author for the catalog port specifically.
 ## How to submit
 
 1. Fork [github.com/Amarel-Taylor-Scott/open-harness-hub](https://github.com/Amarel-Taylor-Scott/open-harness-hub)
-2. Create your artifacts in `catalog/personas/...`, `catalog/pipelines/...`, etc.
+2. Create your components in `catalog/personas/...`, `catalog/pipelines/...`, etc.
 3. Run `python scripts/validate.py` - must report `all manifests valid`
 4. Run `python scripts/build_index_page.py` to refresh `docs/INDEX.md`
 5. Open a PR - Taylor + the contributors review for: schema validity,

@@ -1,0 +1,30 @@
+id: "knowledge-pack/pharma-batch-record-review-frameworks"
+type: knowledge-pack
+version: "0.1.0"
+name: "Pharma Batch Record Review frameworks"
+description: "Composite benchmark and review context pack for pharma batch record review workflows."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "CC-BY-4.0"
+industry: ["pharma.manufacturing", "pharma.gxp"]
+capability: ["retrieval", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "dated"
+tags: ["pharma-batch-record-review", "expansion-v7"]
+created: "2026-05-24"
+updated: "2026-05-24"
+content_types: ["rag_doc", "checklist", "control_summary", "evidence_matrix", "benchmark_context"]
+files:
+  - path: "data/pharma-batch-record-review/frameworks.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    enabled: true
+    embedder: "adapter/nomic-embed-text-v15"
+provenance:
+  sources: ["Pharma Batch Record Review control checklist", "Pharma Batch Record Review evidence matrix", "Pharma Batch Record Review escalation playbook", "Pharma Batch Record Review benchmark context"]
+  collected_through: "2026-05-24"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "composite educational summaries only"

@@ -13,7 +13,7 @@ scheduled/data model + orchestration ladder). Read those for the *topology*; rea
 *feature inventory and the promotion plan*.
 
 > **Warrant.** Owner intent — "catalogue the harnesses/runtimes/workflows, map each to registry
-> status (active vs planned), and give a prioritized plan to promote the planned ones, esp. the CEaaS
+> status (active vs planned), and give a prioritized plan to promote the planned ones, esp. the Baltor
 > enrichment tier + `verify.compression_fidelity`." Corroboration for every status claim below: the
 > live code (foundry/worker/queue self-tests pass offline; the Celery/Airflow modules are import-safe
 > opt-in stubs), `services/registry.yaml` (`active` vs `planned`), and the directory tree
@@ -43,22 +43,22 @@ catalog, governed by [[../concepts/component-taxonomy-and-stages.md]].
 | Harness | What it does | Entrypoint | Owning service | Status |
 |---|---|---|---|---|
 | **Governed recipe / foundry** | 8-stage evidence pipeline: gaps → sources → construction → standardize → novelty → **measure (lift)** → gate → stage_load. Reports **promoted**, never generated. | `python -m scripts.foundry.pipeline` (`--self-test`/`--demo`); fleet via `Foundry.run_fleet` | foundry | **active** — self-test green offline |
-| **Foundry worker (partition consumer)** | Pulls partition jobs off the queue, runs `Foundry.run_partition`, wires a live model route from env if present, persists row families, retry + dead-letter. | `python -m scripts.foundry.worker --serve` (`--self-test`/`--demo`) | foundry / worker | **active** — self-test green |
+| **Foundry worker (partition consumer)** | Pulls partition jobs off the queue, runs `Foundry.run_partition`, wires a live model route from env if present, persists row families, retry, and explicit failed-permanently state. | `python -m scripts.foundry.worker --serve` (`--self-test`/`--demo`) | foundry / worker | **active** — self-test green |
 | **Lift measurement engine** | Stage-5 `pipeline_score − bare_model_score` on held-out tasks; deterministic token-F1 offline, pluggable `BareModel`/`PipelineRunner`/`Judge` for live. **Never fabricates a delta** (unmeasured → review). | `python -m scripts.foundry.measure`; `scripts.eval.durable_gap_harness`; taxonomy in `scripts.eval.reason_codes` | measurement | **active** |
 | **Demand / interaction harness** | Logs every interaction (redacted, consent-gated, hashed), mines unmet demand → capability-requests + research-queue areas. The model-independent gap signal. | `python -m scripts.foundry.interactions` (`--mine`) | foundry | **active** |
 | **Gap screen + research queue** | Cheap Stage-1 gap screen (model-independent weighted) → ranked research areas the owner feeds. | `scripts/acquisition/gap_screen.py`, `research_queue.py` | foundry / measurement | **active** |
-| **CEaaS enrichment tier pipeline** | raw → compressed (structural + learned) → hyper-efficient (distill + cache-shape), hosted + downloadable, the four delivery surfaces. | *none yet* — `enrichment` service `command` is TBD | enrichment | **planned** — see §4 |
-| **`verify.compression_fidelity` harness** | "Did this tier preserve enough?" — quality delta per tier, by a *separate* evaluator. The CEaaS moat; same engine as the lift gate. | *none yet* — seeded as a catalog definition only (`catalog/processors/verify/compression-fidelity-check.yaml`) | measurement | **planned** — see §4 |
+| **Baltor enrichment tier pipeline** | raw → compressed (structural + learned) → hyper-efficient (distill + cache-shape), hosted + downloadable, the four delivery surfaces. | *none yet* — `enrichment` service `command` is TBD | enrichment | **planned** — see §4 |
+| **`verify.compression_fidelity` harness** | "Did this tier preserve enough?" — quality delta per tier, by a *separate* evaluator. The Baltor moat; same engine as the lift gate. | *none yet* — seeded as a catalog definition only (`catalog/processors/verify/compression-fidelity-check.yaml`) | measurement | **planned** — see §4 |
 
 **The load-bearing honest distinction.** The foundry, worker, queue, measurement, and interaction
-harnesses are **real** (their `--self-test`s pass offline today). The two CEaaS harnesses are
-**seeded governed definitions, not running code**: `scripts.seed.ceaas_components` wrote the catalog
+harnesses are **real** (their `--self-test`s pass offline today). The two Baltor harnesses are
+**seeded governed definitions, not running code**: `scripts.seed.baltor_components` wrote the catalog
 YAMLs (`compression/structural-compress`, the four `deliver/*` surfaces, `verify/compression-fidelity-check`),
 and the `enrichment` service in `services/registry.yaml` declares
 `owns: [scripts/processors/{compression,memory,cache,retrieval}]` — **but those directories do not
 exist yet.** A seeded component is a promise with provenance; it is not a feature until an entrypoint
-runs it under measured fidelity. The spec is explicit about this (CEaaS is "spec-level… components are
-seeded… implementation to make CEaaS real" — [[../strategy/context-enrichment-service.md]]).
+runs it under measured fidelity. The spec is explicit about this (Baltor is "spec-level… components are
+seeded… implementation to make Baltor real" — [[../strategy/context-enrichment-service.md]]).
 
 ---
 
@@ -73,7 +73,7 @@ cloud in `infra/k8s/`. See [[backend-services-and-platform.md]] §Containerizati
 | **Local Python (stdlib)** | Run any harness `--self-test`/`--demo` with zero services; the durable local broker is `SqliteQueue`, the local store is `SqliteStore`. | `scripts/foundry/{queues,store}.py` `from_env()` | **active** — the default dev path |
 | **Docker (single + platform)** | Per-role containers from one image. | `infra/docker-compose.yml`, `infra/docker-compose.platform.yml`, `infra/postgres/` | **active** (compose files present) |
 | **Kubernetes** | Per-service Deployments (web, worker, cron, freshness-cron, core). KEDA autoscales workers on queue depth (scale-to-zero). | `infra/k8s/{web,worker,cron,freshness-cron,core}.yaml` | **active** (manifests present) |
-| **Default broker — RedisQueue + built-in worker loop** | Redis-list queue (`rpush`/`lpop`/`llen`), KEDA-native; nack re-queues; dead-letter to `{key}:dead`. The non-negotiable queue+worker tier. | `scripts/foundry/queues.py` (`RedisQueue`), `worker.py` | **active** — self-test green (offline via fake-redis) |
+| **Default broker — RedisQueue + built-in worker loop** | Redis-list queue (`rpush`/`lpop`/`llen`), KEDA-native; nack re-queues; explicit `approval_required`, `budget_blocked`, and `failed_permanently` destinations. The non-negotiable queue+worker tier. | `scripts/foundry/queues.py` (`RedisQueue`), `worker.py` | **active** — self-test green (offline via fake-redis) |
 | **Celery adapter (opt-in)** | Per-queue routing (`foundry,ingest,enrich,measure`), beat scheduler, Flower monitoring. Tasks shell out to the *same* real modules cron/Airflow run — no logic forked. | `services/worker/celery_app.py` (`requirements-platform.txt`) | **opt-in adapter** — import-safe stub; prints "NOT installed" without the extra |
 | **Airflow / Cloud Composer (opt-in)** | The multi-step scheduled DAGs (freshness sweep, daily-factory→embed→promotion, corpus ingest) with per-task retries + backfill. Sits *above* the queue. | `infra/airflow/dags/ohh_platform_dags.py` | **opt-in adapter** — defines nothing if `airflow` absent |
 | **Argo Workflows (opt-in)** | In-cluster alternative to Airflow for the foundry DAG. | `infra/k8s/argo-foundry.yaml` | **opt-in adapter** |
@@ -135,12 +135,12 @@ Airflow. The DAGs are defined identically across `services/worker/celery_app.py`
 
 Prioritized by *blast radius × how-blocked-the-product-is*, each with the **smallest real entrypoint**
 (the minimum runnable thing that flips the status), and a warrant. The rule throughout:
-**reuse the shared backend, add no new engine** — CEaaS is "a surface + a meter + emitters over the
+**reuse the shared backend, add no new engine** — Baltor is "a surface + a meter + emitters over the
 same substrate" ([[../strategy/context-enrichment-service.md]]).
 
-### P1 — `verify.compression_fidelity` as a real harness (the CEaaS moat)
+### P1 — `verify.compression_fidelity` as a real harness (the Baltor moat)
 - **Why first:** it is the *same measurement engine as the lift gate*, extended from "does the pipeline
-  lift?" to "did the tier preserve?". Without it, the entire CEaaS value prop (measured fidelity per
+  lift?" to "did the tier preserve?". Without it, the entire Baltor value prop (measured fidelity per
   tier) is unbacked — and it gates every tier the enrichment pipeline would emit, so it must exist
   before §P2 is meaningful.
 - **Smallest real entrypoint:** `python -m scripts.processors.verify.compression_fidelity --self-test`
@@ -155,8 +155,8 @@ same substrate" ([[../strategy/context-enrichment-service.md]]).
   no-self-grading rule). **Bar:** substantive code → correctness verification (a passing self-test) +
   the principle.
 
-### P2 — CEaaS enrichment tier pipeline (move `enrichment` planned→active)
-- **Why second:** it is the headline CEaaS feature, but it *depends on* P1 (every tier it emits must
+### P2 — Baltor enrichment tier pipeline (move `enrichment` planned→active)
+- **Why second:** it is the headline Baltor feature, but it *depends on* P1 (every tier it emits must
   ship a fidelity score). Today the `enrichment` service has a queue (`ohh:enrich:jobs`) and a declared
   ownership boundary but **no consumer and no code** (`scripts/processors/{compression,memory,cache,
   retrieval}` are absent).
@@ -166,7 +166,7 @@ same substrate" ([[../strategy/context-enrichment-service.md]]).
   fidelity delta, emitting `tier.built`. Start with the *one* freezable tier (structural compress) end
   to end before adding learned compression and the hyper-efficient (distill+cache) tier.
 - **Then, incrementally (each its own runnable module under the same boundary):** `summarize.llmlingua`
-  (learned), `memory/*` + `cache/*` (hyper-efficient, cache-shaped prefix), and the four
+  (learned), `memory/*` + `cache/*` (hyper-efficient, reusable prefix), and the four
   `deliver/*` surfaces (`mcp_serve`, `llms_txt`, `skill_package`, `claudemd`) the YAMLs already define.
 - **Reuse, don't rebuild:** the foundry worker loop + queue protocol (the enrichment worker is the
   same shape as `scripts.foundry.worker`), the store, telemetry. The service's `command:` in
@@ -196,7 +196,7 @@ same substrate" ([[../strategy/context-enrichment-service.md]]).
 - **Smallest real entrypoint per service:** add `services/platform/{ingestion,foundry,measurement,
   retrieval,governance,enrichment}/entrypoint.py` that pins the role, calls `telemetry.configure(...)`,
   and hands off to the owned `scripts.*` module — exactly the pattern `services/products/
-  context_enrichment/entrypoint.py` already demonstrates. Then point each registry `command:` at the
+  baltor/entrypoint.py` already demonstrates. Then point each registry `command:` at the
   new entrypoint.
 - **Warrant:** established principle (the registry is the single source of truth; one telemetry
   contract per service). **Bar:** trivial/reversible additive scaffolding → self-evident correctness,
@@ -220,7 +220,7 @@ same substrate" ([[../strategy/context-enrichment-service.md]]).
 - **opt-in adapter** — real, import-safe code that activates only with a scale extra installed; the
   default path does not need it.
 - **planned** — boundary + queue + (sometimes) a seeded catalog definition exist, but **no entrypoint
-  runs it** and, for CEaaS, the `owns:` code directories do not yet exist.
+  runs it** and, for Baltor, the `owns:` code directories do not yet exist.
 - **seeded definition** — a governed catalog row (provenance, lifecycle) with no executing code. *Not a
   feature.*
 

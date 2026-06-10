@@ -1,0 +1,61 @@
+id: "tool/use-case-seed-entity-ref-exporter"
+type: tool
+version: "0.1.0"
+name: "Use case seed entity ref exporter"
+description: "Emits canonical_entity and object_entity_ref rows from cross-domain use-case seed domains, label paths, inputs, outputs, required stages, and risk tiers."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "finance", "legal", "media", "creative", "energy", "healthcare", "cross_industry"]
+capability: ["extraction", "retrieval", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+tags: ["use-case-seeds", "entity-resolution", "object-entity-refs", "graph-search", "comparison-blocking"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    seeds:
+      type: array
+      items:
+        type: object
+    excluded_scopes:
+      type: array
+      items:
+        type: string
+  required: ["seeds"]
+returns:
+  type: object
+  properties:
+    canonical_entities:
+      type: array
+      items:
+        type: object
+    object_entity_refs:
+      type: array
+      items:
+        type: object
+    row_counts:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      seeds:
+        - id: "trades-permit-and-checklist-builder"
+          domain: "trades"
+          label_paths: ["vertical.trades.electrical.permit_review"]
+      excluded_scopes: ["insurance"]
+    output:
+      row_counts:
+        canonical_entity: 7
+        object_entity_ref: 7
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.use_case_seed_rows.export_seed_rows"
+    language: "python"
+  - kind: "mcp"
+    path: "mcp/factory.export_use_case_seed_entity_refs"

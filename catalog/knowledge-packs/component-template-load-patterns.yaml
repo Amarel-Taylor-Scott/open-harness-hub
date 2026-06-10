@@ -1,0 +1,37 @@
+id: "knowledge-pack/component-template-load-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Component template load patterns"
+description: "Load-order, review, reference, and search-index checks for moving reusable pipeline templates into Postgres template tables."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["planning", "routing", "serving", "verification"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "pipeline-template", "postgres", "pgvector", "bulk-load", "review-gate"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+content_types:
+  - "component_template_load_check"
+files:
+  - path: "catalog/knowledge-packs/data/component-template-load-patterns/checks.jsonl"
+    format: "jsonl"
+    schema: "component_template_load_check"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["id", "check_type", "description", "required_tables", "required_fields", "failure_route"]
+provenance:
+  sources:
+    - "Open Harness Hub component pipeline template expander"
+    - "Open Harness Hub Postgres schema"
+  collected_through: "2026-05-26"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "template metadata only"

@@ -1,0 +1,88 @@
+id: "processor/apqc-pcf-walker"
+type: processor
+version: "0.1.0"
+name: "APQC Process Classification Framework (PCF) walker"
+description: |
+  Walks the APQC Process Classification Framework (Cross-Industry
+  v7.4.0+, ~1,800 processes across 13 categories) and yields one
+  structured "knowledge node" per process. Each node carries:
+
+   - pcf_id: e.g., "8.2.1.1.1"
+   - category: 1.0 (Vision & Strategy), 2.0 (Develop Products), ...
+     up to 13.0 (Manage Enterprise Risk & Compliance)
+   - process_name
+   - parent_path (full breadcrumb)
+   - level (1-5 — category / process group / process / activity / task)
+   - description
+   - typical_inputs (when documented)
+   - typical_outputs (when documented)
+   - related_pcf_ids
+
+  Designed to feed `harness/draft-manifest-author` so each BPO
+  process becomes a candidate AI-pipeline manifest (BPO process →
+  AI-assisted pipeline; e.g., PCF 8.2.1.1.1 "Establish data
+  governance policies" → harness/data-governance-policy-drafter +
+  pipeline/data-governance-policy-pipeline).
+
+  Source: APQC publishes the PCF under a permissive academic-use
+  license. For commercial use, an APQC subscription is required to
+  redistribute the framework text verbatim; this walker preserves
+  PCF IDs (which are factual) and references back to APQC's source
+  rather than redistributing verbatim descriptions. Distill +
+  paraphrase + cite, not republish.
+
+  Industry-specific PCF variants (Banking, Pharma, Retail, Utilities,
+  etc.) follow the same shape; declare which variant at walk time.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry", "software"]
+capability: ["retrieval", "extraction"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+tags: ["apqc", "pcf", "bpo", "process-classification", "walker", "manifest-author"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+attribution:
+  source_url:  "https://www.apqc.org/process-frameworks"
+  source_kind: "other"
+  author:      "APQC"
+  license:     "Refer to APQC PCF redistribution terms — paraphrase + cite, do not republish verbatim."
+
+process_kind: "retrieve.tree_walk"
+deterministic: true
+idempotent: true
+streaming: true
+latency_budget_ms: 30000
+
+inputs:
+  - name: "pcf_variant"
+    type: "string"
+  - name: "categories"
+    type: "integer[]"
+  - name: "max_level"
+    type: "integer"
+  - name: "max_nodes"
+    type: "integer"
+outputs:
+  - name: "nodes"
+    type: "object[]"
+  - name: "walk_stats"
+    type: "object"
+
+side_effects: "read"
+on_error: "raise"
+
+implementations:
+  # NOT YET IMPLEMENTED. APQC PCF redistribution requires a paid APQC license;
+  # implementing this walker as open-source would risk republishing copyrighted
+  # text. To enable, an APQC-licensed integrator must provide a private
+  # implementation at scripts/processors/apqc_pcf_walker.py that paraphrases +
+  # cites the PCF without verbatim republication. Alternative open frameworks
+  # to walk instead: eTOM (Telecom), SCOR (Supply Chain), MIT Process
+  # Handbook, COSO ICIF, ITIL 4 (with license check).
+  - kind: "callable"
+    path: "scripts.processors.apqc_pcf_walker.run"
+    language: "python"

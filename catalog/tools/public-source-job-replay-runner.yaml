@@ -1,0 +1,89 @@
+id: "tool/public-source-job-replay-runner"
+type: tool
+version: "0.1.0"
+name: "Public source job replay runner"
+description: "Consumes queued public-source object-factory jobs and emits resumable run records, checkpoints, output pointers, and partition manifests without fetching or republishing source bodies."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["automotive", "energy", "manufacturing", "construction", "government", "cross_industry"]
+capability: ["routing", "governance", "evaluation", "retrieval"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.factory"
+tags: ["public-sources", "job-replay", "checkpoints", "partition-manifests", "object-factory"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    jobs:
+      type: array
+      items:
+        type: object
+    output_dir:
+      type: string
+    run_id:
+      type: string
+    dry_run:
+      type: boolean
+    resume:
+      type: boolean
+    worker_image:
+      type: string
+  required: ["jobs"]
+returns:
+  type: object
+  properties:
+    output_dir:
+      type: string
+    run_id:
+      type: string
+    input_job_count:
+      type: integer
+    executed_job_count:
+      type: integer
+    skipped_job_count:
+      type: integer
+    partition_count:
+      type: integer
+    job_counts_by_type:
+      type: object
+    files:
+      type: object
+    warnings:
+      type: array
+      items:
+        type: string
+side_effects: "write"
+examples:
+  - input:
+      jobs:
+        - job_id: "job/public-source/demo/01-source_discovery/shard/demo"
+          job_type: "source_discovery"
+          tenant_id: "tenant-public-catalog"
+          status: "queued"
+          inputs:
+            blueprint_id: "demo-blueprint"
+            shard_id: "shard/demo"
+          policy:
+            trust_boundary: "external"
+            privacy_boundary: "public"
+            redact_before_external_model: true
+            excluded_scopes: ["insurance"]
+      dry_run: true
+      resume: true
+    output:
+      input_job_count: 1
+      executed_job_count: 1
+      skipped_job_count: 0
+      partition_count: 1
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.public_source_job_replay.replay_public_source_jobs"
+    language: "python"
+  - kind: "mcp"
+    path: "mcp/factory.replay_public_source_jobs"

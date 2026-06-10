@@ -14,9 +14,9 @@ re-architect" rule), and lists only the smallest remaining steps. Detail lives i
   attestation registry) + **verification** (adversarial check vs the authority + HITL ← the differentiator)
   + **freshness** (track the source, flag stale/contradicted).
 - **Two products, one platform:** OHH = the **open funnel + consumption surface** (NOT a feature-competitor);
-  the Verified Context Service (CEaaS) = the **headline business + moat**. The join: a corpus/tool governed
+  the Verified Context Service (Baltor) = the **headline business + moat**. The join: a corpus/tool governed
   **once**, consumed two ways (wired into an OHH harness, or served into any agent/RAG platform).
-- **Priorities:** CEaaS verified-corpus capability → agent-neutral serving + upstream push-exporters
+- **Priorities:** Baltor verified-corpus capability → agent-neutral serving + upstream push-exporters
   (Contextual/Snowflake/Databricks) → one wedge beachhead (sanctions) end-to-end → OHH as the free funnel.
 
 ## Reconciliation — Part 2 concepts vs what EXISTS (reuse, don't rebuild)
@@ -37,7 +37,7 @@ re-architect" rule), and lists only the smallest remaining steps. Detail lives i
 ## Divergence to DECIDE (flagged, not silently changed)
 - **Naming-as-config / `web/products.js`.** Part 3 suggests product names live in one source of truth like
   `web/products.js`. **We removed `products.js`** when we split the front-end into self-contained per-product
-  folders (`web/harness-hub/`, `web/context-enrichment/`) — the owner's explicit earlier instruction ("separate
+  folders (`web/harness-hub/`, `web/baltor/`) — the owner's explicit earlier instruction ("separate
   folders for all front-end work, only backend shared"). So naming is currently **per-folder, not centralized.**
   These two goals conflict. **Options (owner's call):**
   1. *(recommended, smallest)* a shared **brand data file** (e.g. `web/brand.json` — pure data, not front-end
@@ -63,7 +63,7 @@ re-architect" rule), and lists only the smallest remaining steps. Detail lives i
   your knowledge. We prove it's right."*
 - OHH: *"Power your agents with governed harnesses." / "Open, portable, governed — works with the tools you
   already use, no lock-in."*
-- CEaaS: *"Provenance + verification + freshness. Nobody sells all three together."*
+- Baltor: *"Provenance + verification + freshness. Nobody sells all three together."*
 - /why columns: vs Contextual — *"They ground the answer in your corpus — even if it's wrong. We verify the
   corpus."*; vs raw RAG — *"Retrieval without verification is confident wrongness."*; vs DIY — *"Stop
   hand-maintaining regulatory corpora; subscribe to verified, always-current truth."*

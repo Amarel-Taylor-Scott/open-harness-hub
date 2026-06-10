@@ -33,7 +33,7 @@ Parse DICOM → normalize HU → window/level → resample → export tensor.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `preprocess` | processor | `processor/iterative-revise-loop` | — |
-| 3 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `preprocess` | processor | `processor/iterative-revise-loop` | - |
+| 3 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

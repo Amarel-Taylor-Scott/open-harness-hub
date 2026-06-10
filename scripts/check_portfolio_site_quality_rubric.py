@@ -1,0 +1,12 @@
+#!/usr/bin/env python3
+"""scripts.check_portfolio_site_quality_rubric.py — PROOF (portfolio websites): site_quality_rubric.
+Thin stub; logic lives in scripts/portfolio_checks.py (single source). Deterministic + offline. Exit 0/1."""
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from scripts import portfolio_checks as C
+
+if __name__ == "__main__":
+    if "--self-test" in sys.argv:
+        raise SystemExit(C.run("site_quality_rubric"))
+    print("usage: python3 scripts/check_portfolio_site_quality_rubric.py --self-test")
+    raise SystemExit(0)

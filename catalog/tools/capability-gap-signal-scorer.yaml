@@ -1,0 +1,73 @@
+id: "tool/capability-gap-signal-scorer"
+type: tool
+version: "0.1.0"
+name: "Capability gap signal scorer"
+description: "Scores browser-discovered datasets, papers, competitions, red-team reports, forums, repositories, and deployment signals for reusable AI primitive and pipeline opportunities."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "cross_industry"]
+capability: ["evaluation", "planning", "research"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "hub"
+freshness: "stable"
+tags: ["capability-gap", "browser-scout", "primitive-priority", "pipeline-discovery"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    finding:
+      type: object
+      description: "Normalized finding from browser, search, paper, dataset, or red-team sources."
+    weights:
+      type: object
+      description: "Optional weighting for economic value, data coverage, verifiability, LLM gap, deployment friction, cost savings, reuse potential, and maintenance burden."
+    baseline_results:
+      type: object
+      description: "Optional out-of-box LLM baseline scores."
+  required: ["finding"]
+returns:
+  type: object
+  properties:
+    discovery_score:
+      type: number
+    priority_band:
+      type: string
+      enum: ["low", "medium", "high", "urgent"]
+    recommended_components:
+      type: array
+      items:
+        type: string
+    evidence_gaps:
+      type: array
+      items:
+        type: string
+    promotion_recommendation:
+      type: string
+side_effects: "none"
+examples:
+  - input:
+      finding:
+        source_type: "competition"
+        domain: "regulated_social_platforms"
+        task: "Detect placement-fee overcharging signals in multilingual posts."
+        economic_value: 5
+        data_coverage: 3
+        verifiability: 4
+        llm_capability_gap: 4
+        deployment_friction: 4
+        cost_savings_potential: 5
+        reuse_potential: 4
+        maintenance_burden: 2
+    output:
+      discovery_score: 2400
+      priority_band: "high"
+      recommended_components: ["pipeline", "rule-pack", "rubric", "dataset"]
+      evidence_gaps: ["Needs cited dataset or review sample."]
+      promotion_recommendation: "Create inbox proposal and run out-of-box baseline."
+implementations:
+  - kind: "callable"
+    path: "tools.capability_gap_signal_scorer.score"

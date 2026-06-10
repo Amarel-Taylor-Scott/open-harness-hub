@@ -1,0 +1,149 @@
+id: "logic-pack/prompt-template-library"
+type: logic-pack
+version: "0.1.0"
+name: "Prompt Template Library"
+description: "A reusable library of typed prompt templates — task-brief, visual-descriptor, and few-shot — derived from community prompt-engineering practice. Each template enforces a minimal set of required slots so pipelines cannot ship vague or unconstrained prompts."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["cross_industry"]
+capability: ["generation", "summarization", "format_conversion"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+created: "2026-05-26"
+updated: "2026-05-26"
+
+attribution:
+  source_url: "https://github.com/nidhinjs/prompt-master"
+  source_kind: github
+  author: "nidhinjs"
+  license: "MIT"
+
+tags: ["prompt-templates", "task-brief", "few-shot", "visual-descriptor", "logic-pack"]
+
+content_types:
+  - prompt_template
+
+# ── Template Catalogue ────────────────────────────────────────────────────────
+#
+# Each entry records:
+#   id            — stable template slug
+#   label         — human name
+#   purpose       — one-sentence use case
+#   required_slots — inputs the caller MUST supply before the call
+#   optional_slots — inputs that alter but do not block the call
+#   output_contract — what the model is contracted to produce
+#   anti_patterns  — patterns this template guards against (catalog refs)
+#   template_text  — canonical prompt template (use {{slot}} syntax)
+#
+# These definitions are the authoritative source; downstream pipelines
+# reference template IDs rather than inlining prose.
+# ─────────────────────────────────────────────────────────────────────────────
+
+templates:
+
+  - id: task-brief
+    label: "Task Brief"
+    purpose: "Structured task prompt that enforces role, objective, deliverable, constraints, and success criteria before every generation call."
+    required_slots:
+      - role: "The persona or role the model should adopt (e.g. 'senior copywriter', 'legal analyst')."
+      - objective: "One-sentence statement of exactly what must be produced."
+      - deliverable: "Format and length budget (e.g. 'a 200-word executive summary in plain English')."
+      - success_criteria: "Machine-checkable condition that makes the output acceptable (e.g. 'all claims cite a source', 'JSON validates against schema X')."
+    optional_slots:
+      - constraints: "What to exclude, refuse, or keep under a limit."
+      - tone: "Register — formal, casual, neutral, technical."
+      - examples: "Up to 3 reference outputs the model should match in style."
+    output_contract: "Output matches deliverable format; every required_slot value is honoured; refusal is emitted as structured JSON {refused: true, reason: string} when constraints are violated."
+    anti_patterns:
+      - "pattern/anti-vague-task-prompt"
+      - "pattern/anti-missing-success-criteria-prompt"
+      - "pattern/anti-over-prompting-as-crutch"
+    template_text: |
+      You are {{role}}.
+
+      ## Objective
+      {{objective}}
+
+      ## Deliverable
+      Produce {{deliverable}}.
+
+      {% if constraints %}
+      ## Constraints
+      {{constraints}}
+      {% endif %}
+
+      {% if examples %}
+      ## Reference examples
+      {{examples}}
+      {% endif %}
+
+      ## Success criteria
+      Your response is acceptable when: {{success_criteria}}
+
+      If you cannot satisfy the objective within the constraints, respond with:
+      {"refused": true, "reason": "<one sentence>"}
+
+  - id: visual-descriptor
+    label: "Visual Descriptor"
+    purpose: "Prompt template for describing a visual asset (image, diagram, chart, or scene) in structured text for downstream indexing, alt-text generation, or multimodal retrieval."
+    required_slots:
+      - asset_type: "Kind of visual — photograph, diagram, chart, screenshot, illustration."
+      - audience: "Who will read the description (e.g. 'screen-reader user', 'image search index', 'product catalog')."
+      - detail_level: "Depth of description — brief (1 sentence), standard (3-5 sentences), detailed (full paragraph with data values)."
+    optional_slots:
+      - domain_context: "Subject area that shapes vocabulary (e.g. 'medical imaging', 'financial chart', 'UI screenshot')."
+      - forbidden_terms: "Terms the description must not include (e.g. trade names, proper nouns, speculation)."
+    output_contract: "Plain-text description with no markdown formatting; length matches detail_level; no speculative claims about content not visible in the asset."
+    anti_patterns:
+      - "pattern/anti-vague-task-prompt"
+      - "pattern/anti-missing-success-criteria-prompt"
+    template_text: |
+      Describe the following {{asset_type}} for a {{audience}}.
+      Detail level: {{detail_level}}.
+      {% if domain_context %}Domain context: {{domain_context}}.{% endif %}
+      {% if forbidden_terms %}Do not use: {{forbidden_terms}}.{% endif %}
+
+      Rules:
+      - Use only what is directly visible or stated in the asset.
+      - Do not speculate, infer brand names, or assign intent.
+      - Output plain text only — no markdown, no bullet points.
+
+      [ASSET_CONTENT_PLACEHOLDER]
+
+  - id: few-shot
+    label: "Few-Shot Prompt"
+    purpose: "Template for constructing a few-shot prompt with a consistent example structure (input → reasoning → output) that can be embedded in any generation step requiring demonstration-based calibration."
+    required_slots:
+      - task_description: "What the model must do, stated in one sentence."
+      - examples: "List of 2-5 dicts with keys: input, reasoning (optional), output."
+      - query: "The live input the model must process after seeing the examples."
+    optional_slots:
+      - format_instruction: "How the final output must be formatted (e.g. 'JSON with keys x, y, z')."
+      - cot_required: "Boolean — if true, model must emit a reasoning step before the final answer."
+    output_contract: "Output matches the structure demonstrated in examples; if cot_required=true, reasoning is delimited from final answer; format_instruction (if set) is honoured."
+    anti_patterns:
+      - "pattern/anti-vague-task-prompt"
+      - "pattern/anti-missing-success-criteria-prompt"
+    template_text: |
+      ## Task
+      {{task_description}}
+
+      ## Examples
+      {% for ex in examples %}
+      ### Example {{loop.index}}
+      Input: {{ex.input}}
+      {% if ex.reasoning %}Reasoning: {{ex.reasoning}}{% endif %}
+      Output: {{ex.output}}
+      {% endfor %}
+
+      ## Your turn
+      Input: {{query}}
+      {% if cot_required %}
+      Provide your reasoning first, then your final answer on a new line prefixed with "Answer:".
+      {% endif %}
+      {% if format_instruction %}Output format: {{format_instruction}}{% endif %}
+
+files: []

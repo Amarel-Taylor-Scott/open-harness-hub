@@ -15,7 +15,7 @@ Google I/O 2026 release). The product surface:
 | **Antigravity 2.0** | "Command center to manage multiple local agents in parallel. Group conversations into Projects, operate across multiple workspaces, automate routine tasks with scheduled messages." |
 | **Antigravity CLI** | Terminal-first; runs autonomous coding agents, executes shell commands, manages background subagents. |
 | **Antigravity SDK** | "Prototype custom agents leveraging Antigravity's harness with minimal code. Simple Python scripts to iterate on agentic applications, automate software-engineering tasks, and run evaluations on top of the Antigravity agent harness." |
-| **Antigravity IDE** | "Fully-featured, agentic IDE. Complete with the agent manager, artifacts, and a deep understanding of your codebase." |
+| **Antigravity IDE** | "Fully-featured, agentic IDE. Complete with the agent manager, components, and a deep understanding of your codebase." |
 
 Key blog-index headlines (May 19, 2026 wave): "Subagents, Hooks,
 Scheduled Tasks, Agent Management, Voice, and Much More". So

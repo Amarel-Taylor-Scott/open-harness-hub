@@ -9,13 +9,13 @@ immediately**. Goal: drive both products to launch quality and keep both public 
 
 - **Open Harness Hub** — *bounded*: assemble a governed pipeline, run it, monitor I/O rules. Pinned
   brand `harness-hub`. Home `/`. Tunnel → `dist/showcase-share-url-harness-hub.txt`.
-- **Context Enrichment (CEaaS)** — *unbounded* content refinery: ingest → raw/compressed/hyper-efficient
-  tiers → host/download → serve corpora+tools into open agent loops. Pinned brand `context-enrichment`.
-  Home `/context-enrichment`. Tunnel → `dist/showcase-share-url-context-enrichment.txt`.
+- **Baltor** — *unbounded* content refinery: ingest → raw/compressed/hyper-efficient
+  tiers → host/download → serve corpora+tools into open agent loops. Pinned brand `baltor`.
+  Home `/baltor`. Tunnel → `dist/showcase-share-url-baltor.txt`.
 
 Canonical: `docs/strategy/two-services-shared-infrastructure.md`, `docs/strategy/context-enrichment-service.md`,
 `docs/concepts/context-layer-and-the-desk.md`. Each product has its OWN self-contained front-end folder
-(`web/harness-hub/`, `web/context-enrichment/`); only the backend is shared, and `server.py` serves
+(`web/harness-hub/`, `web/baltor/`); only the backend is shared, and `server.py` serves
 `web/<OH_PRODUCT>/` (default harness-hub).
 
 ## Standing contract (no terminal state)
@@ -30,18 +30,21 @@ corroboration, never a unilateral single-agent call.
 
 ## Launch + keep BOTH tunnels live
 
-Run `bash scripts/serve_two_products.sh` at the start, and any time a tunnel is down. It brings up two
-pinned servers (:8000 harness-hub, :8001 context-enrichment) each behind its own **persistent**
-trycloudflare tunnel, sharing one token. Tunnels survive server restarts (URLs stay stable; the
-launcher reuses a live one). Web assets serve with `Cache-Control: no-store` — HTML/JS/CSS edits go
-live with **no restart**; only `server.py` changes need a relaunch.
+Run `bash scripts/serve_all_sites.sh` at the start, and any time a tunnel is down. It brings up the
+pinned servers (:8000 harness-hub, :8001 baltor, :8002 context-is-everything) each behind its own
+**persistent** trycloudflare tunnel, sharing one token, and **heals until all are live** (gate:
+`python3 -m scripts.showcase.verify_tunnels`). Tunnels survive server restarts (URLs stay stable; the
+launcher reuses a live one). For the dedicated no-stop tunnel loop see `/sites-live`
+(`docs/codex/three-sites-live-goal.md`); it supersedes the two-product `serve_two_products.sh`. Web
+assets serve with `Cache-Control: no-store` — HTML/JS/CSS edits go live with **no restart**; only
+`server.py` changes need a relaunch.
 
 ## The loop (each pass)
 
 1. **Pick the weakest surface across BOTH products** by the app-polish-loop rubric — alternate so
    neither lags:
    - OHH: `/` (entry box), `/app`, `/preview`, `/docs`, `/pricing`, `/trust`, `/compare`, `/catalog`…
-   - CEaaS: `/context-enrichment` (hero, the three tiers, the four consumption surfaces, fidelity moat),
+   - Baltor: `/baltor` (hero, the three tiers, the four consumption surfaces, fidelity moat),
      the `/requests` "enrich your content" funnel, governed-corpora browse…
    Preview a product locally with `OH_PRODUCT=<id> python3 -m scripts.showcase --port <p>` (or
    `bash scripts/serve_two_products.sh`), or hit its pinned tunnel directly.

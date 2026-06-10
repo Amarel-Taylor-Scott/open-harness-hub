@@ -1,0 +1,30 @@
+id: "knowledge-pack/clinical-coding-audit-frameworks"
+type: knowledge-pack
+version: "0.1.0"
+name: "Clinical Coding Audit frameworks"
+description: "Composite benchmark and review context pack for clinical coding audit workflows."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "CC-BY-4.0"
+industry: ["healthcare.payer", "insurance.claims"]
+capability: ["retrieval", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "dated"
+tags: ["clinical-coding-audit", "expansion-v6"]
+created: "2026-05-24"
+updated: "2026-05-24"
+content_types: ["rag_doc", "checklist", "control_summary", "evidence_matrix", "benchmark_context"]
+files:
+  - path: "data/clinical-coding-audit/frameworks.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    enabled: true
+    embedder: "adapter/nomic-embed-text-v15"
+provenance:
+  sources: ["Clinical Coding Audit control checklist", "Clinical Coding Audit evidence matrix", "Clinical Coding Audit escalation playbook", "Clinical Coding Audit benchmark context"]
+  collected_through: "2026-05-24"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "composite educational summaries only"

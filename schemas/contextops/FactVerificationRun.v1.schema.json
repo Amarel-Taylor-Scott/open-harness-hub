@@ -1,0 +1,162 @@
+{
+  "$id": "contextops/FactVerificationRun.v1",
+  "title": "FactVerificationRun.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "The RESULT of running a VerificationRecipe \u2014 one verification attempt for a fact_key. It carries the extracted candidate value (as a FactAssertion candidate, claim_status pinned [candidate]), the source_handle(s) it was read from, the validator outcome, the cross-source confirmation outcome, and the cost_tracking block that makes the economic moat visible (llm_calls_avoided / deterministic_verifications / cached_fact_hits / cost_reduction_estimate / token_cost_before / token_cost_after). A run VERIFIES; it never promotes \u2014 promoted_to_canonical is pinned [false] (reconciliation, elsewhere, decides canonicalization). It always carries a receipt_ref. Deterministic when verified_at is injected.",
+  "required": [
+    "schema_version",
+    "run_id",
+    "tenant_id",
+    "source_scope",
+    "fact_key",
+    "verification_recipe_id",
+    "claim_status",
+    "extracted_value",
+    "source_handles",
+    "validators_passed",
+    "cross_source_confirmed",
+    "outcome",
+    "cost_tracking",
+    "promoted_to_canonical",
+    "receipt_ref",
+    "verified_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": [
+        "FactVerificationRun.v1"
+      ]
+    },
+    "run_id": {
+      "type": "string",
+      "description": "content-addressed over (verification_recipe_id, extracted_value, source_handles); version in metadata, never in the id"
+    },
+    "tenant_id": {
+      "type": "string"
+    },
+    "source_scope": {
+      "type": "string",
+      "enum": [
+        "global_public",
+        "tenant_private",
+        "tenant_shared",
+        "system_reference"
+      ]
+    },
+    "fact_key": {
+      "type": "string"
+    },
+    "verification_recipe_id": {
+      "type": "string",
+      "description": "the VerificationRecipe that produced this run (lineage)"
+    },
+    "claim_status": {
+      "type": "string",
+      "enum": [
+        "candidate"
+      ],
+      "description": "PINNED candidate \u2014 a verification run yields a candidate value; canonicalization is a separate reconciliation decision"
+    },
+    "extracted_value": {
+      "type": "string",
+      "description": "the deterministically extracted value (e.g. '10 business days') \u2014 a candidate, not yet served truth"
+    },
+    "source_handles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "the source handle(s) the value was read from; a run with no source handle is not a valid verification"
+    },
+    "validators_passed": {
+      "type": "boolean",
+      "description": "did every VerificationRecipe.validators pass"
+    },
+    "cross_source_confirmed": {
+      "type": "boolean",
+      "description": "was the recipe's cross-source confirmation policy satisfied"
+    },
+    "ladder_path": {
+      "type": "string",
+      "enum": [
+        "m0_llm_every_time",
+        "m1_agent_research",
+        "m2_source_recipe",
+        "m3_deterministic_extract",
+        "m4_durable_worker",
+        "m5_watch_policy",
+        "m6_canonical_cache",
+        "m7_rule_verifier"
+      ],
+      "description": "which cost-ladder rung served this run (M3+ is the deterministic, cheap path)"
+    },
+    "cost_tracking": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "the economic moat made visible \u2014 the savings of the deterministic path vs ask-LLM-every-time",
+      "required": [
+        "llm_calls_avoided",
+        "deterministic_verifications",
+        "cached_fact_hits",
+        "cost_reduction_estimate",
+        "token_cost_before",
+        "token_cost_after"
+      ],
+      "properties": {
+        "llm_calls_avoided": {
+          "type": "integer",
+          "description": "LLM calls this deterministic run replaced vs M0"
+        },
+        "deterministic_verifications": {
+          "type": "integer",
+          "description": "deterministic verifications performed (cheap, testable)"
+        },
+        "cached_fact_hits": {
+          "type": "integer",
+          "description": "queries served from the canonical fact cache (M6)"
+        },
+        "cost_reduction_estimate": {
+          "type": "number",
+          "description": "estimated fractional cost reduction vs M0 (0..1)"
+        },
+        "token_cost_before": {
+          "type": "number",
+          "description": "the M0 ask-LLM-every-time token cost"
+        },
+        "token_cost_after": {
+          "type": "number",
+          "description": "the cost on the rung that actually served this run"
+        }
+      }
+    },
+    "outcome": {
+      "type": "string",
+      "enum": [
+        "verified",
+        "failed_validation",
+        "failed_cross_source",
+        "source_unreachable",
+        "conflict",
+        "abstain"
+      ],
+      "description": "the run's outcome"
+    },
+    "promoted_to_canonical": {
+      "type": "boolean",
+      "enum": [
+        false
+      ],
+      "description": "pinned false \u2014 a verification run never self-promotes; reconciliation/publish_fact (elsewhere) decides canonicalization"
+    },
+    "receipt_ref": {
+      "type": "string",
+      "description": "opaque ref to the verification receipt (lineage + replay); a run without a receipt is incomplete"
+    },
+    "verified_at": {
+      "type": "string",
+      "description": "injected time; deterministic when injected"
+    }
+  }
+}

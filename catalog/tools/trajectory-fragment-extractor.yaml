@@ -1,0 +1,49 @@
+id: "tool/trajectory-fragment-extractor"
+type: tool
+version: "0.1.0"
+name: "Trajectory fragment extractor"
+description: "Extracts privacy-screened plan nodes, tool calls, tool results, verification steps, error recoveries, and response snippets from agent or pipeline traces into normalized fragment rows."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "evaluation", "governance"]
+modality: ["text", "structured", "code"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.cache"
+tags: ["trajectory-cache", "fragment-extraction", "agent-traces", "privacy-screen"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    trace:
+      type: object
+    privacy_policy:
+      type: object
+    fragment_kinds:
+      type: array
+      items: { type: string }
+  required: ["trace", "privacy_policy"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    fragments:
+      type: array
+      items: { type: object }
+    review_tickets:
+      type: array
+      items: { type: object }
+side_effects: "none"
+examples:
+  - input:
+      trace: { run_id: "run/example", steps: [] }
+      privacy_policy: { allow_shared_cache: false }
+    output:
+      ok: true
+      fragments: []

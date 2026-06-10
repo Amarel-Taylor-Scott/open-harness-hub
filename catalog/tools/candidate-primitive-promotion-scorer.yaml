@@ -1,0 +1,68 @@
+id: "tool/candidate-primitive-promotion-scorer"
+type: tool
+version: "0.1.0"
+name: "Candidate primitive promotion scorer"
+description: "Scores normalized candidate primitives using demand, usefulness, capability-gap, deployment, cost, privacy, license, and dedupe signals, then emits promotion decisions, quality index records, and review tickets."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["evaluation", "governance", "planning", "routing"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.evaluation"
+tags: ["promotion", "quality-gates", "candidate-primitives", "review-routing", "million-primitives"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    input_path:
+      type: string
+    output_dir:
+      type: string
+    weights_json:
+      type: string
+  required: ["input_path", "output_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    candidates:
+      type: integer
+    promotion_decisions:
+      type: integer
+    promote_candidate:
+      type: integer
+    review_before_promotion:
+      type: integer
+    hold:
+      type: integer
+    reject:
+      type: integer
+    index_records:
+      type: integer
+    review_tickets:
+      type: integer
+    paths:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      input_path: "catalog/knowledge-packs/data/task-marketplace-archetype-patterns/archetype-patterns.jsonl"
+      output_dir: "dist/promotion/task-marketplace"
+    output:
+      ok: true
+      candidates: 2
+      promotion_decisions: 2
+      review_tickets: 2
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.candidate_promotion_scorer.score_candidates"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.factory.candidate_promotion_scorer"

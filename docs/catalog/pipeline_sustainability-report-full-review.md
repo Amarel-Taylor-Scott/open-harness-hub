@@ -29,7 +29,7 @@ ESG-supplier-grading review in one workflow.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `climate_review` | pipeline | `pipeline/climate-disclosure-review` | — |
-| 2 | `esg_review` | pipeline | `pipeline/supplier-policy-grading` | — |
-| 3 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `climate_review` | pipeline | `pipeline/climate-disclosure-review` | - |
+| 2 | `esg_review` | pipeline | `pipeline/supplier-policy-grading` | - |
+| 3 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

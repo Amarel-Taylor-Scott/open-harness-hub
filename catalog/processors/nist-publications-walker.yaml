@@ -1,0 +1,69 @@
+id: "processor/nist-publications-walker"
+type: processor
+version: "0.1.0"
+name: "NIST CSRC publications walker"
+description: |
+  Walks the NIST Computer Security Resource Center publication catalog
+  (csrc.nist.gov) and yields one structured knowledge node per
+  publication. Series supported:
+
+   - SP 800-series  — Special Publications (FedRAMP, FISMA, AI RMF anchor)
+   - SP 1800-series — NCCoE practice guides
+   - SP 500-series  — Information technology
+   - AI series      — NIST AI publications (AI 100, AI 200, AI RMF)
+   - IR / NISTIR    — Internal reports
+   - FIPS           — Federal Information Processing Standards
+
+  Each node carries: pub_id (e.g. "NIST SP 800-53 Rev. 5"), series, title,
+  summary, status (final/draft/withdrawn), issued_date, canonical_url,
+  pdf_url.
+
+  Default filters: status=final only.
+
+  Designed to feed `harness/draft-manifest-author` so each publication
+  becomes a candidate knowledge-pack entry (the publication's scope) +
+  candidate rubric (where the publication defines controls) + candidate
+  rule-pack (where the publication enumerates checks).
+
+  Source: NIST publications are public-domain.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cyber", "ai_governance", "ai_governance.nist_rmf", "compliance"]
+capability: ["retrieval", "extraction"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "external"
+tags: ["nist", "csrc", "sp-800", "fips", "ai-rmf", "walker", "manifest-author"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+process_kind: "retrieve.tree_walk"
+deterministic: true
+idempotent: true
+streaming: true
+latency_budget_ms: 60000
+
+inputs:
+  - name: "series"
+    type: "string[]"
+  - name: "max_nodes"
+    type: "integer"
+  - name: "status_filter"
+    type: "string[]"
+outputs:
+  - name: "nodes"
+    type: "object[]"
+  - name: "walk_stats"
+    type: "object"
+
+side_effects: "external_call"
+on_error: "retry"
+retry:
+  max_attempts: 3
+  backoff: "exponential"
+
+implementations:
+  - kind: "callable"
+    path: "scripts.processors.nist_publications_walker.run"
+    language: "python"

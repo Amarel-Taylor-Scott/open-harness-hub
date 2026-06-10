@@ -1,0 +1,26 @@
+{
+  "$id": "purpose_tasks/PurposeTaskSpec.v1", "title": "PurposeTaskSpec.v1", "type": "object", "additionalProperties": false,
+  "description": "A PurposeTask declared by INTENT, not by per-task code. It names a purpose + a capability_slot and a stable input_contract -> output_contract; the controller binds an IMPLEMENTATION from a capability registry by numeric priority (provision-by-capability), runs a cheap deterministic hot path, self-monitors against success_criteria, and on drift self-adapts by running a candidate implementation SIDE-BY-SIDE vs the current one through the governed Parallel-Path Engine — promoting only on a passing PathPromotionDecision and keeping the prior impl as a fallback (rollback_target). success_criteria are MEASURABLE thresholds (e.g. max_cost, min_source_handles, latency_sla, 0 held-out leaks). promotion_criteria are the gates a modified variant must beat. connected_to names the consumers (the blast radius); the output_contract is stable across variants so consumers never break. current_impl_id/alternatives/rollback_target are populated at provision/adaptation time. defined_at is injected (no wall-clock).",
+  "required": ["schema_version", "task_id", "purpose", "capability_slot", "input_contract", "output_contract", "success_criteria", "promotion_criteria", "defined_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["PurposeTaskSpec.v1"]},
+    "task_id": {"type": "string", "description": "stable id of this PurposeTask (content/version hash suffix; never truncation-only)"},
+    "purpose": {"type": "string", "description": "human-readable intent, e.g. 'Pull the Reg-E error-resolution deadline for a card dispute.'"},
+    "capability_slot": {"type": "string", "description": "the capability this task satisfies; the controller binds an implementation FROM the registry for this slot by numeric priority (provision-by-capability, not code)"},
+    "input_contract": {"type": "string", "description": "schema ref the task consumes (X)"},
+    "output_contract": {"type": "string", "description": "schema ref the task produces (Y); STABLE across variants so connected_to consumers never break"},
+    "success_criteria": {"type": "object", "description": "MEASURABLE health thresholds (e.g. max_cost, min_source_handles, latency_sla, held_out leaks = 0); drift below these triggers exactly one governed adaptation cycle"},
+    "promotion_criteria": {"type": "object", "description": "the gates a modified variant must beat to replace the current impl (cost_tolerance, equivalence, handle-coverage, held-out, safety); promotion is authorized only by a passing PathPromotionDecision"},
+    "connected_to": {"type": "array", "items": {"type": "string"}, "description": "consumer systems that depend on this task's output (the blast radius)"},
+    "resources": {"type": "object", "description": "what the task may draw on: templates, skill slots, capability slots, provider graph"},
+    "current_impl_id": {"type": "string", "description": "the implementation currently bound as the cheap deterministic hot path (set at provision time)"},
+    "alternatives": {"type": "array", "items": {"type": "string"}, "description": "other implementations for this capability_slot kept as fallback challengers, in priority order"},
+    "rollback_target": {"type": "string", "description": "the prior implementation the task reverts to if a promotion later fails ('' until a promotion has occurred)"},
+    "safety_class": {"type": "string", "description": "gate level required (e.g. human approval for real-cloud / write effects)"},
+    "tenant_scope": {"type": "string", "description": "tenant/project scope for isolation"},
+    "capabilities": {"type": "object", "description": "OCTS CTS-0: declared capabilities — {required:[], optional:[], forbidden:[]}. Provision is BY declared capability, not code; `forbidden` is a governance boundary (e.g. purchase · credential.access · personal_data.extract) the task may never cross."},
+    "allowed_runtime_classes": {"type": "array", "items": {"type": "string"}, "description": "OCTS CTS-0/CTS-1: abstract runtime classes this task may bind to (from architecture/capability_runtime_classes.json); the platform selects a concrete backend by policy. The contract declares the CLASS, never a vendor product."},
+    "observability": {"type": "object", "description": "OCTS CTS-2: required telemetry/retained-artifacts (traces=opentelemetry; metrics; retained input/output hashes, trace, eval_result)."},
+    "defined_at": {"type": "string", "description": "injected time the task was declared (deterministic, no wall-clock)"}
+  }
+}

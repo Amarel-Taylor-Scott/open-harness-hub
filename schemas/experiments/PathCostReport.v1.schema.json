@@ -1,0 +1,23 @@
+{
+  "$id": "experiments/PathCostReport.v1", "title": "PathCostReport.v1", "type": "object", "additionalProperties": false,
+  "description": "The relative-cost estimate for a path, computed from architecture/execution_backend_pricebook.json (CONFIG, never hardcoded). backend_id names the pricebook backend the path runs on; estimated_cost is the relative-unit cost = request_cost + duration_cost_per_s * estimated_duration_s + idle_cost_per_s * estimated_idle_s. confidence is carried straight from the pricebook entry ('low' placeholder prices must never drive a production decision). pricebook_version pins the config the estimate came from so a cost decision is reproducible. cost_delta_vs_baseline (when present) is this path's estimated_cost minus the baseline path's, the number the promotion gate's cost_acceptable check reads. currency mirrors the pricebook ('relative-unit' offline).",
+  "required": ["schema_version", "report_id", "path_id", "capability_slot", "backend_id", "pricebook_version", "currency", "estimated_cost", "confidence", "estimated_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["PathCostReport.v1"]},
+    "report_id": {"type": "string"},
+    "path_id": {"type": "string", "description": "the path this cost belongs to"},
+    "capability_slot": {"type": "string"},
+    "backend_id": {"type": "string", "description": "the pricebook backend key the path runs on (e.g. 'local_function_emulator@v1')"},
+    "pricebook_version": {"type": "string", "description": "the pricebook 'version' the estimate was computed from (reproducibility)"},
+    "currency": {"type": "string", "enum": ["relative-unit"], "description": "mirrors the pricebook currency; offline ranking units, not real money"},
+    "request_cost": {"type": "number", "description": "the backend's per-request cost from the pricebook"},
+    "duration_cost_per_s": {"type": "number", "description": "the backend's per-second active cost from the pricebook"},
+    "idle_cost_per_s": {"type": "number", "description": "the backend's per-second idle/warm cost from the pricebook"},
+    "estimated_duration_s": {"type": "number", "description": "the injected/measured active duration used in the estimate (>= 0)"},
+    "estimated_idle_s": {"type": "number", "description": "the injected/measured idle/warm duration used in the estimate (>= 0)"},
+    "estimated_cost": {"type": "number", "description": "request_cost + duration_cost_per_s*estimated_duration_s + idle_cost_per_s*estimated_idle_s (>= 0)"},
+    "cost_delta_vs_baseline": {"type": "number", "description": "this path's estimated_cost minus the baseline's (negative = cheaper); feeds the promotion cost gate"},
+    "confidence": {"type": "string", "enum": ["high", "low"], "description": "carried from the pricebook entry; a 'low' placeholder must never drive a production cost decision"},
+    "estimated_at": {"type": "string", "description": "injected time"}
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "$id": "ingestion/SourceArtifact.v1", "title": "SourceArtifact.v1", "type": "object", "additionalProperties": false,
+  "description": "The governed record of one fetched object as it entered the system. No raw source becomes truth: a SourceArtifact stores the raw object + its full provenance/scope/authority/lineage/security metadata and is the only thing a connector writes. Promotion to served facts happens downstream (decomposition → ledger → gate), never here.",
+  "required": ["schema_version", "tenant_id", "source_id", "source_version", "source_handle", "content_hash", "scope", "authority", "artifact_type", "created_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["SourceArtifact.v1"]},
+    "artifact_id": {"type": "string"},
+    "artifact_type": {"type": "string", "enum": ["source_record"]},
+    "tenant_id": {"type": "string"},
+    "source_id": {"type": "string"},
+    "source_version": {"type": "string"},
+    "source_handle": {"type": "string"},
+    "content_hash": {"type": "string"},
+    "scope": {"type": "string", "enum": ["global_public", "tenant_private", "tenant_shared"]},
+    "authority": {"type": "string", "enum": ["official", "regulated", "customer_private", "third_party", "community", "unknown"]},
+    "created_at": {"type": "string"},
+    "ingestion_run_id": {"type": "string"},
+    "source_class": {"type": "string"},
+    "adapter_id": {"type": "string"},
+    "is_source_root": {"type": "boolean"},
+    "consumable": {"type": "boolean"},
+    "non_consumable_reason": {"type": "string"},
+    "lineage": {"type": "object", "additionalProperties": false,
+      "required": ["fetched_at", "fetch_method"],
+      "properties": {
+        "fetched_at": {"type": "string"},
+        "fetch_method": {"type": "string", "enum": ["full_sync", "incremental_sync", "backfill", "webhook_push", "manual_upload"]},
+        "upstream_uri": {"type": "string"},
+        "upstream_etag": {"type": "string"},
+        "upstream_last_modified": {"type": "string"},
+        "cursor_value": {"type": "string"},
+        "parent_artifact_id": {"type": "string"}
+      }},
+    "security": {"type": "object", "additionalProperties": false,
+      "required": ["classification"],
+      "properties": {
+        "classification": {"type": "string", "enum": ["public", "internal", "confidential", "restricted"]},
+        "contains_pii": {"type": "boolean"},
+        "redaction_applied": {"type": "boolean"},
+        "encryption_at_rest": {"type": "string", "enum": ["none", "envelope", "field_level"]},
+        "retention_class": {"type": "string"}
+      }},
+    "raw_ref": {"type": "string"},
+    "raw_byte_size": {"type": "integer"}
+  }
+}

@@ -1,0 +1,63 @@
+id: "tool/entity-recognition-linker"
+type: tool
+version: "0.1.0"
+name: "Entity recognition linker"
+description: "Extracts entity mentions from source records and links them to canonical entities, aliases, registry identifiers, and graph nodes."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["extraction", "retrieval", "verification"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+tags: ["entity-recognition", "entity-resolution", "linking", "aliases", "graph"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    text:
+      type: string
+    record:
+      type: object
+    entity_types:
+      type: array
+      items:
+        type: string
+    linker_indexes:
+      type: array
+      items:
+        type: string
+  required: ["text"]
+returns:
+  type: object
+  properties:
+    mentions:
+      type: array
+      items:
+        type: object
+    canonical_entities:
+      type: array
+      items:
+        type: object
+    unresolved_mentions:
+      type: array
+      items:
+        type: object
+side_effects: "read"
+examples:
+  - input:
+      text: "An AML analyst reviews FinCEN-related transaction monitoring alerts."
+      entity_types: ["occupation", "government_agency", "concept"]
+    output:
+      mentions: []
+      canonical_entities: []
+      unresolved_mentions: []
+implementations:
+  - kind: "callable"
+    path: "tools.entity_recognition_linker.run"
+  - kind: "mcp"
+    path: "mcp/entities.link"

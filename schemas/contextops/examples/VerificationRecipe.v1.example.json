@@ -1,0 +1,81 @@
+{
+  "valid": {
+    "schema_version": "VerificationRecipe.v1",
+    "recipe_id": "vrecipe-cfpb-deadline-8b9c0d1e",
+    "tenant_id": "acme",
+    "source_scope": "global_public",
+    "fact_key": "cfpb.error_resolution.investigation_deadline",
+    "input_source_recipe_ids": ["srecipe-ecfr-1005-11-7a8b9c0d"],
+    "extractor_id": "xsnip-duration-1005-11-9c0d1e2f",
+    "validators": ["non_empty", "unit_check", "source_hash_match"],
+    "success_criteria": "value parses as a business-day duration AND matches the official eCFR source hash",
+    "authority": {
+      "min_authority_rank": 80,
+      "winning_source_type": "regulation"
+    },
+    "cross_source": {
+      "policy": "single_official_source_ok",
+      "min_independent_sources": 1
+    },
+    "freshness": {
+      "max_staleness_seconds": 2592000,
+      "requires_fresh_for_current_values": true
+    },
+    "watch_triggers": ["scheduled", "source_change"],
+    "tenant_scope": "global_public",
+    "produces": "fact_verification_run",
+    "created_at": "2026-06-05T00:00:00Z"
+  },
+  "invalid_faq_wins": {
+    "schema_version": "VerificationRecipe.v1",
+    "recipe_id": "vrecipe-bad-1",
+    "tenant_id": "acme",
+    "source_scope": "global_public",
+    "fact_key": "cfpb.error_resolution.investigation_deadline",
+    "input_source_recipe_ids": ["srecipe-cfpb-faq"],
+    "extractor_id": "xsnip-x",
+    "validators": ["non_empty"],
+    "success_criteria": "x",
+    "authority": {
+      "min_authority_rank": 10,
+      "winning_source_type": "agency_faq"
+    },
+    "cross_source": {
+      "policy": "single_official_source_ok",
+      "min_independent_sources": 1
+    },
+    "freshness": {
+      "max_staleness_seconds": 2592000,
+      "requires_fresh_for_current_values": true
+    },
+    "tenant_scope": "global_public",
+    "produces": "fact_verification_run",
+    "created_at": "2026-06-05T00:00:00Z"
+  },
+  "invalid_produces_canonical": {
+    "schema_version": "VerificationRecipe.v1",
+    "recipe_id": "vrecipe-bad-2",
+    "tenant_id": "acme",
+    "source_scope": "global_public",
+    "fact_key": "cfpb.error_resolution.investigation_deadline",
+    "input_source_recipe_ids": ["srecipe-ecfr-1005-11-7a8b9c0d"],
+    "extractor_id": "xsnip-duration-1005-11-9c0d1e2f",
+    "validators": ["non_empty"],
+    "success_criteria": "x",
+    "authority": {
+      "min_authority_rank": 80,
+      "winning_source_type": "regulation"
+    },
+    "cross_source": {
+      "policy": "single_official_source_ok",
+      "min_independent_sources": 1
+    },
+    "freshness": {
+      "max_staleness_seconds": 2592000,
+      "requires_fresh_for_current_values": true
+    },
+    "tenant_scope": "global_public",
+    "produces": "canonical_fact",
+    "created_at": "2026-06-05T00:00:00Z"
+  }
+}

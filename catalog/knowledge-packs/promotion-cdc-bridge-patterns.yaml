@@ -1,0 +1,37 @@
+id: "knowledge-pack/promotion-cdc-bridge-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Promotion CDC bridge patterns"
+description: "Checks for turning approved component promotion outputs into immutable component change events, index records, and review tickets."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "verification", "retrieval", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "promotion", "cdc", "versioning", "index-delta", "postgres"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+content_types:
+  - "promotion_cdc_bridge_check"
+files:
+  - path: "catalog/knowledge-packs/data/promotion-cdc-bridge-patterns/checks.jsonl"
+    format: "jsonl"
+    schema: "promotion_cdc_bridge_check"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["id", "check_type", "description", "required_inputs", "required_outputs", "failure_route"]
+provenance:
+  sources:
+    - "Open Harness Hub approved component promotion planner"
+    - "Open Harness Hub component CDC planner"
+  collected_through: "2026-05-26"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "component lifecycle metadata only"

@@ -38,6 +38,44 @@ Schema `type` keys are internal storage names; the user only ever sees the
 primitive/product labels. The "stages" below are a conventional *arrangement* of
 these primitives for a typical task — the primitives are the foundation.
 
+### Not an eighth primitive: the capability-request (a typed empty slot)
+
+There is **no eighth primitive**. When a user needs something the catalog does
+not yet provide, that unmet need is captured as a **capability-request**
+(`schemas/capability-request.schema.json`) — a *typed empty slot*, not a new
+role. It carries the `target_type` it will eventually become (one of the
+fourteen component types above, so it stays inside the seven-primitive model),
+at maturity **`abstract`** — the only pre-component tier (see
+`vocabularies/lifecycle.yaml`). A capability-request is **never tenant-visible as
+a component**; it is an operational object (like a review-ticket), not a catalog
+`type`, so it is absent from `validate.py`'s `TYPE_TO_SCHEMA`.
+
+This keeps "what role does it play" (the seven primitives) and "how mature is it"
+(the lifecycle ladder: `abstract` < `experimental` < `beta` < `stable`) as two
+orthogonal axes, mirroring the existing `lifecycle` vs `lifecycle_position` split.
+
+Promotion path (the guard that stops a build-agent from manufacturing junk):
+
+```
+requested → triaged → researching → building → built → verifying
+          → [two-axis lift gate: lift AND durability]
+          → promoted   (mints a real component at lifecycle `experimental`)
+          | rejected / duplicate
+```
+
+The gate is the existing `scripts/eval/durable_gap_harness.py` (admit only on
+structural lift). Fulfillment is either a **premium agent build** (hosted
+build-on-demand) or a **community build** (a contributor earns credits when the
+shared component passes the lift gate). Seed material for the build is the
+mined repo catalog (`data/repo-catalog/`); ranking/dedup of gaps reuses the
+research queue (`data/research-queue/areas.jsonl`).
+
+> Pricing boundary (why this exists): export of pure **text-operation /
+> static-information** components is freezable and stays free (the funnel);
+> recurring value is the **code-executing + dynamic-corpus** layer and
+> build-on-demand fulfillment of capability-requests. The execution-class table
+> below is that boundary.
+
 A pipeline is a left-to-right flow of stages. Each stage is filled by one or
 more component *types*. Not every pipeline uses every stage.
 

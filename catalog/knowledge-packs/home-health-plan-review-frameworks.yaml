@@ -1,0 +1,30 @@
+id: "knowledge-pack/home-health-plan-review-frameworks"
+type: knowledge-pack
+version: "0.1.0"
+name: "Home Health Plan Review frameworks"
+description: "Composite benchmark and review context pack for home health plan review workflows."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "CC-BY-4.0"
+industry: ["healthcare.clinical", "healthcare.payer"]
+capability: ["retrieval", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "dated"
+tags: ["home-health-plan-review", "expansion-v6"]
+created: "2026-05-24"
+updated: "2026-05-24"
+content_types: ["rag_doc", "checklist", "control_summary", "evidence_matrix", "benchmark_context"]
+files:
+  - path: "data/home-health-plan-review/frameworks.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    enabled: true
+    embedder: "adapter/nomic-embed-text-v15"
+provenance:
+  sources: ["Home Health Plan Review control checklist", "Home Health Plan Review evidence matrix", "Home Health Plan Review escalation playbook", "Home Health Plan Review benchmark context"]
+  collected_through: "2026-05-24"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "composite educational summaries only"

@@ -1,0 +1,128 @@
+{
+  "_about": "Canonical seed graph for the Acme Billing demo. Objects conform to schemas/context-object, relationships to schemas/context-relationship, assertions to schemas/context-assertion. ctx:// handles resolve to the sibling raw files. Deterministic + synthetic.",
+  "objects": [
+    {
+      "kind": "baltor.context-object.v1",
+      "context_object_id": "obj-bill-782",
+      "object_type": "work_item",
+      "title": "BILL-782: raise retry ceiling and align the runbook",
+      "summary": "Apply ADR-014's retry ceiling to the code path and make the stale runbook match. Do not change retry-safe codes.",
+      "source_handles": ["ctx://acme-billing/tickets/BILL-782.json#acceptance_criteria"],
+      "classification": "internal",
+      "freshness": { "staleness": "fresh", "effective_date": "2026-05-29" },
+      "provenance": { "content_hash": "sha256:demo-bill782" },
+      "five_w_one_h": { "what": { "topics": ["retry", "retries", "billing", "ceiling"] } },
+      "policy": { "derived_context": true, "promotion_allowed": true, "raw_source_dump_allowed": false, "requires_commit_scope": true },
+      "created_at": "2026-05-29T09:00:00Z"
+    },
+    {
+      "kind": "baltor.context-object.v1",
+      "context_object_id": "obj-adr-014",
+      "object_type": "decision",
+      "title": "ADR-014: Billing retry policy",
+      "summary": "Authoritative retry policy: at most 5 retries, full-jitter exponential backoff, retry-safe codes only. Supersedes the runbook.",
+      "claim": "max_retries = 5",
+      "source_handles": ["ctx://acme-billing/decisions/ADR-014-billing-retry-policy.md#decision"],
+      "classification": "internal",
+      "freshness": { "staleness": "fresh", "effective_date": "2026-03-18" },
+      "provenance": { "content_hash": "sha256:demo-adr014" },
+      "five_w_one_h": { "what": { "topics": ["retry", "retries", "backoff", "ceiling", "policy"] } },
+      "policy": { "derived_context": true, "promotion_allowed": true, "raw_source_dump_allowed": false },
+      "created_at": "2026-03-18T12:00:00Z"
+    },
+    {
+      "kind": "baltor.context-object.v1",
+      "context_object_id": "obj-retry-py",
+      "object_type": "file",
+      "title": "repo/billing/retry.py",
+      "summary": "Implements ADR-014: MAX_RETRIES = 5, retry-safe codes 429/502/503/504.",
+      "claim": "MAX_RETRIES = 5",
+      "source_handles": ["ctx://acme-billing/repo/billing/retry.py#L9-L13"],
+      "classification": "internal",
+      "freshness": { "staleness": "fresh" },
+      "provenance": { "content_hash": "sha256:demo-retrypy" },
+      "five_w_one_h": { "what": { "topics": ["retry", "retries", "code", "ceiling"] } },
+      "policy": { "derived_context": true, "promotion_allowed": true, "raw_source_dump_allowed": false },
+      "created_at": "2026-03-20T15:00:00Z"
+    },
+    {
+      "kind": "baltor.context-object.v1",
+      "context_object_id": "obj-test-retry",
+      "object_type": "test_result",
+      "title": "repo/billing/test_retry.py",
+      "summary": "Pins MAX_RETRIES == 5 and the stop-at-ceiling behavior.",
+      "source_handles": ["ctx://acme-billing/repo/billing/test_retry.py#test_ceiling_is_five"],
+      "classification": "internal",
+      "freshness": { "staleness": "fresh" },
+      "policy": { "derived_context": true, "promotion_allowed": true, "raw_source_dump_allowed": false },
+      "created_at": "2026-03-20T15:05:00Z"
+    },
+    {
+      "kind": "baltor.context-object.v1",
+      "context_object_id": "obj-runbook",
+      "object_type": "document",
+      "title": "docs/billing-runbook.md (stale)",
+      "summary": "Pre-ADR-014 runbook that still says 3 retries. Stale and contradicts the ADR + code.",
+      "claim": "retries up to 3 times",
+      "source_handles": ["ctx://acme-billing/docs/billing-runbook.md#retry-policy"],
+      "classification": "internal",
+      "freshness": { "staleness": "stale", "effective_date": "2025-11-02" },
+      "provenance": { "content_hash": "sha256:demo-runbook" },
+      "five_w_one_h": { "what": { "topics": ["retry", "retries", "runbook", "ceiling"] } },
+      "policy": { "derived_context": true, "promotion_allowed": false, "raw_source_dump_allowed": false, "requires_refresh": true },
+      "created_at": "2025-11-02T10:00:00Z"
+    },
+    {
+      "kind": "baltor.context-object.v1",
+      "context_object_id": "obj-inc-2026-04",
+      "object_type": "incident",
+      "title": "INC-2026-04: Billing retry storm",
+      "summary": "Unbounded retries amplified a transient outage; motivated ADR-014.",
+      "source_handles": ["ctx://acme-billing/incidents/INC-2026-04-retry-storm.md#summary"],
+      "classification": "internal",
+      "freshness": { "staleness": "dated", "effective_date": "2026-03-10" },
+      "policy": { "derived_context": true, "promotion_allowed": true, "raw_source_dump_allowed": false },
+      "created_at": "2026-03-10T18:00:00Z"
+    },
+    {
+      "kind": "baltor.context-object.v1",
+      "context_object_id": "obj-billing-api",
+      "object_type": "document_section",
+      "title": "billing-api.yaml :: POST /v1/payments:submit",
+      "summary": "Idempotent payment-submit endpoint; safe to retry on 429/502/503/504.",
+      "source_handles": ["ctx://acme-billing/api/billing-api.yaml#submitPayment"],
+      "classification": "internal",
+      "freshness": { "staleness": "fresh" },
+      "policy": { "derived_context": true, "promotion_allowed": true, "raw_source_dump_allowed": false },
+      "created_at": "2026-02-01T00:00:00Z"
+    },
+    {
+      "kind": "baltor.context-object.v1",
+      "context_object_id": "obj-billing-team",
+      "object_type": "team",
+      "title": "billing-team",
+      "summary": "Owns billing-service; escalation via billing-oncall.",
+      "source_handles": ["ctx://acme-billing/org/OWNERS.md#billing-team"],
+      "classification": "internal",
+      "freshness": { "staleness": "fresh" },
+      "policy": { "derived_context": true, "promotion_allowed": true, "raw_source_dump_allowed": false },
+      "created_at": "2026-01-15T00:00:00Z"
+    }
+  ],
+  "relationships": [
+    { "kind": "baltor.context-relationship.v1", "context_relationship_id": "rel-1", "from_id": "obj-bill-782", "to_id": "obj-adr-014", "relationship_type": "CITES", "confidence": 0.95, "source_handles": ["ctx://acme-billing/tickets/BILL-782.json#links"], "created_at": "2026-05-29T09:00:00Z" },
+    { "kind": "baltor.context-relationship.v1", "context_relationship_id": "rel-2", "from_id": "obj-bill-782", "to_id": "obj-retry-py", "relationship_type": "MENTIONS", "confidence": 0.9, "source_handles": ["ctx://acme-billing/tickets/BILL-782.json#links"], "created_at": "2026-05-29T09:00:00Z" },
+    { "kind": "baltor.context-relationship.v1", "context_relationship_id": "rel-3", "from_id": "obj-retry-py", "to_id": "obj-adr-014", "relationship_type": "IMPLEMENTS", "confidence": 0.97, "source_handles": ["ctx://acme-billing/repo/billing/retry.py#L9-L13"], "created_at": "2026-03-20T15:00:00Z" },
+    { "kind": "baltor.context-relationship.v1", "context_relationship_id": "rel-4", "from_id": "obj-test-retry", "to_id": "obj-retry-py", "relationship_type": "SUPPORTS", "confidence": 0.9, "source_handles": ["ctx://acme-billing/repo/billing/test_retry.py#test_ceiling_is_five"], "created_at": "2026-03-20T15:05:00Z" },
+    { "kind": "baltor.context-relationship.v1", "context_relationship_id": "rel-5", "from_id": "obj-adr-014", "to_id": "obj-runbook", "relationship_type": "SUPERSEDES", "confidence": 0.99, "source_handles": ["ctx://acme-billing/decisions/ADR-014-billing-retry-policy.md#decision"], "created_at": "2026-03-18T12:00:00Z" },
+    { "kind": "baltor.context-relationship.v1", "context_relationship_id": "rel-6", "from_id": "obj-runbook", "to_id": "obj-adr-014", "relationship_type": "CONTRADICTS", "confidence": 0.92, "relationship_label": "runbook says 3, ADR says 5", "source_handles": ["ctx://acme-billing/docs/billing-runbook.md#retry-policy"], "created_at": "2026-03-18T12:00:00Z" },
+    { "kind": "baltor.context-relationship.v1", "context_relationship_id": "rel-7", "from_id": "obj-adr-014", "to_id": "obj-inc-2026-04", "relationship_type": "DERIVED_FROM", "confidence": 0.85, "source_handles": ["ctx://acme-billing/decisions/ADR-014-billing-retry-policy.md#context"], "created_at": "2026-03-18T12:00:00Z" },
+    { "kind": "baltor.context-relationship.v1", "context_relationship_id": "rel-8", "from_id": "obj-retry-py", "to_id": "obj-billing-team", "relationship_type": "OWNED_BY", "confidence": 0.9, "source_handles": ["ctx://acme-billing/org/OWNERS.md#billing-team"], "created_at": "2026-03-20T15:00:00Z" },
+    { "kind": "baltor.context-relationship.v1", "context_relationship_id": "rel-9", "from_id": "obj-runbook", "to_id": "obj-billing-team", "relationship_type": "OWNED_BY", "confidence": 0.9, "source_handles": ["ctx://acme-billing/org/OWNERS.md#billing-team"], "created_at": "2025-11-02T10:00:00Z" }
+  ],
+  "assertions": [
+    { "kind": "baltor.context-assertion.v1", "context_assertion_id": "as-1", "subject_id": "obj-adr-014", "predicate": "max_retries", "value": 5, "value_type": "number", "confidence": 0.98, "evidence": ["ctx://acme-billing/decisions/ADR-014-billing-retry-policy.md#decision"], "valid_from": "2026-03-18T12:00:00Z", "created_at": "2026-03-18T12:00:00Z" },
+    { "kind": "baltor.context-assertion.v1", "context_assertion_id": "as-2", "subject_id": "obj-retry-py", "predicate": "max_retries", "value": 5, "value_type": "number", "confidence": 0.95, "evidence": ["ctx://acme-billing/repo/billing/retry.py#L9-L13"], "valid_from": "2026-03-20T15:00:00Z", "created_at": "2026-03-20T15:00:00Z" },
+    { "kind": "baltor.context-assertion.v1", "context_assertion_id": "as-3", "subject_id": "obj-runbook", "predicate": "max_retries", "value": 3, "value_type": "number", "confidence": 0.40, "evidence": ["ctx://acme-billing/docs/billing-runbook.md#retry-policy"], "valid_from": "2025-11-02T10:00:00Z", "valid_to": "2026-03-18T12:00:00Z", "created_at": "2025-11-02T10:00:00Z" }
+  ]
+}

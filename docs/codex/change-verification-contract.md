@@ -30,7 +30,7 @@ No warrant → no commit. **"It's green" is necessary, not sufficient** — a pa
 
 The design row is the reason this contract exists: brand, positioning, UI direction, naming, product
 structure, and pricing are the **owner's strategic calls** — an agent proposes and corroborates; it does
-not decide. Scope intent precisely: "CEaaS = teal **sibling**, same typography, accent swapped" is intent
+not decide. Scope intent precisely: "Baltor = teal **sibling**, same typography, accent swapped" is intent
 for *an accent swap*; changing the whole theme **direction** is **not** covered by it and must be held.
 
 ## Exceptions (allowed — but recorded)

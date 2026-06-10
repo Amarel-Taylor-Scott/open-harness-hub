@@ -1,0 +1,57 @@
+id: "tool/bigquery-cold-tier-export-planner"
+type: tool
+version: "0.1.0"
+name: "BigQuery cold tier export planner"
+description: "Plans batch exports from Postgres and object-storage shards into partitioned BigQuery tables for analytics, vector-search experiments, ranking, telemetry, and cache-reuse economics."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "retrieval", "serving"]
+modality: ["text", "structured", "tabular"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.hosting"
+tags: ["bigquery", "postgres", "object-storage", "export", "vector-search", "cost-control"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    source_tables:
+      type: array
+      items: { type: string }
+    partition_key:
+      type: string
+    clustering_keys:
+      type: array
+      items: { type: string }
+    include_vector_indexes:
+      type: boolean
+    cost_policy:
+      type: object
+  required: ["source_tables"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    export_plan:
+      type: object
+    bigquery_tables:
+      type: array
+      items: { type: object }
+    estimated_monthly_cost_inputs:
+      type: object
+side_effects: "none"
+examples:
+  - input:
+      source_tables: ["trajectory_fragment", "cache_reuse_event", "object_embedding"]
+      partition_key: "created_at"
+      clustering_keys: ["subject_domain", "fragment_kind"]
+      include_vector_indexes: true
+    output:
+      ok: true
+      bigquery_tables: []

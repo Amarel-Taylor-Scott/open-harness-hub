@@ -1,0 +1,50 @@
+id: "rubric/telecom-outage-postmortem-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Telecom Outage Postmortem review quality v1"
+description: "Evaluation rubric for telecom outage postmortem reviews."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["telecommunications.fcc", "sre.oncall"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["telecom-outage-postmortem", "expansion-v3"]
+created: "2026-05-24"
+updated: "2026-05-24"
+dimensions:
+  - id: "coverage"
+    label: "Coverage"
+    weight: 0.22
+    scale: "0.0-1.0"
+    evidence_required: "Required review domains, packet fields, and non-applicable areas are handled."
+  - id: "grounding"
+    label: "Grounding"
+    weight: 0.30
+    scale: "0.0-1.0"
+    evidence_required: "Findings cite packet evidence, rule triggers, or retrieved context identifiers."
+  - id: "calibration"
+    label: "Calibration"
+    weight: 0.18
+    scale: "0.0-1.0"
+    evidence_required: "Severity and confidence reflect impact, reversibility, certainty, and escalation threshold."
+  - id: "actionability"
+    label: "Actionability"
+    weight: 0.20
+    scale: "0.0-1.0"
+    evidence_required: "Remediation names owner, component, timeline, and verification method."
+  - id: "auditability"
+    label: "Auditability"
+    weight: 0.10
+    scale: "0.0-1.0"
+    evidence_required: "Trace includes applied rules, context ids, judge score, and redaction status."
+scoring_method: "weighted_sum"
+examples:
+  - grade: 0.9
+    response: "Evidence-linked findings with calibrated severity and owner-specific remediation."
+    notes: "Ready for governed workflow."
+  - grade: 0.3
+    response: "Uncited summary with generic advice and missing escalation rationale."
+    notes: "Insufficient evidence grounding."

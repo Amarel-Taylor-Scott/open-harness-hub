@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/context-product-surface.schema.json",
+  "title": "Context product surface",
+  "description": "Product-level manifest for packaging Context Fabric modules, interfaces, deployment models, standards mappings, and rollout phases.",
+  "type": "object",
+  "required": ["kind", "product_id", "modules", "interfaces", "deployment_models", "created_at"],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "baltor.context-product-surface.v1"
+    },
+    "product_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "positioning": {
+      "type": "string"
+    },
+    "modules": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["connectors", "object_registry", "versioning_history", "context_graph", "artifact_engine", "policy_permissions", "retrieval_indexing", "pack_builder", "agent_interfaces", "observability_evals", "feedback", "admin_console", "developer_kit", "industry_packs", "custom"]
+      }
+    },
+    "interfaces": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["mcp", "a2a", "rest", "graphql", "webhooks", "sdk", "cli", "ui", "ci_cd", "custom"]
+      }
+    },
+    "deployment_models": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["local_first_developer", "repo_context_as_code", "atlassian_rovo_team", "enterprise_gateway", "custom_context_object_platform", "regulated_enclave", "industry_network", "custom"]
+      }
+    },
+    "standards_mappings": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "mvp_phases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "phase": { "type": "string" },
+          "deliverables": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

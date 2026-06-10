@@ -1,0 +1,32 @@
+{
+  "$id": "graph/TemporalFactTimeline.v1",
+  "title": "TemporalFactTimeline",
+  "description": "Full ordered timeline for a fact_key.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "canonical_fact_key": {
+      "type": "string"
+    },
+    "tenant_id": {
+      "type": "string"
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "states": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "required": [
+    "canonical_fact_key",
+    "tenant_id",
+    "observations"
+  ]
+}

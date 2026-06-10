@@ -34,8 +34,8 @@ Convert audio to mel-spectrograms, train CNN backbone, classify.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `spectrogram_train` | processor | `processor/iterative-revise-loop` | — |
-| 3 | `ensemble_folds` | processor | `processor/multi-vector-fusion` | — |
-| 4 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `spectrogram_train` | processor | `processor/iterative-revise-loop` | - |
+| 3 | `ensemble_folds` | processor | `processor/multi-vector-fusion` | - |
+| 4 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

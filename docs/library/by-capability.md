@@ -1,6 +1,6 @@
 # Library - organized by capability
 
-A capability-grouped index of every artifact in the catalog. Use this
+A capability-grouped index of every component in the catalog. Use this
 as a "what's in the toolbox" overview before you compose a pipeline.
 
 > Live counts (auto-updated by `scripts/build_catalog_index.py`):
@@ -171,7 +171,7 @@ The MCP server emitter exposes every `tool/*` plus model-safe `processor/*` as M
 | `pipeline/email-triage-and-draft` | `triage_email` |
 | `pipeline/everything-research-pipeline` | `research_entity` (kitchen-sink, 22 passes) |
 
-## Quick-reference: which artifacts you'd combine for…
+## Quick-reference: which components you'd combine for…
 
 | Goal | Combine |
 |---|---|

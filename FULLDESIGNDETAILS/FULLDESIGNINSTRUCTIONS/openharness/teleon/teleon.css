@@ -1,0 +1,96 @@
+/* =============================================================================
+   teleon/teleon.css — Teleon-SPECIFIC styles only.
+   Everything else (chrome, hero, app shell, primitive pages) comes from the
+   SHARED kit: shared/oh-site.css + shared/oh-components.css + tokens.
+   Accent is set inline on the root (--accent: violet) — this file only adds the
+   few bespoke bits the kit doesn't cover (lifecycle rail, ecosystem ports, run).
+   ============================================================================= */
+
+/* hero gets a touch more room for the long headline */
+.tln .ohs-hero h1 { max-width: 20ch; }
+
+/* hero proof card (right-side aside) */
+.tln-herocard { padding: 22px; box-shadow: var(--e2); }
+/* hero uses an explicit <br/> for its two lines; lift the kit's 18ch cap so longer
+   A/B second lines (e.g. “We make it dependable.”) stay on one line, never a 3rd. */
+.tln .ohs-hero h1 { max-width: none; text-wrap: pretty; }
+/* hero A/B variant pill (prototype control) */
+.tln-abpill { margin-left: 10px; font-family: var(--font-mono); font-size: 9.5px; font-weight: 700; letter-spacing: .06em;
+              padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--panel);
+              color: var(--fg-muted); cursor: pointer; vertical-align: middle; transition: color .12s, border-color .12s; }
+.tln-abpill:hover { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+.thc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.thc-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--fg-faint); }
+.thc-purpose { font-family: var(--font-display); font-size: 17px; font-weight: 700; line-height: 1.35; color: var(--fg); margin-bottom: 16px; }
+.thc-crit { display: flex; flex-direction: column; gap: 8px; padding: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.thc-crit .crit { display: flex; align-items: center; gap: 9px; font-size: 13.5px; color: var(--fg); }
+.thc-crit .ck { color: var(--accent); font-weight: 700; }
+.thc-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; }
+.thc-foot .mono { font-size: 11px; color: var(--fg-faint); }
+.thc-score { font-family: var(--font-display); font-size: 22px; font-weight: 800; color: var(--accent); }
+
+/* lifecycle rail (marketing) — each step is a small stack: label + plain-language gloss */
+.tln-rail { list-style: none; display: flex; flex-wrap: wrap; gap: 14px 0; padding: 0; margin: 32px 0 0; }
+.tln-rail-step { display: flex; align-items: center; gap: 12px; }
+.tln-rail-step .st { display: flex; flex-direction: column; gap: 2px; }
+.tln-rail-step .n { font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--accent); }
+.tln-rail-step .lbl { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--fg); white-space: nowrap; }
+.tln-rail-step .gloss { font-size: 11.5px; color: var(--fg-muted); white-space: nowrap; }
+.tln-rail-step .arr { color: var(--fg-faint); margin: 0 16px; align-self: center; }
+
+/* ecosystem ports */
+.tln-ports { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 32px; }
+.tln-port .pf { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+.tln-port .pn { font-family: var(--font-display); font-size: 14px; font-weight: 700; padding: 6px 11px; border-radius: var(--r-md);
+                border: 1px solid var(--line); }
+.tln-port .pn.src { color: var(--fg); background: var(--bg-subtle); }
+.tln-port .pn.dst { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); background: var(--accent-weak); }
+.tln-port .pa { color: var(--fg-faint); }
+.tln-port p { font-size: 13px; line-height: 1.55; color: var(--fg-muted); margin: 0; }
+
+/* run lifecycle progress */
+.tln-prog { display: flex; flex-direction: column; }
+.tln-prog .row { display: flex; align-items: center; gap: 11px; padding: 11px 2px; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--fg-faint); }
+.tln-prog .row:last-child { border-bottom: none; }
+.tln-prog .row .mk { width: 16px; text-align: center; }
+.tln-prog .row.active, .tln-prog .row.done { color: var(--fg); }
+.tln-prog .row.active .mk { color: var(--accent); display: inline-block; animation: tln-spin 1s linear infinite; }
+@keyframes tln-spin { to { transform: rotate(360deg); } }
+.tln-result { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+.tln-result .mono { font-size: 11.5px; color: var(--fg-faint); }
+
+@media (max-width: 1000px) { .tln-ports { grid-template-columns: 1fr; } }
+
+/* ---- Where Teleon fits (honest landscape vs the OSS runtime stack) ---- */
+.tln-fits .ohs-pagehead { margin-bottom: 30px; }
+.tln-fits .ohs-pagehead h1 { max-width: 30ch; }
+.tln-fits-cats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 13px; margin-top: 6px; }
+.tln-fits-cat { padding: 16px 18px; }
+.tln-fits-cat .ci { font-size: 10px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--fg-faint); }
+.tln-fits-cat .cn { font-size: 15.5px; font-weight: 700; color: var(--fg); letter-spacing: -.01em; margin-top: 4px; }
+.tln-fits-cat .tools { display: flex; flex-wrap: wrap; gap: 6px; margin: 11px 0 12px; }
+.tln-fits-cat .tools span { font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted); border: 1px solid var(--line); border-radius: 5px; padding: 3px 8px; background: var(--bg-subtle); white-space: nowrap; }
+.tln-fits-cat .does { font-size: 12.5px; line-height: 1.5; color: var(--fg-muted); }
+.tln-fits-cat .fit { font-size: 12.5px; line-height: 1.5; color: var(--fg); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); display: flex; gap: 8px; }
+.tln-fits-cat .fit .k { color: var(--accent); font-weight: 700; flex: 0 0 auto; }
+
+.tln-fits-gap { padding: 20px 22px; margin-top: 22px; border-color: color-mix(in srgb, var(--accent) 36%, var(--line)); background: var(--accent-weak); }
+.tln-fits-gap h3 { font-size: 17px; font-weight: 800; letter-spacing: -.02em; margin: 0; color: var(--fg); }
+.tln-fits-gap p { font-size: 13.5px; line-height: 1.55; color: var(--fg-muted); margin: 9px 0 0; max-width: 80ch; }
+.tln-fits-gap .triad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+.tln-fits-gap .tr { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-md); padding: 13px 15px; }
+.tln-fits-gap .tr .t { font-size: 13.5px; font-weight: 700; color: var(--fg); }
+.tln-fits-gap .tr .d { font-size: 12px; color: var(--fg-muted); margin-top: 5px; line-height: 1.45; }
+.tln-fits-gap .tr .x { font-size: 10px; color: var(--fg-faint); margin-top: 8px; }
+
+.tln-fits-h { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--fg-faint); margin: 30px 0 14px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.tln-fits-io { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.tln-fits-io .oh-card { padding: 14px 16px; }
+.tln-fits-io .t { font-size: 13.5px; font-weight: 700; color: var(--fg); }
+.tln-fits-io .d { font-size: 12px; color: var(--fg-muted); margin-top: 6px; line-height: 1.45; }
+
+.tln-fits-foot { margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--line); }
+.tln-fits-foot p { font-size: 12px; color: var(--fg-faint); line-height: 1.6; margin: 0 0 16px; }
+.tln-fits-cta { display: flex; gap: 12px; flex-wrap: wrap; }
+
+@media (max-width: 760px) { .tln-fits-cats, .tln-fits-io { grid-template-columns: 1fr; } .tln-fits-gap .triad { grid-template-columns: 1fr; } }

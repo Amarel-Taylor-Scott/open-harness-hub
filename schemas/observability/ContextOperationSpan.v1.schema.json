@@ -1,0 +1,19 @@
+{
+  "$id": "observability/ContextOperationSpan.v1",
+  "title": "ContextOperationSpan",
+  "description": "One unit of work in a Baltor context operation (pipeline stage / verifier / worker run), recorded by the observability provider seam. Time is injected (occurred_at); the provider DESCRIBES, it is never the authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "span_id": {"type": "string"},
+    "parent_id": {"type": ["string", "null"]},
+    "operation": {"type": "string"},
+    "status": {"type": "string", "enum": ["ok", "error", "held_out"]},
+    "occurred_at": {"type": "string", "description": "injected ISO-8601 timestamp; never wall-clock"},
+    "object_ref": {"type": ["string", "null"]},
+    "correlation_id": {"type": ["string", "null"]},
+    "governance": {"type": "object"},
+    "attributes": {"type": "object"}
+  },
+  "required": ["span_id", "operation", "status", "occurred_at"]
+}

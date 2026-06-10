@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/presentation/format-profile.schema.json",
+  "title": "Format profile",
+  "description": "Controls FORMATTING (not wording) of rendered context for a surface/audience: casing, source-handle/receipt visibility, lineage/policy verbosity, metric + risk styling. Distinct from alias packs (which control copy).",
+  "type": "object",
+  "required": ["kind", "id"],
+  "properties": {
+    "kind": { "type": "string", "const": "baltor.format-profile.v1" },
+    "id": { "type": "string", "pattern": "^format\\." },
+    "title_case": { "type": "boolean" },
+    "show_source_handle_uris": { "type": "boolean" },
+    "show_receipt_ids": { "type": "boolean" },
+    "lineage_detail": { "type": "string", "enum": ["none", "summary", "full"] },
+    "policy_detail": { "type": "string", "enum": ["none", "summary", "full"] },
+    "metric_style": { "type": "string", "enum": ["compact", "verbose"] },
+    "risk_style": { "type": "string", "enum": ["plain_language", "classification", "score"] },
+    "technical_detail_level": { "type": "string", "enum": ["low", "medium", "high"] }
+  },
+  "additionalProperties": true
+}

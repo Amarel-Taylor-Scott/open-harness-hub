@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/source-record.schema.json",
+  "title": "Source record",
+  "description": "Canonical metadata for a raw or semi-raw source item before extraction into normalized objects.",
+  "type": "object",
+  "required": ["source_record_id", "source_type", "publisher", "retrieved_at", "body"],
+  "properties": {
+    "source_record_id": { "type": "string" },
+    "source_type": {
+      "type": "string",
+      "enum": ["web_page", "api_record", "dataset_file", "archive_capture", "repository_file", "package_record", "workflow_file", "document", "user_upload", "signed_submission"]
+    },
+    "source_url": { "type": "string" },
+    "archive_url": { "type": "string" },
+    "publisher": { "type": "string" },
+    "license": { "type": "string" },
+    "state": { "$ref": "_common.schema.json#/$defs/objectState" },
+    "state_history": {
+      "type": "array",
+      "items": { "$ref": "_common.schema.json#/$defs/stateEvent" }
+    },
+    "source_role": { "$ref": "_common.schema.json#/$defs/sourceRole" },
+    "archive_status": { "$ref": "_common.schema.json#/$defs/archiveStatus" },
+    "trust_tier": { "type": "string" },
+    "trust_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "trust_signals": {
+      "type": "object",
+      "properties": {
+        "official_domain": { "type": "boolean" },
+        "https": { "type": "boolean" },
+        "canonical_url": { "type": "string" },
+        "publisher_identity_present": { "type": "boolean" },
+        "updated_at_present": { "type": "boolean" },
+        "archive_available": { "type": "boolean" },
+        "prior_acceptance_rate": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": true
+    },
+    "injection_risk": { "type": "number", "minimum": 0, "maximum": 1 },
+    "injection_flags": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "privacy_boundary": { "type": "string" },
+    "freshness": { "type": "string" },
+    "priority_signals": { "$ref": "_common.schema.json#/$defs/prioritySignals" },
+    "queue_policy": { "$ref": "_common.schema.json#/$defs/queuePolicy" },
+    "retrieved_at": { "type": "string" },
+    "effective_date": { "type": "string" },
+    "content_hash": { "type": "string" },
+    "language": { "type": "string" },
+    "jurisdiction": { "type": "string" },
+    "body": { "type": "object" },
+    "storage_ref": {
+      "type": "object",
+      "properties": {
+        "bucket": { "type": "string" },
+        "key": { "type": "string" },
+        "media_type": { "type": "string" },
+        "size_bytes": { "type": "integer" }
+      }
+    }
+  }
+}

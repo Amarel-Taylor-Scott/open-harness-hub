@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/context/source-expansion-request.schema.json",
+  "title": "Source expansion request",
+  "description": "A request to expand a ctx:// source handle back to its raw evidence. Expansion is never automatic — this request is evaluated by the policy gate (ACL, classification, expansion policy, freshness, prompt-injection). The agent normally works from the compact pack; it asks for raw only when needed.",
+  "type": "object",
+  "required": ["kind", "source_handle", "purpose", "requester"],
+  "properties": {
+    "kind": { "type": "string", "const": "baltor.source-expansion-request.v1" },
+    "source_handle": { "type": "string", "pattern": "^ctx://" },
+    "purpose": { "type": "string" },
+    "requester": { "type": "string" },
+    "max_tokens": { "type": "integer", "minimum": 1 },
+    "expansion_depth": { "type": "string", "enum": ["excerpt", "node", "node_with_context", "full"] },
+    "is_write_action": { "type": "boolean" },
+    "policy_context": { "type": "object", "additionalProperties": true },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": true
+}

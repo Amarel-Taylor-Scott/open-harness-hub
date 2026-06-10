@@ -1,0 +1,61 @@
+id: "tool/embedding-index-search"
+type: tool
+version: "0.1.0"
+name: "Embedding index search"
+description: "Queries a dense vector index and returns semantically similar catalog objects, policy passages, examples, or prior pipeline blueprints with citation metadata."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "cross_industry"]
+capability: ["retrieval", "evaluation"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+tags: ["embeddings", "vector-search", "retrieval", "rag", "saas"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    query:
+      type: string
+    index:
+      type: string
+      description: "Logical index or collection name."
+    top_k:
+      type: integer
+      default: 20
+    filters:
+      type: object
+    include_vectors:
+      type: boolean
+      default: false
+  required: ["query", "index"]
+returns:
+  type: object
+  properties:
+    results:
+      type: array
+      items:
+        type: object
+    index_snapshot:
+      type: string
+    embedding_model:
+      type: string
+side_effects: "read"
+examples:
+  - input:
+      query: "low-cost OFW placement fee overcharging moderation"
+      index: "catalog"
+      top_k: 5
+    output:
+      results: []
+      index_snapshot: "example-snapshot"
+      embedding_model: "example-embedder"
+implementations:
+  - kind: "callable"
+    path: "tools.embedding_index_search.run"
+  - kind: "mcp"
+    path: "mcp/vector.search"

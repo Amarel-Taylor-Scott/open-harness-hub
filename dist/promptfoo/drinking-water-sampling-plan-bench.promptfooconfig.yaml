@@ -1,0 +1,53 @@
+# Auto-generated from Open Harness Hub `benchmark/drinking-water-sampling-plan-bench` v0.1.0.
+# Re-run `python scripts/emit/promptfoo.py` after editing the source manifest.
+description: Synthetic benchmark for drinking water sampling plan review quality, evidence grounding, citation checks, and
+  redaction safety.
+prompts:
+- '{{prompt}}'
+providers:
+- id: ollama:llama3.1:8b
+  label: ollama-default
+  config:
+    apiBaseUrl: http://localhost:11434
+defaultTest:
+  assert:
+  - type: llm-rubric
+    value: Coverage. Domain-specific review areas are covered or marked not applicable.
+    metric: coverage
+    weight: 0.18
+  - type: llm-rubric
+    value: Evidence grounding. Findings cite packet evidence, rule ids, or retrieved context ids.
+    metric: grounding
+    weight: 0.3
+  - type: llm-rubric
+    value: Evidence gap handling. Missing components are separated from confirmed violations.
+    metric: gap_handling
+    weight: 0.14
+  - type: llm-rubric
+    value: Severity calibration. Severity reflects impact and confidence.
+    metric: severity
+    weight: 0.16
+  - type: llm-rubric
+    value: Actionable remediation. Actions name owner, component, mitigation, and verification.
+    metric: remediation
+    weight: 0.14
+  - type: llm-rubric
+    value: Audit readiness. Trace includes context ids, processor outputs, redaction status, model arm, and score.
+    metric: audit
+    weight: 0.08
+tests:
+- description: Sample row 0 from dataset/drinking-water-sampling-plan-samples
+  vars:
+    prompt: 'TODO: replace with rows from dataset'
+outputPath: ./reports/drinking-water-sampling-plan-bench.json
+writeLatestResults: true
+metadata:
+  open_harness_hub_id: benchmark/drinking-water-sampling-plan-bench
+  version: 0.1.0
+  headline_metric: rubric_weighted_sum_with_redaction_and_citation_gates
+  reproducibility:
+    commit_sha: worktree-generated-2026-05-24
+    dataset_version: 0.1.0
+    run_date: '2026-05-24'
+    hardware: local-dev
+    seed: 31

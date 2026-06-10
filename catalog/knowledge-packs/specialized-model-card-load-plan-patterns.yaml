@@ -1,0 +1,47 @@
+id: "knowledge-pack/specialized-model-card-load-plan-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Specialized model card load plan patterns"
+description: "Load-plan patterns for preflighting, promotion-scoring, review-routing, and exporting specialized model-card row families into Postgres/pgvector bulk-load packages."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["healthcare", "finance", "legal", "software.devops", "media", "security", "privacy", "government", "cross_industry"]
+capability: ["governance", "evaluation", "retrieval", "routing", "serving", "embedding"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["huggingface", "model-cards", "bulk-load", "promotion-scoring", "postgres", "pgvector", "review-routing"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+domain: "specialized model card load planning"
+facts:
+  - "Specialized model-card row families should pass relationship preflight before database load."
+  - "Promotion decisions are advisory and should not bypass review for high-impact, license-sensitive, or dedupe-sensitive candidates."
+  - "The load plan emits CSV and psql load SQL for Postgres/pgvector without storing model weights or private training data."
+sources:
+  - title: "Specialized model-card load plan stages"
+    path: "catalog/knowledge-packs/data/specialized-model-card-load-plan-patterns/stages.jsonl"
+content_types:
+  - "load_plan_stage"
+  - "promotion_audit"
+  - "bulk_load_contract"
+files:
+  - path: "catalog/knowledge-packs/data/specialized-model-card-load-plan-patterns/stages.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    recommended: true
+    fields: ["stage", "purpose", "inputs", "outputs"]
+provenance:
+  sources:
+    - "scripts/factory/specialized_model_card_load_plan.py"
+    - "dist/specialized-model-card-load-plan/seed/load-plan-manifest.json"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "public model metadata only; no model weights, private training data, PII, or source bodies copied"
+

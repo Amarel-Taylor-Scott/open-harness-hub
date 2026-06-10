@@ -103,7 +103,7 @@ enforces:
 - **Bounded inputs.** The loop reads a fixed, governed context first — `docs/codex/master-goal.md`
   (the single canonical goal), the architecture docs, `services/registry.yaml` (the live `active` vs
   `planned` map), and `.research-notes/autonomous-session-ledger.md` (what the last run did). It does
-  not free-associate from training data; it grounds in the repo, exactly as a CEaaS-served agent
+  not free-associate from training data; it grounds in the repo, exactly as a Baltor-served agent
   grounds in a governed corpus.
 - **Bounded outputs.** "Stage only YOUR files — the working tree carries pre-existing drift; never
   `git add -A`." This is the I/O gate of the development harness: a deliberate output boundary so one

@@ -1,0 +1,11 @@
+{
+  "schema": "schemas/config/retry_policy.v1.schema.json",
+  "version": "v1",
+  "owner": "runtime-durable",
+  "environment_scope": "all",
+  "config_type": "retry_policy",
+  "max_attempts": 5,
+  "backoff": {"strategy": "exponential", "base_seconds": 2, "max_seconds": 300},
+  "dlq_behavior": {"on_exhausted": "dead_letter", "queue": "<queue>.dlq", "replayable": true},
+  "notes": "A retry policy MUST declare dlq_behavior: what happens after max_attempts is exhausted. max_attempts is finite (no infinite retry). Dead-lettered jobs are inspectable and replayable; nothing is silently dropped."
+}

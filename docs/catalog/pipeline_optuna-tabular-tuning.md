@@ -32,6 +32,6 @@ Run Optuna study to find best hyperparameters; return best params + CV score.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `search` | processor | `processor/iterative-revise-loop` | — |
-| 2 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `search` | processor | `processor/iterative-revise-loop` | - |
+| 2 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

@@ -1,0 +1,80 @@
+id: "tool/source-surface-partition-planner"
+type: tool
+version: "0.1.0"
+name: "Source surface partition planner"
+description: "Converts high-value source-surface backlog rows into deterministic, resumable scan partitions and public-source blueprints that can be handed to containerized discovery and ingestion workers."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["government", "software", "media", "construction", "energy", "finance", "healthcare", "cross_industry"]
+capability: ["retrieval", "extraction", "governance", "routing", "evaluation"]
+modality: ["text", "structured", "image"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+tags: ["source-surfaces", "partitioning", "object-factory", "worker-queue", "resume-cursors"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    source_surfaces:
+      type: array
+      items:
+        type: object
+    output_dir:
+      type: string
+    run_id:
+      type: string
+    max_sources_per_partition:
+      type: integer
+    max_records_per_partition:
+      type: integer
+  required: ["source_surfaces"]
+returns:
+  type: object
+  properties:
+    output_dir:
+      type: string
+    run_id:
+      type: string
+    source_surface_count:
+      type: integer
+    partition_count:
+      type: integer
+    blueprint_count:
+      type: integer
+    partition_counts_by_risk:
+      type: object
+    files:
+      type: array
+      items:
+        type: string
+    warnings:
+      type: array
+      items:
+        type: string
+side_effects: "write"
+examples:
+  - input:
+      source_surfaces:
+        - id: "municipal-permit-trade-checklists"
+          vertical: "construction.trades"
+          source_patterns: ["permit checklist pages", "inspection correction forms"]
+          candidate_primitives: ["permit_requirement_fact", "inspection_question"]
+          partition_count: 2
+          excluded_scope: ["insurance"]
+      max_sources_per_partition: 2
+    output:
+      source_surface_count: 1
+      partition_count: 2
+      blueprint_count: 2
+      partition_counts_by_risk:
+        medium: 2
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.source_surface_partition_planner.plan_source_surface_partitions"
+    language: "python"
+  - kind: "mcp"
+    path: "mcp/factory.plan_source_surface_partitions"

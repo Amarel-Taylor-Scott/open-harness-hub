@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/index-delta-record.schema.json",
+  "title": "Index delta record",
+  "description": "Append-only index update for a partitioned source-derived object.",
+  "type": "object",
+  "required": ["delta_id", "partition_id", "operation", "index_record"],
+  "properties": {
+    "delta_id": { "type": "string" },
+    "partition_id": { "type": "string" },
+    "run_id": { "type": "string" },
+    "operation": { "type": "string", "enum": ["upsert", "delete", "tombstone"] },
+    "index_record": { "$ref": "index-record.schema.json" },
+    "sequence": { "type": "integer", "minimum": 0 },
+    "created": { "type": "string", "format": "date-time" },
+    "content_hash": { "type": "string" },
+    "replay_policy": {
+      "type": "object",
+      "properties": {
+        "idempotency_key": { "type": "string" },
+        "replace_subject": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}
+

@@ -1,0 +1,201 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/pharma-batch-record-review-frameworks",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Pharma Batch Record Review frameworks",
+  "description": "Composite benchmark and review context pack for pharma batch record review workflows.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC-BY-4.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/pharma-batch-record-review-frameworks",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-24",
+  "keywords": [
+    "pharma-batch-record-review",
+    "expansion-v7"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-24",
+  "citation": "Pharma Batch Record Review control checklist; Pharma Batch Record Review evidence matrix; Pharma Batch Record Review escalation playbook; Pharma Batch Record Review benchmark context",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "pharma-batch-record-review-frameworks__frameworks",
+      "name": "frameworks.jsonl",
+      "description": "Data file backing knowledge pack pharma-batch-record-review-frameworks.",
+      "contentUrl": "data/pharma-batch-record-review/frameworks.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "348451 B",
+      "sha256": "5a26ca41856cb44ffd7ee7e09b2da004f2866f3dc07bc40dbce13d31193500c6"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "pharma-batch-record-review-frameworks__records",
+      "name": "pharma-batch-record-review-frameworks__records",
+      "description": "Records parsed from frameworks.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "pharma-batch-record-review-frameworks__records/id",
+          "name": "id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "pharma-batch-record-review-frameworks__frameworks"
+            },
+            "extract": {
+              "column": "id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "pharma-batch-record-review-frameworks__records/source",
+          "name": "source",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "pharma-batch-record-review-frameworks__frameworks"
+            },
+            "extract": {
+              "column": "source"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "pharma-batch-record-review-frameworks__records/text",
+          "name": "text",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "pharma-batch-record-review-frameworks__frameworks"
+            },
+            "extract": {
+              "column": "text"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "pharma-batch-record-review-frameworks__records/title",
+          "name": "title",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "pharma-batch-record-review-frameworks__frameworks"
+            },
+            "extract": {
+              "column": "title"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "pharma-batch-record-review-frameworks__records/use_case",
+          "name": "use_case",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "pharma-batch-record-review-frameworks__frameworks"
+            },
+            "extract": {
+              "column": "use_case"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "pharma-batch-record-review-frameworks__records/version",
+          "name": "version",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "pharma-batch-record-review-frameworks__frameworks"
+            },
+            "extract": {
+              "column": "version"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "pharma-batch-record-review-frameworks__records/aspect",
+          "name": "aspect",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "pharma-batch-record-review-frameworks__frameworks"
+            },
+            "extract": {
+              "column": "aspect"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "pharma-batch-record-review-frameworks__records/scenario",
+          "name": "scenario",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "pharma-batch-record-review-frameworks__frameworks"
+            },
+            "extract": {
+              "column": "scenario"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

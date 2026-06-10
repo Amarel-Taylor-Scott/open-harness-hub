@@ -1,0 +1,90 @@
+id: "pipeline/approved-component-promotion-plan"
+type: pipeline
+version: "0.1.0"
+name: "Approved component promotion plan"
+description: "Creates CSV and SQL load bundles that move only review-approved component candidates into active Postgres component, component version, and subcomponent rows."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["evaluation", "governance", "routing", "verification"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "promotion", "review-gate", "postgres", "component-version", "subcomponents"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Create a review-gated Postgres load plan for active components, versions, subcomponents, and candidate state transitions."
+pipeline_kind: "research_web.approved_component_promotion_plan"
+inputs:
+  - name: "component_candidates_path"
+    type: "string"
+  - name: "subcomponent_candidates_path"
+    type: "string"
+  - name: "promotion_decisions_path"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "approved_component_promotion_plan"
+    type: "json"
+  - name: "components_csv"
+    type: "csv"
+  - name: "component_versions_csv"
+    type: "csv"
+  - name: "subcomponents_csv"
+    type: "csv"
+  - name: "candidate_state_updates_csv"
+    type: "csv"
+  - name: "load_sql"
+    type: "sql"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/approved-component-promotion-patterns"
+steps:
+  - id: "load-approved-promotion-checks"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/approved-component-promotion-patterns"
+    inputs:
+      query: "approved component promotion review gate component version subcomponent postgres load"
+      top_k: 20
+  - id: "plan-approved-component-promotion"
+    kind: "tool"
+    ref: "tool/approved-component-promotion-planner"
+    inputs:
+      component_candidates_path: "$.inputs.component_candidates_path"
+      subcomponent_candidates_path: "$.inputs.subcomponent_candidates_path"
+      promotion_decisions_path: "$.inputs.promotion_decisions_path"
+      output_dir: "$.inputs.output_dir"
+  - id: "audit-staged-vs-committed"
+    kind: "tool"
+    ref: "tool/staged-vs-committed-load-auditor"
+    inputs:
+      reason: "After psql execution, compare active component, version, subcomponent, and candidate state counts with planned counts."
+success_criteria:
+  - kind: "deterministic"
+    target: "$.approved_component_promotion_plan.candidate_state_update_count"
+    op: ">"
+    value: 0
+    severity: "high"
+    label: "Candidate state transitions are exported."
+  - kind: "deterministic"
+    target: "$.approved_component_promotion_plan.approved_component_count"
+    op: ">="
+    value: 0
+    severity: "high"
+    label: "Active component rows are exported only when decisions approve promotion."
+  - kind: "semantic"
+    target: "$.approved_component_promotion_plan"
+    must_cover:
+      - "review-approved candidates"
+      - "active component rows"
+      - "component versions"
+      - "subcomponents"
+      - "candidate state transitions"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Load plan preserves review-gated active component promotion."

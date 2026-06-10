@@ -1,0 +1,129 @@
+{
+  "version": "1.0",
+  "purpose": "Cross-hub bridge graph for the public artifact hubs modeled here (owner-directed 2026-06-06). Encodes how context, skills, tools, MCP connectivity, compression, benchmarks, and harnesses relate and flow into Teleon + Baltor, and asserts the governance rule: NONE of the open hubs is a truth authority \u2014 Baltor governs context, Teleon runs capabilities. Read by scripts/check_open_hubs_bridge_graph.py.",
+  "relationship_chain": "OpenContextHub supplies context \u2192 OpenSkillsHub teaches how \u2192 OpenToolsHub gives execution \u2192 OpenMCPHub connects tools \u2192 OpenCompressionHub makes context cheap \u2192 OpenBenchmarkHub defines what good means \u2192 OpenHarnessHub proves it \u2192 Teleon runs and evolves \u2192 Baltor governs truth \u2192 AI Done Right coordinates the portfolio",
+  "artifact_owners": {
+    "ContextArtifact": "opencontexthub",
+    "SkillArtifact": "openskillshub",
+    "ToolArtifact": "opentoolshub",
+    "HarnessArtifact": "openharnesshub",
+    "BenchmarkArtifact": "openbenchmarkhub",
+    "MCPServerArtifact": "openmcphub",
+    "CompressionCandidate": "opencompressionhub"
+  },
+  "truth_authority": "baltor",
+  "runtime": "teleon",
+  "hubs_are_not_truth_authorities": [
+    "opencontexthub",
+    "openskillshub",
+    "opentoolshub",
+    "openharnesshub",
+    "openbenchmarkhub",
+    "openmcphub",
+    "opencompressionhub"
+  ],
+  "nodes": [
+    "ContextArtifact",
+    "SkillArtifact",
+    "ToolArtifact",
+    "HarnessArtifact",
+    "CapabilitySlot",
+    "TeleonPurposeTask",
+    "Baltor",
+    "BenchmarkArtifact",
+    "BenchmarkResult",
+    "MCPServerArtifact",
+    "CompressionCandidate",
+    "PromotionDecision"
+  ],
+  "edges": [
+    {
+      "from": "ContextArtifact",
+      "rel": "EVALUATED_BY",
+      "to": "HarnessArtifact"
+    },
+    {
+      "from": "ContextArtifact",
+      "rel": "USED_BY",
+      "to": "SkillArtifact"
+    },
+    {
+      "from": "SkillArtifact",
+      "rel": "USES",
+      "to": "ToolArtifact"
+    },
+    {
+      "from": "ToolArtifact",
+      "rel": "EVALUATED_BY",
+      "to": "HarnessArtifact"
+    },
+    {
+      "from": "HarnessArtifact",
+      "rel": "TESTS",
+      "to": "CapabilitySlot"
+    },
+    {
+      "from": "TeleonPurposeTask",
+      "rel": "CONSUMES",
+      "to": "ContextArtifact"
+    },
+    {
+      "from": "TeleonPurposeTask",
+      "rel": "CONSUMES",
+      "to": "SkillArtifact"
+    },
+    {
+      "from": "TeleonPurposeTask",
+      "rel": "CONSUMES",
+      "to": "ToolArtifact"
+    },
+    {
+      "from": "TeleonPurposeTask",
+      "rel": "CONSUMES",
+      "to": "HarnessArtifact"
+    },
+    {
+      "from": "Baltor",
+      "rel": "GOVERNS",
+      "to": "ContextArtifact"
+    },
+    {
+      "from": "BenchmarkArtifact",
+      "rel": "RUN_BY",
+      "to": "HarnessArtifact"
+    },
+    {
+      "from": "BenchmarkArtifact",
+      "rel": "TESTS",
+      "to": "CapabilitySlot"
+    },
+    {
+      "from": "BenchmarkResult",
+      "rel": "SUPPORTS",
+      "to": "PromotionDecision"
+    },
+    {
+      "from": "MCPServerArtifact",
+      "rel": "PROVIDES",
+      "to": "ToolArtifact"
+    },
+    {
+      "from": "CompressionCandidate",
+      "rel": "OPTIMIZES",
+      "to": "ContextArtifact"
+    },
+    {
+      "from": "CompressionCandidate",
+      "rel": "EVALUATED_BY",
+      "to": "HarnessArtifact"
+    }
+  ],
+  "governance_rule": "An open-hub artifact is a reference/candidate, never served truth: discovery is not trust, similarity is not equivalence, output is not truth. Teleon consumes artifacts; Baltor governs whether context becomes verified, reconciled, current, and served.",
+  "boundary_laws": {
+    "benchmark_vs_harness": "OpenBenchmarkHub defines WHAT to measure (benchmarks/metrics/datasets/results/suitability); OpenHarnessHub runs HOW (harnesses/runners/rubrics/fixtures/conformance). NEVER merged.",
+    "benchmark_result_cannot_promote": true,
+    "benchmark_result_note": "A benchmark result is EVIDENCE, not authority. It cannot by itself promote a Teleon candidate or become Baltor truth; promotion still requires policy gates + receipts + source handles + task-specific scorecards + redteam.",
+    "mcp_discovery_not_trust": "OpenMCPHub discovery/metadata is NOT trust; MCP execution is gated through Teleon/OpenTools policy + risk/conformance.",
+    "compression_must_preserve_fidelity": "OpenCompressionHub: token savings are INVALID unless answer-critical facts, source handles, held-out warnings, receipts, and tenant scope all survive."
+  }
+}

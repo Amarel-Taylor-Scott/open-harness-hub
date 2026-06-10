@@ -10,11 +10,13 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-# Core deps always; scale extras (Celery, Prometheus, OTel) only when INSTALL_PLATFORM=1 — keeps the
-# default image light (see requirements-platform.txt, docs/architecture/backend-services-and-platform.md).
+# Core deps always; local deterministic context extras by default; scale platform
+# extras (Celery, Prometheus, OTel) only when INSTALL_PLATFORM=1.
 ARG INSTALL_PLATFORM=0
-COPY requirements.txt requirements-platform.txt ./
+ARG INSTALL_CONTEXT_LOCAL=1
+COPY requirements.txt requirements-platform.txt requirements-context-local.txt ./
 RUN pip install --no-cache-dir -r requirements.txt \
+ && if [ "$INSTALL_CONTEXT_LOCAL" = "1" ]; then pip install --no-cache-dir -r requirements-context-local.txt; fi \
  && if [ "$INSTALL_PLATFORM" = "1" ]; then pip install --no-cache-dir -r requirements-platform.txt; fi
 
 COPY . .

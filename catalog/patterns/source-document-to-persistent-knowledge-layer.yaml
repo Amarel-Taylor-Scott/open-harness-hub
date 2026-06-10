@@ -26,9 +26,9 @@ when_to_use:
 
 structural_shape:
   - "step 1 — ingest source document into local store (chunks + embeddings + page anchors)"
-  - "step 2 — extract structured artifacts: section summaries, key terms, claims, methods, equations, people, datasets, relationships"
-  - "step 3 — persist structured artifacts as wiki pages + concept graph + study guide"
-  - "step 4 — chat becomes a thin UI over the persistent layer — answers reference the same artifacts"
+  - "step 2 — extract structured components: section summaries, key terms, claims, methods, equations, people, datasets, relationships"
+  - "step 3 — persist structured components as wiki pages + concept graph + study guide"
+  - "step 4 — chat becomes a thin UI over the persistent layer — answers reference the same components"
   - "step 5 — user-generated annotations (bookmarks + notes) accumulate onto the layer"
   - "step 6 — assistant + tools share state; subsequent sessions resume the structured layer"
 
@@ -38,12 +38,12 @@ problem: |
   the same concept map from scratch. For users who return to a document
   repeatedly (researchers, students, auditors, lawyers), this wastes both
   human and model effort + prevents the formation of shared, citable
-  artifacts the team can rely on.
+  components the team can rely on.
 
 solution: |
   Encode the source document as a *persistent knowledge layer* in a local
   database: wiki pages, concept graph nodes + edges, study guide, key term
-  glossary, bookmarks, notes, chat history. Each artifact carries a source
+  glossary, bookmarks, notes, chat history. Each component carries a source
   pointer (page + span). The chat becomes a thin UI surfacing the layer +
   letting the user extend it; the model's role is to populate + maintain
   the layer rather than answer one-off questions in isolation. Subsequent

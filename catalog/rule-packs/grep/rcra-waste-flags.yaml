@@ -1,67 +1,801 @@
-id: "rule-pack/grep-rcra-waste-flags"
+id: rule-pack/grep-rcra-waste-flags
 type: rule-pack
-version: "0.1.0"
-name: "RCRA hazardous waste + e-Manifest + DOT HMR flags"
-description: "Detectors for 40 CFR 260-279 + e-Manifest + DOT 49 CFR 172 compliance gaps."
-authors: [{ name: "Open Harness Hub contributors" }]
-license: "MIT"
-industry:   ["waste", "waste.rcra_tsdf", "waste.generator", "waste.universal"]
-capability: ["safety_gating", "classification"]
-modality:   ["text"]
-lifecycle:  "beta"
-trust_boundary: "local"
-freshness:  "volatile"
-tags: ["rcra", "waste", "hazmat"]
-created: "2026-05-21"
-updated: "2026-05-21"
-
-family: "grep"
+version: 0.1.0
+name: RCRA hazardous waste + e-Manifest + DOT HMR flags
+description: Detectors for 40 CFR 260-279 + e-Manifest + DOT 49 CFR 172 compliance
+  gaps.
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- waste
+- waste.rcra_tsdf
+- waste.generator
+- waste.universal
+capability:
+- safety_gating
+- classification
+modality:
+- text
+lifecycle: beta
+trust_boundary: local
+freshness: volatile
+tags:
+- rcra
+- waste
+- hazmat
+created: '2026-05-21'
+updated: '2026-05-25'
+family: grep
 rules:
-  - id: "generator_status_miscategorized_lqg"
-    pattern: "(?i)(?:self[- ]?identified|categorized)\\s+as\\s+(?:a\\s+)?(?:small\\s+quantity\\s+generator|sqg|vsqg)[\\s\\S]{0,300}?(?:generating\\s+(?:over\\s+1[0-9]{3}|>\\s*1000)\\s*kg|well\\s+into\\s+(?:lqg|large\\s+quantity)\\s+territory|placing\\s+it[\\s\\S]{0,160}?lqg)"
-    severity: "critical"
-    category: "waste.generator.miscategorized"
-  - id: "accumulation_past_limit"
-    pattern: "(?i)(?:drums?|containers?)[\\s\\S]{0,200}?(?:over\\s+1[0-9]{2}\\s+days?\\s+old|past\\s+(?:90|180|270)[- ]?day|exceeding\\s+(?:the\\s+)?(?:90|180|270)[- ]?day)"
-    severity: "critical"
-    category: "waste.accumulation.exceeded"
-  - id: "container_marking_missing"
-    pattern: "(?i)(?:no\\s+accumulation\\s+start\\s+date|drums?\\s+(?:with|observed)\\s+(?:with\\s+)?no\\s+(?:accumulation\\s+start\\s+date|hazardous\\s+waste\\s+marking|date\\s+(?:on|written))|hazardous\\s+waste\\s+marking\\s+(?:missing|absent))"
-    severity: "high"
-    category: "waste.container.marking_missing"
-  - id: "secondary_containment_missing"
-    pattern: "(?i)(?:tank[\\s\\S]{0,80}?(?:sat|located|positioned)[\\s\\S]{0,80}?(?:bare\\s+asphalt|bare\\s+(?:concrete|dirt|ground)|no\\s+(?:secondary\\s+)?containment)|secondary\\s+containment\\s+(?:missing|absent|inadequate))"
-    severity: "critical"
-    category: "waste.tank.no_secondary"
-  - id: "incompatible_wastes_co_stored"
-    pattern: "(?i)(?:acid[\\s\\S]{0,80}?(?:cyanide|plating\\s+sludge)|cyanide[\\s\\S]{0,80}?acid|oxidizer[\\s\\S]{0,80}?organic|organic[\\s\\S]{0,80}?oxidizer)[\\s\\S]{0,200}?(?:same\\s+pallet|co[- ]?stored|stored\\s+together)|incompatible[- ]?waste(?:s)?\\s+violation"
-    severity: "critical"
-    category: "waste.storage.incompatible"
-  - id: "weekly_inspection_gap"
-    pattern: "(?i)(?:weekly\\s+(?:container\\s+|tank\\s+)?inspection|inspection\\s+log)[\\s\\S]{0,80}?(?:(?<!zero\\s)(?<!no\\s)gap|six[- ]?week\\s+gap|missed|not\\s+(?:performed|conducted))"
-    severity: "medium"
-    category: "waste.inspection.gap"
-  - id: "ldr_notification_missing"
-    pattern: "(?i)(?:ldr|land\\s+disposal\\s+restriction)\\s+notification\\s+(?:missing|absent|not\\s+attached|without\\s+(?:the\\s+)?(?:required\\s+)?ldr)|without\\s+(?:the\\s+)?(?:required\\s+)?ldr\\s+notification"
-    severity: "critical"
-    category: "waste.ldr.missing"
-  - id: "dot_hazmat_training_missing"
-    pattern: "(?i)(?:signing\\s+employee|shipping\\s+signatory)\\s+(?:held\\s+)?(?:no\\s+(?:current\\s+)?(?:dot\\s+)?hazmat\\s+training|hazmat\\s+training\\s+(?:expired|absent|missing|not\\s+current))|49\\s+cfr\\s+172\\.704\\s+(?:training\\s+)?(?:missing|expired)"
-    severity: "high"
-    category: "waste.dot.no_training"
-  - id: "contingency_plan_not_shared_lepc"
-    pattern: "(?i)(?:contingency\\s+plan|emergency\\s+plan)[\\s\\S]{0,200}?(?:never\\s+(?:been\\s+)?shared|not\\s+(?:coordinated|shared))[\\s\\S]{0,120}?(?:lepc|local\\s+fire\\s+department|fire\\s+department)"
-    severity: "medium"
-    category: "waste.contingency.no_lepc"
-  - id: "satellite_accumulation_exceed_55gal"
-    pattern: "(?i)satellite\\s+accumulation[\\s\\S]{0,200}?(?:over\\s+55\\s+gal|exceed(?:ing|s|ed)?\\s+55\\s*gallon|past\\s+55\\s+gallon)|excess\\s+satellite"
-    severity: "medium"
-    category: "waste.satellite.exceeded"
-  - id: "biennial_report_missing"
-    pattern: "(?i)(?:biennial\\s+report|form\\s+8700[- ]?13)\\s+(?:missing|not\\s+(?:filed|submitted)|overdue|past\\s+march\\s+1)"
-    severity: "medium"
-    category: "waste.biennial.missing"
-  - id: "permit_expired_or_interim_no_part_b"
-    pattern: "(?i)(?:part\\s+b\\s+permit|tsdf\\s+permit)\\s+(?:expired|in\\s+interim\\s+status\\s+without\\s+part\\s+b|lapsed)|interim\\s+status\\s+without\\s+(?:a\\s+)?part\\s+b"
-    severity: "critical"
-    category: "waste.permit.expired"
+- id: generator_status_miscategorized_lqg
+  pattern: (?i)(?:self[- ]?identified|categorized)\s+as\s+(?:a\s+)?(?:small\s+quantity\s+generator|sqg|vsqg)[\s\S]{0,300}?(?:generating\s+(?:over\s+1[0-9]{3}|>\s*1000)\s*kg|well\s+into\s+(?:lqg|large\s+quantity)\s+territory|placing\s+it[\s\S]{0,160}?lqg)
+  severity: critical
+  category: waste.generator.miscategorized
+- id: accumulation_past_limit
+  pattern: (?i)(?:drums?|containers?)[\s\S]{0,200}?(?:over\s+1[0-9]{2}\s+days?\s+old|past\s+(?:90|180|270)[-
+    ]?day|exceeding\s+(?:the\s+)?(?:90|180|270)[- ]?day)
+  severity: critical
+  category: waste.accumulation.exceeded
+- id: container_marking_missing
+  pattern: (?i)(?:no\s+accumulation\s+start\s+date|drums?\s+(?:with|observed)\s+(?:with\s+)?no\s+(?:accumulation\s+start\s+date|hazardous\s+waste\s+marking|date\s+(?:on|written))|hazardous\s+waste\s+marking\s+(?:missing|absent))
+  severity: high
+  category: waste.container.marking_missing
+- id: secondary_containment_missing
+  pattern: (?i)(?:tank[\s\S]{0,80}?(?:sat|located|positioned)[\s\S]{0,80}?(?:bare\s+asphalt|bare\s+(?:concrete|dirt|ground)|no\s+(?:secondary\s+)?containment)|secondary\s+containment\s+(?:missing|absent|inadequate))
+  severity: critical
+  category: waste.tank.no_secondary
+- id: incompatible_wastes_co_stored
+  pattern: (?i)(?:acid[\s\S]{0,80}?(?:cyanide|plating\s+sludge)|cyanide[\s\S]{0,80}?acid|oxidizer[\s\S]{0,80}?organic|organic[\s\S]{0,80}?oxidizer)[\s\S]{0,200}?(?:same\s+pallet|co[-
+    ]?stored|stored\s+together)|incompatible[- ]?waste(?:s)?\s+violation
+  severity: critical
+  category: waste.storage.incompatible
+- id: weekly_inspection_gap
+  pattern: (?i)(?:weekly\s+(?:container\s+|tank\s+)?inspection|inspection\s+log)[\s\S]{0,80}?(?:(?<!zero\s)(?<!no\s)gap|six[-
+    ]?week\s+gap|missed|not\s+(?:performed|conducted))
+  severity: medium
+  category: waste.inspection.gap
+- id: ldr_notification_missing
+  pattern: (?i)(?:ldr|land\s+disposal\s+restriction)\s+notification\s+(?:missing|absent|not\s+attached|without\s+(?:the\s+)?(?:required\s+)?ldr)|without\s+(?:the\s+)?(?:required\s+)?ldr\s+notification
+  severity: critical
+  category: waste.ldr.missing
+- id: dot_hazmat_training_missing
+  pattern: (?i)(?:signing\s+employee|shipping\s+signatory)\s+(?:held\s+)?(?:no\s+(?:current\s+)?(?:dot\s+)?hazmat\s+training|hazmat\s+training\s+(?:expired|absent|missing|not\s+current))|49\s+cfr\s+172\.704\s+(?:training\s+)?(?:missing|expired)
+  severity: high
+  category: waste.dot.no_training
+- id: contingency_plan_not_shared_lepc
+  pattern: (?i)(?:contingency\s+plan|emergency\s+plan)[\s\S]{0,200}?(?:never\s+(?:been\s+)?shared|not\s+(?:coordinated|shared))[\s\S]{0,120}?(?:lepc|local\s+fire\s+department|fire\s+department)
+  severity: medium
+  category: waste.contingency.no_lepc
+- id: satellite_accumulation_exceed_55gal
+  pattern: (?i)satellite\s+accumulation[\s\S]{0,200}?(?:over\s+55\s+gal|exceed(?:ing|s|ed)?\s+55\s*gallon|past\s+55\s+gallon)|excess\s+satellite
+  severity: medium
+  category: waste.satellite.exceeded
+- id: biennial_report_missing
+  pattern: (?i)(?:biennial\s+report|form\s+8700[- ]?13)\s+(?:missing|not\s+(?:filed|submitted)|overdue|past\s+march\s+1)
+  severity: medium
+  category: waste.biennial.missing
+- id: permit_expired_or_interim_no_part_b
+  pattern: (?i)(?:part\s+b\s+permit|tsdf\s+permit)\s+(?:expired|in\s+interim\s+status\s+without\s+part\s+b|lapsed)|interim\s+status\s+without\s+(?:a\s+)?part\s+b
+  severity: critical
+  category: waste.permit.expired
+- id: scale_expansion_v1_critical_signal_01
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_02
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_03
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_04
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_05
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_06
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_07
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_08
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_09
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_10
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_11
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_12
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_13
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_14
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_15
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_16
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_17
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_18
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_19
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_20
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_21
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_22
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_23
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_24
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_25
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_26
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_27
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_28
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_29
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_30
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_31
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_32
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_33
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_34
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_35
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_36
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_37
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_38
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_39
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_40
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}rcra.{0,24}waste.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v2_unsupported_material_claim_001
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-rcra-waste-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_002
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_003
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_004
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_005
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_006
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-rcra-waste-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_007
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_008
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_009
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_010
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_011
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-rcra-waste-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_012
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_013
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_014
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_015
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_016
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-rcra-waste-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_017
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_018
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_019
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_020
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_021
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-rcra-waste-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_022
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_023
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_024
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_025
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_026
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-rcra-waste-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_027
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_028
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_029
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_030
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_031
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-rcra-waste-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_032
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_033
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_034
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_035
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_036
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-rcra-waste-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_037
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_038
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_039
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_040
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_041
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-rcra-waste-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_042
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_043
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_044
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_045
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_046
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-rcra-waste-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_047
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_048
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_049
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_050
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_051
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-rcra-waste-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_052
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_053
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_054
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_055
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_056
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-rcra-waste-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_057
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_058
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_059
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_060
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_061
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-rcra-waste-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_062
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_063
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_064
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_065
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_066
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-rcra-waste-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_067
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_068
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_069
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_070
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_071
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-rcra-waste-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_072
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_073
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_074
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_075
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_076
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-rcra-waste-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_077
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_078
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-rcra-waste-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_079
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_080
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_rcra_waste_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-rcra-waste-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.

@@ -1,0 +1,35 @@
+id: "benchmark/agriculture-pesticide-use-bench"
+type: benchmark
+version: "0.1.0"
+name: "Agriculture Pesticide Use benchmark"
+description: "Synthetic benchmark for agriculture pesticide use review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["agriculture_compliance.usda", "agriculture_compliance.gap"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["agriculture-pesticide-use", "expansion-v6"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/agriculture-pesticide-use-review"
+dataset: "dataset/agriculture-pesticide-use-samples"
+rubric: "rubric/agriculture-pesticide-use-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/agriculture-pesticide-use-review"
+    rule_pack_override: ["rule-pack/grep-agriculture-pesticide-use-flags", "rule-pack/rag-agriculture-pesticide-use-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 29
+report:
+  output: "dist/benchmarks/agriculture-pesticide-use/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

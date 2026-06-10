@@ -26,10 +26,10 @@ evaluating. Backed by a sanctions-list knowledge pack.
 
 | id | severity | category | pattern/condition |
 |---|---|---|---|
-| `ofac_sdn_exact` | critical | — | `fuzzy_match(entity.normalized_name, list='ofac_sdn') >= 1.00` |
-| `ofac_sdn_fuzzy` | high | — | `fuzzy_match(entity.normalized_name, list='ofac_sdn') >= 0.92` |
-| `un_consolidated_list` | high | — | `fuzzy_match(entity.normalized_name, list='un_consolidated') >= 0.92` |
-| `eu_sanctions_list` | high | — | `fuzzy_match(entity.normalized_name, list='eu_consolidated') >= 0.92` |
-| `pep_list` | medium | — | `fuzzy_match(entity.normalized_name, list='institution_pep') >= 0.92` |
-| `adverse_media_negative` | medium | — | `adverse_media_score(entity.normalized_name) >= 0.75` |
+| `ofac_sdn_exact` | critical | - | `fuzzy_match(entity.normalized_name, list='ofac_sdn') >= 1.00` |
+| `ofac_sdn_fuzzy` | high | - | `fuzzy_match(entity.normalized_name, list='ofac_sdn') >= 0.92` |
+| `un_consolidated_list` | high | - | `fuzzy_match(entity.normalized_name, list='un_consolidated') >= 0.92` |
+| `eu_sanctions_list` | high | - | `fuzzy_match(entity.normalized_name, list='eu_consolidated') >= 0.92` |
+| `pep_list` | medium | - | `fuzzy_match(entity.normalized_name, list='institution_pep') >= 0.92` |
+| `adverse_media_negative` | medium | - | `adverse_media_score(entity.normalized_name) >= 0.75` |
 

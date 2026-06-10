@@ -1,0 +1,93 @@
+id: "harness/sdg-alignment-review"
+type: harness
+version: "0.1.0"
+name: "UN SDG alignment-claim review harness"
+description: |
+  Wraps the SDG alignment-claim review flow as a reusable harness.
+  Classifies free-text claims to candidate SDG goals via the
+  classifier rule pack, drills to target/indicator level via RAG
+  against the SDG knowledge pack, checks counter-targets, and grades
+  alignment quality.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["esg", "sustainability", "nonprofit", "government", "humanitarian"]
+capability: ["evaluation", "verification", "retrieval", "classification", "reasoning"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["sdg", "agenda-2030", "alignment", "harness"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+kind: "model_harness"
+tier: "primary"
+applied_layers: [persona, classifier, rag, tools]
+consumes: [classifier_rule, rag_doc, persona_block, response_policy]
+emits: [reasoning_step, context_snippet, extracted_fact]
+logic_paths:
+  - id: "review_sdg_alignment"
+    label: "claim text → candidate SDGs → target+indicator drilldown → counter-target check → grade"
+    entrypoints: ["/api/sdg/review"]
+    steps:
+      - "classify each claim into candidate SDG goals"
+      - "RAG against SDG pack to identify exact targets + indicators"
+      - "check counter-target risks via target-interactions matrix"
+      - "assess additionality + geographic-temporal fit"
+      - "judge per sdg-alignment-v1 rubric"
+      - "propose strengthening edits per gap"
+      - "emit audit trace"
+    consumes: [classifier_rule, rag_doc, persona_block, response_policy]
+    emits: [reasoning_step, context_snippet, extracted_fact]
+    model_call: "required"
+    verification:
+      - "every claim has target + indicator code OR explicit no-UN-indicator note"
+      - "counter-target check present for every claim"
+      - "additionality narrative present (may be 'unverified')"
+knowledge_packs:
+  - id: "sdg_pack"
+    label: "UN SDG 17 goals + targets + indicators + interactions"
+    kind: knowledge_pack
+    types: [rag_doc, citation_edge]
+    required: true
+    trust_boundary: "local"
+    freshness: "dated"
+logic_packs:
+  - id: "persona_default"
+    label: "SDG Alignment Analyst persona"
+    kind: logic_pack
+    types: [persona_block]
+    required: true
+model_io:
+  input:  "{claim_text: string, claim_geography: string, claim_time_horizon: string}"
+  output: "{grade: number, findings: object[], suggested_strengthening: object[]}"
+model_targets:
+  - id: "local_ollama"
+    label: "Local Ollama"
+    transport: "ollama"
+    role: "Default local review."
+    capabilities: [text_generation, chat]
+    required: false
+    default: true
+    trust_boundary: "local"
+  - id: "anthropic_judge"
+    label: "Anthropic Claude Sonnet"
+    transport: "anthropic"
+    role: "Optional frontier judge for impact-investor due diligence."
+    capabilities: [text_generation, chat, long_context]
+    required: false
+    default: false
+    trust_boundary: "external"
+input_verification:
+  - "reject input larger than 512 KB"
+output_verification:
+  - "every finding cites SDG target ID"
+  - "counter-target risks list present"
+  - "rubric/sdg-alignment-v1 score recorded"
+privacy_boundaries:
+  raw_input:      "stays local"
+  derived_output: "may sync to hub"
+  external_calls: "only on explicit user opt-in"
+contributes_to:
+  - "pipeline/sdg-alignment-assessment"

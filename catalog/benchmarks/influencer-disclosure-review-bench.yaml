@@ -1,0 +1,35 @@
+id: "benchmark/influencer-disclosure-review-bench"
+type: benchmark
+version: "0.1.0"
+name: "Influencer Disclosure Review benchmark"
+description: "Synthetic benchmark for influencer disclosure review review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["marketing_ops.claims", "media.distribution"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["influencer-disclosure-review", "expansion-v5"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/influencer-disclosure-review-review"
+dataset: "dataset/influencer-disclosure-review-samples"
+rubric: "rubric/influencer-disclosure-review-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/influencer-disclosure-review-review"
+    rule_pack_override: ["rule-pack/grep-influencer-disclosure-review-flags", "rule-pack/rag-influencer-disclosure-review-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 23
+report:
+  output: "dist/benchmarks/influencer-disclosure-review/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

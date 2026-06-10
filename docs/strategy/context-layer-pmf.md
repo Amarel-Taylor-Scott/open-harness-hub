@@ -23,6 +23,12 @@ that you wire (and swap) into a governed pipeline. The infra is the substrate; O
 governance + composability layer on top. You don't rip out Qdrant/Mem0/LLMLingua — OHH **wraps them
 as governed, measured-lift components** you compose under one provenance/eval contract.
 
+The deeper product loop is context control: **adversarially validate context, find fragile context,
+keep volatile context fresh, reconcile internal inconsistencies, and strengthen weak dependencies with
+better components/tools or verified global context feeds**. The catalog is valuable because it gives
+the runtime modular upgrade paths when a context block, rule pack, tool schema, memory, or harness
+becomes stale, low-lift, unsafe, or hard to verify. See [[../architecture/context-control-loop.md]].
+
 ## The 7-layer context stack → OHH's taxonomy (what we have / the gaps)
 
 | Layer (builder map) | OHH today | Gap to fill |

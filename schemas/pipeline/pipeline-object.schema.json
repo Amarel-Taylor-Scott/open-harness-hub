@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/pipeline/pipeline-object.schema.json",
+  "title": "Pipeline object",
+  "description": "A declared pipeline (how context MOVES through stages) with its triggers, stage mapping, and the policies that make it operable: retry, idempotency, timeout, fallback, observability. Distinct from a flywheel-spec (how context IMPROVES).",
+  "type": "object",
+  "required": ["kind", "pipeline_id", "name", "stages"],
+  "properties": {
+    "kind": { "type": "string", "const": "baltor.pipeline-object.v1" },
+    "pipeline_id": { "type": "string" },
+    "name": { "type": "string" },
+    "owner": { "type": "string" },
+    "stages": { "type": "array", "items": { "type": "string" }, "minItems": 1,
+      "description": "ordered macro/sub stages, e.g. source_intake → document_decomposition → reconciliation → …" },
+    "trigger_types": { "type": "array", "items": { "type": "string" } },
+    "input_schema": { "type": "string" },
+    "output_schema": { "type": "string" },
+    "retry_policy": { "type": "object", "additionalProperties": true },
+    "idempotency_policy": { "type": "object", "additionalProperties": true },
+    "timeout_policy": { "type": "object", "additionalProperties": true },
+    "fallback_policy": { "type": "object", "additionalProperties": true },
+    "observability_policy": { "type": "object", "additionalProperties": true },
+    "version": { "type": "string" }
+  },
+  "additionalProperties": true
+}

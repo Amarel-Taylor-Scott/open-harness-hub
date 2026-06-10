@@ -1,0 +1,40 @@
+id: "knowledge-pack/use-case-seed-row-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Use case seed row patterns"
+description: "Patterns for exporting broad use-case seeds into candidate primitive, entity ref, label, dimension, object embedding, review, dedupe, and index row families."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "finance", "legal", "media", "creative", "energy", "healthcare", "cross_industry"]
+capability: ["classification", "extraction", "retrieval", "routing", "governance"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.product"
+tags: ["use-case-seeds", "label-records", "dimension-records", "entity-refs", "object-embeddings", "candidate-primitives", "hybrid-search"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types:
+  - "use_case_seed_row_pattern"
+  - "label_assignment_mapping"
+  - "dimension_value_mapping"
+  - "entity_ref_mapping"
+  - "object_embedding_mapping"
+files:
+  - path: "catalog/knowledge-packs/data/use-case-seed-row-patterns/rows.jsonl"
+    format: "jsonl"
+    schema: "use-case-seed-row-pattern"
+indexing:
+  bm25: true
+  dense:
+    recommended_model: "sentence-transformers/all-MiniLM-L6-v2"
+provenance:
+  sources:
+    - "Open Harness Hub cross-domain use-case seed surfaces"
+    - "Open Harness Hub hybrid label and dimensional search architecture"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "Synthetic row mappings only; insurance scope is excluded."

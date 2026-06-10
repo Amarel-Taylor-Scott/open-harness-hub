@@ -1,0 +1,70 @@
+id: "tool/recursive-encoding-sanitizer"
+type: tool
+version: "0.1.0"
+name: "Recursive encoding sanitizer"
+description: "Detects likely encoded spans, decodes them within strict depth and size limits, and emits normalized evidence for downstream safety evaluation before model routing."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "security.defensive", "media", "cross_industry"]
+capability: ["safety_gating", "classification", "governance", "evaluation"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "pre_api.safety"
+tags: ["encoding", "guardrails", "edge-ai", "sanitization", "prompt-security"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    text:
+      type: string
+    max_depth:
+      type: integer
+      default: 3
+    max_decoded_bytes:
+      type: integer
+      default: 32768
+    encodings:
+      type: array
+      items:
+        type: string
+      default: ["base64", "hex", "url"]
+  required: ["text"]
+returns:
+  type: object
+  properties:
+    sanitized_text:
+      type: string
+    decoded_segments:
+      type: array
+      items:
+        type: object
+    blocked_for_resource_risk:
+      type: boolean
+    audit_ref:
+      type: string
+side_effects: "read"
+examples:
+  - input:
+      text: "Please inspect this encoded sample: <encoded-span>"
+      max_depth: 3
+      encodings: ["base64", "hex", "url"]
+    output:
+      sanitized_text: "Please inspect this encoded sample: <decoded-span-ref>"
+      decoded_segments:
+        - segment_hash: "sha256:example"
+          encoding: "base64"
+          depth: 1
+          decoded_text_hash: "sha256:decoded-example"
+          route: "evaluate_decoded_content"
+      blocked_for_resource_risk: false
+      audit_ref: "audit://recursive-encoding-sanitizer/example"
+implementations:
+  - kind: "callable"
+    path: "tools.recursive_encoding_sanitizer.run"
+  - kind: "mcp"
+    path: "mcp/guardrails.recursive_encoding_sanitizer"

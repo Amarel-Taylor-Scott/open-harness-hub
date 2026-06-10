@@ -33,6 +33,6 @@ prior." Useful for AI-text detection, prompt recovery, scoring.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `score_each` | harness | `harness/text-safety-review` | — |
-| 2 | `rank` | processor | `processor/multi-vector-fusion` | — |
+| 1 | `score_each` | harness | `harness/text-safety-review` | - |
+| 2 | `rank` | processor | `processor/multi-vector-fusion` | - |
 

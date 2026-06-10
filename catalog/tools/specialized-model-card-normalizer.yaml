@@ -1,0 +1,64 @@
+id: "tool/specialized-model-card-normalizer"
+type: tool
+version: "0.1.0"
+name: "Specialized model card normalizer"
+description: "Normalizes public model cards, task tags, datasets, evaluation metadata, and model-lineage fields into reusable pipeline primitive candidates."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["healthcare", "finance", "legal", "software.devops", "media", "security", "privacy", "government", "cross_industry"]
+capability: ["classification", "extraction", "retrieval", "evaluation", "routing", "governance", "embedding"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "pre_api.ingest"
+tags: ["huggingface", "model-cards", "specialized-models", "normalization", "fine-tuning"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    model_cards:
+      type: array
+      items:
+        type: object
+    normalization_policy:
+      type: object
+    excluded_scopes:
+      type: array
+      items:
+        type: string
+  required: ["model_cards"]
+returns:
+  type: object
+  properties:
+    candidate_primitives:
+      type: array
+      items:
+        type: object
+    model_signal_records:
+      type: array
+      items:
+        type: object
+    review_tickets:
+      type: array
+      items:
+        type: object
+side_effects: "write"
+examples:
+  - input:
+      model_cards:
+        - source_model_id: "ProsusAI/finbert"
+          pipeline_tag: "text-classification"
+      excluded_scopes: ["insurance"]
+    output:
+      candidate_primitives:
+        - object_type: "label_schema"
+          task_shape: "financial-text-sentiment-classification"
+      review_tickets: []
+implementations:
+  - kind: "mcp"
+    path: "mcp/factory.normalize_specialized_model_cards"
+

@@ -1,0 +1,48 @@
+id: "rubric/baltor-chief-ai-officer-quality"
+type: rubric
+version: "0.1.0"
+name: "Baltor Chief AI Officer quality"
+description: "Chief AI Officer rubric for agent readiness, evaluation, model routing, context quality, and responsible scaling."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["software", "ai_governance"]
+capability: ["evaluation", "governance", "routing", "reranking"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["baltor", "chief-ai-officer", "agents", "evals"]
+created: "2026-06-02"
+updated: "2026-06-02"
+dimensions:
+  - id: "context_quality"
+    label: "Packs give agents sufficient, fresh, source-linked context without raw-context overload"
+    weight: 0.22
+    scale: "0.0-1.0"
+    evidence_required: "Pack contents include requirements, decisions, code pointers, risks, freshness, and source handles."
+  - id: "agent_governance"
+    label: "Agents receive only permitted context and actions remain bounded by policy"
+    weight: 0.18
+    scale: "0.0-1.0"
+    evidence_required: "ACL-before-model, read/write separation, tool policies, and expansion logs are enforced."
+  - id: "evaluation_loop"
+    label: "Agent outcomes, pack usefulness, stale-context misses, and source recall are measured"
+    weight: 0.18
+    scale: "0.0-1.0"
+    evidence_required: "Eval cases, feedback, accepted/rejected outputs, and task outcome metrics are stored."
+  - id: "model_routing_discipline"
+    label: "Model routing is risk-based and provider-neutral"
+    weight: 0.14
+    scale: "0.0-1.0"
+    evidence_required: "Routing uses uncertainty, conflict, risk, privacy, and cost rather than model brand."
+  - id: "reranking_discipline"
+    label: "Reranking is source-aware and treats LoRA/domain adapters as eval-gated, traceable components"
+    weight: 0.14
+    scale: "0.0-1.0"
+    evidence_required: "Lexical, vector, cross-encoder, domain adapter, judge, and human review stages are separated."
+  - id: "responsible_scaling"
+    label: "Architecture can scale agents without hiding failures, over-trusting generated summaries, or losing auditability"
+    weight: 0.14
+    scale: "0.0-1.0"
+    evidence_required: "Lineage, policy, freshness, source precedence, and human review gates are preserved."
+scoring_method: "weighted_sum"

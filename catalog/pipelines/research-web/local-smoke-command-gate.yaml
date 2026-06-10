@@ -1,0 +1,69 @@
+id: "pipeline/local-smoke-command-gate"
+type: pipeline
+version: "0.1.0"
+name: "Local smoke command gate"
+description: "Applies local command policies to a generated smoke plan and produces a dry-run execution ledger plus operator approval checklist before any Docker or Postgres commands are run."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "evaluation", "verification"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "postgres", "pgvector", "smoke-test", "approval-gate", "command-ledger"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Gate a generated local smoke plan with command policies and emit a dry-run ledger before local Docker or Postgres execution."
+pipeline_kind: "research_web.local_smoke_command_gate"
+inputs:
+  - name: "smoke_plan"
+    type: "string"
+  - name: "output"
+    type: "string"
+outputs:
+  - name: "command_gate_report"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/local-smoke-command-policies"
+steps:
+  - id: "load-local-command-policies"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/local-smoke-command-policies"
+    inputs:
+      query: "docker psql local smoke command approval policies"
+      top_k: 10
+  - id: "gate-local-smoke-commands"
+    kind: "tool"
+    ref: "tool/local-smoke-command-gate"
+    inputs:
+      smoke_plan: "$.inputs.smoke_plan"
+      output: "$.inputs.output"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.gate-local-smoke-commands.dry_run_only"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "The command gate does not execute commands."
+  - kind: "deterministic"
+    target: "$.gate-local-smoke-commands.command_count"
+    op: ">="
+    value: 1
+    severity: "high"
+    label: "The command gate classifies at least one smoke-plan command."
+  - kind: "semantic"
+    target: "$.gate-local-smoke-commands"
+    must_cover:
+      - "approval checklist"
+      - "dry-run ledger"
+      - "Docker"
+      - "psql"
+      - "no execution"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "The command gate preserves local execution boundaries."

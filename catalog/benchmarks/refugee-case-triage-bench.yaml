@@ -1,0 +1,35 @@
+id: "benchmark/refugee-case-triage-bench"
+type: benchmark
+version: "0.1.0"
+name: "Refugee Case Triage benchmark"
+description: "Synthetic benchmark for refugee case triage review quality, evidence grounding, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["humanitarian.refugee", "legal.immigration"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["refugee-case-triage", "expansion-v4"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/refugee-case-triage-review"
+dataset: "dataset/refugee-case-triage-samples"
+rubric: "rubric/refugee-case-triage-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/refugee-case-triage-review"
+    rule_pack_override: ["rule-pack/grep-refugee-case-triage-flags", "rule-pack/rag-refugee-case-triage-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 17
+report:
+  output: "dist/benchmarks/refugee-case-triage/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

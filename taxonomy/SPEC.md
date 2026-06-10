@@ -4,9 +4,9 @@
 > Status: Draft for public review
 > Audience: Authors of harness/pipeline/benchmark catalogs
 
-This document defines the controlled vocabulary, artifact types, and
+This document defines the controlled vocabulary, component types, and
 manifest fields used by the Open Harness Hub. Every entry in `catalog/`
-must conform to one of the artifact schemas in `schemas/`.
+must conform to one of the component schemas in `schemas/`.
 
 The taxonomy is industry-agnostic. Industry-specific terms (e.g.
 *corridor profile*, *medical-coding rule*, *financial-crime indicator*) are
@@ -184,20 +184,20 @@ sources.
 
 ### 1.12 Schema
 
-A typed I/O contract referenced by multiple artifacts. Schemas live in
+A typed I/O contract referenced by multiple components. Schemas live in
 `catalog/schemas/` and are referenced by `$ref` from manifests.
 
 ---
 
 ## 2. Controlled vocabularies (cross-cutting axes)
 
-Every artifact is tagged with values from these vocabularies. Each is
+Every component is tagged with values from these vocabularies. Each is
 defined in `vocabularies/<name>.yaml`.
 
 ### 2.1 Industry
 
 Open vocabulary. Suggested top-level industries (one or many per
-artifact):
+component):
 
 `healthcare` · `finance` · `legal` · `education` · `government` ·
 `retail` · `manufacturing` · `media` · `security` · `climate` ·
@@ -210,7 +210,7 @@ A sub-vocabulary can be added per industry (e.g. `healthcare.radiology`,
 
 ### 2.2 Capability
 
-What the artifact does, in user-facing terms:
+What the component does, in user-facing terms:
 
 `classification` · `extraction` · `retrieval` · `summarization` ·
 `generation` · `translation` · `reasoning` · `planning` · `evaluation` ·
@@ -223,9 +223,9 @@ What the artifact does, in user-facing terms:
 
 ### 2.4 Trust boundary
 
-`local` — the artifact stays on the user's machine.
+`local` — the component stays on the user's machine.
 `hub` — content is synced to the public hub (no raw PII).
-`external` — the artifact calls a third party.
+`external` — the component calls a third party.
 
 ### 2.5 Lifecycle
 
@@ -242,14 +242,24 @@ What the artifact does, in user-facing terms:
 SPDX identifiers. Suggested defaults: `MIT`, `Apache-2.0`, `CC-BY-4.0`,
 `CC-BY-SA-4.0`, `CC0-1.0`, `Proprietary`.
 
+### 2.8 Cache scope
+
+Prompt-prefix, KV-cache, trajectory-fragment, and context-pack cache entries
+declare a reuse boundary from `vocabularies/cache-scopes.yaml`:
+
+`public` · `org` · `tenant` · `user` · `private`
+
+Scope is an isolation boundary, not a performance hint. Runtimes must never
+widen scope to chase cache-hit rate.
+
 ---
 
 ## 3. Manifest fields
 
-Every manifest starts with the common envelope, then adds artifact-type
+Every manifest starts with the common envelope, then adds component-type
 fields.
 
-### 3.0 Common envelope (all artifact types)
+### 3.0 Common envelope (all component types)
 
 ```yaml
 id: "{type}/{slug}"          # e.g. "harness/text-safety-review"
@@ -337,6 +347,17 @@ model_targets:                   # provider-neutral transports
     role: "Optional judge for high-stakes outputs"
     required: false
     trust_boundary: "external"
+prompt_abi:                      # optional token-efficient prompt/context contract
+  version: "ohh-agent-v1"
+  canonical_prefix_hash: "sha256:..."
+  tool_schema_hash: "sha256:..."
+  policy_block_hash: "sha256:..."
+  output_contract_hash: "sha256:..."
+  context_pack_hashes: ["sha256:..."]
+  cache_scope: "public"          # public | org | tenant | user | private
+  cacheable_prefix_tokens: 6400
+  dynamic_context_boundary: "tenant_context"
+  model_targets: ["local_default", "frontier_judge"]
 input_verification:
   - "redact PII before model call"
   - "reject input > 32KB"
@@ -372,6 +393,11 @@ defaults:
   model_adapter: "adapter/ollama-llama3-8b"
   knowledge_packs: ["knowledge-pack/ilo-indicators"]
   rule_packs: ["rule-pack/grep-recruitment-fraud", "rule-pack/rag-statutes-pH"]
+prompt_abi:
+  version: "ohh-agent-v1"
+  canonical_prefix_hash: "sha256:..."
+  cache_scope: "tenant"
+  dynamic_context_boundary: "user_session_context"
 steps:
   - id: "redact"
     kind: "rule_pack"
@@ -606,12 +632,20 @@ through their own manifests.
 3. **Every harness declares `model_targets`, even when the value is
    `none`.** Pure deterministic gates make this explicit so auditors
    can grep for them.
-4. **Privacy boundaries travel with the artifact, not the deployment.**
+4. **Privacy boundaries travel with the component, not the deployment.**
    A `local`-boundary harness used inside an `external`-boundary
    pipeline must still keep its raw input local.
 5. **Reproducibility is a first-class field.** Every benchmark manifest
    declares `(commit_sha, dataset_version, run_date)`; without it the
    run is research-only, not a citable benchmark.
+6. **Prompt-prefix reuse is scoped, not implicit.** Shared system prompts,
+   tool schemas, output contracts, and context-pack headers may declare
+   `prompt_abi` metadata so runtimes can reuse prompt-prefix or KV-cache
+   work. Reuse is allowed only inside the declared `cache_scope`
+   (`public`, `org`, `tenant`, `user`, `private`) and only for compatible
+   model/tokenizer targets. Tenant, user, private, volatile, and retrieved
+   data must live after the dynamic-context boundary unless explicitly
+   scoped for narrower reuse.
 
 ---
 
@@ -622,15 +656,15 @@ through their own manifests.
 | `experimental` | One author, no review, no production use. |
 | `beta` | At least one external review; documented gaps. |
 | `stable` | Used in production; semver-stable manifest. |
-| `deprecated` | Superseded by another artifact; kept for citation. |
+| `deprecated` | Superseded by another component; kept for citation. |
 
-A `deprecated` artifact must declare `superseded_by` and `deprecated_on`.
+A `deprecated` component must declare `superseded_by` and `deprecated_on`.
 
 ---
 
 ## 7. Naming and IDs
 
-- Artifact IDs are `{type}/{slug}` where `slug` is lowercase-with-dashes.
+- Component IDs are `{type}/{slug}` where `slug` is lowercase-with-dashes.
 - `slug` must be ≤ 64 characters.
 - `id` is immutable once published; renames create a new ID with the
   old one marked `deprecated`.
@@ -640,7 +674,7 @@ A `deprecated` artifact must declare `superseded_by` and `deprecated_on`.
 
 ## 8. Versioning
 
-- Artifacts use semver.
+- Components use semver.
 - Patch version changes for typos, doc clarifications, additional examples.
 - Minor version changes for new optional fields, new manifest entries.
 - Major version changes for breaking schema changes — and only after
@@ -653,11 +687,11 @@ A `deprecated` artifact must declare `superseded_by` and `deprecated_on`.
 Every manifest must pass `python scripts/validate.py`. Validation checks:
 
 1. Manifest validates against `schemas/{type}.schema.json`.
-2. All `ref` fields point to existing artifacts in the catalog.
+2. All `ref` fields point to existing components in the catalog.
 3. Knowledge / logic / rule pack leaf types are in the leaf-type vocabulary.
 4. Industry / capability / modality tags are in their vocabularies.
 5. License is a valid SPDX identifier or `Proprietary`.
-6. Privacy-boundary fields are present on every artifact that crosses
+6. Privacy-boundary fields are present on every component that crosses
    a network boundary.
 
 A pipeline manifest additionally checks the DAG — no cycles, no missing
@@ -696,7 +730,7 @@ pipelines follow the identical pattern with the appropriate
 When a pipeline emits image / audio / video, the manifest should also
 declare:
 
-- `output_safety_packs`: rule packs that screen the generated artifact
+- `output_safety_packs`: rule packs that screen the generated component
   (NSFW, IP, watermark presence, prompt-injection-via-image, etc.).
 - `style_packs`: knowledge packs of style references the prompt-shaper
   pulls from.
@@ -725,7 +759,7 @@ manifest; the subdirectory is purely an organizational hint for browsing.
 | `redact/` | `redact` | "PII / secrets / proprietary-mark redaction with audit log." |
 | `route/` | `route` | "Dispatch incoming input to the right downstream pipeline." |
 | `agent-loop/` | `agent_loop` | "Plan + tool-call + verify + reflect in a loop until done." |
-| `evaluate/` | `evaluate` | "Run a rubric over an artifact and return a graded score." |
+| `evaluate/` | `evaluate` | "Run a rubric over a component and return a graded score." |
 | `system-prompt-library/` | `system_prompt` | "Reusable system-prompt + persona starter for common roles." |
 | `rag-library/` | `rag_pack` | "Curated RAG packs (statutes, glossaries, style refs, physics)." |
 | `grep-library/` | `grep_pack` | "Curated GREP rule packs (PII, NSFW, brand-safety, fraud)." |
@@ -763,18 +797,18 @@ The catalog grows from two ingest paths:
 
 ## 13. Database representations
 
-Every artifact described by this taxonomy can be **persisted** in four
+Every component described by this taxonomy can be **persisted** in four
 representative database shapes. Each shape is a published standard with
 example DDL / collection spec in `db/`. Implementers pick one — the
 manifest stays the same.
 
 ### 13.1 Relational (PostgreSQL / SQLite)
 
-A relational mapping with one row per artifact and a small number of
+A relational mapping with one row per component and a small number of
 join tables for the array fields. Canonical DDL:
 
 ```sql
-CREATE TABLE artifact (
+CREATE TABLE component (
   id              TEXT PRIMARY KEY,            -- "harness/text-safety-review"
   type            TEXT NOT NULL,
   version         TEXT NOT NULL,
@@ -789,26 +823,26 @@ CREATE TABLE artifact (
   body            JSONB NOT NULL               -- full manifest
 );
 
-CREATE TABLE artifact_industry   (artifact_id TEXT REFERENCES artifact(id), industry  TEXT, PRIMARY KEY(artifact_id, industry));
-CREATE TABLE artifact_capability (artifact_id TEXT REFERENCES artifact(id), capability TEXT, PRIMARY KEY(artifact_id, capability));
-CREATE TABLE artifact_modality   (artifact_id TEXT REFERENCES artifact(id), modality  TEXT, PRIMARY KEY(artifact_id, modality));
-CREATE TABLE artifact_tag        (artifact_id TEXT REFERENCES artifact(id), tag       TEXT, PRIMARY KEY(artifact_id, tag));
+CREATE TABLE component_industry   (component_id TEXT REFERENCES component(id), industry  TEXT, PRIMARY KEY(component_id, industry));
+CREATE TABLE component_capability (component_id TEXT REFERENCES component(id), capability TEXT, PRIMARY KEY(component_id, capability));
+CREATE TABLE component_modality   (component_id TEXT REFERENCES component(id), modality  TEXT, PRIMARY KEY(component_id, modality));
+CREATE TABLE component_tag        (component_id TEXT REFERENCES component(id), tag       TEXT, PRIMARY KEY(component_id, tag));
 
-CREATE TABLE artifact_ref (
-  src_id TEXT REFERENCES artifact(id),
-  dst_id TEXT REFERENCES artifact(id),
+CREATE TABLE component_ref (
+  src_id TEXT REFERENCES component(id),
+  dst_id TEXT REFERENCES component(id),
   role   TEXT NOT NULL,                         -- "consumes" | "emits" | "step_ref" | "contributes_to" | "model_target" | "rubric" | "dataset" | ...
   PRIMARY KEY(src_id, dst_id, role)
 );
 ```
 
-This single shape covers all artifact types because the type-specific
+This single shape covers all component types because the type-specific
 fields live in `body` (JSONB). Indexes on `(type, industry, capability)`
 make catalog browse queries fast.
 
 ### 13.2 Document store (MongoDB / Couchbase / Firestore)
 
-One collection per artifact `type`, one document per artifact, with
+One collection per component `type`, one document per component, with
 the full manifest as the document body. The `attribution`, `links`,
 and array fields are nested freely. The `id` field is the document
 key. A `refs` array materializes the inbound/outbound edges for
@@ -819,11 +853,11 @@ graph-style queries.
 Used for runtime caches, not as authoritative storage. Suggested keys:
 
 ```
-artifact:<id>                                 -> manifest JSON
-artifact:by_type:<type>                       -> set of ids
-artifact:by_industry:<industry>               -> set of ids
-artifact:by_capability:<capability>           -> set of ids
-artifact:by_tag:<tag>                         -> set of ids
+component:<id>                                 -> manifest JSON
+component:by_type:<type>                       -> set of ids
+component:by_industry:<industry>               -> set of ids
+component:by_capability:<capability>           -> set of ids
+component:by_tag:<tag>                         -> set of ids
 run:<run_id>                                  -> JSON of a pipeline run
 run:by_pipeline:<pipeline_id>                 -> sorted set of run ids by ts
 ```
@@ -831,13 +865,13 @@ run:by_pipeline:<pipeline_id>                 -> sorted set of run ids by ts
 ### 13.4 Vector database (Pinecone / Weaviate / Qdrant / pgvector)
 
 Used for RAG packs and for semantic search across the catalog itself.
-Each artifact gets at least one embedding of its `name + description`
+Each component gets at least one embedding of its `name + description`
 for catalog search. Knowledge-pack chunks each get an embedding for
 retrieval. Suggested per-vector metadata:
 
 ```
 {
-  "artifact_id":   "knowledge-pack/style-references-cinematic",
+  "component_id":   "knowledge-pack/style-references-cinematic",
   "leaf_type":     "style_reference",
   "chunk_id":      "moody-noir",
   "industry":      ["creative"],
@@ -849,14 +883,14 @@ retrieval. Suggested per-vector metadata:
 
 ### 13.5 Row format for individual rules and knowledge leaves
 
-Beyond the artifact-level table, the **leaves** inside rule packs and
+Beyond the component-level table, the **leaves** inside rule packs and
 knowledge packs follow a small fixed row shape so they are queryable
 across packs:
 
 ```sql
 CREATE TABLE rule (
   rule_id      TEXT PRIMARY KEY,
-  pack_id      TEXT NOT NULL REFERENCES artifact(id),
+  pack_id      TEXT NOT NULL REFERENCES component(id),
   family       TEXT NOT NULL,                  -- grep | glob | classifier | heuristic | privacy | online_search | ...
   severity     TEXT,
   category     TEXT,
@@ -867,7 +901,7 @@ CREATE TABLE rule (
 
 CREATE TABLE knowledge_leaf (
   leaf_id      TEXT PRIMARY KEY,
-  pack_id      TEXT NOT NULL REFERENCES artifact(id),
+  pack_id      TEXT NOT NULL REFERENCES component(id),
   leaf_type    TEXT NOT NULL,
   industry     TEXT,
   language     TEXT,
@@ -937,7 +971,7 @@ validator enforces this rule in §9.
 
 ## 15. Lifecycle position (pre-API / API / post-API)
 
-Every artifact also declares **where in the request lifecycle it sits**.
+Every component also declares **where in the request lifecycle it sits**.
 This is independent of `lifecycle` (which is maturity:
 experimental → stable → deprecated). The two answer different questions.
 
@@ -970,7 +1004,7 @@ purely as a deterministic gate).
 
 This label powers the static catalog browser
 (`docs/catalog/browser.html`) and the vector index
-(`db/vector/oh_catalog.jsonl`) so artifacts can be filtered by where
+(`db/vector/oh_catalog.jsonl`) so components can be filtered by where
 they fit in a pipeline.
 
 ---
@@ -1057,7 +1091,7 @@ full walkthrough.
 
 ---
 
-## 17. Processor artifact type
+## 17. Processor component type
 
 A **processor** is a typed, repeatable transformation with declared
 I/O, side effects, and trust boundary. It is the generic slot for any
@@ -1120,7 +1154,7 @@ A custom `ohh:` namespace covers concepts without prior art: `Harness`,
 Renderers under `scripts/emit/` (planned) produce standards-conformant
 outputs from the YAML manifests. Source of truth stays in `catalog/`.
 
-| Target | Renderer | Source artifact |
+| Target | Renderer | Source component |
 |---|---|---|
 | Croissant 1.0 (JSON-LD ML datasets) | `croissant.py` | `dataset`, `knowledge-pack` |
 | MCP server stubs | `mcp_server.py` | `tool`, `processor` |
@@ -1196,4 +1230,3 @@ Phase 3 (longer): `scripts/emit/{lm_eval_harness,promptfoo,cyclonedx_ml,openline
 - **OpenAI Evals** — declining vs. lm-eval-harness.
 - **HELM** as a direct emit target — mirror vocabulary instead.
 - **Kaggle metadata** — platform-specific; renderer only when publishing.
-

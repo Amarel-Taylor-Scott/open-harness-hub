@@ -1,0 +1,38 @@
+id: "knowledge-pack/daily-production-scheduler-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Daily production scheduler patterns"
+description: "Checks for comparing daily production runs, tracking dedupe and coverage trends, and recommending the next component factory run."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["planning", "governance", "evaluation", "generation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.scale"
+tags: ["components", "daily-factory", "scheduler", "production-report", "coverage", "dedupe"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+content_types:
+  - "daily_production_scheduler_check"
+files:
+  - path: "catalog/knowledge-packs/data/daily-production-scheduler-patterns/checks.jsonl"
+    format: "jsonl"
+    schema: "daily_production_scheduler_check"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["id", "description", "required_outputs", "failure_route"]
+provenance:
+  sources:
+    - "Open Harness Hub daily production runner"
+    - "Open Harness Hub daily production target"
+    - "Open Harness Hub staged load audit reports"
+  collected_through: "2026-05-26"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "synthetic operational checks only"

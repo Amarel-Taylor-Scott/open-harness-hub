@@ -1,7 +1,7 @@
 # worker: the async tier — pulls partition jobs off Redis and runs the foundry.
 # KEDA autoscales it on QUEUE DEPTH (scale-to-zero → N), the right primitive for the
 # bursty 10×1k fan-out. This is the "Celery-like" layer, kept light: queues.RedisQueue
-# + worker.Worker (retry + dead-letter), no heavyweight framework required.
+# + worker.Worker (retry + failed-permanently state), no heavyweight framework required.
 apiVersion: apps/v1
 kind: Deployment
 metadata:

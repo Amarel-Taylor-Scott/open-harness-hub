@@ -1,0 +1,26 @@
+{
+  "version": "1.0",
+  "note": "ENGAGEMENT / AUTHORIZATION POLICY for sales diagnostics + outreach. SINGLE SOURCE for src/baltor/sales/claim_guard.py. Diagnostics may run ONLY on authorized inputs; outreach is DRAFT-ONLY (never auto-sent). No probing of third-party production systems without written authorization. Private evidence first; public summaries require review.",
+  "authorization_bases": ["own_system", "customer_provided", "written_authorization", "public_static_metadata"],
+  "live_probe_requires": "written_authorization",
+  "live_probe_note": "Sending prompt suites to a third-party's live/production chatbot is a LIVE PROBE and requires written authorization from that party (or an authorized engagement). Otherwise use customer-provided transcripts or your own systems.",
+  "prohibited": [
+    "login_bypass", "paywall_bypass", "security_bypass", "scrape_private_data",
+    "automated_abusive_traffic", "unsolicited_load_testing", "store_private_data_in_open_hubs",
+    "publish_private_transcript", "public_accusation_without_review"
+  ],
+  "respect_tos": true,
+  "outreach": {
+    "mode": "draft_only",
+    "auto_send": false,
+    "require_opt_out": true,
+    "no_public_accusation": true,
+    "evidence_based_language_required": true
+  },
+  "evidence": {
+    "private_first": true,
+    "public_summary_requires_review": true,
+    "default_public_claim_safe": false,
+    "real_company_seeds_require_owner_approval": true
+  }
+}

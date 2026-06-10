@@ -1,0 +1,14 @@
+{
+  "version": "1.0",
+  "rule": "Existing working files stay. New reusable code goes under src/baltor/. Old scripts become thin wrappers. Architecture checks prevent NEW drift. No big-bang move.",
+  "legacy_in_scripts": [
+    {"path": "scripts/durable_store.py", "target": "src/baltor/adapters/durable_store/sqlite_durable_store.py", "status": "keep-as-owner", "deadline_pass": "C35"},
+    {"path": "scripts/context_events.py", "target": "src/baltor/adapters/event_bus/in_memory_bus.py", "status": "keep-as-owner", "deadline_pass": "C35"},
+    {"path": "scripts/runtime/*.py", "target": "src/baltor/runtime/**", "status": "move-when-stable", "deadline_pass": "C34"},
+    {"path": "scripts/artifact_graph/*.py", "target": "src/baltor/artifact_graph/**", "status": "move-when-stable", "deadline_pass": "C37"},
+    {"path": "scripts/llm_gateway/*.py", "target": "src/baltor/llm_gateway/**", "status": "move-when-stable", "deadline_pass": "C38"},
+    {"path": "scripts/pipeline_runtime/processors.py", "target": "consolidate ProcessorRegistry into scripts/runtime/processor_registry.py", "status": "dedup-later", "deadline_pass": "C35"},
+    {"path": "scripts/baltor_admin_demo_server.py", "target": "src/baltor/api/**", "status": "split-monolith", "deadline_pass": "C36"}
+  ],
+  "out_of_governed_scope": ["catalog/", "db/", "enrichment/", "context_workers/", "services/", "site/", "foundry/", "sanctions/", "processors/ (legacy OHH)"]
+}

@@ -1,0 +1,888 @@
+id: rule-pack/grep-saas-launch-antipatterns
+type: rule-pack
+version: 0.1.0
+name: SaaS launch landing-page anti-pattern detectors
+description: 'Regex heuristics that catch the most common SaaS / micro-SaaS / AI-
+
+  app launch landing-page failure patterns. Designed to be run over
+
+  landing-page copy, tagline strings, feature lists, pricing pages,
+
+  and "Show HN" / Product Hunt launch posts.
+
+
+  Catches buzzword overload, generic ICP, hidden pricing, vague
+
+  social proof, AI-as-tagline, broken proof-of-product, and the
+
+  typical 2024-2026 AI-launch anti-patterns.
+
+
+  FAST first-pass heuristics. Pair with `persona/saas-launch-critic`
+
+  for full review.
+
+  '
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- software
+- creative
+- cross_industry
+capability:
+- safety_gating
+- classification
+modality:
+- text
+lifecycle: experimental
+trust_boundary: local
+freshness: stable
+tags:
+- saas
+- launch
+- product-hunt
+- marketing
+- grep
+- antipattern
+created: '2026-05-24'
+updated: '2026-05-25'
+family: grep
+language: en
+rules:
+- id: tagline_ai_powered
+  pattern: (?i)\b(AI[- ]powered|powered by AI|AI[- ]driven|AI[- ]first|AI[- ]native|GPT[-
+    ]powered|Claude[- ]powered|LLM[- ]powered)\b
+  severity: high
+  category: tagline.ai_as_value_prop
+- id: tagline_revolutionize
+  pattern: (?i)\b(revolutionize|transform|reimagine|reinvent|redefine|disrupt|democratize|supercharge|unlock|empower)\b\s+(your|the)?\s*(workflow|business|team|process|productivity|growth|operations)\b
+  severity: high
+  category: tagline.buzzword_verb
+- id: tagline_platform_for
+  pattern: (?i)\b(platform|solution|software|tool|app|service|system) for\s+(your|all|every|the
+    modern|the future of)\b
+  severity: medium
+  category: tagline.vague_for_who
+- id: icp_for_everyone
+  pattern: (?i)\bfor (teams|businesses|companies|organizations|individuals) of (any|all|every)
+    (size|industry|type)\b
+  severity: high
+  category: icp.no_specific_persona
+- id: icp_kitchen_sink
+  pattern: (?i)\bfor\s+(marketers?,?\s+){1,}(developers?|designers?|founders?|product
+    managers?|sales|engineers?)\b
+  severity: high
+  category: icp.persona_kitchen_sink
+- id: feature_smart_intelligent
+  pattern: (?i)\b(smart|intelligent|automated|automatic|self[- ]driving|auto[- ])\s+\w{3,}\b
+  severity: medium
+  category: value_prop.capability_not_outcome
+- id: feature_seamless_effortless
+  pattern: (?i)\b(seamless|seamlessly|effortless|effortlessly|with one click|in seconds|zero[-
+    ]friction|frictionless)\b
+  severity: medium
+  category: value_prop.handwave_adverb
+- id: pricing_contact_us
+  pattern: (?i)\bcontact\s+(us|sales|our team)\s+for\s+(pricing|a quote|details)\b
+  severity: medium
+  category: pricing.contact_sales_hidden
+- id: pricing_starting_at
+  pattern: (?i)\bstarting at\b(?!.{0,50}\$\d|\d+ ?\$)
+  severity: medium
+  category: pricing.starting_at_no_anchor
+- id: pricing_no_dollar_sign
+  pattern: (?i)\b(pricing|plans|tiers|subscriptions)\b(?!.{0,500}\$\d)
+  severity: low
+  category: pricing.no_visible_dollar_amount_check
+- id: social_proof_trusted_by
+  pattern: (?i)\b(trusted by|loved by|used by|join over) \d{1,3}[,.]?\d{0,3}\+? (?:companies|teams|users|customers|businesses|developers)\b
+  severity: low
+  category: social_proof.aggregate_number_verify_date
+- id: social_proof_world_class
+  pattern: (?i)\b(trusted by (the )?(world's|industry'?s)? (best|leading|top|fastest[-
+    ]growing))\b
+  severity: high
+  category: social_proof.peacock
+- id: demo_join_waitlist
+  pattern: (?i)\b(join (the |our )?waitlist|join early access|get early access|request
+    access|coming soon|launching soon)\b
+  severity: high
+  category: demo.waitlist_no_product
+- id: demo_request_demo
+  pattern: (?i)\b(request a demo|book a demo|schedule a demo|talk to (sales|us|an
+    expert))\b
+  severity: medium
+  category: demo.no_self_serve
+- id: comparison_only_competitor
+  pattern: (?i)\b(the (only|first|best|leading|premier)|there'?s no other) (?:tool|product|platform|solution)\b
+  severity: high
+  category: competitive.competitive_blindness
+- id: comparison_no_mention
+  pattern: (?i)\b(vs\.?|versus|compared to|compare to|alternative to) ([A-Z][a-zA-Z]+)\b
+  severity: low
+  category: competitive.competitor_mention_verify
+- id: buzz_word_revolutionary
+  pattern: (?i)\b(revolutionary|groundbreaking|game[- ]changing|disruptive|next[-
+    ]generation|paradigm[- ]shift|cutting[- ]edge|state[- ]of[- ]the[- ]art|world[-
+    ]class)\b
+  severity: high
+  category: buzzword.peacock_terms
+- id: buzz_word_modern
+  pattern: (?i)\b(modern|future[- ]ready|future[- ]proof|next[- ]gen)\s+(workplace|company|team|business|workflow|stack)\b
+  severity: medium
+  category: buzzword.modern_workplace
+- id: ai_specific_gpt_wrapper
+  pattern: (?i)\b(built (on|with|using) (GPT[- ]?[345]|Claude|Gemini|Llama|Mistral))\b
+  severity: high
+  category: ai_specific.model_as_differentiator
+- id: ai_specific_custom_gpt
+  pattern: (?i)\b(custom GPT|GPT for [A-Z]|specialized GPT|fine[- ]tuned GPT)\b
+  severity: high
+  category: ai_specific.custom_gpt_wrapper
+- id: ai_specific_no_accuracy
+  pattern: (?i)\b(AI|GPT|LLM|model)\b(?!.{0,500}\b(accuracy|hallucination|evaluation|benchmark|F1|precision|recall|human[-
+    ]in[- ]the[- ]loop|reviewed by)\b)
+  severity: medium
+  category: ai_specific.high_stakes_no_accuracy_disclosure
+- id: onboarding_get_started_vague
+  pattern: (?i)>\s*(get started|start now|try it free|sign up|register)\s*<
+  severity: low
+  category: onboarding.cta_no_promise
+- id: trial_credit_card_required
+  pattern: (?i)\b(\d{1,2})[- ]day (?:free )?trial\b.{0,150}\b(credit card|payment)
+    (required|needed)\b
+  severity: high
+  category: trial.cc_required_friction
+- id: guarantee_money_back
+  pattern: (?i)\b(money[- ]back|satisfaction) guarantee\b(?!.{0,200}\b\d+ days?\b)
+  severity: medium
+  category: guarantee.terms_unclear
+- id: vague_outcome_save_time
+  pattern: (?i)\bsave (you )?(hours|time|countless hours|so much time)\b(?!.{0,80}\b\d+%?\b)
+  severity: medium
+  category: value_prop.vague_time_save_no_number
+- id: vague_outcome_increase_x
+  pattern: (?i)\b(increase|boost|grow|improve|enhance|maximize) (your )?(revenue|sales|conversions?|productivity|efficiency|ROI|growth)\b(?!.{0,80}\b\d+%?\b)
+  severity: medium
+  category: value_prop.vague_outcome_no_number
+- id: scale_expansion_v1_critical_signal_01
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_02
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_03
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_04
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_05
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_06
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_07
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_08
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_09
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_10
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_11
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_12
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_13
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_14
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_15
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_16
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_17
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_18
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_19
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_20
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_21
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_22
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_23
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_24
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_25
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_26
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_27
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_28
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_29
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_30
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_31
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_32
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_33
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_34
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_35
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_36
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_37
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_38
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_39
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_40
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}saas.{0,24}launch.{0,24}antipatterns).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v2_unsupported_material_claim_001
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_002
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_003
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_004
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_005
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_006
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_007
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_008
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_009
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_010
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_011
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_012
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_013
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_014
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_015
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_016
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_017
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_018
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_019
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_020
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_021
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_022
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_023
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_024
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_025
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_026
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_027
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_028
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_029
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_030
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_031
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_032
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_033
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_034
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_035
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_036
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_037
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_038
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_039
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_040
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_041
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_042
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_043
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_044
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_045
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_046
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_047
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_048
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_049
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_050
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_051
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_052
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_053
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_054
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_055
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_056
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_057
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_058
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_059
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_060
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_061
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_062
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_063
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_064
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_065
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_066
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_067
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_068
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_069
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_070
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_071
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_072
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_073
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_074
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_075
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_076
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_077
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_078
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_079
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_080
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_saas_launch_antipatterns|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-saas-launch-antipatterns.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.

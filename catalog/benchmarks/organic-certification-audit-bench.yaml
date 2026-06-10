@@ -1,0 +1,35 @@
+id: "benchmark/organic-certification-audit-bench"
+type: benchmark
+version: "0.1.0"
+name: "Organic Certification Audit benchmark"
+description: "Synthetic benchmark for organic certification audit review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["agriculture_compliance.organic"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["organic-certification-audit", "expansion-v6"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/organic-certification-audit-review"
+dataset: "dataset/organic-certification-audit-samples"
+rubric: "rubric/organic-certification-audit-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/organic-certification-audit-review"
+    rule_pack_override: ["rule-pack/grep-organic-certification-audit-flags", "rule-pack/rag-organic-certification-audit-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 29
+report:
+  output: "dist/benchmarks/organic-certification-audit/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

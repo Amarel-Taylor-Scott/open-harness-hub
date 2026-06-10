@@ -1,0 +1,38 @@
+id: "knowledge-pack/daily-showcase-pipeline-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Daily showcase pipeline patterns"
+description: "Scenario seeds and checks for generating 5 to 25 review-ready, database-backed showcase pipeline templates per day."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["planning", "routing", "evaluation", "governance"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.product"
+tags: ["showcase-pipelines", "daily-factory", "component-templates", "postgres", "review-gate"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+content_types:
+  - "daily_showcase_pipeline_scenario"
+files:
+  - path: "catalog/knowledge-packs/data/daily-showcase-pipeline-patterns/showcase-scenarios.jsonl"
+    format: "jsonl"
+    schema: "daily_showcase_pipeline_scenario"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["id", "name", "user_sentence", "domain", "cost_profile", "deployment_target"]
+provenance:
+  sources:
+    - "Open Harness Hub daily production target"
+    - "Open Harness Hub component template load planner"
+    - "Open Harness Hub user-provided showcase use-case families"
+  collected_through: "2026-05-26"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "synthetic scenario seeds only"

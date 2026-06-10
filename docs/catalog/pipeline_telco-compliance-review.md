@@ -25,10 +25,10 @@ Review telecom carrier compliance packet (CPNI handling + NORS outages + STIR/SH
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `structured_to_prose` | processor | `processor/structured-to-prose` | — |
-| 2 | `redact_pii` | processor | `processor/redact-pii-text` | — |
-| 3 | `grep_red_flags` | rule_pack | `rule-pack/grep-telco-compliance-flags` | — |
-| 4 | `rag_against_fcc` | rule_pack | `rule-pack/hybrid-retrieval-policy` | — |
-| 5 | `grade` | processor | `processor/llm-judge` | — |
-| 6 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `structured_to_prose` | processor | `processor/structured-to-prose` | - |
+| 2 | `redact_pii` | processor | `processor/redact-pii-text` | - |
+| 3 | `grep_red_flags` | rule_pack | `rule-pack/grep-telco-compliance-flags` | - |
+| 4 | `rag_against_fcc` | rule_pack | `rule-pack/hybrid-retrieval-policy` | - |
+| 5 | `grade` | processor | `processor/llm-judge` | - |
+| 6 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

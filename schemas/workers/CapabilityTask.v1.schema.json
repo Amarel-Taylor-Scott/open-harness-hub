@@ -1,0 +1,134 @@
+{
+  "$id": "workers/CapabilityTask.v1",
+  "title": "CapabilityTask",
+  "description": "A capability task in the DB-backed ledger (source of truth). A worker owns it only after an atomic claim.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "task_id": {
+      "type": "string"
+    },
+    "tenant_id": {
+      "type": "string"
+    },
+    "capability_id": {
+      "type": "string"
+    },
+    "worker_bucket": {
+      "type": "string"
+    },
+    "task_type": {
+      "type": "string"
+    },
+    "priority_class": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "claimed",
+        "running",
+        "succeeded",
+        "failed",
+        "retry_wait",
+        "dead",
+        "cancelled"
+      ]
+    },
+    "queue_name": {
+      "type": "string"
+    },
+    "payload_ref": {
+      "type": "string"
+    },
+    "idempotency_key": {
+      "type": "string"
+    },
+    "correlation_id": {
+      "type": "string"
+    },
+    "required_provider": {
+      "type": "string"
+    },
+    "fallback_providers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "required_resource_class": {
+      "type": "string"
+    },
+    "batch_policy_id": {
+      "type": "string"
+    },
+    "lifecycle_policy_id": {
+      "type": "string"
+    },
+    "sla_policy_id": {
+      "type": "string"
+    },
+    "deadline_at": {
+      "type": "string"
+    },
+    "not_before": {
+      "type": "string"
+    },
+    "max_attempts": {
+      "type": "number"
+    },
+    "attempt": {
+      "type": "number"
+    },
+    "lease_owner": {
+      "type": "string"
+    },
+    "lease_until": {
+      "type": "string"
+    },
+    "claimed_at": {
+      "type": "string"
+    },
+    "started_at": {
+      "type": "string"
+    },
+    "heartbeat_at": {
+      "type": "string"
+    },
+    "finished_at": {
+      "type": "string"
+    },
+    "failed_at": {
+      "type": "string"
+    },
+    "error_json": {
+      "type": "object"
+    },
+    "result_artifact_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "updated_at": {
+      "type": "string"
+    },
+    "progress": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "task_id",
+    "tenant_id",
+    "capability_id",
+    "status",
+    "idempotency_key",
+    "max_attempts",
+    "attempt",
+    "created_at"
+  ]
+}

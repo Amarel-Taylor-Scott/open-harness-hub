@@ -1,0 +1,201 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/public-health-outbreak-triage-frameworks",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Public Health Outbreak Triage frameworks",
+  "description": "Composite context pack for public health outbreak triage reviews, including evidence, escalation, and remediation controls.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC-BY-4.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/public-health-outbreak-triage-frameworks",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-24",
+  "keywords": [
+    "public-health-outbreak-triage",
+    "expansion-v3"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-24",
+  "citation": "Public Health Outbreak Triage control checklist; Public Health Outbreak Triage evidence matrix; Public Health Outbreak Triage escalation playbook; Public Health Outbreak Triage remediation tracker",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "public-health-outbreak-triage-frameworks__frameworks",
+      "name": "frameworks.jsonl",
+      "description": "Data file backing knowledge pack public-health-outbreak-triage-frameworks.",
+      "contentUrl": "data/public-health-outbreak-triage/frameworks.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "351180 B",
+      "sha256": "eb158fd70441ab333b6ce66efa9d77ca63c52f4fb53908c2db3f55be561bc08a"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "public-health-outbreak-triage-frameworks__records",
+      "name": "public-health-outbreak-triage-frameworks__records",
+      "description": "Records parsed from frameworks.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "public-health-outbreak-triage-frameworks__records/id",
+          "name": "id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "public-health-outbreak-triage-frameworks__frameworks"
+            },
+            "extract": {
+              "column": "id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "public-health-outbreak-triage-frameworks__records/source",
+          "name": "source",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "public-health-outbreak-triage-frameworks__frameworks"
+            },
+            "extract": {
+              "column": "source"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "public-health-outbreak-triage-frameworks__records/text",
+          "name": "text",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "public-health-outbreak-triage-frameworks__frameworks"
+            },
+            "extract": {
+              "column": "text"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "public-health-outbreak-triage-frameworks__records/title",
+          "name": "title",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "public-health-outbreak-triage-frameworks__frameworks"
+            },
+            "extract": {
+              "column": "title"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "public-health-outbreak-triage-frameworks__records/version",
+          "name": "version",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "public-health-outbreak-triage-frameworks__frameworks"
+            },
+            "extract": {
+              "column": "version"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "public-health-outbreak-triage-frameworks__records/aspect",
+          "name": "aspect",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "public-health-outbreak-triage-frameworks__frameworks"
+            },
+            "extract": {
+              "column": "aspect"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "public-health-outbreak-triage-frameworks__records/scenario",
+          "name": "scenario",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "public-health-outbreak-triage-frameworks__frameworks"
+            },
+            "extract": {
+              "column": "scenario"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "public-health-outbreak-triage-frameworks__records/use_case",
+          "name": "use_case",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "public-health-outbreak-triage-frameworks__frameworks"
+            },
+            "extract": {
+              "column": "use_case"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

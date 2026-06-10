@@ -44,11 +44,11 @@ import urllib.request
 from dataclasses import dataclass
 from typing import Callable
 
-from scripts._config import DEFAULT_EMBEDDING_MODEL, EMBEDDING_MODELS
+from scripts._config import DEFAULT_EMBEDDING_MODEL, EMBEDDING_MODELS, HASH_BOW_FALLBACK_DIMENSIONS
 
 # --- offline hash backend (single source; build_vector_store imports these) --
 HASH_MODEL_ID = "hash-bow-v1"
-HASH_DIM = 256
+HASH_DIM = HASH_BOW_FALLBACK_DIMENSIONS
 _TOKEN_RE = re.compile(r"[a-z0-9][a-z0-9_.+-]{1,40}")
 _HTTP_TIMEOUT_S = 60
 

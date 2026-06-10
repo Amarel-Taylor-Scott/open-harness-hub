@@ -1,14 +1,14 @@
-# Case study: serving this repo's context to Claude Code (CEaaS dogfood)
+# Case study: serving this repo's context to Claude Code (Baltor dogfood)
 
 **Subject:** Open Harness Hub's own documentation and governed corpora.
 **Consumer:** the Claude Code (and MCP-client) agents that build this very repo — including the
 subagent that wrote this file.
-**Service:** Context Enrichment as a Service ([[../strategy/context-enrichment-service.md]]) — the
+**Service:** Baltor ([[../strategy/context-enrichment-service.md]]) — the
 content/corpus refinery, not the pipeline builder.
 
 This is the cleanest dogfood we have: the platform that compresses and governs context for *other*
 people's agents has, sitting inside it, a large doc tree that its *own* agents already struggle to
-carry. If CEaaS works, the first beneficiary is us.
+carry. If Baltor works, the first beneficiary is us.
 
 > **Honest framing up front.** This case study describes a *target* delivery, not a shipped metering
 > dashboard. What is built today: the governed component **definitions** for every tier and surface
@@ -36,15 +36,15 @@ context-engineering guide warns about: you bury the desk and the model's reasoni
 
 Today the agents working this repo cope the way every Claude Code user copes: a hand-maintained
 `CLAUDE.md`, ad-hoc `grep`/`Read` loops, and a CodeGraph index for structural queries. That works, but
-it is exactly the *scattered, single-shot, local, ungoverned* state CEaaS exists to replace
+it is exactly the *scattered, single-shot, local, ungoverned* state Baltor exists to replace
 ([[../strategy/context-enrichment-service.md]] — "the tooling exists... but only as scattered,
 single-shot, local CLIs"). It has no provenance trail, no freshness contract, no measured guarantee
 that the compressed view preserved what the agent needed, and no reuse: every agent rebuilds the same
 view of the same tree.
 
-## 2. The CEaaS move: render the tree into tiers, serve the tiers
+## 2. The Baltor move: render the tree into tiers, serve the tiers
 
-CEaaS treats this repo's docs + corpora as **one governed corpus** and renders it into the three
+Baltor treats this repo's docs + corpora as **one governed corpus** and renders it into the three
 token-efficiency tiers — each a *different mechanism*, which is why they are separate SKUs
 ([[../strategy/context-enrichment-service.md]]):
 
@@ -63,14 +63,14 @@ desk, pay the expensive model call only once.
 
 ## 3. The four surfaces — meet our agents where they ingest
 
-CEaaS's output "isn't an answer — it's a governed corpus rendered into whichever of [the] four shapes
+Baltor's output "isn't an answer — it's a governed corpus rendered into whichever of [the] four shapes
 the user's agent consumes" ([[../strategy/context-enrichment-service.md]]). For Claude Code working
 *this* repo, all four map to a real ingestion path, and each is a seeded component:
 
 1. **MCP server** — [`serve-mcp-corpus`](../../catalog/processors/deliver/serve-mcp-corpus.yaml)
    (`deliver.mcp_serve`). The default surface. The agent gets a live, tier-negotiated, CDC-fresh,
    cited handle on the docs + corpora instead of carrying the tree. This is the same convergence point
-   the repo's own CodeGraph MCP server already proves valuable for *structural* queries; CEaaS is the
+   the repo's own CodeGraph MCP server already proves valuable for *structural* queries; Baltor is the
    *content/corpus* analogue — "where is the lift bar defined and what does it actually say, cited."
 2. **Packed file / llms.txt** —
    [`emit-llms-txt`](../../catalog/processors/deliver/emit-llms-txt.yaml) (`deliver.llms_txt`). Download
@@ -105,14 +105,14 @@ the promotion-boundary rule or the "Conditional not rule-pack" vocabulary. The f
 turns "we compressed your conventions" into a contract — and it is the **same measurement engine and
 the same moat as OHH's capability-lift gate** ([[../design/value-propositions.md]] — "measured, never
 asserted"), extended from "does the pipeline lift?" to "did the tier preserve?". An agent consuming a
-CEaaS tier reads a fidelity score the way an OHH builder reads a `▲ +Δ` lift number: governance, not a
+Baltor tier reads a fidelity score the way an OHH builder reads a `▲ +Δ` lift number: governance, not a
 vendor claim.
 
 ## 5. Why governance is the point even for our own agents
 
 This repo's own rules say a doc must carry a warrant, a fact must carry provenance, and a volatile fact
 must carry CDC/freshness ([[../codex/change-verification-contract.md]]). A raw `grep` of the tree gives
-an agent text with none of that. CEaaS serves the *governed* corpus: each served slice keeps its
+an agent text with none of that. Baltor serves the *governed* corpus: each served slice keeps its
 source link, its lifecycle, and — for the live/hyper-efficient tier — a freshness contract, so an agent
 acting on "the lift bar is two-axis" can cite `scripts/eval/reason_codes.py` as the single source
 rather than paraphrasing from memory. That provenance trail is the external moat
@@ -134,14 +134,14 @@ frozen `llms.txt` goes stale, while the served corpus tracks `main`.
 
 ## 7. Built on the shared backend (no fork)
 
-CEaaS adds no new engine for this — it is a surface + a meter + the four emitters over the same
+Baltor adds no new engine for this — it is a surface + a meter + the four emitters over the same
 substrate OHH already runs ([[../strategy/two-services-shared-infrastructure.md]]): the
 compression/memory/cache components, the governed corpora, the connectors, the lift/fidelity harness,
 the vector store, the workers. The `enrichment` async service in
 [`services/registry.yaml`](../../services/registry.yaml) already declares ownership of
 `scripts/processors/{compression,memory,cache,retrieval}` and `calls: [measurement]` — i.e. it reuses
 OHH's measurement service to score fidelity. A better compressor or a fresher corpus shipped for OHH is
-instantly a better CEaaS tier for our agents.
+instantly a better Baltor tier for our agents.
 
 ## Status (built vs planned)
 
@@ -157,7 +157,7 @@ Honest, and consistent with the spec's own status section
 - `processor/emit-claudemd-fragment` — `catalog/processors/deliver/emit-claudemd-fragment.yaml`
 - `processor/compression-fidelity-check` — `catalog/processors/verify/compression-fidelity-check.yaml`
 
-(Seeded by `scripts/seed/ceaas_components.py`; lifecycle `experimental`.)
+(Seeded by `scripts/seed/baltor_components.py`; lifecycle `experimental`.)
 
 **Planned (no entrypoint yet — boundary defined, code path declared in `services/registry.yaml`):**
 
@@ -177,8 +177,8 @@ per-service column ([[../codex/schema-extensibility.md]]).
 ---
 
 **WARRANT.** User intent — the owner asked for "full docs + dogfood + use cases/case studies," and for
-CEaaS positioning tied to the four consumption surfaces and the measured-fidelity guarantee; this is
-that dogfood case study. Corroboration — the CEaaS spec
+Baltor positioning tied to the four consumption surfaces and the measured-fidelity guarantee; this is
+that dogfood case study. Corroboration — the Baltor spec
 ([[../strategy/context-enrichment-service.md]]), the two-services decision record
 ([[../strategy/two-services-shared-infrastructure.md]]),
 [`services/registry.yaml`](../../services/registry.yaml), and the seeded catalog YAMLs all agree on the

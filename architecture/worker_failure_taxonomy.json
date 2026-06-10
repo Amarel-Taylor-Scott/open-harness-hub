@@ -1,0 +1,30 @@
+{
+  "version": "1.0",
+  "note": "Worker failure taxonomy (C-FLEET-2). Every task/provider failure maps to exactly one of these types. `retryable` drives the nack retry-vs-dead decision; `opens_circuit` marks failures that count toward a provider circuit breaker; `produces` lists the records a failure must emit. The supervisor learns provider routing from the aggregated rates. `unknown` is the safe default for an unclassified error (retryable=false so it never loops forever).",
+  "records_enum": ["ErrorEnvelope", "TaskAttempt", "ProviderFailureRecord", "RetryDecision"],
+  "failures": [
+    {"failure_type": "provider_unavailable", "retryable": true, "opens_circuit": true, "category": "provider", "produces": ["ErrorEnvelope", "TaskAttempt", "ProviderFailureRecord", "RetryDecision"]},
+    {"failure_type": "browser_launch_failed", "retryable": true, "opens_circuit": true, "category": "provider", "produces": ["ErrorEnvelope", "TaskAttempt", "ProviderFailureRecord", "RetryDecision"]},
+    {"failure_type": "navigation_timeout", "retryable": true, "opens_circuit": true, "category": "transient", "produces": ["ErrorEnvelope", "TaskAttempt", "ProviderFailureRecord", "RetryDecision"]},
+    {"failure_type": "selector_not_found", "retryable": false, "opens_circuit": false, "category": "content", "produces": ["ErrorEnvelope", "TaskAttempt"]},
+    {"failure_type": "auth_required", "retryable": false, "opens_circuit": false, "category": "policy", "produces": ["ErrorEnvelope", "TaskAttempt"]},
+    {"failure_type": "captcha_or_bot_block", "retryable": true, "opens_circuit": true, "category": "provider", "produces": ["ErrorEnvelope", "TaskAttempt", "ProviderFailureRecord", "RetryDecision"]},
+    {"failure_type": "rate_limited", "retryable": true, "opens_circuit": true, "category": "provider", "produces": ["ErrorEnvelope", "TaskAttempt", "ProviderFailureRecord", "RetryDecision"]},
+    {"failure_type": "network_error", "retryable": true, "opens_circuit": false, "category": "transient", "produces": ["ErrorEnvelope", "TaskAttempt", "RetryDecision"]},
+    {"failure_type": "content_changed", "retryable": false, "opens_circuit": false, "category": "content", "produces": ["ErrorEnvelope", "TaskAttempt"]},
+    {"failure_type": "parse_failed", "retryable": false, "opens_circuit": false, "category": "content", "produces": ["ErrorEnvelope", "TaskAttempt"]},
+    {"failure_type": "schema_validation_failed", "retryable": false, "opens_circuit": false, "category": "contract", "produces": ["ErrorEnvelope", "TaskAttempt"]},
+    {"failure_type": "tenant_policy_violation", "retryable": false, "opens_circuit": false, "category": "policy", "produces": ["ErrorEnvelope", "TaskAttempt"]},
+    {"failure_type": "source_authority_unknown", "retryable": false, "opens_circuit": false, "category": "policy", "produces": ["ErrorEnvelope", "TaskAttempt"]},
+    {"failure_type": "unsupported_domain", "retryable": false, "opens_circuit": false, "category": "policy", "produces": ["ErrorEnvelope", "TaskAttempt"]},
+    {"failure_type": "worker_crash", "retryable": true, "opens_circuit": false, "category": "infra", "produces": ["ErrorEnvelope", "TaskAttempt", "RetryDecision"]},
+    {"failure_type": "lease_expired", "retryable": true, "opens_circuit": false, "category": "infra", "produces": ["TaskAttempt", "RetryDecision"]},
+    {"failure_type": "duplicate_idempotency_key", "retryable": false, "opens_circuit": false, "category": "contract", "produces": ["ErrorEnvelope"]},
+    {"failure_type": "output_contract_invalid", "retryable": false, "opens_circuit": false, "category": "contract", "produces": ["ErrorEnvelope", "TaskAttempt"]},
+    {"failure_type": "forbidden_output_attempted", "retryable": false, "opens_circuit": false, "category": "policy", "produces": ["ErrorEnvelope", "TaskAttempt"]},
+    {"failure_type": "gpu_unavailable", "retryable": true, "opens_circuit": true, "category": "infra", "produces": ["ErrorEnvelope", "TaskAttempt", "ProviderFailureRecord", "RetryDecision"]},
+    {"failure_type": "model_load_failed", "retryable": true, "opens_circuit": true, "category": "provider", "produces": ["ErrorEnvelope", "TaskAttempt", "ProviderFailureRecord", "RetryDecision"]},
+    {"failure_type": "memory_limit_exceeded", "retryable": false, "opens_circuit": false, "category": "infra", "produces": ["ErrorEnvelope", "TaskAttempt"]},
+    {"failure_type": "unknown", "retryable": false, "opens_circuit": false, "category": "unknown", "produces": ["ErrorEnvelope", "TaskAttempt"]}
+  ]
+}

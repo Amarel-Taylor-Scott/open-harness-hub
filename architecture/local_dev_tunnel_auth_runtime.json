@@ -1,0 +1,161 @@
+{
+  "version": "1.0",
+  "status": "local_design",
+  "updated": "2026-06-09",
+  "purpose": "Local-first runtime, tunnel, and auth plan for testing AI Done Right surfaces without paid cloud hosting.",
+  "principles": {
+    "no_paid_cloud_required": true,
+    "trycloudflare_is_temporary_preview": true,
+    "trycloudflare_is_not_auth": true,
+    "no_fake_urls": true,
+    "local_auth_must_match_service_auth_policy": true,
+    "production_secrets_forbidden": true,
+    "containerized_local_apps_allowed": true
+  },
+  "authoritative_sources": {
+    "static_site_source": "scripts/portfolio_lib.py",
+    "service_registry": "services/registry.yaml",
+    "service_auth_policy": "architecture/service_auth_consumption_model.json",
+    "service_auth_doc": "docs/architecture/service-auth-and-consumption-model.md",
+    "trycloudflare_launcher": "scripts/launch_portfolio_trycloudflare.py",
+    "static_site_server": "scripts/serve_portfolio_sites.py",
+    "identity_realm_registry": "architecture/identity_realm_registry.json"
+  },
+  "local_surface_groups": [
+    {
+      "id": "portfolio_static_launch_sites",
+      "kind": "static_http",
+      "source": "scripts/portfolio_lib.py:SITE_ORDER",
+      "local_server": "scripts/serve_portfolio_sites.py",
+      "trycloudflare_launcher": "scripts/launch_portfolio_trycloudflare.py",
+      "public_exposure": "trycloudflare_quick_tunnel",
+      "auth_mode": "none_static_preview",
+      "fake_urls_allowed": false,
+      "status": "active"
+    },
+    {
+      "id": "demo_control_tower",
+      "kind": "projection_control_surface",
+      "source": "architecture/demo_surface_registry.json",
+      "public_exposure": "trycloudflare_quick_tunnel_when_launched",
+      "auth_mode": "anonymous_demo_read",
+      "writes_truth": false,
+      "fake_urls_allowed": false,
+      "status": "active"
+    },
+    {
+      "id": "product_microservices",
+      "kind": "local_service_processes_or_containers",
+      "source": "services/registry.yaml",
+      "public_exposure": "localhost_or_tunnel_to_selected_port",
+      "auth_mode": "local_internal_service_token",
+      "secret_policy": "secret_ref_only",
+      "status": "active_or_planned_by_registry"
+    },
+    {
+      "id": "identity_local_service",
+      "kind": "local_service_process",
+      "source": "architecture/identity_realm_registry.json",
+      "local_server": "scripts/identity_local_service.py",
+      "public_exposure": "localhost_or_tunnel_to_selected_port",
+      "auth_mode": "realm_session_or_scoped_api_key",
+      "secret_policy": "hash_only_at_rest_no_cleartext",
+      "writes_truth": false,
+      "fake_urls_allowed": false,
+      "status": "active"
+    },
+    {
+      "id": "ai_done_right_design_bundle",
+      "kind": "static_prototype_bundle",
+      "source": "dist/sites/openharness-design/shared/products.js",
+      "public_exposure": "local_static_or_temporary_tunnel",
+      "auth_mode": "prototype_simulated_only",
+      "writes_truth": false,
+      "status": "prototype"
+    }
+  ],
+  "container_stacks": [
+    {
+      "id": "minimal_platform",
+      "file": "infra/docker-compose.yml",
+      "purpose": "Postgres/pgvector, Redis, web, and worker local parity stack.",
+      "cloud_replacement": "managed database, managed Redis, hosted web/worker",
+      "paid_cloud_required": false
+    },
+    {
+      "id": "full_platform",
+      "file": "infra/docker-compose.platform.yml",
+      "purpose": "Product APIs, data tier, worker tier, and observability local parity stack.",
+      "cloud_replacement": "SaaS product accounts, queue workers, telemetry stack",
+      "paid_cloud_required": false
+    },
+    {
+      "id": "context_workers",
+      "file": "infra/docker-compose.context.yml",
+      "purpose": "Context-worker stack with Redis, Postgres, optional Ollama, optional Celery, optional Temporal.",
+      "cloud_replacement": "worker fleet, local model gateway, durable orchestration",
+      "paid_cloud_required": false
+    }
+  ],
+  "local_auth_modes": [
+    {
+      "mode": "none_static_preview",
+      "allowed_for": ["static marketing/prototype pages"],
+      "forbidden_for": ["private tenant data", "write APIs", "truth promotion"]
+    },
+    {
+      "mode": "anonymous_demo_read",
+      "allowed_for": ["projection-only demos with synthetic or public data"],
+      "forbidden_for": ["private bench backend access", "customer data writes"]
+    },
+    {
+      "mode": "local_internal_service_token",
+      "allowed_for": ["service-to-service calls on localhost or local docker network"],
+      "must_include": ["tenant_id", "scope", "aud", "sub", "exp", "correlation_id"],
+      "forbidden_for": ["browser prototypes storing raw tokens"]
+    },
+    {
+      "mode": "queue_identity",
+      "allowed_for": ["local async workers"],
+      "must_scope": ["queue", "job_kind", "tenant_or_public_demo"]
+    },
+    {
+      "mode": "secret_ref_only",
+      "allowed_for": ["configuration references"],
+      "examples": ["secret_ref://local/demo/main", "svc_baltor_redacted"],
+      "forbidden_for": ["raw provider keys", "raw tunnel tokens", "database passwords in browser code"]
+    }
+  ],
+  "trycloudflare_policy": {
+    "launcher": "scripts/launch_portfolio_trycloudflare.py",
+    "url_pattern": "https://<random>.trycloudflare.com",
+    "temporary": true,
+    "not_production_hosting": true,
+    "fake_urls_allowed": false,
+    "missing_states": ["MISSING_CLOUDFLARED", "TUNNEL_UNREACHABLE"],
+    "pid_cleanup": "exact_recorded_pid_only",
+    "share_manifests": [
+      ".agent/portfolio-sites/urls.json",
+      "dist/portfolio-share-urls.json",
+      "dist/portfolio-share-urls.md",
+      "dist/portfolio-share-urls.txt"
+    ]
+  },
+  "commands": {
+    "identity_service": "PYTHONPATH=. python3 scripts/identity_local_service.py --serve",
+    "serve_static_sites": "PYTHONPATH=. python3 scripts/serve_portfolio_sites.py --restart",
+    "launch_trycloudflare": "PYTHONPATH=. python3 scripts/launch_portfolio_trycloudflare.py --restart",
+    "stop_trycloudflare": "PYTHONPATH=. python3 scripts/launch_portfolio_trycloudflare.py --stop",
+    "minimal_container_stack": "docker compose -f infra/docker-compose.yml up --build",
+    "full_container_stack": "docker compose -f infra/docker-compose.platform.yml up --build",
+    "context_worker_stack": "docker compose -f infra/docker-compose.context.yml up --build"
+  },
+  "held_until_authorized": [
+    "paid cloud hosting",
+    "named production tunnels",
+    "production DNS",
+    "production secrets",
+    "network LLM calls with sensitive data",
+    "live third-party diagnostics"
+  ]
+}

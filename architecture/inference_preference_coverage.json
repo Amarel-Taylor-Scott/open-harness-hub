@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "note": "Which object families may declare a model preference for the shared LLM plane, and HOW. RULE: a preference is declared BY REFERENCE — a model_preference_ref pointing at an InferencePreference.v1 (preference_id) — NEVER an inline raw preference, provider name match, API key, or secret. The Inference Gateway resolves the ref (global→product→tenant→env→object-type→instance→call inheritance) and records the ACTUAL model used in a ModelInvocationReceipt. Declaring a preference is NOT choosing a model; the gateway + policy + fallback decide, and the receipt records reality.",
+  "field": "model_preference_ref",
+  "declared_via": "ObjectShell.v1.model_preference_ref (string ref) — or an object-family schema's own model_preference_ref",
+  "by_reference_only": true,
+  "inline_raw_preference_forbidden": true,
+  "object_families": [
+    {"family": "CapabilityTask", "owner": "teleon", "can_declare": true},
+    {"family": "PurposeTask", "owner": "teleon", "can_declare": true},
+    {"family": "CandidateImplementation", "owner": "teleon", "can_declare": true},
+    {"family": "ContextOptimizationPolicy", "owner": "baltor", "can_declare": true},
+    {"family": "ReviewPack", "owner": "baltor", "can_declare": true},
+    {"family": "ConsumptionSummary", "owner": "baltor", "can_declare": true},
+    {"family": "ContextArtifact", "owner": "opencontexthub", "can_declare": true},
+    {"family": "SkillArtifact", "owner": "openskillshub", "can_declare": true},
+    {"family": "ToolArtifact", "owner": "opentoolshub", "can_declare": true},
+    {"family": "HarnessArtifact", "owner": "openharnesshub", "can_declare": true},
+    {"family": "BenchmarkArtifact", "owner": "openbenchmarkhub", "can_declare": true},
+    {"family": "BenchmarkSuitabilityReport", "owner": "openbenchmarkhub", "can_declare": true},
+    {"family": "TemplateArtifact", "owner": "shared_template_registry", "can_declare": true},
+    {"family": "RepoIntelClassifier", "owner": "openharnesshub", "can_declare": true},
+    {"family": "SalesDiagnosticRun", "owner": "baltor", "can_declare": true}
+  ]
+}

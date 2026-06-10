@@ -32,7 +32,7 @@ Every grading-style pipeline uses the same shape:
 [CSDDD-Art.26 / HIPAA / audit-committee trace]
 ```
 
-The 6 step-types are **fixed**. The 5 vertical-specific artifacts
+The 6 step-types are **fixed**. The 5 vertical-specific components
 swap by industry.
 
 ## Three concrete verticals
@@ -99,7 +99,7 @@ Vendor-flagged:        6 steps,  2ms, 7 hits   (C:3 H:3 M:1)
    `processor/redact-pii-text`, `processor/audit-trace-emitter`,
    `processor/llm-judge`, and `pattern/k-anonymity-aggregation` all
    serve all three verticals.
-3. **Adding a new vertical is a 6-artifact PR.** Persona + GREP
+3. **Adding a new vertical is a 6-component PR.** Persona + GREP
    pack(s) + KB + rubric + pipeline + dataset. No runner code, no
    schema changes.
 4. **The catalog is more than YAML.** All three demos run with the
@@ -110,7 +110,7 @@ Vendor-flagged:        6 steps,  2ms, 7 hits   (C:3 H:3 M:1)
 
 ## How to add a fourth vertical
 
-Suggested next-vertical candidates and the artifacts each needs:
+Suggested next-vertical candidates and the components each needs:
 
 | Vertical | Persona | GREP rules | Knowledge pack | Rubric |
 |---|---|---|---|---|

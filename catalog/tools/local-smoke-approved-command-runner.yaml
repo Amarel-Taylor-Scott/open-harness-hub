@@ -1,0 +1,69 @@
+id: "tool/local-smoke-approved-command-runner"
+type: tool
+version: "0.1.0"
+name: "Local smoke approved command runner"
+description: "Builds an execution ledger from a local smoke command gate and optionally runs only commands that policy allows by default or that have a matching run-scoped approval record."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "evaluation", "verification"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "postgres", "pgvector", "smoke-test", "approval-gate", "execution-ledger"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    command_gate:
+      type: string
+    approval_record:
+      type: string
+    output:
+      type: string
+    run_id:
+      type: string
+    execute:
+      type: boolean
+    require_approval_record:
+      type: boolean
+    timeout_seconds:
+      type: integer
+  required: ["command_gate"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    mode:
+      type: string
+    eligible_count:
+      type: integer
+    blocked_count:
+      type: integer
+    executed_count:
+      type: integer
+    rows:
+      type: array
+side_effects: "write"
+examples:
+  - input:
+      command_gate: "dist/model-ops-daily-runs/2026-05-26/local-postgres-smoke/command-gate.json"
+      output: "dist/model-ops-daily-runs/2026-05-26/local-postgres-smoke/approved-command-runner.json"
+      execute: false
+      require_approval_record: true
+    output:
+      mode: "plan_only"
+      eligible_count: 0
+      blocked_count: 8
+implementations:
+  - kind: "callable"
+    path: "scripts.db.local_smoke_approved_command_runner.build_or_run_approved_local_smoke_commands"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.local_smoke_approved_command_runner"

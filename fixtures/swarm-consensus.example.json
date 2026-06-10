@@ -1,0 +1,38 @@
+{
+  "canonical_mutated": false,
+  "confidence": 0.4444,
+  "context_pack_patch": {
+    "applied": false,
+    "authority": "obj-adr-014",
+    "from_value": 3,
+    "op": "update_claim",
+    "predicate": "max_retries",
+    "reason": "align obj-runbook with authoritative obj-adr-014 (=5); requires human/policy approval before apply",
+    "subject_id": "obj-runbook",
+    "to_value": 5
+  },
+  "contradictions": [
+    "contradiction on 'max_retries': authority obj-adr-014=5 vs obj-retry-py=5, obj-runbook=3"
+  ],
+  "kind": "baltor.swarm-consensus.v1",
+  "object_ref": "obj-runbook",
+  "policy_risks": [
+    "obj-runbook policy.requires_refresh=true",
+    "obj-runbook is not promotion-eligible"
+  ],
+  "rejected_claims": [
+    {
+      "subject_id": "obj-runbook",
+      "summary": "'max_retries'=3 on obj-runbook disagrees with obj-adr-014=5, obj-retry-py=5"
+    }
+  ],
+  "requires_human_review": true,
+  "risk_level": "high",
+  "rot_signals": [
+    "obj-runbook is STALE (effective 2025-11-02) \u2014 do not rely on it for a write action"
+  ],
+  "suggested_relationships": [
+    "obj-runbook REQUIRES_REFRESH (per authority)"
+  ],
+  "verified_claims": []
+}

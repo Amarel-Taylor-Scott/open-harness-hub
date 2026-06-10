@@ -1,0 +1,84 @@
+{
+  "$id": "workers/WorkerTelemetry.v1",
+  "title": "WorkerTelemetry",
+  "description": "The seven worker-fleet telemetry tables (C-FLEET-2), computed deterministically from the DB task ledger and feeding the policy recommender. Pure projection; never mutates the ledger.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "worker_task_metrics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "task_id": {"type": "string"}, "capability_id": {"type": "string"}, "priority_class": {"type": "string"},
+          "status": {"type": "string"}, "queue_wait_ms": {"type": ["integer", "null"]},
+          "runtime_ms": {"type": ["integer", "null"]}, "attempt": {"type": "integer"}, "retry_count": {"type": "integer"},
+          "provider_id": {"type": "string"}, "worker_id": {"type": "string"}, "error_type": {"type": ["string", "null"]}
+        },
+        "required": ["task_id", "capability_id", "status", "queue_wait_ms", "runtime_ms", "attempt", "retry_count", "provider_id", "worker_id", "error_type"]
+      }
+    },
+    "worker_lifecycle_metrics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "worker_id": {"type": "string"}, "status": {"type": "string"}, "startup_ms": {"type": "integer"},
+          "tasks_processed": {"type": "integer"}, "tasks_failed": {"type": "integer"}, "tasks_per_start": {"type": "integer"}
+        },
+        "required": ["worker_id", "status", "startup_ms", "tasks_processed", "tasks_failed", "tasks_per_start"]
+      }
+    },
+    "worker_queue_metrics": {
+      "type": "object",
+      "properties": {
+        "queue_depth": {"type": "integer"}, "oldest_task_age_s": {"type": "number"},
+        "tasks_by_priority": {"type": "object"}, "tasks_by_capability": {"type": "object"},
+        "claim_rate": {"type": "number"}, "ack_rate": {"type": "number"}, "nack_rate": {"type": "number"},
+        "dlq_count": {"type": "integer"}, "lease_expiry_count": {"type": "integer"}, "batch_fill_ratio": {"type": "number"}
+      },
+      "required": ["queue_depth", "oldest_task_age_s", "tasks_by_priority", "tasks_by_capability", "claim_rate", "ack_rate", "nack_rate", "dlq_count", "lease_expiry_count", "batch_fill_ratio"]
+    },
+    "worker_provider_metrics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "provider_id": {"type": "string"}, "attempts": {"type": "integer"}, "successes": {"type": "integer"},
+          "failures": {"type": "integer"}, "success_rate": {"type": "number"}, "failure_rate": {"type": "number"},
+          "fallback_count": {"type": "integer"}
+        },
+        "required": ["provider_id", "attempts", "successes", "failures", "success_rate", "failure_rate", "fallback_count"]
+      }
+    },
+    "worker_cost_metrics": {
+      "type": "object",
+      "properties": {
+        "worker_start_count": {"type": "integer"}, "tasks_per_worker_start": {"type": "number"},
+        "tasks_succeeded": {"type": "integer"}, "cost_per_successful_task": {"type": ["number", "null"]},
+        "saved_startups_estimate": {"type": "integer"}
+      },
+      "required": ["worker_start_count", "tasks_per_worker_start", "tasks_succeeded", "cost_per_successful_task", "saved_startups_estimate"]
+    },
+    "worker_failure_metrics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "failure_type": {"type": "string"}, "count": {"type": "integer"},
+          "retryable": {"type": "boolean"}, "opens_circuit": {"type": "boolean"}
+        },
+        "required": ["failure_type", "count", "retryable", "opens_circuit"]
+      }
+    },
+    "worker_capacity_snapshots": {
+      "type": "object",
+      "properties": {
+        "now": {"type": "string"}, "live_workers": {"type": "integer"}, "queued": {"type": "integer"},
+        "running": {"type": "integer"}, "dead": {"type": "integer"}, "by_capability": {"type": "object"}
+      },
+      "required": ["now", "live_workers", "queued", "running", "dead", "by_capability"]
+    }
+  },
+  "required": ["worker_task_metrics", "worker_lifecycle_metrics", "worker_queue_metrics", "worker_provider_metrics", "worker_cost_metrics", "worker_failure_metrics", "worker_capacity_snapshots"]
+}

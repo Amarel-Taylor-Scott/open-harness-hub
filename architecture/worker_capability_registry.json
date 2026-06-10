@@ -1,0 +1,135 @@
+{
+  "version": "1.0",
+  "note": "Capability \u2192 worker_bucket + providers + fallback_order + queues + default policies. Source for the fleet supervisor.",
+  "capabilities": [
+    {
+      "capability_id": "browser.research",
+      "worker_bucket": "browser_workers",
+      "providers": [
+        "browser.playwright@candidate",
+        "browser.emulator@v1"
+      ],
+      "fallback_order": [
+        "browser.playwright@candidate",
+        "browser.emulator@v1"
+      ],
+      "resource_class": "browser_cpu",
+      "queue_names": [
+        "browser.realtime",
+        "browser.batch.5"
+      ],
+      "max_concurrency_per_worker": 1,
+      "estimated_startup_ms": 5000,
+      "estimated_task_ms": 15000,
+      "default_lifecycle_policy_id": "burst_keepalive",
+      "default_batch_policy_id": "batch_min_5",
+      "default_sla_policy_id": "interactive_30s"
+    },
+    {
+      "capability_id": "utility.http_download",
+      "worker_bucket": "utility_workers",
+      "providers": [
+        "utility.http@v1"
+      ],
+      "fallback_order": [
+        "utility.http@v1"
+      ],
+      "resource_class": "io_bound",
+      "queue_names": [
+        "utility.realtime"
+      ],
+      "max_concurrency_per_worker": 8,
+      "estimated_startup_ms": 200,
+      "estimated_task_ms": 800,
+      "default_lifecycle_policy_id": "warm_pool",
+      "default_batch_policy_id": "next_available",
+      "default_sla_policy_id": "interactive_10s"
+    },
+    {
+      "capability_id": "verify.fact",
+      "worker_bucket": "verification_fact_check",
+      "providers": [
+        "verify.deterministic@v1",
+        "verify.llm@candidate"
+      ],
+      "fallback_order": [
+        "verify.deterministic@v1",
+        "verify.llm@candidate"
+      ],
+      "resource_class": "standard_cpu",
+      "queue_names": [
+        "verify.realtime",
+        "verify.batch.25"
+      ],
+      "max_concurrency_per_worker": 4,
+      "estimated_startup_ms": 500,
+      "estimated_task_ms": 3000,
+      "default_lifecycle_policy_id": "warm_pool",
+      "default_batch_policy_id": "batch_min_25",
+      "default_sla_policy_id": "standard_2m"
+    },
+    {
+      "capability_id": "model.inference",
+      "worker_bucket": "model_inference",
+      "providers": [
+        "model.local_stub@v1",
+        "model.gpu@candidate"
+      ],
+      "fallback_order": [
+        "model.local_stub@v1",
+        "model.gpu@candidate"
+      ],
+      "resource_class": "gpu_small",
+      "queue_names": [
+        "model.gpu.batch.25"
+      ],
+      "max_concurrency_per_worker": 1,
+      "estimated_startup_ms": 8000,
+      "estimated_task_ms": 2000,
+      "default_lifecycle_policy_id": "warm_pool",
+      "default_batch_policy_id": "batch_min_25",
+      "default_sla_policy_id": "standard_2m"
+    },
+    {
+      "capability_id": "ingest.source_sync",
+      "worker_bucket": "ingestion_sync",
+      "providers": [
+        "ingest.connector@v1"
+      ],
+      "fallback_order": [
+        "ingest.connector@v1"
+      ],
+      "resource_class": "io_bound",
+      "queue_names": [
+        "ingest.realtime",
+        "ingest.batch.100"
+      ],
+      "max_concurrency_per_worker": 4,
+      "estimated_startup_ms": 300,
+      "estimated_task_ms": 5000,
+      "default_lifecycle_policy_id": "burst_keepalive",
+      "default_batch_policy_id": "batch_min_100",
+      "default_sla_policy_id": "batch_15m"
+    },
+    {
+      "capability_id": "native.export",
+      "worker_bucket": "native_export",
+      "providers": [
+        "native.export@v1"
+      ],
+      "fallback_order": [
+        "native.export@v1"
+      ],
+      "resource_class": "standard_cpu",
+      "queue_names": [
+        "native.realtime"
+      ],
+      "max_concurrency_per_worker": 8,
+      "estimated_startup_ms": 150,
+      "estimated_task_ms": 400,
+      "default_lifecycle_policy_id": "warm_pool",
+      "default_batch_policy_id": "on_demand_immediate",
+      "default_sla_policy_id": "interactive_10s"
+    }
+  ]
+}

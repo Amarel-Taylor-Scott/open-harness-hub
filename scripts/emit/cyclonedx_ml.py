@@ -6,7 +6,7 @@ ML extension: components[].modelCard.{modelParameters, quantitativeAnalysis, con
 
 Output: dist/aibom/cyclonedx-ml.cdx.json
 
-This is a release-level artifact summarising every harness, adapter,
+This is a release-level component summarising every harness, adapter,
 dataset, and knowledge-pack in the catalog as CycloneDX components.
 """
 from __future__ import annotations

@@ -1,0 +1,60 @@
+id: "tool/workflow-import-normalizer"
+type: tool
+version: "0.1.0"
+name: "Workflow import normalizer"
+description: "Imports workflow graphs from ComfyUI, n8n, Flowise, Dify, Langflow, Airflow, or similar systems and normalizes them into Open Harness primitive and pipeline candidate records."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "media", "cross_industry"]
+capability: ["format_conversion", "planning", "evaluation"]
+modality: ["text", "image", "video", "audio", "music", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+tags: ["workflow-import", "comfyui", "n8n", "flowise", "dify", "langflow"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    source_format:
+      type: string
+      enum: ["comfyui", "n8n", "flowise", "dify", "langflow", "airflow", "generic_dag"]
+    workflow:
+      type: object
+    import_policy:
+      type: object
+      description: "License, secret-handling, sandboxing, trust-boundary, and node allowlist policy."
+  required: ["source_format", "workflow"]
+returns:
+  type: object
+  properties:
+    normalized_graph:
+      type: object
+    candidate_primitives:
+      type: array
+      items:
+        type: object
+    candidate_pipeline:
+      type: object
+    warnings:
+      type: array
+      items:
+        type: string
+side_effects: "none"
+examples:
+  - input:
+      source_format: "comfyui"
+      workflow: {}
+    output:
+      normalized_graph: {}
+      candidate_primitives: []
+      candidate_pipeline: {}
+      warnings: ["Example only; real workflow graph required."]
+implementations:
+  - kind: "callable"
+    path: "tools.workflow_import_normalizer.run"
+  - kind: "mcp"
+    path: "mcp/workflows.import_normalize"

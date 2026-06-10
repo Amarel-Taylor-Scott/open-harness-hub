@@ -1,0 +1,64 @@
+id: "tool/cloud-search-function-adapter"
+type: tool
+version: "0.1.0"
+name: "Cloud search function adapter"
+description: "Invokes a user-owned cloud function or serverless endpoint that implements the Open Harness search contract for private, custom, or compliance-scoped search backends."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "tool_use"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "volatile"
+tags: ["search", "cloud-functions", "serverless", "private-search", "saas"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    endpoint:
+      type: string
+      description: "User-owned HTTPS endpoint or provider function identifier."
+    auth_ref:
+      type: string
+      description: "Secret or identity reference, never the raw credential."
+    request:
+      type: object
+      description: "Normalized search request."
+    timeout_ms:
+      type: integer
+      default: 10000
+    privacy_boundary:
+      type: string
+      description: "Boundary label expected for this function."
+  required: ["endpoint", "request"]
+returns:
+  type: object
+  properties:
+    raw_response:
+      type: object
+    invocation_id:
+      type: string
+    provider_metadata:
+      type: object
+side_effects: "external_call"
+examples:
+  - input:
+      endpoint: "https://example.cloudfunctions.net/search"
+      auth_ref: "secret/search-function-token"
+      request:
+        query: "internal deployment standard"
+        max_results: 5
+    output:
+      raw_response: {}
+      invocation_id: "example-invocation"
+      provider_metadata:
+        owner: "user"
+implementations:
+  - kind: "http"
+    url: "https://example.invalid/open-harness-search-contract"
+  - kind: "mcp"
+    path: "mcp/cloud.invoke_search_function"

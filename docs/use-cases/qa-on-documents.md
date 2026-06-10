@@ -15,7 +15,7 @@
 
 ## Primitives used
 
-| Layer | Artifact | What it does |
+| Layer | Component | What it does |
 |---|---|---|
 | Format conversion | `processor/pdf-to-text` | OCR + extract layer → plain text |
 | Chunking | `processor/recursive-character-chunker` | Split with overlap on paragraph/sentence boundaries |

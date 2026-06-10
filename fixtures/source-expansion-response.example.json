@@ -1,0 +1,51 @@
+{
+  "allowed": true,
+  "compact_preview": "# ADR-014: Billing retry policy",
+  "created_at": "1970-01-01T00:00:00Z",
+  "expansion_response_id": "xpr-6fee7708bdf74ad0",
+  "kind": "baltor.source-expansion-response.v1",
+  "lineage_summary": "raw evidence for ctx://acme-billing/decisions/ADR-014-billing-retry-policy.md#decision read from demo-data/acme-billing/decisions/ADR-014-billing-retry-policy.md under policy (purpose=read, classification=internal)",
+  "policy_decision": {
+    "checks": [
+      {
+        "check": "well_formed_handle",
+        "ok": true
+      },
+      {
+        "check": "acl",
+        "ok": true
+      },
+      {
+        "check": "classification_allowed",
+        "ok": true
+      },
+      {
+        "check": "expansion_policy",
+        "ok": true
+      },
+      {
+        "check": "fresh_enough_for_write",
+        "ok": true
+      },
+      {
+        "check": "source_readable",
+        "ok": true
+      },
+      {
+        "check": "prompt_injection_clean",
+        "ok": true
+      }
+    ],
+    "classification": "internal",
+    "expansion_policy": "allowed",
+    "is_write_action": false,
+    "purpose": "read",
+    "requester": "agent",
+    "staleness": "fresh"
+  },
+  "raw_excerpt": "# ADR-014: Billing retry policy\n\n- Status: Accepted\n- Date: 2026-03-18\n- Deciders: billing-team\n- Supersedes: the retry guidance in `docs/billing-runbook.md`\n\n## Context\n\nAfter INC-2026-04 (the retry storm), the unbounded client-side retries amplified a transient\ndownstream outage into a self-inflicted overload. We need a single, authoritative retry policy.\n\n## Decision\n\nThe billing payment-submit client uses **at most 5 retries** with full-jitter exponential\nbackoff (base 200ms, cap 20s). Retries apply only to idempotent, retry-safe status codes\n(429, 502, 503, 504). 5xx that are not retry-safe and all 4xx except 429 are surfaced immediately.\n\n> Authoritative value: **max_retries = 5**.\n\nThis decision is the source of truth for the retry ceiling. The runbook is superseded and must be\nupdated to match; until it is, treat the runbook's number as stale.\n\n## Consequences\n\n- `repo/billing/retry.py` implements `MAX_RETRIES = 5`.\n- The runbook (`docs/billing-runbook.md`, which still says 3) is now stale and contradicts this ADR.\n",
+  "reason": "granted",
+  "source_handle": "ctx://acme-billing/decisions/ADR-014-billing-retry-policy.md#decision",
+  "surrounding_context": "file://demo-data/acme-billing/decisions/ADR-014-billing-retry-policy.md",
+  "tokens_estimated": 259
+}

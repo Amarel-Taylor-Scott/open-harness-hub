@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"></meta>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+<title>Productionization Pass 1 — Audit &amp; Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"></link>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"></link>
+<link rel="stylesheet" href="shared/oh-tokens.css"></link>
+<style>
+  html, body { margin: 0; }
+  body.oh { background: var(--bg); color: var(--fg); font-family: var(--font-display); -webkit-font-smoothing: antialiased; }
+  .doc { max-width: 920px; margin: 0 auto; padding: 0 32px 96px; }
+  .doc-top { display: flex; align-items: center; gap: 12px; padding: 22px 0 18px; border-bottom: 1px solid var(--line); }
+  .doc-mark { width: 28px; height: 28px; border-radius: 7px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 800; font-size: 13px; }
+  .doc-brand { font-weight: 800; font-size: 15px; letter-spacing: -.02em; }
+  .doc-brand small { display: block; font-weight: 500; font-size: 11px; color: var(--fg-faint); }
+  .doc-top .sp { flex: 1; }
+  .doc-date { font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; background: var(--panel); }
+  .eyebrow { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-top: 44px; }
+  h1 { font-size: 32px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; margin: 12px 0 0; max-width: 26ch; }
+  .lede { font-size: 15.5px; line-height: 1.65; color: var(--fg-muted); margin: 16px 0 0; max-width: 64ch; text-wrap: pretty; }
+  .lede b { color: var(--fg); font-weight: 600; }
+  h2 { font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin: 56px 0 0; padding-bottom: 12px; border-bottom: 1px solid var(--line); display: flex; align-items: baseline; gap: 12px; }
+  h2 .n { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); font-weight: 600; }
+  p { font-size: 14px; line-height: 1.65; color: var(--fg-muted); margin: 12px 0 0; max-width: 70ch; text-wrap: pretty; }
+  p b { color: var(--fg); font-weight: 600; }
+  code { font-family: var(--font-mono); font-size: .92em; background: var(--bg-subtle); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 16px; }
+  th { text-align: left; font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-faint); padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: top; line-height: 1.5; color: var(--fg-muted); }
+  td .tt { color: var(--fg); font-weight: 600; }
+  td.req { width: 30%; }
+  .tag { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; white-space: nowrap; }
+  .tag.ok { color: var(--success); border-color: color-mix(in srgb, var(--success) 32%, var(--line)); }
+  .tag.part { color: var(--warning); border-color: color-mix(in srgb, var(--warning) 32%, var(--line)); }
+  .tag.no { color: var(--fg-faint); }
+  .tag.ship { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 36%, var(--line)); background: var(--accent-weak); }
+  .files { font-family: var(--font-mono); font-size: 12px; line-height: 2; color: var(--fg-muted); background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px 20px; margin-top: 16px; }
+  .files b { color: var(--fg); font-weight: 600; }
+  .files i { font-style: normal; color: var(--fg-faint); }
+  .inv { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+  .inv .card { border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--panel); padding: 16px 20px; }
+  .inv .k { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--fg-faint); }
+  .inv .t { font-size: 14.5px; font-weight: 700; margin-top: 6px; }
+  .inv .d { font-size: 12.5px; line-height: 1.55; color: var(--fg-muted); margin-top: 5px; }
+  .foot { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12px; color: var(--fg-faint); line-height: 1.6; }
+  .foot b { color: var(--fg-muted); font-weight: 600; }
+  @media (max-width: 720px) { .inv { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body class="oh dir-s theme-light">
+<div class="doc">
+
+  <header class="doc-top">
+    <div class="doc-mark">A</div>
+    <div class="doc-brand">AI Done Right<small>internal · productionization</small></div>
+    <div class="sp"></div>
+    <div class="doc-date">pass 1 · 2026-06-09</div>
+  </header>
+
+  <div class="eyebrow">Audit · increment · gap ledger</div>
+  <h1>Pass 1: the shared platform plane exists.</h1>
+  <p class="lede">Full sweep of every file, screen, primitive and doc against the five production requirements. Verdict: the <b>front-of-house is genuinely complete</b> (24 surfaces, a deep page kit, A/B engine, backend specs) and <b>everything behind it was mock</b>. This pass ships the first real increment: <b>platform-core</b> — auth, API keys, the standardized Baltor↔Teleon handshake, MCP/tool connections, the analytics/A-B sink, and the Shared LLM Plane — plus compose, TryCloudflare tunnels, contracts, and a Terraform skeleton. All runnable files; gaps stated plainly.</p>
+
+  <h2><span class="n">01</span> What the sweep found (inventory)</h2>
+  <div class="inv">
+    <div class="card">
+      <div class="k">Surfaces · 24</div>
+      <div class="t">Parent + Control Tower + Baltor + Teleon + 21 hubs — all render clean</div>
+      <div class="d">Every site on the shared kit; hubs are <code>makeHub()</code> configs; private bench flips live with one line. 20+ Baltor guided demos on one scenario engine.</div>
+    </div>
+    <div class="card">
+      <div class="k">Page kit · ~30 primitives</div>
+      <div class="t">The portal layer already exists as UI</div>
+      <div class="d">OhAuth (signin/signup/forgot) · OhApiKeys · OhTeam · OhBilling · OhUsage · OhAuditLog · OhSettings · OhOnboarding · OhNotifications · OhStatus · OhDocs · OhDashboard · OhCommandK — consistent across every site.</div>
+    </div>
+    <div class="card">
+      <div class="k">Experiments</div>
+      <div class="t">A/B is half-real already</div>
+      <div class="d"><code>OHExp</code> assigns variants, logs exposure/conversion to <code>dataLayer</code>, has a live dev panel. It only lacked a sink — that sink now exists (<code>/api/v1/events</code>).</div>
+    </div>
+    <div class="card">
+      <div class="k">Docs</div>
+      <div class="t">Backend is specified, not built</div>
+      <div class="d"><code>BACKEND-STACK.md</code> maps every hub to real OSS (Sigstore·Rekor, in-toto/SLSA, CycloneDX AI-BOM, Scorecard, Meilisearch, Keycloak) + a per-registry contract table. The spec is the build plan.</div>
+    </div>
+  </div>
+
+  <h2><span class="n">02</span> The five requirements — status after Pass 1</h2>
+  <table>
+    <thead><tr><th>Requirement</th><th>Before</th><th>After Pass 1</th><th></th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="req"><span class="tt">1 · Local + TryCloudflare, e2e public surfaces</span><br/>registration → landing → A/B → analytics → value</td>
+        <td>Static files opened by hand; no server, no tunnel, mock auth/events.</td>
+        <td>One <code>docker compose up</code> serves all 24 surfaces + the API plane; <code>--profile tunnel</code> / <code>scripts/tunnel.sh</code> gives a real trycloudflare.com URL. Registration/login/keys/events are real round-trips. <b>Remaining:</b> the prototype UIs still post to mock state, not <code>/api</code> (G-1, Pass 2).</td>
+        <td><span class="tag part">partial</span></td>
+      </tr>
+      <tr>
+        <td class="req"><span class="tt">2 · Product↔product &amp; hub connections</span><br/>Baltor⇄Teleon keys, admin creds, user-managed MCP/keys</td>
+        <td>Nothing — no concept of a service account anywhere.</td>
+        <td>Standardized: <code>SERVICE_&lt;ID&gt;_SECRET</code> service accounts, one handshake endpoint issuing scoped <code>sk_svc_…</code> keys with receipts, user self-service keys + MCP/tool/webhook connections. Contract: <code>contracts/SERVICE-CONNECTIONS.md</code>. <b>Remaining:</b> shared Connections portal UI.</td>
+        <td><span class="tag ok">shipped</span></td>
+      </tr>
+      <tr>
+        <td class="req"><span class="tt">3 · Standardized flows</span><br/>registration, portals, LLM planes</td>
+        <td>UI standardized (the kit); flows fake.</td>
+        <td>One auth + key + events contract for every site; portal pages already shared via kit. <b>Remaining:</b> wire kit pages to the contract (G-1).</td>
+        <td><span class="tag part">partial</span></td>
+      </tr>
+      <tr>
+        <td class="req"><span class="tt">4 · Containerized, 1-click deploy, Terraform</span></td>
+        <td>Nothing.</td>
+        <td>platform-core Dockerfile + compose (sites, core, tunnel profiles); Terraform skeleton: named Cloudflare tunnel, DNS per surface, generated service secrets — surfaces map mirrors <code>products.js</code> so opening a hub stays a one-line flip. <b>Remaining:</b> host-provisioning module; never applied yet (G-5).</td>
+        <td><span class="tag part">partial</span></td>
+      </tr>
+      <tr>
+        <td class="req"><span class="tt">5 · Shared infrastructure planes</span><br/>LLM router et al.</td>
+        <td>Nothing.</td>
+        <td><b>Shared LLM Plane</b> live at <code>/llm/v1/chat/completions</code>: OpenAI-compatible, routes claude*/gpt* to real providers, authenticates user/service keys, emits a <code>ModelInvocationReceipt</code> per call, returns <b>501 with instructions when no provider key is set — never a fake completion</b>. Events plane + receipts plane in the same core. <b>Remaining:</b> streaming, quotas (G-4).</td>
+        <td><span class="tag ok">shipped</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2><span class="n">03</span> What Pass 1 shipped (files)</h2>
+  <div class="files">
+<b>production/</b>
+├─ core/server.js          <i>platform-core: auth · keys · handshake · connections · events · A/B · LLM plane · receipts</i>
+├─ core/Dockerfile · package.json
+├─ docker-compose.yaml     <i>sites (Caddy, all 24 surfaces) + core + optional TryCloudflare tunnel</i>
+├─ Caddyfile               <i>/ → static surfaces · /api/* · /llm/* → core</i>
+├─ .env.example            <i>secrets template — nothing defaults to a fake</i>
+├─ scripts/tunnel.sh       <i>quick trycloudflare.com URL for any port</i>
+├─ contracts/SERVICE-CONNECTIONS.md · EVENTS.md
+├─ terraform/main.tf       <i>named tunnels + DNS + generated service secrets (skeleton)</i>
+└─ README.md               <i>run instructions · smoke tests · gap ledger G-1…G-8</i>
+  </div>
+
+  <h2><span class="n">04</span> Gap ledger (honest)</h2>
+  <table>
+    <thead><tr><th>#</th><th>Gap</th><th>Disposition</th></tr></thead>
+    <tbody>
+      <tr><td>G-1</td><td>Prototype UIs (OhAuth, OhApiKeys, OHExp) still run on mock state, not <code>/api/*</code>.</td><td><span class="tag ship">Pass 2 target</span> — wiring plan written in the contracts.</td></tr>
+      <tr><td>G-2</td><td>No real registry CRUD/search backend per hub.</td><td>Not started; per-registry contract exists in BACKEND-STACK.md.</td></tr>
+      <tr><td>G-3</td><td>Receipts are HMAC-signed, not Sigstore/Rekor.</td><td>Accepted local stand-in; record shape forward-compatible.</td></tr>
+      <tr><td>G-4</td><td>LLM plane lacks streaming + per-key quotas.</td><td>Queued.</td></tr>
+      <tr><td>G-5</td><td>Terraform written, never applied; no host module.</td><td>Skeleton only — stated in the file header.</td></tr>
+      <tr><td>G-6</td><td>JWT auth, not Keycloak/Ory SSO.</td><td>Fine locally; swap point documented.</td></tr>
+      <tr><td>G-7</td><td>JSON-file persistence, not Postgres.</td><td>Queued with G-5.</td></tr>
+      <tr><td>G-8</td><td>This workspace authors runnable files; it cannot execute docker/terraform itself. Verification = code review + the README smoke tests on your machine.</td><td>Permanent constraint, stated everywhere.</td></tr>
+    </tbody>
+  </table>
+
+  <h2><span class="n">05</span> Pass roadmap</h2>
+  <table>
+    <thead><tr><th>Pass</th><th>Increment (one per pass)</th><th>Proof</th></tr></thead>
+    <tbody>
+      <tr><td>2</td><td><span class="tt">Wire the front to the plane.</span> OhAuth → <code>/v1/auth/*</code>, OhApiKeys → <code>/v1/keys</code>, OHExp beacon → <code>/v1/events</code> — graceful no-op when core is down, so static prototypes keep working.</td><td>Register on Baltor's signup, see the user + receipt in core; A/B summary shows real exposures.</td></tr>
+      <tr><td>3</td><td><span class="tt">Connections portal.</span> One shared screen (kit pattern) for user MCP/tool connections + the service-connection graph (Baltor⇄Teleon) rendered from <code>/v1/service/connections</code>.</td><td>Handshake from the UI; both sides list the connection.</td></tr>
+      <tr><td>4</td><td><span class="tt">First real registry.</span> OpenContextHub browse/publish on actual CRUD + search; entries signed by the receipts plane.</td><td>Publish → browse → pull round-trip locally.</td></tr>
+      <tr><td>5</td><td><span class="tt">Infra apply.</span> Host-provisioning Terraform module + applied named tunnels; Postgres swap.</td><td><code>terraform apply</code> output + live hostnames.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="foot">
+    <b>Self-evaluation.</b> Improved: the family now has a real, standardized backend plane and a credible local→public path (compose → quick tunnel → named tunnel → DNS), with contracts that keep all 24 surfaces on one auth/key/event vocabulary. Deliberately not done: no claim that anything ran here (G-8), no fake providers, no invented registry data. Next pass is G-1 — the highest-leverage wiring, because it turns the existing beautiful portals into working ones.
+  </div>
+
+</div>
+</body>
+</html>

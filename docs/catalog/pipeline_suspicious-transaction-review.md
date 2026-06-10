@@ -31,12 +31,12 @@ and a SAR-style narrative draft for BSA officer review.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `redact_pii` | harness | `harness/redact-pii-text` | — |
-| 2 | `sanctions_screen_entities` | tool | `tool/sanctions-check` | — |
-| 3 | `graph_query` | tool | `tool/transaction-graph-query` | — |
-| 4 | `typology_score` | rule_pack | `rule-pack/aml-typologies-fatf` | — |
-| 5 | `retrieve_fatf` | knowledge_pack | `knowledge-pack/fatf-typologies-sample` | — |
-| 6 | `investigate` | harness | `harness/aml-investigation` | — |
+| 1 | `redact_pii` | harness | `harness/redact-pii-text` | - |
+| 2 | `sanctions_screen_entities` | tool | `tool/sanctions-check` | - |
+| 3 | `graph_query` | tool | `tool/transaction-graph-query` | - |
+| 4 | `typology_score` | rule_pack | `rule-pack/aml-typologies-fatf` | - |
+| 5 | `retrieve_fatf` | knowledge_pack | `knowledge-pack/fatf-typologies-sample` | - |
+| 6 | `investigate` | harness | `harness/aml-investigation` | - |
 
 ## Sample runs
 

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/model-route-record.schema.json",
+  "title": "Model route record",
+  "description": "Decision record for selecting a local, hosted, cloud, or specialist model for a task.",
+  "type": "object",
+  "required": ["model_route_id", "task_type", "selected_adapter", "route_reason"],
+  "properties": {
+    "model_route_id": { "type": "string" },
+    "task_type": { "type": "string" },
+    "modality": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "selected_adapter": { "type": "string" },
+    "selected_model": { "type": "string" },
+    "candidate_adapters": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "trust_boundary": { "type": "string" },
+    "cost_estimate": { "type": "object" },
+    "latency_budget_ms": { "type": "integer" },
+    "quality_tier": { "type": "string" },
+    "route_reason": { "type": "string" },
+    "pricing_snapshot_id": { "type": "string" },
+    "policy": {
+      "type": "object",
+      "description": "Policy inputs used to select or reject route candidates."
+    },
+    "selected_route": {
+      "type": ["object", "null"],
+      "description": "Normalized selected route metadata. Null when no compliant route exists."
+    },
+    "fallbacks": {
+      "type": "array",
+      "description": "Candidate reviews and fallback/rejection reasons considered during route selection.",
+      "items": { "type": "object" }
+    }
+  }
+}

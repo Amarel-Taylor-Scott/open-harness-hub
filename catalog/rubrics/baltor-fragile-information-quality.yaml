@@ -1,0 +1,88 @@
+id: "rubric/baltor-fragile-information-quality"
+type: rubric
+version: "0.1.0"
+name: "Baltor fragile information quality"
+description: "Overlay rubric for detecting, scoring, refreshing, and auditing fragile information in raw context and context packs."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["software", "ai_governance", "data_governance"]
+capability: ["evaluation", "verification", "retrieval"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+tags: ["baltor", "fragile-information", "freshness", "context-packs", "source-handles"]
+created: "2026-06-02"
+updated: "2026-06-02"
+dimensions:
+  - id: "fragility_taxonomy"
+    label: "System defines fragile information classes such as volatile facts, stale decisions, informal claims, permissions, ownership, costs, and schedules"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Review taxonomy, examples, source-specific mappings, and handling rules for each fragility class."
+  - id: "source_freshness"
+    label: "Freshness is measured from source timestamps, observation timestamps, validation timestamps, and source-specific update semantics"
+    weight: 0.08
+    scale: "0.0-1.0"
+    evidence_required: "Inspect source_updated_at, observed_at, indexed_at, last_validated_at, TTL, and stale-source warnings."
+  - id: "source_precedence"
+    label: "System encodes which source wins when code, tickets, docs, generated wikis, chat, memory, and incidents disagree"
+    weight: 0.08
+    scale: "0.0-1.0"
+    evidence_required: "Check precedence rules, conflict resolution policy, exception handling, and pack warnings."
+  - id: "conflict_detection"
+    label: "Contradictory claims are detected, linked to evidence, scored, and surfaced rather than silently averaged away"
+    weight: 0.08
+    scale: "0.0-1.0"
+    evidence_required: "Review contradiction edges, conflict dimensions, evidence handles, and unresolved-conflict display."
+  - id: "source_handle_validation"
+    label: "Claims and summaries carry source handles that can be expanded and revalidated against current source state"
+    weight: 0.08
+    scale: "0.0-1.0"
+    evidence_required: "Check exact-handle fetch, expansion permissions, handle freshness, and validation failure behavior."
+  - id: "fragile_claim_extraction"
+    label: "Extraction pipelines identify claims likely to change or cause damage if stale or wrong"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Inspect claim extraction, fragility scoring, ambiguity flags, domain sensitivity, and downstream risk."
+  - id: "refresh_scheduling"
+    label: "Fragile information triggers refresh, reindex, re-embed, rerank, or human review based on risk and age"
+    weight: 0.08
+    scale: "0.0-1.0"
+    evidence_required: "Review queues, scheduler policy, retry behavior, live validation, and stale-pack invalidation."
+  - id: "pack_freshness_labels"
+    label: "Context packs label each major claim with freshness, authority, confidence, and validation status"
+    weight: 0.08
+    scale: "0.0-1.0"
+    evidence_required: "Inspect pack schema, claim-level labels, source dates, current/as-of markers, and stale warnings."
+  - id: "temporal_querying"
+    label: "System can answer what was true as of source time, observation time, pack generation time, and current time"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Check bitemporal queries, context_trace output, pack lineage, and historical source version fetch."
+  - id: "risk_weighted_routing"
+    label: "High-fragility or high-risk claims route to stronger retrieval, reranking, model review, ensemble review, or human review"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Review risk formula, routing thresholds, model registry, reviewer escalation, and disagreement handling."
+  - id: "feedback_capture"
+    label: "Users can mark context as stale, wrong, missing, ambiguous, too broad, too narrow, or useful"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Check feedback events, source-level feedback, correction workflow, and impact on retrieval/reranking."
+  - id: "auditability"
+    label: "Every fragile-information decision records what was searched, excluded, returned, compressed, masked, expanded, and refreshed"
+    weight: 0.08
+    scale: "0.0-1.0"
+    evidence_required: "Review retrieval events, policy decisions, lineage events, trace IDs, and pack provenance."
+  - id: "raw_context_sync"
+    label: "Raw context is synced or federated with enough fidelity to detect fragile information without over-storing sensitive content"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Inspect connector sync modes, raw snapshot policy, link-only mode, encrypted local memory, and retention controls."
+  - id: "downstream_contract"
+    label: "Downstream agents receive freshness-aware packs and cannot mistake cached or summarized context for current source truth"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Check pack headers, cache TTL, freshness disclaimers, live validation flags, and exact source expansion tools."
+scoring_method: "weighted_sum"

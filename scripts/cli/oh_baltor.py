@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""``oh-ce`` — the Open Harness Hub open-funnel developer CLI (M5).
+"""``oh-baltor`` — the Open Harness Hub open-funnel developer CLI (M5).
 
 The no-account, works-with-the-agent-you-already-run surface. This is the
 **open funnel + consumption surface** for verified corpora described in the
@@ -36,7 +36,7 @@ It owns **no** product logic of its own — every subcommand imports and delegat
   * ``tiers <corpus.json> [--language L]``
       Show the raw / compressed / hyper-efficient **token counts + measured
       fidelity** for a corpus via ``scripts.enrichment.tier_pipeline`` (rolled up
-      per document, the same way ``serve`` does). The CEaaS density story,
+      per document, the same way ``serve`` does). The Baltor density story,
       runnable offline.
 
 Honest scope (per the change-verification contract,
@@ -58,7 +58,7 @@ Runtime contract (declared per
 ``docs/architecture/component-execution-and-runtime-routing.md`` §4; surfaced as
 ``RUNTIME`` and asserted in the self-test):
 
-  * ``process_kind   = cli.oh_ce`` — an operator/consumption front end.
+  * ``process_kind   = cli.oh_baltor`` — an operator/consumption front end.
   * ``deterministic  = true``  — same (inputs, flags) → byte-identical stdout. No
     clocks, RNG, env reads, or network. (The composed backend is itself
     deterministic; this layer adds none.)
@@ -76,11 +76,11 @@ Runtime contract (declared per
     message + non-zero exit); we never emit a malformed surface silently.
 
 CLI / self-test:
-    python3 scripts/cli/oh_ce.py --selftest        # proves all three subcommands
-    python3 -m scripts.cli.oh_ce --selftest
-    python3 -m scripts.cli.oh_ce serve corpus.json --tier --budget-tokens 2000
-    python3 -m scripts.cli.oh_ce verify "the limit is USD 10,000" --sources s.json
-    python3 -m scripts.cli.oh_ce tiers corpus.json
+    python3 scripts/cli/oh_baltor.py --selftest        # proves all three subcommands
+    python3 -m scripts.cli.oh_baltor --selftest
+    python3 -m scripts.cli.oh_baltor serve corpus.json --tier --budget-tokens 2000
+    python3 -m scripts.cli.oh_baltor verify "the limit is USD 10,000" --sources s.json
+    python3 -m scripts.cli.oh_baltor tiers corpus.json
 """
 from __future__ import annotations
 
@@ -90,11 +90,11 @@ import sys
 from typing import Any
 
 # Make the repo root importable when this file is run *directly*
-# (``python3 scripts/cli/oh_ce.py``). The CLI's whole job is to COMPOSE the
+# (``python3 scripts/cli/oh_baltor.py``). The CLI's whole job is to COMPOSE the
 # shipped ``scripts.*`` backend modules, so it must import them; a direct-file
 # invocation only has THIS file's directory on ``sys.path`` and ``import
 # scripts`` would fail. Prepending the repo root (this file is
-# ``<root>/scripts/cli/oh_ce.py`` → root is two parents up) keeps the clean
+# ``<root>/scripts/cli/oh_baltor.py`` → root is two parents up) keeps the clean
 # package-qualified imports working under BOTH ``-m`` and direct invocation.
 # Stdlib only; no-op under ``-m`` (already on path). Mirrors the identical guard
 # in ``scripts/enrichment/serve.py`` and ``tier_pipeline.py``.
@@ -126,10 +126,10 @@ from scripts.processors.assurance import multi_source_corroborate
 # ── Constants (single source of truth; No-Magic-Values) ──────────────────────
 
 #: process_kind for this front end (open vocab per SPEC §16 / routing doc §4).
-PROCESS_KIND = "cli.oh_ce"
+PROCESS_KIND = "cli.oh_baltor"
 
 #: The CLI program name (used in argparse + the descriptor banner).
-PROG = "oh-ce"
+PROG = "oh-baltor"
 
 #: Declared runtime-routing manifest. deterministic + idempotent + local trust
 #: boundary + reads-a-file/writes-stdout → side_effects "read/emit" (NOT "none":
@@ -465,7 +465,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Show raw/compressed/hyper-efficient token counts + measured fidelity.",
         description="Run the tier pipeline over a corpus's documents and roll up the "
                     "token counts (summed) + fidelity (token-weighted mean, from the "
-                    "separate evaluator). The CEaaS density story, offline.",
+                    "separate evaluator). The Baltor density story, offline.",
     )
     p_tiers.add_argument("corpus", help="Path to the governed-corpus JSON file.")
     p_tiers.add_argument(
@@ -527,13 +527,13 @@ import os  # noqa: E402
 import tempfile  # noqa: E402
 
 _SELFTEST_CORPUS: dict[str, Any] = {
-    "corpus_id": "oh-ce-selftest",
-    "title": "oh-ce self-test corpus",
+    "corpus_id": "oh-baltor-selftest",
+    "title": "oh-baltor self-test corpus",
     "summary": "A tiny governed corpus used to prove the open-funnel CLI offline.",
     "license": "MIT",
     "provenance": {
         "signer": "openharnesshub.com (selftest oracle)",
-        "source": "scripts/cli/oh_ce.py self-test fixture",
+        "source": "scripts/cli/oh_baltor.py self-test fixture",
         "updated": "2026-05-29",
     },
     "documents": [
@@ -595,7 +595,7 @@ def _selftest() -> int:
     # Write the fixtures to a private temp dir (the ONLY filesystem touch — the
     # CLI's contract is "reads a small JSON input"; we give it real files to read,
     # then clean them up, so nothing leaks into the repo).
-    tmp = tempfile.mkdtemp(prefix="oh_ce_selftest_")
+    tmp = tempfile.mkdtemp(prefix="oh_baltor_selftest_")
     corpus_path = os.path.join(tmp, "corpus.json")
     sources_ok_path = os.path.join(tmp, "sources_ok.json")
     sources_conflict_path = os.path.join(tmp, "sources_conflict.json")
@@ -611,12 +611,12 @@ def _selftest() -> int:
         code, llms = _run_cli(["serve", corpus_path, "--llms"])
         assert code == EXIT_OK, f"serve --llms exit {code}"
         lines = llms.splitlines()
-        assert lines[0] == "# oh-ce self-test corpus", \
+        assert lines[0] == "# oh-baltor self-test corpus", \
             f"llms.txt must open with the H1 title, got {lines[0]!r}"
         assert any(ln.startswith("> ") and "tiny governed corpus" in ln for ln in lines), \
             "llms.txt missing the blockquote summary"
         # The moat on the surface: the provenance/signer line is carried through.
-        assert any("Governed corpus `oh-ce-selftest`" in ln and "signed by" in ln for ln in lines), \
+        assert any("Governed corpus `oh-baltor-selftest`" in ln and "signed by" in ln for ln in lines), \
             "llms.txt missing the provenance info line"
         assert "## Reference" in llms, "llms.txt missing the Reference section"
         assert "- [Token budget planner](https://openharnesshub.com/docs/budget): " in llms, \
@@ -639,7 +639,7 @@ def _selftest() -> int:
         descriptor = json.loads(desc_out)  # must be parseable JSON on its own
         assert descriptor == serve_descriptor(_SELFTEST_CORPUS), \
             "serve --descriptor must print serve_descriptor() verbatim"
-        assert descriptor["serverInfo"]["corpusId"] == "oh-ce-selftest"
+        assert descriptor["serverInfo"]["corpusId"] == "oh-baltor-selftest"
         # one MCP resource per governed document, carrying provenance.
         assert len(descriptor["resources"]) == len(_SELFTEST_CORPUS["documents"])
         # the live MCP endpoint is honestly declared a SEAM, not faked as a wire.
@@ -762,7 +762,7 @@ def _selftest() -> int:
             pass
 
     print(
-        "PASS — oh-ce CLI: "
+        "PASS — oh-baltor CLI: "
         "serve --llms emits a well-formed llms.txt (H1+summary+provenance line, "
         "Reference section, spec link format; --full inlines bodies) byte-identical "
         "to emit_llms_txt; serve --descriptor emits the MCP contract (live wire = seam) "

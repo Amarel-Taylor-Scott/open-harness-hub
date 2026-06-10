@@ -11,7 +11,7 @@ marker. On code this yields large, structure-lossless token reductions
 compressor **degrades gracefully** and returns the content essentially
 unchanged rather than mangling it.
 
-This is the *structural* flavor of the CEaaS "Compressed" tier; it pairs with
+This is the *structural* flavor of the Baltor "Compressed" tier; it pairs with
 the *learned* flavor (LLMLingua-style). See
 ``docs/strategy/context-enrichment-service.md``.
 

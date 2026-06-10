@@ -1,0 +1,94 @@
+id: "harness/wikipedia-quality-review"
+type: harness
+version: "0.1.0"
+name: "Wikipedia article quality review harness"
+description: |
+  Wraps the Wikipedia-quality review flow as a reusable harness with
+  persona + GREP + RAG + tools layers. Reviews an article (or draft)
+  against the four core content policies + style/structure rubric and
+  emits structured per-claim findings with WP-policy citation.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["media", "media.editorial", "media.factcheck", "education"]
+capability: ["evaluation", "verification", "retrieval", "extraction"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["wikipedia", "npov", "v", "rs", "or", "blp", "harness"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+kind: "model_harness"
+tier: "primary"
+applied_layers: [persona, grep, rag, tools]
+consumes: [grep_rule, rag_doc, persona_block, response_policy]
+emits: [reasoning_step, context_snippet, extracted_fact]
+logic_paths:
+  - id: "review_wikipedia_article"
+    label: "article text → quality flags → policy RAG → grade + edit suggestions"
+    entrypoints: ["/api/wikipedia/review"]
+    steps:
+      - "fetch article wikitext (or accept inline)"
+      - "extract claims + sources"
+      - "fire WP-quality GREP pack"
+      - "RAG against WP-policy pack per flag category"
+      - "verify a sample of citations against the cited text"
+      - "judge per wikipedia-article-quality-v1 rubric"
+      - "propose per-finding edits (tag / rewrite / remove)"
+      - "emit audit trace"
+    consumes: [grep_rule, rag_doc, persona_block, response_policy]
+    emits: [reasoning_step, context_snippet, extracted_fact]
+    model_call: "required"
+    verification:
+      - "every finding cites a WP policy shortcut (WP:NPOV, WP:V, etc.) + URL anchor"
+      - "every finding quotes the exact text from the article + section heading"
+      - "BLP findings have explicit removal-vs-tag-vs-talk-page recommendation"
+knowledge_packs:
+  - id: "wp_policies"
+    label: "Wikipedia content-policy reference pack"
+    kind: knowledge_pack
+    types: [rag_doc, citation_edge]
+    required: true
+    trust_boundary: "local"
+    freshness: "dated"
+logic_packs:
+  - id: "persona_default"
+    label: "Wikipedia Quality Reviewer persona"
+    kind: logic_pack
+    types: [persona_block]
+    required: true
+model_io:
+  input:  "{article_text: string, article_title: string, language_edition: string}"
+  output: "{grade: number, findings: object[], suggested_edits: object[]}"
+model_targets:
+  - id: "local_ollama"
+    label: "Local Ollama"
+    transport: "ollama"
+    role: "Default local review; reproducible without API keys."
+    capabilities: [text_generation, chat]
+    required: false
+    default: true
+    trust_boundary: "local"
+  - id: "anthropic_judge"
+    label: "Anthropic Claude Sonnet (frontier judge)"
+    transport: "anthropic"
+    role: "Optional frontier-class judge for FA-grade review."
+    capabilities: [text_generation, chat, long_context]
+    required: false
+    default: false
+    trust_boundary: "external"
+input_verification:
+  - "reject input larger than 2 MB (very long FA-class articles)"
+  - "respect language_edition — refuse non-en for v0.1.0"
+output_verification:
+  - "every finding cites WP policy + URL"
+  - "no BLP claims are made about real persons by the reviewer (the reviewer assesses policy compliance only)"
+  - "rubric/wikipedia-article-quality-v1 score recorded"
+privacy_boundaries:
+  raw_input:      "stays local; article text is public"
+  derived_output: "may sync to hub"
+  external_calls: "only if model_target.trust_boundary == external AND user opted in"
+contributes_to:
+  - "pipeline/wikipedia-page-review"

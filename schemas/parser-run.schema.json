@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/parser-run.schema.json",
+  "title": "Parser run",
+  "description": "Provenance for one document parse: which ParserProvider ran, its version + confidence, the source it parsed, and the artifacts it produced. The audit record behind every decomposed DocumentObject (the heavy byte-parse is the ParserProvider seam; this records what it did). Distinct from context-artifact (the produced blobs) — this is the RUN.",
+  "type": "object",
+  "required": ["kind", "parser_run_id", "parser", "parser_version", "source_handle", "status"],
+  "properties": {
+    "kind": { "type": "string", "const": "baltor.parser-run.v1" },
+    "parser_run_id": { "type": "string" },
+    "parser": { "type": "string", "description": "ParserProvider id, e.g. docling / unstructured / liteparse / canned" },
+    "parser_version": { "type": "string" },
+    "source_handle": { "type": "string", "pattern": "^ctx://", "description": "the document the run parsed" },
+    "status": { "type": "string", "enum": ["succeeded", "partial", "failed", "low_confidence"] },
+    "started_at": { "type": "string", "format": "date-time" },
+    "completed_at": { "type": "string", "format": "date-time" },
+    "page_count": { "type": "integer", "minimum": 0 },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "rot_signals_emitted": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["source_hash_changed", "page_count_changed", "parser_version_superseded", "ocr_confidence_low", "layout_confidence_low", "table_extraction_conflict", "figure_extraction_missing", "coordinate_selector_invalid", "source_handle_unresolvable", "document_acl_changed", "reparse_required"] }
+    },
+    "output_artifacts": {
+      "type": "array",
+      "description": "object-store pointers to produced artifacts (raw snapshot, page images, parsed JSON)",
+      "items": { "type": "object", "additionalProperties": true }
+    },
+    "produced_object_count": { "type": "integer", "minimum": 0, "description": "ContextObjects emitted (document/page/block/table/figure/ocr nodes)" }
+  },
+  "additionalProperties": true
+}

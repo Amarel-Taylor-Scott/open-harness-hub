@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/workflow/flywheel-workflow.schema.json",
+  "title": "Flywheel workflow",
+  "description": "An executable workflow that runs one flywheel (sense→decide→act→observe→evaluate→improve→persist→re-trigger). Declares triggers, steps, queue messages, receipts, metrics, fallbacks, runtime, and the verified candidate backend tools. See docs/architecture/hierarchical-flywheels.md.",
+  "type": "object",
+  "required": ["kind", "name", "flywheel_id", "stage", "purpose", "triggers", "steps", "outputs", "metrics"],
+  "properties": {
+    "kind": { "type": "string", "const": "baltor.flywheel-workflow.v1" },
+    "name": { "type": "string" },
+    "flywheel_id": { "type": "string" },
+    "stage": { "type": "string", "description": "macro stage or rail this flywheel serves" },
+    "purpose": { "type": "string" },
+    "triggers": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "inputs": { "type": "array", "items": { "type": "string" } },
+    "decision_context": {
+      "type": "object",
+      "description": "present + required=true for L5 agent-decision flywheels (must reference decision-context.schema.json)",
+      "additionalProperties": true
+    },
+    "steps": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "queue_messages": { "type": "array", "items": { "type": "string" } },
+    "outputs": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "receipts_emitted": { "type": "array", "items": { "type": "string" } },
+    "metrics": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "failure_modes": { "type": "array", "items": { "type": "string" } },
+    "fallback_strategy": { "type": "string" },
+    "human_review_triggers": { "type": "array", "items": { "type": "string" } },
+    "suggested_runtime": { "type": "string" },
+    "candidate_backend_tools": { "type": "array", "items": { "type": "string" } },
+    "harness_refs": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": true
+}

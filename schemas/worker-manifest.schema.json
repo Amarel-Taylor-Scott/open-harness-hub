@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/worker-manifest.schema.json",
+  "title": "Worker manifest",
+  "description": "Portable manifest for a stateless Baltor/OHH worker. The manifest can be generated from the Python registry or used by K8s, Temporal, Argo, Celery, Cloud Run, or local runners.",
+  "type": "object",
+  "required": [
+    "name",
+    "lane",
+    "description",
+    "capabilities",
+    "task_types",
+    "image",
+    "output_contract",
+    "lifecycle",
+    "safety_policy"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(\\.[a-z0-9_]+)+$"
+    },
+    "version": {
+      "$ref": "_common.schema.json#/$defs/semver"
+    },
+    "lane": {
+      "$ref": "_common.schema.json#/$defs/queueLane"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "$ref": "_common.schema.json#/$defs/workerCapability"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "task_types": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          { "$ref": "_common.schema.json#/$defs/researchTaskType" },
+          {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)+$"
+          }
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "emits": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "image": {
+      "$ref": "_common.schema.json#/$defs/workerImage"
+    },
+    "output_contract": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]+\\.v[0-9]+$"
+    },
+    "runtime": {
+      "type": "object",
+      "properties": {
+        "execution_backends": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["local", "cloud_function", "cloud_run_job", "k8s_deployment", "k8s_job", "keda_scaled_job", "temporal_activity", "argo_step", "celery_task"]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "always_on": { "type": "boolean" },
+        "gpu_required": { "type": "boolean" },
+        "browser_required": { "type": "boolean" },
+        "network_required": { "type": "boolean" },
+        "max_runtime_seconds": { "type": "integer", "minimum": 1 },
+        "max_concurrency": { "type": "integer", "minimum": 1 },
+        "scale_to_zero": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "lifecycle": {
+      "type": "object",
+      "required": ["preflight", "load", "execute", "write_artifacts", "emit_followups", "shutdown"],
+      "properties": {
+        "preflight": { "type": "boolean" },
+        "load": { "type": "boolean" },
+        "execute": { "type": "boolean" },
+        "write_artifacts": { "type": "boolean" },
+        "emit_followups": { "type": "boolean" },
+        "shutdown": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "retry_policy": {
+      "type": "object",
+      "properties": {
+        "max_retries": { "type": "integer", "minimum": 0 },
+        "backoff": { "type": "string" },
+        "terminal_state": {
+          "type": "string",
+          "enum": ["failed_permanently"]
+        },
+        "approval_hold_state": {
+          "type": "string",
+          "enum": ["approval_required"]
+        },
+        "budget_hold_state": {
+          "type": "string",
+          "enum": ["budget_blocked"]
+        },
+        "idempotent": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "safety_policy": {
+      "type": "object",
+      "properties": {
+        "privacy_scope": {
+          "$ref": "_common.schema.json#/$defs/cacheScope"
+        },
+        "allowed_domains_required": { "type": "boolean" },
+        "source_text_is_untrusted": { "type": "boolean" },
+        "requires_source_hash": { "type": "boolean" },
+        "requires_evidence_packet": { "type": "boolean" },
+        "requires_archive_capture": { "type": "boolean" },
+        "can_adopt_facts": { "type": "boolean" },
+        "requires_two_sources": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

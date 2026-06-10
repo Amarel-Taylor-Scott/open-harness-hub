@@ -1,0 +1,65 @@
+id: "tool/duplicate-collapse-reporter"
+type: tool
+version: "0.1.0"
+name: "Duplicate collapse reporter"
+description: "Groups staged component row families by primary key and reports duplicate collapse by row family, ID source, and conflict status."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "verification", "evaluation", "planning"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "duplicate-collapse", "dedupe", "daily-factory", "load-audit", "id-stability"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    partition:
+      type: array
+      items:
+        type: string
+    output_dir:
+      type: string
+    run_id:
+      type: string
+    sample_limit:
+      type: integer
+  required: ["partition", "output_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    status:
+      type: string
+    counts:
+      type: object
+    family_reports:
+      type: object
+    files:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      partition: ["dist/model-ops-daily-runs/2026-05-26"]
+      output_dir: "dist/model-ops-daily-runs/2026-05-26/duplicate-collapse"
+      run_id: "model-ops-daily-2026-05-26-duplicate-collapse"
+    output:
+      ok: true
+      status: "ok"
+      counts:
+        duplicate_rows_collapsed: 0
+        critical_duplicate_rows_collapsed: 0
+        conflicting_duplicate_key_groups: 0
+implementations:
+  - kind: "callable"
+    path: "scripts.db.duplicate_collapse_report.build_duplicate_collapse_report"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.duplicate_collapse_report"

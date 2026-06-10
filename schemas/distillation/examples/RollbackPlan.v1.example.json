@@ -1,0 +1,40 @@
+{
+  "valid": {
+    "schema_version": "RollbackPlan.v1",
+    "plan_id": "rbplan-1a2b3c4d5e6f7081",
+    "tenant_id": "acme",
+    "scope": "global_public",
+    "artifact_key": "ctx://public/pack/cfpb-rege-10day",
+    "from_artifact_id": "pack-rege-10day-v2",
+    "rollback_target_id": "pack-rege-10day-v1",
+    "promotion_id": "promo-1a2b3c4d5e6f7081",
+    "deletes_artifacts": false,
+    "deletes_prior_responses": false,
+    "reason": "monitoring red: source-handle coverage dropped below 1.0 after promotion",
+    "rollback_receipt_id": "rcpt-rollback-77",
+    "planned_at": "2026-06-05T00:00:00Z"
+  },
+  "invalid_missing_rollback_target": {
+    "schema_version": "RollbackPlan.v1",
+    "plan_id": "rbplan-bad",
+    "tenant_id": "acme",
+    "scope": "global_public",
+    "artifact_key": "ctx://public/pack/cfpb-rege-10day",
+    "from_artifact_id": "pack-rege-10day-v2",
+    "deletes_artifacts": false,
+    "deletes_prior_responses": false,
+    "reason": "monitoring red"
+  },
+  "invalid_deletes_flag_wrong_type": {
+    "schema_version": "RollbackPlan.v1",
+    "plan_id": "rbplan-bad2",
+    "tenant_id": "acme",
+    "scope": "global_public",
+    "artifact_key": "ctx://public/pack/cfpb-rege-10day",
+    "from_artifact_id": "pack-rege-10day-v2",
+    "rollback_target_id": "pack-rege-10day-v1",
+    "deletes_artifacts": "no",
+    "deletes_prior_responses": false,
+    "reason": "monitoring red"
+  }
+}

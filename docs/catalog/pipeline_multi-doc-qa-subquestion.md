@@ -34,11 +34,11 @@ aggregate into a single cited synthesis.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard_question` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `decompose` | harness | `harness/text-safety-review` | — |
-| 3 | `retrieve_per_subquestion` | rule_pack | `rule-pack/hybrid-retrieval-policy` | — |
-| 4 | `rerank_per_subquestion` | processor | `processor/cross-encoder-reranker` | — |
-| 5 | `answer_per_subquestion` | harness | `harness/text-safety-review` | — |
-| 6 | `aggregate` | harness | `harness/text-safety-review` | — |
-| 7 | `verify_citation_coverage` | processor | `processor/citation-coverage` | — |
+| 1 | `guard_question` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `decompose` | harness | `harness/text-safety-review` | - |
+| 3 | `retrieve_per_subquestion` | rule_pack | `rule-pack/hybrid-retrieval-policy` | - |
+| 4 | `rerank_per_subquestion` | processor | `processor/cross-encoder-reranker` | - |
+| 5 | `answer_per_subquestion` | harness | `harness/text-safety-review` | - |
+| 6 | `aggregate` | harness | `harness/text-safety-review` | - |
+| 7 | `verify_citation_coverage` | processor | `processor/citation-coverage` | - |
 

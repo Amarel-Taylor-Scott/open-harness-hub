@@ -3,7 +3,7 @@
 # by its OWN persistent trycloudflare.com tunnel (the two-services model — see
 # docs/strategy/two-services-shared-infrastructure.md):
 #   • Open Harness Hub    (build / monitor pipelines)  → :8000 → dist/showcase-share-url-harness-hub.txt
-#   • Context Enrichment  (content refinery, CEaaS)    → :8001 → dist/showcase-share-url-context-enrichment.txt
+#   • Baltor   (content refinery / verified context)    → :8001 → dist/showcase-share-url-baltor.txt
 # Same code, same catalog, same token — two surfaces. OH_PRODUCT pins the brand (injected into
 # index.html by the server). Tunnels are left running on exit so their public URLs stay STABLE across
 # server restarts (no dead-tab churn for testers).
@@ -69,13 +69,13 @@ bring_up_tunnel(){ # port slug
 
 say "── bringing up both products on the shared backend ──"
 bring_up_server harness-hub        8000 harness-hub
-bring_up_server context-enrichment 8001 context-enrichment
+bring_up_server baltor 8001 baltor
 bring_up_tunnel 8000 harness-hub
-bring_up_tunnel 8001 context-enrichment
+bring_up_tunnel 8001 baltor
 
 say ""
 say "═══════════════════════════════════════════════════════════════"
 say "  Open Harness Hub    →  $(cat dist/showcase-share-url-harness-hub.txt 2>/dev/null)"
-say "  Context Enrichment  →  $(cat dist/showcase-share-url-context-enrichment.txt 2>/dev/null)"
+say "  Baltor  →  $(cat dist/showcase-share-url-baltor.txt 2>/dev/null)"
 say "  shared backend · stable tunnels · stop tunnels: pkill -f 'cloudflared tunnel'"
 say "═══════════════════════════════════════════════════════════════"

@@ -1,0 +1,36 @@
+id: "knowledge-pack/object-factory-worker-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Object factory worker patterns"
+description: "Reference worker patterns for converting source material into privacy-screened, verified, labeled, deduplicated Open Harness Hub objects."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["extraction", "summarization", "classification", "verification", "governance", "routing"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.factory"
+tags: ["object-factory", "workers", "privacy", "llm-routing", "dedupe", "indexing"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types:
+  - "object-factory-worker-pattern"
+files:
+  - path: "catalog/knowledge-packs/data/object-factory-worker-patterns/workers.jsonl"
+    schema: "schemas/object-factory-worker.schema.json"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    fields: ["responsibility", "inputs", "outputs", "privacy_controls"]
+provenance:
+  sources:
+    - "Open Harness Hub architecture notes"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "Synthetic worker patterns only; no real PII or tenant data."
+

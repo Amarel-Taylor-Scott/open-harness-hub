@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/presentation/render-receipt.schema.json",
+  "title": "Render receipt",
+  "description": "Records HOW a canonical concept was rendered for an audience: the stable canonical_id PLUS the rendered_label, alias profile + version, and surface. Storing the canonical_id (not just the label) keeps the audit trail intact if the label is later renamed (docs/standards/presentation-layer.md §17).",
+  "type": "object",
+  "required": ["kind", "render_receipt_id", "canonical_id", "rendered_label", "alias_profile", "alias_profile_version"],
+  "properties": {
+    "kind": { "type": "string", "const": "baltor.render-receipt.v1" },
+    "render_receipt_id": { "type": "string" },
+    "canonical_id": { "type": "string", "description": "the STABLE concept id, e.g. stage.anti_fragility" },
+    "rendered_label": { "type": "string" },
+    "alias_type": { "type": "string" },
+    "alias_profile": { "type": "string", "description": "alias pack id, e.g. alias_pack.security" },
+    "alias_profile_version": { "type": "string" },
+    "resolution_source": { "type": "string", "description": "which scope won the fallback chain" },
+    "audience": { "type": "string" },
+    "surface": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": true
+}

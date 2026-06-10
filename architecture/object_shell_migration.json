@@ -1,0 +1,19 @@
+{
+  "version": "1.0",
+  "note": "Lossless migration of object families to the canonical ObjectShell.v1 (14 sections). Migration WRAPS — the original object is preserved verbatim in payload (rehydratable to byte-identity), lineage records migrated_from + the original payload hash. Distillation is never replacement. One family is migrated per cycle; the rest are honest backlog.",
+  "migrator": "src/teleon/io/object_shell_migration.py",
+  "shell_builder": "src/teleon/templates/instantiator.compose_object_shell",
+  "families": [
+    {"object_type": "ContextArtifact", "source_schema": "schemas/context-artifact.schema.json", "id_field": "context_artifact_id", "status": "conformed", "proof": "check_object_shell_conformance_migration"},
+    {"object_type": "SkillArtifact", "source_schema": "OpenSkillsHub:SkillArtifact@logical", "id_field": "skill_artifact_id", "status": "conformed", "proof": "check_object_shell_conformance_migration"},
+    {"object_type": "ToolArtifact", "source_schema": "OpenToolsHub:ToolArtifact@logical", "id_field": "tool_artifact_id", "status": "conformed", "proof": "check_object_shell_conformance_migration"},
+    {"object_type": "HarnessArtifact", "source_schema": "OpenHarnessHub:HarnessArtifact@logical", "id_field": "harness_artifact_id", "status": "conformed", "proof": "check_object_shell_conformance_migration"},
+    {"object_type": "TemplateArtifact", "source_schema": "SharedTemplateRegistry:TemplateArtifact@logical", "id_field": "template_artifact_id", "status": "conformed", "proof": "check_object_shell_conformance_migration"},
+    {"object_type": "BenchmarkArtifact", "source_schema": "OpenBenchmarkHub:BenchmarkArtifact@logical", "id_field": "benchmark_artifact_id", "status": "conformed", "proof": "check_object_shell_conformance_migration"},
+    {"object_type": "RepoIntelClassifier", "source_schema": "GitHubSignalFlywheel:RepoIntelClassifier@logical", "id_field": "repo_intel_id", "status": "conformed", "proof": "check_object_shell_conformance_migration"},
+    {"object_type": "PurposeTaskRun", "source_schema": "Teleon:PurposeTaskRun@logical", "id_field": "purpose_task_run_id", "status": "conformed", "proof": "check_object_shell_conformance_migration"},
+    {"object_type": "ModelInvocationReceipt", "source_schema": "schemas/inference/ModelInvocationReceipt.v1.schema.json", "id_field": "receipt_id", "status": "conformed", "proof": "check_object_shell_conformance_migration"},
+    {"object_type": "SandboxRunResult", "source_schema": "schemas/sandbox/SandboxRunResult.v1.schema.json", "id_field": "run_id", "status": "conformed", "proof": "check_object_shell_conformance_migration"},
+    {"object_type": "EvaluationScorecard", "source_schema": "OpenHarnessHub:EvaluationScorecard@logical", "id_field": "eval_id", "status": "conformed", "proof": "check_object_shell_conformance_migration"}
+  ]
+}

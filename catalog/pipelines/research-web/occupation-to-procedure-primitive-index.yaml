@@ -1,0 +1,114 @@
+id: "pipeline/occupation-to-procedure-primitive-index"
+type: pipeline
+version: "0.1.0"
+name: "Occupation to procedure primitive index"
+description: "Convert occupation taxonomies, job descriptions, and role classifications into work atoms, procedure knowledge objects, candidate primitives, and searchable pipeline-building context."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "hr", "education", "cross_industry"]
+capability: ["retrieval", "extraction", "planning", "evaluation", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.discovery"
+tags: ["occupations", "job-descriptions", "work-atoms", "procedure-objects", "million-primitives", "primitive-database"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Mine occupation and job-description sources for tasks, questions, facts, tools, evidence requirements, policies, outputs, evals, and candidate AI pipeline primitives."
+pipeline_kind: "research_web.occupation_work_atom_index_build"
+
+inputs:
+  - name: "occupation_query"
+    type: "string"
+  - name: "source_ids"
+    type: "string[]"
+  - name: "job_descriptions"
+    type: "object[]"
+  - name: "domain_hints"
+    type: "string[]"
+outputs:
+  - name: "work_atoms"
+    type: "object[]"
+  - name: "procedure_objects"
+    type: "object[]"
+  - name: "candidate_primitives"
+    type: "object[]"
+  - name: "keyword_index_records"
+    type: "object[]"
+  - name: "vector_index_records"
+    type: "object[]"
+
+defaults:
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/occupation-source-surface-map"
+    - "knowledge-pack/procedure-knowledge-object-patterns"
+  rule_packs:
+    - "rule-pack/grep-prompt-injection-heuristics"
+
+steps:
+  - id: "load_occupation_surfaces"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/occupation-source-surface-map"
+    inputs:
+      query: "$.inputs.source_ids"
+      top_k: 50
+
+  - id: "lookup_occupation_profiles"
+    kind: "tool"
+    ref: "tool/occupation-taxonomy-source-lookup"
+    inputs:
+      occupation_query: "$.inputs.occupation_query"
+      source_ids: "$.inputs.source_ids"
+      include: ["tasks", "skills", "knowledge", "abilities", "work_context", "requirements", "tools"]
+
+  - id: "extract_work_atoms"
+    kind: "tool"
+    ref: "tool/job-description-work-atom-extractor"
+    inputs:
+      occupation_profile: "$.steps.lookup_occupation_profiles.output.occupations"
+      job_description: "$.inputs.job_descriptions"
+      domain_hints: "$.inputs.domain_hints"
+      extraction_schema:
+        fields: ["task", "review_question", "fact_dependency", "evidence_requirement", "decision_gate", "tool_dependency", "knowledge_area", "skill", "output_component", "risk_control", "evaluation_rubric"]
+
+  - id: "normalize_as_procedure_objects"
+    kind: "tool"
+    ref: "tool/procedure-object-normalizer"
+    inputs:
+      source_document:
+        work_atoms: "$.steps.extract_work_atoms.output.work_atoms"
+      target_domain: "$.inputs.domain_hints[0]"
+      object_types: ["review_question", "checklist_item", "decision_gate", "evidence_requirement", "narrative_template", "evaluation_rubric"]
+
+  - id: "dedupe_existing_primitives"
+    kind: "tool"
+    ref: "tool/embedding-index-search"
+    inputs:
+      query: "$.steps.extract_work_atoms.output.candidate_primitives"
+      index: "catalog"
+      top_k: 10
+      filters:
+        types: ["pipeline", "tool", "knowledge-pack", "rule-pack", "rubric", "benchmark"]
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "occupation-to-procedure-primitive-index"
+      applied_layers: ["occupation_source_lookup", "work_atom_extraction", "procedure_object_normalization", "semantic_dedupe", "primitive_candidate_generation"]
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.outputs.work_atoms"
+    op: "is_truthy"
+    value: true
+    label: "Work atoms are extracted from occupation or job-description sources."
+  - kind: "deterministic"
+    target: "$.outputs.procedure_objects"
+    op: "is_truthy"
+    value: true
+    label: "Procedure knowledge objects are produced for indexing."

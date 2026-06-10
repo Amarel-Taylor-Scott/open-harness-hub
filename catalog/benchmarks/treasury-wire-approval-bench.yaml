@@ -1,0 +1,35 @@
+id: "benchmark/treasury-wire-approval-bench"
+type: benchmark
+version: "0.1.0"
+name: "Treasury Wire Approval benchmark"
+description: "Synthetic benchmark for treasury wire approval review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["finance.fraud", "finance.kyc"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["treasury-wire-approval", "expansion-v5"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/treasury-wire-approval-review"
+dataset: "dataset/treasury-wire-approval-samples"
+rubric: "rubric/treasury-wire-approval-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/treasury-wire-approval-review"
+    rule_pack_override: ["rule-pack/grep-treasury-wire-approval-flags", "rule-pack/rag-treasury-wire-approval-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 23
+report:
+  output: "dist/benchmarks/treasury-wire-approval/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"></meta>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+<title>Expansion Scenarios — Pass 10</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"></link>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"></link>
+<link rel="stylesheet" href="shared/oh-tokens.css"></link>
+<style>
+  html, body { margin: 0; }
+  body.oh { background: var(--bg); color: var(--fg); font-family: var(--font-display); -webkit-font-smoothing: antialiased; }
+  .doc { max-width: 960px; margin: 0 auto; padding: 0 32px 96px; }
+  .doc-top { display: flex; align-items: center; gap: 12px; padding: 22px 0 18px; border-bottom: 1px solid var(--line); }
+  .doc-mark { width: 28px; height: 28px; border-radius: 7px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 800; font-size: 13px; }
+  .doc-brand { font-weight: 800; font-size: 15px; letter-spacing: -.02em; }
+  .doc-brand small { display: block; font-weight: 500; font-size: 11px; color: var(--fg-faint); }
+  .doc-top .sp { flex: 1; }
+  .doc-date { font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; background: var(--panel); }
+  .eyebrow { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-top: 44px; }
+  h1 { font-size: 32px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; margin: 12px 0 0; max-width: 26ch; }
+  .lede { font-size: 15.5px; line-height: 1.65; color: var(--fg-muted); margin: 16px 0 0; max-width: 66ch; text-wrap: pretty; }
+  .lede b { color: var(--fg); font-weight: 600; }
+  h2 { font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin: 54px 0 0; padding-bottom: 12px; border-bottom: 1px solid var(--line); display: flex; align-items: baseline; gap: 12px; }
+  h2 .n { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); font-weight: 600; }
+  p { font-size: 14px; line-height: 1.65; color: var(--fg-muted); margin: 12px 0 0; max-width: 70ch; text-wrap: pretty; }
+  p b { color: var(--fg); font-weight: 600; }
+  code { font-family: var(--font-mono); font-size: .92em; background: var(--bg-subtle); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
+
+  .scn { border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--panel); padding: 16px 20px; margin-top: 12px; display: grid; grid-template-columns: 64px 1fr; gap: 16px; }
+  .scn .id { font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--accent); padding-top: 2px; }
+  .scn .t { font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
+  .scn .rows { display: grid; gap: 6px; margin-top: 9px; }
+  .scn .row { display: grid; grid-template-columns: 86px 1fr; gap: 10px; font-size: 12.5px; line-height: 1.55; }
+  .scn .k { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--fg-faint); padding-top: 2px; }
+  .scn .v { color: var(--fg-muted); }
+  .scn .v b { color: var(--fg); font-weight: 600; }
+  .scn .row.trig .v { color: var(--fg); font-weight: 600; }
+  .scn .row.cost .v { font-family: var(--font-mono); font-size: 11.5px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 16px; }
+  th { text-align: left; font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-faint); padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: top; line-height: 1.5; color: var(--fg-muted); }
+  td:first-child { font-family: var(--font-mono); font-size: 11.5px; color: var(--fg); white-space: nowrap; }
+  .foot { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12px; color: var(--fg-faint); line-height: 1.6; }
+  .foot b { color: var(--fg-muted); font-weight: 600; }
+  @media (max-width: 640px) { .scn { grid-template-columns: 1fr; gap: 8px; } }
+</style>
+</head>
+<body class="oh dir-s theme-light">
+<div class="doc">
+
+  <header class="doc-top">
+    <div class="doc-mark">A</div>
+    <div class="doc-brand">AI Done Right<small>internal · expansion scenarios</small></div>
+    <div class="sp"></div>
+    <div class="doc-date">pass 10 · 2026-06-09</div>
+  </header>
+
+  <div class="eyebrow">Scenario planning · deeper research</div>
+  <h1>Ten futures, each with a trigger, a price, and a way back.</h1>
+  <p class="lede">Pass 9 chose platforms; Pass 10 stress-tests the choices against what could actually happen — first users, one product spiking, hubs going viral, enterprise self-host, the real K8s entry, GPUs, EU residency, repatriation, rebrand. Every scenario names its <b>trigger (a measurement, never a mood)</b>, the smallest response, the verified cost, and the reversal. Canonical: <code>production/cloud/SCENARIOS.md</code>.</p>
+
+  <h2><span class="n">01</span> The scenarios</h2>
+
+  <div class="scn"><span class="id">S-B</span><div>
+    <div class="t">First real users</div>
+    <div class="rows">
+      <div class="row trig"><span class="k">trigger</span><span class="v">any external user depends on uptime beyond laptop hours</span></div>
+      <div class="row"><span class="k">response</span><span class="v">L2: one Hetzner CPX22 (2v/4GB, <b>20TB EU bandwidth</b>) or DO Basic if US-first; Cloudflare in front; same <code>just up</code>; uptime-kuma joins the manifest</span></div>
+      <div class="row cost"><span class="k">cost</span><span class="v">$9.49–24/mo — inside the $15 ceiling at Hetzner</span></div>
+      <div class="row"><span class="k">reversal</span><span class="v">point the tunnel back at the laptop</span></div>
+    </div>
+  </div></div>
+
+  <div class="scn"><span class="id">S-C</span><div>
+    <div class="t">One product takes off</div>
+    <div class="rows">
+      <div class="row trig"><span class="k">trigger</span><span class="v">p95 budget breach or sustained CPU &gt;70%, attributable to ONE plane</span></div>
+      <div class="row"><span class="k">response</span><span class="v">split that plane to Cloud Run (scale-to-zero); manifest entry changes kind, routes identical; static surfaces go CDN the same day</span></div>
+      <div class="row cost"><span class="k">cost</span><span class="v">free tier → usage; watch egress ~$0.12/GB</span></div>
+      <div class="row"><span class="k">reversal</span><span class="v">container unchanged — kind: container again, one deploy</span></div>
+    </div>
+  </div></div>
+
+  <div class="scn"><span class="id">S-D</span><div>
+    <div class="t">Hubs go viral</div>
+    <div class="rows">
+      <div class="row trig"><span class="k">trigger</span><span class="v">bandwidth/saturation spikes on public registry reads</span></div>
+      <div class="row"><span class="k">response</span><span class="v">reads are static-first by design — CDN absorbs them; only publish/verify APIs scale on Cloud Run</span></div>
+      <div class="row cost"><span class="k">cost</span><span class="v">≈$0 reads · usage on writes</span></div>
+      <div class="row"><span class="k">reversal</span><span class="v">CDN is additive</span></div>
+    </div>
+  </div></div>
+
+  <div class="scn"><span class="id">S-E</span><div>
+    <div class="t">Enterprise wants self-host</div>
+    <div class="rows">
+      <div class="row trig"><span class="k">trigger</span><span class="v">a customer wants AIDR inside their network</span></div>
+      <div class="row"><span class="k">response</span><span class="v"><b>none on our infra</b> — the container thesis pays out: signed images + compose bundle + vault seam ARE the product; verified-deployment handshake gives them the badge, us the heartbeat</span></div>
+      <div class="row cost"><span class="k">cost</span><span class="v">$0 infra · packaging only</span></div>
+      <div class="row"><span class="k">reversal</span><span class="v">n/a</span></div>
+    </div>
+  </div></div>
+
+  <div class="scn"><span class="id">S-F</span><div>
+    <div class="t">The real K8s entry</div>
+    <div class="rows">
+      <div class="row trig"><span class="k">trigger</span><span class="v">ALL THREE: &gt;1 host · &gt;10 containers · an orchestration pain compose + deploy.py can't express</span></div>
+      <div class="row"><span class="k">response</span><span class="v"><b>GKE Autopilot first</b> — per-pod billing (~$0.0445/vCPU-hr) = zero bin-packing waste, no node ops, free-tier credit covers one cluster's fee. AKS = cost alternative (free control plane). EKS only if already AWS (flat $73/mo/cluster; 6× fee jump for clusters past the 14-month support window). K8s manifests GENERATED from services.json at entry — same pattern as the Caddyfile.</span></div>
+      <div class="row cost"><span class="k">cost</span><span class="v">4-pod Autopilot ≈ $78–80/mo · 3-node prod cluster $450–650/mo all-in — the entry fee; hence trigger-gated</span></div>
+      <div class="row"><span class="k">reversal</span><span class="v">images + manifest unchanged; compose stays the dev topology forever. Provider-migration rule: gap &lt;$5k/mo → don't migrate, optimize in place.</span></div>
+    </div>
+  </div></div>
+
+  <div class="scn"><span class="id">S-G</span><div>
+    <div class="t">GPU / self-hosted inference</div>
+    <div class="rows">
+      <div class="row trig"><span class="k">trigger</span><span class="v">LLM receipts show monthly provider spend ≥ cost of owned capacity, or a customer demands on-prem models</span></div>
+      <div class="row"><span class="k">response</span><span class="v">add a self-hosted adapter (vLLM/Ollama) behind the LLM plane's router — callers never know. Hetzner GEX44 (RTX 4000, 20GB) for inference.</span></div>
+      <div class="row cost"><span class="k">cost</span><span class="v">€184/mo+ — needs receipts proving ≥ that in provider spend</span></div>
+      <div class="row"><span class="k">reversal</span><span class="v">route models back to providers; the adapter is config</span></div>
+    </div>
+  </div></div>
+
+  <div class="scn"><span class="id">S-H</span><div>
+    <div class="t">EU data residency</div>
+    <div class="rows">
+      <div class="row trig"><span class="k">trigger</span><span class="v">first EU enterprise customer or regulator question</span></div>
+      <div class="row"><span class="k">response</span><span class="v">realm isolation already bounds the data; pin EU realms' volumes to Hetzner DE/FI; events are anon-id-only (S7) — most of the GDPR surface is pre-handled</span></div>
+      <div class="row cost"><span class="k">cost</span><span class="v">~$10/mo second-region VM</span></div>
+      <div class="row"><span class="k">reversal</span><span class="v">volume snapshot + restore; manifest region tag</span></div>
+    </div>
+  </div></div>
+
+  <div class="scn"><span class="id">S-I</span><div>
+    <div class="t">Repatriation insurance (standing posture)</div>
+    <div class="rows">
+      <div class="row"><span class="k">posture</span><span class="v">the 2026 repatriation wave is real — organizations are pulling workloads off hyperscalers over structural cost. Our exit stays open at every level: compose is the canonical topology, the manifest is the architecture, adapters hold the vendors. <b>Moving DOWN the ladder is success, not failure.</b></span></div>
+    </div>
+  </div></div>
+
+  <div class="scn"><span class="id">S-J</span><div>
+    <div class="t">Rebrand · spin-out · hub acquisition</div>
+    <div class="rows">
+      <div class="row trig"><span class="k">trigger</span><span class="v">business event</span></div>
+      <div class="row"><span class="k">response</span><span class="v">S12 pays out: rebrand = products.js + docs; spin-out = a realm + its volumes + manifest entries + secrets — a bounded, listable set</span></div>
+      <div class="row cost"><span class="k">cost</span><span class="v">≈0 engineering</span></div>
+    </div>
+  </div></div>
+
+  <h2><span class="n">02</span> Spend-threshold cheat sheet</h2>
+  <table>
+    <thead><tr><th>Monthly infra spend</th><th>Posture</th></tr></thead>
+    <tbody>
+      <tr><td>&lt; $50</td><td>One VM. Anything more is ceremony.</td></tr>
+      <tr><td>$50 – 500</td><td>VM + Cloud Run for the hot plane + CDN. Re-verify budgets quarterly.</td></tr>
+      <tr><td>$500 – 2k</td><td>K8s ONLY if all S-F triggers are true; else a second VM.</td></tr>
+      <tr><td>&gt; $2k</td><td>Full review pass; commitments (28% 1-yr / 46% 3-yr flex CUDs) once usage is proven stable.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="foot">
+    <b>Self-evaluation.</b> Improved: every plausible growth path now has a pre-decided, costed, reversible answer — the loop (or Claude Code) can act on a trigger without re-researching. Honest: prices are Jun-2026 snapshots and say so; S-F's K8s verdict (Autopilot-first) holds only at our scale and gets re-run at entry. Canonical files: <code>SCENARIOS.md</code> · <code>GRADUATION.md</code> (updated L2 economics) · <code>PLATFORM-REVIEW.md</code>.
+  </div>
+
+</div>
+</body>
+</html>

@@ -31,9 +31,9 @@ judge scores final positions and outputs verdict + transcripts.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `spawn_debaters` | processor | `processor/persona-set-generator` | — |
-| 3 | `round_1` | harness | `harness/text-safety-review` | — |
-| 4 | `subsequent_rounds_loop` | processor | `processor/iterative-revise-loop` | — |
-| 5 | `judge` | processor | `processor/llm-judge` | — |
+| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `spawn_debaters` | processor | `processor/persona-set-generator` | - |
+| 3 | `round_1` | harness | `harness/text-safety-review` | - |
+| 4 | `subsequent_rounds_loop` | processor | `processor/iterative-revise-loop` | - |
+| 5 | `judge` | processor | `processor/llm-judge` | - |
 

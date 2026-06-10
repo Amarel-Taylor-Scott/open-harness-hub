@@ -1,0 +1,58 @@
+id: "tool/daily-stage-ledger-builder"
+type: tool
+version: "0.1.0"
+name: "Daily stage ledger builder"
+description: "Inspects a daily component factory run directory and emits a resumable stage ledger with complete, missing, blocked, skipped, and failed stages plus deterministic resume actions."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["planning", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.scale"
+tags: ["components", "daily-factory", "resume", "stage-ledger", "incremental-build"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    run_dir:
+      type: string
+    stage_contract_path:
+      type: string
+    output_path:
+      type: string
+  required: ["run_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    closeout_ready:
+      type: boolean
+    status_counts:
+      type: object
+    next_stage:
+      type: object
+    resume_actions:
+      type: array
+side_effects: "write"
+examples:
+  - input:
+      run_dir: "dist/daily-production-runs/2026-05-26"
+      output_path: "dist/daily-production-runs/2026-05-26/stage-ledger.json"
+    output:
+      closeout_ready: false
+      status_counts:
+        complete: 5
+        missing: 3
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.daily_stage_ledger.build_daily_stage_ledger"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.factory.daily_stage_ledger"

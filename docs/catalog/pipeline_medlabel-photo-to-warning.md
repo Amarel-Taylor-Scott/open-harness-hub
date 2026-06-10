@@ -45,10 +45,10 @@ Given a photograph of a medicine label + user's current med list, detect dangero
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard_input` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `extract_label_fields` | harness | `harness/text-safety-review` | — |
-| 3 | `rag_drug_interactions` | rule_pack | `rule-pack/hybrid-retrieval-policy` | — |
-| 4 | `judge_interaction_risk` | harness | `harness/text-safety-review` | — |
-| 5 | `assemble_warning` | harness | `harness/text-safety-review` | — |
-| 6 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `guard_input` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `extract_label_fields` | harness | `harness/text-safety-review` | - |
+| 3 | `rag_drug_interactions` | rule_pack | `rule-pack/hybrid-retrieval-policy` | - |
+| 4 | `judge_interaction_risk` | harness | `harness/text-safety-review` | - |
+| 5 | `assemble_warning` | harness | `harness/text-safety-review` | - |
+| 6 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

@@ -1,0 +1,65 @@
+id: "tool/dedupe-resolution-planner"
+type: tool
+version: "0.1.0"
+name: "Dedupe resolution planner"
+description: "Exports dedupe resolution decisions, quality index rows, review tickets, and candidate dedupe review updates as CSV plus a psql load script."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["evaluation", "governance", "routing", "verification"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "dedupe", "entity-resolution", "review-gate", "postgres", "quality-index"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    dedupe_clusters_path:
+      type: string
+    normalized_objects_path:
+      type: string
+    component_candidates_path:
+      type: string
+    output_dir:
+      type: string
+    load_sql_name:
+      type: string
+  required: ["dedupe_clusters_path", "normalized_objects_path", "component_candidates_path"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    dedupe_resolution_count:
+      type: integer
+    index_record_count:
+      type: integer
+    review_ticket_count:
+      type: integer
+    candidate_dedupe_update_count:
+      type: integer
+    files:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      dedupe_clusters_path: "dist/source-surface-scan-partitions/seed/rows/dedupe-clusters.jsonl"
+      normalized_objects_path: "dist/source-surface-scan-partitions/seed/rows/normalized-objects.jsonl"
+      component_candidates_path: "dist/source-surface-scan-partitions/seed/component-store/component-candidates.jsonl"
+      output_dir: "dist/source-surface-scan-partitions/seed/dedupe-resolution"
+    output:
+      ok: true
+      dedupe_resolution_count: 620
+      candidate_dedupe_update_count: 620
+implementations:
+  - kind: "callable"
+    path: "scripts.db.dedupe_resolution_plan.create_dedupe_resolution_plan"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.dedupe_resolution_plan"

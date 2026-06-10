@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Backs `processor/compression-fidelity-check` (process_kind ``verify.compression_fidelity``).
 
-CEaaS lives or dies on **measured fidelity per tier**: compress too aggressively
+Baltor lives or dies on **measured fidelity per tier**: compress too aggressively
 and you destroy the model's ability to reason. Every ``raw -> compressed ->
 hyper-efficient`` artifact must ship a *published quality delta* — "did this tier
 preserve enough?" — and that score must come from a **SEPARATE evaluator, never
@@ -620,7 +620,7 @@ class HybridRetriever:
     print("[self-test] prose example: spec doc with entities, headings, numbers")
     raw_doc = (
         "# Measured fidelity per tier\n"
-        "CEaaS scores every tier with verify.compression_fidelity, never self-graded.\n"
+        "Baltor scores every tier with verify.compression_fidelity, never self-graded.\n"
         "Repomix achieves ~70% token reduction using Tree-sitter on code.\n"
         "LLMLingua-2 reaches 2-5x compression. OpenAI prompt cache cuts ~90% of input.\n"
         "## The seam\n"
@@ -628,7 +628,7 @@ class HybridRetriever:
     )
     good_doc = (
         "# Measured fidelity per tier\n"
-        "CEaaS scores tiers with verify.compression_fidelity, never self-graded.\n"
+        "Baltor scores tiers with verify.compression_fidelity, never self-graded.\n"
         "Repomix: ~70% reduction via Tree-sitter. LLMLingua-2: 2-5x. OpenAI cache ~90%.\n"
         "## The seam\n"
         "An LLM judge upgrades the proxy.\n"

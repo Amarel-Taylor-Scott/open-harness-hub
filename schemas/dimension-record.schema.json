@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/dimension-record.schema.json",
+  "title": "Dimension record",
+  "description": "Numeric or categorical feature assigned to an object for hybrid ranking, filtering, routing, or prioritization.",
+  "type": "object",
+  "required": ["dimension_id", "name", "subject_id", "value"],
+  "properties": {
+    "dimension_id": { "type": "string" },
+    "name": { "type": "string" },
+    "subject_id": { "type": "string" },
+    "subject_type": { "type": "string" },
+    "value": {},
+    "value_type": {
+      "type": "string",
+      "enum": ["number", "integer", "boolean", "string", "category", "array"]
+    },
+    "scale": { "type": "string" },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "assigned_by": { "type": "string" },
+    "assignment_method": {
+      "type": "string",
+      "enum": ["deterministic", "curator", "publisher", "tenant", "model", "imported"]
+    },
+    "model_route_id": { "type": "string" },
+    "provenance": { "type": "object" },
+    "state": { "$ref": "_common.schema.json#/$defs/objectState" },
+    "state_history": {
+      "type": "array",
+      "items": { "$ref": "_common.schema.json#/$defs/stateEvent" }
+    },
+    "priority_signals": { "$ref": "_common.schema.json#/$defs/prioritySignals" },
+    "review_status": { "type": "string" }
+  }
+}

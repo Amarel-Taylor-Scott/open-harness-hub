@@ -1,0 +1,57 @@
+id: "tool/worker-output-merge-auditor"
+type: tool
+version: "0.1.0"
+name: "Worker output merge auditor"
+description: "Audits parallel worker shard outputs before merge by checking row counts, source governance, duplicate ids, privacy boundaries, review tickets, index records, and replay metadata."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["verification", "governance", "evaluation"]
+modality: ["text", "structured", "tabular"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.factory"
+tags: ["container-workers", "merge-audit", "quality-gate", "parallelism", "object-factory"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    partition_manifests:
+      type: array
+      items: { type: object }
+    expected_schemas:
+      type: array
+      items: { type: string }
+    privacy_policy:
+      type: object
+    merge_policy:
+      type: object
+  required: ["partition_manifests", "merge_policy"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    merge_allowed:
+      type: boolean
+    row_count_summary:
+      type: object
+    issues:
+      type: array
+      items: { type: object }
+    review_ticket_ids:
+      type: array
+      items: { type: string }
+side_effects: "none"
+examples:
+  - input:
+      partition_manifests: []
+      merge_policy: { require_review_ticket_for_uncertain_rows: true }
+    output:
+      ok: true
+      merge_allowed: true
+      issues: []

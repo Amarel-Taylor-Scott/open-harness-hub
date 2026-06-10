@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "purpose": "NUMERIC provider/adapter status vocabulary. Runtime control logic uses the numeric `code`; the `label` is human/UI display metadata ONLY and must never be a control-flow string. Numeric codes leave gaps so a new status can be slotted BETWEEN existing ones without renumbering. Single source — proofs + the preference graph read this, never a parallel literal. See docs/architecture/numeric-preference-graph.md.",
+  "control_rule": "Display strings are for humans. Stable IDs are for references. Numeric codes are for control logic. Never branch on a status display string.",
+  "codes": [
+    {"code": 10, "label": "disabled", "adoptable": false, "note": "present but turned off"},
+    {"code": 20, "label": "research", "adoptable": false, "note": "watch-only; not wired"},
+    {"code": 30, "label": "candidate", "adoptable": true, "note": "cataloged, contract-bound, not yet wired live"},
+    {"code": 40, "label": "emulated", "adoptable": true, "note": "running via a local contract-compatible emulator"},
+    {"code": 50, "label": "active_local", "adoptable": true, "note": "wired, running locally (the offline equivalent)"},
+    {"code": 60, "label": "active_external", "adoptable": true, "note": "wired against a real external provider"},
+    {"code": 70, "label": "preferred", "adoptable": true, "note": "the currently-preferred adopted provider"},
+    {"code": 80, "label": "deprecated", "adoptable": false, "note": "on the way out; do not select for new work"}
+  ],
+  "_compat": "Legacy status strings (active/candidate/experimental/deprecated/quarantined/replaced/foil/reference) in external_capability_catalog.json map onto these codes; the catalog keeps its label for backward-compat and DERIVES the code. foil/reference/quarantined are non-adoptable (treated < 30)."
+}

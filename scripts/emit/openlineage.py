@@ -56,10 +56,10 @@ def render(pipeline: dict, catalog: dict) -> dict:
         if not ref or ref.startswith("$.") or ref in seen:
             continue
         seen.add(ref)
-        artifact = catalog.get(ref)
-        if not artifact:
+        component = catalog.get(ref)
+        if not component:
             continue
-        _, m = artifact
+        _, m = component
         if m.get("type") in ("dataset", "knowledge-pack"):
             inputs.append({
                 "namespace": NAMESPACE,

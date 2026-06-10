@@ -18,12 +18,12 @@ outputs from them; we cite external vocabularies by IRI rather than
 re-publishing them (SPEC §18.4). This audit grades how faithfully that posture
 is actually implemented, not whether the posture is right — it is. The full
 landscape rationale lives in [[standards-landscape]]; product framing for the
-CEaaS serving surfaces is in [[context-enrichment-service]] and
+Baltor serving surfaces is in [[context-enrichment-service]] and
 [[two-services-shared-infrastructure]].
 
 **Headline:** the external posture is strong — the emitters pin current,
 relevant specs and the choice of targets is defensible. Conformance debt is
-**concentrated in three places**, not spread thin: (1) two CEaaS serving
+**concentrated in three places**, not spread thin: (1) two Baltor serving
 surfaces declared with non-existent implementation modules that pass CI
 silently, (2) a handful of stale spec pins / non-conformant fields, and (3) a
 governance/addressability layer that was declared in the schema and SPEC but
@@ -80,7 +80,7 @@ the right calls.
 
 ---
 
-## 3. Drift #1 — dangling CEaaS serving surfaces (integrity hole, passes CI silently)
+## 3. Drift #1 — dangling Baltor serving surfaces (integrity hole, passes CI silently)
 
 **This is the highest-severity finding** because it is an *integrity* problem,
 not a cosmetic one: the catalog asserts a capability that has no
@@ -94,10 +94,10 @@ Python `path` under a directory that **does not exist**:
 | `catalog/processors/deliver/serve-mcp-corpus.yaml` | `deliver.mcp_serve` | `scripts.processors.deliver.serve_mcp_corpus.run` | **missing** — no `scripts/processors/deliver/` directory exists |
 | `catalog/processors/deliver/emit-llms-txt.yaml` | `deliver.llms_txt` | `scripts.processors.deliver.emit_llms_txt.run` | **missing** — same |
 
-These are the two consumption surfaces that matter most to the CEaaS product
+These are the two consumption surfaces that matter most to the Baltor product
 (serve a governed corpus over MCP; render it as `llms.txt` / `llms-full.txt` —
 the emerging doc-tier convention). They were seeded as catalog rows by
-`scripts/seed/ceaas_components.py` ahead of the implementations.
+`scripts/seed/baltor_components.py` ahead of the implementations.
 
 **Why CI stays green:** `scripts/validate.py` validates the manifest against
 `schemas/processor.schema.json`, checks vocabularies, and resolves component
@@ -109,7 +109,7 @@ can serve over MCP and emit `llms.txt` today; it cannot.
 
 **Why it matters for the product thesis:** governance is the moat. A catalog
 that claims a deliverable surface it can't run undermines the
-measured/governed posture exactly where the CEaaS wedge lives. This is the
+measured/governed posture exactly where the Baltor wedge lives. This is the
 honest-counting rule applied to capability, not just to component counts.
 
 **Remediation (disjoint code item, not this doc):**
@@ -241,7 +241,7 @@ Ordered by severity × structural-durability (fix the thing that prevents the
 1. **Add an `implementations[].path` resolver check to `scripts/validate.py`.**
    Structural; closes the drift-#1 blind spot permanently and would have caught
    the two dangling processors at commit time. (Highest leverage.)
-2. **Resolve the two dangling CEaaS surfaces** — implement
+2. **Resolve the two dangling Baltor surfaces** — implement
    `serve_mcp_corpus.run` / `emit_llms_txt.run` (start with the deterministic
    `emit-llms-txt`), or demote the manifests until the modules exist.
 3. **Drop the non-standard `when_to_use` key** from `agent_skill.py`; fold the

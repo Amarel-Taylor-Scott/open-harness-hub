@@ -179,7 +179,7 @@ post-hoc filter.
    text arm B (and arm C) will receive. If the answer is **verbatim present**, set
    `answer_in_grounding: true` and **exclude the item from the headline lift delta** — it tests
    copying, not capability. (It is retained as an *extraction-fidelity* metric, which is what the
-   CEaaS `verify.compression_fidelity` check actually wants — see rigor-doc gap 3.)
+   Baltor `verify.compression_fidelity` check actually wants — see rigor-doc gap 3.)
 2. The **bare arm faces the question with no grounding** (it already does). The **gold must be
    derivable independently** of the grounding the pipeline sees (held-out span or fact-combination —
    §3, family 1).

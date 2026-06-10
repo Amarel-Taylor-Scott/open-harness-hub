@@ -1,0 +1,18 @@
+# Scale Local Audit Llm 073
+
+*adapter* · `adapter/scale-local-audit-llm-073` · v0.1.0 · experimental
+
+Reusable local_only adapter profile for benchmark arms, local evaluation, and harness portability checks.
+
+| axis | value |
+|---|---|
+| industry | ai, cross_industry |
+| capability | verification, generation |
+| modality | structured |
+| lifecycle | experimental |
+| trust_boundary | local |
+| freshness | stable |
+| license | MIT |
+
+
+

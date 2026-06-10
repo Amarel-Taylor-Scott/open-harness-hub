@@ -25,10 +25,10 @@ Review M&A target DD packet across 6 streams + propose disposition.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `structured_to_prose` | processor | `processor/structured-to-prose` | — |
-| 2 | `redact_pii` | processor | `processor/redact-pii-text` | — |
-| 3 | `grep_red_flags` | rule_pack | `rule-pack/grep-ma-dd-red-flags` | — |
-| 4 | `rag_against_frameworks` | rule_pack | `rule-pack/hybrid-retrieval-policy` | — |
-| 5 | `grade` | processor | `processor/llm-judge` | — |
-| 6 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `structured_to_prose` | processor | `processor/structured-to-prose` | - |
+| 2 | `redact_pii` | processor | `processor/redact-pii-text` | - |
+| 3 | `grep_red_flags` | rule_pack | `rule-pack/grep-ma-dd-red-flags` | - |
+| 4 | `rag_against_frameworks` | rule_pack | `rule-pack/hybrid-retrieval-policy` | - |
+| 5 | `grade` | processor | `processor/llm-judge` | - |
+| 6 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

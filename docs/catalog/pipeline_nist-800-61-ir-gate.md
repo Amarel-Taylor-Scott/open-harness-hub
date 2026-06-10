@@ -25,7 +25,7 @@ Apply IR playbook gate at incident declaration.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `structured_to_prose` | processor | `processor/structured-to-prose` | — |
-| 2 | `checklist_gate` | processor | `processor/checklist-evaluator` | — |
-| 3 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `structured_to_prose` | processor | `processor/structured-to-prose` | - |
+| 2 | `checklist_gate` | processor | `processor/checklist-evaluator` | - |
+| 3 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

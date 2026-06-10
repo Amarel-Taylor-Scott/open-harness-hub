@@ -1,0 +1,78 @@
+id: "tool/blueprint-record-jsonl-exporter"
+type: tool
+version: "0.1.0"
+name: "Blueprint record JSONL exporter"
+description: "Exports local sentence-to-pipeline output records into canonical source_record, normalized_object, canonical_entity, object_entity_ref, dedupe_cluster, review_ticket, and index_record JSONL row families."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["format_conversion", "retrieval", "governance", "tool_use"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "volatile"
+tags: ["postgres", "pgvector", "jsonl", "bulk-load", "local-demo", "blueprint-records"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    prompt:
+      type: string
+    run_output:
+      type: object
+      description: "Output from the local sentence-to-pipeline demo."
+    output_dir:
+      type: string
+      description: "Directory where split JSONL row-family shards should be written."
+    include_private_prompt:
+      type: boolean
+      description: "When false, store only prompt hash and public-safe task metadata."
+  required: ["run_output"]
+returns:
+  type: object
+  properties:
+    output_dir:
+      type: string
+    row_counts:
+      type: object
+    files:
+      type: array
+      items:
+        type: string
+    row_family_paths:
+      type: object
+      description: "Map of canonical row family name to emitted JSONL path."
+    warnings:
+      type: array
+      items:
+        type: string
+side_effects: "write"
+examples:
+  - input:
+      prompt: "Build a cheap image plus text triage pipeline."
+      run_output:
+        ok: true
+        task_parse:
+          task_type: "image_text_safety_triage"
+          modalities: ["text", "image"]
+          risk_tier: "high"
+        output_records:
+          normalized_objects: []
+      include_private_prompt: false
+    output:
+      output_dir: "dist/blueprint-records/example"
+      row_counts:
+        source_record: 1
+      files: ["source-records.jsonl"]
+      row_family_paths:
+        source_record: "dist/blueprint-records/example/source-records.jsonl"
+      warnings: ["Raw prompt text was not exported."]
+implementations:
+  - kind: "callable"
+    path: "scripts.blueprints.blueprint_records_to_factory_jsonl.export_run_output"
+    language: "python"
+  - kind: "mcp"
+    path: "mcp/blueprints.export_records_jsonl"

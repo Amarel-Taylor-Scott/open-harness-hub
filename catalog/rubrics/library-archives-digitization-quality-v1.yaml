@@ -1,0 +1,55 @@
+id: "rubric/library-archives-digitization-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Library Archives Digitization review quality v1"
+description: "Benchmarkable rubric for library archives digitization review outputs."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["education.higher", "media.editorial"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["library-archives-digitization", "expansion-v6"]
+created: "2026-05-24"
+updated: "2026-05-24"
+dimensions:
+  - id: "coverage"
+    label: "Coverage"
+    weight: 0.18
+    scale: "0.0-1.0"
+    evidence_required: "Domain-specific review areas are covered or marked not applicable."
+  - id: "grounding"
+    label: "Evidence grounding"
+    weight: 0.30
+    scale: "0.0-1.0"
+    evidence_required: "Findings cite packet evidence, rule ids, or retrieved context ids."
+  - id: "gap_handling"
+    label: "Evidence gap handling"
+    weight: 0.14
+    scale: "0.0-1.0"
+    evidence_required: "Missing components are separated from confirmed violations."
+  - id: "severity"
+    label: "Severity calibration"
+    weight: 0.16
+    scale: "0.0-1.0"
+    evidence_required: "Severity reflects impact and confidence."
+  - id: "remediation"
+    label: "Actionable remediation"
+    weight: 0.14
+    scale: "0.0-1.0"
+    evidence_required: "Actions name owner, component, mitigation, and verification."
+  - id: "audit"
+    label: "Audit readiness"
+    weight: 0.08
+    scale: "0.0-1.0"
+    evidence_required: "Trace includes context ids, processor outputs, redaction status, model arm, and score."
+scoring_method: "weighted_sum"
+examples:
+  - grade: 0.9
+    response: "Evidence-linked findings, separated evidence gaps, calibrated severity, and benchmark metadata."
+    notes: "Benchmark pass."
+  - grade: 0.25
+    response: "Generic review without citations or owner-specific remediation."
+    notes: "Benchmark fail."

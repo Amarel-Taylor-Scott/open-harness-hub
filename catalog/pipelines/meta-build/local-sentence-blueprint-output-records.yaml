@@ -1,0 +1,117 @@
+id: "pipeline/local-sentence-blueprint-output-records"
+type: pipeline
+version: "0.1.0"
+name: "Local sentence blueprint output records"
+description: "Turns a local sentence-to-pipeline demo request into governed, normalized, deduplicated, indexed output records that can later be stored in Postgres and searched as reusable primitives."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "government", "finance", "humanitarian", "cross_industry"]
+capability: ["planning", "routing", "evaluation", "governance", "retrieval"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.product"
+tags: ["local-demo", "sentence-to-pipeline", "normalized-objects", "dedupe", "indexing", "pricing"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Convert a user sentence and route matrix into normalized output records with governance, entity linking, fuzzy dedupe, index emission, and review ticket routing."
+pipeline_kind: "meta_build.local_blueprint_records"
+inputs:
+  - name: "prompt"
+    type: "string"
+  - name: "cost_policy"
+    type: "object"
+  - name: "runtime_constraints"
+    type: "object"
+outputs:
+  - name: "task_parse"
+    type: "json"
+  - name: "route_matrix"
+    type: "json"
+  - name: "normalized_objects"
+    type: "array"
+  - name: "index_records"
+    type: "json"
+  - name: "review_tickets"
+    type: "array"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/local-blueprint-output-record-patterns"
+    - "knowledge-pack/costed-blueprint-route-patterns"
+    - "knowledge-pack/local-demo-verified-fact-patterns"
+steps:
+  - id: "govern-source-prompt"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record:
+        source_type: "user_prompt"
+        trust_tier: "user_private_source"
+        license: "tenant-private"
+        privacy_boundary: "tenant"
+  - id: "run-local-demo"
+    kind: "tool"
+    ref: "tool/sentence-to-pipeline-blueprint-runner"
+    inputs:
+      prompt: "$.inputs.prompt"
+      simulate: true
+      cost_policy: "$.inputs.cost_policy"
+      hosting_environment: "$.inputs.runtime_constraints"
+  - id: "build-route-matrix"
+    kind: "pipeline"
+    ref: "pipeline/costed-blueprint-route-matrix"
+    inputs:
+      task_parse: "$.steps.run-local-demo.task_parse"
+      runtime_constraints: "$.inputs.runtime_constraints"
+      cost_policy: "$.inputs.cost_policy"
+  - id: "emit-output-records"
+    kind: "tool"
+    ref: "tool/blueprint-output-record-emitter"
+    inputs:
+      prompt: "$.inputs.prompt"
+      task_parse: "$.steps.run-local-demo.task_parse"
+      route_matrix: "$.steps.build-route-matrix.route_matrix"
+      ab_plan: "$.steps.build-route-matrix.ab_plan"
+      emit_private: false
+  - id: "link-entities"
+    kind: "tool"
+    ref: "tool/entity-recognition-linker"
+    inputs:
+      text: "$.inputs.prompt"
+      record: "$.steps.emit-output-records.normalized_objects"
+      entity_types: ["jurisdiction", "agency", "model", "tool", "concept", "domain"]
+  - id: "dedupe-output-records"
+    kind: "tool"
+    ref: "tool/fuzzy-dedupe-clusterer"
+    inputs:
+      candidate_records: "$.steps.emit-output-records.normalized_objects"
+      match_features: ["normalized_title", "route_name", "risk_tier", "entity_graph"]
+  - id: "emit-index-records"
+    kind: "tool"
+    ref: "tool/index-record-emitter"
+    inputs:
+      normalized_objects: "$.steps.dedupe-output-records.canonical_records"
+      canonical_entities: "$.steps.link-entities.canonical_entities"
+      emit: ["keyword", "vector", "graph", "facet", "freshness", "cost"]
+success_criteria:
+  - kind: "semantic"
+    target: "$.normalized_objects"
+    must_cover:
+      - "model route record"
+      - "prompt prefix cache profile"
+      - "pricing snapshot"
+      - "eval arm"
+      - "verified fact dependency"
+      - "review ticket"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Local demo output is normalized into searchable primitive records."
+  - kind: "deterministic"
+    target: "$.index_records"
+    op: "is_truthy"
+    value: true
+    severity: "medium"
+    label: "Index records are emitted from deduplicated output records."

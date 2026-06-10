@@ -33,7 +33,7 @@ declares the task done or max_iterations is hit.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard_goal` | rule_pack | `rule-pack/grep-cloud-secrets` | — |
-| 2 | `loop` | processor | `processor/iterative-revise-loop` | — |
-| 3 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `guard_goal` | rule_pack | `rule-pack/grep-cloud-secrets` | - |
+| 2 | `loop` | processor | `processor/iterative-revise-loop` | - |
+| 3 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

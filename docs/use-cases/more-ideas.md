@@ -111,7 +111,7 @@ For each future use case, the recipe should answer:
 1. **Goal** (one sentence)
 2. **Inputs** + **outputs** (typed)
 3. **Primary pipeline** (existing or planned slug)
-4. **Primitives used** (table mapping each layer to an artifact in the catalog)
+4. **Primitives used** (table mapping each layer to a component in the catalog)
 5. **Composition diagram** (the persona → grep → rag → tool → harness chain)
 6. **Sample inputs / outputs**
 7. **Install path** (Claude Code marketplace command, direct skill drop, or run-pipeline command)

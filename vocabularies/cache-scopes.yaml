@@ -1,0 +1,25 @@
+# Controlled vocabulary: cache scopes.
+#
+# Where a prompt-prefix, KV-cache block, trajectory fragment, or context-pack
+# cache entry may be reused. Scope is an isolation boundary, not a performance
+# hint; runtimes must never widen it to chase hit rate.
+
+cache_scopes:
+  - id: public
+    label: Public — intentionally shareable across compatible requesters.
+      Use for public OHH templates, public tool schemas, and public context-pack
+      headers.
+  - id: org
+    label: Organization — reusable only inside one organization boundary.
+      Use for internal policies, approved org-wide tools, and shared operating
+      instructions.
+  - id: tenant
+    label: Tenant — reusable only inside one customer tenant boundary.
+      Use for tenant rules, tenant corpus headers, and private allowlists.
+  - id: user
+    label: User — reusable only for the same user or explicitly linked session
+      family. Use for personal memory and private preferences.
+  - id: private
+    label: Private — no shared reuse. Use for secrets, raw private documents,
+      sensitive tool results, and any data whose cache-hit behavior would leak
+      information.

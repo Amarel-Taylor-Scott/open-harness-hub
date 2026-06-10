@@ -1,0 +1,29 @@
+{
+  "version": "1.0",
+  "purpose": "How Baltor decides whether an external repo behind a capability slot is still safe to adopt/keep. Every adapter card carries a health_status from this enum; signals drive transitions; quarantine triggers force a slot off a provider. This makes 'the upstream repo decayed' a governed, reviewable event instead of a silent liability.",
+  "reads_from": "data/backend-tools.yaml",
+  "applies_to": "architecture/external_capability_catalog.json",
+  "health_status_enum": ["healthy", "watch", "at_risk", "decayed", "archived", "unverified"],
+  "adoption_status_enum": ["active", "candidate", "experimental", "deprecated", "quarantined", "replaced", "foil", "reference"],
+  "review_cadence_days": 90,
+  "monitored_signals": [
+    {"signal": "last_commit_age_days", "warn_threshold": 180, "fail_threshold": 365, "action": "watch_then_at_risk", "rationale": "abandonment risk"},
+    {"signal": "open_critical_security_advisories", "warn_threshold": 1, "fail_threshold": 1, "action": "at_risk", "rationale": "unpatched CVE in a dependency we route through"},
+    {"signal": "license_change_to_restrictive", "warn_threshold": 1, "fail_threshold": 1, "action": "quarantine", "rationale": "AGPL/SSPL/commercial relicense can make adoption illegal for our use"},
+    {"signal": "repository_archived", "warn_threshold": 1, "fail_threshold": 1, "action": "quarantine", "rationale": "no future maintenance (e.g. Kuzu archived Oct 2025)"},
+    {"signal": "capability_pivot", "warn_threshold": 1, "fail_threshold": 1, "action": "decayed", "rationale": "project pivoted away from the capability we need (e.g. Marqo -> ecommerce)"},
+    {"signal": "provenance_unverifiable", "warn_threshold": 1, "fail_threshold": 1, "action": "quarantine", "rationale": "cannot confirm the repo is what an upstream list claims (e.g. Synapse AI)"}
+  ],
+  "quarantine_triggers": [
+    "repository_archived",
+    "license_change_to_restrictive",
+    "provenance_unverifiable",
+    "maintainer_abandonment_over_365_days"
+  ],
+  "invariants": [
+    "Every adapter card has a health_status in health_status_enum.",
+    "Every slot/adapter status is in adoption_status_enum.",
+    "An active or candidate slot may NOT be wired (adapter_id) to an adapter whose health_status is decayed or archived.",
+    "A flagged/quarantined provider may never appear as a primary/fallback/stub (adopted) adapter — only in quarantined_providers, a foil card, or a reference card."
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "$id": "shared/ReceiptRef.v1",
+  "title": "ReceiptRef.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "A portable pointer to a receipt (ModelInvocationReceipt, ResourceProvisionReceipt, VerificationReceipt, OptimizationReceipt, HumanApprovalReceipt, ...). Objects carry ReceiptRefs in their receipts[] array so the full receipt can live in the receipt store while the object stays small.",
+  "required": ["receipt_id", "receipt_type"],
+  "properties": {
+    "receipt_id": {"type": "string"},
+    "receipt_type": {"type": "string", "description": "the receipt's schema name, e.g. ModelInvocationReceipt.v1"},
+    "content_hash": {"type": ["string", "null"]},
+    "issued_at": {"type": ["string", "null"]},
+    "store_ref": {"type": ["string", "null"], "description": "where the full receipt lives (logical, not a raw path)"}
+  }
+}

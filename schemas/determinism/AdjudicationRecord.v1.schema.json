@@ -1,0 +1,24 @@
+{
+  "$id": "determinism/AdjudicationRecord.v1", "title": "AdjudicationRecord.v1", "type": "object", "additionalProperties": false,
+  "description": "The record by which a human reviewer or a deterministic policy/authority produces the VERIFIED label for a decision step — turning a pile of LLM/consensus proposals into trustworthy training/eval data. This is the truth-producing event the WorkflowTrace.final_decision and ConsensusRun.final_label point at: adjudicated_by ∈ {human_reviewer, deterministic_policy, authority_ranking} (the existing Baltor reconciliation/policy authorities, NOT a new authority). It REQUIRES source_handles and a receipt_id (verified label = source-grounded + receipt-backed) and records which proposals it accepted vs held out (e.g. FAQ-30 held out). A label adjudicated_by='consensus' is invalid by enum. Deterministic when adjudicated_at is injected.",
+  "required": ["schema_version", "adjudication_id", "tenant_id", "source_scope", "workflow_id", "step_id", "subject_artifact_ids", "adjudicated_by", "verified_label", "accepted_proposal_ids", "held_out_proposal_ids", "source_handles", "receipt_id", "adjudicated_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["AdjudicationRecord.v1"]},
+    "adjudication_id": {"type": "string", "description": "content-addressed id; deterministic"},
+    "tenant_id": {"type": "string"},
+    "source_scope": {"type": "string", "enum": ["global_public", "tenant_private", "tenant_shared"]},
+    "workflow_id": {"type": "string"},
+    "step_id": {"type": "string"},
+    "subject_artifact_ids": {"type": "array", "items": {"type": "string"}, "description": "the artifacts whose decision was adjudicated"},
+    "adjudicated_by": {"type": "string", "enum": ["human_reviewer", "deterministic_policy", "authority_ranking"], "description": "WHO produced the verified label; never 'consensus'/'llm' — those are proposals, not adjudicators"},
+    "reviewer_id": {"type": "string", "description": "accountable signer when adjudicated_by=human_reviewer (no PII; an opaque id)"},
+    "policy_id": {"type": "string", "description": "the deterministic policy/authority rule applied when adjudicated_by != human_reviewer (e.g. existing reconciliation authority ranking)"},
+    "verified_label": {"type": "string", "description": "the trustworthy outcome (e.g. 'winner=reg-e-10day, faq-30 held out'); this is the label the factory may distill toward"},
+    "accepted_proposal_ids": {"type": "array", "items": {"type": "string"}, "description": "llm_trace_id / consensus_run_id proposals this adjudication accepted as consistent with the verified label"},
+    "held_out_proposal_ids": {"type": "array", "items": {"type": "string"}, "description": "proposals held out (e.g. the FAQ-30 answer) — kept, never deleted (lossless), but not served"},
+    "source_handles": {"type": "array", "items": {"type": "string"}, "description": "ctx:// handles grounding the verified label; REQUIRED — an ungrounded adjudication is not a verified label"},
+    "receipt_id": {"type": "string", "description": "the verification/adjudication receipt warranting this label; REQUIRED — verified = receipt-backed"},
+    "reversed": {"type": "boolean", "description": "true if this adjudication was later overturned; a reversed adjudication is never mined as truth"},
+    "adjudicated_at": {"type": "string", "description": "injected time; deterministic when injected"}
+  }
+}

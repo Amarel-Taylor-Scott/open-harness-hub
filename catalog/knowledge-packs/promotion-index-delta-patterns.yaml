@@ -1,0 +1,37 @@
+id: "knowledge-pack/promotion-index-delta-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Promotion index delta patterns"
+description: "Seed promotion-decision index delta patterns for updating quality, facet, and cost indexes incrementally from high-volume candidate primitive scoring."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["evaluation", "governance", "retrieval", "serving"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "hub"
+freshness: "stable"
+lifecycle_position: "cross_cutting.indexing"
+tags: ["promotion", "index-delta", "quality-index", "facet-index", "cost-index", "million-primitives"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types:
+  - "promotion_decision"
+  - "index_delta_pattern"
+files:
+  - path: "catalog/knowledge-packs/data/promotion-index-delta-patterns/promotion-decisions.jsonl"
+    schema: "schemas/promotion-decision.schema.json"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    fields: ["object_id", "decision", "risk_flags", "recommended_outputs"]
+provenance:
+  sources:
+    - "Open Harness Hub candidate primitive promotion scoring"
+    - "Open Harness Hub partitioned index delta architecture"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "Synthetic promotion decisions only; no real PII or proprietary marketplace listing text."

@@ -15,7 +15,7 @@
 
 ## Primitives used
 
-| Layer | Artifact |
+| Layer | Component |
 |---|---|
 | Redact | `harness/redact-pii-text` |
 | Guard | `rule-pack/grep-prompt-injection-heuristics` (emails often carry payloads from untrusted senders) |

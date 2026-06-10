@@ -1,0 +1,70 @@
+id: "tool/local-smoke-command-approval-verifier"
+type: tool
+version: "0.1.0"
+name: "Local smoke command approval verifier"
+description: "Creates run-scoped approval templates for command hashes in a local smoke command gate and verifies approval records without executing commands."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "evaluation", "verification"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "postgres", "pgvector", "smoke-test", "approval-record", "command-ledger"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    command_gate:
+      type: string
+    approval_record:
+      type: string
+    output:
+      type: string
+    mode:
+      type: string
+      enum: ["template", "verify", "selective"]
+    approve_step:
+      type: array
+      items:
+        type: string
+    approver_name:
+      type: string
+    run_id:
+      type: string
+  required: ["command_gate"]
+returns:
+  type: object
+  properties:
+    approval_id:
+      type: string
+    command_count:
+      type: integer
+    approved_count:
+      type: integer
+    missing_approval_count:
+      type: integer
+    rows:
+      type: array
+side_effects: "write"
+examples:
+  - input:
+      command_gate: "dist/model-ops-daily-runs/2026-05-26/local-postgres-smoke/command-gate.json"
+      output: "dist/model-ops-daily-runs/2026-05-26/local-postgres-smoke/approval-template.json"
+      mode: "template"
+    output:
+      approval_id: "approval/example"
+implementations:
+  - kind: "callable"
+    path: "scripts.db.local_smoke_command_approval.build_local_smoke_command_approval_template"
+    language: "python"
+  - kind: "callable"
+    path: "scripts.db.local_smoke_command_approval.verify_local_smoke_command_approvals"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.local_smoke_command_approval"

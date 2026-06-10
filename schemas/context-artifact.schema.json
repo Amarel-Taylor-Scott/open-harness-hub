@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/context-artifact.schema.json",
+  "title": "Context artifact",
+  "description": "Immutable derived representation of one or more context object versions or artifacts, such as a chunk, claim, summary, embedding, repo wiki page, or context pack.",
+  "type": "object",
+  "required": ["kind", "context_artifact_id", "artifact_type", "derived_from", "content_hash", "created_at"],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "baltor.context-artifact.v1"
+    },
+    "context_artifact_id": {
+      "type": "string"
+    },
+    "artifact_type": {
+      "type": "string",
+      "enum": ["raw_snapshot", "normalized_record", "chunk", "claim", "decision", "summary", "embedding", "repo_wiki_page", "glossary_packet", "context_pack", "redacted_view", "index_projection"]
+    },
+    "derived_from": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "content_uri": {
+      "type": "string"
+    },
+    "content_hash": {
+      "type": "string"
+    },
+    "token_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "generator": {
+      "type": "object",
+      "properties": {
+        "pipeline": { "type": "string" },
+        "pipeline_version": { "type": "string" },
+        "model": { "type": "string" },
+        "prompt_version": { "type": "string" },
+        "chunk_strategy": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "lineage_event_id": {
+      "type": "string"
+    },
+    "quality": {
+      "type": "object",
+      "properties": {
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "authority": { "type": "string" },
+        "human_verified": { "type": "boolean" },
+        "conflicts_detected": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

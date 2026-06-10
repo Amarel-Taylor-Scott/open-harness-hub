@@ -32,10 +32,10 @@ for each step) → CRITIQUE (LLM checks output against goal + flags failures)
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `redact_goal` | harness | `harness/redact-pii-text` | — |
-| 2 | `guard_input` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 3 | `plan` | harness | `harness/text-safety-review` | — |
+| 1 | `redact_goal` | harness | `harness/redact-pii-text` | - |
+| 2 | `guard_input` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 3 | `plan` | harness | `harness/text-safety-review` | - |
 | 4 | `execute_loop` | loop | `processor/cost-ceiling-gate` | $.inputs.max_iterations > 0 |
-| 5 | `critique` | processor | `processor/self-refine-critique` | — |
-| 6 | `trace_emit` | processor | `processor/audit-trace-emitter` | — |
+| 5 | `critique` | processor | `processor/self-refine-critique` | - |
+| 6 | `trace_emit` | processor | `processor/audit-trace-emitter` | - |
 

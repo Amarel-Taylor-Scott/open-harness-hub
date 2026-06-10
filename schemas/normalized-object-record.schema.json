@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/normalized-object-record.schema.json",
+  "title": "Normalized object record",
+  "description": "Canonical record shape for high-volume objects extracted from source surfaces before they become manifests, knowledge leaves, graph nodes, or review tickets.",
+  "type": "object",
+  "required": ["object_id", "object_type", "source_record_id", "title", "body", "provenance"],
+  "properties": {
+    "object_id": { "type": "string" },
+    "object_type": {
+      "type": "string",
+      "enum": [
+        "task",
+        "review_question",
+        "checklist_item",
+        "decision_gate",
+        "evidence_requirement",
+        "fact_dependency",
+        "versioned_fact",
+        "tool_dependency",
+        "knowledge_area",
+        "skill",
+        "output_component",
+        "risk_control",
+        "evaluation_rubric",
+        "workflow_node",
+        "source_surface",
+        "candidate_primitive"
+      ]
+    },
+    "source_record_id": { "type": "string" },
+    "title": { "type": "string" },
+    "body": { "type": "object" },
+    "canonical_entity_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "dedupe_cluster_id": { "type": "string" },
+    "state": { "$ref": "_common.schema.json#/$defs/objectState" },
+    "state_history": {
+      "type": "array",
+      "items": { "$ref": "_common.schema.json#/$defs/stateEvent" }
+    },
+    "fact_state": { "$ref": "_common.schema.json#/$defs/factState" },
+    "fact_state_history": {
+      "type": "array",
+      "items": { "$ref": "_common.schema.json#/$defs/stateEvent" }
+    },
+    "supporting_source_count": { "type": "integer", "minimum": 0 },
+    "independent_source_count": { "type": "integer", "minimum": 0 },
+    "authoritative_source_count": { "type": "integer", "minimum": 0 },
+    "trust_tier": { "type": "string" },
+    "trust_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "privacy_boundary": { "type": "string" },
+    "quality_status": { "type": "string" },
+    "review_status": { "type": "string" },
+    "priority": { "$ref": "_common.schema.json#/$defs/queuePriority" },
+    "priority_signals": { "$ref": "_common.schema.json#/$defs/prioritySignals" },
+    "queue_policy": { "$ref": "_common.schema.json#/$defs/queuePolicy" },
+    "content_hash": { "type": "string" },
+    "effective_date": { "type": "string" },
+    "retrieved_at": { "type": "string" },
+    "supersedes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["source_url", "publisher", "license"],
+      "properties": {
+        "source_url": { "type": "string" },
+        "archive_url": { "type": "string" },
+        "publisher": { "type": "string" },
+        "license": { "type": "string" },
+        "collected_by": { "type": "string" },
+        "collection_method": { "type": "string" }
+      }
+    }
+  }
+}

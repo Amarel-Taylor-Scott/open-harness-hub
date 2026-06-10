@@ -1,0 +1,1679 @@
+{
+  "info": {
+    "description": "GENERATED from architecture/contract_registry.json api_routes by scripts/build_contract_specs.py \u2014 do not hand-edit. Projection-only HTTP surface; bodies/returns are the versioned envelope/artifact schemas; errors are ErrorEnvelope.v1.",
+    "title": "Baltor / Teleon portfolio API (generated)",
+    "version": "1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/context/receipts/{id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: receipt",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/context/receipts/<id> (owner scripts/api_context_handler.py)",
+        "x-owner": "scripts/api_context_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/context/responses/{id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/consumption/ContextResponse.v1.schema.json"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/context/responses/<id> (owner scripts/api_context_handler.py)",
+        "x-owner": "scripts/api_context_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/context/serve": {
+      "post": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/consumption/ContextResponse.v1.schema.json"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "POST /api/context/serve (owner scripts/api_context_handler.py)",
+        "x-owner": "scripts/api_context_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/determinism/consensus": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: determinism_consensus",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/determinism/consensus (owner scripts/api_determinism_handler.py)",
+        "x-owner": "scripts/api_determinism_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/determinism/fallback": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: determinism_fallback",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/determinism/fallback (owner scripts/api_determinism_handler.py)",
+        "x-owner": "scripts/api_determinism_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/determinism/overview": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: determinism_overview",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/determinism/overview (owner scripts/api_determinism_handler.py)",
+        "x-owner": "scripts/api_determinism_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/determinism/patterns": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: determinism_patterns",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/determinism/patterns (owner scripts/api_determinism_handler.py)",
+        "x-owner": "scripts/api_determinism_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/determinism/promotions": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: determinism_promotions",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/determinism/promotions (owner scripts/api_determinism_handler.py)",
+        "x-owner": "scripts/api_determinism_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/determinism/replay": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: determinism_replay",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/determinism/replay (owner scripts/api_determinism_handler.py)",
+        "x-owner": "scripts/api_determinism_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/determinism/rules": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: determinism_rules",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/determinism/rules (owner scripts/api_determinism_handler.py)",
+        "x-owner": "scripts/api_determinism_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/determinism/shadow": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: determinism_shadow",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/determinism/shadow (owner scripts/api_determinism_handler.py)",
+        "x-owner": "scripts/api_determinism_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/determinism/traces": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: determinism_traces",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/determinism/traces (owner scripts/api_determinism_handler.py)",
+        "x-owner": "scripts/api_determinism_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/graph/temporal/conflicts": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: CONTRADICTS edges",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/graph/temporal/conflicts (owner scripts/api_temporal_graph_handler.py)",
+        "x-owner": "scripts/api_temporal_graph_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/graph/temporal/current/{key}": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: served+held_out",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/graph/temporal/current/<key> (owner scripts/api_temporal_graph_handler.py)",
+        "x-owner": "scripts/api_temporal_graph_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/graph/temporal/edges": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: TemporalFactEdge[]",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/graph/temporal/edges (owner scripts/api_temporal_graph_handler.py)",
+        "x-owner": "scripts/api_temporal_graph_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/graph/temporal/facts": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: temporal_facts",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/graph/temporal/facts (owner scripts/api_temporal_graph_handler.py)",
+        "x-owner": "scripts/api_temporal_graph_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/graph/temporal/held-out": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: held_out nodes",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/graph/temporal/held-out (owner scripts/api_temporal_graph_handler.py)",
+        "x-owner": "scripts/api_temporal_graph_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/graph/temporal/provider-status": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: TemporalGraphProviderStatus[]",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/graph/temporal/provider-status (owner scripts/api_temporal_graph_handler.py)",
+        "x-owner": "scripts/api_temporal_graph_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/graph/temporal/rebuild": {
+      "post": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: TemporalGraphReceipt",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "POST /api/graph/temporal/rebuild (owner scripts/api_temporal_graph_handler.py)",
+        "x-owner": "scripts/api_temporal_graph_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/graph/temporal/timeline/{key}": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: TemporalFactTimeline",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/graph/temporal/timeline/<key> (owner scripts/api_temporal_graph_handler.py)",
+        "x-owner": "scripts/api_temporal_graph_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/inference/free-endpoints": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/inference/EndpointDueDiligenceReport.v1.schema.json"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/inference/free-endpoints (owner src/teleon/inference/api_projection.py)",
+        "x-owner": "src/teleon/inference/api_projection.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/inference/health": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: InferencePlaneProjection",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/inference/health (owner src/teleon/inference/api_projection.py)",
+        "x-owner": "src/teleon/inference/api_projection.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/inference/model-graph": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: InferencePlaneProjection",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/inference/model-graph (owner src/teleon/inference/api_projection.py)",
+        "x-owner": "src/teleon/inference/api_projection.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/inference/preferences": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: InferencePlaneProjection",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/inference/preferences (owner src/teleon/inference/api_projection.py)",
+        "x-owner": "src/teleon/inference/api_projection.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/inference/providers": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: InferencePlaneProjection",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/inference/providers (owner src/teleon/inference/api_projection.py)",
+        "x-owner": "src/teleon/inference/api_projection.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/inference/receipts": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/inference/ModelInvocationReceipt.v1.schema.json"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/inference/receipts (owner src/teleon/inference/api_projection.py)",
+        "x-owner": "src/teleon/inference/api_projection.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/inference/resolve-preference": {
+      "post": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/inference/ResolvedInferencePreference.v1.schema.json"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "POST /api/inference/resolve-preference (owner src/teleon/inference/api_projection.py)",
+        "x-owner": "src/teleon/inference/api_projection.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/memory/artifacts": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: memory_projection",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/memory/artifacts (owner scripts/api_memory_handler.py)",
+        "x-owner": "scripts/api_memory_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/memory/connectors": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: memory_projection",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/memory/connectors (owner scripts/api_memory_handler.py)",
+        "x-owner": "scripts/api_memory_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/memory/profile": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: memory_projection",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/memory/profile (owner scripts/api_memory_handler.py)",
+        "x-owner": "scripts/api_memory_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/memory/providers": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: memory_projection",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/memory/providers (owner scripts/api_memory_handler.py)",
+        "x-owner": "scripts/api_memory_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/memory/search": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: memory_projection",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/memory/search (owner scripts/api_memory_handler.py)",
+        "x-owner": "scripts/api_memory_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/memory/traces": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: memory_projection",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/memory/traces (owner scripts/api_memory_handler.py)",
+        "x-owner": "scripts/api_memory_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/native/annotations/{source_id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: native_annotations",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/native/annotations/<source_id> (owner scripts/api_native_handler.py)",
+        "x-owner": "scripts/api_native_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/native/diff/{source_id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: NativeDiff",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/native/diff/<source_id> (owner scripts/api_native_handler.py)",
+        "x-owner": "scripts/api_native_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/native/export/{source_id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: NativeProjection+SidecarOverlay",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/native/export/<source_id> (owner scripts/api_native_handler.py)",
+        "x-owner": "scripts/api_native_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/native/ingest": {
+      "post": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: native_ingest_refs",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "POST /api/native/ingest (owner scripts/api_native_handler.py)",
+        "x-owner": "scripts/api_native_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/native/sidecar/{source_id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: SidecarOverlay",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/native/sidecar/<source_id> (owner scripts/api_native_handler.py)",
+        "x-owner": "scripts/api_native_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/pipeline/consumption": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: pipeline_stage_projection",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/pipeline/consumption (owner scripts/api_pipeline_handler.py)",
+        "x-owner": "scripts/api_pipeline_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/pipeline/decomposition": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: pipeline_stage_projection",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/pipeline/decomposition (owner scripts/api_pipeline_handler.py)",
+        "x-owner": "scripts/api_pipeline_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/pipeline/enhancement": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: pipeline_stage_projection",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/pipeline/enhancement (owner scripts/api_pipeline_handler.py)",
+        "x-owner": "scripts/api_pipeline_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/pipeline/optimization": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: pipeline_stage_projection",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/pipeline/optimization (owner scripts/api_pipeline_handler.py)",
+        "x-owner": "scripts/api_pipeline_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/pipeline/overview": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: pipeline_stage_projection",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/pipeline/overview (owner scripts/api_pipeline_handler.py)",
+        "x-owner": "scripts/api_pipeline_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/pipeline/reconciliation": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: pipeline_stage_projection",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/pipeline/reconciliation (owner scripts/api_pipeline_handler.py)",
+        "x-owner": "scripts/api_pipeline_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/pipeline/upload": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: pipeline_stage_projection",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/pipeline/upload (owner scripts/api_pipeline_handler.py)",
+        "x-owner": "scripts/api_pipeline_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/pipeline/verification": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: pipeline_stage_projection",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/pipeline/verification (owner scripts/api_pipeline_handler.py)",
+        "x-owner": "scripts/api_pipeline_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/runtime/consumption": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: consumption_summary",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/runtime/consumption (owner scripts/api_context_handler.py)",
+        "x-owner": "scripts/api_context_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/runtime/sections": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: section_maturity_summary",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/runtime/sections (owner scripts/api_context_handler.py)",
+        "x-owner": "scripts/api_context_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/standards/generate-preview": {
+      "post": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: dry_run",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "POST /api/standards/generate-preview (owner scripts/api_standards_handler.py)",
+        "x-owner": "scripts/api_standards_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/standards/maturity": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: maturity",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/standards/maturity (owner scripts/api_standards_handler.py)",
+        "x-owner": "scripts/api_standards_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/standards/patterns": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: patterns",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/standards/patterns (owner scripts/api_standards_handler.py)",
+        "x-owner": "scripts/api_standards_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/standards/routines": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: routines",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/standards/routines (owner scripts/api_standards_handler.py)",
+        "x-owner": "scripts/api_standards_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/standards/templates": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: templates",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/standards/templates (owner scripts/api_standards_handler.py)",
+        "x-owner": "scripts/api_standards_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    },
+    "/api/standards/waivers": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "projection: waivers",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../schemas/envelopes/ErrorEnvelope.v1.schema.json"
+                }
+              }
+            },
+            "description": "error (ErrorEnvelope.v1)"
+          }
+        },
+        "summary": "GET /api/standards/waivers (owner scripts/api_standards_handler.py)",
+        "x-owner": "scripts/api_standards_handler.py",
+        "x-projection-only": true,
+        "x-status": "active"
+      }
+    }
+  }
+}

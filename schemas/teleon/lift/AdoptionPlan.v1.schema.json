@@ -1,0 +1,22 @@
+{
+  "$id": "teleon/lift/AdoptionPlan.v1", "title": "AdoptionPlan.v1", "type": "object", "additionalProperties": false,
+  "description": "How Teleon Lift adopts an imported workload along the 6-mode ladder (discover→model→observe→shadow→managed_promotion→full_managed), starting read-only at `discover`. The legacy workload is preserved as baseline_implementation (status imported_baseline, the rollback_target) — Teleon evaluates alternatives beside it, never replacing it on import. may_manage (and entering a managed mode that affects production) requires a human-confirmed purpose; otherwise set_mode refuses with `blocked`.",
+  "required": ["schema_version", "workload_id", "purpose_draft_name", "entry_mode", "current_mode", "current_level", "reads_only", "affects_production", "ladder", "baseline_implementation", "rollback_target", "human_confirmed_purpose", "may_manage", "recommended_next"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["AdoptionPlan.v1"]},
+    "workload_id": {"type": "string"},
+    "purpose_draft_name": {"type": "string"},
+    "entry_mode": {"type": "string", "const": "discover"},
+    "current_mode": {"type": "string"},
+    "current_level": {"type": "integer", "minimum": 0, "maximum": 5},
+    "reads_only": {"type": "boolean"},
+    "affects_production": {"type": "boolean"},
+    "ladder": {"type": "array", "items": {"type": "object"}},
+    "baseline_implementation": {"type": "object", "description": "{impl_id, status:imported_baseline, is_rollback_target:true, runtime_binding, source_workload_id}"},
+    "rollback_target": {"type": "string"},
+    "human_confirmed_purpose": {"type": "boolean"},
+    "may_manage": {"type": "boolean"},
+    "recommended_next": {"type": ["string", "null"]},
+    "blocked": {"type": "string", "description": "present only when set_mode refused a transition (e.g. managed mode without a confirmed purpose)"}
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "$id": "environments/EnvironmentRunRequest.v1",
+  "title": "EnvironmentRunRequest.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "A request to run an agent/runtime inside a governed, local-first evaluation environment (Repo2RLEnv/Harbor/OpenEnv-style environments are CANDIDATES behind this spine). The spine MEASURES the agent against a declared reward spec; it does not let the agent's output become truth. Deny-by-default: bounded steps + wall-clock timeout, scoped input (by reference or inline), and require_receipt to force an EnvironmentRunReceipt to be emitted. No raw secrets — pass refs in input/input_ref, never inline credentials.",
+  "required": [
+    "schema_version",
+    "run_id",
+    "environment_id",
+    "agent_id",
+    "tenant_id",
+    "max_steps",
+    "timeout_ms",
+    "reward_spec_id",
+    "require_receipt"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "description": "contract version, e.g. v1"},
+    "run_id": {"type": "string", "description": "caller-assigned idempotency/correlation id for this run"},
+    "environment_id": {"type": "string", "description": "id of the environment to run in (resolves to an EnvironmentProviderNode)"},
+    "agent_id": {"type": "string", "description": "id of the agent/runtime under evaluation (the system-under-test)"},
+    "tenant_id": {"type": "string", "description": "owning tenant; tenant-private lineage never becomes global"},
+    "input_ref": {"type": ["string", "null"], "description": "ResourceRef-style handle to the task input (preferred over inline); exactly one of input_ref or input is expected"},
+    "input": {"type": ["object", "string", "null"], "description": "inline task input when small + non-sensitive; exactly one of input_ref or input is expected"},
+    "max_steps": {"type": "integer", "minimum": 1, "description": "hard upper bound on agent steps (deny-by-default bound)"},
+    "timeout_ms": {"type": "integer", "minimum": 1, "description": "hard wall-clock budget for the whole run in milliseconds"},
+    "reward_spec_id": {"type": "string", "description": "id of the RewardSpec to score this run with (deterministic scoring preferred)"},
+    "require_receipt": {"type": "boolean", "description": "when true, the run MUST emit an EnvironmentRunReceipt or be treated as unavailable"}
+  }
+}

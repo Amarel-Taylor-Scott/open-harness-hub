@@ -1,0 +1,86 @@
+{
+  "name": "Security / Privacy",
+  "pass_threshold": 100,
+  "items": [
+    {
+      "rubric_id": "sec.no_ext_js",
+      "description": "No external JS",
+      "weight": 10,
+      "blocker": true,
+      "evidence_required": "rendered html scan",
+      "proof_script": "scripts/check_portfolio_security_privacy_rubric.py",
+      "pass_condition": "no external script src",
+      "fail_message": "external js"
+    },
+    {
+      "rubric_id": "sec.no_ext_css",
+      "description": "No external CSS",
+      "weight": 10,
+      "blocker": true,
+      "evidence_required": "rendered html scan",
+      "proof_script": "scripts/check_portfolio_security_privacy_rubric.py",
+      "pass_condition": "no external stylesheet",
+      "fail_message": "external css"
+    },
+    {
+      "rubric_id": "sec.no_analytics",
+      "description": "No analytics/tracking",
+      "weight": 10,
+      "blocker": true,
+      "evidence_required": "rendered html scan",
+      "proof_script": "scripts/check_portfolio_security_privacy_rubric.py",
+      "pass_condition": "no gtag/analytics/pixel",
+      "fail_message": "analytics found"
+    },
+    {
+      "rubric_id": "sec.no_secrets",
+      "description": "No API keys/tokens/secrets",
+      "weight": 15,
+      "blocker": true,
+      "evidence_required": "rendered html scan",
+      "proof_script": "scripts/check_portfolio_security_privacy_rubric.py",
+      "pass_condition": "no secret patterns",
+      "fail_message": "secret found"
+    },
+    {
+      "rubric_id": "sec.no_private",
+      "description": "No private/customer data leaked",
+      "weight": 15,
+      "blocker": true,
+      "evidence_required": "rendered html scan",
+      "proof_script": "scripts/check_portfolio_security_privacy_rubric.py",
+      "pass_condition": "no private content",
+      "fail_message": "private content leaked"
+    },
+    {
+      "rubric_id": "sec.no_env",
+      "description": "No raw env vars / secret paths",
+      "weight": 10,
+      "blocker": true,
+      "evidence_required": "rendered html scan",
+      "proof_script": "scripts/check_portfolio_security_privacy_rubric.py",
+      "pass_condition": "no env dumps",
+      "fail_message": "env/secret path"
+    },
+    {
+      "rubric_id": "sec.no_truth_write",
+      "description": "No durable-truth write path / POST endpoints",
+      "weight": 15,
+      "blocker": true,
+      "evidence_required": "rendered html scan",
+      "proof_script": "scripts/check_portfolio_security_privacy_rubric.py",
+      "pass_condition": "static only",
+      "fail_message": "mutation endpoint"
+    },
+    {
+      "rubric_id": "sec.no_staff_leak",
+      "description": "Customer copy hides staff-only details",
+      "weight": 15,
+      "blocker": true,
+      "evidence_required": "rendered html scan",
+      "proof_script": "scripts/check_portfolio_security_privacy_rubric.py",
+      "pass_condition": "no staff internals",
+      "fail_message": "staff detail exposed"
+    }
+  ]
+}

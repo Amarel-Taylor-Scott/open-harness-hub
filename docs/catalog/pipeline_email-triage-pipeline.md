@@ -27,9 +27,9 @@ Triage inbox + draft replies + leakage-check each draft.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `load_prefs` | processor | `processor/preference-loader` | — |
-| 2 | `load_tone_history` | processor | `processor/recipient-tone-history` | — |
-| 3 | `triage_and_draft` | harness | `harness/email-triage-and-draft` | — |
-| 4 | `leakage_check` | rule_pack | `rule-pack/grep-personal-info-leakage` | — |
-| 5 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `load_prefs` | processor | `processor/preference-loader` | - |
+| 2 | `load_tone_history` | processor | `processor/recipient-tone-history` | - |
+| 3 | `triage_and_draft` | harness | `harness/email-triage-and-draft` | - |
+| 4 | `leakage_check` | rule_pack | `rule-pack/grep-personal-info-leakage` | - |
+| 5 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

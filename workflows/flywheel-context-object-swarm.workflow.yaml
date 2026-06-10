@@ -1,0 +1,63 @@
+kind: baltor.flywheel-workflow.v1
+name: Context Object Swarm Flywheel
+flywheel_id: flywheel.context-object-swarm
+stage: Continuous Verification + Adversarial Validation rail
+purpose: On "swarm this object", spin up bounded agents to verify / expand / improve / validate / challenge a context object using its graph neighborhood + source handles (and an external-evidence seam). Aggregate findings into a consensus, PROPOSE a context_pack_patch, and route high-risk findings to a human steward. The swarm proposes; it never overwrites canonical state.
+triggers:
+  - user_requested_swarm
+  - low_confidence_claim
+  - high_conflict_claim
+  - stale_pack_for_write
+  - periodic_reverification
+inputs:
+  - context_object_ref
+  - graph_neighborhood
+  - source_handles
+  - swarm_purpose
+decision_context:
+  references: schemas/flywheel/decision-context.schema.json
+  bounded_to: the target object + its graph neighborhood + its source handles
+  allowed_actions: propose_patch, route_review, emit_findings
+  forbidden_actions: overwrite_canonical_object, auto_apply_patch, unbounded_external_fetch
+  model_routes_via: scripts/model_gateway.py (verification capability; deterministic stub default)
+steps:
+  - load the object + its graph neighborhood (scripts/context_graph.py ContextGraph)
+  - run bounded agents (source-handle, internal-evidence, external-evidence SEAM, contradiction, neighbor, claim-normalizer, freshness, policy)
+  - aggregate findings → SwarmConsensus (risk, verified/rejected claims, contradictions, rot, policy)
+  - PackImprover PROPOSES a context_pack_patch (applied=false) when an authority resolves a conflict
+  - HumanReviewRouter opens a steward-review-request for any HIGH/CRITICAL finding (schemas/governance/steward-review-request.schema.json)
+  - emit a SwarmRun + receipt; canonical state is untouched
+queue_messages:
+  - swarm_requested
+  - swarm_completed
+  - swarm_review_opened
+outputs:
+  - SwarmRun
+  - SwarmConsensus
+  - StewardReviewRequest
+  - ProposedContextPackPatch
+receipts_emitted:
+  - SwarmRun
+metrics:
+  - findings_per_run
+  - contradiction_catch_rate
+  - human_review_rate
+  - proposed_patch_acceptance_rate
+  - mean_consensus_confidence
+failure_modes:
+  - external evidence unreachable (seam) — recorded as not-run, never faked
+  - object not found in the graph
+fallback_strategy: deterministic stub agents run with NO model/network; a live model route only triages/phrases and may never change findings, authority, or the no-overwrite rule
+human_review_triggers:
+  - any HIGH or CRITICAL finding
+  - a proposed patch that would change a canonical claim
+suggested_runtime: worker plane (per-object fan-out); durable engine holds state; control-plane review queue for routed reviews
+candidate_backend_tools:
+  - LangGraph
+  - CrewAI
+  - OpenAI Agents SDK
+  - DBOS
+harness_refs:
+  - fixtures/swarm-run.example.json
+  - fixtures/swarm-finding.example.json
+  - fixtures/swarm-consensus.example.json

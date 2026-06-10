@@ -1,0 +1,72 @@
+id: "tool/fuzzy-dedupe-clusterer"
+type: tool
+version: "0.1.0"
+name: "Fuzzy dedupe clusterer"
+description: "Clusters near-duplicate objects using exact identifiers, normalized strings, fuzzy matching, SimHash or MinHash, vector similarity, and entity graph overlap."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["verification", "classification", "retrieval"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["dedupe", "fuzzy-matching", "simhash", "minhash", "entity-resolution", "clustering"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    candidate_records:
+      type: array
+      items:
+        type: object
+    existing_records:
+      type: array
+      items:
+        type: object
+    thresholds:
+      type: object
+    match_features:
+      type: array
+      items:
+        type: string
+  required: ["candidate_records"]
+returns:
+  type: object
+  properties:
+    clusters:
+      type: array
+      items:
+        type: object
+    canonical_records:
+      type: array
+      items:
+        type: object
+    review_pairs:
+      type: array
+      items:
+        type: object
+    metrics:
+      type: object
+side_effects: "none"
+examples:
+  - input:
+      candidate_records:
+        - object_id: "candidate/a"
+          title: "AML alert review question"
+      thresholds:
+        fuzzy_ratio: 0.92
+        vector_similarity: 0.88
+    output:
+      clusters: []
+      canonical_records: []
+      review_pairs: []
+      metrics: {}
+implementations:
+  - kind: "callable"
+    path: "tools.fuzzy_dedupe_clusterer.run"
+  - kind: "mcp"
+    path: "mcp/dedupe.cluster"

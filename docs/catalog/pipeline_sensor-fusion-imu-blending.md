@@ -34,8 +34,8 @@ Per-sensor branch training (IMU/THM/ToF) + weighted blending.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `train_branches` | processor | `processor/iterative-revise-loop` | — |
-| 3 | `blend` | processor | `processor/multi-vector-fusion` | — |
-| 4 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `train_branches` | processor | `processor/iterative-revise-loop` | - |
+| 3 | `blend` | processor | `processor/multi-vector-fusion` | - |
+| 4 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

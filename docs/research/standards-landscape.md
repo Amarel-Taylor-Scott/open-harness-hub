@@ -20,7 +20,7 @@ things:
    manifest with no `@context` is invisible to them.
 2. **Interop.** Existing eval frameworks (lm-eval-harness, promptfoo,
    garak) and tool standards (OpenAI / Anthropic / MCP) have install
-   bases. A hub artifact that emits to those formats slots into
+   bases. A hub component that emits to those formats slots into
    existing workflows.
 3. **Trust.** Compliance and audit tools (MLflow, OpenLineage, C2PA,
    AIBOM) already exist. Aligning with them means a regulator,
@@ -103,7 +103,7 @@ shift:
    migration.
 2. **`body` JSONB / opaque manifest** in the database mapping - even
    relational stores can absorb new fields without DDL changes.
-3. **`attribution` envelope** present on every artifact lets the hub
+3. **`attribution` envelope** present on every component lets the hub
    ingest from external sources (Kaggle, HF, arXiv) without losing
    provenance.
 4. **Versioned manifests** (semver) with `superseded_by` /

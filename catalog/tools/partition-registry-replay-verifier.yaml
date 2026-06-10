@@ -1,0 +1,69 @@
+id: "tool/partition-registry-replay-verifier"
+type: tool
+version: "0.1.0"
+name: "Partition registry replay verifier"
+description: "Builds a compact registry from partition manifests and replays append-only index deltas to verify idempotency, missing files, duplicate delta IDs, content hashes, and final index-state counts."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "evaluation", "governance", "serving"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.indexing"
+tags: ["partition", "index-delta", "replay", "registry", "incremental-build", "million-primitives"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    manifest_paths:
+      type: array
+      items:
+        type: string
+    manifest_dirs:
+      type: array
+      items:
+        type: string
+    registry_output:
+      type: string
+    registry_input:
+      type: string
+    replay_report_output:
+      type: string
+    verify_only:
+      type: boolean
+returns:
+  type: object
+  properties:
+    registry:
+      type: object
+    replay_report:
+      type: object
+    ok:
+      type: boolean
+side_effects: "write"
+examples:
+  - input:
+      manifest_dirs: ["dist/index-deltas/demo"]
+      registry_output: "dist/partition-registry.json"
+      replay_report_output: "dist/replay-report.json"
+    output:
+      ok: true
+      registry:
+        partition_count: 1
+      replay_report:
+        delta_count: 4
+        replayed_record_count: 4
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.partition_registry_replay.build_partition_registry"
+    language: "python"
+  - kind: "callable"
+    path: "scripts.factory.partition_registry_replay.verify_replay"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.factory.partition_registry_replay"

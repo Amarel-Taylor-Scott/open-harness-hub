@@ -1,0 +1,11 @@
+{
+  "$id": "ErrorEnvelope.v1", "title": "ErrorEnvelope.v1", "type": "object", "additionalProperties": false,
+  "required": ["schema_version","error_id","error_type","retryable","message"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["ErrorEnvelope.v1"]}, "error_id": {"type": "string"},
+    "error_type": {"type": "string", "enum": ["schema_validation_failed","validation_failed","unavailable_processor","transient","permanent","processor_exception","unknown_command"]},
+    "retryable": {"type": "boolean"}, "message": {"type": "string"}, "details": {"type": "object"},
+    "failed_schema": {"type": "string"}, "processor_id": {"type": "string"}, "processor_version": {"type": "string"},
+    "run_id": {"type": "string"}, "step_id": {"type": "string"}, "command_id": {"type": "string"}
+  }
+}

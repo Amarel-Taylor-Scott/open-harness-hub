@@ -1,0 +1,35 @@
+id: "benchmark/cold-chain-pharma-release-bench"
+type: benchmark
+version: "0.1.0"
+name: "Cold Chain Pharma Release benchmark"
+description: "Synthetic benchmark for cold chain pharma release review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["logistics.cold_chain", "pharma.gxp"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["cold-chain-pharma-release", "expansion-v5"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/cold-chain-pharma-release-review"
+dataset: "dataset/cold-chain-pharma-release-samples"
+rubric: "rubric/cold-chain-pharma-release-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/cold-chain-pharma-release-review"
+    rule_pack_override: ["rule-pack/grep-cold-chain-pharma-release-flags", "rule-pack/rag-cold-chain-pharma-release-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 23
+report:
+  output: "dist/benchmarks/cold-chain-pharma-release/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

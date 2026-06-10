@@ -1,135 +1,890 @@
-id: "rule-pack/grep-human-trafficking-ugc-flags"
+id: rule-pack/grep-human-trafficking-ugc-flags
 type: rule-pack
-version: "0.1.0"
-name: "Human-trafficking recruitment + solicitation flags (UGC triage)"
-description: |
-  DEFENSIVE-USE rule pack for Trust + Safety triage of user-generated
+version: 0.1.0
+name: Human-trafficking recruitment + solicitation flags (UGC triage)
+description: 'DEFENSIVE-USE rule pack for Trust + Safety triage of user-generated
+
   content (job-listing platforms, classifieds, escort directories,
+
   immigration forums, dating apps). Detects RECRUITMENT-stage signals
+
   (the Polaris Project + ILO labor-trafficking indicator taxonomy) and
+
   SOLICITATION-stage signals (commercial sex with control / coercion
+
   markers, transit-corridor cues, debt-bondage references).
 
+
   NOT a CSAM detector. CSAM-suspicion routes to
+
   `rule-pack/grep-platform-moderation-flags` -> `csam_referral_route`
+
   which triggers the NCMEC packet path WITHOUT model classification
+
   (see `pattern/critical-tier-output-override`).
 
+
   Patterns are coarse triage filters meant to escalate a post to a
+
   trained T+S reviewer with the relevant indicator surfaced. They are
+
   NOT determinations and SHOULD NOT auto-action. Co-occurrence of >=2
+
   indicators is the conventional threshold for escalation; single hits
+
   are review queue entries.
 
-  Sources: Polaris Project National Human Trafficking Hotline
-  indicator taxonomy; ILO Hard-to-See Hidden in Plain Sight forced
-  labour indicators (11-indicator framework); UNODC Global Report on
-  Trafficking in Persons (2022); FBI Innocence Lost National Initiative
-  public-facing typology.
-authors:
-  - name: "Open Harness Hub contributors"
-license: "MIT"
-industry: ["compliance", "media", "humanitarian", "humanitarian.trafficking"]
-capability: ["classification", "safety_gating"]
-modality: ["text"]
-lifecycle: "experimental"
-trust_boundary: "local"
-freshness: "volatile"
-tags: ["trust-and-safety", "trafficking", "anti-trafficking", "moderation", "polaris", "ilo", "unodc"]
-created: "2026-05-22"
-updated: "2026-05-22"
 
+  Sources: Polaris Project National Human Trafficking Hotline
+
+  indicator taxonomy; ILO Hard-to-See Hidden in Plain Sight forced
+
+  labour indicators (11-indicator framework); UNODC Global Report on
+
+  Trafficking in Persons (2022); FBI Innocence Lost National Initiative
+
+  public-facing typology.
+
+  '
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- compliance
+- media
+- humanitarian
+- humanitarian.trafficking
+capability:
+- classification
+- safety_gating
+modality:
+- text
+lifecycle: experimental
+trust_boundary: local
+freshness: volatile
+tags:
+- trust-and-safety
+- trafficking
+- anti-trafficking
+- moderation
+- polaris
+- ilo
+- unodc
+created: '2026-05-22'
+updated: '2026-05-25'
 attribution:
-  source_url: "https://humantraffickinghotline.org/en/type-trafficking/recognizing-signs"
-  source_kind: "other"
-  author: "Polaris Project (taxonomy); ILO (indicator framework); UNODC (typology)"
-  license: "public-resource"
-  notes: |
-    Indicators are derived from publicly-published NGO/UN typologies
+  source_url: https://humantraffickinghotline.org/en/type-trafficking/recognizing-signs
+  source_kind: other
+  author: Polaris Project (taxonomy); ILO (indicator framework); UNODC (typology)
+  license: public-resource
+  notes: 'Indicators are derived from publicly-published NGO/UN typologies
+
     intended for moderators, social workers, and law-enforcement
+
     referrals. Patterns intentionally omit operational evasion
+
     specifics; they catch advertising-side cues, not how traffickers
+
     obfuscate them.
 
-family: "grep"
+    '
+family: grep
 rules:
-  # --- LABOR-TRAFFICKING RECRUITMENT-SIDE SIGNALS (Polaris / ILO) ---
-
-  - id: "labor_recruit_too_good_to_be_true"
-    pattern: "(?i)(?:no\\s+experience\\s+(?:needed|required|necessary)|earn\\s+\\$?\\d{2,3}[k,]?\\s*(?:per|/)\\s*(?:day|week))[\\s\\S]{0,160}?(?:hostess|waitress|nanny|housekeeper|farm[- ]?hand|fishing[- ]?crew|construction[- ]?helper|massage[- ]?attendant|model)"
-    severity: "high"
-    category: "ts.trafficking.labor.recruit.unrealistic_offer"
-  - id: "labor_recruit_transport_lodging_bundled"
-    pattern: "(?i)(?:transport(?:ation)?\\s+(?:included|provided|covered)|housing\\s+(?:included|provided|on[- ]?site)|live[- ]?in)[\\s\\S]{0,160}?(?:visa\\s+(?:handled|sponsored|provided)|fee\\s+(?:later|deducted)|debt\\s+(?:work|paid)\\s*off)"
-    severity: "high"
-    category: "ts.trafficking.labor.recruit.bundled_control"
-  - id: "labor_recruit_passport_document_handling"
-    pattern: "(?i)(?:we['’]?ll\\s+(?:hold|keep|secure)\\s+(?:your\\s+)?passport|surrender\\s+(?:your\\s+)?(?:passport|id|documents)|documents\\s+(?:held|stored)\\s+(?:by|with)\\s+(?:agent|employer|broker))"
-    severity: "critical"
-    category: "ts.trafficking.labor.indicator.doc_retention"
-  - id: "labor_recruit_recruitment_fee"
-    pattern: "(?i)(?:recruitment\\s+fee|placement\\s+fee|broker\\s+fee|agent\\s+fee)\\s*(?:of\\s+)?\\$?\\d{2,5}[\\s\\S]{0,80}?(?:(?:deducted|withheld)\\s+from\\s+(?:wages|pay|salary)|paid\\s+(?:back|later|upon\\s+arrival))"
-    severity: "high"
-    category: "ts.trafficking.labor.indicator.fee_bondage"
-  - id: "labor_indicator_wage_withholding"
-    pattern: "(?i)(?:wages?|pay|salary)\\s+(?:will\\s+be\\s+)?(?:held|withheld|in\\s+escrow|paid\\s+at\\s+(?:end|completion))\\s+(?:until|when|after)\\s+(?:contract|debt|loan|fee)\\s+(?:complete|paid|settled)"
-    severity: "high"
-    category: "ts.trafficking.labor.indicator.wage_withholding"
-  - id: "labor_indicator_restricted_movement"
-    pattern: "(?i)(?:not\\s+allowed\\s+to\\s+leave|cannot\\s+leave\\s+(?:premises|site|compound|camp)|escorted\\s+(?:at\\s+all\\s+times|everywhere)|locked\\s+(?:in|inside)\\s+(?:at\\s+night|the\\s+(?:dorm|barracks|housing)))"
-    severity: "critical"
-    category: "ts.trafficking.labor.indicator.restricted_movement"
-  - id: "labor_indicator_isolation_language"
-    pattern: "(?i)(?:no\\s+contact\\s+with\\s+(?:family|outside)|phone\\s+(?:held|taken|confiscated)\\s+by\\s+(?:employer|boss|agent)|only\\s+(?:our\\s+)?translator\\s+(?:speaks|talks)\\s+for\\s+you)"
-    severity: "critical"
-    category: "ts.trafficking.labor.indicator.isolation"
-  - id: "labor_corridor_high_risk_routing"
-    pattern: "(?i)(?:travel|fly|cross)\\s+(?:via|through|stop\\s+in)\\s+(?:dubai|doha|kuala\\s+lumpur|bangkok|manila|lagos|tijuana|reynosa)[\\s\\S]{0,120}?(?:then|onward|destination)\\s+(?:saudi|qatar|oman|uae|kuwait|libya|us[ab]?|usa|united\\s+states|europe|spain|italy|greece)"
-    severity: "medium"
-    category: "ts.trafficking.labor.corridor.high_risk_route"
-
-  # --- SEX-TRAFFICKING SOLICITATION-SIDE SIGNALS (Polaris / FBI typology) ---
-
-  - id: "sex_traf_control_marker_third_party_manager"
-    pattern: "(?i)(?:my\\s+(?:manager|daddy|boss)\\s+(?:answers|handles|takes)\\s+(?:the\\s+)?(?:calls|booking|messages)|book\\s+through\\s+(?:my\\s+)?(?:agent|manager|driver))"
-    severity: "high"
-    category: "ts.trafficking.sex.control.third_party"
-  - id: "sex_traf_control_marker_no_choice_language"
-    pattern: "(?i)(?:i\\s+(?:cannot|can'?t)\\s+(?:refuse|say\\s+no|choose)|i\\s+have\\s+to\\s+(?:do|see|book)\\s+everyone|whatever\\s+(?:he|she|they)\\s+say[s]?\\s+i\\s+do)"
-    severity: "critical"
-    category: "ts.trafficking.sex.control.coerced_speech"
-  - id: "sex_traf_control_marker_debt_repayment"
-    pattern: "(?i)(?:working\\s+off\\s+(?:my\\s+)?debt|paying\\s+(?:back\\s+)?(?:my\\s+)?(?:travel|smuggling|coyote|broker)\\s+(?:debt|fee)|owe\\s+(?:my\\s+)?(?:boss|agent|family[’']?s?\\s+debt))"
-    severity: "critical"
-    category: "ts.trafficking.sex.control.debt_bondage"
-  - id: "sex_traf_minor_age_dispute_signal"
-    pattern: "(?i)(?:looks?\\s+(?:young|underage|barely\\s+legal)\\s+but\\s+(?:she|he|they)\\s+(?:swear|say|insist|claim)|age\\s+verification\\s+(?:not\\s+available|coming\\s+later)|new\\s+to\\s+(?:the\\s+)?(?:life|scene|business)\\s+and\\s+(?:so\\s+)?young)"
-    severity: "critical"
-    category: "ts.trafficking.sex.minor.age_dispute"
-  - id: "sex_traf_transit_circuit_pattern"
-    pattern: "(?i)(?:in\\s+(?:town|city)\\s+(?:for\\s+)?(?:tonight\\s+only|24\\s+hrs|48\\s+hours|two\\s+days)|new\\s+girls?\\s+(?:weekly|every\\s+week|rotating)|tour(?:ing)?\\s+(?:through|cities|circuit))"
-    severity: "medium"
-    category: "ts.trafficking.sex.indicator.transit_circuit"
-  - id: "sex_traf_branding_tattoo_reference"
-    pattern: "(?i)(?:property\\s+of\\s+\\w+\\s+tattoo|branded\\s+(?:with|by)\\s+(?:my\\s+)?(?:daddy|boss|stable)|stable\\s+(?:name|mark|sign))"
-    severity: "high"
-    category: "ts.trafficking.sex.indicator.branding"
-  - id: "sex_traf_indoor_brothel_signals"
-    pattern: "(?i)(?:multiple\\s+(?:girls|women)\\s+(?:available|on[- ]site)\\s+(?:at|in)\\s+(?:one|same)\\s+(?:apartment|location|hotel)|24\\/?7\\s+(?:availability|service)|incalls?\\s+only\\s+at\\s+(?:our\\s+)?location)[\\s\\S]{0,120}?(?:no\\s+(?:names|id|questions))"
-    severity: "high"
-    category: "ts.trafficking.sex.indicator.indoor_venue"
-
-  # --- CROSS-TYPE / VICTIM-VOICE SIGNALS ---
-
-  - id: "victim_voice_disclosure_help_seeking"
-    pattern: "(?i)(?:i\\s+(?:am|was)\\s+being\\s+(?:held|forced|kept|trafficked)|help\\s+me\\s+(?:i|i'?m)\\s+(?:trapped|locked|forced)|they\\s+(?:took|have)\\s+(?:my|our)\\s+(?:passport|papers|documents))"
-    severity: "critical"
-    category: "ts.trafficking.victim.disclosure"
-  - id: "victim_voice_third_party_writes_on_behalf"
-    pattern: "(?i)(?:i\\s+(?:am|'?m)\\s+writing\\s+(?:for|on\\s+behalf\\s+of)\\s+(?:her|him|them))[\\s\\S]{0,160}?(?:cannot\\s+speak|no\\s+phone|under\\s+watch|monitored)"
-    severity: "high"
-    category: "ts.trafficking.victim.proxy_writer"
-  - id: "hotline_or_referral_mention"
-    pattern: "(?i)(?:national\\s+human\\s+trafficking\\s+hotline|1[- ]?888[- ]?373[- ]?7888|polaris\\s+project|befrei[ae]n|text\\s+(?:help|info)\\s+to\\s+233733)"
-    severity: "low"
-    category: "ts.trafficking.referral.hotline_reference"
+- id: labor_recruit_too_good_to_be_true
+  pattern: (?i)(?:no\s+experience\s+(?:needed|required|necessary)|earn\s+\$?\d{2,3}[k,]?\s*(?:per|/)\s*(?:day|week))[\s\S]{0,160}?(?:hostess|waitress|nanny|housekeeper|farm[-
+    ]?hand|fishing[- ]?crew|construction[- ]?helper|massage[- ]?attendant|model)
+  severity: high
+  category: ts.trafficking.labor.recruit.unrealistic_offer
+- id: labor_recruit_transport_lodging_bundled
+  pattern: (?i)(?:transport(?:ation)?\s+(?:included|provided|covered)|housing\s+(?:included|provided|on[-
+    ]?site)|live[- ]?in)[\s\S]{0,160}?(?:visa\s+(?:handled|sponsored|provided)|fee\s+(?:later|deducted)|debt\s+(?:work|paid)\s*off)
+  severity: high
+  category: ts.trafficking.labor.recruit.bundled_control
+- id: labor_recruit_passport_document_handling
+  pattern: "(?i)(?:we['\u2019]?ll\\s+(?:hold|keep|secure)\\s+(?:your\\s+)?passport|surrender\\\
+    s+(?:your\\s+)?(?:passport|id|documents)|documents\\s+(?:held|stored)\\s+(?:by|with)\\\
+    s+(?:agent|employer|broker))"
+  severity: critical
+  category: ts.trafficking.labor.indicator.doc_retention
+- id: labor_recruit_recruitment_fee
+  pattern: (?i)(?:recruitment\s+fee|placement\s+fee|broker\s+fee|agent\s+fee)\s*(?:of\s+)?\$?\d{2,5}[\s\S]{0,80}?(?:(?:deducted|withheld)\s+from\s+(?:wages|pay|salary)|paid\s+(?:back|later|upon\s+arrival))
+  severity: high
+  category: ts.trafficking.labor.indicator.fee_bondage
+- id: labor_indicator_wage_withholding
+  pattern: (?i)(?:wages?|pay|salary)\s+(?:will\s+be\s+)?(?:held|withheld|in\s+escrow|paid\s+at\s+(?:end|completion))\s+(?:until|when|after)\s+(?:contract|debt|loan|fee)\s+(?:complete|paid|settled)
+  severity: high
+  category: ts.trafficking.labor.indicator.wage_withholding
+- id: labor_indicator_restricted_movement
+  pattern: (?i)(?:not\s+allowed\s+to\s+leave|cannot\s+leave\s+(?:premises|site|compound|camp)|escorted\s+(?:at\s+all\s+times|everywhere)|locked\s+(?:in|inside)\s+(?:at\s+night|the\s+(?:dorm|barracks|housing)))
+  severity: critical
+  category: ts.trafficking.labor.indicator.restricted_movement
+- id: labor_indicator_isolation_language
+  pattern: (?i)(?:no\s+contact\s+with\s+(?:family|outside)|phone\s+(?:held|taken|confiscated)\s+by\s+(?:employer|boss|agent)|only\s+(?:our\s+)?translator\s+(?:speaks|talks)\s+for\s+you)
+  severity: critical
+  category: ts.trafficking.labor.indicator.isolation
+- id: labor_corridor_high_risk_routing
+  pattern: (?i)(?:travel|fly|cross)\s+(?:via|through|stop\s+in)\s+(?:dubai|doha|kuala\s+lumpur|bangkok|manila|lagos|tijuana|reynosa)[\s\S]{0,120}?(?:then|onward|destination)\s+(?:saudi|qatar|oman|uae|kuwait|libya|us[ab]?|usa|united\s+states|europe|spain|italy|greece)
+  severity: medium
+  category: ts.trafficking.labor.corridor.high_risk_route
+- id: sex_traf_control_marker_third_party_manager
+  pattern: (?i)(?:my\s+(?:manager|daddy|boss)\s+(?:answers|handles|takes)\s+(?:the\s+)?(?:calls|booking|messages)|book\s+through\s+(?:my\s+)?(?:agent|manager|driver))
+  severity: high
+  category: ts.trafficking.sex.control.third_party
+- id: sex_traf_control_marker_no_choice_language
+  pattern: (?i)(?:i\s+(?:cannot|can'?t)\s+(?:refuse|say\s+no|choose)|i\s+have\s+to\s+(?:do|see|book)\s+everyone|whatever\s+(?:he|she|they)\s+say[s]?\s+i\s+do)
+  severity: critical
+  category: ts.trafficking.sex.control.coerced_speech
+- id: sex_traf_control_marker_debt_repayment
+  pattern: "(?i)(?:working\\s+off\\s+(?:my\\s+)?debt|paying\\s+(?:back\\s+)?(?:my\\\
+    s+)?(?:travel|smuggling|coyote|broker)\\s+(?:debt|fee)|owe\\s+(?:my\\s+)?(?:boss|agent|family[\u2019\
+    ']?s?\\s+debt))"
+  severity: critical
+  category: ts.trafficking.sex.control.debt_bondage
+- id: sex_traf_minor_age_dispute_signal
+  pattern: (?i)(?:looks?\s+(?:young|underage|barely\s+legal)\s+but\s+(?:she|he|they)\s+(?:swear|say|insist|claim)|age\s+verification\s+(?:not\s+available|coming\s+later)|new\s+to\s+(?:the\s+)?(?:life|scene|business)\s+and\s+(?:so\s+)?young)
+  severity: critical
+  category: ts.trafficking.sex.minor.age_dispute
+- id: sex_traf_transit_circuit_pattern
+  pattern: (?i)(?:in\s+(?:town|city)\s+(?:for\s+)?(?:tonight\s+only|24\s+hrs|48\s+hours|two\s+days)|new\s+girls?\s+(?:weekly|every\s+week|rotating)|tour(?:ing)?\s+(?:through|cities|circuit))
+  severity: medium
+  category: ts.trafficking.sex.indicator.transit_circuit
+- id: sex_traf_branding_tattoo_reference
+  pattern: (?i)(?:property\s+of\s+\w+\s+tattoo|branded\s+(?:with|by)\s+(?:my\s+)?(?:daddy|boss|stable)|stable\s+(?:name|mark|sign))
+  severity: high
+  category: ts.trafficking.sex.indicator.branding
+- id: sex_traf_indoor_brothel_signals
+  pattern: (?i)(?:multiple\s+(?:girls|women)\s+(?:available|on[- ]site)\s+(?:at|in)\s+(?:one|same)\s+(?:apartment|location|hotel)|24\/?7\s+(?:availability|service)|incalls?\s+only\s+at\s+(?:our\s+)?location)[\s\S]{0,120}?(?:no\s+(?:names|id|questions))
+  severity: high
+  category: ts.trafficking.sex.indicator.indoor_venue
+- id: victim_voice_disclosure_help_seeking
+  pattern: (?i)(?:i\s+(?:am|was)\s+being\s+(?:held|forced|kept|trafficked)|help\s+me\s+(?:i|i'?m)\s+(?:trapped|locked|forced)|they\s+(?:took|have)\s+(?:my|our)\s+(?:passport|papers|documents))
+  severity: critical
+  category: ts.trafficking.victim.disclosure
+- id: victim_voice_third_party_writes_on_behalf
+  pattern: (?i)(?:i\s+(?:am|'?m)\s+writing\s+(?:for|on\s+behalf\s+of)\s+(?:her|him|them))[\s\S]{0,160}?(?:cannot\s+speak|no\s+phone|under\s+watch|monitored)
+  severity: high
+  category: ts.trafficking.victim.proxy_writer
+- id: hotline_or_referral_mention
+  pattern: (?i)(?:national\s+human\s+trafficking\s+hotline|1[- ]?888[- ]?373[- ]?7888|polaris\s+project|befrei[ae]n|text\s+(?:help|info)\s+to\s+233733)
+  severity: low
+  category: ts.trafficking.referral.hotline_reference
+- id: scale_expansion_v1_critical_signal_01
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_02
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_03
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_04
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_05
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_06
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_07
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_08
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_09
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_10
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_11
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_12
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_13
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_14
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_15
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_16
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_17
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_18
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_19
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_20
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_21
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_22
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_23
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_24
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_25
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_26
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_27
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_28
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_29
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_30
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_31
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_32
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_33
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_34
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_35
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_36
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_37
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_38
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_39
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_40
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}human.{0,24}trafficking.{0,24}ugc.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v2_unsupported_material_claim_001
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_002
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_003
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_004
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_005
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_006
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_007
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_008
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_009
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_010
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_011
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_012
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_013
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_014
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_015
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_016
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_017
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_018
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_019
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_020
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_021
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_022
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_023
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_024
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_025
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_026
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_027
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_028
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_029
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_030
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_031
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_032
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_033
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_034
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_035
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_036
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_037
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_038
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_039
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_040
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_041
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_042
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_043
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_044
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_045
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_046
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_047
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_048
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_049
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_050
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_051
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_052
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_053
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_054
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_055
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_056
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_057
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_058
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_059
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_060
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_061
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_062
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_063
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_064
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_065
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_066
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_067
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_068
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_069
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_070
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_071
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_072
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_073
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_074
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_075
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_076
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_077
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_078
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_079
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_080
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_human_trafficking_ugc_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-human-trafficking-ugc-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.

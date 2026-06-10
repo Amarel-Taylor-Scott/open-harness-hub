@@ -37,8 +37,8 @@ Run contract review + evaluate 5 mixed-kind success criteria.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `to_prose` | processor | `processor/structured-to-prose` | — |
-| 2 | `redact_pii` | processor | `processor/redact-pii-text` | — |
-| 3 | `grep_red_flags` | rule_pack | `rule-pack/grep-contract-red-flags` | — |
-| 4 | `grade` | processor | `processor/llm-judge` | — |
+| 1 | `to_prose` | processor | `processor/structured-to-prose` | - |
+| 2 | `redact_pii` | processor | `processor/redact-pii-text` | - |
+| 3 | `grep_red_flags` | rule_pack | `rule-pack/grep-contract-red-flags` | - |
+| 4 | `grade` | processor | `processor/llm-judge` | - |
 

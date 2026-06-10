@@ -1,0 +1,35 @@
+id: "benchmark/public-health-vaccine-cold-chain-bench"
+type: benchmark
+version: "0.1.0"
+name: "Public Health Vaccine Cold Chain benchmark"
+description: "Synthetic benchmark for public health vaccine cold chain review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["healthcare.public_health", "logistics.cold_chain"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["public-health-vaccine-cold-chain", "expansion-v7"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/public-health-vaccine-cold-chain-review"
+dataset: "dataset/public-health-vaccine-cold-chain-samples"
+rubric: "rubric/public-health-vaccine-cold-chain-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/public-health-vaccine-cold-chain-review"
+    rule_pack_override: ["rule-pack/grep-public-health-vaccine-cold-chain-flags", "rule-pack/rag-public-health-vaccine-cold-chain-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 31
+report:
+  output: "dist/benchmarks/public-health-vaccine-cold-chain/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

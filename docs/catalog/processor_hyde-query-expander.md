@@ -1,19 +1,17 @@
 # HyDE query expander
 
-*processor* · `processor/hyde-query-expander` · v0.1.0 · beta
+*processor* · `processor/hyde-query-expander` · v0.1.0 · experimental
 
-Hypothetical Document Embeddings (HyDE): generate a hypothetical
-*answer* to the user's query, then embed that hypothetical answer
-for retrieval instead of (or in addition to) the original query.
-Often improves recall on questions that don't share vocabulary
-with the source documents.
+Generate a hypothetical answer-document with the model and embed it to bridge the short-query↔long-doc gap for dense retrieval. Strong zero-shot recall lift; one LLM call + hallucination risk, so reserve for short/conversational queries against long technical corpora.
+
+Retrieval/prompt taxonomy step R0 (see docs/concepts/retrieval-and-prompt-taxonomy.md). One swappable method-component for the governed-model-call recipe; lift is measured at the pipeline level, not on this component.
 
 | axis | value |
 |---|---|
-| industry | cross_industry |
-| capability | retrieval, generation |
-| modality | text |
-| lifecycle | beta |
+| industry | cross_industry, ai |
+| capability | generation, retrieval |
+| modality | text, structured |
+| lifecycle | experimental |
 | trust_boundary | local |
 | license | MIT |
 

@@ -1,5 +1,13 @@
 # Master Goal — The Long-Horizon Program
 
+> **Baltor-first update (2026-05-31):** active `/goal` runs should read
+> [`baltor-clean-context.md`](baltor-clean-context.md) and
+> [`baltor-autonomous-goal.md`](baltor-autonomous-goal.md) first. The
+> component-factory program below remains the substrate/history, but active
+> product work prioritizes Baltor context control: source sync, verification,
+> reconciliation, serving packages, local/cloud model hierarchy, GTM, and
+> fundraising readiness.
+
 > **This is the single canonical goal.** An agent (Claude Code / Codex) reads
 > this at session start and can run for hours or days, across every phase of
 > the project, without re-deriving strategy. It reconciles and supersedes the

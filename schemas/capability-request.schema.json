@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/capability-request.schema.json",
+  "title": "Capability request",
+  "description": "A demand-capture placeholder for a capability the catalog does NOT yet provide. It is a typed empty slot (NOT an eighth primitive): typed to the component `target_type` it will eventually become, carried at maturity `abstract`, and never tenant-visible as a component. It leaves this state only by promotion — minting a real component at lifecycle `experimental` — after passing the two-axis lift gate (lift AND durability). Fulfilled by a premium agent build or a community build; a working+shared community build earns credits. Operational object: like review-ticket / object-factory-job it is NOT a catalog component type and is not in validate.py TYPE_TO_SCHEMA.",
+  "type": "object",
+  "required": ["capability_request_id", "title", "description", "target_type", "maturity", "status"],
+  "properties": {
+    "capability_request_id": {
+      "type": "string",
+      "description": "Stable id. Long generated ids must carry a content-hash suffix (see docs/codex/no-magic-values.md — never truncation alone)."
+    },
+    "title": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What capability is needed and what the user was trying to accomplish — the unmet need in the user's words."
+    },
+    "target_type": {
+      "$ref": "_common.schema.json#/$defs/componentType",
+      "description": "The component type this request will become once built. The primitive is DERIVED from this via scripts/primitives (label_for_type) — not stored separately, to avoid type/primitive drift."
+    },
+    "maturity": {
+      "type": "string",
+      "const": "abstract",
+      "description": "Always `abstract` while this object is open (see vocabularies/lifecycle.yaml). Promotion mints the component at `experimental` and closes this request; it is never `abstract` and a component at the same time."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["requested", "triaged", "researching", "building", "built", "verifying", "promoted", "rejected", "duplicate"],
+      "description": "requested → triaged → researching → building → built → verifying → promoted (terminal success) | rejected | duplicate (terminal)."
+    },
+    "fulfillment": {
+      "type": "string",
+      "enum": ["unassigned", "agent_build", "community"],
+      "description": "Who builds it. agent_build = premium hosted build-on-demand; community = a contributor builds and shares (reward-eligible)."
+    },
+    "requested_by": {
+      "type": "string",
+      "description": "Tenant/user id of the requester (demand signal). Do not store PII — an opaque id only."
+    },
+    "demand_count": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "How many distinct requesters/queries hit this same gap — demand aggregation for prioritization."
+    },
+    "state": { "$ref": "_common.schema.json#/$defs/objectState" },
+    "state_history": {
+      "type": "array",
+      "items": { "$ref": "_common.schema.json#/$defs/stateEvent" }
+    },
+    "priority": { "$ref": "_common.schema.json#/$defs/queuePriority" },
+    "priority_signals": { "$ref": "_common.schema.json#/$defs/prioritySignals" },
+    "queue_policy": { "$ref": "_common.schema.json#/$defs/queuePolicy" },
+    "seed_repos": {
+      "type": "array",
+      "description": "Candidate source repos (repo_full_name into data/repo-catalog/) the build-agent researches and may wrap. Honors the gate on those rows — never wrap a `reference-only · do-not-ingest` repo.",
+      "items": { "type": "string" }
+    },
+    "research_area_id": {
+      "type": "string",
+      "description": "Link to a data/research-queue/areas.jsonl area, if this gap was surfaced/ranked there."
+    },
+    "lift_gate": {
+      "type": "object",
+      "description": "The two-axis admission gate. A request promotes only when status=passed (pipeline lifts over the bare model AND the lift is structurally durable). See scripts/eval/durable_gap_harness.py.",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["pending", "passed", "failed"]
+        },
+        "lift_reason": {
+          "type": "string",
+          "description": "lift_reason code — single source: scripts/eval/reason_codes.py (do not re-enumerate here)."
+        },
+        "durability_class": {
+          "type": "string",
+          "description": "durability_class — single source: scripts/eval/reason_codes.py."
+        },
+        "bare_model_score": { "type": "number" },
+        "pipeline_score": { "type": "number" },
+        "evaluated_at": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": true
+    },
+    "build_job_id": {
+      "type": "string",
+      "description": "Link to the object-factory-job that performs the build (see schemas/object-factory-job.schema.json)."
+    },
+    "review_ticket_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "promotion_decision_id": {
+      "type": "string",
+      "description": "Link to the promotion-decision that admitted (or refused) the built component."
+    },
+    "promoted_component_id": {
+      "$ref": "_common.schema.json#/$defs/componentId",
+      "description": "Set once promoted — the id of the real component this request became."
+    },
+    "reward": {
+      "type": "object",
+      "description": "Contributor incentive for a community build. Credits are awarded only when the build WORKS (passes the lift gate) AND is shared.",
+      "properties": {
+        "credits": { "type": "number" },
+        "awarded_to": { "type": "string" },
+        "awarded_on": { "type": "string", "format": "date" },
+        "condition": {
+          "type": "string",
+          "enum": ["works_and_shared"],
+          "description": "The only reward condition: the shared component passed the lift gate."
+        }
+      },
+      "additionalProperties": true
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": true
+}

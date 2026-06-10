@@ -1,0 +1,31 @@
+id: "knowledge-pack/standards-regulatory-source-map"
+type: knowledge-pack
+version: "0.1.0"
+name: "Standards and regulatory source map"
+description: "High-value standards, regulatory, public enforcement, disclosure, and public-health source surfaces for generating versioned facts, procedure objects, controls, evidence requirements, and RAG records."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "CC-BY-4.0"
+industry: ["ai", "government", "legal", "healthcare.public_health", "finance", "software.devops", "cross_industry"]
+capability: ["retrieval", "verification", "governance", "extraction"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "volatile"
+tags: ["standards", "regulations", "public-facts", "controls", "source-surfaces", "versioned-facts"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types: ["source_surface", "source_family", "extraction_target", "governance_policy"]
+files:
+  - path: "data/standards-regulatory-source-map/surfaces.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    enabled: true
+    embedder: "processor/local-embedder"
+provenance:
+  sources: ["Official public source documentation and Open Harness Hub source-surface planning"]
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "source map only; no source records copied"

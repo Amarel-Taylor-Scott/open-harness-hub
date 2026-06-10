@@ -1,0 +1,87 @@
+id: "knowledge-pack/manifest-shapes-and-conventions"
+type: knowledge-pack
+version: "0.1.0"
+name: "Open Harness Hub manifest shapes, schemas & conventions reference"
+description: |
+  In-catalog reference pack distilling the OHH manifest shapes for
+  use by `persona/manifest-author` and `harness/draft-manifest-
+  author` when generating draft manifests from external knowledge
+  trees.
+
+  Contents:
+   - **Schema summaries**: one-page distillation of each of the 14
+     component schemas under `schemas/*.schema.json` — required
+     fields, optional fields, validation gotchas.
+   - **Envelope conventions**: id format, slug rules, semver,
+     license defaults, lifecycle progression, attribution.
+   - **Vocabularies in-context**: industries (52+ top-level with
+     sub-industries), capabilities (~25), modalities (7), leaf-
+     types (40+), lifecycle (4), lifecycle-position (12+).
+   - **Pattern library**: 20+ "canonical example" snippets — one
+     well-formed harness, pipeline, rule-pack (each family), tool,
+     rubric, etc. — to ground few-shot generation.
+   - **Hard rules from AGENTS.md + SPEC.md §5**:
+     · Pipeline never wires raw rule packs to a model.
+     · Volatile facts go in tools/knowledge packs, not personas.
+     · Every harness declares model_targets (even if `none`).
+     · Privacy boundaries travel with the component.
+     · Reproducibility is first-class.
+     · Industry-specific concepts as leaf instances, not top-level.
+   - **Curator-review etiquette**: drafts go to `catalog/_inbox/`;
+     curator promotes to live `catalog/{type}/` after review.
+   - **Anti-patterns to avoid**: slug-collision, attribution-
+     stripping, vocabulary-explosion, missing-required-field,
+     placeholder text ("TODO", "FIXME", "lorem ipsum") in shipped
+     manifests.
+
+  Intended consumers:
+   - `harness/draft-manifest-author` (in-context schema reference)
+   - `persona/manifest-author` (system-prompt grounding)
+   - Human contributors (browsable doc page)
+
+  This pack must be REGENERATED whenever schemas/ or vocabularies/
+  change. The CI workflow `validate.yml` should add a check that
+  this pack's version matches schemas/*.schema.json + vocabularies/
+  hashes (TODO; tracked in repo issues).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["software", "software.docs", "ai", "cross_industry"]
+capability: ["retrieval", "verification"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "volatile"
+tags: ["meta", "schemas", "conventions", "manifest-author", "few-shot-grounding"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+content_types:
+  - rag_doc
+  - citation_edge
+files:
+  - path: "data/manifest-shapes/schema-summaries.jsonl"
+    format: "jsonl"
+  - path: "data/manifest-shapes/envelope-conventions.jsonl"
+    format: "jsonl"
+  - path: "data/manifest-shapes/vocabularies-distilled.jsonl"
+    format: "jsonl"
+  - path: "data/manifest-shapes/canonical-examples.jsonl"
+    format: "jsonl"
+  - path: "data/manifest-shapes/hard-rules-and-antipatterns.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    embedder: "adapter/bge-embeddings-local"
+    chunk_tokens: 384
+    overlap_tokens: 64
+provenance:
+  sources:
+    - "schemas/_common.schema.json"
+    - "schemas/{harness,pipeline,rule-pack,knowledge-pack,logic-pack,tool,persona,adapter,rubric,dataset,processor,pattern,benchmark}.schema.json"
+    - "vocabularies/{industries,capabilities,modalities,leaf-types,lifecycle-position}.yaml"
+    - "AGENTS.md"
+    - "taxonomy/SPEC.md (especially §5 hard rules, §16 processor taxonomy)"
+    - "catalog/* (existing 500+ validated manifests as patterns)"
+  collected_through: "2026-05-24"

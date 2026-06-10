@@ -35,12 +35,12 @@ diff verdict (approve / request-changes / block).
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `grep_secrets_cloud` | rule_pack | `rule-pack/grep-cloud-secrets` | — |
-| 2 | `grep_secrets_ai` | rule_pack | `rule-pack/grep-ai-vendor-keys` | — |
-| 3 | `grep_secrets_vcs` | rule_pack | `rule-pack/grep-vcs-platform-pats` | — |
-| 4 | `grep_private_keys` | rule_pack | `rule-pack/grep-private-key-blocks` | — |
-| 5 | `retrieve_owasp_context` | knowledge_pack | `knowledge-pack/owasp-top-10-llm` | — |
-| 6 | `retrieve_attack_context` | knowledge_pack | `knowledge-pack/mitre-attack-sample` | — |
-| 7 | `review` | harness | `harness/text-safety-review` | — |
-| 8 | `verify_citations` | processor | `processor/citation-coverage` | — |
+| 1 | `grep_secrets_cloud` | rule_pack | `rule-pack/grep-cloud-secrets` | - |
+| 2 | `grep_secrets_ai` | rule_pack | `rule-pack/grep-ai-vendor-keys` | - |
+| 3 | `grep_secrets_vcs` | rule_pack | `rule-pack/grep-vcs-platform-pats` | - |
+| 4 | `grep_private_keys` | rule_pack | `rule-pack/grep-private-key-blocks` | - |
+| 5 | `retrieve_owasp_context` | knowledge_pack | `knowledge-pack/owasp-top-10-llm` | - |
+| 6 | `retrieve_attack_context` | knowledge_pack | `knowledge-pack/mitre-attack-sample` | - |
+| 7 | `review` | harness | `harness/text-safety-review` | - |
+| 8 | `verify_citations` | processor | `processor/citation-coverage` | - |
 

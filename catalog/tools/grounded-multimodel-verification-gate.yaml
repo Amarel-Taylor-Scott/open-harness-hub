@@ -1,0 +1,77 @@
+id: "tool/grounded-multimodel-verification-gate"
+type: tool
+version: "0.1.0"
+name: "Grounded multi-model verification gate"
+description: "Verifies high-risk facts or knowledge objects with grounded search, official-source retrieval, archive freshness checks, multiple model reviewers, disagreement detection, and review-ticket routing."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "government", "healthcare", "legal", "humanitarian", "cross_industry"]
+capability: ["verification", "retrieval", "evaluation", "governance", "routing"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "volatile"
+tags: ["grounded-search", "google-grounded-search", "multi-model", "verification", "source-conflict", "high-risk-facts"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    knowledge_object:
+      type: object
+    risk_policy:
+      type: object
+    grounded_search_providers:
+      type: array
+      items:
+        type: string
+    model_reviewers:
+      type: array
+      items:
+        type: object
+    source_policy:
+      type: object
+  required: ["knowledge_object", "risk_policy"]
+returns:
+  type: object
+  properties:
+    verification_status:
+      type: string
+    evidence_packet:
+      type: object
+    source_conflicts:
+      type: array
+      items:
+        type: object
+    model_disagreements:
+      type: array
+      items:
+        type: object
+    review_required:
+      type: boolean
+    review_reasons:
+      type: array
+      items:
+        type: string
+side_effects: "external_call"
+examples:
+  - input:
+      knowledge_object:
+        object_id: "knowledge-object/example-critical-fact"
+        risk_tier: "critical"
+      risk_policy:
+        require_grounded_search: true
+        min_model_reviewers: 2
+      grounded_search_providers: ["google_grounded_search"]
+    output:
+      verification_status: "needs_review"
+      evidence_packet: {}
+      source_conflicts: []
+      model_disagreements: []
+      review_required: true
+      review_reasons: ["Example only; live grounded verification not run."]
+implementations:
+  - kind: "mcp"
+    path: "mcp/verification.grounded_multimodel_gate"

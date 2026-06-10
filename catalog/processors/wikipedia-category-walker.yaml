@@ -1,0 +1,74 @@
+id: "processor/wikipedia-category-walker"
+type: processor
+version: "0.1.0"
+name: "Wikipedia category-tree walker"
+description: |
+  Walks a Wikipedia category tree starting from a root category and
+  yields one structured "knowledge node" per sub-category and
+  per-article. Each node carries:
+
+   - title
+   - canonical URL
+   - revision_id (frozen at walk time for reproducibility)
+   - parent_category_path (breadcrumb from walk root)
+   - intro_text (first 1500 chars of article body)
+   - infobox (structured fields when present)
+   - cited_sources (footnote list, up to 50)
+   - sub_categories (when the node IS a category)
+
+  Designed to feed `harness/draft-manifest-author` so each emitted
+  node becomes a candidate draft manifest.
+
+  Respects:
+   - max_depth (default 3) to bound walk size
+   - max_nodes (default 200) to bound API + LLM cost
+   - rate_limit_per_sec (default 1.0) per Wikipedia API etiquette
+   - revision_freeze_ts so the walk is deterministically replayable
+
+  Implementation uses MediaWiki Action API (categorymembers + parse)
+  with on-disk caching keyed on (title, revision_id).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["media", "media.editorial", "media.factcheck", "software", "cross_industry"]
+capability: ["retrieval", "extraction"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "external"
+tags: ["wikipedia", "walker", "ingestion", "category-tree", "manifest-author"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+process_kind: "retrieve.tree_walk"
+deterministic: true
+idempotent: true
+streaming: true
+latency_budget_ms: 60000
+
+inputs:
+  - name: "root_category"
+    type: "string"
+  - name: "max_depth"
+    type: "integer"
+  - name: "max_nodes"
+    type: "integer"
+  - name: "language_edition"
+    type: "string"
+  - name: "revision_freeze_ts"
+    type: "string"
+outputs:
+  - name: "nodes"
+    type: "object[]"
+  - name: "walk_stats"
+    type: "object"
+
+side_effects: "external_call"
+on_error: "retry"
+retry:
+  max_attempts: 3
+  backoff: "exponential"
+
+implementations:
+  - kind: "callable"
+    path: "scripts.processors.wikipedia_category_walker.run"
+    language: "python"

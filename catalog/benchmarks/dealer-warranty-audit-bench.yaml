@@ -1,0 +1,35 @@
+id: "benchmark/dealer-warranty-audit-bench"
+type: benchmark
+version: "0.1.0"
+name: "Dealer Warranty Audit benchmark"
+description: "Synthetic benchmark for dealer warranty audit review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["automotive.warranty", "finance.fraud"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["dealer-warranty-audit", "expansion-v5"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/dealer-warranty-audit-review"
+dataset: "dataset/dealer-warranty-audit-samples"
+rubric: "rubric/dealer-warranty-audit-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/dealer-warranty-audit-review"
+    rule_pack_override: ["rule-pack/grep-dealer-warranty-audit-flags", "rule-pack/rag-dealer-warranty-audit-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 23
+report:
+  output: "dist/benchmarks/dealer-warranty-audit/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

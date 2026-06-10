@@ -1,0 +1,37 @@
+id: "knowledge-pack/local-blueprint-record-persistence-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Local blueprint record persistence patterns"
+description: "Seed patterns for exporting local sentence-to-pipeline output records into canonical Postgres/pgvector JSONL row families."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["format_conversion", "retrieval", "governance", "planning"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.product"
+tags: ["postgres", "pgvector", "jsonl", "local-demo", "blueprint-records", "bulk-load"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types:
+  - "blueprint_persistence_row_pattern"
+  - "canonical_row_family_mapping"
+files:
+  - path: "catalog/knowledge-packs/data/local-blueprint-record-persistence-patterns/rows.jsonl"
+    format: "jsonl"
+    schema: "local-blueprint-record-persistence-row"
+indexing:
+  bm25: true
+  dense:
+    recommended_model: "sentence-transformers/all-MiniLM-L6-v2"
+provenance:
+  sources:
+    - "Open Harness Hub local sentence-to-pipeline demo output record architecture"
+    - "Open Harness Hub canonical Postgres schema"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "Synthetic row mapping examples only; no raw private prompts or uploaded evidence."

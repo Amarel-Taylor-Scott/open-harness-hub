@@ -6,6 +6,10 @@ Start with:
 
 - **[Master goal](master-goal.md) — the single canonical long-horizon program.
   Read this first; it reconciles and supersedes the goal docs below.**
+- [AI Done Right parser-safe portfolio loop](../goals/aidoneright-portfolio-loop.md)
+- [AI Done Right handoff freshness](../handoff/handoff-freshness.md)
+- [AI Done Right family polish goal](ai-done-right-family-polish-goal.md)
+- [Repo polish loop goal](repo-polish-loop-goal.md)
 - [Object factory workflow](object-factory-workflow.md)
 - [Quality gates](quality-gates.md)
 - [Speed guardrails](speed-guardrails.md)
