@@ -90,11 +90,18 @@ def _eligible(node: dict, eff: dict, requested_tier: int) -> tuple[bool, str]:
 
 # ── provider selection + governed fallback ──────────────────────────────────────────────────────────────────
 def select_provider(resolved: dict, *, available_secrets: set | None = None,
-                    provider_health: dict | None = None) -> dict:
+                    provider_health: dict | None = None,
+                    efficiency_ranking: list | None = None) -> dict:
     """Decide which provider NODE to use for a resolved preference. Prefers the object's allowed_provider_nodes
     in order; rejects nodes that are policy-blocked / wrong-specialization / missing-secret / unhealthy, recording
     each rejection with a reason code. Falls back to the chosen node's local_equivalent, else the offline default.
-    Returns a route decision (chosen node + fallback_used + tier downgrade + rejected_candidates)."""
+    Returns a route decision (chosen node + fallback_used + tier downgrade + rejected_candidates).
+
+    efficiency_ranking (optional, injected by the caller from model_efficiency.rank_models over the
+    receipts): REORDERS the preference among the ALREADY-ALLOWED nodes by measured cost/quality
+    efficiency — eligibility (policy/secret/specialization/health) is unchanged below, and unmeasured
+    nodes keep their declared order. A safe, monotone 'pick the cheapest capable model' improvement
+    that can never violate policy. See docs/architecture/model-efficiency-routing.md."""
     eff = resolved["effective"]
     creds = set(available_secrets or set())
     health = provider_health or {}
@@ -104,6 +111,9 @@ def select_provider(resolved: dict, *, available_secrets: set | None = None,
     order = [n for n in eff.get("allowed_provider_nodes", []) if n not in disallowed and n in idx]
     if not order:  # no explicit list → all graph nodes meeting tier+specialization
         order = [n["node_id"] for n in load_graph()["nodes"] if n["node_id"] not in disallowed]
+    if efficiency_ranking:  # reorder the PREFERENCE by measured efficiency (eligibility unchanged below)
+        from src.teleon.inference.model_efficiency import efficiency_order
+        order = efficiency_order(order, efficiency_ranking)
 
     rejected: list[dict] = []
     chosen: str | None = None
@@ -190,14 +200,28 @@ def build_receipt(*, object_id: str, preference_id: str, requested_model_class: 
 # ── offline gateway (local deterministic execution) ─────────────────────────────────────────────────────────
 def infer_local(*, object_id: str, preference_layers: list[dict], input_text: str, now: str,
                 available_secrets: set | None = None, provider_health: dict | None = None,
-                allow_network: bool = False) -> dict:
+                allow_network: bool = False, use_efficiency_ranking: bool = True) -> dict:
     """End-to-end inference: resolve preference → select provider → DISPATCH execution through the standardized
     provider-adapter layer (src.teleon.inference.adapters.resolve_adapter) → receipt. Offline (allow_network=False,
     the default) only the deterministic LocalStub adapter is available, so an external decided node degrades to the
     stub and the receipt stays honest about what actually ran. Enabling allow_network (owner-authorized) lets a real
-    adapter execute instead — same governed contract (receipt, fallback trail, output-never-truth)."""
+    adapter execute instead — same governed contract (receipt, fallback trail, output-never-truth).
+
+    use_efficiency_ranking (default on): rank the allowed nodes by MEASURED efficiency from the accumulated
+    receipts (model_efficiency.rank_models) and feed it to select_provider — 'pick the cheapest capable model'
+    learned from our own cost/latency data. A no-op until receipts exist (honest: empty ranking → declared order)."""
     resolved = resolve_preference(preference_layers)
-    route = select_provider(resolved, available_secrets=available_secrets, provider_health=provider_health)
+    ranking = None
+    if use_efficiency_ranking:  # learn the preference order from our own receipts (no-op when empty)
+        try:
+            from src.teleon.inference.model_efficiency import rank_models
+            from src.teleon.inference.receipts import load_receipts, RECEIPTS_JSONL_PATH
+            klass = resolved["effective"].get("model_class_preference", {}).get("name")
+            ranking = rank_models(load_receipts(RECEIPTS_JSONL_PATH), task_class=klass) or None
+        except Exception:  # ranking must never break inference — degrade to the declared order
+            ranking = None
+    route = select_provider(resolved, available_secrets=available_secrets, provider_health=provider_health,
+                            efficiency_ranking=ranking)
     decided = route["selected_provider_node_id"]
     result: dict = {}  # the executing adapter's invoke result (live model/latency/tokens when real)
     if route.get("blocked"):
