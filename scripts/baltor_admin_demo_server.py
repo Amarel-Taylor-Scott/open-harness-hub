@@ -663,6 +663,185 @@ if _DURABLE_DB:
         DURABLE = None
 
 
+# ── durable ctx:// run + gateway-receipt store ──────────────────────────────────────────────────────
+# P1 hardening (warrant: docs/architecture/capability-rubric-and-deep-dive-2026-06-11.md — the context
+# gateway is "MVP skeleton of THE product" but ctx:// handles die on restart, RUNS is never pruned
+# (unbounded memory), and no receipt is issued on search/fetch). This adds a DURABLE mirror for RUNS and
+# a persisted receipt ledger WITHOUT a new dependency and WITHOUT touching scripts/durable_store.py: a
+# second sqlite connection onto the SAME WAL db file (BALTOR_DURABLE_DB) — WAL + busy_timeout make
+# multi-connection (and multi-process) reads/writes safe, exactly as DurableStore documents. Lossless:
+# the in-memory RUNS dict stays the live working copy; these tables are a derived durable layer (the bus
+# rejects unknown kinds, so RUNS cannot ride the event log — it needs its own table here).
+#
+# Bounded-memory cap: keep only the most recent N runs in memory AND in the durable table (LRU by
+# created_at). One named constant, env-overridable, so the cap is visible and tunable, never magic.
+DURABLE_RUNS_MAX = int(os.environ.get("BALTOR_DURABLE_RUNS_MAX", "200"))   # newest-N ctx:// runs kept (memory + table)
+RUN_STORE = None          # sqlite3 connection onto BALTOR_DURABLE_DB, or None when durability is off
+RUN_STORE_ERROR = ""
+
+# Item 3 (deep-dive): the CFPB artifact-graph ledger db path was HARDCODED to <repo>/.agent/ — OUTSIDE
+# the Fly volume, so it died with the machine. Route it through the same durable volume the other paths
+# use: default into the directory of BALTOR_DURABLE_DB (the volume) when set, else the legacy .agent/
+# path (byte-identical for local dev / self-tests). Env-overridable, one named constant — no magic value.
+# NOTE: the canonical home for this would be scripts/_config.ADMIN_DEMO_RUNTIME_SETTINGS; that module is
+# out of scope for this surgical change (see status doc), so it is resolved in-file with the same
+# env → default precedence the settings module uses.
+_DURABLE_VOLUME_DIR = os.path.dirname(_DURABLE_DB) if _DURABLE_DB else str(REPO_ROOT / ".agent")
+CFPB_ARTIFACT_GRAPH_DB = os.environ.get(
+    "BALTOR_CFPB_ARTIFACT_GRAPH_DB",
+    os.path.join(_DURABLE_VOLUME_DIR, "cfpb_artifact_graph.db"),
+)
+
+if DURABLE is not None and _DURABLE_DB:
+    try:
+        import sqlite3 as _sqlite3
+
+        RUN_STORE = _sqlite3.connect(_DURABLE_DB, isolation_level=None, check_same_thread=False)
+        RUN_STORE.execute("PRAGMA busy_timeout=5000")  # multi-connection: wait on a held lock, don't error
+        RUN_STORE.execute(
+            "CREATE TABLE IF NOT EXISTS gateway_runs("
+            "run_id TEXT PRIMARY KEY, created_at INTEGER, updated_at INTEGER, body_json TEXT)"
+        )
+        RUN_STORE.execute("CREATE INDEX IF NOT EXISTS idx_gateway_runs_created ON gateway_runs(created_at)")
+        RUN_STORE.execute(
+            "CREATE TABLE IF NOT EXISTS gateway_receipts("
+            "receipt_id TEXT PRIMARY KEY, ts INTEGER, operation TEXT, run_id TEXT, "
+            "handle TEXT, query TEXT, ok INTEGER, content_hash TEXT, body_json TEXT)"
+        )
+        RUN_STORE.execute("CREATE INDEX IF NOT EXISTS idx_gateway_receipts_ts ON gateway_receipts(ts)")
+    except Exception as _e:  # durability was requested ⇒ surface, do not hide; runs still work in-memory
+        RUN_STORE_ERROR = f"run-store init failed: {type(_e).__name__}: {_e}"
+        print(f"[durable] {RUN_STORE_ERROR}", file=sys.stderr, flush=True)
+        RUN_STORE = None
+
+
+def persist_run(run: dict) -> None:
+    """Mirror one run into the durable gateway_runs table so its ctx:// handles survive a restart.
+    Best-effort + lossless: RUNS (in memory) stays authoritative; a write failure never breaks the run."""
+    if RUN_STORE is None or not isinstance(run, dict):
+        return
+    run_id = str(run.get("run_id") or "")
+    if not run_id:
+        return
+    try:
+        RUN_STORE.execute(
+            "INSERT INTO gateway_runs(run_id,created_at,updated_at,body_json) VALUES(?,?,?,?) "
+            "ON CONFLICT(run_id) DO UPDATE SET updated_at=excluded.updated_at, body_json=excluded.body_json",
+            (run_id, int(run.get("created_at") or 0), int(run.get("updated_at") or run.get("created_at") or 0),
+             json.dumps(run, sort_keys=True, default=str)),
+        )
+    except Exception as _e:  # noqa: BLE001 — never let durability mirroring break a live run
+        print(f"[durable] persist_run failed: {type(_e).__name__}: {_e}", file=sys.stderr, flush=True)
+
+
+def prune_runs() -> None:
+    """Bound memory: keep only the newest DURABLE_RUNS_MAX runs in the in-memory RUNS dict AND, when
+    durable, in the gateway_runs table (LRU by created_at). Without this RUNS grew unbounded (deep-dive)."""
+    with RUN_LOCK:
+        if len(RUNS) > DURABLE_RUNS_MAX:
+            ordered = sorted(RUNS.values(), key=lambda r: int(r.get("created_at") or 0), reverse=True)
+            keep = {str(r.get("run_id")) for r in ordered[:DURABLE_RUNS_MAX]}
+            for stale_id in [rid for rid in RUNS if rid not in keep]:
+                RUNS.pop(stale_id, None)
+    if RUN_STORE is not None:
+        try:
+            RUN_STORE.execute(
+                "DELETE FROM gateway_runs WHERE run_id NOT IN "
+                "(SELECT run_id FROM gateway_runs ORDER BY created_at DESC LIMIT ?)",
+                (DURABLE_RUNS_MAX,),
+            )
+        except Exception as _e:  # noqa: BLE001
+            print(f"[durable] prune_runs failed: {type(_e).__name__}: {_e}", file=sys.stderr, flush=True)
+
+
+def rehydrate_runs() -> int:
+    """On startup, reload the newest DURABLE_RUNS_MAX runs from the durable table into RUNS so ctx://
+    handles created before a restart still resolve. Returns the count restored (0 when durability off)."""
+    if RUN_STORE is None:
+        return 0
+    try:
+        rows = RUN_STORE.execute(
+            "SELECT body_json FROM gateway_runs ORDER BY created_at DESC LIMIT ?", (DURABLE_RUNS_MAX,)
+        ).fetchall()
+    except Exception as _e:  # noqa: BLE001
+        print(f"[durable] rehydrate_runs failed: {type(_e).__name__}: {_e}", file=sys.stderr, flush=True)
+        return 0
+    restored = 0
+    with RUN_LOCK:
+        for (body_json,) in rows:
+            try:
+                run = json.loads(body_json or "{}")
+            except json.JSONDecodeError:
+                continue
+            run_id = str(run.get("run_id") or "")
+            if run_id and run_id not in RUNS:
+                RUNS[run_id] = run
+                restored += 1
+    if restored:
+        print(f"[durable] ctx:// runs rehydrated={restored} (cap={DURABLE_RUNS_MAX})", file=sys.stderr, flush=True)
+    return restored
+
+
+def gateway_receipt(operation: str, *, run: dict | None, ok: bool, handle: str = "", query: str = "",
+                    content: object = None) -> dict:
+    """Mint + persist a gateway receipt for a search/fetch and publish the existing `receipt_issued` bus
+    event — honest provenance for "agents propose, Baltor disposes" (deep-dive item 2). The receipt is a
+    governed record of WHAT was served (is_truth:false — serving a pack is not asserting its facts true);
+    it is persisted to the durable gateway_receipts table and rides the durable bus log via BUS.publish."""
+    run_id = str((run or {}).get("run_id") or "")
+    receipt = {
+        "kind": "baltor.gateway-receipt.v1",
+        "receipt_id": f"gwr-{uuid.uuid4().hex[:12]}",
+        "ts": int(time.time()),
+        "operation": operation,             # "context.search" | "context.fetch"
+        "run_id": run_id,
+        "handle": handle or "",
+        "query": (query or "")[:200],
+        "ok": bool(ok),
+        "content_hash": stable_hash(content) if content is not None else "",
+        "is_truth": False,                  # serving context is not asserting its facts are true
+        "served_under_policy": "bounded_fetch_cite_required_volatile_needs_refresh",
+    }
+    if RUN_STORE is not None:
+        try:
+            RUN_STORE.execute(
+                "INSERT OR REPLACE INTO gateway_receipts"
+                "(receipt_id,ts,operation,run_id,handle,query,ok,content_hash,body_json) VALUES(?,?,?,?,?,?,?,?,?)",
+                (receipt["receipt_id"], receipt["ts"], receipt["operation"], receipt["run_id"],
+                 receipt["handle"], receipt["query"], int(receipt["ok"]), receipt["content_hash"],
+                 json.dumps(receipt, sort_keys=True)),
+            )
+        except Exception as _e:  # noqa: BLE001
+            print(f"[durable] gateway_receipt persist failed: {type(_e).__name__}: {_e}", file=sys.stderr, flush=True)
+    try:  # the durable event log persists this automatically (BUS → _persist); kind is in EVENT_KINDS
+        BUS.publish("receipt_issued", component="context_gateway", stage="Consumption",
+                    correlation_id=run_id or None, object_ref=handle or None,
+                    payload={"receipt_id": receipt["receipt_id"], "operation": operation, "ok": bool(ok),
+                             "content_hash": receipt["content_hash"], "is_truth": False})
+    except Exception as _e:  # noqa: BLE001
+        print(f"[durable] gateway_receipt publish failed: {type(_e).__name__}: {_e}", file=sys.stderr, flush=True)
+    return receipt
+
+
+def latest_gateway_receipts(limit: int = 50) -> list[dict]:
+    """Newest-first persisted gateway receipts (durable surface for the /api/context-gateway/receipts read)."""
+    if RUN_STORE is None:
+        return []
+    try:
+        rows = RUN_STORE.execute(
+            "SELECT body_json FROM gateway_receipts ORDER BY ts DESC LIMIT ?", (max(1, min(500, limit)),)
+        ).fetchall()
+    except Exception:  # noqa: BLE001
+        return []
+    out: list[dict] = []
+    for (body_json,) in rows:
+        try:
+            out.append(json.loads(body_json or "{}"))
+        except json.JSONDecodeError:
+            continue
+    return out
+
+
 def log_event(kind: str, message: str, *, run_id: str = "", source: str = "", detail: dict | None = None) -> dict:
     event = {
         "id": f"evt-{uuid.uuid4().hex[:10]}",
@@ -1735,7 +1914,9 @@ def update_run(run_id: str, **updates: object) -> dict | None:
             return None
         run.update(updates)
         run["updated_at"] = int(time.time())
-        return dict(run)
+        snapshot = dict(run)
+    persist_run(snapshot)  # mirror to the durable table outside the lock (ctx:// survives restart)
+    return snapshot
 
 
 def create_background_run(text: str, source_name: str, source_type: str, document_tree: dict | None) -> dict:
@@ -1779,12 +1960,24 @@ def create_background_run(text: str, source_name: str, source_type: str, documen
         RUNS[run_id] = run
     log_event("run.queued", "Run queued for background processing", run_id=run_id, source=source_name, detail={"source_type": source_type, "bytes": len(text), **run["document_tree"]["summary"]})
     enqueue_result = enqueue_context_job(run, text, run["document_tree"])
+    published = bool(enqueue_result["ok"])
     with RUN_LOCK:
         RUNS[run_id]["queue_job_id"] = enqueue_result["job"]["job_id"]
-        RUNS[run_id]["queue_published"] = bool(enqueue_result["ok"])
-        RUNS[run_id]["heartbeat"] = {"ts": int(time.time()), "stage": "queue", "status": "published" if enqueue_result["ok"] else "fallback", "detail": "Background job envelope created", "job_id": enqueue_result["job"]["job_id"]}
-    thread = threading.Thread(target=process_run_background, args=(run_id,), daemon=True)
-    thread.start()
+        RUNS[run_id]["queue_published"] = published
+        RUNS[run_id]["heartbeat"] = {"ts": int(time.time()), "stage": "queue", "status": "published" if published else "fallback", "detail": "Background job envelope created", "job_id": enqueue_result["job"]["job_id"]}
+        snapshot = dict(RUNS[run_id])
+    persist_run(snapshot)   # durable mirror so the ctx:// run survives a restart
+    prune_runs()            # bound memory: keep only the newest DURABLE_RUNS_MAX runs
+    # Item 5 (deep-dive): ONE run engine, not two. When the job was PUBLISHED to Redis, a container worker
+    # owns it and sync_worker_ledger harvests that result — running the in-process worker too is the
+    # double-processing path whose ledger sync would race/overwrite the in-process write. So the in-process
+    # worker is the FALLBACK only: start it solely when nothing was published (no Redis / publish failed).
+    if not published:
+        thread = threading.Thread(target=process_run_background, args=(run_id,), daemon=True)
+        thread.start()
+    else:
+        log_event("run.delegated", "Published to Redis; container worker owns processing (no in-process double-run)",
+                  run_id=run_id, source=source_name, detail={"queue": CONTEXT_QUEUE_KEY, "job_id": enqueue_result["job"]["job_id"]})
     return dict(run)
 
 
@@ -1801,6 +1994,8 @@ def set_stage(run_id: str, stage: str, status: str, detail: str, progress: int) 
         run["progress"] = progress
         run["heartbeat"] = {"ts": int(time.time()), "stage": stage, "status": status, "detail": detail, "progress": progress}
         run["updated_at"] = int(time.time())
+        snapshot = dict(run)
+    persist_run(snapshot)  # keep the durable mirror in step with stage progress
 
 
 def process_run_background(run_id: str) -> None:
@@ -1920,6 +2115,8 @@ def build_run(text: str, source_name: str = "demo-source.txt", source_type: str 
         "refresh_jobs": refresh_jobs,
     }
     RUNS[run_id] = run
+    persist_run(run)   # durable mirror so this run's ctx:// handles survive a restart
+    prune_runs()       # bound memory: keep only the newest DURABLE_RUNS_MAX runs
     log_event("document.tree", "Built document hierarchy, pages, and components", run_id=run_id, source=source_name, detail=run["document_tree"]["summary"])
     log_event("run.complete", "Context run completed", run_id=run_id, source=source_name, detail=run["summary"])
     return run
@@ -3467,11 +3664,13 @@ def context_search_payload(query: str, *, run: dict | None = None, task_type: st
     sync_worker_ledger()
     run = run or latest_run()
     if not run:
+        _rcpt = gateway_receipt("context.search", run=None, ok=False, query=query)
         return {
             "ok": False,
             "answerable": False,
             "error": "no indexed run is available",
             "gateway_policy": gateway_status_payload()["policy"],
+            "receipt": {"receipt_id": _rcpt["receipt_id"], "operation": _rcpt["operation"], "is_truth": False},
         }
     records = iter_rag_records(run)
     claims = run.get("claims") or []
@@ -3532,6 +3731,12 @@ def context_search_payload(query: str, *, run: dict | None = None, task_type: st
         }
         for record in selected_records[:6]
     ]
+    # Honest provenance (deep-dive item 2): every served search mints a persisted receipt + a receipt_issued
+    # bus event. Serving a pack is NOT asserting its facts are true (is_truth:false); the receipt records WHAT
+    # was served, hashed, so the "agents propose, Baltor disposes" claim is auditable rather than aspirational.
+    _rcpt = gateway_receipt("context.search", run=run, ok=True, query=query, content=pack.get("context_pack"))
+    pack["receipt"] = {"receipt_id": _rcpt["receipt_id"], "operation": _rcpt["operation"],
+                       "content_hash": _rcpt["content_hash"], "is_truth": False}
     return {"ok": True, **pack}
 
 
@@ -3540,16 +3745,22 @@ def context_fetch_payload(handle: str, *, run: dict | None = None, max_tokens: i
     sync_worker_ledger()
     run = run or latest_run()
     if not run:
-        return {"ok": False, "error": "no indexed run is available", "handle": handle}
+        _rcpt = gateway_receipt("context.fetch", run=None, ok=False, handle=handle)
+        return {"ok": False, "error": "no indexed run is available", "handle": handle,
+                "receipt": {"receipt_id": _rcpt["receipt_id"], "operation": _rcpt["operation"], "is_truth": False}}
     records = iter_rag_records(run)
     for record in records:
         if record.get("handle") == handle:
+            # Receipt on the raw ingested-content fetch (deep-dive item 2): hashed record of WHAT was served.
+            _rcpt = gateway_receipt("context.fetch", run=run, ok=True, handle=handle, content=record)
             return {
                 "ok": True,
                 "handle": handle,
                 "kind": "component",
                 "token_budget_used_estimate": min(max_tokens, max(1, len(str(record.get("text") or "")) // 4)),
                 "content": record,
+                "receipt": {"receipt_id": _rcpt["receipt_id"], "operation": _rcpt["operation"],
+                            "content_hash": _rcpt["content_hash"], "is_truth": False},
                 "gateway_policy": {
                     "bounded_fetch": True,
                     "raw_source_access_is_fallback": True,
@@ -3559,6 +3770,7 @@ def context_fetch_payload(handle: str, *, run: dict | None = None, max_tokens: i
     for claim in run.get("claims") or []:
         claim_handle = context_handle("claim", run_id=str(run.get("run_id") or ""), claim_id=str(claim.get("id") or ""))
         if claim_handle == handle:
+            _rcpt = gateway_receipt("context.fetch", run=run, ok=True, handle=handle, content=claim)
             return {
                 "ok": True,
                 "handle": handle,
@@ -3569,17 +3781,21 @@ def context_fetch_payload(handle: str, *, run: dict | None = None, max_tokens: i
                     "handle": claim_handle,
                     "instruction": claim.get("safe_context_instruction") or "Use with citation; do not present volatile facts as current without refresh.",
                 },
+                "receipt": {"receipt_id": _rcpt["receipt_id"], "operation": _rcpt["operation"],
+                            "content_hash": _rcpt["content_hash"], "is_truth": False},
                 "gateway_policy": {
                     "bounded_fetch": True,
                     "raw_source_access_is_fallback": True,
                     "citation_required": True,
                 },
             }
+    _rcpt = gateway_receipt("context.fetch", run=run, ok=False, handle=handle)
     return {
         "ok": False,
         "error": "handle not found in current local index",
         "handle": handle,
         "available_handles": [record.get("handle") for record in records[:20] if record.get("handle")],
+        "receipt": {"receipt_id": _rcpt["receipt_id"], "operation": _rcpt["operation"], "is_truth": False},
     }
 
 
@@ -5166,6 +5382,15 @@ class Handler(BaseHTTPRequestHandler):
             log_event("context_gateway.search", "Returned bounded context pack", run_id=str((run or {}).get("run_id") or ""), source=query[:120], detail={"task_type": task_type, "pack_type": pack_type})
             self.send_bytes(200 if payload.get("ok") else 404, json.dumps(payload, indent=2).encode(), "application/json")
         elif path == "/api/context-gateway/fetch":
+            # Item 4 (deep-dive): the gateway fetch returns RAW ingested content, so when OH_SHOWCASE_TOKEN
+            # is configured (public tunnel) this read is token-gated like a POST. Unset (local/self-tests)
+            # ⇒ open, byte-identical to prior behavior. Conservative: ONLY this ingested-content fetch is
+            # gated; search/glossary/dimensions/status stay open so the public demo still reads.
+            if not self._authed(parsed):
+                self.send_bytes(401, json.dumps({"error": "token required for ingested-content fetch",
+                                                 "hint": "append ?token=<token> or send an X-OHH-Token header"}).encode(),
+                                "application/json")
+                return
             qs = parse_qs(parsed.query)
             handle = (qs.get("handle") or [""])[0]
             max_tokens = max(64, min(4000, int((qs.get("max_tokens") or ["1000"])[0])))
@@ -5174,6 +5399,14 @@ class Handler(BaseHTTPRequestHandler):
             payload = context_fetch_payload(handle, run=run, max_tokens=max_tokens)
             log_event("context_gateway.fetch", "Fetched bounded context handle", run_id=str((run or {}).get("run_id") or ""), source=handle[:160], detail={"ok": payload.get("ok"), "kind": payload.get("kind")})
             self.send_bytes(200 if payload.get("ok") else 404, json.dumps(payload, indent=2).encode(), "application/json")
+        elif path == "/api/context-gateway/receipts":
+            # Honest provenance surface (deep-dive item 2): the persisted gateway receipts for search/fetch.
+            qs = parse_qs(parsed.query)
+            limit = max(1, min(500, int((qs.get("limit") or ["50"])[0])))
+            receipts = latest_gateway_receipts(limit)
+            self.send_bytes(200, json.dumps({"ok": True, "kind": "baltor.gateway-receipts.v1",
+                                             "durable": RUN_STORE is not None, "count": len(receipts),
+                                             "receipts": receipts}, indent=2).encode(), "application/json")
         elif path == "/api/context-gateway/glossary":
             qs = parse_qs(parsed.query)
             term = (qs.get("term") or [""])[0]
@@ -5376,7 +5609,10 @@ class Handler(BaseHTTPRequestHandler):
             # C32: ingest→artifacts→vectors→graph→conflicts→reconciliation→receipt. Persisted to a durable
             # ledger file (the ledger is the source of truth; this response is a projection for the page).
             from scripts.cfpb_artifact_graph_demo import run_demo
-            ledger_path = str(Path(__file__).resolve().parents[1] / ".agent" / "cfpb_artifact_graph.db")
+            # Item 3 (deep-dive): was hardcoded to <repo>/.agent/ (outside the Fly volume → lost on restart).
+            # Now routed through CFPB_ARTIFACT_GRAPH_DB, which defaults into the BALTOR_DURABLE_DB volume dir.
+            ledger_path = CFPB_ARTIFACT_GRAPH_DB
+            Path(ledger_path).parent.mkdir(parents=True, exist_ok=True)
             resp = run_demo(tenant_id="acme", ledger_path=ledger_path)
             log_event("artifact_graph.run", f"Built CFPB artifact graph (run {resp['run_id']})", source="cfpb-artifact-graph",
                       detail={"counts": resp["counts"]})
@@ -5644,11 +5880,135 @@ class Handler(BaseHTTPRequestHandler):
         pass
 
 
+def _self_test() -> int:
+    """P1 gateway-hardening proof (warrant: docs/architecture/capability-rubric-and-deep-dive-2026-06-11.md).
+    Covers: (1) ctx:// handle survives a REAL restart on the same durable db; (2) a receipt is issued +
+    persisted on fetch; (3) the CFPB ledger path honors the setting / lands in the durable volume; (4) the
+    in-process worker is the FALLBACK only (no double-processing when Redis publishes). Spawns this server
+    as a subprocess (like check_durable_restart_survival) and drives the run→search→fetch flow over HTTP —
+    deliberately NOT /api/demo/run-full-pipeline (that path is unrelated to this change)."""
+    import socket
+    import subprocess
+    import tempfile
+    import urllib.parse
+    import urllib.request
+
+    failures: list[str] = []
+
+    def check(name: str, ok: bool, detail: str = "") -> None:
+        print(f"  [{'ok' if ok else 'FAIL'}] {name}{(': ' + detail) if detail and not ok else ''}")
+        if not ok:
+            failures.append(name)
+
+    # ── pure-function checks (no server needed) ───────────────────────────────────────────────────────
+    # Item 3: with BALTOR_DURABLE_DB set, the CFPB path defaults into that volume dir, not <repo>/.agent.
+    vol = tempfile.mkdtemp(prefix="baltor-vol-")
+    env_db = os.path.join(vol, "durable.db")
+    expected_cfpb = os.path.join(vol, "cfpb_artifact_graph.db")
+    code = ("import os,sys; os.environ['BALTOR_DURABLE_DB']=sys.argv[1];"
+            "import scripts.baltor_admin_demo_server as s;"
+            "print(s.CFPB_ARTIFACT_GRAPH_DB); print(s.RUN_STORE is not None)")
+    out = subprocess.run([sys.executable, "-c", code, env_db], cwd=str(REPO_ROOT),
+                         env={**os.environ, "PYTHONPATH": str(REPO_ROOT)},
+                         capture_output=True, text=True)
+    lines = (out.stdout or "").strip().splitlines()
+    check("item3: CFPB ledger path lands in the durable volume dir",
+          bool(lines) and lines[0] == expected_cfpb, f"{lines[:1]} != {expected_cfpb}\n{out.stderr[-300:]}")
+    check("item1: RUN_STORE initializes when BALTOR_DURABLE_DB is set", len(lines) > 1 and lines[1] == "True", out.stderr[-300:])
+
+    # Item 5: the run-engine source guarantees ONE path — in-process worker started only when NOT published.
+    src = Path(__file__).read_text(encoding="utf-8")
+    gate_i = src.find("if not published:")
+    thread_i = src.find("threading.Thread(target=process_run_background")
+    check("item5: in-process worker is gated behind `if not published:` (no double-run)",
+          gate_i != -1 and thread_i != -1 and 0 < (thread_i - gate_i) < 200,
+          f"gate@{gate_i} thread@{thread_i}")
+
+    # ── integrated restart-survival + receipt proof (real subprocess server) ──────────────────────────
+    def free_port() -> int:
+        sk = socket.socket(); sk.bind(("127.0.0.1", 0)); p = sk.getsockname()[1]; sk.close(); return p
+
+    def spawn(port: int, db: str):
+        env = {**os.environ, "PYTHONPATH": str(REPO_ROOT), "BALTOR_DURABLE_DB": db}
+        env.pop("OH_SHOWCASE_TOKEN", None)  # keep POSTs open so the proof needs no token
+        return subprocess.Popen([sys.executable, str(Path(__file__).resolve()), "--port", str(port)],
+                                cwd=str(REPO_ROOT), env=env, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+
+    def wait_ready(base: str, proc) -> bool:
+        for _ in range(80):
+            try:
+                if urllib.request.urlopen(base + "/api/health", timeout=1.0).status == 200:
+                    return True
+            except Exception:
+                if proc.poll() is not None:
+                    return False
+                time.sleep(0.25)
+        return False
+
+    def stop(proc) -> None:
+        proc.terminate()
+        try:
+            proc.wait(timeout=8)
+        except Exception:
+            proc.kill()
+
+    db = os.path.join(vol, "durable.db")
+    port = free_port()
+    base = f"http://127.0.0.1:{port}"
+    handle = ""
+    proc = spawn(port, db)
+    try:
+        if not wait_ready(base, proc):
+            check("server #1 ready", False, (proc.stderr.read() or b"").decode("utf-8", "ignore")[-400:] if proc.stderr else "")
+            return 1
+        # create a run (form POST), then search to obtain a ctx:// handle
+        body = urllib.parse.urlencode({"text": SAMPLE_TEXT, "source_name": "selftest.txt", "source_type": "upload"}).encode()
+        req = urllib.request.Request(base + "/admin-demo/runs", data=body, method="POST",
+                                     headers={"Content-Type": "application/x-www-form-urlencoded"})
+        urllib.request.urlopen(req, timeout=20).read()
+        time.sleep(0.5)
+        sres = json.loads(urllib.request.urlopen(base + "/api/context-gateway/search?query=escalation+threshold", timeout=10).read())
+        handles = (sres.get("context_pack") or {}).get("source_handles") or []
+        check("search returns a ctx:// handle + a receipt", bool(handles) and bool((sres.get("receipt") or {}).get("receipt_id")), str(sres.get("receipt")))
+        handle = handles[0] if handles else ""
+        fres = json.loads(urllib.request.urlopen(base + "/api/context-gateway/fetch?handle=" + urllib.parse.quote(handle), timeout=10).read())
+        check("fetch resolves the handle BEFORE restart", fres.get("ok") is True, str(fres)[:160])
+        check("fetch issues a receipt (item 2)", bool((fres.get("receipt") or {}).get("receipt_id")), str(fres.get("receipt")))
+        rc = json.loads(urllib.request.urlopen(base + "/api/context-gateway/receipts?limit=50", timeout=10).read())
+        ops = {r.get("operation") for r in rc.get("receipts") or []}
+        check("receipt PERSISTED for fetch + search (durable)", rc.get("durable") and "context.fetch" in ops and "context.search" in ops, str(sorted(ops)))
+    finally:
+        stop(proc)
+
+    # RESTART on the SAME durable db (a fresh process) — the ctx:// handle must still resolve.
+    proc2 = spawn(port, db)
+    try:
+        if not wait_ready(base, proc2):
+            check("server #2 ready", False, (proc2.stderr.read() or b"").decode("utf-8", "ignore")[-400:] if proc2.stderr else "")
+            return 1
+        fres2 = json.loads(urllib.request.urlopen(base + "/api/context-gateway/fetch?handle=" + urllib.parse.quote(handle), timeout=10).read())
+        check("ctx:// HANDLE SURVIVES RESTART (item 1): same handle still fetches", fres2.get("ok") is True, str(fres2)[:160])
+        check("post-restart fetch also issues a receipt", bool((fres2.get("receipt") or {}).get("receipt_id")))
+        rc2 = json.loads(urllib.request.urlopen(base + "/api/context-gateway/receipts?limit=200", timeout=10).read())
+        check("pre-restart receipts persisted across restart", (rc2.get("count") or 0) >= 2, str(rc2.get("count")))
+    finally:
+        stop(proc2)
+
+    import shutil
+    shutil.rmtree(vol, ignore_errors=True)
+    print(f"\n{'PASS — baltor_admin_demo_server self-test: ctx:// runs + receipts survive a real restart; receipts issued on search/fetch; CFPB path honors the volume setting; single (non-double) run engine.' if not failures else f'{len(failures)} FAILURES: {failures}'}")
+    return 0 if not failures else 1
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", type=int, default=9301)
+    parser.add_argument("--self-test", action="store_true", help="run the P1 gateway-hardening proof and exit")
     args = parser.parse_args(argv)
+    if args.self_test:
+        return _self_test()
     bind_host = os.environ.get("OH_BIND_HOST", "127.0.0.1")  # 0.0.0.0 only in container deploys
+    rehydrate_runs()  # restore the newest ctx:// runs from the durable table so handles survive a restart
     httpd = ThreadingHTTPServer((bind_host, args.port), Handler)
     print(f"Baltor admin demo -> http://{bind_host}:{args.port}/admin-demo/")
     try:
