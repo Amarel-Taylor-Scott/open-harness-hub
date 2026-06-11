@@ -6,7 +6,7 @@ Region: `iad` (fallback `ord`). One Fly app per service; internal services have 
 
 Deploy order (dependencies first):
 
-## 8. aidr-identity
+## 1. aidr-identity
 
 ```bash
 fly apps create aidr-identity
@@ -15,7 +15,7 @@ fly secrets set -a aidr-identity --stage OH_LLM_BASE_URL=<value> OH_LLM_MODEL=<v
 fly deploy -c fly/aidr-identity.fly.toml --ha=false
 ```
 
-## 17. aidr-registry
+## 2. aidr-registry
 
 ```bash
 fly apps create aidr-registry
@@ -24,7 +24,7 @@ fly secrets set -a aidr-registry --stage AIDR_REGISTRY_ADMINS=<value>
 fly deploy -c fly/aidr-registry.fly.toml --ha=false
 ```
 
-## 26. aidr-events
+## 3. aidr-events
 
 ```bash
 fly apps create aidr-events
@@ -32,7 +32,7 @@ fly volumes create events_state -a aidr-events -r iad -s 1
 fly deploy -c fly/aidr-events.fly.toml --ha=false
 ```
 
-## 34. aidr-teleon-runtime
+## 4. aidr-teleon-runtime
 
 ```bash
 fly apps create aidr-teleon-runtime
@@ -41,7 +41,7 @@ fly secrets set -a aidr-teleon-runtime --stage OH_LLM_BASE_URL=<value> OH_LLM_MO
 fly deploy -c fly/aidr-teleon-runtime.fly.toml --ha=false
 ```
 
-## 43. aidr-baltor-backend
+## 5. aidr-baltor-backend
 
 ```bash
 fly apps create aidr-baltor-backend
@@ -50,7 +50,7 @@ fly secrets set -a aidr-baltor-backend --stage OH_LLM_BASE_URL=<value> OH_LLM_MO
 fly deploy -c fly/aidr-baltor-backend.fly.toml --ha=false
 ```
 
-## 52. aidr-web-harness-hub
+## 6. aidr-web-harness-hub
 
 ```bash
 fly apps create aidr-web-harness-hub
@@ -58,7 +58,7 @@ fly secrets set -a aidr-web-harness-hub --stage OH_LLM_BASE_URL=<value> OH_LLM_M
 fly deploy -c fly/aidr-web-harness-hub.fly.toml --ha=false
 ```
 
-## 60. aidr-web-baltor
+## 7. aidr-web-baltor
 
 ```bash
 fly apps create aidr-web-baltor
@@ -66,7 +66,7 @@ fly secrets set -a aidr-web-baltor --stage OH_LLM_BASE_URL=<value> OH_LLM_MODEL=
 fly deploy -c fly/aidr-web-baltor.fly.toml --ha=false
 ```
 
-## 68. aidr-web-context
+## 8. aidr-web-context
 
 ```bash
 fly apps create aidr-web-context
@@ -74,7 +74,7 @@ fly secrets set -a aidr-web-context --stage OH_LLM_BASE_URL=<value> OH_LLM_MODEL
 fly deploy -c fly/aidr-web-context.fly.toml --ha=false
 ```
 
-## 76. aidr-web-teleon
+## 9. aidr-web-teleon
 
 ```bash
 fly apps create aidr-web-teleon
@@ -82,7 +82,7 @@ fly secrets set -a aidr-web-teleon --stage OH_LLM_BASE_URL=<value> OH_LLM_MODEL=
 fly deploy -c fly/aidr-web-teleon.fly.toml --ha=false
 ```
 
-## 84. aidr-redis
+## 10. aidr-redis
 
 ```bash
 fly apps create aidr-redis
@@ -90,7 +90,7 @@ fly volumes create redis_state -a aidr-redis -r iad -s 1
 fly deploy -c fly/aidr-redis.fly.toml --ha=false
 ```
 
-## 92. aidr-postgres — phase-2: the demo plane is file/SQLite-backed; Postgres+pgvector is the staged-row load target (scripts.db.*). Provision when load plans go live.
+## 11. aidr-postgres — phase-2: the demo plane is file/SQLite-backed; Postgres+pgvector is the staged-row load target (scripts.db.*). Provision when load plans go live.
 
 ```bash
 fly apps create aidr-postgres
@@ -99,7 +99,7 @@ fly secrets set -a aidr-postgres --stage POSTGRES_PASSWORD=<value>
 fly deploy -c fly/aidr-postgres.fly.toml --ha=false
 ```
 
-## 101. aidr-worker
+## 12. aidr-worker
 
 ```bash
 fly apps create aidr-worker
@@ -108,7 +108,7 @@ fly deploy -c fly/aidr-worker.fly.toml --ha=false
 fly machine list -a aidr-worker -q | xargs -r -n1 fly machine stop -a aidr-worker  # controller owns the fleet from here
 ```
 
-## 110. aidr-worker-controller
+## 13. aidr-worker-controller
 
 ```bash
 fly apps create aidr-worker-controller

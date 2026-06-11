@@ -170,10 +170,12 @@ def fly_readme(topo: dict, order: list[dict]) -> str:
                "internal services have NO public proxy and talk over the private 6PN network "
                "(`<app>.internal:<port>`). Full owner/agent runbook: `docs/architecture/fly-deploy-runbook.md`.",
            "", "Deploy order (dependencies first):", ""]
+    step_no = 0
     for svc in order:
         app = f"{prefix}-{svc['name']}"
         if svc.get("providers") and "fly" not in svc["providers"]:
             continue
+        step_no += 1
         steps = [f"fly apps create {app}"]
         if svc.get("state_mount"):
             steps.append(f"fly volumes create {volume_name(svc)} -a {app} -r {region} -s {svc.get('volume_gb', 1)}")
@@ -184,7 +186,7 @@ def fly_readme(topo: dict, order: list[dict]) -> str:
         if svc["kind"] == "burst":
             steps.append(f"fly machine list -a {app} -q | xargs -r -n1 fly machine stop -a {app}  "
                          f"# controller owns the fleet from here")
-        out.append(f"## {len(out)}. {app}" + (f" — {svc['phase']}" if svc.get("phase") else ""))
+        out.append(f"## {step_no}. {app}" + (f" — {svc['phase']}" if svc.get("phase") else ""))
         out += ["", "```bash", *steps, "```", ""]
     out += ["After deploys: point Cloudflare DNS at the public apps (CNAME → <app>.fly.dev, proxied), "
             "then run the public gates (e2e/ohh_public_gate.mjs, e2e/teleon_gate.mjs) against the domains.", ""]
