@@ -26,6 +26,11 @@ controller on Fly, manual on compose).** No service code changes.
 
 ## Agent steps (after owner login)
 
+0. **Preflight (GO/NO-GO):** `python3 scripts/deploy/preflight.py` — must print GO. It
+   aggregates the deploy-critical invariants (configs in sync, public apps tokened,
+   single-machine law, state paths inside volumes, catalog bundle ships, provider graph
+   valid, no secret leaks, queue-key single-source, every command module imports). Never
+   `fly deploy` on a NO-GO.
 1. `fly tokens create org -x 720h` → store as the working token; mint per-app deploy tokens
    for CI later. (flyctl can mint its own scoped tokens — no console.)
 2. Follow `fly/README.generated.md` IN ORDER (it is generated from the topology):
@@ -67,3 +72,14 @@ controller on Fly, manual on compose).** No service code changes.
   topology (`queue_key`, `jobs_per_worker`); the controller role disappears (ACA = managed KEDA).
 - In ALL cases `architecture/deploy_topology.json` stays the single source; add an emitter to
   the generator rather than hand-writing provider configs.
+
+## Inference is provider-independent (cost flexibility)
+
+The model plane is NOT tied to Fly or to any one vendor — it is the unified ChatRoute→OIPS
+plane with each model lane as a provider-graph node (`architecture/model_provider_graph.json`),
+every call receipted. Lanes and the route policy: `docs/architecture/flexible-inference-lanes.md`.
+Practical deploy guidance: keep interactive calls on cloud APIs (Ollama Cloud flat-rate /
+OpenRouter gemma-4-26b at $0.06/$0.33); route long-running non-realtime foundry batches to the
+CPU-batch lane (Gemma-4 Q4 on the worker's own scale-to-zero machines — no GPU, pennies per
+window). **Fly GPUs are deprecated after 2026-08-01 — never assume them; GPU = spot providers
+only, and only past ~300–500M batch tokens/month.**
