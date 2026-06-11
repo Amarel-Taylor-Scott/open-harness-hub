@@ -27,6 +27,7 @@ from collections import deque
 from pathlib import Path
 from typing import Any, Callable, Protocol, runtime_checkable
 
+from scripts.foundry import batch_inference as batch
 from scripts.foundry.contracts import Candidate
 from scripts.foundry.model_route import from_env as route_from_env
 from scripts.foundry.model_route import wire as wire_route
@@ -140,24 +141,51 @@ class Worker:
                     "partition": job.get("partition", ""), "attempts": job["_attempts"]}
 
     def _run_partition(self, job: dict) -> dict:
-        """The partition path (unchanged behavior): foundry run + store persist + funnel ledger."""
-        foundry = self.foundry_factory()
-        route = route_from_env()
-        if route is not None:
-            wire_route(foundry, route)   # live measurement + real embeddings if a key is set
-        seeds = [Candidate(gap=g) for g in (job.get("gaps") or [])]
-        partition = job.get("partition", "")
-        result = foundry.run_partition(seeds, partition=partition)
-        # persist the promoted row families (sqlite local / postgres cloud) — the experience DB
-        if self.store is not None:
-            for family, fam_rows in (result.get("rows") or {}).items():
-                if fam_rows:
-                    self.store.write(family, fam_rows)
-        return append_ledger(
-            self.ledger_path, kind=job.get("kind", "real"), partition=partition,
-            result=result, date=time.strftime("%Y-%m-%d", time.gmtime(self._now_s)),
-            env=_env(), ladder_item="worker partition",
-        )
+        """The partition path: foundry run + store persist + funnel ledger.
+
+        OPTIONAL CPU-batch lane (``scripts.foundry.batch_inference``): when ``OH_BATCH_LLM=local``
+        and the job is NOT ``latency_class:"interactive"``, a local OpenAI-compatible server is
+        stood up for the duration of THIS partition and the model route is pointed at it (cloud
+        otherwise). Which lane actually served is recorded honestly on the ledger line
+        (``served_by_lane``). When the lane is inactive (env unset) this is a pure no-op:
+        ``batch.batch_server`` yields unavailable, ``route_env_override`` does nothing, and the
+        path — including the ledger line — is byte-identical to the cloud-only behavior."""
+        # The CPU-batch server starts ONLY when this job is batch-eligible (lane active AND not
+        # latency_class:"interactive"); otherwise an unavailable lane is used (no server, no env
+        # change). The provenance stamp is gated on the lane being ACTIVE (not on this job's
+        # eligibility) so that while the lane is on, an interactive/degraded job is honestly
+        # recorded as served_by_lane="cloud"; when the lane is entirely unset there is NO stamp,
+        # keeping that path byte-identical to the cloud-only behavior.
+        eligible = batch.job_wants_batch(job)
+        lane_ctx = batch.batch_server() if eligible else batch.inactive_lane()
+        with lane_ctx as lane:
+            served_by = batch.LANE_TAG_CLOUD
+            with batch.route_env_override(lane) as on_local_batch:
+                if on_local_batch:
+                    served_by = lane.lane_tag   # local-batch
+                foundry = self.foundry_factory()
+                route = route_from_env()
+                if route is not None:
+                    wire_route(foundry, route)   # live measurement + real embeddings if a key is set
+                seeds = [Candidate(gap=g) for g in (job.get("gaps") or [])]
+                partition = job.get("partition", "")
+                result = foundry.run_partition(seeds, partition=partition)
+            # persist the promoted row families (sqlite local / postgres cloud) — the experience DB
+            if self.store is not None:
+                for family, fam_rows in (result.get("rows") or {}).items():
+                    if fam_rows:
+                        self.store.write(family, fam_rows)
+            line = append_ledger(
+                self.ledger_path, kind=job.get("kind", "real"), partition=partition,
+                result=result, date=time.strftime("%Y-%m-%d", time.gmtime(self._now_s)),
+                env=_env(), ladder_item="worker partition",
+            )
+            # Provenance: stamp the serving lane whenever the batch lane is ACTIVE (records "cloud"
+            # honestly for an interactive/degraded job that bypassed it). An unset lane adds no key,
+            # so that path stays byte-identical to before.
+            if batch.lane_active():
+                line["served_by_lane"] = served_by
+            return line
 
     def _run_reingest(self, job: dict) -> dict:
         """A freshness-CDC ``reingest`` job: re-feed the changed source through the REAL
@@ -190,6 +218,8 @@ class Worker:
 
 
 def _self_test() -> int:
+    import os
+    import sys
     import tempfile
     from pathlib import Path
 
@@ -245,6 +275,73 @@ def _self_test() -> int:
             q2.enqueue({"partition": f"p{i}", "kind": "synthetic_demo", "gaps": [c.gap for c in _fixture()[1]]})
         n = Worker(foundry_factory=lambda: _fixture()[0], queue=q2, ledger_path=Path(tmp) / "l3.jsonl", now_s=0).serve()
         check("serve drains the queue", n == 3 and len(q2) == 0, str(n))
+
+        # ── OPTIONAL CPU-batch lane: provenance + latency-class gating (degrade-safe) ──
+        # Drive a FAKE local OpenAI-compatible server through the worker (no real backend): the
+        # worker must route the batch job's model calls at the local lane and stamp served_by_lane.
+        import contextlib
+        import subprocess as _sp
+
+        saved_lane_env = {k: os.environ.get(k) for k in (
+            batch.ENV_BATCH_LLM, batch.ENV_BATCH_BACKEND, batch.ENV_OLLAMA_BIN,
+            batch.ENV_BATCH_PORT, batch.ENV_BATCH_MODEL)}
+        sentinel = "WORKER-LOCAL-BATCH-OK"
+        script = batch._fake_server_script(sentinel=sentinel)
+        script_path = Path(tmp) / "fake_batch_server.py"
+        script_path.write_text(script, encoding="utf-8")
+        fport = batch._free_port()
+
+        def _fake_spawn(argv, env=None, stdout=None, stderr=None):
+            return _sp.Popen([sys.executable, str(script_path), batch.DEFAULT_BATCH_HOST, str(fport)],
+                             stdout=_sp.DEVNULL, stderr=_sp.DEVNULL)
+
+        _orig_batch_server = batch.batch_server   # capture BEFORE patching (the fake delegates to it)
+
+        @contextlib.contextmanager
+        def _fake_batch_server(**_kw):
+            with _orig_batch_server(health_timeout_s=15, _spawn=_fake_spawn) as ln:
+                yield ln
+
+        os.environ[batch.ENV_BATCH_LLM] = batch.LANE_LOCAL
+        os.environ[batch.ENV_BATCH_BACKEND] = batch.BACKEND_OLLAMA
+        os.environ[batch.ENV_OLLAMA_BIN] = sys.executable     # any real binary ⇒ detect() succeeds
+        os.environ[batch.ENV_BATCH_PORT] = str(fport)
+        os.environ[batch.ENV_BATCH_MODEL] = "fake-batch-gemma"
+        try:
+            batch.batch_server = _fake_batch_server   # inject the fake-server-backed lifecycle
+            qb = InMemoryQueue()
+            qb.enqueue({"partition": "batch-eligible", "kind": "synthetic_demo",
+                        "latency_class": "batch", "gaps": [c.gap for c in _fixture()[1]]})
+            bl = Worker(foundry_factory=lambda: _fixture()[0], queue=qb,
+                        ledger_path=Path(tmp) / "lbatch.jsonl", now_s=0).process_one()
+            check("batch lane: job served + ledgered (no crash)", bl is not None and "error" not in bl, str(bl))
+            check("batch lane: served_by_lane stamped local-batch (honest provenance)",
+                  bl and bl.get("served_by_lane") == batch.LANE_TAG_LOCAL_BATCH, str(bl.get("served_by_lane")))
+
+            # an INTERACTIVE job must NOT use the batch lane even while it's active → stays cloud
+            qi = InMemoryQueue()
+            qi.enqueue({"partition": "interactive", "kind": "synthetic_demo",
+                        "latency_class": "interactive", "gaps": [c.gap for c in _fixture()[1]]})
+            il = Worker(foundry_factory=lambda: _fixture()[0], queue=qi,
+                        ledger_path=Path(tmp) / "linter.jsonl", now_s=0).process_one()
+            check("batch lane: interactive job stays on cloud (latency_class honored)",
+                  il and il.get("served_by_lane") == batch.LANE_TAG_CLOUD, str(il.get("served_by_lane")))
+        finally:
+            batch.batch_server = _orig_batch_server
+            for k, v in saved_lane_env.items():
+                if v is None:
+                    os.environ.pop(k, None)
+                else:
+                    os.environ[k] = v
+
+        # with the lane UNSET, a partition line carries NO served_by_lane key (byte-identical path)
+        os.environ.pop(batch.ENV_BATCH_LLM, None)
+        qn = InMemoryQueue()
+        qn.enqueue({"partition": "cloud-only", "kind": "synthetic_demo", "gaps": [c.gap for c in _fixture()[1]]})
+        nl = Worker(foundry_factory=lambda: _fixture()[0], queue=qn,
+                    ledger_path=Path(tmp) / "lnolane.jsonl", now_s=0).process_one()
+        check("lane unset: no served_by_lane key on the ledger line (no-op)",
+              nl is not None and "served_by_lane" not in nl, str(nl))
 
         # ── reingest dispatch: freshness-CDC jobs are PROCESSED, never silent no-ops ──
         from scripts.foundry.scrapers import CannedFetcher
