@@ -2336,3 +2336,38 @@ OpenClaw/Hermes layer for open-ended tasks. Committed this wave (all verified in
   serves_truth=false, propose-never-dispose). Proposals re-enter the gate → compiler.
 Still running: catalog integrity (a765), exploration ladder (a62ad). NEXT wiring: compiled-unit
 registry + auto-compile-on-promotion, PurposeTask intake queue, the variant proposer.
+
+## 2026-06-11 (cont 8) — Backbone WIRED end-to-end (no placeholders): the loop closes in code
+
+Owner: "no shortcuts, everything fully working start to finish, no placeholders, EVERY value-add
+on Fly, then real videos." Phase A (3 agents) + Phase B/C (hand-wired by me), all committed,
+all self-tests green:
+- **eval_suite is a first-class contract field** (PurposeTaskSpec.v1 + CapabilityTask.v1): a user
+  hands Teleon the benchmark that defines DONE; eval_suite_for/eval_pairs seam the gate consumes;
+  thresholds single-sourced from the live PROMOTE_AT; benchmark_ref fails honestly; 38-check proof.
+- **compiled-unit registry** (src/teleon/compiler/registry.py): durable append-only, REAL rollback
+  (demote-not-delete, rollback_target owned by the registry), 62/62.
+- **Teleon Machines runner** (scripts/deploy/teleon_machines_runner.py): launches compiled units
+  on Fly Machines (reuses the controller's client by subclassing), budgets enforced, lineage
+  receipts, honest no-token plan; --watch mode (poll registry → launch new active units,
+  idempotent); 44/44.
+- **PHASE B — the loop closes (hand-wired teleon_local_runtime.py, single-owner):** on promotion
+  → _auto_compile_and_register compiles the capability to a fly_machine unit + registers it (real
+  unit_id + rollback chain); on non-promotion → _escalation_for_failed asks the exploration ladder
+  for the next tier (advisory T3 dispatch_bounded_exploration on the offline local_emulator).
+  Both guarded (never undo a promotion), hermetic registry path follows STATE_DIR. 4 new
+  self-test checks; proven end-to-end (promote→compiled_unit with unit_id in the registry;
+  re-promote→rollback chain; fail→T3).
+- **PHASE C — Fly deployment decided:** the runner is CO-RESIDENT with the teleon-runtime (Fly
+  apps can't share volumes; the runtime writes the registry the runner reads) — same image
+  (COPY . .), run via `fly ssh ... --watch` now or a runtime background thread next (the zero-op
+  promote→launch path, documented, not yet applied so the launch trigger stays explicit until the
+  owner provisions Fly + token). NO broken separate app added.
+THE FULL ARC NOW REAL IN CODE: describe a capability + eval → build → gate (ungameable) →
+promote → AUTO-COMPILE → register (rollback-able) → runner launches on Fly (live-on-token); a
+failed/open-ended task → exploration ladder → (promoted) → same compiler. Cross-suite green:
+compiler 62, runtime, exploration 28, promotion-bridge 35, runner 44, eval-suite 38, plane +
+generator --check + preflight GO + dependency-law. Remaining honest gaps (NOT placeholders):
+the zero-op launch thread (needs the Fly token) + the named-suite registry behind benchmark_ref
++ a lift PRODUCER per capability (the bridge consumes, nothing yet produces). NEXT: real videos
+of the new value-adds once a demo plane is up.
