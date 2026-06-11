@@ -4875,15 +4875,19 @@ def run_full_pipeline(bus) -> dict:
     # and records a ModelInvocationReceipt. The model output is NEVER the served answer — the deterministic
     # interro["answer_value"] remains truth; the candidate is governed (is_truth=false, receipt-backed, no raw key).
     from src.teleon.inference import oips as _oips
+    # prefer the REAL local model node; the gateway degrades to the stub honestly when it can't run
     _pref = [{"preference_id": "pipeline.explain", "model_class_preference": {"tier_code": 400, "specialization_codes": [300]},
-              "allowed_provider_nodes": ["model.local_stub@v1"], "disallowed_provider_nodes": [],
+              "allowed_provider_nodes": ["model.ollama_local@candidate", "model.local_stub@v1"],
+              "disallowed_provider_nodes": [],
               "fallback_policy": {}, "data_policy": {}}]
     bus.publish("inference.requested", component="inference_gateway", stage="Enhancement", correlation_id=cid,
                 payload={"task": "draft_answer_explanation", "preference_id": "pipeline.explain", "is_truth": False,
                          "context_optimized": True, "optimized_context_tokens": _pre["envelope"]["optimized_tokens"]})
     _inf = _oips.infer_local(object_id="obj-runbook", preference_layers=_pref,
                              input_text=f"Explain the retry ceiling answer: {interro['answer_value']}",
-                             now="2026-06-05T00:00:00Z")
+                             now="2026-06-05T00:00:00Z",
+                             # owner-authorized live model calls (.env); offline → stub, honestly receipted
+                             allow_network=os.environ.get("OH_INFERENCE_ALLOW_NETWORK", "") == "1")
     _rcpt = _inf["receipt"]
     bus.publish("inference.completed", component="inference_gateway", stage="Enhancement", correlation_id=cid,
                 object_ref="obj-runbook",

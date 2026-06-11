@@ -97,11 +97,40 @@ class _HttpAdapter(InferenceProviderAdapter):
         ok, reason = self.available(secrets=secrets, allow_network=allow_network)
         if not ok:
             return provider_unavailable(self.node_id, reason)
-        # network IS allowed + secret (if needed) present — the real call lives here, lazily + SDK-free.
+        if self.adapter_style != "openai_compatible":
+            # the other API styles keep their seam until their live wiring lands (honest degrade)
+            return provider_unavailable(self.node_id, "live_call_not_provisioned_for_this_api_style")
+        # network IS allowed (+ secret if needed) — the REAL call, lazily imported + SDK-free.
+        # Endpoint/model/key resolve from the node config first, env second (single source: .env),
+        # so Ollama local/cloud, OpenRouter, vLLM are all just config on this ONE adapter.
+        import json as _json
+        import os as _os
+        import time as _time
         import urllib.request  # noqa: F401  (stdlib only; the gated live-call path — not exercised offline)
-        # A live adapter would POST to the endpoint here using a secret RESOLVED from self.secret_ref (never embedded).
-        # In this environment network/keys are not provisioned, so we degrade rather than fabricate a result.
-        return provider_unavailable(self.node_id, "live_call_not_provisioned_in_this_environment")
+        base_url = str(self.node.get("base_url") or _os.environ.get("OH_LLM_BASE_URL", "")).rstrip("/")
+        model = self.node.get("model") or _os.environ.get("OH_LLM_MODEL", "")
+        api_key = _os.environ.get("OH_LLM_API_KEY", "")  # resolved at call time; never embedded/echoed
+        if not base_url or not model:
+            return provider_unavailable(self.node_id, "no_base_url_or_model_configured")
+        body = _json.dumps({"model": model, "temperature": 0.2,
+                            "messages": [{"role": "user", "content": input_text}]}).encode("utf-8")
+        headers = {"Content-Type": "application/json"}
+        if api_key:
+            headers["Authorization"] = f"Bearer {api_key}"
+        req = urllib.request.Request(base_url + "/chat/completions", data=body, headers=headers, method="POST")
+        started = _time.perf_counter()
+        try:
+            with urllib.request.urlopen(req, timeout=300) as resp:
+                payload = _json.loads(resp.read().decode("utf-8"))
+            output = payload["choices"][0]["message"]["content"] or ""
+        except Exception as exc:  # any live failure degrades, never fabricates
+            return provider_unavailable(self.node_id, f"live_call_failed_{type(exc).__name__}")
+        usage = payload.get("usage") or {}
+        return {"available": True, "executed_node_id": self.node_id, "requested_node_id": self.node_id,
+                "reason_code": "live_call", "output": output, "is_truth": False,
+                "model": payload.get("model") or model,
+                "latency_ms": int((_time.perf_counter() - started) * 1000),
+                "tokens": {"input": usage.get("prompt_tokens"), "output": usage.get("completion_tokens")}}
 
 
 class HttpOpenAICompatibleAdapter(_HttpAdapter):

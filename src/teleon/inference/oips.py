@@ -192,6 +192,7 @@ def infer_local(*, object_id: str, preference_layers: list[dict], input_text: st
     resolved = resolve_preference(preference_layers)
     route = select_provider(resolved, available_secrets=available_secrets, provider_health=provider_health)
     decided = route["selected_provider_node_id"]
+    result: dict = {}  # the executing adapter's invoke result (live model/latency/tokens when real)
     if route.get("blocked"):
         output = ""
         executed_node = OFFLINE_DEFAULT_NODE
@@ -206,19 +207,29 @@ def infer_local(*, object_id: str, preference_layers: list[dict], input_text: st
         ok = bool(chosen) and chosen.available(secrets=available_secrets or set(), allow_network=allow_network)[0]
         exec_adapter = chosen if ok else resolve_adapter(idx[OFFLINE_DEFAULT_NODE])
         executed_node = decided if ok else OFFLINE_DEFAULT_NODE
-        output = exec_adapter.invoke(object_id=object_id, input_text=input_text, now=now,
-                                     secrets=available_secrets or set(), allow_network=allow_network)["output"]
+        result = exec_adapter.invoke(object_id=object_id, input_text=input_text, now=now,
+                                     secrets=available_secrets or set(), allow_network=allow_network)
         reasons = set(route["fallback_reason_codes"])
+        if not result.get("available"):
+            # the decided live adapter failed MID-CALL — degrade to the stub, recorded honestly
+            reasons.add(str(result.get("reason_code") or "live_call_failed"))
+            executed_node = OFFLINE_DEFAULT_NODE
+            result = resolve_adapter(idx[OFFLINE_DEFAULT_NODE]).invoke(
+                object_id=object_id, input_text=input_text, now=now,
+                secrets=available_secrets or set(), allow_network=allow_network)
+        output = result["output"]
         if executed_node == OFFLINE_DEFAULT_NODE:
             reasons.add("offline_local_execution")
         route = {**route, "fallback_used": route.get("fallback_used") or executed_node != decided or decided != OFFLINE_DEFAULT_NODE,
                  "fallback_reason_codes": sorted(reasons)}
     mcp = resolved["effective"].get("model_class_preference", {})
     requested_class = f"tier:{mcp.get('tier', _tier_code(mcp))}/{','.join(map(str, mcp.get('specialization_codes', [])))}"
-    executed_model = "local-stub@v1" if executed_node == OFFLINE_DEFAULT_NODE else executed_node
+    executed_model = ("local-stub@v1" if executed_node == OFFLINE_DEFAULT_NODE
+                      else (result.get("model") or executed_node))
     receipt = build_receipt(object_id=object_id, preference_id=resolved["preference_id"],
                             requested_model_class=requested_class, route=route, executed_node=executed_node,
-                            executed_model=executed_model, input_text=input_text, output_text=output, now=now)
+                            executed_model=executed_model, input_text=input_text, output_text=output, now=now,
+                            tokens=result.get("tokens"), latency_ms=result.get("latency_ms"))
     return {"output": output, "resolved_preference": resolved, "route_decision": route, "receipt": receipt}
 
 

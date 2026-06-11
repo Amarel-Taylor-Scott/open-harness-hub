@@ -2060,3 +2060,19 @@ gating: showcase proxy timeout 60→360s (model runs outlive it); UI now shows a
 flight; result line carries mode + self-refined ×N; gate asserts receipts == attempts×4.
 teleon_gate now 19 checks — 19/19. NEXT (in progress): Baltor inference plane → model_routes;
 OHH /api/run real flow execution.
+
+## 2026-06-11 (Baltor inference live) — the OIPS gateway executes REAL models, governed
+
+**Warrant: direct user intent** (no-deterministic-shortcuts directive). Implemented the live call
+in the OIPS adapter layer: HttpOpenAICompatibleAdapter now POSTs /chat/completions (stdlib-lazy,
+SDK-free, secret-by-env never embedded; node config first, OH_LLM_* env second) returning
+output+model+latency+tokens; oips.infer_local threads them into the ModelInvocationReceipt and
+degrades MID-CALL failures to the stub with the reason receipted. Owner-authorized switch
+OH_INFERENCE_ALLOW_NETWORK=1 (.env) gates network at the handler + pipeline call sites; the
+pipeline preference now prefers model.ollama_local@candidate with stub fallback. All four
+inference proof checks PASS unchanged-in-spirit (offline degrade intact). LIVE PROOF:
+structured-local → gemma4 real answer (43s, 41→350 tokens, allowed_use candidate, is_truth
+false); run-full-pipeline (109s) emits inference.completed with executed_node
+model.ollama_local@candidate, receipt-backed. Governance held end to end: model output remains a
+candidate; deterministic answers remain served truth. NEXT: OHH /api/run executor (task 34);
+cloud keys drop into .env when provided (OpenRouter/Ollama-cloud = same adapter, different node).

@@ -11,6 +11,7 @@ errors are ErrorEnvelope.v1. UI/dashboard consume THIS projection — they do no
 from __future__ import annotations
 
 import json
+import os
 import re
 
 from src.teleon.inference import api_projection as ap
@@ -72,7 +73,10 @@ def _post(path: str, body: dict) -> tuple:
             return 400, _err("invalid_request", "expected a non-empty 'preference_layers' list")
         out = oips.infer_local(object_id=str(body.get("object_id") or "demo.object"),
                                preference_layers=layers, input_text=str(body.get("input_text") or ""),
-                               now=str(body.get("now") or _DEMO_NOW))
+                               now=str(body.get("now") or _DEMO_NOW),
+                               # owner-authorized live model execution (.env switch); otherwise the
+                               # deterministic stub runs and the receipt says so — never fabricated
+                               allow_network=os.environ.get("OH_INFERENCE_ALLOW_NETWORK", "") == "1")
         rc = out["receipt"]
         if rc.get("receipt_id"):
             _RECEIPTS[rc["receipt_id"]] = rc
