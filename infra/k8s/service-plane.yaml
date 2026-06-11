@@ -1,0 +1,140 @@
+# Service plane — the proven local services, containerized 1:1 (same start commands, same
+# registries baked into the image, same env contract). Pairs with web.yaml (app tier) and
+# worker.yaml (fleet). See docs/architecture/cloud-hosting-blueprint.md §1/§5.
+# One image, many roles: only `command` differs. State dirs ride PVCs (append-only JSON/JSONL
+# contracts unchanged); managed-Postgres migration is a later, lossless step.
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: { name: ohh-service-state, labels: { app.kubernetes.io/part-of: aidoneright } }
+spec: { accessModes: [ReadWriteOnce], resources: { requests: { storage: 5Gi } } }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: identity, labels: { plane: shared } }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: identity } }
+  template:
+    metadata: { labels: { app: identity, plane: shared } }
+    spec:
+      containers:
+        - name: identity
+          image: ${IMAGE}
+          command: ["python3", "-m", "scripts.identity_local_service", "--serve"]
+          ports: [{ containerPort: 9410 }]
+          envFrom: [{ secretRef: { name: model-plane } }]
+          volumeMounts: [{ name: state, mountPath: /app/dist/identity, subPath: identity }]
+          readinessProbe: { httpGet: { path: /api/identity/health, port: 9410 }, periodSeconds: 10 }
+      volumes: [{ name: state, persistentVolumeClaim: { claimName: ohh-service-state } }]
+---
+apiVersion: v1
+kind: Service
+metadata: { name: identity }
+spec: { selector: { app: identity }, ports: [{ port: 9410, targetPort: 9410 }] }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: registry, labels: { plane: shared } }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: registry } }
+  template:
+    metadata: { labels: { app: registry, plane: shared } }
+    spec:
+      containers:
+        - name: registry
+          image: ${IMAGE}
+          command: ["python3", "-m", "scripts.registry_local_service"]
+          ports: [{ containerPort: 9423 }]
+          env:
+            # the registry validates sessions against the identity Service (same contract)
+            - { name: AIDR_IDENTITY_BASE, value: "http://identity:9410" }
+            # operator bootstrap: realm:account_id pairs (owner-provisioned; never in-app)
+            - { name: AIDR_REGISTRY_ADMINS, valueFrom: { secretKeyRef: { name: operator-roster, key: AIDR_REGISTRY_ADMINS, optional: true } } }
+          volumeMounts: [{ name: state, mountPath: /app/dist/local-services-state, subPath: registry }]
+          readinessProbe: { httpGet: { path: /healthz, port: 9423 }, periodSeconds: 10 }
+      volumes: [{ name: state, persistentVolumeClaim: { claimName: ohh-service-state } }]
+---
+apiVersion: v1
+kind: Service
+metadata: { name: registry }
+spec: { selector: { app: registry }, ports: [{ port: 9423, targetPort: 9423 }] }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: events, labels: { plane: shared } }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: events } }
+  template:
+    metadata: { labels: { app: events, plane: shared } }
+    spec:
+      containers:
+        - name: events
+          image: ${IMAGE}
+          command: ["python3", "-m", "scripts.events_local_service"]
+          ports: [{ containerPort: 9420 }]
+          volumeMounts: [{ name: state, mountPath: /app/dist/analytics, subPath: analytics }]
+          readinessProbe: { httpGet: { path: /healthz, port: 9420 }, periodSeconds: 10 }
+      volumes: [{ name: state, persistentVolumeClaim: { claimName: ohh-service-state } }]
+---
+apiVersion: v1
+kind: Service
+metadata: { name: events }
+spec: { selector: { app: events }, ports: [{ port: 9420, targetPort: 9420 }] }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: teleon-runtime, labels: { plane: teleon } }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: teleon-runtime } }
+  template:
+    metadata: { labels: { app: teleon-runtime, plane: teleon } }
+    spec:
+      # the model plane must be REAL before the runtime serves (no silent stub regressions)
+      initContainers:
+        - name: model-plane-gate
+          image: ${IMAGE}
+          command: ["python3", "scripts/check_model_plane.py"]
+          envFrom: [{ secretRef: { name: model-plane } }]
+      containers:
+        - name: runtime
+          image: ${IMAGE}
+          command: ["python3", "scripts/teleon_local_runtime.py"]
+          ports: [{ containerPort: 9430 }]
+          envFrom: [{ secretRef: { name: model-plane } }]
+          volumeMounts: [{ name: state, mountPath: /app/dist/local-services-state/teleon-runtime, subPath: teleon-runtime }]
+          readinessProbe: { httpGet: { path: /healthz, port: 9430 }, periodSeconds: 10 }
+      volumes: [{ name: state, persistentVolumeClaim: { claimName: ohh-service-state } }]
+---
+apiVersion: v1
+kind: Service
+metadata: { name: teleon-runtime }
+spec: { selector: { app: teleon-runtime }, ports: [{ port: 9430, targetPort: 9430 }] }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: baltor-backend, labels: { plane: baltor } }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: baltor-backend } }
+  template:
+    metadata: { labels: { app: baltor-backend, plane: baltor } }
+    spec:
+      containers:
+        - name: backend
+          image: ${IMAGE}
+          command: ["python3", "scripts/baltor_admin_demo_server.py", "--port", "9301"]
+          ports: [{ containerPort: 9301 }]
+          envFrom: [{ secretRef: { name: model-plane } }]
+          env:
+            - { name: REDIS_URL, valueFrom: { secretKeyRef: { name: baltor-stores, key: REDIS_URL, optional: true } } }
+            - { name: BALTOR_DURABLE_DB, valueFrom: { secretKeyRef: { name: baltor-stores, key: BALTOR_DURABLE_DB, optional: true } } }
+          readinessProbe: { httpGet: { path: /api/health, port: 9301 }, periodSeconds: 15 }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: baltor-backend }
+spec: { selector: { app: baltor-backend }, ports: [{ port: 9301, targetPort: 9301 }] }

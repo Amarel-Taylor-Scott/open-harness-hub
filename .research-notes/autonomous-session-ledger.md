@@ -2104,3 +2104,27 @@ Scout corrections recorded: hash embeddings NOT active (nomic promotable live), 
 live, :8001 seams live, events plane is a real service. Re-film at CLOUD speed landed: journeys
 1/2/4 re-recorded (Teleon 29 chapters incl. the model-built run), report-merged (29 videos / 342
 chapters), media/ set synced. CodeStrap memory saved earlier this session.
+
+## 2026-06-11 (realism + narration + cloud) — recorder v4, voice-over pipeline, infra skeleton
+
+**Warrant: direct user intent** (videos must be realistic: click-only nav, no 404s, no
+app-before-signup, artifact close-ups, visible cursor, voice-over; cloud infra + initial
+components; Airbyte research). Recorder v4: click-only navigation (no-click-path = recorded
+product friction; one captioned operator deep link), every 4xx/5xx screenshots itself and FAILS
+the journey, sign-up gates app chapters waiting for the app's own redirect, full-screen artifact
+close-ups (exported YAML body, live inference receipt, Teleon per-example receipts), per-chapter
+stills galleries, and a rendered cursor (glide + click ripple) since headless video has no OS
+pointer. Test iterations fixed real issues the gate caught: kit-chrome pages lack the marketing
+nav (goHome via wordmark like a user), non-fatal signup guards, SPA-hash false positive on the
+live-ops deep link; result: journeys 1+2 clean (0 HTTP errors, 21+18 chapters, animated
+Context Engine canvas now in the Baltor film). Voice-over: e2e/narrate_videos.mjs — msedge-tts
+neural voice per chapter, tempo-fitted to chapter gaps, ffmpeg adelay+amix mux, ffprobe-verified;
+silent originals preserved. Full 29-video batch recording in background. CLOUD: existing
+infra/k8s (KEDA fleet + Argo + web tier) EXTENDED with service-plane.yaml (identity/registry/
+events/teleon-runtime/baltor-backend, PVC state, model-plane-gate initContainer) +
+model-plane-secret.example.yaml; docs/architecture/cloud-hosting-blueprint.md maps topology,
+functions, the full seed set (components/rules/contracts/starting data), and owner+customer key
+provisioning. RESEARCH: Airbyte pivoted to "the context layer for production-grade AI agents"
+(Context Store, MCP Gateway, Agent Engine, 600+ connectors, vector destinations) — the most
+direct Baltor positioning collision; differentiation = assurance vs movement ("they deliver
+context; we make it safe to act on"); wrap as ingestion CANDIDATE behind ports; memory saved.
