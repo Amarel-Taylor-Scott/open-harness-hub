@@ -71,20 +71,27 @@
       return [["Capabilities", state.caps.length], ["Promoted", promoted], ["In eval", inEval], ["Avg score", avg]];
     },
 
-    // REALLY execute a capability run (session-gated server-side); never rejects
+    // REALLY execute a capability run (session-gated server-side); never rejects.
+    // running() lets the UI show an honest "executing" state instead of any fixture result.
     run: function (capabilityId) {
       var s = session();
       var body = { capability_id: capabilityId || "cap-dates", session_id: s && s.session_id };
+      state.running = true;
+      state.lastRun = null;
+      notify();
       return fetch("/api/teleon/" + REALM + "/runs", {
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
       }).then(function (r) { return r.status === 201 ? r.json() : null; })
         .then(function (d) {
           state.lastRun = d && d.run ? d.run : null;
+          state.running = false;
           if (state.lastRun) { runsSettled = false; loadCaps(); loadRuns(); }
+          notify();
           return state.lastRun;
         })
-        .catch(function () { state.lastRun = null; return null; });
+        .catch(function () { state.lastRun = null; state.running = false; notify(); return null; });
     },
+    running: function () { return !!state.running; },
     lastRun: function () { return state.lastRun; },
 
     // dashboard stats/activity — real when the runtime (and a session, for activity) is present

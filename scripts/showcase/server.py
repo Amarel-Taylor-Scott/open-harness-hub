@@ -216,7 +216,9 @@ class Handler(BaseHTTPRequestHandler):
             if self.headers.get(header):
                 req.add_header(header, self.headers[header])
         try:
-            with urllib.request.urlopen(req, timeout=60) as resp:
+            # generous: model-built runs (Teleon) and LLM-selected builds legitimately take
+            # minutes on a local CPU route; the seam must outlive them
+            with urllib.request.urlopen(req, timeout=360) as resp:
                 self._send(resp.status, resp.read(), resp.headers.get("Content-Type") or "application/json")
         except urllib.error.HTTPError as exc:  # backend answered — pass its status/body through honestly
             self._send(exc.code, exc.read(), exc.headers.get("Content-Type") or "application/json")

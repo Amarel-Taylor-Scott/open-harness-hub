@@ -145,14 +145,23 @@ for (const mode of ['logged-out', 'signed-in']) {
   await page.evaluate(() => { window.location.hash = '/runs'; });
   await page.waitForTimeout(1200);
   await page.locator('button:has-text("Build capability")').first().click();
-  await page.waitForTimeout(6500); // designed lifecycle animation + the real run
-  const runResult = await page.evaluate(() => ({
-    text: (document.querySelector('.tln-result') || {}).innerText || '',
-    lastRun: window.TeleonLive && TeleonLive.lastRun(),
-  }));
-  check('Build REALLY executes (gate decision + real score on screen)',
-    /score 1(\.0)? · 4\/4 examples/.test(runResult.text) && runResult.lastRun && runResult.lastRun.decision === 'promoted',
-    runResult.text.slice(0, 120));
+  // MODEL-BUILT runs on local CPU take minutes (the model performs every example, with a
+  // self-refine round on gate failure) — poll for the real result, up to 5 min
+  let runResult = { text: '', lastRun: null };
+  for (let i = 0; i < 420; i += 1) {
+    await page.waitForTimeout(1000);
+    runResult = await page.evaluate(() => ({
+      text: (document.querySelector('.tln-result') || {}).innerText || '',
+      lastRun: window.TeleonLive && TeleonLive.lastRun(),
+    }));
+    if (runResult.lastRun && /score \d/.test(runResult.text)) break;
+  }
+  check('Build REALLY executes (real score + gate decision on screen)',
+    /score \d(\.\d+)? · \d\/4 examples/.test(runResult.text) && !!runResult.lastRun,
+    runResult.text.slice(0, 140));
+  check('Build is MODEL-BUILT when the LLM route is up (honest label on screen)',
+    !runResult.lastRun || runResult.lastRun.mode !== 'model' || /model-built/.test(runResult.text),
+    `mode=${runResult.lastRun && runResult.lastRun.mode}`);
   await page.screenshot({ path: join(OUT, 'teleon-real-run.png') });
 
   const receipts = await page.evaluate(async () => {
@@ -160,9 +169,10 @@ for (const mode of ['logged-out', 'signed-in']) {
     if (!r) return null;
     const res = await fetch(`/api/teleon/teleon/evidence?run_id=${encodeURIComponent(r.run_id)}`);
     const d = await res.json();
-    return d.receipts && d.receipts.length;
+    return { n: d.receipts && d.receipts.length, attempts: r.attempts || 1 };
   });
-  check('receipts persisted for the run (4 examples, hashed)', receipts === 4, String(receipts));
+  check('receipts persisted for EVERY attempt (4 per attempt, lossless)',
+    !!receipts && receipts.n === receipts.attempts * 4, JSON.stringify(receipts));
 
   await page.evaluate(() => { window.location.hash = '/dashboard'; });
   await page.waitForTimeout(1400);

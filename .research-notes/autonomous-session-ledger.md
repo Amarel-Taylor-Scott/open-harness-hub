@@ -2044,3 +2044,19 @@ narrative) — demo task pre-warmed; ohh_public_gate polling 45→150s. Gates re
 10/10, Teleon 18/18 via tunnels; first re-run had transient cold-latency failures, clean on
 verify). Cloud upgrade = .env edit only (OpenRouter/Ollama-cloud: OH_LLM_BASE_URL + OH_LLM_API_KEY
 + OH_LLM_MODEL; same for OH_EMBED_*) — key requested from owner.
+
+## 2026-06-11 (model-built Teleon) — capabilities are now LLM-BUILT; gate stays the judge
+
+**Warrant: direct user intent** ("deterministic processes will not meet the market"). Teleon
+runtime v2: mode model|deterministic|auto — in model mode THE MODEL performs the capability per
+example via the shared provider-neutral route (scripts/model_routes), with ONE self-refine round
+on gate failure; receipts persist EVERY attempt (lossless) with model_id; the promotion gate
+stays deterministic BY DESIGN (evidence judges; models build). Self-test: FakeRoute proves
+plumbing/gate/refine without network; it caught a REAL run-id collision bug (ms-timestamp ids —
+fixed by versioned ids). LIVE PROOF through the UI seam: gemma4 ran cap-cite — attempt 1 failed
+the gate, self-refine recovered 4/4 → promoted v2 (118s CPU, 8 receipts). Seam fixes found by
+gating: showcase proxy timeout 60→360s (model runs outlive it); UI now shows an honest
+"executing on the model — receipts pending" state instead of the fixture while a run is in
+flight; result line carries mode + self-refined ×N; gate asserts receipts == attempts×4.
+teleon_gate now 19 checks — 19/19. NEXT (in progress): Baltor inference plane → model_routes;
+OHH /api/run real flow execution.

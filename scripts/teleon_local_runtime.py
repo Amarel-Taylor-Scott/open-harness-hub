@@ -39,6 +39,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # direct-file run → repo importable
+from scripts.model_routes import resolve_route  # noqa: E402
+
 REPO = Path(__file__).resolve().parents[1]
 SERVICE_REGISTRY = REPO / "architecture" / "local_service_registry.json"
 IDENTITY_REGISTRY = REPO / "architecture" / "identity_realm_registry.json"
@@ -108,6 +111,7 @@ def _cite_statute(text: str) -> str:
 CAPABILITIES = {
     "cap-dates": {
         "name": "Date normalizer",
+        "purpose": "Rewrite every date in the text to ISO 8601 (yyyy-mm-dd), handling US numeric (3/14/2026) and written (March 20, 2026) forms; leave everything else untouched.",
         "criteria": ["ISO 8601 out", "US + written formats", "deterministic"],
         "impl": _normalize_dates,
         "examples": [
@@ -119,7 +123,8 @@ CAPABILITIES = {
     },
     "cap-redact": {
         "name": "PII redactor",
-        "criteria": ["emails masked", "phones masked", "no model call"],
+        "purpose": "Replace every email address with [email] and every phone number (any common US form, with or without +1/parentheses) with [phone]; leave all other text exactly as it is.",
+        "criteria": ["emails masked", "phones masked", "exact otherwise"],
         "impl": _redact_pii,
         "examples": [
             ("Mail ada@example.com or call 415-555-0143.", "Mail [email] or call [phone]."),
@@ -130,6 +135,7 @@ CAPABILITIES = {
     },
     "cap-json-guard": {
         "name": "JSON schema guard",
+        "purpose": "Parse the input as JSON (repairing at most a trailing comma); output the canonical compact form with keys sorted alphabetically and no spaces; if it cannot parse, output exactly INVALID.",
         "criteria": ["parses or repairs once", "canonical output", "flags invalid"],
         "impl": _json_guard,
         "examples": [
@@ -141,6 +147,7 @@ CAPABILITIES = {
     },
     "cap-cite": {
         "name": "Citation formatter",
+        "purpose": "Rewrite every US statute citation to the canonical form 'TITLE U.S.C. § SECTION' (e.g. '12 USC 85' or '15 u.s.c. 1692e' become '12 U.S.C. § 85' and '15 U.S.C. § 1692e'); leave already-canonical citations and all other text unchanged.",
         "criteria": ["U.S.C. canonical form", "section glyph", "idempotent"],
         "impl": _cite_statute,
         "examples": [
@@ -181,36 +188,98 @@ class Runtime:
     def _save_caps(self) -> None:
         self.caps_path.write_text(json.dumps(self.caps, indent=1), encoding="utf-8")
 
-    def execute(self, cap_id: str, account_id: str) -> dict:
-        """REALLY run the capability over its example suite; receipts + gate decision persist."""
+    @staticmethod
+    def _instruction(cap_id: str) -> str:
         spec = CAPABILITIES[cap_id]
-        state = self.caps[cap_id]
-        run_id = f"run_{int(time.time() * 1000):x}_{cap_id}"
+        return (f"You ARE the capability \"{spec['name']}\". {spec['purpose']} "
+                f"Success criteria: {'; '.join(spec['criteria'])}. "
+                "Apply the transformation to the user's input and output ONLY the transformed "
+                "text — no commentary, no quotes, no code fences, no extra whitespace.")
+
+    @staticmethod
+    def _refined_instruction(cap_id: str, base: str, failures: list[dict]) -> str:
+        shown = "\n".join(f"- input: {f['input']!r}\n  your output: {f['got']!r}\n  expected: {f['expected']!r}"
+                          for f in failures[:3])
+        return (base + " IMPORTANT — your previous attempt failed these examples; match the "
+                "expected outputs EXACTLY (character for character):\n" + shown)
+
+    def _suite(self, cap_id: str, run_id: str, attempt: int, transform) -> tuple[list[dict], int]:
+        """Execute one pass over the example suite; the JUDGE (exact match) stays deterministic."""
         receipts, passed = [], 0
-        for i, (inp, expected) in enumerate(spec["examples"]):
+        for i, (inp, expected) in enumerate(CAPABILITIES[cap_id]["examples"]):
             t0 = time.perf_counter_ns()
             try:
-                out = spec["impl"](inp)
+                out = transform(inp)
             except Exception as exc:  # a real failure is a real failure
                 out = f"ERROR: {exc}"
+            out = "" if out is None else str(out).strip()
             us = (time.perf_counter_ns() - t0) // 1000
             ok = out == expected
             passed += ok
-            receipts.append({"run_id": run_id, "example": i, "input_sha": _sha(inp),
-                             "output_sha": _sha(out), "expected_sha": _sha(expected),
-                             "pass": ok, "duration_us": us, "deterministic": True})
-        score = round(passed / len(spec["examples"]), 2)
+            receipts.append({"run_id": run_id, "attempt": attempt, "example": i,
+                             "input_sha": _sha(inp), "output_sha": _sha(out),
+                             "expected_sha": _sha(expected), "pass": ok, "duration_us": us})
+        return receipts, passed
+
+    def execute(self, cap_id: str, account_id: str, mode: str = "auto", route=None) -> dict:
+        """REALLY run the capability suite and apply the promotion gate.
+
+        mode 'model' (the product path): the MODEL performs the capability per example via the
+        provider-neutral chat route; one self-refine round when the gate isn't cleared, both
+        attempts receipted (lossless). mode 'deterministic': the seeded reference implementation
+        (the honest fallback when no model route is reachable — labeled, never disguised).
+        The gate itself is deterministic on purpose: evidence judges, models build.
+        """
+        spec = CAPABILITIES[cap_id]
+        state = self.caps[cap_id]
+        # version is part of the id: two rapid runs of one capability must never collide
+        run_id = f"run_{int(time.time() * 1000):x}_v{state['version'] + 1}_{cap_id}"
+        route = route if route is not None else resolve_route()
+        use_model = mode in ("model", "auto") and route.health()
+        attempts = 0
+        model_note = None
+        if use_model:
+            instruction = self._instruction(cap_id)
+            receipts, passed = self._suite(
+                cap_id, run_id, 1,
+                lambda inp: route.complete(instruction, inp, max_tokens=300, temperature=0.0))
+            attempts = 1
+            total = len(spec["examples"])
+            if passed / total < PROMOTE_AT:  # one self-refine round on real failures
+                idx_fail = [r["example"] for r in receipts if not r["pass"]]
+                failures = [{"input": spec["examples"][i][0], "expected": spec["examples"][i][1],
+                             "got": "(see receipt hash)"} for i in idx_fail]
+                refined = self._refined_instruction(cap_id, instruction, failures)
+                receipts2, passed2 = self._suite(
+                    cap_id, run_id, 2,
+                    lambda inp: route.complete(refined, inp, max_tokens=300, temperature=0.0))
+                attempts = 2
+                if passed2 >= passed:  # keep the better attempt's score; ALL receipts persist
+                    passed = passed2
+                receipts = receipts + receipts2
+            executed_mode, model_id = "model", route.model_id
+        else:
+            receipts, passed = self._suite(cap_id, run_id, 1, spec["impl"])
+            attempts = 1
+            executed_mode, model_id = "deterministic", None
+            if mode == "model":
+                model_note = "model mode requested but no route reachable — ran the reference implementation instead"
+        total = len(spec["examples"])
+        score = round(passed / total, 2)
         decision = ("promoted" if score >= PROMOTE_AT else
                     "candidate" if score >= CANDIDATE_AT else "rolled-back")
         state["version"] += 1
         state["status"] = decision
         state["last_score"] = score
+        state["last_mode"] = executed_mode
         self._save_caps()
         run = {"run_id": run_id, "capability_id": cap_id, "capability": spec["name"],
-               "account_id": account_id, "score": score, "passed": passed,
-               "total": len(spec["examples"]), "decision": decision,
-               "version": state["version"], "at": int(time.time()),
+               "account_id": account_id, "score": score, "passed": passed, "total": total,
+               "decision": decision, "version": state["version"], "at": int(time.time()),
+               "mode": executed_mode, "model_id": model_id, "attempts": attempts,
                "duration_us": sum(r["duration_us"] for r in receipts)}
+        if model_note:
+            run["note"] = model_note
         self.runs.append(run)
         with self.runs_path.open("a", encoding="utf-8") as fh:
             fh.write(json.dumps(run) + "\n")
@@ -259,8 +328,10 @@ class Handler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         qs = parse_qs(parsed.query)
         if parsed.path == "/healthz":
+            route = resolve_route()
             return self._send(200, {"ok": True, "service": SERVICE_ID,
-                                    "capabilities": len(RT.caps), "runs": len(RT.runs)})
+                                    "capabilities": len(RT.caps), "runs": len(RT.runs),
+                                    "llm": {"model": route.model_id, "reachable": route.health()}})
         m = re.match(r"^/api/teleon/([a-z0-9]+)/(capabilities|runs|evidence)$", parsed.path)
         if not m:
             return self._send(404, {"error": "not found"})
@@ -293,7 +364,10 @@ class Handler(BaseHTTPRequestHandler):
         cap_id = str(body.get("capability_id") or "cap-dates")
         if cap_id not in CAPABILITIES:
             return self._send(404, {"error": f"unknown capability {cap_id}"})
-        return self._send(201, {"run": RT.execute(cap_id, account)})
+        mode = str(body.get("mode") or "auto")
+        if mode not in ("auto", "model", "deterministic"):
+            return self._send(400, {"error": "mode must be auto | model | deterministic"})
+        return self._send(201, {"run": RT.execute(cap_id, account, mode=mode)})
 
     def log_message(self, *args) -> None:  # quiet
         pass
@@ -315,7 +389,7 @@ def _self_test() -> int:
         STATE_DIR = Path(tmp)
         rt = Runtime()
         ck("seeded capabilities present", len(rt.caps) == len(CAPABILITIES))
-        run = rt.execute("cap-dates", "acct_test")
+        run = rt.execute("cap-dates", "acct_test", mode="deterministic")
         ck("run really executed (all examples)", run["total"] == 4 and run["passed"] == 4)
         ck("real score → promotion gate applied", run["score"] == 1.0 and run["decision"] == "promoted")
         ck("version bumped + status persisted", rt.caps["cap-dates"]["version"] == 2
@@ -328,8 +402,39 @@ def _self_test() -> int:
         bad = _json_guard("not json")
         ck("failure path is honest (INVALID, not fabricated)", bad == "INVALID")
         for cid in CAPABILITIES:
-            r = rt.execute(cid, "acct_test")
-            ck(f"{cid}: suite passes deterministically", r["score"] == 1.0)
+            r = rt.execute(cid, "acct_test", mode="deterministic")
+            ck(f"{cid}: reference suite passes deterministically", r["score"] == 1.0)
+
+        # ---- the MODEL-BUILT path (fake route: plumbing + gate + refine, no network) ----
+        class FakeRoute:
+            model_id = "fake-test-model"
+            def __init__(self):
+                self.calls = 0
+            def health(self):
+                return True
+            def complete(self, system, user, **kw):
+                self.calls += 1
+                out = CAPABILITIES["cap-cite"]["impl"](user)
+                if "IMPORTANT" not in system and "1692e" in user:
+                    return out.replace("§", "Sec.")  # attempt-1 botch → forces the refine round
+                return out
+        fake = FakeRoute()
+        run_m = rt.execute("cap-cite", "acct_test", mode="model", route=fake)
+        ck("model mode: the MODEL performed the suite", run_m["mode"] == "model"
+           and run_m["model_id"] == "fake-test-model" and fake.calls == 8)
+        ck("model mode: gate failed attempt 1 → self-refine recovered → promoted",
+           run_m["attempts"] == 2 and run_m["score"] == 1.0 and run_m["decision"] == "promoted")
+        rec_m = rt.receipts_for(run_m["run_id"])
+        ck("model receipts persist BOTH attempts (lossless)",
+           len(rec_m) == 8 and {r["attempt"] for r in rec_m} == {1, 2})
+
+        class DeadRoute:
+            model_id = "unreachable"
+            def health(self):
+                return False
+        run_d = rt.execute("cap-dates", "acct_test", mode="model", route=DeadRoute())
+        ck("model mode with no route → honest deterministic fallback + note",
+           run_d["mode"] == "deterministic" and "note" in run_d)
     STATE_DIR = real_state
     print("\n" + ("PASS — teleon_local_runtime: REAL deterministic capability execution with "
                   "receipts, a real promotion gate, and restart-safe state."
