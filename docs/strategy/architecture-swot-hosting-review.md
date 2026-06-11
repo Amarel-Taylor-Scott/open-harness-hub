@@ -53,8 +53,79 @@ Provisioning flows: **customer** — per-realm sign-up → console `/keys` (show
 **owner** — `AIDR_REGISTRY_ADMINS` roster seam + (queued) `provision_access` CLI; **agents** —
 minted API keys against the same realms (verify endpoint exists).
 
-## 2. SWOT
+## 2. SWOT + product-market fit — PER SERVICE (each unit stands alone)
 
+### 2.1 Baltor CEaaS — verified context serving (paid core)
+- **S**: only demoable verification RAIL (live checks, receipts, held-out warnings, revocation);
+  real pipeline + real inference receipts on film. **W**: tenant isolation unproven; live feeds
+  limited (eCFR real, OFAC/EUR-Lex fixtures); billing emulated. **O**: compliance buyers must
+  prove currency (the OFAC-staleness demo IS the wedge); Airbyte educates the category then
+  stops at movement. **T**: Anthropic FS / data-gravity platforms bundling "good enough".
+- **PMF**: target = compliance/risk teams shipping agent workflows in regulated facts.
+  Problem urgency HIGH (provability is mandated, not nice-to-have). Evidence today: working
+  sanctions/CFPB proof loop; zero external users. **Verdict: strongest fit hypothesis in the
+  portfolio — unproven.** Falsify next: 3 design-partner conversations off the guided demos.
+
+### 2.2 Baltor Context Gateway + MCP — the agent context door
+- **S**: bounded packs + source handles + deferred fetch (anti-overfetch by design); MCP bridge
+  exists. **W**: ctx:// handles fixture-grade; not cloud-exposed. **O**: MCP adoption wave
+  (Airbyte ads literally target "mcp_door"). **T**: every platform shipping an MCP server.
+- **PMF**: target = agent builders needing governed context without trusting raw stores.
+  Urgency MEDIUM rising. **Verdict: fit follows CEaaS** (same buyer, second door). Falsify:
+  one external agent consuming the gateway end-to-end.
+
+### 2.3 Teleon Capability Runtime — model-built, evidence-gated capabilities (paid core)
+- **S**: the thesis runs on film (model builds → gate judges → self-refine → receipts per
+  attempt); restart-safe; 12s cloud runs. **W**: 4 seed capabilities; tower designed; metering
+  not billing. **O**: CodeStrap proves "underwritable AI" budgets exist; we underwrite with
+  EVIDENCE not just state machines. **T**: durable-execution platforms adding eval layers.
+- **PMF**: target = platform/AI-infra teams burned by agent regressions. Urgency MEDIUM-HIGH.
+  Evidence: lifecycle real; no external capability authored yet. **Verdict: strong narrative
+  fit, thin usage evidence.** Falsify: let one external team author a capability + criteria.
+
+### 2.4 Teleon Agent Capability Gateway — agents as customers
+- **S**: deterministic-first token ladder; per-realm keys agents can mint/verify; receipts.
+  **W**: not exposed beyond local; no SDK. **O**: agent-to-agent commerce is forming; few
+  receipt-backed capability vendors. **T**: tool marketplaces (MCP directories) as default.
+- **PMF**: target = autonomous agents/fleets needing stable capabilities cheaper than
+  re-derivation. Urgency LOW today, compounding. **Verdict: earliest-stage bet; keep cheap.**
+  Falsify: one external agent calling a capability via key, unattended.
+
+### 2.5 OpenHarnessHub Builder — describe → build → RUN → export (free funnel)
+- **S**: fully live funnel (semantic retrieval over 2,5xx, LLM selection, REAL run trace,
+  open-spec export); zero-signup preview. **W**: lift "unproven" (no measured evals); cold
+  builds ~30-40s on the 80B route. **O**: the demo that makes the registry legible; agents can
+  consume the same API. **T**: copilot-style builders inside incumbent platforms.
+- **PMF**: funnel, not revenue — fit = does it convert visitors to accounts/exports. Evidence:
+  conversion loop works on film; no traffic. **Verdict: fit-for-purpose as funnel.** Falsify:
+  put traffic on it; measure preview→signup.
+
+### 2.6 OpenHarnessHub Registry + promotion plane (+ 21-hub network)
+- **S**: review→promotion gate with separation of duties (proof-gated); 22 seeded catalogs;
+  one engine renders all hubs; per-hub realms live. **W**: no community; signing (Rekor) not
+  yet real; bench hubs private by design. **O**: trust-graded component distribution is unowned
+  territory (HF/MCP dirs are unverified listings). **T**: incumbent registries adding badges.
+- **PMF**: target = component publishers/consumers needing trust grades. Urgency LOW until
+  builder traffic exists. **Verdict: infrastructure ahead of demand — correct sequencing.**
+  Falsify: 10 external submissions through the review queue.
+
+### 2.7 Identity & Keys plane (shared enabler)
+- **S**: 25 isolated realms, hash-only keys, audited, restart-safe; one kit. **W**: no OAuth;
+  demo-grade store. **O**: per-product realms = clean per-product GTM. **T**: none material
+  (internal). **PMF: enabler — fit measured by zero-friction sign-ups across all surfaces
+  (achieved on film).** Not sellable; don't productize.
+
+### 2.8 OIPS Inference Gateway (shared; future sellable)
+- **S**: numeric provider graph + adapters + receipts with is_truth:false; live calls now.
+  **W**: per-node secrets not yet config; one style live. **O**: "model receipts" as a
+  compliance artifact. **T**: LiteLLM/router incumbents (without receipts). **PMF: enabler
+  now; sellable only after Teleon/Baltor prove receipt demand.**
+
+### 2.9 Events/analytics plane (enabler)
+- PII-guarded ingest live across surfaces. **PMF: enabler; fit = funnel metrics exist when
+  traffic arrives.** Not sellable.
+
+### Portfolio-level (kept for context)
 **Portfolio**
 - **S**: evidence-gated honesty is implemented, not claimed (receipts, promotion gates, held-out
   warnings, "unproven" states); one design system across 28 surfaces; provider-neutral model
@@ -130,21 +201,48 @@ collision (needs --port arg).
 - `web/README` says no-build "vanilla" in places — superseded by the transplant section (kept).
 - OpenRouter "ready" → key VALID but ZERO CREDITS (owner action).
 
-## 7. Hosting recommendation (cheap · single provider · co-located)
+## 7. Hosting — the ADVERSARIAL pass (revised after deeper diligence)
 
-Need: ~10 lightweight long-running Python services + 4 static-ish fronts + Postgres + Redis,
-all same-region/same-network; GPU NOT required (model plane is API-based; local gemma optional).
+Need: ~10 lightweight long-running Python services + 4 fronts + Postgres + Redis, ALL
+same-region/same-network, US presence, cheap, ONE provider. GPU not required.
 
-| Option | Co-location | Realistic cost | Fit |
-|---|---|---|---|
-| **Hetzner 1 box (CPX31/CAX31) + k3s + Cloudflare in front** | same HOST (sub-ms) | **€8–15/mo** | ✅ RECOMMENDED — our k8s manifests run on k3s unchanged; Cloudflare tunnel/DNS plan already written; scales by adding a node |
-| Fly.io | private 6PN, same region | ~$15–30/mo realistic | good managed fallback; volumes for state |
-| Render | same-region private net | ~$7/service ⇒ $70+/mo at our service count | your instinct is right — priciest of the three for our shape |
-| GCP/AWS/Azure (Cloud Run/EKS…) | same region | most $$ + most ops | only when scale/GPU/compliance demands |
+**Hetzner — does it have US?** YES: **Ashburn, VA + Hillsboro, OR — CLOUD ONLY** (no dedicated/
+auction servers in the US); ARM CAX available in Ashburn; US prices slightly above EU
+(CX22 ≈ $4.59, CAX11 ≈ $3.79; June-2026 price update pending). **Adversarial findings:** a real
+pattern of NEW-account KYC flags and sudden suspensions ("high-risk" closures without
+explanation), **no managed Postgres/Redis at all**, **no SLA on cloud**, thin support. Cheapest
+by far, but for an investor-facing deployment a fresh US account is an onboarding risk and
+everything is self-operated.
 
-Verdict: **one Hetzner box + k3s + Cloudflare** meets "cheap, single provider, everything
-side-by-side" exactly; Fly.io if you prefer fully managed. Keys needed from you either way:
-Cloudflare token + nameserver flips; then Hetzner API token (or Fly token + card).
+**Fly.io — validated, with scar tissue.** Strengths confirmed: true same-region private
+networking (6PN), plentiful US regions, machines from ~$2, great DX, our shape fits. Adversarial
+findings: a steady incident cadence in their own infra-log (SJC switch drop, FRA WireGuard
+gateway, secrets-service emergency maintenance, Consul wedge affecting Managed Postgres) and the
+historical 3-day Postgres outage; **Managed Postgres pricing cliffs ($282 → $962 → ~$2k/mo
+tiers)** with provisioned-storage billing; volume snapshots become billable Jan 2026; volumes
+are single-host. Verdict: fine IF we self-run small Postgres/Redis on volumes and accept the
+incident cadence — never their Managed Postgres at our stage.
+
+**DigitalOcean — the adversarial control nobody asked for.** Managed Postgres+Redis from ~$15,
+droplets $6–24, US regions, boring-reliable track record, same-VPC co-location. ~60% pricier
+than Hetzner, far below Fly's managed-DB cliffs.
+
+| Option | US? | Co-location | Realistic $/mo | Ops burden | Key risk |
+|---|---|---|---|---|---|
+| **DigitalOcean** droplet(s)+managed PG/Redis | ✅ | same VPC/region | **$40–65** | LOW | none notable — boring is the feature |
+| **Hetzner Ashburn** 1 box + k3s, self-run PG/Redis | ✅ (cloud only) | same HOST | **$9–16** | MEDIUM | new-account KYC/suspension; no SLA; self-ops |
+| **Fly.io** machines + volumes, self-run PG | ✅ | 6PN same region | **$15–35** | LOW-MED | incident cadence; storage billing; avoid MPG |
+| Render | ✅ | private net | $70+ | LOW | cost at our service count |
+| Hyperscalers | ✅ | same region | most | HIGH | overkill pre-traffic |
+
+**Revised verdict (risk-adjusted for the YC window):**
+1. **DigitalOcean** if the deployment must never embarrass us in front of an investor —
+   one region, managed data stores, ~$50/mo, lowest variance.
+2. **Hetzner Ashburn** if cost rules and we accept self-ops + verify the account EARLY
+   (order now, run something harmless for two weeks before relying on it).
+3. **Fly.io** if zero-server-admin matters most — self-run small Postgres, skip MPG.
+All three sit behind the same Cloudflare tunnel/DNS plan; our k3s/systemd manifests work on
+any of them. Owner picks the risk posture; everything after the API token is on me.
 
 ## 8. Owner decisions requested
 
