@@ -97,6 +97,11 @@ def _seam_proxies() -> list[tuple[str, str, str]]:
     events = _local_service_port("local_event_tracking_service")
     if events:
         table.append(("/analytics/", "/analytics", _seam_base("OH_SEAM_ANALYTICS_BASE", events)))
+    mailbox = _local_service_port("mailbox_local_service")
+    if mailbox:  # the visible transactional-email inbox (registration → verify-email click, same-origin)
+        mailbox_base = _seam_base("OH_SEAM_MAILBOX_BASE", mailbox)
+        table.append(("/mailbox", "", mailbox_base))
+        table.append(("/api/mailbox/", "", mailbox_base))
     teleon_runtime = _local_service_port("teleon_local_runtime")
     if teleon_runtime:
         table.append(("/api/teleon/", "", _seam_base("OH_SEAM_TELEON_RUNTIME_BASE", teleon_runtime)))

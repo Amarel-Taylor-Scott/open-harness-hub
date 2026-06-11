@@ -358,8 +358,11 @@ class IdentityService:
             return "skipped_non_email_identifier"
         try:
             from scripts import email_port
+            # a REAL clickable verify link (relative → works on 127.0.0.1 and through a tunnel) into
+            # the mailbox inbox; clicking it completes verify_identifier for real. Demo-grade: the
+            # account id is the handle; a cryptographic one-time token is the prod hardening.
             rec = email_port.send(realm, "verify_email", identifier,
-                                  {"verify_url": f"local://{realm}/verify/{account_id[-12:]}"})
+                                  {"verify_url": f"/mailbox/verify?realm={realm}&account={account_id}"})
             return f"{rec['mode']}:{'sent' if rec['sent'] else 'rendered_not_sent'}"
         except Exception:  # noqa: BLE001  (email must never break registration)
             return "email_port_unavailable"

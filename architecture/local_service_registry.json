@@ -689,7 +689,7 @@
       "screenshot_required": false,
       "trycloudflare_required": false,
       "status": "active_local",
-      "notes": "catalog is SEEDED by extracting each hub's entries from the design bundle (single source). Workspace endpoints are session-gated: the account is resolved by validating the realm session against the identity service (:9410) — the raw session id is never persisted, only the resolved account id. submit lands in a review queue (candidate, never public-active; discovery ≠ trust). truth_authority=false; append-only; the dashboard summary is replayed from the log."
+      "notes": "catalog is SEEDED by extracting each hub's entries from the design bundle (single source). Workspace endpoints are session-gated: the account is resolved by validating the realm session against the identity service (:9410) \u2014 the raw session id is never persisted, only the resolved account id. submit lands in a review queue (candidate, never public-active; discovery \u2260 trust). truth_authority=false; append-only; the dashboard summary is replayed from the log."
     },
     {
       "service_id": "local_mcp_registry_service",
@@ -1003,6 +1003,42 @@
       "trycloudflare_required": false,
       "status": "active_local",
       "notes": "Port single-sourced HERE (the script's argparse default mirrors it); web/baltor live pages reach this backend same-origin through the showcase server's seam proxy (scripts/showcase/server.py), so the dashboards work locally and through tunnels."
+    },
+    {
+      "service_id": "mailbox_local_service",
+      "display_name": "Transactional-email inbox (visible outbox; real verify-click)",
+      "owner": "openharnesshub",
+      "port": 9428,
+      "process_group": "mailbox_local_service",
+      "start_command": [
+        "python3",
+        "scripts/mailbox_local_service.py"
+      ],
+      "stop_command": null,
+      "health_url": "http://127.0.0.1:9428/healthz",
+      "ready_url": "http://127.0.0.1:9428/readyz",
+      "public_routes": [
+        "/mailbox",
+        "/mailbox/",
+        "/mailbox/message",
+        "/mailbox/verify",
+        "/api/mailbox/messages"
+      ],
+      "private_routes": [],
+      "env_file": null,
+      "allowed_consumers": [
+        "browser_user",
+        "demo_reviewer"
+      ],
+      "auth_mode": "anonymous_demo_read",
+      "data_classes": [
+        "email_outbox_no_secrets"
+      ],
+      "logs_path": "dist/local-services/mailbox_local_service.log",
+      "screenshot_required": true,
+      "trycloudflare_required": false,
+      "status": "active_local",
+      "notes": "Visible inbox over dist/email-outbox (email PORT renders here, honestly does not send). The verify link completes the REAL verify_identifier onboarding step via the identity service. Delivery emulated; registration/verify real."
     }
   ]
 }
