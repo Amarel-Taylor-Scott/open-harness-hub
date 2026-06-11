@@ -37,7 +37,7 @@ fly deploy -c fly/aidr-events.fly.toml --ha=false
 ```bash
 fly apps create aidr-teleon-runtime
 fly volumes create teleon_runtime_state -a aidr-teleon-runtime -r iad -s 1
-fly secrets set -a aidr-teleon-runtime --stage OH_LLM_BASE_URL=<value> OH_LLM_MODEL=<value> OH_LLM_API_KEY=<value> OH_EMBED_MODE=<value> OH_EMBED_MODEL=<value> OH_EMBED_BASE_URL=<value> OH_INFERENCE_ALLOW_NETWORK=<value>
+fly secrets set -a aidr-teleon-runtime --stage OH_LLM_BASE_URL=<value> OH_LLM_MODEL=<value> OH_LLM_API_KEY=<value> OH_EMBED_MODE=<value> OH_EMBED_MODEL=<value> OH_EMBED_BASE_URL=<value> OH_INFERENCE_ALLOW_NETWORK=<value> FLY_API_TOKEN=<value>
 fly deploy -c fly/aidr-teleon-runtime.fly.toml --ha=false
 ```
 

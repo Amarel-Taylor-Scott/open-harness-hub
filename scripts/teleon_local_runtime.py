@@ -97,6 +97,15 @@ def _compiled_units_path() -> Path:
     tests, so a self-test never writes to the real registry)."""
     return STATE_DIR.parent / "teleon-compiler" / "compiled-units.jsonl"
 
+
+# ZERO-OP LAUNCH (co-resident, OPT-IN): when OH_TELEON_AUTO_LAUNCH=1 AND FLY_API_TOKEN is set,
+# main() runs a background thread that hands every newly-registered ACTIVE compiled unit to the
+# Machines runner — the "promote → compile → register → LAUNCH, self-running" path with zero
+# operator steps. OFF by default (the launch trigger stays explicit until the owner provisions
+# Fly) and a no-op without a token; the runner shares THIS app's registry volume (co-resident).
+AUTO_LAUNCH_ENV = "OH_TELEON_AUTO_LAUNCH"
+AUTO_LAUNCH_POLL_SECONDS = 30  # match the runner's --watch cadence; the deploy lag for a promotion
+
 # Anti answer-key-gaming split (see Runtime._refined_instruction): every capability's examples
 # are deterministically split by index parity — even indices are TRAIN (their INPUTS may be
 # quoted in the self-refine prompt), odd indices are HOLDOUT (never shown in ANY prompt). The
@@ -651,6 +660,15 @@ class Runtime:
         except Exception as exc:
             return {"escalated": False, "reason": f"{type(exc).__name__}: {exc}"[:200]}
 
+    def launch_pending(self, runner=None, *, receipts_path=None, emit=lambda *_a: None) -> dict:
+        """One CO-RESIDENT auto-launch pass: hand every newly-registered ACTIVE compiled unit to
+        the Machines runner (same image, same registry volume — the launcher Fly can't reach as a
+        separate app). With a runner (real or a fake in tests) → launches; without → an honest
+        plan. Delegates to the runner's watch_once (idempotent via the per-launch receipt)."""
+        from scripts.deploy.teleon_machines_runner import watch_once, RUNNER_RECEIPTS_PATH
+        return watch_once(registry_log=_compiled_units_path(), runner=runner,
+                          receipts_path=receipts_path or RUNNER_RECEIPTS_PATH, emit=emit)
+
     def execute(self, cap_id: str, account_id: str, mode: str = "auto", route=None) -> dict:
         """Synchronous entrypoint: enqueue + run inline, returning the TERMINAL run record. This
         backs the server's DEFAULT plain-POST path (and in-process callers/tests); the opt-in
@@ -821,6 +839,23 @@ def _self_test() -> int:
         ck("non-promotion escalates toward bounded exploration (T3, honest offline default)",
            esc.get("tier") == 3 and esc.get("action") == "dispatch_bounded_exploration"
            and esc.get("runtime_ref") == "local_emulator@v1")
+        # ---- ZERO-OP LAUNCH: a launch pass hands the registered unit to the Machines runner ----
+        from scripts.deploy.teleon_machines_runner import (Runner as _Rnr, RunnerMachinesAPI as _RAPI,  # noqa: N814
+                                                           _runner_config as _rcfg, _FakeMachinesAPI as _FAPI,
+                                                           _FakeClock as _FClk)
+        _lr_clock = _FClk()
+        _lr_api = _FAPI(states=["started", "stopped"], exit_code=0)
+        _lr_runner = _Rnr(_lr_api, _rcfg(), clock=_lr_clock, sleep=_lr_clock.sleep,
+                          receipts_path=Path(tmp) / "auto-launch-receipts.jsonl")
+        _lp1 = rt.launch_pending(runner=_lr_runner, receipts_path=Path(tmp) / "auto-launch-receipts.jsonl")
+        ck("auto-launch: a launch pass launches the registered active units (co-resident runner)",
+           len(_lp1["launched"]) >= 1 and _lr_api.create_calls >= 1)
+        _lp2 = rt.launch_pending(runner=_lr_runner, receipts_path=Path(tmp) / "auto-launch-receipts.jsonl")
+        ck("auto-launch: a second pass re-launches nothing (idempotent via the launch receipt)",
+           _lp2["launched"] == [])
+        _lp3 = rt.launch_pending(runner=None, receipts_path=Path(tmp) / "auto-launch-plan-only.jsonl")
+        ck("auto-launch: no runner (no token) → honest PLAN, never a fake launch",
+           len(_lp3["planned"]) >= 1 and _lp3["launched"] == [])
         ck("deterministic run labeled honestly (gate_note + basis + split rates)",
            run["gate_note"] == DETERMINISTIC_GATE_NOTE and run["gate_basis"] == GATE_BASIS
            and run["train_pass_rate"] == 1.0 and run["holdout_pass_rate"] == 1.0
@@ -1182,6 +1217,21 @@ def main(argv: list[str] | None = None) -> int:
     print(f"Teleon local runtime → http://{bind_host}:{port}  "
           f"({len(RT.caps)} capabilities, {len(RT.runs)} recorded runs, gate ≥{PROMOTE_AT}, "
           f"sync POST→201; async POST {{\"async\": true}}→202, poll GET /runs?run_id=…)")
+    # zero-op launch (co-resident): promoted capabilities launch themselves on Fly Machines
+    if os.environ.get(AUTO_LAUNCH_ENV) == "1" and os.environ.get("FLY_API_TOKEN"):
+        from scripts.deploy.teleon_machines_runner import Runner, RunnerMachinesAPI, _runner_config
+        _cfg = _runner_config()
+        _runner = Runner(RunnerMachinesAPI(_cfg["api_base"], os.environ["FLY_API_TOKEN"], _cfg["app"]), _cfg)
+
+        def _auto_launch_loop() -> None:
+            while True:
+                try:
+                    RT.launch_pending(runner=_runner)
+                except Exception:  # a launch hiccup must never take the runtime down
+                    pass
+                time.sleep(AUTO_LAUNCH_POLL_SECONDS)
+        threading.Thread(target=_auto_launch_loop, name="teleon-auto-launch", daemon=True).start()
+        print(f"  auto-launch ON ({AUTO_LAUNCH_ENV}=1, token present): promoted capabilities launch on Fly Machines")
     try:
         httpd.serve_forever()
     finally:

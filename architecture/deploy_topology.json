@@ -74,7 +74,8 @@
       "state_mount": "/app/dist/local-services-state",
       "volume_gb": 1,
       "env": { "AIDR_IDENTITY_BASE": "@identity" },
-      "secret_groups": ["model-plane"]
+      "env_note": "OH_TELEON_AUTO_LAUNCH is intentionally NOT set here — zero-op launch is OFF until the owner opts in (set it to '1' on the app once Fly + a machines:write token are in place). The compiled-unit registry the runner reads lives on THIS app's volume — the runner is co-resident (same image), which is why FLY_API_TOKEN rides this app, not a separate one.",
+      "secret_groups": ["model-plane", "fly-controller"]
     },
     {
       "name": "baltor-backend",
