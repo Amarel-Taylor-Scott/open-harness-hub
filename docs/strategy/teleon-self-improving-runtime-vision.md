@@ -79,19 +79,23 @@ a sequenced plan).
   queue does not exist yet. The fleet ledger (`enqueue_task`) is task-execution, not
   capability-build intake.
 
-### Stage 2 — Requirements + benchmarks/evals AS the spec — **BUILT (gate suite) + DESIGNED (declarative eval-as-contract)**
+### Stage 2 — Requirements + benchmarks/evals AS the spec — **BUILT (gate suite + declared `eval_suite` field) + DESIGNED (named-suite registry)**
 The owner's "the benchmark IS the spec" is realized as `success_criteria` +
-`promotion_criteria` that a variant must beat. Today this is **two parallel
-expressions** that should converge (see Gap D-2):
+`promotion_criteria` that a variant must beat — and, since 2026-06-11, as a declared
+`eval_suite` field the user hands to Teleon (see `docs/architecture/eval-as-contract.md`).
+The two expressions are converging (see Gap D-2):
 - The live runtime hardcodes per-capability example suites with a real
   train/holdout split (`scripts/teleon_local_runtime.py`, `CAPABILITIES` + `_suite`).
-- The CapabilityTask spec references `sla_policy_id` / `required_resource_class`
-  (numeric thresholds) but has **no `eval_suite` / `benchmark_ref` field** — so the
-  "evaluation system the user describes" is not yet a first-class declared input on
-  the contract. The Stage-2 confirm tool that SHOULD bind here exists
-  (`scripts/eval/measured_lift_headtohead.py`, paired/held-out/separate-judge — per
-  M4 in `docs/codex/north-star.md`) but is **not wired into promotion**
-  (`capability-rubric-and-deep-dive-2026-06-11.md` step 3).
+- **RESOLVED (2026-06-11):** `PurposeTaskSpec.v1` + `CapabilityTask.v1` now carry a
+  first-class, validated **`eval_suite`** (inline `examples` XOR `benchmark_ref`,
+  `gate_threshold`/`holdout_policy` single-sourced from `teleon_local_runtime`
+  PROMOTE_AT/TRAIN_PARITY, judge). The runtime-gate seam
+  (`src.teleon.purpose_tasks.eval_suite_for` → `eval_pairs`) is built + proven
+  (`scripts/check_eval_suite_contract.py`); flipping the live gate to read it and the
+  named-suite registry are the remaining follow-ups. The Stage-2 confirm tool that
+  binds here exists (`scripts/eval/measured_lift_headtohead.py`,
+  paired/held-out/separate-judge — per M4 in `docs/codex/north-star.md`) but is still
+  **not wired into promotion** (`capability-rubric-and-deep-dive-2026-06-11.md` step 3).
 
 ### Stage 3 — Capability BUILD (model proposes, reusing the substrate) — **BUILT (model-built path + digestion) + DESIGNED (open-ended synthesis)**
 - The live runtime's `mode="model"` path makes **the MODEL perform the capability**
@@ -422,15 +426,21 @@ the rubric's "is Teleon the backbone yet?" verdict from *"NO — ~40%"* toward *
 compiler now exists; what remains is intake + live launch + one receipt envelope"*,
 and add the ledger entry. (Owner-gated where outward-facing.)
 
-### D-2. The "benchmark/eval IS the spec" promise is not yet a declared contract field
-The vision is "describe the requirements, the benchmarks/evaluation systems." Today
-evals live as **hardcoded suites in the runtime** and as **separate scorers**
-(`measured_lift_headtohead.py`) that are **not wired into promotion**
-(`capability-rubric-and-deep-dive-2026-06-11.md` step 3). There is no `eval_suite` /
-`benchmark_ref` / `acceptance_criteria` field on `PurposeTaskSpec.v1` /
-`CapabilityTask.v1.schema.json`. **Until that exists, a user cannot actually "hand it
-the evaluation system" — they get a fixed capability set.** This is the most important
-*product* gap behind the vision.
+### D-2. The "benchmark/eval IS the spec" promise as a declared contract field — **FIELD BUILT 2026-06-11; live-gate wire-in + named-suite registry remain**
+The vision is "describe the requirements, the benchmarks/evaluation systems." A
+first-class **`eval_suite`** field now exists on `PurposeTaskSpec.v1` AND
+`CapabilityTask.v1.schema.json` (inline `examples` XOR `benchmark_ref`,
+`gate_threshold`/`holdout_policy` single-sourced from `teleon_local_runtime`, judge;
+`docs/architecture/eval-as-contract.md`, proof `scripts/check_eval_suite_contract.py`).
+A user **can now hand Teleon the evaluation system** as a declared, validated input
+(inline suites are end-to-end usable). The remaining work: (1) flip the live runtime
+gate to read `eval_suite_for(spec)` instead of the hardcoded `CAPABILITIES[...]`
+suite (the seam is built — a one-line source swap, documented); (2) a persistent
+named-suite registry so `benchmark_ref` resolves from a store (the honest resolver
+seam exists; it raises `BenchmarkNotRegisteredError` until then — never a fabricated
+suite); (3) wire the separate Stage-2 scorer (`measured_lift_headtohead.py`) to the
+declared judge/threshold so its paired/held-out lift gates promotion
+(`capability-rubric-and-deep-dive-2026-06-11.md` step 3).
 
 ### D-3. The self-PROGRAMMING proposer is a stub
 `adapt()` tries the *next pre-registered alternative*; it does not generate a new

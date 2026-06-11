@@ -2,7 +2,14 @@
 
 A PurposeTask is declared by INTENT, not code:
     {task_id, purpose, capability_slot, input_contract, output_contract,
-     success_criteria, promotion_criteria, current_impl_id, alternatives, rollback_target}
+     success_criteria, promotion_criteria, eval_suite, current_impl_id, alternatives, rollback_target}
+
+`eval_suite` (a.k.a. the benchmark) is the FIRST-CLASS declared "what DONE means": a user hands Teleon the
+evaluation system (an inline `examples` suite OR a `benchmark_ref`) that the gate scores a candidate against —
+"the benchmark IS the spec" (see src/teleon/purpose_tasks/eval_suite.py + docs/architecture/eval-as-contract.md).
+The spec is a plain dict everywhere (provision/run/adapt all take dicts); `PurposeTaskSpec` is a thin builder
+that round-trips that dict and attaches/normalizes the eval_suite, and `eval_suite_for(spec)` is the seam the
+runtime gate + compiler read instead of a hardcoded example suite.
 
 `provision` binds the highest-priority implementation for the task's capability_slot FROM a registry (the
 provision-by-capability surface — no per-task wiring code). `run_current` runs the cheap deterministic hot
@@ -19,6 +26,10 @@ from typing import Any, Callable
 from src.teleon.experiments import parallel_paths as _pp
 from src.teleon.experiments import path_comparator as _pc
 from src.teleon.experiments import path_promotion as _ppr
+from src.teleon.purpose_tasks import eval_suite as _es
+
+#: contract field carrying the eval/benchmark that defines DONE (see eval_suite.py). Named once here.
+EVAL_SUITE_FIELD = "eval_suite"
 
 #: registry shape: {capability_slot: [{"impl_id": str, "priority": int|float, "handler": Callable[[input], RunnerResult]}]}
 #: handler returns a RunnerResult dict: {output, output_contract, cost, latency_ms, error, source_handles, ...}
@@ -188,3 +199,99 @@ def rollback(spec: dict[str, Any], registry: Registry, *, to: str | None = None)
     new_spec["alternatives"] = ([current] + prior_alts) if current else prior_alts
     new_spec["rollback_target"] = ""   # pending rollback consumed; the next promotion records a fresh target
     return {"rolled_back": True, "from": current, "to": target, "spec": new_spec}
+
+
+# ---------------------------------------------------------------------------
+# eval_suite (the benchmark) as a first-class contract field
+# ---------------------------------------------------------------------------
+
+def _is_model_built(spec: dict[str, Any]) -> bool:
+    """A capability the MODEL builds/performs (vs a fixed deterministic impl) must be gated on a non-empty
+    eval suite. We treat a task as model-built when it declares a `build_mode`/`mode` of 'model' OR carries
+    `model_built: true`; absent any signal we assume NOT model-built (so a deterministic PoC spec without an
+    eval_suite stays valid — backward compatible). The runtime's own gate still applies regardless."""
+    if bool(spec.get("model_built")):
+        return True
+    return str(spec.get("build_mode") or spec.get("mode") or "").lower() == "model"
+
+
+def eval_suite_for(spec: dict[str, Any] | "PurposeTaskSpec") -> dict[str, Any] | None:
+    """Return the NORMALIZED eval_suite the runtime gate + compiler consume, or None if the task declares no
+    eval_suite (backward compatible — older specs simply have no benchmark and fall back to the runtime's
+    own hardcoded suite). This is the single seam: instead of reaching into a hardcoded CAPABILITIES suite,
+    the gate calls `eval_suite_for(spec)` → uses `eval_suite.eval_pairs(...)` for the (input, expected) rows
+    and `gate_threshold`/`holdout_policy`/`judge` for the gate. Raises ValueError (via normalize) if a
+    present eval_suite is invalid — an unmeasurable 'done' is fail-closed, never silently dropped."""
+    raw = spec.spec if isinstance(spec, PurposeTaskSpec) else spec
+    suite = raw.get(EVAL_SUITE_FIELD)
+    if suite is None:
+        return None
+    return _es.normalize_eval_suite(suite, model_built=_is_model_built(raw))
+
+
+class PurposeTaskSpec:
+    """A thin BUILDER/round-trip wrapper around a PurposeTask spec DICT (the spec stays a plain dict for
+    provision/run/adapt — this never replaces it). It exists so a caller can attach + normalize the
+    `eval_suite` ergonomically and round-trip losslessly: `PurposeTaskSpec.from_dict(d).to_dict()` returns an
+    equal dict, and a `with_eval_suite(...)` constructor produces a spec whose eval_suite the gate can read.
+    Pure + deterministic."""
+
+    __slots__ = ("spec",)
+
+    def __init__(self, spec: dict[str, Any]) -> None:
+        if not isinstance(spec, dict):
+            raise TypeError(f"PurposeTaskSpec wraps a dict, got {type(spec).__name__}")
+        self.spec = dict(spec)  # defensive copy — the wrapper owns its dict
+
+    # --- round-trip -------------------------------------------------------
+    @classmethod
+    def from_dict(cls, spec: dict[str, Any]) -> "PurposeTaskSpec":
+        return cls(spec)
+
+    def to_dict(self) -> dict[str, Any]:
+        """The underlying spec dict (a copy). Round-trips: from_dict(d).to_dict() == d."""
+        return dict(self.spec)
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, PurposeTaskSpec):
+            return self.spec == other.spec
+        if isinstance(other, dict):
+            return self.spec == other
+        return NotImplemented
+
+    def __repr__(self) -> str:
+        return f"PurposeTaskSpec(task_id={self.spec.get('task_id')!r}, has_eval_suite={self.eval_suite is not None})"
+
+    # --- eval_suite (the benchmark) --------------------------------------
+    @property
+    def eval_suite(self) -> dict[str, Any] | None:
+        """The RAW declared eval_suite (as stored), or None. Use `normalized_eval_suite()` for the gate-ready
+        form with defaults filled."""
+        return self.spec.get(EVAL_SUITE_FIELD)
+
+    def normalized_eval_suite(self) -> dict[str, Any] | None:
+        """The gate-ready normalized eval_suite (defaults filled from the canonical gate constants), or None."""
+        return eval_suite_for(self)
+
+    def with_eval_suite(self, suite: dict[str, Any], *, model_built: bool | None = None,
+                        normalize: bool = True) -> "PurposeTaskSpec":
+        """Return a NEW PurposeTaskSpec carrying `suite` as its eval_suite. By default the suite is NORMALIZED
+        + validated immediately (defaults filled from the canonical gate constants; an invalid suite raises
+        ValueError now, not at gate time — fail-closed). Pass normalize=False to store the raw suite verbatim
+        (still validated). `model_built` overrides the inferred model-built flag for the non-empty-examples
+        rule; when None it is inferred from the spec (build_mode/mode/model_built)."""
+        mb = _is_model_built(self.spec) if model_built is None else bool(model_built)
+        stored = _es.normalize_eval_suite(suite, model_built=mb) if normalize else suite
+        if not normalize:
+            errs = _es.validate_eval_suite(suite, model_built=mb)
+            if errs:
+                raise ValueError("invalid eval_suite: " + "; ".join(errs))
+        new = dict(self.spec)
+        new[EVAL_SUITE_FIELD] = stored
+        return PurposeTaskSpec(new)
+
+
+__all__ = [
+    "provision", "run_current", "run_current_guarded", "evaluate_health", "adapt", "rollback",
+    "PurposeTaskSpec", "eval_suite_for", "EVAL_SUITE_FIELD",
+]

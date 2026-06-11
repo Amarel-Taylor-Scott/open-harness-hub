@@ -5,7 +5,9 @@ PurposeTask is a Teleon concept (purpose/capability-provisioned self-adapting ex
 from __future__ import annotations
 
 from src.teleon.purpose_tasks.purpose_task import (
-    adapt, evaluate_health, provision, rollback, run_current, run_current_guarded,
+    adapt, eval_suite_for, evaluate_health, provision, rollback, run_current, run_current_guarded,
+    EVAL_SUITE_FIELD, PurposeTaskSpec,
 )
 
-__all__ = ["provision", "run_current", "run_current_guarded", "evaluate_health", "adapt", "rollback"]
+__all__ = ["provision", "run_current", "run_current_guarded", "evaluate_health", "adapt", "rollback",
+           "PurposeTaskSpec", "eval_suite_for", "EVAL_SUITE_FIELD"]

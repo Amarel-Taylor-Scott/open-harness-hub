@@ -5,9 +5,10 @@ PurposeTask is a Teleon concept (purpose/capability-provisioned self-adapting ex
 from __future__ import annotations
 
 from src.teleon.purpose_tasks.projections import (
-    CUSTOMER_RUN_FIELDS, CUSTOMER_SPEC_FIELDS, STAFF_ONLY_FORBIDDEN_IN_CUSTOMER,
+    CUSTOMER_EVAL_FIELDS, CUSTOMER_RUN_FIELDS, CUSTOMER_SPEC_FIELDS, STAFF_ONLY_FORBIDDEN_IN_CUSTOMER,
     customer_projection, customer_view_is_clean, staff_projection,
 )
 
 __all__ = ["staff_projection", "customer_projection", "customer_view_is_clean",
-           "CUSTOMER_SPEC_FIELDS", "CUSTOMER_RUN_FIELDS", "STAFF_ONLY_FORBIDDEN_IN_CUSTOMER"]
+           "CUSTOMER_SPEC_FIELDS", "CUSTOMER_RUN_FIELDS", "STAFF_ONLY_FORBIDDEN_IN_CUSTOMER",
+           "CUSTOMER_EVAL_FIELDS"]

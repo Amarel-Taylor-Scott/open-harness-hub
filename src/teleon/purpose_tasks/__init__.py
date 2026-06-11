@@ -11,6 +11,16 @@ docs/architecture/purpose-task-self-adapting-execution.md.
 This package is the minimal PoC of that motion, composed entirely from the built substrate
 (src/teleon/experiments/*) — no second runtime, ledger, or registry.
 """
-from .purpose_task import provision, run_current, evaluate_health, adapt
+from .purpose_task import (
+    adapt,
+    eval_suite_for,
+    evaluate_health,
+    provision,
+    run_current,
+    PurposeTaskSpec,
+    EVAL_SUITE_FIELD,
+)
+from . import eval_suite
 
-__all__ = ["provision", "run_current", "evaluate_health", "adapt"]
+__all__ = ["provision", "run_current", "evaluate_health", "adapt",
+           "PurposeTaskSpec", "eval_suite_for", "EVAL_SUITE_FIELD", "eval_suite"]

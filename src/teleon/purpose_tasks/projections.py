@@ -45,6 +45,28 @@ def _allow(d: dict[str, Any], fields: tuple[str, ...]) -> dict[str, Any]:
     return {k: d[k] for k in fields if k in d}
 
 
+#: customer-visible eval_suite summary fields (allowlist — deny by default). NOTE: `examples` is ABSENT on
+#: purpose: an example's `expected` is an ANSWER KEY (the same staff-only class as a prompt/candidate code) —
+#: only the shape (id, count, gate threshold, holdout policy, judge, gate basis) and a `benchmark_ref` (which
+#: names a suite, not its answers) reach the customer.
+CUSTOMER_EVAL_FIELDS = (
+    "suite_id", "benchmark_ref", "gate_threshold", "holdout_policy", "judge", "gate_basis",
+    "example_count", "source",
+)
+
+
+def _eval_contract_summary(suite: Any) -> dict[str, Any] | None:
+    """Derive the customer-safe eval_suite summary (allowlist; the `expected` answer key never appears). For
+    an inline suite the example COUNT is surfaced (derived) even if the raw suite hasn't been normalized.
+    Returns None when the task declares no eval_suite."""
+    if not isinstance(suite, dict):
+        return None
+    out = {k: suite[k] for k in CUSTOMER_EVAL_FIELDS if k in suite}
+    if "example_count" not in out and isinstance(suite.get("examples"), list):
+        out["example_count"] = len(suite["examples"])  # derived count — never the examples themselves
+    return out or None
+
+
 def customer_projection(spec: dict[str, Any], runs: list[dict[str, Any]] | None = None) -> dict[str, Any]:
     """Customer-safe view, built by ALLOWLIST (deny-by-default). Shows purpose · connected systems · allowed/
     forbidden capabilities · health · outputs + receipts + source handles · cost/latency · approvals — NEVER
@@ -56,6 +78,13 @@ def customer_projection(spec: dict[str, Any], runs: list[dict[str, Any]] | None 
         "connected_to": spec.get("connected_to", []),
         "forbidden_capabilities": caps.get("forbidden", []),
     }
+    # eval_suite (the benchmark that defines DONE) — a SAFE SUMMARY, never the raw suite: the customer sees
+    # THAT a benchmark gates their capability + its shape (id, example count, gate threshold, holdout policy,
+    # judge), but NEVER the example `expected` outputs — the answer key is staff-only (deny-by-default, same
+    # class as prompts/candidate code). benchmark_ref is shown (it names a suite, it is not the answers).
+    eval_summary = _eval_contract_summary(spec.get("eval_suite"))
+    if eval_summary is not None:
+        safe_spec["eval_contract"] = eval_summary
     safe_runs = [_allow(r, CUSTOMER_RUN_FIELDS) for r in (runs or [])]
     # pending boundary-expansion approvals (customer-actionable) — surfaced as a safe summary if present
     approvals = [
@@ -84,4 +113,5 @@ def customer_view_is_clean(view: dict[str, Any]) -> bool:
 
 
 __all__ = ["staff_projection", "customer_projection", "customer_view_is_clean",
-           "CUSTOMER_SPEC_FIELDS", "CUSTOMER_RUN_FIELDS", "STAFF_ONLY_FORBIDDEN_IN_CUSTOMER"]
+           "CUSTOMER_SPEC_FIELDS", "CUSTOMER_RUN_FIELDS", "STAFF_ONLY_FORBIDDEN_IN_CUSTOMER",
+           "CUSTOMER_EVAL_FIELDS"]

@@ -11,6 +11,35 @@
     "output_contract": {"type": "string", "description": "schema ref the task produces (Y); STABLE across variants so connected_to consumers never break"},
     "success_criteria": {"type": "object", "description": "MEASURABLE health thresholds (e.g. max_cost, min_source_handles, latency_sla, held_out leaks = 0); drift below these triggers exactly one governed adaptation cycle"},
     "promotion_criteria": {"type": "object", "description": "the gates a modified variant must beat to replace the current impl (cost_tolerance, equivalence, handle-coverage, held-out, safety); promotion is authorized only by a passing PathPromotionDecision"},
+    "build_mode": {"type": "string", "enum": ["auto", "model", "deterministic"], "description": "how the capability behind this task is built/performed (mirrors the runtime's run mode). 'model' = a MODEL builds/performs it (an inline eval_suite must then carry >=1 example — a model can't be gated on an empty suite); 'deterministic' = a fixed implementation; 'auto' = model if a route is reachable, else deterministic."},
+    "model_built": {"type": "boolean", "description": "explicit flag that the capability is model-built (equivalent to build_mode='model' for the eval_suite non-empty rule). Either signal makes eval_suite_for require >=1 inline example."},
+    "eval_suite": {
+      "type": "object", "additionalProperties": true,
+      "description": "THE BENCHMARK AS THE SPEC (optional but, when present, fully constrained): the evaluation system that DEFINES done, which the runtime gate scores a candidate against and the compiler refuses to bypass. Declare EITHER an inline `examples` suite (the same {input, expected, weight?} rows the live runtime executes + scores by exact match, split train/holdout) OR a `benchmark_ref` to a named registry suite — exactly one (XOR enforced in src/teleon/purpose_tasks/eval_suite.py, which the in-repo proofs call). `gate_threshold`/`holdout_policy` DEFAULT from the single canonical source (scripts.teleon_local_runtime PROMOTE_AT / TRAIN_PARITY) and are never re-typed. Consumed via src.teleon.purpose_tasks.eval_suite_for(spec).",
+      "required": ["suite_id"],
+      "properties": {
+        "suite_id": {"type": "string", "minLength": 1, "description": "stable id of this eval suite (content/version-hashed; never truncation-only)"},
+        "examples": {
+          "type": "array", "minItems": 1,
+          "description": "INLINE suite (XOR benchmark_ref): the labeled rows the deterministic judge scores. Even indices are TRAIN, odd are HOLDOUT (the runtime's index-parity split); a model-built capability MUST have ≥1 (enforced in eval_suite.py).",
+          "items": {
+            "type": "object", "additionalProperties": true, "required": ["input", "expected"],
+            "properties": {
+              "input": {"description": "the example input fed to the capability"},
+              "expected": {"description": "the answer key the judge scores the output against (STAFF-ONLY in projections — never surfaced to a customer)"},
+              "weight": {"type": "number", "minimum": 0, "description": "optional relative weight of this example (default 1.0)"}
+            }
+          }
+        },
+        "benchmark_ref": {"type": "string", "minLength": 1, "description": "NAMED registry suite (XOR examples): resolved by src.teleon.purpose_tasks.eval_suite.resolve_benchmark_ref against a supplied registry — an unregistered ref raises honestly, never a fabricated suite. The named-suite registry is the documented follow-up."},
+        "gate_threshold": {"type": "number", "minimum": 0, "maximum": 1, "description": "pass-rate a candidate must clear to promote; DEFAULT = scripts.teleon_local_runtime.PROMOTE_AT (single-sourced, never re-typed)"},
+        "holdout_policy": {"type": "string", "description": "how the suite is split into train/holdout; DEFAULT derived from scripts.teleon_local_runtime.TRAIN_PARITY (e.g. 'index_parity:even=train,odd=holdout')"},
+        "gate_basis": {"type": "string", "description": "the basis the threshold is evaluated over (e.g. 'train+holdout' — both splits must clear); stamped from scripts.teleon_local_runtime.GATE_BASIS at normalization"},
+        "judge": {"type": "string", "enum": ["deterministic", "local_model", "frontier_judge", "human"], "description": "how outputs are scored; same vocabulary as schemas/benchmark.schema.json judge. Default deterministic (exact match)."},
+        "source": {"type": "string", "enum": ["inline", "benchmark_ref"], "description": "which carrier defines DONE (stamped at normalization)"},
+        "example_count": {"type": "integer", "minimum": 0, "description": "count of inline examples (stamped at normalization; derived, never authored as a separate truth)"}
+      }
+    },
     "connected_to": {"type": "array", "items": {"type": "string"}, "description": "consumer systems that depend on this task's output (the blast radius)"},
     "resources": {"type": "object", "description": "what the task may draw on: templates, skill slots, capability slots, provider graph"},
     "current_impl_id": {"type": "string", "description": "the implementation currently bound as the cheap deterministic hot path (set at provision time)"},
