@@ -22,6 +22,7 @@ both with sorted keys). stdlib + PyYAML only; no ``src.baltor`` / ``src.openharn
 from __future__ import annotations
 
 import json
+import math
 import re
 from typing import Any
 
@@ -30,6 +31,36 @@ import yaml
 #: Kubernetes object names must be DNS-1123 labels (lowercase alphanumeric + '-', start/end alphanumeric, ≤63).
 _K8S_NAME_MAX = 63
 _DNS1123_SUB = re.compile(r"[^a-z0-9-]+")
+
+#: Fly guest cpu presets are INTEGER vCPU counts; a Kubernetes cpu quantity ("500m","2","250m","1") — the shape the
+#: resource class carries — must be translated to a whole-core count for the fly_machine ``guest.cpus`` field. One
+#: definition of the conversion (1 core = 1000 millicores), CEIL so we never UNDER-provision, floor at MIN_FLY_CPUS.
+#: CANONICAL TRANSLATION — kept byte-identical with scripts/deploy/teleon_machines_runner.py::_cpu_to_fly_cpus
+#: (MILLICORES_PER_CORE / MIN_FLY_CPUS / the parse + ceil + floor). The emitter is the LOWER layer (the runner imports
+#: emit_fly_machine FROM here; emit imports nothing back — dependency law), so this is the single source the runner
+#: should adopt. FOLLOW-UP: have the runner import _cpu_to_fly_cpus from this module and delete its private copy, so
+#: there is exactly ONE definition; until that one-line runner edit lands, the runner reads the SAME resource-class
+#: string (unit.resources.cpu) and applies the SAME formula, so emitter and runner can never disagree on the result.
+_MILLICORES_PER_CORE = 1000          # 1 vCPU = 1000 millicores (Kubernetes cpu unit) — one definition, no parallel literal
+_MIN_FLY_CPUS = 1                    # a Fly machine guest has at least 1 vCPU (floor)
+_CPU_QUANTITY_RE = re.compile(r"([0-9]*\.?[0-9]+)(m?)")  # a Kubernetes cpu quantity: a number with an optional 'm' (milli) suffix
+
+
+def _cpu_to_fly_cpus(cpu_quantity: str) -> int:
+    """Translate a Kubernetes CPU quantity ('500m','2','250m','1') from the resource class into a whole Fly guest
+    vCPU count (Fly's ``guest.cpus`` is an integer preset, not a millicore string). CEIL millicores to a core (never
+    under-provision) and floor at ``_MIN_FLY_CPUS``. Deterministic; one millicores-per-core definition.
+
+    Kept byte-identical with ``scripts/deploy/teleon_machines_runner.py::_cpu_to_fly_cpus`` (its canonical sibling) —
+    see the constant comment above for the single-source plan."""
+    s = str(cpu_quantity).strip()
+    m = _CPU_QUANTITY_RE.fullmatch(s)
+    if not m:
+        # honest fallback: an unexpected CPU shape gets the minimum guest (matches the runner's same fallback).
+        return _MIN_FLY_CPUS
+    value = float(m.group(1))
+    millicores = value if m.group(2) == "m" else value * _MILLICORES_PER_CORE
+    return max(_MIN_FLY_CPUS, int(math.ceil(millicores / _MILLICORES_PER_CORE)))
 
 
 def _k8s_name(capability_id: str) -> str:
@@ -67,10 +98,12 @@ def emit_fly_machine(unit: dict) -> str:
         "image": unit["container"]["image"],
         "env": env,
         "guest": {
-            # Fly guests are sized by named presets; we carry the resolved cpu/memory from the resource class so the
-            # operator picks a matching preset (cpu string + memory_mb come straight from worker_resource_classes).
+            # Fly guests are sized by named presets; memory_mb comes straight from the resource class. ``cpus`` MUST be
+            # a whole-vCPU INTEGER (a Fly create rejects a millicore string like '500m'), so we translate the
+            # resource-class cpu quantity here — the config is VALID at the source, not only after a launcher fixes it.
+            # The raw resource-class cpu STRING is preserved losslessly in metadata.teleon_cpu_request below.
             "cpu_kind": "shared",
-            "cpus": res["cpu"],
+            "cpus": _cpu_to_fly_cpus(res["cpu"]),
             "memory_mb": res["memory_mb"],
         },
         "metadata": {
@@ -79,6 +112,9 @@ def emit_fly_machine(unit: dict) -> str:
             "capability_version": str(unit["capability_version"]),
             "runtime_class": unit["runtime_class"],
             "backend": unit["backend"],
+            # lossless: keep the EXACT resource-class cpu request (the Kubernetes quantity, e.g. '500m') alongside the
+            # translated integer guest.cpus, so the millicore intent is never lost in the fly_machine shape.
+            "teleon_cpu_request": res["cpu"],
             "otel": unit["logging"]["otel_attrs"],
             "generated": GENERATED_MARK,
         },
