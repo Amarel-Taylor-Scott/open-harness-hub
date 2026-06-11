@@ -15,6 +15,25 @@ capability against its example suite right now:
     so a model cannot promote by parroting an answer key it saw in its own prompt;
   * everything persists to disk (restart-safe) under dist/local-services-state/teleon-runtime/.
 
+Runs can be ASYNC (opt-in). A suite can issue up to 8 model calls × 120s, and a fronting proxy
+(e.g. Fly's) cuts a connection that long — after which a blind UI retry would double-bump the
+version. POST {"async": true} therefore persists a PENDING run record and returns
+202 {run_id, status:"running"} at once; a background WORKER thread executes the suite and
+finalizes the same run_id to a terminal status (promoted | candidate | rolled-back | failed).
+Clients poll GET /runs?run_id=… for status. The PLAIN POST (no "async" flag) stays the
+SYNCHRONOUS default — execute now, answer 201 with the finished run — because the generated
+web/teleon/teleon-live.js client depends on exactly that contract.
+
+Async admission is ONE RUN PER CAPABILITY AT A TIME: while a capability has an async run in
+flight, the same account's re-POST gets the SAME running run back (so a proxy-cut client can
+retry blind — no second run, no second version bump), and a DIFFERENT account's request is
+rejected 409. Concurrency model: a global lock guards only the short read-modify-write of shared
+state (caps / runs index / file appends), never the long model calls — so runs of DIFFERENT
+capabilities overlap. A PER-CAPABILITY lock serializes one capability's runs end-to-end (async
+and queued sync runs of the SAME cap never race its version). An optional idempotency_key on
+POST returns the SAME run_id if replayed, even after the run finished. A run left "running" by a
+crash is swept to "interrupted" on startup (older than RUNNING_SWEEP_STALE_S) — never stuck.
+
 Mutations are session-gated against the identity service (realm `teleon`), the same pattern as
 scripts/registry_local_service.py: the account is resolved server-side; the client never asserts
 who it is. Reads are open (local demo plane). Nothing here is "truth" beyond what it really did:
@@ -23,11 +42,19 @@ deterministic code ran, receipts recorded. Port lives in architecture/local_serv
 Endpoints
   GET  /healthz                                  → {ok}
   GET  /api/teleon/<realm>/capabilities          → {capabilities: [...]}
-  POST /api/teleon/<realm>/runs                  → {run} (executes NOW; session required)
-  GET  /api/teleon/<realm>/runs?session_id=…     → {runs: [...]} (the account's)
+  POST /api/teleon/<realm>/runs                  → 201 {run} — SYNC default: executes NOW, returns the
+                                                   finished run (the generated UI's contract; session
+                                                   required; optional idempotency_key dedupes replays)
+       body {"async": true}                      → 202 {run_id, status:"running", run} immediately; the
+                                                   suite runs on a worker thread. One run per capability
+                                                   at a time: the same account's re-POST returns the
+                                                   running run (idempotent retry), another account → 409
+  GET  /api/teleon/<realm>/runs?session_id=…     → {runs: [...]} (the account's, latest status)
+  GET  /api/teleon/<realm>/runs?run_id=…         → {run} (one run's current status — for polling)
   GET  /api/teleon/<realm>/evidence?run_id=…     → {receipts: [...]}
 
-Offline, stdlib-only.  --self-test exercises the whole lifecycle in-process.
+Offline, stdlib-only.  --self-test exercises the whole lifecycle in-process, plus the HTTP
+contract (201 sync / 202 async / 409 busy) over an ephemeral loopback server.
 """
 from __future__ import annotations
 
@@ -67,6 +94,20 @@ REFINE_SHOWN_MAX = 3          # max failed TRAIN inputs quoted in one refine pro
 GATE_BASIS = "train+holdout"  # promotion requires BOTH split pass-rates ≥ PROMOTE_AT on the full suite
 DETERMINISTIC_GATE_NOTE = "deterministic reference run — model not exercised"
 RATE_DECIMALS = 2             # display rounding for scores/pass-rates; receipts keep exact pass/fail
+
+# --- async run lifecycle -----------------------------------------------------
+# A run is created PENDING (status RUNNING) at POST time, then a worker thread executes the suite
+# and finalizes it to one TERMINAL status. These are the only values GET /runs ever reports.
+STATUS_RUNNING = "running"            # persisted at enqueue; worker not finished yet
+STATUS_INTERRUPTED = "interrupted"    # a RUNNING run a restart abandoned — swept on startup, never stuck
+STATUS_FAILED = "failed"             # the worker raised before reaching the gate (honest, not silent)
+# decision values double as terminal statuses: promoted | candidate | rolled-back (see execute()).
+TERMINAL_STATUSES = ("promoted", "candidate", "rolled-back", STATUS_FAILED, STATUS_INTERRUPTED)
+# A run still "running" longer than this when the process (re)starts was abandoned by a crash/restart
+# (the worker thread does not survive a process exit) → sweep it to interrupted. Generous vs. the
+# worst-case suite cost (≤ 8 model calls × ~120s ≈ 16 min) so a genuinely in-flight run is never
+# mislabelled across a same-process check; only a fresh process start sweeps.
+RUNNING_SWEEP_STALE_S = 30 * 60       # 30 minutes (> worst-case suite wall-clock), unit: seconds
 
 
 def _example_split(index: int) -> str:
@@ -190,16 +231,43 @@ def _sha(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()[:16]
 
 
+class CapabilityBusyError(Exception):
+    """An ASYNC run was requested for a capability that already has one in flight, by a DIFFERENT
+    account. (The SAME account gets the running run back instead — the idempotent retry path; see
+    Runtime.submit_run.) The HTTP layer answers 409."""
+
+    def __init__(self, cap_id: str, run_id: str) -> None:
+        super().__init__(f"capability {cap_id} already has a run in flight ({run_id}); "
+                         "one run per capability at a time — poll it or retry after it finishes")
+        self.cap_id = cap_id
+        self.run_id = run_id
+
+
 class Runtime:
     def __init__(self) -> None:
         STATE_DIR.mkdir(parents=True, exist_ok=True)
         self.caps_path = STATE_DIR / "capabilities.json"
         self.runs_path = STATE_DIR / "runs.jsonl"
         self.receipts_path = STATE_DIR / "receipts.jsonl"
-        # ONE lock: ThreadingHTTPServer runs handlers on parallel threads, so every
-        # read-modify-write of caps/runs/receipts state (and the file writes) serializes here —
-        # otherwise concurrent runs race the version bump and corrupt the append-only files.
+        # GLOBAL lock: guards only the SHORT read-modify-write of shared state (caps map, the runs
+        # index, the append-only file writes) — NOT the long model calls. ThreadingHTTPServer
+        # dispatches handlers on parallel threads and a background worker per run also touches this
+        # state, so every such window serializes here, but two runs' model calls still overlap.
         self._lock = threading.Lock()
+        # PER-CAPABILITY locks: a run holds its cap's lock for its whole lifetime (enqueue→finalize)
+        # so two runs of the SAME capability serialize on its version, while DIFFERENT caps run in
+        # parallel. Created lazily under _lock; never the global lock for the duration of model calls.
+        self._cap_locks: dict[str, threading.Lock] = {}
+        # idempotency_key → run_id, so a replayed POST returns the same run (no double version bump).
+        self._idem: dict[str, str] = {}
+        # ASYNC admission state: capability_id → its ONE in-flight async run_id (one run per
+        # capability at a time). Registered at enqueue, cleared by the worker's finally. The same
+        # account's re-POST gets the running run back (idempotent retry — a proxy-cut client can
+        # retry blind without double-bumping); a DIFFERENT account raises CapabilityBusyError
+        # (HTTP 409). Synchronous runs never register here — they keep their original
+        # queue-on-the-cap-lock behavior. In-memory on purpose: workers don't survive a process
+        # exit, so a fresh process has no in-flight runs (the startup sweep handles their records).
+        self._inflight_by_cap: dict[str, str] = {}
         if self.caps_path.exists():
             self.caps = json.loads(self.caps_path.read_text(encoding="utf-8"))
         else:
@@ -208,11 +276,63 @@ class Runtime:
                                "examples": len(c["examples"])}
                          for cid, c in CAPABILITIES.items()}
             self._save_caps()
-        self.runs = [json.loads(line) for line in self.runs_path.read_text(encoding="utf-8").splitlines()] \
-            if self.runs_path.exists() else []
+        # runs.jsonl is an append-only EVENT log: a run_id appears once at enqueue (status running)
+        # and again at finalize (terminal). Fold to latest-line-wins so self.runs is the live view.
+        self.run_index: dict[str, dict] = {}
+        self.runs: list[dict] = []
+        if self.runs_path.exists():
+            for line in self.runs_path.read_text(encoding="utf-8").splitlines():
+                if not line.strip():
+                    continue
+                rec = json.loads(line)
+                rid = rec["run_id"]
+                if rid in self.run_index:
+                    self.run_index[rid].update(rec)  # later line wins (e.g. running → terminal)
+                else:
+                    self.run_index[rid] = rec
+                    self.runs.append(rec)              # ordered list aliases the index dicts
+            for rid, key in ((r["run_id"], r.get("idempotency_key")) for r in self.runs):
+                if key:
+                    self._idem[key] = rid
+        self._sweep_interrupted_runs()  # restart-safety: no run is left "running" forever
 
     def _save_caps(self) -> None:
         self.caps_path.write_text(json.dumps(self.caps, indent=1), encoding="utf-8")
+
+    def _cap_lock(self, cap_id: str) -> threading.Lock:
+        with self._lock:
+            lk = self._cap_locks.get(cap_id)
+            if lk is None:
+                lk = self._cap_locks[cap_id] = threading.Lock()
+            return lk
+
+    def _persist_run(self, run: dict) -> None:
+        """Append one run event and refresh the in-memory view. Caller holds self._lock."""
+        rid = run["run_id"]
+        existing = self.run_index.get(rid)
+        if existing is None:
+            self.run_index[rid] = run
+            self.runs.append(run)
+        else:
+            existing.update(run)  # mutate in place so self.runs (which aliases it) updates too
+        with self.runs_path.open("a", encoding="utf-8") as fh:
+            fh.write(json.dumps(run) + "\n")
+
+    def _sweep_interrupted_runs(self) -> None:
+        """Startup restart-safety: a run still RUNNING after a process (re)start was abandoned by a
+        crash/restart (worker threads don't survive process exit). Any RUNNING row older than
+        RUNNING_SWEEP_STALE_S is rewritten to INTERRUPTED, losslessly (a new event line; the
+        original enqueue line is preserved). Fresh RUNNING rows from the current process are left
+        alone — they belong to live workers."""
+        now = int(time.time())
+        with self._lock:
+            stale = [r for r in self.runs
+                     if r.get("status") == STATUS_RUNNING
+                     and now - int(r.get("at", now)) >= RUNNING_SWEEP_STALE_S]
+            for r in stale:
+                self._persist_run({**r, "status": STATUS_INTERRUPTED,
+                                   "interrupted_at": now,
+                                   "note": "run was RUNNING at process start — abandoned by restart"})
 
     @staticmethod
     def _instruction(cap_id: str) -> str:
@@ -269,8 +389,96 @@ class Runtime:
             rates.append(sum(r["pass"] for r in rows) / len(rows) if rows else 0.0)
         return rates[0], rates[1]
 
-    def execute(self, cap_id: str, account_id: str, mode: str = "auto", route=None) -> dict:
-        """REALLY run the capability suite and apply the promotion gate.
+    def submit_run(self, cap_id: str, account_id: str, mode: str = "auto", route=None,
+                   idempotency_key: str | None = None, background: bool = True) -> dict:
+        """ENQUEUE a run. background=True (the ASYNC path, POST {"async": true}): return the
+        PENDING record (status RUNNING) at once and execute the suite on a worker thread.
+        background=False (the SYNCHRONOUS path — the server default, and what execute() wraps):
+        run inline and return the TERMINAL record. The slow model calls happen OUTSIDE the global
+        lock either way; only the short enqueue/finalize windows serialize.
+
+        ASYNC ADMISSION — one run per capability at a time: while cap_id has an async run in
+        flight, the SAME account's re-POST returns that running run unchanged (a proxy-cut client
+        may retry blind: no second run, no new reservation, the version can never double-bump),
+        and a DIFFERENT account's request raises CapabilityBusyError (HTTP 409). Synchronous runs
+        skip admission and queue on the capability lock, exactly as before async existed.
+
+        Idempotency: a replayed POST carrying the same idempotency_key returns the SAME run_id
+        (and does not reserve a new version) even after the run finished, so a keyed retry can
+        never double-bump either.
+
+        Version reservation: the next version is reserved per-capability under that cap's lock so
+        two runs of the SAME cap reserve distinct, contiguous versions and never race; DIFFERENT
+        caps reserve in parallel. The reserved version is committed to the capability's visible
+        state at finalize, after the gate decision."""
+        route = route if route is not None else resolve_route()
+        # ENQUEUE (fast): reserve the version + persist the pending record under the GLOBAL lock,
+        # then return. The POST NEVER blocks on a model call or on another same-cap run's worker.
+        with self._lock:
+            if idempotency_key and idempotency_key in self._idem:
+                return dict(self.run_index[self._idem[idempotency_key]])  # replay → same run
+            if background:  # async admission — BEFORE reserving, so a busy cap burns no version
+                inflight_id = self._inflight_by_cap.get(cap_id)
+                if inflight_id is not None:
+                    inflight = self.run_index.get(inflight_id, {})
+                    if inflight.get("account_id") == account_id:
+                        return dict(inflight)  # same-account retry → the running run, nothing new
+                    raise CapabilityBusyError(cap_id, inflight_id)
+            state = self.caps[cap_id]
+            # Version RESERVATION is a per-cap monotonic high-water, distinct from the COMMITTED
+            # version (which only advances at finalize). Reserving under the global lock guarantees
+            # two runs of the SAME cap get distinct, contiguous versions and never race; different
+            # caps reserve in parallel. A still-running reservation is never re-handed out.
+            reserved = max(state["version"], state.get("version_reserved", state["version"])) + 1
+            state["version_reserved"] = reserved
+            run_id = f"run_{int(time.time() * 1000):x}_v{reserved}_{cap_id}"
+            pending = {"run_id": run_id, "capability_id": cap_id,
+                       "capability": CAPABILITIES[cap_id]["name"], "account_id": account_id,
+                       "status": STATUS_RUNNING, "version": reserved, "mode_requested": mode,
+                       "at": int(time.time())}
+            if idempotency_key:
+                pending["idempotency_key"] = idempotency_key
+                self._idem[idempotency_key] = run_id
+            if background:  # async: claim the capability's single in-flight slot
+                self._inflight_by_cap[cap_id] = run_id
+            self._persist_run(pending)
+        if not background:  # inline path (sync default + self-test): run now, return terminal
+            return self._worker_body(run_id, cap_id, account_id, mode, route, reserved)
+        # Snapshot BEFORE starting the worker: pending aliases the live run_index record, and an
+        # instant worker could finalize it before this function returns — the 202 must always
+        # describe the ENQUEUE event (status "running"), never a race result. Pollers see live state.
+        snapshot = dict(pending)
+        worker = threading.Thread(
+            target=self._worker_body,
+            args=(run_id, cap_id, account_id, mode, route, reserved),
+            name=f"teleon-run-{run_id}", daemon=True)
+        worker.start()
+        self._last_worker = worker  # test/observability handle; not load-bearing
+        return snapshot
+
+    def _worker_body(self, run_id: str, cap_id: str, account_id: str, mode: str, route,
+                     reserved: int) -> dict:
+        """Worker: hold THIS capability's lock for the run (so two runs of the SAME cap don't
+        interleave their execute/finalize — DIFFERENT caps run in parallel), execute the suite, and
+        finalize. The slow model calls happen inside the per-cap lock but OUTSIDE the global lock, so
+        cross-cap concurrency is preserved. Version distinctness is already guaranteed by the
+        reservation, so submit_run never has to block on this lock.
+
+        The async in-flight slot is freed HERE (finally) — the one funnel every path shares
+        (terminal, failed, even an error escaping finalize) — so a capability can never stay
+        'busy' after its worker is gone. The pop is conditional on the run_id because sync runs
+        never claim the slot and must not free someone else's."""
+        try:
+            with self._cap_lock(cap_id):
+                return self._run_to_completion(run_id, cap_id, account_id, mode, route, reserved)
+        finally:
+            with self._lock:
+                if self._inflight_by_cap.get(cap_id) == run_id:
+                    del self._inflight_by_cap[cap_id]
+
+    def _run_to_completion(self, run_id: str, cap_id: str, account_id: str, mode: str, route,
+                           reserved: int) -> dict:
+        """REALLY run the capability suite and apply the promotion gate, then FINALIZE the run.
 
         mode 'model' (the product path): the MODEL performs the capability per example via the
         provider-neutral chat route; one self-refine round when the gate isn't cleared, both
@@ -278,19 +486,16 @@ class Runtime:
         (the honest fallback when no model route is reachable — labeled, never disguised).
         The gate itself is deterministic on purpose: evidence judges, models build.
 
-        GATE BASIS (train+holdout): the suite always runs in FULL, but promotion requires the
-        TRAIN and the HOLDOUT pass-rates to BOTH clear PROMOTE_AT. The refine prompt may quote
-        failed TRAIN inputs, never any expected output (see _refined_instruction), so a model
-        cannot promote by copying an answer key. The whole read-modify-write — version bump,
-        caps/runs/receipts state and file appends — serializes on self._lock because
-        ThreadingHTTPServer dispatches handlers on parallel threads.
-        """
+        The model calls below run WITHOUT the global lock (so different caps overlap); only the
+        short finalize window — append receipts, commit the reserved version, rewrite the run from
+        RUNNING to its terminal status — takes self._lock.
+
+        GATE BASIS (train+holdout): the suite always runs in FULL, but promotion requires the TRAIN
+        and the HOLDOUT pass-rates to BOTH clear PROMOTE_AT. The refine prompt may quote failed
+        TRAIN inputs, never any expected output (see _refined_instruction), so a model cannot
+        promote by copying an answer key."""
         spec = CAPABILITIES[cap_id]
-        route = route if route is not None else resolve_route()
-        with self._lock:
-            state = self.caps[cap_id]
-            # version is part of the id: two rapid runs of one capability must never collide
-            run_id = f"run_{int(time.time() * 1000):x}_v{state['version'] + 1}_{cap_id}"
+        try:
             use_model = mode in ("model", "auto") and route.health()
             attempts = 0
             model_note = None
@@ -322,48 +527,77 @@ class Runtime:
                 executed_mode, model_id = "deterministic", None
                 if mode == "model":
                     model_note = "model mode requested but no route reachable — ran the reference implementation instead"
-            total = len(spec["examples"])
-            score = round(passed / total, RATE_DECIMALS)
-            # promotion needs BOTH splits ≥ PROMOTE_AT: even a fully leaked prompt could only
-            # game what the prompt contains, never the holdout. Lower tiers stay on the overall
-            # score, exactly as before.
-            decision = ("promoted" if train_rate >= PROMOTE_AT and hold_rate >= PROMOTE_AT else
-                        "candidate" if score >= CANDIDATE_AT else "rolled-back")
-            state["version"] += 1
+        except Exception as exc:  # a worker crash must surface as FAILED, never leave it RUNNING
+            return self._finalize_failed(run_id, cap_id, reserved, exc)
+
+        total = len(spec["examples"])
+        score = round(passed / total, RATE_DECIMALS)
+        # promotion needs BOTH splits ≥ PROMOTE_AT: even a fully leaked prompt could only game what
+        # the prompt contains, never the holdout. Lower tiers stay on the overall score.
+        decision = ("promoted" if train_rate >= PROMOTE_AT and hold_rate >= PROMOTE_AT else
+                    "candidate" if score >= CANDIDATE_AT else "rolled-back")
+        run = {"run_id": run_id, "capability_id": cap_id, "capability": spec["name"],
+               "account_id": account_id, "score": score, "passed": passed, "total": total,
+               "train_pass_rate": round(train_rate, RATE_DECIMALS),
+               "holdout_pass_rate": round(hold_rate, RATE_DECIMALS),
+               # literal honesty field: no example's expected output entered any prompt —
+               # guaranteed by _refined_instruction, enforced by the parrot regression test
+               "holdout_contaminated": False,
+               "gate_basis": GATE_BASIS,
+               # decision is the terminal STATUS; "decision" is kept for back-compat with readers
+               "decision": decision, "status": decision, "version": reserved,
+               "at": int(time.time()),
+               "mode": executed_mode, "model_id": model_id, "attempts": attempts,
+               "duration_us": sum(r["duration_us"] for r in receipts)}
+        if executed_mode == "deterministic":
+            run["gate_note"] = DETERMINISTIC_GATE_NOTE  # honest provenance: gate cleared by code
+        if model_note:
+            run["note"] = model_note
+        for r in receipts:  # every receipt carries the run's gate evidence (self-contained audit rows)
+            r["train_pass_rate"] = run["train_pass_rate"]
+            r["holdout_pass_rate"] = run["holdout_pass_rate"]
+            r["holdout_contaminated"] = False
+        with self._lock:  # short finalize window: commit version + status, append receipts + run
+            state = self.caps[cap_id]
+            state["version"] = max(state["version"], reserved)  # commit the reserved version
             state["status"] = decision
             state["last_score"] = score
             state["last_mode"] = executed_mode
             self._save_caps()
-            run = {"run_id": run_id, "capability_id": cap_id, "capability": spec["name"],
-                   "account_id": account_id, "score": score, "passed": passed, "total": total,
-                   "train_pass_rate": round(train_rate, RATE_DECIMALS),
-                   "holdout_pass_rate": round(hold_rate, RATE_DECIMALS),
-                   # literal honesty field: no example's expected output entered any prompt —
-                   # guaranteed by _refined_instruction, enforced by the parrot regression test
-                   "holdout_contaminated": False,
-                   "gate_basis": GATE_BASIS,
-                   "decision": decision, "version": state["version"], "at": int(time.time()),
-                   "mode": executed_mode, "model_id": model_id, "attempts": attempts,
-                   "duration_us": sum(r["duration_us"] for r in receipts)}
-            if executed_mode == "deterministic":
-                # honest provenance: this gate was cleared by reference code, not a model
-                run["gate_note"] = DETERMINISTIC_GATE_NOTE
-            if model_note:
-                run["note"] = model_note
-            for r in receipts:  # every receipt carries the run's gate evidence (self-contained audit rows)
-                r["train_pass_rate"] = run["train_pass_rate"]
-                r["holdout_pass_rate"] = run["holdout_pass_rate"]
-                r["holdout_contaminated"] = False
-            self.runs.append(run)
-            with self.runs_path.open("a", encoding="utf-8") as fh:
-                fh.write(json.dumps(run) + "\n")
             with self.receipts_path.open("a", encoding="utf-8") as fh:
                 for r in receipts:
                     fh.write(json.dumps(r) + "\n")
-            return run
+            self._persist_run(run)  # RUNNING → terminal (latest-line-wins)
+        return run
+
+    def _finalize_failed(self, run_id: str, cap_id: str, reserved: int, exc: Exception) -> dict:
+        """Worker error path: finalize the run as FAILED (honest), commit the reserved version so
+        numbering stays contiguous, but do NOT change the capability's status/score (a crash is not
+        a gate verdict)."""
+        run = {"run_id": run_id, "capability_id": cap_id,
+               "capability": CAPABILITIES[cap_id]["name"], "version": reserved,
+               "status": STATUS_FAILED, "decision": STATUS_FAILED, "at": int(time.time()),
+               "error": f"{type(exc).__name__}: {exc}"}
+        with self._lock:
+            state = self.caps[cap_id]
+            state["version"] = max(state["version"], reserved)  # keep version numbering contiguous
+            self._save_caps()
+            self._persist_run(run)
+        return run
+
+    def execute(self, cap_id: str, account_id: str, mode: str = "auto", route=None) -> dict:
+        """Synchronous entrypoint: enqueue + run inline, returning the TERMINAL run record. This
+        backs the server's DEFAULT plain-POST path (and in-process callers/tests); the opt-in
+        {"async": true} path uses submit_run(background=True) and is polled instead."""
+        return self.submit_run(cap_id, account_id, mode=mode, route=route, background=False)
+
+    def get_run(self, run_id: str) -> dict | None:
+        with self._lock:
+            run = self.run_index.get(run_id)
+            return dict(run) if run else None
 
     def receipts_for(self, run_id: str) -> list[dict]:
-        with self._lock:  # consistent snapshot: never read a half-appended line mid-execute()
+        with self._lock:  # consistent snapshot: never read a half-appended line mid-finalize
             text = self.receipts_path.read_text(encoding="utf-8") if self.receipts_path.exists() else ""
         return [r for r in map(json.loads, text.splitlines()) if r["run_id"] == run_id]
 
@@ -418,6 +652,13 @@ class Handler(BaseHTTPRequestHandler):
         if what == "capabilities":
             return self._send(200, {"capabilities": sorted(RT.caps.values(), key=lambda c: c["id"])})
         if what == "runs":
+            # ?run_id=… → poll ONE run's current status (open read, like evidence: a run_id is an
+            # opaque handle the 202 just handed back). ?session_id=… → the account's run list (gated).
+            run_id = (qs.get("run_id") or [""])[0]
+            if run_id:
+                run = RT.get_run(run_id)
+                return self._send(200 if run else 404,
+                                  {"run": run} if run else {"error": f"unknown run {run_id}"})
             account = _validate_session(realm, (qs.get("session_id") or [""])[0])
             if not account:
                 return self._send(401, {"error": "a valid realm session is required"})
@@ -446,14 +687,33 @@ class Handler(BaseHTTPRequestHandler):
         mode = str(body.get("mode") or "auto")
         if mode not in ("auto", "model", "deterministic"):
             return self._send(400, {"error": "mode must be auto | model | deterministic"})
-        return self._send(201, {"run": RT.execute(cap_id, account, mode=mode)})
+        idem = body.get("idempotency_key")
+        idem = str(idem) if idem else None
+        if body.get("async"):
+            # ASYNC (opt-in): enqueue + return 202 immediately with the PENDING record (status
+            # running); the suite (≤ 8 model calls × 120s) executes on a worker thread, out of any
+            # fronting proxy's connection window. Poll GET /runs?run_id=… . One run per capability
+            # at a time: the same account's retry gets the SAME running run back (never a second
+            # run, never a double version bump); another account's concurrent request → 409.
+            try:
+                pending = RT.submit_run(cap_id, account, mode=mode, idempotency_key=idem,
+                                        background=True)
+            except CapabilityBusyError as busy:
+                return self._send(409, {"error": str(busy), "capability_id": busy.cap_id,
+                                        "run_id": busy.run_id})
+            return self._send(202, {"run_id": pending["run_id"], "status": pending["status"],
+                                    "run": pending})
+        # SYNC default (backward compatible — the generated web/teleon/teleon-live.js contract):
+        # execute NOW and answer 201 with the finished run. idempotency_key replays still dedupe.
+        run = RT.submit_run(cap_id, account, mode=mode, idempotency_key=idem, background=False)
+        return self._send(201, {"run": run})
 
     def log_message(self, *args) -> None:  # quiet
         pass
 
 
 def _self_test() -> int:
-    global RT
+    global RT, _validate_session
     import tempfile
     fails: list[str] = []
 
@@ -581,16 +841,238 @@ def _self_test() -> int:
            and versions[-new_n:] == list(range(v0 + 1, v0 + new_n + 1)))
         ids = [r["run_id"] for r in rt.runs]
         ck("concurrent executes: run ids unique", len(ids) == len(set(ids)))
-        reloaded_runs = [json.loads(line) for line in
-                         rt.runs_path.read_text(encoding="utf-8").splitlines()]
+        # runs.jsonl is an APPEND-ONLY EVENT log (running line + terminal line per run): every line
+        # must parse, and the DISTINCT run_ids on disk must equal the folded in-memory view.
+        disk_lines = [json.loads(line) for line in
+                      rt.runs_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+        disk_ids = {l["run_id"] for l in disk_lines}
         disk_caps = json.loads(rt.caps_path.read_text(encoding="utf-8"))
-        ck("state files intact after concurrent writes (every line parses, counts match)",
-           len(reloaded_runs) == len(rt.runs)
+        ck("state files intact after concurrent writes (every line parses, distinct ids match view)",
+           len(disk_ids) == len(rt.runs) and disk_ids == {r["run_id"] for r in rt.runs}
            and disk_caps["cap-redact"]["version"] == v0 + new_n)
+
+        # ===================================================================
+        #  ASYNC RUN LIFECYCLE  (the P1 work)
+        # ===================================================================
+        # A slow route whose model calls take SLOW_S each; one clean attempt issues SUITE_CALLS
+        # model calls, so a SYNCHRONOUS run would take ≥ SUITE_CALLS × SLOW_S — an async POST that
+        # returns much faster PROVES it did not block on the suite.
+        SLOW_S = 0.25
+        SUITE_CALLS = len(CAPABILITIES["cap-cite"]["examples"])  # one attempt = one call per example
+        SUITE_MIN_SYNC_S = SUITE_CALLS * SLOW_S  # lower bound on a synchronous one-attempt suite
+
+        def slow_route(cap: str, started=None, ended=None):
+            class SlowRoute:
+                model_id = "slow-fake-model"
+                def health(self) -> bool:
+                    return True
+                def complete(self, system, user, **kw):
+                    if started is not None:
+                        started.append(time.perf_counter())
+                    time.sleep(SLOW_S)
+                    if ended is not None:
+                        ended.append(time.perf_counter())
+                    return CAPABILITIES[cap]["impl"](user)
+            return SlowRoute()
+
+        def poll(run_id: str, timeout: float = 30.0) -> dict:
+            deadline = time.time() + timeout
+            while time.time() < deadline:
+                r = rt.get_run(run_id)
+                if r and r["status"] in TERMINAL_STATUSES:
+                    return r
+                time.sleep(0.01)
+            return rt.get_run(run_id)
+
+        # (1) async POST returns FAST with a pending record — before a slow suite could finish.
+        t0 = time.perf_counter()
+        pend = rt.submit_run("cap-cite", "acct_test", mode="model",
+                             route=slow_route("cap-cite"), background=True)
+        submit_dt = time.perf_counter() - t0
+        ck("async: POST returns immediately with {run_id, status:running} (well before a slow suite)",
+           pend["status"] == STATUS_RUNNING and "run_id" in pend
+           and submit_dt < SUITE_MIN_SYNC_S / 2)
+        ck("async: a freshly-enqueued run is observable as 'running' before it finishes",
+           (rt.get_run(pend["run_id"]) or {}).get("status") == STATUS_RUNNING)
+        # (1b) status transitions running → terminal, receipts land, version commits.
+        term = poll(pend["run_id"])
+        ck("async: status transitions running → terminal (promoted) with real score + receipts",
+           term["status"] == "promoted" and term["score"] == 1.0
+           and len(rt.receipts_for(pend["run_id"])) == SUITE_CALLS)
+        ck("async: the terminal version was committed to the capability state",
+           rt.caps["cap-cite"]["version"] == term["version"])
+
+        # (2) two DIFFERENT caps run CONCURRENTLY — their model-call windows overlap.
+        sd1, ed1, sd2, ed2 = [], [], [], []
+        pa = rt.submit_run("cap-dates", "acct_test", mode="model",
+                           route=slow_route("cap-dates", sd1, ed1), background=True)
+        pb = rt.submit_run("cap-redact", "acct_test", mode="model",
+                           route=slow_route("cap-redact", sd2, ed2), background=True)
+        ra, rb = poll(pa["run_id"]), poll(pb["run_id"])
+        # overlap proof: the two workers' execution INTERVALS intersect — one cap started before the
+        # other finished. Impossible if a single lock had serialized the slow model calls (cap B
+        # would only begin after cap A's whole suite drained). Interval A = [min(sd1), max(ed1)].
+        overlap = (bool(sd1 and sd2 and ed1 and ed2)
+                   and max(min(sd1), min(sd2)) < min(max(ed1), max(ed2)))
+        ck("async: two DIFFERENT capabilities execute concurrently (call intervals overlap)",
+           overlap and ra["status"] == "promoted" and rb["status"] == "promoted")
+
+        # (3) IDEMPOTENCY: a replayed POST with the same key returns the SAME run_id and the
+        #     capability version is bumped exactly ONCE (no double-bump from a UI retry).
+        v_idem = rt.caps["cap-json-guard"]["version"]
+        key = "client-key-abc123"
+        i1 = rt.submit_run("cap-json-guard", "acct_test", mode="deterministic",
+                           idempotency_key=key, background=True)
+        i2 = rt.submit_run("cap-json-guard", "acct_test", mode="deterministic",
+                           idempotency_key=key, background=True)
+        ti1 = poll(i1["run_id"])
+        ck("async idempotency: replayed key returns the SAME run_id (no second run)",
+           i1["run_id"] == i2["run_id"])
+        ck("async idempotency: the capability version bumped exactly ONCE (no double-bump)",
+           rt.caps["cap-json-guard"]["version"] == v_idem + 1 and ti1["status"] == "promoted")
+        idem_runs = [r for r in rt.runs if r.get("idempotency_key") == key]
+        ck("async idempotency: exactly one run carries the key", len(idem_runs) == 1)
+
+        # (4) RESTART SAFETY: a process restart sweeps any stale 'running' row to 'interrupted'
+        #     (older than RUNNING_SWEEP_STALE_S), never leaving it 'running' forever; a FRESH
+        #     'running' row is left alone, and the sweep is lossless (original line preserved).
+        stale_at = int(time.time()) - (RUNNING_SWEEP_STALE_S + 5)
+        with rt._lock:
+            rt._persist_run({"run_id": "run_stale_v99_cap-dates", "capability_id": "cap-dates",
+                             "capability": "Date normalizer", "account_id": "acct_test",
+                             "status": STATUS_RUNNING, "version": 99, "at": stale_at})
+            rt._persist_run({"run_id": "run_fresh_v100_cap-dates", "capability_id": "cap-dates",
+                             "capability": "Date normalizer", "account_id": "acct_test",
+                             "status": STATUS_RUNNING, "version": 100, "at": int(time.time())})
+        rt_restart = Runtime()  # simulate a process restart over the same state dir → startup sweep
+        swept = rt_restart.get_run("run_stale_v99_cap-dates")
+        kept = rt_restart.get_run("run_fresh_v100_cap-dates")
+        ck("restart sweep: a stale 'running' run becomes 'interrupted' (never stuck running)",
+           swept is not None and swept["status"] == STATUS_INTERRUPTED)
+        ck("restart sweep: a fresh 'running' run is NOT swept (belongs to a live worker)",
+           kept is not None and kept["status"] == STATUS_RUNNING)
+        stale_events = [json.loads(line) for line
+                        in rt_restart.runs_path.read_text(encoding="utf-8").splitlines()
+                        if line.strip() and json.loads(line)["run_id"] == "run_stale_v99_cap-dates"]
+        ck("restart sweep is lossless: original 'running' line preserved before 'interrupted'",
+           [e["status"] for e in stale_events] == [STATUS_RUNNING, STATUS_INTERRUPTED])
+
+        # (5) WORKER CRASH: an error escaping the suite finalizes the run 'failed' — never stuck
+        #     'running' — and does NOT corrupt the capability's gate verdict.
+        class HealthCrash:
+            model_id = "crash"
+            def health(self) -> bool:
+                raise RuntimeError("route blew up")  # escapes the per-example try in _suite
+        v_crash = rt.caps["cap-redact"]["version"]
+        status_before = rt.caps["cap-redact"]["status"]
+        crashed = rt.submit_run("cap-redact", "acct_test", mode="model",
+                                route=HealthCrash(), background=False)
+        ck("async crash: a worker error finalizes 'failed' (never stuck 'running'), with the error",
+           crashed["status"] == STATUS_FAILED and "route blew up" in crashed.get("error", ""))
+        ck("async crash: a crash does not change the capability's gate verdict, version stays contiguous",
+           rt.caps["cap-redact"]["status"] == status_before
+           and rt.caps["cap-redact"]["version"] == v_crash + 1)
+
+        # ===================================================================
+        #  HTTP CONTRACT: sync 201 default · async 202 opt-in · 409 busy · idempotent retry
+        # ===================================================================
+        # A real loopback ThreadingHTTPServer with a hermetic identity stub — this is the layer
+        # the generated web/teleon/teleon-live.js (sync, expects 201 + finished {run}) and async
+        # pollers actually talk to, so the status codes are asserted literally.
+        import urllib.error
+        sessions = {"tok-a": "acct_test", "tok-b": "acct_other"}
+        real_validate, real_rt = _validate_session, RT
+        _validate_session = lambda realm, sid: sessions.get(sid)  # noqa: E731 — hermetic identity
+        RT = rt
+        httpd = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        threading.Thread(target=httpd.serve_forever, daemon=True).start()
+        base = f"http://127.0.0.1:{httpd.server_address[1]}/api/teleon/local"
+
+        def call(method: str, path: str, payload: dict | None = None) -> tuple[int, dict]:
+            data = json.dumps(payload).encode("utf-8") if payload is not None else None
+            req = urllib.request.Request(base + path, data=data, method=method,
+                                         headers={"Content-Type": "application/json"})
+            try:
+                with urllib.request.urlopen(req, timeout=10) as resp:
+                    return resp.status, json.loads(resp.read().decode("utf-8"))
+            except urllib.error.HTTPError as err:
+                return err.code, json.loads(err.read().decode("utf-8") or "{}")
+
+        gate = threading.Event()
+
+        class GateRoute:  # holds a model suite in flight until the test opens the gate
+            model_id = "gated-test-model"
+            def health(self) -> bool:
+                return True
+            def complete(self, system, user, **kw):
+                if not gate.wait(timeout=30):
+                    raise TimeoutError("self-test gate never opened")
+                return CAPABILITIES["cap-cite"]["impl"](user)
+
+        try:
+            # (6) SYNC DEFAULT unchanged — the generated teleon-live.js contract: 201 + finished run.
+            cs, bs = call("POST", "/runs", {"session_id": "tok-a", "capability_id": "cap-dates",
+                                            "mode": "deterministic"})
+            ck("HTTP sync default: plain POST answers 201 with the FINISHED run (generated-UI contract)",
+               cs == 201 and bs["run"]["decision"] == "promoted" and bs["run"]["score"] == 1.0)
+            ck("HTTP: no session → 401 (mutations stay gated)",
+               call("POST", "/runs", {"capability_id": "cap-dates"})[0] == 401)
+
+            # (7) ASYNC lifecycle over HTTP: 202 {run_id, status:running} → poll → terminal.
+            ca, ba = call("POST", "/runs", {"session_id": "tok-a", "async": True,
+                                            "capability_id": "cap-dates", "mode": "deterministic"})
+            ck("HTTP async opt-in: 202 {run_id, status:running} immediately",
+               ca == 202 and ba["status"] == STATUS_RUNNING and ba["run_id"])
+            done = poll(ba["run_id"])
+            cg, bg = call("GET", f"/runs?run_id={ba['run_id']}")
+            ck("HTTP async poll: GET runs?run_id= reaches the terminal record",
+               cg == 200 and bg["run"]["status"] == "promoted"
+               and bg["run"]["run_id"] == ba["run_id"] and done["status"] == "promoted")
+            ck("HTTP async poll: unknown run_id → 404",
+               call("GET", "/runs?run_id=run_nope")[0] == 404)
+
+            # (8) 409 ON CONCURRENT + RETRY-NO-DOUBLE-VERSION, against a run HELD in flight by the
+            #     gate (deterministic — no sleep-based timing).
+            v_cite = rt.caps["cap-cite"]["version"]
+            held = rt.submit_run("cap-cite", "acct_test", mode="model", route=GateRoute(),
+                                 background=True)
+            ck("async admission: the held run is live and 'running'",
+               (rt.get_run(held["run_id"]) or {}).get("status") == STATUS_RUNNING)
+            cr, br = call("POST", "/runs", {"session_id": "tok-a", "async": True,
+                                            "capability_id": "cap-cite", "mode": "model"})
+            ck("idempotent retry: same account + same in-flight capability → the SAME running run",
+               cr == 202 and br["run_id"] == held["run_id"] and br["status"] == STATUS_RUNNING)
+            co, bo = call("POST", "/runs", {"session_id": "tok-b", "async": True,
+                                            "capability_id": "cap-cite", "mode": "model"})
+            ck("409 on concurrent: a DIFFERENT account hits the in-flight capability",
+               co == 409 and "error" in bo and bo.get("capability_id") == "cap-cite"
+               and bo.get("run_id") == held["run_id"])
+            gate.set()
+            held_done = poll(held["run_id"])
+            new_cite = [r for r in rt.runs if r["capability_id"] == "cap-cite"
+                        and r.get("version", 0) > v_cite]
+            ck("retry never double-bumps: ONE new run, ONE version bump, terminal promoted",
+               held_done["status"] == "promoted"
+               and rt.caps["cap-cite"]["version"] == v_cite + 1
+               and len(new_cite) == 1 and new_cite[0]["run_id"] == held["run_id"])
+            cf, bf = call("POST", "/runs", {"session_id": "tok-b", "async": True,
+                                            "capability_id": "cap-cite", "mode": "deterministic"})
+            freed = poll(bf["run_id"]) if cf == 202 else {}
+            ck("capability freed after completion: the previously-409'd account is admitted",
+               cf == 202 and bf["run_id"] != held["run_id"] and freed.get("status") == "promoted"
+               and freed.get("account_id") == "acct_other")
+        finally:
+            gate.set()  # never leave a gated worker blocked, even if an assertion threw
+            httpd.shutdown()
+            httpd.server_close()
+            _validate_session, RT = real_validate, real_rt
     STATE_DIR = real_state
     print("\n" + ("PASS — teleon_local_runtime: REAL capability execution with receipts, a "
-                  "train+holdout promotion gate (no answer-key leakage), locked concurrent "
-                  "state, and restart-safe persistence."
+                  "train+holdout promotion gate (no answer-key leakage), opt-in ASYNC runs "
+                  "(202 + worker thread, one in-flight run per capability with 409 conflicts "
+                  "and idempotent same-account retries that never double-bump, interrupted-"
+                  "sweep), the unchanged 201 sync default, locked concurrent state, and "
+                  "restart-safe persistence."
                   if not fails else f"{len(fails)} FAILURES: {fails}"))
     return 0 if not fails else 1
 
@@ -608,7 +1090,8 @@ def main(argv: list[str] | None = None) -> int:
     bind_host = os.environ.get("OH_BIND_HOST", "127.0.0.1")  # 0.0.0.0 only in container deploys
     httpd = ThreadingHTTPServer((bind_host, port), Handler)
     print(f"Teleon local runtime → http://{bind_host}:{port}  "
-          f"({len(RT.caps)} capabilities, {len(RT.runs)} recorded runs, gate ≥{PROMOTE_AT})")
+          f"({len(RT.caps)} capabilities, {len(RT.runs)} recorded runs, gate ≥{PROMOTE_AT}, "
+          f"sync POST→201; async POST {{\"async\": true}}→202, poll GET /runs?run_id=…)")
     try:
         httpd.serve_forever()
     finally:
