@@ -86,13 +86,31 @@ python -m scripts.deploy.teleon_machines_runner --plan   <unit.json> # the creat
 python -m scripts.deploy.teleon_machines_runner --launch <unit.json> # create→poll→complete→teardown (needs token)
 ```
 
-## Topology addition needed (for the topology owner — NOT applied here)
+## Deployment model on Fly — CO-RESIDENT with the teleon-runtime (decided 2026-06-11)
 
-The runner targets a **new Fly app** that is **not yet** in `architecture/deploy_topology.json`. The runner reads
-its app/region from the topology's `fly` block (`<app_prefix>-teleon-runner`, primary region) and an operator can
-override with `FLY_RUNNER_APP` / `FLY_RUNNER_REGION` / `FLY_MACHINES_API`. To make it a first-class deploy target,
-the **topology owner** (this runner edits no topology) should add a `control`-kind service mirroring
-`worker-controller`:
+`--watch` (added 2026-06-11) makes the runner a real daemon: it polls the **compiled-unit registry**
+(`dist/local-services-state/teleon-compiler/compiled-units.jsonl`) and launches every ACTIVE unit it hasn't
+launched yet (one receipt per launch ⇒ idempotent), launching for real with a token and printing an honest plan
+without one. `--watch --once` does a single pass (cron-shaped).
+
+**The deciding constraint:** that registry is written by the **teleon-runtime** app (its auto-compile-on-promotion
+step). On Fly, separate apps do **not** share volumes — so a *separate* `aidr-teleon-runner` app could not see the
+registry. The correct design is therefore **co-resident**: the runner ships in the **same image** as the
+teleon-runtime (it already does — `COPY . .`) and reads the **same volume**. Two ways to run it co-resident,
+both real:
+
+- **Ops / on-demand:** `fly ssh console -a aidr-teleon-runtime` → `python3 -m scripts.deploy.teleon_machines_runner
+  --watch` (or `--launch <unit_id>`). The token is the teleon-runtime app's `FLY_API_TOKEN` (add the
+  `fly-controller` secret group to the teleon-runtime app; scope it `machines:write`).
+- **Always-on:** start the `--watch` loop as a background thread/process inside the teleon-runtime machine
+  (the image carries it). This is the path to "promote → compile → register → **launch**" with zero operator
+  steps; it is the documented next wiring (a small supervisor in the runtime entrypoint), deliberately not yet
+  applied so the launch trigger stays explicit until the owner provisions Fly + the token.
+
+A standalone `control`-kind app is viable ONLY if the registry is made network-reachable (a registry API on the
+runtime, or the compiled-unit registry moved to the shared Postgres in phase-2). Until then, **do not add a
+separate `aidr-teleon-runner` app** — it would have an empty registry. The earlier sketch below is retained as the
+network-reachable-registry variant, not the current recommendation:
 
 ```jsonc
 {

@@ -549,12 +549,79 @@ def cmd_launch(source: str) -> int:
     return 0 if ok else 1
 
 
+#: how often --watch polls the compiled-unit registry for newly-active units (the deploy lag
+#: between a capability promoting and its runtime launching; matches the controller's cadence feel)
+WATCH_POLL_SECONDS = 30
+
+
+def launched_unit_ids(receipts_path: Path = RUNNER_RECEIPTS_PATH) -> set:
+    """unit_ids the runner has already launched (a receipt per launch) — watch never re-launches one."""
+    if not receipts_path.is_file():
+        return set()
+    seen = set()
+    for line in receipts_path.read_text(encoding="utf-8").splitlines():
+        try:
+            seen.add(json.loads(line)["unit_id"])
+        except (json.JSONDecodeError, KeyError):
+            continue
+    return seen
+
+
+def watch_once(*, registry_log: Path | None = None, runner: "Runner | None" = None,
+               token: str | None = None, cfg: dict | None = None,
+               receipts_path: Path = RUNNER_RECEIPTS_PATH, emit=print) -> dict:
+    """ONE watch pass: launch every ACTIVE compiled unit not yet launched. With a token → real
+    launch + receipt; without → an honest plan log (no fake launch). Returns a summary."""
+    from src.teleon.compiler import open_registry
+    reg = open_registry(log_path=registry_log) if registry_log else open_registry()
+    already = launched_unit_ids(receipts_path)
+    # list_active() returns the compiled UNITS directly (the per-capability deploy snapshot)
+    pending = [u for u in reg.list_active()
+               if u.get("unit_id") not in already and u.get("exec_target") == LAUNCH_EXEC_TARGET]
+    launched, planned, refused = [], [], []
+    for unit in pending:
+        try:
+            assert_launchable(unit)
+        except LaunchRefused as exc:
+            refused.append((unit.get("unit_id"), str(exc)))
+            continue
+        if runner is not None:                       # token present (or fake API in the self-test)
+            runner.launch(unit)
+            launched.append(unit["unit_id"])
+        else:                                        # honest degradation: plan, never a fake launch
+            emit(f"# WOULD launch {unit['unit_id']} (active, promoted, not yet launched) — "
+                 f"set FLY_API_TOKEN to make it real")
+            planned.append(unit["unit_id"])
+    return {"active_pending": [u["unit_id"] for u in pending],
+            "launched": launched, "planned": planned, "refused": refused}
+
+
+def cmd_watch(once: bool = False) -> int:
+    """Run as the aidr-teleon-runner app: poll the compiled-unit registry and launch newly-active
+    units. With a token → real launches; without → honest plans (live the moment a token exists)."""
+    cfg = _runner_config()
+    token = os.environ.get("FLY_API_TOKEN", "")
+    runner = Runner(RunnerMachinesAPI(cfg["api_base"], token, cfg["app"]), cfg) if token else None
+    mode = "LAUNCHING" if runner else "PLANNING (no FLY_API_TOKEN — honest dry-run, live on token)"
+    print(f"# teleon-machines-runner --watch [{mode}] app={cfg['app']!r} every {WATCH_POLL_SECONDS}s", flush=True)
+    while True:
+        summary = watch_once(token=token, runner=runner, cfg=cfg)
+        if summary["launched"] or summary["planned"] or summary["refused"]:
+            print(json.dumps({"watch_tick": summary}, sort_keys=True), flush=True)
+        if once:
+            return 0
+        time.sleep(WATCH_POLL_SECONDS)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--self-test", action="store_true",
                         help="offline invariants: fake clock + fake Machines API (no network)")
     parser.add_argument("--launch", metavar="UNIT", help="launch a compiled unit (unit JSON file or unit_id)")
     parser.add_argument("--plan", metavar="UNIT", help="print the create plan for a unit (no launch, no token)")
+    parser.add_argument("--watch", action="store_true",
+                        help="run as the aidr-teleon-runner app: poll the registry + launch new active units")
+    parser.add_argument("--once", action="store_true", help="with --watch: a single pass, then exit")
     args = parser.parse_args(argv)
     if args.self_test:
         return self_test()
@@ -562,6 +629,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_plan(args.plan)
     if args.launch:
         return cmd_launch(args.launch)
+    if args.watch:
+        return cmd_watch(once=args.once)
     parser.print_help()
     return 0
 
@@ -805,6 +874,27 @@ def self_test() -> int:  # noqa: C901 — a flat checklist reads clearer than he
     no_token_exit, created_anything = _no_token_probe(unit)
     checks.append(("no-token: --launch without FLY_API_TOKEN is an honest dry-run (exit 3, NO launch)",
                    no_token_exit == 3 and not created_anything))
+
+    # 13. WATCH MODE (the aidr-teleon-runner app): poll the registry, launch each active unit ONCE -------------
+    import tempfile as _tempfile
+    from src.teleon.compiler import open_registry as _open_reg
+    _wd = Path(_tempfile.mkdtemp())
+    _reg_log = _wd / "compiled-units.jsonl"
+    _open_reg(log_path=_reg_log).register(unit)               # one active, promoted, fly_machine unit
+    _wr = _wd / "runner-receipts.jsonl"
+    _wclock = _FakeClock()
+    _wapi = _FakeMachinesAPI(states=["started", "stopped"], exit_code=0)
+    _wrunner = Runner(_wapi, cfg, clock=_wclock, sleep=_wclock.sleep, receipts_path=_wr)
+    _s1 = watch_once(registry_log=_reg_log, runner=_wrunner, receipts_path=_wr, emit=lambda *_a: None)
+    checks.append(("watch: launches a new active unit (1 launched, 1 machine created)",
+                   _s1["launched"] == [unit["unit_id"]] and _wapi.create_calls == 1))
+    _s2 = watch_once(registry_log=_reg_log, runner=_wrunner, receipts_path=_wr, emit=lambda *_a: None)
+    checks.append(("watch: an already-launched unit is SKIPPED (idempotent — no re-launch)",
+                   _s2["launched"] == [] and _wapi.create_calls == 1))
+    _s3 = watch_once(registry_log=_reg_log, runner=None,
+                     receipts_path=_wd / "fresh.jsonl", emit=lambda *_a: None)
+    checks.append(("watch: a NO-TOKEN pass PLANS the active unit, never launches (honest dry-run)",
+                   _s3["planned"] == [unit["unit_id"]] and _s3["launched"] == []))
 
     failed = [name for name, ok in checks if not ok]
     for name, ok in checks:
