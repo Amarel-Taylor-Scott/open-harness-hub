@@ -2188,3 +2188,28 @@ Airbyte 5 / Mem0 4 / Reducto 4 / Zep 4 / Respan 4 (THE FOIL — "self-driving" =
 v1.6.1, threat ≤2, vocabulary convergence only; wrap candidates). Canonical doc:
 docs/strategy/yc-context-landscape-2026-06.md. Memories: kaelio-ktx updated,
 yc-context-landscape-2026-06 + fly-deploy-layer-built added.
+
+## 2026-06-11 (cont 2) — "Continue with all": provisioning CLI + 13 wrap-candidates + YC draft + full adversarial sweep
+
+PROVISIONING (long-promised, now real): scripts/provision_access.py — owner CLI register→
+onboard(all steps)→login→mint scoped key→verify, append-only receipts (identifier hashed,
+key prefix-only; RAW KEY NEVER IN ARTIFACTS — self-test asserts it), share bundle without the
+raw key, grant-reviewer via the registry admin endpoint; --self-test 8/8 (in-process identity,
+idempotent re-run takes the login path, wrong secret fails closed); LIVE smoke on the running
+plane: registered owner@aidoneright.dev on openharnesshub, 3 onboarding steps, key minted+
+verified end-to-end. FACTORY (warrant: landscape research, 2-source-verified per company):
+13 wrap-candidate adapters admitted as catalog rows (kaelio-ktx ×3, zep-graphiti, reducto,
+exa, firecrawl, recall-ai, deepeval, litellm, ijfw ×2, hud) — lifecycle experimental,
+candidate/wrap tags, provenance → the landscape doc, lift PENDING stated in every description
+(discovery ≠ trust); validator caught my invented enum values (transport/capability/industry)
+→ mapped to real vocabulary ids; fast path green: validate ok, id-index +13, 13 pages built,
+--check-fresh 2,655 components. YC DRAFT (owner-gated): docs/strategy/
+yc-application-draft-2026-06.md — every claim repo-backed, computed numbers marked for
+regeneration, competitive lines from the verified landscape, owner asks listed. ADVERSARIAL
+SWEEP (all PASS): OHH route audit 92/92 + honest live catalog (1,883 cards, no fabricated
+lift); port --check byte-for-byte (116 files); check_model_plane PASS with .env sourced
+(earlier 2 "failures" were my shell lacking the gitignored .env — services had it; not a
+regression); family + handoff self-tests PASS; teleon gate 19/19 incl. a live model-built
+run; compose config valid (docker compose v5); controller 12/12, generator 12/12 + --check.
+.env.example documents the new deploy seams + Fly controller envs. Also committed the
+leftover journey-2 dashboard ?token= recorder fix.

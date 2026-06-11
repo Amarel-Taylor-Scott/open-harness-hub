@@ -1,0 +1,39 @@
+id: "adapter/litellm-gateway"
+type: adapter
+version: "0.1.0"
+name: "LiteLLM gateway (routing backend candidate)"
+description: |
+  Wraps LiteLLM (YC W23, the de-facto OSS LLM gateway: 100+
+  providers behind an OpenAI-compatible surface) as a ROUTING BACKEND
+  candidate behind the Teleon inference port. OIPS keeps receipts, policy,
+  and allowed-use enforcement; LiteLLM supplies provider fan-out and
+  fallbacks. Never a second source of routing truth — the provider graph
+  stays canonical in architecture/model_provider_graph.json.
+  WRAP CANDIDATE (discovery ≠ trust): admitted from the 2026-06 YC/tool
+  landscape research as a governed CANDIDATE behind a port — its output is
+  never served as truth, it is sandboxed, and measured lift is PENDING
+  (two-axis gate: lift AND structural durability) before any promotion.
+  Landscape record: docs/strategy/yc-context-landscape-2026-06.md.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "cross_industry"]
+capability: ["routing", "serving"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "external"
+tags: ["candidate", "wrap", "litellm", "gateway", "routing"]
+created: "2026-06-11"
+updated: "2026-06-11"
+
+transport: "openai_compatible"
+capabilities: ["multi_provider_routing", "fallbacks", "openai_compatible_proxy"]
+auth: "byok"
+cost_model: "self_hosted"
+endpoint: "http://localhost:4000"
+default_model: "none"
+
+provenance:
+  collected_through: "yc-context-landscape research 2026-06-11 (4-agent verified sweep)"
+  sources:
+    - "docs/strategy/yc-context-landscape-2026-06.md"

@@ -392,7 +392,7 @@ async function baltorJourney(page, h) {
   // live ops — reached via the operator tower’s real link in journey-3; here it is the
   // documented operator surface (recorded as a deep link until the product nav links it)
   await h.hud('Live ops — the operator surface (deep link recorded; product nav linking it is queued)');
-  await h.go('http://127.0.0.1:8001/dashboard.html', null, 3200);
+  await h.go(`http://127.0.0.1:8001/dashboard.html?token=${encodeURIComponent(TOKEN)}`, null, 3200);
   await h.pause(1200);
   await h.click('#run', 'Run Full Pipeline — REAL run: real stages, real inference receipt, real events');
   await h.pause(16000);
