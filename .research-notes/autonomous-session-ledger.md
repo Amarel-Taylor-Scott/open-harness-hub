@@ -2076,3 +2076,18 @@ false); run-full-pipeline (109s) emits inference.completed with executed_node
 model.ollama_local@candidate, receipt-backed. Governance held end to end: model output remains a
 candidate; deterministic answers remain served truth. NEXT: OHH /api/run executor (task 34);
 cloud keys drop into .env when provided (OpenRouter/Ollama-cloud = same adapter, different node).
+
+## 2026-06-11 (cloud keys) — Ollama Cloud live as the primary route; OpenRouter staged
+
+**Warrant: owner provided keys.** Probed both live: OpenRouter key VALID but ZERO CREDITS
+(models list OK; completions 402; :free variants 404/429) — staged in .env with the drop-in
+lines, flip when credits added. **Ollama Cloud works**: ministral-3:8b 0.9s, qwen3-next:80b 1.4s.
+Primary route switched to qwen3-next:80b (https://ollama.com/v1); embeddings stay LOCAL nomic
+(promotable, fast, free). All 12 service groups restarted on the new plane. PROOF AT CLOUD SPEED:
+cold /api/build with selection+narrative 33s (was 2m22s on CPU); Teleon MODEL-BUILT run 12s,
+4/4 first attempt → promoted (was 118s + refine on gemma). Recorder gained selective re-record
+with report-merge; ffmpeg helper restored at Playwright's expected path (ubuntu26.04 has no
+upstream build — the owner-authorized static binary serves both paths). Re-filming journeys
+1/2/4 at cloud speed. CodeStrap research saved to memory (closest thesis-foil; X-Reason =
+NL→compiled XState, Palantir-coupled; validates Teleon determinism; adapter-candidate only).
+Deep-dive scouts launched for Baltor/Teleon/OHH dependency maps (owner-requested).

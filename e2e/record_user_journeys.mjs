@@ -502,8 +502,14 @@ const JOURNEYS = [
   { id: 'site-template-registry', title: 'Shared Template Registry — the internal template plane', fn: planeJourney('template-registry', 'Shared Template Registry.html', 'Shared Template Registry — the 14-section shell + mixins') },
 ];
 
+// selective re-record: `node record_user_journeys.mjs journey-1-… journey-4-…` records only those
+// ids and MERGES their results into the existing report (the other entries survive untouched)
+const ONLY = process.argv.slice(2).filter((a) => !a.startsWith('-'));
+const TO_RECORD = ONLY.length ? JOURNEYS.filter((j) => ONLY.includes(j.id)) : JOURNEYS;
+if (ONLY.length) console.log(`selective re-record: ${TO_RECORD.map((j) => j.id).join(', ')}`);
+
 console.log(`native video: ${HAS_NATIVE_VIDEO ? 'ON (webm + mp4)' : 'OFF — webm only'} · ${SIZE.width}×${SIZE.height} · OHH: ${base.host}${base.public ? ' (PUBLIC)' : ''} · Teleon: ${tBase.host}${tBase.public ? ' (PUBLIC)' : ''}\n`);
-for (const j of JOURNEYS) {
+for (const j of TO_RECORD) {
   console.log(`=== recording ${j.id} ===`);
   const { browser, context } = await launchRecorder();
   const page = await context.newPage();
@@ -531,7 +537,16 @@ for (const j of JOURNEYS) {
   console.log(`  [done] ${out ? (out.mp4 || out.webm) : 'NO VIDEO'} · ${h.chapters.length} chapters · ${h.frictions.length} frictions · ${consoleErrors.length} console errors`);
 }
 
-writeFileSync(join(DIRS.reports, 'user-journeys.json'), JSON.stringify({ generated_at: new Date().toISOString(), size: SIZE, results }, null, 1));
+let allResults = results;
+if (ONLY.length) {
+  // merge into the existing report so untouched journeys keep their entries
+  const reportPath = join(DIRS.reports, 'user-journeys.json');
+  const prior = existsSync(reportPath) ? JSON.parse(readFileSync(reportPath, 'utf-8')).results || [] : [];
+  const byId = new Map(prior.map((r) => [r.id, r]));
+  for (const r of results) byId.set(r.id, r);
+  allResults = JOURNEYS.map((j) => byId.get(j.id)).filter(Boolean);
+}
+writeFileSync(join(DIRS.reports, 'user-journeys.json'), JSON.stringify({ generated_at: new Date().toISOString(), size: SIZE, results: allResults }, null, 1));
 const bad = results.filter((r) => !r.video || r.frictions.some((f) => f.fatal));
-console.log(`\n${bad.length ? 'FAIL' : 'PASS'} — ${results.length} journey videos → ${DIRS.videos}`);
+console.log(`\n${bad.length ? 'FAIL' : 'PASS'} — ${results.length} recorded (${allResults.length} in report) → ${DIRS.videos}`);
 process.exit(bad.length ? 1 : 0);
