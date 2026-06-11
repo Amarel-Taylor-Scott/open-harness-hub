@@ -263,6 +263,15 @@ def check_k8s(topo: dict, repo: Path = REPO) -> list[str]:
                 problems.append(f"{checks['worker_file']}: {label} drifted from deploy_topology ({needle!r} not found)")
     else:
         problems.append(f"{checks['worker_file']}: file missing")
+    # stray hand-typed queue-key copies: every watched file must carry the canonical key,
+    # so changing the topology key fails loudly everywhere instead of silently forking queues
+    for rel in checks.get("queue_key_watch_files", []):
+        watched = repo / rel
+        if not watched.is_file():
+            problems.append(f"{rel}: queue-key watch file missing")
+        elif scaling["queue_key"] not in watched.read_text(encoding="utf-8"):
+            problems.append(f"{rel}: does not carry the canonical queue key {scaling['queue_key']!r} — "
+                            f"stale copy (update it or drop it from queue_key_watch_files)")
     return problems
 
 

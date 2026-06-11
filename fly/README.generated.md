@@ -46,7 +46,7 @@ fly deploy -c fly/aidr-teleon-runtime.fly.toml --ha=false
 ```bash
 fly apps create aidr-baltor-backend
 fly volumes create baltor_backend_state -a aidr-baltor-backend -r iad -s 1
-fly secrets set -a aidr-baltor-backend --stage OH_LLM_BASE_URL=<value> OH_LLM_MODEL=<value> OH_LLM_API_KEY=<value> OH_EMBED_MODE=<value> OH_EMBED_MODEL=<value> OH_EMBED_BASE_URL=<value> OH_INFERENCE_ALLOW_NETWORK=<value> REDIS_URL=<value> BALTOR_DURABLE_DB=<value>
+fly secrets set -a aidr-baltor-backend --stage OH_LLM_BASE_URL=<value> OH_LLM_MODEL=<value> OH_LLM_API_KEY=<value> OH_EMBED_MODE=<value> OH_EMBED_MODEL=<value> OH_EMBED_BASE_URL=<value> OH_INFERENCE_ALLOW_NETWORK=<value> REDIS_URL=<value>
 fly deploy -c fly/aidr-baltor-backend.fly.toml --ha=false
 ```
 
@@ -103,7 +103,7 @@ fly deploy -c fly/aidr-postgres.fly.toml --ha=false
 
 ```bash
 fly apps create aidr-worker
-fly secrets set -a aidr-worker --stage OH_LLM_BASE_URL=<value> OH_LLM_MODEL=<value> OH_LLM_API_KEY=<value> OH_EMBED_MODE=<value> OH_EMBED_MODEL=<value> OH_EMBED_BASE_URL=<value> OH_INFERENCE_ALLOW_NETWORK=<value> REDIS_URL=<value>
+fly secrets set -a aidr-worker --stage OH_LLM_BASE_URL=<value> OH_LLM_MODEL=<value> OH_LLM_API_KEY=<value> OH_EMBED_MODE=<value> OH_EMBED_MODEL=<value> OH_EMBED_BASE_URL=<value> OH_INFERENCE_ALLOW_NETWORK=<value> REDIS_URL=<value> DATABASE_URL=<value>
 fly deploy -c fly/aidr-worker.fly.toml --ha=false
 fly machine list -a aidr-worker -q | xargs -r -n1 fly machine stop -a aidr-worker  # controller owns the fleet from here
 ```
@@ -112,7 +112,7 @@ fly machine list -a aidr-worker -q | xargs -r -n1 fly machine stop -a aidr-worke
 
 ```bash
 fly apps create aidr-worker-controller
-fly secrets set -a aidr-worker-controller --stage FLY_API_TOKEN=<value> REDIS_URL=<value>
+fly secrets set -a aidr-worker-controller --stage FLY_API_TOKEN=<value> REDIS_URL=<value> DATABASE_URL=<value>
 fly deploy -c fly/aidr-worker-controller.fly.toml --ha=false
 ```
 

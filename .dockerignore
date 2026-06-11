@@ -28,3 +28,10 @@ data/browser
 data/tmp
 *.sqlite
 *.db
+
+# LAST RULES WIN: the registry service's public-catalog seed must ship in the image —
+# deep-dive 2026-06-11 found the blanket `dist` exclusion silently emptied the deployed
+# catalog (registry_local_service BUNDLE_DIR). Runtime dist/* stays ignored; the design
+# bundle (incl. its images) is re-included here AFTER the *.png/*.jpg excludes.
+!dist/sites/openharness-design
+!dist/sites/openharness-design/**

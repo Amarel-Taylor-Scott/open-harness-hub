@@ -10,9 +10,13 @@ primary_region = "iad"
   app = "python3 scripts/baltor_admin_demo_server.py --port 9301"
 
 [env]
+  ADMIN_DEMO_UPLOAD_DIR = "/app/dist/local-services-state/admin-demo-uploads"
+  BALTOR_DURABLE_DB = "/app/dist/local-services-state/durable.db"
+  BALTOR_QUEUE_HEALTH_HISTORY = "/app/dist/local-services-state/baltor-queue-health-history.jsonl"
+  CONTEXT_WORKER_LEDGER = "/app/dist/local-services-state/context-workers-ledger.jsonl"
   OH_BIND_HOST = "0.0.0.0"
 
-# secrets (never in this file): fly secrets set -a aidr-baltor-backend OH_LLM_BASE_URL=… OH_LLM_MODEL=… OH_LLM_API_KEY=… OH_EMBED_MODE=… OH_EMBED_MODEL=… OH_EMBED_BASE_URL=… OH_INFERENCE_ALLOW_NETWORK=… REDIS_URL=… BALTOR_DURABLE_DB=…
+# secrets (never in this file): fly secrets set -a aidr-baltor-backend OH_LLM_BASE_URL=… OH_LLM_MODEL=… OH_LLM_API_KEY=… OH_EMBED_MODE=… OH_EMBED_MODEL=… OH_EMBED_BASE_URL=… OH_INFERENCE_ALLOW_NETWORK=… REDIS_URL=…
 
 [[mounts]]
   source = "baltor_backend_state"

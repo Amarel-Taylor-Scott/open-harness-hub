@@ -39,6 +39,10 @@ services:
     build: { context: .., dockerfile: Dockerfile }
     command: ["python3", "scripts/baltor_admin_demo_server.py", "--port", "9301"]
     environment:
+      ADMIN_DEMO_UPLOAD_DIR: "/app/dist/local-services-state/admin-demo-uploads"
+      BALTOR_DURABLE_DB: "/app/dist/local-services-state/durable.db"
+      BALTOR_QUEUE_HEALTH_HISTORY: "/app/dist/local-services-state/baltor-queue-health-history.jsonl"
+      CONTEXT_WORKER_LEDGER: "/app/dist/local-services-state/context-workers-ledger.jsonl"
       OH_BIND_HOST: "0.0.0.0"
       REDIS_URL: "redis://redis:6379/0"
     volumes: [baltor_backend_state:/app/dist/local-services-state]

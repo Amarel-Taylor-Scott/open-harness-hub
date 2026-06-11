@@ -2213,3 +2213,27 @@ regression); family + handoff self-tests PASS; teleon gate 19/19 incl. a live mo
 run; compose config valid (docker compose v5); controller 12/12, generator 12/12 + --check.
 .env.example documents the new deploy seams + Fly controller envs. Also committed the
 leftover journey-2 dashboard ?token= recorder fix.
+
+## 2026-06-11 (cont 3) — Owner confirms FLY; 4-agent deep dive + 33-question capability rubric
+
+Owner: "fly account is the best" → hosting CONFIRMED (memory updated). Then owner directed a
+per-surface rubric (embeddings? LLMs? ~20 more; then best-practices/flexibility/multi-cloud/
+wheel-reinvention/optimization/requirements-fit). FOUR adversarial deep-dive agents traced
+flows LIVE: shared-services trio, model spine, baltor+web, factory+infra. CRITICAL FINDS →
+FIXED SAME DAY (all gates re-run green): (1) .dockerignore excluded the registry catalog
+seed — deployed images shipped an EMPTY public catalog; (2) four seam prefixes missing —
+memory/pipeline/determinism/runtime pages 404'd through the public origin; (3) ALL baltor
+persistence defaulted outside the Fly volume — pinned via topology env incl.
+BALTOR_DURABLE_DB; (4) worker rows died with machines — DATABASE_URL added to queue-stores;
+(5) 4 stray hand-typed queue-key literals — generator --check now watches them. FOUND, NOT
+YET FIXED (P0/P1 program in the doc): teleon gate GAMEABLE (refine prompt pastes expected
+outputs; no held-out examples), FOUR model-call planes + four receipt shapes (only OIPS
+mints receipts; node≠endpoint hole), identity has no rate limiting, events sink =
+fill-to-DoS then permanent 429, two admin-demo run engines + double-processing bug, ctx://
+handles die on restart, queue feeder never scheduled (fleet would idle forever), registry
+O(n) re-parse per request, web index rebuilds inside serve() on cold start. RUBRIC:
+architecture/capability_rubric_assessment.json (33 questions × 12 surfaces, honest grades)
++ docs/architecture/capability-rubric-and-deep-dive-2026-06-11.md (verdicts, wheel audit,
+multi-cloud verdict, P0/P1/P2). TELEON BACKBONE: NOT YET — sequenced program planes→
+receipts(OTel ids)→ungameable gates→capability-compiler (topology-generator pattern is the
+proven substrate). Launch-ready: deploy layer, web tier, controller, provisioning CLI.

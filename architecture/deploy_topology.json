@@ -88,7 +88,13 @@
       "health_path": "/api/health",
       "state_mount": "/app/dist/local-services-state",
       "volume_gb": 1,
-      "env": {},
+      "env": {
+        "BALTOR_DURABLE_DB": "/app/dist/local-services-state/durable.db",
+        "CONTEXT_WORKER_LEDGER": "/app/dist/local-services-state/context-workers-ledger.jsonl",
+        "ADMIN_DEMO_UPLOAD_DIR": "/app/dist/local-services-state/admin-demo-uploads",
+        "BALTOR_QUEUE_HEALTH_HISTORY": "/app/dist/local-services-state/baltor-queue-health-history.jsonl"
+      },
+      "env_note": "deep-dive 2026-06-11: every baltor persistence path defaulted OUTSIDE the volume (dist/* and .agent/*) — pinned into the mount so the event-bus WAL, pipeline ledger, fleet ledger, and uploads survive restarts. The .agent/cfpb_artifact_graph.db hardcode (baltor_admin_demo_server.py:5379) still needs a code fix.",
       "secret_groups": ["model-plane", "baltor-stores"]
     },
     {
@@ -239,8 +245,8 @@
     "model-plane": ["OH_LLM_BASE_URL", "OH_LLM_MODEL", "OH_LLM_API_KEY", "OH_EMBED_MODE", "OH_EMBED_MODEL", "OH_EMBED_BASE_URL", "OH_INFERENCE_ALLOW_NETWORK"],
     "showcase-token": ["OH_SHOWCASE_TOKEN"],
     "operator-roster": ["AIDR_REGISTRY_ADMINS"],
-    "baltor-stores": ["REDIS_URL", "BALTOR_DURABLE_DB"],
-    "queue-stores": ["REDIS_URL"],
+    "baltor-stores": ["REDIS_URL"],
+    "queue-stores": ["REDIS_URL", "DATABASE_URL"],
     "postgres-superuser": ["POSTGRES_PASSWORD"],
     "fly-controller": ["FLY_API_TOKEN"]
   },
@@ -248,6 +254,13 @@
     "service_plane_file": "infra/k8s/service-plane.yaml",
     "service_plane_must_contain_deployments": ["identity", "registry", "events", "teleon-runtime", "baltor-backend"],
     "worker_file": "infra/k8s/worker.yaml",
-    "worker_assertions": "listName==scaling.queue_key, listLength==scaling.jobs_per_worker, maxReplicaCount==scaling.max_workers.k8s, pollingInterval==scaling.poll_seconds, cooldownPeriod==scaling.cooldown_seconds"
+    "worker_assertions": "listName==scaling.queue_key, listLength==scaling.jobs_per_worker, maxReplicaCount==scaling.max_workers.k8s, pollingInterval==scaling.poll_seconds, cooldownPeriod==scaling.cooldown_seconds",
+    "queue_key_watch_files": [
+      "infra/k8s/worker.yaml",
+      "infra/k8s/core.yaml",
+      "infra/ingest-compose.yml",
+      "services/registry.yaml"
+    ],
+    "queue_key_watch_note": "deep-dive 2026-06-11 found stray hand-typed copies of the queue key; every watched file must carry the canonical scaling.queue_key so a topology change fails loudly instead of drifting"
   }
 }

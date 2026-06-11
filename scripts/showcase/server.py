@@ -103,9 +103,12 @@ def _seam_proxies() -> list[tuple[str, str, str]]:
     live_ops = _local_service_port("baltor_admin_demo_server")
     if live_ops:
         live_ops_base = _seam_base("OH_SEAM_LIVEOPS_BASE", live_ops)
+        # deep-dive 2026-06-11: memory/pipeline/determinism/runtime were served by the backend
+        # but missing here — four shipped page families 404'd through the public origin
         for prefix in ("/api/demo/", "/api/context/", "/api/dev/", "/api/fleet",
                        "/api/admin-dashboard/", "/api/inference/", "/api/native/",
-                       "/api/standards/", "/api/graph/", "/api/context-gateway/", "/api/events"):
+                       "/api/standards/", "/api/graph/", "/api/context-gateway/", "/api/events",
+                       "/api/memory/", "/api/pipeline/", "/api/determinism/", "/api/runtime/"):
             table.append((prefix, "", live_ops_base))
     return table
 
