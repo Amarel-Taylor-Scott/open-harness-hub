@@ -2278,3 +2278,32 @@ the rubric P1/P2 program (docs/architecture/capability-rubric-and-deep-dive-2026
 P1 SQLite state engines · async teleon runs · one admin-demo engine · ctx:// persistence +
 receipts-on-fetch · embedding-store baking; P2 capability→runtime compiler (the Teleon
 backbone), tenanted gateway, measured-lift promotion. Next session: start at P1 + the sidecar.
+
+## 2026-06-11 (cont 6) — P1 long-haul wave (5 parallel agents, hours) + my fixes; all green, tree clean
+
+Owner: "run for hours, improve every aspect high-level to detailed". Five background agents on
+non-overlapping files, each self-tested, then cross-verified together + committed per lane:
+(1) SQLite-WAL AppendLog (scripts/_jsonl_store.py) behind the JSONL contract for identity/
+registry/events — crash-safe rebuildable index OFF the scanned tree (respects the hygiene
+scanners + lossless law), legacy migrates losslessly, torn-tail recovery, 3.7-7.5x faster
+rehydrate, N-thread WAL no loss/dup. (2) Opt-in async Teleon runs — POST{async:true}=202+worker
+thread, 409 one-in-flight-per-cap admission, same-account idempotent retry (no double version
+bump), interrupted-sweep on restart; PLAIN POST stays 201 (generated teleon-live.js expects it
+— a SECOND agent caught the contract and reconciled; collision resolved to the better design);
+48-check self-test. (3) Baltor gateway hardening (5 items): ctx:// handles persist to the
+durable WAL db + LRU prune + restart rehydrate (traced), receipt on every search/fetch, CFPB db
+path pinned into the volume, /fetch auth, killed the admin-demo double-processing race. (4)
+CPU-batch inference lane (scripts/foundry/batch_inference.py): optional llama.cpp/ollama sidecar
+the worker starts per batch + shuts on drain, honest served_by_lane provenance, byte-identical
+when OH_BATCH_LLM unset. (5) Read-only full-repo verification sweep: 1,133 .py compile clean,
+235 proofs pass, portability STRONG (zero cloud-SDK lock-in), rubric confirmed honest.
+MY FIXES (the sweep's real reds + a regression I introduced): the gemma-4 provider node I added
+earlier used 'id' not the canonical 'node_id' — it had broken the OIPS graph loader across EVERY
+inference gate (KeyError node_id); rewrote it to the full canonical schema, gates green. Plus
+file-layout allowlist (deploy/fly/media/FULLDESIGNDETAILS + skip gitignored archive/),
+secret-hygiene guard-test fixture (assemble api_key name at runtime + allowlist), deploy
+preflight GO/NO-GO gate (9 invariants incl. command-module smoke-import), README step numbering.
+Rubric scores bumped (p1_wave record). Pre-existing reds left for owner: check_adversarial_auth
+(hardcoded 12 vs 25 realms), stale web/harness-hub HTML wiring proofs. NEXT (P2): the Teleon
+capability->runtime compiler (the backbone), tenanted gateway (tenant_id in ctx://, ctxv://
+versioned fetch), measured-lift promotion for registry components.
