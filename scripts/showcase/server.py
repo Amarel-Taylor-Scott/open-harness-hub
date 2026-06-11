@@ -219,7 +219,25 @@ class Handler(BaseHTTPRequestHandler):
             # generous: model-built runs (Teleon) and LLM-selected builds legitimately take
             # minutes on a local CPU route; the seam must outlive them
             with urllib.request.urlopen(req, timeout=360) as resp:
-                self._send(resp.status, resp.read(), resp.headers.get("Content-Type") or "application/json")
+                ctype = resp.headers.get("Content-Type") or "application/json"
+                if "text/event-stream" in ctype:
+                    # SSE pass-through: stream chunks until either side disconnects, so live
+                    # dashboards get real-time events through this origin (and tunnels) too
+                    self.send_response(resp.status)
+                    self.send_header("Content-Type", ctype)
+                    self.send_header("Cache-Control", "no-store")
+                    self.end_headers()
+                    try:
+                        while True:
+                            chunk = resp.read1(8192)
+                            if not chunk:
+                                break
+                            self.wfile.write(chunk)
+                            self.wfile.flush()
+                    except (BrokenPipeError, ConnectionResetError):
+                        pass
+                    return
+                self._send(resp.status, resp.read(), ctype)
         except urllib.error.HTTPError as exc:  # backend answered — pass its status/body through honestly
             self._send(exc.code, exc.read(), exc.headers.get("Content-Type") or "application/json")
         except Exception:
@@ -352,6 +370,17 @@ class Handler(BaseHTTPRequestHandler):
                 return
             narrate = (qs.get("narrate") or ["1"])[0] != "0"   # preview passes narrate=0 → skip the prose LLM call
             self._send(200, json.dumps(build_flow(task, self.index, narrate=narrate)).encode(), "application/json")
+        elif parsed.path == "/api/run":
+            if not self._authed(parsed):
+                self._send(401, b'{"error":"token required"}', "application/json")
+                return
+            qs = parse_qs(parsed.query)
+            task = (qs.get("task") or [""])[0]
+            if not task.strip():
+                self._send(400, b'{"error":"task required"}', "application/json")
+                return
+            from scripts.showcase.builder import run_trace
+            self._send(200, json.dumps(run_trace(task, self.index)).encode(), "application/json")
         elif parsed.path == "/api/export":
             if not self._authed(parsed):
                 self._send(401, b'{"error":"token required"}', "application/json")
@@ -414,10 +443,6 @@ class Handler(BaseHTTPRequestHandler):
                         "subtypes": _subs(c), "schema_types": list(getattr(c, "schema_types", ()))}
                        for c in PRIMITIVE_CLASSES]
             self._send(200, json.dumps(payload).encode(), "application/json")
-        elif parsed.path == "/api/events/stream":
-            # SSE is intentionally not proxied through this stdlib server; the live dashboard
-            # detects the failure and falls back to polling /api/events (deduped client-side).
-            self._send(501, b'{"error":"SSE not proxied; poll /api/events"}', "application/json")
         else:
             seam = _seam_for(parsed.path)
             if seam:

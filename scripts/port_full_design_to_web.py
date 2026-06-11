@@ -329,6 +329,59 @@ PATCHES: dict[str, dict[str, list[tuple[str, str]]]] = {
                 "        <button className=\"oh-btn oh-btn--primary oh-btn--sm\" onClick={() => toast('Deploy bundle generated')}>Deploy</button>",
                 "        <button className=\"oh-btn oh-btn--primary oh-btn--sm\" onClick={() => { if (window.OHHLive && OHHLive.flow() && OHHLive.exportYaml()) { toast('Deploy bundle exported · open-spec YAML'); } else { toast('Deploy bundle generated'); } }}>Deploy</button>",
             ),
+            # /run — the console EXECUTES the flow for real (/api/run): real retrieval, the ONE
+            # governed model call, real checks. The designed simulation (incl. its error/retry
+            # choreography) remains the honest fallback when the backend is silent.
+            (
+                "  const run = (fromRetry) => {\n"
+                "    setRunning(true); if (!fromRetry) { setDone(0); setErrored(false); setRecovered(false); }\n"
+                "    let i = fromRetry ? 3 : 0;\n"
+                "    const tick = () => {\n"
+                "      i += 1; setDone(i);\n"
+                "      if (i === 4 && !recovered && !fromRetry) { setRunning(false); setErrored(true); return; }\n"
+                "      if (i >= RUN_STEPS.length) { setRunning(false); toast('Run complete · $0.0312'); return; }\n"
+                "      timer.current = setTimeout(tick, 600);\n"
+                "    };\n"
+                "    timer.current = setTimeout(tick, 500);\n"
+                "  };",
+                "  const run = (fromRetry) => {\n"
+                "    setRunning(true); if (!fromRetry) { setDone(0); setErrored(false); setRecovered(false); }\n"
+                "    if (window.OHHLive && !fromRetry) OHHLive.execRun();  // the REAL execution kicks here\n"
+                "    let i = fromRetry ? 3 : 0;\n"
+                "    const tick = () => {\n"
+                "      const lt = window.OHHLive && OHHLive.runTrace();\n"
+                "      if (window.OHHLive && !lt) { timer.current = setTimeout(tick, 800); return; }  // real call in flight\n"
+                "      const src = (lt && lt.rows) || RUN_STEPS;\n"
+                "      i += 1; setDone(i);\n"
+                "      if (!lt && i === 4 && !recovered && !fromRetry) { setRunning(false); setErrored(true); return; }\n"
+                "      if (i >= src.length) { setRunning(false); toast('Run complete · ' + ((lt && lt.totals && lt.totals.cost) || '$0.0312')); return; }\n"
+                "      timer.current = setTimeout(tick, 600);\n"
+                "    };\n"
+                "    timer.current = setTimeout(tick, 500);\n"
+                "  };",
+            ),
+            (
+                "        {RUN_STEPS.slice(0, Math.max(done, errored ? 4 : done)).map((s, idx) => {\n"
+                "          const isErr = s.err && errored && !recovered && idx === 3;",
+                "        {(((window.OHHLive && OHHLive.runTrace()) || {}).rows || RUN_STEPS).slice(0, Math.max(done, errored ? 4 : done)).map((s, idx) => {\n"
+                "          const isErr = (s.err && errored && !recovered && idx === 3) || s.status === 'err';",
+            ),
+            (
+                "      <div className=\"pt-sim-banner\">◌ Simulate mode — model steps are echo-stubs until a provider key is connected. <span style={{ marginLeft: 'auto' }}><a style={{ color: 'var(--accent)', cursor: 'pointer' }} onClick={() => navigate('/nope')}>Connect key →</a></span></div>",
+                "      {(window.OHHLive && OHHLive.runTrace()) ? <div className=\"pt-sim-banner\" style={{ borderColor: 'var(--success)', color: 'var(--success)' }}>● Live mode — the model step is a REAL call ({OHHLive.runTrace().model_id}) with measured latency; the trace below is what actually executed.</div> : <div className=\"pt-sim-banner\">◌ Simulate mode — model steps are echo-stubs until a provider key is connected. <span style={{ marginLeft: 'auto' }}><a style={{ color: 'var(--accent)', cursor: 'pointer' }} onClick={() => navigate('/nope')}>Connect key →</a></span></div>}",
+            ),
+            (
+                "            <div className=\"t\"><div className=\"v\">{done >= 5 ? '$0.0312' : '—'}</div><div className=\"k\">est. cost</div></div>\n"
+                "            <div className=\"t\"><div className=\"v\">{done >= 5 ? '8.4k' : '—'}</div><div className=\"k\">tokens</div></div>\n"
+                "            <div className=\"t\"><div className=\"v\">{done >= 5 ? '11' : '—'}</div><div className=\"k\">citations</div></div>",
+                "            <div className=\"t\"><div className=\"v\">{done >= 5 ? (((window.OHHLive && OHHLive.runTrace()) || {}).totals || {}).cost || '$0.0312' : '—'}</div><div className=\"k\">est. cost</div></div>\n"
+                "            <div className=\"t\"><div className=\"v\">{done >= 5 ? ((window.OHHLive && OHHLive.runTrace()) ? (((OHHLive.runTrace().rows.find((r) => r.model) || {}).tok) || '—') : '8.4k') : '—'}</div><div className=\"k\">tokens</div></div>\n"
+                "            <div className=\"t\"><div className=\"v\">{done >= 5 ? ((window.OHHLive && OHHLive.runTrace()) ? ((OHHLive.runTrace().rows.some((r) => /cites retrieved context ✓/.test(r.note || '')) ? '✓' : '—')) : '11') : '—'}</div><div className=\"k\">citations</div></div>",
+            ),
+            (
+                "        <span className=\"oh-badge mono\">suppliers.csv · 1 row</span>",
+                "        <span className=\"oh-badge mono\">{(window.OHHLive && OHHLive.runTrace()) ? 'synthetic sample · 1 item' : 'suppliers.csv · 1 row'}</span>",
+            ),
             # the logged-out preview CTA goes through REAL sign-up — never a faked session flag
             (
                 "<button className=\"oh-btn oh-btn--primary\" onClick={() => { setLoggedIn(true); navigate('/onboarding'); }}>Sign up free →</button>",

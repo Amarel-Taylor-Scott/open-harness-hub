@@ -289,6 +289,22 @@
       return true;
     },
 
+    // REAL run: execute the assembled flow on a synthetic sample (/api/run) — the same honest
+    // contract as build(): failure → null, the designed simulation stays, labeled.
+    execRun: function () {
+      var t = state.task;
+      if (!t) return Promise.resolve(null);
+      if (state.runPromise && state.runTask === t) return state.runPromise;
+      state.runTask = t;
+      state.runTrace = null;
+      state.runPromise = fetch("/api/run?task=" + encodeURIComponent(t) + tokenQs())
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) { state.runTrace = d && d.rows && d.rows.length ? d : null; return state.runTrace; })
+        .catch(function () { state.runTrace = null; return null; });
+      return state.runPromise;
+    },
+    runTrace: function () { return state.runTrace; },
+
     costRange: function () {
       var d = state.data;
       var c = d && d.cost && d.cost.balanced && d.cost.balanced.per_task_usd;
