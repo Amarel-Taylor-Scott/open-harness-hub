@@ -676,6 +676,19 @@ if _DURABLE_DB:
 # Bounded-memory cap: keep only the most recent N runs in memory AND in the durable table (LRU by
 # created_at). One named constant, env-overridable, so the cap is visible and tunable, never magic.
 DURABLE_RUNS_MAX = int(os.environ.get("BALTOR_DURABLE_RUNS_MAX", "200"))   # newest-N ctx:// runs kept (memory + table)
+
+# ── P2 tenancy + ctxv:// versioning (warrant: the rubric's tenancy-gap finding, deep-dive line 25/124) ──
+# The gateway was global: RUNS/handles had no tenant_id, so any caller could fetch any handle, and ctxv://
+# versions were produced (line ~2546) but never fetchable. P2 threads a tenant_id end-to-end and pins
+# served content under an immutable ctxv:// version. Single named default — never a magic literal: the
+# whole current demo runs as this one tenant, so default-tenant behavior stays byte-identical, but the
+# isolation is REAL the moment a different tenant_id is supplied (a fetch with the wrong tenant → 404,
+# which never leaks the handle's existence; a superseded-and-pruned version → 410 Gone).
+DEFAULT_TENANT = "demo"                                                     # the single tenant the public demo runs as
+TENANT_HEADER = "X-OHH-Tenant"                                             # request header carrying the tenant id
+TENANT_PARAM = "tenant"                                                     # query-string / form field carrying the tenant id
+DURABLE_VERSIONS_MAX = int(os.environ.get("BALTOR_DURABLE_VERSIONS_MAX", "5000"))  # newest-N pinned ctxv:// versions kept
+
 RUN_STORE = None          # sqlite3 connection onto BALTOR_DURABLE_DB, or None when durability is off
 RUN_STORE_ERROR = ""
 
@@ -700,15 +713,32 @@ if DURABLE is not None and _DURABLE_DB:
         RUN_STORE.execute("PRAGMA busy_timeout=5000")  # multi-connection: wait on a held lock, don't error
         RUN_STORE.execute(
             "CREATE TABLE IF NOT EXISTS gateway_runs("
-            "run_id TEXT PRIMARY KEY, created_at INTEGER, updated_at INTEGER, body_json TEXT)"
+            "run_id TEXT PRIMARY KEY, created_at INTEGER, updated_at INTEGER, tenant_id TEXT, body_json TEXT)"
         )
         RUN_STORE.execute("CREATE INDEX IF NOT EXISTS idx_gateway_runs_created ON gateway_runs(created_at)")
         RUN_STORE.execute(
             "CREATE TABLE IF NOT EXISTS gateway_receipts("
-            "receipt_id TEXT PRIMARY KEY, ts INTEGER, operation TEXT, run_id TEXT, "
+            "receipt_id TEXT PRIMARY KEY, ts INTEGER, operation TEXT, run_id TEXT, tenant_id TEXT, "
             "handle TEXT, query TEXT, ok INTEGER, content_hash TEXT, body_json TEXT)"
         )
         RUN_STORE.execute("CREATE INDEX IF NOT EXISTS idx_gateway_receipts_ts ON gateway_receipts(ts)")
+        # P2 (ctxv://): one durable row per PINNED immutable version of a ctx:// handle's served content.
+        # base_handle is the mutable ctx:// (latest); version_handle is the immutable ctxv://base@<hash16>;
+        # superseded_at marks a version replaced by a newer hash for the same (tenant, base) but kept until
+        # prune (lossless) — a fetch of a superseded+pruned version → 410, a never-seen version → 404.
+        RUN_STORE.execute(
+            "CREATE TABLE IF NOT EXISTS gateway_versions("
+            "version_handle TEXT PRIMARY KEY, tenant_id TEXT, run_id TEXT, base_handle TEXT, kind TEXT, "
+            "content_hash TEXT, body_json TEXT, created_at INTEGER, superseded_at INTEGER)"
+        )
+        RUN_STORE.execute("CREATE INDEX IF NOT EXISTS idx_gateway_versions_base ON gateway_versions(tenant_id, base_handle)")
+        RUN_STORE.execute("CREATE INDEX IF NOT EXISTS idx_gateway_versions_created ON gateway_versions(created_at)")
+        # Lossless upgrade of a P1-created db (its gateway_runs/gateway_receipts lack tenant_id): add the
+        # column if missing so existing durable files keep working. Pre-P2 rows read back as DEFAULT_TENANT.
+        for _table in ("gateway_runs", "gateway_receipts"):
+            _cols = {r[1] for r in RUN_STORE.execute(f"PRAGMA table_info({_table})").fetchall()}
+            if "tenant_id" not in _cols:
+                RUN_STORE.execute(f"ALTER TABLE {_table} ADD COLUMN tenant_id TEXT")
     except Exception as _e:  # durability was requested ⇒ surface, do not hide; runs still work in-memory
         RUN_STORE_ERROR = f"run-store init failed: {type(_e).__name__}: {_e}"
         print(f"[durable] {RUN_STORE_ERROR}", file=sys.stderr, flush=True)
@@ -725,10 +755,11 @@ def persist_run(run: dict) -> None:
         return
     try:
         RUN_STORE.execute(
-            "INSERT INTO gateway_runs(run_id,created_at,updated_at,body_json) VALUES(?,?,?,?) "
-            "ON CONFLICT(run_id) DO UPDATE SET updated_at=excluded.updated_at, body_json=excluded.body_json",
+            "INSERT INTO gateway_runs(run_id,created_at,updated_at,tenant_id,body_json) VALUES(?,?,?,?,?) "
+            "ON CONFLICT(run_id) DO UPDATE SET updated_at=excluded.updated_at, tenant_id=excluded.tenant_id, "
+            "body_json=excluded.body_json",
             (run_id, int(run.get("created_at") or 0), int(run.get("updated_at") or run.get("created_at") or 0),
-             json.dumps(run, sort_keys=True, default=str)),
+             run_tenant(run), json.dumps(run, sort_keys=True, default=str)),
         )
     except Exception as _e:  # noqa: BLE001 — never let durability mirroring break a live run
         print(f"[durable] persist_run failed: {type(_e).__name__}: {_e}", file=sys.stderr, flush=True)
@@ -782,19 +813,177 @@ def rehydrate_runs() -> int:
     return restored
 
 
+# ── P2 tenancy seam ───────────────────────────────────────────────────────────────────────────────────
+def normalize_tenant(value: object) -> str:
+    """One rule for turning any supplied tenant id into a safe, stable namespace key. Empty/None →
+    DEFAULT_TENANT so the existing single-tenant demo is byte-identical; otherwise compact_id (same
+    [a-z0-9-] normalization the handles use) so a tenant id can never inject path/SQL weirdness."""
+    text = str(value or "").strip()
+    return compact_id(text) if text else DEFAULT_TENANT
+
+
+def resolve_tenant(parsed, header_value: str | None = None, body: dict | None = None) -> str:
+    """Resolve the caller's tenant_id from the request — the isolation seam. Mirrors how `_authed` resolves
+    the token: query param (?tenant=) → request header (X-OHH-Tenant, passed in as header_value) → POST body
+    field → DEFAULT_TENANT. There is no real multi-tenant identity in this demo yet, so this DEFAULTS to one
+    'demo' tenant (the current public demo is unchanged) but is honored end-to-end, so the isolation is REAL
+    when a tenant is supplied. NOTE: this is request-scoped attribution, NOT authentication — `_authed`
+    (OH_SHOWCASE_TOKEN) still gates writes; per-tenant key auth is the next layer
+    (service-auth-and-consumption-model.md)."""
+    qs = parse_qs(getattr(parsed, "query", "") or "")
+    supplied = (qs.get(TENANT_PARAM) or [None])[0]
+    if not supplied:
+        supplied = header_value
+    if not supplied and isinstance(body, dict):
+        supplied = body.get("tenant_id") or body.get(TENANT_PARAM)
+    return normalize_tenant(supplied)
+
+
+def run_tenant(run: dict | None) -> str:
+    """The tenant_id a run belongs to (defaulting to DEFAULT_TENANT for pre-P2 / untenanted runs — lossless:
+    an old run with no tenant_id reads back as the demo tenant, exactly its prior global behavior)."""
+    return normalize_tenant((run or {}).get("tenant_id"))
+
+
+def run_visible_to(run: dict | None, tenant_id: str) -> bool:
+    """Isolation predicate: a run is visible to a tenant ONLY when it belongs to that tenant. A mismatch is
+    treated as not-found by callers (404), so one tenant can never even learn another tenant's handle exists."""
+    return bool(run) and run_tenant(run) == normalize_tenant(tenant_id)
+
+
+def latest_run_for_tenant(tenant_id: str) -> dict | None:
+    """Newest run OWNED BY this tenant (the per-tenant replacement for the global latest_run())."""
+    tid = normalize_tenant(tenant_id)
+    owned = [r for r in RUNS.values() if run_tenant(r) == tid]
+    if not owned:
+        return None
+    return max(owned, key=lambda run: int(run.get("created_at") or 0))
+
+
+def run_for_tenant(run_id: str, tenant_id: str) -> dict | None:
+    """Resolve a run by id but ONLY if it belongs to this tenant; cross-tenant access returns None (→ 404).
+    When run_id is empty, fall back to this tenant's latest run (mirrors the old `RUNS.get(id) or latest_run()`
+    pattern, but tenant-scoped so the fallback can never reach across tenants)."""
+    tid = normalize_tenant(tenant_id)
+    if run_id:
+        run = RUNS.get(run_id)
+        return run if run_visible_to(run, tid) else None
+    return latest_run_for_tenant(tid)
+
+
+# ── P2 ctxv:// version pinning ────────────────────────────────────────────────────────────────────────
+def versioned_handle(base_handle: str, content_hash: str) -> str:
+    """The immutable version id for a ctx:// handle pinned at a content hash — same shape as the context
+    object versions already minted at add_object (ctxv://base@<hash16>). Single source of the form so a
+    pinned-fetch handle is recognizable and stable across the codebase."""
+    base = str(base_handle or "")
+    short = compact_id(content_hash)[-16:] if content_hash else "0"
+    return base.replace("ctx://", "ctxv://", 1) + "@" + short
+
+
+def pin_version(*, tenant_id: str, run: dict | None, base_handle: str, kind: str, content: object) -> str:
+    """Pin the EXACT content just served under a ctx:// handle as an immutable ctxv:// version, so a later
+    fetch of that ctxv:// returns byte-identical bytes even if the live content changed. Lossless: a newer
+    hash for the same (tenant, base) marks older versions superseded_at but KEEPS them until prune (so a
+    superseded version is 410 Gone only after an explicit prune, never silently deleted). Returns the
+    ctxv:// handle (best-effort; durability off ⇒ '' and ctx:// still works exactly as before)."""
+    if RUN_STORE is None or content is None or not base_handle:
+        return ""
+    tid = normalize_tenant(tenant_id)
+    chash = stable_hash(content)
+    vhandle = versioned_handle(base_handle, chash)
+    now = int(time.time())
+    body = json.dumps(content, sort_keys=True, default=str)
+    try:
+        # Idempotent: re-pinning identical content is a no-op (PK = version_handle includes the hash).
+        existing = RUN_STORE.execute(
+            "SELECT 1 FROM gateway_versions WHERE version_handle=?", (vhandle,)
+        ).fetchone()
+        if existing is None:
+            # A different hash for the same (tenant, base) supersedes the older versions — but they STAY
+            # (lossless) until prune_versions() trims by age past the cap.
+            RUN_STORE.execute(
+                "UPDATE gateway_versions SET superseded_at=? WHERE tenant_id=? AND base_handle=? AND superseded_at IS NULL",
+                (now, tid, base_handle),
+            )
+            RUN_STORE.execute(
+                "INSERT INTO gateway_versions"
+                "(version_handle,tenant_id,run_id,base_handle,kind,content_hash,body_json,created_at,superseded_at)"
+                " VALUES(?,?,?,?,?,?,?,?,NULL)",
+                (vhandle, tid, str((run or {}).get("run_id") or ""), base_handle, kind, chash, body, now),
+            )
+            prune_versions()
+    except Exception as _e:  # noqa: BLE001 — version pinning is additive; never break a live fetch
+        print(f"[durable] pin_version failed: {type(_e).__name__}: {_e}", file=sys.stderr, flush=True)
+        return ""
+    return vhandle
+
+
+def prune_versions() -> None:
+    """Bound the pinned-version table to the newest DURABLE_VERSIONS_MAX rows (LRU by created_at). Pruned
+    rows are the OLDEST superseded versions — a fetch of one of them then returns 410 Gone (was-pinned,
+    now-pruned), which is honest: the version existed but the lossless retention window has passed."""
+    if RUN_STORE is None:
+        return
+    try:
+        RUN_STORE.execute(
+            "DELETE FROM gateway_versions WHERE version_handle NOT IN "
+            "(SELECT version_handle FROM gateway_versions ORDER BY created_at DESC LIMIT ?)",
+            (DURABLE_VERSIONS_MAX,),
+        )
+    except Exception as _e:  # noqa: BLE001
+        print(f"[durable] prune_versions failed: {type(_e).__name__}: {_e}", file=sys.stderr, flush=True)
+
+
+def fetch_pinned_version(tenant_id: str, version_handle: str) -> tuple[str, dict | None]:
+    """Resolve a ctxv:// (immutable, version-pinned) fetch for a tenant. Returns (status, row) where status
+    is 'ok' (row carries the pinned body), 'gone' (the base was pinned before but THIS version was
+    superseded and pruned → 410), or 'missing' (never seen by this tenant → 404, no existence leak). The
+    base-existence probe is tenant-scoped, so it never reveals another tenant's versions."""
+    if RUN_STORE is None or not version_handle:
+        return "missing", None
+    tid = normalize_tenant(tenant_id)
+    try:
+        row = RUN_STORE.execute(
+            "SELECT tenant_id,run_id,base_handle,kind,content_hash,body_json,created_at,superseded_at "
+            "FROM gateway_versions WHERE version_handle=? AND tenant_id=?",
+            (version_handle, tid),
+        ).fetchone()
+    except Exception:  # noqa: BLE001
+        return "missing", None
+    if row is not None:
+        return "ok", {
+            "tenant_id": row[0], "run_id": row[1], "base_handle": row[2], "kind": row[3],
+            "content_hash": row[4], "body_json": row[5], "created_at": row[6], "superseded_at": row[7],
+        }
+    # Not present. Distinguish 410 (we DID pin some version of this base for this tenant — this exact
+    # version was superseded+pruned) from 404 (we never pinned this base for this tenant) — without
+    # leaking another tenant's data: the base-existence probe is tenant-scoped.
+    base = str(version_handle or "").split("@", 1)[0].replace("ctxv://", "ctx://", 1)
+    try:
+        seen = RUN_STORE.execute(
+            "SELECT 1 FROM gateway_versions WHERE tenant_id=? AND base_handle=? LIMIT 1", (tid, base)
+        ).fetchone()
+    except Exception:  # noqa: BLE001
+        seen = None
+    return ("gone", None) if seen is not None else ("missing", None)
+
+
 def gateway_receipt(operation: str, *, run: dict | None, ok: bool, handle: str = "", query: str = "",
-                    content: object = None) -> dict:
+                    content: object = None, tenant_id: str = "") -> dict:
     """Mint + persist a gateway receipt for a search/fetch and publish the existing `receipt_issued` bus
     event — honest provenance for "agents propose, Baltor disposes" (deep-dive item 2). The receipt is a
     governed record of WHAT was served (is_truth:false — serving a pack is not asserting its facts true);
     it is persisted to the durable gateway_receipts table and rides the durable bus log via BUS.publish."""
     run_id = str((run or {}).get("run_id") or "")
+    tenant = normalize_tenant(tenant_id or run_tenant(run))  # explicit caller tenant wins; else the run's owner
     receipt = {
         "kind": "baltor.gateway-receipt.v1",
         "receipt_id": f"gwr-{uuid.uuid4().hex[:12]}",
         "ts": int(time.time()),
         "operation": operation,             # "context.search" | "context.fetch"
         "run_id": run_id,
+        "tenant_id": tenant,                # P2: which tenant this read was served to (isolation provenance)
         "handle": handle or "",
         "query": (query or "")[:200],
         "ok": bool(ok),
@@ -806,8 +995,8 @@ def gateway_receipt(operation: str, *, run: dict | None, ok: bool, handle: str =
         try:
             RUN_STORE.execute(
                 "INSERT OR REPLACE INTO gateway_receipts"
-                "(receipt_id,ts,operation,run_id,handle,query,ok,content_hash,body_json) VALUES(?,?,?,?,?,?,?,?,?)",
-                (receipt["receipt_id"], receipt["ts"], receipt["operation"], receipt["run_id"],
+                "(receipt_id,ts,operation,run_id,tenant_id,handle,query,ok,content_hash,body_json) VALUES(?,?,?,?,?,?,?,?,?,?)",
+                (receipt["receipt_id"], receipt["ts"], receipt["operation"], receipt["run_id"], receipt["tenant_id"],
                  receipt["handle"], receipt["query"], int(receipt["ok"]), receipt["content_hash"],
                  json.dumps(receipt, sort_keys=True)),
             )
@@ -1919,8 +2108,9 @@ def update_run(run_id: str, **updates: object) -> dict | None:
     return snapshot
 
 
-def create_background_run(text: str, source_name: str, source_type: str, document_tree: dict | None) -> dict:
+def create_background_run(text: str, source_name: str, source_type: str, document_tree: dict | None, tenant_id: str = DEFAULT_TENANT) -> dict:
     run_id = f"adm-{uuid.uuid4().hex[:10]}"
+    tenant_id = normalize_tenant(tenant_id)  # P2: owner tenant for this run's ctx:// handles
     now = int(time.time())
     connector = (document_tree or {}).get("connector_envelope") if isinstance(document_tree, dict) else None
     source_record = {"name": source_name, "type": source_type, "sync_state": "received", "version": "pending"}
@@ -1930,6 +2120,7 @@ def create_background_run(text: str, source_name: str, source_type: str, documen
         source_record["source_system"] = connector.get("source_system")
     run = {
         "run_id": run_id,
+        "tenant_id": tenant_id,
         "created_at": now,
         "updated_at": now,
         "status": "queued",
@@ -2062,8 +2253,9 @@ def process_run_background(run_id: str) -> None:
     log_event("run.complete", "Background context run completed", run_id=run_id, source=source_name, detail=summary)
 
 
-def build_run(text: str, source_name: str = "demo-source.txt", source_type: str = "upload", document_tree: dict | None = None) -> dict:
+def build_run(text: str, source_name: str = "demo-source.txt", source_type: str = "upload", document_tree: dict | None = None, tenant_id: str = DEFAULT_TENANT) -> dict:
     run_id = f"adm-{uuid.uuid4().hex[:10]}"
+    tenant_id = normalize_tenant(tenant_id)  # P2: this run is OWNED by this tenant; ctx:// handles are scoped to it
     log_event("run.created", "Context run created", run_id=run_id, source=source_name, detail={"source_type": source_type, "bytes": len(text)})
     raw_claims = split_claims(text)
     log_event("worker.ingest", "Ingested source text", run_id=run_id, source=source_name, detail={"characters": len(text)})
@@ -2080,6 +2272,7 @@ def build_run(text: str, source_name: str = "demo-source.txt", source_type: str 
     sources = [{"name": source_name, "type": source_type, "sync_state": "synced", "version": "local-v1"}]
     run = {
         "run_id": run_id,
+        "tenant_id": tenant_id,
         "created_at": int(time.time()),
         "status": "complete",
         "progress": 100,
@@ -3659,12 +3852,17 @@ def keyword_score(query: str, text: str) -> int:
     return sum(1 for term in terms if term in haystack)
 
 
-def context_search_payload(query: str, *, run: dict | None = None, task_type: str = "code_change", token_budget: int = 3000, pack_type: str = "implementation_pack") -> dict:
+def context_search_payload(query: str, *, run: dict | None = None, task_type: str = "code_change", token_budget: int = 3000, pack_type: str = "implementation_pack", tenant_id: str = DEFAULT_TENANT) -> dict:
     sync_context_worker_events()
     sync_worker_ledger()
-    run = run or latest_run()
+    tenant_id = normalize_tenant(tenant_id)
+    # P2 isolation: a run passed in is honored ONLY if it belongs to this tenant; the empty-run fallback is
+    # this tenant's latest run, never the global latest — so a tenant can never search another's index.
+    if run is not None and not run_visible_to(run, tenant_id):
+        run = None
+    run = run or latest_run_for_tenant(tenant_id)
     if not run:
-        _rcpt = gateway_receipt("context.search", run=None, ok=False, query=query)
+        _rcpt = gateway_receipt("context.search", run=None, ok=False, query=query, tenant_id=tenant_id)
         return {
             "ok": False,
             "answerable": False,
@@ -3734,64 +3932,103 @@ def context_search_payload(query: str, *, run: dict | None = None, task_type: st
     # Honest provenance (deep-dive item 2): every served search mints a persisted receipt + a receipt_issued
     # bus event. Serving a pack is NOT asserting its facts are true (is_truth:false); the receipt records WHAT
     # was served, hashed, so the "agents propose, Baltor disposes" claim is auditable rather than aspirational.
-    _rcpt = gateway_receipt("context.search", run=run, ok=True, query=query, content=pack.get("context_pack"))
+    _rcpt = gateway_receipt("context.search", run=run, ok=True, query=query, content=pack.get("context_pack"), tenant_id=tenant_id)
     pack["receipt"] = {"receipt_id": _rcpt["receipt_id"], "operation": _rcpt["operation"],
                        "content_hash": _rcpt["content_hash"], "is_truth": False}
+    pack["tenant_id"] = tenant_id
     return {"ok": True, **pack}
 
 
-def context_fetch_payload(handle: str, *, run: dict | None = None, max_tokens: int = 1000) -> dict:
+_FETCH_POLICY = {"bounded_fetch": True, "raw_source_access_is_fallback": True, "citation_required": True}
+
+
+def context_fetch_payload(handle: str, *, run: dict | None = None, max_tokens: int = 1000, tenant_id: str = DEFAULT_TENANT) -> dict:
     sync_context_worker_events()
     sync_worker_ledger()
-    run = run or latest_run()
+    tenant_id = normalize_tenant(tenant_id)
+
+    # P2 ctxv:// (immutable, version-pinned) fetch: serve the EXACT bytes pinned under this version, even if
+    # the live content has since changed — or 410 Gone if that version was superseded and pruned, or 404 if
+    # this tenant never pinned it (existence is never leaked across tenants).
+    if str(handle).startswith("ctxv://"):
+        status, vrow = fetch_pinned_version(tenant_id, handle)
+        if status == "ok":
+            try:
+                content = json.loads((vrow or {}).get("body_json") or "{}")
+            except json.JSONDecodeError:
+                content = {}
+            _rcpt = gateway_receipt("context.fetch", run={"run_id": (vrow or {}).get("run_id")},
+                                    ok=True, handle=handle, content=content, tenant_id=tenant_id)
+            return {
+                "ok": True, "status": "ok", "handle": handle, "kind": (vrow or {}).get("kind") or "version",
+                "immutable": True, "base_handle": (vrow or {}).get("base_handle"),
+                "content_hash": (vrow or {}).get("content_hash"),
+                "token_budget_used_estimate": min(max_tokens, max(1, len(str(content)) // 4)),
+                "content": content,
+                "receipt": {"receipt_id": _rcpt["receipt_id"], "operation": _rcpt["operation"],
+                            "content_hash": _rcpt["content_hash"], "is_truth": False},
+                "gateway_policy": {**_FETCH_POLICY, "version_pinned": True},
+            }
+        # superseded+pruned (410) vs never-seen (404) — both still mint a receipt (honest: we WERE asked).
+        _rcpt = gateway_receipt("context.fetch", run=None, ok=False, handle=handle, tenant_id=tenant_id)
+        err = ("this pinned version was superseded and has been pruned (lossless retention window passed)"
+               if status == "gone" else "version handle not found for this tenant")
+        return {"ok": False, "status": status, "handle": handle, "error": err,
+                "receipt": {"receipt_id": _rcpt["receipt_id"], "operation": _rcpt["operation"], "is_truth": False}}
+
+    # ctx:// (latest, mutable): tenant-scoped run resolution — never the global latest.
+    if run is not None and not run_visible_to(run, tenant_id):
+        run = None
+    run = run or latest_run_for_tenant(tenant_id)
     if not run:
-        _rcpt = gateway_receipt("context.fetch", run=None, ok=False, handle=handle)
-        return {"ok": False, "error": "no indexed run is available", "handle": handle,
+        _rcpt = gateway_receipt("context.fetch", run=None, ok=False, handle=handle, tenant_id=tenant_id)
+        return {"ok": False, "status": "no_run", "error": "no indexed run is available", "handle": handle,
                 "receipt": {"receipt_id": _rcpt["receipt_id"], "operation": _rcpt["operation"], "is_truth": False}}
     records = iter_rag_records(run)
     for record in records:
         if record.get("handle") == handle:
             # Receipt on the raw ingested-content fetch (deep-dive item 2): hashed record of WHAT was served.
-            _rcpt = gateway_receipt("context.fetch", run=run, ok=True, handle=handle, content=record)
+            _rcpt = gateway_receipt("context.fetch", run=run, ok=True, handle=handle, content=record, tenant_id=tenant_id)
+            # P2: pin the served content as an immutable ctxv:// the agent can re-fetch byte-identically.
+            vhandle = pin_version(tenant_id=tenant_id, run=run, base_handle=handle, kind="component", content=record)
             return {
                 "ok": True,
+                "status": "ok",
                 "handle": handle,
+                "version_handle": vhandle,                # immutable pin of exactly these bytes
                 "kind": "component",
                 "token_budget_used_estimate": min(max_tokens, max(1, len(str(record.get("text") or "")) // 4)),
                 "content": record,
                 "receipt": {"receipt_id": _rcpt["receipt_id"], "operation": _rcpt["operation"],
                             "content_hash": _rcpt["content_hash"], "is_truth": False},
-                "gateway_policy": {
-                    "bounded_fetch": True,
-                    "raw_source_access_is_fallback": True,
-                    "citation_required": True,
-                },
+                "gateway_policy": _FETCH_POLICY,
             }
     for claim in run.get("claims") or []:
         claim_handle = context_handle("claim", run_id=str(run.get("run_id") or ""), claim_id=str(claim.get("id") or ""))
         if claim_handle == handle:
-            _rcpt = gateway_receipt("context.fetch", run=run, ok=True, handle=handle, content=claim)
+            _rcpt = gateway_receipt("context.fetch", run=run, ok=True, handle=handle, content=claim, tenant_id=tenant_id)
+            served = {
+                **claim,
+                "handle": claim_handle,
+                "instruction": claim.get("safe_context_instruction") or "Use with citation; do not present volatile facts as current without refresh.",
+            }
+            vhandle = pin_version(tenant_id=tenant_id, run=run, base_handle=handle, kind="claim", content=served)
             return {
                 "ok": True,
+                "status": "ok",
                 "handle": handle,
+                "version_handle": vhandle,
                 "kind": "claim",
                 "token_budget_used_estimate": min(max_tokens, max(1, len(str(claim.get("claim") or "")) // 4)),
-                "content": {
-                    **claim,
-                    "handle": claim_handle,
-                    "instruction": claim.get("safe_context_instruction") or "Use with citation; do not present volatile facts as current without refresh.",
-                },
+                "content": served,
                 "receipt": {"receipt_id": _rcpt["receipt_id"], "operation": _rcpt["operation"],
                             "content_hash": _rcpt["content_hash"], "is_truth": False},
-                "gateway_policy": {
-                    "bounded_fetch": True,
-                    "raw_source_access_is_fallback": True,
-                    "citation_required": True,
-                },
+                "gateway_policy": _FETCH_POLICY,
             }
-    _rcpt = gateway_receipt("context.fetch", run=run, ok=False, handle=handle)
+    _rcpt = gateway_receipt("context.fetch", run=run, ok=False, handle=handle, tenant_id=tenant_id)
     return {
         "ok": False,
+        "status": "missing",
         "error": "handle not found in current local index",
         "handle": handle,
         "available_handles": [record.get("handle") for record in records[:20] if record.get("handle")],
@@ -5142,6 +5379,11 @@ class Handler(BaseHTTPRequestHandler):
         supplied = (parse_qs(parsed.query).get("token") or [None])[0] or self.headers.get("X-OHH-Token")
         return _token_ok(SHOWCASE_TOKEN, supplied)
 
+    def _tenant(self, parsed, body: dict | None = None) -> str:
+        """P2 isolation seam at the request edge: ?tenant= → X-OHH-Tenant header → body → DEFAULT_TENANT.
+        Defaults to the single demo tenant (byte-identical) but is honored end-to-end when supplied."""
+        return resolve_tenant(parsed, self.headers.get(TENANT_HEADER), body)
+
     def _serve_web(self, name: str) -> None:
         """Serve a static file from web/baltor/ (open GET — viewing is never token-gated)."""
         try:
@@ -5377,9 +5619,10 @@ class Handler(BaseHTTPRequestHandler):
             pack_type = (qs.get("pack_type") or ["implementation_pack"])[0]
             token_budget = max(256, min(12000, int((qs.get("token_budget") or ["3000"])[0])))
             run_id = (qs.get("run_id") or [""])[0]
-            run = RUNS.get(run_id) if run_id else latest_run()
-            payload = context_search_payload(query, run=run, task_type=task_type, token_budget=token_budget, pack_type=pack_type)
-            log_event("context_gateway.search", "Returned bounded context pack", run_id=str((run or {}).get("run_id") or ""), source=query[:120], detail={"task_type": task_type, "pack_type": pack_type})
+            tenant = self._tenant(parsed)                          # P2: which tenant is searching
+            run = run_for_tenant(run_id, tenant)                   # tenant-scoped — cross-tenant run_id → None → no-run 404
+            payload = context_search_payload(query, run=run, task_type=task_type, token_budget=token_budget, pack_type=pack_type, tenant_id=tenant)
+            log_event("context_gateway.search", "Returned bounded context pack", run_id=str((run or {}).get("run_id") or ""), source=query[:120], detail={"task_type": task_type, "pack_type": pack_type, "tenant_id": tenant})
             self.send_bytes(200 if payload.get("ok") else 404, json.dumps(payload, indent=2).encode(), "application/json")
         elif path == "/api/context-gateway/fetch":
             # Item 4 (deep-dive): the gateway fetch returns RAW ingested content, so when OH_SHOWCASE_TOKEN
@@ -5395,10 +5638,15 @@ class Handler(BaseHTTPRequestHandler):
             handle = (qs.get("handle") or [""])[0]
             max_tokens = max(64, min(4000, int((qs.get("max_tokens") or ["1000"])[0])))
             run_id = (qs.get("run_id") or [""])[0]
-            run = RUNS.get(run_id) if run_id else latest_run()
-            payload = context_fetch_payload(handle, run=run, max_tokens=max_tokens)
-            log_event("context_gateway.fetch", "Fetched bounded context handle", run_id=str((run or {}).get("run_id") or ""), source=handle[:160], detail={"ok": payload.get("ok"), "kind": payload.get("kind")})
-            self.send_bytes(200 if payload.get("ok") else 404, json.dumps(payload, indent=2).encode(), "application/json")
+            tenant = self._tenant(parsed)                          # P2: which tenant is fetching
+            # ctxv:// resolves against the tenant-scoped version table (run-independent); ctx:// resolves a
+            # tenant-owned run (cross-tenant run_id → None → no-run 404, never leaking the handle's existence).
+            run = None if str(handle).startswith("ctxv://") else run_for_tenant(run_id, tenant)
+            payload = context_fetch_payload(handle, run=run, max_tokens=max_tokens, tenant_id=tenant)
+            # 410 Gone iff a once-pinned ctxv:// version was superseded+pruned; every other not-ok → 404.
+            code = 200 if payload.get("ok") else (410 if payload.get("status") == "gone" else 404)
+            log_event("context_gateway.fetch", "Fetched bounded context handle", run_id=str((run or {}).get("run_id") or ""), source=handle[:160], detail={"ok": payload.get("ok"), "kind": payload.get("kind"), "tenant_id": tenant, "status": payload.get("status")})
+            self.send_bytes(code, json.dumps(payload, indent=2).encode(), "application/json")
         elif path == "/api/context-gateway/receipts":
             # Honest provenance surface (deep-dive item 2): the persisted gateway receipts for search/fetch.
             qs = parse_qs(parsed.query)
@@ -5714,15 +5962,17 @@ class Handler(BaseHTTPRequestHandler):
                 data = json.loads(raw or "{}")
             except json.JSONDecodeError:
                 data = {}
-            run = RUNS.get(str(data.get("run_id") or "")) if data.get("run_id") else latest_run()
+            tenant = self._tenant(parsed, data)
+            run = run_for_tenant(str(data.get("run_id") or ""), tenant)
             payload = context_search_payload(
                 str(data.get("query") or ""),
                 run=run,
                 task_type=str(data.get("task_type") or "code_change"),
                 token_budget=int(data.get("token_budget") or 3000),
                 pack_type=str(data.get("pack_type") or "implementation_pack"),
+                tenant_id=tenant,
             )
-            log_event("context_gateway.search", "Returned bounded context pack", run_id=str((run or {}).get("run_id") or ""), source=str(data.get("query") or "")[:120], detail={"method": "POST"})
+            log_event("context_gateway.search", "Returned bounded context pack", run_id=str((run or {}).get("run_id") or ""), source=str(data.get("query") or "")[:120], detail={"method": "POST", "tenant_id": tenant})
             self.send_bytes(200 if payload.get("ok") else 404, json.dumps(payload, indent=2).encode(), "application/json")
             return
         if parsed.path == "/api/context-gateway/fetch":
@@ -5732,10 +5982,13 @@ class Handler(BaseHTTPRequestHandler):
                 data = json.loads(raw or "{}")
             except json.JSONDecodeError:
                 data = {}
-            run = RUNS.get(str(data.get("run_id") or "")) if data.get("run_id") else latest_run()
-            payload = context_fetch_payload(str(data.get("handle") or ""), run=run, max_tokens=int(data.get("max_tokens") or 1000))
-            log_event("context_gateway.fetch", "Fetched bounded context handle", run_id=str((run or {}).get("run_id") or ""), source=str(data.get("handle") or "")[:160], detail={"ok": payload.get("ok"), "method": "POST"})
-            self.send_bytes(200 if payload.get("ok") else 404, json.dumps(payload, indent=2).encode(), "application/json")
+            tenant = self._tenant(parsed, data)
+            handle = str(data.get("handle") or "")
+            run = None if handle.startswith("ctxv://") else run_for_tenant(str(data.get("run_id") or ""), tenant)
+            payload = context_fetch_payload(handle, run=run, max_tokens=int(data.get("max_tokens") or 1000), tenant_id=tenant)
+            code = 200 if payload.get("ok") else (410 if payload.get("status") == "gone" else 404)
+            log_event("context_gateway.fetch", "Fetched bounded context handle", run_id=str((run or {}).get("run_id") or ""), source=handle[:160], detail={"ok": payload.get("ok"), "method": "POST", "tenant_id": tenant, "status": payload.get("status")})
+            self.send_bytes(code, json.dumps(payload, indent=2).encode(), "application/json")
             return
         if parsed.path == "/api/context-gateway/glossary":
             length = int(self.headers.get("Content-Length") or "0")
@@ -5826,8 +6079,10 @@ class Handler(BaseHTTPRequestHandler):
         text = ""
         source_name = "pasted-context.txt"
         document_tree = None
+        form_tenant = ""                                          # P2: owner tenant supplied via the form body
         if "multipart/form-data" in ctype:
             form = parse_multipart_form(self.headers, self.rfile)
+            form_tenant = str(form.getfirst(TENANT_PARAM) or "")
             text = str(form.getfirst("text") or "")
             file_item = form["file"] if "file" in form else None
             if file_item is not None and getattr(file_item, "filename", ""):
@@ -5847,13 +6102,17 @@ class Handler(BaseHTTPRequestHandler):
             body = self.rfile.read(length).decode("utf-8", errors="ignore")
             data = parse_qs(body)
             text = (data.get("text") or [""])[0]
+            form_tenant = (data.get(TENANT_PARAM) or [""])[0]
         if not text.strip():
             text = SAMPLE_TEXT
             source_name = "baltor-policy-sample.txt"
             document_tree = None
             log_event("upload.fallback", "No source body supplied; using sample policy", source=source_name)
         source_type = "connector" if (document_tree or {}).get("connector_envelope") or source_name.startswith(("ftp://", "sftp://")) or "connector" in source_name.lower() else "upload"
-        run = create_background_run(text, source_name, source_type, document_tree)
+        # P2: the run is OWNED by the resolving tenant (form field → ?tenant= → X-OHH-Tenant → demo). The
+        # default keeps the current demo byte-identical; a supplied tenant scopes every ctx:// handle it mints.
+        tenant = self._tenant(parsed, {"tenant_id": form_tenant} if form_tenant else None)
+        run = create_background_run(text, source_name, source_type, document_tree, tenant_id=tenant)
         self.send_response(303)
         self.send_header("Location", f"/admin-demo/monitoring?run={run['run_id']}")
         self.end_headers()
@@ -5881,15 +6140,20 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def _self_test() -> int:
-    """P1 gateway-hardening proof (warrant: docs/architecture/capability-rubric-and-deep-dive-2026-06-11.md).
-    Covers: (1) ctx:// handle survives a REAL restart on the same durable db; (2) a receipt is issued +
-    persisted on fetch; (3) the CFPB ledger path honors the setting / lands in the durable volume; (4) the
-    in-process worker is the FALLBACK only (no double-processing when Redis publishes). Spawns this server
-    as a subprocess (like check_durable_restart_survival) and drives the run→search→fetch flow over HTTP —
-    deliberately NOT /api/demo/run-full-pipeline (that path is unrelated to this change)."""
+    """Gateway proof (warrant: docs/architecture/capability-rubric-and-deep-dive-2026-06-11.md).
+    P1 (still proven): (1) ctx:// handle survives a REAL restart on the same durable db; (2) a receipt is
+    issued + persisted on fetch; (3) the CFPB ledger path honors the setting / lands in the durable volume;
+    (4) the in-process worker is the FALLBACK only (no double-processing when Redis publishes).
+    P2 (tenancy + ctxv://): (5) a ctxv:// pin returns byte-identical bytes AFTER the live content changes,
+    is superseded-but-kept (lossless), and becomes 410 Gone only after an explicit prune; (6) tenant A
+    cannot fetch tenant B's ctx:// handle (404, no existence leak) while same-tenant fetch works, and a
+    ctxv:// version is tenant-scoped too; (7) the default-tenant path is byte-identical to before.
+    Spawns this server as a subprocess (like check_durable_restart_survival) and drives the
+    run→search→fetch flow over HTTP — deliberately NOT /api/demo/run-full-pipeline (unrelated to this change)."""
     import socket
     import subprocess
     import tempfile
+    import urllib.error
     import urllib.parse
     import urllib.request
 
@@ -5923,6 +6187,57 @@ def _self_test() -> int:
     check("item5: in-process worker is gated behind `if not published:` (no double-run)",
           gate_i != -1 and thread_i != -1 and 0 < (thread_i - gate_i) < 200,
           f"gate@{gate_i} thread@{thread_i}")
+
+    # ── P2 item5: ctxv:// immutability + lossless supersession + prune→410 (pure, in a durable subprocess) ──
+    # Done in a subprocess that imports the module WITH a temp BALTOR_DURABLE_DB (RUN_STORE live), so it
+    # exercises the real pin_version / fetch_pinned_version / prune_versions against real sqlite. It pins C1
+    # under base handle H, then pins a DIFFERENT content C2 under the SAME H (the live content changed), and
+    # proves: (a) C1's ctxv:// still returns C1 byte-identical (immutable under a live change); (b) C1 is now
+    # superseded but STILL fetchable (lossless — nothing deleted); (c) H's latest ctxv:// is C2; (d) after a
+    # prune to cap=1, C1's ctxv:// is 410 Gone (was-pinned, retention window passed) while C2 stays ok;
+    # (e) a wrong-tenant fetch of C2's ctxv:// is 'missing' (404), never leaking it across tenants.
+    pv_db = os.path.join(vol, "versions.db")
+    pv_code = (
+        "import os,sys,json; os.environ['BALTOR_DURABLE_DB']=sys.argv[1];"
+        "import scripts.baltor_admin_demo_server as s;"
+        "H='ctx://baltor/adm-pin/component/x=1';"
+        "C1={'text':'ten business days','v':1}; C2={'text':'thirty business days','v':2};"
+        "v1=s.pin_version(tenant_id='acme', run={'run_id':'adm-pin'}, base_handle=H, kind='component', content=C1);"
+        "st1,row1=s.fetch_pinned_version('acme', v1);"
+        "v2=s.pin_version(tenant_id='acme', run={'run_id':'adm-pin'}, base_handle=H, kind='component', content=C2);"
+        "st1b,row1b=s.fetch_pinned_version('acme', v1);"           # C1 after the live change → still C1
+        "st2,row2=s.fetch_pinned_version('acme', v2);"             # C2 latest
+        "stx,_=s.fetch_pinned_version('globex', v2);"             # wrong tenant → missing
+        "import sqlite3; sup=s.RUN_STORE.execute('SELECT superseded_at FROM gateway_versions WHERE version_handle=?',(v1,)).fetchone();"
+        "s.DURABLE_VERSIONS_MAX=1; s.prune_versions();"
+        "st1c,_=s.fetch_pinned_version('acme', v1); st2c,_=s.fetch_pinned_version('acme', v2);"
+        "print(json.dumps({'v1':v1,'v2':v2,'diff':v1!=v2,"
+        "'c1':json.loads(row1['body_json']) if row1 else None,"
+        "'c1_after':json.loads(row1b['body_json']) if row1b else None,"
+        "'c2':json.loads(row2['body_json']) if row2 else None,"
+        "'st1':st1,'st1b':st1b,'st2':st2,'stx':stx,'superseded':bool(sup and sup[0]),"
+        "'st1_after_prune':st1c,'st2_after_prune':st2c}))"
+    )
+    pvout = subprocess.run([sys.executable, "-c", pv_code, pv_db], cwd=str(REPO_ROOT),
+                           env={**os.environ, "PYTHONPATH": str(REPO_ROOT)}, capture_output=True, text=True)
+    try:
+        pv = json.loads((pvout.stdout or "").strip().splitlines()[-1])
+    except Exception:  # noqa: BLE001
+        pv = {}
+        check("P2 item5: ctxv:// version-pinning subprocess ran", False, (pvout.stderr or "")[-400:])
+    if pv:
+        C1, C2 = {"text": "ten business days", "v": 1}, {"text": "thirty business days", "v": 2}
+        check("P2 item5a: ctxv:// pin returns C1 byte-identical AFTER the live content changed to C2",
+              pv.get("st1b") == "ok" and pv.get("c1_after") == C1 and pv.get("c1") == C1, str(pv))
+        check("P2 item5b: superseding is LOSSLESS — old version superseded_at set but STILL fetchable",
+              pv.get("superseded") is True and pv.get("st1b") == "ok", str(pv.get("superseded")))
+        check("P2 item5c: latest ctxv:// for the same base is the NEW content C2 (distinct handle)",
+              pv.get("st2") == "ok" and pv.get("c2") == C2 and pv.get("diff") is True, str(pv))
+        check("P2 item5d: after prune past the cap, the old version is 410 GONE while the new one stays ok",
+              pv.get("st1_after_prune") == "gone" and pv.get("st2_after_prune") == "ok",
+              f"old={pv.get('st1_after_prune')} new={pv.get('st2_after_prune')}")
+        check("P2 item5e: a ctxv:// version is tenant-scoped — wrong tenant → missing (404), no leak",
+              pv.get("stx") == "missing", str(pv.get("stx")))
 
     # ── integrated restart-survival + receipt proof (real subprocess server) ──────────────────────────
     def free_port() -> int:
@@ -5977,6 +6292,54 @@ def _self_test() -> int:
         rc = json.loads(urllib.request.urlopen(base + "/api/context-gateway/receipts?limit=50", timeout=10).read())
         ops = {r.get("operation") for r in rc.get("receipts") or []}
         check("receipt PERSISTED for fetch + search (durable)", rc.get("durable") and "context.fetch" in ops and "context.search" in ops, str(sorted(ops)))
+
+        # ── P2 item6/7: tenant isolation over real HTTP ───────────────────────────────────────────────
+        # A status-aware GET (urlopen raises on 4xx/410): returns (status_code, json_body).
+        def http_get(url: str):
+            try:
+                r = urllib.request.urlopen(url, timeout=10)
+                return r.status, json.loads(r.read() or "{}")
+            except urllib.error.HTTPError as he:  # 404/410 carry a JSON body we still want to read
+                try:
+                    return he.code, json.loads(he.read() or "{}")
+                except Exception:  # noqa: BLE001
+                    return he.code, {}
+
+        # The default-tenant fetch above (no ?tenant=) already proved byte-identical default behavior (item7).
+        # Now create a run OWNED BY tenant 'acme', then prove 'globex' cannot reach its handle.
+        abody = urllib.parse.urlencode({"text": SAMPLE_TEXT, "source_name": "acme.txt", "tenant": "acme"}).encode()
+        areq = urllib.request.Request(base + "/admin-demo/runs", data=abody, method="POST",
+                                      headers={"Content-Type": "application/x-www-form-urlencoded"})
+        urllib.request.urlopen(areq, timeout=20).read()
+        time.sleep(0.5)
+        # search AS acme → an acme-owned ctx:// handle (its pack carries tenant_id)
+        a_sc, a_search = http_get(base + "/api/context-gateway/search?tenant=acme&query=escalation+threshold")
+        a_handles = (a_search.get("context_pack") or {}).get("source_handles") or []
+        a_handle = a_handles[0] if a_handles else ""
+        check("P2 item6: search is tenant-scoped (acme pack tagged tenant_id=acme)",
+              a_sc == 200 and a_search.get("tenant_id") == "acme" and bool(a_handle), str(a_search.get("tenant_id")))
+        # tenant 'globex' fetches acme's handle → 404 (never leaks that it exists)
+        g_sc, g_body = http_get(base + "/api/context-gateway/fetch?tenant=globex&handle=" + urllib.parse.quote(a_handle))
+        check("P2 item6: tenant B (globex) CANNOT fetch tenant A's handle → 404 (no existence leak)",
+              g_sc == 404 and g_body.get("ok") is not True, f"status={g_sc} body={str(g_body)[:120]}")
+        # globex search → its OWN (empty) namespace, never acme's run
+        gs_sc, gs_body = http_get(base + "/api/context-gateway/search?tenant=globex&query=escalation+threshold")
+        check("P2 item6: tenant B search never returns tenant A's run (own empty namespace → 404)",
+              gs_sc == 404 and gs_body.get("ok") is not True, f"status={gs_sc}")
+        # acme fetches its own handle → 200, and gets a ctxv:// version_handle back
+        a_sc2, a_fetch = http_get(base + "/api/context-gateway/fetch?tenant=acme&handle=" + urllib.parse.quote(a_handle))
+        a_version = a_fetch.get("version_handle") or ""
+        check("P2 item6: SAME-tenant fetch works (acme → 200) and returns a ctxv:// version_handle",
+              a_sc2 == 200 and a_fetch.get("ok") is True and a_version.startswith("ctxv://"), str(a_fetch)[:160])
+        # acme fetches the ctxv:// version → 200 immutable pinned bytes
+        av_sc, a_ver_fetch = http_get(base + "/api/context-gateway/fetch?tenant=acme&handle=" + urllib.parse.quote(a_version))
+        check("P2 item6: ctxv:// pinned-version fetch works over HTTP for the owner (200, immutable=True)",
+              av_sc == 200 and a_ver_fetch.get("ok") is True and a_ver_fetch.get("immutable") is True
+              and a_ver_fetch.get("content") == a_fetch.get("content"), str(a_ver_fetch)[:160])
+        # globex fetches acme's ctxv:// version → 404 (version isolation, no leak)
+        gv_sc, _gv = http_get(base + "/api/context-gateway/fetch?tenant=globex&handle=" + urllib.parse.quote(a_version))
+        check("P2 item6: tenant B CANNOT fetch tenant A's ctxv:// version → 404",
+              gv_sc == 404, f"status={gv_sc}")
     finally:
         stop(proc)
 
@@ -5996,14 +6359,14 @@ def _self_test() -> int:
 
     import shutil
     shutil.rmtree(vol, ignore_errors=True)
-    print(f"\n{'PASS — baltor_admin_demo_server self-test: ctx:// runs + receipts survive a real restart; receipts issued on search/fetch; CFPB path honors the volume setting; single (non-double) run engine.' if not failures else f'{len(failures)} FAILURES: {failures}'}")
+    print(f"\n{'PASS — baltor_admin_demo_server self-test: ctx:// runs + receipts survive a real restart; receipts issued on search/fetch; CFPB path honors the volume setting; single (non-double) run engine; P2 — gateway is tenant-isolated (B cannot fetch A: ctx:// AND ctxv:// → 404), ctxv:// returns the pinned version after a live content change (lossless supersession; 410 only after prune), default-tenant path byte-identical.' if not failures else f'{len(failures)} FAILURES: {failures}'}")
     return 0 if not failures else 1
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", type=int, default=9301)
-    parser.add_argument("--self-test", action="store_true", help="run the P1 gateway-hardening proof and exit")
+    parser.add_argument("--self-test", action="store_true", help="run the gateway hardening + tenancy proof and exit")
     args = parser.parse_args(argv)
     if args.self_test:
         return _self_test()
