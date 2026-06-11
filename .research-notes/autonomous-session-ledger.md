@@ -2237,3 +2237,28 @@ architecture/capability_rubric_assessment.json (33 questions × 12 surfaces, hon
 multi-cloud verdict, P0/P1/P2). TELEON BACKBONE: NOT YET — sequenced program planes→
 receipts(OTel ids)→ungameable gates→capability-compiler (topology-generator pattern is the
 proven substrate). Launch-ready: deploy layer, web tier, controller, provisioning CLI.
+
+## 2026-06-11 (cont 4) — "fix EVERYTHING" wave (4 parallel agents, all green) + DiffusionGemma verdict
+
+FIXED (each lane self-tested + cross-suite green: identity/events/registry/teleon/worker/
+provisioning/generator/showcase all PASS): identity sliding-window login throttle + lockout
+(generic 401 preserved — no enumeration oracle; audited lockouts; injectable clock tests);
+events ring rotation (lossless .1 generation) + transient 600/min cap w/ Retry-After —
+fill-to-DoS permanent-429 eliminated; registry append-through cache (O(n)-per-request →
+4.1ms over 22k rows) + api_calls rotation; teleon gate DE-CONTAMINATED (train/holdout parity
+split, expected outputs NEVER in prompts, promotion needs BOTH splits ≥0.90, answer-key-parrot
+regression test proves old gate promoted 4/4 and now rolls back at 0.5) + threading lock
+(concurrent versions monotonic); model-plane step 1: ChatRoute = shim over OIPS (dependency
+law verified first — scripts/ is tooling, 46 precedents), every call mints+persists
+ModelInvocationReceipts to dist/local-services-state/model-receipts/ with executed_base_host
+(node≠endpoint hole closed), node base_url binding in the provider graph, ONE network switch;
+worker dispatches on job kind — freshness CDC reingest jobs now run feed_source for real or
+fail LOUD; generator README emits scheduled-feeder commands (real argparse flags), the
+single-machine law for all 7 stateful apps, per-volume snapshot-retention 5. Rubric scores
+bumped + fix_wave note. DIFFUSIONGEMMA (owner ask): released 2026-06-10, Apache-2.0, 26B-A4B
+MoE, 1100 tok/s claims are LOW-BATCH only; quality strictly below AR Gemma-4-26B sibling on
+every benchmark; Ollama can't serve it; **Fly GPUs deprecated Aug 1 2026**; verdict DON'T
+self-host (warm GPU $510-725/mo vs ~$6/mo OpenRouter at 1k calls/day) — instead add
+google/gemma-4-26b-a4b-it via OpenRouter ($0.06/$0.33, :free dev tier) as the small-model
+route; re-evaluate when llama.cpp PR #24423 + Ollama #16664 land or a hosted route ≲$0.15/1M
+appears.

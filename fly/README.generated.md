@@ -117,3 +117,42 @@ fly deploy -c fly/aidr-worker-controller.fly.toml --ha=false
 ```
 
 After deploys: point Cloudflare DNS at the public apps (CNAME → <app>.fly.dev, proxied), then run the public gates (e2e/ohh_public_gate.mjs, e2e/teleon_gate.mjs) against the domains.
+
+## Scheduled feeder (keep the worker queue fed)
+
+The worker fleet drains the `ohh:foundry:jobs` queue; feed it on a schedule with Fly scheduled machines on the worker app (run from the repo root — `.` builds `Dockerfile`; or pass the app's currently deployed image ref instead):
+
+```bash
+fly machine run . --schedule daily -a aidr-worker --command "python -m scripts.foundry.seeds --enqueue"
+fly machine run . --schedule daily -a aidr-worker --command "python -m scripts.ingest.freshness --check --enqueue"
+```
+
+`seeds --enqueue` puts one partition job per research-queue area on the broker (add `--with-fixture` for a guaranteed-promoting smoke partition); `freshness --check --enqueue` polls every registered source (CDC) and enqueues a `reingest` job per new/changed source — the worker re-feeds it through `scripts.ingest.feed`.
+
+## Single-machine law (stateful apps)
+
+Every app below owns SINGLE-WRITER state (JSON/JSONL/SQLite on its volume). Never `fly scale count >1` on any of them — a second machine gets a second empty volume and forks the state; `--ha=false` at deploy time is mandatory, not an optimization. Scale these UP (bigger VM), never OUT:
+
+- `aidr-identity` — single-writer state at `/app/dist/identity` (volume `identity_state`)
+- `aidr-registry` — single-writer state at `/app/dist/registry` (volume `registry_state`)
+- `aidr-events` — single-writer state at `/app/dist/analytics` (volume `events_state`)
+- `aidr-teleon-runtime` — single-writer state at `/app/dist/local-services-state` (volume `teleon_runtime_state`)
+- `aidr-baltor-backend` — single-writer state at `/app/dist/local-services-state` (volume `baltor_backend_state`)
+- `aidr-redis` — single-writer state at `/data` (volume `redis_state`)
+- `aidr-postgres` — single-writer state at `/data` (volume `postgres_state`)
+
+## Volume snapshots (+ off-provider backup)
+
+Fly bills snapshot storage — pin retention to 5 days on every volume (`fly volumes list -a <app>` shows the volume id):
+
+```bash
+fly volumes update <identity_state-id> --snapshot-retention 5  # app aidr-identity, volume identity_state
+fly volumes update <registry_state-id> --snapshot-retention 5  # app aidr-registry, volume registry_state
+fly volumes update <events_state-id> --snapshot-retention 5  # app aidr-events, volume events_state
+fly volumes update <teleon_runtime_state-id> --snapshot-retention 5  # app aidr-teleon-runtime, volume teleon_runtime_state
+fly volumes update <baltor_backend_state-id> --snapshot-retention 5  # app aidr-baltor-backend, volume baltor_backend_state
+fly volumes update <redis_state-id> --snapshot-retention 5  # app aidr-redis, volume redis_state
+fly volumes update <postgres_state-id> --snapshot-retention 5  # app aidr-postgres, volume postgres_state
+```
+
+Snapshots live on the same provider as the volumes — also run a nightly off-provider backup (e.g. a scheduled machine running restic from each state mount to Cloudflare R2 or Backblaze B2) so a provider/account-level incident can't take the state and its only copies together.

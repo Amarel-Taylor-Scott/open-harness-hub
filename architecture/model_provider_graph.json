@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "note": "Model provider graph \u2014 nodes + numeric edges. Runtime branches on node_id + numeric codes, NEVER on display strings. Every external node REQUIRES_SECRET_REF + REQUIRES_LOCAL_EQUIVALENT; the offline default is model.local_stub@v1.",
+  "note": "Model provider graph \u2014 nodes + numeric edges. Runtime branches on node_id + numeric codes, NEVER on display strings. Every external node REQUIRES_SECRET_REF + REQUIRES_LOCAL_EQUIVALENT; the offline default is model.local_stub@v1. OPTIONAL per-node binding keys: `base_url` (the endpoint this node ACTUALLY serves from \u2014 adapters use it node-first with env OH_LLM_BASE_URL as fallback, so a receipt can never name a node another host served; NEVER embed credentials in it) and `model` (pin a model id node-first over env OH_LLM_MODEL). Nodes without base_url (the generic local node, BYOK, env-configured) intentionally resolve from env/tenant config; the receipt's executed_base_host records the effective host either way.",
   "offline_default_node": "model.local_stub@v1",
   "nodes": [
     {
@@ -42,6 +42,7 @@
     },
     {
       "node_id": "model.openai.frontier@candidate",
+      "base_url": "https://api.openai.com/v1",
       "tier_code": 500,
       "specialization_codes": [
         300,
@@ -60,6 +61,7 @@
     },
     {
       "node_id": "model.anthropic.frontier@candidate",
+      "base_url": "https://api.anthropic.com/v1",
       "tier_code": 600,
       "specialization_codes": [
         300,
@@ -78,6 +80,7 @@
     },
     {
       "node_id": "model.google.frontier@candidate",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
       "tier_code": 500,
       "specialization_codes": [
         300,
@@ -139,6 +142,7 @@
     },
     {
       "node_id": "model.fireworks@candidate",
+      "base_url": "https://api.fireworks.ai/inference/v1",
       "tier_code": 500,
       "specialization_codes": [
         300,
@@ -156,6 +160,7 @@
     },
     {
       "node_id": "model.ollama_cloud@candidate",
+      "base_url": "https://ollama.com/v1",
       "tier_code": 400,
       "specialization_codes": [
         100,
@@ -175,6 +180,7 @@
     },
     {
       "node_id": "model.ollama_local@candidate",
+      "base_url": "http://localhost:11434/v1",
       "tier_code": 300,
       "specialization_codes": [
         100,
@@ -190,6 +196,25 @@
       "local_equivalent": "model.local_stub@v1",
       "external": false,
       "display": "Ollama local \u2014 OpenAI-compatible localhost (candidate)",
+      "adapter_style": "openai_compatible"
+    },
+    {
+      "node_id": "model.env_openai_compatible@candidate",
+      "tier_code": 300,
+      "specialization_codes": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        1000,
+        1100
+      ],
+      "status_code": 200,
+      "secret_ref": "secret://env/oh_llm_api_key",
+      "local_equivalent": "model.local_stub@v1",
+      "external": true,
+      "display": "env-configured OpenAI-compatible (OH_LLM_BASE_URL; no fixed base_url by design \u2014 the receipt's executed_base_host records the effective host)",
       "adapter_style": "openai_compatible"
     }
   ],
@@ -236,6 +261,11 @@
     },
     {
       "from": "model.ollama_local@candidate",
+      "edge_type_code": 1300,
+      "to": "model.local_stub@v1"
+    },
+    {
+      "from": "model.env_openai_compatible@candidate",
       "edge_type_code": 1300,
       "to": "model.local_stub@v1"
     }

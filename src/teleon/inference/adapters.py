@@ -24,9 +24,14 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 
 from src.teleon.inference.oips import _stable, OFFLINE_DEFAULT_NODE
+from src.teleon.inference.receipts import base_host_of
 
 #: controlled vocabulary of API styles (a STYLE label, not a brand display-name; routing is numeric in oips)
 ADAPTER_STYLES = ("deterministic_stub", "openai_compatible", "ollama_native", "anthropic_messages")
+#: sampling default for live chat calls (one definition — scripts.model_routes imports it for its signature default)
+DEFAULT_TEMPERATURE = 0.2
+#: live-call socket timeout in seconds (generous: local models can be slow; callers may pass timeout_s to tighten)
+_LIVE_CALL_TIMEOUT_S = 300
 
 
 def provider_unavailable(node_id: str, reason_code: str) -> dict:
@@ -93,7 +98,12 @@ class _HttpAdapter(InferenceProviderAdapter):
         # external nodes with a secret_ref require that secret; local HTTP (e.g. Ollama localhost) may need none
         self.requires_secret = bool(self.secret_ref) and bool(node.get("external"))
 
-    def invoke(self, *, object_id, input_text, now, secrets=None, allow_network=False) -> dict:
+    def invoke(self, *, object_id, input_text, now, secrets=None, allow_network=False,
+               system: str = "", max_tokens: int | None = None, temperature: float | None = None,
+               api_key: str | None = None, timeout_s: int | None = None) -> dict:
+        # The optional keyword args are per-CALL overrides used by route shims (scripts.model_routes):
+        # defaults reproduce the pre-existing behavior exactly (no system message, no max_tokens cap,
+        # DEFAULT_TEMPERATURE, env api key, _LIVE_CALL_TIMEOUT_S).
         ok, reason = self.available(secrets=secrets, allow_network=allow_network)
         if not ok:
             return provider_unavailable(self.node_id, reason)
@@ -109,18 +119,25 @@ class _HttpAdapter(InferenceProviderAdapter):
         import urllib.request  # noqa: F401  (stdlib only; the gated live-call path — not exercised offline)
         base_url = str(self.node.get("base_url") or _os.environ.get("OH_LLM_BASE_URL", "")).rstrip("/")
         model = self.node.get("model") or _os.environ.get("OH_LLM_MODEL", "")
-        api_key = _os.environ.get("OH_LLM_API_KEY", "")  # resolved at call time; never embedded/echoed
+        key = api_key if api_key is not None else _os.environ.get("OH_LLM_API_KEY", "")  # call-time; never embedded/echoed
         if not base_url or not model:
             return provider_unavailable(self.node_id, "no_base_url_or_model_configured")
-        body = _json.dumps({"model": model, "temperature": 0.2,
-                            "messages": [{"role": "user", "content": input_text}]}).encode("utf-8")
+        messages = ([{"role": "system", "content": system}] if system else []) + \
+                   [{"role": "user", "content": input_text}]
+        request_body: dict = {"model": model,
+                              "temperature": DEFAULT_TEMPERATURE if temperature is None else temperature,
+                              "messages": messages,
+                              "stream": False}  # explicit OpenAI-compat default: one JSON body, never SSE chunks
+        if max_tokens is not None:
+            request_body["max_tokens"] = max_tokens
+        body = _json.dumps(request_body).encode("utf-8")
         headers = {"Content-Type": "application/json"}
-        if api_key:
-            headers["Authorization"] = f"Bearer {api_key}"
+        if key:
+            headers["Authorization"] = f"Bearer {key}"
         req = urllib.request.Request(base_url + "/chat/completions", data=body, headers=headers, method="POST")
         started = _time.perf_counter()
         try:
-            with urllib.request.urlopen(req, timeout=300) as resp:
+            with urllib.request.urlopen(req, timeout=timeout_s or _LIVE_CALL_TIMEOUT_S) as resp:
                 payload = _json.loads(resp.read().decode("utf-8"))
             output = payload["choices"][0]["message"]["content"] or ""
         except Exception as exc:  # any live failure degrades, never fabricates
@@ -129,6 +146,9 @@ class _HttpAdapter(InferenceProviderAdapter):
         return {"available": True, "executed_node_id": self.node_id, "requested_node_id": self.node_id,
                 "reason_code": "live_call", "output": output, "is_truth": False,
                 "model": payload.get("model") or model,
+                # EFFECTIVE base host of the endpoint that actually served the call — hostname[:port]
+                # only, never credentials — so the receipt can't name a node another host served.
+                "base_host": base_host_of(base_url),
                 "latency_ms": int((_time.perf_counter() - started) * 1000),
                 "tokens": {"input": usage.get("prompt_tokens"), "output": usage.get("completion_tokens")}}
 
@@ -173,6 +193,6 @@ def resolve_adapter(node: dict, *, registry: dict | None = None) -> InferencePro
     return reg[style_for_node(node)](node)
 
 
-__all__ = ["ADAPTER_STYLES", "provider_unavailable", "InferenceProviderAdapter", "LocalStubAdapter",
+__all__ = ["ADAPTER_STYLES", "DEFAULT_TEMPERATURE", "provider_unavailable", "InferenceProviderAdapter", "LocalStubAdapter",
            "HttpOpenAICompatibleAdapter", "OllamaNativeAdapter", "AnthropicMessagesAdapter",
            "REGISTRY", "style_for_node", "resolve_adapter"]

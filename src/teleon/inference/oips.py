@@ -1,9 +1,11 @@
 """src.teleon.inference.oips — the Open Inference Preference Spec engine: preference inheritance + numeric
 provider selection + governed fallback + ModelInvocationReceipt provenance + a local deterministic stub.
 
-Pure + deterministic (all inputs injected: available_secrets, provider_health, now). Branches on numeric codes +
-node ids, NEVER on provider display strings. No external SDK import, no network. Secret refs are checked for
-PRESENCE only — raw keys never appear here, in logs, or in receipts.
+Pure + deterministic decisions (all inputs injected: available_secrets, provider_health, now). Branches on numeric
+codes + node ids, NEVER on provider display strings. No external SDK import, no network. Secret refs are checked for
+PRESENCE only — raw keys never appear here, in logs, or in receipts. The ONLY side effect: infer_local appends each
+minted receipt to the durable JSONL sink (src.teleon.inference.receipts — best-effort, hashes/metadata only, never
+affects the returned values), so invocation provenance survives restarts instead of living in a process dict.
 """
 from __future__ import annotations
 
@@ -157,7 +159,8 @@ def _allowed_use(route: dict, executed_node: str) -> str:
 def build_receipt(*, object_id: str, preference_id: str, requested_model_class: str, route: dict,
                   executed_node: str, executed_model: str, input_text: str, output_text: str, now: str,
                   tokens: dict | None = None, cost: float | None = None, latency_ms: int | None = None,
-                  prompt_template: str = "", config_version: str = "inference_router_config@v1") -> dict:
+                  prompt_template: str = "", config_version: str = "inference_router_config@v1",
+                  base_host: str | None = None) -> dict:
     h = lambda s: "sha256:" + hashlib.sha256(s.encode()).hexdigest()
     receipt = {
         "schema_version": "ModelInvocationReceipt.v1",
@@ -166,6 +169,10 @@ def build_receipt(*, object_id: str, preference_id: str, requested_model_class: 
         "object_id": object_id, "preference_id": preference_id,
         "requested_model_class": requested_model_class,
         "selected_provider_node_id": executed_node, "selected_model": executed_model, "selected_region": "local",
+        # the EFFECTIVE host that served the call (hostname[:port], never credentials) — None when no
+        # HTTP endpoint executed (stub/blocked). Lets a receipt prove WHERE the call actually went,
+        # independent of which graph node was named.
+        "executed_base_host": base_host,
         "fallback_used": bool(route.get("fallback_used")),
         "fallback_reason_codes": list(route.get("fallback_reason_codes", [])),
         "rejected_candidates": list(route.get("rejected_candidates", [])),
@@ -229,7 +236,11 @@ def infer_local(*, object_id: str, preference_layers: list[dict], input_text: st
     receipt = build_receipt(object_id=object_id, preference_id=resolved["preference_id"],
                             requested_model_class=requested_class, route=route, executed_node=executed_node,
                             executed_model=executed_model, input_text=input_text, output_text=output, now=now,
-                            tokens=result.get("tokens"), latency_ms=result.get("latency_ms"))
+                            tokens=result.get("tokens"), latency_ms=result.get("latency_ms"),
+                            base_host=result.get("base_host"))
+    # durable provenance: best-effort append to the shared JSONL sink (never raises, never changes the return)
+    from src.teleon.inference.receipts import persist_receipt  # lazy: keep the decision plane import-light
+    persist_receipt(receipt, plane="oips")
     return {"output": output, "resolved_preference": resolved, "route_decision": route, "receipt": receipt}
 
 

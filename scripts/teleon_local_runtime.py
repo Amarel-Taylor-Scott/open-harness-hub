@@ -6,10 +6,13 @@ criteria on real examples. This service holds a small set of REAL deterministic 
 (pure-Python implementations — no model calls, no network), and a "run" actually EXECUTES the
 capability against its example suite right now:
 
-  * every example execution produces a RECEIPT (input/output hashes, pass/fail, duration µs);
-  * the run's score is the real pass-rate; the PROMOTION GATE is applied to that score
-    (>= 0.90 → promoted; >= 0.70 → candidate; below → rolled-back) and the capability's
-    version/status/state update accordingly;
+  * every example execution produces a RECEIPT (input/output hashes, pass/fail, duration µs,
+    train/holdout split — even example indices are TRAIN, odd are HOLDOUT);
+  * the run's score is the real pass-rate; the PROMOTION GATE requires BOTH the train and the
+    holdout pass-rates to clear the gate (>= 0.90 → promoted; overall >= 0.70 → candidate;
+    below → rolled-back) and the capability's version/status/state update accordingly. The
+    self-refine prompt may quote failed TRAIN inputs but NEVER any example's expected output,
+    so a model cannot promote by parroting an answer key it saw in its own prompt;
   * everything persists to disk (restart-safe) under dist/local-services-state/teleon-runtime/.
 
 Mutations are session-gated against the identity service (realm `teleon`), the same pattern as
@@ -34,6 +37,7 @@ import json
 import os
 import re
 import sys
+import threading
 import time
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -51,6 +55,23 @@ SERVICE_ID = "teleon_local_runtime"
 
 PROMOTE_AT = 0.90   # the gate: promoted at or above this real pass-rate
 CANDIDATE_AT = 0.70  # below the gate but workable → candidate; below this → rolled-back
+
+# Anti answer-key-gaming split (see Runtime._refined_instruction): every capability's examples
+# are deterministically split by index parity — even indices are TRAIN (their INPUTS may be
+# quoted in the self-refine prompt), odd indices are HOLDOUT (never shown in ANY prompt). The
+# expected OUTPUT text of any example, train or holdout, never enters a prompt at all.
+TRAIN_PARITY = 0              # example index i is TRAIN iff i % 2 == TRAIN_PARITY, else HOLDOUT
+TRAIN_SPLIT = "train"         # split labels on receipts — single definition, used everywhere
+HOLDOUT_SPLIT = "holdout"
+REFINE_SHOWN_MAX = 3          # max failed TRAIN inputs quoted in one refine prompt (prompt-size cap)
+GATE_BASIS = "train+holdout"  # promotion requires BOTH split pass-rates ≥ PROMOTE_AT on the full suite
+DETERMINISTIC_GATE_NOTE = "deterministic reference run — model not exercised"
+RATE_DECIMALS = 2             # display rounding for scores/pass-rates; receipts keep exact pass/fail
+
+
+def _example_split(index: int) -> str:
+    """Deterministic split: even example indices are TRAIN, odd are HOLDOUT (never prompted)."""
+    return TRAIN_SPLIT if index % 2 == TRAIN_PARITY else HOLDOUT_SPLIT
 
 
 def _registry_port(service_id: str) -> int:
@@ -175,6 +196,10 @@ class Runtime:
         self.caps_path = STATE_DIR / "capabilities.json"
         self.runs_path = STATE_DIR / "runs.jsonl"
         self.receipts_path = STATE_DIR / "receipts.jsonl"
+        # ONE lock: ThreadingHTTPServer runs handlers on parallel threads, so every
+        # read-modify-write of caps/runs/receipts state (and the file writes) serializes here —
+        # otherwise concurrent runs race the version bump and corrupt the append-only files.
+        self._lock = threading.Lock()
         if self.caps_path.exists():
             self.caps = json.loads(self.caps_path.read_text(encoding="utf-8"))
         else:
@@ -198,11 +223,22 @@ class Runtime:
                 "text — no commentary, no quotes, no code fences, no extra whitespace.")
 
     @staticmethod
-    def _refined_instruction(cap_id: str, base: str, failures: list[dict]) -> str:
-        shown = "\n".join(f"- input: {f['input']!r}\n  your output: {f['got']!r}\n  expected: {f['expected']!r}"
-                          for f in failures[:3])
-        return (base + " IMPORTANT — your previous attempt failed these examples; match the "
-                "expected outputs EXACTLY (character for character):\n" + shown)
+    def _refined_instruction(cap_id: str, base: str, train_fail_inputs: list[str]) -> str:
+        """Self-refine prompt — LEAK CONTROL. It may quote failed TRAIN inputs and DESCRIBE what
+        a correct output must satisfy (the capability's purpose + criteria), but the expected
+        OUTPUT text of ANY example (train or holdout) must never appear in any prompt: the
+        holdout split exists so a model that parrots leaked answers cannot clear the gate."""
+        spec = CAPABILITIES[cap_id]
+        describe = ("a correct output must satisfy every success criterion "
+                    f"({'; '.join(spec['criteria'])}) per the stated purpose, with nothing extra")
+        if train_fail_inputs:
+            shown = "\n".join(f"- {inp!r}" for inp in train_fail_inputs[:REFINE_SHOWN_MAX])
+            detail = (f"your previous attempt produced wrong outputs for these inputs — "
+                      f"{describe}:\n{shown}")
+        else:  # only held-out examples failed; they are never disclosed, even as inputs
+            detail = ("your previous attempt failed on held-out examples (their contents are "
+                      f"never disclosed); re-read the purpose and apply it exactly — {describe}")
+        return base + " IMPORTANT — " + detail
 
     def _suite(self, cap_id: str, run_id: str, attempt: int, transform) -> tuple[list[dict], int]:
         """Execute one pass over the example suite; the JUDGE (exact match) stays deterministic."""
@@ -218,9 +254,20 @@ class Runtime:
             ok = out == expected
             passed += ok
             receipts.append({"run_id": run_id, "attempt": attempt, "example": i,
+                             "split": _example_split(i),
                              "input_sha": _sha(inp), "output_sha": _sha(out),
                              "expected_sha": _sha(expected), "pass": ok, "duration_us": us})
         return receipts, passed
+
+    @staticmethod
+    def _split_rates(receipts: list[dict]) -> tuple[float, float]:
+        """(train, holdout) pass-rates over ONE attempt's receipts. An empty split fails closed
+        (0.0): a gate nobody measured must never read as cleared."""
+        rates = []
+        for split in (TRAIN_SPLIT, HOLDOUT_SPLIT):
+            rows = [r for r in receipts if r["split"] == split]
+            rates.append(sum(r["pass"] for r in rows) / len(rows) if rows else 0.0)
+        return rates[0], rates[1]
 
     def execute(self, cap_id: str, account_id: str, mode: str = "auto", route=None) -> dict:
         """REALLY run the capability suite and apply the promotion gate.
@@ -230,70 +277,95 @@ class Runtime:
         attempts receipted (lossless). mode 'deterministic': the seeded reference implementation
         (the honest fallback when no model route is reachable — labeled, never disguised).
         The gate itself is deterministic on purpose: evidence judges, models build.
+
+        GATE BASIS (train+holdout): the suite always runs in FULL, but promotion requires the
+        TRAIN and the HOLDOUT pass-rates to BOTH clear PROMOTE_AT. The refine prompt may quote
+        failed TRAIN inputs, never any expected output (see _refined_instruction), so a model
+        cannot promote by copying an answer key. The whole read-modify-write — version bump,
+        caps/runs/receipts state and file appends — serializes on self._lock because
+        ThreadingHTTPServer dispatches handlers on parallel threads.
         """
         spec = CAPABILITIES[cap_id]
-        state = self.caps[cap_id]
-        # version is part of the id: two rapid runs of one capability must never collide
-        run_id = f"run_{int(time.time() * 1000):x}_v{state['version'] + 1}_{cap_id}"
         route = route if route is not None else resolve_route()
-        use_model = mode in ("model", "auto") and route.health()
-        attempts = 0
-        model_note = None
-        if use_model:
-            instruction = self._instruction(cap_id)
-            receipts, passed = self._suite(
-                cap_id, run_id, 1,
-                lambda inp: route.complete(instruction, inp, max_tokens=300, temperature=0.0))
-            attempts = 1
+        with self._lock:
+            state = self.caps[cap_id]
+            # version is part of the id: two rapid runs of one capability must never collide
+            run_id = f"run_{int(time.time() * 1000):x}_v{state['version'] + 1}_{cap_id}"
+            use_model = mode in ("model", "auto") and route.health()
+            attempts = 0
+            model_note = None
+            if use_model:
+                instruction = self._instruction(cap_id)
+                receipts, passed = self._suite(
+                    cap_id, run_id, 1,
+                    lambda inp: route.complete(instruction, inp, max_tokens=300, temperature=0.0))
+                attempts = 1
+                train_rate, hold_rate = self._split_rates(receipts)
+                if min(train_rate, hold_rate) < PROMOTE_AT:  # one self-refine round on real failures
+                    train_fail_inputs = [spec["examples"][r["example"]][0] for r in receipts
+                                         if not r["pass"] and r["split"] == TRAIN_SPLIT]
+                    refined = self._refined_instruction(cap_id, instruction, train_fail_inputs)
+                    receipts2, passed2 = self._suite(
+                        cap_id, run_id, 2,
+                        lambda inp: route.complete(refined, inp, max_tokens=300, temperature=0.0))
+                    attempts = 2
+                    train_rate2, hold_rate2 = self._split_rates(receipts2)
+                    # keep the gate-better attempt's score (ties → attempt 2); ALL receipts persist
+                    if (passed2, min(train_rate2, hold_rate2)) >= (passed, min(train_rate, hold_rate)):
+                        passed, train_rate, hold_rate = passed2, train_rate2, hold_rate2
+                    receipts = receipts + receipts2
+                executed_mode, model_id = "model", route.model_id
+            else:
+                receipts, passed = self._suite(cap_id, run_id, 1, spec["impl"])
+                attempts = 1
+                train_rate, hold_rate = self._split_rates(receipts)
+                executed_mode, model_id = "deterministic", None
+                if mode == "model":
+                    model_note = "model mode requested but no route reachable — ran the reference implementation instead"
             total = len(spec["examples"])
-            if passed / total < PROMOTE_AT:  # one self-refine round on real failures
-                idx_fail = [r["example"] for r in receipts if not r["pass"]]
-                failures = [{"input": spec["examples"][i][0], "expected": spec["examples"][i][1],
-                             "got": "(see receipt hash)"} for i in idx_fail]
-                refined = self._refined_instruction(cap_id, instruction, failures)
-                receipts2, passed2 = self._suite(
-                    cap_id, run_id, 2,
-                    lambda inp: route.complete(refined, inp, max_tokens=300, temperature=0.0))
-                attempts = 2
-                if passed2 >= passed:  # keep the better attempt's score; ALL receipts persist
-                    passed = passed2
-                receipts = receipts + receipts2
-            executed_mode, model_id = "model", route.model_id
-        else:
-            receipts, passed = self._suite(cap_id, run_id, 1, spec["impl"])
-            attempts = 1
-            executed_mode, model_id = "deterministic", None
-            if mode == "model":
-                model_note = "model mode requested but no route reachable — ran the reference implementation instead"
-        total = len(spec["examples"])
-        score = round(passed / total, 2)
-        decision = ("promoted" if score >= PROMOTE_AT else
-                    "candidate" if score >= CANDIDATE_AT else "rolled-back")
-        state["version"] += 1
-        state["status"] = decision
-        state["last_score"] = score
-        state["last_mode"] = executed_mode
-        self._save_caps()
-        run = {"run_id": run_id, "capability_id": cap_id, "capability": spec["name"],
-               "account_id": account_id, "score": score, "passed": passed, "total": total,
-               "decision": decision, "version": state["version"], "at": int(time.time()),
-               "mode": executed_mode, "model_id": model_id, "attempts": attempts,
-               "duration_us": sum(r["duration_us"] for r in receipts)}
-        if model_note:
-            run["note"] = model_note
-        self.runs.append(run)
-        with self.runs_path.open("a", encoding="utf-8") as fh:
-            fh.write(json.dumps(run) + "\n")
-        with self.receipts_path.open("a", encoding="utf-8") as fh:
-            for r in receipts:
-                fh.write(json.dumps(r) + "\n")
-        return run
+            score = round(passed / total, RATE_DECIMALS)
+            # promotion needs BOTH splits ≥ PROMOTE_AT: even a fully leaked prompt could only
+            # game what the prompt contains, never the holdout. Lower tiers stay on the overall
+            # score, exactly as before.
+            decision = ("promoted" if train_rate >= PROMOTE_AT and hold_rate >= PROMOTE_AT else
+                        "candidate" if score >= CANDIDATE_AT else "rolled-back")
+            state["version"] += 1
+            state["status"] = decision
+            state["last_score"] = score
+            state["last_mode"] = executed_mode
+            self._save_caps()
+            run = {"run_id": run_id, "capability_id": cap_id, "capability": spec["name"],
+                   "account_id": account_id, "score": score, "passed": passed, "total": total,
+                   "train_pass_rate": round(train_rate, RATE_DECIMALS),
+                   "holdout_pass_rate": round(hold_rate, RATE_DECIMALS),
+                   # literal honesty field: no example's expected output entered any prompt —
+                   # guaranteed by _refined_instruction, enforced by the parrot regression test
+                   "holdout_contaminated": False,
+                   "gate_basis": GATE_BASIS,
+                   "decision": decision, "version": state["version"], "at": int(time.time()),
+                   "mode": executed_mode, "model_id": model_id, "attempts": attempts,
+                   "duration_us": sum(r["duration_us"] for r in receipts)}
+            if executed_mode == "deterministic":
+                # honest provenance: this gate was cleared by reference code, not a model
+                run["gate_note"] = DETERMINISTIC_GATE_NOTE
+            if model_note:
+                run["note"] = model_note
+            for r in receipts:  # every receipt carries the run's gate evidence (self-contained audit rows)
+                r["train_pass_rate"] = run["train_pass_rate"]
+                r["holdout_pass_rate"] = run["holdout_pass_rate"]
+                r["holdout_contaminated"] = False
+            self.runs.append(run)
+            with self.runs_path.open("a", encoding="utf-8") as fh:
+                fh.write(json.dumps(run) + "\n")
+            with self.receipts_path.open("a", encoding="utf-8") as fh:
+                for r in receipts:
+                    fh.write(json.dumps(r) + "\n")
+            return run
 
     def receipts_for(self, run_id: str) -> list[dict]:
-        if not self.receipts_path.exists():
-            return []
-        return [r for r in map(json.loads, self.receipts_path.read_text(encoding="utf-8").splitlines())
-                if r["run_id"] == run_id]
+        with self._lock:  # consistent snapshot: never read a half-appended line mid-execute()
+            text = self.receipts_path.read_text(encoding="utf-8") if self.receipts_path.exists() else ""
+        return [r for r in map(json.loads, text.splitlines()) if r["run_id"] == run_id]
 
 
 def _identity_base() -> str:
@@ -399,6 +471,10 @@ def _self_test() -> int:
         run = rt.execute("cap-dates", "acct_test", mode="deterministic")
         ck("run really executed (all examples)", run["total"] == 4 and run["passed"] == 4)
         ck("real score → promotion gate applied", run["score"] == 1.0 and run["decision"] == "promoted")
+        ck("deterministic run labeled honestly (gate_note + basis + split rates)",
+           run["gate_note"] == DETERMINISTIC_GATE_NOTE and run["gate_basis"] == GATE_BASIS
+           and run["train_pass_rate"] == 1.0 and run["holdout_pass_rate"] == 1.0
+           and run["holdout_contaminated"] is False)
         ck("version bumped + status persisted", rt.caps["cap-dates"]["version"] == 2
            and rt.caps["cap-dates"]["status"] == "promoted")
         receipts = rt.receipts_for(run["run_id"])
@@ -434,6 +510,10 @@ def _self_test() -> int:
         rec_m = rt.receipts_for(run_m["run_id"])
         ck("model receipts persist BOTH attempts (lossless)",
            len(rec_m) == 8 and {r["attempt"] for r in rec_m} == {1, 2})
+        ck("genuine model run: BOTH splits cleared the gate, fields honest, no gate_note",
+           run_m["train_pass_rate"] == 1.0 and run_m["holdout_pass_rate"] == 1.0
+           and run_m["gate_basis"] == GATE_BASIS and run_m["holdout_contaminated"] is False
+           and "gate_note" not in run_m)
 
         class DeadRoute:
             model_id = "unreachable"
@@ -441,10 +521,76 @@ def _self_test() -> int:
                 return False
         run_d = rt.execute("cap-dates", "acct_test", mode="model", route=DeadRoute())
         ck("model mode with no route → honest deterministic fallback + note",
-           run_d["mode"] == "deterministic" and "note" in run_d)
+           run_d["mode"] == "deterministic" and "note" in run_d and "gate_note" in run_d)
+
+        # ---- ANTI-GAMING REGRESSION (the de-contamination this gate exists for) ----
+        # Under the OLD refine prompt (expected outputs pasted verbatim), this route promoted
+        # 4/4 on attempt 2 by copying the answer key. It must now fail the holdout and NOT promote.
+        class ParrotRoute:
+            """Answer-key parrot: succeeds on an example ONLY if that example's expected
+            output text is visible in its prompt; otherwise it just echoes the input."""
+            model_id = "answer-key-parrot"
+            def __init__(self):
+                self.leak_seen = False
+            def health(self):
+                return True
+            def complete(self, system, user, **kw):
+                for inp, expected in CAPABILITIES["cap-cite"]["examples"]:
+                    if inp == user and expected in system:
+                        self.leak_seen = True
+                        return expected  # copies the key — the gamed path
+                return user  # no key visible → no real skill: echo unchanged
+        parrot = ParrotRoute()
+        run_p = rt.execute("cap-cite", "acct_test", mode="model", route=parrot)
+        ck("anti-gaming: no expected output text ever reached a prompt", not parrot.leak_seen)
+        ck("anti-gaming: answer-key parrot fails the holdout and is NOT promoted",
+           run_p["decision"] != "promoted" and run_p["holdout_pass_rate"] < PROMOTE_AT)
+        rec_p = rt.receipts_for(run_p["run_id"])
+        ck("anti-gaming: holdout receipts record the real failures",
+           any(not r["pass"] and r["split"] == HOLDOUT_SPLIT for r in rec_p))
+        ck("receipts carry split + gate evidence fields",
+           len(rec_p) == 8 and all(r["split"] in (TRAIN_SPLIT, HOLDOUT_SPLIT)
+                                   and r["holdout_contaminated"] is False
+                                   and "train_pass_rate" in r and "holdout_pass_rate" in r
+                                   for r in rec_p))
+        ck("split rule is the deterministic even/odd parity",
+           all(r["split"] == _example_split(r["example"]) for r in rec_p))
+
+        # ---- concurrency: parallel handler threads must not corrupt versions/state ----
+        workers = 2      # the reported race window: two ThreadingHTTPServer handler threads
+        per_thread = 8   # rapid-fire read-modify-write cycles per thread to expose races
+        v0 = rt.caps["cap-redact"]["version"]
+        barrier = threading.Barrier(workers)
+        errors: list[str] = []
+        def hammer() -> None:
+            try:
+                barrier.wait()
+                for _ in range(per_thread):
+                    rt.execute("cap-redact", "acct_test", mode="deterministic", route=DeadRoute())
+            except Exception as exc:  # pragma: no cover - only on regression
+                errors.append(repr(exc))
+        threads = [threading.Thread(target=hammer) for _ in range(workers)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+        new_n = workers * per_thread
+        versions = sorted(r["version"] for r in rt.runs if r["capability_id"] == "cap-redact")
+        ck("concurrent executes: versions monotonic, contiguous, no duplicates",
+           not errors and rt.caps["cap-redact"]["version"] == v0 + new_n
+           and versions[-new_n:] == list(range(v0 + 1, v0 + new_n + 1)))
+        ids = [r["run_id"] for r in rt.runs]
+        ck("concurrent executes: run ids unique", len(ids) == len(set(ids)))
+        reloaded_runs = [json.loads(line) for line in
+                         rt.runs_path.read_text(encoding="utf-8").splitlines()]
+        disk_caps = json.loads(rt.caps_path.read_text(encoding="utf-8"))
+        ck("state files intact after concurrent writes (every line parses, counts match)",
+           len(reloaded_runs) == len(rt.runs)
+           and disk_caps["cap-redact"]["version"] == v0 + new_n)
     STATE_DIR = real_state
-    print("\n" + ("PASS — teleon_local_runtime: REAL deterministic capability execution with "
-                  "receipts, a real promotion gate, and restart-safe state."
+    print("\n" + ("PASS — teleon_local_runtime: REAL capability execution with receipts, a "
+                  "train+holdout promotion gate (no answer-key leakage), locked concurrent "
+                  "state, and restart-safe persistence."
                   if not fails else f"{len(fails)} FAILURES: {fails}"))
     return 0 if not fails else 1
 

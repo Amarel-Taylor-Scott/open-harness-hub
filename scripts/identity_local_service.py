@@ -32,9 +32,10 @@ import secrets as _secrets
 import sys
 import threading
 import time
+from collections import deque
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
@@ -47,6 +48,17 @@ MAX_BODY_BYTES = 64 * 1024          # local JSON bodies only; anything bigger is
 KEY_PREFIX_DISPLAY_CHARS = 12       # how much of a raw key the list projection may reveal
 _REQUEST_ID_RE = re.compile(r"^[A-Za-z0-9._:-]{1,80}$")
 
+# -- login throttle policy (closes the unthrottled-credential-guessing gap) --
+LOGIN_WINDOW_S = 300                # sliding failure window: 5 min is long enough to see scripted
+                                    # guessing, short enough that a fat-fingered human heals fast
+LOGIN_MAX_FAILURES = 5              # failures per (realm, identifier) inside the window before a
+                                    # lockout — humans re-type a few times, scripts burn this out
+LOGIN_SOURCE_MAX_FAILURES = 20      # wider budget per (realm, source addr): catches one source
+                                    # SPRAYING many identifiers, with headroom for shared-NAT and
+                                    # local proof traffic (existing proofs fail ≤~4 per realm)
+LOCKOUT_S = 900                     # 15 min lockout (3× the window, so an expired lockout restarts
+                                    # with an empty window): ~5 guesses per 15 min kills brute force
+
 
 def _now() -> int:
     """Wall-clock seconds, injected into the kit as its logical clock (ttl values are in seconds)."""
@@ -57,6 +69,69 @@ def _key_hash(realm_id: str, raw_key: str) -> str:
     """One-way ref for an API key (hash-only at rest). NOT production crypto — same seam class as the
     kit's CredentialProviderPort; a real KMS/HMAC scheme drops in when deploying."""
     return "keyref:" + hashlib.blake2b(f"apikey|{realm_id}|{raw_key}".encode(), digest_size=16).hexdigest()
+
+
+class _LoginThrottle:
+    """Sliding-window login limiter + lockout, keyed per (realm, identifier) AND per (realm, source
+    address). Realms are independent by law (no SSO), so throttle state never bridges realms either.
+
+    Deliberately IN-MEMORY, per-process: this service's law is one process per state dir on one
+    machine, so process memory IS the whole picture. Lockouts are transient anti-bruteforce posture,
+    not identity truth — persisting them to the JSON state would let a flood survive restarts as a
+    durable self-DoS, so they are never written to disk. Limits are constructor parameters (defaults
+    = the module policy constants) so the self-test can exercise them without env vars or sleeps."""
+
+    _IDENTIFIER_DIM = "identifier"  # window dimension names — keep the two key spaces disjoint
+    _SOURCE_DIM = "source"
+
+    def __init__(self, window_s: int = LOGIN_WINDOW_S, max_failures: int = LOGIN_MAX_FAILURES,
+                 source_max_failures: int = LOGIN_SOURCE_MAX_FAILURES,
+                 lockout_s: int = LOCKOUT_S) -> None:
+        self.window_s = window_s
+        self.max_failures = max_failures
+        self.source_max_failures = source_max_failures
+        self.lockout_s = lockout_s
+        self.failures: dict[tuple[str, str, str], deque[int]] = {}   # key -> failure timestamps
+        self.locked_until: dict[tuple[str, str, str], int] = {}
+
+    def _keys(self, realm_id: str, identifier: str,
+              source: str) -> tuple[tuple[str, str, str], tuple[str, str, str]]:
+        return ((self._IDENTIFIER_DIM, realm_id, identifier), (self._SOURCE_DIM, realm_id, source))
+
+    def _prune(self, key: tuple[str, str, str], now: int) -> deque[int]:
+        window = self.failures.setdefault(key, deque())
+        while window and window[0] <= now - self.window_s:
+            window.popleft()
+        return window
+
+    def locked(self, realm_id: str, identifier: str, source: str, now: int) -> bool:
+        for key in self._keys(realm_id, identifier, source):
+            until = self.locked_until.get(key, 0)
+            if now < until:
+                return True
+            if until:                                  # expired lockout: drop it; the failure window
+                del self.locked_until[key]             # is older than LOGIN_WINDOW_S, so it prunes clean
+        return False
+
+    def record_failure(self, realm_id: str, identifier: str, source: str, now: int) -> bool:
+        """Record one failed attempt on both dimensions; True when this attempt STARTS a lockout
+        (the audit hook). Only ever called while unlocked — locked attempts are rejected upstream."""
+        started = False
+        ident_key, source_key = self._keys(realm_id, identifier, source)
+        for key, limit in ((ident_key, self.max_failures), (source_key, self.source_max_failures)):
+            window = self._prune(key, now)
+            window.append(now)
+            if len(window) >= limit:
+                self.locked_until[key] = now + self.lockout_s
+                started = True
+        return started
+
+    def reset(self, realm_id: str, identifier: str, source: str, now: int) -> None:
+        """A successful login clears the IDENTIFIER's window + lock. The source window is left to
+        age out: one good login must not launder a spray across many other identifiers."""
+        ident_key, _ = self._keys(realm_id, identifier, source)
+        self.failures.pop(ident_key, None)
+        self.locked_until.pop(ident_key, None)
 
 
 class RealmRuntime:
@@ -133,13 +208,17 @@ class IdentityService:
     SERVICE_SCOPES = ("llm:invoke", "events:write", "registry:read", "registry:publish",
                       "serve:cited", "verify:run", "state:read", "state:write")
 
-    def __init__(self, state_dir: Path | None = None, registry_path: Path | None = None) -> None:
+    def __init__(self, state_dir: Path | None = None, registry_path: Path | None = None,
+                 clock: Callable[[], int] | None = None,
+                 login_throttle: _LoginThrottle | None = None) -> None:
         self.registry = json.loads((registry_path or REGISTRY_PATH).read_text(encoding="utf-8"))
         defaults = self.registry["defaults"]
         self.state_dir = Path(state_dir) if state_dir else (REPO_ROOT / defaults["state_dir"])
         self.state_dir.mkdir(parents=True, exist_ok=True)
         self.default_port = int(defaults["port"])
         self.lock = threading.Lock()
+        self._clock = clock or _now            # injectable so the self-test elapses windows, no sleeps
+        self.login_throttle = login_throttle or _LoginThrottle()
         self.runtimes = {spec["realm_id"]: RealmRuntime(spec, defaults, self.state_dir)
                          for spec in self.registry["realms"]}
         self.audit_path = self.state_dir / "audit-events.jsonl"
@@ -233,7 +312,7 @@ class IdentityService:
 
     # -- request handling (transport-independent; the HTTP handler is a thin shell) --
     def handle(self, method: str, realm_id: str, action: str, body: dict[str, Any],
-               request_id: str, bearer: str = "") -> tuple[int, dict[str, Any]]:
+               request_id: str, bearer: str = "", source: str = "") -> tuple[int, dict[str, Any]]:
         # service-to-service slice: spans two realms, authed by the FROM realm's service secret
         # (a Bearer header, never a user session) — handled before the per-realm user dispatch
         if action.startswith("service/"):
@@ -247,11 +326,15 @@ class IdentityService:
         actor_box = {"actor": "anonymous"}
         try:
             with self.lock:
-                status, payload = self._dispatch(rt, method, action, body, _now(), actor_box)
+                status, payload = self._dispatch(rt, method, action, body, self._clock(),
+                                                 actor_box, source)
         except ValueError as exc:
             status, payload = 400, {"error": str(exc)}
         self.audit(realm_id, action, actor_box["actor"],
                    "ok" if status < 400 else "rejected", request_id)
+        if actor_box.pop("lockout_started", ""):
+            # the lockout transition gets its OWN audit kind; the wire response stays generic 401
+            self.audit(realm_id, "login/lockout", actor_box["actor"], "locked", request_id)
         return status, payload
 
     def _send_verify_email(self, realm: str, identifier: str, account_id: str) -> str:
@@ -286,7 +369,7 @@ class IdentityService:
         return 404, {"error": f"unknown service action {action!r}"}
 
     def _dispatch(self, rt: RealmRuntime, method: str, action: str, body: dict[str, Any],
-                  now: int, actor_box: dict[str, str]) -> tuple[int, dict[str, Any]]:
+                  now: int, actor_box: dict[str, str], source: str = "") -> tuple[int, dict[str, Any]]:
         if action == "register" and method == "POST":
             acct = rt.realm.register(str(body.get("identifier", "")), str(body.get("secret", "")), now=now)
             rt.save()
@@ -305,11 +388,19 @@ class IdentityService:
             actor_box["actor"] = acct["account_id"]
             return 200, {k: acct[k] for k in ("account_id", "status", "onboarding_done")}
         if action == "login" and method == "POST":
+            identifier = str(body.get("identifier", ""))
+            # throttle gate BEFORE the credential path: a locked identifier/source gets the SAME
+            # generic 401 as a bad secret — lock state must not become an enumeration oracle
+            if self.login_throttle.locked(rt.realm_id, identifier, source, now):
+                return 401, {"error": "login rejected"}
             try:
-                sess = rt.realm.login(str(body.get("identifier", "")), str(body.get("secret", "")), now=now)
+                sess = rt.realm.login(identifier, str(body.get("secret", "")), now=now)
             except ValueError:
                 # generic on purpose: a login surface must not enumerate accounts or failure reasons
+                if self.login_throttle.record_failure(rt.realm_id, identifier, source, now):
+                    actor_box["lockout_started"] = "yes"   # handle() audits this as login/lockout
                 return 401, {"error": "login rejected"}
+            self.login_throttle.reset(rt.realm_id, identifier, source, now)
             rt.save()
             actor_box["actor"] = sess["account_id"]
             return 200, dict(sess)
@@ -413,7 +504,8 @@ class _Handler(BaseHTTPRequestHandler):
                 action = "api-keys/list"
             body = dict(pair.split("=", 1) for pair in query.split("&") if "=" in pair)
         bearer = self.headers.get("Authorization", "").removeprefix("Bearer ").strip()
-        status, payload = self.identity.handle(method, realm_id, action, body, rid, bearer)
+        status, payload = self.identity.handle(method, realm_id, action, body, rid, bearer,
+                                               source=self.client_address[0])
         self._send(status, payload, rid)
 
     def do_GET(self) -> None:   # noqa: N802 (http.server API)
@@ -440,16 +532,135 @@ def start_service(port: int = 0, state_dir: Path | None = None,
     return server, thread, server.server_address[1]
 
 
+def _self_test() -> int:
+    """Offline proof of the login throttle: wrong-secret failures trip a lockout that rejects even
+    the CORRECT secret with the same generic 401, the lockout is audited as its own kind, success
+    resets the identifier window, an elapsed lockout heals (injected clock — no sleeps), a spraying
+    source is cut off per (realm, source), and the HTTP handler really plumbs the client address.
+    Temp state dir, ephemeral port, stdlib-only. Exit 0/1."""
+    import shutil
+    import tempfile
+    import urllib.error
+    import urllib.request
+
+    fails: list[str] = []
+
+    def ck(name: str, ok: bool, detail: str = "") -> None:
+        print(f"  [{'ok' if ok else 'FAIL'}] {name}{(': ' + detail) if detail and not ok else ''}")
+        if not ok:
+            fails.append(name)
+
+    good = "-".join(("throttle", "proof", "fragment"))   # FAKE passphrase fragments, not a real secret
+    clock = [1_000_000]                                  # injected logical clock (seconds)
+    state_dir = Path(tempfile.mkdtemp(prefix="identity-throttle-proof-"))
+    svc = IdentityService(state_dir=state_dir / "core", clock=lambda: clock[0])
+    rid = "throttle-proof-001"
+    src = "203.0.113.10"                                 # TEST-NET-3 documentation address
+
+    def login(identifier: str, secret: str, source: str = src) -> tuple[int, dict[str, Any]]:
+        return svc.handle("POST", "baltor", "login",
+                          {"identifier": identifier, "secret": secret}, rid, source=source)
+
+    def provision(identifier: str) -> None:
+        st, acct = svc.handle("POST", "baltor", "register",
+                              {"identifier": identifier, "secret": good}, rid, source=src)
+        assert st == 201, f"register failed ({st}): {acct}"
+        for step in acct["onboarding_steps"]:
+            svc.handle("POST", "baltor", "onboard",
+                       {"account_id": acct["account_id"], "step": step}, rid, source=src)
+
+    server = thread = None
+    try:
+        provision("lock@example.test")
+        st, _ = login("lock@example.test", good)
+        ck("A: correct secret logs in before any failures", st == 200, str(st))
+        results = [login("lock@example.test", good + "x") for _ in range(LOGIN_MAX_FAILURES + 1)]
+        ck(f"A: {LOGIN_MAX_FAILURES + 1} wrong-secret logins all return 401",
+           [s for s, _ in results] == [401] * (LOGIN_MAX_FAILURES + 1), str([s for s, _ in results]))
+        ck("A: every rejection is the same generic body (no reason enumeration)",
+           all(body == {"error": "login rejected"} for _, body in results))
+
+        st, body = login("lock@example.test", good)
+        ck("B: the CORRECT secret during lockout is still rejected (401)", st == 401, str(st))
+        ck("B: the lockout response is byte-identical to a bad-secret response",
+           body == {"error": "login rejected"})
+        audit_path = state_dir / "core" / "audit-events.jsonl"
+        events = [json.loads(line) for line in audit_path.read_text(encoding="utf-8").splitlines()]
+        ck("B: the lockout transition is audited as its own kind (login/lockout, locked)",
+           any(e["action"] == "login/lockout" and e["outcome"] == "locked" for e in events))
+
+        clock[0] += LOCKOUT_S + 1                        # elapse the lockout, no sleeping
+        st, sess = login("lock@example.test", good)
+        ck("C: after the lockout elapses the correct secret succeeds", st == 200 and "session_id" in sess,
+           str(st))
+
+        for _ in range(LOGIN_MAX_FAILURES - 1):          # success above reset the window: these
+            login("lock@example.test", good + "x")       # fresh failures stay BELOW the limit
+        st, _ = login("lock@example.test", good)
+        ck("D: failures reset on success (a fresh sub-limit run does not lock)", st == 200, str(st))
+
+        clock[0] += LOGIN_WINDOW_S + 1                   # clean window before the spray scenario
+        provision("spray-target@example.test")
+        spray_src = "198.51.100.7"                       # TEST-NET-2: the hostile source
+        for i in range(LOGIN_SOURCE_MAX_FAILURES):
+            login(f"ghost-{i}@example.test", good, source=spray_src)
+        st_blocked, _ = login("spray-target@example.test", good, source=spray_src)
+        st_clean, _ = login("spray-target@example.test", good, source=src)
+        ck("E: a source spraying many identifiers is locked even with a correct secret",
+           st_blocked == 401, str(st_blocked))
+        ck("E: the same account from a clean source still logs in", st_clean == 200, str(st_clean))
+
+        # F: over HTTP the handler passes client_address down — the lockout works on the wire
+        server, thread, port = start_service(port=0, state_dir=state_dir / "http")
+        base = f"http://127.0.0.1:{port}/api/identity/baltor"
+
+        def post(path: str, payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+            req = urllib.request.Request(base + path, method="POST",
+                                         data=json.dumps(payload).encode(),
+                                         headers={"Content-Type": "application/json"})
+            try:
+                with urllib.request.urlopen(req, timeout=10) as resp:
+                    return resp.status, json.loads(resp.read() or b"{}")
+            except urllib.error.HTTPError as err:
+                return err.code, json.loads(err.read() or b"{}")
+
+        st, acct = post("/register", {"identifier": "wire@example.test", "secret": good})
+        for step in acct["onboarding_steps"]:
+            post("/onboard", {"account_id": acct["account_id"], "step": step})
+        wire = [post("/login", {"identifier": "wire@example.test", "secret": good + "x"})[0]
+                for _ in range(LOGIN_MAX_FAILURES + 1)]
+        st, body = post("/login", {"identifier": "wire@example.test", "secret": good})
+        ck("F: over HTTP the lockout fires too (client address plumbed)",
+           wire == [401] * (LOGIN_MAX_FAILURES + 1) and st == 401
+           and body == {"error": "login rejected"}, f"{wire} then {st}")
+    finally:
+        if server is not None:
+            server.shutdown()
+            thread.join(timeout=5)
+        shutil.rmtree(state_dir, ignore_errors=True)
+
+    print("\n" + ("PASS — identity_local_service --self-test: sliding-window login throttle per "
+                  "(realm, identifier) + (realm, source), lockout rejects even correct secrets with "
+                  "the same generic 401, audited as login/lockout, reset on success, heals after "
+                  f"{LOCKOUT_S}s, and is live over HTTP."
+                  if not fails else f"{len(fails)} FAILURES: {fails}"))
+    return 0 if not fails else 1
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--port", type=int, default=None, help="default comes from the realm registry")
     parser.add_argument("--state-dir", default=None)
     parser.add_argument("--serve", action="store_true", help="run in the foreground")
+    parser.add_argument("--self-test", action="store_true",
+                        help="offline login-throttle proof (temp state, injected clock)")
     parser.add_argument("--bind", default=os.environ.get("OH_BIND_HOST", "127.0.0.1"),
                         help="0.0.0.0 lets the local Caddy gateway reach this host service via "
                              "host.docker.internal (public exposure still only via the gateway/tunnel); "
                              "default honors OH_BIND_HOST for container deploys")
     args = parser.parse_args(argv)
+    if args.self_test:
+        return _self_test()
     identity = IdentityService(state_dir=Path(args.state_dir) if args.state_dir else None)
     port = args.port if args.port is not None else identity.default_port
     if not args.serve:

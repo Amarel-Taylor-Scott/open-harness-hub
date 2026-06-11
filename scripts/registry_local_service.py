@@ -28,6 +28,14 @@ LAW (mirrors the registry's law + the repo's promotion boundary):
     (discovery is not trust; candidate != active).
   * no secrets stored; the raw session id is never persisted (only the resolved account id is).
   * append-only JSONL; the workspace summary is REPLAYED from the log (no destructive state).
+    Reads are served by an in-process APPEND-THROUGH CACHE (parsed once at startup, appended on
+    every write); the files stay the durable source — a restart rebuilds the cache from disk.
+  * api_calls.jsonl is size-rotated (API_CALLS_ROTATE_LINES) keeping exactly one previous
+    generation (.1, preserved — lossless); counters rebuild from the live generation only.
+
+Run ``python3 -m scripts.registry_local_service --self-test`` for the offline store proof
+(cache-after-write, restart rehydration, rotation); the full service/HTTP proof remains
+``scripts/check_registry_backend.py``.
 
 Offline, stdlib-only. Port + identity port come from the registries (single source, drift-gated by
 scripts/check_registry_backend.py).
@@ -63,6 +71,10 @@ FREE_TIER_CALL_CAP = 1000        # calls/30d that map to a full usage meter on t
 ENTRY_FIELDS = ("id", "name", "by", "facet", "score", "installs", "ver", "desc")
 ACTIVITY_LIMIT = 8               # most-recent events shown on the dashboard
 REVIEW_DECISIONS = ("approve", "reject", "revoke")   # approve = promote; revoke = rollback
+# Size bound for the hot api_calls.jsonl (it grows per authed request, unbounded otherwise).
+# At this many lines the live log rotates to exactly ONE preserved previous generation
+# (api_calls.jsonl.1) — far above CALL_WINDOW/FREE_TIER scale, so the 30d meter stays usable.
+API_CALLS_ROTATE_LINES = 50_000
 
 
 class SelfReviewError(Exception):
@@ -162,7 +174,8 @@ class SessionValidator:
 # the store — append-only workspace log; the dashboard summary is replayed from it
 # ---------------------------------------------------------------------------
 class RegistryStore:
-    def __init__(self, state_dir: Path | None = None, bundle_dir: Path | None = None) -> None:
+    def __init__(self, state_dir: Path | None = None, bundle_dir: Path | None = None,
+                 rotate_calls_lines: int = API_CALLS_ROTATE_LINES) -> None:
         self.state_dir = Path(state_dir) if state_dir else (REPO_ROOT / "dist" / "registry")
         self.state_dir.mkdir(parents=True, exist_ok=True)
         self.workspace_path = self.state_dir / "workspace.jsonl"      # install/uninstall/publish
@@ -173,6 +186,19 @@ class RegistryStore:
         self.admins_path = self.state_dir / "admins.jsonl"           # admin roster (operator-bootstrapped)
         self.catalog_path = self.state_dir / "catalog.json"
         self.lock = threading.Lock()
+        self.rotate_calls_lines = rotate_calls_lines  # injectable so the self-test proves rotation cheaply
+        # APPEND-THROUGH CACHE (hot-path fix): each JSONL is parsed ONCE here; reads serve from
+        # memory and writes append to BOTH the file and this cache under self.lock — previously
+        # every workspace/audit read re-parsed whole files per request (O(n) per request).
+        # The files stay the durable source of truth: a restart rebuilds this cache from disk
+        # (proven in --self-test). SINGLE-MACHINE LAW: this assumes exactly one service process
+        # owns state_dir (deploy law — never `fly scale count >1` on stateful apps; JSONL state
+        # is single-writer). A second writer process would silently stale this cache.
+        self._cache: dict[Path, list[dict]] = {
+            p: self._load_jsonl(p)
+            for p in (self.workspace_path, self.calls_path, self.review_path,
+                      self.decisions_path, self.reviewers_path, self.admins_path)
+        }
         self.catalog = self._load_or_build_catalog(bundle_dir or BUNDLE_DIR)
         # operator bootstrap seam: AIDR_REGISTRY_ADMINS="realm:account_id,realm2:acct" seeds admins
         # without a file write (handy for deploys). The file roster + this env allowlist are unioned;
@@ -211,14 +237,52 @@ class RegistryStore:
             return seed
         return next((e for e in self.promoted(realm) if e.get("id") == entry_id), None)
 
+    @staticmethod
+    def _load_jsonl(path: Path) -> list[dict]:
+        """Parse one append-only JSONL into memory (startup rehydration). Unparseable lines are
+        skipped exactly like the old per-request readers skipped them (a torn tail line after a
+        crash mid-append must never wedge startup)."""
+        if not path.exists():
+            return []
+        out: list[dict] = []
+        for line in path.read_text(encoding="utf-8").splitlines():
+            try:
+                rec = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(rec, dict):
+                out.append(rec)
+        return out
+
+    def _rows(self, path: Path) -> list[dict]:
+        """THE read path for every JSONL-backed query: a snapshot of the in-memory rows — never a
+        per-request file re-parse. The shallow copy (pointer copy, cheap) keeps iteration safe
+        while another request thread appends."""
+        with self.lock:
+            return list(self._cache[path])
+
     def _append(self, path: Path, rec: dict) -> None:
+        """Append-through (caller MUST hold self.lock): the durable file first, then the cache."""
         with path.open("a", encoding="utf-8") as fh:
             fh.write(json.dumps(rec, sort_keys=True) + "\n")
+        self._cache[path].append(rec)
+
+    def _rotate_calls_locked(self) -> None:
+        """Size-based rotation for the API-call log (caller holds self.lock): rename the live file
+        to ``api_calls.jsonl.1`` and start fresh. Exactly ONE previous generation is kept,
+        PRESERVED — rotation never truncates in place (lossless); a later rotation replaces ``.1``
+        (the deliberate retention bound for this operational request log). Counters/summaries
+        (e.g. the 30d meter) rebuild from the live generation only — an honest floor, never a
+        fabricated number."""
+        os.replace(self.calls_path, self.calls_path.with_name(self.calls_path.name + ".1"))
+        self._cache[self.calls_path] = []
 
     def log_call(self, account_id: str, realm: str, method: str, path: str, now: int) -> None:
         with self.lock:
             self._append(self.calls_path, {"ts": now, "account_id": account_id, "realm": realm,
                                            "method": method, "path": path})
+            if len(self._cache[self.calls_path]) >= self.rotate_calls_lines:
+                self._rotate_calls_locked()
 
     def record(self, account_id: str, realm: str, action: str, entry: dict, now: int) -> dict:
         """action in {install, uninstall, publish}. entry is a client-supplied SNAPSHOT (id/name/
@@ -234,32 +298,16 @@ class RegistryStore:
         return rec
 
     def _events_for(self, account_id: str, realm: str) -> list[dict]:
-        if not self.workspace_path.exists():
-            return []
-        out = []
-        for line in self.workspace_path.read_text(encoding="utf-8").splitlines():
-            try:
-                rec = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            if rec.get("account_id") == account_id and rec.get("realm") == realm:
-                out.append(rec)
-        return out
+        return [rec for rec in self._rows(self.workspace_path)
+                if rec.get("account_id") == account_id and rec.get("realm") == realm]
 
     def _calls_30d(self, account_id: str, realm: str, now: int) -> int:
-        if not self.calls_path.exists():
-            return 0
+        # Counts the LIVE generation only (post-rotation the meter is an honest floor — see
+        # _rotate_calls_locked; the rotation bound is far above the free-tier cap anyway).
         cutoff = now - CALL_WINDOW_SECONDS
-        n = 0
-        for line in self.calls_path.read_text(encoding="utf-8").splitlines():
-            try:
-                rec = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            if (rec.get("account_id") == account_id and rec.get("realm") == realm
-                    and int(rec.get("ts", 0)) >= cutoff):
-                n += 1
-        return n
+        return sum(1 for rec in self._rows(self.calls_path)
+                   if (rec.get("account_id") == account_id and rec.get("realm") == realm
+                       and int(rec.get("ts", 0)) >= cutoff))
 
     @staticmethod
     def _ago(ts: int, now: int) -> str:
@@ -313,14 +361,8 @@ class RegistryStore:
     def submissions(self, account_id: str, realm: str, now: int) -> list[dict]:
         """The account's review-queue submissions (candidates), newest first. A submission stays
         in_review until it clears review — it is NEVER public-active here (discovery ≠ trust)."""
-        if not self.review_path.exists():
-            return []
         out = []
-        for line in self.review_path.read_text(encoding="utf-8").splitlines():
-            try:
-                rec = json.loads(line)
-            except json.JSONDecodeError:
-                continue
+        for rec in self._rows(self.review_path):
             if rec.get("account_id") == account_id and rec.get("realm") == realm:
                 entry = rec.get("entry") or {}
                 out.append({"entry_id": rec.get("entry_id"), "name": entry.get("name") or rec.get("entry_id"),
@@ -331,17 +373,10 @@ class RegistryStore:
         return out
 
     # ---- roster helper (one replay for both reviewer + admin rosters) --------
-    @staticmethod
-    def _replay_roster(path: Path, realm: str) -> set[str]:
+    def _replay_roster(self, path: Path, realm: str) -> set[str]:
         """Current members of an append-only grant/revoke roster for a realm (latest action wins)."""
-        if not path.exists():
-            return set()
         state: dict[str, str] = {}
-        for line in path.read_text(encoding="utf-8").splitlines():
-            try:
-                rec = json.loads(line)
-            except json.JSONDecodeError:
-                continue
+        for rec in self._rows(path):
             if rec.get("realm") == realm and rec.get("account_id"):
                 state[rec["account_id"]] = rec.get("action")
         return {a for a, act in state.items() if act == "grant"}
@@ -383,14 +418,8 @@ class RegistryStore:
     def recent_contributors(self, realm: str, now: int, limit: int = 12) -> list[dict]:
         """Distinct accounts who've submitted candidates in this realm (the people most likely to be
         made reviewers) — so an admin can grant active contributors without copy-pasting account ids."""
-        if not self.review_path.exists():
-            return []
         agg: dict[str, dict] = {}
-        for line in self.review_path.read_text(encoding="utf-8").splitlines():
-            try:
-                rec = json.loads(line)
-            except json.JSONDecodeError:
-                continue
+        for rec in self._rows(self.review_path):
             if rec.get("realm") == realm and rec.get("account_id"):
                 a = agg.setdefault(rec["account_id"], {"account_id": rec["account_id"], "submissions": 0, "ts": 0})
                 a["submissions"] += 1
@@ -402,27 +431,15 @@ class RegistryStore:
 
     # ---- review queue + decisions (the ONLY path candidate → public-active) --
     def _latest_submissions(self, realm: str) -> dict[str, dict]:
-        if not self.review_path.exists():
-            return {}
         subs: dict[str, dict] = {}
-        for line in self.review_path.read_text(encoding="utf-8").splitlines():
-            try:
-                rec = json.loads(line)
-            except json.JSONDecodeError:
-                continue
+        for rec in self._rows(self.review_path):
             if rec.get("realm") == realm and rec.get("entry_id"):
                 subs[rec["entry_id"]] = rec       # latest submission per entry wins
         return subs
 
     def _latest_decisions(self, realm: str) -> dict[str, dict]:
-        if not self.decisions_path.exists():
-            return {}
         dec: dict[str, dict] = {}
-        for line in self.decisions_path.read_text(encoding="utf-8").splitlines():
-            try:
-                rec = json.loads(line)
-            except json.JSONDecodeError:
-                continue
+        for rec in self._rows(self.decisions_path):
             if rec.get("realm") == realm and rec.get("entry_id"):
                 dec[rec["entry_id"]] = rec        # latest decision per entry wins
         return dec
@@ -499,17 +516,12 @@ class RegistryStore:
         dec_map = {"approve": ("Promoted to catalog", "✓", "review:approve", True),
                    "reject": ("Rejected candidate", "⊘", "review:reject", False),
                    "revoke": ("Revoked promotion", "↩", "review:revoke", True)}
-        if self.decisions_path.exists():
-            for line in self.decisions_path.read_text(encoding="utf-8").splitlines():
-                try:
-                    rec = json.loads(line)
-                except json.JSONDecodeError:
-                    continue
-                if rec.get("realm") == realm and rec.get("reviewer_account") == account_id:
-                    ev = dec_map.get(rec.get("decision"), (rec.get("decision"), "•", "review", True))
-                    rows.append({"ts": rec.get("ts", 0), "ev": ev[0], "icon": ev[1],
-                                 "target": (rec.get("entry") or {}).get("name") or rec.get("entry_id"),
-                                 "policy": ev[2], "ok": ev[3]})
+        for rec in self._rows(self.decisions_path):
+            if rec.get("realm") == realm and rec.get("reviewer_account") == account_id:
+                ev = dec_map.get(rec.get("decision"), (rec.get("decision"), "•", "review", True))
+                rows.append({"ts": rec.get("ts", 0), "ev": ev[0], "icon": ev[1],
+                             "target": (rec.get("entry") or {}).get("name") or rec.get("entry_id"),
+                             "policy": ev[2], "ok": ev[3]})
         rows.sort(key=lambda r: r.get("ts", 0), reverse=True)
         for r in rows:
             r["t"] = self._ago(r["ts"], now)
@@ -751,8 +763,101 @@ def _roster_cli(args: list[str]) -> int:
     return 0
 
 
+def _self_test() -> int:
+    """Offline store proof for the hot-path cache + rotation (the HTTP/service proof stays in
+    scripts/check_registry_backend.py): cache serves after writes, a restart (new RegistryStore
+    on the same state_dir) rehydrates equal state, rotation preserves the previous generation."""
+    import shutil
+    import tempfile
+
+    fails: list[str] = []
+
+    def ck(name: str, ok: bool, detail: str = "") -> None:
+        print(f"  [{'ok' if ok else 'FAIL'}] {name}{(': ' + detail) if detail and not ok else ''}")
+        if not ok:
+            fails.append(name)
+
+    tmp = Path(tempfile.mkdtemp(prefix="registry-selftest-"))
+    no_bundle = tmp / "no-bundle"   # nonexistent ⇒ empty catalog (store proof needs no design bundle)
+    now = 1_700_000_000
+    rotate_at = 5                   # tiny injected bound so rotation is provable in milliseconds
+    try:
+        sd = tmp / "state"
+        store = RegistryStore(state_dir=sd, bundle_dir=no_bundle, rotate_calls_lines=rotate_at)
+
+        # ── 1) append-through: reads reflect writes immediately ─────────────────
+        store.record("a1", "r1", "install", {"id": "x1", "name": "X One", "score": "4.0"}, now)
+        store.record("a1", "r1", "publish", {"id": "c1", "name": "Cand"}, now + 1)
+        store.log_call("a1", "r1", "GET", "/w", now + 2)
+        ws = store.workspace("a1", "r1", now + 3)
+        stats = dict(ws["stats"])
+        ck("cache serves writes immediately (installed/published/calls)",
+           stats["Installed"] == 1 and stats["Published"] == 1 and stats["API calls · 30d"] == 1, str(stats))
+
+        # reads are MEMORY-served: blank the durable files; the live store still answers.
+        # (Disk stays the durable source for RESTART — restored + proven right below.)
+        ws_bytes, call_bytes = store.workspace_path.read_bytes(), store.calls_path.read_bytes()
+        store.workspace_path.write_text("", encoding="utf-8")
+        store.calls_path.write_text("", encoding="utf-8")
+        again = dict(store.workspace("a1", "r1", now + 3)["stats"])
+        ck("reads served from memory, not a per-request file re-parse",
+           again["Installed"] == 1 and again["API calls · 30d"] == 1, str(again))
+        store.workspace_path.write_bytes(ws_bytes)   # restore the durable layer (lossless)
+        store.calls_path.write_bytes(call_bytes)
+
+        # review/roster flows ride the same cache (decide reads submissions from memory)
+        store.grant_reviewer("r1", "rev1", by="t", now=now + 4)
+        store.decide("r1", "c1", "rev1", "approve", "ok", now + 5, score="4.2")
+        ck("review flow over the cache promotes the candidate",
+           any(e.get("id") == "c1" for e in store.promoted("r1")))
+
+        # ── 2) restart: a NEW store on the same state_dir rehydrates EQUAL state ─
+        store2 = RegistryStore(state_dir=sd, bundle_dir=no_bundle, rotate_calls_lines=rotate_at)
+        ck("restart rehydrates an equal workspace summary",
+           store2.workspace("a1", "r1", now + 6) == store.workspace("a1", "r1", now + 6))
+        ck("restart rehydrates submissions + roster + decisions",
+           store2.submissions("a1", "r1", now + 6) == store.submissions("a1", "r1", now + 6)
+           and store2.is_reviewer("r1", "rev1")
+           and store2.audit("rev1", "r1", now + 6) == store.audit("rev1", "r1", now + 6))
+
+        # ── 3) rotation: live → .1 (preserved), counters rebuild from live only ──
+        rot_dir = tmp / "rot"
+        rs = RegistryStore(state_dir=rot_dir, bundle_dir=no_bundle, rotate_calls_lines=rotate_at)
+        for i in range(rotate_at + 2):                      # 5 trigger the rotation, 2 land live
+            rs.log_call("a1", "r1", "GET", f"/c{i}", now + i)
+        prev = rs.calls_path.with_name(rs.calls_path.name + ".1")
+        ck("rotation triggered at the line bound", prev.exists())
+        prev_lines = prev.read_text(encoding="utf-8").splitlines()
+        live_lines = rs.calls_path.read_text(encoding="utf-8").splitlines()
+        ck("previous generation preserved losslessly (rotation never truncates)",
+           len(prev_lines) == rotate_at and "/c0" in prev_lines[0], f"{len(prev_lines)} lines")
+        ck("live generation holds only the post-rotation tail",
+           len(live_lines) == 2 and "/c5" in live_lines[0], f"{len(live_lines)} lines")
+        ck("counters rebuild from the live generation only", rs._calls_30d("a1", "r1", now + 9) == 2)
+        rs2 = RegistryStore(state_dir=rot_dir, bundle_dir=no_bundle, rotate_calls_lines=rotate_at)
+        ck("restart after rotation rehydrates the live generation only",
+           rs2._calls_30d("a1", "r1", now + 9) == 2)
+        # a second rotation REPLACES .1 (exactly one previous generation — the retention bound)
+        for i in range(rotate_at - 2):
+            rs.log_call("a1", "r1", "GET", f"/d{i}", now + 10 + i)
+        ck("second rotation keeps exactly one previous generation (.1 replaced, no .2)",
+           "/d2" in prev.read_text(encoding="utf-8")
+           and not prev.with_name(prev.name.replace(".1", ".2")).exists()
+           and rs._calls_30d("a1", "r1", now + 20) == 0)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+    print("\n" + ("PASS — registry store self-test: append-through cache serves reads from memory, "
+                  "restart rehydrates equal state from the durable JSONL, api_calls rotation keeps "
+                  "one preserved previous generation."
+                  if not fails else f"{len(fails)} FAILURES: {fails}"))
+    return 0 if not fails else 1
+
+
 def main() -> int:
     args = sys.argv[1:]
+    if args and args[0] == "--self-test":
+        return _self_test()
     if args and args[0] in _ROSTER_COMMANDS:
         return _roster_cli(args)
     port = _registry_port()
