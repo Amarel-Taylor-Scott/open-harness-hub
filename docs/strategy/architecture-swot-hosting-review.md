@@ -203,6 +203,13 @@ collision (needs --port arg).
 
 ## 7. Hosting — the ADVERSARIAL pass (revised after deeper diligence)
 
+> **SUPERSEDED IN PART (2026-06-11):** the full six-lane comparison — Fly deep-dive, managed
+> scale-to-zero (ACA/Cloud Run), VPS/k3s, PaaS, bare-metal/budget, and the per-provider
+> MCP/agent-automation scores demanded by the owner's new hard requirement ("agent sets up
+> everything after account+billing") — now lives in `docs/strategy/hosting-decision-matrix.md`.
+> That doc is the current verdict (Fly ~$40–50 leaning pick · DO DOKS boring-safe · ACA dark
+> horse); this section remains as the earlier adversarial narrative for DO/Hetzner/Fly.
+
 Need: ~10 lightweight long-running Python services + 4 fronts + Postgres + Redis, ALL
 same-region/same-network, US presence, cheap, ONE provider. GPU not required.
 

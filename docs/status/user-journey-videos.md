@@ -10,6 +10,12 @@ per-realm sign-up, live /api/build with model selection, the MODEL-BUILT Teleon 
 lifecycle (real gate decisions + receipts), real installs/keys, the live event bus with real
 inference receipts. Captioned-emulated: billing/checkout, run-console trace.
 
+NARRATION (added 2026-06-11): every committed video carries a spoken voice-over —
+`e2e/narrate_videos.mjs` synthesizes each chapter caption (Edge neural TTS, en-US-AndrewNeural),
+tempo-fits clips to chapter gaps (≤1.4×), and muxes onto the H.264 track (29/29 PASS, ffprobe
+verified). Two of ~230 chapter clips failed TTS and stay caption-only: journey-2-baltor c15,
+site-openreceipthub c2. Per-chapter PNG close-ups live in `media/user-journey-videos/stills/`.
+
 ## Open Harness Hub — PUBLIC URL: landing → live build → live registry → sign-up → live canvas + real export → configuration
 
 `artifacts/e2e/videos/journey-1-openharnesshub.mp4` · 101s · 25 chapters · against `expansion-cat-manual-podcasts.trycloudflare.com`

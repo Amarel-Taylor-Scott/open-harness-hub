@@ -2128,3 +2128,35 @@ provisioning. RESEARCH: Airbyte pivoted to "the context layer for production-gra
 (Context Store, MCP Gateway, Agent Engine, 600+ connectors, vector destinations) — the most
 direct Baltor positioning collision; differentiation = assurance vs movement ("they deliver
 context; we make it safe to act on"); wrap as ingestion CANDIDATE behind ports; memory saved.
+
+## 2026-06-11 — Narration shipped (29/29) + the six-lane hosting matrix + ktx research
+
+NARRATION: found+fixed the runaway-mux bug — apad makes mixed audio infinite and with
+stream-copied video `-shortest` never terminates (ffmpegs spinning 94% CPU for 100+ min, two
+racing on one output from the earlier orphan). Fix: explicit `-t <vidDur+0.2>` output cap +
+write-to-.part-then-rename (no plausible partials), kill by EXACT PID only. Full batch then
+PASSED 29/29 in minutes (6-way concurrent TTS); ffprobe-verified AAC on every video; 2 of ~230
+chapter clips TTS-missed (journey-2 c15, openreceipthub c2 — captions cover them; recorded in
+README+manifest). Synced narrated mp4s + 29 stills galleries + run-report into
+media/user-journey-videos (~87MB committed deliverable).
+HOSTING (owner: "look at other options and costs", then HARD REQUIREMENT "platform must be
+agent-automatable after account+billing", then "include raw barebones"): six parallel
+adversarial research lanes, all prices verified on official pages/billing APIs 2026-06-10/11 →
+NEW CANONICAL DOC docs/strategy/hosting-decision-matrix.md (master table: 19 options × cost ×
+agent-score × scale-to-zero × risk); SWOT §7 banner marks it superseded-in-part. Headlines:
+Fly $39–52 keeps the leaning-pick crown WITH eyes open (65 incidents/90d; Jun-8 capacity error
+hit the exact stopped-machine wake path; reservations −40%; custom Machines controller justified
+— official autoscaler can't reach zero, dormant since 2024-06); DO DOKS $81→97–117 boring-safe
+(official MCP spans 20+ services incl. managed PG/Valkey — best non-hyperscaler agent story);
+ACA ≈$79 dark horse (scale rules ARE KEDA incl. redis scaler; Managed Redis B0 $11.68); Cloud
+Run's $73 is a mirage for us (idle CPU-throttle breaks background work → honest $126); Render
+$127 structurally eliminated; Koyeb Mistral-acquired; Hetzner $56 fails the agent-bootstrap
+requirement (console-only tokens, KYC flags, 3 price hikes in 2026, US traffic cut to 4TB);
+barebones lane: Netcup RS4000 Manassas ~$40 best raw $/GB (manual order), OVH SYS-1 $33 (TF
+can't order Eco), Equinix Metal EOL 2026-06-30; wildcards Modal $0 burst fleet / Oracle
+Always-Free staging clone. MCP insight: API completeness + token bootstrap is the real gate,
+not MCP presence. Memories: hosting-agent-automatable-requirement, kaelio-ktx-competitor.
+KTX: Kaelio/ktx = YC X25 open-source "executable context layer for data agents" (1.1k★ in 30d,
+Apache-2.0, MCP-first, file-first git state, read-only by design) — unrelated to hosting,
+directly adjacent to Baltor's governed-context thesis; differentiate on verification rail +
+receipts; closest comparable WrenAI 15.5k★; vanna archived Feb 2026 (category consolidating).

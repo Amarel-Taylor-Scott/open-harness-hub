@@ -10,7 +10,7 @@
 // Run: node e2e/narrate_videos.mjs [journey-id ...]     (default: every journey in the report)
 
 import { MsEdgeTTS, OUTPUT_FORMAT } from 'msedge-tts';
-import { readFileSync, writeFileSync, mkdirSync, existsSync, statSync, createWriteStream, rmSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, statSync, createWriteStream, rmSync, renameSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
@@ -71,16 +71,19 @@ for (const j of targets) {
   const tmp = join(OUT_DIR, `.tmp-${j.id}`);
   rmSync(tmp, { recursive: true, force: true });
   mkdirSync(tmp, { recursive: true });
+  // synthesize concurrently (batches of 6) — serial TTS was the bottleneck
+  const specs = j.chapters.map((c, i) => ({ c, i, text: speakable(c.caption) })).filter((s) => s.text);
+  for (let b = 0; b < specs.length; b += 6) {
+    await Promise.all(specs.slice(b, b + 6).map(async (s) => {
+      try { s.ok = await ttsTo(join(tmp, `c${s.i}.mp3`), s.text); } catch (e) { s.ok = false; }
+    }));
+  }
   const clips = [];
-  for (let i = 0; i < j.chapters.length; i += 1) {
-    const c = j.chapters[i];
-    const text = speakable(c.caption);
-    if (!text) continue;
+  for (const s of specs) {
+    if (!s.ok) { console.log(`  [tts-miss] ${j.id} c${s.i}`); continue; }
+    const { c, i } = s;
     const gap = Math.max(1.2, (i + 1 < j.chapters.length ? j.chapters[i + 1].at_s : vidDur) - c.at_s - 0.4);
     const raw = join(tmp, `c${i}.mp3`);
-    try {
-      if (!(await ttsTo(raw, text))) continue;
-    } catch (e) { console.log(`  [tts-miss] ${j.id} c${i}: ${String(e).slice(0, 60)}`); continue; }
     let dur = probeDuration(raw) || 2;
     let use = raw;
     if (dur > gap) {
@@ -93,16 +96,21 @@ for (const j of targets) {
   }
   if (!clips.length) { console.log(`  [skip] ${j.id} — no narration clips`); continue; }
 
-  const args = ['-y', '-loglevel', 'error', '-i', video];
+  const args = ['-y', '-nostdin', '-loglevel', 'error', '-i', video];
   clips.forEach((c) => args.push('-i', c.file));
   const delays = clips.map((c, i) => `[${i + 1}:a]adelay=${Math.round(c.at * 1000)}|${Math.round(c.at * 1000)}[a${i}]`).join(';');
   const mixIn = clips.map((_, i) => `[a${i}]`).join('');
   const out = join(OUT_DIR, j.video.mp4);
+  const part = `${out}.part.mp4`;
+  // -t caps the output explicitly: apad makes the mixed audio infinite, and with stream-copied
+  // video -shortest alone never terminates (observed: muxes spinning 100+ min on 1-min videos)
   args.push('-filter_complex', `${delays};${mixIn}amix=inputs=${clips.length}:normalize=0,apad[aud]`,
-    '-map', '0:v', '-map', '[aud]', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '96k', '-shortest', out);
+    '-map', '0:v', '-map', '[aud]', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '96k',
+    '-t', (vidDur + 0.2).toFixed(2), part);
   const r = ff(args);
-  const ok = r.status === 0 && existsSync(out) && probeHasAudio(out)
-    && Math.abs((probeDuration(out) || 0) - vidDur) < 3;
+  const ok = r.status === 0 && existsSync(part) && probeHasAudio(part)
+    && Math.abs((probeDuration(part) || 0) - vidDur) < 3;
+  if (ok) renameSync(part, out); else rmSync(part, { force: true });
   console.log(`  [${ok ? 'ok' : 'FAIL'}] ${j.id} — ${clips.length} narration clips${ok ? '' : ' — ' + (r.stderr || '').slice(-160)}`);
   if (!ok) failures += 1;
   rmSync(tmp, { recursive: true, force: true });
