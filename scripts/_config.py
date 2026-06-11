@@ -656,6 +656,12 @@ REGISTERED_MODEL_CLASS_VALUES: dict[str, dict[str, str]] = {
 OLLAMA_LLAMA3_EXAMPLE_MODEL = "llama3"
 OPENAI_GPT4O_EXAMPLE_MODEL = "gpt-4o"
 OPENAI_GPT4O_MINI_EXAMPLE_MODEL = "gpt-4o-mini"
+# Default model id for the non-commercial ChatAnywhere demo route. It is an
+# env-overridable DEFAULT in scripts/model_gateway.py (OH_LLM_CHATANYWHERE_MODEL)
+# and is documented once in baltor-free-llm-demo-routing.md; registering it here
+# is the single source of truth so the same id in the doc/gateway is not flagged
+# as drift (docs/codex/no-magic-values.md).
+CHATANYWHERE_DEMO_MODEL = "gpt-3.5-turbo"
 
 REGISTERED_EXAMPLE_MODEL_VALUES: dict[str, dict[str, str]] = {
     OLLAMA_LLAMA3_EXAMPLE_MODEL: {
@@ -672,6 +678,11 @@ REGISTERED_EXAMPLE_MODEL_VALUES: dict[str, dict[str, str]] = {
         "provider": "openai",
         "owner": "response_cache_fragment_reuse",
         "description": "Catalog example route model; deployment-owned routes may override it.",
+    },
+    CHATANYWHERE_DEMO_MODEL: {
+        "provider": "chatanywhere",
+        "owner": "model_gateway",
+        "description": "Default model for the non-commercial ChatAnywhere demo lane; env-overridable.",
     },
 }
 
@@ -895,6 +906,22 @@ PGVECTOR_LOAD_PLAN_EXAMPLE_SUMMARY_PATH = str(
 PGVECTOR_TYPE_SETTING_KEY = "pgvector_type"
 PGVECTOR_LOAD_SQL_INPUT_NAME = "pgvector_load_sql"
 PGVECTOR_EMBEDDING_LOAD_CHECK_SCHEMA = "pgvector_embedding_load_check"
+
+# Output filenames for scripts.db.object_embedding_batch_loader. Defined here
+# (single source) rather than typed into the module, so the load tool and any
+# audit that reads its output agree on the names (no-magic-values).
+OBJECT_EMBEDDING_BATCH_LOADER_RUN_ID = "object-embedding-batch-loader"
+OBJECT_EMBEDDING_BATCH_LOADER_SQL_FILENAME = "object-embedding-batch-load.sql"
+OBJECT_EMBEDDING_BATCH_LOADER_REJECTED_FILENAME = "rejected-object-embedding-rows.jsonl"
+OBJECT_EMBEDDING_BATCH_LOADER_AUDIT_FILENAME = "object-embedding-batch-load-audit.jsonl"
+
+# Output filenames for scripts.db.cdc_event_emitter. The emitter delegates the
+# event computation to scripts.db.component_cdc_plan (lossless reuse) and just
+# adapts the version-pair input shape declared by the catalog manifest.
+CDC_EVENT_EMITTER_RUN_ID = "cdc-event-emitter"
+CDC_EVENT_EMITTER_PREVIOUS_VERSIONS_FILENAME = "previous-component-versions.jsonl"
+CDC_EVENT_EMITTER_NEW_VERSIONS_FILENAME = "new-component-versions.jsonl"
+CDC_EVENT_EMITTER_SUMMARY_FILENAME = "cdc-event-emitter-summary.json"
 LOCAL_PGVECTOR_EMBEDDING_SMOKE_RUN_ID = "local-pgvector-embedding-smoke"
 LOCAL_PGVECTOR_EMBEDDING_SMOKE_SELF_TEST_RUN_ID = f"{LOCAL_PGVECTOR_EMBEDDING_SMOKE_RUN_ID}-self-test"
 LOCAL_PGVECTOR_EMBEDDING_SMOKE_PLAN_FILENAME = f"{LOCAL_PGVECTOR_EMBEDDING_SMOKE_RUN_ID}-plan.json"
@@ -985,6 +1012,11 @@ LOCAL_PGVECTOR_EMBEDDING_SMOKE_PLANNER_TOOL_ID = "tool/local-pgvector-embedding-
 PGVECTOR_EMBEDDING_LOAD_PATTERNS_PACK_ID = "knowledge-pack/pgvector-embedding-load-patterns"
 POSTGRES_PGVECTOR_BOOTSTRAP_PATTERNS_PACK_ID = "knowledge-pack/postgres-pgvector-bootstrap-patterns"
 LOCAL_PGVECTOR_EMBEDDING_SMOKE_PATTERNS_PACK_ID = "knowledge-pack/local-pgvector-embedding-smoke-patterns"
+# Versioned capability-adapter id for the pgvector retrieval provider. It recurs
+# as a fallback_adapter across architecture/external_capability_catalog.json and
+# repo_replacement_matrix.json; register its canonical identity here so those
+# manifests are seedable component_ref rows, not drifting literals.
+PGVECTOR_RETRIEVAL_ADAPTER_ID = "vector.pgvector@v1"
 
 REGISTERED_COMPONENT_REF_IDS: dict[str, dict[str, str]] = {
     PGVECTOR_EMBEDDING_LOAD_PLANNER_TOOL_ID: {
@@ -1016,6 +1048,40 @@ REGISTERED_COMPONENT_REF_IDS: dict[str, dict[str, str]] = {
         "component_type": "knowledge-pack",
         "role": "knowledge_pack",
         "owner": "local_pgvector_embedding_smoke",
+    },
+    PGVECTOR_RETRIEVAL_ADAPTER_ID: {
+        "component_type": "adapter",
+        "role": "fallback_adapter",
+        "owner": "external_capability_catalog",
+    },
+}
+
+# --- Backend infrastructure identifier registry ----------------------------
+# Concrete third-party backend identifiers (container image tags, project URLs,
+# product names) that intentionally recur across deploy/architecture descriptors.
+# They are NOT logical backend-choice keys (see VECTOR_STORAGE_BACKENDS) and NOT
+# load-plan interface terms (see LOAD_PLAN_TERMS) — they name real external
+# artifacts. Registered here so the hard-coded-setting audit recognizes them as
+# intentional, single-sourced identities instead of drift (no-magic-values).
+PGVECTOR_CONTAINER_IMAGE = "pgvector/pgvector:pg16"
+PGVECTOR_PROJECT_URL = "https://github.com/pgvector/pgvector"
+QDRANT_BACKEND_NAME = "Qdrant"
+
+REGISTERED_BACKEND_INFRA_IDENTIFIERS: dict[str, dict[str, str]] = {
+    PGVECTOR_CONTAINER_IMAGE: {
+        "kind": "container_image",
+        "family": PGVECTOR_BACKEND_FAMILY,
+        "description": "Postgres+pgvector container image used by deploy topology and local smoke.",
+    },
+    PGVECTOR_PROJECT_URL: {
+        "kind": "project_url",
+        "family": PGVECTOR_BACKEND_FAMILY,
+        "description": "Upstream pgvector project URL referenced by backend candidate registries.",
+    },
+    QDRANT_BACKEND_NAME: {
+        "kind": "product_name",
+        "family": "qdrant",
+        "description": "Vector-search backend candidate (provider name) tracked in the Open*Hub backend registry.",
     },
 }
 

@@ -26,6 +26,7 @@ from scripts._config import (
     EMBEDDING_MODELS,
     LOAD_PLAN_TERMS,
     MODEL_RUNTIME_PROFILES,
+    REGISTERED_BACKEND_INFRA_IDENTIFIERS,
     REGISTERED_COMPONENT_REF_IDS,
     REGISTERED_EXAMPLE_MODEL_VALUES,
     REGISTERED_MODEL_CLASS_VALUES,
@@ -97,6 +98,12 @@ PRIVATE_RUNTIME_SETTING_RESOLVER_RE = re.compile(
 )
 APPROVED_RUNTIME_SETTING_WRAPPER_RE = re.compile(r"\breturn\s+runtime_setting\(")
 
+# A quoted token that ends in a documentation/source file extension is a
+# filename, never a model id, even when it matches a model-family prefix such as
+# `claude-` (e.g. the handoff doc "CLAUDE-CODE.md"). Skipping these removes a
+# false positive without weakening real model-literal detection.
+NON_MODEL_FILE_SUFFIXES = (".md", ".py", ".txt", ".json", ".yaml", ".yml", ".toml", ".sql", ".html")
+
 REGISTERED_MODEL_VALUES = {
     *EMBEDDING_MODELS.keys(),
     *EMBEDDING_MODEL_PROFILES.keys(),
@@ -108,7 +115,9 @@ REGISTERED_MODEL_VALUES = {
 REGISTERED_TOOL_TAG_VALUES = set(REGISTERED_TOOL_TAGS.keys())
 REGISTERED_MODEL_FAMILY_TAG_VALUES = set(REGISTERED_MODEL_FAMILY_TAGS.keys())
 REGISTERED_MODEL_CLASS_LITERAL_VALUES = set(REGISTERED_MODEL_CLASS_VALUES.keys())
-REGISTERED_BACKEND_VALUES = set(VECTOR_STORAGE_BACKENDS.keys())
+REGISTERED_BACKEND_VALUES = set(VECTOR_STORAGE_BACKENDS.keys()) | set(
+    REGISTERED_BACKEND_INFRA_IDENTIFIERS.keys()
+)
 REGISTERED_BACKEND_FAMILY_VALUES = set(BACKEND_FAMILY_TERMS.keys())
 REGISTERED_TERMINOLOGY_VALUES = set(LOAD_PLAN_TERMS.keys())
 REGISTERED_COMPONENT_REF_VALUES = set(REGISTERED_COMPONENT_REF_IDS.keys())
@@ -290,6 +299,8 @@ def audit_hardcoded_settings() -> dict[str, Any]:
                 value = match.group("value")
                 if value.isupper() and "_" in value:
                     continue
+                if value.lower().endswith(NON_MODEL_FILE_SUFFIXES):
+                    continue  # filename matched a model prefix (e.g. CLAUDE-CODE.md)
                 location = {"path": rel(path), "line": line_number}
                 if value in REGISTERED_TOOL_TAG_VALUES:
                     tool_tag_literals[value].append(location)
