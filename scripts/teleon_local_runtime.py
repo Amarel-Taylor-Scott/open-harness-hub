@@ -83,6 +83,20 @@ SERVICE_ID = "teleon_local_runtime"
 PROMOTE_AT = 0.90   # the gate: promoted at or above this real pass-rate
 CANDIDATE_AT = 0.70  # below the gate but workable → candidate; below this → rolled-back
 
+# On promotion the capability is COMPILED to a deployable runtime unit and registered (the
+# loop's deploy arc: gate → compile → registry → the Machines runner launches it). fly_machine
+# is the default exec target on our host; the compiler also emits k8s_job/local_process — the
+# unit stays portable, only the launcher differs. Compilation is a downstream deploy step: a
+# compile/registry hiccup is recorded honestly on the run, never failing the promotion itself.
+AUTO_COMPILE_EXEC_TARGET = "fly_machine"
+
+
+def _compiled_units_path() -> Path:
+    """The compiled-unit registry log — beside the runtime state it describes (the canonical
+    dist/local-services-state/teleon-compiler/ in production; follows a patched STATE_DIR in
+    tests, so a self-test never writes to the real registry)."""
+    return STATE_DIR.parent / "teleon-compiler" / "compiled-units.jsonl"
+
 # Anti answer-key-gaming split (see Runtime._refined_instruction): every capability's examples
 # are deterministically split by index parity — even indices are TRAIN (their INPUTS may be
 # quoted in the self-refine prompt), odd indices are HOLDOUT (never shown in ANY prompt). The
@@ -568,6 +582,16 @@ class Runtime:
                 for r in receipts:
                     fh.write(json.dumps(r) + "\n")
             self._persist_run(run)  # RUNNING → terminal (latest-line-wins)
+        # The loop's deploy arc, OUTSIDE the lock (compile/registry do disk I/O): a promotion
+        # compiles+registers a deployable runtime unit; a non-promotion records the next-tier
+        # escalation decision (advisory — the ladder proposes, nothing auto-dispatches). Both
+        # are guarded and re-persist the run with the added field; neither can change the gate.
+        if decision == "promoted":
+            run["compiled_unit"] = self._auto_compile_and_register(cap_id)
+        else:
+            run["escalation"] = self._escalation_for_failed(cap_id, run)
+        with self._lock:
+            self._persist_run(run)
         return run
 
     def _finalize_failed(self, run_id: str, cap_id: str, reserved: int, exc: Exception) -> dict:
@@ -584,6 +608,48 @@ class Runtime:
             self._save_caps()
             self._persist_run(run)
         return run
+
+    def _auto_compile_and_register(self, cap_id: str) -> dict:
+        """Promotion → deployable runtime unit. Reuses the compiler's OWN live-state reader (the
+        single source of how a promoted capability becomes compilable) + the compiled-unit
+        registry (which owns rollback_target). Returns a small projection on the run; on any
+        failure returns {compiled: False, reason} — the promotion already stands."""
+        try:
+            from src.teleon.compiler import compile_capability, open_registry
+            from src.teleon.compiler.fixtures import load_live_capability, fixture_task_spec
+            capability, receipt_refs = load_live_capability(cap_id, state_dir=STATE_DIR)
+            task_spec = dict(fixture_task_spec())
+            task_spec["capability_id"] = cap_id
+            # deterministic provenance: the promoting run's epoch handle (no clock here)
+            now = capability.get("promoted_at") or f"epoch:{capability.get('version', 0)}"
+            unit = compile_capability(capability, task_spec, exec_target=AUTO_COMPILE_EXEC_TARGET,
+                                      now=now, receipt_refs=receipt_refs)
+            registered = open_registry(log_path=_compiled_units_path()).register(unit)  # stamps rollback_target
+            # register() returns the stored RECORD {kind, unit, active, rollback_target, …}
+            return {"compiled": True, "unit_id": registered["unit"]["unit_id"],
+                    "exec_target": AUTO_COMPILE_EXEC_TARGET,
+                    "rollback_target": registered.get("rollback_target") or None}
+        except Exception as exc:  # never let a deploy-step hiccup undo a real promotion
+            return {"compiled": False, "reason": f"{type(exc).__name__}: {exc}"[:200]}
+
+    def _escalation_for_failed(self, cap_id: str, run: dict) -> dict:
+        """Non-promotion → the next-tier escalation decision (advisory; the ladder PROPOSES, this
+        records, nothing auto-dispatches). The gate already TRIED the cheap rungs and they didn't
+        clear the bar — deterministic_primitive=False (it was tried, didn't cover it) + the run's
+        real attempt count as failed-LLM history — so the ladder tiers it up toward bounded
+        exploration on its own logic (it reaches T3 once the LLM budget is exhausted)."""
+        try:
+            from src.teleon.exploration.ladder import escalation_decision, TaskClass
+            attempts = max(int(run.get("attempts") or 0), 1)  # ≥1 attempt was made to reach a verdict
+            history = [{"kind": "deterministic", "passed": False}]
+            history += [{"kind": "llm", "passed": False} for _ in range(attempts)]
+            task = TaskClass(task_id=cap_id, task_class="routine", deterministic_primitive=False)
+            d = escalation_decision(task, history)
+            return {"tier": d.tier, "action": d.action, "rationale": d.rationale,
+                    "requires_human_boundary": d.requires_human_boundary,
+                    "runtime_ref": d.runtime_ref}
+        except Exception as exc:
+            return {"escalated": False, "reason": f"{type(exc).__name__}: {exc}"[:200]}
 
     def execute(self, cap_id: str, account_id: str, mode: str = "auto", route=None) -> dict:
         """Synchronous entrypoint: enqueue + run inline, returning the TERMINAL run record. This
@@ -725,12 +791,36 @@ def _self_test() -> int:
     global STATE_DIR
     real_state = STATE_DIR
     with tempfile.TemporaryDirectory() as tmp:
-        STATE_DIR = Path(tmp)
+        # co-locate under a teleon-runtime subdir so the compiled-unit registry (STATE_DIR.parent/
+        # teleon-compiler) also lands in the temp tree — the self-test never touches the real registry
+        STATE_DIR = Path(tmp) / "teleon-runtime"
         rt = Runtime()
         ck("seeded capabilities present", len(rt.caps) == len(CAPABILITIES))
         run = rt.execute("cap-dates", "acct_test", mode="deterministic")
         ck("run really executed (all examples)", run["total"] == 4 and run["passed"] == 4)
         ck("real score → promotion gate applied", run["score"] == 1.0 and run["decision"] == "promoted")
+        # ---- the LOOP'S DEPLOY ARC: promotion auto-compiles + registers a deployable unit ----
+        cu = run.get("compiled_unit") or {}
+        ck("promotion auto-compiled a runtime unit", cu.get("compiled") is True
+           and str(cu.get("unit_id", "")).startswith("cru_")
+           and cu.get("exec_target") == AUTO_COMPILE_EXEC_TARGET)
+        from src.teleon.compiler import open_registry as _open_reg
+        _reg = _open_reg(log_path=_compiled_units_path())
+        _active = _reg.latest_active_for("cap-dates")
+        ck("the compiled unit is in the registry (active)",
+           _active is not None and _active["unit_id"] == cu.get("unit_id"))
+        # a second promotion of ANOTHER cap supersedes + sets a real rollback_target (lossless
+        # chain) — uses cap-redact so cap-dates' version assertions below stay intact
+        cu_a = (rt.execute("cap-redact", "acct_test", mode="deterministic").get("compiled_unit") or {})
+        cu_b = (rt.execute("cap-redact", "acct_test", mode="deterministic").get("compiled_unit") or {})
+        ck("re-promotion registers a new unit with a real rollback_target",
+           cu_a.get("compiled") is True and cu_b.get("compiled") is True
+           and cu_b.get("rollback_target") == cu_a.get("unit_id"))
+        # ---- the FAILURE PATH: a non-promotion records the next-tier escalation (advisory) ----
+        esc = rt._escalation_for_failed("cap-dates", {"attempts": 2})
+        ck("non-promotion escalates toward bounded exploration (T3, honest offline default)",
+           esc.get("tier") == 3 and esc.get("action") == "dispatch_bounded_exploration"
+           and esc.get("runtime_ref") == "local_emulator@v1")
         ck("deterministic run labeled honestly (gate_note + basis + split rates)",
            run["gate_note"] == DETERMINISTIC_GATE_NOTE and run["gate_basis"] == GATE_BASIS
            and run["train_pass_rate"] == 1.0 and run["holdout_pass_rate"] == 1.0
