@@ -2262,3 +2262,19 @@ self-host (warm GPU $510-725/mo vs ~$6/mo OpenRouter at 1k calls/day) — instea
 google/gemma-4-26b-a4b-it via OpenRouter ($0.06/$0.33, :free dev tier) as the small-model
 route; re-evaluate when llama.cpp PR #24423 + Ollama #16664 land or a hosted route ≲$0.15/1M
 appears.
+
+## 2026-06-11 (cont 5) — Flexible inference lanes (owner: Gemma-4 CPU batch, max flexibility)
+
+Owner: Gemma-4 needs no GPU for long-running non-realtime tasks; Fly stays; maximum
+flexibility; keep asking "is this the best way" across Baltor/OHH/Teleon. LANDED:
+docs/architecture/flexible-inference-lanes.md (4 lanes — cloud APIs / CPU-batch self-host ON
+the scale-to-zero worker fleet via llama.cpp sidecar / GPU spot only >300M tok-mo, never Fly
+GPUs (dead 2026-08-01) / local dev — all behind the ONE receipted ChatRoute→OIPS plane;
+adding a lane = a graph node, proven) + model.openrouter.gemma_4_26b@candidate node in the
+provider graph (real key on file; $0.06/$0.33; graph JSON validated). Queued next (doc §Next
+builds): worker batch-inference sidecar (OH_BATCH_LLM=local), latency_class routing, per-node
+cost actuals from the persisted receipts sink. The standing "is this the best way" review =
+the rubric P1/P2 program (docs/architecture/capability-rubric-and-deep-dive-2026-06-11.md):
+P1 SQLite state engines · async teleon runs · one admin-demo engine · ctx:// persistence +
+receipts-on-fetch · embedding-store baking; P2 capability→runtime compiler (the Teleon
+backbone), tenanted gateway, measured-lift promotion. Next session: start at P1 + the sidecar.
