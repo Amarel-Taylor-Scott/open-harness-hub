@@ -28,8 +28,11 @@ LAW (mirrors the registry's law + the repo's promotion boundary):
     (discovery is not trust; candidate != active).
   * no secrets stored; the raw session id is never persisted (only the resolved account id is).
   * append-only JSONL; the workspace summary is REPLAYED from the log (no destructive state).
-    Reads are served by an in-process APPEND-THROUGH CACHE (parsed once at startup, appended on
-    every write); the files stay the durable source — a restart rebuilds the cache from disk.
+    Each log is a SQLite-WAL append-log (scripts._jsonl_store): the db (off the scanned state dir)
+    is the crash-safe primary + the O(attach) rehydration index, while the *.jsonl stays the durable,
+    externally-read on-disk record. Reads are db-served (never an O(n) per-request file re-parse); a
+    restart reopens the db (no whole-file re-parse) and a pre-existing legacy jsonl is migrated
+    losslessly. SINGLE-MACHINE LAW: one service process owns state_dir (WAL is single-writer-node).
   * api_calls.jsonl is size-rotated (API_CALLS_ROTATE_LINES) keeping exactly one previous
     generation (.1, preserved — lossless); counters rebuild from the live generation only.
 
@@ -57,6 +60,8 @@ from urllib.parse import parse_qs, urlsplit
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
+
+from scripts._jsonl_store import AppendLog  # noqa: E402  (SQLite-WAL append-log behind each jsonl)
 
 SERVICE_ID = "local_openhub_projection_api"
 REGISTRY_PATH = REPO_ROOT / "architecture" / "local_service_registry.json"
@@ -187,15 +192,16 @@ class RegistryStore:
         self.catalog_path = self.state_dir / "catalog.json"
         self.lock = threading.Lock()
         self.rotate_calls_lines = rotate_calls_lines  # injectable so the self-test proves rotation cheaply
-        # APPEND-THROUGH CACHE (hot-path fix): each JSONL is parsed ONCE here; reads serve from
-        # memory and writes append to BOTH the file and this cache under self.lock — previously
-        # every workspace/audit read re-parsed whole files per request (O(n) per request).
-        # The files stay the durable source of truth: a restart rebuilds this cache from disk
-        # (proven in --self-test). SINGLE-MACHINE LAW: this assumes exactly one service process
-        # owns state_dir (deploy law — never `fly scale count >1` on stateful apps; JSONL state
-        # is single-writer). A second writer process would silently stale this cache.
-        self._cache: dict[Path, list[dict]] = {
-            p: self._load_jsonl(p)
+        # SQLite-WAL APPEND-LOG per JSONL (scripts._jsonl_store): the db (off the scanned state dir)
+        # is the crash-safe primary + the O(attach) rehydration index; the *.jsonl stays the durable,
+        # externally-read on-disk record. Reads are db-served (never an O(n) per-request file
+        # re-parse); writes commit one ACID row then mirror the jsonl line — both under self.lock. A
+        # restart reopens the db instead of re-parsing whole files; a pre-existing legacy jsonl is
+        # migrated losslessly on first open. SINGLE-MACHINE LAW: exactly one service process owns
+        # state_dir (deploy law — never `fly scale count >1` on stateful apps; WAL is single-writer-
+        # node). busy_timeout makes a concurrent reader/writer WAIT, not error.
+        self._logs: dict[Path, AppendLog] = {
+            p: AppendLog(p)
             for p in (self.workspace_path, self.calls_path, self.review_path,
                       self.decisions_path, self.reviewers_path, self.admins_path)
         }
@@ -237,51 +243,31 @@ class RegistryStore:
             return seed
         return next((e for e in self.promoted(realm) if e.get("id") == entry_id), None)
 
-    @staticmethod
-    def _load_jsonl(path: Path) -> list[dict]:
-        """Parse one append-only JSONL into memory (startup rehydration). Unparseable lines are
-        skipped exactly like the old per-request readers skipped them (a torn tail line after a
-        crash mid-append must never wedge startup)."""
-        if not path.exists():
-            return []
-        out: list[dict] = []
-        for line in path.read_text(encoding="utf-8").splitlines():
-            try:
-                rec = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            if isinstance(rec, dict):
-                out.append(rec)
-        return out
-
     def _rows(self, path: Path) -> list[dict]:
-        """THE read path for every JSONL-backed query: a snapshot of the in-memory rows — never a
-        per-request file re-parse. The shallow copy (pointer copy, cheap) keeps iteration safe
-        while another request thread appends."""
-        with self.lock:
-            return list(self._cache[path])
+        """THE read path for every JSONL-backed query: the live-generation rows from the append-log's
+        SQLite index (an indexed scan of an attached db — never a per-request whole-file re-parse).
+        The log already returns a fresh list, safe to iterate while another request thread appends."""
+        return self._logs[path].all()
 
     def _append(self, path: Path, rec: dict) -> None:
-        """Append-through (caller MUST hold self.lock): the durable file first, then the cache."""
-        with path.open("a", encoding="utf-8") as fh:
-            fh.write(json.dumps(rec, sort_keys=True) + "\n")
-        self._cache[path].append(rec)
+        """Append-through (caller MUST hold self.lock): one crash-safe SQLite commit, then the
+        durable *.jsonl mirror line — the append-log does both atomically under its own lock."""
+        self._logs[path].append(rec)
 
     def _rotate_calls_locked(self) -> None:
         """Size-based rotation for the API-call log (caller holds self.lock): rename the live file
-        to ``api_calls.jsonl.1`` and start fresh. Exactly ONE previous generation is kept,
-        PRESERVED — rotation never truncates in place (lossless); a later rotation replaces ``.1``
-        (the deliberate retention bound for this operational request log). Counters/summaries
-        (e.g. the 30d meter) rebuild from the live generation only — an honest floor, never a
-        fabricated number."""
-        os.replace(self.calls_path, self.calls_path.with_name(self.calls_path.name + ".1"))
-        self._cache[self.calls_path] = []
+        to ``api_calls.jsonl.1`` and start a fresh live generation. Exactly ONE previous generation
+        is kept on disk, PRESERVED — rotation never truncates in place (lossless); a later rotation
+        replaces ``.1`` (the deliberate retention bound for this operational request log), and the
+        db retains every rotated row (queryable). Counters/summaries (e.g. the 30d meter) rebuild
+        from the live generation only — an honest floor, never a fabricated number."""
+        self._logs[self.calls_path].rotate()           # api_calls.jsonl → .1 + db generation bump
 
     def log_call(self, account_id: str, realm: str, method: str, path: str, now: int) -> None:
         with self.lock:
             self._append(self.calls_path, {"ts": now, "account_id": account_id, "realm": realm,
                                            "method": method, "path": path})
-            if len(self._cache[self.calls_path]) >= self.rotate_calls_lines:
+            if self._logs[self.calls_path].count() >= self.rotate_calls_lines:
                 self._rotate_calls_locked()
 
     def record(self, account_id: str, realm: str, action: str, entry: dict, now: int) -> dict:

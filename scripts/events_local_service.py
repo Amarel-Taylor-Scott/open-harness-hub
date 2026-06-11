@@ -12,11 +12,13 @@ summary — projection/evidence only, NOT the platform event bus and never truth
 Event shape (EVENTS.md): {site, event: page|action|exposure|conversion|llm, name,
 experiment?, variant?, anon, props?}. Guards: `anon` is a random per-browser id — events
 carrying an email-shaped anon or obvious PII/keys are REJECTED (400), never stored.
-Persistence: dist/analytics/events.jsonl (append-only within a generation; at MAX_EVENTS the
-file ROTATES to events.jsonl.1, one previous generation kept — never a permanent 429) —
-counters rebuild from the live file on start. Floods get a transient 429 + Retry-After.
-Offline, stdlib-only; CORS open for local preview. Port comes from the local service registry
-(architecture/local_service_registry.json — single source; drift-gated by the proof).
+Persistence: dist/analytics/events.jsonl, an append-only mirror over a SQLite-WAL append-log
+(scripts._jsonl_store: the db is the crash-safe primary — no torn-tail corruption, O(attach)
+restart instead of an O(n) re-parse — and the jsonl stays the durable on-disk contract). At
+MAX_EVENTS the live generation ROTATES to events.jsonl.1, one previous generation kept — never a
+permanent 429 — and counters rebuild from the live generation on start. Floods get a transient
+429 + Retry-After. Offline, stdlib-only; CORS open for local preview. Port comes from the local
+service registry (architecture/local_service_registry.json — single source; drift-gated by the proof).
 """
 from __future__ import annotations
 
@@ -35,15 +37,16 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+# SQLite-WAL append-log behind the jsonl + the on-disk layout constants (SINGLE SOURCE — the
+# rotation/migration suffixes are defined once in scripts._jsonl_store, never re-typed here)
+from scripts._jsonl_store import AppendLog, MIGRATED_SUFFIX, ROTATED_SUFFIX  # noqa: E402
+
 SERVICE_ID = "local_event_tracking_service"
 REGISTRY_PATH = REPO_ROOT / "architecture" / "local_service_registry.json"
 VERSION = "1.0"
 EVENT_TYPES = {"page", "action", "exposure", "conversion", "llm"}
 MAX_EVENTS = 50_000            # ring-GENERATION size (EVENTS.md cap): reaching it ROTATES the live
                                # file instead of bricking ingest forever (no fill-to-DoS 429)
-ROTATED_SUFFIX = ".1"          # the single kept previous generation (events.jsonl.1): rotation
-                               # RENAMES the full live file here — lossless law: the data being
-                               # rotated is preserved, never deleted; only the prior .1 ages out
 PER_MINUTE_INGEST_CAP = 600    # process-wide accepted events/min (~10/s): far above legit local
                                # beacon traffic, so a runaway client gets a TRANSIENT 429 +
                                # Retry-After instead of filling generations
@@ -65,6 +68,10 @@ class EventsPlane:
         self.state_dir.mkdir(parents=True, exist_ok=True)
         self.path = self.state_dir / "events.jsonl"
         self.rotated_path = self.path.with_name(self.path.name + ROTATED_SUFFIX)
+        # SQLite-WAL append-log behind the events.jsonl mirror: the db (off the scanned state dir) is
+        # the crash-safe primary + the O(attach) rehydration index; events.jsonl stays the durable,
+        # externally-read on-disk record. A pre-existing legacy events.jsonl is migrated losslessly.
+        self._log = AppendLog(self.path)
         self.lock = threading.Lock()
         # clock + limits are PARAMETERS (not env) so the self-test runs fast with no sleeps
         self._clock = clock or time.time
@@ -77,14 +84,10 @@ class EventsPlane:
         self.by_site: Counter[str] = Counter()
         self.by_type: Counter[str] = Counter()
         self.by_variant: Counter[str] = Counter()      # "experiment:variant:event"
-        # counters rebuild from the LIVE generation only — the rotated .1 file is preserved
-        # evidence (lossless law), not part of the live counts
-        if self.path.exists():
-            for line in self.path.read_text(encoding="utf-8").splitlines():
-                try:
-                    self._tally(json.loads(line))
-                except json.JSONDecodeError:
-                    continue
+        # counters rebuild from the LIVE generation only (the append-log excludes a rotated .1 —
+        # preserved evidence, lossless law) — an attach + indexed scan, not a whole-file re-parse
+        for evt in self._log.iter():
+            self._tally(evt)
 
     def _tally(self, evt: dict) -> None:
         self.count += 1
@@ -108,12 +111,12 @@ class EventsPlane:
         return None
 
     def _rotate(self) -> None:
-        """Ring rotation at the generation cap (caller holds the lock): the FULL live file is
-        atomically RENAMED to the one kept previous generation — lossless law: rotation preserves
-        the data being rotated, never deletes the live file; only the prior .1 generation ages out.
-        Live counters then restart: they always describe the live generation only."""
-        if self.path.exists():
-            os.replace(self.path, self.rotated_path)   # atomic; replaces the older .1 (exactly one kept)
+        """Ring rotation at the generation cap (caller holds the lock): the FULL live generation's
+        jsonl is atomically RENAMED to the one kept previous generation — lossless law: rotation
+        preserves the data being rotated, never deletes the live file; only the prior .1 generation
+        ages out (the db keeps every rotated row, queryable). Live counters then restart: they always
+        describe the live generation only."""
+        self._log.rotate()                              # jsonl → .1 (one kept) + db generation bump
         self.count = 0
         self.by_site.clear()
         self.by_type.clear()
@@ -151,11 +154,10 @@ class EventsPlane:
                              "retry_after_s": retry_after}
             if self.count + len(accepted) > self.max_events:
                 self._rotate()                         # un-bricks the sink: rotate, never reject forever
-            with self.path.open("a", encoding="utf-8") as fh:
-                for evt in accepted:
-                    fh.write(json.dumps(evt, sort_keys=True) + "\n")
-                    self._tally(evt)
-                    self._ingest_window.append(now)
+            for evt in accepted:
+                self._log.append(evt)                  # crash-safe db commit + events.jsonl mirror line
+                self._tally(evt)
+                self._ingest_window.append(now)
         return 202, {"accepted": len(accepted)}
 
     def summary(self) -> dict:
@@ -234,11 +236,14 @@ def start_service(port: int = 0, state_dir: Path | None = None,
 
 
 def _self_test() -> int:
-    """Offline proof of the ring + flood posture: the generation cap ROTATES (old generation
-    preserved, exactly one kept, ingest continues — never a permanent 429), counters rebuild from
-    the live generation only, the per-minute cap 429s with Retry-After and RECOVERS (injected
-    clock — no sleeps), oversized batches fail honestly, and the wire keeps truth_authority:false.
-    Temp state dirs, ephemeral port, stdlib-only. Exit 0/1."""
+    """Offline proof of the ring + flood posture AND the SQLite-WAL state engine: the generation cap
+    ROTATES (old generation preserved, exactly one kept, ingest continues — never a permanent 429),
+    counters rebuild from the live generation only, the per-minute cap 429s with Retry-After and
+    RECOVERS (injected clock — no sleeps), oversized batches fail honestly, the wire keeps
+    truth_authority:false, a legacy pre-SQLite events.jsonl migrates in LOSSLESSLY on startup (file
+    preserved untouched + byte-identical snapshot), a restart rehydrates EQUAL state from the db,
+    and concurrent multi-thread ingest loses/dups nothing. Temp state dirs, ephemeral port,
+    stdlib-only. Exit 0/1."""
     import shutil
     import tempfile
     import urllib.error
@@ -259,9 +264,16 @@ def _self_test() -> int:
 
     root = Path(tempfile.mkdtemp(prefix="events-proof-"))
     server = thread = None
+    planes: list[EventsPlane] = []     # every plane built here — closed + db removed in finally
+
+    def plane(*args, **kwargs) -> EventsPlane:
+        p = EventsPlane(*args, **kwargs)
+        planes.append(p)
+        return p
+
     try:
         # A+B: rotation at the generation cap — old generation PRESERVED, ingest continues
-        rot = EventsPlane(state_dir=root / "rot", max_events=5)
+        rot = plane(state_dir=root / "rot", max_events=5)
         st, out = rot.ingest({"events": [evt(i) for i in range(5)]})
         ck("A: a full generation ingests (202)", st == 202 and out["accepted"] == 5, f"{st} {out}")
         ck("A: no rotation below the cap", not rot.rotated_path.exists())
@@ -276,12 +288,12 @@ def _self_test() -> int:
         ck("B: a later rotation keeps exactly ONE previous generation (older replaced)",
            st == 202 and lines(rot.rotated_path) == 1 and lines(rot.path) == 5,
            f"{st} .1={lines(rot.rotated_path)} live={lines(rot.path)}")
-        reborn = EventsPlane(state_dir=root / "rot")
+        reborn = plane(state_dir=root / "rot")
         ck("B: counters rebuild from the LIVE generation only", reborn.count == 5, str(reborn.count))
 
         # C: per-minute cap — transient 429 with Retry-After, then recovery (injected clock)
         clock = [2_000_000.0]
-        cap = EventsPlane(state_dir=root / "cap", clock=lambda: clock[0], per_minute_cap=3)
+        cap = plane(state_dir=root / "cap", clock=lambda: clock[0], per_minute_cap=3)
         for i in range(3):
             cap.ingest(evt(i))
         st, out = cap.ingest(evt(3))
@@ -318,16 +330,78 @@ def _self_test() -> int:
             status_body = json.loads(r.read())
         ck("D: the plane still declares truth_authority:false",
            status_body.get("truth_authority") is False)
+
+        # E: MIGRATION from a pre-SQLite legacy state dir — lossless, one-time, behavior-equal
+        mig_dir = root / "mig"
+        mig_dir.mkdir(parents=True)
+        legacy = [{**evt(i), "ts": 3_000_000 + i} for i in range(7)]
+        legacy_file = mig_dir / "events.jsonl"
+        with legacy_file.open("w", encoding="utf-8") as fh:
+            for e in legacy:
+                fh.write(json.dumps(e, sort_keys=True) + "\n")   # the pre-SQLite writer's exact format
+        legacy_bytes = legacy_file.read_bytes()
+        mig = plane(state_dir=mig_dir)
+        ck("E: a legacy events.jsonl (no db yet) migrates into the SQLite log on startup",
+           mig.count == 7 and mig.by_site.get("baltor") == 7 and mig._log.count() == 7,
+           f"count={mig.count} db={mig._log.count()}")
+        ck("E: the legacy file is preserved untouched (in place + byte-identical snapshot)",
+           legacy_file.read_bytes() == legacy_bytes
+           and legacy_file.with_name(legacy_file.name + MIGRATED_SUFFIX).read_bytes() == legacy_bytes)
+        st, _ = mig.ingest(evt(7))
+        ck("E: ingest continues over the migrated state (202)", st == 202 and mig.count == 8, str(st))
+        again = plane(state_dir=mig_dir)
+        ck("E: migration is one-time — a restart re-attaches, never re-imports",
+           again.count == 8 and again._log.count() == 8, str(again.count))
+
+        # F: restart rehydration EQUALITY + CONCURRENT writes (the WAL path under request threads).
+        # The flood cap is parameterized out of the way: this section proves storage concurrency
+        # (plane lock + append-log lock + WAL), not the flood posture (that is section C).
+        conc_dir = root / "conc"
+        conc = plane(state_dir=conc_dir, per_minute_cap=10_000)
+        threads_n, per_thread = 8, 25
+        barrier = threading.Barrier(threads_n)
+        errors: list[tuple] = []
+
+        def _hammer(t: int) -> None:
+            barrier.wait()
+            for k in range(per_thread):
+                st_i, out_i = conc.ingest({"site": "baltor", "event": "action",
+                                           "name": f"t{t}-k{k}", "anon": f"a_{t:02x}{k:02x}"})
+                if st_i != 202:
+                    errors.append((t, k, st_i, out_i))
+
+        workers = [threading.Thread(target=_hammer, args=(t,)) for t in range(threads_n)]
+        for w in workers:
+            w.start()
+        for w in workers:
+            w.join()
+        unique_names = {e.get("name") for e in conc._log.all()}
+        ck("F: concurrent ingest stores every event exactly once (no error/loss/dup)",
+           not errors and conc.count == threads_n * per_thread
+           and len(unique_names) == threads_n * per_thread
+           and lines(conc.path) == threads_n * per_thread,
+           f"errors={errors[:2]} count={conc.count} unique={len(unique_names)} mirror={lines(conc.path)}")
+        reopened = plane(state_dir=conc_dir)
+        ck("F: a restart rehydrates EQUAL state (identical summary, db-served)",
+           reopened.summary() == conc.summary() and reopened.count == conc.count,
+           f"{reopened.count} vs {conc.count}")
     finally:
         if server is not None:
             server.shutdown()
             thread.join(timeout=5)
+            planes.append(server.RequestHandlerClass.plane)   # the HTTP plane, for db cleanup too
+        for p in planes:                       # close every SQLite handle, then remove the proof dbs
+            p._log.close()                     # (off-state_dir index files; -wal/-shm vanish on close)
+            for suffix in ("", "-wal", "-shm"):
+                Path(str(p._log.db_path) + suffix).unlink(missing_ok=True)
         shutil.rmtree(root, ignore_errors=True)
 
     print("\n" + ("PASS — events_local_service --self-test: generation cap rotates (previous "
                   "generation preserved, exactly one kept, ingest never bricked), live-only "
                   f"counters, transient {PER_MINUTE_INGEST_CAP}/min-style cap with Retry-After that "
-                  "recovers, honest oversized-batch 400, truth_authority:false intact."
+                  "recovers, honest oversized-batch 400, truth_authority:false intact, legacy "
+                  "events.jsonl migrated losslessly (preserved + snapshot), restart rehydrates "
+                  "equal state from the SQLite-WAL log, concurrent ingest loses nothing."
                   if not fails else f"{len(fails)} FAILURES: {fails}"))
     return 0 if not fails else 1
 

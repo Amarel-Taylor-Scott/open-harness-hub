@@ -12,9 +12,12 @@ Phase-1 local MVP of docs/architecture/service-auth-and-consumption-model.md:
   * per-realm API keys: HASH-ONLY at rest (key_id + display prefix + blake2b ref); the raw value is
     returned exactly ONCE at mint; mint/list/revoke require a valid realm session; verify proves
     possession (for service callers)
-  * an audit event (JSONL) for every privileged call, carrying X-AIDR-Request-Id correlation
-  * file-backed persistence under dist/identity/ (atomic replace; no cleartext secret and no raw key
-    is ever written to disk — the kit stores one-way credential refs, this service stores key hashes)
+  * an audit event for every privileged call (carrying X-AIDR-Request-Id correlation), persisted as
+    an append-only audit-events.jsonl mirror over a SQLite-WAL append-log (scripts._jsonl_store):
+    crash-safe + no torn-tail corruption, the jsonl stays the durable on-disk record
+  * file-backed persistence under dist/identity/ (atomic replace for the realm + service-connection
+    stores; no cleartext secret and no raw key is ever written to disk — the kit stores one-way
+    credential refs, this service stores key hashes; the SQLite index lives off the state dir)
 
 This is a LOCAL DEV EQUIVALENT, not production auth: blake2b refs are NOT production crypto (argon2/
 bcrypt/OAuth/SSO drop in at the kit's CredentialProviderPort seam — owner-gated); CORS is wide open for
@@ -41,6 +44,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from scripts._jsonl_store import AppendLog  # noqa: E402  (SQLite-WAL append-log behind audit-events)
 from src.openharnesshub.auth_kit import make_realm  # noqa: E402  (repo-root import, kit is the bottom layer)
 
 REGISTRY_PATH = REPO_ROOT / "architecture" / "identity_realm_registry.json"
@@ -221,7 +225,14 @@ class IdentityService:
         self.login_throttle = login_throttle or _LoginThrottle()
         self.runtimes = {spec["realm_id"]: RealmRuntime(spec, defaults, self.state_dir)
                          for spec in self.registry["realms"]}
+        # audit stream: an append-only audit-events.jsonl mirror over a SQLite-WAL append-log
+        # (scripts._jsonl_store). The db (off the scanned state dir — disk-hygiene proofs read_text
+        # every file UNDER state_dir, so no binary file may live there) is the crash-safe primary;
+        # the jsonl stays the durable, externally-read record. A legacy audit-events.jsonl migrates
+        # losslessly on first open. The realm stores + service-connections stay whole-document
+        # atomic-replace JSON (not append-logs — the append-log abstraction does not fit them).
         self.audit_path = self.state_dir / "audit-events.jsonl"
+        self.audit_log = AppendLog(self.audit_path)
         # service-to-service connections span TWO realms, so they live at the service level (NOT in a
         # realm's user store). Services legitimately cross realms; USERS never do (that's the no-SSO law).
         self.service_path = self.state_dir / "service-connections.json"
@@ -300,8 +311,8 @@ class IdentityService:
     def audit(self, realm_id: str, action: str, actor: str, outcome: str, request_id: str) -> None:
         event = {"ts": _now(), "realm": realm_id, "action": action, "actor": actor,
                  "outcome": outcome, "request_id": request_id}
-        with self.audit_path.open("a", encoding="utf-8") as fh:
-            fh.write(json.dumps(event, sort_keys=True) + "\n")
+        # one crash-safe SQLite commit + the audit-events.jsonl mirror line (append-log, own lock)
+        self.audit_log.append(event)
 
     def realms_projection(self) -> list[dict[str, Any]]:
         return [{"realm_id": rt.realm_id, "display_name": rt.realm.display_name,
