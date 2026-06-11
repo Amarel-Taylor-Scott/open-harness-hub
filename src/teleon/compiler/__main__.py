@@ -2,11 +2,20 @@
 
 Mirrors ``scripts/deploy/generate_provider_configs.py``'s CLI shape (the proven pattern):
 
-  python -m src.teleon.compiler --self-test            # offline invariants (determinism · refusal · 3 emitters · …)
+  python -m src.teleon.compiler --self-test            # offline invariants (determinism · refusal · 3 emitters · registry · …)
   python -m src.teleon.compiler --compile <cap_id>     # compile a capability (live runtime state if present, else fixture)
   python -m src.teleon.compiler --compile <cap_id> --exec-target k8s_job   # pick the deployable shape
   python -m src.teleon.compiler --emit                 # with --compile: also print the concrete deployable text
+  python -m src.teleon.compiler --register <cap_id>    # compile AND register into the durable registry (sets the prior active unit as rollback_target)
+  python -m src.teleon.compiler --list                 # show the registry: active units (one/capability) + full lossless history
+  python -m src.teleon.compiler --rollback <cap_id>    # return the rollback-target unit (the predecessor of the active unit) — REAL rollback
   python -m src.teleon.compiler --check                # drift gate over the committed example units
+
+The compiled-unit REGISTRY (src/teleon/compiler/registry.py) is the per-capability analog of the per-service
+``architecture/deploy_topology.json``: a durable, append-only JSONL under ``dist/local-services-state/teleon-compiler/``
+(the Fly volume mount) that tracks which capability-version is compiled to which runtime, preserves full history
+(superseded units are DEMOTED, not deleted — lossless), and makes the compiler's ``rollback_target`` field real
+(``--rollback`` returns the exact prior promoted unit). Doc: ``docs/architecture/compiled-unit-registry.md``.
 
 The committed example units (the drift-gate fixtures) live next to this package under ``examples/`` and are
 written by ``--write-examples`` (regen on a deliberate compiler change, like the topology generator's outputs).
@@ -32,6 +41,7 @@ import importlib
 _c = importlib.import_module("src.teleon.compiler.compile")
 _e = importlib.import_module("src.teleon.compiler.emit")
 _f = importlib.import_module("src.teleon.compiler.fixtures")
+_r = importlib.import_module("src.teleon.compiler.registry")  # the durable compiled-unit registry (deploy_topology analog)
 
 _PKG_DIR = Path(__file__).resolve().parent
 EXAMPLES_DIR = _PKG_DIR / "examples"
@@ -66,10 +76,11 @@ def _render_examples(now: str = FIXED_NOW) -> dict[Path, str]:
     return out
 
 
-# ── --compile ────────────────────────────────────────────────────────────────────────────────────────────────
-def cmd_compile(capability_id: str, exec_target: str, *, do_emit: bool, now: str | None) -> int:
-    """Compile ``capability_id`` from the LIVE runtime state if present, else the fixture. Prints the unit (and the
-    concrete deployable text with --emit). Refuses a non-promoted capability with a clear reason (exit 2)."""
+# ── compile-for-CLI (shared by --compile and --register) ─────────────────────────────────────────────────────
+def _compile_for_cli(capability_id: str, exec_target: str, *, now: str | None) -> tuple[dict, str]:
+    """Compile ``capability_id`` from the LIVE runtime state if present, else the fixture. Returns (unit, source).
+    Raises ``NotPromotedError`` (a non-promoted capability) or schema-validation ``RuntimeError`` — callers map
+    those to clear exit codes. The single compile path both --compile and --register share (no duplicated wiring)."""
     used_now = now or FIXED_NOW
     source = "fixture"
     try:
@@ -83,17 +94,26 @@ def cmd_compile(capability_id: str, exec_target: str, *, do_emit: bool, now: str
                   f"compiling the fixture capability instead", file=sys.stderr)
         task_spec = _f.fixture_task_spec()
         receipt_refs = ["llmrcpt_fixture_0001"]
+    unit = _c.compile_capability(cap, task_spec, exec_target=exec_target, now=used_now,
+                                 resolved_preference=_f.fixture_resolved_preference(), receipt_refs=receipt_refs)
+    errors = _c.validate_unit(unit)
+    if errors:
+        raise RuntimeError("compiled unit failed schema validation:\n  " + "\n  ".join(f"✗ {e}" for e in errors))
+    return unit, source
+
+
+# ── --compile ────────────────────────────────────────────────────────────────────────────────────────────────
+def cmd_compile(capability_id: str, exec_target: str, *, do_emit: bool, now: str | None) -> int:
+    """Compile ``capability_id`` from the LIVE runtime state if present, else the fixture. Prints the unit (and the
+    concrete deployable text with --emit). Refuses a non-promoted capability with a clear reason (exit 2)."""
     try:
-        unit = _c.compile_capability(cap, task_spec, exec_target=exec_target, now=used_now,
-                                     resolved_preference=_f.fixture_resolved_preference(), receipt_refs=receipt_refs)
+        unit, source = _compile_for_cli(capability_id, exec_target, now=now)
     except _c.NotPromotedError as exc:
         print(f"REFUSED — {exc}", file=sys.stderr)
         return 2
-    errors = _c.validate_unit(unit)
-    if errors:
-        print("COMPILED UNIT FAILED SCHEMA VALIDATION:", file=sys.stderr)
-        for e in errors:
-            print(f"  ✗ {e}", file=sys.stderr)
+    except RuntimeError as exc:
+        print(str(exc).upper().split("\n", 1)[0], file=sys.stderr)
+        print(str(exc).split("\n", 1)[1] if "\n" in str(exc) else "", file=sys.stderr)
         return 1
     print(f"# compiled {capability_id!r} (source: {source}) → exec_target={exec_target}, "
           f"backend={unit['backend']}, unit_id={unit['unit_id']}")
@@ -101,6 +121,97 @@ def cmd_compile(capability_id: str, exec_target: str, *, do_emit: bool, now: str
     if do_emit:
         print(f"\n# --- concrete deployable ({exec_target}) ---")
         print(_e.emit(unit, exec_target))
+    return 0
+
+
+# ── --register / --list / --rollback (the durable compiled-unit registry) ────────────────────────────────────
+def _open_registry(state_dir: str | None):
+    """Open the registry at ``state_dir`` (the dist/local-services-state/teleon-compiler mount) or the default."""
+    if state_dir:
+        return _r.open_registry(Path(state_dir) / _r.DEFAULT_LOG_NAME)
+    return _r.open_registry()
+
+
+def cmd_register(capability_id: str, exec_target: str, *, now: str | None, state_dir: str | None) -> int:
+    """Compile ``capability_id`` AND register the unit into the durable registry (idempotent by unit_id). On a new
+    unit this DEMOTES the prior active unit for the capability and stamps it as the new unit's rollback_target —
+    making rollback real end-to-end. Refuses a non-promoted capability (exit 2)."""
+    try:
+        unit, source = _compile_for_cli(capability_id, exec_target, now=now)
+    except _c.NotPromotedError as exc:
+        print(f"REFUSED — {exc}", file=sys.stderr)
+        return 2
+    except RuntimeError as exc:
+        print(str(exc), file=sys.stderr)
+        return 1
+    reg = _open_registry(state_dir)
+    try:
+        before = reg.get(unit["unit_id"]) is not None
+        record = reg.register(unit)
+    finally:
+        reg.close()
+    note = "already registered (idempotent no-op)" if before else "registered"
+    print(f"# {note}: {capability_id!r} (source: {source}) → exec_target={exec_target}, "
+          f"unit_id={record['unit']['unit_id']}, active={record['active']}")
+    if record["rollback_target"]:
+        print(f"#   supersedes (rollback_target) → {record['rollback_target']}")
+    else:
+        print("#   first compiled unit for this capability (no rollback target yet)")
+    print(f"#   registry log: {reg.log_path}")
+    print(json.dumps(record, indent=2, sort_keys=True, ensure_ascii=False))
+    return 0
+
+
+def cmd_list(state_dir: str | None) -> int:
+    """Show the registry: every currently-active compiled unit (one per capability), plus the full history per
+    capability (active + demoted, lossless). The per-capability deploy_topology snapshot."""
+    reg = _open_registry(state_dir)
+    try:
+        active = reg.list_active()
+        cap_ids = reg.capability_ids()
+        print(f"# compiled-unit registry @ {reg.log_path}")
+        print(f"# {len(active)} active unit(s) across {len(cap_ids)} capability(ies):")
+        for u in active:
+            rt = u.get("rollback_target") or "—"
+            print(f"  [active] {u['capability_id']} v{u['capability_version']} "
+                  f"({u['exec_target']}) unit_id={u['unit_id']} rollback_target={rt}")
+        for cap in cap_ids:
+            hist = reg.history(cap)
+            print(f"  history[{cap}]: {len(hist)} unit(s) —")
+            for r in hist:
+                u = r["unit"]
+                flag = "active " if r["active"] else "demoted"
+                print(f"      [{flag}] v{u['capability_version']} {u['exec_target']} unit_id={u['unit_id']}")
+    finally:
+        reg.close()
+    return 0
+
+
+def cmd_rollback(capability_id: str, state_dir: str | None) -> int:
+    """Return the rollback-target unit for a capability (the predecessor of the current active unit) — REAL
+    rollback. Exit 0 + prints the target unit; exit 3 (honest) when there is no predecessor or the history is
+    tampered/missing."""
+    reg = _open_registry(state_dir)
+    try:
+        try:
+            target = reg.rollback_target(capability_id)
+        except _r.RegistryIntegrityError as exc:
+            print(f"ROLLBACK UNAVAILABLE — {exc}", file=sys.stderr)
+            return 3
+        active = reg.latest_active_for(capability_id)
+    finally:
+        reg.close()
+    if active is None:
+        print(f"no active compiled unit for capability {capability_id!r} — nothing is deployed to roll back from",
+              file=sys.stderr)
+        return 3
+    if target is None:
+        print(f"capability {capability_id!r} is on its FIRST compiled unit ({active['unit_id']}) — "
+              "no predecessor to roll back to", file=sys.stderr)
+        return 3
+    print(f"# rollback target for {capability_id!r}: active={active['unit_id']} → "
+          f"rollback_to={target['unit_id']} (v{target['capability_version']}, {target['exec_target']})")
+    print(json.dumps(target, indent=2, sort_keys=True, ensure_ascii=False))
     return 0
 
 
@@ -134,6 +245,167 @@ def cmd_write_examples() -> int:
         print(f"  wrote {path.relative_to(_PKG_DIR.parents[2])}")
     print(f"PASS — {len(EXAMPLE_TARGETS)} example units written")
     return 0
+
+
+# ── registry self-test (register/latest/history/rollback/supersede + idempotency + lossless + rehydration) ────
+def _compile_version(version: int, *, exec_target: str = "k8s_job", now: str) -> dict:
+    """Compile a fixture capability at a given ``version`` (a real version bump → a new unit_id) for the registry
+    proofs. Reuses the deterministic fixtures so the produced units are byte-stable across runs."""
+    cap = {**_f.fixture_promoted_capability(), "version": version}
+    return _c.compile_capability(cap, _f.fixture_task_spec(), exec_target=exec_target, now=now,
+                                 resolved_preference=_f.fixture_resolved_preference(),
+                                 receipt_refs=[f"llmrcpt_fixture_v{version}"])
+
+
+def _registry_checks(checks: list[tuple[str, bool]]) -> None:  # noqa: C901 — a flat checklist is clearer here
+    """Exercise the durable compiled-unit registry end-to-end under a temp dir (never the real state path):
+    register → latest_for/latest_active_for → history → rollback_target/rollback_to → supersede/mark_active, plus
+    idempotency, lossless supersession (demote-not-delete), restart-rehydration EQUALITY, and determinism
+    (byte-identical log across two independent runs from the same inputs)."""
+    import shutil
+    import tempfile
+
+    # two real versions of one capability (v2 then v3 of cap-redact) → two distinct unit_ids.
+    u2 = _compile_version(2, now="2026-06-11T00:00:00Z")
+    u3 = _compile_version(3, now="2026-06-12T00:00:00Z")
+    checks.append(("registry: a version bump produces a distinct unit_id (the timeline has >1 unit)",
+                   u2["unit_id"] != u3["unit_id"]))
+
+    tmp = Path(tempfile.mkdtemp(prefix="cru-registry-selftest-"))
+    try:
+        log_a = tmp / "a" / _r.DEFAULT_LOG_NAME
+        reg = _r.open_registry(log_a, db_path=tmp / "idx" / "a.db")
+
+        # register v2: first compile → no rollback target, active.
+        r2 = reg.register(u2)
+        checks.append(("registry: register a first unit → active, empty rollback_target (no predecessor)",
+                       r2["active"] is True and r2["rollback_target"] == ""))
+        checks.append(("registry: latest_active_for returns the just-registered unit",
+                       reg.latest_active_for("cap-redact")["unit_id"] == u2["unit_id"]))
+        checks.append(("registry: rollback_target is None on the first unit (honest, no fabricated predecessor)",
+                       reg.rollback_target("cap-redact") is None))
+
+        # register v3: REAL rollback wiring — v2 becomes v3's rollback_target and is DEMOTED (not deleted).
+        r3 = reg.register(u3)
+        checks.append(("registry: registering a newer unit sets the PRIOR active unit as its rollback_target (REAL rollback)",
+                       r3["rollback_target"] == u2["unit_id"] and r3["unit"]["rollback_target"] == u2["unit_id"]))
+        checks.append(("registry: the newer unit is active; the prior unit is DEMOTED (single active per capability)",
+                       reg.latest_active_for("cap-redact")["unit_id"] == u3["unit_id"]
+                       and reg.get(u2["unit_id"])["active"] is False))
+        checks.append(("registry: latest_for = newest by version (v3) regardless of active state",
+                       reg.latest_for("cap-redact")["unit_id"] == u3["unit_id"]))
+        checks.append(("registry: rollback_target(cap) returns the EXACT prior unit (the field is now consumable)",
+                       reg.rollback_target("cap-redact")["unit_id"] == u2["unit_id"]))
+
+        # LOSSLESS: the demoted predecessor is preserved + queryable in history (demote-not-delete).
+        hist = reg.history("cap-redact")
+        checks.append(("registry: history preserves BOTH units (lossless — superseded is demoted, not deleted)",
+                       [h["unit"]["unit_id"] for h in hist] == [u2["unit_id"], u3["unit_id"]]))
+        checks.append(("registry: history is deterministically ordered (by capability_version, compiled_at, unit_id)",
+                       [h["unit"]["capability_version"] for h in hist] == [2, 3]))
+        checks.append(("registry: list_active has exactly one active unit for the capability (v3)",
+                       [u["unit_id"] for u in reg.list_active()] == [u3["unit_id"]]))
+
+        # IDEMPOTENCY: re-registering the same unit_id is a no-op (no duplicate append, no forked rollback chain).
+        records_before = len(reg.all_records())
+        r3_again = reg.register(u3)
+        checks.append(("registry: re-registering the same unit is IDEMPOTENT (no duplicate append)",
+                       r3_again["unit"]["unit_id"] == u3["unit_id"] and len(reg.all_records()) == records_before))
+
+        # REAL rollback end-to-end: rollback_to re-activates the predecessor and demotes the current active unit.
+        rolled = reg.rollback_to("cap-redact")
+        checks.append(("registry: rollback_to(cap) re-activates the predecessor (v2) and demotes v3 (REAL rollback)",
+                       rolled["unit"]["unit_id"] == u2["unit_id"]
+                       and reg.latest_active_for("cap-redact")["unit_id"] == u2["unit_id"]
+                       and reg.get(u3["unit_id"])["active"] is False))
+        # mark_active forward again (re-promote v3) — single-active invariant holds.
+        reg.mark_active(u3["unit_id"])
+        checks.append(("registry: mark_active re-promotes a unit and demotes the previously-active one",
+                       reg.latest_active_for("cap-redact")["unit_id"] == u3["unit_id"]
+                       and reg.get(u2["unit_id"])["active"] is False))
+        # supersede demotes by id without deleting; history is unchanged in length (lossless).
+        reg.supersede(u3["unit_id"], reason="self-test manual supersede")
+        checks.append(("registry: supersede demotes a unit by id WITHOUT deleting it (history length unchanged)",
+                       reg.get(u3["unit_id"])["active"] is False and len(reg.history("cap-redact")) == 2))
+
+        # RESTART REHYDRATION EQUALITY: reopen from the durable JSONL → byte-identical projection state.
+        active_before = reg.list_active()
+        hist_before = reg.history("cap-redact")
+        records_snapshot = reg.all_records()
+        reg.close()
+        reg2 = _r.open_registry(log_a, db_path=tmp / "idx" / "a.db")
+        checks.append(("registry: restart rehydrates EQUAL active set (O(attach) from the durable JSONL)",
+                       reg2.list_active() == active_before))
+        checks.append(("registry: restart rehydrates EQUAL history (lossless across a restart)",
+                       reg2.history("cap-redact") == hist_before))
+        checks.append(("registry: restart rehydrates the EXACT append-only log (no record loss/dup)",
+                       reg2.all_records() == records_snapshot))
+        reg2.close()
+
+        # HONEST INTEGRITY: a register with a unit that has no unit_id is refused; a tampered log raises loudly.
+        bad_refused = False
+        reg3 = _r.open_registry(tmp / "b" / _r.DEFAULT_LOG_NAME, db_path=tmp / "idx" / "b.db")
+        try:
+            reg3.register({"capability_id": "cap-x"})  # no unit_id
+        except _r.RegistryError:
+            bad_refused = True
+        checks.append(("registry: register refuses a unit with no unit_id (honest, clear error)", bad_refused))
+        # a missing/tampered history is detected: corrupt the JSONL mirror (a demote of an unknown unit) so a
+        # FRESH open re-imports from it and the fold-time validator fires. (We tamper the durable mirror + drop the
+        # rebuildable index so the engine re-reads the JSONL — proving the JSONL is the source of truth.)
+        reg3.register(u2)
+        reg3.close()
+        idx_db = tmp / "idx" / "b.db"
+        for p in (idx_db, Path(str(idx_db) + "-wal"), Path(str(idx_db) + "-shm")):
+            if p.exists():
+                p.unlink()
+        with (tmp / "b" / _r.DEFAULT_LOG_NAME).open("a", encoding="utf-8") as fh:
+            fh.write(json.dumps({"kind": _r.KIND_DEMOTE, "unit_id": "cru_phantom_never_registered"}) + "\n")
+        tamper_detected = False
+        try:
+            _r.open_registry(tmp / "b" / _r.DEFAULT_LOG_NAME, db_path=tmp / "idx" / "b2.db")
+        except _r.RegistryIntegrityError:
+            tamper_detected = True
+        checks.append(("registry: a tampered log (demote of a never-registered unit) is DETECTED, not silently folded",
+                       tamper_detected))
+        # rollback_target raises loudly when the active unit names a predecessor the log cannot back (missing
+        # history). register() itself OWNS rollback_target (it overrides any caller value with the real
+        # predecessor) — so a stored unit can only reference a MISSING predecessor via a hand-tampered/torn log.
+        # We write exactly that: a register record whose unit's rollback_target points at a never-registered id,
+        # then a fresh open (index dropped so the durable JSONL is re-read) must FAIL on rollback_target, not guess.
+        log_c = tmp / "c" / _r.DEFAULT_LOG_NAME
+        log_c.parent.mkdir(parents=True, exist_ok=True)
+        orphan_unit = json.loads(json.dumps(u3))
+        orphan_unit["rollback_target"] = "cru_missing_predecessor"  # a predecessor that was never registered
+        tampered_record = {"kind": _r.KIND_REGISTER, "record_version": _r.REGISTRY_RECORD_VERSION,
+                           "unit": orphan_unit, "active": True,
+                           "registered_at": orphan_unit["provenance"]["compiled_at"],
+                           "rollback_target": "cru_missing_predecessor", "supersedes": "cru_missing_predecessor"}
+        with log_c.open("w", encoding="utf-8") as fh:
+            fh.write(json.dumps(tampered_record, sort_keys=True) + "\n")
+        reg4 = _r.open_registry(log_c, db_path=tmp / "idx" / "c.db")
+        missing_raises = False
+        try:
+            reg4.rollback_target("cap-redact")
+        except _r.RegistryIntegrityError:
+            missing_raises = True
+        checks.append(("registry: rollback_target fails honestly when the named predecessor is missing from the log",
+                       missing_raises))
+        reg4.close()
+
+        # DETERMINISM: two independent registries built from the SAME register sequence yield byte-identical logs.
+        det_logs: list[str] = []
+        for run in ("d1", "d2"):
+            lp = tmp / run / _r.DEFAULT_LOG_NAME
+            rg = _r.open_registry(lp, db_path=tmp / "idx" / f"{run}.db")
+            rg.register(_compile_version(2, now="2026-06-11T00:00:00Z"))
+            rg.register(_compile_version(3, now="2026-06-12T00:00:00Z"))
+            rg.close()
+            det_logs.append(lp.read_text(encoding="utf-8"))
+        checks.append(("registry: the durable JSONL is BYTE-IDENTICAL across two independent runs (deterministic)",
+                       det_logs[0] == det_logs[1] and bool(det_logs[0])))
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
 
 
 # ── --self-test (offline invariants, exhaustive) ─────────────────────────────────────────────────────────────
@@ -302,13 +574,18 @@ def self_test() -> int:  # noqa: C901 — a flat checklist is clearer here than 
     checks.append(("drift gate: a fresh render of the k8s example is non-empty + deterministic",
                    bool(fresh[sample_path]) and fresh[sample_path] == _render_examples()[sample_path]))
 
-    # 11. dependency law: this package imports nothing from src.baltor / src.openharnesshub. Scan only the IMPORT
+    # 11. THE REGISTRY (the durable, append-only compiled-unit registry — the deploy_topology analog). All under a
+    # temp dir so the real dist/local-services-state/teleon-compiler state is never touched by the self-test.
+    _registry_checks(checks)
+
+    # 12. dependency law: this package imports nothing from src.baltor / src.openharnesshub. Scan only the IMPORT
     # directives (import/from lines), so a literal mention in a comment/string — like this very check — is not a
-    # false positive. Branch on the forbidden layer roots, never on a brand display name.
+    # false positive. Branch on the forbidden layer roots, never on a brand display name. _r (registry) is included
+    # so the new module's imports (it pulls scripts._jsonl_store — tooling, not a brand layer) are covered too.
     forbidden_roots = ("src.baltor", "src.openharnesshub")
     pkg_init = importlib.import_module("src.teleon.compiler")
     import_lines: list[str] = []
-    for m in (_c, _e, _f, pkg_init, sys.modules[__name__]):
+    for m in (_c, _e, _f, _r, pkg_init, sys.modules[__name__]):
         for raw in Path(m.__file__).read_text(encoding="utf-8").splitlines():
             s = raw.strip()
             if s.startswith(("import ", "from ")):
@@ -333,6 +610,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--emit", action="store_true", help="with --compile: also print the concrete deployable text")
     parser.add_argument("--check", action="store_true", help="drift gate over the committed example units")
     parser.add_argument("--write-examples", action="store_true", help="(re)write the committed example units")
+    parser.add_argument("--register", metavar="CAP_ID",
+                        help="compile a capability AND register the unit into the durable registry (sets the prior "
+                             "active unit as its rollback_target; idempotent by unit_id)")
+    parser.add_argument("--list", action="store_true",
+                        help="show the registry: active units (one per capability) + full lossless history")
+    parser.add_argument("--rollback", metavar="CAP_ID",
+                        help="return the rollback-target unit for a capability (the predecessor of its active unit)")
+    parser.add_argument("--state-dir", default=None,
+                        help="registry state dir (default: dist/local-services-state/teleon-compiler — the Fly volume mount)")
     parser.add_argument("--now", default=None, help="timestamp stamped as provenance.compiled_at (default: fixed)")
     args = parser.parse_args(argv)
     if args.self_test:
@@ -341,6 +627,12 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_write_examples()
     if args.check:
         return cmd_check()
+    if args.register:
+        return cmd_register(args.register, args.exec_target, now=args.now, state_dir=args.state_dir)
+    if args.list:
+        return cmd_list(args.state_dir)
+    if args.rollback:
+        return cmd_rollback(args.rollback, args.state_dir)
     if args.compile:
         return cmd_compile(args.compile, args.exec_target, do_emit=args.emit, now=args.now)
     parser.print_help()
