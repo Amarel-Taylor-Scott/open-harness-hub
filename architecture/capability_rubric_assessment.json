@@ -224,7 +224,7 @@
       ]
     },
     "teleon_runtime": {
-      "verdict": "Demo+ (honest demo wearing some product clothes)",
+      "verdict": "MVP (the backbone core is built: ungameable gate + async + compiler + receipted plane)",
       "scores": {
         "A1": 0,
         "A2": 3,
@@ -258,7 +258,7 @@
         "F3": 4,
         "F4": 3,
         "F5": 2,
-        "F6": 2,
+        "F6": 3,
         "F7": 2
       },
       "na": [
@@ -729,6 +729,69 @@
       "next": [
         "--all-realms batch mode (S)"
       ]
+    },
+    "teleon_compiler": {
+      "verdict": "MVP \u2014 deterministic backbone core",
+      "scores": {
+        "A1": 0,
+        "A2": 0,
+        "A3": 0,
+        "A4": 0,
+        "A5": 2,
+        "B1": 0,
+        "B2": 0,
+        "B3": 3,
+        "B4": 0,
+        "B5": 0,
+        "B6": 4,
+        "C1": 3,
+        "C2": 3,
+        "C3": 3,
+        "C4": 0,
+        "C5": 0,
+        "C6": 2,
+        "D1": 4,
+        "D2": 0,
+        "D3": 0,
+        "D4": 3,
+        "D5": 2,
+        "E1": 3,
+        "E2": 0,
+        "E3": 2,
+        "E4": 4,
+        "E5": 4,
+        "F1": 4,
+        "F2": 4,
+        "F3": 4,
+        "F4": 4,
+        "F5": 3,
+        "F6": 3,
+        "F7": 2
+      },
+      "na": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "B1",
+        "B2",
+        "B5",
+        "C4",
+        "C5",
+        "D2",
+        "D3",
+        "E2"
+      ],
+      "top_gaps": [
+        "compiled-unit registry not built (per-capability analog of deploy_topology)",
+        "rollback_target carried but not CONSUMED",
+        "no PurposeTask intake queue (auto-compile on promotion) + no first credentialed cloud launch (runner = local runtime)"
+      ],
+      "next": [
+        "compiled-unit registry + auto-compile-on-promotion (M)",
+        "rollback consumption (S)",
+        "first credentialed cloud deploy of a compiled unit (M)"
+      ]
     }
   },
   "portfolio_synergies_unrealized": [
@@ -756,5 +819,6 @@
     "multi_cloud_verdict": "GOOD by construction: stdlib-python services + env contracts; ONE topology emits fly/ + k8s + compose; only the worker controller is provider-specific BY DESIGN (KEDA twin encodes identical numbers); recommended object storage is S3-compatible (Tigris\u2194R2\u2194B2 swappable). The real portability constraint is JSON-file state (single-machine) \u2014 the SQLite/Postgres path fixes scale and portability together."
   },
   "fix_wave_2026_06_11": "4-agent parallel fix wave, all self-tests green: identity login throttle+lockout (C5 0\u21923); events ring rotation + transient per-minute cap (un-bricked); registry append-through cache + api_calls rotation (O(n)\u2192memory, 4.1ms/req over 22k rows); teleon train/holdout de-contaminated gate (answer-key parrot now FAILS) + state lock; ChatRoute\u2192OIPS shim (every model_routes call mints+persists ModelInvocationReceipts, node base_url binding, one network switch); worker reingest dispatch (CDC jobs no longer silent no-ops); generator README emits scheduled feeders + single-machine law + snapshot retention.",
-  "p1_wave_2026_06_11": "5-agent P1 long-haul wave, all self-tests green + tree clean: SQLite-WAL append-log behind the JSONL contract (identity/registry/events \u2014 crash-safe, 3.7-7.5x faster rehydrate, multi-machine prep); opt-in async Teleon runs (202 + worker thread, 409 admission, idempotency, interrupted-sweep) keeping the 201 sync contract; Baltor gateway persistence (ctx:// handles survive restart) + receipts-on-fetch + volume-pinned db path + /fetch auth + killed double-processing; CPU-batch inference lane (gemma-4 sidecar, degrade-safe). PLUS: repaired the gemma-4 provider node schema (had broken the OIPS graph loader across all inference gates), file-layout allowlist, secret-hygiene fixtures, deploy preflight gate, README numbering."
+  "p1_wave_2026_06_11": "5-agent P1 long-haul wave, all self-tests green + tree clean: SQLite-WAL append-log behind the JSONL contract (identity/registry/events \u2014 crash-safe, 3.7-7.5x faster rehydrate, multi-machine prep); opt-in async Teleon runs (202 + worker thread, 409 admission, idempotency, interrupted-sweep) keeping the 201 sync contract; Baltor gateway persistence (ctx:// handles survive restart) + receipts-on-fetch + volume-pinned db path + /fetch auth + killed double-processing; CPU-batch inference lane (gemma-4 sidecar, degrade-safe). PLUS: repaired the gemma-4 provider node schema (had broken the OIPS graph loader across all inference gates), file-layout allowlist, secret-hygiene fixtures, deploy preflight gate, README numbering.",
+  "p2_wave_2026_06_11": "THE BACKBONE landed: src/teleon/compiler (promoted capability -> K8s Job/Fly Machine/local, deterministic byte-identical x5, only-promoted-compiles in code+schema, OTel logging, 40/40); measured-lift promotion bridge (lift+durability, reason_codes single-source); Baltor tenanted gateway + ctxv:// immutable fetch (cross-tenant 404, lossless supersession); proof suite 388/393 green + realm-count check fixed; Teleon self-improving-runtime vision synthesized (5 gaps surfaced). Remaining = wiring: compiled-unit registry, rollback consumption, PurposeTask intake queue, self-programming variant proposer (exploration ladder), first cloud launch."
 }

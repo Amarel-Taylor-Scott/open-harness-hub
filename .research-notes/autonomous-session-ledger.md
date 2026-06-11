@@ -2307,3 +2307,32 @@ Rubric scores bumped (p1_wave record). Pre-existing reds left for owner: check_a
 (hardcoded 12 vs 25 realms), stale web/harness-hub HTML wiring proofs. NEXT (P2): the Teleon
 capability->runtime compiler (the backbone), tenanted gateway (tenant_id in ctx://, ctxv://
 versioned fetch), measured-lift promotion for registry components.
+
+## 2026-06-11 (cont 7) — P2 wave lands: THE BACKBONE BUILT + tenancy + measured-lift + positioning + open-ended ladder launched
+
+Owner re-issued max-depth + asked how Teleon self-programs/diagnoses/tunes/improves + about an
+OpenClaw/Hermes layer for open-ended tasks. Committed this wave (all verified independently):
+- **THE BACKBONE**: src/teleon/compiler/ + schemas/runtime/CompiledRuntimeUnit.v1 — promoted
+  capability → K8s Job/Fly Machine/local process, PURE+deterministic (byte-identical x5),
+  only-promoted-compiles enforced in CODE AND SCHEMA, OTel logging on every unit, reuses
+  runtime_binding/OIPS/SLA for budgets (no magic values), 40/40 self-test, drift-gated,
+  dependency-law clean. This is the answer to "Teleon auto-builds deterministic K8/cloud
+  runtimes" — the compiler CORE now exists (was "NONE" in the deep-dive; reconciled rubric +
+  deep-dive doc + memory to reflect ~75-80% built, remaining = wiring).
+- **Measured-lift promotion bridge** (scripts/eval/promotion_bridge.py): lift+durability gate,
+  reason_codes single-source, 35/35; wire-in points documented not applied.
+- **Baltor tenanted gateway**: tenant_id isolation (cross-tenant 404) + ctxv:// immutable
+  versioned fetch (lossless supersession), 21/21, live trace, P1→P2 ADD COLUMN migration.
+- **Proof suite 388/393 green** + realm-count check computes from registry (was hardcoded 12).
+- **Teleon self-improving-runtime vision** (docs/strategy/): definitive cited lifecycle +
+  5 gaps (doc/reality drift on the compiler [now fixed], eval-as-contract-field, stub variant
+  proposer, intake queue + cloud launch, durability-gate wiring). Positioning: "Serverless runs
+  code, K8s runs workloads, Teleon runs purpose — and keeps it correct; the loop proves itself
+  instead of trusting itself."
+- **Open-ended exploration ladder** (LAUNCHED, src/teleon/exploration/): the escalation tier
+  routing open-ended/no-template/first-pass-failed work to bounded OpenClaw/Hermes/swarm
+  CANDIDATES (the ports already exist: agent_runtime_provider, research_agent_provider,
+  stateful_swarm_provider; catalog has clawless_openclaw@candidate, hermes@candidate;
+  serves_truth=false, propose-never-dispose). Proposals re-enter the gate → compiler.
+Still running: catalog integrity (a765), exploration ladder (a62ad). NEXT wiring: compiled-unit
+registry + auto-compile-on-promotion, PurposeTask intake queue, the variant proposer.

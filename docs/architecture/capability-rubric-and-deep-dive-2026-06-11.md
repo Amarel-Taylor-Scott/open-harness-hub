@@ -46,14 +46,24 @@ Owner question: *"is this setup to take contracts/intents/capabilities and autom
 build out efficient more deterministic K8 runtimes or cloud functions using appropriate
 standardization and logging tools?"*
 
-**Honest answer: NO — about 40% of the substrate exists, and none of the compiler.** What
-exists and is real: the CapabilityTask/PurposeTask spec; a demo runtime proving the
-promote/candidate gate pattern with receipts; OIPS receipts with `is_truth:false` and an
-allowed-use ladder; FleetLedger + supervisor (decisions, not spawns); sandbox/template/
-inference ports; and — importantly — the **deploy topology generator, which IS a working
-deterministic compiler** (declarative JSON → fly.toml/k8s/compose, drift-gated). What does
-NOT exist: any path from a capability contract to an emitted runtime; standardized logging
-(four receipt shapes, none OTel-compatible); an ungameable gate; a single model plane.
+**Answer as of 2026-06-11 (UPDATED — was "NO ~40%"): the compiler CORE now EXISTS; the
+backbone is ~75–80% built, the remaining gaps are wiring, not a rebuild.** The four
+prerequisites the original answer named as missing have all landed this session:
+- **ungameable gate** — train/holdout split, answer-key-parrot regression-proof (`scripts/teleon_local_runtime.py`).
+- **single receipted model plane** — ChatRoute is a shim over OIPS; every call mints+persists a `ModelInvocationReceipt` with `executed_base_host` (`scripts/model_routes.py` + `src/teleon/inference/receipts.py`).
+- **capability→runtime COMPILER** — `src/teleon/compiler/` (`compile.py`/`emit.py`): a promoted capability + gate evidence + receipts compiles deterministically (byte-identical ×5) to a K8s Job / Fly Machine / local process, OTel logging attrs on every unit, **only-promoted-compiles enforced in code AND schema** (`schemas/runtime/CompiledRuntimeUnit.v1.schema.json`). 40/40 self-test, drift-gated, dependency-law clean.
+- **measured-lift promotion bridge** — `scripts/eval/promotion_bridge.py` gates on lift + durability (reason_codes single-source).
+
+Still substrate-real from before: CapabilityTask/PurposeTask spec, FleetLedger + supervisor,
+sandbox/template/inference ports, the deploy topology generator (the pattern the compiler
+mirrors). What's left is WIRING (the honest gaps, per `teleon-self-improving-runtime-vision.md`):
+a registry of compiled units, rollback CONSUMPTION (the field is carried, not consumed yet),
+the **PurposeTask intent-intake queue** (auto-compile on promotion — the "just describe the
+capability" front door), the **self-programming variant PROPOSER** (today `adapt()` selects
+among pre-built; the open-ended exploration ladder `src/teleon/exploration/` is the escalation
+path to genuine synthesis), and a first credentialed cloud launch (runner is still the local
+runtime; cloud backends are `@candidate` by design). The measured-lift bridge needs its
+one-line wire-in into the runtime gate + registry decide.
 
 The backbone program, sequenced (each step is prerequisite to the next):
 
