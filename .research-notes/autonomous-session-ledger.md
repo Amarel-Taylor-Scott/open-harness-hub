@@ -2160,3 +2160,31 @@ KTX: Kaelio/ktx = YC X25 open-source "executable context layer for data agents" 
 Apache-2.0, MCP-first, file-first git state, read-only by design) — unrelated to hosting,
 directly adjacent to Baltor's governed-context thesis; differentiate on verification rail +
 receipts; closest comparable WrenAI 15.5k★; vanna archived Feb 2026 (category consolidating).
+
+## 2026-06-11 (cont) — Fly deploy layer BUILT + YC landscape research (4 agents)
+
+DEPLOY (warrant: explicit owner intent "build out the necessary changes to support fly.io and
+build out flexibility so we can easily switch as needed"): NEW architecture/deploy_topology.json
+(single source; ports joined from local_service_registry, @service refs resolved per provider,
+scaling block shared by KEDA AND the Fly controller) → scripts/deploy/generate_provider_configs.py
+(13 fly/*.fly.toml + generated README + deploy/docker-compose.deploy.yml; --check drift gate;
+k8s cross-checks; 12/12 self-test) + scripts/deploy/fly_worker_controller.py (the KEDA
+replacement on Fly: stdlib RESP LLEN, start-before-create, capacity backoff 2 polls→300s cap,
+drain after full cooldown, managed_by-metadata safety, JSONL receipts; 12/12 self-test incl.
+429/capacity/drain/foreign-machine cases). PORTABILITY FIXES with real bug payoff: all six
+servers hard-bound 127.0.0.1 (k8s manifests were dead-on-arrival) → OH_BIND_HOST convention;
+showcase seam proxy now honors OH_SEAM_*_BASE (cloud) with registry-port defaults (local);
+teleon runtime honors AIDR_IDENTITY_BASE; k8s service-plane gained the bind env on all five
+deployments + FIXED the registry mountPath bug (code persists dist/registry, manifest mounted
+dist/local-services-state — state would not have survived). Runbook:
+docs/architecture/fly-deploy-runbook.md (owner = account+card+one login; agent = everything
+else; switch playbook to k3s/DOKS/ACA/compose). Showcase --self-test exit 0 after seam changes.
+RESEARCH (4 background agents, all prices/batches verified on primary pages): ktx deep-dive
+(receipt-shaped substrate, NO verification/receipts/CDC; convergence triggers; 3 wrap shapes),
+YC context sweep ~45 cos + YC agent-infra sweep ~50 cos (WHITE SPACE CONFIRMED: nobody does
+verification + portable receipts + governed truth promotion through W26; threats
+Airbyte 5 / Mem0 4 / Reducto 4 / Zep 4 / Respan 4 (THE FOIL — "self-driving" = agents dispose)
+/ Mastra 4; consolidation wave = standalone obs/evals/security are features), IJFW (FerroxLabs
+v1.6.1, threat ≤2, vocabulary convergence only; wrap candidates). Canonical doc:
+docs/strategy/yc-context-landscape-2026-06.md. Memories: kaelio-ktx updated,
+yc-context-landscape-2026-06 + fly-deploy-layer-built added.
