@@ -21,7 +21,8 @@ _SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv", "_reference", "art
 _SCAN_EXT = {".py", ".json", ".md", ".txt", ".yaml", ".yml", ".html", ".js", ".mjs", ".env", ".example"}
 #: files that intentionally contain SYNTHETIC example keys to TEST redaction/PII scrubbing. Allowlisted —
 #: but each match in them must be a KNOWN synthetic fixture, so a REAL key in these files still fails.
-_REDACTION_FIXTURE_FILES = {"scripts/check_prelaunch.py", "scripts/foundry/interactions.py"}
+_REDACTION_FIXTURE_FILES = {"scripts/check_prelaunch.py", "scripts/foundry/interactions.py",
+                            "scripts/email_port.py"}  # exercises the send() secret-shaped-prop guard
 _SYNTHETIC_KEYS = {"sk-ABCDEFGHIJKLMNOP12345", "sk-ABCDEF1234567890"}
 
 

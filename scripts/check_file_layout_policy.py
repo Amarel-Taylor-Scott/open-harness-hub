@@ -12,7 +12,9 @@ import json
 from pathlib import Path
 
 _REPO = Path(__file__).resolve().parents[1]
-_SKIP = {".venv", "__pycache__", ".git", "node_modules", "_reference"}
+# local-only dirs that are gitignored and never part of the tracked tree (tooling caches +
+# the dated rollback snapshot kept on disk under the lossless law — see archive/<date>/README)
+_SKIP = {".venv", "__pycache__", ".git", "node_modules", "_reference", "archive"}
 
 
 def _self_test() -> int:

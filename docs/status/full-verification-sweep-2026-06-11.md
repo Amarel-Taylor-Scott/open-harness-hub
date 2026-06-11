@@ -72,7 +72,7 @@ plane edits settle; expect them green.
    Fix: add the 4 tracked dirs to the policy allowlist (or relocate them) and gitignore/clear
    `archive/`. Single-source-of-truth drift — the policy file is the SoT and it's behind reality.
 2. **`check_llm_secret_hygiene` — fake `sk-` literal (P2).** `scripts/email_port.py:160` in a
-   `__main__` demo block: `send(..., {"api_key": "sk-deadbeef12345678"})`. NOT a real secret
+   `__main__` demo block: a demo literal shaped like a raw `sk-` key. NOT a real secret
    (placeholder), but the gate correctly pattern-matches `sk-`. Fix: change the demo literal to
    a non-`sk-` placeholder or `env://`. (No key rotation implication — it's a literal demo string.)
 3. **`check_oh_states_kit` — `A: index.html loads oh-states.js` (P1).** A shipped front-end
@@ -168,7 +168,7 @@ does NOT cover:
   (no-magic-values drift) — e.g. `pgvector/pgvector:pg16` (`scripts/validate_compose.py:83`).
 
 **P2 (hygiene/polish):**
-- `scripts/email_port.py:160` — replace `"sk-deadbeef12345678"` demo literal (unbreaks
+- `scripts/email_port.py:160` — replace the raw-key-shaped demo literal (unbreaks
   `check_llm_secret_hygiene`).
 - `scripts/db/factory_jsonl_bulk_copy.py:6` — fix `\c` invalid escape (raw string).
 - web/ TODO debt = 209 — schedule a sweep.

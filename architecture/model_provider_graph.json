@@ -218,14 +218,18 @@
       "adapter_style": "openai_compatible"
     },
     {
-      "id": "model.openrouter.gemma_4_26b@candidate",
-      "style": "openai_compatible",
+      "node_id": "model.openrouter.gemma_4_26b@candidate",
       "base_url": "https://openrouter.ai/api/v1",
       "model": "google/gemma-4-26b-a4b-it",
-      "tier": 200,
-      "status": "candidate",
-      "allowed_use": "candidate_generation",
-      "note": "owner-directed 2026-06-11 cheaper-inference lane: AR sibling beats DiffusionGemma on every benchmark at $0.06/$0.33 per 1M (:free dev tier). Key = OPENROUTER_API_KEY (on file). See docs/architecture/flexible-inference-lanes.md."
+      "tier_code": 300,
+      "specialization_codes": [100, 200, 300, 400, 500, 1000, 1100],
+      "status_code": 200,
+      "secret_ref": "secret://provider/openrouter",
+      "local_equivalent": "model.local_stub@v1",
+      "external": true,
+      "display": "OpenRouter Gemma-4 26B A4B (cheaper-inference lane)",
+      "adapter_style": "openai_compatible",
+      "note": "owner-directed 2026-06-11 cheaper-inference lane: AR sibling beats DiffusionGemma on every benchmark at $0.06/$0.33 per 1M (:free dev tier). Key = OPENROUTER_API_KEY (secret://provider/openrouter). See docs/architecture/flexible-inference-lanes.md."
     }
   ],
   "edges": [
