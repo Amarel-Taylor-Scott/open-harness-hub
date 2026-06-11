@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """scripts.check_adversarial_auth_all_realms — ADVERSARIAL signup/auth validation across EVERY
-front end's realm (parent + Baltor + Teleon + all 9 live hubs), not just harness-hub.
+front end's realm (parent + Baltor + Teleon + every LIVE Open*Hub), not just harness-hub.
 
-The identity service backs all 12 realms; this hammers each one with the happy path AND the attacks
-a hostile signup flow must survive:
+The identity service backs every realm declared in architecture/identity_realm_registry.json (the
+single source — never hand-count the realms here); this hammers each one with the happy path AND
+the attacks a hostile signup flow must survive:
   HAPPY (per realm): register → verification email rendered (no send) → login-before-onboard
     rejected → onboard → login → mint key (raw once) → verify → revoke → verify fails → logout →
     re-login → session restored.
@@ -33,6 +34,10 @@ if str(REPO_ROOT) not in sys.path:
 
 from scripts.identity_local_service import start_service  # noqa: E402
 
+# The realm set is COMPUTED from the registry the identity service itself loads — the single source.
+# Adding/removing a realm there must never require editing this proof (no-magic-values law).
+REGISTRY_PATH = REPO_ROOT / "architecture" / "identity_realm_registry.json"
+
 _SECRET = "-".join(("demo", "passphrase", "fragment"))
 _KEY_RE = re.compile(r"(sk-[A-Za-z0-9]{8,}|AKIA[0-9A-Z]{12,}|credref:)")
 
@@ -56,12 +61,17 @@ def _self_test() -> int:
             print(f"  [FAIL] {name}{(': ' + detail) if detail else ''}")
             fails.append(name)
 
+    # Single source of the expected realm set: the registry the identity service loads.
+    declared = [r["realm_id"] for r in json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))["realms"]]
+
     state = Path(tempfile.mkdtemp(prefix="adv-auth-"))
     server, thread, port = start_service(port=0, state_dir=state)
     try:
         _, realms_resp = _call(port, "GET", "/api/identity/realms")
         realms = [r["realm_id"] for r in realms_resp["realms"]]
-        ck("all 12 front-end realms present", len(realms) == 12, str(len(realms)))
+        # served realms must EXACTLY equal the registry-declared realms (drift gate, both directions)
+        ck(f"all {len(declared)} registry-declared front-end realms served (no drift)",
+           set(realms) == set(declared), f"served^declared={sorted(set(realms) ^ set(declared))}")
         sessions = {}
         for realm in realms:
             ident = f"user@{realm}.test"
@@ -121,10 +131,10 @@ def _self_test() -> int:
         server.shutdown(); thread.join(timeout=5)
         shutil.rmtree(state, ignore_errors=True)
 
-    print(("PASS — check_adversarial_auth_all_realms: every front end's realm (parent + Baltor + Teleon + "
-           "9 live hubs) survives the happy path AND the attacks — duplicate/early/wrong-credential rejected, "
-           "no account enumeration, session-gated keys, cross-realm isolation (no SSO), injection-safe, no "
-           "secret on the wire or disk."
+    print((f"PASS — check_adversarial_auth_all_realms: every registry-declared realm ({len(declared)}: "
+           "parent + Baltor + Teleon + every live hub) survives the happy path AND the attacks — "
+           "duplicate/early/wrong-credential rejected, no account enumeration, session-gated keys, "
+           "cross-realm isolation (no SSO), injection-safe, no secret on the wire or disk."
            if not fails else f"\n{len(fails)} FAILURES: {fails[:20]}"))
     return 0 if not fails else 1
 
