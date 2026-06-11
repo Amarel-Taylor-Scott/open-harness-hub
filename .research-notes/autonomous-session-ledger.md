@@ -2091,3 +2091,16 @@ upstream build — the owner-authorized static binary serves both paths). Re-fil
 1/2/4 at cloud speed. CodeStrap research saved to memory (closest thesis-foil; X-Reason =
 NL→compiled XState, Palantir-coupled; validates Teleon determinism; adapter-candidate only).
 Deep-dive scouts launched for Baltor/Teleon/OHH dependency maps (owner-requested).
+
+## 2026-06-11 (deep dive) — three-product dependency map synthesized + cloud-speed re-film
+
+**Warrant: direct user intent** ("deep dive on Baltor, Teleon, OpenHarnessHub and all surfaces
+they depend on"). Three exhaustive scouts ran in parallel; synthesis (scout findings reconciled
+against live-verified session state) → docs/status/products-deep-dive.md: shared service plane
+table (8 live planes + 3 held), per-product LIVE/designed/fixture split, mermaid cross-system
+flow, 10 consolidated prioritized risks (notably: model-plane regression silence → check gate
+queued; consumption tenant isolation; ctx:// handle fixtures; events WAL), 7-step buildout list.
+Scout corrections recorded: hash embeddings NOT active (nomic promotable live), LLM selection
+live, :8001 seams live, events plane is a real service. Re-film at CLOUD speed landed: journeys
+1/2/4 re-recorded (Teleon 29 chapters incl. the model-built run), report-merged (29 videos / 342
+chapters), media/ set synced. CodeStrap memory saved earlier this session.

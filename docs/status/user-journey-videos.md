@@ -1,69 +1,70 @@
 # User-journey videos — every website in the family
 
-Generated 2026-06-10T20:51:58.392Z by `e2e/record_user_journeys.mjs` (1600×900; OHH + Teleon record
-THROUGH THEIR PUBLIC TUNNEL URLS). Files in `artifacts/e2e/videos/` (webm + mp4). GENERATED
-from `artifacts/e2e/reports/user-journeys.json` — regenerate, don't hand-edit.
+Generated 2026-06-11T02:08:18.190Z by `e2e/record_user_journeys.mjs` (1600×900; OHH + Teleon record
+THROUGH THEIR PUBLIC TUNNEL URLS; the LLM-affected journeys are filmed at CLOUD-MODEL speed —
+qwen3-next via Ollama Cloud). Files in `artifacts/e2e/videos/` + committed copies in
+`media/user-journey-videos/`. GENERATED from the run report — regenerate, don't hand-edit.
 
-29 videos: 6 product/tour journeys + 23 per-website cuts (every Open*Hub —
-private bench included — plus the internal planes). Every per-site cut shows the FULLY WIRED
-loop on that site's own identity realm: browse → REAL sign-up → REAL install in the workspace →
-REAL API-key mint (shown once) → billing (EMULATED caption). Honest captions throughout.
+29 videos: 6 product/tour journeys + 23 per-website cuts. Real on camera:
+per-realm sign-up, live /api/build with model selection, the MODEL-BUILT Teleon capability
+lifecycle (real gate decisions + receipts), real installs/keys, the live event bus with real
+inference receipts. Captioned-emulated: billing/checkout, run-console trace.
 
 ## Open Harness Hub — PUBLIC URL: landing → live build → live registry → sign-up → live canvas + real export → configuration
 
-`artifacts/e2e/videos/journey-1-openharnesshub.mp4` · 108s · 25 chapters · against `expansion-cat-manual-podcasts.trycloudflare.com`
+`artifacts/e2e/videos/journey-1-openharnesshub.mp4` · 101s · 25 chapters · against `expansion-cat-manual-podcasts.trycloudflare.com`
 
 | t | chapter |
 |---|---|
-| 7s | OpenHarnessHub.io — live on the public link: expansion-cat-manual-podcasts.trycloudflare.com |
+| 6s | OpenHarnessHub.io — live on the public link: expansion-cat-manual-podcasts.trycloudflare.com |
 | 12s | Describe a task — the REAL backend assembles a governed pipeline |
 | 15s | Build → /api/build assembles from 2,400+ governed components |
-| 22s | The REAL assembled flow — live components, recipe phases, real cost. No invented lift numbers. |
+| 21s | The REAL assembled flow — live components, recipe phases, real cost. No invented lift numbers. |
 | 28s | Explore — the live registry: 2,400+ real components |
-| 32s | Search and facets run over the real catalog |
-| 37s | A real component — license, lifecycle, provenance from the catalog |
-| 46s | Create a REAL account — per-realm identity, no SSO, no fake sessions |
-| 49s | The identity service registers, onboards, and mints a session |
-| 56s | The workspace — “recent flows” is YOUR real build history |
-| 62s | Confirm the task and constraints |
-| 64s | Assemble — live backend build |
-| 69s | Three REAL cost tiers — cheap / balanced / quality, from the live cost model. Lift: honestly “unproven”. |
-| 71s | The flow canvas — the REAL build in the designed topology |
-| 76s | Every node is a real catalog component — click to inspect |
-| 78s | Swap alternatives are the build’s REAL dropped candidates, ranked by match |
-| 81s | Deploy → downloads the REAL open-spec YAML bundle |
-| 84s | Run console (designed simulation — captioned, not faked) |
-| 89s | Foundry — distillation & verification tooling |
-| 91s | Governance — provenance, signing, review gates |
-| 94s | Checkout — the commercial surface (payment EMULATED, no charges) |
-| 97s | Plans & upgrade (emulated) |
-| 99s | Configuration — workspace settings |
-| 103s | Dark mode — same surface, dark tokens |
-| 108s | OpenHarnessHub — fully wired: live registry, live builds, real accounts, real exports |
+| 30s | Search and facets run over the real catalog |
+| 34s | A real component — license, lifecycle, provenance from the catalog |
+| 41s | Create a REAL account — per-realm identity, no SSO, no fake sessions |
+| 45s | The identity service registers, onboards, and mints a session |
+| 51s | The workspace — “recent flows” is YOUR real build history |
+| 57s | Confirm the task and constraints |
+| 59s | Assemble — live backend build |
+| 64s | Three REAL cost tiers — cheap / balanced / quality, from the live cost model. Lift: honestly “unproven”. |
+| 66s | The flow canvas — the REAL build in the designed topology |
+| 70s | Every node is a real catalog component — click to inspect |
+| 72s | Swap alternatives are the build’s REAL dropped candidates, ranked by match |
+| 75s | Deploy → downloads the REAL open-spec YAML bundle |
+| 78s | Run console (designed simulation — captioned, not faked) |
+| 82s | Foundry — distillation & verification tooling |
+| 85s | Governance — provenance, signing, review gates |
+| 87s | Checkout — the commercial surface (payment EMULATED, no charges) |
+| 90s | Plans & upgrade (emulated) |
+| 92s | Configuration — workspace settings |
+| 96s | Dark mode — same surface, dark tokens |
+| 101s | OpenHarnessHub — fully wired: live registry, live builds, real accounts, real exports |
 
 ## Baltor — landing → sign-up → console → emulated billing → LIVE pipeline on the real event bus
 
-`artifacts/e2e/videos/journey-2-baltor.mp4` · 84s · 17 chapters
+`artifacts/e2e/videos/journey-2-baltor.mp4` · 82s · 17 chapters
 
 | t | chapter |
 |---|---|
-| 5s | Baltor — context assurance (the paid product) |
+| 4s | Baltor — context assurance (the paid product) |
 | 12s | Why context — the thesis |
 | 15s | The Context Engine — six governed stages + verification rail |
 | 21s | Case studies |
-| 24s | Pricing |
-| 26s | A REAL Baltor account — its own identity realm (no SSO) |
-| 30s | Real register → onboarding → session |
-| 38s | The console — corpora, freshness, serving health |
-| 44s | Governed corpora — raw / compressed / hyper tiers |
-| 45s | Inside a corpus — tiers, freshness, citations |
-| 49s | Serving context packages to agents |
-| 52s | Verification — claims checked against live sources |
-| 54s | The audit log |
-| 57s | Billing — plan & invoices (payment EMULATED, no charges) |
-| 65s | Live ops — the REAL event bus behind the product |
-| 66s | Run Full Pipeline — a REAL run, streaming real events and receipts |
-| 84s | Baltor — real console, real events, honest billing emulation |
+| 23s | Pricing |
+| 25s | A REAL Baltor account — its own identity realm (no SSO) |
+| 29s | Real register → onboarding → session |
+| 36s | The console — corpora, freshness, serving health |
+| 42s | Governed corpora — raw / compressed / hyper tiers |
+| 43s | Inside a corpus — tiers, freshness, citations |
+| 47s | Serving context packages to agents |
+| 49s | Verification — claims checked against live sources |
+| 52s | The audit log |
+| 55s | Billing — plan & invoices (payment EMULATED, no charges) |
+| 62s | Live ops — the REAL event bus behind the product |
+| 63s | Run Full Pipeline — a REAL run, streaming real events and receipts |
+| 82s | Baltor — real console, real events, honest billing emulation |
 
 ## AI Done Right — the parent portfolio, the Demo Control Tower (live health), and the scorecard
 
@@ -85,39 +86,39 @@ REAL API-key mint (shown once) → billing (EMULATED caption). Honest captions t
 
 ## Teleon — PUBLIC URL: landing → sign-up → REAL capability build (gate + receipts) → REAL key lifecycle → tower
 
-`artifacts/e2e/videos/journey-4-teleon.mp4` · 108s · 29 chapters · against `national-horizontal-rankings-katrina.trycloudflare.com`
+`artifacts/e2e/videos/journey-4-teleon.mp4` · 105s · 29 chapters · against `national-horizontal-rankings-katrina.trycloudflare.com`
 
 | t | chapter |
 |---|---|
-| 7s | Teleon.dev — live on the public link: national-horizontal-rankings-katrina.trycloudflare.com |
-| 8s | Capabilities, not code — the hero ships with live A/B variants (see the chip) |
-| 13s | How it works |
-| 17s | Case studies |
-| 19s | Pricing |
-| 22s | Docs |
-| 24s | Create a REAL account — Teleon has its own identity realm (no SSO) |
-| 28s | Real register → onboarding → session |
-| 36s | Capabilities — the REAL runtime state: status from a real promotion gate |
-| 40s | Build a capability — this executes FOR REAL (deterministic examples, receipts) |
-| 41s | Building — every example runs now; the gate scores the real pass-rate |
-| 50s | Shipped by the REAL gate — real score, real version bump, receipts on disk |
-| 55s | The capability table updates from the run that just happened |
-| 57s | The console — REAL counters from your recorded runs |
-| 61s | ⌘K — the command palette, on every app surface |
-| 64s | Evidence — what was tried, how it scored, why it shipped |
-| 67s | Library — building blocks drawn from the open hubs |
-| 69s | Configuration — API keys |
-| 70s | Minting a REAL API key on the teleon realm |
-| 74s | The raw key is shown exactly once — the service stores only a hash |
-| 77s | Real revocation — gone immediately |
-| 81s | Team |
-| 83s | Usage — REAL recorded runs and execution time |
-| 86s | Billing — plan & invoices (payment EMULATED, no charges) |
-| 88s | Audit log |
-| 91s | Settings |
-| 94s | Dark mode — same tokens, dark theme |
-| 102s | The PurposeTask Control Tower — operator view (designed prototype) |
-| 108s | Teleon — real accounts, real keys, and a REAL capability lifecycle: build → gate → ship |
+| 6s | Teleon.dev — live on the public link: national-horizontal-rankings-katrina.trycloudflare.com |
+| 7s | Capabilities, not code — the hero ships with live A/B variants (see the chip) |
+| 12s | How it works |
+| 16s | Case studies |
+| 18s | Pricing |
+| 20s | Docs |
+| 23s | Create a REAL account — Teleon has its own identity realm (no SSO) |
+| 26s | Real register → onboarding → session |
+| 33s | Capabilities — the REAL runtime state: status from a real promotion gate |
+| 37s | Build a capability — this executes FOR REAL (deterministic examples, receipts) |
+| 39s | Building — every example runs now; the gate scores the real pass-rate |
+| 47s | Shipped by the REAL gate — real score, real version bump, receipts on disk |
+| 52s | The capability table updates from the run that just happened |
+| 55s | The console — REAL counters from your recorded runs |
+| 59s | ⌘K — the command palette, on every app surface |
+| 62s | Evidence — what was tried, how it scored, why it shipped |
+| 64s | Library — building blocks drawn from the open hubs |
+| 66s | Configuration — API keys |
+| 67s | Minting a REAL API key on the teleon realm |
+| 71s | The raw key is shown exactly once — the service stores only a hash |
+| 74s | Real revocation — gone immediately |
+| 78s | Team |
+| 80s | Usage — REAL recorded runs and execution time |
+| 83s | Billing — plan & invoices (payment EMULATED, no charges) |
+| 85s | Audit log |
+| 88s | Settings |
+| 91s | Dark mode — same tokens, dark theme |
+| 99s | The PurposeTask Control Tower — operator view (designed prototype) |
+| 105s | Teleon — real accounts, real keys, and a REAL capability lifecycle: build → gate → ship |
 
 ## Tour — the live open registries (one engine) + bespoke depth + a REAL install
 
