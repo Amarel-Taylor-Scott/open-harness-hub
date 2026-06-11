@@ -31,6 +31,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import sys
 import time
@@ -295,13 +296,19 @@ class Runtime:
                 if r["run_id"] == run_id]
 
 
+def _identity_base() -> str:
+    """Identity service base. Local default from the realm registry port; AIDR_IDENTITY_BASE
+    overrides in container deploys (same convention as registry_local_service)."""
+    return os.environ.get("AIDR_IDENTITY_BASE", f"http://127.0.0.1:{_identity_port()}").rstrip("/")
+
+
 def _validate_session(realm: str, session_id: str) -> str | None:
     """Resolve the account server-side via the identity service (never trust the client)."""
     if not session_id:
         return None
     try:
         req = urllib.request.Request(
-            f"http://127.0.0.1:{_identity_port()}/api/identity/{realm}/session/validate",
+            f"{_identity_base()}/api/identity/{realm}/session/validate",
             data=json.dumps({"session_id": session_id}).encode("utf-8"),
             headers={"Content-Type": "application/json"}, method="POST")
         with urllib.request.urlopen(req, timeout=10) as resp:
@@ -452,8 +459,9 @@ def main(argv: list[str] | None = None) -> int:
         return _self_test()
     RT = Runtime()
     port = args.port or _registry_port(SERVICE_ID)
-    httpd = ThreadingHTTPServer(("127.0.0.1", port), Handler)
-    print(f"Teleon local runtime → http://127.0.0.1:{port}  "
+    bind_host = os.environ.get("OH_BIND_HOST", "127.0.0.1")  # 0.0.0.0 only in container deploys
+    httpd = ThreadingHTTPServer((bind_host, port), Handler)
+    print(f"Teleon local runtime → http://{bind_host}:{port}  "
           f"({len(RT.caps)} capabilities, {len(RT.runs)} recorded runs, gate ≥{PROMOTE_AT})")
     try:
         httpd.serve_forever()

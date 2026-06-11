@@ -24,6 +24,8 @@ spec:
           command: ["python3", "-m", "scripts.identity_local_service", "--serve"]
           ports: [{ containerPort: 9410 }]
           envFrom: [{ secretRef: { name: model-plane } }]
+          env:
+            - { name: OH_BIND_HOST, value: "0.0.0.0" }
           volumeMounts: [{ name: state, mountPath: /app/dist/identity, subPath: identity }]
           readinessProbe: { httpGet: { path: /api/identity/health, port: 9410 }, periodSeconds: 10 }
       volumes: [{ name: state, persistentVolumeClaim: { claimName: ohh-service-state } }]
@@ -48,11 +50,14 @@ spec:
           command: ["python3", "-m", "scripts.registry_local_service"]
           ports: [{ containerPort: 9423 }]
           env:
+            - { name: OH_BIND_HOST, value: "0.0.0.0" }
             # the registry validates sessions against the identity Service (same contract)
             - { name: AIDR_IDENTITY_BASE, value: "http://identity:9410" }
             # operator bootstrap: realm:account_id pairs (owner-provisioned; never in-app)
             - { name: AIDR_REGISTRY_ADMINS, valueFrom: { secretKeyRef: { name: operator-roster, key: AIDR_REGISTRY_ADMINS, optional: true } } }
-          volumeMounts: [{ name: state, mountPath: /app/dist/local-services-state, subPath: registry }]
+          # RegistryStore persists under dist/registry (registry_local_service.py) — earlier
+          # manifest mounted dist/local-services-state, which the registry never writes
+          volumeMounts: [{ name: state, mountPath: /app/dist/registry, subPath: registry }]
           readinessProbe: { httpGet: { path: /healthz, port: 9423 }, periodSeconds: 10 }
       volumes: [{ name: state, persistentVolumeClaim: { claimName: ohh-service-state } }]
 ---
@@ -75,6 +80,8 @@ spec:
           image: ${IMAGE}
           command: ["python3", "-m", "scripts.events_local_service"]
           ports: [{ containerPort: 9420 }]
+          env:
+            - { name: OH_BIND_HOST, value: "0.0.0.0" }
           volumeMounts: [{ name: state, mountPath: /app/dist/analytics, subPath: analytics }]
           readinessProbe: { httpGet: { path: /healthz, port: 9420 }, periodSeconds: 10 }
       volumes: [{ name: state, persistentVolumeClaim: { claimName: ohh-service-state } }]
@@ -105,6 +112,9 @@ spec:
           command: ["python3", "scripts/teleon_local_runtime.py"]
           ports: [{ containerPort: 9430 }]
           envFrom: [{ secretRef: { name: model-plane } }]
+          env:
+            - { name: OH_BIND_HOST, value: "0.0.0.0" }
+            - { name: AIDR_IDENTITY_BASE, value: "http://identity:9410" }
           volumeMounts: [{ name: state, mountPath: /app/dist/local-services-state/teleon-runtime, subPath: teleon-runtime }]
           readinessProbe: { httpGet: { path: /healthz, port: 9430 }, periodSeconds: 10 }
       volumes: [{ name: state, persistentVolumeClaim: { claimName: ohh-service-state } }]
@@ -130,6 +140,7 @@ spec:
           ports: [{ containerPort: 9301 }]
           envFrom: [{ secretRef: { name: model-plane } }]
           env:
+            - { name: OH_BIND_HOST, value: "0.0.0.0" }
             - { name: REDIS_URL, valueFrom: { secretKeyRef: { name: baltor-stores, key: REDIS_URL, optional: true } } }
             - { name: BALTOR_DURABLE_DB, valueFrom: { secretKeyRef: { name: baltor-stores, key: BALTOR_DURABLE_DB, optional: true } } }
           readinessProbe: { httpGet: { path: /api/health, port: 9301 }, periodSeconds: 15 }

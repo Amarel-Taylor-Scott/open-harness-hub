@@ -5648,8 +5648,9 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", type=int, default=9301)
     args = parser.parse_args(argv)
-    httpd = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
-    print(f"Baltor admin demo -> http://127.0.0.1:{args.port}/admin-demo/")
+    bind_host = os.environ.get("OH_BIND_HOST", "127.0.0.1")  # 0.0.0.0 only in container deploys
+    httpd = ThreadingHTTPServer((bind_host, args.port), Handler)
+    print(f"Baltor admin demo -> http://{bind_host}:{args.port}/admin-demo/")
     try:
         httpd.serve_forever()
     finally:

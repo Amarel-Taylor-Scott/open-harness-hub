@@ -69,32 +69,44 @@ def _identity_service_port() -> int | None:
         return None
 
 
-def _seam_proxies() -> list[tuple[str, str, int]]:
-    """Same-origin seams (url_prefix, strip_prefix, target_port) to the local service plane.
+def _seam_base(env_key: str, port: int) -> str:
+    """Seam target base URL. Default = the local plane (http://127.0.0.1:<port> with the port
+    from the architecture registries); a non-empty OH_SEAM_*_BASE env overrides it for cloud
+    deploys where peers live on other hosts (e.g. http://aidr-identity.internal:9410 on Fly,
+    http://identity:9410 on K8s). This env seam is THE provider switch — same image everywhere,
+    only these bases change (set by scripts/deploy/generate_provider_configs.py, never by hand)."""
+    override = (os.environ.get(env_key) or "").strip().rstrip("/")
+    return override if override else f"http://127.0.0.1:{port}"
+
+
+def _seam_proxies() -> list[tuple[str, str, str]]:
+    """Same-origin seams (url_prefix, strip_prefix, target_base) to the service plane.
 
     The full-design kit (web/<product>/kit/oh-identity.js, oh-registry.js) is pointed at these
     relative bases by the ported entry HTMLs, so identity/registry/analytics/live-ops calls work
-    both on 127.0.0.1 and through a tunnel. Ports come from the architecture registries only.
+    both on 127.0.0.1 and through a tunnel. Ports come from the architecture registries only;
+    cloud deploys override the host via OH_SEAM_*_BASE (see _seam_base).
     """
-    table: list[tuple[str, str, int]] = []
+    table: list[tuple[str, str, str]] = []
     identity = _identity_service_port()
     if identity:
-        table.append(("/api/identity/", "", identity))
+        table.append(("/api/identity/", "", _seam_base("OH_SEAM_IDENTITY_BASE", identity)))
     registry = _local_service_port("local_openhub_projection_api")
     if registry:
-        table.append(("/registry/", "/registry", registry))
+        table.append(("/registry/", "/registry", _seam_base("OH_SEAM_REGISTRY_BASE", registry)))
     events = _local_service_port("local_event_tracking_service")
     if events:
-        table.append(("/analytics/", "/analytics", events))
+        table.append(("/analytics/", "/analytics", _seam_base("OH_SEAM_ANALYTICS_BASE", events)))
     teleon_runtime = _local_service_port("teleon_local_runtime")
     if teleon_runtime:
-        table.append(("/api/teleon/", "", teleon_runtime))
+        table.append(("/api/teleon/", "", _seam_base("OH_SEAM_TELEON_RUNTIME_BASE", teleon_runtime)))
     live_ops = _local_service_port("baltor_admin_demo_server")
     if live_ops:
+        live_ops_base = _seam_base("OH_SEAM_LIVEOPS_BASE", live_ops)
         for prefix in ("/api/demo/", "/api/context/", "/api/dev/", "/api/fleet",
                        "/api/admin-dashboard/", "/api/inference/", "/api/native/",
                        "/api/standards/", "/api/graph/", "/api/context-gateway/", "/api/events"):
-            table.append((prefix, "", live_ops))
+            table.append((prefix, "", live_ops_base))
     return table
 
 
@@ -145,15 +157,15 @@ def _governance_metadata() -> dict[str, dict]:
         return out
 
 
-def _seam_for(path: str) -> tuple[str, int] | None:
-    """The (strip_prefix, port) seam owning this path, if any. A prefix without a trailing slash
+def _seam_for(path: str) -> tuple[str, str] | None:
+    """The (strip_prefix, base) seam owning this path, if any. A prefix without a trailing slash
     matches itself or nested paths; with a trailing slash it matches nested paths only."""
-    for prefix, strip, port in _SEAM_PROXIES:
+    for prefix, strip, base in _SEAM_PROXIES:
         if prefix.endswith("/"):
             if path.startswith(prefix):
-                return strip, port
+                return strip, base
         elif path == prefix or path.startswith(prefix + "/"):
-            return strip, port
+            return strip, base
     return None
 _ADMIN_DEMO_VIEWS = {"sources", "monitoring", "outputs", "download", "explore", "testing"}
 _ADMIN_DEMO_TITLES = {
@@ -198,15 +210,16 @@ class Handler(BaseHTTPRequestHandler):
         """Serve a file from the active product front-end."""
         return self._serve_static_from(WEB_DIR, rel)
 
-    def _proxy_seam(self, parsed, strip: str, port: int) -> None:
-        """Forward this request to a local service (same-origin seam, fixed local ports only).
+    def _proxy_seam(self, parsed, strip: str, base: str) -> None:
+        """Forward this request to a service-plane peer (same-origin seam; base from the
+        architecture registries locally, OH_SEAM_*_BASE in cloud deploys).
 
-        Streams are not proxied (the dashboards' polling fallback covers SSE). When the backing
-        service is down we answer an honest 502 — the full-design kit treats that as
-        service-unavailable and falls back to its in-file design data, never fabricating state.
+        When the backing service is down we answer an honest 502 — the full-design kit treats
+        that as service-unavailable and falls back to its in-file design data, never
+        fabricating state.
         """
         rel = parsed.path[len(strip):] if strip and parsed.path.startswith(strip) else parsed.path
-        target = f"http://127.0.0.1:{port}{rel}" + (f"?{parsed.query}" if parsed.query else "")
+        target = f"{base}{rel}" + (f"?{parsed.query}" if parsed.query else "")
         body = None
         if self.command == "POST":
             length = int(self.headers.get("Content-Length") or 0)
@@ -242,7 +255,7 @@ class Handler(BaseHTTPRequestHandler):
             self._send(exc.code, exc.read(), exc.headers.get("Content-Type") or "application/json")
         except Exception:
             self._send(502, json.dumps({
-                "error": "local service unreachable", "target_port": port,
+                "error": "local service unreachable", "target": base,
                 "hint": "python3 scripts/start_local_services.py",
             }).encode(), "application/json")
 
@@ -474,10 +487,11 @@ def serve(port: int = 8000) -> None:
     # pre-warm the catalog governance cache off-thread: the port binds immediately and the
     # first /api/components hit never pays the ~seconds-long catalog sweep
     __import__("threading").Thread(target=_governance_metadata, daemon=True).start()
-    httpd = ThreadingHTTPServer(("127.0.0.1", port), Handler)
+    bind_host = os.environ.get("OH_BIND_HOST", "127.0.0.1")  # 0.0.0.0 only in container deploys
+    httpd = ThreadingHTTPServer((bind_host, port), Handler)
     gate = "token-gated" if Handler.token else "OPEN (set OH_SHOWCASE_TOKEN to gate)"
-    seams = sorted({port for _, _, port in _SEAM_PROXIES})
-    print(f"{OH_PRODUCT} showcase → http://127.0.0.1:{port}  "
+    seams = sorted({base for _, _, base in _SEAM_PROXIES})
+    print(f"{OH_PRODUCT} showcase → http://{bind_host}:{port}  "
           f"({len(Handler.index.items)} components, embeddings={Handler.index.backend.name}, "
           f"promotable={Handler.index.backend.promotable}, /api/build {gate}, "
           f"service seams → {seams or 'none (registries unreadable)'})")

@@ -181,7 +181,8 @@ def main() -> int:
     port = _registry_port()
     plane = EventsPlane()
     handler = type("BoundHandler", (_Handler,), {"plane": plane})
-    server = ThreadingHTTPServer(("127.0.0.1", port), handler)
+    bind_host = os.environ.get("OH_BIND_HOST", "127.0.0.1")  # 0.0.0.0 only in container deploys
+    server = ThreadingHTTPServer((bind_host, port), handler)
     pid_file = REPO_ROOT / ".agent" / "local-services" / f"{SERVICE_ID}.pid"
     pid_file.parent.mkdir(parents=True, exist_ok=True)
     pid_file.write_text(str(os.getpid()), encoding="utf-8")

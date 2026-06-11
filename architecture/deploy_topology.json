@@ -1,0 +1,253 @@
+{
+  "version": 1,
+  "updated": "2026-06-11",
+  "purpose": "Single source of truth for CLOUD deploy topology (Fly.io first, provider-flexible by design). scripts/deploy/generate_provider_configs.py renders this into fly/*.fly.toml + deploy/docker-compose.deploy.yml and cross-checks infra/k8s/ against it. Ports are NEVER typed here for registry-backed services — they are joined from architecture/local_service_registry.json (no magic values). Service-to-service bases use the '@<service>' notation and are resolved per provider (fly: http://<prefix>-<svc>.internal:<port>, k8s/compose: http://<svc>:<port>).",
+  "owner_directive": "2026-06-11: 'build out the necessary changes to support fly.io and build out flexibility so we can easily switch as needed'",
+  "image": {
+    "dockerfile": "Dockerfile",
+    "k8s_placeholder": "${IMAGE}",
+    "registry_hint": "ghcr.io/amarel-taylor-scott/openharnesshub:latest"
+  },
+  "fly": {
+    "app_prefix": "aidr",
+    "primary_region": "iad",
+    "fallback_region": "ord",
+    "internal_domain_suffix": ".internal"
+  },
+  "ports_source": "architecture/local_service_registry.json",
+  "services": [
+    {
+      "name": "identity",
+      "kind": "backend",
+      "registry_service_id": "local_auth_service",
+      "command": ["python3", "-m", "scripts.identity_local_service", "--serve"],
+      "public": false,
+      "cpu_kind": "shared",
+      "cpus": 1,
+      "memory_mb": 512,
+      "health_path": "/api/identity/health",
+      "state_mount": "/app/dist/identity",
+      "volume_gb": 1,
+      "env": {},
+      "secret_groups": ["model-plane"]
+    },
+    {
+      "name": "registry",
+      "kind": "backend",
+      "registry_service_id": "local_openhub_projection_api",
+      "command": ["python3", "-m", "scripts.registry_local_service"],
+      "public": false,
+      "cpu_kind": "shared",
+      "cpus": 1,
+      "memory_mb": 512,
+      "health_path": "/healthz",
+      "state_mount": "/app/dist/registry",
+      "volume_gb": 1,
+      "env": { "AIDR_IDENTITY_BASE": "@identity" },
+      "secret_groups": ["operator-roster"]
+    },
+    {
+      "name": "events",
+      "kind": "backend",
+      "registry_service_id": "local_event_tracking_service",
+      "command": ["python3", "-m", "scripts.events_local_service"],
+      "public": false,
+      "cpu_kind": "shared",
+      "cpus": 1,
+      "memory_mb": 256,
+      "health_path": "/healthz",
+      "state_mount": "/app/dist/analytics",
+      "volume_gb": 1,
+      "env": {},
+      "secret_groups": []
+    },
+    {
+      "name": "teleon-runtime",
+      "kind": "backend",
+      "registry_service_id": "teleon_local_runtime",
+      "command": ["python3", "scripts/teleon_local_runtime.py"],
+      "public": false,
+      "cpu_kind": "shared",
+      "cpus": 1,
+      "memory_mb": 512,
+      "health_path": "/healthz",
+      "state_mount": "/app/dist/local-services-state",
+      "volume_gb": 1,
+      "env": { "AIDR_IDENTITY_BASE": "@identity" },
+      "secret_groups": ["model-plane"]
+    },
+    {
+      "name": "baltor-backend",
+      "kind": "backend",
+      "registry_service_id": "baltor_admin_demo_server",
+      "command": ["python3", "scripts/baltor_admin_demo_server.py", "--port", "9301"],
+      "public": false,
+      "cpu_kind": "shared",
+      "cpus": 1,
+      "memory_mb": 1024,
+      "health_path": "/api/health",
+      "state_mount": "/app/dist/local-services-state",
+      "volume_gb": 1,
+      "env": {},
+      "secret_groups": ["model-plane", "baltor-stores"]
+    },
+    {
+      "name": "web-harness-hub",
+      "kind": "web",
+      "registry_service_id": "harness_hub_app",
+      "command": ["python3", "-m", "scripts.showcase", "--port", "8000"],
+      "public": true,
+      "cpu_kind": "shared",
+      "cpus": 1,
+      "memory_mb": 1024,
+      "health_path": "/api/health",
+      "env": {
+        "OH_PRODUCT": "harness-hub",
+        "OH_SEAM_IDENTITY_BASE": "@identity",
+        "OH_SEAM_REGISTRY_BASE": "@registry",
+        "OH_SEAM_ANALYTICS_BASE": "@events",
+        "OH_SEAM_TELEON_RUNTIME_BASE": "@teleon-runtime",
+        "OH_SEAM_LIVEOPS_BASE": "@baltor-backend"
+      },
+      "secret_groups": ["model-plane", "showcase-token"]
+    },
+    {
+      "name": "web-baltor",
+      "kind": "web",
+      "registry_service_id": "baltor_app",
+      "command": ["python3", "-m", "scripts.showcase", "--port", "8001"],
+      "public": true,
+      "cpu_kind": "shared",
+      "cpus": 1,
+      "memory_mb": 1024,
+      "health_path": "/api/health",
+      "env": {
+        "OH_PRODUCT": "baltor",
+        "OH_SEAM_IDENTITY_BASE": "@identity",
+        "OH_SEAM_REGISTRY_BASE": "@registry",
+        "OH_SEAM_ANALYTICS_BASE": "@events",
+        "OH_SEAM_TELEON_RUNTIME_BASE": "@teleon-runtime",
+        "OH_SEAM_LIVEOPS_BASE": "@baltor-backend"
+      },
+      "secret_groups": ["model-plane", "showcase-token"]
+    },
+    {
+      "name": "web-context",
+      "kind": "web",
+      "registry_service_id": "context_is_everything_app",
+      "command": ["python3", "-m", "scripts.showcase", "--port", "8002"],
+      "public": true,
+      "cpu_kind": "shared",
+      "cpus": 1,
+      "memory_mb": 512,
+      "health_path": "/api/health",
+      "env": {
+        "OH_PRODUCT": "context-is-everything",
+        "OH_SEAM_IDENTITY_BASE": "@identity",
+        "OH_SEAM_REGISTRY_BASE": "@registry",
+        "OH_SEAM_ANALYTICS_BASE": "@events",
+        "OH_SEAM_TELEON_RUNTIME_BASE": "@teleon-runtime",
+        "OH_SEAM_LIVEOPS_BASE": "@baltor-backend"
+      },
+      "secret_groups": ["model-plane", "showcase-token"]
+    },
+    {
+      "name": "web-teleon",
+      "kind": "web",
+      "registry_service_id": "teleon_app",
+      "command": ["python3", "-m", "scripts.showcase", "--port", "8003"],
+      "public": true,
+      "cpu_kind": "shared",
+      "cpus": 1,
+      "memory_mb": 1024,
+      "health_path": "/api/health",
+      "env": {
+        "OH_PRODUCT": "teleon",
+        "OH_SEAM_IDENTITY_BASE": "@identity",
+        "OH_SEAM_REGISTRY_BASE": "@registry",
+        "OH_SEAM_ANALYTICS_BASE": "@events",
+        "OH_SEAM_TELEON_RUNTIME_BASE": "@teleon-runtime",
+        "OH_SEAM_LIVEOPS_BASE": "@baltor-backend"
+      },
+      "secret_groups": ["model-plane", "showcase-token"]
+    },
+    {
+      "name": "redis",
+      "kind": "data",
+      "image": "redis:7-alpine",
+      "port": 6379,
+      "command": ["redis-server", "--appendonly", "yes", "--dir", "/data"],
+      "public": false,
+      "cpu_kind": "shared",
+      "cpus": 1,
+      "memory_mb": 256,
+      "state_mount": "/data",
+      "volume_gb": 1,
+      "env": {},
+      "secret_groups": []
+    },
+    {
+      "name": "postgres",
+      "kind": "data",
+      "image": "pgvector/pgvector:pg16",
+      "port": 5432,
+      "public": false,
+      "cpu_kind": "shared",
+      "cpus": 1,
+      "memory_mb": 1024,
+      "state_mount": "/data",
+      "volume_gb": 10,
+      "env": { "PGDATA": "/data/pgdata" },
+      "secret_groups": ["postgres-superuser"],
+      "phase": "phase-2: the demo plane is file/SQLite-backed; Postgres+pgvector is the staged-row load target (scripts.db.*). Provision when load plans go live."
+    },
+    {
+      "name": "worker",
+      "kind": "burst",
+      "command": ["python", "-m", "scripts.foundry.worker", "--serve"],
+      "public": false,
+      "cpu_kind": "shared",
+      "cpus": 1,
+      "memory_mb": 2048,
+      "env": {},
+      "secret_groups": ["model-plane", "queue-stores"],
+      "scaling": {
+        "queue_key": "ohh:foundry:jobs",
+        "queue_key_source": "scripts/foundry/queues.py DEFAULT_QUEUE_KEY (generator asserts equality)",
+        "jobs_per_worker": 10,
+        "poll_seconds": 15,
+        "cooldown_seconds": 120,
+        "min_workers": 0,
+        "max_workers": { "k8s": 20, "fly": 8 }
+      }
+    },
+    {
+      "name": "worker-controller",
+      "kind": "control",
+      "providers": ["fly"],
+      "command": ["python3", "scripts/deploy/fly_worker_controller.py"],
+      "public": false,
+      "cpu_kind": "shared",
+      "cpus": 1,
+      "memory_mb": 256,
+      "env": {},
+      "secret_groups": ["fly-controller", "queue-stores"],
+      "notes": "Fly-only replacement for KEDA: polls the Redis queue depth and drives worker machines through the Machines API (start stopped first, create only when allowed, stop on drain after cooldown). On K8s this role does not exist — infra/k8s/worker.yaml's KEDA ScaledObject does the same from the SAME scaling block above."
+    }
+  ],
+  "secret_group_contents": {
+    "model-plane": ["OH_LLM_BASE_URL", "OH_LLM_MODEL", "OH_LLM_API_KEY", "OH_EMBED_MODE", "OH_EMBED_MODEL", "OH_EMBED_BASE_URL", "OH_INFERENCE_ALLOW_NETWORK"],
+    "showcase-token": ["OH_SHOWCASE_TOKEN"],
+    "operator-roster": ["AIDR_REGISTRY_ADMINS"],
+    "baltor-stores": ["REDIS_URL", "BALTOR_DURABLE_DB"],
+    "queue-stores": ["REDIS_URL"],
+    "postgres-superuser": ["POSTGRES_PASSWORD"],
+    "fly-controller": ["FLY_API_TOKEN"]
+  },
+  "k8s_cross_checks": {
+    "service_plane_file": "infra/k8s/service-plane.yaml",
+    "service_plane_must_contain_deployments": ["identity", "registry", "events", "teleon-runtime", "baltor-backend"],
+    "worker_file": "infra/k8s/worker.yaml",
+    "worker_assertions": "listName==scaling.queue_key, listLength==scaling.jobs_per_worker, maxReplicaCount==scaling.max_workers.k8s, pollingInterval==scaling.poll_seconds, cooldownPeriod==scaling.cooldown_seconds"
+  }
+}

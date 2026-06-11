@@ -445,9 +445,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--port", type=int, default=None, help="default comes from the realm registry")
     parser.add_argument("--state-dir", default=None)
     parser.add_argument("--serve", action="store_true", help="run in the foreground")
-    parser.add_argument("--bind", default="127.0.0.1",
+    parser.add_argument("--bind", default=os.environ.get("OH_BIND_HOST", "127.0.0.1"),
                         help="0.0.0.0 lets the local Caddy gateway reach this host service via "
-                             "host.docker.internal (public exposure still only via the gateway/tunnel)")
+                             "host.docker.internal (public exposure still only via the gateway/tunnel); "
+                             "default honors OH_BIND_HOST for container deploys")
     args = parser.parse_args(argv)
     identity = IdentityService(state_dir=Path(args.state_dir) if args.state_dir else None)
     port = args.port if args.port is not None else identity.default_port
