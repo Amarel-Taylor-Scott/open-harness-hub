@@ -44,7 +44,9 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from scripts._jsonl_store import AppendLog  # noqa: E402  (SQLite-WAL append-log behind audit-events)
+# SQLite-WAL append-log behind audit-events + the migration suffix (SINGLE SOURCE — defined once
+# in scripts._jsonl_store, never re-typed here)
+from scripts._jsonl_store import AppendLog, MIGRATED_SUFFIX  # noqa: E402
 from src.openharnesshub.auth_kit import make_realm  # noqa: E402  (repo-root import, kit is the bottom layer)
 
 REGISTRY_PATH = REPO_ROOT / "architecture" / "identity_realm_registry.json"
@@ -544,10 +546,14 @@ def start_service(port: int = 0, state_dir: Path | None = None,
 
 
 def _self_test() -> int:
-    """Offline proof of the login throttle: wrong-secret failures trip a lockout that rejects even
-    the CORRECT secret with the same generic 401, the lockout is audited as its own kind, success
-    resets the identifier window, an elapsed lockout heals (injected clock — no sleeps), a spraying
-    source is cut off per (realm, source), and the HTTP handler really plumbs the client address.
+    """Offline proof of the login throttle AND the SQLite-WAL audit engine. Throttle: wrong-secret
+    failures trip a lockout that rejects even the CORRECT secret with the same generic 401, the
+    lockout is audited as its own kind, success resets the identifier window, an elapsed lockout
+    heals (injected clock — no sleeps), a spraying source is cut off per (realm, source), and the
+    HTTP handler really plumbs the client address. State engine: a legacy pre-SQLite
+    audit-events.jsonl migrates in LOSSLESSLY on startup (file preserved untouched + byte-identical
+    snapshot), concurrent service calls lose/dup no audit row or account, and a restart rehydrates
+    EQUAL state (audit history, accounts, a live session, an unrevoked API key).
     Temp state dir, ephemeral port, stdlib-only. Exit 0/1."""
     import shutil
     import tempfile
@@ -644,16 +650,101 @@ def _self_test() -> int:
         ck("F: over HTTP the lockout fires too (client address plumbed)",
            wire == [401] * (LOGIN_MAX_FAILURES + 1) and st == 401
            and body == {"error": "login rejected"}, f"{wire} then {st}")
+
+        # G: the SQLite-WAL state engine — legacy audit migration, concurrent writes, restart equality
+        mig_dir = state_dir / "mig"
+        mig_dir.mkdir(parents=True)
+        legacy_audit = [{"ts": 900_000 + i, "realm": "baltor", "action": "login",
+                         "actor": f"acct_legacy_{i}", "outcome": "ok",
+                         "request_id": f"legacy-{i:03d}"} for i in range(9)]
+        audit_file = mig_dir / "audit-events.jsonl"
+        with audit_file.open("w", encoding="utf-8") as fh:
+            for e in legacy_audit:
+                fh.write(json.dumps(e, sort_keys=True) + "\n")   # the pre-SQLite writer's exact format
+        legacy_bytes = audit_file.read_bytes()
+        svc_g = IdentityService(state_dir=mig_dir, clock=lambda: clock[0])
+        ck("G: a legacy audit-events.jsonl (no db yet) migrates into the SQLite log on startup",
+           svc_g.audit_log.count() == len(legacy_audit) and svc_g.audit_log.all() == legacy_audit,
+           f"count={svc_g.audit_log.count()}")
+        ck("G: the legacy audit file is preserved untouched (in place + byte-identical snapshot)",
+           audit_file.read_bytes() == legacy_bytes
+           and audit_file.with_name(audit_file.name + MIGRATED_SUFFIX).read_bytes() == legacy_bytes)
+
+        # a full account flow over the migrated state (teleon realm keeps baltor's numbers clean)
+        st, g_acct = svc_g.handle("POST", "teleon", "register",
+                                  {"identifier": "mig@example.test", "secret": good}, rid, source=src)
+        for step in g_acct["onboarding_steps"]:
+            svc_g.handle("POST", "teleon", "onboard",
+                         {"account_id": g_acct["account_id"], "step": step}, rid, source=src)
+        _, g_sess = svc_g.handle("POST", "teleon", "login",
+                                 {"identifier": "mig@example.test", "secret": good}, rid, source=src)
+        _, g_key = svc_g.handle("POST", "teleon", "api-keys/mint",
+                                {"session_id": g_sess["session_id"]}, rid, source=src)
+        ck("G: the standard flow works over the migrated state (register→onboard→login→mint)",
+           st == 201 and "session_id" in g_sess and g_key.get("shown_once") is True)
+
+        # CONCURRENT writes through the service seam: every register = one account + one audit row
+        before = svc_g.audit_log.count()
+        threads_n, per_thread = 8, 25
+        barrier = threading.Barrier(threads_n)
+        conc_errors: list[tuple[int, int, int]] = []
+
+        def _hammer(t: int) -> None:
+            barrier.wait()
+            for k in range(per_thread):                  # no "@" → the email port is never involved
+                st_i, _ = svc_g.handle("POST", "baltor", "register",
+                                       {"identifier": f"conc-{t}-{k}", "secret": good},
+                                       f"conc-{t}-{k}", source=src)
+                if st_i != 201:
+                    conc_errors.append((t, k, st_i))
+
+        workers = [threading.Thread(target=_hammer, args=(t,)) for t in range(threads_n)]
+        for w in workers:
+            w.start()
+        for w in workers:
+            w.join()
+        expected = threads_n * per_thread
+        conc_rids = {e["request_id"] for e in svc_g.audit_log.all()
+                     if str(e.get("request_id", "")).startswith("conc-")}
+        baltor_accounts = svc_g.runtimes["baltor"].realm.accounts
+        ck("G: concurrent registrations lose/dup nothing (accounts + one audit row each)",
+           not conc_errors and svc_g.audit_log.count() == before + expected
+           and len(conc_rids) == expected
+           and sum(1 for a in baltor_accounts.values()
+                   if a["identifier"].startswith("conc-")) == expected,
+           f"errors={conc_errors[:2]} audit={svc_g.audit_log.count() - before} rids={len(conc_rids)}")
+
+        # RESTART rehydration equality: a new service on the same state dir sees identical state
+        svc_g2 = IdentityService(state_dir=mig_dir, clock=lambda: clock[0])
+        st_sess, _ = svc_g2.handle("POST", "teleon", "session/validate",
+                                   {"session_id": g_sess["session_id"]}, rid, source=src)
+        _, g_verify = svc_g2.handle("POST", "teleon", "api-keys/verify",
+                                    {"api_key": g_key["api_key"]}, rid, source=src)
+        ck("G: a restart rehydrates EQUAL state (audit history, accounts, session, API key)",
+           svc_g2.audit_log.all()[:before + expected] == svc_g.audit_log.all()[:before + expected]
+           and svc_g2.runtimes["baltor"].realm.accounts == baltor_accounts
+           and st_sess == 200 and g_verify.get("valid") is True,
+           f"sess={st_sess} key={g_verify.get('valid')}")
     finally:
         if server is not None:
             server.shutdown()
             thread.join(timeout=5)
+            services = [svc, server.RequestHandlerClass.identity]
+        else:
+            services = [svc]
+        services += [s for s in (locals().get("svc_g"), locals().get("svc_g2")) if s is not None]
+        for s in services:                     # close every SQLite handle, then remove the proof dbs
+            s.audit_log.close()                # (off-state_dir index files; -wal/-shm vanish on close)
+            for suffix in ("", "-wal", "-shm"):
+                Path(str(s.audit_log.db_path) + suffix).unlink(missing_ok=True)
         shutil.rmtree(state_dir, ignore_errors=True)
 
     print("\n" + ("PASS — identity_local_service --self-test: sliding-window login throttle per "
                   "(realm, identifier) + (realm, source), lockout rejects even correct secrets with "
                   "the same generic 401, audited as login/lockout, reset on success, heals after "
-                  f"{LOCKOUT_S}s, and is live over HTTP."
+                  f"{LOCKOUT_S}s, live over HTTP — and the SQLite-WAL audit engine migrates a legacy "
+                  "audit-events.jsonl losslessly (preserved + snapshot), loses nothing under "
+                  "concurrent registrations, and rehydrates equal state across a restart."
                   if not fails else f"{len(fails)} FAILURES: {fails}"))
     return 0 if not fails else 1
 

@@ -37,8 +37,8 @@ LAW (mirrors the registry's law + the repo's promotion boundary):
     generation (.1, preserved — lossless); counters rebuild from the live generation only.
 
 Run ``python3 -m scripts.registry_local_service --self-test`` for the offline store proof
-(cache-after-write, restart rehydration, rotation); the full service/HTTP proof remains
-``scripts/check_registry_backend.py``.
+(db-served reads after writes, legacy-state migration, restart rehydration equality, concurrent
+writes, rotation); the full service/HTTP proof remains ``scripts/check_registry_backend.py``.
 
 Offline, stdlib-only. Port + identity port come from the registries (single source, drift-gated by
 scripts/check_registry_backend.py).
@@ -61,7 +61,9 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from scripts._jsonl_store import AppendLog  # noqa: E402  (SQLite-WAL append-log behind each jsonl)
+# SQLite-WAL append-log behind each jsonl + the on-disk layout constants (SINGLE SOURCE — the
+# rotation/migration suffixes are defined once in scripts._jsonl_store, never re-typed here)
+from scripts._jsonl_store import AppendLog, MIGRATED_SUFFIX, ROTATED_SUFFIX  # noqa: E402
 
 SERVICE_ID = "local_openhub_projection_api"
 REGISTRY_PATH = REPO_ROOT / "architecture" / "local_service_registry.json"
@@ -750,9 +752,11 @@ def _roster_cli(args: list[str]) -> int:
 
 
 def _self_test() -> int:
-    """Offline store proof for the hot-path cache + rotation (the HTTP/service proof stays in
-    scripts/check_registry_backend.py): cache serves after writes, a restart (new RegistryStore
-    on the same state_dir) rehydrates equal state, rotation preserves the previous generation."""
+    """Offline store proof for the SQLite-WAL append-log engine + rotation (the HTTP/service proof
+    stays in scripts/check_registry_backend.py): db-served reads reflect writes immediately, a
+    legacy pre-SQLite state dir migrates in LOSSLESSLY (files preserved untouched + byte-identical
+    snapshots), a restart (new RegistryStore on the same state_dir) rehydrates EQUAL state,
+    concurrent multi-thread writes lose/dup nothing, rotation preserves the previous generation."""
     import shutil
     import tempfile
 
@@ -767,38 +771,45 @@ def _self_test() -> int:
     no_bundle = tmp / "no-bundle"   # nonexistent ⇒ empty catalog (store proof needs no design bundle)
     now = 1_700_000_000
     rotate_at = 5                   # tiny injected bound so rotation is provable in milliseconds
+    stores: list[RegistryStore] = []   # every store built here — db handles closed + removed in finally
+
+    def make_store(state_dir: Path, **kwargs) -> RegistryStore:
+        s = RegistryStore(state_dir=state_dir, bundle_dir=no_bundle, **kwargs)
+        stores.append(s)
+        return s
+
     try:
         sd = tmp / "state"
-        store = RegistryStore(state_dir=sd, bundle_dir=no_bundle, rotate_calls_lines=rotate_at)
+        store = make_store(sd, rotate_calls_lines=rotate_at)
 
-        # ── 1) append-through: reads reflect writes immediately ─────────────────
+        # ── 1) write-through: db-served reads reflect writes immediately ────────
         store.record("a1", "r1", "install", {"id": "x1", "name": "X One", "score": "4.0"}, now)
         store.record("a1", "r1", "publish", {"id": "c1", "name": "Cand"}, now + 1)
         store.log_call("a1", "r1", "GET", "/w", now + 2)
         ws = store.workspace("a1", "r1", now + 3)
         stats = dict(ws["stats"])
-        ck("cache serves writes immediately (installed/published/calls)",
+        ck("db-served reads reflect writes immediately (installed/published/calls)",
            stats["Installed"] == 1 and stats["Published"] == 1 and stats["API calls · 30d"] == 1, str(stats))
 
-        # reads are MEMORY-served: blank the durable files; the live store still answers.
-        # (Disk stays the durable source for RESTART — restored + proven right below.)
+        # reads are DB-served: blank the jsonl mirrors; the live store still answers from SQLite.
+        # (The mirrors stay the contracted on-disk record — restored right below, lossless.)
         ws_bytes, call_bytes = store.workspace_path.read_bytes(), store.calls_path.read_bytes()
         store.workspace_path.write_text("", encoding="utf-8")
         store.calls_path.write_text("", encoding="utf-8")
         again = dict(store.workspace("a1", "r1", now + 3)["stats"])
-        ck("reads served from memory, not a per-request file re-parse",
+        ck("reads served from the SQLite log, not a per-request file re-parse",
            again["Installed"] == 1 and again["API calls · 30d"] == 1, str(again))
-        store.workspace_path.write_bytes(ws_bytes)   # restore the durable layer (lossless)
+        store.workspace_path.write_bytes(ws_bytes)   # restore the mirror layer (lossless)
         store.calls_path.write_bytes(call_bytes)
 
-        # review/roster flows ride the same cache (decide reads submissions from memory)
+        # review/roster flows ride the same db-served path (decide reads submissions from the log)
         store.grant_reviewer("r1", "rev1", by="t", now=now + 4)
         store.decide("r1", "c1", "rev1", "approve", "ok", now + 5, score="4.2")
-        ck("review flow over the cache promotes the candidate",
+        ck("review flow over the SQLite log promotes the candidate",
            any(e.get("id") == "c1" for e in store.promoted("r1")))
 
         # ── 2) restart: a NEW store on the same state_dir rehydrates EQUAL state ─
-        store2 = RegistryStore(state_dir=sd, bundle_dir=no_bundle, rotate_calls_lines=rotate_at)
+        store2 = make_store(sd, rotate_calls_lines=rotate_at)
         ck("restart rehydrates an equal workspace summary",
            store2.workspace("a1", "r1", now + 6) == store.workspace("a1", "r1", now + 6))
         ck("restart rehydrates submissions + roster + decisions",
@@ -808,10 +819,10 @@ def _self_test() -> int:
 
         # ── 3) rotation: live → .1 (preserved), counters rebuild from live only ──
         rot_dir = tmp / "rot"
-        rs = RegistryStore(state_dir=rot_dir, bundle_dir=no_bundle, rotate_calls_lines=rotate_at)
+        rs = make_store(rot_dir, rotate_calls_lines=rotate_at)
         for i in range(rotate_at + 2):                      # 5 trigger the rotation, 2 land live
             rs.log_call("a1", "r1", "GET", f"/c{i}", now + i)
-        prev = rs.calls_path.with_name(rs.calls_path.name + ".1")
+        prev = rs.calls_path.with_name(rs.calls_path.name + ROTATED_SUFFIX)
         ck("rotation triggered at the line bound", prev.exists())
         prev_lines = prev.read_text(encoding="utf-8").splitlines()
         live_lines = rs.calls_path.read_text(encoding="utf-8").splitlines()
@@ -820,7 +831,7 @@ def _self_test() -> int:
         ck("live generation holds only the post-rotation tail",
            len(live_lines) == 2 and "/c5" in live_lines[0], f"{len(live_lines)} lines")
         ck("counters rebuild from the live generation only", rs._calls_30d("a1", "r1", now + 9) == 2)
-        rs2 = RegistryStore(state_dir=rot_dir, bundle_dir=no_bundle, rotate_calls_lines=rotate_at)
+        rs2 = make_store(rot_dir, rotate_calls_lines=rotate_at)
         ck("restart after rotation rehydrates the live generation only",
            rs2._calls_30d("a1", "r1", now + 9) == 2)
         # a second rotation REPLACES .1 (exactly one previous generation — the retention bound)
@@ -828,14 +839,111 @@ def _self_test() -> int:
             rs.log_call("a1", "r1", "GET", f"/d{i}", now + 10 + i)
         ck("second rotation keeps exactly one previous generation (.1 replaced, no .2)",
            "/d2" in prev.read_text(encoding="utf-8")
-           and not prev.with_name(prev.name.replace(".1", ".2")).exists()
+           and not prev.with_name(prev.name.replace(ROTATED_SUFFIX, ".2")).exists()
            and rs._calls_30d("a1", "r1", now + 20) == 0)
+
+        # ── 4) MIGRATION from a pre-SQLite legacy state dir — lossless, one-time ─
+        # Hand-written files in the exact formats the pre-SQLite writers produced
+        # (json.dumps(rec, sort_keys=True) per line), so this proves the real upgrade path.
+        mig = tmp / "mig"
+        mig.mkdir()
+        legacy_files = {
+            "workspace.jsonl": [
+                {"ts": now, "account_id": "m1", "realm": "r9", "action": "install",
+                 "entry_id": "e1", "entry": {"id": "e1", "name": "E One", "score": "4.4"}},
+                {"ts": now + 1, "account_id": "m1", "realm": "r9", "action": "publish",
+                 "entry_id": "p9", "entry": {"id": "p9", "name": "P Nine"}},
+            ],
+            "review_queue.jsonl": [
+                {"ts": now + 1, "account_id": "m1", "realm": "r9", "action": "publish",
+                 "entry_id": "p9", "entry": {"id": "p9", "name": "P Nine"}, "status": "in_review",
+                 "note": "candidate — never public-active until it clears review"},
+            ],
+            "reviewers.jsonl": [
+                {"ts": now + 2, "realm": "r9", "account_id": "revm", "action": "grant",
+                 "by": "operator-cli", "reason": "legacy roster"},
+            ],
+            "review_decisions.jsonl": [
+                {"ts": now + 3, "realm": "r9", "entry_id": "p9", "decision": "approve",
+                 "reviewer_account": "revm", "reason": "legacy approval", "submitter_account": "m1",
+                 "submit_ts": now + 1, "entry": {"id": "p9", "name": "P Nine"}, "score": "4.1"},
+            ],
+            "api_calls.jsonl": [
+                {"ts": now + 4, "account_id": "m1", "realm": "r9", "method": "GET", "path": "/legacy"},
+            ],
+        }
+        legacy_bytes: dict[str, bytes] = {}
+        for name, recs in legacy_files.items():
+            with (mig / name).open("w", encoding="utf-8") as fh:
+                for rec in recs:
+                    fh.write(json.dumps(rec, sort_keys=True) + "\n")
+            legacy_bytes[name] = (mig / name).read_bytes()
+        ms = make_store(mig)
+        mstats = dict(ms.workspace("m1", "r9", now + 5)["stats"])
+        ck("migration: workspace replay over the migrated rows is exact",
+           mstats["Installed"] == 1 and mstats["Published"] == 1 and mstats["API calls · 30d"] == 1,
+           str(mstats))
+        ck("migration: roster + decisions replay (reviewer present, candidate promoted with lineage)",
+           ms.is_reviewer("r9", "revm")
+           and any(e.get("id") == "p9" and e.get("provenance", {}).get("reviewer") == "revm"
+                   for e in ms.promoted("r9")))
+        ck("migration: every legacy file preserved untouched (in place + byte-identical snapshot)",
+           all((mig / n).read_bytes() == legacy_bytes[n]
+               and (mig / (n + MIGRATED_SUFFIX)).read_bytes() == legacy_bytes[n]
+               for n in legacy_files))
+        ms.record("m1", "r9", "install", {"id": "e2", "name": "E Two"}, now + 6)
+        ms2 = make_store(mig)
+        ck("migration: one-time — a restart re-attaches (no re-import) and stays EQUAL",
+           ms2.workspace("m1", "r9", now + 7) == ms.workspace("m1", "r9", now + 7)
+           and dict(ms2.workspace("m1", "r9", now + 7)["stats"])["Installed"] == 2)
+
+        # ── 5) CONCURRENT writes: request threads lose/dup nothing (WAL + locks) ─
+        conc_dir = tmp / "conc"
+        cs = make_store(conc_dir)                  # default rotation bound: no rotation mid-proof
+        threads_n, per_thread = 8, 25
+        barrier = threading.Barrier(threads_n)
+        errors: list[BaseException] = []
+
+        def _hammer(t: int) -> None:
+            try:
+                barrier.wait()
+                for k in range(per_thread):
+                    cs.record("c1", "rc", "install", {"id": f"e-{t}-{k}", "name": f"E {t}.{k}"}, now + k)
+                    cs.log_call("c1", "rc", "GET", f"/c-{t}-{k}", now + k)
+            except BaseException as exc:  # noqa: BLE001  (any thread failure must fail the proof)
+                errors.append(exc)
+
+        workers = [threading.Thread(target=_hammer, args=(t,)) for t in range(threads_n)]
+        for w in workers:
+            w.start()
+        for w in workers:
+            w.join()
+        expected = threads_n * per_thread
+        cstats = dict(cs.workspace("c1", "rc", now + 30)["stats"])
+        unique_ids = {r.get("entry_id") for r in cs._rows(cs.workspace_path)}
+        ck("concurrent writes: every record stored exactly once (no error/loss/dup)",
+           not errors and cstats["Installed"] == expected and len(unique_ids) == expected
+           and cstats["API calls · 30d"] == expected,
+           f"errors={errors[:1]} stats={cstats} unique={len(unique_ids)}")
+        ck("concurrent writes: jsonl mirrors carry the same rows (durability contract intact)",
+           len(cs.workspace_path.read_text(encoding='utf-8').splitlines()) == expected
+           and len(cs.calls_path.read_text(encoding='utf-8').splitlines()) == expected)
+        cs2 = make_store(conc_dir)
+        ck("concurrent writes: restart rehydrates the identical workspace (db-backed equality)",
+           cs2.workspace("c1", "rc", now + 30) == cs.workspace("c1", "rc", now + 30))
     finally:
+        for s in stores:                   # close every SQLite handle, then remove the proof dbs
+            for log in s._logs.values():   # (off-state_dir index files; -wal/-shm vanish on close)
+                log.close()
+                for suffix in ("", "-wal", "-shm"):
+                    Path(str(log.db_path) + suffix).unlink(missing_ok=True)
         shutil.rmtree(tmp, ignore_errors=True)
 
-    print("\n" + ("PASS — registry store self-test: append-through cache serves reads from memory, "
-                  "restart rehydrates equal state from the durable JSONL, api_calls rotation keeps "
-                  "one preserved previous generation."
+    print("\n" + ("PASS — registry store self-test: SQLite-WAL append-logs serve reads (never a "
+                  "per-request file re-parse) with the *.jsonl mirrors intact, a legacy pre-SQLite "
+                  "state dir migrates in losslessly (files preserved + byte-identical snapshots, "
+                  "one-time), restarts rehydrate equal state, concurrent writes lose nothing, and "
+                  "api_calls rotation keeps one preserved previous generation (db keeps them all)."
                   if not fails else f"{len(fails)} FAILURES: {fails}"))
     return 0 if not fails else 1
 
