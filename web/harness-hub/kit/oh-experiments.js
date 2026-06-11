@@ -132,6 +132,20 @@
     clearEvents: function () { writeJSON(LS_EVENTS, []); notifyChange(null); return API; },
   };
 
+  // Bridge → the governed events plane: forward assignments/conversions to window.OHEvents
+  // (shared/oh-identity.js) so the family's experiments get a real SERVER-SIDE A/B readout, not
+  // just a localStorage ring buffer. This IS the "register OHExp.onTrack(fn) — no app changes"
+  // wiring the header promises; kept here (loads after oh-identity.js) so OHEvents already exists.
+  // $exposure → an exposure beacon; an experiment-attributed action (useExperiment().track, which
+  // tags props.experiment/variant) → a conversion beacon carrying THAT sticky variant. No-op when
+  // OHEvents is absent (OHExp keeps working exactly as before).
+  API.onTrack(function (payload) {
+    var E = root.OHEvents; if (!E || typeof E.exposure !== 'function') return;
+    var p = payload.props || {};
+    if (payload.event === '$exposure') { if (p.experiment) E.exposure(p.experiment, p.variant); return; }
+    if (p.experiment && p.variant) E.conversion(p.experiment, payload.event, p.variant);
+  });
+
   root.OHExp = API;
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
 })(typeof window !== 'undefined' ? window : this);

@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """scripts.check_oh_states_kit — PROOF for the shared empty/loading/error UX primitives
-(UX-BACKLOG P1 #3). Static contract: the kit is loaded, exposes the three primitives, each carries
-the right ARIA role, uses DESIGN TOKENS not hardcoded colors (S1), and escapes interpolated text
-(no injection). node --check syntax-gates the file when node is available.
+(UX-BACKLOG P1 #3). oh-states.js is the vanilla token-only primitive loaded by the PRESERVED legacy
+front-end (web/harness-hub/legacy.html — kept lossless when the kit React SPA became the current
+surface). Static contract: the primitive is loaded by its host, exposes the three functions, each
+carries the right ARIA role, uses DESIGN TOKENS not hardcoded colors (S1), and escapes interpolated
+text (no injection). node --check syntax-gates the file when node is available.
 
 Offline, stdlib-only. Exit 0/1.
 """
@@ -27,10 +29,10 @@ def _self_test() -> int:
         if not ok:
             fails.append(name)
 
-    html = (WEB / "index.html").read_text(encoding="utf-8")
+    legacy = (WEB / "legacy.html").read_text(encoding="utf-8")
     kit = KIT.read_text(encoding="utf-8")
 
-    ck("A: index.html loads oh-states.js", 'src="oh-states.js"' in html)
+    ck("A: legacy.html (the preserved vanilla host) loads oh-states.js", 'src="oh-states.js"' in legacy)
     ck("B: exposes empty/skeleton/error", all(f"{fn}:" in kit for fn in ("empty", "skeleton", "error")))
     ck("C: empty has role=status", 'oh-state--empty' in kit and 'role="status"' in kit)
     ck("C: loading has aria-busy", 'aria-busy="true"' in kit)

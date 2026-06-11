@@ -62,20 +62,58 @@
     revokeKey: function (realm, id) { var s = getSession(realm); return call("POST", "/api/identity/" + realm + "/api-keys/revoke", { session_id: s && s.session_id, key_id: id }); },
   };
 
-  // page analytics beacon to the LOCAL events plane (scripts/events_local_service.py, :9420) — one
-  // page_view per surface load, anon-only, text/plain (CORS-safelisted), graceful no-op when down.
+  // analytics + A/B beacon to the LOCAL events plane (scripts/events_local_service.py, :9420).
+  // ONE events client for the kit SPA, exposed as window.OHEvents (the app's app.js drives it):
+  //   .page(route)      — a page_view per route render (dedupes consecutive identical names)
+  //   .variant(exp,[..])— sticky deterministic A/B assignment + an exposure once per session
+  //   .conversion(exp,n)— a conversion beacon carrying the assigned variant
+  // anon-only, text/plain (CORS-safelisted), graceful no-op when the plane is down, and a
+  // client-side refusal so an email/api-key shape never rides a beacon (anon-only telemetry).
+  // (Supersedes the standalone shared/events.js, which the kit entry no longer loads.)
   (function () {
     var EVENTS = (window.OHH_EVENTS_BASE || "http://127.0.0.1:9420").replace(/\/+$/, "");
     var ANON = "oh-anon";
     var id; try { id = localStorage.getItem(ANON); } catch (e) {}
     if (!id) { id = "a_" + Math.random().toString(16).slice(2, 12); try { localStorage.setItem(ANON, id); } catch (e) {} }
     var site = ((window.PORTFOLIO && window.PORTFOLIO.GROUP && window.PORTFOLIO.GROUP.name) || "aidoneright").toLowerCase().replace(/[^a-z0-9]/g, "");
-    // "/" fallback: served at a root path (the wired web/ apps) the last path segment is empty,
-    // and the events plane requires a non-empty name.
-    var evt = { site: site, event: "page", name: (location.pathname.split("/").slice(-1)[0] || "/") + (location.hash || ""), anon: id };
-    try {
-      if (navigator.sendBeacon) { navigator.sendBeacon(EVENTS + "/api/events", new Blob([JSON.stringify(evt)], { type: "text/plain;charset=UTF-8" })); }
-      else { fetch(EVENTS + "/api/events", { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(evt), keepalive: true }).catch(function () {}); }
-    } catch (e) {}
+    var PII_RE = /[\w.+-]+@[\w-]+\.[\w.-]+|sk-[A-Za-z0-9]{6}|AKIA[0-9A-Z]{8}/;  // email / api-key shapes — refuse to beacon
+    var lastPage = null, exposed = {};
+    function emit(evt) {
+      evt.site = site; evt.anon = id;
+      var body; try { body = JSON.stringify(evt); } catch (e) { return; }
+      if (PII_RE.test(body)) { return; }  // anon-only: never beacon a payload carrying an email/secret shape
+      try {
+        if (navigator.sendBeacon) { navigator.sendBeacon(EVENTS + "/api/events", new Blob([body], { type: "text/plain;charset=UTF-8" })); }
+        else { fetch(EVENTS + "/api/events", { method: "POST", headers: { "Content-Type": "text/plain" }, body: body, keepalive: true }).catch(function () {}); }
+      } catch (e) {}
+    }
+    // sticky deterministic assignment: same anon+experiment → same variant (32-bit rolling hash)
+    function variantOf(experiment, variants) {
+      variants = variants || ["A", "B"];
+      var s = id + "|" + experiment, h = 0;
+      for (var i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) & 0xFFFFFFFF; }
+      return variants[h % variants.length];
+    }
+    window.OHEvents = {
+      // "/" fallback: served at a root path (the wired web/ apps) the last path segment is empty,
+      // and the events plane requires a non-empty name.
+      page: function (name) {
+        name = (name || (location.pathname.split("/").slice(-1)[0] || "/")) + (location.hash || "");
+        if (name === lastPage) { return; } lastPage = name;  // dedupe consecutive identical route renders
+        emit({ event: "page", name: name });
+      },
+      variant: function (experiment, variants) {
+        var v = variantOf(experiment, variants);
+        if (!exposed[experiment]) { exposed[experiment] = v; emit({ event: "exposure", name: experiment, experiment: experiment, variant: v }); }
+        return v;
+      },
+      exposure: function (experiment, variant) { emit({ event: "exposure", name: experiment, experiment: experiment, variant: variant || variantOf(experiment) }); },
+      // variant is explicit when forwarded from OHExp (its sticky RANDOM assignment) — fall back to the
+      // deterministic hash only for direct callers that never assigned one.
+      conversion: function (experiment, name, variant) { emit({ event: "conversion", name: name || "conversion", experiment: experiment, variant: variant || exposed[experiment] || variantOf(experiment) }); },
+    };
+    // auto page_view on load → covers any surface whose app doesn't drive per-route events itself;
+    // app-driven OHEvents.page(route) calls dedupe against this initial one (no double count).
+    window.OHEvents.page();
   }());
 }());

@@ -4,7 +4,9 @@
 design files stay the single source and our Baltor-specific additions are preserved.
 
 Asserts:
-  A. BRAND SCOPE: web/baltor/index.html root is `oh dir-d theme-light` (Baltor's canonical teal scope — not dir-s).
+  A. BRAND SCOPE: the Baltor React SPA mounts under the runtime scope `'oh ' + BRANDCE.dir + ' theme-…'`
+     (ce-main.jsx), where BRANDCE = PRODUCTS.contextEnrichment, whose dir is Baltor's canonical teal scope
+     dir-d (not dir-s). (The scope is applied by the React shell at mount, not hardcoded in index.html.)
   B. FONTS: index.html loads Hanken Grotesk (display) + IBM Plex Mono; the stale Space Grotesk / JetBrains Mono are gone.
   C. TOKENS: oh-tokens.css gives dir-d the teal accent (#0e7c86 light / #2dd4bf dark) + Hanken Grotesk display.
   D. CANONICAL PRIMITIVE + SCALE: oh-components.css carries the shared card surface (.oh-card + .pt-panel alias) and
@@ -19,6 +21,7 @@ Deterministic + offline (static checks). Exit 0/1.
 from __future__ import annotations
 
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -38,8 +41,20 @@ def _self_test() -> int:
     tokens = (_W / "styles" / "oh-tokens.css").read_text()
     comp = (_W / "styles" / "oh-components.css").read_text()
     proto = (_W / "styles" / "proto.css").read_text()
+    ce_main = (_W / "ce-main.jsx").read_text()
+    ce_store = (_W / "ce-store.jsx").read_text()
+    products = (_W / "kit" / "products.js").read_text()
+    # the React shell mounts the app under Baltor's runtime scope (ce-main.jsx) → BRANDCE.dir, and
+    # BRANDCE is PRODUCTS.contextEnrichment (ce-store.jsx), whose own dir is the canonical teal dir-d.
+    # The first `dir: '…'` after the contextEnrichment key is that block's dir field.
+    _ce_dir = re.search(r"dir: '(dir-[a-z])'", products[products.find("contextEnrichment:"):])
+    ce_dir = _ce_dir.group(1) if _ce_dir else None
 
-    check("A: SPA root is the Baltor dir-d (teal) scope", 'class="oh dir-d theme-light"' in idx)
+    check("A: SPA mounts under the Baltor dir-d (teal) runtime scope (not dir-s)",
+          "'oh ' + BRANDCE.dir + ' theme-'" in ce_main
+          and "BRANDCE = PRODUCTS.contextEnrichment" in ce_store
+          and 'src="ce-main.jsx"' in idx
+          and ce_dir == "dir-d", f"contextEnrichment.dir={ce_dir}")
     check("B: loads Hanken Grotesk + IBM Plex Mono; no stale Space Grotesk/JetBrains",
           "Hanken+Grotesk" in idx and "IBM+Plex+Mono" in idx and "Space+Grotesk" not in idx and "JetBrains" not in idx)
     check("C: dir-d teal accent + Hanken display in tokens",
