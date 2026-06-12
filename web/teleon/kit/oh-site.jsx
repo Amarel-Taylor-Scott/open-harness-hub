@@ -256,8 +256,26 @@ function OhAppShell({ brand, nav, groups, header, foot, topbar, isActive, route,
       </aside>
       <main className="ohs-main">
         {topbar && <div className="ohs-topbar">{topbar}</div>}
+        <OhPreviewBanner />
         {children}
       </main>
+    </div>
+  );
+}
+
+// Honest preview indicator: when sign-up fell to the in-tab preview path (identity service
+// offline) we set sessionStorage 'oh-preview'; this banner makes that visible so a preview
+// is never mistaken for a real, saved account. (Fixes the silent no-session fallback.)
+function OhPreviewBanner() {
+  const [show, setShow] = React.useState(() => { try { return sessionStorage.getItem('oh-preview') === '1'; } catch (e) { return false; } });
+  if (!show) return null;
+  return (
+    <div className="ohs-preview-banner" role="status" aria-live="polite"
+      style={{ background: 'var(--accent-weak)', border: '1px solid color-mix(in srgb, var(--accent) 35%, var(--line))', borderRadius: 'var(--r-md)', padding: '9px 14px', margin: '0 0 14px', fontSize: 12.5, lineHeight: 1.5, display: 'flex', gap: 10, alignItems: 'center' }}>
+      <span style={{ color: 'var(--accent)' }}>◷</span>
+      <span><b>Preview mode.</b> The identity service is offline, so this session is <b>not saved</b> — sign-up did not create a real account. Start the local services to use a real realm account.</span>
+      <button className="oh-btn oh-btn--ghost oh-btn--sm" style={{ marginLeft: 'auto' }}
+        onClick={() => { try { sessionStorage.removeItem('oh-preview'); } catch (e) {} setShow(false); }}>Dismiss</button>
     </div>
   );
 }
@@ -304,15 +322,18 @@ function OhAuth({ brand, mode }) {
     setErr('');
     if (!email || email.indexOf('@') < 0) { setErr('Enter a valid work email.'); return; }
     if (pass.length < 8) { setErr('Use a passphrase of at least 8 characters.'); return; }
-    if (!window.OHIdentity) { navigate('/dashboard'); return; }
+    // Preview path (no client or service down): flag it so the dashboard shows the preview
+    // banner — never let an unsaved preview look like a real, persisted sign-up.
+    const enterPreview = () => { try { sessionStorage.setItem('oh-preview', '1'); } catch (e) {} navigate('/dashboard'); };
+    if (!window.OHIdentity) { enterPreview(); return; }
     setBusy(true);
     let live = false;
     try { live = await window.OHIdentity.available(); } catch (e) {}
-    if (!live) { setBusy(false); navigate('/dashboard'); return; } // preview path — identity service down
+    if (!live) { setBusy(false); enterPreview(); return; } // preview path — identity service down
     try {
       const r = signup ? await window.OHIdentity.signup(realm, email, pass) : await window.OHIdentity.login(realm, email, pass);
       setBusy(false);
-      if (r && r.ok) { navigate('/dashboard'); }
+      if (r && r.ok) { try { sessionStorage.removeItem('oh-preview'); } catch (e) {} navigate('/dashboard'); }  // real session — clear any stale preview flag
       else { setErr((r && r.error) || 'Authentication failed (this brand may not have a live realm yet).'); }
     } catch (e) { setBusy(false); setErr('Service error — please try again.'); }
   }
