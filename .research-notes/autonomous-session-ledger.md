@@ -2532,3 +2532,24 @@ Read: the 70-repo sweep went wide+shallow; "deep dives" = go DEEP on the moat-cr
 Synthesis: the thesis HELD at depth — none does verification+receipts+governed-promotion. 5
 parallel web-grounded Agent-tool subagents (not Workflow). Highest-leverage next build = the
 Ragas/DeepEval scorer adapter into foundry/measure (real measured lift into the two-axis gate).
+
+## 2026-06-12 — Continuous-improvement loop, wave 1 (warrant: owner "continue improving hour after hour")
+
+Worked the session's established backlog (5W1H findings + deep-dive conclusions), real artifacts + proofs:
+- **eval_scorers** (`scripts/foundry/eval_scorers.py`) — the measure-stage Judge ladder that closes
+  the offline measurement cap: a REFERENCE-FREE deterministic faithfulness proxy scores lift
+  WITHOUT a gold answer (the Ragas-Faithfulness shadow), plus exact-match/token-F1/context-precision;
+  model-backed NJudgeMajority returns None on judge disagreement and raises without a route (never
+  fabricated); Ragas/DeepEval honest seams; LadderJudge drops into MeasurementStage. In `make test`.
+- **catalog_processor_bridge + catalog_runtime_adapter** (the 5W1H DEEPEST unlock) — 97 governed
+  processors now dispatchable by id/process_kind AND registerable into the runner's ProcessorRegistry
+  (output = candidate processor_output artifact; the gate promotes, not the adapter). Runtime stays
+  stdlib-only (proof C35): the bridge reads a committed JSON dispatch index built out-of-scope by
+  `build_processor_dispatch_index.py`, with a flywheel drift gate keeping it in sync with the manifests.
+- **cohort_policy_selector** (`scripts/processors/compression/`) — the context-efficiency "consumer
+  behavior" capability: usage SHAPE → cohort (power/iterating/fresh/balanced/unknown) → the compression
+  curve (budget_fraction + utility/volatility/recency weights). Power-user compresses the stable
+  substrate hard, fresh barely compresses, unknown stays conservative.
+- Caught + fixed a self-introduced RED honestly (the bridge's yaml import violated the stdlib-only
+  runtime law) — the right architecture (runtime reads built JSON, not source YAML).
+- Proof suite 438 → 443, all green.

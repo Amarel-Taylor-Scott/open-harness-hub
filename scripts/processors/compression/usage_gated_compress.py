@@ -120,8 +120,15 @@ def _stats(prior: dict[str, Any], item_id: str) -> dict[str, int]:
     return prior.get("items", {}).get(item_id, {})
 
 
-def _priority(stats: dict[str, int], now_turn: int) -> tuple[float, dict[str, float]]:
-    """The Friston gate: spend fidelity where prediction fails or use is proven."""
+def _priority(stats: dict[str, int], now_turn: int,
+              weights: dict[str, float] | None = None) -> tuple[float, dict[str, float]]:
+    """The Friston gate: spend fidelity where prediction fails or use is proven.
+
+    ``weights`` (utility/volatility/recency, e.g. from ``cohort_policy_selector``) overrides
+    the module defaults so the gate follows the tenant's cohort curve; None = the defaults."""
+    w_u = (weights or {}).get("utility", W_UTILITY)
+    w_v = (weights or {}).get("volatility", W_VOLATILITY)
+    w_r = (weights or {}).get("recency", W_RECENCY)
     served = int(stats.get("served", 0))
     if served == 0:
         # Unseen → maximally surprising → keep. (Novelty is high free energy.)
@@ -135,7 +142,7 @@ def _priority(stats: dict[str, int], now_turn: int) -> tuple[float, dict[str, fl
     else:
         age = max(0, int(now_turn) - int(last_cited))
         recency = math.pow(2.0, -age / RECENCY_HALF_LIFE_TURNS)
-    priority = W_UTILITY * utility + W_VOLATILITY * volatility + W_RECENCY * recency
+    priority = w_u * utility + w_v * volatility + w_r * recency
     return round(priority, SCORE_DECIMALS), {
         "utility": round(utility, SCORE_DECIMALS),
         "volatility": round(volatility, SCORE_DECIMALS),
@@ -143,12 +150,15 @@ def _priority(stats: dict[str, int], now_turn: int) -> tuple[float, dict[str, fl
 
 
 def run(*, items: list[dict[str, Any]], prior: dict[str, Any] | None = None,
-        token_budget: int, now_turn: int = 0) -> dict[str, Any]:
+        token_budget: int, now_turn: int = 0,
+        weights: dict[str, float] | None = None) -> dict[str, Any]:
     """Plan per-item fidelity tiers under ``token_budget`` using the usage prior.
 
     Each item: ``{"id", "text", optional "pinned": bool, optional "handle"}``.
-    Returns ``{"plan": {...}}`` — tiers, the lossless ``paged_out`` list, and
-    the estimated re-read saving (the Friston payoff).
+    ``weights`` (utility/volatility/recency) overrides the default gate blend — pass the
+    ``cohort_policy_selector`` policy's weights to follow the tenant's cohort curve.
+    Returns ``{"plan": {...}}`` — tiers, the lossless ``paged_out`` list, and the estimated
+    re-read saving (the Friston payoff).
     """
     if not isinstance(items, list):
         raise TypeError("items must be a list of id/text dicts")
@@ -160,7 +170,7 @@ def run(*, items: list[dict[str, Any]], prior: dict[str, Any] | None = None,
         if not isinstance(it, dict) or "id" not in it or "text" not in it:
             raise ValueError(f"items[{i}] needs id and text")
         full_tokens = _count_tokens(str(it["text"]))
-        priority, breakdown = _priority(_stats(prior, str(it["id"])), now_turn)
+        priority, breakdown = _priority(_stats(prior, str(it["id"])), now_turn, weights)
         rows.append({"id": str(it["id"]), "pinned": bool(it.get("pinned")),
                      "handle": it.get("handle") or f"ctx://{it['id']}",
                      "full_tokens": full_tokens, "priority": priority,
@@ -342,6 +352,22 @@ def _selftest() -> None:
     snapshot = json.dumps(prior, sort_keys=True)
     observe(prior, served_ids=["hot.py"], cited_ids=["hot.py"], now_turn=20)
     assert json.dumps(prior, sort_keys=True) == snapshot
+
+    # COHORT WEIGHTS bite: a high-utility item (cited, never changed) outranks a
+    # high-volatility item under the defaults, but volatility-heavy cohort weights
+    # (the 'iterating' curve) flip that — the gate follows the tenant's curve.
+    wp = empty_prior()
+    for t in range(1, 9):
+        wp = observe(wp, served_ids=["proven", "churning"], cited_ids=["proven"],
+                     changed_ids=["churning"], now_turn=t)
+    wi = [{"id": "proven", "text": "x " * 20}, {"id": "churning", "text": "y " * 20}]
+    pr_default = {p["id"]: p["priority"] for p in
+                  run(items=wi, prior=wp, token_budget=10_000, now_turn=9)["plan"]["items"]}
+    pr_volatile = {p["id"]: p["priority"] for p in
+                   run(items=wi, prior=wp, token_budget=10_000, now_turn=9,
+                       weights={"utility": 0.1, "volatility": 0.8, "recency": 0.1})["plan"]["items"]}
+    assert pr_default["proven"] > pr_default["churning"]      # default: utility wins
+    assert pr_volatile["churning"] > pr_volatile["proven"]    # volatility-heavy: churn wins
 
     # Determinism + read-only run() + impossible-pin-budget raise + bad args.
     a = json.dumps(run(items=items, prior=prior, token_budget=budget, now_turn=13), sort_keys=True)
