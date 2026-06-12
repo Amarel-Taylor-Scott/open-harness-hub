@@ -29,6 +29,7 @@ Run ``python -m scripts.foundry.novelty`` for the offline self-test.
 from __future__ import annotations
 
 import hashlib
+import math
 import re
 from dataclasses import dataclass, field
 from typing import Any
@@ -152,18 +153,50 @@ class NoveltyIndex:
     n_bands: int = DEFAULT_LSH_BANDS
     hamming_max: int = DEFAULT_HAMMING_MAX
     jaccard_min: float = DEFAULT_JACCARD_MIN
+    #: Heavy-paraphrase lane (same fact, DISJOINT vocabulary → SimHash misses it): an
+    #: injected real embedder's cosine catches it. Cosine floor for a semantic duplicate.
+    embed_cosine_min: float = 0.92
+    #: O(n) cap — the novelty stage is the FAST pass; above this the embedding lane defers to
+    #: the ANN-blocked `processors/semantic_dedup` (never an unbounded O(n²) scan here).
+    embed_max_compare: int = 500
     _buckets: dict[tuple[str, int, int], list[tuple[str, int]]] = field(default_factory=dict)
     _structural: dict[str, set[str]] = field(default_factory=dict)
     _source_keys: set[str] = field(default_factory=set)
+    _embeddings: dict[str, tuple[str, list[float]]] = field(default_factory=dict)  # cid -> (type, vec)
     size: int = 0
 
-    def add(self, component_id: str, target_type: str, sig: int, struct: set[str], src_key: str | None) -> None:
+    def add(self, component_id: str, target_type: str, sig: int, struct: set[str],
+            src_key: str | None, embedding: list[float] | None = None) -> None:
         for band in lsh_bands(sig, bits=self.bits, n_bands=self.n_bands):
             self._buckets.setdefault((target_type, band[0], band[1]), []).append((component_id, sig))
         self._structural[component_id] = struct
         if src_key:
             self._source_keys.add(src_key)
+        if embedding is not None:
+            self._embeddings[component_id] = (target_type, list(embedding))
         self.size += 1
+
+    def _embed_near(self, target_type: str, embedding: list[float] | None) -> tuple[bool, str | None]:
+        """Heavy-paraphrase cosine match within the same type (bounded by embed_max_compare)."""
+        if not embedding or not self._embeddings:
+            return False, None
+        na = math.sqrt(sum(x * x for x in embedding))
+        if na == 0:
+            return False, None
+        compared = 0
+        for cid, (ctype, vec) in self._embeddings.items():
+            if ctype != target_type or len(vec) != len(embedding):
+                continue
+            compared += 1
+            if compared > self.embed_max_compare:
+                break
+            nb = math.sqrt(sum(x * x for x in vec))
+            if nb == 0:
+                continue
+            cos = sum(a * b for a, b in zip(embedding, vec)) / (na * nb)
+            if cos >= self.embed_cosine_min:
+                return True, cid
+        return False, None
 
     def add_body(self, body: dict, *, source: dict | None = None) -> None:
         cid = body.get("id", "") or ""
@@ -178,7 +211,8 @@ class NoveltyIndex:
         self.add(getattr(entry, "id", ""), getattr(entry, "type", ""), sig,
                  set(getattr(entry, "structural", set())) or set(), None)
 
-    def check(self, target_type: str, sig: int, struct: set[str], src_key: str | None) -> dict[str, Any]:
+    def check(self, target_type: str, sig: int, struct: set[str], src_key: str | None,
+              embedding: list[float] | None = None) -> dict[str, Any]:
         # candidates that share at least one LSH band with the same type
         seen: dict[str, int] = {}
         for band in lsh_bands(sig, bits=self.bits, n_bands=self.n_bands):
@@ -194,18 +228,23 @@ class NoveltyIndex:
         source_dup = bool(src_key) and src_key in self._source_keys
         simhash_near = nearest_id is not None and nearest_ham <= self.hamming_max
         struct_near = nearest_jac >= self.jaccard_min
-        is_duplicate = source_dup or (simhash_near and struct_near)
+        embed_near, embed_of = self._embed_near(target_type, embedding)
+        is_duplicate = source_dup or (simhash_near and struct_near) or embed_near
         reasons: list[str] = []
         if source_dup:
             reasons.append("same-source clone (source_url already mined into this type)")
         if simhash_near and struct_near:
             reasons.append(f"near-duplicate: of {nearest_id} (hamming {nearest_ham}, jaccard {nearest_jac:.2f})")
+        if embed_near:
+            reasons.append(f"semantic paraphrase: of {embed_of} (cosine >= {self.embed_cosine_min})")
         return {
             "simhash": sig,
             "is_duplicate": is_duplicate,
             "source_dup": source_dup,
             "simhash_near": simhash_near,
             "struct_near": struct_near,
+            "embed_near": embed_near,
+            "embed_of": embed_of,
             "nearest_id": nearest_id,
             "hamming": nearest_ham if nearest_id is not None else None,
             "jaccard": round(nearest_jac, 3),
@@ -313,6 +352,29 @@ def _self_test() -> int:
     r3 = idx.check("knowledge-pack", simhash_of(other), structural_set(other),
                    source_key("knowledge-pack", {"source_url": "https://faa.gov/part450"}))
     check("unrelated + new source ⇒ novel", not r3["is_duplicate"], str(r3))
+
+    # HEAVY PARAPHRASE lane (same fact, DISJOINT vocabulary, DIFFERENT source → SimHash +
+    # structural both miss it): an injected real embedder's cosine catches it. With a toy
+    # embedder, a near-identical vector triggers embed_near; an orthogonal one does not.
+    eidx = NoveltyIndex(hamming_max=DEFAULT_HAMMING_MAX, jaccard_min=DEFAULT_JACCARD_MIN)
+    eidx.add("kp/orig", "knowledge-pack", simhash_of({"type": "knowledge-pack", "name": "a", "description": "aaa"}),
+             {"a"}, source_key("knowledge-pack", {"source_url": "https://a.example/1"}),
+             embedding=[1.0, 0.0, 0.0])
+    para = eidx.check("knowledge-pack",
+                      simhash_of({"type": "knowledge-pack", "name": "z", "description": "totally different words"}),
+                      {"z"}, source_key("knowledge-pack", {"source_url": "https://b.example/2"}),
+                      embedding=[0.999, 0.001, 0.0])
+    check("heavy paraphrase (disjoint words+source) ⇒ duplicate via embedding lane",
+          para["is_duplicate"] and para["embed_near"] and para["embed_of"] == "kp/orig", str(para))
+    distinct = eidx.check("knowledge-pack",
+                          simhash_of({"type": "knowledge-pack", "name": "q", "description": "unrelated"}),
+                          {"q"}, source_key("knowledge-pack", {"source_url": "https://c.example/3"}),
+                          embedding=[0.0, 1.0, 0.0])
+    check("orthogonal embedding ⇒ NOT an embedding duplicate", not distinct["embed_near"], str(distinct))
+    # The lane is INERT when no embedding is supplied (the offline default path is unchanged).
+    inert = eidx.check("knowledge-pack", simhash_of(other), structural_set(other),
+                       source_key("knowledge-pack", {"source_url": "https://d.example/4"}))
+    check("no embedding supplied ⇒ embedding lane inert", not inert["embed_near"], str(inert))
 
     # candidate with NO source ⇒ suspect (novelty unverifiable)
     r4 = idx.check("tool", simhash_of({"type": "tool", "name": "x", "description": "y"}), set(), None)
