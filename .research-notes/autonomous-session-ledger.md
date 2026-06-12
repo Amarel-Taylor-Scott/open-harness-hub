@@ -2512,3 +2512,23 @@ cases." Three tracks, all REAL per the anti-filler law (no clone generators):
   manifest + `docs/concepts/prediction-error-gated-context.md` (the Friston context-efficiency
   design space) and the platform 5W1H analysis.
 - 7 parallel subagents used (Agent tool, not Workflow — no orchestration opt-in was given).
+
+## 2026-06-12 — Moat-cluster deep dives (warrant: owner "more deep dives" after the broad sweep)
+
+Read: the 70-repo sweep went wide+shallow; "deep dives" = go DEEP on the moat-critical few.
+5 web-grounded (live-fetched) strategic deep dives on the verification-adjacent cluster →
+`docs/research/moat-cluster-deep-dives-2026-06-12.md` (2,100 words) + memories:
+- **Langfuse** (closest pressure, COMPLEMENT — assurance-vs-logging; memory
+  `langfuse-observability-competitor`).
+- **Ragas + DeepEval** (VALIDATE + the SHIPPABLE finding: foundry/measure.py already exposes
+  the 3 Protocols; their metrics are the candidate scorers that close the offline-cap — now
+  unblocked by the owner's keys; next build = a ragas_scorer adapter).
+- **Guardrails-AI + NeMo** (VALIDATE the gate pattern; the deterministic-validators-vs-LLM-
+  self-checks line cuts exactly on our law).
+- **vLLM + SGLang + LMCache** (INTEGRATION; vLLM drops into OPENAI_BASE_URL with zero adapter,
+  LMCache = the real cache-kv-reuse backend; GPU-gated — not viable on the CPU-batch Fly plane).
+- **DSPy** (admissible ONLY under the lossless law — compile() must emit trace+rejects+rollback;
+  offline-distillation path only, never the live provider-neutral plane).
+Synthesis: the thesis HELD at depth — none does verification+receipts+governed-promotion. 5
+parallel web-grounded Agent-tool subagents (not Workflow). Highest-leverage next build = the
+Ragas/DeepEval scorer adapter into foundry/measure (real measured lift into the two-axis gate).
