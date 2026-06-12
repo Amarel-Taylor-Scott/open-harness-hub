@@ -89,6 +89,26 @@ def _self_test() -> int:
     else:
         print("  [ok] E: node unavailable — syntax check skipped honestly")
 
+    # F. OFFLINE LOAD — the bundle prototypes served by the showcase server load React/Babel from the
+    #    LOCAL /vendor/ mount, not an external CDN (the cross-product blank a confused user hit).
+    if str(REPO) not in sys.path:
+        sys.path.insert(0, str(REPO))
+    from scripts.showcase.server import rewrite_bundle_html
+    vendor = REPO / "web" / "vendor"
+    ck("F: /vendor/ has the pinned React/Babel runtime",
+       all((vendor / f).exists() for f in ("react.development.js", "react-dom.development.js", "babel.min.js")))
+    _sample = ('<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />'
+               '<link href="https://fonts.googleapis.com/css2?family=Inter" rel="stylesheet" />'
+               '<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" '
+               'integrity="sha384-XXX" crossorigin="anonymous"></script>'
+               '<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>')
+    _rew = rewrite_bundle_html(_sample)
+    ck("F: rewrite repoints CDN React/Babel to /vendor/",
+       "/vendor/react.development.js" in _rew and "/vendor/babel.min.js" in _rew)
+    ck("F: rewrite removes ALL external CDN + integrity/crossorigin (offline, no SRI mismatch)",
+       "unpkg.com" not in _rew and "fonts.googleapis" not in _rew and "fonts.gstatic" not in _rew
+       and "integrity=" not in _rew and "crossorigin" not in _rew)
+
     print("\n" + ("PASS — check_bundle_full_design_wiring: the full-design bundle is WIRED to the real "
                   "backends — realm-aware identity client (drift-gated, override, per-realm sessions, no "
                   "stored passphrase) loaded across the surfaces, OhAuth does real register/login with honest "

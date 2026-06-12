@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import urllib.error
 import urllib.request
 from collections import Counter
@@ -46,6 +47,25 @@ _STATIC_TYPES = {".html": "text/html; charset=utf-8", ".js": "application/javasc
                  ".png": "image/png", ".woff2": "font/woff2", ".ico": "image/x-icon", ".map": "application/json",
                  ".md": "text/markdown; charset=utf-8", ".txt": "text/plain; charset=utf-8",
                  ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".gif": "image/gif", ".webp": "image/webp"}
+
+#: The shared pinned runtime files this server mounts at /vendor/ (web/vendor/). The design-bundle
+#: prototypes load these from unpkg's CDN; we repoint them here so they load OFFLINE.
+_VENDOR_RUNTIME_FILES = ("react.development.js", "react-dom.development.js", "babel.min.js")
+_UNPKG_RE = re.compile(r'https://unpkg\.com/(?:@babel/standalone|react-dom|react)@[^/"\']+/(?:umd/)?([\w.-]+\.js)')
+_FONT_LINK_RE = re.compile(r'<link\b[^>]*fonts\.g(?:oogleapis|static)\.com[^>]*>\s*')
+
+
+def rewrite_bundle_html(html_text: str) -> str:
+    """Make a design-bundle prototype load OFFLINE from the local /vendor/ mount instead of external
+    CDNs (the cause of the blank cross-product screen a confused user hits, and a no-external-CDN
+    violation). Repoint the pinned React/Babel runtime to /vendor/, drop the subresource integrity
+    (the local copy hashes differently than unpkg's) + the now-orphaned crossorigin, and drop the
+    Google-Fonts CDN links (the page degrades to its declared font stack — never blank)."""
+    text = _UNPKG_RE.sub(r"/vendor/\1", html_text)
+    text = re.sub(r'\s+integrity="[^"]*"', "", text)
+    text = re.sub(r'\s+crossorigin(?:="[^"]*")?', "", text)
+    text = _FONT_LINK_RE.sub("", text)
+    return text
 
 
 def _local_service_port(service_id: str) -> int | None:
@@ -211,7 +231,14 @@ class Handler(BaseHTTPRequestHandler):
         target = (base / rel.lstrip("/")).resolve()
         if not (target == base or base in target.parents) or not target.is_file():
             return False
-        self._send(200, target.read_bytes(), _STATIC_TYPES.get(target.suffix, "application/octet-stream"))
+        # Design-bundle prototypes (DESIGN_BUNDLE_DIR) load React/Babel/fonts from external CDNs, so
+        # they go BLANK offline (the cross-product dead-end). Rewrite them on serve to the local
+        # /vendor/ runtime this server already mounts.
+        if target.suffix == ".html" and base == DESIGN_BUNDLE_DIR.resolve():
+            body = rewrite_bundle_html(target.read_text(encoding="utf-8")).encode("utf-8")
+        else:
+            body = target.read_bytes()
+        self._send(200, body, _STATIC_TYPES.get(target.suffix, "application/octet-stream"))
         return True
 
     def _serve_static(self, rel: str) -> bool:
