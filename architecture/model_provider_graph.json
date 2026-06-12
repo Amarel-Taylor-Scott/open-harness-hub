@@ -230,6 +230,20 @@
       "display": "OpenRouter Gemma-4 26B A4B (cheaper-inference lane)",
       "adapter_style": "openai_compatible",
       "note": "owner-directed 2026-06-11 cheaper-inference lane: AR sibling beats DiffusionGemma on every benchmark at $0.06/$0.33 per 1M (:free dev tier). Key = OPENROUTER_API_KEY (secret://provider/openrouter). See docs/architecture/flexible-inference-lanes.md."
+    },
+    {
+      "node_id": "model.mistral.small_latest@candidate",
+      "base_url": "https://api.mistral.ai/v1",
+      "model": "mistral-small-latest",
+      "tier_code": 300,
+      "specialization_codes": [100, 200, 300, 400, 500, 1000, 1100],
+      "status_code": 200,
+      "secret_ref": "secret://provider/mistral",
+      "local_equivalent": "model.local_stub@v1",
+      "external": true,
+      "display": "Mistral Small (owner keys; OpenAI-compatible lane)",
+      "adapter_style": "openai_compatible",
+      "note": "owner-provided Mistral API keys; OpenAI-compatible at api.mistral.ai/v1. Key = MISTRAL_API_KEY (secret://provider/mistral). chat + mistral-embed embeddings. from_env() resolves it before the generic OPENAI lane."
     }
   ],
   "edges": [

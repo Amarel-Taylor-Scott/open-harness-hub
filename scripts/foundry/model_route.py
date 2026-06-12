@@ -91,9 +91,10 @@ def _openai_compatible(base: str, key: str, model: str, embed_model: str):
 def from_env() -> ModelRoute | None:
     """Build a ModelRoute from env, or None (→ offline defaults). No network unless called.
 
-    Priority: ``OLLAMA_API_KEY`` (Ollama Cloud — gives chat **and** embeddings) →
-    ``ANTHROPIC_API_KEY`` → ``OPENAI_API_KEY``. Pick models with ``OH_CHAT_MODEL`` /
-    ``OH_EMBED_MODEL``.
+    Priority: ``OLLAMA_API_KEY`` (Ollama Cloud — chat **and** embeddings) → ``MISTRAL_API_KEY``
+    → ``OPENROUTER_API_KEY`` → ``ANTHROPIC_API_KEY`` → ``OPENAI_API_KEY`` (+ ``OPENAI_BASE_URL``).
+    Mistral and OpenRouter are OpenAI-compatible, so they ride ``_openai_compatible`` with their
+    own base URLs. Pick models with ``OH_CHAT_MODEL`` / ``OH_EMBED_MODEL``.
     """
     model = os.environ.get("OH_CHAT_MODEL", _DEFAULT_CHAT_MODEL)
 
@@ -118,6 +119,21 @@ def from_env() -> ModelRoute | None:
             return vecs[0]
 
         return ModelRoute(comp, embed_fn=_ollama_embed, name=f"ollama:{model}")
+
+    # Mistral — OpenAI-compatible (the owner's existing keys); chat + mistral-embed embeddings.
+    if os.environ.get("MISTRAL_API_KEY"):
+        base = os.environ.get("MISTRAL_BASE_URL", "https://api.mistral.ai/v1")
+        mdl = os.environ.get("OH_CHAT_MODEL") or "mistral-small-latest"
+        embed_model = os.environ.get("OH_EMBED_MODEL", "mistral-embed")
+        comp, emb = _openai_compatible(base, os.environ["MISTRAL_API_KEY"], mdl, embed_model)
+        return ModelRoute(comp, embed_fn=emb, name=f"mistral:{mdl}")
+
+    # OpenRouter — OpenAI-compatible gateway to many models (incl. ':free' variants).
+    if os.environ.get("OPENROUTER_API_KEY"):
+        base = os.environ.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+        embed_model = os.environ.get("OH_EMBED_MODEL", "text-embedding-3-small")
+        comp, emb = _openai_compatible(base, os.environ["OPENROUTER_API_KEY"], model, embed_model)
+        return ModelRoute(comp, embed_fn=emb, name=f"openrouter:{model}")
 
     if os.environ.get("ANTHROPIC_API_KEY"):
         key = os.environ["ANTHROPIC_API_KEY"]

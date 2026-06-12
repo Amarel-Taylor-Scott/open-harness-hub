@@ -626,4 +626,6 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/build_processor_dispatch_index.py", "build_processor_dispatch_index"),
     # ── Cohort compression-policy selector (context-efficiency 'consumer behavior'): scripts/processors/compression/cohort_policy_selector.py — reads a usage_gated_compress prior, classifies the tenant's usage SHAPE (power-user/iterating/fresh/balanced/unknown), and emits the compression curve (budget_fraction + utility/volatility/recency weights); power-user compresses the stable substrate hard, fresh barely compresses, unknown stays conservative; deterministic. ──
     ("scripts/processors/compression/cohort_policy_selector.py", "cohort_policy_selector"),
+    # ── Model-provider LANES wired end-to-end (backlog #4): scripts/check_model_provider_lanes.py — Ollama Cloud / Mistral / OpenRouter / Anthropic / OpenAI / local Ollama each have a governed graph node (external nodes carry secret_ref + local_equivalent) AND a verified env→route mapping through model_route.from_env (offline, no network); live smoke runs only with a real key + OH_LANE_SMOKE_LIVE=1. ──
+    ("scripts/check_model_provider_lanes.py", "check_model_provider_lanes"),
 ]
