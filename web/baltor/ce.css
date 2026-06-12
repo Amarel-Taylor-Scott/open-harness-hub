@@ -455,16 +455,21 @@
 /* phones: keep the top bar + the inline A/B preview controls from forcing horizontal page scroll
    (QA stress test found top-bar + .ce-abset overflow at 320-390px) — tighten the bar, drop the
    redundant "Sign in" link, and hide the prototype A/B preview affordance on phones */
-@media (max-width: 460px) {
+@media (max-width: 900px) {                /* tablets (incl. iPad portrait 768): tighten so the nav still fits */
+  .ce-top { gap: 14px; }
+  .ce-top-nav { gap: 14px; }
+  .ce-top-r { gap: 10px; }
+  .ce-page { overflow-x: clip; }           /* sticky-safe backstop against any residual scroll */
+}
+@media (max-width: 600px) {                /* phones + phablets: tighten, drop redundant sign-in + the A/B preview, wrap the footer */
   .ce-top { gap: 10px; }
   .ce-top-r { gap: 8px; }
   .ce-top-r .ce-navlink { display: none; }
   .ce-abset { display: none; }
   .ce-foot-links { flex-wrap: wrap; gap: 12px 18px; }
 }
-/* phone + tablet: no element may force a horizontal scrollbar (clip is sticky-safe, unlike hidden) */
-@media (max-width: 900px) { .ce-page { overflow-x: clip; } }
 @media (max-width: 360px) { .ce-top-r .oh-btn { padding: 7px 11px; } }
+@media (max-width: 300px) { .ce-top-r .oh-btn { display: none; } }
 
 /* ---------- corpus commons (oracle marketplace) ---------- */
 .ce-dash-engine { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }
