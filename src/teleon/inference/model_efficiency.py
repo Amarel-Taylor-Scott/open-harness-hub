@@ -162,6 +162,62 @@ def ingest_external_ranking(source: str, entries: list[dict], *, now: str) -> di
             "signals": signals}
 
 
+# ---------------------------------------------------------------- producers (feed rank_models)
+
+#: The committed external-leaderboard fixture (a CANDIDATE signal; provenance external_unverified).
+DEFAULT_EXTERNAL_LEADERBOARD = Path(__file__).resolve().parents[3] / "data" / "model-efficiency" / "external-leaderboard.jsonl"
+
+
+def quality_from_receipts(receipts: Iterable[dict]) -> dict[tuple[str, str], float]:
+    """The QUALITY producer: per-(model, class) mean quality from receipts that carry a
+    ``quality`` field (written by the measured-lift / eval pass). Returns the ``(model, class)``
+    map ``rank_models(quality=...)`` consumes; EMPTY when no receipt carries quality (honest —
+    cheapest-capable stays cost/latency-only until quality evidence exists). Deterministic."""
+    sums: dict[tuple[str, str], list[float]] = {}
+    for r in receipts:
+        q = r.get("quality")
+        if q is None:
+            continue
+        model = str(r.get("selected_model") or r.get("selected_provider_node_id") or "")
+        if not model:
+            continue
+        klass = str(r.get("requested_model_class") or "default")
+        sums.setdefault((model, klass), []).append(max(0.0, min(1.0, _safe_float(q))))
+    return {k: round(sum(v) / len(v), 6) for k, v in sums.items() if v}
+
+
+def external_signals_for_ranking(record: dict) -> dict[tuple[str, str], float]:
+    """Convert an ``ingest_external_ranking`` record's ``'model::klass'`` signal keys into the
+    ``(model, class)`` tuple shape ``rank_models(external=...)`` expects — bridging the two so the
+    external candidate signal can actually tie-break the ranking (still weighted < first-party)."""
+    out: dict[tuple[str, str], float] = {}
+    for key, score in (record.get("signals") or {}).items():
+        model, _, klass = str(key).partition("::")
+        if model:
+            out[(model, klass or "default")] = max(0.0, min(1.0, _safe_float(score)))
+    return out
+
+
+def load_external_leaderboard(path: Path | str = DEFAULT_EXTERNAL_LEADERBOARD,
+                              *, now: str = "1970-01-01T00:00:00Z") -> dict[tuple[str, str], float]:
+    """Load the committed leaderboard fixture → the ``(model, class)`` external map for
+    ``rank_models``. EMPTY when the file is absent (honest — no external signal, no effect).
+    Routes through ``ingest_external_ranking`` so the candidate-not-truth provenance is enforced."""
+    p = Path(path)
+    if not p.exists():
+        return {}
+    entries: list[dict] = []
+    for line in p.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line and not line.startswith("#"):
+            try:
+                entries.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+    record = ingest_external_ranking(str(p.name), entries, now=now)
+    return external_signals_for_ranking(record)
+
+
 # ---------------------------------------------------------------- self-test (offline, deterministic)
 
 def _self_test() -> int:
@@ -215,6 +271,30 @@ def _self_test() -> int:
     ck("external signal only tie-breaks, never outvotes first-party (B stays worst even if ext loves it)",
        rank_models(recs, task_class="extract",
                    external={("B", "extract"): 1.0})[-1]["model"] == "B")
+
+    # NEW PRODUCERS (the wiring that feeds rank_models in the live OIPS path):
+    # quality_from_receipts surfaces a quality dimension from receipts that carry it; it then
+    # demotes a cheap-but-low-quality model via the quality-per-cost score.
+    q_recs = recs + [{"selected_model": "A", "requested_model_class": "extract",
+                      "cost_estimate_usd": 0.001, "latency_ms": 200, "fallback_used": False, "quality": 0.1},
+                     {"selected_model": "C", "requested_model_class": "extract",
+                      "cost_estimate_usd": 0.001, "latency_ms": 220, "fallback_used": False, "quality": 0.95}]
+    qmap = quality_from_receipts(q_recs)
+    ck("quality_from_receipts surfaces per-(model,class) quality from receipts",
+       qmap.get(("A", "extract")) == 0.1 and qmap.get(("C", "extract")) == 0.95)
+    ck("quality_from_receipts is EMPTY when no receipt carries quality (honest)",
+       quality_from_receipts(recs) == {})
+    fed = [r["model"] for r in rank_models(q_recs, task_class="extract", quality=qmap or None)]
+    ck("fed quality demotes the cheap-but-low-quality model (C now beats A)",
+       fed.index("C") < fed.index("A"))
+    # external_signals_for_ranking bridges the 'model::klass' record shape → (model, class) tuples.
+    bridged = external_signals_for_ranking(ext)
+    ck("external_signals_for_ranking bridges to (model,class) tuples rank_models consumes",
+       bridged.get(("A", "extract")) == 0.9)
+    # load_external_leaderboard loads the committed fixture into the right shape (or empty if absent).
+    board = load_external_leaderboard()
+    ck("load_external_leaderboard loads the committed fixture as (model,class) tuples",
+       board == {} or all(isinstance(k, tuple) and len(k) == 2 for k in board))
 
     failed = [n for n, ok in checks if not ok]
     for n, ok in checks:

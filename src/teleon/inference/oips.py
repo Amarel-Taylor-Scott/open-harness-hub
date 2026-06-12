@@ -214,10 +214,17 @@ def infer_local(*, object_id: str, preference_layers: list[dict], input_text: st
     ranking = None
     if use_efficiency_ranking:  # learn the preference order from our own receipts (no-op when empty)
         try:
-            from src.teleon.inference.model_efficiency import rank_models
+            from src.teleon.inference.model_efficiency import (
+                load_external_leaderboard, quality_from_receipts, rank_models)
             from src.teleon.inference.receipts import load_receipts, RECEIPTS_JSONL_PATH
             klass = resolved["effective"].get("model_class_preference", {}).get("name")
-            ranking = rank_models(load_receipts(RECEIPTS_JSONL_PATH), task_class=klass) or None
+            receipts = load_receipts(RECEIPTS_JSONL_PATH)
+            # cheapest-CAPABLE, not just cheapest: feed the measured QUALITY (from receipts that
+            # carry it) + the EXTERNAL leaderboard (candidate, weighted below first-party) so a
+            # fast-cheap-but-low-quality model can't win on cost/latency alone.
+            ranking = rank_models(receipts, task_class=klass,
+                                  quality=quality_from_receipts(receipts) or None,
+                                  external=load_external_leaderboard() or None) or None
         except Exception:  # ranking must never break inference — degrade to the declared order
             ranking = None
     route = select_provider(resolved, available_secrets=available_secrets, provider_health=provider_health,
