@@ -634,4 +634,13 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/state_local_service.py", "state_local_service"),
     # ── Ingest staging→measure→gate PROMOTE job (#7; closes health≠promotion): scripts/ingest/promote_staged.py — fed official-source rows are staging-only until this runs; offline (no model route) every unmeasured candidate routes to REVIEW (boundary held, no fabricated lift); with a route it measures real bare-vs-pipeline lift and PROMOTES the ones clearing the floor with provenance + durability. Composes model_route.measurement_stage + gate.evaluate (no new gate logic). ──
     ("scripts/ingest/promote_staged.py", "ingest_promote_staged"),
+    # ── SHOWCASE PIPELINES gated (closes the "self-tested but un-gated" orphan): each scripts/showcase_pipelines/*.py COMPOSES the real processor run() callables end-to-end into a governed flow for a concrete scenario and self-tests the whole composition (the ONE simulated seam is the model call). These were runnable but reachable from no gate; now the flywheel keeps every showcase green so a processor change that breaks a composition is caught. Spread across durability classes (precedence/aggregation/freshness/coded-vocabulary/low-resource) and domains beyond CFPB. ──
+    ("scripts/showcase_pipelines/regulated_fact_qa.py", "showcase_regulated_fact_qa"),
+    ("scripts/showcase_pipelines/governed_rag.py", "showcase_governed_rag"),
+    ("scripts/showcase_pipelines/clinical_support.py", "showcase_clinical_support"),
+    ("scripts/showcase_pipelines/low_resource_alert.py", "showcase_low_resource_alert"),
+    ("scripts/showcase_pipelines/context_efficiency_loop.py", "showcase_context_efficiency_loop"),
+    ("scripts/showcase_pipelines/sanctions_aml_screening.py", "showcase_sanctions_aml_screening"),
+    ("scripts/showcase_pipelines/cve_dependency_triage.py", "showcase_cve_dependency_triage"),
+    ("scripts/showcase_pipelines/icd10_coding.py", "showcase_icd10_coding"),
 ]

@@ -10,6 +10,11 @@ pipeline runs offline. Everything around it — screen, retrieve, fuse, rerank, 
 source-precedence, extract, place, build-prompt, verify, deliver — is the real
 governed machinery. Swap the seam for `scripts.foundry.model_route` to go live.
 
+Every pipeline here is kept green by the flywheel gate (registered in
+`scripts/flywheel_proof_modules.py` as `showcase_*`) — a processor change that breaks a
+composition is caught, not just discoverable. They span durability classes and domains
+beyond the CFPB/regulated-fact flagship.
+
 Pipelines:
   regulated_fact_qa     — governed regulated-fact QA (state usury caps): screen →
                           hybrid retrieve → rerank → dedupe → source-precedence →
@@ -22,4 +27,16 @@ Pipelines:
   low_resource_alert    — disaster-alert pipeline for a low-resource language:
                           faithful-extract → english-pivot → language-lock →
                           tts-preprocess → escalate (human signs off before broadcast).
+  context_efficiency_loop — usage-gated context compression: classify the tenant's
+                          usage shape → cohort compression curve → serve only what's
+                          needed (the consumer-behavior efficiency loop).
+  sanctions_aml_screening — OFAC 50% Rule (durability: AGGREGATION): an UNLISTED entity
+                          majority-owned by listed persons through an ownership chain is
+                          BLOCKED — graph arithmetic a bare model can't do.
+  cve_dependency_triage — CVE/dependency triage (durability: FRESHNESS + exactness):
+                          exact CVE-id lookup → deterministic version-range match vs the
+                          lockfile → NVD/KEV precedence → escalate; abstain on unknowns.
+  icd10_coding          — ICD-10 coding assistant (durability: CODED VOCABULARY): SOAP
+                          structure → ground each documented diagnosis to the terminology
+                          → ABSTAIN over fabricate → propose to a human coder.
 """
