@@ -2452,3 +2452,33 @@ endpoint-to-endpoint / plane-to-plane communication" + "continue documenting use
   descriptions); QUARANTINED: anthropics/skills (no_license — stars are not proof). Pattern
   recorded: deterministic processor core ours + reference repo as live backend candidate behind
   the same run() seam.
+
+## 2026-06-12 (cont.) — implementation debt CLEARED + tunnel journeys + Ona intel
+
+- **CATALOG IMPLEMENTATION DEBT: 69/69 → ZERO UNRESOLVED.** Every in-repo
+  `implementations[].path` callable (179 total across 2,681 manifests) now resolves to a
+  real, self-tested module. Families landed this stretch: clinical 8/8 (defensive
+  decision-support, injected governed corpora, proposed-never-disposed), connectors 3/3
+  (MCP transports injected, untrusted+screen-pointed, connector-side read-only SQL law),
+  top-level 15/15 (SM-2, template gem, fence guard, thinking-latency policy, smart
+  router, faithful extract, language lock, offline gate, offline queue sync, TTS
+  preprocess, OCR prepass, English-pivot translation, APQC walker, doc→markdown ingest,
+  curriculum QA builder). Shared discipline throughout: injected seams, honest labeled
+  fallbacks or refusals (receipts/fetches/datasets never faked), lossless accounting,
+  serves_truth pinned False.
+- **Tunnel-plane journey test (owner ask): PASS 29/29 recorded, 0 HTTP frictions, 0
+  console errors** (e2e/record_user_journeys.mjs); the OpenHarnessHub app journey ran on
+  its PUBLIC trycloudflare base (sign-up → mailbox verify → key mint = identity/mailbox/
+  registry server-to-server over tunnels); 6/6 seam endpoints answered through tunnels;
+  the Baltor admin flow passed exit-0 over its tunnel. 19 tunnels live (8 static + 11
+  service-plane); manifests unified on dist/cloudflare-extra-tunnels.json; demo
+  control tower shows 12 verified public URLs.
+- **Repo intel batch 2** (docs/research/github-repo-intel-2026-06-12.md): markitdown,
+  docling, vllm, ragflow, tesseract intaken as tool candidates; crawl4ai watch;
+  litellm (NOASSERTION) + firecrawl (AGPL) QUARANTINED — the license gate held against
+  the two most popular repos in the batch.
+- **OpenAI→Ona acquisition analysis** (docs/research/openai-ona-acquisition-2026-06-11.md
+  + memory openai-ona-codex-competitor): category PROOF for the Teleon thesis from the
+  largest vendor ("models are only one part… logged… review"); they bought execution,
+  NOT verification/receipts/lift-gates/provider-neutrality — the assurance white space
+  stays ours; bundling threat noted with watch triggers.
