@@ -1,6 +1,6 @@
 # Open Harness Hub — dev shortcuts. Local runs need ZERO services (sqlite); the same
 # commands run in cloud against Postgres+Redis purely by env (see .env.example).
-.PHONY: help bootstrap test e2e foundry worker demand scrape ingest freshness ingest-health ingest-loop dev-up dev-down
+.PHONY: help bootstrap test e2e foundry worker demand scrape ingest freshness ingest-health ingest-promote ingest-loop dev-up dev-down
 
 help:
 	@echo "bootstrap  - pip install runtime deps"
@@ -50,6 +50,9 @@ freshness:
 
 ingest-health:
 	python3 -m scripts.ingest.health --check
+
+ingest-promote:
+	python3 -m scripts.ingest.promote_staged --self-test
 
 ingest-loop:
 	python3 -m scripts.ingest.run --loop

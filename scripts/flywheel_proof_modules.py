@@ -632,4 +632,6 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/receipt_local_service.py", "receipt_local_service"),
     # ── State service (#10c; was status:planned): scripts/state_local_service.py — fulfils local_state_service (:9427); keyed session/action state replayed from an append-only op-log (set/append/delete), truth_authority=false always; crash-safe history. ──
     ("scripts/state_local_service.py", "state_local_service"),
+    # ── Ingest staging→measure→gate PROMOTE job (#7; closes health≠promotion): scripts/ingest/promote_staged.py — fed official-source rows are staging-only until this runs; offline (no model route) every unmeasured candidate routes to REVIEW (boundary held, no fabricated lift); with a route it measures real bare-vs-pipeline lift and PROMOTES the ones clearing the floor with provenance + durability. Composes model_route.measurement_stage + gate.evaluate (no new gate logic). ──
+    ("scripts/ingest/promote_staged.py", "ingest_promote_staged"),
 ]
