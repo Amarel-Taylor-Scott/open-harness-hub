@@ -26,6 +26,7 @@ REPO = Path(__file__).resolve().parents[1]
 VERIFIER = REPO / "e2e" / "verify_examples_gallery_videos.mjs"
 RECORDER = REPO / "e2e" / "record_examples_gallery.mjs"
 EXPLORER = REPO / "e2e" / "confused_user_explore.mjs"  # confused-user UX explorer (same toolchain)
+STRESS = REPO / "e2e" / "qa_stress_test.mjs"           # hostile QA stress harness (same toolchain)
 #: the verifier looks for ffmpeg here first (johnvansickle static) then the playwright-bundled one.
 _FFMPEG_CANDIDATES = (Path.home() / ".local" / "share" / "aidr-tools" / "ffmpeg",
                       Path.home() / ".cache" / "ms-playwright" / "ffmpeg-1011" / "ffmpeg-linux")
@@ -61,7 +62,7 @@ def _self_test() -> int:
         return 1 if any(not ok for _, ok in checks) else 0
 
     # node present → syntax-check the e2e video/exploration tools (cheap, environment-light).
-    for f in (VERIFIER, RECORDER, EXPLORER):
+    for f in (VERIFIER, RECORDER, EXPLORER, STRESS):
         if not f.exists():
             ck(f"{f.name} exists", False)
             continue
