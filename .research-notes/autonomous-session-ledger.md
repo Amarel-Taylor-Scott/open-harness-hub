@@ -2482,3 +2482,33 @@ endpoint-to-endpoint / plane-to-plane communication" + "continue documenting use
   largest vendor ("models are only one part… logged… review"); they bought execution,
   NOT verification/receipts/lift-gates/provider-neutrality — the assurance white space
   stays ours; bundling threat noted with watch triggers.
+
+## 2026-06-12 — "100% power" wave: integrations + examples + use cases (warrant: explicit owner directive)
+
+Owner: "use 100% of your power, just this once — more integrations, more examples, more use
+cases." Three tracks, all REAL per the anti-filler law (no clone generators):
+
+- **EXAMPLES — 4 runnable showcase pipelines** (`scripts/showcase_pipelines/`, all self-test
+  green) that COMPOSE the real processor callables end-to-end, model as the only simulated
+  seam: `regulated_fact_qa` (flagship, 8 processors + governed verify + report — surfaced &
+  fixed two real governance requirements: answer-by-query-relevance and jurisdiction-match),
+  `governed_rag` (the hybrid-RAG default), `clinical_support` (defensive clinical family),
+  `low_resource_alert` (faithful-extract→english-pivot→language-lock→TTS→human-signoff). This
+  is the proof the 56 processors compose, not prose.
+- **INTEGRATIONS — 70 repos governed** (`docs/research/github-repo-intel-2026-06-12.md`
+  batch 3) via 4 parallel discovery scouts → one deterministic `repo_intel.engine` pass:
+  19 tool-candidate, 10 propose-teleon-integration, 8 harness, 4 skill, 1 context, 23 watch,
+  **5 license-quarantined** (marker/surya GPL, MinerU AGPL, phoenix Elastic-2.0, pgvector
+  PostgreSQL→human review). All knowledge_proposed (api-verify = the engine's own
+  proof_to_promote step). Reconfirmed at scale: eval+guardrails VALIDATE the thesis,
+  observability is complement-not-foil, agent-swarms are the foil; the verification+receipts
+  white space holds.
+- **USE CASES — 29 verticals** (`docs/strategy/vertical-use-case-catalog-2026-06-12.md`) via
+  3 domain mappers, each grounded in the capability-gap NEGATIVE SPACE (structural durability,
+  not transient), each a pipeline of real processor ids, 4 cross-linked to the runnable
+  showcase pipelines. Clusters: regulated/compliance (9), engineering/security/data (10),
+  healthcare/public-sector/edge (10). Beachhead = Cluster A; B/C are the expansion.
+- Plus earlier in the session: the prediction-error-gated `usage-gated-compress` processor +
+  manifest + `docs/concepts/prediction-error-gated-context.md` (the Friston context-efficiency
+  design space) and the platform 5W1H analysis.
+- 7 parallel subagents used (Agent tool, not Workflow — no orchestration opt-in was given).
