@@ -34,9 +34,18 @@ def _tunnel_urls() -> dict:
     return {sid: r.get("public_url") for sid, r in json.loads(_TUNNELS.read_text()).items() if r.get("public_url")}
 
 
+def _extra_tunnels() -> dict:
+    """Port-level tunnels (dist/cloudflare-extra-tunnels.json) — the SAME seam
+    cloudflare_handoff consumes, so the two manifests can never disagree about
+    which surfaces are publicly reachable."""
+    f = P.REPO / "dist" / "cloudflare-extra-tunnels.json"
+    return {str(k): v for k, v in json.loads(f.read_text()).items()} if f.exists() else {}
+
+
 def _unified() -> list[dict]:
     reg = json.loads(_REG.read_text())["surfaces"]
     tcf = _tunnel_urls()
+    extra = _extra_tunnels()
     ct_pub = _CT_TUNNEL.read_text().strip() if _CT_TUNNEL.exists() else None
     out = []
     for s in reg:
@@ -47,6 +56,8 @@ def _unified() -> list[dict]:
             pub = ct_pub
         elif s["surface_id"].startswith("site."):
             pub = tcf.get(s["surface_id"][len("site."):])  # map site.<pid> → portfolio tunnel
+        if not pub and port and str(port) in extra and s["status"] == "active":
+            pub = extra[str(port)].rstrip("/") + s["local_path"]  # port-level tunnel + route
         group = "Start here" if s["surface_id"] == "demo-control-tower" else _GROUP.get(s["surface_type"], "Other")
         out.append({"surface_id": s["surface_id"], "display_name": s["display_name"], "group": group,
                     "type": s["surface_type"], "status": s["status"], "local_url": local,

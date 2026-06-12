@@ -33,7 +33,10 @@ if str(_REPO) not in sys.path:
 from scripts import build_demo_control_tower as B
 from scripts import portfolio_lib as P
 
-_TCF = re.compile(r"^https://[a-z0-9-]+\.trycloudflare\.com$")
+#: host-anchored (the no-fakes guarantee); an optional ROUTE path is allowed —
+#: port-level tunnels (dist/cloudflare-extra-tunnels.json) expose route-scoped
+#: surfaces like /admin-demo/ whose public URL legitimately carries the path.
+_TCF = re.compile(r"^https://[a-z0-9-]+\.trycloudflare\.com(/[A-Za-z0-9._/-]*)?$")
 _REQUIRED = ("surface_id", "company_or_hub", "surface_type", "display_name", "local_port", "status")
 
 

@@ -71,6 +71,11 @@ def build_inventory(now: str) -> dict:
             pub = ct
         elif s["surface_id"].startswith("site."):
             pub = tcf.get(s["surface_id"][len("site."):])
+            if not pub and port and str(port) in extra:
+                # tunnel-launcher record keys and surface ids can drift
+                # (portfolio vs portfolio-hub) — a port-level extra tunnel
+                # is the same honest evidence, so fall back to it.
+                pub = extra[str(port)].rstrip("/") + s["local_path"]
         elif port and str(port) in extra:
             pub = extra[str(port)].rstrip("/") + s["local_path"]  # a port-level tunnel (admin server) + the route
         else:

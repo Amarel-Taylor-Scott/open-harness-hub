@@ -2427,3 +2427,28 @@ self-test-gated (green before commit).
   grep_agentic_retrieve, hyde_query_expander, multi_query_expander), deliver 10, clinical 8,
   connectors 3, top-level 14 (list: /tmp/contracts_59.txt; regenerate via the importlib sweep) —
   plus wedge/benchmark.py live-baseline lane and emit/mcp_server.py generated-handler wiring.
+
+## 2026-06-12 — Tunnel-plane journey test + repo-intel batch (warrant: owner directive)
+
+**Owner:** "full test of user-video-journeys using trycloudflare URLs for server-to-server /
+endpoint-to-endpoint / plane-to-plane communication" + "continue documenting useful github repos".
+
+- **Plane up + GO:** 23/23 surfaces, recording-readiness gate GO (all 5 recordable seams 200).
+- **NEW `scripts/launch_service_plane_tunnels.py`** (self-tested): registry-sourced TryCloudflare
+  tunnels for the SERVICE plane (4 apps + identity/mailbox/registry/events/teleon-runtime/
+  baltor-backend/control-tower); refreshes the journey recorder's share files + emits
+  OH_SEAM_*_BASE env block; portfolio-launcher discipline (no fake URLs, exact-PID cleanup).
+- **Endpoint-to-endpoint over PUBLIC URLs: ALL GO** — identity realms, mailbox inbox, registry
+  catalog, teleon runtime, baltor backend, events plane all HTTP 200 via their tunnels; the full
+  Baltor admin flow (queue → ZIP ingest → context gateway) passed exit-0 over its tunnel.
+- **Manifest seam unified:** cloudflare_handoff.py site.* rows now fall back to the port-level
+  extra-tunnels seam; build_demo_control_tower.py consumes the SAME dist/cloudflare-extra-tunnels.json
+  (two manifests can no longer disagree); check_demo_control_tower regex updated to allow
+  route-scoped tunnel URLs (host-anchored no-fakes guarantee kept). 12 verified public URLs on
+  the start-here manifest; video recorder (e2e/record_user_journeys.mjs) running over the tunnels.
+- **Repo-intel batch (11 repos, api_verified):** docs/research/github-repo-intel-2026-06-12.md —
+  intake_as_skill_candidate: revfactory/harness, obra/superpowers; intake_as_tool_candidate:
+  LLMLingua, GPTCache, letta, graphiti, mem0, graphrag; watch: harness-100, LMCache (thin
+  descriptions); QUARANTINED: anthropics/skills (no_license — stars are not proof). Pattern
+  recorded: deterministic processor core ours + reference repo as live backend candidate behind
+  the same run() seam.
