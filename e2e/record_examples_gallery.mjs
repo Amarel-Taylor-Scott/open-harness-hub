@@ -16,7 +16,7 @@ import { spawn, spawnSync } from 'node:child_process';
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { finalizeNativeVideo, DIRS, HAS_NATIVE_VIDEO } from './gate_common.mjs';
+import { finalizeNativeVideo, DIRS, HAS_NATIVE_VIDEO, attachCollectors, hasHorizontalOverflow } from './gate_common.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = join(HERE, '..');
@@ -59,6 +59,7 @@ async function recordWalkthrough(browser, examples) {
     ...(HAS_NATIVE_VIDEO ? { recordVideo: { dir: DIRS.videos, size: SIZE } } : {}),
   });
   const page = await context.newPage();
+  const log = attachCollectors(page);
   const chapters = [];
   await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('.hero h1');
@@ -69,18 +70,23 @@ async function recordWalkthrough(browser, examples) {
     const card = page.locator(`#ex-${ex.id}`);
     await card.scrollIntoViewIfNeeded();
     await sleep(2600); // real dwell so the card is readable in the video
-    // the verdict chip text really is on screen
-    const chipVisible = await page.locator(`#ex-${ex.id} .chip`, { hasText: ex.verdict.slice(0, 24) }).count();
-    if (chipVisible) onScreen++;
+    // The chip must be VISIBLE and carry the FULL verdict (not a 24-char prefix) while on screen.
+    const chip = page.locator(`#ex-${ex.id} .chip`);
+    const text = ((await chip.textContent().catch(() => '')) || '').trim();
+    const shown = (await chip.isVisible().catch(() => false)) && text.includes(ex.verdict.trim());
+    if (shown) onScreen++;
     await page.screenshot({ path: join(STILLS, `card-${String(onScreen).padStart(2, '0')}-${ex.id}.png`) }).catch(() => {});
-    chapters.push({ at: ex.id, verdict: ex.verdict, chip_on_screen: chipVisible > 0 });
+    chapters.push({ at: ex.id, verdict: ex.verdict, chip_on_screen: shown });
   }
   await sleep(1200);
+  const overflow = await hasHorizontalOverflow(page);
+  const consoleErrors = log.console.filter((c) => c.type === 'error' && !/favicon/i.test(c.text)).length;
   const handle = page.video();
   await page.close();
   await context.close();
   const out = await finalizeNativeVideo(handle, 'examples-gallery-walkthrough');
-  return { video: out, chapters, verdicts_on_screen: onScreen, total: examples.length };
+  return { video: out, chapters, verdicts_on_screen: onScreen, total: examples.length,
+    overflow, consoleErrors, pageErrors: log.pageErrors.length };
 }
 
 async function recordOne(browser, ex) {
@@ -89,19 +95,37 @@ async function recordOne(browser, ex) {
     ...(HAS_NATIVE_VIDEO ? { recordVideo: { dir: DIRS.videos, size: SIZE } } : {}),
   });
   const page = await context.newPage();
+  const log = attachCollectors(page);
   await page.goto(`${BASE}/#ex-${ex.id}`, { waitUntil: 'domcontentloaded' });
-  await page.locator(`#ex-${ex.id}`).scrollIntoViewIfNeeded();
+  const card = page.locator(`#ex-${ex.id}`);
+  await card.scrollIntoViewIfNeeded();
   await sleep(700);
-  // ASSERT the real verdict (from the builder) is the chip text on screen.
-  const chip = (await page.locator(`#ex-${ex.id} .chip`).textContent().catch(() => '')) || '';
-  const ok = chip.includes(ex.verdict.slice(0, 24));
+  // ADVERSARIAL in-page checks: the chip is actually VISIBLE and in the viewport, shows the FULL
+  // verdict (not a prefix), the card is not half-rendered (kv rows + trace/report present), there is
+  // no layout overflow, and the page logged no console/page errors. Any of these failing → the clip
+  // is NOT trustworthy even if a video file gets produced.
+  const chip = page.locator(`#ex-${ex.id} .chip`);
+  const chipText = ((await chip.textContent().catch(() => '')) || '').trim();
+  const visible = await chip.isVisible().catch(() => false);
+  const box = await chip.boundingBox().catch(() => null);
+  const inViewport = !!box && box.y >= 0 && box.y <= SIZE.height && box.width > 20;
+  const fullText = chipText.includes(ex.verdict.trim());
+  const hasRows = (await page.locator(`#ex-${ex.id} table.kv td`).count()) > 0;
+  const hasEvidence = (await page.locator(`#ex-${ex.id} .trace, #ex-${ex.id} .report`).count()) > 0;
+  // The trace/report block is required ONLY for cards whose spec renders one (some are rows-only).
+  const evidenceOk = ex.has_evidence === false ? true : hasEvidence;
+  const overflow = await hasHorizontalOverflow(page);
+  const consoleErrors = log.console.filter((c) => c.type === 'error' && !/favicon/i.test(c.text)).length;
+  const ok = visible && inViewport && fullText && hasRows && evidenceOk && !overflow
+    && consoleErrors === 0 && log.pageErrors.length === 0;
   await sleep(3200); // dwell so the clip shows the contrast + verdict + trace
   await page.screenshot({ path: join(STILLS, `clip-${ex.id}.png`) }).catch(() => {});
   const handle = page.video();
   await page.close();
   await context.close();
   const out = await finalizeNativeVideo(handle, `examples-${ex.id}`);
-  return { id: ex.id, verdict: ex.verdict, verdict_on_screen: ok, video: out };
+  return { id: ex.id, verdict: ex.verdict, verdict_on_screen: ok, video: out,
+    checks: { visible, inViewport, fullText, hasRows, hasEvidence, overflow, consoleErrors, pageErrors: log.pageErrors.length } };
 }
 
 (async () => {
@@ -134,8 +158,20 @@ async function recordOne(browser, ex) {
 
   writeFileSync(join(DIRS.reports, 'examples-gallery.json'), JSON.stringify(report, null, 2));
   const clipsOk = report.clips.filter((c) => c.video && c.verdict_on_screen).length;
-  const walkOk = report.walkthrough && report.walkthrough.video && report.walkthrough.verdicts_on_screen === report.walkthrough.total;
+  const walkOk = report.walkthrough && report.walkthrough.video && report.walkthrough.verdicts_on_screen === report.walkthrough.total
+    && !report.walkthrough.overflow && !report.walkthrough.consoleErrors && !report.walkthrough.pageErrors;
   console.log(`\n  ${clipsOk}/${examples.length} example clips recorded with the real verdict on screen; walkthrough ${walkOk ? 'OK' : 'INCOMPLETE'}.`);
-  console.log(`  report: artifacts/e2e/reports/examples-gallery.json · videos: artifacts/e2e/videos/examples-*.{webm,mp4}`);
-  process.exit(clipsOk === examples.length && walkOk ? 0 : 1);
+  // ADVERSARIAL file verification: independently inspect the produced video FILES (not blank / black /
+  // frozen / truncated / wrong-size). On a FULL run, recording only "succeeds" if every file passes —
+  // a DOM assertion alone never proves the bytes show anything.
+  let filesOk = true;
+  if (!pick.length) {
+    console.log('\n  · adversarial video-file verification:');
+    const v = spawnSync(process.execPath, [join(HERE, 'verify_examples_gallery_videos.mjs')],
+      { cwd: REPO, encoding: 'utf-8' });
+    process.stdout.write((v.stdout || '').split('\n').map((l) => '  ' + l).join('\n'));
+    filesOk = v.status === 0;
+  }
+  console.log(`\n  report: artifacts/e2e/reports/examples-gallery.json · videos: artifacts/e2e/videos/examples-*.{webm,mp4}`);
+  process.exit(clipsOk === examples.length && walkOk && filesOk ? 0 : 1);
 })().catch((e) => { console.error(e); process.exit(1); });

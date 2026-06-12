@@ -320,6 +320,7 @@ def render(cards: list[dict[str, Any]]) -> str:
     return f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%235b6cff'/%3E%3C/svg%3E">
 <title>AI Done Right — Governed Examples Gallery</title>
 <style>{css}
 .exwrap{{max-width:1100px;margin:0 auto;padding:0 22px 80px}}
@@ -374,7 +375,10 @@ def build() -> dict[str, Any]:
     # Sidecar manifest the recorder reads to assert each card's REAL verdict (single source — no
     # HTML parsing, no drift between what's rendered and what's asserted on camera).
     manifest = [{"id": c["id"], "title": c["title"], "domain": c["domain"],
-                 "durability": c["durability"], "status": c["status"], "verdict": c["verdict"]}
+                 "durability": c["durability"], "status": c["status"], "verdict": c["verdict"],
+                 # whether this card renders a trace/report block (some are rows-only by design) —
+                 # the recorder requires the evidence block on screen ONLY when this is true.
+                 "has_evidence": bool(c.get("markdown") or c.get("trace"))}
                 for c in cards]
     (_OUT.parent / "examples.json").write_text(
         json.dumps({"examples": manifest}, indent=2), encoding="utf-8")
@@ -386,8 +390,11 @@ def _self_test() -> int:
     res = build()
     assert res["examples"] == len(EXAMPLES) == 11, res["examples"]
     page = _OUT.read_text(encoding="utf-8")
-    # The page is self-contained: no external CDN/script/analytics (recordable offline, honest).
-    assert "http://" not in page.split("<body>")[0] and "https://" not in page, "external resource leaked into the gallery"
+    # The page is self-contained: no external CDN/script/analytics FETCHED (recordable offline, honest).
+    # A data: URI or an SVG XML namespace inside one is fine — we flag only real fetched src=/href= URLs.
+    import re as _re
+    fetched = _re.findall(r'(?:src|href)\s*=\s*"(https?://[^"]+)"', page)
+    assert not fetched, f"external fetched resource leaked into the gallery: {fetched}"
     assert "<script" not in page.lower(), "gallery must be static (no JS)"
     # Every example rendered its REAL verdict (these are produced by run(), not typed here).
     cards = {c["id"]: c for c in res["cards"]}
