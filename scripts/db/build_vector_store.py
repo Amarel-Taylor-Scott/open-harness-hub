@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import re
 import sqlite3
 import sys
@@ -180,16 +181,86 @@ def regex_labels(doc: dict) -> list[dict]:
     return out
 
 
-def llm_label(doc: dict, model_route_id: str) -> list[dict]:
+# LLM labels propose from the SAME closed vocabulary as the regex rules — the
+# model never invents a label set (it must not draw its own map), and every
+# LLM row lands review_status='needs_review' until a gate clears it.
+LLM_LABEL_SYSTEM = (
+    "You label AI pipeline components. Choose ONLY from the allowed (label_set, label) "
+    "pairs given. Reply with a JSON array of objects: "
+    '[{"label_set": ..., "label": ..., "confidence": 0.0-1.0}]. '
+    "Reply [] when nothing applies. No prose."
+)
+LLM_REVIEW_STATUS = "needs_review"  # gate clears LLM rows; they never start auto-approved
+LLM_ASSIGNED_BY = "build_vector_store.llm"
+#: Proposals below this confidence are dropped at intake — a model unsure of a
+#: label should not create review load.
+LLM_MIN_CONFIDENCE = 0.2
+
+
+def label_vocabulary() -> list[tuple[str, str]]:
+    """The closed (label_set, label) vocabulary — REGEX_LABEL_RULES is the single source."""
+    return sorted({(ls, lab) for ls, lab, _ in REGEX_LABEL_RULES})
+
+
+def _parse_llm_labels(raw: str) -> list[dict]:
+    """Strict parse of the model reply (tolerates a fenced block, nothing else)."""
+    text = raw.strip()
+    if text.startswith("```"):
+        text = re.sub(r"^```[a-zA-Z]*\s*|\s*```$", "", text)
+    data = json.loads(text)  # malformed output raises — never guess labels
+    if not isinstance(data, list):
+        raise ValueError(f"expected a JSON array of labels, got {type(data).__name__}")
+    return [d for d in data if isinstance(d, dict)]
+
+
+def llm_label(doc: dict, model_route_id: str | None = None, route=None) -> list[dict]:
     """LLM-generated labels slot into label_assignment with assignment_method='llm'.
 
-    Not called offline (no model route here). Implement by calling a provider-
-    neutral model route, then returning rows like regex_labels() but with
-    assignment_method='llm', model_route_id set, confidence from the model, and
-    review_status='needs_review' until a gate clears them. Left as the explicit
-    extension point so we never fabricate LLM labels.
+    Calls the provider-neutral model route (`scripts.foundry.model_route`):
+    pass a route explicitly, or leave ``route=None`` to resolve one from the
+    environment via ``from_env()`` (OpenAI-compatible / Ollama / Anthropic-key
+    lanes). Without any configured route this RAISES — we never fabricate LLM
+    labels. Proposals outside the closed vocabulary are rejected; survivors
+    come back shaped like regex_labels() rows but with assignment_method='llm',
+    the route id, model-reported confidence, and review_status='needs_review'
+    until a gate clears them.
     """
-    raise NotImplementedError("wire a provider-neutral model route to enable LLM labels")
+    if route is None:
+        from scripts.foundry.model_route import from_env
+
+        route = from_env()
+    if route is None:
+        raise RuntimeError(
+            "no model route configured — set an OpenAI-compatible/Ollama route for "
+            "scripts.foundry.model_route.from_env(), or pass route= explicitly; "
+            "LLM labels are never fabricated offline")
+    vocab = label_vocabulary()
+    allowed = set(vocab)
+    pairs = "\n".join(f"- label_set={ls} label={lab}" for ls, lab in vocab)
+    prompt = (
+        f"Allowed (label_set, label) pairs:\n{pairs}\n\n"
+        f"Component description:\n{_doc_text(doc)[:4000]}\n\n"
+        "Which pairs apply? JSON array only."
+    )
+    rows: list[dict] = []
+    for item in _parse_llm_labels(route.complete(prompt, system=LLM_LABEL_SYSTEM)):
+        pair = (item.get("label_set"), item.get("label"))
+        if pair not in allowed:
+            continue  # out-of-vocabulary proposal — rejected, the model can't draw its own map
+        try:
+            confidence = max(0.0, min(1.0, float(item.get("confidence", 0.0))))
+        except (TypeError, ValueError):
+            continue  # unusable confidence — rejected
+        if confidence < LLM_MIN_CONFIDENCE:
+            continue
+        rows.append({
+            "label_set": pair[0], "label": pair[1],
+            "confidence": confidence, "assigned_by": LLM_ASSIGNED_BY,
+            "assignment_method": "llm",
+            "model_route_id": model_route_id or getattr(route, "name", "model-route"),
+            "review_status": LLM_REVIEW_STATUS,
+        })
+    return rows
 
 
 def build(

@@ -15,8 +15,16 @@ CLI: python3 scripts/check_ingest_markdown_folder.py --self-test
 from __future__ import annotations
 
 import argparse
+import sys
 from collections import Counter
 from pathlib import Path
+
+if __name__ == "__main__" and __package__ in (None, ""):  # pragma: no cover
+    import os
+
+    _RR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if _RR not in sys.path:
+        sys.path.insert(0, _RR)
 
 from scripts.ingest.source_adapters import SourceAdapter
 from scripts.runtime.verification_gate import VerificationGate
@@ -169,11 +177,14 @@ def _self_test() -> int:
         check("on-disk demo-data/markdown-vault/ fixture exists", False, str(_VAULT_DIR))
 
     ok = not fails
-    print(f"\n{'PASS — check_ingest_markdown_folder: notes flow through the governed path (source_record/field/'
-          'atomic_fact/narrative_allegation, correct #note.<relpath> handles); .obsidian ignored; frontmatter '
-          'parsed (no yaml dep); structured frontmatter promotion-eligible while note prose is held out and '
-          'never promotable; wikilinks captured as edge candidates; private vault stays tenant_private (no '
-          'global leak); facts gate-compatible; deterministic.' if ok else f'{len(fails)} FAILURES: {fails}'}")
+    # NOTE: the message is precomputed — a multi-line expression inside an f-string brace is
+    # PEP 701 (3.12+) syntax and CI runs Python 3.11.
+    pass_msg = ("PASS — check_ingest_markdown_folder: notes flow through the governed path (source_record/field/"
+                "atomic_fact/narrative_allegation, correct #note.<relpath> handles); .obsidian ignored; frontmatter "
+                "parsed (no yaml dep); structured frontmatter promotion-eligible while note prose is held out and "
+                "never promotable; wikilinks captured as edge candidates; private vault stays tenant_private (no "
+                "global leak); facts gate-compatible; deterministic.")
+    print("\n" + (pass_msg if ok else f"{len(fails)} FAILURES: {fails}"))
     return 0 if ok else 1
 
 

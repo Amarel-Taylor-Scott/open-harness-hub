@@ -171,9 +171,14 @@ def _self_test() -> int:
           str(report.orphaned_input_ids))
 
     ok = not fails
-    print(
-        f"\n{'PASS — check_cfpb_lossless_distillation: the EXISTING CFPB->consumption path is lossless — raw/source/#field atomic_facts survive; FAQ-30 + allegations are held out but rehydratable; the answer stays \"10 business days\"; the optimized pack carries baseline lineage; rejected candidates stay queryable; a rollback target (un-mutated baseline) exists; NO source artifact deleted; the InformationRetentionReport confirms safe_to_promote.' if ok else f'{len(fails)} FAILURES: {fails}'}"
-    )
+    # NOTE: the message is precomputed — a backslash escape inside an f-string brace is
+    # PEP 701 (3.12+) syntax and CI runs Python 3.11.
+    pass_msg = ('PASS — check_cfpb_lossless_distillation: the EXISTING CFPB->consumption path is lossless — '
+                'raw/source/#field atomic_facts survive; FAQ-30 + allegations are held out but rehydratable; the '
+                'answer stays "10 business days"; the optimized pack carries baseline lineage; rejected candidates '
+                'stay queryable; a rollback target (un-mutated baseline) exists; NO source artifact deleted; the '
+                'InformationRetentionReport confirms safe_to_promote.')
+    print("\n" + (pass_msg if ok else f"{len(fails)} FAILURES: {fails}"))
     return 0 if ok else 1
 
 

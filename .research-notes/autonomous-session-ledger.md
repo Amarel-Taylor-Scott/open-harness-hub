@@ -2371,3 +2371,59 @@ generator --check + preflight GO + dependency-law. Remaining honest gaps (NOT pl
 the zero-op launch thread (needs the Fly token) + the named-suite registry behind benchmark_ref
 + a lift PRODUCER per capability (the bridge consumes, nothing yet produces). NEXT: real videos
 of the new value-adds once a demo plane is up.
+
+## 2026-06-12 — "Make everything real" hygiene wave (warrant: explicit owner directive)
+
+**Owner directive:** "make everything real, use 100% of your power, no half finish items,
+everything should work." Warrant class: clear user intent; all changes below are
+self-test-gated (green before commit).
+
+- **Flywheel RED→GREEN (438/438; was 432/438).** Root causes, all in proof scripts, none in
+  product code: (a) PEP-701-only f-strings (multi-line/backslash expressions inside braces) in
+  check_ingest_markdown_folder / check_ingest_folder_batch / check_cfpb_lossless_distillation /
+  check_contextops_triage — parse on 3.12+, CI runs 3.11; messages precomputed, byte-equal
+  output; (b) the two ingest proofs also lacked the repo-root sys.path bootstrap; (c)
+  check_no_direct_supermemory_imports + check_lossless_distillation_full_stack were downstream
+  casualties of (a). No assertion weakened.
+- **Catalog implementation debt audited exhaustively:** 179 in-repo `implementations[].path`
+  callables across 2,681 manifests; **69 did not resolve** (validate.py prints only a varying
+  subset per run — the count came from a full importlib sweep, not the validator output).
+- **28 of 69 made real this session** (pure stdlib, deterministic, time-injected, No-Magic-Values,
+  on_error=raise, every module self-tested with a PASS line):
+  - `scripts/processors/cache/` (4): cache_exact (canonical-JSON SHA-256 keying), cache_semantic
+    (TF-cosine paraphrase hits; personalized entries NEVER served; tenant-scoped), cache_kv_reuse
+    (longest whole-token prefix plan, model-scoped, 7x LMCache ceiling), cache_prompt_prefix
+    (stable-prefix detection; Anthropic cache_control + OpenAI >=1024 eligibility).
+  - `scripts/processors/memory/` (6): memory_recall (semantic+recency, tenant_private never
+    leaks), memory_reflect (themed synthesis, fact!=opinion, conflicts surfaced Unresolved,
+    serves_truth=False), memory_distilled_write (quote+turn lineage, held_out with reasons,
+    content-addressed replay-stable fact ids), memory_agentic_hierarchy (budgeted page-out/in,
+    pins never dropped, evictions MOVE — lossless), memory_confidence_track (log-odds belief,
+    authority-ordered weights, 10 opinions can never SUPPORT a fact), memory_temporal_graph
+    (validity intervals, supersede-never-delete, what-was-true-when queries).
+  - `scripts/processors/retrieval/` (17): bm25_keyword_retrieve, exact_id_lookup, rrf_fusion,
+    mmr_diversity_select, simhash_dedupe (threshold re-measured for chunk scale: near-dup 7 bits
+    vs unrelated 36 → 10-bit default), fuzzy_trigram_retrieve, source_precedence_select
+    (conflicts flagged_not_averaged), recursive_character_chunker, page_aware_chunker (tables
+    never torn; anchors never invented), json_repair_coerce (one bounded repair pass,
+    refuse-to-guess), prompt_injection_screen (halt-on-detect, chunk lineage),
+    extractive_span_selector (verbatim spans + offsets), context_placer_edge (#1 opens/#2
+    closes), system_prompt_builder (non-omittable cite-or-abstain), llmlingua_compress (honest
+    proxy-scorer labeling), dense_vector_retrieve (injected embedder or hash placeholder
+    HONESTLY labeled via scripts.embeddings — single source), hybrid_retrieve_fuse (composes the
+    single-source siblings + RRF).
+- **llm_label() wired for real** (scripts/db/build_vector_store.py): provider-neutral
+  scripts.foundry.model_route, CLOSED vocabulary from REGEX_LABEL_RULES (model can't draw its
+  own map), assignment_method='llm', review_status='needs_review', honest RuntimeError without a
+  route (labels never fabricated). Proven with a scripted route.
+- **revfactory/harness intake (owner question):** ran through the REAL repo_intel engine →
+  `intake_as_skill_candidate` (Apache-2.0 license_ok, no quarantine, trend LOW pending a 2nd
+  snapshot, hubs: openskillshub/openharnesshub/shared-template-registry/teleon) with the full
+  proof_to_promote ladder; snapshot appended to .agent/repo-intel/snapshots.jsonl. Discovery !=
+  trust; never auto-active.
+- **Deploy preflight: GO 9/9.** validate.py: all manifests valid. make test: foundry suite green.
+- **Remaining honest tail (enumerated, not silent):** 41 catalog callables still unresolved —
+  retrieval 6 (contextual_compressor, cross_encoder_reranker, graphrag_retrieve,
+  grep_agentic_retrieve, hyde_query_expander, multi_query_expander), deliver 10, clinical 8,
+  connectors 3, top-level 14 (list: /tmp/contracts_59.txt; regenerate via the importlib sweep) —
+  plus wedge/benchmark.py live-baseline lane and emit/mcp_server.py generated-handler wiring.

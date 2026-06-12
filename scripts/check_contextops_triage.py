@@ -236,9 +236,18 @@ def _self_test() -> int:
     check("an out-of-enum lane is REJECTED by the v1 schema", _validate(forged_lane, schema) != [])
 
     ok = not fails
-    print(
-        f"\n{'PASS — check_contextops_triage: the ContextTriageClassifier routes context into the 12 lanes deterministically (taxonomy == the contract enum, every lane demonstrated by a fixture); the CFPB reference case (FAQ \"30 days\" vs Reg-E source of law) classifies as needs_reconciliation + is_low_authority + is_conflict_candidate; a narrative_allegation can never become a verified/reusable fact, a model_interpretation requires source support, current/rate/fee/deadline claims are fragile, a FAQ ranks below a source of law, tenant_private context stays tenant-scoped; every result pins serves_truth=False; identical inputs give a byte-identical result + a clock-free content-addressed triage_id; to_dict() validates against ContextTriageResult.v1 and a serves_truth=true / out-of-enum-lane mutation is rejected by that schema.' if ok else f'{len(fails)} FAILURES: {fails}'}"
-    )
+    # NOTE: the message is precomputed — a backslash escape inside an f-string brace is
+    # PEP 701 (3.12+) syntax and CI runs Python 3.11.
+    pass_msg = ('PASS — check_contextops_triage: the ContextTriageClassifier routes context into the 12 lanes '
+                'deterministically (taxonomy == the contract enum, every lane demonstrated by a fixture); the CFPB '
+                'reference case (FAQ "30 days" vs Reg-E source of law) classifies as needs_reconciliation + '
+                'is_low_authority + is_conflict_candidate; a narrative_allegation can never become a verified/reusable '
+                'fact, a model_interpretation requires source support, current/rate/fee/deadline claims are fragile, '
+                'a FAQ ranks below a source of law, tenant_private context stays tenant-scoped; every result pins '
+                'serves_truth=False; identical inputs give a byte-identical result + a clock-free content-addressed '
+                'triage_id; to_dict() validates against ContextTriageResult.v1 and a serves_truth=true / '
+                'out-of-enum-lane mutation is rejected by that schema.')
+    print("\n" + (pass_msg if ok else f"{len(fails)} FAILURES: {fails}"))
     return 0 if ok else 1
 
 

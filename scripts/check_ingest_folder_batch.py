@@ -15,7 +15,15 @@ CLI: python3 scripts/check_ingest_folder_batch.py --self-test
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
+
+if __name__ == "__main__" and __package__ in (None, ""):  # pragma: no cover
+    import os
+
+    _RR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if _RR not in sys.path:
+        sys.path.insert(0, _RR)
 
 from scripts.ingest.source_adapters import SourceAdapter
 from src.baltor.adapters.source.folder_batch import LocalFolderBatchAdapter
@@ -144,11 +152,14 @@ def _self_test() -> int:
         check("on-disk demo-data/folder-batch/ fixture exists", False, str(_BATCH_DIR))
 
     ok = not fails
-    print(f"\n{'PASS — check_ingest_folder_batch: a mixed-extension folder is classified + routed to existing '
-          'adapters behind normalize(); a folder_manifest source artifact + per-file artifacts + batch summary '
-          'are produced; a .pdf/.txt is HONESTLY non-consumable (raw stored, never faked) and one bad/raising '
-          'file does NOT abort the batch; per-file idempotency key = tenant+relpath+content_hash; a duplicate '
-          'run is byte-identical (deterministic).' if ok else f'{len(fails)} FAILURES: {fails}'}")
+    # NOTE: the message is precomputed — a multi-line expression inside an f-string brace is
+    # PEP 701 (3.12+) syntax and CI runs Python 3.11.
+    pass_msg = ("PASS — check_ingest_folder_batch: a mixed-extension folder is classified + routed to existing "
+                "adapters behind normalize(); a folder_manifest source artifact + per-file artifacts + batch summary "
+                "are produced; a .pdf/.txt is HONESTLY non-consumable (raw stored, never faked) and one bad/raising "
+                "file does NOT abort the batch; per-file idempotency key = tenant+relpath+content_hash; a duplicate "
+                "run is byte-identical (deterministic).")
+    print("\n" + (pass_msg if ok else f"{len(fails)} FAILURES: {fails}"))
     return 0 if ok else 1
 
 
