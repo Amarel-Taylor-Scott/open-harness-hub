@@ -755,7 +755,10 @@
       "owner": "teleon",
       "port": 9426,
       "process_group": "local_receipt_service",
-      "start_command": null,
+      "start_command": [
+        "python3",
+        "scripts/receipt_local_service.py"
+      ],
       "stop_command": null,
       "health_url": "http://127.0.0.1:9426/healthz",
       "ready_url": "http://127.0.0.1:9426/readyz",
@@ -765,18 +768,16 @@
       ],
       "env_file": null,
       "allowed_consumers": [
-        "baltor",
-        "teleon",
-        "harness-hub"
+        "internal_service"
       ],
-      "auth_mode": "local_internal_service_token",
+      "auth_mode": "internal_service",
       "data_classes": [
-        "receipt_metadata_no_secrets"
+        "receipts_no_secrets"
       ],
       "logs_path": "dist/local-services/local_receipt_service.log",
       "screenshot_required": false,
       "trycloudflare_required": false,
-      "status": "planned",
+      "status": "active_local",
       "held_reason": "gate-specified; ModelInvocationReceipt + evidence-ledger machinery exists in src/teleon \u2014 project it behind a local HTTP surface, don't duplicate"
     },
     {
@@ -785,7 +786,10 @@
       "owner": "teleon",
       "port": 9427,
       "process_group": "local_state_service",
-      "start_command": null,
+      "start_command": [
+        "python3",
+        "scripts/state_local_service.py"
+      ],
       "stop_command": null,
       "health_url": "http://127.0.0.1:9427/healthz",
       "ready_url": "http://127.0.0.1:9427/readyz",
@@ -795,16 +799,16 @@
       ],
       "env_file": null,
       "allowed_consumers": [
-        "all_local_surfaces"
+        "internal_service"
       ],
-      "auth_mode": "realm_session_or_scoped_api_key",
+      "auth_mode": "internal_service",
       "data_classes": [
-        "local_session_state"
+        "session_state_no_secrets"
       ],
       "logs_path": "dist/local-services/local_state_service.log",
       "screenshot_required": false,
       "trycloudflare_required": false,
-      "status": "planned",
+      "status": "active_local",
       "held_reason": "gate-specified; src/teleon/blackboard (local SQLite, append-only) is the candidate substrate \u2014 wire, don't duplicate; never truth"
     },
     {

@@ -628,4 +628,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/processors/compression/cohort_policy_selector.py", "cohort_policy_selector"),
     # ── Model-provider LANES wired end-to-end (backlog #4): scripts/check_model_provider_lanes.py — Ollama Cloud / Mistral / OpenRouter / Anthropic / OpenAI / local Ollama each have a governed graph node (external nodes carry secret_ref + local_equivalent) AND a verified env→route mapping through model_route.from_env (offline, no network); live smoke runs only with a real key + OH_LANE_SMOKE_LIVE=1. ──
     ("scripts/check_model_provider_lanes.py", "check_model_provider_lanes"),
+    # ── Receipt service (#10c; was status:planned): scripts/receipt_local_service.py — fulfils local_receipt_service (:9426); append-only content-addressed receipts for important flows (is_truth=false — the gate promotes, not this); filter by kind/flow, get by id; same content → same id (replay-detectable). ──
+    ("scripts/receipt_local_service.py", "receipt_local_service"),
+    # ── State service (#10c; was status:planned): scripts/state_local_service.py — fulfils local_state_service (:9427); keyed session/action state replayed from an append-only op-log (set/append/delete), truth_authority=false always; crash-safe history. ──
+    ("scripts/state_local_service.py", "state_local_service"),
 ]
