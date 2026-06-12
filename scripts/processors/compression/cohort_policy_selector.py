@@ -204,7 +204,6 @@ def _self_test() -> int:
     # A power-user policy compresses HARDER (keeps fewer tokens) than a fresh policy on the
     # same items — the curves actually differ.
     items = [{"id": fid, "text": "stable code body " * 30} for fid in served]
-    naive = sum(len("stable code body " * 30).__class__ and 1 for _ in items)  # placeholder
     full_tokens = sum(len(("stable code body " * 30).split()) for _ in items)
     power_budget = max(1, int(full_tokens * p_policy["budget_fraction"]))
     fresh_budget = max(1, int(full_tokens * f_policy["budget_fraction"]))

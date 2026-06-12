@@ -34,6 +34,30 @@ PROVIDER_BY_TRANSPORT = {
     "none":                 "echo",
 }
 
+#: The emitted config lives at dist/promptfoo/<slug>.promptfooconfig.yaml; the dataset split paths
+#: are repo-relative (e.g. data/<x>/samples/). promptfoo resolves file:// against the config's own
+#: directory, so reach the repo root with two ".." hops. Single constant, not a literal per call.
+_CONFIG_TO_REPO = "../../"
+
+
+def _resolve_dataset(benchmark: dict, catalog: dict) -> dict | None:
+    """The dataset manifest a benchmark binds, if any (mirrors how rubric is resolved)."""
+    ref = benchmark.get("dataset")
+    if not isinstance(ref, str) or not ref:
+        return None
+    entry = catalog.get(ref)
+    return entry[1] if entry else None
+
+
+def _dataset_split(dataset: dict) -> tuple[str | None, int, str | None]:
+    """Pick the eval split (prefer `test`) → (path, declared_row_count, split_name)."""
+    splits = dataset.get("splits", {}) or {}
+    name = "test" if "test" in splits else next(iter(splits), None)
+    if not name:
+        return None, 0, None
+    split = splits.get(name) or {}
+    return split.get("path"), int(split.get("rows", 0) or 0), name
+
 
 def render(benchmark: dict, catalog: dict) -> str:
     slug = slug_only(benchmark["id"])
@@ -69,17 +93,25 @@ def render(benchmark: dict, catalog: dict) -> str:
     if not asserts:
         asserts.append({"type": "contains-json"})
 
+    # Bind tests to the dataset's eval split via promptfoo's native file loader — one test per real
+    # row, never a fabricated placeholder. If no dataset is bound (or it declares no split), emit an
+    # HONEST single schema smoke test, clearly labelled as not-a-benchmark-run.
+    dataset = _resolve_dataset(benchmark, catalog)
+    ds_path, ds_rows, ds_split = _dataset_split(dataset) if dataset else (None, 0, None)
+    if ds_path:
+        tests: object = f"file://{_CONFIG_TO_REPO}{ds_path.rstrip('/')}/*.json"
+    else:
+        tests = [{
+            "description": "No dataset bound — schema smoke test only (not a scored benchmark run).",
+            "vars": {"prompt": "Return a JSON object that satisfies the benchmark output schema."},
+        }]
+
     config: dict = {
         "description": benchmark.get("description", "").strip(),
         "prompts":     ["{{prompt}}"],
         "providers":   providers,
         "defaultTest": {"assert": asserts},
-        "tests":       [
-            {
-                "description": f"Sample row 0 from {benchmark.get('dataset','dataset')}",
-                "vars":        {"prompt": "TODO: replace with rows from dataset"},
-            }
-        ],
+        "tests":       tests,
         "outputPath":  f"./reports/{slug}.json",
         "writeLatestResults": True,
         "metadata": {
@@ -87,6 +119,9 @@ def render(benchmark: dict, catalog: dict) -> str:
             "version":              benchmark.get("version", "0.0.0"),
             "headline_metric":      benchmark.get("headline_metric"),
             "reproducibility":      benchmark.get("reproducibility", {}),
+            "dataset":              dataset["id"] if dataset else None,
+            "dataset_split":        ds_split,
+            "dataset_rows":         ds_rows,
         },
     }
 
@@ -99,7 +134,35 @@ def render(benchmark: dict, catalog: dict) -> str:
     return header + yaml_out
 
 
-def main() -> int:
+def _self_test() -> int:
+    # A benchmark that binds a dataset → tests load from the split path (real rows, no placeholder).
+    cat = {
+        "dataset/demo-samples": (None, {"id": "dataset/demo-samples", "type": "dataset",
+                                        "splits": {"test": {"rows": 12, "path": "data/demo/samples/"}}}),
+    }
+    bench = {"id": "benchmark/demo", "version": "1.0.0", "dataset": "dataset/demo-samples",
+             "description": "demo", "model_arms": [{"label": "bare"}]}
+    out = render(bench, cat)
+    assert "TODO" not in out, "placeholder row leaked into the emitted config"
+    assert "file://../../data/demo/samples/*.json" in out, out
+    assert "dataset_rows: 12" in out and "dataset_split: test" in out, out
+    # A benchmark with NO dataset → an honest smoke test, still no TODO.
+    nods = render({"id": "benchmark/x", "version": "1.0.0", "model_arms": [{"label": "bare"}]}, {})
+    assert "TODO" not in nods and "schema smoke test only" in nods, nods
+    assert "dataset: null" in nods
+    # Deterministic.
+    assert render(bench, cat) == render(bench, cat)
+    print("PASS — emit/promptfoo: benchmark.dataset → promptfoo tests bound to the split path via "
+          "file:// (real rows, never a TODO placeholder); unbound benchmark → honest schema smoke "
+          "test; dataset id/split/rows in metadata; deterministic")
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    if argv is None:
+        argv = sys.argv[1:]
+    if "--self-test" in argv:
+        return _self_test()
     catalog = load_catalog()
     out_dir = DIST / "promptfoo"
     if out_dir.exists():
