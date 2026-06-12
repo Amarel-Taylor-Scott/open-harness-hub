@@ -85,6 +85,26 @@ EXAMPLES: list[dict[str, Any]] = [
         "markdown": lambda o: o["report_markdown"], "trace": lambda o: o["trace"],
     },
     {
+        "id": "related_party_network", "title": "Related-party / shell-network discovery",
+        "domain": "Financial crime · KYB · entity resolution", "durability": "Aggregation",
+        "scenario": "Screen a registry of staffing agencies for hidden networks — cluster over shared "
+                    "addresses, phones, officers, and M&A events.",
+        "fails": "A bare model takes each entity at face value (different names, different rows) and "
+                 "says “independent.” It can’t normalize identifiers or compute connected components.",
+        "invoke": lambda m: m.run(entities=m._ENTITIES, ma_events=m._MA_EVENTS, sources=m._SOURCES),
+        "verdict": lambda o: ("block" if o["high_risk_count"] else "serve",
+                              f"{o['high_risk_count']} shell network(s) flagged" if o["high_risk_count"]
+                              else "no undisclosed networks"),
+        "rows": lambda o: [("Clusters found", str(len(o["clusters"])))]
+                          + [(" · ".join(c["members"]),
+                              f"{c['risk'].upper()} — shares {', '.join(c['shared_kinds'])}"
+                              + (f"; M&A {', '.join(c['disclosed_ma'])}" if c["disclosed_ma"] else ""))
+                             for c in o["clusters"] if len(c["members"]) > 1]
+                          + [("Escalated", ", ".join(o["escalated"]) or "none"),
+                             ("Serves truth", str(o["serves_truth"]))],
+        "markdown": lambda o: o["report_markdown"], "trace": lambda o: o["trace"],
+    },
+    {
         "id": "cve_dependency_triage", "title": "CVE / dependency vulnerability triage",
         "domain": "Software supply chain · security", "durability": "Freshness + exactness",
         "scenario": "Is CVE-2024-3094 affecting us? Match the advisory’s version range against the "
@@ -97,6 +117,23 @@ EXAMPLES: list[dict[str, Any]] = [
         "rows": lambda o: [("Affected package", o["affected_packages"][0]["name"] + " " +
                             o["affected_packages"][0]["installed"]),
                            ("Known-exploited (KEV)", str(o["kev"])), ("Escalated", str(o["escalated"]))],
+        "markdown": lambda o: o["report_markdown"], "trace": lambda o: o["trace"],
+    },
+    {
+        "id": "common_control_resolver", "title": "Common control from M&A news",
+        "domain": "Financial crime · audit · M&A", "durability": "Aggregation + freshness",
+        "scenario": "Chain M&A deals by date to each company’s ultimate parent, then check if a "
+                    "vendor↔customer transaction is actually self-dealing under common control.",
+        "fails": "A bare model doesn’t know post-cutoff deals, can’t chain acquirer-of-acquirer "
+                 "ownership, and misses that today’s “arm’s-length” vendor was bought by the customer’s parent.",
+        "invoke": lambda m: m.run(transaction=m._TRANSACTION, ma_events=m._MA_EVENTS, sources=m._SOURCES),
+        "verdict": lambda o: ("block" if o["under_common_control"] else "serve",
+                              f"RELATED-PARTY — both controlled by {o['ultimate_parent']}"
+                              if o["under_common_control"] else "arm’s-length (no common control)"),
+        "rows": lambda o: [("Buyer control chain", " → ".join(o["buyer_chain"])),
+                           ("Seller control chain", " → ".join(o["seller_chain"])),
+                           ("Ultimate parent", o["ultimate_parent"] or "—"),
+                           ("As of", o["as_of"]), ("Escalated", str(o["escalated"]))],
         "markdown": lambda o: o["report_markdown"], "trace": lambda o: o["trace"],
     },
     {
@@ -328,7 +365,7 @@ def build() -> dict[str, Any]:
 
 def _self_test() -> int:
     res = build()
-    assert res["examples"] == len(EXAMPLES) == 8, res["examples"]
+    assert res["examples"] == len(EXAMPLES) == 10, res["examples"]
     page = _OUT.read_text(encoding="utf-8")
     # The page is self-contained: no external CDN/script/analytics (recordable offline, honest).
     assert "http://" not in page.split("<body>")[0] and "https://" not in page, "external resource leaked into the gallery"
@@ -337,6 +374,8 @@ def _self_test() -> int:
     cards = {c["id"]: c for c in res["cards"]}
     assert "BLOCKED" in cards["sanctions_aml_screening"]["verdict"] and "54%" in cards["sanctions_aml_screening"]["verdict"]
     assert "AFFECTED" in cards["cve_dependency_triage"]["verdict"] and "KEV" in cards["cve_dependency_triage"]["verdict"]
+    assert "shell network" in cards["related_party_network"]["verdict"] and cards["related_party_network"]["status"] == "block"
+    assert "RELATED-PARTY" in cards["common_control_resolver"]["verdict"] and "ParentCo" in cards["common_control_resolver"]["verdict"]
     assert "abstained" in cards["icd10_coding"]["verdict"] and any("ABSTAINED" in k for k, _ in cards["icd10_coding"]["rows"])
     assert "SERVED" in cards["regulated_fact_qa"]["verdict"]
     assert "28%" in page and any("28%" in v for _, v in cards["regulated_fact_qa"]["rows"]), "the served answer (28%) must appear"

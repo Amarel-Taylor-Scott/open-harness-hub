@@ -39,4 +39,12 @@ Pipelines:
   icd10_coding          — ICD-10 coding assistant (durability: CODED VOCABULARY): SOAP
                           structure → ground each documented diagnosis to the terminology
                           → ABSTAIN over fabricate → propose to a human coder.
+  related_party_network — shell-network discovery (durability: AGGREGATION): normalize
+                          identifiers → shared-address/phone/officer graph → union-find
+                          components; "independent" agencies sharing identifiers collapse
+                          into one HIGH-risk network; a disclosed M&A group stays NORMAL.
+  common_control_resolver — common control from M&A news (durability: AGGREGATION +
+                          FRESHNESS): chain acquisitions by date → ultimate parent; a
+                          vendor↔customer transaction under one parent is flagged as a
+                          related-party (self-dealing) transaction — temporal/as-of aware.
 """
