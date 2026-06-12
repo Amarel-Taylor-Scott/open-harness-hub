@@ -152,6 +152,25 @@ EXAMPLES: list[dict[str, Any]] = [
         "markdown": lambda o: None, "trace": lambda o: o["trace"],
     },
     {
+        "id": "procurement_collusion_ring", "title": "Procurement bid-rigging ring",
+        "domain": "Public procurement · fraud", "durability": "Aggregation",
+        "scenario": "Screen a tender ledger for a bid-rigging ring — vendors who rotate wins and "
+                    "submit cover bids (deliberately high losing bids) to fake competition.",
+        "fails": "A bare model scores each tender in isolation and calls it competitive. The ring is "
+                 "a property of the WHOLE bid history — who co-bids, whether wins rotate, cover-bid bands.",
+        "invoke": lambda m: m.run(tenders=m._TENDERS, sources=m._SOURCES),
+        "verdict": lambda o: ("block" if o["is_ring"] else "serve",
+                              (f"BID-RIGGING RING — {len(o['ring'])} vendors, "
+                               f"{o['signals']['cover_bid_share']:.0%} cover-bid tenders") if o["is_ring"]
+                              else "competitive (no ring)"),
+        "rows": lambda o: [("Ring members", " · ".join(o["ring"]) or "none"),
+                           ("Wins rotate among them", str(o["signals"]["wins_rotate"])),
+                           ("Rotating winners", " · ".join(o["signals"]["winners"]) or "—"),
+                           ("Cover-bid tenders", f"{o['signals']['cover_bid_share']:.0%}"),
+                           ("Escalated", str(o["escalated"]))],
+        "markdown": lambda o: o["report_markdown"], "trace": lambda o: o["trace"],
+    },
+    {
         "id": "regulated_fact_qa", "title": "Regulated-fact QA — state interest-rate caps",
         "domain": "Consumer finance · regulated facts", "durability": "Precedence + freshness",
         "scenario": "“What is the consumer loan interest rate cap in Ohio?” — answer only from the "
@@ -365,7 +384,7 @@ def build() -> dict[str, Any]:
 
 def _self_test() -> int:
     res = build()
-    assert res["examples"] == len(EXAMPLES) == 10, res["examples"]
+    assert res["examples"] == len(EXAMPLES) == 11, res["examples"]
     page = _OUT.read_text(encoding="utf-8")
     # The page is self-contained: no external CDN/script/analytics (recordable offline, honest).
     assert "http://" not in page.split("<body>")[0] and "https://" not in page, "external resource leaked into the gallery"
@@ -376,6 +395,7 @@ def _self_test() -> int:
     assert "AFFECTED" in cards["cve_dependency_triage"]["verdict"] and "KEV" in cards["cve_dependency_triage"]["verdict"]
     assert "shell network" in cards["related_party_network"]["verdict"] and cards["related_party_network"]["status"] == "block"
     assert "RELATED-PARTY" in cards["common_control_resolver"]["verdict"] and "ParentCo" in cards["common_control_resolver"]["verdict"]
+    assert "BID-RIGGING RING" in cards["procurement_collusion_ring"]["verdict"] and cards["procurement_collusion_ring"]["status"] == "block"
     assert "abstained" in cards["icd10_coding"]["verdict"] and any("ABSTAINED" in k for k, _ in cards["icd10_coding"]["rows"])
     assert "SERVED" in cards["regulated_fact_qa"]["verdict"]
     assert "28%" in page and any("28%" in v for _, v in cards["regulated_fact_qa"]["rows"]), "the served answer (28%) must appear"

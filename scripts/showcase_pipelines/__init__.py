@@ -47,4 +47,8 @@ Pipelines:
                           FRESHNESS): chain acquisitions by date → ultimate parent; a
                           vendor↔customer transaction under one parent is flagged as a
                           related-party (self-dealing) transaction — temporal/as-of aware.
+  procurement_collusion_ring — bid-rigging detection (durability: AGGREGATION):
+                          aggregate bids across tenders → a co-bidding group whose wins
+                          rotate and whose losing bids are cover bids is flagged as a ring;
+                          an honest undercutter is excluded, a competitive ledger is not.
 """
