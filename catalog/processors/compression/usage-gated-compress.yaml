@@ -1,0 +1,55 @@
+id: processor/usage-gated-compress
+type: processor
+version: 0.1.0
+name: Usage-gated compression (prediction-error retention)
+description: Prediction-error-gated context retention (the Friston move) — keep a usage prior learned from
+  past turns and spend token fidelity only on surprising or load-bearing context (utility + volatility +
+  recency), compressing the predictable, re-read-as-ritual remainder to FULL/SUMMARY/HANDLE_ONLY tiers under
+  a budget. Cross-turn + model-external (unlike H2O's attention gate or LLMLingua's per-prompt perplexity) and
+  it cuts PREFILL re-read cost. Lossless — paged-out items keep a rehydratable handle; a prediction miss
+  re-promotes them.
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+capability:
+- summarization
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- baltor
+- compression
+- tier
+- context-layer
+created: '2026-06-12'
+updated: '2026-06-12'
+attribution:
+  source_kind: manual
+  author: Open Harness Hub — Baltor
+  license: MIT
+process_kind: compress.usage_gated
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: items
+  type: object
+- name: prior
+  type: object
+- name: token_budget
+  type: object
+outputs:
+- name: plan
+  type: object
+side_effects: none
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.compression.usage_gated_compress.run
+  language: python
+links:
+  source: docs/concepts/prediction-error-gated-context.md

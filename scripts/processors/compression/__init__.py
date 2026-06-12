@@ -11,4 +11,12 @@ Modules:
                          (process_kind compress.structural): strip code bodies,
                          keep signatures + structure (Repomix-style), for
                          Python and JS/TS, degrading gracefully on other text.
+  usage_gated_compress — backs processor/usage-gated-compress
+                         (process_kind compress.usage_gated): prediction-error-
+                         gated retention (the Friston move) — a usage prior
+                         learned from past turns decides per-item FULL/SUMMARY/
+                         HANDLE_ONLY fidelity under a budget; cross-turn,
+                         model-external, lossless (paged-out items rehydrate on
+                         a prediction miss). See
+                         docs/concepts/prediction-error-gated-context.md.
 """
