@@ -53,3 +53,19 @@ cls = E.classify(repo)
 print(E.intake_decision(repo, cls, E.compute_trend(repo), E.risk(repo), now="<iso8601>"))
 PY
 ```
+
+## Batch 2 (same session) — ingestion / parsing / routing / serving lanes
+
+| Repo | Stars | License | Intake decision | Lane | Maps to (ours) |
+|---|---|---|---|---|---|
+| microsoft/markitdown | 151.8k | MIT | intake_as_tool_candidate | wrap | `doc_to_markdown_rag_ingest` (catalog) — the any-format→Markdown converter behind the same seam; pairs with native-format-preservation sidecars. |
+| docling-project/docling | 61.4k | MIT | intake_as_tool_candidate | wrap | the live `DoclingParser` backend our `scripts/ingest/parser_provider.py` seam already names — wiring it = installing the optional dep, the seam exists. |
+| vllm-project/vllm | 82.7k | Apache-2.0 | intake_as_tool_candidate | integrate (serving) | the self-hosted inference engine the Teleon plane would run; pairs with LMCache for the KV layer `cache_kv_reuse` plans for. |
+| infiniflow/ragflow | 82.6k | Apache-2.0 | intake_as_tool_candidate | inspiration + foil | full RAG platform — compare their chunk/citation UX against our governed retrieval family; we differentiate on verification + receipts. |
+| tesseract-ocr/tesseract | 74.6k | Apache-2.0 | intake_as_tool_candidate | wrap | the OCR engine behind `on_device_ocr_prepass` (catalog) — engine injected, prompt-block contract ours. |
+| unclecode/crawl4ai | 68.3k | Apache-2.0 | watch | wrap (pending) | LLM-friendly crawler for the acquisition lane; thin API description → re-classify after a content crawl. |
+| BerriAI/litellm | 50.2k | NOASSERTION | **quarantine (no_license)** | wrap (pending) | unified model routing — overlaps our OIPS gateway; SPDX shows NOASSERTION (mixed MIT + enterprise dirs) so the engine refuses until owner license review. |
+| firecrawl/firecrawl | 131.8k | AGPL-3.0 | **quarantine (restrictive)** | inspiration only | scrape→LLM-ready markdown; AGPL is incompatible with our open-core commercial layer — read the design, never vendor the code. |
+
+Governance note: two more high-star quarantines (litellm NOASSERTION, firecrawl AGPL) —
+the license gate is doing exactly its job on the most popular repos in the batch.
