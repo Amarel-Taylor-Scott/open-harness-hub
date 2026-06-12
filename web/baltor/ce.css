@@ -450,7 +450,21 @@
   .ce-eng-metrics { grid-template-columns: 1fr 1fr; }
   .ce-eng-zone b { font-size: 8.5px; }
   .ce-eng-zone span { display: none; }
+  .ce-top-nav { display: none; }
 }
+/* phones: keep the top bar + the inline A/B preview controls from forcing horizontal page scroll
+   (QA stress test found top-bar + .ce-abset overflow at 320-390px) — tighten the bar, drop the
+   redundant "Sign in" link, and hide the prototype A/B preview affordance on phones */
+@media (max-width: 460px) {
+  .ce-top { gap: 10px; }
+  .ce-top-r { gap: 8px; }
+  .ce-top-r .ce-navlink { display: none; }
+  .ce-abset { display: none; }
+  .ce-foot-links { flex-wrap: wrap; gap: 12px 18px; }
+}
+/* phone + tablet: no element may force a horizontal scrollbar (clip is sticky-safe, unlike hidden) */
+@media (max-width: 900px) { .ce-page { overflow-x: clip; } }
+@media (max-width: 360px) { .ce-top-r .oh-btn { padding: 7px 11px; } }
 
 /* ---------- corpus commons (oracle marketplace) ---------- */
 .ce-dash-engine { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }

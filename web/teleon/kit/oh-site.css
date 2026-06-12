@@ -473,3 +473,15 @@
   .ohs-docs-side { position: static; flex-direction: row; flex-wrap: wrap; border-right: none; border-bottom: 1px solid var(--line); }
   .ohs-top-nav { display: none; }
 }
+/* phones: keep the top bar (logo + theme + sign-in + CTA) from forcing horizontal page scroll
+   (QA stress test found ~110px of top-bar overflow at 320-390px) — tighten gaps + drop the
+   redundant top-bar "Sign in" link (the hero and the portfolio menu both still offer it) */
+@media (max-width: 460px) {
+  .ohs-top { gap: 10px; }
+  .ohs-top-r { gap: 8px; }
+  .ohs-top-r .ohs-navlink { display: none; }
+}
+@media (max-width: 360px) {
+  .ohs-pf { display: none; }              /* the cross-product switcher — hidden on tiny phones */
+  .ohs-top-r .oh-btn { padding: 7px 11px; }
+}
