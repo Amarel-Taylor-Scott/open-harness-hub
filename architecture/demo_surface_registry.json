@@ -168,6 +168,27 @@
       "status": "active"
     },
     {
+      "surface_id": "examples-gallery",
+      "company_or_hub": "contextiseverything",
+      "surface_type": "interactive_demo",
+      "display_name": "Governed Examples Gallery (8 pipelines, real output)",
+      "local_port": 9108,
+      "local_path": "/",
+      "health_path": "/",
+      "requires_token": false,
+      "trycloudflare_required": true,
+      "screenshot_required": true,
+      "brand_boundary": "8 runnable pipelines beyond CFPB; every card is the pipeline's real deterministic output; the model is the only simulated seam",
+      "proof_scripts": [
+        "scripts/build_examples_gallery.py"
+      ],
+      "demo_steps": [
+        "PYTHONPATH=. python3 scripts/build_examples_gallery.py",
+        "node e2e/record_examples_gallery.mjs"
+      ],
+      "status": "active"
+    },
+    {
       "surface_id": "baltor.integrate_cfpb",
       "company_or_hub": "baltor",
       "surface_type": "interactive_demo",

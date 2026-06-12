@@ -1,6 +1,6 @@
 # Proof Inventory
 
-**438** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
+**456** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
 
 - `scripts/ingest/context_rot.py`
 - `scripts/ingest/document_decompose.py`
@@ -440,3 +440,21 @@
 - `scripts/check_adversarial_auth_all_realms.py`
 - `scripts/check_bundle_full_design_wiring.py`
 - `scripts/check_registry_backend.py`
+- `scripts/foundry/eval_scorers.py`
+- `scripts/runtime/catalog_processor_bridge.py`
+- `scripts/runtime/catalog_runtime_adapter.py`
+- `scripts/build_processor_dispatch_index.py`
+- `scripts/processors/compression/cohort_policy_selector.py`
+- `scripts/check_model_provider_lanes.py`
+- `scripts/receipt_local_service.py`
+- `scripts/state_local_service.py`
+- `scripts/ingest/promote_staged.py`
+- `scripts/showcase_pipelines/regulated_fact_qa.py`
+- `scripts/showcase_pipelines/governed_rag.py`
+- `scripts/showcase_pipelines/clinical_support.py`
+- `scripts/showcase_pipelines/low_resource_alert.py`
+- `scripts/showcase_pipelines/context_efficiency_loop.py`
+- `scripts/showcase_pipelines/sanctions_aml_screening.py`
+- `scripts/showcase_pipelines/cve_dependency_triage.py`
+- `scripts/showcase_pipelines/icd10_coding.py`
+- `scripts/build_examples_gallery.py`

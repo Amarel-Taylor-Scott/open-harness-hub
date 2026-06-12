@@ -643,4 +643,6 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/showcase_pipelines/sanctions_aml_screening.py", "showcase_sanctions_aml_screening"),
     ("scripts/showcase_pipelines/cve_dependency_triage.py", "showcase_cve_dependency_triage"),
     ("scripts/showcase_pipelines/icd10_coding.py", "showcase_icd10_coding"),
+    # ── Governed-examples GALLERY built from REAL pipeline output (the recordable surface for "more videos, more examples"): scripts/build_examples_gallery.py — imports all 8 showcase pipelines, runs each run() on its own synthetic inputs, and renders ONE self-contained on-brand HTML (dist/examples-gallery/index.html) where every card's verdict/trace/report is the pipeline's ACTUAL deterministic output (BLOCKED 54% / AFFECTED+KEV / abstained / SERVED 28% / ESCALATED / SIGN-OFF / savings). No external resources, no JS — recordable offline by e2e/record_examples_gallery.mjs. Single-sources the portfolio CSS (portfolio_lib.SHARED_CSS). ──
+    ("scripts/build_examples_gallery.py", "build_examples_gallery"),
 ]
