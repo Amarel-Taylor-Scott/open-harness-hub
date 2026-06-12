@@ -643,6 +643,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/showcase_pipelines/sanctions_aml_screening.py", "showcase_sanctions_aml_screening"),
     ("scripts/showcase_pipelines/cve_dependency_triage.py", "showcase_cve_dependency_triage"),
     ("scripts/showcase_pipelines/icd10_coding.py", "showcase_icd10_coding"),
+    # ── LLM-plane local service ACTIVATED (#service-registry; was status:planned): scripts/llm_plane_local_service.py — fulfils local_llm_plane_emulator (:9425) by PROJECTING the canonical OIPS router (src/teleon/inference) over /api/inference/* (providers/models/health/route) — wires that module, never duplicates routing. A route returns the real select_provider decision + a DETERMINISTIC offline stub completion (is_stub, served_truth=false) + a receipt (is_truth=false); network LLMs stay owner-gated (an external node only wins if its secret is actually present, else it falls back to the local equivalent). ──
+    ("scripts/llm_plane_local_service.py", "llm_plane_local_service"),
     # ── Governed-examples GALLERY built from REAL pipeline output (the recordable surface for "more videos, more examples"): scripts/build_examples_gallery.py — imports all 8 showcase pipelines, runs each run() on its own synthetic inputs, and renders ONE self-contained on-brand HTML (dist/examples-gallery/index.html) where every card's verdict/trace/report is the pipeline's ACTUAL deterministic output (BLOCKED 54% / AFFECTED+KEV / abstained / SERVED 28% / ESCALATED / SIGN-OFF / savings). No external resources, no JS — recordable offline by e2e/record_examples_gallery.mjs. Single-sources the portfolio CSS (portfolio_lib.SHARED_CSS). ──
     ("scripts/build_examples_gallery.py", "build_examples_gallery"),
 ]

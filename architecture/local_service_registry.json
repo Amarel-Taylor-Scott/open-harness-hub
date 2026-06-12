@@ -726,7 +726,10 @@
       "owner": "teleon",
       "port": 9425,
       "process_group": "local_llm_plane_emulator",
-      "start_command": null,
+      "start_command": [
+        "python3",
+        "scripts/llm_plane_local_service.py"
+      ],
       "stop_command": null,
       "health_url": "http://127.0.0.1:9425/healthz",
       "ready_url": "http://127.0.0.1:9425/readyz",
@@ -746,8 +749,8 @@
       "logs_path": "dist/local-services/local_llm_plane_emulator.log",
       "screenshot_required": false,
       "trycloudflare_required": false,
-      "status": "planned",
-      "held_reason": "src/teleon/inference (OIPS router + receipts) exists as the canonical plane \u2014 expose a local deterministic-stub HTTP surface from it; network LLMs stay owner-gated"
+      "status": "active_local",
+      "held_reason": "scripts/llm_plane_local_service.py projects the canonical OIPS router (src/teleon/inference) over /api/inference/* \u2014 deterministic offline stub completion + receipt; network LLMs stay owner-gated (an external node needs a secret_ref the offline plane does not hold)"
     },
     {
       "service_id": "local_receipt_service",
