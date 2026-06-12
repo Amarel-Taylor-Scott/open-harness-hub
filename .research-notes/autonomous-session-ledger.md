@@ -2553,3 +2553,28 @@ Worked the session's established backlog (5W1H findings + deep-dive conclusions)
 - Caught + fixed a self-introduced RED honestly (the bridge's yaml import violated the stdlib-only
   runtime law) — the right architecture (runtime reads built JSON, not source YAML).
 - Proof suite 438 → 443, all green.
+
+## 2026-06-12 — Backlog close-out: all items working + WIRED, no orphaned paths (warrant: owner directive)
+
+Owner: "get all backlog items working, fully integrated, fully wired, no orphaned paths." The
+orphan check confirmed the recent builds (runtime bridge / scorer ladder / cohort selector) were
+self-tested but referenced only by their own modules — built, not used. Closed the whole 5W1H
+backlog (Part E) + de-orphaned everything. Gates at close: flywheel GREEN 447/447, validate clean.
+
+DE-ORPHAN WIRINGS:
+- catalog processors → default_registry() (102 refs; the runner now offers all 97).
+- LadderJudge (faithfulness-aware) → the MeasurementStage default (lazy import breaks the cycle).
+- cohort_policy_selector → compress_with_cohort_policy() (the wired entry point; usage_gated_compress
+  now honors cohort weights; the showcase uses it).
+
+BUILDS (each wired + flywheel-gated):
+- #1 auth preview banner (all kits); #4 Mistral+OpenRouter lanes + check_model_provider_lanes;
+  #8 OIPS quality/external producers wired into oips.py + committed leaderboard fixture; #10a
+  heavy-paraphrase embedding lane in foundry novelty; #10c receipt(:9426)+state(:9427) services
+  (activated in the registry, live HTTP 200); #7 promote_staged (staging→measure→gate, make
+  ingest-promote — offline holds the boundary, a route promotes).
+
+REMAINING (honest): #5 record-CFPB-video is OWNER-GATED (recording gate GO, needs a human);
+#6 marketing-nav is mostly non-issues (app-mapper); #10b gate-verdicts-in-UI is the one
+substantive frontend enhancement not yet built (backend ready via the receipt service).
+Proof suite 438 → 447. Status doc: docs/strategy/backlog-status-2026-06-12.md.
