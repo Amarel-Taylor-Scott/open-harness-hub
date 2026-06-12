@@ -29,7 +29,7 @@ if __name__ == "__main__" and __package__ in (None, ""):  # pragma: no cover
     if _RR not in sys.path:
         sys.path.insert(0, _RR)
 
-from scripts.processors.compression.cohort_policy_selector import select_policy, summarize_usage
+from scripts.processors.compression.cohort_policy_selector import compress_with_cohort_policy
 from scripts.processors.compression.usage_gated_compress import empty_prior, observe, run as gate_run
 
 #: A synthetic large-codebase working set: 2 HOT files cited every turn, a large STABLE
@@ -54,14 +54,10 @@ def run(*, working_set: list[dict[str, Any]] = _WORKING_SET,
     for turn in range(1, warmup_turns + 1):
         prior = observe(prior, served_ids=served, cited_ids=list(_HOT_IDS),
                         changed_ids=["config.yaml"] if turn % 2 == 0 else [], now_turn=turn)
-    # 2. classify the cohort + pick the compression curve.
-    shape = summarize_usage(prior)
-    policy = select_policy(shape)
-    # 3. apply the gate with the cohort's budget + weights.
-    full_tokens = sum(len(str(it["text"]).split()) for it in working_set if not it.get("pinned"))
-    budget = max(1, int(full_tokens * policy["budget_fraction"]))
-    plan = gate_run(items=working_set, prior=prior, token_budget=budget,
-                    now_turn=warmup_turns + 1, weights=policy["weights"])["plan"]
+    # 2-3. the WIRED entry point: classify the cohort, derive the budget, apply the gate
+    # with the cohort's weights — one call (cohort_policy_selector.compress_with_cohort_policy).
+    wired = compress_with_cohort_policy(items=working_set, prior=prior, now_turn=warmup_turns + 1)
+    policy, budget, plan = wired["policy"], wired["token_budget"], wired["plan"]
     # 4. a prediction MISS: a paged-out item is referenced next turn → re-promote it.
     rehydrated = None
     if plan["paged_out"]:

@@ -125,7 +125,18 @@ class MeasurementStage(BaseStage):
         pipeline_runner: PipelineRunner | None = None,
         synthesizer: Synthesizer | None = None,
     ) -> None:
-        self.judge: Judge = judge or DeterministicChecker()
+        # Default to the LadderJudge: graded token-F1 against a gold answer when one exists,
+        # else the REFERENCE-FREE faithfulness proxy (scores lift from evidence with no gold —
+        # closing the offline cap). Lazy import avoids the eval_scorers↔measure cycle. A
+        # builtins-only fallback (DeterministicChecker) keeps measure importable in isolation.
+        if judge is not None:
+            self.judge = judge
+        else:
+            try:
+                from scripts.foundry.eval_scorers import LadderJudge
+                self.judge = LadderJudge()
+            except Exception:  # noqa: BLE001
+                self.judge = DeterministicChecker()
         self.bare_model = bare_model
         self.pipeline_runner = pipeline_runner
         self.synthesizer = synthesizer   # generates held-out eval tasks when a gap has none

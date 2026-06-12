@@ -270,8 +270,14 @@ class LadderJudge:
 
     name = "deterministic-ladder"
 
+    #: Default chain: graded token-F1 first when a gold answer exists (NOT exact-match,
+    #: which would short-circuit to a binary 0/1), then the reference-free proxies. This
+    #: preserves the prior `DeterministicChecker` behavior on gold tasks AND adds a signal
+    #: where there is no gold.
+    _DEFAULT_CHAIN = (TokenF1Judge, FaithfulnessProxyJudge, ContextPrecisionProxyJudge)
+
     def __init__(self, judges: list[Any] | None = None, *, tail: list[Any] | None = None) -> None:
-        base = judges if judges is not None else [J() for J in DETERMINISTIC_JUDGES]
+        base = judges if judges is not None else [J() for J in self._DEFAULT_CHAIN]
         self.judges = list(base) + list(tail or [])
 
     def score(self, task: dict, answer: str | None) -> float | None:

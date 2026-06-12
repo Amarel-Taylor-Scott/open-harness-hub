@@ -137,6 +137,29 @@ def run(*, prior: dict[str, Any]) -> dict[str, Any]:
     return {"policy": select_policy(shape)}
 
 
+def compress_with_cohort_policy(*, items: list[dict[str, Any]], prior: dict[str, Any],
+                                token_budget: int | None = None, now_turn: int = 0) -> dict[str, Any]:
+    """THE wired entry point: usage prior → cohort policy → gated compression in one call.
+
+    Classifies the tenant's usage shape, selects the compression curve, derives the token
+    budget from the cohort's `budget_fraction` when ``token_budget`` is not given, and runs
+    `usage_gated_compress` with the cohort's weights. Returns the policy + the plan together —
+    this is how a real context-serving path applies consumer-behavior-aware compression
+    (the showcase `context_efficiency_loop` uses it). Pins are honored; lossless paged_out.
+    """
+    from scripts.processors.compression.usage_gated_compress import run as gate_run
+
+    policy = run(prior=prior)["policy"]
+    if token_budget is None:
+        full = sum(len(str(it.get("text", "")).split()) for it in items if not it.get("pinned"))
+        # never let the cohort budget drop below the pins (the gate raises otherwise)
+        pinned = sum(len(str(it.get("text", "")).split()) for it in items if it.get("pinned"))
+        token_budget = max(pinned + 1, int(full * policy["budget_fraction"]))
+    plan = gate_run(items=items, prior=prior, token_budget=token_budget,
+                    now_turn=now_turn, weights=policy["weights"])["plan"]
+    return {"policy": policy, "token_budget": token_budget, "plan": plan}
+
+
 def _self_test() -> int:
     from scripts.processors.compression.usage_gated_compress import empty_prior, observe, run as gate_run
 
@@ -201,6 +224,16 @@ def _self_test() -> int:
 
     # Empty prior → unknown/conservative, never a crash.
     assert select_policy(summarize_usage(empty_prior()))["cohort"] == COHORT_UNKNOWN
+
+    # THE WIRED ENTRY POINT: compress_with_cohort_policy applies the curve in one call,
+    # derives the budget from the cohort, and never starves the pins.
+    wired_items = ([{"id": fid, "text": "stable code body " * 30} for fid in served]
+                   + [{"id": "sys", "text": "persona", "pinned": True}])
+    wired = compress_with_cohort_policy(items=wired_items, prior=power, now_turn=9)
+    assert wired["policy"]["cohort"] == COHORT_POWER
+    assert wired["plan"]["tokens_kept"] <= wired["token_budget"]
+    assert "sys" in wired["plan"]["tiers"]["full"]            # pin kept
+    assert wired["plan"]["predicted_reread_savings"] > 0      # the curve bites
 
     print(
         "PASS — cohort_policy_selector: usage SHAPE → cohort (power/iterating/fresh/balanced/"

@@ -36,9 +36,17 @@ class ProcessorRegistry:
         return sorted(self._by_ref)
 
 
-def default_registry() -> ProcessorRegistry:
+def default_registry(*, include_catalog: bool = True) -> ProcessorRegistry:
+    """The registry the runner loads from: the hand-wired BUILTINS PLUS — by default — the
+    97 governed catalog processors (via `catalog_runtime_adapter`), so the runtime actually
+    offers the component families that exist instead of only the CFPB-specific set. Catalog
+    refs (``processor/<name>@v1``) never collide with the builtin refs. Pass
+    ``include_catalog=False`` for a builtins-only registry."""
     from scripts.runtime.builtin_processors import BUILTINS
     r = ProcessorRegistry()
     for p in BUILTINS:
         r.register(p)
+    if include_catalog:
+        from scripts.runtime.catalog_runtime_adapter import register_catalog_processors
+        register_catalog_processors(r)
     return r
