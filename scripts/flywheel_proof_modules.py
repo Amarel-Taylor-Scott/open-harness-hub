@@ -622,4 +622,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/runtime/catalog_processor_bridge.py", "catalog_processor_bridge"),
     # ── Catalog processors registered INTO the runtime: scripts/runtime/catalog_runtime_adapter.py — wraps each catalog run() as a runtime Processor (handle(command,ctx)), emits a CANDIDATE processor_output artifact (gate promotes, not the adapter), registers the whole fleet into the ProcessorRegistry the runner uses; a run() error fails cleanly (no crash). ──
     ("scripts/runtime/catalog_runtime_adapter.py", "catalog_runtime_adapter"),
+    # ── Processor dispatch-index DRIFT gate: scripts/build_processor_dispatch_index.py — the committed architecture/processor_dispatch_index.json (the stdlib-json map the runtime bridge reads, keeping the runtime YAML-free) must match the manifests; this rebuilds in memory and fails if it drifted. Manifests stay authoritative without a runtime YAML dependency. ──
+    ("scripts/build_processor_dispatch_index.py", "build_processor_dispatch_index"),
+    # ── Cohort compression-policy selector (context-efficiency 'consumer behavior'): scripts/processors/compression/cohort_policy_selector.py — reads a usage_gated_compress prior, classifies the tenant's usage SHAPE (power-user/iterating/fresh/balanced/unknown), and emits the compression curve (budget_fraction + utility/volatility/recency weights); power-user compresses the stable substrate hard, fresh barely compresses, unknown stays conservative; deterministic. ──
+    ("scripts/processors/compression/cohort_policy_selector.py", "cohort_policy_selector"),
 ]

@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
-"""scripts.runtime.catalog_processor_bridge — dispatch the 97 catalog processors by manifest.
+"""scripts.runtime.catalog_processor_bridge — dispatch the 97 catalog processors at runtime.
 
 The governed processor method-components under `scripts/processors/**` each resolve to a
 `run(...)` callable named by a catalog manifest (`process_kind` + `implementations[].path`).
-This bridge discovers every `process_kind → component-id → callable` mapping FROM THE
-MANIFESTS (single source — never a second hand-maintained list) and invokes the real
-callable by id or by process_kind. It is the lookup layer that lets the product use the
-components that already exist; the companion `catalog_runtime_adapter` wraps these as
-runtime `Processor`s for the consumption runtime.
+This bridge resolves `process_kind → component-id → callable` and invokes the real callable
+by id or by process_kind. It is the lookup layer that lets the product use the components
+that already exist; the companion `catalog_runtime_adapter` wraps these as runtime
+`Processor`s for the consumption runtime.
+
+The governed runtime is **stdlib-only** (proof C35), so this bridge reads the committed
+`architecture/processor_dispatch_index.json` with stdlib `json` — it does NOT parse YAML.
+That index is built from the manifests (the single source) by the out-of-scope builder
+`scripts/build_processor_dispatch_index.py`; a flywheel drift gate keeps it in sync, so the
+manifests remain authoritative without dragging a YAML dependency into the runtime.
 
 Resolution:
   * by **component id** (`processor/cache-exact`) — always unambiguous.
@@ -27,6 +32,7 @@ from __future__ import annotations
 
 import argparse
 import importlib
+import json
 import sys
 from functools import lru_cache
 from pathlib import Path
@@ -37,34 +43,33 @@ if __name__ == "__main__" and __package__ in (None, ""):  # pragma: no cover
     if _RR not in sys.path:
         sys.path.insert(0, _RR)
 
-import yaml  # noqa: E402
-
 _REPO = Path(__file__).resolve().parents[2]
-_CATALOG_PROCESSORS = _REPO / "catalog" / "processors"
+#: The committed, stdlib-json-readable dispatch index (built from the manifests by the
+#: out-of-scope `scripts/build_processor_dispatch_index.py`; a flywheel drift gate keeps it
+#: fresh). The runtime reads THIS, never the YAML manifests.
+_INDEX_PATH = _REPO / "architecture" / "processor_dispatch_index.json"
 
-#: Only in-repo callables are dispatchable; third-party/descriptive paths are skipped
-#: (exactly as the validator skips them — they are contracts, not in-repo wiring).
+#: Only in-repo callables are dispatchable; the index already filters to these.
 _IN_REPO_PREFIXES = ("scripts.", "src.")
-_CALLABLE_KIND = "callable"
 
 
 class ProcessorSpec:
-    """One dispatchable processor, distilled from its manifest."""
+    """One dispatchable processor, from the committed dispatch index."""
 
     __slots__ = ("component_id", "process_kind", "path", "deterministic",
                  "side_effects", "inputs", "outputs")
 
-    def __init__(self, manifest: dict[str, Any], path: str) -> None:
-        self.component_id: str = str(manifest["id"])
-        self.process_kind: str = str(manifest.get("process_kind", ""))
-        self.path = path
-        self.deterministic = bool(manifest.get("deterministic", False))
-        self.side_effects = manifest.get("side_effects", "unknown")
-        self.inputs = [i.get("name") for i in (manifest.get("inputs") or []) if isinstance(i, dict)]
-        self.outputs = [o.get("name") for o in (manifest.get("outputs") or []) if isinstance(o, dict)]
+    def __init__(self, component_id: str, entry: dict[str, Any]) -> None:
+        self.component_id = component_id
+        self.process_kind = str(entry.get("process_kind", ""))
+        self.path = str(entry["callable_path"])
+        self.deterministic = bool(entry.get("deterministic", False))
+        self.side_effects = entry.get("side_effects", "unknown")
+        self.inputs = list(entry.get("inputs", []))
+        self.outputs = list(entry.get("outputs", []))
 
     def load(self) -> Callable[..., dict[str, Any]]:
-        """Import and return the `run` callable named by the manifest path."""
+        """Import and return the `run` callable named by the index path."""
         module_name, attr = self.path.rsplit(".", 1)
         fn = getattr(importlib.import_module(module_name), attr)
         if not callable(fn):
@@ -79,29 +84,19 @@ class ProcessorSpec:
 
 @lru_cache(maxsize=1)
 def _discover() -> tuple[dict[str, ProcessorSpec], dict[str, list[str]]]:
-    """Scan the processor manifests → ({component_id: spec}, {process_kind: [ids]})."""
+    """Load the committed dispatch index → ({component_id: spec}, {process_kind: [ids]})."""
+    if not _INDEX_PATH.exists():
+        raise FileNotFoundError(
+            f"{_INDEX_PATH.relative_to(_REPO)} is missing — run "
+            f"`python3 scripts/build_processor_dispatch_index.py --write`")
+    index = json.loads(_INDEX_PATH.read_text(encoding="utf-8"))
     by_id: dict[str, ProcessorSpec] = {}
     by_kind: dict[str, list[str]] = {}
-    for p in sorted(_CATALOG_PROCESSORS.rglob("*.yaml")):
-        if "_inbox" in p.parts:
-            continue
-        try:
-            manifest = yaml.safe_load(p.read_text(encoding="utf-8"))
-        except Exception:  # noqa: BLE001 — a malformed manifest is skipped, never fatal
-            continue
-        if not isinstance(manifest, dict) or manifest.get("type") != "processor" or "id" not in manifest:
-            continue
-        for impl in manifest.get("implementations") or []:
-            if not isinstance(impl, dict) or impl.get("kind") != _CALLABLE_KIND:
-                continue
-            path = impl.get("path")
-            if not isinstance(path, str) or not path.startswith(_IN_REPO_PREFIXES):
-                continue
-            spec = ProcessorSpec(manifest, path)
-            by_id[spec.component_id] = spec
-            if spec.process_kind:
-                by_kind.setdefault(spec.process_kind, []).append(spec.component_id)
-            break  # first in-repo callable impl wins
+    for component_id, entry in index.get("by_id", {}).items():
+        spec = ProcessorSpec(component_id, entry)
+        by_id[component_id] = spec
+        if spec.process_kind:
+            by_kind.setdefault(spec.process_kind, []).append(component_id)
     return by_id, {k: sorted(v) for k, v in by_kind.items()}
 
 

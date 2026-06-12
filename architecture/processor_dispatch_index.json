@@ -1,0 +1,1436 @@
+{
+  "by_id": {
+    "processor/allergy-contraindication-check": {
+      "callable_path": "scripts.processors.clinical.allergy_contraindication_check.run",
+      "deterministic": true,
+      "inputs": [
+        "orders",
+        "allergies",
+        "conditions"
+      ],
+      "outputs": [
+        "conflicts"
+      ],
+      "process_kind": "verify.allergy_contraindication",
+      "side_effects": "read"
+    },
+    "processor/apqc-pcf-walker": {
+      "callable_path": "scripts.processors.apqc_pcf_walker.run",
+      "deterministic": true,
+      "inputs": [
+        "pcf_variant",
+        "categories",
+        "max_level",
+        "max_nodes"
+      ],
+      "outputs": [
+        "nodes",
+        "walk_stats"
+      ],
+      "process_kind": "retrieve.tree_walk",
+      "side_effects": "read"
+    },
+    "processor/bm25-keyword-retrieve": {
+      "callable_path": "scripts.processors.retrieval.bm25_keyword_retrieve.run",
+      "deterministic": true,
+      "inputs": [
+        "query",
+        "corpus",
+        "top_k"
+      ],
+      "outputs": [
+        "candidates"
+      ],
+      "process_kind": "retrieve.lexical_bm25",
+      "side_effects": "read"
+    },
+    "processor/cache-exact": {
+      "callable_path": "scripts.processors.cache.cache_exact.run",
+      "deterministic": true,
+      "inputs": [
+        "key"
+      ],
+      "outputs": [
+        "hit"
+      ],
+      "process_kind": "cache.exact_hash",
+      "side_effects": "read"
+    },
+    "processor/cache-kv-reuse": {
+      "callable_path": "scripts.processors.cache.cache_kv_reuse.run",
+      "deterministic": true,
+      "inputs": [
+        "prefix"
+      ],
+      "outputs": [
+        "kv"
+      ],
+      "process_kind": "cache.kv_reuse",
+      "side_effects": "read"
+    },
+    "processor/cache-prompt-prefix": {
+      "callable_path": "scripts.processors.cache.cache_prompt_prefix.run",
+      "deterministic": true,
+      "inputs": [
+        "prompt"
+      ],
+      "outputs": [
+        "cache_hint"
+      ],
+      "process_kind": "cache.prompt_prefix",
+      "side_effects": "read"
+    },
+    "processor/cache-semantic": {
+      "callable_path": "scripts.processors.cache.cache_semantic.run",
+      "deterministic": false,
+      "inputs": [
+        "query",
+        "threshold"
+      ],
+      "outputs": [
+        "hit"
+      ],
+      "process_kind": "cache.semantic",
+      "side_effects": "read"
+    },
+    "processor/cache-write": {
+      "callable_path": "scripts.processors.platform.cache_write.run",
+      "deterministic": true,
+      "inputs": [
+        "key",
+        "result",
+        "ttl"
+      ],
+      "outputs": [
+        "cached"
+      ],
+      "process_kind": "cache.write_response",
+      "side_effects": "write"
+    },
+    "processor/catalog-search": {
+      "callable_path": "scripts.processors.catalog_search.run",
+      "deterministic": true,
+      "inputs": [
+        "prompt",
+        "top_k",
+        "types_filter",
+        "intent_tags"
+      ],
+      "outputs": [
+        "candidates",
+        "stats"
+      ],
+      "process_kind": "retrieve.bm25",
+      "side_effects": "read"
+    },
+    "processor/clinical-abstention-gate": {
+      "callable_path": "scripts.processors.clinical.clinical_abstention_gate.run",
+      "deterministic": true,
+      "inputs": [
+        "answer",
+        "evidence"
+      ],
+      "outputs": [
+        "sufficient",
+        "reason"
+      ],
+      "process_kind": "gate.evidence_sufficiency",
+      "side_effects": "none"
+    },
+    "processor/clinical-redflag-screen": {
+      "callable_path": "scripts.processors.clinical.clinical_redflag_screen.run",
+      "deterministic": true,
+      "inputs": [
+        "note",
+        "vitals"
+      ],
+      "outputs": [
+        "red_flags",
+        "escalate"
+      ],
+      "process_kind": "gate.clinical_redflag",
+      "side_effects": "none"
+    },
+    "processor/compression-fidelity-check": {
+      "callable_path": "scripts.processors.verify.compression_fidelity_check.run",
+      "deterministic": false,
+      "inputs": [
+        "raw",
+        "tier"
+      ],
+      "outputs": [
+        "fidelity"
+      ],
+      "process_kind": "verify.compression_fidelity",
+      "side_effects": "none"
+    },
+    "processor/context-placer-edge": {
+      "callable_path": "scripts.processors.retrieval.context_placer_edge.run",
+      "deterministic": true,
+      "inputs": [
+        "chunks",
+        "query",
+        "instructions"
+      ],
+      "outputs": [
+        "assembled_prompt"
+      ],
+      "process_kind": "assemble.context_placement",
+      "side_effects": "none"
+    },
+    "processor/contextual-compressor": {
+      "callable_path": "scripts.processors.retrieval.contextual_compressor.run",
+      "deterministic": false,
+      "inputs": [
+        "chunks",
+        "query"
+      ],
+      "outputs": [
+        "compressed"
+      ],
+      "process_kind": "summarize.contextual_compression",
+      "side_effects": "external_call"
+    },
+    "processor/contextual-grounded-generate": {
+      "callable_path": "scripts.processors.faithful_extract_before_model.run",
+      "deterministic": false,
+      "inputs": [
+        "messages",
+        "knowledge",
+        "model",
+        "avoid_commentary"
+      ],
+      "outputs": [
+        "response",
+        "attributions",
+        "model"
+      ],
+      "process_kind": "call.grounded_generate",
+      "side_effects": "external_call"
+    },
+    "processor/contextual-parse": {
+      "callable_path": "scripts.processors.doc_to_markdown_rag_ingest.run",
+      "deterministic": false,
+      "inputs": [
+        "document_path",
+        "parse_mode",
+        "enable_document_hierarchy",
+        "enable_split_tables",
+        "output_format"
+      ],
+      "outputs": [
+        "markdown",
+        "document_hierarchy",
+        "chunks",
+        "source_record_id",
+        "content_hash"
+      ],
+      "process_kind": "format_convert.pdf_to_text",
+      "side_effects": "external_call"
+    },
+    "processor/contextual-rerank": {
+      "callable_path": "scripts.processors.gemma_reranker.run",
+      "deterministic": false,
+      "inputs": [
+        "query",
+        "documents",
+        "instruction",
+        "model",
+        "top_k"
+      ],
+      "outputs": [
+        "ranked_candidates",
+        "scores",
+        "model"
+      ],
+      "process_kind": "rerank.cross_encoder",
+      "side_effects": "external_call"
+    },
+    "processor/corpus-integrity-check": {
+      "callable_path": "scripts.processors.assurance.corpus_integrity_check.run",
+      "deterministic": true,
+      "inputs": [
+        "candidate_document",
+        "authoritative_source",
+        "claim_fields"
+      ],
+      "outputs": [
+        "integrity_verdict",
+        "findings",
+        "review_ticket"
+      ],
+      "process_kind": "verify.corpus_integrity",
+      "side_effects": "read"
+    },
+    "processor/create-data-store-view": {
+      "callable_path": "scripts.processors.platform.create_data_store_view.run",
+      "deterministic": true,
+      "inputs": [
+        "rows",
+        "schema"
+      ],
+      "outputs": [
+        "store_id",
+        "view"
+      ],
+      "process_kind": "platform.create_data_store",
+      "side_effects": "write"
+    },
+    "processor/cross-encoder-reranker": {
+      "callable_path": "scripts.processors.retrieval.cross_encoder_reranker.run",
+      "deterministic": false,
+      "inputs": [
+        "query",
+        "candidates",
+        "top_n"
+      ],
+      "outputs": [
+        "reranked"
+      ],
+      "process_kind": "rerank.cross_encoder",
+      "side_effects": "read"
+    },
+    "processor/curriculum-qa-dataset-builder": {
+      "callable_path": "scripts.processors.curriculum_qa_dataset_builder.run",
+      "deterministic": false,
+      "inputs": [
+        "pdf_path",
+        "language_hint",
+        "chunk_size_tokens",
+        "chunk_stride_tokens",
+        "max_qa_pairs_per_chunk",
+        "model_adapter_ref",
+        "output_path"
+      ],
+      "outputs": [
+        "output_jsonl_path",
+        "total_chunks",
+        "total_qa_pairs",
+        "dropped_pairs",
+        "coverage_pages"
+      ],
+      "process_kind": "extract.pdf_to_dataset",
+      "side_effects": "write"
+    },
+    "processor/deliver-email": {
+      "callable_path": "scripts.processors.deliver.deliver_email.run",
+      "deterministic": false,
+      "inputs": [
+        "result",
+        "recipients",
+        "template"
+      ],
+      "outputs": [
+        "message_id"
+      ],
+      "process_kind": "deliver.email",
+      "side_effects": "external_call"
+    },
+    "processor/deliver-notify": {
+      "callable_path": "scripts.processors.deliver.deliver_notify.run",
+      "deterministic": false,
+      "inputs": [
+        "result",
+        "channel"
+      ],
+      "outputs": [
+        "ack"
+      ],
+      "process_kind": "deliver.notify",
+      "side_effects": "external_call"
+    },
+    "processor/deliver-report": {
+      "callable_path": "scripts.processors.deliver.deliver_report.run",
+      "deterministic": true,
+      "inputs": [
+        "result",
+        "format"
+      ],
+      "outputs": [
+        "document_uri"
+      ],
+      "process_kind": "report.pdf",
+      "side_effects": "external_call"
+    },
+    "processor/deliver-return": {
+      "callable_path": "scripts.processors.deliver.deliver_return.run",
+      "deterministic": true,
+      "inputs": [
+        "result"
+      ],
+      "outputs": [
+        "response"
+      ],
+      "process_kind": "deliver.return_response",
+      "side_effects": "none"
+    },
+    "processor/deliver-webhook": {
+      "callable_path": "scripts.processors.deliver.deliver_webhook.run",
+      "deterministic": false,
+      "inputs": [
+        "result",
+        "endpoint",
+        "signing_key"
+      ],
+      "outputs": [
+        "delivery_receipt"
+      ],
+      "process_kind": "deliver.webhook",
+      "side_effects": "external_call"
+    },
+    "processor/dense-vector-retrieve": {
+      "callable_path": "scripts.processors.retrieval.dense_vector_retrieve.run",
+      "deterministic": false,
+      "inputs": [
+        "query",
+        "index",
+        "top_k"
+      ],
+      "outputs": [
+        "candidates"
+      ],
+      "process_kind": "retrieve.dense_vector",
+      "side_effects": "read"
+    },
+    "processor/disable-thinking-mode-latency": {
+      "callable_path": "scripts.processors.disable_thinking_mode_latency.run",
+      "deterministic": true,
+      "inputs": [
+        "inference_request",
+        "target_latency_ms",
+        "force_disable_thinking"
+      ],
+      "outputs": [
+        "modified_request",
+        "thinking_mode_disabled",
+        "injected_prefix",
+        "param_overrides"
+      ],
+      "process_kind": "policy.identity",
+      "side_effects": "none"
+    },
+    "processor/doc-to-markdown-rag-ingest": {
+      "callable_path": "scripts.processors.doc_to_markdown_rag_ingest.run",
+      "deterministic": false,
+      "inputs": [
+        "document_path",
+        "task_id",
+        "chunk_size_tokens",
+        "chunk_stride_tokens",
+        "model_adapter_ref",
+        "dense_embed",
+        "embedding_adapter_ref"
+      ],
+      "outputs": [
+        "markdown_path",
+        "summary",
+        "chunk_count",
+        "scope_id",
+        "index_record_id"
+      ],
+      "process_kind": "extract.doc_to_rag",
+      "side_effects": "write"
+    },
+    "processor/dosage-range-validator": {
+      "callable_path": "scripts.processors.clinical.dosage_range_validator.run",
+      "deterministic": true,
+      "inputs": [
+        "order",
+        "patient",
+        "dose_corpus"
+      ],
+      "outputs": [
+        "in_range",
+        "adjusted"
+      ],
+      "process_kind": "verify.dosage_range",
+      "side_effects": "read"
+    },
+    "processor/draft-manifest-yaml-emitter": {
+      "callable_path": "scripts.processors.draft_manifest_yaml_emitter.run",
+      "deterministic": true,
+      "inputs": [
+        "draft_manifest",
+        "target_type",
+        "target_slug",
+        "overwrite_inbox"
+      ],
+      "outputs": [
+        "written_path",
+        "validation_status",
+        "validation_errors",
+        "id_collision_with_live"
+      ],
+      "process_kind": "coerce.schema_validate",
+      "side_effects": "write"
+    },
+    "processor/draft-quality-gate": {
+      "callable_path": "scripts.processors.draft_quality_gate.run",
+      "deterministic": true,
+      "inputs": [
+        "draft_manifest",
+        "live_catalog_ids"
+      ],
+      "outputs": [
+        "accepted",
+        "reasons",
+        "warnings"
+      ],
+      "process_kind": "verify.draft_quality_gate",
+      "side_effects": "none"
+    },
+    "processor/drug-interaction-checker": {
+      "callable_path": "scripts.processors.clinical.drug_interaction_checker.run",
+      "deterministic": true,
+      "inputs": [
+        "med_list",
+        "interaction_corpus"
+      ],
+      "outputs": [
+        "interactions",
+        "severity"
+      ],
+      "process_kind": "verify.drug_interaction",
+      "side_effects": "read"
+    },
+    "processor/emit-claudemd-fragment": {
+      "callable_path": "scripts.processors.deliver.emit_claudemd_fragment.run",
+      "deterministic": true,
+      "inputs": [
+        "distilled"
+      ],
+      "outputs": [
+        "claudemd"
+      ],
+      "process_kind": "deliver.claudemd",
+      "side_effects": "none"
+    },
+    "processor/emit-llms-txt": {
+      "callable_path": "scripts.processors.deliver.emit_llms_txt.run",
+      "deterministic": true,
+      "inputs": [
+        "corpus"
+      ],
+      "outputs": [
+        "llms_txt"
+      ],
+      "process_kind": "deliver.llms_txt",
+      "side_effects": "none"
+    },
+    "processor/english-pivot-translation": {
+      "callable_path": "scripts.processors.english_pivot_translation.run",
+      "deterministic": false,
+      "inputs": [
+        "source_text",
+        "source_language",
+        "target_language",
+        "tts_mode",
+        "model_adapter_ref"
+      ],
+      "outputs": [
+        "english_pivot_text",
+        "target_language_text",
+        "tts_ready_text"
+      ],
+      "process_kind": "format_convert.translate_pivot",
+      "side_effects": "none"
+    },
+    "processor/escalate-human": {
+      "callable_path": "scripts.processors.deliver.escalate_human.run",
+      "deterministic": true,
+      "inputs": [
+        "result",
+        "reason"
+      ],
+      "outputs": [
+        "ticket"
+      ],
+      "process_kind": "escalate.human",
+      "side_effects": "external_call"
+    },
+    "processor/exact-id-lookup": {
+      "callable_path": "scripts.processors.retrieval.exact_id_lookup.run",
+      "deterministic": true,
+      "inputs": [
+        "identifier",
+        "corpus"
+      ],
+      "outputs": [
+        "match"
+      ],
+      "process_kind": "retrieve.exact_id",
+      "side_effects": "read"
+    },
+    "processor/extractive-span-selector": {
+      "callable_path": "scripts.processors.retrieval.extractive_span_selector.run",
+      "deterministic": true,
+      "inputs": [
+        "chunks",
+        "query"
+      ],
+      "outputs": [
+        "spans"
+      ],
+      "process_kind": "summarize.extractive",
+      "side_effects": "none"
+    },
+    "processor/factory-run-reporter": {
+      "callable_path": "scripts.factory.run_report.write_run_components",
+      "deterministic": true,
+      "inputs": [
+        "report",
+        "walks",
+        "drafts",
+        "rejected",
+        "deduped"
+      ],
+      "outputs": [
+        "run_dir",
+        "report_md_path"
+      ],
+      "process_kind": "report.markdown",
+      "side_effects": "write"
+    },
+    "processor/faithful-extract-before-model": {
+      "callable_path": "scripts.processors.faithful_extract_before_model.run",
+      "deterministic": true,
+      "inputs": [
+        "raw_text",
+        "input_type",
+        "field_map",
+        "system_prompt_prefix"
+      ],
+      "outputs": [
+        "extracted_fields",
+        "unextracted_fields",
+        "prompt_block",
+        "extraction_coverage"
+      ],
+      "process_kind": "extract.structured_fields",
+      "side_effects": "none"
+    },
+    "processor/fuzzy-trigram-retrieve": {
+      "callable_path": "scripts.processors.retrieval.fuzzy_trigram_retrieve.run",
+      "deterministic": true,
+      "inputs": [
+        "query",
+        "corpus",
+        "max_distance"
+      ],
+      "outputs": [
+        "candidates"
+      ],
+      "process_kind": "retrieve.fuzzy_trigram",
+      "side_effects": "read"
+    },
+    "processor/gemma-reranker": {
+      "callable_path": "scripts.processors.gemma_reranker.run",
+      "deterministic": false,
+      "inputs": [
+        "prompt",
+        "candidates",
+        "top_k",
+        "model",
+        "simulate"
+      ],
+      "outputs": [
+        "ranked_candidates",
+        "recommendation",
+        "model",
+        "simulated"
+      ],
+      "process_kind": "rerank.cross_encoder",
+      "side_effects": "external_call"
+    },
+    "processor/graphrag-retrieve": {
+      "callable_path": "scripts.processors.retrieval.graphrag_retrieve.run",
+      "deterministic": false,
+      "inputs": [
+        "query",
+        "graph"
+      ],
+      "outputs": [
+        "subgraph"
+      ],
+      "process_kind": "retrieve.graph",
+      "side_effects": "read"
+    },
+    "processor/grep-agentic-retrieve": {
+      "callable_path": "scripts.processors.retrieval.grep_agentic_retrieve.run",
+      "deterministic": true,
+      "inputs": [
+        "pattern",
+        "corpus"
+      ],
+      "outputs": [
+        "matches"
+      ],
+      "process_kind": "retrieve.grep_agentic",
+      "side_effects": "read"
+    },
+    "processor/hybrid-retrieve-fuse": {
+      "callable_path": "scripts.processors.retrieval.hybrid_retrieve_fuse.run",
+      "deterministic": false,
+      "inputs": [
+        "query",
+        "corpus",
+        "index",
+        "top_k"
+      ],
+      "outputs": [
+        "candidates"
+      ],
+      "process_kind": "retrieve.hybrid",
+      "side_effects": "read"
+    },
+    "processor/hyde-query-expander": {
+      "callable_path": "scripts.processors.retrieval.hyde_query_expander.run",
+      "deterministic": false,
+      "inputs": [
+        "query"
+      ],
+      "outputs": [
+        "expanded_query"
+      ],
+      "process_kind": "query.hyde",
+      "side_effects": "external_call"
+    },
+    "processor/icd10-code-grounder": {
+      "callable_path": "scripts.processors.clinical.icd10_code_grounder.run",
+      "deterministic": true,
+      "inputs": [
+        "diagnoses",
+        "terminology_corpus"
+      ],
+      "outputs": [
+        "codes",
+        "abstained"
+      ],
+      "process_kind": "coerce.icd_ground",
+      "side_effects": "read"
+    },
+    "processor/json-repair-coerce": {
+      "callable_path": "scripts.processors.retrieval.json_repair_coerce.run",
+      "deterministic": true,
+      "inputs": [
+        "model_output",
+        "schema"
+      ],
+      "outputs": [
+        "json",
+        "recovered"
+      ],
+      "process_kind": "coerce.json_repair",
+      "side_effects": "none"
+    },
+    "processor/lab-critical-value-flag": {
+      "callable_path": "scripts.processors.clinical.lab_critical_value_flag.run",
+      "deterministic": true,
+      "inputs": [
+        "labs",
+        "reference_ranges"
+      ],
+      "outputs": [
+        "critical",
+        "escalate"
+      ],
+      "process_kind": "gate.lab_critical_value",
+      "side_effects": "read"
+    },
+    "processor/language-lock-respond-in-input-language": {
+      "callable_path": "scripts.processors.language_lock_respond_in_input_language.run",
+      "deterministic": true,
+      "inputs": [
+        "user_text",
+        "system_prompt",
+        "detection_confidence_threshold",
+        "fallback_language"
+      ],
+      "outputs": [
+        "detected_language",
+        "detection_confidence",
+        "patched_system_prompt",
+        "lock_applied"
+      ],
+      "process_kind": "format_convert.language_patch",
+      "side_effects": "none"
+    },
+    "processor/llmlingua-compress": {
+      "callable_path": "scripts.processors.retrieval.llmlingua_compress.run",
+      "deterministic": false,
+      "inputs": [
+        "context",
+        "ratio"
+      ],
+      "outputs": [
+        "compressed"
+      ],
+      "process_kind": "summarize.llmlingua",
+      "side_effects": "none"
+    },
+    "processor/mcp-confluence-connector": {
+      "callable_path": "scripts.processors.connectors.mcp_confluence_connector.run",
+      "deterministic": false,
+      "inputs": [
+        "space",
+        "query"
+      ],
+      "outputs": [
+        "pages"
+      ],
+      "process_kind": "connect.mcp_confluence",
+      "side_effects": "external_call"
+    },
+    "processor/mcp-gitlab-connector": {
+      "callable_path": "scripts.processors.connectors.mcp_gitlab_connector.run",
+      "deterministic": false,
+      "inputs": [
+        "repo",
+        "query"
+      ],
+      "outputs": [
+        "docs"
+      ],
+      "process_kind": "connect.mcp_gitlab",
+      "side_effects": "external_call"
+    },
+    "processor/mcp-postgres-connector": {
+      "callable_path": "scripts.processors.connectors.mcp_postgres_connector.run",
+      "deterministic": false,
+      "inputs": [
+        "query"
+      ],
+      "outputs": [
+        "rows"
+      ],
+      "process_kind": "connect.mcp_postgres",
+      "side_effects": "external_call"
+    },
+    "processor/memory-agentic-hierarchy": {
+      "callable_path": "scripts.processors.memory.memory_agentic_hierarchy.run",
+      "deterministic": true,
+      "inputs": [
+        "context",
+        "store"
+      ],
+      "outputs": [
+        "paged"
+      ],
+      "process_kind": "memory.agentic",
+      "side_effects": "write"
+    },
+    "processor/memory-confidence-track": {
+      "callable_path": "scripts.processors.memory.memory_confidence_track.run",
+      "deterministic": true,
+      "inputs": [
+        "claim",
+        "evidence"
+      ],
+      "outputs": [
+        "belief"
+      ],
+      "process_kind": "memory.belief",
+      "side_effects": "write"
+    },
+    "processor/memory-distilled-write": {
+      "callable_path": "scripts.processors.memory.memory_distilled_write.run",
+      "deterministic": false,
+      "inputs": [
+        "turns"
+      ],
+      "outputs": [
+        "facts"
+      ],
+      "process_kind": "memory.write_kb",
+      "side_effects": "write"
+    },
+    "processor/memory-recall": {
+      "callable_path": "scripts.processors.memory.memory_recall.run",
+      "deterministic": false,
+      "inputs": [
+        "query",
+        "store"
+      ],
+      "outputs": [
+        "memories"
+      ],
+      "process_kind": "memory.recall",
+      "side_effects": "read"
+    },
+    "processor/memory-reflect": {
+      "callable_path": "scripts.processors.memory.memory_reflect.run",
+      "deterministic": false,
+      "inputs": [
+        "query",
+        "memories"
+      ],
+      "outputs": [
+        "synthesis"
+      ],
+      "process_kind": "memory.reflect",
+      "side_effects": "read"
+    },
+    "processor/memory-temporal-graph": {
+      "callable_path": "scripts.processors.memory.memory_temporal_graph.run",
+      "deterministic": false,
+      "inputs": [
+        "event"
+      ],
+      "outputs": [
+        "graph_delta"
+      ],
+      "process_kind": "memory.temporal_graph",
+      "side_effects": "write"
+    },
+    "processor/memory-write": {
+      "callable_path": "scripts.processors.platform.memory_write.run",
+      "deterministic": true,
+      "inputs": [
+        "turn",
+        "session"
+      ],
+      "outputs": [
+        "written"
+      ],
+      "process_kind": "memory.write_conversational",
+      "side_effects": "write"
+    },
+    "processor/mmr-diversity-select": {
+      "callable_path": "scripts.processors.retrieval.mmr_diversity_select.run",
+      "deterministic": true,
+      "inputs": [
+        "candidates",
+        "lambda",
+        "k"
+      ],
+      "outputs": [
+        "selected"
+      ],
+      "process_kind": "select.mmr_diversity",
+      "side_effects": "none"
+    },
+    "processor/multi-query-expander": {
+      "callable_path": "scripts.processors.retrieval.multi_query_expander.run",
+      "deterministic": false,
+      "inputs": [
+        "query",
+        "n"
+      ],
+      "outputs": [
+        "query_variants"
+      ],
+      "process_kind": "query.multi_query",
+      "side_effects": "external_call"
+    },
+    "processor/multi-source-corroborate": {
+      "callable_path": "scripts.processors.assurance.multi_source_corroborate.run",
+      "deterministic": true,
+      "inputs": [
+        "claim",
+        "supporting_evidence",
+        "contradicting_evidence",
+        "min_independent_sources",
+        "must_verify_fields"
+      ],
+      "outputs": [
+        "corroboration_verdict",
+        "independent_agreement_count",
+        "findings",
+        "review_ticket"
+      ],
+      "process_kind": "verify.multi_source_corroborate",
+      "side_effects": "read"
+    },
+    "processor/nist-publications-walker": {
+      "callable_path": "scripts.processors.nist_publications_walker.run",
+      "deterministic": true,
+      "inputs": [
+        "series",
+        "max_nodes",
+        "status_filter"
+      ],
+      "outputs": [
+        "nodes",
+        "walk_stats"
+      ],
+      "process_kind": "retrieve.tree_walk",
+      "side_effects": "external_call"
+    },
+    "processor/offline-fallback-gate": {
+      "callable_path": "scripts.processors.offline_fallback_gate.run",
+      "deterministic": true,
+      "inputs": [
+        "probe_host",
+        "probe_timeout_ms",
+        "online_step_ref",
+        "offline_corpus_ref"
+      ],
+      "outputs": [
+        "gate_decision",
+        "selected_step_ref",
+        "latency_ms",
+        "probe_host_reached"
+      ],
+      "process_kind": "gate.cost_ceiling",
+      "side_effects": "read"
+    },
+    "processor/offline-queue-sync-on-reconnect": {
+      "callable_path": "scripts.processors.offline_queue_sync_on_reconnect.run",
+      "deterministic": true,
+      "inputs": [
+        "operation",
+        "record",
+        "endpoint_url",
+        "auth_token",
+        "max_batch_size"
+      ],
+      "outputs": [
+        "queue_depth",
+        "synced_count",
+        "failed_count",
+        "oldest_pending_age_s",
+        "last_sync_ts",
+        "sync_status"
+      ],
+      "process_kind": "agent_loop.queue_flush",
+      "side_effects": "write"
+    },
+    "processor/on-device-ocr-prepass": {
+      "callable_path": "scripts.processors.on_device_ocr_prepass.run",
+      "deterministic": true,
+      "inputs": [
+        "image_bytes",
+        "language_hint",
+        "engine"
+      ],
+      "outputs": [
+        "ocr_text",
+        "bounding_boxes",
+        "confidence",
+        "engine_used",
+        "prompt_block"
+      ],
+      "process_kind": "format_convert.pdf_to_text",
+      "side_effects": "none"
+    },
+    "processor/on-device-smart-router": {
+      "callable_path": "scripts.processors.on_device_smart_router.run",
+      "deterministic": true,
+      "inputs": [
+        "request",
+        "connectivity_status",
+        "device_profile",
+        "cost_ceiling_usd",
+        "latency_budget_ms"
+      ],
+      "outputs": [
+        "selected_path",
+        "endpoint_url",
+        "routing_reason",
+        "estimated_cost_usd",
+        "routing_signature"
+      ],
+      "process_kind": "route.dispatch",
+      "side_effects": "read"
+    },
+    "processor/package-agent-skill": {
+      "callable_path": "scripts.processors.deliver.package_agent_skill.run",
+      "deterministic": true,
+      "inputs": [
+        "corpus",
+        "tools"
+      ],
+      "outputs": [
+        "skill_bundle"
+      ],
+      "process_kind": "deliver.skill_package",
+      "side_effects": "none"
+    },
+    "processor/page-aware-chunker": {
+      "callable_path": "scripts.processors.retrieval.page_aware_chunker.run",
+      "deterministic": true,
+      "inputs": [
+        "document",
+        "layout"
+      ],
+      "outputs": [
+        "chunks"
+      ],
+      "process_kind": "chunk.layout_aware",
+      "side_effects": "none"
+    },
+    "processor/persist-object-store": {
+      "callable_path": "scripts.processors.platform.persist_object_store.run",
+      "deterministic": true,
+      "inputs": [
+        "artifact"
+      ],
+      "outputs": [
+        "uri"
+      ],
+      "process_kind": "platform.object_store",
+      "side_effects": "write"
+    },
+    "processor/persist-pgvector": {
+      "callable_path": "scripts.processors.platform.persist_pgvector.run",
+      "deterministic": false,
+      "inputs": [
+        "records",
+        "embedder"
+      ],
+      "outputs": [
+        "upserted"
+      ],
+      "process_kind": "index.update_vector",
+      "side_effects": "write"
+    },
+    "processor/persist-postgres": {
+      "callable_path": "scripts.processors.platform.persist_postgres.run",
+      "deterministic": true,
+      "inputs": [
+        "rows",
+        "table"
+      ],
+      "outputs": [
+        "upserted"
+      ],
+      "process_kind": "platform.postgres_upsert",
+      "side_effects": "write"
+    },
+    "processor/persist-run-store": {
+      "callable_path": "scripts.processors.platform.persist_run_store.run",
+      "deterministic": true,
+      "inputs": [
+        "run"
+      ],
+      "outputs": [
+        "run_id"
+      ],
+      "process_kind": "audit.trace",
+      "side_effects": "write"
+    },
+    "processor/pipeline-recommender": {
+      "callable_path": "scripts.processors.pipeline_recommender.run",
+      "deterministic": false,
+      "inputs": [
+        "prompt",
+        "retrieval_top_k",
+        "rerank_top_k",
+        "types_filter",
+        "model",
+        "simulate_rerank"
+      ],
+      "outputs": [
+        "stage_1_retrieval",
+        "stage_2_rerank",
+        "stage_3_composition_sketch"
+      ],
+      "process_kind": "route.recommendation",
+      "side_effects": "external_call"
+    },
+    "processor/prompt-injection-screen": {
+      "callable_path": "scripts.processors.retrieval.prompt_injection_screen.run",
+      "deterministic": true,
+      "inputs": [
+        "input"
+      ],
+      "outputs": [
+        "safe",
+        "reason"
+      ],
+      "process_kind": "gate.prompt_injection",
+      "side_effects": "none"
+    },
+    "processor/recursive-character-chunker": {
+      "callable_path": "scripts.processors.retrieval.recursive_character_chunker.run",
+      "deterministic": true,
+      "inputs": [
+        "document",
+        "chunk_size",
+        "overlap"
+      ],
+      "outputs": [
+        "chunks"
+      ],
+      "process_kind": "chunk.recursive",
+      "side_effects": "none"
+    },
+    "processor/register-component": {
+      "callable_path": "scripts.processors.platform.register_component.run",
+      "deterministic": false,
+      "inputs": [
+        "result",
+        "manifest"
+      ],
+      "outputs": [
+        "component_id"
+      ],
+      "process_kind": "platform.register_component",
+      "side_effects": "write"
+    },
+    "processor/rrf-fusion": {
+      "callable_path": "scripts.processors.retrieval.rrf_fusion.run",
+      "deterministic": true,
+      "inputs": [
+        "ranked_lists",
+        "k"
+      ],
+      "outputs": [
+        "fused_list"
+      ],
+      "process_kind": "rerank.reciprocal_rank_fusion",
+      "side_effects": "none"
+    },
+    "processor/semantic-dedup": {
+      "callable_path": "scripts.processors.semantic_dedup.run",
+      "deterministic": true,
+      "inputs": [
+        "draft_manifest",
+        "live_corpus",
+        "only_same_type"
+      ],
+      "outputs": [
+        "is_duplicate",
+        "is_near_match",
+        "best_match_id",
+        "best_match_hamming",
+        "best_match_jaccard",
+        "top_5"
+      ],
+      "process_kind": "verify.semantic_dedup",
+      "side_effects": "read"
+    },
+    "processor/serve-mcp-corpus": {
+      "callable_path": "scripts.processors.deliver.serve_mcp_corpus.run",
+      "deterministic": false,
+      "inputs": [
+        "corpus",
+        "tools"
+      ],
+      "outputs": [
+        "mcp_endpoint"
+      ],
+      "process_kind": "deliver.mcp_serve",
+      "side_effects": "external_call"
+    },
+    "processor/simhash-dedupe": {
+      "callable_path": "scripts.processors.retrieval.simhash_dedupe.run",
+      "deterministic": true,
+      "inputs": [
+        "candidates",
+        "threshold"
+      ],
+      "outputs": [
+        "deduped"
+      ],
+      "process_kind": "select.dedupe_simhash",
+      "side_effects": "none"
+    },
+    "processor/sm2-spaced-repetition-scheduler": {
+      "callable_path": "scripts.processors.sm2_spaced_repetition_scheduler.run",
+      "deterministic": true,
+      "inputs": [
+        "card_id",
+        "quality_score",
+        "easiness_factor",
+        "interval_days",
+        "repetitions",
+        "last_review_date"
+      ],
+      "outputs": [
+        "next_review_date",
+        "new_interval_days",
+        "new_easiness_factor",
+        "new_repetitions",
+        "reset_to_today"
+      ],
+      "process_kind": "eval.rubric_deterministic",
+      "side_effects": "none"
+    },
+    "processor/soap-note-structurer": {
+      "callable_path": "scripts.processors.clinical.soap_note_structurer.run",
+      "deterministic": true,
+      "inputs": [
+        "encounter"
+      ],
+      "outputs": [
+        "soap"
+      ],
+      "process_kind": "format_convert.soap_note",
+      "side_effects": "none"
+    },
+    "processor/source-precedence-select": {
+      "callable_path": "scripts.processors.retrieval.source_precedence_select.run",
+      "deterministic": true,
+      "inputs": [
+        "candidates",
+        "policy"
+      ],
+      "outputs": [
+        "selected",
+        "conflicts"
+      ],
+      "process_kind": "select.source_precedence",
+      "side_effects": "none"
+    },
+    "processor/structural-compress": {
+      "callable_path": "scripts.processors.compression.structural_compress.run",
+      "deterministic": true,
+      "inputs": [
+        "content"
+      ],
+      "outputs": [
+        "compressed"
+      ],
+      "process_kind": "compress.structural",
+      "side_effects": "none"
+    },
+    "processor/structured-json-fence-guard": {
+      "callable_path": "scripts.processors.structured_json_fence_guard.run",
+      "deterministic": true,
+      "inputs": [
+        "raw_model_output",
+        "target_schema",
+        "prompt_prefix_injection",
+        "strict_mode"
+      ],
+      "outputs": [
+        "parsed_object",
+        "extraction_method",
+        "validation_errors",
+        "fence_found"
+      ],
+      "process_kind": "coerce.json_repair",
+      "side_effects": "none"
+    },
+    "processor/system-prompt-builder": {
+      "callable_path": "scripts.processors.retrieval.system_prompt_builder.run",
+      "deterministic": true,
+      "inputs": [
+        "task",
+        "constraints",
+        "schema"
+      ],
+      "outputs": [
+        "system_prompt"
+      ],
+      "process_kind": "assemble.prompt_template",
+      "side_effects": "none"
+    },
+    "processor/template-field-gem": {
+      "callable_path": "scripts.processors.template_field_gem.run",
+      "deterministic": true,
+      "inputs": [
+        "template",
+        "context",
+        "strict_mode"
+      ],
+      "outputs": [
+        "assembled_prompt",
+        "resolved_fields",
+        "missing_fields",
+        "conditional_fields_omitted"
+      ],
+      "process_kind": "format_convert.template_render",
+      "side_effects": "none"
+    },
+    "processor/tts-preprocess-low-resource": {
+      "callable_path": "scripts.processors.tts_preprocess_low_resource.run",
+      "deterministic": true,
+      "inputs": [
+        "text",
+        "target_language",
+        "tts_engine",
+        "expansion_map_path",
+        "ssml_rate",
+        "phonetic_map_path"
+      ],
+      "outputs": [
+        "preprocessed_text",
+        "segments",
+        "ssml_output",
+        "transformations_applied"
+      ],
+      "process_kind": "format_convert.tts_preprocess",
+      "side_effects": "none"
+    },
+    "processor/update-dashboard-widget": {
+      "callable_path": "scripts.processors.platform.update_dashboard_widget.run",
+      "deterministic": true,
+      "inputs": [
+        "metric",
+        "store"
+      ],
+      "outputs": [
+        "widget_id"
+      ],
+      "process_kind": "platform.dashboard_widget",
+      "side_effects": "write"
+    },
+    "processor/usage-gated-compress": {
+      "callable_path": "scripts.processors.compression.usage_gated_compress.run",
+      "deterministic": true,
+      "inputs": [
+        "items",
+        "prior",
+        "token_budget"
+      ],
+      "outputs": [
+        "plan"
+      ],
+      "process_kind": "compress.usage_gated",
+      "side_effects": "none"
+    },
+    "processor/uscode-section-walker": {
+      "callable_path": "scripts.processors.uscode_section_walker.run",
+      "deterministic": true,
+      "inputs": [
+        "titles",
+        "max_sections",
+        "skip_repealed",
+        "lrc_release_tag"
+      ],
+      "outputs": [
+        "nodes",
+        "walk_stats"
+      ],
+      "process_kind": "retrieve.tree_walk",
+      "side_effects": "read"
+    },
+    "processor/wikidata-query-walker": {
+      "callable_path": "scripts.processors.wikidata_query_walker.run",
+      "deterministic": true,
+      "inputs": [
+        "preset",
+        "sparql",
+        "max_nodes"
+      ],
+      "outputs": [
+        "nodes",
+        "walk_stats"
+      ],
+      "process_kind": "retrieve.tree_walk",
+      "side_effects": "external_call"
+    },
+    "processor/wikipedia-category-walker": {
+      "callable_path": "scripts.processors.wikipedia_category_walker.run",
+      "deterministic": true,
+      "inputs": [
+        "root_category",
+        "max_depth",
+        "max_nodes",
+        "language_edition",
+        "revision_freeze_ts"
+      ],
+      "outputs": [
+        "nodes",
+        "walk_stats"
+      ],
+      "process_kind": "retrieve.tree_walk",
+      "side_effects": "external_call"
+    }
+  },
+  "component_count": 97,
+  "generated_from": "catalog/processors",
+  "version": 1
+}
