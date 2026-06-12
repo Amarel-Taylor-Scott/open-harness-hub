@@ -69,3 +69,48 @@ PY
 
 Governance note: two more high-star quarantines (litellm NOASSERTION, firecrawl AGPL) —
 the license gate is doing exactly its job on the most popular repos in the batch.
+
+## Batch 3 (the "100% power" sweep) — 70 repos across 4 capability-lane clusters
+
+Four discovery scouts proposed real repos from knowledge (no live API — rate-limit-safe);
+all 70 unique repos run through `repo_intel.engine` in one deterministic pass. **These are
+`knowledge_proposed_unverified` — API fact-verification is the engine's own
+`proof_to_promote` step**, so every row is candidate-grade and nothing is treated as a
+committed number. Snapshots appended to `.agent/repo-intel/snapshots.jsonl`.
+
+**Decision distribution (70 unique):** 19 `intake_as_tool_candidate` · 10
+`propose_teleon_integration` · 8 `intake_as_harness_candidate` · 4 `intake_as_skill_candidate`
+· 1 `intake_as_context_candidate` · 23 `watch` (thin signals) · **5 `quarantine`**.
+
+**Quarantined by the license gate (the governance working — stars are not proof):**
+marker (GPL-3.0), surya (GPL-3.0), MinerU (AGPL-3.0) — copyleft, inspiration-only never
+vendor; Arize/phoenix (Elastic-2.0) — source-available, wrap-behind-port-only; pgvector
+(PostgreSQL license) — permissive but not in the OSI-permissive allowlist, routed to human
+license review (conservative, correct).
+
+**Lane → our-seam map (the integration thesis):**
+
+| Cluster | Representative repos | Maps to our seam | Lane |
+|---|---|---|---|
+| Vector stores | qdrant, weaviate, milvus, chroma, lancedb, marqo, vespa | `dense-vector-retrieve` / `hybrid-retrieve-fuse` backend | wrap |
+| RAG frameworks | llama_index, haystack, R2R, llmware, txtai, Verba | `doc-to-markdown-rag-ingest`, retrieval family | inspiration/template |
+| Rerankers | FlagEmbedding (bge), rerankers | `cross-encoder-reranker` scorer seam | wrap |
+| Chunkers | chonkie, semchunk | `page-aware-chunker` / `recursive-character-chunker` | wrap |
+| Agent frameworks | langgraph, autogen, crewai, smolagents, metagpt, autogpt, swarms | bounded-agent runtime (propose-never-truth, sandboxed) | wrap/foil |
+| Prompt-opt | dspy | `system-prompt-builder` under the lossless law | integrate |
+| Eval | ragas, deepeval, promptfoo, giskard, uptrain | the verification gate (scorers feed receipts) | wrap — VALIDATES thesis |
+| Observability | langfuse, phoenix, openllmetry, helicone | the receipts plane (assurance-vs-logging) | complement |
+| Guardrails | guardrails-ai, nemo-guardrails, llm-guard, rebuff | `prompt-injection-screen`, `clinical-abstention-gate` | wrap — VALIDATES thesis |
+| PII / red-team | presidio, garak | redaction at intake / injection-screen hardening | wrap/inspiration |
+| Doc parsing / OCR | unstructured, nougat, PaddleOCR (+ quarantined marker/surya/MinerU) | `doc-to-markdown-rag-ingest`, `on-device-ocr-prepass` | wrap |
+| Inference serving | sglang, vllm/aibrix, TGI, TensorRT-LLM, llama.cpp, ollama | the inference gateway / `smart-router` | integrate |
+| Memory | cognee, memobase | the `memory-*` family backends | wrap |
+| Fine-tuning | LLaMA-Factory, unsloth, axolotl | the inference gateway (training jobs) | integrate |
+
+**The standing finding, reconfirmed at scale:** the eval + guardrails clusters
+**VALIDATE** our verification thesis (their pass/fail verdicts ARE the shape of our gates),
+the observability cluster is **complement not foil** (it logs what happened, makes no
+truth/promotion decision — assurance-vs-logging is the differentiator), and the
+self-evolving agent-swarm cluster is **the foil, never our runtime** (sandbox-only, never
+pip-install/execute). No single repo does verification + receipts + governed truth
+promotion — the white space holds at 70-repo scale.
