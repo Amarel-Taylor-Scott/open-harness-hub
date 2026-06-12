@@ -20,7 +20,7 @@ bootstrap:
 	pip install -r requirements.txt
 
 test:
-	@for m in contracts novelty standardize gate measure gaps sources construction openness \
+	@for m in contracts novelty standardize gate measure eval_scorers gaps sources construction openness \
 	          access benchmark_synth interactions model_route queues store scrapers stage_load; do \
 	  python -m scripts.foundry.$$m >/dev/null 2>&1 && echo "  ok $$m" || python -m scripts.foundry.$$m --self-test ; \
 	done
