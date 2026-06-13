@@ -1,6 +1,6 @@
 # Proof Inventory
 
-**463** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
+**464** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
 
 - `scripts/ingest/context_rot.py`
 - `scripts/ingest/document_decompose.py`
@@ -59,6 +59,7 @@
 - `scripts/check_cfpb_deterministic_graph.py`
 - `scripts/check_cfpb_conflict_detection.py`
 - `scripts/check_cfpb_reconciliation.py`
+- `scripts/check_source_authority.py`
 - `scripts/check_cfpb_artifact_graph_demo.py`
 - `scripts/check_storage_model_flexible.py`
 - `scripts/check_tenant_store_resolver.py`

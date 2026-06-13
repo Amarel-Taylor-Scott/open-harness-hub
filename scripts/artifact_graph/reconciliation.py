@@ -14,10 +14,27 @@ from __future__ import annotations
 from typing import Sequence
 
 from scripts.artifact_graph.artifact_ledger import EPOCH, Reconciliation, chash
+from scripts.artifact_graph.source_authority import classify_payload, has_provenance
+
+
+def _authority(art) -> dict:
+    """A source's authority, EARNED from its provenance (publisher/domain + verified signature) via
+    source_authority.classify when the artifact carries provenance; the legacy fixture source_rank is
+    used ONLY for artifacts not yet migrated. Carries the human-readable lineage `basis` for the receipt
+    so a reviewer sees authority being CLASSIFIED, not assumed."""
+    if not art:
+        return {"rank": 0, "basis": "no artifact", "earned": False}
+    p = art.payload_json
+    if has_provenance(p):
+        c = classify_payload(p)
+        return {"rank": c["rank"], "basis": c["basis"], "earned": True}
+    rank = int(p.get("source_rank", 50))
+    return {"rank": rank, "basis": f"legacy fixture source_rank={rank} (artifact carries no provenance to classify)",
+            "earned": False}
 
 
 def _rank(art) -> int:
-    return int(art.payload_json.get("source_rank", 50)) if art else 0
+    return _authority(art)["rank"]
 
 
 def _rid(conflict_id: str) -> str:
@@ -36,18 +53,22 @@ def reconcile(conflicts: Sequence, by_id: dict, *, tenant_id: str, now: str = EP
         a, b = by_id.get(c.artifact_a_id), by_id.get(c.artifact_b_id)
         decision, winning, loser, resolver, human = "unresolved_hold_out", None, None, "deterministic", False
         rationale = "unresolved → held out from the promoted pack"
+        authority_basis = None
 
         if c.conflict_type == "promoted_depends_on_unverified":
             # a promotable artifact leaning on an unverified allegation → needs human; hold the allegation out
             decision, winning, loser, human = "needs_human", c.artifact_a_id, c.artifact_b_id, True
             rationale = "promotable artifact depends on an unverified allegation; routed to human review"
         elif a and b:
-            ra, rb = _rank(a), _rank(b)
-            if ra != rb:  # source-of-law / authority precedence
+            auth_a, auth_b = _authority(a), _authority(b)
+            ra, rb = auth_a["rank"], auth_b["rank"]
+            if ra != rb:  # authority precedence — EARNED from each source's provenance, not a fixture rank
                 hi, lo = (a, b) if ra > rb else (b, a)
+                hi_auth, lo_auth = (auth_a, auth_b) if ra > rb else (auth_b, auth_a)
                 decision, winning, loser = "resolved_by_authority", hi.artifact_id, lo.artifact_id
-                rationale = (f"{hi.payload_json.get('authority', hi.source_id)} (rank {max(ra, rb)}) outranks "
-                             f"{lo.payload_json.get('authority', lo.source_id)} (rank {min(ra, rb)})")
+                rationale = f"authority precedence — WINNER: {hi_auth['basis']}  ·  HELD OUT: {lo_auth['basis']}"
+                authority_basis = {"winner": hi_auth["basis"], "held_out": lo_auth["basis"],
+                                   "earned": hi_auth["earned"] and lo_auth["earned"]}
             elif a.source_version != b.source_version:  # freshness (same authority)
                 hi, lo = (a, b) if a.source_version >= b.source_version else (b, a)
                 decision, winning, loser = "resolved_by_freshness", hi.artifact_id, lo.artifact_id
@@ -66,6 +87,7 @@ def reconcile(conflicts: Sequence, by_id: dict, *, tenant_id: str, now: str = EP
             winners[c.conflict_id] = winning
         receipt = {"reconciliation_id": _rid(c.conflict_id), "decision": decision, "winning_artifact_id": winning,
                    "held_out_artifact_ids": [loser] if loser else [], "reason": rationale,
+                   "authority_basis": authority_basis,  # HOW authority was established (classified provenance), not assumed
                    "evidence": (a.source_handles_json if a else []) + (b.source_handles_json if b else []),
                    "human_review_required": human}
         recons.append(Reconciliation(reconciliation_id=_rid(c.conflict_id), tenant_id=tenant_id,

@@ -67,6 +67,7 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_cfpb_deterministic_graph.py", "check_cfpb_deterministic_graph"),
     ("scripts/check_cfpb_conflict_detection.py", "check_cfpb_conflict_detection"),
     ("scripts/check_cfpb_reconciliation.py", "check_cfpb_reconciliation"),
+    ("scripts/check_source_authority.py", "check_source_authority"),
     ("scripts/check_cfpb_artifact_graph_demo.py", "check_cfpb_artifact_graph_demo"),
     # ── generalized runtime: hybrid storage + tenant resolver + LLM Gateway v1 ──
     ("scripts/check_storage_model_flexible.py", "check_storage_model_flexible"),

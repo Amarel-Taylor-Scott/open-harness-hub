@@ -26,8 +26,10 @@ PIPELINE_ID = "cfpb_artifact_graph"
 PIPELINE_VERSION = "v1"
 SCHEMA_VERSION = "v1"
 
-#: deterministic source-authority ranks (regulation/law > FAQ/summary) — drives reconciliation precedence.
-SOURCE_RANK = {"regulation": 100, "regulation_summary": 30, "faq_summary": 10, "complaint": 50}
+# Source authority is no longer a static rank dict — it is EARNED from each source's provenance
+# (publisher/domain + verified signature) via scripts/artifact_graph/source_authority against
+# architecture/source_authority_registry.json, and recorded in the reconciliation receipt's
+# authority_basis. To grant a source authority, add a publisher there — never hand-type a rank here.
 
 PROC = {  # artifact_type → (processor_id, processor_version, model_dependent)
     "source_record": ("source.cfpb", "v1", False), "source_field": ("source.cfpb", "v1", False),
@@ -125,16 +127,26 @@ def build_artifacts(records: Sequence[Mapping[str, Any]], policy: TenantPolicy, 
                          promotion_eligible=False, now=now))
 
     # ── regulatory SEED: the known Reg E (10 business days) vs FAQ (30 days) contradiction ──
+    # Authority is EARNED from provenance (scripts/artifact_graph/source_authority), not a fixture rank:
+    # Reg E is the codified rule published at the eCFR (source-of-law, verified) → it OUTRANKS a vendor
+    # FAQ summary published at an unlisted domain (earns no authority). Flip the publisher and the winner
+    # flips — proven by check_source_authority. No `source_rank` typed on the artifact.
     rege = _art(artifact_type="atomic_fact", key="reg_e_deadline", tenant_id=tenant, source_id="reg-e",
                 run_id=rid, text="Regulation E: error investigation deadline is 10 business days.",
                 payload={"topic": "investigation_deadline", "value": 10, "unit": "business_days",
-                         "source": "regulation", "source_rank": SOURCE_RANK["regulation"], "authority": "Regulation E"},
+                         "source": "regulation", "authority": "Regulation E (12 CFR 1005.11)",
+                         "publisher": "Electronic Code of Federal Regulations (GPO)",
+                         "source_uri": "https://www.ecfr.gov/current/title-12/chapter-X/part-1005/section-1005.11",
+                         "source_signed": True},
                 handles=["ctx://reg-e/1005.11#deadline"], claim_status="fact", promotion_eligible=True,
                 source_version="reg-e-2025", now=now)
     faq = _art(artifact_type="atomic_fact", key="faq_deadline", tenant_id=tenant, source_id="faq",
                run_id=rid, text="FAQ summary: investigation deadline is 30 days.",
                payload={"topic": "investigation_deadline", "value": 30, "unit": "days",
-                        "source": "faq_summary", "source_rank": SOURCE_RANK["faq_summary"], "authority": "FAQ"},
+                        "source": "faq_summary", "authority": "Third-party compliance FAQ (vendor summary)",
+                        "publisher": "Acme Compliance LLC (vendor summary)",
+                        "source_uri": "https://acme-compliance.example.com/reg-e/faq#deadlines",
+                        "source_signed": False},
                handles=["ctx://faq/deadlines#q3"], claim_status="fact", promotion_eligible=True,
                source_version="faq-2026", now=now)
     arts += [rege, faq]

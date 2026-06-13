@@ -149,8 +149,11 @@ class RulePromotionReceipt:
 
 # ── the mined deterministic rule LOGIC (asserts equivalence; does NOT re-implement reconciliation) ──
 def _rank_of(art) -> int:
-    """The authority rank the EXISTING reconciliation authority reads (source_rank in payload)."""
-    return int(art.payload_json.get("source_rank", 50)) if art else 0
+    """The authority rank the EXISTING reconciliation authority reads — now EARNED from each source's
+    provenance (publisher/domain + verified signature) via scripts/artifact_graph/source_authority, not a
+    payload source_rank. Delegates to reconciliation._rank so the mined rule reads the IDENTICAL authority
+    signal it asserts equivalence to (the whole point: reproduce the authority, never fork a second one)."""
+    return RC._rank(art)
 
 
 def apply_authority_precedence_rule(conflict, by_id: dict) -> dict | None:
