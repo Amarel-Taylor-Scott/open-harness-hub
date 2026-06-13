@@ -137,6 +137,26 @@ EXAMPLES: list[dict[str, Any]] = [
         "markdown": lambda o: o["report_markdown"], "trace": lambda o: o["trace"],
     },
     {
+        "id": "beneficial_ownership_resolver", "title": "Beneficial ownership + OFAC 50% rule",
+        "domain": "Sanctions · KYC · M&A roll-ups", "durability": "Aggregation + freshness + source-authority",
+        "scenario": "Resolve each agency’s authoritative parent from conflicting ownership claims (an SEC "
+                    "filing governs over a press rumor), then apply OFAC’s 50% rule — an entity ≥50%-owned "
+                    "through the chain by an SDN-listed person is itself blocked, even if unlisted.",
+        "fails": "A bare model doesn’t know post-cutoff deals, can’t tell an SEC filing from a blog, and "
+                 "can’t propagate a sanctions block down a ≥50% ownership chain.",
+        "invoke": lambda m: m.run(ownership_signals=m._SIGNALS, blocked_entities=m._BLOCKED),
+        "verdict": lambda o: ("block" if o["blocked_by_inheritance"] else "serve",
+                              (f"{len(o['blocked_by_inheritance'])} BLOCKED BY INHERITANCE (OFAC 50% rule): "
+                               + ", ".join(sorted(o["blocked_by_inheritance"])))
+                              if o["blocked_by_inheritance"] else "no entity blocked by the 50% rule"),
+        "rows": lambda o: [("Blocked by inheritance", ", ".join(sorted(o["blocked_by_inheritance"])) or "—"),
+                           ("Proof chain", " → ".join(max(o["blocked_by_inheritance"].values(),
+                                           key=lambda v: len(v["chain"]))["chain"]) if o["blocked_by_inheritance"] else "—"),
+                           ("Held-out (lower-authority) claims", str(len(o["held_out_claims"]))),
+                           ("As of", o["as_of"]), ("Escalated", str(o["escalated"]))],
+        "markdown": lambda o: o["report_markdown"], "trace": lambda o: o["trace"],
+    },
+    {
         "id": "icd10_coding", "title": "ICD-10 coding — abstain over fabricate",
         "domain": "Clinical · medical coding", "durability": "Coded vocabulary",
         "scenario": "Code the diagnoses in an encounter note against a governed terminology. The note "
@@ -388,7 +408,7 @@ def build() -> dict[str, Any]:
 
 def _self_test() -> int:
     res = build()
-    assert res["examples"] == len(EXAMPLES) == 11, res["examples"]
+    assert res["examples"] == len(EXAMPLES) == 12, res["examples"]
     page = _OUT.read_text(encoding="utf-8")
     # The page is self-contained: no external CDN/script/analytics FETCHED (recordable offline, honest).
     # A data: URI or an SVG XML namespace inside one is fine — we flag only real fetched src=/href= URLs.
@@ -404,6 +424,9 @@ def _self_test() -> int:
     assert "RELATED-PARTY" in cards["common_control_resolver"]["verdict"] and "ParentCo" in cards["common_control_resolver"]["verdict"]
     assert "BID-RIGGING RING" in cards["procurement_collusion_ring"]["verdict"] and cards["procurement_collusion_ring"]["status"] == "block"
     assert "abstained" in cards["icd10_coding"]["verdict"] and any("ABSTAINED" in k for k, _ in cards["icd10_coding"]["rows"])
+    assert "BLOCKED BY INHERITANCE" in cards["beneficial_ownership_resolver"]["verdict"] \
+        and cards["beneficial_ownership_resolver"]["status"] == "block" \
+        and "Volkov Holdings → Meridian Staffing Holdings → Apex Staffing" in dict(cards["beneficial_ownership_resolver"]["rows"]).get("Proof chain", "")
     assert "SERVED" in cards["regulated_fact_qa"]["verdict"]
     assert "28%" in page and any("28%" in v for _, v in cards["regulated_fact_qa"]["rows"]), "the served answer (28%) must appear"
     assert "ESCALATED" in cards["clinical_support"]["verdict"]
