@@ -93,6 +93,17 @@ class ConsoleAdapter:
         (OUTBOX / fname).write_text(
             f"To: {msg['to']}\nFrom: {msg['brand']} <no-reply@{msg['realm']}.local>\n"
             f"Subject: {msg['subject']}\n\n{msg['body']}\n", encoding="utf-8")
+        # Cloud: also PUSH to the mailbox service so the demo inbox works across separate Fly apps
+        # (per-app volumes can't share the outbox filesystem). Best-effort — email must never break
+        # registration, so a mailbox hiccup is swallowed; the local outbox write above already held.
+        ingest = os.environ.get("MAILBOX_INGEST_URL")
+        if ingest:
+            try:
+                _post_json(ingest.rstrip("/") + "/api/mailbox/ingest",
+                           {"to": msg["to"], "subject": msg["subject"], "body": msg["body"],
+                            "realm": msg["realm"], "template": msg["template"]}, {})
+            except Exception:  # noqa: BLE001
+                pass
         rec = {"ts": ts, "realm": msg["realm"], "template": msg["template"], "to": msg["to"],
                "mode": "console", "sent": False, "outbox_file": fname,
                "note": "rendered to outbox; NOT sent (dev console adapter — Mode Protocol)"}

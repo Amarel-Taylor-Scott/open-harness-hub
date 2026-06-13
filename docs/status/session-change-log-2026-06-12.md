@@ -61,6 +61,36 @@ explorer, QA stress harness, responsive audit); the receipt/state/llm-plane loca
 catalog→runtime processor bridge; the foundry scorer ladder; Mistral/OpenRouter inference lanes; and
 research/strategy docs. All gated in the flywheel.
 
+## Continuation (06-13) — receipt/state/mailbox wired into the deploy topology
+The 3 backend services that existed in the registry but were **not** in the cloud topology are now
+deployable, and the mailbox's cross-app delivery path is wired end-to-end. All additive; no behaviour
+changed for local dev (every new path is env-gated and skipped when the env var is unset).
+
+- **`architecture/deploy_topology.json`**: added 3 backend services — `receipt` (:9426), `state`
+  (:9427), `mailbox` (:9428) — each health-gated (`/healthz`), own 1GB volume, mesh-addressable. Added
+  `OH_SEAM_MAILBOX_BASE: "@mailbox"` to all 4 web services and `MAILBOX_INGEST_URL: "@mailbox"` to
+  identity. Regenerated `fly/*.toml` (+3 new: mailbox/receipt/state) + `deploy/docker-compose.deploy.yml`
+  (generated files; `--check` PASS, preflight **GO**).
+- **Why mailbox needs an HTTP ingest path:** on Fly each app has its own volume, so identity (which
+  renders the verification email) and mailbox (which displays it) can't share an outbox filesystem.
+  `scripts/email_port.py` ConsoleAdapter now **also** pushes the rendered mail to `MAILBOX_INGEST_URL`
+  (best-effort; a mailbox hiccup is swallowed so email never blocks registration). `scripts/mailbox_local_service.py`
+  gained `store_message()` + `POST /api/mailbox/ingest` to receive it. The web tier already proxied
+  `/api/mailbox/` → the seam, so the reviewer's register→verify-email→click flow now works across
+  separate apps. Verified with a live socket test (ingest 201 → inbox renders → bad path 404 → bad JSON 400)
+  and a new deterministic self-test check (mailbox now 6/6).
+- **receipt/state** are **private** server-to-server services (`is_truth:false` / `truth_authority:false`)
+  with no consumer yet **by design** — "wiring into the topology" means making them deployable + reachable
+  on the internal mesh (`@receipt`/`@state`), which is done. No fake consumer was invented (warrant rule).
+  They share a mount path but use distinct files (`receipts.jsonl` vs `state-log.jsonl`) on separate
+  per-app volumes — no collision.
+- **`dist/promptfoo/*.yaml` (115 files)**: flywheel-regenerated to replace stale `TODO: replace with
+  rows` placeholders with real `file://` dataset globs + row counts. **Deterministic** (identical diff
+  hash across two flywheel runs) — committed separately from the wiring as housekeeping, not mixed in.
+
+Gates after this batch: flywheel **462/462**, preflight **GO**, mailbox **6/6**, receipt **10/10**,
+state **9/9**, live ingest end-to-end **PASS**.
+
 ## How to review or roll back
 - Full session delta: `git diff 5a722649..HEAD`
 - Any single change: `git show <sha>` then `git revert <sha>` if unwanted

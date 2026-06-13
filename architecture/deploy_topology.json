@@ -28,7 +28,7 @@
       "health_path": "/api/identity/health",
       "state_mount": "/app/dist/identity",
       "volume_gb": 1,
-      "env": {},
+      "env": { "MAILBOX_INGEST_URL": "@mailbox" },
       "secret_groups": ["model-plane", "email-plane"]
     },
     {
@@ -59,6 +59,51 @@
       "state_mount": "/app/dist/analytics",
       "volume_gb": 1,
       "env": {},
+      "secret_groups": []
+    },
+    {
+      "name": "receipt",
+      "kind": "backend",
+      "registry_service_id": "local_receipt_service",
+      "command": ["python3", "scripts/receipt_local_service.py"],
+      "public": false,
+      "cpu_kind": "shared",
+      "cpus": 1,
+      "memory_mb": 256,
+      "health_path": "/healthz",
+      "state_mount": "/app/dist/local-services-state",
+      "volume_gb": 1,
+      "env": {},
+      "secret_groups": []
+    },
+    {
+      "name": "state",
+      "kind": "backend",
+      "registry_service_id": "local_state_service",
+      "command": ["python3", "scripts/state_local_service.py"],
+      "public": false,
+      "cpu_kind": "shared",
+      "cpus": 1,
+      "memory_mb": 256,
+      "health_path": "/healthz",
+      "state_mount": "/app/dist/local-services-state",
+      "volume_gb": 1,
+      "env": {},
+      "secret_groups": []
+    },
+    {
+      "name": "mailbox",
+      "kind": "backend",
+      "registry_service_id": "mailbox_local_service",
+      "command": ["python3", "scripts/mailbox_local_service.py"],
+      "public": false,
+      "cpu_kind": "shared",
+      "cpus": 1,
+      "memory_mb": 256,
+      "health_path": "/healthz",
+      "state_mount": "/app/dist/email-outbox",
+      "volume_gb": 1,
+      "env": { "AIDR_IDENTITY_BASE": "@identity" },
       "secret_groups": []
     },
     {
@@ -114,7 +159,8 @@
         "OH_SEAM_REGISTRY_BASE": "@registry",
         "OH_SEAM_ANALYTICS_BASE": "@events",
         "OH_SEAM_TELEON_RUNTIME_BASE": "@teleon-runtime",
-        "OH_SEAM_LIVEOPS_BASE": "@baltor-backend"
+        "OH_SEAM_LIVEOPS_BASE": "@baltor-backend",
+        "OH_SEAM_MAILBOX_BASE": "@mailbox"
       },
       "secret_groups": ["model-plane", "showcase-token"]
     },
@@ -134,7 +180,8 @@
         "OH_SEAM_REGISTRY_BASE": "@registry",
         "OH_SEAM_ANALYTICS_BASE": "@events",
         "OH_SEAM_TELEON_RUNTIME_BASE": "@teleon-runtime",
-        "OH_SEAM_LIVEOPS_BASE": "@baltor-backend"
+        "OH_SEAM_LIVEOPS_BASE": "@baltor-backend",
+        "OH_SEAM_MAILBOX_BASE": "@mailbox"
       },
       "secret_groups": ["model-plane", "showcase-token"]
     },
@@ -154,7 +201,8 @@
         "OH_SEAM_REGISTRY_BASE": "@registry",
         "OH_SEAM_ANALYTICS_BASE": "@events",
         "OH_SEAM_TELEON_RUNTIME_BASE": "@teleon-runtime",
-        "OH_SEAM_LIVEOPS_BASE": "@baltor-backend"
+        "OH_SEAM_LIVEOPS_BASE": "@baltor-backend",
+        "OH_SEAM_MAILBOX_BASE": "@mailbox"
       },
       "secret_groups": ["model-plane", "showcase-token"]
     },
@@ -174,7 +222,8 @@
         "OH_SEAM_REGISTRY_BASE": "@registry",
         "OH_SEAM_ANALYTICS_BASE": "@events",
         "OH_SEAM_TELEON_RUNTIME_BASE": "@teleon-runtime",
-        "OH_SEAM_LIVEOPS_BASE": "@baltor-backend"
+        "OH_SEAM_LIVEOPS_BASE": "@baltor-backend",
+        "OH_SEAM_MAILBOX_BASE": "@mailbox"
       },
       "secret_groups": ["model-plane", "showcase-token"]
     },

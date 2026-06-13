@@ -32,7 +32,31 @@ fly volumes create events_state -a aidr-events -r iad -s 1
 fly deploy -c fly/aidr-events.fly.toml --ha=false
 ```
 
-## 4. aidr-teleon-runtime
+## 4. aidr-receipt
+
+```bash
+fly apps create aidr-receipt
+fly volumes create receipt_state -a aidr-receipt -r iad -s 1
+fly deploy -c fly/aidr-receipt.fly.toml --ha=false
+```
+
+## 5. aidr-state
+
+```bash
+fly apps create aidr-state
+fly volumes create state_state -a aidr-state -r iad -s 1
+fly deploy -c fly/aidr-state.fly.toml --ha=false
+```
+
+## 6. aidr-mailbox
+
+```bash
+fly apps create aidr-mailbox
+fly volumes create mailbox_state -a aidr-mailbox -r iad -s 1
+fly deploy -c fly/aidr-mailbox.fly.toml --ha=false
+```
+
+## 7. aidr-teleon-runtime
 
 ```bash
 fly apps create aidr-teleon-runtime
@@ -41,7 +65,7 @@ fly secrets set -a aidr-teleon-runtime --stage OH_LLM_BASE_URL=<value> OH_LLM_MO
 fly deploy -c fly/aidr-teleon-runtime.fly.toml --ha=false
 ```
 
-## 5. aidr-baltor-backend
+## 8. aidr-baltor-backend
 
 ```bash
 fly apps create aidr-baltor-backend
@@ -50,7 +74,7 @@ fly secrets set -a aidr-baltor-backend --stage OH_LLM_BASE_URL=<value> OH_LLM_MO
 fly deploy -c fly/aidr-baltor-backend.fly.toml --ha=false
 ```
 
-## 6. aidr-web-harness-hub
+## 9. aidr-web-harness-hub
 
 ```bash
 fly apps create aidr-web-harness-hub
@@ -58,7 +82,7 @@ fly secrets set -a aidr-web-harness-hub --stage OH_LLM_BASE_URL=<value> OH_LLM_M
 fly deploy -c fly/aidr-web-harness-hub.fly.toml --ha=false
 ```
 
-## 7. aidr-web-baltor
+## 10. aidr-web-baltor
 
 ```bash
 fly apps create aidr-web-baltor
@@ -66,7 +90,7 @@ fly secrets set -a aidr-web-baltor --stage OH_LLM_BASE_URL=<value> OH_LLM_MODEL=
 fly deploy -c fly/aidr-web-baltor.fly.toml --ha=false
 ```
 
-## 8. aidr-web-context
+## 11. aidr-web-context
 
 ```bash
 fly apps create aidr-web-context
@@ -74,7 +98,7 @@ fly secrets set -a aidr-web-context --stage OH_LLM_BASE_URL=<value> OH_LLM_MODEL
 fly deploy -c fly/aidr-web-context.fly.toml --ha=false
 ```
 
-## 9. aidr-web-teleon
+## 12. aidr-web-teleon
 
 ```bash
 fly apps create aidr-web-teleon
@@ -82,7 +106,7 @@ fly secrets set -a aidr-web-teleon --stage OH_LLM_BASE_URL=<value> OH_LLM_MODEL=
 fly deploy -c fly/aidr-web-teleon.fly.toml --ha=false
 ```
 
-## 10. aidr-redis
+## 13. aidr-redis
 
 ```bash
 fly apps create aidr-redis
@@ -90,7 +114,7 @@ fly volumes create redis_state -a aidr-redis -r iad -s 1
 fly deploy -c fly/aidr-redis.fly.toml --ha=false
 ```
 
-## 11. aidr-postgres — phase-2: the demo plane is file/SQLite-backed; Postgres+pgvector is the staged-row load target (scripts.db.*). Provision when load plans go live.
+## 14. aidr-postgres — phase-2: the demo plane is file/SQLite-backed; Postgres+pgvector is the staged-row load target (scripts.db.*). Provision when load plans go live.
 
 ```bash
 fly apps create aidr-postgres
@@ -99,7 +123,7 @@ fly secrets set -a aidr-postgres --stage POSTGRES_PASSWORD=<value>
 fly deploy -c fly/aidr-postgres.fly.toml --ha=false
 ```
 
-## 12. aidr-worker
+## 15. aidr-worker
 
 ```bash
 fly apps create aidr-worker
@@ -108,7 +132,7 @@ fly deploy -c fly/aidr-worker.fly.toml --ha=false
 fly machine list -a aidr-worker -q | xargs -r -n1 fly machine stop -a aidr-worker  # controller owns the fleet from here
 ```
 
-## 13. aidr-worker-controller
+## 16. aidr-worker-controller
 
 ```bash
 fly apps create aidr-worker-controller
@@ -136,6 +160,9 @@ Every app below owns SINGLE-WRITER state (JSON/JSONL/SQLite on its volume). Neve
 - `aidr-identity` — single-writer state at `/app/dist/identity` (volume `identity_state`)
 - `aidr-registry` — single-writer state at `/app/dist/registry` (volume `registry_state`)
 - `aidr-events` — single-writer state at `/app/dist/analytics` (volume `events_state`)
+- `aidr-receipt` — single-writer state at `/app/dist/local-services-state` (volume `receipt_state`)
+- `aidr-state` — single-writer state at `/app/dist/local-services-state` (volume `state_state`)
+- `aidr-mailbox` — single-writer state at `/app/dist/email-outbox` (volume `mailbox_state`)
 - `aidr-teleon-runtime` — single-writer state at `/app/dist/local-services-state` (volume `teleon_runtime_state`)
 - `aidr-baltor-backend` — single-writer state at `/app/dist/local-services-state` (volume `baltor_backend_state`)
 - `aidr-redis` — single-writer state at `/data` (volume `redis_state`)
@@ -149,6 +176,9 @@ Fly bills snapshot storage — pin retention to 5 days on every volume (`fly vol
 fly volumes update <identity_state-id> --snapshot-retention 5  # app aidr-identity, volume identity_state
 fly volumes update <registry_state-id> --snapshot-retention 5  # app aidr-registry, volume registry_state
 fly volumes update <events_state-id> --snapshot-retention 5  # app aidr-events, volume events_state
+fly volumes update <receipt_state-id> --snapshot-retention 5  # app aidr-receipt, volume receipt_state
+fly volumes update <state_state-id> --snapshot-retention 5  # app aidr-state, volume state_state
+fly volumes update <mailbox_state-id> --snapshot-retention 5  # app aidr-mailbox, volume mailbox_state
 fly volumes update <teleon_runtime_state-id> --snapshot-retention 5  # app aidr-teleon-runtime, volume teleon_runtime_state
 fly volumes update <baltor_backend_state-id> --snapshot-retention 5  # app aidr-baltor-backend, volume baltor_backend_state
 fly volumes update <redis_state-id> --snapshot-retention 5  # app aidr-redis, volume redis_state

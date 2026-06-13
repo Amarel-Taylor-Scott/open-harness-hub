@@ -28,6 +28,7 @@ import html
 import json
 import os
 import re
+import time
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -75,6 +76,20 @@ def _parse_message(path: Path) -> dict:
             "subject": hd.get("subject", ""), "body": body.strip(),
             "verify_link": verify.group(0) if verify else None,
             "ts": int(path.stem.split("-")[0]) if path.stem.split("-")[0].isdigit() else 0}
+
+
+def store_message(*, to: str, subject: str, body: str, realm: str = "mail", template: str = "msg",
+                  sender: str = "", now: float = 0.0, outbox: Path | None = None) -> str:
+    """Write a received email to the outbox in the format `_parse_message` reads. This lets the
+    mailbox RECEIVE mail over HTTP (cloud: the identity service pushes here, because Fly per-app
+    volumes can't share a filesystem) instead of only reading a co-located outbox (local dev)."""
+    outbox = outbox or OUTBOX
+    outbox.mkdir(parents=True, exist_ok=True)
+    ts = int(now) if now else int(time.time())
+    fname = f"{ts}-{re.sub(r'[^a-zA-Z0-9_-]', '_', realm)}-{re.sub(r'[^a-zA-Z0-9_-]', '_', template)}.txt"
+    frm = sender or f"no-reply@{realm}"
+    (outbox / fname).write_text(f"To: {to}\nFrom: {frm}\nSubject: {subject}\n\n{body}\n", encoding="utf-8")
+    return fname
 
 
 def list_messages(outbox: Path | None = None) -> list[dict]:
@@ -169,6 +184,22 @@ class _Handler(BaseHTTPRequestHandler):
                               "text/html; charset=utf-8")
         self._send(404, b"not found", "text/plain")
 
+    def do_POST(self) -> None:  # noqa: N802
+        # Ingest a rendered email over HTTP (the cloud delivery path: identity pushes here). The
+        # message lands in this service's own outbox/volume and is then served like any caught mail.
+        if urlparse(self.path).path != "/api/mailbox/ingest":
+            return self._send(404, b'{"error":"not_found"}', "application/json")
+        try:
+            n = int(self.headers.get("content-length", 0))
+            data = json.loads(self.rfile.read(n) or b"{}")
+            fname = store_message(to=str(data.get("to", "")), subject=str(data.get("subject", "")),
+                                  body=str(data.get("body", "")), realm=str(data.get("realm", "mail")),
+                                  template=str(data.get("template", "msg")), sender=str(data.get("from", "")),
+                                  now=float(data.get("now", 0.0)))
+            self._send(201, json.dumps({"stored": fname}).encode(), "application/json")
+        except (ValueError, json.JSONDecodeError) as exc:
+            self._send(400, json.dumps({"error": str(exc)}).encode(), "application/json")
+
     def log_message(self, *a):  # quiet
         pass
 
@@ -210,6 +241,18 @@ def _self_test() -> int:
         ck("message HTML renders a clickable Verify button to the real link",
            'class="verify"' in _message_html(msgs[0]["file"])
            and "/mailbox/verify?realm=openharnesshub" in _message_html(msgs[0]["file"]))
+        # the cross-app ingest path: cloud identity pushes mail here over HTTP (Fly per-app volumes
+        # can't share a filesystem), so store_message() must round-trip into the same inbox a local
+        # co-located outbox would. This is what POST /api/mailbox/ingest writes.
+        rt = store_message(to="grace@example.com", subject="Verify your email",
+                           body="Click: /mailbox/verify?realm=baltor&account=acct_999",
+                           realm="baltor", template="verify_email", now=1700000002)
+        rtmsgs = list_messages()
+        ck("store_message round-trips into the inbox (cross-app HTTP ingest)",
+           rt.endswith(".txt") and "baltor" in rt and any(
+               m["to"] == "grace@example.com" and m["subject"] == "Verify your email"
+               and m["verify_link"] == "/mailbox/verify?realm=baltor&account=acct_999"
+               for m in rtmsgs))
         ok, status = complete_verify("openharnesshub", "acct_x", identity_base="http://127.0.0.1:1")
         ck("verify against an unreachable identity is HONEST (failed, not faked)", ok is False)
     OUTBOX = real
