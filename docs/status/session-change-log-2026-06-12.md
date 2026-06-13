@@ -114,6 +114,29 @@ surfaced a bug the unit/`--check`/preflight gates could not:
   **stale** previous-session image. Lesson: don't pipe build commands through `tail` (it hides the
   exit code). Rebuilt correctly → image fresh → flow passes.
 
+## Continuation (06-13) — polish round (observability + gate hardening)
+Tightened the work above; no behaviour change for configured deploys, all env-gated.
+
+- **`scripts/email_port.py` — the mailbox push is now OBSERVABLE, not a silent `pass`.** A failed
+  cross-app ingest used to vanish into `except: pass`; it now records `mailbox_ingest: ok |
+  failed:<ExcType> | not_configured` in the email audit (exception TYPE only — never a message that
+  could echo the internal URL), so an operator can `grep mailbox_ingest`. Still best-effort — a
+  mailbox hiccup never blocks registration and the local outbox write always holds.
+- **`scripts/email_port.py` — self-test now GATES the push path.** New checks prove the push fires to
+  `<base>/api/mailbox/ingest` with the rendered mail (incl. the `rstrip("/")` URL build), success is
+  audited, and a failure is recorded + non-blocking. Patches the module-global `_post_json` (no
+  socket, works under both `__main__` and import). This is the unit-level coverage that was missing —
+  why container start-up was the first thing to catch the stale-image regression.
+- **`scripts/deploy/generate_provider_configs.py` — the gate now catches dependency cycles.** Added
+  `_compose_has_cycle()` + two self-test checks: the generated compose is acyclic AND the detector
+  fires on a planted cycle (proving it isn't a no-op). Closes the gap where `--check`/preflight passed
+  GO on an undeployable cyclic compose (they never ran `docker compose`). Self-test 15→17 checks.
+
+Gates: flywheel **462/462**, generator self-test **17/17**, preflight **GO**, email_port self-test
+green under both invocation styles. Validated (no fix needed): the 3 new Fly tomls have full
+structural parity with existing backends (build/processes/env/mounts/health), and the Fly runbook
+already lists all 3 new apps + their `fly volumes create` + deploy commands.
+
 ## How to review or roll back
 - Full session delta: `git diff 5a722649..HEAD`
 - Any single change: `git show <sha>` then `git revert <sha>` if unwanted

@@ -277,6 +277,47 @@ def _acyclic_deps(graph: dict[str, list[str]]) -> tuple[dict[str, list[str]], li
     return kept, dropped
 
 
+def _compose_has_cycle(compose_text: str) -> bool:
+    """Independently parse the EMITTED compose's depends_on edges and report whether they cycle.
+    docker-compose rejects ANY cyclic depends_on, so this is the gate that catches a cycle BEFORE
+    deploy even if _acyclic_deps ever regresses — defense-in-depth for the exact bug that only
+    container start-up (not --check/preflight) first surfaced."""
+    graph: dict[str, list[str]] = {}
+    cur = None
+    in_services = False
+    for line in compose_text.splitlines():
+        if re.match(r"^services:\s*$", line):
+            in_services = True; continue
+        if re.match(r"^[A-Za-z]", line):       # a new top-level key (volumes:, name:) ends services
+            in_services = False; continue
+        if not in_services:
+            continue
+        m = re.match(r"^  ([A-Za-z0-9_-]+):\s*$", line)
+        if m:
+            cur = m.group(1); graph.setdefault(cur, [])
+            continue
+        m = re.match(r"^    depends_on:\s*(\[.*\])\s*$", line)
+        if m and cur:
+            try:
+                graph[cur] = list(json.loads(m.group(1)))
+            except (ValueError, TypeError):
+                graph[cur] = []
+    WHITE, GRAY, BLACK = 0, 1, 2
+    color = {n: WHITE for n in graph}
+
+    def walk(u: str) -> bool:
+        color[u] = GRAY
+        for v in graph.get(u, []):
+            if v not in color:        # edge to a non-service (shouldn't happen) — ignore
+                continue
+            if color[v] == GRAY or (color[v] == WHITE and walk(v)):
+                return True
+        color[u] = BLACK
+        return False
+
+    return any(color[n] == WHITE and walk(n) for n in sorted(graph))
+
+
 def compose_yaml(topo: dict) -> str:
     """The same plane as plain docker-compose — parity proof and the any-VPS escape hatch."""
     dep_map, dropped_edges = _acyclic_deps(_dep_graph(topo))
@@ -450,6 +491,10 @@ def self_test() -> int:
         ("controller is fly-only (absent from compose)", "worker-controller" not in compose),
         ("compose seams resolve to service DNS", '"http://identity:9410"' in compose),
         ("compose wires worker REDIS_URL to the redis service", '"redis://redis:6379/0"' in compose),
+        ("generated compose has NO dependency cycle (compose rejects cycles — the deploy-blocker "
+         "only container start-up first caught)", not _compose_has_cycle(compose)),
+        ("...and the cycle detector actually fires on a planted cycle (not a silent no-op)",
+         _compose_has_cycle('services:\n  a:\n    depends_on: ["b"]\n  b:\n    depends_on: ["a"]\n')),
         ("no secret VALUES leak into any generated file", all(
             tok not in content for content in rendered.values()
             for tok in ("sk-or-", "OH_LLM_API_KEY ="))),

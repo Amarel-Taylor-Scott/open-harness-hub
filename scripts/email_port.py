@@ -97,15 +97,20 @@ class ConsoleAdapter:
         # (per-app volumes can't share the outbox filesystem). Best-effort — email must never break
         # registration, so a mailbox hiccup is swallowed; the local outbox write above already held.
         ingest = os.environ.get("MAILBOX_INGEST_URL")
+        ingest_status = "not_configured"
         if ingest:
             try:
                 _post_json(ingest.rstrip("/") + "/api/mailbox/ingest",
                            {"to": msg["to"], "subject": msg["subject"], "body": msg["body"],
                             "realm": msg["realm"], "template": msg["template"]}, {})
-            except Exception:  # noqa: BLE001
-                pass
+                ingest_status = "ok"
+            except Exception as exc:  # noqa: BLE001  (email must never break registration)
+                # best-effort, but NOT silent: the outcome lands in the audit below so an operator
+                # can see a mailbox-ingest failure (grep mailbox_ingest) without it ever blocking
+                # registration. Exception TYPE only — never a message that could echo the URL.
+                ingest_status = f"failed:{type(exc).__name__}"
         rec = {"ts": ts, "realm": msg["realm"], "template": msg["template"], "to": msg["to"],
-               "mode": "console", "sent": False, "outbox_file": fname,
+               "mode": "console", "sent": False, "outbox_file": fname, "mailbox_ingest": ingest_status,
                "note": "rendered to outbox; NOT sent (dev console adapter — Mode Protocol)"}
         with AUDIT.open("a", encoding="utf-8") as fh:
             fh.write(json.dumps(rec, sort_keys=True) + "\n")
@@ -213,6 +218,39 @@ def _self_test() -> int:
     ck("console: mode=console, sent=False (Mode Protocol — no silent send)",
        rec["mode"] == "console" and rec["sent"] is False)
     ck("console: written to outbox + audit", (OUTBOX / rec["outbox_file"]).exists() and AUDIT.exists())
+    # cross-app mailbox ingest push (the cloud delivery path): best-effort, OBSERVABLE, never blocks.
+    # Gate the deliver()→push logic by capturing the HTTP call — the unit gap that let container-only
+    # testing be the first to catch a stale-image regression. Patches the module-global _post_json
+    # (works under both `python -m`/import and `__main__` invocation; no socket, deterministic).
+    global _post_json
+    real_post, calls = _post_json, []
+
+    def _ok(url, payload, headers):
+        calls.append((url, payload)); return {"stored": "ok"}
+
+    def _boom(url, payload, headers):
+        calls.append((url, payload)); raise RuntimeError("mailbox unreachable")
+
+    prev_ingest = os.environ.get("MAILBOX_INGEST_URL")
+    try:
+        os.environ["MAILBOX_INGEST_URL"] = "http://mailbox:9428/"   # trailing slash → tests rstrip too
+        _post_json = _ok
+        rec_push = send("baltor", "verify_email", "push@example.test", {"verify_url": "/mailbox/verify?realm=baltor&account=acct_x"})
+        ck("mailbox ingest: push fired to <base>/api/mailbox/ingest with the rendered mail",
+           len(calls) == 1 and calls[0][0] == "http://mailbox:9428/api/mailbox/ingest"
+           and calls[0][1].get("to") == "push@example.test" and calls[0][1].get("template") == "verify_email")
+        ck("mailbox ingest: success recorded in the audit (observable, not silent)", rec_push.get("mailbox_ingest") == "ok")
+        # failure is OBSERVABLE + NON-BLOCKING: an unreachable mailbox still delivers locally and flags the audit
+        _post_json = _boom
+        rec_fail = send("baltor", "verify_email", "push2@example.test", {"verify_url": "/mailbox/verify?realm=baltor&account=acct_y"})
+        ck("mailbox ingest: failure recorded (failed:...), never silent, never blocks the local outbox write",
+           str(rec_fail.get("mailbox_ingest", "")).startswith("failed:") and (OUTBOX / rec_fail["outbox_file"]).exists())
+    finally:
+        _post_json = real_post
+        if prev_ingest is None:
+            os.environ.pop("MAILBOX_INGEST_URL", None)
+        else:
+            os.environ["MAILBOX_INGEST_URL"] = prev_ingest
     # real-send adapters are seams: NotConfigured without a key, NEVER a fake send
     for ad in ("resend", "postmark"):
         os.environ.pop({"resend": "RESEND_API_KEY", "postmark": "POSTMARK_API_KEY"}[ad], None)
