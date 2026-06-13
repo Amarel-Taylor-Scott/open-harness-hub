@@ -50,11 +50,20 @@ def _receipt(run_id: str, provider_id: str, now: str, **extra) -> dict:
 
 
 class LocalTempdirProvider:
-    """Offline golden-path sandbox: scoped tempdir + sanitized env + timeout + no shell. Network = none."""
+    """Offline golden-path sandbox: scoped tempdir + sanitized env + timeout + no shell. Network = none.
+
+    `requested_provider_id` records the isolation kind the CALLER asked for when this local impl is
+    substituted for another (not-yet-implemented) local provider — they share this impl for now. The
+    receipt then carries BOTH the actual impl (`provider_id`) and what was requested, so sandbox
+    EVIDENCE never claims an isolation kind that did not actually run (governed-receipt integrity)."""
     provider_id = OFFLINE_DEFAULT_PROVIDER
 
+    def __init__(self, requested_provider_id: str | None = None) -> None:
+        self.requested_provider_id = requested_provider_id or OFFLINE_DEFAULT_PROVIDER
+
     def describe(self) -> dict:
-        return {"provider_id": self.provider_id, "kind": "local_tempdir", "external": False, "network": "none"}
+        return {"provider_id": self.provider_id, "requested_provider_id": self.requested_provider_id,
+                "kind": "local_tempdir", "external": False, "network": "none"}
 
     def health(self) -> dict:
         return {"provider_id": self.provider_id, "available": True}
@@ -87,11 +96,15 @@ class LocalTempdirProvider:
         expected = request.get("expected_outputs") or []
         contract_ok = (code == 0) and all(e in out for e in expected)
         status = "ok" if (code == 0 and not violations) else ("policy_violation" if violations else "failed")
+        substituted = self.requested_provider_id != self.provider_id  # asked for a different local kind
         return {"schema_version": "SandboxRunResult.v1", "run_id": request["run_id"], "provider_id": self.provider_id,
+                "requested_provider_id": self.requested_provider_id, "provider_substituted": substituted,
                 "status": status, "exit_code": code, "output_contract_valid": contract_ok,
                 "policy_violations": violations, "secrets_leaked": secrets_leaked, "network_events": [],
                 "duration_ms": None, "cost_estimate": 0.0, "stdout_sample": out[:512],
-                "receipt_id": _receipt(request["run_id"], self.provider_id, now)["receipt_id"], "is_truth": False}
+                "receipt_id": _receipt(request["run_id"], self.provider_id, now,
+                                       requested_provider_id=self.requested_provider_id,
+                                       provider_substituted=substituted)["receipt_id"], "is_truth": False}
 
 
 class _CandidateSeam:
@@ -122,7 +135,9 @@ def select_provider(provider_id: str | None = None) -> SandboxProviderPort:
     cat = {p["provider_id"]: p for p in load_catalog()["providers"]}
     node = cat.get(provider_id)
     if node and not node.get("external"):
-        return LocalTempdirProvider()  # other local providers share the local impl for now
+        # other local providers share this impl for now → record the REQUESTED id so the receipt is
+        # honest about the substitution (never claims an isolation kind that didn't actually run)
+        return LocalTempdirProvider(requested_provider_id=provider_id)
     return _CandidateSeam(provider_id)
 
 

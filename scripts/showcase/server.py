@@ -458,7 +458,11 @@ class Handler(BaseHTTPRequestHandler):
             qs = parse_qs(parsed.query)
             q = (qs.get("q") or [""])[0].lower()
             typ = (qs.get("type") or [""])[0]
-            limit = int((qs.get("limit") or ["300"])[0])
+            try:                              # malformed ?limit= (fuzzer/crawler/typo) → honest default, never a 500
+                limit = int((qs.get("limit") or ["300"])[0])
+            except ValueError:
+                limit = 300
+            limit = max(1, min(limit, 1000))  # clamp so a huge limit can't force a giant response either
             items = self.index.items
             governance = _governance_metadata()
             res = [{"id": it["id"], "type": it["type"], "label": label_for_type(it["type"]),

@@ -16,6 +16,7 @@ CLI / self-test (offline, deterministic):
 from __future__ import annotations
 
 import argparse
+import threading
 from typing import Any, Callable
 
 #: Single source of truth for event types (mirror into schemas/events/* when added). The dashboard
@@ -46,29 +47,37 @@ STAGES: tuple[str, ...] = (
 
 
 class EventBus:
-    """Minimal synchronous pub/sub with a monotonic seq + bounded recent buffer. No clock, no IO."""
+    """Minimal synchronous pub/sub with a monotonic seq + bounded recent buffer. No clock, no IO.
+
+    Thread-safe: a Lock guards the seq counter, the events buffer, and the subscriber list because
+    the bus is driven concurrently by ThreadingHTTPServer request threads (multiple dashboard viewers
+    + active runs publishing at once). Subscriber callbacks are SNAPSHOTTED under the lock and invoked
+    OUTSIDE it, so a slow subscriber never holds the lock and a re-entrant publish can't deadlock."""
 
     def __init__(self, *, buffer: int = 1000) -> None:
         self._subs: list[Callable[[dict], None]] = []
         self._events: list[dict] = []
         self._seq = 0
         self._buffer = buffer
+        self._lock = threading.Lock()
 
     def publish(self, kind: str, *, stage: str | None = None, component: str | None = None,
                 correlation_id: str | None = None, causation_id: str | None = None,
                 object_ref: str | None = None, payload: dict | None = None) -> dict:
         if kind not in EVENT_KINDS:
             raise ValueError(f"unknown event kind {kind!r}; add it to EVENT_KINDS (single source)")
-        self._seq += 1
-        ev = {
-            "seq": self._seq, "kind": kind, "stage": stage, "component": component,
-            "correlation_id": correlation_id, "causation_id": causation_id,
-            "object_ref": object_ref, "payload": payload or {},
-        }
-        self._events.append(ev)
-        if len(self._events) > self._buffer:
-            self._events = self._events[-self._buffer:]
-        for cb in list(self._subs):
+        with self._lock:
+            self._seq += 1
+            ev = {
+                "seq": self._seq, "kind": kind, "stage": stage, "component": component,
+                "correlation_id": correlation_id, "causation_id": causation_id,
+                "object_ref": object_ref, "payload": payload or {},
+            }
+            self._events.append(ev)
+            if len(self._events) > self._buffer:
+                self._events = self._events[-self._buffer:]
+            subs = list(self._subs)  # snapshot under the lock; invoke below WITHOUT holding it
+        for cb in subs:
             try:
                 cb(ev)
             except Exception:  # a bad subscriber must never break publishing
@@ -76,20 +85,29 @@ class EventBus:
         return ev
 
     def subscribe(self, cb: Callable[[dict], None]) -> Callable[[], None]:
-        self._subs.append(cb)
-        return lambda: self._subs.remove(cb) if cb in self._subs else None
+        with self._lock:
+            self._subs.append(cb)
+
+        def _unsub() -> None:
+            with self._lock:
+                if cb in self._subs:
+                    self._subs.remove(cb)
+        return _unsub
 
     def recent(self, n: int = 50) -> list[dict]:
-        return self._events[-n:]
+        with self._lock:
+            return self._events[-n:]
 
     def clear(self) -> None:
         """Drop the buffered events (the seq counter stays monotonic so ids never repeat)."""
-        self._events = []
+        with self._lock:
+            self._events = []
 
     def restore(self, events: list[dict]) -> None:
         """Re-seed the buffer from a durable log (e.g. on restart) — events are NOT re-published
         (no duplicate side effects); seq continues past the highest restored id so it stays monotonic."""
-        self._events = list(events)[-self._buffer:]
+        with self._lock:
+            self._events = list(events)[-self._buffer:]
         self._seq = max((int(e.get("seq") or 0) for e in self._events), default=self._seq)
 
     def by_correlation(self, correlation_id: str) -> list[dict]:

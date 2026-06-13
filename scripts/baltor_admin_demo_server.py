@@ -5435,8 +5435,17 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Connection", "keep-alive")
         self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
-        q: "_queue.Queue[dict]" = _queue.Queue()
-        unsub = BUS.subscribe(lambda ev: q.put(ev))
+        # Bounded so a stalled/abandoned tunnel viewer (closed lid, flaky mobile) can't balloon RAM or
+        # back-pressure publish() (which runs on request threads). On overflow drop the event; the
+        # client re-syncs from BUS.recent() on reconnect. 2000 ≈ 2× the bus buffer — ample headroom.
+        q: "_queue.Queue[dict]" = _queue.Queue(maxsize=2000)
+
+        def _enqueue(ev: dict) -> None:
+            try:
+                q.put_nowait(ev)
+            except _queue.Full:
+                pass  # lagged viewer: drop; recent() backfills on reconnect — never block the bus
+        unsub = BUS.subscribe(_enqueue)
         try:
             for ev in BUS.recent(100):
                 self.wfile.write(f"data: {json.dumps(ev)}\n\n".encode("utf-8"))
