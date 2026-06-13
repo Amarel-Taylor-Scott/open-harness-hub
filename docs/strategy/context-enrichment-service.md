@@ -1,7 +1,7 @@
 # Baltor.ai — the Context Enrichment service (CEaaS) — product spec
 
 > **Brand (2026-05-29, locked — [[brand-architecture.md]]):** this service is **Baltor.ai** (in prose:
-> **Baltor**), modules **Verify · Corpus · Compress**, under the company/mission **Context is Everything**.
+> **Baltor**), modules **Verify · Corpus · Compress**, under the company **AI Done Right** (founding thesis: Context is Everything).
 > "CEaaS / Context Enrichment" is the working/descriptive term used in this spec and in code; the brand is
 > Baltor.
 

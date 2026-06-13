@@ -29,7 +29,7 @@ Then run the loop:
 Do not ask me questions or present options. Decide from repo context, implement
 the most defensible improvement, validate it, append a ledger entry, and
 continue. If a path is blocked, switch to another high-value path. Cover all
-three websites: Baltor, Open Harness Hub, and Context Is Everything. Research
+three websites: Baltor, Open Harness Hub, and AI Done Right. Research
 best practices and current market facts when useful. Include competitor
 analysis, hosting/cloud/K8s/serverless/model costs, worker economics, pricing,
 marketing budget, pro forma financials, GTM, customer acquisition, fundraising,

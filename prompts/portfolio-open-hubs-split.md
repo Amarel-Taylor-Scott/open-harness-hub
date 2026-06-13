@@ -13,14 +13,14 @@
 
 # /workflows /portfolio-add-opencontext-openskills-opentools-openharness-io
 
-Seven entities under ContextIsEverything Group: **Teleon.dev** · **Baltor** · **OpenContextHub.io** ·
+Seven entities under AI Done Right (founding thesis: ContextIsEverything): **Teleon.dev** · **Baltor** · **OpenContextHub.io** ·
 **OpenSkillsHub.io** · **OpenToolsHub.io** · **OpenHarnessHub.io** (replaces .org). Do not merge into one
 website; do not blur boundaries; no open hub is a runtime or a truth authority; no customer-private data in open
 hubs.
 
 **Relationship:** OpenContextHub provides reusable context → OpenSkillsHub teaches how → OpenToolsHub gives
 execution → OpenHarnessHub proves it works → Teleon runs/evolves capabilities → Baltor governs context + decides
-truth → ContextIsEverything coordinates.
+truth → AI Done Right coordinates.
 
 ## OPEN HUBS CLAUSE (carry forward)
 The portfolio includes OpenContextHub.io, OpenSkillsHub.io, OpenToolsHub.io, and OpenHarnessHub.io.

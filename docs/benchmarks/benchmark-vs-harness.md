@@ -24,7 +24,7 @@ Relationship (encoded in `architecture/open_hubs_bridge_graph.json`): `Benchmark
 
 `OpenContextHub` context → `OpenSkillsHub` how → `OpenToolsHub` execution → `OpenMCPHub` connects tools →
 `OpenCompressionHub` makes context cheap → **`OpenBenchmarkHub` defines what good means** → `OpenHarnessHub`
-proves it → `Teleon` runs/evolves → `Baltor` governs truth → `ContextIsEverything` coordinates.
+proves it → `Teleon` runs/evolves → `Baltor` governs truth → `AI Done Right` coordinates (founding thesis: ContextIsEverything).
 
 ## Benchmark families (registry taxonomy, queued build)
 

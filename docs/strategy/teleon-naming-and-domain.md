@@ -4,11 +4,16 @@
 for the naming of the purpose-driven runtime. It supersedes the earlier "Purpose Runtime" decision (which
 superseded "Anneal"). Portfolio context: [teleon-baltor-openharnesshub-portfolio].
 
+> **Parent-brand update (LOCKED 2026-06-08):** the holding company's display brand is **AI Done Right**
+> (`aidoneright.dev`), tagline *"AI, done right."* The earlier working name **ContextIsEverything** is
+> preserved as **founding thesis / legacy path context**, not as the parent display brand. See
+> [parent-brand-aidoneright] and `brand.json` (canonical).
+
 ## The locked naming stack
 
 | Layer | Name | Notes |
 |---|---|---|
-| **Holding company** | **ContextIsEverything** (working name; variants …Labs/…Group; **brand clearance pending**) | umbrella IP/brands/standards/structure; owns no runtime/customer-data |
+| **Holding company / parent display brand** | **AI Done Right** — `aidoneright.dev` (**LOCKED 2026-06-08**); prior working name *ContextIsEverything* kept as founding thesis | umbrella IP/brands/standards/structure; owns no runtime/customer-data |
 | **Runtime product / SaaS** | **Teleon** — `teleon.dev` (owned) | the purpose-driven, eval-gated, self-adaptive compute runtime |
 | **Applied product** | **Baltor** — `baltor.ai` | customer-facing context/intelligence product, **powered by Teleon** (a tenant) |
 | **Open ecosystem + standard** | **OpenHarnessHub** | evals/harnesses/templates/skills/adapters/examples + the **open CapabilityTask spec** |

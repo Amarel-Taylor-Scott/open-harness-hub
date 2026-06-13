@@ -88,7 +88,7 @@ license + sandbox/eval gate; discovery≠trust) · `/drafts` (candidates + promo
 **Maintainer/staff:** moderation/governance queue · quarantine · abuse reports · namespace disputes · registry
 health.
 
-### ContextIsEverything — holding company
+### AI Done Right (founding thesis: ContextIsEverything) — holding company
 Minimal product surface. Candidates: the **portfolio identity provider** home (if federated SSO) + an internal
 **cross-portfolio command center** (read-only health rollup of all products — the Demo Control Tower grown up) +
 an investor data room. Not a tenant-facing app.

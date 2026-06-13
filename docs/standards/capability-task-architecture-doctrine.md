@@ -1,8 +1,8 @@
 # CapabilityTask Architecture Doctrine — intent-native, eval-gated, self-adaptive compute
 
-**Date:** 2026-06-06. **Status:** doctrine (the architectural constitution behind OCTS + PurposeTask).
+**Date:** 2026-06-06. **Status:** doctrine (the architectural constitution behind CTS + PurposeTask).
 Companion to `docs/standards/open-capability-task-specification.md` (the standard) and
-`docs/architecture/purpose-task-self-adapting-execution.md` (Baltor's reference runtime). PoC + OCTS CTS-0
+`docs/architecture/purpose-task-self-adapting-execution.md` (Baltor's reference runtime). PoC + CTS CTS-0
 shipped (flywheel 317: `PurposeTaskSpec.v1` is a conformant CapabilityTask; runtime-class vocabulary +
 parallel-path promotion gate).
 
@@ -79,9 +79,9 @@ boundary changes. "Self-evolving code" is framed for enterprise as **eval-gated 
 every candidate is an artifact with provenance, every promotion has evidence, every boundary change has approval.
 
 ## Naming (carry through)
-Standard = **Open Capability Task Specification (OCTS)**, vendor-neutral (not named after Baltor). Baltor's
+Standard = **Capability Task Specification (CTS)**, vendor-neutral (not named after Baltor). Baltor's
 reference runtime = **PurposeTask**. Baltor's existing `CapabilityTask.v1` (FleetLedger) = the LOWER execution
-unit; OCTS `CapabilityTask` = the higher purpose object ≡ PurposeTask. Product names sound powerful (Baltor
+unit; CTS `CapabilityTask` = the higher purpose object ≡ PurposeTask. Product names sound powerful (Baltor
 Capability Plane / Intent Runtime / Adaptive Compute); the standard sounds neutral.
 
 ## Manifesto
@@ -90,6 +90,6 @@ Capability Plane / Intent Runtime / Adaptive Compute); the standard sounds neutr
 > runtimes may evolve through evidence-gated promotion under explicit policy boundaries.*
 
 *Warrant: clear owner intent (an architecture doctrine for intent-native, eval-gated, self-adaptive compute).
-Formalizes + is consistent with the shipped OCTS CTS-0 + PurposeTask substrate; the core invariant (means/ends)
+Formalizes + is consistent with the shipped CTS CTS-0 + PurposeTask substrate; the core invariant (means/ends)
 + adaptation ladder are the governance backbone. Next concrete increments: encode the adaptation ladder
-(L0–L5 + auto-promote-vs-human-approval) as a config artifact + proof; OCTS CTS-1 (runtime-class → backend binding).*
+(L0–L5 + auto-promote-vs-human-approval) as a config artifact + proof; CTS CTS-1 (runtime-class → backend binding).*

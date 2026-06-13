@@ -1,6 +1,6 @@
 # /workflows /baltor-purpose-task-dashboard-and-standard (STAGED — the dual-audience control surface)
 
-Build the PurposeTask dashboard (Baltor STAFF + CUSTOMER views over one truth model) on top of the OCTS/
+Build the PurposeTask dashboard (Baltor STAFF + CUSTOMER views over one truth model) on top of the CTS/
 PurposeTask runtime. Design: `docs/architecture/purpose-task-dashboard-staff-and-customer.md`. The redaction
 safety core is **already built + proven** (`src/baltor/purpose_tasks/projections.py` +
 `check_purpose_task_projection_redaction`, flywheel 318).

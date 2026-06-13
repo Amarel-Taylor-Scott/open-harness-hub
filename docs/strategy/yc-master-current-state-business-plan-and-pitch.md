@@ -1,4 +1,4 @@
-# Baltor / Context is Everything — YC Master: Current State · Scale · Business Plan · Pitch
+# Baltor / AI Done Right (founding thesis: Context is Everything) — YC Master: Current State · Scale · Business Plan · Pitch
 
 **Status:** consolidating master (additive). **Date:** 2026-06-06.
 **Purpose:** one artifact that ties together (1) where we actually are, (2) the cloud/API/cloud-function
@@ -25,7 +25,7 @@ uses it verbatim and never re-opens it.
 - **Soul:** *Trust your context like Nome trusted Balto.*
 - **Pillars:** **Verified · Current · Efficient · Provable.**
 
-**Company:** Context is Everything. **Paid SaaS:** **Baltor.ai** (modules: **Verify · Corpus · Compress**,
+**Company:** AI Done Right (founding thesis: Context is Everything). **Paid SaaS:** **Baltor.ai** (modules: **Verify · Corpus · Compress**,
 with proof built into all three — not a separate SKU). **Open funnel:** **Open Harness Hub** (free; build the
 governed workflow that consumes Baltor). One backend; the join is *one governed object, two doors*.
 
@@ -234,7 +234,7 @@ provenance/eval contract. Bottom-up wedge first (regulated-context buyers), expa
 
 > Render to slides as-is. Keep claims to what the proofs support (assurance brand — overclaiming is fatal).
 
-1. **Title** — *Context is Everything · Baltor.ai.* "Models don't fail. Their context does." [founder, contact]
+1. **Title** — *AI Done Right · Baltor.ai.* "Models don't fail. Their context does." [founder, contact]
 2. **Problem** — Enterprise agents fail because their context is **stale, contradictory, unverified, and not
    packaged for consumption**. Today teams paper over it with manual review that doesn't scale and no audit
    trail. (Buyer pains: "our agents cite stale policy"; "our documents disagree"; "we don't know which facts

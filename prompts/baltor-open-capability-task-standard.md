@@ -1,19 +1,19 @@
-# /workflows /baltor-open-capability-task-standard (STAGED — Baltor as the reference implementation of OCTS)
+# /workflows /baltor-open-capability-task-standard (STAGED — Baltor as the reference implementation of CTS)
 
-Build Baltor's **reference implementation** of the **Open Capability Task Specification (OCTS)** — the
+Build Baltor's **reference implementation** of the **Capability Task Specification (CTS)** — the
 vendor-neutral standard for purpose/capability-provisioned, eval-gated, self-adapting cloud work. Spec/vision:
 `docs/standards/open-capability-task-specification.md`. **The standard is NOT named after Baltor** (adoption
 requires neutrality, like OTel/CloudEvents/OCI); Baltor's conformant runtime is **PurposeTask**.
 
-> **Naming layers (do not conflate):** OCTS `kind: CapabilityTask` (governed PURPOSE object) ≡ Baltor
+> **Naming layers (do not conflate):** CTS `kind: CapabilityTask` (governed PURPOSE object) ≡ Baltor
 > **`PurposeTask`** (reference impl; `PurposeTaskSpec.v1` built). Baltor's existing **`CapabilityTask.v1`**
 > (FleetLedger) is the LOWER execution unit a worker claims — the substrate a PurposeTask dispatches onto.
 > **Build on the existing substrate; no second runtime/ledger/registry.** Focused increments; never concurrent
 > with another repo-mutating workflow. Lead with the working reference impl, not a committee — a spec without a
 > conformant runtime + registry + adapters is a PDF nobody uses.
 
-## OCTS IMPLEMENTATION CLAUSE (carry in the North Star loop)
-Baltor implements OCTS conformance: a CapabilityTask is the stable contract (purpose · I/O · capabilities ·
+## CTS IMPLEMENTATION CLAUSE (carry in the North Star loop)
+Baltor implements CTS conformance: a CapabilityTask is the stable contract (purpose · I/O · capabilities ·
 connected-systems · success_criteria · runtime classes · evals · adaptation · promotion · provenance ·
 governance); the implementation/runtime are interchangeable behind it. Promotion is eval-gated (golden +
 regression + shadow + canary + policy); a task may self-adapt its IMPLEMENTATION but NEVER its purpose/
@@ -22,11 +22,11 @@ conformant runtime.
 
 ## Phases (each = JSON/code/proof/docs together; map to existing substrate)
 - **P1 — Spec artifacts (CTS-0):** finalize `schemas/purpose_tasks/PurposeTaskSpec.v1` as the conformant
-  `CapabilityTask` contract (add the OCTS sections it lacks: triggers · capabilities{required/optional/forbidden}
+  `CapabilityTask` contract (add the CTS sections it lacks: triggers · capabilities{required/optional/forbidden}
   · connectedSystems · runtimePolicy.allowedRuntimeClasses · evaluations · adaptation · promotion · provenance ·
   governance.policyGates). Add `architecture/capability_runtime_classes.json` (the abstract runtime-class
   vocabulary + vendor mappings — distinct from execution_backend_pricebook; it's the layer ABOVE backends).
-  Proof `check_octs_contract_conformance` (a PurposeTaskSpec validates as an OCTS CapabilityTask; required
+  Proof `check_octs_contract_conformance` (a PurposeTaskSpec validates as a CTS CapabilityTask; required
   fields present; forbidden-capability + governance.policyGates honored).
 - **P2 — Runtime binding (CTS-1):** map allowedRuntimeClasses → the existing **execution-backend selector**
   (cloud-agnostic, local-emulator-first). Proof `check_octs_runtime_binding` (a class binds to a concrete backend
@@ -51,7 +51,7 @@ conformant runtime.
   alignment.
 
 ## Acceptance
-A PurposeTaskSpec is OCTS-conformant (CapabilityTask contract) · runtime classes bind to backends by policy ·
+A PurposeTaskSpec is CTS-conformant (CapabilityTask contract) · runtime classes bind to backends by policy ·
 TaskRuns emit standard events+telemetry · promotion is eval-gated via the Parallel-Path Engine · runtime
 optimization moves a task across classes on evidence · bounded self-adaptation works + the self-corrupt redteam
 fails safely · conformance tests + OCI package layout exist · offline demo + flywheel GREEN.

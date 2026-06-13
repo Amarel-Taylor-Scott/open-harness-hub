@@ -1,4 +1,4 @@
-# Marketing & Messaging — ContextIsEverything Group
+# Marketing & Messaging — AI Done Right (founding thesis: ContextIsEverything)
 
 Canonical positioning and copy for the brand family. Source of truth for product/brand
 *identity* is `shared/products.js`; this file is the human-readable messaging guide (use it
@@ -7,7 +7,7 @@ for site copy, sales decks, and onboarding). When a brand name/tagline changes, 
 
 ---
 
-## Company — ContextIsEverything Group
+## Company — AI Done Right
 - **Mission / company line:** *Context is Everything.*
 - **Thesis:** *A model is only as good as the context it acts on.*
 - **What it is:** a holding company / portfolio. A **house of brands** under one mission —
@@ -78,7 +78,7 @@ for site copy, sales decks, and onboarding). When a brand name/tagline changes, 
 ---
 
 ## Naming & relationship rules (do not break)
-- "Context is Everything" is the **only** company-level brand. Baltor and Open Harness Hub are
+- "AI Done Right" is the **only** company-level brand. Baltor and Open Harness Hub are
   **sister products** (peers) — neither is a parent. OHH appears on Baltor only as a quiet
   "sister product" footer link — **never** a switcher or a parent.
 - Renaming any brand is a one-line edit in `products.js` (`name` / `wordmark`).

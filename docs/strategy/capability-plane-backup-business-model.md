@@ -1,7 +1,7 @@
 # Capability Plane — the second business line (backup to the context engine), on one shared substrate
 
 **Date:** 2026-06-06. **Status:** strategy / positioning (owner direction). **Owner intent:** build out the
-CapabilityTask/OCTS/PurposeTask architecture far enough that, **if Baltor's context-enhancement engine doesn't
+CapabilityTask/CTS/PurposeTask architecture far enough that, **if Baltor's context-enhancement engine doesn't
 win, the purpose-driven cloud architecture can stand alone as a backup business model.** Doctrine + spec are
 captured: `docs/standards/{open-capability-task-specification,capability-task-architecture-doctrine}.md`;
 reference runtime: `docs/architecture/purpose-task-self-adapting-execution.md` (PurposeTask, CTS-0 shipped).
@@ -11,7 +11,7 @@ This extends the existing [[two-services-ohh-and-ceaas]] pattern to a THIRD door
 - **Line A (primary): the governed Context Engine** — Baltor.ai (Verify · Corpus · Compress): verified, current,
   provable context for AI agents. The current bet.
 - **Line B (backup/optionality): the Capability Plane** — *intent-native, eval-gated, self-adaptive compute*: the
-  reference runtime (PurposeTask) of the open **OCTS** standard. "Declare a capability; the platform finds/builds
+  reference runtime (PurposeTask) of the open **CTS** standard. "Declare a capability; the platform finds/builds
   the implementation, picks the runtime, measures success, repairs drift, proves promotions, asks humans only at
   boundaries." A genuinely new cloud layer between static serverless/K8s and unbounded agents.
 - **The crux: the work is NOT wasted whichever line wins, because they share one substrate** (see below). Line B
@@ -20,7 +20,7 @@ This extends the existing [[two-services-ohh-and-ceaas]] pattern to a THIRD door
 ## Why the backup is a real standalone business (the category gap)
 Hyperscalers have the PARTS (functions · jobs · workflows · runbooks · ops-copilots · spec→code) but **none
 exposes a long-lived capability object that owns success-criteria + cross-backend selection + evidence-gated
-self-evolution + fallback preservation** (see the OCTS competitive analysis). The category is **Capability-
+self-evolution + fallback preservation** (see the CTS competitive analysis). The category is **Capability-
 Oriented Cloud Runtime / Intent-Native Compute / Eval-Gated Serverless.** Demand is real: every team running
 agents/serverless hits the "my deployment no longer matches my purpose" problem; the alternative today is
 unbounded agents (expensive/unpredictable) or slow manual CI/CD. The economic breakthrough (the **capability
@@ -42,7 +42,7 @@ Both lines run on the SAME governed substrate already shipped/being built — so
 them for A; they ARE B. That's what makes the backup credible rather than a distraction.
 
 ## Commoditization play (how it becomes a category, not a feature)
-1. **Open the standard, neutral** — OCTS (`capabilitytasks.io`), built on CNCF/LF standards (CloudEvents/OpenAPI/
+1. **Open the standard, neutral** — CTS (`capabilitytasks.io`), built on CNCF/LF standards (CloudEvents/OpenAPI/
    AsyncAPI/Serverless-Workflow/OTel/OCI/SLSA/xRegistry/Score/OAM). The standard is NOT named after Baltor.
 2. **Be the best reference implementation** — PurposeTask / the Baltor Capability Plane. Adoption of the spec
    pulls workloads toward the best conformant runtime (the OTel/OCI playbook).
@@ -82,13 +82,13 @@ None of these should be decided unilaterally — flagged per the change-verifica
 
 ## Build-out path (continues via the loop, focused increments — no premature B-only fork)
 Shipped: PurposeTask PoC + `PurposeTaskSpec.v1` (CTS-0) + runtime-class vocabulary + parallel-path promotion +
-execution selector. Next (each serves BOTH lines): adaptation-ladder config + proof · OCTS CTS-1 (runtime-class
+execution selector. Next (each serves BOTH lines): adaptation-ladder config + proof · CTS CTS-1 (runtime-class
 → backend binding) · the eval harness depth · the Template Factory (Workflow opt-in) → the capability compiler ·
 the CapabilityRun/Promotion/Evidence ledger · the registry. Capstone: the full PurposeTask runtime
 (`prompts/baltor-purpose-driven-cloud-task-runtime.md`).
 
 *Warrant: clear owner intent (build the purpose-driven cloud architecture out as a commoditizable backup
 business model). Framed as optionality on a SHARED substrate (not a fork), sequenced behind the primary's proof
-points, honest about focus-dilution risk. Brand-consistent (Context is Everything parent; Baltor.ai = Line A;
-Capability Plane = Line B, OCTS reference runtime). Decisions flagged ⟦DECISION⟧. Related:
+points, honest about focus-dilution risk. Brand-consistent (AI Done Right parent, founding thesis: ContextIsEverything; Baltor.ai = Line A;
+Capability Plane = Line B, CTS reference runtime). Decisions flagged ⟦DECISION⟧. Related:
 [[two-services-ohh-and-ceaas]], [[cloud-task-self-adapting-execution]], [[context-layer-pmf]].*

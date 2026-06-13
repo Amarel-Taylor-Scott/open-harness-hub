@@ -24,7 +24,7 @@ here. **Nothing in this doc is invented** — the marketing copy is pulled verba
 
 | Surface | Accent | Type pairing | Role |
 |---------|--------|--------------|------|
-| ContextIsEverything (HoldCo) | `#2563eb` blue | Hanken Grotesk + IBM Plex Mono | parent / portfolio |
+| AI Done Right (HoldCo; founding thesis: ContextIsEverything) | `#2563eb` blue | Hanken Grotesk + IBM Plex Mono | parent / portfolio |
 | Teleon | `#6d5ef0` indigo | Hanken Grotesk + IBM Plex Mono | runtime SaaS |
 | **Baltor** | `#0e7c86` teal (dark `#2dd4bf`) — coupled to `--verified` | **Hanken Grotesk + IBM Plex Mono (dir-d)** | governed-context product |
 | OpenContextHub | `#2f8f6b` green | branded-house | context registry |
@@ -41,7 +41,7 @@ Each is a single marketing page (`websites/<id>/` → `dist/sites/<id>/index.htm
 `hero · what-it-is/owns · what-it-is-not · who-for · governance/core · types/contents · how-it-fits`. **Copy is
 canonical from `portfolio_lib.SITES`.** Status: all BUILT (need design polish to the Claude Design system).
 
-### ContextIsEverything Group — accent `#2563eb`
+### AI Done Right (founding thesis: ContextIsEverything) — accent `#2563eb`
 - **one-liner:** "Infrastructure for governed, self-improving AI systems."
 - **problem:** "Governed, self-improving AI needs more than one product — it needs a coordinated runtime, a
   governed-context layer, and an open ecosystem, kept distinct yet aligned."

@@ -2,7 +2,7 @@
 description: Design loop — refine the Baltor/Teleon/portfolio HTML surfaces (web/baltor/, openharness tokens), one verified design increment per cycle. Design-only; never backend.
 ---
 
-You extend the ContextIsEverything / Teleon / Baltor DESIGN portfolio — DESIGN + PROTOTYPE work ONLY. Build/refine
+You extend the AI Done Right / Teleon / Baltor DESIGN portfolio — DESIGN + PROTOTYPE work ONLY. Build/refine
 interactive HTML surfaces, preserve positioning, verify visual quality, cross-link correctly, stop after ONE
 verified design increment. NOT backend: do not touch runtime/provider-routing/durable-workers/flywheel-proof
 code, run no network/LLM calls, make no claim the prototypes don't support, imply no production hosting, create no

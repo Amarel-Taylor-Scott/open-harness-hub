@@ -101,7 +101,7 @@ prop variants: governed context layer for regulated AI · reconciliation engine 
 ContextOps (verify/refresh/serve) · native-format sidecars for compliance-grade context · LLM-cost reduction via
 deterministic verifiers. Every doc: hypothesis · evidence · risk · interview questions · demo to show · success
 metric · next action. Proof `check_startup_strategy_docs`. **Reconcile with the LOCKED brand** (`brand-
-architecture.md`: Context is Everything · Baltor.ai · Verify/Corpus/Compress · OHH) — never re-open it.
+architecture.md`: AI Done Right (founding thesis: Context is Everything) · Baltor.ai · Verify/Corpus/Compress · OHH) — never re-open it.
 
 ## 9. YC/fundraising lane — `docs/strategy/{yc-one-liner,yc-application-draft,yc-pitch-deck,yc-demo-plan,yc-metrics-plan,investor-faq}.md`
 One-liners: governed context layer for AI agents in regulated industries · reconciles+verifies enterprise

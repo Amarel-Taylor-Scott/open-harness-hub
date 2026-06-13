@@ -7,10 +7,10 @@ another brand's signature.
 
 | Brand | Owns (signature) | Must NOT claim as identity | Explicit "not" |
 |---|---|---|---|
-| ContextIsEverything | portfolio · holding company · "Infrastructure for governed, self-improving AI systems" | self-adaptive capabilities · governed context · open capability ecosystem | "owns no runtime code" |
+| AI Done Right (founding thesis: ContextIsEverything) | portfolio · holding company · "Infrastructure for governed, self-improving AI systems" | self-adaptive capabilities · governed context · open capability ecosystem | "owns no runtime code" |
 | Teleon | self-adaptive capabilities · CapabilityTask · intent-native, eval-gated, self-adaptive compute | governed context · open capability ecosystem · holding company | "Not a generic AI-agent deployment" |
 | Baltor | governed context · source-grounded · reconciled | self-adaptive capabilities · purpose-defined compute · open capability ecosystem | "Not a generic compute runtime"; uses Teleon via PurposeTaskProviderPort |
 | OpenHarnessHub | open capability ecosystem · open skills · harnesses/templates/rubrics | self-adaptive capabilities · governed context · holding company | "Not a hosted runtime" |
 
-Relationship (allowed, in the relationship zone): OpenHarnessHub → Teleon → Baltor; ContextIsEverything
-coordinates the portfolio. Teleon returns evidence/candidate/result, never Baltor truth.
+Relationship (allowed, in the relationship zone): OpenHarnessHub → Teleon → Baltor; AI Done Right
+(founding thesis: ContextIsEverything) coordinates the portfolio. Teleon returns evidence/candidate/result, never Baltor truth.

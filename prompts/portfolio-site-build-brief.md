@@ -17,13 +17,13 @@ one shared design system, strict brand boundaries. Source of truth for copy/port
 - **If you go multi-page, keep these guarantees** — extend `portfolio_lib.py` (still single-source) or replace
   the renderer, but update the `check_portfolio_*` proofs in the SAME change so required_phrases/boundaries
   still hold per page. Keep the dependency-law cross-links: `OpenHarnessHub → Teleon → Baltor`,
-  ContextIsEverything coordinates.
+  AI Done Right coordinates.
 
 ## Shared system (build once, reuse on all 7)
 - **Component library:** sticky header (brand dot + name + `kind` tag + nav), hero (pill + h1 + lead + dual CTA),
   section blocks, "what it is / what it is NOT" two-column, owns/not-owns table, dependency diagram, footer with
   cross-links + `LOCAL_DEMO_DISCLAIMER`.
-- **Accents (per-site `--accent`):** ContextIsEverything `#5b6cff` · Teleon `#21c7a8` · Baltor `#ff8a3d` ·
+- **Accents (per-site `--accent`):** AI Done Right `#5b6cff` · Teleon `#21c7a8` · Baltor `#ff8a3d` ·
   OpenContextHub `#3da9fc` · OpenSkillsHub `#c77dff` · OpenToolsHub `#f6c945` · OpenHarnessHub `#21d3a0`.
 - **Global pages every site gets:** `/` `/about` `/legal/privacy` `/legal/terms` `/contact` + a 404. Product
   sites (Teleon, Baltor) also get `/security`, `/pricing`, `/docs`, `/blog`, and app entry `/login` `/signup`.
@@ -34,7 +34,7 @@ one shared design system, strict brand boundaries. Source of truth for copy/port
 
 ---
 
-## 1. ContextIsEverything — holding company / investor site (`#5b6cff`)
+## 1. AI Done Right (founding thesis: ContextIsEverything) — holding company / investor site (`#5b6cff`)
 One-liner (IDENTITY): **"Infrastructure for governed, self-improving AI systems."** Audience: founders,
 investors, partners, researchers. It owns NO runtime/product — pages must reflect that.
 
@@ -154,5 +154,5 @@ Per-hub specifics:
 2. The registry template → instantiate the 4 hubs (highest reuse).
 3. Teleon (product depth: platform / capabilitytask / runtimes / lift / dashboards).
 4. Baltor (context-engine / demo / trust / built-on-teleon).
-5. ContextIsEverything (thesis / architecture / standards / investors).
+5. AI Done Right (thesis / architecture / standards / investors).
 6. Re-assert the brand-boundary proofs per page; keep `flywheel --once` green.

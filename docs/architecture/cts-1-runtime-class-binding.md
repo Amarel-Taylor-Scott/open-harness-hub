@@ -3,7 +3,7 @@
 **Status:** built + proven (`scripts/check_runtime_class_binding.py`, registered in the flywheel).
 **Code:** `src/baltor/purpose_tasks/runtime_binding.py` · **Contract:** `schemas/purpose_tasks/RuntimeClassBinding.v1.schema.json`.
 
-CTS-0 let a PurposeTask *declare* `allowed_runtime_classes` from the OCTS-portable vocabulary
+CTS-0 let a PurposeTask *declare* `allowed_runtime_classes` from the CTS-portable vocabulary
 (`architecture/capability_runtime_classes.json`). **CTS-1 is the binding step:** turn a declared abstract
 runtime *class* into a *concrete, runnable backend* — by policy, available credentials, and provider health —
 without the contract ever naming a vendor product.

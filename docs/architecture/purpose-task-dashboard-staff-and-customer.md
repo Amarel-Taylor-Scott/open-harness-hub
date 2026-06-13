@@ -24,7 +24,7 @@ useful; projection is read-only + deterministic.
 - **Customer NEVER sees**: internal prompts · raw secrets · candidate implementation code · other tenants'
   traces · raw provider decisions · redteam payloads · private builder memory · debug/stack traces.
 
-## Surface A — Staff "Purpose Runtime Control Tower" (`/purpose-tasks?view=staff`)
+## Surface A — Staff "Teleon Control Tower" (`/purpose-tasks?view=staff`)
 Cards: **Task Health** (green/yellow/red · failure rate · freshness · eval score) · **Runtime Class** (current
 backend · alternatives · last switch + WHY) · **Implementation Lineage** (baseline · candidates · promoted
 versions · rollback target) · **Evidence Scorecard** (correctness · source-handles · cost · runtime · safety ·

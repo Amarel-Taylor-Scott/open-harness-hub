@@ -35,7 +35,7 @@ criterion** — it's good discipline for what to admit. It is not the customer-f
 - **Open Harness Hub** is "the open project behind Baltor" — credibility, standard-setting,
   developer adoption, SEO. **Not** a near-term revenue engine (OSS free→paid converts ~0.5–3%,
   often <1%; even Confluent monetized <1% — via enterprise value, not volume).
-- **Context is Everything** → corporate footer / legal entity only. Don't make a prospect
+- **AI Done Right** (founding thesis: Context is Everything) → corporate footer / legal entity only. Don't make a prospect
   parse three identities to understand one product.
 
 ## Beachhead & expansion

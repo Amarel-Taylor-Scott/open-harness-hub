@@ -2,7 +2,7 @@
 
 > **Brand note (2026-05-29, locked — [[brand-architecture.md]]):** Service 2 below — the **Context Enrichment
 > service / CEaaS** — is branded **Baltor.ai** (in prose: **Baltor**), with modules **Verify · Corpus ·
-> Compress**. The company/mission is **Context is Everything**; **Open Harness Hub** (Service 1) keeps its
+> Compress**. The company is **AI Done Right** (founding thesis: Context is Everything); **Open Harness Hub** (Service 1) keeps its
 > name. "CEaaS" persists here and in code as the working/descriptive term for the same product.
 
 **Decision (owner, 2026-05-29):** run **two separate products/platforms on two domains**, sharing

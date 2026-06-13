@@ -1,8 +1,8 @@
 # Positioning v2 (canonical) — name · value prop · competitive stance
 
 > **Naming is now locked** ([[brand-architecture.md]], 2026-05-29): the paid SaaS this doc calls
-> "CEaaS / verified-context SaaS / Name TBD" is **Baltor.ai** (in prose: **Baltor**); the company/mission
-> is **Context is Everything**; **Open Harness Hub** keeps its name. This doc owns *positioning*; brand
+> "CEaaS / verified-context SaaS / Name TBD" is **Baltor.ai** (in prose: **Baltor**); the company
+> is **AI Done Right** (founding thesis: Context is Everything); **Open Harness Hub** keeps its name. This doc owns *positioning*; brand
 > identity/messaging lives in [[brand-architecture.md]].
 
 The single throughline that consolidates the strategy. Deep-dives feed this doc; don't duplicate them:
@@ -51,8 +51,8 @@ Bridge to "agent" in language/SEO (*"Power your agents with governed harnesses"*
 you can trust"*), never by renaming (that collapses the harness-vs-agent line the two-product split needs,
 and drops us into the commoditizing agent category). The metaphor *is* the pitch: a harness reins in
 powerful behavior → **governed agents you can trust.** (Own the full mark; "harness" alone collides with
-Harness.io.) The verified-context product is **Baltor.ai** (prose: **Baltor**) and the company/mission is
-**Context is Everything** — both now locked; only trademark/domain clearance remains open.
+Harness.io.) The verified-context product is **Baltor.ai** (prose: **Baltor**) and the company is
+**AI Done Right** (founding thesis: Context is Everything) — both now locked; only trademark/domain clearance remains open.
 
 ## The two products (one governed object, two doors)
 - **Open Harness Hub — the bounded, governed harness** (free/OSS funnel + low-end wedge). Assemble + monitor

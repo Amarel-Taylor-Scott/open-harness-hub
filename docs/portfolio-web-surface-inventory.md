@@ -29,7 +29,7 @@ served truth** · benchmark result ≠ promotion authority · candidate ≠ acti
 | # | Website | Location | Kind | Status |
 |---|---------|----------|------|--------|
 | 1 | **Baltor** (app + demo) | `web/baltor/` + `scripts/baltor_admin_demo_server.py` | SPA + 33 page routes + 80 API routes | LIVE core / mixed |
-| 2 | **ContextIsEverything** (HoldCo) | `web/context-is-everything/` + `dist/sites/contextiseverything/` | parent-brand pages | BUILT |
+| 2 | **AI Done Right** (HoldCo; founding thesis: ContextIsEverything) | `web/context-is-everything/` + `dist/sites/contextiseverything/` | parent-brand pages | BUILT |
 | 3 | **Teleon.dev** | `websites/teleon.dev/` → `dist/sites/teleon.dev/` | one-pager | BUILT |
 | 3b | **Teleon Control Tower** (staff) | — (`prompts/teleon-build-kit.md`) | greenfield TS | **NONE** |
 | 3c | **Capability Assurance Portal** (customer) | — | greenfield TS | **NONE** |

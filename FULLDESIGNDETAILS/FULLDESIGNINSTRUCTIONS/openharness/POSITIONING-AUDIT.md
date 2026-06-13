@@ -1,4 +1,4 @@
-# Positioning & Language Audit — Baltor / ContextIsEverything
+# Positioning & Language Audit — Baltor / AI Done Right
 
 A grounded read on (1) category-language alignment with the 2026 market, (2) marketing
 language vs backend/architecture language, and (3) product–market-fit signal. Companion to

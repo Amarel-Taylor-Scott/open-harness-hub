@@ -13,7 +13,7 @@ business and technical platform:
   packages, and serves trusted context into existing agents/RAG systems.
 - **Open Harness Hub**: the public standards/catalog surface for modular
   harnesses, workers, schemas, capabilities, and reusable agent infrastructure.
-- **Context Is Everything**: the narrative/research surface that explains why
+- **AI Done Right**: the narrative/research surface that explains why
   verified, current, traceable context is the durable enterprise AI control
   layer.
 
@@ -185,7 +185,7 @@ Build or improve clear pages/guides for:
 6. Local development with cheap models and optional frontier-model APIs.
 7. Deployment cost estimates and scaling inflection points.
 8. GTM launch checklist and weekly operating cadence.
-9. Demo scripts for Baltor, Open Harness Hub, and Context Is Everything.
+9. Demo scripts for Baltor, Open Harness Hub, and AI Done Right.
 
 ## Engineering Priority Menu
 

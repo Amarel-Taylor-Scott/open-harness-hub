@@ -6,7 +6,7 @@ The public launch checklist lives in the parent brand site:
 
 It is the operating checklist for taking the three-site platform story from local development to production:
 
-- **Context is Everything** as the parent mission and platform story.
+- **AI Done Right** (founding thesis: Context is Everything) as the parent mission and platform story.
 - **Baltor** as the paid verified-context control product.
 - **Open Harness Hub** as the open builder funnel and governed workflow surface.
 

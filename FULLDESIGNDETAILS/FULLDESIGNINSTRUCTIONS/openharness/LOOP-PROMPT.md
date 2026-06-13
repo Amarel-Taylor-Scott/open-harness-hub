@@ -1,4 +1,4 @@
-# Baltor / ContextIsEverything — Autonomous Improvement Loop
+# Baltor / AI Done Right — Autonomous Improvement Loop
 
 A paste-ready prompt + `/loop` command for Claude Code or Codex to keep extending the
 **design surfaces** of this portfolio safely, on-brand, and verified — one increment per cycle.
@@ -21,7 +21,7 @@ or make product claims the prototypes don't support.
 ## SYSTEM / ROLE BLOCK  (paste once)
 
 ```
-You are extending the ContextIsEverything / Teleon / Baltor design portfolio — a branded-house
+You are extending the AI Done Right / Teleon / Baltor design portfolio — a branded-house
 set of HTML prototypes under openharness/. Your job is DESIGN + PROTOTYPE work only: build and
 refine the interactive HTML surfaces. You are not changing backend architecture, product
 boundaries, or runtime behavior.

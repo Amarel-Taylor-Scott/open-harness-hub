@@ -1,4 +1,4 @@
-# Open Capability Task Specification (OCTS) — a portable standard for autonomous-but-bounded cloud work
+# Capability Task Specification (CTS) — a portable standard for autonomous-but-bounded cloud work
 
 **Date:** 2026-06-06. **Status:** vision / draft standard (v0.1). **Owner intent:** create an **industry
 standard** — not a Baltor product — for provisioning workers and cloud functions **by purpose/capability, not
@@ -6,17 +6,17 @@ by code**, where the task contract is the stable architectural object and cloud 
 queues / browser workers / agents / workflows are interchangeable implementations.
 
 > **Positioning (load-bearing): the standard is NOT named after Baltor.** Like OpenTelemetry / CloudEvents /
-> OCI won adoption by being neutral, OCTS must be vendor-neutral and built ON the CNCF/Linux-Foundation
-> ecosystem, not competing with it. **Baltor is the best *reference implementation*** of OCTS (its
+> OCI won adoption by being neutral, CTS must be vendor-neutral and built ON the CNCF/Linux-Foundation
+> ecosystem, not competing with it. **Baltor is the best *reference implementation*** of CTS (its
 > `PurposeTask` runtime), and the standard's existence makes Baltor's governed substrate the obvious conformant
 > engine. The open spec lives (proposed) at `capabilitytasks.io` / `github.com/capabilitytasks/spec`.
 
 > **Naming-layer reconciliation (avoid the collision in this repo):**
-> - OCTS **`kind: CapabilityTask`** = the higher-level **governed purpose object** (purpose + evals + adaptation
+> - CTS **`kind: CapabilityTask`** = the higher-level **governed purpose object** (purpose + evals + adaptation
 >   + runtime policy). Baltor's reference implementation of it is **`PurposeTask`** (`PurposeTaskSpec.v1`,
 >   built — flywheel 316). *Also avoids Google Cloud Tasks; that's why Baltor's product noun is PurposeTask.*
 > - Baltor's existing **`CapabilityTask.v1`** (FleetLedger) = the **lower execution-level unit** a worker
->   atomically claims to run ONE invocation. It is the substrate a `PurposeTask`/OCTS `CapabilityTask` dispatches
+>   atomically claims to run ONE invocation. It is the substrate a `PurposeTask`/CTS `CapabilityTask` dispatches
 >   onto — a different layer, not a rename. Both coexist; the docs/specs must always say which layer they mean.
 
 ## The inversion (the gap)
@@ -30,17 +30,17 @@ object where **purpose, evals, evolution policy, and runtime choice are primary.
 
 ## Sit ABOVE existing infra, don't replace it
 ```
-Open Capability Task Specification
+Capability Task Specification
   → Task control plane (scheduler · evaluator · policy · runtime router)
   → Runtime adapters
   → Lambda / Cloud Run / Knative / K8s Jobs / KEDA / Temporal / Dapr / Argo / browser / GPU / edge
 ```
-K8s, Knative, Cloud Run, KEDA, Temporal, Dapr, Argo, cloud functions all remain — OCTS decides **which, when,
+K8s, Knative, Cloud Run, KEDA, Temporal, Dapr, Argo, cloud functions all remain — CTS decides **which, when,
 why, and under what success criteria.** Adoption is feasible *because* it demands no rip-and-replace; it gives a
 common **intent layer.**
 
 ## Reuse existing standards (the novel layer stays small)
-| Need | Reuse | OCTS adds |
+| Need | Reuse | CTS adds |
 |---|---|---|
 | I/O + HTTP contracts | JSON Schema · OpenAPI | task input/output + HTTP trigger contracts |
 | Event interface | CloudEvents · AsyncAPI | standard task-lifecycle events |
@@ -76,7 +76,7 @@ durable-workflow → Temporal/Dapr/Inngest/Hatchet/Argo. The contract declares t
 2. **Runtime binding** — allowedRuntimeClasses + per-platform adapters (portable, like Score/OAM but with purpose+evals).
 3. **Evaluation** — *what "working" means* (the part cloud platforms lack). No promotion unless a candidate beats
    the incumbent on golden+regression+shadow+canary+security+cost+latency+policy. CI/CD asks "did it build/deploy?";
-   OCTS asks "is the capability still meeting its purpose, is there a better impl, can it prove itself before promotion?"
+   CTS asks "is the capability still meeting its purpose, is there a better impl, can it prove itself before promotion?"
 4. **Adaptation** — bounded **TaskOrientation** memory (knownFailureModes · environmentFacts · preferred/rejected
    strategies) + the loop: detect → classify → propose candidate → offline evals → shadow → canary → promote-if-policy
    → rollback. Record what/why/evidence/tests/runtime/permissions/approver/rollback (SLSA-style provenance).

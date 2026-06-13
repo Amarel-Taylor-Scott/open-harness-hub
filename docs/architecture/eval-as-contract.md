@@ -98,7 +98,7 @@ doesn't override it gates **identically** to today. A `benchmark_ref` suite must
 compile"). The eval_suite is the **declared acceptance contract** the gate uses to reach that promoted state;
 the compiler reads it (via `eval_suite_for`) for two things: (1) refusing to compile a model-built capability
 whose declared suite never cleared its `gate_threshold`, and (2) emitting the OTel `eval_suite` /
-`success_criteria.passed` attributes the OCTS spec already names
+`success_criteria.passed` attributes the CTS spec already names
 (`docs/standards/open-capability-task-specification.md`). The compiler never bypasses the suite — agents
 PROPOSE, the gate (scored against the declared benchmark) DISPOSES.
 

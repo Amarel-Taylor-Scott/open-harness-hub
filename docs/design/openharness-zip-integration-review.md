@@ -28,7 +28,7 @@ the open product surface.
 - Use one shared design foundation across all three sites: common spacing,
   card primitives, typography scale, and status patterns.
 - Keep brand roles distinct:
-  - Context is Everything: parent mission and platform story.
+  - AI Done Right (founding thesis: Context is Everything): parent mission and platform story.
   - Baltor: paid context-control and context-assurance product.
   - Open Harness Hub: open catalog, builder, registry, and funnel.
 - Treat the old `context-enrichment` prototype as Baltor source material, not
@@ -48,7 +48,7 @@ the open product surface.
 
 ## Current Gaps
 
-- Baltor and Context is Everything are visually related but still less aligned
+- Baltor and AI Done Right (founding thesis: Context is Everything) are visually related but still less aligned
   to the Open Harness Hub shared component system than the zip export intends.
 - The Baltor admin demo has modular CSS, but its panels are still custom
   `ad-*` components rather than mapped aliases to the shared `oh-*` primitives.

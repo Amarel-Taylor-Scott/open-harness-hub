@@ -19,7 +19,7 @@ You are Claude Code running the ContextIsEverything Portfolio Infrastructure Spl
 
 **Goal:** Refactor the architecture documentation, local development topology, infrastructure plan, and
 integration boundaries now that the portfolio contains four separate but related entities:
-1. **ContextIsEverything** — holding company / studio / portfolio layer.
+1. **AI Done Right** (founding thesis: ContextIsEverything) — holding company / studio / portfolio layer.
 2. **Teleon.dev** — independent purpose runtime company. Product: Teleon Runtime. Object: CapabilityTask /
    PurposeTask. Category: intent-native, eval-gated, self-adaptive compute.
 3. **Baltor** — governed context company. Product: context ingestion, decomposition, reconciliation, freshness,
@@ -31,7 +31,7 @@ a runtime · let the holding company own runtime code · share production truth 
 customer-facing websites · import across company boundaries except through explicit ports/contracts.
 
 **Core relationship:** OpenHarnessHub supplies reusable capability parts → Teleon runs and evolves capabilities
-→ Baltor governs context produced by capabilities → ContextIsEverything coordinates the portfolio.
+→ Baltor governs context produced by capabilities → AI Done Right coordinates the portfolio.
 
 ## PART 1 — Company infrastructure map
 `architecture/company_portfolio_map.json` · `company_infrastructure_map.json` · `company_data_boundaries.json` ·
@@ -94,7 +94,7 @@ Run the PART 8 proofs `--self-test`; regress `demo_offline_full_baltor` · `chec
 · cloud account strategy · Teleon/Baltor integration port · Baltor uses embedded Teleon locally · websites
 distinct · ContextIsEverything brand risk recorded · redteam fails safely · Baltor demo green · flywheel green.
 
-**Mental model:** ContextIsEverything Group = the portfolio/thesis. Teleon.dev = the infrastructure company.
+**Mental model:** AI Done Right (founding thesis: ContextIsEverything) = the portfolio/thesis. Teleon.dev = the infrastructure company.
 Baltor = the governed context company. OpenHarnessHub = the open capability ecosystem. Infrastructure:
 co-located for latency/dev-speed · contract-separated for product clarity · account-separated for security/
 spinout · data-separated for trust · brand-separated for customer clarity.

@@ -62,7 +62,7 @@ The per-capability analog of `deploy_topology.json`'s per-service entry. One pro
 |---|---|
 | `unit_id` | hash of `compiler_version + capability_id + capability_version + exec_target + source_spec_hash` (deterministic; **independent of `now`** so a daily recompile of identical inputs collapses to one id) |
 | `capability_id` / `capability_version` | the promoted capability record (lineage to the source) |
-| `runtime_class` | the OCTS-portable class the CapabilityTask declared (`architecture/capability_runtime_classes.json`) |
+| `runtime_class` | the CTS-portable class the CapabilityTask declared (`architecture/capability_runtime_classes.json`) |
 | `backend` | **`src/teleon/purpose_tasks/runtime_binding.bind_allowed`** — the SAME class→backend authority PurposeTask uses |
 | `binding` | the full `RuntimeClassBinding.v1` decision (WHY this backend — lineage, not just which) |
 | `exec_target` | `fly_machine` \| `k8s_job` \| `local_process` (the deployable shape this unit pins) |

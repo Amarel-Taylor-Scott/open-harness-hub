@@ -5,7 +5,7 @@
 
 ## Strategy (owner, locked direction)
 Portfolio = a sales machine, not just architecture. **Open\*Hub websites = inbound proof funnels · diagnostics =
-credibility · Teleon = operational efficiency · Baltor = governance/compliance/trust · ContextIsEverything =
+credibility · Teleon = operational efficiency · Baltor = governance/compliance/trust · AI Done Right =
 routes leads.** Sell a **specific pain diagnosis**, not abstract architecture. Every lead gets a **proof
 artifact**, not a generic pitch. Product routing:
 - "spending too much money/time creating + maintaining tasks/actions/services" → **Teleon** (Task Sprawl Audit)
