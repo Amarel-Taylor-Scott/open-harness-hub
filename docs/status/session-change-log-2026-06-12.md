@@ -91,6 +91,29 @@ changed for local dev (every new path is env-gated and skipped when the env var 
 Gates after this batch: flywheel **462/462**, preflight **GO**, mailbox **6/6**, receipt **10/10**,
 state **9/9**, live ingest end-to-end **PASS**.
 
+## Continuation (06-13) — container end-to-end caught a real deploy-blocker
+Verified the mailbox flow through **actual docker containers** (not just isolated sockets), which
+surfaced a bug the unit/`--check`/preflight gates could not:
+
+- **BUG (fixed): docker-compose dependency cycle `identity ⇄ mailbox`.** The generator turned every
+  `@<service>` env ref into a `depends_on` edge; identity refs `@mailbox` (push verify-mail) and
+  mailbox refs `@identity` (complete verify), so compose refused to start with
+  `dependency cycle detected`. `--check` and preflight never ran `docker compose`, so it slipped
+  through. **Fix:** `scripts/deploy/generate_provider_configs.py` now breaks cycles deterministically
+  (`_acyclic_deps`, DFS back-edge removal over sorted nodes) — compose `depends_on` is start-ORDER
+  only and these are runtime seams (best-effort push / on-demand verify), so the cycle-closing edge
+  is safe to drop. The dropped edge is surfaced as a comment in the generated compose (never silent).
+  Now `docker compose config` validates clean; identity keeps `depends_on:[mailbox]`, mailbox drops
+  its identity edge.
+- **Verified end-to-end across two real containers:** register → **201** → identity renders the verify
+  email and **pushes** it to the mailbox container over HTTP → mailbox stores it in its own volume →
+  clicking the verify link calls identity back cross-container → **account verified (200), not faked**.
+- **Process note (no code bug):** the local image must be built with `POSTGRES_PASSWORD=x` (compose
+  interpolates the phase-2 postgres env at parse time). An earlier build was piped through `| tail`,
+  which masked compose's non-zero exit — the build silently did nothing and the test ran against a
+  **stale** previous-session image. Lesson: don't pipe build commands through `tail` (it hides the
+  exit code). Rebuilt correctly → image fresh → flow passes.
+
 ## How to review or roll back
 - Full session delta: `git diff 5a722649..HEAD`
 - Any single change: `git show <sha>` then `git revert <sha>` if unwanted

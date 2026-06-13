@@ -230,12 +230,63 @@ def fly_readme(topo: dict, order: list[dict]) -> str:
 
 # ---------------------------------------------------------------- compose emitter
 
+def _compose_services(topo: dict) -> list[dict]:
+    """Compose-eligible services (fly-only roles like the worker-controller have no compose analog)."""
+    return [s for s in topo["services"]
+            if not (s.get("providers") and set(s["providers"]) == {"fly"})]
+
+
+def _dep_graph(topo: dict) -> dict[str, list[str]]:
+    """service → the compose services it references via '@<service>' env refs (sorted, deterministic)."""
+    names = {s["name"] for s in _compose_services(topo)}
+    graph: dict[str, list[str]] = {}
+    for s in _compose_services(topo):
+        deps = {v[1:] for v in (s.get("env") or {}).values()
+                if isinstance(v, str) and v.startswith("@") and not v.startswith("@app:")}
+        graph[s["name"]] = sorted(d for d in deps if d in names)
+    return graph
+
+
+def _acyclic_deps(graph: dict[str, list[str]]) -> tuple[dict[str, list[str]], list[tuple[str, str]]]:
+    """Break dependency cycles so docker-compose accepts the graph (it rejects ANY cyclic depends_on).
+
+    compose `depends_on` is start-ORDER only. The env @-refs that can form a cycle here are RUNTIME
+    seams — e.g. identity pushes verify-mail to mailbox (best-effort, swallowed) while mailbox calls
+    identity to complete an on-demand verify click — so neither is a startup requirement and the
+    cycle-closing edge is safe to drop. Deterministic DFS back-edge removal over sorted nodes/edges,
+    so the same topology always drops the same edge. Returns (kept_deps, dropped_edges)."""
+    WHITE, GRAY, BLACK = 0, 1, 2
+    color = {n: WHITE for n in graph}
+    kept: dict[str, list[str]] = {n: [] for n in graph}
+    dropped: list[tuple[str, str]] = []
+
+    def visit(u: str) -> None:
+        color[u] = GRAY
+        for v in graph.get(u, []):
+            if color.get(v) == GRAY:          # back-edge → closes a cycle → drop it
+                dropped.append((u, v))
+                continue
+            kept[u].append(v)
+            if color.get(v) == WHITE:
+                visit(v)
+        color[u] = BLACK
+
+    for n in sorted(graph):
+        if color[n] == WHITE:
+            visit(n)
+    return kept, dropped
+
+
 def compose_yaml(topo: dict) -> str:
     """The same plane as plain docker-compose — parity proof and the any-VPS escape hatch."""
+    dep_map, dropped_edges = _acyclic_deps(_dep_graph(topo))
     lines = [f"# {GENERATED_MARK}",
              "# Run from repo root: docker compose -f deploy/docker-compose.deploy.yml up",
-             "# Worker fleet: --profile workers (scaled manually here; KEDA on k8s / controller on Fly).",
-             "name: aidoneright", "services:"]
+             "# Worker fleet: --profile workers (scaled manually here; KEDA on k8s / controller on Fly)."]
+    for (u, v) in dropped_edges:  # surfaced, never silent: the cycle-closing start-order hint we dropped
+        lines.append(f"# depends_on {u}→{v} omitted: runtime seam (best-effort/on-demand) that would "
+                     "form a start-order cycle; compose depends_on is ordering only.")
+    lines += ["name: aidoneright", "services:"]
     volumes: list[str] = []
     for svc in topo["services"]:
         if svc.get("providers") and set(svc["providers"]) == {"fly"}:
@@ -262,8 +313,7 @@ def compose_yaml(topo: dict) -> str:
             volume = volume_name(svc)
             volumes.append(volume)
             lines.append(f"    volumes: [{volume}:{svc['state_mount']}]")
-        deps = sorted({v[1:] for v in (svc.get("env") or {}).values()
-                       if isinstance(v, str) and v.startswith("@") and not v.startswith("@app:")})
+        deps = list(dep_map.get(svc["name"], []))  # cycle-broken (see _acyclic_deps)
         if svc["kind"] == "burst":
             deps = sorted(set(deps) | {"redis"})
             lines.append("    profiles: [workers]")
