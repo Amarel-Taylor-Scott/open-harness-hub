@@ -21,6 +21,11 @@ RUN pip install --no-cache-dir -r requirements.txt \
 
 COPY . .
 
+# Prebuild the catalog vector store (hash backend, offline, deterministic) INTO the image so the web
+# tier boots instantly instead of rebuilding it on the first request. A real-embedder deploy
+# (OH_EMBED_BACKEND + keys) transparently rebuilds for its own model on first boot. Non-fatal.
+RUN python -m scripts.db.build_vector_store build >/dev/null 2>&1 || true
+
 # Health: the foundry self-tests run offline with zero cost — a cheap liveness/readiness probe.
 HEALTHCHECK --interval=5m --timeout=60s --start-period=20s \
     CMD python -m scripts.foundry.pipeline --self-test >/dev/null 2>&1 || exit 1
