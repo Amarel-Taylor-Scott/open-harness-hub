@@ -35,10 +35,7 @@ defaultTest:
     value: Audit readiness. Trace includes context ids, processor outputs, redaction status, model arm, and score.
     metric: audit
     weight: 0.08
-tests:
-- description: Sample row 0 from dataset/supplier-audit-corrective-action-samples
-  vars:
-    prompt: 'TODO: replace with rows from dataset'
+tests: file://../../data/supplier-audit-corrective-action/samples/*.json
 outputPath: ./reports/supplier-audit-corrective-action-bench.json
 writeLatestResults: true
 metadata:
@@ -51,3 +48,6 @@ metadata:
     run_date: '2026-05-24'
     hardware: local-dev
     seed: 31
+  dataset: dataset/supplier-audit-corrective-action-samples
+  dataset_split: test
+  dataset_rows: 14

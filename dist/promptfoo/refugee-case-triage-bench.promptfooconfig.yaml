@@ -34,10 +34,7 @@ defaultTest:
     value: Auditability. Trace records processor outputs, retrieved context ids, redaction status, and benchmark metadata.
     metric: auditability
     weight: 0.08
-tests:
-- description: Sample row 0 from dataset/refugee-case-triage-samples
-  vars:
-    prompt: 'TODO: replace with rows from dataset'
+tests: file://../../data/refugee-case-triage/samples/*.json
 outputPath: ./reports/refugee-case-triage-bench.json
 writeLatestResults: true
 metadata:
@@ -50,3 +47,6 @@ metadata:
     run_date: '2026-05-24'
     hardware: local-dev
     seed: 17
+  dataset: dataset/refugee-case-triage-samples
+  dataset_split: test
+  dataset_rows: 12

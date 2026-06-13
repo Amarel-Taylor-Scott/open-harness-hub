@@ -35,10 +35,7 @@ defaultTest:
     value: Audit readiness. Trace includes context ids, processor outputs, redaction status, model arm, and score.
     metric: audit
     weight: 0.08
-tests:
-- description: Sample row 0 from dataset/ai-red-team-findings-samples
-  vars:
-    prompt: 'TODO: replace with rows from dataset'
+tests: file://../../data/ai-red-team-findings/samples/*.json
 outputPath: ./reports/ai-red-team-findings-bench.json
 writeLatestResults: true
 metadata:
@@ -51,3 +48,6 @@ metadata:
     run_date: '2026-05-24'
     hardware: local-dev
     seed: 23
+  dataset: dataset/ai-red-team-findings-samples
+  dataset_split: test
+  dataset_rows: 14

@@ -35,10 +35,7 @@ defaultTest:
     value: Audit readiness. Trace includes context ids, processor outputs, redaction status, model arm, and score.
     metric: audit
     weight: 0.08
-tests:
-- description: Sample row 0 from dataset/maritime-crew-certification-samples
-  vars:
-    prompt: 'TODO: replace with rows from dataset'
+tests: file://../../data/maritime-crew-certification/samples/*.json
 outputPath: ./reports/maritime-crew-certification-bench.json
 writeLatestResults: true
 metadata:
@@ -51,3 +48,6 @@ metadata:
     run_date: '2026-05-24'
     hardware: local-dev
     seed: 31
+  dataset: dataset/maritime-crew-certification-samples
+  dataset_split: test
+  dataset_rows: 14

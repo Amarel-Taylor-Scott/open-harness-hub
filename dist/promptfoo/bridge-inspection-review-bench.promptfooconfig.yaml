@@ -34,10 +34,7 @@ defaultTest:
     value: Auditability. Trace records processor outputs, retrieved context ids, redaction status, and benchmark metadata.
     metric: auditability
     weight: 0.08
-tests:
-- description: Sample row 0 from dataset/bridge-inspection-review-samples
-  vars:
-    prompt: 'TODO: replace with rows from dataset'
+tests: file://../../data/bridge-inspection-review/samples/*.json
 outputPath: ./reports/bridge-inspection-review-bench.json
 writeLatestResults: true
 metadata:
@@ -50,3 +47,6 @@ metadata:
     run_date: '2026-05-24'
     hardware: local-dev
     seed: 17
+  dataset: dataset/bridge-inspection-review-samples
+  dataset_split: test
+  dataset_rows: 12
