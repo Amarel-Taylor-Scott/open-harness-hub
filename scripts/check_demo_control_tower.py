@@ -15,6 +15,10 @@ Asserts (deterministic + offline; rebuilds the page/manifest, does not require l
   F. NO FAKE URLS: any TryCloudflare URL present is a real *.trycloudflare.com host (from the captured manifest),
      never invented; absent ones render '—'/'(launch a tunnel)', not a fabricated link.
   G. PORT CONSISTENCY: registry static-site ports == portfolio_lib PORTS/HUB_PORT (single source).
+  H. NO DEAD LIVE SURFACES: every status:active surface with a non-zero local_port maps to an ACTIVE
+     service port in local_service_registry.json — a drifted/dead port (the 9307→9301 demo-blocker, an
+     unbacked 9108) becomes a CI failure here instead of a connection-refused in front of a reviewer.
+     (local_port 0 = served on-demand / static artifact, intentionally exempt.)
 
 Exit 0/1.
 """
@@ -91,6 +95,17 @@ def _self_test() -> int:
     # G. port consistency with portfolio_lib (single source)
     ok_ports = all(by_id[f"site.{sid}"]["local_port"] == P.PORTS[sid] for sid in P.SITE_ORDER) and by_id["site.portfolio-hub"]["local_port"] == P.HUB_PORT
     check("G: registry static-site ports == portfolio_lib (single source)", ok_ports)
+
+    # H. no dead LIVE surfaces — every active surface's non-zero port is backed by an active service.
+    #    Single-sources the surface port against the running registry so a drifted port (the 9307
+    #    flagship-demo blocker) or an unbacked port (the old 9108 gallery) FAILS here, not on stage.
+    svc_reg = json.loads((_REPO / "architecture" / "local_service_registry.json").read_text())
+    backed_ports = {s["port"] for s in svc_reg.get("services", [])
+                    if str(s.get("status", "")).startswith("active") and s.get("port")}
+    dead = [(s["surface_id"], s["local_port"]) for s in reg
+            if s["status"] == "active" and s.get("local_port") and s["local_port"] not in backed_ports]
+    check("H: every active surface's live (non-zero) port is backed by an active service (no dead demo URLs)",
+          not dead, f"unbacked surfaces: {dead}")
 
     print("\n" + (f"PASS — check_demo_control_tower: {res['surfaces']} surfaces aggregated into one start-here page + "
                   f"dist/demo-all-urls.* ({res['with_public_url']} real TryCloudflare URLs); CFPB e2e invariant cited; "

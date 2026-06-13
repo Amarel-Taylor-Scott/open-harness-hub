@@ -74,7 +74,7 @@ without a card + contract test + fallback.
 
 - **Offline, deterministic:** `PYTHONPATH=. python3 scripts/demo_offline_full_baltor.py --self-test` — every
   core section fires; the CFPB correctness invariant holds.
-- **Live dashboards:** the admin server (`:9307`) serves `/dashboard`, `/fleet` (live supervisor + the new
+- **Live dashboards:** the admin server (`:9301`) serves `/dashboard`, `/fleet` (live supervisor + the new
   execution-backend panels), `/consume`, projection-only over the durable stores.
 - **Runs with no Redis, no pip, no cloud, no network LLM** — then scales to cloud by flipping policy/config.
 

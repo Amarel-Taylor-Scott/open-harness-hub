@@ -18,7 +18,8 @@ Asserts:
   D. DATA SEPARATION (trust): every sensitive_truth_type is owned by EXACTLY ONE company (Baltor) and appears in
      every OTHER company's forbidden_data_types — Teleon/OHH/HoldCo can never own or store Baltor truth.
   E. UNIQUENESS: local_dev_port is unique across companies (no collision); website_domains are disjoint across
-     companies (brand separation); Baltor's port matches the repo's known admin port 9307 (consistency).
+     companies (brand separation); Baltor's port matches the running admin server port read from
+     local_service_registry (baltor_admin_demo_server) — single-sourced, never a literal here.
   F. SHARED FOUNDATION: 'production database' + 'god token' + 'customer data store' are in never_shared and NOT
      in shared (no shared prod DB / no god token).
   G. BRAND RISK: the register flags AI Done Right (parent; conflict_caution, clearance_pending) with required
@@ -38,7 +39,20 @@ _A = _REPO / "architecture"
 _REQUIRED_FIELDS = ("company_id", "role", "product_boundary", "website_domains", "owned_runtime_surfaces",
                     "owned_data_types", "forbidden_data_types", "allowed_integrations", "shared_contracts",
                     "deployment_profile", "local_dev_port", "cloud_account_strategy", "separation_level")
-_BALTOR_ADMIN_PORT = 9307  # the running admin server / Baltor product port — keep the map consistent with it
+
+
+def _registry_port(service_id: str) -> int:
+    """SINGLE SOURCE: the running admin/Baltor port comes from the service registry, never a literal
+    here — a port typed twice is a port that drifts (it did: 9307 vs the registry's 9301), and a
+    check that compares the map to a sibling literal locks the drift in instead of catching it."""
+    reg = json.loads((_A / "local_service_registry.json").read_text())
+    for s in reg.get("services", []):
+        if s.get("service_id") == service_id:
+            return int(s["port"])
+    raise SystemExit(f"check_company_portfolio_boundaries: '{service_id}' not in local_service_registry")
+
+
+_BALTOR_ADMIN_PORT = _registry_port("baltor_admin_demo_server")  # derived from the registry, not hand-typed
 
 
 def _self_test() -> int:
@@ -95,7 +109,8 @@ def _self_test() -> int:
     # E. uniqueness
     ports = [c["local_dev_port"] for c in companies.values()]
     check("E: local_dev_port unique across companies", len(ports) == len(set(ports)), str(ports))
-    check("E: Baltor local_dev_port matches the repo admin port 9307", companies["baltor"]["local_dev_port"] == _BALTOR_ADMIN_PORT)
+    check(f"E: Baltor local_dev_port matches the registry admin port ({_BALTOR_ADMIN_PORT}, from baltor_admin_demo_server)",
+          companies["baltor"]["local_dev_port"] == _BALTOR_ADMIN_PORT, str(companies["baltor"]["local_dev_port"]))
     all_domains = [d for c in companies.values() for d in c["website_domains"]]
     check("E: website_domains disjoint across companies (brand separation)", len(all_domains) == len(set(all_domains)), str(all_domains))
 

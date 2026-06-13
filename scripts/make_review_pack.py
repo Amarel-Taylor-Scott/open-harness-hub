@@ -152,7 +152,7 @@ def build_report(results: list[dict], *, when: str, screenshots: list[dict], rec
 
     lines.append("## D · Visual evidence (freshness matters — re-record if stale)")
     lines.append("")
-    lines.append("Regenerate: `cd e2e && BASE=http://127.0.0.1:9307 node record_dashboard.mjs && BASE=http://localhost:8000 node record_demo.mjs`")
+    lines.append("Regenerate: `cd e2e && BASE=http://127.0.0.1:9301 node record_dashboard.mjs && BASE=http://localhost:8000 node record_demo.mjs`")
     lines.append("")
     for s in screenshots:
         if s["exists"]:

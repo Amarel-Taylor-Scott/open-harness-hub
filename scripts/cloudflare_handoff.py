@@ -60,7 +60,7 @@ def _extra_tunnels() -> dict:
 def build_inventory(now: str) -> dict:
     reg = json.loads(_REG.read_text())["surfaces"]
     tcf = _tunnels()
-    extra = _extra_tunnels()  # port → tunnel URL (e.g. the :9307 admin server)
+    extra = _extra_tunnels()  # port → tunnel URL (e.g. the :9301 admin server)
     ct = _CT_URL.read_text().strip() if _CT_URL.exists() else None
     surfaces = []
     order = 0
