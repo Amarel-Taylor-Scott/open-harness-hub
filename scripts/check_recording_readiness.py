@@ -21,13 +21,21 @@ REPO = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, str(REPO))
 from src.teleon.monitoring.flywheel import Flywheel, urllib_pinger  # noqa: E402
 
-#: the recordable journey seams (path, what it proves) — hit through the running plane.
+def _registry_ports() -> dict:
+    reg = json.loads((REPO / "architecture" / "local_service_registry.json").read_text())
+    return {s["service_id"]: s.get("port") for s in reg.get("services", [])}
+
+
+_P = _registry_ports()
+#: the recordable journey seams (url, what it proves). PORTS come from the service registry (single
+#: source) so a registry port change can't leave this GO/NO-GO gate silently probing dead URLs; the
+#: journey PATHS are seam-specific and stay here.
 _SEAM_SMOKES = [
-    ("http://127.0.0.1:9410/api/identity/realms", "identity realms (registration target)"),
-    ("http://127.0.0.1:9428/api/mailbox/messages", "mailbox inbox (email verify journey)"),
-    ("http://127.0.0.1:9423/api/openhub/catalog", "live registry catalog (browse journey)"),
-    ("http://127.0.0.1:9430/healthz", "teleon runtime (capability journey)"),
-    ("http://127.0.0.1:9301/api/health", "baltor backend (context-gateway journey)"),
+    (f"http://127.0.0.1:{_P['local_auth_service']}/api/identity/realms", "identity realms (registration target)"),
+    (f"http://127.0.0.1:{_P['mailbox_local_service']}/api/mailbox/messages", "mailbox inbox (email verify journey)"),
+    (f"http://127.0.0.1:{_P['local_openhub_projection_api']}/api/openhub/catalog", "live registry catalog (browse journey)"),
+    (f"http://127.0.0.1:{_P['teleon_local_runtime']}/healthz", "teleon runtime (capability journey)"),
+    (f"http://127.0.0.1:{_P['baltor_admin_demo_server']}/api/health", "baltor backend (context-gateway journey)"),
 ]
 
 

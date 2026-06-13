@@ -146,6 +146,14 @@ def _self_test() -> int:
     def ck(n, ok):
         checks.append((n, ok))
 
+    # _SOURCE_BACKED ids must exist as ACTIVE services in the registry — a rename there must fail
+    # loudly here, not silently misroute a source/capability break to a generic restart.
+    import json as _json
+    _active = {s["service_id"] for s in _json.loads(SERVICE_REGISTRY.read_text())["services"]
+               if str(s.get("status", "")).startswith("active")}
+    ck("every _SOURCE_BACKED id is an active registry service (rename fails loudly)",
+       all(sid in _active for sid in _SOURCE_BACKED))
+
     surfaces = [{"service_id": "identity", "health_url": "x"},
                 {"service_id": "registry", "health_url": "x"},
                 {"service_id": "teleon_local_runtime", "health_url": "x"},   # source-backed → reheal

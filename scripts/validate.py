@@ -415,6 +415,21 @@ def _object_governance_package_warnings(known_ids: set[str]) -> list[str]:
             f"expected table(s): {', '.join(missing_tables)}"
         )
 
+    # vector(N) drift guard (no-magic-values): the canonical schema's embedding column dimension MUST
+    # equal the single source — scripts._config.DEFAULT_EMBEDDING_DIMENSIONS. A model swap there must
+    # not silently leave `psql -f schema.sql` creating a wrong-width column the live load then rejects.
+    try:
+        import re as _re
+        from scripts._config import DEFAULT_EMBEDDING_DIMENSIONS
+        _vm = _re.search(r"\bvector\((\d+)\)", schema_text)
+        if _vm and int(_vm.group(1)) != DEFAULT_EMBEDDING_DIMENSIONS:
+            warnings.append(
+                f"object governance package drift: schema.sql embedding vector({_vm.group(1)}) != "
+                f"DEFAULT_EMBEDDING_DIMENSIONS ({DEFAULT_EMBEDDING_DIMENSIONS}) — single-source the "
+                "column from scripts._config.pgvector_type")
+    except Exception as exc:  # pragma: no cover - defensive
+        warnings.append(f"object governance package drift: embedding-dimension check unavailable: {type(exc).__name__}")
+
     try:
         from scripts.db.object_governance_view_probe import probe_object_governance_views
     except Exception as exc:  # pragma: no cover - defensive release warning.

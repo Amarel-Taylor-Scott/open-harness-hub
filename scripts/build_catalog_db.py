@@ -249,7 +249,8 @@ def main(argv: list[str] | None = None) -> int:
     if os.environ.get("OH_BUILD_EMBEDDINGS") == "1":
         try:
             from sentence_transformers import SentenceTransformer  # type: ignore
-            model_name = os.environ.get("OH_EMBEDDING_MODEL", "all-MiniLM-L6-v2")
+            from scripts._config import DEFAULT_EMBEDDING_MODEL
+            model_name = os.environ.get("OH_EMBEDDING_MODEL", DEFAULT_EMBEDDING_MODEL)  # single source: _config
             model = SentenceTransformer(model_name)
             rows = c.execute("SELECT id, name, description FROM components").fetchall()
             texts = [f"{r[1]}\n\n{r[2] or ''}" for r in rows]

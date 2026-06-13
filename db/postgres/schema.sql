@@ -562,7 +562,7 @@ CREATE TABLE IF NOT EXISTS object_embedding (
   embedding_model  TEXT NOT NULL,
   text_hash        TEXT NOT NULL,
   text             TEXT NOT NULL,
-  embedding        vector(384),
+  embedding        vector(384),   -- single source: scripts._config.DEFAULT_EMBEDDING_DIMENSIONS (drift-guarded by scripts/validate.py)
   metadata         JSONB,
   created_at       TIMESTAMPTZ DEFAULT now(),
   UNIQUE (subject_id, subject_type, embedding_model, text_hash)
