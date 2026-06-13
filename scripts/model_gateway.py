@@ -1,5 +1,10 @@
 """Policy-aware model route selection for Baltor and Open Harness Hub.
 
+CANONICAL LAYER: `src/teleon/inference` (OIPS) owns provider-ordering truth (the numeric preference
+graph). This Baltor-era gateway + `scripts/llm_gateway` are the legacy route-selection path during the
+runtime extraction; when the two disagree on ordering, OIPS wins — keep this module's LANE_ORDER/
+TRUST_ORDER in sync with the OIPS graph, never fork a second source of ordering truth.
+
 Workers should ask for a capability, not a concrete provider. This module picks
 the first compliant local, hosted, or frontier route from deployment config and
 returns a model-route decision record suitable for ledgers and audit packets.

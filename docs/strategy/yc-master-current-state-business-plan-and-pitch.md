@@ -43,7 +43,7 @@ unusual for pre-seed and it is the thing to lead with.
 |---|---|---|
 | Six-stage governed engine (Source → Reconciliation → Anti-Fragility → Enhancement → Optimization → Consumption) + a universal **Verification rail** | **working** | `scripts/demo_offline_full_baltor.py --self-test` |
 | **CFPB correctness invariant** (end-to-end): answer = "10 business days" (Reg-E wins by authority); the 30-day FAQ held out; narrative allegations held out; only the reconciled winner served; lineage + receipt on everything | **working, always-on** | `check_offline_full_demo`, `check_contextops_cfpb_reference` |
-| Live **OFAC sanctions** connector (real fetch → flow → caught a real would-be violation) | **working** | `scripts/ingest/sanctions_feed_live.py --self-test` |
+| **OFAC sanctions** connector (deterministic) + synthetic-fixture conformance test that always proves the held-out-violation invariant; real SDN fetch behind `--live` (on demand) | **working** | `scripts/ingest/sanctions_feed_live.py --self-test` |
 | Recursive **document decomposition** (1,000-page proven), atomic facts vs held-out allegations | **working** | `scripts/ingest/document_decompose.py --self-test` |
 | **Worker fleet**: durable SQLite ledger, atomic claim (`BEGIN IMMEDIATE` = Postgres `FOR UPDATE SKIP LOCKED`), leases, retry/DLQ, idempotency, dependency ordering | **working, cross-process** | `check_durable_fleet_ledger`, `check_worker_fleet_supervisor_full_stack` |
 | **Live supervisor scaling**: leader/shard leases, two-process failover, no duplicate scheduling | **working** | `check_live_supervisor_two_process`, `…_full_stack` |
@@ -247,7 +247,7 @@ provenance/eval contract. Bottom-up wedge first (regulated-context buyers), expa
    Verified · Current · Efficient · Provable.
 5. **Demo** — the CFPB correctness invariant, live: Reg-E "10 business days" served; the 30-day FAQ and the
    narrative allegation **held out**; only the reconciled winner served, with its source authority and a
-   receipt. Then OFAC: a real would-be sanctions violation caught. *Runs offline, deterministically.*
+   receipt. Then OFAC: the connector deterministically flags a HELD-OUT would-be sanctions violation (synthetic fixture; real SDN fetch on demand). *Runs offline, deterministically.*
 6. **Product / how it works** — the six stages + verification rail; agents **PROPOSE**, Baltor **DISPOSES**;
    memory/LLM/browser output is candidate context, never truth; the promotion boundary (candidate ≠ served).
 7. **Moat** — **Verified + Current + Provable + cost-efficient governed DATA** + the **Determinism Factory**
@@ -265,8 +265,8 @@ provenance/eval contract. Bottom-up wedge first (regulated-context buyers), expa
 12. **Competition** — 2×2 / table: enterprise search (Glean), RAG platforms (Contextual AI — absorbed into
     Google DeepMind May 2026), vector DBs, knowledge graphs, GRC tools, source intelligence. Baltor's column:
     *verify + package + prove facts before agents use them; lifecycle-managed fact state with history.*
-13. **Traction / milestones** — *be honest:* a working governed engine (305 deterministic proofs, full offline
-    demo, live OFAC catch) + locked brand + owned domains. Seed-readiness gates: 3 design partners, 1 paid
+13. **Traction / milestones** — *be honest:* a working governed engine (⟦computed: 463⟧ deterministic proofs, full offline
+    demo, OFAC conformance proof on a synthetic fixture) + locked brand + owned domains. Seed-readiness gates: 3 design partners, 1 paid
     pilot, 1 exported package consumed by a real downstream agent/RAG stack, measured stale-fact catch + manual-
     review reduction.
 14. **Team** — technical founder; training-free / frozen-model + legal-AI background (favors structural,

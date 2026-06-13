@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """scripts.llm_gateway.router — the LLM Gateway: the single, policy-aware entry point for model calls.
 
+CANONICAL LAYER: `src/teleon/inference` (OIPS) owns provider-ordering truth; this gateway is the
+Baltor-era selection path during the runtime extraction. Keep routing-preference order here in sync
+with the OIPS numeric graph — do not fork a second source of provider-ordering truth.
+
 ``gateway.complete(request, policy)`` selects a provider by tenant policy + routing preference, calls it,
 VALIDATES the output, and FALLS BACK on a retryable failure OR a validation failure — recording every
 attempt in an LLMTrace. Policy violations are EXCLUDED up front (never retried as transport). External
