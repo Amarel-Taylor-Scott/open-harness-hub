@@ -29,7 +29,7 @@
       "state_mount": "/app/dist/identity",
       "volume_gb": 1,
       "env": {},
-      "secret_groups": ["model-plane"]
+      "secret_groups": ["model-plane", "email-plane"]
     },
     {
       "name": "registry",
@@ -217,7 +217,7 @@
       "cpus": 1,
       "memory_mb": 2048,
       "env": {},
-      "secret_groups": ["model-plane", "queue-stores"],
+      "secret_groups": ["model-plane", "foundry-model", "queue-stores"],
       "scaling": {
         "queue_key": "ohh:foundry:jobs",
         "queue_key_source": "scripts/foundry/queues.py DEFAULT_QUEUE_KEY (generator asserts equality)",
@@ -244,6 +244,8 @@
   ],
   "secret_group_contents": {
     "model-plane": ["OH_LLM_BASE_URL", "OH_LLM_MODEL", "OH_LLM_API_KEY", "OH_EMBED_MODE", "OH_EMBED_MODEL", "OH_EMBED_BASE_URL", "OH_INFERENCE_ALLOW_NETWORK"],
+    "foundry-model": ["OLLAMA_API_KEY", "OLLAMA_HOST", "MISTRAL_API_KEY", "OPENROUTER_API_KEY", "OH_CHAT_MODEL", "OH_EMBED_MODEL"],
+    "email-plane": ["RESEND_API_KEY", "POSTMARK_API_KEY", "EMAIL_FROM", "EMAIL_ADAPTER", "AIDR_PUBLIC_BASE"],
     "showcase-token": ["OH_SHOWCASE_TOKEN"],
     "operator-roster": ["AIDR_REGISTRY_ADMINS"],
     "baltor-stores": ["REDIS_URL"],

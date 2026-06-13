@@ -11,7 +11,7 @@ Deploy order (dependencies first):
 ```bash
 fly apps create aidr-identity
 fly volumes create identity_state -a aidr-identity -r iad -s 1
-fly secrets set -a aidr-identity --stage OH_LLM_BASE_URL=<value> OH_LLM_MODEL=<value> OH_LLM_API_KEY=<value> OH_EMBED_MODE=<value> OH_EMBED_MODEL=<value> OH_EMBED_BASE_URL=<value> OH_INFERENCE_ALLOW_NETWORK=<value>
+fly secrets set -a aidr-identity --stage OH_LLM_BASE_URL=<value> OH_LLM_MODEL=<value> OH_LLM_API_KEY=<value> OH_EMBED_MODE=<value> OH_EMBED_MODEL=<value> OH_EMBED_BASE_URL=<value> OH_INFERENCE_ALLOW_NETWORK=<value> RESEND_API_KEY=<value> POSTMARK_API_KEY=<value> EMAIL_FROM=<value> EMAIL_ADAPTER=<value> AIDR_PUBLIC_BASE=<value>
 fly deploy -c fly/aidr-identity.fly.toml --ha=false
 ```
 
@@ -103,7 +103,7 @@ fly deploy -c fly/aidr-postgres.fly.toml --ha=false
 
 ```bash
 fly apps create aidr-worker
-fly secrets set -a aidr-worker --stage OH_LLM_BASE_URL=<value> OH_LLM_MODEL=<value> OH_LLM_API_KEY=<value> OH_EMBED_MODE=<value> OH_EMBED_MODEL=<value> OH_EMBED_BASE_URL=<value> OH_INFERENCE_ALLOW_NETWORK=<value> REDIS_URL=<value> DATABASE_URL=<value>
+fly secrets set -a aidr-worker --stage OH_LLM_BASE_URL=<value> OH_LLM_MODEL=<value> OH_LLM_API_KEY=<value> OH_EMBED_MODE=<value> OH_EMBED_MODEL=<value> OH_EMBED_BASE_URL=<value> OH_INFERENCE_ALLOW_NETWORK=<value> OLLAMA_API_KEY=<value> OLLAMA_HOST=<value> MISTRAL_API_KEY=<value> OPENROUTER_API_KEY=<value> OH_CHAT_MODEL=<value> OH_EMBED_MODEL=<value> REDIS_URL=<value> DATABASE_URL=<value>
 fly deploy -c fly/aidr-worker.fly.toml --ha=false
 fly machine list -a aidr-worker -q | xargs -r -n1 fly machine stop -a aidr-worker  # controller owns the fleet from here
 ```

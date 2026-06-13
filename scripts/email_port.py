@@ -23,6 +23,8 @@ import os
 import re
 import sys
 import time
+import urllib.error
+import urllib.request
 from pathlib import Path
 from typing import Any, Callable
 
@@ -99,35 +101,88 @@ class ConsoleAdapter:
         return rec
 
 
+def _record_sent(msg: dict[str, Any], mode: str, provider_id: str | None) -> dict[str, Any]:
+    rec = {"ts": int(time.time()), "realm": msg["realm"], "template": msg["template"],
+           "to": msg["to"], "mode": mode, "sent": True, "provider_id": provider_id,
+           "note": f"sent via {mode}"}
+    OUTBOX.mkdir(parents=True, exist_ok=True)
+    with AUDIT.open("a", encoding="utf-8") as fh:
+        fh.write(json.dumps(rec, sort_keys=True) + "\n")
+    return rec
+
+
+def _post_json(url: str, payload: dict[str, Any], headers: dict[str, str]) -> dict[str, Any]:
+    """One stdlib HTTP POST → parsed JSON. Raises RuntimeError on a non-2xx (a failed send is never
+    swallowed). No new deps; the key lives only in the request header, never logged."""
+    req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), method="POST",
+                                 headers={"Content-Type": "application/json", **headers})
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:  # noqa: S310 (https provider endpoint)
+            return json.loads(resp.read() or b"{}")
+    except urllib.error.HTTPError as e:  # surface the provider error, scrubbed of any key echo
+        raise RuntimeError(f"email send failed: HTTP {e.code} {str(e.read()[:200])}") from None
+    except urllib.error.URLError as e:
+        raise RuntimeError(f"email send failed: {e.reason}") from None
+
+
 class ResendAdapter:
-    """Real-send SEAM (owner-gated). Without RESEND_API_KEY → NotConfigured (never fakes a send)."""
+    """Real send via Resend's HTTP API (stdlib urllib). Owner-gated by RESEND_API_KEY; without it,
+    NotConfigured (never fakes a send). EMAIL_FROM sets the verified sender."""
 
     name = "resend"
+    endpoint = "https://api.resend.com/emails"
 
     def deliver(self, msg: dict[str, Any]) -> dict[str, Any]:
-        if not os.environ.get("RESEND_API_KEY"):
+        key = os.environ.get("RESEND_API_KEY")
+        if not key:
             raise NotConfigured("RESEND_API_KEY unset — real email send is owner-gated; not faked")
-        # a real HTTP call to Resend goes here when deploying; the key stays in the env only
-        raise NotConfigured("Resend transport not wired in this local build (seam present)")
+        sender = os.environ.get("EMAIL_FROM") or f"{msg['brand']} <no-reply@{msg['realm']}>"
+        body = _post_json(self.endpoint,
+                          {"from": sender, "to": [msg["to"]], "subject": msg["subject"], "text": msg["body"]},
+                          {"Authorization": f"Bearer {key}"})
+        return _record_sent(msg, "resend", body.get("id"))
 
 
-class PostmarkAdapter(ResendAdapter):
+class PostmarkAdapter:
+    """Real send via Postmark's HTTP API. Owner-gated by POSTMARK_API_KEY."""
+
     name = "postmark"
+    endpoint = "https://api.postmarkapp.com/email"
 
     def deliver(self, msg: dict[str, Any]) -> dict[str, Any]:
-        if not os.environ.get("POSTMARK_API_KEY"):
+        key = os.environ.get("POSTMARK_API_KEY")
+        if not key:
             raise NotConfigured("POSTMARK_API_KEY unset — real email send is owner-gated; not faked")
-        raise NotConfigured("Postmark transport not wired in this local build (seam present)")
+        sender = os.environ.get("EMAIL_FROM") or f"no-reply@{msg['realm']}"
+        body = _post_json(self.endpoint,
+                          {"From": sender, "To": msg["to"], "Subject": msg["subject"], "TextBody": msg["body"]},
+                          {"X-Postmark-Server-Token": key, "Accept": "application/json"})
+        return _record_sent(msg, "postmark", str(body.get("MessageID")))
 
 
 _ADAPTERS = {"console": ConsoleAdapter, "resend": ResendAdapter, "postmark": PostmarkAdapter}
 
 
+def _default_adapter() -> str:
+    """Pick the adapter from the environment so a deploy goes real just by setting a key:
+    explicit EMAIL_ADAPTER wins; else resend/postmark if their key is present; else the dev console."""
+    explicit = os.environ.get("EMAIL_ADAPTER", "").strip().lower()
+    if explicit in _ADAPTERS:
+        return explicit
+    if os.environ.get("RESEND_API_KEY"):
+        return "resend"
+    if os.environ.get("POSTMARK_API_KEY"):
+        return "postmark"
+    return "console"
+
+
 def send(realm: str, template: str, to: str, props: dict[str, Any] | None = None, *,
-         adapter: str = "console") -> dict[str, Any]:
-    """The one standardized call site. Returns a delivery record; console mode flags sent=False."""
+         adapter: str | None = None) -> dict[str, Any]:
+    """The one standardized call site. Returns a delivery record; console mode flags sent=False.
+    `adapter=None` auto-selects from the env (real send when a provider key is set), so production
+    sends real email by setting RESEND_API_KEY/EMAIL_FROM — no code change."""
     msg = _render(realm, template, to, props or {})
-    impl = _ADAPTERS.get(adapter)
+    impl = _ADAPTERS.get(adapter or _default_adapter())
     if impl is None:
         raise ValueError(f"unknown adapter {adapter!r}; known {sorted(_ADAPTERS)}")
     return impl().deliver(msg)
