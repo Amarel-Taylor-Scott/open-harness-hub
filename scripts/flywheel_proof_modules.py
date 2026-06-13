@@ -141,6 +141,7 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_memory_results_become_artifacts.py", "check_memory_results_become_artifacts"),
     ("scripts/check_memory_tenant_project_scoping.py", "check_memory_tenant_project_scoping"),
     ("scripts/check_memory_api.py", "check_memory_api"),
+    ("scripts/check_response_redaction_single_source.py", "check_response_redaction_single_source"),
     ("scripts/check_memory_page_projection_only.py", "check_memory_page_projection_only"),
     ("scripts/check_no_direct_supermemory_imports.py", "check_no_direct_supermemory_imports"),
     ("scripts/check_supermemory_no_truth_bypass.py", "check_supermemory_no_truth_bypass"),

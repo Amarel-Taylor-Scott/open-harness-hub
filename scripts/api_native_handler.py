@@ -52,7 +52,7 @@ _MODES_FILE = _ARCH / "native_output_modes.json"
 _EXPORT_SERVICE_MODULE = "src.baltor.native.native_export_service"
 
 #: substrings that must never appear in any payload this handler returns (defense-in-depth scrub).
-_SECRET_MARKERS = ("OH_SHOWCASE_TOKEN", "sk-", "api_key", "Authorization", "Bearer ", "MEMORY.md", ".agent/")
+from scripts.security.response_redaction import SECRET_MARKERS as _SECRET_MARKERS  # single source — no per-handler drift
 
 #: a value that differs from source in native_output is only legitimate when it is VERIFIED; these are the
 #: claim_status values that may NOT be served as a confirmed fact in a native projection (held-out lane).

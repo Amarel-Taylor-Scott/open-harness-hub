@@ -1,6 +1,6 @@
 # Proof Inventory
 
-**462** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
+**463** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
 
 - `scripts/ingest/context_rot.py`
 - `scripts/ingest/document_decompose.py`
@@ -119,6 +119,7 @@
 - `scripts/check_memory_results_become_artifacts.py`
 - `scripts/check_memory_tenant_project_scoping.py`
 - `scripts/check_memory_api.py`
+- `scripts/check_response_redaction_single_source.py`
 - `scripts/check_memory_page_projection_only.py`
 - `scripts/check_no_direct_supermemory_imports.py`
 - `scripts/check_supermemory_no_truth_bypass.py`

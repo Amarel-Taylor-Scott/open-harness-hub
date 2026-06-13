@@ -67,7 +67,7 @@ _CANDIDATE_PROVIDERS = (
 )
 
 #: substrings that must never appear in any payload this handler returns.
-_SECRET_MARKERS = ("OH_SHOWCASE_TOKEN", "sk-", "api_key", "Authorization", "MEMORY.md", ".agent/", "Bearer ")
+from scripts.security.response_redaction import SECRET_MARKERS as _SECRET_MARKERS  # single source — no per-handler drift
 
 #: deterministic process-level projection of every provider call (a MemoryTrace per call). Safe to rebuild on
 #: restart — it is a projection, not a durable truth store. No canonical fact is ever recorded here.

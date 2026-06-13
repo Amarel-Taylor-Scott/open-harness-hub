@@ -44,7 +44,7 @@ ROUTES = (
 _NOW = "2026-06-05T00:00:00Z"
 
 #: substrings that must never appear in any payload this handler returns.
-_SECRET_MARKERS = ("OH_SHOWCASE_TOKEN", "sk-", "api_key", "Authorization", "Bearer ", "MEMORY.md", ".agent/")
+from scripts.security.response_redaction import SECRET_MARKERS as _SECRET_MARKERS  # single source — no per-handler drift
 
 #: deterministic per-process projection cache. The demo is pure + offline + deterministic, so caching it makes
 #: the nine routes coherent within a page load. It is a projection cache (rebuilt on restart), never durable truth.

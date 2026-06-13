@@ -24,7 +24,7 @@ _RESPONSES: dict = {}
 _RECEIPTS: dict = {}
 _LATEST: dict = {"response_id": None}
 #: fields that must never appear in an API response.
-_SECRET_MARKERS = ("OH_SHOWCASE_TOKEN", "sk-", "api_key", "Authorization", "MEMORY.md", ".agent/")
+from scripts.security.response_redaction import SECRET_MARKERS as _SECRET_MARKERS  # single source — no per-handler drift (was missing Bearer + .claude/)
 
 
 def _as_bool(v, default: bool = True) -> bool:

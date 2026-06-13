@@ -48,7 +48,7 @@ _SOURCES = {
 _GENERATOR_CANDIDATES = ("scripts.standards_generator", "scripts.pattern_generator")
 
 #: substrings that must never appear in any payload this handler returns.
-_SECRET_MARKERS = ("OH_SHOWCASE_TOKEN", "sk-", "api_key", "Authorization", "MEMORY.md", ".agent/")
+from scripts.security.response_redaction import SECRET_MARKERS as _SECRET_MARKERS  # single source — no per-handler drift (was missing Bearer + .claude/)
 
 
 def _read_json(path: Path) -> tuple[bool, object, str]:

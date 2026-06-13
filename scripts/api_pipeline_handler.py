@@ -39,7 +39,7 @@ _NOW = "2026-06-05T00:00:00Z"
 #: the only wired corpus (mirrors the consumption API).
 _CORPUS = "cfpb"
 #: markers that must never appear in a projection payload.
-_SECRET_MARKERS = ("OH_SHOWCASE_TOKEN", "sk-", "api_key", "Authorization", "MEMORY.md", ".agent/", ".claude/")
+from scripts.security.response_redaction import SECRET_MARKERS as _SECRET_MARKERS  # single source — no per-handler drift (was missing Bearer )
 
 #: the seven journey stages, in order (single source for overview + stepper). Each id maps to an endpoint.
 STAGES = (
