@@ -25,6 +25,8 @@ _REGISTRY = _REPO / "architecture" / "source_authority_registry.json"
 _TOP_TIERS = ("source_of_law", "official_agency")  # binding authority → requires VERIFIED provenance
 _UNVERIFIED = "unverified"
 _DOWNGRADE_TO = "official_guidance"  # a claimed top-tier source without verified provenance lands here
+#: tiers that COUNT toward corroboration — an independent AUTHORITATIVE source. Secondary/unverified never do.
+_AUTHORITATIVE_TIERS = ("source_of_law", "official_agency", "standards_body", "government_other")
 
 
 @lru_cache(maxsize=1)
@@ -86,6 +88,43 @@ def classify_payload(payload: dict) -> dict:
 def has_provenance(payload: dict) -> bool:
     """True if the payload carries classifiable provenance (so the rank can be EARNED, not assigned)."""
     return bool(payload.get("publisher") or payload.get("source_uri"))
+
+
+def corroboration(value_claims: list[dict]) -> dict:
+    """Multi-source corroboration: does the WINNING value have >=2 INDEPENDENT authoritative sources agreeing?
+
+    ``value_claims`` = [{"value":…, "publisher":…, "source_uri":…, "signed":…}, …]. Independence = distinct
+    publisher DOMAINS (two reads of the SAME agency do not corroborate each other). Only authoritative tiers
+    count (a vendor blog never corroborates). The winning value is the one with the highest single-source
+    authority (ties → more independent authoritative backing); its corroboration is the number of independent
+    authoritative domains asserting it. This is the difference between "a source SAYS X" and "independent
+    authorities AGREE X" — recorded so a receipt can claim corroboration only when it is earned."""
+    enriched = []
+    for c in value_claims:
+        a = classify(publisher=str(c.get("publisher", "")), source_uri=str(c.get("source_uri", "")), signed=c.get("signed"))
+        enriched.append({"value": c.get("value"), "domain": a["domain"], "tier": a["tier"], "rank": a["rank"],
+                         "label": a["label"], "authoritative": a["tier"] in _AUTHORITATIVE_TIERS})
+    if not enriched:
+        return {"value": None, "corroborated": False, "independent_authoritative_sources": 0, "sources": [], "basis": "no claims"}
+    by_value: dict = {}
+    for e in enriched:
+        by_value.setdefault(e["value"], []).append(e)
+
+    def _score(v):
+        es = by_value[v]
+        return (max(e["rank"] for e in es), len({e["domain"] for e in es if e["authoritative"]}))
+
+    winner = max(sorted(by_value), key=_score)   # sorted() first → deterministic tie-break
+    ws = by_value[winner]
+    independent_auth = sorted({e["domain"] for e in ws if e["authoritative"]})
+    corroborated = len(independent_auth) >= 2
+    basis = (f"value {winner!r} asserted by {len(independent_auth)} independent authoritative source(s)"
+             + (": " + ", ".join(independent_auth) if independent_auth else "")
+             + (" → CORROBORATED" if corroborated else " → single-sourced (not corroborated)"))
+    return {"value": winner, "corroborated": corroborated,
+            "independent_authoritative_sources": len(independent_auth),
+            "sources": [{"label": e["label"], "domain": e["domain"], "tier": e["tier"]} for e in ws if e["authoritative"]],
+            "basis": basis}
 
 
 def _self_test() -> int:

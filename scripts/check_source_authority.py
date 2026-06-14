@@ -77,6 +77,28 @@ def _self_test() -> int:
     ck("FLIP: Reg-E republished on a vendor blog NO LONGER wins by authority (authority is EARNED)",
        win2 is None or win2.winning_artifact_id != built["reg_e_id"])
 
+    # 4. MULTI-SOURCE CORROBORATION — "independent authorities AGREE", not just "a source says". Earned, not asserted.
+    two_indep = SA.corroboration([
+        {"value": "blocked", "source_uri": "https://ofac.treasury.gov/x"},
+        {"value": "blocked", "source_uri": "https://www.federalregister.gov/designation"}])
+    ck("two INDEPENDENT authoritative sources agreeing → CORROBORATED",
+       two_indep["corroborated"] and two_indep["independent_authoritative_sources"] == 2)
+    same_src = SA.corroboration([
+        {"value": "blocked", "source_uri": "https://ofac.treasury.gov/a"},
+        {"value": "blocked", "source_uri": "https://ofac.treasury.gov/b"}])
+    ck("the SAME authority twice is NOT corroboration (one independent domain)",
+       not same_src["corroborated"] and same_src["independent_authoritative_sources"] == 1)
+    one_plus_blog = SA.corroboration([
+        {"value": "blocked", "source_uri": "https://ofac.treasury.gov/a"},
+        {"value": "blocked", "source_uri": "https://rumor-blog.example.com/b"}])
+    ck("a vendor blog does NOT corroborate an authoritative source (only authoritative tiers count)",
+       not one_plus_blog["corroborated"] and one_plus_blog["independent_authoritative_sources"] == 1)
+    disagree = SA.corroboration([
+        {"value": "blocked", "source_uri": "https://ofac.treasury.gov/a"},
+        {"value": "clear", "source_uri": "https://rumor-blog.example.com/b"}])
+    ck("on disagreement the higher-authority value wins; corroboration counts only sources asserting IT",
+       disagree["value"] == "blocked" and not disagree["corroborated"])
+
     print(("PASS — " if not fails else "FAIL — ")
           + "check_source_authority: authority is DERIVED from publisher/domain+provenance and recorded in the "
             "receipt; Reg-E's win is contingent on its eCFR provenance — flip the publisher and it stops winning.")
