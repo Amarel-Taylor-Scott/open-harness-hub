@@ -1,6 +1,6 @@
 # Proof Inventory
 
-**468** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
+**470** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
 
 - `scripts/ingest/context_rot.py`
 - `scripts/ingest/document_decompose.py`
@@ -465,6 +465,8 @@
 - `scripts/showcase_pipelines/related_party_network.py`
 - `scripts/showcase_pipelines/common_control_resolver.py`
 - `scripts/showcase_pipelines/beneficial_ownership_resolver.py`
+- `scripts/showcase_pipelines/fda_labeling_claim_review.py`
+- `scripts/showcase_pipelines/export_control_screening.py`
 - `scripts/showcase_pipelines/procurement_collusion_ring.py`
 - `scripts/llm_plane_local_service.py`
 - `scripts/build_readme_stats.py`

@@ -157,6 +157,38 @@ EXAMPLES: list[dict[str, Any]] = [
         "markdown": lambda o: o["report_markdown"], "trace": lambda o: o["trace"],
     },
     {
+        "id": "fda_labeling_claim_review", "title": "FDA labeling: off-label overclaims",
+        "domain": "Pharma · regulatory · promo review", "durability": "Source-authority + freshness",
+        "scenario": "Substantiate each promotional claim against the FDA-approved label; a claim that "
+                    "contradicts the label or asserts an unapproved indication is held out as off-label risk (FDCA 502).",
+        "fails": "A bare model can’t tell an FDA-approved label from a glossy brochure and repeats the overclaim as fact.",
+        "invoke": lambda m: m.run(label_claims=m._CLAIMS),
+        "verdict": lambda o: ("block" if o["held_out"] else "serve",
+                              f"{len(o['held_out'])} promotional claim(s) HELD OUT (off-label / contradicts the FDA label)"
+                              if o["held_out"] else "all claims substantiated by the FDA-approved label"),
+        "rows": lambda o: [("Substantiated (FDA label)", "; ".join(g["claim"] for g in o["governing"].values()) or "—"),
+                           ("Held-out overclaims", str(len(o["held_out"]))),
+                           ("Violation kinds", ", ".join(sorted({h["kind"] for h in o["held_out"]})) or "—"),
+                           ("Escalated", str(o["escalated"]))],
+        "markdown": lambda o: o["report_markdown"], "trace": lambda o: o["trace"],
+    },
+    {
+        "id": "export_control_screening", "title": "BIS export-control screening",
+        "domain": "Trade compliance · sanctions · EAR", "durability": "Source-authority + freshness",
+        "scenario": "Screen each export’s end-user against the authoritative BIS Entity List; a stale vendor-DB "
+                    "“clear” is held out when the Entity List shows the end-user listed → a license is required.",
+        "fails": "A bare model doesn’t know post-cutoff Entity-List additions and clears an export it shouldn’t.",
+        "invoke": lambda m: m.run(exports=m._EXPORTS, screening_signals=m._SIGNALS),
+        "verdict": lambda o: ("block" if o["blocked_export_ids"] else "serve",
+                              f"{len(o['blocked_export_ids'])} export(s) REQUIRE A LICENSE (end-user on the BIS Entity List)"
+                              if o["blocked_export_ids"] else "all end-users clear on the authoritative screen"),
+        "rows": lambda o: [("License required", ", ".join(o["blocked_export_ids"]) or "—"),
+                           ("Governing source tier", next(iter(o["governing"].values()))["tier"] if o["governing"] else "—"),
+                           ("Held-out stale “clear”s", str(len(o["held_out"]))),
+                           ("Escalated", str(o["escalated"]))],
+        "markdown": lambda o: o["report_markdown"], "trace": lambda o: o["trace"],
+    },
+    {
         "id": "icd10_coding", "title": "ICD-10 coding — abstain over fabricate",
         "domain": "Clinical · medical coding", "durability": "Coded vocabulary",
         "scenario": "Code the diagnoses in an encounter note against a governed terminology. The note "
@@ -408,7 +440,7 @@ def build() -> dict[str, Any]:
 
 def _self_test() -> int:
     res = build()
-    assert res["examples"] == len(EXAMPLES) == 12, res["examples"]
+    assert res["examples"] == len(EXAMPLES) == 14, res["examples"]
     page = _OUT.read_text(encoding="utf-8")
     # The page is self-contained: no external CDN/script/analytics FETCHED (recordable offline, honest).
     # A data: URI or an SVG XML namespace inside one is fine — we flag only real fetched src=/href= URLs.
@@ -427,6 +459,10 @@ def _self_test() -> int:
     assert "BLOCKED BY INHERITANCE" in cards["beneficial_ownership_resolver"]["verdict"] \
         and cards["beneficial_ownership_resolver"]["status"] == "block" \
         and "Volkov Holdings → Meridian Staffing Holdings → Apex Staffing" in dict(cards["beneficial_ownership_resolver"]["rows"]).get("Proof chain", "")
+    assert "HELD OUT (off-label" in cards["fda_labeling_claim_review"]["verdict"] and cards["fda_labeling_claim_review"]["status"] == "block"
+    assert "REQUIRE A LICENSE" in cards["export_control_screening"]["verdict"] \
+        and cards["export_control_screening"]["status"] == "block" \
+        and "EXP-001" in dict(cards["export_control_screening"]["rows"]).get("License required", "")
     assert "SERVED" in cards["regulated_fact_qa"]["verdict"]
     assert "28%" in page and any("28%" in v for _, v in cards["regulated_fact_qa"]["rows"]), "the served answer (28%) must appear"
     assert "ESCALATED" in cards["clinical_support"]["verdict"]
