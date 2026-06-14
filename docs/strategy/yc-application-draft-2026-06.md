@@ -15,9 +15,11 @@ here is aspirational copy. Numbers marked ⟦computed⟧ must be regenerated at 
 ## What does your company do?
 
 AI agents fail because their context is wrong, stale, or unprovable — not because models are
-weak. Baltor is a context-assurance engine: it ingests sources, corroborates facts across
-independent sources, signs what passes, issues portable receipts for what was verified (when,
-against what), and revokes facts when sources change (CDC). Agents propose; Baltor disposes.
+weak. Baltor is a context-assurance engine: it ingests sources, **establishes which source is
+authoritative by provenance** (publisher/domain + verified signature, not assumption — so an SEC
+filing outranks a press rumor, provably), signs what passes, issues portable receipts for what
+was verified (when, against what), and revokes facts when sources change (CDC). Agents propose;
+Baltor disposes.
 Under it sits Teleon, a deterministic capability runtime — every capability is promoted or
 rejected by eval gates with an evidence ledger, never by vibes — and OpenHarnessHub, an open
 registry of ⟦computed: 2,655⟧ governed pipeline components with provenance and measured-lift
@@ -26,14 +28,19 @@ admission.
 ## Why now?
 
 - Agent plumbing is exploding (41.5% of YC W26) but splits into perimeter, identity,
-  red-teaming, and observability. **Nobody issues verifiable receipts for context or runs a
-  governed promote/revoke lifecycle for facts** — verified across ~95 YC companies on primary
-  sources, 2026-06-11 (`docs/strategy/yc-context-landscape-2026-06.md`).
-- The 2025–26 consolidation wave (Langfuse→ClickHouse, Helicone+Trieve→Mintlify,
-  Traceloop→ServiceNow, Context.ai→OpenAI, Invariant→Snyk, Lakera→CheckPoint) proves
-  standalone observability/evals/security are features. Assurance has to be a rail.
-- Research is ahead of the market (PROV-AGENT; "Tool Receipts, Not Zero-Knowledge Proofs") —
-  the receipts rail will be funded within a few batches; we have it built.
+  red-teaming, and observability. The tamper-evident-receipt rail that emerged in 2026
+  (Attested Intelligence, Fetch.ai AEVS, Diagrid) signs **EXECUTION — what an agent DID.
+  Nobody governs TRUTH — promote / reject / revoke a FACT by earned source authority on a
+  regulated beachhead.** Verified across ~95 YC companies (`docs/strategy/yc-context-landscape-2026-06.md`)
+  + a 2026-06-13 landscape sweep (`docs/research/agent-governance-landscape-2026-06-13.md`).
+- **The EU AI Act reaches full enforcement Aug 2, 2026** — 72-hour incident reporting forces
+  organizations to reconstruct what an agent did *and why* within three days. That is portable
+  receipts + fact lineage, on a hard deadline.
+- The 2025–26 consolidation wave (Langfuse→ClickHouse at a $15B valuation, Helicone+Trieve→Mintlify,
+  Traceloop→ServiceNow, Context.ai→OpenAI, Invariant→Snyk, Lakera→CheckPoint) proves standalone
+  observability/evals/security are features — and data platforms (ClickHouse, Atlan) are racing to
+  own the AI feedback loop. Assurance has to be a portable rail ABOVE any one platform, which is
+  exactly what a provider-neutral receipt is.
 
 ## What do you understand that others don't?
 
