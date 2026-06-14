@@ -486,6 +486,7 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_shared_io_resource_full_stack.py", "check_shared_io_resource_full_stack"),
     # ── Inference Gateway DISPATCHES through the adapter layer: oips.infer_local executes via adapters.resolve_adapter (the base class is the LIVE backbone, not a hardcoded stub); stub output delegated not inlined; byte-identical to the adapter; governed fallback to the stub offline; allow_network opt-in ──
     ("scripts/check_inference_dispatch_via_adapters.py", "check_inference_dispatch_via_adapters"),
+    ("scripts/check_inference_adapter_styles.py", "check_inference_adapter_styles"),
     # ── Sales/lead-proof SAFETY GATE: claim language stays "appears/requires review" not legal-conclusion; no public accusation vs named real co without review; live third-party probe needs written authorization; outreach draft-only; regulated->legal review; synthetic seeds only ──
     ("scripts/check_sales_guardrails.py", "check_sales_guardrails"),
     # ── Baltor Chatbot Guardrail Audit: mode-aware (configurable engagement modes) audit of a PROVIDED transcript; flags regulated-risk answers in appears/requires-review language; private synthetic evidence pack; live third-party probe gated by mode + written authorization (offline seam) ──
