@@ -52,6 +52,7 @@ class RedisQueue:
     def __init__(self, client: Any, key: str = DEFAULT_QUEUE_KEY) -> None:
         self.client = client
         self.key = key
+        self.processing_key = key + ":processing"   # in-flight: pull MOVES here; ack/nack/terminal remove
         self.failed_permanently_key = key + ":failed-permanently"
         self.approval_required_key = key + ":approval-required"
         self.budget_blocked_key = key + ":budget-blocked"
@@ -60,39 +61,82 @@ class RedisQueue:
     def _dec(raw: Any) -> str:
         return raw if isinstance(raw, str) else raw.decode("utf-8")
 
+    @staticmethod
+    def _clean(job: dict) -> dict:
+        return {k: v for k, v in job.items() if k != "_processing_raw"}   # drop the queue-transport field, keep _attempts
+
+    def _remove_from_processing(self, job: dict) -> None:
+        raw = job.get("_processing_raw")
+        if raw is not None and callable(getattr(self.client, "lrem", None)):
+            self.client.lrem(self.processing_key, 1, raw)
+
     def enqueue(self, job: dict) -> None:
         self.client.rpush(self.key, json.dumps(job))
 
     def pull(self) -> dict | None:
-        raw = self.client.lpop(self.key)
-        return None if raw is None else json.loads(self._dec(raw))
+        # RELIABLE: atomically MOVE pending → processing, so a crash between pull and ack/terminal does NOT
+        # lose the job (reap_stuck requeues whatever's left in processing). LMOVE is atomic; rpoplpush is the
+        # older fallback; lpop is a last resort if the client supports neither (non-reliable, logged by absence).
+        if callable(getattr(self.client, "lmove", None)):
+            raw = self.client.lmove(self.key, self.processing_key, "LEFT", "RIGHT")
+        elif callable(getattr(self.client, "rpoplpush", None)):
+            raw = self.client.rpoplpush(self.key, self.processing_key)
+        else:
+            raw = self.client.lpop(self.key)
+        if raw is None:
+            return None
+        dec = self._dec(raw)
+        job = json.loads(dec)
+        job["_processing_raw"] = dec   # so ack/nack/terminal can LREM the exact item out of processing
+        return job
 
-    def ack(self, job: dict) -> None:   # list-pop already removed it
-        pass
+    def ack(self, job: dict) -> None:
+        self._remove_from_processing(job)   # done → drop from in-flight
 
     def nack(self, job: dict) -> None:
-        self.client.rpush(self.key, json.dumps(job))
+        self._remove_from_processing(job)
+        self.client.rpush(self.key, json.dumps(self._clean(job)))   # retry: back to pending (keeps _attempts etc.)
+
+    def reap_stuck(self) -> int:
+        """Requeue every job left in the in-flight 'processing' list (a worker crashed/redeployed mid-job left
+        it there). Call at a quiesced startup (multi-node: when no live worker is mid-pull). Returns the count.
+        Matches SqliteQueue's crash-recovery semantics so both backends are durable, not just the local one."""
+        if not (callable(getattr(self.client, "lmove", None)) or callable(getattr(self.client, "rpoplpush", None))):
+            return 0
+        moved = 0
+        while True:
+            if callable(getattr(self.client, "lmove", None)):
+                raw = self.client.lmove(self.processing_key, self.key, "LEFT", "LEFT")
+            else:
+                raw = self.client.rpoplpush(self.processing_key, self.key)
+            if raw is None:
+                break
+            moved += 1
+        return moved
 
     def dead_letter(self, job: dict) -> None:
         """Compatibility alias; new code should call fail_permanently()."""
         self.fail_permanently(job)
 
     def fail_permanently(self, job: dict) -> None:
-        self.client.rpush(self.failed_permanently_key, json.dumps(job))
+        self._remove_from_processing(job)
+        self.client.rpush(self.failed_permanently_key, json.dumps(self._clean(job)))
 
     def hold(self, job: dict) -> None:
         """Compatibility alias; new code should call hold_for_approval()."""
         self.hold_for_approval(job)
 
     def hold_for_approval(self, job: dict) -> None:
-        self.client.rpush(self.approval_required_key, json.dumps(job))
+        self._remove_from_processing(job)
+        self.client.rpush(self.approval_required_key, json.dumps(self._clean(job)))
 
     def block(self, job: dict) -> None:
         """Compatibility alias; new code should call block_for_budget()."""
         self.block_for_budget(job)
 
     def block_for_budget(self, job: dict) -> None:
-        self.client.rpush(self.budget_blocked_key, json.dumps(job))
+        self._remove_from_processing(job)
+        self.client.rpush(self.budget_blocked_key, json.dumps(self._clean(job)))
 
     def _state_key(self, status: str) -> str:
         if status == "pending":
@@ -152,9 +196,19 @@ class RedisQueue:
         return None
 
 
+#: a job left 'processing' longer than this (seconds) is presumed orphaned by a crashed/redeployed worker
+#: and is requeued by reap_stuck(). Scale-to-zero fleets redeploy routinely, so in-flight orphans are normal.
+_DEFAULT_VISIBILITY_TIMEOUT_S = 900
+
+
 class SqliteQueue:
     """Durable LOCAL queue (sqlite) — same protocol, no services. Cloud swaps RedisQueue
-    via from_env; nothing else changes. Single-node dev; Redis is the multi-node path."""
+    via from_env; nothing else changes. Single-node dev; Redis is the multi-node path.
+
+    CRASH RECOVERY: pull() stamps claimed_at; a worker that crashes/redeploys mid-job leaves its row
+    'processing' forever. reap_stuck() requeues such orphans past a visibility timeout, and __init__ runs
+    it at startup — so scale-to-zero work is never silently orphaned (no dead-letter, no alert) the way it
+    was before."""
 
     def __init__(self, path: str, *, key: str = DEFAULT_QUEUE_KEY) -> None:
         self.path = str(path)
@@ -162,9 +216,29 @@ class SqliteQueue:
         Path(self.path).parent.mkdir(parents=True, exist_ok=True)
         con = sqlite3.connect(self.path)
         con.execute("CREATE TABLE IF NOT EXISTS jobs "
-                    "(seq INTEGER PRIMARY KEY AUTOINCREMENT, qkey TEXT, body TEXT, status TEXT DEFAULT 'pending')")
+                    "(seq INTEGER PRIMARY KEY AUTOINCREMENT, qkey TEXT, body TEXT, status TEXT DEFAULT 'pending', "
+                    "claimed_at REAL)")
+        # migrate a pre-existing table that predates claimed_at (added for crash-recovery reaping)
+        if "claimed_at" not in {r[1] for r in con.execute("PRAGMA table_info(jobs)")}:
+            con.execute("ALTER TABLE jobs ADD COLUMN claimed_at REAL")
         con.commit()
         con.close()
+        self.reap_stuck()  # startup: requeue jobs a crashed worker left stuck in 'processing' past the timeout
+
+    def reap_stuck(self, *, visibility_timeout_s: float = _DEFAULT_VISIBILITY_TIMEOUT_S, now: float | None = None) -> int:
+        """Requeue jobs stuck in 'processing' past the visibility timeout (a worker crashed/redeployed mid-job).
+        Returns the count requeued. Safe under concurrency: only rows claimed longer ago than the timeout are
+        reaped, so a live in-flight job is never stolen. Pass visibility_timeout_s=0 to reap ALL in-flight rows
+        (a known-quiesced single-node restart)."""
+        cutoff = (now if now is not None else time.time()) - visibility_timeout_s
+        c = self._con()
+        try:
+            cur = c.execute("UPDATE jobs SET status='pending', claimed_at=NULL "
+                            "WHERE qkey=? AND status='processing' AND (claimed_at IS NULL OR claimed_at <= ?)",
+                            (self.key, cutoff))
+            return int(cur.rowcount)
+        finally:
+            c.close()
 
     def _con(self) -> sqlite3.Connection:
         return sqlite3.connect(self.path, isolation_level=None)   # autocommit; pull() manages its own txn
@@ -184,7 +258,7 @@ class SqliteQueue:
                 c.execute("COMMIT")
                 return None
             seq, body = row
-            c.execute("UPDATE jobs SET status='processing' WHERE seq=?", (seq,))
+            c.execute("UPDATE jobs SET status='processing', claimed_at=? WHERE seq=?", (time.time(), seq))
             c.execute("COMMIT")
             job = json.loads(body)
             job["_seq"] = seq   # so ack/retry/failure routing can target this row

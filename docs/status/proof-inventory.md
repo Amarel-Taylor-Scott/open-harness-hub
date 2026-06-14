@@ -1,6 +1,6 @@
 # Proof Inventory
 
-**467** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
+**468** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
 
 - `scripts/ingest/context_rot.py`
 - `scripts/ingest/document_decompose.py`
@@ -300,6 +300,7 @@
 - `scripts/ingest/tenant_ingest.py`
 - `scripts/flywheel_worker.py`
 - `scripts/check_durable_worker_parallel.py`
+- `scripts/check_durable_queue_crash_recovery.py`
 - `scripts/check_pipeline_runtime.py`
 - `scripts/check_pipeline_parallel_runs.py`
 - `scripts/check_pipeline_per_step_queue.py`

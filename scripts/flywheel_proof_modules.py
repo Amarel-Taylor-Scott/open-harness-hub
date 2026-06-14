@@ -358,6 +358,7 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/ingest/tenant_ingest.py", "tenant_ingest"),
     ("scripts/flywheel_worker.py", "flywheel_worker"),
     ("scripts/check_durable_worker_parallel.py", "check_durable_worker_parallel"),
+    ("scripts/check_durable_queue_crash_recovery.py", "check_durable_queue_crash_recovery"),
     ("scripts/check_pipeline_runtime.py", "check_pipeline_runtime"),
     ("scripts/check_pipeline_parallel_runs.py", "check_pipeline_parallel_runs"),
     ("scripts/check_pipeline_per_step_queue.py", "check_pipeline_per_step_queue"),
