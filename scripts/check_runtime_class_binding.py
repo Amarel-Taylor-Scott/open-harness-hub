@@ -39,11 +39,10 @@ if _REPO not in sys.path:
 
 from src.baltor.purpose_tasks import runtime_binding as rb
 from src.baltor.workers import execution_backend_selector as sel
-from src.baltor.workers.execution_dispatch import _JOB_BACKENDS, _POOL_BACKENDS
+from src.baltor.workers.execution_dispatch import _executor_for_backend
 
-#: bare-id local backends routed by LocalFunctionEmulator (the dispatch else-branch) — the function/subprocess family.
+#: bare-id local backends routed by LocalFunctionEmulator — the function/subprocess family.
 _FUNCTION_FAMILY = {"local_function_emulator@v1", "local_subprocess@v1", "managed_venv@v1"}
-_ROUTABLE = _JOB_BACKENDS | _POOL_BACKENDS | _FUNCTION_FAMILY
 
 
 def _self_test() -> int:
@@ -76,7 +75,8 @@ def _self_test() -> int:
         check(f"A: {cls} declares local_equivalent", bool(eq))
         bare = rb.local_fallback_backend(cls)
         check(f"A: {cls} local equivalent is declared/built", bare in backends_enum or ("execution." + bare) in built, bare)
-        check(f"A: {cls} local equivalent routes to a real executor", bare in _ROUTABLE, bare)
+        check(f"A: {cls} local equivalent routes to a real executor (config-derived from the policy matrix)",
+              _executor_for_backend(bare) is not None, bare)
 
     # B. offline default → every known class falls back local (cloud-defer-only-after-local-equivalent)
     for cls in all_classes:

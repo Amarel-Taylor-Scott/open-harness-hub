@@ -394,6 +394,7 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_adaptation_ladder.py", "check_adaptation_ladder"),
     # ── CTS-1: bind an OCTS runtime CLASS → concrete backend by policy/creds/health; cloud deferred after a built local equivalent; class-scoped guard; deny-by-default; composes with the execution selector ──
     ("scripts/check_runtime_class_binding.py", "check_runtime_class_binding"),
+    ("scripts/check_execution_dispatch_fail_loud.py", "check_execution_dispatch_fail_loud"),
     # ── Portfolio dependency LAW: HoldCo owns Teleon (runtime SaaS) + Baltor (applied, tenant of Teleon) + OpenHarnessHub (open ecosystem); Baltor→Teleon→OHH only, never reverse; Teleon never imports Baltor; migration debt tracked ──
     ("scripts/check_portfolio_dependency_law.py", "check_portfolio_dependency_law"),
     # ── Company boundary model: HoldCo ContextIsEverything owns no runtime/customer-data; data-separation (Baltor truth owned by Baltor alone, forbidden elsewhere); surfaces+integrations agree with the import law; no shared prod DB/god token; brand risk registered ──

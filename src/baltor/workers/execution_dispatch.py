@@ -2,5 +2,5 @@
 from __future__ import annotations
 
 from src.teleon.workers.execution_dispatch import (  # noqa: F401
-    SHARD_BUCKET, _JOB_BACKENDS, _POOL_BACKENDS, dispatch_capability, dispatch_owned_shards)
+    SHARD_BUCKET, _executor_for_backend, dispatch_capability, dispatch_owned_shards)
 __all__ = ["dispatch_capability", "dispatch_owned_shards", "SHARD_BUCKET"]

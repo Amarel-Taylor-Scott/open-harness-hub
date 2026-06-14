@@ -1,6 +1,6 @@
 # Proof Inventory
 
-**466** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
+**467** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
 
 - `scripts/ingest/context_rot.py`
 - `scripts/ingest/document_decompose.py`
@@ -324,6 +324,7 @@
 - `scripts/check_purpose_task_projection_redaction.py`
 - `scripts/check_adaptation_ladder.py`
 - `scripts/check_runtime_class_binding.py`
+- `scripts/check_execution_dispatch_fail_loud.py`
 - `scripts/check_portfolio_dependency_law.py`
 - `scripts/check_company_portfolio_boundaries.py`
 - `scripts/check_teleon_lift.py`
