@@ -444,6 +444,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/eval/rulearena_benchmark.py", "rulearena_benchmark"),
     # ── the A/B STRATEGY HARNESS (the core advantage, MEASURED): scores every descent strategy and picks the cheapest that stays within an accuracy tolerance of the full-model baseline — deterministic wins on rule-guided work, a cheaper model on open-ended work, and a cheap-but-WRONG fork the ceiling-only prior would have shipped is CAUGHT (regression prevented); winners feed the meta-learner so the most-efficient path is learned from measured evidence ──
     ("scripts/check_teleon_ab_harness.py", "check_teleon_ab_harness"),
+    # ── ECOSYSTEM COHESION e2e: a REAL discovered capability flows through the whole stack — screen -> network/impl-finder -> A/B descent (org-policy-bounded, clears the accuracy floor) -> meta-learner + cost measurement -> tenant-objective binding — each stage consuming the last, governed throughout (serves_truth=False); the tools/verticals/resource-registries compose, not a pile of modules ──
+    ("scripts/check_teleon_assurance_pipeline_e2e.py", "check_teleon_assurance_pipeline_e2e"),
     # ── CTS-1: bind an OCTS runtime CLASS → concrete backend by policy/creds/health; cloud deferred after a built local equivalent; class-scoped guard; deny-by-default; composes with the execution selector ──
     ("scripts/check_runtime_class_binding.py", "check_runtime_class_binding"),
     ("scripts/check_execution_dispatch_fail_loud.py", "check_execution_dispatch_fail_loud"),
