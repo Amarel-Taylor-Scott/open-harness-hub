@@ -418,6 +418,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/capability_seeder.py", "capability_seeder"),
     # ── the SIDE RUNNER: a resumable runner that discovers capability candidates (feed-file source; live search/scrape a governed off-by-default seam), seeds + screens them, walks each non-det -> most-det on the evolution-graph engine, stages to JSONL, and remembers processed hashes so re-runs are idempotent; owner-launched loop stops only via .agent/STOP_REQUESTED ──
     ("scripts/context_workers/capability_discovery_runner.py", "capability_discovery_runner"),
+    # ── interchangeable PROVIDER ENDPOINTS per capability (WHOIS via RDAP/paid-API/library, geocoding via Census/Google/Mapbox): the objective layer picks the best endpoint per priority (minimize_cost->free, minimize_latency->fastest, maximize_accuracy->most reliable); a policy-forbidden endpoint is excluded before scoring (safety beats objective); observed telemetry deprioritizes a slow endpoint; deterministic, never truth ──
+    ("scripts/check_teleon_endpoint_registry.py", "check_teleon_endpoint_registry"),
     # ── CTS-1: bind an OCTS runtime CLASS → concrete backend by policy/creds/health; cloud deferred after a built local equivalent; class-scoped guard; deny-by-default; composes with the execution selector ──
     ("scripts/check_runtime_class_binding.py", "check_runtime_class_binding"),
     ("scripts/check_execution_dispatch_fail_loud.py", "check_execution_dispatch_fail_loud"),
