@@ -144,6 +144,8 @@ def evaluate(attrs: dict, policy: OrgGuardrailPolicy) -> PolicyDecision:
             reasons.append(f"violates no_external_egress (public domain {dom!r})")
         elif m == "permissive_license_only" and policy.allowed_licenses and lic is not None and lic not in policy.allowed_licenses:
             reasons.append("violates permissive_license_only (license not on the allow-list)")
+        elif m == "vetted_only" and attrs.get("vetted") is not True:
+            reasons.append("violates vetted_only (candidate has not passed vetting/human review)")
 
     return PolicyDecision(allowed=not reasons, reasons=tuple(reasons), policy_id=policy.policy_id)
 

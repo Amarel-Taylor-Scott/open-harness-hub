@@ -131,6 +131,47 @@ def _teleon_capability_plan(tenant_id: str, variety: str = "model") -> dict:
             "headline": f"{tenant_id}: {obj.name} -> place on {placement['chosen']}, descent={descent['decision']}"}
 
 
+def _teleon_capability_descent_journey(tenant_id: str) -> dict:
+    """A Teleon journey: watch a regulated-fact capability DESCEND — under the tenant's tunable preferences (soft
+    objective + HARD blockers), the A/B harness picks the cheapest strategy that keeps accuracy (governed by the
+    tenant's policy), the fragile fact is bound to its authoritative source (freshness: stale held out), and the
+    whole thing is governed with provenance. Built from the REAL A/B + preferences + freshness engines; deterministic."""
+    from scripts.eval.vertical_eval_suites import eval_suite_scorer
+
+    from src.teleon.evolution import FreshnessSyncedCapability, ab_test
+    from src.teleon.governance import preferences_for
+    prefs = preferences_for(tenant_id)
+    policy = prefs.to_org_policy()
+    cap = {"capability_slot": "reg-e-error-resolution-deadline", "category": "regulation",
+           "determinism_ceiling": 0.95, "deterministic_coverage_estimate": 0.9}
+    ab = ab_test(cap, scorer=eval_suite_scorer, max_accuracy_drop=prefs.max_accuracy_drop, policy=policy)
+    fr = FreshnessSyncedCapability(cap["capability_slot"], authoritative_source="ecfr://12/1005.11",
+                                   volatility_class="low")
+    fresh = fr.sync("10 business days", now="t0", source_version="2025-edition")
+    held = fr.on_source_change({"kind": "changed", "source": "ecfr://12/1005.11"}, now="t1")
+    steps = [
+        {"action": "Tenant declares tunable preferences (soft objective + HARD blockers)", "surface": "preferences",
+         "status": "ok", "outcome": f"{tenant_id}: objective={prefs.to_objective().name}, "
+         f"hard={'MIT-only+vetted' if policy.allowed_licenses else 'none'}, max_accuracy_drop={prefs.max_accuracy_drop}",
+         "evidence_ref": None},
+        {"action": "A/B the descent strategies; pick the cheapest that keeps accuracy (within the tenant's confines)",
+         "surface": "descent-ab", "status": "ok",
+         "outcome": f"winner={ab['winner']} @ accuracy {ab['winner_accuracy']} (floor {ab['accuracy_floor']}), cost {ab['winner_cost']}",
+         "evidence_ref": None},
+        {"action": "Governance: the winning fork clears the accuracy floor + the org guardrail policy",
+         "surface": "governance", "status": "ok",
+         "outcome": f"within confines: accuracy>=floor={ab['winner_accuracy'] >= ab['accuracy_floor']}", "evidence_ref": None},
+        {"action": "Freshness: bind the fragile fact to its authoritative source; hold stale out on change",
+         "surface": "freshness", "status": "held_out",
+         "outcome": f"synced to {fresh['provenance']['authoritative_source']} ({fr.policy['sync_cadence']}); "
+         f"on rule change -> {held['status']} (stale never served)", "evidence_ref": fresh["provenance"]["source_version"]},
+        {"action": "Governance boundary: a descent/serve decision is evidence, never autonomous truth",
+         "surface": "governance", "status": "ok", "outcome": f"serves_truth={ab['serves_truth']}", "evidence_ref": None},
+    ]
+    return {"product": "Teleon", "name": f"Capability descent under tenant preferences ({prefs.to_objective().name}) — {tenant_id}",
+            "steps": steps, "headline": f"{tenant_id}: descend -> {ab['winner']} (acc {ab['winner_accuracy']}), freshness-synced, governed"}
+
+
 def all_journeys() -> dict:
     """The full journey registry: the two flagship Baltor journeys + EVERY regulated-fact vertical (sourced from
     the examples-gallery registry so verticals stay single-sourced, not duplicated). Built on demand so the
@@ -141,6 +182,9 @@ def all_journeys() -> dict:
         # Teleon: the SAME capability planned differently per tenant priority (the per-tenant objective, on camera).
         "teleon-capability-plan-cost-tenant": lambda: _teleon_capability_plan("high-volume-batch"),
         "teleon-capability-plan-accuracy-tenant": lambda: _teleon_capability_plan("baltor-compliance"),
+        # Teleon: watch a capability DESCEND under tunable tenant preferences (A/B + hard blockers + freshness + governance).
+        "teleon-capability-descent-cost-startup": lambda: _teleon_capability_descent_journey("cost-first-startup"),
+        "teleon-capability-descent-mit-bank": lambda: _teleon_capability_descent_journey("mit-only-bank"),
     }
     from scripts.build_examples_gallery import EXAMPLES
     for ex in EXAMPLES:
@@ -231,6 +275,21 @@ def _self_test() -> int:
     ck("the Teleon journeys are replayable (same trace_hash) and never serve truth",
        track("teleon-capability-plan-cost-tenant")["trace_hash"] == cost_j["trace_hash"]
        and cost_j["serves_truth"] is False and acc_j["serves_truth"] is False)
+
+    # the DESCENT walkthrough journey: a capability descends under tunable preferences, governed, with freshness.
+    desc = track("teleon-capability-descent-cost-startup")
+    surfaces = {s["surface"] for s in desc["steps"]}
+    ck("a capability-DESCENT journey walks preferences -> A/B descent -> governance -> freshness -> boundary",
+       desc["product"] == "Teleon" and {"preferences", "descent-ab", "freshness", "governance"} <= surfaces, str(surfaces))
+    ab_step = next(s for s in desc["steps"] if s["surface"] == "descent-ab")
+    fr_step = next(s for s in desc["steps"] if s["surface"] == "freshness")
+    ck("the descent step shows a measured winner; the freshness step holds the stale fact out (held_out)",
+       "winner=" in ab_step["outcome"] and fr_step["status"] == "held_out" and "never served" in fr_step["outcome"])
+    ck("the MIT-only bank descent journey reflects its HARD blocker in the preferences step",
+       "MIT-only" in next(s for s in track("teleon-capability-descent-mit-bank")["steps"]
+                          if s["surface"] == "preferences")["outcome"])
+    ck("the descent journey is replayable + never serves truth",
+       track("teleon-capability-descent-cost-startup")["trace_hash"] == desc["trace_hash"] and desc["serves_truth"] is False)
 
     print("\n" + ("PASS — track_user_journey: a user journey is tracked against the REAL demo backend as an ordered, "
                   "deterministic, REPLAYABLE UserJourneyTrace.v1 (same journey -> same trace_hash); the moat step "

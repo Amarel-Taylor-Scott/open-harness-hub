@@ -54,6 +54,10 @@ from src.teleon.evolution.ab_harness import (
 )
 from src.teleon.evolution.descent_measurement import cost_speed_report, measure_descent
 from src.teleon.evolution.descender import descend
+from src.teleon.evolution.freshness_runtime import (
+    FreshnessSyncedCapability,
+    demonstrate_freshness_e2e,
+)
 from src.teleon.evolution.distiller import (
     STRATEGIES,
     STRATEGY_FRESHNESS_SYNC,
@@ -77,4 +81,5 @@ __all__ = [
     "descent_strategies", "all_descent_strategies", "descent_strategy", "strategies_for_axis",
     "descend", "measure_descent", "cost_speed_report",
     "ab_test", "ab_test_corpus", "ceiling_scorer", "rulearena_scorer", "KEEP_MODEL",
+    "FreshnessSyncedCapability", "demonstrate_freshness_e2e",
 ]

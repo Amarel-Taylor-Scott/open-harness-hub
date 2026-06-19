@@ -15,8 +15,14 @@ from src.teleon.governance.org_policy import (
     load_policy,
     policy_ids,
 )
+from src.teleon.governance.tenant_preferences import (
+    TenantPreferences,
+    known_tenants,
+    preferences_for,
+)
 
 __all__ = [
     "OrgGuardrailPolicy", "PolicyDecision", "OrgPolicyError", "load_policy", "policy_ids",
     "evaluate", "evaluate_endpoint", "evaluate_runner", "forbidden_endpoints", "bounds_runner_change",
+    "TenantPreferences", "preferences_for", "known_tenants",
 ]

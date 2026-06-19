@@ -446,6 +446,12 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_teleon_ab_harness.py", "check_teleon_ab_harness"),
     # ── ECOSYSTEM COHESION e2e: a REAL discovered capability flows through the whole stack — screen -> network/impl-finder -> A/B descent (org-policy-bounded, clears the accuracy floor) -> meta-learner + cost measurement -> tenant-objective binding — each stage consuming the last, governed throughout (serves_truth=False); the tools/verticals/resource-registries compose, not a pile of modules ──
     ("scripts/check_teleon_assurance_pipeline_e2e.py", "check_teleon_assurance_pipeline_e2e"),
+    # ── tunable TENANT PREFERENCES + hard blockers: a tenant tunes soft objective/axis-priorities/accuracy-tolerance + sets HARD blockers (MIT-only license, vetted-only, no external egress); compiles to an OrgGuardrailPolicy (hard blocks) + a CapabilityObjective (soft ranks) + the A/B tolerance; hard blocks, soft ranks, suggestions advise ──
+    ("scripts/check_teleon_tenant_preferences.py", "check_teleon_tenant_preferences"),
+    # ── per-VERTICAL eval suites feeding the A/B harness: each regulated-fact vertical maps to a rule-guided eval suite; eval_suite_scorer gives the A/B a REAL per-vertical accuracy (deterministic fork 100% vs model mis-applies) so the A/B picks the right strategy per vertical on measured evidence ──
+    ("scripts/eval/vertical_eval_suites.py", "vertical_eval_suites"),
+    # ── FRESHNESS axis end-to-end on a regulated fact (Reg E / eCFR): bind to the authoritative source on a volatility-matched cadence; serve the current value with provenance; on a rule change HOLD THE STALE ANSWER OUT (never served) until re-synced — the wedge provers concede + gateways disclaim ──
+    ("scripts/check_teleon_freshness_e2e.py", "check_teleon_freshness_e2e"),
     # ── CTS-1: bind an OCTS runtime CLASS → concrete backend by policy/creds/health; cloud deferred after a built local equivalent; class-scoped guard; deny-by-default; composes with the execution selector ──
     ("scripts/check_runtime_class_binding.py", "check_runtime_class_binding"),
     ("scripts/check_execution_dispatch_fail_loud.py", "check_execution_dispatch_fail_loud"),
