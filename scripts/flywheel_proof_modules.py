@@ -430,6 +430,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/context_workers/distillation_runner.py", "distillation_runner"),
     # ── the TRAINING system: the skills DB joins capability features + distillation outcomes into a labeled, splittable, exportable dataset; a FittedPolicy is trained from it that learns the highest-efficiency distillation strategy per class, generalizes (class->band->prior backoff), and beats the cold-start prior on held-out; a real model/LoRA plugs in behind the same port (candidate, never truth) + the harness emits its governed spec ──
     ("scripts/check_teleon_distillation_training.py", "check_teleon_distillation_training"),
+    # ── the BULK REGISTRY INGESTER (the hundreds-of-thousands path): maps machine-readable registry dumps (MCP/Airbyte/npm-PyPI/OpenAPI/generic) to governed CapabilityCandidate rows WITHOUT an LLM — per-format adapters + deterministic category/kind priors; scales 1k entries -> 1k rows in one free pass; every row passes the seeder screen + is flagged for Stage-2 confirm; writes a runner-ingestible feed ──
+    ("scripts/check_teleon_bulk_registry_ingest.py", "check_teleon_bulk_registry_ingest"),
     # ── CTS-1: bind an OCTS runtime CLASS → concrete backend by policy/creds/health; cloud deferred after a built local equivalent; class-scoped guard; deny-by-default; composes with the execution selector ──
     ("scripts/check_runtime_class_binding.py", "check_runtime_class_binding"),
     ("scripts/check_execution_dispatch_fail_loud.py", "check_execution_dispatch_fail_loud"),
