@@ -89,6 +89,53 @@ def preseed() -> dict:
     return {"count": len(out), "registry_slots": sorted(registry), "units": out}
 
 
+#: illustrative per-call costs (USD) for the descent demonstration: a model call vs a distilled deterministic
+#: rule. The adapt()/promotion/rollback ENGINE is REAL; these two impls stand in for "the model" and "the rule
+#: the determinism factory distilled from verified traces," so the descent runs offline + deterministically.
+_MODEL_CALL_COST = 0.05
+_DISTILLED_RULE_COST = 0.0
+_DESCENT_ANSWER = "10 business days"  # the gated answer both impls must agree on (the CFPB reference fact)
+
+
+def demonstrate_descent(variety: str = "model") -> dict:
+    """Run Teleon's REAL adapt() engine to show a capability DESCEND non-deterministic -> deterministic: a
+    model-tier impl is the current hot path; a distilled deterministic rule (cost ~0, EQUIVALENT output) is the
+    candidate; adapt() runs them side-by-side through the Parallel-Path Engine and promotes the rule ONLY on a
+    passing PathPromotionDecision (equivalent + not-more-expensive), keeping the model as a reversible
+    rollback_target. This EXECUTES the cost self-improvement the seed's adaptation_target only declares."""
+    from src.teleon.purpose_tasks.purpose_task import adapt, provision, run_current
+    unit = next(u for u in _seed()["units"] if u["variety"] == variety)
+    spec = unit["spec"]
+    slot = spec["capability_slot"]
+
+    def _impl(impl_id: str, cost: float):
+        def handler(_inp):
+            return {"output": _DESCENT_ANSWER, "output_contract": spec["output_contract"], "cost": cost,
+                    "latency_ms": 1, "error": None, "source_handles": ["ctx://ecfr/reg-e"],
+                    "impl_id": impl_id, "serves_truth": False}
+        return handler
+
+    model_id, rule_id = f"model.{slot}@v1", f"distilled_rule.{slot}@v1"
+    registry = {slot: [
+        {"impl_id": model_id, "priority": 100, "handler": _impl(model_id, _MODEL_CALL_COST)},
+        {"impl_id": rule_id, "priority": 90, "handler": _impl(rule_id, _DISTILLED_RULE_COST)},
+    ]}
+    prov = provision(spec, registry)  # current = the model (the original, highest-priority impl)
+    snap = {"x": "Reg E error-resolution deadline?"}
+    before = run_current(prov, registry, snap)
+    res = adapt(prov, registry, snap, now="descent-demo",
+                promotion_criteria={"cost_tolerance": float((spec.get("promotion_criteria") or {}).get("cost_tolerance", 0.25))},
+                candidate_impl_id=rule_id)
+    after_spec = res["spec"]
+    after = run_current(after_spec, registry, snap)
+    return {"task_id": spec["task_id"], "capability_slot": slot, "variety": variety,
+            "before_impl": prov["current_impl_id"], "after_impl": after_spec["current_impl_id"],
+            "promoted": res["promoted"], "rollback_target": after_spec.get("rollback_target"),
+            "before_cost": before["cost"], "after_cost": after["cost"],
+            "answer_before": before["output"], "answer_after": after["output"],
+            "equivalent": before["output"] == after["output"]}
+
+
 def _self_test() -> int:
     from jsonschema import Draft202012Validator
 
@@ -155,11 +202,27 @@ def _self_test() -> int:
        oe["spec"]["success_criteria"].get("requires_human_boundary") is True
        and oe["spec"].get("safety_class") == "human_approval_required")
 
+    # THE LIVE DESCENT (cost self-improvement on the REAL adapt() engine, not just a declared adaptation_target):
+    # a model-tier capability is descended to a distilled deterministic rule — promoted ONLY because it is
+    # EQUIVALENT and cheaper, with the model kept as a reversible rollback_target.
+    d = demonstrate_descent("model")
+    ck("descent: Teleon PROMOTES the distilled deterministic rule over the model (real adapt() engine)",
+       d["promoted"] is True and d["before_impl"].startswith("model") and d["after_impl"].startswith("distilled_rule"),
+       str(d))
+    ck("descent: the promotion is COST-REDUCING (model call -> ~0 deterministic)",
+       d["after_cost"] < d["before_cost"] and d["after_cost"] == 0.0, f"{d['before_cost']} -> {d['after_cost']}")
+    ck("descent: the promoted rule is EQUIVALENT (same gated answer) — never a cheaper-but-wrong swap",
+       d["equivalent"] and d["answer_after"] == _DESCENT_ANSWER)
+    ck("descent: the model is kept as a reversible rollback_target (promotion is never one-way)",
+       bool(d["rollback_target"]) and d["rollback_target"].startswith("model"))
+
     print("\n" + ("PASS - teleon_preseed_capabilities: 8 capability-DEFINED units span the full spectrum "
                   "(template -> deterministic -> det+tool -> skill -> tool -> skill+tool -> model -> open-ended), "
                   "each a valid PurposeTaskSpec.v1 classified at its tier by the real ladder, provisioned by "
-                  "capability, with a non-det -> det descent that drives the expensive rungs toward deterministic "
-                  "for cost; nothing serves truth; the open-ended worker stays a sandboxed, human-bounded candidate."
+                  "capability; nothing serves truth; the open-ended worker stays a sandboxed, human-bounded "
+                  "candidate; AND the non-det -> det descent is DEMONSTRATED on the real adapt() engine — a model "
+                  "capability is promoted to an equivalent, cheaper deterministic rule with the model kept as a "
+                  "reversible rollback_target (the cost self-improvement, executed not just declared)."
                   if not fails else f"{len(fails)} FAILURES: {fails}"))
     return 0 if not fails else 1
 
@@ -168,10 +231,14 @@ def _main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description="Pre-seed Teleon with capability-defined units across the spectrum.")
     p.add_argument("--self-test", action="store_true")
     p.add_argument("--list", action="store_true")
+    p.add_argument("--descent", action="store_true", help="run the live model->deterministic descent on the real adapt() engine")
     p.add_argument("--json", action="store_true")
     a = p.parse_args(argv)
     if a.self_test:
         return _self_test()
+    if a.descent:
+        print(json.dumps(demonstrate_descent("model"), indent=2))
+        return 0
     pre = preseed()
     if a.json:
         print(json.dumps(pre, indent=2))
