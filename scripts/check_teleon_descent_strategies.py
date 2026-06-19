@@ -55,8 +55,8 @@ def _self_test() -> int:
             fails.append(name)
 
     # FULL MENU: efficiency + trust/robustness/openness axes (15), single source.
-    ck("the canonical axis set spans efficiency + trust/robustness/openness (15 axes)",
-       len(DESCENT_AXES) == 15 and set(_NEW_AXES) <= set(DESCENT_AXES)
+    ck("the canonical axis set spans efficiency + trust/robustness/openness (>=15 axes, extensible)",
+       len(DESCENT_AXES) >= 15 and set(_NEW_AXES) <= set(DESCENT_AXES)
        and {"determinism", "cost", "latency", "llm_usage", "freshness"} <= set(DESCENT_AXES))
 
     # REGISTRY: a strategy per new axis; every 'improves' is a real axis; required metadata present.

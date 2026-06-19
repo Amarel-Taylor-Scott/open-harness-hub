@@ -58,6 +58,7 @@ from src.teleon.evolution.freshness_runtime import (
     FreshnessSyncedCapability,
     demonstrate_freshness_e2e,
 )
+from src.teleon.evolution.token_reduction import compress_skill, estimate_tokens
 from src.teleon.evolution.distiller import (
     STRATEGIES,
     STRATEGY_FRESHNESS_SYNC,
@@ -82,4 +83,5 @@ __all__ = [
     "descend", "measure_descent", "cost_speed_report",
     "ab_test", "ab_test_corpus", "ceiling_scorer", "rulearena_scorer", "KEEP_MODEL",
     "FreshnessSyncedCapability", "demonstrate_freshness_e2e",
+    "compress_skill", "estimate_tokens",
 ]

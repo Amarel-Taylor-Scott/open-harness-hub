@@ -29,7 +29,11 @@ DESCENT_AXES = {
     "determinism": {"direction": "higher", "unit": "0..1", "meaning": "non-deterministic -> deterministic"},
     "cost": {"direction": "lower", "unit": "relative/call", "meaning": "expensive -> cheaper"},
     "latency": {"direction": "lower", "unit": "ms", "meaning": "slow -> faster (speed)"},
-    "llm_usage": {"direction": "lower", "unit": "model calls/tokens", "meaning": "more -> less LLM / lower context"},
+    "llm_usage": {"direction": "lower", "unit": "model calls", "meaning": "more -> fewer LLM/agent calls"},
+    "tokens_in": {"direction": "lower", "unit": "input tokens/call",
+                  "meaning": "smaller prompt/context/skill -> fewer INPUT tokens (compress the prompt, even a skill)"},
+    "tokens_out": {"direction": "lower", "unit": "output tokens/call",
+                   "meaning": "more concise output -> fewer OUTPUT tokens"},
     "freshness": {"direction": "higher", "unit": "0..1 currency",
                   "meaning": "fragile/stale -> robust, auto-synced to the authoritative source"},
     # ── trust / robustness (the second wave) ──

@@ -38,6 +38,8 @@ class RunObservation:
     llm_calls: float
     passed: bool
     output_key: str = ""
+    tokens_in: float = 0.0    # INPUT tokens consumed this run (prompt + context + skill) — token consumption, tracked
+    tokens_out: float = 0.0   # OUTPUT tokens produced this run
 
 
 class RunLedger:
@@ -61,6 +63,18 @@ class RunLedger:
     def observations(self, impl_id: str) -> list[RunObservation]:
         """The retained, ordered observation trace for one impl (telemetry, never discarded)."""
         return list(self._obs.get(impl_id, ()))
+
+    def token_usage(self, impl_id: str) -> dict:
+        """Observed TOKEN CONSUMPTION (in + out) for one impl — the mean input/output tokens per run, the metric
+        the owner asked to track. Raises if no runs (never a silent zero)."""
+        runs = self._obs.get(impl_id, ())
+        if not runs:
+            raise TelemetryError(f"no observations recorded for impl {impl_id!r}")
+        n = len(runs)
+        ti = sum(float(getattr(r, "tokens_in", 0.0)) for r in runs) / n
+        to = sum(float(getattr(r, "tokens_out", 0.0)) for r in runs) / n
+        return {"impl_id": impl_id, "mean_tokens_in": round(ti, 3), "mean_tokens_out": round(to, 3),
+                "mean_tokens_total": round(ti + to, 3), "runs": n}
 
     def observed_metrics(self, impl_id: str) -> MetricVector:
         """The MetricVector derived purely from this impl's recorded runs (see module docstring for methods)."""

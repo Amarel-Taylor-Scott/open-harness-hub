@@ -22,6 +22,16 @@
       "note": "the Pramaana/AlphaProof formal-verification approach as ONE verifiability strategy for FORMALIZABLE domains — strictly broader for us: freshness keeps the proven spec CURRENT and source-authority proves the spec is authoritative, closing the bounded limitation formal-proof systems openly admit (a proof is only valid w.r.t. its encoded spec)."
     },
     {
+      "axis": "tokens_in", "strategy_id": "prompt_compression", "fork_kind": "token_reduced",
+      "improves": ["tokens_in", "cost"],
+      "binds": "a compressed prompt/skill (deterministic prune of redundancy/boilerplate/duplication; TokenTamer/LLMLingua as a candidate behind a port) that preserves answer-critical content",
+      "reuses": "skill digestion + the lossless-distillation law (the raw skill is preserved; answer-critical facts + source handles survive)",
+      "governed_by": "lossless: compression may shrink the surface ONLY if answer-critical facts + source handles + held-out warnings survive; the raw skill is preserved",
+      "measurement": "INPUT tokens before vs after (RunObservation.tokens_in via RunLedger.token_usage)",
+      "fork_determinism_delta": 0.0, "fork_cost_delta": -0.01,
+      "note": "even a SKILL can be token-reduced — fewer input tokens = lower context = cheaper, same behavior. Composes with model_downgrade (a weaker model wants a tighter prompt)."
+    },
+    {
       "axis": "reliability", "strategy_id": "multi_provider_failover", "fork_kind": "redundant",
       "improves": ["reliability"], "binds": "an ENDPOINT SET (primary + ordered fallbacks) for one capability",
       "reuses": "src/teleon/endpoints (the alternative providers ARE the failover set)",
