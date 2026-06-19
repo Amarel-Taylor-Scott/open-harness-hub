@@ -422,6 +422,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_teleon_endpoint_registry.py", "check_teleon_endpoint_registry"),
     # ── ORG guardrail policy: an org's devops/security rules (license/domain/runtime/package allow+deny lists + methodology rules like deterministic_only/no_llm) BOUND a capability — disallowed endpoints excluded before objective selection (safety beats objective; all-banned fails loud), and the AI may self-heal/fork a unit ONLY to a runner within the confines (a model fix is vetoed under a deterministic-only org) ──
     ("scripts/check_teleon_org_guardrail_policy.py", "check_teleon_org_guardrail_policy"),
+    # ── OpenAI Codex as a first-class governed inference LANE (openai_compatible node, external + secret + local Ollama fallback; offline -> provider_unavailable, never fabricated): the objective routes among lanes (minimize_cost -> free local, capability priority -> Codex) and the org policy bounds it (air-gapped forbids cloud -> falls back to local Ollama; no-LLM forbids every lane -> escalate) ──
+    ("scripts/check_teleon_codex_lane.py", "check_teleon_codex_lane"),
     # ── CTS-1: bind an OCTS runtime CLASS → concrete backend by policy/creds/health; cloud deferred after a built local equivalent; class-scoped guard; deny-by-default; composes with the execution selector ──
     ("scripts/check_runtime_class_binding.py", "check_runtime_class_binding"),
     ("scripts/check_execution_dispatch_fail_loud.py", "check_execution_dispatch_fail_loud"),

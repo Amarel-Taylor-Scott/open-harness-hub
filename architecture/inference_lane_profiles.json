@@ -1,0 +1,20 @@
+{
+  "version": "InferenceLaneProfiles.v1",
+  "purpose": "The interchangeable INFERENCE LANES a capability unit can run its model calls on — local (deterministic stub, self-hosted Ollama) and cloud (Gemma via OpenRouter, Mistral, OpenAI Codex, OpenAI frontier, Anthropic). Codex is a first-class lane here, an ALTERNATIVE to the local Ollama/Gemma layers. The objective layer picks the lane per the tenant's priority (minimize_cost -> a free local lane; an accuracy/capability priority -> a capable cloud lane like Codex); the org guardrail policy can FORBID lanes (an air-gapped org forbids every cloud lane -> inference falls back to local Ollama; a no-LLM org forbids every model lane). Mirrors the provider-endpoint registry, one layer up. Each lane maps to a node in architecture/model_provider_graph.json (oips handles eligibility/fallback/receipts for the chosen lane). cost = relative per-call units; capability is a 0..1 capability/quality prior (-> accuracy dimension). Data only; read by src/teleon/inference/lane_selection.py; never a src.baltor symbol; LLM output is never truth.",
+  "lanes": [
+    {"lane_id": "model.local_stub@v1", "display": "local deterministic stub", "egress": "local",
+     "egress_domain": "local", "cost": 0.0, "latency_ms": 5, "capability": 0.1, "is_local": true},
+    {"lane_id": "model.ollama_local@candidate", "display": "Ollama local (self-hosted)", "egress": "local",
+     "egress_domain": "localhost", "cost": 0.0, "latency_ms": 1500, "capability": 0.62, "is_local": true},
+    {"lane_id": "model.openrouter.gemma_4_26b@candidate", "display": "Gemma-4 26B (OpenRouter)", "egress": "cloud",
+     "egress_domain": "openrouter.ai", "cost": 0.002, "latency_ms": 900, "capability": 0.72, "is_local": false},
+    {"lane_id": "model.mistral.small_latest@candidate", "display": "Mistral small", "egress": "cloud",
+     "egress_domain": "api.mistral.ai", "cost": 0.003, "latency_ms": 700, "capability": 0.70, "is_local": false},
+    {"lane_id": "model.openai.codex@candidate", "display": "OpenAI Codex (agentic coding)", "egress": "cloud",
+     "egress_domain": "api.openai.com", "cost": 0.02, "latency_ms": 2500, "capability": 0.96, "is_local": false},
+    {"lane_id": "model.openai.frontier@candidate", "display": "OpenAI frontier", "egress": "cloud",
+     "egress_domain": "api.openai.com", "cost": 0.03, "latency_ms": 1200, "capability": 0.93, "is_local": false},
+    {"lane_id": "model.anthropic.frontier@candidate", "display": "Anthropic frontier", "egress": "cloud",
+     "egress_domain": "api.anthropic.com", "cost": 0.025, "latency_ms": 1100, "capability": 0.94, "is_local": false}
+  ]
+}
