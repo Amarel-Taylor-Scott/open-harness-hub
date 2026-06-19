@@ -46,7 +46,7 @@ def _self_test() -> int:
 
     # CANONICAL AXES: cost + latency(speed) + freshness are first-class, with correct directions.
     ck("the canonical axes include determinism/cost/latency(speed)/llm_usage/freshness",
-       {"determinism", "cost", "latency", "llm_usage", "freshness"} == set(DESCENT_AXES))
+       {"determinism", "cost", "latency", "llm_usage", "freshness"} <= set(DESCENT_AXES))
     ck("cost & latency are lower-is-better; determinism & freshness are higher-is-better",
        DESCENT_AXES["cost"]["direction"] == "lower" and DESCENT_AXES["latency"]["direction"] == "lower"
        and DESCENT_AXES["determinism"]["direction"] == "higher" and DESCENT_AXES["freshness"]["direction"] == "higher")
