@@ -400,6 +400,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_purpose_task_projection_redaction.py", "check_purpose_task_projection_redaction"),
     # ── Adaptation ladder L0-L5: MEANS auto-promote on gates; ENDS/forbidden/unknown never auto (core invariant, deny-by-default) ──
     ("scripts/check_adaptation_ladder.py", "check_adaptation_ladder"),
+    # ── pre-seed Teleon with capability-DEFINED units across the full execution-style spectrum (template → deterministic → det+tool → skill → tool → skill+tool → model → open-ended), each a PurposeTaskSpec.v1 classified by the real escalation ladder + provisioned by capability, with a non-det → det descent for cost ──
+    ("scripts/teleon_preseed_capabilities.py", "teleon_preseed_capabilities"),
     # ── CTS-1: bind an OCTS runtime CLASS → concrete backend by policy/creds/health; cloud deferred after a built local equivalent; class-scoped guard; deny-by-default; composes with the execution selector ──
     ("scripts/check_runtime_class_binding.py", "check_runtime_class_binding"),
     ("scripts/check_execution_dispatch_fail_loud.py", "check_execution_dispatch_fail_loud"),
