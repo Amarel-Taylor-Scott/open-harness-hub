@@ -40,7 +40,11 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_experiments_isolation.py", "check_experiments_isolation"),
     ("scripts/ingest/decompose_to_context_objects.py", "decompose_to_context_objects"),
     ("scripts/ingest/parser_provider.py", "parser_provider"),
+    ("scripts/ingest/parse_quality.py", "parse_quality"),
+    ("scripts/ingest/parse_adjudicator.py", "parse_adjudicator"),
+    ("scripts/check_parser_portfolio.py", "check_parser_portfolio"),
     ("scripts/ingest/sanctions_feed_live.py", "sanctions_feed_live"),
+    ("scripts/check_live_ofac_receipt.py", "check_live_ofac_receipt"),
     ("scripts/ingest/ecfr_feed.py", "ecfr_feed"),
     ("scripts/ingest/federal_register_feed.py", "federal_register_feed"),
     ("scripts/validate_flywheel_schemas.py", "validate_flywheel_schemas"),
@@ -68,6 +72,9 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_cfpb_conflict_detection.py", "check_cfpb_conflict_detection"),
     ("scripts/check_cfpb_reconciliation.py", "check_cfpb_reconciliation"),
     ("scripts/check_source_authority.py", "check_source_authority"),
+    ("scripts/check_source_authority_registry_extended.py", "check_source_authority_registry_extended"),
+    ("scripts/check_authority_rank_core_precedence.py", "check_authority_rank_core_precedence"),
+    ("scripts/artifact_graph/authority_corroboration.py", "authority_corroboration"),
     ("scripts/check_cfpb_artifact_graph_demo.py", "check_cfpb_artifact_graph_demo"),
     # ── generalized runtime: hybrid storage + tenant resolver + LLM Gateway v1 ──
     ("scripts/check_storage_model_flexible.py", "check_storage_model_flexible"),
@@ -446,6 +453,12 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_shared_command_work_io.py", "check_shared_command_work_io"),
     # ── Event I/O: internal EventBus events project to CloudEvents 1.0 (EventEnvelope.v1 / CloudEventProjection.v1) — type in EVENT_KINDS, correlation_id required, deterministic (source,type,seq) id, secrets redacted; pure projector in src/teleon/io ──
     ("scripts/check_shared_event_io.py", "check_shared_event_io"),
+    # ── Teleon EGRESS GRAPH: outbound worker fetch/search/tool calls become redacted append-only observations projected into a tenant/query-scoped graph (query->egress->destination plus worker/tool/response digest); searchable by query/worker/destination; output is evidence only, never truth. ──
+    ("scripts/check_teleon_egress_graph.py", "check_teleon_egress_graph"),
+    # ── Teleon EGRESS ENFORCEMENT: covered workers + live inference route outbound HTTP through EgressClient; raw HTTP isolated to approved transports; route decisions/attempts ledgered; blocked routes don't fall through; evidence remains truth-free. ──
+    ("scripts/check_teleon_egress_enforcement.py", "check_teleon_egress_enforcement"),
+    # ── Teleon EXECUTION ENVIRONMENT TAXONOMY: every runtime class has pre-autotune defaults, policy preferences, route preferences, resource/lifecycle/SLA refs, local equivalent, and no-truth/autotune boundary locks. ──
+    ("scripts/check_teleon_execution_environment_taxonomy.py", "check_teleon_execution_environment_taxonomy"),
     # ── Baltor main UI: the animated Context Engine hero + its canonical six-stage language wired into the SPA (overview + /engine), single-sourced from web/baltor/stages.json; canvas/raf; reduced-motion; offline; no Oracle copy ──
     ("scripts/check_baltor_engine_hero_ui.py", "check_baltor_engine_hero_ui"),
     # ── Baltor SPA implements the canonical Claude-Design branded-house system (dir-d teal scope, Hanken Grotesk + IBM Plex Mono, shared card primitive + scale) while preserving our own additions; design spec persisted in-repo ──
@@ -658,6 +671,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/showcase_pipelines/fda_labeling_claim_review.py", "showcase_fda_labeling_claim_review"),
     # ── BIS export-control screening (regulated-fact vertical): scripts/showcase_pipelines/export_control_screening.py — screen each export's end-user against the authoritative BIS Entity List (bis.doc.gov) vs a stale vendor screening DB; the vendor "clear" is HELD OUT and the export to the LISTED end-user REQUIRES A LICENSE (escalated, EAR) while a clean end-user clears; flip the source → the screen flips. Earned authority; serves_truth=false. ──
     ("scripts/showcase_pipelines/export_control_screening.py", "showcase_export_control_screening"),
+    # ── Fragile fact-base watchtower (owner-requested: licensed employment agencies in the Philippines): scripts/context_workers/ph_employment_agency_watchtower.py — DMW/POEA + DOLE official evidence governs licensing status, stale customer/vendor context is held out, unavailable official sources create verification tasks, and Teleon deterministic tools stay separated from LLM-assisted candidate evidence. ──
+    ("scripts/context_workers/ph_employment_agency_watchtower.py", "ph_employment_agency_watchtower"),
     # ── Procurement collusion / bid-rigging ring (owner-requested relationship-network 'etc'): scripts/showcase_pipelines/procurement_collusion_ring.py — aggregate bids ACROSS tenders → a co-bidding group whose wins ROTATE and whose losing bids are COVER BIDS (just above the winner) is flagged as a bid-rigging ring (RingCo/BidCo/CovCo escalated), while an honest undercutter is excluded and a competitive ledger is not flagged. The ring is a property of the whole bid history — invisible to a per-tender model; signed award notice governs; serves_truth=false. ──
     ("scripts/showcase_pipelines/procurement_collusion_ring.py", "showcase_procurement_collusion_ring"),
     # ── LLM-plane local service ACTIVATED (#service-registry; was status:planned): scripts/llm_plane_local_service.py — fulfils local_llm_plane_emulator (:9425) by PROJECTING the canonical OIPS router (src/teleon/inference) over /api/inference/* (providers/models/health/route) — wires that module, never duplicates routing. A route returns the real select_provider decision + a DETERMINISTIC offline stub completion (is_stub, served_truth=false) + a receipt (is_truth=false); network LLMs stay owner-gated (an external node only wins if its secret is actually present, else it falls back to the local equivalent). ──

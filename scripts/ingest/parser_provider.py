@@ -36,9 +36,19 @@ if __name__ == "__main__" and __package__ in (None, ""):  # pragma: no cover
 
 from scripts.ingest.document_decompose import CannedParser, ParserProvider
 
-#: Registry of known parser adapters → the Baltor-verified backend (research/backend-tool-verification.md).
-#: primary Docling; LiteParse/Unstructured are fallbacks (not yet wired — declared, not faked).
-KNOWN_PARSERS = ("canned", "docling")
+#: Candidate parser engines behind the SAME ParserProvider seam (declared, never faked). Each lazily imports its
+#: package on the live path and raises a LABELED seam when absent, with license + exec-needs surfaced so adoption
+#: is a governed decision (discovery != trust). From the parser-portfolio gap + the 2026-06-18 DeepRepo intake.
+_CANDIDATE_ENGINES = {
+    "mineru":     {"package": "magic_pdf",     "install": "pip install magic-pdf", "license": "AGPL-3.0 + model conditions", "exec_needs": "cpu/gpu; formula+table+OCR", "strength": "scientific / formula-heavy PDFs -> Markdown+JSON"},
+    "tika":       {"package": "tika",          "install": "pip install tika (+ Java/Tika server)", "license": "Apache-2.0", "exec_needs": "JVM / Tika server", "strength": "broad MIME detection + text (1000+ types); low-fidelity fallback"},
+    "markitdown": {"package": "markitdown",    "install": "pip install markitdown", "license": "MIT", "exec_needs": "cpu", "strength": "lightweight any->Markdown for LLM pipelines"},
+    "grobid":     {"package": "grobid_client", "install": "pip install grobid-client-python (+ GROBID server)", "license": "Apache-2.0", "exec_needs": "GROBID server", "strength": "scientific papers -> structured TEI/XML (citations/sections)"},
+    "omniparse":  {"package": "omniparse",     "install": "github.com/adithya-s-k/omniparse (Docker)", "license": "GPL-3.0 (weights cc-by-nc-sa; non-commercial above a revenue threshold)", "exec_needs": "docker/gpu; documents+media+web", "strength": "multimodal: PDF/DOCX/PPTX/image/audio/video/web -> Markdown"},
+}
+#: Registry of known parser adapters: the offline CannedParser, the verified primary Docling, and the candidate
+#: engines above — each a swappable ParserProvider, none faked.
+KNOWN_PARSERS = ("canned", "docling", *_CANDIDATE_ENGINES)
 _DOCLING_INSTALL = "pip install docling"
 
 
@@ -76,22 +86,56 @@ class DoclingParser:
         return {"pages": [{"page_no": p, "blocks": pages[p]} for p in sorted(pages)]}  # pragma: no cover
 
 
+class CandidateParser:
+    """A CANDIDATE ParserProvider behind the same seam as Docling: lazily imports its package on the live path;
+    when absent (as in this stdlib-only env) it raises a LABELED seam naming the install + license + exec-needs
+    — it NEVER fakes a parse. Adopting it is a governed decision (discovery != trust)."""
+
+    def __init__(self, name: str) -> None:
+        if name not in _CANDIDATE_ENGINES:
+            raise KeyError(f"unknown candidate engine {name!r}; known: {tuple(_CANDIDATE_ENGINES)}")
+        self.name = name
+        self._meta = _CANDIDATE_ENGINES[name]
+
+    def _available(self) -> bool:
+        return importlib.util.find_spec(self._meta["package"]) is not None
+
+    def parse(self, raw: Any) -> dict:
+        if not self._available():
+            raise NotImplementedError(
+                f"{self.name} is a CANDIDATE parser SEAM: package '{self._meta['package']}' is not installed "
+                f"({self._meta['install']}). License: {self._meta['license']}; exec: {self._meta['exec_needs']}. "
+                f"The contract is proven via CannedParser; adopting this adapter is a governed decision "
+                f"(discovery != trust) — it never fakes a parse.")
+        raise NotImplementedError(  # pragma: no cover - per-engine live mapping is future work
+            f"{self.name} live byte-parse -> ParsedDocument mapping is not yet wired (candidate adapter).")
+
+
 def get_parser(name: str, *, fixture: dict | None = None) -> ParserProvider:
-    """Factory: return a parser adapter by name. ``canned`` needs a ``fixture`` (the offline path)."""
+    """Factory: return a parser adapter by name. ``canned`` needs a ``fixture`` (the offline path); the candidate
+    engines (mineru/tika/markitdown/grobid/omniparse) return a labeled seam until their package is installed."""
     if name == "canned":
         if fixture is None:
             raise ValueError("the 'canned' parser requires a fixture={'pages': [...]} mapping")
         return CannedParser(fixture)
     if name == "docling":
         return DoclingParser()
+    if name in _CANDIDATE_ENGINES:
+        return CandidateParser(name)
     raise KeyError(f"unknown parser {name!r}; known: {KNOWN_PARSERS}")
 
 
 def parser_status() -> dict[str, Any]:
-    """Which parsers are usable here (the offline 'canned' always; 'docling' only if installed)."""
-    return {"canned": {"available": True, "kind": "offline-fixture"},
-            "docling": {"available": _docling_available(), "kind": "live-byte-parse",
-                        "install": None if _docling_available() else _DOCLING_INSTALL}}
+    """Which parsers are usable here + the candidate engines' license/exec-needs (governed adoption metadata)."""
+    status: dict[str, Any] = {"canned": {"available": True, "kind": "offline-fixture"},
+                              "docling": {"available": _docling_available(), "kind": "live-byte-parse",
+                                          "install": None if _docling_available() else _DOCLING_INSTALL}}
+    for cand_name, meta in _CANDIDATE_ENGINES.items():
+        avail = importlib.util.find_spec(meta["package"]) is not None
+        status[cand_name] = {"available": avail, "kind": "candidate-byte-parse", "license": meta["license"],
+                             "exec_needs": meta["exec_needs"], "strength": meta["strength"],
+                             "install": None if avail else meta["install"]}
+    return status
 
 
 def _self_test() -> int:
@@ -127,6 +171,22 @@ def _self_test() -> int:
         check("docling absent → labeled seam raised (not faked)", seam)
         check("status reports docling unavailable + install hint",
               parser_status()["docling"] == {"available": False, "kind": "live-byte-parse", "install": _DOCLING_INSTALL})
+
+    # the candidate engines are honest seams too: absent package → labeled seam surfacing install + license.
+    for cand in _CANDIDATE_ENGINES:
+        cp = get_parser(cand)
+        check(f"CandidateParser({cand}) satisfies ParserProvider", isinstance(cp, ParserProvider))
+        if importlib.util.find_spec(_CANDIDATE_ENGINES[cand]["package"]) is None:
+            seam = False
+            try:
+                cp.parse("some.pdf")
+            except NotImplementedError as e:
+                seam = (cand in str(e) and _CANDIDATE_ENGINES[cand]["install"] in str(e)
+                        and "license" in str(e).lower())
+            check(f"{cand} absent → labeled candidate seam (install + license surfaced, not faked)", seam)
+    check("parser_status surfaces every candidate engine with license + exec-needs + availability",
+          all(all(k in parser_status()[c] for k in ("license", "exec_needs", "available")) for c in _CANDIDATE_ENGINES))
+    check("KNOWN_PARSERS includes all candidate engines", all(c in KNOWN_PARSERS for c in _CANDIDATE_ENGINES))
 
     # unknown parser fails closed.
     raised = False
