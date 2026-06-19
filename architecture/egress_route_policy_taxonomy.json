@@ -1,0 +1,294 @@
+{
+  "version": "1.0",
+  "purpose": "Vendor-neutral route-policy vocabulary for Teleon outbound actions. Workers submit an egress intent; the route broker chooses one of these policies by source policy, tenant policy, credentials, residency, availability, and risk. The append-only egress ledger is the source of record; graph/search indexes are projections.",
+  "control_rule": "Proxy/VPN/browser routes are governance and reachability tools, never bypass tools. If a source requires authorization, blocks automation, demands a customer network, or presents legal/contractual uncertainty, the route decision becomes blocked/manual_review instead of rotating exits.",
+  "route_kind_enum": [
+    "direct",
+    "official_api",
+    "customer_private_connector",
+    "approved_proxy",
+    "approved_vpn",
+    "browser_pool",
+    "blocked"
+  ],
+  "decision_contract": {
+    "schema_version": "EgressRouteDecision.v1",
+    "required_fields": [
+      "tenant_id",
+      "run_id",
+      "worker_id",
+      "query_id",
+      "destination",
+      "route_policy_id",
+      "policy_version",
+      "reason",
+      "serves_truth",
+      "capture_required"
+    ],
+    "serves_truth": false
+  },
+  "routes": [
+    {
+      "route_policy_id": "direct_public_internet",
+      "route_kind": "direct",
+      "default_allowed": true,
+      "allowed_for": [
+        "public source discovery",
+        "public official pages with no customer-private network requirement",
+        "low-risk static asset fetches",
+        "local development against public endpoints"
+      ],
+      "requires": [
+        "egress_intent",
+        "tenant_or_global_source_policy",
+        "destination_host_recorded",
+        "TeleonEgressObservation.v1"
+      ],
+      "forbidden_for": [
+        "customer-private sources",
+        "sources requiring customer network presence",
+        "access control bypass",
+        "captcha bypass"
+      ],
+      "capture_required": true,
+      "decision_receipt_required": true,
+      "payload_policy": {
+        "store_raw_by_default": false,
+        "store_response_digest": true,
+        "raw_payload_requires": [
+          "explicit retention policy",
+          "encryption",
+          "access logging",
+          "ttl"
+        ]
+      },
+      "fallback_route_policy_id": "manual_review_blocked",
+      "serves_truth": false
+    },
+    {
+      "route_policy_id": "official_api",
+      "route_kind": "official_api",
+      "default_allowed": true,
+      "allowed_for": [
+        "official API-backed source refresh",
+        "license or registry feeds with published API contracts",
+        "webhook validation",
+        "rate-limit-compliant authoritative verification"
+      ],
+      "requires": [
+        "egress_intent",
+        "source_authority_record",
+        "credential_ref_or_public_contract",
+        "rate_limit_policy",
+        "TeleonEgressObservation.v1"
+      ],
+      "forbidden_for": [
+        "scraping around a published API restriction",
+        "credential value in request payload",
+        "access control bypass",
+        "captcha bypass"
+      ],
+      "capture_required": true,
+      "decision_receipt_required": true,
+      "payload_policy": {
+        "store_raw_by_default": false,
+        "store_response_digest": true,
+        "raw_payload_requires": [
+          "source license allows retention",
+          "encryption",
+          "ttl",
+          "access logging"
+        ]
+      },
+      "fallback_route_policy_id": "manual_review_blocked",
+      "serves_truth": false
+    },
+    {
+      "route_policy_id": "customer_private_connector",
+      "route_kind": "customer_private_connector",
+      "default_allowed": false,
+      "allowed_for": [
+        "customer-owned APIs",
+        "customer intranet sources",
+        "customer-approved private registries",
+        "residency-bound enterprise context"
+      ],
+      "requires": [
+        "tenant_approval",
+        "workload_identity",
+        "private_connector_binding",
+        "purpose_limit",
+        "TeleonEgressObservation.v1"
+      ],
+      "forbidden_for": [
+        "public exploratory search",
+        "cross-tenant routing",
+        "access control bypass",
+        "captcha bypass"
+      ],
+      "capture_required": true,
+      "decision_receipt_required": true,
+      "payload_policy": {
+        "store_raw_by_default": false,
+        "store_response_digest": true,
+        "raw_payload_requires": [
+          "tenant retention policy",
+          "tenant encryption boundary",
+          "access logging",
+          "ttl"
+        ]
+      },
+      "fallback_route_policy_id": "manual_review_blocked",
+      "serves_truth": false
+    },
+    {
+      "route_policy_id": "approved_proxy_exit",
+      "route_kind": "approved_proxy",
+      "default_allowed": false,
+      "allowed_for": [
+        "tenant-approved regional access",
+        "source-approved network path",
+        "egress IP allowlisting",
+        "customer-mandated audit path"
+      ],
+      "requires": [
+        "tenant_approval",
+        "exit_policy_id",
+        "region_or_ip_binding",
+        "abuse_prevention_policy",
+        "TeleonEgressObservation.v1"
+      ],
+      "forbidden_for": [
+        "ban evasion",
+        "access control bypass",
+        "captcha bypass",
+        "source terms evasion",
+        "undisclosed identity rotation"
+      ],
+      "capture_required": true,
+      "decision_receipt_required": true,
+      "payload_policy": {
+        "store_raw_by_default": false,
+        "store_response_digest": true,
+        "raw_payload_requires": [
+          "policy owner approval",
+          "encryption",
+          "access logging",
+          "ttl"
+        ]
+      },
+      "fallback_route_policy_id": "manual_review_blocked",
+      "serves_truth": false
+    },
+    {
+      "route_policy_id": "approved_vpn_exit",
+      "route_kind": "approved_vpn",
+      "default_allowed": false,
+      "allowed_for": [
+        "customer-approved private network access",
+        "regulatory data-residency path",
+        "source-approved secure tunnel",
+        "legacy system reachability"
+      ],
+      "requires": [
+        "tenant_approval",
+        "vpn_profile_ref",
+        "workload_identity",
+        "residency_policy",
+        "TeleonEgressObservation.v1"
+      ],
+      "forbidden_for": [
+        "ban evasion",
+        "access control bypass",
+        "captcha bypass",
+        "undisclosed jurisdiction switching"
+      ],
+      "capture_required": true,
+      "decision_receipt_required": true,
+      "payload_policy": {
+        "store_raw_by_default": false,
+        "store_response_digest": true,
+        "raw_payload_requires": [
+          "tenant retention policy",
+          "encryption",
+          "access logging",
+          "ttl"
+        ]
+      },
+      "fallback_route_policy_id": "manual_review_blocked",
+      "serves_truth": false
+    },
+    {
+      "route_policy_id": "browser_pool_render",
+      "route_kind": "browser_pool",
+      "default_allowed": false,
+      "allowed_for": [
+        "JavaScript-rendered public pages",
+        "visual inspection",
+        "screenshots as evidence",
+        "public forms that permit automated access"
+      ],
+      "requires": [
+        "browser_task_policy",
+        "domain_allowlist",
+        "rate_limit_policy",
+        "artifact_capture_policy",
+        "TeleonEgressObservation.v1"
+      ],
+      "forbidden_for": [
+        "credential stuffing",
+        "account creation without approval",
+        "access control bypass",
+        "captcha bypass",
+        "hidden form submission"
+      ],
+      "capture_required": true,
+      "decision_receipt_required": true,
+      "payload_policy": {
+        "store_raw_by_default": false,
+        "store_response_digest": true,
+        "raw_payload_requires": [
+          "screenshot/artifact retention policy",
+          "encryption",
+          "access logging",
+          "ttl"
+        ]
+      },
+      "fallback_route_policy_id": "manual_review_blocked",
+      "serves_truth": false
+    },
+    {
+      "route_policy_id": "manual_review_blocked",
+      "route_kind": "blocked",
+      "default_allowed": true,
+      "allowed_for": [
+        "authorization uncertainty",
+        "source terms uncertainty",
+        "anti-automation signal",
+        "missing tenant approval",
+        "missing route credentials",
+        "high-risk destination"
+      ],
+      "requires": [
+        "blocked_decision_receipt",
+        "verification_task_or_owner_review",
+        "reason_code",
+        "TeleonEgressObservation.v1"
+      ],
+      "forbidden_for": [
+        "silent fallback to proxy rotation",
+        "silent fallback to VPN rotation",
+        "serving missing evidence as truth"
+      ],
+      "capture_required": true,
+      "decision_receipt_required": true,
+      "payload_policy": {
+        "store_raw_by_default": false,
+        "store_response_digest": false,
+        "raw_payload_requires": []
+      },
+      "fallback_route_policy_id": null,
+      "serves_truth": false
+    }
+  ]
+}

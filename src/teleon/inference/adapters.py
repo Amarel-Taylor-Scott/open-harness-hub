@@ -11,7 +11,7 @@ for a provider-graph node by its `adapter_style` (CONFIG, not code) and calls `.
   - EASY TO SWAP/CONFIGURE: a node's `adapter_style` (in architecture/model_provider_graph.json) decides the adapter;
     flipping it swaps the implementation with zero code change. Routing stays NUMERIC in oips; adapters are the
     pluggable execution layer beneath it.
-  - GOVERNED: no provider SDK is imported at module load (HTTP uses stdlib urllib, imported LAZILY, and only when the
+  - GOVERNED: no provider SDK is imported at module load (HTTP goes through Teleon egress capture, and only when the
     caller explicitly allows network); secrets are referenced by `secret_ref`, never embedded; offline / no-secret /
     no-network ⇒ a `ProviderUnavailableResult` (graceful degradation to the gateway's local fallback); every result
     is `is_truth=False` — model output is a candidate, never served truth.
@@ -23,6 +23,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
+from src.teleon.egress import EgressClient
 from src.teleon.inference.oips import _stable, OFFLINE_DEFAULT_NODE
 from src.teleon.inference.receipts import base_host_of
 
@@ -112,8 +113,8 @@ class LocalStubAdapter(InferenceProviderAdapter):
 
 
 class _HttpAdapter(InferenceProviderAdapter):
-    """Shared base for HTTP providers. requires_network=True; the real call uses stdlib urllib imported LAZILY inside
-    invoke (NEVER a provider SDK, never at module load). Offline / no-secret ⇒ provider_unavailable (graceful).
+    """Shared base for HTTP providers. requires_network=True; the real call uses Teleon egress capture
+    (NEVER a provider SDK, never at module load). Offline / no-secret ⇒ provider_unavailable (graceful).
 
     The transport (resolve config + per-node secret + POST + degrade-on-failure) is shared; each API STYLE overrides
     four small seams — `_endpoint_path`, `_build_body`, `_auth_headers`, `_parse_output` (+ optional `_parse_usage`)
@@ -158,13 +159,12 @@ class _HttpAdapter(InferenceProviderAdapter):
         ok, reason = self.available(secrets=secrets, allow_network=allow_network)
         if not ok:
             return provider_unavailable(self.node_id, reason)
-        # network IS allowed (+ secret if needed) — the REAL call, lazily imported + SDK-free. Endpoint/model
+        # network IS allowed (+ secret if needed) — the REAL call, SDK-free and routed through egress capture. Endpoint/model
         # resolve from node config first, env second; the KEY resolves from THIS node's secret_ref (per-node,
         # so providers don't share one global key) with a call-time override winning.
         import json as _json
         import os as _os
         import time as _time
-        import urllib.request  # noqa: F401  (stdlib only; the gated live-call path — not exercised offline)
         base_url = str(self.node.get("base_url") or _os.environ.get("OH_LLM_BASE_URL", "")).rstrip("/")
         model = self.node.get("model") or _os.environ.get("OH_LLM_MODEL", "")
         key = api_key if api_key is not None else resolve_secret_ref(self.secret_ref)  # PER-NODE; never embedded/echoed
@@ -173,11 +173,24 @@ class _HttpAdapter(InferenceProviderAdapter):
         body = _json.dumps(self._build_body(model=model, system=system, input_text=input_text,
                                             max_tokens=max_tokens, temperature=temperature)).encode("utf-8")
         headers = {"Content-Type": "application/json", **self._auth_headers(key)}
-        req = urllib.request.Request(base_url + self._endpoint_path, data=body, headers=headers, method="POST")
         started = _time.perf_counter()
         try:
-            with urllib.request.urlopen(req, timeout=timeout_s or _LIVE_CALL_TIMEOUT_S) as resp:
-                payload = _json.loads(resp.read().decode("utf-8"))
+            result = EgressClient().request_bytes(
+                tenant_id=str(self.node.get("tenant_id") or "teleon-inference"),
+                run_id=str(object_id),
+                worker_id=f"inference.{self.node_id}",
+                worker_kind="inference_adapter",
+                operation=f"inference.{self.adapter_style}",
+                url=base_url + self._endpoint_path,
+                method="POST",
+                body=body,
+                headers=headers,
+                timeout_s=timeout_s or _LIVE_CALL_TIMEOUT_S,
+                query_text=f"inference {self.node_id} {object_id}",
+                tool_name="teleon.inference",
+                route_policy_id="direct_public_internet",
+            )
+            payload = _json.loads(result["text"])
             output = self._parse_output(payload)
         except Exception as exc:  # any live failure degrades, never fabricates
             return provider_unavailable(self.node_id, f"live_call_failed_{type(exc).__name__}")

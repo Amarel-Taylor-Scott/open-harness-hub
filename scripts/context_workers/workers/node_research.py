@@ -7,11 +7,11 @@ authorization policy for sensitive node types.
 """
 from __future__ import annotations
 
+import json
 import os
 import re
 import subprocess
 import time
-import urllib.request
 from pathlib import Path
 from typing import Any
 
@@ -20,6 +20,7 @@ from scripts.context_workers.common import compact, stable_hash
 from scripts.context_workers.registry import TaskContext, TaskResult, registry
 from scripts.db.runtime_settings import runtime_setting
 from scripts.db.setting_profile_rows import setting_profile_rows_by_namespace
+from src.teleon.egress import EgressClient
 
 SENSITIVE_NODE_TYPES = {"person", "email", "phone", "username", "private_person"}
 ACTIVE_RECON_TOOLS = {"amass", "theharvester", "subfinder", "dnsx"}
@@ -431,10 +432,20 @@ def _run_tool(ctx: TaskContext, node: dict[str, Any], tool: str, payload: dict[s
             target = os.environ.get(env_var, "").rstrip("/")
             if not target.startswith(("http://", "https://")):
                 return _evidence_record(ctx, node, tool, "configured", {"env": env_var, "note": "API key/configuration present; direct endpoint call not implemented for this source"})
-            body = json.dumps({"node": node, "query": label, "node_type": node_type, "run_id": ctx.run_id}).encode("utf-8")
-            req = urllib.request.Request(target, data=body, headers={"content-type": "application/json"})
-            with urllib.request.urlopen(req, timeout=int(payload.get("timeout_s") or 30)) as response:  # noqa: S310 - operator configured endpoint
-                raw = response.read().decode("utf-8", errors="replace")
+            result = EgressClient().request_json(
+                tenant_id=ctx.tenant_id,
+                run_id=ctx.run_id,
+                worker_id="node.research.enrich",
+                worker_kind="context_worker",
+                operation="node_research.service_json",
+                url=target,
+                json_payload={"node": node, "query": label, "node_type": node_type, "run_id": ctx.run_id},
+                timeout_s=int(payload.get("timeout_s") or 30),
+                query_text=f"{tool} {label}",
+                tool_name=tool,
+                route_policy_id="direct_public_internet",
+            )
+            raw = result["text"]
             return _evidence_record(ctx, node, tool, "ready", {"response": raw[:20000]})
         return _evidence_record(ctx, node, tool, "configured", ready)
     except Exception as exc:  # noqa: BLE001

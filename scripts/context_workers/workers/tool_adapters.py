@@ -12,8 +12,6 @@ import os
 import re
 import subprocess
 import tempfile
-import urllib.error
-import urllib.request
 from pathlib import Path
 from typing import Any, Callable
 
@@ -21,6 +19,7 @@ from scripts._config import CONTEXT_TOOL_ADAPTER_RUNTIME_SETTINGS, CONTEXT_TOOL_
 from scripts.context_workers.common import WORD_RE, chunk_text, compact, stable_hash
 from scripts.context_workers.registry import TaskContext, TaskResult, registry
 from scripts.db.runtime_settings import runtime_setting
+from src.teleon.egress import EgressBlocked, EgressClient, EgressTransportError
 
 LOCAL_DEFAULT_ADAPTERS = {
     "ftfy",
@@ -168,15 +167,21 @@ def _source_path(payload: dict[str, Any]) -> Path | None:
     return None
 
 
-def _http_json(url: str, payload: dict[str, Any], timeout_s: int = 30) -> dict[str, Any]:
-    body = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(url, data=body, headers={"content-type": "application/json"})
-    with urllib.request.urlopen(req, timeout=timeout_s) as response:  # noqa: S310 - operator-configured local/service URL
-        data = response.read().decode("utf-8", errors="replace")
-    try:
-        return json.loads(data)
-    except json.JSONDecodeError:
-        return {"raw_response": data}
+def _http_json(ctx: TaskContext, url: str, payload: dict[str, Any], timeout_s: int = 30) -> dict[str, Any]:
+    result = EgressClient().request_json(
+        tenant_id=ctx.tenant_id,
+        run_id=ctx.run_id,
+        worker_id="context_tool_adapter",
+        worker_kind="context_worker",
+        operation="context_tool_adapter.service_json",
+        url=url,
+        json_payload=payload,
+        timeout_s=timeout_s,
+        query_text=f"context tool adapter service {url}",
+        tool_name="context_tool_adapter",
+        route_policy_id="direct_public_internet",
+    )
+    return result["json"]
 
 
 def _adapter_record(adapter: str, *, status: str = "ready", **extra: Any) -> dict[str, Any]:
@@ -654,16 +659,25 @@ def parse_grobid(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
         f'Content-Disposition: form-data; name="input"; filename="{path.name}"\r\n'
         "Content-Type: application/pdf\r\n\r\n"
     ).encode("utf-8") + path.read_bytes() + f"\r\n--{boundary}--\r\n".encode("utf-8")
-    req = urllib.request.Request(
-        f"{base_url}/api/processFulltextDocument",
-        data=body,
-        headers={"content-type": f"multipart/form-data; boundary={boundary}"},
-    )
     try:
-        with urllib.request.urlopen(req, timeout=int(payload.get("timeout_s") or 120)) as response:  # noqa: S310
-            tei = response.read().decode("utf-8", errors="replace")
+        result = EgressClient().request_bytes(
+            tenant_id=ctx.tenant_id,
+            run_id=ctx.run_id,
+            worker_id="document.parse.grobid",
+            worker_kind="context_worker",
+            operation="grobid.processFulltextDocument",
+            url=f"{base_url}/api/processFulltextDocument",
+            method="POST",
+            body=body,
+            headers={"content-type": f"multipart/form-data; boundary={boundary}"},
+            timeout_s=int(payload.get("timeout_s") or 120),
+            query_text=f"grobid parse {path.name}",
+            tool_name=adapter,
+            route_policy_id="direct_public_internet",
+        )
+        tei = result["text"]
         return TaskResult.success({"parsed_document": _adapter_record(adapter, path=str(path), tei_xml=tei)})
-    except urllib.error.URLError as exc:
+    except (EgressBlocked, EgressTransportError) as exc:
         return TaskResult.failure(f"grobid_request_failed: {exc!r}")
 
 
@@ -1180,7 +1194,7 @@ def _service_adapter(name: str, env_var: str, output_key: str, description: str,
         if not url:
             return _not_configured_result(adapter, _env_var)
         try:
-            response = _http_json(url, payload, timeout_s=int(payload.get("timeout_s") or 30))
+            response = _http_json(ctx, url, payload, timeout_s=int(payload.get("timeout_s") or 30))
             return TaskResult.success({_output_key: _adapter_record(adapter, response=response)})
         except Exception as exc:  # noqa: BLE001
             return TaskResult.failure(f"{adapter}_request_failed: {exc!r}")

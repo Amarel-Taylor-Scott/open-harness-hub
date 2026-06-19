@@ -33,6 +33,15 @@ The **DB FleetLedger remains the source of truth.** An execution backend only *r
 write artifacts/events, idempotency, retry/DLQ) — it never owns truth and never emits a
 `CanonicalFact`/`ContextResponse` unless it is an explicit gate-approved consumption/export provider.
 
+Each abstract runtime class also has an execution-environment profile in
+`architecture/execution_environment_profiles.json`. That profile is the
+pre-autotune policy card for K8s jobs/workers, cloud functions, serverless
+containers, browser pools, GPU pools, durable workflows, streams, and local
+subprocesses: resource minimum, lifecycle/SLA defaults, egress route preference,
+identity mode, scale-to-zero default, and the knobs autotuning is allowed to
+touch. Autotuning cannot change tenant scope, source authority, secret policy,
+egress restrictions, trust boundary, or truth authority.
+
 ## Why this exists
 
 Cost changes; workload shape changes; cold starts matter; idle cost matters; dependencies matter (browser/

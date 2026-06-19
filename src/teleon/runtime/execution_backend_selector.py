@@ -78,6 +78,10 @@ def select_backend(task: dict, *, policy_matrix: dict | None = None, pricebook: 
     bucket = task.get("worker_bucket", "utility")
     bp = policy_matrix["buckets"].get(bucket, {})
     runtime = int(task.get("estimated_runtime_ms", 500))
+    # offline fallback is single-sourced from the matrix (config: offline_default_backend), with the stdlib
+    # _FALLBACK_ORDER as the last-resort default so this stdlib-only module never hard-fails if the key is absent.
+    offline_default = policy_matrix.get("offline_default_backend", _FALLBACK_ORDER[0])
+    fallback_order = (offline_default, *(b for b in _FALLBACK_ORDER if b != offline_default))
 
     eligible = list((policy_override or {}).get("eligible") or bp.get("eligible", _FALLBACK_ORDER))
     excluded = set(bp.get("excluded_by_default", [])) | set((policy_override or {}).get("excluded_backends", []))
@@ -92,12 +96,12 @@ def select_backend(task: dict, *, policy_matrix: dict | None = None, pricebook: 
 
     eligible = [b for b in eligible if b not in excluded]
     if not eligible:
-        eligible = list(_FALLBACK_ORDER)
+        eligible = list(fallback_order)
 
     # available + healthy candidates (a backend with no creds, or health False, is not runnable now)
     runnable = [b for b in eligible if (b in creds) and health.get(b, True)]
     if not runnable:
-        fb = next((b for b in _FALLBACK_ORDER if b in eligible), _FALLBACK_ORDER[0])
+        fb = next((b for b in fallback_order if b in eligible), fallback_order[0])
         return _decision("fallback_due_to_provider_health", fb,
                          f"no eligible backend is available+healthy (creds/health) → fall back to {fb}",
                          eligible=eligible, considered=eligible)
