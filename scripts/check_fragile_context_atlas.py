@@ -18,7 +18,7 @@ Rule codes (all must be empty for the real files):
   per pack:  domain_unknown · mode_unknown · volatility_bad · heldout_status_bad · heldout_not_never_served ·
              no_source_authority · no_heldout · benchmark_authority · llm_authority · refresh_missing ·
              status_invalid · active_invalid · candidate_invalid
-  atlas:     size_min · dup_pack_ids · demo_bijection · candidate_missing · brand_named · oracle_language · secret_leak
+  atlas:     size_min · dup_pack_ids · dup_demo_priority · demo_bijection · candidate_missing · brand_named · oracle_language · secret_leak
 
 Deterministic + offline. Exit 0/1.
 """
@@ -105,10 +105,13 @@ def find_violations(tax: dict, atlas: dict, refs: dict) -> dict[str, list]:
     # ── packs ──
     packs = atlas.get("packs", [])
     pack_ids = [p.get("pack_id") for p in packs]
+    demo_priorities = [p.get("demo_priority") for p in packs]
     if len(packs) < MIN_PACKS:
         add("size_min", len(packs))
     if len(set(pack_ids)) != len(pack_ids):
         add("dup_pack_ids", [pid for pid in pack_ids if pack_ids.count(pid) > 1])
+    if len(set(demo_priorities)) != len(demo_priorities):
+        add("dup_demo_priority", [n for n in demo_priorities if demo_priorities.count(n) > 1])
 
     active, candidate = [], []
     for p in packs:
@@ -194,7 +197,8 @@ def _self_test() -> int:
     check("A: taxonomy — 11 canonical modes (fields ok), TIME/FRESHNESS carry volatility+refresh, domains map to real industries, held-out statuses reuse CanonicalFact.status",
           clean("tax_mode_count", "tax_mode_fields", "tax_time_mode", "tax_domain_industry", "tax_heldout_statuses"),
           json.dumps({k: v[k] for k in v if k.startswith("tax_")}))
-    check("B: atlas >= MIN_PACKS packs, unique pack_ids", clean("size_min", "dup_pack_ids"))
+    check("B: atlas >= MIN_PACKS packs, unique pack_ids, unique demo priorities",
+          clean("size_min", "dup_pack_ids", "dup_demo_priority"))
     check("C: every pack.domain + fragility mode is in the taxonomy (lock-step)", clean("domain_unknown", "mode_unknown"),
           json.dumps({k: v.get(k) for k in ("domain_unknown", "mode_unknown") if v.get(k)}))
     check("D: reuse enums — volatility in FragilityMetadata; held-out status in CanonicalFact subset + never_served",

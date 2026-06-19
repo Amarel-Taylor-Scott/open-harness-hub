@@ -19,6 +19,7 @@ Attacks (each = a deep copy of the real atlas with ONE injected violation; the n
   9. unverified LLM output cited as authority -> llm_authority
  10. active pack overclaiming a non-existent demo -> demo_bijection
  11. candidate pack given a served answer (candidate-as-active) -> candidate_invalid
+ 12. duplicate demo priority                  -> dup_demo_priority
 
 Deterministic + offline. Exit 0/1.
 """
@@ -69,6 +70,7 @@ def _atk_overclaim(a):    a["packs"].append({"pack_id": "fragile.x.ghost", "stat
 def _atk_cand_served(a):
     i = _first_candidate_index(a)
     a["packs"][i]["served_answer"] = "now serving an unverified candidate"
+def _atk_dup_priority(a):  a["packs"][1]["demo_priority"] = a["packs"][0]["demo_priority"]
 
 
 _ATTACKS = [
@@ -83,6 +85,7 @@ _ATTACKS = [
     ("9. unverified LLM output cited as authority", "llm_authority", _atk_llm),
     ("10. active pack overclaiming a non-existent demo", "demo_bijection", _atk_overclaim),
     ("11. candidate given a served answer (candidate-as-active)", "candidate_invalid", _atk_cand_served),
+    ("12. duplicate demo priority", "dup_demo_priority", _atk_dup_priority),
 ]
 
 
@@ -115,7 +118,7 @@ def _self_test() -> int:
     print("\n" + (f"PASS — check_fragile_context_atlas_redteam: the real atlas is clean (0 violations) and all "
                   f"{len(_ATTACKS)} injected governance attacks (vendor accusation, pack-as-truth, missing source "
                   "authority/held-out, missing refresh, leaked credential, served contradiction, benchmark/LLM cited as "
-                  "authority, demo overclaim, candidate-as-active) are caught by the shared validator." if not fails
+                  "authority, demo overclaim, candidate-as-active, duplicate priority) are caught by the shared validator." if not fails
                   else f"{len(fails)} FAILURES: {fails}"))
     return 0 if not fails else 1
 

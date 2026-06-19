@@ -106,6 +106,13 @@ Everything passes through the safety gate in `docs/sales/public-claim-and-engage
 - **Produces:** a DiagnosticRun → a draft EvidencePack (appears / requires review) → ReviewApproval.
 - **Finds:** where HR / payroll / benefits context is authority-fragile, compliance-fragile, customer-fragile, jurisdiction-fragile — an answer served from a stale, conflicting, or wrong-authority source instead of the source of record.
 
+### Labor-Recruitment Licensing Freshness Audit
+- **Domains:** Labor mobility / recruitment licensing
+- **Fragility modes:** Action-fragile, Authority-fragile, Compliance-fragile, Freshness-fragile, Jurisdiction-fragile
+- **Atlas packs:** fragile.labor_mobility.ph_employment_agency_license
+- **Produces:** a DiagnosticRun → a draft EvidencePack (appears / requires review) → ReviewApproval.
+- **Finds:** where Labor mobility / recruitment licensing context is action-fragile, authority-fragile, compliance-fragile, freshness-fragile, jurisdiction-fragile — an answer served from a stale, conflicting, or wrong-authority source instead of the source of record.
+
 ### Legal-Context Provenance Audit
 - **Domains:** Legal / contract / compliance
 - **Fragility modes:** Authority-fragile, Customer-fragile, Jurisdiction-fragile, Source-fragile, Time-fragile

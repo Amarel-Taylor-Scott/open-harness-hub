@@ -252,6 +252,43 @@ declare a reuse boundary from `vocabularies/cache-scopes.yaml`:
 Scope is an isolation boundary, not a performance hint. Runtimes must never
 widen scope to chase cache-hit rate.
 
+### 2.9 Execution surface profile
+
+Runtime placement is a cross-cutting policy axis, not a component type. A
+pipeline, harness, worker, or purpose task may declare an abstract runtime class
+such as `cloud-function`, `kubernetes-job`, `queue-worker`, `browser-worker`,
+`gpu-worker`, `durable-workflow`, or `local-subprocess`. The shared profile for
+that class lives in `architecture/execution_environment_profiles.json`.
+
+An execution surface profile captures:
+
+- the surface family and execution shape;
+- the local correctness backend;
+- minimum resource class and trigger/state model;
+- lifecycle and SLA preferences;
+- default egress route policy;
+- pre-autotune defaults;
+- which knobs may be tuned;
+- which knobs are locked forever (`trust_boundary`, `tenant_scope`,
+  `secret_policy`, `source_authority`, egress restrictions, and truth authority).
+
+Authors should branch on the abstract runtime class and numeric policy, never on
+a cloud vendor product name. Concrete backend selection is a reversible policy
+decision below the catalog contract.
+
+### 2.10 Egress route policy
+
+Outbound search, fetch, API, MCP, browser, and registry actions are governed by
+route policies in `architecture/egress_route_policy_taxonomy.json`. A worker
+emits an egress intent, receives a route-policy decision, records the action in
+an append-only ledger, and only then may use the response as evidence.
+
+The route graph is not a truth authority. It records what was requested, which
+route was used, what digest came back, what was blocked, and which worker/query
+touched it. Baltor source-precedence and verification gates decide what can
+become served context. Proxy and VPN routes require explicit policy and are not
+fallbacks for bypassing authorization, anti-automation controls, or source terms.
+
 ---
 
 ## 3. Manifest fields

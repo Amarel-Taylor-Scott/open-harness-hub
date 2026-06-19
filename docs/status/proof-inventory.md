@@ -1,6 +1,6 @@
 # Proof Inventory
 
-**470** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
+**481** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
 
 - `scripts/ingest/context_rot.py`
 - `scripts/ingest/document_decompose.py`
@@ -34,7 +34,11 @@
 - `scripts/check_experiments_isolation.py`
 - `scripts/ingest/decompose_to_context_objects.py`
 - `scripts/ingest/parser_provider.py`
+- `scripts/ingest/parse_quality.py`
+- `scripts/ingest/parse_adjudicator.py`
+- `scripts/check_parser_portfolio.py`
 - `scripts/ingest/sanctions_feed_live.py`
+- `scripts/check_live_ofac_receipt.py`
 - `scripts/ingest/ecfr_feed.py`
 - `scripts/ingest/federal_register_feed.py`
 - `scripts/validate_flywheel_schemas.py`
@@ -60,6 +64,9 @@
 - `scripts/check_cfpb_conflict_detection.py`
 - `scripts/check_cfpb_reconciliation.py`
 - `scripts/check_source_authority.py`
+- `scripts/check_source_authority_registry_extended.py`
+- `scripts/check_authority_rank_core_precedence.py`
+- `scripts/artifact_graph/authority_corroboration.py`
 - `scripts/check_cfpb_artifact_graph_demo.py`
 - `scripts/check_storage_model_flexible.py`
 - `scripts/check_tenant_store_resolver.py`
@@ -357,6 +364,9 @@
 - `scripts/check_shared_io_resource_spine.py`
 - `scripts/check_shared_command_work_io.py`
 - `scripts/check_shared_event_io.py`
+- `scripts/check_teleon_egress_graph.py`
+- `scripts/check_teleon_egress_enforcement.py`
+- `scripts/check_teleon_execution_environment_taxonomy.py`
 - `scripts/check_baltor_engine_hero_ui.py`
 - `scripts/check_baltor_design_system.py`
 - `scripts/check_openbenchmarkhub_core.py`
@@ -467,6 +477,7 @@
 - `scripts/showcase_pipelines/beneficial_ownership_resolver.py`
 - `scripts/showcase_pipelines/fda_labeling_claim_review.py`
 - `scripts/showcase_pipelines/export_control_screening.py`
+- `scripts/context_workers/ph_employment_agency_watchtower.py`
 - `scripts/showcase_pipelines/procurement_collusion_ring.py`
 - `scripts/llm_plane_local_service.py`
 - `scripts/build_readme_stats.py`
