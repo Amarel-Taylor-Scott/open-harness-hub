@@ -404,6 +404,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/teleon_preseed_capabilities.py", "teleon_preseed_capabilities"),
     # ── capability OBJECTIVE flexibility: measure each impl (cost/latency/llm/determinism/accuracy), prioritize via a CapabilityObjective (preset or weights), select with a deterministic + traceable SelectionTrace; safety beats the objective; the objective DRIVES the descent (cost/llm/determinism -> distilled rule, accuracy -> model) ──
     ("scripts/check_teleon_capability_objectives.py", "check_teleon_capability_objectives"),
+    # ── OBSERVED measurement / telemetry: a RunLedger turns real run outcomes into a MetricVector per impl (cost/latency/llm means, accuracy=pass-rate, determinism=output-stability); observed evidence feeds select() and blend() removes the cold-start cliff so a unit improves on what it ACTUALLY did, not a declared claim ──
+    ("scripts/check_teleon_run_telemetry.py", "check_teleon_run_telemetry"),
     # ── CTS-1: bind an OCTS runtime CLASS → concrete backend by policy/creds/health; cloud deferred after a built local equivalent; class-scoped guard; deny-by-default; composes with the execution selector ──
     ("scripts/check_runtime_class_binding.py", "check_runtime_class_binding"),
     ("scripts/check_execution_dispatch_fail_loud.py", "check_execution_dispatch_fail_loud"),

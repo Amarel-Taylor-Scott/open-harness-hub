@@ -12,8 +12,10 @@ from src.teleon.objectives.objective import (
     ObjectiveError,
     select,
 )
+from src.teleon.objectives.telemetry import RunLedger, RunObservation, TelemetryError
 
 __all__ = [
     "CapabilityObjective", "MetricVector", "ObjectiveError", "select", "PRESETS",
     "OBJECTIVE_DIMENSIONS", "LOWER_IS_BETTER", "HIGHER_IS_BETTER",
+    "RunLedger", "RunObservation", "TelemetryError",
 ]
