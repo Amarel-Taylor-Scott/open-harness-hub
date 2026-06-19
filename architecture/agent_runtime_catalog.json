@@ -47,6 +47,45 @@
       "serves_truth": false,
       "runtime_ref": "env://AGENT_RUNTIME_HERMES_ENDPOINT",
       "note": "open-ended agent runtime -- candidate only; never imported/executed; provision onto k8s_job / sandbox_worker behind owner gate; output is a candidate proposal that returns to Baltor's governance rail."
+    },
+    {
+      "runtime_id": "codex@candidate",
+      "display_name": "OpenAI Codex (agentic coding harness)",
+      "status": "candidate",
+      "imported": false,
+      "executed": false,
+      "is_browser_runtime": false,
+      "sandbox_profile": "container-sandbox",
+      "default_worker_bucket": "open_ended_agent",
+      "serves_truth": false,
+      "runtime_ref": "env://AGENT_RUNTIME_CODEX_ENDPOINT",
+      "note": "coding-agent HARNESS for backend operations that require an LLM (Stage-2 candidate confirm, distilling a deterministic rule from traces, code-map generation) -- the agentic counterpart to the model.openai.codex inference lane; candidate only, never imported/executed without an owner-gated runtime_ref; provision onto k8s_job / sandbox_worker, never a generic cloud function; output is a candidate proposal, never truth."
+    },
+    {
+      "runtime_id": "claude_code@candidate",
+      "display_name": "Claude Code (agentic coding harness)",
+      "status": "candidate",
+      "imported": false,
+      "executed": false,
+      "is_browser_runtime": false,
+      "sandbox_profile": "container-sandbox",
+      "default_worker_bucket": "open_ended_agent",
+      "serves_truth": false,
+      "runtime_ref": "env://AGENT_RUNTIME_CLAUDE_CODE_ENDPOINT",
+      "note": "coding-agent HARNESS (alternative to Codex) for backend LLM operations; candidate only, never imported/executed without an owner-gated runtime_ref; sandboxed; output is a candidate proposal, never truth."
+    },
+    {
+      "runtime_id": "openhands@candidate",
+      "display_name": "OpenHands (open-source SWE agent harness)",
+      "status": "candidate",
+      "imported": false,
+      "executed": false,
+      "is_browser_runtime": false,
+      "sandbox_profile": "container-sandbox",
+      "default_worker_bucket": "open_ended_agent",
+      "serves_truth": false,
+      "runtime_ref": "env://AGENT_RUNTIME_OPENHANDS_ENDPOINT",
+      "note": "open-source SWE-agent HARNESS (self-hostable alternative to Codex/Claude Code) for backend LLM operations; candidate only, never imported/executed without an owner-gated runtime_ref; sandboxed; output is a candidate proposal, never truth."
     }
   ]
 }
