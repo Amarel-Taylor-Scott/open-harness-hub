@@ -414,6 +414,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_teleon_tenant_objective_binding.py", "check_teleon_tenant_objective_binding"),
     # ── the capability EVOLUTION graph (proactive, distinct from reactive self_healing): a capability evolves non-det -> most-det through DOCUMENTED forks (coverage traded for determinism, parent preserved, residual routed to a richer runner — never dropped); lineage/descent_path/most_deterministic_runner; lossless violations fail loud; self-healing writes heal edges into the SAME shared lineage (one capability, one history, two authors) ──
     ("scripts/check_teleon_capability_evolution_graph.py", "check_teleon_capability_evolution_graph"),
+    # ── capability seeder: discovered candidates (from public skills/tools/MCP/plugin sources) normalize into governed CapabilityCandidate.v1, pass a cheap gap/lift SCREEN (rejects retained, not dropped), and each is WALKED non-det -> most-det on the evolution-graph engine (a documented deterministic fork covering the estimated fraction, residual routed to the preserved model); discovery != trust — nothing auto-active, nothing serves truth ──
+    ("scripts/capability_seeder.py", "capability_seeder"),
     # ── CTS-1: bind an OCTS runtime CLASS → concrete backend by policy/creds/health; cloud deferred after a built local equivalent; class-scoped guard; deny-by-default; composes with the execution selector ──
     ("scripts/check_runtime_class_binding.py", "check_runtime_class_binding"),
     ("scripts/check_execution_dispatch_fail_loud.py", "check_execution_dispatch_fail_loud"),
