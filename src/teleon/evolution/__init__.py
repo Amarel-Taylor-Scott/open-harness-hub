@@ -45,6 +45,13 @@ from src.teleon.evolution.descent_axes import (
     is_axis,
     strategies_for_axis,
 )
+from src.teleon.evolution.ab_harness import (
+    KEEP_MODEL,
+    ab_test,
+    ab_test_corpus,
+    ceiling_scorer,
+    rulearena_scorer,
+)
 from src.teleon.evolution.descent_measurement import cost_speed_report, measure_descent
 from src.teleon.evolution.descender import descend
 from src.teleon.evolution.distiller import (
@@ -69,4 +76,5 @@ __all__ = [
     "DESCENT_AXES", "LOWER_IS_BETTER_AXES", "HIGHER_IS_BETTER_AXES", "freshness_policy", "improves", "is_axis",
     "descent_strategies", "all_descent_strategies", "descent_strategy", "strategies_for_axis",
     "descend", "measure_descent", "cost_speed_report",
+    "ab_test", "ab_test_corpus", "ceiling_scorer", "rulearena_scorer", "KEEP_MODEL",
 ]
