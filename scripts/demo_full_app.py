@@ -146,7 +146,7 @@ def run_demo(*, corpus: str = DEFAULT_CORPUS, live: bool = False) -> dict[str, A
         "kind": "baltor.lineage-manifest.v1",
         "lineage_manifest_id": "lin-" + sha256(pack_id.encode("utf-8")).hexdigest()[:12],
         "object_ref": pack_id,
-        "compact_summary": f"Pack for BILL-782 built from {len(consulted)} objects; authority "
+        "compact_summary": f"Pack for {cfg['task_id']} built from {len(consulted)} objects; authority "
                            f"{interro['authority']['subject_id'] if interro['authority'] else 'n/a'}.",
         "lineage_summary_for_llm": interro["answer"],
         "source_count": len(consulted),

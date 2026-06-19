@@ -1,0 +1,55 @@
+{
+  "schema_version": "LiveSourceReceipt.v1",
+  "receipt_kind": "ofac_sdn_live_verified_context_run",
+  "captured_at": "2026-06-14T01:25:55Z",
+  "captured_command": "python3 scripts/ingest/sanctions_feed_live.py --live --demo --limit 5",
+  "warrant": {
+    "kind": "user_intent",
+    "source": "docs/goals/yc-readiness-loop.md B1",
+    "summary": "Capture one dated --live OFAC run against the real SDN list, store the dated receipt, and cite that specific run."
+  },
+  "source_run": {
+    "content_hash": "e30f607781ae806b40fc593821e142c136de31170284a099211b6e4cf169fc27",
+    "list_date": "2026-06-14",
+    "list_version": "OFAC-SDN-LIVE-2026-06-14+e30f6077",
+    "parser": "sanctions_feed_live.sdn_csv.v1",
+    "retrieved_at": "2026-06-14T01:25:55Z",
+    "rows_parsed": 5,
+    "rows_skipped": 0,
+    "source_handle": "ctx://ofac/sdn",
+    "source_key": "ofac_sdn",
+    "source_url": "https://www.treasury.gov/ofac/downloads/sdn.csv"
+  },
+  "verification_run": {
+    "pipeline": "scripts.pipeline.verified_context_flow",
+    "headline": "verified 1 of 2 internal claim(s) against OFAC-SDN-LIVE-2026-06-14+e30f6077 and served them; held 1 out of the served corpus (1 would-be sanctions violation(s))",
+    "claims_total": 2,
+    "claims_served": 1,
+    "claims_held_out": 1,
+    "would_be_violations": [
+      {
+        "claim_id": "internal-OFAC-36-clearance",
+        "entity_ref": "OFAC-36",
+        "current_list_version": "OFAC-SDN-LIVE-2026-06-14+e30f6077",
+        "program": "CUBA",
+        "status_claimed_by_internal_doc": "clear",
+        "status_in_live_source": "listed",
+        "serving_decision": "held_out",
+        "detail_redacted": "Internal doc said the live-listed entity was CLEAR; the current OFAC SDN snapshot LISTS the entity."
+      }
+    ],
+    "served_claims": [
+      {
+        "claim_id": "internal-OFAC-173-block",
+        "entity_ref": "OFAC-173",
+        "serving_decision": "served"
+      }
+    ]
+  },
+  "privacy_redaction": {
+    "raw_sdn_names_committed": false,
+    "entity_refs_are_public_ofac_ent_nums": true,
+    "note": "The live command necessarily parsed raw public OFAC records in memory, but this stored receipt omits names and keeps only OFAC entity refs, source lineage, and serving decisions."
+  },
+  "serves_truth": false
+}
