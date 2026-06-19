@@ -44,8 +44,11 @@ _STAGING_DIR = _REPO / "data" / "capability-candidates"
 
 SCHEMA_VERSION = "CapabilityCandidate.v1"
 
-#: the source kinds the adapters accept (matches the discovered-feed source_kind field).
-SOURCE_KINDS = ("anthropic_skill", "github_skills_repo", "github_tools_repo", "mcp_server", "plugin", "skills_pack")
+#: the source kinds the adapters accept (matches the discovered-feed source_kind field). Two families: discovery-
+#: source kinds (where a candidate was FOUND) + implementation kinds (what BACKS it — a REST/HTTP API, a library,
+#: a wire protocol). Additive; widen as discovery surfaces new kinds.
+SOURCE_KINDS = ("anthropic_skill", "github_skills_repo", "github_tools_repo", "mcp_server", "plugin", "skills_pack",
+                "rest_api", "http_api", "api", "library", "protocol", "connector")
 #: capability categories we organize the negative-space corpus around (a stable, bounded vocabulary; widen
 #: deliberately as the corpus grows — additive, the named beachhead categories are never removed).
 CATEGORIES = (
