@@ -416,6 +416,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_teleon_capability_evolution_graph.py", "check_teleon_capability_evolution_graph"),
     # ── capability seeder: discovered candidates (from public skills/tools/MCP/plugin sources) normalize into governed CapabilityCandidate.v1, pass a cheap gap/lift SCREEN (rejects retained, not dropped), and each is WALKED non-det -> most-det on the evolution-graph engine (a documented deterministic fork covering the estimated fraction, residual routed to the preserved model); discovery != trust — nothing auto-active, nothing serves truth ──
     ("scripts/capability_seeder.py", "capability_seeder"),
+    # ── the SIDE RUNNER: a resumable runner that discovers capability candidates (feed-file source; live search/scrape a governed off-by-default seam), seeds + screens them, walks each non-det -> most-det on the evolution-graph engine, stages to JSONL, and remembers processed hashes so re-runs are idempotent; owner-launched loop stops only via .agent/STOP_REQUESTED ──
+    ("scripts/context_workers/capability_discovery_runner.py", "capability_discovery_runner"),
     # ── CTS-1: bind an OCTS runtime CLASS → concrete backend by policy/creds/health; cloud deferred after a built local equivalent; class-scoped guard; deny-by-default; composes with the execution selector ──
     ("scripts/check_runtime_class_binding.py", "check_runtime_class_binding"),
     ("scripts/check_execution_dispatch_fail_loud.py", "check_execution_dispatch_fail_loud"),
