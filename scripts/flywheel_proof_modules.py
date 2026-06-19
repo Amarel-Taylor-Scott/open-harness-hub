@@ -410,6 +410,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_teleon_unit_placement.py", "check_teleon_unit_placement"),
     # ── the objective GOVERNS self-improvement: a CapabilityObjective decides whether a unit's non-det -> det descent fires on the real adapt() engine (cost/determinism/llm -> promote the distilled rule, model kept as rollback) or is VETOED (maximize_accuracy holds the descent back when the rule diverges on novel/held-out inputs — the lossless-distillation law, made a tunable priority) ──
     ("scripts/check_teleon_objective_gated_descent.py", "check_teleon_objective_gated_descent"),
+    # ── per-tenant objective binding: each tenant resolves (from the shared registry) to the CapabilityObjective matching its priority (preset or explicit weights); unbound -> documented default; malformed -> fails loud; and the tenant's objective FLOWS into placement + the journey so the SAME capability plans differently per tenant ──
+    ("scripts/check_teleon_tenant_objective_binding.py", "check_teleon_tenant_objective_binding"),
     # ── CTS-1: bind an OCTS runtime CLASS → concrete backend by policy/creds/health; cloud deferred after a built local equivalent; class-scoped guard; deny-by-default; composes with the execution selector ──
     ("scripts/check_runtime_class_binding.py", "check_runtime_class_binding"),
     ("scripts/check_execution_dispatch_fail_loud.py", "check_execution_dispatch_fail_loud"),

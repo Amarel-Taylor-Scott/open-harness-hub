@@ -90,6 +90,47 @@ def _vertical_journey(example: dict) -> dict:
             "steps": steps, "headline": str(headline)}
 
 
+def _teleon_capability_plan(tenant_id: str, variety: str = "model") -> dict:
+    """A Teleon journey: a TENANT's declared priority flows through the objective layer into a concrete plan for a
+    capability-DEFINED unit — which runtime class to place it on, and whether to descend it to a cheaper
+    deterministic rule. The SAME capability plans DIFFERENTLY per tenant: a cost tenant descends to the 90%-coverage
+    deterministic rule; a compliance/accuracy tenant HOLDS the descent when that rule diverges on novel inputs.
+    Built from the REAL objective + adapt() engines (not a mock); deterministic, so the trace replays to one hash."""
+    from scripts.teleon_preseed_capabilities import _seed, objective_gated_descent, select_placement
+
+    from src.teleon.objectives import objective_for_tenant
+    obj = objective_for_tenant(tenant_id)
+    unit = next(u for u in _seed()["units"] if u["variety"] == variety)
+    slot = unit["spec"]["capability_slot"]
+    placement = select_placement(unit, obj)
+    # the capability genuinely has novel inputs (regulated facts vary), so the divergence is REAL; only the
+    # tenant's PRIORITY decides whether to accept a 90%-coverage deterministic rule for it.
+    descent = objective_gated_descent(obj, variety=variety, novel_divergence=True)
+    held = descent["decision"] == "hold"
+    steps = [
+        {"action": "Tenant declares its priority", "surface": "intake", "status": "ok",
+         "outcome": f"tenant {tenant_id!r} prioritizes {obj.name}", "evidence_ref": None},
+        {"action": "Teleon binds the tenant to a CapabilityObjective", "surface": "objective-binding",
+         "status": "ok", "outcome": f"objective={obj.name} over cost/latency/llm/determinism/accuracy",
+         "evidence_ref": None},
+        {"action": f"Place the capability ({slot}) on the best runtime class for the priority",
+         "surface": "placement", "status": "ok",
+         "outcome": f"chosen runtime: {placement['chosen']}", "evidence_ref": None},
+        {"action": "Decide the non-deterministic -> deterministic descent under the priority",
+         "surface": "self-improvement", "status": "held_out" if held else "ok",
+         "outcome": ("descent HELD: accuracy priority vetoes a 90%-coverage rule that diverges on novel inputs "
+                     "(model kept as rollback)" if held else
+                     f"DESCEND: promote the distilled deterministic rule (cost {descent.get('before_cost')} -> "
+                     f"{descent.get('after_cost')}); model kept as rollback"), "evidence_ref": None},
+        {"action": "Governance boundary: a plan/selection is evidence, never autonomous truth",
+         "surface": "governance", "status": "ok", "outcome": f"serves_truth={placement['serves_truth']}",
+         "evidence_ref": None},
+    ]
+    return {"product": "Teleon", "name": f"Capability plan under tenant priority ({obj.name}) — {variety} unit",
+            "steps": steps,
+            "headline": f"{tenant_id}: {obj.name} -> place on {placement['chosen']}, descent={descent['decision']}"}
+
+
 def all_journeys() -> dict:
     """The full journey registry: the two flagship Baltor journeys + EVERY regulated-fact vertical (sourced from
     the examples-gallery registry so verticals stay single-sourced, not duplicated). Built on demand so the
@@ -97,6 +138,9 @@ def all_journeys() -> dict:
     registry: dict = {
         "baltor-context-assurance": lambda: _baltor_context_assurance(corpus="cfpb"),
         "baltor-context-assurance-bill782": lambda: _baltor_context_assurance(corpus="acme"),
+        # Teleon: the SAME capability planned differently per tenant priority (the per-tenant objective, on camera).
+        "teleon-capability-plan-cost-tenant": lambda: _teleon_capability_plan("high-volume-batch"),
+        "teleon-capability-plan-accuracy-tenant": lambda: _teleon_capability_plan("baltor-compliance"),
     }
     from scripts.build_examples_gallery import EXAMPLES
     for ex in EXAMPLES:
@@ -173,6 +217,20 @@ def _self_test() -> int:
     vt = track(verticals[0]) if verticals else {}
     ck("a vertical journey runs the real showcase into a 5-step trace that never serves truth",
        len(vt.get("steps", [])) == 5 and vt.get("serves_truth") is False, str(vt.get("name")))
+
+    # Teleon per-tenant objective FLOWS into the journey: the SAME capability plans DIFFERENTLY per tenant priority.
+    cost_j = track("teleon-capability-plan-cost-tenant")
+    acc_j = track("teleon-capability-plan-accuracy-tenant")
+    ck("a Teleon capability-plan journey is tracked (objective-binding -> placement -> descent -> governance)",
+       cost_j["product"] == "Teleon" and {s["surface"] for s in cost_j["steps"]}
+       >= {"objective-binding", "placement", "self-improvement", "governance"}, str([s["surface"] for s in cost_j["steps"]]))
+    cost_descent = next(s for s in cost_j["steps"] if s["surface"] == "self-improvement")
+    acc_descent = next(s for s in acc_j["steps"] if s["surface"] == "self-improvement")
+    ck("the cost tenant DESCENDS while the accuracy tenant HOLDS the descent — same capability, opposite plan by priority",
+       cost_descent["status"] == "ok" and acc_descent["status"] == "held_out", f"{cost_descent['status']} vs {acc_descent['status']}")
+    ck("the Teleon journeys are replayable (same trace_hash) and never serve truth",
+       track("teleon-capability-plan-cost-tenant")["trace_hash"] == cost_j["trace_hash"]
+       and cost_j["serves_truth"] is False and acc_j["serves_truth"] is False)
 
     print("\n" + ("PASS — track_user_journey: a user journey is tracked against the REAL demo backend as an ordered, "
                   "deterministic, REPLAYABLE UserJourneyTrace.v1 (same journey -> same trace_hash); the moat step "

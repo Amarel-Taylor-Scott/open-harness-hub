@@ -13,9 +13,15 @@ from src.teleon.objectives.objective import (
     select,
 )
 from src.teleon.objectives.telemetry import RunLedger, RunObservation, TelemetryError
+from src.teleon.objectives.tenant_binding import (
+    DEFAULT_OBJECTIVE_PRESET,
+    bound_tenants,
+    objective_for_tenant,
+)
 
 __all__ = [
     "CapabilityObjective", "MetricVector", "ObjectiveError", "select", "PRESETS",
     "OBJECTIVE_DIMENSIONS", "LOWER_IS_BETTER", "HIGHER_IS_BETTER",
     "RunLedger", "RunObservation", "TelemetryError",
+    "objective_for_tenant", "bound_tenants", "DEFAULT_OBJECTIVE_PRESET",
 ]
