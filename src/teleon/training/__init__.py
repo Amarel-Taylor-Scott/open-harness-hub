@@ -14,6 +14,7 @@ from src.teleon.training.policy import (
     run_training,
     train,
 )
+from src.teleon.training.capability_network import CapabilityNetwork, enrich_features
 from src.teleon.training.skills_db import (
     FEATURE_KEYS,
     DistillationDataset,
@@ -25,5 +26,5 @@ from src.teleon.training.skills_db import (
 __all__ = [
     "feature_vector", "DistillationExample", "DistillationDataset", "build_dataset", "FEATURE_KEYS",
     "PriorPolicy", "FittedPolicy", "TrainedArtifactPolicy", "train", "evaluate", "model_artifact_spec",
-    "run_training",
+    "run_training", "CapabilityNetwork", "enrich_features",
 ]

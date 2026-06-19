@@ -432,6 +432,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_teleon_distillation_training.py", "check_teleon_distillation_training"),
     # ── the BULK REGISTRY INGESTER (the hundreds-of-thousands path): maps machine-readable registry dumps (MCP/Airbyte/npm-PyPI/OpenAPI/generic) to governed CapabilityCandidate rows WITHOUT an LLM — per-format adapters + deterministic category/kind priors; scales 1k entries -> 1k rows in one free pass; every row passes the seeder screen + is flagged for Stage-2 confirm; writes a runner-ingestible feed ──
     ("scripts/check_teleon_bulk_registry_ingest.py", "check_teleon_bulk_registry_ingest"),
+    # ── the cross-capability NETWORK graph + metadata enrichment: detects alternative_of endpoint sets (same need, different provider), captures composability via category adjacency, and exposes a per-capability profile + network features that EXTEND the skills-DB feature vector — so distillation is learned from STRUCTURE, not just per-item features (complements each capability's per-capability evolution/distillation lineage) ──
+    ("scripts/check_teleon_capability_network.py", "check_teleon_capability_network"),
     # ── CTS-1: bind an OCTS runtime CLASS → concrete backend by policy/creds/health; cloud deferred after a built local equivalent; class-scoped guard; deny-by-default; composes with the execution selector ──
     ("scripts/check_runtime_class_binding.py", "check_runtime_class_binding"),
     ("scripts/check_execution_dispatch_fail_loud.py", "check_execution_dispatch_fail_loud"),
