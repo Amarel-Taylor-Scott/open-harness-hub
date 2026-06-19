@@ -408,6 +408,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_teleon_run_telemetry.py", "check_teleon_run_telemetry"),
     # ── the objective applied to the REAL seeded units: each unit's allowed runtime classes are scored by a CapabilityObjective on REAL pricebook cost + the REAL SLA latency budget, so minimize_latency picks the tightest-SLA placement and minimize_cost the cheapest — the same units flip placement under different priorities (flexibility made real on the units, never synthetic) ──
     ("scripts/check_teleon_unit_placement.py", "check_teleon_unit_placement"),
+    # ── the objective GOVERNS self-improvement: a CapabilityObjective decides whether a unit's non-det -> det descent fires on the real adapt() engine (cost/determinism/llm -> promote the distilled rule, model kept as rollback) or is VETOED (maximize_accuracy holds the descent back when the rule diverges on novel/held-out inputs — the lossless-distillation law, made a tunable priority) ──
+    ("scripts/check_teleon_objective_gated_descent.py", "check_teleon_objective_gated_descent"),
     # ── CTS-1: bind an OCTS runtime CLASS → concrete backend by policy/creds/health; cloud deferred after a built local equivalent; class-scoped guard; deny-by-default; composes with the execution selector ──
     ("scripts/check_runtime_class_binding.py", "check_runtime_class_binding"),
     ("scripts/check_execution_dispatch_fail_loud.py", "check_execution_dispatch_fail_loud"),

@@ -233,6 +233,43 @@ def select_placement(unit: dict, objective) -> dict:
     return select(candidates, objective)
 
 
+#: illustrative descent metrics (demonstration stand-ins, like _MODEL_CALL_COST): an LLM call is substantially
+#: non-deterministic (sampling) and makes 1 model call; the distilled rule is fully deterministic with 0 model
+#: calls. On held-out/novel inputs OUTSIDE its distillation set the rule may lose a little accuracy (the
+#: determinism-factory's held-out-divergence warning) — which a maximize_accuracy objective may veto the descent on.
+_MODEL_DETERMINISM = 0.2
+_RULE_NOVEL_ACCURACY = 0.93
+
+
+def objective_gated_descent(objective, *, variety: str = "model", novel_divergence: bool = False) -> dict:
+    """Govern a unit's non-det -> det DESCENT by a CapabilityObjective. The objective scores the model vs its
+    distilled deterministic rule (REAL descent cost; tier-derived determinism/llm; the rule's accuracy reflects
+    whether it was observed to DIVERGE on held-out/novel inputs). If the objective selects the rule, Teleon runs
+    the REAL adapt() engine and PROMOTES it (the cost self-improvement, model kept as a reversible rollback_target).
+    If the objective selects the model — e.g. maximize_accuracy when the rule diverges on novel inputs — Teleon
+    HOLDS the descent back (keeps the model; the rule stays a candidate). So the SAME descent either fires or is
+    vetoed purely by the priority, with a traceable reason. Never serves truth."""
+    from src.teleon.objectives import MetricVector, select
+    model_metrics = MetricVector(cost=_MODEL_CALL_COST, llm_usage=1, determinism=_MODEL_DETERMINISM, accuracy=1.0)
+    rule_metrics = MetricVector(cost=_DISTILLED_RULE_COST, llm_usage=0, determinism=1.0,
+                                accuracy=(_RULE_NOVEL_ACCURACY if novel_divergence else 1.0))
+    trace = select([("model", model_metrics), ("distilled_rule", rule_metrics)], objective)
+    descend = trace["chosen"] == "distilled_rule"
+    result = {"objective": objective.name, "variety": variety, "novel_divergence": novel_divergence,
+              "decision": "descend" if descend else "hold", "selection": trace, "serves_truth": False}
+    if descend:
+        live = demonstrate_descent(variety)  # the REAL adapt() engine promotes the rule + keeps the rollback_target
+        result.update({"promoted": live["promoted"], "before_impl": live["before_impl"],
+                       "after_impl": live["after_impl"], "rollback_target": live["rollback_target"],
+                       "before_cost": live["before_cost"], "after_cost": live["after_cost"],
+                       "equivalent": live["equivalent"]})
+    else:
+        result.update({"promoted": False,
+                       "held_reason": (f"objective {objective.name!r} prioritizes a dimension the distilled rule "
+                                       f"loses on (accuracy on novel/held-out inputs) — descent vetoed, model kept")})
+    return result
+
+
 def _self_test() -> int:
     from jsonschema import Draft202012Validator
 
