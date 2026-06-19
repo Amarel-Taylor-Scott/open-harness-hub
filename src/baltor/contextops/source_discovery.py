@@ -29,20 +29,10 @@ from src.baltor.ports.research_agent_provider import AGENT_SERVES_TRUTH
 SOURCE_CANDIDATE_SCHEMA_VERSION = "SourceCandidate.v1"
 RELIABILITY_SCORE_SCHEMA_VERSION = "SourceReliabilityScore.v1"
 
-#: default authority_rank per source_type (higher outranks lower). Single source of the authority precedence
-#: used by discovery; reconciliation reads the rank, so a FAQ (20) can never outrank a regulation (90).
-AUTHORITY_RANK: dict[str, int] = {
-    "source_of_law": 95,
-    "regulation": 90,
-    "statute": 88,
-    "official_agency": 80,
-    "primary_dataset": 70,
-    "vendor_doc": 40,
-    "agency_faq": 20,
-    "secondary_summary": 15,
-    "blog": 5,
-    "tenant_document": 50,
-}
+#: discovery reads the SHARED canonical source_type→rank map (unified with reliability on 2026-06-18, A3 —
+#: discovery's prior divergent values vendor_doc=40/agency_faq=20/secondary_summary=15/tenant_document=50 are
+#: preserved as lineage in contextops.authority_rank). Re-exported so existing callers keep working.
+from src.baltor.contextops.authority_rank import AUTHORITY_RANK  # noqa: E402  (intra-Baltor shared vocabulary)
 
 #: default per-factor reliability signals per source_type (each 0..1). Single source for the deterministic
 #: reliability factors; the composite is derived from these + authority_rank.

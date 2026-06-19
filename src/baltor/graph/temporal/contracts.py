@@ -33,7 +33,9 @@ EDGE_TYPES = {
 
 EDGE_SOURCES = {"deterministic", "llm_candidate", "human", "imported", "provider"}
 
-#: source authority ranking (higher wins). Shared with reconciliation/reliability — source-of-law beats FAQ.
+#: source authority ranking for the temporal graph (higher wins) — source-of-law beats FAQ. NOTE: one of three
+#: source_type→rank maps (also reliability + source_discovery); the CORE precedence is shared + gated by
+#: check_authority_rank_core_precedence, but the full maps are NOT yet value-unified (OPP-unify-authority-rank-maps).
 AUTHORITY_RANK = {
     "source_of_law": 100, "official_regulation": 90, "statute": 95, "official_agency": 80,
     "primary_dataset": 75, "official_api": 70, "official_faq": 40, "agency_faq": 40,

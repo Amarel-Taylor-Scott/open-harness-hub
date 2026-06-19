@@ -16,7 +16,13 @@ Deterministic + offline. Exit 0/1.
 """
 from __future__ import annotations
 
+import os
 import sys
+
+if __name__ == "__main__" and __package__ in (None, ""):  # pragma: no cover
+    _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if _REPO_ROOT not in sys.path:
+        sys.path.insert(0, _REPO_ROOT)
 
 from scripts.artifact_graph import cfpb_artifacts as CA
 from scripts.artifact_graph import conflict_detector as CD
@@ -98,6 +104,19 @@ def _self_test() -> int:
         {"value": "clear", "source_uri": "https://rumor-blog.example.com/b"}])
     ck("on disagreement the higher-authority value wins; corroboration counts only sources asserting IT",
        disagree["value"] == "blocked" and not disagree["corroborated"])
+    # the SAME authority via TWO DIFFERENT SUBDOMAINS is still ONE voice — the gap the same-exact-domain
+    # test above could not catch (domain-keyed independence would have wrongly counted these as two).
+    two_subdomains = SA.corroboration([
+        {"value": "blocked", "source_uri": "https://sanctionssearch.ofac.treas.gov/details"},
+        {"value": "blocked", "source_uri": "https://ofac.treasury.gov/recent-actions"}])
+    ck("two SUBDOMAINS of one authority (OFAC) are ONE voice, not two (keyed on authority_id, not raw domain)",
+       not two_subdomains["corroborated"] and two_subdomains["independent_authoritative_sources"] == 1)
+    # SPOOF: look-alike hosts cannot forge a corroborated receipt (boundary match defeats substring impersonation).
+    spoofed = SA.corroboration([
+        {"value": "blocked", "source_uri": "https://sec.gov.attacker.com/a", "signed": True},
+        {"value": "blocked", "source_uri": "https://ofac.treasury.gov.evil.io/b", "signed": True}])
+    ck("look-alike spoof hosts cannot forge corroboration (0 authoritative families)",
+       not spoofed["corroborated"] and spoofed["independent_authoritative_sources"] == 0)
 
     print(("PASS — " if not fails else "FAIL — ")
           + "check_source_authority: authority is DERIVED from publisher/domain+provenance and recorded in the "

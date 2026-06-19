@@ -36,8 +36,10 @@ POLICIES = (
 
 #: source_types that count as "official" / source-of-record for the official-source policies.
 _OFFICIAL_TYPES = ("source_of_law", "regulation", "statute", "official_agency", "primary_dataset")
-#: the minimum authority_rank an official source must clear (a low-rank "official" can't carry it alone).
-_OFFICIAL_MIN_RANK = 70
+#: the minimum authority_rank an official source must clear (a low-rank "official" can't carry it alone) —
+#: DERIVED from the reliability map (the lowest-ranked official type's rank), not a hand-typed literal coupled
+#: to that scale; pinned to min(_OFFICIAL_TYPES) so it tracks the map if the official tiers are re-ranked.
+_OFFICIAL_MIN_RANK = min(default_authority_rank(t) for t in _OFFICIAL_TYPES)
 
 
 class CrossSourceError(Exception):

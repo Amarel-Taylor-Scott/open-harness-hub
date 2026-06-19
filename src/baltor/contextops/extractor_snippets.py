@@ -30,7 +30,8 @@ from dataclasses import dataclass
 from src.baltor.contracts.artifacts.fact_assertion import SCOPES
 
 #: the ONLY claim_status an extractor may mint — pinned, matching ExtractorSnippet.v1 + the contract layer.
-CANDIDATE_STATUS = "candidate"
+#: Single-sourced from the contracts layer so it can never drift from the ports' CANDIDATE_CLAIM_STATUS.
+from src.baltor.contracts.governance import CANDIDATE_CLAIM_STATUS as CANDIDATE_STATUS  # noqa: E402
 #: an extractor candidate is always a factual claim shape (never an allegation/conclusion) — from CLAIM_SHAPED.
 CANDIDATE_CLAIM_TYPE = "atomic_fact"
 #: what an extractor produces — pinned, matching ExtractorSnippet.v1.produces.

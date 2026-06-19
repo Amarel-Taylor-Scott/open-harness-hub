@@ -25,7 +25,8 @@ from __future__ import annotations
 from typing import Any, Protocol, runtime_checkable
 
 #: the ONLY claim_status a fresh provider output may carry. A memory result is a candidate, never served.
-CANDIDATE_CLAIM_STATUS = "candidate"
+#: Single-sourced from the contracts layer (ports may import contracts) so it can never drift across modules.
+from src.baltor.contracts.governance import CANDIDATE_CLAIM_STATUS  # noqa: E402
 
 #: claim_status values a provider output must NEVER carry (those are the downstream gates' job, not memory's).
 FORBIDDEN_CLAIM_STATUSES = frozenset({"served", "canonical", "verified", "promoted", "fact"})

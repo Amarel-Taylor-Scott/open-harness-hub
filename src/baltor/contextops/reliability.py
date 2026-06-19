@@ -18,20 +18,12 @@ import hashlib
 import json
 from dataclasses import dataclass
 
-#: default authority_rank per source_type (single source — higher outranks lower). Mirrors the
-#: SourceCandidate.source_type enum; source-of-law > regulation > statute > official_agency > FAQ > … .
-AUTHORITY_RANK = {
-    "source_of_law": 95,
-    "regulation": 90,
-    "statute": 88,
-    "official_agency": 80,
-    "primary_dataset": 70,
-    "agency_faq": 30,
-    "vendor_doc": 25,
-    "secondary_summary": 20,
-    "tenant_document": 15,
-    "blog": 5,
-}
+#: AUTHORITY_RANK + default_authority_rank + scope_adjusted_rank are the SHARED canonical contextops map — the
+#: three subsystems were unified onto it on 2026-06-18 (A3). reliability and source_discovery now read ONE map;
+#: precedence is scope-aware (a tenant's own doc wins for tenant_private facts). Re-exported so existing
+#: `from ...reliability import AUTHORITY_RANK` / `default_authority_rank` callers keep working unchanged.
+from src.baltor.contextops.authority_rank import (  # noqa: E402  (intra-Baltor shared vocabulary)
+    AUTHORITY_RANK, default_authority_rank, scope_adjusted_rank)
 
 #: the eight per-factor signals the composite is derived from (single source — matches the closed factors block
 #: in SourceReliabilityScore.v1). contradiction_rate is "lower is better", so it is INVERTED in the composite.
@@ -115,11 +107,6 @@ class SourceReliabilityScore:
                 "scored_at": self.scored_at}
 
 
-def default_authority_rank(source_type: str) -> int:
-    """The default comparative authority for a source_type (source-of-law > FAQ). Unknown → 0 (lowest)."""
-    return AUTHORITY_RANK.get(source_type, 0)
-
-
 def score_source(*, candidate_id: str, source_type: str, factors: dict, tenant_id: str = "",
                  source_scope: str = "global_public", fact_scope: str | None = None,
                  rate_limit_risk: str = "none", authority_rank: int | None = None,
@@ -130,7 +117,7 @@ def score_source(*, candidate_id: str, source_type: str, factors: dict, tenant_i
     rank is supplied. ``tenant_scope_ok`` is computed: a tenant_private source can only back a fact of the
     SAME tenant_private scope; everything else (global/system) requires a non-tenant-private source.
     """
-    rank = default_authority_rank(source_type) if authority_rank is None else authority_rank
+    rank = scope_adjusted_rank(source_type, source_scope, fact_scope) if authority_rank is None else authority_rank
     scope_ok = True
     if fact_scope is not None:
         if source_scope == "tenant_private":

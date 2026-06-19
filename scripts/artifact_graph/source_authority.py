@@ -44,9 +44,19 @@ def _domain_of(source_uri: str, publisher: str) -> str:
     return (publisher or "").strip().lower()
 
 
+def _host_matches(host: str, match: str) -> bool:
+    """Boundary-aware host match — NOT substring containment. Substring containment (`match in host`) let a
+    look-alike like 'sec.gov.attacker.com' or 'mysec.gov.io' impersonate a registered authority and earn its
+    rank. A suffix rule ('.gov'/'.mil') matches the bare TLD host or any sub-host of it; a normal rule matches
+    the exact host or a TRUE subdomain (the boundary before the match falls on a dot)."""
+    if match.startswith("."):
+        return host == match[1:] or host.endswith(match)
+    return host == match or host.endswith("." + match)
+
+
 def _best_match(domain: str, publishers: list[dict]) -> dict | None:
     """Longest (most-specific) matching rule wins → sanctionssearch.ofac.treas.gov beats treasury.gov beats .gov."""
-    hits = [p for p in publishers if p["match"].lower() in domain]
+    hits = [p for p in publishers if _host_matches(domain, p["match"].lower())]
     return max(hits, key=lambda p: len(p["match"])) if hits else None
 
 
@@ -61,8 +71,8 @@ def classify(*, publisher: str = "", source_uri: str = "", signed: bool | None =
 
     if rule is None:
         rank = tiers[_UNVERIFIED]["rank"]
-        return {"tier": _UNVERIFIED, "rank": rank, "matched_by": None, "domain": domain, "signed": False,
-                "label": label, "downgraded": False,
+        return {"tier": _UNVERIFIED, "rank": rank, "matched_by": None, "authority_id": None, "domain": domain,
+                "signed": False, "label": label, "downgraded": False,
                 "basis": f"'{domain or publisher or 'unknown'}' is not a listed authoritative publisher → unverified (rank {rank})"}
 
     is_signed = bool(rule.get("signed", False)) if signed is None else bool(signed)
@@ -74,8 +84,8 @@ def classify(*, publisher: str = "", source_uri: str = "", signed: bool | None =
     basis = (f"{label} matched '{rule['match']}' → {tier} (rank {rank}); "
              f"provenance {'verified' if is_signed else 'UNVERIFIED'}"
              + (" — downgraded from a claimed top tier" if downgraded else ""))
-    return {"tier": tier, "rank": rank, "matched_by": rule["match"], "domain": domain,
-            "signed": is_signed, "label": label, "downgraded": downgraded, "basis": basis}
+    return {"tier": tier, "rank": rank, "matched_by": rule["match"], "authority_id": rule.get("authority_id"),
+            "domain": domain, "signed": is_signed, "label": label, "downgraded": downgraded, "basis": basis}
 
 
 def classify_payload(payload: dict) -> dict:
@@ -94,29 +104,34 @@ def corroboration(value_claims: list[dict]) -> dict:
     """Multi-source corroboration: does the WINNING value have >=2 INDEPENDENT authoritative sources agreeing?
 
     ``value_claims`` = [{"value":…, "publisher":…, "source_uri":…, "signed":…}, …]. Independence = distinct
-    publisher DOMAINS (two reads of the SAME agency do not corroborate each other). Only authoritative tiers
-    count (a vendor blog never corroborates). The winning value is the one with the highest single-source
-    authority (ties → more independent authoritative backing); its corroboration is the number of independent
-    authoritative domains asserting it. This is the difference between "a source SAYS X" and "independent
-    authorities AGREE X" — recorded so a receipt can claim corroboration only when it is earned."""
+    authority FAMILIES (the registry ``authority_id`` — two reads of the SAME agency, even via different
+    subdomains, do NOT corroborate each other; a rule with no family falls back to its domain). Only
+    authoritative tiers count (a vendor blog never corroborates). The winning value is the one with the highest
+    single-source authority (ties → more independent authoritative backing); its corroboration is the number of
+    independent authoritative FAMILIES asserting it. This is the difference between "a source SAYS X" and
+    "independent authorities AGREE X" — recorded so a receipt can claim corroboration only when it is earned."""
     enriched = []
     for c in value_claims:
         a = classify(publisher=str(c.get("publisher", "")), source_uri=str(c.get("source_uri", "")), signed=c.get("signed"))
-        enriched.append({"value": c.get("value"), "domain": a["domain"], "tier": a["tier"], "rank": a["rank"],
-                         "label": a["label"], "authoritative": a["tier"] in _AUTHORITATIVE_TIERS})
+        enriched.append({"value": c.get("value"), "domain": a["domain"], "authority_id": a.get("authority_id"),
+                         "tier": a["tier"], "rank": a["rank"], "label": a["label"],
+                         "authoritative": a["tier"] in _AUTHORITATIVE_TIERS})
     if not enriched:
         return {"value": None, "corroborated": False, "independent_authoritative_sources": 0, "sources": [], "basis": "no claims"}
+    # one real authority = one voice: a registered family id collapses its subdomains; unfamilied rules
+    # (the .gov/.mil catch-alls) stay distinct by domain so they are never merged into one "government" voice.
+    _family = lambda e: e.get("authority_id") or e["domain"]
     by_value: dict = {}
     for e in enriched:
         by_value.setdefault(e["value"], []).append(e)
 
     def _score(v):
         es = by_value[v]
-        return (max(e["rank"] for e in es), len({e["domain"] for e in es if e["authoritative"]}))
+        return (max(e["rank"] for e in es), len({_family(e) for e in es if e["authoritative"]}))
 
     winner = max(sorted(by_value), key=_score)   # sorted() first → deterministic tie-break
     ws = by_value[winner]
-    independent_auth = sorted({e["domain"] for e in ws if e["authoritative"]})
+    independent_auth = sorted({_family(e) for e in ws if e["authoritative"]})
     corroborated = len(independent_auth) >= 2
     basis = (f"value {winner!r} asserted by {len(independent_auth)} independent authoritative source(s)"
              + (": " + ", ".join(independent_auth) if independent_auth else "")
@@ -157,6 +172,30 @@ def _self_test() -> int:
     # most-specific match wins
     ofac = classify(source_uri="https://sanctionssearch.ofac.treas.gov/")
     ck("longest/most-specific domain match wins (OFAC SDN, not bare .gov)", ofac["matched_by"] == "sanctionssearch.ofac.treas.gov")
+
+    # SPOOF REJECTION (boundary match, not substring): a look-alike host must NOT inherit a registered
+    # authority's rank — this is the EARNED-NOT-ASSUMED contract for the moat, flip-the-host-changes-the-verdict.
+    gov_other_rank = _registry()["tiers"]["government_other"]["rank"]
+    for spoof in ("https://sec.gov.attacker.com/x", "https://notsec.gov/x",
+                  "https://www.fda.gov.phishing.ru/x", "https://fakebis.doc.gov.cn/x"):
+        s = classify(source_uri=spoof, signed=True)
+        host = spoof.split("//")[1].split("/")[0]
+        ck(f"look-alike {host} earns NO binding authority", s["tier"] not in _TOP_TIERS and s["rank"] <= gov_other_rank,
+           f"{s['tier']}/{s['rank']}")
+    sub = classify(source_uri="https://oig.sec.gov/reports")
+    ck("a legit subdomain (oig.sec.gov) still earns official_agency", sub["tier"] == "official_agency" and sub["matched_by"] == "sec.gov")
+
+    # CORROBORATION INDEPENDENCE: two subdomains of ONE authority are ONE voice; two real authorities are two.
+    same_agency = corroboration([
+        {"value": "blocked", "source_uri": "https://sanctionssearch.ofac.treas.gov/details", "signed": True},
+        {"value": "blocked", "source_uri": "https://ofac.treasury.gov/recent-actions", "signed": True}])
+    ck("two OFAC subdomains corroborate as ONE authority, not two",
+       same_agency["independent_authoritative_sources"] == 1 and not same_agency["corroborated"], str(same_agency))
+    two_agencies = corroboration([
+        {"value": "blocked", "source_uri": "https://ofac.treasury.gov/x", "signed": True},
+        {"value": "blocked", "source_uri": "https://www.federalregister.gov/y", "signed": True}])
+    ck("two GENUINELY independent authorities DO corroborate (>=2 families)",
+       two_agencies["independent_authoritative_sources"] == 2 and two_agencies["corroborated"], str(two_agencies))
 
     # every basis is human-readable lineage for the receipt
     ck("classification carries a human-readable basis (receipt lineage)", all("rank" in c["basis"] for c in (law, cfpb, vendor)))

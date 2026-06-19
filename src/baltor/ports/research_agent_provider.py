@@ -36,7 +36,8 @@ RESEARCH_PRODUCES = "source_discovery_report"
 CODEGEN_PRODUCES = "fact_assertion_candidate"
 
 #: the claim_status every codegen-agent output carries — a candidate, never served/canonical.
-CANDIDATE_CLAIM_STATUS = "candidate"
+#: Single-sourced from the contracts layer (ports may import contracts) so it can never drift across modules.
+from src.baltor.contracts.governance import CANDIDATE_CLAIM_STATUS  # noqa: E402
 
 #: serves_truth is pinned False on every agent output — THE INVARIANT, made a constant the proofs assert.
 AGENT_SERVES_TRUTH = False
