@@ -25,20 +25,24 @@ STRATEGY_DIRECT_API_RULE = "direct_api_rule"            # the capability IS a de
 STRATEGY_TEMPLATE_MATCH = "template_match"              # an exact-match template for the canonical sub-cases
 STRATEGY_DETERMINISTIC_EXTRACT = "deterministic_extract"  # distill a rule from verified traces for most cases
 STRATEGY_PARTIAL_PLUS_RESIDUAL = "partial_rule_plus_model_residual"  # rule for the easy fraction, model for the rest
+STRATEGY_MODEL_DOWNGRADE = "model_downgrade"  # NOT deterministic: route an open-ended/text task to a CHEAPER/smaller model (the cost win when determinism is impossible)
 STRATEGIES = (STRATEGY_DIRECT_API_RULE, STRATEGY_TEMPLATE_MATCH, STRATEGY_DETERMINISTIC_EXTRACT,
-              STRATEGY_PARTIAL_PLUS_RESIDUAL)
+              STRATEGY_PARTIAL_PLUS_RESIDUAL, STRATEGY_MODEL_DOWNGRADE)
 
 #: illustrative one-time cost (relative units) to APPLY each strategy — the meta-learner refines these from real
-#: DistillationRecords. direct/template are cheap (wrap/match); extract/partial need analysis of traces.
+#: DistillationRecords. direct/template are cheap (wrap/match); extract/partial need analysis of traces;
+#: model_downgrade needs an eval to confirm the cheaper model is sufficient.
 _DISTILL_COST = {STRATEGY_DIRECT_API_RULE: 0.05, STRATEGY_TEMPLATE_MATCH: 0.08,
-                 STRATEGY_DETERMINISTIC_EXTRACT: 0.18, STRATEGY_PARTIAL_PLUS_RESIDUAL: 0.30}
+                 STRATEGY_DETERMINISTIC_EXTRACT: 0.18, STRATEGY_PARTIAL_PLUS_RESIDUAL: 0.30,
+                 STRATEGY_MODEL_DOWNGRADE: 0.12}
 #: ceiling bands -> the default strategy. determinism_ceiling is "how inherently deterministic the capability is".
 _CEILING_DIRECT = 0.99   # >= this: it's a pure deterministic call (API/compute) — direct rule, near-full coverage
 _CEILING_EXTRACT = 0.70  # >= this: most of it can be a distilled rule
 _CEILING_PARTIAL = 0.40  # >= this: a rule for the easy fraction + the model for the residual
 _MODEL_ROOT_DETERMINISM = 0.2
-_MODEL_ROOT_COST = 0.07          # per-call cost of the undistilled model runner
+_MODEL_ROOT_COST = 0.07          # per-call cost of the undistilled frontier-model runner
 _DETERMINISTIC_RULE_COST = 0.0   # a distilled deterministic rule is ~free to run
+_CHEAP_MODEL_COST = 0.004        # a cheaper/smaller model lane (local Ollama / Gemma) — still a model, ~17x cheaper than frontier
 
 
 @dataclass(frozen=True)
@@ -60,13 +64,16 @@ class DistillationRecord:
     policy_allowed: bool
     applied: bool
     fork_runner_id: str
+    improvement_axes: tuple = ()   # the efficiency axes the fork improves: cost / latency / llm_usage / determinism
     serves_truth: bool = False
 
     def as_dict(self) -> dict:
-        return {k: getattr(self, k) for k in (
+        d = {k: getattr(self, k) for k in (
             "capability_slot", "category", "strategy", "determinism_ceiling", "per_call_cost_before",
             "per_call_cost_after", "distill_cost", "coverage", "residual_fraction", "equivalence_verified",
             "lossless", "policy_allowed", "applied", "fork_runner_id", "serves_truth")}
+        d["improvement_axes"] = list(self.improvement_axes)
+        return d
 
 
 def choose_strategy(determinism_ceiling: float) -> str:
@@ -78,7 +85,9 @@ def choose_strategy(determinism_ceiling: float) -> str:
         return STRATEGY_DETERMINISTIC_EXTRACT
     if dc >= _CEILING_PARTIAL:
         return STRATEGY_PARTIAL_PLUS_RESIDUAL
-    return STRATEGY_TEMPLATE_MATCH
+    # inherently model-bound (open-ended / free-text): can't go deterministic — descend to a cheaper / smaller /
+    # lower-context / faster model instead (the efficiency win when determinism is impossible).
+    return STRATEGY_MODEL_DOWNGRADE
 
 
 def distill(capability_slot: str, *, category: str = "other", determinism_ceiling: float,
@@ -93,10 +102,27 @@ def distill(capability_slot: str, *, category: str = "other", determinism_ceilin
     root = RunnerNode(f"{capability_slot}::model@v1", capability_slot, "model", tier=2,
                       determinism=_MODEL_ROOT_DETERMINISM, capability_coverage=1.0, cost=_MODEL_ROOT_COST)
     g.add_runner(root)
-    fork = RunnerNode(f"{capability_slot}::deterministic@distilled", capability_slot, "distilled_rule", tier=1,
-                      determinism=1.0, capability_coverage=cov, cost=_DETERMINISTIC_RULE_COST)
-    g.document_fork(root.runner_id, fork, rationale=(f"distilled via {strat}: deterministic rule covers "
-                    f"~{int(round(cov * 100))}% of cases (ceiling {determinism_ceiling}); residual -> model"))
+    if strat == STRATEGY_MODEL_DOWNGRADE:
+        # EFFICIENCY descent (NOT a determinism gain): the capability stays an open-ended/text MODEL task but
+        # descends to a cheaper / smaller / lower-context / faster model. determinism is unchanged; the win is
+        # cost + LLM-usage (lower context) + latency. residual -> the frontier model (lossless).
+        after_cost = _CHEAP_MODEL_COST
+        fork = RunnerNode(f"{capability_slot}::cheaper_model@distilled", capability_slot, "cheaper_model", tier=2,
+                          determinism=_MODEL_ROOT_DETERMINISM, capability_coverage=cov, cost=after_cost)
+        rationale = (f"model-downgrade (efficiency): cannot be made deterministic (ceiling {determinism_ceiling}); "
+                     f"route ~{int(round(cov * 100))}% of cases to a cheaper/smaller/lower-context/faster model at "
+                     f"~{after_cost} vs {_MODEL_ROOT_COST}; residual -> frontier model")
+        equivalence_verified = False  # a cheaper model may diverge — gated by eval, never assumed equivalent
+        improvement_axes = ("cost", "latency", "llm_usage")  # cheaper + faster + lower-context; determinism NOT improved
+    else:
+        after_cost = _DETERMINISTIC_RULE_COST
+        fork = RunnerNode(f"{capability_slot}::deterministic@distilled", capability_slot, "distilled_rule", tier=1,
+                          determinism=1.0, capability_coverage=cov, cost=after_cost)
+        rationale = (f"distilled via {strat}: deterministic rule covers ~{int(round(cov * 100))}% of cases "
+                     f"(ceiling {determinism_ceiling}); residual -> model")
+        equivalence_verified = float(determinism_ceiling) >= _CEILING_DIRECT
+        improvement_axes = ("cost", "latency", "llm_usage", "determinism")  # a rule is cheaper, faster, no-LLM, AND deterministic
+    g.document_fork(root.runner_id, fork, rationale=rationale)
     g.validate()
 
     # WITHIN CONFINES: the fork is applied only if the org policy allows this runner as a fix.
@@ -105,14 +131,13 @@ def distill(capability_slot: str, *, category: str = "other", determinism_ceilin
         from src.teleon.governance import bounds_runner_change
         policy_allowed = bounds_runner_change(fork, policy).allowed
 
-    # for a pure deterministic call (ceiling ~1.0) the covered cases are exactly equivalent to the model output.
-    equivalence_verified = float(determinism_ceiling) >= _CEILING_DIRECT
     record = DistillationRecord(
         capability_slot=capability_slot, category=category, strategy=strat,
         determinism_ceiling=float(determinism_ceiling), per_call_cost_before=_MODEL_ROOT_COST,
-        per_call_cost_after=_DETERMINISTIC_RULE_COST, distill_cost=_DISTILL_COST[strat], coverage=cov,
+        per_call_cost_after=after_cost, distill_cost=_DISTILL_COST[strat], coverage=cov,
         residual_fraction=round(1.0 - cov, 6), equivalence_verified=equivalence_verified, lossless=True,
-        policy_allowed=policy_allowed, applied=policy_allowed, fork_runner_id=fork.runner_id)
+        policy_allowed=policy_allowed, applied=policy_allowed, fork_runner_id=fork.runner_id,
+        improvement_axes=improvement_axes)
     return {"capability_slot": capability_slot, "strategy": strat, "graph": g.to_dict(),
             "record": record.as_dict(), "applied": policy_allowed, "serves_truth": False}
 

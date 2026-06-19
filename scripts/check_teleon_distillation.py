@@ -52,11 +52,30 @@ def _self_test() -> int:
     ck("the graph descent walks model -> deterministic rule",
        [n.split("::")[-1] for n in d["graph"]["descent_path"]] == ["model@v1", "deterministic@distilled"])
 
-    # a low-ceiling capability distills only its deterministic sliver; residual stays on the model (lossless).
-    low = distill("autonomous-research-agent", category="research", determinism_ceiling=0.25,
-                  deterministic_coverage_estimate=0.35)["record"]
-    ck("a low-ceiling capability distills a partial rule (residual routed to the model)",
-       low["residual_fraction"] > 0.5 and low["equivalence_verified"] is False and low["lossless"] is True)
+    # MODEL DOWNGRADE: an open-ended/text capability that CANNOT go deterministic descends to a CHEAPER model
+    # (the efficiency win — cost/latency/llm_usage improve; determinism does NOT). residual -> the frontier model.
+    ck("a low determinism-ceiling defaults to the model_downgrade strategy", choose_strategy(0.25) == "model_downgrade")
+    low_full = distill("autonomous-research-agent", category="research", determinism_ceiling=0.25,
+                       deterministic_coverage_estimate=0.35)
+    low = low_full["record"]
+    ck("model_downgrade forks to a CHEAPER MODEL (still non-deterministic), not a deterministic rule",
+       low["strategy"] == "model_downgrade" and low["fork_runner_id"].endswith("::cheaper_model@distilled")
+       and any(r["kind"] == "cheaper_model" for r in low_full["graph"]["runners"]))
+    ck("it is a COST win (cheaper than frontier) but NOT free and NOT deterministic (determinism unchanged)",
+       0 < low["per_call_cost_after"] < low["per_call_cost_before"] and low["equivalence_verified"] is False
+       and any(r["kind"] == "cheaper_model" and r["determinism"] < 1.0 for r in low_full["graph"]["runners"]))
+    ck("the improvement axes are cost/latency/llm_usage (cheaper, faster, lower-context) — NOT determinism",
+       set(low["improvement_axes"]) == {"cost", "latency", "llm_usage"} and low["lossless"] is True
+       and low["residual_fraction"] > 0.5)
+    ck("a deterministic strategy improves determinism TOO (the other descent axis)",
+       "determinism" in distill("xbrl", category="financial-data", determinism_ceiling=1.0,
+                                 deterministic_coverage_estimate=1.0)["record"]["improvement_axes"])
+    # GOVERNANCE: a deterministic-only org will NOT accept a cheaper-model fork (still non-deterministic) -> held.
+    audit0 = load_policy("deterministic-audit")
+    held = distill("open-ended-writer", category="other", determinism_ceiling=0.25,
+                   deterministic_coverage_estimate=0.4, policy=audit0)
+    ck("under a deterministic-only org, a cheaper-model fork is HELD (it is not deterministic) — escalate",
+       held["applied"] is False and held["record"]["policy_allowed"] is False)
 
     # WITHIN CONFINES: the deterministic fork is what a strict org wants -> applied under deterministic-audit.
     audit = load_policy("deterministic-audit")
