@@ -16,14 +16,44 @@ facts instead of going stale. Pure + deterministic; Teleon-layer — never impor
 """
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
+_STRATEGY_REGISTRY_PATH = Path(__file__).resolve().parents[3] / "architecture" / "descent_strategy_registry.json"
+
 #: the canonical descent axes — name -> (direction, unit, what improving it means). Single source of truth.
+#: Add an axis here + a strategy in architecture/descent_strategy_registry.json and the generic descender + the
+#: measurement harness pick it up automatically — no other code change.
 DESCENT_AXES = {
+    # ── efficiency / correctness (the first wave) ──
     "determinism": {"direction": "higher", "unit": "0..1", "meaning": "non-deterministic -> deterministic"},
     "cost": {"direction": "lower", "unit": "relative/call", "meaning": "expensive -> cheaper"},
     "latency": {"direction": "lower", "unit": "ms", "meaning": "slow -> faster (speed)"},
     "llm_usage": {"direction": "lower", "unit": "model calls/tokens", "meaning": "more -> less LLM / lower context"},
     "freshness": {"direction": "higher", "unit": "0..1 currency",
                   "meaning": "fragile/stale -> robust, auto-synced to the authoritative source"},
+    # ── trust / robustness (the second wave) ──
+    "verifiability": {"direction": "higher", "unit": "0..1 provenance",
+                      "meaning": "unverified -> every output carries source handles + a lineage receipt"},
+    "reliability": {"direction": "higher", "unit": "0..1 / #providers",
+                    "meaning": "single fragile provider -> multi-provider failover (redundancy)"},
+    "locality": {"direction": "higher", "unit": "0..1 sovereignty",
+                 "meaning": "external egress -> local/on-prem (data sovereignty, air-gap)"},
+    "specialization": {"direction": "higher", "unit": "0..1 narrowness",
+                       "meaning": "general frontier model -> a narrow specialized small model / LoRA"},
+    "privacy": {"direction": "higher", "unit": "0..1",
+                "meaning": "PII-exposing -> redacted / tokenized / synthetic-safe"},
+    # ── durability / openness (newly proposed) ──
+    "reproducibility": {"direction": "higher", "unit": "0..1",
+                        "meaning": "non-reproducible -> pinned + versioned + replayable (same input+version -> same output)"},
+    "portability": {"direction": "higher", "unit": "0..1",
+                    "meaning": "vendor-locked -> portable / open-format (OKF, no lock-in)"},
+    "resilience": {"direction": "higher", "unit": "0..1",
+                   "meaning": "brittle -> self-healing (auto-recovers from breaks, not just source change)"},
+    "energy": {"direction": "lower", "unit": "relative kWh/call",
+               "meaning": "high-energy -> low-energy / green compute (local CPU, small model, cached)"},
+    "safety": {"direction": "higher", "unit": "0..1 least-privilege",
+               "meaning": "ungated -> least-privilege, sandboxed, policy-bounded"},
 }
 LOWER_IS_BETTER_AXES = tuple(a for a, m in DESCENT_AXES.items() if m["direction"] == "lower")
 HIGHER_IS_BETTER_AXES = tuple(a for a, m in DESCENT_AXES.items() if m["direction"] == "higher")
@@ -38,6 +68,12 @@ _DEFAULT_CADENCE = "weekly"
 
 def is_axis(name: str) -> bool:
     return name in DESCENT_AXES
+
+
+def descent_strategies(*, registry: dict | None = None) -> dict:
+    """The descent-strategy registry keyed by axis (the fork mechanism per axis — single source, config not code)."""
+    data = registry if registry is not None else json.loads(_STRATEGY_REGISTRY_PATH.read_text(encoding="utf-8"))
+    return {s["axis"]: s for s in data.get("strategies", [])}
 
 
 def improves(axis: str, before: float, after: float) -> bool:
