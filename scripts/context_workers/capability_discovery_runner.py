@@ -110,6 +110,7 @@ def run_once(*, feeds_dir: Path = _FEEDS_DIR, state_path: Path = _STATE_PATH, st
     seeded row stays a candidate."""
     state = _load_state(state_path)
     seen = set(state.get("processed_hashes", []))
+    _prior_seen = len(seen)  # to report how many NEW candidates entered the resumable cursor this run
     new_accepted, new_rejected, walked = [], [], []
     for raw in discover(feeds_dir, allow_live=allow_live):
         try:
@@ -145,6 +146,7 @@ def run_once(*, feeds_dir: Path = _FEEDS_DIR, state_path: Path = _STATE_PATH, st
         state["last_run"] = now
     _save_state(state_path, state)
     return {"new_accepted": len(new_accepted), "new_rejected": len(new_rejected),
+            "processed": len(seen) - _prior_seen,  # candidates that entered the cursor this run (accepted + screened-out)
             "walked": len(walked), "total_accepted": state["total_accepted"],
             "by_category": by_cat, "serves_truth": False,
             "sample": [{"capability_slot": c["capability_slot"],
@@ -202,9 +204,9 @@ def _self_test() -> int:
         ck("the named categories are covered in one pass",
            {"federal-register", "regulation", "legal-statute", "financial-data", "scraping", "email", "research"}
            <= set(r1["by_category"]), str(sorted(r1["by_category"])))
-        ck("state persists processed hashes + a resumable cursor", state_path.exists()
-           and len(_load_state(state_path)["processed_hashes"]) == r1["new_accepted"]
-           and _load_state(state_path)["last_run"] == "t0")
+        ck("state persists the resumable cursor (every processed candidate, accepted + screened-out) + last_run",
+           state_path.exists() and len(_load_state(state_path)["processed_hashes"]) == r1["processed"]
+           and r1["processed"] >= r1["new_accepted"] and _load_state(state_path)["last_run"] == "t0")
 
         # SECOND pass: IDEMPOTENT — nothing new (already processed).
         r2 = run_once(feeds_dir=_FEEDS_DIR, state_path=state_path, staged_path=staged_path, now="t1")
