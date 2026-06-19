@@ -85,6 +85,7 @@ def preseed() -> dict:
             "adaptation_target": u["adaptation_target"], "cost_rationale": u["cost_rationale"],
             "allowed_runtime_classes": spec.get("allowed_runtime_classes", []),
             "forbidden": (spec.get("capabilities") or {}).get("forbidden", []),
+            "resolved_resources": resolve_resources(u),
         })
     return {"count": len(out), "registry_slots": sorted(registry), "units": out}
 
@@ -134,6 +135,67 @@ def demonstrate_descent(variety: str = "model") -> dict:
             "before_cost": before["cost"], "after_cost": after["cost"],
             "answer_before": before["output"], "answer_after": after["output"],
             "equivalent": before["output"] == after["output"]}
+
+
+def _arch(name: str) -> dict:
+    """Read a SHARED data registry (architecture/<name>). Data only — never a src.baltor import (Teleon is the
+    logic; these registries are the resources). Keeps the resolver dependency-law-safe."""
+    return json.loads((_REPO / "architecture" / name).read_text(encoding="utf-8"))
+
+
+def _backend_cost(pricebook: dict, backend: str, *, est_seconds: float = 1.0) -> float:
+    """A rough per-call cost (relative units) for a backend from the pricebook resource: request + duration*sec."""
+    pb = pricebook.get(backend, {})
+    return round(float(pb.get("request_cost", 0.0)) + float(pb.get("duration_cost_per_s", 0.0)) * est_seconds, 4)
+
+
+#: which RESOURCE-holding service each declared resource kind integrates with (Teleon = logic; these hold details).
+_RESOURCE_SERVICES = {
+    "templates": "architecture/template_catalog.json",
+    "skill_slots": "architecture/skill_to_tool_promotion_catalog.json",
+    "tool_slots": "architecture/context_engineering_tool_catalog.json",
+}
+
+
+def resolve_resources(unit: dict) -> dict:
+    """Integrate a capability unit with the RESOURCE-holding services to get useful details. Teleon owns the LOGIC
+    (ladder/provision/adapt/descent); these registries hold the resources. Reads SHARED data registries only
+    (architecture/*.json) — never imports src.baltor (dependency-law-safe). Per unit returns: the runtime PROFILE
+    + pricebook COST (local floor + the cheapest cloud candidate) for each allowed runtime class, the catalog
+    services its skill/tool/template slots integrate with, and the source-authority service its source
+    dependencies are governed by."""
+    spec = unit["spec"]
+    profiles = {p["runtime_class"]: p for p in _arch("execution_environment_profiles.json")["profiles"]}
+    pricebook = _arch("execution_backend_pricebook.json").get("backends", {})
+
+    runtime = []
+    for rc in spec.get("allowed_runtime_classes", []):
+        prof = profiles.get(rc, {})
+        pp = prof.get("policy_preferences", {})
+        local_backend = prof.get("default_local_backend", "")
+        cloud = next((b for b in prof.get("preferred_candidate_backends", []) if b in pricebook), None)
+        runtime.append({
+            "runtime_class": rc, "resolved": bool(prof),
+            "default_local_backend": local_backend, "local_cost": _backend_cost(pricebook, local_backend),
+            "cloud_backend": cloud, "cloud_cost": _backend_cost(pricebook, cloud) if cloud else None,
+            "sla_policy": pp.get("default_sla_policy_id"), "egress_route": pp.get("egress_route_policy_id"),
+            "autotune": prof.get("autotuning_policy_id"),
+        })
+
+    res = spec.get("resources", {}) or {}
+    slot_integrations = {kind: {"refs": res.get(kind), "resource_service": svc}
+                         for kind, svc in _RESOURCE_SERVICES.items() if res.get(kind)}
+    governance = {}
+    if spec.get("source_dependencies"):
+        governance = {"source_dependencies": spec["source_dependencies"],
+                      "resource_service": "architecture/source_authority_registry.json",
+                      "detail": "earned source authority (tier/rank/basis) resolved by the source-authority service at runtime"}
+    # the unit's cheapest runnable cost (the local floor) + the cloud cost it would pay un-distilled
+    local_floor = min((r["local_cost"] for r in runtime), default=0.0)
+    cloud_costs = [r["cloud_cost"] for r in runtime if r["cloud_cost"] is not None]
+    return {"runtime": runtime, "local_floor_cost": local_floor,
+            "cloud_cost": min(cloud_costs) if cloud_costs else None,
+            "resource_slots": slot_integrations, "governance": governance}
 
 
 def _self_test() -> int:
@@ -216,6 +278,19 @@ def _self_test() -> int:
     ck("descent: the model is kept as a reversible rollback_target (promotion is never one-way)",
        bool(d["rollback_target"]) and d["rollback_target"].startswith("model"))
 
+    # RESOURCE INTEGRATION: Teleon (the LOGIC) pulls useful details from the resource-holding services.
+    for u in units:
+        rr = resolve_resources(u)
+        ck(f"{u['variety']}: every runtime class resolves to a real profile + pricebook cost (runtime+cost resources)",
+           bool(rr["runtime"]) and all(r["resolved"] and r["local_cost"] is not None for r in rr["runtime"]),
+           str(rr["runtime"])[:120])
+    ck("resource integration surfaces a REAL cloud cost from the pricebook (what un-distilled execution would cost)",
+       any((resolve_resources(u)["cloud_cost"] or 0) > 0 for u in units))
+    ck("skill/tool/template units name their catalog resource service (integration point)",
+       len([u for u in units if resolve_resources(u)["resource_slots"]]) >= 3)
+    ck("source-dependent units integrate with the source-authority service for earned-authority detail",
+       len([u for u in units if resolve_resources(u)["governance"]]) >= 3)
+
     print("\n" + ("PASS - teleon_preseed_capabilities: 8 capability-DEFINED units span the full spectrum "
                   "(template -> deterministic -> det+tool -> skill -> tool -> skill+tool -> model -> open-ended), "
                   "each a valid PurposeTaskSpec.v1 classified at its tier by the real ladder, provisioned by "
@@ -232,12 +307,20 @@ def _main(argv: list[str] | None = None) -> int:
     p.add_argument("--self-test", action="store_true")
     p.add_argument("--list", action="store_true")
     p.add_argument("--descent", action="store_true", help="run the live model->deterministic descent on the real adapt() engine")
+    p.add_argument("--resources", action="store_true", help="show each unit's resolved resource details (runtime profile, cost, catalogs, source-authority)")
     p.add_argument("--json", action="store_true")
     a = p.parse_args(argv)
     if a.self_test:
         return _self_test()
     if a.descent:
         print(json.dumps(demonstrate_descent("model"), indent=2))
+        return 0
+    if a.resources:
+        for u in preseed()["units"]:
+            rr = u["resolved_resources"]
+            print(f"  {u['variety']:22} local_floor={rr['local_floor_cost']} cloud={rr['cloud_cost']} "
+                  f"runtime={[r['runtime_class'] for r in rr['runtime']]} slots={list(rr['resource_slots'])} "
+                  f"governed={bool(rr['governance'])}")
         return 0
     pre = preseed()
     if a.json:
