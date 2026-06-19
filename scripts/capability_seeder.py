@@ -46,9 +46,14 @@ SCHEMA_VERSION = "CapabilityCandidate.v1"
 
 #: the source kinds the adapters accept (matches the discovered-feed source_kind field).
 SOURCE_KINDS = ("anthropic_skill", "github_skills_repo", "github_tools_repo", "mcp_server", "plugin", "skills_pack")
-#: capability categories we organize the negative-space corpus around.
-CATEGORIES = ("email", "research", "scraping", "legal-statute", "regulation", "federal-register",
-              "financial-data", "data-extraction", "code", "document", "other")
+#: capability categories we organize the negative-space corpus around (a stable, bounded vocabulary; widen
+#: deliberately as the corpus grows — additive, the named beachhead categories are never removed).
+CATEGORIES = (
+    "email", "messaging", "research", "scraping", "data-extraction", "document", "code", "devtools",
+    "cloud-infra", "database", "legal-statute", "regulation", "federal-register", "financial-data",
+    "market-data", "scientific-data", "healthcare", "geo-weather", "productivity", "identity-compliance",
+    "media", "other",
+)
 
 # ── descent-walk constants (illustrative runner characteristics; named, not magic) ─────────────────────────────
 _MODEL_ROOT_DETERMINISM = 0.2        # a model-tier runner is substantially non-deterministic (sampling)
