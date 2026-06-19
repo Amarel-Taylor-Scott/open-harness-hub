@@ -248,15 +248,20 @@ def objective_gated_descent(objective, *, variety: str = "model", novel_divergen
     the REAL adapt() engine and PROMOTES it (the cost self-improvement, model kept as a reversible rollback_target).
     If the objective selects the model — e.g. maximize_accuracy when the rule diverges on novel inputs — Teleon
     HOLDS the descent back (keeps the model; the rule stays a candidate). So the SAME descent either fires or is
-    vetoed purely by the priority, with a traceable reason. Never serves truth."""
-    from src.teleon.objectives import MetricVector, select
+    vetoed purely by the priority, with a traceable reason. Never serves truth.
+
+    The fork-vs-hold DECISION lives in src.teleon.evolution.descent (its proper home — the proactive descent
+    logic, distinct from src.teleon.self_healing's reactive restore); this wraps it with the seed-demo + the real
+    adapt() engine run."""
+    from src.teleon.evolution.descent import descent_decision
+    from src.teleon.objectives import MetricVector
     model_metrics = MetricVector(cost=_MODEL_CALL_COST, llm_usage=1, determinism=_MODEL_DETERMINISM, accuracy=1.0)
     rule_metrics = MetricVector(cost=_DISTILLED_RULE_COST, llm_usage=0, determinism=1.0,
                                 accuracy=(_RULE_NOVEL_ACCURACY if novel_divergence else 1.0))
-    trace = select([("model", model_metrics), ("distilled_rule", rule_metrics)], objective)
-    descend = trace["chosen"] == "distilled_rule"
+    dec = descent_decision(objective, model_metrics=model_metrics, rule_metrics=rule_metrics)
+    descend = dec["descend"]
     result = {"objective": objective.name, "variety": variety, "novel_divergence": novel_divergence,
-              "decision": "descend" if descend else "hold", "selection": trace, "serves_truth": False}
+              "decision": dec["decision"], "selection": dec["selection"], "serves_truth": False}
     if descend:
         live = demonstrate_descent(variety)  # the REAL adapt() engine promotes the rule + keeps the rollback_target
         result.update({"promoted": live["promoted"], "before_impl": live["before_impl"],
