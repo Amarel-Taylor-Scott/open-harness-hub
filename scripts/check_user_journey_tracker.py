@@ -22,7 +22,7 @@ if __name__ == "__main__" and __package__ in (None, ""):  # pragma: no cover
 
 from jsonschema import Draft202012Validator
 
-from scripts.track_user_journey import JOURNEYS, _has_secret, track
+from scripts.track_user_journey import _has_secret, all_journeys, track
 
 _SCHEMA_PATH = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) / "schemas" / "UserJourneyTrace.v1.schema.json"
 
@@ -39,9 +39,11 @@ def _self_test() -> int:
     Draft202012Validator.check_schema(schema)
     ck("UserJourneyTrace.v1 is a valid JSON Schema", True)
     validator = Draft202012Validator(schema)
-    ck("at least one journey is registered", len(JOURNEYS) >= 1)
+    registry = all_journeys()
+    ck("the flagship Baltor journeys + ALL regulated-fact verticals are registered (>=15)",
+       len(registry) >= 15 and sum(1 for j in registry if j.startswith("vertical-")) >= 12, str(len(registry)))
 
-    for jid in sorted(JOURNEYS):
+    for jid in sorted(registry):
         t = track(jid)
         ck(f"{jid}: trace conforms to UserJourneyTrace.v1",
            validator.is_valid(t), str([e.message for e in validator.iter_errors(t)][:2]))

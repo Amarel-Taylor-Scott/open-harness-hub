@@ -59,20 +59,60 @@ def _baltor_context_assurance(corpus: str = "cfpb") -> dict:
             "steps": steps, "headline": str(out.get("headline", ""))}
 
 
-#: journey registry — id -> runner. Extend with the showcase verticals + the OHH build journey as needed.
-JOURNEYS = {
-    "baltor-context-assurance": lambda: _baltor_context_assurance(corpus="cfpb"),
-    "baltor-context-assurance-bill782": lambda: _baltor_context_assurance(corpus="acme"),
-}
+_DISPOSITION_STATUS = {"block": "blocked", "review": "held_out", "serve": "ok", "info": "ok"}
+
+
+def _vertical_journey(example: dict) -> dict:
+    """A regulated-fact-vertical journey, built from the REAL showcase pipeline behind the examples-gallery
+    registry (the ONE source for all verticals): describe the task -> the capability gap (the structural lift)
+    -> run the governed pipeline -> serve the verdict with its evidence rows -> the governance boundary. The
+    verdict + rows are the showcase's ACTUAL output (example['invoke'] runs run() on the module's own fixtures)."""
+    import importlib
+    module = importlib.import_module(f"scripts.showcase_pipelines.{example['id']}")
+    result = example["invoke"](module)
+    disposition, headline = example["verdict"](result)
+    rows = example["rows"](result)
+    serves_truth = result.get("serves_truth", False) if isinstance(result, dict) else False
+    steps = [
+        {"action": "Describe the regulated-context task", "surface": "intake", "status": "ok",
+         "outcome": " ".join(str(example["scenario"]).split())[:180], "evidence_ref": None},
+        {"action": "Capability gap — why a bare model fails (the structural lift)", "surface": "gap-screen",
+         "status": "ok", "outcome": " ".join(str(example["fails"]).split())[:180], "evidence_ref": None},
+        {"action": "Run the governed pipeline (earned authority, deterministic)",
+         "surface": "reconciliation+verification", "status": _DISPOSITION_STATUS.get(disposition, "ok"),
+         "outcome": str(headline)[:200], "evidence_ref": None},
+        {"action": "Serve the governed verdict with its evidence rows", "surface": "consumption", "status": "ok",
+         "outcome": "; ".join(f"{k}: {v}" for k, v in rows[:4])[:240], "evidence_ref": None},
+        {"action": "Governance boundary: output is evidence/candidate, never autonomous truth",
+         "surface": "governance", "status": "ok", "outcome": f"serves_truth={serves_truth}", "evidence_ref": None},
+    ]
+    return {"product": "Baltor", "name": f"{example['title']} — {example['domain']}",
+            "steps": steps, "headline": str(headline)}
+
+
+def all_journeys() -> dict:
+    """The full journey registry: the two flagship Baltor journeys + EVERY regulated-fact vertical (sourced from
+    the examples-gallery registry so verticals stay single-sourced, not duplicated). Built on demand so the
+    scripts.* imports resolve after the path is set (works whether the module is imported or run directly)."""
+    registry: dict = {
+        "baltor-context-assurance": lambda: _baltor_context_assurance(corpus="cfpb"),
+        "baltor-context-assurance-bill782": lambda: _baltor_context_assurance(corpus="acme"),
+    }
+    from scripts.build_examples_gallery import EXAMPLES
+    for ex in EXAMPLES:
+        registry[f"vertical-{ex['id']}"] = (lambda ex=ex: _vertical_journey(ex))
+    return registry
+
 
 _SECRET_MARKERS = ("bearer ", "sk-", "api_key=", "password", "secret:")  # redaction guard for the trace
 
 
 def track(journey_id: str) -> dict:
     """Run a registered journey against the real backend and return a UserJourneyTrace.v1 (deterministic)."""
-    if journey_id not in JOURNEYS:
-        raise KeyError(f"unknown journey {journey_id!r}; known: {sorted(JOURNEYS)}")
-    j = JOURNEYS[journey_id]()
+    registry = all_journeys()
+    if journey_id not in registry:
+        raise KeyError(f"unknown journey {journey_id!r}; known: {sorted(registry)}")
+    j = registry[journey_id]()
     steps = [{"step_no": i + 1, **s} for i, s in enumerate(j["steps"])]
     steps_ok = sum(1 for s in steps if s["status"] in ("ok", "held_out"))
     # content hash over the ordered (action, surface, status, outcome) — same journey replays to the same hash.
@@ -126,7 +166,13 @@ def _self_test() -> int:
     except KeyError:
         raised = True
     ck("an unknown journey fails loud", raised)
-    ck("at least one journey is registered", len(JOURNEYS) >= 1)
+    reg = all_journeys()
+    verticals = sorted(j for j in reg if j.startswith("vertical-"))
+    ck("the flagship + ALL regulated-fact verticals are registered (>=15 journeys)", len(reg) >= 15, str(len(reg)))
+    ck("there are >=12 vertical journeys (one per showcase)", len(verticals) >= 12, str(len(verticals)))
+    vt = track(verticals[0]) if verticals else {}
+    ck("a vertical journey runs the real showcase into a 5-step trace that never serves truth",
+       len(vt.get("steps", [])) == 5 and vt.get("serves_truth") is False, str(vt.get("name")))
 
     print("\n" + ("PASS — track_user_journey: a user journey is tracked against the REAL demo backend as an ordered, "
                   "deterministic, REPLAYABLE UserJourneyTrace.v1 (same journey -> same trace_hash); the moat step "
@@ -146,7 +192,7 @@ def _main(argv: list[str] | None = None) -> int:
     if a.self_test:
         return _self_test()
     if a.list:
-        print("\n".join(sorted(JOURNEYS)))
+        print("\n".join(sorted(all_journeys())))
         return 0
     if a.journey:
         print(json.dumps(track(a.journey), indent=2 if a.json else None, sort_keys=not a.json))
