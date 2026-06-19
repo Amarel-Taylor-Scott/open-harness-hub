@@ -428,6 +428,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_teleon_distillation.py", "check_teleon_distillation"),
     # ── the scheduled DISTILLATION RUNNER: a resumable, free+offline (cron-safe) pass that distills the corpus's pure-deterministic capabilities into deterministic forks (193 ceiling-1.0 in one pass), idempotent, lowering the ceiling threshold distills more, meta-learner accumulates across runs; loop stops via .agent/STOP_REQUESTED ──
     ("scripts/context_workers/distillation_runner.py", "distillation_runner"),
+    # ── the TRAINING system: the skills DB joins capability features + distillation outcomes into a labeled, splittable, exportable dataset; a FittedPolicy is trained from it that learns the highest-efficiency distillation strategy per class, generalizes (class->band->prior backoff), and beats the cold-start prior on held-out; a real model/LoRA plugs in behind the same port (candidate, never truth) + the harness emits its governed spec ──
+    ("scripts/check_teleon_distillation_training.py", "check_teleon_distillation_training"),
     # ── CTS-1: bind an OCTS runtime CLASS → concrete backend by policy/creds/health; cloud deferred after a built local equivalent; class-scoped guard; deny-by-default; composes with the execution selector ──
     ("scripts/check_runtime_class_binding.py", "check_runtime_class_binding"),
     ("scripts/check_execution_dispatch_fail_loud.py", "check_execution_dispatch_fail_loud"),

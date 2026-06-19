@@ -19,11 +19,15 @@ _MIN_OBS = 3
 _BAND_EDGES = ((0.99, "direct"), (0.70, "extract"), (0.40, "partial"), (0.0, "template"))
 
 
+def determinism_band(determinism_ceiling: float) -> str:
+    """The determinism band ('direct'/'extract'/'partial'/'template') for a ceiling — the single source for bands."""
+    dc = float(determinism_ceiling)
+    return next(name for edge, name in _BAND_EDGES if dc >= edge)
+
+
 def class_key(category: str, determinism_ceiling: float) -> str:
     """A capability class = category x determinism band — the grain at which a distillation strategy generalizes."""
-    dc = float(determinism_ceiling)
-    band = next(name for edge, name in _BAND_EDGES if dc >= edge)
-    return f"{category}|{band}"
+    return f"{category}|{determinism_band(determinism_ceiling)}"
 
 
 def _efficiency(rec: dict) -> float:
