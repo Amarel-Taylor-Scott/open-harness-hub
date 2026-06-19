@@ -143,7 +143,11 @@ def _teleon_capability_descent_journey(tenant_id: str) -> dict:
     prefs = preferences_for(tenant_id)
     policy = prefs.to_org_policy()
     cap = {"capability_slot": "reg-e-error-resolution-deadline", "category": "regulation",
-           "determinism_ceiling": 0.95, "deterministic_coverage_estimate": 0.9}
+           "determinism_ceiling": 0.95, "deterministic_coverage_estimate": 0.9,
+           "skill_text": ("You are a Reg E assistant.\nYou are a Reg E assistant.\n"
+                          "Always cite ecfr://12/1005.11.\n[optional] background context.\n"
+                          "[optional] more background.\nReturn the deadline in business days.\n"),
+           "must_keep": ("ecfr://12/1005.11", "business days")}
     ab = ab_test(cap, scorer=eval_suite_scorer, max_accuracy_drop=prefs.max_accuracy_drop, policy=policy)
     fr = FreshnessSyncedCapability(cap["capability_slot"], authoritative_source="ecfr://12/1005.11",
                                    volatility_class="low")
@@ -157,6 +161,11 @@ def _teleon_capability_descent_journey(tenant_id: str) -> dict:
         {"action": "A/B the descent strategies; pick the cheapest that keeps accuracy (within the tenant's confines)",
          "surface": "descent-ab", "status": "ok",
          "outcome": f"winner={ab['winner']} @ accuracy {ab['winner_accuracy']} (floor {ab['accuracy_floor']}), cost {ab['winner_cost']}",
+         "evidence_ref": None},
+        {"action": "Token consumption (in/out) tracked; the skill is compressed where the model is kept",
+         "surface": "tokens", "status": "ok",
+         "outcome": f"winner tokens in/out: {ab['winner_tokens_in']}/{ab['winner_tokens_out']}; "
+         f"prompt compression saves {ab['tokens_saved_by_compression']} input tokens (lossless={ab['compression_lossless']})",
          "evidence_ref": None},
         {"action": "Governance: the winning fork clears the accuracy floor + the org guardrail policy",
          "surface": "governance", "status": "ok",
@@ -279,8 +288,11 @@ def _self_test() -> int:
     # the DESCENT walkthrough journey: a capability descends under tunable preferences, governed, with freshness.
     desc = track("teleon-capability-descent-cost-startup")
     surfaces = {s["surface"] for s in desc["steps"]}
-    ck("a capability-DESCENT journey walks preferences -> A/B descent -> governance -> freshness -> boundary",
-       desc["product"] == "Teleon" and {"preferences", "descent-ab", "freshness", "governance"} <= surfaces, str(surfaces))
+    ck("a capability-DESCENT journey walks preferences -> A/B descent -> tokens -> governance -> freshness -> boundary",
+       desc["product"] == "Teleon" and {"preferences", "descent-ab", "tokens", "freshness", "governance"} <= surfaces, str(surfaces))
+    tok_step = next(s for s in desc["steps"] if s["surface"] == "tokens")
+    ck("the descent journey surfaces TOKEN consumption (in/out) + the prompt-compression savings",
+       "tokens in/out" in tok_step["outcome"] and "saves" in tok_step["outcome"])
     ab_step = next(s for s in desc["steps"] if s["surface"] == "descent-ab")
     fr_step = next(s for s in desc["steps"] if s["surface"] == "freshness")
     ck("the descent step shows a measured winner; the freshness step holds the stale fact out (held_out)",

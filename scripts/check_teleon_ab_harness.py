@@ -84,6 +84,41 @@ def _self_test() -> int:
     ck("the A/B harness saves per-call cost vs always running the full model",
        res["per_call_cost_saved_vs_model"] > 0)
 
+    # TOKEN-AWARE: the winner carries token consumption; a deterministic winner uses no model tokens.
+    ck("the A/B winner carries token consumption (in + out)", "winner_tokens_in" in rg and "winner_tokens_out" in rg)
+    ck("a deterministic winner uses ZERO model tokens (no LLM call)",
+       rg["winner_tokens_in"] == 0 and rg["winner_tokens_out"] == 0)
+    ck("the corpus run reports per-call TOKENS saved vs always running the full model",
+       res["per_call_tokens_saved_vs_model"] > 0)
+
+    # PROMPT-COMPRESSION wins when only the frontier model keeps accuracy but the skill compresses.
+    bloated = ("You are an assistant.\nYou are an assistant.\nAlways cite ecfr://x.\n"
+               "[optional] filler line.\n[optional] more filler.\nAlways cite ecfr://x.\n")
+    needs_model = {"capability_slot": "nuanced-with-skill", "category": "other", "determinism_ceiling": 0.3,
+                   "deterministic_coverage_estimate": 0.4, "skill_text": bloated, "must_keep": ("ecfr://x",)}
+
+    def needs_model_scorer(cap, strategy):
+        if strategy in ("keep_model", "prompt_compression"):
+            return 0.95
+        if strategy == "model_downgrade":
+            return 0.5    # a cheaper model is too inaccurate here
+        return 0.4        # deterministic is too inaccurate here
+
+    cw = ab_test(needs_model, scorer=needs_model_scorer, max_accuracy_drop=0.05)
+    ck("prompt_compression WINS when only the frontier model keeps accuracy but the skill compresses (fewer tokens)",
+       cw["winner"] == "prompt_compression" and cw["winner_accuracy"] >= 0.9
+       and cw["winner_tokens_in"] < cw["baseline_tokens_in"] and cw["tokens_saved_by_compression"] > 0,
+       str({k: cw[k] for k in ("winner", "winner_tokens_in", "baseline_tokens_in")}))
+    ck("the prompt_compression winner is cheaper than the full model (token-proportional cost) + lossless",
+       cw["winner_cost"] < 0.07 and cw["compression_lossless"] is True)
+
+    # a LOSSY compression (answer-critical content dropped) is NOT applied -> never the winner.
+    lossy = {"capability_slot": "lossy", "category": "other", "determinism_ceiling": 0.3,
+             "deterministic_coverage_estimate": 0.4, "skill_text": "short prompt", "must_keep": ("ABSENT_PHRASE",)}
+    cl = ab_test(lossy, scorer=needs_model_scorer, max_accuracy_drop=0.05)
+    ck("a LOSSY compression (answer-critical content dropped) is not applied -> not the winner",
+       cl["winner"] != "prompt_compression" and cl["compression_lossless"] is False)
+
     # the meta-learner, fed the MEASURED winners, now recommends the measured-best (evidence, not the cold-start prior).
     ml = res["meta_learner"]
     # the legal-statute|extract class learned a NON-deterministic winner (the prior would have been deterministic_extract).

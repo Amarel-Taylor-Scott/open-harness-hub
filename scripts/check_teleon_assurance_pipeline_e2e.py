@@ -67,6 +67,8 @@ def _self_test() -> int:
        ab["winner_accuracy"] >= ab["accuracy_floor"] and ab["serves_truth"] is False)
     ck("for this ceiling-1.0 capability the winner is the cheap DETERMINISTIC fork (cost 0.0, accuracy kept)",
        ab["winner"] in ("direct_api_rule", "deterministic_extract") and ab["winner_cost"] == 0.0, str(ab["winner"]))
+    ck("token consumption (in/out) flows through the pipeline (deterministic winner uses no model tokens)",
+       "winner_tokens_in" in ab and ab["winner_tokens_in"] == 0 and ab["winner_tokens_out"] == 0)
     # the org policy actually BOUNDS the descent: a deterministic-only org accepts this deterministic winner...
     det_ab = ab_test(cand, scorer=ceiling_scorer, policy=load_policy("deterministic-audit"))
     ck("the org guardrail policy bounds the descent in-line (a deterministic-only org still gets a deterministic winner)",
