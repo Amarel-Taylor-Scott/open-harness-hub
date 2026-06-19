@@ -33,12 +33,23 @@ from src.teleon.evolution.capability_graph import (
     record_heal,
 )
 from src.teleon.evolution.descent import descent_decision, plan_descent_to_determinism
+from src.teleon.evolution.descent_axes import (
+    DESCENT_AXES,
+    HIGHER_IS_BETTER_AXES,
+    LOWER_IS_BETTER_AXES,
+    freshness_policy,
+    improves,
+    is_axis,
+)
+from src.teleon.evolution.descent_measurement import cost_speed_report, measure_descent
 from src.teleon.evolution.distiller import (
     STRATEGIES,
+    STRATEGY_FRESHNESS_SYNC,
     DistillationRecord,
     choose_strategy,
     distill,
     distill_candidate,
+    distill_robustness,
 )
 from src.teleon.evolution.impl_finder import ExternalImplSearchPort, find_implementations
 from src.teleon.evolution.meta_learner import DistillationMetaLearner, class_key
@@ -47,7 +58,9 @@ __all__ = [
     "CapabilityEvolutionGraph", "RunnerNode", "EvolutionEdge", "EvolutionError",
     "EDGE_FORK", "EDGE_DISTILL", "EDGE_PROMOTE", "EDGE_ROLLBACK", "EDGE_HEAL", "EDGE_KINDS",
     "record_heal", "descent_decision", "plan_descent_to_determinism",
-    "distill", "distill_candidate", "DistillationRecord", "choose_strategy", "STRATEGIES",
-    "DistillationMetaLearner", "class_key",
+    "distill", "distill_candidate", "distill_robustness", "DistillationRecord", "choose_strategy", "STRATEGIES",
+    "STRATEGY_FRESHNESS_SYNC", "DistillationMetaLearner", "class_key",
     "find_implementations", "ExternalImplSearchPort",
+    "DESCENT_AXES", "LOWER_IS_BETTER_AXES", "HIGHER_IS_BETTER_AXES", "freshness_policy", "improves", "is_axis",
+    "measure_descent", "cost_speed_report",
 ]

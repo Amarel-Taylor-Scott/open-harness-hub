@@ -436,6 +436,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_teleon_capability_network.py", "check_teleon_capability_network"),
     # ── the deterministic-IMPLEMENTATION FINDER: on capability entry, search the corpus (cross-category, by intent) for a MORE-deterministic / cheaper implementation (an LLM date-parser finds a deterministic library -> replace the model); already-deterministic caps need none; unmatched ones route to external search (a governed seam off by default behind ExternalImplSearchPort). Proposes, never disposes; never truth ──
     ("scripts/check_teleon_impl_finder.py", "check_teleon_impl_finder"),
+    # ── DESCENT AXES (canonical: determinism/cost/latency-speed/llm_usage/freshness) + the FRESHNESS (anti-fragility) axis (bind a fragile changing-fact capability to an authoritative source on a volatility-matched sync cadence + CDC re-heal -> always-current deterministic lookup, stale held out) + the cost/speed MEASUREMENT harness (per-call cost saved + per-axis improvement + OBSERVED cost/latency from real runs) ──
+    ("scripts/check_teleon_descent_axes.py", "check_teleon_descent_axes"),
     # ── CTS-1: bind an OCTS runtime CLASS → concrete backend by policy/creds/health; cloud deferred after a built local equivalent; class-scoped guard; deny-by-default; composes with the execution selector ──
     ("scripts/check_runtime_class_binding.py", "check_runtime_class_binding"),
     ("scripts/check_execution_dispatch_fail_loud.py", "check_execution_dispatch_fail_loud"),
