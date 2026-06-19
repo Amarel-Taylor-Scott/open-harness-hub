@@ -433,6 +433,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_shared_template_registry.py", "check_shared_template_registry"),
     # ── Demo Control Tower: aggregates registered demo/runtime surfaces (portfolio_lib static sites + hub + Baltor CFPB + dashboards + registries) into ONE start-here page + dist/demo-all-urls.*; honest active/candidate/internal status; no fake URLs; CFPB e2e invariant cited; ports single-sourced ──
     ("scripts/check_demo_control_tower.py", "check_demo_control_tower"),
+    ("scripts/track_user_journey.py", "track_user_journey"),
+    ("scripts/check_user_journey_tracker.py", "check_user_journey_tracker"),
     # ── GitHub Signal Flywheel / Repo Intelligence: top repos → GOVERNED candidates (discovery!=trust, stars!=proof, trend!=fit!=activation); weekly growth from STORED snapshots; classify→hub; never auto-active; bad-license→quarantine ──
     ("scripts/check_github_signal_flywheel.py", "check_github_signal_flywheel"),
     # ── Cloudflare URL handoff: aggregate+verify every TryCloudflare+local URL → shareable MD + one-by-one review checklist + review state + rubric scorecard; no fake URLs; honest candidate/missing + screenshot-unavailable ──
