@@ -1,4 +1,4 @@
-"""src.baltor.workers.execution_providers.local_worker_pool — the local equivalent for a Kubernetes
+"""src.teleon.workers.execution_providers.local_worker_pool — the local equivalent for a Kubernetes
 Deployment / warm worker pool. Runs N local workers that each atomically claim + drain from the
 DurableFleetLedger (exactly-once across the pool), with cooldown drain + stale-lease reclaim. No truth.
 """

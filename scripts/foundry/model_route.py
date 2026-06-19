@@ -35,7 +35,6 @@ from scripts.foundry.measure import MeasurementStage
 
 _SCORE_RE = re.compile(r"\d+(?:\.\d+)?|\.\d+")   # first number; clamped to [0,1]
 _DEFAULT_CHAT_MODEL = "claude-opus-4-8"   # overridable via OH_CHAT_MODEL
-_DEFAULT_OLLAMA_EMBED_MODEL = "nomic-embed-text"   # an Ollama embedding tag (see scripts/_config)
 
 
 class ModelRoute:
@@ -96,6 +95,7 @@ def from_env() -> ModelRoute | None:
     Mistral and OpenRouter are OpenAI-compatible, so they ride ``_openai_compatible`` with their
     own base URLs. Pick models with ``OH_CHAT_MODEL`` / ``OH_EMBED_MODEL``.
     """
+    from scripts._config import DEFAULT_MISTRAL_EMBED_MODEL, DEFAULT_OLLAMA_EMBED_MODEL, DEFAULT_OPENAI_EMBED_MODEL
     model = os.environ.get("OH_CHAT_MODEL", _DEFAULT_CHAT_MODEL)
 
     # Ollama Cloud — OpenAI-compatible at <host>/v1; the only single key that gives BOTH
@@ -103,7 +103,7 @@ def from_env() -> ModelRoute | None:
     if os.environ.get("OLLAMA_API_KEY"):
         host = os.environ.get("OLLAMA_HOST", "https://ollama.com").rstrip("/")
         key = os.environ["OLLAMA_API_KEY"]
-        embed_model = os.environ.get("OH_EMBED_MODEL", _DEFAULT_OLLAMA_EMBED_MODEL)
+        embed_model = os.environ.get("OH_EMBED_MODEL", DEFAULT_OLLAMA_EMBED_MODEL)
         comp, _ = _openai_compatible(f"{host}/v1", key, model, embed_model)  # chat via OpenAI-compatible /v1
 
         def _ollama_embed(text: str) -> list[float]:
@@ -124,14 +124,14 @@ def from_env() -> ModelRoute | None:
     if os.environ.get("MISTRAL_API_KEY"):
         base = os.environ.get("MISTRAL_BASE_URL", "https://api.mistral.ai/v1")
         mdl = os.environ.get("OH_CHAT_MODEL") or "mistral-small-latest"
-        embed_model = os.environ.get("OH_EMBED_MODEL", "mistral-embed")
+        embed_model = os.environ.get("OH_EMBED_MODEL", DEFAULT_MISTRAL_EMBED_MODEL)
         comp, emb = _openai_compatible(base, os.environ["MISTRAL_API_KEY"], mdl, embed_model)
         return ModelRoute(comp, embed_fn=emb, name=f"mistral:{mdl}")
 
     # OpenRouter — OpenAI-compatible gateway to many models (incl. ':free' variants).
     if os.environ.get("OPENROUTER_API_KEY"):
         base = os.environ.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
-        embed_model = os.environ.get("OH_EMBED_MODEL", "text-embedding-3-small")
+        embed_model = os.environ.get("OH_EMBED_MODEL", DEFAULT_OPENAI_EMBED_MODEL)
         comp, emb = _openai_compatible(base, os.environ["OPENROUTER_API_KEY"], model, embed_model)
         return ModelRoute(comp, embed_fn=emb, name=f"openrouter:{model}")
 
@@ -156,7 +156,7 @@ def from_env() -> ModelRoute | None:
 
     if os.environ.get("OPENAI_API_KEY"):
         base = os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
-        embed_model = os.environ.get("OH_EMBED_MODEL", "text-embedding-3-small")
+        embed_model = os.environ.get("OH_EMBED_MODEL", DEFAULT_OPENAI_EMBED_MODEL)
         comp, emb = _openai_compatible(base, os.environ["OPENAI_API_KEY"], model, embed_model)
         return ModelRoute(comp, embed_fn=emb, name=f"openai:{model}")
 

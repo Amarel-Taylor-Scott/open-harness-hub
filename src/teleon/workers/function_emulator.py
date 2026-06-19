@@ -1,4 +1,4 @@
-"""src.baltor.workers.function_emulator — the LOCAL FUNCTION EMULATOR execution backend (offline reference
+"""src.teleon.workers.function_emulator — the LOCAL FUNCTION EMULATOR execution backend (offline reference
 path). It is contract-identical to a cloud function: given a capability, it atomically CLAIMS tasks from the
 DurableFleetLedger, runs a registered lightweight handler, writes the result, and ack/nacks — idempotent,
 retry/DLQ-preserving. It publishes NO truth. This is what proves the execution-backend abstraction offline

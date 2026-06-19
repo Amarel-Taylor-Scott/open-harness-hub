@@ -707,9 +707,17 @@ EMBEDDING_MODELS: dict[str, int] = {
     "nomic-embed-text": 768,            # Ollama tag, stronger 768-dim option
     "text-embedding-3-small": 1536,     # OpenAI-compatible hosted route
     "text-embedding-ada-002": 1536,     # legacy OpenAI-compatible route
+    "mistral-embed": 1024,              # Mistral OpenAI-compatible embeddings route
 }
 
+# Per-provider-lane DEFAULT embedding tags — the single source for the live model_route lanes (each MUST be a
+# key above so its dimension stays authoritative). Override per-run with OH_EMBED_MODEL.
+DEFAULT_OLLAMA_EMBED_MODEL = "nomic-embed-text"
+DEFAULT_OPENAI_EMBED_MODEL = "text-embedding-3-small"
+DEFAULT_MISTRAL_EMBED_MODEL = "mistral-embed"
+
 DEFAULT_EMBEDDING_DIMENSIONS: int = EMBEDDING_MODELS[DEFAULT_EMBEDDING_MODEL]
+assert all(_m in EMBEDDING_MODELS for _m in (DEFAULT_OLLAMA_EMBED_MODEL, DEFAULT_OPENAI_EMBED_MODEL, DEFAULT_MISTRAL_EMBED_MODEL))
 
 # --- Model profile registry -------------------------------------------------
 # Model profile IDs are routing/config records, not provider model IDs. These

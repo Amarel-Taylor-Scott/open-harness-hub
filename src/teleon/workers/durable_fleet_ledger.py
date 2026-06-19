@@ -1,4 +1,4 @@
-"""src.baltor.workers.durable_fleet_ledger — the DURABLE (SQLite) capability-task ledger.
+"""src.teleon.workers.durable_fleet_ledger — the DURABLE (SQLite) capability-task ledger.
 
 The in-memory FleetLedger is the proven contract; this is its durable, CROSS-PROCESS twin so the live
 supervisor's spawn pass acts on REAL persisted queued work and multiple worker processes can claim against

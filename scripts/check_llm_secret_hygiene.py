@@ -7,8 +7,15 @@ CLI: python3 scripts/check_llm_secret_hygiene.py --self-test
 from __future__ import annotations
 
 import argparse
+import os
 import re
+import sys
 from pathlib import Path
+
+if __name__ == "__main__" and __package__ in (None, ""):  # pragma: no cover
+    _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if _REPO_ROOT not in sys.path:
+        sys.path.insert(0, _REPO_ROOT)
 
 from scripts.llm_gateway.providers import default_registry
 from scripts.llm_gateway.secrets import SecretsResolver, UnavailableSecret

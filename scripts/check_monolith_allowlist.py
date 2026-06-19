@@ -47,13 +47,41 @@ def _self_test() -> int:
     unlisted = [f"{r}:{n}" for r, n in over if r not in allow]
     check("no governed file over budget OUTSIDE the allowlist", unlisted == [], str(unlisted))
     check("the known API monolith (admin server) is allowlisted", _API_SERVER in allow)
-    check("every allowlist entry has reason + target_split + deadline_pass",
-          all(all(k in e for k in ("reason", "target_split", "deadline_pass")) for e in m["allowlist"]))
+    check("every allowlist entry has reason + target_split + deadline_pass + current_lines",
+          all(all(k in e for k in ("reason", "target_split", "deadline_pass", "current_lines")) for e in m["allowlist"]))
     check("every allowlisted monolith still exists (no stale allowlist)",
           all((_REPO / p).exists() for p in allow), str([p for p in allow if not (_REPO / p).exists()]))
     check("allowlist is bounded (debt is visible, not unbounded)", len(allow) <= 5, str(len(allow)))
 
-    print(f"\n{'PASS — check_monolith_allowlist: monolith growth is measured + gated; the one legacy over-budget file (admin server) is allowlisted with a split target + deadline.' if not fails else f'{len(fails)} FAILURES: {fails}'}")
+    # RATCHET: an allowlisted monolith may SHRINK but never GROW past its recorded current_lines — otherwise the
+    # allowlist silently hides unbounded growth (the admin server had drifted 5445->6394 undetected). Counted via
+    # the SAME line counter as the budget check so the baseline and the comparison can never disagree.
+    grew = []
+    for e in m["allowlist"]:
+        p = _REPO / e["path"]
+        if p.exists() and "current_lines" in e:
+            actual = sum(1 for _ in p.open(encoding="utf-8", errors="ignore"))
+            if actual > int(e["current_lines"]):
+                grew.append(f"{e['path']} grew {e['current_lines']}->{actual}")
+    check("no allowlisted monolith grew past its recorded current_lines (ratchet: shrink ok, growth forbidden)",
+          grew == [], str(grew))
+
+    # DEADLINE: once the flywheel pass counter reaches an entry's deadline_pass, a STILL-over-budget monolith is no
+    # longer waived — mirrors the pattern_waivers expiry rule, reading its single-source current_pass (no 2nd counter).
+    pw = json.loads((_REPO / "architecture" / "pattern_waivers.json").read_text())
+    current_pass = int(pw.get("current_pass", 0))
+    past_deadline = []
+    for e in m["allowlist"]:
+        p = _REPO / e["path"]
+        deadline = int(str(e.get("deadline_pass", "")).lstrip("Cc") or 0)
+        if p.exists() and deadline:
+            actual = sum(1 for _ in p.open(encoding="utf-8", errors="ignore"))
+            if actual > _budget(e["path"]) and current_pass >= deadline:
+                past_deadline.append(f"{e['path']} past deadline C{deadline} (pass {current_pass}) still {actual}>budget")
+    check("no allowlisted monolith is past its split deadline while still over budget (deadline is enforceable)",
+          past_deadline == [], str(past_deadline))
+
+    print(f"\n{'PASS — check_monolith_allowlist: monolith growth is measured + gated; allowlisted files ratchet (shrink ok, growth forbidden); the split deadline is enforceable against the flywheel pass counter.' if not fails else f'{len(fails)} FAILURES: {fails}'}")
     return 0 if not fails else 1
 
 

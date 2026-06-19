@@ -13,8 +13,8 @@ Asserts:
      (object_id, input_text, now) — the adapter layer matches the live gateway.
   F. GRACEFUL DEGRADATION: an external HTTP adapter (Ollama cloud) offline (no network / no secret) returns a
      ProviderUnavailableResult (available=False, reason recorded) — never a fabricated output.
-  G. NO SDK AT IMPORT: the adapters module imports NO provider SDK at module load (openai/anthropic/google/groq/…);
-     HTTP is stdlib urllib imported lazily inside invoke.
+  G. NO SDK OR RAW HTTP AT IMPORT: the adapters module imports NO provider SDK at module load
+     (openai/anthropic/google/groq/…) and live HTTP goes through Teleon EgressClient, not raw urllib.
   H. NO RAW KEY: the module holds no raw key; adapters carry a secret_ref (not a value); results never include output
      when unavailable and are always is_truth=False.
   I. DETERMINISM.
@@ -88,8 +88,8 @@ def _self_test() -> int:
           oc["available"] is False and oc["output"] is None and bool(oc["reason_code"]) and oc["is_truth"] is False)
 
     src = (_REPO / "src" / "teleon" / "inference" / "adapters.py").read_text(encoding="utf-8")
-    check("G: no provider SDK imported at module load (HTTP is lazy stdlib urllib)",
-          not _SDK.search(src) and "import urllib.request" in src)
+    check("G: no provider SDK or raw HTTP imported at module load (HTTP uses Teleon EgressClient)",
+          not _SDK.search(src) and "EgressClient" in src and "import urllib.request" not in src)
     check("H: no raw key in the adapters module + offline result carries no secret/output",
           not _LEAK.search(src + json.dumps(oc)))
 
@@ -99,8 +99,9 @@ def _self_test() -> int:
 
     print("\n" + ("PASS — check_inference_provider_adapters: the LLM plane has one governed base class with multiple "
                   "API-method subclasses, resolved by config (adapter_style), swappable with no code change, "
-                  "byte-consistent with the gateway, SDK-free at import, secret-by-ref, and degrading to a "
-                  "ProviderUnavailableResult offline." if not fails else f"{len(fails)} FAILURES: {fails}"))
+                  "byte-consistent with the gateway, SDK/raw-HTTP-free at import, egress-captured for live HTTP, "
+                  "secret-by-ref, and degrading to a ProviderUnavailableResult offline."
+                  if not fails else f"{len(fails)} FAILURES: {fails}"))
     return 0 if not fails else 1
 
 

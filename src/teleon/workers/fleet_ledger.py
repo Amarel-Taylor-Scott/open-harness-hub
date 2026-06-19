@@ -1,4 +1,4 @@
-"""src.baltor.workers.fleet_ledger — the DB-backed capability-task ledger: the SOURCE OF TRUTH for the
+"""src.teleon.workers.fleet_ledger — the DB-backed capability-task ledger: the SOURCE OF TRUTH for the
 worker fleet. Workers do NOT own a task until an atomic claim succeeds. In-memory + deterministic for
 self-tests (injected `now`, hashlib ids, no RNG); the same shape maps to SQLite (BEGIN IMMEDIATE) and later
 Postgres (SELECT ... FOR UPDATE SKIP LOCKED) without changing the task/worker contracts.

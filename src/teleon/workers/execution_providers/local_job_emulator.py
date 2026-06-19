@@ -1,4 +1,4 @@
-"""src.baltor.workers.execution_providers.local_job_emulator — the local equivalent for Kubernetes Job /
+"""src.teleon.workers.execution_providers.local_job_emulator — the local equivalent for Kubernetes Job /
 Cloud Run Job / batch execution. Claims a BATCH from the DurableFleetLedger (batch_min thresholds or a
 partial batch at max_wait), processes each item via the function emulator with retry/DLQ, records the
 batch result, exits. No truth published. `execution.local_cloud_run_job_emulator@v1` is an alias.
