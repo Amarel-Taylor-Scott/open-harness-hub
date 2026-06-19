@@ -420,6 +420,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/context_workers/capability_discovery_runner.py", "capability_discovery_runner"),
     # ── interchangeable PROVIDER ENDPOINTS per capability (WHOIS via RDAP/paid-API/library, geocoding via Census/Google/Mapbox): the objective layer picks the best endpoint per priority (minimize_cost->free, minimize_latency->fastest, maximize_accuracy->most reliable); a policy-forbidden endpoint is excluded before scoring (safety beats objective); observed telemetry deprioritizes a slow endpoint; deterministic, never truth ──
     ("scripts/check_teleon_endpoint_registry.py", "check_teleon_endpoint_registry"),
+    # ── ORG guardrail policy: an org's devops/security rules (license/domain/runtime/package allow+deny lists + methodology rules like deterministic_only/no_llm) BOUND a capability — disallowed endpoints excluded before objective selection (safety beats objective; all-banned fails loud), and the AI may self-heal/fork a unit ONLY to a runner within the confines (a model fix is vetoed under a deterministic-only org) ──
+    ("scripts/check_teleon_org_guardrail_policy.py", "check_teleon_org_guardrail_policy"),
     # ── CTS-1: bind an OCTS runtime CLASS → concrete backend by policy/creds/health; cloud deferred after a built local equivalent; class-scoped guard; deny-by-default; composes with the execution selector ──
     ("scripts/check_runtime_class_binding.py", "check_runtime_class_binding"),
     ("scripts/check_execution_dispatch_fail_loud.py", "check_execution_dispatch_fail_loud"),
