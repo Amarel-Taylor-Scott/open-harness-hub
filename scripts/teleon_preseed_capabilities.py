@@ -198,6 +198,41 @@ def resolve_resources(unit: dict) -> dict:
             "resource_slots": slot_integrations, "governance": governance}
 
 
+#: SLA-policy-id duration suffix -> seconds. The latency budget is DECLARED in each profile's
+#: default_sla_policy_id (e.g. "interactive_30s", "batch_15m", "offline_24h"); we read it, never re-type it.
+_SLA_UNIT_SECONDS = {"s": 1, "m": 60, "h": 3600, "d": 86400}
+_SLA_DEFAULT_SECONDS = 120.0  # an SLA id with no parseable duration -> a neutral "standard" budget (documented)
+
+
+def _sla_seconds(sla_policy_id) -> float:
+    """The latency budget (seconds) encoded in a profile's default_sla_policy_id ('interactive_30s' -> 30,
+    'standard_2m' -> 120, 'batch_15m' -> 900, 'offline_24h' -> 86400). Real declared signal, not a magic number."""
+    import re
+    m = re.search(r"_(\d+)([smhd])$", str(sla_policy_id or ""))
+    return float(m.group(1)) * _SLA_UNIT_SECONDS[m.group(2)] if m else _SLA_DEFAULT_SECONDS
+
+
+def select_placement(unit: dict, objective) -> dict:
+    """Choose WHICH allowed runtime class to run a capability unit on, under a CapabilityObjective — the objective
+    layer applied to the unit's REAL resources. Candidates are the unit's allowed_runtime_classes; each is measured
+    by its REAL production cost (the pricebook cloud-backend cost where the class runs on cloud, else its local
+    floor) and its REAL latency budget (the profile's SLA policy). A tighter SLA generally costs more, so
+    minimize_latency and minimize_cost pick DIFFERENT placements. Returns the objective layer's full, deterministic
+    SelectionTrace (serves_truth False). Placement varies cost + latency only (determinism/llm/accuracy are impl
+    properties, equal across placements -> they don't distort the choice)."""
+    from src.teleon.objectives import MetricVector, ObjectiveError, select
+    runtime = resolve_resources(unit)["runtime"]
+    if not runtime:
+        raise ObjectiveError(f"unit {unit['spec']['task_id']!r} has no resolvable runtime class to place on")
+    candidates = [
+        (r["runtime_class"],
+         MetricVector(cost=float(r["cloud_cost"] if r["cloud_cost"] is not None else r["local_cost"]),
+                      latency=_sla_seconds(r["sla_policy"])))
+        for r in runtime
+    ]
+    return select(candidates, objective)
+
+
 def _self_test() -> int:
     from jsonschema import Draft202012Validator
 
@@ -308,10 +343,22 @@ def _main(argv: list[str] | None = None) -> int:
     p.add_argument("--list", action="store_true")
     p.add_argument("--descent", action="store_true", help="run the live model->deterministic descent on the real adapt() engine")
     p.add_argument("--resources", action="store_true", help="show each unit's resolved resource details (runtime profile, cost, catalogs, source-authority)")
+    p.add_argument("--objective", metavar="PRESET", help="show each unit's objective-driven placement (e.g. minimize_cost | minimize_latency | balanced)")
     p.add_argument("--json", action="store_true")
     a = p.parse_args(argv)
     if a.self_test:
         return _self_test()
+    if a.objective:
+        from src.teleon.objectives import PRESETS
+        if a.objective not in PRESETS:
+            print(f"unknown objective {a.objective!r}; choose one of: {', '.join(sorted(PRESETS))}")
+            return 2
+        obj = PRESETS[a.objective]
+        for u in _seed()["units"]:
+            sel = select_placement(u, obj)
+            ranked = "  ".join(f"{r['impl_id']}={r['score']}" for r in sel["ranked"])
+            print(f"  {u['variety']:22} -> {sel['chosen']:20} under {a.objective}   [{ranked}]")
+        return 0
     if a.descent:
         print(json.dumps(demonstrate_descent("model"), indent=2))
         return 0
