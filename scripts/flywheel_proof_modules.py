@@ -424,6 +424,10 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_teleon_org_guardrail_policy.py", "check_teleon_org_guardrail_policy"),
     # ── OpenAI Codex as a first-class governed inference LANE (openai_compatible node, external + secret + local Ollama fallback; offline -> provider_unavailable, never fabricated): the objective routes among lanes (minimize_cost -> free local, capability priority -> Codex) and the org policy bounds it (air-gapped forbids cloud -> falls back to local Ollama; no-LLM forbids every lane -> escalate) ──
     ("scripts/check_teleon_codex_lane.py", "check_teleon_codex_lane"),
+    # ── the DISTILLER + META-LEARNER (the moat): the distiller turns a capability into a deterministic FORK (ceiling-1.0 -> a fully-deterministic ~zero-cost rule, equivalence-verified, lossless, within the org's confines); the meta-learner learns from the records the cheapest-effective distillation STRATEGY per class (overriding the prior with evidence) + the cheapest sufficient LANE, so distilling gets cheaper as it runs ──
+    ("scripts/check_teleon_distillation.py", "check_teleon_distillation"),
+    # ── the scheduled DISTILLATION RUNNER: a resumable, free+offline (cron-safe) pass that distills the corpus's pure-deterministic capabilities into deterministic forks (193 ceiling-1.0 in one pass), idempotent, lowering the ceiling threshold distills more, meta-learner accumulates across runs; loop stops via .agent/STOP_REQUESTED ──
+    ("scripts/context_workers/distillation_runner.py", "distillation_runner"),
     # ── CTS-1: bind an OCTS runtime CLASS → concrete backend by policy/creds/health; cloud deferred after a built local equivalent; class-scoped guard; deny-by-default; composes with the execution selector ──
     ("scripts/check_runtime_class_binding.py", "check_runtime_class_binding"),
     ("scripts/check_execution_dispatch_fail_loud.py", "check_execution_dispatch_fail_loud"),

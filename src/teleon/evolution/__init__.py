@@ -33,9 +33,19 @@ from src.teleon.evolution.capability_graph import (
     record_heal,
 )
 from src.teleon.evolution.descent import descent_decision, plan_descent_to_determinism
+from src.teleon.evolution.distiller import (
+    STRATEGIES,
+    DistillationRecord,
+    choose_strategy,
+    distill,
+    distill_candidate,
+)
+from src.teleon.evolution.meta_learner import DistillationMetaLearner, class_key
 
 __all__ = [
     "CapabilityEvolutionGraph", "RunnerNode", "EvolutionEdge", "EvolutionError",
     "EDGE_FORK", "EDGE_DISTILL", "EDGE_PROMOTE", "EDGE_ROLLBACK", "EDGE_HEAL", "EDGE_KINDS",
     "record_heal", "descent_decision", "plan_descent_to_determinism",
+    "distill", "distill_candidate", "DistillationRecord", "choose_strategy", "STRATEGIES",
+    "DistillationMetaLearner", "class_key",
 ]
