@@ -18,10 +18,21 @@ chain — are now real products, not just literature (PROV-AGENT / "Tool Receipt
 | **Fetch.ai AEVS** (May 2026) | publicly verifiable, tamper-evident receipts per tool call; on-chain audit trail | execution provenance, on-chain |
 | **Diagrid** (Dapr 1.18, Jun 2026) | Workflow History Signing → tamper-evident, independently verifiable execution records + Workflow Attestation | workflow provenance |
 | **NexArt** | SHA-256 sealed run records + independent Ed25519 receipts | execution provenance |
+| **IAGA-Sentinel** (open, 152★; added 2026-06-18 via DeepRepo intake) | Ed25519+Merkle signed receipts, offline-replayable via a standalone `iaga-verify` binary, explicitly mapped to **EU AI Act Art.12 / Annex IV**; Dictum policy DSL with **egress allowlisting (`url_host`) + PII detection (`secret_ref`)**; honest `is_authoritative:false` for soft (non-kernel) enforcement; AISec 2026 paper | execution provenance + soft policy, EU-sovereign, **open-source** |
 
 **They all sign EXECUTION (what an agent DID).** None do governed **TRUTH promotion** — a deterministic
 gate that *promotes or rejects a FACT* (source precedence, revocation/CDC, capability-lift admission),
 on a regulated-fact beachhead. That gap is the moat to lead with.
+
+**IAGA-Sentinel (added 2026-06-18 via the DeepRepo intake)** is the first **open-source** entrant and the
+most regulatory-specific (explicit EU AI Act Art.12 / Annex IV mapping). Two notes sharpen our read: (1) it
+also ships **egress allowlisting + PII detection** in its Dictum policy DSL — overlapping Teleon's egress-
+governance plane (`src/teleon/egress/`), so it is a competitor on *both* the receipt rail and egress control;
+(2) it still signs EXECUTION, not TRUTH — no source-authority precedence, no fact revocation/CDC, no
+capability-lift admission. Its `is_authoritative:false` honesty mirrors our own `serves_truth:false`
+discipline — convergent design *validates the category*. Disposition: competitor-on-receipts /
+complement-on-truth; its signed execution receipt could be one evidence input behind a port (never our truth
+authority). Do not vendor/execute. Re-verify quarterly — this space moves in weeks.
 
 ## Consolidation: data platforms are buying the AI feedback loop
 - **ClickHouse acquired Langfuse** (Jan 2026) alongside a **$400M Series D at a $15B valuation**
@@ -37,9 +48,31 @@ Implication: standalone observability/evals are being absorbed into data platfor
 position is **above any data platform** — a portable, provider-neutral governance/verification layer
 the customer carries between runtimes (the opposite of centralizing telemetry into one vendor).
 
+## Format standardization: a hyperscaler just standardized the context FORMAT (added 2026-06-18)
+- **Google Cloud Open Knowledge Format (OKF) v0.1** (announced 2026-06-12; spec at
+  `GoogleCloudPlatform/knowledge-catalog/okf/SPEC.md`) formalizes the emergent "LLM-wiki" pattern into a
+  vendor-neutral portable standard: a directory of markdown **concept** files + YAML frontmatter (`type`
+  required; `title`/`description`/`resource`/`tags`/`timestamp` optional), markdown links forming a concept
+  graph, optional `index.md` (progressive disclosure) + `log.md` (chronological history). "If you can `cat` a
+  file you can read it; if you can `git clone` you can ship it." Reference impls: a BigQuery enrichment agent,
+  a static HTML visualizer, sample bundles; Google's Knowledge Catalog ingests OKF natively.
+- **Read for us — this is a tailwind, not a threat, and it sharpens the wedge.** OKF standardizes the
+  context *transport/format* (one skeptic: *"a standard, or just a folder?"*). It carries **no verification,
+  no earned source authority, no CDC/revocation, no truth-promotion, no capability-lift admission** — exactly
+  the assurance layer Baltor/Teleon sit ABOVE. A hyperscaler standardizing portable, file-based, git-shippable
+  context **validates the context-layer TAM and the "carry it between runtimes" thesis**, and gives us a clean
+  one-liner: *"OKF is how context travels; Baltor governs whether the context in it is true, current, and
+  provable."* Disposition: **adopt OKF as a candidate export/ingest format** behind the native-format-preservation
+  port (a 9th output mode alongside our governed sidecars — the same "adopt the standard, wrap it with governance"
+  play as PROV/OpenLineage/WebAnnotation/JSONPatch), so a governed Baltor context pack ships as an OKF bundle with
+  our receipts/lineage as the assurance sidecar. Do not vendor/run the reference BigQuery agent. Re-verify as the
+  spec moves past v0.1.
+
 ## Why now (hardened)
-- **EU AI Act full enforcement Aug 2, 2026** — 72-hour incident reporting requires reconstructing
-  *what an agent did and why* within 3 days → direct demand for receipts + lineage. A hard, dated wedge.
+- **EU AI Act full application Aug 2, 2026** — Article 73 serious-incident reporting requires reconstructing
+  *what an agent did and why* on a tiered clock (2 days widespread/critical-infra, 10 days a death, 15 days
+  otherwise) → direct demand for receipts + lineage. A hard, dated wedge. (The flat "72-hour" figure is
+  GDPR Art. 33, a separate regime — don't conflate.)
 - **OWASP Top-10 for Agentic Applications** (Dec 2025) — first formal taxonomy (goal hijacking, tool
   misuse, identity abuse, memory poisoning, cascading failures, rogue agents). A framework to map
   governance coverage against in the pitch.

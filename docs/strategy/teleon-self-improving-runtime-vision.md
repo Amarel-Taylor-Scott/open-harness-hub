@@ -371,7 +371,7 @@ promoted arrangement into a runtime unit.
   instantiator renders **CANDIDATE** shapes only (`src/teleon/templates/instantiator.py`,
   `CANDIDATE_STATUS=200`, `_ACTIVE_STATUS=400`; memory [[shared-template-registry]]).
   Generated objects are never born active.
-- **Component / subcomponent registry** — the 2,655-component substrate
+- **Component / subcomponent registry** — the ⟦computed: 2,678⟧-component substrate
   (`build_component_id_index.py --check-fresh`); pre-LLM / LLM / post-LLM / runtime
   components are the building blocks (`CLAUDE.md` North Star).
 - **Knowledge Corpus / context packs** — facts with a `retrieval` trigger (keyword/

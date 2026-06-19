@@ -10,7 +10,11 @@ here is aspirational copy. Numbers marked ⟦computed⟧ must be regenerated at 
 
 > **Baltor: verified context for AI agents.**
 
-(Alternative if applying as the platform: "Teleon: receipts and gates for AI capabilities.")
+Applying entity: **AI Done Right** (holding company). The portfolio applies as one, led by Baltor — not
+Baltor *or* Teleon: **Baltor** is the flagship applied product and customer-facing wedge (the 50-char line
+above = what a customer buys); **Teleon** is the deterministic capability runtime beneath it; the
+**Open\*Hubs** are the open registry + ecosystem. (Owner ratified 2026-06-18: lead with Baltor, keep all
+entities — final headline polish is the owner's.)
 
 ## What does your company do?
 
@@ -22,8 +26,9 @@ was verified (when, against what), and revokes facts when sources change (CDC). 
 Baltor disposes.
 Under it sits Teleon, a deterministic capability runtime — every capability is promoted or
 rejected by eval gates with an evidence ledger, never by vibes — and OpenHarnessHub, an open
-registry of ⟦computed: 2,655⟧ governed pipeline components with provenance and measured-lift
-admission.
+registry of ⟦computed: 2,678⟧ governed pipeline components (⟦computed: 1,059⟧ of them action-ready
+across the six Action types — adapters, personas, processors, harnesses, rubrics, tools) — each with
+provenance and measured-lift admission.
 
 ## Why now?
 
@@ -33,9 +38,11 @@ admission.
   Nobody governs TRUTH — promote / reject / revoke a FACT by earned source authority on a
   regulated beachhead.** Verified across ~95 YC companies (`docs/strategy/yc-context-landscape-2026-06.md`)
   + a 2026-06-13 landscape sweep (`docs/research/agent-governance-landscape-2026-06-13.md`).
-- **The EU AI Act reaches full enforcement Aug 2, 2026** — 72-hour incident reporting forces
-  organizations to reconstruct what an agent did *and why* within three days. That is portable
-  receipts + fact lineage, on a hard deadline.
+- **The EU AI Act reaches full application Aug 2, 2026** — Article 73 serious-incident reporting forces
+  organizations to reconstruct *what an agent did and why* on a hard clock: as little as 2 days (a
+  widespread infringement or critical-infrastructure disruption), 10 days (a death), 15 days at the
+  outside. That is portable receipts + fact lineage, on a deadline. (The flat 72-hour figure is GDPR
+  Art. 33 — a separate regime; we don't conflate them.)
 - The 2025–26 consolidation wave (Langfuse→ClickHouse at a $15B valuation, Helicone+Trieve→Mintlify,
   Traceloop→ServiceNow, Context.ai→OpenAI, Invariant→Snyk, Lakera→CheckPoint) proves standalone
   observability/evals/security are features — and data platforms (ClickHouse, Atlan) are racing to
@@ -59,11 +66,13 @@ admission.
 
 ## Progress / traction (all reproducible from the repo)
 
-- Working end-to-end demo plane: 4 product apps + 21 hub registries + 25 identity realms
-  (separate-realm auth, hash-only keys), live model plane (cloud LLM + promotable local
-  embeddings), Teleon capabilities BUILT by a model and judged by a deterministic gate with
-  receipts per attempt, real pipeline runs with citation checks.
-- ⟦computed: 2,655⟧-component governed registry; provenance + two-axis admission encoded in
+- Working end-to-end demo plane: 4 product apps + ⟦computed: 22⟧ hub registries + 25 identity realms
+  (separate-realm auth, hash-only keys), a model plane that is offline-deterministic by default
+  (reproducible from a clean checkout) with a cloud LLM behind a bring-your-own key — the narrated
+  journey videos were filmed against a live cloud model — plus promotable local embeddings; Teleon
+  capabilities BUILT by a model and judged by a deterministic gate with receipts per attempt; real
+  pipeline runs with citation checks.
+- ⟦computed: 2,678⟧-component governed registry; provenance + two-axis admission encoded in
   CI gates; ⟦computed: 29⟧ narrated user-journey videos recorded against the live plane
   (4xx/5xx tripwires — zero HTTP errors on film).
 - Deploy layer: one topology file renders Fly.io configs + docker-compose, with a

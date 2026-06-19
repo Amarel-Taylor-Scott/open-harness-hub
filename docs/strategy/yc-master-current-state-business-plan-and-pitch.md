@@ -43,7 +43,7 @@ unusual for pre-seed and it is the thing to lead with.
 |---|---|---|
 | Six-stage governed engine (Source → Reconciliation → Anti-Fragility → Enhancement → Optimization → Consumption) + a universal **Verification rail** | **working** | `scripts/demo_offline_full_baltor.py --self-test` |
 | **CFPB correctness invariant** (end-to-end): answer = "10 business days" (Reg-E wins by authority); the 30-day FAQ held out; narrative allegations held out; only the reconciled winner served; lineage + receipt on everything | **working, always-on** | `check_offline_full_demo`, `check_contextops_cfpb_reference` |
-| **OFAC sanctions** connector — deterministic + a synthetic-fixture conformance test (always-green) **AND a dated live catch**: a 2026-06-14 `--live` run against the real OFAC SDN list (19,065 rows, hash `e30f6077`) caught a would-be violation — an internal doc clearing an entity the live list designates (program CUBA). Receipt: `docs/strategy/evidence/ofac-live-run-2026-06-14.json` | **working** | `--self-test` (offline) · `--live --demo` (dated run) |
+| **OFAC sanctions** connector — deterministic + a synthetic-fixture conformance test (always-green) **AND a dated live catch**: a 2026-06-14 `--live` run against the real OFAC SDN list (the real 19,065-row source list, hash `e30f6077`; this dated run parsed a 5-row `--limit` sample) caught a *planted* would-be violation — a SYNTHETIC internal claim asserting CLEAR on a currently-designated entity (program CUBA), held out of the served corpus (the clearing claim is the demo's adversarial test input; the live SDN fetch + hash are real). Receipt: `docs/strategy/evidence/ofac-live-run-2026-06-14.json` | **working** | `--self-test` (offline) · `--live --demo` (dated run) |
 | Recursive **document decomposition** (1,000-page proven), atomic facts vs held-out allegations | **working** | `scripts/ingest/document_decompose.py --self-test` |
 | **Worker fleet**: durable SQLite ledger, atomic claim (`BEGIN IMMEDIATE` = Postgres `FOR UPDATE SKIP LOCKED`), leases, retry/DLQ, idempotency, dependency ordering | **working, cross-process** | `check_durable_fleet_ledger`, `check_worker_fleet_supervisor_full_stack` |
 | **Live supervisor scaling**: leader/shard leases, two-process failover, no duplicate scheduling | **working** | `check_live_supervisor_two_process`, `…_full_stack` |
@@ -52,11 +52,11 @@ unusual for pre-seed and it is the thing to lead with.
 | Native-format preservation + governed sidecars; temporal fact graph; context-rot/freshness CDC; memory-as-candidate-context (never truth) | **working** | respective `check_*` proofs |
 | **Governance spine**: every served fact has source handles + receipt + lineage; promotion boundary (candidate ≠ tenant-visible); LLM/agent/memory/browser output is never truth | **enforced by proofs** | the no-bypass / no-truth redteam proofs |
 
-**Deterministic proof count (computed, recompute with `python3 -c "from scripts.flywheel_proof_modules import PROOF_MODULES; print(len(PROOF_MODULES))"`):** **305 green** as of 2026-06-06. A stdlib-only Python 3.14 watchdog re-runs all 305 every ~10 min; any regression is caught within one tick.
+**Deterministic proof count (computed, recompute with `python3 -c "from scripts.flywheel_proof_modules import PROOF_MODULES; print(len(PROOF_MODULES))"`):** **⟦computed: 481⟧ green** as of 2026-06-18. A stdlib-only Python 3.14 watchdog re-runs all ⟦computed: 481⟧ every ~10 min; any regression is caught within one tick.
 
-**Catalog snapshot (dated; recompute `find catalog/<type> -name '*.yaml' | wc -l`):** as of 2026-06-06 —
-adapters 20 · personas 233 · processors 179 · harnesses 195 · rubrics 245 · tools 173 (**1,045 components**) ·
-pipelines 420. **Honesty note:** this is a *seeded* component library, not 1,045 measured-lift-verified
+**Catalog snapshot (dated; recompute `find catalog/<type> -name '*.yaml' | wc -l`):** as of 2026-06-18 —
+adapters 33 · personas 233 · processors 180 · harnesses 195 · rubrics 245 · tools 173 (**1,059 components**) ·
+pipelines 420. **Honesty note:** this is a *seeded* component library, not 1,059 measured-lift-verified
 components. The moat is the **governed engine + the measured-lift admission gate + the proofs**, not the raw
 count. Lead the pitch with the engine; the catalog is the developer funnel and the upgrade-path substrate.
 
@@ -247,7 +247,7 @@ provenance/eval contract. Bottom-up wedge first (regulated-context buyers), expa
    Verified · Current · Efficient · Provable.
 5. **Demo** — the CFPB correctness invariant, live: Reg-E "10 business days" served; the 30-day FAQ and the
    narrative allegation **held out**; only the reconciled winner served, with its source authority and a
-   receipt. Then OFAC: the connector deterministically flags a HELD-OUT would-be sanctions violation (synthetic fixture; real SDN fetch on demand). *Runs offline, deterministically.*
+   receipt. Then OFAC: the connector deterministically flags a HELD-OUT would-be sanctions violation (an always-green synthetic conformance test, plus a dated 2026-06-14 `--live` catch against the real SDN list). *Runs offline, deterministically.*
 6. **Product / how it works** — the six stages + verification rail; agents **PROPOSE**, Baltor **DISPOSES**;
    memory/LLM/browser output is candidate context, never truth; the promotion boundary (candidate ≠ served).
 7. **Moat** — **Verified + Current + Provable + cost-efficient governed DATA** + the **Determinism Factory**
@@ -265,8 +265,8 @@ provenance/eval contract. Bottom-up wedge first (regulated-context buyers), expa
 12. **Competition** — 2×2 / table: enterprise search (Glean), RAG platforms (Contextual AI — absorbed into
     Google DeepMind May 2026), vector DBs, knowledge graphs, GRC tools, source intelligence. Baltor's column:
     *verify + package + prove facts before agents use them; lifecycle-managed fact state with history.*
-13. **Traction / milestones** — *be honest:* a working governed engine (⟦computed: 463⟧ deterministic proofs, full offline
-    demo, OFAC conformance proof on a synthetic fixture) + locked brand + owned domains. Seed-readiness gates: 3 design partners, 1 paid
+13. **Traction / milestones** — *be honest:* a working governed engine (⟦computed: 481⟧ deterministic proofs, full offline
+    demo, OFAC: an always-green synthetic conformance proof AND a dated 2026-06-14 `--live` catch on the real SDN list) + locked brand + owned domains. Seed-readiness gates: 3 design partners, 1 paid
     pilot, 1 exported package consumed by a real downstream agent/RAG stack, measured stale-fact catch + manual-
     review reduction.
 14. **Team** — technical founder; training-free / frozen-model + legal-AI background (favors structural,
@@ -299,9 +299,9 @@ unilaterally on brand/strategy — confirm with owner, then supersede the stale 
    gtm-launch-guide, gtm-onepager, pricing pro-forma, several competitive-* docs, acquihire/acquisition). Make
    **this doc the index/master** and demote the rest to depth-references; merge the 3–4 competitive docs into
    one.
-5. **Make "what counts as a real component" unambiguous.** 1,045 catalog entries vs measured-lift-verified
+5. **Make "what counts as a real component" unambiguous.** 1,059 catalog entries vs measured-lift-verified
    components — publish the distinction (the two-axis lift gate is the admission rule) so the deck never
-   implies 1,045 proven components.
+   implies 1,059 proven components.
 6. **Capability catalog → real adapters behind the CLOUD-DEFER discipline.** 30 slots are mostly stdlib stubs;
    the consolidation is to land each first real adapter *only after* a local equivalent + contract test +
    fallback exist (mirror the execution-backend work just shipped).
@@ -316,7 +316,7 @@ unilaterally on brand/strategy — confirm with owner, then supersede the stale 
 | **Frontier models close the "capability gap"** | moat is **governed DATA + provenance + freshness + receipts**, not capability; the lift gate is an internal selection criterion, not the external story |
 | **No traction yet** | lead with the working engine + the design-partner gates; the asset is the proof, not the logo wall |
 | **Services-heavy early margin** | Determinism Factory turns each expensive resolution into reusable cheap infrastructure; COGS discipline in the pricing doc |
-| **Over-broad surface (1,045 components, 30 slots)** | the engine is the product; the catalog is the funnel; the lift gate keeps the catalog honest |
+| **Over-broad surface (1,059 components, 30 slots)** | the engine is the product; the catalog is the funnel; the lift gate keeps the catalog honest |
 | **Regulated-domain liability** | assurance brand discipline — never claim "100% accurate"; review queues, signed publishers, held-out unverified facts, audit trail |
 
 ---
@@ -338,6 +338,6 @@ unilaterally on brand/strategy — confirm with owner, then supersede the stale 
 
 *Warrant: written on clear owner intent (this request). Grounded in the LOCKED brand
 (`brand-architecture.md`), the authoritative pricing pro forma, the PMF/TAM doc, the live execution-backend
-work (305 green proofs as of 2026-06-06), and the capability catalog. Pricing, raise size, TAM math, and
+work (⟦computed: 481⟧ green proofs as of 2026-06-18), and the capability catalog. Pricing, raise size, TAM math, and
 public tier names are flagged ⟦DECISION⟧ and must not be treated as decided. No brand/strategy decision was
 made unilaterally; §6 lists the supersessions to confirm with the owner.*
