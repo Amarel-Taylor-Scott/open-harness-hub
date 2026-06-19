@@ -40,6 +40,7 @@ from src.teleon.evolution.distiller import (
     distill,
     distill_candidate,
 )
+from src.teleon.evolution.impl_finder import ExternalImplSearchPort, find_implementations
 from src.teleon.evolution.meta_learner import DistillationMetaLearner, class_key
 
 __all__ = [
@@ -48,4 +49,5 @@ __all__ = [
     "record_heal", "descent_decision", "plan_descent_to_determinism",
     "distill", "distill_candidate", "DistillationRecord", "choose_strategy", "STRATEGIES",
     "DistillationMetaLearner", "class_key",
+    "find_implementations", "ExternalImplSearchPort",
 ]

@@ -434,6 +434,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_teleon_bulk_registry_ingest.py", "check_teleon_bulk_registry_ingest"),
     # ── the cross-capability NETWORK graph + metadata enrichment: detects alternative_of endpoint sets (same need, different provider), captures composability via category adjacency, and exposes a per-capability profile + network features that EXTEND the skills-DB feature vector — so distillation is learned from STRUCTURE, not just per-item features (complements each capability's per-capability evolution/distillation lineage) ──
     ("scripts/check_teleon_capability_network.py", "check_teleon_capability_network"),
+    # ── the deterministic-IMPLEMENTATION FINDER: on capability entry, search the corpus (cross-category, by intent) for a MORE-deterministic / cheaper implementation (an LLM date-parser finds a deterministic library -> replace the model); already-deterministic caps need none; unmatched ones route to external search (a governed seam off by default behind ExternalImplSearchPort). Proposes, never disposes; never truth ──
+    ("scripts/check_teleon_impl_finder.py", "check_teleon_impl_finder"),
     # ── CTS-1: bind an OCTS runtime CLASS → concrete backend by policy/creds/health; cloud deferred after a built local equivalent; class-scoped guard; deny-by-default; composes with the execution selector ──
     ("scripts/check_runtime_class_binding.py", "check_runtime_class_binding"),
     ("scripts/check_execution_dispatch_fail_loud.py", "check_execution_dispatch_fail_loud"),
