@@ -11,7 +11,7 @@ truth. Pure + deterministic; Teleon-layer — never imports src.baltor.
 from __future__ import annotations
 
 from src.teleon.evolution.capability_graph import CapabilityEvolutionGraph, RunnerNode
-from src.teleon.evolution.descent_axes import descent_strategies
+from src.teleon.evolution.descent_axes import descent_strategies, descent_strategy
 from src.teleon.evolution.distiller import _MODEL_ROOT_COST, _MODEL_ROOT_DETERMINISM, DistillationRecord
 
 _DESCENT_APPLY_COST = 0.10  # one-time cost to apply a generic descent (wire the binding + an eval) — refined by the meta-learner
@@ -19,14 +19,19 @@ _DESCENT_APPLY_COST = 0.10  # one-time cost to apply a generic descent (wire the
 
 def descend(capability_slot: str, axis: str, *, category: str = "other",
             parent_determinism: float = _MODEL_ROOT_DETERMINISM, parent_cost: float = _MODEL_ROOT_COST,
-            coverage: float = 1.0, policy=None, registry: dict | None = None) -> dict:
-    """Improve ``capability_slot`` along ``axis`` using the registered strategy. Builds a fork (improved on the
-    axis, determinism/coverage non-regressing so the evolution-graph edge is valid), checks the org ``policy``, and
+            coverage: float = 1.0, strategy_id: str | None = None, policy=None, registry: dict | None = None) -> dict:
+    """Improve ``capability_slot`` along ``axis`` using the registered strategy (or a specific ``strategy_id`` —
+    e.g. 'formal_proof_verification' for the Lean/SMT verifiability strategy). Builds a fork (improved on the axis,
+    determinism/coverage non-regressing so the evolution-graph edge is valid), checks the org ``policy``, and
     returns the graph + DistillationRecord + the strategy's binding/reuses/measurement metadata."""
-    strategies = descent_strategies(registry=registry)
-    if axis not in strategies:
-        raise KeyError(f"no descent strategy registered for axis {axis!r}; have: {sorted(strategies)}")
-    s = strategies[axis]
+    if strategy_id is not None:
+        s = descent_strategy(strategy_id, registry=registry)
+        axis = s["axis"]
+    else:
+        strategies = descent_strategies(registry=registry)
+        if axis not in strategies:
+            raise KeyError(f"no descent strategy registered for axis {axis!r}; have: {sorted(strategies)}")
+        s = strategies[axis]
     cov = max(0.0, min(1.0, float(coverage)))
     det = min(1.0, max(0.0, parent_determinism + float(s.get("fork_determinism_delta", 0.0))))
     cost = max(0.0, parent_cost + float(s.get("fork_cost_delta", 0.0)))

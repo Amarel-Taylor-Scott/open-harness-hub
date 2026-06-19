@@ -70,10 +70,37 @@ def is_axis(name: str) -> bool:
     return name in DESCENT_AXES
 
 
-def descent_strategies(*, registry: dict | None = None) -> dict:
-    """The descent-strategy registry keyed by axis (the fork mechanism per axis — single source, config not code)."""
+def _strategy_list(registry: dict | None = None) -> list:
     data = registry if registry is not None else json.loads(_STRATEGY_REGISTRY_PATH.read_text(encoding="utf-8"))
-    return {s["axis"]: s for s in data.get("strategies", [])}
+    return list(data.get("strategies", []))
+
+
+def descent_strategies(*, registry: dict | None = None) -> dict:
+    """The PRIMARY descent strategy per axis (first registered wins). Config, not code — the single source of the
+    fork mechanism per axis. (An axis may have multiple strategies; use all_descent_strategies / descent_strategy
+    to reach alternates like formal_proof_verification.)"""
+    out: dict = {}
+    for s in _strategy_list(registry):
+        out.setdefault(s["axis"], s)
+    return out
+
+
+def all_descent_strategies(*, registry: dict | None = None) -> dict:
+    """Every descent strategy keyed by strategy_id (supports multiple strategies per axis)."""
+    return {s["strategy_id"]: s for s in _strategy_list(registry)}
+
+
+def descent_strategy(strategy_id: str, *, registry: dict | None = None) -> dict:
+    """One descent strategy by id (e.g. 'formal_proof_verification'). Raises on an unknown id — never a silent pick."""
+    strategies = all_descent_strategies(registry=registry)
+    if strategy_id not in strategies:
+        raise KeyError(f"unknown descent strategy {strategy_id!r}; have: {sorted(strategies)}")
+    return strategies[strategy_id]
+
+
+def strategies_for_axis(axis: str, *, registry: dict | None = None) -> list:
+    """All strategies registered for an axis (e.g. verifiability -> [receipt_binding, formal_proof_verification])."""
+    return [s for s in _strategy_list(registry) if s["axis"] == axis]
 
 
 def improves(axis: str, before: float, after: float) -> bool:

@@ -28,12 +28,22 @@ from src.teleon.evolution import (
     DESCENT_AXES,
     descend,
     descent_strategies,
+    descent_strategy,
     measure_descent,
+    strategies_for_axis,
 )
 from src.teleon.governance import load_policy
 
 _NEW_AXES = ("verifiability", "reliability", "locality", "specialization", "privacy",
              "reproducibility", "portability", "resilience", "energy", "safety")
+
+
+def _raises(fn) -> bool:
+    try:
+        fn()
+        return False
+    except (KeyError, ValueError):
+        return True
 
 
 def _self_test() -> int:
@@ -83,6 +93,20 @@ def _self_test() -> int:
     # a verifiability fork on an ALREADY-deterministic runner is accepted even by the strict org.
     det_ok = descend("cap-v3", "verifiability", parent_determinism=1.0, policy=load_policy("deterministic-audit"))
     ck("a verifiability fork on a deterministic runner is accepted by a deterministic-only org", det_ok["applied"] is True)
+
+    # FORMAL-PROOF verifiability strategy (vs Pramaana): an axis can have MULTIPLE strategies; descend by id.
+    vstrats = strategies_for_axis("verifiability")
+    ck("verifiability has MULTIPLE strategies (receipt_binding + formal_proof_verification)",
+       {s["strategy_id"] for s in vstrats} >= {"receipt_binding", "formal_proof_verification"})
+    fp = descend("reg-tax-deduction", "verifiability", strategy_id="formal_proof_verification")
+    ck("descend(strategy_id='formal_proof_verification') builds a formally_verified fork improving verifiability+determinism",
+       fp["fork_kind"] == "formally_verified" and {"verifiability", "determinism"} <= set(fp["improves"])
+       and any(r["kind"] == "formally_verified" for r in fp["graph"]["runners"]))
+    ck("the formal-proof strategy COMPOSES with freshness + source-authority (strictly broader than a static prover)",
+       "freshness" in descent_strategy("formal_proof_verification")["reuses"]
+       and "authorit" in descent_strategy("formal_proof_verification")["reuses"].lower())
+    ck("descend by an unknown strategy_id fails loud",
+       _raises(lambda: descend("c", "verifiability", strategy_id="vibes_based_proof")))
 
     # unknown axis fails loud.
     raised = False

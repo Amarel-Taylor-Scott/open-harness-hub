@@ -37,10 +37,13 @@ from src.teleon.evolution.descent_axes import (
     DESCENT_AXES,
     HIGHER_IS_BETTER_AXES,
     LOWER_IS_BETTER_AXES,
+    all_descent_strategies,
     descent_strategies,
+    descent_strategy,
     freshness_policy,
     improves,
     is_axis,
+    strategies_for_axis,
 )
 from src.teleon.evolution.descent_measurement import cost_speed_report, measure_descent
 from src.teleon.evolution.descender import descend
@@ -64,5 +67,6 @@ __all__ = [
     "STRATEGY_FRESHNESS_SYNC", "DistillationMetaLearner", "class_key",
     "find_implementations", "ExternalImplSearchPort",
     "DESCENT_AXES", "LOWER_IS_BETTER_AXES", "HIGHER_IS_BETTER_AXES", "freshness_policy", "improves", "is_axis",
-    "descent_strategies", "descend", "measure_descent", "cost_speed_report",
+    "descent_strategies", "all_descent_strategies", "descent_strategy", "strategies_for_axis",
+    "descend", "measure_descent", "cost_speed_report",
 ]

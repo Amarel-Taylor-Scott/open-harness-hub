@@ -440,6 +440,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_teleon_descent_axes.py", "check_teleon_descent_axes"),
     # ── descent is an extensible MENU: 15 canonical axes (efficiency + trust/robustness/openness — verifiability/reliability/locality/specialization/privacy/reproducibility/portability/resilience/energy/safety) with a config-driven strategy registry + a GENERIC descender that builds a valid, lossless, policy-checked, never-truth fork for ANY registered axis; adding an axis is a registry entry, not new code; measured per axis ──
     ("scripts/check_teleon_descent_strategies.py", "check_teleon_descent_strategies"),
+    # ── RuleArena (ACL-2025) benchmark: on rule-guided reasoning (airline baggage/tax brackets/overtime/NBA trade/late fees) a distilled DETERMINISTIC rule fork is 100% accurate while a bare model mis-applies rules — the measured accuracy LIFT (the moat, measured, not asserted; the seed of the A/B strategy harness) ──
+    ("scripts/eval/rulearena_benchmark.py", "rulearena_benchmark"),
     # ── CTS-1: bind an OCTS runtime CLASS → concrete backend by policy/creds/health; cloud deferred after a built local equivalent; class-scoped guard; deny-by-default; composes with the execution selector ──
     ("scripts/check_runtime_class_binding.py", "check_runtime_class_binding"),
     ("scripts/check_execution_dispatch_fail_loud.py", "check_execution_dispatch_fail_loud"),

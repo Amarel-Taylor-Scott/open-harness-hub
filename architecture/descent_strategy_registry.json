@@ -12,6 +12,16 @@
       "note": "the Baltor thesis as a descent axis: agents PROPOSE, the receipt rail makes it PROVABLE."
     },
     {
+      "axis": "verifiability", "strategy_id": "formal_proof_verification", "fork_kind": "formally_verified",
+      "improves": ["verifiability", "determinism"],
+      "binds": "a machine-checkable proof (Lean / SMT / Z3) that the answer satisfies the domain's formalized rules; returns the proof OR the violated rule, never an unproven answer",
+      "reuses": "the deterministic-rule layer + the verification foundry; COMPOSES with the freshness axis (re-prove when the source/spec changes) + source-authority (prove which spec is the authoritative one)",
+      "governed_by": "won't return unless proved; the formal spec is itself version-pinned + freshness-synced so a stale spec is held out",
+      "measurement": "fraction of answers with a machine-checkable proof; proof-coverage of the formalizable rule set",
+      "fork_determinism_delta": 0.0, "fork_cost_delta": 0.05,
+      "note": "the Pramaana/AlphaProof formal-verification approach as ONE verifiability strategy for FORMALIZABLE domains — strictly broader for us: freshness keeps the proven spec CURRENT and source-authority proves the spec is authoritative, closing the bounded limitation formal-proof systems openly admit (a proof is only valid w.r.t. its encoded spec)."
+    },
+    {
       "axis": "reliability", "strategy_id": "multi_provider_failover", "fork_kind": "redundant",
       "improves": ["reliability"], "binds": "an ENDPOINT SET (primary + ordered fallbacks) for one capability",
       "reuses": "src/teleon/endpoints (the alternative providers ARE the failover set)",
