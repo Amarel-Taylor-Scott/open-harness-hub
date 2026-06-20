@@ -230,6 +230,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_framework_integration.py", "check_framework_integration"),
     # ── MODALITY CAPABILITY CATALOG: AI-startup capabilities across document/image/text/video/audio/multimodal reverse-engineered into input→output pipelines that all share a DETERMINISTIC spine wrapping an irreducible MODEL CORE; each a tunable cascade (run the spine cheap, escalate to cheapest-capable model core); fully deterministic only where there is no model core; discovery≠trust, never serves truth ──
     ("scripts/check_modality_capability_catalog.py", "check_modality_capability_catalog"),
+    # ── DEFAULT BRAIN POLICY: the cheap Ollama brain (GLM-5.2 orchestrator/distiller-judge, Kimi-k2.7-code reviewer) is the DEFAULT, verifiably cheaper than its frontier escalation (cross-checked vs the model index), which fires only when a confidence/quality bar fails — the descent applied to the brain itself; auth via OLLAMA_API_KEY env ref (value gitignored); never serves truth ──
+    ("scripts/check_default_brain_policy.py", "check_default_brain_policy"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),
