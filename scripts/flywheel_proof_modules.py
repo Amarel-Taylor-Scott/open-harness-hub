@@ -192,6 +192,16 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/ingest_github_signal_intake.py", "ingest_github_signal_intake"),
     # ── CAPABILITY SEEDS (learn-from-them, clean-room): all 10 reviewed repos implemented as 11 governed seeds in src/teleon/seeds — drop-in only for clean licenses, technique-only for copyleft/unstated; each runs real logic + records the lesson + emits a PurposeTask candidate; court-deadline + inference-routing seeds deterministically CORRECT; never serves truth, nothing promoted ──
     ("scripts/check_capability_seeds.py", "check_capability_seeds"),
+    # ── PROFESSION-SCALE SEEDER: generalize the DueCare template beyond migrant-worker protection — 15 professions / 11 sectors derive 55 DURABLE governed capability candidates (license-verification · exclusion-screening · compliance-currency + profession-specific) on the O*NET/WORKBank spine; DueCare is ONE instance; never serves truth, nothing promoted ──
+    ("scripts/check_profession_capability_seeder.py", "check_profession_capability_seeder"),
+    # ── REPO_REFERENCE manifest: external repos cloned for offline study are governed + reconstructable (slug+SHA) WITHOUT republishing — vendorable agrees with the license class (copyleft/unstated/private never vendorable), folder gitignored, every reviewed repo + the DueCare template covered, distilled seeds map to real artifacts ──
+    ("scripts/check_repo_reference_manifest.py", "check_repo_reference_manifest"),
+    # ── FUNDAMENTAL PRIMITIVES taxonomy: ONE canonical map of the system's primitives (data storage/transfer/computation/unit/medium · interop/context/skill standards · k8s/cloud-fn/execution/environment runtime · seven-primitive grammar · the assurance wedge), each mapped to a REAL artifact; all owner-requested families covered; assurance first-class; generated code/file map (no drift); non-destructive index ──
+    ("scripts/check_fundamental_primitives_taxonomy.py", "check_fundamental_primitives_taxonomy"),
+    # ── CODE GRAPH: deterministic ast-based dependency graph (file→file imports + crossing symbols) over src/scripts/local_emulators; upstream/downstream are exact inverses; impact = transitive blast radius; neighbors by file path → "edit 1 file, see what breaks"; stdlib-only, always available; never serves truth ──
+    ("scripts/code_graph.py", "code_graph"),
+    # ── MODEL INDEX (best+cheapest+effective, FRESHNESS-governed): unified index of model cost + live endpoint + download location + quality; selector picks the cheapest FRESH model within a quality floor; stale model facts are HELD OUT and never selected until re-verified (kept-up-to-date is the wedge); never serves truth ──
+    ("scripts/check_model_index.py", "check_model_index"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),
