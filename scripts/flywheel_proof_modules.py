@@ -214,6 +214,10 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_api_and_feed_seeds.py", "check_api_and_feed_seeds"),
     # ── OPENAPI DECONSTRUCTOR: deconstruct an API hub's endpoint SPECS (OpenAPI — how RapidAPI describes every endpoint) into governed capability-seed candidates (input/output contract + endpoint + auth + high determinism); a deconstructed endpoint distills to a deterministic capability via direct_api_rule; the live Playwright/owner-session harvest has a built local emulator (DEFER GATE); discovery≠trust, never serves truth ──
     ("scripts/check_openapi_deconstructor.py", "check_openapi_deconstructor"),
+    # ── PLUGGABLE GIT BACKEND (the brain-blast: Teleon units abstract git primitives): one GitBackendPort backs a capability unit's storage/versioning/diffs on internal git OR the client's GitHub/GitLab/Gitea (same abstraction); governance rides in a SIDECAR (client code stays clean); a backend never serves truth; live external calls owner-gated with an offline mirror (DEFER GATE) ──
+    ("scripts/check_git_backend_port.py", "check_git_backend_port"),
+    # ── CAPABILITY IMPLEMENTATION REGISTRY: a capability is facilitated by a VARIETY of implementations (internal repos/libraries/API hubs/models/LLMs); each declares tools/models/API-keys (env-ref names) + cost + determinism; the selector picks the best COMBINATION by available keys + objective (a key unlocks an option); + the owner workspace inventory staged as candidate capabilities; discovery≠trust, never serves truth ──
+    ("scripts/check_capability_implementation_registry.py", "check_capability_implementation_registry"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),
