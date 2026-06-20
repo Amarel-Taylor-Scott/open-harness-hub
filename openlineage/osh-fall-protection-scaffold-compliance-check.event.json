@@ -1,0 +1,90 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-20T15:47:30.653909+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "90f7a9b1-61e7-455e-99c5-7d0105456971",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-20T15:47:30.653921+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/osh-fall-protection-scaffold-compliance-check",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Review a construction-site safety packet (job hazard analysis, scaffold\ninspection tags, toolbox-talk logs, safety-officer accreditation) for\nfall-protection and scaffolding compliance, grounded in the Philippine\nOccupational Safety and Health Standards (RA 11058 + DOLE Department Order\n198 s. 2018) cross-walked to OSHA 29 CFR 1926 (Subpart L scaffolds, Subpart\nM fall protection, Focus Four). It flags: working at height without fall\nprotection, scaffold erected/used without a competent person, scaffold\ndefects, and a site at/above the size threshold operating without a\nDOLE/PRC-accredited safety officer \u2014 then routes worker-safety flags to the\nDOLE Regional Office (OSH division) alongside the building-code path.\n\nStandard hybrid RAG bundle (Bundle A) over the OSHA-1926 corpus with a\ndeterministic grep pre-screen for the Focus-Four signals; the\nsafety-officer accreditation is an accountability_or_license signal a model\ncannot hold, so its absence is flagged and routed, never assumed satisfied.\nDetection + routing + citations only; no worker PII stored; no advice on\nevading safety requirements."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../osh-fall-protection-scaffold-compliance-check.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/osh-fall-protection-scaffold-compliance-check/output/findings",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "findings (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/osh-fall-protection-scaffold-compliance-check/output/stop_work_recommended",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "stop_work_recommended (boolean)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/osh-fall-protection-scaffold-compliance-check/output/routing_packet",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "routing_packet (object)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/osh-fall-protection-scaffold-compliance-check/output/score",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "score (number)"
+        }
+      }
+    }
+  ]
+}

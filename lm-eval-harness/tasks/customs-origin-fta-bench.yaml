@@ -1,0 +1,64 @@
+# Auto-generated from Open Harness Hub manifest `benchmark/customs-origin-fta-bench` v0.1.0.
+# Edit the source manifest at catalog/benchmarks/customs-origin-fta-bench.yaml and re-run
+# `python scripts/emit/lm_eval_harness.py`.
+task: customs-origin-fta-bench
+tag:
+- customs-origin-fta
+- evaluation
+- expansion-v4
+- verification
+description: Synthetic benchmark for customs origin fta review quality, evidence grounding, and redaction safety.
+dataset_path: open-harness-hub/customs-origin-fta-samples
+dataset_name: null
+output_type: generate_until
+training_split: train
+validation_split: val
+test_split: test
+doc_to_text: '# Persona: persona/fta-origin-reviewer
+
+
+  {{prompt}}'
+doc_to_target: '{{ideal}}'
+generation_kwargs:
+  max_gen_toks: 512
+  temperature: 0.0
+  top_p: 1.0
+  until:
+  - '
+
+
+    '
+metric_list:
+- metric: domain_coverage
+  aggregation: mean
+  higher_is_better: true
+- metric: evidence_grounding
+  aggregation: mean
+  higher_is_better: true
+- metric: severity_confidence
+  aggregation: mean
+  higher_is_better: true
+- metric: evidence_gap_quality
+  aggregation: mean
+  higher_is_better: true
+- metric: actionability
+  aggregation: mean
+  higher_is_better: true
+- metric: auditability
+  aggregation: mean
+  higher_is_better: true
+- metric: weighted_rubric_score
+  aggregation: mean
+  higher_is_better: true
+num_fewshot: 0
+metadata:
+  version: 0.1.0
+  open_harness_hub_id: benchmark/customs-origin-fta-bench
+  rubric: rubric/customs-origin-fta-quality-v1
+  pipeline: pipeline/customs-origin-fta-review
+  reproducibility:
+    commit_sha: worktree-generated-2026-05-24
+    dataset_version: 0.1.0
+    run_date: '2026-05-24'
+    hardware: local-dev
+    seed: 17

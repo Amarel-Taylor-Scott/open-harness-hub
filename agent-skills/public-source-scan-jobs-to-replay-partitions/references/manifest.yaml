@@ -1,0 +1,100 @@
+id: "pipeline/public-source-scan-jobs-to-replay-partitions"
+type: pipeline
+version: "0.1.0"
+name: "Public source scan jobs to replay partitions"
+description: "Consumes emitted public-source scan jobs and produces resumable run records, checkpoints, and partition manifests that prepare later container workers and Postgres/pgvector bulk loads."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["automotive", "energy", "manufacturing", "construction", "government", "cross_industry"]
+capability: ["routing", "governance", "evaluation", "retrieval"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.factory"
+tags: ["public-sources", "job-replay", "partition-manifests", "checkpoints", "pgvector"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Replay public-source scan jobs into additive partition manifests and checkpoints without storing source bodies, then audit the generated partitions for later bulk-load and index replay."
+pipeline_kind: "research_web.public_source_job_replay_partitions"
+inputs:
+  - name: "scan_jobs"
+    type: "array"
+    schema: "schemas/object-factory-job.schema.json"
+  - name: "output_dir"
+    type: "string"
+  - name: "run_id"
+    type: "string"
+  - name: "resume"
+    type: "boolean"
+outputs:
+  - name: "job_run_records"
+    type: "jsonl"
+  - name: "checkpoint"
+    type: "json"
+  - name: "partition_manifests"
+    type: "jsonl"
+  - name: "partition_count"
+    type: "integer"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/public-source-scan-job-patterns"
+    - "knowledge-pack/public-source-job-replay-patterns"
+steps:
+  - id: "govern-scan-job-batch"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record:
+        source_type: "object_factory_scan_job_batch"
+        license: "CC-BY-4.0"
+        privacy_boundary: "public_metadata_only"
+      source_policy:
+        require_license: true
+        forbid_private_source_bodies: true
+        require_redaction_before_external_model: true
+        excluded_scopes: ["insurance"]
+  - id: "replay-scan-jobs"
+    kind: "tool"
+    ref: "tool/public-source-job-replay-runner"
+    inputs:
+      jobs: "$.inputs.scan_jobs"
+      output_dir: "$.inputs.output_dir"
+      run_id: "$.inputs.run_id"
+      dry_run: true
+      resume: "$.inputs.resume"
+      worker_image: "open-harness/local-public-source-replay:latest"
+  - id: "audit-replay-partitions"
+    kind: "tool"
+    ref: "tool/worker-output-merge-auditor"
+    inputs:
+      partition_manifests: "$.steps.replay-scan-jobs.files.partition_manifests"
+      expected_schemas:
+        - "schemas/partition-manifest.schema.json"
+      privacy_policy:
+        forbid_source_body_republication: true
+        require_public_metadata_only: true
+      merge_policy:
+        require_review_ticket_for_uncertain_rows: true
+        require_checkpoint: true
+success_criteria:
+  - kind: "deterministic"
+    target: "$.partition_count"
+    op: ">"
+    value: 0
+    severity: "high"
+    label: "Replay emits at least one partition manifest."
+  - kind: "semantic"
+    target: "$.job_run_records"
+    must_cover:
+      - "job id"
+      - "input hash"
+      - "checkpoint"
+      - "output pointer"
+      - "privacy policy"
+      - "partition manifest"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Replay records preserve the audit metadata needed for additive worker runs."

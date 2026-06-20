@@ -1,0 +1,90 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-20T15:47:30.652966+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "34c77933-143c-4ad5-97d0-32057f18c3b7",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-20T15:47:30.652978+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/worker-voice-ilo-indicator-extract",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "DEFENSIVE worker-protection pipeline. Reads an *anonymized worker-voice\nartifact* \u2014 a grievance-line transcript, exit-interview note, or social-\naudit worker-interview summary \u2014 and extracts which of the ILO 11 forced-\nlabour indicators are *evidenced* in the worker's own words, returning a\nper-indicator present / absent / insufficient-evidence verdict with the\nquoted span and the ILO indicator definition for each.\n\nNegative-space task: worker testimony is colloquial, multilingual, and\npartial; the same lived experience maps to ILO indicators only through a\nfixed definitional frame (\"they keep my passport\" -> retention of identity\ndocuments; \"I owe the agent and work it off\" -> debt bondage). A bare model\nover-reads \u2014 inferring \"abuse of vulnerability\" or \"intimidation\" from tone\nalone \u2014 or under-reads, missing an indicator stated obliquely. The durable\nlift is disciplined, cited mapping of testimony spans to the eleven\nindicator definitions, with hard abstention where the text does not support\na mapping. Over-attribution in this domain is a safety harm: it can\nmislabel a worker's account.\n\nBundle: Agentic / CRAG (taxonomy Bundle D) \u2014 a corrective retrieval gate\ngrades whether the retrieved ILO indicator definitions actually cover the\ntestimony before the model maps; if coverage is weak the query is\ndecomposed and re-retrieved, and the model is held to insufficient-evidence\nrather than guessing. `pattern/refuse-on-redacted` enforces abstention on\nredacted/missing spans. Output is a cited indicator map for a trained\ncaseworker / auditor, NOT a victim determination and NOT a referral by\nitself."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../worker-voice-ilo-indicator-extract.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/worker-voice-ilo-indicator-extract/output/indicator_map",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "indicator_map (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/worker-voice-ilo-indicator-extract/output/present_indicator_count",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "present_indicator_count (integer)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/worker-voice-ilo-indicator-extract/output/caseworker_handoff",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "caseworker_handoff (object)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/worker-voice-ilo-indicator-extract/output/evidence_gaps",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "evidence_gaps (object[])"
+        }
+      }
+    }
+  ]
+}

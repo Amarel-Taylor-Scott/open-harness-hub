@@ -1,0 +1,90 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-20T15:47:30.632210+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "8a1c1855-bddf-4358-8cc8-6195c1799392",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-20T15:47:30.632222+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/eur-lex-citation-fidelity-audit",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Audits a regulatory compliance memo's citations to EUR-Lex instruments\n(e.g. \"Art 9 Reg (EU) 2024/1689\", \"Art 35 GDPR\") for fidelity: does each cited\narticle actually exist, and does its text support the claim the memo attaches\nto it? Returns per-citation supported / unsupported / misattributed /\nnot-found, with the retrieved authoritative passage and a corrected citation\nwhen the article number is wrong.\n\nNegative-space task: a bare LLM invents plausible-looking article numbers and\nattaches real-sounding obligations to the wrong provision \u2014 the classic\nfabricated-legal-citation failure that is unacceptable in a regulated filing.\nThis pipeline runs a citation-fidelity bundle: it extracts each citation,\nretrieves the controlling article text from the AI Act / governance corpus,\nand runs a chain-of-verification pass that must quote the supporting span or\ndowngrade the citation \u2014 every claim is re-checked against the primary text\nrather than trusted."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../eur-lex-citation-fidelity-audit.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/eur-lex-citation-fidelity-audit/output/citation_findings",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "citation_findings (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/eur-lex-citation-fidelity-audit/output/fidelity_score",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "fidelity_score (number)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/eur-lex-citation-fidelity-audit/output/uncited_claims",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "uncited_claims (string[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/eur-lex-citation-fidelity-audit/output/corrected_citations",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "corrected_citations (object[])"
+        }
+      }
+    }
+  ]
+}

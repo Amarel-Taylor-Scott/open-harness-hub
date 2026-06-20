@@ -1,0 +1,77 @@
+id: "pipeline/postgres-pgvector-bootstrap"
+type: pipeline
+version: "0.1.0"
+name: "Postgres pgvector bootstrap"
+description: "Plans and executes the canonical Postgres/pgvector bootstrap path for generated object storage, loader SQL application, and object count reporting."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "retrieval", "serving", "evaluation"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["postgres", "pgvector", "bootstrap", "render", "million-primitives"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Bootstrap a canonical Postgres/pgvector store for generated Open Harness Hub objects and report database-backed object counts."
+pipeline_kind: "serving"
+inputs:
+  - name: "target"
+    type: "string"
+  - name: "database_url"
+    type: "string"
+  - name: "staged_jsonl_shards"
+    type: "array"
+outputs:
+  - name: "bootstrap_plan"
+    type: "json"
+  - name: "object_count_report"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/postgres-pgvector-bootstrap-patterns"
+    - "knowledge-pack/object-count-db-bootstrap-patterns"
+steps:
+  - id: "plan-bootstrap"
+    kind: "tool"
+    ref: "tool/postgres-pgvector-bootstrap-planner"
+    inputs:
+      target: "local_docker"
+      output: "dist/reports/postgres-bootstrap-plan.json"
+  - id: "emit-loader-sql"
+    kind: "tool"
+    ref: "tool/factory-jsonl-postgres-loader"
+    inputs:
+      output: "dist/sql/factory-load.sql"
+  - id: "count-canonical-rows"
+    kind: "tool"
+    ref: "tool/postgres-object-count-sql"
+    inputs:
+      sql_path: "db/postgres/object_count_report.sql"
+    when: "database_url is present"
+  - id: "count-staged-rows"
+    kind: "tool"
+    ref: "tool/object-count-report-generator"
+    inputs:
+      catalog_id_index: "dist/catalog-component-ids.json"
+      output: "dist/reports/object-count-report.json"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.bootstrap_plan.commands"
+    op: "is_truthy"
+    value: true
+    severity: "critical"
+    label: "Bootstrap plan emits executable commands."
+  - kind: "semantic"
+    target: "$.bootstrap_plan"
+    must_cover:
+      - "schema initialization"
+      - "factory JSONL loader SQL"
+      - "canonical Postgres object count report"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Bootstrap plan covers schema, load, and count."

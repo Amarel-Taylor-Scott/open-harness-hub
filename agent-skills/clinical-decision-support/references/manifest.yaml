@@ -1,0 +1,131 @@
+id: "harness/clinical-decision-support"
+type: harness
+version: "0.1.0"
+name: "Clinical Decision Support"
+description: |
+  Healthcare-specific harness for differential-diagnosis reasoning.
+  Composes the clinical-reasoner persona, red-flag classifier rules,
+  HIPAA PHI privacy gate, clinical-guideline RAG, ICD-10 lookup tool,
+  and a citation-first response policy. Educational / decision-
+  support framing; never a substitute for a licensed clinician.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["healthcare", "healthcare.clinical"]
+capability: ["reasoning", "retrieval", "safety_gating", "tool_use"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+tags: ["healthcare", "differential-diagnosis", "phi-safe"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+kind: "model_harness"
+tier: "primary"
+applied_layers:
+  - persona
+  - grep
+  - classifier
+  - rag
+  - tools
+  - privacy
+
+consumes:
+  - persona_block
+  - grep_rule
+  - classifier_rule
+  - rag_doc
+  - citation_edge
+  - tool_definition
+emits:
+  - reasoning_step
+  - context_snippet
+  - audit_template
+
+logic_paths:
+  - id: "differential_with_red_flags"
+    label: "Differential diagnosis with red-flag escalation"
+    entrypoints: ["/api/clinical/dx"]
+    steps:
+      - "redact PHI (rule-pack/phi-hipaa-en)"
+      - "fire red-flag classifier (rule-pack/clinical-red-flags)"
+      - "if any red flag fires → first sentence states the flag + recommend immediate evaluation"
+      - "retrieve guideline chunks (knowledge-pack/clinical-guidelines-sample)"
+      - "expand chunks with 1-hop citation graph"
+      - "call ICD-10 lookup tool for code candidates"
+      - "compose persona + retrieved chunks + tool results"
+      - "call model"
+      - "verify every claim cited by guideline section"
+      - "produce ranked differential with prior probabilities"
+    consumes: [persona_block, grep_rule, classifier_rule, rag_doc, citation_edge, tool_definition]
+    emits: [reasoning_step, context_snippet, audit_template]
+    model_call: "required"
+    verification:
+      - "no PHI in output (re-scan)"
+      - "every differential has at least one cited section"
+      - "red flag, if present, in first sentence"
+
+knowledge_packs:
+  - id: "clinical_guidelines"
+    label: "Clinical guidelines RAG"
+    kind: knowledge_pack
+    types: [rag_doc, citation_edge]
+    required: true
+    trust_boundary: "local"
+    freshness: "dated"
+  - id: "icd10_codes"
+    label: "ICD-10 code reference"
+    kind: knowledge_pack
+    types: [rag_doc]
+    required: false
+    trust_boundary: "local"
+    freshness: "dated"
+
+logic_packs:
+  - id: "clinical_persona"
+    label: "Clinical reasoner persona"
+    kind: logic_pack
+    types: [persona_block]
+    required: true
+  - id: "response_policy_clinical"
+    label: "Clinical response policy (no Rx, no definitive Dx, cite-or-omit)"
+    kind: logic_pack
+    types: [response_policy]
+    required: true
+
+model_io:
+  input:  "{presentation: str, history: str, exam: str}"
+  output: "{red_flag: str|null, differentials: Differential[], next_steps: str[], citations: Citation[], trace: TraceFrame[]}"
+
+model_targets:
+  - id: "local_ollama"
+    label: "Local Ollama"
+    transport: "ollama"
+    role: "Default local generation; no PHI ever leaves the host."
+    capabilities: ["text_generation", "chat", "tool_use"]
+    required: false
+    default: true
+    trust_boundary: "local"
+  - id: "self_hosted_gpu"
+    label: "Self-hosted GPU adapter"
+    transport: "transformers"
+    role: "On-prem inference for covered entities."
+    capabilities: ["text_generation", "chat"]
+    required: false
+    default: false
+    trust_boundary: "local"
+
+input_verification:
+  - "PHI redacted before model call (HIPAA Safe Harbor)"
+  - "red-flag classifier run BEFORE differential reasoning"
+output_verification:
+  - "no PHI leaks in output (re-scan with rule-pack/phi-hipaa-en)"
+  - "every factual claim cites a guideline section"
+  - "no definitive diagnosis language; only differentials"
+  - "no prescribing language; only medication-class discussion if cited"
+
+privacy_boundaries:
+  raw_input:      "stays local; never sent to external API by default"
+  derived_output: "stays local; only sharable after explicit user opt-in AND PHI re-scan"
+  external_calls: "none by default; external judges require user opt-in"
+  hipaa_safe_harbor: "applies — 18 identifier categories are redacted on input"

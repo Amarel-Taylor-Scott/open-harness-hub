@@ -1,0 +1,73 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/dataset/bill-info-test-documents",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Bill_info AI evaluation set (28 documents)",
+  "description": "The 28-document evaluation set used in Sviatoslav Grabovsky's\nBill_info AI (Gemma 4 Good Hackathon — Impact Track). Mixes:\n - Reddit-sourced real German Inkasso / Mahnung letters (from r/germany)\n - Redacted documents for refusal testing (7 documents)\n - Clear synthetic cases\n - Adversarial edge cases (e.g. synthetic Polish-IBAN scam letter)\n\nReported metrics on this set:\n - Documents tested: 28\n - Extraction success rate: 96% (27/28)\n - Overall field accuracy: 95.8%\n - Refusal accuracy on redacted documents: 100% (7/7)\n - Average latency (local): 8.5s\n\nThe single failure was a synthetic info-letter that triggered a\nschema validation error — the safe failure mode. The validation\nlayer rejected malformed output rather than showing a plausible-\nbut-invalid analysis.\n\nThe original repository is the authoritative source — gold\nstandards + evaluation harness are reproducible via\n`python -m eval.run_eval`.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/MIT.html",
+  "url": "https://open-harness-hub.dev/dataset/bill-info-test-documents",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Sviatoslav Grabovsky"
+    },
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors (catalog reference)"
+    }
+  ],
+  "datePublished": "2026-05-21",
+  "keywords": [
+    "bill-info-ai",
+    "verbraucherzentrale",
+    "synthetic",
+    "redacted-refusal",
+    "hackathon"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-21"
+}

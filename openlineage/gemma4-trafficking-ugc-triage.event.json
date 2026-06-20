@@ -1,0 +1,101 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-20T15:47:30.648526+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "6ae881cc-a57e-45d5-84c2-b09b54d934cc",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-20T15:47:30.648542+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/gemma4-trafficking-ugc-triage",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "DEFENSIVE Trust + Safety pipeline. Reviews user-generated content\n(job posts, classifieds, escort listings, immigration forums,\ndating-app messages) for human-trafficking RECRUITMENT and\nSOLICITATION signals using the Polaris Project + ILO indicator\ntaxonomies, then escalates flagged posts to a human moderator queue\nwith extracted indicators, a structured statement of reasons, and\n(when criteria met) a Polaris-hotline referral packet.\n\nCSAM suspicion always routes to the NCMEC-referral path WITHOUT\nmodel classification of suspected CSAM material, via\n`pattern/critical-tier-output-override`. The model never describes,\nscores, or labels suspected CSAM.\n\nBuilt around the existing Gemma-4 26B vision adapter so a single\nmultimodal call can read both the post text and any attached\nimagery; falls back to text-only Gemma-4 when no media is attached.\n\nComposes three already-published patterns:\n  - pattern/two-stage-extract-then-judge \u2014 stage 1 extracts every\n    relevant field (advertised service, claimed identity, control\n    markers, transit cues, contact pathway, attached image\n    semantics); stage 2 (the classifier rule pack) judges the\n    extracted JSON against the Polaris typology.\n  - pattern/refuse-on-redacted \u2014 return null over hallucination on\n    missing/redacted fields. Posts with no signal short-circuit to\n    \"allow\" without invented findings.\n  - pattern/critical-tier-output-override \u2014 minor-age dispute OR\n    victim-disclosure OR CSAM-suspicion forces a deterministic\n    output structure (NCMEC route or trained-reviewer queue),\n    overriding any other classifier confidence.\n\nOutput is decision + severity + extracted indicators + statement of\nreasons + (optional) Polaris/NCMEC referral packets. NEVER\nauto-action on a single hit; >=2 co-occurring indicators OR any\ncritical-tier rule are the escalation thresholds."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../gemma4-trafficking-ugc-triage.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/gemma4-trafficking-ugc-triage/output/decision",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "decision (string)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/gemma4-trafficking-ugc-triage/output/severity",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "severity (integer)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/gemma4-trafficking-ugc-triage/output/extracted_indicators",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "extracted_indicators (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/gemma4-trafficking-ugc-triage/output/statement_of_reasons",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "statement_of_reasons (object)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/gemma4-trafficking-ugc-triage/output/referral_packet",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "referral_packet (object|null)"
+        }
+      }
+    }
+  ]
+}

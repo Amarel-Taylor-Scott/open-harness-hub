@@ -1,0 +1,195 @@
+id: "pipeline/cfr-part11-records-control-gate"
+type: pipeline
+version: "0.1.0"
+name: "21 CFR Part 11 electronic-records control gate"
+description: |
+  Gates an electronic-records / electronic-signature system description against
+  the controls of 21 CFR Part 11 (FDA electronic records; electronic
+  signatures), returning a per-control pass / fail / not-evidenced verdict, the
+  cited Part 11 subsection, the matched control statement, and a go / no-go
+  disposition for whether the system may hold GxP records.
+
+  Negative-space task: a bare LLM treats Part 11 as a vibe ("you need audit
+  trails and e-signatures") and cannot map a specific control description onto
+  the enumerated §11.10 / §11.30 / §11.50 / §11.70 / §11.200 requirements, nor
+  refuse to pass a control it has no evidence for. This pipeline runs a
+  high-precision regulated-RAG bundle with a deterministic go/no-go checklist
+  gate: structure-aware retrieval over the Part 11 corpus, a records-retention
+  reviewer persona bound to cite-or-abstain, citation-span verification, and a
+  checklist gate that blocks a go disposition while any predicate control is
+  unevidenced.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["pharma.gxp", "government.regulatory", "medical_devices.qms", "legal.compliance"]
+capability: ["evaluation", "verification", "retrieval", "extraction"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "dated"
+tags: ["21-cfr-part-11", "gxp", "electronic-records", "data-integrity", "go-nogo-gate", "high-precision-legal-rag"]
+created: "2026-05-29"
+updated: "2026-05-29"
+
+attribution:
+  source_url: "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11"
+  source_kind: "other"
+  author: "Office of the Federal Register / FDA (eCFR)"
+  license: "public-domain"
+
+task: "Gate an electronic-records system description against 21 CFR Part 11 controls and return a per-control pass/fail/not-evidenced verdict with the cited subsection, plus a go/no-go disposition that blocks while any predicate control is unevidenced."
+pipeline_kind: "review"
+
+inputs:
+  - name: "system_control_description"
+    type: "string|object"
+  - name: "record_class"
+    type: "string"
+
+outputs:
+  - name: "control_findings"
+    type: "object[]"
+  - name: "disposition"
+    type: "string"
+  - name: "score"
+    type: "number"
+  - name: "evidence_gaps"
+    type: "object[]"
+
+defaults:
+  persona: "persona/records-retention-reviewer"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs: ["knowledge-pack/gxp-21-cfr-11-guidelines", "knowledge-pack/standards-regulatory-source-map"]
+  rule_packs: ["rule-pack/web-search-allowlist-default"]
+
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.system_control_description" }
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+  - id: "chunk_controls"
+    kind: "processor"
+    ref: "processor/page-aware-chunker"
+    inputs: { text: "$.steps.redact_pii.output.text", chunk_tokens: 384, overlap_tokens: 48 }
+  - id: "decompose_controls"
+    kind: "processor"
+    ref: "processor/sub-question-decomposer"
+    inputs:
+      compound_question: "Does the system provide validation, accurate record copies, record protection/retention, audit trails, operational/authority/device checks, e-signature manifestations, signature-record linking, and signature uniqueness per 21 CFR Part 11?"
+      max_subquestions: 8
+      domain_hint: "21-cfr-part-11-controls"
+  - id: "retrieve_part11"
+    kind: "processor"
+    ref: "processor/hybrid-bm25-vector-retrieve"
+    inputs:
+      query: "$.steps.decompose_controls.output.subquestions"
+      corpus: "knowledge-pack/gxp-21-cfr-11-guidelines"
+      top_k: 20
+  - id: "rerank_part11"
+    kind: "processor"
+    ref: "processor/cross-encoder-reranker"
+    inputs:
+      query: "$.steps.decompose_controls.output.subquestions"
+      candidates: "$.steps.retrieve_part11.output.passages"
+      top_k: 8
+  - id: "inject_schema"
+    kind: "processor"
+    ref: "processor/inject-output-schema"
+    inputs:
+      schema_hint: "control_findings[]: {control, cfr_subsection, verdict:pass|fail|not_evidenced, matched_statement, cited_text}"
+  - id: "review_controls"
+    kind: "harness"
+    ref: "harness/records-retention-disposition-review"
+    inputs:
+      packet: "$.steps.redact_pii.output.text"
+      context: "$.steps.rerank_part11.output.passages"
+      controls: "$.steps.decompose_controls.output.subquestions"
+      schema: "$.steps.inject_schema.output.schema"
+  - id: "check_citation_spans"
+    kind: "processor"
+    ref: "processor/citation-span-checker"
+    inputs: { trace: "$.steps.review_controls.output", config: {} }
+  - id: "extract_evidence_gaps"
+    kind: "processor"
+    ref: "processor/evidence-gap-extractor"
+    inputs: { trace: "$.steps.review_controls.output", config: {} }
+  - id: "go_nogo_gate"
+    kind: "branch"
+    ref: "pattern/go-nogo-checklist-gate"
+    inputs:
+      findings: "$.steps.review_controls.output.control_findings"
+      block_on: "any verdict == fail or not_evidenced for a predicate control"
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.go_nogo_gate.output"
+      rubric_ref: "rubric/records-retention-disposition-quality-v1"
+  - id: "summary"
+    kind: "processor"
+    ref: "processor/review-summary-composer"
+    inputs: { trace: "$.steps.grade.output.result", config: {} }
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "cfr-part11-records-control-gate"
+      applied_layers: ["privacy", "chunk", "decompose", "rag", "rerank", "schema", "harness", "citation_span", "evidence_gaps", "go_nogo", "judge"]
+
+success_criteria:
+  - rubric: "rubric/records-retention-disposition-quality-v1"
+    threshold: 0.72
+  - kind: "deterministic"
+    target: "$.steps.check_citation_spans.output.result.pass"
+    op: "=="
+    value: true
+    severity: "critical"
+    label: "Every pass/fail control verdict cites the controlling Part 11 subsection."
+  - kind: "regex"
+    target: "$.steps.go_nogo_gate.output.disposition"
+    pattern: "^(go|no-go)$"
+    must_match: true
+    severity: "high"
+    label: "Disposition is an explicit go/no-go, never an implied pass."
+
+worked_example:
+  input:
+    system_control_description:
+      system: "LIMS for stability-study results"
+      controls:
+        - "All test results are recorded in the LIMS with a timestamped, attributable audit trail that records create/modify actions and prior values."
+        - "Records are exported to PDF for inspectors on request."
+        - "Analysts log in with username and password."
+    record_class: "GxP — stability study raw data (predicate-rule record)"
+  expected_output:
+    disposition: "no-go"
+    score: 0.78
+    control_findings:
+      - control: "Computer-generated, time-stamped audit trail"
+        cfr_subsection: "21 CFR 11.10(e)"
+        verdict: "pass"
+        matched_statement: "timestamped, attributable audit trail that records create/modify actions and prior values"
+        cited_text: "Use of secure, computer-generated, time-stamped audit trails to independently record ... actions that create, modify, or delete electronic records. [11.10(e)]"
+      - control: "Ability to generate accurate and complete copies in human-readable and electronic form"
+        cfr_subsection: "21 CFR 11.10(b)"
+        verdict: "not_evidenced"
+        matched_statement: "Records are exported to PDF (human-readable only) — electronic-form copy not described."
+        cited_text: "The ability to generate accurate and complete copies of records in both human readable and electronic form ... [11.10(b)]"
+      - control: "Validation of systems to ensure accuracy, reliability, consistent intended performance"
+        cfr_subsection: "21 CFR 11.10(a)"
+        verdict: "not_evidenced"
+        matched_statement: null
+        cited_text: "Validation of systems to ensure accuracy, reliability, consistent intended performance ... [11.10(a)]"
+    evidence_gaps:
+      - control: "11.10(b)"
+        gap: "No description of electronic-form copy generation for inspector review."
+      - control: "11.10(a)"
+        gap: "No system-validation evidence provided."
+      - control: "11.10(g) / 11.200"
+        gap: "Authority checks and signature uniqueness (two distinct identification components) not described."
+    note: "Disposition is no-go because predicate controls 11.10(a) and 11.10(b) are unevidenced — the gate blocks despite the audit-trail control passing."

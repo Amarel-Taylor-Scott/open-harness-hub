@@ -1,0 +1,117 @@
+id: "pipeline/agent-workflow-system-reference-intake"
+type: pipeline
+version: "0.1.0"
+name: "Agent workflow system reference intake"
+description: "Safely plan reference intake for agent frameworks, skill marketplaces, and workflow systems, then extract normalized skill/workflow primitives without republishing upstream source files."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "extraction", "governance", "safety", "planning"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.discovery"
+tags: ["agent-frameworks", "workflow-systems", "skills", "reference-intake", "openclaw", "claude-code", "hermes"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Study agent/workflow ecosystems through safe reference intake, extract reusable workflow and skill primitives, and route them through governance, labels, dedupe, and index emission."
+pipeline_kind: "research_web.agent_workflow_reference_intake"
+
+inputs:
+  - name: "source_system_ids"
+    type: "string[]"
+  - name: "install_policy"
+    type: "string"
+  - name: "sandbox_policy"
+    type: "object"
+outputs:
+  - name: "intake_plans"
+    type: "object[]"
+  - name: "extracted_manifests"
+    type: "object[]"
+  - name: "candidate_primitives"
+    type: "object[]"
+  - name: "label_records"
+    type: "object[]"
+  - name: "dedupe_clusters"
+    type: "object[]"
+  - name: "review_tickets"
+    type: "object[]"
+
+defaults:
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/agent-workflow-system-source-map"
+    - "knowledge-pack/hybrid-label-dimension-taxonomy"
+  rule_packs:
+    - "rule-pack/grep-prompt-injection-heuristics"
+
+steps:
+  - id: "load_agent_systems"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/agent-workflow-system-source-map"
+    inputs:
+      query: "$.inputs.source_system_ids"
+      top_k: 50
+
+  - id: "plan_reference_intake"
+    kind: "tool"
+    ref: "tool/reference-repo-intake-planner"
+    inputs:
+      source_system: "$.steps.load_agent_systems.output.docs"
+      install_policy: "$.inputs.install_policy"
+      sandbox_policy: "$.inputs.sandbox_policy"
+      allowed_roots: ["_reference", "/private/tmp"]
+
+  - id: "extract_skill_workflows"
+    kind: "tool"
+    ref: "tool/skill-workflow-manifest-extractor"
+    inputs:
+      reference_path: "$.steps.plan_reference_intake.output.output_paths"
+      source_system: "$.steps.load_agent_systems.output.docs"
+      extract_types: ["skill_md", "workflow_json", "agent_config", "node_graph", "tool_permissions", "scripts", "marketplace_metadata"]
+      safety_policy:
+        do_not_execute: true
+        flag_scripts: true
+        flag_credentials: true
+
+  - id: "label_and_dimension"
+    kind: "pipeline"
+    ref: "pipeline/hybrid-label-vector-index"
+    inputs:
+      subjects: "$.steps.extract_skill_workflows.output.candidate_primitives"
+      adapter_registry: []
+      tenant_label_set: {}
+      cost_policy:
+        prefer_low_cost: true
+
+  - id: "governance_entity_dedupe_index"
+    kind: "pipeline"
+    ref: "pipeline/source-governance-entity-dedupe-index"
+    inputs:
+      source_records: "$.steps.extract_skill_workflows.output.extracted_manifests"
+      candidate_objects: "$.steps.extract_skill_workflows.output.candidate_primitives"
+      tenant_policy:
+        untrusted_code_requires_review: true
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "agent-workflow-system-reference-intake"
+      applied_layers: ["source_map", "reference_intake_plan", "skill_workflow_extraction", "label_dimension", "governance_entity_dedupe"]
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.outputs.intake_plans"
+    op: "is_truthy"
+    value: true
+    label: "Reference intake plans are produced before any install or clone."
+  - kind: "deterministic"
+    target: "$.outputs.review_tickets"
+    op: "is_truthy"
+    value: true
+    label: "Risky executable skills and workflow imports are routed to review."

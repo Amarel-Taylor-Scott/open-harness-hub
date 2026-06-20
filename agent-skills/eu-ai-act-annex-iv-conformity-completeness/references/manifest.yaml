@@ -1,0 +1,208 @@
+id: "pipeline/eu-ai-act-annex-iv-conformity-completeness"
+type: pipeline
+version: "0.1.0"
+name: "EU AI Act Annex IV technical-documentation completeness check"
+description: |
+  Checks a high-risk AI system's technical-documentation package against the
+  Article 11 / Annex IV requirement list of Regulation (EU) 2024/1689, returns a
+  per-requirement present / partial / missing verdict, the cited Annex IV point
+  number, and the exact span in the submitted package that satisfies it (or an
+  evidence gap when nothing does).
+
+  Negative-space task: a bare LLM cannot reliably enumerate the nine Annex IV
+  points, map a provider's free-form documentation onto them, and refuse to mark
+  a point "present" without a citable span — it pattern-matches plausible-sounding
+  prose and silently passes incomplete dossiers. This pipeline runs a
+  high-precision legal-RAG bundle (Bundle B): deterministic redaction and
+  decomposition before the model, field-weighted + dense retrieval over the AI
+  Act corpus, a cite-or-abstain reviewer persona, then deterministic
+  citation-coverage and evidence-gap gates so an unsupported "present" cannot pass.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai_governance", "ai_governance.eu_act", "legal.compliance", "government.regulatory"]
+capability: ["evaluation", "extraction", "retrieval", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "dated"
+tags: ["eu-ai-act", "annex-iv", "article-11", "conformity", "technical-documentation", "high-precision-legal-rag"]
+created: "2026-05-29"
+updated: "2026-05-29"
+
+attribution:
+  source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+  source_kind: "other"
+  author: "European Union (EUR-Lex)"
+  license: "other"
+
+task: "Check a high-risk AI system technical-documentation package for completeness against Article 11 / Annex IV of Regulation (EU) 2024/1689 and return a per-requirement present/partial/missing verdict with cited Annex IV points and supporting spans."
+pipeline_kind: "review"
+
+inputs:
+  - name: "tech_doc_package"
+    type: "string|object"
+  - name: "system_metadata"
+    type: "object"
+
+outputs:
+  - name: "requirement_findings"
+    type: "object[]"
+  - name: "completeness_verdict"
+    type: "string"
+  - name: "score"
+    type: "number"
+  - name: "evidence_gaps"
+    type: "object[]"
+
+defaults:
+  persona: "persona/ai-governance-auditor"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs: ["knowledge-pack/ai-governance-frameworks", "knowledge-pack/standards-regulatory-source-map"]
+  rule_packs: ["rule-pack/web-search-allowlist-default"]
+
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.tech_doc_package" }
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+  - id: "chunk_doc"
+    kind: "processor"
+    ref: "processor/page-aware-chunker"
+    inputs: { text: "$.steps.redact_pii.output.text", chunk_tokens: 512, overlap_tokens: 64 }
+  - id: "decompose_requirements"
+    kind: "processor"
+    ref: "processor/sub-question-decomposer"
+    inputs:
+      compound_question: "Does this package satisfy each Annex IV point: general description, system elements and development, monitoring and control, risk-management system, changes log, standards applied, EU declaration of conformity, post-market monitoring plan, and other elements?"
+      max_subquestions: 9
+      domain_hint: "eu-ai-act-annex-iv"
+  - id: "retrieve_annex_iv"
+    kind: "processor"
+    ref: "processor/hybrid-bm25-vector-retrieve"
+    inputs:
+      query: "$.steps.decompose_requirements.output.subquestions"
+      corpus: "knowledge-pack/ai-governance-frameworks"
+      top_k: 24
+  - id: "rerank_context"
+    kind: "processor"
+    ref: "processor/cross-encoder-reranker"
+    inputs:
+      query: "$.steps.decompose_requirements.output.subquestions"
+      candidates: "$.steps.retrieve_annex_iv.output.passages"
+      top_k: 8
+  - id: "inject_schema"
+    kind: "processor"
+    ref: "processor/inject-output-schema"
+    inputs:
+      schema_hint: "requirement_findings[]: {annex_iv_point, requirement, verdict, cited_point, supporting_span}"
+  - id: "review_completeness"
+    kind: "harness"
+    ref: "harness/ai-red-team-findings-review"
+    inputs:
+      packet: "$.steps.redact_pii.output.text"
+      context: "$.steps.rerank_context.output.passages"
+      requirements: "$.steps.decompose_requirements.output.subquestions"
+      schema: "$.steps.inject_schema.output.schema"
+  - id: "check_citation_spans"
+    kind: "processor"
+    ref: "processor/citation-span-checker"
+    inputs: { trace: "$.steps.review_completeness.output", config: {} }
+  - id: "citation_coverage"
+    kind: "processor"
+    ref: "processor/citation-coverage"
+    inputs: { response_markdown: "$.steps.review_completeness.output.text" }
+  - id: "extract_evidence_gaps"
+    kind: "processor"
+    ref: "processor/evidence-gap-extractor"
+    inputs: { trace: "$.steps.review_completeness.output", config: {} }
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.review_completeness.output"
+      rubric_ref: "rubric/ai-governance-quality-v1"
+  - id: "summary"
+    kind: "processor"
+    ref: "processor/review-summary-composer"
+    inputs: { trace: "$.steps.grade.output.result", config: {} }
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "eu-ai-act-annex-iv-conformity-completeness"
+      applied_layers: ["privacy", "chunk", "decompose", "rag", "rerank", "schema", "harness", "citation_span", "citation_coverage", "evidence_gaps", "judge"]
+
+success_criteria:
+  - rubric: "rubric/ai-governance-quality-v1"
+    threshold: 0.72
+  - kind: "deterministic"
+    target: "$.steps.check_citation_spans.output.result.pass"
+    op: "=="
+    value: true
+    severity: "critical"
+    label: "Every present/partial verdict cites a supporting span in the submitted package."
+  - kind: "deterministic"
+    target: "$.steps.citation_coverage.output.passes"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "Every factual sentence in the review carries a citation marker."
+
+worked_example:
+  input:
+    tech_doc_package:
+      system_name: "ResumeRank high-risk hiring scorer"
+      sections:
+        - heading: "1. General description"
+          text: "ResumeRank ranks candidates by predicted fit; intended for HR shortlisting. Provider: Acme GmbH."
+        - heading: "2. Development process"
+          text: "Trained on 2.1M historical CVs; gradient-boosted ensemble; validation AUC 0.81."
+        - heading: "5. Risk management"
+          text: "We monitor adverse-impact ratio quarterly."
+    system_metadata:
+      risk_tier: "high-risk (Annex III §4 employment)"
+      placed_on_market: "2026-08"
+  expected_output:
+    completeness_verdict: "INCOMPLETE — 4 of 9 Annex IV points missing or partial"
+    score: 0.74
+    requirement_findings:
+      - annex_iv_point: "1"
+        requirement: "General description of the AI system and its intended purpose"
+        verdict: "present"
+        cited_point: "Annex IV(1), Reg (EU) 2024/1689"
+        supporting_span: "ResumeRank ranks candidates by predicted fit; intended for HR shortlisting."
+      - annex_iv_point: "2(g)"
+        requirement: "Detailed description of the system's elements and development process"
+        verdict: "partial"
+        cited_point: "Annex IV(2)(g), Reg (EU) 2024/1689"
+        supporting_span: "Trained on 2.1M historical CVs; gradient-boosted ensemble — training-data provenance and labelling methodology not documented."
+      - annex_iv_point: "3"
+        requirement: "Monitoring, functioning and control, incl. accuracy/robustness metrics and foreseeable unintended outcomes"
+        verdict: "missing"
+        cited_point: "Annex IV(3), Reg (EU) 2024/1689"
+        supporting_span: null
+      - annex_iv_point: "5"
+        requirement: "Risk-management system per Article 9"
+        verdict: "partial"
+        cited_point: "Annex IV(5) + Art 9, Reg (EU) 2024/1689"
+        supporting_span: "We monitor adverse-impact ratio quarterly — no documented risk identification/estimation/mitigation cycle."
+      - annex_iv_point: "8"
+        requirement: "Post-market monitoring plan per Article 72"
+        verdict: "missing"
+        cited_point: "Annex IV(8) + Art 72, Reg (EU) 2024/1689"
+        supporting_span: null
+    evidence_gaps:
+      - point: "Annex IV(3)"
+        gap: "No accuracy/robustness/cybersecurity metrics or foreseeable-unintended-outcome analysis."
+      - point: "Annex IV(6)"
+        gap: "No list of harmonised standards applied (or description of solutions used to meet Chapter III Section 2)."
+      - point: "Annex IV(7)"
+        gap: "No EU declaration of conformity included."
+      - point: "Annex IV(8)"
+        gap: "No post-market monitoring plan."

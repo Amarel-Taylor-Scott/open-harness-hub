@@ -1,0 +1,64 @@
+id: "harness/water-quality-multimodal-triage"
+type: harness
+version: "0.1.0"
+name: "Water quality multimodal triage harness"
+description: "Multi-model harness for water quality triage that routes lab tables, sampling plans, chain-of-custody records, service-area maps, historical trends, official thresholds, and public notice drafts."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["environmental.water", "water_utility.sdwa"]
+capability: ["governance", "retrieval", "verification", "evaluation"]
+modality: ["text", "structured", "tabular", "spatial", "timeseries", "multimodal"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+tags: ["multimodal", "water-quality", "sampling", "public-notice", "threshold-check"]
+created: "2026-05-25"
+updated: "2026-05-25"
+kind: "model_harness"
+tier: "primary"
+applied_layers: ["tools", "official_sources", "rag", "classifier", "privacy"]
+knowledge_packs:
+  - id: "public_service_patterns"
+    label: "Multimodal public service patterns"
+    kind: "knowledge_pack"
+    types: ["multimodal_harness_pattern", "public_service_workflow_pattern"]
+    required: true
+    trust_boundary: "local"
+    freshness: "dated"
+model_targets:
+  - id: "tabular_threshold_checker"
+    label: "Tabular threshold checker"
+    transport: "callable"
+    role: "Deterministically checks lab values against configured thresholds."
+    capabilities: ["tabular_validation", "threshold_checking"]
+    required: true
+    default: true
+    trust_boundary: "local"
+  - id: "notice_draft_model"
+    label: "Public notice draft model"
+    transport: "openai_compatible"
+    role: "Drafts cited public notice language after deterministic checks."
+    capabilities: ["text_generation", "summarization"]
+    required: false
+    default: false
+    trust_boundary: "mixed"
+  - id: "trend_summarizer"
+    label: "Local trend summarizer"
+    transport: "ollama"
+    role: "Summarizes historical sample trends and evidence gaps."
+    capabilities: ["summarization", "reasoning"]
+    required: false
+    default: false
+    trust_boundary: "local"
+model_io:
+  input: "lab results, sampling metadata, chain-of-custody records, service-area map, historical trend table, official thresholds"
+  output: "advisory triage packet, threshold findings, trend summary, citation list, resampling request, public notice draft"
+  transport: "callable"
+input_verification: ["validate lab units before model use", "check sample date freshness", "verify chain-of-custody completeness"]
+output_verification: ["threshold exceedance uses deterministic result", "public notice text cites official source", "conflicting lab values route to review"]
+privacy_boundaries:
+  raw_input: "Operational utility data may be sensitive; keep raw tables and maps tenant-scoped."
+  derived_output: "Public notice drafts must pass legal and operator review before release."
+  external_calls: "Hosted drafting models receive only redacted, summarized findings unless explicitly approved."
+contributes_to: ["pipeline/multimodal-public-service-harness-intake"]

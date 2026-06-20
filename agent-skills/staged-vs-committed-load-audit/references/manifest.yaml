@@ -1,0 +1,96 @@
+id: "pipeline/staged-vs-committed-load-audit"
+type: pipeline
+version: "0.1.0"
+name: "Staged versus committed load audit"
+description: "Compares object-factory staged bulk-load counts against canonical Postgres and pgvector row counts to prove what was actually committed after load execution."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "evaluation", "retrieval", "serving", "verification"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["postgres", "pgvector", "load-audit", "object-counts", "bulk-load", "verification"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Audit whether staged object-factory rows from a load plan match canonical Postgres row counts after load execution."
+pipeline_kind: "research_web.staged_vs_committed_load_audit"
+inputs:
+  - name: "load_plan_manifest"
+    type: "string"
+  - name: "committed_counts"
+    type: "string"
+  - name: "execution_summary"
+    type: "string"
+  - name: "output"
+    type: "string"
+outputs:
+  - name: "audit_status"
+    type: "string"
+  - name: "load_audit"
+    type: "json"
+  - name: "mismatched_relations"
+    type: "integer"
+  - name: "not_verified_relations"
+    type: "integer"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/staged-vs-committed-load-audit-patterns"
+steps:
+  - id: "govern-load-audit-inputs"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record:
+        source_type: "load_audit_metadata"
+        license: "CC-BY-4.0"
+        privacy_boundary: "local_counts_only"
+      source_policy:
+        require_license: true
+        forbid_private_source_bodies: true
+        require_redaction_before_external_model: true
+        excluded_scopes: ["insurance"]
+  - id: "run-postgres-count-report"
+    kind: "tool"
+    ref: "tool/postgres-object-count-sql"
+    inputs:
+      sql_path: "db/postgres/object_count_report.sql"
+      database_url: "$.inputs.database_url"
+    when: "database_url is present"
+  - id: "audit-staged-versus-committed"
+    kind: "tool"
+    ref: "tool/staged-vs-committed-load-auditor"
+    inputs:
+      load_plan_manifest: "$.inputs.load_plan_manifest"
+      committed_counts: "$.inputs.committed_counts"
+      execution_summary: "$.inputs.execution_summary"
+      output: "$.inputs.output"
+      run_id: "$.inputs.run_id"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.load_audit.preflight.ok"
+    op: "=="
+    value: true
+    severity: "critical"
+    label: "Load audit starts from a preflight-clean load plan."
+  - kind: "deterministic"
+    target: "$.mismatched_relations"
+    op: "=="
+    value: 0
+    severity: "critical"
+    label: "No staged-vs-committed mismatch is present."
+  - kind: "semantic"
+    target: "$.load_audit"
+    must_cover:
+      - "staged counts"
+      - "committed Postgres counts"
+      - "not verified when database counts are absent"
+      - "object_count_report.sql"
+      - "insurance scope excluded"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Audit report is explicit about proof level and storage boundary."

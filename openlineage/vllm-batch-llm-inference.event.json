@@ -1,0 +1,68 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-20T15:47:30.612577+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "8eb7d527-1dfa-4908-a2a4-6f59454a4d0f",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-20T15:47:30.612589+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/vllm-batch-llm-inference",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Serve many prompts through a single vLLM engine with shared KV cache\n+ prefix caching. Optional logits-processor-zoo entries\n(SuppressTokens / AllowedTokens / FixedTokenBias) constrain output\nto a fixed-format token grammar \u2014 useful for retrieval-rerank\nletter outputs, JSON skeletons, or multiple-choice answers.\n\nVerified by Open Harness Hub mining: jagatkiran Qwen14B-Retrieval-\nQwen32B-logits-processor-zoo (672 votes, EEDI), aerdem4 Eedi-Qwen32B-\nvllm-with-logits-processor-zoo (594 votes, EEDI), itahiro DeepSeek-\nR1-distill-7B (1399 votes, AIMO 2), mbmmurad QwQ-32B-preview (1097\nvotes, AIMO 2), yekenot DeepSeek-R1-distill-7B-awq (1087 votes).\nConfirmed pattern in 7 of 35 mined kernels."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors (port)",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../vllm-batch-llm-inference.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/vllm-batch-llm-inference/output/completions",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "completions (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/vllm-batch-llm-inference/output/token_logprobs",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "token_logprobs (object[])"
+        }
+      }
+    }
+  ]
+}

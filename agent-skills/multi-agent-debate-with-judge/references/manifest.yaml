@@ -1,0 +1,95 @@
+id: "pipeline/multi-agent-debate-with-judge"
+type: pipeline
+version: "0.1.0"
+name: "Multi-agent debate with judge"
+description: |
+  Two or more debater personas argue different sides of a question
+  across N rounds. A judge persona scores the final positions. Used
+  for hard reasoning tasks where stress-testing improves accuracy.
+
+  Verified by Open Harness Hub clone:
+  `microsoft/autogen` implements the group-chat round-table pattern.
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai"]
+capability: ["reasoning", "evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url: "https://github.com/microsoft/autogen"
+  source_kind: "github"
+  author: "Microsoft Research"
+  license: "MIT"
+
+task: |
+  Two or more debater agents argue different positions across N rounds;
+  judge scores final positions and outputs verdict + transcripts.
+pipeline_kind: "multi_agent"
+
+inputs:
+  - name: "question"
+    type: "string"
+  - name: "n_debaters"
+    type: "integer"
+  - name: "n_rounds"
+    type: "integer"
+
+outputs:
+  - name: "verdict"
+    type: "string"
+  - name: "judge_scores"
+    type: "object[]"
+  - name: "transcripts"
+    type: "object[]"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/grep-prompt-injection-heuristics"
+
+steps:
+  - id: "guard"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.question" }
+
+  - id: "spawn_debaters"
+    kind: "processor"
+    ref: "processor/persona-set-generator"
+    inputs:
+      topic: "$.inputs.question"
+      n_personas: "$.inputs.n_debaters"
+
+  - id: "round_1"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Each debater produces an initial position. Output a JSON array of {debater_id, position, evidence}."}]
+      context: "$.steps.spawn_debaters.output.personas"
+
+  - id: "subsequent_rounds_loop"
+    kind: "processor"
+    ref: "processor/iterative-revise-loop"
+    inputs:
+      initial_prompt: "$.steps.round_1.output.text"
+      inner_harness_ref: "harness/text-safety-review"
+      verifier_refs:
+        - "processor/citation-coverage"
+      max_iterations: "$.inputs.n_rounds"
+      convergence_policy: "all_pass"
+
+  - id: "judge"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.subsequent_rounds_loop.output.final_response"
+      rubric_ref: "rubric/research-entity-v1"
+
+success_criteria: []

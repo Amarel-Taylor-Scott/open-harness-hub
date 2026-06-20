@@ -1,0 +1,127 @@
+id: "pipeline/deep-research-with-citations"
+type: pipeline
+version: "0.1.0"
+name: "Deep research with citations"
+description: |
+  The "deep research" pattern popularized by Perplexity and the
+  Anthropic orchestrator-workers cookbook. Fully layered:
+    redact (PII out before external search) →
+    persona (research analyst) →
+    plan (LLM decomposes into sub-queries) →
+    online-search rule pack (allowlist + sanitize) →
+    tool (web-search) →
+    rule pack (post-search verification — relevance + credibility) →
+    harness (text-safety-review composes cited synthesis) →
+    processor (citation-coverage verifier on output).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry", "media"]
+capability: ["research", "retrieval", "reasoning", "verification"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "external"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+task: |
+  Given a user query, produce a one-page sourced synthesis: (1) decompose
+  into sub-questions, (2) PII-sanitize each sub-query, (3) search across
+  allowlisted sources, (4) verify each source's relevance + credibility,
+  (5) compose a cited answer with confidence intervals per claim.
+pipeline_kind: "research_web"
+
+inputs:
+  - name: "query"
+    type: "string"
+  - name: "max_sources"
+    type: "integer"
+  - name: "freshness_window_days"
+    type: "integer"
+outputs:
+  - name: "synthesis_markdown"
+    type: "markdown"
+  - name: "citations"
+    type: "Citation[]"
+  - name: "confidence_per_claim"
+    type: "object[]"
+  - name: "trace"
+    type: "TraceFrame[]"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/common-abbreviations"
+    - "knowledge-pack/iso-country-codes"
+  rule_packs:
+    - "rule-pack/privacy-pii-text-en"
+    - "rule-pack/web-search-allowlist-default"
+    - "rule-pack/grep-prompt-injection-heuristics"
+
+steps:
+  - id: "redact_query"
+    kind: "harness"
+    ref: "harness/redact-pii-text"
+    inputs: { text: "$.inputs.query" }
+
+  - id: "expand_abbreviations"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/common-abbreviations"
+    inputs:
+      query: "$.steps.redact_query.output.redacted_text"
+      top_k: 3
+
+  - id: "plan_subqueries"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Decompose the user query into 3-5 sub-questions that each can be answered by a single web search. Output as a JSON array of strings."}]
+      context: "$.steps.expand_abbreviations.output.docs"
+
+  - id: "sanitize_search_queries"
+    kind: "rule_pack"
+    ref: "rule-pack/web-search-allowlist-default"
+    inputs:
+      queries: "$.steps.plan_subqueries.output.text"
+
+  - id: "search_sources"
+    kind: "tool"
+    ref: "tool/web-search"
+    inputs:
+      query: "$.steps.sanitize_search_queries.output.sanitized"
+      max_results: "$.inputs.max_sources"
+
+  - id: "guard_retrieved_content"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs:
+      text: "$.steps.search_sources.output.results"
+
+  - id: "verify_sources"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "For each source, score (a) relevance to the original query, (b) source credibility (primary vs secondary vs blog), (c) freshness vs the requested window. Drop sources scoring below 0.6 on any axis."}]
+      context: "$.steps.search_sources.output.results"
+
+  - id: "synthesize"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Synthesize a one-page answer to the original query. Every factual sentence must cite at least one accepted source. Attach a calibrated confidence (0-1) per claim. Refuse to answer any sub-question with < 2 independent corroborating sources."}]
+      context:
+        - "$.steps.verify_sources.output.accepted"
+
+  - id: "verify_citation_coverage"
+    kind: "processor"
+    ref: "processor/citation-coverage"
+    inputs:
+      response_markdown: "$.steps.synthesize.output.text"
+
+success_criteria:
+  - rubric: "rubric/research-entity-v1"
+    threshold: 0.75

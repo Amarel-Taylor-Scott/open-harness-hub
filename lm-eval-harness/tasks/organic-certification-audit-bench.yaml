@@ -1,0 +1,65 @@
+# Auto-generated from Open Harness Hub manifest `benchmark/organic-certification-audit-bench` v0.1.0.
+# Edit the source manifest at catalog/benchmarks/organic-certification-audit-bench.yaml and re-run
+# `python scripts/emit/lm_eval_harness.py`.
+task: organic-certification-audit-bench
+tag:
+- evaluation
+- expansion-v6
+- organic-certification-audit
+- verification
+description: Synthetic benchmark for organic certification audit review quality, evidence grounding, citation checks, and
+  redaction safety.
+dataset_path: open-harness-hub/organic-certification-audit-samples
+dataset_name: null
+output_type: generate_until
+training_split: train
+validation_split: val
+test_split: test
+doc_to_text: '# Persona: persona/organic-certification-reviewer
+
+
+  {{prompt}}'
+doc_to_target: '{{ideal}}'
+generation_kwargs:
+  max_gen_toks: 512
+  temperature: 0.0
+  top_p: 1.0
+  until:
+  - '
+
+
+    '
+metric_list:
+- metric: coverage
+  aggregation: mean
+  higher_is_better: true
+- metric: grounding
+  aggregation: mean
+  higher_is_better: true
+- metric: gap_handling
+  aggregation: mean
+  higher_is_better: true
+- metric: severity
+  aggregation: mean
+  higher_is_better: true
+- metric: remediation
+  aggregation: mean
+  higher_is_better: true
+- metric: audit
+  aggregation: mean
+  higher_is_better: true
+- metric: weighted_rubric_score
+  aggregation: mean
+  higher_is_better: true
+num_fewshot: 0
+metadata:
+  version: 0.1.0
+  open_harness_hub_id: benchmark/organic-certification-audit-bench
+  rubric: rubric/organic-certification-audit-quality-v1
+  pipeline: pipeline/organic-certification-audit-review
+  reproducibility:
+    commit_sha: worktree-generated-2026-05-24
+    dataset_version: 0.1.0
+    run_date: '2026-05-24'
+    hardware: local-dev
+    seed: 29

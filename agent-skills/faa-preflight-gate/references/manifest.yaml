@@ -1,0 +1,66 @@
+id: "pipeline/faa-preflight-gate"
+type: pipeline
+version: "0.1.0"
+name: "FAA Part 91 Before-Takeoff gate"
+description: "Apply the FAA before-takeoff checklist as a deterministic GO/NO-GO gate."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["aviation", "compliance"]
+capability: ["safety_gating", "evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+tags: ["faa", "part-91", "before-takeoff", "go-nogo"]
+created: "2026-05-21"
+updated: "2026-05-21"
+
+attribution:
+  source_url: "https://www.faa.gov/regulations_policies/advisory_circulars/index.cfm/go/document.information/documentid/1031144"
+  source_kind: "other"
+  author: "FAA AC 120-71B + AFM/POH (composite)"
+  license: "CC-BY-4.0"
+
+task: "Apply FAA Before-Takeoff Checklist + Takeoff Briefing."
+pipeline_kind: "review"
+
+inputs:
+  - name: "preflight_packet"
+    type: "string|object"
+outputs:
+  - name: "verdict"
+    type: "string"
+  - name: "items"
+    type: "object[]"
+  - name: "nogo_triggers"
+    type: "string[]"
+
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/technician-checklists"
+
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.preflight_packet" }
+  - id: "checklist_gate"
+    kind: "processor"
+    ref: "processor/checklist-evaluator"
+    inputs:
+      candidate: "$.steps.structured_to_prose.output.prose"
+      checklist_id: "faa-before-takeoff"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "faa-preflight-gate"
+      applied_layers: ["structured_to_prose", "checklist_evaluator"]
+
+success_criteria:
+  - kind: deterministic
+    target: "$.steps.checklist_gate.output.verdict"
+    op: "=="
+    value: "go"
+    severity: "critical"
+    label: "FAA before-takeoff checklist gate must return GO"

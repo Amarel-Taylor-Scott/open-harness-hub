@@ -1,0 +1,59 @@
+id: "pipeline/esi-triage-gate"
+type: pipeline
+version: "0.1.0"
+name: "ESI 5-Level Triage gate (ER)"
+description: "Apply AHRQ ESI v4 triage algorithm — danger-zone vitals at ESI 3 require upgrade to ESI 2."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["healthcare", "compliance"]
+capability: ["safety_gating", "evaluation"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+tags: ["esi-triage", "ahrq", "go-nogo"]
+created: "2026-05-21"
+updated: "2026-05-21"
+attribution:
+  source_url: "https://www.ahrq.gov/research/findings/final-reports/esi/index.html"
+  source_kind: "other"
+  author: "AHRQ ESI Implementation Handbook 2020 (composite)"
+  license: "CC-BY-4.0"
+task: "Apply ESI triage gate at ED registration."
+pipeline_kind: "review"
+inputs:
+  - name: "triage_packet"
+    type: "string|object"
+outputs:
+  - name: "verdict"
+    type: "string"
+  - name: "items"
+    type: "object[]"
+  - name: "nogo_triggers"
+    type: "string[]"
+defaults:
+  knowledge_packs: ["knowledge-pack/technician-checklists"]
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.triage_packet" }
+  - id: "checklist_gate"
+    kind: "processor"
+    ref: "processor/checklist-evaluator"
+    inputs:
+      candidate: "$.steps.structured_to_prose.output.prose"
+      checklist_id: "esi-triage"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "esi-triage-gate"
+      applied_layers: ["structured_to_prose", "checklist_evaluator"]
+success_criteria:
+  - kind: deterministic
+    target: "$.steps.checklist_gate.output.verdict"
+    op: "=="
+    value: "go"
+    severity: "critical"
+    label: "ESI triage gate must return GO before patient assignment"

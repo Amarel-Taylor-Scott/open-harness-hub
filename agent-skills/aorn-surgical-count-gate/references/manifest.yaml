@@ -1,0 +1,59 @@
+id: "pipeline/aorn-surgical-count-gate"
+type: pipeline
+version: "0.1.0"
+name: "AORN Surgical Count GO/NO-GO gate"
+description: "Apply AORN Sponge/Sharp/Instrument count gate before patient leaves OR — discrepancy requires intra-op imaging."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["healthcare", "compliance"]
+capability: ["safety_gating", "evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+tags: ["aorn", "surgical-count", "go-nogo"]
+created: "2026-05-21"
+updated: "2026-05-21"
+attribution:
+  source_url: "https://www.aorn.org/guidelines"
+  source_kind: "other"
+  author: "AORN Guidelines for Perioperative Practice 2024 (composite)"
+  license: "CC-BY-4.0"
+task: "Apply AORN surgical count gate before OR transport."
+pipeline_kind: "review"
+inputs:
+  - name: "or_packet"
+    type: "string|object"
+outputs:
+  - name: "verdict"
+    type: "string"
+  - name: "items"
+    type: "object[]"
+  - name: "nogo_triggers"
+    type: "string[]"
+defaults:
+  knowledge_packs: ["knowledge-pack/technician-checklists"]
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.or_packet" }
+  - id: "checklist_gate"
+    kind: "processor"
+    ref: "processor/checklist-evaluator"
+    inputs:
+      candidate: "$.steps.structured_to_prose.output.prose"
+      checklist_id: "aorn-count"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "aorn-surgical-count-gate"
+      applied_layers: ["structured_to_prose", "checklist_evaluator"]
+success_criteria:
+  - kind: deterministic
+    target: "$.steps.checklist_gate.output.verdict"
+    op: "=="
+    value: "go"
+    severity: "critical"
+    label: "AORN count gate must return GO before transport"

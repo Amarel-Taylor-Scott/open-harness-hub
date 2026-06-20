@@ -1,0 +1,165 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/llm-pipeline-saas-blueprints",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "LLM pipeline SaaS blueprint patterns",
+  "description": "Stable planning logic for a SaaS that recommends, prices, generates, enriches, and optionally sets up LLM pipelines in user-controlled hosting environments.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC-BY-4.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/llm-pipeline-saas-blueprints",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-25",
+  "keywords": [
+    "saas",
+    "pipeline-generation",
+    "pricing",
+    "terraform",
+    "mcp",
+    "blueprints",
+    "browser",
+    "embeddings"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-25",
+  "citation": "Open Harness Hub SaaS product blueprint",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "llm-pipeline-saas-blueprints__patterns",
+      "name": "patterns.jsonl",
+      "description": "Data file backing knowledge pack llm-pipeline-saas-blueprints.",
+      "contentUrl": "data/llm-pipeline-saas-blueprints/patterns.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "5055 B",
+      "sha256": "477c6b20aa7a48e72a3c8bee33f412501c66e856fe8661cfad364e1e8b2b16ba"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "llm-pipeline-saas-blueprints__records",
+      "name": "llm-pipeline-saas-blueprints__records",
+      "description": "Records parsed from patterns.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "llm-pipeline-saas-blueprints__records/id",
+          "name": "id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "llm-pipeline-saas-blueprints__patterns"
+            },
+            "extract": {
+              "column": "id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "llm-pipeline-saas-blueprints__records/title",
+          "name": "title",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "llm-pipeline-saas-blueprints__patterns"
+            },
+            "extract": {
+              "column": "title"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "llm-pipeline-saas-blueprints__records/text",
+          "name": "text",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "llm-pipeline-saas-blueprints__patterns"
+            },
+            "extract": {
+              "column": "text"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "llm-pipeline-saas-blueprints__records/tags",
+          "name": "tags",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "llm-pipeline-saas-blueprints__patterns"
+            },
+            "extract": {
+              "column": "tags"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "llm-pipeline-saas-blueprints__records/version",
+          "name": "version",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "llm-pipeline-saas-blueprints__patterns"
+            },
+            "extract": {
+              "column": "version"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,245 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/primitive-source-surface-map",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Primitive source surface map",
+  "description": "Initial routine scan surfaces for building a large indexed primitive database with keyword, vector, graph, and model-polished search.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC-BY-4.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/primitive-source-surface-map",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-25",
+  "keywords": [
+    "primitive-database",
+    "source-surfaces",
+    "million-primitives",
+    "verified-sources"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-25",
+  "citation": "Data.gov Catalog API; OpenAlex API; Semantic Scholar API; NIST NVD API; openFDA; Public hiring and task marketplace metadata patterns",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "primitive-source-surface-map__surfaces",
+      "name": "surfaces.jsonl",
+      "description": "Data file backing knowledge pack primitive-source-surface-map.",
+      "contentUrl": "data/primitive-source-surface-map/surfaces.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "12392 B",
+      "sha256": "d1be7d8e67ef8fb3aee3a3e48683a48400c350bcc32e83e68aff0e4d0fcac098"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "primitive-source-surface-map__records",
+      "name": "primitive-source-surface-map__records",
+      "description": "Records parsed from surfaces.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "primitive-source-surface-map__records/id",
+          "name": "id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "primitive-source-surface-map__surfaces"
+            },
+            "extract": {
+              "column": "id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "primitive-source-surface-map__records/title",
+          "name": "title",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "primitive-source-surface-map__surfaces"
+            },
+            "extract": {
+              "column": "title"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "primitive-source-surface-map__records/source_type",
+          "name": "source_type",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "primitive-source-surface-map__surfaces"
+            },
+            "extract": {
+              "column": "source_type"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "primitive-source-surface-map__records/url",
+          "name": "url",
+          "dataType": "sc:URL",
+          "source": {
+            "fileObject": {
+              "@id": "primitive-source-surface-map__surfaces"
+            },
+            "extract": {
+              "column": "url"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "primitive-source-surface-map__records/access_method",
+          "name": "access_method",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "primitive-source-surface-map__surfaces"
+            },
+            "extract": {
+              "column": "access_method"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "primitive-source-surface-map__records/scan_cadence",
+          "name": "scan_cadence",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "primitive-source-surface-map__surfaces"
+            },
+            "extract": {
+              "column": "scan_cadence"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "primitive-source-surface-map__records/primitive_opportunities",
+          "name": "primitive_opportunities",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "primitive-source-surface-map__surfaces"
+            },
+            "extract": {
+              "column": "primitive_opportunities"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "primitive-source-surface-map__records/authority",
+          "name": "authority",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "primitive-source-surface-map__surfaces"
+            },
+            "extract": {
+              "column": "authority"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "primitive-source-surface-map__records/license_note",
+          "name": "license_note",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "primitive-source-surface-map__surfaces"
+            },
+            "extract": {
+              "column": "license_note"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "primitive-source-surface-map__records/tags",
+          "name": "tags",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "primitive-source-surface-map__surfaces"
+            },
+            "extract": {
+              "column": "tags"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "primitive-source-surface-map__records/version",
+          "name": "version",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "primitive-source-surface-map__surfaces"
+            },
+            "extract": {
+              "column": "version"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

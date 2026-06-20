@@ -1,0 +1,68 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-20T15:47:30.594115+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "5277ffcf-77c9-47d9-9210-29b247e9b841",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-20T15:47:30.594126+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/efficientnet-medical-imaging",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "EfficientNet-B0 / B3 backbone + custom head for medical-imaging\ncompetitions: skin lesion (ISIC), brain activity (EEG-as-image),\nhistopathology (HuBMAP), spine MRI (RSNA Lumbar). Uses timm or\nsegmentation-models-pytorch for pre-trained checkpoints; 5-fold\nCV; image augmentation via albumentations.\n\nVerified by Open Harness Hub mining: cdeotte EfficientNetB0 starter\n(1564 votes, HMS Harmful Brain Activity), motono0223 ISIC PyTorch\nbaseline (794 votes, EfficientNet + timm), hidngnguyna baseline\nU-Net + EfficientNet (617 votes, HuBMAP), awsaf49 HMS-HBAC KerasCV\n(1733 votes \u2014 KerasCV variant of the same shape)."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors (port)",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../efficientnet-medical-imaging.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/efficientnet-medical-imaging/output/fold_metrics",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "fold_metrics (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/efficientnet-medical-imaging/output/predictions",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "predictions (number[])"
+        }
+      }
+    }
+  ]
+}

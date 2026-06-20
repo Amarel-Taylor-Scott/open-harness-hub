@@ -1,0 +1,68 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-20T15:47:30.595763+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "7b6040f7-3983-4f3b-8c96-7acc39419030",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-20T15:47:30.595778+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/blip-clip-image-to-prompt",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Generate a prompt that would re-create a given image. Combines:\n(1) BLIP captioning model for high-level description, (2) CLIP\nInterrogator for matching against curated artist / style / medium\nvocabulary, (3) embeddings cosine-similarity to confirm prompt\nfidelity to original image. The winning Kaggle shape for the\nStable Diffusion Image-to-Prompts competition.\n\nVerified by Open Harness Hub mining: leonidkulyk LB 0.45836\nBLIP+CLIP CLIP-Interrogator (732 votes), inversion Calculating\nStable Diffusion Prompt Embeddings (617 votes), burhanuddinlatsaheb\nText-to-Image Generation (570 votes \u2014 uses the same BLIP+CLIP\ncombo). Confirmed across 3 top kernels."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors (port)",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../blip-clip-image-to-prompt.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/blip-clip-image-to-prompt/output/predicted_prompt",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "predicted_prompt (string)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/blip-clip-image-to-prompt/output/similarity_score",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "similarity_score (number)"
+        }
+      }
+    }
+  ]
+}

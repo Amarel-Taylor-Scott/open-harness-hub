@@ -1,0 +1,57 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-20T15:47:30.590191+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "08f37d9b-eb57-4f32-bb24-91bbb5f4eb9c",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-20T15:47:30.590202+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/awq-quantized-inference",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Serve a 4-bit AWQ (Activation-aware Weight Quantization) checkpoint\nfor inference. AWQ preserves activation statistics, generally\ndelivering lower perplexity drop than naive nf4. The de-facto\nKaggle pattern when you need 32B+ in 24GB of VRAM AND care about\nquality (vs bitsandbytes when you care about LoRA training).\n\nVerified by Open Harness Hub mining across 7 of 35 kernels:\ntakanashihumbert EEDI-Qwen-2.5-32B-AWQ (650), yekenot AIMO-2-DeepSeek-\nR1-distill-7B-awq (1087), mbmmurad QwQ-32B-AWQ (1097), aerdem4 EEDI-\nQwen32B-vLLM (594), jagatkiran Qwen14B + Qwen32B-AWQ (672), itahiro\nDeepSeek-R1-distill-7B (1399, vLLM serves AWQ)."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors (port)",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../awq-quantized-inference.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/awq-quantized-inference/output/completions",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "completions (object[])"
+        }
+      }
+    }
+  ]
+}

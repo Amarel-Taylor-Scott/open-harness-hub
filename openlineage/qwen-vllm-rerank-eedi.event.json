@@ -1,0 +1,79 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-20T15:47:30.589026+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "c733208f-afdb-43e1-8f10-ace80e2d0cdf",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-20T15:47:30.589037+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/qwen-vllm-rerank-eedi",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Two-stage retrieval pipeline that won EEDI Mining Misconceptions:\n1. Embedding-based retrieve top-K candidate misconceptions\n2. Constrain a Qwen-32B-AWQ vLLM call to emit ONLY one of the K\n   candidate IDs (via logits-processor-zoo AllowedTokens) \u2014 the LLM\n   reranks among a fixed candidate set, never hallucinates an unseen\n   ID. Optionally two-time retrieval first to refine the query.\n\nVerified by Open Harness Hub mining: jagatkiran Qwen14B-Retrieval-\nQwen32B-logits-processor-zoo (672 votes, EEDI), aerdem4 Eedi-Qwen32B-\nvllm-with-logits-processor-zoo (594 votes, EEDI), takanashihumbert\nEedi-Qwen-2.5-32B-AWQ-two-time-retrieval (650 votes), anhvth226 EEDI-\n11-21-14B (686 votes). Confirmed 4-of-4 across top EEDI kernels."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors (port)",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../qwen-vllm-rerank-eedi.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/qwen-vllm-rerank-eedi/output/best_misconception_id",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "best_misconception_id (string)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/qwen-vllm-rerank-eedi/output/retrieved_candidates",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "retrieved_candidates (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/qwen-vllm-rerank-eedi/output/rerank_logprobs",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "rerank_logprobs (object)"
+        }
+      }
+    }
+  ]
+}

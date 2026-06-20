@@ -1,0 +1,140 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-20T15:47:30.643331+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "db6e22e7-50c0-4301-b035-5267b592b71a",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-20T15:47:30.643343+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/ofac-un-cross-list-fuzzy-screening",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Screen a counterparty (person or entity) name against multiple\nsanctions lists at once \u2014 OFAC SDN, UN Consolidated, EU Consolidated,\nand an institution PEP list \u2014 using deterministic fuzzy matching\n(name canonicalization + Jaro-Winkler \u2265 threshold) so that\ntransliteration, honorific, and word-order variants are caught, and\nevery hit carries its source list, program, and listing date.\n\nNegative space: a bare model cannot answer \"is NAME on a sanctions\nlist\" \u2014 it hallucinates list membership, cannot apply a calibrated\nfuzz threshold, and gives no provenance. Screening MUST be a\ndeterministic match against a governed list snapshot, with the model\nused only to summarize and explain matches (cite-or-abstain), never\nto decide membership. Cross-list reconciliation flags a name that\nhits one list but not another (a coverage gap), and clusters\nnear-duplicate hits across lists so an analyst sees one entity, not\nfour rows.\n\nReference / educational only \u2014 list contents are governed snapshots,\ninputs are synthetic. Bundle: High-precision legal / regulated RAG\n(exact-id + fuzzy leg; source-precedence; cite-or-abstain)."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../ofac-un-cross-list-fuzzy-screening.yaml"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "knowledge-pack/sanctions-list-shape",
+      "facets": {
+        "schema": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-1-0/SchemaDatasetFacet.json",
+          "fields": [
+            {
+              "name": "entity_signal",
+              "type": "string"
+            }
+          ]
+        },
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "Reference SHAPE for sanctions list integration. Real data must be\npulled from OFAC, UN, EU, HMT, or the institution's licensed\nprovider; this pack illustrates the row schema, not the entries.\nEach row is an entity (individual or organization) with\nnormalized name, source list, listing date, and aliases."
+        },
+        "dataSource": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+          "name": "open-harness-hub",
+          "uri": "https://open-harness-hub.dev/knowledge-pack/sanctions-list-shape"
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ofac-un-cross-list-fuzzy-screening/output/sanctions_hit",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "sanctions_hit (boolean)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ofac-un-cross-list-fuzzy-screening/output/matches",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "matches (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ofac-un-cross-list-fuzzy-screening/output/clustered_entities",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "clustered_entities (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ofac-un-cross-list-fuzzy-screening/output/cross_list_gaps",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "cross_list_gaps (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ofac-un-cross-list-fuzzy-screening/output/disposition",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "disposition (enum[clear, halt_and_escalate, enhanced_due_diligence])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ofac-un-cross-list-fuzzy-screening/output/match_rationale",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "match_rationale (markdown)"
+        }
+      }
+    }
+  ]
+}

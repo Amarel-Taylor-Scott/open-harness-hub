@@ -1,0 +1,79 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-20T15:47:30.653711+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "e47376a5-eddc-442b-a7ed-cd91c5e88c2c",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-20T15:47:30.653723+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/nscp-structural-load-coefficient-verify",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Verify the edition-specific numeric coefficients in a structural design\nsubmittal (load-combination equations, importance / seismic-zone factors,\nstrength-reduction phi factors, allowable-stress increases) against an\nauthoritative constants corpus rather than the model's memory. Base models\nconfidently misquote these life-safety numbers because they blend\nASCE 7 / AISC 360 / ACI 318 / Eurocode / NSCP editions \u2014 a confident-wrong\nfailure that is deterministically checkable against the published tables.\n\nThis is a Cheap exact-id / keyword-first bundle (Bundle C) with a verify\nspine: the structural-design-code-constants Knowledge Corpus is queried by\nexact_id (e.g. \"ASCE 7-22 load combo 2\", \"ACI 318 phi flexure\", \"NSCP 2015\nseismic zone 4 Z\"), every cited coefficient is checked for citation\ncoverage, and a deterministic gate requires that the submittal's numbers\nmatch the edition the design claims. The pipeline does NOT perform the\nstructural-adequacy assessment itself \u2014 that is a tier-5 licensed-engineer\non-site act; it flags coefficient mismatches and routes them. Detection and\ncitation only; no PII."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../nscp-structural-load-coefficient-verify.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/nscp-structural-load-coefficient-verify/output/coefficient_findings",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "coefficient_findings (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/nscp-structural-load-coefficient-verify/output/decision",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "decision (string)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/nscp-structural-load-coefficient-verify/output/score",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "score (number)"
+        }
+      }
+    }
+  ]
+}

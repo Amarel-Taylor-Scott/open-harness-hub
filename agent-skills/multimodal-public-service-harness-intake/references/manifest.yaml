@@ -1,0 +1,94 @@
+id: "pipeline/multimodal-public-service-harness-intake"
+type: pipeline
+version: "0.1.0"
+name: "Multimodal public service harness intake"
+description: "Normalizes disaster assistance, water quality, and food quality use cases into multi-model harnesses, generated row shards, source-governed facts, review tickets, and index records."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["humanitarian.disaster", "government.benefits", "environmental.water", "water_utility.sdwa", "food.safety", "food_safety"]
+capability: ["governance", "retrieval", "verification", "evaluation"]
+modality: ["text", "image", "structured", "tabular", "spatial", "timeseries", "multimodal"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.multimodal"
+tags: ["multimodal", "model-routing", "public-service", "quality", "review-routing", "million-primitives"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Convert public-service and quality use cases into reusable multimodal harness primitives and generated database rows."
+pipeline_kind: "agent_loop"
+inputs:
+  - name: "use_case_brief"
+    type: "markdown"
+  - name: "evidence_bundle"
+    type: "object"
+  - name: "cost_policy"
+    type: "object"
+outputs:
+  - name: "harness_blueprint"
+    type: "json"
+  - name: "model_route_plan"
+    type: "json"
+  - name: "generated_row_shards"
+    type: "object"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/multimodal-public-service-patterns"
+steps:
+  - id: "source-governance"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      reason: "Official facts, volatile advisories, and tenant evidence must keep provenance, freshness, and privacy boundaries."
+  - id: "route-evidence"
+    kind: "tool"
+    ref: "tool/multimodal-evidence-router"
+    inputs:
+      domain: "$.inputs.use_case_brief.domain"
+  - id: "model-route"
+    kind: "tool"
+    ref: "tool/model-capability-router"
+    inputs:
+      cost_policy: "$.inputs.cost_policy"
+  - id: "disaster-assistance"
+    kind: "harness"
+    ref: "harness/disaster-assistance-multimodal-intake"
+    when: "domain == humanitarian.disaster"
+  - id: "water-quality"
+    kind: "harness"
+    ref: "harness/water-quality-multimodal-triage"
+    when: "domain == environmental.water"
+  - id: "food-quality"
+    kind: "harness"
+    ref: "harness/food-quality-multimodal-hold-release"
+    when: "domain == food.safety"
+  - id: "safety-screen"
+    kind: "tool"
+    ref: "tool/multimodal-safety-screen"
+    inputs:
+      evidence_bundle: "$.inputs.evidence_bundle"
+  - id: "emit-index"
+    kind: "tool"
+    ref: "tool/index-record-emitter"
+    inputs:
+      subject_type: "multimodal_harness_blueprint"
+success_criteria:
+  - kind: "semantic"
+    target: "$.harness_blueprint"
+    must_cover:
+      - "model routing"
+      - "official-source retrieval"
+      - "multimodal evidence normalization"
+      - "human review routing"
+      - "cost policy"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Harness blueprint covers multimodal public-service controls."
+  - kind: "deterministic"
+    target: "$.model_route_plan"
+    op: "is_truthy"
+    value: true
+    severity: "medium"
+    label: "Model route plan is emitted."

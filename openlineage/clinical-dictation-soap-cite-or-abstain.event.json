@@ -1,0 +1,101 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-20T15:47:30.599440+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "57fbdb35-6902-443d-862e-ad59586e1fc2",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-20T15:47:30.599452+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/clinical-dictation-soap-cite-or-abstain",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Turn a clinician's free-text dictation into a structured SOAP note\n(Subjective / Objective / Assessment / Plan) in which every\nAssessment and Plan claim is grounded in a cited guideline span or\nin the dictation itself \u2014 otherwise abstain on that claim. This is\nthe High-precision clinical RAG bundle (Bundle B) wired as a\ngoverned gate:\n\n - PHI redaction (HIPAA) on the raw dictation before anything else;\n - clinical acronym-sense disambiguation corpus resolves ambiguous\n   dictated abbreviations (\"MS\" = mitral stenosis vs multiple\n   sclerosis) against context BEFORE retrieval, the dominant error\n   source in dictation;\n - hybrid retrieval over the clinical guidelines corpus, fused +\n   cross-encoder reranked;\n - clinical-reasoner persona + clinical decision-support harness\n   drafts the SOAP note with a citation on each A/P claim;\n - DETERMINISTIC cite-or-abstain gate: an Assessment/Plan line with\n   no citation fails citation-coverage and blocks publication \u2014\n   the model may NOT invent a guideline-backed recommendation.\n\nNegative-space task: dictation transcription tools paraphrase a\nrecommendation into the note that the clinician never said and no\nguideline supports. Here unsupported A/P content is structurally\nbarred; clinical red-flags also gate for escalation.\n\nDecision-support DRAFT for clinician review; NOT autonomous medical\nadvice. Synthetic dictation only."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../clinical-dictation-soap-cite-or-abstain.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/clinical-dictation-soap-cite-or-abstain/output/soap_note",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "soap_note (object)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/clinical-dictation-soap-cite-or-abstain/output/findings",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "findings (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/clinical-dictation-soap-cite-or-abstain/output/citation_coverage",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "citation_coverage (number)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/clinical-dictation-soap-cite-or-abstain/output/abstained_claims",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "abstained_claims (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/clinical-dictation-soap-cite-or-abstain/output/trace",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "trace (object[])"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+id: "pipeline/daily-production-schedule-report"
+type: pipeline
+version: "0.1.0"
+name: "Daily production schedule report"
+description: "Builds a trend report over daily production runs and emits the next recommended component factory command."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["planning", "governance", "evaluation", "generation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.scale"
+tags: ["components", "daily-factory", "scheduler", "production-report", "coverage", "dedupe"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Compare daily component production runs and recommend whether the next run should scale, hold, rotate matrix, or prioritize gap fill."
+pipeline_kind: "research_web.daily_production_schedule_report"
+inputs:
+  - name: "runs_root"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+  - name: "next_run_date"
+    type: "string"
+  - name: "max_target"
+    type: "integer"
+outputs:
+  - name: "schedule_report"
+    type: "json"
+  - name: "schedule_report_markdown"
+    type: "markdown"
+  - name: "next_run_recommendation"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/daily-production-scheduler-patterns"
+    - "knowledge-pack/daily-production-run-patterns"
+steps:
+  - id: "load-scheduler-checks"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/daily-production-scheduler-patterns"
+    inputs:
+      query: "daily production scheduler trend metrics next run recommendation dedupe coverage"
+      top_k: 20
+  - id: "build-schedule-report"
+    kind: "tool"
+    ref: "tool/daily-production-scheduler"
+    inputs:
+      runs_root: "$.inputs.runs_root"
+      output_dir: "$.inputs.output_dir"
+      next_run_date: "$.inputs.next_run_date"
+      max_target: "$.inputs.max_target"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.build-schedule-report.run_count"
+    op: ">="
+    value: 1
+    severity: "medium"
+    label: "At least one daily run is included when prior runs exist."
+  - kind: "semantic"
+    target: "$.build-schedule-report.next_run_recommendation"
+    must_cover:
+      - "target count"
+      - "matrix"
+      - "showcase count"
+      - "gap fill"
+      - "reason"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "The next run recommendation is actionable."
+  - kind: "semantic"
+    target: "$.build-schedule-report"
+    must_cover:
+      - "coverage rate"
+      - "duplicate rate"
+      - "component candidates"
+      - "review tickets"
+      - "staged rows"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "The schedule report captures the metrics needed to scale safely."

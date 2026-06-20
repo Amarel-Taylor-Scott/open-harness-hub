@@ -1,0 +1,105 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-20T15:47:30.651753+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "de1a0633-72c6-4179-bc10-fb958f4dd6c1",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-20T15:47:30.651766+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/medlabel-photo-to-warning",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Photograph of a medicine label \u2192 Gemma 4 vision extract (active\ningredients + dosage + strength + warnings) \u2192 drug-interaction\ncheck against the user's current medication list \u2192 multilingual\nuser-language warning if a critical interaction or contraindication\nis detected. Offline-first to work in low-connectivity settings.\n\nVerified reference port of MedLabel by [unconfirmed author], shown\nat the Gemma 4 Good Hackathon 2026 (companion to Bill_info AI in\nthe same hackathon's Impact Track \u2014 Digital Equity & Inclusivity /\nSafety & Trust). Sourced from the project's public YouTube demo;\ncatalog port maintains the architectural shape but needs author\nattribution + repo URL confirmation before claiming author co-\ncredit.\n\nImplements the same 3 design patterns Bill_info AI publishes:\n - pattern/two-stage-extract-then-judge (extract fields \u2192 judge\n   interaction risk)\n - pattern/critical-tier-output-override (severe interaction \u2192\n   \"STOP, do not take, contact doctor\" overrides anything else)\n - pattern/refuse-on-redacted (illegible label fields \u2192 null +\n   \"unreadable\" warning rather than guessing dosage)"
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "MedLabel team (Gemma 4 Good Hackathon \u2014 author pending confirmation)",
+            "type": "MAINTAINER"
+          },
+          {
+            "name": "Open Harness Hub contributors (catalog port + spec)",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../medlabel-photo-to-warning.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/medlabel-photo-to-warning/output/extracted_label",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "extracted_label (object)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/medlabel-photo-to-warning/output/interaction_findings",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "interaction_findings (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/medlabel-photo-to-warning/output/warning_severity",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "warning_severity (string)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/medlabel-photo-to-warning/output/user_language_warning",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "user_language_warning (string)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/medlabel-photo-to-warning/output/doctor_contact_recommended",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "doctor_contact_recommended (boolean)"
+        }
+      }
+    }
+  ]
+}

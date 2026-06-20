@@ -1,0 +1,68 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-20T15:47:30.649843+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "6bb5efcd-6e7e-4b3b-8f70-7b870245bb47",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-20T15:47:30.649855+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/bidirectional-lstm-sequence-prediction",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Stacked Bidirectional LSTM for sequence-to-sequence or sequence-\nto-label prediction. Standard Kaggle approach for: ventilator\npressure prediction, classic NLP toxic comment classification,\nsignal classification, EEG time-series. Often combined with 1D-CNN\nfor local feature extraction before recurrent layers.\n\nVerified by Open Harness Hub mining: theoviel Deep Learning Starter\nSimple LSTM (1166 votes, Ventilator Pressure Prediction), tenffe\nfinetune of TensorFlow Bidirectional LSTM (668 votes, same comp),\ntanulsingh077 Deep Learning For NLP Zero To Transformers + BERT\n(6394 votes!, Jigsaw Multilingual Toxic), rhtsingh Utilizing\nTransformer Representations Efficiently (1247 votes, CommonLit\nReadability \u2014 has 1D-CNN + LSTM head)."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors (port)",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../bidirectional-lstm-sequence-prediction.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/bidirectional-lstm-sequence-prediction/output/predictions",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "predictions (number[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/bidirectional-lstm-sequence-prediction/output/model_component",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "model_component (component_id)"
+        }
+      }
+    }
+  ]
+}

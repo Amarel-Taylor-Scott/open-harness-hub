@@ -1,0 +1,85 @@
+id: "pipeline/code-act-jupyter-loop"
+type: pipeline
+version: "0.1.0"
+name: "Code-act Jupyter loop"
+description: |
+  The OpenInterpreter pattern: model emits Python code in fenced
+  blocks, runtime renders the message + executes the code in a
+  Jupyter kernel, streams the observation back into the model's
+  context, loops until the model emits a `DONE` marker.
+
+  Verified by Open Harness Hub mining of the OpenInterpreter clone:
+  `interpreter/core/respond.py` implements exactly this loop.
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "software"]
+capability: ["agent_loop", "code_synthesis", "tool_use"]
+modality:   ["text", "code"]
+lifecycle:  "beta"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url: "https://github.com/OpenInterpreter/open-interpreter/blob/main/interpreter/core/respond.py"
+  source_kind: "github"
+  author: "OpenInterpreter contributors"
+  license: "AGPL-3.0"
+
+task: |
+  Given a natural-language goal, generate Python code → execute in
+  Jupyter sandbox → observe output → iterate until the model
+  declares the task done or max_iterations is hit.
+pipeline_kind: "code_act"
+
+inputs:
+  - name: "goal"
+    type: "string"
+  - name: "max_iterations"
+    type: "integer"
+  - name: "sandbox_image"
+    type: "string"
+outputs:
+  - name: "final_state"
+    type: "object"
+  - name: "iterations"
+    type: "object[]"
+  - name: "files_produced"
+    type: "string[]"
+  - name: "done"
+    type: "boolean"
+
+defaults:
+  persona: "persona/code-consultant"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/grep-cloud-secrets"
+    - "rule-pack/grep-ai-vendor-keys"
+
+steps:
+  - id: "guard_goal"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-cloud-secrets"
+    inputs: { text: "$.inputs.goal" }
+
+  - id: "loop"
+    kind: "processor"
+    ref: "processor/iterative-revise-loop"
+    inputs:
+      initial_prompt: "$.inputs.goal"
+      inner_harness_ref: "harness/text-safety-review"
+      verifier_refs:
+        - "processor/json-schema-repair"
+      max_iterations: "$.inputs.max_iterations"
+      cost_ceiling_usd: 1.00
+      convergence_policy: "all_pass"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "code-act-jupyter-loop"
+      applied_layers: ["persona", "grep", "tools", "execute"]
+
+success_criteria: []

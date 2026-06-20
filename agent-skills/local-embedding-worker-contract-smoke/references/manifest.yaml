@@ -1,0 +1,82 @@
+id: "pipeline/local-embedding-worker-contract-smoke"
+type: pipeline
+version: "0.1.0"
+name: "Local embedding worker contract smoke"
+description: "Runs a bounded local worker contract check that proves stored vector metadata rows line up with daily embedding completion stubs."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["embedding", "retrieval", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["embeddings", "vector-search", "pgvector", "daily-factory", "worker-contract", "readiness"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Prove a local embedding worker can produce database-loadable vector metadata rows for a daily embedding execution sample."
+pipeline_kind: "research_web.local_embedding_worker_contract_smoke"
+inputs:
+  - name: "embedding_plan"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+  - name: "run_id"
+    type: "string"
+  - name: "limit"
+    type: "integer"
+outputs:
+  - name: "sampled_embedding_completion_stubs"
+    type: "jsonl"
+  - name: "stored_vector_contract_rows"
+    type: "jsonl"
+  - name: "vector_readiness_summary"
+    type: "json"
+  - name: "local_embedding_worker_contract_summary"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/local-embedding-worker-contract-patterns"
+steps:
+  - id: "load-local-embedding-contract-checks"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/local-embedding-worker-contract-patterns"
+    inputs:
+      query: "local embedding worker vector metadata contract readiness sample"
+      top_k: 20
+  - id: "run-local-embedding-worker-contract"
+    kind: "tool"
+    ref: "tool/local-embedding-worker-contract"
+    inputs:
+      embedding_plan: "$.inputs.embedding_plan"
+      output_dir: "$.inputs.output_dir"
+      run_id: "$.inputs.run_id"
+      limit: "$.inputs.limit"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.run-local-embedding-worker-contract.vector_readiness.readiness_status"
+    op: "=="
+    value: "ready"
+    severity: "high"
+    label: "The sampled worker output passes vector readiness."
+  - kind: "deterministic"
+    target: "$.run-local-embedding-worker-contract.stored_vector_rows"
+    op: ">="
+    value: 1
+    severity: "high"
+    label: "Stored vector metadata rows are emitted."
+  - kind: "semantic"
+    target: "$.run-local-embedding-worker-contract"
+    must_cover:
+      - "contract stub"
+      - "embedding id"
+      - "text hash"
+      - "dimensions"
+      - "readiness"
+      - "not production vectors"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "The worker boundary is explicit."

@@ -1,0 +1,83 @@
+id: "pipeline/promotion-cdc-bridge-plan"
+type: pipeline
+version: "0.1.0"
+name: "Promotion CDC bridge plan"
+description: "Turns approved component promotion outputs into immutable component change events plus freshness, graph, and review records for database-first lifecycle management."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "verification", "retrieval", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "promotion", "cdc", "versioning", "index-delta", "postgres"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Bridge review-approved component publication into CDC rows so component versions, search indexes, and review queues remain incremental and auditable."
+pipeline_kind: "research_web.promotion_cdc_bridge_plan"
+inputs:
+  - name: "approved_component_versions_csv"
+    type: "string"
+  - name: "previous_component_versions_path"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "promotion_cdc_bridge_plan"
+    type: "json"
+  - name: "new_component_versions"
+    type: "jsonl"
+  - name: "component_change_events"
+    type: "jsonl"
+  - name: "component_change_index_records"
+    type: "jsonl"
+  - name: "component_change_review_tickets"
+    type: "jsonl"
+  - name: "load_sql"
+    type: "sql"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/promotion-cdc-bridge-patterns"
+steps:
+  - id: "load-promotion-cdc-bridge-checks"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/promotion-cdc-bridge-patterns"
+    inputs:
+      query: "approved component promotion cdc version hash index review load"
+      top_k: 20
+  - id: "bridge-promotion-to-cdc"
+    kind: "tool"
+    ref: "tool/promotion-cdc-bridge-planner"
+    inputs:
+      approved_component_versions_csv: "$.inputs.approved_component_versions_csv"
+      previous_component_versions_path: "$.inputs.previous_component_versions_path"
+      output_dir: "$.inputs.output_dir"
+      actor_type: "worker"
+      actor_ref: "approved-component-promotion"
+  - id: "audit-staged-vs-committed"
+    kind: "tool"
+    ref: "tool/staged-vs-committed-load-auditor"
+    inputs:
+      reason: "After psql execution, compare component_change_event, index_record, and review_ticket counts with the bridge plan."
+success_criteria:
+  - kind: "deterministic"
+    target: "$.promotion_cdc_bridge_plan.cdc.change_event_count"
+    op: ">="
+    value: 0
+    severity: "high"
+    label: "Approved version rows are converted into a CDC plan."
+  - kind: "semantic"
+    target: "$.promotion_cdc_bridge_plan"
+    must_cover:
+      - "component versions"
+      - "change events"
+      - "index records"
+      - "review tickets"
+      - "load SQL"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Bridge output preserves lifecycle and search-update requirements."

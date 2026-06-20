@@ -1,0 +1,156 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-20T15:47:30.643568+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "acb319be-2642-40d2-9ff0-df5e82528eac",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-20T15:47:30.643580+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/beneficial-owner-sanctions-chain-screening",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Resolve the ownership / control chain of a corporate counterparty and\ndecide whether a sanctioned or politically-exposed ultimate beneficial\nowner (UBO) sits behind it \u2014 applying the aggregated-ownership and\ncontrol tests used in sanctions compliance (e.g. OFAC's 50 Percent\nRule and control-based designation) \u2014 and produce a cited yes/no with\nthe traversed chain.\n\nNegative space: a bare model cannot walk a corporate ownership graph,\ncannot apply the aggregated-50%/control test, and cannot tell you\nWHICH intermediate entity is the sanctioned node \u2014 it has no registry\naccess and confabulates ownership. The chain comes from a registry\nlookup tool + entity linking; each hop is screened deterministically;\nthe model only narrates the resolved chain and applies the\ncontrol/ownership test against retrieved framework text, citing each\nconclusion. Indirect ownership through a sanctioned parent makes the\ncounterparty blocked even when the counterparty itself is not listed \u2014\nthe exact reasoning step base models miss.\n\nReference / educational only \u2014 registry results and chains are\nsynthetic / governed snapshots; not legal advice. Bundle: High-\nprecision legal / regulated RAG over a sanctions-ownership corpus."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../beneficial-owner-sanctions-chain-screening.yaml"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "knowledge-pack/sanctions-ownership-chain-frameworks",
+      "facets": {
+        "schema": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-1-0/SchemaDatasetFacet.json",
+          "fields": [
+            {
+              "name": "rag_doc",
+              "type": "string"
+            },
+            {
+              "name": "checklist",
+              "type": "string"
+            },
+            {
+              "name": "control_summary",
+              "type": "string"
+            },
+            {
+              "name": "evidence_matrix",
+              "type": "string"
+            },
+            {
+              "name": "benchmark_context",
+              "type": "string"
+            }
+          ]
+        },
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "Composite benchmark and review context pack for sanctions ownership chain workflows."
+        },
+        "dataSource": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+          "name": "open-harness-hub",
+          "uri": "https://open-harness-hub.dev/knowledge-pack/sanctions-ownership-chain-frameworks"
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/beneficial-owner-sanctions-chain-screening/output/blocked_by_ubo",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "blocked_by_ubo (boolean)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/beneficial-owner-sanctions-chain-screening/output/ownership_chain",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "ownership_chain (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/beneficial-owner-sanctions-chain-screening/output/controlling_sanctioned_node",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "controlling_sanctioned_node (object)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/beneficial-owner-sanctions-chain-screening/output/aggregated_ownership_pct",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "aggregated_ownership_pct (number)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/beneficial-owner-sanctions-chain-screening/output/disposition",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "disposition (enum[clear, blocked_50_percent, blocked_control, enhanced_due_diligence, insufficient_data])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/beneficial-owner-sanctions-chain-screening/output/chain_rationale",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "chain_rationale (markdown)"
+        }
+      }
+    }
+  ]
+}

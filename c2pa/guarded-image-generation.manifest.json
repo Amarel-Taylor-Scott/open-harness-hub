@@ -1,0 +1,61 @@
+{
+  "claim_generator": "open_harness_hub/guarded-image-generation@0.1.0",
+  "claim_generator_info": [
+    {
+      "name": "Open Harness Hub",
+      "version": "0.1.0"
+    }
+  ],
+  "title": "Guarded image generation (screen \u2192 generate \u2192 filter \u2192 select)",
+  "format": "image/png",
+  "instance_id": "urn:uuid:00000000-0000-0000-0000-000000000000",
+  "thumbnail": {
+    "format": "image/jpeg",
+    "identifier": "thumb.jpg"
+  },
+  "assertions": [
+    {
+      "label": "c2pa.actions",
+      "data": {
+        "actions": [
+          {
+            "action": "c2pa.created",
+            "when": "2026-06-20T15:48:01.665090+00:00",
+            "softwareAgent": {
+              "name": "Guarded image generation (screen \u2192 generate \u2192 filter \u2192 select)",
+              "version": "0.1.0"
+            },
+            "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia"
+          }
+        ]
+      }
+    },
+    {
+      "label": "c2pa.training-mining",
+      "data": {
+        "entries": {
+          "c2pa.ai_generative_training": {
+            "use": "allowed",
+            "notice": "Pipeline `pipeline/guarded-image-generation` uses tool `tool/image-prompt-safety-screen` and obeys the hub's output_safety_packs."
+          },
+          "c2pa.ai_inference": {
+            "use": "allowed"
+          }
+        }
+      }
+    },
+    {
+      "label": "ohh.pipeline_provenance",
+      "data": {
+        "pipeline_id": "pipeline/guarded-image-generation",
+        "pipeline_version": "0.1.0",
+        "synth_tool": "tool/image-prompt-safety-screen",
+        "output_safety_packs": [],
+        "style_packs": [],
+        "physics_packs": [],
+        "license": "MIT",
+        "trust_boundary": "local"
+      }
+    }
+  ]
+}

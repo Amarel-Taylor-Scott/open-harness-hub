@@ -1,0 +1,91 @@
+id: "pipeline/workflow-primitive-ingest"
+type: pipeline
+version: "0.1.0"
+name: "Workflow primitive ingest"
+description: "Import AI workflow graphs from systems such as ComfyUI, n8n, Flowise, Dify, and Langflow, then normalize, safety-scan, score, and index reusable primitives."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "media", "cross_industry"]
+capability: ["retrieval", "format_conversion", "evaluation", "governance"]
+modality: ["text", "image", "video", "audio", "music", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.discovery"
+tags: ["workflow-import", "comfyui", "n8n", "flowise", "dify", "primitive-database"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Convert external AI workflow graphs into searchable candidate primitives with safety, cost, provenance, and evaluation metadata."
+pipeline_kind: "research_web.workflow_primitive_ingest"
+
+inputs:
+  - name: "source_format"
+    type: "string"
+  - name: "workflow"
+    type: "object"
+  - name: "import_policy"
+    type: "object"
+outputs:
+  - name: "candidate_primitives"
+    type: "object[]"
+  - name: "candidate_pipeline"
+    type: "object"
+  - name: "safety_report"
+    type: "object"
+  - name: "index_records"
+    type: "object[]"
+
+defaults:
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/workflow-builder-inspiration"
+    - "knowledge-pack/saas-operating-platform-patterns"
+  rule_packs:
+    - "rule-pack/grep-prompt-injection-heuristics"
+
+steps:
+  - id: "normalize_workflow"
+    kind: "tool"
+    ref: "tool/workflow-import-normalizer"
+    inputs:
+      source_format: "$.inputs.source_format"
+      workflow: "$.inputs.workflow"
+      import_policy: "$.inputs.import_policy"
+
+  - id: "scan_nodes"
+    kind: "tool"
+    ref: "tool/workflow-node-safety-scanner"
+    inputs:
+      node_package: "$.steps.normalize_workflow.output.candidate_primitives"
+      workflow_context: "$.steps.normalize_workflow.output.normalized_graph"
+      policy: "$.inputs.import_policy"
+
+  - id: "score_primitives"
+    kind: "tool"
+    ref: "tool/capability-gap-signal-scorer"
+    inputs:
+      finding: "$.steps.normalize_workflow.output.candidate_primitives"
+
+  - id: "plan_index"
+    kind: "tool"
+    ref: "tool/primitive-index-orchestrator"
+    inputs:
+      primitive_batch: "$.steps.normalize_workflow.output.candidate_primitives"
+      index_targets: ["keyword", "vector", "graph", "facet", "quality"]
+      rebuild_mode: "incremental"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "workflow-primitive-ingest"
+      applied_layers: ["workflow_normalization", "node_safety_scan", "primitive_scoring", "index_planning"]
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.outputs.candidate_primitives"
+    op: "is_truthy"
+    value: true
+    label: "Candidate primitives are produced from the workflow."

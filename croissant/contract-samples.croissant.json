@@ -1,0 +1,69 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/dataset/contract-samples",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Synthetic commercial contract samples (3 cases)",
+  "description": "Three synthetic commercial contracts for testing\n`pipeline/contract-clause-review`. Fully synthetic — no real\ncontract data.\n\nCases:\n - sample-msa-clean.json — well-drafted MSA with all critical\n   clauses present (capped indemnity with carve-outs, mutual\n   liability cap, DPA attached, audit rights, anti-bribery\n   warranty, 90-day termination with wind-down, symmetric\n   assignment, broad force-majeure). Expected high grade.\n - sample-vendor-flagged.json — aggressive vendor agreement\n   with 9 red flags (uncapped indemnity to vendor, $10k\n   vendor cap vs unlimited customer liability, IP assignment\n   of pre-existing IP, no residuals, no DPA, no audit rights,\n   no anti-bribery, 5-day termination, free vendor assignment,\n   narrow force-majeure). Expected highly flagged.\n - sample-nda-mixed.json — NDA missing residuals clause + 5y\n   term (long but not red-flag). Mixed signals.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/MIT.html",
+  "url": "https://open-harness-hub.dev/dataset/contract-samples",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-20",
+  "keywords": [
+    "legal",
+    "contract",
+    "synthetic",
+    "nda",
+    "msa"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-20"
+}

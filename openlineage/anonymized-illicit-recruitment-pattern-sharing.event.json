@@ -1,0 +1,79 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-20T15:47:30.650688+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "0878e4a6-06bb-4420-a2c9-1e2b65fccdde",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-20T15:47:30.650699+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/anonymized-illicit-recruitment-pattern-sharing",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Mechanism for cross-industry knowledge sharing of systemic bad\nactors (rogue labor brokers, repeat-offender contractors, illicit\nrecruitment corridors) WITHOUT leaking corporate-confidential\nsupply-chain information. The shape:\n\n 1. Each org's audit pipeline emits a `pattern_indicator` record\n    (HMACed broker ID + corridor + indicator categories + observation\n    window).\n 2. Indicators are bucketed; counts < `k` (default k = 5) are\n    dropped (k-anonymity).\n 3. Surviving buckets are signed and published to a shared hub.\n 4. Member orgs query the hub: \"have these indicators been seen\n    against this corridor / broker?\" \u2014 returns aggregate count +\n    severity, never per-org provenance.\n\nUse case: a beverage company audits a tier-3 packaging supplier in\nMae Sot and finds 3 indicators. The hub already shows 14 indicators\nfrom 4 other orgs against the same broker in the same corridor in\nthe last 90 days \u2192 trigger heightened review across all members.\n\nInspired by reviewer feedback on the DueCare ecosystem; aligned with\nFATF Recommendation 18 information-sharing principles (adapted to\nESG / forced-labor context)."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../anonymized-illicit-recruitment-pattern-sharing.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/anonymized-illicit-recruitment-pattern-sharing/output/shared_indicators",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "shared_indicators (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/anonymized-illicit-recruitment-pattern-sharing/output/matched_peer_aggregates",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "matched_peer_aggregates (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/anonymized-illicit-recruitment-pattern-sharing/output/rejected_below_k",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "rejected_below_k (object[])"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-20T15:47:30.591035+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "40f543dd-b65c-4459-bf6a-cafe5b45cd25",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-20T15:47:30.591047+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/call-qa-grading-from-audio",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Negative-space task: grading a recorded support/collections/sales call\nagainst a QA rubric. A bare LLM handed a raw audio file (or even a\ntranscript) produces a plausible score with no audit trail, drifts on\nwhether a MANDATORY disclosure was actually spoken, and cites nothing \u2014\nso the score cannot be defended in a dispute or a regulator review. This\npipeline transcribes deterministically with Whisper (segments +\ntimestamps), redacts PII before the model, retrieves the controlling QA\ncriteria, grades each rubric dimension with the model REQUIRED to quote the\nverbatim transcript span that justifies it, and runs a deterministic gate\nthat fails the call when a required-disclosure phrase is absent from the\ntranscript \u2014 regardless of what the model scored.\n\nCapability lift is structural: the durable lift is grounding (every score\ntied to a quoted span) + a deterministic disclosure check (a phrase is\npresent in the transcript or it is not \u2014 one correct answer). Both survive\nmodel upgrades; the transcription, redaction, retrieval, and disclosure\ncheck are freezable and cost no model tokens beyond the single grading call.\n\nBundle: Standard hybrid RAG over the QA-criteria corpus (taxonomy Bundle A)\nfronted by an audio\u2192text Input-Formatting step and closed by grounded,\ncited grading with deterministic verification."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../call-qa-grading-from-audio.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/call-qa-grading-from-audio/output/dimension_scores",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "dimension_scores (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/call-qa-grading-from-audio/output/cited_spans",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "cited_spans (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/call-qa-grading-from-audio/output/disclosure_verdict",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "disclosure_verdict (string)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/call-qa-grading-from-audio/output/overall_grade",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "overall_grade (number)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/call-qa-grading-from-audio/output/findings",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "findings (object[])"
+        }
+      }
+    }
+  ]
+}

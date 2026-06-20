@@ -1,0 +1,101 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-20T15:47:30.591230+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "24ef4c0e-a751-455e-ab70-6cb854fe4b52",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-20T15:47:30.591242+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/deposition-page-line-index",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Negative-space task: turning a long deposition transcript into a usable\nindex for litigation. A bare LLM summarizes a deposition fluently but (a)\nfabricates or mis-attributes the page:line citations that make a digest\nadmissible/usable, (b) loses the thread across hundreds of pages, and (c)\ncannot reliably flag where a witness contradicts an earlier answer. This\npipeline extracts page-anchored text, chunks page-aware so every chunk keeps\nits page:line, retrieves topic-relevant testimony with hybrid + rerank, and\nproduces a topic digest where EVERY assertion must carry a verbatim quote +\nits page:line \u2014 verified deterministically so an entry with an unsupported\nor unparseable citation fails the run rather than shipping.\n\nCapability lift is structural: the durable lift is citation fidelity (every\nindex entry traces to a real page:line span) \u2014 a verification step, not a\nmodel capability that closes on the next release. Extraction, page-aware\nchunking, hybrid retrieval, rerank, and the citation-coverage check are\nfreezable and cost no model tokens beyond the digest call.\n\nBundle: High-precision legal RAG for regulated domains (taxonomy Bundle B) \u2014\npage/structure-aware chunking to preserve citable anchors, hybrid BM25 +\ndense + rerank, cite-every-claim-or-abstain output, and a citation-coverage\ngate."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../deposition-page-line-index.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/deposition-page-line-index/output/topic_index",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "topic_index (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/deposition-page-line-index/output/cited_spans",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "cited_spans (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/deposition-page-line-index/output/contradiction_flags",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "contradiction_flags (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/deposition-page-line-index/output/concept_graph",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "concept_graph (object)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/deposition-page-line-index/output/findings",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "findings (object[])"
+        }
+      }
+    }
+  ]
+}

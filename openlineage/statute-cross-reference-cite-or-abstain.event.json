@@ -1,0 +1,101 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-20T15:47:30.599632+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "1a1af1d0-c890-479c-84a5-af600e6538a6",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-20T15:47:30.599644+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/statute-cross-reference-cite-or-abstain",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Resolve the internal cross-references in a statute or regulation\n(\"subject to subsection (b)\", \"as defined in \u00a73\", \"notwithstanding\nparagraph (2)\") and answer what the cross-referenced provision\nactually says \u2014 with an EXACT-section citation for every resolved\nreference, or abstain. High-precision legal/regulated RAG bundle\n(Bundle B) with an exact-id retrieval leg as the load-bearing lock:\n\n - GREP/regex triage extracts the section/paragraph identifiers and\n   defined-term references in the input;\n - hybrid retrieval (the exact-id leg matches \u00a7/\u00b6 numbers that\n   embeddings blur; the dense leg covers defined-term phrasing) over\n   the statute citation + cross-reference grounding corpus, fused +\n   cross-encoder reranked;\n - cite-first counsel persona + statute-clarity harness resolves each\n   reference to the provision it points at, with a per-reference\n   citation;\n - DETERMINISTIC cite-or-abstain gate: a resolved cross-reference\n   with no citation to the target provision fails citation-coverage\n   and blocks publication \u2014 the model may NOT assert what an\n   unretrieved \u00a7X says.\n\nNegative-space task: base models hallucinate the content of a\ncross-referenced section (\"\u00a74(b) requires written notice\") when the\nsection was never retrieved. Exact-id matching + cite-or-abstain\nmake the resolution verifiable instead of fluent-but-wrong.\n\nNOT legal advice; descriptive over the cited authorities only."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../statute-cross-reference-cite-or-abstain.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/statute-cross-reference-cite-or-abstain/output/resolved_references",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "resolved_references (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/statute-cross-reference-cite-or-abstain/output/answer_markdown",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "answer_markdown (string)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/statute-cross-reference-cite-or-abstain/output/citation_coverage",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "citation_coverage (number)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/statute-cross-reference-cite-or-abstain/output/abstained",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "abstained (boolean)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/statute-cross-reference-cite-or-abstain/output/trace",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "trace (object[])"
+        }
+      }
+    }
+  ]
+}

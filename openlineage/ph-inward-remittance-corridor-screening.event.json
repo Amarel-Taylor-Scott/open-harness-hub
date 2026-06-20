@@ -1,0 +1,160 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-20T15:47:30.643849+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "fac4d76f-08cf-4a53-85ba-57c59d8d54c3",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-20T15:47:30.643862+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/ph-inward-remittance-corridor-screening",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Screen an inbound cross-border remittance into a Philippine account\n(e.g. an OFW remittance corridor) for three risks at once: (1) the\nordering / intermediary BANK is identifiable and valid via its SWIFT\nBIC, (2) the originating corridor / jurisdiction is high-risk, and\n(3) the remittance pattern matches a structuring / rapid-pass-through\ntypology \u2014 producing a cited risk disposition.\n\nNegative space: a bare model cannot validate a SWIFT BIC or resolve it\nto a bank + country, cannot say which corridors are high-risk for PH\ninbound flows, and cannot score a deposit series against a structuring\nthreshold \u2014 these are a deterministic BIC validator, a governed\ncorridor corpus, and a deterministic typology classifier respectively.\nThe model only assembles the cited disposition. Structuring across a\nseries of sub-threshold deposits is the canonical pattern a single-\ntransaction view (and a base model) misses.\n\nReference / educational only \u2014 synthetic remittance inputs, governed\ncorridor snapshots; not a payment-blocking system. Bundle: Standard\nhybrid RAG + deterministic tool legs (BIC, typology) feeding one\ngoverned model call."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../ph-inward-remittance-corridor-screening.yaml"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "knowledge-pack/high-risk-corridors-and-sectors",
+      "facets": {
+        "schema": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-1-0/SchemaDatasetFacet.json",
+          "fields": [
+            {
+              "name": "rag_doc",
+              "type": "string"
+            },
+            {
+              "name": "classifier_rule",
+              "type": "string"
+            }
+          ]
+        },
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "Composite reference of high-risk geographic corridors and product\nsectors with documented patterns of forced labor, child labor,\nenvironmental harm, or governance opacity. Used by\n`pipeline/supplier-policy-grading` and `pipeline/deep-tier-supplier-\naudit` to up-weight findings when the supplier sources from listed\ncorridors / sectors.\n\nEach entry includes: corridor name + indicative geography + product\nsectors + documented risk categories + citations to the regulatory\nbasis for heightened review (UFLPA WROs, CBP findings list, ILO\ncountry reports, US TVPA Tier rankings).\n\nCategories covered:\n - **Apparel / textile**: Xinjiang (cotton, UFLPA), Sialkot\n   (Pakistan, sports goods), Bangladesh (Ashulia, Narayanganj),\n   Cambodia (Phnom Penh), Vietnam, Myanmar\n - **Electronics / minerals**: DRC (cobalt \u2014 Katanga, Kolwezi,\n   Likasi), Indonesia (tin \u2014 Bangka), Colombia (gold), Peru\n   (gold), Madagascar (mica), India (Jharkhand mica)\n - **Agriculture**: C\u00f4te d'Ivoire + Ghana (cocoa, child labor),\n   Brazil (beef + Amazon deforestation), Paraguay + Argentina\n   (soy, Gran Chaco deforestation), Malaysia + Indonesia\n   (palm oil, RSPO gaps), Uzbekistan (cotton, formerly state-\n   compelled), Turkmenistan (cotton)\n - **Construction / domestic work**: Gulf states (Qatar, Saudi\n   Arabia, UAE, Kuwait, Bahrain \u2014 kafala system), Singapore\n   (migrant construction)\n - **Seafood**: Thailand (Samut Sakhon, Ranong \u2014 fishing vessels),\n   Bangladesh (shrimp), Vietnam\n - **Brick kilns**: India (Bihar, UP), Pakistan (Punjab), Nepal,\n   Cambodia\n - **Carpets / glass / footwear**: Pakistan (Sialkot), India\n   (Bhainsa carpets, Firozabad glass), Bangladesh\n\nComposite educational extracts; supplier mapping requires real-\ntime CBP WRO / UFLPA Entity List checks (which change frequently)."
+        },
+        "dataSource": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+          "name": "open-harness-hub",
+          "uri": "https://open-harness-hub.dev/knowledge-pack/high-risk-corridors-and-sectors"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "knowledge-pack/aml-red-flags-extended",
+      "facets": {
+        "schema": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-1-0/SchemaDatasetFacet.json",
+          "fields": [
+            {
+              "name": "rag_doc",
+              "type": "string"
+            }
+          ]
+        },
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "Extended catalog of anti-money-laundering red flags drawn from FATF\nguidance, FinCEN advisories, and Wolfsberg principles. Complements\n`knowledge-pack/fatf-typologies-sample` with finer-grained\nobservable indicators (transaction pattern, behavioral, document,\ngeographic) for use in AML pipelines."
+        },
+        "dataSource": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+          "name": "open-harness-hub",
+          "uri": "https://open-harness-hub.dev/knowledge-pack/aml-red-flags-extended"
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ph-inward-remittance-corridor-screening/output/counterparty_bank",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "counterparty_bank (object)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ph-inward-remittance-corridor-screening/output/corridor_risk",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "corridor_risk (object)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ph-inward-remittance-corridor-screening/output/structuring_indicators",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "structuring_indicators (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ph-inward-remittance-corridor-screening/output/risk_disposition",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "risk_disposition (enum[low, monitor, enhanced_due_diligence, halt_and_escalate])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ph-inward-remittance-corridor-screening/output/disposition_rationale",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "disposition_rationale (markdown)"
+        }
+      }
+    }
+  ]
+}

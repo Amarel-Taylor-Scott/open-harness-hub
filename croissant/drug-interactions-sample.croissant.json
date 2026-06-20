@@ -1,0 +1,258 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/drug-interactions-sample",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Drug-drug interactions (sample, educational)",
+  "description": "Composite paraphrases of well-known drug-drug interaction patterns\nfor educational reference. NOT a substitute for an authoritative\ndatabase (e.g. RxNorm + Lexicomp + Micromedex). Each entry carries\ndrugA / drugB / severity / mechanism / management.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC-BY-4.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/drug-interactions-sample",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-19",
+  "keywords": [
+    "pharmacy",
+    "ddi",
+    "drug-interactions"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-19",
+  "citation": "Composite paraphrases of public drug-interaction references.",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "drug-interactions-sample__drug-interactions",
+      "name": "drug-interactions.jsonl",
+      "description": "Data file backing knowledge pack drug-interactions-sample.",
+      "contentUrl": "knowledge-packs/data/drug-interactions.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "201851 B",
+      "sha256": "f7be1e16242fe410b74caad6936577c152c0cf95d8301c129601abb020118d41"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "drug-interactions-sample__records",
+      "name": "drug-interactions-sample__records",
+      "description": "Records parsed from drug-interactions.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "drug-interactions-sample__records/id",
+          "name": "id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "drug-interactions-sample__drug-interactions"
+            },
+            "extract": {
+              "column": "id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "drug-interactions-sample__records/drugA",
+          "name": "drugA",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "drug-interactions-sample__drug-interactions"
+            },
+            "extract": {
+              "column": "drugA"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "drug-interactions-sample__records/drugB",
+          "name": "drugB",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "drug-interactions-sample__drug-interactions"
+            },
+            "extract": {
+              "column": "drugB"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "drug-interactions-sample__records/severity",
+          "name": "severity",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "drug-interactions-sample__drug-interactions"
+            },
+            "extract": {
+              "column": "severity"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "drug-interactions-sample__records/mechanism",
+          "name": "mechanism",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "drug-interactions-sample__drug-interactions"
+            },
+            "extract": {
+              "column": "mechanism"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "drug-interactions-sample__records/management",
+          "name": "management",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "drug-interactions-sample__drug-interactions"
+            },
+            "extract": {
+              "column": "management"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "drug-interactions-sample__records/source",
+          "name": "source",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "drug-interactions-sample__drug-interactions"
+            },
+            "extract": {
+              "column": "source"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "drug-interactions-sample__records/tags",
+          "name": "tags",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "drug-interactions-sample__drug-interactions"
+            },
+            "extract": {
+              "column": "tags"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "drug-interactions-sample__records/text",
+          "name": "text",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "drug-interactions-sample__drug-interactions"
+            },
+            "extract": {
+              "column": "text"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "drug-interactions-sample__records/title",
+          "name": "title",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "drug-interactions-sample__drug-interactions"
+            },
+            "extract": {
+              "column": "title"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "drug-interactions-sample__records/use_case",
+          "name": "use_case",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "drug-interactions-sample__drug-interactions"
+            },
+            "extract": {
+              "column": "use_case"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "drug-interactions-sample__records/version",
+          "name": "version",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "drug-interactions-sample__drug-interactions"
+            },
+            "extract": {
+              "column": "version"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

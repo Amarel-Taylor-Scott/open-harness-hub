@@ -1,0 +1,90 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-20T15:47:30.652551+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "3fc328be-cc7a-41f9-981d-9df087511520",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-20T15:47:30.652563+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/supplier-forced-labor-prescreen",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "CHEAP STAGE-1 triage gate for modern-slavery supplier screening. Given a\nminimal supplier identity (name, country, product, parent), it decides \u2014\nbefore any expensive deep-tier audit \u2014 whether the supplier should be\nrouted to full forced-labour due diligence, based on keyword/exact-id hits\nagainst UFLPA Entity-List / CBP Withhold-Release-Order signals, the UFLPA\nhigh-priority sectors (cotton, polysilicon, tomatoes), and ILO/UNODC\nhigh-risk-sector + high-risk-corridor markers in the regulatory pack.\n\nNegative-space task: a procurement team onboarding thousands of suppliers\ncannot run a full audit on every one, and a bare model asked \"is this\nsupplier risky?\" invents a plausible-sounding risk score with no traceable\nbasis. The durable lift is a *cheap, deterministic, cited* screen that\nseparates \"no signal -> standard onboarding\" from \"signal -> escalate to\nfull audit\", so the expensive Stage-2 pipeline\n(`pipeline/apparel-forced-labor-trace-review`) only runs where a real\nsignal exists. This is the \"screen before you collect\" half of the\ncapability-gap framework applied to supplier intake.\n\nBundle: Cheap keyword-first (taxonomy Bundle C) \u2014 exact-id / keyword\nretrieval against the due-diligence pack as the cost floor, a cost-ceiling\ngate so the screen stays cheap, and a corrective route: any sanctions/WRO\nhit OR a high-risk sector+corridor co-occurrence escalates to the full\naudit; otherwise the supplier passes with a cited \"no-signal\" rationale.\nThis pipeline makes NO forced-labour determination \u2014 it only routes."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../supplier-forced-labor-prescreen.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/supplier-forced-labor-prescreen/output/routing_decision",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "routing_decision (string)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/supplier-forced-labor-prescreen/output/matched_signals",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "matched_signals (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/supplier-forced-labor-prescreen/output/next_pipeline",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "next_pipeline (string|null)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/supplier-forced-labor-prescreen/output/screen_cost",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "screen_cost (object)"
+        }
+      }
+    }
+  ]
+}

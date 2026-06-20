@@ -1,0 +1,68 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-20T15:47:30.651948+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "d9217fe4-212d-438e-b00b-68c4d2b4e8da",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-20T15:47:30.651960+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/sentence-transformer-finetune-retrieval",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Fine-tune a sentence-transformer (Sentence-BERT family) on\n(query, positive, negative) triplets using MultipleNegativesRankingLoss\nor CosineSimilarityLoss. Embeds documents into a dense space,\nretrieves by cosine similarity. The dominant Kaggle shape for\nretrieval-style competitions on educational content + curriculum\nmatching + semantic search.\n\nVerified by Open Harness Hub mining: yuiwai LECR-stsb-roberta-base\n(420 votes, Learning Equality Curriculum Recommendations), yuiwai\nall-MiniLM-L6-v2-tuning (401 votes, LECR), karakasatarik 0.459\nsingle-model-inference w/ postprocessing (375 votes, LECR),\nleonidkulyk BLIP+CLIP interrogator (732 votes, SD image-to-prompts\n\u2014 uses sentence-transformer fine-tune). 7+ kernels in our 43-kernel\ncorpus use sentence-transformers."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Open Harness Hub contributors (port)",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../sentence-transformer-finetune-retrieval.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/sentence-transformer-finetune-retrieval/output/finetuned_model",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "finetuned_model (component_id)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/sentence-transformer-finetune-retrieval/output/eval_metrics",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "eval_metrics (object)"
+        }
+      }
+    }
+  ]
+}

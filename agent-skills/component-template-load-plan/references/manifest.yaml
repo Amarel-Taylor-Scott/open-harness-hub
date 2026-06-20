@@ -1,0 +1,81 @@
+id: "pipeline/component-template-load-plan"
+type: pipeline
+version: "0.1.0"
+name: "Component template load plan"
+description: "Creates CSV and SQL load bundles that place off-the-shelf component pipeline templates into Postgres template tables with ordered layer-aware steps."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["planning", "routing", "serving", "verification"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "pipeline-template", "postgres", "bulk-load", "review-gate"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Create a review-gated Postgres load plan for reusable component pipeline templates and ordered template steps."
+pipeline_kind: "research_web.component_template_load_plan"
+inputs:
+  - name: "template_paths"
+    type: "array"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "component_template_load_plan"
+    type: "json"
+  - name: "component_pipeline_templates_csv"
+    type: "csv"
+  - name: "component_pipeline_template_steps_csv"
+    type: "csv"
+  - name: "load_sql"
+    type: "sql"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/component-template-load-patterns"
+steps:
+  - id: "load-template-checks"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/component-template-load-patterns"
+    inputs:
+      query: "component pipeline template postgres load order layer coverage reference preservation search indexing"
+      top_k: 20
+  - id: "plan-template-load"
+    kind: "tool"
+    ref: "tool/component-template-load-planner"
+    inputs:
+      template_paths: "$.inputs.template_paths"
+      output_dir: "$.inputs.output_dir"
+  - id: "audit-staged-vs-committed"
+    kind: "tool"
+    ref: "tool/staged-vs-committed-load-auditor"
+    inputs:
+      reason: "After psql execution, compare template and template-step counts with planned counts before publishing off-the-shelf pipelines."
+success_criteria:
+  - kind: "deterministic"
+    target: "$.component_template_load_plan.template_count"
+    op: ">"
+    value: 0
+    severity: "high"
+    label: "Template rows are exported."
+  - kind: "deterministic"
+    target: "$.component_template_load_plan.template_step_count"
+    op: ">"
+    value: 0
+    severity: "high"
+    label: "Template step rows are exported."
+  - kind: "semantic"
+    target: "$.component_template_load_plan"
+    must_cover:
+      - "component pipeline template"
+      - "ordered template steps"
+      - "pre_llm"
+      - "llm"
+      - "post_llm"
+      - "control_flow"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Load plan preserves layer-aware off-the-shelf pipeline structure."

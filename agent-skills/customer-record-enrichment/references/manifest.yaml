@@ -1,0 +1,106 @@
+id: "pipeline/customer-record-enrichment"
+type: pipeline
+version: "0.1.0"
+name: "Customer record enrichment (deterministic, cross-vertical)"
+description: |
+  Normalize + enrich a raw customer / vendor record. Chains the
+  format-convert processors (address / phone / name / country /
+  date) followed by deduplication via entity-resolution-link, with
+  optional external-tool calls (USPS / geocode / OpenCorporates /
+  SWIFT BIC) gated on env keys.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry", "retail", "finance", "compliance"]
+capability: ["format_conversion", "verification", "extraction"]
+modality:   ["text", "structured"]
+lifecycle:  "beta"
+trust_boundary: "mixed"
+lifecycle_position: "pre_api.enrichment"
+tags: ["enrichment", "dedupe", "data-cleaning", "kyc"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+task: "Normalize + enrich + dedupe-key a customer record."
+pipeline_kind: "enrichment"
+
+inputs:
+  - name: "raw_record"
+    type: "object"
+  - name: "profile"
+    type: "string"
+outputs:
+  - name: "standardized"
+    type: "object"
+  - name: "enriched"
+    type: "object"
+  - name: "dedup_key"
+    type: "string"
+  - name: "provenance"
+    type: "object[]"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+
+steps:
+  - id: "parse_address"
+    kind: "processor"
+    ref: "processor/address-parse-standardize"
+    inputs:
+      address_text:  "$.inputs.raw_record.address"
+      country_hint:  "$.inputs.raw_record.country_hint"
+  - id: "normalize_country"
+    kind: "processor"
+    ref: "processor/iso-country-normalize"
+    inputs:
+      country_text: "$.inputs.raw_record.country"
+  - id: "normalize_phone"
+    kind: "processor"
+    ref: "processor/phone-normalize-e164"
+    inputs:
+      phone_text:    "$.inputs.raw_record.phone"
+      country_hint:  "$.steps.normalize_country.output.alpha_2"
+  - id: "canonicalize_name"
+    kind: "processor"
+    ref: "processor/name-canonicalize"
+    inputs:
+      raw_name: "$.inputs.raw_record.name"
+      name_culture_hint: "$.inputs.raw_record.name_culture_hint"
+  - id: "parse_dates"
+    kind: "processor"
+    ref: "processor/date-parse-multiformat"
+    inputs:
+      date_text:    "$.inputs.raw_record.dob"
+      locale_hint:  "$.inputs.profile"
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs:
+      text: "$.inputs.raw_record"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "customer-record-enrichment"
+      applied_layers: ["format_convert", "verification"]
+
+success_criteria:
+  - kind: deterministic
+    label: "address parsed (components extracted)"
+    target: "$.steps.parse_address.output.confidence"
+    op: ">"
+    value: 0
+    severity: medium
+  - kind: deterministic
+    label: "phone normalized to E.164"
+    target: "$.steps.normalize_phone.output.is_valid"
+    op: "is_truthy"
+    value: null
+    severity: medium
+  - kind: deterministic
+    label: "country resolved to ISO alpha-2"
+    target: "$.steps.normalize_country.output.is_valid"
+    op: "is_truthy"
+    value: null
+    severity: high

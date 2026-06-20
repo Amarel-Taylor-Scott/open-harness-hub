@@ -1,0 +1,59 @@
+id: "pipeline/kyc-cip-gate"
+type: pipeline
+version: "0.1.0"
+name: "KYC/CIP onboarding gate (BSA + USA PATRIOT §326)"
+description: "Apply CIP 4-element + OFAC + PEP + beneficial-ownership gate before account opening. OFAC hit + cannot-verify-identity = NO-GO."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["finance", "compliance"]
+capability: ["safety_gating", "evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+tags: ["kyc", "cip", "bsa", "go-nogo"]
+created: "2026-05-21"
+updated: "2026-05-21"
+attribution:
+  source_url: "https://www.fincen.gov/cdd-final-rule"
+  source_kind: "other"
+  author: "31 CFR 1020.220 + 31 CFR 1010.230 + USA PATRIOT §326 (composite)"
+  license: "CC-BY-4.0"
+task: "Apply CIP/CDD gate before account opening."
+pipeline_kind: "review"
+inputs:
+  - name: "onboarding_packet"
+    type: "string|object"
+outputs:
+  - name: "verdict"
+    type: "string"
+  - name: "items"
+    type: "object[]"
+  - name: "nogo_triggers"
+    type: "string[]"
+defaults:
+  knowledge_packs: ["knowledge-pack/technician-checklists"]
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.onboarding_packet" }
+  - id: "checklist_gate"
+    kind: "processor"
+    ref: "processor/checklist-evaluator"
+    inputs:
+      candidate: "$.steps.structured_to_prose.output.prose"
+      checklist_id: "kyc-cip"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "kyc-cip-gate"
+      applied_layers: ["structured_to_prose", "checklist_evaluator"]
+success_criteria:
+  - kind: deterministic
+    target: "$.steps.checklist_gate.output.verdict"
+    op: "=="
+    value: "go"
+    severity: "critical"
+    label: "CIP/CDD gate must return GO before account opening"

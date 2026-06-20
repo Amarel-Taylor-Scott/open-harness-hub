@@ -1,0 +1,59 @@
+id: "pipeline/nfpa-70e-loto-gate"
+type: pipeline
+version: "0.1.0"
+name: "NFPA 70E Lockout/Tagout gate"
+description: "Apply NFPA 70E + OSHA 1910.147 LOTO gate — voltage detected after isolation = re-isolate."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["energy", "compliance"]
+capability: ["safety_gating", "evaluation"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+tags: ["nfpa-70e", "loto", "osha", "go-nogo"]
+created: "2026-05-21"
+updated: "2026-05-21"
+attribution:
+  source_url: "https://www.nfpa.org/codes-and-standards/all-codes-and-standards/list-of-codes-and-standards/detail?code=70E"
+  source_kind: "other"
+  author: "NFPA 70E-2024 + OSHA 1910.147 (composite)"
+  license: "CC-BY-4.0"
+task: "Apply LOTO gate before electrical work."
+pipeline_kind: "review"
+inputs:
+  - name: "loto_packet"
+    type: "string|object"
+outputs:
+  - name: "verdict"
+    type: "string"
+  - name: "items"
+    type: "object[]"
+  - name: "nogo_triggers"
+    type: "string[]"
+defaults:
+  knowledge_packs: ["knowledge-pack/technician-checklists"]
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.loto_packet" }
+  - id: "checklist_gate"
+    kind: "processor"
+    ref: "processor/checklist-evaluator"
+    inputs:
+      candidate: "$.steps.structured_to_prose.output.prose"
+      checklist_id: "nfpa70e-loto"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "nfpa-70e-loto-gate"
+      applied_layers: ["structured_to_prose", "checklist_evaluator"]
+success_criteria:
+  - kind: deterministic
+    target: "$.steps.checklist_gate.output.verdict"
+    op: "=="
+    value: "go"
+    severity: "critical"
+    label: "LOTO gate must return GO before energized work"
