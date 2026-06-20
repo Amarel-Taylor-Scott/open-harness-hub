@@ -73,6 +73,13 @@ def build_all() -> dict:
     root_hub = P.DIST / "index.html"
     root_hub.write_text(hub_html, encoding="utf-8")
     results["hub"] = {"path": str(hub.relative_to(P.REPO)), "root_path": str(root_hub.relative_to(P.REPO))}
+    # standards-interoperability page, generated from architecture/standards_interop_manifest.json (its own
+    # source of truth). Kept out of the per-site renderer; never block the site build on it.
+    try:
+        from scripts.check_standards_interop_manifest import write_pages as _write_interop
+        results["interop_pages"] = _write_interop()
+    except Exception as e:  # pragma: no cover
+        results["interop_pages_error"] = str(e)
     _BUILD_MANIFEST.write_text(json.dumps(results, indent=2), encoding="utf-8")
     return results
 

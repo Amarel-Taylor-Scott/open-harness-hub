@@ -214,9 +214,10 @@ SITES: dict[str, dict] = {
         ],
         "cta_primary": ("Browse the context registry", "#artifact"),
         "cta_secondary": ("Run a Fragile Context Audit", "#fragile"),
+        "cta_tertiary": ("Standards interoperability", "interop.html"),
         "required_phrases": ["Open context artifacts for AI systems.", "context pack", "source-handle",
                              "Reference context is not served truth.", "Baltor governs", "Browse the context registry",
-                             "Run a Fragile Context Audit", "fragile context"],
+                             "Run a Fragile Context Audit", "fragile context", "Standards interoperability"],
         "forbidden_identity": ["self-adaptive capabilities", "skill graph", "tool graph", "open harnesses"],
     },
     "openskillshub": {
@@ -378,6 +379,8 @@ def render_site(site_id: str) -> str:
     s = SITES[site_id]
     cta1_label, cta1_href = s["cta_primary"]
     cta2_label, cta2_href = s["cta_secondary"]
+    cta3 = s.get("cta_tertiary")  # optional 3rd CTA (a relative page link, not an in-page anchor)
+    cta3_html = f'\n    <a class="btn secondary" href="{_esc(cta3[1])}">{_esc(cta3[0])}</a>' if cta3 else ""
     sections_html = "".join(
         f'<section id="{_esc(h.lower().split(" ")[0])}"><h2>{_esc(h)}</h2>'
         f'<p>{_esc(b)}</p></section>' for h, b in s["sections"])
@@ -403,7 +406,7 @@ def render_site(site_id: str) -> str:
   <p class="lead">{_esc(s['problem'])}</p>
   <div class="cta">
     <a class="btn primary" href="{_esc(cta1_href)}">{_esc(cta1_label)}</a>
-    <a class="btn secondary" href="{_esc(cta2_href)}">{_esc(cta2_label)}</a>
+    <a class="btn secondary" href="{_esc(cta2_href)}">{_esc(cta2_label)}</a>{cta3_html}
   </div>
   <p class="preview">Preview build — temporary URL, not production hosting.</p>
 </div>

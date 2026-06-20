@@ -174,12 +174,17 @@ def _self_test() -> int:
        bool(okf) and okf["status"] == "built" and okf["direction"] == "ingest+emit"
        and "freshness" in okf.get("governance_added", "").lower())
 
-    # the generated page is FRESH (computed from the manifest; no drift, no magic values)
-    ck("the generated interop page exists", _PAGE.exists(), str(_PAGE))
-    if _PAGE.exists():
-        ck("the generated interop page matches the manifest (regenerate with --build if this fails)",
-           _PAGE.read_text() == render_page(m))
+    # the page is GENERATED from the manifest (computed counts/lists — no magic values). dist/ is a build
+    # artifact (gitignored, rebuilt by build_portfolio_sites), so the proof validates the RENDER and only enforces
+    # freshness when the on-disk page is present — green on a fresh checkout, drift-catching once built.
     c = _counts(m)
+    page = render_page(m)
+    ck("the interop page renders from the manifest (principle + every standard name present)",
+       html.escape(m["principle"]) in page and all(html.escape(s["name"]) in page for s in stds))
+    ck("the page badge is computed from the manifest (no hand-typed standards count)", f'(of {c["total"]})' in page)
+    if _PAGE.exists():
+        ck("the on-disk interop page is fresh vs the manifest (regenerate with --build if this fails)",
+           _PAGE.read_text() == page)
     ck("counts are computed from the manifest (built+emitted+mapped+declined == total)",
        c["built"] + c["emitted"] + c["mapped"] + c["declined"] == c["total"] and c["total"] >= 8)
     ck("deterministic", render_page(load_manifest()) == render_page(m))
