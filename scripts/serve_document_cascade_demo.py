@@ -25,28 +25,14 @@ if __name__ == "__main__" and __package__ in (None, ""):  # pragma: no cover
         sys.path.insert(0, _R)
 
 from src.teleon.extraction.document_extraction_cascade import extract
+from src.teleon.extraction.schema_templates import parse_user_schema, render_template, template_names
 
-_VALID_CLASSES = ("structured", "semi", "unstructured")
 _FRONTIER_ONLY_COST = 0.302   # the naive baseline: acquire + send the whole doc to a frontier LLM
 
 
-def _parse_schema(text: str) -> dict:
-    """One field per line: 'field_name: structured|semi|unstructured' (unknown class -> unstructured, so it escalates)."""
-    fields = {}
-    for line in (text or "").splitlines():
-        line = line.strip()
-        if not line or ":" not in line:
-            continue
-        name, _, cls = line.partition(":")
-        name, cls = name.strip(), cls.strip().lower()
-        if name:
-            fields[name] = cls if cls in _VALID_CLASSES else "unstructured"
-    return fields
-
-
 def run_extract(spec: dict) -> dict:
-    """Run the REAL cascade on the written-in capability and add the savings-vs-frontier comparison."""
-    required = _parse_schema(spec.get("schema", ""))
+    """Run the REAL cascade on the USER-DEFINED capability and add the savings-vs-frontier comparison."""
+    required = parse_user_schema(spec.get("schema", ""))
     doc = {"has_text_layer": bool(spec.get("has_text_layer", True)), "scanned": bool(spec.get("scanned", False))}
     keys = ("LLM_API_KEY",) if spec.get("has_llm_key", True) else ()
     if not required:
@@ -80,14 +66,19 @@ _PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8"/>
 <div class="sub">Write in a capability. The page runs the REAL cheapest-that-meets cascade (deterministic rules before LLM, escalate only as far as the requirement forces) and shows the path + cost. Extraction is a candidate — never served as truth.</div></header>
 <main>
  <div class="panel">
-  <label>Schema fields (one per line — <code>name: structured|semi|unstructured</code>)</label>
-  <textarea id="schema">agency_license_no: structured
-agency_name: structured
-issue_date: structured
-address: semi
-authorized_destinations: semi
-recruiter_obligations: unstructured
-fee_terms: unstructured</textarea>
+  <label>Start from a template <span style="color:var(--mut)">(optional — pick one, then edit, or write your own)</span></label>
+  <select id="template" onchange="applyTemplate()">
+   <option value="">✎ Write your own schema</option>
+   {{TEMPLATE_OPTIONS}}
+  </select>
+  <label>Schema fields — <b>you define these</b> (one per line — <code>name: structured|semi|unstructured</code>)</label>
+  <textarea id="schema"># Write the fields YOU want to extract — one per line, "name: class".
+# class = structured | semi | unstructured.  Or pick a template above ↑ and edit it.
+invoice_number: structured
+invoice_date: structured
+total_amount: structured
+vendor_name: structured
+payment_terms: unstructured</textarea>
   <div class="chk"><input type="checkbox" id="textlayer" checked><label style="margin:0">document has a text layer (else OCR)</label></div>
   <div class="chk"><input type="checkbox" id="scanned"><label style="margin:0">document is a scan</label></div>
   <div class="chk"><input type="checkbox" id="llmkey" checked><label style="margin:0">an LLM key is available</label></div>
@@ -97,6 +88,11 @@ fee_terms: unstructured</textarea>
  <div class="panel" id="out"><div class="sub">Results will appear here.</div></div>
 </main>
 <script>
+const TEMPLATES={{TEMPLATE_JSON}};
+function applyTemplate(){
+ const n=document.getElementById('template').value;
+ if(n && TEMPLATES[n]!==undefined){document.getElementById('schema').value=TEMPLATES[n];runCascade();}
+}
 async function runCascade(){
  const spec={schema:document.getElementById('schema').value,
    has_text_layer:document.getElementById('textlayer').checked,
@@ -122,6 +118,14 @@ window.onload=runCascade;
 </script></body></html>"""
 
 
+def _render_page() -> str:
+    """Inject the showcase templates (for the optional chooser) into the page — the schema the user extracts is still
+    whatever lands in the editable textarea; templates only prefill it."""
+    opts = "\n".join(f'<option value="{n}">{n.replace("_", " ")}</option>' for n in template_names())
+    tmpl_json = json.dumps({n: render_template(n) for n in template_names()})
+    return _PAGE.replace("{{TEMPLATE_OPTIONS}}", opts).replace("{{TEMPLATE_JSON}}", tmpl_json)
+
+
 def _make_handler():
     class _H(BaseHTTPRequestHandler):
         def _send(self, code, body, ctype="application/json"):
@@ -130,7 +134,7 @@ def _make_handler():
             self.send_header("Content-Length", str(len(data))); self.end_headers(); self.wfile.write(data)
 
         def do_GET(self):  # noqa: N802
-            self._send(200, _PAGE, "text/html; charset=utf-8") if self.path.rstrip("/") in ("", "/") else self._send(404, json.dumps({"error": "not found"}))
+            self._send(200, _render_page(), "text/html; charset=utf-8") if self.path.rstrip("/") in ("", "/") else self._send(404, json.dumps({"error": "not found"}))
 
         def do_POST(self):  # noqa: N802
             if self.path.rstrip("/") != "/extract":
@@ -157,8 +161,18 @@ def _self_test() -> int:
         if not ok:
             fails.append(name)
 
+    page = _render_page()
     ck("the page renders the write-in form (schema textarea + run button + doc-profile toggles)",
-       "<textarea id=\"schema\">" in _PAGE and "Run cascade" in _PAGE and "textlayer" in _PAGE and "llmkey" in _PAGE)
+       "<textarea id=\"schema\">" in page and "Run cascade" in page and "textlayer" in page and "llmkey" in page)
+    # USER-DEFINED schemas are the real path; templates are an OPTIONAL chooser that prefills the editable box
+    ck("the page offers a template chooser AND a 'write your own' option (templates are optional, not the surface)",
+       'id="template"' in page and "Write your own schema" in page and ">employment agency<" in page)
+    ck("the template placeholders are fully rendered (chooser is live, not a stub)",
+       "{{TEMPLATE_JSON}}" not in page and "{{TEMPLATE_OPTIONS}}" not in page)
+    # a USER-DEFINED schema whose fields appear in NO template still runs (proves it is not template-locked)
+    ru = run_extract({"schema": "widget_serial: structured\nfailure_notes: unstructured", "has_llm_key": True})
+    ck("a user-defined schema (fields in no template) runs the real cascade",
+       ru["met_requirement"] and "widget_serial" in ru["filled"] and ru["used_llm"])
     # the REAL engine runs on written-in input: all-structured -> NO LLM, cheap, big savings
     r1 = run_extract({"schema": "a: structured\nb: structured", "has_text_layer": True, "has_llm_key": True})
     ck("all-structured capability runs the real cascade: met, no LLM, huge savings vs frontier",

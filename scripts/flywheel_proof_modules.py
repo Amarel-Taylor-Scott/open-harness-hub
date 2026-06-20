@@ -236,6 +236,10 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/serve_document_cascade_demo.py", "serve_document_cascade_demo"),
     # ── INPUT ACQUIRE (generalize across input types): pdf/office/text/email+attachments/web-page/rss/social/image/audio each normalized by a cheapest-first acquire ladder (deterministic where possible; model only when forced; web/social via LEGITIMATE paths, never scraping) then fed the SAME extraction cascade; combined acquire+extract receipt; never serves truth ──
     ("scripts/check_input_acquire.py", "check_input_acquire"),
+    # ── CASCADE MEASUREMENT (cheapest-that-meets is MEASURED, not assumed): each extract method scored vs offline ground-truth fixtures; per field the cascade picks the cheapest method whose MEASURED accuracy clears the confidence floor; the floor is a live A/B (cheap_llm below it, frontier above it, cost rises with the bar); accuracy computed from fixtures (no hidden table); missing fields honest; never serves truth ──
+    ("scripts/check_cascade_measurement.py", "check_cascade_measurement"),
+    # ── SCHEMA TEMPLATES (extraction is USER-DEFINED; templates are OPTIONAL): any field the user writes runs the real cascade; code/DB showcase templates are a chooser that prefills an editable schema box (employment_agency single-sourced from the cascade, no duplicated field list); one parser grammar; chosen templates round-trip render→parse; never serves truth ──
+    ("scripts/check_schema_templates.py", "check_schema_templates"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),
