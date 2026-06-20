@@ -190,6 +190,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/ingest_entity_intelligence_catalog.py", "ingest_entity_intelligence_catalog"),
     # ── GITHUB SIGNAL intake (owner-shared repos, reviewed live): 10 targets staged as governed candidates w/ disposition (ADOPT/CONSIDER/WATCH/AVOID); copyleft/unstated/proprietary can NEVER be adoptable (org-guardrail cross-check); provenance corrections + unscrapeable links recorded honestly; discovery≠trust, serves_truth=false ──
     ("scripts/ingest_github_signal_intake.py", "ingest_github_signal_intake"),
+    # ── CAPABILITY SEEDS (learn-from-them, clean-room): all 10 reviewed repos implemented as 11 governed seeds in src/teleon/seeds — drop-in only for clean licenses, technique-only for copyleft/unstated; each runs real logic + records the lesson + emits a PurposeTask candidate; court-deadline + inference-routing seeds deterministically CORRECT; never serves truth, nothing promoted ──
+    ("scripts/check_capability_seeds.py", "check_capability_seeds"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),
