@@ -218,6 +218,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_git_backend_port.py", "check_git_backend_port"),
     # ── CAPABILITY IMPLEMENTATION REGISTRY: a capability is facilitated by a VARIETY of implementations (internal repos/libraries/API hubs/models/LLMs); each declares tools/models/API-keys (env-ref names) + cost + determinism; the selector picks the best COMBINATION by available keys + objective (a key unlocks an option); + the owner workspace inventory staged as candidate capabilities; discovery≠trust, never serves truth ──
     ("scripts/check_capability_implementation_registry.py", "check_capability_implementation_registry"),
+    # ── DOCUMENT EXTRACTION CASCADE: PDF→schema as a cheapest-that-meets-requirements cascade over a method grid (metadata/OCR/text → regex/keyword/deterministic-NLP → prune/compress → cheapest-capable LLM → frontier); deterministic rules before LLM; compress-only-when-needed; unfillable fields reported MISSING honestly (never fabricated); full cost/path receipt; far cheaper than always-frontier; never serves truth ──
+    ("scripts/check_document_extraction_cascade.py", "check_document_extraction_cascade"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),
