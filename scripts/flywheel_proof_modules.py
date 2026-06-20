@@ -220,6 +220,10 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_capability_implementation_registry.py", "check_capability_implementation_registry"),
     # ── DOCUMENT EXTRACTION CASCADE: PDF→schema as a cheapest-that-meets-requirements cascade over a method grid (metadata/OCR/text → regex/keyword/deterministic-NLP → prune/compress → cheapest-capable LLM → frontier); deterministic rules before LLM; compress-only-when-needed; unfillable fields reported MISSING honestly (never fabricated); full cost/path receipt; far cheaper than always-frontier; never serves truth ──
     ("scripts/check_document_extraction_cascade.py", "check_document_extraction_cascade"),
+    # ── INTELLIGENCE SOURCE REGISTRY: a constant stream (top repos / AI news / papers / newsletters / search) from FREE LEGITIMATE sources only (RSS + official REST APIs, keyless or free-key env-refs, ToS-clean); keyless news-sweep plan covers every need; pull routes through governed-feed-intake (legitimate paths, refuses scraping); key-gated sources logged unfetchable honestly; never serves truth ──
+    ("scripts/check_intelligence_source_registry.py", "check_intelligence_source_registry"),
+    # ── TUNABLE TASK CATALOG (generalize the doc-extraction idea): 13 agentic tasks that each fit AUTOMATED SETUP TUNING — tiered method grid (deterministic floor → small model → frontier LLM), cheapest-first, escalate only as far as the requirement forces; the auto-tuner key-gates LLM tiers + lets deterministic-possible tasks finish with no LLM; never serves truth ──
+    ("scripts/check_tunable_task_catalog.py", "check_tunable_task_catalog"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),

@@ -1,0 +1,475 @@
+{
+  "version": "1.0",
+  "updated": "2026-06-20",
+  "principle": "ANY agentic task with (a) multiple method tiers of differing cost/quality and (b) a measurable requirement can go through AUTOMATED SETUP TUNING: walk the tiers cheapest-first (deterministic \u2192 small model \u2192 frontier LLM), escalate only as far as the requirement forces, and pick the cheapest variation that meets it \u2014 tracking a cost/path receipt. document-schema-extraction is the reference running instance (src/teleon/extraction/document_extraction_cascade.py); this catalog generalizes the pattern. serves_truth=false; outputs are candidates.",
+  "cost_rank_legend": {
+    "free": 0,
+    "low": 1,
+    "mid": 2,
+    "high": 3
+  },
+  "serves_truth": false,
+  "tasks": [
+    {
+      "task_id": "document-schema-extraction",
+      "name": "PDF/document \u2192 schema",
+      "requirement_metric": "field coverage @ confidence",
+      "deterministic_possible": false,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "acquire",
+          "methods": "text-layer / OCR / enhanced-OCR / vision-LLM",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "rule-extract",
+          "methods": "regex / keyword / deterministic-NLP / heuristics",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "compress",
+          "methods": "prune unimportant + token compress",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "llm",
+          "methods": "cheapest-capable LLM \u2192 frontier",
+          "deterministic": false,
+          "cost_tier": "mid",
+          "cost_rank": 2,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "entity-resolution",
+      "name": "resolve records to canonical entities",
+      "requirement_metric": "pairwise F1",
+      "deterministic_possible": false,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "blocking",
+          "methods": "canonical blocking keys (exact email/phone/id)",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "fuzzy",
+          "methods": "RapidFuzz token_sort + connected components",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "probabilistic",
+          "methods": "Fellegi-Sunter / splink",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "llm-adjudicate",
+          "methods": "LLM only on ambiguous residual pairs",
+          "deterministic": false,
+          "cost_tier": "mid",
+          "cost_rank": 2,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "text-classification",
+      "name": "label text into categories",
+      "requirement_metric": "accuracy",
+      "deterministic_possible": false,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "rules",
+          "methods": "regex/keyword rule classifier",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "small-model",
+          "methods": "SetFit / fine-tuned small encoder",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "llm",
+          "methods": "LLM zero/few-shot on the residual",
+          "deterministic": false,
+          "cost_tier": "mid",
+          "cost_rank": 2,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "grounded-answer",
+      "name": "answer a question with citations",
+      "requirement_metric": "groundedness",
+      "deterministic_possible": false,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "cache",
+          "methods": "semantic cache of prior answers",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "retrieve",
+          "methods": "keyless search + page fetch (RAG)",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "llm-synthesize",
+          "methods": "cheapest-capable LLM synthesis + cite",
+          "deterministic": false,
+          "cost_tier": "mid",
+          "cost_rank": 2,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "translation",
+      "name": "translate text",
+      "requirement_metric": "BLEU / adequacy",
+      "deterministic_possible": false,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "glossary",
+          "methods": "term glossary + rule substitution",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "small-mt",
+          "methods": "small MT model (local)",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "llm",
+          "methods": "frontier LLM for hard/idiomatic spans",
+          "deterministic": false,
+          "cost_tier": "mid",
+          "cost_rank": 2,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "summarization",
+      "name": "summarize a document",
+      "requirement_metric": "ROUGE / faithfulness",
+      "deterministic_possible": false,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "extractive",
+          "methods": "TextRank / extractive selection",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "small-model",
+          "methods": "small abstractive model",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "llm",
+          "methods": "frontier LLM for nuance",
+          "deterministic": false,
+          "cost_tier": "mid",
+          "cost_rank": 2,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "code-review",
+      "name": "review a code change",
+      "requirement_metric": "issue recall",
+      "deterministic_possible": false,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "static",
+          "methods": "linters + static analysis + AST rules",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "small-model",
+          "methods": "small code model heuristics",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "llm",
+          "methods": "frontier LLM for semantic review",
+          "deterministic": false,
+          "cost_tier": "high",
+          "cost_rank": 3,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "content-moderation",
+      "name": "flag unsafe content",
+      "requirement_metric": "recall @ precision",
+      "deterministic_possible": false,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "grep-rules",
+          "methods": "GREP indicator rules (deterministic)",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "classifier",
+          "methods": "safety classifier (Llama-Guard-style)",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "llm",
+          "methods": "LLM adjudication on the residual",
+          "deterministic": false,
+          "cost_tier": "mid",
+          "cost_rank": 2,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "sql-generation",
+      "name": "NL \u2192 SQL over a schema",
+      "requirement_metric": "execution match",
+      "deterministic_possible": false,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "template",
+          "methods": "template/slot match for canonical queries",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "small-model",
+          "methods": "small text-to-SQL model + schema-constrained decode",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "llm",
+          "methods": "frontier LLM for complex joins",
+          "deterministic": false,
+          "cost_tier": "mid",
+          "cost_rank": 2,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "dedup-near-duplicate",
+      "name": "detect near-duplicates",
+      "requirement_metric": "pairwise F1",
+      "deterministic_possible": true,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "hash",
+          "methods": "exact content hash",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "minhash",
+          "methods": "MinHash + LSH near-dup",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "embedding",
+          "methods": "embedding cosine on the residual",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        }
+      ]
+    },
+    {
+      "task_id": "image-tagging",
+      "name": "classify/tag an image",
+      "requirement_metric": "top-k accuracy",
+      "deterministic_possible": false,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "perceptual-hash",
+          "methods": "perceptual hash / deterministic CV features",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "small-model",
+          "methods": "small vision classifier",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "vision-llm",
+          "methods": "vision LLM for ambiguous images",
+          "deterministic": false,
+          "cost_tier": "high",
+          "cost_rank": 3,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "transcription-asr",
+      "name": "audio \u2192 text",
+      "requirement_metric": "WER",
+      "deterministic_possible": true,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "local-asr",
+          "methods": "local whisper.cpp / small ASR",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "cloud-asr",
+          "methods": "cloud ASR for hard audio",
+          "deterministic": false,
+          "cost_tier": "mid",
+          "cost_rank": 2,
+          "requires_keys": [
+            "ASR_API_KEY"
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "email-triage",
+      "name": "route/triage an inbox",
+      "requirement_metric": "routing accuracy",
+      "deterministic_possible": false,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "rules",
+          "methods": "sender/keyword/header rules",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "small-model",
+          "methods": "small classifier",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "llm",
+          "methods": "LLM for ambiguous threads",
+          "deterministic": false,
+          "cost_tier": "mid",
+          "cost_rank": 2,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
+    }
+  ]
+}
