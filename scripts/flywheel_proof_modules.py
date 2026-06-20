@@ -178,6 +178,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_native_export_rehydration.py", "check_native_export_rehydration"),
     ("scripts/check_native_api.py", "check_native_api"),
     ("scripts/check_native_format_full_stack.py", "check_native_format_full_stack"),
+    # ── OKF INTEROP: import/export Google's Open Knowledge Format at the EDGES (markdown+YAML, type-required, reserved index.md/log.md) WITHOUT surrendering the core — our governance (verified/source/freshness/receipt) rides in the frontmatter OKF doesn't mandate + a CDC log.md; round-trip lossless (governance + arbitrary keys survive); OKF is a candidate projection, our object stays the core; never serves truth ──
+    ("scripts/check_okf_interop.py", "check_okf_interop"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),
@@ -458,6 +460,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/demo_assurance_descent.py", "demo_assurance_descent"),
     # ── HONEST go-live readiness gate: verifies the built engine by RUNNING it (A/B/preferences/freshness/500+ proofs/corpus/deploy-config) + enumerates the live-wiring seams (live LLM, live source+CDC, real distillation, Postgres+promotion, auth/tenancy, hosting deploy) with owning sprints; go_live_ready=False until they are wired ──
     ("scripts/check_teleon_go_live_readiness.py", "check_teleon_go_live_readiness"),
+    # ── LOCAL emulation: every BLOCKING go-live seam maps to a built local emulator (deterministic OpenAI-compatible model + authoritative-source/CDC server, both stdlib-only; Postgres/identity/runtime as real local containers); freshness seam (serve fresh→source changes→stale held out→re-synced) + model seam (deterministic+token counts) wire e2e in-process; runs via the compose overlay + Tiltfile; local_go_live_ready=True while cloud stays honestly False ──
+    ("scripts/check_teleon_local_emulation.py", "check_teleon_local_emulation"),
     # ── CTS-1: bind an OCTS runtime CLASS → concrete backend by policy/creds/health; cloud deferred after a built local equivalent; class-scoped guard; deny-by-default; composes with the execution selector ──
     ("scripts/check_runtime_class_binding.py", "check_runtime_class_binding"),
     ("scripts/check_execution_dispatch_fail_loud.py", "check_execution_dispatch_fail_loud"),

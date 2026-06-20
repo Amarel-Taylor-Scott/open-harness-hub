@@ -1,0 +1,29 @@
+# Local-emulation overlay: stand up the LIVE go-live seams locally so the whole stack runs with NO GPU, NO API
+# key, NO network, NO paid cloud. Layer it on top of the deploy compose:
+#   POSTGRES_PASSWORD=x docker compose -f deploy/docker-compose.deploy.yml -f deploy/docker-compose.emulators.yml up
+# - model-emulator  : deterministic, OpenAI-compatible local LLM (the "live LLM inference" + distillation seams)
+# - source-emulator : an authoritative-source + CDC server (the "live source fetch + CDC freshness" seam)
+# Both are stdlib-only (run in the same image, no extra deps) and NEVER serve truth. The Postgres + identity
+# services (the remaining blocking seams) already run as real local containers in the base deploy compose.
+name: aidoneright
+services:
+  model-emulator:
+    build: { context: .., dockerfile: Dockerfile }
+    command: ["python3", "-m", "local_emulators.model_emulator"]
+    environment:
+      EMU_HOST: "0.0.0.0"
+      EMU_MODEL_PORT: "8080"
+    restart: unless-stopped
+  source-emulator:
+    build: { context: .., dockerfile: Dockerfile }
+    command: ["python3", "-m", "local_emulators.source_of_truth_emulator"]
+    environment:
+      EMU_HOST: "0.0.0.0"
+      EMU_SOURCE_PORT: "8081"
+    restart: unless-stopped
+  # Point the runtime's live seams at the local emulators (LLM output + source fetch resolve locally).
+  teleon-runtime:
+    environment:
+      OH_MODEL_EMULATOR_BASE: "http://model-emulator:8080"
+      OH_SOURCE_EMULATOR_BASE: "http://source-emulator:8081"
+    depends_on: ["model-emulator", "source-emulator"]

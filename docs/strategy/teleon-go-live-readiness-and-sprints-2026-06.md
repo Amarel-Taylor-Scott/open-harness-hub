@@ -32,6 +32,27 @@ the blocking seams are closed.
 | **observability** | RunLedger telemetry + receipts (in-memory) | ship receipts/metrics to a backend (OTel/Langfuse) + drift/staleness alerts |
 | **tenant surface** | the descent-walkthrough journey + the demo | the Capability Assurance Portal UI (set preferences, watch a capability descend with receipts) |
 
+## Local emulation (built — run the whole stack with no GPU/key/cloud)
+
+Every **blocking** seam above now has a built LOCAL emulator, gated by `scripts/check_teleon_local_emulation.py`
+(the local counterpart to the readiness gate). The two genuinely-new live seams are emulated as importable,
+stdlib-only services (also runnable as tiny containers): `local_emulators/model_emulator.py` (deterministic,
+OpenAI-compatible local LLM with real token counts — the live-LLM + distillation seams) and
+`local_emulators/source_of_truth_emulator.py` (an authoritative-source + CDC server — the live-source/freshness
+seam). The remaining blocking seams map to **real** local containers already in `deploy_topology.json` (Postgres,
+identity, teleon-runtime). Bring it all up with one command: `tilt up` (or
+`docker compose -f deploy/docker-compose.deploy.yml -f deploy/docker-compose.emulators.yml up`). The proof wires
+the freshness seam end-to-end in-process (serve fresh → source changes → stale held out → re-synced) and routes a
+model call through the local LLM, so `local_go_live_ready=True` **while cloud `go_live_ready` stays honestly False**
+(local emulation ≠ real cloud go-live). Emulators never serve truth. This de-risks every sprint below: each live
+seam can be developed + tested against its local emulator before the owner provisions paid cloud.
+
+**Standards interop (built — ride the open formats):** `src/baltor/native/okf_adapter.py` imports/exports Google's
+Open Knowledge Format at the edges (gated by `scripts/check_okf_interop.py`) — round-trip lossless, with our
+assurance (verified / source / freshness / receipt) riding in the OKF frontmatter OKF itself doesn't mandate + a
+CDC `log.md`. OKF is a candidate **projection**; the governed object stays the core. *"They standardize where
+context lives; Baltor governs whether it's true."*
+
 ## Sprint plan (prioritized — polish / review / connect / wire)
 
 **S0 — Hosting live (1 sprint).** Run the Fly (lean ~$40-50; per the hosting-decision-matrix) deploy from
