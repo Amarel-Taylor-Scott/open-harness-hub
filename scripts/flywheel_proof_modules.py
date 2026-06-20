@@ -252,6 +252,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/build_portfolio_connection_map.py", "build_portfolio_connection_map"),
     # ── DESCENT ATTEMPT STORE (the BRAIN: smarter over time): canonical append-only, lossless store of EVERY unbounded->bounded attempt — keeps failures + losers as training NEGATIVES; doubles as the meta-learner memory (best_strategy_for computed from records) and the training corpus (features+label+reward) for a descent-policy model; internal infra now, OpenDistillationHub public-revenue candidate later; never serves truth ──
     ("scripts/check_descent_attempt_store.py", "check_descent_attempt_store"),
+    # ── CATALOG DESCENT DEMO (convert skills/tools -> cheaper bounded versions, WIRED TO THE BRAIN): runs the unbounded->bounded descent over all 16 real capability-catalog entries and records EVERY attempt into the DescentAttemptStore — bounding the catalog AND producing the training corpus + meta-learner memory in one run; full caps -> determinism 1.0 (llm_to_rule), partial -> cheap model tier (model_downgrade); idempotent; never serves truth ──
+    ("scripts/convert_catalog_demo.py", "convert_catalog_demo"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),
