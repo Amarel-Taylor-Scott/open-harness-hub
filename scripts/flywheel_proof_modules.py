@@ -454,6 +454,10 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/eval/vertical_eval_suites.py", "vertical_eval_suites"),
     # ── FRESHNESS axis end-to-end on a regulated fact (Reg E / eCFR): bind to the authoritative source on a volatility-matched cadence; serve the current value with provenance; on a rule change HOLD THE STALE ANSWER OUT (never served) until re-synced — the wedge provers concede + gateways disclaim ──
     ("scripts/check_teleon_freshness_e2e.py", "check_teleon_freshness_e2e"),
+    # ── runnable DEMO: the real assurance engine on sample seed skills under a tenant's preferences — token-aware A/B descent (deterministic/cheaper-model/compressed-prompt within accuracy confines), freshness for fragile facts (stale held out), cost+token measurement, governed; diverse outcomes; no mocks ──
+    ("scripts/demo_assurance_descent.py", "demo_assurance_descent"),
+    # ── HONEST go-live readiness gate: verifies the built engine by RUNNING it (A/B/preferences/freshness/500+ proofs/corpus/deploy-config) + enumerates the live-wiring seams (live LLM, live source+CDC, real distillation, Postgres+promotion, auth/tenancy, hosting deploy) with owning sprints; go_live_ready=False until they are wired ──
+    ("scripts/check_teleon_go_live_readiness.py", "check_teleon_go_live_readiness"),
     # ── CTS-1: bind an OCTS runtime CLASS → concrete backend by policy/creds/health; cloud deferred after a built local equivalent; class-scoped guard; deny-by-default; composes with the execution selector ──
     ("scripts/check_runtime_class_binding.py", "check_runtime_class_binding"),
     ("scripts/check_execution_dispatch_fail_loud.py", "check_execution_dispatch_fail_loud"),

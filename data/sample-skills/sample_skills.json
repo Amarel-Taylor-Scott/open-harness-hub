@@ -1,0 +1,44 @@
+{
+  "version": "SampleSkills.v1",
+  "purpose": "A small set of REAL-shaped skill artifacts for the demo + the A/B/descent engines. Each is a capability with a skill_text (the prompt — some intentionally bloated with duplicates/[optional] lines so prompt-compression shows savings) + must_keep (answer-critical content that must survive compression). Spans the descent outcomes: rule-guided -> deterministic; open-ended -> cheaper model / compressed prompt; fragile -> freshness-synced. Demo only; CANDIDATES, never truth.",
+  "skills": [
+    {
+      "capability_slot": "reg-e-error-resolution-deadline",
+      "category": "regulation", "determinism_ceiling": 0.95, "deterministic_coverage_estimate": 0.9,
+      "fragile": true, "authoritative_source": "ecfr://12/1005.11", "volatility_class": "low",
+      "must_keep": ["ecfr://12/1005.11", "business days"],
+      "skill_text": "You are a Regulation E compliance assistant.\nYou are a Regulation E compliance assistant.\nAlways cite the authoritative source ecfr://12/1005.11.\n[optional] Background: Reg E governs electronic fund transfers.\n[optional] More background the model does not need to answer.\nReturn the error-resolution deadline in business days.\nAlways cite the authoritative source ecfr://12/1005.11.\n"
+    },
+    {
+      "capability_slot": "us-tax-bracket-owed",
+      "category": "financial-data", "determinism_ceiling": 1.0, "deterministic_coverage_estimate": 1.0,
+      "fragile": true, "authoritative_source": "irs://1040/brackets", "volatility_class": "medium",
+      "must_keep": ["bracket", "marginal"],
+      "skill_text": "Compute federal income tax owed.\nApply the marginal bracket rates in order.\n[optional] Note: brackets are inflation-adjusted yearly.\nApply the marginal bracket rates in order.\nReturn the total owed as a number.\n"
+    },
+    {
+      "capability_slot": "geocode-postal-address",
+      "category": "geo-weather", "determinism_ceiling": 0.95, "deterministic_coverage_estimate": 0.92,
+      "fragile": false, "must_keep": ["coordinates"],
+      "skill_text": "Convert a US postal address to coordinates.\nReturn the coordinates as lat,long.\n"
+    },
+    {
+      "capability_slot": "summarize-regulation-change",
+      "category": "document", "determinism_ceiling": 0.35, "deterministic_coverage_estimate": 0.4,
+      "fragile": false, "must_keep": ["cite the section", "no legal advice"],
+      "skill_text": "You are a careful summarizer.\nYou are a careful summarizer.\nSummarize the regulatory change in plain English.\n[optional] You may use up to three paragraphs.\n[optional] Avoid jargon where possible.\nAlways cite the section.\nNever give legal advice; this is informational only (no legal advice).\nAlways cite the section.\n"
+    },
+    {
+      "capability_slot": "draft-compliance-notice-email",
+      "category": "email", "determinism_ceiling": 0.3, "deterministic_coverage_estimate": 0.35,
+      "fragile": false, "must_keep": ["recipient", "do not send"],
+      "skill_text": "Draft a compliance notice email.\nDraft a compliance notice email.\n[optional] Use a professional, neutral tone.\nAddress the recipient by name.\nProduce a DRAFT only; do not send it.\n"
+    },
+    {
+      "capability_slot": "extract-invoice-fields",
+      "category": "data-extraction", "determinism_ceiling": 0.85, "deterministic_coverage_estimate": 0.8,
+      "fragile": false, "must_keep": ["total", "invoice number"],
+      "skill_text": "Extract structured fields from an invoice.\n[optional] Invoices vary by vendor.\nExtract the invoice number and the total.\nReturn the fields as JSON.\n"
+    }
+  ]
+}

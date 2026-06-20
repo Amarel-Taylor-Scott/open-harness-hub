@@ -255,7 +255,7 @@ python scripts/oh_hub.py run pipeline/X --inputs input.json
 python scripts/oh_hub.py emit persona/esg-auditor mcp  # emit to MCP / Croissant / etc.
 ```
 
-<!--N:demo_scripts-->20<!--/N--> demo scripts (`scripts/demo_*.py`) are pre-baked end-to-end runs spanning the verticals; the core set:
+<!--N:demo_scripts-->21<!--/N--> demo scripts (`scripts/demo_*.py`) are pre-baked end-to-end runs spanning the verticals; the core set:
 
 ```bash
 python3 scripts/demo_esg_pipeline.py          # ESG / CSDDD supplier grading
