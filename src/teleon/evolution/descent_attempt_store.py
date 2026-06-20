@@ -19,8 +19,13 @@ import os
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
-#: the descent axes a unit is scored on (lower cost/tokens/stale-risk + higher determinism = more bounded/efficient).
-AXES = ("cost", "determinism", "tokens", "model_tier", "stale_risk")
+from src.teleon.evolution.descent_axes import LOWER_IS_BETTER_AXES, is_axis
+
+#: the axes the brain scores attempts on — a SUBSET of the canonical single source (descent_axes.DESCENT_AXES), so brain
+#: records never drift from the strategies / measurement harness (cost/tokens_in/llm_usage lower-better;
+#: determinism/freshness higher-better). Validated against the canonical vocabulary at import.
+AXES = ("cost", "determinism", "tokens_in", "llm_usage", "freshness")
+assert all(is_axis(a) for a in AXES), "brain axes must be canonical descent_axes names"
 OUTCOMES = ("improved", "converged", "no_change", "failed", "rolled_back")
 _SUCCESS = ("improved", "converged")   # the rest (no_change/failed/rolled_back) are retained NEGATIVES for training
 
@@ -44,14 +49,16 @@ class DescentAttempt:
 
 
 def _reward(before: dict, after: dict) -> dict:
-    """Computed deltas (the training reward signal): how much MORE bounded/efficient the unit became."""
-    return {
-        "cost_saved": round(before.get("cost", 0.0) - after.get("cost", 0.0), 6),
-        "determinism_gain": round(after.get("determinism", 0.0) - before.get("determinism", 0.0), 6),
-        "tokens_saved": before.get("tokens", 0) - after.get("tokens", 0),
-        "model_tier_drop": before.get("model_tier", 0) - after.get("model_tier", 0),
-        "stale_risk_drop": round(before.get("stale_risk", 0.0) - after.get("stale_risk", 0.0), 6),
-    }
+    """Computed deltas (the training reward signal) — derived GENERICALLY from the canonical axis directions, so a new
+    axis needs no new code: lower-is-better axes report *_saved (before-after); higher-is-better report *_gain."""
+    r: dict = {}
+    for axis in AXES:
+        b, a = before.get(axis, 0.0), after.get(axis, 0.0)
+        if axis in LOWER_IS_BETTER_AXES:
+            r[f"{axis}_saved"] = round(b - a, 6)
+        else:
+            r[f"{axis}_gain"] = round(a - b, 6)
+    return r
 
 
 class DescentAttemptStore:
@@ -69,6 +76,9 @@ class DescentAttemptStore:
         """Append an attempt; idempotent — re-appending the same attempt does NOT duplicate it."""
         if attempt.outcome not in OUTCOMES:
             raise ValueError(f"unknown outcome {attempt.outcome!r}")
+        bad = sorted({k for k in (*attempt.before, *attempt.after) if not is_axis(k)})
+        if bad:
+            raise ValueError(f"non-canonical axis keys {bad} — use descent_axes names (single source)")
         rec = asdict(attempt)
         rec["attempt_id"] = attempt.attempt_id()
         rec["reward"] = _reward(attempt.before, attempt.after)

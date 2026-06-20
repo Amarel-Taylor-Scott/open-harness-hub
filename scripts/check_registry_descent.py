@@ -54,7 +54,7 @@ def _self_test() -> int:
         # the impl-registry + tunable adapters produce well-formed attempts with full axes
         ir = _impl_registry_attempts()
         ck("impl-registry attempts carry before/after on the descent axes",
-           ir and all(set(a.before) == {"cost", "determinism", "tokens", "model_tier", "stale_risk"} for a in ir))
+           ir and all(set(a.before) == {"cost", "determinism", "tokens_in", "llm_usage", "freshness"} for a in ir))
         tt = _tunable_task_attempts()
         ck("tunable-task attempts prefer the deterministic cheapest tier (a real bounding)",
            tt and any(a.after["determinism"] >= 0.99 for a in tt))

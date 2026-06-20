@@ -19,6 +19,8 @@ if __name__ == "__main__" and __package__ in (None, ""):  # pragma: no cover
         sys.path.insert(0, _R)
 
 from src.teleon.evolution.descent_attempt_store import AXES, DescentAttempt, DescentAttemptStore
+from src.teleon.evolution.descent_axes import is_axis
+from src.teleon.evolution.meta_learner import from_brain
 
 
 def _self_test() -> int:
@@ -32,24 +34,25 @@ def _self_test() -> int:
     with tempfile.TemporaryDirectory() as d:
         store = DescentAttemptStore(os.path.join(d, "attempts.jsonl"))
 
-        # a WIN: an LLM step turned into a deterministic rule — cost->0, determinism->1
+        # a WIN: an LLM step turned into a deterministic rule — cost->0, determinism->1 (canonical axes)
         win = DescentAttempt("employment-agency-extract", "llm_to_rule",
-                             before={"cost": 0.30, "determinism": 0.2, "tokens": 800, "model_tier": 75, "stale_risk": 1.0},
-                             after={"cost": 0.0, "determinism": 1.0, "tokens": 0, "model_tier": 0, "stale_risk": 0.0},
+                             before={"cost": 0.30, "determinism": 0.2, "tokens_in": 800, "llm_usage": 75, "freshness": 0.0},
+                             after={"cost": 0.0, "determinism": 1.0, "tokens_in": 0, "llm_usage": 0, "freshness": 1.0},
                              outcome="converged", losers=("model_downgrade",), rollback_target="v1", raw_ref="raw#1")
         # a partial win via a different strategy on a similar unit
         win2 = DescentAttempt("invoice-extract", "model_downgrade",
-                              before={"cost": 0.30, "determinism": 0.2, "tokens": 800, "model_tier": 75, "stale_risk": 0.5},
-                              after={"cost": 0.03, "determinism": 0.2, "tokens": 600, "model_tier": 8, "stale_risk": 0.5},
+                              before={"cost": 0.30, "determinism": 0.2, "tokens_in": 800, "llm_usage": 75, "freshness": 0.5},
+                              after={"cost": 0.03, "determinism": 0.2, "tokens_in": 600, "llm_usage": 8, "freshness": 0.5},
                               outcome="improved")
         # a FAILURE (must be retained as a training NEGATIVE)
         fail = DescentAttempt("legal-clause-extract", "llm_to_rule",
-                              before={"cost": 0.30, "determinism": 0.2, "tokens": 900, "model_tier": 75, "stale_risk": 1.0},
-                              after={"cost": 0.30, "determinism": 0.2, "tokens": 900, "model_tier": 75, "stale_risk": 1.0},
+                              before={"cost": 0.30, "determinism": 0.2, "tokens_in": 900, "llm_usage": 75, "freshness": 0.0},
+                              after={"cost": 0.30, "determinism": 0.2, "tokens_in": 900, "llm_usage": 75, "freshness": 0.0},
                               outcome="failed")
         store.append(win); store.append(win2); store.append(fail)
 
         ck("every descent axis is recorded in before/after", set(win.before) == set(AXES) and set(win.after) == set(AXES))
+        ck("the brain's axes are CANONICAL descent_axes (single-sourced, no drift)", all(is_axis(a) for a in AXES))
 
         # idempotent: re-appending the same attempt does not duplicate
         store.append(win)
@@ -64,8 +67,8 @@ def _self_test() -> int:
 
         # the reward signal is computed (the training label's value)
         wrec = next(r for r in recs if r["unit_id"] == "employment-agency-extract")
-        ck("reward deltas are computed (cost_saved/determinism_gain/tokens_saved)",
-           wrec["reward"]["cost_saved"] == 0.3 and wrec["reward"]["determinism_gain"] == 0.8 and wrec["reward"]["tokens_saved"] == 800)
+        ck("reward deltas are computed (cost_saved/determinism_gain/tokens_in_saved)",
+           wrec["reward"]["cost_saved"] == 0.3 and wrec["reward"]["determinism_gain"] == 0.8 and wrec["reward"]["tokens_in_saved"] == 800)
 
         # the training corpus carries features + label + reward + success, INCLUDING the negative
         ex = store.training_examples()
@@ -83,6 +86,12 @@ def _self_test() -> int:
         ck("stats give per-strategy success rate (llm_to_rule: 1 win / 1 fail = 0.5)",
            st["llm_to_rule"]["success_rate"] == 0.5 and st["llm_to_rule"]["n"] == 2)
         ck("nothing serves truth", all(r["serves_truth"] is False for r in recs))
+
+        # CANONICAL BRAIN: the meta_learner READS this store (no parallel storage) and recommends from it
+        ml = from_brain(store.all())
+        rec = ml.recommend_strategy("employment-agency-extract", 1.0)
+        ck("meta_learner reads the canonical brain and returns a recommendation (brain is the single store)",
+           isinstance(rec, dict) and rec.get("strategy") and ml.count("employment-agency-extract", 1.0) >= 1, str(rec))
 
         # deterministic
         store2 = DescentAttemptStore(os.path.join(d, "a2.jsonl"))

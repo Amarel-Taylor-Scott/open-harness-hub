@@ -28,8 +28,9 @@ _DET_FLOOR = 0.8   # the requirement a bounded pick must still meet
 
 
 def _axes(cost: float, det: float) -> dict:
-    return {"cost": round(cost, 4), "determinism": round(det, 4), "tokens": int(cost * 4000),
-            "model_tier": 0 if det >= 0.99 else 60, "stale_risk": round(1.0 - det, 4)}
+    """Canonical descent axes (single-sourced from descent_axes): llm_usage 0/1 by determinism; freshness ~ determinism."""
+    return {"cost": round(cost, 4), "determinism": round(det, 4), "tokens_in": int(cost * 4000),
+            "llm_usage": 0 if det >= 0.99 else 1, "freshness": round(det, 4)}
 
 
 def _strategy_outcome(before: dict, after: dict) -> tuple:
