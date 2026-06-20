@@ -202,6 +202,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/code_graph.py", "code_graph"),
     # ── MODEL INDEX (best+cheapest+effective, FRESHNESS-governed): unified index of model cost + live endpoint + download location + quality; selector picks the cheapest FRESH model within a quality floor; stale model facts are HELD OUT and never selected until re-verified (kept-up-to-date is the wedge); never serves truth ──
     ("scripts/check_model_index.py", "check_model_index"),
+    # ── DESCENT METHOD CATALOG: for every improvement dimension (all 17 descent axes) the concrete METHODS to accomplish it (e.g. reduce skill tokens via compression / redundant-text dedupe), each grounded in a VARIETY of researched candidate modules; license class governs vendorability (copyleft/source-available/unstated/unverified = behind-a-port); generated how-to map; discovery≠trust, never serves truth ──
+    ("scripts/check_descent_method_catalog.py", "check_descent_method_catalog"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),

@@ -1,0 +1,1173 @@
+{
+  "version": "1.0",
+  "updated": "2026-06-20",
+  "principle": "For each improvement DIMENSION (descent axis), the concrete METHODS to accomplish it, each grounded in a VARIETY of real candidate modules found by research (5 parallel reviewer agents, 2026-06-20). Discovery is NOT trust: every module is a candidate (license-flagged; copyleft/source-available/unstated/unverified are non-vendorable, adopt-behind-a-port only) that must pass its own intake + measured-lift before promotion. Extends architecture/descent_strategy_registry.json (the built strategies) with the broader method/module landscape.",
+  "serves_truth": false,
+  "dimensions": [
+    {
+      "axis": "tokens_in",
+      "methods": [
+        {
+          "method": "prompt/context compression",
+          "how": "small-LM scores token salience, drops low-information tokens",
+          "modules": [
+            {
+              "repo": "microsoft/LLMLingua",
+              "what": "coarse-to-fine prompt+KV compression up to ~20x",
+              "license": "MIT",
+              "vendorable": true
+            },
+            {
+              "repo": "3DAgentWorld/Toolkit-for-Prompt-Compression",
+              "what": "toolkit wrapping 5 compressors",
+              "license": "MIT",
+              "vendorable": true
+            },
+            {
+              "repo": "liyucheng09/Selective_Context",
+              "what": "drops low-self-information units",
+              "license": "MIT",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "prompt distillation (gist tokens)",
+          "how": "train the model to pack a prompt into few reusable cached tokens",
+          "modules": [
+            {
+              "repo": "jayelm/gisting",
+              "what": "compress prompts into reusable gist tokens (~26x)",
+              "license": "Apache-2.0",
+              "vendorable": true
+            },
+            {
+              "repo": "microsoft/LLMLingua",
+              "what": "data-distilled small token-classifier compressor (LLMLingua-2)",
+              "license": "MIT",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "KV/prefix cache reuse",
+          "how": "cache & reuse prefill KV blocks so repeated context isn't recomputed",
+          "modules": [
+            {
+              "repo": "LMCache/LMCache",
+              "what": "tiered KV-cache offload+reuse (CacheBlend)",
+              "license": "Apache-2.0",
+              "vendorable": true
+            },
+            {
+              "repo": "vllm-project/vllm",
+              "what": "Automatic Prefix Caching",
+              "license": "Apache-2.0",
+              "vendorable": true
+            },
+            {
+              "repo": "sgl-project/sglang",
+              "what": "RadixAttention prefix sharing",
+              "license": "Apache-2.0",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "retrieval-instead-of-stuffing (RAG)",
+          "how": "retrieve only relevant chunks rather than stuffing the full corpus",
+          "modules": [
+            {
+              "repo": "run-llama/llama_index",
+              "what": "indexing + retrievers/routers",
+              "license": "MIT",
+              "vendorable": true
+            },
+            {
+              "repo": "deepset-ai/haystack",
+              "what": "modular hybrid-search RAG",
+              "license": "Apache-2.0 (unverified)",
+              "vendorable": false
+            }
+          ]
+        },
+        {
+          "method": "redundant-text dedupe",
+          "how": "strip near-duplicate text before it enters context",
+          "modules": [
+            {
+              "repo": "ekzhu/datasketch",
+              "what": "MinHash+LSH near-duplicate detection",
+              "license": "MIT (unverified)",
+              "vendorable": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "axis": "tokens_out",
+      "methods": [
+        {
+          "method": "grammar/schema constrained decoding",
+          "how": "mask logits each step so only schema-valid tokens emit",
+          "modules": [
+            {
+              "repo": "dottxt-ai/outlines",
+              "what": "structured generation (JSON Schema/regex/CFG)",
+              "license": "Apache-2.0",
+              "vendorable": true
+            },
+            {
+              "repo": "mlc-ai/xgrammar",
+              "what": "near-zero-overhead CFG/JSON engine (vLLM/SGLang default)",
+              "license": "Apache-2.0",
+              "vendorable": true
+            },
+            {
+              "repo": "guidance-ai/llguidance",
+              "what": "fast CFG constrained decoding (~50us/token)",
+              "license": "MIT",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "typed/validated structured output",
+          "how": "define a schema, parse into a type, re-ask on failure",
+          "modules": [
+            {
+              "repo": "567-labs/instructor",
+              "what": "Pydantic-typed JSON, auto-validate+retry",
+              "license": "MIT",
+              "vendorable": true
+            },
+            {
+              "repo": "BoundaryML/baml",
+              "what": "DSL for typed LLM functions, schema-aligned parsing",
+              "license": "Apache-2.0",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "schema-filling wrappers",
+          "how": "wrapper writes the structural tokens, model generates only values",
+          "modules": [
+            {
+              "repo": "1rgs/jsonformer",
+              "what": "fills fixed JSON tokens, model fills values",
+              "license": "MIT",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "native provider structured output",
+          "how": "provider enforces JSON Schema server-side",
+          "modules": [
+            {
+              "repo": "openai structured-outputs",
+              "what": "response_format json_schema strict",
+              "license": "proprietary",
+              "vendorable": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "axis": "cost",
+      "methods": [
+        {
+          "method": "model downgrade / cascade",
+          "how": "cheap model first, escalate only on a failed quality check (FrugalGPT)",
+          "modules": [
+            {
+              "repo": "lm-sys/RouteLLM",
+              "what": "strong-vs-weak cascade routers; ~85% cost cut",
+              "license": "Apache-2.0",
+              "vendorable": true
+            },
+            {
+              "repo": "stanford-futuredata/FrugalGPT",
+              "what": "reference cascade impl",
+              "license": "unverified",
+              "vendorable": false
+            }
+          ]
+        },
+        {
+          "method": "semantic/exact response caching",
+          "how": "return a stored answer for an identical or similar prompt",
+          "modules": [
+            {
+              "repo": "zilliztech/GPTCache",
+              "what": "embedding-based semantic cache",
+              "license": "MIT",
+              "vendorable": true
+            },
+            {
+              "repo": "aurelio-labs/semantic-router",
+              "what": "embedding decision layer to gate cache-or-call",
+              "license": "MIT",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "LLM gateway cost controls",
+          "how": "one OpenAI-compatible endpoint adds cost tracking, caching, budgets",
+          "modules": [
+            {
+              "repo": "BerriAI/litellm",
+              "what": "SDK+proxy to 100+ APIs, cost/budgets",
+              "license": "MIT (enterprise/ separate)",
+              "vendorable": true
+            },
+            {
+              "repo": "Portkey-AI/gateway",
+              "what": "fast gateway, retries/fallbacks/caching",
+              "license": "MIT",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "batch inference",
+          "how": "async submission for ~50% discount or self-host batching",
+          "modules": [
+            {
+              "repo": "vllm-project/vllm",
+              "what": "continuous batching + chunked prefill",
+              "license": "Apache-2.0",
+              "vendorable": true
+            },
+            {
+              "repo": "openai batch API",
+              "what": "flat 50% discount, 24h SLA",
+              "license": "proprietary",
+              "vendorable": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "axis": "latency",
+      "methods": [
+        {
+          "method": "response/semantic caching",
+          "how": "return a stored answer for an identical or near-duplicate prompt, skipping inference",
+          "modules": [
+            {
+              "repo": "zilliztech/GPTCache",
+              "what": "semantic cache (~100x on hits)",
+              "license": "MIT",
+              "vendorable": true
+            },
+            {
+              "repo": "BerriAI/litellm",
+              "what": "gateway response+semantic caching",
+              "license": "MIT",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "prefix-cache / KV reuse",
+          "how": "cache KV of shared prefixes; recompute only the unique suffix -> big TTFT drop",
+          "modules": [
+            {
+              "repo": "LMCache/LMCache",
+              "what": "tiered KV-cache cross-request reuse",
+              "license": "Apache-2.0 (unverified)",
+              "vendorable": false
+            },
+            {
+              "repo": "sgl-project/sglang",
+              "what": "RadixAttention longest-common-prefix reuse",
+              "license": "Apache-2.0",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "speculative decoding",
+          "how": "a cheap draft proposes tokens; the target verifies in parallel -> fewer sequential passes",
+          "modules": [
+            {
+              "repo": "SafeAILab/EAGLE",
+              "what": "EAGLE-1/2/3 speculative decoding (~3x)",
+              "license": "unverified",
+              "vendorable": false
+            },
+            {
+              "repo": "FasterDecoding/Medusa",
+              "what": "draft-free multi-head decoding",
+              "license": "Apache-2.0 (unverified)",
+              "vendorable": false
+            }
+          ]
+        },
+        {
+          "method": "smaller/faster model routing",
+          "how": "route simple queries to a small/cheap model, reserve the big model for hard ones",
+          "modules": [
+            {
+              "repo": "lm-sys/RouteLLM",
+              "what": "strong-vs-weak routing at fixed quality",
+              "license": "Apache-2.0 (unverified)",
+              "vendorable": false
+            },
+            {
+              "repo": "aurelio-labs/semantic-router",
+              "what": "embedding routing without an LLM call",
+              "license": "MIT",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "continuous/dynamic batching",
+          "how": "interleave many in-flight sequences at token granularity to amortize weight loads",
+          "modules": [
+            {
+              "repo": "vllm-project/vllm",
+              "what": "continuous batching + PagedAttention",
+              "license": "Apache-2.0",
+              "vendorable": true
+            },
+            {
+              "repo": "huggingface/text-generation-inference",
+              "what": "production serving + continuous batching",
+              "license": "Apache-2.0 (old tags HFOIL, flag)",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "streaming",
+          "how": "emit tokens incrementally over SSE so perceived latency (TTFT) drops",
+          "modules": [
+            {
+              "repo": "vercel/ai",
+              "what": "streamText/SSE provider-agnostic helpers",
+              "license": "Apache-2.0 (unverified)",
+              "vendorable": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "axis": "llm_usage",
+      "methods": [
+        {
+          "method": "deterministic rule replacement",
+          "how": "compile/distill LLM decisions into rules or a small model",
+          "modules": [
+            {
+              "repo": "stanfordnlp/dspy",
+              "what": "compile modular LM programs into optimized prompts/weights",
+              "license": "MIT",
+              "vendorable": true
+            },
+            {
+              "repo": "aurelio-labs/semantic-router",
+              "what": "swap LLM decision calls for vector-space matching",
+              "license": "MIT",
+              "vendorable": true
+            },
+            {
+              "repo": "arcee-ai/DistillKit",
+              "what": "distill a large teacher into a small student",
+              "license": "Apache-2.0",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "memoize/cache",
+          "how": "cache results so repeated asks don't re-call",
+          "modules": [
+            {
+              "repo": "zilliztech/GPTCache",
+              "what": "semantic cache (similarity hits)",
+              "license": "MIT",
+              "vendorable": true
+            },
+            {
+              "repo": "langchain-ai/langchain",
+              "what": "set_llm_cache exact-match call cache",
+              "license": "MIT (unverified)",
+              "vendorable": false
+            }
+          ]
+        },
+        {
+          "method": "fewer agent hops",
+          "how": "compile/optimize agent graphs; parallelize round-trips",
+          "modules": [
+            {
+              "repo": "langchain-ai/langgraph",
+              "what": "graph runtime with fan-out/fan-in",
+              "license": "MIT (unverified)",
+              "vendorable": false
+            },
+            {
+              "repo": "zou-group/textgrad",
+              "what": "textual-gradient prompt optimization \u2192 leaner program",
+              "license": "MIT",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "tool-use instead of generation",
+          "how": "call a tool/function for a fact rather than generating it",
+          "modules": [
+            {
+              "repo": "BerriAI/litellm",
+              "what": "native function/tool calling + parallel_tool_calls",
+              "license": "MIT",
+              "vendorable": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "axis": "determinism",
+      "methods": [
+        {
+          "method": "LLM->rule / source-bound extraction",
+          "how": "LLM proposes structure, code disposes; bind every field to a source span",
+          "modules": [
+            {
+              "repo": "google/langextract",
+              "what": "structured extraction mapped to exact source char-span",
+              "license": "Apache-2.0",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "grammar/schema constrained decoding",
+          "how": "only grammar-valid tokens emit \u2192 100% structural correctness",
+          "modules": [
+            {
+              "repo": "mlc-ai/xgrammar",
+              "what": "CFG/JSON/regex constrained generation",
+              "license": "Apache-2.0",
+              "vendorable": true
+            },
+            {
+              "repo": "guidance-ai/guidance",
+              "what": "interleave control + constrained gen",
+              "license": "MIT",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "formal verification",
+          "how": "discharge proof obligations on LLM output via a solver",
+          "modules": [
+            {
+              "repo": "Z3Prover/z3",
+              "what": "SMT solver",
+              "license": "MIT (unverified)",
+              "vendorable": false
+            },
+            {
+              "repo": "leanprover/lean4",
+              "what": "formal proof assistant",
+              "license": "Apache-2.0 (unverified)",
+              "vendorable": false
+            }
+          ]
+        },
+        {
+          "method": "finite-state/DSL compilation",
+          "how": "compile NL intent into a deterministic state machine",
+          "modules": [
+            {
+              "repo": "statelyai/xstate",
+              "what": "statecharts for predictable logic",
+              "license": "MIT (unverified)",
+              "vendorable": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "axis": "verifiability",
+      "methods": [
+        {
+          "method": "lineage/provenance",
+          "how": "emit run->job->dataset lineage in a portable standard",
+          "modules": [
+            {
+              "repo": "OpenLineage/OpenLineage",
+              "what": "open lineage standard + collectors",
+              "license": "Apache-2.0",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "cryptographic receipts/attestation",
+          "how": "sign artifact+context; land proof on a transparency log",
+          "modules": [
+            {
+              "repo": "sigstore/cosign",
+              "what": "keyless signing + transparency log",
+              "license": "Apache-2.0 (unverified)",
+              "vendorable": false
+            },
+            {
+              "repo": "in-toto/in-toto",
+              "what": "supply-chain attestation framework",
+              "license": "Apache-2.0 (unverified)",
+              "vendorable": false
+            }
+          ]
+        },
+        {
+          "method": "grounding/hallucination detection",
+          "how": "check each claim against evidence; flag unsupported spans",
+          "modules": [
+            {
+              "repo": "amazon-science/RefChecker",
+              "what": "knowledge-triplet hallucination checks",
+              "license": "Apache-2.0",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "cross-source corroboration",
+          "how": "retrieve from multiple independent sources, aggregate agreement",
+          "modules": [
+            {
+              "repo": "Cartus/Automated-Fact-Checking-Resources",
+              "what": "graph-based evidence aggregation (GEAR)",
+              "license": "unverified",
+              "vendorable": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "axis": "reliability",
+      "methods": [
+        {
+          "method": "multi-provider failover gateway",
+          "how": "one unified API; auto-reroute on provider failure",
+          "modules": [
+            {
+              "repo": "BerriAI/litellm",
+              "what": "Router retry/fallback/load-balancing",
+              "license": "MIT",
+              "vendorable": true
+            },
+            {
+              "repo": "Portkey-AI/gateway",
+              "what": "failover/load-balancing/retries",
+              "license": "MIT",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "retries with backoff",
+          "how": "re-issue transient-failed calls with exponential backoff + jitter",
+          "modules": [
+            {
+              "repo": "jd/tenacity",
+              "what": "general-purpose Python retry",
+              "license": "Apache-2.0",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "circuit breakers",
+          "how": "stop calling a failing dependency after a threshold; probe to re-close",
+          "modules": [
+            {
+              "repo": "danielfm/pybreaker",
+              "what": "Python circuit breaker",
+              "license": "BSD-3 (unverified)",
+              "vendorable": false
+            },
+            {
+              "repo": "resilience4j/resilience4j",
+              "what": "JVM breaker/retry/bulkhead",
+              "license": "Apache-2.0",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "fallback chains",
+          "how": "ordered providers tried until one succeeds",
+          "modules": [
+            {
+              "repo": "langchain-ai/langchain",
+              "what": "Runnable.with_fallbacks()",
+              "license": "MIT (unverified)",
+              "vendorable": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "axis": "resilience",
+      "methods": [
+        {
+          "method": "durable execution / checkpoint-resume",
+          "how": "checkpoint each step; auto-resume from last completed on crash",
+          "modules": [
+            {
+              "repo": "temporalio/temporal",
+              "what": "durable workflows, auto retry/resume",
+              "license": "MIT",
+              "vendorable": true
+            },
+            {
+              "repo": "dbos-inc/dbos-transact-py",
+              "what": "Postgres-checkpointed durable workflows",
+              "license": "MIT (unverified)",
+              "vendorable": false
+            }
+          ]
+        },
+        {
+          "method": "self-healing supervisor/restart",
+          "how": "a supervisor watches processes and restarts with backoff",
+          "modules": [
+            {
+              "repo": "Supervisor/supervisor",
+              "what": "process control/restart",
+              "license": "BSD-derived (unverified)",
+              "vendorable": false
+            }
+          ]
+        },
+        {
+          "method": "graceful degradation",
+          "how": "on partial failure return a reduced useful answer (cached/smaller/partial)",
+          "modules": [
+            {
+              "repo": "langchain-ai/langchain",
+              "what": "with_fallbacks to cached/smaller model",
+              "license": "MIT (unverified)",
+              "vendorable": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "axis": "locality",
+      "methods": [
+        {
+          "method": "local inference runtime",
+          "how": "run the model on owned hardware behind a stable API",
+          "modules": [
+            {
+              "repo": "ollama/ollama",
+              "what": "pull/run GGUF models locally + REST",
+              "license": "MIT",
+              "vendorable": true
+            },
+            {
+              "repo": "ggml-org/llama.cpp",
+              "what": "C/C++ CPU/Metal/CUDA inference",
+              "license": "MIT",
+              "vendorable": true
+            },
+            {
+              "repo": "vllm-project/vllm",
+              "what": "high-throughput GPU serving",
+              "license": "Apache-2.0",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "edge/on-device models",
+          "how": "compile the model to run on phone/embedded/browser",
+          "modules": [
+            {
+              "repo": "mlc-ai/mlc-llm",
+              "what": "TVM-compiled universal deployment",
+              "license": "Apache-2.0",
+              "vendorable": true
+            },
+            {
+              "repo": "pytorch/executorch",
+              "what": "~50KB on-device PyTorch runtime",
+              "license": "BSD",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "no-egress network policy",
+          "how": "default-deny egress so a workload cannot call out",
+          "modules": [
+            {
+              "repo": "cilium/cilium",
+              "what": "eBPF egress policy default-deny",
+              "license": "Apache-2.0 (eBPF GPL/BSD split)",
+              "vendorable": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "axis": "privacy",
+      "methods": [
+        {
+          "method": "PII detection + redaction",
+          "how": "NLP+regex find entities, then mask before the LLM sees them",
+          "modules": [
+            {
+              "repo": "microsoft/presidio",
+              "what": "PII detect/redact/anonymize",
+              "license": "MIT",
+              "vendorable": true
+            },
+            {
+              "repo": "guardrails-ai/guardrails_pii",
+              "what": "Presidio-backed PII validator",
+              "license": "Apache-2.0",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "tokenization/pseudonymization",
+          "how": "replace identifiers with reversible tokens or k-anon generalizations",
+          "modules": [
+            {
+              "repo": "arx-deidentifier/arx",
+              "what": "k-anonymity/l-diversity/t-closeness/DP",
+              "license": "Apache-2.0",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "differential privacy",
+          "how": "calibrated noise bounds per-record influence",
+          "modules": [
+            {
+              "repo": "google/differential-privacy",
+              "what": "DP building blocks",
+              "license": "Apache-2.0",
+              "vendorable": true
+            },
+            {
+              "repo": "meta-pytorch/opacus",
+              "what": "DP-SGD training with budget tracking",
+              "license": "Apache-2.0",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "synthetic data",
+          "how": "model that reproduces statistical shape without real records",
+          "modules": [
+            {
+              "repo": "sdv-dev/SDV",
+              "what": "tabular synthetic data",
+              "license": "BSL (source-available, flag)",
+              "vendorable": false
+            },
+            {
+              "repo": "joke2k/faker",
+              "what": "rule-based fake values",
+              "license": "MIT",
+              "vendorable": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "axis": "safety",
+      "methods": [
+        {
+          "method": "sandboxing (microVM/userspace-kernel)",
+          "how": "virtualize/intercept syscalls so untrusted code can't reach the host",
+          "modules": [
+            {
+              "repo": "google/gvisor",
+              "what": "userspace kernel runsc OCI runtime",
+              "license": "Apache-2.0",
+              "vendorable": true
+            },
+            {
+              "repo": "firecracker-microvm/firecracker",
+              "what": "microVM VMM ~125ms boot",
+              "license": "Apache-2.0",
+              "vendorable": true
+            },
+            {
+              "repo": "google/nsjail",
+              "what": "namespaces/cgroups/seccomp-bpf",
+              "license": "Apache-2.0",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "policy engines",
+          "how": "decisions evaluated against declarative policy, separate from app code",
+          "modules": [
+            {
+              "repo": "open-policy-agent/opa",
+              "what": "Rego policy engine",
+              "license": "Apache-2.0",
+              "vendorable": true
+            },
+            {
+              "repo": "cedar-policy/cedar",
+              "what": "formally-verified authz language",
+              "license": "Apache-2.0 (unverified)",
+              "vendorable": false
+            }
+          ]
+        },
+        {
+          "method": "LLM guardrails (I/O rails)",
+          "how": "filter/transform prompts before + responses after by rules/classifiers",
+          "modules": [
+            {
+              "repo": "NVIDIA-NeMo/Guardrails",
+              "what": "programmable I/O/topical rails",
+              "license": "Apache-2.0",
+              "vendorable": true
+            },
+            {
+              "repo": "guardrails-ai/guardrails",
+              "what": "65+ validators into I/O guards",
+              "license": "Apache-2.0",
+              "vendorable": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "axis": "specialization",
+      "methods": [
+        {
+          "method": "LoRA/PEFT/QLoRA fine-tuning",
+          "how": "attach low-rank adapters; train a tiny delta on consumer GPUs",
+          "modules": [
+            {
+              "repo": "huggingface/peft",
+              "what": "canonical LoRA/QLoRA library",
+              "license": "Apache-2.0",
+              "vendorable": true
+            },
+            {
+              "repo": "unslothai/unsloth",
+              "what": "fused kernels for ~2x faster LoRA/QLoRA",
+              "license": "Apache-2.0",
+              "vendorable": true
+            },
+            {
+              "repo": "huggingface/trl",
+              "what": "SFT/DPO/RLHF trainers",
+              "license": "Apache-2.0",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "knowledge distillation",
+          "how": "transfer teacher capability into a smaller student",
+          "modules": [
+            {
+              "repo": "arcee-ai/DistillKit",
+              "what": "production KD toolkit",
+              "license": "Apache-2.0",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "few-shot classifier heads",
+          "how": "fine-tune embeddings + a light head, no prompts",
+          "modules": [
+            {
+              "repo": "huggingface/setfit",
+              "what": "prompt-free few-shot classification",
+              "license": "Apache-2.0",
+              "vendorable": true
+            }
+          ]
+        },
+        {
+          "method": "rerankers/embedding models",
+          "how": "swap a frontier call for a cross-encoder reranker on top-k",
+          "modules": [
+            {
+              "repo": "huggingface/sentence-transformers",
+              "what": "embedding + reranker models",
+              "license": "Apache-2.0",
+              "vendorable": true
+            },
+            {
+              "repo": "FlagOpen/FlagEmbedding",
+              "what": "BGE embeddings + rerankers",
+              "license": "MIT (unverified)",
+              "vendorable": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "axis": "portability",
+      "methods": [
+        {
+          "method": "open context/skill/agent formats",
+          "how": "represent knowledge & tools in a vendor-neutral spec",
+          "modules": [
+            {
+              "repo": "GoogleCloudPlatform/knowledge-catalog",
+              "what": "OKF v0.1 (markdown+YAML)",
+              "license": "Apache-2.0",
+              "vendorable": true
+            },
+            {
+              "repo": "modelcontextprotocol/modelcontextprotocol",
+              "what": "MCP tool/data interface",
+              "license": "MIT (unverified)",
+              "vendorable": false
+            },
+            {
+              "repo": "opensanctions/followthemoney",
+              "what": "FtM entity data model",
+              "license": "MIT (unverified)",
+              "vendorable": false
+            }
+          ]
+        },
+        {
+          "method": "standard data/provenance schemas",
+          "how": "emit lineage/metadata in interoperable standards",
+          "modules": [
+            {
+              "repo": "OpenLineage/OpenLineage",
+              "what": "open lineage standard",
+              "license": "Apache-2.0",
+              "vendorable": true
+            },
+            {
+              "repo": "mlcommons/croissant",
+              "what": "ML dataset metadata on schema.org/JSON-LD",
+              "license": "Apache-2.0 (unverified)",
+              "vendorable": false
+            }
+          ]
+        },
+        {
+          "method": "OpenAI-compatible abstraction",
+          "how": "one interface for 100+ providers; swap vendors freely",
+          "modules": [
+            {
+              "repo": "BerriAI/litellm",
+              "what": "100+ APIs in OpenAI format",
+              "license": "MIT",
+              "vendorable": true
+            },
+            {
+              "repo": "ollama/ollama",
+              "what": "local runner w/ OpenAI-compatible API",
+              "license": "MIT",
+              "vendorable": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "axis": "freshness",
+      "methods": [
+        {
+          "method": "change-data-capture (CDC)",
+          "how": "stream row-level DB changes as events to keep derived data current",
+          "modules": [
+            {
+              "repo": "debezium/debezium",
+              "what": "CDC for Postgres/MySQL/Mongo",
+              "license": "Apache-2.0 (unverified)",
+              "vendorable": false
+            }
+          ]
+        },
+        {
+          "method": "source polling / scheduled re-sync",
+          "how": "pull from authoritative APIs on a schedule via standard taps",
+          "modules": [
+            {
+              "repo": "meltano/sdk",
+              "what": "Singer SDK for taps/targets",
+              "license": "Apache-2.0",
+              "vendorable": true
+            },
+            {
+              "repo": "airbytehq/airbyte",
+              "what": "250+ ELT connectors",
+              "license": "ELv2 (source-available, flag)",
+              "vendorable": false
+            }
+          ]
+        },
+        {
+          "method": "cache invalidation on source change",
+          "how": "evict/refresh caches the moment the source mutates",
+          "modules": [
+            {
+              "repo": "janbjorge/PGCacheWatch",
+              "what": "Postgres LISTEN/NOTIFY -> cache invalidation",
+              "license": "unverified",
+              "vendorable": false
+            }
+          ]
+        },
+        {
+          "method": "webhooks / event triggers",
+          "how": "push notifications from the source the instant data changes",
+          "modules": [
+            {
+              "repo": "svix/svix-webhooks",
+              "what": "open-source webhook send/receive service",
+              "license": "MIT",
+              "vendorable": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "axis": "reproducibility",
+      "methods": [
+        {
+          "method": "data/experiment + version pinning",
+          "how": "tie data+model+params to a commit so a run is re-derivable",
+          "modules": [
+            {
+              "repo": "iterative/dvc",
+              "what": "data/model versioning tied to Git",
+              "license": "Apache-2.0 (unverified)",
+              "vendorable": false
+            },
+            {
+              "repo": "mlflow/mlflow",
+              "what": "experiment tracking into repeatable runs",
+              "license": "Apache-2.0 (unverified)",
+              "vendorable": false
+            }
+          ]
+        },
+        {
+          "method": "record/replay logs",
+          "how": "capture real LLM/HTTP calls once, replay deterministically in tests",
+          "modules": [
+            {
+              "repo": "vcr/vcr",
+              "what": "cassette record/replay of HTTP",
+              "license": "MIT (unverified)",
+              "vendorable": false
+            }
+          ]
+        },
+        {
+          "method": "content-addressed hashing",
+          "how": "hash content -> CID; identity changes iff bytes change",
+          "modules": [
+            {
+              "repo": "ipfs/kubo",
+              "what": "content-addressed Merkle-DAG store",
+              "license": "MIT/Apache (unverified)",
+              "vendorable": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "axis": "energy",
+      "methods": [
+        {
+          "method": "quantization",
+          "how": "reduce weight precision (INT8/INT4/FP8) -> less memory+compute per token",
+          "modules": [
+            {
+              "repo": "ggml-org/llama.cpp",
+              "what": "GGUF 2-8 bit quant, CPU",
+              "license": "MIT",
+              "vendorable": true
+            },
+            {
+              "repo": "bitsandbytes-foundation/bitsandbytes",
+              "what": "8/4-bit (NF4) quant for QLoRA",
+              "license": "MIT (unverified)",
+              "vendorable": false
+            }
+          ]
+        },
+        {
+          "method": "small models on CPU",
+          "how": "run 1-7B Q4 models on CPU/edge instead of GPU",
+          "modules": [
+            {
+              "repo": "ggml-org/llama.cpp",
+              "what": "CPU/ARM/Apple-Silicon inference",
+              "license": "MIT",
+              "vendorable": true
+            },
+            {
+              "repo": "ml-explore/mlx",
+              "what": "Apple-Silicon inference",
+              "license": "MIT (unverified)",
+              "vendorable": false
+            }
+          ]
+        },
+        {
+          "method": "green-compute / carbon-aware scheduling",
+          "how": "shift jobs to lowest grid carbon intensity; measure footprint",
+          "modules": [
+            {
+              "repo": "Green-Software-Foundation/carbon-aware-sdk",
+              "what": "carbon-aware time/region scheduling",
+              "license": "MIT (unverified)",
+              "vendorable": false
+            },
+            {
+              "repo": "mlco2/codecarbon",
+              "what": "measure energy + regional CO2",
+              "license": "MIT (unverified)",
+              "vendorable": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
