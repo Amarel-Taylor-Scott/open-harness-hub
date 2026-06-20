@@ -54,7 +54,7 @@ PROFESSIONS: list[Profession] = [
                "state contractors board", (("permit-requirement", "is a permit required for this work class? (jurisdictional If-Statement)", 0.9),)),
     Profession("seafarer", "Seafarer", "maritime", "53-5021",
                "flag-state Certificate-of-Competency registry (BIMCO digital cert)", "Combined IUU vessel list",
-               "flag state / IMO", (("port-state-control", "QR-verify a digital seafarer credential", 1.0),)),
+               "flag state / IMO", (("port-state-control", "deterministic Paris/Tokyo MoU Ship Risk Profile -> inspection priority/interval", 1.0),)),
     Profession("customs-broker", "Customs Broker", "trade", "13-1041",
                "CBP customs-broker license registry", "UFLPA / CBP forced-labor entity list",
                "US CBP", (("hts-classification", "deterministic HTS code lookup for a good", 0.85),)),
