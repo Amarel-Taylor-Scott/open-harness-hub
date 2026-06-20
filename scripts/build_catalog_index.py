@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
-"""Build a single hierarchical, faceted index of every artifact and write
-it to docs/catalog/index.json so the static catalog browser can load it.
+"""Build a hierarchical, faceted static catalog browser index.
+
+Hosted/database-backed flows should pass `--row-dir` so the browser index is
+derived from database-exported rows. The no-argument mode remains a local/static
+seed-export fallback that walks catalog YAML.
 
 Each row in the output is:
 
@@ -27,10 +30,11 @@ Each row in the output is:
 
 Output also includes:
   - `_meta`: counts grouped by lifecycle stage, by type, by industry.
-  - `_tree`: hierarchical lifecycle → type → industry → artifact ids.
+  - `_tree`: hierarchical lifecycle → type → industry → component ids.
 """
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from collections import defaultdict
@@ -46,6 +50,11 @@ except ImportError:
 ROOT = Path(__file__).resolve().parent.parent
 CATALOG = ROOT / "catalog"
 OUT = ROOT / "docs" / "catalog" / "index.json"
+
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts.db.catalog_row_source import iter_components_from_rows, row_source_status
 
 
 def derive_position(manifest: dict) -> str:
@@ -107,7 +116,35 @@ def step_refs(manifest: dict) -> list[str]:
     return refs
 
 
-def main() -> int:
+def row_from_manifest(manifest: dict[str, Any], path: str) -> dict[str, Any]:
+    position = manifest.get("lifecycle_position") or derive_position(manifest)
+    stage = position.split(".", 1)[0]
+    return {
+        "id":          manifest["id"],
+        "type":        manifest["type"],
+        "name":        manifest.get("name", manifest["id"]),
+        "description": (manifest.get("description") or "").strip(),
+        "version":     manifest.get("version", ""),
+        "industry":    manifest.get("industry", []) or [],
+        "capability":  manifest.get("capability", []) or [],
+        "modality":    manifest.get("modality", []) or [],
+        "lifecycle":   manifest.get("lifecycle", "experimental"),
+        "lifecycle_position": position,
+        "lifecycle_stage":    stage,
+        "trust_boundary":     manifest.get("trust_boundary"),
+        "tags":               manifest.get("tags", []) or [],
+        "applied_layers":     manifest.get("applied_layers", []) or [],
+        "family":             manifest.get("family"),
+        "pipeline_kind":      manifest.get("pipeline_kind"),
+        "consumes":           manifest.get("consumes", []) or [],
+        "emits":              manifest.get("emits", []) or [],
+        "step_refs":          step_refs(manifest),
+        "links":              manifest.get("links", {}) or {},
+        "path":               path,
+    }
+
+
+def rows_from_yaml() -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for path in CATALOG.rglob("*.yaml"):
         if "_inbox" in path.parts or any(p == "data" for p in path.parts):
@@ -118,34 +155,18 @@ def main() -> int:
             continue
         if not isinstance(m, dict) or "type" not in m or "id" not in m:
             continue
+        rows.append(row_from_manifest(m, str(path.relative_to(ROOT))))
+    return rows
 
-        position = m.get("lifecycle_position") or derive_position(m)
-        stage = position.split(".", 1)[0]
 
-        rows.append({
-            "id":          m["id"],
-            "type":        m["type"],
-            "name":        m.get("name", m["id"]),
-            "description": (m.get("description") or "").strip(),
-            "version":     m.get("version", ""),
-            "industry":    m.get("industry", []) or [],
-            "capability":  m.get("capability", []) or [],
-            "modality":    m.get("modality", []) or [],
-            "lifecycle":   m.get("lifecycle", "experimental"),
-            "lifecycle_position": position,
-            "lifecycle_stage":    stage,
-            "trust_boundary":     m.get("trust_boundary"),
-            "tags":               m.get("tags", []) or [],
-            "applied_layers":     m.get("applied_layers", []) or [],
-            "family":             m.get("family"),
-            "pipeline_kind":      m.get("pipeline_kind"),
-            "consumes":           m.get("consumes", []) or [],
-            "emits":              m.get("emits", []) or [],
-            "step_refs":          step_refs(m),
-            "links":              m.get("links", {}) or {},
-            "path":               str(path.relative_to(ROOT)),
-        })
+def rows_from_database_rows(row_dir: Path) -> list[dict[str, Any]]:
+    return [
+        row_from_manifest(component.manifest, component.source_path)
+        for component in iter_components_from_rows(row_dir)
+    ]
 
+
+def build_index_payload(rows: list[dict[str, Any]], *, source: str, row_dir: Path | None = None) -> dict[str, Any]:
     rows.sort(key=lambda r: (r["lifecycle_stage"], r["type"], r["id"]))
 
     # Build aggregates.
@@ -182,9 +203,13 @@ def main() -> int:
                 .setdefault(ind, []) \
                 .append(r["id"])
 
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(json.dumps({
+    return {
         "_version": "0.1.0",
+        "_source": {
+            "kind": source,
+            "row_dir": str(row_dir) if row_dir else "",
+            "row_source_status": row_source_status(row_dir) if row_dir else None,
+        },
         "_meta": {
             "by_stage":      dict(sorted(by_stage.items())),
             "by_position":   dict(sorted(by_position.items())),
@@ -197,8 +222,36 @@ def main() -> int:
         },
         "_tree": tree,
         "rows":  rows,
-    }, indent=2))
-    print(f"wrote {OUT.relative_to(ROOT)} — {len(rows)} artifacts")
+    }
+
+
+def display_path(path: Path) -> str:
+    try:
+        return str(path.relative_to(ROOT))
+    except ValueError:
+        return str(path)
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Build the static catalog browser index from DB rows or catalog YAML.")
+    parser.add_argument("--row-dir", type=Path, help="Read database-shaped row sets instead of walking catalog YAML.")
+    parser.add_argument("--output", type=Path, default=OUT)
+    args = parser.parse_args(argv)
+
+    if args.row_dir:
+        rows = rows_from_database_rows(args.row_dir)
+        source = "database_rows"
+    else:
+        rows = rows_from_yaml()
+        source = "catalog_yaml_seed_export"
+
+    payload = build_index_payload(rows, source=source, row_dir=args.row_dir)
+    output = args.output if args.output.is_absolute() else ROOT / args.output
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+    by_stage = payload["_meta"]["by_stage"]
+    by_type = payload["_meta"]["by_type"]
+    print(f"wrote {display_path(output)} — {len(rows)} components from {source}")
     print(f"  by stage:     {dict(sorted(by_stage.items()))}")
     print(f"  by type:      {dict(sorted(by_type.items()))}")
     return 0

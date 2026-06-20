@@ -1,0 +1,38 @@
+id: "knowledge-pack/daily-embedding-execution-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Daily embedding execution patterns"
+description: "Checks for turning daily object embedding work rows into sharded execution batches, model profiles, cost estimates, and vector readiness audits."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["embedding", "retrieval", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["embeddings", "vector-search", "pgvector", "daily-factory", "cost-estimation", "worker-shards"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+content_types:
+  - "daily_embedding_execution_check"
+files:
+  - path: "catalog/knowledge-packs/data/daily-embedding-execution-patterns/checks.jsonl"
+    format: "jsonl"
+    schema: "daily_embedding_execution_check"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["id", "description", "required_outputs", "failure_route"]
+provenance:
+  sources:
+    - "Open Harness Hub embedding execution planner"
+    - "Open Harness Hub vector readiness audit"
+    - "Open Harness Hub daily production runner"
+  collected_through: "2026-05-26"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "synthetic operational checks only"

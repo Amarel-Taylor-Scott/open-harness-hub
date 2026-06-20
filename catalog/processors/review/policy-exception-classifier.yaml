@@ -1,0 +1,38 @@
+id: "processor/policy-exception-classifier"
+type: processor
+version: "0.1.0"
+name: "Policy exception classifier"
+description: "Classifies policy exceptions by approval need, risk type, and evidence sufficiency."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["cross_industry"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "post_api.verify"
+freshness: "stable"
+tags: ["review-component", "pipeline-component"]
+created: "2026-05-24"
+updated: "2026-05-24"
+process_kind: "classify.policy_exception"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 250
+side_effects: "none"
+on_error: "raise"
+inputs:
+  - name: "trace"
+    type: "object"
+  - name: "config"
+    type: "object"
+outputs:
+  - name: "result"
+    type: "object"
+  - name: "warnings"
+    type: "object[]"
+implementations:
+  - kind: "callable"
+    path: "scripts/processors/review/policy-exception-classifier.py"
+    language: "python"

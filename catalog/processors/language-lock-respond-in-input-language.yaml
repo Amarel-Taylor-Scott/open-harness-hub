@@ -1,0 +1,100 @@
+id: "processor/language-lock-respond-in-input-language"
+type: processor
+version: "0.1.0"
+name: "Language lock — detect input language and enforce same-language output"
+description: |
+  Pre-pass processor that detects the user's input language (using a
+  lightweight on-device language identifier such as fastText LangDetect or
+  lingua-py) and injects a language-lock instruction into the system prompt
+  before the LLM call. This prevents the model from mid-response switching
+  to English or another dominant language — a common failure mode in
+  multilingual low-resource settings.
+
+  The processor emits two artefacts used by the next pipeline step:
+    detected_language — BCP-47 language code (e.g., "mr", "sw", "tw",
+                        "tl", "hi", "yo")
+    patched_system_prompt — the original system prompt with a language-lock
+                            instruction prepended:
+                            "IMPORTANT: The user is writing in {language}.
+                            You MUST respond ONLY in {language}. Do not
+                            switch to English or any other language mid-
+                            response, even for technical terms. If a term
+                            has no {language} equivalent, transliterate it."
+
+  CAPABILITY LIFT (structural): frontier and on-device models trained
+  predominantly on English data have a strong prior toward English responses,
+  especially when a question touches domain vocabulary that appears more
+  frequently in English training data (e.g., STEM terms). This bias is
+  architectural — it persists across model generations for under-resourced
+  languages. Deterministically locking the output language via a prompt
+  constraint is a structural fix. lift_reason: sparse_data (low-resource
+  language response bias); mechanism: orchestration_complexity (requires
+  a deterministic language-detect step outside the model's own generation).
+
+authors:
+  - name: "Open Harness Hub contributors"
+license: "Apache-2.0"
+industry:   ["education", "education.k12", "education.tutoring", "cross_industry"]
+capability: ["extraction", "format_conversion", "safety_gating"]
+modality:   ["text"]
+lifecycle:  "stable"
+lifecycle_position: "pre_api"
+trust_boundary: "local"
+created: "2026-05-28"
+updated: "2026-05-28"
+
+attribution:
+  source_url: "https://github.com/google-gemini/gemma-cookbook"
+  source_kind: "github"
+  author: "ShikshaEdge offline multilingual tutor (Gemma community); fastText language identification (Facebook AI, CC-BY-4.0)"
+  license: "Apache-2.0"
+
+tags:
+  - "on-device"
+  - "offline"
+  - "language-lock"
+  - "language-detection"
+  - "multilingual"
+  - "low-resource-language"
+  - "marathi"
+  - "swahili"
+  - "twi"
+  - "tagalog"
+  - "anti-hallucination"
+  - "deterministic"
+  - "structural-lift"
+  - "shikshaedge"
+  - "global-south"
+
+process_kind: "format_convert.language_patch"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 150
+
+inputs:
+  - name: "user_text"
+    type: "string"
+  - name: "system_prompt"
+    type: "string"
+  - name: "detection_confidence_threshold"
+    type: "number"
+  - name: "fallback_language"
+    type: "string"
+outputs:
+  - name: "detected_language"
+    type: "string"
+  - name: "detection_confidence"
+    type: "number"
+  - name: "patched_system_prompt"
+    type: "string"
+  - name: "lock_applied"
+    type: "boolean"
+
+side_effects: "none"
+on_error: "fallback"
+
+implementations:
+  - kind: "callable"
+    path: "scripts.processors.language_lock_respond_in_input_language.run"
+    language: "python"

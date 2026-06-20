@@ -1,0 +1,68 @@
+id: "tool/fast-factory-closeout-reporter"
+type: tool
+version: "0.1.0"
+name: "Fast factory closeout reporter"
+description: "Builds a fast database-first closeout report from staged row, load-audit, embedding, pgvector, and local smoke-plan summaries without a full catalog rebuild."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "evaluation", "planning", "retrieval"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.scale"
+tags: ["speed-guardrails", "database-first", "closeout", "metrics", "daily-factory"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    output:
+      type: string
+    component_id_index:
+      type: string
+    theory_batch_summary:
+      type: string
+    load_audit_summary:
+      type: string
+    governance_bridge_summary:
+      type: string
+    local_vector_worker_summary:
+      type: string
+    pgvector_load_plan_summary:
+      type: string
+    embedding_committed_load_audit:
+      type: string
+    local_postgres_smoke_plan:
+      type: string
+  required: ["output"]
+returns:
+  type: object
+  properties:
+    speed_policy:
+      type: object
+    public_component_definitions:
+      type: object
+    database_first_metrics:
+      type: object
+    local_postgres_smoke:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      output: "dist/fast-factory-closeout/2026-05-26/summary.json"
+      theory_batch_summary: "dist/theory-component-batch/2026-05-26/theory-component-batch-summary.json"
+    output:
+      speed_policy:
+        mode: "database_first_incremental"
+      database_first_metrics:
+        generated_normalized_component_candidates: 1000
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.fast_factory_closeout_report.build_fast_factory_closeout_report"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.factory.fast_factory_closeout_report"

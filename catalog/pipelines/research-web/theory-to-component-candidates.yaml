@@ -1,0 +1,63 @@
+id: "pipeline/theory-to-component-candidates"
+type: pipeline
+version: "0.1.0"
+name: "Theory to component candidates"
+description: "Converts technical theories and postmortems into staged, database-backed component candidates that can be deduped, indexed, reviewed, embedded, and promoted."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "security.defensive", "cross_industry"]
+capability: ["generation", "planning", "governance", "retrieval"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "cross_cutting.scale"
+tags: ["theory-to-components", "daily-factory", "component-candidates", "postmortems", "review-gate"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Turn a set of theory seeds into staged component candidate row families."
+pipeline_kind: "research_web.theory_to_component_candidates"
+inputs:
+  - name: "theory_seeds"
+    type: "jsonl"
+  - name: "target_count"
+    type: "integer"
+outputs:
+  - name: "normalized_component_candidates"
+    type: "jsonl"
+  - name: "index_records"
+    type: "jsonl"
+  - name: "embedding_work_rows"
+    type: "jsonl"
+  - name: "review_tickets"
+    type: "jsonl"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/theory-to-component-patterns"
+steps:
+  - id: "expand-theory-seeds"
+    kind: "tool"
+    ref: "tool/theory-component-seed-generator"
+    inputs:
+      theory_seeds: "$.inputs.theory_seeds"
+      target_count: "$.inputs.target_count"
+  - id: "audit-staged-rows"
+    kind: "tool"
+    ref: "tool/staged-vs-committed-load-auditor"
+    inputs:
+      staged_counts: "$.steps.expand-theory-seeds.row_counts"
+      committed_counts: {}
+  - id: "emit-audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "theory-to-component-candidates"
+      applied_layers: ["theory_seed_expansion", "source_governance", "dedupe_ready_rows", "review_gate"]
+success_criteria:
+  - kind: "deterministic"
+    target: "$.steps.expand-theory-seeds.seed_count"
+    op: ">="
+    value: 1000
+    severity: "high"
+    label: "At least 1,000 staged component candidates are produced for a normal daily run."

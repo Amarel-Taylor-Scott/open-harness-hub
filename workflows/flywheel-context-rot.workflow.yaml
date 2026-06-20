@@ -1,0 +1,55 @@
+kind: baltor.flywheel-workflow.v1
+name: Context Rot Flywheel
+flywheel_id: flywheel.context-rot
+stage: Anti-Fragility
+purpose: Decide per cached item whether it is still safe to serve, or must refresh/block/human-review. Implemented offline by scripts/ingest/context_rot.py (TTL + content-hash CDC + ACL + supersession). Freshness ≠ correctness.
+triggers:
+  - ttl_expired
+  - source_hash_changed
+  - source_acl_changed
+  - pack_requested
+  - eval_failed
+  - human_override
+inputs:
+  - source_handles
+  - cached_claims
+  - context_packs
+  - ttl_policy
+steps:
+  - validate source-handle resolution
+  - compare current vs cached content hash (CDC)
+  - check ACL change
+  - check TTL / freshness window
+  - find superseded claims
+  - classify rot state
+  - route to refresh / block / serve-with-warning / human-review
+  - issue receipt update
+queue_messages:
+  - pack_refresh_job
+  - human_review_ticket
+outputs:
+  - RotSignal
+  - InvalidatedClaim
+  - RefreshedContextObject
+  - PackRefreshJob
+  - ContextReceiptUpdate
+receipts_emitted:
+  - ContextReceiptUpdate
+metrics:
+  - rot_detection
+  - freshness_detection
+  - stale_claims_blocked
+  - packs_refreshed
+failure_modes:
+  - upstream source unreachable (cannot recompute hash)
+  - ACL service unavailable
+fallback_strategy: when current state is unknown, hold (do not serve) and route to human review
+human_review_triggers:
+  - permission_changed
+  - contradiction_found
+suggested_runtime: worker-plane CronJob (ContextRotSweeper) + on-demand on pack_requested
+candidate_backend_tools:
+  - Graphiti
+  - OpenFGA
+harness_refs:
+  - fixtures/harness/context-rot.harness.json

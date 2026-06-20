@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor — Live Demo Console</title>
+<style>
+  :root{
+    --bg:#0a0d14; --panel:#121723; --panel2:#0e131d; --line:#1f2734;
+    --ink:#e6edf6; --muted:#8aa0b6; --gold:#e9b949; --emerald:#34d39a; --blue:#5aa0ff;
+    --purple:#a98bff; --red:#ff6b6b; --amber:#f5a623;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 70% -10%,#13203a 0%,var(--bg) 55%);
+       color:var(--ink);font-family:var(--sans);line-height:1.45}
+  header{display:flex;align-items:center;gap:16px;padding:18px 24px;border-bottom:1px solid var(--line);
+         position:sticky;top:0;background:rgba(10,13,20,.85);backdrop-filter:blur(8px);z-index:5}
+  .brand{font-weight:700;letter-spacing:.2px}
+  .brand .dot{color:var(--gold)}
+  .sub{color:var(--muted);font-size:13px}
+  .controls{margin-left:auto;display:flex;gap:10px;align-items:center}
+  select,button{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);
+                border-radius:9px;padding:9px 13px}
+  button.run{background:linear-gradient(180deg,#1c2740,#141d30);border-color:#2b3a5a;cursor:pointer;font-weight:600}
+  button.run:hover{border-color:var(--blue)}
+  button.run:disabled{opacity:.5;cursor:default}
+  main{max-width:1180px;margin:0 auto;padding:22px 24px 60px}
+  .headline{font-size:15px;color:var(--muted);margin:6px 2px 18px}
+  .headline b{color:var(--ink)}
+  .progress{height:4px;background:#16202f;border-radius:99px;overflow:hidden;margin:0 2px 22px}
+  .progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--emerald));
+                transition:width .5s ease}
+  .stages{display:grid;grid-template-columns:1fr;gap:12px}
+  .stage{border:1px solid var(--line);background:linear-gradient(180deg,var(--panel),var(--panel2));
+         border-radius:14px;padding:14px 16px;opacity:.32;transform:translateY(8px);
+         transition:opacity .45s ease,transform .45s ease,border-color .45s ease}
+  .stage.on{opacity:1;transform:none}
+  .stage.flag.on{border-color:#5a4a1f}
+  .stage .top{display:flex;align-items:center;gap:11px}
+  .pill{font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#0a0d14;
+        background:var(--muted);border-radius:99px;padding:3px 9px}
+  .stage.on .pill{background:var(--emerald)}
+  .stage.flag.on .pill{background:var(--amber)}
+  .stage.seam.on .pill{background:var(--purple)}
+  .stage h3{margin:0;font-size:15px;flex:1}
+  .stage .num{font-family:var(--mono);color:var(--muted);font-size:12px}
+  .stage .hl{color:var(--ink);margin:8px 0 0;font-size:13.5px}
+  .metrics{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+  .metric{font-family:var(--mono);font-size:11.5px;color:var(--ink);background:#0c1320;border:1px solid var(--line);
+          border-radius:7px;padding:4px 8px}
+  .metric b{color:var(--gold);font-weight:600}
+  .handles{margin-top:9px;display:flex;flex-wrap:wrap;gap:6px}
+  .handle{font-family:var(--mono);font-size:11px;color:var(--blue);background:#0b1626;border:1px solid #1b2c44;
+          border-radius:6px;padding:3px 7px;word-break:break-all}
+  .running .pill::after{content:" ·";animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:.2}}
+  .grid2{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-top:22px}
+  @media(max-width:880px){.grid2{grid-template-columns:1fr}}
+  .card{border:1px solid var(--line);background:var(--panel2);border-radius:14px;padding:16px}
+  .card h4{margin:0 0 12px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  svg{width:100%;height:300px;display:block}
+  .liftbar{margin:9px 0}
+  .liftbar .lbl{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px}
+  .liftbar .lbl span:last-child{font-family:var(--mono);color:var(--muted)}
+  .bar{height:9px;border-radius:99px;background:#0c1320;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;border-radius:99px;transition:width .8s ease}
+  .note{color:var(--muted);font-size:12px;margin-top:24px;text-align:center}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:8px}
+  .legend i{display:inline-block;width:9px;height:9px;border-radius:99px;margin-right:5px;vertical-align:middle}
+  .gnode:hover circle{stroke:var(--ink)}
+  .panel{margin-top:12px;border-top:1px solid var(--line);padding-top:12px;font-size:13px;min-height:36px}
+  .panel .ttl{font-weight:600;margin-bottom:3px}
+  .panel .kv{color:var(--muted);font-size:12px;margin:2px 0}
+  .panel .asserts{margin:8px 0;display:flex;flex-wrap:wrap;gap:6px}
+  .panel .btns{display:flex;gap:8px;margin-top:10px}
+  .panel .btns button{padding:6px 11px;font-size:12px;cursor:pointer}
+  .exp{margin-top:10px;font-family:var(--mono);font-size:11.5px;white-space:pre-wrap;border:1px solid var(--line);
+       border-radius:8px;padding:9px;background:#0c1320}
+  .exp.deny{border-color:#5a2530;color:var(--red)}
+  .exp.allow{border-color:#1f4a39;color:var(--emerald)}
+  .vers{margin:8px 0;display:flex;flex-direction:column;gap:5px}
+  .ver{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line);border-radius:7px;padding:5px 8px;background:#0c1320}
+  .ver .badge{font-size:10px;border-radius:99px;padding:1px 7px;margin-left:6px}
+  .ver.stale .badge{background:#3a2e12;color:var(--gold)}
+  .ver.proposed .badge{background:#2a1c3a;color:var(--purple)}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="brand">Baltor<span class="dot">.</span> Context Engine — Live Demo Console</div>
+    <div class="sub">deterministic replay of a real pipeline run · source → reconciliation → anti-fragility → enhancement → optimization → consumption</div>
+  </div>
+  <div class="controls">
+    <label class="sub" for="corpus">corpus</label>
+    <select id="corpus"></select>
+    <button class="run" id="run">▶ Run</button>
+  </div>
+</header>
+<main>
+  <div class="headline" id="headline">Loading run…</div>
+  <div class="progress"><i id="bar"></i></div>
+  <div class="stages" id="stages"></div>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Context graph</h4>
+      <svg id="graph" viewBox="0 0 520 300" aria-label="context graph"></svg>
+      <div class="legend">
+        <span><i style="background:var(--gold)"></i>authority</span>
+        <span><i style="background:var(--red)"></i>stale / contradicts</span>
+        <span><i style="background:var(--blue)"></i>object</span>
+        <span>— red dashed = CONTRADICTS · click a node</span>
+      </div>
+      <div class="panel" id="panel"></div>
+    </div>
+    <div class="card">
+      <h4>Measured lift (with / without context · with / without harness)</h4>
+      <div id="lift"></div>
+      <div class="note" id="lift-note" style="text-align:left"></div>
+    </div>
+  </div>
+  <div class="note" id="footnote"></div>
+</main>
+
+<script>
+const ACCENT = {ok:'var(--emerald)', flag:'var(--amber)', seam:'var(--purple)'};
+const $ = sel => document.querySelector(sel);
+let RUN = null, timer = null;
+
+async function load(corpus){
+  const file = corpus === 'cfpb' ? 'demo-run.cfpb.json' : 'demo-run.json';
+  try{
+    const r = await fetch(file, {cache:'no-store'});
+    if(!r.ok) throw new Error(r.status);
+    RUN = await r.json();
+  }catch(e){
+    $('#headline').innerHTML = `Could not load <code>${file}</code> (${e}). Serve this folder over HTTP `+
+      `(e.g. <code>python3 -m http.server</code> in <code>web/baltor/</code>) — browsers block file:// fetch.`;
+    RUN = null; return;
+  }
+  // populate corpus selector once
+  if(RUN.available_corpora && !$('#corpus').dataset.filled){
+    $('#corpus').innerHTML = RUN.available_corpora.map(c =>
+      `<option value="${c.id}" ${c.id===corpus?'selected':''}>${c.label}</option>`).join('');
+    $('#corpus').dataset.filled = '1';
+  }
+  render();
+}
+
+function render(){
+  $('#headline').innerHTML = `<b>${RUN.corpus_label}</b> — ${RUN.headline}`;
+  $('#bar').style.width = '0%';
+  // stages (hidden until played)
+  $('#stages').innerHTML = RUN.stages.map(s => `
+    <div class="stage ${s.status}" data-id="${s.id}">
+      <div class="top">
+        <span class="pill">${s.status}</span>
+        <h3>${s.title}</h3>
+        <span class="num">stage ${s.id+1}/${RUN.stages.length}</span>
+      </div>
+      <div class="hl">${s.headline}</div>
+      <div class="metrics">${Object.entries(s.metrics||{}).map(([k,v])=>
+        `<span class="metric">${k} <b>${fmt(v)}</b></span>`).join('')}</div>
+      <div class="handles">${(s.source_handles||[]).filter(Boolean).slice(0,5).map(h=>
+        `<span class="handle">${h}</span>`).join('')}</div>
+    </div>`).join('');
+  drawGraph(); drawLift();
+  $('#panel').innerHTML = '<span class="kv">click a graph node to inspect its object, claims, lineage, and policy-gated source expansion</span>';
+  $('#footnote').textContent = RUN.note || '';
+}
+
+function fmt(v){
+  if(Array.isArray(v)) return v.join(', ');
+  if(v && typeof v === 'object') return Object.entries(v).map(([k,x])=>`${k}:${x}`).join('  ');
+  return String(v);
+}
+
+function play(){
+  clearTimeout(timer);
+  document.querySelectorAll('.stage').forEach(el=>el.classList.remove('on','running'));
+  $('#bar').style.width = '0%';
+  const stages = [...document.querySelectorAll('.stage')];
+  let i = 0;
+  const step = () => {
+    if(i>0) stages[i-1].classList.remove('running');
+    if(i>=stages.length){ $('#run').disabled=false; return; }
+    const el = stages[i];
+    el.classList.add('on','running');
+    $('#bar').style.width = `${Math.round(((i+1)/stages.length)*100)}%`;
+    el.scrollIntoView({behavior:'smooth', block:'center'});
+    i++; timer = setTimeout(step, 780);
+  };
+  $('#run').disabled = true;
+  step();
+}
+
+function drawGraph(){
+  const svg = $('#graph'); const g = RUN.graph || {nodes:[],edges:[]};
+  if(!g.nodes.length){ svg.innerHTML = `<text x="20" y="40" fill="#8aa0b6" font-size="13">live-source seam — run locally with the connector</text>`; return; }
+  const cx=260, cy=150, R=118, n=g.nodes.length;
+  const pos = {};
+  g.nodes.forEach((nd,k)=>{ const a=-Math.PI/2 + k*2*Math.PI/n; pos[nd.id]=[cx+R*Math.cos(a), cy+R*Math.sin(a)]; });
+  const color = nd => nd.staleness==='stale' ? 'var(--red)' :
+    (nd.type==='decision' ? 'var(--gold)' : 'var(--blue)');
+  const edges = g.edges.map(e=>{
+    const a=pos[e.from], b=pos[e.to]; if(!a||!b) return '';
+    const con = e.type==='CONTRADICTS';
+    return `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}"
+      stroke="${con?'var(--red)':'#2a3850'}" stroke-width="${con?2:1}" ${con?'stroke-dasharray="5 4"':''}/>`;
+  }).join('');
+  const nodes = g.nodes.map(nd=>{
+    const [x,y]=pos[nd.id];
+    const short = nd.id.replace(/^obj-/,'');
+    return `<g class="gnode" data-id="${nd.id}" style="cursor:pointer"><circle cx="${x}" cy="${y}" r="9" fill="${color(nd)}" stroke="#0a0d14" stroke-width="2">
+      ${nd.staleness==='stale'?'<animate attributeName="r" values="9;12;9" dur="1.6s" repeatCount="indefinite"/>':''}
+      </circle><text x="${x}" y="${y-14}" fill="#cdd9e6" font-size="10" text-anchor="middle">${short}</text></g>`;
+  }).join('');
+  svg.innerHTML = edges + nodes;
+  svg.querySelectorAll('.gnode').forEach(el => el.addEventListener('click', () => showObject(el.dataset.id)));
+}
+
+function showObject(id){
+  const d = (RUN.object_detail || {})[id]; const p = $('#panel');
+  if(!d){ p.innerHTML = '<span class="kv">no detail for this node</span>'; return; }
+  const asserts = (d.assertions||[]).map(a =>
+    `<span class="metric">${a.predicate} <b>${a.value}</b> @${a.confidence}</span>`).join('') || '<span class="kv">no assertions</span>';
+  const vers = (d.versions||[]).map(v => {
+    const cls = v.status==='proposed' ? 'proposed' : 'stale';
+    const tag = v.status==='proposed' ? 'pending review · not applied' : 'current';
+    return `<div class="ver ${cls}">${v.source_revision}: value=<b>${v.value}</b> · ${v.status}<span class="badge">${tag}</span></div>`;
+  }).join('');
+  p.innerHTML = `
+    <div class="ttl">${d.title}</div>
+    <div class="kv">type: ${d.object_type} · classification: ${d.classification} · freshness: ${d.freshness}</div>
+    <div class="handles">${(d.source_handles||[]).map(h=>`<span class="handle">${h}</span>`).join('')}</div>
+    <div class="asserts">${asserts}</div>
+    ${vers ? `<div class="kv">version timeline (current = v1; v2 proposed, gated)</div><div class="vers">${vers}</div>` : ''}
+    <div class="btns"><button class="run" id="bExp">Expand source ▸</button>
+      <button class="run" id="bDeny">Try restricted ▸</button></div>
+    <div id="expOut"></div>`;
+  $('#bExp').onclick = () => {
+    const e = d.expansion_allowed || {};
+    $('#expOut').innerHTML = e.allowed
+      ? `<div class="exp allow">✓ granted (${e.reason})\n${(e.raw_excerpt||'').slice(0,500)}\n\n— ${e.lineage_summary||''}</div>`
+      : `<div class="exp deny">✗ ${e.reason} — no raw returned</div>`;
+  };
+  $('#bDeny').onclick = () => {
+    const e = d.expansion_denied || {};
+    $('#expOut').innerHTML = `<div class="exp deny">✗ DENIED: ${e.reason} — gate returned raw_excerpt=${JSON.stringify(e.raw_excerpt)} (no bytes leak)</div>`;
+  };
+}
+
+function drawLift(){
+  const lm = RUN.lift_matrix; const wrap = $('#lift');
+  if(!lm){ wrap.innerHTML = '<div class="note" style="text-align:left">no lift matrix for this corpus (seam)</div>'; $('#lift-note').textContent=''; return; }
+  const cm = lm.by_model.local_mock.condition_mean;
+  const max = Math.max(...Object.values(cm).map(v=>v||0), 1);
+  const tint = c => c==='no_context'?'var(--red)' : c==='raw_context'?'var(--amber)' :
+    c.includes('harness')||c.includes('swarm')?'var(--emerald)':'var(--blue)';
+  wrap.innerHTML = lm.conditions.map(c=>{
+    const v = cm[c]||0; const w = Math.round((v/max)*100);
+    return `<div class="liftbar"><div class="lbl"><span>${c}</span><span>${v.toFixed(3)}</span></div>
+      <div class="bar"><i style="background:${tint(c)};width:0" data-w="${w}"></i></div></div>`;
+  }).join('');
+  setTimeout(()=>document.querySelectorAll('#lift .bar > i').forEach(b=>b.style.width=b.dataset.w+'%'), 120);
+  const s = lm.summary;
+  $('#lift-note').innerHTML = `governed pack beats no-context: <b>${s.with_context_beats_no_context}</b> · `+
+    `harness ≥ pack: <b>${s.harness_ge_pack}</b> · raw dump underperforms the pack: <b>${s.raw_underperforms_pack}</b>`;
+}
+
+$('#run').addEventListener('click', play);
+$('#corpus').addEventListener('change', e => load(e.target.value));
+load('acme');
+</script>
+</body>
+</html>

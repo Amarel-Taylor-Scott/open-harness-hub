@@ -42,12 +42,14 @@ import sys
 from pathlib import Path
 from typing import Iterable
 
-import yaml
-
 
 REPO = Path(__file__).resolve().parent.parent
 CATALOG = REPO / "catalog"
 DB_PATH = REPO / "dist" / "catalog.sqlite"
+if str(REPO) not in sys.path:
+    sys.path.insert(0, str(REPO))
+
+from scripts.db.catalog_row_source import iter_components_from_rows, resolve_catalog_row_dir
 
 STOP = {"with", "from", "this", "that", "have", "been", "will", "must", "shall", "into", "than", "then", "each", "such", "their", "would", "could", "should", "above", "below", "over", "more", "less", "very", "many", "some", "what", "when", "where", "which", "while", "until", "after", "before", "every", "etc", "the", "and", "for", "are", "any", "you", "your"}
 
@@ -61,7 +63,39 @@ def tokenize(text: str) -> set[str]:
     return toks
 
 
-def load_artifacts() -> list[dict]:
+def _searchable_component(doc: dict, path: str) -> dict:
+    searchable = " ".join([
+        doc.get("name", ""),
+        doc.get("description", "") if isinstance(doc.get("description"), str) else "",
+        " ".join(doc.get("tags", []) if isinstance(doc.get("tags"), list) else []),
+        " ".join(doc.get("industry", []) if isinstance(doc.get("industry"), list) else []),
+        " ".join(doc.get("capability", []) if isinstance(doc.get("capability"), list) else []),
+    ])
+    return {
+        "id": doc["id"],
+        "type": doc["type"],
+        "name": doc.get("name", ""),
+        "description": (doc.get("description") or "")[:200] if isinstance(doc.get("description"), str) else "",
+        "tokens": tokenize(searchable),
+        "path": path,
+        "_doc": doc,
+    }
+
+
+def load_components() -> list[dict]:
+    row_dir = resolve_catalog_row_dir()
+    if row_dir is not None:
+        return [
+            _searchable_component(component.manifest, component.source_path)
+            for component in iter_components_from_rows(row_dir)
+        ]
+
+    try:
+        import yaml
+    except ImportError:
+        sys.stderr.write("pyyaml is required for YAML fallback: pip install pyyaml\n")
+        sys.exit(2)
+
     out = []
     for p in CATALOG.rglob("*.yaml"):
         try:
@@ -70,29 +104,14 @@ def load_artifacts() -> list[dict]:
             continue
         if not isinstance(doc, dict) or not doc.get("id") or not doc.get("type"):
             continue
-        searchable = " ".join([
-            doc.get("name", ""),
-            doc.get("description", "") if isinstance(doc.get("description"), str) else "",
-            " ".join(doc.get("tags", []) if isinstance(doc.get("tags"), list) else []),
-            " ".join(doc.get("industry", []) if isinstance(doc.get("industry"), list) else []),
-            " ".join(doc.get("capability", []) if isinstance(doc.get("capability"), list) else []),
-        ])
-        out.append({
-            "id": doc["id"],
-            "type": doc["type"],
-            "name": doc.get("name", ""),
-            "description": (doc.get("description") or "")[:200] if isinstance(doc.get("description"), str) else "",
-            "tokens": tokenize(searchable),
-            "path": str(p.relative_to(REPO)),
-            "_doc": doc,
-        })
+        out.append(_searchable_component(doc, str(p.relative_to(REPO))))
     return out
 
 
-def lexical_score(task_tokens: set[str], artifact: dict) -> float:
+def lexical_score(task_tokens: set[str], component: dict) -> float:
     if not task_tokens:
         return 0.0
-    overlap = task_tokens & artifact["tokens"]
+    overlap = task_tokens & component["tokens"]
     return len(overlap) / max(1, len(task_tokens) ** 0.7)
 
 
@@ -112,7 +131,7 @@ def _unpack_vector(blob: bytes, dim: int) -> list[float]:
 
 
 def load_embeddings() -> tuple[dict[str, list[float]], str | None]:
-    """Returns ({artifact_id: vector}, model_name) from dist/catalog.sqlite.
+    """Returns ({component_id: vector}, model_name) from dist/catalog.sqlite.
 
     Empty dict signals 'no embeddings available' and the caller falls back to
     pure lexical scoring.
@@ -122,7 +141,7 @@ def load_embeddings() -> tuple[dict[str, list[float]], str | None]:
     try:
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
-        rows = c.execute("SELECT artifact_id, model, dim, vector FROM embeddings").fetchall()
+        rows = c.execute("SELECT component_id, model, dim, vector FROM embeddings").fetchall()
         conn.close()
     except sqlite3.Error:
         return {}, None
@@ -171,14 +190,14 @@ def load_edges() -> dict[str, list[str]]:
 
 def search(
     task: str,
-    artifacts: list[dict],
+    components: list[dict],
     *,
     mode: str = "lexical",
     top_k: int = 25,
 ) -> tuple[list[tuple[dict, float, set[str], dict[str, float]]], str]:
     """Returns (ranked, effective_mode).
 
-    `ranked` items are (artifact, blended_score, matched_tokens, components)
+    `ranked` items are (component, blended_score, matched_tokens, components)
     where `components` is the per-source breakdown {lexical, semantic, edge}.
     `effective_mode` reflects what actually ran (may downgrade if embeddings
     aren't available).
@@ -201,7 +220,7 @@ def search(
 
     # First pass: blended score without edge boost.
     ranked_first: list[tuple[dict, float, set[str], dict[str, float]]] = []
-    for art in artifacts:
+    for art in components:
         lx = lexical_score(tt, art)
         sm = 0.0
         if effective_mode in ("semantic", "hybrid") and qvec is not None and art["id"] in embs:
@@ -340,8 +359,8 @@ def main() -> int:
 
     mode = "hybrid" if args.hybrid else ("semantic" if args.semantic else "lexical")
 
-    artifacts = load_artifacts()
-    hits, effective_mode = search(args.task, artifacts, mode=mode, top_k=args.top_k)
+    components = load_components()
+    hits, effective_mode = search(args.task, components, mode=mode, top_k=args.top_k)
     grouped = group_by_type(hits)
 
     if args.json:
@@ -367,6 +386,11 @@ def main() -> int:
         return 0
 
     if args.draft_yaml:
+        try:
+            import yaml
+        except ImportError:
+            sys.stderr.write("pyyaml is required for --draft-yaml: pip install pyyaml\n")
+            return 2
         draft = make_draft_pipeline(args.task, grouped)
         print(yaml.safe_dump(draft, sort_keys=False))
         return 0
@@ -376,7 +400,7 @@ def main() -> int:
     if mode != "lexical" and effective_mode == "lexical":
         print("(embeddings sidecar not found or empty; run `OH_BUILD_EMBEDDINGS=1 python3 scripts/build_catalog_db.py` to enable semantic search)")
     print()
-    print(f"Found {len(hits)} relevant artifacts across {len(grouped)} types.")
+    print(f"Found {len(hits)} relevant components across {len(grouped)} types.")
     print()
     for t in ["persona", "rule-pack", "knowledge-pack", "rubric", "tool", "processor", "pattern", "adapter", "pipeline", "dataset"]:
         if t not in grouped:

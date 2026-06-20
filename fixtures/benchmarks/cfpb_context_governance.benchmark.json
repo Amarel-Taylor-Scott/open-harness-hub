@@ -1,0 +1,26 @@
+{
+  "benchmark_id": "benchmark.baltor.cfpb_context_governance@v1",
+  "display_name": "Baltor CFPB Context Governance Benchmark",
+  "benchmark_family": "context_governance",
+  "capability_slots": ["context_reconciliation", "source_handle_preservation", "held_out_warning_preservation"],
+  "input_contracts": ["ContextPack.v1"],
+  "output_contracts": ["ContextResponse.v1"],
+  "metrics": ["answer_correctness", "source_handle_coverage", "held_out_leak_count", "receipt_presence", "allegation_leak_count", "tenant_leak_count"],
+  "datasets": [{"dataset_id": "dataset.cfpb.reg_e_deadline@v1", "ref": "demo-data/cfpb-sample"}],
+  "harnesses": ["harness.baltor.context_governance@v1"],
+  "expected_results": {
+    "served_answer_contains": "10 business days",
+    "held_out_fact": "30 days",
+    "source_handles_required": true,
+    "receipts_required": true,
+    "allegations_served_as_fact": false
+  },
+  "known_limitations": ["Demo fixture is not a full production corpus.", "Human legal review may be required for real customer claims."],
+  "contamination_risk": "low",
+  "suitability_notes": "Use as a context-governance gate (holdout/source-handles/receipts), NOT as a general model benchmark.",
+  "source": "first_party",
+  "confidence": "high",
+  "visibility": "public_reference",
+  "owner": "baltor",
+  "status_code": 500
+}

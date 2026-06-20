@@ -1,0 +1,52 @@
+id: "tool/image-prompt-safety-screen"
+type: tool
+version: "0.1.0"
+name: "Image prompt safety screen"
+description: |
+  Pre-generation guard: screens an image prompt for prohibited content/intent
+  (CSAM, non-consensual, targeted real individuals, weapons-making, etc.),
+  returns allow/block + the matched policy categories, and optionally a
+  sanitized rewrite. The deterministic gate that runs BEFORE any GPU cost.
+
+  Capability lift: blocks disallowed requests before generation, cutting both
+  risk and wasted compute — the generator has no policy of its own.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["media", "security", "cross_industry"]
+capability: ["safety_gating", "governance", "classification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["image-safety", "prompt-guard", "policy", "pre-generation", "cost-saving"]
+created: "2026-05-27"
+updated: "2026-05-27"
+
+parameters:
+  type: object
+  required: ["prompt"]
+  properties:
+    prompt: { type: string, description: "The user's image prompt." }
+    policy_ref: { type: string, description: "Optional component_id of a prohibited-term / policy pack." }
+    rewrite: { type: boolean, description: "If true, return a sanitized rewrite when only soft issues are found." }
+
+returns:
+  type: object
+  properties:
+    allow: { type: boolean }
+    blocked_categories: { type: array, items: { type: string } }
+    rewritten_prompt: { type: string }
+
+side_effects: "none"
+
+examples:
+  - input: { prompt: "a watercolor fox in a forest", rewrite: false }
+    output: { allow: true, blocked_categories: [], rewritten_prompt: "" }
+    notes: "Allowed prompts pass straight through to generation."
+
+implementations:
+  - kind: callable
+    language: python
+    path: "src/tools/image_prompt_safety_screen.py"
+    notes: "Deterministic policy match (prohibited_term pack) + optional small-model intent check via a model route."

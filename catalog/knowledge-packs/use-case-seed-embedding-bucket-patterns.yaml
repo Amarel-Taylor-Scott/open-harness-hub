@@ -1,0 +1,38 @@
+id: "knowledge-pack/use-case-seed-embedding-bucket-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Use case seed embedding bucket patterns"
+description: "Patterns for emitting deterministic embedding stubs and embedding-bucket dimensions from cross-domain use-case seeds before real pgvector embedding backfill."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "finance", "legal", "media", "creative", "energy", "healthcare", "cross_industry"]
+capability: ["retrieval", "classification", "governance", "evaluation"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.product"
+tags: ["use-case-seeds", "object-embeddings", "embedding-buckets", "pgvector", "comparison-blocking"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types:
+  - "object_embedding_pattern"
+  - "embedding_bucket_dimension"
+  - "vector_index_stub_pattern"
+files:
+  - path: "catalog/knowledge-packs/data/use-case-seed-embedding-bucket-patterns/rows.jsonl"
+    format: "jsonl"
+    schema: "use-case-seed-embedding-bucket-pattern"
+indexing:
+  bm25: true
+  dense:
+    recommended_model: "sentence-transformers/all-MiniLM-L6-v2"
+provenance:
+  sources:
+    - "Open Harness Hub use-case seed row exporter"
+    - "Open Harness Hub resumable object comparison jobs architecture"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "Synthetic embedding-bucket patterns only; insurance scope is excluded."

@@ -1,0 +1,34 @@
+{
+  "$id": "memory/MemoryArtifact.v1", "title": "MemoryArtifact.v1", "type": "object", "additionalProperties": false,
+  "description": "The governed record of one remembered/recalled item as it entered the system from a memory/context provider (e.g. Supermemory). remembered != verified; retrieved != served; profiled != canonical; candidate memory != promoted fact. A MemoryArtifact is ALWAYS a candidate by default and carries NO field that asserts it is a served/canonical fact by itself — promotion to a CanonicalFact happens downstream ONLY through Baltor's VerificationGate + Reconciliation + ConsumptionGate, never here. Carries tenant_id + project/container scope + the upstream external_source_handle + lineage so no memory crosses tenants and every recall is traceable back to its provider id.",
+  "required": ["schema_version", "artifact_id", "tenant_id", "scope", "container", "external_source_handle", "claim_status", "content", "provider_id", "lineage", "created_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["MemoryArtifact.v1"]},
+    "artifact_id": {"type": "string", "description": "Content-addressed id (hashlib over normalized content+handle+tenant). Stable; formatting changes must not produce a new id, content changes must."},
+    "tenant_id": {"type": "string", "description": "Owning tenant. No cross-tenant memory leakage; every read is tenant-scoped."},
+    "scope": {"type": "string", "enum": ["global_public", "tenant_private", "tenant_shared"], "description": "Visibility tier. tenant_private/tenant_shared memory NEVER appears on the public /memory page."},
+    "container": {"type": "string", "description": "Project/container scope within the tenant (mirrors a provider container/project id). Recall is bounded to a (tenant_id, container)."},
+    "external_source_handle": {"type": "string", "description": "The upstream id from the memory provider (e.g. a Supermemory memory id). REQUIRED: a recall with no upstream handle has no lineage and cannot be admitted."},
+    "claim_status": {"type": "string", "enum": ["candidate", "promoted", "held_out"], "description": "candidate = remembered/retrieved, NOT served. promoted = became a CanonicalFact via the downstream gates (set elsewhere, never by the provider). held_out = preserved but deliberately not served (lossless: held-out != deleted)."},
+    "content": {"type": "object", "description": "The remembered payload (text/structured). Raw content is preserved; transforms are lossless at the system level and never overwrite this.", "additionalProperties": true},
+    "provider_id": {"type": "string", "description": "Identity of the providing adapter, e.g. 'supermemory.api@candidate', 'memory.local@v1', 'memory.emulator@v1'."},
+    "provenance": {"type": "object", "additionalProperties": true, "description": "Provider-side provenance (recall query, score, search_mode, upstream metadata). Never asserts canonical truth."},
+    "lineage": {"type": "object", "additionalProperties": false,
+      "required": ["recalled_at"],
+      "properties": {
+        "recalled_at": {"type": "string", "description": "Injected time the recall/write happened (no wall-clock)."},
+        "parent_artifact_id": {"type": "string", "description": "If this memory derives from another MemoryArtifact, its id (preserved, not collapsed)."},
+        "source_handles": {"type": "array", "items": {"type": "string"}, "description": "Upstream source handle(s) this memory was extracted from. Preserved for rehydration/rollback."},
+        "transform_run": {"type": "string", "description": "Hint/id of the transform run that produced this artifact (lossless distillation: omitted != deleted)."},
+        "rollback_target": {"type": "string", "description": "Artifact id this can be rolled back to. Preserved so no transform is irreversible."}
+      }},
+    "security": {"type": "object", "additionalProperties": false,
+      "required": ["classification"],
+      "properties": {
+        "classification": {"type": "string", "enum": ["public", "internal", "confidential", "restricted"]},
+        "contains_pii": {"type": "boolean"},
+        "redaction_applied": {"type": "boolean"}
+      }},
+    "created_at": {"type": "string", "description": "Injected creation time (deterministic; no wall-clock)."}
+  }
+}

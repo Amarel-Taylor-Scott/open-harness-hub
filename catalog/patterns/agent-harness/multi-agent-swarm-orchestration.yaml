@@ -1,0 +1,95 @@
+id: "pattern/multi-agent-swarm-orchestration"
+type: pattern
+version: "0.1.0"
+name: "Multi-agent swarm orchestration"
+description: |
+  A lead orchestrator agent decomposes a broad or ambiguous goal into
+  independent work packages and dispatches them in parallel to a swarm of
+  specialist subagents — each operating in its own isolated context (git
+  worktree, process, or MCP session). Subagents produce structured outputs
+  (YAML manifests, JSONL rows, reports, code patches) that the orchestrator
+  aggregates, validates, and gates before promotion or merge.
+
+  This is the model used to drive Open Harness Hub breadth-factory batches:
+  a BREADTH agent fans out to N concurrent workers that each catalog or
+  generate a different component family, then the orchestrator collects and
+  validates the results. The pattern differs from simple Orchestrator-Workers
+  in that subagents themselves may invoke tools (search, shell, model calls)
+  and are expected to self-correct before returning results.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry:   ["ai", "software.devops", "cross_industry"]
+capability: ["agent_loop", "planning", "routing"]
+modality:   ["text", "code", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "mixed"
+tags:
+  - "multi-agent"
+  - "swarm"
+  - "orchestration"
+  - "parallel-agents"
+  - "breadth-factory"
+  - "agent-harness"
+created: "2026-05-26"
+updated: "2026-05-26"
+
+paper_url: "https://anthropic.com/research/building-effective-agents"
+paper_citation: "Anthropic 2024, Building effective agents — orchestrator-workers and parallelisation patterns"
+
+reference_implementations:
+  - url: "https://github.com/smtg-ai/claude-squad"
+    language: "go"
+    notes: "Git-worktree parallel agents with tmux session management"
+  - url: "https://github.com/ruvnet/claude-flow"
+    language: "python"
+    framework: "claude-flow"
+    notes: "Full swarm framework with distributed memory and role-based routing"
+  - url: "https://github.com/anthropics/anthropic-cookbook/tree/main/patterns/agents"
+    language: "python"
+    notes: "Anthropic reference patterns including orchestrator-workers"
+
+structural_shape:
+  - "orchestrator receives goal + constraints (budget, scope, deadline)"
+  - "orchestrator decomposes goal into N independent work packages"
+  - "orchestrator spawns N subagent contexts (worktrees / processes / MCP sessions)"
+  - "each subagent: fetches package, invokes tools, self-corrects, emits structured output"
+  - "orchestrator collects outputs and runs validation / gate checks"
+  - "orchestrator aggregates passing outputs; flags or queues failing ones for repair"
+  - "orchestrator emits merged result or triggers downstream pipeline step"
+
+when_to_use:
+  - "Broad cataloging or generation tasks where work packages are independent (e.g. catalog N GitHub repos in parallel)"
+  - "Large factory batches that exceed a single context window (fan-out to reduce per-agent token load)"
+  - "Multi-perspective analysis where specialist subagents need different system prompts or tools"
+  - "Any task where wall-clock time matters and subtasks do not share mutable state mid-run"
+  - "Cost-controlled scale: orchestrator can cap spend by limiting swarm size or using smaller subagent models"
+
+when_not_to_use:
+  - "Subtasks with tight sequential dependencies (prefer pattern/plan-and-execute or pattern/react)"
+  - "Low-budget single-turn queries where orchestration overhead exceeds savings"
+  - "Sensitive data contexts where spawning external subagent processes increases the attack surface"
+  - "Tasks requiring real-time coordination between subagents mid-execution"
+
+variants:
+  - "Git-worktree swarm (Claude Squad): each subagent in its own isolated branch; merge/review at end"
+  - "Process-per-agent (Claude-Flow): swarm managed by a coordinator process with shared memory store"
+  - "MCP-session swarm: each subagent connects via a dedicated MCP server instance"
+  - "Heterogeneous swarm: different model tiers per role (orchestrator on Opus, workers on Haiku)"
+  - "Hierarchical swarm: sub-orchestrators manage subsets of workers for very large fan-outs"
+
+counter_patterns:
+  - "pattern/react"
+  - "pattern/plan-and-execute"
+  - "pattern/prompt-chaining"
+
+implementing_pipelines: []
+
+implementing_processors: []
+
+tradeoffs:
+  latency: "Wall-clock SHORTER than sequential chains when N > 2 and subtasks are IO-bound"
+  cost: "Higher total spend per run (N parallel model calls); mitigate with smaller subagent models or strict token budgets"
+  quality: "Strong for breadth coverage; individual subagent depth limited by context and tools available"
+  complexity: "High — requires orchestrator prompt design, output schema contracts, validation gates, and merge/conflict handling"
+  explainability: "High — each subagent's output is independently inspectable and attributable to its work package"

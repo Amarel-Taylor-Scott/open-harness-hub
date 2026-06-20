@@ -67,7 +67,7 @@ Snapshot at last Space build (auto-updated by CI):
 
 {counts_lines}
 
-**Total artifacts**: {total}.
+**Total components**: {total}.
 
 ## Run locally
 

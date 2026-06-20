@@ -1,0 +1,30 @@
+id: "knowledge-pack/medical-device-complaint-frameworks"
+type: knowledge-pack
+version: "0.1.0"
+name: "Medical Device Complaint frameworks"
+description: "Composite context pack for medical device complaint reviews, including evidence, escalation, and remediation controls."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "CC-BY-4.0"
+industry: ["healthcare", "pharma.gxp"]
+capability: ["retrieval", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "dated"
+tags: ["medical-device-complaint", "expansion-v3"]
+created: "2026-05-24"
+updated: "2026-05-24"
+content_types: ["rag_doc", "checklist", "control_summary", "evidence_matrix"]
+files:
+  - path: "data/medical-device-complaint/frameworks.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    enabled: true
+    embedder: "adapter/nomic-embed-text-v15"
+provenance:
+  sources: ["Medical Device Complaint control checklist", "Medical Device Complaint evidence matrix", "Medical Device Complaint escalation playbook", "Medical Device Complaint remediation tracker"]
+  collected_through: "2026-05-24"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "composite educational summaries only"

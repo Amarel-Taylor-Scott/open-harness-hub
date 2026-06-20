@@ -1,0 +1,21 @@
+{
+  "capability_slot": "hybrid_retrieval",
+  "adapter_id": "vector.deterministic_local@v1",
+  "description": "RetrievalQuery -> RankedHits. The wired stub is a deterministic 64-dim hashed-lexical vector (offline, no-pip); Qdrant is the candidate primary behind the same contract.",
+  "input": {
+    "schema": "RetrievalQuery",
+    "query": "billing dispute error resolution deadline",
+    "tenant_id": "demo",
+    "top_k": 3,
+    "filters": {"artifact_type": "atomic_fact"}
+  },
+  "output": {
+    "schema": "RankedHits",
+    "hits": [
+      {"object_id": "obj-reg-e-c1", "score": 0.91, "source_handle": "ctx://cfpb-sample/reg-e.pdf#page=1&block=2"},
+      {"object_id": "obj-faq-c2", "score": 0.77, "source_handle": "ctx://cfpb-sample/faq.html#block=7"}
+    ],
+    "provider": "vector.deterministic_local@v1",
+    "deterministic": true
+  }
+}

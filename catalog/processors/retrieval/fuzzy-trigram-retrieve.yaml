@@ -1,0 +1,51 @@
+id: processor/fuzzy-trigram-retrieve
+type: processor
+version: 0.1.0
+name: Fuzzy / trigram retrieve
+description: 'Substring/typo/name matching via trigram (pg_trgm) + edit/phonetic distance — language-agnostic,
+  in-DB, catches misspellings and name variants. Character-level only; not a semantic ranker.
+
+
+  Retrieval/prompt taxonomy step R1 (see docs/concepts/retrieval-and-prompt-taxonomy.md). One swappable
+  method-component for the governed-model-call recipe; lift is measured at the pipeline level, not on
+  this component.'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+- ai
+capability:
+- retrieval
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- retrieval-taxonomy
+- step-r1
+- rag
+- freezable
+created: '2026-05-29'
+updated: '2026-05-29'
+process_kind: retrieve.fuzzy_trigram
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: query
+  type: object
+- name: corpus
+  type: object
+- name: max_distance
+  type: object
+outputs:
+- name: candidates
+  type: object
+side_effects: read
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.retrieval.fuzzy_trigram_retrieve.run
+  language: python

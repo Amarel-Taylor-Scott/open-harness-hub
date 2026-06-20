@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor — Enhancement</title>
+<link rel="stylesheet" href="./stage-detail.css?v=enhancement-dom-1" />
+<style>
+  body.focused-stage .page { width: min(100%, 1180px); display: grid; grid-template-rows: auto auto auto auto; gap: 16px; align-content: center; }
+  .focused-canvas { height: auto; min-height: 500px; }
+  .stage-diagram { --flow-gap: clamp(10px, 1.4vw, 18px); min-height: 500px; padding: 22px clamp(18px,3vw,34px) 28px; display: grid; grid-template-rows: auto 1fr; gap: 28px; }
+  .diagram-labels { display: grid; grid-template-columns: minmax(235px,.9fr) minmax(260px,1fr) minmax(260px,1fr); gap: clamp(18px,3vw,44px); text-align: center; }
+  .diagram-labels b { display: block; color: #d9ae61; font-size: 11px; text-transform: uppercase; letter-spacing: .12em; }
+  .diagram-labels span { display: block; margin-top: 4px; color: #7f8794; font-size: 12px; font-weight: 650; }
+  .diagram-body { display: grid; grid-template-columns: minmax(235px,.9fr) minmax(44px,.12fr) minmax(260px,1fr) minmax(44px,.12fr) minmax(260px,1fr); column-gap: var(--flow-gap); align-items: center; }
+  .stack { display: grid; gap: 18px; position: relative; z-index: 2; }
+  .item-card, .hub-card, .output-card { border: 1px solid #3a4454; border-radius: 14px; background: rgba(12,16,22,.9); box-shadow: 0 20px 40px rgba(0,0,0,.22); }
+  .item-card { --accent: #d9ae61; min-height: 74px; border-color: color-mix(in srgb,var(--accent) 54%,#262d38); border-radius: 10px; padding: 12px 14px; position: relative; background: rgba(12,16,22,.86); }
+  .item-card::after { content: ""; position: absolute; right: -5px; top: 50%; width: 9px; height: 9px; border-radius: 999px; background: var(--accent); transform: translateY(-50%); opacity: .52; box-shadow: 0 0 0 7px color-mix(in srgb,var(--accent) 9%,transparent); }
+  .item-card b { display: block; color: color-mix(in srgb,var(--accent) 78%,#e7ebf0); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
+  .item-card span { display: block; margin-top: 5px; color: #e7ebf0; font-weight: 850; line-height: 1.25; }
+  .item-card small { display: block; margin-top: 4px; color: #8c95a4; font-size: 11px; }
+  .line-stack { display: grid; grid-template-rows: repeat(3,74px); gap: 18px; align-items: center; min-width: 44px; margin-inline: calc(var(--flow-gap)*-1); padding-inline: var(--flow-gap); z-index: 1; }
+  .line-stack.out { grid-template-rows: repeat(3,54px); gap: 13px; padding-top: 54px; padding-bottom: 54px; }
+  .flow-line { --accent: #d9ae61; display: block; position: relative; width: calc(100% + (var(--flow-gap)*2)); height: 1px; margin-inline: calc(var(--flow-gap)*-1); background: linear-gradient(90deg,color-mix(in srgb,var(--accent) 58%,transparent),color-mix(in srgb,var(--accent) 18%,transparent)); }
+  .flow-line::after, .flow-line .packet { content: ""; position: absolute; top: 50%; width: 8px; height: 8px; border-radius: 999px; background: var(--accent); transform: translateY(-50%); box-shadow: 0 0 14px color-mix(in srgb,var(--accent) 56%,transparent); }
+  .flow-line::after { right: 0; }
+  .flow-line .packet { left: 14%; width: 7px; height: 7px; opacity: 0; animation: packet 3.8s linear infinite; animation-delay: var(--delay,0s); }
+  .hub-card, .output-card { width: 100%; min-height: 336px; padding: 22px; position: relative; z-index: 2; }
+  .hub-card h2, .output-card h2 { margin: 0 0 18px; font-size: 17px; line-height: 1.1; }
+  .rows { display: grid; gap: 13px; }
+  .row { min-height: 54px; border-radius: 8px; background: rgba(255,255,255,.035); display: grid; grid-template-columns: 40px 1fr; align-items: center; gap: 12px; padding: 9px 11px; }
+  .badge { width: 30px; height: 30px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; background: var(--accent,#d9ae61); color: #071017; font-weight: 900; }
+  .row span { color: #b7c0cc; font-size: 12.5px; line-height: 1.3; }
+  .enriched { grid-template-columns: 48px 1fr; }
+  .object { position: relative; width: 34px; height: 34px; transform: rotate(45deg); border: 1px solid #f0c878; background: #b88937; box-shadow: 5px 5px 0 rgba(217,174,97,.24), inset -5px -5px 0 rgba(0,0,0,.18); }
+  .object i { position: absolute; width: 7px; height: 7px; border-radius: 999px; background: #f7d38a; box-shadow: 0 0 10px rgba(217,174,97,.7); }
+  .object i:nth-child(1) { left: -8px; top: 8px; } .object i:nth-child(2) { right: -7px; top: 4px; } .object i:nth-child(3) { right: 5px; bottom: -8px; }
+  .note { margin-top: 15px; border: 1px solid rgba(217,174,97,.28); border-radius: 10px; background: rgba(217,174,97,.055); padding: 12px; color: #d9d0c0; font-size: 12.5px; line-height: 1.35; }
+  @keyframes packet { 0%{left:14%;opacity:0} 18%{opacity:.88} 84%{opacity:.88} 100%{left:100%;opacity:0} }
+  @media (prefers-reduced-motion: reduce) { .flow-line .packet{animation:none;left:72%;opacity:.55} }
+  @media (max-width:900px) { .stage-diagram{min-height:0}.diagram-labels{display:none}.diagram-body{grid-template-columns:1fr;gap:16px}.line-stack{display:none}.item-card::after{display:none} }
+</style>
+</head>
+<body class="focused-stage">
+<main class="page">
+  <nav class="nav"><a href="../context-stages.html">All stages</a><a href="../context-engine-hero.html">Main flow</a></nav>
+  <section class="focused-shell" style="--stage:var(--amber)">
+    <header class="focused-head">
+      <div class="focused-title"><div class="eyebrow">03 · Context enrichment</div><h1>Enhancement</h1><p>Baltor augments reconciled context with verified sources, approved tools, graph relationships, and domain facts only when they improve the task and can be cited.</p></div>
+      <div class="focused-metrics"><div><span>Enhancements found</span><b>19</b></div><div><span>External checks</span><b>7</b></div><div><span>Conflicts helped</span><b>11</b></div><div><span>Status</span><b>Verified</b></div></div>
+    </header>
+    <div class="focused-canvas"><div class="stage-diagram">
+      <div class="diagram-labels"><div><b>Reconciled objects</b><span>task facts that need more context</span></div><div><b>Enhancement materializer</b><span>external sources / tools / graph links</span></div><div><b>Enriched context</b><span>objects with attached verified context</span></div></div>
+      <div class="diagram-body">
+        <div class="stack">
+          <div class="item-card" style="--accent:#d9ae61"><b>Policy conflict</b><span>late_fee_cap needs current authority</span><small>internal sources disagree</small></div>
+          <div class="item-card" style="--accent:#32c786"><b>Service object</b><span>billing-service needs impact context</span><small>dependencies incomplete</small></div>
+          <div class="item-card" style="--accent:#a47ef7"><b>Review pack seed</b><span>MR needs owner and risk context</span><small>candidate pack not complete</small></div>
+        </div>
+        <div class="line-stack"><span class="flow-line" style="--accent:#d9ae61;--delay:-.2s"><i class="packet"></i></span><span class="flow-line" style="--accent:#32c786;--delay:-1.2s"><i class="packet"></i></span><span class="flow-line" style="--accent:#a47ef7;--delay:-2.1s"><i class="packet"></i></span></div>
+        <section class="hub-card"><h2>Enhancement materializer</h2><div class="rows">
+          <div class="row" style="--accent:#d9ae61"><i class="badge">E</i><span>Attach verified external context, such as current regulatory or card-network limits.</span></div>
+          <div class="row" style="--accent:#32c786"><i class="badge">G</i><span>Add service graph, dependency, incident, and owner relationships.</span></div>
+          <div class="row" style="--accent:#4c8df6"><i class="badge">T</i><span>Use approved tools to resolve missing facts without dumping raw results.</span></div>
+        </div><div class="note">Enhancement adds context only when it is relevant, source-linked, and allowed for the task.</div></section>
+        <div class="line-stack out"><span class="flow-line" style="--accent:#d9ae61;--delay:-.6s"><i class="packet"></i></span><span class="flow-line" style="--accent:#32c786;--delay:-1.7s"><i class="packet"></i></span><span class="flow-line" style="--accent:#a47ef7;--delay:-2.5s"><i class="packet"></i></span></div>
+        <section class="output-card"><h2>Enriched context</h2><div class="rows">
+          <div class="row enriched"><i class="object"><i></i><i></i><i></i></i><span>Late-fee object now includes verified external authority and citation.</span></div>
+          <div class="row enriched"><i class="object"><i></i><i></i><i></i></i><span>Service object now carries dependencies, recent incidents, and ownership.</span></div>
+          <div class="row enriched"><i class="object"><i></i><i></i><i></i></i><span>Review seed now includes risks, reviewers, and source expansion handles.</span></div>
+        </div></section>
+      </div>
+    </div></div>
+    <div class="stage-assurance-card"><div class="assurance-title"><b>Continuous Verification + Adversarial Validation</b><span>Universal assurance layer</span></div><p>During enhancement, Baltor checks whether added context is relevant, current, policy-allowed, and strong enough to resolve or clarify the original claim.</p><div class="assurance-tags"><span>external authority</span><span>tool evidence</span><span>graph links</span><span>relevance</span></div></div>
+  </section>
+  <section class="focused-explainer"><article><b>What this stage does</b><p>It enriches reconciled objects with verified external facts, service relationships, owner context, tools, and metadata.</p></article><article><b>Concrete example</b><p>For a credit-card late-fee claim, Baltor attaches an approved external source or tool result before the pack uses the value.</p></article><article><b>Why it matters</b><p>Internal context is often incomplete. Enhancement adds missing context without turning every raw source into prompt bloat.</p></article></section>
+  <div class="stage-links"><a href="./source.html">Source</a><a href="./reconciliation.html">Reconciliation</a><a href="./anti-fragility.html">Anti-Fragility</a><a class="is-current" href="./enhancement.html">Enhancement</a><a href="./optimization.html">Optimization</a><a href="./consumption.html">Consumption</a></div>
+</main>
+</body>
+</html>

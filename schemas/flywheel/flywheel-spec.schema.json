@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/flywheel/flywheel-spec.schema.json",
+  "title": "Flywheel spec",
+  "description": "Declares a self-contained improvement loop (a Flywheel Capsule): objective, triggers, steps, metrics, policy gates, fallbacks, runtime placement, and receipts. See docs/architecture/hierarchical-flywheels.md.",
+  "type": "object",
+  "required": ["kind", "id", "name", "version", "level", "scope", "objective", "triggers", "steps", "metrics"],
+  "properties": {
+    "kind": { "type": "string", "const": "baltor.flywheel-spec.v1" },
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "version": { "type": "string" },
+    "level": { "type": "string", "enum": ["L0_system", "L1_stage", "L2_subsystem", "L3_object", "L4_worker", "L5_agent_decision"] },
+    "scope": { "type": "string" },
+    "stage_mapping": { "type": "string", "description": "which macro stage / rail this serves" },
+    "objective": { "type": "string" },
+    "triggers": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "inputs": { "type": "array", "items": { "type": "string" } },
+    "decision_context_requirements": {
+      "type": "object",
+      "description": "present + required=true iff this is an L5 agent-decision flywheel",
+      "properties": { "required": { "type": "boolean" }, "decision_context_schema": { "type": "string" } },
+      "additionalProperties": true
+    },
+    "steps": {
+      "type": "array", "minItems": 1,
+      "items": { "type": "object", "required": ["name"], "properties": { "name": { "type": "string" }, "worker": { "type": "string" }, "emits": { "type": "array", "items": { "type": "string" } } }, "additionalProperties": true }
+    },
+    "outputs": { "type": "array", "items": { "type": "string" } },
+    "metrics": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "fallbacks": { "type": "array", "items": { "type": "string" } },
+    "policies": { "type": "array", "items": { "type": "string" } },
+    "harness_refs": { "type": "array", "items": { "type": "string" } },
+    "storage": { "type": "object", "additionalProperties": true },
+    "runtime_placement": { "type": "string", "description": "which runtime plane / pod class (see docs/architecture/runtime-planes.md)" },
+    "receipts_emitted": { "type": "array", "items": { "type": "string" } },
+    "owner": { "type": "string" },
+    "steward": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": true
+}

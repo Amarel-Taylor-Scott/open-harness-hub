@@ -1,0 +1,38 @@
+id: "knowledge-pack/approved-promotion-smoke-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Approved promotion smoke patterns"
+description: "Synthetic approval-path checks that prove component promotion, component versioning, CDC, index projection, and review routing work together."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "verification", "evaluation", "retrieval"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.testing"
+tags: ["components", "promotion", "cdc", "smoke-test", "postgres", "review-gate"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+content_types:
+  - "approved_promotion_smoke_check"
+files:
+  - path: "catalog/knowledge-packs/data/approved-promotion-smoke-patterns/checks.jsonl"
+    format: "jsonl"
+    schema: "approved_promotion_smoke_check"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["id", "check_type", "description", "required_outputs", "failure_route"]
+provenance:
+  sources:
+    - "Open Harness Hub approved component promotion planner"
+    - "Open Harness Hub promotion CDC bridge planner"
+    - "Open Harness Hub component CDC planner"
+  collected_through: "2026-05-26"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "synthetic data only"

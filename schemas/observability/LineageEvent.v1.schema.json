@@ -1,0 +1,17 @@
+{
+  "$id": "observability/LineageEvent.v1",
+  "title": "LineageEvent",
+  "description": "A lineage transition fed to the LineageProvider seam: an activity consumed inputs and produced outputs under an accountable agent, with Baltor governance facets. Time is injected.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "event_id": {"type": "string"},
+    "activity": {"type": "string"},
+    "occurred_at": {"type": "string", "description": "injected ISO-8601 timestamp; never wall-clock"},
+    "inputs": {"type": "array", "items": {"type": "string"}},
+    "outputs": {"type": "array", "items": {"type": "string"}},
+    "agent": {"type": "string"},
+    "governance": {"type": "object"}
+  },
+  "required": ["event_id", "activity", "occurred_at"]
+}

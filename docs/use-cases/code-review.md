@@ -15,7 +15,7 @@
 
 ## Primitives used
 
-| Layer | Artifact | What it does |
+| Layer | Component | What it does |
 |---|---|---|
 | GREP - cloud | `rule-pack/grep-cloud-secrets` | AWS/GCP/Azure/DO/OCI/Cloudflare keys in the diff |
 | GREP - AI vendor | `rule-pack/grep-ai-vendor-keys` | Anthropic/OpenAI/HF/Cohere/Replicate/Groq/Together/etc. |

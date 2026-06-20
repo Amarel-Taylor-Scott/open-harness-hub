@@ -1,0 +1,11 @@
+{
+  "schema": "schemas/config/sync_policy.v1.schema.json",
+  "version": "v1",
+  "owner": "ingestion",
+  "environment_scope": "all",
+  "config_type": "sync_policy",
+  "sync_modes": ["full_sync", "incremental_sync", "backfill"],
+  "cursor_strategy": "timestamp",
+  "idempotency_strategy": "content_hash on (tenant_id, source_id, record content)",
+  "notes": "A sync policy MUST declare a cursor_strategy and an idempotency_strategy. cursor_strategy is one of the connector-catalog cursor_strategy_enum (timestamp|monotonic_id|etag|page_token|content_hash_set|none). The cursor advances only after artifacts are durably stored."
+}

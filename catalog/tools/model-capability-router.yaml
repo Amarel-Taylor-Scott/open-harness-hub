@@ -1,0 +1,83 @@
+id: "tool/model-capability-router"
+type: tool
+version: "0.1.0"
+name: "Model capability router"
+description: "Selects local, hosted, cloud, or specialist models for labeling, reranking, extraction, summarization, judging, embedding, captioning, code, and media tasks by cost, capability, latency, trust boundary, and policy."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["routing", "planning", "tool_use", "evaluation"]
+modality: ["text", "image", "audio", "video", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+tags: ["model-routing", "local-models", "cloud-models", "gemma", "ollama", "openai-compatible", "cost-routing"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    task:
+      type: object
+      description: "Task type, modality, schema strictness, quality tier, context size, and safety needs."
+    adapter_registry:
+      type: array
+      items:
+        type: object
+    cost_policy:
+      type: object
+    trust_policy:
+      type: object
+    latency_budget_ms:
+      type: integer
+  required: ["task", "adapter_registry"]
+returns:
+  type: object
+  properties:
+    model_route_id:
+      type: string
+    selected_adapter:
+      type: string
+    selected_model:
+      type: string
+    route_reason:
+      type: string
+    fallbacks:
+      type: array
+      items:
+        type: object
+    cost_estimate:
+      type: object
+    pricing_snapshot_id:
+      type: string
+side_effects: "read"
+examples:
+  - input:
+      task:
+        task_type: "rerank"
+        modality: ["text"]
+        quality_tier: "cheap"
+      adapter_registry:
+        - id: "adapter/ollama-default"
+          capabilities: ["chat", "text_generation"]
+        - id: "adapter/openai-gpt-frontier"
+          capabilities: ["chat", "text_generation"]
+      cost_policy:
+        prefer_low_cost: true
+      trust_policy:
+        allowed_boundaries: ["local", "hub"]
+    output:
+      model_route_id: "model-route-example"
+      selected_adapter: "adapter/ollama-default"
+      selected_model: "default-local-chat"
+      route_reason: "Cheap local chat-capable adapter satisfies task and trust policy."
+      fallbacks: []
+      cost_estimate: {}
+      pricing_snapshot_id: ""
+implementations:
+  - kind: "callable"
+    path: "tools.model_capability_router.route"
+  - kind: "mcp"
+    path: "mcp/models.route"

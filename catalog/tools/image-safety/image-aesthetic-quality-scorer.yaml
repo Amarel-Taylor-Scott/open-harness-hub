@@ -1,0 +1,56 @@
+id: "tool/image-aesthetic-quality-scorer"
+type: tool
+version: "0.1.0"
+name: "Image aesthetic & technical quality scorer"
+description: |
+  Scores a generated image for aesthetic quality and flags technical defects
+  (blur, JPEG/compression artifacts, low contrast, watermark/text bleed) so a
+  pipeline can keep only the best of N candidates.
+
+  Capability lift: turns "generate and hope" into "generate N, keep the best" —
+  a measurable selection gate the generator cannot apply to itself.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["media", "cross_industry"]
+capability: ["classification", "evaluation"]
+modality: ["image"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["image-quality", "aesthetic", "selection", "laion-aesthetic", "github-component"]
+created: "2026-05-27"
+updated: "2026-05-27"
+
+attribution:
+  source_url: "https://github.com/christophschuhmann/improved-aesthetic-predictor"
+  source_kind: "other"
+  author: "LAION improved-aesthetic-predictor (reference)"
+  license: "see-upstream"
+
+parameters:
+  type: object
+  required: ["image"]
+  properties:
+    image: { type: string, description: "Image path, URL, or base64." }
+    min_aesthetic: { type: number, description: "Pass threshold on the 0-10 aesthetic score. Default 5.0." }
+
+returns:
+  type: object
+  properties:
+    aesthetic_score: { type: number, description: "0-10 predicted aesthetic score." }
+    passes: { type: boolean }
+    technical_flags: { type: array, items: { type: string } }
+
+side_effects: "read"
+
+examples:
+  - input: { image: "out/scene_03.png", min_aesthetic: 5.0 }
+    output: { aesthetic_score: 6.4, passes: true, technical_flags: [] }
+    notes: "Use to rank candidates and drop low-quality / artifacted outputs."
+
+implementations:
+  - kind: callable
+    language: python
+    path: "src/tools/image_aesthetic_quality_scorer.py"
+    notes: "Aesthetic predictor head over a CLIP embedding + classical artifact checks."

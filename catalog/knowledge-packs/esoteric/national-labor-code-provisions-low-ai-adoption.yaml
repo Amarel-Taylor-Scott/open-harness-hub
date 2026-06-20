@@ -1,0 +1,56 @@
+id: knowledge-pack/national-labor-code-provisions-low-ai-adoption
+type: knowledge-pack
+version: 0.1.0
+name: National Labor Code Provisions Low Ai Adoption
+description: 'Capability-lift knowledge pack for an esoteric area LLMs handle poorly.
+  Gap: models default to US/EU labor norms and miss national wage/hours/termination/severance
+  provisions of countries with little online legal text Grounded in national labor
+  codes + ILO NATLEX legislative database (ILO, public) via rag_vector retrieval.
+  Lift: thin training data (under-digitized jurisdictions) + low economic incentive
+  = valley; provisions are exact statutory text'
+authors:
+- name: Open Harness Hub capability-gap factory
+license: CC-BY-4.0
+industry:
+- cross_industry
+capability:
+- retrieval
+- verification
+modality:
+- structured
+- text
+lifecycle: experimental
+trust_boundary: external
+freshness: volatile
+tags:
+- capability-lift
+- esoteric
+- knowledge-pack
+- rag_vector
+- ingestion-target
+created: '2026-05-28'
+updated: '2026-05-28'
+attribution:
+  source_url: national labor codes + ILO NATLEX legislative database (ILO, public)
+  source_kind: other
+  author: national labor codes + ILO NATLEX legislative database (ILO, public)
+  license: see-source
+content_types:
+- fact_table
+- reference_doc
+retrieval:
+- rag_vector
+files:
+- path: data/esoteric-packs/national-labor-code-provisions-low-ai-adoption.jsonl
+  format: jsonl
+  content_type: fact_table
+  schema: capability-gap seed (real facts where stable; else ingestion contract)
+indexing:
+  bm25: true
+  dense:
+    model: all-MiniLM-L6-v2
+provenance:
+  sources:
+  - national labor codes + ILO NATLEX legislative database (ILO, public)
+  collected_through: '2026-05-28'
+  collected_by: capability-gap factory

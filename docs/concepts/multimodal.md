@@ -1,7 +1,8 @@
 # Multimodal pipelines
 
-Image, audio, and video pipelines compose the **same** primitives as
-text pipelines. The hub does not split modalities into separate trees.
+Image, audio, music, video, document, and 3D pipelines compose the
+**same** primitives as text pipelines. The hub does not split modalities
+into separate trees.
 
 A common image-gen pipeline:
 
@@ -24,15 +25,25 @@ pipeline_kind: "generate_image"
 
 ## Recommended fields for generative pipelines
 
-When a pipeline emits image / audio / video, the manifest should also
+When a pipeline emits image / audio / music / video, the manifest should also
 declare:
 
 | Field | What |
 |---|---|
-| `output_safety_packs` | Rule packs that screen the generated artifact (NSFW, IP, watermark, prompt-injection-via-image). |
+| `output_safety_packs` | Rule packs that screen the generated component (NSFW, IP, watermark, prompt-injection-via-image). |
 | `style_packs` | Knowledge packs of style references the prompt-shaper pulls from. |
 | `physics_packs` | Knowledge packs encoding physical priors (lens optics, acoustic, motion). |
 | `attribution` | Free text describing who / what the style references are drawn from, plus license. |
+
+The hosted backend also needs media-aware services:
+
+- asset storage for large outputs and previews.
+- media captions, transcripts, thumbnails, waveforms, and perceptual hashes.
+- cost models for resolution, duration, frame count, sample rate, GPU seconds, storage, and egress.
+- safety screens for NSFW, IP, likeness, watermark, hidden text, malware, and policy violations.
+- provenance for prompt, seed, model version, source assets, license, and safety report.
+
+See [`pipeline/multimodal-generation-blueprint`](../catalog/pipeline_multimodal-generation-blueprint.md) for a generic media generation blueprint.
 
 ## Example in the catalog
 

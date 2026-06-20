@@ -1,0 +1,86 @@
+id: "pipeline/verified-fact-update-propagation"
+type: pipeline
+version: "0.1.0"
+name: "Verified fact update propagation"
+description: "Ingests a signed verified fact update from a vetted publisher, updates source-governed knowledge records, finds dependent pipelines, emits review tickets, and prepares re-index or redeployment plans."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "government", "legal", "cross_industry"]
+capability: ["verification", "governance", "retrieval", "planning"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.product"
+tags: ["verified-facts", "fact-feed", "government-publisher", "pipeline-updates", "signed-knowledge"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Propagate vetted source-of-truth updates such as government rule changes into dependent Open Harness Hub pipelines and indexes."
+pipeline_kind: "research_web.verified_fact_update"
+inputs:
+  - name: "publisher"
+    type: "object"
+  - name: "fact_update"
+    type: "object"
+  - name: "dependency_index"
+    type: "object"
+outputs:
+  - name: "accepted_fact_records"
+    type: "array"
+  - name: "affected_components"
+    type: "array"
+  - name: "review_tickets"
+    type: "array"
+  - name: "reindex_plan"
+    type: "json"
+  - name: "redeployment_plan"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/local-demo-verified-fact-patterns"
+    - "knowledge-pack/signed-knowledge-network-patterns"
+steps:
+  - id: "verify-publisher-submission"
+    kind: "tool"
+    ref: "tool/verified-source-publisher-intake"
+    inputs:
+      publisher: "$.inputs.publisher"
+      submission: "$.inputs.fact_update"
+  - id: "signed-object-intake"
+    kind: "tool"
+    ref: "tool/signed-knowledge-object-intake"
+    inputs:
+      signed_object: "$.inputs.fact_update"
+      publisher_verification: "$.steps.verify-publisher-submission.output"
+  - id: "index-signed-knowledge"
+    kind: "pipeline"
+    ref: "pipeline/signed-knowledge-object-to-index"
+    inputs:
+      publisher: "$.inputs.publisher"
+      signed_objects: "$.inputs.fact_update"
+  - id: "propagate-impact"
+    kind: "tool"
+    ref: "tool/verified-fact-impact-propagator"
+    inputs:
+      verified_fact_update: "$.inputs.fact_update"
+      dependency_index: "$.inputs.dependency_index"
+  - id: "emit-index-delta"
+    kind: "tool"
+    ref: "tool/index-record-emitter"
+    inputs:
+      subject_type: "verified_fact_update"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.affected_components"
+    op: "!="
+    value: null
+    severity: "high"
+    label: "Affected component list is explicit even when empty."
+  - kind: "deterministic"
+    target: "$.review_tickets"
+    op: "!="
+    value: null
+    severity: "high"
+    label: "Review ticket output is explicit even when empty."

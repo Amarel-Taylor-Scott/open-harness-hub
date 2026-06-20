@@ -1,0 +1,84 @@
+id: "pattern/input-token-compression"
+type: pattern
+version: "0.1.0"
+name: "Input-token compression (prune / dedupe / compress context before the model)"
+description: |
+  Shrink what the model has to read before the call, so the same task costs
+  fewer input tokens (and often runs faster and more accurately, because the
+  model sees less noise).
+
+  The context that reaches an LLM is usually far larger than it needs to be:
+  retrieved RAG chunks overlap, system prompts repeat, few-shot examples are
+  verbose, and long documents carry boilerplate. This pattern inserts a
+  deterministic-or-cheap compression stage between context assembly and the
+  expensive model call.
+
+  Compression levers (compose as needed):
+   1. **redundancy dedupe** — drop near-duplicate retrieved chunks
+      (SimHash / embedding cosine) before they hit the prompt.
+   2. **extractive pre-summarization** — keep only sentences/spans that
+      answer the query; discard the rest.
+   3. **prompt compression** — LLMLingua-style token dropping on low-
+      information tokens, with a target compression ratio.
+   4. **schema-aware field selection** — for structured inputs, send only
+      the fields the task uses.
+   5. **token budgeter** — cap assembled context to a hard token / cost
+      ceiling, evicting lowest-scoring chunks first.
+
+  Every compression step declares the tokens-in saved and is paired with a
+  quality check so the pipeline can detect when compression hurts the answer.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry:   ["cross_industry", "ai"]
+capability: ["summarization", "retrieval", "routing"]
+modality:   ["text", "structured"]
+lifecycle:  "beta"
+trust_boundary: "mixed"
+tags: ["token-efficiency", "cost-savings", "context-compression", "rag", "input-tokens"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+paper_url: "https://arxiv.org/abs/2310.05736"
+paper_citation: "Jiang et al. 2023, LLMLingua: Compressing Prompts for Accelerated Inference of LLMs"
+reference_implementations:
+  - { url: "https://github.com/microsoft/LLMLingua", language: "python", framework: "LLMLingua / LongLLMLingua", notes: "MIT; prompt compression with target ratio" }
+  - { url: "https://github.com/run-llama/llama_index", language: "python", framework: "LlamaIndex postprocessors (similarity dedupe, recency, rerank)", notes: "MIT" }
+
+structural_shape:
+  - "assemble candidate context (retrieval / documents / few-shot)"
+  - "dedupe near-duplicate chunks (SimHash or embedding cosine)"
+  - "extractive pre-summarize each chunk against the task query"
+  - "optionally apply prompt compression to a target token ratio"
+  - "token-budget the result to a hard input-token / cost ceiling"
+  - "record tokens_in_before, tokens_in_after, and a quality probe"
+  - "call the model with the compressed context"
+
+when_to_use:
+  - "Long-context or RAG pipelines where input tokens dominate cost"
+  - "High-frequency pipelines where per-call savings compound"
+  - "Retrieved context is redundant or noisy"
+  - "A cheaper/local model can do the compression before a frontier call"
+
+when_not_to_use:
+  - "Inputs are already short — compression overhead is not worth it"
+  - "Tasks where every token is load-bearing (verbatim legal/medical text)"
+  - "When the quality probe shows compression degrades the answer"
+
+variants:
+  - "Query-aware compression (compress relative to the specific question)"
+  - "Two-tier: cheap local model compresses, frontier model answers"
+  - "Cache-aware: compress once, reuse the compressed context across turns"
+
+counter_patterns:
+  - "anti-over-prompting-as-crutch (padding the prompt instead of trimming it)"
+
+implementing_pipelines: []
+implementing_processors: []
+
+tradeoffs:
+  latency:        "dedupe/budgeting ≈ free; extractive/LLMLingua add a cheap pre-pass that usually nets faster overall"
+  cost:           "primary win — fewer input tokens on the expensive call; small cost if an LLM does the compression"
+  quality:        "often improves (less noise); can hurt if over-compressed — always pair with a quality probe"
+  complexity:     "Medium — needs a budgeter and a quality check in the trace"
+  explainability: "High — emit tokens-in before/after and which chunks were dropped"

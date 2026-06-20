@@ -28,6 +28,6 @@ calibrated confidence.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `retrieve` | knowledge_pack | `$.inputs.corpus` | — |
-| 2 | `judge` | harness | `harness/text-safety-review` | — |
+| 1 | `retrieve` | knowledge_pack | `$.inputs.corpus` | - |
+| 2 | `judge` | harness | `harness/text-safety-review` | - |
 

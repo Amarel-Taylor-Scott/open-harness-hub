@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/swarm/swarm-consensus.schema.json",
+  "title": "Swarm consensus",
+  "description": "The aggregated verdict of a swarm over one context object: risk level, whether human review is required, verified vs rejected claims, contradictions/rot/policy signals, and a PROPOSED context_pack_patch. canonical_mutated is const false — a swarm proposes; it never overwrites a canonical object (application is a separate human/policy-gated step).",
+  "type": "object",
+  "required": ["kind", "object_ref", "risk_level", "requires_human_review", "confidence", "canonical_mutated"],
+  "properties": {
+    "kind": { "type": "string", "const": "baltor.swarm-consensus.v1" },
+    "object_ref": { "type": "string" },
+    "risk_level": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+    "requires_human_review": { "type": "boolean" },
+    "verified_claims": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+    "rejected_claims": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+    "contradictions": { "type": "array", "items": { "type": "string" } },
+    "rot_signals": { "type": "array", "items": { "type": "string" } },
+    "policy_risks": { "type": "array", "items": { "type": "string" } },
+    "suggested_relationships": { "type": "array", "items": { "type": "string" } },
+    "context_pack_patch": {
+      "type": ["object", "null"],
+      "properties": { "applied": { "const": false } },
+      "additionalProperties": true
+    },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "canonical_mutated": { "const": false }
+  },
+  "additionalProperties": true
+}

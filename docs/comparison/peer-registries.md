@@ -29,7 +29,7 @@ structured-to-prose  →  PII/PHI redact  →  GREP red-flags  →  RAG  →  LL
    processor             rule-pack + processor   rule-pack    knowledge-pack  processor    processor
 ```
 
-**Each step has its own first-class artifact type** in the registry.
+**Each step has its own first-class component type** in the registry.
 No other peer indexes ALL of:
 
 1. The persona library (12 personas including ESG-auditor /
@@ -60,7 +60,7 @@ They could each absorb part of this scope. But:
 
 - **HuggingFace** is model-centric: hosts the BERT / Llama / Mistral
   weights. Adding "this is the regex you run BEFORE the model" needs
-  a different artifact type with different lifecycle properties
+  a different component type with different lifecycle properties
   (volatile vs stable, local-only trust boundary, etc.). The Open
   Harness Hub schemas formalize that.
 - **LangChain Hub** is prompt-centric and locked to LangChain's
@@ -89,7 +89,7 @@ They could each absorb part of this scope. But:
      cards                                          ...
 ```
 
-Each downstream registry gets a clean publication artifact in its
+Each downstream registry gets a clean publication component in its
 native format from one source. No double-bookkeeping; no drift.
 
 ## What forks should look like
@@ -101,7 +101,7 @@ domain consortiums publish their own catalogs against the same spec.
 
 A pharmaceutical-compliance hub, a defense-acquisition hub, a
 climate-finance hub - all are healthy forks that consume the same
-schemas/vocabularies/emitters and share interoperable artifacts.
+schemas/vocabularies/emitters and share interoperable components.
 
 ## Status (May 2026)
 

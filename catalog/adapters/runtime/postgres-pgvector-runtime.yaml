@@ -1,0 +1,48 @@
+id: "adapter/postgres-pgvector-runtime"
+type: adapter
+version: "0.1.0"
+name: "Postgres + pgvector canonical store adapter"
+description: |
+  Provider-neutral adapter for the Open Harness Hub canonical Postgres store with
+  pgvector extension enabled. Wraps all read/write paths for the component,
+  normalized_object, object_embedding, index_record, source_record,
+  component_change_event, and related tables defined in db/postgres/schema.sql.
+
+  Supports local Docker, Render Postgres, Supabase, Google Cloud SQL, and any
+  libpq-compatible endpoint via the DATABASE_URL environment variable. The
+  vector(384) dimension baseline matches the local MiniLM embedding worker;
+  deployments using larger models add parallel embedding rows without changing
+  the schema.
+
+  Does not hardcode connection strings, pool sizes, or vector dimensions — all
+  are resolved at runtime from environment or caller config.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "serving", "embedding", "governance"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags:
+  - postgres
+  - pgvector
+  - vector-search
+  - canonical-store
+  - database
+  - embedding
+created: "2026-05-26"
+updated: "2026-05-26"
+
+transport: "none"
+capabilities:
+  - relational_read
+  - relational_write
+  - vector_similarity_search
+  - jsonb_query
+  - full_text_search
+auth: "none"
+cost_model: "self_hosted"
+endpoint: "${DATABASE_URL}"

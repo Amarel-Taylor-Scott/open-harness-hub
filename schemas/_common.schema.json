@@ -1,17 +1,22 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://open-harness-hub.dev/schemas/_common.schema.json",
-  "title": "Common envelope for Open Harness Hub artifacts",
-  "description": "Shared $defs referenced by every artifact-type schema.",
+  "title": "Common envelope for Open Harness Hub components",
+  "description": "Shared $defs referenced by every component-type schema.",
   "$defs": {
     "slug": {
       "type": "string",
       "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
       "maxLength": 64
     },
-    "artifactId": {
+    "componentId": {
       "type": "string",
       "pattern": "^(harness|pipeline|benchmark|rule-pack|knowledge-pack|logic-pack|tool|persona|adapter|rubric|dataset|schema|processor|pattern)/[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "componentType": {
+      "description": "Canonical set of component types (the storage `type` keys). Single source — referenced by the envelope `type` and by capability-request `target_type`. Each maps to exactly one of the seven primitives (see docs/concepts/component-taxonomy-and-stages.md).",
+      "type": "string",
+      "enum": ["harness", "pipeline", "benchmark", "rule-pack", "knowledge-pack", "logic-pack", "tool", "persona", "adapter", "rubric", "dataset", "schema", "processor", "pattern"]
     },
     "semver": {
       "type": "string",
@@ -35,8 +40,8 @@
       "type": "object",
       "required": ["id", "type", "version", "name", "description", "license", "lifecycle"],
       "properties": {
-        "id":          { "$ref": "#/$defs/artifactId" },
-        "type":        { "type": "string", "enum": ["harness", "pipeline", "benchmark", "rule-pack", "knowledge-pack", "logic-pack", "tool", "persona", "adapter", "rubric", "dataset", "schema", "processor", "pattern"] },
+        "id":          { "$ref": "#/$defs/componentId" },
+        "type":        { "$ref": "#/$defs/componentType" },
         "version":     { "$ref": "#/$defs/semver" },
         "name":        { "type": "string", "minLength": 1, "maxLength": 128 },
         "description": { "type": "string", "minLength": 1 },
@@ -48,7 +53,7 @@
         "lifecycle":   { "type": "string", "enum": ["experimental", "beta", "stable", "deprecated"] },
         "lifecycle_position": {
           "type": "string",
-          "description": "Where the artifact sits in the request lifecycle. See vocabularies/lifecycle-position.yaml.",
+          "description": "Where the component sits in the request lifecycle. See vocabularies/lifecycle-position.yaml.",
           "pattern": "^(pre_api|api|post_api|cross_cutting)(\\.[a-z_]+)?$"
         },
         "trust_boundary": { "type": "string", "enum": ["local", "hub", "external", "mixed"] },
@@ -60,12 +65,12 @@
         },
         "nist_ai_rmf_controls": {
           "type": "array",
-          "description": "NIST AI RMF control IDs this artifact contributes to (e.g. 'GOVERN-1.1', 'MAP-3.2').",
+          "description": "NIST AI RMF control IDs this component contributes to (e.g. 'GOVERN-1.1', 'MAP-3.2').",
           "items": { "type": "string" }
         },
         "iso_42001_controls": {
           "type": "array",
-          "description": "ISO/IEC 42001 control IDs this artifact contributes to (e.g. 'A.6.2.4').",
+          "description": "ISO/IEC 42001 control IDs this component contributes to (e.g. 'A.6.2.4').",
           "items": { "type": "string" }
         },
         "data_protection": {
@@ -93,11 +98,11 @@
         "tags":        { "type": "array", "items": { "type": "string" } },
         "created":     { "$ref": "#/$defs/isoDate" },
         "updated":     { "$ref": "#/$defs/isoDate" },
-        "superseded_by": { "$ref": "#/$defs/artifactId" },
+        "superseded_by": { "$ref": "#/$defs/componentId" },
         "deprecated_on": { "$ref": "#/$defs/isoDate" },
         "attribution": {
           "type": "object",
-          "description": "When an artifact was mined or imported from an external source.",
+          "description": "When a component was mined or imported from an external source.",
           "properties": {
             "source_url":  { "type": "string", "format": "uri" },
             "source_kind": { "type": "string", "enum": ["kaggle", "github", "huggingface", "arxiv", "manual", "other"] },
@@ -110,6 +115,56 @@
     "modelCall": {
       "type": "string",
       "enum": ["none", "optional", "hybrid", "required", "external_optional"]
+    },
+    "cacheScope": {
+      "type": "string",
+      "enum": ["public", "org", "tenant", "user", "private"]
+    },
+    "promptAbi": {
+      "type": "object",
+      "description": "Canonical prompt/context prefix metadata for cache-safe prefix and KV reuse.",
+      "properties": {
+        "version": {
+          "type": "string",
+          "description": "Prompt ABI version or named compatibility family."
+        },
+        "canonical_prefix_hash": {
+          "type": "string",
+          "description": "Hash of the canonical static prefix tokens or serialized prompt blocks."
+        },
+        "tool_schema_hash": {
+          "type": "string",
+          "description": "Hash of canonical tool schema serialization when tools are part of the static prefix."
+        },
+        "policy_block_hash": {
+          "type": "string",
+          "description": "Hash of stable system policy / governance text included in the static prefix."
+        },
+        "output_contract_hash": {
+          "type": "string",
+          "description": "Hash of the stable response schema or output contract included in the static prefix."
+        },
+        "context_pack_hashes": {
+          "type": "array",
+          "description": "Hashes of stable public/org/tenant context-pack headers or corpus maps in the static prefix.",
+          "items": { "type": "string" }
+        },
+        "cache_scope": { "$ref": "#/$defs/cacheScope" },
+        "cacheable_prefix_tokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "dynamic_context_boundary": {
+          "type": "string",
+          "description": "Name or marker for the first tenant/user/task-specific block that must not be globally reused."
+        },
+        "model_targets": {
+          "type": "array",
+          "description": "Model target ids this ABI hash is valid for; tokenizer/model changes can invalidate KV reuse.",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
     },
     "modelTransport": {
       "type": "string",
@@ -177,6 +232,256 @@
         "freshness":     { "type": "string", "enum": ["stable", "volatile", "dated"] }
       },
       "additionalProperties": false
+    },
+    "objectState": {
+      "type": "string",
+      "description": "Shared operational state for non-component records. Components keep the public lifecycle enum; operational objects use this richer state machine.",
+      "enum": [
+        "detected",
+        "staged",
+        "queued",
+        "running",
+        "waiting_on_source",
+        "waiting_on_worker",
+        "waiting_on_policy",
+        "waiting_on_review",
+        "partially_supported",
+        "supported",
+        "verified",
+        "adopted",
+        "served",
+        "held",
+        "rejected",
+        "superseded",
+        "failed",
+        "archived"
+      ]
+    },
+    "factState": {
+      "type": "string",
+      "description": "Lifecycle state for candidate, served, superseded, or rejected facts.",
+      "enum": [
+        "candidate_detected",
+        "one_source_found",
+        "two_sources_found",
+        "authoritative_source_found",
+        "needs_second_source",
+        "needs_reconciliation",
+        "needs_trust_review",
+        "needs_archive_capture",
+        "needs_freshness_check",
+        "ready_for_adoption",
+        "adopted_current",
+        "adopted_with_history",
+        "served_current",
+        "rejected",
+        "superseded"
+      ]
+    },
+    "sourceRole": {
+      "type": "string",
+      "enum": [
+        "customer_original",
+        "customer_current",
+        "official_authority",
+        "public_register",
+        "publisher_primary",
+        "credible_secondary",
+        "news_report",
+        "low_trust_reference",
+        "spam_or_injection",
+        "superseded"
+      ]
+    },
+    "archiveStatus": {
+      "type": "string",
+      "enum": [
+        "not_required",
+        "queued",
+        "submitted",
+        "captured",
+        "failed_retryable",
+        "failed_final",
+        "blocked_by_policy"
+      ]
+    },
+    "queuePriority": {
+      "type": "string",
+      "enum": ["background", "low", "normal", "high", "urgent", "blocked"]
+    },
+    "queueLane": {
+      "type": "string",
+      "enum": [
+        "ingest",
+        "normalize",
+        "analyze",
+        "graph",
+        "embed",
+        "verify",
+        "refresh",
+        "research",
+        "archive",
+        "promote",
+        "review",
+        "orchestrate"
+      ]
+    },
+    "workerImage": {
+      "type": "string",
+      "description": "Preferred runtime image or execution pool for a worker.",
+      "enum": [
+        "baltor-worker-cpu",
+        "baltor-worker-orchestrator",
+        "baltor-worker-audit",
+        "baltor-worker-research",
+        "baltor-worker-browser",
+        "baltor-worker-ocr",
+        "baltor-worker-ml",
+        "baltor-worker-gpu",
+        "baltor-worker-archive"
+      ]
+    },
+    "workerCapability": {
+      "type": "string",
+      "description": "Capability token advertised by worker manifests and matched by the queue router.",
+      "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$"
+    },
+    "stateEvent": {
+      "type": "object",
+      "required": ["from_state", "to_state", "reason", "created_at"],
+      "properties": {
+        "from_state": { "type": "string" },
+        "to_state": { "type": "string" },
+        "reason": { "type": "string" },
+        "actor": { "type": "string" },
+        "worker_id": { "type": "string" },
+        "job_id": { "type": "string" },
+        "source_record_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "queued_task_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "created_at": { "type": "string", "format": "date-time" },
+        "metadata": { "type": "object" }
+      },
+      "additionalProperties": true
+    },
+    "prioritySignals": {
+      "type": "object",
+      "description": "Inputs to the queue-priority policy. Scores are normalized 0..1 unless otherwise stated.",
+      "properties": {
+        "risk": { "type": "number", "minimum": 0, "maximum": 1 },
+        "customer_impact": { "type": "number", "minimum": 0, "maximum": 1 },
+        "agent_usage": { "type": "number", "minimum": 0 },
+        "source_authority": { "type": "number", "minimum": 0, "maximum": 1 },
+        "source_count": { "type": "integer", "minimum": 0 },
+        "freshness_age_hours": { "type": "number", "minimum": 0 },
+        "failed_attempts": { "type": "integer", "minimum": 0 },
+        "deadline_hours": { "type": "number", "minimum": 0 },
+        "injection_risk": { "type": "number", "minimum": 0, "maximum": 1 },
+        "manual_review_cost": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": true
+    },
+    "queuePolicy": {
+      "type": "object",
+      "description": "Resolved routing and prioritization decision for a follow-up task.",
+      "properties": {
+        "lane": { "$ref": "#/$defs/queueLane" },
+        "priority": { "$ref": "#/$defs/queuePriority" },
+        "priority_score": { "type": "number" },
+        "reason_codes": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "not_before": { "type": "string", "format": "date-time" },
+        "deadline_at": { "type": "string", "format": "date-time" },
+        "max_attempts": { "type": "integer", "minimum": 0 },
+        "backoff": { "type": "string" },
+        "dedupe_key": { "type": "string" },
+        "cost_estimate": { "$ref": "#/$defs/costEstimate" },
+        "budget_policy": { "$ref": "#/$defs/budgetPolicy" },
+        "requires": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "costEstimate": {
+      "type": "object",
+      "description": "Planning estimate for a task or run. This is not a customer invoice.",
+      "properties": {
+        "currency": { "type": "string", "default": "USD" },
+        "estimate_kind": { "type": "string" },
+        "estimated_total_usd": { "type": "number", "minimum": 0 },
+        "estimated_floor_usd": { "type": "number", "minimum": 0 },
+        "estimated_ceiling_usd": { "type": "number", "minimum": 0 },
+        "estimated_tokens": { "type": "integer", "minimum": 0 },
+        "estimated_search_calls": { "type": "integer", "minimum": 0 },
+        "estimated_browser_seconds": { "type": "number", "minimum": 0 },
+        "estimated_worker_seconds": { "type": "number", "minimum": 0 },
+        "estimated_gpu_seconds": { "type": "number", "minimum": 0 },
+        "line_items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": { "type": "string" },
+              "label": { "type": "string" },
+              "amount_usd": { "type": "number", "minimum": 0 },
+              "basis": { "type": "string" }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "budgetPolicy": {
+      "type": "object",
+      "description": "Budget decision used by queue routers and orchestrators.",
+      "properties": {
+        "tenant_budget_remaining_usd": { "type": "number", "minimum": 0 },
+        "task_budget_ceiling_usd": { "type": "number", "minimum": 0 },
+        "monthly_budget_ceiling_usd": { "type": "number", "minimum": 0 },
+        "budget_used_pct": { "type": "number", "minimum": 0 },
+        "action": {
+          "type": "string",
+          "enum": ["allow", "batch", "require_approval", "block"]
+        },
+        "reason_codes": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "researchTaskType": {
+      "type": "string",
+      "enum": [
+        "verify.second_source.find",
+        "verify.official_source.find",
+        "verify.source_disagreement.resolve",
+        "source.trust.score",
+        "source.archive.submit",
+        "web.fetch.one",
+        "web.site.search",
+        "web.price.check",
+        "web.statute.read",
+        "web.business.address.find",
+        "web.business.hierarchy.find",
+        "web.news.mna.scan",
+        "docs.capability.lookup",
+        "context.reconcile.claims",
+        "context.review.prioritize",
+        "openclaw.adversarial.review",
+        "hermes.procedure.discover",
+        "human.owner.confirm"
+      ]
     }
   }
 }

@@ -1,0 +1,53 @@
+id: processor/hybrid-retrieve-fuse
+type: processor
+version: 0.1.0
+name: Hybrid retrieve (lexical + dense)
+description: 'Run a lexical (BM25) leg and a dense leg in parallel and hand both candidate lists to fusion
+  (R3). The recommended default: exact-term safety + semantic recall. Most tasks start here.
+
+
+  Retrieval/prompt taxonomy step R1 (see docs/concepts/retrieval-and-prompt-taxonomy.md). One swappable
+  method-component for the governed-model-call recipe; lift is measured at the pipeline level, not on
+  this component.'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+- ai
+capability:
+- retrieval
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- retrieval-taxonomy
+- step-r1
+- rag
+- model-assisted
+created: '2026-05-29'
+updated: '2026-05-29'
+process_kind: retrieve.hybrid
+deterministic: false
+idempotent: true
+streaming: false
+inputs:
+- name: query
+  type: object
+- name: corpus
+  type: object
+- name: index
+  type: object
+- name: top_k
+  type: object
+outputs:
+- name: candidates
+  type: object
+side_effects: read
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.retrieval.hybrid_retrieve_fuse.run
+  language: python

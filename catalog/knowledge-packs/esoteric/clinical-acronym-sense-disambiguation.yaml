@@ -1,0 +1,56 @@
+id: knowledge-pack/clinical-acronym-sense-disambiguation
+type: knowledge-pack
+version: 0.1.0
+name: Clinical Acronym Sense Disambiguation
+description: 'Capability-lift knowledge pack for an esoteric area LLMs handle poorly.
+  Gap: ambiguous acronyms (RA=rheumatoid arthritis vs right atrium vs room air); picks
+  frequent-wrong sense Grounded in MeSH descriptors/entry terms (NLM, freely reproducible)
+  via classifier retrieval. Lift: JAMIA 2024 + MeDAL: non-trivial error; context-conditioned
+  sense classifier over closed inventory'
+authors:
+- name: Open Harness Hub capability-gap factory
+license: CC-BY-4.0
+industry:
+- healthcare
+- pharma
+capability:
+- retrieval
+- verification
+modality:
+- structured
+- text
+lifecycle: experimental
+trust_boundary: external
+freshness: volatile
+tags:
+- capability-lift
+- esoteric
+- knowledge-pack
+- classifier
+- ingestion-target
+created: '2026-05-28'
+updated: '2026-05-28'
+attribution:
+  source_url: MeSH descriptors/entry terms (NLM, freely reproducible)
+  source_kind: other
+  author: MeSH descriptors/entry terms (NLM, freely reproducible)
+  license: see-source
+content_types:
+- fact_table
+- reference_doc
+retrieval:
+- classifier
+files:
+- path: data/esoteric-packs/clinical-acronym-sense-disambiguation.jsonl
+  format: jsonl
+  content_type: fact_table
+  schema: capability-gap seed (real facts where stable; else ingestion contract)
+indexing:
+  bm25: true
+  dense:
+    model: all-MiniLM-L6-v2
+provenance:
+  sources:
+  - MeSH descriptors/entry terms (NLM, freely reproducible)
+  collected_through: '2026-05-28'
+  collected_by: capability-gap factory

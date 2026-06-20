@@ -1,63 +1,795 @@
-id: "rule-pack/grep-biosecurity-flags"
+id: rule-pack/grep-biosecurity-flags
 type: rule-pack
-version: "0.1.0"
-name: "Biosecurity / select-agent / BSL-3 BSL-4 / DURC flags"
-description: "Detectors for 42 CFR 73 / BMBL / WHO LBM4 / DURC compliance gaps."
-authors: [{ name: "Open Harness Hub contributors" }]
-license: "MIT"
-industry:   ["biosecurity", "biosecurity.select_agent", "biosecurity.bsl", "biosecurity.durc"]
-capability: ["safety_gating", "classification"]
-modality:   ["text"]
-lifecycle:  "beta"
-trust_boundary: "local"
-freshness:  "volatile"
-tags: ["biosecurity", "select-agent", "bmbl"]
-created: "2026-05-21"
-updated: "2026-05-21"
-
-family: "grep"
+version: 0.1.0
+name: Biosecurity / select-agent / BSL-3 BSL-4 / DURC flags
+description: Detectors for 42 CFR 73 / BMBL / WHO LBM4 / DURC compliance gaps.
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- biosecurity
+- biosecurity.select_agent
+- biosecurity.bsl
+- biosecurity.durc
+capability:
+- safety_gating
+- classification
+modality:
+- text
+lifecycle: beta
+trust_boundary: local
+freshness: volatile
+tags:
+- biosecurity
+- select-agent
+- bmbl
+created: '2026-05-21'
+updated: '2026-05-25'
+family: grep
 rules:
-  - id: "unescorted_access_no_sra"
-    pattern: "(?i)(?:without\\s+(?:an\\s+)?active\\s+(?:fbi\\s+)?(?:security\\s+risk\\s+assessment|sra)|unescorted\\s+(?:visiting\\s+collaborator|individual|visitor))[\\s\\S]{0,200}?(?:select\\s+agent|tier\\s+1)|tier\\s+1[\\s\\S]{0,160}?unescorted"
-    severity: "critical"
-    category: "biosec.access.no_sra"
-  - id: "inventory_variance_form4"
-    pattern: "(?i)(?:(?<!no\\s)(?<!zero\\s)(?:select\\s+agent\\s+)?inventory\\s+(?:mismatch|variance|discrepancy)[\\s\\S]{0,200}?(?:cdc\\s+form\\s+4|form\\s+4))|form\\s+4[\\s\\S]{0,120}?(?:significant\\s+)?(?:variance|mismatch|discrepancy)(?!\\s+(?:over|across)\\s+the\\s+last)"
-    severity: "critical"
-    category: "biosec.inventory.variance"
-  - id: "dual_key_breached"
-    pattern: "(?i)(?:dual[- ]?key|two[- ]?person)\\s+(?:procedure|access|requirement)\\s+(?:waived|breached|skipped|broken|quietly\\s+waived)|single\\s+pi\\s+(?:with\\s+)?sole\\s+access"
-    severity: "critical"
-    category: "biosec.access.dual_key_breached"
-  - id: "gain_of_function_no_durc_p3co"
-    pattern: "(?i)(?:gain[- ]?of[- ]?function|aerosol(?:ization)?\\s+(?:protocol|experiment)|enhanced\\s+pathogen)[\\s\\S]{0,200}?(?:launched|initiated|started|conducted)[\\s\\S]{0,200}?(?:without\\s+(?:durc|p3co)\\s+review|no\\s+durc|no\\s+p3co)|gain[- ]?of[- ]?function\\s+(?:without|no)\\s+durc"
-    severity: "critical"
-    category: "biosec.durc.no_review"
-  - id: "release_loss_unreported_7d"
-    pattern: "(?i)(?:spill|release|loss|theft)[\\s\\S]{0,200}?(?:not\\s+reported\\s+to\\s+(?:cdc|dsat)|past\\s+7[- ]?day|within\\s+the\\s+7[- ]?day\\s+window|not\\s+reported\\s+(?:within|in))"
-    severity: "critical"
-    category: "biosec.release.unreported"
-  - id: "transfer_form2_missing"
-    pattern: "(?i)(?:shipped|transferred)[\\s\\S]{0,200}?(?:without\\s+(?:the\\s+)?(?:aphis\\s*[/]\\s*cdc\\s+)?form\\s+2|no\\s+form\\s+2|form\\s+2\\s+(?:transfer\\s+)?authorization\\s+(?:missing|absent|in\\s+place))"
-    severity: "high"
-    category: "biosec.transfer.no_form2"
-  - id: "bsc_certification_overdue"
-    pattern: "(?i)(?:bsc[- ]?ii|biosafety\\s+cabinet)\\s+(?:annual\\s+)?(?:recertification|certification)\\s+(?:eight\\s+months\\s+overdue|overdue|expired|past\\s+due)"
-    severity: "high"
-    category: "biosec.bsc.cert_overdue"
-  - id: "hepa_leak_test_overdue"
-    pattern: "(?i)hepa\\s+(?:push[- ]?through\\s+)?(?:filter\\s+)?(?:leak|integrity|pao|dop)\\s+(?:test|integrity\\s+test|last\\s+documented)[\\s\\S]{0,120}?(?:overdue|expired|in\\s+(?:202[0-4])|last\\s+(?:tested|documented)\\s+(?:in\\s+202[0-4]|over\\s+12\\s+months))"
-    severity: "medium"
-    category: "biosec.hepa.overdue"
-  - id: "autoclave_unvalidated_cycle"
-    pattern: "(?i)(?:autoclave|sterilization)\\s+(?:short\\s+cycle|unvalidated\\s+cycle|cycle\\s+(?:not\\s+validated|validation\\s+missing))|biological\\s+indicator\\s+(?:failure|missing|skipped)"
-    severity: "high"
-    category: "biosec.decon.unvalidated"
-  - id: "ppe_doffing_violation"
-    pattern: "(?i)ppe\\s+doffing\\s+(?:sequence\\s+)?violation|doffing\\s+(?:sequence\\s+)?(?:violation|skipped|incorrect)"
-    severity: "medium"
-    category: "biosec.ppe.doffing"
-  - id: "visitor_log_incomplete"
-    pattern: "(?i)visitor\\s+log\\s+(?:incomplete|gap|missing|not\\s+maintained)"
-    severity: "low"
-    category: "biosec.visitor.log_incomplete"
+- id: unescorted_access_no_sra
+  pattern: (?i)(?:without\s+(?:an\s+)?active\s+(?:fbi\s+)?(?:security\s+risk\s+assessment|sra)|unescorted\s+(?:visiting\s+collaborator|individual|visitor))[\s\S]{0,200}?(?:select\s+agent|tier\s+1)|tier\s+1[\s\S]{0,160}?unescorted
+  severity: critical
+  category: biosec.access.no_sra
+- id: inventory_variance_form4
+  pattern: (?i)(?:(?<!no\s)(?<!zero\s)(?:select\s+agent\s+)?inventory\s+(?:mismatch|variance|discrepancy)[\s\S]{0,200}?(?:cdc\s+form\s+4|form\s+4))|form\s+4[\s\S]{0,120}?(?:significant\s+)?(?:variance|mismatch|discrepancy)(?!\s+(?:over|across)\s+the\s+last)
+  severity: critical
+  category: biosec.inventory.variance
+- id: dual_key_breached
+  pattern: (?i)(?:dual[- ]?key|two[- ]?person)\s+(?:procedure|access|requirement)\s+(?:waived|breached|skipped|broken|quietly\s+waived)|single\s+pi\s+(?:with\s+)?sole\s+access
+  severity: critical
+  category: biosec.access.dual_key_breached
+- id: gain_of_function_no_durc_p3co
+  pattern: (?i)(?:gain[- ]?of[- ]?function|aerosol(?:ization)?\s+(?:protocol|experiment)|enhanced\s+pathogen)[\s\S]{0,200}?(?:launched|initiated|started|conducted)[\s\S]{0,200}?(?:without\s+(?:durc|p3co)\s+review|no\s+durc|no\s+p3co)|gain[-
+    ]?of[- ]?function\s+(?:without|no)\s+durc
+  severity: critical
+  category: biosec.durc.no_review
+- id: release_loss_unreported_7d
+  pattern: (?i)(?:spill|release|loss|theft)[\s\S]{0,200}?(?:not\s+reported\s+to\s+(?:cdc|dsat)|past\s+7[-
+    ]?day|within\s+the\s+7[- ]?day\s+window|not\s+reported\s+(?:within|in))
+  severity: critical
+  category: biosec.release.unreported
+- id: transfer_form2_missing
+  pattern: (?i)(?:shipped|transferred)[\s\S]{0,200}?(?:without\s+(?:the\s+)?(?:aphis\s*[/]\s*cdc\s+)?form\s+2|no\s+form\s+2|form\s+2\s+(?:transfer\s+)?authorization\s+(?:missing|absent|in\s+place))
+  severity: high
+  category: biosec.transfer.no_form2
+- id: bsc_certification_overdue
+  pattern: (?i)(?:bsc[- ]?ii|biosafety\s+cabinet)\s+(?:annual\s+)?(?:recertification|certification)\s+(?:eight\s+months\s+overdue|overdue|expired|past\s+due)
+  severity: high
+  category: biosec.bsc.cert_overdue
+- id: hepa_leak_test_overdue
+  pattern: (?i)hepa\s+(?:push[- ]?through\s+)?(?:filter\s+)?(?:leak|integrity|pao|dop)\s+(?:test|integrity\s+test|last\s+documented)[\s\S]{0,120}?(?:overdue|expired|in\s+(?:202[0-4])|last\s+(?:tested|documented)\s+(?:in\s+202[0-4]|over\s+12\s+months))
+  severity: medium
+  category: biosec.hepa.overdue
+- id: autoclave_unvalidated_cycle
+  pattern: (?i)(?:autoclave|sterilization)\s+(?:short\s+cycle|unvalidated\s+cycle|cycle\s+(?:not\s+validated|validation\s+missing))|biological\s+indicator\s+(?:failure|missing|skipped)
+  severity: high
+  category: biosec.decon.unvalidated
+- id: ppe_doffing_violation
+  pattern: (?i)ppe\s+doffing\s+(?:sequence\s+)?violation|doffing\s+(?:sequence\s+)?(?:violation|skipped|incorrect)
+  severity: medium
+  category: biosec.ppe.doffing
+- id: visitor_log_incomplete
+  pattern: (?i)visitor\s+log\s+(?:incomplete|gap|missing|not\s+maintained)
+  severity: low
+  category: biosec.visitor.log_incomplete
+- id: scale_expansion_v1_critical_signal_01
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_02
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_03
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_04
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_05
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_06
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_07
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_08
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_09
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_10
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_11
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_12
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_13
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_14
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_15
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_16
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_17
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_18
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_19
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_20
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_21
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_22
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_23
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_24
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_25
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_26
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_27
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_28
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_29
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_30
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_31
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_32
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_33
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_34
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_35
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_36
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_37
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_38
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_39
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_40
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}biosecurity.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v2_unsupported_material_claim_001
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-biosecurity-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_002
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_003
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_004
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_005
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_006
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-biosecurity-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_007
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_008
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_009
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_010
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_011
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-biosecurity-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_012
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_013
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_014
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_015
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_016
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-biosecurity-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_017
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_018
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_019
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_020
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_021
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-biosecurity-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_022
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_023
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_024
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_025
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_026
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-biosecurity-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_027
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_028
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_029
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_030
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_031
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-biosecurity-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_032
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_033
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_034
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_035
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_036
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-biosecurity-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_037
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_038
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_039
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_040
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_041
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-biosecurity-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_042
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_043
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_044
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_045
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_046
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-biosecurity-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_047
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_048
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_049
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_050
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_051
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-biosecurity-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_052
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_053
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_054
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_055
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_056
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-biosecurity-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_057
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_058
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_059
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_060
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_061
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-biosecurity-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_062
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_063
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_064
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_065
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_066
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-biosecurity-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_067
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_068
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_069
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_070
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_071
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-biosecurity-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_072
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_073
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_074
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_075
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_076
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-biosecurity-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_077
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_078
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-biosecurity-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_079
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_080
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_biosecurity_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-biosecurity-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.

@@ -1,0 +1,65 @@
+id: "tool/task-marketplace-archetype-normalizer"
+type: tool
+version: "0.1.0"
+name: "Task marketplace archetype normalizer"
+description: "Converts task-marketplace metadata or user exports into normalized task archetype objects, entity records, dedupe clusters, index records, and review tickets without retaining raw listing text or personal data."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["extraction", "planning", "governance", "routing"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "pre_api.source_intake"
+tags: ["task-marketplace", "workflow-archetypes", "privacy", "dedupe", "indexing", "review-routing"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    input_path:
+      type: string
+    output_dir:
+      type: string
+  required: ["input_path", "output_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    source_records:
+      type: integer
+    normalized_objects:
+      type: integer
+    entities:
+      type: integer
+    dedupe_clusters:
+      type: integer
+    index_records:
+      type: integer
+    review_tickets:
+      type: integer
+    privacy_findings:
+      type: integer
+    paths:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      input_path: "catalog/knowledge-packs/data/task-marketplace-archetype-patterns/source-records.jsonl"
+      output_dir: "dist/task-marketplace-intake/demo"
+    output:
+      ok: true
+      source_records: 4
+      normalized_objects: 4
+      index_records: 8
+      review_tickets: 4
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.task_marketplace_intake.normalize_task_marketplace_records"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.factory.task_marketplace_intake"

@@ -1,0 +1,176 @@
+{
+  "agents_run": [
+    "SourceHandleValidator",
+    "InternalEvidenceFinder",
+    "ExternalEvidenceFinder",
+    "ContradictionHunter",
+    "GraphNeighborExplorer",
+    "ClaimNormalizer",
+    "FreshnessChecker",
+    "PolicyChecker",
+    "RiskReviewer",
+    "PackImprover",
+    "HumanReviewRouter"
+  ],
+  "canonical_mutated": false,
+  "consensus": {
+    "canonical_mutated": false,
+    "confidence": 0.4444,
+    "context_pack_patch": {
+      "applied": false,
+      "authority": "obj-adr-014",
+      "from_value": 3,
+      "op": "update_claim",
+      "predicate": "max_retries",
+      "reason": "align obj-runbook with authoritative obj-adr-014 (=5); requires human/policy approval before apply",
+      "subject_id": "obj-runbook",
+      "to_value": 5
+    },
+    "contradictions": [
+      "contradiction on 'max_retries': authority obj-adr-014=5 vs obj-retry-py=5, obj-runbook=3"
+    ],
+    "kind": "baltor.swarm-consensus.v1",
+    "object_ref": "obj-runbook",
+    "policy_risks": [
+      "obj-runbook policy.requires_refresh=true",
+      "obj-runbook is not promotion-eligible"
+    ],
+    "rejected_claims": [
+      {
+        "subject_id": "obj-runbook",
+        "summary": "'max_retries'=3 on obj-runbook disagrees with obj-adr-014=5, obj-retry-py=5"
+      }
+    ],
+    "requires_human_review": true,
+    "risk_level": "high",
+    "rot_signals": [
+      "obj-runbook is STALE (effective 2025-11-02) \u2014 do not rely on it for a write action"
+    ],
+    "suggested_relationships": [
+      "obj-runbook REQUIRES_REFRESH (per authority)"
+    ],
+    "verified_claims": []
+  },
+  "created_at": "1970-01-01T00:00:00Z",
+  "deterministic": true,
+  "findings": [
+    {
+      "agent": "SourceHandleValidator",
+      "evidence": [
+        "ctx://acme-billing/docs/billing-runbook.md#retry-policy"
+      ],
+      "finding_type": "handles_ok",
+      "severity": "info",
+      "suggestion": null,
+      "summary": "obj-runbook has 1 valid ctx:// handle(s)"
+    },
+    {
+      "agent": "InternalEvidenceFinder",
+      "evidence": [
+        "ctx://acme-billing/decisions/ADR-014-billing-retry-policy.md#decision",
+        "ctx://acme-billing/repo/billing/retry.py#L9-L13"
+      ],
+      "finding_type": "internal_disagreement",
+      "severity": "high",
+      "suggestion": null,
+      "summary": "'max_retries'=3 on obj-runbook disagrees with obj-adr-014=5, obj-retry-py=5"
+    },
+    {
+      "agent": "ExternalEvidenceFinder",
+      "evidence": [],
+      "finding_type": "external_not_run",
+      "severity": "info",
+      "suggestion": null,
+      "summary": "external corroboration NOT run (offline / external_allowed=false) \u2014 labeled seam"
+    },
+    {
+      "agent": "ContradictionHunter",
+      "evidence": [
+        "ctx://acme-billing/decisions/ADR-014-billing-retry-policy.md#decision",
+        "ctx://acme-billing/docs/billing-runbook.md#retry-policy",
+        "ctx://acme-billing/repo/billing/retry.py#L9-L13"
+      ],
+      "finding_type": "contradiction",
+      "severity": "high",
+      "suggestion": "align obj-runbook with the authority",
+      "summary": "contradiction on 'max_retries': authority obj-adr-014=5 vs obj-retry-py=5, obj-runbook=3"
+    },
+    {
+      "agent": "GraphNeighborExplorer",
+      "evidence": [],
+      "finding_type": "neighborhood",
+      "severity": "info",
+      "suggestion": null,
+      "summary": "obj-runbook has 2 neighbor(s); edges: ['CONTRADICTS\u2192obj-adr-014', 'OWNED_BY\u2192obj-billing-team', 'obj-adr-014\u2192SUPERSEDES']"
+    },
+    {
+      "agent": "ClaimNormalizer",
+      "evidence": [],
+      "finding_type": "claims_normalized",
+      "severity": "info",
+      "suggestion": null,
+      "summary": "obj-runbook assertions are well-formed"
+    },
+    {
+      "agent": "FreshnessChecker",
+      "evidence": [
+        "ctx://acme-billing/docs/billing-runbook.md#retry-policy"
+      ],
+      "finding_type": "stale",
+      "severity": "high",
+      "suggestion": null,
+      "summary": "obj-runbook is STALE (effective 2025-11-02) \u2014 do not rely on it for a write action"
+    },
+    {
+      "agent": "PolicyChecker",
+      "evidence": [],
+      "finding_type": "requires_refresh",
+      "severity": "medium",
+      "suggestion": null,
+      "summary": "obj-runbook policy.requires_refresh=true"
+    },
+    {
+      "agent": "PolicyChecker",
+      "evidence": [],
+      "finding_type": "promotion_blocked",
+      "severity": "medium",
+      "suggestion": null,
+      "summary": "obj-runbook is not promotion-eligible"
+    }
+  ],
+  "kind": "baltor.swarm-run.v1",
+  "llm_used": false,
+  "object_ref": "obj-runbook",
+  "purpose": "verify",
+  "receipt": {
+    "deterministic": true,
+    "findings_count": 9,
+    "kind": "baltor.swarm-receipt.v1",
+    "object_ref": "obj-runbook",
+    "requires_human_review": true,
+    "review_requests": [
+      "rr-4f8b9ada7bd49159"
+    ],
+    "risk_level": "high",
+    "swarm_receipt_id": "swrc-6fa637d72d9df3e7"
+  },
+  "review_requests": [
+    {
+      "created_at": "1970-01-01T00:00:00Z",
+      "evidence": [
+        "ctx://acme-billing/decisions/ADR-014-billing-retry-policy.md#decision",
+        "ctx://acme-billing/docs/billing-runbook.md#retry-policy",
+        "ctx://acme-billing/repo/billing/retry.py#L9-L13"
+      ],
+      "kind": "baltor.steward-review-request.v1",
+      "owner": "obj-billing-team",
+      "requested_by": "context_object_swarm",
+      "review_request_id": "rr-4f8b9ada7bd49159",
+      "risk": "high",
+      "status": "open",
+      "subject": "obj-runbook",
+      "trigger": "high_conflict_claim"
+    }
+  ],
+  "swarm_run_id": "swarm-6fa637d72d9df3e7"
+}

@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor · Ingestion → Consumption</title>
+<style>
+  :root { --bg:#0d1117; --panel:#161b22; --line:#21262d; --fg:#e6edf3; --mut:#8b949e; --ok:#3fb950; --warn:#d29922; --bad:#f85149; --acc:#58a6ff; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  header { padding:14px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  h1 { font-size:15px; margin:0; font-weight:600; }
+  .sub { color:var(--mut); font-size:12px; }
+  button { background:var(--acc); color:#0d1117; border:0; border-radius:6px; padding:8px 14px; font-weight:700; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:wait; }
+  main { display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:12px; padding:16px; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:12px; }
+  .panel h2 { font-size:12px; margin:0 0 8px; color:var(--acc); text-transform:uppercase; letter-spacing:.04em; }
+  .answer { grid-column:1/-1; }
+  .answer .big { font-size:20px; font-weight:700; color:var(--ok); }
+  .row { display:flex; justify-content:space-between; gap:8px; padding:2px 0; border-bottom:1px dashed var(--line); }
+  .mut { color:var(--mut); }
+  .pill { display:inline-block; padding:1px 7px; border-radius:999px; font-size:11px; }
+  .pill.ok { background:rgba(63,185,80,.15); color:var(--ok); }
+  .pill.warn { background:rgba(210,153,34,.15); color:var(--warn); }
+  code { color:var(--acc); word-break:break-all; }
+  .hint { color:var(--mut); font-size:11px; }
+  pre { white-space:pre-wrap; word-break:break-word; max-height:280px; overflow:auto; margin:0; color:var(--mut); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Baltor · Ingestion → Consumption</h1>
+  <span class="sub">CFPB Reg&nbsp;E correctness invariant · projection-only (this page computes no truth; it reads the API)</span>
+  <button id="run">Run CFPB Ingestion → Consumption</button>
+  <span id="status" class="sub"></span>
+</header>
+<main id="panels">
+  <div class="panel answer"><h2>Answer (served)</h2><div id="answer" class="big mut">— click Run —</div><div id="decision" class="hint"></div></div>
+</main>
+
+<script>
+// Projection only: fetch the API and RENDER. No truth is computed, stored, or mutated here.
+const SERVE = "/api/context/serve?tenant_id=demo&corpus=cfpb&require_optimized=true";  // ungated GET projection
+const SECTIONS = "/api/runtime/sections";
+const panels = document.getElementById("panels");
+const statusEl = document.getElementById("status");
+
+function panel(title){ const d=document.createElement("div"); d.className="panel"; const h=document.createElement("h2"); h.textContent=title; d.appendChild(h); panels.appendChild(d); return d; }
+function row(p,k,v){ const r=document.createElement("div"); r.className="row"; r.innerHTML=`<span class="mut">${k}</span><span>${v}</span>`; p.appendChild(r); }
+function list(p,items){ if(!items||!items.length){ row(p,"(none)",""); return; } items.forEach(t=>{ const r=document.createElement("div"); r.className="row"; r.innerHTML=t; p.appendChild(r); }); }
+
+async function run(){
+  const btn=document.getElementById("run"); btn.disabled=true; statusEl.textContent="running…";
+  // clear previous panels except the answer card
+  [...panels.querySelectorAll(".panel:not(.answer)")].forEach(e=>e.remove());
+  try {
+    const resp = await (await fetch(SERVE)).json();
+    const secs = await (await fetch(SECTIONS)).json();
+    render(resp, secs);
+    statusEl.textContent = "served · deterministic";
+  } catch(e){ statusEl.textContent = "error: "+e; }
+  btn.disabled=false;
+}
+
+function render(r, secs){
+  document.getElementById("answer").textContent = r.answer || "(not consumable)";
+  document.getElementById("answer").className = "big " + (r.answer ? "" : "mut");
+  document.getElementById("decision").textContent = `response_id ${r.response_id||"-"} · schema ${r.schema_version||"-"}`;
+  const sf=r.served_facts||[], ho=r.held_out_warnings||[], rc=r.receipts||{}, ln=r.lineage||{}, fr=r.freshness||{};
+
+  // 1-2 Ingestion / Source artifacts
+  let p=panel("Ingestion · Source artifacts");
+  row(p,"source artifacts",(ln.source_artifact_ids||[]).length);
+  list(p,(ln.source_artifact_ids||[]).map(s=>`<code>${s}</code>`));
+
+  // 3-5 Decomposition / Atomic facts / Held-out allegations
+  p=panel("Atomic facts (served)"); row(p,"served_facts",sf.length);
+  list(p, sf.map(f=>`<span><code>${f.source_handle||""}</code><br><span class="mut">${(f.object||"")} · ${f.claim_status||""}</span></span>`));
+  p=panel("Held-out allegations / warnings"); row(p,"held_out",ho.length);
+  list(p, ho.map(h=>`<span class="pill warn">held&nbsp;out</span> <code>${h.artifact_id}</code><br><span class="mut">${h.reason||""}</span>`));
+
+  // 6-8 Artifact ledger / Vectors / Graph (lineage projection)
+  p=panel("Artifact ledger · Vectors · Graph"); row(p,"artifact_ids",(ln.artifact_ids||[]).length);
+  row(p,"context_pack_id",`<code>${ln.context_pack_id||"-"}</code>`); row(p,"promotion_id",`<code>${ln.promotion_id||"-"}</code>`);
+
+  // 9-10 Conflicts / Reconciliation
+  p=panel("Conflicts · Reconciliation");
+  list(p,(r.conflicts||[]).map(c=>`<span class="pill warn">conflict</span> ${c.conflict_type||""} → winner <code>${c.winner||""}</code>, held&nbsp;out <code>${c.held_out||""}</code>`));
+  list(p,(r.reconciliations||[]).map(x=>`<span class="mut">${x.decision||""}: ${x.reason||""}</span>`));
+
+  // 11-16 Verification / Optimization / Consumption receipts
+  p=panel("Receipts (verification · optimization · consumption)");
+  row(p,"verification",`<code>${rc.verification_receipt_id||"-"}</code>`);
+  row(p,"optimization",`<code>${rc.optimization_receipt_id||"-"}</code>`);
+  row(p,"consumption",`<code>${rc.consumption_receipt_id||"-"}</code>`);
+
+  // 12 Fragile facts / freshness
+  p=panel("Freshness"); row(p,"as_of",fr.as_of||"-"); row(p,"stale_fact_count",fr.stale_fact_count??"-"); row(p,"fragile_fact_count",fr.fragile_fact_count??"-");
+
+  // 16 ContextResponse (raw projection)
+  p=panel("ContextResponse.v1 (raw)"); const pre=document.createElement("pre"); pre.textContent=JSON.stringify(r,null,2); p.appendChild(pre);
+
+  // 19 Section maturity + 20 Provider status
+  p=panel("Section maturity"); row(p,"reference M10",`${secs.reference_m10}/${secs.reference_total}`); row(p,"sections",secs.total);
+  const cand=(secs.sections||[]).filter(s=>s.status==="candidate"||s.status==="experimental");
+  p=panel("Provider status (candidates)"); row(p,"candidate sections",cand.length);
+  list(p,cand.map(s=>`<code>${s.section_id}</code> <span class="pill warn">${s.status}</span>`));
+}
+
+document.getElementById("run").addEventListener("click", run);
+run();
+</script>
+</body>
+</html>

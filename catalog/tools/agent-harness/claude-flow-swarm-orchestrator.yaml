@@ -1,0 +1,107 @@
+id: "tool/claude-flow-swarm-orchestrator"
+type: tool
+version: "0.1.0"
+name: "Claude-Flow swarm orchestrator"
+description: |
+  A large third-party swarm-orchestration framework (ruvnet/claude-flow) that
+  manages fleets of Claude agents: spawning swarms, routing tasks to
+  specialists, sharing memory across agents via a distributed state store, and
+  tracking inter-agent communication. Provides CLI and programmatic interfaces
+  for launching swarm runs, querying swarm topology, injecting tasks, and
+  reading aggregated results.
+
+  COST AND TRUST CAVEAT: Claude-Flow operates at swarm scale — N concurrent
+  model calls per run, external state services, and optional cloud hooks.
+  Budget for significant per-run API spend. Review upstream trust and network
+  egress requirements before use in sensitive or cost-constrained environments.
+
+  Reference/integration contract only; verify the upstream license before
+  bundling. This is a large, actively-developed third-party project; pin a
+  release tag for production use.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["ai", "software.devops", "cross_industry"]
+capability: ["agent_loop", "planning", "routing"]
+modality:   ["text", "code", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "external"
+tags:
+  - "swarm"
+  - "multi-agent"
+  - "claude-flow"
+  - "orchestration"
+  - "agent-harness"
+  - "ruvnet"
+created: "2026-05-26"
+updated: "2026-05-26"
+attribution:
+  source_url: "https://github.com/ruvnet/claude-flow"
+  source_kind: "github"
+  author: "ruvnet"
+
+parameters:
+  type: object
+  properties:
+    op:
+      type: string
+      enum: ["spawn_swarm", "route_task", "query_topology", "read_results"]
+      description: "Swarm operation."
+    swarm_config:
+      type: object
+      description: "Swarm configuration: agent roles, counts, memory backend, coordination strategy."
+    task:
+      type: string
+      description: "High-level task description for the swarm to execute (op=spawn_swarm or route_task)."
+    swarm_id:
+      type: string
+      description: "Running swarm identifier (op=route_task, query_topology, read_results)."
+    agent_filter:
+      type: object
+      description: "Filter for topology query (op=query_topology)."
+  required: ["op"]
+returns:
+  type: object
+  properties:
+    swarm_id:
+      type: string
+    topology:
+      type: object
+      description: "Agent graph with roles, statuses, and communication links."
+    results:
+      type: array
+      description: "Aggregated outputs from all agents."
+      items:
+        type: object
+        properties:
+          agent_id:  { type: "string" }
+          role:      { type: "string" }
+          output:    { type: "string" }
+          status:    { type: "string", enum: ["running", "complete", "failed"] }
+    cost_estimate:
+      type: object
+      properties:
+        input_tokens:  { type: "integer" }
+        output_tokens: { type: "integer" }
+        usd_estimate:  { type: "number" }
+side_effects: "external_call"
+examples:
+  - input:
+      op: "spawn_swarm"
+      task: "Research and draft a catalog entry for ten open-source agent frameworks"
+      swarm_config:
+        agents: 5
+        roles: ["researcher", "writer", "reviewer", "coordinator", "fact-checker"]
+        memory_backend: "redis"
+    output:
+      swarm_id: "cf-swarm-001"
+      cost_estimate: { input_tokens: 120000, output_tokens: 40000, usd_estimate: 0.72 }
+    notes: "Cost estimate is illustrative; actual spend depends on model tier and task complexity."
+implementations:
+  - kind: "shell"
+    command: "claude-flow swarm --task \"{{task}}\" --agents {{swarm_config.agents}}"
+  - kind: "callable"
+    path: "claude_flow.swarm.Swarm"
+    language: "python"
+  - kind: "mcp"
+    path: "claude-flow-mcp-server"

@@ -1,0 +1,72 @@
+id: "tool/staged-vs-committed-load-auditor"
+type: tool
+version: "0.1.0"
+name: "Staged versus committed load auditor"
+description: "Compares staged bulk-load counts from a load-plan manifest with actual Postgres object count rows, emitting a relation-level verified, staged-only, or mismatch audit report."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "evaluation", "retrieval", "serving", "verification"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["postgres", "pgvector", "load-audit", "object-counts", "bulk-load", "verification"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    load_plan_manifest:
+      type: string
+    committed_counts:
+      type: string
+      description: "Optional JSON, JSONL, or CSV output from db/postgres/object_count_report.sql."
+    execution_summary:
+      type: string
+    output:
+      type: string
+    run_id:
+      type: string
+  required: ["load_plan_manifest"]
+returns:
+  type: object
+  properties:
+    audit_status:
+      type: string
+    summary:
+      type: object
+    preflight:
+      type: object
+    bulk_load:
+      type: object
+    execution_summary:
+      type: object
+    relations:
+      type: array
+      items:
+        type: object
+    safety:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      load_plan_manifest: "dist/source-surface-scan-partitions/seed/load-plan/load-plan-manifest.json"
+      execution_summary: "dist/source-surface-scan-partitions/seed/execution-summary.json"
+      output: "dist/source-surface-scan-partitions/seed/load-audit.json"
+    output:
+      audit_status: "staged_only"
+      summary:
+        expected_staged_total: 21229
+        not_verified_relations: 11
+      preflight:
+        ok: true
+implementations:
+  - kind: "callable"
+    path: "scripts.db.staged_vs_committed_load_audit.audit_staged_vs_committed_load"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.staged_vs_committed_load_audit"

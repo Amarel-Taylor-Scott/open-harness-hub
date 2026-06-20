@@ -1,0 +1,22 @@
+{
+  "version": "1.0",
+  "note": "Dependency direction is strict and downward only. Enforced by check_import_boundaries_manifest.py over the governed scope.",
+  "rules": {
+    "contracts": {"may_import": ["stdlib"], "must_not_import": ["ports", "adapters", "runtime", "processors", "api", "web", "scripts"]},
+    "ports": {"may_import": ["contracts", "stdlib"], "must_not_import": ["adapters", "processors", "api", "web"]},
+    "adapters": {"may_import": ["contracts", "ports", "stdlib"], "must_not_import": ["processors", "web"]},
+    "runtime": {"may_import": ["contracts", "ports", "stdlib"], "must_not_import": ["processors", "demos", "web", "scripts.baltor_admin_demo_server", "cfpb", "esg"]},
+    "processors": {"may_import": ["contracts", "ports", "runtime.processor", "stdlib", "domain libs"], "must_not_import": ["scripts.baltor_admin_demo_server", "web", "global BUS", "global DURABLE"]},
+    "workers": {"may_import": ["runtime", "adapters", "processors", "scripts.durable_store"], "must_not_import": ["web"]},
+    "api": {"may_import": ["runtime", "adapters", "processors", "projections"], "must_not_import": []},
+    "web": {"may_import": ["api projections only"], "must_not_import": ["durable store writes"]},
+    "llm": {"rule": "model calls may ONLY go through the LLM gateway; no direct openai/anthropic/gemini/ollama/vllm import outside scripts/llm_gateway or src/baltor/llm_gateway"}
+  },
+  "runtime_core_files": ["scripts/runtime/envelopes.py", "scripts/runtime/schema_validator.py", "scripts/runtime/ports.py", "scripts/runtime/context.py", "scripts/runtime/processor.py", "scripts/runtime/processor_registry.py", "scripts/runtime/processor_harness.py", "scripts/runtime/logger.py"],
+  "runtime_core_forbidden_substrings": ["baltor_admin_demo_server", "import web", "from web", "decompose_structured", "demo_cfpb", "cfpb_artifacts", "integrate_cfpb"],
+  "processor_files": ["scripts/runtime/builtin_processors.py"],
+  "processor_forbidden_substrings": ["baltor_admin_demo_server", "import web", "from web"],
+  "legacy_allowlist": [
+    {"path": "scripts/runtime/builtin_processors.py", "reason": "the processor-adapter layer; it MAY import the legacy decompose_structured module (a domain library), which is why it is classified 'processors', not 'runtime_core'"}
+  ]
+}

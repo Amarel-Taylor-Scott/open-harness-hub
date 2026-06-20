@@ -1,0 +1,62 @@
+id: "tool/postgres-pgvector-bootstrap-planner"
+type: tool
+version: "0.1.0"
+name: "Postgres pgvector bootstrap planner"
+description: "Emits a side-effect-free local, Render, or managed Postgres bootstrap plan for initializing pgvector, loading factory JSONL output, and reporting canonical object counts."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "retrieval", "serving", "evaluation"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["postgres", "pgvector", "docker-compose", "render", "bootstrap"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    target:
+      type: string
+      enum: ["local_docker", "render", "managed_postgres"]
+    database_url_env:
+      type: string
+    compose_file:
+      type: string
+    schema_file:
+      type: string
+    load_sql:
+      type: string
+    count_sql:
+      type: string
+    output:
+      type: string
+returns:
+  type: object
+  properties:
+    target:
+      type: string
+    commands:
+      type: array
+      items: { type: object }
+    counting_policy:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      target: "local_docker"
+      output: "dist/reports/postgres-bootstrap-plan.json"
+    output:
+      target: "local_docker"
+      counting_policy:
+        manifest_count: "curated YAML component definitions"
+implementations:
+  - kind: "callable"
+    path: "scripts.db.postgres_bootstrap_plan.build_plan"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.postgres_bootstrap_plan"

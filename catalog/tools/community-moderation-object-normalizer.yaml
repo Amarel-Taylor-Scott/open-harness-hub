@@ -1,0 +1,62 @@
+id: "tool/community-moderation-object-normalizer"
+type: tool
+version: "0.1.0"
+name: "Community moderation object normalizer"
+description: "Normalizes community moderation policies, group rules, appeal questions, escalation triggers, and transparency requirements into candidate knowledge objects."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["media", "retail", "security", "cross_industry"]
+capability: ["classification", "routing", "governance", "evaluation", "retrieval"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "pre_api.ingest"
+tags: ["social-media", "community-moderation", "trust-and-safety", "appeals", "knowledge-objects"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    moderation_sources:
+      type: array
+      items:
+        type: object
+    policy:
+      type: object
+    excluded_scopes:
+      type: array
+      items:
+        type: string
+  required: ["moderation_sources"]
+returns:
+  type: object
+  properties:
+    normalized_objects:
+      type: array
+      items:
+        type: object
+    review_tickets:
+      type: array
+      items:
+        type: object
+    index_records:
+      type: array
+      items:
+        type: object
+side_effects: "write"
+examples:
+  - input:
+      moderation_sources:
+        - id: "group-rules"
+          source_type: "community_rules"
+      excluded_scopes: ["insurance"]
+    output:
+      normalized_objects:
+        - object_type: "decision_gate"
+      review_tickets: []
+implementations:
+  - kind: "mcp"
+    path: "mcp/factory.normalize_community_moderation_objects"

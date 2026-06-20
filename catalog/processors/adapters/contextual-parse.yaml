@@ -1,0 +1,114 @@
+id: "processor/contextual-parse"
+type: processor
+version: "0.1.0"
+name: "Contextual AI Parse adapter (hosted document understanding → markdown + hierarchy)"
+description: |
+  GOVERNED ADAPTER that WRAPS Contextual AI's hosted Parse engine
+  (`POST /parse`) as an Open Harness Hub processor component. This is a
+  thin wrapper over a third-party best-of-breed engine — OHH does NOT
+  rebuild it. Contextual's Parse converts PDF / DOC(X) / PPT(X) / PNG /
+  JPG (<300MB, <2000 pages) to clean Markdown or JSON, infers document
+  hierarchy, and attaches positional metadata to each chunk
+  (`parse_mode`, `enable_document_hierarchy`, `enable_split_tables`).
+  On OmniDocBench it scores 87.0 — a stronger document-understanding
+  engine than OHH's local OCR/extract stand-ins.
+
+  WRAP, NOT REPLACE — what OHH adds ON TOP of the external engine:
+    - PROVENANCE: every parsed chunk is bound to its source_record with
+      a content hash, so a downstream Knowledge Corpus carries where
+      each fact came from — Contextual returns text + hierarchy, but the
+      governed source binding is OHH's.
+    - MEASURED-LIFT ADMISSION: this adapter is admitted into a pipeline
+      only when paired measurement (`scripts/foundry/measure.py`) shows
+      `pipeline_score - bare_model_score > 0` AND the lift is structural
+      (`scripts/eval/reason_codes.py`); it is not admitted by vendor fiat.
+    - COMPOSITION: it slots into the seven-primitive grammar as a pre-API
+      Input/ingest step, interchangeable at the schema boundary with the
+      local-first path below.
+
+  DETERMINISTIC / LOCAL FALLBACK: when no Contextual credentials are
+  configured (or for offline / no-cloud negative-space runs), the
+  pipeline falls back to the local-first ingest processor
+  `processor/doc-to-markdown-rag-ingest` (PyMuPDF / python-docx /
+  html2text). The hosted path is higher-accuracy; the local path is the
+  no-cloud default — complementary, not exclusive.
+
+  Hosted engine, external trust boundary, external_call side effect:
+  routed to the external-metered worker pool (see
+  docs/architecture/component-execution-and-runtime-routing.md). Requires
+  a Contextual AI API key. Cost (Contextual list pricing, 2026): $3 per
+  1k pages text, $40 per 1k pages multimodal — metered per call.
+authors:
+  - name: "Contextual AI"
+    url: "https://contextual.ai"
+  - name: "Open Harness Hub contributors (governance wrapper)"
+license: "proprietary-saas-wrapped"
+industry:   ["ai", "cross_industry"]
+capability: ["extraction", "format_conversion", "retrieval"]
+modality:   ["text", "image", "structured"]
+lifecycle:  "experimental"
+lifecycle_position: "pre_api.context_assembly"
+trust_boundary: "external"
+links:
+  source:   "https://docs.contextual.ai/api-reference/parse/parse-file.md"
+  homepage: "https://contextual.ai/component-apis"
+attribution:
+  source_url:  "https://docs.contextual.ai/api-reference/parse/parse-file.md"
+  source_kind: "other"
+  author:      "Contextual AI (Douwe Kiela, Amanpreet Singh)"
+  license:     "Contextual AI commercial terms"
+tags:
+  - "contextual-ai"
+  - "wrapped-third-party"
+  - "hosted"
+  - "document-parsing"
+  - "ocr"
+  - "pdf"
+  - "markdown"
+  - "rag-ingest"
+  - "external-metered"
+  - "governance-wrapper"
+created: "2026-05-29"
+updated: "2026-05-29"
+
+process_kind: "format_convert.pdf_to_text"
+deterministic: false
+idempotent: true
+streaming: false
+latency_budget_ms: 120000
+
+inputs:
+  - name: "document_path"
+    type: "string"
+  - name: "parse_mode"
+    type: "string"
+  - name: "enable_document_hierarchy"
+    type: "boolean"
+  - name: "enable_split_tables"
+    type: "boolean"
+  - name: "output_format"
+    type: "string"
+outputs:
+  - name: "markdown"
+    type: "string"
+  - name: "document_hierarchy"
+    type: "object"
+  - name: "chunks"
+    type: "object[]"
+  - name: "source_record_id"
+    type: "string"
+  - name: "content_hash"
+    type: "string"
+
+side_effects: "external_call"
+on_error: "fallback"
+retry:
+  max_attempts: 2
+  backoff: "exponential"
+
+implementations:
+  - kind: "http"
+    url: "https://api.contextual.ai/v1/parse"
+  - kind: "callable"
+    path: "scripts.processors.doc_to_markdown_rag_ingest.run"
+    language: "python"

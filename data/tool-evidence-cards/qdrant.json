@@ -1,0 +1,20 @@
+{
+  "kind": "baltor.tool-evidence-card.v1",
+  "id": "tool.qdrant",
+  "name": "Qdrant",
+  "capability": "hybrid_retrieval",
+  "github_url": "https://github.com/qdrant/qdrant",
+  "license": "Apache-2.0",
+  "hosting": "hybrid",
+  "free_noncommercial": "yes_oss",
+  "local_demo_fit": "high",
+  "regulated_fit": "high",
+  "adapter_complexity": "medium",
+  "security_notes": "self-hostable; vectors reference leaf object_ids, not source-of-truth text",
+  "strengths": ["pure-Apache Rust", "native dense+sparse hybrid + filtering", "self-host or cloud"],
+  "weaknesses": ["separate service to operate vs in-Postgres pgvector"],
+  "fallbacks": ["pgvector"],
+  "decision": "adopt",
+  "evidence": [{"source": "research/backend-tool-verification.md", "note": "primary for hybrid_retrieval; pgvector fallback for the demo path"}],
+  "last_evaluated_at": "2026-06-04"
+}

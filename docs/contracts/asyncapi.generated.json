@@ -1,0 +1,98 @@
+{
+  "asyncapi": "3.0.0",
+  "channels": {
+    "runtime.commands": {
+      "description": "Durable work queue (lease/ack/nack\u2192DLQ); payload is a CommandEnvelope.v1.",
+      "messages": {
+        "context.consume": {
+          "name": "context.consume",
+          "payload": {
+            "$ref": "../../schemas/envelopes/CommandEnvelope.v1.schema.json"
+          },
+          "x-status": "active"
+        },
+        "pipeline.run": {
+          "name": "pipeline.run",
+          "payload": {
+            "$ref": "../../schemas/envelopes/CommandEnvelope.v1.schema.json"
+          },
+          "x-status": "active"
+        },
+        "pipeline.run_step": {
+          "name": "pipeline.run_step",
+          "payload": {
+            "$ref": "../../schemas/envelopes/CommandEnvelope.v1.schema.json"
+          },
+          "x-status": "active"
+        },
+        "pipeline.step": {
+          "name": "pipeline.step",
+          "payload": {
+            "$ref": "../../schemas/envelopes/CommandEnvelope.v1.schema.json"
+          },
+          "x-status": "active"
+        },
+        "tenant.doc": {
+          "name": "tenant.doc",
+          "payload": {
+            "$ref": "../../schemas/envelopes/CommandEnvelope.v1.schema.json"
+          },
+          "x-status": "active"
+        }
+      }
+    },
+    "runtime.events": {
+      "description": "Facts about what happened (CloudEvents 1.0 EventEnvelope.v1).",
+      "messages": {
+        "baltor.graph.edge.created.v1": {
+          "name": "baltor.graph.edge.created.v1",
+          "payload": {
+            "$ref": "../../schemas/envelopes/EventEnvelope.v1.schema.json"
+          },
+          "x-status": "active"
+        },
+        "baltor.pipeline.step.completed.v1": {
+          "name": "baltor.pipeline.step.completed.v1",
+          "payload": {
+            "$ref": "../../schemas/envelopes/EventEnvelope.v1.schema.json"
+          },
+          "x-status": "active"
+        }
+      }
+    },
+    "runtime.logs": {
+      "description": "In-process log events (scripts.context_events); not durable facts.",
+      "messages": {
+        "artifact.created": {
+          "name": "artifact.created",
+          "x-status": "active"
+        },
+        "pipeline.step.completed": {
+          "name": "pipeline.step.completed",
+          "x-status": "active"
+        },
+        "pipeline.step.started": {
+          "name": "pipeline.step.started",
+          "x-status": "active"
+        },
+        "processor.completed": {
+          "name": "processor.completed",
+          "x-status": "active"
+        },
+        "processor.failed": {
+          "name": "processor.failed",
+          "x-status": "active"
+        },
+        "schema.validation.failed": {
+          "name": "schema.validation.failed",
+          "x-status": "active"
+        }
+      }
+    }
+  },
+  "info": {
+    "description": "GENERATED from architecture/contract_registry.json (command_types / event_types / log_events) by scripts/build_contract_specs.py \u2014 do not hand-edit. Commands are CommandEnvelope.v1 on durable queues; events are EventEnvelope.v1 (CloudEvents 1.0).",
+    "title": "Baltor / Teleon portfolio events (generated)",
+    "version": "1.0"
+  }
+}

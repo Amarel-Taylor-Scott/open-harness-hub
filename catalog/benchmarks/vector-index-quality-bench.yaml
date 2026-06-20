@@ -1,0 +1,35 @@
+id: "benchmark/vector-index-quality-bench"
+type: benchmark
+version: "0.1.0"
+name: "Vector Index Quality benchmark"
+description: "Synthetic benchmark for vector index quality review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["ai", "data_governance.quality"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["vector-index-quality", "expansion-v5"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/vector-index-quality-review"
+dataset: "dataset/vector-index-quality-samples"
+rubric: "rubric/vector-index-quality-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/vector-index-quality-review"
+    rule_pack_override: ["rule-pack/grep-vector-index-quality-flags", "rule-pack/rag-vector-index-quality-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 23
+report:
+  output: "dist/benchmarks/vector-index-quality/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

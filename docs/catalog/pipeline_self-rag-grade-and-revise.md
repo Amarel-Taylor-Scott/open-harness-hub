@@ -35,11 +35,11 @@ support, bounded iteration on failure.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `decide_retrieve` | harness | `harness/text-safety-review` | — |
+| 1 | `decide_retrieve` | harness | `harness/text-safety-review` | - |
 | 2 | `retrieve` | rule_pack | `rule-pack/hybrid-retrieval-policy` | $.steps.decide_retrieve.output.text == 'YES' |
 | 3 | `grade_documents` | processor | `processor/document-grader` | $.steps.decide_retrieve.output.text == 'YES' |
 | 4 | `rewrite_query_if_irrelevant` | harness | `harness/text-safety-review` | $.steps.grade_documents.output.all_irrelevant |
-| 5 | `generate` | harness | `harness/text-safety-review` | — |
-| 6 | `grade_answer_support` | processor | `processor/hallucination-scorer` | — |
+| 5 | `generate` | harness | `harness/text-safety-review` | - |
+| 6 | `grade_answer_support` | processor | `processor/hallucination-scorer` | - |
 | 7 | `iterate_if_unsupported` | processor | `processor/iterative-revise-loop` | $.steps.grade_answer_support.output.overall_score < 0.6 |
 

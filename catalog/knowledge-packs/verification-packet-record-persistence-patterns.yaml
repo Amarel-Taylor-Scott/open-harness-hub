@@ -1,0 +1,38 @@
+id: "knowledge-pack/verification-packet-record-persistence-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Verification packet record persistence patterns"
+description: "Seed patterns for exporting expert-review, grounded-search, and multi-model verification packets into canonical JSONL row families."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "government", "humanitarian", "legal", "healthcare", "cross_industry"]
+capability: ["verification", "format_conversion", "retrieval", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.product"
+tags: ["verification-packet", "expert-review", "postgres", "pgvector", "jsonl", "review-ticket"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types:
+  - "verification_packet_row_pattern"
+  - "expert_review_evidence_mapping"
+  - "grounded_verification_mapping"
+files:
+  - path: "catalog/knowledge-packs/data/verification-packet-record-persistence-patterns/rows.jsonl"
+    format: "jsonl"
+    schema: "verification-packet-record-persistence-row"
+indexing:
+  bm25: true
+  dense:
+    recommended_model: "sentence-transformers/all-MiniLM-L6-v2"
+provenance:
+  sources:
+    - "Open Harness Hub expert email and grounded verification architecture"
+    - "Open Harness Hub canonical factory row families"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "Synthetic mapping examples only; no real reviewer contact data or raw email content."

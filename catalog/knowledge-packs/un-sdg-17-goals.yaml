@@ -1,0 +1,112 @@
+id: "knowledge-pack/un-sdg-17-goals"
+type: knowledge-pack
+version: "0.1.0"
+name: "UN Sustainable Development Goals (17 goals / 169 targets / 248 indicators)"
+description: |
+  Reference pack of (composite educational) extracts from the UN
+  2030 Agenda for Sustainable Development:
+
+  **The 17 Goals** (and their 5 Ps clustering):
+   - **People** (1-5): No Poverty, Zero Hunger, Good Health & Well-
+     being, Quality Education, Gender Equality.
+   - **Planet** (6, 12-15): Clean Water & Sanitation, Responsible
+     Consumption & Production, Climate Action, Life Below Water,
+     Life on Land.
+   - **Prosperity** (7-11): Affordable & Clean Energy, Decent Work
+     & Economic Growth, Industry/Innovation/Infrastructure, Reduced
+     Inequalities, Sustainable Cities & Communities.
+   - **Peace** (16): Peace, Justice & Strong Institutions.
+   - **Partnership** (17): Partnerships for the Goals.
+
+  **169 Targets** — the operational sub-goals (e.g., Target 1.1
+  "By 2030, eradicate extreme poverty for all people everywhere,
+  currently measured as people living on less than $2.15 a day").
+
+  **248 Indicators** — Global Indicator Framework (E/CN.3/2025/2,
+  2025 refinement). 231 unique indicators with multiple appearances;
+  tier classification (Tier I = methodology + data both ready,
+  Tier II = methodology ready / data sparse, Tier III =
+  methodology under development).
+
+  **Target-interaction matrix**: synergies (one target's progress
+  helps another) and trade-offs (one target's progress can harm
+  another). Examples:
+   - 7 (energy) ↔ 13 (climate): strong synergy via renewables.
+   - 7 (energy) ↔ 15 (life on land): trade-off via lithium / cobalt
+     mining and dam-flooding.
+   - 2 (hunger) ↔ 15 (life on land): trade-off via agricultural
+     intensification.
+   - 8 (growth) ↔ 10 (inequality): often-noted trade-off when
+     growth is unevenly distributed.
+   - 9 (infrastructure) ↔ 13 (climate): trade-off via concrete /
+     steel emissions; synergy via resilient infrastructure.
+   - 14 (oceans) ↔ 2 (hunger): trade-off via overfishing for food
+     security.
+
+  **Progress reality (per UN SDG Report 2025):**
+   - Only ~17% of targets are on track.
+   - 39 targets show moderate progress.
+   - 18 targets show insufficient progress.
+   - 36 targets show stagnation or regression.
+   - 4 years left in "Decade of Action."
+
+  **CSRD ESRS / GRI / SASB cross-walks** to SDG (optional mappings
+  published by each framework).
+
+  **Common SDG-washing patterns:**
+   - Goal-level claim without target-level backing.
+   - Counter-target ignorance.
+   - Geographic / temporal mismatch.
+   - Additionality unverified.
+   - Indicator misuse (using a custom KPI under a UN-indicator label).
+
+  Composite educational extracts. Authoritative source:
+  sdgs.un.org/goals + UN Statistical Commission Global Indicator
+  Framework documents.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry:   ["esg", "sustainability", "nonprofit", "government", "humanitarian", "cross_industry"]
+capability: ["retrieval", "verification"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "dated"
+tags: ["sdg", "un", "agenda-2030", "targets", "indicators", "5-ps"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+attribution:
+  source_url:  "https://sdgs.un.org/goals"
+  source_kind: "other"
+  author:      "United Nations (composite distillation)"
+  license:     "CC-BY-3.0-IGO"
+
+content_types:
+  - rag_doc
+  - citation_edge
+files:
+  - path: "data/sdg-pack/goals-and-targets.jsonl"
+    format: "jsonl"
+  - path: "data/sdg-pack/global-indicator-framework-2025.jsonl"
+    format: "jsonl"
+  - path: "data/sdg-pack/target-interactions-matrix.jsonl"
+    format: "jsonl"
+  - path: "data/sdg-pack/sdg-report-2025-progress.jsonl"
+    format: "jsonl"
+  - path: "data/sdg-pack/framework-crosswalks.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    embedder: "adapter/bge-embeddings-local"
+    chunk_tokens: 512
+    overlap_tokens: 64
+provenance:
+  sources:
+    - "https://sdgs.un.org/goals"
+    - "https://unstats.un.org/sdgs/indicators/indicators-list/"
+    - "UN SDG Report 2025 (E/2025/56)"
+    - "Global Indicator Framework refinement E/CN.3/2025/2"
+    - "UN-DESA SDG interactions matrix (2023)"
+  collected_through: "2026-05-15"

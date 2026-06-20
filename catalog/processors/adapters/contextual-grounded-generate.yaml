@@ -1,0 +1,123 @@
+id: "processor/contextual-grounded-generate"
+type: processor
+version: "0.1.0"
+name: "Contextual AI Grounded Generate adapter (GLM — grounded LLM with inline attributions)"
+description: |
+  GOVERNED ADAPTER that WRAPS Contextual AI's hosted Grounded Language
+  Model (`POST /v1/generate`) as an Open Harness Hub processor component.
+  This is a thin wrapper over a third-party best-of-breed engine — OHH
+  does NOT rebuild it. The GLM takes `messages[]` plus a `knowledge[]`
+  array, prioritizes the supplied retrievals over its parametric memory,
+  emits inline attributions, and supports `avoid_commentary`. It scores
+  88% on Google's FACTS grounding benchmark (vs Gemini 2.0 Flash 84.6%,
+  Claude 3.5 Sonnet 79.4%, GPT-4o 78.8%) — a strong grounded-generation
+  engine.
+
+  WRAP, NOT REPLACE — and a precise distinction OHH leads with:
+  grounding != lift. Contextual's GLM produces answers FAITHFUL to the
+  retrieved documents (grounding). It does NOT measure, and does not
+  claim, the accuracy LIFT a component-over-a-corpus adds versus the same
+  bare model. What OHH adds ON TOP of the external engine:
+    - PROVENANCE: the `knowledge[]` this adapter is fed comes from a
+      GOVERNED corpus (signed publisher / verified source / freshness-
+      tracked), so "grounded" means grounded in provenance-carrying
+      content — not merely faithful to whatever was ingested.
+    - MEASURED-LIFT ADMISSION: admitted only when paired measurement
+      (`scripts/foundry/measure.py`) shows a positive, STRUCTURAL lift
+      (`scripts/eval/reason_codes.py`) from a SEPARATE evaluator — never
+      by the vendor's model-vs-model factuality number alone.
+    - COMPOSITION: slots into the seven-primitive grammar as an API-stage
+      Action, interchangeable at the schema boundary with OHH's
+      deterministic anti-hallucination pre-pass + governed-source path.
+
+  DETERMINISTIC / LOCAL FALLBACK: when no Contextual credentials are
+  configured, the pipeline falls back to
+  `processor/faithful-extract-before-model` — OHH's deterministic
+  extract-before-model anti-hallucination pre-pass that injects
+  machine-readable facts verbatim before any local model call. The hosted
+  GLM is a stronger grounded generator; the local path guarantees zero
+  hallucination on extractable fields offline.
+
+  Hosted engine, external trust boundary, external_call side effect:
+  routed to the external-metered worker pool (see
+  docs/architecture/component-execution-and-runtime-routing.md). Requires
+  a Contextual AI API key. Cost (Contextual list pricing, 2026): $3 per M
+  input tokens / $15 per M output tokens — metered per call.
+authors:
+  - name: "Contextual AI"
+    url: "https://contextual.ai"
+  - name: "Open Harness Hub contributors (governance wrapper)"
+license: "proprietary-saas-wrapped"
+industry:   ["ai", "cross_industry"]
+capability: ["generation", "retrieval", "verification"]
+modality:   ["text"]
+lifecycle:  "experimental"
+lifecycle_position: "api.model_call"
+trust_boundary: "external"
+links:
+  source:   "https://docs.contextual.ai/api-reference/generate/generate.md"
+  homepage: "https://contextual.ai/blog/introducing-grounded-language-model"
+attribution:
+  source_url:  "https://docs.contextual.ai/api-reference/generate/generate.md"
+  source_kind: "other"
+  author:      "Contextual AI (Douwe Kiela, Amanpreet Singh)"
+  license:     "Contextual AI commercial terms"
+tags:
+  - "contextual-ai"
+  - "wrapped-third-party"
+  - "hosted"
+  - "grounded-generation"
+  - "glm"
+  - "rag-2"
+  - "inline-attributions"
+  - "grounding-not-lift"
+  - "external-metered"
+  - "governance-wrapper"
+created: "2026-05-29"
+updated: "2026-05-29"
+
+process_kind: "call.grounded_generate"
+deterministic: false
+idempotent: true
+streaming: true
+latency_budget_ms: 60000
+
+inputs:
+  - name: "messages"
+    type: "object[]"
+  - name: "knowledge"
+    type: "object[]"
+  - name: "model"
+    type: "string"
+  - name: "avoid_commentary"
+    type: "boolean"
+outputs:
+  - name: "response"
+    type: "string"
+  - name: "attributions"
+    type: "object[]"
+  - name: "model"
+    type: "string"
+
+side_effects: "external_call"
+on_error: "fallback"
+retry:
+  max_attempts: 2
+  backoff: "exponential"
+
+model_targets:
+  - id: "contextual_glm"
+    label: "Contextual AI Grounded Language Model (hosted)"
+    transport: "openai_compatible"
+    role: "Hosted grounded generator with inline attributions; default when Contextual credentials are configured."
+    capabilities: [text_generation, chat, long_context]
+    required: false
+    default: true
+    trust_boundary: "external"
+
+implementations:
+  - kind: "http"
+    url: "https://api.contextual.ai/v1/generate"
+  - kind: "callable"
+    path: "scripts.processors.faithful_extract_before_model.run"
+    language: "python"

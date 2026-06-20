@@ -1,0 +1,21 @@
+{
+  "$id": "io/AckNackReceipt.v1",
+  "title": "AckNackReceipt.v1",
+  "type": "object",
+  "additionalProperties": true,
+  "description": "The outcome of a worker completing (ack) or failing (nack) a work item — projected from the FleetLedger task after ack_task/nack_task. ack => succeeded; nack(retryable) => retry_wait; nack(non-retryable or max attempts) => dead. Carries result refs or the error.",
+  "required": ["task_id", "worker_id", "outcome", "resulting_status", "attempt"],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "task_id": {"type": "string"},
+    "worker_id": {"type": "string"},
+    "outcome": {"type": "string", "enum": ["ack", "nack"]},
+    "resulting_status": {"type": "string", "enum": ["succeeded", "queued", "retry_wait", "dead"], "description": "queued = requeued for retry (the runtime does retry_wait->queued and clears the lease)"},
+    "retryable": {"type": ["boolean", "null"]},
+    "attempt": {"type": "integer"},
+    "result_artifact_ids": {"type": "array"},
+    "error_json": {"type": "object"},
+    "finished_at": {"type": ["string", "null"]},
+    "failed_at": {"type": ["string", "null"]}
+  }
+}

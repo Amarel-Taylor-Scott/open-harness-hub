@@ -1,0 +1,72 @@
+id: "pipeline/facilities-maintenance-workorders-review"
+type: pipeline
+version: "0.1.0"
+name: "Facilities Maintenance Workorders review pipeline"
+description: "End-to-end facilities maintenance workorders review with redaction, grep triage, RAG grounding, harness review, rubric scoring, and audit trace."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["facilities.maintenance", "infrastructure"]
+capability: ["evaluation", "extraction", "retrieval", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "stable"
+tags: ["facilities-maintenance-workorders", "use-case-expansion"]
+created: "2026-05-24"
+updated: "2026-05-24"
+task: "Review maintenance work orders for priority, safety impact, preventive maintenance gaps, vendor evidence, and closure quality."
+pipeline_kind: "review"
+inputs:
+  - name: "packet"
+    type: "string|object"
+outputs:
+  - name: "findings"
+    type: "object[]"
+  - name: "score"
+    type: "number"
+  - name: "evidence_gaps"
+    type: "object[]"
+defaults:
+  persona: "persona/facilities-maintenance-reviewer"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs: ["knowledge-pack/facilities-maintenance-workorders-frameworks"]
+  rule_packs: ["rule-pack/grep-facilities-maintenance-workorders-flags", "rule-pack/rag-facilities-maintenance-workorders-retrieval-policy"]
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.packet" }
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+  - id: "grep_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-facilities-maintenance-workorders-flags"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+  - id: "retrieve_context"
+    kind: "rule_pack"
+    ref: "rule-pack/rag-facilities-maintenance-workorders-retrieval-policy"
+    inputs: { query: "$.steps.grep_flags.output.fired", corpus: "knowledge-pack/facilities-maintenance-workorders-frameworks", top_k: 8 }
+  - id: "review_harness"
+    kind: "harness"
+    ref: "harness/facilities-maintenance-workorders-review"
+    inputs:
+      packet: "$.steps.redact_pii.output.text"
+      context: "$.steps.retrieve_context.output.passages"
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.review_harness.output.findings"
+      rubric_ref: "rubric/facilities-maintenance-workorders-quality-v1"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "facilities-maintenance-workorders-review"
+      applied_layers: ["privacy", "grep", "rag", "harness", "judge"]
+success_criteria:
+  - rubric: "rubric/facilities-maintenance-workorders-quality-v1"
+    threshold: 0.65

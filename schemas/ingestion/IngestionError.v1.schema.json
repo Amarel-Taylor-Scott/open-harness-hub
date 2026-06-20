@@ -1,0 +1,19 @@
+{
+  "$id": "ingestion/IngestionError.v1", "title": "IngestionError.v1", "type": "object", "additionalProperties": false,
+  "description": "A structured, non-fatal record of one thing that went wrong during an ingestion run (unreachable source, parser unavailable, malformed record, scope violation attempt). An error NEVER produces a served fact; a parser-unavailable error stores the raw object as a non-consumable SourceArtifact and records the reason here, so the connector degrades honestly instead of faking truth.",
+  "required": ["schema_version", "error_id", "run_id", "tenant_id", "source_id", "error_type", "retryable", "created_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["IngestionError.v1"]},
+    "error_id": {"type": "string"},
+    "run_id": {"type": "string"},
+    "tenant_id": {"type": "string"},
+    "source_id": {"type": "string"},
+    "adapter_id": {"type": "string"},
+    "error_type": {"type": "string", "enum": ["source_unreachable", "auth_failed", "rate_limited", "parser_unavailable", "malformed_record", "schema_validation_failed", "scope_violation", "idempotency_conflict", "unknown"]},
+    "retryable": {"type": "boolean"},
+    "message": {"type": "string"},
+    "offending_handle": {"type": "string"},
+    "raw_artifact_id": {"type": "string"},
+    "created_at": {"type": "string"}
+  }
+}

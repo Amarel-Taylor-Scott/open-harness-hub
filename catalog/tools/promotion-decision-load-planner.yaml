@@ -1,0 +1,64 @@
+id: "tool/promotion-decision-load-planner"
+type: tool
+version: "0.1.0"
+name: "Promotion decision load planner"
+description: "Exports promotion decisions, quality index records, and review tickets as CSV plus a psql load script for Postgres without connecting to the database."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["evaluation", "governance", "routing", "verification"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "promotion", "review-gate", "postgres", "quality-index"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    promotion_decisions_path:
+      type: string
+    index_records_path:
+      type: string
+    review_tickets_path:
+      type: string
+    output_dir:
+      type: string
+    load_sql_name:
+      type: string
+  required: ["promotion_decisions_path"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    promotion_decision_count:
+      type: integer
+    index_record_count:
+      type: integer
+    review_ticket_count:
+      type: integer
+    files:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      promotion_decisions_path: "dist/source-surface-scan-partitions/seed/load-plan/promotion/promotion-decisions.jsonl"
+      index_records_path: "dist/source-surface-scan-partitions/seed/load-plan/promotion/promotion-index-records.jsonl"
+      review_tickets_path: "dist/source-surface-scan-partitions/seed/load-plan/promotion/promotion-review-tickets.jsonl"
+      output_dir: "dist/source-surface-scan-partitions/seed/promotion-decision-load"
+    output:
+      ok: true
+      promotion_decision_count: 620
+      index_record_count: 620
+      review_ticket_count: 620
+implementations:
+  - kind: "callable"
+    path: "scripts.db.promotion_decision_load_plan.create_promotion_decision_load_plan"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.promotion_decision_load_plan"

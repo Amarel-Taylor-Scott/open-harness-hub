@@ -1,0 +1,76 @@
+id: "pipeline/model-runtime-training-component-seeds"
+type: pipeline
+version: "0.1.0"
+name: "Model runtime training component seeds"
+description: "Turns local model runtime, Kubernetes runtime, fine-tuning, evaluation, and federated reviewed-object sharing patterns into staged component row families for review and indexing."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["generation", "planning", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.model_ops"
+tags: ["components", "training", "fine-tuning", "local-models", "kubernetes", "federated-knowledge"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Generate staged model runtime, training, and federated knowledge-sharing component candidates without training models, downloading weights, or applying database mutations."
+pipeline_kind: "research_web.model_runtime_training_component_seeds"
+inputs:
+  - name: "seeds_path"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "normalized_component_rows"
+    type: "jsonl"
+  - name: "index_records"
+    type: "jsonl"
+  - name: "review_tickets"
+    type: "jsonl"
+  - name: "seed_summary"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/model-runtime-training-component-patterns"
+steps:
+  - id: "load-model-runtime-training-patterns"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/model-runtime-training-component-patterns"
+    inputs:
+      query: "local models Kubernetes fine tuning federated reviewed knowledge object sharing"
+      top_k: 20
+  - id: "export-model-runtime-training-rows"
+    kind: "tool"
+    ref: "tool/model-runtime-training-seed-exporter"
+    inputs:
+      seeds_path: "$.inputs.seeds_path"
+      output_dir: "$.inputs.output_dir"
+      excluded_scopes: ["insurance"]
+success_criteria:
+  - kind: "deterministic"
+    target: "$.export-model-runtime-training-rows.seed_count"
+    op: ">="
+    value: 10
+    severity: "high"
+    label: "The seed pack covers at least ten model/runtime/training component patterns."
+  - kind: "deterministic"
+    target: "$.export-model-runtime-training-rows.row_counts.normalized_object"
+    op: ">="
+    value: 10
+    severity: "high"
+    label: "The exporter emits database-backed component candidates."
+  - kind: "semantic"
+    target: "$.export-model-runtime-training-rows"
+    must_cover:
+      - "local runtime"
+      - "training governance"
+      - "Kubernetes runtime"
+      - "federated reviewed object sharing"
+      - "review gate"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "The generated candidates preserve the model-ops and sharing use cases."

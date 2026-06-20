@@ -1,0 +1,125 @@
+{
+  "created_at": "1970-01-01T00:00:00Z",
+  "kind": "baltor.version-timeline.v1",
+  "note": "append-only; current is a POINTER (still v1); v2 is a candidate pending review \u2014 NOT promoted, NOT applied (promotion boundary); receipts immutable",
+  "timelines": [
+    {
+      "corpus": "acme",
+      "corpus_label": "Acme Billing (synthetic, offline)",
+      "current_version_id": "obj-runbook-v1",
+      "object_id": "obj-runbook",
+      "predicate": "max_retries",
+      "versions": [
+        {
+          "applied": true,
+          "candidate_promoted": true,
+          "content_hash": "sha256:demo-runbook",
+          "context_object_id": "obj-runbook",
+          "context_version_id": "obj-runbook-v1",
+          "created_at": "2025-11-02T10:00:00Z",
+          "is_current": true,
+          "kind": "baltor.context-version.v1",
+          "observed_at": "2025-11-02T10:00:00Z",
+          "source_handle": "ctx://acme-billing/docs/billing-runbook.md#retry-policy",
+          "source_revision": "v1",
+          "status": "stale",
+          "valid_from": "2025-11-02T10:00:00Z",
+          "valid_to": null,
+          "value": 3
+        },
+        {
+          "applied": false,
+          "authority": "obj-adr-014",
+          "candidate_promoted": false,
+          "content_hash": "sha256:proposed-obj-runbook",
+          "context_object_id": "obj-runbook",
+          "context_version_id": "obj-runbook-v2",
+          "created_at": "1970-01-01T00:00:00Z",
+          "is_current": false,
+          "kind": "baltor.context-version.v1",
+          "lifecycle": "pending_review",
+          "observed_at": "1970-01-01T00:00:00Z",
+          "policy": {
+            "promotion_allowed": false,
+            "reason": "candidate pending human review (promotion boundary)"
+          },
+          "proposed_patch": {
+            "applied": false,
+            "authority": "obj-adr-014",
+            "from_value": 3,
+            "op": "update_claim",
+            "predicate": "max_retries",
+            "reason": "align obj-runbook with authoritative obj-adr-014 (=5); requires human/policy approval before apply",
+            "subject_id": "obj-runbook",
+            "to_value": 5
+          },
+          "receipt_ref": "rcpt-7d1e834e95c6",
+          "review_request_id": "rr-4f8b9ada7bd49159",
+          "source_handle": "ctx://acme-billing/docs/billing-runbook.md#retry-policy",
+          "source_revision": "v2-proposed",
+          "status": "proposed",
+          "value": 5
+        }
+      ]
+    },
+    {
+      "corpus": "cfpb",
+      "corpus_label": "CFPB sample (synthetic, offline)",
+      "current_version_id": "obj-faq-v1",
+      "object_id": "obj-faq",
+      "predicate": "error_resolution_days",
+      "versions": [
+        {
+          "applied": true,
+          "candidate_promoted": true,
+          "content_hash": "sha256:demo-faq",
+          "context_object_id": "obj-faq",
+          "context_version_id": "obj-faq-v1",
+          "created_at": "2025-09-01T10:00:00Z",
+          "is_current": true,
+          "kind": "baltor.context-version.v1",
+          "observed_at": "2025-09-01T10:00:00Z",
+          "source_handle": "ctx://cfpb-sample/docs/disputes-faq.md#timeline",
+          "source_revision": "v1",
+          "status": "stale",
+          "valid_from": "2025-09-01T10:00:00Z",
+          "valid_to": null,
+          "value": 30
+        },
+        {
+          "applied": false,
+          "authority": "obj-rege",
+          "candidate_promoted": false,
+          "content_hash": "sha256:proposed-obj-faq",
+          "context_object_id": "obj-faq",
+          "context_version_id": "obj-faq-v2",
+          "created_at": "1970-01-01T00:00:00Z",
+          "is_current": false,
+          "kind": "baltor.context-version.v1",
+          "lifecycle": "pending_review",
+          "observed_at": "1970-01-01T00:00:00Z",
+          "policy": {
+            "promotion_allowed": false,
+            "reason": "candidate pending human review (promotion boundary)"
+          },
+          "proposed_patch": {
+            "applied": false,
+            "authority": "obj-rege",
+            "from_value": 30,
+            "op": "update_claim",
+            "predicate": "error_resolution_days",
+            "reason": "align obj-faq with authoritative obj-rege (=10); requires human/policy approval before apply",
+            "subject_id": "obj-faq",
+            "to_value": 10
+          },
+          "receipt_ref": "rcpt-047bea64f222",
+          "review_request_id": "rr-941a164ccbd77994",
+          "source_handle": "ctx://cfpb-sample/docs/disputes-faq.md#timeline",
+          "source_revision": "v2-proposed",
+          "status": "proposed",
+          "value": 10
+        }
+      ]
+    }
+  ]
+}

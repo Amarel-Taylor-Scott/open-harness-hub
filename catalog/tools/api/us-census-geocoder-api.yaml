@@ -1,0 +1,86 @@
+id: "tool/us-census-geocoder-api"
+type: tool
+version: "0.1.0"
+name: "US Census Geocoder API"
+description: |
+  Resolves a street address (or coordinates) to a standardized address plus its
+  Census geographies: state/county FIPS, tract, block, and GEOID. The bridge
+  from messy address strings to the geography codes the ACS API needs.
+
+  Capability lift: a bare LLM cannot reliably map an address to its census tract
+  or county FIPS. This tool returns the canonical geographies deterministically,
+  enabling address → FIPS → ACS-figure grounding chains.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["government", "cross_industry"]
+capability: ["retrieval", "tool_use", "format_conversion"]
+modality: ["structured", "spatial"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "stable"
+tags: ["census", "geocoder", "fips", "geography", "api", "address"]
+created: "2026-05-27"
+updated: "2026-05-27"
+
+attribution:
+  source_url: "https://geocoding.geo.census.gov/geocoder/"
+  source_kind: "other"
+  author: "U.S. Census Bureau"
+  license: "public-domain"
+
+parameters:
+  type: object
+  required: ["address", "benchmark"]
+  properties:
+    address:
+      type: string
+      description: "One-line street address, e.g. '1600 Pennsylvania Ave NW, Washington, DC 20500'."
+    benchmark:
+      type: string
+      description: "Geocoder benchmark, e.g. 'Public_AR_Current'."
+      default: "Public_AR_Current"
+    vintage:
+      type: string
+      description: "Geography vintage for 'geographies' return type, e.g. 'Current_Current'."
+    return_type:
+      type: string
+      enum: ["locations", "geographies"]
+      description: "'geographies' also returns FIPS/tract/block."
+      default: "geographies"
+
+returns:
+  type: object
+  properties:
+    matched_address:
+      type: string
+    coordinates:
+      type: object
+      properties: { x: { type: number }, y: { type: number } }
+    geographies:
+      type: object
+      description: "state/county FIPS, tract, block, GEOID when return_type='geographies'."
+    source_url:
+      type: string
+
+side_effects: "external_call"
+
+examples:
+  - input:
+      address: "1600 Pennsylvania Ave NW, Washington, DC 20500"
+      benchmark: "Public_AR_Current"
+      return_type: "geographies"
+    output:
+      matched_address: "1600 PENNSYLVANIA AVE NW, WASHINGTON, DC, 20500"
+      geographies:
+        state: "11"
+        county: "001"
+        tract: "006202"
+      source_url: "https://geocoding.geo.census.gov/geocoder/geographies/onelineaddress?address=...&benchmark=Public_AR_Current&vintage=Current_Current&format=json"
+    notes: "Feed state+county into tool/us-census-acs-api's for/in clauses."
+
+implementations:
+  - kind: http
+    method: GET
+    url: "https://geocoding.geo.census.gov/geocoder/{return_type}/onelineaddress"
+    notes: "Query: address, benchmark, vintage (for geographies), format=json."

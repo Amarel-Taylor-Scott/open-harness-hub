@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor · Optimization & Efficiency</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../shared/oh-tokens.css" />
+<link rel="stylesheet" href="../shared/oh-components.css" />
+<link rel="stylesheet" href="../shared/oh-site.css" />
+<link rel="stylesheet" href="guided-demo.css" />
+<link rel="stylesheet" href="engine-stagenav.css" />
+<script src="../shared/oh-experiments.js"></script>
+<script src="track.js"></script>
+<script src="engine-stagenav.js"></script>
+<style>
+  /* Optimization showcase — token-lean cited packs WITHOUT losing fidelity. Efficiency is
+     one component of the governed-context engine; source handles + held-out survive every tier. */
+  .op-tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; margin-top: 4px; }
+  @media (max-width: 820px) { .op-tiers { grid-template-columns: 1fr; } }
+  .op-tier { display: flex; flex-direction: column; padding: 0; overflow: hidden; cursor: pointer; transition: border-color .12s, box-shadow .12s; }
+  .op-tier.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .op-tier-h { padding: 15px 17px 13px; border-bottom: 1px solid var(--line); }
+  .op-tier-k { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-faint); }
+  .op-tier-nm { font-size: 16px; font-weight: 700; letter-spacing: -.01em; margin-top: 4px; }
+  .op-tier-tok { font-family: var(--font-display); font-size: 30px; font-weight: 800; letter-spacing: -.03em; color: var(--accent); line-height: 1; margin-top: 10px; }
+  .op-tier-tok small { font-size: 13px; font-weight: 600; color: var(--fg-muted); }
+  .op-tier-body { padding: 14px 17px; font-size: 12.5px; line-height: 1.5; color: var(--fg-muted); }
+  .op-tier-body b { color: var(--fg); font-weight: 600; }
+  .op-keep { margin-top: auto; padding: 12px 17px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
+  .op-keep .row { display: flex; align-items: center; gap: 8px; font-size: 11.5px; }
+  .op-keep .row .ic { width: 15px; text-align: center; flex: 0 0 auto; }
+  .op-keep .yes { color: var(--success); } .op-keep .yes .ic { color: var(--success); }
+  .op-keep .lossy { color: var(--danger); } .op-keep .lossy .ic { color: var(--danger); }
+
+  .op-bar { height: 30px; border-radius: var(--r-sm); background: var(--bg-subtle); border: 1px solid var(--line); overflow: hidden; position: relative; display: flex; align-items: center; }
+  .op-bar i { height: 100%; background: var(--accent); opacity: .22; }
+  .op-bar span { position: absolute; left: 11px; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--fg); }
+  .op-bar small { position: absolute; right: 11px; font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted); }
+  .op-barrow { display: grid; grid-template-columns: 120px 1fr; gap: 12px; align-items: center; padding: 7px 0; }
+  .op-barrow .bl { font-size: 12.5px; color: var(--fg-muted); }
+
+  .op-fid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  @media (max-width: 680px) { .op-fid { grid-template-columns: 1fr 1fr; } }
+  .op-fid .f { padding: 13px 15px; }
+  .op-fid .v { font-family: var(--font-display); font-size: 22px; font-weight: 800; letter-spacing: -.02em; color: var(--accent); line-height: 1; }
+  .op-fid .k { font-size: 11.5px; color: var(--fg-muted); margin-top: 6px; line-height: 1.35; }
+
+  .op-warn { font-family: var(--font-mono); font-size: 11.5px; color: var(--warning); border: 1px solid color-mix(in srgb, var(--warning) 30%, var(--line)); background: color-mix(in srgb, var(--warning) 9%, transparent); border-radius: var(--r-sm); padding: 11px 14px; margin-top: 16px; line-height: 1.5; }
+</style>
+</head>
+<body class="oh dir-d theme-dark oh-site cd" data-page="engine_optimization">
+<div class="cd-top"><div class="cd-wrap" style="display:flex;align-items:center;gap:14px;padding-top:0;padding-bottom:0;width:100%;box-sizing:border-box;">
+  <a class="cd-logo" href="Baltor Guided Demos.html"><span class="cd-mark">◳</span><span>Baltor<small>optimization &amp; efficiency</small></span></a>
+  <span class="sp"></span>
+  <a class="cd-back" href="Baltor Engine.html">← The engine</a>
+  <span class="cd-tag" style="margin-left:14px;">Lean — without losing the proof</span>
+</div></div>
+
+<div class="cd-wrap">
+  <section class="cd-hero">
+    <div class="cd-eyebrow">Engine component · optimization</div>
+    <h1>Fewer tokens. Same proof.</h1>
+    <p>Optimization is one stage of the governed-context engine — it distills a verified pack to the smallest form that still answers the task, and ships three tiers so you trade cost against detail on purpose. The rule that makes it safe: <b>token reduction is not success unless fidelity survives</b>. Source handles, citations and held-out warnings carry through every tier — compression never deletes the proof.</p>
+  </section>
+
+  <section class="cd-sec">
+    <div class="cd-sec-h"><h2>Three tiers, one corpus</h2><span class="note">Same verified facts · different budgets · tap a tier</span></div>
+    <div class="op-tiers" id="tiers"></div>
+  </section>
+
+  <section class="cd-sec">
+    <div class="cd-sec-h"><h2>Measured on the CFPB pack</h2><span class="note">Tokens to answer “What’s the Reg E error-resolution deadline?”</span></div>
+    <div class="oh-card oh-card--pad" id="bars"></div>
+    <div class="op-warn">⚠ A token win that drops a citation or a held-out warning is a <b>regression</b>, not an optimization. Baltor’s verification rail re-checks the optimized pack and fails it if a source handle or contradiction was lost — efficiency never overrides provenance.</div>
+  </section>
+
+  <section class="cd-sec">
+    <div class="cd-sec-h"><h2>What survives compression</h2><span class="note">Fidelity held at the hyper-efficient tier</span></div>
+    <div class="op-fid" id="fid"></div>
+  </section>
+
+  <div class="cd-foot"><b>Efficiency beside the rest.</b> Optimization sits alongside reconciliation, hardening, enhancement and verification — a lean pack is only valuable because every other stage already made it correct, current and cited. See the <a href="Baltor Guided Demos.html">guided demos</a> for the full pipeline and the <a href="Baltor Context Governance Report.html">governance report</a> for where efficiency lands in the audit output. <b>Not legal, medical, or financial advice.</b></div>
+</div>
+
+<script>
+const TIERS = [
+  { k:'tier 1 · raw', nm:'Raw verified', tok:['1.0','×'], pct:100,
+    body:'The full reconciled, verified context with <b>every</b> citation, note and lineage record inline. Maximum detail — for review, audit, and high-stakes reasoning.',
+    keep:[['✓','yes','Source handles'],['✓','yes','Citations'],['✓','yes','Held-out warnings'],['✓','yes','Full lineage inline']] },
+  { k:'tier 2 · compressed', nm:'Compressed', tok:['0.28','×'], pct:28,
+    body:'Distilled to the load-bearing facts with citations attached and lineage <b>by reference</b>. The everyday tier — most of the detail, a fraction of the tokens.',
+    keep:[['✓','yes','Source handles'],['✓','yes','Citations'],['✓','yes','Held-out warnings'],['↗','yes','Lineage by handle']] },
+  { k:'tier 3 · hyper', nm:'Hyper-efficient', tok:['0.06','×'], pct:6,
+    body:'The answer plus its claim-level citations and any held-out warning — nothing else. For tight context budgets and high-volume serving, still <b>fully cited</b>.',
+    keep:[['✓','yes','Source handles'],['✓','yes','Citations'],['✓','yes','Held-out warnings'],['—','lossy','Prose dropped (recoverable by handle)']] },
+];
+let cur = 2;
+function tier(t, i) {
+  return `<div class="oh-card op-tier${i===cur?' on':''}" data-i="${i}">
+    <div class="op-tier-h">
+      <div class="op-tier-k">${t.k}</div>
+      <div class="op-tier-nm">${t.nm}</div>
+      <div class="op-tier-tok">${t.tok[0]}<small>${t.tok[1]} tokens</small></div>
+    </div>
+    <div class="op-tier-body">${t.body}</div>
+    <div class="op-keep">${t.keep.map(k=>`<div class="row ${k[1]}"><span class="ic">${k[0]}</span>${k[2]}</div>`).join('')}</div>
+  </div>`;
+}
+document.getElementById('tiers').innerHTML = TIERS.map(tier).join('');
+document.getElementById('tiers').addEventListener('click', (e) => {
+  const c = e.target.closest('[data-i]'); if (!c) return;
+  cur = +c.dataset.i;
+  document.querySelectorAll('.op-tier').forEach((el,i)=>el.classList.toggle('on', i===cur));
+  drawBars();
+});
+function drawBars() {
+  document.getElementById('bars').innerHTML = TIERS.map((t,i) =>
+    `<div class="op-barrow"><div class="bl"${i===cur?' style="color:var(--accent);font-weight:600"':''}>${t.nm}</div>
+      <div class="op-bar"><i style="width:${t.pct}%"></i><span>${Math.round(t.pct*42)} tok</span><small>${t.tok[0]}×</small></div></div>`).join('');
+}
+drawBars();
+document.getElementById('fid').innerHTML = [
+  ['100%','Citations preserved','every served claim still resolves to a source handle'],
+  ['0','Held-out warnings dropped','contradictions survive to the leanest tier'],
+  ['16×','Smaller, same answer','hyper vs raw on the CFPB pack'],
+  ['1','Verification rail','re-checks the optimized pack, fails on lost provenance'],
+].map(f=>`<div class="oh-card f"><div class="v">${f[0]}</div><div class="k"><b style="color:var(--fg)">${f[1]}</b><br>${f[2]}</div></div>`).join('');
+if (window.mountStageNav) window.mountStageNav('optimization');
+</script>
+</body>
+</html>

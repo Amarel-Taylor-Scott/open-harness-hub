@@ -1,0 +1,161 @@
+{
+  "version": "1.0",
+  "note": "CANDIDATE Open*Hub.io websites drawn from modular components already built/cataloged in this system. PRIVATE-FIRST: each is a private surface now; it opens (public site + open-sourced registry) only when the open_trigger fires (a real competitor comes online OR a planned release), AND only after owner domain/trademark clearance. NONE is public/active here. Governance: discovery!=trust; a hub registers/\u25b8discovers artifacts, it is NOT a truth authority; candidate!=active; benchmark/review/registry output never auto-promotes. Branded-house: a new hub = makeHub(config) + ONE accent + a products.js PORTFOLIO entry (the openharness design bundle) \u2014 no new framework.",
+  "release_policy": {
+    "default_status": "private_first",
+    "open_when": "a credible competitor launches in the hub's lane OR a planned public release milestone \u2014 whichever first; recorded per-hub as open_trigger",
+    "domain_trademark": "owner_clearance_required before any public .io site (same gate as the existing gap-three-hub-sites blocker)",
+    "discovery_is_not_trust": true,
+    "never": [
+      "public/active without owner domain+trademark clearance",
+      "registry output as truth",
+      "auto-open without the trigger"
+    ]
+  },
+  "existing_hubs": [
+    "OpenContextHub",
+    "OpenSkillsHub",
+    "OpenToolsHub",
+    "OpenMCPHub",
+    "OpenCompressionHub",
+    "OpenBenchmarkHub",
+    "OpenHarnessHub",
+    "OpenSkillToTool",
+    "OpenReviewHub"
+  ],
+  "candidates": [
+    {
+      "hub_id": "OpenTemplatesHub",
+      "proposed_domain": "opentemplateshub.io",
+      "domain_status": "owner_clearance_required",
+      "thesis": "Reusable starting SHAPES: schema / runtime / API-UI / inference-preference / PurposeTask template families. Templates generate starting shapes; harnesses prove the generated outputs work.",
+      "registers": "TemplateArtifact / SchemaObjectTemplate families + the canonical 14-section object shell + schema mixins",
+      "modular_component_source": "Shared Template Registry (src/teleon/templates + templates/ tree)",
+      "distinct_from": "OpenHarnessHub proves behaviour; OpenToolsHub holds executables; templates are the SHAPE you instantiate (candidate, never active)",
+      "status": "candidate",
+      "release_status": "private_first",
+      "open_trigger": "already earmarked OpenTemplatesHub.io; open when a public schema/scaffold-template registry competitor appears or at the next release",
+      "maturity": "ready_substrate"
+    },
+    {
+      "hub_id": "OpenEndpointHub",
+      "proposed_domain": "openendpointhub.io",
+      "domain_status": "owner_clearance_required",
+      "thesis": "Governed due-diligence for LLM ENDPOINTS: official free/limited + low-cost (incl. Chinese) providers + gateway/proxy repos, classified official|discovery|aggregator|quarantine with data-use/region/ToS posture. The governed answer to 'which cheap endpoint can I actually use, for what data?'",
+      "registers": "FreeLimitedEndpoint + lowcost endpoint nodes + GatewayRepoAssessment + EndpointDueDiligenceReport",
+      "modular_component_source": "free_limited_llm_endpoint_registry + lowcost_llm_endpoint_registry + free_endpoint_intel + gateway_repo_watchlist",
+      "distinct_from": "OpenMCPHub registers MCP servers; OpenToolsHub registers executables; this registers MODEL ENDPOINTS + their data-class/jurisdiction eligibility (the load-bearing guard)",
+      "status": "candidate",
+      "release_status": "private_first",
+      "open_trigger": "open as governed-endpoint-registry competitors (vs the ungoverned free-LLM-list repos) emerge; differentiator = data-class/jurisdiction governance + quarantine policy",
+      "maturity": "ready_substrate"
+    },
+    {
+      "hub_id": "OpenEnvironmentHub",
+      "proposed_domain": "openenvironmenthub.io",
+      "domain_status": "owner_clearance_required",
+      "thesis": "Verifiable agent EVAL ENVIRONMENTS + reward specs (Repo2RLEnv / Harbor / OpenEnv class): a repo/task becomes a runnable environment with an executable reward. A benchmark is a definition; an environment is the runnable thing you score against.",
+      "registers": "AgentEnvironmentArtifact + RewardSpec + EnvironmentProviderNode + the Harbor-format intake",
+      "modular_component_source": "Environment + Reward Spine (schemas/environments/* + agent_environment_research_registry)",
+      "distinct_from": "OpenBenchmarkHub = benchmark definitions + result records; OpenHarnessHub = runners/rubrics; OpenEnvHub = the runnable ENVIRONMENT + reward (evidence, never promotion authority)",
+      "status": "candidate",
+      "release_status": "private_first",
+      "open_trigger": "open as repo->RL-env / verifiable-env competitors (Repo2RLEnv-style) gain traction; differentiator = governance + held-out + source-handle coverage",
+      "maturity": "ready_substrate",
+      "naming_note": "full word 'Environment' (owner preference: no abbreviations)"
+    },
+    {
+      "hub_id": "OpenSandboxHub",
+      "proposed_domain": "opensandboxhub.io",
+      "domain_status": "owner_clearance_required",
+      "thesis": "Isolated EXECUTION SANDBOX registry + risk / conformance / visibility scoring (E2B / Daytona / CubeSandbox / kubernetes-sigs agent-sandbox / Docker). Discovery is not trust: a sandbox must pass a conformance + risk profile before it runs candidate work.",
+      "registers": "SandboxProviderNode + conformance/risk profiles + run-isolation policy",
+      "modular_component_source": "sandbox_provider_catalog + src/teleon/sandbox (SandboxProviderPort)",
+      "distinct_from": "OpenMCPHub does this for MCP servers; OpenSandboxHub is the same discovery+risk+conformance pattern for sandboxed runtimes (sandbox output never truth)",
+      "status": "candidate",
+      "release_status": "private_first",
+      "open_trigger": "open as agent-sandbox runtimes proliferate (agent-sandbox CRD, CubeSandbox, etc.) and a registry is needed",
+      "maturity": "ready_substrate"
+    },
+    {
+      "hub_id": "OpenAgentHub",
+      "proposed_domain": "openagenthub.io",
+      "domain_status": "owner_clearance_required",
+      "thesis": "AGENT-RUNTIME / harness registry: open-ended agent runtimes (OpenClaw / Hermes / ARK / AgentScope / kagent) as CANDIDATE bounded adapters + agent capability cards + run receipts. Agents propose; they never serve truth.",
+      "registers": "AgentRuntime/AgentProviderNode + AgentRunReceipt + capability cards (the agent-runtime catalog + teleon_runtime_landscape entries)",
+      "modular_component_source": "agent_runtime_catalog + agent_runtime_provider + teleon_runtime_landscape + the Agent Capability Gateway",
+      "distinct_from": "OpenSkillsHub = reusable know-how; OpenToolsHub = executables; OpenHarnessHub = eval; OpenAgentHub = the RUNTIMES that run agents (candidate, sandboxed, never the truth authority)",
+      "status": "candidate",
+      "release_status": "private_first",
+      "open_trigger": "open as a neutral agent-runtime registry need emerges (vs vendor-locked agent app stores); keep agents bounded-candidate",
+      "maturity": "ready_substrate"
+    },
+    {
+      "hub_id": "OpenReceiptHub",
+      "proposed_domain": "openreceipthub.io",
+      "domain_status": "owner_clearance_required",
+      "thesis": "Portable signed RECEIPT + provenance + AI-BOM standards: ModelInvocationReceipt / AgentRunReceipt / EnvironmentRunReceipt schemas mapped to the open supply-chain stack (Sigstore/Rekor, in-toto, CycloneDX AI-BOM, OpenSSF). The portable-receipt moat as a public standard surface.",
+      "registers": "Receipt schemas + provenance/attestation standard mappings + verification recipes",
+      "modular_component_source": "the receipt schemas across the system (inference/agents/environments) + the BACKEND-STACK open-standards mapping",
+      "distinct_from": "OpenReviewHub = scrutiny/verdict on an artifact; OpenReceiptHub = the portable, signed ATTESTATION standard a served fact/run carries (complementary: review produces a verdict, the receipt makes it portable + verifiable)",
+      "status": "candidate",
+      "release_status": "private_first",
+      "open_trigger": "open when portable-AI-provenance standards consolidate and an interop registry is needed; this is a standards-credibility play",
+      "maturity": "emerging"
+    },
+    {
+      "hub_id": "OpenStateHub",
+      "proposed_domain": "openstatehub.io",
+      "domain_status": "owner_clearance_required",
+      "thesis": "Governed persistent agent STATE: blackboard schemas + memory/state providers (Irys-style blackboard, mem0 / letta / graphiti) as candidates, with provenance + held-out + tenant scoping. Durable governed state, not volatile prompt context.",
+      "registers": "Blackboard contracts + memory/state provider nodes + GovernedBlackboardEntry",
+      "modular_component_source": "the blackboard spine (schemas/blackboard/*) + stateful_swarm/blackboard provider catalogs + the memory provider catalog",
+      "distinct_from": "OpenContextHub = governed TRUTH packs/source-handles (what may be served); OpenStateHub = durable agent working STATE (analytical, candidate, never auto-served as truth)",
+      "status": "candidate",
+      "release_status": "private_first",
+      "open_trigger": "open as stateful-swarm / persistent-agent-memory architectures (Irys, etc.) become a category; earliest-stage of these candidates",
+      "maturity": "emerging"
+    },
+    {
+      "hub_id": "OpenToolToSkillHub",
+      "proposed_domain": "opentooltoskillhub.io",
+      "domain_status": "owner_clearance_required",
+      "thesis": "BIDIRECTIONAL Skill<->Tool conversion + a CERTIFICATION/trust layer: turn MCP/OpenAPI/CLI tools into portable Agent Skills (SKILL.md), and compile Skills into typed/tested/DETERMINISTIC tools \u2014 each conversion signed, sandboxed, tested, permission-declared. The wedge is VERIFIED conversion + a trust badge, because skill marketplaces have a real security problem (malicious-skill audits found credential-theft skills).",
+      "registers": "skill<->tool conversion packages (SKILL.md + tool.yaml + schemas + evals + security/SBOM/signatures) + certification reports",
+      "modular_component_source": "skill_to_tool_promotion_catalog + the Determinism Factory (deterministic-tool standard) + OpenReviewHub (certification/verdict) + the existing OpenSkillToTool.io (skill->tool direction)",
+      "distinct_from": "OpenSkillToTool.io = skill->tool ONLY; this adds tool->skill + bidirectional + a CERTIFICATION trust layer. OpenSkillsHub=skills, OpenToolsHub=tools; this is the verified CONVERSION + trust layer between them. Landscape: mcp2skill (MCP->Skill, CLI), SkillSmith (skill->runtime/tool compile, research), SkillClaw (skill evolution upstream), registries (skills-hub.ai/Portkey = discovery not verified-conversion) \u2014 verified BIDIRECTIONAL + certification is open whitespace.",
+      "status": "candidate",
+      "release_status": "private_first",
+      "open_trigger": "open as mcp2skill / SkillSmith-style converters mature; differentiator = verified + certified + bidirectional (a trust badge, not 'more skills'). Pairs with OpenSkillToTool.io (could merge into one bidirectional hub).",
+      "maturity": "ready_substrate",
+      "naming_note": "full words (owner: no abbreviations)"
+    },
+    {
+      "hub_id": "OpenCurrentContextHub",
+      "proposed_domain": "opencurrentcontext.io",
+      "domain_status": "owner_clearance_required",
+      "thesis": "Get CURRENT/fresh context on demand: watch a query/source, detect change, alert + serve the fresh source-handled context. The freshness rail as a standalone product. MVP = a Google-Alert-style watch (query/source -> change detection -> alert).",
+      "registers": "context watches + freshness/change signals + current-context responses (with source handles + freshness timestamps)",
+      "modular_component_source": "Baltor Anti-Fragility/freshness/CDC + the Fragile Context Atlas + sanctions_feed_live (live official-source fetch) + the fragile_fact_watchtower opportunity",
+      "distinct_from": "OpenContextHub = governed context PACKS (point-in-time, what may be served); OpenCurrentContextHub = the CURRENT/changing EDGE (freshness, watches, alerts). GOVERNANCE: current != verified (freshness != correctness); a change-alert is a SIGNAL that triggers re-verification, NEVER auto-truth. Use official feeds/APIs (eCFR/Federal Register/sanctions), no ToS-violating scraping.",
+      "status": "candidate",
+      "release_status": "private_first",
+      "open_trigger": "open as live-context/freshness competitors emerge; differentiator = GOVERNED freshness (signal->verify, not a raw alert; source handles + provenance).",
+      "maturity": "emerging",
+      "naming_note": "full words (owner: no abbreviations)"
+    },
+    {
+      "hub_id": "OpenRoutingHub",
+      "proposed_domain": "openroutinghub.io",
+      "domain_status": "owner_clearance_required",
+      "thesis": "Open, portable ABSTRACTS for model-routing POLICY: how an object/agent declares LLM preferences and how a router resolves them \u2014 provider-selection graphs, lane policies (dev/agent/interactive/batch/self-host), governed fallback chains, and the receipt shape that records the model ACTUALLY used. Owner-proposed 2026-06-09.",
+      "registers": "OpenInferencePreferenceSpec (OIPS) cards \u00b7 numeric provider-selection graphs \u00b7 model-CLASS\u2192rate lane policies \u00b7 fallback/cost policies \u00b7 ModelInvocationReceipt shapes \u2014 policies and preference specs only, never live keys or a routing runtime",
+      "modular_component_source": "Inference Gateway + OIPS (src/teleon/inference) + the numeric provider-selection graph (prompts/baltor-numeric-provider-selection-graph) + LLM-ECONOMICS five lanes (design_handoff_platform_productionization/production/cloud/LLM-ECONOMICS.md) + scripts/billing_ledger CLASS\u2192rate map",
+      "distinct_from": "OpenEndpointHub catalogs ENDPOINTS (where a model lives); OpenRoutingHub catalogs POLICY (how to choose/fall-back among them). Teleon's inference gateway is the RUNTIME that consumes these cards; the hub is the open registry of the cards (candidate, never active, never serves keys or truth).",
+      "status": "candidate",
+      "release_status": "private_first",
+      "open_trigger": "open as a portable model-routing / LLM-gateway-policy registry competitor appears (e.g. an OpenRouter-style preference-spec standard) OR at the inference-gateway public release \u2014 whichever first",
+      "maturity": "ready_substrate"
+    }
+  ]
+}

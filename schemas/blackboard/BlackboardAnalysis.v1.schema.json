@@ -1,0 +1,21 @@
+{
+  "$id": "blackboard/BlackboardAnalysis.v1",
+  "title": "BlackboardAnalysis.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "An ANALYSIS entry: a claim a worker derived by reasoning over earlier entries. supporting_entry_ids[] preserves the lineage from the claim to the observations/calculations it rests on (a conclusion always points back to its support). serves_truth is pinned const false — an analysis is the swarm's reasoning, NEVER served truth; only Baltor's separate governance layer (GovernedBlackboardEntry + verification) may make anything derived from it promotable.",
+  "required": [
+    "entry_id",
+    "blackboard_id",
+    "claim",
+    "supporting_entry_ids",
+    "serves_truth"
+  ],
+  "properties": {
+    "entry_id": {"type": "string", "description": "id of the BlackboardEntry (kind=analysis) this body belongs to"},
+    "blackboard_id": {"type": "string", "description": "the blackboard this analysis belongs to"},
+    "claim": {"type": "string", "description": "the derived claim/conclusion"},
+    "supporting_entry_ids": {"type": "array", "items": {"type": "string"}, "description": "entry_ids of the observations/calculations/sources this claim rests on (lineage from conclusion to support)"},
+    "serves_truth": {"type": "boolean", "const": false, "description": "ALWAYS false — an analysis is swarm reasoning, never served truth; promotion is a separate Baltor-governed decision"}
+  }
+}

@@ -49,12 +49,13 @@
         "defaults": {
           "type": "object",
           "properties": {
-            "persona":         { "$ref": "_common.schema.json#/$defs/artifactId" },
-            "model_adapter":   { "$ref": "_common.schema.json#/$defs/artifactId" },
-            "knowledge_packs": { "type": "array", "items": { "$ref": "_common.schema.json#/$defs/artifactId" } },
-            "rule_packs":      { "type": "array", "items": { "$ref": "_common.schema.json#/$defs/artifactId" } }
+            "persona":         { "$ref": "_common.schema.json#/$defs/componentId" },
+            "model_adapter":   { "$ref": "_common.schema.json#/$defs/componentId" },
+            "knowledge_packs": { "type": "array", "items": { "$ref": "_common.schema.json#/$defs/componentId" } },
+            "rule_packs":      { "type": "array", "items": { "$ref": "_common.schema.json#/$defs/componentId" } }
           }
         },
+        "prompt_abi": { "$ref": "_common.schema.json#/$defs/promptAbi" },
         "steps": {
           "type": "array",
           "minItems": 1,
@@ -82,7 +83,7 @@
                 "required": ["rubric", "threshold"],
                 "properties": {
                   "kind":      { "const": "rubric" },
-                  "rubric":    { "$ref": "_common.schema.json#/$defs/artifactId" },
+                  "rubric":    { "$ref": "_common.schema.json#/$defs/componentId" },
                   "threshold": { "type": "number" },
                   "severity":  { "type": "string", "enum": ["critical", "high", "medium", "low"] },
                   "label":     { "type": "string" }
@@ -108,7 +109,7 @@
                   "kind":        { "const": "semantic" },
                   "target":      { "type": "string" },
                   "must_cover":  { "type": "array", "items": { "type": "string" }, "minItems": 1, "description": "Reference topics — embedding similarity to each must clear similarity_threshold." },
-                  "embedder":    { "$ref": "_common.schema.json#/$defs/artifactId" },
+                  "embedder":    { "$ref": "_common.schema.json#/$defs/componentId" },
                   "similarity_threshold": { "type": "number", "default": 0.6 },
                   "severity":    { "type": "string", "enum": ["critical", "high", "medium", "low"] },
                   "label":       { "type": "string" }
@@ -120,8 +121,8 @@
                 "properties": {
                   "kind":         { "const": "llm_judge" },
                   "target":       { "type": "string" },
-                  "rubric":       { "$ref": "_common.schema.json#/$defs/artifactId" },
-                  "judge_adapter":{ "$ref": "_common.schema.json#/$defs/artifactId" },
+                  "rubric":       { "$ref": "_common.schema.json#/$defs/componentId" },
+                  "judge_adapter":{ "$ref": "_common.schema.json#/$defs/componentId" },
                   "prompt":       { "type": "string", "description": "Optional custom prompt; otherwise derived from rubric." },
                   "threshold":    { "type": "number" },
                   "severity":     { "type": "string", "enum": ["critical", "high", "medium", "low"] },
@@ -145,7 +146,7 @@
                 "required": ["kind", "tool"],
                 "properties": {
                   "kind":     { "const": "tool_validate" },
-                  "tool":     { "$ref": "_common.schema.json#/$defs/artifactId" },
+                  "tool":     { "$ref": "_common.schema.json#/$defs/componentId" },
                   "target":   { "type": "string" },
                   "params":   { "type": "object" },
                   "severity": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
@@ -167,16 +168,16 @@
         },
         "output_safety_packs": {
           "type": "array",
-          "items": { "$ref": "_common.schema.json#/$defs/artifactId" },
-          "description": "Required when modality includes image/audio/video. Rule packs that screen the generated artifact."
+          "items": { "$ref": "_common.schema.json#/$defs/componentId" },
+          "description": "Required when modality includes image/audio/video. Rule packs that screen the generated component."
         },
         "style_packs": {
           "type": "array",
-          "items": { "$ref": "_common.schema.json#/$defs/artifactId" }
+          "items": { "$ref": "_common.schema.json#/$defs/componentId" }
         },
         "physics_packs": {
           "type": "array",
-          "items": { "$ref": "_common.schema.json#/$defs/artifactId" }
+          "items": { "$ref": "_common.schema.json#/$defs/componentId" }
         }
       }
     }

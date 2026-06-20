@@ -1,0 +1,79 @@
+# ---------------------------------------------------------------------------
+# Open Harness Hub .gitignore
+#
+# Goal: never accidentally stage generated factory output, local reference
+# clones, or OS/tooling cruft. Curated, published outputs are negated back in.
+#
+# Note: already-tracked files stay tracked regardless of these rules. To add a
+# new file under an ignored path on purpose, use `git add -f <path>`.
+# ---------------------------------------------------------------------------
+
+# --- OS / editor cruft ---
+.DS_Store
+Thumbs.db
+*~
+.idea/
+.vscode/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# --- MkDocs build output ---
+/site/
+
+# --- Local reference repos ---
+# Cloned for offline study only; NEVER republished (AGENTS.md hard rule).
+# Tracked gitlink pointers remain; their working-tree contents stay out.
+/_reference/
+
+# --- Generated factory output (dist/) ---
+# Ignored by default so daily run scratch (which can reach gigabytes) is never
+# staged by accident. Curated, published emitter products are negated back in
+# below. Keep this negation list as the single source of truth for "which dist
+# outputs are products, not scratch" (see docs/codex/no-magic-values.md).
+/dist/*
+!/dist/agent-skills/
+!/dist/aibom/
+!/dist/c2pa/
+!/dist/croissant/
+!/dist/hf/
+!/dist/lm-eval-harness/
+!/dist/mcp/
+!/dist/openlineage/
+!/dist/promptfoo/
+!/dist/spdx/
+!/dist/catalog.sqlite
+
+# Private/internal docs (acquihire material, internal strategy) — NOT part of the open-core publication
+docs/internal/
+
+# --- Local platform secrets + runtime state (productionization handoff) ---
+# .env carries locally generated dev secrets — never staged (vault flow: production/vault/README.md)
+.env
+design_handoff_platform_productionization/production/.deploy-state.json
+design_handoff_platform_productionization/production/dist/
+design_handoff_platform_productionization/production/core/node_modules/
+
+# --- Generated E2E review output (videos/screenshots/html/reports) — regenerable, large ---
+/artifacts/
+
+# --- Local transactional-email outbox (rendered dev mail; regenerable) ---
+dist/email-outbox/
+
+# --- Retired files/snapshots (retained on disk, not committed) ---
+/archive/
+
+# agent runtime state (pid files, loop ledgers, local-service state) — never in git
+.agent/
+
+# untracked scratch — dated archive snapshots are not part of the tree
+archive/

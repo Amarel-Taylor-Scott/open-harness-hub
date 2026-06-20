@@ -1,0 +1,45 @@
+id: processor/cache-prompt-prefix
+type: processor
+version: 0.1.0
+name: Prompt-prefix cache
+description: Mark the stable prompt prefix (persona + system + tool schemas) for provider prompt caching
+  (~90% read discount on Anthropic, automatic >1,024 tokens on OpenAI). Turn on first — free.
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+capability:
+- memory
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- context-layer
+- cache
+created: '2026-05-29'
+updated: '2026-05-29'
+attribution:
+  source_kind: manual
+  author: Open Harness Hub context-layer taxonomy
+  license: MIT
+process_kind: cache.prompt_prefix
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: prompt
+  type: object
+outputs:
+- name: cache_hint
+  type: object
+side_effects: read
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.cache.cache_prompt_prefix.run
+  language: python
+links:
+  source: docs/strategy/context-layer-pmf.md

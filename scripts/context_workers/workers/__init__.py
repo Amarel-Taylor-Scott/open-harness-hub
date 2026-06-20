@@ -1,0 +1,133 @@
+"""Default worker modules for the Context Fidelity registry."""
+from __future__ import annotations
+
+from scripts.context_workers.workers.chunk import chunk_context
+from scripts.context_workers.workers.claim import claim_extract
+from scripts.context_workers.workers.deterministic_graphs import (
+    code_graph_build,
+    document_graph_build,
+    nlp_signals,
+    proper_noun_extract,
+    regex_extract,
+)
+from scripts.context_workers.workers.document_tree import document_tree_normalize
+from scripts.context_workers.workers.entity import entity_extract
+from scripts.context_workers.workers.fragility import fragility_scan
+from scripts.context_workers.workers.graph import graph_extract
+from scripts.context_workers.workers.keyword import keyword_analysis
+from scripts.context_workers.workers.llm_trust_layer import (
+    ambiguity_scan,
+    conflict_scan,
+    fragile_fact_enrich,
+    llm_audit_review,
+    llm_claim_review,
+    llm_conflict_review,
+    llm_context_summarize,
+    llm_graph_enrich,
+    llm_trust_plan,
+    model_cascade_catalog,
+)
+from scripts.context_workers.workers.node_research import (
+    node_evidence_score,
+    node_research_catalog,
+    node_research_enrich,
+    node_research_plan,
+)
+from scripts.context_workers.workers.pipeline import pipeline_pass
+from scripts.context_workers.workers.pre_llm_hygiene import (
+    dedupe_fingerprint,
+    graph_metrics,
+    pii_detect,
+    text_normalize,
+)
+from scripts.context_workers.workers.refresh import refresh_plan, search_verify
+from scripts.context_workers.workers.tool_adapters import (
+    adapter_catalog,
+    gliner_extract,
+    datasketch_minhash,
+    experimental_adapters_pipeline,
+    ftfy_repair,
+    language_detect,
+    marker_cli_extract,
+    mineru_cli_extract,
+    networkx_analyze,
+    openosint_catalog,
+    openosint_run,
+    paddleocr_cli_extract,
+    parse_docling,
+    parse_grobid,
+    parse_markitdown,
+    parse_pdfplumber,
+    parse_pymupdf,
+    parse_tika,
+    parse_unstructured,
+    presidio_detect,
+    rapidfuzz_alias,
+    rdf_export,
+    sklearn_features,
+    spacy_extract,
+    stanza_extract,
+    textacy_extract,
+)
+
+__all__ = [
+    "chunk_context",
+    "claim_extract",
+    "code_graph_build",
+    "document_graph_build",
+    "document_tree_normalize",
+    "dedupe_fingerprint",
+    "entity_extract",
+    "fragility_scan",
+    "graph_extract",
+    "graph_metrics",
+    "keyword_analysis",
+    "node_evidence_score",
+    "node_research_catalog",
+    "node_research_enrich",
+    "node_research_plan",
+    "nlp_signals",
+    "pii_detect",
+    "pipeline_pass",
+    "proper_noun_extract",
+    "regex_extract",
+    "refresh_plan",
+    "search_verify",
+    "text_normalize",
+    "adapter_catalog",
+    "ambiguity_scan",
+    "conflict_scan",
+    "fragile_fact_enrich",
+    "gliner_extract",
+    "datasketch_minhash",
+    "experimental_adapters_pipeline",
+    "ftfy_repair",
+    "language_detect",
+    "llm_audit_review",
+    "llm_claim_review",
+    "llm_conflict_review",
+    "llm_context_summarize",
+    "llm_graph_enrich",
+    "llm_trust_plan",
+    "model_cascade_catalog",
+    "marker_cli_extract",
+    "mineru_cli_extract",
+    "networkx_analyze",
+    "openosint_catalog",
+    "openosint_run",
+    "paddleocr_cli_extract",
+    "parse_docling",
+    "parse_grobid",
+    "parse_markitdown",
+    "parse_pdfplumber",
+    "parse_pymupdf",
+    "parse_tika",
+    "parse_unstructured",
+    "presidio_detect",
+    "rapidfuzz_alias",
+    "rdf_export",
+    "sklearn_features",
+    "spacy_extract",
+    "stanza_extract",
+    "textacy_extract",
+]

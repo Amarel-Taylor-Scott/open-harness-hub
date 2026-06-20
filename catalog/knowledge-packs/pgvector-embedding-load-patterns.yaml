@@ -1,0 +1,38 @@
+id: "knowledge-pack/pgvector-embedding-load-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Pgvector embedding load patterns"
+description: "Checks for converting stored vector rows into reviewable pgvector object_embedding load SQL while preserving replay, dimensions, source text, and safety boundaries."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["embedding", "retrieval", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["embeddings", "vector-search", "pgvector", "postgres", "daily-factory", "load-plan"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+content_types:
+  - "pgvector_embedding_load_check"
+files:
+  - path: "catalog/knowledge-packs/data/pgvector-embedding-load-patterns/checks.jsonl"
+    format: "jsonl"
+    schema: "pgvector_embedding_load_check"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["id", "description", "required_outputs", "failure_route"]
+provenance:
+  sources:
+    - "Open Harness Hub pgvector embedding load planner"
+    - "Open Harness Hub local hash embedding worker"
+    - "Open Harness Hub Postgres schema"
+  collected_through: "2026-05-26"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "synthetic operational checks only"

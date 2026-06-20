@@ -13,7 +13,7 @@ INSTALL vss;        LOAD vss;
 
 CREATE SEQUENCE IF NOT EXISTS run_seq START 1;
 
-CREATE TABLE IF NOT EXISTS artifact (
+CREATE TABLE IF NOT EXISTS component (
   id              VARCHAR PRIMARY KEY,
   type            VARCHAR NOT NULL,
   version         VARCHAR NOT NULL,
@@ -34,18 +34,18 @@ CREATE TABLE IF NOT EXISTS artifact (
   body            JSON NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS artifact_type_idx ON artifact (type);
+CREATE INDEX IF NOT EXISTS component_type_idx ON component (type);
 
-CREATE TABLE IF NOT EXISTS artifact_ref (
-  src_id VARCHAR NOT NULL REFERENCES artifact(id),
-  dst_id VARCHAR NOT NULL REFERENCES artifact(id),
+CREATE TABLE IF NOT EXISTS component_ref (
+  src_id VARCHAR NOT NULL REFERENCES component(id),
+  dst_id VARCHAR NOT NULL REFERENCES component(id),
   role   VARCHAR NOT NULL,
   PRIMARY KEY (src_id, dst_id, role)
 );
 
 CREATE TABLE IF NOT EXISTS rule (
   rule_id   VARCHAR PRIMARY KEY,
-  pack_id   VARCHAR NOT NULL REFERENCES artifact(id),
+  pack_id   VARCHAR NOT NULL REFERENCES component(id),
   family    VARCHAR NOT NULL,
   severity  VARCHAR,
   category  VARCHAR,
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS rule (
 
 CREATE TABLE IF NOT EXISTS knowledge_leaf (
   leaf_id   VARCHAR PRIMARY KEY,
-  pack_id   VARCHAR NOT NULL REFERENCES artifact(id),
+  pack_id   VARCHAR NOT NULL REFERENCES component(id),
   leaf_type VARCHAR NOT NULL,
   industry  VARCHAR,
   language  VARCHAR,
@@ -69,11 +69,11 @@ CREATE INDEX IF NOT EXISTS knowledge_leaf_emb_idx
 
 CREATE TABLE IF NOT EXISTS run (
   run_id        VARCHAR PRIMARY KEY DEFAULT ('run_' || nextval('run_seq')),
-  artifact_id   VARCHAR NOT NULL REFERENCES artifact(id),
+  component_id   VARCHAR NOT NULL REFERENCES component(id),
   started_at    TIMESTAMPTZ NOT NULL,
   finished_at   TIMESTAMPTZ,
   status        VARCHAR NOT NULL,
-  adapter_id    VARCHAR REFERENCES artifact(id),
+  adapter_id    VARCHAR REFERENCES component(id),
   inputs        JSON,
   outputs       JSON,
   trace         JSON,
@@ -81,12 +81,12 @@ CREATE TABLE IF NOT EXISTS run (
   trust_boundary VARCHAR
 );
 
--- Build FTS index over artifacts.
-PRAGMA create_fts_index('artifact', 'id', 'name', 'description', overwrite=1);
+-- Build FTS index over components.
+PRAGMA create_fts_index('component', 'id', 'name', 'description', overwrite=1);
 
 -- Sample analytical queries:
---   SELECT type, count(*) FROM artifact GROUP BY type;
---   SELECT * FROM artifact WHERE 'healthcare.clinical' IN industry;
+--   SELECT type, count(*) FROM component GROUP BY type;
+--   SELECT * FROM component WHERE 'healthcare.clinical' IN industry;
 --   SELECT * FROM knowledge_leaf
 --     ORDER BY array_distance(embedding, :query_vector)
 --     LIMIT 10;

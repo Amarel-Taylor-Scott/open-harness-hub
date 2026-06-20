@@ -5,15 +5,15 @@ Ergonomic catalog access for humans + AI agents (Claude Code / Cursor /
 Aider / etc).
 
 Subcommands:
-  list [TYPE]           — list artifacts (optionally filtered by type)
-  describe <id>         — print artifact YAML + immediate dependencies
+  list [TYPE]           — list components (optionally filtered by type)
+  describe <id>         — print component YAML + immediate dependencies
   search <query>        — fuzzy search across id / name / description / tags
   depends <id>          — print dependency graph
   validate              — validate all manifests
   run <pipeline-id>     — run a pipeline (forwards to run_pipeline)
   stats                 — catalog summary
-  emit <id> <format>    — emit one artifact to a standards format
-  industries [INDUSTRY] — list artifacts by industry vertical
+  emit <id> <format>    — emit one component to a standards format
+  industries [INDUSTRY] — list components by industry vertical
 
 Examples:
   scripts/oh_hub.py list pipeline
@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 import textwrap
@@ -35,6 +36,8 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 CATALOG = ROOT / "catalog"
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 try:
     import yaml  # type: ignore[import]
@@ -42,9 +45,21 @@ except ImportError:
     sys.stderr.write("pyyaml is required: pip install pyyaml\n")
     sys.exit(2)
 
+from scripts.db.catalog_row_source import iter_components_from_rows
 
-def load_catalog() -> dict[str, dict]:
+
+def load_catalog(row_dir: Path | None = None) -> dict[str, dict]:
+    """Load catalog components from database rows, falling back to YAML seeds."""
     out: dict[str, dict] = {}
+    if row_dir is not None:
+        for component in iter_components_from_rows(row_dir):
+            data = dict(component.manifest)
+            data["_path"] = component.source_path
+            data["_source"] = "database_rows"
+            data["_database_refs"] = component.database_refs
+            out[component.id] = data
+        return out
+
     for path in CATALOG.rglob("*.yaml"):
         if "_inbox" in path.parts:
             continue
@@ -54,11 +69,12 @@ def load_catalog() -> dict[str, dict]:
             continue
         if isinstance(data, dict) and "id" in data:
             data["_path"] = str(path.relative_to(ROOT))
+            data["_source"] = "catalog_yaml_seed_export"
             out[data["id"]] = data
     return out
 
 
-ARTIFACT_TYPES = [
+COMPONENT_TYPES = [
     "harness", "pipeline", "benchmark", "rule-pack", "knowledge-pack",
     "logic-pack", "tool", "persona", "adapter", "rubric", "dataset",
     "schema", "processor", "pattern",
@@ -92,14 +108,14 @@ def cmd_list(args, catalog):
     id_w = max((len(r[0]) for r in rows), default=20)
     for r in rows:
         print(f"  {r[3]:<{type_w}}  {r[0]:<{id_w}}  {r[1]}")
-    print(f"\n{len(rows)} artifact(s){' of type ' + type_filter if type_filter else ''}")
+    print(f"\n{len(rows)} component(s){' of type ' + type_filter if type_filter else ''}")
 
 
 # ------------------------------------------------------------------
 # Subcommand: describe
 # ------------------------------------------------------------------
 def _find_refs_in(obj, out):
-    """Walk obj collecting strings that look like artifact ids."""
+    """Walk obj collecting strings that look like component ids."""
     REF_RE = re.compile(r"^(harness|pipeline|benchmark|rule-pack|knowledge-pack|logic-pack|tool|persona|adapter|rubric|dataset|schema|processor|pattern)/[a-z0-9]+(-[a-z0-9]+)*$")
     if isinstance(obj, dict):
         for v in obj.values():
@@ -118,7 +134,7 @@ def cmd_describe(args, catalog):
     if art is None:
         candidates = [aid for aid in catalog if art_id in aid]
         if not candidates:
-            print(f"unknown artifact {art_id!r}", file=sys.stderr)
+            print(f"unknown component {art_id!r}", file=sys.stderr)
             return 1
         if len(candidates) == 1:
             art = catalog[candidates[0]]
@@ -144,6 +160,7 @@ def cmd_describe(args, catalog):
     print(f"  capabilities:{', '.join(art.get('capability') or [])}")
     print(f"  tags:        {', '.join(art.get('tags') or [])}")
     print(f"  manifest:    {art.get('_path')}")
+    print(f"  source:      {art.get('_source', 'unknown')}")
 
     desc = art.get("description", "").strip()
     if desc:
@@ -158,7 +175,7 @@ def cmd_describe(args, catalog):
     _find_refs_in({k: v for k, v in art.items() if k != "_path"}, refs)
     refs.discard(art_id)
     if refs:
-        print(f"  references {len(refs)} other artifact(s):")
+        print(f"  references {len(refs)} other component(s):")
         for ref in sorted(refs):
             status = "✓" if ref in catalog else "✗ (missing)"
             print(f"    {status} {ref}")
@@ -201,7 +218,7 @@ def cmd_search(args, catalog):
 def cmd_depends(args, catalog):
     art_id = args.id
     if art_id not in catalog:
-        print(f"unknown artifact {art_id!r}", file=sys.stderr)
+        print(f"unknown component {art_id!r}", file=sys.stderr)
         return 1
 
     def walk(aid, depth, visited):
@@ -244,6 +261,8 @@ def cmd_validate(args, catalog):
 def cmd_run(args, catalog):
     import subprocess
     cmd = ["python3", str(ROOT / "scripts" / "run_pipeline.py"), args.pipeline_id]
+    if getattr(args, "row_dir", None) is not None:
+        cmd += ["--row-dir", str(args.row_dir)]
     if args.inputs:
         cmd += ["--inputs", args.inputs]
     if args.simulate:
@@ -269,7 +288,7 @@ def cmd_stats(args, catalog):
 
     print(f"\n  Catalog at {ROOT.name}:")
     print(f"  ─────────────────────────")
-    print(f"  total: {len(catalog)} artifacts\n")
+    print(f"  total: {len(catalog)} components\n")
 
     print("  by type:")
     for t, c in by_type.most_common():
@@ -300,15 +319,15 @@ def cmd_industries(args, catalog):
     if args.industry:
         rows = by_ind.get(args.industry, [])
         if not rows:
-            print(f"no artifacts tagged industry={args.industry!r}")
+            print(f"no components tagged industry={args.industry!r}")
             return 1
         rows.sort()
         for art_id, art_type, name in rows:
             print(f"  [{art_type:<14}]  {art_id:<55}  {name}")
-        print(f"\n  {len(rows)} artifacts in industry {args.industry!r}")
+        print(f"\n  {len(rows)} components in industry {args.industry!r}")
     else:
         for ind in sorted(by_ind.keys()):
-            print(f"  {ind:<35} {len(by_ind[ind]):>4} artifacts")
+            print(f"  {ind:<35} {len(by_ind[ind]):>4} components")
 
 
 # ------------------------------------------------------------------
@@ -326,7 +345,10 @@ def cmd_emit(args, catalog):
                 continue
             print(f"  {f.stem}", file=sys.stderr)
         return 1
-    return subprocess.call(["python3", str(target), args.id])
+    env = os.environ.copy()
+    if getattr(args, "row_dir", None) is not None:
+        env["OH_CATALOG_ROW_DIR"] = str(args.row_dir)
+    return subprocess.call(["python3", str(target), args.id], env=env)
 
 
 # ------------------------------------------------------------------
@@ -339,14 +361,20 @@ def main() -> int:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )
+    parser.add_argument(
+        "--row-dir",
+        type=Path,
+        default=os.environ.get("OH_CATALOG_ROW_DIR"),
+        help="Read catalog components from database-exported JSONL rows instead of YAML seeds.",
+    )
     sub = parser.add_subparsers(dest="command")
 
-    p_list = sub.add_parser("list", help="list artifacts")
-    p_list.add_argument("type", nargs="?", default=None, choices=ARTIFACT_TYPES + [None])
+    p_list = sub.add_parser("list", help="list components")
+    p_list.add_argument("type", nargs="?", default=None, choices=COMPONENT_TYPES + [None])
     p_list.add_argument("--sort", choices=["id", "name", "type"], default="id")
     p_list.add_argument("--json", action="store_true")
 
-    p_desc = sub.add_parser("describe", help="describe an artifact")
+    p_desc = sub.add_parser("describe", help="describe a component")
     p_desc.add_argument("id")
     p_desc.add_argument("--json", action="store_true")
 
@@ -369,7 +397,7 @@ def main() -> int:
     p_ind = sub.add_parser("industries", help="list by industry")
     p_ind.add_argument("industry", nargs="?", default=None)
 
-    p_emit = sub.add_parser("emit", help="emit artifact to standards format")
+    p_emit = sub.add_parser("emit", help="emit component to standards format")
     p_emit.add_argument("id")
     p_emit.add_argument("format")
 
@@ -378,7 +406,9 @@ def main() -> int:
         parser.print_help()
         return 0
 
-    catalog = load_catalog()
+    if args.row_dir is not None and not isinstance(args.row_dir, Path):
+        args.row_dir = Path(args.row_dir)
+    catalog = load_catalog(args.row_dir)
     handler = {
         "list":       cmd_list,
         "describe":   cmd_describe,

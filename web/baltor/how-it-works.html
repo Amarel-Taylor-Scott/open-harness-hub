@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>How Baltor works — sync, verify, reconcile, serve</title>
+<meta name="description" content="Watch Baltor load context, sync source versions, verify facts against authoritative sources, reconcile updates, queue follow-up research, and deliver serving packages with proof." />
+<!-- Self-contained animated explainer. No external JS deps. Brand: docs/strategy/brand-architecture.md (LOCKED). -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#0e1726; --ink-soft:#33415a; --muted:#697892; --line:#e3e7ef;
+    --paper:#f7f9fc; --card:#ffffff; --accent:#1d6fe0; --accent-ink:#0b3b7a;
+    --good:#1f9d6b; --warn:#d98a2b; --bad:#d2544e; --fragile:#8a5cd0; --max:1120px;
+  }
+  *{box-sizing:border-box} html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 22px}
+  .mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+  header.top{position:sticky;top:0;z-index:9;background:rgba(247,249,252,.86);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .top .wrap{display:flex;align-items:center;gap:16px;height:58px}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:600}
+  .brand .dot{width:11px;height:11px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#5aa0ff,var(--accent));box-shadow:0 0 0 4px rgba(29,111,224,.12)}
+  .top nav{margin-left:auto;display:flex;gap:18px;font-size:14px;color:var(--ink-soft)}
+  .top nav a:hover{color:var(--ink)}
+  .intro{padding:46px 0 8px;text-align:center}
+  .eyebrow{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);background:rgba(29,111,224,.08);border:1px solid rgba(29,111,224,.16);padding:5px 11px;border-radius:999px;margin-bottom:16px}
+  h1{font-size:clamp(28px,4.4vw,44px);line-height:1.06;letter-spacing:-.025em;margin:0 0 12px;font-weight:600}
+  .intro p{color:var(--ink-soft);max-width:640px;margin:0 auto;font-size:16.5px}
+
+  /* stage */
+  .stage{margin:30px 0 10px;background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 24px 60px -40px rgba(14,23,38,.5)}
+  .board{display:grid;grid-template-columns:1fr 1.35fr 1fr;gap:0}
+  @media(max-width:860px){.board{grid-template-columns:1fr}}
+  .col{padding:22px 20px;min-height:360px;position:relative}
+  .col + .col{border-left:1px solid var(--line)}
+  @media(max-width:860px){.col + .col{border-left:none;border-top:1px solid var(--line)}}
+  .col h3{margin:0 0 4px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .col .lead{font-size:12.5px;color:var(--muted);margin:0 0 16px;min-height:30px}
+
+  /* fact cards */
+  .facts{display:flex;flex-direction:column;gap:9px}
+  .fact{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:13px;
+    opacity:0;transform:translateX(-14px);transition:all .5s cubic-bezier(.2,.7,.3,1)}
+  .stage[data-step]:not([data-step="0"]) .fact,.stage[data-step="0"] .fact{opacity:1;transform:none}
+  .stage[data-step="-1"] .fact{opacity:0;transform:translateX(-14px)}
+  .fact .ic{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff;background:var(--muted);flex:none;transition:.35s}
+  .fact .txt{flex:1;min-width:0}
+  .fact .txt b{font-weight:600}
+  .fact .tag{font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:999px;background:#eef2f8;color:var(--muted);white-space:nowrap;transition:.35s}
+  /* states */
+  .fact.verified .ic{background:var(--good)} .fact.verified .tag{background:rgba(31,157,107,.12);color:var(--good)}
+  .fact.contra .ic{background:var(--warn)} .fact.contra .tag{background:rgba(217,138,43,.14);color:var(--warn)}
+  .fact.gap .ic{background:var(--bad)} .fact.gap .tag{background:rgba(210,84,78,.13);color:var(--bad)}
+  .fact.fragile .ic{background:var(--fragile)} .fact.fragile .tag{background:rgba(138,92,208,.14);color:var(--fragile)}
+  .fact.reconciled .ic{background:var(--good)} .fact.reconciled .tag{background:rgba(31,157,107,.12);color:var(--good)}
+  .fact.filled .ic{background:var(--good)} .fact.filled .tag{background:rgba(31,157,107,.12);color:var(--good)}
+  .fact.scanning{box-shadow:0 0 0 2px rgba(29,111,224,.35);border-color:var(--accent)}
+  .fact.gap .txt b{color:var(--bad)}
+  .fact.filled .txt .fillin{color:var(--good);font-weight:600}
+
+  /* middle column: the assurance engine */
+  .engine{position:relative;height:100%;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center}
+  .agentwrap{position:relative;width:170px;height:170px;display:grid;place-items:center}
+  .core{width:96px;height:96px;border-radius:24px;background:linear-gradient(160deg,#16233b,#0e1726);color:#dfe9fb;display:grid;place-items:center;text-align:center;font-size:12px;font-weight:600;letter-spacing:.02em;box-shadow:0 14px 30px -14px rgba(14,23,38,.7);position:relative;z-index:3}
+  .core small{display:block;font-size:10px;color:#8aa0c8;font-weight:500;margin-top:3px}
+  .ring{position:absolute;inset:0;border-radius:50%;border:1.5px dashed rgba(29,111,224,.35);animation:spin 14s linear infinite}
+  .ring.r2{inset:18px;border-color:rgba(138,92,208,.30);animation-duration:9s;animation-direction:reverse}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  /* official sources */
+  .sources{width:100%;border:1px dashed var(--line);border-radius:12px;padding:10px 12px;background:#fbfdff;opacity:.4;transition:.5s}
+  .stage[data-step="2"] .sources,.stage[data-step="3"] .sources,.stage[data-step="4"] .sources,.stage[data-step="5"] .sources{opacity:1;border-color:rgba(29,111,224,.4)}
+  .sources .lbl{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+  .src-chips{display:flex;flex-wrap:wrap;gap:6px}
+  .schip{font-size:11px;font-weight:600;color:var(--accent-ink);background:rgba(29,111,224,.08);border:1px solid rgba(29,111,224,.18);border-radius:7px;padding:4px 8px;display:flex;align-items:center;gap:5px}
+  .schip::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--good)}
+  /* watcher agents */
+  .watchers{display:flex;gap:8px;align-items:center;font-size:11.5px;color:var(--fragile);font-weight:600;opacity:0;transform:translateY(6px);transition:.5s}
+  .stage[data-step="4"] .watchers,.stage[data-step="5"] .watchers{opacity:1;transform:none}
+  .wdot{width:22px;height:22px;border-radius:50%;background:rgba(138,92,208,.12);border:1.5px solid var(--fragile);display:grid;place-items:center}
+  .wdot span{width:7px;height:7px;border-radius:50%;background:var(--fragile);animation:pulse 1.5s ease-in-out infinite}
+  @keyframes pulse{0%,100%{transform:scale(.7);opacity:.5}50%{transform:scale(1.25);opacity:1}}
+
+  /* deliver column: tiers */
+  .deliver{opacity:.35;transition:.5s}
+  .stage[data-step="5"] .deliver{opacity:1}
+  .tier{margin-bottom:10px}
+  .tier .row1{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;margin-bottom:4px}
+  .tier .row1 b{font-weight:600}
+  .tier .row1 .tok{font-size:11px;color:var(--muted)}
+  .bar{height:9px;border-radius:6px;background:#eef2f8;overflow:hidden}
+  .bar i{display:block;height:100%;width:0;border-radius:6px;transition:width 1s cubic-bezier(.2,.7,.3,1)}
+  .stage[data-step="5"] .bar i{width:var(--w)}
+  .tier.t1 .bar i{background:#9fb4cf} .tier.t2 .bar i{background:#6f9be0}
+  .tier.t3 .bar i{background:var(--accent)} .tier.t4 .bar i{background:#2f8f6a} .tier.t5 .bar i{background:var(--good)}
+  .tier .note{font-size:10.5px;color:var(--muted);margin-top:3px}
+  .proof{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--good);background:rgba(31,157,107,.1);border:1px solid rgba(31,157,107,.22);border-radius:999px;padding:2px 7px;margin-left:6px}
+  .proof::before{content:"✓"}
+
+  /* caption / controls */
+  .caption{display:flex;align-items:flex-start;gap:14px;padding:18px 22px;border-top:1px solid var(--line);background:#fbfdff}
+  .stepno{flex:none;width:30px;height:30px;border-radius:9px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px}
+  .caption .ctxt{flex:1}
+  .caption .ctxt b{display:block;font-size:15px;margin-bottom:2px}
+  .caption .ctxt span{color:var(--ink-soft);font-size:13.5px}
+  .controls{display:flex;gap:8px;align-items:center;padding:0 22px 18px}
+  .controls button{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:8px;padding:7px 13px;cursor:pointer}
+  .controls button:hover{border-color:#c4ccda}
+  .controls .dots{margin-left:auto;display:flex;gap:6px;align-items:center}
+  .controls .dots i{width:8px;height:8px;border-radius:50%;background:#d4dce8;cursor:pointer;transition:.2s}
+  .controls .dots i.on{background:var(--accent);transform:scale(1.25)}
+
+  /* valleys chart */
+  .valleys{margin:14px 0 50px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px}
+  .valleys h4{margin:0 0 2px;font-size:15px}
+  .valleys p{margin:0 0 12px;color:var(--ink-soft);font-size:13.5px}
+  .vchart{width:100%;height:120px}
+  .vlegend{display:flex;gap:18px;font-size:12px;color:var(--muted);margin-top:8px;flex-wrap:wrap}
+  .vlegend b{font-weight:600}
+  .footer{padding:18px 0 60px;text-align:center;color:var(--muted);font-size:13px}
+  .footer a{color:var(--accent);font-weight:600}
+</style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <a class="brand" href="/"><span class="dot"></span> Baltor</a>
+      <nav>
+        <a href="/">Home</a>
+        <a href="https://openharnesshub.com">Open Harness Hub</a>
+        <a href="https://baltor.ai">Get started</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="intro">
+      <span class="eyebrow">How it works</span>
+      <h1>Your context, verified and traceable —<br />then served however your agent needs it.</h1>
+      <p>Baltor loads the context your agent relies on, keeps source versions synced, checks facts against authoritative sources, reconciles updates, queues follow-up research, and serves context packages with proof on every step.</p>
+    </section>
+
+    <!-- THE ANIMATED PIPELINE -->
+    <section class="stage" id="stage" data-step="0">
+      <div class="board">
+        <!-- 1 · CONNECT -->
+        <div class="col">
+          <h3>1 · Connect</h3>
+          <p class="lead" id="lead-connect">Your context syncs in — docs, policies, records — exactly as you have it today.</p>
+          <div class="facts" id="facts">
+            <div class="fact" data-f="0"><span class="ic">?</span><span class="txt"><b>OFAC SDN</b> — Acme Maritime Ltd</span><span class="tag">raw</span></div>
+            <div class="fact" data-f="1"><span class="ic">?</span><span class="txt"><b>EU listing date</b> — 2025-09-02</span><span class="tag">raw</span></div>
+            <div class="fact" data-f="2"><span class="ic">?</span><span class="txt"><b>Export threshold</b> — <span class="fillin">—</span></span><span class="tag">raw</span></div>
+            <div class="fact" data-f="3"><span class="ic">?</span><span class="txt"><b>Vessel IMO</b> — 9176187</span><span class="tag">raw</span></div>
+            <div class="fact" data-f="4"><span class="ic">?</span><span class="txt"><b>Registered address</b> — Hong Kong</span><span class="tag">raw</span></div>
+            <div class="fact" data-f="5"><span class="ic">?</span><span class="txt"><b>Ownership</b> — 49% held by X</span><span class="tag">raw</span></div>
+          </div>
+        </div>
+
+        <!-- 2 · ASSURE (the engine) -->
+        <div class="col">
+          <h3>2 · Assure</h3>
+          <p class="lead" id="lead-assure">Workers read every fact, identify weak evidence, needed updates, and facts that will not stay true.</p>
+          <div class="engine">
+            <div class="agentwrap">
+              <div class="ring"></div><div class="ring r2"></div>
+              <div class="core" id="core">Verifying<small>cross-check · reconcile</small></div>
+            </div>
+            <div class="sources">
+              <div class="lbl">Official sources</div>
+              <div class="src-chips">
+                <span class="schip">OFAC SDN</span><span class="schip">BIS EAR</span>
+                <span class="schip">EU Consolidated</span><span class="schip">IMO registry</span>
+              </div>
+            </div>
+            <div class="watchers">
+              <span class="wdot"><span></span></span> 2 watcher agents re-checking fragile facts
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 · DELIVER (tiers) -->
+        <div class="col">
+          <h3>3 · Deliver</h3>
+          <p class="lead" id="lead-deliver">Same context, multiple serving packages — pick what your agent or retrieval stack needs. Proof travels with each.</p>
+          <div class="deliver">
+            <div class="tier t1" style="--w:100%"><div class="row1"><b>Source ledger</b><span class="tok">hashes</span></div><div class="bar"><i></i></div><div class="note">Original files, source versions, owners, and diffs.</div></div>
+            <div class="tier t2" style="--w:100%"><div class="row1"><b>Verified context</b><span class="tok">facts</span></div><div class="bar"><i></i></div><div class="note">Current facts with evidence and state lineage. <span class="proof">proof</span></div></div>
+            <div class="tier t3" style="--w:86%"><div class="row1"><b>RAG records</b><span class="tok">chunks</span></div><div class="bar"><i></i></div><div class="note">Chunks, citations, freshness, and retrieval metadata. <span class="proof">ready</span></div></div>
+            <div class="tier t4" style="--w:64%"><div class="row1"><b>Graph package</b><span class="tok">nodes</span></div><div class="bar"><i></i></div><div class="note">Entities, claims, source links, and procedure edges. <span class="proof">hybrid</span></div></div>
+            <div class="tier t5" style="--w:42%"><div class="row1"><b>Audit packet</b><span class="tok">history</span></div><div class="bar"><i></i></div><div class="note">Worker traces, adoption decisions, and source history. <span class="proof">traceable</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="caption">
+        <div class="stepno" id="stepno">1</div>
+        <div class="ctxt"><b id="cap-title">Connect your context</b><span id="cap-body">Sync in the docs, policies, and records your agent already relies on — no re-platforming, no schema change.</span></div>
+      </div>
+      <div class="controls">
+        <button id="prev">‹ Back</button>
+        <button id="playpause">⏸ Pause</button>
+        <button id="next">Next ›</button>
+        <div class="dots" id="dots"></div>
+      </div>
+    </section>
+
+    <!-- VALLEYS-FILLED CHART -->
+    <section class="valleys">
+      <h4>The weak spots, resolved or queued</h4>
+      <p>Where your context is missing support, stale, or out of date with the source of truth, your agent has a blind spot. Baltor finds each weak spot, resolves what it can from authority, and queues the rest for follow-up research.</p>
+      <svg class="vchart" id="vchart" viewBox="0 0 720 120" preserveAspectRatio="none" aria-hidden="true"></svg>
+      <div class="vlegend">
+        <span><b style="color:var(--bad)">▼ weak spot</b> — gap / stale / needs support</span>
+        <span><b style="color:var(--good)">▲ resolved</b> — reconciled against official source</span>
+        <span><b style="color:var(--fragile)">◑ watched</b> — temporally fragile, re-checked on a schedule</span>
+      </div>
+    </section>
+
+    <div class="footer">
+      That's the whole pitch: <b>verified · current · reconciled · traceable</b> context for the agents you already run. &nbsp;
+      <a href="https://baltor.ai">Start with Baltor →</a>
+    </div>
+  </main>
+
+<script>
+(function(){
+  var stage=document.getElementById('stage');
+  // fact state per step: states applied at each step index (0..5)
+  var F=[
+    {el:'[data-f="0"]'},{el:'[data-f="1"]'},{el:'[data-f="2"]'},
+    {el:'[data-f="3"]'},{el:'[data-f="4"]'},{el:'[data-f="5"]'}
+  ];
+  // step -> {classes per fact}, core label, caption
+  var STEPS=[
+    { // 0 Connect
+      title:'Connect your context',
+      body:'Sync in the docs, policies, and records your agent already relies on — no re-platforming, no schema change.',
+      core:['Idle','waiting for context'],
+      facts:['','','','','',''], extra:''
+    },
+    { // 1 Fact-check
+      title:'Fact-check every claim',
+      body:'Workers read each fact and classify it: verified, needs reconciliation, missing support, or time-sensitive.',
+      core:['Scanning','reading each fact'],
+      facts:['verified scanning','contra scanning','gap scanning','verified scanning','fragile scanning','contra scanning'],
+      tags:['verified','needs reconciliation','gap','verified','time-sensitive','needs reconciliation']
+    },
+    { // 2 Cross-check official sources
+      title:'Cross-check against official sources',
+      body:'Every flag is checked against the authoritative source — OFAC, BIS, the EU consolidated list, the IMO registry — and source differences are reconciled to the right date, scope, and precedence.',
+      core:['Cross-checking','vs. authority'],
+      facts:['verified','reconciled','gap','verified','fragile','reconciled'],
+      tags:['verified','reconciled','gap','verified','fragile','reconciled']
+    },
+    { // 3 Fill gaps
+      title:'Fill missing support',
+      body:'Where a useful fact is missing support, Baltor searches for the official source or keeps a follow-up task queued until the evidence is strong enough.',
+      core:['Filling','from authority'],
+      facts:['verified','reconciled','filled','verified','fragile','reconciled'],
+      tags:['verified','reconciled','filled','verified','fragile','reconciled'],
+      fill:{2:'USD 10,000 (BIS EAR §740)'}
+    },
+    { // 4 Watch fragile
+      title:'Refresh time-sensitive facts',
+      body:'Some facts are true today and wrong next week — an address, a listing, a threshold. Baltor assigns refresh workers that re-check each one on a schedule before your agent cites it.',
+      core:['Refreshing','time-sensitive facts'],
+      facts:['verified','reconciled','filled','verified','fragile','reconciled'],
+      tags:['verified','reconciled','filled','verified','watched','reconciled']
+    },
+    { // 5 Deliver
+      title:'Deliver — serving packages with proof',
+      body:'The verified context is served in whatever shape your agent needs: text pack, RAG records, graph package, hybrid bundle, or audit packet — each with provenance and state history.',
+      core:['Delivering','+ proof'],
+      facts:['verified','reconciled','filled','verified','watched','reconciled'],
+      tags:['verified','reconciled','filled','verified','watched','reconciled']
+    }
+  ];
+  var TAGTEXT={verified:'verified','needs reconciliation':'needs reconciliation',gap:'needs support',fragile:'time-sensitive','time-sensitive':'time-sensitive',reconciled:'reconciled',filled:'supported',watched:'refreshing ◑'};
+  var N=STEPS.length, cur=0, playing=true, timer=null;
+
+  function applyFact(i,classes,tag,fill){
+    var node=document.querySelector(F[i].el);
+    node.className='fact '+(classes||'');
+    var t=node.querySelector('.tag');
+    if(tag){t.textContent=TAGTEXT[tag]||tag;} else {t.textContent='raw';}
+    if(fill){ var f=node.querySelector('.fillin'); if(f){f.textContent=fill;} }
+  }
+  function render(){
+    stage.setAttribute('data-step',cur);
+    var S=STEPS[cur];
+    for(var i=0;i<6;i++){ applyFact(i, S.facts[i], S.tags?S.tags[i]:null, S.fill?S.fill[i]:null); }
+    var core=document.getElementById('core');
+    core.innerHTML=S.core[0]+'<small>'+S.core[1]+'</small>';
+    document.getElementById('cap-title').textContent=S.title;
+    document.getElementById('cap-body').textContent=S.body;
+    document.getElementById('stepno').textContent=(cur+1);
+    var dots=document.querySelectorAll('#dots i');
+    dots.forEach(function(d,k){ d.className = k===cur?'on':''; });
+    drawValleys(cur);
+  }
+  function go(n){ cur=(n+N)%N; render(); }
+  function next(){ go(cur+1); }
+  function prev(){ go(cur-1); }
+  function tick(){ if(playing) next(); }
+
+  document.getElementById('next').onclick=function(){stop();next();};
+  document.getElementById('prev').onclick=function(){stop();prev();};
+  function stop(){ playing=false; setPP(); }
+  function setPP(){ document.getElementById('playpause').textContent= playing?'⏸ Pause':'▶ Play'; }
+  document.getElementById('playpause').onclick=function(){ playing=!playing; setPP(); };
+
+  // dots
+  var dotsWrap=document.getElementById('dots');
+  for(var k=0;k<N;k++){ var d=document.createElement('i'); d.dataset.k=k; d.onclick=(function(kk){return function(){stop();go(kk);};})(k); dotsWrap.appendChild(d); }
+
+  // valleys sparkline — dips that fill as steps progress
+  var VAL=[ // baseline y (higher number = deeper valley); index ~ a fact/topic
+    {x:40,base:30},{x:150,base:92,kind:'contra'},{x:260,base:34},
+    {x:370,base:104,kind:'gap'},{x:480,base:40},{x:590,base:88,kind:'fragile'},{x:680,base:30}
+  ];
+  function drawValleys(step){
+    var svg=document.getElementById('vchart'); var W=720,H=120;
+    // how filled: contra fills at step>=2, gap at step>=3, fragile partially watched at step>=4
+    function y(p){
+      var b=p.base;
+      if(p.kind==='contra' && step>=2) b=32;
+      if(p.kind==='gap' && step>=3) b=34;
+      if(p.kind==='fragile' && step>=4) b=44; // watched: lifted but kept under watch
+      return b;
+    }
+    var pts=VAL.map(function(p){return [p.x, y(p)];});
+    // smooth path
+    var d='M '+pts[0][0]+' '+pts[0][1];
+    for(var i=1;i<pts.length;i++){
+      var p0=pts[i-1],p1=pts[i]; var mx=(p0[0]+p1[0])/2;
+      d+=' C '+mx+' '+p0[1]+' '+mx+' '+p1[1]+' '+p1[0]+' '+p1[1];
+    }
+    var area=d+' L 680 120 L 40 120 Z';
+    var color = step>=4 ? '#1f9d6b' : (step>=2 ? '#6f9be0' : '#d2544e');
+    var markers=VAL.filter(function(p){return p.kind;}).map(function(p){
+      var yy=y(p); var filled=(p.kind==='contra'&&step>=2)||(p.kind==='gap'&&step>=3);
+      var watched=(p.kind==='fragile'&&step>=4);
+      var c= filled?'#1f9d6b':(watched?'#8a5cd0':(p.kind==='gap'?'#d2544e':p.kind==='contra'?'#d98a2b':'#8a5cd0'));
+      var sym= filled?'▲':(watched?'◑':'▼');
+      return '<text x="'+p.x+'" y="'+(yy-10)+'" font-size="13" fill="'+c+'" text-anchor="middle" font-family="Inter">'+sym+'</text>';
+    }).join('');
+    svg.innerHTML=
+      '<defs><linearGradient id="vg" x1="0" y1="0" x2="0" y2="1">'
+      +'<stop offset="0" stop-color="'+color+'" stop-opacity="0.18"/>'
+      +'<stop offset="1" stop-color="'+color+'" stop-opacity="0"/></linearGradient></defs>'
+      +'<path d="'+area+'" fill="url(#vg)"/>'
+      +'<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="2.5" stroke-linecap="round" style="transition:all .8s"/>'
+      +markers;
+  }
+
+  render();
+  timer=setInterval(tick, 3200);
+})();
+</script>
+</body>
+</html>

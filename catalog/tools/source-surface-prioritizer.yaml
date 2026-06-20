@@ -1,0 +1,63 @@
+id: "tool/source-surface-prioritizer"
+type: tool
+version: "0.1.0"
+name: "Source surface prioritizer"
+description: "Scores source surfaces by usefulness, demand, complexity, time savings, deployment frequency, capability gap, cost savings, governance needs, and expected object yield."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["evaluation", "planning", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["source-surfaces", "prioritization", "million-primitives", "planning", "scoring"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    source_surfaces:
+      type: array
+      items:
+        type: object
+    priority_weights:
+      type: object
+    constraints:
+      type: object
+  required: ["source_surfaces"]
+returns:
+  type: object
+  properties:
+    ranked_sources:
+      type: array
+      items:
+        type: object
+    review_notes:
+      type: array
+      items:
+        type: string
+    next_batches:
+      type: array
+      items:
+        type: object
+side_effects: "none"
+examples:
+  - input:
+      source_surfaces:
+        - id: "federal-register-api"
+          expected_object_yield: 100000
+      priority_weights:
+        usefulness: 1
+        verifiability: 1
+    output:
+      ranked_sources: []
+      review_notes: []
+      next_batches: []
+implementations:
+  - kind: "callable"
+    path: "tools.source_surface_prioritizer.run"
+  - kind: "mcp"
+    path: "mcp/source_surfaces.prioritize"

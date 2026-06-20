@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/context-model-profile.schema.json",
+  "title": "Context model profile",
+  "description": "Provider-neutral model capability slot for context routing. Concrete model names are examples; routing is based on task, risk, uncertainty, cost, privacy, and evidence policy.",
+  "type": "object",
+  "required": ["kind", "model_profile_id", "tier", "slot", "default_tasks", "max_risk", "created_at"],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "baltor.context-model-profile.v1"
+    },
+    "model_profile_id": {
+      "type": "string"
+    },
+    "tier": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 6
+    },
+    "slot": {
+      "type": "string",
+      "enum": ["deterministic", "small_local", "mid_open", "large_open", "ensemble", "frontier", "human_review", "custom"]
+    },
+    "example_families": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "deployment_modes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["local", "self_hosted", "hosted_api", "gateway", "human_queue", "custom"]
+      }
+    },
+    "default_tasks": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "max_risk": {
+      "type": "string",
+      "enum": ["none", "low", "medium", "high_but_not_final", "very_high_with_appeal", "final_human", "custom"]
+    },
+    "cost_profile": {
+      "type": "string",
+      "enum": ["free_or_sunk", "cheap", "balanced", "expensive", "human_cost", "custom"]
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

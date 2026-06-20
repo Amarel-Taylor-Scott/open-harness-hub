@@ -1,0 +1,75 @@
+id: "pipeline/flexible-hierarchy-label-extension"
+type: pipeline
+version: "0.1.0"
+name: "Flexible hierarchy label extension"
+description: "Assigns vertical, jurisdiction, workflow, risk, and deployment labels as flexible records so new domains do not require constant core vocabulary changes."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "energy", "healthcare", "legal", "cross_industry"]
+capability: ["classification", "retrieval", "routing", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.product"
+tags: ["hierarchical-labels", "dimensions", "taxonomy", "hybrid-search", "verticals"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Apply flexible hierarchical labels and dimensions to subjects without expanding core capability or modality vocabularies."
+pipeline_kind: "research_web.flexible_hierarchy_label_extension"
+inputs:
+  - name: "subjects"
+    type: "array"
+  - name: "label_taxonomy"
+    type: "json"
+  - name: "dimension_definitions"
+    type: "array"
+outputs:
+  - name: "label_records"
+    type: "array"
+  - name: "dimension_records"
+    type: "array"
+  - name: "review_tickets"
+    type: "array"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/flexible-hierarchy-label-patterns"
+steps:
+  - id: "assign-labels-and-dimensions"
+    kind: "tool"
+    ref: "tool/hierarchical-label-dimensioner"
+    inputs:
+      subjects: "$.inputs.subjects"
+      label_taxonomy: "$.inputs.label_taxonomy"
+      dimension_definitions: "$.inputs.dimension_definitions"
+  - id: "dedupe-label-records"
+    kind: "tool"
+    ref: "tool/fuzzy-dedupe-clusterer"
+    inputs:
+      candidate_records: "$.steps.assign-labels-and-dimensions.label_records"
+      match_features: ["subject_id", "label_set", "path", "label"]
+  - id: "emit-label-index"
+    kind: "tool"
+    ref: "tool/index-record-emitter"
+    inputs:
+      normalized_objects: "$.steps.assign-labels-and-dimensions.label_records"
+      emit: ["keyword", "vector", "graph", "facet", "quality"]
+success_criteria:
+  - kind: "semantic"
+    target: "$.label_records"
+    must_cover:
+      - "hierarchical"
+      - "vertical"
+      - "jurisdiction"
+      - "workflow"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Flexible hierarchy labels are emitted as records."
+  - kind: "deterministic"
+    target: "$.dimension_records"
+    op: "is_truthy"
+    value: true
+    severity: "medium"
+    label: "Dimension records are emitted for hybrid search."

@@ -1,0 +1,88 @@
+id: "rubric/baltor-schema-flexibility-quality"
+type: rubric
+version: "0.1.0"
+name: "Baltor schema flexibility quality"
+description: "Overlay rubric for document-style, long attribute/facet, and wide columnar schema choices in Baltor context-object systems."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["software", "data_governance", "ai_governance"]
+capability: ["evaluation", "governance", "verification"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+tags: ["baltor", "schema", "document-store", "attributes", "columnar", "flexibility"]
+created: "2026-06-02"
+updated: "2026-06-02"
+dimensions:
+  - id: "stable_envelope"
+    label: "Core object envelope is small, stable, and resistant to source-specific schema churn"
+    weight: 0.08
+    scale: "0.0-1.0"
+    evidence_required: "Review required object fields, source mapping, current version pointer, security facet, and timestamp strategy."
+  - id: "facet_extensibility"
+    label: "Source-specific and industry-specific attributes live in namespaced facets with additive evolution"
+    weight: 0.08
+    scale: "0.0-1.0"
+    evidence_required: "Check facet namespaces, unknown-field preservation, deprecation handling, and producer metadata."
+  - id: "long_attribute_model"
+    label: "Dimensions, assertions, claims, scores, relationship attributes, and assessments can be stored as long records"
+    weight: 0.08
+    scale: "0.0-1.0"
+    evidence_required: "Inspect long-form tables or collections for subject, predicate/dimension, value, confidence, evidence, method, and validity."
+  - id: "wide_columnar_model"
+    label: "High-volume metrics, eval outcomes, cost data, latency, freshness, and usage analytics fit wide columnar reporting"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Confirm analytics model for dashboards, pack outcomes, retrieval metrics, cost trends, and cohort analysis."
+  - id: "document_model_fit"
+    label: "Flexible document records are used for context objects, versions, raw source snapshots, normalized payloads, and packs"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Review JSONB/document layout, object storage links, raw snapshot policy, and normalized representation strategy."
+  - id: "promoted_index_policy"
+    label: "High-value attributes can be promoted to indexes without becoming the source of truth"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Check promoted indexes for tenant, kind, source, service, repo, risk, freshness, authority, and sensitivity."
+  - id: "relationship_storage_fit"
+    label: "Binary edges and n-ary/hyperedge relationships can be represented without embedding unlimited edges in objects"
+    weight: 0.08
+    scale: "0.0-1.0"
+    evidence_required: "Inspect relationship documents, endpoints, roles, evidence, confidence, temporal windows, and graph traversal indexes."
+  - id: "bitemporal_support"
+    label: "Object, relationship, assertion, dimension, policy, and pack records distinguish valid time from system time"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Review valid_from, valid_to, observed_at, recorded_at, indexed_at, and as-of query behavior."
+  - id: "schema_registry"
+    label: "Schema definitions, dimension definitions, relationship types, masks, and transformer contracts are registered and versioned"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Check registries, validation rules, backward compatibility, and migration/alias policy."
+  - id: "cloud_backend_mapping"
+    label: "Schema design maps cleanly to Postgres JSONB, document stores, object storage, graph indexes, search, vector stores, and warehouses"
+    weight: 0.08
+    scale: "0.0-1.0"
+    evidence_required: "Review deployment mappings for local SQLite, Postgres, object stores, OpenSearch, vector DBs, and analytical warehouses."
+  - id: "migration_safety"
+    label: "New source systems, fields, dimensions, and object kinds can be added without disruptive migrations"
+    weight: 0.08
+    scale: "0.0-1.0"
+    evidence_required: "Inspect additive schema patterns, compatibility tests, backfill policy, and versioned processors."
+  - id: "query_ergonomics"
+    label: "Flexible schemas remain queryable through stable APIs, materialized views, indexes, and context-pack builders"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Check API filters, graph traversal, dimension queries, source-handle fetch, and explainable retrieval plans."
+  - id: "data_minimization"
+    label: "Schema choices support minimal storage, masking, retention, and encrypted local/cloud separation"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Review retention labels, redaction fields, local cache TTLs, raw-source storage policy, and private memory boundaries."
+  - id: "no_magic_values"
+    label: "Schema and index definitions avoid duplicated magic values and use single-source constants or registries"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Check shared constants for dimensions, relationship types, model IDs, thresholds, paths, and backend names."
+scoring_method: "weighted_sum"

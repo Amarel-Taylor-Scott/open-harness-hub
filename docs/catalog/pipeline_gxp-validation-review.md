@@ -30,11 +30,11 @@ regulation section for each finding.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `structured_to_prose` | processor | `processor/structured-to-prose` | — |
-| 2 | `redact_phi` | processor | `processor/redact-pii-text` | — |
-| 3 | `grep_phi` | rule_pack | `rule-pack/phi-hipaa-en` | — |
-| 4 | `grep_gxp_red_flags` | rule_pack | `rule-pack/grep-gxp-data-integrity-red-flags` | — |
-| 5 | `rag_against_cfr_11` | rule_pack | `rule-pack/hybrid-retrieval-policy` | — |
-| 6 | `grade` | processor | `processor/llm-judge` | — |
-| 7 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `structured_to_prose` | processor | `processor/structured-to-prose` | - |
+| 2 | `redact_phi` | processor | `processor/redact-pii-text` | - |
+| 3 | `grep_phi` | rule_pack | `rule-pack/phi-hipaa-en` | - |
+| 4 | `grep_gxp_red_flags` | rule_pack | `rule-pack/grep-gxp-data-integrity-red-flags` | - |
+| 5 | `rag_against_cfr_11` | rule_pack | `rule-pack/hybrid-retrieval-policy` | - |
+| 6 | `grade` | processor | `processor/llm-judge` | - |
+| 7 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

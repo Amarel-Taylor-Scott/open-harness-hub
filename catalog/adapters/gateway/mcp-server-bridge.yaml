@@ -1,0 +1,38 @@
+id: "adapter/mcp-server-bridge"
+type: adapter
+version: "0.1.0"
+name: "MCP server bridge"
+description: |
+  Adapter that exposes Open Harness Hub catalog tools over a Model
+  Context Protocol (MCP) server. Wraps any tool registered in the
+  catalog's tool registry and surfaces it as an MCP tool definition
+  that any MCP-compatible host (Claude Desktop, Claude Code, custom
+  agents) can discover and call. Handles request translation between
+  the MCP JSON-RPC wire format and the catalog tool's parameter
+  schema, forwards the call to the backing implementation (callable,
+  HTTP, or shell), and returns an MCP-compliant response. Supports
+  optional API-key authentication via environment variable injection
+  so tenant-keyed tools remain secure behind the bridge.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "cross_industry", "software.devops"]
+capability: ["routing", "serving", "tool_use", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+tags: ["mcp", "bridge", "tool-registry", "json-rpc", "gateway", "claude-desktop"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+transport: "openai_compatible"
+capabilities:
+  - "tool_use"
+  - "mcp_server"
+  - "tool_registry_bridge"
+  - "request_translation"
+  - "tenant_key_injection"
+auth: "byok"
+cost_model: "self_hosted"
+endpoint: "http://localhost:8090/mcp"
+default_model: "none"

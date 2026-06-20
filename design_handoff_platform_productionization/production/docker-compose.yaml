@@ -1,0 +1,57 @@
+# docker-compose — AI Done Right local platform
+# One command serves all 24 prototype surfaces + the shared platform core,
+# optionally exposed publicly via a TryCloudflare quick tunnel.
+#
+#   cp .env.example .env        # fill in secrets (no fakes — see README)
+#   docker compose up --build
+#   → http://localhost:8080            (all sites, via Caddy)
+#   → http://localhost:8080/api/healthz (platform-core through the proxy)
+#
+#   docker compose --profile tunnel up  # adds a TryCloudflare public URL (printed in logs)
+
+services:
+  core:
+    build: ./core
+    environment:
+      - PORT=8787
+      - DATA_FILE=/data/core.json
+      - CORE_JWT_SECRET=${CORE_JWT_SECRET:?set in .env}
+      - CORE_SIGNING_SECRET=${CORE_SIGNING_SECRET:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - OLLAMA_API_KEY=${OLLAMA_API_KEY:-}
+      - OLLAMA_HOST=${OLLAMA_HOST:-http://host.docker.internal:11434}
+      - SERVICE_BALTOR_SECRET=${SERVICE_BALTOR_SECRET:-}
+      - SERVICE_TELEON_SECRET=${SERVICE_TELEON_SECRET:-}
+      - SERVICE_PARENT_SECRET=${SERVICE_PARENT_SECRET:-}
+    volumes:
+      - core-data:/data
+    ports:
+      - "8787:8787"
+    restart: unless-stopped
+
+  sites:
+    image: caddy:2-alpine
+    depends_on: [core]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # lets the gateway route /api/identity/* to host services
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro   # GENERATED from services.json — edit routes there, run `just routes`
+      # SITE_ROOT = your local checkout of the design repo (folder that contains openharness/)
+      - ${SITE_ROOT:?set SITE_ROOT in .env to the folder containing openharness/}:/srv/sites:ro
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+  # TryCloudflare quick tunnel — public URL with zero config (printed in container logs).
+  # Quick tunnels are ephemeral/dev-only; the Terraform skeleton provisions named tunnels.
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    profiles: [tunnel]
+    command: tunnel --no-autoupdate --url http://sites:80
+    depends_on: [sites]
+    restart: unless-stopped
+
+volumes:
+  core-data:

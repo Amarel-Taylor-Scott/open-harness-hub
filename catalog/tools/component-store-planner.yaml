@@ -1,0 +1,57 @@
+id: "tool/component-store-planner"
+type: tool
+version: "0.1.0"
+name: "Component store planner"
+description: "Plans database-backed component and subcomponent candidate rows from factory JSONL without mutating Postgres, keeping repository files as seed/export definitions rather than the product store."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "retrieval", "serving", "verification"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "subcomponents", "postgres", "planning", "database-first", "object-factory"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    row_dir:
+      type: string
+    output_dir:
+      type: string
+    run_id:
+      type: string
+  required: ["row_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    component_candidate_count:
+      type: integer
+    subcomponent_candidate_count:
+      type: integer
+    source_component_link_count:
+      type: integer
+    files:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      row_dir: "dist/source-surface-scan-partitions/seed/rows"
+      output_dir: "dist/source-surface-scan-partitions/seed/component-store"
+    output:
+      ok: true
+      component_candidate_count: 620
+      subcomponent_candidate_count: 15500
+implementations:
+  - kind: "callable"
+    path: "scripts.db.component_store_plan.plan_component_store"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.component_store_plan"

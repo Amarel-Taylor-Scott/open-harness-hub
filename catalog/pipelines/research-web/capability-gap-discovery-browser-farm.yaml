@@ -1,0 +1,165 @@
+id: "pipeline/capability-gap-discovery-browser-farm"
+type: pipeline
+version: "0.1.0"
+name: "Capability gap discovery browser farm"
+description: "Coordinate browser, search, and embedding agents to discover high-value LLM capability gaps and rank candidate primitives, pipelines, evals, and deployment blueprints."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "cross_industry"]
+capability: ["research", "retrieval", "evaluation", "planning"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.discovery"
+tags: ["capability-gap", "browser-scout", "primitive-priority", "pipeline-discovery"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Find and rank areas where out-of-box LLMs are weak but reusable pipelines and primitives can create measurable capability lift."
+pipeline_kind: "research_web.capability_gap_discovery"
+
+inputs:
+  - name: "seed_topics"
+    type: "string[]"
+  - name: "source_lanes"
+    type: "string[]"
+  - name: "max_findings"
+    type: "integer"
+  - name: "allowed_domains"
+    type: "string[]"
+outputs:
+  - name: "normalized_findings"
+    type: "object[]"
+  - name: "ranked_opportunities"
+    type: "object[]"
+  - name: "candidate_primitives"
+    type: "object[]"
+  - name: "candidate_pipeline_blueprints"
+    type: "object[]"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/capability-gap-discovery-patterns"
+    - "knowledge-pack/llm-pipeline-saas-blueprints"
+  rule_packs:
+    - "rule-pack/web-search-allowlist-default"
+    - "rule-pack/grep-prompt-injection-heuristics"
+
+steps:
+  - id: "load_discovery_patterns"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/capability-gap-discovery-patterns"
+    inputs:
+      query: "$.inputs.seed_topics"
+      top_k: 12
+
+  - id: "semantic_prior_search"
+    kind: "tool"
+    ref: "tool/embedding-index-search"
+    inputs:
+      query: "$.inputs.seed_topics"
+      index: "catalog"
+      top_k: 25
+      filters:
+        types: ["pipeline", "tool", "processor", "rule-pack", "knowledge-pack", "rubric", "benchmark"]
+
+  - id: "source_router"
+    kind: "tool"
+    ref: "tool/search-provider-router"
+    inputs:
+      query: "$.inputs.seed_topics"
+      requirements:
+        freshness: "current"
+        citations_required: true
+        discovery_lanes: "$.inputs.source_lanes"
+      provider_registry:
+        - name: "web-search"
+          kind: "web_api"
+        - name: "browser-research"
+          kind: "browser"
+        - name: "custom-cloud-search"
+          kind: "cloud_function"
+      fallback_policy: "allow_public_web"
+
+  - id: "dataset_browser"
+    kind: "tool"
+    ref: "tool/browser-research-session"
+    inputs:
+      query: "Find datasets and competitions related to $.inputs.seed_topics that imply reusable LLM pipeline opportunities."
+      max_pages: 10
+      allowed_domains: ["kaggle.com", "huggingface.co", "data.gov"]
+      extraction_schema:
+        source_type: "dataset_or_competition"
+        fields: ["task", "labels", "schema", "domain", "evidence_url", "reuse_signal"]
+
+  - id: "paper_browser"
+    kind: "tool"
+    ref: "tool/browser-research-session"
+    inputs:
+      query: "Find papers and benchmarks related to $.inputs.seed_topics that describe LLM weaknesses, workflow gaps, or evaluation opportunities."
+      max_pages: 10
+      allowed_domains: ["arxiv.org", "semanticscholar.org", "paperswithcode.com", "pubmed.ncbi.nlm.nih.gov"]
+      extraction_schema:
+        source_type: "paper_or_benchmark"
+        fields: ["task", "method", "failure_mode", "benchmark", "evidence_url", "lift_hypothesis"]
+
+  - id: "red_team_browser"
+    kind: "tool"
+    ref: "tool/browser-research-session"
+    inputs:
+      query: "Find red-team events, hackathons, safety evaluations, and public failure reports related to $.inputs.seed_topics."
+      max_pages: 8
+      allowed_domains: "$.inputs.allowed_domains"
+      extraction_schema:
+        source_type: "red_team_or_hackathon"
+        fields: ["failure_mode", "affected_workflow", "evidence_url", "candidate_guardrail", "eval_idea"]
+
+  - id: "normalize_findings"
+    kind: "tool"
+    ref: "tool/search-result-normalizer"
+    inputs:
+      provider: "capability-gap-browser-farm"
+      raw_response:
+        dataset: "$.steps.dataset_browser.output.findings"
+        papers: "$.steps.paper_browser.output.findings"
+        red_team: "$.steps.red_team_browser.output.findings"
+      normalize_for: "audit"
+      max_results: "$.inputs.max_findings"
+
+  - id: "score_findings"
+    kind: "tool"
+    ref: "tool/capability-gap-signal-scorer"
+    inputs:
+      finding: "$.steps.normalize_findings.output.results"
+      weights:
+        economic_value: 1.4
+        data_coverage: 1.1
+        verifiability: 1.3
+        llm_capability_gap: 1.5
+        deployment_friction: 1.2
+        cost_savings_potential: 1.2
+        reuse_potential: 1.4
+        maintenance_burden: 0.8
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "capability-gap-discovery-browser-farm"
+      applied_layers: ["discovery_patterns", "semantic_prior_search", "source_router", "dataset_browser", "paper_browser", "red_team_browser", "normalization", "scoring"]
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.outputs.ranked_opportunities"
+    op: "is_truthy"
+    value: true
+    label: "At least one ranked opportunity is produced."
+  - kind: "deterministic"
+    target: "$.outputs.candidate_primitives"
+    op: "is_truthy"
+    value: true
+    label: "At least one primitive proposal is produced."

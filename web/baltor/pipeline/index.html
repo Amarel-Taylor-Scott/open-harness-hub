@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor · Pipeline Journey (projection-only)</title>
+<meta name="description" content="Follow ONE Baltor pipeline run, stage by stage: upload → decomposition → reconciliation → enhancement → optimization → verification → consumption. A projection over the existing runtime — lossless at every step." />
+<!-- Shared design system for the whole 7-stage series. Cohesive web/baltor language. -->
+<link rel="stylesheet" href="./pipeline.css" />
+<style>
+  /* Index-only flourish layered on top of the shared system (pipeline.css). */
+  .hero { padding:18px var(--pad-page) 4px; }
+  .hero .eyebrow { color:var(--violet); font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.12em; }
+  .hero h1 { font-size:clamp(24px,3.2vw,36px); margin:6px 0 6px; }
+  .lawwrap { padding:6px var(--pad-page) 0; }
+  .totals { display:flex; flex-wrap:wrap; gap:8px; padding:10px var(--pad-page) 0; }
+  .tot { font-size:11px; color:var(--mut); border:1px solid var(--line); border-radius:7px; padding:4px 9px; background:var(--panel); }
+  .tot b { color:var(--fg); }
+  .tot.held b { color:var(--violet); } .tot.rej b { color:var(--bad); }
+</style>
+</head>
+<body>
+
+<!-- The 7-stage stepper (index is the journey root; no current stage highlighted) -->
+<nav class="stepper" aria-label="Pipeline stages">
+  <a href="./upload.html"><span class="step-no">01</span> Upload</a>
+  <a href="./decomposition.html"><span class="step-no">02</span> Decomposition</a>
+  <a href="./reconciliation.html"><span class="step-no">03</span> Reconciliation</a>
+  <a href="./enhancement.html"><span class="step-no">04</span> Enhancement</a>
+  <a href="./optimization.html"><span class="step-no">05</span> Optimization</a>
+  <a href="./verification.html"><span class="step-no">06</span> Verification</a>
+  <a href="./consumption.html"><span class="step-no">07</span> Consumption</a>
+</nav>
+
+<header class="hero">
+  <div class="eyebrow">The Baltor pipeline journey</div>
+  <h1>One run, end to end — losslessly</h1>
+  <div class="sub">Follow a single real pipeline run through all seven stages. Each stage takes an
+    <b>input</b>, produces a derived <b>output</b>, and — this is the law — keeps everything it
+    <b>held out</b> or <b>rejected</b> visible beside the winner, with source handles and receipts.
+    This page is a projection over the existing runtime: it computes no truth; it reads
+    <code>/api/pipeline/overview</code>.</div>
+</header>
+
+<div class="lawwrap">
+  <div class="law"><b>Lossless distillation law:</b> distillation is never replacement. Every arrow
+    below creates a new derived layer while preserving the raw layer, the lineage, the alternatives,
+    the rejected candidates, and a rollback path. "Omitted from the answer" is shown as held-out —
+    never hidden, never erased.</div>
+</div>
+
+<div class="bar">
+  <button id="run">Run pipeline</button>
+  <span class="status" id="status"><span class="dot"></span>idle</span>
+  <span class="prevnext"><a href="./upload.html">Start at Stage 01 · Upload &rarr;</a></span>
+</div>
+
+<div class="totals" id="totals" hidden></div>
+
+<section class="cards" id="cards">
+  <div class="card" style="cursor:default;"><span class="empty">&mdash; click Run pipeline &mdash;</span></div>
+</section>
+
+<script>
+// PROJECTION ONLY. This page fetches the read-only projection API and RENDERS. It computes, stores,
+// and mutates NO truth. It fetches ONLY /api/pipeline/overview. No client-side persistence of truth,
+// no secrets. The per-stage detail lives on each stage page; this is the journey overview.
+const QS = "?tenant=demo&corpus=cfpb";
+const EP = { overview: "/api/pipeline/overview" + QS };
+
+// Static stage catalogue (id → label, page, one-line description). The LIVE counts come from the API;
+// these strings only label/deep-link the cards so the journey reads coherently even before a run.
+const STAGES = [
+  ["upload",         "Upload",         "upload.html",         "Raw sources become normalized SourceArtifacts — every raw_ref + source handle preserved."],
+  ["decomposition",  "Decomposition",  "decomposition.html",  "Documents split into atomic facts; narrative allegations are held out, not erased."],
+  ["reconciliation", "Reconciliation", "reconciliation.html", "Conflicting values resolved by authority — the losing value (FAQ “30 days”) kept beside the winner."],
+  ["enhancement",    "Enhancement",    "enhancement.html",    "Entity linking, freshness/fragility classes, and the knowledge-graph edges."],
+  ["optimization",   "Optimization",  "optimization.html",   "A bake-off: the promoted pack plus the baseline and the rejected candidates with reasons."],
+  ["verification",   "Verification",   "verification.html",   "Per-artifact allow / hold_out decisions with a verification receipt."],
+  ["consumption",    "Consumption",    "consumption.html",    "The served answer with each fact's source handle, held_out_warnings, and the receipt lineage."],
+];
+
+const cards = document.getElementById("cards");
+const statusEl = document.getElementById("status");
+const totalsEl = document.getElementById("totals");
+
+function esc(s){ return String(s==null?"":s).replace(/[&<>]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+function setStatus(kind,msg){ statusEl.innerHTML = `<span class="dot ${kind}"></span>${esc(msg)}`; }
+
+function buildCards(byId, degraded){
+  cards.innerHTML = "";
+  let tHeld = 0, tRej = 0, tOut = 0, live = 0;
+  STAGES.forEach(([id,label,page,desc],i)=>{
+    const s = byId[id] || {};
+    const a = document.createElement("a"); a.className="card"; a.href = "./"+page;
+    const has = Object.keys(s).length > 0; if (has) live++;
+    const inC  = s.in_count, outC = s.out_count, heldC = s.held_out_count||0, rejC = s.rejected_count||0;
+    if (typeof outC === "number") tOut += outC;
+    tHeld += heldC; tRej += rejC;
+    const statusPill = s.status
+      ? `<span class="pill ${s.status==="ok"||s.status==="done"?"ok":"warn"}">${esc(s.status)}</span>` : "";
+    a.innerHTML =
+      `<div class="stage-no">Stage ${String(i+1).padStart(2,"0")} ${statusPill}</div>`+
+      `<div class="stage-name">${esc(s.name||label)}</div>`+
+      `<div class="stage-desc">${esc(desc)}</div>`+
+      `<div class="counts">`+
+        `<span class="count">in <b>${inC==null?"–":inC}</b></span>`+
+        `<span class="count">out <b>${outC==null?"–":outC}</b></span>`+
+        `<span class="count held">held&nbsp;out <b>${heldC}</b></span>`+
+        `<span class="count rej">rejected <b>${rejC}</b></span>`+
+      `</div>`+
+      `<div class="go">Open ${esc(label)} stage &rarr;</div>`;
+    cards.appendChild(a);
+  });
+  totalsEl.hidden = false;
+  totalsEl.innerHTML =
+    `<span class="tot">stages live <b>${live}/7</b></span>`+
+    `<span class="tot">total out <b>${tOut}</b></span>`+
+    `<span class="tot held">held out (kept) <b>${tHeld}</b></span>`+
+    `<span class="tot rej">rejected (kept) <b>${tRej}</b></span>`+
+    (degraded ? `<span class="tot" style="color:var(--warn)">degraded · counts unavailable</span>` : "");
+}
+
+async function getJSON(url){ const r=await fetch(url); if(!r.ok && r.status>=500) throw new Error("HTTP "+r.status); return r.json(); }
+
+async function run(){
+  const btn=document.getElementById("run"); btn.disabled=true; setStatus("run","loading…");
+  cards.innerHTML = `<div class="card" style="cursor:default;"><span class="loading">fetching /api/pipeline/overview …</span></div>`;
+  let ov=null, degraded=false;
+  try {
+    ov = await getJSON(EP.overview);
+  } catch(e){
+    cards.innerHTML = `<div class="card" style="cursor:default;"><span class="err">error loading the journey overview: ${esc(e)}</span></div>`;
+    totalsEl.hidden = true; setStatus("bad","error"); btn.disabled=false; return;
+  }
+  // Degrade gracefully: if overview is empty/absent, still render the 7 stage cards as deep links.
+  const stages = (ov && ov.stages) || [];
+  if (!stages.length) degraded = true;
+  const byId = {}; stages.forEach(s => { if (s && s.id) byId[s.id] = s; });
+  buildCards(byId, degraded);
+  if (degraded) {
+    setStatus("warn","degraded · overview empty — stage links still available");
+  } else {
+    const runId = ov.run_id ? (" · run "+ov.run_id) : "";
+    setStatus("ok","projected · read-only"+runId);
+  }
+  btn.disabled=false;
+}
+
+document.getElementById("run").addEventListener("click", run);
+run();
+</script>
+</body>
+</html>

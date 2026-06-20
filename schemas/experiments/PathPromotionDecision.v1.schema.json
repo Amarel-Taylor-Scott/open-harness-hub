@@ -1,0 +1,48 @@
+{
+  "$id": "experiments/PathPromotionDecision.v1", "title": "PathPromotionDecision.v1", "type": "object", "additionalProperties": false,
+  "description": "The single object that authorizes promoting a candidate path to baseline — nothing else may promote a path. decision is 'promote' ONLY when ALL gates pass: same_input AND same_output_contract AND output_equivalent AND source_handles_preserved AND held_out_not_leaked AND safety_ok AND cost_acceptable (cost within ceiling OR justified). same_input is the input-attestation gate: the candidate provably ran on the SAME input as the baseline (a different-input comparison can never be promoted). If ANY gate is false the decision MUST be 'keep_baseline' and promoted_path_id MUST be null. This consistency is ENFORCED at the contract layer by the if/then constraints below: a schema-valid decision='promote' REQUIRES every gate boolean to be true, and a decision='keep_baseline' REQUIRES promoted_path_id==null — so 'passes the schema' implies a legitimate promotion shape (a forged 'promote' with false gates is REJECTED). rollback_target is ALWAYS the baseline's path_id (REQUIRED, never null) so the move is reversible. The gate booleans are mirrored from the PathComparisonReport verdict so the warrant is auditable. References the report_id + run_id so the promotion is traceable back to the apples-to-apples run. Serve-authorization must additionally call path_promotion.is_promote_authorized (which re-derives promote AND promoted_path_id==candidate_path_id) — never trust decision=='promote' alone.",
+  "required": ["schema_version", "decision_id", "report_id", "run_id", "capability_slot", "candidate_path_id", "baseline_path_id", "decision", "same_input", "same_output_contract", "output_equivalent", "source_handles_preserved", "held_out_not_leaked", "safety_ok", "cost_acceptable", "rollback_target", "decided_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["PathPromotionDecision.v1"]},
+    "decision_id": {"type": "string"},
+    "report_id": {"type": "string", "description": "the PathComparisonReport whose verdict this decision acts on"},
+    "run_id": {"type": "string", "description": "the ParallelPathRun behind the report"},
+    "capability_slot": {"type": "string"},
+    "candidate_path_id": {"type": "string", "description": "the candidate being judged for promotion"},
+    "baseline_path_id": {"type": "string", "description": "the current baseline the candidate challenged"},
+    "decision": {"type": "string", "enum": ["promote", "keep_baseline"], "description": "'promote' ONLY when every gate is true; otherwise 'keep_baseline'"},
+    "promoted_path_id": {"description": "the candidate_path_id when decision=='promote'; MUST be null when decision=='keep_baseline'"},
+    "same_input": {"type": "boolean", "description": "gate: candidate provably ran on the SAME input as the baseline (its input_snapshot_hash == the run's). A different-input comparison can never be promoted."},
+    "same_output_contract": {"type": "boolean", "description": "gate: candidate's output_contract matches the baseline's"},
+    "output_equivalent": {"type": "boolean", "description": "gate: candidate's served facts equal the baseline's"},
+    "source_handles_preserved": {"type": "boolean", "description": "gate: candidate kept >= the baseline's grounding handles"},
+    "held_out_not_leaked": {"type": "boolean", "description": "gate: a baseline-held-out fact does NOT leak into the candidate output"},
+    "safety_ok": {"type": "boolean", "description": "gate: candidate output is safe / grounded / non-leaking"},
+    "cost_acceptable": {"type": "boolean", "description": "gate: candidate cost is within the ceiling OR explicitly justified"},
+    "rollback_target": {"type": "string", "description": "REQUIRED — ALWAYS the baseline's path_id; the path a rollback reverts to. A decision without it is invalid."},
+    "reason": {"type": "string", "description": "human-readable warrant: which gate(s) drove the decision"},
+    "decided_at": {"type": "string", "description": "injected time"}
+  },
+  "allOf": [
+    {
+      "description": "A 'promote' decision REQUIRES every gate boolean to be true — a schema-valid 'promote' with any false gate is REJECTED at the contract layer (closes the forged-decision hole).",
+      "if": {"properties": {"decision": {"const": "promote"}}},
+      "then": {
+        "properties": {
+          "same_input": {"const": true},
+          "same_output_contract": {"const": true},
+          "output_equivalent": {"const": true},
+          "source_handles_preserved": {"const": true},
+          "held_out_not_leaked": {"const": true},
+          "safety_ok": {"const": true},
+          "cost_acceptable": {"const": true}
+        }
+      }
+    },
+    {
+      "description": "A 'keep_baseline' decision REQUIRES promoted_path_id == null — a kept decision can never name a promoted path (fixes the prose/schema contradiction).",
+      "if": {"properties": {"decision": {"const": "keep_baseline"}}},
+      "then": {"properties": {"promoted_path_id": {"const": null}}}
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+id: "tool/search-result-normalizer"
+type: tool
+version: "0.1.0"
+name: "Search result normalizer"
+description: "Normalizes heterogeneous search responses into a common citation-ready result shape with source URL, title, snippet, fetched text pointer, score, provider metadata, and freshness metadata."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "cross_industry"]
+capability: ["retrieval", "evaluation"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "hub"
+freshness: "stable"
+tags: ["search", "normalization", "citations", "provider-abstraction", "saas"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    provider:
+      type: string
+    raw_response:
+      type: object
+    normalize_for:
+      type: string
+      enum: ["citations", "rag", "ranking", "audit"]
+      default: "citations"
+    max_results:
+      type: integer
+      default: 10
+  required: ["provider", "raw_response"]
+returns:
+  type: object
+  properties:
+    results:
+      type: array
+      items:
+        type: object
+    provider_metadata:
+      type: object
+    warnings:
+      type: array
+      items:
+        type: string
+side_effects: "none"
+examples:
+  - input:
+      provider: "example_search"
+      raw_response:
+        items: []
+      normalize_for: "rag"
+    output:
+      results: []
+      provider_metadata:
+        provider: "example_search"
+      warnings: []
+implementations:
+  - kind: "callable"
+    path: "tools.search_result_normalizer.run"

@@ -1,0 +1,57 @@
+id: knowledge-pack/structural-design-code-constants
+type: knowledge-pack
+version: 0.1.0
+name: Structural Design Code Constants
+description: 'Capability-lift knowledge pack for an esoteric area LLMs handle poorly.
+  Gap: misquote load/phi factors, load-combination equations across ASCE7/AISC360/ACI318/Eurocode
+  Grounded in ASCE7/AISC360/ACI318 public load combos + Eurocode factor tables + AISC
+  shapes via exact_id retrieval. Lift: edition-specific life-safety numeric coefficients,
+  deterministically checkable'
+authors:
+- name: Open Harness Hub capability-gap factory
+license: CC-BY-4.0
+industry:
+- manufacturing
+capability:
+- retrieval
+- verification
+modality:
+- structured
+- text
+lifecycle: experimental
+trust_boundary: external
+freshness: volatile
+tags:
+- capability-lift
+- esoteric
+- knowledge-pack
+- exact_id
+- ingestion-target
+created: '2026-05-28'
+updated: '2026-05-28'
+attribution:
+  source_url: ASCE7/AISC360/ACI318 public load combos + Eurocode factor tables + AISC
+    shapes
+  source_kind: other
+  author: ASCE7/AISC360/ACI318 public load combos + Eurocode factor tables + AISC
+    shapes
+  license: see-source
+content_types:
+- fact_table
+- reference_doc
+retrieval:
+- exact_id
+files:
+- path: data/esoteric-packs/structural-design-code-constants.jsonl
+  format: jsonl
+  content_type: fact_table
+  schema: capability-gap seed (real facts where stable; else ingestion contract)
+indexing:
+  bm25: true
+  dense:
+    model: all-MiniLM-L6-v2
+provenance:
+  sources:
+  - ASCE7/AISC360/ACI318 public load combos + Eurocode factor tables + AISC shapes
+  collected_through: '2026-05-28'
+  collected_by: capability-gap factory

@@ -15,7 +15,7 @@
 
 ## Primitives used
 
-| Layer | Artifact | What it does |
+| Layer | Component | What it does |
 |---|---|---|
 | Redact | `harness/redact-pii-text` | Strip PII before external search |
 | Expand | `knowledge-pack/common-abbreviations` | Domain abbreviations |

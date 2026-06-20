@@ -1,0 +1,44 @@
+# Baltor capability worker — warm/hot pool Deployment (C-FLEET-2).
+# Maps lifecycle policies warm_pool / hot_pool / high_priority_on_demand. Scale 1->N is the HPA's job;
+# scale-to-zero (0->1) is KEDA's (see the ScaledObject template). The DB task ledger is the source of
+# truth — a worker always claims atomically after wake-up; Pub/Sub (if added) is only a wake-up signal.
+# Placeholders: ${CAPABILITY_ID} ${MIN_WORKERS} ${MAX_WORKERS} ${IMAGE} ${BALTOR_DB_URL}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: baltor-worker-${CAPABILITY_ID}
+  labels: {app: baltor-worker, capability: "${CAPABILITY_ID}", lifecycle: warm_pool}
+spec:
+  replicas: ${MIN_WORKERS}        # min_workers from worker_lifecycle_policies.json
+  selector:
+    matchLabels: {app: baltor-worker, capability: "${CAPABILITY_ID}"}
+  template:
+    metadata:
+      labels: {app: baltor-worker, capability: "${CAPABILITY_ID}"}
+    spec:
+      terminationGracePeriodSeconds: 120   # let the worker finish its current task (drain)
+      containers:
+        - name: worker
+          image: ${IMAGE}
+          args: ["python3", "scripts/capability_worker.py", "--capability", "${CAPABILITY_ID}", "--db", "${BALTOR_DB_URL}"]
+          env:
+            - {name: BALTOR_DB_URL, value: "${BALTOR_DB_URL}"}   # the ledger = truth
+          lifecycle:
+            preStop:
+              exec:
+                command: ["python3", "scripts/capability_worker.py", "--drain"]  # stop claiming, finish current
+          resources:
+            requests: {cpu: "100m", memory: "128Mi"}
+            limits: {cpu: "1", memory: "1Gi"}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler           # HPA handles 1->N (KEDA handles 0->1)
+metadata:
+  name: baltor-worker-${CAPABILITY_ID}
+spec:
+  scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: baltor-worker-${CAPABILITY_ID}}
+  minReplicas: 1
+  maxReplicas: ${MAX_WORKERS}            # max_workers from worker_lifecycle_policies.json
+  metrics:
+    - type: Resource
+      resource: {name: cpu, target: {type: Utilization, averageUtilization: 70}}

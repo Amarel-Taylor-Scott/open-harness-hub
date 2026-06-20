@@ -1,0 +1,59 @@
+id: knowledge-pack/bioacoustic-mel-features-and-taxonomy-priors
+type: knowledge-pack
+version: 0.1.0
+name: Bioacoustic Mel Features And Taxonomy Priors
+description: 'Capability-lift knowledge pack for an esoteric area LLMs handle poorly.
+  Gap: species ID needs mel-spectrogram + taxonomy + region/season occurrence prior;
+  no audio front end Grounded in BirdCLEF audio+labels (CC) + eBird/Xeno-canto taxonomy/occurrence
+  (CC) via classifier retrieval. Lift: winning combined mel-CNN + taxonomy/region
+  priors (macro ROC-AUC); audio+prior component supplies structure'
+authors:
+- name: Open Harness Hub capability-gap factory
+license: CC-BY-4.0
+industry:
+- healthcare
+- pharma
+- finance
+- compliance
+- government
+capability:
+- retrieval
+- verification
+modality:
+- structured
+- text
+lifecycle: experimental
+trust_boundary: external
+freshness: volatile
+tags:
+- capability-lift
+- esoteric
+- knowledge-pack
+- classifier
+- ingestion-target
+created: '2026-05-28'
+updated: '2026-05-28'
+attribution:
+  source_url: BirdCLEF audio+labels (CC) + eBird/Xeno-canto taxonomy/occurrence (CC)
+  source_kind: other
+  author: BirdCLEF audio+labels (CC) + eBird/Xeno-canto taxonomy/occurrence (CC)
+  license: see-source
+content_types:
+- fact_table
+- reference_doc
+retrieval:
+- classifier
+files:
+- path: data/esoteric-packs/bioacoustic-mel-features-and-taxonomy-priors.jsonl
+  format: jsonl
+  content_type: fact_table
+  schema: capability-gap seed (real facts where stable; else ingestion contract)
+indexing:
+  bm25: true
+  dense:
+    model: all-MiniLM-L6-v2
+provenance:
+  sources:
+  - BirdCLEF audio+labels (CC) + eBird/Xeno-canto taxonomy/occurrence (CC)
+  collected_through: '2026-05-28'
+  collected_by: capability-gap factory

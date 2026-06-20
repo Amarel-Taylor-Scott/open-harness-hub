@@ -1,0 +1,64 @@
+id: "tool/vector-readiness-auditor"
+type: tool
+version: "0.1.0"
+name: "Vector readiness auditor"
+description: "Compares planned embedding completion stubs with optional stored vector metadata and emits readiness, missing-vector, mismatch, and orphan-vector audit records without calling embedding providers."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "embedding", "governance", "evaluation", "verification"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["embeddings", "vector-search", "pgvector", "audit", "readiness", "replay"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    completion_stubs_jsonl:
+      type: string
+    stored_vectors_jsonl:
+      type: string
+    output_dir:
+      type: string
+    run_id:
+      type: string
+  required: ["completion_stubs_jsonl"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    planned_rows:
+      type: integer
+    stored_rows:
+      type: integer
+    ready_rows:
+      type: integer
+    missing_vector_rows:
+      type: integer
+    readiness_status:
+      type: string
+    files:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      completion_stubs_jsonl: "dist/source-surface-scan-partitions/seed/embedding-plan/embedding-completion-stubs.jsonl"
+      output_dir: "dist/source-surface-scan-partitions/seed/vector-readiness"
+    output:
+      ok: true
+      planned_rows: 620
+      missing_vector_rows: 620
+      readiness_status: "not_ready"
+implementations:
+  - kind: "callable"
+    path: "scripts.db.vector_readiness_audit.audit_vector_readiness"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.vector_readiness_audit"

@@ -1,0 +1,51 @@
+id: processor/mmr-diversity-select
+type: processor
+version: 0.1.0
+name: MMR diversity select
+description: 'Maximal-Marginal-Relevance selection — trades relevance against diversity to cut near-duplicate
+  redundancy and broaden coverage of the final top-k. Deterministic; λ tunes the trade-off.
+
+
+  Retrieval/prompt taxonomy step R5 (see docs/concepts/retrieval-and-prompt-taxonomy.md). One swappable
+  method-component for the governed-model-call recipe; lift is measured at the pipeline level, not on
+  this component.'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+- ai
+capability:
+- routing
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- retrieval-taxonomy
+- step-r5
+- rag
+- freezable
+created: '2026-05-29'
+updated: '2026-05-29'
+process_kind: select.mmr_diversity
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: candidates
+  type: object
+- name: lambda
+  type: object
+- name: k
+  type: object
+outputs:
+- name: selected
+  type: object
+side_effects: none
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.retrieval.mmr_diversity_select.run
+  language: python

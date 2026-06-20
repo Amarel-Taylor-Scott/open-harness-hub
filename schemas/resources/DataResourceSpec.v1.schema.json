@@ -1,0 +1,24 @@
+{
+  "$id": "resources/DataResourceSpec.v1",
+  "title": "DataResourceSpec.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "Declares a data resource to provision (logical only — no raw physical name, no raw credentials). Temporary resources (managed_ephemeral/pipeline_temp) REQUIRE ttl_seconds; persistent resources (managed_persistent/tenant_dedicated) REQUIRE owner + retention_class. A non-local provider REQUIRES a local_equivalent (offline golden path). Credentials are secret_ref/key_ref only.",
+  "required": ["spec_id", "logical_name", "kind_code", "ownership_code"],
+  "properties": {
+    "spec_id": {"type": "string"},
+    "logical_name": {"type": "string"},
+    "kind_code": {"type": "integer"},
+    "ownership_code": {"type": "integer"},
+    "provider": {"type": "string", "description": "local (golden path) | a provider node id; non-local requires local_equivalent"},
+    "local_equivalent": {"type": ["string", "null"]},
+    "ttl_seconds": {"type": ["integer", "null"], "description": "REQUIRED for temporary resources"},
+    "owner": {"type": ["string", "null"], "description": "REQUIRED for persistent resources"},
+    "retention_class": {"type": ["string", "null"], "description": "REQUIRED for persistent resources"},
+    "secret_ref": {"type": ["string", "null"]},
+    "key_ref": {"type": ["string", "null"]},
+    "data_classification": {"type": ["string", "null"], "enum": ["public", "synthetic", "internal", "customer_sensitive", null]},
+    "tenant_id": {"type": ["string", "null"]},
+    "schema_hint": {"type": ["object", "null"]}
+  }
+}

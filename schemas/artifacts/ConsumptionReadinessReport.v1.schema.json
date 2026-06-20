@@ -1,0 +1,16 @@
+{
+  "$id": "ConsumptionReadinessReport.v1", "title": "ConsumptionReadinessReport.v1", "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "report_id", "pack_id", "consumable", "created_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["ConsumptionReadinessReport.v1"]},
+    "report_id": {"type": "string"},
+    "pack_id": {"type": "string"},
+    "consumable": {"type": "boolean"},
+    "checks": {"type": "array", "items": {"type": "object", "additionalProperties": true,
+      "required": ["name", "ok"],
+      "properties": {"name": {"type": "string"}, "ok": {"type": "boolean"}, "detail": {"type": "string"}}}},
+    "verification_receipt_id": {"type": "string"},
+    "optimization_receipt_id": {"type": "string"},
+    "created_at": {"type": "string"}
+  }
+}

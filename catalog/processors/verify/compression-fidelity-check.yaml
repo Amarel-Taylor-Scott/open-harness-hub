@@ -1,0 +1,51 @@
+id: processor/compression-fidelity-check
+type: processor
+version: 0.1.0
+name: Compression fidelity check
+description: Measure the quality delta per tier so every raw -> compressed -> hyper-efficient artifact
+  ships a published fidelity score, scored by a SEPARATE evaluator (never self-graded). Aggressive compression
+  destroys reasoning; this is the measured-fidelity guarantee — the same engine and moat as OHH's lift
+  gate.
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+capability:
+- evaluation
+- governance
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- baltor
+- fidelity
+- governance
+created: '2026-05-29'
+updated: '2026-05-29'
+attribution:
+  source_kind: manual
+  author: Open Harness Hub — Baltor
+  license: MIT
+process_kind: verify.compression_fidelity
+deterministic: false
+idempotent: true
+streaming: false
+inputs:
+- name: raw
+  type: object
+- name: tier
+  type: object
+outputs:
+- name: fidelity
+  type: object
+side_effects: none
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.verify.compression_fidelity_check.run
+  language: python
+links:
+  source: docs/strategy/context-enrichment-service.md

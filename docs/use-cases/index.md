@@ -2,7 +2,7 @@
 
 Eight one-page recipes that show how to compose the hub's primitives
 into real production patterns. Each recipe lists: the goal, the exact
-artifacts to use, the composition, and the install path for Claude
+components to use, the composition, and the install path for Claude
 Code / Cursor / any Agent Skills-compatible host.
 
 ## The eight starter use cases

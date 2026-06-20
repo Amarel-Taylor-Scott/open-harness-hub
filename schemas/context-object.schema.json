@@ -1,0 +1,318 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/context-object.schema.json",
+  "title": "Context object",
+  "description": "Standards-aligned stable identity profile for agent-consumable context objects with source handles, current version pointers, provenance, evidence selectors, policy, and delivery metadata.",
+  "type": "object",
+  "required": ["kind", "context_object_id", "object_type", "created_at", "source_handles", "policy"],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "baltor.context-object.v1"
+    },
+    "@context": {
+      "description": "Optional JSON-LD context mapping local terms to schema.org, PROV-O, Web Annotation, SPDX, RO-Crate, or Baltor terms.",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "object" },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "type": "string" },
+              { "type": "object" }
+            ]
+          }
+        }
+      ]
+    },
+    "@id": {
+      "type": "string",
+      "description": "Optional JSON-LD identifier. Prefer the same value as context_object_id when publishing linked data."
+    },
+    "context_object_id": {
+      "type": "string"
+    },
+    "current_version_id": {
+      "type": "string",
+      "description": "Current immutable context version pointer. Current is a pointer, not a mutation of history."
+    },
+    "source_system": {
+      "type": "string"
+    },
+    "native_id": {
+      "type": "string"
+    },
+    "source_url": {
+      "type": "string"
+    },
+    "acl_id": {
+      "type": "string"
+    },
+    "classification": {
+      "type": "string",
+      "enum": ["public", "internal", "confidential", "restricted", "regulated", "unknown"]
+    },
+    "object_type": {
+      "type": "string",
+      "enum": [
+        "document",
+        "document_section",
+        "source_excerpt",
+        "claim",
+        "fact",
+        "decision",
+        "requirement",
+        "work_item",
+        "issue",
+        "comment",
+        "repo",
+        "file",
+        "symbol",
+        "commit",
+        "merge_request",
+        "test_result",
+        "incident",
+        "dataset",
+        "table",
+        "metric",
+        "dashboard",
+        "policy",
+        "contract_clause",
+        "clinical_observation",
+        "transaction",
+        "asset",
+        "shipment",
+        "supplier",
+        "person",
+        "team",
+        "glossary_term",
+        "repo_wiki_page",
+        "context_pack",
+        "glossary_packet",
+        "connector_envelope",
+        "sync_event",
+        "artifact_manifest",
+        "trace_event",
+        "review_decision"
+      ]
+    },
+    "title": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "claim": {
+      "type": "string"
+    },
+    "body": {
+      "description": "Bounded context payload. Do not store unrestricted raw source dumps here.",
+      "type": "object"
+    },
+    "facets": {
+      "description": "Namespaced flexible attributes. Source-specific raw fields stay under source namespaces; cross-source fields can be normalized into core namespaces.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "five_w_one_h": {
+      "description": "Universal who/what/when/where/why/how interpretive dimensions for retrieval, filtering, and context-pack assembly.",
+      "type": "object",
+      "properties": {
+        "who": {
+          "type": "object",
+          "properties": {
+            "actors": { "type": "array", "items": { "type": "string" } },
+            "owners": { "type": "array", "items": { "type": "string" } },
+            "reviewers": { "type": "array", "items": { "type": "string" } },
+            "audience": { "type": "array", "items": { "type": "string" } }
+          },
+          "additionalProperties": true
+        },
+        "what": {
+          "type": "object",
+          "properties": {
+            "entities": { "type": "array", "items": { "type": "string" } },
+            "topics": { "type": "array", "items": { "type": "string" } },
+            "object_types": { "type": "array", "items": { "type": "string" } }
+          },
+          "additionalProperties": true
+        },
+        "when": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "where": {
+          "type": "object",
+          "properties": {
+            "digital_locations": { "type": "array", "items": { "type": "string" } },
+            "logical_locations": { "type": "array", "items": { "type": "string" } },
+            "physical_locations": { "type": "array", "items": { "type": "string" } }
+          },
+          "additionalProperties": true
+        },
+        "why": {
+          "type": "object",
+          "properties": {
+            "goals": { "type": "array", "items": { "type": "string" } },
+            "rationale": { "type": "array", "items": { "type": "string" } },
+            "drivers": { "type": "array", "items": { "type": "string" } }
+          },
+          "additionalProperties": true
+        },
+        "how": {
+          "type": "object",
+          "properties": {
+            "methods": { "type": "array", "items": { "type": "string" } },
+            "processes": { "type": "array", "items": { "type": "string" } },
+            "tools": { "type": "array", "items": { "type": "string" } }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "dimension_summary": {
+      "description": "Optional denormalized view of high-value dimensions. Authoritative dimension assessments live in context-dimension-value records.",
+      "type": "object",
+      "additionalProperties": true
+    },
+    "source_handles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^ctx://"
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source_handle"],
+        "properties": {
+          "source_handle": {
+            "type": "string",
+            "pattern": "^ctx://"
+          },
+          "selector_type": {
+            "type": "string",
+            "description": "Web Annotation style selector.",
+            "enum": ["TextQuoteSelector", "TextPositionSelector", "FragmentSelector", "CssSelector", "XPathSelector", "DataPositionSelector", "TimeState", "LineRangeSelector"]
+          },
+          "selector": {
+            "type": "object"
+          },
+          "evidence_span": {
+            "type": "string"
+          },
+          "supports_claim": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "description": "PROV-like provenance for derivation and generation.",
+      "properties": {
+        "wasDerivedFrom": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "wasGeneratedBy": {
+          "type": "string"
+        },
+        "generatedAtTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "wasAttributedTo": {
+          "type": "string"
+        },
+        "content_hash": {
+          "type": "string"
+        },
+        "commit_sha": {
+          "type": "string"
+        },
+        "pipeline_id": {
+          "type": "string"
+        },
+        "job_id": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "lineage": {
+      "type": "object",
+      "description": "OpenLineage-style source/output relationship summary.",
+      "properties": {
+        "run_id": { "type": "string" },
+        "job_name": { "type": "string" },
+        "inputs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "outputs": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "delivery": {
+      "type": "object",
+      "description": "MCP or local gateway delivery metadata.",
+      "properties": {
+        "mcp_resource_uri": { "type": "string" },
+        "mcp_tool": { "type": "string" },
+        "pack_type": { "type": "string" },
+        "token_budget_used": { "type": "integer", "minimum": 0 },
+        "cache_manifest": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "policy": {
+      "type": "object",
+      "required": ["derived_context", "promotion_allowed", "raw_source_dump_allowed"],
+      "properties": {
+        "derived_context": { "type": "boolean" },
+        "promotion_allowed": { "type": "boolean" },
+        "raw_source_dump_allowed": { "type": "boolean" },
+        "requires_refresh": { "type": "boolean" },
+        "requires_commit_scope": { "type": "boolean" },
+        "source_scope_only": { "type": "boolean" },
+        "block_global_memory_promotion": { "type": "boolean" },
+        "acl_filter_applied": { "type": "boolean" },
+        "prompt_injection_checked": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "freshness": {
+      "type": "object",
+      "properties": {
+        "retrieved_at": { "type": "string", "format": "date-time" },
+        "effective_date": { "type": "string" },
+        "expires_at": { "type": "string", "format": "date-time" },
+        "next_refresh_at": { "type": "string", "format": "date-time" },
+        "staleness": { "type": "string", "enum": ["fresh", "dated", "stale", "unknown"] }
+      },
+      "additionalProperties": true
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

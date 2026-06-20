@@ -29,10 +29,41 @@ except ImportError:
 
 ROOT = Path(__file__).resolve().parent.parent
 CATALOG = ROOT / "catalog"
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts._config import (
+    ANTHROPIC_API_KEY_ENV,
+    DEFAULT_ANTHROPIC_JUDGE_MODEL,
+    DEFAULT_OLLAMA_HOST,
+    DEFAULT_OLLAMA_JUDGE_MODEL,
+    DEFAULT_OLLAMA_MAX_TOKENS,
+    DEFAULT_OLLAMA_TIMEOUT_SECONDS,
+    DEFAULT_OPENAI_CHAT_COMPLETIONS_ENDPOINT,
+    DEFAULT_OPENAI_JUDGE_MODEL,
+    OH_ANTHROPIC_MODEL_ENV,
+    OH_OLLAMA_MAX_TOKENS_ENV,
+    OH_OLLAMA_TIMEOUT_ENV,
+    OH_OPENAI_ENDPOINT_ENV,
+    OH_OPENAI_MODEL_ENV,
+    OLLAMA_HOST_ENV,
+    OLLAMA_MODEL_ENV,
+    OPENAI_API_KEY_ENV,
+)
+from scripts.db.catalog_row_source import iter_components_from_rows
 
 
-def load_catalog() -> dict[str, dict]:
+def load_catalog(row_dir: Path | None = None) -> dict[str, dict]:
     out: dict[str, dict] = {}
+    if row_dir is not None:
+        for component in iter_components_from_rows(row_dir):
+            data = dict(component.manifest)
+            data["_path"] = component.source_path
+            data["_source"] = "database_rows"
+            data["_database_refs"] = component.database_refs
+            out[component.id] = data
+        return out
+
     for path in CATALOG.rglob("*.yaml"):
         if "_inbox" in path.parts or any(p == "data" for p in path.parts):
             continue
@@ -41,6 +72,8 @@ def load_catalog() -> dict[str, dict]:
         except yaml.YAMLError:
             continue
         if isinstance(data, dict) and "id" in data:
+            data["_path"] = str(path.relative_to(ROOT))
+            data["_source"] = "catalog_yaml_seed_export"
             out[data["id"]] = data
     return out
 
@@ -113,7 +146,7 @@ def _structured_to_prose(data, prefix: str = "") -> list[str]:
     return out
 
 
-def _run_processor(ref_id: str, inputs: dict, artifact: dict | None) -> dict:
+def _run_processor(ref_id: str, inputs: dict, component: dict | None) -> dict:
     """Dispatch on processor id. Falls back to structured echo if unknown."""
     if ref_id == "processor/structured-to-prose":
         lines = _structured_to_prose(inputs.get("data", {}))
@@ -264,7 +297,7 @@ def _checklist_evaluator(inputs: dict) -> dict:
         "items":                items,
         "nogo_triggers":        nogo_triggers,
         "checklist_id":         checklist_id,
-        "checklist_artifact":   checklist.get("artifact", ""),
+        "checklist_component":   checklist.get("component", ""),
         "checklist_source":     checklist.get("source", ""),
         "unverified_count":     unverified_count,
         "step_count":           total,
@@ -314,20 +347,20 @@ def _llm_judge(inputs: dict) -> dict:
     """LLM judge — try adapter, fall back to deterministic."""
     rubric_id = inputs.get("rubric_ref")
     candidate = inputs.get("candidate", "")
-    rubric_artifact = _load_artifact(rubric_id) if rubric_id else None
+    rubric_component = _load_component(rubric_id) if rubric_id else None
     ctx_steps = _CURRENT_CTX.get("steps", {}) if _CURRENT_CTX else {}
 
     arm = os.environ.get("OH_JUDGE_ARM", "deterministic")
     adapter_result: dict | None = None
 
     if arm == "ollama" and _ollama_available():
-        adapter_result = _judge_via_ollama(candidate, rubric_artifact)
+        adapter_result = _judge_via_ollama(candidate, rubric_component)
     elif arm == "anthropic" and os.environ.get("ANTHROPIC_API_KEY"):
-        adapter_result = _judge_via_anthropic(candidate, rubric_artifact)
+        adapter_result = _judge_via_anthropic(candidate, rubric_component)
     elif arm == "openai" and os.environ.get("OPENAI_API_KEY"):
-        adapter_result = _judge_via_openai(candidate, rubric_artifact)
+        adapter_result = _judge_via_openai(candidate, rubric_component)
 
-    deterministic = _deterministic_grade(rubric_artifact, ctx_steps)
+    deterministic = _deterministic_grade(rubric_component, ctx_steps)
 
     if adapter_result is not None:
         return {
@@ -340,7 +373,7 @@ def _llm_judge(inputs: dict) -> dict:
     return {**deterministic, "method_label": "deterministic (no model arm configured / available)"}
 
 
-def _load_artifact(art_id: str | None) -> dict | None:
+def _load_component(art_id: str | None) -> dict | None:
     if not art_id:
         return None
     catalog = _CURRENT_CATALOG
@@ -352,7 +385,7 @@ def _load_artifact(art_id: str | None) -> dict | None:
 def _ollama_available() -> bool:
     try:
         import urllib.request
-        host = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
+        host = os.environ.get(OLLAMA_HOST_ENV, DEFAULT_OLLAMA_HOST)
         with urllib.request.urlopen(f"{host}/api/tags", timeout=1) as r:
             return r.status == 200
     except Exception:
@@ -362,12 +395,12 @@ def _ollama_available() -> bool:
 def _judge_via_ollama(candidate: str, rubric: dict | None) -> dict | None:
     try:
         import urllib.request
-        host  = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
-        model = os.environ.get("OLLAMA_MODEL", "llama3.1:8b")
+        host  = os.environ.get(OLLAMA_HOST_ENV, DEFAULT_OLLAMA_HOST)
+        model = os.environ.get(OLLAMA_MODEL_ENV, DEFAULT_OLLAMA_JUDGE_MODEL)
         prompt = _build_judge_prompt(candidate, rubric)
-        payload = json.dumps({"model": model, "prompt": prompt, "stream": False, "options": {"temperature": 0.0, "num_predict": int(os.environ.get("OH_OLLAMA_MAX_TOKENS", "512"))}}).encode()
+        payload = json.dumps({"model": model, "prompt": prompt, "stream": False, "options": {"temperature": 0.0, "num_predict": int(os.environ.get(OH_OLLAMA_MAX_TOKENS_ENV, str(DEFAULT_OLLAMA_MAX_TOKENS)))}}).encode()
         req = urllib.request.Request(f"{host}/api/generate", data=payload, headers={"Content-Type": "application/json"})
-        timeout = int(os.environ.get("OH_OLLAMA_TIMEOUT", "300"))
+        timeout = int(os.environ.get(OH_OLLAMA_TIMEOUT_ENV, str(DEFAULT_OLLAMA_TIMEOUT_SECONDS)))
         with urllib.request.urlopen(req, timeout=timeout) as r:
             data = json.loads(r.read())
         return _parse_judge_response(data.get("response", ""))
@@ -378,8 +411,8 @@ def _judge_via_ollama(candidate: str, rubric: dict | None) -> dict | None:
 def _judge_via_anthropic(candidate: str, rubric: dict | None) -> dict | None:
     try:
         import urllib.request
-        api_key = os.environ["ANTHROPIC_API_KEY"]
-        model   = os.environ.get("OH_ANTHROPIC_MODEL", "claude-sonnet-4-6")
+        api_key = os.environ[ANTHROPIC_API_KEY_ENV]
+        model   = os.environ.get(OH_ANTHROPIC_MODEL_ENV, DEFAULT_ANTHROPIC_JUDGE_MODEL)
         prompt = _build_judge_prompt(candidate, rubric)
         payload = json.dumps({"model": model, "max_tokens": 1024, "messages": [{"role": "user", "content": prompt}]}).encode()
         req = urllib.request.Request(
@@ -398,9 +431,9 @@ def _judge_via_anthropic(candidate: str, rubric: dict | None) -> dict | None:
 def _judge_via_openai(candidate: str, rubric: dict | None) -> dict | None:
     try:
         import urllib.request
-        api_key = os.environ["OPENAI_API_KEY"]
-        model   = os.environ.get("OH_OPENAI_MODEL", "gpt-5")
-        endpoint = os.environ.get("OH_OPENAI_ENDPOINT", "https://api.openai.com/v1/chat/completions")
+        api_key = os.environ[OPENAI_API_KEY_ENV]
+        model   = os.environ.get(OH_OPENAI_MODEL_ENV, DEFAULT_OPENAI_JUDGE_MODEL)
+        endpoint = os.environ.get(OH_OPENAI_ENDPOINT_ENV, DEFAULT_OPENAI_CHAT_COMPLETIONS_ENDPOINT)
         prompt = _build_judge_prompt(candidate, rubric)
         payload = json.dumps({"model": model, "messages": [{"role": "user", "content": prompt}], "temperature": 0.0}).encode()
         req = urllib.request.Request(endpoint, data=payload, headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"})
@@ -494,7 +527,7 @@ def _evaluate_criterion(criterion: dict, ctx: dict) -> dict:
 
         if kind == "llm_judge":
             text = _resolve_path(criterion.get("target", ""), ctx) or ""
-            rubric = _load_artifact(criterion.get("rubric"))
+            rubric = _load_component(criterion.get("rubric"))
             res = _llm_judge({"candidate": text, "rubric_ref": criterion.get("rubric")})
             score = res.get("score")
             threshold = criterion.get("threshold", 0.7)
@@ -607,11 +640,11 @@ def run_step(step: dict, catalog: dict[str, dict], ctx: dict, *, simulate: bool)
     """Run one pipeline step. Returns a step-result record."""
     started = time.monotonic()
     ref_id = step["ref"]
-    artifact = catalog.get(ref_id) if not ref_id.startswith("$.") else catalog.get(resolve(ref_id, ctx))
+    component = catalog.get(ref_id) if not ref_id.startswith("$.") else catalog.get(resolve(ref_id, ctx))
     inputs = {k: resolve(v, ctx) for k, v in (step.get("inputs") or {}).items()}
 
     output: dict = {}
-    simulated = simulate or artifact is None
+    simulated = simulate or component is None
 
     if simulated:
         # Stub: echo a structured response so the trace is meaningful.
@@ -628,7 +661,7 @@ def run_step(step: dict, catalog: dict[str, dict], ctx: dict, *, simulate: bool)
         elif not isinstance(text, str):
             text = str(text)
         fired = []
-        for rule in artifact.get("rules", []) or []:
+        for rule in component.get("rules", []) or []:
             pattern = rule.get("pattern")
             if pattern:
                 try:
@@ -645,14 +678,14 @@ def run_step(step: dict, catalog: dict[str, dict], ctx: dict, *, simulate: bool)
                     pass
         output = {"fired": fired, "pack": ref_id, "hit_count": len(fired)}
     elif step["kind"] == "processor":
-        output = _run_processor(ref_id, inputs, artifact)
+        output = _run_processor(ref_id, inputs, component)
     elif step["kind"] == "pipeline":
         # Nested pipeline: run it with the resolved inputs and return its
         # output + a per-step trace summary.
-        if artifact is None or artifact.get("type") != "pipeline":
+        if component is None or component.get("type") != "pipeline":
             output = {"_error": f"step references {ref_id} which is not a pipeline"}
         else:
-            sub_result = run_pipeline(artifact, inputs, simulate=False)
+            sub_result = run_pipeline(component, inputs, simulate=False, catalog=catalog)
             output = {
                 "sub_pipeline":      ref_id,
                 "sub_output":        sub_result.get("output"),
@@ -683,9 +716,17 @@ def run_step(step: dict, catalog: dict[str, dict], ctx: dict, *, simulate: bool)
     }
 
 
-def run_pipeline(pipeline: dict, inputs: dict, *, simulate: bool) -> dict:
+def run_pipeline(
+    pipeline: dict,
+    inputs: dict,
+    *,
+    simulate: bool,
+    catalog: dict[str, dict] | None = None,
+    row_dir: Path | None = None,
+) -> dict:
     global _CURRENT_CATALOG, _CURRENT_CTX
-    catalog = load_catalog()
+    if catalog is None:
+        catalog = load_catalog(row_dir)
     ctx: dict[str, Any] = {"inputs": inputs, "steps": {}}
     _CURRENT_CATALOG = catalog
     _CURRENT_CTX     = ctx
@@ -708,6 +749,7 @@ def run_pipeline(pipeline: dict, inputs: dict, *, simulate: bool) -> dict:
 
     return {
         "pipeline":           pipeline["id"],
+        "catalog_source":     pipeline.get("_source", "unknown"),
         "inputs":             inputs,
         "trace":              trace,
         "output":             last_output,
@@ -718,14 +760,22 @@ def run_pipeline(pipeline: dict, inputs: dict, *, simulate: bool) -> dict:
     }
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Run a pipeline manifest from the catalog.")
     ap.add_argument("pipeline_id", help="e.g. pipeline/research-entity")
     ap.add_argument("--inputs", default=None, help="Path to a JSON file with inputs.")
     ap.add_argument("--simulate", action="store_true", help="Force all steps to simulate.")
-    args = ap.parse_args()
+    ap.add_argument(
+        "--row-dir",
+        type=Path,
+        default=os.environ.get("OH_CATALOG_ROW_DIR"),
+        help="Read catalog components from database-exported JSONL rows instead of YAML seeds.",
+    )
+    args = ap.parse_args(argv)
+    if args.row_dir is not None and not isinstance(args.row_dir, Path):
+        args.row_dir = Path(args.row_dir)
 
-    catalog = load_catalog()
+    catalog = load_catalog(args.row_dir)
     pipeline = catalog.get(args.pipeline_id)
     if pipeline is None:
         sys.stderr.write(f"unknown pipeline {args.pipeline_id!r}\n")
@@ -735,7 +785,7 @@ def main() -> int:
         return 1
 
     inputs = json.loads(Path(args.inputs).read_text()) if args.inputs else {}
-    result = run_pipeline(pipeline, inputs, simulate=args.simulate)
+    result = run_pipeline(pipeline, inputs, simulate=args.simulate, catalog=catalog)
     print(json.dumps(result, indent=2))
     return 0
 

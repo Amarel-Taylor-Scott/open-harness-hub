@@ -32,7 +32,7 @@ model to pick the answer, ensemble across seeds for calibrated probs.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `retrieve` | rule_pack | `rule-pack/hybrid-retrieval-policy` | — |
-| 2 | `rerank` | processor | `processor/cross-encoder-reranker` | — |
-| 3 | `answer` | harness | `harness/text-safety-review` | — |
+| 1 | `retrieve` | rule_pack | `rule-pack/hybrid-retrieval-policy` | - |
+| 2 | `rerank` | processor | `processor/cross-encoder-reranker` | - |
+| 3 | `answer` | harness | `harness/text-safety-review` | - |
 

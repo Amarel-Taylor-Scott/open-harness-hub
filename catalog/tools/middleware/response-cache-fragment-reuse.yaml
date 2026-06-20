@@ -1,0 +1,151 @@
+id: "tool/response-cache-fragment-reuse"
+type: tool
+version: "0.1.0"
+name: "Response cache fragment reuse"
+description: |
+  Caches prior model response fragments keyed by a content hash of
+  the canonical request (prompt text + parameters digest). On a
+  cache hit, returns the stored fragment immediately without
+  contacting the model, recording latency and cost savings. On a
+  miss, the caller dispatches to the model, then stores the fragment
+  via the write endpoint. Supports TTL-based expiry, namespace
+  isolation for tenant deployments, and partial fragment stitching
+  when only portions of a composite request are cached.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "cross_industry", "software.devops"]
+capability: ["serving", "retrieval", "format_conversion"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "volatile"
+lifecycle_position: "pre_api.routing"
+tags: ["cache", "fragment-reuse", "content-hash", "cost-saving", "tenant-namespace"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  required: ["operation"]
+  properties:
+    operation:
+      type: string
+      enum: ["lookup", "store", "invalidate", "stats"]
+      description: >
+        "lookup" — check cache for a matching fragment.
+        "store"  — persist a model response fragment.
+        "invalidate" — evict one or all fragments in a namespace.
+        "stats"  — return hit/miss/savings counters for a namespace.
+    request_body:
+      type: object
+      description: >
+        Required for "lookup" and "store". The canonical request
+        object whose hash is used as the cache key. Must include
+        at minimum a "prompt" or "messages" field.
+    fragment:
+      type: object
+      description: >
+        Required for "store". The model response fragment to cache.
+        Must include a "content" field.
+    content_hash:
+      type: string
+      description: >
+        Optional pre-computed SHA-256 hex of the canonical request.
+        If absent, the tool computes it.
+    namespace:
+      type: string
+      description: >
+        Tenant or pipeline namespace for cache isolation.
+        Defaults to "default".
+    ttl_seconds:
+      type: integer
+      description: >
+        Time-to-live for stored fragments. Defaults to 3600.
+    partial_match:
+      type: boolean
+      description: >
+        If true, also attempt to return cached sub-fragments for
+        composite requests. Defaults to false.
+
+returns:
+  type: object
+  properties:
+    hit:
+      type: boolean
+    content_hash:
+      type: string
+    fragment:
+      type: object
+      description: Cached response fragment on hit; null on miss.
+    latency_saved_ms:
+      type: integer
+      description: Estimated latency saved by serving from cache.
+    cost_saved_usd:
+      type: number
+      description: Estimated cost avoided by serving from cache.
+    expires_at:
+      type: string
+      description: ISO-8601 expiry timestamp for a stored fragment.
+    partial_hits:
+      type: array
+      description: Sub-fragment cache hits when partial_match is true.
+      items:
+        type: object
+        properties:
+          hash: { type: string }
+          fragment: { type: object }
+    stats:
+      type: object
+      description: Present when operation is "stats".
+      properties:
+        hits: { type: integer }
+        misses: { type: integer }
+        total_cost_saved_usd: { type: number }
+        total_latency_saved_ms: { type: integer }
+        entry_count: { type: integer }
+
+side_effects: "write"
+
+examples:
+  - input:
+      operation: "lookup"
+      request_body:
+        messages:
+          - role: user
+            content: "List the top 5 causes of supply chain disruption."
+        model: "gpt-4o-mini"
+        temperature: 0
+      namespace: "pipeline/supply-chain-audit"
+    output:
+      hit: true
+      content_hash: "a3f7c2e91d45b60e8f1234567890abcd"
+      fragment:
+        content: "1. Natural disasters\n2. Geopolitical events\n3. ..."
+      latency_saved_ms: 1450
+      cost_saved_usd: 0.00031
+    notes: "Cache hit; model not contacted."
+  - input:
+      operation: "store"
+      request_body:
+        messages:
+          - role: user
+            content: "What is the GDPR definition of personal data?"
+        model: "llama3"
+        temperature: 0
+      fragment:
+        content: "Personal data means any information relating to an identified..."
+      namespace: "pipeline/gdpr-review"
+      ttl_seconds: 86400
+    output:
+      hit: false
+      content_hash: "b9e123cd45f67a890123456789abcdef"
+      expires_at: "2026-05-27T00:00:00Z"
+    notes: "Fragment stored; will be reused for identical requests in the next 24 h."
+
+implementations:
+  - kind: callable
+    language: python
+    path: "src/middleware/response_cache_fragment_reuse.py"
+  - kind: http
+    url: "http://localhost:8080/v1/cache"

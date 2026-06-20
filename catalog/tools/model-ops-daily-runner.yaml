@@ -1,0 +1,58 @@
+id: "tool/model-ops-daily-runner"
+type: tool
+version: "0.1.0"
+name: "Model ops daily runner"
+description: "Expands local model runtime, Kubernetes runtime, fine-tuning, evaluation, and federated reviewed-object patterns into a daily target-sized component candidate batch with staged Postgres load-audit output."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["generation", "planning", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.model_ops"
+tags: ["components", "model-ops", "training", "fine-tuning", "local-models", "kubernetes", "load-audit"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    run_date:
+      type: string
+    output_dir:
+      type: string
+    target_count:
+      type: integer
+    seeds_path:
+      type: string
+  required: ["run_date", "output_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    row_counts:
+      type: object
+    row_family_paths:
+      type: object
+    load_audit:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      run_date: "2026-05-26"
+      output_dir: "dist/model-ops-daily-runs/2026-05-26"
+      target_count: 1000
+    output:
+      ok: true
+      row_counts:
+        normalized_object: 1000
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.model_ops_daily_run.run_model_ops_daily_batch"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.factory.model_ops_daily_run"

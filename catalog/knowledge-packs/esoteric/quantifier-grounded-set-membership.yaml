@@ -1,0 +1,55 @@
+id: knowledge-pack/quantifier-grounded-set-membership
+type: knowledge-pack
+version: 0.1.0
+name: Quantifier Grounded Set Membership
+description: 'Capability-lift knowledge pack for an esoteric area LLMs handle poorly.
+  Gap: misinterprets all/some/no/most/at-least-k; asserts unsupported universals Grounded
+  in Wikidata enumerated sets (CC0) as membership ground truth via graph retrieval.
+  Lift: Quantifier Comprehension (2306.07384): inverse-scaling; resolve against retrieved
+  set = counted truth'
+authors:
+- name: Open Harness Hub capability-gap factory
+license: CC-BY-4.0
+industry:
+- cross_industry
+capability:
+- retrieval
+- verification
+modality:
+- structured
+- text
+lifecycle: experimental
+trust_boundary: external
+freshness: volatile
+tags:
+- capability-lift
+- esoteric
+- knowledge-pack
+- graph
+- ingestion-target
+created: '2026-05-28'
+updated: '2026-05-28'
+attribution:
+  source_url: Wikidata enumerated sets (CC0) as membership ground truth
+  source_kind: other
+  author: Wikidata enumerated sets (CC0) as membership ground truth
+  license: see-source
+content_types:
+- fact_table
+- reference_doc
+retrieval:
+- graph
+files:
+- path: data/esoteric-packs/quantifier-grounded-set-membership.jsonl
+  format: jsonl
+  content_type: fact_table
+  schema: capability-gap seed (real facts where stable; else ingestion contract)
+indexing:
+  bm25: true
+  dense:
+    model: all-MiniLM-L6-v2
+provenance:
+  sources:
+  - Wikidata enumerated sets (CC0) as membership ground truth
+  collected_through: '2026-05-28'
+  collected_by: capability-gap factory

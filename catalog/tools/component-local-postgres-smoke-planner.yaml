@@ -1,0 +1,79 @@
+id: "tool/component-local-postgres-smoke-planner"
+type: tool
+version: "0.1.0"
+name: "Component local Postgres smoke planner"
+description: "Emits a side-effect-free local Docker pgvector smoke execution plan for applying staged component row SQL, embedding vector SQL, and committed-count audits."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "embedding", "governance", "evaluation", "serving"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "postgres", "pgvector", "smoke-test", "load-audit", "committed-counts"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    component_run_summary:
+      type: string
+    load_audit_summary:
+      type: string
+    pgvector_load_plan_summary:
+      type: string
+    embedding_execution_plan:
+      type: string
+    vector_readiness_summary:
+      type: string
+    output_dir:
+      type: string
+    run_id:
+      type: string
+    database_url:
+      type: string
+  required:
+    - "component_run_summary"
+    - "load_audit_summary"
+    - "pgvector_load_plan_summary"
+    - "embedding_execution_plan"
+    - "vector_readiness_summary"
+    - "output_dir"
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    target:
+      type: string
+    readiness:
+      type: object
+    commands:
+      type: array
+    files:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      component_run_summary: "dist/model-ops-daily-runs/2026-05-26/model-ops-daily-run-summary.json"
+      load_audit_summary: "dist/model-ops-daily-runs/2026-05-26/load-audit/summary.json"
+      pgvector_load_plan_summary: "dist/model-ops-daily-runs/2026-05-26/pgvector-load-plan/pgvector-embedding-load-plan-summary.json"
+      embedding_execution_plan: "dist/model-ops-daily-runs/2026-05-26/embedding-plan/embedding-execution-plan.json"
+      vector_readiness_summary: "dist/model-ops-daily-runs/2026-05-26/local-hash-embedding-worker/vector-readiness/vector-readiness-summary.json"
+      output_dir: "dist/model-ops-daily-runs/2026-05-26/local-postgres-smoke"
+    output:
+      ok: true
+      readiness:
+        candidate_rows: 1000
+        vector_accepted_rows: 1000
+        safe_to_apply_locally: true
+implementations:
+  - kind: "callable"
+    path: "scripts.db.component_local_postgres_smoke_plan.build_component_local_postgres_smoke_plan"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.component_local_postgres_smoke_plan"

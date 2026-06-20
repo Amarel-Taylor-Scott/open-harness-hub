@@ -1,0 +1,65 @@
+id: "knowledge-pack/canonical-factory-row-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Canonical factory row patterns"
+description: "Synthetic generated-object row patterns covering provenance, normalized objects, dedupe, entity links, review tickets, labels, dimensions, embeddings, and index records for Postgres-scale factories."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "finance.aml", "cross_industry"]
+capability: ["governance", "retrieval", "evaluation", "serving"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["postgres", "pgvector", "entity-resolution", "dedupe", "labels", "million-primitives"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types:
+  - "factory_row_fixture"
+  - "relationship_preflight_fixture"
+  - "bulk_load_fixture"
+files:
+  - path: "catalog/knowledge-packs/data/canonical-factory-row-patterns/source-records.jsonl"
+    format: "jsonl"
+    schema: "source-record"
+  - path: "catalog/knowledge-packs/data/canonical-factory-row-patterns/normalized-objects.jsonl"
+    format: "jsonl"
+    schema: "normalized-object"
+  - path: "catalog/knowledge-packs/data/canonical-factory-row-patterns/dedupe-clusters.jsonl"
+    format: "jsonl"
+    schema: "dedupe-cluster"
+  - path: "catalog/knowledge-packs/data/canonical-factory-row-patterns/canonical-entities.jsonl"
+    format: "jsonl"
+    schema: "canonical-entity"
+  - path: "catalog/knowledge-packs/data/canonical-factory-row-patterns/object-entity-refs.jsonl"
+    format: "jsonl"
+    schema: "object-entity-ref"
+  - path: "catalog/knowledge-packs/data/canonical-factory-row-patterns/review-tickets.jsonl"
+    format: "jsonl"
+    schema: "review-ticket"
+  - path: "catalog/knowledge-packs/data/canonical-factory-row-patterns/label-assignments.jsonl"
+    format: "jsonl"
+    schema: "label-assignment"
+  - path: "catalog/knowledge-packs/data/canonical-factory-row-patterns/dimension-values.jsonl"
+    format: "jsonl"
+    schema: "dimension-value"
+  - path: "catalog/knowledge-packs/data/canonical-factory-row-patterns/object-embeddings.jsonl"
+    format: "jsonl"
+    schema: "object-embedding"
+  - path: "catalog/knowledge-packs/data/canonical-factory-row-patterns/index-records.jsonl"
+    format: "jsonl"
+    schema: "index-record"
+indexing:
+  bm25: true
+  dense:
+    recommended_model: "sentence-transformers/all-MiniLM-L6-v2"
+provenance:
+  sources:
+    - "Synthetic Open Harness Hub fixtures"
+    - "Open Harness Hub canonical Postgres schema"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "Synthetic data only; no personal data, secrets, or proprietary source records."

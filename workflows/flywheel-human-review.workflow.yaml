@@ -1,0 +1,50 @@
+kind: baltor.flywheel-workflow.v1
+name: Human Review Flywheel
+flywheel_id: flywheel.human-review
+stage: Continuous Verification + Adversarial Validation rail
+purpose: Route the cases automation must NOT decide alone to a human steward, capture the ruling, and feed it back. The escape valve behind the verification rail and the gold-pack contract.
+triggers:
+  - high_conflict_claim
+  - restricted_expansion
+  - memory_promotion
+  - stale_pack_for_write
+  - low_confidence_parser_artifact
+  - wiki_vs_code_conflict
+  - policy_exception
+inputs:
+  - steward_review_request
+  - evidence_handles
+  - policy_decision
+steps:
+  - open a steward-review-request (schemas/governance/steward-review-request.schema.json)
+  - present evidence (source handles, conflicting claims, policy context) to the steward
+  - steward rules approve / reject / needs_more_info (steward-review-decision)
+  - on approve-with-conditions, enqueue the conditions as queue messages
+  - record the decision + link it to the request (audit trail)
+queue_messages:
+  - steward_review_opened
+  - steward_decision_recorded
+outputs:
+  - StewardReviewRequest
+  - StewardReviewDecision
+  - ConditionQueueMessage
+receipts_emitted:
+  - StewardReviewDecision
+metrics:
+  - review_turnaround
+  - approval_rate
+  - decisions_with_conditions
+  - escalations_reopened
+failure_modes:
+  - no steward available within SLA
+  - decision references a stale request
+fallback_strategy: while unresolved, the subject is HELD OUT of served packs (fail-closed); never auto-serve a pending-review item
+human_review_triggers:
+  - this IS the human-review flywheel
+suggested_runtime: control-plane review queue + UI; durable workflow holds state until a decision lands
+candidate_backend_tools:
+  - DBOS
+  - OpenFGA
+harness_refs:
+  - fixtures/steward-review-request.example.json
+  - fixtures/steward-review-decision.example.json

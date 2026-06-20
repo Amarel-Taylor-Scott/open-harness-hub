@@ -15,7 +15,7 @@
 
 ## Primitives used
 
-| Layer | Artifact |
+| Layer | Component |
 |---|---|
 | Privacy | `rule-pack/phi-hipaa-en` (HIPAA Safe-Harbor 18 identifiers) |
 | Redact | `harness/redact-pii-text` |

@@ -1,0 +1,79 @@
+id: "tool/llm-polish-verify-worker"
+type: tool
+version: "0.1.0"
+name: "LLM polish and verify worker"
+description: "Routes redacted candidate objects through a provider-neutral model wrapper for schema polishing, JSON repair, citation-preserving rewrite, and optional source-grounded verification."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["generation", "verification", "summarization", "routing", "evaluation"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.factory"
+tags: ["llm-routing", "polishing", "verification", "json-repair", "object-factory", "byok"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    candidate_objects:
+      type: array
+      items:
+        type: object
+    target_schema:
+      type: object
+    source_spans:
+      type: array
+      items:
+        type: object
+    model_route:
+      type: object
+    polish_policy:
+      type: object
+  required: ["candidate_objects", "target_schema"]
+returns:
+  type: object
+  properties:
+    polished_objects:
+      type: array
+      items:
+        type: object
+    verification_report:
+      type: object
+    model_route_record:
+      type: object
+    review_tickets:
+      type: array
+      items:
+        type: object
+side_effects: "external_call"
+examples:
+  - input:
+      candidate_objects:
+        - object_type: "checklist_item"
+          text: "Confirm source citation is present."
+      target_schema:
+        type: object
+      model_route:
+        selected_adapter: "adapter/ollama-default"
+      polish_policy:
+        forbid_uncited_facts: true
+    output:
+      polished_objects:
+        - object_type: "checklist_item"
+          text: "Confirm that the candidate object includes at least one source citation."
+      verification_report:
+        uncited_facts: 0
+      model_route_record:
+        selected_adapter: "adapter/ollama-default"
+      review_tickets: []
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.object_factory_workers.polish_and_verify"
+    language: "python"
+  - kind: "mcp"
+    path: "mcp/object_factory.polish_verify"

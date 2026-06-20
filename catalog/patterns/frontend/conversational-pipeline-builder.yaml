@@ -1,0 +1,58 @@
+id: "pattern/conversational-pipeline-builder"
+type: pattern
+version: "0.1.0"
+name: "Conversational Pipeline Builder"
+description: |
+  The headline UX loop for Open Harness Hub: a user pastes a free-text LLM
+  challenge or use-case and the system guides them from raw intent to a
+  working, costed, deployable pipeline blueprint. The loop is
+  paste → understand → retrieve → assemble → estimate-cost →
+  emit-blueprint → refine, with each phase surfaced progressively in the
+  UI so the user can steer at any step.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "cross_industry"]
+capability: ["dialogue", "planning", "retrieval", "reasoning", "generation"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "hub"
+tags: ["conversational-builder", "pipeline-assembly", "ux", "frontend", "paste-to-flow"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+structural_shape:
+  - "user pastes free-text challenge / use-case into the builder input"
+  - "intent-extraction call: classify task type, modalities, quality vs cost priority, domain"
+  - "component-retrieval call: vector search + keyword filter against catalog index returns ranked candidate components"
+  - "assembly call: orchestrator composes retrieved components into an ordered pipeline DAG"
+  - "cost-estimation step: compute per-component token budget, model tier, infra cost band"
+  - "blueprint-emit step: serialize pipeline to YAML/JSON harness manifest + human-readable summary"
+  - "refine loop: user provides follow-up constraint (swap model, add safety gate, reduce cost); repeat from assembly step"
+
+when_to_use:
+  - "Primary entry point for new users who have an LLM task but no existing pipeline"
+  - "Rapid prototyping where the goal is a deployable blueprint in under 5 interactions"
+  - "Catalog exploration driven by a concrete use-case rather than browsing"
+  - "When the user needs a costed proposal before committing engineering time"
+
+when_not_to_use:
+  - "User already has a working pipeline and only needs incremental edits (use direct catalog search instead)"
+  - "Highly regulated deployment requiring human sign-off at every step (add explicit approval gates outside this pattern)"
+  - "Use-cases outside catalog coverage — surface a 'no components found' fallback rather than hallucinating a pipeline"
+
+variants:
+  - "Wizard mode: step-by-step form instead of free-text paste (lower LLM dependency)"
+  - "API mode: POST /builder/assemble receives structured intent JSON, skips NL understanding"
+  - "Batch mode: CSV of use-cases assembled in parallel, results written to staging JSONL"
+
+counter_patterns:
+  - "pattern/naive-rag (retrieve-only, no assembly or cost estimation)"
+  - "pattern/orchestrator-workers (parallel task decomposition, not sequential UX loop)"
+
+tradeoffs:
+  latency: "3–5 sequential LLM calls; progressive disclosure hides most latency from the user"
+  cost: "Medium — intent + retrieval + assembly + cost-estimate calls, but retrieval is embedding-only"
+  quality: "Strongly dependent on catalog coverage and retrieval precision; degrades gracefully to 'partial match' state"
+  complexity: "Medium — 4-phase loop with a refine branch; each phase is independently testable"
+  explainability: "High — every phase emits its reasoning; blueprint includes component provenance"

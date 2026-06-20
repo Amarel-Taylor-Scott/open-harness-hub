@@ -1,0 +1,53 @@
+id: processor/lab-critical-value-flag
+type: processor
+version: 0.1.0
+name: Lab critical-value flag
+description: 'Compare lab results against governed reference + critical-value thresholds (e.g. K+ > 6.5,
+  glucose < 40) and escalate critical values immediately. Deterministic; no model call; the panic-value
+  safety net.
+
+
+  Clinical decision-SUPPORT component — DEFENSIVE only: grounds on a governed corpus, fires a deterministic
+  gate, and/or routes to a clinician; never autonomous medical advice. Lift is measured at the pipeline
+  level.'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- healthcare
+capability:
+- safety_gating
+- classification
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- clinical
+- decision-support
+- deterministic-gate
+- freezable
+- governed
+created: '2026-05-29'
+updated: '2026-05-29'
+process_kind: gate.lab_critical_value
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: labs
+  type: object
+- name: reference_ranges
+  type: object
+outputs:
+- name: critical
+  type: object
+- name: escalate
+  type: object
+side_effects: read
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.clinical.lab_critical_value_flag.run
+  language: python

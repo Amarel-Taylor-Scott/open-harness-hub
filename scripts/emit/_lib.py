@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import sys
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -11,11 +13,34 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent.parent
 CATALOG = ROOT / "catalog"
 DIST = ROOT / "dist"
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts.db.catalog_row_source import iter_components_from_rows
 
 
-def load_catalog() -> dict[str, tuple[Path, dict]]:
-    """Load every manifest and return id → (path, manifest)."""
+def source_path_to_local_path(source_path: str) -> Path:
+    if source_path.startswith("db://"):
+        return Path(source_path)
+    path = Path(source_path)
+    return path if path.is_absolute() else ROOT / path
+
+
+def load_catalog(row_dir: Path | None = None) -> dict[str, tuple[Path, dict]]:
+    """Load catalog components and return id → (source path, manifest)."""
     out: dict[str, tuple[Path, dict]] = {}
+    if row_dir is None and os.environ.get("OH_CATALOG_ROW_DIR"):
+        row_dir = Path(os.environ["OH_CATALOG_ROW_DIR"])
+
+    if row_dir is not None:
+        for component in iter_components_from_rows(row_dir):
+            data = dict(component.manifest)
+            data["_path"] = component.source_path
+            data["_source"] = "database_rows"
+            data["_database_refs"] = component.database_refs
+            out[component.id] = (source_path_to_local_path(component.source_path), data)
+        return out
+
     for path in CATALOG.rglob("*.yaml"):
         if "_inbox" in path.parts or any(p == "data" for p in path.parts):
             continue
@@ -24,6 +49,8 @@ def load_catalog() -> dict[str, tuple[Path, dict]]:
         except yaml.YAMLError:
             continue
         if isinstance(data, dict) and "id" in data and "type" in data:
+            data["_path"] = str(path.relative_to(ROOT))
+            data["_source"] = "catalog_yaml_seed_export"
             out[data["id"]] = (path, data)
     return out
 
@@ -34,9 +61,9 @@ def by_type(catalog: dict[str, tuple[Path, dict]], type_: str) -> Iterable[tuple
             yield path, m
 
 
-def slug_only(artifact_id: str) -> str:
-    """Strip the `type/` prefix from an artifact id."""
-    return artifact_id.split("/", 1)[-1] if "/" in artifact_id else artifact_id
+def slug_only(component_id: str) -> str:
+    """Strip the `type/` prefix from a component id."""
+    return component_id.split("/", 1)[-1] if "/" in component_id else component_id
 
 
 def sha256_file(path: Path) -> str:

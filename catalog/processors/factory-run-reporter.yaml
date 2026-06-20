@@ -1,0 +1,61 @@
+id: "processor/factory-run-reporter"
+type: processor
+version: "0.1.0"
+name: "Factory run provenance + cost + quality reporter"
+description: |
+  Writes a complete factory-run report to
+  `dist/factory-runs/{run_id}/` capturing:
+
+   - run.json — top-level summary (walker, params, totals, costs)
+   - walks/*.json — raw walker outputs
+   - drafts/*.json — emitted drafts (mirrored copies)
+   - rejected.json — quality-gate rejections with reasons
+   - dedup.json — semantic-dedup hits with best matches
+   - validation_failures.json — schema-validation failures
+   - REPORT.md — human-readable summary
+
+  Every draft in `catalog/_inbox/` can be traced back to its
+  walker run + source node, enabling reproducibility and
+  accountability at 2000x scale.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["software", "ai", "cross_industry"]
+capability: ["verification"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+tags: ["meta", "factory", "provenance", "reporting", "audit"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+process_kind: "report.markdown"
+deterministic: true
+idempotent: false
+streaming: false
+latency_budget_ms: 5000
+
+inputs:
+  - name: "report"
+    type: "object"
+  - name: "walks"
+    type: "object"
+  - name: "drafts"
+    type: "object[]"
+  - name: "rejected"
+    type: "object[]"
+  - name: "deduped"
+    type: "object[]"
+outputs:
+  - name: "run_dir"
+    type: "string"
+  - name: "report_md_path"
+    type: "string"
+
+side_effects: "write"
+on_error: "raise"
+
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.run_report.write_run_components"
+    language: "python"

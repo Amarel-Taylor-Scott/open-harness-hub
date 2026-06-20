@@ -1,0 +1,72 @@
+id: "tool/primitive-source-surface-scanner"
+type: tool
+version: "0.1.0"
+name: "Primitive source surface scanner"
+description: "Scans configured source surfaces such as government catalogs, papers, datasets, repos, standards, regulations, pricing pages, and red-team reports for candidate AI primitives."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "cross_industry"]
+capability: ["retrieval", "planning", "evaluation"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "volatile"
+tags: ["primitive-database", "source-scan", "million-primitives", "verified-sources"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    source_surface:
+      type: object
+      description: "Source endpoint, access method, cadence, license, and extraction contract."
+    query_plan:
+      type: object
+    max_records:
+      type: integer
+      default: 1000
+    since:
+      type: string
+    include_raw:
+      type: boolean
+      default: false
+  required: ["source_surface"]
+returns:
+  type: object
+  properties:
+    scan_id:
+      type: string
+    records:
+      type: array
+      items:
+        type: object
+    source_metadata:
+      type: object
+    license_notes:
+      type: array
+      items:
+        type: string
+    next_cursor:
+      type: string
+side_effects: "external_call"
+examples:
+  - input:
+      source_surface:
+        id: "data-gov-catalog"
+        access_method: "api"
+        endpoint: "https://catalog.data.gov"
+      max_records: 10
+    output:
+      scan_id: "scan-example"
+      records: []
+      source_metadata:
+        source_surface: "data-gov-catalog"
+      license_notes: ["Check dataset-level license before deriving redistributable primitives."]
+      next_cursor: null
+implementations:
+  - kind: "callable"
+    path: "tools.primitive_source_surface_scanner.scan"
+  - kind: "mcp"
+    path: "mcp/primitive_sources.scan"

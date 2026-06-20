@@ -1,0 +1,48 @@
+id: processor/grep-agentic-retrieve
+type: processor
+version: 0.1.0
+name: Agentic grep retrieve
+description: 'Agentic regex/grep retrieval (ripgrep-style, as Claude Code does): exact, no index, private;
+  ~90% of RAG quality on well-named corpora (Amazon ''Keyword Search Is All You Need''). Costs more turns;
+  pair with a vector leg for the mature hybrid.'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+capability:
+- retrieval
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- context-layer
+- retrieval
+created: '2026-05-29'
+updated: '2026-05-29'
+attribution:
+  source_kind: manual
+  author: Open Harness Hub context-layer taxonomy
+  license: MIT
+process_kind: retrieve.grep_agentic
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: pattern
+  type: object
+- name: corpus
+  type: object
+outputs:
+- name: matches
+  type: object
+side_effects: read
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.retrieval.grep_agentic_retrieve.run
+  language: python
+links:
+  source: docs/strategy/context-layer-pmf.md

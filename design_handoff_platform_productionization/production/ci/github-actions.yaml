@@ -1,0 +1,92 @@
+# github-actions.yaml — the adoptable AIDR pipeline (standard S5).
+# One pipeline shape for every deployable. Copy into .github/workflows/ in the real
+# repo. Stages: lint → test → build → package (signed, SBOM'd, digest-pinned) →
+# deploy → smoke. Deploy refuses unsigned images; smoke fails loud on any /health miss.
+#
+# HONEST STATUS: shipped as the adoption artifact (standard S5 = "proposed" until this
+# runs green in the actual repo). Secrets referenced here are GitHub Actions secrets —
+# never committed values.
+
+name: aidr-pipeline
+on:
+  push: { branches: [main] }
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tokens-only lint (S1 — no hardcoded hex outside oh-tokens.css)
+        run: |
+          ! grep -rEn '#[0-9a-fA-F]{3,8}\b' --include='*.css' . \
+            | grep -v 'oh-tokens.css' | grep -v node_modules || \
+            { echo '::error::hardcoded colors found — use shared/oh-tokens.css vars'; exit 1; }
+      - name: Python compiles (proof modules + services)
+        run: python3 -m py_compile $(git ls-files '*.py') || exit 1
+      - name: Secret scan (S8)
+        uses: gitleaks/gitleaks-action@v2
+        env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Proof modules (S4.1 — named checks with counts, never "tests pass")
+        run: PYTHONPATH=. python3 -m flywheel_proof_modules --all
+      - name: Contract tests (S4.2 — live vs simulated same shapes)
+        run: |
+          PYTHONPATH=. python3 scripts/identity_local_service.py --serve &
+          sleep 2
+          node production/tests/contract_identity.test.js   # asserts ENDPOINTS map shapes
+      - name: Surface smokes (S4.3 — Playwright golden paths + S1 structural probes)
+        run: npx playwright install --with-deps chromium && npx playwright test production/tests/smokes/
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Precompiled JSX (in-browser Babel is prototype-only)
+        run: npm ci && npm run build   # Vite — emits dist/ per surface
+
+  package:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions: { id-token: write, contents: read, packages: write }
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build + push images (digest-pinned bases)
+        run: |
+          for svc in production/core; do
+            name=ghcr.io/${{ github.repository_owner }}/$(basename $svc)
+            docker build -t $name:${{ github.sha }} $svc
+            docker push $name:${{ github.sha }}
+          done
+      - name: SBOM (CycloneDX) per image (S6)
+        run: syft ghcr.io/${{ github.repository_owner }}/core:${{ github.sha }} -o cyclonedx-json > sbom.cdx.json
+      - name: Sign (cosign keyless, S6 — deploy refuses unsigned)
+        run: cosign sign --yes ghcr.io/${{ github.repository_owner }}/core:${{ github.sha }}
+
+  deploy:
+    needs: package
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify signature before anything ships (S6 gate)
+        run: cosign verify ghcr.io/${{ github.repository_owner }}/core:${{ github.sha }}
+      - name: Compose up on host (or terraform apply -auto-approve for infra changes)
+        run: |
+          ssh ${{ secrets.DEPLOY_HOST }} \
+            "cd aidoneright/production && git pull && docker compose pull && docker compose up -d"
+
+  smoke:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every surface answers /health through the tunnel (S7 — fail loud)
+        run: |
+          for url in ${{ vars.SURFACE_HEALTH_URLS }}; do
+            curl -fsS --max-time 10 "$url" | grep -q '"ok"' || { echo "::error::$url unhealthy"; exit 1; }
+          done

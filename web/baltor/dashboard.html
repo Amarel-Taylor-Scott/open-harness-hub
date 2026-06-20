@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor — Live Ops Dashboard</title>
+<style>
+  :root{--bg:#0a0d14;--panel:#121723;--panel2:#0e131d;--line:#1f2734;--ink:#e6edf6;--muted:#8aa0b6;
+    --gold:#e9b949;--emerald:#34d39a;--blue:#5aa0ff;--purple:#a98bff;--red:#ff6b6b;--amber:#f5a623;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--sans:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 70% -10%,#13203a 0%,var(--bg) 55%);color:var(--ink);font-family:var(--sans);line-height:1.45}
+  header{display:flex;align-items:center;gap:14px;padding:16px 22px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(10,13,20,.85);backdrop-filter:blur(8px);z-index:5}
+  .brand{font-weight:700}.brand .dot{color:var(--gold)}
+  .sub{color:var(--muted);font-size:12.5px}
+  .controls{margin-left:auto;display:flex;gap:9px;align-items:center}
+  button{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 13px;cursor:pointer;font-size:13px}
+  button.run{background:linear-gradient(180deg,#1c2740,#141d30);border-color:#2b3a5a;font-weight:600}
+  button.run:hover{border-color:var(--blue)}
+  .conn{font-size:11px;font-family:var(--mono);padding:3px 9px;border-radius:99px;border:1px solid var(--line)}
+  .conn.live{color:var(--emerald);border-color:#1f4a39}.conn.poll{color:var(--amber);border-color:#5a4a1f}.conn.down{color:var(--red);border-color:#5a2530}
+  main{max-width:1180px;margin:0 auto;padding:18px 22px 60px}
+  .stages{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:18px}
+  @media(max-width:820px){.stages{grid-template-columns:repeat(2,1fr)}}
+  .stage{border:1px solid var(--line);background:var(--panel2);border-radius:11px;padding:10px;transition:border-color .3s,background .3s}
+  .stage.hot{border-color:var(--emerald);background:linear-gradient(180deg,#10241c,#0e131d)}
+  .stage .n{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+  .stage .c{font-family:var(--mono);font-size:20px;margin-top:4px}
+  .grid{display:grid;grid-template-columns:1fr;gap:14px}
+  .card{border:1px solid var(--line);background:var(--panel2);border-radius:13px;padding:14px}
+  .card h4{margin:0 0 10px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .ev{display:grid;grid-template-columns:48px 200px 1fr;gap:10px;align-items:baseline;font-family:var(--mono);font-size:12px;padding:5px 0;border-bottom:1px solid #16202f}
+  .ev .seq{color:var(--muted)}
+  .ev .kind{font-weight:600}
+  .ev .meta{color:var(--muted);word-break:break-all}
+  .k-pipeline{color:var(--blue)}.k-contradiction{color:var(--red)}.k-review{color:var(--amber)}
+  .k-pack{color:var(--emerald)}.k-receipt{color:var(--gold)}.k-swarm{color:var(--purple)}.k-inference{color:var(--blue)}.k-default{color:var(--ink)}
+  .note{color:var(--muted);font-size:12px;margin-top:18px}
+  .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+  @media(max-width:820px){.metrics{grid-template-columns:repeat(2,1fr)}}
+  .metric{border:1px solid var(--line);background:var(--panel2);border-radius:11px;padding:11px 13px}
+  .metric .ml{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+  .metric .mv{font-family:var(--mono);font-size:22px;margin-top:5px}
+  .metric .mv.good{color:var(--emerald)}.metric .mv.warn{color:var(--amber)}
+  .grid{grid-template-columns:1.4fr 1fr}
+  @media(max-width:880px){.grid{grid-template-columns:1fr}}
+  #artifacts .art{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line);border-radius:7px;padding:6px 8px;margin-bottom:6px;background:#0c1320}
+  #artifacts .art b{color:var(--gold)}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="brand">Baltor<span class="dot">.</span> Live Ops Dashboard</div>
+    <div class="sub">every connected module fires onto one event bus — watch it live</div>
+  </div>
+  <div class="controls">
+    <span id="conn" class="conn down">connecting…</span>
+    <button class="run" id="run">▶ Run Full Pipeline</button>
+    <button class="run" id="run-fleet" title="Run every stage as a CapabilityTask claimed by a worker under the supervisor">▶ Run via Fleet</button>
+    <button id="clear">Clear</button>
+    <button id="audit" title="Run the Context Auditor → Optimizer over the demo bundle (projection-only; manifest is evidence, not truth)">⊘ Audit context</button>
+    <a href="/inference-plane" class="conn" style="text-decoration:none;color:var(--purple);border-color:#3a2f5a" title="Shared LLM Plane — provider graph, receipts, health (projection-only; model output is candidate, never truth)">Inference plane →</a>
+  </div>
+</header>
+<main>
+  <div class="metrics">
+    <div class="metric"><div class="ml">Answer</div><div class="mv" id="m-answer">—</div></div>
+    <div class="metric"><div class="ml">Measured lift (pack vs none)</div><div class="mv good" id="m-lift">—</div></div>
+    <div class="metric"><div class="ml">Pack tokens</div><div class="mv" id="m-pack">—</div></div>
+    <div class="metric"><div class="ml">Reviews routed</div><div class="mv warn" id="m-reviews">0</div></div>
+  </div>
+  <div class="stages" id="stages"></div>
+  <div class="grid">
+    <div class="card">
+      <h4>Live event stream <span id="count" class="sub"></span></h4>
+      <div id="events"></div>
+    </div>
+    <div class="card">
+      <h4>Recent artifacts</h4>
+      <div id="artifacts"><span class="sub">run the pipeline to see receipts, packs, swarm consensus, reviews, and the measured lift…</span></div>
+    </div>
+    <div class="card">
+      <h4>Context Auditor → Optimizer <span class="sub">audit manifest (proposes → lossless apply)</span></h4>
+      <div id="audit-panel"><span class="sub">click "⊘ Audit context" to run the auditor + lossless optimizer over the demo bundle…</span></div>
+    </div>
+  </div>
+  <div class="note" id="note"></div>
+</main>
+<script>
+const STAGES = ["Source Systems","Reconciliation","Anti-Fragility","Enhancement","Optimization","Consumption","Verification rail"];
+const $ = s => document.querySelector(s);
+let seen = 0, lastSeq = 0;
+
+function renderStages(){
+  $('#stages').innerHTML = STAGES.map((s,i)=>`<div class="stage" data-stage="${s}"><div class="n">${i+1}. ${s}</div><div class="c" id="sc-${i}">0</div></div>`).join('');
+}
+const stageCount = {};
+function bump(stage){
+  if(!stage) return;
+  const i = STAGES.indexOf(stage); if(i<0) return;
+  stageCount[stage] = (stageCount[stage]||0)+1;
+  const el = $(`#sc-${i}`); if(el) el.textContent = stageCount[stage];
+  const card = document.querySelector(`.stage[data-stage="${CSS.escape(stage)}"]`);
+  if(card){ card.classList.add('hot'); clearTimeout(card._t); card._t = setTimeout(()=>card.classList.remove('hot'), 1200); }
+}
+function kclass(kind){
+  if(kind.startsWith('pipeline')) return 'k-pipeline';
+  if(kind.startsWith('contradiction')) return 'k-contradiction';
+  if(kind.startsWith('review')) return 'k-review';
+  if(kind.includes('pack')) return 'k-pack';
+  if(kind.startsWith('receipt')) return 'k-receipt';
+  if(kind.startsWith('swarm')) return 'k-swarm';
+  if(kind.startsWith('inference')) return 'k-inference';
+  return 'k-default';
+}
+let reviewCount = 0;
+function pushArtifact(html){
+  const a = $('#artifacts');
+  if(a.querySelector('.sub')) a.innerHTML = '';
+  const d = document.createElement('div'); d.className = 'art'; d.innerHTML = html;
+  a.insertBefore(d, a.firstChild);
+  while(a.children.length > 8) a.removeChild(a.lastChild);
+}
+function updateMetrics(ev){
+  const p = ev.payload || {};
+  if(ev.kind === 'context_lift.calculated'){
+    const lift = (p.lift != null) ? (p.lift > 0 ? '+' : '') + p.lift : '—';
+    $('#m-lift').textContent = lift;
+    pushArtifact(`lift <b>${lift}</b> · pack ${p.context_pack} vs no-context ${p.no_context} · best: ${p.best}`);
+  }
+  if(ev.kind === 'context_pack.created' && p.tokens_before != null && p.tokens_after != null) $('#m-pack').textContent = `${p.tokens_before}→${p.tokens_after}`;
+  if(ev.kind === 'verification.completed') pushArtifact(`verified flow · served <b>${p.served}</b> · held out ${p.held_out} · would-be violations ${p.would_be_violations}`);
+  if(ev.kind === 'receipt_issued'){ if(p.answer_value!=null) $('#m-answer').textContent = p.answer_value; pushArtifact(`receipt issued · answer <b>${p.answer_value}</b> · authority ${p.authority||''}`); }
+  if(ev.kind === 'inference.completed') pushArtifact(`inference · node <b>${p.executed_node||'?'}</b> · fallback ${p.fallback_used} · candidate-not-truth (is_truth=${p.is_truth})`);
+  if(ev.kind === 'review.requested'){ reviewCount++; $('#m-reviews').textContent = reviewCount; pushArtifact(`review routed · ${ev.object_ref||''} · trigger ${p.trigger||''} (risk ${p.risk||''})`); }
+  if(ev.kind === 'swarm.consensus.created') pushArtifact(`swarm consensus · risk <b>${p.risk_level}</b> · proposed fix ${p.proposed_fix||'none'}`);
+}
+function addEvent(ev){
+  if(ev.seq && ev.seq <= lastSeq) return; // dedupe across SSE backlog + poll
+  if(ev.seq) lastSeq = ev.seq;
+  seen++; $('#count').textContent = `(${seen})`;
+  bump(ev.stage);
+  updateMetrics(ev);
+  const meta = [ev.component, ev.object_ref, ev.payload && Object.keys(ev.payload).length ? JSON.stringify(ev.payload) : ''].filter(Boolean).join(' · ');
+  const row = document.createElement('div');
+  row.className = 'ev';
+  row.innerHTML = `<span class="seq">#${ev.seq||''}</span><span class="kind ${kclass(ev.kind)}">${ev.kind}</span><span class="meta">${meta}</span>`;
+  const list = $('#events'); list.insertBefore(row, list.firstChild);
+  while(list.children.length > 200) list.removeChild(list.lastChild);
+}
+
+// Resilient transport: POLLING is the reliable baseline (a plain GET that works through any proxy /
+// cloudflare tunnel — which buffer SSE). SSE is only an accelerant layered on top when the transport
+// allows it. addEvent() dedupes by seq, so running both is safe and never double-counts.
+let pollTimer = null, sseEvents = 0;
+async function pollOnce(){
+  try{
+    const r = await fetch('/api/events?limit=300', {cache:'no-store'});
+    const d = await r.json();
+    (d.events||[]).forEach(addEvent);
+    if(!sseEvents){ $('#conn').className='conn poll'; $('#conn').textContent='polling'; }
+  }catch(_){ $('#conn').className='conn down'; $('#conn').textContent='offline'; }
+}
+function connect(){
+  pollOnce(); pollTimer = setInterval(pollOnce, 1500);          // always-on baseline
+  try{
+    const es = new EventSource('/api/events/stream');
+    es.onmessage = e => { try{ addEvent(JSON.parse(e.data)); sseEvents++; $('#conn').className='conn live'; $('#conn').textContent='live (SSE)'; }catch(_){} };
+    es.onerror = ()=>{ es.close(); };                            // poll keeps running regardless
+  }catch(_){}
+}
+
+// when opened via a token-gated share URL (?token=…), pass the token through to the mutating POSTs
+const TOKEN = new URLSearchParams(location.search).get('token') || '';
+const tok = u => TOKEN ? (u + (u.includes('?')?'&':'?') + 'token=' + encodeURIComponent(TOKEN)) : u;
+$('#run').addEventListener('click', async ()=>{
+  $('#run').disabled = true; $('#run').textContent = 'running…';
+  try{
+    const r = await fetch(tok('/api/demo/run-full-pipeline'),{method:'POST'});
+    if(r.status === 401){ $('#note').textContent = '🔒 needs a token to run — open this page with ?token=… (viewing still works without it).'; return; }
+    const d = await r.json();
+    $('#note').textContent = `pipeline ${d.ok?'OK':'failed'} — answer=${d.answer_value}, events=${d.events_emitted} (watch the stream fill in)`;
+  }
+  catch(e){ $('#note').textContent = 'pipeline call failed: '+e; }
+  finally{ $('#run').disabled=false; $('#run').textContent='▶ Run Full Pipeline'; }
+});
+$('#run-fleet').addEventListener('click', async ()=>{
+  $('#run-fleet').disabled = true; $('#run-fleet').textContent = 'running on fleet…';
+  try{
+    // every stage runs AS a CapabilityTask claimed atomically by a worker under the supervisor
+    const r = await fetch(tok('/api/demo/run-full-pipeline-via-fleet'),{method:'POST'});
+    if(r.status === 401){ $('#note').textContent = '🔒 needs a token to run — open this page with ?token=… (viewing still works without it).'; return; }
+    const d = await r.json();
+    $('#note').textContent = `fleet pipeline ${d.ok?'OK':'failed'} — answer=${d.answer_value}, ${d.worker_processed||0} stages claimed+processed, events=${d.events_emitted}`;
+  }
+  catch(e){ $('#note').textContent = 'fleet pipeline call failed: '+e; }
+  finally{ $('#run-fleet').disabled=false; $('#run-fleet').textContent='▶ Run via Fleet'; }
+});
+$('#clear').addEventListener('click', async ()=>{ await fetch(tok('/api/events/clear'),{method:'POST'}); $('#events').innerHTML=''; seen=0; lastSeq=0; reviewCount=0; $('#count').textContent=''; for(const k in stageCount) delete stageCount[k]; renderStages(); ['m-answer','m-lift','m-pack'].forEach(id=>$('#'+id).textContent='—'); $('#m-reviews').textContent='0'; $('#artifacts').innerHTML='<span class="sub">cleared — run the pipeline again…</span>'; });
+$('#audit').addEventListener('click', async ()=>{
+  $('#audit-panel').innerHTML='<span class="sub">auditing…</span>';
+  try{
+    const m = await (await fetch('/api/context/audit',{cache:'no-store'})).json();
+    const saved = m.original_tokens - m.optimized_tokens;
+    $('#audit-panel').innerHTML =
+      `<div class="metric"><div class="ml">Tokens (raw → optimized)</div><div class="mv good">${m.original_tokens} → ${m.optimized_tokens} (−${saved})</div></div>`+
+      `<div class="sub" style="margin:8px 0">${m.issues.length} issue(s) · ${m.dropped.length} dropped · ${m.superseded.length} superseded · lossless=${m.lossless} (raw rehydratable)</div>`+
+      m.issues.map(i=>`<div class="ev"><b>${i.type}</b> <span class="sub">[${i.severity}]</span> — ${i.reason}</div>`).join('');
+  }catch(e){ $('#audit-panel').innerHTML='<span class="sub">audit failed: '+e+'</span>'; }
+});
+
+renderStages();
+connect();
+$('#note').textContent = TOKEN ? 'Token loaded — ▶ Run Full Pipeline is enabled.' : 'View-only (no ?token=). You can watch events live; add ?token=… to enable ▶ Run Full Pipeline.';
+</script>
+</body>
+</html>

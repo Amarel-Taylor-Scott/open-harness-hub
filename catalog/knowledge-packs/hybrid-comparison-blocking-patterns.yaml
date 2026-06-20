@@ -1,0 +1,38 @@
+id: "knowledge-pack/hybrid-comparison-blocking-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Hybrid comparison blocking patterns"
+description: "Patterns for planning resumable object comparisons using normalized object fields plus labels, dimensions, entity refs, and embedding buckets."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "government", "cross_industry"]
+capability: ["retrieval", "governance", "evaluation", "routing"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.product"
+tags: ["pairwise-comparison", "blocking", "entity-refs", "embedding-buckets", "resumable-workers"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types:
+  - "comparison_block_pattern"
+  - "comparison_checkpoint_pattern"
+  - "hybrid_similarity_feature"
+files:
+  - path: "catalog/knowledge-packs/data/hybrid-comparison-blocking-patterns/rows.jsonl"
+    format: "jsonl"
+    schema: "hybrid-comparison-blocking-pattern"
+indexing:
+  bm25: true
+  dense:
+    recommended_model: "sentence-transformers/all-MiniLM-L6-v2"
+provenance:
+  sources:
+    - "Open Harness Hub resumable object comparison planner"
+    - "Open Harness Hub use-case seed entity and embedding bucket rows"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "Synthetic comparison planning patterns only."

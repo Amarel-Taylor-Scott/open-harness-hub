@@ -1,0 +1,55 @@
+/* ============================================================
+   OpenHarnessHub — Private Registry + Connect/MCP (local-first)
+   ============================================================ */
+
+/* ---------------- PRIVATE REGISTRY ---------------- */
+.pt-reg-cover { display: flex; align-items: center; gap: 16px; background: var(--panel); border: 1px solid var(--line);
+                border-radius: var(--r-lg); padding: 14px 18px; margin-bottom: 18px; flex-wrap: wrap; }
+.pt-reg-cover .seg { display: flex; flex-direction: column; gap: 3px; }
+.pt-reg-cover .seg .v { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--fg); }
+.pt-reg-cover .seg .v.gov { color: var(--accent); }
+.pt-reg-cover .seg .k { font-size: 11px; color: var(--fg-muted); }
+.pt-reg-cover .plus { color: var(--fg-faint); font-size: 18px; }
+.pt-reg-cover .covbar { flex: 1; min-width: 160px; height: 8px; border-radius: 4px; background: var(--bg-subtle); overflow: hidden; display: flex; }
+.pt-reg-cover .covbar .priv { background: var(--verified); height: 100%; }
+.pt-reg-cover .covbar .pub { background: var(--accent); height: 100%; }
+.pt-priv-badge { font-size: 10px; font-weight: 700; border-radius: var(--r-pill); padding: 2px 8px; }
+.pt-priv-badge.priv { color: var(--verified); background: color-mix(in srgb, var(--verified) 12%, transparent); border: 1px solid color-mix(in srgb, var(--verified) 35%, transparent); }
+.pt-priv-badge.fork { color: var(--p-loop); background: color-mix(in srgb, var(--p-loop) 12%, transparent); border: 1px solid color-mix(in srgb, var(--p-loop) 35%, transparent); }
+.pt-priv-badge.ingest { color: var(--warning); background: color-mix(in srgb, var(--warning) 12%, transparent); border: 1px solid color-mix(in srgb, var(--warning) 35%, transparent); }
+.pt-toolbar { display: flex; gap: 9px; margin-bottom: 16px; flex-wrap: wrap; }
+
+/* ---------------- CONNECT / MCP BRIDGE ---------------- */
+.pt-bridge { display: grid; grid-template-columns: 1fr 96px 1fr; align-items: stretch; gap: 0; margin-bottom: 22px; }
+.pt-zone { border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px 18px; }
+.pt-zone.private { border-color: color-mix(in srgb, var(--verified) 45%, var(--line)); background: color-mix(in srgb, var(--verified) 5%, var(--panel)); }
+.pt-zone.governed { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); background: color-mix(in srgb, var(--accent) 5%, var(--panel)); }
+.pt-zone .zh { display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--fg); margin-bottom: 3px; }
+.pt-zone .zsub { font-size: 11px; color: var(--fg-muted); margin-bottom: 13px; }
+.pt-zone.private .zh .tag, .pt-zone.governed .zh .tag { font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 2px 7px; border-radius: var(--r-pill); margin-left: auto; }
+.pt-zone.private .zh .tag { color: var(--verified); background: color-mix(in srgb, var(--verified) 12%, transparent); }
+.pt-zone.governed .zh .tag { color: var(--accent); background: var(--accent-weak); }
+.pt-mcpnode { display: flex; align-items: center; gap: 9px; padding: 9px 11px; background: var(--panel); border: 1px solid var(--line);
+              border-radius: var(--r-md); margin-bottom: 8px; font-size: 12.5px; }
+.pt-mcpnode .ic { width: 20px; text-align: center; flex: 0 0 auto; color: var(--fg-muted); }
+.pt-mcpnode .nm { flex: 1; color: var(--fg); }
+.pt-mcpnode .nm small { display: block; font-family: var(--font-mono); font-size: 10px; color: var(--fg-faint); }
+.pt-mcpnode.agent { border-style: dashed; border-color: var(--line-strong); }
+.pt-bridge-mid { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.pt-bridge-mid .line { position: absolute; top: 12px; bottom: 12px; width: 0; border-left: 2px dashed var(--line-strong); }
+.pt-bridge-mid .lab { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--fg-muted); background: var(--bg);
+                      padding: 4px 0; writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: .1em; z-index: 1; }
+.pt-bridge-arrow { z-index: 1; background: var(--bg); font-size: 11px; color: var(--fg-muted); padding: 4px 6px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.pt-bridge-arrow .a { color: var(--accent); font-weight: 700; }
+.pt-crossline { display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--fg-muted); margin-bottom: 22px; padding: 11px 14px;
+                background: var(--bg-subtle); border: 1px solid var(--line); border-radius: var(--r-md); flex-wrap: wrap; }
+.pt-crossline .ok { color: var(--success); font-weight: 600; }
+.pt-crossline .no { color: var(--danger); font-weight: 600; }
+.pt-codeblock { font-family: var(--font-mono); font-size: 11.5px; line-height: 1.6; background: var(--bg-subtle); border: 1px solid var(--line);
+                border-radius: var(--r-md); padding: 13px 15px; color: var(--fg-muted); white-space: pre; overflow-x: auto; }
+.pt-codeblock .tok { color: var(--accent); }
+.pt-srv { display: flex; align-items: center; gap: 11px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 12.5px; }
+.pt-srv:last-child { border-bottom: none; }
+.pt-srv .dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
+.pt-srv .nm { flex: 1; color: var(--fg); }
+.pt-srv .nm small { display: block; font-family: var(--font-mono); font-size: 10px; color: var(--fg-faint); }

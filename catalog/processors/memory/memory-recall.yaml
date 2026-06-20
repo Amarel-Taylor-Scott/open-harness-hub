@@ -1,0 +1,47 @@
+id: processor/memory-recall
+type: processor
+version: 0.1.0
+name: Memory recall
+description: Recall the memories relevant to the current turn (semantic + recency over the memory store).
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+capability:
+- memory
+- retrieval
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- context-layer
+- memory
+created: '2026-05-29'
+updated: '2026-05-29'
+attribution:
+  source_kind: manual
+  author: Open Harness Hub context-layer taxonomy
+  license: MIT
+process_kind: memory.recall
+deterministic: false
+idempotent: true
+streaming: false
+inputs:
+- name: query
+  type: object
+- name: store
+  type: object
+outputs:
+- name: memories
+  type: object
+side_effects: read
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.memory.memory_recall.run
+  language: python
+links:
+  source: docs/strategy/context-layer-pmf.md

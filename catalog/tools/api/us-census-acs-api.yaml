@@ -1,0 +1,95 @@
+id: "tool/us-census-acs-api"
+type: tool
+version: "0.1.0"
+name: "US Census ACS Data API"
+description: |
+  Fetches authoritative American Community Survey estimates from the U.S.
+  Census Data API for a set of variables and a geography. Returns current,
+  citeable figures (population, income, housing, education, employment, …).
+
+  Capability lift: a bare LLM cannot reliably recall current ACS values for an
+  arbitrary place, and invents variable codes. This tool returns the real value
+  with its variable code and geography, so a pipeline can verify and cite it.
+  Pair with knowledge-pack/us-census-api-reference for the variable vocabulary.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["government", "finance", "cross_industry"]
+capability: ["retrieval", "tool_use", "verification"]
+modality: ["structured", "tabular"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "volatile"
+tags: ["census", "acs", "public-data", "api", "grounding"]
+created: "2026-05-27"
+updated: "2026-05-27"
+
+attribution:
+  source_url: "https://www.census.gov/data/developers/data-sets/acs-5year.html"
+  source_kind: "other"
+  author: "U.S. Census Bureau"
+  license: "public-domain"
+
+parameters:
+  type: object
+  required: ["year", "dataset", "variables", "for_geography"]
+  properties:
+    year:
+      type: integer
+      description: "Vintage year, e.g. 2022. Use the latest available for the dataset."
+    dataset:
+      type: string
+      description: "API dataset path, e.g. 'acs/acs5' (5-year) or 'acs/acs1'."
+      default: "acs/acs5"
+    variables:
+      type: array
+      items: { type: string }
+      description: "ACS variable codes, e.g. ['NAME','B19013_001E']. See knowledge-pack/us-census-api-reference."
+    for_geography:
+      type: string
+      description: "API `for` clause, e.g. 'county:075' or 'place:*'."
+    in_geography:
+      type: string
+      description: "Optional API `in` clause for nested geographies, e.g. 'state:06'."
+    api_key:
+      type: string
+      description: "Census API key. Optional for low-volume use; recommended above 500 calls/day."
+
+returns:
+  type: object
+  properties:
+    rows:
+      type: array
+      description: "List of objects keyed by requested variable + geography ids (NAME, state, county, …)."
+      items: { type: object }
+    source_url:
+      type: string
+      description: "The exact request URL, for citation and replay."
+    retrieved_at:
+      type: string
+      description: "ISO-8601 fetch timestamp (freshness for CDC/revocation)."
+
+side_effects: "external_call"
+
+examples:
+  - input:
+      year: 2022
+      dataset: "acs/acs5"
+      variables: ["NAME", "B19013_001E"]
+      for_geography: "county:075"
+      in_geography: "state:06"
+    output:
+      rows:
+        - NAME: "San Francisco County, California"
+          B19013_001E: "141446"
+          state: "06"
+          county: "075"
+      source_url: "https://api.census.gov/data/2022/acs/acs5?get=NAME,B19013_001E&for=county:075&in=state:06"
+      retrieved_at: "2026-05-27T00:00:00Z"
+    notes: "Median household income for San Francisco County; cite source_url + retrieved_at."
+
+implementations:
+  - kind: http
+    method: GET
+    url: "https://api.census.gov/data/{year}/{dataset}"
+    notes: "Query string: get=<comma-joined variables>&for=<for_geography>&in=<in_geography>&key=<api_key>."

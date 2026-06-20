@@ -1,0 +1,27 @@
+{
+  "valid": {
+    "schema_version": "MemoryWriteRequest.v1",
+    "tenant_id": "acme",
+    "scope": "tenant_private",
+    "container": "support-agent",
+    "content": {"text": "Customer prefers email over phone for dispute updates."},
+    "metadata": {"tags": ["contact-preference"]},
+    "provider_hint": "memory.emulator@v1",
+    "now": "2026-06-05T00:00:00Z"
+  },
+  "invalid_missing_container": {
+    "schema_version": "MemoryWriteRequest.v1",
+    "tenant_id": "acme",
+    "scope": "tenant_private",
+    "content": {"text": "Customer prefers email over phone for dispute updates."},
+    "now": "2026-06-05T00:00:00Z"
+  },
+  "invalid_bad_scope": {
+    "schema_version": "MemoryWriteRequest.v1",
+    "tenant_id": "acme",
+    "scope": "world_readable",
+    "container": "support-agent",
+    "content": {"text": "x"},
+    "now": "2026-06-05T00:00:00Z"
+  }
+}

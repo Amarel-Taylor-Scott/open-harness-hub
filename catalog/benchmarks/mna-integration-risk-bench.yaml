@@ -1,0 +1,35 @@
+id: "benchmark/mna-integration-risk-bench"
+type: benchmark
+version: "0.1.0"
+name: "M&A Integration Risk benchmark"
+description: "Synthetic benchmark for m&a integration risk review quality, evidence grounding, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["m_and_a.integration", "m_and_a.due_diligence"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["mna-integration-risk", "expansion-v4"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/mna-integration-risk-review"
+dataset: "dataset/mna-integration-risk-samples"
+rubric: "rubric/mna-integration-risk-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/mna-integration-risk-review"
+    rule_pack_override: ["rule-pack/grep-mna-integration-risk-flags", "rule-pack/rag-mna-integration-risk-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 17
+report:
+  output: "dist/benchmarks/mna-integration-risk/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

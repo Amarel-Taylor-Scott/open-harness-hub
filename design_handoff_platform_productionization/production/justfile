@@ -1,0 +1,74 @@
+# justfile — the pipeline contract (S5a). CI YAML and humans call ONLY these recipes;
+# local run = CI run = agent run. Install: https://github.com/casey/just (or read each
+# recipe — every body is plain shell).
+
+set dotenv-load := true
+
+# ---------- one-click local platform ----------
+
+# bring everything up: secrets → routes → containers → health
+up: vault-export routes
+	docker compose up -d --build
+	python3 scripts/deploy.py --status
+
+# the self-orienting deploy: builds/restarts ONLY what changed, verifies, writes a receipt
+deploy:
+	python3 scripts/deploy.py
+
+# plan only — show what WOULD change
+plan:
+	python3 scripts/deploy.py --dry-run
+
+# expose the gateway publicly (ephemeral trycloudflare URL prints below)
+tunnel:
+	bash scripts/tunnel.sh ${GATEWAY_PORT:-8080}
+
+# regenerate the gateway routes from services.json
+routes:
+	python3 scripts/gen_caddy.py
+
+status:
+	python3 scripts/deploy.py --status
+
+down:
+	docker compose down
+
+# ---------- vault (SOPS + age — see vault/README.md) ----------
+
+# one-time: create your age identity (stays OUTSIDE the repo)
+vault-init:
+	mkdir -p ~/.config/aidr
+	test -f ~/.config/aidr/age.key || age-keygen -o ~/.config/aidr/age.key
+	@echo "public key (put in .sops.yaml):" && grep 'public key' ~/.config/aidr/age.key
+
+# edit secrets in your $EDITOR; encrypted at rest, only ciphertext touches the repo
+vault-edit:
+	SOPS_AGE_KEY_FILE=~/.config/aidr/age.key sops vault/secrets.enc.yaml
+
+# decrypt → .env for compose/services (file is gitignored; refuses to run without vault)
+vault-export:
+	@test -f vault/secrets.enc.yaml && \
+	  SOPS_AGE_KEY_FILE=~/.config/aidr/age.key sops -d --output-type dotenv vault/secrets.enc.yaml > .env && \
+	  echo ".env written from vault ($(grep -c '=' .env) keys)" || \
+	  echo "no vault yet — using existing .env (run 'just vault-init' then 'just vault-edit' to adopt the vault)"
+
+# ---------- CI stages (S5: workflow YAML only calls these) ----------
+
+lint:
+	! grep -rEn '#[0-9a-fA-F]{3,8}\b' --include='*.css' .. | grep -v 'oh-tokens.css' | grep -v node_modules
+	python3 -m py_compile $(git ls-files '*.py' 2>/dev/null) || true
+
+test:
+	python3 scripts/gen_caddy.py --check
+	@echo "(proof modules + contract tests + playwright smokes land here — S4 queue)"
+
+package:
+	docker compose build
+	@echo "(syft SBOM + cosign sign land here when the registry exists — S6)"
+
+smoke:
+	python3 scripts/deploy.py --status
+
+# latency budgets from services.json, measured through the gateway (S11 proof)
+bench *ARGS:
+	python3 scripts/latency_probe.py {{ARGS}}

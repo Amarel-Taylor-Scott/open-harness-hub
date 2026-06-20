@@ -1,0 +1,75 @@
+id: "rubric/draft-manifest-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Draft manifest quality rubric v1 (for curator review)"
+description: |
+  Seven-dimension rubric for grading a draft manifest emitted by
+  `harness/draft-manifest-author` before a curator promotes it from
+  `catalog/_inbox/` to live `catalog/{type}/`. Used both as
+  automated screening (judge LLM applies the rubric) and as the
+  curator's review checklist.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["software", "software.docs", "ai", "cross_industry"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-24"
+updated: "2026-05-24"
+
+dimensions:
+  - id: "schema_validity"
+    label: "Validates against schemas/{type}.schema.json (must be 1.0 to promote)"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "scripts/validate.py exit code on the single file + structured error list"
+
+  - id: "vocabulary_compliance"
+    label: "All industry / capability / modality / leaf-type values exist in vocabularies/ (no VOCAB-CHANGE-NEEDED unflagged)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "per-field vocab lookup result"
+
+  - id: "description_quality"
+    label: "Description states what / where-from / when-to-use / when-NOT-to-use; no placeholder text (TODO/FIXME/lorem)"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "description-sections checklist + placeholder-string grep result"
+
+  - id: "attribution_completeness"
+    label: "If ported from external source: attribution.source_url + author + license present and license is compatible"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "attribution fields + license-compatibility check"
+
+  - id: "non_collision"
+    label: "id does not collide with existing live catalog entry; slug is descriptive (not 'foo-1' or 'wikipedia-thing')"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "live-catalog id-collision check + slug-readability assessment"
+
+  - id: "reuse_over_invention"
+    label: "If component overlaps significantly with existing one, proposes an UPDATE (version bump) rather than a new component"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "similarity-search against existing components + UPDATE-vs-NEW justification"
+
+  - id: "operability"
+    label: "If a harness/pipeline/processor: declares model_targets / inputs / outputs / side_effects so the runtime can actually execute it"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "per-type operability checklist"
+
+scoring_method: "weighted_sum"
+examples:
+  - grade: 1.0
+    response: "Validates; all vocab values exist; description has all 4 sections; attribution complete + compatible; no collision; reuse-vs-new explicitly justified; operability fields complete."
+    notes: "Promote to live catalog."
+  - grade: 0.6
+    response: "Validates; one vocab value missing (flagged as VOCAB-CHANGE-NEEDED); description missing 'when NOT to use'; attribution present; no collision; reuse-vs-new not justified; operability fields complete."
+    notes: "Curator add to vocabularies/ first; ask author for 'when NOT to use' + reuse justification; then promote."
+  - grade: 0.2
+    response: "Validation fails on missing required field; uses 'wikipedia-something' slug; description has TODO placeholder; no attribution despite Wikipedia source; might collide with existing harness/research-entity."
+    notes: "Reject; send back for rework."

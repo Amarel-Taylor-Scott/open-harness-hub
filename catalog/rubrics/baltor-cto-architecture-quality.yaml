@@ -1,0 +1,48 @@
+id: "rubric/baltor-cto-architecture-quality"
+type: rubric
+version: "0.1.0"
+name: "Baltor CTO architecture quality"
+description: "CTO rubric for extensible, non-fragile, cloud-compatible Context Pack and Context Fabric architecture."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["software", "ai_governance"]
+capability: ["evaluation", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["baltor", "cto", "architecture", "context-packs"]
+created: "2026-06-02"
+updated: "2026-06-02"
+dimensions:
+  - id: "extensible_contracts"
+    label: "Context object, pack, connector, reranker, and model-routing contracts are extensible without brittle migrations"
+    weight: 0.20
+    scale: "0.0-1.0"
+    evidence_required: "Schemas use stable envelopes, flexible facets, additive dimensions, typed relationships, and versioned artifacts."
+  - id: "fragile_information_freshness"
+    label: "Architecture detects fragile/stale/conflicting information and schedules refresh or validation"
+    weight: 0.20
+    scale: "0.0-1.0"
+    evidence_required: "Freshness labels, source precedence, conflict detection, refresh queues, and source-handle validation are present."
+  - id: "data_shape_flexibility"
+    label: "System supports document, long attribute/facet, and wide columnar data shapes where each fits"
+    weight: 0.15
+    scale: "0.0-1.0"
+    evidence_required: "Design maps context objects to documents, dimensions/assertions to long records, and metrics/evals to columnar analytics."
+  - id: "cloud_portability"
+    label: "Cloud architecture is portable across major hosting stacks and avoids unnecessary provider lock-in"
+    weight: 0.15
+    scale: "0.0-1.0"
+    evidence_required: "Deployment supports container/Kubernetes/serverless options, object storage, Postgres-compatible metadata, and replaceable vector/search backends."
+  - id: "self_optimization"
+    label: "Feedback, evals, telemetry, and policy outcomes improve retrieval, reranking, compression, and routing over time"
+    weight: 0.15
+    scale: "0.0-1.0"
+    evidence_required: "Pack feedback, trace telemetry, eval cases, reranking decisions, freshness outcomes, and training labels are captured."
+  - id: "security_boundary"
+    label: "ACL-before-model, local encrypted memory boundaries, and raw-source expansion controls are technically enforceable"
+    weight: 0.15
+    scale: "0.0-1.0"
+    evidence_required: "Policy gates, source ACL filters, audit logs, encrypted sync separation, and exact-handle fetch controls are implemented."
+scoring_method: "weighted_sum"

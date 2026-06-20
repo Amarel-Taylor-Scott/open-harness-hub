@@ -1,0 +1,18 @@
+{
+  "$id": "inference/InferenceRequest.v1",
+  "title": "InferenceRequest.v1",
+  "type": "object",
+  "additionalProperties": true,
+  "description": "A request into the Inference Gateway for an object. Carries the requested model class + the object's preference reference + an input HASH (never the raw prompt text, which may be sensitive). The gateway resolves the preference, selects a provider (ModelRouteDecision), executes, and writes a ModelInvocationReceipt. Secrets are refs only.",
+  "required": ["request_id", "object_id", "requested_model_class", "input_hash", "created_at"],
+  "properties": {
+    "request_id": {"type": "string"},
+    "object_id": {"type": "string"},
+    "preference_id": {"type": ["string", "null"]},
+    "task_intent": {"type": ["string", "null"]},
+    "requested_model_class": {"type": "string", "description": "tier/specialization summary, e.g. tier:500/[500]"},
+    "input_hash": {"type": "string", "description": "sha256 of the input — NEVER the raw prompt text"},
+    "tenant_id": {"type": ["string", "null"]},
+    "created_at": {"type": "string"}
+  }
+}

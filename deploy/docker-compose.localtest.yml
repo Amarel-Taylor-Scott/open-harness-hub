@@ -1,0 +1,10 @@
+# Local-test override: REMOVE the web host-port mappings (the live dev servers hold 8000-8003, and
+# host-port mapping isn't reachable from the test sandbox anyway). The web SPAs still run and reach
+# the backends over the compose network; verify internally with `docker compose exec`.
+#   POSTGRES_PASSWORD=x docker compose -f deploy/docker-compose.deploy.yml -f deploy/docker-compose.localtest.yml up -d
+name: aidoneright
+services:
+  web-harness-hub: { ports: !override [] }
+  web-baltor:      { ports: !override [] }
+  web-context:     { ports: !override [] }
+  web-teleon:      { ports: !override [] }

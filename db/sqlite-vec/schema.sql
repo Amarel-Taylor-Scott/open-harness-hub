@@ -10,9 +10,9 @@
 --   sqlite3 catalog.db
 --   .load ./vec0
 
--- Catalog index — one vector per artifact (name + description + tags).
+-- Catalog index — one vector per component (name + description + tags).
 CREATE VIRTUAL TABLE IF NOT EXISTS catalog_vec USING vec0(
-  artifact_id     TEXT PRIMARY KEY,
+  component_id     TEXT PRIMARY KEY,
   embedding       FLOAT[384],                  -- adjust dim to match your embedder
   +type           TEXT,
   +industry_csv   TEXT,

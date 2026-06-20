@@ -1,0 +1,37 @@
+id: "knowledge-pack/database-component-store-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Database component store patterns"
+description: "Patterns for storing active components and subcomponents in Postgres first, while treating repository files and JSONL as seed, staging, and export formats."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "retrieval", "serving", "verification"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "subcomponents", "postgres", "pgvector", "database-first", "object-factory"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+content_types:
+  - "component_store_stage"
+files:
+  - path: "catalog/knowledge-packs/data/database-component-store-patterns/stages.jsonl"
+    format: "jsonl"
+    schema: "component_store_stage"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["id", "stage", "description", "inputs", "outputs", "review_gate"]
+provenance:
+  sources:
+    - "Open Harness Hub north star platform architecture"
+    - "Open Harness Hub Postgres schema"
+  collected_through: "2026-05-26"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "schema and process metadata only"

@@ -1,0 +1,26 @@
+# Baltor capability worker — one-shot Kubernetes Job (C-FLEET-2).
+# Maps the cold_start_each_task lifecycle policy: rare/expensive/risky tasks (untrusted sandbox, sensitive
+# one-off browser sessions) get a fresh, isolated Job per task and exit. No keepalive, no pool. The Job
+# claims exactly one task from the DB task ledger (the source of truth) via atomic claim, runs it, exits.
+# Placeholders: ${CAPABILITY_ID} ${TASK_ID} ${IMAGE} ${BALTOR_DB_URL}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: baltor-coldstart-${CAPABILITY_ID}-${TASK_ID}
+  labels: {app: baltor-worker, capability: "${CAPABILITY_ID}", lifecycle: cold_start_each_task}
+spec:
+  backoffLimit: 2                    # retries map to the ledger's max_attempts / DLQ
+  ttlSecondsAfterFinished: 600
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: worker
+          image: ${IMAGE}
+          # bootstrap_task_id is a HINT; ownership begins only after the atomic claim succeeds
+          args: ["python3", "scripts/capability_worker.py", "--capability", "${CAPABILITY_ID}", "--bootstrap-task", "${TASK_ID}", "--once", "--db", "${BALTOR_DB_URL}"]
+          env:
+            - {name: BALTOR_DB_URL, value: "${BALTOR_DB_URL}"}
+          resources:
+            requests: {cpu: "250m", memory: "256Mi"}
+            limits: {cpu: "2", memory: "2Gi"}

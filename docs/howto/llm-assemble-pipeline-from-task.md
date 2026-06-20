@@ -1,6 +1,6 @@
 # Getting started: assemble a pipeline from a task description
 
-A common ask: "I have a task. The catalog has 500+ artifacts. Which ones do I need?"
+A common ask: "I have a task. The catalog has 500+ components. Which ones do I need?"
 
 The catalog ships a scaffolding script that takes a free-text task description, searches the catalog for relevant components, and emits a draft pipeline manifest. The script is meant for two audiences:
 
@@ -35,7 +35,7 @@ Output (abridged):
 ```
 Task: 'Review a vendor invoice for fraud signals + extract line items'
 
-Found 24 relevant artifacts across 8 types.
+Found 24 relevant components across 8 types.
 
 == persona (3 hits) ==
   [0.61] persona/bureaucracy-translator-cite-first
@@ -98,9 +98,9 @@ The JSON has the shape:
 
 Feed it to your agent with a prompt like:
 
-> Here is a task and a set of catalog hits. Compose a working pipeline.yaml using only artifacts that exist in `hits_by_type`. Refine the `draft_pipeline` if needed; never invent artifact IDs.
+> Here is a task and a set of catalog hits. Compose a working pipeline.yaml using only components that exist in `hits_by_type`. Refine the `draft_pipeline` if needed; never invent component IDs.
 
-The "never invent artifact IDs" constraint is important. The script gives the agent a closed set of real IDs to compose from, which prevents fabricated references that would fail validation.
+The "never invent component IDs" constraint is important. The script gives the agent a closed set of real IDs to compose from, which prevents fabricated references that would fail validation.
 
 ## Validation loop
 
@@ -141,9 +141,9 @@ The composer correctly slots the GREP pack as the early triage step and the clas
 
 The script reads from `dist/catalog.sqlite`, a derived SQLite database with three useful tables:
 
-- `artifacts` — id, type, name, description, license, lifecycle, etc. (one row per manifest)
-- `artifacts_fts` — FTS5 full-text index over name + description + tags + industry + capability
+- `components` — id, type, name, description, license, lifecycle, etc. (one row per manifest)
+- `components_fts` — FTS5 full-text index over name + description + tags + industry + capability
 - `edges` — typed adjacency (`uses_rule_pack`, `uses_persona`, `step_ref`, etc.) used for the hybrid-mode edge-aware boost
 - `embeddings` — optional, populated only when `OH_BUILD_EMBEDDINGS=1` is set
 
-YAML stays the source of truth; the DB is a derived build artifact, regenerated from the YAML on every push.
+YAML stays the source of truth; the DB is a derived build component, regenerated from the YAML on every push.

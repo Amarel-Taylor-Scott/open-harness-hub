@@ -1,0 +1,38 @@
+id: "knowledge-pack/index-coverage-repair-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Index coverage repair patterns"
+description: "Checks for detecting and repairing missing keyword, vector, graph, facet, and quality index records in high-volume staged component batches."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "governance", "verification", "planning"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.indexing"
+tags: ["components", "index-coverage", "repair", "daily-factory", "pgvector", "hybrid-search"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+content_types:
+  - "index_coverage_repair_check"
+files:
+  - path: "catalog/knowledge-packs/data/index-coverage-repair-patterns/checks.jsonl"
+    format: "jsonl"
+    schema: "index_coverage_repair_check"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["id", "check_type", "description", "required_inputs", "required_outputs", "failure_route"]
+provenance:
+  sources:
+    - "Open Harness Hub daily production rows"
+    - "Open Harness Hub model-ops daily run"
+    - "Open Harness Hub promotion readiness planner"
+  collected_through: "2026-05-26"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "synthetic operational checks only"

@@ -1,0 +1,67 @@
+id: "tool/web-archive-capture-lookup"
+type: tool
+version: "0.1.0"
+name: "Web archive capture lookup"
+description: "Looks up archived captures for a source URL using Wayback CDX-compatible indexes, Archive-It collections, pywb, or private WARC/CDX stores."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "government", "healthcare.public_health", "cross_industry"]
+capability: ["retrieval", "verification", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "volatile"
+tags: ["wayback", "archive-org", "cdx", "warc", "versioned-facts"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    url:
+      type: string
+    from_date:
+      type: string
+    to_date:
+      type: string
+    archive_provider:
+      type: string
+      description: "internet_archive, archive_it, pywb, private_warc, or compatible provider."
+    filters:
+      type: object
+  required: ["url"]
+returns:
+  type: object
+  properties:
+    captures:
+      type: array
+      items:
+        type: object
+    selected_capture:
+      type: object
+    archive_provider:
+      type: string
+    review_notes:
+      type: array
+      items:
+        type: string
+side_effects: "external_call"
+examples:
+  - input:
+      url: "https://www.cdc.gov/example/guidance"
+      from_date: "2024-01-01"
+      to_date: "2024-12-31"
+      archive_provider: "internet_archive"
+    output:
+      captures: []
+      selected_capture: {}
+      archive_provider: "internet_archive"
+      review_notes: ["Example only; provider response omitted."]
+implementations:
+  - kind: "http"
+    url: "https://web.archive.org/cdx"
+  - kind: "callable"
+    path: "tools.web_archive_capture_lookup.run"
+  - kind: "mcp"
+    path: "mcp/web_archive.lookup_captures"

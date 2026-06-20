@@ -1,0 +1,277 @@
+{
+  "version": "1.0",
+  "note": "Seeded OFFICIAL free/limited LLM endpoint candidates. Every rate_limit_claim / free-tier figure is owner_provided_unverified (confidence: unverified) \u2014 third-party free-tier claims are NOT trusted; official provider docs decide eligibility before any phase advance. class_code -> free_endpoint_class_codes.json. All rows are candidate/watch; none is production infrastructure; raw keys never stored (secret_ref only).",
+  "endpoints": [
+    {
+      "endpoint_id": "endpoint.github_models@candidate",
+      "provider_name": "GitHub Models",
+      "class_code": 100,
+      "api_style": "openai_compatible",
+      "base_url_known": true,
+      "signals": {
+        "has_official_docs": true,
+        "shared_key_markers": false,
+        "reverse_engineered_markers": false,
+        "browser_runtime": false,
+        "rate_limit_documented": true,
+        "data_retention_documented": "partial"
+      },
+      "rate_limit_claim": {
+        "summary": "rate-limited no-cost access for experimentation/prototyping",
+        "source": "owner_provided_unverified",
+        "confidence": "unverified"
+      },
+      "secret_ref": "secret://provider/github_models",
+      "status": "candidate"
+    },
+    {
+      "endpoint_id": "endpoint.google_gemini@candidate",
+      "provider_name": "Google Gemini API",
+      "class_code": 100,
+      "api_style": "native",
+      "base_url_known": true,
+      "signals": {
+        "has_official_docs": true,
+        "shared_key_markers": false,
+        "reverse_engineered_markers": false,
+        "browser_runtime": false,
+        "rate_limit_documented": true,
+        "data_retention_documented": "free_tier_used_to_improve_products"
+      },
+      "rate_limit_claim": {
+        "summary": "free tier free-of-charge for some models; free tier data 'used to improve our products: Yes'",
+        "source": "owner_provided_unverified",
+        "confidence": "unverified"
+      },
+      "secret_ref": "secret://provider/google",
+      "status": "candidate",
+      "data_policy_note": "free-tier prompts may be used for product improvement \u2014 watch data-use policy; never route customer-sensitive data on free tier"
+    },
+    {
+      "endpoint_id": "endpoint.groq@candidate",
+      "provider_name": "Groq",
+      "class_code": 100,
+      "api_style": "openai_compatible",
+      "base_url_known": true,
+      "signals": {
+        "has_official_docs": true,
+        "shared_key_markers": false,
+        "reverse_engineered_markers": false,
+        "browser_runtime": false,
+        "rate_limit_documented": true,
+        "data_retention_documented": "partial"
+      },
+      "rate_limit_claim": {
+        "summary": "free/developer rate limits; OpenAI-compatible base URL",
+        "source": "owner_provided_unverified",
+        "confidence": "unverified"
+      },
+      "secret_ref": "secret://provider/groq",
+      "status": "candidate"
+    },
+    {
+      "endpoint_id": "endpoint.mistral_la_plateforme@candidate",
+      "provider_name": "Mistral La Plateforme",
+      "class_code": 100,
+      "api_style": "openai_compatible",
+      "base_url_known": true,
+      "signals": {
+        "has_official_docs": true,
+        "shared_key_markers": false,
+        "reverse_engineered_markers": false,
+        "browser_runtime": false,
+        "rate_limit_documented": true,
+        "data_retention_documented": "partial"
+      },
+      "rate_limit_claim": {
+        "summary": "free mode enabled by default with limited rate limits; key without credit card",
+        "source": "owner_provided_unverified",
+        "confidence": "unverified"
+      },
+      "secret_ref": "secret://provider/mistral",
+      "status": "candidate"
+    },
+    {
+      "endpoint_id": "endpoint.cerebras@candidate",
+      "provider_name": "Cerebras Inference",
+      "class_code": 100,
+      "api_style": "openai_compatible",
+      "base_url_known": true,
+      "signals": {
+        "has_official_docs": true,
+        "shared_key_markers": false,
+        "reverse_engineered_markers": false,
+        "browser_runtime": false,
+        "rate_limit_documented": "verify_in_account",
+        "data_retention_documented": "partial"
+      },
+      "rate_limit_claim": {
+        "summary": "OpenAI client-compatible; verify current free limits in account before treating as durable",
+        "source": "owner_provided_unverified",
+        "confidence": "unverified"
+      },
+      "secret_ref": "secret://provider/cerebras",
+      "status": "watch"
+    },
+    {
+      "endpoint_id": "endpoint.cloudflare_workers_ai@candidate",
+      "provider_name": "Cloudflare Workers AI",
+      "class_code": 100,
+      "api_style": "native",
+      "base_url_known": true,
+      "signals": {
+        "has_official_docs": true,
+        "shared_key_markers": false,
+        "reverse_engineered_markers": false,
+        "browser_runtime": false,
+        "rate_limit_documented": true,
+        "data_retention_documented": "partial"
+      },
+      "rate_limit_claim": {
+        "summary": "free allocation of 10,000 Neurons/day, paid overage beyond",
+        "source": "owner_provided_unverified",
+        "confidence": "unverified"
+      },
+      "secret_ref": "secret://provider/cloudflare",
+      "status": "candidate"
+    },
+    {
+      "endpoint_id": "endpoint.openrouter_free@candidate",
+      "provider_name": "OpenRouter (:free variants)",
+      "class_code": 400,
+      "api_style": "openai_compatible",
+      "base_url_known": true,
+      "signals": {
+        "has_official_docs": true,
+        "aggregator": true,
+        "shared_key_markers": false,
+        "reverse_engineered_markers": false,
+        "browser_runtime": false,
+        "rate_limit_documented": true,
+        "data_retention_documented": "partial"
+      },
+      "rate_limit_claim": {
+        "summary": ":free variants ~20 RPM; ~50 req/day unless >=10 credits purchased (then ~1000/day)",
+        "source": "owner_provided_unverified",
+        "confidence": "unverified"
+      },
+      "secret_ref": "secret://provider/openrouter",
+      "status": "candidate",
+      "data_policy_note": "aggregator/intermediary \u2014 verify which upstream provider actually serves + its data handling"
+    },
+    {
+      "endpoint_id": "endpoint.huggingface_inference_providers@candidate",
+      "provider_name": "Hugging Face Inference Providers",
+      "class_code": 400,
+      "api_style": "mixed",
+      "base_url_known": true,
+      "signals": {
+        "has_official_docs": true,
+        "aggregator": true,
+        "shared_key_markers": false,
+        "reverse_engineered_markers": false,
+        "browser_runtime": false,
+        "rate_limit_documented": true,
+        "data_retention_documented": "partial"
+      },
+      "rate_limit_claim": {
+        "summary": "monthly credits: free $0.10/mo, Pro $2/mo, Team/Enterprise $2/seat; unified access to many providers",
+        "source": "owner_provided_unverified",
+        "confidence": "unverified"
+      },
+      "secret_ref": "secret://provider/huggingface",
+      "status": "candidate",
+      "data_policy_note": "tiny free budget \u2014 prototype only; intermediary routes to upstream providers"
+    },
+    {
+      "endpoint_id": "endpoint.nvidia_nim_catalog@candidate",
+      "provider_name": "NVIDIA NIM API Catalog",
+      "class_code": 100,
+      "api_style": "openai_compatible",
+      "base_url_known": true,
+      "signals": {
+        "has_official_docs": true,
+        "shared_key_markers": false,
+        "reverse_engineered_markers": false,
+        "browser_runtime": false,
+        "rate_limit_documented": true,
+        "data_retention_documented": "partial"
+      },
+      "rate_limit_claim": {
+        "summary": "Developer Program: free access to NIM API endpoints for prototyping; downloadable NIM containers for dev/test",
+        "source": "owner_provided_unverified",
+        "confidence": "unverified"
+      },
+      "secret_ref": "secret://provider/nvidia_nim",
+      "status": "candidate"
+    },
+    {
+      "endpoint_id": "endpoint.together_ai@paid",
+      "provider_name": "Together AI",
+      "class_code": 300,
+      "api_style": "openai_compatible",
+      "base_url_known": true,
+      "signals": {
+        "has_official_docs": true,
+        "shared_key_markers": false,
+        "reverse_engineered_markers": false,
+        "browser_runtime": false,
+        "rate_limit_documented": true,
+        "data_retention_documented": "partial",
+        "paid_required": true
+      },
+      "rate_limit_claim": {
+        "summary": "no free trial; requires minimum $5 credit purchase (stale third-party 'free credit' claims are wrong)",
+        "source": "owner_provided_unverified",
+        "confidence": "unverified"
+      },
+      "secret_ref": "secret://provider/together",
+      "status": "watch",
+      "data_policy_note": "DO NOT list as free by default \u2014 official docs require credit purchase"
+    },
+    {
+      "endpoint_id": "endpoint.ollama_cloud@candidate",
+      "provider_name": "Ollama Cloud",
+      "class_code": 100,
+      "api_style": "openai_compatible",
+      "base_url_known": true,
+      "signals": {
+        "has_official_docs": true,
+        "shared_key_markers": false,
+        "reverse_engineered_markers": false,
+        "browser_runtime": false,
+        "rate_limit_documented": true,
+        "data_retention_documented": "partial"
+      },
+      "rate_limit_claim": {
+        "summary": "free-tier hosted models, rate-limited for experimentation/prototyping",
+        "source": "owner_provided_unverified",
+        "confidence": "unverified"
+      },
+      "secret_ref": "secret://provider/ollama_cloud",
+      "status": "candidate"
+    },
+    {
+      "endpoint_id": "endpoint.ollama_local@candidate",
+      "provider_name": "Ollama (local self-hosted)",
+      "class_code": 500,
+      "api_style": "openai_compatible",
+      "base_url_known": true,
+      "declared_role": "self_hosted_gateway",
+      "signals": {
+        "has_official_docs": true,
+        "shared_key_markers": false,
+        "reverse_engineered_markers": false,
+        "browser_runtime": false,
+        "rate_limit_documented": false
+      },
+      "rate_limit_claim": {
+        "summary": "self-hosted local runtime (OpenAI-compatible); lab/dev candidate, no hosted key",
+        "source": "owner_provided_unverified",
+        "confidence": "unverified"
+      },
+      "secret_ref": null,
+      "status": "candidate"
+    }
+  ]
+}

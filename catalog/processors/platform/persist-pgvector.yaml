@@ -1,0 +1,49 @@
+id: processor/persist-pgvector
+type: processor
+version: 0.1.0
+name: Upsert to pgvector index
+description: Embed result records and upsert them into the platform pgvector index so they become semantically
+  searchable. Platform-actions (on-platform) bucket.
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+capability:
+- embedding
+- serving
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- action-bucket
+- platform
+- on-platform
+created: '2026-05-29'
+updated: '2026-05-29'
+attribution:
+  source_kind: manual
+  author: Open Harness Hub action-bucket taxonomy
+  license: MIT
+process_kind: index.update_vector
+deterministic: false
+idempotent: true
+streaming: false
+inputs:
+- name: records
+  type: object
+- name: embedder
+  type: object
+outputs:
+- name: upserted
+  type: object
+side_effects: write
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.platform.persist_pgvector.run
+  language: python
+links:
+  source: docs/concepts/component-taxonomy-and-stages.md

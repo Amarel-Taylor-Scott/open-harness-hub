@@ -1,0 +1,16 @@
+{
+  "$comment": "Project hooks. The Stop hook drives the north-star self-prompting loop IN-SESSION, but is OFF and harmless by default: scripts/hooks/north_star_stop_hook.py exits 0 (allows the agent to stop normally) unless .agent/LOOP_ACTIVE exists. Owner opt-in: `touch .agent/LOOP_ACTIVE` to run the loop forever in this session; `touch .agent/STOP_REQUESTED` to stop; `rm .agent/loop/hook_iterations` to reset the per-run cap (NORTH_STAR_LOOP_MAX_ITERS, default 200). Fail-open: any hook error allows the stop. See docs/runtime/north-star-loop-runtime.md. Disable entirely by removing the Stop entry below.",
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/hooks/north_star_stop_hook.py\""
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+id: "knowledge-pack/public-source-job-replay-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Public source job replay patterns"
+description: "Patterns for replaying queued public-source scan jobs into run records, checkpoints, output pointers, and partition manifests without storing source bodies."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["automotive", "energy", "manufacturing", "construction", "government", "cross_industry"]
+capability: ["routing", "governance", "evaluation", "retrieval"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.factory"
+tags: ["public-sources", "job-replay", "checkpoints", "partition-manifests", "object-factory"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+domain: "object-factory public-source replay"
+facts:
+  - "Queued jobs should be replayable by job id and payload hash."
+  - "Dry-run replay emits output pointers and partition manifests without fetching source bodies."
+  - "Partition manifests make later Postgres/pgvector loads additive and auditable."
+sources:
+  - title: "Public source job replay patterns"
+    path: "catalog/knowledge-packs/data/public-source-job-replay-patterns/rows.jsonl"
+content_types:
+  - "worker_replay_pattern"
+  - "job_run_record"
+  - "checkpoint"
+  - "partition_manifest"

@@ -1,0 +1,191 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/local-smoke-command-policies",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Local smoke command policies",
+  "description": "Command classification policies for local Docker pgvector smoke plans, including approval requirements for Docker, psql, and audit commands.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC-BY-4.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/local-smoke-command-policies",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-26",
+  "keywords": [
+    "components",
+    "postgres",
+    "pgvector",
+    "smoke-test",
+    "approval-gate",
+    "command-ledger"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-26",
+  "citation": "scripts/db/component_local_postgres_smoke_plan.py; docs/architecture/model-runtime-training-and-federated-sharing-components.md",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "local-smoke-command-policies__policies",
+      "name": "policies.jsonl",
+      "description": "Data file backing knowledge pack local-smoke-command-policies.",
+      "contentUrl": "data/local-smoke-command-policies/policies.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "1668 B",
+      "sha256": "8e0f73545a0c34a15e5db7c48ddc7c9a7efba6150a2ec9758cb01bb3f0f76bad"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "local-smoke-command-policies__records",
+      "name": "local-smoke-command-policies__records",
+      "description": "Records parsed from policies.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "local-smoke-command-policies__records/policy_id",
+          "name": "policy_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "local-smoke-command-policies__policies"
+            },
+            "extract": {
+              "column": "policy_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "local-smoke-command-policies__records/command_prefixes",
+          "name": "command_prefixes",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "local-smoke-command-policies__policies"
+            },
+            "extract": {
+              "column": "command_prefixes"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "local-smoke-command-policies__records/risk",
+          "name": "risk",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "local-smoke-command-policies__policies"
+            },
+            "extract": {
+              "column": "risk"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "local-smoke-command-policies__records/requires_approval",
+          "name": "requires_approval",
+          "dataType": "sc:Boolean",
+          "source": {
+            "fileObject": {
+              "@id": "local-smoke-command-policies__policies"
+            },
+            "extract": {
+              "column": "requires_approval"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "local-smoke-command-policies__records/allowed_by_default",
+          "name": "allowed_by_default",
+          "dataType": "sc:Boolean",
+          "source": {
+            "fileObject": {
+              "@id": "local-smoke-command-policies__policies"
+            },
+            "extract": {
+              "column": "allowed_by_default"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "local-smoke-command-policies__records/reason",
+          "name": "reason",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "local-smoke-command-policies__policies"
+            },
+            "extract": {
+              "column": "reason"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "local-smoke-command-policies__records/operator_check",
+          "name": "operator_check",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "local-smoke-command-policies__policies"
+            },
+            "extract": {
+              "column": "operator_check"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

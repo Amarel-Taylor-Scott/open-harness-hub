@@ -33,10 +33,10 @@ community summaries); answer queries via local / global / DRIFT search.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `extract_entities_and_edges` | harness | `harness/text-safety-review` | — |
+| 1 | `extract_entities_and_edges` | harness | `harness/text-safety-review` | - |
 | 2 | `build_communities` | processor | `processor/community-summary-mapreduce` | $.inputs.search_mode in ['global', 'drift'] |
 | 3 | `local_search` | harness | `harness/text-safety-review` | $.inputs.search_mode == 'local' |
 | 4 | `global_search` | harness | `harness/text-safety-review` | $.inputs.search_mode == 'global' |
 | 5 | `drift_search` | harness | `harness/text-safety-review` | $.inputs.search_mode == 'drift' |
-| 6 | `verify_citations` | processor | `processor/citation-coverage` | — |
+| 6 | `verify_citations` | processor | `processor/citation-coverage` | - |
 

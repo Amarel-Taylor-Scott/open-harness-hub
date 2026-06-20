@@ -1,0 +1,70 @@
+{
+  "valid": {
+    "schema_version": "VerifierProofResult.v1",
+    "result_id": "vpr-xsnip-duration-1e2f3a4b",
+    "tenant_id": "acme",
+    "source_scope": "global_public",
+    "subject_id": "xsnip-duration-1005-11-9c0d1e2f",
+    "subject_type": "extractor_snippet",
+    "sandbox_passed": true,
+    "proof_passed": true,
+    "gate_decision": "approved",
+    "proof_script_ids": ["scripts/check_contextops_contracts.py"],
+    "sandbox_report": {
+      "network_used": false,
+      "secrets_present": false,
+      "unit_test_passed": true
+    },
+    "human_signoff_id": "",
+    "evaluated_at": "2026-06-05T00:00:00Z"
+  },
+  "valid_rejected": {
+    "schema_version": "VerifierProofResult.v1",
+    "result_id": "vpr-xsnip-bad-2f3a4b5c",
+    "tenant_id": "acme",
+    "source_scope": "global_public",
+    "subject_id": "xsnip-bad-2",
+    "subject_type": "extractor_snippet",
+    "sandbox_passed": false,
+    "proof_passed": true,
+    "gate_decision": "rejected",
+    "proof_script_ids": ["scripts/check_contextops_contracts.py"],
+    "sandbox_report": {
+      "network_used": false,
+      "secrets_present": false,
+      "unit_test_passed": false
+    },
+    "evaluated_at": "2026-06-05T00:00:00Z"
+  },
+  "invalid_bad_gate_decision": {
+    "schema_version": "VerifierProofResult.v1",
+    "result_id": "vpr-bad-1",
+    "tenant_id": "acme",
+    "source_scope": "global_public",
+    "subject_id": "xsnip-duration-1005-11-9c0d1e2f",
+    "subject_type": "extractor_snippet",
+    "sandbox_passed": true,
+    "proof_passed": true,
+    "gate_decision": "maybe",
+    "proof_script_ids": ["scripts/check_contextops_contracts.py"],
+    "evaluated_at": "2026-06-05T00:00:00Z"
+  },
+  "invalid_sandbox_has_secrets": {
+    "schema_version": "VerifierProofResult.v1",
+    "result_id": "vpr-bad-2",
+    "tenant_id": "acme",
+    "source_scope": "global_public",
+    "subject_id": "xsnip-duration-1005-11-9c0d1e2f",
+    "subject_type": "extractor_snippet",
+    "sandbox_passed": true,
+    "proof_passed": true,
+    "gate_decision": "approved",
+    "proof_script_ids": ["scripts/check_contextops_contracts.py"],
+    "sandbox_report": {
+      "network_used": false,
+      "secrets_present": true,
+      "unit_test_passed": true
+    },
+    "evaluated_at": "2026-06-05T00:00:00Z"
+  }
+}

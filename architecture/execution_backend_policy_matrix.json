@@ -1,0 +1,102 @@
+{
+  "version": "1.0",
+  "note": "Execution-backend flexibility (NOT 'X should be a cloud function'). A CapabilityTask is contract-stable; the execution backend is interchangeable behind ExecutionProviderPort and chosen by policy/telemetry/pricing. Kubernetes, cloud functions, local subprocesses, jobs, pools, and the local emulator can run SIDE BY SIDE and be switched as cost/latency/reliability/cold-start/customer-requirements change. 'eligible' = function-eligible / k8s-eligible by default; choices are reversible policy decisions, overridable WITH PROOF. The DB FleetLedger remains the source of truth; no backend owns truth.",
+  "cloud_agnostic_note": "AWS Lambda is NOT canonical — it is one peer in the serverless-function FAMILY. All serverless providers are interchangeable behind ExecutionProviderPort and selected by policy/pricebook/health; the local_function_emulator is the required offline equivalent for every one of them. To add a new serverless provider, edit `generic_cloud_functions` + `candidate_local_equivalents` here (config), not the selector code.",
+  "backends_enum": [
+    "local_subprocess@v1", "local_function_emulator@v1", "k8s_deployment_worker@candidate", "k8s_job@candidate",
+    "aws_lambda@candidate", "gcp_cloud_run_function@candidate", "gcp_cloud_function@candidate",
+    "azure_function@candidate", "cloudflare_workers@candidate", "openfaas_knative@candidate",
+    "cloud_run_job@candidate", "browser_pool@candidate", "gpu_pool@candidate", "sandbox_worker@candidate"
+  ],
+  "generic_cloud_functions": ["aws_lambda@candidate", "gcp_cloud_run_function@candidate", "gcp_cloud_function@candidate", "azure_function@candidate", "cloudflare_workers@candidate", "openfaas_knative@candidate"],
+  "offline_default_backend": "local_function_emulator@v1",
+  "_defer_gate": "A real cloud/K8s/Docker backend may be CANDIDATE only if it declares a local_emulator_provider below that is built + proven. Cloud can wait; capability cannot. Enforced by check_real_execution_candidates_have_emulators + check_no_deferred_execution_surfaces.",
+  "candidate_local_equivalents": {
+    "aws_lambda@candidate": "execution.local_function_emulator@v1",
+    "gcp_cloud_run_function@candidate": "execution.local_function_emulator@v1",
+    "gcp_cloud_function@candidate": "execution.local_function_emulator@v1",
+    "azure_function@candidate": "execution.local_function_emulator@v1",
+    "cloudflare_workers@candidate": "execution.local_function_emulator@v1",
+    "openfaas_knative@candidate": "execution.local_function_emulator@v1",
+    "cloud_run_job@candidate": "execution.local_cloud_run_job_emulator@v1",
+    "k8s_job@candidate": "execution.local_job_emulator@v1",
+    "k8s_deployment_worker@candidate": "execution.local_worker_pool@v1",
+    "docker_container@candidate": "execution.container_image_emulator@v1",
+    "gpu_pool@candidate": "execution.local_worker_pool@v1",
+    "browser_pool@candidate": "execution.local_worker_pool@v1",
+    "sandbox_worker@candidate": "execution.local_worker_pool@v1"
+  },
+  "local_equivalents_built": [
+    "execution.local_function_emulator@v1", "execution.managed_venv@v1", "execution.local_job_emulator@v1",
+    "execution.local_worker_pool@v1", "execution.local_cloud_run_job_emulator@v1",
+    "execution.container_image_emulator@v1", "execution.provider_unavailable@v1"
+  ],
+  "buckets": {
+    "utility": {
+      "default": "local_function_emulator@v1",
+      "eligible": ["local_subprocess@v1", "local_function_emulator@v1", "aws_lambda@candidate", "gcp_cloud_run_function@candidate", "azure_function@candidate", "k8s_deployment_worker@candidate"],
+      "excluded_by_default": [],
+      "notes": "short deterministic tasks; cloud functions MAY be cost-effective; k8s still allowed by volume/packaging"
+    },
+    "memory_context": {
+      "default": "local_function_emulator@v1",
+      "eligible": ["local_subprocess@v1", "local_function_emulator@v1", "aws_lambda@candidate", "gcp_cloud_run_function@candidate", "azure_function@candidate", "k8s_deployment_worker@candidate"],
+      "excluded_by_default": [],
+      "notes": "small memory writes/recalls MAY fit functions; tenant/project scoping required"
+    },
+    "ingestion_sync": {
+      "default": "local_subprocess@v1",
+      "eligible": ["local_subprocess@v1", "local_function_emulator@v1", "k8s_deployment_worker@candidate", "k8s_job@candidate", "gcp_cloud_run_function@candidate", "aws_lambda@candidate"],
+      "excluded_by_default": [],
+      "notes": "webhooks/small sources MAY fit functions; large backfills use jobs/pools"
+    },
+    "verification_fact_check": {
+      "default": "local_function_emulator@v1",
+      "eligible": ["local_subprocess@v1", "local_function_emulator@v1", "k8s_deployment_worker@candidate", "gcp_cloud_run_function@candidate"],
+      "excluded_by_default": [],
+      "notes": "deterministic verifiers MAY fit functions; reconciliation authority stays separate"
+    },
+    "browser": {
+      "default": "browser_pool@candidate",
+      "eligible": ["local_subprocess@v1", "k8s_deployment_worker@candidate", "k8s_job@candidate", "browser_pool@candidate"],
+      "excluded_by_default": ["aws_lambda@candidate", "gcp_cloud_run_function@candidate", "azure_function@candidate"],
+      "notes": "browser cold-start + deps are heavy; generic functions allowed ONLY with explicit proof"
+    },
+    "model_inference": {
+      "default": "gpu_pool@candidate",
+      "eligible": ["k8s_deployment_worker@candidate", "k8s_job@candidate", "gpu_pool@candidate", "cloud_run_job@candidate"],
+      "excluded_by_default": ["aws_lambda@candidate", "gcp_cloud_run_function@candidate", "azure_function@candidate"],
+      "notes": "model load + GPU favor pools/jobs; generic functions excluded by default"
+    },
+    "cpu_gpu_compute": {
+      "default": "gpu_pool@candidate",
+      "eligible": ["k8s_deployment_worker@candidate", "k8s_job@candidate", "gpu_pool@candidate", "cloud_run_job@candidate"],
+      "excluded_by_default": ["aws_lambda@candidate", "gcp_cloud_run_function@candidate", "azure_function@candidate"],
+      "notes": "heavy compute favors pools/jobs"
+    },
+    "open_ended_agent": {
+      "default": "sandbox_worker@candidate",
+      "eligible": ["local_subprocess@v1", "k8s_job@candidate", "sandbox_worker@candidate"],
+      "excluded_by_default": ["aws_lambda@candidate", "gcp_cloud_run_function@candidate", "azure_function@candidate"],
+      "notes": "long-running, sandboxed, tool-heavy; generic function only if very small/bounded + proven"
+    },
+    "parser_document": {
+      "default": "local_subprocess@v1",
+      "eligible": ["local_subprocess@v1", "k8s_deployment_worker@candidate", "k8s_job@candidate", "cloud_run_job@candidate"],
+      "excluded_by_default": [],
+      "notes": "OCR/parse can be heavy; jobs/pools for large docs"
+    },
+    "reconciliation_policy": {
+      "default": "local_subprocess@v1",
+      "eligible": ["local_subprocess@v1", "local_function_emulator@v1", "k8s_deployment_worker@candidate"],
+      "excluded_by_default": [],
+      "notes": "policy decisions + receipts; no LLM truth"
+    },
+    "control_plane": {
+      "default": "local_subprocess@v1",
+      "eligible": ["local_subprocess@v1", "k8s_deployment_worker@candidate"],
+      "excluded_by_default": ["aws_lambda@candidate", "gcp_cloud_run_function@candidate", "azure_function@candidate"],
+      "notes": "always-on lightweight supervisor; not a function"
+    }
+  }
+}

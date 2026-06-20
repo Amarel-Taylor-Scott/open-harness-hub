@@ -35,8 +35,8 @@ Train EfficientNet (B0/B3) on medical imaging task; 5-fold CV + TTA at inference
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `augment_and_train` | processor | `processor/iterative-revise-loop` | — |
-| 3 | `fold_ensemble` | processor | `processor/multi-vector-fusion` | — |
-| 4 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `augment_and_train` | processor | `processor/iterative-revise-loop` | - |
+| 3 | `fold_ensemble` | processor | `processor/multi-vector-fusion` | - |
+| 4 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

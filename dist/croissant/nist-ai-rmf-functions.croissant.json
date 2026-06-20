@@ -1,0 +1,348 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/nist-ai-rmf-functions",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "NIST AI Risk Management Framework (AI RMF 1.0) — Functions, Categories, and Subcategories",
+  "description": "Structured reference corpus for the NIST AI Risk Management Framework (AI RMF 1.0,\nJanuary 2023). Covers all four core functions — GOVERN, MAP, MEASURE, MANAGE —\nwith their categories and subcategories, implementation tips, and trustworthiness\ncharacteristics. Includes supplemental entries for Profiles, the Playbook, and\nthe Generative AI supplement (NIST AI 600-1). Suitable for AI governance harnesses,\ncompliance gap analysis, control mapping, and retrieval-augmented AI risk review.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC-BY-4.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/nist-ai-rmf-functions",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-26",
+  "keywords": [
+    "nist",
+    "ai-rmf",
+    "ai-governance",
+    "risk-management",
+    "govern",
+    "map",
+    "measure",
+    "manage",
+    "trustworthy-ai"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-26",
+  "citation": "NIST AI Risk Management Framework 1.0 (https://doi.org/10.6028/NIST.AI.100-1); NIST AI RMF Playbook (https://airc.nist.gov/Docs/1); NIST AI 600-1 Generative AI Supplement (https://doi.org/10.6028/NIST.AI.600-1)",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "nist-ai-rmf-functions__nist-ai-rmf-functions",
+      "name": "nist-ai-rmf-functions.jsonl",
+      "description": "Data file backing knowledge pack nist-ai-rmf-functions.",
+      "contentUrl": "knowledge-packs/data/nist-ai-rmf-functions.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "47419 B",
+      "sha256": "6d70290d1c15b5da06004d51fb48e22f74beca4e81a6182be49938d58ea13fea"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "nist-ai-rmf-functions__records",
+      "name": "nist-ai-rmf-functions__records",
+      "description": "Records parsed from nist-ai-rmf-functions.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "nist-ai-rmf-functions__records/id",
+          "name": "id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "nist-ai-rmf-functions__nist-ai-rmf-functions"
+            },
+            "extract": {
+              "column": "id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "nist-ai-rmf-functions__records/function",
+          "name": "function",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "nist-ai-rmf-functions__nist-ai-rmf-functions"
+            },
+            "extract": {
+              "column": "function"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "nist-ai-rmf-functions__records/category_id",
+          "name": "category_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "nist-ai-rmf-functions__nist-ai-rmf-functions"
+            },
+            "extract": {
+              "column": "category_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "nist-ai-rmf-functions__records/category",
+          "name": "category",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "nist-ai-rmf-functions__nist-ai-rmf-functions"
+            },
+            "extract": {
+              "column": "category"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "nist-ai-rmf-functions__records/subcategories",
+          "name": "subcategories",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "nist-ai-rmf-functions__nist-ai-rmf-functions"
+            },
+            "extract": {
+              "column": "subcategories"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "nist-ai-rmf-functions__records/source",
+          "name": "source",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "nist-ai-rmf-functions__nist-ai-rmf-functions"
+            },
+            "extract": {
+              "column": "source"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "nist-ai-rmf-functions__records/source_url",
+          "name": "source_url",
+          "dataType": "sc:URL",
+          "source": {
+            "fileObject": {
+              "@id": "nist-ai-rmf-functions__nist-ai-rmf-functions"
+            },
+            "extract": {
+              "column": "source_url"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "nist-ai-rmf-functions__records/license",
+          "name": "license",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "nist-ai-rmf-functions__nist-ai-rmf-functions"
+            },
+            "extract": {
+              "column": "license"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "nist-ai-rmf-functions__records/tags",
+          "name": "tags",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "nist-ai-rmf-functions__nist-ai-rmf-functions"
+            },
+            "extract": {
+              "column": "tags"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "nist-ai-rmf-functions__records/subcategory_id",
+          "name": "subcategory_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "nist-ai-rmf-functions__nist-ai-rmf-functions"
+            },
+            "extract": {
+              "column": "subcategory_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "nist-ai-rmf-functions__records/subcategory",
+          "name": "subcategory",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "nist-ai-rmf-functions__nist-ai-rmf-functions"
+            },
+            "extract": {
+              "column": "subcategory"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "nist-ai-rmf-functions__records/implementation_tips",
+          "name": "implementation_tips",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "nist-ai-rmf-functions__nist-ai-rmf-functions"
+            },
+            "extract": {
+              "column": "implementation_tips"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "nist-ai-rmf-functions__records/kind",
+          "name": "kind",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "nist-ai-rmf-functions__nist-ai-rmf-functions"
+            },
+            "extract": {
+              "column": "kind"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "nist-ai-rmf-functions__records/title",
+          "name": "title",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "nist-ai-rmf-functions__nist-ai-rmf-functions"
+            },
+            "extract": {
+              "column": "title"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "nist-ai-rmf-functions__records/characteristics",
+          "name": "characteristics",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "nist-ai-rmf-functions__nist-ai-rmf-functions"
+            },
+            "extract": {
+              "column": "characteristics"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "nist-ai-rmf-functions__records/description",
+          "name": "description",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "nist-ai-rmf-functions__nist-ai-rmf-functions"
+            },
+            "extract": {
+              "column": "description"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "nist-ai-rmf-functions__records/functions",
+          "name": "functions",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "nist-ai-rmf-functions__nist-ai-rmf-functions"
+            },
+            "extract": {
+              "column": "functions"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "nist-ai-rmf-functions__records/function_descriptions",
+          "name": "function_descriptions",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "nist-ai-rmf-functions__nist-ai-rmf-functions"
+            },
+            "extract": {
+              "column": "function_descriptions"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

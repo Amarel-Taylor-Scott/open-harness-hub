@@ -1,0 +1,160 @@
+id: "pipeline/id-document-mrz-checkdigit-tamper-verify"
+type: pipeline
+version: "0.1.0"
+name: "ID-document MRZ check-digit verification + tamper-indicator screen"
+description: |
+  Negative-space task: validating a passport/ID Machine-Readable Zone (MRZ)
+  has two parts a bare VLM structurally fails. (1) The ICAO 9303 check digits
+  are a deterministic mod-10 weighted (7-3-1) checksum over each field plus a
+  composite digit — a model "reads" the MRZ but cannot reliably RECOMPUTE the
+  checksums, and will happily declare a forged MRZ valid. (2) Tamper screening
+  needs character-level OCR confidence, font/spacing consistency, and image
+  metadata signals the VLM's lossy vision tokens cannot see. This pipeline
+  runs a deterministic OCR pre-pass for the exact MRZ glyphs, recomputes every
+  ICAO 9303 check digit OUTSIDE the model, screens for tamper indicators, and
+  refuses to pass a document whose MRZ does not self-verify — instead of
+  emitting a fluent but ungrounded "looks authentic".
+
+  This is an identity-assurance support tool over a SUBMITTED document image;
+  it does NOT do biometric 1:1 face matching or liveness. Capability lift is
+  structural: MRZ check digits are a formal checksum (one correct answer) and
+  a deterministic recomputation beats a stochastic reader by construction; the
+  lift survives model upgrades and costs no model tokens.
+
+  Bundle: High-precision regulated extraction (taxonomy Bundle B) with a
+  deterministic OCR pre-pass, exact-id/checksum verification, and a tamper
+  Conditional that halts and routes to human review on any failed indicator.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["security.fraud", "privacy.dsar", "government.benefits"]
+capability: ["verification", "extraction", "evaluation", "classification"]
+modality: ["image", "text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "stable"
+tags: ["document-media-intelligence", "mrz", "icao-9303", "check-digit", "tamper", "identity-document", "deterministic-gate", "structural-lift", "bundle-b"]
+created: "2026-05-29"
+updated: "2026-05-29"
+task: |
+  Given a photo/scan of a passport or ID card's data page, OCR the
+  Machine-Readable Zone, parse the document type/issuing-state/document
+  number/birth-date/expiry/optional fields, recompute every ICAO 9303
+  check digit (per-field + composite) deterministically, screen the image for
+  tamper indicators (low OCR confidence, font/spacing anomalies, expiry in the
+  past), and emit a verdict (mrz_valid | check_digit_failed | tampered |
+  expired) with the exact failing field(s) and check digit(s) cited. No
+  biometric face match or liveness is performed.
+pipeline_kind: "verify_data"
+inputs:
+  - name: "document_image"
+    type: "bytes"
+  - name: "issuing_state_hint"
+    type: "string"
+outputs:
+  - name: "verdict"
+    type: "string"
+  - name: "parsed_mrz"
+    type: "object"
+  - name: "check_digit_results"
+    type: "object[]"
+  - name: "tamper_indicators"
+    type: "object[]"
+  - name: "review_ticket"
+    type: "object"
+defaults:
+  persona: "persona/dsar-identity-reviewer"
+  model_adapter: "adapter/gemma-4-26b-vision"
+  knowledge_packs: ["knowledge-pack/dsar-identity-verification-frameworks"]
+  rule_packs: ["rule-pack/grep-dsar-identity-verification-flags", "rule-pack/rag-dsar-identity-verification-retrieval-policy"]
+steps:
+  # --- INPUT GATING: deterministic OCR pre-pass for MRZ glyphs + confidence ---
+  - id: "ocr_mrz"
+    kind: "processor"
+    ref: "processor/on-device-ocr-prepass"
+    inputs: { image_bytes: "$.inputs.document_image", language_hint: "mrz", engine: "tesseract" }
+  # --- ACTION (model call): parse MRZ fields ONLY — no checksum asked of the model ---
+  - id: "inject_schema"
+    kind: "processor"
+    ref: "processor/inject-output-schema"
+    inputs:
+      schema:
+        mrz: "{document_type, issuing_state, surname, given_names, document_number, document_number_check, nationality, birth_date, birth_date_check, sex, expiry_date, expiry_date_check, optional_data, optional_check, composite_check}"
+  - id: "parse_mrz_fields"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "system", "content": "{{persona.dsar-identity-reviewer}}"},
+         {"role": "user", "content": "From the OCR'd MRZ text, parse the ICAO 9303 fields into the schema, INCLUDING each printed check-digit character. Copy verbatim; do NOT compute, correct, or validate any check digit — parsing only. Return null for any unreadable field."}]
+      context:
+        mrz_ocr: "$.steps.ocr_mrz.output.prompt_block"
+  - id: "coerce_json"
+    kind: "processor"
+    ref: "processor/json-schema-repair"
+    inputs: { text: "$.steps.parse_mrz_fields.output.text" }
+  # --- normalize dates (the model often mangles YYMMDD ordering) ---
+  - id: "normalize_dates"
+    kind: "processor"
+    ref: "processor/date-parse-multiformat"
+    inputs: { text: "$.steps.parse_mrz_fields.output.text" }
+  # --- KNOWLEDGE: identity-verification framework context for the flags that fired ---
+  - id: "grep_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-dsar-identity-verification-flags"
+    inputs: { text: "$.steps.ocr_mrz.output.ocr_text" }
+  - id: "retrieve_context"
+    kind: "rule_pack"
+    ref: "rule-pack/rag-dsar-identity-verification-retrieval-policy"
+    inputs: { query: "$.steps.grep_flags.output.fired", corpus: "knowledge-pack/dsar-identity-verification-frameworks", top_k: 8 }
+  # --- DETERMINISTIC: recompute every ICAO 9303 check digit + tamper indicators ---
+  - id: "build_checkdigit_matrix"
+    kind: "processor"
+    ref: "processor/control-matrix-builder"
+    inputs: { trace: "$.steps.coerce_json.output.json", config: { checks: ["document_number_check = mod10_731(document_number)", "birth_date_check = mod10_731(birth_date)", "expiry_date_check = mod10_731(expiry_date)", "composite_check = mod10_731(composite_fields)", "expiry_date >= today", "ocr_confidence >= 0.85"] } }
+  - id: "verify_check_digits"
+    kind: "processor"
+    ref: "processor/verify-deterministic-criterion"
+    inputs:
+      target_value: "$.steps.build_checkdigit_matrix.output.result.all_check_digits_valid"
+      op: "is_truthy"
+      value: null
+  - id: "verify_not_tampered"
+    kind: "processor"
+    ref: "processor/verify-deterministic-criterion"
+    inputs:
+      target_value: "$.steps.build_checkdigit_matrix.output.result.tamper_indicator_count"
+      op: "=="
+      value: 0
+  # --- CONDITIONAL: on any failure, halt + route to human review ---
+  - id: "escalate_on_failure"
+    kind: "processor"
+    ref: "processor/escalate-human-review"
+    when: "$.steps.verify_check_digits.output.pass == false || $.steps.verify_not_tampered.output.pass == false"
+    inputs: { trace: "$.steps.build_checkdigit_matrix.output.result", reason: "MRZ check digit failed or tamper indicator present" }
+  - id: "summary"
+    kind: "processor"
+    ref: "processor/review-summary-composer"
+    inputs: { trace: "$.steps.build_checkdigit_matrix.output.result", config: {} }
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "id-document-mrz-checkdigit-tamper-verify"
+      applied_layers: ["ocr_prepass", "parse", "json_repair", "normalize_dates", "grep", "rag", "checkdigit_deterministic", "tamper_screen", "escalate", "summary"]
+success_criteria:
+  - kind: "deterministic"
+    label: "every ICAO 9303 check digit recomputes and matches (MRZ self-verifies)"
+    target: "$.steps.verify_check_digits.output.pass"
+    op: "=="
+    value: true
+    severity: "critical"
+  - kind: "deterministic"
+    label: "zero tamper indicators (OCR confidence + expiry + font/spacing)"
+    target: "$.steps.verify_not_tampered.output.pass"
+    op: "=="
+    value: true
+    severity: "critical"
+  - rubric: "rubric/dsar-identity-verification-quality-v1"
+    threshold: 0.70

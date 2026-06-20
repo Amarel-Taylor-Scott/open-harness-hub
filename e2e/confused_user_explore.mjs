@@ -1,0 +1,251 @@
+// e2e/confused_user_explore.mjs — drive the LIVE product SPA as a CONFUSED USER and review for issues.
+//
+// Personas a real user actually is: impatient, curious, lost. This bot clicks everything it can see,
+// tries weird routes a confused user would type/land on (#/does-not-exist, #/c/, #garbage), types
+// nonsense into inputs and hits Enter, double-clicks, and mashes back/forward — while recording a
+// video and capturing, for every action: did the URL change? did the visible content change? did a
+// toast fire? any console/page error or failed request? It then CLASSIFIES each interaction and writes
+// a ranked issue review. The point is to find — empirically, by clicking — the things a code read
+// misses: buttons that look live but do nothing, toasts that claim success with no state change, routes
+// that land on a blank screen, and interactions that throw.
+//
+// Run:  BASE=http://127.0.0.1:8000 node e2e/confused_user_explore.mjs
+//       (defaults to the harness-hub kit SPA on :8000; set BASE to any running surface)
+//
+// Out:  artifacts/e2e/videos/confused-user-explore.{webm,mp4}
+//       artifacts/e2e/reports/confused-user-explore.json   + a ranked console summary
+import { chromium } from 'playwright';
+import { writeFileSync, mkdirSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { finalizeNativeVideo, DIRS, HAS_NATIVE_VIDEO, attachCollectors, hasHorizontalOverflow } from './gate_common.mjs';
+
+const HERE = dirname(fileURLToPath(import.meta.url));
+const BASE = (process.env.BASE || 'http://127.0.0.1:8000').replace(/\/$/, '');
+const TOKEN = process.env.OH_SHOWCASE_TOKEN || process.env.TOKEN || '';
+const SIZE = { width: 1440, height: 900 };
+const MAX_ACTIONS = Number(process.env.MAX_ACTIONS || 70);
+const ORIGIN = new URL(BASE).origin;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// Weird routes a confused/curious user might type, fat-finger, or reach from a stale bookmark.
+const WEIRD_ROUTES = ['#/does-not-exist', '#/c/no-such-component', '#garbage', '#/c/', '#//',
+  '#/admin/secret', '#/build/', '#%20%20', '#/ops/zzz', '#/?q=<script>'];
+// Action words that make a "dead click" genuinely suspicious (vs clicking a heading).
+const ACTION_RE = /\b(add|new|run|ingest|gate|save|export|build|create|buy|upgrade|subscribe|start|connect|watch|vote|publish|deploy|install|generate|request|submit|continue|get started|try)\b/i;
+
+function url(hash = '') {
+  const t = TOKEN ? `?token=${encodeURIComponent(TOKEN)}` : '';
+  return `${BASE}/${t}${hash}`;
+}
+
+async function snapshot(page) {
+  return page.evaluate(() => {
+    const root = document.querySelector('#root') || document.body;
+    const txt = (root.innerText || '').replace(/\s+/g, ' ').trim();
+    return {
+      hash: location.hash, path: location.pathname, host: location.host,
+      len: txt.length, head: txt.slice(0, 160), tail: txt.slice(-80),
+      toasts: [...document.querySelectorAll('.pt-toast, .oh-toast, [class*="toast"]')].map((t) => t.innerText.trim()).filter(Boolean),
+      h: (document.querySelector('h1, h2') || {}).innerText || '',
+    };
+  });
+}
+
+// A stable-ish key + label for a clickable, so we don't re-click the same affordance forever.
+async function clickables(page) {
+  return page.evaluate(() => {
+    const sel = 'a, button, [role="button"], .oh-btn, [onclick], [style*="cursor: pointer"], .pt-card, .card, .pt-gh-row, .ohs-top-nav a, .ohs-side-nav a';
+    const seen = new Set();
+    const out = [];
+    for (const el of document.querySelectorAll(sel)) {
+      const r = el.getBoundingClientRect();
+      if (r.width < 6 || r.height < 6) continue;                 // invisible / zero-size
+      const style = getComputedStyle(el);
+      if (style.visibility === 'hidden' || style.display === 'none' || style.pointerEvents === 'none') continue;
+      // Skip controls that are INTENTIONALLY disabled (owner-gated seams, e.g. OAuth) — clicking a
+      // disabled button "failing" is not a bug, and a confused user can't click it either.
+      if (el.disabled || el.getAttribute('aria-disabled') === 'true' || style.cursor === 'not-allowed') continue;
+      const text = (el.innerText || el.getAttribute('aria-label') || el.title || '').replace(/\s+/g, ' ').trim().slice(0, 60);
+      const href = el.getAttribute('href') || '';
+      const tag = el.tagName.toLowerCase();
+      const key = `${tag}|${text}|${href}|${el.className}`.slice(0, 160);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      el.setAttribute('data-cux', out.length);                  // address it back deterministically
+      out.push({ idx: out.length, tag, text, href, cls: String(el.className).slice(0, 80),
+        external: /^https?:\/\//.test(href) && !href.includes(location.host), blank: el.getAttribute('target') === '_blank' });
+    }
+    return out;
+  });
+}
+
+function changed(a, b) {
+  return a.hash !== b.hash || a.h !== b.h || Math.abs(a.len - b.len) > 24 || a.head !== b.head;
+}
+function blankish(s) { return s.len < 40 && !s.toasts.length; }
+
+const issues = [];
+function flag(kind, severity, detail) { issues.push({ kind, severity, ...detail }); }
+
+(async () => {
+  mkdirSync(DIRS.videos, { recursive: true });
+  mkdirSync(DIRS.reports, { recursive: true });
+  console.log(`confused-user explore · ${BASE} · native video ${HAS_NATIVE_VIDEO ? 'ON' : 'OFF'} · up to ${MAX_ACTIONS} actions`);
+
+  const browser = await chromium.launch({ channel: 'chrome', args: ['--no-sandbox', '--disable-dev-shm-usage'] });
+  const context = await browser.newContext({
+    viewport: SIZE, ...(HAS_NATIVE_VIDEO ? { recordVideo: { dir: DIRS.videos, size: SIZE } } : {}),
+  });
+  const page = await context.newPage();
+  const log = attachCollectors(page);
+  const actions = [];
+  let consoleSeen = 0, reqFailSeen = 0, pageErrSeen = 0;
+
+  function deltaErrors() {
+    const c = log.console.filter((x) => x.type === 'error' && !/favicon/i.test(x.text));
+    const out = { console: c.slice(consoleSeen), reqFail: log.requestFailures.slice(reqFailSeen), pageErr: log.pageErrors.slice(pageErrSeen) };
+    consoleSeen = c.length; reqFailSeen = log.requestFailures.length; pageErrSeen = log.pageErrors.length;
+    return out;
+  }
+
+  try {
+    await page.goto(url(), { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('#root', { timeout: 10000 }).catch(() => {});
+    await sleep(1500);
+    deltaErrors(); // reset baseline (ignore load-time noise we didn't cause by clicking)
+    const visited = new Set();
+    const goHome = async () => {
+      await page.goto(url(), { waitUntil: 'domcontentloaded' }).catch(() => {});
+      await page.waitForSelector('#root', { timeout: 6000 }).catch(() => {});
+      await sleep(700); deltaErrors();
+    };
+    // Click that survives a React re-render between enumeration and click. proto-main's toast timers
+    // re-render every ~2.6s and wipe the imperative data-cux attribute → a stale Playwright locator →
+    // a misleading "click_failed" on a control that a real mouse clicks fine (verified). Tier 1: the
+    // real Playwright click (tests true reachability). Tier 2 (on timeout): re-find the element
+    // in-page by its stable key and fire a SYNTHETIC click so the onClick handler still runs and we
+    // observe the EFFECT — a genuinely dead handler then shows up as a dead_click, and an element
+    // that's truly gone from the DOM is the only real click failure.
+    const itemKey = (c) => `${c.tag}|${c.text}|${c.href}`;
+    const robustClick = async (item) => {
+      try { await page.locator(`[data-cux="${item.idx}"]`).click({ timeout: 1800 }); return null; } catch { /* re-render race → synthetic */ }
+      const fired = await page.evaluate((key) => {
+        const sel = 'a, button, [role="button"], .oh-btn, [onclick], [style*="cursor: pointer"], .pt-card, .card, .pt-gh-row, .ohs-top-nav a, .ohs-side-nav a';
+        for (const el of document.querySelectorAll(sel)) {
+          const r = el.getBoundingClientRect();
+          if (r.width < 6 || r.height < 6) continue;
+          const text = (el.innerText || el.getAttribute('aria-label') || el.title || '').replace(/\s+/g, ' ').trim().slice(0, 60);
+          if (`${el.tagName.toLowerCase()}|${text}|${el.getAttribute('href') || ''}` === key) { el.click(); return true; }
+        }
+        return false;
+      }, itemKey(item)).catch(() => false);
+      return fired ? null : 'element gone from the DOM (no handle, no synthetic target)';
+    };
+
+    for (let step = 0; step < MAX_ACTIONS; step++) {
+      // Every 6th action, BE WEIRD: a garbage route, or type nonsense + Enter, or back/forward.
+      if (step > 0 && step % 6 === 0) {
+        const mode = (step / 6) % 3;
+        const pre = await snapshot(page);
+        if (mode === 0) {
+          const route = WEIRD_ROUTES[(step / 6) % WEIRD_ROUTES.length];
+          await page.goto(url(route), { waitUntil: 'domcontentloaded' }).catch(() => {});
+          await sleep(600);
+          const post = await snapshot(page); const errs = deltaErrors();
+          if (blankish(post)) flag('blank_route', 'high', { route, note: 'weird route landed on a near-empty screen' });
+          if (errs.pageErr.length || errs.console.length) flag('route_error', 'high', { route, errors: [...errs.pageErr, ...errs.console.map((e) => e.text)].slice(0, 3) });
+          actions.push({ step, kind: 'weird_route', route, blank: blankish(post), errors: errs.console.length + errs.pageErr.length });
+        } else if (mode === 1) {
+          const input = page.locator('input[type="text"], input:not([type]), input[type="search"], textarea').first();
+          if (await input.count()) {
+            await input.fill('🤖 zzz <script>alert(1)</script> ' + ' garbage'.repeat(2)).catch(() => {});
+            await input.press('Enter').catch(() => {});
+            await sleep(500);
+            const errs = deltaErrors();
+            if (errs.pageErr.length) flag('input_error', 'high', { note: 'garbage input threw', errors: errs.pageErr.slice(0, 2) });
+            actions.push({ step, kind: 'garbage_input', errors: errs.console.length + errs.pageErr.length });
+          }
+        } else {
+          await page.goBack({ waitUntil: 'domcontentloaded' }).catch(() => {});
+          await sleep(300); await page.goForward({ waitUntil: 'domcontentloaded' }).catch(() => {});
+          await sleep(300); deltaErrors();
+          actions.push({ step, kind: 'back_forward' });
+        }
+        // make sure we're still inside the app
+        if (new URL(page.url()).origin !== ORIGIN) { await page.goto(url(), { waitUntil: 'domcontentloaded' }).catch(() => {}); await sleep(500); }
+        continue;
+      }
+
+      // Otherwise: click the next unvisited clickable.
+      let list = await clickables(page);
+      let next = list.find((c) => !visited.has(`${c.tag}|${c.text}|${c.href}`) && !c.external && !c.blank);
+      if (!next) {
+        // Nothing new here — go home to surface other affordances before giving up.
+        await goHome();
+        list = await clickables(page);
+        next = list.find((c) => !visited.has(`${c.tag}|${c.text}|${c.href}`) && !c.external && !c.blank);
+        if (!next) { actions.push({ step, kind: 'exhausted' }); break; }
+      }
+      visited.add(`${next.tag}|${next.text}|${next.href}`);
+
+      const pre = await snapshot(page);
+      const clickErr = await robustClick(next);
+      await sleep(450);
+      let post = await snapshot(page);
+      // A SPA route can re-render through an empty frame — re-check before crying "blank".
+      if (blankish(post) && !blankish(pre)) { await sleep(900); post = await snapshot(page); }
+      const errs = deltaErrors();
+      const newToast = post.toasts.length > pre.toasts.length || post.toasts.some((t) => !pre.toasts.includes(t));
+      const navAway = post.host !== pre.host;
+      const didChange = changed(pre, post);
+      const overflow = await hasHorizontalOverflow(page);
+
+      let verdict = 'ok';
+      if (errs.pageErr.length) { verdict = 'page_error'; flag('interaction_error', 'high', { label: next.text || next.cls, errors: errs.pageErr.slice(0, 2) }); }
+      else if (errs.console.length) { verdict = 'console_error'; flag('console_error_on_click', 'medium', { label: next.text || next.cls, errors: errs.console.slice(0, 2).map((e) => e.text) }); }
+      else if (clickErr) { verdict = 'click_failed'; flag('click_failed', 'medium', { label: next.text || next.cls, error: clickErr }); }
+      else if (blankish(post) && !blankish(pre)) { verdict = 'went_blank'; flag('went_blank', 'high', { label: next.text || next.cls, note: 'click emptied the screen' }); }
+      else if (newToast && !didChange) { verdict = 'toast_only'; flag('toast_only_no_state_change', 'medium', { label: next.text || next.cls, toast: post.toasts.slice(-1)[0] }); }
+      else if (!didChange && !newToast && ACTION_RE.test(next.text)) { verdict = 'dead_click'; flag('dead_click', 'medium', { label: next.text, cls: next.cls, note: 'action-labelled control did nothing (no nav, no content change, no toast)' }); }
+      else if (!didChange && !newToast) { verdict = 'inert'; } // a heading/label; not necessarily a bug
+      if (overflow) flag('horizontal_overflow', 'low', { at: post.h || post.hash || next.text });
+
+      actions.push({ step, kind: 'click', label: next.text || next.cls, tag: next.tag, verdict, navAway, newToast, didChange });
+      // Recover so the exploration keeps going: return home if we wandered off-app, blanked the
+      // screen, or just to resurface other affordances every few steps.
+      if (navAway || new URL(page.url()).origin !== ORIGIN || blankish(post) || verdict === 'went_blank') {
+        await goHome();
+      } else if (step % 9 === 8) {
+        await goHome();
+      }
+    }
+  } finally {
+    const handle = page.video();
+    await page.close();
+    await context.close();
+    await browser.close();
+    var video = await finalizeNativeVideo(handle, 'confused-user-explore');
+  }
+
+  // ---- review ----
+  const sev = { high: 3, medium: 2, low: 1 };
+  issues.sort((a, b) => sev[b.severity] - sev[a.severity]);
+  const byKind = {};
+  for (const i of issues) byKind[i.kind] = (byKind[i.kind] || 0) + 1;
+  const report = { base: BASE, actions: actions.length, clicked: actions.filter((a) => a.kind === 'click').length,
+    issues, byKind, video, actionLog: actions };
+  writeFileSync(join(DIRS.reports, 'confused-user-explore.json'), JSON.stringify(report, null, 2));
+
+  console.log(`\n  explored ${report.actions} actions (${report.clicked} clicks) on ${BASE}`);
+  console.log(`  video: ${video ? (video.mp4 || video.webm) : 'none'}`);
+  console.log(`\n  ISSUES (${issues.length}):`);
+  if (!issues.length) console.log('    — none found');
+  for (const [kind, n] of Object.entries(byKind).sort((a, b) => b[1] - a[1])) {
+    const ex = issues.find((i) => i.kind === kind);
+    console.log(`    [${ex.severity.toUpperCase().padEnd(6)}] ${kind} ×${n} — e.g. ${JSON.stringify(ex.label || ex.route || ex.note || ex.toast || '').slice(0, 90)}`);
+  }
+  console.log(`\n  full report: artifacts/e2e/reports/confused-user-explore.json`);
+  const high = issues.filter((i) => i.severity === 'high').length;
+  process.exit(high > 0 ? 2 : 0); // exit 2 = high-severity issues found (informational, not a crash)
+})().catch((e) => { console.error(e); process.exit(1); });

@@ -1,0 +1,64 @@
+id: "tool/source-surface-seed-row-exporter"
+type: tool
+version: "0.1.0"
+name: "Source surface seed row exporter"
+description: "Converts esoteric source-surface seeds into canonical source_record, normalized_object, entity ref, label, dimension, object_embedding, dedupe, review, and index JSONL row families."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["automotive", "energy", "manufacturing", "construction", "government", "cross_industry"]
+capability: ["extraction", "classification", "retrieval", "governance", "evaluation"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+tags: ["source-surfaces", "candidate-primitives", "factory-rows", "jsonl", "embedding-buckets"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    source_surfaces:
+      type: array
+      items:
+        type: object
+    output_dir:
+      type: string
+    excluded_scopes:
+      type: array
+      items:
+        type: string
+  required: ["source_surfaces"]
+returns:
+  type: object
+  properties:
+    output_dir:
+      type: string
+    source_surface_count:
+      type: integer
+    candidate_seed_count:
+      type: integer
+    row_counts:
+      type: object
+    row_family_paths:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      source_surfaces:
+        - id: "plumbing-hvac-permit-system-surface"
+          candidate_primitives: ["permit_requirement_fact"]
+      excluded_scopes: ["insurance"]
+    output:
+      source_surface_count: 1
+      candidate_seed_count: 1
+      row_counts:
+        normalized_object: 1
+        object_embedding: 1
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.source_surface_seed_rows.export_source_surface_rows"
+    language: "python"
+  - kind: "mcp"
+    path: "mcp/factory.export_source_surface_seed_rows"

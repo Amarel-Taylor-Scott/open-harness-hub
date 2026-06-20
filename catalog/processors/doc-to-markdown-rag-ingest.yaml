@@ -1,0 +1,108 @@
+id: "processor/doc-to-markdown-rag-ingest"
+type: processor
+version: "0.1.0"
+name: "Doc-to-markdown RAG ingest (any document → markdown + auto-summary → scoped per-task RAG)"
+description: |
+  End-to-end document ingestion processor for the Trove local agentic
+  framework. Converts any supported document format (PDF, DOCX, HTML,
+  plain text, Markdown) to clean Markdown, generates a one-paragraph
+  auto-summary using a local LLM call, and writes both the Markdown body
+  and the summary into a per-task scoped RAG store (BM25 + optional dense
+  index). Each task in Trove gets its own isolated RAG scope so documents
+  loaded for one gem do not pollute the context of another.
+
+  Pipeline stages:
+    1. Format detection — sniff MIME type and route to the appropriate
+       converter (PyMuPDF for PDF, python-docx for DOCX, html2text for HTML,
+       passthrough for plain text/Markdown).
+    2. Markdown conversion — emit clean Markdown preserving heading hierarchy.
+    3. Auto-summary — one LLM call with a fixed "summarise this document in
+       one paragraph" prompt; result stored alongside the Markdown body.
+    4. Chunk + embed — sliding-window chunker (configurable) → BM25 index
+       update; optional dense embedding if a local embedding model is
+       configured.
+    5. Scope registration — write an index record associating the document
+       with the gem/task ID so retrieval queries are automatically scoped.
+
+  CAPABILITY LIFT (structural): bare model context windows cannot hold entire
+  documents (especially multi-page PDFs), so a model asked to answer questions
+  from a document must hallucinate or fail. This processor builds the
+  retrieval layer that makes on-device RAG from arbitrary documents possible
+  without a cloud service. The gap is structural (context-length physical
+  limit). lift_reason: no_addressable_source (no cloud service; all local);
+  mechanism: context_length (document exceeds context window).
+
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["ai", "cross_industry", "education", "legal"]
+capability: ["extraction", "research", "retrieval", "format_conversion"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+lifecycle_position: "pre_api"
+trust_boundary: "local"
+created: "2026-05-28"
+updated: "2026-05-28"
+
+attribution:
+  source_url: "https://github.com/google-gemini/gemma-cookbook"
+  source_kind: "github"
+  author: "Trove no-code local agentic gem framework (Gemma community); PyMuPDF (AGPL-3.0 / commercial dual license); python-docx (MIT)"
+  license: "MIT"
+
+tags:
+  - "on-device"
+  - "offline"
+  - "rag"
+  - "document-ingest"
+  - "markdown"
+  - "pdf"
+  - "docx"
+  - "auto-summary"
+  - "chunking"
+  - "bm25"
+  - "per-task-scope"
+  - "trove"
+  - "no-code"
+  - "structural-lift"
+
+process_kind: "extract.doc_to_rag"
+deterministic: false
+idempotent: true
+streaming: false
+latency_budget_ms: 60000
+
+inputs:
+  - name: "document_path"
+    type: "string"
+  - name: "task_id"
+    type: "string"
+  - name: "chunk_size_tokens"
+    type: "integer"
+  - name: "chunk_stride_tokens"
+    type: "integer"
+  - name: "model_adapter_ref"
+    type: "string"
+  - name: "dense_embed"
+    type: "boolean"
+  - name: "embedding_adapter_ref"
+    type: "string"
+outputs:
+  - name: "markdown_path"
+    type: "string"
+  - name: "summary"
+    type: "string"
+  - name: "chunk_count"
+    type: "integer"
+  - name: "scope_id"
+    type: "string"
+  - name: "index_record_id"
+    type: "string"
+
+side_effects: "write"
+on_error: "raise"
+
+implementations:
+  - kind: "callable"
+    path: "scripts.processors.doc_to_markdown_rag_ingest.run"
+    language: "python"

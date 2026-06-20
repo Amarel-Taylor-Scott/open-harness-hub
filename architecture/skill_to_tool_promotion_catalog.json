@@ -1,0 +1,184 @@
+{
+  "version": "1.0",
+  "note": "Skill -> deterministic-tool promotion catalog. The FORK direction on SkillClaw (AMAP-ML, MIT, WIP): instead of evolving a free-form SKILL.md and re-injecting it into the agent's probabilistic loop, we COMPILE a repeatedly-reused, held-out-validated skill into a DETERMINISTIC, schema-bounded, sandboxed, signed internal TOOL. This is the Determinism Factory (M0->M8 LLM->rule ladder) applied to skills, gated by the agent-gateway's deterministic-first token ladder, and governed by the Lossless Distillation law (the source skill + losing candidates + lineage are PRESERVED, never replaced). Discovery != trust; skill output != truth; tool output != truth; tools are NEVER auto-published.",
+  "governance_law": {
+    "skill_output_is_not_truth": true,
+    "tool_output_is_not_truth": true,
+    "tools_never_auto_published": true,
+    "distillation_is_lossless": true,
+    "statement": "Skill and tool outputs are CANDIDATES, never authoritative truth. A promoted tool is deterministic GIVEN the same input + declared state; it does not make the surrounding agent deterministic (the agent still plans probabilistically). No generated tool is auto-published: every promotion requires sandbox + secret-scan + static-analysis + dependency-lock + SBOM + human/policy approval, and ships signed + versioned with a rollback target. Distillation is never replacement: the source skill, its lineage, the held-out eval set, and the LOSING candidate tools are preserved. SkillClaw is a research_candidate (MIT, WIP) and is NEVER run unchanged as production infra; skills are mined ONLY from public / synthetic / redacted-internal-non-sensitive traces, never customer / secrets / regulated / confidential data (and never through a low-cost or foreign processing lane).",
+    "related_laws": [
+      "docs/codex/lossless-distillation.md",
+      "docs/codex/change-verification-contract.md",
+      "prompts/baltor-determinism-factory.md"
+    ]
+  },
+  "skillclaw_entry": {
+    "provider_id": "skillclaw@research_candidate",
+    "name": "SkillClaw",
+    "source": [
+      "https://github.com/AMAP-ML/SkillClaw",
+      "https://opensourceprojects.dev/post/skillclaw"
+    ],
+    "license": "MIT",
+    "status": "research_candidate",
+    "active": false,
+    "wip": true,
+    "no_truth_authority": true,
+    "vendor": "AMAP-ML (Alibaba)",
+    "summary": "Watches agent conversations via a local Client Proxy (OpenAI-compatible /v1/chat/completions + /v1/messages) that records session artifacts and manages a local skill library; an optional Evolve Server reads sessions from shared storage (Alibaba OSS / S3 / local FS), detects repeated gaps/failure patterns, generates or evolves reusable SKILL.md skills (workflow engine = Summarize -> Aggregate -> Execute; or an agent engine), validates them against a set, and publishes them back to shared storage for collective reuse. Integrates with Hermes / Codex / Claude Code / OpenClaw / QwenPaw and other OpenAI-compatible agents.",
+    "what_we_take": "The OBSERVE -> DETECT-GAP -> GENERATE-SKILL -> VALIDATE -> INTEGRATE loop as a CANDIDATE source of skill drafts only.",
+    "what_we_change_fork": "We do not stop at re-injecting an evolved SKILL.md into the probabilistic agent loop, and we do not auto-publish to shared storage. We add a skill->tool COMPILER: a validated, repeatedly-reused skill becomes a deterministic, schema-bounded, sandboxed, secret-scanned, SBOM'd, human-approved, signed, versioned internal tool with a rollback target. Self-improvement happens OUT OF BAND and is promoted only through the gate.",
+    "risk_notes": [
+      "WIP / experimental: API and skill format are unstable; pin a reviewed commit if ever vendored.",
+      "Default publish path writes evolved skills directly to shared storage ({group_id}/skills/<name>/SKILL.md) on threshold -> in our fork this is replaced by the promotion gate; nothing auto-publishes.",
+      "Cross-user collective evolution can carry one tenant's data into a shared skill -> our data_policy + lineage requirements forbid customer/secret/regulated/confidential traces and forbid tenant-private lineage becoming global.",
+      "Shared storage defaults include Alibaba OSS and processing may route through a low-cost / foreign lane -> never send sensitive traces; offline/local-only handling for any non-public trace.",
+      "Source conflict on maturity: opensourceprojects.dev presents it as WORK IN PROGRESS; the GitHub README reads more feature-complete. We treat it as WIP / research_candidate (the safer reading) until independently re-verified."
+    ],
+    "proof_to_promote": [
+      "independent_reverify_status_and_license",
+      "vendor_a_reviewed_pinned_commit",
+      "skill_drafts_quarantined_as_candidates_not_active",
+      "data_policy_enforced_public_synthetic_redacted_only",
+      "no_auto_publish_to_shared_storage",
+      "sandbox_run",
+      "secret_scan",
+      "static_analysis",
+      "dependency_lock",
+      "sbom",
+      "human_or_policy_approval",
+      "signed_and_versioned_with_rollback",
+      "redteam"
+    ]
+  },
+  "promotion_ladder": [
+    {
+      "rung": 0,
+      "id": "observation",
+      "name": "Observation",
+      "produces": "session_trace (public / synthetic / redacted-internal-non-sensitive only)",
+      "description": "The Client Proxy (or our agent-gateway trace store) records agent conversations/tool calls; a gap detector finds repeated failures or repeated manual workarounds. Pure observation; nothing is created or trusted yet.",
+      "is_truth": false,
+      "auto_advance": false
+    },
+    {
+      "rung": 1,
+      "id": "draft_skill",
+      "name": "Draft skill (SKILL.md)",
+      "produces": "SKILL.md (candidate)",
+      "description": "From the observed gap, generate a reusable SKILL.md (SkillClaw-style draft, or hand-authored). It is a CANDIDATE: it lives in a quarantine library and is never auto-published to shared/global storage.",
+      "is_truth": false,
+      "auto_advance": false
+    },
+    {
+      "rung": 2,
+      "id": "verified_skill",
+      "name": "Verified skill (held-out eval)",
+      "produces": "SkillValidationReport",
+      "description": "The skill must demonstrate capability LIFT on a HELD-OUT eval set (not the traces it was mined from) and must not regress. Tracks reuse count. Still probabilistic (it instructs an LLM); still not truth. A skill that makes things worse is rejected (the rejected candidate is preserved in lineage, not erased).",
+      "is_truth": false,
+      "auto_advance": false
+    },
+    {
+      "rung": 3,
+      "id": "tool_candidate",
+      "name": "Tool candidate (compiled)",
+      "produces": "tool.yaml + input/output JSON schema + src + unit/golden/property tests + security_manifest",
+      "description": "The skill->tool COMPILER turns a sufficiently-reused, verified skill into a deterministic-tool CANDIDATE: a tool.yaml descriptor, input and output JSON Schemas, source implementing the deterministic core, unit + golden + property tests, and a security manifest declaring side-effects and sandbox caps. The source skill is retained as the documented fallback. Not yet proven deterministic.",
+      "is_truth": false,
+      "auto_advance": false
+    },
+    {
+      "rung": 4,
+      "id": "deterministic_tool",
+      "name": "Deterministic tool (proven)",
+      "produces": "DeterminismProofReport",
+      "description": "The candidate must PASS the deterministic_tool_standard: no LLM calls, no unseeded randomness, no wall-clock dependency, N repeat runs produce the same output hash, sandbox caps hold (fs read-only/allowed-paths, network blocked, subprocess blocked), declared side-effects match observed, and tests pass (tool tests 100%). Deterministic GIVEN same input + declared state; the agent calling it stays probabilistic.",
+      "is_truth": false,
+      "auto_advance": false
+    },
+    {
+      "rung": 5,
+      "id": "certified_internal_tool",
+      "name": "Certified internal tool (approved + registered)",
+      "produces": "ToolPromotionReceipt (signed) + registry entry",
+      "description": "After secret-scan + static-analysis + dependency-lock + SBOM pass AND a human/policy approver signs off, the tool is signed, versioned, and entered in the internal tool registry with a rollback target. Used deterministic-first by the agent-gateway, with the skill/LLM path as fallback for out-of-distribution inputs. Tool output is still a candidate the consumption gate must verify, never auto-served truth.",
+      "is_truth": false,
+      "auto_advance": false
+    },
+    {
+      "rung": 6,
+      "id": "retired_or_merged",
+      "name": "Retired / merged",
+      "produces": "RetirementRecord (lineage preserved)",
+      "description": "A tool that is superseded, merged into a better tool, or whose underlying gap closed is RETIRED: the active pointer moves, monitoring stops, but the tool, its lineage, the source skill, the held-out eval, and the losing candidates are PRESERVED (lossless) and remain rollback/rehydration targets. Retired/merged != deleted.",
+      "is_truth": false,
+      "auto_advance": false
+    }
+  ],
+  "deterministic_tool_standard": {
+    "note": "A 'deterministic tool' is deterministic GIVEN the same input + declared state. It does NOT make the calling agent deterministic; the agent still plans probabilistically and decides WHEN to call the tool. Tool output is a candidate, never authoritative truth.",
+    "determinism": {
+      "no_llm_calls": true,
+      "no_random_without_seed": true,
+      "no_wall_clock_dependency": true,
+      "repeat_runs": 5,
+      "same_output_hash": true,
+      "deterministic_given": "same_input_plus_declared_state"
+    },
+    "sandbox": {
+      "fs": "read_only",
+      "fs_mode": "allowed_paths_only",
+      "network": "blocked",
+      "subprocess": "blocked"
+    },
+    "declared_side_effects": {
+      "required": true,
+      "must_match_observed": true,
+      "default": "none"
+    },
+    "tests": {
+      "unit": true,
+      "golden": true,
+      "property": true,
+      "min_tool_test_pass": 1.0
+    },
+    "promotion_gates": {
+      "min_reuse": 3,
+      "min_skill_validation": 1,
+      "min_tool_test_pass": 1.0,
+      "min_repeatability": 1.0,
+      "human_approval_required": true
+    },
+    "security": {
+      "secret_scan": true,
+      "static_analysis": true,
+      "dependency_lock": true,
+      "sbom": true,
+      "signed": true
+    },
+    "lineage": {
+      "preserve_source_skill": true,
+      "preserve_held_out_eval": true,
+      "preserve_losing_candidates": true,
+      "rollback_target_required": true
+    },
+    "agent_is_deterministic": false
+  },
+  "data_policy": {
+    "note": "Skills and tools are mined ONLY from non-sensitive traces; sensitive data is never sent to any external evolver or low-cost/foreign processing lane.",
+    "mine_from": [
+      "public",
+      "synthetic",
+      "redacted_internal_non_sensitive"
+    ],
+    "never": [
+      "customer",
+      "secrets",
+      "regulated",
+      "confidential"
+    ],
+    "tenant_private_lineage_never_global": true
+  }
+}

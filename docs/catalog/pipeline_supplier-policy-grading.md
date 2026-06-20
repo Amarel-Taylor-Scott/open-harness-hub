@@ -38,15 +38,15 @@ to ILO indicators / CSDDD articles / lead-company code of conduct.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `structured_to_prose` | processor | `processor/structured-to-prose` | — |
-| 2 | `redact_pii` | processor | `processor/redact-pii-text` | — |
-| 3 | `grep_social_red_flags` | rule_pack | `rule-pack/grep-esg-forced-labor-red-flags` | — |
-| 4 | `grep_environmental_red_flags` | rule_pack | `rule-pack/grep-esg-environmental-red-flags` | — |
-| 5 | `grep_governance_red_flags` | rule_pack | `rule-pack/grep-esg-governance-red-flags` | — |
-| 6 | `rag_against_global_pack` | rule_pack | `rule-pack/hybrid-retrieval-policy` | — |
-| 7 | `rag_against_corridors` | rule_pack | `rule-pack/hybrid-retrieval-policy` | — |
-| 8 | `rag_against_lead_code` | rule_pack | `rule-pack/hybrid-retrieval-policy` | — |
-| 9 | `grade` | processor | `processor/llm-judge` | — |
-| 10 | `propose_remediation` | harness | `harness/text-safety-review` | — |
-| 11 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `structured_to_prose` | processor | `processor/structured-to-prose` | - |
+| 2 | `redact_pii` | processor | `processor/redact-pii-text` | - |
+| 3 | `grep_social_red_flags` | rule_pack | `rule-pack/grep-esg-forced-labor-red-flags` | - |
+| 4 | `grep_environmental_red_flags` | rule_pack | `rule-pack/grep-esg-environmental-red-flags` | - |
+| 5 | `grep_governance_red_flags` | rule_pack | `rule-pack/grep-esg-governance-red-flags` | - |
+| 6 | `rag_against_global_pack` | rule_pack | `rule-pack/hybrid-retrieval-policy` | - |
+| 7 | `rag_against_corridors` | rule_pack | `rule-pack/hybrid-retrieval-policy` | - |
+| 8 | `rag_against_lead_code` | rule_pack | `rule-pack/hybrid-retrieval-policy` | - |
+| 9 | `grade` | processor | `processor/llm-judge` | - |
+| 10 | `propose_remediation` | harness | `harness/text-safety-review` | - |
+| 11 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

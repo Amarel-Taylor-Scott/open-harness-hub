@@ -1,0 +1,37 @@
+id: "knowledge-pack/primitive-source-surface-map"
+type: knowledge-pack
+version: "0.1.0"
+name: "Primitive source surface map"
+description: "Initial routine scan surfaces for building a large indexed primitive database with keyword, vector, graph, and model-polished search."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "CC-BY-4.0"
+industry: ["ai", "cross_industry"]
+capability: ["retrieval", "planning", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "hub"
+freshness: "stable"
+tags: ["primitive-database", "source-surfaces", "million-primitives", "verified-sources"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types: ["source_surface", "scan_policy", "publisher_lane"]
+files:
+  - path: "data/primitive-source-surface-map/surfaces.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    enabled: true
+    embedder: "processor/local-embedder"
+provenance:
+  sources:
+    - "Data.gov Catalog API"
+    - "OpenAlex API"
+    - "Semantic Scholar API"
+    - "NIST NVD API"
+    - "openFDA"
+    - "Public hiring and task marketplace metadata patterns"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "source metadata and synthetic task archetypes only; no worker/client PII, private messages, or proprietary listing text"

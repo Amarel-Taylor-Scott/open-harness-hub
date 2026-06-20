@@ -1,0 +1,321 @@
+{
+  "version": "1.0",
+  "note": "Model provider graph \u2014 nodes + numeric edges. Runtime branches on node_id + numeric codes, NEVER on display strings. Every external node REQUIRES_SECRET_REF + REQUIRES_LOCAL_EQUIVALENT; the offline default is model.local_stub@v1. OPTIONAL per-node binding keys: `base_url` (the endpoint this node ACTUALLY serves from \u2014 adapters use it node-first with env OH_LLM_BASE_URL as fallback, so a receipt can never name a node another host served; NEVER embed credentials in it) and `model` (pin a model id node-first over env OH_LLM_MODEL). Nodes without base_url (the generic local node, BYOK, env-configured) intentionally resolve from env/tenant config; the receipt's executed_base_host records the effective host either way.",
+  "offline_default_node": "model.local_stub@v1",
+  "nodes": [
+    {
+      "node_id": "model.local_stub@v1",
+      "tier_code": 100,
+      "specialization_codes": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        1100
+      ],
+      "status_code": 100,
+      "secret_ref": null,
+      "local_equivalent": "model.local_stub@v1",
+      "external": false,
+      "display": "local deterministic stub",
+      "adapter_style": "deterministic_stub"
+    },
+    {
+      "node_id": "model.local_openai_compatible@candidate",
+      "tier_code": 300,
+      "specialization_codes": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        1000,
+        1100
+      ],
+      "status_code": 200,
+      "secret_ref": "secret://local/openai_compatible",
+      "local_equivalent": "model.local_stub@v1",
+      "external": false,
+      "display": "local OpenAI-compatible (Ollama/vLLM)",
+      "adapter_style": "openai_compatible"
+    },
+    {
+      "node_id": "model.openai.frontier@candidate",
+      "base_url": "https://api.openai.com/v1",
+      "tier_code": 500,
+      "specialization_codes": [
+        300,
+        400,
+        500,
+        600,
+        1000,
+        1100
+      ],
+      "status_code": 200,
+      "secret_ref": "secret://provider/openai",
+      "local_equivalent": "model.local_stub@v1",
+      "external": true,
+      "display": "OpenAI frontier",
+      "adapter_style": "openai_compatible"
+    },
+    {
+      "node_id": "model.openai.codex@candidate",
+      "base_url": "https://api.openai.com/v1",
+      "model": "gpt-5-codex",
+      "tier_code": 500,
+      "specialization_codes": [
+        300,
+        400,
+        500,
+        600,
+        1000,
+        1100
+      ],
+      "status_code": 200,
+      "secret_ref": "secret://provider/openai",
+      "local_equivalent": "model.ollama_local@candidate",
+      "external": true,
+      "display": "OpenAI Codex (agentic coding backend) — alternative to local Ollama/Gemma; governed fallback to Ollama",
+      "adapter_style": "openai_compatible"
+    },
+    {
+      "node_id": "model.anthropic.frontier@candidate",
+      "base_url": "https://api.anthropic.com/v1",
+      "tier_code": 600,
+      "specialization_codes": [
+        300,
+        400,
+        500,
+        600,
+        1000,
+        1100
+      ],
+      "status_code": 200,
+      "secret_ref": "secret://provider/anthropic",
+      "local_equivalent": "model.local_stub@v1",
+      "external": true,
+      "display": "Anthropic frontier reasoning",
+      "adapter_style": "anthropic_messages"
+    },
+    {
+      "node_id": "model.google.frontier@candidate",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "tier_code": 500,
+      "specialization_codes": [
+        300,
+        400,
+        500,
+        900,
+        1000,
+        1100
+      ],
+      "status_code": 200,
+      "secret_ref": "secret://provider/google",
+      "local_equivalent": "model.local_stub@v1",
+      "external": true,
+      "display": "Google Gemini frontier",
+      "adapter_style": "openai_compatible"
+    },
+    {
+      "node_id": "model.customer_private.frontier@candidate",
+      "tier_code": 700,
+      "specialization_codes": [
+        300,
+        400,
+        500,
+        600,
+        1100
+      ],
+      "status_code": 200,
+      "secret_ref": "secret://customer/byok",
+      "local_equivalent": "model.local_stub@v1",
+      "external": false,
+      "display": "customer-private (BYOK)",
+      "adapter_style": "openai_compatible"
+    },
+    {
+      "node_id": "embedding.local_hash@v1",
+      "tier_code": 100,
+      "specialization_codes": [
+        700
+      ],
+      "status_code": 100,
+      "secret_ref": null,
+      "local_equivalent": "embedding.local_hash@v1",
+      "external": false,
+      "display": "local deterministic embeddings",
+      "adapter_style": "deterministic_stub"
+    },
+    {
+      "node_id": "judge.local_deterministic@v1",
+      "tier_code": 100,
+      "specialization_codes": [
+        600
+      ],
+      "status_code": 100,
+      "secret_ref": null,
+      "local_equivalent": "judge.local_deterministic@v1",
+      "external": false,
+      "display": "local deterministic judge",
+      "adapter_style": "deterministic_stub"
+    },
+    {
+      "node_id": "model.fireworks@candidate",
+      "base_url": "https://api.fireworks.ai/inference/v1",
+      "tier_code": 500,
+      "specialization_codes": [
+        300,
+        400,
+        500,
+        1000,
+        1100
+      ],
+      "status_code": 200,
+      "secret_ref": "secret://provider/fireworks",
+      "local_equivalent": "model.local_stub@v1",
+      "external": true,
+      "display": "Fireworks AI inference (candidate)",
+      "adapter_style": "openai_compatible"
+    },
+    {
+      "node_id": "model.ollama_cloud@candidate",
+      "base_url": "https://ollama.com/v1",
+      "tier_code": 400,
+      "specialization_codes": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        1000,
+        1100
+      ],
+      "status_code": 200,
+      "secret_ref": "secret://provider/ollama_cloud",
+      "local_equivalent": "model.local_stub@v1",
+      "external": true,
+      "display": "Ollama Cloud (free-tier rate-limited; candidate)",
+      "adapter_style": "openai_compatible"
+    },
+    {
+      "node_id": "model.ollama_local@candidate",
+      "base_url": "http://localhost:11434/v1",
+      "tier_code": 300,
+      "specialization_codes": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        1000,
+        1100
+      ],
+      "status_code": 200,
+      "secret_ref": null,
+      "local_equivalent": "model.local_stub@v1",
+      "external": false,
+      "display": "Ollama local \u2014 OpenAI-compatible localhost (candidate)",
+      "adapter_style": "openai_compatible"
+    },
+    {
+      "node_id": "model.env_openai_compatible@candidate",
+      "tier_code": 300,
+      "specialization_codes": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        1000,
+        1100
+      ],
+      "status_code": 200,
+      "secret_ref": "secret://env/oh_llm_api_key",
+      "local_equivalent": "model.local_stub@v1",
+      "external": true,
+      "display": "env-configured OpenAI-compatible (OH_LLM_BASE_URL; no fixed base_url by design \u2014 the receipt's executed_base_host records the effective host)",
+      "adapter_style": "openai_compatible"
+    },
+    {
+      "node_id": "model.openrouter.gemma_4_26b@candidate",
+      "base_url": "https://openrouter.ai/api/v1",
+      "model": "google/gemma-4-26b-a4b-it",
+      "tier_code": 300,
+      "specialization_codes": [100, 200, 300, 400, 500, 1000, 1100],
+      "status_code": 200,
+      "secret_ref": "secret://provider/openrouter",
+      "local_equivalent": "model.local_stub@v1",
+      "external": true,
+      "display": "OpenRouter Gemma-4 26B A4B (cheaper-inference lane)",
+      "adapter_style": "openai_compatible",
+      "note": "owner-directed 2026-06-11 cheaper-inference lane: AR sibling beats DiffusionGemma on every benchmark at $0.06/$0.33 per 1M (:free dev tier). Key = OPENROUTER_API_KEY (secret://provider/openrouter). See docs/architecture/flexible-inference-lanes.md."
+    },
+    {
+      "node_id": "model.mistral.small_latest@candidate",
+      "base_url": "https://api.mistral.ai/v1",
+      "model": "mistral-small-latest",
+      "tier_code": 300,
+      "specialization_codes": [100, 200, 300, 400, 500, 1000, 1100],
+      "status_code": 200,
+      "secret_ref": "secret://provider/mistral",
+      "local_equivalent": "model.local_stub@v1",
+      "external": true,
+      "display": "Mistral Small (owner keys; OpenAI-compatible lane)",
+      "adapter_style": "openai_compatible",
+      "note": "owner-provided Mistral API keys; OpenAI-compatible at api.mistral.ai/v1. Key = MISTRAL_API_KEY (secret://provider/mistral). chat + mistral-embed embeddings. from_env() resolves it before the generic OPENAI lane."
+    }
+  ],
+  "edges": [
+    {
+      "from": "model.openai.frontier@candidate",
+      "edge_type_code": 1300,
+      "to": "model.anthropic.frontier@candidate"
+    },
+    {
+      "from": "model.anthropic.frontier@candidate",
+      "edge_type_code": 1300,
+      "to": "model.google.frontier@candidate"
+    },
+    {
+      "from": "model.google.frontier@candidate",
+      "edge_type_code": 1300,
+      "to": "model.local_openai_compatible@candidate"
+    },
+    {
+      "from": "model.local_openai_compatible@candidate",
+      "edge_type_code": 1300,
+      "to": "model.local_stub@v1"
+    },
+    {
+      "from": "model.openai.frontier@candidate",
+      "edge_type_code": 1900,
+      "to": "model.openai.frontier@candidate"
+    },
+    {
+      "from": "model.openai.frontier@candidate",
+      "edge_type_code": 2000,
+      "to": "model.local_stub@v1"
+    },
+    {
+      "from": "model.fireworks@candidate",
+      "edge_type_code": 1300,
+      "to": "model.local_stub@v1"
+    },
+    {
+      "from": "model.ollama_cloud@candidate",
+      "edge_type_code": 1300,
+      "to": "model.ollama_local@candidate"
+    },
+    {
+      "from": "model.ollama_local@candidate",
+      "edge_type_code": 1300,
+      "to": "model.local_stub@v1"
+    },
+    {
+      "from": "model.env_openai_compatible@candidate",
+      "edge_type_code": 1300,
+      "to": "model.local_stub@v1"
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "$id": "egress/EgressRoutePolicy.v1",
+  "title": "EgressRoutePolicy.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "A Teleon egress route-policy entry. Route policies govern how an outbound worker action may leave the platform; they are evidence and routing controls only, never truth authorities.",
+  "required": [
+    "route_policy_id",
+    "route_kind",
+    "default_allowed",
+    "allowed_for",
+    "requires",
+    "forbidden_for",
+    "capture_required",
+    "decision_receipt_required",
+    "payload_policy",
+    "fallback_route_policy_id",
+    "serves_truth"
+  ],
+  "properties": {
+    "route_policy_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$"
+    },
+    "route_kind": {
+      "type": "string"
+    },
+    "default_allowed": {
+      "type": "boolean"
+    },
+    "allowed_for": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "requires": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "forbidden_for": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "capture_required": {
+      "type": "boolean",
+      "const": true
+    },
+    "decision_receipt_required": {
+      "type": "boolean",
+      "const": true
+    },
+    "payload_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "store_raw_by_default",
+        "store_response_digest",
+        "raw_payload_requires"
+      ],
+      "properties": {
+        "store_raw_by_default": {
+          "type": "boolean",
+          "const": false
+        },
+        "store_response_digest": {
+          "type": "boolean"
+        },
+        "raw_payload_requires": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "fallback_route_policy_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "serves_truth": {
+      "type": "boolean",
+      "const": false
+    }
+  }
+}

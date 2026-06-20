@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GTM Launch Guide | AI Done Right</title>
+<meta name="description" content="Step-by-step launch guide for taking AI Done Right, Baltor, and Open Harness Hub from local development to production GTM readiness." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#101828;--muted:#667085;--soft:#eef2f6;--line:#d9e2ec;--paper:#f8fafc;
+    --card:#fff;--blue:#1d6fe0;--teal:#149b8f;--ember:#c56b2c;--good:#16875f;
+    --warn:#b7791f;--bad:#c2413b;--max:1180px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.55}
+  a{color:inherit;text-decoration:none}
+  code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.92em;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:6px;padding:1px 5px}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+  .top{position:sticky;top:0;z-index:10;background:rgba(248,250,252,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .top .wrap{height:64px;display:flex;align-items:center;gap:18px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700}
+  .mark{width:14px;height:14px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 5px rgba(29,111,224,.12)}
+  nav{margin-left:auto;display:flex;align-items:center;gap:18px;font-size:14px;color:#475467}
+  nav a:hover{color:var(--ink)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 13px;font-weight:700;font-size:14px}
+  .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+  .hero{padding:64px 0 28px}
+  .eyebrow{font-size:12px;letter-spacing:.11em;text-transform:uppercase;font-weight:800;color:var(--blue);margin-bottom:12px}
+  h1{font-size:clamp(34px,5vw,58px);line-height:1.02;letter-spacing:-.035em;margin:0 0 16px}
+  .lead{max-width:800px;color:#344054;font-size:19px;margin:0}
+  .hero-grid{display:grid;grid-template-columns:1.4fr .9fr;gap:22px;align-items:start;margin-top:28px}
+  @media(max-width:860px){.hero-grid{grid-template-columns:1fr}nav{display:none}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:0 20px 50px -42px rgba(16,24,40,.5)}
+  .launch-state{display:grid;gap:10px}
+  .state-row{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #eef2f6;padding:8px 0;font-size:14px}
+  .state-row:last-child{border-bottom:0}
+  .state-row span{color:var(--muted)}
+  .state-row strong{font-weight:800}
+  .bar{height:10px;border-radius:999px;background:#e9eef5;overflow:hidden;margin-top:14px}
+  .bar i{display:block;height:100%;width:38%;background:linear-gradient(90deg,var(--blue),var(--teal));border-radius:999px}
+  .section{padding:30px 0}
+  .section h2{font-size:28px;letter-spacing:-.025em;margin:0 0 8px}
+  .section> .wrap>p{color:#475467;max-width:780px;margin:0 0 18px}
+  .steps{display:grid;gap:14px}
+  .step{display:grid;grid-template-columns:74px 1fr 210px;gap:18px;align-items:start;background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px}
+  @media(max-width:860px){.step{grid-template-columns:1fr}}
+  .num{width:46px;height:46px;border-radius:12px;background:#eff6ff;color:var(--blue);display:grid;place-items:center;font-weight:800}
+  .step h3{margin:0 0 6px;font-size:18px;letter-spacing:-.015em}
+  .step p{margin:0;color:#475467}
+  .checks{margin:10px 0 0;padding:0;list-style:none;display:grid;gap:6px}
+  .checks li{position:relative;padding-left:21px;color:#344054;font-size:14px}
+  .checks li:before{content:"";position:absolute;left:0;top:.6em;width:8px;height:8px;border-radius:50%;background:var(--good)}
+  .owner{background:#f8fafc;border:1px solid #e5eaf0;border-radius:11px;padding:12px;font-size:13px;color:#475467}
+  .owner b{display:block;color:var(--ink);margin-bottom:4px}
+  .lanes{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:860px){.lanes{grid-template-columns:1fr}}
+  .lane h3{margin:0 0 8px}
+  .lane .tag{display:inline-flex;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+  .tag.dev{background:#eef2ff;color:#3843a5}.tag.stage{background:#fff7ed;color:#9a3412}.tag.prod{background:#ecfdf3;color:#067647}
+  .matrix{overflow:auto;border:1px solid var(--line);border-radius:14px;background:#fff}
+  table{width:100%;border-collapse:collapse;min-width:780px}
+  th,td{padding:12px 14px;border-bottom:1px solid #eef2f6;text-align:left;font-size:14px;vertical-align:top}
+  th{background:#f8fafc;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#667085}
+  tr:last-child td{border-bottom:0}
+  .callout{background:#101828;color:#edf2f7;border-radius:16px;padding:26px;margin:18px 0 0}
+  .callout h2{color:#fff}
+  .callout p{color:#b9c5d4}
+  .footer{padding:34px 0 60px;color:#667085;font-size:13px}
+</style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <a class="brand" href="/"><span class="mark"></span> AI Done Right</a>
+      <nav>
+        <a href="/">Home</a>
+        <a href="#environments">Environments</a>
+        <a href="#launch">Launch checklist</a>
+        <a href="#ops">Operations</a>
+        <a class="btn primary" href="https://baltor.ai">Baltor</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <div class="eyebrow">GTM launch guide</div>
+        <h1>From repo to production, domains, email, and customer-ready demos.</h1>
+        <p class="lead">A step-by-step operating guide for launching the three-site platform story: AI Done Right as the parent brand, Baltor as the paid context-control product, and Open Harness Hub as the open builder funnel.</p>
+        <div class="hero-grid">
+          <div class="panel">
+            <h2 style="margin:0 0 8px">Launch principle</h2>
+            <p style="margin:0;color:#475467">Do not treat GTM as a landing page exercise. The launch is production readiness plus a coherent buyer path: credible domains, working demos, transactional email, analytics, support, billing, docs, and a repeatable pilot motion.</p>
+          </div>
+          <div class="panel launch-state">
+            <div class="state-row"><span>Current state</span><strong>prototype to pilot</strong></div>
+            <div class="state-row"><span>Primary buyer</span><strong>compliance / AI governance</strong></div>
+            <div class="state-row"><span>Wedge</span><strong>verified context control</strong></div>
+            <div class="state-row"><span>Next gate</span><strong>design partner pilot</strong></div>
+            <div class="bar" aria-label="Launch readiness"><i></i></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="environments">
+      <div class="wrap">
+        <h2>1. Set up the environments</h2>
+        <p>Keep the same product story across local, development, staging, and production. The difference should be data, secrets, observability, and traffic policy, not code behavior.</p>
+        <div class="lanes">
+          <div class="panel lane"><span class="tag dev">Local/dev</span><h3>Developer loop</h3><p>Run all three sites locally, use synthetic data, local queue, local models, and no production credentials.</p></div>
+          <div class="panel lane"><span class="tag stage">Staging</span><h3>Buyer rehearsal</h3><p>Use production-like cloud services, test domains, transactional email sandbox, test billing, and seeded demo corpora.</p></div>
+          <div class="panel lane"><span class="tag prod">Production</span><h3>Customer path</h3><p>Use live domains, monitored services, real auth, support, billing, backups, security headers, and audit logs.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="launch">
+      <div class="wrap">
+        <h2>2. Step-by-step launch checklist</h2>
+        <p>Work through these in order. Each step should have an owner, a verification command or dashboard, and a rollback path.</p>
+        <div class="steps">
+          <article class="step">
+            <div class="num">01</div>
+            <div><h3>Repository and branch policy</h3><p>Protect the main branch and make releases traceable.</p><ul class="checks"><li>Create `main`, `develop`, and release branches or a trunk-based equivalent.</li><li>Require PR checks for validation, docs build, and site smoke tests.</li><li>Add CODEOWNERS for web, infra, schemas, and docs.</li><li>Tag releases as `web-YYYY.MM.DD-n` or semver once customer-facing.</li></ul></div>
+            <div class="owner"><b>Proof</b>Branch protection is enabled, CI blocks broken builds, and a release tag can be traced to deployed artifacts.</div>
+          </article>
+
+          <article class="step">
+            <div class="num">02</div>
+            <div><h3>Local development</h3><p>Make a new contributor productive in one session.</p><ul class="checks"><li>Document `python3 -m scripts.showcase` for one site and `scripts/serve_all_sites.sh` for all three.</li><li>Keep `OH_PRODUCT` as the product selector.</li><li>Run worker self-tests and admin demo locally with synthetic data.</li><li>Use local Ollama/OpenAI-compatible endpoints only through provider-neutral env vars.</li></ul></div>
+            <div class="owner"><b>Proof</b>Fresh checkout can serve AI Done Right, Baltor, OHH, and `/admin-demo` without production secrets.</div>
+          </article>
+
+          <article class="step">
+            <div class="num">03</div>
+            <div><h3>Cloud accounts and projects</h3><p>Create separate dev, staging, and production projects.</p><ul class="checks"><li>Choose the first hosting path: Cloudflare Pages/Workers, Vercel/Render, or Cloud Run/Kubernetes.</li><li>Create separate projects/accounts for staging and production.</li><li>Set IAM groups for admin, deploy, read-only, and billing.</li><li>Turn on budget alerts before connecting metered model APIs.</li></ul></div>
+            <div class="owner"><b>Proof</b>Each environment has separate credentials, budgets, and audit logs.</div>
+          </article>
+
+          <article class="step">
+            <div class="num">04</div>
+            <div><h3>Staging deployment</h3><p>Deploy the exact three-site story before touching production domains.</p><ul class="checks"><li>Deploy `context-is-everything`, `baltor`, and `harness-hub` as separate web doors.</li><li>Point each to the shared backend API where needed.</li><li>Seed staging with non-PII demo data and sample context runs.</li><li>Run health checks for `/`, `/api/health`, and `/admin-demo/`.</li></ul></div>
+            <div class="owner"><b>Proof</b>Staging URLs show the correct brand marker and load the right product folder.</div>
+          </article>
+
+          <article class="step">
+            <div class="num">05</div>
+            <div><h3>Production services</h3><p>Bring up durable services only after staging is clean.</p><ul class="checks"><li>Provision Postgres/pgvector for operational records, facts, sources, and vectors.</li><li>Provision object storage for raw uploads, extracted text, packages, and audit artifacts.</li><li>Provision Redis or managed queue for worker lanes.</li><li>Configure backups, retention, encryption, and restore tests.</li></ul></div>
+            <div class="owner"><b>Proof</b>Restore test succeeds and service credentials are not shared with staging.</div>
+          </article>
+
+          <article class="step">
+            <div class="num">06</div>
+            <div><h3>Domains and DNS</h3><p>Connect clean customer-facing routes.</p><ul class="checks"><li>Point parent domain to AI Done Right.</li><li>Point `baltor.ai` or product domain to Baltor.</li><li>Point OHH domain to Open Harness Hub.</li><li>Configure HTTPS, redirects, canonical hostnames, HSTS when ready, and DNS monitoring.</li></ul></div>
+            <div class="owner"><b>Proof</b>Each domain returns 200, correct brand marker, valid TLS, and expected canonical URL.</div>
+          </article>
+
+          <article class="step">
+            <div class="num">07</div>
+            <div><h3>Auth, CRM, and billing</h3><p>Make interest capture and pilot conversion real.</p><ul class="checks"><li>Add waitlist/demo request forms with spam protection.</li><li>Route leads into CRM with source, campaign, and requested use case.</li><li>Enable test billing for pilots and production billing for paid contracts.</li><li>Add account roles for admin, curator, viewer, and security reviewer.</li></ul></div>
+            <div class="owner"><b>Proof</b>Submit a demo request and confirm CRM record, confirmation email, and internal alert.</div>
+          </article>
+
+          <article class="step">
+            <div class="num">08</div>
+            <div><h3>Transactional email</h3><p>Set up email before inviting design partners.</p><ul class="checks"><li>Choose provider and create separate staging/production sending domains.</li><li>Configure SPF, DKIM, DMARC, bounce handling, and suppression lists.</li><li>Create templates for invite, magic link, run complete, export ready, review required, billing receipt, and support reply.</li><li>Log every outbound email event against tenant and run ids.</li></ul></div>
+            <div class="owner"><b>Proof</b>Seeded staging user receives every template; production domain passes authentication checks.</div>
+          </article>
+
+          <article class="step">
+            <div class="num">09</div>
+            <div><h3>Observability and operations</h3><p>Know what is running, queued, slow, broken, or expensive.</p><ul class="checks"><li>Track web latency, API health, queue depth, oldest job age, worker failures, and model/API spend.</li><li>Add run ledger, worker traces, and audit packet download.</li><li>Create alerts for site down, queue stuck, email failures, DNS/TLS failures, and spend spikes.</li><li>Document incident owner and rollback command.</li></ul></div>
+            <div class="owner"><b>Proof</b>Staging incident drill triggers alert, captures logs, and restores service.</div>
+          </article>
+
+          <article class="step">
+            <div class="num">10</div>
+            <div><h3>Security and compliance baseline</h3><p>Do enough to be credible with enterprise buyers.</p><ul class="checks"><li>Use secret manager, not repo/env files, for production secrets.</li><li>Set CSP, security headers, CORS policy, rate limits, and upload size limits.</li><li>Document data retention, subprocessors, backups, access review, and deletion path.</li><li>Prepare a lightweight security packet for design partners.</li></ul></div>
+            <div class="owner"><b>Proof</b>Security packet, data-flow diagram, and access review are current before production pilots.</div>
+          </article>
+
+          <article class="step">
+            <div class="num">11</div>
+            <div><h3>Demo and pilot packaging</h3><p>Turn the product into a repeatable buyer motion.</p><ul class="checks"><li>Create one polished Baltor admin demo with upload, processing, outputs, and downloads.</li><li>Create one OHH path showing a governed harness consuming trusted context.</li><li>Create one parent narrative page explaining why context is the bottleneck.</li><li>Prepare a 2-week paid pilot offer and success metrics.</li></ul></div>
+            <div class="owner"><b>Proof</b>Sales call can move from parent story to Baltor demo to pilot scope without switching narratives.</div>
+          </article>
+
+          <article class="step">
+            <div class="num">12</div>
+            <div><h3>Production cutover</h3><p>Launch only when staging has rehearsed the full path.</p><ul class="checks"><li>Freeze release candidate and tag it.</li><li>Run smoke checks on all three production domains.</li><li>Send test transactional emails from production domain.</li><li>Verify analytics, CRM, billing, support inbox, backups, alerts, and rollback.</li></ul></div>
+            <div class="owner"><b>Proof</b>Launch checklist is signed off with URLs, test evidence, and owners.</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="ops">
+      <div class="wrap">
+        <h2>3. Service setup matrix</h2>
+        <p>Use this as the GTM infrastructure map. Vendor choices can change; the interfaces should not.</p>
+        <div class="matrix">
+          <table>
+            <thead><tr><th>Area</th><th>Dev</th><th>Staging</th><th>Production</th><th>Verification</th></tr></thead>
+            <tbody>
+              <tr><td>Web hosting</td><td>Local server</td><td>Preview/staging deploy</td><td>Three domain-backed sites</td><td>Brand marker + 200 on `/`</td></tr>
+              <tr><td>API/backend</td><td>Local Python</td><td>Cloud service with test data</td><td>Autoscaled API with logs</td><td>`/api/health` and smoke workflow</td></tr>
+              <tr><td>Database</td><td>SQLite/Postgres local</td><td>Managed Postgres test</td><td>Managed Postgres + backups</td><td>Migration + restore test</td></tr>
+              <tr><td>Queue/workers</td><td>SQLite/Redis local</td><td>Redis queue + worker pool</td><td>KEDA/worker lanes or managed queue</td><td>Queue depth drains and failed-message quarantine works</td></tr>
+              <tr><td>Object storage</td><td>Local `dist/` or MinIO</td><td>Staging bucket</td><td>Production bucket with retention</td><td>Upload, export, retention check</td></tr>
+              <tr><td>Models</td><td>Ollama/local or mock</td><td>Test API keys and budgets</td><td>Provider-neutral routes and budgets</td><td>Spend alert + fallback route</td></tr>
+              <tr><td>Email</td><td>Console/log sink</td><td>Sandbox sending domain</td><td>Authenticated production domain</td><td>SPF/DKIM/DMARC + template test</td></tr>
+              <tr><td>Domains</td><td>localhost</td><td>staging subdomains</td><td>parent, Baltor, OHH domains</td><td>TLS, redirect, canonical host</td></tr>
+              <tr><td>Analytics/CRM</td><td>Off or local logs</td><td>Test workspace</td><td>Production lead attribution</td><td>Demo request creates CRM record</td></tr>
+              <tr><td>Support</td><td>Developer issue tracker</td><td>Internal inbox</td><td>Support inbox + SLA tags</td><td>Test ticket round trip</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout">
+          <h2>Rule of thumb</h2>
+          <p>Launch the parent story only when the buyer can click into Baltor, see a credible context-control demo, request a pilot, receive transactional email, and land in the CRM. Launch OHH as the open funnel, not as a competing generic agent builder.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="footer">
+    <div class="wrap">AI Done Right · Baltor · Open Harness Hub · GTM launch guide</div>
+  </footer>
+</body>
+</html>

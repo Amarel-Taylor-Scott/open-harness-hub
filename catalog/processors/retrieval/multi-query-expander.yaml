@@ -1,0 +1,50 @@
+id: processor/multi-query-expander
+type: processor
+version: 0.1.0
+name: Multi-query / RAG-fusion expander
+description: 'Rephrase the query into N variants, retrieve each, and union via RRF — covers multiple phrasings
+  and lifts recall when a single transform is insufficient. N× retrieval; the recall escalation.
+
+
+  Retrieval/prompt taxonomy step R0 (see docs/concepts/retrieval-and-prompt-taxonomy.md). One swappable
+  method-component for the governed-model-call recipe; lift is measured at the pipeline level, not on
+  this component.'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+- ai
+capability:
+- generation
+- retrieval
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- retrieval-taxonomy
+- step-r0
+- rag
+- model-assisted
+created: '2026-05-29'
+updated: '2026-05-29'
+process_kind: query.multi_query
+deterministic: false
+idempotent: true
+streaming: false
+inputs:
+- name: query
+  type: object
+- name: n
+  type: object
+outputs:
+- name: query_variants
+  type: object
+side_effects: external_call
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.retrieval.multi_query_expander.run
+  language: python

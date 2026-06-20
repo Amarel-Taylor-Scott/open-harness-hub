@@ -1,0 +1,112 @@
+{
+  "version": "1.0",
+  "note": "SandboxProviderPort catalog. Local providers are the golden path (offline, no setup). External providers are CANDIDATE behind the same port, each with a local_equivalent + proof_to_promote. Discovery\u2260trust; sandbox\u2260truth.",
+  "offline_default": "sandbox.local_tempdir@v1",
+  "providers": [
+    {
+      "provider_id": "sandbox.local_tempdir@v1",
+      "kind": "local_tempdir",
+      "status": "active",
+      "external": false,
+      "local_equivalent": "sandbox.local_tempdir@v1",
+      "network": "none",
+      "notes": "scoped tempdir, no network, no secrets \u2014 golden path"
+    },
+    {
+      "provider_id": "sandbox.managed_venv@v1",
+      "kind": "managed_venv",
+      "status": "active",
+      "external": false,
+      "local_equivalent": "sandbox.managed_venv@v1",
+      "network": "none",
+      "notes": "isolated venv subprocess, no network"
+    },
+    {
+      "provider_id": "sandbox.local_subprocess_no_network@v1",
+      "kind": "subprocess",
+      "status": "active",
+      "external": false,
+      "local_equivalent": "sandbox.local_tempdir@v1",
+      "network": "none"
+    },
+    {
+      "provider_id": "sandbox.docker@candidate",
+      "kind": "container",
+      "status": "candidate",
+      "external": true,
+      "local_equivalent": "sandbox.managed_venv@v1",
+      "network": "deny_by_default",
+      "proof_to_promote": [
+        "adapter_contract",
+        "network_policy",
+        "no_secret_leak",
+        "no_docker_socket_mount"
+      ]
+    },
+    {
+      "provider_id": "sandbox.openshell@candidate",
+      "kind": "shell",
+      "status": "candidate",
+      "external": true,
+      "local_equivalent": "sandbox.local_subprocess_no_network@v1"
+    },
+    {
+      "provider_id": "sandbox.e2b@candidate",
+      "kind": "microvm",
+      "status": "candidate",
+      "external": true,
+      "local_equivalent": "sandbox.local_tempdir@v1"
+    },
+    {
+      "provider_id": "sandbox.daytona@candidate",
+      "kind": "devbox",
+      "status": "candidate",
+      "external": true,
+      "local_equivalent": "sandbox.managed_venv@v1"
+    },
+    {
+      "provider_id": "sandbox.cubesandbox@candidate",
+      "kind": "hardware_isolated_microvm",
+      "status": "candidate",
+      "external": true,
+      "e2b_compatible": true,
+      "local_equivalent": "sandbox.local_tempdir@v1",
+      "strengths": [
+        "sub-60ms create",
+        "high density",
+        "snapshot/clone/rollback",
+        "eBPF network isolation"
+      ],
+      "risks": [
+        "kernel/root/XFS/KVM setup",
+        "operational complexity",
+        "needs dedicated host"
+      ],
+      "proof_to_promote": [
+        "check_cubesandbox_adapter_contract",
+        "check_cubesandbox_network_policy",
+        "check_cubesandbox_snapshot_rollback",
+        "check_cubesandbox_no_secret_leak"
+      ]
+    },
+    {
+      "provider_id": "sandbox.k8s_job@candidate",
+      "kind": "k8s_job",
+      "status": "candidate",
+      "external": true,
+      "local_equivalent": "sandbox.local_job_emulator@v1"
+    }
+  ],
+  "skill_sources": [
+    "skill_source.hermes@candidate",
+    "skill_source.openclaw@candidate",
+    "skill_source.codex@candidate",
+    "skill_source.agentskills_io@candidate",
+    "skill_source.voltagent_awesome@candidate"
+  ],
+  "tool_sources": [
+    "tool_source.mcp_registry@candidate",
+    "tool_source.github_mcp_registry@candidate",
+    "tool_source.modelcontextprotocol_servers@candidate"
+  ]
+}

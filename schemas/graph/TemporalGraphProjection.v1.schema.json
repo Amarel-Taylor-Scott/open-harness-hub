@@ -1,0 +1,37 @@
+{
+  "$id": "graph/TemporalGraphProjection.v1",
+  "title": "TemporalGraphProjection",
+  "description": "A read-only projection of the temporal graph (never canonical truth by itself).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "tenant_id": {
+      "type": "string"
+    },
+    "scope": {
+      "type": "string"
+    },
+    "facts": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "provider_id": {
+      "type": "string"
+    },
+    "as_of": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "tenant_id",
+    "facts"
+  ]
+}

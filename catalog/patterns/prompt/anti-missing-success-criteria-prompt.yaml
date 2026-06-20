@@ -1,0 +1,59 @@
+id: "pattern/anti-missing-success-criteria-prompt"
+type: pattern
+version: "0.1.0"
+name: "Anti-pattern: prompt with no success criteria"
+description: "Deploying a prompt-driven component with no machine-checkable success criteria: no output schema, no scoring rubric, no refusal condition, no pass/fail threshold. Any output is accepted because there is no definition of what a good output looks like."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "CC-BY-4.0"
+industry: ["cross_industry"]
+capability: ["generation", "evaluation"]
+modality: ["text"]
+lifecycle: "stable"
+trust_boundary: "local"
+created: "2026-05-26"
+updated: "2026-05-26"
+
+attribution:
+  source_url: "https://github.com/nidhinjs/prompt-master"
+  source_kind: github
+  author: "nidhinjs"
+  license: "MIT"
+
+when_to_use:
+  - "This is an anti-pattern. Do NOT use it in any pipeline that produces a decision, verdict, or downstream-consumed output."
+
+structural_shape:
+  - "WRONG: system prompt → model → raw text output → human reads it → done. No gate, no schema, no rubric."
+  - "RIGHT: system prompt with explicit output schema (JSON fields + types) → model → schema validation step → rubric scoring gate → pass/fail threshold → emit or reject."
+  - "RIGHT: store the success criteria in a rubric/* or pattern/composable-success-criteria component; reference it from the pipeline definition."
+
+problem: |
+  Without success criteria: (a) every output passes by default, so
+  regressions are invisible until a human notices; (b) the pipeline
+  cannot be benchmarked or compared against a baseline; (c) there is no
+  defensible audit record of what the pipeline was supposed to produce;
+  (d) downstream consumers have no contract to build against;
+  (e) fine-tuning or RLHF cannot be grounded because there is no signal
+  of what "better" means.
+
+solution: |
+  Every prompt-driven component must declare: (1) output schema — typed
+  fields and formats the model must emit; (2) rubric — scored dimensions
+  with weights and evidence_required; (3) refusal condition — inputs
+  that trigger a structured refusal rather than a best-effort answer;
+  (4) pass threshold — minimum score or field coverage to accept.
+  Store these in rubric/* or pattern/composable-success-criteria and
+  reference them from the harness or pipeline manifest.
+
+implementing_pipelines: []
+
+related_patterns:
+  - "pattern/composable-success-criteria"
+  - "pattern/go-nogo-checklist-gate"
+  - "pattern/anti-llm-as-judge-without-rubric"
+  - "pattern/evaluator-optimizer"
+
+counter_patterns:
+  - "Attach a rubric/* component and a JSON output schema to every prompt-driven step."
+
+tags: ["anti-pattern", "prompt", "success-criteria", "evaluation", "credit-killing", "governance"]

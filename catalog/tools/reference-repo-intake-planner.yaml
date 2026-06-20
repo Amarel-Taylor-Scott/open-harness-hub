@@ -1,0 +1,73 @@
+id: "tool/reference-repo-intake-planner"
+type: tool
+version: "0.1.0"
+name: "Reference repo intake planner"
+description: "Plans safe metadata-only, reference-clone, or sandbox-run intake for agent frameworks, workflow systems, skill marketplaces, and hub repositories without globally installing them."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["planning", "governance", "safety", "retrieval"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+tags: ["reference-repos", "install-plan", "agent-frameworks", "skills", "sandbox"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    source_system:
+      type: object
+    install_policy:
+      type: string
+    sandbox_policy:
+      type: object
+    allowed_roots:
+      type: array
+      items:
+        type: string
+  required: ["source_system", "install_policy"]
+returns:
+  type: object
+  properties:
+    intake_level:
+      type: string
+      enum: ["metadata_only", "reference_clone", "sandbox_run", "reject"]
+    planned_commands:
+      type: array
+      items:
+        type: object
+    required_approvals:
+      type: array
+      items:
+        type: string
+    risk_flags:
+      type: array
+      items:
+        type: string
+    output_paths:
+      type: array
+      items:
+        type: string
+side_effects: "none"
+examples:
+  - input:
+      source_system:
+        id: "trailofbits-skills"
+        url: "https://github.com/trailofbits/skills"
+      install_policy: "reference_clone_or_metadata_only"
+      allowed_roots: ["_reference"]
+    output:
+      intake_level: "reference_clone"
+      planned_commands: []
+      required_approvals: ["network_clone"]
+      risk_flags: ["script_execution"]
+      output_paths: ["_reference/trailofbits-skills"]
+implementations:
+  - kind: "callable"
+    path: "tools.reference_repo_intake_planner.run"
+  - kind: "mcp"
+    path: "mcp/reference_repos.plan_intake"

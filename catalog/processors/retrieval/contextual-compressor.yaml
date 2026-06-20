@@ -1,0 +1,49 @@
+id: processor/contextual-compressor
+type: processor
+version: 0.1.0
+name: Contextual compressor
+description: 'LLM extracts only the query-relevant content from each chunk to cut tokens and ''lost-in-the-middle''
+  dilution. Strong token reduction; one model call + can drop nuance — use when extractive isn''t enough.
+
+
+  Retrieval/prompt taxonomy step R4 (see docs/concepts/retrieval-and-prompt-taxonomy.md). One swappable
+  method-component for the governed-model-call recipe; lift is measured at the pipeline level, not on
+  this component.'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+- ai
+capability:
+- summarization
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- retrieval-taxonomy
+- step-r4
+- rag
+- model-assisted
+created: '2026-05-29'
+updated: '2026-05-29'
+process_kind: summarize.contextual_compression
+deterministic: false
+idempotent: true
+streaming: false
+inputs:
+- name: chunks
+  type: object
+- name: query
+  type: object
+outputs:
+- name: compressed
+  type: object
+side_effects: external_call
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.retrieval.contextual_compressor.run
+  language: python

@@ -10,9 +10,9 @@
       "required": ["pipeline", "dataset", "rubric", "judge", "model_arms", "headline_metric"],
       "properties": {
         "type":     { "const": "benchmark" },
-        "pipeline": { "$ref": "_common.schema.json#/$defs/artifactId" },
-        "dataset":  { "$ref": "_common.schema.json#/$defs/artifactId" },
-        "rubric":   { "$ref": "_common.schema.json#/$defs/artifactId" },
+        "pipeline": { "$ref": "_common.schema.json#/$defs/componentId" },
+        "dataset":  { "$ref": "_common.schema.json#/$defs/componentId" },
+        "rubric":   { "$ref": "_common.schema.json#/$defs/componentId" },
         "judge":    { "type": "string", "enum": ["deterministic", "local_model", "frontier_judge", "human"] },
         "model_arms": {
           "type": "array",
@@ -22,9 +22,9 @@
             "required": ["label", "adapter_ref"],
             "properties": {
               "label":            { "type": "string" },
-              "adapter_ref":      { "$ref": "_common.schema.json#/$defs/artifactId" },
-              "harness_override": { "$ref": "_common.schema.json#/$defs/artifactId" },
-              "rule_pack_override": { "type": "array", "items": { "$ref": "_common.schema.json#/$defs/artifactId" } }
+              "adapter_ref":      { "$ref": "_common.schema.json#/$defs/componentId" },
+              "harness_override": { "$ref": "_common.schema.json#/$defs/componentId" },
+              "rule_pack_override": { "type": "array", "items": { "$ref": "_common.schema.json#/$defs/componentId" } }
             }
           }
         },

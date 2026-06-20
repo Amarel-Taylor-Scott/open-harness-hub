@@ -1,0 +1,55 @@
+id: knowledge-pack/machine-text-detection-stylometric-features
+type: knowledge-pack
+version: 0.1.0
+name: Machine Text Detection Stylometric Features
+description: 'Capability-lift knowledge pack for an esoteric area LLMs handle poorly.
+  Gap: LLM self-report unreliable/gameable; signal is in stylometric/perplexity/token-distribution
+  features Grounded in DAIGT corpus + DAIGT-V2/V4 (CC) via classifier retrieval. Lift:
+  leaderboard won by TF-IDF/char-ngram+GBDT+perplexity, not LLM self-report; feature
+  extractor lifts ROC-AUC'
+authors:
+- name: Open Harness Hub capability-gap factory
+license: CC-BY-4.0
+industry:
+- cross_industry
+capability:
+- retrieval
+- verification
+modality:
+- structured
+- text
+lifecycle: experimental
+trust_boundary: external
+freshness: volatile
+tags:
+- capability-lift
+- esoteric
+- knowledge-pack
+- classifier
+- ingestion-target
+created: '2026-05-28'
+updated: '2026-05-28'
+attribution:
+  source_url: DAIGT corpus + DAIGT-V2/V4 (CC)
+  source_kind: other
+  author: DAIGT corpus + DAIGT-V2/V4 (CC)
+  license: see-source
+content_types:
+- fact_table
+- reference_doc
+retrieval:
+- classifier
+files:
+- path: data/esoteric-packs/machine-text-detection-stylometric-features.jsonl
+  format: jsonl
+  content_type: fact_table
+  schema: capability-gap seed (real facts where stable; else ingestion contract)
+indexing:
+  bm25: true
+  dense:
+    model: all-MiniLM-L6-v2
+provenance:
+  sources:
+  - DAIGT corpus + DAIGT-V2/V4 (CC)
+  collected_through: '2026-05-28'
+  collected_by: capability-gap factory

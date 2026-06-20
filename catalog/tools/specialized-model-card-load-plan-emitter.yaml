@@ -1,0 +1,62 @@
+id: "tool/specialized-model-card-load-plan-emitter"
+type: tool
+version: "0.1.0"
+name: "Specialized model card load plan emitter"
+description: "Runs relationship preflight, candidate promotion scoring, review-ticket routing, and bulk CSV/psql load-script export for specialized model-card row families."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["healthcare", "finance", "legal", "software.devops", "media", "security", "privacy", "government", "cross_industry"]
+capability: ["governance", "evaluation", "retrieval", "routing", "serving", "embedding"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["huggingface", "model-cards", "bulk-load", "promotion-scoring", "postgres", "pgvector"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    row_dir:
+      type: string
+    output_dir:
+      type: string
+    load_sql_name:
+      type: string
+  required: ["row_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    preflight_report:
+      type: object
+    promotion_summary:
+      type: object
+    bulk_manifest:
+      type: object
+    safety_notes:
+      type: array
+      items:
+        type: string
+side_effects: "write"
+examples:
+  - input:
+      row_dir: "dist/specialized-model-card-rows/seed"
+      output_dir: "dist/specialized-model-card-load-plan/seed"
+    output:
+      ok: true
+      promotion_summary:
+        promotion_decisions: 33
+      bulk_manifest:
+        ok: true
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.specialized_model_card_load_plan.create_model_card_load_plan"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.factory.specialized_model_card_load_plan"
+

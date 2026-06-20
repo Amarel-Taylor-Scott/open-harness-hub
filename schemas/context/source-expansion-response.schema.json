@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/context/source-expansion-response.schema.json",
+  "title": "Source expansion response",
+  "description": "The policy gate's verdict on a raw-expansion request. raw_excerpt is present ONLY when allowed=true; a denial carries a reason and raw_excerpt=null (no bytes leak past the gate). policy_decision records every check that ran, so the decision is auditable.",
+  "type": "object",
+  "required": ["kind", "source_handle", "allowed", "reason"],
+  "properties": {
+    "kind": { "type": "string", "const": "baltor.source-expansion-response.v1" },
+    "expansion_response_id": { "type": "string" },
+    "source_handle": { "type": "string", "pattern": "^ctx://" },
+    "allowed": { "type": "boolean" },
+    "reason": { "type": "string" },
+    "compact_preview": { "type": "string" },
+    "raw_excerpt": { "type": ["string", "null"] },
+    "surrounding_context": { "type": "string" },
+    "lineage_summary": { "type": "string" },
+    "policy_decision": {
+      "type": "object",
+      "properties": {
+        "checks": { "type": "array", "items": { "type": "object", "additionalProperties": true } }
+      },
+      "additionalProperties": true
+    },
+    "tokens_estimated": { "type": "integer", "minimum": 0 },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,93 @@
+id: "tool/claude-squad-parallel-agents"
+type: tool
+version: "0.1.0"
+name: "Claude Squad parallel-agent harness"
+description: |
+  Launch and coordinate multiple Claude Code agents in parallel using Git
+  worktrees so each agent has an isolated working tree and can operate on a
+  different branch or task simultaneously without conflicting. A CLI-driven
+  harness that spawns N tmux-backed agent sessions, monitors their state, and
+  merges or reviews outcomes. Suited for fan-out code tasks: parallel
+  refactors, multi-file feature generation, independent test authoring, or
+  running this very Open Harness Hub breadth-factory batch.
+
+  Reference/integration contract only; verify the upstream license before
+  bundling.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["ai", "software.devops", "cross_industry"]
+capability: ["agent_loop", "planning", "tool_use", "routing"]
+modality:   ["code", "text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+tags:
+  - "multi-agent"
+  - "git-worktree"
+  - "parallel-agents"
+  - "claude-code"
+  - "agent-harness"
+  - "tmux"
+created: "2026-05-26"
+updated: "2026-05-26"
+attribution:
+  source_url: "https://github.com/smtg-ai/claude-squad"
+  source_kind: "github"
+  author: "smtg-ai"
+
+parameters:
+  type: object
+  properties:
+    task:
+      type: string
+      description: "Natural-language task description dispatched to each agent."
+    n_agents:
+      type: integer
+      description: "Number of parallel agent sessions to spawn."
+      default: 3
+    worktree_prefix:
+      type: string
+      description: "Base path prefix for generated git worktrees."
+      default: ".worktrees"
+    auto_merge:
+      type: boolean
+      description: "Attempt automatic merge of agent branches on completion."
+      default: false
+  required: ["task"]
+returns:
+  type: object
+  properties:
+    sessions:
+      type: array
+      description: "One record per agent session."
+      items:
+        type: object
+        properties:
+          session_id:  { type: "string" }
+          branch:      { type: "string" }
+          worktree:    { type: "string" }
+          status:      { type: "string", enum: ["running", "complete", "failed"] }
+          output_path: { type: "string" }
+    merge_result:
+      type: object
+      properties:
+        success:    { type: "boolean" }
+        conflicts:  { type: "array", items: { type: "string" } }
+side_effects: "write"
+examples:
+  - input:
+      task: "Add docstrings to every public function in scripts/validate.py"
+      n_agents: 2
+      auto_merge: false
+    output:
+      sessions:
+        - { session_id: "sq-01", branch: "squad/sq-01", worktree: ".worktrees/sq-01", status: "complete", output_path: ".worktrees/sq-01/scripts/validate.py" }
+        - { session_id: "sq-02", branch: "squad/sq-02", worktree: ".worktrees/sq-02", status: "complete", output_path: ".worktrees/sq-02/scripts/validate.py" }
+      merge_result: { success: false, conflicts: ["scripts/validate.py"] }
+    notes: "Merge conflict expected when both agents edited the same file; human review needed."
+implementations:
+  - kind: "shell"
+    command: "cs new --task \"{{task}}\" --n {{n_agents}}"
+  - kind: "callable"
+    path: "claude_squad.harness.launch"
+    language: "python"

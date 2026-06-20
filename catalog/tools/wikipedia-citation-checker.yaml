@@ -1,0 +1,93 @@
+id: "tool/wikipedia-citation-checker"
+type: tool
+version: "0.1.0"
+name: "Wikipedia citation reachability + source-text-integrity checker"
+description: |
+  For each citation in a supplied Wikipedia article, check:
+
+   1. URL reachability (200 vs 404 vs paywall vs redirect chain).
+   2. Archived-version availability (web.archive.org, archive.today).
+   3. Reliable-source tier classification (WP:RSP cross-check).
+   4. (Optional, on-demand only) Source-text-integrity sample —
+      fetch a citation, locate the quoted claim, return
+      supports / contradicts / not-found.
+
+  Does NOT modify the article. Does NOT make policy determinations.
+  Surfaces evidence for `harness/wikipedia-quality-review` and the
+  reviewer.
+
+  Implementation should rate-limit aggressively to avoid hitting
+  reliable-source paywalls or upsetting publishers; on-demand
+  source-text-integrity checks are explicit per-citation, not
+  bulk-scrape.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["media", "media.editorial", "media.factcheck"]
+capability: ["verification", "retrieval"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "external"
+tags: ["wikipedia", "citations", "verifiability", "rs", "reachability"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+parameters:
+  type: object
+  properties:
+    citations:
+      type: "array"
+      items:
+        type: "object"
+        properties:
+          ref_name:    { type: "string" }
+          url:         { type: "string", format: "uri" }
+          claim_text:  { type: "string", description: "The article passage cited to this source." }
+        required: ["url"]
+    check_source_text:
+      type: "boolean"
+      default: false
+      description: "If true, fetch the URL and run source-text-integrity check."
+    rsp_check:
+      type: "boolean"
+      default: true
+      description: "Cross-check against WP:RSP perennial-sources list."
+  required: ["citations"]
+returns:
+  type: object
+  properties:
+    results:
+      type: "array"
+      items:
+        type: "object"
+        properties:
+          ref_name:        { type: "string" }
+          url:             { type: "string", format: "uri" }
+          reachable:       { type: "boolean" }
+          status_code:     { type: "integer" }
+          paywall_detected: { type: "boolean" }
+          archive_url:     { type: "string", format: "uri" }
+          rs_tier:         { type: "string", description: "peer_reviewed | major_news | regional_news | trade_press | self_published | rsp_unreliable | rsp_generally_reliable | unknown" }
+          source_text_integrity: { type: "string", description: "not_checked | supports | contradicts | not_found | paywall | error" }
+side_effects: "external_call"
+examples:
+  - input:
+      citations:
+        - ref_name: "loper-bright"
+          url: "https://www.supremecourt.gov/opinions/23pdf/22-451_7m58.pdf"
+          claim_text: "Chevron deference was overruled in 2024."
+      check_source_text: false
+      rsp_check: true
+    output:
+      results:
+        - ref_name: "loper-bright"
+          url: "https://www.supremecourt.gov/opinions/23pdf/22-451_7m58.pdf"
+          reachable: true
+          status_code: 200
+          paywall_detected: false
+          archive_url: "https://web.archive.org/web/2024/https://www.supremecourt.gov/opinions/23pdf/22-451_7m58.pdf"
+          rs_tier: "primary_source"
+          source_text_integrity: "not_checked"
+implementations:
+  - kind: "callable"
+    path: "tools.wikipedia_citation_checker.run"

@@ -1,0 +1,107 @@
+id: "processor/offline-queue-sync-on-reconnect"
+type: processor
+version: "0.1.0"
+name: "Offline queue sync on reconnect (store-and-forward for community health alerts)"
+description: |
+  Store-and-forward processor that buffers alert records locally (SQLite or
+  flat-file queue) when the device is offline and flushes them to the
+  upstream endpoint (MoH server, NGO dashboard, or district health API) in
+  FIFO order as soon as a network connection is detected. Designed for the
+  AfyaEdge syndromic surveillance pattern: field health workers capture triage
+  outputs locally; the processor ensures no alert is lost during connectivity
+  gaps and each record carries a content hash, device ID, capture timestamp,
+  and sync status.
+
+  The processor exposes three operations:
+    enqueue(record)  — append a record to the local queue with a hash and
+                       pending status; always succeeds offline.
+    sync_now()       — probe connectivity, then flush pending records in
+                       FIFO order; retries on transient failure; marks each
+                       record synced or failed.
+    status()         — return queue depth, oldest-pending age, and last-sync
+                       timestamp.
+
+  CAPABILITY LIFT (structural): cloud endpoints are structurally unavailable
+  in remote last-mile settings during the window that matters most (active
+  triage). This processor converts a synchronous cloud dependency into an
+  async queue, making alert capture a purely local operation. The gap is
+  structural because no amount of model improvement closes the physical
+  absence of a network link.
+  lift_reason: no_addressable_source (network absent at point of care);
+  mechanism: orchestration_complexity (multi-step enqueue/retry/sync
+  protocol that a bare model cannot execute reliably).
+
+authors:
+  - name: "Open Harness Hub contributors"
+license: "Apache-2.0"
+industry:   ["healthcare.public_health", "public_safety", "cross_industry"]
+capability: ["agent_loop", "governance", "verification"]
+modality:   ["structured"]
+lifecycle:  "experimental"
+lifecycle_position: "post_api"
+trust_boundary: "local"
+created: "2026-05-28"
+updated: "2026-05-28"
+
+attribution:
+  source_url: "https://github.com/google-gemini/gemma-cookbook"
+  source_kind: "github"
+  author: "AfyaEdge offline community health pattern (Gemma community); store-and-forward pattern common to mHealth systems (e.g. OpenMRS offline module)"
+  license: "Apache-2.0"
+
+tags:
+  - "offline"
+  - "on-device"
+  - "store-and-forward"
+  - "sync"
+  - "queue"
+  - "reconnect"
+  - "community-health"
+  - "mhealth"
+  - "last-mile"
+  - "global-south"
+  - "africa"
+  - "structural-lift"
+  - "afyaedge"
+
+process_kind: "agent_loop.queue_flush"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 5000
+
+inputs:
+  - name: "operation"
+    type: "string"
+  - name: "record"
+    type: "object"
+  - name: "endpoint_url"
+    type: "string"
+  - name: "auth_token"
+    type: "string"
+  - name: "max_batch_size"
+    type: "integer"
+outputs:
+  - name: "queue_depth"
+    type: "integer"
+  - name: "synced_count"
+    type: "integer"
+  - name: "failed_count"
+    type: "integer"
+  - name: "oldest_pending_age_s"
+    type: "integer"
+  - name: "last_sync_ts"
+    type: "string"
+  - name: "sync_status"
+    type: "string"
+
+side_effects: "write"
+on_error: "retry"
+retry:
+  max_attempts: 3
+  backoff: "exponential"
+
+implementations:
+  - kind: "callable"
+    path: "scripts.processors.offline_queue_sync_on_reconnect.run"
+    language: "python"

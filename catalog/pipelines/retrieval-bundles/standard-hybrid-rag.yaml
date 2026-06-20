@@ -1,0 +1,94 @@
+id: "pipeline/standard-hybrid-rag"
+type: pipeline
+version: "0.1.0"
+name: "Standard Hybrid RAG (Bundle A)"
+description: |
+  The recommended default retrieval pipeline from the retrieval/prompt taxonomy
+  (docs/concepts/retrieval-and-prompt-taxonomy.md, Bundle A). Answers a question over a
+  governed Knowledge Corpus with cited evidence — or abstains — by composing the swappable
+  retrieval-taxonomy components: a hybrid retrieve (BM25 + dense) fused by RRF, reranked by a
+  cross-encoder, de-duplicated and ordered by source precedence, edge-placed to beat
+  "lost in the middle", behind a prompt-injection screen and a cite-or-abstain system prompt,
+  with deterministic JSON recovery on the way out. Every step except the one model call and the
+  cross-encoder is deterministic and freezable, so it adds lift without adding recurring cost.
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["cross_industry", "compliance"]
+capability: ["retrieval", "reranking", "generation", "verification", "governance"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.chat"
+freshness: "stable"
+tags: ["retrieval-taxonomy", "bundle-a", "hybrid-rag", "cite-or-abstain"]
+created: "2026-05-29"
+updated: "2026-05-29"
+task: "Answer a question over a governed regulatory/knowledge corpus with per-claim citations, or abstain when the corpus does not support an answer."
+pipeline_kind: "serving"
+inputs:
+  - name: "query"
+    type: "string"
+  - name: "corpus"
+    type: "string|object"
+outputs:
+  - name: "answer"
+    type: "object"
+  - name: "citations"
+    type: "object[]"
+defaults:
+  model_adapter: "adapter/ollama-default"
+steps:
+  - id: "injection_screen"
+    kind: "processor"
+    ref: "processor/prompt-injection-screen"
+    inputs: { input: "$.inputs.query" }
+  - id: "retrieve_bm25"
+    kind: "processor"
+    ref: "processor/bm25-keyword-retrieve"
+    inputs: { query: "$.inputs.query", corpus: "$.inputs.corpus", top_k: 50 }
+  - id: "retrieve_dense"
+    kind: "processor"
+    ref: "processor/dense-vector-retrieve"
+    inputs: { query: "$.inputs.query", index: "$.inputs.corpus", top_k: 50 }
+  - id: "fuse"
+    kind: "processor"
+    ref: "processor/rrf-fusion"
+    inputs: { ranked_lists: ["$.steps.retrieve_bm25.output.candidates", "$.steps.retrieve_dense.output.candidates"], k: 60 }
+  - id: "rerank"
+    kind: "processor"
+    ref: "processor/cross-encoder-reranker"
+    inputs: { query: "$.inputs.query", candidates: "$.steps.fuse.output.fused_list", top_n: 10 }
+  - id: "dedupe"
+    kind: "processor"
+    ref: "processor/simhash-dedupe"
+    inputs: { candidates: "$.steps.rerank.output.reranked", threshold: 3 }
+  - id: "select"
+    kind: "processor"
+    ref: "processor/source-precedence-select"
+    inputs: { candidates: "$.steps.dedupe.output.deduped", policy: "primary_signed_valid_through_first" }
+  - id: "system_prompt"
+    kind: "processor"
+    ref: "processor/system-prompt-builder"
+    inputs: { task: "$.inputs.query", constraints: "cite every claim or abstain", schema: "answer+citations" }
+  - id: "place_context"
+    kind: "processor"
+    ref: "processor/context-placer-edge"
+    inputs: { chunks: "$.steps.select.output.selected", query: "$.inputs.query", instructions: "$.steps.system_prompt.output.system_prompt" }
+  - id: "answer"
+    kind: "adapter"
+    ref: "adapter/ollama-default"
+    inputs: { prompt: "$.steps.place_context.output.assembled_prompt", system: "$.steps.system_prompt.output.system_prompt" }
+  - id: "recover_json"
+    kind: "processor"
+    ref: "processor/json-repair-coerce"
+    inputs: { model_output: "$.steps.answer.output", schema: "answer+citations" }
+worked_example:
+  input:
+    query: "Under the EU AI Act, what technical documentation must a high-risk AI system maintain?"
+    corpus: "knowledge-corpus/eu-ai-act (Regulation (EU) 2024/1689, article-level)"
+  output:
+    answer:
+      decision: "Article 11 + Annex IV require technical documentation covering the system's purpose, design, training data governance, risk-management, and post-market monitoring."
+      abstained: false
+    citations:
+      - { source: "Regulation (EU) 2024/1689", locator: "Art. 11(1); Annex IV(1-9)", retrieved_by: "hybrid (BM25 + dense) → RRF → cross-encoder" }

@@ -1,0 +1,71 @@
+id: "tool/publisher-identity-verifier"
+type: tool
+version: "0.1.0"
+name: "Publisher identity verifier"
+description: "Verifies that a person, organization, agency, project, or delegated agent controls the claimed identity scope for signed knowledge publication."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "government", "cross_industry"]
+capability: ["verification", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "volatile"
+tags: ["identity", "signature", "publisher", "provenance", "signed-knowledge"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    publisher:
+      type: object
+    claimed_scope:
+      type: object
+    proofs:
+      type: array
+      items:
+        type: object
+      description: "DNS records, repository signatures, DIDs, certificates, OAuth domain proof, registry references, WebAuthn attestations, or manual review records."
+  required: ["publisher", "claimed_scope", "proofs"]
+returns:
+  type: object
+  properties:
+    publisher_id:
+      type: string
+    verification_status:
+      type: string
+      enum: ["verified", "rejected", "needs_review", "expired"]
+    trust_level:
+      type: string
+    verified_scopes:
+      type: array
+      items:
+        type: string
+    evidence:
+      type: array
+      items:
+        type: object
+side_effects: "external_call"
+examples:
+  - input:
+      publisher:
+        type: "person"
+        handle: "example-person"
+      claimed_scope:
+        subject: "personal-rag-profile"
+      proofs:
+        - method: "repository-signature"
+          url: "https://example.com/proof"
+    output:
+      publisher_id: "person/example-person"
+      verification_status: "needs_review"
+      trust_level: "self-signed"
+      verified_scopes: []
+      evidence: []
+implementations:
+  - kind: "callable"
+    path: "tools.publisher_identity_verifier.run"
+  - kind: "mcp"
+    path: "mcp/signed_knowledge.verify_publisher"

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/context-debt-item.schema.json",
+  "title": "Context debt item",
+  "description": "One unit of context debt — a known gap that degrades the governed context over time (unverified claim, stale pack, missing source handle, unresolved conflict, unowned object, unbenchmarked tool, missing harness, policy exception). Aggregated into a context_debt_score by scripts/context_debt.py.",
+  "type": "object",
+  "required": ["kind", "id", "debt_type", "severity", "subject", "detected_at"],
+  "properties": {
+    "kind": { "type": "string", "const": "baltor.context-debt-item.v1" },
+    "id": { "type": "string" },
+    "debt_type": { "type": "string", "enum": ["unverified_claim", "stale_pack", "missing_source_handle", "unresolved_conflict", "unowned_object", "unbenchmarked_tool", "missing_harness", "policy_exception", "low_confidence_parser_artifact"] },
+    "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+    "subject": { "type": "string", "description": "the object/handle/tool the debt is about" },
+    "detected_at": { "type": "string" },
+    "recommended_action": { "type": "string" },
+    "evidence": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": true
+}

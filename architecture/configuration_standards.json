@@ -1,0 +1,151 @@
+{
+  "version": "1.0",
+  "purpose": "Configuration standards: the canonical shape every Baltor config of a given type must satisfy. Config is the seam where operators tune the system WITHOUT editing code, so config drift is as dangerous as code drift. Every config type declares its schema, version, owner, and environment scope; provider configs declare an emulator + fallback (so a missing real provider degrades to a deterministic offline path, never a crash); connector configs declare tenant scope; retry policies declare DLQ behavior; sync policies declare a cursor + idempotency strategy. SECRET RULE (non-negotiable): no config may contain a raw secret value — only secret REFERENCES (env://… or secret://…), resolved at runtime by SecretsResolver. Templates live under templates/configs/<config_type>/. This file is the single source of the required-field rules enforced by scripts/check_configuration_standards.py.",
+  "secret_reference_schemes": ["env://", "secret://"],
+  "raw_secret_forbidden": true,
+  "required_fields_all": ["schema", "version", "owner", "environment_scope"],
+  "environment_scope_enum": ["local", "test", "demo", "staging", "production", "all"],
+  "templates_home": "templates/configs",
+  "config_types": [
+    {
+      "config_type": "tenant_policy",
+      "schema": "schemas/config/tenant_policy.v1.schema.json",
+      "version": "v1",
+      "owner": "platform-tenancy",
+      "environment_scope": "all",
+      "required_fields": ["schema", "version", "owner", "environment_scope", "tenant_id", "isolation_mode", "data_residency", "allowed_scopes"],
+      "rules": ["tenant_policy MUST name the tenant scope it governs", "isolation_mode must be one of strict|shared", "no raw secrets"],
+      "template": "templates/configs/tenant_policy/template.json"
+    },
+    {
+      "config_type": "source_connector_config",
+      "schema": "schemas/config/source_connector_config.v1.schema.json",
+      "version": "v1",
+      "owner": "ingestion",
+      "environment_scope": "all",
+      "required_fields": ["schema", "version", "owner", "environment_scope", "tenant_scope", "source_class", "auth_ref", "fallback_fixture"],
+      "rules": ["connector config MUST declare tenant_scope", "auth_ref must be a secret REF (env://… or secret://…), never a raw value", "MUST declare a fallback_fixture (deterministic offline source)"],
+      "template": "templates/configs/source_connector_config/template.json"
+    },
+    {
+      "config_type": "provider_config",
+      "schema": "schemas/config/provider_config.v1.schema.json",
+      "version": "v1",
+      "owner": "platform-providers",
+      "environment_scope": "all",
+      "required_fields": ["schema", "version", "owner", "environment_scope", "provider_id", "emulator", "fallback"],
+      "rules": ["provider config MUST declare an emulator (offline stand-in) and a fallback provider", "credentials only as secret REFs", "no raw secrets"],
+      "template": "templates/configs/provider_config/template.json"
+    },
+    {
+      "config_type": "sync_policy",
+      "schema": "schemas/config/sync_policy.v1.schema.json",
+      "version": "v1",
+      "owner": "ingestion",
+      "environment_scope": "all",
+      "required_fields": ["schema", "version", "owner", "environment_scope", "cursor_strategy", "idempotency_strategy", "sync_modes"],
+      "rules": ["sync policy MUST declare a cursor_strategy and an idempotency_strategy", "cursor_strategy in the connector-catalog cursor_strategy_enum", "no raw secrets"],
+      "template": "templates/configs/sync_policy/template.json"
+    },
+    {
+      "config_type": "watch_policy",
+      "schema": "schemas/config/watch_policy.v1.schema.json",
+      "version": "v1",
+      "owner": "watchtower",
+      "environment_scope": "all",
+      "required_fields": ["schema", "version", "owner", "environment_scope", "watch_interval_seconds", "freshness_ttl_seconds", "revocation_behavior"],
+      "rules": ["watch policy MUST declare a freshness TTL and a revocation behavior", "no raw secrets"],
+      "template": "templates/configs/watch_policy/template.json"
+    },
+    {
+      "config_type": "retry_policy",
+      "schema": "schemas/config/retry_policy.v1.schema.json",
+      "version": "v1",
+      "owner": "runtime-durable",
+      "environment_scope": "all",
+      "required_fields": ["schema", "version", "owner", "environment_scope", "max_attempts", "backoff", "dlq_behavior"],
+      "rules": ["retry policy MUST declare dlq_behavior (what happens after max_attempts)", "max_attempts is a finite integer (no infinite retry)", "no raw secrets"],
+      "template": "templates/configs/retry_policy/template.json"
+    },
+    {
+      "config_type": "queue_policy",
+      "schema": "schemas/config/queue_policy.v1.schema.json",
+      "version": "v1",
+      "owner": "runtime-durable",
+      "environment_scope": "all",
+      "required_fields": ["schema", "version", "owner", "environment_scope", "queue_name", "lease_seconds", "idempotency_required"],
+      "rules": ["queue policy MUST declare lease_seconds and whether idempotency is required", "no raw secrets"],
+      "template": "templates/configs/queue_policy/template.json"
+    },
+    {
+      "config_type": "rate_limit_policy",
+      "schema": "schemas/config/rate_limit_policy.v1.schema.json",
+      "version": "v1",
+      "owner": "platform-providers",
+      "environment_scope": "all",
+      "required_fields": ["schema", "version", "owner", "environment_scope", "requests_per_window", "window_seconds", "on_exceed"],
+      "rules": ["rate limit policy MUST declare an on_exceed behavior (backoff|reject|queue)", "no raw secrets"],
+      "template": "templates/configs/rate_limit_policy/template.json"
+    },
+    {
+      "config_type": "security_policy",
+      "schema": "schemas/config/security_policy.v1.schema.json",
+      "version": "v1",
+      "owner": "security",
+      "environment_scope": "all",
+      "required_fields": ["schema", "version", "owner", "environment_scope", "encryption_at_rest", "pii_redaction", "secret_resolution"],
+      "rules": ["security policy MUST declare encryption + PII redaction + secret resolution", "secret_resolution names the resolver scheme, never a key", "no raw secrets"],
+      "template": "templates/configs/security_policy/template.json"
+    },
+    {
+      "config_type": "object_store_config",
+      "schema": "schemas/config/object_store_config.v1.schema.json",
+      "version": "v1",
+      "owner": "platform-storage",
+      "environment_scope": "all",
+      "required_fields": ["schema", "version", "owner", "environment_scope", "backend", "fallback", "tenant_scoped"],
+      "rules": ["object store config MUST declare a fallback (local store) for offline determinism", "credentials only as secret REFs", "no raw secrets"],
+      "template": "templates/configs/object_store_config/template.json"
+    },
+    {
+      "config_type": "vector_store_config",
+      "schema": "schemas/config/vector_store_config.v1.schema.json",
+      "version": "v1",
+      "owner": "platform-storage",
+      "environment_scope": "all",
+      "required_fields": ["schema", "version", "owner", "environment_scope", "backend", "dimensions", "fallback"],
+      "rules": ["vector store config MUST declare a fallback (local deterministic store)", "dimensions imported from the shared schema dimension constant (no parallel literal)", "no raw secrets"],
+      "template": "templates/configs/vector_store_config/template.json"
+    },
+    {
+      "config_type": "llm_provider_config",
+      "schema": "schemas/config/llm_provider_config.v1.schema.json",
+      "version": "v1",
+      "owner": "llm-gateway",
+      "environment_scope": "all",
+      "required_fields": ["schema", "version", "owner", "environment_scope", "provider_id", "api_key_ref", "emulator", "fallback"],
+      "rules": ["api_key_ref MUST be a secret REF (env://OPENAI_API_KEY style), never a raw key", "MUST declare an emulator (offline stub) and a fallback provider", "vendor SDK lives only behind the gateway", "no raw secrets"],
+      "template": "templates/configs/llm_provider_config/template.json"
+    },
+    {
+      "config_type": "optimization_policy",
+      "schema": "schemas/config/optimization_policy.v1.schema.json",
+      "version": "v1",
+      "owner": "optimization",
+      "environment_scope": "all",
+      "required_fields": ["schema", "version", "owner", "environment_scope", "regression_gate", "promote_threshold", "answer_coverage_floor"],
+      "rules": ["optimization policy MUST declare a regression_gate and an answer_coverage_floor", "promote_threshold cannot waive the answer-coverage floor", "no raw secrets"],
+      "template": "templates/configs/optimization_policy/template.json"
+    },
+    {
+      "config_type": "reconciliation_policy",
+      "schema": "schemas/config/reconciliation_policy.v1.schema.json",
+      "version": "v1",
+      "owner": "reconciliation",
+      "environment_scope": "all",
+      "required_fields": ["schema", "version", "owner", "environment_scope", "authority_order", "freshness_window_seconds", "held_out_on_loss"],
+      "rules": ["reconciliation policy MUST declare authority_order and freshness_window_seconds", "held_out_on_loss MUST be true (the loser is never dropped silently)", "no raw secrets"],
+      "template": "templates/configs/reconciliation_policy/template.json"
+    }
+  ]
+}

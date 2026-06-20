@@ -1,0 +1,70 @@
+id: "tool/expert-email-review-campaign-manager"
+type: tool
+version: "0.1.0"
+name: "Expert email review campaign manager"
+description: "Creates consent-aware expert review campaigns for knowledge objects, sends small structured questions, tracks responses, unsubscribe/suppression state, and evidence requirements without publishing private contact data."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "government", "humanitarian", "legal", "cross_industry"]
+capability: ["verification", "governance", "routing", "tool_use"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "volatile"
+tags: ["expert-review", "email", "civil-society", "consent", "review-campaign"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    knowledge_object:
+      type: object
+    question_template:
+      type: string
+    reviewer_pool_ref:
+      type: string
+      description: "Reference to a tenant-private or verified reviewer pool; do not embed raw email addresses in public components."
+    contact_policy:
+      type: object
+    due_date:
+      type: string
+  required: ["knowledge_object", "question_template", "reviewer_pool_ref", "contact_policy"]
+returns:
+  type: object
+  properties:
+    campaign_id:
+      type: string
+    sent_count:
+      type: integer
+    blocked_count:
+      type: integer
+    review_questions:
+      type: array
+      items:
+        type: object
+    warnings:
+      type: array
+      items:
+        type: string
+side_effects: "external_call"
+examples:
+  - input:
+      knowledge_object:
+        object_id: "knowledge-object/example"
+        risk_tier: "high"
+      question_template: "Does this context fact make sense to you?"
+      reviewer_pool_ref: "tenant-private/reviewer-pool/civil-society"
+      contact_policy:
+        require_opt_in: true
+        suppress_unsubscribed: true
+    output:
+      campaign_id: "expert-review-campaign-example"
+      sent_count: 0
+      blocked_count: 0
+      review_questions: []
+      warnings: ["Example only; no email sent."]
+implementations:
+  - kind: "mcp"
+    path: "mcp/expert_review.create_campaign"

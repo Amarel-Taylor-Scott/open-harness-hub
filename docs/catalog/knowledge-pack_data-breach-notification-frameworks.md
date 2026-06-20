@@ -1,0 +1,18 @@
+# Data Breach Notification frameworks
+
+*knowledge-pack* · `knowledge-pack/data-breach-notification-frameworks` · v0.1.0 · experimental
+
+Composite benchmark and review context pack for data breach notification workflows.
+
+| axis | value |
+|---|---|
+| industry | privacy, security.defensive |
+| capability | retrieval, verification |
+| modality | text |
+| lifecycle | experimental |
+| trust_boundary | local |
+| freshness | dated |
+| license | CC-BY-4.0 |
+
+
+

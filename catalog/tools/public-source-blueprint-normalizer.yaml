@@ -1,0 +1,64 @@
+id: "tool/public-source-blueprint-normalizer"
+type: tool
+version: "0.1.0"
+name: "Public source blueprint normalizer"
+description: "Normalizes public source blueprints into source-scan jobs, archive-capture policies, extraction contracts, review triggers, and candidate primitive routing metadata."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["automotive", "energy", "manufacturing", "construction", "government", "cross_industry"]
+capability: ["retrieval", "extraction", "classification", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "volatile"
+tags: ["public-sources", "scraper-blueprints", "source-governance", "object-factory"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    public_source_blueprints:
+      type: array
+      items:
+        type: object
+    scan_policy:
+      type: object
+    excluded_scopes:
+      type: array
+      items:
+        type: string
+  required: ["public_source_blueprints"]
+returns:
+  type: object
+  properties:
+    scan_jobs:
+      type: array
+      items:
+        type: object
+    extraction_contracts:
+      type: array
+      items:
+        type: object
+    review_routes:
+      type: array
+      items:
+        type: object
+side_effects: "write"
+examples:
+  - input:
+      public_source_blueprints:
+        - id: "labor-agency-fee-rule-blueprint"
+          vertical: "employment_agency.fee_rules"
+      excluded_scopes: ["insurance"]
+    output:
+      scan_jobs:
+        - source_family: "labor-agency-fee-rule-blueprint"
+      extraction_contracts: []
+      review_routes: []
+implementations:
+  - kind: "mcp"
+    path: "mcp/factory.normalize_public_source_blueprints"
+  - kind: "callable"
+    path: "tools.public_source_blueprint_normalizer.run"

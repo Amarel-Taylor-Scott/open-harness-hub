@@ -1,0 +1,23 @@
+{
+  "$id": "agents/AgentCapabilityConsumer.v1",
+  "title": "AgentCapabilityConsumer.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "An AI AGENT registered as a CUSTOMER of the Teleon Agent Capability Gateway. MCP connects agents to tools; Teleon turns tools into governed, deterministic CapabilityTasks the agent calls instead of burning frontier tokens re-solving repeatable workflows. This is the consumer's BOUNDARY declaration: which capabilities it may call (allowed_capabilities), which tools are denied (forbidden_tools), the boundary_policy that governs what it can reach, and a secret_policy that carries secret REFERENCES only (env://<NAME>) — NEVER secret values. Law: agents ASK, Teleon EXECUTES, Baltor governs truth; a consumer can never self-expand its own boundary (that requires an AgentBoundaryExpansionRequest held for human approval) and an agent/LLM output is never served truth.",
+  "required": [
+    "consumer_id",
+    "kind",
+    "allowed_capabilities",
+    "forbidden_tools",
+    "boundary_policy",
+    "secret_policy"
+  ],
+  "properties": {
+    "consumer_id": {"type": "string", "description": "stable id of the agent consumer (the customer calling the gateway)"},
+    "kind": {"type": "string", "enum": ["claude_code", "codex", "openclaw", "hermes", "openhands", "vertical_saas", "company_brain", "baltor_agent", "custom"], "description": "the class of agent consumer; OpenClaw/Hermes/OpenHands-style runtimes are CANDIDATES, never executed here — this only classifies the calling customer"},
+    "allowed_capabilities": {"type": "array", "items": {"type": "string"}, "description": "explicit allowlist of capability_ids this consumer may call (deny-by-default — a capability not listed cannot be invoked)"},
+    "forbidden_tools": {"type": "array", "items": {"type": "string"}, "description": "explicit tool denylist; a tool here is rejected even if a capability would otherwise reach it"},
+    "boundary_policy": {"type": "object", "description": "the consumer's boundary governance object (e.g. {can_self_expand: false, requires_human_for_boundary_change: true, max_cost_per_run, allowed_domains}) — the agent cannot self-expand purpose/secrets/domains; widening the boundary requires an AgentBoundaryExpansionRequest held for human approval"},
+    "secret_policy": {"type": "object", "description": "secret REFERENCES only (e.g. {refs: [\"env://<NAME>\"]}) — NEVER secret values; resolved only at the runtime boundary by an authorized resolver, never exposed to the agent"}
+  }
+}

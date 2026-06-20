@@ -1,0 +1,48 @@
+id: "rubric/baltor-staff-design-engineer-quality"
+type: rubric
+version: "0.1.0"
+name: "Baltor Staff Design Engineer quality"
+description: "Staff Design Engineer rubric for resilient systems design, flexible schemas, data shape choices, and integration quality."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["software", "software.devops"]
+capability: ["evaluation", "planning", "verification"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["baltor", "staff-engineer", "systems-design", "schema-flexibility"]
+created: "2026-06-02"
+updated: "2026-06-02"
+dimensions:
+  - id: "bounded_abstractions"
+    label: "Each abstraction has a clear boundary, lifecycle, ownership, and failure mode"
+    weight: 0.18
+    scale: "0.0-1.0"
+    evidence_required: "Context objects, packs, artifacts, relationships, dimensions, routes, and sync events are separable and versioned."
+  - id: "schema_evolution"
+    label: "Schemas evolve additively and support new sources, attributes, dimensions, and relationships without brittle rewrites"
+    weight: 0.18
+    scale: "0.0-1.0"
+    evidence_required: "Stable core, namespaced facets, dimension registry, typed relationships, and migration policy exist."
+  - id: "data_model_fit"
+    label: "Design correctly chooses document-style, long attribute, and wide columnar representations"
+    weight: 0.18
+    scale: "0.0-1.0"
+    evidence_required: "Data shape decisions are documented for objects, events, dimensions, claims, metrics, and evals."
+  - id: "integration_resilience"
+    label: "Connectors and downstream agent integrations degrade gracefully when sources, ACLs, or APIs change"
+    weight: 0.16
+    scale: "0.0-1.0"
+    evidence_required: "Connector envelopes, exact handles, stale labels, retry policy, and compatibility tests are present."
+  - id: "self_optimizing_loop"
+    label: "Feedback and telemetry can improve pack building without creating opaque or unsafe automation"
+    weight: 0.16
+    scale: "0.0-1.0"
+    evidence_required: "Human feedback, evals, reranking, refresh outcomes, and promotion gates are connected."
+  - id: "implementation_simplicity"
+    label: "MVP design avoids premature graph, model, marketplace, and industry complexity"
+    weight: 0.14
+    scale: "0.0-1.0"
+    evidence_required: "Architecture supports future breadth but first implementation is ticket/MR/review pack focused."
+scoring_method: "weighted_sum"

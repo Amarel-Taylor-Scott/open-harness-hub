@@ -1,0 +1,36 @@
+{
+  "version": "1.0",
+  "purpose": "The CapabilityTask/PurposeTask ADAPTATION LADDER (doctrine: docs/standards/capability-task-architecture-doctrine.md). Risk-tiered levels L0..L5 map a change type to the GATE it must pass and whether a HUMAN must approve. Encodes the CORE INVARIANT: a task may adapt its MEANS (L0-L3, auto if gates pass) but may NEVER autonomously change its ENDS (L5, always human-gated). Deny-by-default: an UNKNOWN change type is treated as L5 (human-gated), never auto. Single source — the classifier (src/baltor/purpose_tasks/adaptation_ladder.py) + the proof read this; no parallel literal.",
+  "control_rule": "Branch on the numeric LEVEL + the gate, never on a change-name string. Higher level ⇒ stricter gate; auto-promotion is only for L0-L3 (MEANS) and only when the gate passes; L4-L5 (decomposition / ENDS) always require a human.",
+  "levels": [
+    {"level": 0, "name": "runtime_tuning", "gate": "auto_on_metrics", "requires_human": false,
+     "change_types": ["timeout.patch", "memory.patch", "concurrency.patch", "retry.patch", "batch_size.patch", "cache_ttl.patch"],
+     "note": "low risk; auto-promote on metrics"},
+    {"level": 1, "name": "runtime_rebind", "gate": "cost_latency_reliability_evals", "requires_human": false,
+     "change_types": ["runtime.rebind"],
+     "note": "function↔worker↔job↔GPU; needs cost/latency/reliability evals"},
+    {"level": 2, "name": "config_repair", "gate": "regression_plus_shadow", "requires_human": false,
+     "change_types": ["selector.patch", "parser.patch", "prompt.patch", "api_param.patch", "schema_map.patch", "retry_policy.patch"],
+     "note": "needs regression tests + shadow traffic"},
+    {"level": 3, "name": "implementation_candidate", "gate": "full_eval_provenance_canary_rollback", "requires_human": false,
+     "change_types": ["implementation.generate_candidate", "workflow.patch", "tool_sequence.patch", "model.swap_within_allowed"],
+     "note": "new code/workflow/tool sequence; full eval + provenance + canary + rollback"},
+    {"level": 4, "name": "capability_decomposition", "gate": "human_approval", "requires_human": true,
+     "change_types": ["decompose_task", "add_validator_task", "add_fallback_task", "add_human_review_task"],
+     "note": "structural change to the capability graph; human approval"},
+    {"level": 5, "name": "boundary_expansion", "gate": "human_approval", "requires_human": true,
+     "change_types": ["purpose.change", "permission.expand", "connected_system.add", "external_domain.add",
+                      "secret.add", "data_class.increase", "destructive_action.enable", "model_provider.change",
+                      "new_runtime_class", "risk_class.increase", "approval_requirement.change"],
+     "note": "redraws the box (the ENDS); ALWAYS human-approved"}
+  ],
+  "forbidden_autonomous": [
+    "success_criteria.weaken", "eval_suite.remove", "observability.disable", "rollback.remove",
+    "regression_test.remove", "source_handle.drop", "tenant_isolation.change"
+  ],
+  "_forbidden_note": "These can NEVER be an autonomous candidate adaptation (they weaken the contract / hide the truth). Changing them at all is a deliberate human CapabilityBoundaryChange to the contract itself (L5), never a candidate promotion. The classifier returns may_auto_promote=false for them.",
+  "ends_change_types": ["purpose.change", "permission.expand", "connected_system.add", "external_domain.add",
+                        "secret.add", "data_class.increase", "risk_class.increase", "approval_requirement.change",
+                        "success_criteria.weaken"],
+  "_ends_note": "The CORE INVARIANT set — every 'ends' change must be human-gated (L5) or forbidden; none may auto-promote."
+}

@@ -1,0 +1,48 @@
+id: "rubric/baltor-chief-customer-experience-quality"
+type: rubric
+version: "0.1.0"
+name: "Baltor Chief Customer Experience quality"
+description: "Chief Customer Experience rubric for onboarding, supportability, trust, and customer outcome clarity."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["software", "customer_success"]
+capability: ["evaluation", "verification", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["baltor", "customer-experience", "support", "onboarding"]
+created: "2026-06-02"
+updated: "2026-06-02"
+dimensions:
+  - id: "time_to_first_value"
+    label: "Customer can connect sources and generate a useful first pack quickly"
+    weight: 0.22
+    scale: "0.0-1.0"
+    evidence_required: "Setup path, required permissions, sample pack, and first-use workflow are clear and tested."
+  - id: "customer_outcome_reporting"
+    label: "Customer can see whether packs improve cycle time, review confidence, freshness, and agent quality"
+    weight: 0.18
+    scale: "0.0-1.0"
+    evidence_required: "Dashboards show usage, usefulness, stale context caught, source expansions, and outcome deltas."
+  - id: "trust_and_explainability"
+    label: "Customer-facing explanations make source handles, policy denials, and freshness understandable"
+    weight: 0.18
+    scale: "0.0-1.0"
+    evidence_required: "Docs and UI explain why context was included, excluded, stale, refreshed, or denied."
+  - id: "support_diagnostics"
+    label: "Support teams can troubleshoot connectors, sync, queues, packs, permissions, and cloud hosting issues"
+    weight: 0.16
+    scale: "0.0-1.0"
+    evidence_required: "Support-safe diagnostic bundle includes route health, connector state, queue status, trace IDs, and config summaries."
+  - id: "change_resilience"
+    label: "Customer experience remains stable as sources, schemas, cloud deployments, and agent tools change"
+    weight: 0.14
+    scale: "0.0-1.0"
+    evidence_required: "Backward-compatible contracts, migration notices, and feature flags prevent surprise breakage."
+  - id: "feedback_loop"
+    label: "Customer feedback on stale, missing, excessive, or wrong context directly improves future packs"
+    weight: 0.12
+    scale: "0.0-1.0"
+    evidence_required: "Pack-level and source-level feedback are captured and tied to refresh/reranking/eval actions."
+scoring_method: "weighted_sum"

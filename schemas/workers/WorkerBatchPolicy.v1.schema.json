@@ -1,0 +1,26 @@
+{
+  "$id": "workers/WorkerBatchPolicy.v1",
+  "title": "WorkerBatchPolicy",
+  "description": "Batch threshold + max-wait (anti-starvation).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "batch_policy_id": {
+      "type": "string"
+    },
+    "batch_min": {
+      "type": "number"
+    },
+    "max_wait_seconds": {
+      "type": "number"
+    },
+    "schedule_window": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "batch_policy_id",
+    "batch_min",
+    "max_wait_seconds"
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/context-local-memory-profile.schema.json",
+  "title": "Context local memory profile",
+  "description": "Local-first encrypted memory profile for offline agent memory and encrypted sync. E2EE memory is locally searchable; company cloud search requires a separate company-readable context tier.",
+  "type": "object",
+  "required": ["kind", "local_memory_profile_id", "memory_class", "storage", "encryption", "search", "sync", "created_at"],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "baltor.context-local-memory-profile.v1"
+    },
+    "local_memory_profile_id": {
+      "type": "string"
+    },
+    "memory_class": {
+      "type": "string",
+      "enum": ["private_local", "team_encrypted", "repo_encrypted", "org_approved_cache", "company_context", "custom"]
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "storage": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "encryption": {
+      "type": "object",
+      "required": ["mode"],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["local_only", "end_to_end_sync", "company_managed", "none", "custom"]
+        }
+      },
+      "additionalProperties": true
+    },
+    "search": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "sync": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,48 @@
+id: "rubric/baltor-chief-expense-officer-quality"
+type: rubric
+version: "0.1.0"
+name: "Baltor Chief Expense Officer quality"
+description: "Chief Expense Officer rubric for cost discipline, cloud efficiency, and avoiding expensive fragile architecture."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["software", "finance", "sre"]
+capability: ["evaluation", "verification", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["baltor", "expense", "cloud-cost", "efficiency"]
+created: "2026-06-02"
+updated: "2026-06-02"
+dimensions:
+  - id: "unit_economics"
+    label: "Cost per useful context pack is measurable and trends toward sustainable gross margin"
+    weight: 0.22
+    scale: "0.0-1.0"
+    evidence_required: "Pack cost includes connector fetch, storage, embedding, reranking, model calls, worker time, and support load."
+  - id: "compute_tiering"
+    label: "Architecture uses deterministic and cheap local/open processing before expensive models or frontier calls"
+    weight: 0.18
+    scale: "0.0-1.0"
+    evidence_required: "Routing policy favors validators, cached artifacts, and local rerankers before expensive review tiers."
+  - id: "storage_efficiency"
+    label: "Document, long attribute, and wide columnar storage choices minimize waste while preserving query flexibility"
+    weight: 0.16
+    scale: "0.0-1.0"
+    evidence_required: "Raw blobs, normalized objects, dimensions, events, and metrics have separate retention and storage plans."
+  - id: "cloud_cost_controls"
+    label: "Cloud deployment has budget limits, autoscaling rules, queue backpressure, and retention controls"
+    weight: 0.16
+    scale: "0.0-1.0"
+    evidence_required: "Budgets, usage caps, drain estimates, storage lifecycle, model-call quotas, and alerts are documented."
+  - id: "reuse_and_cache"
+    label: "System reuses context packs, source handles, embeddings, repo wiki artifacts, and validation results where safe"
+    weight: 0.14
+    scale: "0.0-1.0"
+    evidence_required: "Cache keys include version, ACL, policy, freshness, model/reranker version, and tenant scope."
+  - id: "scope_control"
+    label: "MVP avoids expensive broad-platform features before paid demand is proven"
+    weight: 0.14
+    scale: "0.0-1.0"
+    evidence_required: "Industry packs, marketplace, full graph UI, and heavy model-routing investments are explicitly deferred."
+scoring_method: "weighted_sum"

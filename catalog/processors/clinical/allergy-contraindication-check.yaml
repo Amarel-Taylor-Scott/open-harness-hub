@@ -1,0 +1,53 @@
+id: processor/allergy-contraindication-check
+type: processor
+version: 0.1.0
+name: Allergy / contraindication check
+description: 'Check ordered medications/procedures against the patient''s documented allergies and contraindicated
+  conditions (e.g. NSAID with CKD, penicillin allergy). Deterministic conflict detection with the documented
+  source — blocks contraindicated orders, routes to review.
+
+
+  Clinical decision-SUPPORT component — DEFENSIVE only: grounds on a governed corpus, fires a deterministic
+  gate, and/or routes to a clinician; never autonomous medical advice. Lift is measured at the pipeline
+  level.'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- healthcare
+capability:
+- verification
+- safety_gating
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- clinical
+- decision-support
+- deterministic-gate
+- freezable
+- governed
+created: '2026-05-29'
+updated: '2026-05-29'
+process_kind: verify.allergy_contraindication
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: orders
+  type: object
+- name: allergies
+  type: object
+- name: conditions
+  type: object
+outputs:
+- name: conflicts
+  type: object
+side_effects: read
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.clinical.allergy_contraindication_check.run
+  language: python

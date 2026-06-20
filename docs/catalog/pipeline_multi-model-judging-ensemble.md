@@ -32,7 +32,7 @@ perplexity baseline or judge, weighted-blend for final answer.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `per_model_inference` | processor | `processor/action-sampler-multi-rollout` | — |
-| 3 | `blend` | processor | `processor/multi-vector-fusion` | — |
+| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `per_model_inference` | processor | `processor/action-sampler-multi-rollout` | - |
+| 3 | `blend` | processor | `processor/multi-vector-fusion` | - |
 

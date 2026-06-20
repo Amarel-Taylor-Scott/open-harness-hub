@@ -1,0 +1,79 @@
+id: "tool/public-source-scan-job-emitter"
+type: tool
+version: "0.1.0"
+name: "Public source scan job emitter"
+description: "Converts public-source blueprints into queue-ready object-factory jobs and shard manifests for discovery, snapshot, conversion, ingest, entity-linking, dedupe, indexing, and review workers."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["automotive", "energy", "manufacturing", "construction", "government", "cross_industry"]
+capability: ["retrieval", "extraction", "governance", "routing", "evaluation"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+tags: ["public-sources", "object-factory", "worker-jobs", "shards", "queue-ready"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    blueprints:
+      type: array
+      items:
+        type: object
+    output_dir:
+      type: string
+    tenant_id:
+      type: string
+    scan_policy:
+      type: object
+    excluded_scopes:
+      type: array
+      items:
+        type: string
+  required: ["blueprints"]
+returns:
+  type: object
+  properties:
+    output_dir:
+      type: string
+    blueprint_count:
+      type: integer
+    shard_count:
+      type: integer
+    job_count:
+      type: integer
+    job_counts_by_type:
+      type: object
+    files:
+      type: object
+    warnings:
+      type: array
+      items:
+        type: string
+side_effects: "write"
+examples:
+  - input:
+      blueprints:
+        - id: "municipal-plumbing-hvac-permit-blueprint"
+          vertical: "construction.plumbing_hvac"
+      scan_policy:
+        cadence: "weekly"
+        max_records_per_blueprint: 250
+        max_usd_per_blueprint: 3
+      excluded_scopes: ["insurance"]
+    output:
+      blueprint_count: 1
+      shard_count: 1
+      job_count: 8
+      job_counts_by_type:
+        source_discovery: 1
+        publish_review: 1
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.public_source_scan_jobs.emit_public_source_scan_jobs"
+    language: "python"
+  - kind: "mcp"
+    path: "mcp/factory.emit_public_source_scan_jobs"

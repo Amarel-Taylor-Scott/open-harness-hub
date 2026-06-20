@@ -1,0 +1,35 @@
+id: "benchmark/aviation-sms-risk-register-bench"
+type: benchmark
+version: "0.1.0"
+name: "Aviation SMS Risk Register benchmark"
+description: "Synthetic benchmark for aviation sms risk register review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["aviation.safety", "aviation.maintenance"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["aviation-sms-risk-register", "expansion-v7"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/aviation-sms-risk-register-review"
+dataset: "dataset/aviation-sms-risk-register-samples"
+rubric: "rubric/aviation-sms-risk-register-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/aviation-sms-risk-register-review"
+    rule_pack_override: ["rule-pack/grep-aviation-sms-risk-register-flags", "rule-pack/rag-aviation-sms-risk-register-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 31
+report:
+  output: "dist/benchmarks/aviation-sms-risk-register/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

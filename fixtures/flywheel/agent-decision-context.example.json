@@ -1,0 +1,21 @@
+{
+  "kind": "baltor.decision-context.v1",
+  "id": "dctx.context-rot.refresh-decision.0001",
+  "purpose": "Decide whether to refresh, hold, or serve-with-warning a stale OFAC-derived sanctions pack.",
+  "actor": "agent:context-rot-decider",
+  "scope": "pack:ctx://baltor/pack/sanctions-screening",
+  "five_w_one_h": {"why": {"goals": ["never serve a stale would-be-violation"]}},
+  "evidence": [
+    {"source_handle": "ctx://ofac/sdn"},
+    {"source_handle": "ctx://baltor/pack/sanctions-screening"}
+  ],
+  "risk": "high",
+  "constraints": ["no source-system writes", "read-only fetch only"],
+  "allowed_tools": ["context_rot.assess", "ecfr_feed.changed_since"],
+  "latency_budget_ms": 5000,
+  "stop_conditions": ["a would_be_violation is detected", "confidence below 0.6"],
+  "human_review_triggers": ["permission_changed", "contradiction_found"],
+  "policy_ref": "policy:serve-pack.v1",
+  "created_at": "2026-06-04T00:00:00Z",
+  "valid_until": "2026-06-04T01:00:00Z"
+}

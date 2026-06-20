@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/index-record.schema.json",
+  "title": "Index record",
+  "description": "Derived search/index record emitted from a catalog component, source record, normalized object, or canonical entity.",
+  "type": "object",
+  "required": ["index_record_id", "index_kind", "subject_id", "text"],
+  "properties": {
+    "index_record_id": { "type": "string" },
+    "index_kind": {
+      "type": "string",
+      "enum": ["keyword", "vector", "graph", "facet", "freshness", "quality", "cost"]
+    },
+    "subject_id": { "type": "string" },
+    "subject_type": { "type": "string" },
+    "text": { "type": "string" },
+    "metadata": { "type": "object" },
+    "embedding_model": { "type": "string" },
+    "embedding_ref": { "type": "string" },
+    "graph_edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["src_id", "dst_id", "role"],
+        "properties": {
+          "src_id": { "type": "string" },
+          "dst_id": { "type": "string" },
+          "role": { "type": "string" },
+          "confidence": { "type": "number" }
+        }
+      }
+    }
+  }
+}

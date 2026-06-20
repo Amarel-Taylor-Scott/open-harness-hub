@@ -94,7 +94,7 @@ same YAML.
 ## What the hub does that Agent Skills can't
 
 These are the hub features that have no place in a SKILL.md folder and
-that justify keeping the hub catalog as the primary artifact:
+that justify keeping the hub catalog as the primary component:
 
 - **Composition**: a `pipeline/research-entity` is a DAG of 6 steps
   across multiple harnesses, rule packs, tools, and knowledge packs. A
@@ -123,7 +123,7 @@ them):
 - No compliance metadata.
 - No cross-emit to MCP, Croissant, HF cards, lm-eval-harness,
   CycloneDX-ML.
-- No catalog browser / vector index / faceted search across artifact
+- No catalog browser / vector index / faceted search across component
   types beyond skills.
 
 What we'd gain: a smaller mental model and zero translation step. The

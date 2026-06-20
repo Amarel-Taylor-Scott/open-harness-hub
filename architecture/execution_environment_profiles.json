@@ -1,0 +1,954 @@
+{
+  "version": "1.0",
+  "purpose": "Shared execution-environment profiles for every abstract Teleon runtime class. Profiles capture pre-autotune defaults, requirements, policy preferences, route preferences, and immutable trust-boundary locks before a concrete cloud/K8s/local backend is selected. WIRING STATUS: these are AUTHORED defaults + guardrails validated by check_teleon_execution_environment_taxonomy; they are NOT yet consumed by the live egress/route selection callers (which pass route_policy_id explicitly to decide_route). Wiring profile.policy_preferences into selection is a tracked follow-up — this file is the authored target, not yet the runtime source.",
+  "control_rule": "A worker declares a runtime_class and worker bucket. The profile supplies portable defaults and guardrails; the runtime binding and backend selector may tune only the allowed knobs. Autotuning never changes tenant scope, source authority, secret policy, egress restrictions, or truth authority.",
+  "surface_family_enum": [
+    "function",
+    "serverless_container",
+    "kubernetes",
+    "durable_workflow",
+    "browser_pool",
+    "gpu_pool",
+    "stream",
+    "local"
+  ],
+  "state_model_enum": [
+    "stateless",
+    "ephemeral",
+    "warm_pool",
+    "durable",
+    "stateful_singleton"
+  ],
+  "trigger_model_enum": [
+    "http",
+    "event",
+    "queue",
+    "schedule",
+    "manual",
+    "stream",
+    "workflow"
+  ],
+  "autotuning_policy_templates": {
+    "default_safe_autotune": {
+      "allowed_knobs": [
+        "backend_order_within_eligible_set",
+        "concurrency",
+        "timeout_within_sla",
+        "max_replicas",
+        "keepalive_seconds",
+        "batch_policy_id",
+        "resource_class_upward_only"
+      ],
+      "forbidden_knobs": [
+        "trust_boundary",
+        "tenant_scope",
+        "secret_policy",
+        "source_authority",
+        "egress_blocklist",
+        "serves_truth"
+      ],
+      "promotion_gate": "parallel_path_evidence_required",
+      "requires_baseline_rollback": true
+    },
+    "pool_safe_autotune": {
+      "allowed_knobs": [
+        "backend_order_within_eligible_set",
+        "concurrency",
+        "timeout_within_sla",
+        "min_replicas_within_policy",
+        "max_replicas",
+        "keepalive_seconds",
+        "batch_policy_id",
+        "resource_class_upward_only"
+      ],
+      "forbidden_knobs": [
+        "trust_boundary",
+        "tenant_scope",
+        "secret_policy",
+        "source_authority",
+        "egress_blocklist",
+        "serves_truth"
+      ],
+      "promotion_gate": "parallel_path_evidence_required",
+      "requires_baseline_rollback": true
+    },
+    "sandbox_or_browser_safe_autotune": {
+      "allowed_knobs": [
+        "backend_order_within_eligible_set",
+        "max_replicas",
+        "keepalive_seconds",
+        "timeout_within_sla",
+        "resource_class_upward_only"
+      ],
+      "forbidden_knobs": [
+        "trust_boundary",
+        "tenant_scope",
+        "secret_policy",
+        "source_authority",
+        "egress_blocklist",
+        "serves_truth",
+        "domain_allowlist",
+        "network_policy",
+        "sandbox_isolation"
+      ],
+      "promotion_gate": "redteam_and_parallel_path_required",
+      "requires_baseline_rollback": true
+    },
+    "gpu_safe_autotune": {
+      "allowed_knobs": [
+        "backend_order_within_eligible_set",
+        "batch_policy_id",
+        "max_replicas",
+        "timeout_within_sla",
+        "gpu_class_upward_only"
+      ],
+      "forbidden_knobs": [
+        "trust_boundary",
+        "tenant_scope",
+        "secret_policy",
+        "source_authority",
+        "egress_blocklist",
+        "serves_truth",
+        "model_license_policy"
+      ],
+      "promotion_gate": "cost_quality_regression_gate_required",
+      "requires_baseline_rollback": true
+    },
+    "durable_workflow_safe_autotune": {
+      "allowed_knobs": [
+        "backend_order_within_eligible_set",
+        "retry_policy_within_contract",
+        "activity_concurrency",
+        "timeout_within_sla",
+        "max_parallel_activities"
+      ],
+      "forbidden_knobs": [
+        "trust_boundary",
+        "tenant_scope",
+        "secret_policy",
+        "source_authority",
+        "egress_blocklist",
+        "serves_truth",
+        "durable_ledger_source"
+      ],
+      "promotion_gate": "idempotency_replay_and_parallel_path_required",
+      "requires_baseline_rollback": true
+    }
+  },
+  "profiles": [
+    {
+      "runtime_class": "edge-function",
+      "surface_family": "function",
+      "execution_shape": "request_response_edge",
+      "default_local_backend": "local_function_emulator@v1",
+      "preferred_candidate_backends": [
+        "cloudflare_workers@candidate"
+      ],
+      "requirements": {
+        "min_resource_class": "tiny_cpu",
+        "requires_gpu": false,
+        "requires_browser": false,
+        "state_model": "stateless",
+        "trigger_models": [
+          "http",
+          "event"
+        ],
+        "supports_scale_to_zero": true,
+        "max_duration_class": "short",
+        "network_policy_default": "deny_by_default_allowlisted_egress"
+      },
+      "policy_preferences": {
+        "default_lifecycle_policy_id": "cold_start_each_task",
+        "default_sla_policy_id": "interactive_10s",
+        "egress_route_policy_id": "direct_public_internet",
+        "identity_mode": "short_lived_worker_identity",
+        "secret_access_default": false,
+        "tenant_data_access_default": false
+      },
+      "pre_autotune_defaults": {
+        "concurrency_source": "worker_resource_classes.tiny_cpu.concurrency_default",
+        "timeout_source": "worker_resource_classes.tiny_cpu.timeout_default_s",
+        "scale_to_zero": true,
+        "min_instances": 0
+      },
+      "autotuning_policy_id": "default_safe_autotune",
+      "observability": {
+        "required_receipts": [
+          "RuntimeClassBinding.v1",
+          "ExecutionProviderDecision",
+          "EventEnvelope.v1"
+        ],
+        "egress_observation_required_when_outbound": true,
+        "serves_truth": false
+      },
+      "preferred_when": [
+        "cheap request transforms",
+        "auth checks",
+        "simple fetches near users"
+      ],
+      "avoid_when": [
+        "browser automation",
+        "GPU/model loads",
+        "long-running jobs",
+        "private customer network access"
+      ]
+    },
+    {
+      "runtime_class": "cloud-function",
+      "surface_family": "function",
+      "execution_shape": "event_handler",
+      "default_local_backend": "local_function_emulator@v1",
+      "preferred_candidate_backends": [
+        "aws_lambda@candidate",
+        "gcp_cloud_function@candidate",
+        "gcp_cloud_run_function@candidate",
+        "azure_function@candidate"
+      ],
+      "requirements": {
+        "min_resource_class": "tiny_cpu",
+        "requires_gpu": false,
+        "requires_browser": false,
+        "state_model": "stateless",
+        "trigger_models": [
+          "http",
+          "event",
+          "queue"
+        ],
+        "supports_scale_to_zero": true,
+        "max_duration_class": "short-medium",
+        "network_policy_default": "deny_by_default_allowlisted_egress"
+      },
+      "policy_preferences": {
+        "default_lifecycle_policy_id": "cold_start_each_task",
+        "default_sla_policy_id": "interactive_30s",
+        "egress_route_policy_id": "direct_public_internet",
+        "identity_mode": "workload_identity_or_function_role",
+        "secret_access_default": false,
+        "tenant_data_access_default": false
+      },
+      "pre_autotune_defaults": {
+        "concurrency_source": "worker_resource_classes.tiny_cpu.concurrency_default",
+        "timeout_source": "worker_resource_classes.tiny_cpu.timeout_default_s",
+        "scale_to_zero": true,
+        "min_instances": 0
+      },
+      "autotuning_policy_id": "default_safe_autotune",
+      "observability": {
+        "required_receipts": [
+          "RuntimeClassBinding.v1",
+          "ExecutionProviderDecision",
+          "EventEnvelope.v1"
+        ],
+        "egress_observation_required_when_outbound": true,
+        "serves_truth": false
+      },
+      "preferred_when": [
+        "lightweight event handling",
+        "webhook validation",
+        "small deterministic verification",
+        "low idle-cost requirement"
+      ],
+      "avoid_when": [
+        "heavy dependencies",
+        "browser sessions",
+        "GPU/model residency",
+        "unbounded agent loops"
+      ]
+    },
+    {
+      "runtime_class": "serverless-container",
+      "surface_family": "serverless_container",
+      "execution_shape": "stateless_http_service",
+      "default_local_backend": "managed_venv@v1",
+      "preferred_candidate_backends": [
+        "cloud_run@candidate",
+        "knative@candidate",
+        "azure_container_apps@candidate"
+      ],
+      "requirements": {
+        "min_resource_class": "standard_cpu",
+        "requires_gpu": false,
+        "requires_browser": false,
+        "state_model": "stateless",
+        "trigger_models": [
+          "http",
+          "event",
+          "queue"
+        ],
+        "supports_scale_to_zero": true,
+        "max_duration_class": "medium",
+        "network_policy_default": "deny_by_default_allowlisted_egress"
+      },
+      "policy_preferences": {
+        "default_lifecycle_policy_id": "burst_keepalive",
+        "default_sla_policy_id": "standard_2m",
+        "egress_route_policy_id": "official_api",
+        "identity_mode": "workload_identity",
+        "secret_access_default": false,
+        "tenant_data_access_default": false
+      },
+      "pre_autotune_defaults": {
+        "concurrency_source": "worker_resource_classes.standard_cpu.concurrency_default",
+        "timeout_source": "worker_resource_classes.standard_cpu.timeout_default_s",
+        "scale_to_zero": true,
+        "min_instances": 0
+      },
+      "autotuning_policy_id": "default_safe_autotune",
+      "observability": {
+        "required_receipts": [
+          "RuntimeClassBinding.v1",
+          "ExecutionProviderDecision",
+          "EventEnvelope.v1"
+        ],
+        "egress_observation_required_when_outbound": true,
+        "serves_truth": false
+      },
+      "preferred_when": [
+        "HTTP service with container dependencies",
+        "medium request duration",
+        "provider-neutral serverless packaging"
+      ],
+      "avoid_when": [
+        "stateful durable workflows",
+        "large GPU workloads",
+        "long batch reprocessing"
+      ]
+    },
+    {
+      "runtime_class": "cloud-run-job",
+      "surface_family": "serverless_container",
+      "execution_shape": "ephemeral_batch_container",
+      "default_local_backend": "local_cloud_run_job_emulator@v1",
+      "preferred_candidate_backends": [
+        "cloud_run_job@candidate"
+      ],
+      "requirements": {
+        "min_resource_class": "high_cpu",
+        "requires_gpu": false,
+        "requires_browser": false,
+        "state_model": "ephemeral",
+        "trigger_models": [
+          "queue",
+          "schedule",
+          "manual"
+        ],
+        "supports_scale_to_zero": true,
+        "max_duration_class": "long",
+        "network_policy_default": "deny_by_default_allowlisted_egress"
+      },
+      "policy_preferences": {
+        "default_lifecycle_policy_id": "batch_min_25",
+        "default_sla_policy_id": "batch_15m",
+        "egress_route_policy_id": "official_api",
+        "identity_mode": "job_workload_identity",
+        "secret_access_default": false,
+        "tenant_data_access_default": false
+      },
+      "pre_autotune_defaults": {
+        "concurrency_source": "worker_resource_classes.high_cpu.concurrency_default",
+        "timeout_source": "worker_resource_classes.high_cpu.timeout_default_s",
+        "scale_to_zero": true,
+        "min_instances": 0
+      },
+      "autotuning_policy_id": "default_safe_autotune",
+      "observability": {
+        "required_receipts": [
+          "RuntimeClassBinding.v1",
+          "ExecutionProviderDecision",
+          "EventEnvelope.v1"
+        ],
+        "egress_observation_required_when_outbound": true,
+        "serves_truth": false
+      },
+      "preferred_when": [
+        "containerized batch without standing pool",
+        "scheduled refresh",
+        "large parser or ingestion batch"
+      ],
+      "avoid_when": [
+        "interactive latency",
+        "warm state requirement",
+        "durable human approval loops"
+      ]
+    },
+    {
+      "runtime_class": "kubernetes-job",
+      "surface_family": "kubernetes",
+      "execution_shape": "ephemeral_job",
+      "default_local_backend": "local_job_emulator@v1",
+      "preferred_candidate_backends": [
+        "k8s_job@candidate",
+        "aws_batch@candidate",
+        "kueue@candidate"
+      ],
+      "requirements": {
+        "min_resource_class": "high_cpu",
+        "requires_gpu": false,
+        "requires_browser": false,
+        "state_model": "ephemeral",
+        "trigger_models": [
+          "queue",
+          "schedule",
+          "manual"
+        ],
+        "supports_scale_to_zero": true,
+        "max_duration_class": "long",
+        "network_policy_default": "namespace_deny_by_default_allowlisted_egress"
+      },
+      "policy_preferences": {
+        "default_lifecycle_policy_id": "batch_min_25",
+        "default_sla_policy_id": "batch_15m",
+        "egress_route_policy_id": "official_api",
+        "identity_mode": "kubernetes_service_account_workload_identity",
+        "secret_access_default": false,
+        "tenant_data_access_default": false
+      },
+      "pre_autotune_defaults": {
+        "concurrency_source": "worker_resource_classes.high_cpu.concurrency_default",
+        "timeout_source": "worker_resource_classes.high_cpu.timeout_default_s",
+        "scale_to_zero": true,
+        "min_instances": 0
+      },
+      "autotuning_policy_id": "default_safe_autotune",
+      "observability": {
+        "required_receipts": [
+          "RuntimeClassBinding.v1",
+          "ExecutionProviderDecision",
+          "EventEnvelope.v1"
+        ],
+        "egress_observation_required_when_outbound": true,
+        "serves_truth": false
+      },
+      "preferred_when": [
+        "batch ETL",
+        "large document parsing",
+        "replayable reports",
+        "tenant-isolated namespace policy"
+      ],
+      "avoid_when": [
+        "sub-second interactive work",
+        "long-lived warm cache",
+        "edge request transforms"
+      ]
+    },
+    {
+      "runtime_class": "kubernetes-worker",
+      "surface_family": "kubernetes",
+      "execution_shape": "warm_queue_worker",
+      "default_local_backend": "local_worker_pool@v1",
+      "preferred_candidate_backends": [
+        "k8s_deployment_worker@candidate"
+      ],
+      "requirements": {
+        "min_resource_class": "standard_cpu",
+        "requires_gpu": false,
+        "requires_browser": false,
+        "state_model": "warm_pool",
+        "trigger_models": [
+          "queue",
+          "event"
+        ],
+        "supports_scale_to_zero": false,
+        "max_duration_class": "long",
+        "network_policy_default": "namespace_deny_by_default_allowlisted_egress"
+      },
+      "policy_preferences": {
+        "default_lifecycle_policy_id": "warm_pool",
+        "default_sla_policy_id": "standard_2m",
+        "egress_route_policy_id": "customer_private_connector",
+        "identity_mode": "kubernetes_service_account_workload_identity",
+        "secret_access_default": false,
+        "tenant_data_access_default": true
+      },
+      "pre_autotune_defaults": {
+        "concurrency_source": "worker_resource_classes.standard_cpu.concurrency_default",
+        "timeout_source": "worker_resource_classes.standard_cpu.timeout_default_s",
+        "scale_to_zero": false,
+        "min_instances": 1
+      },
+      "autotuning_policy_id": "pool_safe_autotune",
+      "observability": {
+        "required_receipts": [
+          "RuntimeClassBinding.v1",
+          "ExecutionProviderDecision",
+          "EventEnvelope.v1"
+        ],
+        "egress_observation_required_when_outbound": true,
+        "serves_truth": false
+      },
+      "preferred_when": [
+        "steady queue volume",
+        "customer-private connectors",
+        "warm parser or verifier dependencies",
+        "namespace-level policy control"
+      ],
+      "avoid_when": [
+        "rare one-off task",
+        "cost-sensitive zero-idle lane",
+        "untrusted open-ended code without sandbox"
+      ]
+    },
+    {
+      "runtime_class": "queue-worker",
+      "surface_family": "kubernetes",
+      "execution_shape": "event_scaled_worker",
+      "default_local_backend": "local_worker_pool@v1",
+      "preferred_candidate_backends": [
+        "keda_scaledobject@candidate",
+        "ecs_service@candidate"
+      ],
+      "requirements": {
+        "min_resource_class": "io_bound",
+        "requires_gpu": false,
+        "requires_browser": false,
+        "state_model": "warm_pool",
+        "trigger_models": [
+          "queue",
+          "event"
+        ],
+        "supports_scale_to_zero": true,
+        "max_duration_class": "long",
+        "network_policy_default": "deny_by_default_allowlisted_egress"
+      },
+      "policy_preferences": {
+        "default_lifecycle_policy_id": "cooldown_drain",
+        "default_sla_policy_id": "standard_2m",
+        "egress_route_policy_id": "official_api",
+        "identity_mode": "workload_identity",
+        "secret_access_default": false,
+        "tenant_data_access_default": true
+      },
+      "pre_autotune_defaults": {
+        "concurrency_source": "worker_resource_classes.io_bound.concurrency_default",
+        "timeout_source": "worker_resource_classes.io_bound.timeout_default_s",
+        "scale_to_zero": true,
+        "min_instances": 0
+      },
+      "autotuning_policy_id": "pool_safe_autotune",
+      "observability": {
+        "required_receipts": [
+          "RuntimeClassBinding.v1",
+          "ExecutionProviderDecision",
+          "EventEnvelope.v1"
+        ],
+        "egress_observation_required_when_outbound": true,
+        "serves_truth": false
+      },
+      "preferred_when": [
+        "high-volume async processing",
+        "source refresh bursts",
+        "IO-bound verification"
+      ],
+      "avoid_when": [
+        "human approval orchestration",
+        "strict singleton control plane",
+        "GPU-bound inference"
+      ]
+    },
+    {
+      "runtime_class": "durable-workflow",
+      "surface_family": "durable_workflow",
+      "execution_shape": "durable_orchestration",
+      "default_local_backend": "local_job_emulator@v1",
+      "preferred_candidate_backends": [
+        "temporal@candidate",
+        "dapr_workflow@candidate",
+        "argo_workflow@candidate",
+        "inngest@candidate",
+        "hatchet@candidate"
+      ],
+      "requirements": {
+        "min_resource_class": "standard_cpu",
+        "requires_gpu": false,
+        "requires_browser": false,
+        "state_model": "durable",
+        "trigger_models": [
+          "workflow",
+          "queue",
+          "event",
+          "manual"
+        ],
+        "supports_scale_to_zero": false,
+        "max_duration_class": "long",
+        "network_policy_default": "deny_by_default_allowlisted_egress"
+      },
+      "policy_preferences": {
+        "default_lifecycle_policy_id": "warm_pool",
+        "default_sla_policy_id": "offline_24h",
+        "egress_route_policy_id": "customer_private_connector",
+        "identity_mode": "workflow_service_identity",
+        "secret_access_default": false,
+        "tenant_data_access_default": true
+      },
+      "pre_autotune_defaults": {
+        "concurrency_source": "worker_resource_classes.standard_cpu.concurrency_default",
+        "timeout_source": "worker_resource_classes.human_review.timeout_default_s",
+        "scale_to_zero": false,
+        "min_instances": 1
+      },
+      "autotuning_policy_id": "durable_workflow_safe_autotune",
+      "observability": {
+        "required_receipts": [
+          "RuntimeClassBinding.v1",
+          "ExecutionProviderDecision",
+          "EventEnvelope.v1",
+          "WorkflowTrace.v1"
+        ],
+        "egress_observation_required_when_outbound": true,
+        "serves_truth": false
+      },
+      "preferred_when": [
+        "long-running retries",
+        "human approval",
+        "multi-step orchestration",
+        "idempotent replay"
+      ],
+      "avoid_when": [
+        "simple one-shot function",
+        "raw truth publication",
+        "second durable ledger"
+      ]
+    },
+    {
+      "runtime_class": "browser-worker",
+      "surface_family": "browser_pool",
+      "execution_shape": "sandboxed_browser_session",
+      "default_local_backend": "local_worker_pool@v1",
+      "preferred_candidate_backends": [
+        "browser_pool@candidate"
+      ],
+      "requirements": {
+        "min_resource_class": "browser_cpu",
+        "requires_gpu": false,
+        "requires_browser": true,
+        "state_model": "ephemeral",
+        "trigger_models": [
+          "queue",
+          "manual"
+        ],
+        "supports_scale_to_zero": true,
+        "max_duration_class": "medium",
+        "network_policy_default": "domain_allowlist_only"
+      },
+      "policy_preferences": {
+        "default_lifecycle_policy_id": "burst_keepalive",
+        "default_sla_policy_id": "standard_2m",
+        "egress_route_policy_id": "browser_pool_render",
+        "identity_mode": "browser_session_identity_no_shared_login",
+        "secret_access_default": false,
+        "tenant_data_access_default": true
+      },
+      "pre_autotune_defaults": {
+        "concurrency_source": "worker_resource_classes.browser_cpu.concurrency_default",
+        "timeout_source": "worker_resource_classes.browser_cpu.timeout_default_s",
+        "scale_to_zero": true,
+        "min_instances": 0
+      },
+      "autotuning_policy_id": "sandbox_or_browser_safe_autotune",
+      "observability": {
+        "required_receipts": [
+          "RuntimeClassBinding.v1",
+          "ExecutionProviderDecision",
+          "EventEnvelope.v1",
+          "TeleonEgressObservation.v1"
+        ],
+        "egress_observation_required_when_outbound": true,
+        "serves_truth": false
+      },
+      "preferred_when": [
+        "JavaScript-rendered pages",
+        "screenshots as evidence",
+        "visual source inspection"
+      ],
+      "avoid_when": [
+        "captcha bypass",
+        "account automation without owner approval",
+        "generic cloud functions"
+      ]
+    },
+    {
+      "runtime_class": "gpu-worker",
+      "surface_family": "gpu_pool",
+      "execution_shape": "gpu_batch_or_inference",
+      "default_local_backend": "local_worker_pool@v1",
+      "preferred_candidate_backends": [
+        "gpu_pool@candidate"
+      ],
+      "requirements": {
+        "min_resource_class": "gpu_small",
+        "requires_gpu": true,
+        "requires_browser": false,
+        "state_model": "warm_pool",
+        "trigger_models": [
+          "queue",
+          "manual"
+        ],
+        "supports_scale_to_zero": true,
+        "max_duration_class": "long",
+        "network_policy_default": "deny_by_default_allowlisted_egress"
+      },
+      "policy_preferences": {
+        "default_lifecycle_policy_id": "batch_min_5",
+        "default_sla_policy_id": "batch_15m",
+        "egress_route_policy_id": "direct_public_internet",
+        "identity_mode": "gpu_pool_workload_identity",
+        "secret_access_default": false,
+        "tenant_data_access_default": false
+      },
+      "pre_autotune_defaults": {
+        "concurrency_source": "worker_resource_classes.gpu_small.concurrency_default",
+        "timeout_source": "worker_resource_classes.gpu_small.timeout_default_s",
+        "scale_to_zero": true,
+        "min_instances": 0
+      },
+      "autotuning_policy_id": "gpu_safe_autotune",
+      "observability": {
+        "required_receipts": [
+          "RuntimeClassBinding.v1",
+          "ExecutionProviderDecision",
+          "EventEnvelope.v1",
+          "ModelInvocationReceipt"
+        ],
+        "egress_observation_required_when_outbound": true,
+        "serves_truth": false
+      },
+      "preferred_when": [
+        "OCR",
+        "embedding",
+        "model inference",
+        "GPU-bound transforms"
+      ],
+      "avoid_when": [
+        "generic cloud functions",
+        "tiny deterministic utilities",
+        "unlicensed model weights"
+      ]
+    },
+    {
+      "runtime_class": "batch-job",
+      "surface_family": "kubernetes",
+      "execution_shape": "large_batch_reprocessing",
+      "default_local_backend": "local_job_emulator@v1",
+      "preferred_candidate_backends": [
+        "k8s_job@candidate",
+        "cloud_run_job@candidate",
+        "aws_batch@candidate"
+      ],
+      "requirements": {
+        "min_resource_class": "high_cpu",
+        "requires_gpu": false,
+        "requires_browser": false,
+        "state_model": "ephemeral",
+        "trigger_models": [
+          "queue",
+          "schedule",
+          "manual"
+        ],
+        "supports_scale_to_zero": true,
+        "max_duration_class": "long",
+        "network_policy_default": "deny_by_default_allowlisted_egress"
+      },
+      "policy_preferences": {
+        "default_lifecycle_policy_id": "batch_min_100",
+        "default_sla_policy_id": "offline_24h",
+        "egress_route_policy_id": "official_api",
+        "identity_mode": "batch_workload_identity",
+        "secret_access_default": false,
+        "tenant_data_access_default": false
+      },
+      "pre_autotune_defaults": {
+        "concurrency_source": "worker_resource_classes.high_cpu.concurrency_default",
+        "timeout_source": "worker_resource_classes.high_cpu.timeout_default_s",
+        "scale_to_zero": true,
+        "min_instances": 0
+      },
+      "autotuning_policy_id": "default_safe_autotune",
+      "observability": {
+        "required_receipts": [
+          "RuntimeClassBinding.v1",
+          "ExecutionProviderDecision",
+          "EventEnvelope.v1"
+        ],
+        "egress_observation_required_when_outbound": true,
+        "serves_truth": false
+      },
+      "preferred_when": [
+        "large reindexing",
+        "bulk source refresh",
+        "offline verification sweeps"
+      ],
+      "avoid_when": [
+        "interactive customer path",
+        "standing warm pool",
+        "manual approval workflow"
+      ]
+    },
+    {
+      "runtime_class": "cron-task",
+      "surface_family": "kubernetes",
+      "execution_shape": "scheduled_task",
+      "default_local_backend": "local_function_emulator@v1",
+      "preferred_candidate_backends": [
+        "k8s_cronjob@candidate"
+      ],
+      "requirements": {
+        "min_resource_class": "tiny_cpu",
+        "requires_gpu": false,
+        "requires_browser": false,
+        "state_model": "ephemeral",
+        "trigger_models": [
+          "schedule"
+        ],
+        "supports_scale_to_zero": true,
+        "max_duration_class": "short-medium",
+        "network_policy_default": "deny_by_default_allowlisted_egress"
+      },
+      "policy_preferences": {
+        "default_lifecycle_policy_id": "scheduled_batch_window",
+        "default_sla_policy_id": "offline_24h",
+        "egress_route_policy_id": "official_api",
+        "identity_mode": "scheduled_workload_identity",
+        "secret_access_default": false,
+        "tenant_data_access_default": false
+      },
+      "pre_autotune_defaults": {
+        "concurrency_source": "worker_resource_classes.tiny_cpu.concurrency_default",
+        "timeout_source": "worker_resource_classes.tiny_cpu.timeout_default_s",
+        "scale_to_zero": true,
+        "min_instances": 0
+      },
+      "autotuning_policy_id": "default_safe_autotune",
+      "observability": {
+        "required_receipts": [
+          "RuntimeClassBinding.v1",
+          "ExecutionProviderDecision",
+          "EventEnvelope.v1"
+        ],
+        "egress_observation_required_when_outbound": true,
+        "serves_truth": false
+      },
+      "preferred_when": [
+        "scheduled maintenance",
+        "freshness cron",
+        "low-priority source polling"
+      ],
+      "avoid_when": [
+        "event-driven urgent work",
+        "long human approval loops",
+        "high-churn queue drain"
+      ]
+    },
+    {
+      "runtime_class": "stream-processor",
+      "surface_family": "stream",
+      "execution_shape": "continuous_stream_processor",
+      "default_local_backend": "local_worker_pool@v1",
+      "preferred_candidate_backends": [
+        "keda_scaledobject@candidate"
+      ],
+      "requirements": {
+        "min_resource_class": "io_bound",
+        "requires_gpu": false,
+        "requires_browser": false,
+        "state_model": "warm_pool",
+        "trigger_models": [
+          "stream",
+          "event"
+        ],
+        "supports_scale_to_zero": false,
+        "max_duration_class": "long",
+        "network_policy_default": "deny_by_default_allowlisted_egress"
+      },
+      "policy_preferences": {
+        "default_lifecycle_policy_id": "hot_pool",
+        "default_sla_policy_id": "standard_2m",
+        "egress_route_policy_id": "official_api",
+        "identity_mode": "stream_workload_identity",
+        "secret_access_default": false,
+        "tenant_data_access_default": true
+      },
+      "pre_autotune_defaults": {
+        "concurrency_source": "worker_resource_classes.io_bound.concurrency_default",
+        "timeout_source": "worker_resource_classes.io_bound.timeout_default_s",
+        "scale_to_zero": false,
+        "min_instances": 1
+      },
+      "autotuning_policy_id": "pool_safe_autotune",
+      "observability": {
+        "required_receipts": [
+          "RuntimeClassBinding.v1",
+          "ExecutionProviderDecision",
+          "EventEnvelope.v1"
+        ],
+        "egress_observation_required_when_outbound": true,
+        "serves_truth": false
+      },
+      "preferred_when": [
+        "continuous source-change stream",
+        "high-volume CDC",
+        "near-real-time invalidation"
+      ],
+      "avoid_when": [
+        "rare scheduled task",
+        "one-off batch",
+        "manual human review"
+      ]
+    },
+    {
+      "runtime_class": "local-subprocess",
+      "surface_family": "local",
+      "execution_shape": "local_offline_process",
+      "default_local_backend": "local_subprocess@v1",
+      "preferred_candidate_backends": [],
+      "requirements": {
+        "min_resource_class": "standard_cpu",
+        "requires_gpu": false,
+        "requires_browser": false,
+        "state_model": "stateless",
+        "trigger_models": [
+          "manual",
+          "queue",
+          "event"
+        ],
+        "supports_scale_to_zero": true,
+        "max_duration_class": "short-medium",
+        "network_policy_default": "local_dev_deny_by_default_when_enforced"
+      },
+      "policy_preferences": {
+        "default_lifecycle_policy_id": "cold_start_each_task",
+        "default_sla_policy_id": "standard_2m",
+        "egress_route_policy_id": "direct_public_internet",
+        "identity_mode": "local_developer_identity",
+        "secret_access_default": false,
+        "tenant_data_access_default": false
+      },
+      "pre_autotune_defaults": {
+        "concurrency_source": "worker_resource_classes.standard_cpu.concurrency_default",
+        "timeout_source": "worker_resource_classes.standard_cpu.timeout_default_s",
+        "scale_to_zero": true,
+        "min_instances": 0
+      },
+      "autotuning_policy_id": "default_safe_autotune",
+      "observability": {
+        "required_receipts": [
+          "RuntimeClassBinding.v1",
+          "ExecutionProviderDecision",
+          "EventEnvelope.v1"
+        ],
+        "egress_observation_required_when_outbound": true,
+        "serves_truth": false
+      },
+      "preferred_when": [
+        "offline correctness invariant",
+        "local development",
+        "small deterministic task",
+        "missing cloud credentials"
+      ],
+      "avoid_when": [
+        "production scale requirement",
+        "customer-private cloud network dependency",
+        "GPU-heavy workload"
+      ]
+    }
+  ]
+}

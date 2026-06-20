@@ -1,0 +1,81 @@
+id: "pipeline/esoteric-industry-source-surface-intake"
+type: pipeline
+version: "0.1.0"
+name: "Esoteric industry source surface intake"
+description: "Normalizes esoteric vertical source-surface seeds for automotive, employment agencies, plumbing and HVAC, woodworking, offshore oil and gas, and environmental reviews into candidate primitive plans."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["automotive", "energy", "manufacturing", "construction", "government", "cross_industry"]
+capability: ["extraction", "classification", "retrieval", "governance", "evaluation"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.product"
+tags: ["source-surfaces", "capability-gaps", "candidate-primitives", "automotive", "trades", "environmental-review"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Turn esoteric industry source-surface seeds into governed candidate primitive plans with flexible labels and review routing."
+pipeline_kind: "research_web.esoteric_industry_source_surface_intake"
+inputs:
+  - name: "source_surface_seeds"
+    type: "array"
+  - name: "excluded_scopes"
+    type: "array"
+outputs:
+  - name: "candidate_primitives"
+    type: "array"
+  - name: "review_routes"
+    type: "array"
+  - name: "label_paths"
+    type: "array"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/esoteric-industry-source-surfaces"
+    - "knowledge-pack/source-surface-seed-row-patterns"
+    - "knowledge-pack/flexible-hierarchy-label-patterns"
+steps:
+  - id: "govern-source-surface-seeds"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record:
+        source_type: "synthetic_source_surface_seed_batch"
+        license: "CC-BY-4.0"
+        privacy_boundary: "public"
+      source_policy:
+        excluded_scopes: "$.inputs.excluded_scopes"
+        require_license: true
+  - id: "normalize-source-surfaces"
+    kind: "tool"
+    ref: "tool/esoteric-source-surface-normalizer"
+    inputs:
+      source_surface_seeds: "$.inputs.source_surface_seeds"
+      excluded_scopes: "$.inputs.excluded_scopes"
+  - id: "emit-candidate-index"
+    kind: "tool"
+    ref: "tool/index-record-emitter"
+    inputs:
+      normalized_objects: "$.steps.normalize-source-surfaces.candidate_primitives"
+      emit: ["keyword", "vector", "graph", "facet", "quality"]
+  - id: "export-factory-rows"
+    kind: "tool"
+    ref: "tool/source-surface-seed-row-exporter"
+    inputs:
+      source_surfaces: "$.inputs.source_surface_seeds"
+      excluded_scopes: "$.inputs.excluded_scopes"
+success_criteria:
+  - kind: "semantic"
+    target: "$.candidate_primitives"
+    must_cover:
+      - "automotive sales"
+      - "employment agency fee rules"
+      - "plumbing HVAC permits"
+      - "woodworking shop workflow"
+      - "offshore oil and gas"
+      - "environmental review"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Esoteric source surfaces are represented as candidate primitive plans."

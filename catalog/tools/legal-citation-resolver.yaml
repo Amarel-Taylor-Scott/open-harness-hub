@@ -1,0 +1,87 @@
+id: "tool/legal-citation-resolver"
+type: tool
+version: "0.1.0"
+name: "Legal citation resolver (statute / case / regulation)"
+description: |
+  Resolve a legal citation string to its canonical metadata + best-
+  effort source URL. Handles:
+
+   - US federal statutes: "42 U.S.C. § 1983"
+   - US federal regulations: "29 C.F.R. § 1910.132"
+   - US Supreme Court: "Loper Bright Enterprises v. Raimondo, 603 U.S. ___ (2024)"
+   - US Circuit / District: "Smith v. Jones, 999 F.3d 1234 (5th Cir. 2024)"
+   - State statutes: "Cal. Penal Code § 187"
+   - UK statutes: "Human Rights Act 1998, s 3"
+   - UK cases (neutral citation): "Pepper v Hart [1993] AC 593"
+   - EU directives: "Directive 2024/1760"
+   - EU regulations: "Regulation (EU) 2023/1115"
+   - Bluebook short forms: "id.", "supra note 4"
+
+  Returns structured metadata: jurisdiction, source type, identifier
+  parts, canonical URL (when known), and a confidence score for the
+  parse. Does NOT verify that the cited authority says what the
+  citing source claims it says — that requires the
+  `processor/llm-judge` step against the actual text.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["legal", "legal.compliance", "government"]
+capability: ["extraction", "verification"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+tags: ["law", "citations", "bluebook", "ecli", "ouls"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+parameters:
+  type: object
+  properties:
+    citation:
+      type: "string"
+      description: "Free-text legal citation."
+    prior_context:
+      type: "array"
+      items: { type: "string" }
+      description: "Optional prior citations in the same document (resolves 'id.' / 'supra'/'ibid')."
+  required: ["citation"]
+returns:
+  type: object
+  properties:
+    parse_ok:    { type: "boolean" }
+    jurisdiction: { type: "string", description: "us-federal | us-state-XX | uk | eu | other" }
+    source_type:  { type: "string", description: "statute | regulation | case | secondary" }
+    parts:        { type: "object" }
+    canonical_url: { type: "string", format: "uri" }
+    confidence:   { type: "number", minimum: 0, maximum: 1 }
+    notes:        { type: "string" }
+side_effects: "read"
+examples:
+  - input:  { citation: "42 U.S.C. § 1983" }
+    output:
+      parse_ok: true
+      jurisdiction: "us-federal"
+      source_type: "statute"
+      parts: { title: 42, code: "U.S.C.", section: "1983" }
+      canonical_url: "https://www.law.cornell.edu/uscode/text/42/1983"
+      confidence: 0.98
+      notes: ""
+  - input:  { citation: "Loper Bright Enterprises v. Raimondo, 603 U.S. ___ (2024)" }
+    output:
+      parse_ok: true
+      jurisdiction: "us-federal"
+      source_type: "case"
+      parts:
+        plaintiff: "Loper Bright Enterprises"
+        defendant: "Raimondo"
+        reporter: "U.S."
+        volume: 603
+        page: "___"
+        year: 2024
+        court: "Supreme Court of the United States"
+      canonical_url: "https://www.supremecourt.gov/opinions/23pdf/22-451_7m58.pdf"
+      confidence: 0.95
+      notes: "Slip opinion — page TBD pending US Reports volume."
+implementations:
+  - kind: "callable"
+    path: "tools.legal_citation_resolver.run"

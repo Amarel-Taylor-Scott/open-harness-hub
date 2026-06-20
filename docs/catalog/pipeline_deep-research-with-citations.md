@@ -37,13 +37,13 @@ allowlisted sources, (4) verify each source's relevance + credibility,
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `redact_query` | harness | `harness/redact-pii-text` | — |
-| 2 | `expand_abbreviations` | knowledge_pack | `knowledge-pack/common-abbreviations` | — |
-| 3 | `plan_subqueries` | harness | `harness/text-safety-review` | — |
-| 4 | `sanitize_search_queries` | rule_pack | `rule-pack/web-search-allowlist-default` | — |
-| 5 | `search_sources` | tool | `tool/web-search` | — |
-| 6 | `guard_retrieved_content` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 7 | `verify_sources` | harness | `harness/text-safety-review` | — |
-| 8 | `synthesize` | harness | `harness/text-safety-review` | — |
-| 9 | `verify_citation_coverage` | processor | `processor/citation-coverage` | — |
+| 1 | `redact_query` | harness | `harness/redact-pii-text` | - |
+| 2 | `expand_abbreviations` | knowledge_pack | `knowledge-pack/common-abbreviations` | - |
+| 3 | `plan_subqueries` | harness | `harness/text-safety-review` | - |
+| 4 | `sanitize_search_queries` | rule_pack | `rule-pack/web-search-allowlist-default` | - |
+| 5 | `search_sources` | tool | `tool/web-search` | - |
+| 6 | `guard_retrieved_content` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 7 | `verify_sources` | harness | `harness/text-safety-review` | - |
+| 8 | `synthesize` | harness | `harness/text-safety-review` | - |
+| 9 | `verify_citation_coverage` | processor | `processor/citation-coverage` | - |
 

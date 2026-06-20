@@ -1,0 +1,242 @@
+/* =============================================================================
+   context-is-everything/cie.css — the parent / mission site.
+   "AI Done Right" — the company brand above Baltor.ai (paid) and
+   Open Harness Hub (open). Authoritative, editorial, ink-forward; each product
+   appears in its OWN accent (Baltor teal, OHH ember) so the family reads clearly.
+   Built on the shared design tokens (shared/oh-tokens.css, .oh dir-s theme-light).
+   ============================================================================= */
+
+:root {
+  --cie-ink: #14171a;
+  --cie-blue: #2f6fed;        /* parent identity — clean / light blue */
+  --cie-blue-weak: #eef4ff;
+  /* product swatches: fallback defaults — cie-main.jsx overrides these at the root
+     from PORTFOLIO.ENTITIES accents (products.js) so they can never drift. */
+  --cie-baltor: #0e7c86;   /* Baltor teal (canonical) */
+  --cie-ohh: #d2542f;      /* OHH ember (canonical) */
+}
+
+/* The parent's OWN identity. NOTE: the `dir-s` scope on the root sets fonts
+   (.oh.dir-s = 2 classes) and neutrals (.oh.dir-s.theme-* = 3 classes), so these
+   overrides MUST match that specificity or higher to win. */
+.oh.dir-s.cie {
+  --font-display: "Hanken Grotesk", "Inter", system-ui, sans-serif;  /* match Baltor (loaded here) */
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+.cie { min-height: 100vh; background: var(--bg); color: var(--fg); }
+
+/* cool, white / light-blue neutral set — distinct from Baltor (teal-on-white) & OHH (ember-on-cream) */
+.oh.dir-s.theme-light.cie {
+  --bg: #ffffff;
+  --bg-subtle: #f4f8fd;
+  --panel: #ffffff;
+  --panel-2: #f7faff;
+  --line: #e7ecf3;
+  --line-strong: #d4dbe6;
+  --fg: #101620;
+  --fg-muted: #49515f;
+  --fg-faint: #8b94a3;
+}
+
+/* parent dark mode — cool dark-neutral set (keeps the light-blue signature) */
+.oh.dir-s.theme-dark.cie {
+  --bg: #0c1116;
+  --bg-subtle: #11171e;
+  --panel: #121a22;
+  --panel-2: #0e151c;
+  --line: #1f2a35;
+  --line-strong: #33414f;
+  --fg: #e9eef4;
+  --fg-muted: #9aa6b3;
+  --fg-faint: #6b7889;
+  --cie-blue: #5b8cff;
+  --cie-blue-weak: #14223e;
+}
+.cie-wrap { max-width: var(--maxw-site); margin: 0 auto; padding: 0 28px; }
+.cie .mono { font-family: var(--font-mono); }
+.cie-spacer { flex: 1; }
+
+/* ---- top bar ---- */
+.cie-top { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 20px; height: var(--h-topbar); padding: 0 28px;
+           background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.cie-logo { display: inline-flex; align-items: center; gap: 11px; cursor: pointer; text-decoration: none; }
+.cie-logo-mk { width: 26px; height: 26px; flex: 0 0 auto; }
+.cie-logo-name { font-family: var(--font-display); font-weight: 800; font-size: 18px; letter-spacing: -.02em; color: var(--fg); }
+.cie-top-nav { display: flex; gap: 22px; }
+.cie-top-nav a { font-size: 13.5px; font-weight: 550; color: var(--fg-muted); cursor: pointer; text-decoration: none; }
+.cie-top-nav a:hover { color: var(--fg); }
+.cie-theme-toggle { width: 34px; height: 34px; flex: 0 0 auto; display: grid; place-items: center; border: 1px solid var(--line);
+                    border-radius: var(--r-md); background: var(--panel); color: var(--fg-muted); font-size: 15px; cursor: pointer; transition: color .12s, border-color .12s; }
+.cie-theme-toggle:hover { color: var(--cie-blue); border-color: color-mix(in srgb, var(--cie-blue) 40%, var(--line)); }
+
+/* ---- hero / thesis ---- */
+.cie-hero { padding: 92px 0 68px; border-bottom: 1px solid var(--line); }
+.cie-eyebrow { font-size: var(--fs-eyebrow); font-weight: 700; letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--cie-blue); margin-bottom: 22px; }
+.cie-hero h1 { font-family: var(--font-display); font-size: var(--fs-h1); line-height: 1.05; letter-spacing: -.03em;
+               font-weight: 800; color: var(--fg); margin: 0; text-wrap: balance; }
+.cie-hero h1 .tint-b { color: var(--cie-baltor); }
+.cie-hero h1 .tint-o { color: var(--cie-ohh); }
+.cie-hero h1 .tint-blue { color: var(--cie-blue); }
+.cie-hero .cie-lede { font-size: var(--fs-lead); line-height: var(--lh-lead); color: var(--fg-muted); max-width: 60ch; margin: 28px 0 0; }
+/* two-column hero: copy + portfolio-at-a-glance aside (fills the right side) */
+.cie-hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 48px; align-items: center; }
+.cie-hero-aside { display: flex; flex-direction: column; gap: 12px; }
+.cha-layer { border: 1px solid var(--line); background: var(--panel); border-radius: var(--r-lg); padding: 15px 17px; }
+.cha-label { display: block; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 10px; }
+.cha-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.cha-chip { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-display); font-size: 13px; font-weight: 700; color: var(--fg);
+            border: 1px solid color-mix(in srgb, var(--ent) 32%, var(--line)); border-left: 3px solid var(--ent); border-radius: var(--r-md); padding: 6px 11px; background: var(--panel); }
+.cha-chip .g { color: var(--ent); }
+.cie-hero .cie-cta { display: flex; gap: 12px; margin-top: 30px; flex-wrap: wrap; }
+
+/* ---- section frame ---- */
+.cie-section { padding: 72px 0; border-bottom: 1px solid var(--line); }
+.cie-kicker { font-size: 13px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--fg-faint);
+              display: flex; align-items: center; gap: 14px; margin-bottom: 30px; }
+.cie-kicker::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+.cie-section h2 { font-family: var(--font-display); font-size: var(--fs-h2); line-height: 1.1; letter-spacing: -.025em;
+                  font-weight: 800; color: var(--fg); margin: 0 0 18px; text-wrap: balance; }
+.cie-section .cie-body { font-size: 16.5px; line-height: 1.62; color: var(--fg-muted); max-width: 62ch; }
+.cie-section .cie-body strong { color: var(--fg); font-weight: 650; }
+
+/* ---- the problem: failure modes ---- */
+.cie-fail { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 36px; }
+.cie-failcard { padding: var(--pad-card); }
+.cie-failcard .fc-x { font-size: 20px; color: var(--danger); margin-bottom: 12px; }
+.cie-failcard h4 { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--fg); margin: 0 0 6px; }
+.cie-failcard p { font-size: 12.5px; line-height: 1.5; color: var(--fg-muted); margin: 0; }
+
+/* ---- the two products ---- */
+.cie-products { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 36px; }
+.cie-prod { padding: var(--pad-panel);
+            display: flex; flex-direction: column; position: relative; overflow: hidden; }
+.cie-prod::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 4px; }
+.cie-prod.baltor::before { background: var(--cie-baltor); }
+.cie-prod.ohh::before { background: var(--cie-ohh); }
+.cie-prod-tag { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 14px; }
+.cie-prod.baltor .cie-prod-tag { color: var(--cie-baltor); }
+.cie-prod.ohh .cie-prod-tag { color: var(--cie-ohh); }
+.cie-prod h3 { font-family: var(--font-display); font-size: 28px; font-weight: 800; letter-spacing: -.02em; color: var(--fg); margin: 0 0 4px; }
+.cie-prod .cie-prod-sub { font-size: 13.5px; color: var(--fg-muted); margin-bottom: 16px; }
+.cie-prod .cie-prod-desc { font-size: 14.5px; line-height: 1.6; color: var(--fg-muted); margin: 0 0 18px; flex: 1; }
+.cie-prod-pills { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 22px; }
+.cie-pill { font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: var(--r-pill); border: 1px solid var(--line); color: var(--fg-muted); background: var(--bg); }
+.cie-prod.baltor .cie-pill { border-color: color-mix(in srgb, var(--cie-baltor) 32%, var(--line)); color: var(--cie-baltor); }
+.cie-prod.ohh .cie-pill { border-color: color-mix(in srgb, var(--cie-ohh) 32%, var(--line)); color: var(--cie-ohh); }
+.cie-btn { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; font-family: inherit; font-size: 14px; font-weight: 600;
+           padding: 11px 18px; border-radius: var(--r-md); cursor: pointer; text-decoration: none; border: 1px solid transparent; transition: filter .14s; }
+.cie-btn:hover { filter: brightness(1.06); }
+.cie-prod.baltor .cie-btn { background: var(--cie-baltor); color: #fff; }
+.cie-prod.ohh .cie-btn { background: var(--cie-ohh); color: #fff; }
+.cie-btn-ghost { background: transparent; border-color: var(--line-strong); color: var(--fg); }
+
+/* the join line */
+.cie-join { margin-top: 26px; padding: 18px 22px; border: 1px dashed var(--line-strong); border-radius: var(--r-lg);
+            font-size: 14.5px; line-height: 1.55; color: var(--fg-muted); text-align: center; }
+.cie-join strong { color: var(--fg); }
+.cie-join .b { color: var(--cie-baltor); font-weight: 650; }
+.cie-join .o { color: var(--cie-ohh); font-weight: 650; }
+
+/* ---- balto story ---- */
+.cie-story { display: grid; grid-template-columns: 1.1fr .9fr; gap: 44px; align-items: center; }
+.cie-story-card { border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--cie-ink); color: #fff; padding: var(--pad-panel); }
+.cie-story-card .sc-mk { font-size: 30px; margin-bottom: 16px; }
+.cie-story-card blockquote { font-family: var(--font-display); font-size: 23px; line-height: 1.3; font-weight: 600; letter-spacing: -.01em; margin: 0 0 16px; }
+.cie-story-card .sc-cap { font-size: 13px; line-height: 1.5; color: color-mix(in srgb, #fff 64%, transparent); }
+
+/* ---- architecture flow spine ---- */
+.cie-flow { list-style: none; display: flex; flex-wrap: wrap; gap: 10px 0; padding: 0; margin: 36px 0 0; }
+.cie-flow-step { display: flex; align-items: center; gap: 14px; }
+.cie-flow-step .n { font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--cie-blue); }
+.cie-flow-step .lbl { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--fg); white-space: nowrap; }
+.cie-flow-step .arr { color: var(--fg-faint); margin: 0 16px; }
+
+/* ---- portfolio stack ---- */
+.cie-stack { position: relative; display: flex; flex-direction: column; gap: 14px; margin-top: 36px; }
+.cie-layer { display: grid; grid-template-columns: 200px 1fr; gap: 22px; align-items: stretch; padding: 18px;
+             border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--panel-2); }
+.cie-layer-side { align-self: center; }
+.cie-layer-label { font-family: var(--font-display); font-size: var(--fs-h3); font-weight: 800; letter-spacing: -.01em; color: var(--fg); }
+.cie-layer-sub { font-size: 12.5px; color: var(--fg-muted); margin-top: 4px; }
+.cie-layer-cards { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.cie-layer-cards.multi { grid-template-columns: repeat(2, 1fr); }
+.cie-stack-flow { display: flex; justify-content: flex-end; gap: 20px; font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); margin-top: 2px; }
+
+/* proof · across the portfolio */
+.cie-proof-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.cie-proof-card { display: flex; flex-direction: column; align-items: flex-start; gap: 0; padding: 22px; text-decoration: none;
+  border: 1px solid var(--line); border-left: 3px solid var(--ent); border-radius: var(--r-lg); background: var(--panel); transition: border-color .15s, box-shadow .15s, transform .12s; }
+.cie-proof-card:hover { box-shadow: var(--e1); transform: translateY(-1px); border-color: color-mix(in srgb, var(--ent) 45%, var(--line)); }
+.cie-proof-brand { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: .03em; color: var(--ent); }
+.cie-proof-sector { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--fg-faint); margin-top: 8px; }
+.cie-proof-title { font-family: var(--font-display); font-size: 17px; font-weight: 700; letter-spacing: -.01em; color: var(--fg); margin: 6px 0 0; line-height: 1.22; }
+.cie-proof-metric { display: flex; flex-direction: column; gap: 1px; margin: 16px 0 0; padding-top: 14px; border-top: 1px solid var(--line); width: 100%; }
+.cie-proof-metric .v { font-family: var(--font-display); font-size: 24px; font-weight: 800; letter-spacing: -.03em; color: var(--ent); line-height: 1; }
+.cie-proof-metric .k { font-size: 11.5px; color: var(--fg-muted); }
+.cie-proof-go { margin-top: 14px; font-size: 12.5px; font-weight: 600; color: var(--ent); }
+@media (max-width: 880px) { .cie-proof-grid { grid-template-columns: 1fr; } }
+
+/* entity card (portfolio + ports share .cie-ent tints via --ent) */
+.cie-ent { padding: 18px; display: flex; flex-direction: column; gap: 3px; text-decoration: none;
+           border-top: 3px solid var(--ent); }
+.cie-ent.linkable { cursor: pointer; transition: transform .14s var(--ease), box-shadow .14s var(--ease); }
+.cie-ent.linkable:hover { transform: translateY(-2px); box-shadow: var(--e2); }
+.ent-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.ent-glyph { font-size: 20px; color: var(--ent); }
+.ent-status { font-family: var(--font-mono); font-size: 9.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+              padding: 3px 7px; border-radius: 999px; }
+.ent-status.s-live { color: var(--ent); background: color-mix(in srgb, var(--ent) 14%, transparent); }
+.ent-status.s-building { color: var(--warning); background: color-mix(in srgb, var(--warning) 14%, transparent); }
+.ent-status.s-planned { color: var(--fg-faint); background: var(--bg-subtle); }
+.ent-status.s-private { color: var(--ent); background: color-mix(in srgb, var(--ent) 12%, transparent);
+                        outline: 1px dashed color-mix(in srgb, var(--ent) 50%, transparent); outline-offset: -1px; }
+.ent-name { font-family: var(--font-display); font-size: 18px; font-weight: 800; letter-spacing: -.01em; color: var(--fg); }
+.cie-ent.compact .ent-name { font-size: 16px; }
+.ent-kind { font-size: 12px; color: var(--fg-muted); }
+.ent-blurb { font-size: 13px; line-height: 1.5; color: var(--fg-muted); margin: 8px 0 0; flex: 1; }
+.ent-go { font-size: 12px; font-weight: 600; color: var(--ent); margin-top: 12px; }
+.cie-ent:not(.linkable) .ent-go { color: var(--fg-faint); }
+
+/* ---- ports / how it fits ---- */
+.cie-ports { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 36px; }
+.cie-port { display: flex; flex-direction: column; gap: 12px; }
+.port-flow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.port-node { font-family: var(--font-display); font-size: 14.5px; font-weight: 700; color: var(--fg);
+             border: 1px solid color-mix(in srgb, var(--ent) 40%, var(--line)); border-left: 3px solid var(--ent);
+             border-radius: var(--r-md); padding: 7px 12px; background: color-mix(in srgb, var(--ent) 7%, var(--panel)); }
+.port-arrow { color: var(--fg-faint); font-size: 16px; }
+.port-label { font-size: 13px; line-height: 1.55; color: var(--fg-muted); margin: 0; }
+
+/* footer "soon" entities */
+.cie-foot-soon { display: block; font-size: 13.5px; color: var(--fg-faint); margin-bottom: 9px; }
+.cie-foot-soon i { font-style: normal; font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: .05em; margin-left: 8px; opacity: .7; }
+
+/* ---- cta band + footer ---- */
+.cie-band { padding: 74px 0; text-align: center; background: var(--cie-blue-weak); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.cie-band h2 { font-family: var(--font-display); font-size: clamp(28px, 4vw, 42px); font-weight: 800; letter-spacing: -.025em; color: var(--fg); margin: 0 0 12px; }
+.cie-band p { font-size: 16px; color: var(--fg-muted); margin: 0 0 26px; }
+.cie-band .cie-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.cie-foot { padding: 40px 0 64px; }
+.cie-foot-grid { display: flex; align-items: flex-start; justify-content: space-between; gap: 30px; flex-wrap: wrap; }
+.cie-foot-name { font-family: var(--font-display); font-weight: 800; font-size: 16px; color: var(--fg); }
+.cie-foot-tag { font-size: 12.5px; color: var(--fg-faint); margin-top: 4px; }
+.cie-foot-cols { display: flex; gap: 56px; flex-wrap: wrap; }
+.cie-foot-col h5 { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--fg-faint); margin: 0 0 12px; }
+.cie-foot-col a { display: block; font-size: 13.5px; color: var(--fg-muted); cursor: pointer; text-decoration: none; margin-bottom: 9px; }
+.cie-foot-col a:hover { color: var(--fg); }
+
+@media (max-width: 900px) {
+  .cie-hero-grid { grid-template-columns: 1fr; gap: 32px; }
+  .cie-fail { grid-template-columns: 1fr 1fr; }
+  .cie-products { grid-template-columns: 1fr; }
+  .cie-story { grid-template-columns: 1fr; gap: 28px; }
+  .cie-top-nav { display: none; }
+  .cie-layer { grid-template-columns: 1fr; gap: 14px; }
+  .cie-layer-cards.multi { grid-template-columns: 1fr 1fr; }
+  .cie-ports { grid-template-columns: 1fr; }
+  .cie-flow-step .arr { margin: 0 10px; }
+}
+@media (max-width: 560px) {
+  .cie-fail { grid-template-columns: 1fr; }
+  .cie-layer-cards.multi { grid-template-columns: 1fr; }
+}

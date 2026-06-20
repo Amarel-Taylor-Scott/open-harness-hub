@@ -1,0 +1,35 @@
+id: "benchmark/ai-red-team-findings-bench"
+type: benchmark
+version: "0.1.0"
+name: "AI Red Team Findings benchmark"
+description: "Synthetic benchmark for ai red team findings review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["ai", "security.offensive"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["ai-red-team-findings", "expansion-v5"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/ai-red-team-findings-review"
+dataset: "dataset/ai-red-team-findings-samples"
+rubric: "rubric/ai-red-team-findings-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/ai-red-team-findings-review"
+    rule_pack_override: ["rule-pack/grep-ai-red-team-findings-flags", "rule-pack/rag-ai-red-team-findings-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 23
+report:
+  output: "dist/benchmarks/ai-red-team-findings/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

@@ -1,0 +1,61 @@
+id: "tool/codegraph-code-graph-query"
+type: tool
+version: "0.1.0"
+name: "CodeGraph code knowledge-graph query"
+description: |
+  Query a pre-indexed code knowledge graph for symbols, their definitions, and
+  their relationships (callers, callees, imports, references), so an agent can
+  navigate a large codebase with far fewer tokens and tool calls than reading
+  files. Integration contract for CodeGraph, a 100%-local code-graph index for
+  coding agents (Claude Code, Codex, Cursor, OpenCode, Hermes).
+
+  This is a reference/integration contract, not a redistribution of upstream
+  code; verify the upstream license before bundling it. Especially relevant to
+  this repo: navigating thousands of catalog YAML + factory scripts with low
+  token cost (pairs with pattern/input-token-compression).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "code_synthesis"]
+modality:   ["code", "text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+tags: ["code-graph", "codegraph", "token-efficiency", "agent-tooling", "navigation"]
+created: "2026-05-26"
+updated: "2026-05-26"
+attribution:
+  source_url: "https://github.com/colbymchenry/codegraph"
+  source_kind: "github"
+  author: "colbymchenry"
+
+parameters:
+  type: object
+  properties:
+    query:       { type: "string", description: "Symbol name, file path, or natural-language code question." }
+    relation:    { type: "string", enum: ["definition", "callers", "callees", "imports", "references"], default: "definition" }
+    max_results: { type: "integer", default: 20 }
+required: ["query"]
+returns:
+  type: object
+  properties:
+    results:
+      type: array
+      items:
+        type: object
+        properties:
+          symbol:   { type: "string" }
+          file:     { type: "string" }
+          line:     { type: "integer" }
+          kind:     { type: "string" }
+          snippet:  { type: "string" }
+          relations: { type: "array", items: { type: "string" } }
+side_effects: "read"
+examples:
+  - input:  { query: "build_pgvector_embedding_load_plan", relation: "callers", max_results: 5 }
+    output: { results: [{ "symbol": "main", "file": "scripts/db/pgvector_embedding_load_plan.py", "line": 249, "kind": "function", "snippet": "result = build_pgvector_embedding_load_plan(...)", "relations": ["calls"] }] }
+implementations:
+  - kind: "shell"
+    path: "codegraph query"
+  - kind: "mcp"
+    path: "codegraph-mcp-server"

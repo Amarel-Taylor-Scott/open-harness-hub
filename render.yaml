@@ -1,0 +1,63 @@
+# Render Blueprint — Phase 1 cloud topology (docs/architecture/cloud-architecture.md).
+#
+#   web    — request/response (the playground today; the product UI/API later)
+#   worker — the async tier: pulls partition jobs off the queue, runs the foundry
+#   cron   — the daily partitioned factory + re-scrapes / decay re-benchmarks
+#   redis  — the job broker (queue)
+#   pg     — Postgres + pgvector (the registry + embeddings)  [or point at Neon]
+#
+# Secrets (OLLAMA_API_KEY, …) are `sync: false` — set them in the Render dashboard, NEVER here.
+# Phase 2 (scale / enterprise BYO-cloud) lifts the worker to K8s + KEDA — same container/commands.
+
+services:
+  - type: web
+    name: ohh-web
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerCommand: python hf-space/app.py          # placeholder for the product UI/API
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: "7860"
+
+  - type: worker
+    name: ohh-foundry-worker
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerCommand: python -m scripts.foundry.worker --serve   # wire a Redis/SQS Queue adapter for prod
+    envVars:
+      - key: OH_CHAT_MODEL
+        value: gpt-oss:120b
+      - key: OH_EMBED_MODEL
+        value: nomic-embed-text
+      - key: OLLAMA_API_KEY
+        sync: false                                # secret — set in dashboard
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: ohh-queue
+          property: connectionString
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ohh-postgres
+          property: connectionString
+
+  - type: cron
+    name: ohh-daily-factory
+    runtime: docker
+    schedule: "0 6 * * *"                          # daily partitioned factory run
+    dockerfilePath: ./Dockerfile
+    dockerCommand: python -m scripts.foundry.seeds --run
+    envVars:
+      - key: OLLAMA_API_KEY
+        sync: false
+
+  - type: redis
+    name: ohh-queue
+    ipAllowList: []                                # internal only — the job broker
+    plan: starter
+
+databases:
+  - name: ohh-postgres
+    plan: basic-256mb
+    # After provision: CREATE EXTENSION IF NOT EXISTS vector;  (or use Neon's managed pgvector)

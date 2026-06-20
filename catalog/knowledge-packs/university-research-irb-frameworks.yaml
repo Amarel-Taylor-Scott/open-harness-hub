@@ -1,0 +1,30 @@
+id: "knowledge-pack/university-research-irb-frameworks"
+type: knowledge-pack
+version: "0.1.0"
+name: "University Research IRB frameworks"
+description: "Composite context pack for university research irb reviews, including evidence, escalation, and remediation controls."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "CC-BY-4.0"
+industry: ["education.higher", "scientific_research.social"]
+capability: ["retrieval", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "dated"
+tags: ["university-research-irb", "expansion-v3"]
+created: "2026-05-24"
+updated: "2026-05-24"
+content_types: ["rag_doc", "checklist", "control_summary", "evidence_matrix"]
+files:
+  - path: "data/university-research-irb/frameworks.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    enabled: true
+    embedder: "adapter/nomic-embed-text-v15"
+provenance:
+  sources: ["University Research IRB control checklist", "University Research IRB evidence matrix", "University Research IRB escalation playbook", "University Research IRB remediation tracker"]
+  collected_through: "2026-05-24"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "composite educational summaries only"

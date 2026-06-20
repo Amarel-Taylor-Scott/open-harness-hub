@@ -10,6 +10,12 @@
       "properties": {
         "type":          { "const": "knowledge-pack" },
         "content_types": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "retrieval": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "enum": ["rag_vector", "regex", "keyword", "exact_id", "classifier", "graph"] },
+          "description": "How this pack is triggered/consumed by a harness; a pack may support several. Lets the builder render Knowledge(RAG) vs Knowledge(regex/keyword/exact-id)."
+        },
         "files": {
           "type": "array",
           "items": {

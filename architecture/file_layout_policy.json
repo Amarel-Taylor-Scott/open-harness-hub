@@ -1,0 +1,102 @@
+{
+  "version": "1.0",
+  "reusable_code_home": "src/baltor",
+  "scripts_policy": "scripts/ is for entrypoints, proof scripts (check_*.py / demo_*.py), CLI wrappers, and compatibility wrappers ONLY. New reusable product/runtime code belongs under src/baltor/.",
+  "scan_scope": [
+    "scripts",
+    "src/baltor"
+  ],
+  "approved_top_level": [
+    "_reference",
+    "architecture",
+    "artifacts",
+    "catalog",
+    "code-templates",
+    "configs",
+    "data",
+    "db",
+    "demo-data",
+    "deploy",
+    "design_handoff_platform_productionization",
+    "dist",
+    "docs",
+    "e2e",
+    "examples",
+    "experiments",
+    "fixtures",
+    "fly",
+    "FULLDESIGNDETAILS",
+    "hf-space",
+    "infra",
+    "local_emulators",
+    "media",
+    "pipelines",
+    "prompts",
+    "proofs",
+    "research",
+    "review-pack",
+    "rubrics",
+    "schemas",
+    "scripts",
+    "services",
+    "site",
+    "src",
+    "taxonomy",
+    "templates",
+    "tests",
+    "vocabularies",
+    "web",
+    "websites",
+    "workflows"
+  ],
+  "banned_filenames": [
+    "utils.py",
+    "helpers.py",
+    "common.py",
+    "misc.py",
+    "stuff.py",
+    "temp.py",
+    "scratch.py",
+    "final.py",
+    "old.py",
+    "new.py",
+    "fix.py",
+    "test2.py"
+  ],
+  "banned_filename_allowlist": [
+    {
+      "path": "scripts/new.py",
+      "reason": "legacy OHH entrypoint predating the policy; rename in a later pass"
+    },
+    {
+      "path": "scripts/context_workers/common.py",
+      "reason": "legacy OHH module (out of Baltor governed scope); rename when context_workers is migrated"
+    }
+  ],
+  "line_budgets": {
+    "runtime_core": {
+      "warn": 350,
+      "fail": 500
+    },
+    "processor": {
+      "warn": 300,
+      "fail": 450
+    },
+    "adapter": {
+      "warn": 350,
+      "fail": 500
+    },
+    "proof": {
+      "warn": 250,
+      "fail": 400
+    },
+    "api_server": {
+      "warn": 500,
+      "fail": 750
+    },
+    "ui_page": {
+      "warn": 350,
+      "fail": 600
+    }
+  }
+}

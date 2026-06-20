@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor — Reconciliation</title>
+<link rel="stylesheet" href="./stage-detail.css?v=reconciliation-dom-2" />
+<style>
+  body.focused-stage .page {
+    width: min(100%, 1180px);
+    display: grid;
+    grid-template-rows: auto auto auto auto;
+    gap: 16px;
+    align-content: center;
+  }
+
+  .focused-canvas {
+    height: auto;
+    min-height: 500px;
+  }
+
+  .recon-diagram {
+    --flow-gap: clamp(10px, 1.4vw, 18px);
+    min-height: 500px;
+    padding: 22px clamp(18px, 3vw, 34px) 28px;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 28px;
+  }
+
+  .diagram-labels {
+    display: grid;
+    grid-template-columns: minmax(235px, .9fr) minmax(260px, 1fr) minmax(260px, 1fr);
+    gap: clamp(18px, 3vw, 44px);
+    text-align: center;
+  }
+
+  .diagram-labels b {
+    display: block;
+    color: #32c786;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+  }
+
+  .diagram-labels span {
+    display: block;
+    margin-top: 4px;
+    color: #7f8794;
+    font-size: 12px;
+    font-weight: 650;
+  }
+
+  .diagram-body {
+    display: grid;
+    grid-template-columns: minmax(235px, .9fr) minmax(44px, .12fr) minmax(260px, 1fr) minmax(44px, .12fr) minmax(260px, 1fr);
+    column-gap: var(--flow-gap);
+    align-items: center;
+  }
+
+  .source-claims,
+  .recon-card,
+  .resolution-card {
+    position: relative;
+    z-index: 2;
+  }
+
+  .source-claims {
+    display: grid;
+    gap: 20px;
+  }
+
+  .claim-card {
+    --accent: #64748b;
+    min-height: 72px;
+    border: 1px solid color-mix(in srgb, var(--accent) 56%, #262d38);
+    border-radius: 10px;
+    background: rgba(12,16,22,.86);
+    padding: 12px 14px;
+    position: relative;
+  }
+
+  .claim-card::after {
+    content: "";
+    position: absolute;
+    right: -5px;
+    top: 50%;
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background: var(--accent);
+    transform: translateY(-50%);
+    opacity: .55;
+    box-shadow: 0 0 0 7px color-mix(in srgb, var(--accent) 9%, transparent);
+    animation: reconNodePulse 2.6s ease-in-out infinite;
+  }
+
+  .claim-card b,
+  .mini-label {
+    display: block;
+    color: color-mix(in srgb, var(--accent) 78%, #e7ebf0);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+
+  .claim-card span {
+    display: block;
+    margin-top: 5px;
+    color: #e7ebf0;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  .claim-card small {
+    display: block;
+    margin-top: 4px;
+    color: #8c95a4;
+    font-size: 11px;
+  }
+
+  .line-stack {
+    display: grid;
+    grid-template-rows: repeat(3, 72px);
+    gap: 20px;
+    align-items: center;
+    min-width: 44px;
+    margin-inline: calc(var(--flow-gap) * -1);
+    padding-inline: var(--flow-gap);
+    z-index: 1;
+  }
+
+  .line-stack.out {
+    grid-template-rows: repeat(2, 56px);
+    gap: 28px;
+    padding-top: 42px;
+    padding-bottom: 42px;
+  }
+
+  .flow-line {
+    --accent: #32c786;
+    display: block;
+    position: relative;
+    width: calc(100% + (var(--flow-gap) * 2));
+    height: 1px;
+    margin-inline: calc(var(--flow-gap) * -1);
+    background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 58%, transparent), color-mix(in srgb, var(--accent) 18%, transparent));
+    opacity: .86;
+  }
+
+  .flow-line::after,
+  .flow-line .packet {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--accent);
+    transform: translateY(-50%);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 56%, transparent);
+  }
+
+  .flow-line::after { right: 0; }
+
+  .flow-line .packet {
+    left: 14%;
+    width: 10px;
+    height: 10px;
+    opacity: 0;
+    animation: reconPacket 3.6s linear infinite;
+    animation-delay: var(--delay, 0s);
+  }
+
+  .flow-line .packet::after {
+    content: "";
+    position: absolute;
+    inset: -8px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--accent) 44%, transparent);
+    opacity: .5;
+  }
+
+  .recon-card,
+  .resolution-card {
+    border: 1px solid #3a4454;
+    border-radius: 14px;
+    background: rgba(12,16,22,.9);
+    padding: 22px;
+    width: 100%;
+    min-height: 332px;
+    box-shadow: 0 20px 40px rgba(0,0,0,.22);
+  }
+
+  .recon-card h2,
+  .resolution-card h2 {
+    margin: 0 0 18px;
+    font-size: 17px;
+    line-height: 1.1;
+  }
+
+  .comparison-grid,
+  .resolution-rows {
+    display: grid;
+    gap: 13px;
+  }
+
+  .comparison-row,
+  .resolution-row {
+    min-height: 52px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.035);
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 11px;
+  }
+
+  .confidence {
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.08);
+    overflow: hidden;
+  }
+
+  .confidence i {
+    display: block;
+    height: 100%;
+    width: var(--score, 50%);
+    background: var(--accent, #32c786);
+    border-radius: inherit;
+    transform-origin: left center;
+    animation: confidenceSweep 2.8s ease-in-out infinite;
+  }
+
+  .comparison-row span,
+  .resolution-row span {
+    color: #b7c0cc;
+    font-size: 12.5px;
+    line-height: 1.3;
+  }
+
+  .resolution-row {
+    grid-template-columns: 36px 1fr;
+  }
+
+  .status-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #071017;
+    font-weight: 900;
+    background: var(--accent, #32c786);
+    animation: statusPulse 2.8s ease-in-out infinite;
+  }
+
+  .review-queue {
+    margin-top: 15px;
+    border: 1px solid rgba(217,174,97,.28);
+    border-radius: 10px;
+    background: rgba(217,174,97,.055);
+    padding: 12px;
+    color: #d9d0c0;
+    font-size: 12.5px;
+    line-height: 1.35;
+    animation: reviewPulse 3.2s ease-in-out infinite;
+  }
+
+  @keyframes reconPacket {
+    0% { left: 4%; opacity: 0; transform: translateY(-50%) scale(.65); }
+    14% { opacity: .95; }
+    50% { transform: translateY(-50%) scale(1.15); }
+    86% { opacity: .95; }
+    100% { left: 100%; opacity: 0; transform: translateY(-50%) scale(.65); }
+  }
+
+  @keyframes reconNodePulse {
+    0%, 100% { opacity: .3; box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 14%, transparent); }
+    50% { opacity: .8; box-shadow: 0 0 0 10px color-mix(in srgb, var(--accent) 8%, transparent); }
+  }
+
+  @keyframes confidenceSweep {
+    0%, 100% { transform: scaleX(.72); filter: brightness(.9); }
+    48%, 62% { transform: scaleX(1); filter: brightness(1.25); }
+  }
+
+  @keyframes statusPulse {
+    0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent, #32c786) 18%, transparent); }
+    50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent, #32c786) 9%, transparent); }
+  }
+
+  @keyframes reviewPulse {
+    0%, 100% { border-color: rgba(217,174,97,.24); background: rgba(217,174,97,.045); }
+    50% { border-color: rgba(217,174,97,.54); background: rgba(217,174,97,.085); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flow-line .packet,
+    .claim-card::after,
+    .confidence i,
+    .status-dot,
+    .review-queue { animation: none; }
+    .flow-line .packet { left: 72%; opacity: .55; transform: translateY(-50%); }
+  }
+
+  @media (max-width: 900px) {
+    .recon-diagram { min-height: 0; }
+    .diagram-labels { display: none; }
+    .diagram-body { grid-template-columns: 1fr; gap: 16px; }
+    .line-stack { display: none; }
+    .claim-card::after { display: none; }
+  }
+</style>
+</head>
+<body class="focused-stage">
+<main class="page">
+  <nav class="nav">
+    <a href="../context-stages.html">All stages</a>
+    <a href="../context-engine-hero.html">Main flow</a>
+  </nav>
+
+  <section class="focused-shell" style="--stage:var(--green)">
+    <header class="focused-head">
+      <div class="focused-title">
+        <div class="eyebrow">01 · Cluster alignment</div>
+        <h1>Reconciliation</h1>
+        <p>Related sources are linked and compared before Baltor trusts them. When sources disagree, Baltor applies confidence, source precedence, and policy rules, or routes the contradiction for review.</p>
+      </div>
+      <div class="focused-metrics" aria-label="Reconciliation metrics">
+        <div><span>Conflicts found</span><b>37</b></div>
+        <div><span>Sources linked</span><b>148</b></div>
+        <div><span>Auto resolved</span><b>82%</b></div>
+        <div><span>Review state</span><b>Queued</b></div>
+      </div>
+    </header>
+
+    <div class="focused-canvas">
+      <div class="recon-diagram">
+        <div class="diagram-labels" aria-hidden="true">
+          <div><b>Disagreeing sources</b><span>documents, code, tickets, and graph projections</span></div>
+          <div><b>Reconciliation engine</b><span>entity match / confidence / source precedence</span></div>
+          <div><b>Resolved context</b><span>accepted claims or explicit review queue</span></div>
+        </div>
+
+        <div class="diagram-body">
+          <div class="source-claims" aria-label="Conflicting source claims">
+            <div class="claim-card" style="--accent:#38bdf8"><b>Jira requirement</b><span>Refund window is 30 days</span><small>ticket updated this sprint</small></div>
+            <div class="claim-card" style="--accent:#d9ae61"><b>Policy page</b><span>Refund window is 14 days</span><small>last reviewed 9 months ago</small></div>
+            <div class="claim-card" style="--accent:#4c8df6"><b>CodeGraph reality</b><span>Runtime reads refund_policy.window</span><small>current deploy path</small></div>
+          </div>
+
+          <div class="line-stack" aria-hidden="true">
+            <span class="flow-line" style="--accent:#38bdf8; --delay:-.2s"><i class="packet"></i></span>
+            <span class="flow-line" style="--accent:#d9ae61; --delay:-1.1s"><i class="packet"></i></span>
+            <span class="flow-line" style="--accent:#4c8df6; --delay:-2s"><i class="packet"></i></span>
+          </div>
+
+          <section class="recon-card" aria-label="Reconciliation engine">
+            <h2>Reconciliation engine</h2>
+            <div class="comparison-grid">
+              <div class="comparison-row"><div class="confidence"><i style="--score:84%; --accent:#38bdf8"></i></div><span>Jira is fresh and task-specific, but may describe intent rather than current behavior.</span></div>
+              <div class="comparison-row"><div class="confidence"><i style="--score:38%; --accent:#d9ae61"></i></div><span>Policy page is authoritative in name, but stale and contradicted by newer evidence.</span></div>
+              <div class="comparison-row"><div class="confidence"><i style="--score:92%; --accent:#4c8df6"></i></div><span>CodeGraph confirms where live behavior is resolved, not the final business answer.</span></div>
+            </div>
+            <div class="review-queue">If precedence cannot safely choose, Baltor preserves the conflict instead of hiding it in a summary.</div>
+          </section>
+
+          <div class="line-stack out" aria-hidden="true">
+            <span class="flow-line" style="--accent:#32c786; --delay:-.5s"><i class="packet"></i></span>
+            <span class="flow-line" style="--accent:#d9ae61; --delay:-1.7s"><i class="packet"></i></span>
+          </div>
+
+          <section class="resolution-card" aria-label="Resolved context">
+            <h2>Resolved context</h2>
+            <div class="resolution-rows">
+              <div class="resolution-row" style="--accent:#32c786"><i class="status-dot">✓</i><span>Accepted: use current policy object as the live value source for implementation.</span></div>
+              <div class="resolution-row" style="--accent:#d9ae61"><i class="status-dot">!</i><span>Flagged: stale policy page should be reviewed or superseded before broad reuse.</span></div>
+              <div class="resolution-row" style="--accent:#32c786"><i class="status-dot">↗</i><span>Linked: ticket, policy page, code path, and source handles remain expandable.</span></div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage-assurance-card">
+      <div class="assurance-title">
+        <b>Continuous Verification + Adversarial Validation</b>
+        <span>Universal assurance layer</span>
+      </div>
+      <p>During reconciliation, Baltor actively looks for contradictions, weak source authority, stale evidence, ambiguous entity matches, and places where source precedence needs human review.</p>
+      <div class="assurance-tags">
+        <span>contradictions</span>
+        <span>source precedence</span>
+        <span>entity matching</span>
+        <span>review queue</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="focused-explainer" aria-label="Reconciliation stage explanation">
+    <article>
+      <b>What this stage does</b>
+      <p>It deduplicates related objects, aligns entities across systems, compares claims, and makes disagreements visible instead of letting conflicting chunks enter a prompt.</p>
+    </article>
+    <article>
+      <b>Concrete example</b>
+      <p>Jira, a policy page, and code all describe the refund window differently. Baltor ranks evidence, applies source precedence, and flags the stale source when confidence is not enough.</p>
+    </article>
+    <article>
+      <b>Why it matters</b>
+      <p>AI workflows fail when conflicting context is silently summarized. Reconciliation turns disagreement into a structured decision or a reviewable exception.</p>
+    </article>
+  </section>
+
+  <div class="stage-links">
+    <a href="./source.html">Source</a>
+    <a class="is-current" href="./reconciliation.html">Reconciliation</a>
+    <a href="./anti-fragility.html">Anti-Fragility</a>
+    <a href="./enhancement.html">Enhancement</a>
+    <a href="./optimization.html">Optimization</a>
+    <a href="./consumption.html">Consumption</a>
+  </div>
+</main>
+</body>
+</html>

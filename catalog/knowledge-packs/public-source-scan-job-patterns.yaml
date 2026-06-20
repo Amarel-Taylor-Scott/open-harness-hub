@@ -1,0 +1,38 @@
+id: "knowledge-pack/public-source-scan-job-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Public source scan job patterns"
+description: "Patterns for expanding public source blueprints into queue-ready object-factory scan, snapshot, conversion, ingest, entity-linking, dedupe, index, and review jobs."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["automotive", "energy", "manufacturing", "construction", "government", "cross_industry"]
+capability: ["retrieval", "extraction", "governance", "routing", "evaluation"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.factory"
+tags: ["object-factory", "public-sources", "queues", "scan-jobs", "worker-shards"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types:
+  - "object_factory_job_pattern"
+  - "public_source_scan_job"
+  - "worker_shard_manifest"
+files:
+  - path: "catalog/knowledge-packs/data/public-source-scan-job-patterns/rows.jsonl"
+    format: "jsonl"
+    schema: "public-source-scan-job-pattern"
+indexing:
+  bm25: true
+  dense:
+    recommended_model: "sentence-transformers/all-MiniLM-L6-v2"
+provenance:
+  sources:
+    - "Open Harness Hub public source scan job emitter"
+    - "Open Harness Hub object factory job schema"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "Job pattern metadata only; no scraped source bodies or private data."

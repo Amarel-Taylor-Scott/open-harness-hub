@@ -1,0 +1,60 @@
+id: "tool/workflow-node-safety-scanner"
+type: tool
+version: "0.1.0"
+name: "Workflow node safety scanner"
+description: "Scans imported or user-contributed workflow nodes for secret exposure, unsafe code execution, external calls, file access, license concerns, and deployment risk."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["safety", "governance", "evaluation"]
+modality: ["code", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+tags: ["workflow-security", "custom-nodes", "sandbox", "safety", "governance"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    node_package:
+      type: object
+    workflow_context:
+      type: object
+    policy:
+      type: object
+  required: ["node_package"]
+returns:
+  type: object
+  properties:
+    risk_score:
+      type: number
+    findings:
+      type: array
+      items:
+        type: object
+    allowed_for:
+      type: array
+      items:
+        type: string
+    required_mitigations:
+      type: array
+      items:
+        type: string
+side_effects: "read"
+examples:
+  - input:
+      node_package:
+        name: "example-node"
+    output:
+      risk_score: 0.4
+      findings: []
+      allowed_for: ["local_dev"]
+      required_mitigations: ["Review package source before production use."]
+implementations:
+  - kind: "callable"
+    path: "tools.workflow_node_safety_scanner.run"
+  - kind: "mcp"
+    path: "mcp/workflows.scan_node"

@@ -1,0 +1,76 @@
+{
+  "name": "Brand Boundaries",
+  "pass_threshold": 100,
+  "items": [
+    {
+      "rubric_id": "brand.cie_portfolio_only",
+      "description": "ContextIsEverything is portfolio-only (no runtime identity)",
+      "weight": 12,
+      "blocker": true,
+      "evidence_required": "identity zone",
+      "proof_script": "scripts/check_portfolio_brand_boundaries.py",
+      "pass_condition": "CIE identity claims no runtime",
+      "fail_message": "CIE claims a runtime"
+    },
+    {
+      "rubric_id": "brand.teleon_owns_runtime",
+      "description": "Teleon owns Purpose Runtime / CapabilityTask",
+      "weight": 12,
+      "blocker": true,
+      "evidence_required": "teleon required phrases",
+      "proof_script": "scripts/check_portfolio_brand_boundaries.py",
+      "pass_condition": "teleon signature present",
+      "fail_message": "teleon identity missing"
+    },
+    {
+      "rubric_id": "brand.baltor_owns_context",
+      "description": "Baltor owns governed context",
+      "weight": 12,
+      "blocker": true,
+      "evidence_required": "baltor required phrases",
+      "proof_script": "scripts/check_portfolio_brand_boundaries.py",
+      "pass_condition": "baltor signature present",
+      "fail_message": "baltor identity missing"
+    },
+    {
+      "rubric_id": "brand.ohh_owns_open",
+      "description": "OpenHarnessHub owns skills/harnesses/templates/evals",
+      "weight": 12,
+      "blocker": true,
+      "evidence_required": "ohh required phrases",
+      "proof_script": "scripts/check_portfolio_brand_boundaries.py",
+      "pass_condition": "ohh signature present",
+      "fail_message": "ohh identity missing"
+    },
+    {
+      "rubric_id": "brand.teleon_not_agent_deploy",
+      "description": "Teleon not positioned as generic AI-agent deployment",
+      "weight": 12,
+      "blocker": true,
+      "evidence_required": "teleon what-is-not + forbidden slogans",
+      "proof_script": "scripts/check_portfolio_brand_boundaries.py",
+      "pass_condition": "no agent-deploy slogans; explicit not-deployment",
+      "fail_message": "teleon mis-positioned as agent deploy"
+    },
+    {
+      "rubric_id": "brand.no_identity_appropriation",
+      "description": "No site appropriates another brand signature in its IDENTITY zone",
+      "weight": 28,
+      "blocker": true,
+      "evidence_required": "identity zone scan",
+      "proof_script": "scripts/check_portfolio_brand_boundaries.py",
+      "pass_condition": "forbidden_identity absent from identity zone",
+      "fail_message": "brand boundary blurred"
+    },
+    {
+      "rubric_id": "brand.crosslinks",
+      "description": "All sites cross-link without blurring",
+      "weight": 12,
+      "blocker": true,
+      "evidence_required": "relationship zone + footer",
+      "proof_script": "scripts/check_portfolio_brand_boundaries.py",
+      "pass_condition": "cross-links present in relationship/footer",
+      "fail_message": "cross-links missing"
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+id: "tool/multimodal-safety-screen"
+type: tool
+version: "0.1.0"
+name: "Multimodal safety screen"
+description: "Screens generated or uploaded image, video, audio, music, and document assets for safety, rights, likeness, watermark, hidden text, malware, and policy concerns."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "media", "cross_industry"]
+capability: ["evaluation", "governance", "safety"]
+modality: ["image", "video", "audio", "music", "text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+tags: ["multimodal", "safety", "rights", "output-screening", "media"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    asset_ref:
+      type: string
+    media_type:
+      type: string
+    policy:
+      type: object
+    checks:
+      type: array
+      items:
+        type: string
+  required: ["asset_ref", "media_type"]
+returns:
+  type: object
+  properties:
+    passed:
+      type: boolean
+    findings:
+      type: array
+      items:
+        type: object
+    required_actions:
+      type: array
+      items:
+        type: string
+    audit_ref:
+      type: string
+side_effects: "read"
+examples:
+  - input:
+      asset_ref: "asset://example"
+      media_type: "video"
+      checks: ["nsfw", "watermark", "likeness", "hidden_text"]
+    output:
+      passed: true
+      findings: []
+      required_actions: []
+      audit_ref: "audit://example"
+implementations:
+  - kind: "callable"
+    path: "tools.multimodal_safety_screen.run"
+  - kind: "mcp"
+    path: "mcp/media.safety_screen"

@@ -1,0 +1,13 @@
+{
+  "schema": "schemas/config/source_connector_config.v1.schema.json",
+  "version": "v1",
+  "owner": "ingestion",
+  "environment_scope": "all",
+  "config_type": "source_connector_config",
+  "tenant_scope": "<tenant_id | global_public | tenant_shared>",
+  "source_class": "<source_class, e.g. cfpb_structured>",
+  "auth_ref": "env://SOURCE_API_TOKEN",
+  "fallback_fixture": "scripts/runtime/builtin_processors.py#source.cfpb_fixture",
+  "sync_policy_ref": "templates/configs/sync_policy/template.json",
+  "notes": "A connector is the ONLY thing that touches a raw upstream. auth_ref is a secret REFERENCE (env://… or secret://…) and is NEVER a raw value. fallback_fixture is a deterministic offline source used when the upstream is unavailable, so the system stays green and the proof stays offline."
+}

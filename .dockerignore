@@ -1,0 +1,45 @@
+.git
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.cache
+
+_reference
+dist
+site
+node_modules
+
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.mp4
+*.mov
+*.zip
+*.tar
+*.tar.gz
+
+data/auth
+data/browser
+data/tmp
+*.sqlite
+*.db
+
+# Test output / media / archives — NOT runtime deps (the image runs the Python services; the e2e
+# gates + recorders run from the repo against live domains, not from inside the image). Trims ~650MB.
+artifacts
+media
+e2e
+archive
+*.webm
+
+# LAST RULES WIN: the registry service's public-catalog seed must ship in the image —
+# deep-dive 2026-06-11 found the blanket `dist` exclusion silently emptied the deployed
+# catalog (registry_local_service BUNDLE_DIR). Runtime dist/* stays ignored; the design
+# bundle (incl. its images) is re-included here AFTER the *.png/*.jpg excludes.
+!dist/sites/openharness-design
+!dist/sites/openharness-design/**

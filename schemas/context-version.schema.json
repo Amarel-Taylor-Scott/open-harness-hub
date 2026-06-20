@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/context-version.schema.json",
+  "title": "Context object version",
+  "description": "Immutable observed state of a context object, including raw and normalized artifact pointers, hashes, validity windows, and security versioning.",
+  "type": "object",
+  "required": ["kind", "context_version_id", "context_object_id", "content_hash", "observed_at", "created_at"],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "baltor.context-version.v1"
+    },
+    "context_version_id": {
+      "type": "string"
+    },
+    "context_object_id": {
+      "type": "string"
+    },
+    "source_revision": {
+      "type": "string"
+    },
+    "content_hash": {
+      "type": "string"
+    },
+    "metadata_hash": {
+      "type": "string"
+    },
+    "acl_hash": {
+      "type": "string"
+    },
+    "raw_snapshot_uri": {
+      "type": "string"
+    },
+    "normalized_uri": {
+      "type": "string"
+    },
+    "normalized_format": {
+      "type": "string",
+      "enum": ["markdown", "json", "html", "text", "parquet", "xml", "binary", "unknown"]
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source_updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "valid_from": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "valid_to": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "tombstone": {
+      "type": "boolean"
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

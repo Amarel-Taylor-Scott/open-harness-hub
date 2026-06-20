@@ -1,0 +1,30 @@
+id: "knowledge-pack/lab-result-critical-alert-frameworks"
+type: knowledge-pack
+version: "0.1.0"
+name: "Lab Result Critical Alert frameworks"
+description: "Composite context pack for lab result critical alert reviews, including evidence, escalation, and remediation controls."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "CC-BY-4.0"
+industry: ["healthcare.clinical", "healthcare.public_health"]
+capability: ["retrieval", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "dated"
+tags: ["lab-result-critical-alert", "expansion-v3"]
+created: "2026-05-24"
+updated: "2026-05-24"
+content_types: ["rag_doc", "checklist", "control_summary", "evidence_matrix"]
+files:
+  - path: "data/lab-result-critical-alert/frameworks.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    enabled: true
+    embedder: "adapter/nomic-embed-text-v15"
+provenance:
+  sources: ["Lab Result Critical Alert control checklist", "Lab Result Critical Alert evidence matrix", "Lab Result Critical Alert escalation playbook", "Lab Result Critical Alert remediation tracker"]
+  collected_through: "2026-05-24"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "composite educational summaries only"

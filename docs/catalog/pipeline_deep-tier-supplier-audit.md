@@ -41,9 +41,9 @@ report.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `walk_chain` | processor | `processor/iterative-revise-loop` | — |
-| 3 | `aggregate_audit_gaps` | processor | `processor/multi-vector-fusion` | — |
-| 4 | `escalate_high_severity` | processor | `processor/escalate-human-review` | — |
-| 5 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `walk_chain` | processor | `processor/iterative-revise-loop` | - |
+| 3 | `aggregate_audit_gaps` | processor | `processor/multi-vector-fusion` | - |
+| 4 | `escalate_high_severity` | processor | `processor/escalate-human-review` | - |
+| 5 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

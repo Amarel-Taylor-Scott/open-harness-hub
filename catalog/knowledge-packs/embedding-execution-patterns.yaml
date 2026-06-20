@@ -1,0 +1,37 @@
+id: "knowledge-pack/embedding-execution-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Embedding execution patterns"
+description: "Provider-neutral embedding execution profiles and audit requirements for turning staged object_embedding rows into batch plans, completion records, and verified vector-search readiness."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "embedding", "governance", "evaluation", "serving"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["embeddings", "pgvector", "batching", "cost-estimation", "audit", "vector-search"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+content_types:
+  - "embedding_execution_profile"
+  - "embedding_audit_requirement"
+files:
+  - path: "catalog/knowledge-packs/data/embedding-execution-patterns/profiles.jsonl"
+    format: "jsonl"
+    schema: "embedding_execution_profile"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["profile_id", "provider", "model", "runtime", "use_when", "audit_requirements"]
+provenance:
+  sources:
+    - "Open Harness Hub object_embedding schema and pgvector storage plan"
+  collected_through: "2026-05-26"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "profile metadata only; no source text or PII"

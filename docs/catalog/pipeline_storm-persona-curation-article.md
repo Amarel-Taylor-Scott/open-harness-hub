@@ -33,11 +33,11 @@ parallel, and a final polish pass.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `redact_topic` | harness | `harness/redact-pii-text` | — |
-| 2 | `generate_personas` | processor | `processor/persona-set-generator` | — |
-| 3 | `curate_knowledge` | harness | `harness/text-safety-review` | — |
-| 4 | `outline` | processor | `processor/skeleton-outliner` | — |
-| 5 | `expand_sections` | harness | `harness/text-safety-review` | — |
-| 6 | `polish` | processor | `processor/self-refine-critique` | — |
-| 7 | `verify_citations` | processor | `processor/citation-coverage` | — |
+| 1 | `redact_topic` | harness | `harness/redact-pii-text` | - |
+| 2 | `generate_personas` | processor | `processor/persona-set-generator` | - |
+| 3 | `curate_knowledge` | harness | `harness/text-safety-review` | - |
+| 4 | `outline` | processor | `processor/skeleton-outliner` | - |
+| 5 | `expand_sections` | harness | `harness/text-safety-review` | - |
+| 6 | `polish` | processor | `processor/self-refine-critique` | - |
+| 7 | `verify_citations` | processor | `processor/citation-coverage` | - |
 

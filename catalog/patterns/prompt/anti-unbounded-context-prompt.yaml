@@ -1,0 +1,58 @@
+id: "pattern/anti-unbounded-context-prompt"
+type: pattern
+version: "0.1.0"
+name: "Anti-pattern: unbounded context prompt"
+description: "Feeding an LLM the entire available context — all retrieved chunks, all conversation history, all documents, all tool results — without a token budget, relevance gate, or compression step. The model's attention dilutes across irrelevant material and per-call cost grows unboundedly."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "CC-BY-4.0"
+industry: ["cross_industry"]
+capability: ["generation", "retrieval"]
+modality: ["text"]
+lifecycle: "stable"
+trust_boundary: "local"
+created: "2026-05-26"
+updated: "2026-05-26"
+
+attribution:
+  source_url: "https://github.com/nidhinjs/prompt-master"
+  source_kind: github
+  author: "nidhinjs"
+  license: "MIT"
+
+when_to_use:
+  - "This is an anti-pattern. Do NOT use it."
+
+structural_shape:
+  - "WRONG: retrieve top-100 chunks → concat → send full context → call model."
+  - "RIGHT: retrieve → rerank → enforce token budget (e.g. 2,000 input tokens) → compress remaining context via summarization step → call model with bounded window."
+  - "RIGHT: use chain-of-density or input-token-compression pattern to reduce context before the model call, not inside it."
+
+problem: |
+  Unbounded context causes: (a) quadratic attention cost that makes long-
+  context calls 5-20x more expensive than bounded calls; (b) attention
+  dilution — models give non-uniform weight to irrelevant early material,
+  degrading answer quality; (c) unpredictable latency from variable
+  context size; (d) no reproducibility because the context window varies
+  call-to-call; (e) inability to attribute which chunks drove the answer,
+  making citation and verification impossible.
+
+solution: |
+  Set an explicit input token budget in the pipeline definition.
+  Add a relevance gate after retrieval: rerank, threshold by score,
+  then truncate. For long sources, pre-compress with a summarization
+  step (see pattern/chain-of-density or pattern/input-token-compression)
+  before the primary model call. Record which chunks were included and
+  which were truncated in the audit trace.
+
+implementing_pipelines: []
+
+related_patterns:
+  - "pattern/input-token-compression"
+  - "pattern/chain-of-density"
+  - "pattern/two-stage-retrieve-rerank"
+  - "pattern/anti-over-prompting-as-crutch"
+
+counter_patterns:
+  - "Enforce a token budget at the pipeline level; add a rerank + truncate step before every LLM call."
+
+tags: ["anti-pattern", "prompt", "context-bloat", "cost", "attention-dilution", "credit-killing"]

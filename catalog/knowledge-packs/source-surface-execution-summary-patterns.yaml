@@ -1,0 +1,37 @@
+id: "knowledge-pack/source-surface-execution-summary-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Source surface execution summary patterns"
+description: "Metric contracts for monitoring source-surface partition runs from planned partitions through replay, generated rows, promotion decisions, review tickets, and bulk-load readiness."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["government", "software", "media", "construction", "energy", "finance", "healthcare", "cross_industry"]
+capability: ["governance", "evaluation", "retrieval", "routing", "serving"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["source-surfaces", "execution-summary", "object-counts", "load-readiness", "multi-day-runs"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types:
+  - "execution_summary_metric"
+  - "object_factory_progress_metric"
+files:
+  - path: "catalog/knowledge-packs/data/source-surface-execution-summary-patterns/metrics.jsonl"
+    format: "jsonl"
+    schema: "execution_summary_metric"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["metric", "description", "aggregation", "review_use"]
+provenance:
+  sources:
+    - "Open Harness Hub source-surface partition, replay, row-emission, and load-plan outputs"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "metric contracts only; no raw source bodies or PII"

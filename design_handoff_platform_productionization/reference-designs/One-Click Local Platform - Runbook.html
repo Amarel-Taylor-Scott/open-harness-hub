@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"></meta>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+<title>One-Click Local Platform — Runbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"></link>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"></link>
+<link rel="stylesheet" href="shared/oh-tokens.css"></link>
+<style>
+  html, body { margin: 0; }
+  body.oh { background: var(--bg); color: var(--fg); font-family: var(--font-display); -webkit-font-smoothing: antialiased; }
+  .doc { max-width: 920px; margin: 0 auto; padding: 0 32px 96px; }
+  .doc-top { display: flex; align-items: center; gap: 12px; padding: 22px 0 18px; border-bottom: 1px solid var(--line); }
+  .doc-mark { width: 28px; height: 28px; border-radius: 7px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 800; font-size: 13px; }
+  .doc-brand { font-weight: 800; font-size: 15px; letter-spacing: -.02em; }
+  .doc-brand small { display: block; font-weight: 500; font-size: 11px; color: var(--fg-faint); }
+  .doc-top .sp { flex: 1; }
+  .doc-date { font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; background: var(--panel); }
+  .eyebrow { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-top: 44px; }
+  h1 { font-size: 32px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; margin: 12px 0 0; max-width: 24ch; }
+  .lede { font-size: 15.5px; line-height: 1.65; color: var(--fg-muted); margin: 16px 0 0; max-width: 64ch; text-wrap: pretty; }
+  .lede b { color: var(--fg); font-weight: 600; }
+  h2 { font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin: 52px 0 0; padding-bottom: 12px; border-bottom: 1px solid var(--line); display: flex; align-items: baseline; gap: 12px; }
+  h2 .n { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); font-weight: 600; }
+  p { font-size: 14px; line-height: 1.65; color: var(--fg-muted); margin: 12px 0 0; max-width: 70ch; text-wrap: pretty; }
+  p b { color: var(--fg); font-weight: 600; }
+  code { font-family: var(--font-mono); font-size: .92em; background: var(--bg-subtle); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
+  .ex { font-family: var(--font-mono); font-size: 12px; line-height: 1.85; color: var(--fg-muted); background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-md); padding: 14px 18px; margin-top: 14px; overflow-x: auto; white-space: pre; }
+  .ex b { color: var(--fg); font-weight: 600; }
+  .ex i { font-style: normal; color: var(--verified); }
+  .ex em { font-style: normal; color: var(--fg-faint); }
+  .steps { counter-reset: s; margin-top: 6px; }
+  .step { display: grid; grid-template-columns: 30px 1fr; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); counter-increment: s; }
+  .step:last-child { border-bottom: none; }
+  .step::before { content: counter(s); width: 24px; height: 24px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--line)); color: var(--accent); font-family: var(--font-mono); font-size: 11px; font-weight: 600; display: grid; place-items: center; margin-top: 1px; }
+  .step .t { font-size: 14.5px; font-weight: 700; }
+  .step .d { font-size: 13px; line-height: 1.55; color: var(--fg-muted); margin-top: 4px; max-width: 66ch; }
+  .step .d b { color: var(--fg); font-weight: 600; }
+  .foot { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12px; color: var(--fg-faint); line-height: 1.6; }
+  .foot b { color: var(--fg-muted); font-weight: 600; }
+</style>
+</head>
+<body class="oh dir-s theme-light">
+<div class="doc">
+
+  <header class="doc-top">
+    <div class="doc-mark">A</div>
+    <div class="doc-brand">AI Done Right<small>internal · runbook</small></div>
+    <div class="sp"></div>
+    <div class="doc-date">pass 6 · 2026-06-09</div>
+  </header>
+
+  <div class="eyebrow">Self-orienting local platform</div>
+  <h1>One manifest. One command. Only what changed.</h1>
+  <p class="lede">Pass 6 makes the platform <b>self-understanding</b>: a single <code>services.json</code> that the router, the deployer and the tunnel all read; a <code>deploy.py</code> that orients itself (fingerprint → diff → act → verify → receipt) and touches only what changed; one short path namespace that works identically on localhost and trycloudflare; and a vault (SOPS+age) so keys are encrypted at rest with zero servers to run.</p>
+
+  <h2><span class="n">01</span> The whole interface</h2>
+  <div class="ex"><em># in production/ — every recipe is plain shell; CI calls the same ones (S5a)</em>
+just vault-init          <em># once — age keypair, outside the repo</em>
+just vault-edit          <em># secrets in $EDITOR, ciphertext-only in git</em>
+<b>just up</b>                  <em># vault → routes → containers → status</em>
+<b>just tunnel</b>              <em># public https://&lt;random&gt;.trycloudflare.com</em>
+<b>just deploy</b>              <em># the 1-click: only what changed, verified, receipted</em>
+just plan                <em># dry-run — show what WOULD change</em></div>
+
+  <h2><span class="n">02</span> How the deploy orients itself</h2>
+  <div class="steps">
+    <div class="step"><div><div class="t">Orient</div><div class="d">Reads <code>services.json</code> (what should exist), <code>.deploy-state.json</code> (what last shipped), and fingerprints every service's inputs.</div></div></div>
+    <div class="step"><div><div class="t">Plan</div><div class="d">The diff is the plan: which containers rebuild, whether routes regenerate, which host services need <i>you</i> to restart them — it prints the exact command instead of pretending to own your identity service.</div></div></div>
+    <div class="step"><div><div class="t">Act</div><div class="d">Regenerates the Caddyfile from the manifest if routes changed; <code>compose build + up</code> for changed containers only; reloads the gateway. Unchanged services are never touched.</div></div></div>
+    <div class="step"><div><div class="t">Verify</div><div class="d">Health-checks every routed service <b>through the gateway</b> (the path users take), with retries. An unhealthy service fails the deploy loudly — nothing is reported shipped that didn't answer.</div></div></div>
+    <div class="step"><div><div class="t">Receipt</div><div class="d">Appends what changed, hash before/after, and health results to <code>dist/deploy-receipts.jsonl</code> — HMAC-signed when <code>CORE_SIGNING_SECRET</code> is set, explicitly marked unsigned otherwise.</div></div></div>
+  </div>
+
+  <h2><span class="n">03</span> Short, intelligent routes</h2>
+  <p>One path namespace, declared once in <code>services.json</code>, generated into the gateway by <code>gen_caddy.py</code> (with a <code>--check</code> drift gate for CI): <code>/api/identity/*</code> → your identity service on the host (9410) · <code>/api/events/*</code>, <code>/llm/*</code>, <code>/api/core/*</code> → platform-core · everything else → the 24 static surfaces. <b>Code never hardcodes a port</b> — the same relative paths work on localhost, through the tunnel URL, and later behind real DNS. Adding a service is one manifest entry; the router, deployer and health checks follow automatically.</p>
+
+  <h2><span class="n">04</span> The vault decision</h2>
+  <p><b>SOPS + age</b> (full record: <code>production/vault/README.md</code>). Secrets live <i>encrypted inside the repo</i>; the age private key lives only on your machine. No server to run, no SaaS root-of-trust, diffable, and the swap-seam is one recipe — services only ever see env vars, so graduating to OpenBao later touches <code>vault-export</code> and nothing else. HashiCorp Vault/OpenBao deferred until runtime rotation/leases are real needs; Infisical/Doppler rejected (external root of trust conflicts with local-first).</p>
+
+  <div class="foot">
+    <b>Honest status (G-9, G-10).</b> All of this ships as runnable, stdlib-only files — authored here, not executed here. First validation on your machine: <code>just plan</code> (read-only), then <code>just up</code>. Fingerprints use size+mtime (fast) — tighten to sha256 when artifacts get checked in. Vault needs <code>sops</code>+<code>age</code> installed; without them it falls back to your existing <code>.env</code> and says so.
+  </div>
+
+</div>
+</body>
+</html>

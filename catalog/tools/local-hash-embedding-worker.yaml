@@ -1,0 +1,71 @@
+id: "tool/local-hash-embedding-worker"
+type: tool
+version: "0.1.0"
+name: "Local hash embedding worker"
+description: "Generates deterministic local hashing-vector embeddings from planned embedding completion rows and emits pgvector-ready JSONL rows for readiness auditing."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["embedding", "retrieval", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["embeddings", "vector-search", "pgvector", "daily-factory", "local-worker", "hashing-vectorizer"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    embedding_plan:
+      type: string
+    output_dir:
+      type: string
+    run_id:
+      type: string
+    worker_id:
+      type: string
+    storage_backend:
+      type: string
+    limit:
+      type: integer
+    fallback_dimensions:
+      type: integer
+  required: ["embedding_plan", "output_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    completed_embedding_rows:
+      type: integer
+    stored_vector_rows:
+      type: integer
+    missing_text_rows:
+      type: integer
+    vector_readiness:
+      type: object
+    files:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      embedding_plan: "dist/daily-embedding-execution/2026-05-31/embedding-plan/embedding-execution-plan.json"
+      output_dir: "dist/local-hash-embedding-worker/2026-05-31"
+      limit: 256
+    output:
+      ok: true
+      completed_embedding_rows: 256
+      stored_vector_rows: 256
+      missing_text_rows: 0
+      vector_readiness:
+        readiness_status: "ready"
+implementations:
+  - kind: "callable"
+    path: "scripts.db.local_hash_embedding_worker.run_local_hash_embedding_worker"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.local_hash_embedding_worker"

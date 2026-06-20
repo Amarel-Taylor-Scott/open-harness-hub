@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/context-reranker-profile.schema.json",
+  "title": "Context reranker profile",
+  "description": "Provider-neutral reranker capability profile for context retrieval. Concrete reranker names are examples; selection is based on corpus, query type, risk, latency, privacy, and evidence policy.",
+  "type": "object",
+  "required": ["kind", "reranker_profile_id", "stage", "slot", "default_tasks", "created_at"],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "baltor.context-reranker-profile.v1"
+    },
+    "reranker_profile_id": {
+      "type": "string"
+    },
+    "stage": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 6
+    },
+    "slot": {
+      "type": "string",
+      "enum": ["deterministic_filter", "lexical_ranker", "vector_ranker", "cross_encoder", "lora_domain_reranker", "llm_judge", "human_review", "custom"]
+    },
+    "example_families": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "deployment_modes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["local", "self_hosted", "hosted_api", "gateway", "human_queue", "custom"]
+      }
+    },
+    "default_tasks": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "candidate_pool": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "latency_profile": {
+      "type": "string",
+      "enum": ["free_or_sunk", "low", "medium", "high", "human", "custom"]
+    },
+    "training": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

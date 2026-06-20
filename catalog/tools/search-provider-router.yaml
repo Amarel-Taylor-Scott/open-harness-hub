@@ -1,0 +1,80 @@
+id: "tool/search-provider-router"
+type: tool
+version: "0.1.0"
+name: "Search provider router"
+description: "Chooses an appropriate search backend for a query based on freshness need, domain allowlist, privacy boundary, budget, locale, citation requirements, and provider availability."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "cross_industry"]
+capability: ["retrieval", "planning", "tool_use"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+tags: ["search", "router", "provider-abstraction", "cloud-functions", "saas"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    query:
+      type: string
+    requirements:
+      type: object
+      description: "Freshness, citation, locale, privacy, cost, and domain requirements."
+    provider_registry:
+      type: array
+      items:
+        type: object
+      description: "Configured providers such as model-native search, Brave, Google Programmable Search, Serper, Tavily, Exa, SearXNG, internal search, or custom functions."
+    fallback_policy:
+      type: string
+      enum: ["none", "same_boundary_only", "allow_public_web", "allow_cached"]
+      default: "same_boundary_only"
+  required: ["query", "provider_registry"]
+returns:
+  type: object
+  properties:
+    selected_provider:
+      type: string
+    provider_kind:
+      type: string
+    reason:
+      type: string
+    normalized_request:
+      type: object
+    fallbacks:
+      type: array
+      items:
+        type: string
+    estimated_cost:
+      type: object
+side_effects: "none"
+examples:
+  - input:
+      query: "latest model pricing page"
+      requirements:
+        freshness: "current"
+        citations_required: true
+        max_cost_usd: 0.02
+      provider_registry:
+        - name: "brave"
+          kind: "web_api"
+        - name: "internal_docs"
+          kind: "private_index"
+    output:
+      selected_provider: "brave"
+      provider_kind: "web_api"
+      reason: "Current public web evidence required."
+      normalized_request:
+        query: "latest model pricing page"
+      fallbacks: ["internal_docs"]
+      estimated_cost:
+        source: "provider_registry"
+implementations:
+  - kind: "callable"
+    path: "tools.search_provider_router.route"
+  - kind: "mcp"
+    path: "mcp/search.route"

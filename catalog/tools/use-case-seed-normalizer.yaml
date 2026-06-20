@@ -1,0 +1,55 @@
+id: "tool/use-case-seed-normalizer"
+type: tool
+version: "0.1.0"
+name: "Use case seed normalizer"
+description: "Normalizes broad use-case seed descriptions into candidate primitives with task family, domain, jurisdiction, modality, risk tier, excluded-scope, and review-routing metadata."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["finance", "legal", "media", "creative", "government", "cross_industry"]
+capability: ["extraction", "planning", "routing", "governance"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+tags: ["use-case-seeds", "normalization", "candidate-primitives", "routing"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    seed:
+      type: object
+    excluded_scopes:
+      type: array
+      items:
+        type: string
+  required: ["seed"]
+returns:
+  type: object
+  properties:
+    normalized_object:
+      type: object
+    labels:
+      type: array
+      items:
+        type: string
+    review_tickets:
+      type: array
+      items:
+        type: object
+side_effects: "none"
+examples:
+  - input:
+      seed:
+        id: "bank-law-change-monitor"
+        domain: "banking_law"
+        risk_tier: "high"
+      excluded_scopes: ["insurance"]
+    output:
+      labels: ["domain:banking_law", "risk:high"]
+      review_tickets: []
+implementations:
+  - kind: "mcp"
+    path: "mcp/factory.normalize_use_case_seed"

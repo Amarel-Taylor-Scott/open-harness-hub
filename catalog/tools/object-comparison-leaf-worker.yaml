@@ -1,0 +1,62 @@
+id: "tool/object-comparison-leaf-worker"
+type: tool
+version: "0.1.0"
+name: "Object comparison leaf worker"
+description: "Compares one leaf shard of object pairs, emits comparison results, and writes completed pair checkpoints for resumable batch runs."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "government", "cross_industry"]
+capability: ["retrieval", "governance", "evaluation", "routing"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+tags: ["pairwise-comparison", "leaf-worker", "checkpointing", "dedupe", "resume"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    records:
+      type: array
+      items:
+        type: object
+    leaf:
+      type: object
+    threshold:
+      type: number
+  required: ["records", "leaf"]
+returns:
+  type: object
+  properties:
+    leaf_id:
+      type: string
+    status:
+      type: string
+    comparison_results:
+      type: array
+      items:
+        type: object
+    checkpoints:
+      type: array
+      items:
+        type: object
+side_effects: "write"
+examples:
+  - input:
+      records: []
+      leaf:
+        leaf_id: "comparison-job/example/block/public/leaf/000000"
+        pairs: []
+    output:
+      status: "completed"
+      comparison_results: []
+      checkpoints: []
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.object_comparison_jobs.compare_leaf"
+    language: "python"
+  - kind: "mcp"
+    path: "mcp/factory.compare_object_leaf"

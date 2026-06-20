@@ -1,0 +1,70 @@
+id: "tool/daily-production-runner"
+type: tool
+version: "0.1.0"
+name: "Daily production runner"
+description: "Runs the daily component candidate generator, showcase pipeline generator, coverage audit, gap-fill generator, and staged Postgres load audit as one repeatable workflow."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["generation", "planning", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.scale"
+tags: ["components", "daily-factory", "production-run", "showcase-pipelines", "load-audit", "pgvector"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    run_date:
+      type: string
+    output_dir:
+      type: string
+    target_count:
+      type: integer
+    matrix:
+      type: string
+      enum: ["core", "expanded", "combined"]
+    showcase_count:
+      type: integer
+    scenario_path:
+      type: string
+    include_gap_fill:
+      type: boolean
+  required: ["run_date", "output_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    generated:
+      type: object
+    coverage:
+      type: object
+    load_audit:
+      type: object
+    paths:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      run_date: "2026-05-29"
+      output_dir: "dist/daily-production-runs/2026-05-29"
+      target_count: 1000
+      matrix: "combined"
+      showcase_count: 10
+    output:
+      ok: true
+      generated:
+        component_candidates: 1000
+        showcase_templates: 10
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.daily_production_run.run_daily_production"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.factory.daily_production_run"

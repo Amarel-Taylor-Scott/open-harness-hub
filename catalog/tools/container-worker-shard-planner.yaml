@@ -1,0 +1,56 @@
+id: "tool/container-worker-shard-planner"
+type: tool
+version: "0.1.0"
+name: "Container worker shard planner"
+description: "Plans source-surface partitions, queue lanes, worker images, shard leases, retry policy, and output row contracts for parallel object-factory workers."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["planning", "routing", "governance", "serving"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.factory"
+tags: ["container-workers", "sharding", "queues", "parallelism", "object-factory"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    source_surfaces:
+      type: array
+      items: { type: object }
+    worker_registry:
+      type: array
+      items: { type: object }
+    queue_policy:
+      type: object
+    cost_policy:
+      type: object
+    trust_policy:
+      type: object
+  required: ["source_surfaces", "worker_registry"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    shard_plan:
+      type: array
+      items: { type: object }
+    queue_lanes:
+      type: array
+      items: { type: object }
+    estimated_parallelism:
+      type: object
+side_effects: "none"
+examples:
+  - input:
+      source_surfaces: [{ id: "surface/github-workflows", kind: "repository" }]
+      worker_registry: [{ worker_id: "repo-miner", worker_type: "repository_miner" }]
+    output:
+      ok: true
+      shard_plan: []

@@ -39,9 +39,9 @@ N times with diverse sampling; majority-vote the parsed answers.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `rollouts` | processor | `processor/action-sampler-multi-rollout` | — |
-| 3 | `execute_and_iterate` | processor | `processor/iterative-revise-loop` | — |
-| 4 | `majority` | processor | `processor/multi-vector-fusion` | — |
-| 5 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `rollouts` | processor | `processor/action-sampler-multi-rollout` | - |
+| 3 | `execute_and_iterate` | processor | `processor/iterative-revise-loop` | - |
+| 4 | `majority` | processor | `processor/multi-vector-fusion` | - |
+| 5 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

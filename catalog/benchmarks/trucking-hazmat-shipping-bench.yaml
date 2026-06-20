@@ -1,0 +1,35 @@
+id: "benchmark/trucking-hazmat-shipping-bench"
+type: benchmark
+version: "0.1.0"
+name: "Trucking Hazmat Shipping benchmark"
+description: "Synthetic benchmark for trucking hazmat shipping review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["transportation.trucking", "trade"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["trucking-hazmat-shipping", "expansion-v6"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/trucking-hazmat-shipping-review"
+dataset: "dataset/trucking-hazmat-shipping-samples"
+rubric: "rubric/trucking-hazmat-shipping-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/trucking-hazmat-shipping-review"
+    rule_pack_override: ["rule-pack/grep-trucking-hazmat-shipping-flags", "rule-pack/rag-trucking-hazmat-shipping-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 29
+report:
+  output: "dist/benchmarks/trucking-hazmat-shipping/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

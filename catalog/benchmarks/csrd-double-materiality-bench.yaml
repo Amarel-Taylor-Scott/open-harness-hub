@@ -1,0 +1,35 @@
+id: "benchmark/csrd-double-materiality-bench"
+type: benchmark
+version: "0.1.0"
+name: "CSRD Double Materiality benchmark"
+description: "Synthetic benchmark for csrd double materiality review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["esg.csrd", "sustainability"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["csrd-double-materiality", "expansion-v7"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/csrd-double-materiality-review"
+dataset: "dataset/csrd-double-materiality-samples"
+rubric: "rubric/csrd-double-materiality-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/csrd-double-materiality-review"
+    rule_pack_override: ["rule-pack/grep-csrd-double-materiality-flags", "rule-pack/rag-csrd-double-materiality-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 31
+report:
+  output: "dist/benchmarks/csrd-double-materiality/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

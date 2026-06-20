@@ -1,0 +1,119 @@
+# Service registry — the single source of truth for the backend service map.
+# Three PRODUCT services (the request-tier doors) over one SHARED PLATFORM plane, plus the async/
+# scheduled infra tiers. See docs/architecture/backend-services-and-platform.md. `owns` lists the
+# scripts/ packages each service is responsible for (code stays in scripts/; this is the boundary).
+# `status: active` = a real runnable entrypoint exists today; `planned` = boundary defined, code lives
+# in scripts/ but no single service entrypoint yet (migrates incrementally — non-breaking).
+
+products:
+  - id: harness-hub
+    brand: Open Harness Hub
+    tier: request
+    status: active
+    web_root: web/harness-hub
+    env: { OH_PRODUCT: harness-hub }
+    command: ["python", "-m", "scripts.showcase", "--port", "8000"]
+    owns: [scripts/showcase]
+    comms: { sync_reads: [retrieval, identity], enqueues: [foundry] }
+    scale: { by: rps, min: 1 }
+  - id: baltor
+    brand: Baltor
+    tier: request
+    status: active
+    web_root: web/baltor
+    env: { OH_PRODUCT: baltor }
+    command: ["python", "-m", "scripts.showcase", "--port", "8001"]
+    owns: [scripts/showcase]
+    comms: { sync_reads: [retrieval, enrichment, identity], enqueues: [enrichment, ingestion] }
+    scale: { by: rps, min: 1 }
+  - id: context-is-everything
+    brand: Context is Everything
+    tier: request
+    status: active
+    web_root: web/context-is-everything
+    env: { OH_PRODUCT: context-is-everything }
+    command: ["python", "-m", "scripts.showcase", "--port", "8002"]
+    owns: [scripts/showcase]
+    comms: {}
+    scale: { by: rps, min: 1 }
+    note: parent-brand mission landing (static; shares the backend, links to baltor + harness-hub)
+
+platform:
+  - id: ingestion
+    tier: async
+    status: active
+    owns: [scripts/ingest, scripts/acquisition]
+    command: ["python", "-m", "scripts.ingest.run", "--loop"]
+    queue: ohh:ingest:jobs
+    comms: { emits: [source.normalized], consumes: [freshness.changed] }
+    scale: { by: queue_depth }
+  - id: foundry
+    tier: async
+    status: active
+    owns: [scripts/foundry, scripts/factory]
+    command: ["python", "-m", "scripts.foundry.worker", "--serve"]
+    queue: ohh:foundry:jobs
+    comms: { calls: [measurement], emits: [candidate.loaded] }
+    scale: { by: queue_depth, scale_to_zero: true }
+  - id: measurement
+    tier: async
+    status: active
+    owns: [scripts/eval, scripts/verification]
+    command: ["python", "-m", "scripts.eval.durable_gap_harness"]
+    comms: { called_by: [foundry, enrichment] }
+    scale: { by: job }
+  - id: enrichment
+    tier: async
+    status: planned          # components seeded (scripts/seed/baltor_components.py); tier pipeline entrypoint TBD
+    product_affinity: baltor
+    owns: [scripts/processors/compression, scripts/processors/memory, scripts/processors/cache, scripts/processors/retrieval]
+    queue: ohh:enrich:jobs
+    comms: { calls: [measurement], emits: [tier.built] }
+    scale: { by: queue_depth }
+  - id: retrieval
+    tier: request
+    status: active
+    owns: [scripts/db, scripts/processors/retrieval]
+    command: ["python", "-m", "scripts.db.build_vector_index"]
+    comms: { reads: [postgres_pgvector] }
+    scale: { by: rps }
+  - id: governance
+    tier: scheduled
+    status: active
+    owns: [scripts/db, scripts/_publish]
+    command: ["python", "-m", "scripts.db.daily_promotion_readiness_plan"]
+    comms: { emits: [promotion.ready, cdc.changed] }
+    scale: { by: cron }
+  - id: identity
+    tier: request
+    status: active
+    owns: [scripts/identity_local_service, src/openharnesshub/auth_kit]
+    command: ["python", "-m", "scripts.identity_local_service", "--serve"]
+    comms: {}
+    scale: { by: rps, min: 1 }
+    note: separate INDEPENDENT identity realm per product (architecture/identity_realm_registry.json); register/login/session + hash-only API keys; local dev equivalent of the production IdP — real credential adapters stay owner-gated
+
+infra:
+  - id: worker
+    tier: async
+    status: active
+    command: ["python", "-m", "scripts.foundry.worker", "--serve"]
+    broker_adapters: { default: RedisQueue, optional: [celery] }   # services/worker/celery_app.py
+    scale: { by: queue_depth, scale_to_zero: true }
+  - id: scheduler
+    tier: scheduled
+    status: active
+    dags: infra/airflow/dags
+    adapters: { default: cron, optional: [airflow_composer, argo_workflows] }
+
+datastores:
+  - { id: postgres_pgvector, role: "operational + vector store" }
+  - { id: object_store, role: "raw + tiered artifacts (R2/S3)" }
+  - { id: redis, role: "job broker + cache" }
+  - { id: event_bus, role: "CDC / freshness / promotion pub-sub" }
+
+telemetry:
+  logs: structured JSON (scripts/showcase/jsonlog.py → services/platform/_shared/telemetry.py)
+  metrics: prometheus (/metrics)
+  traces: opentelemetry (enqueue → worker → store spans)
+  collectors: infra/observability/

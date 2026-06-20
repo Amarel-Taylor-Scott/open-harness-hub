@@ -1,13 +1,13 @@
 # Open Harness Hub - single-page catalog index
 
-Auto-generated from `scripts/build_index_page.py` against 505 live artifacts. Run that script to refresh after any catalog change.
+Auto-generated from `scripts/build_index_page.py` against 505 live components. Run that script to refresh after any catalog change.
 
 Use `python scripts/oh_hub.py describe <id>` for the full manifest + dependency tree of any entry below.
 
 ## Stats
 
-- **Total artifacts:** 505
-- **Artifact types:** 12
+- **Total components:** 505
+- **Component types:** 12
 - **Industries:** 142
 
 ## Table of contents
@@ -493,7 +493,7 @@ Use `python scripts/oh_hub.py describe <id>` for the full manifest + dependency 
   _cross_industry, legal, software_ • Sampled summary of common SPDX licenses — permissive, copyleft, non-commercial, public-domain. For each: license_id, category, one-paragraph summary, redistribution-compatible flag…
 - **`knowledge-pack/style-references-cinematic`** - Cinematic style references  
   _creative_ • Curated style descriptors for cinematic product / scene photography. Each entry is a textual descriptor of a style — lighting, color palette, composition, atmosphere — with attribu…
-- **`knowledge-pack/technician-checklists`** - Technician checklists — 50 industry procedural artifacts  
+- **`knowledge-pack/technician-checklists`** - Technician checklists — 50 industry procedural components  
   _compliance, healthcare, aviation, construction_ • Canonical written checklists / standard work that real practitioners use: WHO Surgical Safety, FAA preflight, OSHA JHA, AORN counts, HACCP CCP, NFPA 70E LOTO, MSHA pre-shift, ITIL …
 - **`knowledge-pack/telco-fcc-cpni-frameworks`** - Telco regulatory frameworks (FCC 47 CFR + CPNI + CALEA + STIR/SHAKEN)  
   _telecommunications, telecommunications.fcc, telecommunications.cpni_ • Composite 47 CFR Part 4 (NORS) / Part 9 (911) / Part 64 (CPNI + STIR/SHAKEN) / CALEA + 47 USC §222.
@@ -997,7 +997,7 @@ Use `python scripts/oh_hub.py describe <id>` for the full manifest + dependency 
 - **`pattern/chain-of-verification`** - Chain-of-Verification (CoVe)  
   _ai, cross_industry_ • Generate a draft response, decompose it into atomic verifiable claims, execute independent verification queries per claim, and emit a final response that drops or revises unverifia…
 - **`pattern/composable-success-criteria`** - Composable success criteria (regex + semantic + LLM-judge + deterministic + tool + composite)  
-  _cross_industry, ai, compliance_ • Treat success criteria as first-class composable artifacts rather than a single rubric+threshold check. Six concrete criterion kinds combine via AND / OR / NOT into arbitrary boole…
+  _cross_industry, ai, compliance_ • Treat success criteria as first-class composable components rather than a single rubric+threshold check. Six concrete criterion kinds combine via AND / OR / NOT into arbitrary boole…
 - **`pattern/concept-graph-from-text`** - Concept graph from text  
   _education, esg, supply_chain, compliance_ • Promote relationships between entities mentioned in source text to first-class graph nodes + edges. Each node + edge is source-anchored (page, span). Generalizes from CiteMind's Bo…
 - **`pattern/corrective-rag`** - Corrective RAG (CRAG)  
@@ -1237,7 +1237,7 @@ Use `python scripts/oh_hub.py describe <id>` for the full manifest + dependency 
 
 - `dataset/aviation-safety-samples` - Aviation safety samples
 - `knowledge-pack/aviation-safety-frameworks` - Aviation safety frameworks (NTSB / FAA / ICAO / HFACS / ASAP)
-- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural artifacts
+- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural components
 - `pattern/go-nogo-checklist-gate` - GO/NO-GO checklist gate
 - `persona/aviation-safety-investigator` - Aviation Safety Investigator (NTSB / FAA / ICAO / SMS / ASAP)
 - `pipeline/aviation-safety-review` - Aviation safety incident review
@@ -1385,7 +1385,7 @@ Use `python scripts/oh_hub.py describe <id>` for the full manifest + dependency 
 - `knowledge-pack/high-risk-corridors-and-sectors` - High-risk corridors & sector-specific labor / environmental risks
 - `knowledge-pack/lead-company-code-stub` - Lead-company code-of-conduct stub (placeholder)
 - `knowledge-pack/platform-content-policy-frameworks` - Platform content policy frameworks (DSA + UK OSA + COPPA + NetzDG)
-- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural artifacts
+- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural components
 - `knowledge-pack/trade-export-control-frameworks` - Trade & export control frameworks (HTS / EAR / ITAR / OFAC)
 - `pattern/anti-no-audit-trace` - Anti-pattern: No audit trace
 - `pattern/anti-no-pii-redact-before-model` - Anti-pattern: PII reaches the model without redaction
@@ -1509,7 +1509,7 @@ Use `python scripts/oh_hub.py describe <id>` for the full manifest + dependency 
 
 - `dataset/construction-safety-samples` - Construction safety samples
 - `knowledge-pack/osha-construction-1926` - OSHA 29 CFR 1926 (Construction) + ANSI Z10 + Focus Four
-- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural artifacts
+- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural components
 - `pattern/go-nogo-checklist-gate` - GO/NO-GO checklist gate
 - `persona/construction-safety-officer` - Construction Safety Officer (OSHA 1926 / ANSI Z10 / Focus Four)
 - `pipeline/construction-safety-review` - Construction safety review (OSHA 1926 / Focus Four)
@@ -1744,7 +1744,7 @@ Use `python scripts/oh_hub.py describe <id>` for the full manifest + dependency 
 
 ### cyber
 
-- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural artifacts
+- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural components
 - `pipeline/nist-800-61-ir-gate` - NIST 800-61 Incident Response gate
 
 ### defense
@@ -1855,7 +1855,7 @@ Use `python scripts/oh_hub.py describe <id>` for the full manifest + dependency 
 
 - `dataset/nerc-cip-samples` - NERC CIP BES samples
 - `knowledge-pack/nerc-cip-standards` - NERC CIP standards (CIP-002 to CIP-014)
-- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural artifacts
+- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural components
 - `pattern/go-nogo-checklist-gate` - GO/NO-GO checklist gate
 - `persona/nerc-cip-analyst` - NERC CIP Compliance Analyst (Bulk Electric System cyber)
 - `persona/nuclear-safety-inspector` - Nuclear Safety Inspector (NRC 10 CFR / IAEA / INPO)
@@ -1885,7 +1885,7 @@ Use `python scripts/oh_hub.py describe <id>` for the full manifest + dependency 
 - `knowledge-pack/csddd-and-forced-labor-indicators` - Global supply-chain due-diligence regulatory pack
 - `knowledge-pack/high-risk-corridors-and-sectors` - High-risk corridors & sector-specific labor / environmental risks
 - `knowledge-pack/lead-company-code-stub` - Lead-company code-of-conduct stub (placeholder)
-- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural artifacts
+- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural components
 - `pattern/concept-graph-from-text` - Concept graph from text
 - `pattern/k-anonymity-aggregation` - K-anonymity + HMACed-key cross-organization aggregation
 - `pattern/source-document-to-persistent-knowledge-layer` - Source document → persistent knowledge layer
@@ -1941,7 +1941,7 @@ Use `python scripts/oh_hub.py describe <id>` for the full manifest + dependency 
 - `knowledge-pack/ma-dd-frameworks` - M&A DD frameworks (legal / financial / IP / customer / HR / tax)
 - `knowledge-pack/oecd-tp-and-beps` - OECD TP Guidelines + BEPS + Pillar Two + §482
 - `knowledge-pack/sanctions-list-shape` - Sanctions list (shape, with placeholder entries)
-- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural artifacts
+- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural components
 - `pattern/anti-no-pii-redact-before-model` - Anti-pattern: PII reaches the model without redaction
 - `pattern/go-nogo-checklist-gate` - GO/NO-GO checklist gate
 - `pattern/k-anonymity-aggregation` - K-anonymity + HMACed-key cross-organization aggregation
@@ -2021,7 +2021,7 @@ Use `python scripts/oh_hub.py describe <id>` for the full manifest + dependency 
 
 ### food
 
-- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural artifacts
+- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural components
 - `pipeline/haccp-ccp-gate` - HACCP CCP monitoring gate
 
 ### food_safety
@@ -2119,7 +2119,7 @@ Use `python scripts/oh_hub.py describe <id>` for the full manifest + dependency 
 - `knowledge-pack/drug-interactions-sample` - Drug-drug interactions (sample, educational)
 - `knowledge-pack/icd10-sample` - ICD-10 sample
 - `knowledge-pack/radiology-acrac-fleischner` - ACR Appropriateness Criteria + Fleischner + ACR RADS rubrics
-- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural artifacts
+- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural components
 - `pattern/anti-no-pii-redact-before-model` - Anti-pattern: PII reaches the model without redaction
 - `pattern/anti-un-cited-extraction` - Anti-pattern: Un-cited extraction
 - `pattern/concept-graph-from-text` - Concept graph from text
@@ -2233,7 +2233,7 @@ Use `python scripts/oh_hub.py describe <id>` for the full manifest + dependency 
 
 ### infrastructure
 
-- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural artifacts
+- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural components
 
 ### insurance
 
@@ -2332,7 +2332,7 @@ Use `python scripts/oh_hub.py describe <id>` for the full manifest + dependency 
 
 ### manufacturing
 
-- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural artifacts
+- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural components
 - `pipeline/sensor-fusion-imu-blending` - Multi-sensor fusion (IMU + thermal + ToF) with model blending
 
 ### maritime
@@ -2392,14 +2392,14 @@ Use `python scripts/oh_hub.py describe <id>` for the full manifest + dependency 
 
 ### mining
 
-- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural artifacts
+- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural components
 - `pipeline/msha-preshift-exam` - MSHA pre-shift exam GO/NO-GO gate
 
 ### nuclear
 
 - `dataset/nuclear-samples` - Nuclear safety samples
 - `knowledge-pack/nuclear-nrc-iaea-frameworks` - Nuclear safety frameworks (NRC 10 CFR + IAEA + INPO)
-- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural artifacts
+- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural components
 - `persona/nuclear-safety-inspector` - Nuclear Safety Inspector (NRC 10 CFR / IAEA / INPO)
 - `pipeline/nuclear-safety-review` - Nuclear safety review (NRC 10 CFR + IAEA + INPO)
 - `rubric/nuclear-quality-v1` - Nuclear safety review quality v1
@@ -2450,7 +2450,7 @@ Use `python scripts/oh_hub.py describe <id>` for the full manifest + dependency 
 
 - `dataset/gxp-validation-samples` - Synthetic GxP validation samples (3 cases)
 - `knowledge-pack/gxp-21-cfr-11-guidelines` - 21-CFR-11 + EU GMP Annex 11 + ICH + ALCOA+ regulatory pack
-- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural artifacts
+- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural components
 - `persona/gxp-auditor` - GxP Auditor (21-CFR-11 / EU GMP Annex 11 / ICH / ALCOA+)
 - `pipeline/gxp-validation-review` - GxP validation review (21-CFR-11 + Annex 11 + ALCOA+)
 - `rubric/gxp-validation-quality-v1` - GxP validation review quality v1
@@ -2732,7 +2732,7 @@ Use `python scripts/oh_hub.py describe <id>` for the full manifest + dependency 
 ### telecommunications
 
 - `dataset/telco-samples` - Telco compliance samples
-- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural artifacts
+- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural components
 - `knowledge-pack/telco-fcc-cpni-frameworks` - Telco regulatory frameworks (FCC 47 CFR + CPNI + CALEA + STIR/SHAKEN)
 - `persona/telco-compliance-officer` - Telco Compliance Officer (FCC Part 47 / CPNI / CALEA / TRAI)
 - `pipeline/telco-compliance-review` - Telco compliance review (FCC + CPNI + CALEA + STIR/SHAKEN)
@@ -2824,7 +2824,7 @@ Use `python scripts/oh_hub.py describe <id>` for the full manifest + dependency 
 
 ### transportation
 
-- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural artifacts
+- `knowledge-pack/technician-checklists` - Technician checklists — 50 industry procedural components
 - `pipeline/dot-pretrip-gate` - DOT pre-trip inspection gate (DVIR / 49 CFR 396)
 - `tool/google-geocode` - Google Maps Geocoding (address → lat/lng)
 

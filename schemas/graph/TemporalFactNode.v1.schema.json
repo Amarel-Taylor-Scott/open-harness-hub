@@ -1,0 +1,132 @@
+{
+  "$id": "graph/TemporalFactNode.v1",
+  "title": "TemporalFactNode",
+  "description": "A governed temporal fact node: an observed assertion with validity interval + Baltor-governed current_state.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "temporal_fact_id": {
+      "type": "string"
+    },
+    "canonical_fact_key": {
+      "type": "string"
+    },
+    "tenant_id": {
+      "type": "string"
+    },
+    "scope": {
+      "type": "string",
+      "enum": [
+        "global_public",
+        "tenant_private",
+        "tenant_override",
+        "system_reference"
+      ]
+    },
+    "subject": {
+      "type": "string"
+    },
+    "predicate": {
+      "type": "string"
+    },
+    "object": {
+      "type": "string"
+    },
+    "unit": {
+      "type": "string"
+    },
+    "value_normalized": {
+      "type": "string"
+    },
+    "claim_status": {
+      "type": "string"
+    },
+    "source_authority": {
+      "type": "string"
+    },
+    "source_artifact_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "source_handles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "content_hash": {
+      "type": "string"
+    },
+    "first_observed_at": {
+      "type": "string"
+    },
+    "last_observed_at": {
+      "type": "string"
+    },
+    "valid_from": {
+      "type": "string"
+    },
+    "valid_to": {
+      "type": "string"
+    },
+    "invalidated_at": {
+      "type": "string"
+    },
+    "current_state": {
+      "type": "string",
+      "enum": [
+        "candidate",
+        "verified_current",
+        "stale",
+        "contested",
+        "superseded",
+        "held_out",
+        "tenant_override",
+        "needs_human",
+        "deprecated"
+      ]
+    },
+    "verification_receipt_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "reconciliation_receipt_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "freshness": {
+      "type": "object"
+    },
+    "lineage": {
+      "type": "object"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "updated_at": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "temporal_fact_id",
+    "canonical_fact_key",
+    "tenant_id",
+    "scope",
+    "subject",
+    "predicate",
+    "object",
+    "value_normalized",
+    "claim_status",
+    "source_authority",
+    "source_handles",
+    "content_hash",
+    "current_state",
+    "created_at"
+  ]
+}

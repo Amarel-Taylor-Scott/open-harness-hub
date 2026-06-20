@@ -1,0 +1,92 @@
+id: "tool/federal-register-api"
+type: tool
+version: "0.1.0"
+name: "Federal Register API"
+description: |
+  Searches and fetches U.S. Federal Register documents (rules, proposed rules,
+  notices, presidential documents) with full metadata: agencies, publication
+  date, effective date, CFR references, and the canonical document URL.
+
+  Capability lift: a bare LLM cannot reliably recall current/effective federal
+  rules or their exact citations and dates. This tool returns the authoritative
+  record with an effective date and source URL, enabling cite-and-verify and
+  CDC/freshness handling for volatile regulatory facts.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["government", "legal", "compliance"]
+capability: ["retrieval", "tool_use", "verification"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "volatile"
+tags: ["federal-register", "regulation", "public-data", "api", "grounding", "citation"]
+created: "2026-05-27"
+updated: "2026-05-27"
+
+attribution:
+  source_url: "https://www.federalregister.gov/developers/documentation/api/v1"
+  source_kind: "other"
+  author: "Office of the Federal Register / GPO"
+  license: "public-domain"
+
+parameters:
+  type: object
+  required: ["term"]
+  properties:
+    term:
+      type: string
+      description: "Full-text search term, e.g. 'forced labor import ban'."
+    document_types:
+      type: array
+      items: { type: string, enum: ["RULE", "PRORULE", "NOTICE", "PRESDOCU"] }
+      description: "Filter by document type."
+    agencies:
+      type: array
+      items: { type: string }
+      description: "Agency slugs, e.g. ['homeland-security-department']."
+    publication_date_gte:
+      type: string
+      description: "ISO date lower bound (publication_date >=)."
+    per_page:
+      type: integer
+      default: 20
+    fields:
+      type: array
+      items: { type: string }
+      description: "Fields to return, e.g. ['title','effective_on','html_url','agencies']."
+
+returns:
+  type: object
+  properties:
+    count: { type: integer }
+    results:
+      type: array
+      items: { type: object }
+      description: "Documents with title, effective_on, html_url, agencies, cfr_references."
+    source_url: { type: string }
+    retrieved_at: { type: string }
+
+side_effects: "external_call"
+
+examples:
+  - input:
+      term: "forced labor"
+      document_types: ["RULE"]
+      per_page: 5
+      fields: ["title", "effective_on", "html_url"]
+    output:
+      count: 1
+      results:
+        - title: "Prohibition on Importation of Goods Made With Forced Labor"
+          effective_on: "2024-01-01"
+          html_url: "https://www.federalregister.gov/documents/..."
+      source_url: "https://www.federalregister.gov/api/v1/documents.json?conditions[term]=forced+labor&conditions[type][]=RULE"
+      retrieved_at: "2026-05-27T00:00:00Z"
+    notes: "Cite html_url + effective_on; re-fetch on a schedule for revocation/freshness."
+
+implementations:
+  - kind: http
+    method: GET
+    url: "https://www.federalregister.gov/api/v1/documents.json"
+    notes: "Query: conditions[term], conditions[type][], conditions[agencies][], per_page, fields[]."

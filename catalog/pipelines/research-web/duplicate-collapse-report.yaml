@@ -1,0 +1,80 @@
+id: "pipeline/duplicate-collapse-report"
+type: pipeline
+version: "0.1.0"
+name: "Duplicate collapse report"
+description: "Reports staged row-family duplicate collapse before load audit, index coverage repair, promotion readiness, or Postgres loading."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "verification", "evaluation", "planning"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "duplicate-collapse", "dedupe", "daily-factory", "load-audit", "id-stability"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Detect duplicate primary-key collapse in staged component row families and distinguish shared reference rows from critical component candidate collisions."
+pipeline_kind: "research_web.duplicate_collapse_report"
+inputs:
+  - name: "partition"
+    type: "array"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "duplicate_collapse_report"
+    type: "json"
+  - name: "duplicate_collapse_details"
+    type: "jsonl"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/duplicate-collapse-report-patterns"
+steps:
+  - id: "load-duplicate-collapse-patterns"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/duplicate-collapse-report-patterns"
+    inputs:
+      query: "duplicate collapse primary key id source conflicting duplicate row family"
+      top_k: 20
+  - id: "report-duplicate-collapse"
+    kind: "tool"
+    ref: "tool/duplicate-collapse-reporter"
+    inputs:
+      partition: "$.inputs.partition"
+      output_dir: "$.inputs.output_dir"
+      run_id: "$.inputs.run_id"
+      sample_limit: "$.inputs.sample_limit"
+  - id: "route-conflicts"
+    kind: "tool"
+    ref: "tool/object-factory-job-router"
+    inputs:
+      reason: "Conflicting duplicate primary keys must be reviewed before database load or active component promotion."
+      excluded_scopes: ["insurance"]
+success_criteria:
+  - kind: "deterministic"
+    target: "$.duplicate_collapse_report.counts.row_families"
+    op: ">="
+    value: 10
+    severity: "high"
+    label: "The duplicate collapse report covers the canonical staged row families."
+  - kind: "deterministic"
+    target: "$.duplicate_collapse_report.counts.conflicting_duplicate_key_groups"
+    op: ">="
+    value: 0
+    severity: "high"
+    label: "The report explicitly counts conflicting duplicate primary keys."
+  - kind: "semantic"
+    target: "$.duplicate_collapse_report"
+    must_cover:
+      - "primary key"
+      - "row family"
+      - "ID source"
+      - "conflicting duplicate"
+      - "critical component rows"
+      - "no database side effects"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Duplicate collapse output exposes scale-regression risk."

@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/context/source-locator.schema.json",
+  "title": "Source locator",
+  "description": "The full, precise, reversible address of the raw evidence behind a ctx:// source handle. Context objects stay compact (digestible front); the SourceLocator holds the exact paths, storage URIs, version pointers, and fragment selectors (page/bbox/table-cell, line/byte ranges, text quote) so an authorized expansion can walk back to the raw source. Raw blobs live in object storage — this stores the locator + hashes, never the blob.",
+  "type": "object",
+  "required": ["kind", "source_locator_id", "source_handle", "source_type"],
+  "properties": {
+    "kind": { "type": "string", "const": "baltor.source-locator.v1" },
+    "source_locator_id": { "type": "string" },
+    "source_handle": { "type": "string", "pattern": "^ctx://" },
+    "source_type": { "type": "string", "description": "e.g. document_paragraph, document_table_cell, repo_file_lines, api_endpoint, ticket_field, incident_section" },
+    "source_system": { "type": "string" },
+    "source_object_id": { "type": "string" },
+    "raw_location": {
+      "type": "object",
+      "description": "Where the raw bytes live, across environments. Keep all that apply.",
+      "properties": {
+        "original_uri": { "type": "string" },
+        "storage_uri": { "type": "string", "description": "object-store URI of the immutable raw snapshot (e.g. s3://, gs://)" },
+        "version_uri": { "type": "string", "description": "version-controlled pointer (e.g. lakefs://, dolt ref)" },
+        "local_demo_uri": { "type": "string", "description": "file:// path for the local/free demo" }
+      },
+      "additionalProperties": true
+    },
+    "repository_path": { "type": "string" },
+    "commit_sha": { "type": "string" },
+    "branch": { "type": "string" },
+    "file_path": { "type": "string" },
+    "line_start": { "type": "integer", "minimum": 0 },
+    "line_end": { "type": "integer", "minimum": 0 },
+    "byte_start": { "type": "integer", "minimum": 0 },
+    "byte_end": { "type": "integer", "minimum": 0 },
+    "page": { "type": "integer", "minimum": 0 },
+    "bbox": {
+      "type": "object",
+      "properties": {
+        "x": { "type": "number" }, "y": { "type": "number" },
+        "width": { "type": "number" }, "height": { "type": "number" },
+        "unit": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "table_id": { "type": "string" },
+    "row": { "type": "integer" },
+    "column": { "type": "integer" },
+    "figure_id": { "type": "string" },
+    "diagram_id": { "type": "string" },
+    "text_quote": { "type": "string", "description": "W3C Web Annotation TextQuoteSelector exact text" },
+    "text_position": {
+      "type": "object",
+      "properties": { "start": { "type": "integer" }, "end": { "type": "integer" } },
+      "additionalProperties": true
+    },
+    "content_hash": { "type": "string" },
+    "selected_region_hash": { "type": "string" },
+    "acl_snapshot_ref": { "type": "string" },
+    "parser_run_ref": { "type": "string" },
+    "artifact_ref": { "type": "string" },
+    "last_validated_at": { "type": "string", "format": "date-time" },
+    "valid_until": { "type": ["string", "null"], "format": "date-time" }
+  },
+  "additionalProperties": true
+}

@@ -23,7 +23,7 @@ to be called by an image-gen pipeline AFTER the txt2img tool returns.
 
 | id | severity | category | pattern/condition |
 |---|---|---|---|
-| `nsfw_classifier_threshold` | critical | — | `nsfw_classifier(image) < 0.10` |
-| `celebrity_face_match` | high | — | `celebrity_face_match(image, registry='public_celebrities') == false` |
-| `watermark_present` | medium | — | `watermark_detector(image, brand=$.context.brand) == true` |
+| `nsfw_classifier_threshold` | critical | - | `nsfw_classifier(image) < 0.10` |
+| `celebrity_face_match` | high | - | `celebrity_face_match(image, registry='public_celebrities') == false` |
+| `watermark_present` | medium | - | `watermark_detector(image, brand=$.context.brand) == true` |
 

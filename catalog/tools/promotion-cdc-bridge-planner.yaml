@@ -1,0 +1,65 @@
+id: "tool/promotion-cdc-bridge-planner"
+type: tool
+version: "0.1.0"
+name: "Promotion CDC bridge planner"
+description: "Converts approved component version CSV rows into component version JSONL, runs component CDC planning, and emits change events, index records, review tickets, and load SQL."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "verification", "retrieval", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "promotion", "cdc", "postgres", "versioning", "index-records"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    approved_component_versions_csv:
+      type: string
+    previous_component_versions_path:
+      type: string
+    output_dir:
+      type: string
+    actor_type:
+      type: string
+    actor_ref:
+      type: string
+  required: ["approved_component_versions_csv", "output_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    approved_component_version_count:
+      type: integer
+    new_component_version_count:
+      type: integer
+    cdc:
+      type: object
+    files:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      approved_component_versions_csv: "dist/source-surface-scan-partitions/seed/approved-component-promotion/component-versions.csv"
+      previous_component_versions_path: "dist/component-cdc/previous-component-versions.jsonl"
+      output_dir: "dist/promotion-cdc-bridge"
+      actor_type: "worker"
+      actor_ref: "approved-component-promotion"
+    output:
+      ok: true
+      new_component_version_count: 1
+      cdc:
+        change_event_count: 1
+implementations:
+  - kind: "callable"
+    path: "scripts.db.promotion_cdc_bridge_plan.create_promotion_cdc_bridge_plan"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.promotion_cdc_bridge_plan"

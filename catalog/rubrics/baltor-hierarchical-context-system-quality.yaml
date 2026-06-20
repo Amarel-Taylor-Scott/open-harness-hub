@@ -1,0 +1,158 @@
+id: "rubric/baltor-hierarchical-context-system-quality"
+type: rubric
+version: "0.1.0"
+name: "Baltor hierarchical context system quality"
+description: "Long-form hierarchical rubric for evaluating Baltor as a full context-object system from gates through strategic advantage."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["software", "ai_governance", "data_governance"]
+capability: ["evaluation", "governance", "verification", "retrieval"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+tags: ["baltor", "hierarchical-rubric", "context-system", "context-objects"]
+created: "2026-06-02"
+updated: "2026-06-02"
+dimensions:
+  - id: "0.1"
+    label: "Gate: no context is sent to a model before source permissions and policy checks"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Inspect ACL-before-model enforcement, policy decision records, and denial paths."
+  - id: "0.2"
+    label: "Gate: every context-pack claim can be traced to source handles or explicit uncertainty"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Review pack claims, source_handle fields, unresolved-claim warnings, and expansion logs."
+  - id: "0.3"
+    label: "Gate: generated summaries, repo wikis, and memories are not treated as source of truth"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Check artifact authority labels, source precedence, and pack display rules."
+  - id: "0.4"
+    label: "Gate: private local memory and company-readable context have a clear encryption and indexing boundary"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Inspect local memory policy, encrypted sync model, embedding storage, and org-readable context tier."
+  - id: "1.1"
+    label: "Foundation: context objects have stable IDs, source mappings, kind/subkind, ownership, classification, and current-version pointers"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Review context_objects schema, examples, source adapters, ownership fields, and version pointers."
+  - id: "1.2"
+    label: "Foundation: source versions, artifacts, relationships, assertions, dimensions, policies, packs, and feedback are separate records"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Check entity model and confirm relationships/scores/artifacts are not embedded as unbounded object arrays."
+  - id: "1.3"
+    label: "Foundation: raw context sync preserves enough fidelity to detect fragile information"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Inspect raw snapshot strategy, federated fetch modes, link-only modes, normalization, and source timestamps."
+  - id: "1.4"
+    label: "Foundation: context packs are the primary delivery unit for agents and humans"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Review implementation_pack, review_pack, repo_pack, incident_pack, and trace outputs."
+  - id: "1.5"
+    label: "Foundation: tools, masks, transformers, rubrics, processors, and prompts can be registered as context objects"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Check registries, context-object mappings, lineage, policy, and relationship examples for each component class."
+  - id: "2.1"
+    label: "Maturity: source precedence resolves conflicts between code, tickets, docs, chat, generated context, and local memory"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Review precedence tables, conflict edges, examples, and unresolved conflict warnings."
+  - id: "2.2"
+    label: "Maturity: flexible facets support source-specific attributes without breaking the core schema"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Check facet namespaces, schema registry, unknown-field preservation, and source adapter outputs."
+  - id: "2.3"
+    label: "Maturity: long records support dimensions, assertions, claims, relationship attributes, and model/reranker decisions"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Inspect long-form schemas for subject, dimension/predicate, value, scope, evidence, confidence, validity, and method."
+  - id: "2.4"
+    label: "Maturity: wide columnar analytics support cost, latency, quality, freshness, and outcome dashboards"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Review analytics events, warehouse tables, materialized views, and dashboard dimensions."
+  - id: "2.5"
+    label: "Maturity: graph traversal supports typed binary edges and n-ary endpoint relationships"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Check relationship endpoints, roles, evidence, confidence, validity windows, and traversal APIs."
+  - id: "2.6"
+    label: "Maturity: bitemporal history answers what was true in the source and what the system knew at pack time"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Inspect valid_from, valid_to, observed_at, recorded_at, indexed_at, and as-of queries."
+  - id: "2.7"
+    label: "Maturity: masks are composable projection and redaction objects with lineage and policy triggers"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Review mask registry, field-level behavior, redaction reasons, applied mask IDs, and downstream compatibility."
+  - id: "2.8"
+    label: "Maturity: transformers declare input/output contracts, lossiness, reversibility, validation, and lineage"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Inspect raw-to-normalized, normalized-to-artifact, artifact-to-embedding, and pack-to-view transformers."
+  - id: "3.1"
+    label: "Optimization: retrieval combines exact handles, keyword, vector, graph, temporal, entity, and policy-filtered modes"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Review retrieval planner, provider routing, filters, candidates, and explain traces."
+  - id: "3.2"
+    label: "Optimization: reranking uses source authority, freshness, graph proximity, source precedence, and learned relevance signals"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Inspect ranker features, RRF/MMR/cross-encoder/LoRA ranker support, and ranking telemetry."
+  - id: "3.3"
+    label: "Optimization: fragile information drives refresh priority, live validation, escalation, and warning labels"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Check fragility scores, refresh queues, source validation, and stale/conflict warnings in packs."
+  - id: "3.4"
+    label: "Optimization: feedback becomes structured training and evaluation data"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Inspect feedback events, accepted corrections, training exports, eval cases, and regression reports."
+  - id: "3.5"
+    label: "Optimization: model routing escalates by risk, uncertainty, disagreement, privacy, cost, and latency"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Review model registry, escalation score, risk thresholds, and human-review handoff."
+  - id: "3.6"
+    label: "Optimization: cost and token budgets are tracked per pack, retrieval step, model call, embedding, and expansion"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Check cost ledger, token accounting, cache hit rates, and unit economics dashboards."
+  - id: "3.7"
+    label: "Optimization: drift detection covers source coverage, schema changes, embedding/ranker behavior, policy denials, and outcome quality"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Review drift reports, baselines, alerts, and remediation records."
+  - id: "4.1"
+    label: "Strategic advantage: customers can prove what an agent saw, why it saw it, and whether it was allowed to see it"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Review context_trace, audit exports, policy decisions, source expansion logs, and pack lineage."
+  - id: "4.2"
+    label: "Strategic advantage: the pack format is reusable across Claude Code, Cursor, Copilot, Rovo Dev, CI agents, and internal agents"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Inspect MCP/API delivery, CLI, PR comments, IDE integrations, and pack schema stability."
+  - id: "4.3"
+    label: "Strategic advantage: the architecture can onboard new sources and industries without changing the core object contract"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Review adapter contracts, source taxonomy, facet namespaces, and extension examples."
+  - id: "4.4"
+    label: "Strategic advantage: customer-facing value is tied to measurable cycle time, review quality, trust, governance, or cost outcomes"
+    weight: 0.025
+    scale: "0.0-1.0"
+    evidence_required: "Check pilot metrics, customer reports, before/after studies, and expansion signals."
+scoring_method: "weighted_sum"

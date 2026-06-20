@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor · Determinism Factory (projection-only)</title>
+<style>
+  :root { --bg:#0d1117; --panel:#161b22; --line:#21262d; --fg:#e6edf3; --mut:#8b949e; --ok:#3fb950; --warn:#d29922; --bad:#f85149; --acc:#58a6ff; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  header { padding:14px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  h1 { font-size:15px; margin:0; font-weight:600; }
+  .sub { color:var(--mut); font-size:12px; }
+  button { background:var(--acc); color:#0d1117; border:0; border-radius:6px; padding:8px 14px; font-weight:700; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:wait; }
+  main { display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:12px; padding:16px; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:12px; }
+  .panel h2 { font-size:12px; margin:0 0 8px; color:var(--acc); text-transform:uppercase; letter-spacing:.04em; }
+  .wide { grid-column:1/-1; }
+  .answer { grid-column:1/-1; }
+  .answer .big { font-size:20px; font-weight:700; color:var(--ok); }
+  .row { display:flex; justify-content:space-between; gap:8px; padding:2px 0; border-bottom:1px dashed var(--line); }
+  .mut { color:var(--mut); }
+  .pill { display:inline-block; padding:1px 7px; border-radius:999px; font-size:11px; }
+  .pill.ok { background:rgba(63,185,80,.15); color:var(--ok); }
+  .pill.warn { background:rgba(210,153,34,.15); color:var(--warn); }
+  .pill.bad { background:rgba(248,81,73,.13); color:var(--bad); }
+  .pill.llm { background:rgba(88,166,255,.13); color:var(--acc); }
+  code { color:var(--acc); word-break:break-all; }
+  .hint { color:var(--mut); font-size:11px; }
+  .empty { color:var(--mut); font-style:italic; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Baltor · Determinism Factory</h1>
+  <span class="sub">LLMs propose · Baltor verifies · repeated VERIFIED patterns become deterministic · projection-only (this page computes no truth; it reads /api/determinism/*)</span>
+  <button id="run">Refresh projection</button>
+  <span id="status" class="sub"></span>
+</header>
+<div style="padding:0 18px 8px;" class="hint">
+  LLM proposal &ne; truth · consensus &ne; truth (can_serve_fact=false) · pattern is distilled from VERIFIED traces ONLY · a candidate rule is proposed, never live · promotion needs replay + shadow + a human sign-off.
+  Reference invariant: the served answer is the Reg&nbsp;E winner "10 business days" ONLY; the FAQ "30 days" is held out, never served. Public page — no private memory, no secrets, no durable writes.
+</div>
+<main id="panels">
+  <div class="panel answer"><h2>Served decision (deterministic)</h2><div id="answer" class="big mut">— loading —</div><div id="decision" class="hint"></div></div>
+</main>
+
+<script>
+// Projection only: fetch the API and RENDER. No truth is computed, stored, or mutated here.
+// No client-side persistence of truth; no durable writes; fetch ONLY /api/determinism/*.
+const EP = {
+  overview:   "/api/determinism/overview",
+  traces:     "/api/determinism/traces",
+  consensus:  "/api/determinism/consensus",
+  patterns:   "/api/determinism/patterns",
+  rules:      "/api/determinism/rules",
+  replay:     "/api/determinism/replay",
+  shadow:     "/api/determinism/shadow",
+  promotions: "/api/determinism/promotions",
+  fallback:   "/api/determinism/fallback",
+};
+const panels = document.getElementById("panels");
+const statusEl = document.getElementById("status");
+
+function esc(s){ return String(s==null?"":s).replace(/[&<>]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+function panel(title){ const d=document.createElement("div"); d.className="panel"; const h=document.createElement("h2"); h.textContent=title; d.appendChild(h); panels.appendChild(d); return d; }
+function wide(title){ const d=panel(title); d.classList.add("wide"); return d; }
+function row(p,k,v){ const r=document.createElement("div"); r.className="row"; r.innerHTML=`<span class="mut">${esc(k)}</span><span>${v}</span>`; p.appendChild(r); }
+function empty(p,msg){ const e=document.createElement("div"); e.className="empty"; e.textContent=msg||"(none)"; p.appendChild(e); }
+function kindPill(k){ const c = k==="workflow"?"ok":(k==="consensus"?"warn":"llm"); return `<span class="pill ${c}">${esc(k)}</span>`; }
+
+async function getJSON(url){ const r = await fetch(url); if(!r.ok && r.status>=500) throw new Error("HTTP "+r.status); return r.json(); }
+
+async function run(){
+  const btn=document.getElementById("run"); btn.disabled=true; statusEl.textContent="loading…";
+  [...panels.querySelectorAll(".panel:not(.answer)")].forEach(e=>e.remove());
+  document.getElementById("answer").textContent = "loading…";
+  document.getElementById("answer").className = "big mut";
+  try {
+    const [ov, trc, cons, pat, rul, rep, shad, prom, fb] = await Promise.all([
+      getJSON(EP.overview), getJSON(EP.traces), getJSON(EP.consensus), getJSON(EP.patterns),
+      getJSON(EP.rules), getJSON(EP.replay), getJSON(EP.shadow), getJSON(EP.promotions), getJSON(EP.fallback),
+    ]);
+    render({ov, trc, cons, pat, rul, rep, shad, prom, fb});
+    statusEl.textContent = "projected · deterministic · read-only";
+  } catch(e){
+    document.getElementById("answer").textContent = "(projection unavailable)";
+    const p = wide("Error"); empty(p, "error loading determinism projection: " + e);
+    statusEl.textContent = "error";
+  }
+  btn.disabled=false;
+}
+
+function render(d){
+  const g = (d.ov.reference)||{}, sc = (d.ov.stage_counts)||{};
+
+  // 0 Answer card: the REFERENCE served decision
+  document.getElementById("answer").textContent = g.served_decision || "(not served)";
+  document.getElementById("answer").className = "big " + (g.served_is_reference ? "" : "mut");
+  document.getElementById("decision").textContent =
+    `winner ${g.winner_answer||"-"} · held out ${g.held_out_answer||"-"} · served_by ${g.served_by||"-"} · reference ${g.served_is_reference?"yes":"no"}`;
+
+  // 1 Overview: stage counts + reference assertion + degraded note
+  let p = wide("Overview · stage counts");
+  if (d.ov.available === false) { empty(p, d.ov.note || "degraded — engine not available"); }
+  row(p, "workflow", `<code>${esc(d.ov.workflow_id||"-")}</code>`);
+  row(p, "as of", esc(d.ov.now||"-"));
+  row(p, "LLM traces", sc.llm_traces ?? "—");
+  row(p, "consensus runs", sc.consensus_runs ?? "—");
+  row(p, "verified traces", sc.verified_traces ?? "—");
+  row(p, "patterns", sc.patterns ?? "—");
+  row(p, "rule candidates", sc.rule_candidates ?? "—");
+  row(p, "promotions", sc.promotions ?? "—");
+  row(p, "safety blocks", `<span class="pill bad">${sc.safety_blocks ?? 0}</span>`);
+  row(p, "consensus can_serve_fact", g.consensus_can_serve_fact===false ? `<span class="pill ok">false (never truth)</span>` : `<span class="pill bad">${esc(g.consensus_can_serve_fact)}</span>`);
+  row(p, "lossless distill link", g.lossless ? `<span class="pill ok">preserved</span>` : `<span class="pill bad">lost</span>`);
+
+  // 2 LLM traces (proposals — never truth)
+  p = panel("LLM traces (proposals · never truth)");
+  const traces = (d.trc.traces)||[];
+  const llm = traces.filter(t=>t.trace_kind==="llm");
+  row(p, "available", d.trc.available===false ? "degraded" : "yes");
+  row(p, "llm traces", llm.length);
+  if (!llm.length) empty(p, d.trc.note || "no LLM proposals");
+  llm.forEach(t => row(p, `${kindPill(t.trace_kind)} <code>${esc(t.model_id||"")}</code>`,
+    `<span class="mut">${esc((t.decision&&t.decision.answer)||"")} · verified=${t.verified}</span>`));
+
+  // 3 Verified traces (the existing authority — source-grounded + receipt)
+  p = panel("Verified traces (authority)");
+  const vtr = traces.filter(t=>t.trace_kind==="workflow" && t.verified===true && t.scope==="global_public");
+  row(p, "verified workflow traces", vtr.length);
+  if (!vtr.length) empty(p, "no verified traces");
+  vtr.forEach(t => row(p, `${kindPill(t.trace_kind)} <code>${esc(t.step_id||"")}</code>`,
+    `<span class="mut">${esc((t.output_handles||[]).join(", ")) || "—"} · ${esc((t.receipt_ids||[]).join(","))}</span>`));
+
+  // 4 Consensus runs (EVIDENCE — can_serve_fact false)
+  p = panel("Consensus runs (evidence)");
+  if (d.cons.available === false) empty(p, d.cons.note || "no consensus run");
+  row(p, "agreement_score", d.cons.agreement_score ?? "—");
+  row(p, "routing", esc(d.cons.routing||"-"));
+  row(p, "disagreement clusters", (d.cons.disagreement_clusters||[]).length);
+  row(p, "can_serve_fact", d.cons.can_serve_fact===false ? `<span class="pill ok">false</span>` : `<span class="pill bad">${esc(d.cons.can_serve_fact)}</span>`);
+
+  // 5 Patterns (mined from VERIFIED traces ONLY; lossless support)
+  p = panel("Pattern candidates");
+  const pats = (d.pat.patterns)||[];
+  if (d.pat.available===false) empty(p, d.pat.note || "");
+  row(p, "patterns", pats.length);
+  if (!pats.length) empty(p, "no patterns mined");
+  pats.forEach(x => {
+    row(p, `<code>${esc(x.candidate_id)}</code>`, `<span class="mut">support=${x.support}</span>`);
+    row(p, "distilled from (lossless)", `<span class="mut">${(x.support_trace_ids||[]).length} verified traces</span>`);
+    row(p, "decided", `<span class="pill ok">${esc(x.decision&&x.decision.winner_answer)}</span> · held out <span class="pill warn">${esc(x.decision&&x.decision.loser_answer)}</span>`);
+  });
+
+  // 6 Rule candidates (proposed, never live; lossless distilled_from_trace_ids)
+  p = panel("Rule candidates (proposed)");
+  const rules = (d.rul.rules)||[];
+  if (d.rul.available===false) empty(p, d.rul.note || "");
+  row(p, "candidates", rules.length);
+  if (!rules.length) empty(p, "no rule candidates");
+  rules.forEach(r => {
+    row(p, `<code>${esc(r.rule_candidate_id)}</code>`, `${r.active?'<span class="pill bad">active</span>':'<span class="pill warn">proposed</span>'}`);
+    row(p, "asserts-equivalence-to", `<code>${esc(r.asserts_equivalence_to)}</code>`);
+    row(p, "distilled_from_trace_ids (lossless)", `<span class="mut">${(r.distilled_from_trace_ids||[]).length} traces</span>`);
+    row(p, "label_source", `<span class="pill ok">${esc(r.label_source)}</span>`);
+    row(p, "fallback", `<span class="mut">${esc(r.fallback&&r.fallback.route)} · never_fabricate=${r.fallback&&r.fallback.never_fabricate}</span>`);
+  });
+
+  // 7 Replay (precision / unsafe / tenant leak)
+  p = panel("Replay report");
+  if (d.rep.available===false) empty(p, d.rep.note || "no replay");
+  row(p, "trace_count", d.rep.trace_count ?? "—");
+  row(p, "precision", d.rep.precision ?? "—");
+  row(p, "unsafe_count", `<span class="pill ${d.rep.unsafe_count===0?'ok':'bad'}">${d.rep.unsafe_count ?? "—"}</span>`);
+  row(p, "tenant_leak_count", `<span class="pill ${d.rep.tenant_leak_count===0?'ok':'bad'}">${d.rep.tenant_leak_count ?? "—"}</span>`);
+
+  // 8 Shadow (live stayed authoritative)
+  p = panel("Shadow report");
+  if (d.shad.available===false) empty(p, d.shad.note || "no shadow");
+  row(p, "tick_count", d.shad.tick_count ?? "—");
+  row(p, "agreement_rate", d.shad.agreement_rate ?? "—");
+  row(p, "live_authoritative", d.shad.live_authoritative ? `<span class="pill ok">yes</span>` : `<span class="pill bad">no</span>`);
+  row(p, "unsafe_mismatch_count", `<span class="pill ${d.shad.unsafe_mismatch_count===0?'ok':'bad'}">${d.shad.unsafe_mismatch_count ?? "—"}</span>`);
+
+  // 9 Promotions (gate receipt)
+  p = panel("Promotions (gate receipt)");
+  const promo = d.prom.promoted, blk = d.prom.blocked;
+  if (!promo && !blk) empty(p, "no promotion decision");
+  if (promo) {
+    row(p, "promoted", promo.promoted ? `<span class="pill ok">yes</span>` : `<span class="pill bad">no</span>`);
+    row(p, "human_review_signed", promo.human_review_signed ? "yes" : "no");
+    row(p, "distilled_from (preserved)", `<span class="mut">${(promo.distilled_from_trace_ids||[]).length} traces</span>`);
+  }
+
+  // 10 Safety blocks (the dangerous error class the gate refuses)
+  p = panel("Safety blocks");
+  const blocks = (d.prom.safety_blocks)||[];
+  if (!blocks.length) empty(p, "no blocks (counter-cases all cleared)");
+  blocks.forEach(b => row(p, `<span class="pill bad">blocked</span>`, `<code>${esc(b)}</code>`));
+  if (blk) row(p, "tenant_private → global", blk.promoted ? `<span class="pill bad">leaked</span>` : `<span class="pill ok">refused</span>`);
+
+  // 11 Fallback (deterministic-first serving + recorded fallback; never fabricated)
+  p = panel("Fallback rate · serving");
+  const events = (d.fb.events)||[];
+  if (d.fb.available===false || !events.length) empty(p, d.fb.note || "no serving events");
+  row(p, "served_by_rule", esc(d.fb.served_by_rule||"-"));
+  row(p, "rule_fired", d.fb.rule_fired ? `<span class="pill ok">yes</span>` : `<span class="pill warn">no</span>`);
+  row(p, "OOD fell back", d.fb.ood_fell_back ? `<span class="pill warn">yes</span>` : "no");
+  const fallbacks = events.filter(e=>e.fell_back).length;
+  row(p, "fallback rate", `${events.length ? (fallbacks/events.length).toFixed(2) : "—"}`);
+  row(p, "fabricated", d.fb.fabricated ? `<span class="pill bad">true</span>` : `<span class="pill ok">false</span>`);
+  events.forEach(e => row(p, `<code>${esc(e.event_id)}</code> ${esc(e.reason)}`,
+    `<span class="mut">served_by=${esc(e.served_by)} · ${esc(e.decision==null?"(abstain)":e.decision)}</span>`));
+
+  // 12 The motion (M0→M7) — every stage legible at a glance
+  p = wide("The motion (M0 → M7)");
+  const stages = (d.ov.stages)||[];
+  if (!stages.length) empty(p, "no stage map");
+  stages.forEach(s => row(p, `<span class="mut">${esc(s.m)}</span> ${esc(s.stage)}`,
+    `${esc(s.output)} <span class="mut">· ${esc(s.safe)}</span>`));
+}
+
+document.getElementById("run").addEventListener("click", run);
+run();
+</script>
+</body>
+</html>

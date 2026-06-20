@@ -27,8 +27,8 @@ Multi-turn personal chat with preference + memory awareness.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `load_prefs` | processor | `processor/preference-loader` | — |
-| 2 | `chat` | harness | `harness/chat-with-memory` | — |
-| 3 | `leakage_check` | rule_pack | `rule-pack/grep-personal-info-leakage` | — |
-| 4 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `load_prefs` | processor | `processor/preference-loader` | - |
+| 2 | `chat` | harness | `harness/chat-with-memory` | - |
+| 3 | `leakage_check` | rule_pack | `rule-pack/grep-personal-info-leakage` | - |
+| 4 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

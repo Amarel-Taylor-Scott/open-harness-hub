@@ -1,0 +1,120 @@
+id: "pipeline/wikipedia-page-review"
+type: pipeline
+version: "0.1.0"
+name: "Wikipedia page review (NPOV / V / RS / OR / BLP / MOS)"
+description: |
+  End-to-end pipeline that reviews a Wikipedia article against the
+  core content policies and the article-quality rubric. Produces
+  per-claim findings with policy citation, severity, and suggested
+  edit (tag / rewrite / remove / talk-page-escalate).
+
+  Use cases:
+   - GA / FA peer review preparation
+   - New page patrol (NPP) backlog assist
+   - AfC (Articles for Creation) reviewer assistance
+   - "Is my draft ready to publish?" pre-submission check
+   - Cleanup queue triage (which {{citation needed}} articles are
+     fixable, which need rewriting, which need AfD)
+
+  Article text input options:
+   - paste raw wikitext
+   - paste rendered text
+   - (live URL fetch is via the tool/wikipedia-citation-checker
+     companion; this pipeline runs against the supplied text only)
+
+  NOT a substitute for human editor review. NOT for making BLP
+  removal decisions — that's an editor / admin call.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["media", "media.editorial", "media.factcheck", "education"]
+capability: ["evaluation", "extraction", "verification"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.grading"
+tags: ["wikipedia", "npov", "verifiability", "rs", "blp", "review", "encyclopedic"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+attribution:
+  source_url:  "https://en.wikipedia.org/wiki/Wikipedia:Content_policies"
+  source_kind: "other"
+  author:      "Wikipedia contributors (policy reference)"
+  license:     "CC-BY-SA-4.0"
+
+task: |
+  Given the text of a Wikipedia article (English Wikipedia, v0.1.0),
+  produce a per-policy-pillar quality assessment with per-finding
+  severity, exact quote, section pointer, and suggested edit.
+pipeline_kind: "grading"
+
+inputs:
+  - name: "article_text"
+    type: "string"
+  - name: "article_title"
+    type: "string"
+  - name: "language_edition"
+    type: "string"
+outputs:
+  - name: "grade"
+    type: "number"
+  - name: "findings"
+    type: "object[]"
+  - name: "suggested_edits"
+    type: "object[]"
+  - name: "trace"
+    type: "object[]"
+
+defaults:
+  persona: "persona/wikipedia-quality-reviewer"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/grep-wikipedia-quality-flags"
+
+steps:
+  - id: "normalize"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs:
+      data: "$.inputs.article_text"
+
+  - id: "grep_quality_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-wikipedia-quality-flags"
+    inputs:
+      text: "$.steps.normalize.output.prose"
+
+  - id: "rag_wp_policies"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.steps.grep_quality_flags.output.hits"
+      corpus: "knowledge-pack/wikipedia-quality-guidelines"
+      top_k: 8
+
+  - id: "review"
+    kind: "harness"
+    ref: "harness/wikipedia-quality-review"
+    inputs:
+      article_text: "$.steps.normalize.output.prose"
+      article_title: "$.inputs.article_title"
+      language_edition: "$.inputs.language_edition"
+
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.review.output"
+      rubric_ref: "rubric/wikipedia-article-quality-v1"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "wikipedia-page-review"
+      applied_layers: ["persona", "grep", "rag", "judge"]
+
+success_criteria:
+  - rubric:    "rubric/wikipedia-article-quality-v1"
+    threshold: 0.7

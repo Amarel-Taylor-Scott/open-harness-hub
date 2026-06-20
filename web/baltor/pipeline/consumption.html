@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor · Pipeline · Consumption (served context)</title>
+<style>
+  /* Cohesive with web/baltor/consume.html + memory.html: same palette/spacing/typography,
+     elevated with a pipeline stepper, INPUT/OUTPUT/LOSSLESS/LINEAGE panels. */
+  :root { --bg:#0d1117; --panel:#161b22; --panel2:#1b222c; --line:#21262d; --fg:#e6edf3; --mut:#8b949e;
+          --ok:#3fb950; --warn:#d29922; --bad:#f85149; --acc:#58a6ff; --violet:#a47ef7; --radius:10px; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:
+      radial-gradient(circle at 12% -4%, rgba(164,126,247,.10), transparent 36%),
+      radial-gradient(circle at 90% 108%, rgba(88,166,255,.08), transparent 40%), var(--bg);
+    color:var(--fg); font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  a { color:var(--acc); text-decoration:none; }
+  header { padding:14px 18px 0; }
+  .crumbs { color:var(--mut); font-size:11px; text-transform:uppercase; letter-spacing:.08em; }
+  .crumbs a { color:var(--mut); }
+  h1 { font-size:19px; margin:6px 0 2px; font-weight:700; letter-spacing:-.01em; }
+  .sub { color:var(--mut); font-size:12px; }
+  .bar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:12px 18px 6px; }
+  button { background:var(--acc); color:#0d1117; border:0; border-radius:7px; padding:8px 15px; font:inherit; font-weight:700; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:wait; }
+  .status { color:var(--mut); font-size:12px; }
+  .dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--mut); margin-right:5px; vertical-align:middle; }
+  .dot.ok { background:var(--ok); } .dot.warn { background:var(--warn); } .dot.bad { background:var(--bad); } .dot.run { background:var(--acc); }
+
+  /* ── pipeline stepper (shared across all 7 stage pages) ── */
+  .stepper { display:flex; gap:6px; overflow-x:auto; padding:8px 18px 14px; border-bottom:1px solid var(--line); }
+  .step { flex:0 0 auto; display:flex; align-items:center; gap:7px; padding:7px 11px; border:1px solid var(--line);
+          border-radius:999px; background:var(--panel); color:var(--mut); font-size:11px; font-weight:700;
+          text-transform:uppercase; letter-spacing:.05em; white-space:nowrap; }
+  .step .n { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%;
+             background:var(--line); color:var(--mut); font-size:10px; }
+  .step.cur { border-color:var(--violet); color:var(--fg); background:linear-gradient(180deg, rgba(164,126,247,.16), transparent); }
+  .step.cur .n { background:var(--violet); color:#0d1117; }
+  .prevnext { display:flex; justify-content:space-between; padding:10px 18px 0; font-size:12px; }
+
+  main { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:12px; padding:14px 18px 28px; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:13px; }
+  .panel h2 { font-size:11px; margin:0 0 9px; color:var(--acc); text-transform:uppercase; letter-spacing:.06em; display:flex; align-items:center; gap:7px; }
+  .panel.lossless { border-color:color-mix(in srgb, var(--warn) 38%, var(--line)); background:linear-gradient(180deg, rgba(210,153,34,.06), transparent), var(--panel); }
+  .panel.lossless h2 { color:var(--warn); }
+  .panel.output { border-color:color-mix(in srgb, var(--ok) 30%, var(--line)); }
+  .panel.output h2 { color:var(--ok); }
+  .panel.answer .big { font-size:21px; font-weight:800; color:var(--ok); line-height:1.25; }
+  .panel.answer .big.mut { color:var(--mut); }
+  .wide { grid-column:1/-1; }
+  .tag { font-size:10px; font-weight:700; padding:1px 7px; border-radius:999px; border:1px solid var(--line); color:var(--mut); text-transform:uppercase; letter-spacing:.05em; }
+  .row { display:flex; justify-content:space-between; gap:10px; padding:4px 0; border-bottom:1px dashed var(--line); }
+  .row:last-child { border-bottom:0; }
+  .mut { color:var(--mut); }
+  .pill { display:inline-block; padding:1px 8px; border-radius:999px; font-size:11px; font-weight:600; }
+  .pill.ok { background:rgba(63,185,80,.15); color:var(--ok); }
+  .pill.warn { background:rgba(210,153,34,.15); color:var(--warn); }
+  .pill.bad { background:rgba(248,81,73,.14); color:var(--bad); }
+  .pill.acc { background:rgba(88,166,255,.14); color:var(--acc); }
+  code { color:var(--acc); word-break:break-all; }
+  .hint { color:var(--mut); font-size:11px; line-height:1.5; }
+  .empty { color:var(--mut); font-style:italic; padding:6px 0; }
+  .loading { color:var(--acc); }
+  .degraded { color:var(--warn); }
+  .err { color:var(--bad); }
+  .fact { border:1px solid var(--line); border-radius:8px; padding:9px 10px; margin-top:8px; background:var(--panel2); }
+  .fact.served { border-color:color-mix(in srgb, var(--ok) 36%, var(--line)); }
+  .fact.held { border-color:color-mix(in srgb, var(--warn) 42%, var(--line)); }
+  .receipt-chain { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:8px; }
+  .receipt-chain .seg { border:1px solid var(--line); border-radius:6px; padding:4px 8px; font-size:11px; background:var(--panel2); }
+  .receipt-chain .arrow { color:var(--mut); }
+</style>
+</head>
+<body>
+<header>
+  <div class="crumbs"><a href="./index.html">Pipeline journey</a> &rsaquo; Stage 07</div>
+  <h1>Consumption · served context</h1>
+  <div class="sub">The final ContextResponse: <b>served facts</b> (each with a source handle) plus <b>held_out_warnings</b> shown next to them,
+    and the verification &rarr; optimization &rarr; consumption receipt lineage. Projection-only: this page computes no truth; it reads /api/pipeline/*.</div>
+</header>
+
+<nav class="stepper" id="stepper" aria-label="Pipeline stages"></nav>
+
+<div class="bar">
+  <button id="run">Run / Refresh</button>
+  <span class="status" id="status"><span class="dot"></span>idle</span>
+  <span class="prevnext" style="margin-left:auto; gap:14px;">
+    <a id="prev" href="./verification.html">&larr; Verification</a>
+    <a id="next" href="./index.html">Journey index &rarr;</a>
+  </span>
+</div>
+
+<main id="panels">
+  <div class="panel wide" id="banner"><span class="empty">&mdash; click Run / Refresh &mdash;</span></div>
+</main>
+
+<script>
+// PROJECTION ONLY. This page fetches projection APIs and RENDERS. It computes, stores, and mutates NO truth.
+// No durable writes; no client-side persistence of truth; no secrets. Held-out warnings shown SEPARATELY.
+const STAGE = "consumption";
+const QS = "?tenant=demo&corpus=cfpb";
+const EP = {
+  overview:    "/api/pipeline/overview" + QS,
+  consumption: "/api/pipeline/consumption" + QS,
+};
+const STAGES = [
+  ["upload","Upload","upload.html"], ["decomposition","Decompose","decomposition.html"],
+  ["reconciliation","Reconcile","reconciliation.html"], ["enhancement","Enhance","enhancement.html"],
+  ["optimization","Optimize","optimization.html"], ["verification","Verify","verification.html"],
+  ["consumption","Consume","consumption.html"],
+];
+const panels = document.getElementById("panels");
+const statusEl = document.getElementById("status");
+
+function esc(s){ return String(s==null?"":s).replace(/[&<>]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+function setStatus(kind,msg){ statusEl.innerHTML = `<span class="dot ${kind}"></span>${esc(msg)}`; }
+function panel(title,cls){ const d=document.createElement("div"); d.className="panel"+(cls?" "+cls:""); const h=document.createElement("h2"); h.innerHTML=title; d.appendChild(h); panels.appendChild(d); return d; }
+function row(p,k,v){ const r=document.createElement("div"); r.className="row"; r.innerHTML=`<span class="mut">${esc(k)}</span><span>${v}</span>`; p.appendChild(r); }
+function empty(p,msg){ const e=document.createElement("div"); e.className="empty"; e.textContent=msg||"(none)"; p.appendChild(e); }
+
+function buildStepper(){
+  const nav=document.getElementById("stepper");
+  STAGES.forEach(([id,label,href],i)=>{
+    const a=document.createElement("a"); a.className="step"+(id===STAGE?" cur":""); a.href="./"+href;
+    a.innerHTML=`<span class="n">${i+1}</span>${esc(label)}`; nav.appendChild(a);
+  });
+}
+
+async function getJSON(url){ const r=await fetch(url); if(!r.ok && r.status>=500) throw new Error("HTTP "+r.status+" "+url); return r.json(); }
+
+async function run(){
+  const btn=document.getElementById("run"); btn.disabled=true; setStatus("run","loading…");
+  [...panels.querySelectorAll(".panel")].forEach(e=>e.remove());
+  const wait=panel('<span class="loading">Loading consumption projection…</span>',"wide"); empty(wait,"fetching /api/pipeline/consumption …");
+  let ov=null, cn=null, degraded=false;
+  try {
+    [ov, cn] = await Promise.all([
+      getJSON(EP.overview).catch(()=>{degraded=true; return null;}),
+      getJSON(EP.consumption),
+    ]);
+  } catch(e){
+    [...panels.querySelectorAll(".panel")].forEach(x=>x.remove());
+    const p=panel('<span class="err">Error</span>',"wide"); empty(p,"error loading consumption projection: "+e);
+    setStatus("bad","error"); btn.disabled=false; return;
+  }
+  [...panels.querySelectorAll(".panel")].forEach(e=>e.remove());
+  render(ov, cn||{}, degraded);
+  setStatus(degraded?"warn":"ok", degraded ? "degraded · projected (overview unavailable)" : "served · read-only");
+  btn.disabled=false;
+}
+
+function render(ov, cn, degraded){
+  const served = cn.served_facts || [];
+  const held = cn.held_out_warnings || [];
+  const rc = cn.receipts || {};
+
+  // ANSWER (the served, governed answer) — OUTPUT headline
+  let p = panel('Answer · served context', "answer output wide");
+  const ans=document.createElement("div"); ans.className="big"+(cn.answer?"":" mut"); ans.textContent = cn.answer || "(not consumable)";
+  p.appendChild(ans);
+  if (degraded) { const d=document.createElement("div"); d.className="degraded"; d.style.marginTop="6px"; d.textContent="overview endpoint unavailable — rendering consumption payload only (degraded)."; p.appendChild(d); }
+  const meta=document.createElement("div"); meta.className="hint"; meta.style.marginTop="6px";
+  meta.innerHTML = `run_id <code>${esc((ov&&ov.run_id)||"—")}</code> · served_facts <b>${served.length}</b> · held_out_warnings <b>${held.length}</b>`;
+  p.appendChild(meta);
+
+  // INPUT — the upstream gates this answer rests on
+  p = panel("Input · upstream gate results");
+  row(p, "verification receipt", `<code>${esc(rc.verification||"—")}</code>`);
+  row(p, "optimization receipt", `<code>${esc(rc.optimization||"—")}</code>`);
+  row(p, "served facts (post-gate)", served.length);
+  row(p, "held-out warnings carried", held.length);
+  const ih=document.createElement("div"); ih.className="hint"; ih.style.marginTop="8px";
+  ih.textContent="Only verification allow-decisions on the optimization-promoted pack reach this stage.";
+  p.appendChild(ih);
+
+  // OUTPUT — served facts, each with a source handle
+  p = panel("Output · served facts (each with a source handle)", "output");
+  if (!served.length) { empty(p, "no served facts (answer not consumable)"); }
+  served.forEach(f => {
+    const d=document.createElement("div"); d.className="fact served";
+    d.innerHTML = `<div><span class="pill ok">served</span> <code>${esc(f.source_handle||"(no handle)")}</code></div>`+
+      `<div class="mut" style="margin-top:4px;">${esc(f.text||f.object||"")}</div>`;
+    p.appendChild(d);
+  });
+
+  // LOSSLESS — held_out_warnings shown next to the served answer
+  p = panel("Held out · warnings (omitted from the answer, not erased)", "lossless");
+  const losslessHint=document.createElement("div"); losslessHint.className="hint";
+  losslessHint.textContent="Lossless distillation: items omitted from the served answer surface here as held_out_warnings with their reason — visible, retained, never hidden.";
+  p.appendChild(losslessHint);
+  if (!held.length) { empty(p, "no held-out warnings in this response"); }
+  held.forEach(h => {
+    const d=document.createElement("div"); d.className="fact held";
+    const label = h.source_handle || h.artifact_id || h.id || "held-out";
+    d.innerHTML = `<div><span class="pill warn">held out</span> <code>${esc(label)}</code></div>`+
+      `<div class="mut" style="margin-top:4px;">${esc(h.reason||h.text||h.warning||"")}</div>`;
+    p.appendChild(d);
+  });
+
+  // LINEAGE — verification → optimization → consumption receipt chain
+  p = panel("Source handles · receipt lineage");
+  const chain=document.createElement("div"); chain.className="receipt-chain";
+  chain.innerHTML =
+    `<span class="seg"><span class="mut">verification</span><br><code>${esc(rc.verification||"—")}</code></span>`+
+    `<span class="arrow">&rarr;</span>`+
+    `<span class="seg"><span class="mut">optimization</span><br><code>${esc(rc.optimization||"—")}</code></span>`+
+    `<span class="arrow">&rarr;</span>`+
+    `<span class="seg"><span class="mut">consumption</span><br><code>${esc(rc.consumption||"—")}</code></span>`;
+  p.appendChild(chain);
+  const handles = new Set();
+  served.forEach(f => { if(f.source_handle) handles.add(f.source_handle); (f.source_handles||[]).forEach(h=>handles.add(h)); });
+  const sub=document.createElement("div"); sub.className="hint"; sub.style.marginTop="10px"; sub.textContent="served source handles:"; p.appendChild(sub);
+  if (handles.size) [...handles].forEach(h => row(p, "", `<code>${esc(h)}</code>`));
+  else empty(p, "no source handles in this response");
+  const nx=document.createElement("div"); nx.className="hint"; nx.style.marginTop="8px";
+  nx.innerHTML = `Back to the start: <a href="./index.html">pipeline journey index &rarr;</a> walks all 7 stages of this run.`;
+  p.appendChild(nx);
+}
+
+buildStepper();
+document.getElementById("run").addEventListener("click", run);
+run();
+</script>
+</body>
+</html>

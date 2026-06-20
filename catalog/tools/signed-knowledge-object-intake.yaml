@@ -1,0 +1,78 @@
+id: "tool/signed-knowledge-object-intake"
+type: tool
+version: "0.1.0"
+name: "Signed knowledge object intake"
+description: "Accepts signed personal, organizational, government, or project knowledge objects, validates usage policies, checks revocation state, and emits normalized records for search and RAG indexing."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "government", "cross_industry"]
+capability: ["verification", "governance", "retrieval"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+tags: ["signed-knowledge", "rag-network", "intake", "revocation", "privacy-boundary"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    signed_object:
+      type: object
+    publisher_verification:
+      type: object
+    policy_defaults:
+      type: object
+  required: ["signed_object", "publisher_verification"]
+returns:
+  type: object
+  properties:
+    object_id:
+      type: string
+    intake_status:
+      type: string
+      enum: ["accepted", "rejected", "needs_review", "revoked", "expired"]
+    normalized_claims:
+      type: array
+      items:
+        type: object
+    usage_policy:
+      type: object
+    privacy_boundary:
+      type: string
+    index_records:
+      type: array
+      items:
+        type: object
+    review_notes:
+      type: array
+      items:
+        type: string
+side_effects: "write"
+examples:
+  - input:
+      signed_object:
+        object_id: "profile/example-person/public"
+        publisher_id: "person/example-person"
+        claims:
+          name: "Example Person"
+        usage_policy:
+          allow_retrieval: true
+      publisher_verification:
+        verification_status: "needs_review"
+    output:
+      object_id: "profile/example-person/public"
+      intake_status: "needs_review"
+      normalized_claims: []
+      usage_policy:
+        allow_retrieval: true
+      privacy_boundary: "user-private"
+      index_records: []
+      review_notes: ["Example only."]
+implementations:
+  - kind: "callable"
+    path: "tools.signed_knowledge_object_intake.run"
+  - kind: "mcp"
+    path: "mcp/signed_knowledge.intake_object"

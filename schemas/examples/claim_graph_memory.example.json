@@ -1,0 +1,21 @@
+{
+  "capability_slot": "claim_graph_memory",
+  "adapter_id": "claimgraph.stub@v1",
+  "description": "ClaimSet -> TemporalClaimGraph. Bi-temporal: each claim carries the source handle + the window it was asserted-true. Graphiti is the candidate primary behind the same contract.",
+  "input": {
+    "schema": "ClaimSet",
+    "claims": [
+      {"claim_id": "c1", "subject": "reg-e-error-resolution", "predicate": "deadline_business_days", "object": "10", "source_handle": "ctx://cfpb-sample/reg-e.pdf#page=1&block=2"},
+      {"claim_id": "c2", "subject": "reg-e-error-resolution", "predicate": "deadline_business_days", "object": "30", "source_handle": "ctx://cfpb-sample/faq.html#block=7"}
+    ]
+  },
+  "output": {
+    "schema": "TemporalClaimGraph",
+    "nodes": [{"id": "reg-e-error-resolution", "kind": "entity"}],
+    "edges": [
+      {"from": "reg-e-error-resolution", "rel": "deadline_business_days", "to": "10", "source_handle": "ctx://cfpb-sample/reg-e.pdf#page=1&block=2", "valid_from": "T0"},
+      {"from": "reg-e-error-resolution", "rel": "deadline_business_days", "to": "30", "source_handle": "ctx://cfpb-sample/faq.html#block=7", "valid_from": "T0"}
+    ],
+    "conflicts": [{"kind": "deadline_mismatch", "claims": ["c1", "c2"], "note": "reconciliation is the authority's job, not the memory store's"}]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "$id": "inference/ResolvedInferencePreference.v1",
+  "title": "ResolvedInferencePreference.v1",
+  "type": "object",
+  "additionalProperties": true,
+  "description": "The effective preference after OIPS inheritance (global -> product -> tenant -> environment -> object-type -> object-instance -> call). Carries the resolved_from trail + an effective_policy_hash for audit.",
+  "required": [
+    "preference_id",
+    "effective",
+    "resolved_from",
+    "effective_policy_hash"
+  ],
+  "properties": {
+    "preference_id": {
+      "type": "string"
+    },
+    "effective": {
+      "type": "object"
+    },
+    "resolved_from": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "effective_policy_hash": {
+      "type": "string"
+    },
+    "conflict_notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

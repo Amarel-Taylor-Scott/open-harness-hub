@@ -1,0 +1,45 @@
+openapi: 3.1.0
+info:
+  title: Baltor Runtime API
+  version: "1.0.0"
+  description: >
+    HTTP surface for the generalized runtime. Request/response bodies are the versioned envelopes
+    (see schemas/envelopes/*.schema.json). NOTE: these endpoints are the CONTRACT; the live wiring of
+    /api/runtime/* into scripts/baltor_admin_demo_server.py is the deferred generalized-runtime pass
+    (the contract layer — envelopes, schemas, ports, registry, harness, worker — is shipped + proven).
+paths:
+  /api/runtime/pipelines:
+    get:
+      summary: List registered pipelines (PipelineSpec refs)
+      responses: { "200": { description: OK } }
+  /api/runtime/pipelines/run:
+    post:
+      summary: Enqueue a pipeline run (CommandEnvelope work onto the durable queue)
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: "../../schemas/envelopes/CommandEnvelope.v1.schema.json" } } }
+      responses:
+        "200": { description: "run accepted", content: { application/json: { schema: { type: object, required: [run_id], properties: { run_id: { type: string } } } } } }
+        "422": { description: "schema validation failed (ErrorEnvelope)", content: { application/json: { schema: { $ref: "../../schemas/envelopes/ErrorEnvelope.v1.schema.json" } } } }
+  /api/runtime/runs/{run_id}:
+    get:
+      summary: Get a run's artifacts/edges/vectors/conflicts/reconciliations (projection)
+      parameters: [ { name: run_id, in: path, required: true, schema: { type: string } } ]
+      responses: { "200": { description: OK }, "404": { description: not found } }
+  /api/runtime/artifacts:
+    get:
+      summary: List artifacts for a tenant (ArtifactEnvelope projections)
+      parameters: [ { name: tenant_id, in: query, required: true, schema: { type: string } } ]
+      responses: { "200": { description: OK } }
+  /api/runtime/events:
+    get:
+      summary: Recent EventEnvelopes (CloudEvents) for a run
+      parameters: [ { name: run_id, in: query, required: true, schema: { type: string } } ]
+      responses: { "200": { description: OK } }
+components:
+  schemas:
+    CommandEnvelope: { $ref: "../../schemas/envelopes/CommandEnvelope.v1.schema.json" }
+    EventEnvelope: { $ref: "../../schemas/envelopes/EventEnvelope.v1.schema.json" }
+    ArtifactEnvelope: { $ref: "../../schemas/envelopes/ArtifactEnvelope.v1.schema.json" }
+    ProcessorResult: { $ref: "../../schemas/envelopes/ProcessorResult.v1.schema.json" }
+    ErrorEnvelope: { $ref: "../../schemas/envelopes/ErrorEnvelope.v1.schema.json" }

@@ -1,0 +1,35 @@
+id: "benchmark/apparel-forced-labor-trace-bench"
+type: benchmark
+version: "0.1.0"
+name: "Apparel Forced Labor Trace benchmark"
+description: "Synthetic benchmark for apparel forced labor trace review quality, evidence grounding, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["esg.modern_slavery", "supply_chain.due_diligence"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["apparel-forced-labor-trace", "expansion-v4"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/apparel-forced-labor-trace-review"
+dataset: "dataset/apparel-forced-labor-trace-samples"
+rubric: "rubric/apparel-forced-labor-trace-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/apparel-forced-labor-trace-review"
+    rule_pack_override: ["rule-pack/grep-apparel-forced-labor-trace-flags", "rule-pack/rag-apparel-forced-labor-trace-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 17
+report:
+  output: "dist/benchmarks/apparel-forced-labor-trace/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

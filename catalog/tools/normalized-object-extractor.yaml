@@ -1,0 +1,72 @@
+id: "tool/normalized-object-extractor"
+type: tool
+version: "0.1.0"
+name: "Normalized object extractor"
+description: "Extracts candidate tasks, facts, questions, checklist items, decision gates, tool requirements, and failure modes from governed source content into normalized object records with evidence spans."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["extraction", "summarization", "classification", "research"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "pre_api.ingest"
+tags: ["object-factory", "normalization", "extraction", "source-spans", "candidate-objects"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    source_record:
+      type: object
+    source_content:
+      type: object
+    extraction_targets:
+      type: array
+      items:
+        type: string
+    extraction_policy:
+      type: object
+  required: ["source_content", "extraction_targets"]
+returns:
+  type: object
+  properties:
+    normalized_objects:
+      type: array
+      items:
+        type: object
+    evidence_spans:
+      type: array
+      items:
+        type: object
+    extraction_warnings:
+      type: array
+      items:
+        type: string
+side_effects: "read"
+examples:
+  - input:
+      source_content:
+        markdown_pointer: "s3://hub-derived/example/page.md"
+        source_spans:
+          - id: "span-001"
+            heading: "Review steps"
+      extraction_targets: ["checklist_item", "decision_gate"]
+    output:
+      normalized_objects:
+        - object_type: "checklist_item"
+          text: "Review the source evidence before publishing the object."
+          evidence_span_ids: ["span-001"]
+      evidence_spans:
+        - id: "span-001"
+          heading: "Review steps"
+      extraction_warnings: []
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.object_factory_workers.extract_normalized_objects"
+    language: "python"
+  - kind: "mcp"
+    path: "mcp/object_factory.extract_normalized_objects"

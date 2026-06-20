@@ -1,0 +1,69 @@
+id: "tool/generative-media-router"
+type: tool
+version: "0.1.0"
+name: "Generative media router"
+description: "Selects image, video, audio, music, or 3D generation providers based on modality, policy, cost, latency, resolution, duration, licensing, and deployment boundary."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "media", "cross_industry"]
+capability: ["generation", "planning", "tool_use"]
+modality: ["image", "video", "audio", "music", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+tags: ["multimodal", "image-generation", "video-generation", "music-generation", "cost-routing"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    request:
+      type: object
+      description: "Prompt, modality, duration, resolution, style, safety, and license requirements."
+    provider_registry:
+      type: array
+      items:
+        type: object
+    budget:
+      type: object
+    deployment_boundary:
+      type: string
+  required: ["request", "provider_registry"]
+returns:
+  type: object
+  properties:
+    selected_provider:
+      type: string
+    selected_model:
+      type: string
+    route_reason:
+      type: string
+    cost_estimate:
+      type: object
+    safety_requirements:
+      type: array
+      items:
+        type: string
+side_effects: "none"
+examples:
+  - input:
+      request:
+        modality: "music"
+        duration_seconds: 30
+        prompt: "short instrumental intro"
+      provider_registry:
+        - name: "local-audio-model"
+          modalities: ["audio", "music"]
+    output:
+      selected_provider: "local-audio-model"
+      selected_model: null
+      route_reason: "Only registered provider supports requested modality."
+      cost_estimate: {}
+      safety_requirements: ["license_check", "audio_safety_screen"]
+implementations:
+  - kind: "callable"
+    path: "tools.generative_media_router.route"
+  - kind: "mcp"
+    path: "mcp/media.route_generation"

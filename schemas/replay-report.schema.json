@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/replay-report.schema.json",
+  "title": "Index delta replay report",
+  "description": "Audit output proving whether partition index deltas replay into an idempotent index state.",
+  "type": "object",
+  "required": ["version", "generated_at", "ok", "partition_count", "delta_count", "replayed_record_count", "errors", "warnings"],
+  "properties": {
+    "version": { "type": "string" },
+    "generated_at": { "type": "string" },
+    "ok": { "type": "boolean" },
+    "partition_count": { "type": "integer", "minimum": 0 },
+    "delta_count": { "type": "integer", "minimum": 0 },
+    "replayed_record_count": { "type": "integer", "minimum": 0 },
+    "index_kind_counts": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "operation_counts": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "errors": { "type": "array", "items": { "type": "string" } },
+    "warnings": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": true
+}

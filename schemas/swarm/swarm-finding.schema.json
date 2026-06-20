@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/swarm/swarm-finding.schema.json",
+  "title": "Swarm finding",
+  "description": "One structured observation from a single bounded swarm agent about a context object: its type, severity, a human summary, the ctx:// evidence it rests on, and an optional suggestion. Findings are inputs to the SwarmConsensus; they never mutate canonical state.",
+  "type": "object",
+  "required": ["agent", "finding_type", "severity", "summary"],
+  "properties": {
+    "agent": { "type": "string" },
+    "finding_type": { "type": "string" },
+    "severity": { "type": "string", "enum": ["info", "low", "medium", "high", "critical"] },
+    "summary": { "type": "string" },
+    "evidence": { "type": "array", "items": { "type": "string" } },
+    "suggestion": { "type": ["string", "null"] }
+  },
+  "additionalProperties": true
+}

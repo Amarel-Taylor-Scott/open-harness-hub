@@ -1,0 +1,45 @@
+id: processor/emit-claudemd-fragment
+type: processor
+version: 0.1.0
+name: Emit CLAUDE.md fragment
+description: Emit the distilled, always-loaded near-zero-token tier as a CLAUDE.md fragment — stable knowledge
+  that survives compaction (conventions, glossary).
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+capability:
+- format_conversion
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- baltor
+- consumption-surface
+created: '2026-05-29'
+updated: '2026-05-29'
+attribution:
+  source_kind: manual
+  author: Open Harness Hub — Baltor
+  license: MIT
+process_kind: deliver.claudemd
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: distilled
+  type: object
+outputs:
+- name: claudemd
+  type: object
+side_effects: none
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.deliver.emit_claudemd_fragment.run
+  language: python
+links:
+  source: docs/strategy/context-enrichment-service.md

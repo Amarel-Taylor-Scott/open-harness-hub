@@ -1,0 +1,78 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/syndromic-surveillance-case-definitions",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "WHO syndromic surveillance case definitions and outbreak thresholds (offline)",
+  "description": "Offline Knowledge Corpus of public-domain WHO syndromic surveillance case\ndefinitions covering: acute watery diarrhoea (cholera), acute respiratory\nillness (ARI/ILI), meningitis syndrome, acute haemorrhagic fever, acute\njaundice, severe acute malnutrition (SAM), and measles-like rash illness.\nEach entry includes the WHO IDSR (Integrated Disease Surveillance and\nResponse) or EWARN alert threshold, the minimum case definition criteria,\nand the escalation tier (Green/Yellow/Red) used by the AfyaEdge triage\npattern.\n\nDEFENSIVE INGESTION CONTRACT:\n- All content sourced from public-domain WHO IDSR 3rd edition and WHO\n  EWARN field guides; no novel clinical criteria are generated.\n- This corpus is a decision-SUPPORT reference only. It does NOT replace\n  clinical diagnosis or official epidemiological investigation.\n- Every harness consuming this pack MUST surface the disclaimer:\n  \"These are surveillance thresholds for triage support only — always\n  confirm with a trained health officer and escalate to MoH as required.\"\n- Alert thresholds may be superseded by in-country MoH guidance; treat\n  this corpus as a baseline pending local calibration.\n- Volatile facts (active outbreak status, local MoH contacts) are\n  excluded; only stable syndromic definitions and baseline thresholds\n  are included.\n\nCAPABILITY LIFT (structural): in remote/low-resource community health\nsettings, network connectivity is absent or unreliable. Field health\nworkers cannot query WHO servers mid-consultation. This corpus encodes\nthe stable syndromic decision rules so the on-device triage assistant\ncan function when cloud retrieval is impossible.\nlift_reason: no_addressable_source (network unavailable in the field);\nmechanism: context_length (no model can reliably recall all IDSR\nthresholds at inference time without retrieval).",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC-BY-4.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/syndromic-surveillance-case-definitions",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-28",
+  "keywords": [
+    "offline",
+    "on-device",
+    "syndromic-surveillance",
+    "who",
+    "idsr",
+    "ewarn",
+    "outbreak-threshold",
+    "global-south",
+    "africa",
+    "field-epidemiology",
+    "defensive",
+    "structural-lift",
+    "afyaedge"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-28",
+  "citation": "WHO Integrated Disease Surveillance and Response (IDSR) Technical Guidelines, 3rd edition (2020) — public domain, CC-BY-NC-SA-3.0-IGO; WHO EWARN (Early Warning Alert and Response Network) Field Guide — public domain; WHO Communicable Disease Toolkit for Syria (community health syndromic definitions section) — public domain"
+}

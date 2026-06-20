@@ -33,7 +33,7 @@ defined chat template + generation kwargs.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `infer` | harness | `harness/text-safety-review` | — |
-| 3 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `infer` | harness | `harness/text-safety-review` | - |
+| 3 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

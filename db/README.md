@@ -10,7 +10,7 @@ the other backends derive from it.
 | **SQLite** | Embedded / single-file portable catalog. WAL mode + FTS5 built-in. | `sqlite/schema.sql` |
 | **SQLite + sqlite-vec** | Embedded vector search — single-file catalog + vectors, zero deps. | `sqlite-vec/schema.sql` |
 | **DuckDB** | OLAP analytics over runs / cost / latency without a server. Native ARRAY + JSON + HNSW. | `duckdb/schema.sql` |
-| **MongoDB / Couchbase / Firestore** | Document store. One collection per artifact type. | `mongodb/collections.md` |
+| **MongoDB / Couchbase / Firestore** | Document store. One collection per component type. | `mongodb/collections.md` |
 | **Redis / DynamoDB** | Runtime cache + ephemeral run state. Sub-ms reads. | `redis/keys.md` |
 | **Elasticsearch / OpenSearch** | BM25 + dense vector hybrid search at scale (Reciprocal Rank Fusion). | `elasticsearch/index-templates.md` |
 | **Neo4j / Memgraph** | Graph queries: which pipelines depend on this harness? 2-hop blast radius? | `neo4j/schema.cypher` |
@@ -42,26 +42,26 @@ canonical store, plus one specialty engine for either RAG retrieval
 ## Row shape every backend agrees on
 
 ```sql
--- One row per artifact (with JSON body for the long tail).
-artifact(id, type, version, name, description, license, lifecycle,
+-- One row per component (with JSON body for the long tail).
+component(id, type, version, name, description, license, lifecycle,
          lifecycle_position, trust_boundary, freshness, eu_ai_act_risk,
          created, updated, attribution, links, body)
 
 -- Cross-cutting axes
-artifact_industry(artifact_id, industry)
-artifact_capability(artifact_id, capability)
-artifact_modality(artifact_id, modality)
-artifact_tag(artifact_id, tag)
+component_industry(component_id, industry)
+component_capability(component_id, capability)
+component_modality(component_id, modality)
+component_tag(component_id, tag)
 
--- Inter-artifact edges
-artifact_ref(src_id, dst_id, role)
+-- Inter-component edges
+component_ref(src_id, dst_id, role)
 
 -- Leaves inside packs
 rule(rule_id, pack_id, family, severity, category, pattern, body, enabled)
 knowledge_leaf(leaf_id, pack_id, leaf_type, industry, language, body, embedding)
 
 -- Pipeline / benchmark / harness runs
-run(run_id, artifact_id, started_at, finished_at, status, adapter_id,
+run(run_id, component_id, started_at, finished_at, status, adapter_id,
     inputs, outputs, trace, cost_usd, trust_boundary)
 ```
 

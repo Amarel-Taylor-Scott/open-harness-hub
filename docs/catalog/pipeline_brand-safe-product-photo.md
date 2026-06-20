@@ -31,12 +31,12 @@ brand-safety rules and produces verifiable lens physics.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard_input` | rule_pack | `rule-pack/grep-prohibited-terms` | — |
-| 2 | `retrieve_style` | knowledge_pack | `knowledge-pack/style-references-cinematic` | — |
-| 3 | `retrieve_physics` | knowledge_pack | `knowledge-pack/lens-physics-primers` | — |
-| 4 | `shape_prompt` | harness | `harness/text-safety-review` | — |
-| 5 | `txt2img` | tool | `tool/txt2img-sdxl` | — |
-| 6 | `review_output` | rule_pack | `rule-pack/grep-output-safety-image` | — |
+| 1 | `guard_input` | rule_pack | `rule-pack/grep-prohibited-terms` | - |
+| 2 | `retrieve_style` | knowledge_pack | `knowledge-pack/style-references-cinematic` | - |
+| 3 | `retrieve_physics` | knowledge_pack | `knowledge-pack/lens-physics-primers` | - |
+| 4 | `shape_prompt` | harness | `harness/text-safety-review` | - |
+| 5 | `txt2img` | tool | `tool/txt2img-sdxl` | - |
+| 6 | `review_output` | rule_pack | `rule-pack/grep-output-safety-image` | - |
 
 ## Sample runs
 

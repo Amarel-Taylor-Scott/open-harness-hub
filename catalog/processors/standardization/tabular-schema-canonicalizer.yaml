@@ -1,0 +1,59 @@
+id: "processor/tabular-schema-canonicalizer"
+type: processor
+version: "0.1.0"
+name: "Tabular schema canonicalizer (column mapping + value standardization)"
+description: |
+  Maps an arbitrary input table to a declared canonical schema: fuzzy-matches
+  source column names to target fields, infers types, and standardizes values
+  (dates → ISO 8601, units → SI, currency → ISO 4217 minor units, booleans,
+  whitespace/case). Emits the column mapping, the standardized table, and any
+  unmapped columns for review.
+
+  Capability lift: this is the "messy spreadsheet → clean schema" step that a
+  bare LLM does inconsistently and unauditably across rows. Doing it
+  deterministically (with a confidence + an explicit unmapped list) makes the
+  result reproducible, cheap, and reviewable — and runs before any model call.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["cross_industry", "finance", "government"]
+capability: ["format_conversion", "extraction"]
+modality: ["tabular", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["standardization", "tabular", "schema-mapping", "etl", "normalize", "no-llm"]
+created: "2026-05-27"
+updated: "2026-05-27"
+
+process_kind: "normalize.tabular_schema"
+deterministic: true
+idempotent: true
+streaming: true
+latency_budget_ms: 250
+
+inputs:
+  - name: "table"
+    type: "object[]"
+  - name: "target_schema"
+    type: "object"
+  - name: "min_match_confidence"
+    type: "number"
+outputs:
+  - name: "standardized_table"
+    type: "object[]"
+  - name: "column_mapping"
+    type: "object"
+  - name: "unmapped_columns"
+    type: "string[]"
+  - name: "coercion_report"
+    type: "object[]"
+
+side_effects: "none"
+on_error: "continue"
+
+implementations:
+  - kind: callable
+    language: python
+    path: "src/processors/tabular_schema_canonicalizer.py"
+    notes: "Fuzzy column match (Jaro-Winkler) + type inference + value standardizers; columns below min_match_confidence go to unmapped_columns for review, never silently dropped."

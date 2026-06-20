@@ -1,0 +1,118 @@
+id: "pipeline/source-surface-seeds-to-factory-rows"
+type: pipeline
+version: "0.1.0"
+name: "Source surface seeds to factory rows"
+description: "Converts esoteric industry source-surface seeds into canonical factory row families with source governance, entity refs, fuzzy dedupe, embedding stubs, review tickets, and index records."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["automotive", "energy", "manufacturing", "construction", "government", "cross_industry"]
+capability: ["extraction", "classification", "retrieval", "governance", "evaluation"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.product"
+tags: ["source-surfaces", "candidate-primitives", "factory-rows", "jsonl", "bulk-load"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Export source-surface seeds into canonical JSONL row families ready for relationship preflight and Postgres bulk-copy loading."
+pipeline_kind: "research_web.source_surface_seed_factory_rows"
+inputs:
+  - name: "source_surface_seeds"
+    type: "array"
+  - name: "excluded_scopes"
+    type: "array"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "row_counts"
+    type: "json"
+  - name: "jsonl_files"
+    type: "array"
+  - name: "bulk_load_plan"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/esoteric-industry-source-surfaces"
+    - "knowledge-pack/source-surface-seed-row-patterns"
+    - "knowledge-pack/use-case-seed-row-patterns"
+steps:
+  - id: "govern-source-surface-seeds"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record:
+        source_type: "synthetic_source_surface_seed_batch"
+        license: "CC-BY-4.0"
+        privacy_boundary: "public"
+      source_policy:
+        excluded_scopes: "$.inputs.excluded_scopes"
+        require_license: true
+  - id: "export-source-surface-row-families"
+    kind: "tool"
+    ref: "tool/source-surface-seed-row-exporter"
+    inputs:
+      source_surfaces: "$.inputs.source_surface_seeds"
+      output_dir: "$.inputs.output_dir"
+      excluded_scopes: "$.inputs.excluded_scopes"
+  - id: "preflight-row-relationships"
+    kind: "tool"
+    ref: "tool/factory-jsonl-relationship-preflight"
+    inputs:
+      source_records:
+        - "$.steps.export-source-surface-row-families.row_family_paths.source_record"
+      normalized_objects:
+        - "$.steps.export-source-surface-row-families.row_family_paths.normalized_object"
+      canonical_entities:
+        - "$.steps.export-source-surface-row-families.row_family_paths.canonical_entity"
+      object_entity_refs:
+        - "$.steps.export-source-surface-row-families.row_family_paths.object_entity_ref"
+      dedupe_clusters:
+        - "$.steps.export-source-surface-row-families.row_family_paths.dedupe_cluster"
+      review_tickets:
+        - "$.steps.export-source-surface-row-families.row_family_paths.review_ticket"
+      label_assignments:
+        - "$.steps.export-source-surface-row-families.row_family_paths.label_assignment"
+      dimension_values:
+        - "$.steps.export-source-surface-row-families.row_family_paths.dimension_value"
+      object_embeddings:
+        - "$.steps.export-source-surface-row-families.row_family_paths.object_embedding"
+  - id: "prepare-bulk-copy"
+    kind: "tool"
+    ref: "tool/factory-jsonl-bulk-copy-loader"
+    inputs:
+      source_records:
+        - "$.steps.export-source-surface-row-families.row_family_paths.source_record"
+      normalized_objects:
+        - "$.steps.export-source-surface-row-families.row_family_paths.normalized_object"
+      canonical_entities:
+        - "$.steps.export-source-surface-row-families.row_family_paths.canonical_entity"
+      object_entity_refs:
+        - "$.steps.export-source-surface-row-families.row_family_paths.object_entity_ref"
+      dedupe_clusters:
+        - "$.steps.export-source-surface-row-families.row_family_paths.dedupe_cluster"
+      review_tickets:
+        - "$.steps.export-source-surface-row-families.row_family_paths.review_ticket"
+      label_assignments:
+        - "$.steps.export-source-surface-row-families.row_family_paths.label_assignment"
+      dimension_values:
+        - "$.steps.export-source-surface-row-families.row_family_paths.dimension_value"
+      object_embeddings:
+        - "$.steps.export-source-surface-row-families.row_family_paths.object_embedding"
+      index_records:
+        - "$.steps.export-source-surface-row-families.row_family_paths.index_record"
+success_criteria:
+  - kind: "semantic"
+    target: "$.row_counts"
+    must_cover:
+      - "normalized_object"
+      - "canonical_entity"
+      - "object_entity_ref"
+      - "object_embedding"
+      - "review_ticket"
+      - "index_record"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Source-surface seeds are emitted as complete factory row families."

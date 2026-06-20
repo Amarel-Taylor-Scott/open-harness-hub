@@ -25,10 +25,10 @@ Review a job posting / screening process for protected-class bias + disparate im
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `structured_to_prose` | processor | `processor/structured-to-prose` | — |
-| 2 | `redact_pii` | processor | `processor/redact-pii-text` | — |
-| 3 | `grep_bias_flags` | rule_pack | `rule-pack/grep-hr-hiring-bias-flags` | — |
-| 4 | `rag_against_statutes` | rule_pack | `rule-pack/hybrid-retrieval-policy` | — |
-| 5 | `grade` | processor | `processor/llm-judge` | — |
-| 6 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `structured_to_prose` | processor | `processor/structured-to-prose` | - |
+| 2 | `redact_pii` | processor | `processor/redact-pii-text` | - |
+| 3 | `grep_bias_flags` | rule_pack | `rule-pack/grep-hr-hiring-bias-flags` | - |
+| 4 | `rag_against_statutes` | rule_pack | `rule-pack/hybrid-retrieval-policy` | - |
+| 5 | `grade` | processor | `processor/llm-judge` | - |
+| 6 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

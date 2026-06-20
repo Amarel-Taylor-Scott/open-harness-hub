@@ -1,0 +1,37 @@
+id: "knowledge-pack/object-comparison-job-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Object comparison job patterns"
+description: "Seed patterns for blocked, leaf-sharded, checkpointed knowledge-object pairwise comparison jobs."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "government", "cross_industry"]
+capability: ["retrieval", "governance", "evaluation", "routing"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.product"
+tags: ["pairwise-comparison", "blocking", "checkpointing", "dedupe", "resumable-workers"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types:
+  - "comparison_job_pattern"
+  - "blocking_strategy"
+  - "leaf_checkpoint_contract"
+files:
+  - path: "catalog/knowledge-packs/data/object-comparison-job-patterns/patterns.jsonl"
+    format: "jsonl"
+    schema: "object-comparison-job-pattern"
+indexing:
+  bm25: true
+  dense:
+    recommended_model: "sentence-transformers/all-MiniLM-L6-v2"
+provenance:
+  sources:
+    - "Open Harness Hub object factory scaling architecture"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "Synthetic job-control patterns only; no raw object payloads."

@@ -1,0 +1,31 @@
+id: "knowledge-pack/hybrid-label-dimension-taxonomy"
+type: knowledge-pack
+version: "0.1.0"
+name: "Hybrid label and dimension taxonomy"
+description: "Label sets, schema.org-style mappings, hierarchical paths, and generated dimension definitions for hybrid keyword, vector, graph, and model-polished search."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "classification", "reranking", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "hub"
+freshness: "stable"
+tags: ["labels", "dimensions", "schema-org", "hybrid-search", "pgvector", "reranking"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types: ["label_set", "dimension_definition", "schema_org_mapping", "hierarchical_label"]
+files:
+  - path: "data/hybrid-label-dimension-taxonomy/labels.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    enabled: true
+    embedder: "processor/local-embedder"
+provenance:
+  sources: ["Open Harness Hub hybrid label and dimensional search architecture", "schema.org concept vocabulary"]
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "synthetic taxonomy records only"

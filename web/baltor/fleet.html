@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<!--
+  /fleet — Baltor live supervisor fleet (OPP-supervisor-scaling-live).
+  PROJECTION-ONLY: this page only GETs /api/fleet/* (read-only). It never writes or mutates supervisor
+  truth — the durable SupervisorStore is the source of truth. Dark/compact aesthetic.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Baltor · Live Supervisor Fleet</title>
+  <style>
+    :root { --bg:#0c0f14; --panel:#141a22; --line:#222c38; --txt:#dce3ec; --dim:#8a97a8; --ok:#3fb950; --warn:#d29922; --accent:#58a6ff; }
+    * { box-sizing:border-box; } body { margin:0; background:var(--bg); color:var(--txt); font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; }
+    header { padding:14px 20px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:14px; }
+    header h1 { font-size:15px; margin:0; font-weight:600; } .badge { font-size:11px; color:var(--dim); }
+    .leader { color:var(--ok); font-weight:600; }
+    main { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:14px; padding:18px 20px; }
+    .panel { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:12px 14px; }
+    .panel h2 { font-size:12px; margin:0 0 8px; color:var(--accent); text-transform:uppercase; letter-spacing:.04em; }
+    table { width:100%; border-collapse:collapse; } td,th { text-align:left; padding:3px 6px; border-bottom:1px solid var(--line); vertical-align:top; }
+    th { color:var(--dim); font-weight:500; } .pill { display:inline-block; padding:1px 7px; border:1px solid var(--line); border-radius:999px; font-size:11px; }
+    .muted { color:var(--dim); } .right { text-align:right; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Baltor · Live Supervisor Fleet</h1>
+    <span class="badge">projection-only · DB ledger is the source of truth</span>
+    <span class="badge">leader: <span id="leader" class="leader">—</span></span>
+    <span class="badge" id="ts"></span>
+  </header>
+  <main>
+    <div class="panel"><h2>Supervisor instances</h2><table id="supervisors"><thead><tr><th>id</th><th>status</th><th>pid</th><th>mode</th></tr></thead><tbody></tbody></table></div>
+    <div class="panel"><h2>Shard ownership</h2><table id="shards"><thead><tr><th>shard</th><th>type</th><th>owner</th><th>status</th></tr></thead><tbody></tbody></table></div>
+    <div class="panel"><h2>Failovers</h2><table id="failovers"><thead><tr><th>lease</th><th>old → new</th><th>gen</th></tr></thead><tbody></tbody></table></div>
+    <div class="panel"><h2>Recent ticks</h2><table id="ticks"><thead><tr><th>supervisor</th><th>leader</th><th>shards</th><th>decisions</th></tr></thead><tbody></tbody></table></div>
+    <div class="panel"><h2>Decisions (idempotent)</h2><table id="decisions"><thead><tr><th>type</th><th>by</th><th>key</th></tr></thead><tbody></tbody></table></div>
+    <div class="panel"><h2>Capacity snapshots</h2><table id="capacity"><thead><tr><th>supervisor</th><th>created</th></tr></thead><tbody></tbody></table></div>
+    <div class="panel"><h2>Durable task queue (live dispatch)</h2><table id="taskstatus"><thead><tr><th>status</th><th>count</th></tr></thead><tbody></tbody></table></div>
+    <div class="panel"><h2>Spawn requests (real spawn/drain)</h2><table id="spawnreqs"><thead><tr><th>capability</th><th>worker</th><th>dry_run</th></tr></thead><tbody></tbody></table></div>
+    <div class="panel"><h2>Execution backends (policy-driven · switchable · local-first)</h2><table id="execmix"><thead><tr><th>backend</th><th>decisions</th></tr></thead><tbody></tbody></table><div class="muted" id="execnote" style="margin-top:6px"></div></div>
+    <div class="panel"><h2>Recent execution-backend decisions</h2><table id="execrecent"><thead><tr><th>capability</th><th>backend</th><th>reason</th></tr></thead><tbody></tbody></table></div>
+  </main>
+  <script>
+    // PROJECTION-ONLY: GET reads only. No POST/PUT/DELETE, no writes.
+    const td = (v) => `<td>${v == null ? '<span class="muted">—</span>' : String(v)}</td>`;
+    function fill(id, rows, cols) {
+      const b = document.querySelector(`#${id} tbody`);
+      b.innerHTML = (rows || []).map(r => '<tr>' + cols.map(c => td(typeof c === 'function' ? c(r) : r[c])).join('') + '</tr>').join('')
+                    || '<tr><td class="muted" colspan="9">none</td></tr>';
+    }
+    async function refresh() {
+      try {
+        const r = await fetch('/api/fleet', { cache: 'no-store' });
+        const d = await r.json();
+        document.getElementById('leader').textContent = d.leader || 'none';
+        document.getElementById('ts').textContent = 'now=' + d.now;
+        fill('supervisors', d.supervisors, ['supervisor_id', 'status', 'pid', 'mode']);
+        fill('shards', d.shards, ['shard_id', 'shard_type', s => s.owner_id || '—', 'status']);
+        fill('failovers', d.failovers, ['lease_name', f => `${f.old_owner} → ${f.new_owner}`, 'generation']);
+        fill('ticks', (d.ticks || []).slice(-12).reverse(), ['supervisor_id', t => t.leader ? 'yes' : 'no', t => (JSON.parse(t.shard_ids_json || '[]')).length, 'decision_count']);
+        fill('decisions', (d.decisions || []).slice(-12).reverse(), ['decision_type', 'supervisor_id', 'idempotency_key']);
+        fill('capacity', (d.capacity || []).slice(-10).reverse(), ['supervisor_id', 'created_at']);
+        const bs = (d.tasks && d.tasks.by_status) || {};
+        fill('taskstatus', Object.keys(bs).map(k => ({ s: k, n: bs[k] })), ['s', 'n']);
+        fill('spawnreqs', (d.spawn_requests || []).slice(-10).reverse(), ['capability_id', 'worker_id', r => r.dry_run ? 'dry' : 'REAL']);
+        const ex = d.execution || {};
+        const bb = ex.by_backend || {};
+        fill('execmix', Object.keys(bb).map(k => ({ b: k, n: bb[k] })), [r => `<span class="pill">${r.b}</span>`, 'n']);
+        document.getElementById('execnote').textContent = ex.note || '';
+        fill('execrecent', (ex.recent || []).slice(-10).reverse(), ['capability', r => `<span class="pill">${r.backend}</span>`, 'reason']);
+      } catch (e) { /* projection unavailable — leave last render */ }
+    }
+    refresh(); setInterval(refresh, 4000);
+  </script>
+</body>
+</html>

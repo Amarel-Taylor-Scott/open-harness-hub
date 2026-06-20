@@ -1,0 +1,35 @@
+id: "benchmark/fsma-produce-safety-bench"
+type: benchmark
+version: "0.1.0"
+name: "FSMA Produce Safety benchmark"
+description: "Synthetic benchmark for fsma produce safety review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["agriculture_compliance.fsma", "food.safety"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["fsma-produce-safety", "expansion-v7"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/fsma-produce-safety-review"
+dataset: "dataset/fsma-produce-safety-samples"
+rubric: "rubric/fsma-produce-safety-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/fsma-produce-safety-review"
+    rule_pack_override: ["rule-pack/grep-fsma-produce-safety-flags", "rule-pack/rag-fsma-produce-safety-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 31
+report:
+  output: "dist/benchmarks/fsma-produce-safety/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Emit MCP (Model Context Protocol) server artifacts from every `tool/*`
+"""Emit MCP (Model Context Protocol) server components from every `tool/*`
 manifest and from `processor/*` manifests that are safe to invoke from a
 model (deterministic, idempotent, no escalation).
 
@@ -33,8 +33,8 @@ from scripts.emit._lib import (  # noqa: E402
 NAME_RE = re.compile(r"[^A-Za-z0-9_.\-]")
 
 
-def mcp_name(artifact_id: str) -> str:
-    return NAME_RE.sub("_", slug_only(artifact_id))
+def mcp_name(component_id: str) -> str:
+    return NAME_RE.sub("_", slug_only(component_id))
 
 
 def is_model_callable_processor(p: dict) -> bool:
@@ -101,7 +101,7 @@ def to_mcp_tool(manifest: dict) -> dict:
 
     # Hub-specific extension so consumers can trace back to the manifest.
     tool["_meta"] = {
-        "ohh:artifactId": manifest["id"],
+        "ohh:componentId": manifest["id"],
         "ohh:version":    manifest.get("version"),
         "ohh:license":    manifest.get("license"),
         "ohh:industry":   manifest.get("industry", []),
@@ -251,7 +251,7 @@ def render_python_server(tools: list[dict]) -> str:
         handler_defs_lines.append(
             f"async def _run_{py_name}(args: dict[str, Any]) -> Any:\n"
             f"    \"\"\"{t['title']} — {t.get('description', '').splitlines()[0] if t.get('description') else ''}\"\"\"\n"
-            f"    # TODO: implement {t['_meta']['ohh:artifactId']!r}\n"
+            f"    # TODO: implement {t['_meta']['ohh:componentId']!r}\n"
             f"    return {{'received': args, 'tool': {n!r}, 'status': 'stub'}}"
         )
         handler_map_lines.append(f"    {n!r}: _run_{py_name},")
@@ -270,7 +270,7 @@ def render_ts_server(tools: list[dict]) -> str:
         safe_key = n if all(c.isalnum() or c == "_" for c in n) else f'"{n}"'
         ts_handlers_lines.append(
             f"  {safe_key}: async (args: any) => {{\n"
-            f"    // TODO: implement {t['_meta']['ohh:artifactId']}\n"
+            f"    // TODO: implement {t['_meta']['ohh:componentId']}\n"
             f"    return {{ received: args, tool: {n!r}, status: 'stub' }};\n"
             f"  }},"
         )
@@ -387,7 +387,7 @@ def main() -> int:
     print("\ntool names:")
     for t in tools:
         meta = t["_meta"]
-        print(f"  {t['name']:40s}  ({meta['ohh:artifactId']})")
+        print(f"  {t['name']:40s}  ({meta['ohh:componentId']})")
     return 0
 
 

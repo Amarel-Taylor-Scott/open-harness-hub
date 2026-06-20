@@ -1,0 +1,55 @@
+id: "tool/verified-fact-impact-propagator"
+type: tool
+version: "0.1.0"
+name: "Verified fact impact propagator"
+description: "Finds pipelines, knowledge packs, rule packs, indexes, and deployment bundles affected by a signed verified fact update, then emits review tickets, re-index plans, and optional redeployment plans."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "government", "legal", "cross_industry"]
+capability: ["verification", "governance", "retrieval", "planning"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.product"
+tags: ["verified-facts", "impact-analysis", "signed-knowledge", "fact-feed", "pipeline-updates"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    verified_fact_update:
+      type: object
+    dependency_index:
+      type: object
+    update_policy:
+      type: object
+  required: ["verified_fact_update", "dependency_index"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    affected_components:
+      type: array
+      items: { type: object }
+    review_tickets:
+      type: array
+      items: { type: object }
+    reindex_plan:
+      type: object
+    redeployment_plan:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      verified_fact_update:
+        publisher_id: "government/ph"
+        subject: "employment_agency_fee_rules"
+      dependency_index: {}
+    output:
+      ok: true
+      affected_components: []
+      review_tickets: []

@@ -1,0 +1,83 @@
+id: "pipeline/vector-readiness-audit"
+type: pipeline
+version: "0.1.0"
+name: "Vector readiness audit"
+description: "Reconciles planned embedding completion rows with stored vector metadata so hybrid search indexes can distinguish planned, missing, ready, mismatched, and orphaned vectors."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "embedding", "governance", "evaluation", "verification"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["embeddings", "vector-search", "pgvector", "bigquery-vector-search", "audit", "readiness"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Audit vector search readiness by comparing embedding completion stubs with stored vector metadata."
+pipeline_kind: "research_web.vector_readiness_audit"
+inputs:
+  - name: "completion_stubs_jsonl"
+    type: "string"
+  - name: "stored_vectors_jsonl"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "vector_readiness_summary"
+    type: "json"
+  - name: "vector_readiness_rows"
+    type: "jsonl"
+  - name: "vector_orphan_rows"
+    type: "jsonl"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/vector-readiness-audit-patterns"
+steps:
+  - id: "load-readiness-checks"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/vector-readiness-audit-patterns"
+    inputs:
+      query: "vector readiness missing stored vector hash dimension orphan audit"
+      top_k: 20
+  - id: "audit-vector-readiness"
+    kind: "tool"
+    ref: "tool/vector-readiness-auditor"
+    inputs:
+      completion_stubs_jsonl: "$.inputs.completion_stubs_jsonl"
+      stored_vectors_jsonl: "$.inputs.stored_vectors_jsonl"
+      output_dir: "$.inputs.output_dir"
+      run_id: "$.inputs.run_id"
+  - id: "route-missing-or-mismatched-vectors"
+    kind: "tool"
+    ref: "tool/object-factory-job-router"
+    inputs:
+      reason: "Missing or mismatched vectors should be retried or reviewed before search readiness is advertised."
+      excluded_scopes: ["insurance"]
+success_criteria:
+  - kind: "deterministic"
+    target: "$.vector_readiness_summary.planned_rows"
+    op: ">"
+    value: 0
+    severity: "high"
+    label: "Planned embedding completion rows are present."
+  - kind: "deterministic"
+    target: "$.vector_readiness_summary.ready_rows"
+    op: "<="
+    value: "$.vector_readiness_summary.planned_rows"
+    severity: "high"
+    label: "Ready vector count cannot exceed planned rows."
+  - kind: "semantic"
+    target: "$.vector_readiness_summary"
+    must_cover:
+      - "missing vectors"
+      - "text hash mismatch"
+      - "dimension mismatch"
+      - "orphan stored vector"
+      - "safe retry"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Audit exposes vector search readiness and repair routes."

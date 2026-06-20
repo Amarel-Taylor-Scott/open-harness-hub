@@ -18,7 +18,7 @@ when_to_use:
 
 structural_shape:
   - "WRONG: 5,000-token system prompt with retrieved data + persona + rules + examples + format constraints + safety rules + tool descriptions all inline."
-  - "RIGHT: persona artifact (short hard_rules + system_prompt); retrieval as separate step; rules as rule-pack; format constraints as JSON schema."
+  - "RIGHT: persona component (short hard_rules + system_prompt); retrieval as separate step; rules as rule-pack; format constraints as JSON schema."
 
 problem: |
   Long system prompts: (a) inflate per-call cost + latency, (b) increase
@@ -28,11 +28,11 @@ problem: |
   across pipelines, (e) hide what the system actually does behind prose.
 
 solution: |
-  Decompose the prompt into typed artifacts the catalog already has:
+  Decompose the prompt into typed components the catalog already has:
   persona (role + hard_rules), rule-pack (deterministic detectors),
   rubric (scoring dims), tool definitions (typed signatures), retrieval
   step (factual grounding). The system prompt becomes ~200 tokens that
-  reference those artifacts. Pipelines become inspectable.
+  reference those components. Pipelines become inspectable.
 
 implementing_pipelines: []
 
@@ -42,6 +42,6 @@ related_patterns:
   - "pattern/composable-success-criteria"
 
 counter_patterns:
-  - "Decompose into persona / rule-pack / rubric / tool artifacts."
+  - "Decompose into persona / rule-pack / rubric / tool components."
 
 tags: ["anti-pattern", "prompt", "context-bloat", "brittle"]

@@ -1,0 +1,106 @@
+{
+  "name": "Customer Readiness",
+  "pass_threshold": 90,
+  "items": [
+    {
+      "rubric_id": "cust.one_liner",
+      "description": "Clear customer one-liner",
+      "weight": 12,
+      "blocker": true,
+      "evidence_required": "one_liner",
+      "proof_script": "scripts/check_portfolio_customer_readiness_rubric.py",
+      "pass_condition": "present",
+      "fail_message": "missing"
+    },
+    {
+      "rubric_id": "cust.audience",
+      "description": "Identifies audience",
+      "weight": 12,
+      "blocker": true,
+      "evidence_required": "audience",
+      "proof_script": "scripts/check_portfolio_customer_readiness_rubric.py",
+      "pass_condition": "present",
+      "fail_message": "missing"
+    },
+    {
+      "rubric_id": "cust.problem",
+      "description": "States the problem it solves",
+      "weight": 12,
+      "blocker": true,
+      "evidence_required": "problem",
+      "proof_script": "scripts/check_portfolio_customer_readiness_rubric.py",
+      "pass_condition": "present",
+      "fail_message": "missing"
+    },
+    {
+      "rubric_id": "cust.use_case",
+      "description": "One concrete use case",
+      "weight": 12,
+      "blocker": true,
+      "evidence_required": "use_case",
+      "proof_script": "scripts/check_portfolio_customer_readiness_rubric.py",
+      "pass_condition": "present",
+      "fail_message": "missing"
+    },
+    {
+      "rubric_id": "cust.cta",
+      "description": "Has a CTA",
+      "weight": 12,
+      "blocker": true,
+      "evidence_required": "cta",
+      "proof_script": "scripts/check_portfolio_customer_readiness_rubric.py",
+      "pass_condition": "present",
+      "fail_message": "missing"
+    },
+    {
+      "rubric_id": "cust.no_overclaim",
+      "description": "Avoids overclaiming production readiness",
+      "weight": 12,
+      "blocker": true,
+      "evidence_required": "disclaimer",
+      "proof_script": "scripts/check_portfolio_customer_readiness_rubric.py",
+      "pass_condition": "local-preview disclaimer; no overclaim",
+      "fail_message": "overclaims production"
+    },
+    {
+      "rubric_id": "cust.teleon_bounded",
+      "description": "Teleon uses bounded self-adaptation language",
+      "weight": 10,
+      "blocker": true,
+      "evidence_required": "teleon copy",
+      "proof_script": "scripts/check_portfolio_customer_readiness_rubric.py",
+      "pass_condition": "Humans approve boundary expansion present",
+      "fail_message": "unbounded language"
+    },
+    {
+      "rubric_id": "cust.baltor_receipts",
+      "description": "Baltor emphasizes governed context + receipts",
+      "weight": 10,
+      "blocker": true,
+      "evidence_required": "baltor copy",
+      "proof_script": "scripts/check_portfolio_customer_readiness_rubric.py",
+      "pass_condition": "receipts + governed context",
+      "fail_message": "missing"
+    },
+    {
+      "rubric_id": "cust.ohh_discovery",
+      "description": "OpenHarnessHub emphasizes discovery-is-not-trust",
+      "weight": 10,
+      "blocker": true,
+      "evidence_required": "ohh copy",
+      "proof_script": "scripts/check_portfolio_customer_readiness_rubric.py",
+      "pass_condition": "Discovery is not trust present",
+      "fail_message": "missing"
+    },
+    {
+      "rubric_id": "cust.cie_portfolio",
+      "description": "ContextIsEverything stays portfolio-level",
+      "weight": 8,
+      "blocker": true,
+      "evidence_required": "cie copy",
+      "proof_script": "scripts/check_portfolio_customer_readiness_rubric.py",
+      "pass_condition": "portfolio framing",
+      "fail_message": "product framing"
+    }
+  ]
+}

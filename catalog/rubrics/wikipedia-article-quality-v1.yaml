@@ -1,0 +1,68 @@
+id: "rubric/wikipedia-article-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "Wikipedia article quality rubric v1 (NPOV / V / RS / OR / structure)"
+description: |
+  Six-dimension rubric for grading the quality of a Wikipedia
+  article against the core content policies + style/structure
+  expectations. Tracks the WP GA-criteria + FA-criteria shape with
+  open-source-friendly evidence requirements.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["media", "media.editorial", "media.factcheck", "education"]
+capability: ["evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-24"
+updated: "2026-05-24"
+
+dimensions:
+  - id: "neutrality"
+    label: "WP:NPOV — neutral voice, balanced viewpoints, no editorial loading"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "list of any editorial-voice / weasel / peacock / loaded-label flags with quotes + section"
+
+  - id: "verifiability"
+    label: "WP:V — every challengeable claim has an inline citation that supports the text"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "unsourced-claim list + source-text-integrity sample (3+ randomly-checked citations)"
+
+  - id: "reliable_sources"
+    label: "WP:RS — sources are independent, secondary, reputable; medical claims meet WP:MEDRS"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "source-tier distribution + WP:RSP cross-check on contentious sources"
+
+  - id: "no_original_research"
+    label: "WP:NOR — no synthesis combining sources to a conclusion neither states"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "synth-marker passages with cited sources next to combined claims"
+
+  - id: "blp_safety"
+    label: "WP:BLP (if applicable) — contentious living-person claims are high-quality-sourced or removed"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "BLP-flag list with source-quality assessment per claim"
+
+  - id: "structure_and_style"
+    label: "WP:MOS + WP:LEAD — lead summary, section structure, consistent style"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "lead-length check + section-heading audit + citation-style consistency check"
+
+scoring_method: "weighted_sum"
+examples:
+  - grade: 1.0
+    response: "Neutral throughout; every claim sourced; reliable independent sources; no synthesis; BLP claims double-sourced; well-structured lead and sections."
+    notes: "FA-grade. Production-ready."
+  - grade: 0.6
+    response: "Mostly neutral with 2 peacock terms; lead has one unsourced challengeable claim; sources include one trade-press item used for a contested claim; no SYNTH; clean structure."
+    notes: "GA-grade. Fixable with tags + edits."
+  - grade: 0.2
+    response: "Editorial voice throughout; half the claims unsourced; primary sources used for interpretive claims; one BLP claim cited only to subject's blog; lead is one sentence."
+    notes: "Stub / needs major rewrite."

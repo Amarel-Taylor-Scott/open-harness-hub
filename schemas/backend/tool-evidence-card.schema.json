@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/backend/tool-evidence-card.schema.json",
+  "title": "Tool evidence card",
+  "description": "A durable, evidence-backed evaluation of one backend tool for a Baltor capability. Facts must come from research/backend-tool-verification.md (verify-first); never invented. Flagged tools get decision=avoid with the reason. Capability + fallbacks are cross-checked against data/backend-tools.yaml by the validator.",
+  "type": "object",
+  "required": ["kind", "id", "name", "capability", "decision", "last_evaluated_at"],
+  "properties": {
+    "kind": { "type": "string", "const": "baltor.tool-evidence-card.v1" },
+    "id": { "type": "string", "pattern": "^tool\\." },
+    "name": { "type": "string" },
+    "capability": { "type": "string", "description": "a data/backend-tools.yaml capability key" },
+    "github_url": { "type": "string" },
+    "license": { "type": "string" },
+    "hosting": { "type": "string", "enum": ["local", "self_hosted", "managed", "hybrid", "unknown"] },
+    "free_noncommercial": { "type": "string", "enum": ["yes_oss", "free_tier", "no", "unknown"] },
+    "local_demo_fit": { "type": "string", "enum": ["high", "medium", "low", "unknown"] },
+    "regulated_fit": { "type": "string", "enum": ["high", "medium", "low", "unknown"] },
+    "adapter_complexity": { "type": "string", "enum": ["low", "medium", "high", "unknown"] },
+    "security_notes": { "type": "string" },
+    "strengths": { "type": "array", "items": { "type": "string" } },
+    "weaknesses": { "type": "array", "items": { "type": "string" } },
+    "fallbacks": { "type": "array", "items": { "type": "string" } },
+    "decision": { "type": "string", "enum": ["evaluate", "adopt", "avoid"] },
+    "evidence": { "type": "array", "items": { "type": "object", "required": ["source"], "properties": { "source": { "type": "string" }, "note": { "type": "string" } }, "additionalProperties": true } },
+    "last_evaluated_at": { "type": "string" }
+  },
+  "additionalProperties": true
+}

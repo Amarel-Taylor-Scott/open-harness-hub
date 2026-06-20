@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/dedupe-cluster.schema.json",
+  "title": "Dedupe cluster",
+  "description": "Near-duplicate grouping across source records, normalized objects, and candidate primitives.",
+  "type": "object",
+  "required": ["dedupe_cluster_id", "member_ids", "status"],
+  "properties": {
+    "dedupe_cluster_id": { "type": "string" },
+    "canonical_object_id": { "type": "string" },
+    "member_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["open", "auto_merged", "review_required", "rejected", "curated"]
+    },
+    "methods": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "scores": {
+      "type": "object",
+      "properties": {
+        "exact_id": { "type": "boolean" },
+        "fuzzy_ratio": { "type": "number" },
+        "simhash_hamming": { "type": "integer" },
+        "minhash_jaccard": { "type": "number" },
+        "vector_similarity": { "type": "number" },
+        "entity_overlap": { "type": "number" }
+      }
+    },
+    "merge_policy": { "type": "string" },
+    "review_reason": { "type": "string" }
+  }
+}

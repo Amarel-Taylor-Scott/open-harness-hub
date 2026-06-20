@@ -1,0 +1,85 @@
+{
+  "_note": "SINGLE SOURCE for the Baltor Context Engine stage language (the canonical copy lifted from context-engine-hero.html). The animated engine hero (pages/engine-hero.js) and the marketing pages both read THIS file — do not re-type stage copy elsewhere. Six macro stages + the verification rail only (raw document processing is a backend layer, never a seventh stage).",
+  "title": "Baltor Context Engine",
+  "eyebrow": "Automated Context Engine",
+  "tagline": "Continuous reconciliation, anti-fragility, enhancement, optimization, and provenance",
+  "verification_rail": {
+    "title": "Continuous verification + adversarial validation",
+    "checks": "contradictions  /  source precedence  /  fragile facts  /  missing evidence  /  freshness  /  policy risk",
+    "long": "Prioritized continuous verification and adversarial interrogation runs below every stage, checking contradictions, source precedence, freshness windows, and policy."
+  },
+  "metrics": [
+    {"key": "conflicts", "label": "Conflicts solved"},
+    {"key": "hardened", "label": "Fragile facts hardened"},
+    {"key": "enhanced", "label": "Enhancements linked"},
+    {"key": "state", "label": "Serving state"}
+  ],
+  "stages": [
+    {
+      "id": "source", "num": "00", "title": "Source Systems", "kind": "Raw ingress",
+      "accent": "#4b5563", "zone_accent": "#64748b", "zone_sub": "raw ingress",
+      "copy": "Captures organizational knowledge exactly where it lives, preserving timestamps, permissions, content hashes, and expandable source handles.",
+      "tags": ["watch changes", "parse objects", "preserve handles"],
+      "detail": {
+        "subtitle": "Raw context is preserved, not trusted",
+        "copy": "Example: Jira comments, Confluence pages, code, architecture diagrams, incidents, and local memory enter with timestamps, permissions, hashes, and source handles before any claim is trusted.",
+        "tags": ["ACLs", "hashes", "timestamps", "source handles"]
+      }
+    },
+    {
+      "id": "reconciliation", "num": "01", "title": "Reconciliation", "kind": "Cluster alignment",
+      "accent": "#32c786", "zone_accent": "#10b981", "zone_sub": "cluster alignment",
+      "copy": "Deduplicates related artifacts, maps relationships, identifies comments-versus-decisions, and surfaces contradictions across tickets, docs, code, and memory.",
+      "tags": ["dedupe", "link evidence", "surface conflicts"],
+      "detail": {
+        "subtitle": "Resolve disagreements across sources",
+        "copy": "Example: Jira says refunds are approved after 30 days, an old policy page says 14 days, and the billing service uses 21 days. Baltor links the evidence, chooses the highest-confidence source when policy allows, or flags the conflict for review.",
+        "tags": ["source conflict", "confidence", "precedence", "review queue"]
+      }
+    },
+    {
+      "id": "anti", "num": "02", "title": "Anti-Fragility", "kind": "Robust object hardening",
+      "accent": "#4c8df6", "zone_accent": "#3b82f6", "zone_sub": "robust objects",
+      "copy": "Finds facts likely to change in source systems and replaces brittle text with robust knowledge objects that can update over time.",
+      "tags": ["detect fragile values", "create objects", "refresh over time"],
+      "detail": {
+        "subtitle": "Replace brittle facts with robust knowledge objects",
+        "copy": "Example: magic numbers, settings, refund policies, thresholds, and limits are treated as volatile. Baltor creates refreshable objects and tools so the value can be rechecked against the right system instead of copied into stale context.",
+        "tags": ["magic numbers", "settings", "refreshable objects", "live tools"]
+      }
+    },
+    {
+      "id": "enhancement", "num": "03", "title": "Enhancement", "kind": "Context enrichment",
+      "accent": "#d9ae61", "zone_accent": "#d9ae61", "zone_sub": "context enrichment",
+      "copy": "Adds relevant external context objects, metadata, relationships, architecture/service graph links, event/schema facts, and missing connective context.",
+      "tags": ["add metadata", "connect objects", "increase robustness"],
+      "detail": {
+        "subtitle": "Augment with verified external context",
+        "copy": "Example: if internal sources disagree about the maximum allowable credit card late fee, Baltor can attach verified external sources or approved tools to resolve the conflict before the pack is served.",
+        "tags": ["external sources", "approved tools", "conflict resolution", "verified facts"]
+      }
+    },
+    {
+      "id": "optimization", "num": "04", "title": "Optimization", "kind": "Pack shaping",
+      "accent": "#a47ef7", "zone_accent": "#a78bfa", "zone_sub": "pack shaping",
+      "copy": "Summarizes, distills, converts unstructured context into structured objects, ranks relevance, and fits the result to the task budget.",
+      "tags": ["summarize", "structure", "rank"],
+      "detail": {
+        "subtitle": "Shape context into a compact task pack",
+        "copy": "Example: a 40-page policy thread, three tickets, and five source handles become a 3,000-token review pack: ranked claims, conflicts, tests to run, and expansion links. Benefit: less token waste, fewer tool calls, and less irrelevant context.",
+        "tags": ["ranked claims", "token savings", "fewer tool calls", "pack shaping"]
+      }
+    },
+    {
+      "id": "consumption", "num": "05", "title": "Consumption", "kind": "Delivery",
+      "accent": "#4b5563", "zone_accent": "#64748b", "zone_sub": "delivery",
+      "copy": "Serves task-specific packs to AI workflows and humans, allowing precise source-handle expansion while recording every pack claim, route, and decision.",
+      "tags": ["serve pack", "expand handles", "audit usage"],
+      "detail": {
+        "subtitle": "Serve context with receipts and controlled expansion",
+        "copy": "Example: Claude, Cursor, another context layer, an internal workflow, or a human dashboard receives the same governed pack. Each consumer can expand approved source handles while Baltor records what was served, why, and under which policy.",
+        "tags": ["Claude", "dashboards", "MCP/API", "audit receipts"]
+      }
+    }
+  ]
+}

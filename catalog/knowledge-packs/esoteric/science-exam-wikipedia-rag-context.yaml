@@ -1,0 +1,55 @@
+id: knowledge-pack/science-exam-wikipedia-rag-context
+type: knowledge-pack
+version: 0.1.0
+name: Science Exam Wikipedia Rag Context
+description: 'Capability-lift knowledge pack for an esoteric area LLMs handle poorly.
+  Gap: hallucinates on long-tail science MCQs; lift came from retrieving Wikipedia
+  passages Grounded in Kaggle LLM Science Exam + STEM Wikipedia (CC-BY-SA) via rag_vector
+  retrieval. Lift: decisive move was Wikipedia FAISS retriever feeding context; packaged
+  index lifts MAP@3 over closed-book'
+authors:
+- name: Open Harness Hub capability-gap factory
+license: CC-BY-4.0
+industry:
+- cross_industry
+capability:
+- retrieval
+- verification
+modality:
+- structured
+- text
+lifecycle: experimental
+trust_boundary: external
+freshness: volatile
+tags:
+- capability-lift
+- esoteric
+- knowledge-pack
+- rag_vector
+- ingestion-target
+created: '2026-05-28'
+updated: '2026-05-28'
+attribution:
+  source_url: Kaggle LLM Science Exam + STEM Wikipedia (CC-BY-SA)
+  source_kind: other
+  author: Kaggle LLM Science Exam + STEM Wikipedia (CC-BY-SA)
+  license: see-source
+content_types:
+- fact_table
+- reference_doc
+retrieval:
+- rag_vector
+files:
+- path: data/esoteric-packs/science-exam-wikipedia-rag-context.jsonl
+  format: jsonl
+  content_type: fact_table
+  schema: capability-gap seed (real facts where stable; else ingestion contract)
+indexing:
+  bm25: true
+  dense:
+    model: all-MiniLM-L6-v2
+provenance:
+  sources:
+  - Kaggle LLM Science Exam + STEM Wikipedia (CC-BY-SA)
+  collected_through: '2026-05-28'
+  collected_by: capability-gap factory

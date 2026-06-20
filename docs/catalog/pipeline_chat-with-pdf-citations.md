@@ -37,14 +37,14 @@ passages via hybrid retrieval + rerank, then produce a cited answer.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `pdf_to_text` | processor | `processor/pdf-to-text` | — |
-| 2 | `chunk` | processor | `processor/recursive-character-chunker` | — |
-| 3 | `embed` | processor | `processor/embedder-minilm` | — |
-| 4 | `embed_query` | processor | `processor/embedder-minilm` | — |
-| 5 | `retrieve` | rule_pack | `rule-pack/hybrid-retrieval-policy` | — |
-| 6 | `rerank` | processor | `processor/cross-encoder-reranker` | — |
-| 7 | `guard_chunks` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 8 | `redact_chunks_pii` | rule_pack | `rule-pack/privacy-pii-text-en` | — |
-| 9 | `answer` | harness | `harness/text-safety-review` | — |
-| 10 | `verify_citation_coverage` | processor | `processor/citation-coverage` | — |
+| 1 | `pdf_to_text` | processor | `processor/pdf-to-text` | - |
+| 2 | `chunk` | processor | `processor/recursive-character-chunker` | - |
+| 3 | `embed` | processor | `processor/embedder-minilm` | - |
+| 4 | `embed_query` | processor | `processor/embedder-minilm` | - |
+| 5 | `retrieve` | rule_pack | `rule-pack/hybrid-retrieval-policy` | - |
+| 6 | `rerank` | processor | `processor/cross-encoder-reranker` | - |
+| 7 | `guard_chunks` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 8 | `redact_chunks_pii` | rule_pack | `rule-pack/privacy-pii-text-en` | - |
+| 9 | `answer` | harness | `harness/text-safety-review` | - |
+| 10 | `verify_citation_coverage` | processor | `processor/citation-coverage` | - |
 

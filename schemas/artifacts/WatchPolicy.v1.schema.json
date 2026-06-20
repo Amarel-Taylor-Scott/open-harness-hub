@@ -1,0 +1,14 @@
+{
+  "$id": "WatchPolicy.v1", "title": "WatchPolicy.v1", "type": "object", "additionalProperties": true,
+  "required": ["schema_version", "watch_policy_id", "name", "volatility_class", "refresh_interval_seconds", "no_refresh"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["WatchPolicy.v1"]},
+    "watch_policy_id": {"type": "string"},
+    "name": {"type": "string"},
+    "volatility_class": {"type": "string", "enum": ["stable", "low", "medium", "high", "realtime"]},
+    "refresh_interval_seconds": {"type": "integer"},
+    "no_refresh": {"type": "boolean"},
+    "escalate_on_conflict": {"type": "boolean"},
+    "max_staleness_seconds": {"type": "integer"}
+  }
+}

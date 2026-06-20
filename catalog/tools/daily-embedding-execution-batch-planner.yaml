@@ -1,0 +1,69 @@
+id: "tool/daily-embedding-execution-batch-planner"
+type: tool
+version: "0.1.0"
+name: "Daily embedding execution batch planner"
+description: "Plans sharded embedding execution work and vector readiness audits from a staged daily production run without calling embedding providers."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["embedding", "retrieval", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["embeddings", "vector-search", "pgvector", "daily-factory", "cost-estimation", "worker-shards"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    daily_run_dir:
+      type: string
+    output_dir:
+      type: string
+    run_id:
+      type: string
+    default_profile:
+      type: string
+    max_items_per_batch:
+      type: integer
+    max_tokens_per_batch:
+      type: integer
+    stored_vectors_jsonl:
+      type: string
+  required: ["daily_run_dir", "output_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    embedding_plan:
+      type: object
+    vector_readiness:
+      type: object
+    decision:
+      type: string
+    files:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      daily_run_dir: "dist/daily-production-runs/2026-05-31"
+      output_dir: "dist/daily-embedding-execution/2026-05-31"
+      default_profile: "local-bge-small-en"
+    output:
+      ok: true
+      embedding_plan:
+        input_embedding_rows: 5000
+        planned_completion_rows: 5000
+      vector_readiness:
+        readiness_status: "not_ready"
+implementations:
+  - kind: "callable"
+    path: "scripts.db.daily_embedding_execution_batch_plan.build_daily_embedding_execution_batch_plan"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.daily_embedding_execution_batch_plan"

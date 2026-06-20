@@ -1,0 +1,54 @@
+id: "tool/agent-campaign-state-recorder"
+type: tool
+version: "0.1.0"
+name: "Agent campaign state recorder"
+description: "Records durable goal, campaign, worker, worktree, checkpoint, and evidence state for long-running agentic harnesses."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "serving", "evaluation"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.orchestration"
+tags: ["agentic-harness", "campaign-state", "checkpoint", "goal-runtime"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    campaign_id:
+      type: string
+    goal_id:
+      type: string
+    worker_id:
+      type: string
+    worktree_path:
+      type: string
+    checkpoint:
+      type: object
+    evidence:
+      type: array
+      items: { type: object }
+  required: ["campaign_id", "goal_id", "checkpoint"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    state_ref:
+      type: string
+    next_checkpoint_due:
+      type: string
+side_effects: "write"
+examples:
+  - input:
+      campaign_id: "campaign/open-harness-million-object"
+      goal_id: "goal/scale-open-harness-hub"
+      checkpoint: { status: "running", manifest_count: 4108 }
+    output:
+      ok: true
+      state_ref: "campaign/open-harness-million-object/checkpoints/latest"

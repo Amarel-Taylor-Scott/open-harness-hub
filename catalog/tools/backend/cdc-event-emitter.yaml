@@ -1,0 +1,127 @@
+id: "tool/cdc-event-emitter"
+type: tool
+version: "0.1.0"
+name: "CDC event emitter"
+description: |
+  Emits change-data-capture events for component definition updates into the
+  component_change_event table defined in db/postgres/schema.sql.
+
+  For each component version transition (create, update, supersede, deprecate,
+  source refresh, hash recompute, publisher sign), computes canonical
+  definition hashes for the previous and new component_version rows, detects
+  changed fields, resolves actor metadata, and writes a deterministic
+  component_change_event row. Also emits corresponding index_record deltas and
+  optional review_ticket rows when changes cross high-risk thresholds (e.g.,
+  content hash mismatch, publisher signature missing, promotion_state
+  regression).
+
+  Designed to run after any factory batch, promotion decision, or curator edit.
+  Hash computation is content-driven so formatting-only changes do not produce
+  false new_definition_hash values.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "verification", "retrieval", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.versioning"
+tags:
+  - cdc
+  - change-data-capture
+  - versioning
+  - hashing
+  - postgres
+  - audit-trace
+  - governance
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  required: ["component_versions_jsonl", "output_dir"]
+  properties:
+    component_versions_jsonl:
+      type: string
+      description: >
+        Path to JSONL file where each line pairs a previous and new
+        component_version row for a single component_id. Required fields per
+        line: component_id, previous_version (nullable), new_version.
+    output_dir:
+      type: string
+      description: >
+        Directory for the generated change event JSONL, index delta JSONL,
+        review ticket JSONL, and SQL load script.
+    actor_type:
+      type: string
+      description: >
+        Actor responsible for this change batch. Must be one of: system,
+        publisher, curator, tenant, worker, import.
+    actor_ref:
+      type: string
+      description: Free-form identifier for the actor (e.g., worker name, publisher ID).
+    high_risk_review_threshold:
+      type: number
+      description: >
+        Fraction of changed fields relative to total body fields above which
+        a review_ticket is generated. Defaults to 0.5.
+    dry_run:
+      type: boolean
+      description: >
+        When true, computes and returns change events without writing SQL or
+        JSONL output. Defaults to false.
+
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    component_versions_processed:
+      type: integer
+    change_events_emitted:
+      type: integer
+    index_deltas_emitted:
+      type: integer
+    review_tickets_emitted:
+      type: integer
+    change_type_counts:
+      type: object
+      description: Count per change_type value (created, updated, superseded, etc.).
+    files:
+      type: object
+      description: >
+        Paths produced: change_events_jsonl, index_deltas_jsonl,
+        review_tickets_jsonl, sql_load_script.
+
+side_effects: "write"
+
+examples:
+  - input:
+      component_versions_jsonl: "dist/component-cdc/2026-05-26/version-pairs.jsonl"
+      output_dir: "dist/cdc-event-emitter/2026-05-26"
+      actor_type: "worker"
+      actor_ref: "cdc-event-emitter"
+    output:
+      ok: true
+      component_versions_processed: 50
+      change_events_emitted: 48
+      index_deltas_emitted: 48
+      review_tickets_emitted: 3
+      change_type_counts:
+        created: 20
+        updated: 25
+        deprecated: 3
+      files:
+        change_events_jsonl: "dist/cdc-event-emitter/2026-05-26/change-events.jsonl"
+        index_deltas_jsonl: "dist/cdc-event-emitter/2026-05-26/index-deltas.jsonl"
+        review_tickets_jsonl: "dist/cdc-event-emitter/2026-05-26/review-tickets.jsonl"
+        sql_load_script: "dist/cdc-event-emitter/2026-05-26/load.sql"
+
+implementations:
+  - kind: "callable"
+    path: "scripts.db.cdc_event_emitter.emit_cdc_events"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.cdc_event_emitter"

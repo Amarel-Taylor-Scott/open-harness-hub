@@ -1,0 +1,60 @@
+id: "tool/agentmemory-persistent-memory"
+type: tool
+version: "0.1.0"
+name: "AgentMemory persistent memory store"
+description: |
+  Store and retrieve durable memories for an AI coding agent across sessions —
+  facts, decisions, file/symbol notes, and task state — with semantic recall.
+  Integration contract for AgentMemory, a persistent-memory layer for AI coding
+  agents.
+
+  Reference/integration contract only; verify the upstream license before
+  bundling. Complements the conversational builder (carry context across a
+  multi-turn build) and the Twelve-Factor "unify execution & business state"
+  factor (see pattern/twelve-factor-agent).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["ai", "software.devops", "cross_industry"]
+capability: ["memory", "retrieval"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+tags: ["memory", "agentmemory", "persistence", "agent-tooling", "recall"]
+created: "2026-05-26"
+updated: "2026-05-26"
+attribution:
+  source_url: "https://github.com/rohitg00/agentmemory"
+  source_kind: "github"
+  author: "rohitg00"
+
+parameters:
+  type: object
+  properties:
+    op:        { type: "string", enum: ["store", "retrieve", "delete"], description: "Memory operation." }
+    namespace: { type: "string", description: "Logical memory partition (e.g. project or session id)." }
+    content:   { type: "string", description: "Memory text to store (op=store)." }
+    query:     { type: "string", description: "Semantic query (op=retrieve)." }
+    top_k:     { type: "integer", default: 5 }
+required: ["op", "namespace"]
+returns:
+  type: object
+  properties:
+    memories:
+      type: array
+      items:
+        type: object
+        properties:
+          id:       { type: "string" }
+          content:  { type: "string" }
+          score:    { type: "number" }
+          stored_at: { type: "string" }
+side_effects: "write"
+examples:
+  - input:  { op: "retrieve", namespace: "open-harness-hub", query: "what blocks promotion of a row?", top_k: 2 }
+    output: { memories: [{ "id": "m_01", "content": "placeholder embeddings + open review tickets block promotion", "score": 0.82, "stored_at": "2026-05-26T20:00:00Z" }] }
+implementations:
+  - kind: "callable"
+    path: "agentmemory.client"
+  - kind: "mcp"
+    path: "agentmemory-mcp-server"

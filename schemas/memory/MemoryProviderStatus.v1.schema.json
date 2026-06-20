@@ -1,0 +1,13 @@
+{
+  "$id": "memory/MemoryProviderStatus.v1", "title": "MemoryProviderStatus.v1", "type": "object", "additionalProperties": false,
+  "description": "The health/availability card for one memory/context provider behind a Baltor wrapper. A candidate provider (e.g. supermemory.api@candidate, mcp.supermemory@candidate) reports status='candidate' or 'unavailable' with a reason naming the missing credential — as an env:// REFERENCE, never a secret value. The deterministic emulator reports status='emulated', available=true with NO credential needed, so the golden path runs offline with zero credentials. credential_ref MUST be an env:// reference, never an inline key/value.",
+  "required": ["schema_version", "provider_id", "status", "available"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["MemoryProviderStatus.v1"]},
+    "provider_id": {"type": "string", "description": "Adapter identity, e.g. 'supermemory.api@candidate', 'memory.local@v1', 'memory.emulator@v1'."},
+    "status": {"type": "string", "enum": ["active", "candidate", "emulated", "unavailable"], "description": "active = real provider wired; candidate = cataloged but not yet a runtime dependency; emulated = deterministic offline impl; unavailable = missing creds/reachability."},
+    "available": {"type": "boolean", "description": "Whether the provider can currently serve. The emulator is available=true with no creds; a candidate with no creds is available=false."},
+    "reason": {"type": "string", "description": "Human-readable explanation, e.g. 'missing credential env://SUPERMEMORY_API_KEY'. Never contains a secret value."},
+    "credential_ref": {"type": "string", "description": "REFERENCE to the credential the provider needs, e.g. 'env://SUPERMEMORY_API_KEY'. MUST start with env:// or secret:// — NEVER an inline key value."}
+  }
+}

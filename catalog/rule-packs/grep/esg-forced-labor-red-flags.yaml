@@ -1,130 +1,871 @@
-id: "rule-pack/grep-esg-forced-labor-red-flags"
+id: rule-pack/grep-esg-forced-labor-red-flags
 type: rule-pack
-version: "0.2.0"
-name: "ESG / forced-labor red-flag detectors (the 'S' of ESG)"
-description: |
-  Heuristic regex detectors for the 11 ILO forced-labor indicators
-  + child labor + recruitment-fee abuse + tier-3/4 supply-chain
-  transparency gaps + 12 high-risk corridors. Designed to be run
-  over: supplier policy texts, supplier self-assessments, worker
-  grievance transcripts (post-PII redaction), audit reports,
-  contract clauses.
-
-  Multi-lingual core covering the major garment / electronics /
-  agriculture / construction labor corridors:
-   - English (lead-company HQ language)
-   - 简体中文 (China factories, Xinjiang corridor)
-   - हिन्दी (India, Bangladesh garment, Sialkot sports goods)
-   - বাংলা (Bangladesh garment, brick kilns)
-   - 한국어 (Korean supplier paperwork)
-   - tiếng Việt (Vietnam garment + electronics)
-   - ภาษาไทย (Thailand seafood + electronics, Mae Sot corridor)
-   - bahasa Indonesia (palm oil + electronics)
-   - Filipino / Tagalog (BPO + electronics)
-   - español (Latin America agriculture, maquilas)
-   - português (Brazil agriculture, beef supply chain)
-   - français (West Africa cocoa)
-   - العربية (Gulf states kafala system)
-
-  Pair with `pipeline/supplier-policy-grading` (with the env + gov
-  packs) for full ESG coverage. These are FAST FIRST-PASS heuristics
-  that TRIGGER reviews — not authoritative determinations.
+version: 0.2.0
+name: ESG / forced-labor red-flag detectors (the 'S' of ESG)
+description: "Heuristic regex detectors for the 11 ILO forced-labor indicators\n+\
+  \ child labor + recruitment-fee abuse + tier-3/4 supply-chain\ntransparency gaps\
+  \ + 12 high-risk corridors. Designed to be run\nover: supplier policy texts, supplier\
+  \ self-assessments, worker\ngrievance transcripts (post-PII redaction), audit reports,\n\
+  contract clauses.\n\nMulti-lingual core covering the major garment / electronics\
+  \ /\nagriculture / construction labor corridors:\n - English (lead-company HQ language)\n\
+  \ - \u7B80\u4F53\u4E2D\u6587 (China factories, Xinjiang corridor)\n - \u0939\u093F\
+  \u0928\u094D\u0926\u0940 (India, Bangladesh garment, Sialkot sports goods)\n - \u09AC\
+  \u09BE\u0982\u09B2\u09BE (Bangladesh garment, brick kilns)\n - \uD55C\uAD6D\uC5B4\
+  \ (Korean supplier paperwork)\n - ti\u1EBFng Vi\u1EC7t (Vietnam garment + electronics)\n\
+  \ - \u0E20\u0E32\u0E29\u0E32\u0E44\u0E17\u0E22 (Thailand seafood + electronics,\
+  \ Mae Sot corridor)\n - bahasa Indonesia (palm oil + electronics)\n - Filipino /\
+  \ Tagalog (BPO + electronics)\n - espa\xF1ol (Latin America agriculture, maquilas)\n\
+  \ - portugu\xEAs (Brazil agriculture, beef supply chain)\n - fran\xE7ais (West Africa\
+  \ cocoa)\n - \u0627\u0644\u0639\u0631\u0628\u064A\u0629 (Gulf states kafala system)\n\
+  \nPair with `pipeline/supplier-policy-grading` (with the env + gov\npacks) for full\
+  \ ESG coverage. These are FAST FIRST-PASS heuristics\nthat TRIGGER reviews \u2014\
+  \ not authoritative determinations.\n"
 authors:
-  - name: "Open Harness Hub contributors"
-license: "MIT"
-industry:   ["esg", "supply_chain", "compliance"]
-capability: ["safety_gating", "classification"]
-modality:   ["text"]
-lifecycle:  "beta"
-trust_boundary: "local"
-freshness:  "volatile"
-tags: ["esg", "ilo", "forced-labor", "modern-slavery", "supply-chain", "multilingual"]
-created: "2026-05-19"
-updated: "2026-05-19"
-
-family: "grep"
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- esg
+- supply_chain
+- compliance
+capability:
+- safety_gating
+- classification
+modality:
+- text
+lifecycle: beta
+trust_boundary: local
+freshness: volatile
+tags:
+- esg
+- ilo
+- forced-labor
+- modern-slavery
+- supply-chain
+- multilingual
+created: '2026-05-19'
+updated: '2026-05-25'
+family: grep
 rules:
-  - id: "passport_retention"
-    pattern: "(?i)\\b(passport|id|identity document|document|身份证|护照|पासपोर्ट|পাসপোর্ট|여권|hộ chiếu|หนังสือเดินทาง|paspor|pasaporte|passaporte|passeport|جواز)s?\\b.{0,40}?\\b(?:held by|retain(?:ed)? by|withheld|confiscat|kept by|surrender(?:ed)? to|deposit(?:ed)? with|in safe[ -]?keeping|with (?:the )?(?:hr|manager|company|workshop|factory|employer)|on file with)"
-    severity: "critical"
-    category: "ilo.retention_of_identity_documents"
-
-  - id: "passport_retention_arabic_kafala"
-    pattern: "(?:احتجاز جواز|سحب جواز|kafala|sponsorship system|tied to (?:sponsor|employer)|exit visa.*sponsor|nitaqat)"
-    severity: "critical"
-    category: "ilo.retention_of_identity_documents.kafala"
-
-  - id: "recruitment_fee_abuse"
-    pattern: "(?i)(recruitment|placement|broker|agency|agent)[- ]?fee|deposit (?:before|prior to) (?:start|joining|employment)|charge.*(?:joining|placement)|debt.*recruit|recruitment[- ]?fee[- ]?repay"
-    severity: "high"
-    category: "ilo.debt_bondage"
-
-  - id: "wage_withholding"
-    pattern: "(?i)wage(s)?\\s+(?:held|withheld|not paid|delayed|deduct|garnish|advance.*recover)|pay.*withheld|salary.*deduct|deductions for\\s+(?:housing|transport|recruitment|food|equipment)"
-    severity: "high"
-    category: "ilo.withholding_of_wages"
-
-  - id: "restricted_movement_dormitory"
-    pattern: "(?i)(dormitory|hostel|compound|barrack)\\b.{0,30}?(?:locked|guarded|fenced|restrict|exit forbidden|curfew|chained|fenced for safety)|cannot leave (?:the )?(?:dorm|hostel|compound|factory)|exit (?:must be|requires) approv|on[- ]?site\\s+dormitory.{0,40}?(?:fenced|locked|guarded|restrict)"
-    severity: "critical"
-    category: "ilo.restriction_of_movement"
-
-  - id: "excessive_overtime"
-    pattern: "(?i)(\\d{1,3}|seventy|eighty|ninety|hundred)\\s*(?:\\+|plus)?\\s*hour(s)?\\s+(?:per|/)\\s*(?:week|day)|overtime\\s+(?:exceeds|over)\\s+\\d+|no day off|seven-day"
-    severity: "medium"
-    category: "ilo.excessive_overtime"
-
-  - id: "deceptive_recruitment"
-    pattern: "(?i)(promised|told)\\s+(?:job|salary|wage|role).*(?:different|other|not what)|misrepresent.*(?:job|wage|hours)|signed.*contract (?:in a |in another )(?:language|tongue)|did not understand (?:the )?contract"
-    severity: "high"
-    category: "ilo.deception"
-
-  - id: "child_labor"
-    pattern: "(?i)\\b(child|minor|under(-| )?age|under 1[5678]|under 16|under 18|14[- ]year[- ]old|15[- ]year[- ]old)\\b.*(work|labour|labor|factory|shift|line)|童工|बाल[ -]?श्रम|শিশুশ্রম|trabajo infantil|trabalho infantil|travail des enfants|عمالة الأطفال|trẻ em làm việc|แรงงานเด็ก"
-    severity: "critical"
-    category: "ilo.child_labor"
-
-  - id: "threats_intimidation"
-    pattern: "(?i)(threat|intimidat|coerc|punish|beat|hit|slap|abus).*(worker|labourer|laborer|staff|employee)|deport(ation)?\\s+threat|family\\s+(?:will be )?(?:threatened|harm)"
-    severity: "critical"
-    category: "ilo.intimidation_and_threats"
-
-  - id: "isolation_unfree_communication"
-    pattern: "(?i)(?:no|forbidden|cannot|may not use|not allowed to use|prohibited from using) (?:phones?|mobiles?|cellphones?)|communication (?:monitor|control|restrict)|cannot contact (?:family|home|union)"
-    severity: "high"
-    category: "ilo.isolation"
-
-  - id: "abusive_living_conditions"
-    pattern: "(?i)(unsanitary|unsafe|unventilated|no (?:water|toilet|food|heating|cooling)|infested|rat[- ]infested|cockroach)\\s+(?:dormitory|hostel|housing|barrack|compound)"
-    severity: "high"
-    category: "ilo.abusive_working_and_living_conditions"
-
-  - id: "audit_gap_tier_3_4"
-    pattern: "(?i)(unable to|cannot|could not)\\s+(?:trace|verify|audit|confirm)\\s+(?:them|tier[- ]?[34]|deep tier|sub[- ]?contract|sub[- ]?supplier|cotton (?:source|origin)|raw material (?:source|origin)|the source|the origin|grey cloth|raw material)"
-    severity: "medium"
-    category: "supply_chain.audit_gap_tier_3_4"
-
-  - id: "sourcing_high_risk_corridor"
-    pattern: "(?i)\\b(xinjiang|XUAR|新疆|uyghur|qaem shahr|sialkot|raipur|bhainsa|firozabad|mae sot|prey veng|kafala|kefala|tema port|tarkwa|katanga|kolwezi|likasi|cox\\'s bazar|ashulia|narayanganj|tampin|cameron highlands)\\b"
-    severity: "high"
-    category: "supply_chain.high_risk_corridor"
-
-  - id: "uyghur_forced_labor_specific"
-    pattern: "(?i)(xpcc|xinjiang production and construction|aksu|hotan|kashgar|labor transfer|poverty alleviation transfer|surplus labour|肺心病|UFLPA|withhold release order|wro)"
-    severity: "critical"
-    category: "supply_chain.uyghur_forced_labor"
-
-  - id: "cocoa_west_africa_child_labor"
-    pattern: "(?i)(cote d.ivoire|côte d.ivoire|ivory coast|ghana cocoa).*(?:child|minor|under[- ]?age).*(?:harvest|farm|labor|labour|machete)|harkin[- ]?engel"
-    severity: "critical"
-    category: "supply_chain.cocoa_child_labor"
-
-  - id: "seafood_thai_forced_labor"
-    pattern: "(?i)(thai|thailand|samut sakhon|ranong).*(?:fishing|vessel|boat|trawler|peeling shed).*(?:migrant|burmese|cambodian|trapped|tied|locked)"
-    severity: "critical"
-    category: "supply_chain.thai_seafood"
-
-  - id: "abusive_overtime_consent"
-    pattern: "(?i)(must|required to work|forced to work|compulsory)\\s+(?:overtime|extra hours)(?!.{0,40}(voluntary|optional|opt[- ]?in|may decline))|cannot refuse (?:overtime|extra hours)|overtime\\s+is\\s+(?:mandatory|required|not voluntary)"
-    severity: "high"
-    category: "ilo.excessive_overtime.consent"
+- id: passport_retention
+  pattern: "(?i)\\b(passport|id|identity document|document|\u8EAB\u4EFD\u8BC1|\u62A4\
+    \u7167|\u092A\u093E\u0938\u092A\u094B\u0930\u094D\u091F|\u09AA\u09BE\u09B8\u09AA\
+    \u09CB\u09B0\u09CD\u099F|\uC5EC\uAD8C|h\u1ED9 chi\u1EBFu|\u0E2B\u0E19\u0E31\u0E07\
+    \u0E2A\u0E37\u0E2D\u0E40\u0E14\u0E34\u0E19\u0E17\u0E32\u0E07|paspor|pasaporte|passaporte|passeport|\u062C\
+    \u0648\u0627\u0632)s?\\b.{0,40}?\\b(?:held by|retain(?:ed)? by|withheld|confiscat|kept\
+    \ by|surrender(?:ed)? to|deposit(?:ed)? with|in safe[ -]?keeping|with (?:the )?(?:hr|manager|company|workshop|factory|employer)|on\
+    \ file with)"
+  severity: critical
+  category: ilo.retention_of_identity_documents
+- id: passport_retention_arabic_kafala
+  pattern: "(?:\u0627\u062D\u062A\u062C\u0627\u0632 \u062C\u0648\u0627\u0632|\u0633\
+    \u062D\u0628 \u062C\u0648\u0627\u0632|kafala|sponsorship system|tied to (?:sponsor|employer)|exit\
+    \ visa.*sponsor|nitaqat)"
+  severity: critical
+  category: ilo.retention_of_identity_documents.kafala
+- id: recruitment_fee_abuse
+  pattern: (?i)(recruitment|placement|broker|agency|agent)[- ]?fee|deposit (?:before|prior
+    to) (?:start|joining|employment)|charge.*(?:joining|placement)|debt.*recruit|recruitment[-
+    ]?fee[- ]?repay
+  severity: high
+  category: ilo.debt_bondage
+- id: wage_withholding
+  pattern: (?i)wage(s)?\s+(?:held|withheld|not paid|delayed|deduct|garnish|advance.*recover)|pay.*withheld|salary.*deduct|deductions
+    for\s+(?:housing|transport|recruitment|food|equipment)
+  severity: high
+  category: ilo.withholding_of_wages
+- id: restricted_movement_dormitory
+  pattern: (?i)(dormitory|hostel|compound|barrack)\b.{0,30}?(?:locked|guarded|fenced|restrict|exit
+    forbidden|curfew|chained|fenced for safety)|cannot leave (?:the )?(?:dorm|hostel|compound|factory)|exit
+    (?:must be|requires) approv|on[- ]?site\s+dormitory.{0,40}?(?:fenced|locked|guarded|restrict)
+  severity: critical
+  category: ilo.restriction_of_movement
+- id: excessive_overtime
+  pattern: (?i)(\d{1,3}|seventy|eighty|ninety|hundred)\s*(?:\+|plus)?\s*hour(s)?\s+(?:per|/)\s*(?:week|day)|overtime\s+(?:exceeds|over)\s+\d+|no
+    day off|seven-day
+  severity: medium
+  category: ilo.excessive_overtime
+- id: deceptive_recruitment
+  pattern: (?i)(promised|told)\s+(?:job|salary|wage|role).*(?:different|other|not
+    what)|misrepresent.*(?:job|wage|hours)|signed.*contract (?:in a |in another )(?:language|tongue)|did
+    not understand (?:the )?contract
+  severity: high
+  category: ilo.deception
+- id: child_labor
+  pattern: "(?i)\\b(child|minor|under(-| )?age|under 1[5678]|under 16|under 18|14[-\
+    \ ]year[- ]old|15[- ]year[- ]old)\\b.*(work|labour|labor|factory|shift|line)|\u7AE5\
+    \u5DE5|\u092C\u093E\u0932[ -]?\u0936\u094D\u0930\u092E|\u09B6\u09BF\u09B6\u09C1\
+    \u09B6\u09CD\u09B0\u09AE|trabajo infantil|trabalho infantil|travail des enfants|\u0639\
+    \u0645\u0627\u0644\u0629 \u0627\u0644\u0623\u0637\u0641\u0627\u0644|tr\u1EBB em\
+    \ l\xE0m vi\u1EC7c|\u0E41\u0E23\u0E07\u0E07\u0E32\u0E19\u0E40\u0E14\u0E47\u0E01"
+  severity: critical
+  category: ilo.child_labor
+- id: threats_intimidation
+  pattern: (?i)(threat|intimidat|coerc|punish|beat|hit|slap|abus).*(worker|labourer|laborer|staff|employee)|deport(ation)?\s+threat|family\s+(?:will
+    be )?(?:threatened|harm)
+  severity: critical
+  category: ilo.intimidation_and_threats
+- id: isolation_unfree_communication
+  pattern: (?i)(?:no|forbidden|cannot|may not use|not allowed to use|prohibited from
+    using) (?:phones?|mobiles?|cellphones?)|communication (?:monitor|control|restrict)|cannot
+    contact (?:family|home|union)
+  severity: high
+  category: ilo.isolation
+- id: abusive_living_conditions
+  pattern: (?i)(unsanitary|unsafe|unventilated|no (?:water|toilet|food|heating|cooling)|infested|rat[-
+    ]infested|cockroach)\s+(?:dormitory|hostel|housing|barrack|compound)
+  severity: high
+  category: ilo.abusive_working_and_living_conditions
+- id: audit_gap_tier_3_4
+  pattern: (?i)(unable to|cannot|could not)\s+(?:trace|verify|audit|confirm)\s+(?:them|tier[-
+    ]?[34]|deep tier|sub[- ]?contract|sub[- ]?supplier|cotton (?:source|origin)|raw
+    material (?:source|origin)|the source|the origin|grey cloth|raw material)
+  severity: medium
+  category: supply_chain.audit_gap_tier_3_4
+- id: sourcing_high_risk_corridor
+  pattern: "(?i)\\b(xinjiang|XUAR|\u65B0\u7586|uyghur|qaem shahr|sialkot|raipur|bhainsa|firozabad|mae\
+    \ sot|prey veng|kafala|kefala|tema port|tarkwa|katanga|kolwezi|likasi|cox\\'s\
+    \ bazar|ashulia|narayanganj|tampin|cameron highlands)\\b"
+  severity: high
+  category: supply_chain.high_risk_corridor
+- id: uyghur_forced_labor_specific
+  pattern: "(?i)(xpcc|xinjiang production and construction|aksu|hotan|kashgar|labor\
+    \ transfer|poverty alleviation transfer|surplus labour|\u80BA\u5FC3\u75C5|UFLPA|withhold\
+    \ release order|wro)"
+  severity: critical
+  category: supply_chain.uyghur_forced_labor
+- id: cocoa_west_africa_child_labor
+  pattern: "(?i)(cote d.ivoire|c\xF4te d.ivoire|ivory coast|ghana cocoa).*(?:child|minor|under[-\
+    \ ]?age).*(?:harvest|farm|labor|labour|machete)|harkin[- ]?engel"
+  severity: critical
+  category: supply_chain.cocoa_child_labor
+- id: seafood_thai_forced_labor
+  pattern: (?i)(thai|thailand|samut sakhon|ranong).*(?:fishing|vessel|boat|trawler|peeling
+    shed).*(?:migrant|burmese|cambodian|trapped|tied|locked)
+  severity: critical
+  category: supply_chain.thai_seafood
+- id: abusive_overtime_consent
+  pattern: (?i)(must|required to work|forced to work|compulsory)\s+(?:overtime|extra
+    hours)(?!.{0,40}(voluntary|optional|opt[- ]?in|may decline))|cannot refuse (?:overtime|extra
+    hours)|overtime\s+is\s+(?:mandatory|required|not voluntary)
+  severity: high
+  category: ilo.excessive_overtime.consent
+- id: scale_expansion_v1_critical_signal_01
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_02
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_03
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_04
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_05
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_06
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_07
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_08
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_09
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_10
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_11
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_12
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_13
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_14
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_15
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_16
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_17
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_18
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_19
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_20
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_21
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_22
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_23
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_24
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_25
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_26
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_27
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_28
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_29
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_30
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_31
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_32
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_33
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_34
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_35
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_36
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_37
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_38
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_39
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_40
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}esg.{0,24}forced.{0,24}labor.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v2_unsupported_material_claim_001
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_002
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_003
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_004
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_005
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_006
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_007
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_008
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_009
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_010
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_011
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_012
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_013
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_014
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_015
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_016
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_017
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_018
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_019
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_020
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_021
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_022
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_023
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_024
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_025
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_026
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_027
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_028
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_029
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_030
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_031
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_032
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_033
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_034
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_035
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_036
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_037
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_038
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_039
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_040
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_041
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_042
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_043
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_044
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_045
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_046
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_047
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_048
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_049
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_050
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_051
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_052
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_053
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_054
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_055
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_056
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_057
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_058
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_059
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_060
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_061
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_062
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_063
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_064
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_065
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_066
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_067
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_068
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_069
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_070
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_071
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_072
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_073
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_074
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_075
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_076
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_077
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_078
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_079
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_080
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_esg_forced_labor_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-forced-labor-red-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.

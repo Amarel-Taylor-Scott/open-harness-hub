@@ -1,0 +1,74 @@
+id: "tool/hierarchical-label-dimensioner"
+type: tool
+version: "0.1.0"
+name: "Hierarchical label dimensioner"
+description: "Assigns hierarchical labels, schema.org-style labels, custom labels, and numeric/categorical dimensions to components, source records, normalized objects, and entities."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["classification", "extraction", "reranking", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+tags: ["labels", "dimensions", "schema-org", "hierarchical-taxonomy", "hybrid-search"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    subjects:
+      type: array
+      items:
+        type: object
+    label_taxonomy:
+      type: object
+    dimension_definitions:
+      type: array
+      items:
+        type: object
+    model_route:
+      type: object
+      description: "Optional route for model-generated labels and dimensions."
+    tenant_label_set:
+      type: object
+  required: ["subjects", "label_taxonomy"]
+returns:
+  type: object
+  properties:
+    label_records:
+      type: array
+      items:
+        type: object
+    dimension_records:
+      type: array
+      items:
+        type: object
+    review_tickets:
+      type: array
+      items:
+        type: object
+    metrics:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      subjects:
+        - id: "pipeline/aml-alert-questionnaire-review"
+          text: "AML alert review questionnaire pipeline"
+      label_taxonomy:
+        label_sets: ["hierarchical", "schema_org"]
+      dimension_definitions:
+        - name: "evidence_requiredness"
+    output:
+      label_records: []
+      dimension_records: []
+      review_tickets: []
+      metrics: {}
+implementations:
+  - kind: "callable"
+    path: "tools.hierarchical_label_dimensioner.run"
+  - kind: "mcp"
+    path: "mcp/labels.dimension"

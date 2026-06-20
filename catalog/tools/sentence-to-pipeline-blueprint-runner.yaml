@@ -1,0 +1,59 @@
+id: "tool/sentence-to-pipeline-blueprint-runner"
+type: tool
+version: "0.1.0"
+name: "Sentence to pipeline blueprint runner"
+description: "Local-first tool that turns a plain-language user request into cheap, balanced, and quality-first LLM pipeline blueprints with guardrails, eval kits, cost estimates, and deployment bundle placeholders."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["planning", "generation", "evaluation", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.product"
+tags: ["local-demo", "pipeline-generation", "blueprint", "cost-estimate", "guardrails"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    prompt:
+      type: string
+    simulate:
+      type: boolean
+    registry_path:
+      type: string
+    cost_policy:
+      type: object
+    hosting_environment:
+      type: object
+  required: ["prompt"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    task_parse:
+      type: object
+    options:
+      type: array
+      items: { type: object }
+    deployment_bundle:
+      type: object
+    eval_plan:
+      type: object
+side_effects: "none"
+examples:
+  - input:
+      prompt: "Build me an LLM pipeline that intakes a photo plus description and processes it in the cheapest way possible to classify whether it may relate to human exploitation."
+      simulate: true
+    output:
+      ok: true
+      options: []
+implementations:
+  - kind: "callable"
+    path: "scripts.blueprints.local_sentence_demo.run_sentence_to_pipeline"
+    language: "python"

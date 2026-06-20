@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "note": "Competitive-intelligence provider-node mappings (owner_provided_unverified). Each external company maps to a PORT as a CANDIDATE (never active, never a direct import, output never truth). Inference providers route via the Shared Inference Gateway numeric graph with governed fallback; execution backends are chosen by policy/telemetry/price with a local-equivalent default; bounded agents are sandboxed and their output is candidate, not truth.",
+  "source": "owner_provided_unverified",
+  "mappings": [
+    {"company": "Fireworks AI", "target_port": "InferenceGatewayProviderPort", "maps_to": "model.fireworks@candidate", "status": "candidate", "kind": "inference_provider", "requires": ["secret_ref", "local_equivalent"], "governance": "routed via the Inference Gateway numeric graph; never the offline default; governed fallback to the local stub; ModelInvocationReceipt records the actual model used"},
+    {"company": "Crusoe", "target_port": "ExecutionBackendProviderPort", "status": "candidate", "kind": "managed_gpu_cloud", "requires": ["local_equivalent", "region_policy"], "governance": "chosen by policy/telemetry/price; local emulator is the default path; never a direct import"},
+    {"company": "Nscale", "target_port": "ExecutionBackendProviderPort", "status": "candidate", "kind": "sovereign_gpu_cloud", "requires": ["local_equivalent", "region_policy", "data_residency"], "governance": "sovereign/region-aware backend candidate; runtime decision input (residency/cost/latency/capacity); never a direct import"},
+    {"company": "Cursor / Anysphere", "target_port": "CodegenAgentProviderPort", "status": "candidate", "kind": "bounded_agent", "requires": ["sandbox_policy"], "governance": "bounded + sandboxed; never the runtime; output is a candidate, not truth; gated through Teleon/OpenTools"},
+    {"company": "Cognition / Devin", "target_port": "CodegenAgentProviderPort", "status": "candidate", "kind": "bounded_agent", "requires": ["sandbox_policy"], "governance": "autonomous SWE agent candidate; bounded + sandboxed; output not truth"},
+    {"company": "Lovable", "target_port": "GeneratedAppTarget", "status": "candidate", "kind": "app_builder_target", "governance": "NOT a provider — a target whose generated apps need a productionization audit (Teleon + OpenHarnessHub + Baltor)"},
+    {"company": "Mercor", "target_port": "ExpertEvaluationProviderPort", "status": "candidate", "kind": "human_in_loop", "governance": "expert/human-in-loop eval + skill extraction candidate; output gated; feeds OpenSkillsHub/OpenBenchmarkHub/Baltor review"},
+    {"company": "Harvey", "target_port": "BenchmarkAnalog", "status": "reference", "kind": "regulated_context_benchmark_analog", "governance": "analog for benchmark.legal_context_governance; not a provider; no public accusation"},
+    {"company": "OpenEvidence", "target_port": "BenchmarkAnalog", "status": "reference", "kind": "regulated_context_benchmark_analog", "governance": "analog for benchmark.clinical_evidence_grounding; not a provider; no medical-advice claims; review required"}
+  ]
+}

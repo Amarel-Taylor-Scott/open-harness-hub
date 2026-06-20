@@ -1,0 +1,93 @@
+id: "rubric/baltor-context-object-component-quality"
+type: rubric
+version: "0.1.0"
+name: "Baltor context object component quality"
+description: "Overlay rubric for treating tools, rubrics, masks, transformers, packs, and processors as versioned context objects with relationships, dimensions, lineage, and policy."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["software", "ai_governance", "data_governance"]
+capability: ["evaluation", "governance", "verification"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+tags: ["baltor", "context-objects", "tools", "rubrics", "masks", "transformers"]
+created: "2026-06-02"
+updated: "2026-06-02"
+dimensions:
+  - id: "stable_identity"
+    label: "Component has a stable context-object identity, native source mapping, and source-handle strategy"
+    weight: 0.06
+    scale: "0.0-1.0"
+    evidence_required: "Review ctx:// identity, component ID, source URL or registry handle, native IDs, and expansion handles."
+  - id: "versioned_contract"
+    label: "Component behavior, schema, inputs, outputs, and policy assumptions are versioned without mutating history"
+    weight: 0.06
+    scale: "0.0-1.0"
+    evidence_required: "Check semver, immutable versions, change notes, compatibility claims, and migration/alias handling."
+  - id: "relationship_readiness"
+    label: "Component can participate in unlimited typed relationships and hyperedge-style relationships"
+    weight: 0.06
+    scale: "0.0-1.0"
+    evidence_required: "Look for relationships to source objects, packs, tools, policies, evals, models, masks, transformers, and owners."
+  - id: "dimension_readiness"
+    label: "Component can carry quality, trust, risk, freshness, cost, utility, and safety dimensions"
+    weight: 0.06
+    scale: "0.0-1.0"
+    evidence_required: "Confirm dimension definitions, values, scope, confidence, evidence, method, and validity windows."
+  - id: "lineage_completeness"
+    label: "Generated or derived component outputs have explicit lineage from inputs, actor, pipeline, model, and prompt"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Inspect lineage events, derived_from links, pipeline versions, model versions, prompt versions, and trace IDs."
+  - id: "policy_binding"
+    label: "Component has enforceable policy boundaries for read, write, execute, expand, export, store, sync, and model-send actions"
+    weight: 0.07
+    scale: "0.0-1.0"
+    evidence_required: "Check ACL-before-model controls, action policy, DLP labels, retention, local/cloud memory scope, and audit logs."
+  - id: "mask_semantics"
+    label: "Masks are modeled as first-class projection/redaction/view-control context objects rather than ad hoc filters"
+    weight: 0.06
+    scale: "0.0-1.0"
+    evidence_required: "Verify mask identity, version, selected fields, hidden fields, redaction reason, policy trigger, and downstream compatibility."
+  - id: "transformer_semantics"
+    label: "Transformers are modeled as first-class representation-changing context objects with reversible or explainable behavior where possible"
+    weight: 0.06
+    scale: "0.0-1.0"
+    evidence_required: "Review transformer input/output contracts, determinism, model usage, lossiness, reversibility, lineage, and validation."
+  - id: "tool_semantics"
+    label: "Tools are modeled as callable context objects with schemas, permissions, side-effect class, audit, and failure modes"
+    weight: 0.06
+    scale: "0.0-1.0"
+    evidence_required: "Check tool input/output schema, idempotency, read/write class, approval gates, retries, rate limits, and result handles."
+  - id: "rubric_semantics"
+    label: "Rubrics are modeled as reusable evaluation context objects with scored dimensions, evidence requirements, and review lineage"
+    weight: 0.06
+    scale: "0.0-1.0"
+    evidence_required: "Check rubric dimensions, weights, examples, target object classes, review records, and feedback relationships."
+  - id: "retrieval_surface"
+    label: "Component can be retrieved, ranked, masked, expanded, and packed without leaking unauthorized raw source content"
+    weight: 0.06
+    scale: "0.0-1.0"
+    evidence_required: "Inspect search metadata, embeddings policy, source handles, raw expansion controls, and token-budget behavior."
+  - id: "operational_observability"
+    label: "Component emits metrics and traces for use, failure, latency, cost, freshness, policy decisions, and downstream outcomes"
+    weight: 0.06
+    scale: "0.0-1.0"
+    evidence_required: "Review telemetry events, dashboards, trace IDs, feedback capture, and outcome-linked usage logs."
+  - id: "cloud_portability"
+    label: "Component can run or be stored across local, cloud, serverless, containerized, and managed-service deployments"
+    weight: 0.05
+    scale: "0.0-1.0"
+    evidence_required: "Check local-first behavior, object storage compatibility, Postgres/JSONB fit, vector/search portability, and environment configuration."
+  - id: "self_improvement"
+    label: "Component can improve through feedback, evals, reranking labels, freshness outcomes, and human corrections without breaking contracts"
+    weight: 0.06
+    scale: "0.0-1.0"
+    evidence_required: "Look for feedback events, eval cases, accepted corrections, retraining labels, rollback, and comparison to prior versions."
+  - id: "anti_fragility"
+    label: "Component avoids brittle assumptions, hidden coupling, magic values, provider lock-in, and one-off source-specific behavior"
+    weight: 0.08
+    scale: "0.0-1.0"
+    evidence_required: "Review config ownership, constants, adapter boundaries, extension points, failure isolation, and compatibility tests."
+scoring_method: "weighted_sum"

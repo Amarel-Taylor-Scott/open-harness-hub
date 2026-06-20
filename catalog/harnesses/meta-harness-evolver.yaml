@@ -1,0 +1,48 @@
+id: "harness/meta-harness-evolver"
+type: harness
+version: "0.1.0"
+name: "Meta-harness evolver"
+description: "Harness pattern that proposes, benchmarks, compares, and safely updates other harnesses using isolated branches, rollback paths, and human review gates."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "evaluation", "serving"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "dated"
+tags: ["agentic-harness", "meta-harness", "harness-evolution", "evaluation", "worktree"]
+created: "2026-05-25"
+updated: "2026-05-25"
+kind: "utility_surface"
+tier: "secondary"
+applied_layers: ["tools", "privacy", "heuristic", "classifier"]
+knowledge_packs:
+  - id: "orchestration_patterns"
+    label: "Agentic orchestration harness patterns"
+    kind: "knowledge_pack"
+    types: ["meta_harness_pattern", "long_running_agent_control"]
+    required: true
+    trust_boundary: "local"
+    freshness: "dated"
+model_targets:
+  - id: "none"
+    label: "No direct model target"
+    transport: "none"
+    role: "Supervises proposer, evaluator, and reviewer agents."
+    capabilities: ["proposal_routing", "benchmark_comparison", "rollback_planning"]
+    required: false
+    default: true
+    trust_boundary: "local"
+model_io:
+  input: "target harness, proposal set, benchmark traces, safety policy, rollback policy"
+  output: "accepted/rejected proposal, benchmark delta, review ticket, rollback plan"
+  transport: "none"
+input_verification: ["target harness has tests or benchmarks", "proposal runs in isolation", "safety gates cannot be weakened without human review"]
+output_verification: ["benchmark delta is recorded", "review ticket is emitted", "rollback plan exists before merge"]
+privacy_boundaries:
+  raw_input: "Harness traces may include sensitive repo and run context; keep local or tenant-scoped."
+  derived_output: "Publish only reviewed benchmark deltas and sanitized proposal summaries."
+  external_calls: "External calls depend on configured proposer and evaluator adapters."
+contributes_to: ["pipeline/agentic-orchestration-harness-intake"]

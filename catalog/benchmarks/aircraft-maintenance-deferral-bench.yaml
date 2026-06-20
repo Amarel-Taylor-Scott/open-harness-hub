@@ -1,0 +1,35 @@
+id: "benchmark/aircraft-maintenance-deferral-bench"
+type: benchmark
+version: "0.1.0"
+name: "Aircraft Maintenance Deferral benchmark"
+description: "Synthetic benchmark for aircraft maintenance deferral review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["aviation.maintenance"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["aircraft-maintenance-deferral", "expansion-v6"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/aircraft-maintenance-deferral-review"
+dataset: "dataset/aircraft-maintenance-deferral-samples"
+rubric: "rubric/aircraft-maintenance-deferral-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/aircraft-maintenance-deferral-review"
+    rule_pack_override: ["rule-pack/grep-aircraft-maintenance-deferral-flags", "rule-pack/rag-aircraft-maintenance-deferral-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 29
+report:
+  output: "dist/benchmarks/aircraft-maintenance-deferral/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

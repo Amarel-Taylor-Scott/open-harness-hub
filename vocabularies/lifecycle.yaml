@@ -1,6 +1,19 @@
-# Controlled vocabulary: lifecycle stages.
+# Controlled vocabulary: lifecycle stages (maturity ladder).
+#
+# Order is the maturity ladder: abstract < experimental < beta < stable
+# (deprecated is terminal). `abstract` is the ONLY pre-component tier — a thing
+# at `abstract` is a capability-request placeholder, not a usable component, and
+# is never tenant-visible. It is deliberately NOT in the component envelope
+# `lifecycle` enum (schemas/_common.schema.json): a real component starts at
+# `experimental`. Promotion (after the two-axis lift gate passes) is what mints
+# the component AT `experimental` and closes the request.
 
 lifecycle:
+  - id: abstract
+    label: Abstract — a capability-request placeholder; not yet built, not a
+      usable component, never tenant-visible. Typed to the component type it
+      will become (capability-request `target_type`). Leaves this tier only by
+      promotion to `experimental` after passing the lift + durability gate.
   - id: experimental
     label: Experimental — one author, no review, no production use.
   - id: beta
@@ -8,5 +21,5 @@ lifecycle:
   - id: stable
     label: Stable — used in production; semver-stable manifest.
   - id: deprecated
-    label: Deprecated — superseded by another artifact; kept for citation.
+    label: Deprecated — superseded by another component; kept for citation.
       Must declare `superseded_by` and `deprecated_on`.

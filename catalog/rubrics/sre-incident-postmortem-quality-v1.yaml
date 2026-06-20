@@ -1,0 +1,45 @@
+id: "rubric/sre-incident-postmortem-quality-v1"
+type: rubric
+version: "0.1.0"
+name: "SRE Incident Postmortem review quality v1"
+description: "Scores sre incident postmortem reviews for evidence grounding, issue coverage, risk calibration, and actionable remediation."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["sre", "sre.oncall", "software.devops"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["sre-incident-postmortem", "synthetic-expansion"]
+created: "2026-05-24"
+updated: "2026-05-24"
+dimensions:
+  - id: "coverage"
+    label: "Covers required review domains"
+    weight: 0.30
+    scale: "0.0-1.0"
+    evidence_required: "Findings address every required framework area and explain non-applicable areas."
+  - id: "grounding"
+    label: "Grounded in cited context"
+    weight: 0.30
+    scale: "0.0-1.0"
+    evidence_required: "Each material finding cites source context, packet evidence, or a rule trigger."
+  - id: "risk_calibration"
+    label: "Severity calibration"
+    weight: 0.20
+    scale: "0.0-1.0"
+    evidence_required: "Critical, high, medium, and low labels reflect impact and control urgency."
+  - id: "remediation"
+    label: "Actionable remediation"
+    weight: 0.20
+    scale: "0.0-1.0"
+    evidence_required: "Recommendations name owners, missing components, and verification evidence."
+scoring_method: "weighted_sum"
+examples:
+  - grade: 0.9
+    response: "Cited review with complete domain coverage and prioritized remediation."
+    notes: "Passes for grounded operational use."
+  - grade: 0.4
+    response: "Generic review with uncited conclusions and vague fixes."
+    notes: "Fails grounding and remediation dimensions."

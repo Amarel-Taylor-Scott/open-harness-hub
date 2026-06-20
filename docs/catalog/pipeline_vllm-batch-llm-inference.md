@@ -38,7 +38,7 @@ Output structured completions for downstream scoring or ensembling.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `serve` | processor | `processor/vllm-batched-sampling` | — |
-| 3 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `serve` | processor | `processor/vllm-batched-sampling` | - |
+| 3 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

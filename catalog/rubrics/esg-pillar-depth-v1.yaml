@@ -1,0 +1,71 @@
+id: "rubric/esg-pillar-depth-v1"
+type: rubric
+version: "0.1.0"
+name: "ESG pillar (E / S / G) disclosure depth rubric v1"
+description: |
+  Six-dimension rubric for grading the DEPTH and QUALITY of a single
+  ESG pillar disclosure (Environmental, Social, or Governance)
+  against SASB + ISSB + TCFD + GRI + SBTi. Pillar is specified at
+  rubric application time.
+
+  Complements `rubric/esg-supplier-compliance-v1` (regulatory
+  enforcement) and `rubric/esg-env-v1` (E-only ESRS sub-rubric).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["esg", "esg.csrd", "sustainability", "climate", "compliance"]
+capability: ["evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-24"
+updated: "2026-05-24"
+
+dimensions:
+  - id: "material_topic_completeness"
+    label: "All SASB-industry material topics for the pillar disclosed (or explicit not-material justification)"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "SASB SICS classification + per-topic disclosed/not-disclosed/not-material table with reasons"
+
+  - id: "framework_alignment"
+    label: "Disclosures cross-walk to ISSB IFRS S1/S2, GRI, TCFD with disclosure codes cited"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "framework-code-cited table per disclosure"
+
+  - id: "metric_specificity"
+    label: "Quantitative KPIs with method/scope/boundary/baseline specified (not narrative-only)"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "per-metric metadata: protocol (e.g. GHG Protocol), scope boundary, baseline year, methodology version"
+
+  - id: "double_materiality"
+    label: "Both inward (impact-on-stakeholders) and outward (financial-materiality) addressed for each material topic"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "double-materiality assessment present + per-topic both-sides covered"
+
+  - id: "target_rigour"
+    label: "Targets are SBTi-validated (climate) or framework-aligned (others); interim milestones present; baseline + target year explicit"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "SBTi validation lookup result + interim-year metric table"
+
+  - id: "assurance_and_greenwashing_clean"
+    label: "Third-party assurance (limited or reasonable); no greenwashing markers fired by rule-pack/grep-greenwashing-flags"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "auditor name + assurance level + greenwashing-flag list (must be empty for >0.8 score)"
+
+scoring_method: "weighted_sum"
+examples:
+  - grade: 1.0
+    response: "Every SASB topic for industry disclosed; framework codes cited per disclosure; quantitative KPIs with full methodology; double-materiality table; SBTi-validated targets; reasonable assurance from Big-4; zero greenwashing flags."
+    notes: "Best-in-class; ISSB-S1/S2 ready."
+  - grade: 0.5
+    response: "Most material topics covered; some framework codes cited; targets without SBTi validation; limited assurance only; 3 greenwashing flags fired (vague 'eco-friendly', no Scope-3 boundary, 'best-in-class' no benchmark)."
+    notes: "Mid-tier; needs framework discipline + assurance upgrade."
+  - grade: 0.0
+    response: "Half the SASB topics missing; no framework codes; narrative-only; no targets; no assurance; 15+ greenwashing flags."
+    notes: "Marketing brochure, not a disclosure."

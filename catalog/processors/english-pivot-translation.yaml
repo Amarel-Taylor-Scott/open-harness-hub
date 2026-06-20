@@ -1,0 +1,99 @@
+id: "processor/english-pivot-translation"
+type: processor
+version: "0.1.0"
+name: "English-pivot translation (generate English first, translate to low-resource language)"
+description: |
+  Two-step translation processor that routes through English as a pivot
+  language to reach low-resource target languages. Instead of translating
+  directly from a source language (e.g. Filipino official bulletin) to a
+  target low-resource language (e.g. Waray, Ilocano, Kapampangan), the
+  processor:
+
+    Step 1 — English generation: prompts the model to produce a complete,
+             faithful English output from the source content.
+    Step 2 — Low-resource translation: prompts the model to translate the
+             English output into the target language, optionally with
+             phonetic simplification hints for TTS.
+
+  The English-pivot pattern exploits the asymmetry in model training data:
+  source→English and English→target both have stronger training signal than
+  source→target directly, because most parallel corpora pass through English.
+  This yields measurably better fluency for the target language, especially
+  for technical/numeric content.
+
+  CAPABILITY LIFT (structural): direct low-resource-to-low-resource
+  translation is systematically worse because almost no parallel corpora
+  exist for these pairs. The gap is a data-distribution artifact: it will
+  not close for very-low-resource language pairs regardless of model size
+  unless parallel corpora exist. English-pivot is a structural mitigation.
+  lift_reason: sparse_data (low-resource language pair); mechanism:
+  orchestration_complexity (two-stage chained prompt that a single-pass
+  model call cannot replicate reliably).
+
+authors:
+  - name: "Open Harness Hub contributors"
+license: "Apache-2.0"
+industry:   ["public_safety", "government.regulatory", "education", "cross_industry"]
+capability: ["translation", "format_conversion", "agent_loop"]
+modality:   ["text"]
+lifecycle:  "experimental"
+lifecycle_position: "api.main"
+trust_boundary: "local"
+created: "2026-05-28"
+updated: "2026-05-28"
+
+attribution:
+  source_url: "https://github.com/google-gemini/gemma-cookbook"
+  source_kind: "github"
+  author: "WeatherSpeak PH (Gemma community — English-pivot translation for Philippine low-resource languages)"
+  license: "Apache-2.0"
+
+tags:
+  - "offline"
+  - "on-device"
+  - "translation"
+  - "english-pivot"
+  - "low-resource-language"
+  - "waray"
+  - "ilocano"
+  - "kapampangan"
+  - "tagalog"
+  - "global-south"
+  - "philippines"
+  - "disaster-communication"
+  - "sparse-data"
+  - "structural-lift"
+  - "weatherspeak"
+
+process_kind: "format_convert.translate_pivot"
+deterministic: false
+idempotent: false
+streaming: false
+latency_budget_ms: 8000
+
+inputs:
+  - name: "source_text"
+    type: "string"
+  - name: "source_language"
+    type: "string"
+  - name: "target_language"
+    type: "string"
+  - name: "tts_mode"
+    type: "boolean"
+  - name: "model_adapter_ref"
+    type: "string"
+outputs:
+  - name: "english_pivot_text"
+    type: "string"
+  - name: "target_language_text"
+    type: "string"
+  - name: "tts_ready_text"
+    type: "string"
+
+side_effects: "none"
+on_error: "raise"
+
+implementations:
+  - kind: "callable"
+    path: "scripts.processors.english_pivot_translation.run"
+    language: "python"

@@ -1,0 +1,42 @@
+{
+  "$comment": "services.json — the single source of truth the gateway, deployer and tunnel all read (self-understanding). One path namespace everywhere: code calls /api/<plane>/* identically on localhost, through the tunnel, and in prod. Add a service = add an entry; `just deploy` does the rest.",
+  "gateway": {
+    "port": 8080,
+    "tunnel": "quick",
+    "$tunnel_comment": "quick = ephemeral trycloudflare URL (dev). Named tunnels come from terraform/ when S5b goes live."
+  },
+  "services": [
+    {
+      "id": "sites",
+      "kind": "static",
+      "$comment": "All 24 prototype surfaces, served as files. Root comes from SITE_ROOT in .env.",
+      "routes": ["/*"],
+      "priority": 100,
+      "latency_p95_ms": 100
+    },
+    {
+      "id": "identity",
+      "kind": "host",
+      "$comment": "The user's canonical identity service (12 realms). Runs on the host, not in compose.",
+      "port": 9410,
+      "routes": ["/api/identity/*"],
+      "health": "/api/identity/health",
+      "start": "PYTHONPATH=. python3 scripts/identity_local_service.py --serve",
+      "priority": 10,
+      "latency_p95_ms": 250
+    },
+    {
+      "id": "core",
+      "kind": "container",
+      "$comment": "platform-core: events/A-B sink, LLM plane, receipts, service handshakes (reference impl).",
+      "build": "core",
+      "port": 8787,
+      "routes": ["/api/core/*", "/api/events/*", "/llm/*"],
+      "strip_prefix": { "/api/core": "", "/api/events": "/v1/events", "/llm": "/llm" },
+      "health": "/api/core/healthz",
+      "priority": 10,
+      "latency_p95_ms": 250,
+      "$latency_comment": "Budgets are LOCAL p95 through the gateway, measured by scripts/latency_probe.py (just bench). LLM passthrough is excluded — provider time isn't ours; the probe measures only our overhead routes."
+    }
+  ]
+}

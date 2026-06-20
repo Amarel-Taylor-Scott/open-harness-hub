@@ -38,10 +38,10 @@ the intent is sensitive (refund > $X, legal, escalation, threat).
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `redact_pii` | harness | `harness/redact-pii-text` | — |
-| 2 | `guard_prompt_injection` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 3 | `classify_intent` | processor | `processor/intent-dispatcher` | — |
-| 4 | `draft_response` | harness | `harness/text-safety-review` | — |
-| 5 | `trace_audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `redact_pii` | harness | `harness/redact-pii-text` | - |
+| 2 | `guard_prompt_injection` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 3 | `classify_intent` | processor | `processor/intent-dispatcher` | - |
+| 4 | `draft_response` | harness | `harness/text-safety-review` | - |
+| 5 | `trace_audit` | processor | `processor/audit-trace-emitter` | - |
 | 6 | `escalate_if_sensitive` | processor | `processor/escalate-human-review` | $.steps.classify_intent.output.selected_route IN ['human_review', 'legal_human_review'] |
 

@@ -8,7 +8,7 @@ lives in [SPEC §16](../reference/spec.md#16-comprehensive-prepost-api-process-t
 
 A **process** is a typed, repeatable transformation with declared
 inputs, outputs, side effects, and trust boundary. The hub provides
-four kinds of process artifacts, each with a different purpose:
+four kinds of process components, each with a different purpose:
 
 | Type | Who invokes it | Example |
 |---|---|---|

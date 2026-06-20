@@ -33,8 +33,8 @@ on each, then have a reviewer model pick the best one.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard_bug` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `sample_candidates` | processor | `processor/action-sampler-multi-rollout` | — |
-| 3 | `reviewer_judge` | processor | `processor/llm-judge` | — |
-| 4 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `guard_bug` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `sample_candidates` | processor | `processor/action-sampler-multi-rollout` | - |
+| 3 | `reviewer_judge` | processor | `processor/llm-judge` | - |
+| 4 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

@@ -1,0 +1,53 @@
+id: "tool/multimodal-evidence-router"
+type: tool
+version: "0.1.0"
+name: "Multimodal evidence router"
+description: "Routes mixed evidence bundles to OCR, vision, tabular, geospatial, time-series, retrieval, deterministic-check, and human-review stages based on modality, impact, confidence, and cost."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["humanitarian.disaster", "government.benefits", "environmental.water", "water_utility.sdwa", "food.safety", "cross_industry"]
+capability: ["governance", "retrieval", "verification", "serving"]
+modality: ["text", "image", "structured", "tabular", "spatial", "timeseries", "multimodal"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.routing"
+tags: ["multimodal", "model-routing", "evidence", "cost-control", "human-review"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    evidence_bundle:
+      type: object
+    domain:
+      type: string
+    cost_policy:
+      type: object
+    review_policy:
+      type: object
+  required: ["evidence_bundle", "domain"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    routes:
+      type: array
+      items: { type: object }
+    review_required:
+      type: boolean
+    reasons:
+      type: array
+      items: { type: string }
+side_effects: "none"
+examples:
+  - input:
+      domain: "environmental.water"
+      evidence_bundle: { lab_results: "csv", service_area: "geojson", notice: "text" }
+    output:
+      ok: true
+      review_required: true
+      reasons: ["threshold check required"]

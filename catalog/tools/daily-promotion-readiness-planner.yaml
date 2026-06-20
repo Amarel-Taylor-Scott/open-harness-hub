@@ -1,0 +1,71 @@
+id: "tool/daily-promotion-readiness-planner"
+type: tool
+version: "0.1.0"
+name: "Daily promotion readiness planner"
+description: "Audits staged daily production or model-ops rows and separates candidate-table load readiness from active component promotion readiness."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "evaluation", "retrieval", "planning"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "promotion", "daily-factory", "review-gate", "embedding-execution", "postgres"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    daily_run_dir:
+      type: string
+    output_dir:
+      type: string
+    run_summary:
+      type: string
+    run_id:
+      type: string
+  required: ["daily_run_dir", "output_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    counts:
+      type: object
+    decision:
+      type: string
+    next_actions:
+      type: array
+    files:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      daily_run_dir: "dist/daily-production-runs/2026-05-31"
+      output_dir: "dist/daily-promotion-readiness/2026-05-31"
+    output:
+      ok: true
+      counts:
+        normalized_objects: 5000
+        candidate_load_ready: 5000
+        active_promotion_ready: 0
+  - input:
+      daily_run_dir: "dist/model-ops-daily-runs/2026-05-26"
+      output_dir: "dist/model-ops-daily-runs/2026-05-26/promotion-readiness"
+      run_summary: "dist/model-ops-daily-runs/2026-05-26/model-ops-daily-run-summary.json"
+    output:
+      ok: true
+      counts:
+        normalized_objects: 1000
+        candidate_load_ready: 1000
+        active_promotion_ready: 0
+implementations:
+  - kind: "callable"
+    path: "scripts.db.daily_promotion_readiness_plan.build_daily_promotion_readiness_plan"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.daily_promotion_readiness_plan"

@@ -1,0 +1,91 @@
+{
+  "$id": "templates/TemplateArtifact.v1",
+  "title": "TemplateArtifact.v1",
+  "type": "object",
+  "additionalProperties": true,
+  "description": "A reusable STARTING-SHAPE template (infrastructure/inference/resource/api/ui/purpose-task/schema-object). Generates starting shapes; it is NOT a runtime, NOT proof, and never writes truth. Generated outputs are candidates until a harness/eval validates them. Carries numeric status/visibility codes + provenance; secret_refs only.",
+  "required": [
+    "template_id",
+    "display_name",
+    "template_kind",
+    "template_format",
+    "generates",
+    "input_contracts",
+    "output_contracts",
+    "required_variables",
+    "local_emulator",
+    "related_harnesses",
+    "visibility_code",
+    "provenance",
+    "status_code",
+    "owner"
+  ],
+  "properties": {
+    "template_id": {
+      "type": "string"
+    },
+    "display_name": {
+      "type": "string"
+    },
+    "template_kind": {
+      "type": "string"
+    },
+    "template_format": {
+      "type": "string"
+    },
+    "capability_slots": {
+      "type": "array"
+    },
+    "generates": {
+      "type": "array"
+    },
+    "input_contracts": {
+      "type": "array"
+    },
+    "output_contracts": {
+      "type": "array"
+    },
+    "required_variables": {
+      "type": "array"
+    },
+    "optional_variables": {
+      "type": "array"
+    },
+    "local_emulator": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "related_skills": {
+      "type": "array"
+    },
+    "related_tools": {
+      "type": "array"
+    },
+    "related_harnesses": {
+      "type": "array"
+    },
+    "related_context": {
+      "type": "array"
+    },
+    "visibility_code": {
+      "type": "integer"
+    },
+    "provenance": {
+      "type": "object"
+    },
+    "status_code": {
+      "type": "integer"
+    },
+    "risk_score": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "owner": {
+      "type": "string"
+    }
+  }
+}

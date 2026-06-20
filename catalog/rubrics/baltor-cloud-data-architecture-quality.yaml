@@ -1,0 +1,128 @@
+id: "rubric/baltor-cloud-data-architecture-quality"
+type: rubric
+version: "0.1.0"
+name: "Baltor cloud data architecture quality"
+description: "Hierarchical rubric for cloud-compatible data architecture across document objects, long attributes, graph relationships, search, vector, and columnar analytics."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["software", "software.devops", "data_governance", "sre"]
+capability: ["evaluation", "governance", "verification"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+tags: ["baltor", "cloud", "data-architecture", "schema-flexibility"]
+created: "2026-06-02"
+updated: "2026-06-02"
+dimensions:
+  - id: "1.1"
+    label: "Data shape: document-style storage is used for flexible object envelopes, source payloads, versions, and packs"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Review JSONB/document examples, raw snapshot URIs, normalized documents, and pack records."
+  - id: "1.2"
+    label: "Data shape: long attribute storage is used for dimensions, assertions, claims, scores, and relationship attributes"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Inspect tables/collections for subject, key/dimension/predicate, value, scope, evidence, and validity."
+  - id: "1.3"
+    label: "Data shape: wide columnar storage is used for high-volume metrics, cost, evals, freshness, usage, and outcomes"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Review analytics schema, warehouse tables, event shapes, and materialized dashboards."
+  - id: "1.4"
+    label: "Data shape: graph edges are stored separately and indexed for traversal, not embedded as unbounded arrays"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Inspect edge storage, endpoint roles, traversal indexes, pagination, and graph expansion limits."
+  - id: "2.1"
+    label: "Schema evolution: facets, dimensions, relationship types, masks, and transformers evolve additively"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Check schema registry, dimension registry, type registry, backward compatibility, and migration policy."
+  - id: "2.2"
+    label: "Schema evolution: promoted indexes improve speed without becoming the canonical source of truth"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Review indexed fields, materialized views, rebuild policy, and consistency checks."
+  - id: "2.3"
+    label: "Schema evolution: analytical tables support column, partition, and sort-order evolution for changing usage patterns"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Check lakehouse/table format choice, partition strategy, schema IDs, and old-data readability."
+  - id: "3.1"
+    label: "Indexing: JSON/document queries use targeted indexes and broad GIN-style indexes only where access patterns justify them"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Review query plans, JSONB indexes, expression indexes, and index-size/performance tradeoffs."
+  - id: "3.2"
+    label: "Indexing: search indexes support keyword, filters, source handles, ACL filters, freshness, and source precedence"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Inspect OpenSearch/Elasticsearch/search mapping, filter fields, security filters, and freshness fields."
+  - id: "3.3"
+    label: "Indexing: vector indexes are scoped by tenant, permissions, model version, artifact type, and privacy class"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Check vector metadata, embedding model IDs, ACL filters, private-memory treatment, and index rebuild policy."
+  - id: "3.4"
+    label: "Indexing: analytical indexes and materialized views support cost, latency, quality, and freshness monitoring"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Review warehouse partitions, materialized views, dashboard queries, and retention policies."
+  - id: "4.1"
+    label: "Cloud portability: metadata can run on Postgres-compatible storage before requiring specialized graph or document databases"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Check MVP storage plan, JSONB usage, edge tables, migration path, and managed Postgres compatibility."
+  - id: "4.2"
+    label: "Cloud portability: raw and large artifacts use object storage abstractions across S3, R2, GCS, Azure Blob, or equivalent"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Inspect URI abstraction, encryption, retention, lifecycle policies, and signed access."
+  - id: "4.3"
+    label: "Cloud portability: retrieval backends are replaceable across local, managed, and self-hosted search/vector services"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Review provider abstraction, adapters, index schema, migration/export behavior, and fallback retrieval."
+  - id: "4.4"
+    label: "Cloud portability: compute can run as local service, container, Kubernetes workload, serverless worker, or managed job"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Check deployment manifests, environment config, queue workers, autoscaling, and local dev parity."
+  - id: "5.1"
+    label: "Reliability: ingestion, indexing, embedding, and pack generation are resumable, idempotent, observable, and retry-safe"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Review job IDs, checkpoints, retries, dedupe keys, dead-letter queues, and trace IDs."
+  - id: "5.2"
+    label: "Reliability: source outages and stale indexes degrade gracefully with cache labels and freshness warnings"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Inspect offline behavior, cached pack headers, source validation status, and fallback fetch."
+  - id: "5.3"
+    label: "Reliability: data correctness is protected through hashes, snapshots, lineage, and validation after transformation"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Check content hashes, metadata hashes, validation results, transformer output checks, and lineage events."
+  - id: "6.1"
+    label: "Security: tenant isolation and ACL filters are applied at object, artifact, index, vector, graph, and warehouse layers"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Review row filters, tenant keys, source permissions, policy decisions, and cross-tenant tests."
+  - id: "6.2"
+    label: "Security: secrets, PII, prompt-injection content, and sensitive embeddings are identified and controlled"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Check scanning, redaction, embedding policy, DLP events, and untrusted-source labels."
+  - id: "7.1"
+    label: "Cost: storage classes, index retention, embedding refresh, and reranking depth are budgeted and measured"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Review cost dashboards, retention controls, embedding counts, ranker call counts, and pack unit economics."
+  - id: "7.2"
+    label: "Cost: wide analytics and event retention support finance-grade reporting without overloading transactional stores"
+    weight: 0.04
+    scale: "0.0-1.0"
+    evidence_required: "Inspect event export, warehouse retention, partitioning, and transactional/analytical workload separation."
+scoring_method: "weighted_sum"

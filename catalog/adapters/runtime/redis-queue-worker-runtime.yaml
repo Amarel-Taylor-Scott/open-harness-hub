@@ -1,0 +1,48 @@
+id: "adapter/redis-queue-worker-runtime"
+type: adapter
+version: "0.1.0"
+name: "Redis job queue worker runtime adapter"
+description: |
+  Provider-neutral adapter for a Redis-backed job queue used to dispatch and
+  consume asynchronous background jobs in the Open Harness Hub pipeline.
+
+  Supported job families: scan (source surface scan), embed (batch embedding
+  execution), eval (benchmark evaluation), price (model pricing lookup), and
+  promote (promotion readiness assessment). Workers dequeue jobs, execute them,
+  and write results back to the canonical Postgres store via the
+  postgres-pgvector-runtime adapter.
+
+  Compatible with Redis OSS, Upstash Redis, and any RESP2/RESP3-compatible
+  endpoint. Connection resolved from REDIS_URL environment variable at runtime.
+  Does not hardcode queue names, retry counts, or concurrency limits.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["routing", "serving", "governance"]
+modality: ["structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags:
+  - redis
+  - job-queue
+  - worker
+  - async
+  - scan
+  - embed
+  - eval
+created: "2026-05-26"
+updated: "2026-05-26"
+
+transport: "none"
+capabilities:
+  - enqueue_job
+  - dequeue_job
+  - job_result_write
+  - dead_letter_queue
+  - job_priority_routing
+auth: "none"
+cost_model: "self_hosted"
+endpoint: "${REDIS_URL}"

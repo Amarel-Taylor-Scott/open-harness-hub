@@ -53,13 +53,13 @@ guidance.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard_input` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `extract_fields_gemma_vision` | harness | `harness/text-safety-review` | — |
-| 3 | `validate_business_rules` | processor | `processor/verify-deterministic-criterion` | — |
-| 4 | `structured_to_prose` | processor | `processor/structured-to-prose` | — |
-| 5 | `grep_fake_inkasso_flags` | rule_pack | `rule-pack/grep-fake-inkasso-fraud-flags` | — |
-| 6 | `fraud_detect_gemma` | harness | `harness/text-safety-review` | — |
-| 7 | `rag_against_verbraucherzentrale` | rule_pack | `rule-pack/hybrid-retrieval-policy` | — |
-| 8 | `assemble_user_facing` | harness | `harness/text-safety-review` | — |
-| 9 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `guard_input` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `extract_fields_gemma_vision` | harness | `harness/text-safety-review` | - |
+| 3 | `validate_business_rules` | processor | `processor/verify-deterministic-criterion` | - |
+| 4 | `structured_to_prose` | processor | `processor/structured-to-prose` | - |
+| 5 | `grep_fake_inkasso_flags` | rule_pack | `rule-pack/grep-fake-inkasso-fraud-flags` | - |
+| 6 | `fraud_detect_gemma` | harness | `harness/text-safety-review` | - |
+| 7 | `rag_against_verbraucherzentrale` | rule_pack | `rule-pack/hybrid-retrieval-policy` | - |
+| 8 | `assemble_user_facing` | harness | `harness/text-safety-review` | - |
+| 9 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

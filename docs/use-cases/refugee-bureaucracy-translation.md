@@ -32,9 +32,9 @@ advice.
 Bill_info AI's architectural answer is **two-stage extract-then-judge
 + critical-tier output override + refuse-on-redacted**.
 
-## Catalog ingredients (16 artifacts)
+## Catalog ingredients (16 components)
 
-| Layer | Artifact | Role |
+| Layer | Component | Role |
 |---|---|---|
 | Persona | `persona/bureaucracy-translator-cite-first` | Action-first, ≤10-second attention budget; cite Verbraucherzentrale; never hallucinate |
 | Adapter | `adapter/gemma-4-26b-vision` | Gemma 4 26B-A4B-IT (256K context, vision, native multilingual, Apache 2.0 weights for NGO self-hosting) |
@@ -130,7 +130,7 @@ This use-case integration credits Sviatoslav Grabovsky on:
 - The knowledge pack (`knowledge-pack/verbraucherzentrale-fake-inkasso-indicators`)
 - The dataset reference (`dataset/bill-info-test-documents`)
 
-All artifacts cite the HF Space URL + the Gemma 4 Good Hackathon
+All components cite the HF Space URL + the Gemma 4 Good Hackathon
 context + the Apache 2.0 Gemma license + Bill_info AI's MIT code
 license.
 

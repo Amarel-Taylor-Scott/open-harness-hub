@@ -1,0 +1,16 @@
+{
+  "key": "BILL-782",
+  "type": "Story",
+  "summary": "Raise billing payment-submit retry ceiling and align the runbook",
+  "status": "In Progress",
+  "assignee": "dev-2",
+  "reporter": "billing-team",
+  "created": "2026-05-29",
+  "description": "Payments occasionally fail under transient downstream errors. Apply the retry ceiling from ADR-014 (the authoritative decision) and make the runbook match the code. Do NOT change which status codes are retry-safe.",
+  "acceptance_criteria": [
+    "Retry ceiling matches ADR-014 (the authoritative decision).",
+    "The runbook no longer contradicts the code.",
+    "No change to retry-safe status codes (429/502/503/504)."
+  ],
+  "links": { "relates_to": ["ADR-014"], "touches": ["repo/billing/retry.py"] }
+}

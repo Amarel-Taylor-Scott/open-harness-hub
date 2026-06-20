@@ -1,0 +1,61 @@
+id: "tool/public-source-load-plan-emitter"
+type: tool
+version: "0.1.0"
+name: "Public source load plan emitter"
+description: "Runs relationship preflight, candidate promotion scoring, review-ticket routing, and bulk CSV/psql load-script export for public-source replay row families."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["government", "software", "media", "construction", "energy", "finance", "healthcare", "cross_industry"]
+capability: ["governance", "evaluation", "retrieval", "routing", "serving", "embedding"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["public-sources", "bulk-load", "promotion-scoring", "postgres", "pgvector", "review-gates"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    row_dir:
+      type: string
+    output_dir:
+      type: string
+    load_sql_name:
+      type: string
+  required: ["row_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    preflight_report:
+      type: object
+    promotion_summary:
+      type: object
+    bulk_manifest:
+      type: object
+    safety_notes:
+      type: array
+      items:
+        type: string
+side_effects: "write"
+examples:
+  - input:
+      row_dir: "dist/source-surface-scan-partitions/seed/rows"
+      output_dir: "dist/source-surface-scan-partitions/seed/load-plan"
+    output:
+      ok: true
+      promotion_summary:
+        promotion_decisions: 620
+      bulk_manifest:
+        ok: true
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.public_source_load_plan.create_public_source_load_plan"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.factory.public_source_load_plan"

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/local-smoke-command-approval.schema.json",
+  "title": "Local smoke command approval",
+  "description": "Run-scoped approval record for specific command hashes in a local smoke execution ledger.",
+  "type": "object",
+  "required": ["approval_id", "run_id", "smoke_plan", "command_gate", "approver", "decisions"],
+  "properties": {
+    "approval_id": { "type": "string" },
+    "run_id": { "type": "string" },
+    "smoke_plan": { "type": "string" },
+    "command_gate": { "type": "string" },
+    "approver": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" },
+        "email_hash": { "type": "string" },
+        "public_key_fingerprint": { "type": "string" }
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["command_hash", "decision", "reason"],
+        "properties": {
+          "ordinal": { "type": "integer" },
+          "step": { "type": "string" },
+          "command_hash": { "type": "string" },
+          "decision": { "type": "string", "enum": ["approved", "rejected", "deferred"] },
+          "reason": { "type": "string" },
+          "expires_at": { "type": "string" },
+          "scope": { "type": "string", "enum": ["single_run", "single_command"] }
+        }
+      }
+    },
+    "created_at": { "type": "string" },
+    "signature": {
+      "type": "object",
+      "properties": {
+        "method": { "type": "string" },
+        "value": { "type": "string" }
+      }
+    }
+  },
+  "additionalProperties": true
+}

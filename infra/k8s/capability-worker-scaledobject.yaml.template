@@ -1,0 +1,23 @@
+# Baltor capability worker — KEDA ScaledObject (C-FLEET-2).
+# Maps lifecycle policies burst_keepalive / cooldown_drain (scale-to-zero, event-driven). KEDA's
+# cooldownPeriod governs scale-DOWN-to-zero (ramp-down); HPA handles 1->N once at least one replica runs.
+# pollingInterval is how often KEDA reads the queue trigger. The trigger reads queue depth FROM THE DB
+# task ledger (the source of truth) — Pub/Sub, if present, is only a wake-up accelerator.
+# Placeholders: ${CAPABILITY_ID} ${MAX_WORKERS} ${COOLDOWN_SECONDS} ${QUEUE_DEPTH_TARGET} ${BALTOR_DB_URL}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: baltor-worker-${CAPABILITY_ID}
+spec:
+  scaleTargetRef:
+    name: baltor-worker-${CAPABILITY_ID}
+  pollingInterval: 15                 # how often KEDA checks the queue-depth trigger (seconds)
+  cooldownPeriod: ${COOLDOWN_SECONDS} # ramp-DOWN-to-zero delay = keepalive_after_task_seconds
+  minReplicaCount: 0                  # scale to zero when idle (burst_keepalive / cooldown_drain)
+  maxReplicaCount: ${MAX_WORKERS}
+  triggers:
+    - type: postgresql               # queue-depth trigger reads the DB ledger (truth)
+      metadata:
+        connectionFromEnv: BALTOR_DB_URL
+        query: "SELECT count(*) FROM task_queue WHERE capability_id='${CAPABILITY_ID}' AND status='queued'"
+        targetQueryValue: "${QUEUE_DEPTH_TARGET}"

@@ -1,0 +1,72 @@
+id: "rubric/sdg-alignment-v1"
+type: rubric
+version: "0.1.0"
+name: "UN SDG alignment-claim quality rubric v1"
+description: |
+  Six-dimension rubric for grading the QUALITY of an SDG alignment
+  claim — whether for a corporate sustainability disclosure, NGO
+  program, government budget item, or impact-investment thesis.
+
+  Grades DISCLOSURE QUALITY, not SDG IMPACT. A program may genuinely
+  contribute to an SDG but score low on this rubric if the claim is
+  poorly substantiated; conversely, a high-quality claim may still
+  describe a marginal contribution.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["esg", "sustainability", "nonprofit", "government", "humanitarian"]
+capability: ["evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-24"
+updated: "2026-05-24"
+
+dimensions:
+  - id: "target_specificity"
+    label: "Claims map to specific SDG TARGETS (e.g., 1.1, 13.2) not just goal-level"
+    weight: 0.25
+    scale: "0..1"
+    evidence_required: "per-claim target ID list; goal-only claims count against the score"
+
+  - id: "indicator_grounding"
+    label: "Claims cite UN Global Indicator Framework codes (or explicit 'no UN indicator available, using X custom proxy')"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "per-claim indicator ID + measurement methodology"
+
+  - id: "counter_target_check"
+    label: "Counter-target risks acknowledged (e.g., 'SDG 7 program's lithium sourcing risks SDG 15 + SDG 6')"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "counter-target risks list with severity assessment"
+
+  - id: "geographic_temporal_fit"
+    label: "Claim geography + time horizon match the cited indicator's measurement level"
+    weight: 0.10
+    scale: "0..1"
+    evidence_required: "per-claim geography vs indicator-tier table"
+
+  - id: "additionality"
+    label: "Additionality assessed — would this outcome happen without this intervention?"
+    weight: 0.15
+    scale: "0..1"
+    evidence_required: "counterfactual narrative + cited baseline"
+
+  - id: "no_sdg_washing"
+    label: "No SDG-washing markers (no goal-only claims, no missing indicators, no cherry-picked geography)"
+    weight: 0.20
+    scale: "0..1"
+    evidence_required: "SDG-washing-marker list (must be empty for >0.8 score)"
+
+scoring_method: "weighted_sum"
+examples:
+  - grade: 1.0
+    response: "Every claim cites target + indicator codes; counter-targets identified and mitigated; geography matches indicator tier; additionality demonstrated; zero SDG-washing markers."
+    notes: "Disclosure-grade; ready for impact-investor due diligence."
+  - grade: 0.5
+    response: "Targets cited for half the claims; indicators missing or replaced with custom KPIs; one counter-target identified; geography fits; additionality assumed not demonstrated."
+    notes: "Decent first draft; needs indicator discipline + additionality work."
+  - grade: 0.0
+    response: "Goal-only claims throughout; no targets / indicators; no counter-target check; global indicator cited for a local intervention; no additionality discussion; multiple peacock terms."
+    notes: "Pure SDG-washing."

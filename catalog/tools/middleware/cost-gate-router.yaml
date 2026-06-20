@@ -1,0 +1,186 @@
+id: "tool/cost-gate-router"
+type: tool
+version: "0.1.0"
+name: "Cost gate router"
+description: |
+  Routes each inference request to the cheapest model that meets
+  caller-supplied quality and cost ceiling constraints. Before
+  dispatching, estimates input and output token counts and projected
+  cost for every candidate route. Rejects routes that would breach
+  the per-request or per-day cost ceiling. Among remaining
+  candidates, selects the lowest-cost route whose quality tier
+  satisfies the minimum quality score. Emits a cost audit record
+  for each decision.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "cross_industry", "software.devops"]
+capability: ["routing", "governance", "evaluation"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "pre_api.routing"
+tags: ["cost-gate", "token-estimation", "quality-ceiling", "cost-audit", "routing"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  required: ["request_text", "route_candidates", "constraints"]
+  properties:
+    request_text:
+      type: string
+      description: >
+        Full prompt or message body to be dispatched. Used for token
+        estimation before route selection.
+    route_candidates:
+      type: array
+      description: Ordered list of candidate model routes to evaluate.
+      items:
+        type: object
+        required: ["id", "cost_per_1k_input_tokens", "cost_per_1k_output_tokens", "quality_tier"]
+        properties:
+          id:
+            type: string
+          transport:
+            type: string
+          endpoint:
+            type: string
+          model:
+            type: string
+          api_key_env:
+            type: string
+          cost_per_1k_input_tokens:
+            type: number
+            description: USD cost per 1 000 input tokens.
+          cost_per_1k_output_tokens:
+            type: number
+            description: USD cost per 1 000 output tokens.
+          quality_tier:
+            type: number
+            minimum: 0
+            maximum: 1
+            description: >
+              Normalized quality score 0–1 for the route (e.g. derived
+              from benchmark evals). Higher is better.
+          trust_boundary:
+            type: string
+            enum: ["local", "hub", "external", "mixed"]
+    constraints:
+      type: object
+      required: ["max_cost_usd_per_request", "min_quality_tier"]
+      properties:
+        max_cost_usd_per_request:
+          type: number
+          description: Hard ceiling in USD for a single request.
+        min_quality_tier:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Minimum acceptable quality_tier score.
+        max_daily_spend_usd:
+          type: number
+          description: >
+            Optional. If provided, gate also checks cumulative daily
+            spend before allowing the request.
+        trust_boundary_filter:
+          type: string
+          enum: ["local", "hub", "external", "mixed"]
+          description: >
+            Optional. Only consider routes matching this boundary.
+    estimated_output_tokens:
+      type: integer
+      description: >
+        Caller hint for expected output length. If absent the gate
+        uses a heuristic (25 % of input tokens, minimum 64).
+
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    selected_route:
+      type: string
+      description: ID of the selected route, or null if all were gated.
+    estimated_cost_usd:
+      type: number
+    estimated_input_tokens:
+      type: integer
+    estimated_output_tokens:
+      type: integer
+    quality_tier:
+      type: number
+    gated_routes:
+      type: array
+      items:
+        type: object
+        properties:
+          id: { type: string }
+          reason: { type: string }
+    audit_record:
+      type: object
+      description: >
+        Structured cost-gate decision record suitable for appending
+        to an audit JSONL file.
+
+side_effects: "write"
+
+examples:
+  - input:
+      request_text: "Extract all named entities from the following legal clause: ..."
+      route_candidates:
+        - id: "local/ollama-phi4"
+          transport: "ollama"
+          endpoint: "http://localhost:11434"
+          model: "phi4"
+          cost_per_1k_input_tokens: 0.0
+          cost_per_1k_output_tokens: 0.0
+          quality_tier: 0.72
+          trust_boundary: "local"
+        - id: "cloud/openai-gpt4o-mini"
+          transport: "openai_compatible"
+          endpoint: "https://api.openai.com/v1"
+          model: "gpt-4o-mini"
+          api_key_env: "OPENAI_API_KEY"
+          cost_per_1k_input_tokens: 0.00015
+          cost_per_1k_output_tokens: 0.0006
+          quality_tier: 0.85
+          trust_boundary: "external"
+        - id: "cloud/openai-gpt4o"
+          transport: "openai_compatible"
+          endpoint: "https://api.openai.com/v1"
+          model: "gpt-4o"
+          api_key_env: "OPENAI_API_KEY"
+          cost_per_1k_input_tokens: 0.005
+          cost_per_1k_output_tokens: 0.015
+          quality_tier: 0.97
+          trust_boundary: "external"
+      constraints:
+        max_cost_usd_per_request: 0.01
+        min_quality_tier: 0.80
+    output:
+      ok: true
+      selected_route: "cloud/openai-gpt4o-mini"
+      estimated_cost_usd: 0.00021
+      estimated_input_tokens: 980
+      estimated_output_tokens: 245
+      quality_tier: 0.85
+      gated_routes:
+        - id: "local/ollama-phi4"
+          reason: "quality_tier 0.72 below minimum 0.80"
+        - id: "cloud/openai-gpt4o"
+          reason: "estimated_cost_usd 0.0171 exceeds max 0.01"
+      audit_record:
+        ts: "2026-05-26T00:00:00Z"
+        selected: "cloud/openai-gpt4o-mini"
+        estimated_cost_usd: 0.00021
+        constraints_applied: ["min_quality_tier", "max_cost_usd_per_request"]
+    notes: "Local route gated on quality; frontier gated on cost; mid-tier selected."
+
+implementations:
+  - kind: callable
+    language: python
+    path: "src/middleware/cost_gate_router.py"
+  - kind: http
+    url: "http://localhost:8080/v1/gateway/cost-gate"

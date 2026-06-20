@@ -36,9 +36,9 @@ Score an essay/text on a target dimension via DeBERTa-v3 embeddings + hand-craft
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `spell_correct` | processor | `processor/structured-to-prose` | — |
-| 3 | `embed_deberta` | processor | `processor/embedder-minilm` | — |
-| 4 | `score_lgbm` | processor | `processor/multi-vector-fusion` | — |
-| 5 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `spell_correct` | processor | `processor/structured-to-prose` | - |
+| 3 | `embed_deberta` | processor | `processor/embedder-minilm` | - |
+| 4 | `score_lgbm` | processor | `processor/multi-vector-fusion` | - |
+| 5 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

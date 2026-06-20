@@ -1,0 +1,35 @@
+id: "benchmark/city-311-service-triage-bench"
+type: benchmark
+version: "0.1.0"
+name: "City 311 Service Triage benchmark"
+description: "Synthetic benchmark for city 311 service triage review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["government.benefits", "facilities.maintenance"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["city-311-service-triage", "expansion-v6"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/city-311-service-triage-review"
+dataset: "dataset/city-311-service-triage-samples"
+rubric: "rubric/city-311-service-triage-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/city-311-service-triage-review"
+    rule_pack_override: ["rule-pack/grep-city-311-service-triage-flags", "rule-pack/rag-city-311-service-triage-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 29
+report:
+  output: "dist/benchmarks/city-311-service-triage/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

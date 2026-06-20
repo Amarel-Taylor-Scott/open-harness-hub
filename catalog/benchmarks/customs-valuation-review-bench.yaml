@@ -1,0 +1,35 @@
+id: "benchmark/customs-valuation-review-bench"
+type: benchmark
+version: "0.1.0"
+name: "Customs Valuation Review benchmark"
+description: "Synthetic benchmark for customs valuation review review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["customs.entry", "trade.hts"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["customs-valuation-review", "expansion-v6"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/customs-valuation-review-review"
+dataset: "dataset/customs-valuation-review-samples"
+rubric: "rubric/customs-valuation-review-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/customs-valuation-review-review"
+    rule_pack_override: ["rule-pack/grep-customs-valuation-review-flags", "rule-pack/rag-customs-valuation-review-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 29
+report:
+  output: "dist/benchmarks/customs-valuation-review/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

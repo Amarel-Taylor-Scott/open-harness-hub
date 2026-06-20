@@ -1,0 +1,1674 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor — Context Engine Visual</title>
+<meta name="description" content="A full-width visual prototype for Baltor's automated context engine pipeline." />
+<style>
+  :root {
+    --bg: #07090c;
+    --ink: #f5f7fa;
+    --muted: #a0a9b8;
+    --quiet: #687386;
+    --line: #262d38;
+    --line-strong: #343d4b;
+    --panel: #10151d;
+    --panel-2: #151b24;
+    --source: #4b5563;
+    --source-soft: #2b313b;
+    --bronze: #4b5563;
+    --silver: #a7b0bf;
+    --gold: #d9ae61;
+    --green: #32c786;
+    --blue: #4c8df6;
+    --cyan: #22d3ee;
+    --amber: #d9ae61;
+    --violet: #a47ef7;
+    --red: #ef7272;
+  }
+
+  * { box-sizing: border-box; }
+
+  html,
+  body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    letter-spacing: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    min-height: 100vh;
+    overflow-x: hidden;
+    padding: 20px;
+  }
+
+  .page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background:
+      radial-gradient(circle at 12% 0%, rgba(217,174,97,.08), transparent 34%),
+      radial-gradient(circle at 86% 105%, rgba(164,126,247,.07), transparent 38%),
+      var(--bg);
+  }
+
+  .top {
+    display: none;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 750;
+  }
+
+  .mark {
+    width: 23px;
+    height: 23px;
+    color: var(--gold);
+  }
+
+  .top-note {
+    margin-left: auto;
+    color: var(--muted);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .stage {
+    width: min(100%, 1180px);
+    flex: none;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: auto auto;
+    padding: 0;
+    gap: 16px;
+  }
+
+  .intro {
+    display: none;
+    padding: clamp(20px, 3.4vw, 42px) clamp(18px, 3.8vw, 54px) 16px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 520px);
+    gap: 28px;
+    align-items: end;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: max-content;
+    color: var(--gold);
+    border: 1px solid rgba(217,174,97,.28);
+    background: rgba(217,174,97,.08);
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 0 4px rgba(50,199,134,.12);
+  }
+
+  h1 {
+    margin: 14px 0 0;
+    max-width: 980px;
+    font-size: clamp(42px, 6.8vw, 104px);
+    line-height: .88;
+    letter-spacing: 0;
+  }
+
+  .intro-copy {
+    color: #c8d0dc;
+    font-size: clamp(15px, 1.5vw, 18px);
+    line-height: 1.45;
+    margin: 0 0 4px;
+  }
+
+  .intro-copy strong {
+    color: var(--ink);
+    font-weight: 750;
+  }
+
+  .visual-shell {
+    width: 100%;
+    margin: 0 auto;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--panel);
+    box-shadow: 0 24px 48px rgba(0,0,0,.6);
+    display: grid;
+    grid-template-rows: auto 410px auto;
+    min-height: 0;
+    position: relative;
+  }
+
+  .visual-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(120deg, rgba(217,174,97,.08), transparent 26%, transparent 74%, rgba(164,126,247,.07)),
+      linear-gradient(rgba(255,255,255,.018), transparent 38%);
+    opacity: .95;
+    z-index: 0;
+  }
+
+  .visual-shell > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .visual-head {
+    min-height: 106px;
+    padding: 24px 28px 22px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: flex-end;
+    gap: 24px;
+    justify-content: space-between;
+    background: transparent;
+  }
+
+  .admin-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    align-self: center;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.024);
+    border-radius: 999px;
+    padding: 4px;
+  }
+
+  .admin-toggle button {
+    appearance: none;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 6px 10px;
+  }
+
+  .admin-toggle button.is-active {
+    color: var(--ink);
+    background: rgba(255,255,255,.07);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
+  }
+
+  .visual-title {
+    min-width: 0;
+  }
+
+  .visual-title b {
+    display: block;
+    font-size: 26px;
+    line-height: 1.05;
+    letter-spacing: 0;
+  }
+
+  .visual-title span {
+    display: block;
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  .visual-title::before {
+    content: "Automated Context Engine";
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--gold);
+    font-size: 12px;
+    font-weight: 850;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    margin-bottom: 7px;
+  }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(88px, max-content));
+    gap: 0;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(255,255,255,.02);
+    padding: 10px 16px;
+    min-width: 440px;
+    justify-content: space-between;
+  }
+
+  .metric {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    padding: 0 10px;
+  }
+
+  .metric span {
+    display: block;
+    color: var(--quiet);
+    font-size: 10px;
+    font-weight: 850;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+  }
+
+  .metric b {
+    display: block;
+    margin-top: 2px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 16px;
+  }
+
+  .canvas-area {
+    position: relative;
+    min-height: 0;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.016), rgba(0,0,0,.08)),
+      #040609;
+    margin: 0 16px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: inset 0 0 24px rgba(0,0,0,.55);
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 410px;
+  }
+
+  .zone-labels {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: .62fr .98fr 1.16fr 1.24fr .98fr .62fr;
+    padding-top: 18px;
+  }
+
+  .zone-label {
+    text-align: center;
+    font-size: 10px;
+    font-weight: 850;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+
+  .zone-label b {
+    display: block;
+    color: var(--zone);
+    font-size: 9px;
+    margin-bottom: 4px;
+  }
+
+  .zone-label span {
+    display: block;
+    color: #6d7480;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  body[data-palette="gradient"] .zone-label.reconcile { --zone: #28c995; }
+  body[data-palette="gradient"] .zone-label.anti { --zone: #28bde8; }
+  body[data-palette="gradient"] .zone-label.enhance { --zone: #4c8df6; }
+  body[data-palette="gradient"] .zone-label.optimize { --zone: #8b7cf6; }
+
+  .zone-hover-layer {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: .62fr .98fr 1.16fr 1.24fr .98fr .62fr;
+    z-index: 4;
+  }
+
+  .zone-hover {
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .zone-hover:hover,
+  .zone-hover:focus-visible {
+    background: linear-gradient(180deg, rgba(255,255,255,.018), transparent 62%);
+    outline: 0;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+  }
+
+  .layer-cards {
+    display: none;
+    pointer-events: none;
+    position: absolute;
+    left: clamp(18px, 2.6vw, 34px);
+    right: clamp(18px, 2.6vw, 34px);
+    bottom: 66px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .layer-card {
+    min-height: 84px;
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 8px;
+    background: rgba(12,16,22,.72);
+    backdrop-filter: blur(10px);
+    padding: 12px 13px;
+  }
+
+  .layer-card b {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex: none;
+  }
+
+  .layer-card span {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  .bronze { color: var(--bronze); }
+  .silver { color: var(--silver); }
+  .consume { color: var(--gold); }
+  .dot.bronze { background: var(--bronze); }
+  .dot.silver { background: var(--silver); }
+  .dot.consume { background: var(--gold); }
+
+  .status-bar {
+    display: none;
+    min-height: 68px;
+    border-top: 1px solid var(--line);
+    background: rgba(16,21,29,.82);
+    padding: 12px clamp(16px, 2vw, 24px);
+    display: grid;
+    grid-template-columns: 1.1fr 1fr 1fr;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .verification-card {
+    width: 100%;
+    border: 1px solid rgba(164,126,247,.28);
+    border-radius: 12px;
+    background:
+      linear-gradient(90deg, rgba(164,126,247,.095), rgba(16,21,29,.82) 46%, rgba(16,21,29,.78)),
+      rgba(16,21,29,.82);
+    box-shadow: 0 18px 42px rgba(0,0,0,.28);
+    display: grid;
+    grid-template-columns: minmax(260px, .85fr) minmax(420px, 1.15fr) max-content;
+    align-items: center;
+    gap: 22px;
+    padding: 16px 18px;
+    min-height: 92px;
+    height: 92px;
+    transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+  }
+
+
+  .verification-title b {
+    display: block;
+    color: #d5c4ff;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+
+  .verification-title span,
+  .verification-copy {
+    display: block;
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 12.5px;
+    line-height: 1.42;
+  }
+
+  .verification-title,
+  .verification-copy,
+  .verification-tags {
+    min-width: 0;
+  }
+
+  .verification-copy {
+    display: -webkit-box;
+    min-height: calc(12.5px * 1.42 * 3);
+    max-height: calc(12.5px * 1.42 * 3);
+    overflow: hidden;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+
+  .verification-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    max-width: 300px;
+    max-height: 50px;
+    overflow: hidden;
+  }
+
+  .verification-tags span {
+    color: #c8b8ff;
+    border: 1px solid rgba(164,126,247,.28);
+    background: rgba(255,255,255,.025);
+    border-radius: 999px;
+    padding: 5px 8px;
+    font-size: 11px;
+    line-height: 1;
+  }
+
+  .verification-dots {
+    flex: none;
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .verification-dots i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--violet);
+    box-shadow: 0 0 18px rgba(164,126,247,.58);
+  }
+
+  .status-item small {
+    display: block;
+    color: var(--quiet);
+    font-size: 10px;
+    font-weight: 850;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    margin-bottom: 5px;
+  }
+
+  .status-item b {
+    display: block;
+    font-size: 14px;
+    line-height: 1.25;
+  }
+
+  .wizard-rails {
+    width: min(100%, 1540px);
+    margin: 0 auto;
+    padding: 18px 0 34px;
+  }
+
+  .rails-panel {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(16,21,29,.74);
+    box-shadow: 0 24px 60px rgba(0,0,0,.26);
+  }
+
+  .rails-head {
+    min-height: 64px;
+    padding: 15px 18px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+  }
+
+  .rails-head b {
+    display: block;
+    font-size: 15px;
+    margin-bottom: 3px;
+  }
+
+  .rails-head span {
+    display: block;
+    color: var(--muted);
+    font-size: 12.5px;
+    line-height: 1.35;
+  }
+
+  .automation-pill {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--gold);
+    border: 1px solid rgba(217,174,97,.32);
+    background: rgba(217,174,97,.09);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 11px;
+    font-weight: 850;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+  }
+
+  .automation-pill::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 0 4px rgba(217,174,97,.14);
+  }
+
+  .rail-row {
+    min-height: 82px;
+    display: grid;
+    grid-template-columns: 80px minmax(180px, 260px) minmax(360px, 1fr) minmax(220px, 320px);
+    gap: 18px;
+    align-items: center;
+    padding: 16px 18px;
+    border-bottom: 1px solid rgba(255,255,255,.045);
+    background: linear-gradient(90deg, var(--rail-bg), rgba(16,21,29,.62) 36%, rgba(16,21,29,.5));
+    border-left: 3px solid var(--rail);
+    color: inherit;
+    text-decoration: none;
+    transition: background .18s ease, box-shadow .18s ease, transform .18s ease;
+  }
+
+  .rail-row:hover,
+  .rail-row:focus-visible {
+    background: linear-gradient(90deg, var(--rail-bg), rgba(255,255,255,.032) 42%, rgba(16,21,29,.58));
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--rail), transparent 74%);
+    outline: 0;
+  }
+
+  .rail-row:focus-visible {
+    transform: translateY(-1px);
+  }
+
+  .rail-row:last-child {
+    border-bottom: 0;
+  }
+
+  .rail-num {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    color: var(--rail);
+    border: 1px solid color-mix(in srgb, var(--rail), transparent 40%);
+    background: color-mix(in srgb, var(--rail), transparent 88%);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 16px;
+    font-weight: 850;
+  }
+
+  .rail-title b {
+    display: block;
+    font-size: 15px;
+    line-height: 1.1;
+  }
+
+  .rail-title span {
+    display: block;
+    margin-top: 4px;
+    color: #a5adba;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+  }
+
+  .rail-copy {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.48;
+  }
+
+  .rail-tags {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+
+  .rail-tags span {
+    color: var(--rail);
+    border: 1px solid color-mix(in srgb, var(--rail), transparent 74%);
+    background: rgba(255,255,255,.025);
+    border-radius: 999px;
+    padding: 5px 9px;
+    font-size: 11px;
+    line-height: 1;
+  }
+
+  .rail-foot {
+    padding: 12px 18px;
+    color: var(--muted);
+    font-size: 12.5px;
+    border-top: 1px solid rgba(255,255,255,.045);
+    background: rgba(12,15,22,.72);
+  }
+
+  .rail-foot b {
+    color: var(--gold);
+  }
+
+  @media (max-width: 980px) {
+    .intro {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .metrics {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      width: 100%;
+    }
+
+    .visual-head {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .verification-card {
+      grid-template-columns: 1fr;
+    }
+
+    .status-bar {
+      grid-template-columns: 1fr;
+    }
+
+    .rail-row {
+      grid-template-columns: 56px 1fr;
+      gap: 12px 16px;
+    }
+
+    .rail-copy,
+    .rail-tags {
+      grid-column: 2;
+    }
+
+    .rail-tags {
+      justify-content: flex-start;
+    }
+
+    .layer-cards {
+      position: static;
+      padding: 12px;
+      background: #05070a;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .top-note { display: none; }
+    h1 { font-size: clamp(40px, 13vw, 62px); }
+    .stage { padding: 12px 0 0; }
+    .visual-shell { border-left: 0; border-right: 0; border-radius: 0; }
+    .wizard-rails { padding-left: 12px; padding-right: 12px; }
+    .rails-head { align-items: flex-start; flex-direction: column; }
+    canvas { min-height: 430px; }
+    .zone-labels { padding-top: 14px; }
+    .zone-label { font-size: 8px; }
+    .layer-cards { grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+    }
+  }
+</style>
+</head>
+<body data-palette="distinct">
+<div class="page">
+  <header class="top">
+    <div class="brand" aria-label="Baltor">
+      <svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="3" y="9" width="6" height="6" rx="1.5" fill="currentColor" />
+        <path d="M10.5 12h3.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+        <rect x="14.5" y="7.5" width="6.5" height="6.5" rx="2" stroke="currentColor" stroke-width="1.7" transform="rotate(45 17.75 10.75)" />
+      </svg>
+      Baltor
+    </div>
+    <div class="top-note">Visual prototype: automated context wizard rails</div>
+  </header>
+
+  <main class="stage">
+    <section class="visual-shell" aria-label="Full-width Baltor context engine visual">
+      <div class="visual-head">
+        <div class="visual-title">
+          <b>Baltor Context Engine</b>
+          <span>Continuous reconciliation, anti-fragility, enhancement, optimization, and provenance</span>
+        </div>
+        <div class="admin-toggle" aria-label="Color mode">
+          <button type="button" id="paletteDistinct" class="is-active">Contrast</button>
+          <button type="button" id="paletteGradient">Gradient</button>
+        </div>
+        <div class="metrics" aria-live="polite">
+          <div class="metric"><span>Conflicts solved</span><b id="conflicts">0</b></div>
+          <div class="metric"><span>Fragile facts hardened</span><b id="hardened">0</b></div>
+          <div class="metric"><span>Enhancements linked</span><b id="enhanced">0</b></div>
+          <div class="metric"><span>Serving state</span><b id="state">Ready</b></div>
+        </div>
+      </div>
+
+      <div class="canvas-area">
+        <canvas id="flowCanvas" aria-hidden="true"></canvas>
+        <div class="zone-labels" aria-hidden="true">
+          <div class="zone-label source" style="--zone:#64748b"><b>Source Systems</b><span>raw ingress</span></div>
+          <div class="zone-label reconcile" style="--zone:#10b981"><b>Reconciliation</b><span>cluster alignment</span></div>
+          <div class="zone-label anti" style="--zone:#3b82f6"><b>Anti-Fragility</b><span>robust objects</span></div>
+          <div class="zone-label enhance" style="--zone:#d9ae61"><b>Enhancement</b><span>context enrichment</span></div>
+          <div class="zone-label optimize" style="--zone:#a78bfa"><b>Optimization</b><span>pack shaping</span></div>
+          <div class="zone-label consume" style="--zone:#64748b"><b>Consumption</b><span>delivery</span></div>
+        </div>
+        <div class="zone-hover-layer">
+          <a class="zone-hover" href="stages/source.html" data-stage-detail="source" aria-label="Open Source Systems stage"></a>
+          <a class="zone-hover" href="stages/reconciliation.html" data-stage-detail="reconciliation" aria-label="Open Reconciliation stage"></a>
+          <a class="zone-hover" href="stages/anti-fragility.html" data-stage-detail="anti" aria-label="Open Anti-Fragility stage"></a>
+          <a class="zone-hover" href="stages/enhancement.html" data-stage-detail="enhancement" aria-label="Open Enhancement stage"></a>
+          <a class="zone-hover" href="stages/optimization.html" data-stage-detail="optimization" aria-label="Open Optimization stage"></a>
+          <a class="zone-hover" href="stages/consumption.html" data-stage-detail="consumption" aria-label="Open Consumption stage"></a>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="verification-card" id="verificationCard" aria-label="Continuous verification and adversarial validation">
+      <div class="verification-title">
+        <b id="verificationTitle">Stage Details</b>
+        <span id="verificationSubtitle">Hover over a partition</span>
+      </div>
+      <div class="verification-copy" id="verificationCopy">
+        Move over any vertical stage above to see a concrete example of what Baltor verifies, reconciles, hardens, enriches, optimizes, or serves at that step.
+      </div>
+      <div class="verification-tags" id="verificationTags">
+        <span>hover stages</span><span>examples</span><span>benefits</span><span>controls</span>
+      </div>
+    </section>
+
+    <section class="wizard-rails" aria-label="Context wizard rails">
+      <div class="rails-panel">
+        <div class="rails-head">
+          <div>
+            <b>Context Wizard Rails</b>
+            <span>Six visible context stages explain what the automation is doing before an AI workflow receives a pack.</span>
+          </div>
+          <div class="automation-pill">Continuous automation</div>
+        </div>
+
+        <a class="rail-row" href="stages/source.html" style="--rail:var(--bronze);--rail-bg:rgba(75,85,99,.075)">
+          <div class="rail-num">00</div>
+          <div class="rail-title"><b>Source Systems</b><span>Raw ingress</span></div>
+          <div class="rail-copy">Captures organizational knowledge exactly where it lives, preserving timestamps, permissions, content hashes, and expandable source handles.</div>
+          <div class="rail-tags"><span>watch changes</span><span>parse objects</span><span>preserve handles</span></div>
+        </a>
+
+        <a class="rail-row" href="stages/reconciliation.html" style="--rail:var(--green);--rail-bg:rgba(50,199,134,.075)">
+          <div class="rail-num">01</div>
+          <div class="rail-title"><b>Reconciliation</b><span>Cluster alignment</span></div>
+          <div class="rail-copy">Deduplicates related artifacts, maps relationships, identifies comments-versus-decisions, and surfaces contradictions across tickets, docs, code, and memory.</div>
+          <div class="rail-tags"><span>dedupe</span><span>link evidence</span><span>surface conflicts</span></div>
+        </a>
+
+        <a class="rail-row" href="stages/anti-fragility.html" style="--rail:var(--blue);--rail-bg:rgba(76,141,246,.075)">
+          <div class="rail-num">02</div>
+          <div class="rail-title"><b>Anti-Fragility</b><span>Robust object hardening</span></div>
+          <div class="rail-copy">Finds facts likely to change in source systems and replaces brittle text with robust knowledge objects that can update over time.</div>
+          <div class="rail-tags"><span>detect fragile values</span><span>create objects</span><span>refresh over time</span></div>
+        </a>
+
+        <a class="rail-row" href="stages/enhancement.html" style="--rail:var(--amber);--rail-bg:rgba(217,174,97,.085)">
+          <div class="rail-num">03</div>
+          <div class="rail-title"><b>Enhancement</b><span>Context enrichment</span></div>
+          <div class="rail-copy">Adds relevant external context objects, metadata, relationships, architecture/service graph links, event/schema facts, and missing connective context.</div>
+          <div class="rail-tags"><span>add metadata</span><span>connect objects</span><span>increase robustness</span></div>
+        </a>
+
+        <a class="rail-row" href="stages/optimization.html" style="--rail:var(--violet);--rail-bg:rgba(164,126,247,.075)">
+          <div class="rail-num">04</div>
+          <div class="rail-title"><b>Optimization</b><span>Pack shaping</span></div>
+          <div class="rail-copy">Summarizes, distills, converts unstructured context into structured objects, ranks relevance, and fits the result to the task budget.</div>
+          <div class="rail-tags"><span>summarize</span><span>structure</span><span>rank</span></div>
+        </a>
+
+        <a class="rail-row" href="stages/consumption.html" style="--rail:var(--bronze);--rail-bg:rgba(75,85,99,.075)">
+          <div class="rail-num">05</div>
+          <div class="rail-title"><b>Consumption</b><span>Delivery</span></div>
+          <div class="rail-copy">Serves task-specific packs to AI workflows and humans, allowing precise source-handle expansion while recording every pack claim, route, and decision.</div>
+          <div class="rail-tags"><span>serve pack</span><span>expand handles</span><span>audit usage</span></div>
+        </a>
+
+        <div class="rail-foot">
+          <b>Universal verification layer:</b> prioritized continuous verification and adversarial interrogation runs below every stage, checking contradictions, source precedence, freshness windows, and policy.
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var canvas = document.getElementById("flowCanvas");
+  var ctx = canvas.getContext("2d");
+  var dpr = window.devicePixelRatio || 1;
+  var items = [];
+  var spawn = 0;
+  var solved = 0;
+  var hardened = 0;
+  var enhanced = 0;
+
+  var els = {
+    conflicts: document.getElementById("conflicts"),
+    hardened: document.getElementById("hardened"),
+    enhanced: document.getElementById("enhanced"),
+    state: document.getElementById("state"),
+    verificationCard: document.getElementById("verificationCard"),
+    verificationTitle: document.getElementById("verificationTitle"),
+    verificationSubtitle: document.getElementById("verificationSubtitle"),
+    verificationCopy: document.getElementById("verificationCopy"),
+    verificationTags: document.getElementById("verificationTags")
+  };
+  var paletteButtons = {
+    distinct: document.getElementById("paletteDistinct"),
+    gradient: document.getElementById("paletteGradient")
+  };
+
+  function css(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  var color = {
+    source: css("--source"),
+    sourceSoft: css("--source-soft"),
+    bronze: css("--bronze"),
+    silver: css("--silver"),
+    gold: css("--gold"),
+    green: css("--green"),
+    blue: css("--blue"),
+    cyan: css("--cyan"),
+    amber: css("--amber"),
+    violet: css("--violet"),
+    red: css("--red"),
+    muted: css("--quiet"),
+    line: css("--line")
+  };
+
+  var palettes = {
+    distinct: [color.source, color.green, color.blue, color.amber, color.violet, color.source],
+    gradient: [color.source, "#28c995", "#28bde8", color.blue, "#8b7cf6", color.source]
+  };
+  var stageDetails = {
+    default: {
+      title: "Stage Details",
+      subtitle: "Hover over a partition",
+      copy: "Move over any vertical stage above to see a concrete example of what Baltor verifies, reconciles, hardens, enriches, optimizes, or serves at that step.",
+      tags: ["hover stages", "examples", "benefits", "controls"]
+    },
+    source: {
+      title: "Source Systems",
+      subtitle: "Raw context is preserved, not trusted",
+      copy: "Example: Jira comments, Confluence pages, code, architecture diagrams, incidents, and local memory enter with timestamps, permissions, hashes, and source handles before any claim is trusted.",
+      tags: ["ACLs", "hashes", "timestamps", "source handles"]
+    },
+    reconciliation: {
+      title: "Reconciliation",
+      subtitle: "Resolve disagreements across sources",
+      copy: "Example: Jira says refunds are approved after 30 days, an old policy page says 14 days, and the billing service uses 21 days. Baltor links the evidence, chooses the highest-confidence source when policy allows, or flags the conflict for review.",
+      tags: ["source conflict", "confidence", "precedence", "review queue"]
+    },
+    anti: {
+      title: "Anti-Fragility",
+      subtitle: "Replace brittle facts with robust knowledge objects",
+      copy: "Example: magic numbers, settings, refund policies, thresholds, and limits are treated as volatile. Baltor creates refreshable objects and tools so the value can be rechecked against the right system instead of copied into stale context.",
+      tags: ["magic numbers", "settings", "refreshable objects", "live tools"]
+    },
+    enhancement: {
+      title: "Enhancement",
+      subtitle: "Augment with verified external context",
+      copy: "Example: if internal sources disagree about the maximum allowable credit card late fee, Baltor can attach verified external sources or approved tools to resolve the conflict before the pack is served.",
+      tags: ["external sources", "approved tools", "conflict resolution", "verified facts"]
+    },
+    optimization: {
+      title: "Optimization",
+      subtitle: "Shape context into a compact task pack",
+      copy: "Example: a 40-page policy thread, three tickets, and five source handles become a 3,000-token review pack: ranked claims, conflicts, tests to run, and expansion links. Benefit: less token waste, fewer tool calls, and less irrelevant context.",
+      tags: ["ranked claims", "token savings", "fewer tool calls", "pack shaping"]
+    },
+    consumption: {
+      title: "Consumption",
+      subtitle: "Serve context with receipts and controlled expansion",
+      copy: "Example: Claude, Cursor, another context layer, an internal workflow, or a human dashboard receives the same governed pack. Each consumer can expand approved source handles while Baltor records what was served, why, and under which policy.",
+      tags: ["Claude", "dashboards", "MCP/API", "audit receipts"]
+    }
+  };
+  function setStageDetail(stage) {
+    var detail = stageDetails[stage] || stageDetails.default;
+    els.verificationTitle.textContent = detail.title;
+    els.verificationSubtitle.textContent = detail.subtitle;
+    els.verificationCopy.textContent = detail.copy;
+    els.verificationTags.innerHTML = detail.tags.map(function (tag) {
+      return "<span>" + tag + "</span>";
+    }).join("");
+  }
+
+  Array.from(document.querySelectorAll(".zone-hover[data-stage-detail]")).forEach(function (zone) {
+    zone.addEventListener("mouseenter", function () {
+      setStageDetail(zone.dataset.stageDetail);
+    });
+    zone.addEventListener("mouseleave", function () {
+      setStageDetail("default");
+    });
+    zone.addEventListener("focus", function () {
+      setStageDetail(zone.dataset.stageDetail);
+    });
+    zone.addEventListener("blur", function () {
+      setStageDetail("default");
+    });
+  });
+
+  function paletteMode() {
+    return document.body.dataset.palette === "gradient" ? "gradient" : "distinct";
+  }
+
+  function stageColor(stage) {
+    return palettes[paletteMode()][stage];
+  }
+
+  function setPalette(mode) {
+    document.body.dataset.palette = mode;
+    paletteButtons.distinct.classList.toggle("is-active", mode === "distinct");
+    paletteButtons.gradient.classList.toggle("is-active", mode === "gradient");
+  }
+
+  paletteButtons.distinct.addEventListener("click", function () { setPalette("distinct"); });
+  paletteButtons.gradient.addEventListener("click", function () { setPalette("gradient"); });
+
+  function resize() {
+    var rect = canvas.getBoundingClientRect();
+    dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.max(1, Math.round(rect.width * dpr));
+    canvas.height = Math.max(1, Math.round(rect.height * dpr));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function rnd(min, max) {
+    return min + Math.random() * (max - min);
+  }
+
+  function ContextItem(w, h, seedX) {
+    this.x = seedX == null ? -rnd(20, 160) : seedX;
+    this.y = rnd(86, h - 64);
+    this.baseY = this.y;
+    this.speed = rnd(.61, 1.06);
+    this.size = rnd(7, 12);
+    this.seed = Math.random() * 1000;
+    this.rotation = rnd(0, Math.PI * 2);
+    this.transitionJitter = {
+      robust: rnd(-.075, .075),
+      enhance: rnd(-.07, .07),
+      optimize: rnd(-.055, .055),
+      consume: rnd(-.045, .045)
+    };
+    this.offsetA = { x: rnd(-22, 22), y: rnd(-18, 18) };
+    this.offsetB = { x: rnd(-22, 22), y: rnd(-18, 18) };
+    this.cluster = [
+      { x: rnd(-30, 28), y: rnd(-26, 26), s: rnd(.5, .72) },
+      { x: rnd(-28, 30), y: rnd(-26, 26), s: rnd(.46, .68) },
+      { x: rnd(-26, 24), y: rnd(-24, 24), s: rnd(.44, .64) }
+    ];
+    this.enhanceCount = Math.random() < .72 ? Math.floor(rnd(2, 4)) : Math.floor(rnd(4, 7));
+    this.enhancePoints = [];
+    for (var e = 0; e < this.enhanceCount; e++) {
+      this.enhancePoints.push({
+        angle: (Math.PI * 2 * e / Math.max(1, this.enhanceCount)) + rnd(-.32, .32),
+        distance: rnd(.92, 1.34),
+        size: rnd(.24, .38),
+        depth: rnd(.58, 1.16),
+        phase: rnd(0, Math.PI * 2),
+        shape: Math.random() > .55 ? "diamond" : "square",
+        materializeAt: rnd(.005, .09),
+        materializeFor: rnd(.06, .12),
+        travelDelay: rnd(0, .018),
+        pairDelay: rnd(.04, .22),
+        pairDuration: rnd(.58, .88),
+        lane: Math.floor(rnd(0, 2)),
+        fieldX: rnd(.04, .2),
+        fieldY: rnd(.1, .9)
+      });
+    }
+    this.stage = 0;
+    this.solved = false;
+    this.hardened = false;
+    this.enhanced = false;
+  }
+
+  ContextItem.prototype.update = function (w, h, t) {
+    var zones = zoneWidths(w);
+    this.x += this.speed;
+    this.y = this.baseY + Math.sin(t * .002 + this.seed) * 4;
+    this.rotation += .017;
+
+    if (this.x > zones[1]) {
+      this.stage = Math.max(this.stage, 1);
+      for (var c = 0; c < this.cluster.length; c++) {
+        this.cluster[c].x *= .93;
+        this.cluster[c].y *= .93;
+      }
+    }
+
+    if (this.x > zones[2] - (zones[2] - zones[1]) * (.18 + this.transitionJitter.robust)) {
+      this.stage = Math.max(this.stage, 2);
+      this.offsetA.x *= .88;
+      this.offsetA.y *= .88;
+      this.offsetB.x *= .88;
+      this.offsetB.y *= .88;
+      for (var i = 0; i < this.cluster.length; i++) {
+        this.cluster[i].x *= .82;
+        this.cluster[i].y *= .82;
+      }
+      if (!this.solved) {
+        this.solved = true;
+        solved += 1;
+      }
+      if (!this.hardened) {
+        this.hardened = true;
+        hardened += 1;
+      }
+    }
+
+    if (this.x > zones[3] - (zones[3] - zones[2]) * (.18 + this.transitionJitter.enhance)) {
+      this.stage = Math.max(this.stage, 3);
+    }
+
+    if (this.x > zones[4] - (zones[4] - zones[3]) * (.06 + this.transitionJitter.optimize)) {
+      this.stage = Math.max(this.stage, 4);
+      this.size = Math.max(6.4, this.size * .992);
+      this.speed = Math.min(1.35, this.speed * 1.001);
+      if (!this.enhanced) {
+        this.enhanced = true;
+        enhanced += 1;
+      }
+    }
+
+    if (this.x > zones[5] - (zones[5] - zones[4]) * (.12 + this.transitionJitter.consume)) {
+      this.stage = Math.max(this.stage, 5);
+    }
+  };
+
+  ContextItem.prototype.draw = function (t) {
+    ctx.save();
+    var zones = zoneWidths(canvas.width / dpr);
+    var c = stageColor(0);
+    var alpha = .74;
+    if (this.stage >= 1) c = stageColor(1);
+    if (this.stage >= 2) c = stageColor(2);
+    if (this.stage >= 3) c = stageColor(3);
+    if (this.stage >= 4) c = stageColor(4);
+    if (this.stage >= 5) c = stageColor(5);
+
+    if (this.stage < 2) alpha = .36 + Math.sin(t * .006 + this.seed) * .12;
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = c;
+    ctx.strokeStyle = c;
+
+    if (this.stage < 1) {
+      square(this.x, this.y, this.size);
+      square(this.x + this.offsetA.x, this.y + this.offsetA.y, this.size * .56);
+      square(this.x + this.offsetB.x, this.y + this.offsetB.y, this.size * .52);
+      link(this.x, this.y, this.x + this.offsetA.x, this.y + this.offsetA.y, c, .3);
+      link(this.x, this.y, this.x + this.offsetB.x, this.y + this.offsetB.y, c, .3);
+    } else if (this.stage < 2) {
+      drawCluster(this, t);
+    } else if (this.stage < 3) {
+      var robustP = transitionProgressWithJitter(this, zones, 2, .18, .28, this.transitionJitter.robust);
+      drawClusterGhost(this, ease(1 - robustP));
+      drawHardenedObject(this, t, robustP);
+    } else if (this.stage < 4) {
+      drawHardenedObject(this, t, 1);
+      drawEnhancedObject(this, t);
+    } else {
+      if (this.stage === 4) {
+        drawEnhancedGhost(this, slowEase(1 - stageProgress(this, zones, 4)));
+        drawCompressedPacket(this);
+      }
+      if (this.stage >= 5) {
+        drawCompressedGhost(this, ease(1 - transitionProgressWithJitter(this, zones, 5, .12, .26, this.transitionJitter.consume)));
+        drawConsumptionPacket(this);
+      }
+    }
+    ctx.restore();
+  };
+
+  function stageProgress(item, zones, fromStage) {
+    var start = zones[fromStage];
+    var end = zones[fromStage + 1];
+    return clamp((item.x - start) / Math.max(1, end - start), 0, 1);
+  }
+
+  function transitionProgress(item, zones, intoStage, lead, completeAt) {
+    var prevWidth = zones[intoStage] - zones[intoStage - 1];
+    var currWidth = zones[intoStage + 1] - zones[intoStage];
+    var start = zones[intoStage] - prevWidth * lead;
+    var end = zones[intoStage] + currWidth * completeAt;
+    return transitionProgressWithJitter(item, zones, intoStage, lead, completeAt, 0);
+  }
+
+  function transitionProgressWithJitter(item, zones, intoStage, lead, completeAt, jitter) {
+    var prevWidth = zones[intoStage] - zones[intoStage - 1];
+    var currWidth = zones[intoStage + 1] - zones[intoStage];
+    var start = zones[intoStage] - prevWidth * (lead + jitter);
+    var end = zones[intoStage] + currWidth * (completeAt + jitter * .45);
+    return ease(clamp((item.x - start) / Math.max(1, end - start), 0, 1));
+  }
+
+  function clamp(v, min, max) {
+    return Math.max(min, Math.min(max, v));
+  }
+
+  function ease(v) {
+    return v * v * (3 - 2 * v);
+  }
+
+  function slowEase(v) {
+    return ease(clamp((v - .08) / .88, 0, 1));
+  }
+
+  function fastEase(v) {
+    return ease(clamp(v / .58, 0, 1));
+  }
+
+  function mixHex(a, b, t) {
+    var ca = parseHex(a);
+    var cb = parseHex(b);
+    var r = Math.round(ca.r + (cb.r - ca.r) * t);
+    var g = Math.round(ca.g + (cb.g - ca.g) * t);
+    var blue = Math.round(ca.b + (cb.b - ca.b) * t);
+    return "rgb(" + r + "," + g + "," + blue + ")";
+  }
+
+  function parseHex(hex) {
+    var clean = hex.replace("#", "");
+    if (clean.length === 3) {
+      clean = clean.split("").map(function (ch) { return ch + ch; }).join("");
+    }
+    var value = parseInt(clean, 16);
+    return {
+      r: (value >> 16) & 255,
+      g: (value >> 8) & 255,
+      b: value & 255
+    };
+  }
+
+  function hexToRgba(hex, alpha) {
+    var parsed = parseHex(hex);
+    var r = parsed.r;
+    var g = parsed.g;
+    var b = parsed.b;
+    return "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
+  }
+
+  function drawCluster(item, t) {
+    var zones = zoneWidths(canvas.width / dpr);
+    var p = ease(stageProgress(item, zones, 1));
+    ctx.save();
+    var c = stageColor(1);
+    ctx.strokeStyle = c;
+    ctx.fillStyle = c;
+    ctx.globalAlpha *= .86;
+    for (var i = 0; i < item.cluster.length; i++) {
+      var node = item.cluster[i];
+      var x = item.x + node.x * (1 - p * .74);
+      var y = item.y + node.y * (1 - p * .74);
+      link(x, y, item.x, item.y, c, .22 + p * .24);
+      square(x, y, item.size * node.s);
+    }
+    ctx.fillStyle = c;
+    square(item.x, item.y, item.size * (.78 + p * .24));
+    ctx.restore();
+  }
+
+  function drawClusterGhost(item, amount) {
+    if (amount <= .03) return;
+    ctx.save();
+    ctx.globalAlpha *= amount * .38;
+    var c = stageColor(1);
+    ctx.fillStyle = c;
+    ctx.strokeStyle = c;
+    for (var i = 0; i < item.cluster.length; i++) {
+      var node = item.cluster[i];
+      var x = item.x + node.x * .18;
+      var y = item.y + node.y * .18;
+      link(x, y, item.x, item.y, c, .28);
+      square(x, y, item.size * node.s * .78);
+    }
+    ctx.restore();
+  }
+
+  function drawReconciledObject(item) {
+    ctx.save();
+    ctx.fillStyle = color.green;
+    ctx.strokeStyle = "rgba(50,199,134,.62)";
+    ctx.lineWidth = 1.2;
+    square(item.x, item.y, item.size * 1.05);
+    ctx.restore();
+  }
+
+  function drawHardenedObject(item, t, progress) {
+    progress = progress == null ? 1 : progress;
+    ctx.save();
+    var c = mixHex(stageColor(1), stageColor(2), progress);
+    ctx.fillStyle = c;
+    ctx.strokeStyle = c;
+    ctx.lineWidth = 1.15;
+    var s = item.size * (.68 + progress * .28);
+    var lift = item.size * (.06 + progress * .34);
+    ctx.globalAlpha *= .42;
+    square(item.x + lift, item.y - lift, s);
+    ctx.globalAlpha /= .42;
+    square(item.x, item.y, s);
+    ctx.beginPath();
+    ctx.moveTo(item.x - s / 2, item.y - s / 2);
+    ctx.lineTo(item.x + lift - s / 2, item.y - lift - s / 2);
+    ctx.moveTo(item.x + s / 2, item.y - s / 2);
+    ctx.lineTo(item.x + lift + s / 2, item.y - lift - s / 2);
+    ctx.moveTo(item.x + s / 2, item.y + s / 2);
+    ctx.lineTo(item.x + lift + s / 2, item.y - lift + s / 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawEnhancedObject(item) {
+    ctx.save();
+    var zones = zoneWidths(canvas.width / dpr);
+    var raw = transitionProgressWithJitter(item, zones, 3, .18, .32, item.transitionJitter.enhance);
+    var colorP = raw;
+    var zoneW = zones[4] - zones[3];
+    var c = mixHex(stageColor(2), stageColor(3), colorP);
+    ctx.fillStyle = c;
+    ctx.strokeStyle = c;
+    ctx.lineWidth = 1.1;
+    var s = item.size * .92;
+    var lift = item.size * .4;
+    ctx.globalAlpha *= .42;
+    square(item.x + lift, item.y - lift, s);
+    ctx.globalAlpha /= .42;
+    square(item.x, item.y, s);
+    ctx.beginPath();
+    ctx.moveTo(item.x - s / 2, item.y - s / 2);
+    ctx.lineTo(item.x + lift - s / 2, item.y - lift - s / 2);
+    ctx.moveTo(item.x + s / 2, item.y - s / 2);
+    ctx.lineTo(item.x + lift + s / 2, item.y - lift - s / 2);
+    ctx.moveTo(item.x + s / 2, item.y + s / 2);
+    ctx.lineTo(item.x + lift + s / 2, item.y - lift + s / 2);
+    ctx.stroke();
+    var accentColors = ["#d9ae61", "#f2c879", "#f59e0b", "#ffe0a3"];
+    var laneXs = [
+      zones[3] + zoneW * .045,
+      zones[3] + zoneW * .11
+    ];
+    ctx.save();
+    ctx.globalAlpha *= ease(clamp(raw / .16, 0, 1)) * .18;
+    ctx.strokeStyle = "#d9ae61";
+    ctx.setLineDash([2, 5]);
+    ctx.beginPath();
+    ctx.moveTo(laneXs[0], 74);
+    ctx.lineTo(laneXs[0], (canvas.height / dpr) - 48);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+    for (var i = 0; i < item.enhancePoints.length; i++) {
+      var point = item.enhancePoints[i];
+      var pointColor = accentColors[i % accentColors.length];
+      var appearP = ease(clamp((raw - point.materializeAt) / point.materializeFor, 0, 1));
+      if (appearP <= .01) continue;
+      var laneGate = ease(clamp((item.x - laneXs[0]) / Math.max(1, zoneW * .18), 0, 1));
+      var pairRaw = (raw - point.materializeAt - point.travelDelay - point.pairDelay) / point.pairDuration;
+      var attachP = slowEase(pairRaw) * laneGate;
+      var angle = point.angle + item.rotation * (.22 + point.depth * .06) + Math.sin(item.rotation * .45 + point.phase) * .08;
+      var distance = item.size * point.distance * (1.12 + attachP * .24);
+      var z = .72 + Math.sin(item.rotation + point.phase) * .12 + point.depth * .08;
+      var targetX = item.x + Math.cos(angle) * distance;
+      var targetY = item.y + Math.sin(angle) * distance * z;
+      var sourceX = laneXs[point.lane];
+      var sourceY = 78 + point.fieldY * ((canvas.height / dpr) - 134) + Math.sin(point.phase + item.rotation * .18) * item.size * .18;
+      var midX = sourceX + (item.x - sourceX) * .78;
+      var midY = sourceY + (targetY - sourceY) * .42 + Math.sin(point.phase + item.rotation * .28) * item.size * .16;
+      var flowP = attachP < .2 ? attachP / .2 : 1;
+      var settleP = attachP < .2 ? 0 : (attachP - .2) / .8;
+      var flowX = sourceX + (midX - sourceX) * flowP;
+      var flowY = sourceY + (midY - sourceY) * flowP;
+      var ox = flowX + (targetX - flowX) * settleP;
+      var oy = flowY + (targetY - flowY) * settleP;
+      if (attachP > .08) {
+        var sourceLineFade = 1 - clamp((settleP - .72) / .28, 0, 1);
+        link(sourceX, sourceY, ox, oy, pointColor, .12 * attachP * appearP * sourceLineFade);
+      }
+      if (settleP > .12) {
+        var objectLineFade = 1 - clamp((settleP - .82) / .18, 0, 1);
+        link(item.x, item.y, ox, oy, pointColor, (.22 * objectLineFade) * appearP);
+      }
+      ctx.save();
+      ctx.fillStyle = pointColor;
+      ctx.globalAlpha *= appearP * (.28 + attachP * .32);
+      ctx.beginPath();
+      ctx.arc(sourceX, sourceY, 1.15, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+      ctx.save();
+      ctx.fillStyle = pointColor;
+      ctx.globalAlpha *= (.18 + appearP * .82) * (.42 + attachP * .58);
+      if (attachP < .2) {
+        ctx.shadowColor = pointColor;
+        ctx.shadowBlur = 8 * appearP;
+      }
+      var pointSize = item.size * point.size * (1 + attachP * .34) * (.88 + point.depth * .2);
+      if (point.shape === "diamond") {
+        diamond(ox, oy, pointSize * .62);
+      } else {
+        square(ox, oy, pointSize);
+      }
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+
+  function drawEnhancedGhost(item, amount) {
+    if (amount <= .03) return;
+    ctx.save();
+    ctx.globalAlpha *= amount * .55;
+    drawEnhancedObject(item);
+    ctx.restore();
+  }
+
+  function drawCompressedPacket(item) {
+    var zones = zoneWidths(canvas.width / dpr);
+    var p = transitionProgressWithJitter(item, zones, 4, .04, .36, item.transitionJitter.optimize);
+    ctx.save();
+    var c = mixHex(stageColor(3), stageColor(4), p);
+    ctx.fillStyle = c;
+    ctx.strokeStyle = c;
+    ctx.lineWidth = 1.4;
+    ctx.translate(item.x, item.y);
+    ctx.rotate(item.rotation);
+    var packSize = item.size * (.9 - p * .22);
+    var lift = item.size * (.28 - p * .1);
+    drawDiamondPrism(0, 0, packSize, lift, c);
+    ctx.globalAlpha *= .94;
+    ctx.setLineDash([4, 5]);
+    ctx.beginPath();
+    ctx.arc(0, 0, item.size * (1.58 - p * .32), 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha *= .42;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.arc(0, 0, item.size * (1.92 - p * .4), 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha /= .42;
+    ctx.setLineDash([]);
+    ctx.fillStyle = c;
+    ctx.beginPath();
+    ctx.arc(item.size * (1.55 - p * .32), item.size * -.24, 1.15, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = color.gold;
+    ctx.beginPath();
+    ctx.arc(-item.size * (1.32 - p * .2), item.size * .34, .9, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "rgba(245,247,250,.78)";
+    ctx.beginPath();
+    ctx.arc(item.size * .06, -item.size * (1.42 - p * .28), .78, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawCompressedGhost(item, amount) {
+    if (amount <= .03) return;
+    ctx.save();
+    ctx.globalAlpha *= amount * .58;
+    drawCompressedPacket(item);
+    ctx.restore();
+  }
+
+  function drawConsumptionPacket(item) {
+    var zones = zoneWidths(canvas.width / dpr);
+    var p = transitionProgressWithJitter(item, zones, 5, .12, .32, item.transitionJitter.consume);
+    ctx.save();
+    var c = mixHex(stageColor(4), stageColor(5), p);
+    ctx.fillStyle = c;
+    ctx.strokeStyle = c;
+    ctx.lineWidth = 1.15;
+    ctx.translate(item.x, item.y);
+    ctx.rotate(item.rotation);
+    var packSize = item.size * (.86 - p * .24);
+    var lift = item.size * (.2 - p * .08);
+    drawDiamondPrism(0, 0, packSize, lift, c);
+    ctx.globalAlpha *= .58 * (1 - p * .18);
+    ctx.setLineDash([3, 6]);
+    ctx.beginPath();
+    ctx.arc(0, 0, item.size * (1.32 - p * .28), 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = c;
+    ctx.globalAlpha *= .72;
+    ctx.beginPath();
+    ctx.arc(item.size * (1.03 - p * .2), item.size * -.2, 1.05, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(-item.size * (.86 - p * .16), item.size * .22, .9, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "rgba(245,247,250,.62)";
+    ctx.beginPath();
+    ctx.arc(item.size * .04, -item.size * (.95 - p * .18), .72, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function zoneWidths(w) {
+    var parts = [.62, .98, 1.16, 1.24, .98, .62];
+    var total = parts.reduce(function (a, b) { return a + b; }, 0);
+    var x = 0;
+    var out = [0];
+    parts.forEach(function (p) {
+      x += w * (p / total);
+      out.push(x);
+    });
+    return out;
+  }
+
+  function drawBackground(w, h) {
+    var zones = zoneWidths(w);
+    var fills = [0, 1, 2, 3, 4, 5].map(function (stage, index) {
+      return hexToRgba(stageColor(stage), index === 0 || index === 5 ? .038 : .047);
+    });
+
+    for (var i = 0; i < 6; i++) {
+      ctx.fillStyle = fills[i];
+      ctx.fillRect(zones[i], 0, zones[i + 1] - zones[i], h);
+      if (i > 0) {
+        ctx.strokeStyle = "rgba(255,255,255,.07)";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 6]);
+        ctx.beginPath();
+        ctx.moveTo(zones[i], 0);
+        ctx.lineTo(zones[i], h);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }
+
+    for (var j = 0; j < 32; j++) {
+      var x = (j * 173) % Math.max(1, w);
+      var y = 72 + ((j * 89) % Math.max(1, h - 112));
+      ctx.fillStyle = "rgba(255,255,255,.035)";
+      ctx.fillRect(x, y, 1, 1);
+    }
+
+    drawAssuranceLane(w, h);
+  }
+
+  function drawAssuranceLane(w, h) {
+    var y = h - 17;
+    ctx.save();
+    ctx.fillStyle = "rgba(164,126,247,.055)";
+    ctx.fillRect(0, y - 15, w, 34);
+    ctx.strokeStyle = "rgba(164,126,247,.24)";
+    ctx.setLineDash([5, 7]);
+    ctx.beginPath();
+    ctx.moveTo(0, y - 15);
+    ctx.lineTo(w, y - 15);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = "rgba(213,196,255,.92)";
+    ctx.font = "800 10px Inter, ui-sans-serif, system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("CONTINUOUS VERIFICATION + ADVERSARIAL VALIDATION", w / 2, y - 1);
+    ctx.fillStyle = "rgba(160,169,184,.74)";
+    ctx.font = "600 10px Inter, ui-sans-serif, system-ui, sans-serif";
+    ctx.fillText("contradictions  /  source precedence  /  fragile facts  /  missing evidence  /  freshness  /  policy risk", w / 2, y + 13);
+    ctx.restore();
+  }
+
+  function square(x, y, s) {
+    ctx.fillRect(x - s / 2, y - s / 2, s, s);
+  }
+
+  function diamond(x, y, s) {
+    ctx.beginPath();
+    ctx.moveTo(x, y - s);
+    ctx.lineTo(x + s, y);
+    ctx.lineTo(x, y + s);
+    ctx.lineTo(x - s, y);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function drawDiamondPrism(x, y, s, lift, c) {
+    ctx.save();
+    ctx.fillStyle = c;
+    ctx.strokeStyle = c;
+    ctx.lineWidth = 1.1;
+    ctx.globalAlpha *= .36;
+    diamond(x + lift, y - lift, s);
+    ctx.globalAlpha /= .36;
+    diamond(x, y, s);
+    ctx.beginPath();
+    ctx.moveTo(x, y - s);
+    ctx.lineTo(x + lift, y - lift - s);
+    ctx.moveTo(x + s, y);
+    ctx.lineTo(x + lift + s, y - lift);
+    ctx.moveTo(x, y + s);
+    ctx.lineTo(x + lift, y - lift + s);
+    ctx.moveTo(x - s, y);
+    ctx.lineTo(x + lift - s, y - lift);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function triangle(x1, y1, x2, y2, x3, y3, c) {
+    ctx.save();
+    ctx.strokeStyle = c;
+    ctx.globalAlpha *= .58;
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.lineTo(x3, y3);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function link(x1, y1, x2, y2, c, a) {
+    ctx.save();
+    ctx.strokeStyle = c;
+    ctx.globalAlpha *= a;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function updateMetrics() {
+    els.conflicts.textContent = String(solved);
+    els.hardened.textContent = String(hardened);
+    els.enhanced.textContent = String(enhanced);
+    els.state.textContent = "Ready";
+    els.state.style.color = color.gold;
+  }
+
+  function frame(t) {
+    var w = canvas.width / dpr;
+    var h = canvas.height / dpr;
+    ctx.clearRect(0, 0, w, h);
+    drawBackground(w, h);
+
+    spawn += 1;
+    if (spawn > 18) {
+      spawn = 0;
+      items.push(new ContextItem(w, h));
+    }
+
+    for (var i = items.length - 1; i >= 0; i--) {
+      items[i].update(w, h, t);
+      items[i].draw(t);
+      if (items[i].x > w + 120) items.splice(i, 1);
+    }
+
+    updateMetrics();
+    requestAnimationFrame(frame);
+  }
+
+  window.addEventListener("resize", resize);
+  resize();
+
+  var w = canvas.width / dpr;
+  var h = canvas.height / dpr;
+  for (var i = 0; i < 31; i++) {
+    items.push(new ContextItem(w, h, rnd(0, w)));
+  }
+
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+id: "tool/prompt-master-prompt-optimizer"
+type: tool
+version: "0.1.0"
+name: "Prompt Master prompt optimizer"
+description: |
+  Turn a rough intent + a target AI tool into a sharp, token-efficient prompt.
+  Integration contract for Prompt Master, an MIT-licensed Claude skill that
+  detects the target tool, extracts intent dimensions, routes to a prompt
+  template, applies only bounded-effect techniques, and runs a token-efficiency
+  audit ("every word load-bearing") before returning one clean prompt + a
+  one-line strategy note.
+
+  Reference/integration contract, not a redistribution of upstream content.
+  Ties directly into this catalog's token-efficiency family
+  (pattern/input-token-compression, pattern/terse-output-budget) and the
+  output-format family (pattern/strict-output-format-contract): a good prompt
+  is the cheapest place to cut tokens and lock output shape. Its catalogue of
+  prompt anti-patterns and templates is a strong source surface for future
+  pattern/logic-pack intake (see the prompt-tooling source-surface plan).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["ai", "cross_industry"]
+capability: ["generation", "format_conversion", "routing"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+tags: ["prompt-engineering", "token-efficiency", "claude-skill", "prompt-optimization", "agent-skill"]
+created: "2026-05-26"
+updated: "2026-05-26"
+attribution:
+  source_url: "https://github.com/nidhinjs/prompt-master"
+  source_kind: "github"
+  author: "nidhinjs"
+  license: "MIT"
+
+parameters:
+  type: object
+  properties:
+    intent:      { type: "string", description: "Rough description of what the user wants." }
+    target_tool: { type: "string", description: "Destination AI tool (e.g. claude-code, midjourney, gpt, cursor)." }
+    bad_prompt:  { type: "string", description: "Optional existing prompt to repair instead of writing fresh." }
+    memory:      { type: "array", items: { type: "string" }, description: "Prior decisions to carry forward (memory block)." }
+  required: ["intent"]
+required: ["intent"]
+returns:
+  type: object
+  properties:
+    prompt:        { type: "string", description: "The optimized, copy-ready prompt." }
+    target_tool:   { type: "string" }
+    framework:     { type: "string", description: "Template/architecture chosen (routed silently)." }
+    strategy_note: { type: "string", description: "One-line rationale." }
+    clarifying_questions: { type: "array", items: { type: "string" }, description: "Up to 3, only if critical info is missing." }
+side_effects: "none"
+examples:
+  - input:  { intent: "refactor my auth module", target_tool: "cursor" }
+    output: { prompt: "<optimized prompt>", target_tool: "cursor", framework: "task-brief", strategy_note: "Exact file scope + done-criteria so the agent cannot guess wrong." }
+implementations:
+  - kind: "callable"
+    path: "prompt_master.optimize"
+  - kind: "mcp"
+    path: "prompt-master-skill"

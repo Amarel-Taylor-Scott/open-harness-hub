@@ -1,12 +1,12 @@
 # Layers & primitives
 
-Every artifact lives at one of four layers. Lower layers are the
+Every component lives at one of four layers. Lower layers are the
 building blocks of higher layers.
 
 ## Layer 1 - Primitives
 
 The pure building blocks. None of them call a model or another
-artifact by themselves; they describe data, behavior, or interfaces.
+component by themselves; they describe data, behavior, or interfaces.
 
 - **Knowledge pack** - typed bundle of *facts*.
 - **Logic pack** - typed bundle of *behavior*.

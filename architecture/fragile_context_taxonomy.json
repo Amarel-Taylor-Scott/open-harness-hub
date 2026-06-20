@@ -1,0 +1,50 @@
+{
+  "version": "1.0",
+  "note": "Canonical taxonomy for the Fragile Context Atlas: the failure MODES that make ingested context risky, and the DOMAINS where companies already feed fragile context into RAG / chatbots / agent memory / enterprise search / workflow agents. Single source — architecture/fragile_context_atlas.json packs reference mode ids + domain ids from here; scripts/check_fragile_context_atlas.py enforces the lock-step. This file does NOT redefine freshness or fact lifecycle: the TIME/FRESHNESS modes carry a `volatility_class` from schemas/artifacts/FragilityMetadata.v1.schema.json, PRIVACY carries a `scope` from the watchtower scope enum, and held-out examples use the held-out subset of CanonicalFact.status. Reuse, never duplicate.",
+  "reuses": {
+    "volatility_class": "schemas/artifacts/FragilityMetadata.v1.schema.json (stable|low|medium|high|realtime) — TIME_FRAGILE / FRESHNESS_FRAGILE modes carry one",
+    "scope": "Fragile Fact Watchtower scope enum (global_public|tenant_private|tenant_override|system_reference) — PRIVACY_FRAGILE / CUSTOMER_FRAGILE",
+    "fact_status": "schemas/artifacts/CanonicalFact.v1.schema.json status enum — held-out examples use {stale,contested,superseded,held_out,deprecated}; served answers map to verified_current/tenant_override",
+    "industry_vocab": "vocabularies/industries.yaml — every domain.industry is a canonical industry id",
+    "quality_rubric": "catalog/rubrics/baltor-fragile-information-quality.yaml — the audit-dimension layer (this taxonomy is the failure-mode + domain layer above it)",
+    "public_claim_policy": "docs/sales/public-claim-and-engagement-policy.md — the atlas names system TYPES, never a vendor (enforced by the proof)"
+  },
+  "fragility_modes": [
+    {"id": "TIME_FRAGILE", "label": "Time-fragile", "definition": "Correctness depends on a date, rate, fee, deadline, or effective period that changes over time.", "carries": "volatility_class", "requires_refresh_policy": true},
+    {"id": "AUTHORITY_FRAGILE", "label": "Authority-fragile", "definition": "Truth depends on which source wins when a regulation / contract / system-of-record disagrees with an SOP, wiki, macro, or chat note.", "carries": null, "requires_refresh_policy": false},
+    {"id": "JURISDICTION_FRAGILE", "label": "Jurisdiction-fragile", "definition": "The correct answer varies by country, state, market, or regulatory regime.", "carries": null, "requires_refresh_policy": false},
+    {"id": "CUSTOMER_FRAGILE", "label": "Customer-fragile", "definition": "The answer varies by customer, tenant, product tier, or negotiated terms.", "carries": "scope", "requires_refresh_policy": false},
+    {"id": "SOURCE_FRAGILE", "label": "Source-fragile", "definition": "An informal source (blog, wiki, chat note, draft) competes with an official source of record.", "carries": null, "requires_refresh_policy": false},
+    {"id": "CONFLICT_FRAGILE", "label": "Conflict-fragile", "definition": "Two or more sources disagree and the conflict must be surfaced, not silently averaged away.", "carries": null, "requires_refresh_policy": false},
+    {"id": "ACTION_FRAGILE", "label": "Action-fragile", "definition": "The answer can trigger a payment, shipment, denial, legal step, customer commitment, or escalation.", "carries": null, "requires_refresh_policy": false},
+    {"id": "COMPLIANCE_FRAGILE", "label": "Compliance-fragile", "definition": "Regulated advice or disclosure (financial, medical, legal, employment, safety) where a wrong served answer is a regulatory exposure.", "carries": null, "requires_refresh_policy": false},
+    {"id": "PRIVACY_FRAGILE", "label": "Privacy-fragile", "definition": "Tenant-private, customer-private, employee-private, or patient-private context that must not leak across scope.", "carries": "scope", "requires_refresh_policy": false},
+    {"id": "MODEL_FRAGILE", "label": "Model-fragile", "definition": "An LLM-derived or extracted value that has not been independently verified. LLM output is candidate, not truth.", "carries": null, "requires_refresh_policy": false},
+    {"id": "FRESHNESS_FRAGILE", "label": "Freshness-fragile", "definition": "Context decays and needs scheduled re-verification; freshness is not the same as correctness.", "carries": "volatility_class", "requires_refresh_policy": true}
+  ],
+  "held_out_statuses": ["stale", "contested", "superseded", "held_out", "deprecated"],
+  "domains": [
+    {"id": "consumer_finance", "industry": "finance", "label": "Consumer finance / fintech / banking", "typical_buyer": "consumer-finance compliance & support ops", "ingesting_systems": ["support_chatbot", "helpdesk_rag", "agent_memory"]},
+    {"id": "sanctions_kyc", "industry": "compliance", "label": "Sanctions / KYC / screening", "typical_buyer": "financial-crime & compliance screening", "ingesting_systems": ["screening_workflow", "agent_tool", "enterprise_search"]},
+    {"id": "supply_chain_esg", "industry": "esg", "label": "Supply chain / ESG / EUDR", "typical_buyer": "supply-chain & ESG compliance", "ingesting_systems": ["supplier_portal_rag", "agent_memory", "company_brain"]},
+    {"id": "customer_support_refunds", "industry": "customer_success", "label": "Customer support / refunds / billing", "typical_buyer": "support & CX operations", "ingesting_systems": ["support_chatbot", "helpdesk_rag", "macros_rag"]},
+    {"id": "trade_tariffs_customs", "industry": "customs", "label": "Trade / tariffs / customs", "typical_buyer": "customs & trade compliance", "ingesting_systems": ["classification_tool", "agent_tool", "erp_rag"]},
+    {"id": "logistics_shipping", "industry": "logistics", "label": "Logistics / shipping / transport", "typical_buyer": "logistics & transport compliance", "ingesting_systems": ["shipping_workflow", "sop_rag", "agent_tool"]},
+    {"id": "environmental_regulatory", "industry": "environmental", "label": "Environmental / utility regulatory limits", "typical_buyer": "EHS & environmental compliance", "ingesting_systems": ["sop_rag", "field_agent_app", "company_brain"]},
+    {"id": "capital_markets_disclosure", "industry": "capital_markets", "label": "Capital-markets / financial disclosure", "typical_buyer": "financial reporting & disclosure", "ingesting_systems": ["reporting_model", "finance_rag", "agent_tool"]},
+    {"id": "pharma_regulatory", "industry": "pharma", "label": "Pharma / regulatory limits", "typical_buyer": "regulatory affairs", "ingesting_systems": ["reg_rag", "agent_tool", "company_brain"]},
+    {"id": "clinical_coding", "industry": "healthcare", "label": "Clinical coding / payer policy", "typical_buyer": "health-system coding & revenue-cycle", "ingesting_systems": ["coding_assistant", "ehr_rag", "agent_tool"]},
+    {"id": "occupational_safety", "industry": "ehs", "label": "Occupational / workplace safety", "typical_buyer": "EHS & workplace safety", "ingesting_systems": ["sds_rag", "field_app", "sop_rag"]},
+    {"id": "insurance", "industry": "insurance", "label": "Insurance / claims / coverage", "typical_buyer": "claims & appeals operations", "ingesting_systems": ["claims_chatbot", "policy_rag", "agent_memory"]},
+    {"id": "legal_compliance", "industry": "legal", "label": "Legal / contract / compliance", "typical_buyer": "legal operations & contract review", "ingesting_systems": ["contract_copilot", "playbook_rag", "matter_rag"]},
+    {"id": "hr_payroll_benefits", "industry": "hr", "label": "HR / payroll / benefits", "typical_buyer": "HR & payroll operations", "ingesting_systems": ["hr_chatbot", "handbook_rag", "agent_memory"]},
+    {"id": "labor_mobility", "industry": "labor", "label": "Labor mobility / recruitment licensing", "typical_buyer": "worker-protection, compliance, and overseas recruitment operations", "ingesting_systems": ["worker_support_chatbot", "agency_screening_tool", "casework_rag"]},
+    {"id": "data_privacy_residency", "industry": "privacy", "label": "Data privacy / retention / residency", "typical_buyer": "privacy office / DPO", "ingesting_systems": ["company_brain", "data_catalog_rag", "agent_memory"]},
+    {"id": "developer_docs_api", "industry": "software", "label": "Developer docs / API copilots", "typical_buyer": "developer relations & platform engineering", "ingesting_systems": ["api_copilot", "docs_rag", "code_assistant"]},
+    {"id": "sales_marketing_claims", "industry": "marketing_ops", "label": "Sales / marketing / approved claims", "typical_buyer": "marketing ops & legal review", "ingesting_systems": ["sales_copilot", "battlecard_rag", "agent_memory"]},
+    {"id": "enterprise_company_brain", "industry": "cross_industry", "label": "Enterprise search / company brain", "typical_buyer": "platform / IT & knowledge ops", "ingesting_systems": ["enterprise_search", "agent_memory", "copilot"]},
+    {"id": "procurement_vendor_risk", "industry": "procurement", "label": "Procurement / vendor risk", "typical_buyer": "procurement & vendor risk", "ingesting_systems": ["vendor_portal_rag", "agent_tool", "company_brain"]},
+    {"id": "tax_accounting", "industry": "tax", "label": "Tax / accounting guidance", "typical_buyer": "tax & accounting operations", "ingesting_systems": ["tax_copilot", "guidance_rag", "agent_tool"]},
+    {"id": "real_estate_mortgage", "industry": "real_estate", "label": "Real estate / mortgage / lending", "typical_buyer": "mortgage & lending compliance", "ingesting_systems": ["loan_chatbot", "disclosure_rag", "agent_memory"]}
+  ]
+}

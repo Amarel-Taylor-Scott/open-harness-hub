@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/queue/queue-message.schema.json",
+  "title": "Queue message",
+  "description": "The durable unit of work between Baltor flywheels: a SourceEvent → QueueMessage → WorkerRun. Carries correlation/causation ids (trace the whole chain), an idempotency key (exactly-once effect), retry accounting, and a trace context. Failures retry → dead-letter → human review.",
+  "type": "object",
+  "required": ["kind", "message_id", "message_type", "created_at"],
+  "properties": {
+    "kind": { "type": "string", "const": "baltor.queue-message.v1" },
+    "message_id": { "type": "string" },
+    "message_type": { "type": "string", "description": "e.g. document_uploaded, pack_refresh_job, context_rot_detected" },
+    "stage": { "type": "string" },
+    "object_refs": { "type": "array", "items": { "type": "string" } },
+    "source_event_ref": { "type": "string" },
+    "correlation_id": { "type": "string", "description": "groups all messages for one originating event" },
+    "causation_id": { "type": "string", "description": "the message that caused this one" },
+    "idempotency_key": { "type": "string" },
+    "dedupe_key": { "type": "string" },
+    "priority": { "type": "integer" },
+    "attempt_count": { "type": "integer", "minimum": 0 },
+    "max_attempts": { "type": "integer", "minimum": 1 },
+    "available_at": { "type": "string" },
+    "expires_at": { "type": "string" },
+    "payload": { "type": "object" },
+    "trace_context": { "type": "object", "description": "OpenTelemetry trace/span propagation" },
+    "created_at": { "type": "string" }
+  },
+  "additionalProperties": true
+}

@@ -29,11 +29,11 @@ Normalize + enrich + dedupe-key a customer record.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `parse_address` | processor | `processor/address-parse-standardize` | — |
-| 2 | `normalize_country` | processor | `processor/iso-country-normalize` | — |
-| 3 | `normalize_phone` | processor | `processor/phone-normalize-e164` | — |
-| 4 | `canonicalize_name` | processor | `processor/name-canonicalize` | — |
-| 5 | `parse_dates` | processor | `processor/date-parse-multiformat` | — |
-| 6 | `redact_pii` | processor | `processor/redact-pii-text` | — |
-| 7 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `parse_address` | processor | `processor/address-parse-standardize` | - |
+| 2 | `normalize_country` | processor | `processor/iso-country-normalize` | - |
+| 3 | `normalize_phone` | processor | `processor/phone-normalize-e164` | - |
+| 4 | `canonicalize_name` | processor | `processor/name-canonicalize` | - |
+| 5 | `parse_dates` | processor | `processor/date-parse-multiformat` | - |
+| 6 | `redact_pii` | processor | `processor/redact-pii-text` | - |
+| 7 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

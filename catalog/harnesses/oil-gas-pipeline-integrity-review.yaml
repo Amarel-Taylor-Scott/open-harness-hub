@@ -1,0 +1,47 @@
+id: "harness/oil-gas-pipeline-integrity-review"
+type: harness
+version: "0.1.0"
+name: "Oil Gas Pipeline Integrity review harness"
+description: "Harness for oil gas pipeline integrity review using persona, grep, RAG, privacy, reusable processors, and benchmarkable evaluation."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["energy.oil_gas", "infrastructure"]
+capability: ["evaluation", "retrieval", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["oil-gas-pipeline-integrity", "expansion-v4"]
+created: "2026-05-24"
+updated: "2026-05-24"
+kind: "model_harness"
+tier: "primary"
+applied_layers: ["persona", "grep", "rag", "privacy"]
+knowledge_packs:
+  - id: "frameworks"
+    label: "Oil Gas Pipeline Integrity framework and benchmark context"
+    kind: "knowledge_pack"
+    types: ["rag_doc", "checklist", "control_summary", "evidence_matrix", "benchmark_context"]
+    required: true
+    trust_boundary: "local"
+    freshness: "dated"
+model_targets:
+  - id: "review_model"
+    label: "Local benchmarkable review model"
+    transport: "ollama"
+    role: "packet reviewer"
+    capabilities: ["reasoning", "summarization"]
+    required: true
+    default: true
+    trust_boundary: "local"
+model_io:
+  input: "normalized packet evidence plus retrieved context"
+  output: "findings, citations, score inputs, evidence gaps, risk updates, and redaction status"
+  transport: "ollama"
+input_verification: ["redact direct identifiers", "normalize evidence items before retrieval", "record benchmark dataset version when present"]
+output_verification: ["citation span check passes", "severity calibration applied", "redaction audit passes", "rubric score emitted"]
+privacy_boundaries:
+  raw_input: "Raw packet remains local unless deployment configures an external adapter."
+  derived_output: "Findings may contain sensitive operational details and require redaction before publication."
+  external_calls: "No external calls are required by this harness."
+contributes_to: ["pipeline/oil-gas-pipeline-integrity-review", "benchmark/oil-gas-pipeline-integrity-bench"]

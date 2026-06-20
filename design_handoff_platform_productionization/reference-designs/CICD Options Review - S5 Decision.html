@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"></meta>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+<title>CI/CD Options Review — S5 Decision Record</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"></link>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"></link>
+<link rel="stylesheet" href="shared/oh-tokens.css"></link>
+<style>
+  html, body { margin: 0; }
+  body.oh { background: var(--bg); color: var(--fg); font-family: var(--font-display); -webkit-font-smoothing: antialiased; }
+  .doc { max-width: 920px; margin: 0 auto; padding: 0 32px 96px; }
+  .doc-top { display: flex; align-items: center; gap: 12px; padding: 22px 0 18px; border-bottom: 1px solid var(--line); }
+  .doc-mark { width: 28px; height: 28px; border-radius: 7px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 800; font-size: 13px; }
+  .doc-brand { font-weight: 800; font-size: 15px; letter-spacing: -.02em; }
+  .doc-brand small { display: block; font-weight: 500; font-size: 11px; color: var(--fg-faint); }
+  .doc-top .sp { flex: 1; }
+  .doc-date { font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; background: var(--panel); }
+  .eyebrow { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-top: 44px; }
+  h1 { font-size: 32px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; margin: 12px 0 0; max-width: 26ch; }
+  .lede { font-size: 15.5px; line-height: 1.65; color: var(--fg-muted); margin: 16px 0 0; max-width: 64ch; text-wrap: pretty; }
+  .lede b { color: var(--fg); font-weight: 600; }
+  h2 { font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin: 54px 0 0; padding-bottom: 12px; border-bottom: 1px solid var(--line); display: flex; align-items: baseline; gap: 12px; }
+  h2 .n { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); font-weight: 600; }
+  h3 { font-size: 16px; font-weight: 700; letter-spacing: -.01em; margin: 26px 0 0; }
+  p { font-size: 14px; line-height: 1.65; color: var(--fg-muted); margin: 12px 0 0; max-width: 70ch; text-wrap: pretty; }
+  p b, li b { color: var(--fg); font-weight: 600; }
+  code { font-family: var(--font-mono); font-size: .92em; background: var(--bg-subtle); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 16px; }
+  th { text-align: left; font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-faint); padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: top; line-height: 1.5; color: var(--fg-muted); }
+  td .tt { color: var(--fg); font-weight: 600; }
+  .v { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; white-space: nowrap; }
+  .v.keep { color: var(--success); border-color: color-mix(in srgb, var(--success) 32%, var(--line)); }
+  .v.no { color: var(--fg-faint); }
+  .v.watch { color: var(--warning); border-color: color-mix(in srgb, var(--warning) 32%, var(--line)); }
+  .ex { font-family: var(--font-mono); font-size: 11.5px; line-height: 1.7; color: var(--fg-muted); background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-md); padding: 12px 16px; margin-top: 14px; overflow-x: auto; white-space: pre; }
+  .ex b { color: var(--verified); font-weight: 600; }
+  ul.rules { margin: 14px 0 0; padding: 0 0 0 2px; list-style: none; }
+  ul.rules li { font-size: 13.5px; line-height: 1.6; color: var(--fg-muted); padding: 8px 0 8px 26px; position: relative; border-bottom: 1px solid var(--line); max-width: 74ch; }
+  ul.rules li:last-child { border-bottom: none; }
+  ul.rules li::before { content: "✓"; position: absolute; left: 2px; color: var(--verified); font-weight: 700; }
+  .foot { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12px; color: var(--fg-faint); line-height: 1.6; }
+  .foot b { color: var(--fg-muted); font-weight: 600; }
+</style>
+</head>
+<body class="oh dir-s theme-light">
+<div class="doc">
+
+  <header class="doc-top">
+    <div class="doc-mark">A</div>
+    <div class="doc-brand">AI Done Right<small>internal · S5 decision record</small></div>
+    <div class="sp"></div>
+    <div class="doc-date">pass 5 · 2026-06-09</div>
+  </header>
+
+  <div class="eyebrow">CI/CD platform review</div>
+  <h1>Keep GitHub Actions — but don't let it own the pipeline.</h1>
+  <p class="lede">Reviewed the 2026 field (GitLab CI, Buildkite, CircleCI, Jenkins, TeamCity, Woodpecker/Gitea, Dagger, Argo/Tekton) against what this portfolio actually is: a GitHub-hosted monorepo, one operator plus coding agents, a self-hosted local platform behind TryCloudflare tunnels, and a signed-supply-chain ambition (S6). Verdict: <b>GitHub Actions as orchestrator, with all pipeline logic extracted into a vendor-neutral contract that runs identically on your laptop</b> — and a pull-based deploy instead of giving CI the keys to your machine.</p>
+
+  <h2><span class="n">01</span> What the decision actually depends on</h2>
+  <p>Five facts about this project decide the answer, not feature lists: <b>(1)</b> the repo lives on GitHub, so anything else adds an integration seam; <b>(2)</b> the dev loop is local-first — your proof modules (<code>check_* 27/27</code>) already run on your machine, and CI must run <i>the same commands</i>, not a parallel YAML reimplementation; <b>(3)</b> the deploy target is your own host behind a tunnel, not a cloud k8s fleet; <b>(4)</b> S6 requires OIDC keyless signing (cosign) and attestations, which GitHub's OIDC issuer does natively; <b>(5)</b> a one-person + agents team can't afford to operate a CI server.</p>
+
+  <h2><span class="n">02</span> The field, honestly</h2>
+  <table>
+    <thead><tr><th>Option</th><th>What it's best at</th><th>Why / why not for AIDR</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td><span class="tt">GitHub Actions</span></td><td>Default for GitHub-hosted code; largest action ecosystem; native OIDC for keyless signing + artifact attestations; free tier covers this scale.</td><td>Frictionless with the repo; the known costs (YAML debugging, marketplace supply-chain risk) are mitigated by the pipeline contract + SHA-pinning below.</td><td><span class="v keep">adopt</span></td></tr>
+      <tr><td><span class="tt">GitLab CI</span></td><td>The all-in-one platform (repos + CI + registry + scanning).</td><td>Strongest alternative — but only if the code moves to GitLab. A platform migration for CI alone is scope creep.</td><td><span class="v no">pass</span></td></tr>
+      <tr><td><span class="tt">Buildkite</span></td><td>Managed control plane + your own agents; great at scale and for security-sensitive runners.</td><td>The hybrid model is genuinely attractive for our self-hosted deploy — but it's a paid product solving a problem one pull-based runner solves for free here.</td><td><span class="v no">pass</span></td></tr>
+      <tr><td><span class="tt">CircleCI</span></td><td>Raw build speed, test parallelism for huge suites.</td><td>Our suites are small; credit pricing and declining mindshare don't pay for the seam.</td><td><span class="v no">pass</span></td></tr>
+      <tr><td><span class="tt">Jenkins / TeamCity</span></td><td>Maximum control, self-hosted, enterprise governance.</td><td>An ops burden a solo operator shouldn't carry; everything they'd give us, the contract + one runner gives cheaper.</td><td><span class="v no">pass</span></td></tr>
+      <tr><td><span class="tt">Woodpecker / Gitea Actions</span></td><td>Fully self-hosted, open-source CI for a self-hosted forge.</td><td>The right answer <i>if</i> the project ever leaves GitHub for a self-hosted forge — the pipeline contract makes that move cheap. Revisit then, not now.</td><td><span class="v watch">watch</span></td></tr>
+      <tr><td><span class="tt">Dagger</span></td><td>Pipelines as real code (Go/Py/TS) running identically on any CI or laptop.</td><td>Philosophically exactly our S2/S4 instinct — but it adds an engine dependency where plain <code>just</code> targets + containers already deliver the portability we need. Steal the idea, skip the dependency.</td><td><span class="v watch">watch</span></td></tr>
+      <tr><td><span class="tt">Argo CD / Tekton</span></td><td>Kubernetes-native GitOps CD at fleet scale.</td><td>We deploy docker-compose to one host. No cluster, no fit — yet. The pull-based deploy below is GitOps' core idea at compose scale.</td><td><span class="v no">pass</span></td></tr>
+    </tbody>
+  </table>
+
+  <h2><span class="n">03</span> The Pipeline Contract (S5a) — the real decision</h2>
+  <p>The lock-in and debuggability problems people leave Actions over come from writing logic <i>in</i> YAML. So the standard is: <b>workflow YAML may only orchestrate; every step body is a <code>just</code> recipe (or script) that runs identically on your machine</b>. CI becomes a thin scheduler around the same commands your loop and your agents already run.</p>
+  <div class="ex"># justfile — the pipeline IS these recipes; CI just calls them
+just lint      <b># tokens hex-lint · py_compile · gitleaks</b>
+just test      <b># proof modules · contract tests · playwright smokes</b>
+just build     <b># vite build per surface</b>
+just package   <b># docker build + syft SBOM + cosign sign</b>
+just smoke     <b># curl every /health through the tunnel</b>
+
+# .github/workflows/pipeline.yaml step bodies are ONLY:  run: just &lt;stage&gt;</div>
+  <p>Consequences: local run = CI run (debug locally, never in YAML); swapping orchestrators (Woodpecker, GitLab, anything) is rewriting ~60 lines of glue, not the pipeline; and agents can execute any stage directly, which is how this project actually works.</p>
+
+  <h2><span class="n">04</span> Runner strategy — never give CI your house keys</h2>
+  <h3>Hosted runners: lint · test · build · package</h3>
+  <p>Stateless stages run on GitHub-hosted runners (now including larger/ARM natively). Nothing secret beyond scoped tokens; OIDC mints short-lived identities for cosign — no long-lived signing keys stored anywhere.</p>
+  <h3>Deploy: pull-based, from the host</h3>
+  <p>Do <b>not</b> SSH from CI into your machine, and do not run a self-hosted runner exposed to a public repo (poisoned-PR risk). Instead the host pulls: a systemd timer (or watchtower) runs <code>just deploy-pull</code> — fetch latest <b>signed</b> images, <code>cosign verify</code>, <code>docker compose up -d</code>, then post a deploy receipt to the events plane. CI's deploy job just tags the release; the host decides to take it. That's GitOps' trust direction at compose scale, and it matches the house thesis: <b>the artifact carries proof; the consumer verifies.</b></p>
+
+  <h2><span class="n">05</span> Hardening checklist (Actions-specific best practice)</h2>
+  <ul class="rules">
+    <li><b>Pin every third-party action by commit SHA</b>, not tag — marketplace actions are a real supply-chain surface; Dependabot keeps the pins fresh.</li>
+    <li><b>Default-deny token:</b> <code>permissions: {}</code> at workflow top; each job requests only what it needs (<code>id-token: write</code> only in <code>package</code>).</li>
+    <li><b>OIDC keyless everywhere</b> — cosign signing and any cloud auth via the OIDC issuer; zero long-lived secrets in Actions beyond the gitleaks-scanned <code>.env</code> names.</li>
+    <li><b>Concurrency groups</b> per ref to cancel superseded runs; <b>path filters</b> so design-only commits don't rebuild containers.</li>
+    <li><b>Cache aggressively</b> (npm, docker layers) — the cheapest 40–60% build-time win.</li>
+    <li><b>Required checks as branch protection</b> = the merge gate IS the standards gate (S1 lint, S4 proofs).</li>
+    <li><b>Flaky policy:</b> quarantine within a day, fix or delete within a week — an ignored pipeline is worse than none (S10 honesty applies to CI too).</li>
+  </ul>
+
+  <h2><span class="n">06</span> What changes in the standards</h2>
+  <p><b>S5 is amended</b> (recorded in <code>production/standards/STANDARDS.md</code>): GitHub Actions adopted as orchestrator; <b>S5a Pipeline Contract</b> (logic in <code>just</code> recipes, YAML orchestrates only); <b>S5b pull-based deploy</b> (host verifies signatures and pulls; CI never reaches into the host); hardening checklist absorbed into the workflow file. The existing <code>production/ci/github-actions.yaml</code> gets refactored to thin orchestration in its next touch. Decision is reversible by design — the contract makes the orchestrator a commodity.</p>
+
+  <div class="foot">
+    <b>Self-evaluation.</b> The question wasn't "which CI is best" but "where should pipeline truth live" — answer: in the repo as runnable recipes, with Actions as the free, native scheduler and the host as the only party trusted to deploy to itself. Revisit triggers: leaving GitHub (→ Woodpecker/Gitea), outgrowing one host (→ Argo on k8s), or pipeline logic outgrowing shell (→ Dagger).
+  </div>
+
+</div>
+</body>
+</html>

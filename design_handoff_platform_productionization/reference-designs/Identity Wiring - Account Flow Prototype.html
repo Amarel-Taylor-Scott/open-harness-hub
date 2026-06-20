@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"></meta>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+<title>Identity Wiring — Account Flow Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"></link>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"></link>
+<link rel="stylesheet" href="shared/oh-tokens.css"></link>
+<style>
+  html, body { margin: 0; min-height: 100%; }
+  body.oh { background: var(--bg); color: var(--fg); font-family: var(--font-display); -webkit-font-smoothing: antialiased; }
+  .idw { max-width: 1060px; margin: 0 auto; padding: 0 28px 80px; }
+
+  .idw-top { display: flex; align-items: center; gap: 14px; padding: 18px 0 14px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .idw-mark { width: 27px; height: 27px; border-radius: 7px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 800; font-size: 13px; }
+  .idw-brand { font-weight: 800; font-size: 15px; letter-spacing: -.02em; }
+  .idw-brand small { display: block; font-weight: 500; font-size: 11px; color: var(--fg-faint); }
+  .idw-top .sp { flex: 1; }
+  .idw-ctl { display: flex; align-items: center; gap: 8px; }
+  .idw-ctl label { font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-faint); }
+  .idw-ctl select, .idw-ctl input { font: inherit; font-size: 12.5px; color: var(--fg); background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 6px 9px; }
+  .idw-ctl input { width: 210px; font-family: var(--font-mono); font-size: 11.5px; }
+  .mode { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; letter-spacing: .05em; border-radius: 999px; padding: 4px 11px; border: 1px solid var(--line); }
+  .mode.live { color: var(--success); border-color: color-mix(in srgb, var(--success) 36%, var(--line)); }
+  .mode.simulated { color: var(--warning); border-color: color-mix(in srgb, var(--warning) 36%, var(--line)); }
+
+  .simbar { display: flex; gap: 10px; align-items: baseline; margin-top: 14px; padding: 11px 16px; border: 1px solid color-mix(in srgb, var(--warning) 36%, var(--line)); background: color-mix(in srgb, var(--warning) 8%, var(--panel)); border-radius: var(--r-md); font-size: 12.5px; color: var(--fg-muted); line-height: 1.5; }
+  .simbar b { color: var(--warning); font-weight: 700; }
+  .simbar code { font-family: var(--font-mono); font-size: 11px; color: var(--fg); }
+
+  .idw-grid { display: grid; grid-template-columns: 1fr 340px; gap: 18px; margin-top: 22px; align-items: start; }
+  @media (max-width: 880px) { .idw-grid { grid-template-columns: 1fr; } }
+  .panel { border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--panel); }
+  .panel-h { display: flex; align-items: baseline; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+  .panel-h h2 { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin: 0; }
+  .panel-h .n { margin-left: auto; font-family: var(--font-mono); font-size: 10.5px; color: var(--fg-faint); }
+  .panel-b { padding: 18px; }
+
+  .tabs { display: flex; gap: 6px; margin-bottom: 16px; }
+  .tabs button { font: inherit; font-size: 12.5px; font-weight: 600; color: var(--fg-muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 7px 15px; cursor: pointer; }
+  .tabs button.on { background: var(--accent-weak); color: var(--accent); border-color: color-mix(in srgb, var(--accent) 36%, var(--line)); }
+
+  .fld { display: grid; gap: 5px; margin-bottom: 12px; }
+  .fld label { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--fg-faint); }
+  .fld input { font: inherit; font-size: 14px; color: var(--fg); background: var(--bg-subtle); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 10px 12px; }
+  .fld input:focus { outline: none; border-color: var(--accent); }
+  .btn { font: inherit; font-size: 14px; font-weight: 700; color: var(--accent-ink); background: var(--accent); border: none; border-radius: var(--r-md); padding: 11px 18px; cursor: pointer; }
+  .btn:disabled { opacity: .55; cursor: default; }
+  .btn.ghost { background: transparent; color: var(--fg-muted); border: 1px solid var(--line); font-weight: 600; }
+  .row { display: flex; gap: 10px; align-items: center; }
+  .err { font-size: 12.5px; color: var(--danger); margin-top: 10px; line-height: 1.45; }
+
+  .sess { display: grid; gap: 8px; }
+  .sess .kv { display: flex; gap: 10px; font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .sess .kv:last-child { border-bottom: none; }
+  .sess .k { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--fg-faint); width: 110px; flex: 0 0 auto; padding-top: 2px; }
+  .sess .v { color: var(--fg); font-weight: 600; }
+  .sess .v small { color: var(--fg-muted); font-weight: 400; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th { text-align: left; font-size: 9.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-faint); padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  td { padding: 9px 8px; border-bottom: 1px solid var(--line); color: var(--fg-muted); vertical-align: middle; }
+  td.mono { font-family: var(--font-mono); font-size: 11px; }
+  td .rev { font: inherit; font-size: 11.5px; color: var(--danger); background: none; border: 1px solid var(--line); border-radius: var(--r-sm); padding: 3px 9px; cursor: pointer; }
+
+  .raw { margin-top: 14px; border: 1px solid color-mix(in srgb, var(--verified) 40%, var(--line)); background: color-mix(in srgb, var(--verified) 7%, var(--bg-subtle)); border-radius: var(--r-md); padding: 13px 16px; }
+  .raw .k { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--verified); }
+  .raw .key { font-family: var(--font-mono); font-size: 13px; color: var(--fg); margin-top: 6px; word-break: break-all; }
+  .raw .note { font-size: 11.5px; color: var(--fg-muted); margin-top: 7px; }
+
+  .log { display: grid; gap: 0; max-height: 380px; overflow: auto; }
+  .log-row { display: flex; gap: 9px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--line); font-family: var(--font-mono); font-size: 10.5px; color: var(--fg-muted); }
+  .log-row:last-child { border-bottom: none; }
+  .log-row .st { font-weight: 600; width: 30px; flex: 0 0 auto; }
+  .log-row .st.ok { color: var(--success); } .log-row .st.bad { color: var(--danger); }
+  .log-row .op { color: var(--fg); font-weight: 600; width: 86px; flex: 0 0 auto; }
+  .log-row .sim { color: var(--warning); }
+  .log-row .rid { color: var(--fg-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hint { font-size: 12px; color: var(--fg-faint); line-height: 1.55; margin-top: 12px; }
+  .hint code { font-family: var(--font-mono); font-size: 10.5px; color: var(--fg-muted); }
+</style>
+</head>
+<body class="oh dir-d theme-dark">
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="shared/oh-identity.js"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+const REALMS = OhIdentity.REALMS;
+
+function App() {
+  const [realm, setRealm] = useState('baltor');
+  const [base, setBase] = useState(localStorage.getItem('aidr.base') || 'http://localhost:9410/api/identity');
+  const [mode, setMode] = useState('unknown');
+  const [log, setLog] = useState([]);
+  const [view, setView] = useState('auth');       // auth | onboard | portal
+  const [user, setUser] = useState(null);
+  const clientRef = useRef(null);
+
+  const pushLog = useCallback((r) => setLog((l) => [r, ...l].slice(0, 60)), []);
+
+  if (!clientRef.current) clientRef.current = OhIdentity.makeClient({ realm, base, onLog: pushLog });
+  const idc = clientRef.current;
+
+  const refreshSession = useCallback(async () => {
+    if (!idc.hasSession()) { setUser(null); setView('auth'); return; }
+    const r = await idc.session();
+    setMode(idc.mode);
+    if (r.ok && r.data && (r.data.valid !== false)) {
+      setUser(r.data.user || { realm });
+      setView(r.data.onboarded === false ? 'onboard' : 'portal');
+    } else { setUser(null); setView('auth'); }
+  }, [realm, base]);
+
+  useEffect(() => { (async () => {
+    idc.setRealm(realm); idc.setBase(base);
+    localStorage.setItem('aidr.base', base);
+    await idc.probe(); setMode(idc.mode);
+    await refreshSession();
+  })(); }, [realm, base]);
+
+  return (
+    <div className="idw">
+      <header className="idw-top">
+        <div className="idw-mark">A</div>
+        <div className="idw-brand">Identity wiring<small>register → onboard → portal → keys · /api/identity/&lt;realm&gt;/*</small></div>
+        <div className="sp"></div>
+        <div className="idw-ctl">
+          <label>realm</label>
+          <select value={realm} onChange={(e) => setRealm(e.target.value)}>
+            {REALMS.map((r) => <option key={r} value={r}>{r}</option>)}
+          </select>
+        </div>
+        <div className="idw-ctl">
+          <label>backend</label>
+          <input value={base} onChange={(e) => setBase(e.target.value)} spellCheck="false" />
+        </div>
+        <span className={'mode ' + mode}>{mode === 'live' ? '● live backend' : mode === 'simulated' ? '○ simulated' : '… probing'}</span>
+      </header>
+
+      {mode === 'simulated' &&
+        <div className="simbar"><b>SIMULATED.</b><span>Identity service not reachable at <code>{base}</code>. This tab runs an in-memory stand-in (same contract, nothing persists, clearly not the real service). Start it locally: <code>PYTHONPATH=. python3 scripts/identity_local_service.py --serve</code> then set the backend field (or tunnel it and paste the trycloudflare URL).</span></div>}
+
+      <div className="idw-grid">
+        <main>
+          {view === 'auth' && <AuthPanel idc={idc} realm={realm} onDone={refreshSession} />}
+          {view === 'onboard' && <OnboardPanel idc={idc} user={user} onDone={refreshSession} />}
+          {view === 'portal' && <Portal idc={idc} realm={realm} user={user} onSignout={async () => { await idc.logout(); refreshSession(); }} />}
+        </main>
+        <aside>
+          <div className="panel">
+            <div className="panel-h"><h2>Request log</h2><span className="n">X-AIDR-Request-Id</span></div>
+            <div className="panel-b log">
+              {log.length === 0 && <div className="hint">Every call lands here with its request id — the same id the backend writes to its audit JSONL.</div>}
+              {log.map((r, i) => (
+                <div className="log-row" key={i}>
+                  <span className={'st ' + (r.ok ? 'ok' : 'bad')}>{r.status}</span>
+                  <span className="op">{r.op}</span>
+                  <span>{r.realm}</span>
+                  {r.simulated && <span className="sim">sim</span>}
+                  <span className="rid">{r.requestId}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="hint" style={{ padding: '0 4px' }}>
+            Realms are fully separate by design — switch the realm above and the session does not follow (no SSO). Endpoint paths live in one map in <code>shared/oh-identity.js</code>; align them there if the service differs.
+          </div>
+        </aside>
+      </div>
+    </div>
+  );
+}
+
+function AuthPanel({ idc, realm, onDone }) {
+  const [tab, setTab] = useState('signin');
+  const [email, setEmail] = useState('');
+  const [pw, setPw] = useState('');
+  const [name, setName] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState(null);
+
+  async function submit(e) {
+    e.preventDefault(); setBusy(true); setErr(null);
+    const r = tab === 'signin'
+      ? await idc.login({ email, password: pw })
+      : await idc.register({ email, password: pw, name });
+    setBusy(false);
+    if (!r.ok) return setErr((r.data && r.data.error) || ('failed (' + r.status + ')'));
+    onDone();
+  }
+
+  return (
+    <div className="panel">
+      <div className="panel-h"><h2>{tab === 'signin' ? 'Sign in' : 'Create account'}</h2><span className="n">realm: {realm}</span></div>
+      <div className="panel-b">
+        <div className="tabs">
+          <button type="button" className={tab === 'signin' ? 'on' : ''} onClick={() => setTab('signin')}>Sign in</button>
+          <button type="button" className={tab === 'signup' ? 'on' : ''} onClick={() => setTab('signup')}>Create account</button>
+        </div>
+        <form onSubmit={submit}>
+          {tab === 'signup' &&
+            <div className="fld"><label>Name</label><input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ada Lovelace" /></div>}
+          <div className="fld"><label>Email</label><input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" /></div>
+          <div className="fld"><label>Password</label><input type="password" required minLength="8" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="••••••••" /></div>
+          <div className="row">
+            <button className="btn" disabled={busy}>{busy ? 'Working…' : tab === 'signin' ? 'Sign in →' : 'Create account →'}</button>
+          </div>
+          {err && <div className="err">{err}</div>}
+        </form>
+        <div className="hint">An account here exists in <b>this realm only</b> — registering on Baltor creates nothing on Teleon or any hub.</div>
+      </div>
+    </div>
+  );
+}
+
+function OnboardPanel({ idc, user, onDone }) {
+  const [ws, setWs] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState(null);
+  async function submit(e) {
+    e.preventDefault(); setBusy(true); setErr(null);
+    const r = await idc.onboard({ workspace: ws || 'default', role: 'owner' });
+    setBusy(false);
+    if (!r.ok) return setErr((r.data && r.data.error) || 'failed');
+    onDone();
+  }
+  return (
+    <div className="panel">
+      <div className="panel-h"><h2>One step — name your workspace</h2></div>
+      <div className="panel-b">
+        <form onSubmit={submit}>
+          <div className="fld"><label>Workspace</label><input value={ws} onChange={(e) => setWs(e.target.value)} placeholder="acme-compliance" /></div>
+          <button className="btn" disabled={busy}>{busy ? 'Working…' : 'Finish setup →'}</button>
+          {err && <div className="err">{err}</div>}
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function Portal({ idc, realm, user, onSignout }) {
+  const [keys, setKeys] = useState([]);
+  const [keyName, setKeyName] = useState('');
+  const [raw, setRaw] = useState(null);
+  const [busy, setBusy] = useState(false);
+
+  const load = useCallback(async () => {
+    const r = await idc.listKeys();
+    if (r.ok) setKeys((r.data && r.data.keys) || (Array.isArray(r.data) ? r.data : []));
+  }, []);
+  useEffect(() => { load(); }, [load]);
+
+  async function mint(e) {
+    e.preventDefault(); setBusy(true); setRaw(null);
+    const r = await idc.mintKey({ name: keyName || 'default' });
+    setBusy(false); setKeyName('');
+    if (r.ok) { setRaw(r.data.raw || r.data.secret || null); load(); }
+  }
+  async function revoke(id) { await idc.revokeKey(id); load(); }
+
+  return (
+    <div>
+      <div className="panel">
+        <div className="panel-h"><h2>Session</h2><span className="n">{realm}</span></div>
+        <div className="panel-b sess">
+          <div className="kv"><span className="k">Signed in</span><span className="v">{(user && (user.name || user.email)) || '—'} <small>{user && user.email}</small></span></div>
+          <div className="kv"><span className="k">Realm</span><span className="v">{realm} <small>· isolated — no cross-realm session</small></span></div>
+          <div className="kv"><span className="k">Actions</span><span><button className="btn ghost" onClick={onSignout}>Sign out</button></span></div>
+        </div>
+      </div>
+
+      <div className="panel" style={{ marginTop: 16 }}>
+        <div className="panel-h"><h2>API keys</h2><span className="n">hash-only · raw shown once</span></div>
+        <div className="panel-b">
+          <form className="row" onSubmit={mint} style={{ marginBottom: 14 }}>
+            <input className="fld-inline" style={{ flex: 1, font: 'inherit', fontSize: 13, color: 'var(--fg)', background: 'var(--bg-subtle)', border: '1px solid var(--line)', borderRadius: 'var(--r-sm)', padding: '9px 12px' }}
+                   value={keyName} onChange={(e) => setKeyName(e.target.value)} placeholder="Key name (e.g. production)" />
+            <button className="btn" disabled={busy}>Mint key</button>
+          </form>
+          {raw &&
+            <div className="raw">
+              <div className="k">Raw key — shown exactly once</div>
+              <div className="key">{raw}</div>
+              <div className="note">The service stores only the hash. Copy it now; it cannot be recovered. Revoke + re-mint to rotate.</div>
+            </div>}
+          <table style={{ marginTop: raw ? 14 : 0 }}>
+            <thead><tr><th>Name</th><th>Prefix</th><th>Created</th><th>Last used</th><th></th></tr></thead>
+            <tbody>
+              {keys.length === 0 && <tr><td colSpan="5" style={{ color: 'var(--fg-faint)' }}>No keys yet — mint the first one above.</td></tr>}
+              {keys.map((k) => (
+                <tr key={k.id}>
+                  <td style={{ color: 'var(--fg)', fontWeight: 600 }}>{k.name}</td>
+                  <td className="mono">{k.prefix}</td>
+                  <td className="mono">{(k.created || '').slice(0, 10)}</td>
+                  <td className="mono">{k.lastUsed ? k.lastUsed.slice(0, 16).replace('T', ' ') : '—'}</td>
+                  <td><button className="rev" onClick={() => revoke(k.id)}>Revoke</button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

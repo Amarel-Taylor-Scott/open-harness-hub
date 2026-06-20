@@ -1,0 +1,108 @@
+id: "tool/object-comparison-block-planner"
+type: tool
+version: "0.1.0"
+name: "Object comparison block planner"
+description: "Plans blocked, leaf-sharded, resumable pairwise comparison jobs for knowledge objects and normalized registry records using object fields plus optional labels, dimensions, entity refs, and embedding buckets."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "government", "cross_industry"]
+capability: ["retrieval", "governance", "evaluation", "routing"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+tags: ["pairwise-comparison", "blocking", "checkpointing", "workers", "dedupe", "entity-refs", "embedding-buckets"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    records:
+      type: array
+      items:
+        type: object
+    labels:
+      type: array
+      items:
+        type: object
+    dimensions:
+      type: array
+      items:
+        type: object
+    entity_refs:
+      type: array
+      items:
+        type: object
+    embeddings:
+      type: array
+      items:
+        type: object
+    job_id:
+      type: string
+    block_fields:
+      type: array
+      items:
+        type: string
+    block_mode:
+      type: string
+      enum: ["all", "any"]
+    leaf_size:
+      type: integer
+    checkpoint_path:
+      type: string
+    output_dir:
+      type: string
+  required: ["records"]
+returns:
+  type: object
+  properties:
+    output_dir:
+      type: string
+    job:
+      type: object
+    files:
+      type: array
+      items:
+        type: string
+side_effects: "write"
+examples:
+  - input:
+      records:
+        - object_id: "object/a"
+          object_type: "versioned_fact"
+          privacy_boundary: "public"
+        - object_id: "object/b"
+          object_type: "versioned_fact"
+          privacy_boundary: "public"
+      block_fields: ["object_type", "privacy_boundary"]
+      block_mode: "all"
+      leaf_size: 100
+    output:
+      job:
+        remaining_pair_count: 1
+  - input:
+      records:
+        - object_id: "object/a"
+          object_type: "candidate_primitive"
+        - object_id: "object/b"
+          object_type: "candidate_primitive"
+      dimensions:
+        - subject_id: "object/a"
+          name: "embedding_bucket"
+          value: "seed-bucket/trades/high/demo/demo"
+        - subject_id: "object/b"
+          name: "embedding_bucket"
+          value: "seed-bucket/trades/high/demo/demo"
+      block_fields: ["object_type", "embedding_bucket"]
+      block_mode: "any"
+    output:
+      job:
+        remaining_pair_count: 1
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.object_comparison_jobs.write_job_plan"
+    language: "python"
+  - kind: "mcp"
+    path: "mcp/factory.plan_object_comparison_job"

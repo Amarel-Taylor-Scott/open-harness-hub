@@ -1,0 +1,23 @@
+{
+  "kind": "baltor.lineage-manifest.v1",
+  "lineage_manifest_id": "lin-bill782-pack",
+  "object_ref": "ctxpack-BILL-782-implementation",
+  "compact_summary": "Built from ADR-014 (authority), retry.py (implements), and the stale runbook (flagged).",
+  "lineage_summary_for_llm": "Retry ceiling = 5, per ADR-014; confirmed by retry.py; the runbook (says 3) is stale and superseded.",
+  "source_count": 3,
+  "artifact_count": 4,
+  "activity_count": 3,
+  "input_refs": ["obj-adr-014", "obj-retry-py", "obj-runbook"],
+  "activity_refs": ["parser-run-adr014", "comprun-billing", "verif-run-billing"],
+  "output_refs": ["ctxpack-BILL-782-implementation"],
+  "raw_artifact_refs": ["s3://baltor-raw/acme-billing/decisions/ADR-014-billing-retry-policy.md"],
+  "source_locator_refs": ["loc-adr014-decision"],
+  "parser_runs": ["parser-run-adr014"],
+  "compression_runs": ["comprun-billing"],
+  "verification_runs": ["verif-run-billing"],
+  "policy_decisions": ["policy-decision-no-stale-write"],
+  "receipts": ["ctxreceipt-BILL-782"],
+  "raw_expansion_available": true,
+  "expansion_policy": "allowed_with_approval",
+  "created_at": "2026-06-04T15:00:00Z"
+}

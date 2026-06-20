@@ -1,0 +1,577 @@
+/* ============================================================
+   Open Harness Hub — design tokens
+   One component layer (oh-components.css) consumes these vars.
+   Six scopes: {dir-a | dir-b | dir-d} × {theme-light | theme-dark}.
+   Primitive-legend hues stay close to the shipped identity; only the
+   ACCENT and the Action-primitive coupling differ per direction.
+   ============================================================ */
+
+.oh {
+  /* radius + motion are largely shared; directions retune below */
+  --r-sm: 6px;
+  --r-md: 9px;
+  --r-lg: 12px;
+  --r-pill: 999px;
+  --r-node: 10px;
+  --ease: cubic-bezier(.2,.8,.2,1);
+
+  --font-sans: "Inter", -apple-system, "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-display: var(--font-sans);
+
+  /* primitive-legend defaults (dark-surface palette / shipped) */
+  --p-input: #8b949e;
+  --p-knowledge: #3fb950;
+  --p-conditional: #d29922;
+  --p-action: #fb7714;
+  --p-loop: #a371f7;
+  --p-stop: #f85149;
+  --p-output: #58a6ff;
+  --operator: #e3b341;
+
+  font-family: var(--font-sans);
+  color: var(--fg);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* light-surface primitive palette (darkened for AA on white/paper) */
+.oh.theme-light {
+  --p-input: #5b6470;
+  --p-knowledge: #1a7f37;
+  --p-conditional: #9a6700;
+  --p-action: #c2410c;
+  --p-loop: #6e40c9;
+  --p-stop: #cf222e;
+  --p-output: #0969da;
+  --operator: #8a6d1f;
+}
+
+/* ===========================================================
+   DIRECTION A — Warm Editorial "Paper"
+   Newsreader serif display · Inter UI · clay accent == Action
+   =========================================================== */
+.oh.dir-a { --font-display: "Newsreader", Georgia, serif; }
+
+.oh.dir-a.theme-light {
+  --bg: #faf7f0;
+  --bg-subtle: #f3eee2;
+  --panel: #ffffff;
+  --panel-2: #fbf8f1;
+  --line: #e7e0d2;
+  --line-strong: #d6cdb9;
+  --fg: #1c1b19;
+  --fg-muted: #6b675e;
+  --fg-faint: #868074;
+
+  --accent: #b8501f;            /* refined clay — evolves the orange */
+  --accent-ink: #ffffff;
+  --accent-weak: #fbeee4;
+  --success: #1a7f37;
+  --warning: #9a6700;
+  --danger: #c0392b;
+  --info: #1f6fb2;
+  --verified: #0e7c86;          /* teal — the moat color */
+
+  --p-action: #b8501f;          /* A couples accent <-> Action */
+  --e1: 0 1px 2px rgba(60,40,20,.05);
+  --e2: 0 10px 30px rgba(60,40,20,.10);
+}
+
+.oh.dir-a.theme-dark {
+  --bg: #1b1a17;
+  --bg-subtle: #131210;
+  --panel: #242220;
+  --panel-2: #1f1d1a;
+  --line: #353230;
+  --line-strong: #4a4641;
+  --fg: #f1ece2;
+  --fg-muted: #a59d8f;
+  --fg-faint: #797266;
+
+  --accent: #d8743a;
+  --accent-ink: #1b1206;
+  --accent-weak: #2e2114;
+  --success: #4cc35f;
+  --warning: #e0a93a;
+  --danger: #f06258;
+  --info: #6fb0e8;
+  --verified: #39c5cf;
+
+  --p-action: #d8743a;
+  --e1: 0 1px 0 rgba(0,0,0,.3);
+  --e2: 0 10px 30px rgba(0,0,0,.45);
+}
+
+/* ===========================================================
+   DIRECTION B — Clinical Monochrome
+   Space Grotesk display · Inter UI · heavy mono · single blue accent
+   Accent decoupled from Action (Action stays canonical orange).
+   =========================================================== */
+.oh.dir-b { --font-display: "Space Grotesk", "Inter", sans-serif;
+            --r-sm: 5px; --r-md: 7px; --r-lg: 10px; }
+
+.oh.dir-b.theme-light {
+  --bg: #ffffff;
+  --bg-subtle: #f7f7f8;
+  --panel: #ffffff;
+  --panel-2: #fafafa;
+  --line: #eaeaea;
+  --line-strong: #d4d4d4;
+  --fg: #0a0a0a;
+  --fg-muted: #737373;
+  --fg-faint: #858585;
+
+  --accent: #2563eb;            /* spent ONLY on the primary action */
+  --accent-ink: #ffffff;
+  --accent-weak: #eef3ff;
+  --success: #15803d;
+  --warning: #a16207;
+  --danger: #dc2626;
+  --info: #2563eb;
+  --verified: #0e7490;
+
+  --e1: 0 1px 2px rgba(0,0,0,.04);
+  --e2: 0 8px 24px rgba(0,0,0,.08);
+}
+
+.oh.dir-b.theme-dark {
+  --bg: #0a0a0a;
+  --bg-subtle: #000000;
+  --panel: #121212;
+  --panel-2: #0e0e0e;
+  --line: #1f1f1f;
+  --line-strong: #333333;
+  --fg: #fafafa;
+  --fg-muted: #8f8f8f;
+  --fg-faint: #6a6a6a;
+
+  --accent: #3b82f6;
+  --accent-ink: #04060d;
+  --accent-weak: #0e1a2e;
+  --success: #4ade80;
+  --warning: #d4a72c;
+  --danger: #f87171;
+  --info: #60a5fa;
+  --verified: #22d3ee;
+
+  --p-action: #fb7714;          /* B keeps canonical orange Action */
+  --p-knowledge: #3fb950;
+  --p-output: #58a6ff;
+  --e1: 0 1px 0 rgba(0,0,0,.4);
+  --e2: 0 8px 24px rgba(0,0,0,.5);
+}
+
+/* ===========================================================
+   DIRECTION D — Answer-Engine Light + Teal
+   Hanken Grotesk display · Inter UI · IBM Plex Mono
+   Teal accent doubles as the verified/governance color.
+   =========================================================== */
+.oh.dir-d { --font-display: "Hanken Grotesk", "Inter", sans-serif;
+            --font-mono: "IBM Plex Mono", ui-monospace, monospace; }
+
+.oh.dir-d.theme-light {
+  --bg: #ffffff;
+  --bg-subtle: #f7f9fa;
+  --panel: #fcfcfd;
+  --panel-2: #f4f7f8;
+  --line: #e6e8eb;
+  --line-strong: #ccd2d6;
+  --fg: #0f1419;
+  --fg-muted: #5b6470;
+  --fg-faint: #7d8690;
+
+  --accent: #0e7c86;            /* deep teal/peacock — also 'verified' */
+  --accent-ink: #ffffff;
+  --accent-weak: #e3f4f5;
+  --success: #1a7f37;
+  --warning: #9a6700;
+  --danger: #cf222e;
+  --info: #0969da;
+  --verified: #0e7c86;
+
+  --e1: 0 1px 2px rgba(15,30,40,.05);
+  --e2: 0 10px 30px rgba(15,30,40,.10);
+}
+
+.oh.dir-d.theme-dark {
+  --bg: #0b1114;
+  --bg-subtle: #060a0c;
+  --panel: #111a1e;
+  --panel-2: #0d1518;
+  --line: #1e2a2f;
+  --line-strong: #324047;
+  --fg: #e8eef0;
+  --fg-muted: #8d9aa3;
+  --fg-faint: #616f76;
+
+  --accent: #2dd4bf;
+  --accent-ink: #04110f;
+  --accent-weak: #0d2522;
+  --success: #4cc35f;
+  --warning: #e0a93a;
+  --danger: #f06258;
+  --info: #58a6ff;
+  --verified: #2dd4bf;
+
+  --p-action: #fb7714;
+  --p-knowledge: #3fb950;
+  --p-output: #58a6ff;
+  --e1: 0 1px 0 rgba(0,0,0,.35);
+  --e2: 0 10px 30px rgba(0,0,0,.45);
+}
+
+/* ===========================================================
+   DIRECTION C — Refined Product Dark  (Linear · Raycast)
+   Inter Tight display · Inter UI · indigo→violet accent
+   Dark is the primary; accent decoupled from Action.
+   =========================================================== */
+.oh.dir-c { --font-display: "Inter Tight", "Inter", sans-serif;
+            --r-sm: 6px; --r-md: 8px; --r-lg: 11px; }
+
+.oh.dir-c.theme-dark {
+  --bg: #0b0b0f;
+  --bg-subtle: #08080b;
+  --panel: #16161d;
+  --panel-2: #111118;
+  --line: #26262e;
+  --line-strong: #3a3a45;
+  --fg: #ededf2;
+  --fg-muted: #8a8a99;
+  --fg-faint: #6a6a76;
+
+  --accent: #7c6bf0;            /* indigo/violet */
+  --accent-ink: #0b0712;
+  --accent-weak: #1b1730;
+  --success: #3fb950;
+  --warning: #d29922;
+  --danger: #f85149;
+  --info: #58a6ff;
+  --verified: #2dd4bf;
+
+  --p-action: #fb7714;
+  --p-knowledge: #3fb950;
+  --p-output: #58a6ff;
+  --e1: 0 1px 0 rgba(0,0,0,.4);
+  --e2: 0 12px 32px rgba(0,0,0,.5);
+}
+
+.oh.dir-c.theme-light {
+  --bg: #fbfbfd;
+  --bg-subtle: #f4f4f8;
+  --panel: #ffffff;
+  --panel-2: #f7f7fb;
+  --line: #ececf1;
+  --line-strong: #d8d8e1;
+  --fg: #1a1a22;
+  --fg-muted: #6a6a78;
+  --fg-faint: #838390;
+
+  --accent: #5e4fd0;
+  --accent-ink: #ffffff;
+  --accent-weak: #efedfc;
+  --success: #1a7f37;
+  --warning: #9a6700;
+  --danger: #cf222e;
+  --info: #0969da;
+  --verified: #0e8c7e;
+  --e1: 0 1px 2px rgba(20,16,40,.05);
+  --e2: 0 10px 30px rgba(20,16,40,.10);
+}
+
+/* ===========================================================
+   DIRECTION E — Blueprint Terminal
+   Archivo display · Inter UI · JetBrains Mono (mono-forward)
+   Ink-navy + cyan; technical/precise, schematic. Dark primary.
+   =========================================================== */
+.oh.dir-e { --font-display: "Archivo", "Inter", sans-serif;
+            --r-sm: 4px; --r-md: 6px; --r-lg: 8px; --r-node: 7px; }
+
+.oh.dir-e.theme-dark {
+  --bg: #0a0e16;
+  --bg-subtle: #05080e;
+  --panel: #0f1521;
+  --panel-2: #0c111b;
+  --line: #1c2433;
+  --line-strong: #2c3850;
+  --fg: #dce6f2;
+  --fg-muted: #7e8da3;
+  --fg-faint: #5e6c84;
+
+  --accent: #22c7d6;            /* cyan == verified */
+  --accent-ink: #04161a;
+  --accent-weak: #07242a;
+  --success: #46d6a6;
+  --warning: #e0b341;
+  --danger: #ff6b6b;
+  --info: #58a6ff;
+  --verified: #22c7d6;
+
+  --p-action: #fb7714;
+  --p-knowledge: #3fb950;
+  --p-output: #58a6ff;
+  --e1: 0 1px 0 rgba(0,0,0,.4);
+  --e2: 0 10px 28px rgba(0,0,0,.55);
+}
+
+.oh.dir-e.theme-light {
+  --bg: #f5f8fc;
+  --bg-subtle: #eaf0f7;
+  --panel: #ffffff;
+  --panel-2: #f1f5fa;
+  --line: #dce6f0;
+  --line-strong: #c2d0e0;
+  --fg: #0e1828;
+  --fg-muted: #5a6a80;
+  --fg-faint: #728296;
+
+  --accent: #0e8fa8;
+  --accent-ink: #ffffff;
+  --accent-weak: #e0f3f6;
+  --success: #1a7f57;
+  --warning: #9a6700;
+  --danger: #cf222e;
+  --info: #0969da;
+  --verified: #0e8fa8;
+  --e1: 0 1px 2px rgba(14,24,40,.05);
+  --e2: 0 10px 30px rgba(14,24,40,.10);
+}
+
+/* ===========================================================
+   DIRECTION F — Ledger / Governance
+   Spectral serif display · Inter UI · JetBrains Mono
+   Parchment + forest green; the audit-ledger trust read.
+   Light is the primary; deep-forest dark companion.
+   =========================================================== */
+.oh.dir-f { --font-display: "Spectral", Georgia, serif; }
+
+.oh.dir-f.theme-light {
+  --bg: #fbfaf5;
+  --bg-subtle: #f2f0e6;
+  --panel: #ffffff;
+  --panel-2: #f8f6ee;
+  --line: #e4e0d2;
+  --line-strong: #d2ccba;
+  --fg: #1a1f1a;
+  --fg-muted: #5e6258;
+  --fg-faint: #858374;
+
+  --accent: #1e6b43;            /* forest green */
+  --accent-ink: #ffffff;
+  --accent-weak: #e6f1ea;
+  --success: #1a7f37;
+  --warning: #9a6700;
+  --danger: #b23a2e;
+  --info: #1f6fb2;
+  --verified: #0e7c86;
+  --e1: 0 1px 2px rgba(30,40,20,.05);
+  --e2: 0 10px 30px rgba(30,45,25,.10);
+}
+
+.oh.dir-f.theme-dark {
+  --bg: #0c1411;
+  --bg-subtle: #070d0b;
+  --panel: #12201a;
+  --panel-2: #0e1a15;
+  --line: #20302a;
+  --line-strong: #32463c;
+  --fg: #e7efe7;
+  --fg-muted: #95a399;
+  --fg-faint: #647067;
+
+  --accent: #349a63;
+  --accent-ink: #04130b;
+  --accent-weak: #0e2418;
+  --success: #4cc35f;
+  --warning: #e0a93a;
+  --danger: #f0726a;
+  --info: #6fb0e8;
+  --verified: #39c5cf;
+
+  --p-knowledge: #3fb950;
+  --p-action: #fb7714;
+  --p-output: #58a6ff;
+  --e1: 0 1px 0 rgba(0,0,0,.35);
+  --e2: 0 10px 30px rgba(0,0,0,.45);
+}
+
+/* ===========================================================
+   DIRECTION G — Hacker Terminal  (indie devs · hackers · OSS)
+   JetBrains Mono display + UI · phosphor green · near-black
+   Mono-everything, CRT-calm. Dark primary.
+   =========================================================== */
+.oh.dir-g { --font-display: "JetBrains Mono", ui-monospace, monospace;
+            --font-sans: "JetBrains Mono", "Inter", ui-monospace, monospace;
+            --r-sm: 3px; --r-md: 4px; --r-lg: 6px; --r-node: 5px; --r-pill: 4px; }
+
+.oh.dir-g.theme-dark {
+  --bg: #0a0c0a;
+  --bg-subtle: #060806;
+  --panel: #0f140f;
+  --panel-2: #0c110c;
+  --line: #1c261c;
+  --line-strong: #2c3a2c;
+  --fg: #d6e0d6;
+  --fg-muted: #7e947e;
+  --fg-faint: #5f6f5d;
+
+  --accent: #39d353;            /* phosphor green */
+  --accent-ink: #03130a;
+  --accent-weak: #0c2014;
+  --success: #39d353;
+  --warning: #e3b341;
+  --danger: #ff6b6b;
+  --info: #58a6ff;
+  --verified: #2bd4d9;
+
+  --p-action: #fb7714;
+  --p-knowledge: #3fb950;
+  --p-output: #58a6ff;
+  --e1: 0 0 0 1px rgba(57,211,83,.04);
+  --e2: 0 8px 24px rgba(0,0,0,.6);
+}
+
+.oh.dir-g.theme-light {
+  --bg: #f3f6f2;
+  --bg-subtle: #e8ede6;
+  --panel: #ffffff;
+  --panel-2: #f0f4ef;
+  --line: #d8e2d6;
+  --line-strong: #bcccb9;
+  --fg: #11200f;
+  --fg-muted: #56684f;
+  --fg-faint: #73846c;
+
+  --accent: #1f8a3b;
+  --accent-ink: #ffffff;
+  --accent-weak: #e3f3e6;
+  --success: #1a7f37;
+  --warning: #9a6700;
+  --danger: #cf222e;
+  --info: #0969da;
+  --verified: #0e7c86;
+  --e1: 0 1px 2px rgba(20,40,20,.05);
+  --e2: 0 10px 30px rgba(20,40,20,.10);
+}
+
+/* ===========================================================
+   DIRECTION H — Enterprise Slate  (CTOs · enterprise integrations)
+   IBM Plex Sans display · Inter UI · corporate navy/steel blue
+   Polished, governed, procurement-ready. Light primary.
+   =========================================================== */
+.oh.dir-h { --font-display: "IBM Plex Sans", "Inter", sans-serif; }
+
+.oh.dir-h.theme-light {
+  --bg: #fcfdfe;
+  --bg-subtle: #f3f6fa;
+  --panel: #ffffff;
+  --panel-2: #f6f9fc;
+  --line: #e4e9f0;
+  --line-strong: #cbd5e2;
+  --fg: #15233b;
+  --fg-muted: #5c6b82;
+  --fg-faint: #79869a;
+
+  --accent: #1f5fbf;            /* corporate blue */
+  --accent-ink: #ffffff;
+  --accent-weak: #e8f0fc;
+  --success: #1a7f37;
+  --warning: #9a6700;
+  --danger: #cf222e;
+  --info: #1f5fbf;
+  --verified: #0e7c86;
+  --e1: 0 1px 2px rgba(21,35,59,.06);
+  --e2: 0 12px 32px rgba(21,35,59,.12);
+}
+
+.oh.dir-h.theme-dark {
+  --bg: #0c1320;
+  --bg-subtle: #070c16;
+  --panel: #131d30;
+  --panel-2: #0f1827;
+  --line: #233248;
+  --line-strong: #364866;
+  --fg: #e6edf6;
+  --fg-muted: #8c9cb4;
+  --fg-faint: #5e6f89;
+
+  --accent: #4d8de6;
+  --accent-ink: #040a14;
+  --accent-weak: #0f2138;
+  --success: #4cc35f;
+  --warning: #e0a93a;
+  --danger: #f06258;
+  --info: #6fb0e8;
+  --verified: #39c5cf;
+
+  --p-action: #fb7714;
+  --p-knowledge: #3fb950;
+  --p-output: #58a6ff;
+  --e1: 0 1px 0 rgba(0,0,0,.35);
+  --e2: 0 12px 32px rgba(0,0,0,.5);
+}
+
+/* ===========================================================
+   DIRECTION S — ★ Harness House Style  (the synthesis)
+   Grafts: A's editorial warmth · B's restraint · D's verified-teal
+   Space Grotesk display · Inter UI · JetBrains Mono · ember accent
+   (couples to Action for brand continuity). Built to score 5/5.
+   =========================================================== */
+.oh.dir-s { --font-display: "Hanken Grotesk", "Inter", sans-serif; }
+
+.oh.dir-s.theme-light {
+  --bg: #fafaf8;
+  --bg-subtle: #f1f0ec;
+  --panel: #ffffff;
+  --panel-2: #f8f7f3;
+  --line: #e7e5dd;
+  --line-strong: #d5d2c7;
+  --fg: #161513;
+  --fg-muted: #66635b;
+  --fg-faint: #868277;
+
+  --accent: #d6553a;            /* refined ember — evolves the brand orange */
+  --accent-ink: #ffffff;
+  --accent-weak: #fbede7;
+  --success: #1a7f37;
+  --warning: #9a6700;
+  --danger: #c0392b;
+  --info: #1f6fb2;
+  --verified: #0e7c86;
+
+  --p-action: #c2410c;
+  --e1: 0 1px 2px rgba(40,30,20,.05);
+  --e2: 0 12px 34px rgba(40,30,20,.11);
+}
+
+.oh.dir-s.theme-dark {
+  --bg: #121110;
+  --bg-subtle: #0c0b0a;
+  --panel: #1b1a18;
+  --panel-2: #161513;
+  --line: #2a2825;
+  --line-strong: #3d3a35;
+  --fg: #f2efe9;
+  --fg-muted: #a39e94;
+  --fg-faint: #726d64;
+
+  --accent: #e2603a;
+  --accent-ink: #160a05;
+  --accent-weak: #2c1b12;
+  --success: #4cc35f;
+  --warning: #e0a93a;
+  --danger: #f06258;
+  --info: #6fb0e8;
+  --verified: #2dd4bf;
+
+  --p-action: #e2603a;
+  --p-knowledge: #3fb950;
+  --p-output: #58a6ff;
+  --e1: 0 1px 0 rgba(0,0,0,.3);
+  --e2: 0 12px 34px rgba(0,0,0,.5);
+}
+
+
+/* Global font floor — nothing falls back to the UA serif (private-preview banner etc.). */
+html, body { font-family: var(--font-sans, "Inter", -apple-system, "Segoe UI", system-ui, sans-serif); }

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/flywheel/decision-context.schema.json",
+  "title": "Decision context",
+  "description": "The bounded context an AI-agent (L5) flywheel may act within. Agents never run from unbounded context; they decide inside this envelope and emit a decision-receipt.",
+  "type": "object",
+  "required": ["kind", "id", "purpose", "actor", "scope", "allowed_tools", "stop_conditions", "risk", "policy_ref", "created_at", "valid_until"],
+  "properties": {
+    "kind": { "type": "string", "const": "baltor.decision-context.v1" },
+    "id": { "type": "string" },
+    "purpose": { "type": "string" },
+    "actor": { "type": "string", "description": "agent/profile id permitted to act" },
+    "scope": { "type": "string", "description": "what this decision is bounded to (e.g. a corpus, a ticket, a pack)" },
+    "five_w_one_h": { "type": "object", "additionalProperties": true },
+    "evidence": {
+      "type": "array",
+      "items": { "type": "object", "required": ["source_handle"], "properties": { "source_handle": { "type": "string", "pattern": "^ctx://" } }, "additionalProperties": true }
+    },
+    "risk": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+    "constraints": { "type": "array", "items": { "type": "string" } },
+    "allowed_tools": { "type": "array", "items": { "type": "string" }, "minItems": 0 },
+    "cost_budget": { "type": "object", "additionalProperties": true },
+    "latency_budget_ms": { "type": ["integer", "null"], "minimum": 0 },
+    "stop_conditions": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "human_review_triggers": { "type": "array", "items": { "type": "string" } },
+    "policy_ref": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "valid_until": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": true
+}

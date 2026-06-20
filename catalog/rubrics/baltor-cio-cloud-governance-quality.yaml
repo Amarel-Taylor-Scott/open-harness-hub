@@ -1,0 +1,48 @@
+id: "rubric/baltor-cio-cloud-governance-quality"
+type: rubric
+version: "0.1.0"
+name: "Baltor CIO cloud governance quality"
+description: "CIO rubric for cloud compatibility, enterprise integration, data governance, and operational control."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["software", "sre", "data_governance"]
+capability: ["evaluation", "governance", "verification"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["baltor", "cio", "cloud", "governance"]
+created: "2026-06-02"
+updated: "2026-06-02"
+dimensions:
+  - id: "identity_and_access"
+    label: "Identity, source permissions, role scopes, and context access are centrally governable"
+    weight: 0.20
+    scale: "0.0-1.0"
+    evidence_required: "OIDC/SSO, source ACL mirroring, policy decisions, tool allowlists, and audit trails are documented."
+  - id: "cloud_deployment_options"
+    label: "Architecture supports SaaS, private cloud, VPC, Kubernetes, and serverless-compatible deployments"
+    weight: 0.18
+    scale: "0.0-1.0"
+    evidence_required: "Deployment matrix covers compute, storage, network, secrets, observability, and data residency."
+  - id: "data_governance"
+    label: "Raw context, derived artifacts, embeddings, local memory, and company context have clear governance boundaries"
+    weight: 0.18
+    scale: "0.0-1.0"
+    evidence_required: "Classification, retention, encryption, local E2EE distinction, and company-readable tiers are explicit."
+  - id: "interoperability"
+    label: "System interoperates with existing enterprise sources, search, gateways, and AI tools"
+    weight: 0.16
+    scale: "0.0-1.0"
+    evidence_required: "MCP/API, connectors, gateway compatibility, context-pack contracts, and source-handle conventions are portable."
+  - id: "observability_and_audit"
+    label: "CIO can monitor health, usage, access, cost, freshness, and policy across deployments"
+    weight: 0.14
+    scale: "0.0-1.0"
+    evidence_required: "Dashboards and exports include queue health, connector sync, pack traces, source expansions, and policy outcomes."
+  - id: "vendor_risk"
+    label: "Design avoids hard dependency on one model, vector store, cloud vendor, or agent client"
+    weight: 0.14
+    scale: "0.0-1.0"
+    evidence_required: "Provider-neutral model/reranker slots and replaceable storage/search/vector backends are present."
+scoring_method: "weighted_sum"

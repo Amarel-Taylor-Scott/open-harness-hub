@@ -1,0 +1,200 @@
+id: "rule-pack/classifier-sdg-mapping"
+type: rule-pack
+version: "0.1.0"
+name: "UN SDG goal-mapping classifier rules (17 goals / 169 targets)"
+description: |
+  Classifier-style rules that map free-text claim fragments to the
+  most likely SDG goals + targets they touch. Each rule defines
+  labeled examples + a confidence threshold for a lightweight
+  classifier (zero-shot, BM25 + cosine, or fine-tuned).
+
+  Use as a FIRST-PASS clustering step in `pipeline/sdg-alignment-
+  assessment` to narrow the candidate goal set before deeper
+  target-level analysis.
+
+  Coverage: all 17 goals; top 5 most-likely targets per goal.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["esg", "sustainability", "nonprofit", "government", "cross_industry"]
+capability: ["classification"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["sdg", "classifier", "agenda-2030", "mapping"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+family: "classifier"
+language: "en"
+rules:
+  - id: "sdg_1_poverty"
+    label: "SDG 1: No Poverty"
+    threshold: 0.55
+    examples:
+      - "lifted X people above the international poverty line"
+      - "cash transfer to households earning under $2.15/day"
+      - "social protection floor extension"
+      - "land tenure formalization for the rural poor"
+      - "microfinance for the bottom decile"
+
+  - id: "sdg_2_zero_hunger"
+    label: "SDG 2: Zero Hunger"
+    threshold: 0.55
+    examples:
+      - "stunting reduction program in children under 5"
+      - "smallholder farmer productivity doubling"
+      - "agricultural biodiversity seed bank"
+      - "resilient agricultural practices under climate change"
+      - "food fortification program"
+
+  - id: "sdg_3_health_wellbeing"
+    label: "SDG 3: Good Health and Well-being"
+    threshold: 0.55
+    examples:
+      - "maternal mortality reduction below 70/100,000"
+      - "ending preventable deaths of children under 5"
+      - "universal health coverage expansion"
+      - "essential medicine access in LMICs"
+      - "tobacco control framework convention implementation"
+
+  - id: "sdg_4_quality_education"
+    label: "SDG 4: Quality Education"
+    threshold: 0.55
+    examples:
+      - "free equitable inclusive primary and secondary education"
+      - "early childhood development access"
+      - "TVET technical vocational education and training"
+      - "literacy and numeracy for adults"
+      - "gender parity in education"
+
+  - id: "sdg_5_gender_equality"
+    label: "SDG 5: Gender Equality"
+    threshold: 0.55
+    examples:
+      - "ending all forms of discrimination against women and girls"
+      - "ending violence against women"
+      - "ending child marriage and FGM"
+      - "women's equal access to economic resources"
+      - "women in leadership positions"
+
+  - id: "sdg_6_water_sanitation"
+    label: "SDG 6: Clean Water and Sanitation"
+    threshold: 0.55
+    examples:
+      - "safe drinking water access"
+      - "adequate sanitation and hygiene"
+      - "water-use efficiency in industry"
+      - "integrated water resource management"
+      - "freshwater ecosystem protection"
+
+  - id: "sdg_7_clean_energy"
+    label: "SDG 7: Affordable and Clean Energy"
+    threshold: 0.55
+    examples:
+      - "universal access to affordable reliable modern energy"
+      - "increasing renewable share in energy mix"
+      - "doubling energy efficiency improvement rate"
+      - "clean cookstove access"
+      - "energy infrastructure for LDCs"
+
+  - id: "sdg_8_decent_work"
+    label: "SDG 8: Decent Work and Economic Growth"
+    threshold: 0.55
+    examples:
+      - "decent work for all including persons with disabilities"
+      - "youth employment and the NEET indicator"
+      - "ending forced labour and modern slavery"
+      - "safe working environments"
+      - "labour rights and the ILO core conventions"
+
+  - id: "sdg_9_industry_innovation"
+    label: "SDG 9: Industry, Innovation and Infrastructure"
+    threshold: 0.55
+    examples:
+      - "resilient infrastructure investment"
+      - "sustainable industrialization"
+      - "R&D spending as percent of GDP"
+      - "mobile broadband coverage in rural areas"
+      - "small-scale industrial enterprise finance access"
+
+  - id: "sdg_10_reduced_inequality"
+    label: "SDG 10: Reduced Inequalities"
+    threshold: 0.55
+    examples:
+      - "income growth of bottom 40% faster than national average"
+      - "social, economic, and political inclusion"
+      - "remittance cost reduction below 3%"
+      - "migration policy planned and well-managed"
+      - "voting rights of developing countries in IFI"
+
+  - id: "sdg_11_sustainable_cities"
+    label: "SDG 11: Sustainable Cities and Communities"
+    threshold: 0.55
+    examples:
+      - "affordable housing and slum upgrading"
+      - "sustainable transport system"
+      - "inclusive urbanization"
+      - "cultural and natural heritage protection"
+      - "disaster risk reduction at city level"
+
+  - id: "sdg_12_responsible_consumption"
+    label: "SDG 12: Responsible Consumption and Production"
+    threshold: 0.55
+    examples:
+      - "10-Year Framework on Sustainable Consumption and Production"
+      - "halving per-capita food waste at retail and consumer levels"
+      - "environmentally sound management of chemicals throughout life cycle"
+      - "company sustainability reporting"
+      - "sustainable public procurement"
+
+  - id: "sdg_13_climate_action"
+    label: "SDG 13: Climate Action"
+    threshold: 0.55
+    examples:
+      - "strengthening resilience and adaptive capacity to climate hazards"
+      - "integrating climate change into national policies"
+      - "improving education and human capacity on climate change"
+      - "Green Climate Fund mobilization"
+      - "national adaptation plans (NAPs)"
+
+  - id: "sdg_14_life_below_water"
+    label: "SDG 14: Life Below Water"
+    threshold: 0.55
+    examples:
+      - "preventing marine pollution and reducing nutrient loading"
+      - "ocean acidification impact reduction"
+      - "ending overfishing and IUU fishing"
+      - "conserving at least 10% of coastal and marine areas"
+      - "increased benefit to SIDS from sustainable marine resources"
+
+  - id: "sdg_15_life_on_land"
+    label: "SDG 15: Life on Land"
+    threshold: 0.55
+    examples:
+      - "halting deforestation and restoring degraded forests"
+      - "combating desertification and restoring land"
+      - "biodiversity loss reduction"
+      - "ending poaching and trafficking of protected species"
+      - "preventing invasive alien species impacts"
+
+  - id: "sdg_16_peace_justice"
+    label: "SDG 16: Peace, Justice and Strong Institutions"
+    threshold: 0.55
+    examples:
+      - "reducing all forms of violence and related death rates"
+      - "ending abuse, exploitation, trafficking of children"
+      - "rule of law and equal access to justice"
+      - "reducing corruption and bribery"
+      - "transparent accountable institutions at all levels"
+
+  - id: "sdg_17_partnerships"
+    label: "SDG 17: Partnerships for the Goals"
+    threshold: 0.55
+    examples:
+      - "ODA commitment 0.7% of GNI from developed countries"
+      - "technology transfer to developing countries"
+      - "capacity-building for tax collection in LDCs"
+      - "data, monitoring and accountability for SDGs"
+      - "multi-stakeholder partnerships"

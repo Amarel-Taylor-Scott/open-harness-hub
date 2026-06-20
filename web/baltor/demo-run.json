@@ -1,0 +1,572 @@
+{
+  "available_corpora": [
+    {
+      "id": "acme",
+      "label": "Acme Billing (synthetic, offline)",
+      "live": false,
+      "note": "bundled synthetic engineering KB \u2014 fully offline + deterministic"
+    },
+    {
+      "id": "cfpb",
+      "label": "CFPB sample (synthetic, offline)",
+      "live": false,
+      "note": "bundled SYNTHETIC consumer-finance KB (Reg E vs a stale FAQ) \u2014 NOT live CFPB data; the live CFPB API connector is a separate path"
+    }
+  ],
+  "corpus": "acme",
+  "corpus_label": "Acme Billing (synthetic, offline)",
+  "created_at": "1970-01-01T00:00:00Z",
+  "graph": {
+    "edges": [
+      {
+        "from": "obj-bill-782",
+        "to": "obj-adr-014",
+        "type": "CITES"
+      },
+      {
+        "from": "obj-bill-782",
+        "to": "obj-retry-py",
+        "type": "MENTIONS"
+      },
+      {
+        "from": "obj-retry-py",
+        "to": "obj-adr-014",
+        "type": "IMPLEMENTS"
+      },
+      {
+        "from": "obj-test-retry",
+        "to": "obj-retry-py",
+        "type": "SUPPORTS"
+      },
+      {
+        "from": "obj-adr-014",
+        "to": "obj-runbook",
+        "type": "SUPERSEDES"
+      },
+      {
+        "from": "obj-runbook",
+        "to": "obj-adr-014",
+        "type": "CONTRADICTS"
+      },
+      {
+        "from": "obj-adr-014",
+        "to": "obj-inc-2026-04",
+        "type": "DERIVED_FROM"
+      },
+      {
+        "from": "obj-retry-py",
+        "to": "obj-billing-team",
+        "type": "OWNED_BY"
+      },
+      {
+        "from": "obj-runbook",
+        "to": "obj-billing-team",
+        "type": "OWNED_BY"
+      }
+    ],
+    "nodes": [
+      {
+        "id": "obj-adr-014",
+        "staleness": "fresh",
+        "title": "ADR-014: Billing retry policy",
+        "type": "decision"
+      },
+      {
+        "id": "obj-bill-782",
+        "staleness": "fresh",
+        "title": "BILL-782: raise retry ceiling and align the runbook",
+        "type": "work_item"
+      },
+      {
+        "id": "obj-billing-api",
+        "staleness": "fresh",
+        "title": "billing-api.yaml :: POST /v1/payments:submit",
+        "type": "document_section"
+      },
+      {
+        "id": "obj-billing-team",
+        "staleness": "fresh",
+        "title": "billing-team",
+        "type": "team"
+      },
+      {
+        "id": "obj-inc-2026-04",
+        "staleness": "dated",
+        "title": "INC-2026-04: Billing retry storm",
+        "type": "incident"
+      },
+      {
+        "id": "obj-retry-py",
+        "staleness": "fresh",
+        "title": "repo/billing/retry.py",
+        "type": "file"
+      },
+      {
+        "id": "obj-runbook",
+        "staleness": "stale",
+        "title": "docs/billing-runbook.md (stale)",
+        "type": "document"
+      },
+      {
+        "id": "obj-test-retry",
+        "staleness": "fresh",
+        "title": "repo/billing/test_retry.py",
+        "type": "test_result"
+      }
+    ]
+  },
+  "headline": "Answer = 5 (authority obj-adr-014); 1 contradiction(s) caught; pack 219\u219261 tokens; swarm routed 1 review(s), proposed a fix (not applied).",
+  "kind": "baltor.demo-run.v1",
+  "lift_matrix": {
+    "by_model": {
+      "local_mock": {
+        "condition_mean": {
+          "context_pack": 0.76925,
+          "context_pack_with_harness": 1.0,
+          "context_pack_with_swarm_verified": 0.9737,
+          "no_context": 0.1923,
+          "raw_context": 0.08695
+        },
+        "no_context_mean": 0.1923,
+        "route": {
+          "live_generation": false,
+          "note": "seam \u2014 offline uses recorded mock answers",
+          "selected_adapter": "local_mock",
+          "trust_boundary": "local"
+        }
+      }
+    },
+    "conditions": [
+      "no_context",
+      "raw_context",
+      "context_pack",
+      "context_pack_with_harness",
+      "context_pack_with_swarm_verified"
+    ],
+    "summary": {
+      "best_condition": "context_pack_with_harness",
+      "harness_ge_pack": true,
+      "raw_underperforms_pack": true,
+      "swarm_verified_ge_pack": true,
+      "with_context_beats_no_context": true
+    }
+  },
+  "live": false,
+  "note": "deterministic replay of a REAL pipeline run \u2014 the console animates these recorded stages",
+  "object_detail": {
+    "obj-adr-014": {
+      "assertions": [
+        {
+          "confidence": 0.98,
+          "predicate": "max_retries",
+          "value": 5
+        }
+      ],
+      "classification": "internal",
+      "expansion_allowed": {
+        "allowed": true,
+        "compact_preview": "# ADR-014: Billing retry policy",
+        "lineage_summary": "raw evidence for ctx://acme-billing/decisions/ADR-014-billing-retry-policy.md#decision read from demo-data/acme-billing/decisions/ADR-014-billing-retry-policy.md under policy (purpose=read, classification=internal)",
+        "raw_excerpt": "# ADR-014: Billing retry policy\n\n- Status: Accepted\n- Date: 2026-03-18\n- Deciders: billing-team\n- Supersedes: the retry guidance in `docs/billing-runbook.md`\n\n## Context\n\nAfter INC-2026-04 (the retry storm), the unbounded client-side retries amplified a transient\ndownstream outage into a self-inflicted overload. We need a single, authoritative retry policy.\n\n## Decision\n\nThe billing payment-submit client uses **at most 5 retries** with full-jitter exponential\nbackoff (base 20",
+        "reason": "granted"
+      },
+      "expansion_denied": {
+        "allowed": false,
+        "raw_excerpt": null,
+        "reason": "classification_restricted"
+      },
+      "freshness": "fresh",
+      "object_type": "decision",
+      "source_handles": [
+        "ctx://acme-billing/decisions/ADR-014-billing-retry-policy.md#decision"
+      ],
+      "summary": "Authoritative retry policy: at most 5 retries, full-jitter exponential backoff, retry-safe codes only. Supersedes the runbook.",
+      "title": "ADR-014: Billing retry policy"
+    },
+    "obj-bill-782": {
+      "assertions": [],
+      "classification": "internal",
+      "expansion_allowed": {
+        "allowed": true,
+        "compact_preview": "{",
+        "lineage_summary": "raw evidence for ctx://acme-billing/tickets/BILL-782.json#acceptance_criteria read from demo-data/acme-billing/tickets/BILL-782.json under policy (purpose=read, classification=internal)",
+        "raw_excerpt": "{\n  \"key\": \"BILL-782\",\n  \"type\": \"Story\",\n  \"summary\": \"Raise billing payment-submit retry ceiling and align the runbook\",\n  \"status\": \"In Progress\",\n  \"assignee\": \"dev-2\",\n  \"reporter\": \"billing-team\",\n  \"created\": \"2026-05-29\",\n  \"description\": \"Payments occasionally fail under transient downstream errors. Apply the retry ceiling from ADR-014 (the authoritative decision) and make the runbook match the code. Do NOT change which status codes are retry-safe.\",\n  \"acceptance_cr",
+        "reason": "granted"
+      },
+      "expansion_denied": {
+        "allowed": false,
+        "raw_excerpt": null,
+        "reason": "classification_restricted"
+      },
+      "freshness": "fresh",
+      "object_type": "work_item",
+      "source_handles": [
+        "ctx://acme-billing/tickets/BILL-782.json#acceptance_criteria"
+      ],
+      "summary": "Apply ADR-014's retry ceiling to the code path and make the stale runbook match. Do not change retry-safe codes.",
+      "title": "BILL-782: raise retry ceiling and align the runbook"
+    },
+    "obj-billing-api": {
+      "assertions": [],
+      "classification": "internal",
+      "expansion_allowed": {
+        "allowed": true,
+        "compact_preview": "openapi: 3.0.3",
+        "lineage_summary": "raw evidence for ctx://acme-billing/api/billing-api.yaml#submitPayment read from demo-data/acme-billing/api/billing-api.yaml under policy (purpose=read, classification=internal)",
+        "raw_excerpt": "openapi: 3.0.3\ninfo:\n  title: Acme Billing API (synthetic demo)\n  version: 1.4.0\npaths:\n  /v1/payments:submit:\n    post:\n      operationId: submitPayment\n      summary: Submit a payment for processing (idempotent; safe to retry on 429/502/503/504).\n      responses:\n        '202': { description: Accepted }\n        '429': { description: Too Many Requests (retry-safe) }\n        '503': { description: Service Unavailable (retry-safe) }\n",
+        "reason": "granted"
+      },
+      "expansion_denied": {
+        "allowed": false,
+        "raw_excerpt": null,
+        "reason": "classification_restricted"
+      },
+      "freshness": "fresh",
+      "object_type": "document_section",
+      "source_handles": [
+        "ctx://acme-billing/api/billing-api.yaml#submitPayment"
+      ],
+      "summary": "Idempotent payment-submit endpoint; safe to retry on 429/502/503/504.",
+      "title": "billing-api.yaml :: POST /v1/payments:submit"
+    },
+    "obj-billing-team": {
+      "assertions": [],
+      "classification": "internal",
+      "expansion_allowed": {
+        "allowed": true,
+        "compact_preview": "# Owners (synthetic demo)",
+        "lineage_summary": "raw evidence for ctx://acme-billing/org/OWNERS.md#billing-team read from demo-data/acme-billing/org/OWNERS.md under policy (purpose=read, classification=internal)",
+        "raw_excerpt": "# Owners (synthetic demo)\n\n`billing-service` is owned by **billing-team** (lead: alice@acme.example).\nEscalation path: billing-oncall.\n\n```\n/repo/billing/   @billing-team\n```\n",
+        "reason": "granted"
+      },
+      "expansion_denied": {
+        "allowed": false,
+        "raw_excerpt": null,
+        "reason": "classification_restricted"
+      },
+      "freshness": "fresh",
+      "object_type": "team",
+      "source_handles": [
+        "ctx://acme-billing/org/OWNERS.md#billing-team"
+      ],
+      "summary": "Owns billing-service; escalation via billing-oncall.",
+      "title": "billing-team"
+    },
+    "obj-inc-2026-04": {
+      "assertions": [],
+      "classification": "internal",
+      "expansion_allowed": {
+        "allowed": true,
+        "compact_preview": "# INC-2026-04: Billing retry storm",
+        "lineage_summary": "raw evidence for ctx://acme-billing/incidents/INC-2026-04-retry-storm.md#summary read from demo-data/acme-billing/incidents/INC-2026-04-retry-storm.md under policy (purpose=read, classification=internal)",
+        "raw_excerpt": "# INC-2026-04: Billing retry storm\n\n- Severity: SEV-2\n- Date: 2026-03-10\n- Service: billing-service\n\n## Summary\n\nA transient downstream outage was amplified by unbounded client retries, causing a self-inflicted\noverload. Root cause: no retry ceiling and no jitter on the payment-submit path.\n\n## Follow-up\n\nADR-014 was written to set an authoritative retry policy (max 5 retries, full-jitter exponential\nbackoff, retry-safe status codes only).\n",
+        "reason": "granted"
+      },
+      "expansion_denied": {
+        "allowed": false,
+        "raw_excerpt": null,
+        "reason": "classification_restricted"
+      },
+      "freshness": "dated",
+      "object_type": "incident",
+      "source_handles": [
+        "ctx://acme-billing/incidents/INC-2026-04-retry-storm.md#summary"
+      ],
+      "summary": "Unbounded retries amplified a transient outage; motivated ADR-014.",
+      "title": "INC-2026-04: Billing retry storm"
+    },
+    "obj-retry-py": {
+      "assertions": [
+        {
+          "confidence": 0.95,
+          "predicate": "max_retries",
+          "value": 5
+        }
+      ],
+      "classification": "internal",
+      "expansion_allowed": {
+        "allowed": true,
+        "compact_preview": "\"\"\"Acme billing \u2014 payment-submit retry client (synthetic demo code).",
+        "lineage_summary": "raw evidence for ctx://acme-billing/repo/billing/retry.py#L9-L13 read from demo-data/acme-billing/repo/billing/retry.py under policy (purpose=read, classification=internal)",
+        "raw_excerpt": "\"\"\"Acme billing \u2014 payment-submit retry client (synthetic demo code).\n\nImplements ADR-014: at most 5 retries, full-jitter exponential backoff, retry-safe codes only.\n\"\"\"\nfrom __future__ import annotations\n\n# Per ADR-014 (Billing retry policy). The runbook's \"3\" is stale; this is the implemented ceiling.\nMAX_RETRIES = 5\nBACKOFF_BASE_MS = 200\nBACKOFF_CAP_MS = 20_000\nRETRY_SAFE_STATUS = (429, 502, 503, 504)\n\n\ndef should_retry(status_code: int, attempt: int) -> bool:\n    \"\"\"True i",
+        "reason": "granted"
+      },
+      "expansion_denied": {
+        "allowed": false,
+        "raw_excerpt": null,
+        "reason": "classification_restricted"
+      },
+      "freshness": "fresh",
+      "object_type": "file",
+      "source_handles": [
+        "ctx://acme-billing/repo/billing/retry.py#L9-L13"
+      ],
+      "summary": "Implements ADR-014: MAX_RETRIES = 5, retry-safe codes 429/502/503/504.",
+      "title": "repo/billing/retry.py"
+    },
+    "obj-runbook": {
+      "assertions": [
+        {
+          "confidence": 0.4,
+          "predicate": "max_retries",
+          "value": 3
+        }
+      ],
+      "classification": "internal",
+      "expansion_allowed": {
+        "allowed": true,
+        "compact_preview": "# Billing runbook (STALE \u2014 superseded by ADR-014)",
+        "lineage_summary": "raw evidence for ctx://acme-billing/docs/billing-runbook.md#retry-policy read from demo-data/acme-billing/docs/billing-runbook.md under policy (purpose=read, classification=internal)",
+        "raw_excerpt": "# Billing runbook (STALE \u2014 superseded by ADR-014)\n\n> Last reviewed: 2025-11-02. This page predates ADR-014 and has **not** been updated.\n\n## Retry policy\n\nThe payment-submit client retries up to **3 times** on transient failures.\n\n<!--\nDEMO NOTE: this \"3\" is deliberately stale and WRONG. ADR-014 (2026-03-18) set the authoritative\nceiling to 5, and repo/billing/retry.py implements 5. Baltor must detect that this runbook\nCONTRADICTS the ADR + code, mark it stale, pick the ADR a",
+        "reason": "granted"
+      },
+      "expansion_denied": {
+        "allowed": false,
+        "raw_excerpt": null,
+        "reason": "classification_restricted"
+      },
+      "freshness": "stale",
+      "object_type": "document",
+      "source_handles": [
+        "ctx://acme-billing/docs/billing-runbook.md#retry-policy"
+      ],
+      "summary": "Pre-ADR-014 runbook that still says 3 retries. Stale and contradicts the ADR + code.",
+      "title": "docs/billing-runbook.md (stale)",
+      "versions": [
+        {
+          "applied": true,
+          "candidate_promoted": true,
+          "content_hash": "sha256:demo-runbook",
+          "context_object_id": "obj-runbook",
+          "context_version_id": "obj-runbook-v1",
+          "created_at": "2025-11-02T10:00:00Z",
+          "is_current": true,
+          "kind": "baltor.context-version.v1",
+          "observed_at": "2025-11-02T10:00:00Z",
+          "source_handle": "ctx://acme-billing/docs/billing-runbook.md#retry-policy",
+          "source_revision": "v1",
+          "status": "stale",
+          "valid_from": "2025-11-02T10:00:00Z",
+          "valid_to": null,
+          "value": 3
+        },
+        {
+          "applied": false,
+          "authority": "obj-adr-014",
+          "candidate_promoted": false,
+          "content_hash": "sha256:proposed-obj-runbook",
+          "context_object_id": "obj-runbook",
+          "context_version_id": "obj-runbook-v2",
+          "created_at": "1970-01-01T00:00:00Z",
+          "is_current": false,
+          "kind": "baltor.context-version.v1",
+          "lifecycle": "pending_review",
+          "observed_at": "1970-01-01T00:00:00Z",
+          "policy": {
+            "promotion_allowed": false,
+            "reason": "candidate pending human review (promotion boundary)"
+          },
+          "proposed_patch": {
+            "applied": false,
+            "authority": "obj-adr-014",
+            "from_value": 3,
+            "op": "update_claim",
+            "predicate": "max_retries",
+            "reason": "align obj-runbook with authoritative obj-adr-014 (=5); requires human/policy approval before apply",
+            "subject_id": "obj-runbook",
+            "to_value": 5
+          },
+          "receipt_ref": "rcpt-7d1e834e95c6",
+          "review_request_id": "rr-4f8b9ada7bd49159",
+          "source_handle": "ctx://acme-billing/docs/billing-runbook.md#retry-policy",
+          "source_revision": "v2-proposed",
+          "status": "proposed",
+          "value": 5
+        }
+      ]
+    },
+    "obj-test-retry": {
+      "assertions": [],
+      "classification": "internal",
+      "expansion_allowed": {
+        "allowed": true,
+        "compact_preview": "\"\"\"Test pinning the ADR-014 retry ceiling (synthetic demo).\"\"\"",
+        "lineage_summary": "raw evidence for ctx://acme-billing/repo/billing/test_retry.py#test_ceiling_is_five read from demo-data/acme-billing/repo/billing/test_retry.py under policy (purpose=read, classification=internal)",
+        "raw_excerpt": "\"\"\"Test pinning the ADR-014 retry ceiling (synthetic demo).\"\"\"\nfrom billing.retry import MAX_RETRIES, should_retry\n\n\ndef test_ceiling_is_five():\n    assert MAX_RETRIES == 5  # ADR-014 \u2014 the authoritative ceiling\n\n\ndef test_stops_at_ceiling():\n    assert should_retry(503, attempt=4) is True\n    assert should_retry(503, attempt=5) is False\n\n\ndef test_non_retry_safe_codes_never_retry():\n    assert should_retry(400, attempt=0) is False\n",
+        "reason": "granted"
+      },
+      "expansion_denied": {
+        "allowed": false,
+        "raw_excerpt": null,
+        "reason": "classification_restricted"
+      },
+      "freshness": "fresh",
+      "object_type": "test_result",
+      "source_handles": [
+        "ctx://acme-billing/repo/billing/test_retry.py#test_ceiling_is_five"
+      ],
+      "summary": "Pins MAX_RETRIES == 5 and the stop-at-ceiling behavior.",
+      "title": "repo/billing/test_retry.py"
+    }
+  },
+  "receipt": {
+    "answer_value": 5,
+    "compression_run_id": "comprun-19ca8aebaee23f85",
+    "created_at": "1970-01-01T00:00:00Z",
+    "deterministic": true,
+    "interrogation_run_id": "gir-f7be23f5e3972273",
+    "kind": "baltor.context-receipt.v1",
+    "lineage_manifest_ref": "lin-7d1e834e95c6",
+    "model_route": {
+      "live_attempted": false,
+      "live_model_phrasing": false,
+      "note": "model is a SEAM \u2014 facts come from the graph; offline default never calls a model",
+      "selected_adapter": "deterministic-mock",
+      "trust_boundary": "local"
+    },
+    "pack_id": "ctxpack-c204effa40e6",
+    "question": "What is the retry ceiling / how many retries are allowed?",
+    "receipt_id": "rcpt-7d1e834e95c6",
+    "source_handles": [
+      "ctx://acme-billing/api/billing-api.yaml#submitPayment",
+      "ctx://acme-billing/decisions/ADR-014-billing-retry-policy.md#decision",
+      "ctx://acme-billing/docs/billing-runbook.md#retry-policy",
+      "ctx://acme-billing/incidents/INC-2026-04-retry-storm.md#summary",
+      "ctx://acme-billing/repo/billing/retry.py#L9-L13",
+      "ctx://acme-billing/repo/billing/test_retry.py#test_ceiling_is_five",
+      "ctx://acme-billing/tickets/BILL-782.json#acceptance_criteria"
+    ]
+  },
+  "seam": false,
+  "stages": [
+    {
+      "headline": "ingested 8 context objects from the Acme Billing (synthetic, offline) corpus",
+      "id": 0,
+      "metrics": {
+        "objects": 8,
+        "source_handles": 8
+      },
+      "source_handles": [
+        "ctx://acme-billing/api/billing-api.yaml#submitPayment",
+        "ctx://acme-billing/decisions/ADR-014-billing-retry-policy.md#decision",
+        "ctx://acme-billing/docs/billing-runbook.md#retry-policy",
+        "ctx://acme-billing/incidents/INC-2026-04-retry-storm.md#summary",
+        "ctx://acme-billing/org/OWNERS.md#billing-team"
+      ],
+      "status": "ok",
+      "title": "Source Systems"
+    },
+    {
+      "headline": "built the graph; detected a contradiction (authority obj-adr-014=5 vs obj-retry-py=5, obj-runbook=3)",
+      "id": 1,
+      "metrics": {
+        "authority": "obj-adr-014",
+        "contradictions": 1,
+        "edges": 9
+      },
+      "source_handles": [
+        "ctx://acme-billing/decisions/ADR-014-billing-retry-policy.md#decision",
+        "ctx://acme-billing/docs/billing-runbook.md#retry-policy",
+        "ctx://acme-billing/repo/billing/retry.py#L9-L13"
+      ],
+      "status": "flag",
+      "title": "Reconciliation"
+    },
+    {
+      "headline": "swarm-verified the stale source \u2192 routed 1 human review, proposed (not applied) the fix",
+      "id": 2,
+      "metrics": {
+        "applied": false,
+        "patch": "3\u21925",
+        "reviews": 1,
+        "risk": "high"
+      },
+      "source_handles": [
+        "obj-runbook"
+      ],
+      "status": "flag",
+      "title": "Anti-Fragility"
+    },
+    {
+      "headline": "interrogated the graph \u2192 answer 5 (authority obj-adr-014), source-cited",
+      "id": 3,
+      "metrics": {
+        "answer": 5,
+        "swarm_recommended": true,
+        "uncertainty": "medium"
+      },
+      "source_handles": [
+        "ctx://acme-billing/decisions/ADR-014-billing-retry-policy.md#decision",
+        "ctx://acme-billing/docs/billing-runbook.md#retry-policy",
+        "ctx://acme-billing/repo/billing/retry.py#L9-L13"
+      ],
+      "status": "ok",
+      "title": "Enhancement"
+    },
+    {
+      "headline": "compressed the pack 219\u219261 tokens \u2014 every retained item keeps its source handle",
+      "id": 4,
+      "metrics": {
+        "dropped": 0,
+        "keyphrases": [
+          "retry",
+          "adr",
+          "billing",
+          "014",
+          "runbook"
+        ],
+        "retained": 7,
+        "tokens_after": 61,
+        "tokens_before": 219
+      },
+      "source_handles": [
+        "ctx://acme-billing/api/billing-api.yaml#submitPayment",
+        "ctx://acme-billing/decisions/ADR-014-billing-retry-policy.md#decision",
+        "ctx://acme-billing/docs/billing-runbook.md#retry-policy",
+        "ctx://acme-billing/incidents/INC-2026-04-retry-storm.md#summary",
+        "ctx://acme-billing/repo/billing/retry.py#L9-L13",
+        "ctx://acme-billing/repo/billing/test_retry.py#test_ceiling_is_five"
+      ],
+      "status": "ok",
+      "title": "Optimization"
+    },
+    {
+      "headline": "issued a portable receipt with full lineage (manifest lin-7d1e834e95c6)",
+      "id": 5,
+      "metrics": {
+        "lineage_manifest_ref": "lin-7d1e834e95c6",
+        "model_route": "deterministic-mock",
+        "pack_id": "ctxpack-c204effa40e6",
+        "receipt_id": "rcpt-7d1e834e95c6"
+      },
+      "source_handles": [
+        "ctx://acme-billing/api/billing-api.yaml#submitPayment",
+        "ctx://acme-billing/decisions/ADR-014-billing-retry-policy.md#decision",
+        "ctx://acme-billing/docs/billing-runbook.md#retry-policy",
+        "ctx://acme-billing/incidents/INC-2026-04-retry-storm.md#summary",
+        "ctx://acme-billing/repo/billing/retry.py#L9-L13",
+        "ctx://acme-billing/repo/billing/test_retry.py#test_ceiling_is_five"
+      ],
+      "status": "ok",
+      "title": "Consumption"
+    },
+    {
+      "headline": "measured lift: governed pack 0.76925 vs no-context 0.1923; raw dump 0.08695 (underperforms); harness 1.0",
+      "id": 6,
+      "metrics": {
+        "best": "context_pack_with_harness",
+        "condition_means": {
+          "context_pack": 0.76925,
+          "context_pack_with_harness": 1.0,
+          "context_pack_with_swarm_verified": 0.9737,
+          "no_context": 0.1923,
+          "raw_context": 0.08695
+        },
+        "raw_underperforms_pack": true
+      },
+      "source_handles": [],
+      "status": "ok",
+      "title": "Continuous Verification rail"
+    }
+  ]
+}

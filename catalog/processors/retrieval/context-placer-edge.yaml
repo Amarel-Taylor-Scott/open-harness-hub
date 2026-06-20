@@ -1,0 +1,52 @@
+id: processor/context-placer-edge
+type: processor
+version: 0.1.0
+name: Edge context placement
+description: 'Place the most-relevant evidence at the edges (first AND last) in structured, source-tagged,
+  delimited blocks, with task instructions last — directly mitigates the ''lost in the middle'' attention
+  drop and enables per-claim citation. Deterministic.
+
+
+  Retrieval/prompt taxonomy step R6 (see docs/concepts/retrieval-and-prompt-taxonomy.md). One swappable
+  method-component for the governed-model-call recipe; lift is measured at the pipeline level, not on
+  this component.'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+- ai
+capability:
+- format_conversion
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- retrieval-taxonomy
+- step-r6
+- rag
+- freezable
+created: '2026-05-29'
+updated: '2026-05-29'
+process_kind: assemble.context_placement
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: chunks
+  type: object
+- name: query
+  type: object
+- name: instructions
+  type: object
+outputs:
+- name: assembled_prompt
+  type: object
+side_effects: none
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.retrieval.context_placer_edge.run
+  language: python

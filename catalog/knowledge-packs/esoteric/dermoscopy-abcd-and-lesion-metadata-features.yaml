@@ -1,0 +1,56 @@
+id: knowledge-pack/dermoscopy-abcd-and-lesion-metadata-features
+type: knowledge-pack
+version: 0.1.0
+name: Dermoscopy Abcd And Lesion Metadata Features
+description: 'Capability-lift knowledge pack for an esoteric area LLMs handle poorly.
+  Gap: malignancy needs dermoscopic ABCD/7-point + patient metadata + ugly-duckling
+  context Grounded in ISIC Archive images+metadata (CC) + ABCD/7-point checklists
+  (clinical lit) via classifier retrieval. Lift: top fused image + tabular + within-patient
+  under partial-AUC; feature+metadata schema produced the lift'
+authors:
+- name: Open Harness Hub capability-gap factory
+license: CC-BY-4.0
+industry:
+- cross_industry
+capability:
+- retrieval
+- verification
+modality:
+- structured
+- text
+lifecycle: experimental
+trust_boundary: external
+freshness: volatile
+tags:
+- capability-lift
+- esoteric
+- knowledge-pack
+- classifier
+- ingestion-target
+created: '2026-05-28'
+updated: '2026-05-28'
+attribution:
+  source_url: ISIC Archive images+metadata (CC) + ABCD/7-point checklists (clinical
+    lit)
+  source_kind: other
+  author: ISIC Archive images+metadata (CC) + ABCD/7-point checklists (clinical lit)
+  license: see-source
+content_types:
+- fact_table
+- reference_doc
+retrieval:
+- classifier
+files:
+- path: data/esoteric-packs/dermoscopy-abcd-and-lesion-metadata-features.jsonl
+  format: jsonl
+  content_type: fact_table
+  schema: capability-gap seed (real facts where stable; else ingestion contract)
+indexing:
+  bm25: true
+  dense:
+    model: all-MiniLM-L6-v2
+provenance:
+  sources:
+  - ISIC Archive images+metadata (CC) + ABCD/7-point checklists (clinical lit)
+  collected_through: '2026-05-28'
+  collected_by: capability-gap factory

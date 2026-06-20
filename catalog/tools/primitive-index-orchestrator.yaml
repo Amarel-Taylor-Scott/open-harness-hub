@@ -1,0 +1,67 @@
+id: "tool/primitive-index-orchestrator"
+type: tool
+version: "0.1.0"
+name: "Primitive index orchestrator"
+description: "Plans and dispatches keyword, vector, graph, facet, quality, freshness, and cost indexing jobs for large primitive batches."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "planning", "tool_use"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+tags: ["primitive-database", "indexing", "embeddings", "vector-search", "backend"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    primitive_batch:
+      type: array
+      items:
+        type: object
+    index_targets:
+      type: array
+      items:
+        type: string
+    rebuild_mode:
+      type: string
+      enum: ["incremental", "full", "backfill"]
+      default: "incremental"
+    tenant:
+      type: string
+  required: ["primitive_batch", "index_targets"]
+returns:
+  type: object
+  properties:
+    job_id:
+      type: string
+    planned_jobs:
+      type: array
+      items:
+        type: object
+    checksums:
+      type: object
+    warnings:
+      type: array
+      items:
+        type: string
+side_effects: "write"
+examples:
+  - input:
+      primitive_batch: []
+      index_targets: ["keyword", "vector", "graph", "facet"]
+      rebuild_mode: "incremental"
+    output:
+      job_id: "index-job-example"
+      planned_jobs: []
+      checksums: {}
+      warnings: []
+implementations:
+  - kind: "callable"
+    path: "tools.primitive_index_orchestrator.plan"
+  - kind: "mcp"
+    path: "mcp/index.plan_primitive_batch"

@@ -1,0 +1,2355 @@
+{
+  "version": "1.0",
+  "note": "Honest maturity of every Baltor section. critical_path_required=true MUST be m10_complete with a registered passing proof. Non-reference sections may be candidate/experimental with a local stub behind a port + a reason. Enforced by scripts/check_section_maturity_matrix.py; the runtime correctness invariant (ingestion\u2192consumption\u2192ContextResponse) is asserted end-to-end by scripts/check_baltor_full_stack_perfect.py.",
+  "status_enum": [
+    "m0_absent",
+    "m1_folder",
+    "m2_contract",
+    "m3_port",
+    "m4_impl",
+    "m5_integrated",
+    "m6_proof",
+    "m7_api",
+    "m8_ui",
+    "m9_antibypass",
+    "m10_complete",
+    "candidate",
+    "experimental",
+    "deprecated"
+  ],
+  "sections": [
+    {
+      "section_id": "source_adapters",
+      "category": "ingestion",
+      "owner_folder": "scripts/ingest",
+      "owner_module": "scripts/ingest/sanctions_feed_live.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "FetchRequest"
+      ],
+      "output_contracts": [
+        "source_record"
+      ],
+      "ports": [
+        "SourceAdapterPort"
+      ],
+      "adapters": [
+        "sanctions_feed_live",
+        "ecfr_feed",
+        "federal_register_feed",
+        "cfpb_fixture"
+      ],
+      "registries": [
+        "external_capability_catalog.json#scraping_manager"
+      ],
+      "proof_scripts": [
+        "scripts/ingest/sanctions_feed_live.py",
+        "scripts/ingest/ecfr_feed.py",
+        "scripts/ingest/federal_register_feed.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/backend/architecture-overview.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "ingestion",
+      "category": "ingestion",
+      "owner_folder": "scripts/ingest",
+      "owner_module": "scripts/ingest/tenant_ingest.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "source_record"
+      ],
+      "output_contracts": [
+        "normalized_object"
+      ],
+      "ports": [
+        "SourceAdapterPort"
+      ],
+      "adapters": [
+        "tenant_ingest",
+        "decompose_structured"
+      ],
+      "registries": [
+        "contract_registry.json"
+      ],
+      "proof_scripts": [
+        "scripts/ingest/tenant_ingest.py",
+        "scripts/demo_cfpb_context_pack.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/architecture/consumption-runtime.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "multi_source_ingestion",
+      "category": "ingestion",
+      "owner_folder": "scripts/ingest",
+      "owner_module": "scripts/ingest/source_adapters.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "RawSource"
+      ],
+      "output_contracts": [
+        "source_record",
+        "source_field",
+        "atomic_fact",
+        "narrative_allegation"
+      ],
+      "ports": [
+        "SourceAdapterPort"
+      ],
+      "adapters": [
+        "ApiStructuredAdapter",
+        "CsvAdapter",
+        "JsonAdapter",
+        "UnavailableParserAdapter (pdf/html candidate)"
+      ],
+      "registries": [
+        "contract_registry.json#source_types",
+        "external_capability_catalog.json#parser_manager"
+      ],
+      "proof_scripts": [
+        "scripts/check_multi_source_ingestion.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/ingestion/multi-source-ingestion.md"
+      ],
+      "known_gaps": [
+        "pdf/html parsers are cataloged candidates \u2192 explicit non-consumable (raw stored), never faked; database/email/folder source types sequenced next"
+      ],
+      "critical_path_required": false
+    },
+    {
+      "section_id": "parser_provider",
+      "category": "ingestion",
+      "owner_folder": "scripts/ingest",
+      "owner_module": "scripts/ingest/parser_provider.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "RawDocument"
+      ],
+      "output_contracts": [
+        "DocumentTree"
+      ],
+      "ports": [
+        "ParserProviderPort"
+      ],
+      "adapters": [
+        "parser.stub@v1 (canned)"
+      ],
+      "registries": [
+        "external_capability_catalog.json#parser_manager"
+      ],
+      "proof_scripts": [
+        "scripts/ingest/parser_provider.py",
+        "scripts/parser_router.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/backend/document-decomposition.md"
+      ],
+      "known_gaps": [
+        "Docling/Unstructured are candidate primaries (cataloged); stub wired"
+      ],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "source_artifact_graph",
+      "category": "decomposition",
+      "owner_folder": "scripts/pipeline_runtime",
+      "owner_module": "scripts/pipeline_runtime/source_graph.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "source_record"
+      ],
+      "output_contracts": [
+        "SourceArtifact"
+      ],
+      "ports": [],
+      "adapters": [
+        "build_cfpb_source_graph"
+      ],
+      "registries": [
+        "contract_registry.json"
+      ],
+      "proof_scripts": [
+        "scripts/check_cfpb_source_graph_diff.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/section-cards/source-artifact-graph.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "context_object_decomposition",
+      "category": "decomposition",
+      "owner_folder": "scripts/ingest",
+      "owner_module": "scripts/ingest/decompose_to_context_objects.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "source_record"
+      ],
+      "output_contracts": [
+        "context_object"
+      ],
+      "ports": [
+        "DecomposerPort"
+      ],
+      "adapters": [
+        "decompose_to_context_objects",
+        "context_graph"
+      ],
+      "registries": [
+        "contract_registry.json"
+      ],
+      "proof_scripts": [
+        "scripts/ingest/decompose_to_context_objects.py",
+        "scripts/context_graph.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/backend/document-decomposition.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "structured_atomic_decomposition",
+      "category": "decomposition",
+      "owner_folder": "scripts/ingest",
+      "owner_module": "scripts/ingest/decompose_structured.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "source_field"
+      ],
+      "output_contracts": [
+        "atomic_fact",
+        "narrative_allegation"
+      ],
+      "ports": [
+        "DecomposerPort"
+      ],
+      "adapters": [
+        "decompose_cfpb_complaint"
+      ],
+      "registries": [
+        "contract_registry.json#atomic_fact"
+      ],
+      "proof_scripts": [
+        "scripts/ingest/decompose_structured.py",
+        "scripts/check_cfpb_multi_grain_artifacts.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/decomposition/cfpb-multi-grain-artifacts.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "unstructured_document_decomposition",
+      "category": "decomposition",
+      "owner_folder": "scripts/pipeline_runtime",
+      "owner_module": "scripts/pipeline_runtime/processors.py",
+      "status": "candidate",
+      "input_contracts": [
+        "RawDocument"
+      ],
+      "output_contracts": [
+        "DocumentTree"
+      ],
+      "ports": [
+        "ParserProviderPort"
+      ],
+      "adapters": [
+        "unstructured_doc_tree@v1 (canned)",
+        "unstructured_pdf_docling@v0 (experimental)"
+      ],
+      "registries": [
+        "external_capability_catalog.json#parser_manager"
+      ],
+      "proof_scripts": [
+        "scripts/check_pipeline_unstructured.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/backend/document-decomposition.md"
+      ],
+      "known_gaps": [
+        "real Docling/PyMuPDF parser is a cataloged candidate; CFPB correctness invariant is structured, not unstructured"
+      ],
+      "critical_path_required": false
+    },
+    {
+      "section_id": "artifact_ledger",
+      "category": "storage",
+      "owner_folder": "scripts/artifact_graph",
+      "owner_module": "scripts/artifact_graph/artifact_ledger.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "ArtifactEnvelope"
+      ],
+      "output_contracts": [
+        "artifact_row"
+      ],
+      "ports": [
+        "ArtifactStorePort"
+      ],
+      "adapters": [
+        "ArtifactGraphLedger",
+        "ArtifactLedger"
+      ],
+      "registries": [
+        "runtime_ownership.json#ArtifactLedger"
+      ],
+      "proof_scripts": [
+        "scripts/check_cfpb_artifact_ledger.py",
+        "scripts/check_artifact_type_registry.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/architecture/cfpb-artifact-graph-demo.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "object_store",
+      "category": "storage",
+      "owner_folder": "src/baltor/adapters/object_store",
+      "owner_module": "src/baltor/adapters/object_store/local_object_store.py",
+      "status": "m6_proof",
+      "input_contracts": [
+        "blob"
+      ],
+      "output_contracts": [
+        "payload_ref"
+      ],
+      "ports": [
+        "ObjectStorePort"
+      ],
+      "adapters": [
+        "LocalContentAddressedObjectStore",
+        "in_memory_object_store"
+      ],
+      "registries": [
+        "external_capability_catalog.json"
+      ],
+      "proof_scripts": [
+        "scripts/check_object_store_payload_ref.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/artifact-graph/object-store.md"
+      ],
+      "known_gaps": [
+        "content-addressed payload_ref + content-hash verify + tenant-safe refs proven via LocalContentAddressedObjectStore; wiring large artifacts into the live ledger write-path is the next increment"
+      ],
+      "critical_path_required": false
+    },
+    {
+      "section_id": "vectorization",
+      "category": "retrieval",
+      "owner_folder": "scripts/artifact_graph",
+      "owner_module": "scripts/artifact_graph/vector_store.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "atomic_fact"
+      ],
+      "output_contracts": [
+        "object_embedding"
+      ],
+      "ports": [
+        "VectorProviderPort"
+      ],
+      "adapters": [
+        "DeterministicLocalVectorProvider"
+      ],
+      "registries": [
+        "external_capability_catalog.json#hybrid_retrieval"
+      ],
+      "proof_scripts": [
+        "scripts/check_cfpb_vectorization.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/section-cards/vectorization.md"
+      ],
+      "known_gaps": [
+        "Qdrant/pgvector are cataloged candidates; deterministic local provider wired"
+      ],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "graph_builder",
+      "category": "graph",
+      "owner_folder": "scripts/artifact_graph",
+      "owner_module": "scripts/artifact_graph/graph_builder.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "ArtifactEnvelope"
+      ],
+      "output_contracts": [
+        "artifact_edge"
+      ],
+      "ports": [
+        "GraphBuilderPort"
+      ],
+      "adapters": [
+        "GraphBuilder"
+      ],
+      "registries": [
+        "runtime_ownership.json#GraphBuilder"
+      ],
+      "proof_scripts": [
+        "scripts/check_cfpb_deterministic_graph.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/section-cards/graph-builder.md"
+      ],
+      "known_gaps": [
+        "HelixDB/FalkorDB graph substrate cataloged as candidate"
+      ],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "conflict_detection",
+      "category": "reconciliation",
+      "owner_folder": "scripts/artifact_graph",
+      "owner_module": "scripts/artifact_graph/conflict_detector.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "atomic_fact"
+      ],
+      "output_contracts": [
+        "conflict"
+      ],
+      "ports": [
+        "ConflictDetectorPort"
+      ],
+      "adapters": [
+        "ConflictDetector"
+      ],
+      "registries": [
+        "runtime_ownership.json#ConflictDetector"
+      ],
+      "proof_scripts": [
+        "scripts/check_cfpb_conflict_detection.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/section-cards/conflict-detection.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "reconciliation",
+      "category": "reconciliation",
+      "owner_folder": "scripts/artifact_graph",
+      "owner_module": "scripts/artifact_graph/reconciliation.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "conflict"
+      ],
+      "output_contracts": [
+        "reconciliation"
+      ],
+      "ports": [
+        "ReconcilerPort"
+      ],
+      "adapters": [
+        "Reconciler"
+      ],
+      "registries": [
+        "runtime_ownership.json#Reconciler"
+      ],
+      "proof_scripts": [
+        "scripts/check_cfpb_reconciliation.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/section-cards/reconciliation.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "verification_gate",
+      "category": "governance",
+      "owner_folder": "scripts/runtime",
+      "owner_module": "scripts/runtime/verification_gate.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "ArtifactEnvelope"
+      ],
+      "output_contracts": [
+        "verification_receipt"
+      ],
+      "ports": [
+        "VerificationGatePort"
+      ],
+      "adapters": [
+        "VerificationGate"
+      ],
+      "registries": [
+        "runtime_ownership.json#VerificationGate",
+        "contract_registry.json#verification_receipt"
+      ],
+      "proof_scripts": [
+        "scripts/check_verification_gate.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/architecture/verification-gate.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "fragile_fact_watchtower",
+      "category": "freshness",
+      "owner_folder": "src/baltor/facts",
+      "owner_module": "src/baltor/facts/refresh_planner.py",
+      "status": "m6_proof",
+      "input_contracts": [
+        "FragilityMetadata",
+        "WatchPolicy",
+        "VerificationTask"
+      ],
+      "output_contracts": [
+        "VerificationResult"
+      ],
+      "ports": [
+        "FragileFactProviderPort"
+      ],
+      "adapters": [
+        "classifier",
+        "refresh_planner",
+        "FactAssertion",
+        "CanonicalFact",
+        "FragilityMetadata",
+        "WatchPolicy",
+        "VerificationTask",
+        "VerificationResult"
+      ],
+      "registries": [
+        "contract_registry.json"
+      ],
+      "proof_scripts": [
+        "scripts/check_watchtower_minimum_freshness.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/runtime/fragile-fact-watchtower.md"
+      ],
+      "known_gaps": [
+        "minimum slice built (6 contracts + deterministic classifier + FactRefreshPlanner feeding the C40 gate real freshness; stale->durable VerificationTask; tenant_private cannot update global_public); the live external-source FragileFactProviderPort refresh adapter remains candidate (stubbed evidence only)"
+      ],
+      "critical_path_required": false
+    },
+    {
+      "section_id": "enhancement",
+      "category": "enhancement",
+      "owner_folder": "scripts",
+      "owner_module": "scripts/context_compress.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "context_object"
+      ],
+      "output_contracts": [
+        "context_pack"
+      ],
+      "ports": [],
+      "adapters": [
+        "context_compress",
+        "demo_full_app"
+      ],
+      "registries": [
+        "contract_registry.json#context_pack"
+      ],
+      "proof_scripts": [
+        "scripts/context_compress.py",
+        "scripts/demo_full_app.py",
+        "scripts/baltor_acceptance.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/section-cards/enhancement.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "optimization_suite",
+      "category": "optimization",
+      "owner_folder": "scripts/runtime",
+      "owner_module": "scripts/runtime/optimization.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "context_pack"
+      ],
+      "output_contracts": [
+        "optimization_receipt"
+      ],
+      "ports": [
+        "OptimizerProviderPort",
+        "CompressionProviderPort"
+      ],
+      "adapters": [
+        "DedupeOptimizer",
+        "ExcludeHeldOutOptimizer",
+        "AuthorityRankOptimizer",
+        "CompressionOptimizer"
+      ],
+      "registries": [
+        "runtime_ownership.json#OptimizationHarness",
+        "contract_registry.json#optimization_receipt"
+      ],
+      "proof_scripts": [
+        "scripts/check_optimization_harness.py",
+        "scripts/check_optimization_suite.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/architecture/optimization-harness.md"
+      ],
+      "known_gaps": [
+        "DSPy/Optuna/promptfoo/Ragas/MLflow/LLMLingua cataloged as candidate provider slots"
+      ],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "consumption_readiness",
+      "category": "consumption",
+      "owner_folder": "scripts/runtime",
+      "owner_module": "scripts/runtime/optimization.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "context_pack",
+        "verification_receipt",
+        "optimization_receipt"
+      ],
+      "output_contracts": [
+        "consumption_readiness_report"
+      ],
+      "ports": [],
+      "adapters": [
+        "ConsumptionReadinessGate"
+      ],
+      "registries": [
+        "runtime_ownership.json#ConsumptionReadinessGate",
+        "contract_registry.json#consumption_readiness_report"
+      ],
+      "proof_scripts": [
+        "scripts/check_optimization_suite.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/architecture/optimization-harness.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "consumption_service",
+      "category": "consumption",
+      "owner_folder": "scripts/runtime",
+      "owner_module": "scripts/runtime/consumption.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "ConsumptionRequest"
+      ],
+      "output_contracts": [
+        "context_response",
+        "consumption_receipt"
+      ],
+      "ports": [
+        "ConsumptionServicePort"
+      ],
+      "adapters": [
+        "ConsumptionService"
+      ],
+      "registries": [
+        "runtime_ownership.json#ConsumptionService",
+        "contract_registry.json#context_response"
+      ],
+      "proof_scripts": [
+        "scripts/check_consumption_service.py",
+        "scripts/check_cfpb_to_consumption_end_to_end.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/architecture/consumption-runtime.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "context_response",
+      "category": "consumption",
+      "owner_folder": "scripts/runtime",
+      "owner_module": "scripts/runtime/consumption.py",
+      "status": "m10_complete",
+      "input_contracts": [],
+      "output_contracts": [
+        "ContextResponse.v1"
+      ],
+      "ports": [],
+      "adapters": [
+        "ContextResponse"
+      ],
+      "registries": [
+        "contract_registry.json#context_response"
+      ],
+      "proof_scripts": [
+        "scripts/check_cfpb_to_consumption_end_to_end.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/architecture/consumption-runtime.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "api_runtime",
+      "category": "surface",
+      "owner_folder": "scripts",
+      "owner_module": "scripts/api_context_handler.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "ConsumptionRequest"
+      ],
+      "output_contracts": [
+        "ContextResponse.v1"
+      ],
+      "ports": [],
+      "adapters": [
+        "api_context_handler",
+        "baltor_admin_demo_server"
+      ],
+      "registries": [
+        "contract_registry.json#api_routes"
+      ],
+      "proof_scripts": [
+        "scripts/check_consumption_api.py",
+        "scripts/check_context_response_retrieval_api.py",
+        "scripts/check_runtime_sections_api.py",
+        "scripts/check_no_api_consumption_bypass.py"
+      ],
+      "api_routes": [
+        "POST /api/context/serve",
+        "GET /api/context/responses/<id>",
+        "GET /api/context/receipts/<id>",
+        "GET /api/runtime/sections",
+        "GET /api/runtime/consumption"
+      ],
+      "ui_pages": [],
+      "docs": [
+        "docs/api/context-api.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "ui_pages",
+      "category": "surface",
+      "owner_folder": "web/baltor",
+      "owner_module": "web/baltor/app.js",
+      "status": "m10_complete",
+      "input_contracts": [],
+      "output_contracts": [],
+      "ports": [],
+      "adapters": [
+        "consume.html",
+        "dashboard.html",
+        "demo-console.html",
+        "reviews.html",
+        "dev-dashboard.html"
+      ],
+      "registries": [],
+      "proof_scripts": [
+        "scripts/check_consumption_ui.py",
+        "scripts/check_demo_console_links.py",
+        "scripts/check_architecture_dashboard_projection_only.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [
+        "/consume",
+        "/dashboard",
+        "/demo-console",
+        "/reviews",
+        "/dev"
+      ],
+      "docs": [
+        "docs/ui/consume-page.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "durable_queue",
+      "category": "runtime",
+      "owner_folder": "scripts",
+      "owner_module": "scripts/durable_store.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "CommandEnvelope"
+      ],
+      "output_contracts": [
+        "job",
+        "event"
+      ],
+      "ports": [
+        "QueuePort"
+      ],
+      "adapters": [
+        "DurableStore"
+      ],
+      "registries": [
+        "runtime_ownership.json#DurableStore"
+      ],
+      "proof_scripts": [
+        "scripts/durable_store.py",
+        "scripts/check_durable_restart_survival.py",
+        "scripts/check_durable_http_enqueue_drain.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/architecture/durable-runtime-plan.md"
+      ],
+      "known_gaps": [
+        "DBOS/Temporal cataloged as candidate durable engines"
+      ],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "workers",
+      "category": "runtime",
+      "owner_folder": "scripts",
+      "owner_module": "scripts/flywheel_worker.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "CommandEnvelope"
+      ],
+      "output_contracts": [
+        "ProcessorResult"
+      ],
+      "ports": [],
+      "adapters": [
+        "flywheel_worker"
+      ],
+      "registries": [
+        "runtime_ownership.json#ProcessorHarness"
+      ],
+      "proof_scripts": [
+        "scripts/check_durable_worker_parallel.py",
+        "scripts/check_worker_command_envelope.py",
+        "scripts/check_invalid_command_envelope_safe_failure.py",
+        "scripts/check_consumption_worker_command.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/workers/durable-worker-runtime.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "event_bus",
+      "category": "runtime",
+      "owner_folder": "scripts",
+      "owner_module": "scripts/context_events.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "EventEnvelope"
+      ],
+      "output_contracts": [
+        "event"
+      ],
+      "ports": [
+        "EventBusPort"
+      ],
+      "adapters": [
+        "EventBus"
+      ],
+      "registries": [
+        "runtime_ownership.json#EventBus"
+      ],
+      "proof_scripts": [
+        "scripts/context_events.py",
+        "scripts/check_event_integration.py",
+        "scripts/check_event_envelope.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/section-cards/event-bus.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "llm_gateway",
+      "category": "model",
+      "owner_folder": "scripts/llm_gateway",
+      "owner_module": "scripts/llm_gateway/router.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "LlmRequest"
+      ],
+      "output_contracts": [
+        "LlmResponse"
+      ],
+      "ports": [
+        "LLMGatewayPort"
+      ],
+      "adapters": [
+        "stub.local@v1",
+        "openai.responses@v1",
+        "openai_compatible.http@v1"
+      ],
+      "registries": [
+        "runtime_ownership.json#LLMGateway",
+        "external_capability_catalog.json#api_manager"
+      ],
+      "proof_scripts": [
+        "scripts/check_llm_gateway_stub.py",
+        "scripts/check_llm_router_policy.py",
+        "scripts/check_llm_secret_hygiene.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/architecture/llm-gateway.md"
+      ],
+      "known_gaps": [
+        "network providers gated by BALTOR_LLM_ALLOW_NETWORK (off); stub default"
+      ],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "provider_catalog",
+      "category": "governance",
+      "owner_folder": "src/baltor/runtime/registry",
+      "owner_module": "src/baltor/runtime/registry/capability_registry.py",
+      "status": "m10_complete",
+      "input_contracts": [],
+      "output_contracts": [],
+      "ports": [],
+      "adapters": [
+        "CapabilityRegistry"
+      ],
+      "registries": [
+        "external_capability_catalog.json",
+        "repo_replacement_matrix.json",
+        "repo_health_policy.json"
+      ],
+      "proof_scripts": [
+        "scripts/check_external_capability_catalog.py",
+        "scripts/check_provider_replacement_matrix.py",
+        "scripts/check_flagged_tools_not_reintroduced.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/architecture/external-capability-catalog.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "security_tenant_isolation",
+      "category": "security",
+      "owner_folder": "scripts/security",
+      "owner_module": "scripts/security/tenant_catalog.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "TenantPolicy"
+      ],
+      "output_contracts": [
+        "security_metadata"
+      ],
+      "ports": [
+        "TenantStoreResolverPort"
+      ],
+      "adapters": [
+        "TenantStoreResolver"
+      ],
+      "registries": [
+        "runtime_ownership.json#TenantStoreResolver"
+      ],
+      "proof_scripts": [
+        "scripts/check_tenant_isolation_policy.py",
+        "scripts/check_tenant_store_resolver.py",
+        "scripts/check_pipeline_tenant_isolation.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/security/tenant-isolation-and-encryption.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "encryption_metadata",
+      "category": "security",
+      "owner_folder": "scripts/security",
+      "owner_module": "scripts/security/tenant_catalog.py",
+      "status": "m10_complete",
+      "input_contracts": [],
+      "output_contracts": [
+        "security_metadata"
+      ],
+      "ports": [],
+      "adapters": [
+        "security_metadata",
+        "rotate_key"
+      ],
+      "registries": [],
+      "proof_scripts": [
+        "scripts/check_artifact_security_metadata.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/security/tenant-isolation-and-encryption.md"
+      ],
+      "known_gaps": [
+        "encryption-at-rest itself is an OWNER-DECISION; metadata + KMS-rotation seam proven"
+      ],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "observability",
+      "category": "observability",
+      "owner_folder": "scripts/runtime",
+      "owner_module": "scripts/runtime/logger.py",
+      "status": "m10_complete",
+      "input_contracts": [],
+      "output_contracts": [
+        "log_event",
+        "otel_span"
+      ],
+      "ports": [
+        "LoggerPort"
+      ],
+      "adapters": [
+        "RuntimeLogger",
+        "otel span seam"
+      ],
+      "registries": [
+        "runtime_ownership.json#RuntimeLogger"
+      ],
+      "proof_scripts": [
+        "scripts/check_structured_runtime_logging.py",
+        "scripts/check_otel_spans.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/section-cards/observability.md"
+      ],
+      "known_gaps": [
+        "OTLP exporter / Langfuse cataloged as candidate"
+      ],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "review_pack",
+      "category": "governance",
+      "owner_folder": "scripts",
+      "owner_module": "scripts/make_review_pack.py",
+      "status": "m10_complete",
+      "input_contracts": [],
+      "output_contracts": [
+        "review_pack"
+      ],
+      "ports": [],
+      "adapters": [
+        "make_review_pack"
+      ],
+      "registries": [],
+      "proof_scripts": [
+        "scripts/make_review_pack.py",
+        "scripts/check_review_pack_recorders.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [
+        "/reviews"
+      ],
+      "docs": [
+        "docs/section-cards/review-pack.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "docs",
+      "category": "governance",
+      "owner_folder": "docs",
+      "owner_module": "docs/architecture/consumption-runtime.md",
+      "status": "m10_complete",
+      "input_contracts": [],
+      "output_contracts": [],
+      "ports": [],
+      "adapters": [],
+      "registries": [],
+      "proof_scripts": [
+        "scripts/check_architecture_adr_coverage.py",
+        "scripts/check_no_oracle_copy.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/adr"
+      ],
+      "known_gaps": [],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "architecture_guardrails",
+      "category": "governance",
+      "owner_folder": "architecture",
+      "owner_module": "architecture/project_spine.json",
+      "status": "m10_complete",
+      "input_contracts": [],
+      "output_contracts": [],
+      "ports": [],
+      "adapters": [],
+      "registries": [
+        "project_spine.json",
+        "import_boundaries.json",
+        "runtime_ownership.json",
+        "contract_registry.json",
+        "monolith_allowlist.json"
+      ],
+      "proof_scripts": [
+        "scripts/check_project_spine_folders.py",
+        "scripts/check_import_boundaries_manifest.py",
+        "scripts/check_runtime_ownership_manifest.py",
+        "scripts/check_contract_registry_manifest.py",
+        "scripts/check_no_duplicate_runtime.py",
+        "scripts/check_no_direct_provider_bypass.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/architecture/architecture-drift-guardrails.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "proof_registry",
+      "category": "governance",
+      "owner_folder": "scripts",
+      "owner_module": "scripts/baltor_flywheel.py",
+      "status": "m10_complete",
+      "input_contracts": [],
+      "output_contracts": [],
+      "ports": [],
+      "adapters": [
+        "baltor_flywheel"
+      ],
+      "registries": [],
+      "proof_scripts": [
+        "scripts/baltor_acceptance.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/section-cards/proof-registry.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": true
+    },
+    {
+      "section_id": "current_state_reporting",
+      "category": "reporting",
+      "owner_folder": "scripts",
+      "owner_module": "scripts/report_current_state.py",
+      "status": "m10_complete",
+      "input_contracts": [
+        "section_maturity_matrix",
+        "opportunities",
+        "risk_register"
+      ],
+      "output_contracts": [
+        "current_state_report"
+      ],
+      "ports": [],
+      "adapters": [
+        "report_current_state"
+      ],
+      "registries": [
+        "section_maturity_matrix.json"
+      ],
+      "proof_scripts": [
+        "scripts/report_current_state.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/status/baltor-current-state-and-opportunities.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": false
+    },
+    {
+      "section_id": "opportunity_mapping",
+      "category": "reporting",
+      "owner_folder": "architecture",
+      "owner_module": "architecture/opportunities.json",
+      "status": "m10_complete",
+      "input_contracts": [
+        "section_maturity_matrix"
+      ],
+      "output_contracts": [
+        "opportunities",
+        "risk_register"
+      ],
+      "ports": [],
+      "adapters": [
+        "opportunities.json",
+        "risk_register.json"
+      ],
+      "registries": [
+        "opportunities.json",
+        "risk_register.json"
+      ],
+      "proof_scripts": [
+        "scripts/check_opportunity_map.py",
+        "scripts/check_risk_register.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/status/opportunities.md",
+        "docs/status/risks-and-gaps.md"
+      ],
+      "known_gaps": [],
+      "critical_path_required": false
+    },
+    {
+      "section_id": "multi_source_consumption",
+      "category": "consumption",
+      "owner_folder": "scripts/runtime",
+      "owner_module": "scripts/runtime/source_consumption.py",
+      "status": "m6_proof",
+      "input_contracts": [
+        "RawSource"
+      ],
+      "output_contracts": [
+        "context_response"
+      ],
+      "ports": [
+        "SourceAdapterPort"
+      ],
+      "adapters": [
+        "run_source_to_consumption"
+      ],
+      "registries": [
+        "architecture/multi_source_run_matrix.json"
+      ],
+      "proof_scripts": [
+        "scripts/check_source_to_consumption_generic.py",
+        "scripts/check_multi_source_regression.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/runtime/source-consumption.md",
+        "docs/status/multi-source-regression.md"
+      ],
+      "known_gaps": [
+        "generic source_type->consumption (csv/json/webhook served; pdf/html honest non-consumable); database/email/folder adapters sequenced next"
+      ],
+      "critical_path_required": false
+    },
+    {
+      "section_id": "ingestion_contracts",
+      "category": "ingestion",
+      "owner_folder": "schemas/ingestion",
+      "owner_module": "src/baltor/ports/source_adapter.py",
+      "status": "m6_proof",
+      "input_contracts": [
+        "RawSource"
+      ],
+      "output_contracts": [
+        "SourceArtifact",
+        "IngestionReceipt",
+        "SyncState",
+        "SyncCursor",
+        "SourceHandle",
+        "IngestionRun",
+        "IngestionError"
+      ],
+      "ports": [
+        "SourceAdapterPort",
+        "SyncPlannerPort",
+        "SourceArtifactStorePort"
+      ],
+      "adapters": [
+        "(catalogued in ingestion_connector_catalog.json)"
+      ],
+      "registries": [
+        "architecture/ingestion_connector_catalog.json",
+        "architecture/ingestion_maturity_matrix.json"
+      ],
+      "proof_scripts": [
+        "scripts/check_ingestion_contracts.py",
+        "scripts/check_ingestion_ports.py",
+        "scripts/check_ingestion_connector_catalog.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/ingestion/ingestion-contracts.md"
+      ],
+      "known_gaps": [
+        "ports are typed Protocols; working impl lives in scripts/ingest/source_adapters.py (migration_plan)"
+      ],
+      "critical_path_required": false
+    },
+    {
+      "section_id": "markdown_folder",
+      "category": "ingestion",
+      "owner_folder": "src/baltor/adapters/source",
+      "owner_module": "src/baltor/adapters/source/markdown_folder.py",
+      "status": "m8_ui",
+      "input_contracts": [
+        "RawSource"
+      ],
+      "output_contracts": [
+        "source_record",
+        "source_field",
+        "atomic_fact",
+        "narrative_allegation"
+      ],
+      "ports": [
+        "SourceAdapterPort"
+      ],
+      "adapters": [
+        "MarkdownFolderAdapter"
+      ],
+      "registries": [
+        "architecture/ingestion_connector_catalog.json"
+      ],
+      "proof_scripts": [
+        "scripts/check_ingest_markdown_folder.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/ingestion/markdown-folder.md"
+      ],
+      "known_gaps": [
+        "adapter proven standalone; central normalize() REGISTRY wiring is an optional follow-up (avoids circular import); frontmatter facts promotion-eligible only when note says so; note prose held out"
+      ],
+      "critical_path_required": false
+    },
+    {
+      "section_id": "local_folder_batch",
+      "category": "ingestion",
+      "owner_folder": "src/baltor/adapters/source",
+      "owner_module": "src/baltor/adapters/source/folder_batch.py",
+      "status": "m8_ui",
+      "input_contracts": [
+        "RawSource"
+      ],
+      "output_contracts": [
+        "folder_manifest",
+        "source_record",
+        "source_field",
+        "atomic_fact",
+        "narrative_allegation"
+      ],
+      "ports": [
+        "SourceAdapterPort"
+      ],
+      "adapters": [
+        "LocalFolderBatchAdapter"
+      ],
+      "registries": [
+        "architecture/ingestion_connector_catalog.json"
+      ],
+      "proof_scripts": [
+        "scripts/check_ingest_folder_batch.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/ingestion/folder-batch.md"
+      ],
+      "known_gaps": [
+        "per-file partial failure honest (pdf/txt non-consumable, raw stored); central normalize() REGISTRY wiring optional follow-up"
+      ],
+      "critical_path_required": false
+    },
+    {
+      "input_contracts": [],
+      "output_contracts": [
+        "pattern_registry",
+        "standard_catalog",
+        "template_catalog",
+        "pattern_miner_report"
+      ],
+      "ports": [],
+      "adapters": [
+        "scripts/pattern_miner.py",
+        "scripts/generate_from_template.py"
+      ],
+      "registries": [
+        "architecture/pattern_registry.json",
+        "architecture/pattern_maturity_matrix.json",
+        "architecture/standard_catalog.json",
+        "architecture/template_catalog.json"
+      ],
+      "proof_scripts": [
+        "scripts/check_pattern_registry.py",
+        "scripts/check_pattern_miner.py",
+        "scripts/check_standard_catalog.py",
+        "scripts/check_template_catalog.py",
+        "scripts/check_template_generation.py",
+        "scripts/check_pattern_standards_full_stack.py",
+        "scripts/check_standardized_examples.py",
+        "scripts/check_standards_review_pack.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/standards/pattern-system.md",
+        "docs/standards/README.md",
+        "docs/standards/template-authoring.md",
+        "docs/examples/standardized-patterns.md",
+        "docs/status/pattern-miner-report.md",
+        "docs/status/standards-review-pack.md"
+      ],
+      "known_gaps": [
+        "25-pattern registry: 1 enforced, 22 standard, 2 candidate; 7 'standard' patterns lack a standard_catalog card (OPP-standard-cards-governance-patterns; registry owner's call, not auto-edited)",
+        "7 of 17 templates active, 10 candidate (OPP-build-candidate-templates)",
+        "miner not yet wired into a flywheel scan pass; no enforcement flips a pattern on a non-conforming new instance"
+      ],
+      "section_id": "pattern_standards_factory",
+      "category": "governance",
+      "owner_folder": "scripts",
+      "owner_module": "scripts/pattern_miner.py",
+      "status": "m6_proof",
+      "critical_path_required": false
+    },
+    {
+      "input_contracts": [],
+      "output_contracts": [],
+      "ports": [],
+      "adapters": [],
+      "registries": [
+        "architecture/routine_library.json",
+        "architecture/configuration_standards.json",
+        "architecture/pattern_waivers.json"
+      ],
+      "proof_scripts": [
+        "scripts/check_new_code_uses_standards.py",
+        "scripts/check_routine_library.py",
+        "scripts/check_configuration_standards.py",
+        "scripts/check_pattern_waivers.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/standards/standards-linter.md",
+        "docs/standards/routine-library.md",
+        "docs/standards/configuration-standards.md",
+        "docs/standards/waivers.md"
+      ],
+      "known_gaps": [
+        "linter rules are 'candidate' (pass on clean repo + negative-tested) but not yet wired into CI as a hard gate; waivers expire on a deterministic pass counter not yet tied to the flywheel pass counter (OPP-standards-enforce-ci)"
+      ],
+      "section_id": "standards_linter",
+      "category": "governance",
+      "owner_folder": "scripts",
+      "owner_module": "scripts/check_new_code_uses_standards.py",
+      "status": "m6_proof",
+      "critical_path_required": false
+    },
+    {
+      "input_contracts": [],
+      "output_contracts": [],
+      "ports": [],
+      "adapters": [],
+      "registries": [],
+      "proof_scripts": [
+        "scripts/check_standards_api.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/standards/standards-api.md"
+      ],
+      "known_gaps": [
+        "served LIVE: GET /api/standards/* + POST generate-preview via the admin monolith (HTTP 200 verified 2026-06-05); projection-only; truth files produced by the standards factory"
+      ],
+      "section_id": "standards_api",
+      "category": "governance",
+      "owner_folder": "scripts",
+      "owner_module": "scripts/api_standards_handler.py",
+      "status": "m8_ui",
+      "critical_path_required": false
+    },
+    {
+      "input_contracts": [],
+      "output_contracts": [],
+      "ports": [],
+      "adapters": [],
+      "registries": [],
+      "proof_scripts": [
+        "scripts/check_standards_ui.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [
+        "/standards"
+      ],
+      "docs": [
+        "docs/standards/standards-api.md"
+      ],
+      "known_gaps": [
+        "served LIVE: GET /standards via the admin monolith + linked from the hub (verified 2026-06-05); projection-only over /api/standards/*"
+      ],
+      "section_id": "standards_ui",
+      "category": "governance",
+      "owner_folder": "web/baltor",
+      "owner_module": "web/baltor/standards.html",
+      "status": "m8_ui",
+      "critical_path_required": false
+    },
+    {
+      "input_contracts": [],
+      "output_contracts": [
+        "MemoryArtifact",
+        "MemorySearchResult",
+        "MemoryProfile",
+        "MemoryTrace",
+        "MemoryProviderStatus"
+      ],
+      "ports": [
+        "MemoryProviderPort",
+        "MemoryProfileProviderPort",
+        "MemoryMCPProviderPort"
+      ],
+      "adapters": [
+        "memory.baltor_local@v1",
+        "memory.supermemory_emulator@v1",
+        "memory.supermemory_api@candidate",
+        "mcp.supermemory@candidate"
+      ],
+      "registries": [],
+      "proof_scripts": [
+        "scripts/check_memory_provider_contract.py",
+        "scripts/check_local_memory_provider.py",
+        "scripts/check_supermemory_emulator.py",
+        "scripts/check_memory_results_become_artifacts.py",
+        "scripts/check_memory_tenant_project_scoping.py",
+        "scripts/check_no_direct_supermemory_imports.py",
+        "scripts/check_supermemory_no_truth_bypass.py",
+        "scripts/check_memory_trace_written.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/research/supermemory.md"
+      ],
+      "known_gaps": [
+        "supermemory api/mcp are CANDIDATE stubs (raise UnavailableProvider w/o creds); emulator is the working offline contract",
+        "memory results are claim_status=candidate, never served as fact (proven by check_supermemory_no_truth_bypass)",
+        "capability_catalog slots (memory_provider/mcp_tool_provider) + a full-stack proof deferred: OPP-memory-provider-m10"
+      ],
+      "section_id": "memory_provider",
+      "category": "memory",
+      "owner_folder": "src/baltor/adapters/memory",
+      "owner_module": "src/baltor/ports/memory_provider.py",
+      "status": "m6_proof",
+      "critical_path_required": false
+    },
+    {
+      "input_contracts": [],
+      "output_contracts": [],
+      "ports": [],
+      "adapters": [
+        "scripts/api_memory_handler.py"
+      ],
+      "registries": [],
+      "proof_scripts": [
+        "scripts/check_memory_page_projection_only.py",
+        "scripts/check_memory_api.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [
+        "/memory"
+      ],
+      "docs": [
+        "docs/research/supermemory.md"
+      ],
+      "known_gaps": [
+        "served LIVE by the admin monolith: GET /memory HTTP 200 (verified 2026-06-05); projection-only over /api/memory/*; provider behind it stays candidate (memory_provider m6)"
+      ],
+      "section_id": "memory_ui",
+      "category": "memory",
+      "owner_folder": "web/baltor",
+      "owner_module": "web/baltor/memory.html",
+      "status": "m8_ui",
+      "critical_path_required": false
+    },
+    {
+      "input_contracts": [],
+      "output_contracts": [],
+      "ports": [],
+      "adapters": [
+        "scripts/api_pipeline_handler.py"
+      ],
+      "registries": [],
+      "proof_scripts": [
+        "scripts/check_pipeline_api.py",
+        "scripts/check_pipeline_upload_ui.py",
+        "scripts/check_pipeline_decomposition_ui.py",
+        "scripts/check_pipeline_reconciliation_ui.py",
+        "scripts/check_pipeline_enhancement_ui.py",
+        "scripts/check_pipeline_optimization_ui.py",
+        "scripts/check_pipeline_verification_ui.py",
+        "scripts/check_pipeline_consumption_ui.py",
+        "scripts/check_pipeline_pages_full_stack.py"
+      ],
+      "api_routes": [
+        "GET /api/pipeline/overview",
+        "GET /api/pipeline/upload",
+        "GET /api/pipeline/decomposition",
+        "GET /api/pipeline/reconciliation",
+        "GET /api/pipeline/enhancement",
+        "GET /api/pipeline/optimization",
+        "GET /api/pipeline/verification",
+        "GET /api/pipeline/consumption"
+      ],
+      "ui_pages": [
+        "/pipeline",
+        "/pipeline/upload",
+        "/pipeline/decomposition",
+        "/pipeline/reconciliation",
+        "/pipeline/enhancement",
+        "/pipeline/optimization",
+        "/pipeline/verification",
+        "/pipeline/consumption"
+      ],
+      "docs": [
+        "docs/ui/pipeline-pages.md"
+      ],
+      "known_gaps": [
+        "served LIVE by the admin monolith: GET /pipeline + 7 stage pages + /api/pipeline/* HTTP 200 (verified 2026-06-05); each stage surfaces held-out/rejected/source-handles/lineage (lossless visible); reference value renders live (winner '10 business days', held_out '30 days')"
+      ],
+      "section_id": "pipeline_pages",
+      "category": "consumption",
+      "owner_folder": "web/baltor/pipeline",
+      "owner_module": "web/baltor/pipeline/index.html",
+      "status": "m8_ui",
+      "critical_path_required": false
+    },
+    {
+      "input_contracts": [
+        "SourceArtifact",
+        "NativeShapeContract"
+      ],
+      "output_contracts": [
+        "NativeProjection",
+        "SidecarOverlay",
+        "NativeDiff",
+        "NativeExportReceipt"
+      ],
+      "ports": [],
+      "adapters": [
+        "scripts/api_native_handler.py"
+      ],
+      "registries": [
+        "architecture/native_output_modes.json"
+      ],
+      "proof_scripts": [
+        "scripts/check_native_shape_contract.py",
+        "scripts/check_native_json_roundtrip.py",
+        "scripts/check_native_csv_roundtrip.py",
+        "scripts/check_native_markdown_sidecar.py",
+        "scripts/check_native_export_same_schema.py",
+        "scripts/check_native_output_modes.py",
+        "scripts/check_native_sidecar_lineage.py",
+        "scripts/check_native_export_no_truth_bypass.py",
+        "scripts/check_native_export_rehydration.py",
+        "scripts/check_native_api.py",
+        "scripts/check_native_format_full_stack.py"
+      ],
+      "api_routes": [
+        "POST /api/native/ingest",
+        "GET /api/native/export/<source_id>",
+        "GET /api/native/sidecar/<source_id>",
+        "GET /api/native/diff/<source_id>",
+        "GET /api/native/annotations/<source_id>"
+      ],
+      "ui_pages": [],
+      "docs": [
+        "docs/native/overview.md",
+        "docs/native/output-modes.md",
+        "docs/native/sidecars.md",
+        "docs/native/README.md"
+      ],
+      "known_gaps": [
+        "8 output_modes (passthrough/schema_preserving/annotated_native/baltor_native/dual/compare); JSON/CSV/Markdown; ORIGINAL never overwritten, held-out preserved, every verified change carries a diff+receipt (lossless at the output layer); /api/native/* wired this pass; SQL side-table variant + /native UI + PDF/HTML/DOCX are follow-ups (OPP-native-format)"
+      ],
+      "section_id": "native_format_preservation",
+      "category": "consumption_export",
+      "owner_folder": "src/baltor/native",
+      "owner_module": "src/baltor/native/native_export_service.py",
+      "status": "m6_proof",
+      "critical_path_required": false
+    },
+    {
+      "input_contracts": [],
+      "output_contracts": [
+        "DistillationRun",
+        "LineageBundle",
+        "RehydrationReport",
+        "InformationRetentionReport",
+        "PromotionRecord",
+        "RollbackPlan"
+      ],
+      "ports": [],
+      "adapters": [
+        "src/baltor/distillation/lossless_store.py",
+        "src/baltor/distillation/lineage.py",
+        "src/baltor/distillation/rehydration.py",
+        "src/baltor/distillation/rollback.py",
+        "src/baltor/distillation/retention_report.py"
+      ],
+      "registries": [],
+      "proof_scripts": [
+        "scripts/check_lossless_distillation_contracts.py",
+        "scripts/check_lossless_artifact_store.py",
+        "scripts/check_lineage_bundle_complete.py",
+        "scripts/check_distillation_rehydration.py",
+        "scripts/check_distillation_rollback.py",
+        "scripts/check_information_retention_report.py",
+        "scripts/check_cfpb_lossless_distillation.py",
+        "scripts/check_optimization_lossless_distillation.py",
+        "scripts/check_ingestion_decomposition_lossless.py",
+        "scripts/check_lossless_distillation_redteam.py",
+        "scripts/check_lossless_distillation_full_stack.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/codex/lossless-distillation.md",
+        "docs/distillation/overview.md",
+        "docs/distillation/lossless-principle.md",
+        "docs/distillation/rehydration.md",
+        "docs/distillation/cfpb-example.md"
+      ],
+      "known_gaps": [
+        "CORE shipped: append-only content-addressed LosslessStore + LineageBundle + rehydration + rollback (pointer-only) + InformationRetentionReport; existing CFPB/optimization/ingestion flows PROVEN lossless (raw/source/held-out/rejected/lineage preserved; answer stays '10 business days'; FAQ-30 held out but rehydratable); red-team attacks fail safely. DEFERRED (OPP-lossless-distillation-runtime): parallel-runs/shadow/monitoring/durable distill.* commands/API/UI"
+      ],
+      "section_id": "lossless_distillation",
+      "category": "governance",
+      "owner_folder": "src/baltor/distillation",
+      "owner_module": "src/baltor/distillation/lossless_store.py",
+      "status": "m6_proof",
+      "critical_path_required": false
+    },
+    {
+      "input_contracts": [],
+      "output_contracts": [
+        "WorkflowTrace",
+        "LLMTrace",
+        "ConsensusRun",
+        "AdjudicationRecord",
+        "PatternCandidate",
+        "RuleCandidate",
+        "RuleReplayReport",
+        "ShadowRunReport",
+        "DeterministicRule",
+        "RulePromotionReceipt",
+        "FallbackPolicy"
+      ],
+      "ports": [],
+      "adapters": [
+        "src/baltor/determinism/trace_store.py",
+        "src/baltor/determinism/consensus.py",
+        "src/baltor/determinism/pattern_miner.py",
+        "src/baltor/determinism/rule_candidate_generator.py",
+        "src/baltor/determinism/replay_engine.py",
+        "src/baltor/determinism/shadow_runner.py",
+        "src/baltor/determinism/rule_promotion_gate.py",
+        "src/baltor/determinism/fallback_router.py"
+      ],
+      "registries": [],
+      "proof_scripts": [
+        "scripts/check_determinism_contracts.py",
+        "scripts/check_trace_store.py",
+        "scripts/check_consensus_recorder.py",
+        "scripts/check_determinism_pattern_miner.py",
+        "scripts/check_rule_candidate_generation.py",
+        "scripts/check_rule_replay_engine.py",
+        "scripts/check_rule_shadow_mode.py",
+        "scripts/check_rule_promotion_gate.py",
+        "scripts/check_deterministic_rule_fallback.py",
+        "scripts/check_cfpb_reconciliation_rule_distillation.py",
+        "scripts/check_source_classification_rule_distillation.py",
+        "scripts/check_optimization_rejection_rule_distillation.py",
+        "scripts/check_determinism_redteam.py",
+        "scripts/check_determinism_full_stack.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/determinism/overview.md",
+        "docs/determinism/consensus-is-not-truth.md",
+        "docs/determinism/llm-to-rules.md",
+        "docs/determinism/cfpb-example.md"
+      ],
+      "known_gaps": [
+        "CORE shipped: trace store + consensus(evidence-not-truth) + pattern miner + rule candidate + replay + shadow + promotion gate + fallback. Distills ONLY from VERIFIED traces; consensus alone can NEVER serve a fact; tenant_private never trains global; promoted rule PRESERVES distilled_from_trace_ids (lossless). CFPB reconciliation rule ASSERTS-EQUIVALENCE to the existing reference (Reg E '10 business days' beats FAQ '30 days') \u2014 reproduces, never a 2nd authority. DEFERRED (OPP-determinism-api-ui): /api/determinism + /determinism UI"
+      ],
+      "section_id": "determinism_factory",
+      "category": "governance",
+      "owner_folder": "src/baltor/determinism",
+      "owner_module": "src/baltor/determinism/trace_store.py",
+      "status": "m6_proof",
+      "critical_path_required": false
+    },
+    {
+      "input_contracts": [],
+      "output_contracts": [],
+      "ports": [],
+      "adapters": [
+        "scripts/api_determinism_handler.py",
+        "src/baltor/determinism/demo.py"
+      ],
+      "registries": [],
+      "proof_scripts": [
+        "scripts/check_determinism_api.py",
+        "scripts/check_determinism_ui.py"
+      ],
+      "api_routes": [
+        "GET /api/determinism/overview",
+        "GET /api/determinism/traces",
+        "GET /api/determinism/consensus",
+        "GET /api/determinism/patterns",
+        "GET /api/determinism/rules",
+        "GET /api/determinism/replay",
+        "GET /api/determinism/shadow",
+        "GET /api/determinism/promotions",
+        "GET /api/determinism/fallback"
+      ],
+      "ui_pages": [
+        "/determinism"
+      ],
+      "docs": [
+        "docs/ui/context-surfaces.md"
+      ],
+      "known_gaps": [
+        "served LIVE: GET /determinism + /api/determinism/* via admin monolith + hub-linked (verified this pass); projection-only demo of the M0\u2192M7 motion (consensus\u2260truth, distill-from-verified, CFPB rule reproduces '10 business days', tenant_private\u2192global blocked)"
+      ],
+      "section_id": "determinism_ui",
+      "category": "governance",
+      "owner_folder": "web/baltor",
+      "owner_module": "web/baltor/determinism.html",
+      "status": "m8_ui",
+      "critical_path_required": false
+    },
+    {
+      "input_contracts": [],
+      "output_contracts": [],
+      "ports": [],
+      "adapters": [
+        "scripts/api_native_handler.py"
+      ],
+      "registries": [],
+      "proof_scripts": [
+        "scripts/check_native_ui.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [
+        "/native"
+      ],
+      "docs": [
+        "docs/ui/context-surfaces.md"
+      ],
+      "known_gaps": [
+        "served LIVE: GET /native via admin monolith + hub-linked (verified this pass); interactive same-shape-in/out preview over the live /api/native/* (native output / sidecar / diff); original never overwritten"
+      ],
+      "section_id": "native_ui",
+      "category": "consumption_export",
+      "owner_folder": "web/baltor",
+      "owner_module": "web/baltor/native.html",
+      "status": "m8_ui",
+      "critical_path_required": false
+    },
+    {
+      "input_contracts": [],
+      "output_contracts": [
+        "ContextTriageResult",
+        "SourceDiscoveryReport",
+        "SourceRecipe",
+        "VerificationRecipe",
+        "ExtractorSnippet",
+        "SourceReliabilityScore"
+      ],
+      "ports": [
+        "ResearchAgentProviderPort",
+        "SourceDiscoveryProviderPort",
+        "CodegenAgentProviderPort"
+      ],
+      "adapters": [
+        "src/baltor/contextops/triage.py",
+        "src/baltor/contextops/research_stub.py",
+        "src/baltor/contextops/source_discovery.py",
+        "src/baltor/contextops/source_recipe.py",
+        "src/baltor/contextops/verification_recipe.py",
+        "src/baltor/contextops/extractor_snippets.py",
+        "src/baltor/contextops/sandbox_gate.py",
+        "src/baltor/contextops/reliability.py",
+        "src/baltor/contextops/cross_source_confirmation.py",
+        "src/baltor/contextops/cost_tracking.py"
+      ],
+      "registries": [],
+      "proof_scripts": [
+        "scripts/check_contextops_contracts.py",
+        "scripts/check_contextops_triage.py",
+        "scripts/check_contextops_research_agent_provider.py",
+        "scripts/check_contextops_source_discovery.py",
+        "scripts/check_contextops_source_recipe.py",
+        "scripts/check_contextops_verification_recipe.py",
+        "scripts/check_contextops_extractor_snippets.py",
+        "scripts/check_contextops_sandbox_gate.py",
+        "scripts/check_contextops_reliability_scoring.py",
+        "scripts/check_contextops_cross_source_confirmation.py",
+        "scripts/check_contextops_cost_reduction.py",
+        "scripts/check_contextops_cfpb_reference.py",
+        "scripts/check_contextops_redteam.py",
+        "scripts/check_contextops_full_stack.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "prompts/baltor-contextops-verification-foundry.md"
+      ],
+      "known_gaps": [
+        "END-TO-END PROVEN: CFPB reference runs through triage\u2192research(stub)\u2192source/verification recipes\u2192sandboxed extractor\u2192reliability\u2192cross-source\u2192EXISTING reconciliation authority, reproducing '10 business days' with FAQ-30 held out; INVARIANT holds (agents proposed, Baltor disposed \u2014 no agent/LLM served the fact); M0\u2192M7 cost ladder (research-once/deterministic-forever) measured; red-team 15 attacks fail safely. DEFERRED (OPP-contextops-runtime): generated-worker EXECUTION, watch scheduler, /api/contextops + /contextops UI, research_agent capability_catalog slot (OWL/Browser-use/Skyvern/etc candidates)"
+      ],
+      "section_id": "contextops",
+      "category": "governance",
+      "owner_folder": "src/baltor/contextops",
+      "owner_module": "src/baltor/contextops/triage.py",
+      "status": "m6_proof",
+      "critical_path_required": false
+    },
+    {
+      "input_contracts": [],
+      "output_contracts": [],
+      "ports": [],
+      "adapters": [
+        "src/baltor/workers/worker_router.py"
+      ],
+      "registries": [
+        "architecture/worker_bucket_registry.json",
+        "architecture/worker_registry.json",
+        "architecture/worker_resource_classes.json",
+        "architecture/worker_tool_policy.json"
+      ],
+      "proof_scripts": [
+        "scripts/check_worker_bucket_registry.py",
+        "scripts/check_worker_router.py",
+        "scripts/check_worker_taxonomy_full_stack.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/workers/worker-taxonomy.md"
+      ],
+      "known_gaps": [
+        "18 buckets classified by tools/determinism/resource/risk/queue/outputs; router enforces prefix\u2192bucket + forbidden-output rejection; SAFETY SPLIT proven (only reconciliation/native_export/distillation/human gates publish truth; open-ended/browser/model produce evidence+candidates). Rides existing durable-worker model (no 2nd framework). DEFERRED (OPP-worker-taxonomy-surface): 17 per-bucket task contracts, 18 per-bucket docs, /api/workers + /workers UI, per-rule split proofs (invariants currently proven consolidated)"
+      ],
+      "section_id": "worker_taxonomy",
+      "category": "architecture_guardrails",
+      "owner_folder": "src/baltor/workers",
+      "owner_module": "src/baltor/workers/worker_router.py",
+      "status": "m6_proof",
+      "critical_path_required": false
+    },
+    {
+      "input_contracts": [],
+      "output_contracts": [
+        "TemporalFactNode",
+        "TemporalFactEdge",
+        "TemporalFactState",
+        "TemporalGraphProjection",
+        "TemporalGraphReceipt"
+      ],
+      "ports": [
+        "TemporalGraphProviderPort"
+      ],
+      "adapters": [
+        "src/baltor/graph/temporal/store.py",
+        "src/baltor/graph/temporal/policy.py",
+        "src/baltor/graph/temporal/builder.py",
+        "src/baltor/graph/temporal/bridges.py",
+        "src/baltor/graph/providers/temporal_graph_provider.py",
+        "scripts/api_temporal_graph_handler.py"
+      ],
+      "registries": [
+        "schemas/graph/"
+      ],
+      "proof_scripts": [
+        "scripts/check_temporal_graph_contracts.py",
+        "scripts/check_temporal_graph_local_store.py",
+        "scripts/check_temporal_graph_cfpb_reference.py",
+        "scripts/check_temporal_graph_provider_catalog.py",
+        "scripts/check_temporal_graph_watchtower_bridge.py",
+        "scripts/check_temporal_graph_reconciliation_bridge.py",
+        "scripts/check_temporal_graph_consumption.py",
+        "scripts/check_temporal_graph_api.py",
+        "scripts/check_temporal_graph_ui.py",
+        "scripts/check_temporal_graph_redteam.py",
+        "scripts/check_temporal_graph_full_stack.py"
+      ],
+      "api_routes": [
+        "GET /api/graph/temporal/facts",
+        "GET /api/graph/temporal/current/<key>",
+        "GET /api/graph/temporal/conflicts",
+        "GET /api/graph/temporal/held-out",
+        "GET /api/graph/temporal/timeline/<key>",
+        "GET /api/graph/temporal/provider-status",
+        "POST /api/graph/temporal/rebuild"
+      ],
+      "ui_pages": [
+        "/temporal-graph"
+      ],
+      "docs": [
+        "docs/graph/temporal-fact-graph.md"
+      ],
+      "known_gaps": [
+        "LOCAL-FIRST temporal graph PROVEN: append-only nodes/edges/observations; authority+freshness projection (source-of-law beats FAQ; STALE top never promotes a lower-authority claim); CFPB reference (Reg E 10 verified_current, FAQ 30 held out + preserved); watchtower/reconciliation/consumption bridges; provider seam (baltor_local active, graphiti candidate raises UnavailableProvider, graphiti_emulator offline same contract). API + /temporal-graph UI built. DEFERRED (OPP-temporal-graph-runtime): durable graph.temporal.* worker commands on the live dispatch path, SQLite-backed store, a real Graphiti backend, central capability_catalog temporal_graph_provider slot"
+      ],
+      "section_id": "temporal_fact_graph",
+      "category": "reconciliation",
+      "owner_folder": "src/baltor/graph/temporal",
+      "owner_module": "src/baltor/graph/temporal/store.py",
+      "status": "m8_ui",
+      "critical_path_required": false
+    },
+    {
+      "input_contracts": [],
+      "output_contracts": [],
+      "ports": [],
+      "adapters": [],
+      "registries": [
+        "architecture/external_capability_catalog.json",
+        "architecture/repo_replacement_matrix.json"
+      ],
+      "proof_scripts": [
+        "scripts/check_context_provider_catalog.py",
+        "scripts/check_external_capability_catalog.py",
+        "scripts/check_provider_replacement_matrix.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/research/context-layer-landscape.md",
+        "docs/research/agentic-tools-landscape.md"
+      ],
+      "known_gaps": [
+        "6 context-provider slots cataloged as CANDIDATES behind ports, each wired to a working local stub: memory_provider (mem0/letta/supermemory), mcp_tool_provider (supermemory), temporal_graph_provider (graphiti), observability_provider (langfuse/phoenix/langsmith), lineage_provider (openlineage), research_agent (OWL/hermes/browser-use/skyvern). Baltor stays the authority; none is the runtime. DEFERRED (OPP-context-provider-catalog-m10): real adapters behind the ports + contract examples + first-real-dependency cards"
+      ],
+      "section_id": "context_provider_catalog",
+      "category": "provider_catalog",
+      "owner_folder": "src/baltor/runtime/registry",
+      "owner_module": "src/baltor/runtime/registry/capability_registry.py",
+      "status": "m6_proof",
+      "critical_path_required": false
+    },
+    {
+      "input_contracts": [],
+      "output_contracts": [
+        "CapabilityTask",
+        "CapabilityWorker",
+        "WorkerFleetSupervisorDecision"
+      ],
+      "ports": [],
+      "adapters": [
+        "src/baltor/workers/fleet_ledger.py",
+        "src/baltor/workers/fleet_supervisor.py",
+        "src/baltor/workers/local_spawn_manager.py",
+        "scripts/capability_worker.py"
+      ],
+      "registries": [
+        "architecture/worker_capability_registry.json",
+        "architecture/worker_lifecycle_policies.json",
+        "architecture/worker_batch_policies.json",
+        "architecture/worker_sla_policies.json"
+      ],
+      "proof_scripts": [
+        "scripts/check_worker_fleet_schema.py",
+        "scripts/check_worker_atomic_claim.py",
+        "scripts/check_worker_fleet_supervisor.py",
+        "scripts/capability_worker.py",
+        "scripts/check_worker_status_progress_tracking.py",
+        "scripts/check_worker_provider_fallback.py",
+        "scripts/check_local_spawn_manager.py",
+        "scripts/check_worker_fleet_redteam.py",
+        "scripts/check_worker_fleet_supervisor_full_stack.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/workers/capability-fleet-supervisor.md"
+      ],
+      "known_gaps": [
+        "LEAN CORE proven: DB-ledger=truth + atomic claim (exactly-one, lease reclaim, idempotency, retry/DLQ) + capability registry + lifecycle/batch/SLA policies + supervisor decisions (spawn/use-existing/SLA-spawn/batch-wait/dispatch/max-wait/reclaim/fallback/reject-unknown) + worker lifecycle (claim\u2192process\u2192drain\u2192cooldown\u2192idle-stop) + local spawn manager (dry-run, exact-pid stop, no pkill) + provider fallback. INVARIANT: workers own a task ONLY via atomic claim; bootstrap is a hint. In-memory now; SQLite BEGIN IMMEDIATE \u2192 Postgres SKIP LOCKED later. DEFERRED (OPP-worker-fleet-surface): persistent SQLite/Postgres ledger on the live dispatch path, /api/fleet + /fleet UI, metrics dashboard, WorkerWakeupPort (pubsub/KEDA), K8s templates"
+      ],
+      "section_id": "worker_fleet_supervisor",
+      "category": "scaling",
+      "owner_folder": "src/baltor/workers",
+      "owner_module": "src/baltor/workers/fleet_ledger.py",
+      "status": "m6_proof",
+      "critical_path_required": false
+    },
+    {
+      "input_contracts": [
+        "ContextOperationSpan",
+        "LineageEvent"
+      ],
+      "output_contracts": [
+        "SpanTree",
+        "LineageFacet"
+      ],
+      "ports": [
+        "ObservabilityProvider",
+        "LineageProvider"
+      ],
+      "adapters": [
+        "src/baltor/observability/tracing/provider.py",
+        "src/baltor/observability/projections/lineage.py",
+        "src/baltor/observability/projections/standards.py"
+      ],
+      "registries": [
+        "architecture/external_capability_catalog.json"
+      ],
+      "proof_scripts": [
+        "scripts/check_observability_provider_seam.py",
+        "scripts/check_lineage_standards_adapters.py",
+        "scripts/check_observability_governance_redteam.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/observability/provider-seam-and-standards.md"
+      ],
+      "known_gaps": [
+        "LEAN CORE proven: ObservabilityProvider + LineageProvider seams behind the two catalog slots (wired local stubs; langfuse/phoenix/langsmith/openlineage candidate-only) + four interchange standards (W3C PROV-JSON, OpenLineage RunEvent, W3C Web Annotation, RFC6902 JSON Patch) all conformant/deterministic/governance-bearing. INVARIANT: providers DESCRIBE, never the authority; allegations never laundered to verified; held-out flagged in every rendering; forged facets stripped; records frozen; no canonical-write method. DEFERRED (OPP-observability-surface): real langfuse/openlineage adapters (needs dep), /observability live trace view, OTel collector seam, emit renderings from the live pipeline run"
+      ],
+      "section_id": "observability_provider_seam",
+      "category": "governance",
+      "owner_folder": "src/baltor/observability",
+      "owner_module": "src/baltor/observability/projections/lineage.py",
+      "status": "m6_proof",
+      "critical_path_required": false
+    },
+    {
+      "input_contracts": [
+        "CapabilityTask",
+        "CapabilityWorker"
+      ],
+      "output_contracts": [
+        "WorkerTelemetry"
+      ],
+      "ports": [],
+      "adapters": [
+        "src/baltor/workers/spawn_decision.py",
+        "src/baltor/workers/batch_windows.py",
+        "src/baltor/workers/cooldown_drain.py",
+        "src/baltor/workers/provider_circuit_breaker.py",
+        "src/baltor/workers/provider_fallback.py",
+        "src/baltor/workers/failure_taxonomy.py",
+        "src/baltor/workers/telemetry.py",
+        "src/baltor/workers/policy_recommender.py"
+      ],
+      "registries": [
+        "architecture/worker_lifecycle_policies.json",
+        "architecture/worker_batch_policies.json",
+        "architecture/worker_sla_policies.json",
+        "architecture/worker_failure_taxonomy.json"
+      ],
+      "proof_scripts": [
+        "scripts/check_worker_lifecycle_policy_details.py",
+        "scripts/check_worker_spawn_decision_engine.py",
+        "scripts/check_worker_batch_windows.py",
+        "scripts/check_worker_cooldown_drain.py",
+        "scripts/check_worker_provider_circuit_breaker.py",
+        "scripts/check_worker_telemetry_schema.py",
+        "scripts/check_worker_failure_taxonomy.py",
+        "scripts/check_worker_policy_recommender.py",
+        "scripts/check_worker_k8s_keda_mapping_docs.py",
+        "scripts/check_worker_lifecycle_redteam.py"
+      ],
+      "api_routes": [],
+      "ui_pages": [],
+      "docs": [
+        "docs/workers/k8s-keda-worker-mapping.md"
+      ],
+      "known_gaps": [
+        "LEAN CORE proven: 10 lifecycle policies (cold_start..cooldown_drain) with full ramp field set (batch thresholds REFERENCED not duplicated) + spawn-decision engine (estimate-based reuse-vs-spawn, concurrency holds, circuit-aware, P0/P1 batch bypass, dead-letter) + batch windows (5/25/100, max_wait partial=no-starvation, grouping+fairness) + cooldown-drain (pickup_count + idle_burn_ms) + provider circuit breakers (closed/open/half_open, taxonomy-gated) + fallback router + 22-type failure taxonomy + 7 telemetry tables (pure read) + policy recommender (no unsafe truth path) + K8s/KEDA mapping docs+4 templates. DEFERRED (OPP-fleet-lifecycle-surface): /fleet telemetry API/UI, supervisor wiring of spawn_decision on live dispatch, auto-apply of recommendations, real per-provider breaker metrics, OTel export"
+      ],
+      "section_id": "worker_lifecycle_telemetry",
+      "category": "scaling",
+      "owner_folder": "src/baltor/workers",
+      "owner_module": "src/baltor/workers/spawn_decision.py",
+      "status": "m6_proof",
+      "critical_path_required": false
+    },
+    {
+      "input_contracts": [],
+      "output_contracts": [
+        "SupervisorScaling"
+      ],
+      "ports": [],
+      "adapters": [
+        "scripts/capability_worker.py",
+        "src/baltor/workers/control_plane.py",
+        "src/baltor/workers/durable_fleet_ledger.py",
+        "src/baltor/workers/supervisor_ledger.py",
+        "src/baltor/workers/supervisor_metrics.py",
+        "src/baltor/workers/supervisor_projection.py",
+        "src/baltor/workers/supervisor_store.py",
+        "src/baltor/workers/supervisor_watch.py"
+      ],
+      "registries": [
+        "architecture/contract_registry.json"
+      ],
+      "proof_scripts": [
+        "scripts/check_flywheel_supervisor_leader_lease.py",
+        "scripts/check_flywheel_supervisor_failover.py",
+        "scripts/check_flywheel_supervisor_shards.py",
+        "scripts/check_flywheel_supervisor_idempotent_decisions.py",
+        "scripts/check_flywheel_supervisor_no_duplicate_spawn.py",
+        "scripts/check_flywheel_supervisor_lag_metrics.py",
+        "scripts/check_flywheel_supervisor_keda_mapping.py",
+        "scripts/check_control_plane_tick.py",
+        "scripts/check_live_supervisor_schema.py",
+        "scripts/check_live_supervisor_leader_lease.py",
+        "scripts/check_live_supervisor_shards.py",
+        "scripts/check_live_supervisor_idempotent_decisions.py",
+        "scripts/check_live_supervisor_persistence.py",
+        "scripts/check_flywheel_watch_uses_supervisor_leases.py",
+        "scripts/check_live_supervisor_two_process.py",
+        "scripts/check_live_supervisor_redteam.py",
+        "scripts/check_live_supervisor_api.py",
+        "scripts/check_live_supervisor_ui.py",
+        "scripts/check_live_supervisor_full_stack.py",
+        "scripts/check_durable_fleet_ledger.py",
+        "scripts/check_live_supervisor_dispatch.py",
+        "scripts/check_live_supervisor_parallel_dispatch.py"
+      ],
+      "api_routes": [
+        "/api/fleet",
+        "/api/fleet/leader",
+        "/api/fleet/shards",
+        "/api/fleet/ticks",
+        "/api/fleet/decisions",
+        "/api/fleet/capacity",
+        "/api/fleet/failovers",
+        "/api/fleet/supervisors/<id>"
+      ],
+      "ui_pages": [
+        "/fleet"
+      ],
+      "docs": [
+        "docs/workers/flywheel-supervisor-scaling.md",
+        "docs/workers/operating-model-always-on-vs-scale-to-zero.md"
+      ],
+      "known_gaps": [
+        "LIVE DISPATCH PROVEN (m8_ui): durable SupervisorStore + DurableFleetLedger (BEGIN IMMEDIATE atomic claim) wired into baltor_flywheel.py --watch. Proven: two-process leader failover; and --watch --dispatch reads the REAL durable queue, records a spawn decision + real spawn REQUEST, and SPAWNS a real capability_worker process that claims+DRAINS the durable tasks (check_live_supervisor_dispatch). /api/fleet/* + /fleet project supervisor state + durable task queue + spawn requests (read-only). --dispatch is opt-in (the bare watchdog records decisions only). PARALLEL multi-worker drain across capabilities + DEPENDENCY ORDERING proven (durable depends_on gate; one worker per capability drains concurrently). DEFERRED (OPP-supervisor-scaling-live \u2192 M10): real K8s/KEDA multi-node deploy; leader shard-rebalance under load."
+      ],
+      "section_id": "flywheel_supervisor_scaling",
+      "category": "scaling",
+      "owner_folder": "src/baltor/workers",
+      "owner_module": "src/baltor/workers/supervisor_ledger.py",
+      "status": "m8_ui",
+      "critical_path_required": false
+    },
+    {
+      "input_contracts": [
+        "CapabilityTask"
+      ],
+      "output_contracts": [
+        "context_pack",
+        "receipt"
+      ],
+      "ports": [],
+      "adapters": [
+        "scripts/fleet_pipeline.py"
+      ],
+      "registries": [
+        "architecture/worker_capability_registry.json"
+      ],
+      "proof_scripts": [
+        "scripts/fleet_pipeline.py"
+      ],
+      "api_routes": [
+        "/api/demo/run-full-pipeline-via-fleet"
+      ],
+      "ui_pages": [
+        "/dashboard (Run via Fleet)"
+      ],
+      "docs": [
+        "docs/workers/operating-model-always-on-vs-scale-to-zero.md"
+      ],
+      "known_gaps": [
+        "G1 THE JOIN (m8_ui): the full context pipeline (Intake\u2192Decomposition\u2192Reconciliation\u2192Anti-Fragility\u2192Enhancement\u2192Verification\u2192Consumption) runs AS FLEET WORK \u2014 every stage is a CapabilityTask enqueued in the FleetLedger and executed ONLY after a worker wins the ATOMIC CLAIM, under a supervisor use-existing/spawn decision, calling the SAME shipped engines (context_graph/compress/swarm/verified_context_flow/lift) and emitting the same dashboard events. Reference answer (retry ceiling=5) preserved. Route /api/demo/run-full-pipeline-via-fleet. /dashboard 'Run via Fleet' button LIVE. DEFERRED (OPP-fleet-driven-pipeline-surface): durable FleetLedger on the live dispatch path, multi-worker parallel stage execution with dependency ordering."
+      ],
+      "section_id": "fleet_driven_pipeline",
+      "category": "scaling",
+      "owner_folder": "scripts",
+      "owner_module": "scripts/fleet_pipeline.py",
+      "status": "m8_ui",
+      "critical_path_required": false
+    }
+  ]
+}

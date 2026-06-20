@@ -36,9 +36,9 @@ Given a Stable-Diffusion-generated image, recover an approximate prompt + verify
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `caption_with_blip` | processor | `processor/embedder-minilm` | — |
-| 3 | `clip_interrogate` | processor | `processor/cross-encoder-reranker` | — |
-| 4 | `verify_cosine` | processor | `processor/multi-vector-fusion` | — |
-| 5 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `caption_with_blip` | processor | `processor/embedder-minilm` | - |
+| 3 | `clip_interrogate` | processor | `processor/cross-encoder-reranker` | - |
+| 4 | `verify_cosine` | processor | `processor/multi-vector-fusion` | - |
+| 5 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

@@ -1,0 +1,63 @@
+id: "tool/esoteric-source-surface-normalizer"
+type: tool
+version: "0.1.0"
+name: "Esoteric source surface normalizer"
+description: "Normalizes esoteric industry source-surface seeds into candidate primitive plans with flexible labels, source governance requirements, and review routing metadata."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["automotive", "energy", "manufacturing", "construction", "government", "cross_industry"]
+capability: ["extraction", "classification", "retrieval", "governance"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+tags: ["source-surfaces", "capability-gaps", "candidate-primitives", "flexible-labels"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    source_surface_seeds:
+      type: array
+      items:
+        type: object
+    excluded_scopes:
+      type: array
+      items:
+        type: string
+  required: ["source_surface_seeds"]
+returns:
+  type: object
+  properties:
+    candidate_primitives:
+      type: array
+      items:
+        type: object
+    label_paths:
+      type: array
+      items:
+        type: string
+    review_routes:
+      type: array
+      items:
+        type: object
+side_effects: "write"
+examples:
+  - input:
+      source_surface_seeds:
+        - id: "plumbing-hvac-permit-system-surface"
+          vertical: "trades.mechanical.plumbing_hvac"
+      excluded_scopes: ["insurance"]
+    output:
+      candidate_primitives:
+        - "permit_requirement_fact"
+      label_paths:
+        - "vertical.trades.plumbing.inspection"
+implementations:
+  - kind: "callable"
+    path: "scripts.factory.use_case_seed_rows.export_seed_rows"
+    language: "python"
+  - kind: "mcp"
+    path: "mcp/factory.normalize_esoteric_source_surfaces"

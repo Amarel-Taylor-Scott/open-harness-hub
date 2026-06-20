@@ -1,0 +1,62 @@
+id: "tool/terraform-blueprint-emitter"
+type: tool
+version: "0.1.0"
+name: "Terraform blueprint emitter"
+description: "Emits Terraform module skeletons and variable files for an approved LLM pipeline deployment blueprint."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["generation", "format_conversion", "tool_use"]
+modality: ["structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["terraform", "blueprint", "runtime", "saas"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    deployment_plan:
+      type: object
+    cloud:
+      type: string
+    region:
+      type: string
+    include_mcp_plan:
+      type: boolean
+  required: ["deployment_plan"]
+returns:
+  type: object
+  properties:
+    files:
+      type: array
+      items:
+        type: object
+    warnings:
+      type: array
+      items:
+        type: string
+    required_approvals:
+      type: array
+      items:
+        type: string
+side_effects: "none"
+examples:
+  - input:
+      deployment_plan:
+        pipeline_ref: "pipeline/platform-content-triage"
+      cloud: "aws"
+      region: "us-east-1"
+      include_mcp_plan: true
+    output:
+      files:
+        - path: "terraform/main.tf"
+          content_ref: "generated"
+      warnings: ["Review secrets, IAM, retention, and region before apply."]
+      required_approvals: ["Create cloud resources", "Store provider API keys"]
+implementations:
+  - kind: "callable"
+    path: "tools.terraform_blueprint_emitter.run"

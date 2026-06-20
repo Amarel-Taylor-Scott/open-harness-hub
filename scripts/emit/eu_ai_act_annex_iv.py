@@ -142,7 +142,7 @@ def main() -> int:
         n += 1
     print(f"wrote {n} Annex IV dossiers to dist/eu-ai-act/")
     if n == 0:
-        print("  (no `eu_ai_act_risk: high_risk` artifacts in the catalog — emitter is a no-op until one is added)")
+        print("  (no `eu_ai_act_risk: high_risk` components in the catalog — emitter is a no-op until one is added)")
     return 0
 
 

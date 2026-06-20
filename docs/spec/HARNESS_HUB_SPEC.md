@@ -13,15 +13,15 @@ implementation into a portable, vendor-neutral specification for any
 team that wants to publish or consume **harnesses** - host-agnostic,
 industry-agnostic descriptions of repeatable LLM-pipeline workflows.
 
-The full implementation lives in this repo at v0.4.0+ (200 artifacts,
+The full implementation lives in this repo at v0.4.0+ (200 components,
 4 working verticals, 13 standards-format emitters). This SPEC is the
 portable layer.
 
 ## 1. The shape
 
 A harness publication is one **YAML manifest** that validates against
-a published JSON Schema. The shape is the same for every artifact
-type. There are **14 artifact types**:
+a published JSON Schema. The shape is the same for every component
+type. There are **14 component types**:
 
 | Type | What it is |
 |---|---|
@@ -148,7 +148,7 @@ reference implementation runs the IDENTICAL chain across:
 - **AppSec code review** (29 CWE-cited GREP rules + OWASP RAG)
 
 with only the persona, GREP rule pack, knowledge pack, and rubric
-changing. Adding a fifth vertical is a 6-artifact PR.
+changing. Adding a fifth vertical is a 6-component PR.
 
 ## 5. Success criteria (the bar for "this pipeline passed")
 
@@ -220,7 +220,7 @@ get **thirteen** standards-format publications for free.
 Controlled lists live in `vocabularies/`:
 
 - `industries.yaml` - 30+ industries with sub-industries (healthcare.radiology, finance.aml, esg.csddd, legal.contract, security.appsec, ...)
-- `capabilities.yaml` - what the artifact DOES (retrieval, classification, generation, anonymization, code-execution, ...)
+- `capabilities.yaml` - what the component DOES (retrieval, classification, generation, anonymization, code-execution, ...)
 - `modalities.yaml` - text / image / audio / video / structured
 - `lifecycle-position.yaml` - pre_api.* / api.* / post_api.* / cross_cutting
 - `applied-layers.yaml` - persona / grep / rag / tools / official_sources / online / classifier / heuristic / privacy
@@ -274,7 +274,7 @@ depends / run / emit`) works against any clone of any fork.
   OpenTelemetry for runtime metrics.
 - A workflow engine. Use Temporal / Airflow / Prefect for orchestration.
 
-This spec is the **artifact layer between them**. The thing in the
+This spec is the **component layer between them**. The thing in the
 middle that says "this is how I compose them into a repeatable,
 inspectable workflow that I can publish, version, and grade."
 

@@ -1,88 +1,818 @@
-id: "rule-pack/grep-climate-disclosure-gaps"
+id: rule-pack/grep-climate-disclosure-gaps
 type: rule-pack
-version: "0.1.0"
-name: "Climate disclosure gap detectors (TCFD / ISSB / ESRS E1)"
-description: |
-  GREP detectors for the highest-leverage climate-disclosure gaps:
+version: 0.1.0
+name: Climate disclosure gap detectors (TCFD / ISSB / ESRS E1)
+description: 'GREP detectors for the highest-leverage climate-disclosure gaps:
+
   missing Scope-3 categories, missing transition plan, board-
+
   oversight silence, no 2C scenario analysis, no SBTi commitment,
+
   missing assurance, market-based-only Scope 2.
+
+  '
 authors:
-  - name: "Open Harness Hub contributors"
-license: "MIT"
-industry:   ["climate", "esg", "finance", "compliance"]
-capability: ["safety_gating", "classification", "verification"]
-modality:   ["text"]
-lifecycle:  "beta"
-trust_boundary: "local"
-freshness:  "volatile"
-tags: ["climate", "tcfd", "issb", "esrs", "scope-3", "sbti"]
-created: "2026-05-20"
-updated: "2026-05-20"
-
-family: "grep"
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- climate
+- esg
+- finance
+- compliance
+capability:
+- safety_gating
+- classification
+- verification
+modality:
+- text
+lifecycle: beta
+trust_boundary: local
+freshness: volatile
+tags:
+- climate
+- tcfd
+- issb
+- esrs
+- scope-3
+- sbti
+created: '2026-05-20'
+updated: '2026-05-25'
+family: grep
 rules:
-  - id: "scope_3_not_measured"
-    pattern: "(?i)scope\\s*3[\\s\\S]{0,80}?(?:not\\s+measured|not\\s+(?:disclosed|reported|calculated)|excluded|\\bN/A\\b|not\\s+applicable|out\\s+of\\s+scope)"
-    severity: "critical"
-    category: "climate.scope_3.not_measured"
-
-  - id: "scope_3_categories_partial"
-    pattern: "(?i)(?:only\\s+(?:categor(?:y|ies))|measured\\s+only\\s+categor(?:y|ies))\\s+\\d+(?:\\s*[-,+]\\s*\\d+)*(?!.{0,200}all\\s+15)"
-    severity: "high"
-    category: "climate.scope_3.partial"
-
-  - id: "no_transition_plan"
-    pattern: "(?i)(no|absent|none)\\s+(?:climate\\s+)?(?:transition|net[- ]?zero|decarbon)\\s+plan|transition\\s+plan\\s*[:=]\\s*(?:\\bN/A\\b|none|not\\s+applicable|in\\s+progress)"
-    severity: "critical"
-    category: "climate.no_transition_plan"
-
-  - id: "no_sbti_commitment"
-    pattern: "(?i)(no|not|absent)\\s+sbti(?:\\s+(?:committed|validated|target))?|sbti\\s*[:=]\\s*(?:no|none|not\\s+committed|\\bN/A\\b|not\\s+applicable|withdrew|removed)"
-    severity: "high"
-    category: "climate.no_sbti"
-
-  - id: "no_board_oversight"
-    pattern: "(?i)board\\s+(?:does not|has no|provides no|no formal)\\s+(?:climate|oversight|review)|climate.{0,40}not\\s+on\\s+the\\s+board\\s+agenda"
-    severity: "high"
-    category: "climate.governance.no_board"
-
-  - id: "no_scenario_analysis"
-    pattern: "(?i)(no|not (?:performed|conducted)|absent|n[\\.\\/]?a)\\s+scenario\\s+analys(?:is|es)|2[°°c]?c\\s+scenario\\s+not\\s+analyzed|1\\.5\\s*°?c\\s+scenario\\s+not"
-    severity: "high"
-    category: "climate.no_scenario_analysis"
-
-  - id: "no_third_party_assurance"
-    pattern: "(?i)(no|not|unassured|unverified)\\s+(?:third[- ]?party|independent|external)\\s+(?:verification|assurance|audit)\\s+(?:of\\s+)?(?:ghg|emissions|climate|scope)|self[- ]?reported.{0,40}(?:not\\s+verified|no\\s+assurance)"
-    severity: "medium"
-    category: "climate.no_assurance"
-
-  - id: "scope_2_market_only"
-    pattern: "(?i)scope\\s*2\\s+(?:market[- ]?based)\\s+only(?!.{0,80}location[- ]?based)|location[- ]?based\\s+(?:not\\s+reported|excluded|n[\\.\\/]?a)"
-    severity: "medium"
-    category: "climate.scope_2.market_only"
-
-  - id: "transition_risk_not_assessed"
-    pattern: "(?i)transition\\s+risk\\s+(?:not\\s+(?:assessed|considered|identified|material)|out\\s+of\\s+scope|n[\\.\\/]?a)"
-    severity: "high"
-    category: "climate.transition_risk.unassessed"
-
-  - id: "physical_risk_not_assessed"
-    pattern: "(?i)physical\\s+(?:climate\\s+)?risk\\s+(?:not\\s+(?:assessed|considered|identified|material)|out\\s+of\\s+scope|n[\\.\\/]?a)"
-    severity: "high"
-    category: "climate.physical_risk.unassessed"
-
-  - id: "no_targets_set"
-    pattern: "(?i)(no|absent|not\\s+set)\\s+(?:climate|ghg|emissions?)\\s+targets?|targets?\\s*[:=]\\s*(?:none|n[\\.\\/]?a|to\\s+be\\s+set)"
-    severity: "high"
-    category: "climate.no_targets"
-
-  - id: "offsetting_without_disclosure"
-    pattern: "(?i)(net[- ]?zero|carbon[- ]?neutral)(?!.{0,400}(offsets?|removal|sbti|residual\\s+\\d|10%))|achieve\\s+net[- ]?zero\\s+(?:via|through|by)\\s+offsets?\\s+only"
-    severity: "medium"
-    category: "climate.offset_only_pathway"
-
-  - id: "missing_methodology"
-    pattern: "(?i)methodology\\s*[:=]\\s*(?:n[\\.\\/]?a|none|undisclosed)|emissions\\s+calculation\\s+method(?:ology)?\\s+(?:not\\s+disclosed|unknown)"
-    severity: "medium"
-    category: "climate.no_methodology"
+- id: scope_3_not_measured
+  pattern: (?i)scope\s*3[\s\S]{0,80}?(?:not\s+measured|not\s+(?:disclosed|reported|calculated)|excluded|\bN/A\b|not\s+applicable|out\s+of\s+scope)
+  severity: critical
+  category: climate.scope_3.not_measured
+- id: scope_3_categories_partial
+  pattern: (?i)(?:only\s+(?:categor(?:y|ies))|measured\s+only\s+categor(?:y|ies))\s+\d+(?:\s*[-,+]\s*\d+)*(?!.{0,200}all\s+15)
+  severity: high
+  category: climate.scope_3.partial
+- id: no_transition_plan
+  pattern: (?i)(no|absent|none)\s+(?:climate\s+)?(?:transition|net[- ]?zero|decarbon)\s+plan|transition\s+plan\s*[:=]\s*(?:\bN/A\b|none|not\s+applicable|in\s+progress)
+  severity: critical
+  category: climate.no_transition_plan
+- id: no_sbti_commitment
+  pattern: (?i)(no|not|absent)\s+sbti(?:\s+(?:committed|validated|target))?|sbti\s*[:=]\s*(?:no|none|not\s+committed|\bN/A\b|not\s+applicable|withdrew|removed)
+  severity: high
+  category: climate.no_sbti
+- id: no_board_oversight
+  pattern: (?i)board\s+(?:does not|has no|provides no|no formal)\s+(?:climate|oversight|review)|climate.{0,40}not\s+on\s+the\s+board\s+agenda
+  severity: high
+  category: climate.governance.no_board
+- id: no_scenario_analysis
+  pattern: "(?i)(no|not (?:performed|conducted)|absent|n[\\.\\/]?a)\\s+scenario\\\
+    s+analys(?:is|es)|2[\xB0\xB0c]?c\\s+scenario\\s+not\\s+analyzed|1\\.5\\s*\xB0\
+    ?c\\s+scenario\\s+not"
+  severity: high
+  category: climate.no_scenario_analysis
+- id: no_third_party_assurance
+  pattern: (?i)(no|not|unassured|unverified)\s+(?:third[- ]?party|independent|external)\s+(?:verification|assurance|audit)\s+(?:of\s+)?(?:ghg|emissions|climate|scope)|self[-
+    ]?reported.{0,40}(?:not\s+verified|no\s+assurance)
+  severity: medium
+  category: climate.no_assurance
+- id: scope_2_market_only
+  pattern: (?i)scope\s*2\s+(?:market[- ]?based)\s+only(?!.{0,80}location[- ]?based)|location[-
+    ]?based\s+(?:not\s+reported|excluded|n[\.\/]?a)
+  severity: medium
+  category: climate.scope_2.market_only
+- id: transition_risk_not_assessed
+  pattern: (?i)transition\s+risk\s+(?:not\s+(?:assessed|considered|identified|material)|out\s+of\s+scope|n[\.\/]?a)
+  severity: high
+  category: climate.transition_risk.unassessed
+- id: physical_risk_not_assessed
+  pattern: (?i)physical\s+(?:climate\s+)?risk\s+(?:not\s+(?:assessed|considered|identified|material)|out\s+of\s+scope|n[\.\/]?a)
+  severity: high
+  category: climate.physical_risk.unassessed
+- id: no_targets_set
+  pattern: (?i)(no|absent|not\s+set)\s+(?:climate|ghg|emissions?)\s+targets?|targets?\s*[:=]\s*(?:none|n[\.\/]?a|to\s+be\s+set)
+  severity: high
+  category: climate.no_targets
+- id: offsetting_without_disclosure
+  pattern: (?i)(net[- ]?zero|carbon[- ]?neutral)(?!.{0,400}(offsets?|removal|sbti|residual\s+\d|10%))|achieve\s+net[-
+    ]?zero\s+(?:via|through|by)\s+offsets?\s+only
+  severity: medium
+  category: climate.offset_only_pathway
+- id: missing_methodology
+  pattern: (?i)methodology\s*[:=]\s*(?:n[\.\/]?a|none|undisclosed)|emissions\s+calculation\s+method(?:ology)?\s+(?:not\s+disclosed|unknown)
+  severity: medium
+  category: climate.no_methodology
+- id: scale_expansion_v1_critical_signal_01
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_02
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_03
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_04
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_05
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_06
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_07
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_08
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_09
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_10
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_11
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_12
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_13
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_14
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_15
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_16
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_17
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_18
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_19
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_20
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_21
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_22
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_23
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_24
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_25
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_26
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_27
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_28
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_29
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_30
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_31
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_32
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_33
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_34
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_35
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_36
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_37
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_38
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_39
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_40
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}climate.{0,24}disclosure.{0,24}gaps).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v2_unsupported_material_claim_001
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_002
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_003
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_004
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_005
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_006
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_007
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_008
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_009
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_010
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_011
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_012
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_013
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_014
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_015
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_016
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_017
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_018
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_019
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_020
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_021
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_022
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_023
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_024
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_025
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_026
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_027
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_028
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_029
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_030
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_031
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_032
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_033
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_034
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_035
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_036
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_037
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_038
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_039
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_040
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_041
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_042
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_043
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_044
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_045
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_046
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_047
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_048
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_049
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_050
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_051
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_052
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_053
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_054
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_055
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_056
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_057
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_058
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_059
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_060
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_061
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_062
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_063
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_064
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_065
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_066
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_067
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_068
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_069
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_070
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_071
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_072
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_073
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_074
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_075
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_076
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_077
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_078
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_079
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_080
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_climate_disclosure_gaps|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-climate-disclosure-gaps.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.

@@ -1,0 +1,38 @@
+id: "knowledge-pack/source-surface-partition-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Source surface partition patterns"
+description: "Seed backlog of high-value source surfaces that should be split into resumable scan partitions before public-source discovery, snapshotting, normalization, entity linking, dedupe, indexing, and review."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["government", "software", "media", "construction", "energy", "finance", "healthcare", "cross_industry"]
+capability: ["retrieval", "extraction", "classification", "governance", "evaluation", "routing"]
+modality: ["text", "structured", "image"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+tags: ["source-surfaces", "partitions", "scheduler", "object-factory", "million-objects", "excluded-scope-insurance"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types:
+  - "source_surface_partition_seed"
+  - "source_surface_priority_signal"
+  - "candidate_primitive_backlog"
+files:
+  - path: "catalog/knowledge-packs/data/source-surface-partition-patterns/source-surfaces.jsonl"
+    format: "jsonl"
+    schema: "source_surface_partition_seed"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["title", "vertical", "source_patterns", "candidate_primitives", "label_paths"]
+provenance:
+  sources:
+    - "Open Harness Hub source-surface planning notes"
+    - "Public source families listed in docs/codex/million-object-goal.md"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "synthetic seed metadata only; no raw source bodies or PII"

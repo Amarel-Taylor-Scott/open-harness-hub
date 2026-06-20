@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/object-factory-job.schema.json",
+  "title": "Object factory job",
+  "type": "object",
+  "required": ["job_id", "job_type", "tenant_id", "status", "inputs", "policy"],
+  "properties": {
+    "job_id": { "type": "string" },
+    "job_type": {
+      "type": "string",
+      "enum": [
+        "source_ingest",
+        "source_discovery",
+        "crawler_spider",
+        "repository_miner",
+        "workflow_miner",
+        "source_snapshot",
+        "page_to_markdown",
+        "document_digest",
+        "sensitive_data_gate",
+        "entity_linking",
+        "fuzzy_dedupe",
+        "batch_embedding",
+        "llm_polish",
+        "prompt_cache_profile",
+        "verification",
+        "label_dimension",
+        "dedupe_index",
+        "cost_meter",
+        "eval_test",
+        "warehouse_export",
+        "publish_review"
+      ]
+    },
+    "tenant_id": { "type": "string" },
+    "source_record_id": { "type": "string" },
+    "parent_job_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "spawned_job_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "running",
+        "succeeded",
+        "failed",
+        "needs_review",
+        "skipped",
+        "waiting_on_source",
+        "waiting_on_worker",
+        "waiting_on_policy",
+        "waiting_on_review",
+        "approval_required",
+        "budget_blocked",
+        "failed_permanently"
+      ]
+    },
+    "state": { "$ref": "_common.schema.json#/$defs/objectState" },
+    "state_history": {
+      "type": "array",
+      "items": { "$ref": "_common.schema.json#/$defs/stateEvent" }
+    },
+    "lane": { "$ref": "_common.schema.json#/$defs/queueLane" },
+    "priority": { "$ref": "_common.schema.json#/$defs/queuePriority" },
+    "priority_signals": { "$ref": "_common.schema.json#/$defs/prioritySignals" },
+    "queue_policy": { "$ref": "_common.schema.json#/$defs/queuePolicy" },
+    "inputs": {
+      "type": "object",
+      "description": "Pointers to source records, object storage paths, or prior job outputs. Do not inline secrets."
+    },
+    "policy": {
+      "type": "object",
+      "properties": {
+        "trust_boundary": { "type": "string", "enum": ["local", "hub", "external", "mixed"] },
+        "allowed_model_boundaries": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["local", "hub", "external", "mixed"] }
+        },
+        "redact_before_external_model": { "type": "boolean" },
+        "max_usd": { "type": "number" },
+        "license_policy": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "model_route": {
+      "type": "object",
+      "properties": {
+        "selected_adapter": { "type": "string" },
+        "selected_model": { "type": "string" },
+        "route_reason": { "type": "string" },
+        "pricing_snapshot_id": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "outputs": { "type": "object" },
+    "audit": {
+      "type": "object",
+      "properties": {
+        "worker_id": { "type": "string" },
+        "worker_image": { "type": "string" },
+        "git_commit": { "type": "string" },
+        "prompt_version": { "type": "string" },
+        "started_at": { "type": "string", "format": "date-time" },
+        "finished_at": { "type": "string", "format": "date-time" },
+        "retry_count": { "type": "integer" },
+        "review_ticket_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

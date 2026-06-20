@@ -32,7 +32,7 @@ Fine-tune Mask-RCNN (COCO-pretrained) on domain-specific object detection / inst
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `train` | processor | `processor/iterative-revise-loop` | — |
-| 3 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `train` | processor | `processor/iterative-revise-loop` | - |
+| 3 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

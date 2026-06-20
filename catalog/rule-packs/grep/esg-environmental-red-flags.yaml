@@ -1,127 +1,859 @@
-id: "rule-pack/grep-esg-environmental-red-flags"
+id: rule-pack/grep-esg-environmental-red-flags
 type: rule-pack
-version: "0.1.0"
-name: "ESG environmental red-flag detectors (the 'E' of ESG)"
-description: |
-  GREP detectors for the environmental dimension of supplier
-  disclosures: deforestation, water pollution, hazardous-waste
-  mismanagement, GHG underreporting, biodiversity harm, illegal
-  resource extraction, single-use plastics. Aligned to:
-   - EU CSDDD Art. 5(1)(b) (environmental adverse impacts)
-   - EU CSRD ESRS E1-E5 disclosure standards
-   - German LkSG §2(3) (environmental risks)
-   - California SB 261 (climate financial risk)
-   - TCFD recommendations
-   - Equator Principles 4 (project finance)
-
-  Pair with `pipeline/supplier-policy-grading` for full ESG grading
-  (S + E + G together).
+version: 0.1.0
+name: ESG environmental red-flag detectors (the 'E' of ESG)
+description: "GREP detectors for the environmental dimension of supplier\ndisclosures:\
+  \ deforestation, water pollution, hazardous-waste\nmismanagement, GHG underreporting,\
+  \ biodiversity harm, illegal\nresource extraction, single-use plastics. Aligned\
+  \ to:\n - EU CSDDD Art. 5(1)(b) (environmental adverse impacts)\n - EU CSRD ESRS\
+  \ E1-E5 disclosure standards\n - German LkSG \xA72(3) (environmental risks)\n -\
+  \ California SB 261 (climate financial risk)\n - TCFD recommendations\n - Equator\
+  \ Principles 4 (project finance)\n\nPair with `pipeline/supplier-policy-grading`\
+  \ for full ESG grading\n(S + E + G together).\n"
 authors:
-  - name: "Open Harness Hub contributors"
-license: "MIT"
-industry:   ["esg", "supply_chain", "compliance", "climate", "sustainability"]
-capability: ["safety_gating", "classification"]
-modality:   ["text"]
-lifecycle:  "beta"
-trust_boundary: "local"
-freshness:  "volatile"
-tags: ["esg", "environmental", "csddd", "csrd", "tcfd", "lksg", "deforestation"]
-created: "2026-05-19"
-updated: "2026-05-19"
-
-family: "grep"
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- esg
+- supply_chain
+- compliance
+- climate
+- sustainability
+capability:
+- safety_gating
+- classification
+modality:
+- text
+lifecycle: beta
+trust_boundary: local
+freshness: volatile
+tags:
+- esg
+- environmental
+- csddd
+- csrd
+- tcfd
+- lksg
+- deforestation
+created: '2026-05-19'
+updated: '2026-05-25'
+family: grep
 rules:
-  - id: "deforestation_high_risk"
-    pattern: "(?i)\\b(deforest|clear[- ]?cut|slash[- ]?and[- ]?burn|forest conversion|primary forest|old[- ]growth|amazon|congo basin|borneo|sumatra|cerrado|gran chaco)\\b"
-    severity: "critical"
-    category: "environmental.deforestation"
-
-  - id: "illegal_logging_terms"
-    pattern: "(?i)(illegal|unpermitted|unlicensed)\\s+(?:logg|harvest|extract|timber|wood)|FLEGT|CITES violation|protected species"
-    severity: "critical"
-    category: "environmental.illegal_extraction"
-
-  - id: "hazardous_waste_mismanagement"
-    pattern: "(?i)(hazardous|toxic|radioactive|persistent organic pollutant|pop)\\s+(?:waste|effluent|discharge|dump|spill|leak|disposal)|untreated\\s+(?:effluent|wastewater|sewage)|open[- ]?(?:dumping|pit)|incinerat.*without scrubber"
-    severity: "critical"
-    category: "environmental.hazardous_waste"
-
-  - id: "water_pollution"
-    pattern: "(?i)(discharge|effluent|runoff)\\s+(?:to|into|in)\\s+(?:river|stream|sea|aquifer|groundwater|waterway|lake)|untreated\\s+(?:water|effluent|sewage)|exceed.*pollutant limit|color.*discharge"
-    severity: "high"
-    category: "environmental.water_pollution"
-
-  - id: "water_stress_sourcing"
-    pattern: "(?i)water[- ]?stressed?\\s+(?:basin|region|area|catchment)|aqueduct\\s+(?:high|extremely high)|groundwater (?:depletion|overdraft|exhaust)|fossil aquifer"
-    severity: "medium"
-    category: "environmental.water_stress"
-
-  - id: "ghg_underreporting_signal"
-    pattern: "(?i)scope[ -]?3.*\\b(not (?:calculated|reported|measured)|excluded|out of scope|n[\\.\\/]a)\\b|category 1[- ]?15.*excluded|method:\\s*estimate only|no boundary defined"
-    severity: "high"
-    category: "environmental.ghg_underreporting"
-
-  - id: "missing_climate_transition_plan"
-    pattern: "(?i)(no|absent|not (?:applicable|available))\\s+(?:transition|net[- ]?zero|decarbon)\\s+plan|sbti.*(?:not (?:set|committed)|withdrew|removed)|paris[- ]?aligned.*\\bno\\b"
-    severity: "high"
-    category: "environmental.no_transition_plan"
-
-  - id: "biodiversity_protected_area"
-    pattern: "(?i)(operations|extraction|sourcing|facility)\\s+(?:in|near|adjacent to)\\s+(?:protected area|natural park|key biodiversity area|kba|world heritage|wetland|ramsar|natura 2000)"
-    severity: "critical"
-    category: "environmental.biodiversity"
-
-  - id: "air_emissions_excessive"
-    pattern: "(?i)(particulate|pm[ ]?2\\.5|pm[ ]?10|nox|sox|so2|voc|vocs)\\s+(?:exceed|over|above)\\s+(?:limit|standard|threshold|cap)|black smoke|visible plume.*hours"
-    severity: "high"
-    category: "environmental.air_emissions"
-
-  - id: "child_pollution_exposure"
-    pattern: "(?i)(school|clinic|hospital|residential|kindergarten)\\s+(?:within|next to|adjacent|across)\\s+(?:facility|plant|smelter|tannery|dyehouse|battery)|community health complain"
-    severity: "high"
-    category: "environmental.community_exposure"
-
-  - id: "palm_oil_unsustainable"
-    pattern: "(?i)palm oil.*(?:not|non)[- ]?(?:rspo|sustainable|certified)|conventional palm oil|grease[- ]?bond|undefined origin palm"
-    severity: "high"
-    category: "environmental.palm_oil"
-
-  - id: "cobalt_drc_artisanal_unaudited"
-    pattern: "(?i)cobalt.*(?:drc|democratic republic|katanga|kolwezi|likasi).*(?:artisanal|asm|small[- ]?scale).*(?:not audited|unverified|no chain of custody)"
-    severity: "critical"
-    category: "environmental.conflict_minerals"
-
-  - id: "single_use_plastic"
-    pattern: "(?i)single[- ]?use plastic|non[- ]?recyclable.*packaging|plastic.*not collected|ocean[- ]?bound plastic"
-    severity: "low"
-    category: "environmental.packaging"
-
-  - id: "ozone_depleting_substance"
-    pattern: "(?i)(cfc|hcfc|hfc|hydrochlorofluorocarbon|methyl bromide|halon)\\s+(?:use|emission|stockpile|legacy)|montreal protocol.*non[- ]?complian"
-    severity: "high"
-    category: "environmental.ozone_depleting"
-
-  - id: "land_clearing_legacy"
-    pattern: "(?i)(land|plot|area|hectare|forest)\\s+(?:was |were |has been )?(?:cleared|deforested|converted|burned)(?!.{0,80}(prior to|before)\\s+(?:2018|2019|2020))|legacy\\s+clearing|clearing.*\\b201[0-9]\\b"
-    severity: "high"
-    category: "environmental.deforestation_legacy"
-
-  - id: "scope_3_excluded_categories"
-    pattern: "(?i)scope[ -]?3.*(?:cat(?:egory)?\\s*\\d+).*(?:null|excluded|not (?:measured|reported|calculated)|n[\\.\\/]?a)|categor(?:y|ies)\\s+[\\d, ]+\\s+(?:not|excluded|null)"
-    severity: "medium"
-    category: "environmental.scope_3_underreporting"
-
-  - id: "no_third_party_ghg_verification"
-    pattern: "(?i)(?:ghg|emissions|carbon)\\s+(?:not|no|never)\\s+(?:third[- ]?party|externally|independently)\\s+(?:verified|audited|assured)|self[- ]?(?:estimated|reported)\\s+(?:not\\s+)?verified"
-    severity: "medium"
-    category: "environmental.ghg_no_verification"
-
-  - id: "near_protected_area"
-    pattern: "(?i)(?:within|near|adjacent|kilometre|km|miles?)\\s+(?:of|to|from)\\s+(?:(?:national|natural)?\\s*(?:park|reserve|sanctuary)|protected area|key biodiversity area|kba|ramsar|natura 2000|world heritage)|defensores del chaco|amazon rainforest"
-    severity: "high"
-    category: "environmental.biodiversity_proximity"
-
-  - id: "untreated_dye_effluent"
-    pattern: "(?i)(?:dye|tannery|leather|textile)\\s+effluent.*(?:discharge|release|dump|drain|canal|river|stream)|effluent\\s+(?:to|into|in)\\s+(?:back\\s+)?(?:canal|river|stream|drain)|untreated\\s+(?:dye|wastewater|effluent)"
-    severity: "critical"
-    category: "environmental.water_pollution.textile_dye"
+- id: deforestation_high_risk
+  pattern: (?i)\b(deforest|clear[- ]?cut|slash[- ]?and[- ]?burn|forest conversion|primary
+    forest|old[- ]growth|amazon|congo basin|borneo|sumatra|cerrado|gran chaco)\b
+  severity: critical
+  category: environmental.deforestation
+- id: illegal_logging_terms
+  pattern: (?i)(illegal|unpermitted|unlicensed)\s+(?:logg|harvest|extract|timber|wood)|FLEGT|CITES
+    violation|protected species
+  severity: critical
+  category: environmental.illegal_extraction
+- id: hazardous_waste_mismanagement
+  pattern: (?i)(hazardous|toxic|radioactive|persistent organic pollutant|pop)\s+(?:waste|effluent|discharge|dump|spill|leak|disposal)|untreated\s+(?:effluent|wastewater|sewage)|open[-
+    ]?(?:dumping|pit)|incinerat.*without scrubber
+  severity: critical
+  category: environmental.hazardous_waste
+- id: water_pollution
+  pattern: (?i)(discharge|effluent|runoff)\s+(?:to|into|in)\s+(?:river|stream|sea|aquifer|groundwater|waterway|lake)|untreated\s+(?:water|effluent|sewage)|exceed.*pollutant
+    limit|color.*discharge
+  severity: high
+  category: environmental.water_pollution
+- id: water_stress_sourcing
+  pattern: (?i)water[- ]?stressed?\s+(?:basin|region|area|catchment)|aqueduct\s+(?:high|extremely
+    high)|groundwater (?:depletion|overdraft|exhaust)|fossil aquifer
+  severity: medium
+  category: environmental.water_stress
+- id: ghg_underreporting_signal
+  pattern: (?i)scope[ -]?3.*\b(not (?:calculated|reported|measured)|excluded|out of
+    scope|n[\.\/]a)\b|category 1[- ]?15.*excluded|method:\s*estimate only|no boundary
+    defined
+  severity: high
+  category: environmental.ghg_underreporting
+- id: missing_climate_transition_plan
+  pattern: (?i)(no|absent|not (?:applicable|available))\s+(?:transition|net[- ]?zero|decarbon)\s+plan|sbti.*(?:not
+    (?:set|committed)|withdrew|removed)|paris[- ]?aligned.*\bno\b
+  severity: high
+  category: environmental.no_transition_plan
+- id: biodiversity_protected_area
+  pattern: (?i)(operations|extraction|sourcing|facility)\s+(?:in|near|adjacent to)\s+(?:protected
+    area|natural park|key biodiversity area|kba|world heritage|wetland|ramsar|natura
+    2000)
+  severity: critical
+  category: environmental.biodiversity
+- id: air_emissions_excessive
+  pattern: (?i)(particulate|pm[ ]?2\.5|pm[ ]?10|nox|sox|so2|voc|vocs)\s+(?:exceed|over|above)\s+(?:limit|standard|threshold|cap)|black
+    smoke|visible plume.*hours
+  severity: high
+  category: environmental.air_emissions
+- id: child_pollution_exposure
+  pattern: (?i)(school|clinic|hospital|residential|kindergarten)\s+(?:within|next
+    to|adjacent|across)\s+(?:facility|plant|smelter|tannery|dyehouse|battery)|community
+    health complain
+  severity: high
+  category: environmental.community_exposure
+- id: palm_oil_unsustainable
+  pattern: (?i)palm oil.*(?:not|non)[- ]?(?:rspo|sustainable|certified)|conventional
+    palm oil|grease[- ]?bond|undefined origin palm
+  severity: high
+  category: environmental.palm_oil
+- id: cobalt_drc_artisanal_unaudited
+  pattern: (?i)cobalt.*(?:drc|democratic republic|katanga|kolwezi|likasi).*(?:artisanal|asm|small[-
+    ]?scale).*(?:not audited|unverified|no chain of custody)
+  severity: critical
+  category: environmental.conflict_minerals
+- id: single_use_plastic
+  pattern: (?i)single[- ]?use plastic|non[- ]?recyclable.*packaging|plastic.*not collected|ocean[-
+    ]?bound plastic
+  severity: low
+  category: environmental.packaging
+- id: ozone_depleting_substance
+  pattern: (?i)(cfc|hcfc|hfc|hydrochlorofluorocarbon|methyl bromide|halon)\s+(?:use|emission|stockpile|legacy)|montreal
+    protocol.*non[- ]?complian
+  severity: high
+  category: environmental.ozone_depleting
+- id: land_clearing_legacy
+  pattern: (?i)(land|plot|area|hectare|forest)\s+(?:was |were |has been )?(?:cleared|deforested|converted|burned)(?!.{0,80}(prior
+    to|before)\s+(?:2018|2019|2020))|legacy\s+clearing|clearing.*\b201[0-9]\b
+  severity: high
+  category: environmental.deforestation_legacy
+- id: scope_3_excluded_categories
+  pattern: (?i)scope[ -]?3.*(?:cat(?:egory)?\s*\d+).*(?:null|excluded|not (?:measured|reported|calculated)|n[\.\/]?a)|categor(?:y|ies)\s+[\d,
+    ]+\s+(?:not|excluded|null)
+  severity: medium
+  category: environmental.scope_3_underreporting
+- id: no_third_party_ghg_verification
+  pattern: (?i)(?:ghg|emissions|carbon)\s+(?:not|no|never)\s+(?:third[- ]?party|externally|independently)\s+(?:verified|audited|assured)|self[-
+    ]?(?:estimated|reported)\s+(?:not\s+)?verified
+  severity: medium
+  category: environmental.ghg_no_verification
+- id: near_protected_area
+  pattern: (?i)(?:within|near|adjacent|kilometre|km|miles?)\s+(?:of|to|from)\s+(?:(?:national|natural)?\s*(?:park|reserve|sanctuary)|protected
+    area|key biodiversity area|kba|ramsar|natura 2000|world heritage)|defensores del
+    chaco|amazon rainforest
+  severity: high
+  category: environmental.biodiversity_proximity
+- id: untreated_dye_effluent
+  pattern: (?i)(?:dye|tannery|leather|textile)\s+effluent.*(?:discharge|release|dump|drain|canal|river|stream)|effluent\s+(?:to|into|in)\s+(?:back\s+)?(?:canal|river|stream|drain)|untreated\s+(?:dye|wastewater|effluent)
+  severity: critical
+  category: environmental.water_pollution.textile_dye
+- id: scale_expansion_v1_critical_signal_01
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_02
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_03
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_04
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_05
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_06
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_07
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_08
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_09
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_10
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_11
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_12
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_13
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_14
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_15
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_16
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_17
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_18
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_19
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_20
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_21
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_22
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_23
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_24
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_25
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_26
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_27
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_28
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_29
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_30
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_31
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_32
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_33
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_34
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_35
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_36
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_37
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_38
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_39
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_40
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}esg.{0,24}environmental.{0,24}red.{0,24}flags).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v2_unsupported_material_claim_001
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_002
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_003
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_004
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_005
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_006
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_007
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_008
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_009
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_010
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_011
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_012
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_013
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_014
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_015
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_016
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_017
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_018
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_019
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_020
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_021
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_022
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_023
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_024
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_025
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_026
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_027
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_028
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_029
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_030
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_031
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_032
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_033
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_034
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_035
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_036
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_037
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_038
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_039
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_040
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_041
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_042
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_043
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_044
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_045
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_046
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_047
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_048
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_049
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_050
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_051
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_052
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_053
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_054
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_055
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_056
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_057
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_058
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_059
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_060
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_061
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_062
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_063
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_064
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_065
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_066
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_067
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_068
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_069
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_070
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_071
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_072
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_073
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_074
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_075
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_076
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_077
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_078
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_079
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_080
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_esg_environmental_red_flags|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-esg-environmental-red-flags.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.

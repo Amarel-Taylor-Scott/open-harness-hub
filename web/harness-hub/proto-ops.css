@@ -1,0 +1,52 @@
+/* ============================================================
+   OpenHarnessHub — Status/SLA · Activity/Notifications · GitHub source search
+   ============================================================ */
+
+/* ---------------- STATUS / SLA ---------------- */
+.pt-status-banner { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-radius: var(--r-lg); margin-bottom: 20px;
+                    background: color-mix(in srgb, var(--success) 10%, var(--panel)); border: 1px solid color-mix(in srgb, var(--success) 35%, var(--line)); }
+.pt-status-banner .d { width: 12px; height: 12px; border-radius: 50%; background: var(--success); flex: 0 0 auto; }
+.pt-status-banner .t { font-family: var(--font-display); font-size: 17px; font-weight: 700; color: var(--fg); }
+.pt-status-banner .s { font-size: 12.5px; color: var(--fg-muted); margin-left: auto; }
+.pt-svc-row { display: grid; grid-template-columns: 1fr 200px 70px; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 12.5px; }
+.pt-svc-row:last-child { border-bottom: none; }
+.pt-svc-row .nm { color: var(--fg); font-weight: 500; }
+.pt-svc-row .up { font-family: var(--font-mono); color: var(--fg-muted); text-align: right; }
+.pt-uptime { display: flex; gap: 2px; height: 22px; align-items: stretch; }
+.pt-uptime i { flex: 1; border-radius: 1px; background: var(--success); opacity: .85; }
+.pt-uptime i.warn { background: var(--warning); } .pt-uptime i.down { background: var(--danger); }
+.pt-incident { display: flex; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 12.5px; }
+.pt-incident:last-child { border-bottom: none; }
+.pt-incident .dt { font-family: var(--font-mono); font-size: 10.5px; color: var(--fg-faint); flex: 0 0 92px; padding-top: 2px; }
+.pt-incident .body { flex: 1; } .pt-incident .body .h { color: var(--fg); font-weight: 600; }
+.pt-incident .body .d { color: var(--fg-muted); margin-top: 2px; }
+
+/* ---------------- ACTIVITY / NOTIFICATIONS ---------------- */
+.pt-activity { display: grid; grid-template-columns: 1.5fr 1fr; gap: 22px; align-items: start; }
+.pt-evt { display: flex; gap: 11px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 12.5px; }
+.pt-evt:last-child { border-bottom: none; }
+.pt-evt .ico { width: 26px; height: 26px; border-radius: var(--r-sm); display: grid; place-items: center; flex: 0 0 auto; font-size: 13px; }
+.pt-evt .body { flex: 1; min-width: 0; }
+.pt-evt .body .h { color: var(--fg); line-height: 1.4; }
+.pt-evt .body .h b { font-weight: 600; }
+.pt-evt .body .h .mono { font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted); }
+.pt-evt .body .t { font-family: var(--font-mono); font-size: 10.5px; color: var(--fg-faint); margin-top: 3px; }
+.pt-evt .body .diff { font-family: var(--font-mono); font-size: 10.5px; margin-top: 4px; }
+.pt-evt .body .diff .add { color: var(--success); } .pt-evt .body .diff .rem { color: var(--danger); }
+
+/* ---------------- GITHUB SOURCE SEARCH ---------------- */
+.pt-gh-mode { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--verified);
+              border: 1px solid color-mix(in srgb, var(--verified) 35%, var(--line)); border-radius: var(--r-pill); padding: 3px 9px; }
+.pt-gh-row { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-md); padding: 13px 15px; margin-bottom: 10px; }
+.pt-gh-row.abstract { border-style: dashed; border-color: var(--line-strong); background: transparent; }
+.pt-gh-top { display: flex; align-items: center; gap: 9px; margin-bottom: 5px; flex-wrap: wrap; }
+.pt-gh-top .repo { font-family: var(--font-mono); font-size: 11.5px; color: var(--info); }
+.pt-gh-top .stars { font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted); }
+.pt-gh-top .lic { font-family: var(--font-mono); font-size: 10px; border: 1px solid var(--line); border-radius: var(--r-sm); padding: 1px 6px; color: var(--fg-muted); }
+.pt-gh-row .nm { font-size: 13.5px; font-weight: 600; color: var(--fg); }
+.pt-gh-row .match { font-size: 12px; color: var(--fg-muted); line-height: 1.45; margin: 5px 0 9px; }
+.pt-gh-row .match mark { background: var(--accent-weak); color: var(--accent); padding: 0 3px; border-radius: 3px; }
+.pt-gh-row .foot { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+.pt-gh-status { font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; border-radius: var(--r-pill); padding: 2px 8px; }
+.pt-gh-status.promoted { color: var(--success); background: color-mix(in srgb, var(--success) 12%, transparent); }
+.pt-gh-status.abstract { color: var(--warning); background: color-mix(in srgb, var(--warning) 12%, transparent); }

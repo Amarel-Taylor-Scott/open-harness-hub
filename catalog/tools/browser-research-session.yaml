@@ -1,0 +1,80 @@
+id: "tool/browser-research-session"
+type: tool
+version: "0.1.0"
+name: "Browser research session"
+description: "Runs a controlled browser-based research session for pages that require rendering, navigation, screenshots, or structured extraction from dynamic web applications."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "cross_industry"]
+capability: ["retrieval", "tool_use"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "volatile"
+tags: ["browser", "search", "research", "retrieval", "saas"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    query:
+      type: string
+      description: "Research question or extraction objective."
+    start_urls:
+      type: array
+      items:
+        type: string
+    max_pages:
+      type: integer
+      default: 5
+    allowed_domains:
+      type: array
+      items:
+        type: string
+    capture_screenshots:
+      type: boolean
+      default: false
+    extraction_schema:
+      type: object
+      description: "Optional schema for structured extraction."
+  required: ["query"]
+returns:
+  type: object
+  properties:
+    session_id:
+      type: string
+    findings:
+      type: array
+      items:
+        type: object
+    citations:
+      type: array
+      items:
+        type: object
+    screenshots:
+      type: array
+      items:
+        type: string
+    limits:
+      type: object
+side_effects: "external_call"
+examples:
+  - input:
+      query: "Find current deployment requirements on the provider status page."
+      max_pages: 3
+      allowed_domains: ["example.com"]
+      capture_screenshots: true
+    output:
+      session_id: "browser-session-example"
+      findings: []
+      citations: []
+      screenshots: []
+      limits:
+        note: "Example only; live browser execution required."
+implementations:
+  - kind: "mcp"
+    path: "mcp/browser.research_session"
+  - kind: "callable"
+    path: "tools.browser_research_session.run"

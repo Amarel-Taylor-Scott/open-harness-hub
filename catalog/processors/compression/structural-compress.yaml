@@ -1,0 +1,47 @@
+id: processor/structural-compress
+type: processor
+version: 0.1.0
+name: Structural compression (Tree-sitter)
+description: Strip function/method bodies, keep signatures + structure (Repomix / Tree-sitter style) —
+  ~70% token reduction on code, structure-lossless. The 'compressed' tier's structural flavor; pairs with
+  the learned flavor (retrieval/llmlingua-compress). Ships a measured fidelity delta (verify/compression-fidelity-check).
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+capability:
+- summarization
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- baltor
+- compression
+- tier
+created: '2026-05-29'
+updated: '2026-05-29'
+attribution:
+  source_kind: manual
+  author: Open Harness Hub — Baltor
+  license: MIT
+process_kind: compress.structural
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: content
+  type: object
+outputs:
+- name: compressed
+  type: object
+side_effects: none
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.compression.structural_compress.run
+  language: python
+links:
+  source: docs/strategy/context-enrichment-service.md

@@ -1,0 +1,30 @@
+{
+  "kind": "baltor.flywheel-spec.v1",
+  "id": "flywheel.context-rot",
+  "name": "Context Rot Flywheel",
+  "version": "1.0.0",
+  "level": "L2_subsystem",
+  "scope": "all cached context objects + served packs",
+  "stage_mapping": "Anti-Fragility",
+  "objective": "Detect stale/contradicted/permission-invalid context before it is served; refresh or hold.",
+  "triggers": ["ttl_expired", "source_hash_changed", "source_acl_changed", "pack_requested", "eval_failed", "human_override"],
+  "inputs": ["source_handles", "cached_claims", "context_packs", "ttl_policy"],
+  "steps": [
+    {"name": "validate_source_handles", "worker": "ContextRotSweeper", "emits": ["rot_signal"]},
+    {"name": "compare_content_hash", "worker": "ContextRotSweeper"},
+    {"name": "check_acl_and_ttl", "worker": "ContextRotSweeper"},
+    {"name": "classify_and_route", "worker": "ContextRotSweeper", "emits": ["pack_refresh_job", "context_receipt_update"]}
+  ],
+  "outputs": ["RotSignal", "InvalidatedClaim", "RefreshedContextObject", "PackRefreshJob", "ContextReceiptUpdate"],
+  "metrics": ["rot_detection", "freshness_detection", "stale_claims_blocked", "packs_refreshed"],
+  "fallbacks": ["serve_with_freshness_warning", "route_to_human_review"],
+  "policies": ["block_serving_on_permission_changed", "hold_would_be_violations"],
+  "harness_refs": ["fixtures/harness/context-rot.harness.json"],
+  "runtime_placement": "worker-plane:cron (ContextRotSweeper)",
+  "receipts_emitted": ["ContextReceiptUpdate"],
+  "owner": "team:context-assurance",
+  "steward": "team:context-assurance",
+  "created_at": "2026-06-04T00:00:00Z",
+  "updated_at": "2026-06-04T00:00:00Z",
+  "_implemented_by": "scripts/ingest/context_rot.py (the deterministic core of this flywheel)"
+}

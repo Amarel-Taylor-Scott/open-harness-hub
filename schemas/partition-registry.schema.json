@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/partition-registry.schema.json",
+  "title": "Partition registry",
+  "description": "A compact registry of partition manifests used to replay index deltas without rebuilding the full catalog.",
+  "type": "object",
+  "required": ["version", "generated_at", "partition_count", "total_objects", "partitions"],
+  "properties": {
+    "version": { "type": "string" },
+    "generated_at": { "type": "string" },
+    "partition_count": { "type": "integer", "minimum": 0 },
+    "total_objects": { "type": "integer", "minimum": 0 },
+    "duplicates": { "type": "array", "items": { "type": "string" } },
+    "partitions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["partition_id", "manifest_path", "manifest_hash", "object_count", "index_delta_paths"],
+        "properties": {
+          "partition_id": { "type": "string" },
+          "manifest_path": { "type": "string" },
+          "manifest_hash": { "type": "string" },
+          "partition_kind": { "type": "string" },
+          "run_id": { "type": "string" },
+          "source_surface_id": { "type": "string" },
+          "tenant_id": { "type": "string" },
+          "object_count": { "type": "integer", "minimum": 0 },
+          "shard_paths": { "type": "array", "items": { "type": "string" } },
+          "index_delta_paths": { "type": "array", "items": { "type": "string" } },
+          "content_hash": { "type": "string" },
+          "privacy_summary": { "type": "object" },
+          "quality_summary": { "type": "object" },
+          "created": { "type": "string" },
+          "updated": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,20 @@
+{
+  "$id": "inference/ModelRouteDecision.v1",
+  "title": "ModelRouteDecision.v1",
+  "type": "object",
+  "additionalProperties": true,
+  "description": "The Inference Gateway's provider-selection decision for a resolved preference (projection of oips.select_provider): which provider NODE was chosen, whether a governed fallback was used, the requested vs selected tier, and the rejected candidates with reason codes. Fallback is never silent — it is recorded here. blocked=true means fail-closed (no eligible provider).",
+  "required": ["selected_provider_node_id", "fallback_used", "blocked", "fallback_reason_codes",
+               "rejected_candidates", "requested_tier_code"],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "selected_provider_node_id": {"type": ["string", "null"]},
+    "fallback_used": {"type": "boolean"},
+    "tier_downgraded": {"type": "boolean"},
+    "blocked": {"type": "boolean"},
+    "fallback_reason_codes": {"type": "array", "items": {"type": "string"}},
+    "rejected_candidates": {"type": "array", "description": "each: {provider_node_id, reason_code}"},
+    "requested_tier_code": {"type": "integer"},
+    "selected_tier_code": {"type": ["integer", "null"]}
+  }
+}

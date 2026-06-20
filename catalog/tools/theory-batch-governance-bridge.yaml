@@ -1,0 +1,68 @@
+id: "tool/theory-batch-governance-bridge"
+type: tool
+version: "0.1.0"
+name: "Theory batch governance bridge"
+description: "Plans promotion readiness, review queues, embedding execution, and vector readiness for theory-derived component batches from their staged load-audit outputs."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "security.defensive", "cross_industry"]
+capability: ["governance", "embedding", "planning", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["theory-to-components", "promotion", "embedding-execution", "review-gate", "pgvector"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    theory_batch_summary:
+      type: string
+    load_audit_summary:
+      type: string
+    output_dir:
+      type: string
+    run_id:
+      type: string
+    default_profile:
+      type: string
+  required: ["theory_batch_summary", "load_audit_summary", "output_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    promotion:
+      type: object
+    embedding:
+      type: object
+    load_audit:
+      type: object
+    files:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      theory_batch_summary: "dist/theory-component-batch/2026-05-26/theory-component-batch-summary.json"
+      load_audit_summary: "dist/theory-component-batch-load-audit/2026-05-26/summary.json"
+      output_dir: "dist/theory-batch-governance-bridge/2026-05-26"
+    output:
+      ok: true
+      promotion:
+        counts:
+          normalized_objects: 1000
+          candidate_load_ready: 1000
+          active_promotion_ready: 0
+      embedding:
+        input_embedding_rows: 1000
+        planned_completion_rows: 1000
+implementations:
+  - kind: "callable"
+    path: "scripts.db.theory_batch_governance_bridge.build_theory_batch_governance_bridge"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.theory_batch_governance_bridge"

@@ -1,0 +1,35 @@
+{
+  "$id": "agents/AgentCapabilityReceipt.v1",
+  "title": "AgentCapabilityReceipt.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "Mandatory PROVENANCE of one capability run on the Teleon Agent Capability Gateway: which capability ran for which consumer, the input/output content hashes (so the result is tamper-evident and de-duplicable), the runtime_path actually taken on the token-saving ladder (deterministic|cache|api|llm_fallback|human — the cheapest step that served it, proving deterministic-first), the backend it executed on, a cost_estimate, start/complete timestamps, and the policy_checks that were enforced. The receipt records WHAT WAS DONE and HOW CHEAPLY; it never asserts the output is true (Baltor governs truth). No raw secrets — hashes, runtime_path labels, and check booleans only.",
+  "required": [
+    "receipt_id",
+    "request_id",
+    "capability_id",
+    "consumer_id",
+    "input_hash",
+    "output_hash",
+    "runtime_path",
+    "backend",
+    "cost_estimate",
+    "started_at",
+    "completed_at",
+    "policy_checks"
+  ],
+  "properties": {
+    "receipt_id": {"type": "string", "description": "unique id of this receipt"},
+    "request_id": {"type": "string", "description": "the run request this receipt attests"},
+    "capability_id": {"type": "string", "description": "the capability that ran"},
+    "consumer_id": {"type": "string", "description": "the agent consumer the run was executed for"},
+    "input_hash": {"type": "string", "description": "canonical hash of the run input (tamper-evident; not the raw input)"},
+    "output_hash": {"type": "string", "description": "canonical hash of the output (tamper-evident; not the raw output)"},
+    "runtime_path": {"type": "string", "enum": ["deterministic", "cache", "api", "llm_fallback", "human"], "description": "the token-ladder step actually used to serve this run — deterministic/cache/api are the cheap hot path; llm_fallback/human only when the deterministic ladder was exhausted and policy allowed; recording it proves the gateway is deterministic-first"},
+    "backend": {"type": "string", "description": "the execution backend the run ran on (e.g. local_function@v1; cloud/K8s by policy via the execution backend selector)"},
+    "cost_estimate": {"type": "object", "description": "estimated cost of this run (e.g. {unit: 'usd', amount}); the basis for cost-per-successful-run pricing"},
+    "started_at": {"type": "string", "description": "ISO-8601 start timestamp"},
+    "completed_at": {"type": "string", "description": "ISO-8601 completion timestamp"},
+    "policy_checks": {"type": "object", "description": "the governance checks enforced, e.g. {capability_allowed, no_forbidden_tool_used, secrets_refs_only, deterministic_first_honored, llm_fallback_within_policy, cost_within_max, freshness_met, no_self_boundary_expansion} -> booleans"}
+  }
+}

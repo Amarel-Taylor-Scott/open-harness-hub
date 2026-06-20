@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"></meta>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+<title>LLM Economics &amp; the Claude Code Backlog — Pass 12</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"></link>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"></link>
+<link rel="stylesheet" href="shared/oh-tokens.css"></link>
+<style>
+  html, body { margin: 0; }
+  body.oh { background: var(--bg); color: var(--fg); font-family: var(--font-display); -webkit-font-smoothing: antialiased; }
+  .doc { max-width: 940px; margin: 0 auto; padding: 0 32px 96px; }
+  .doc-top { display: flex; align-items: center; gap: 12px; padding: 22px 0 18px; border-bottom: 1px solid var(--line); }
+  .doc-mark { width: 28px; height: 28px; border-radius: 7px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 800; font-size: 13px; }
+  .doc-brand { font-weight: 800; font-size: 15px; letter-spacing: -.02em; }
+  .doc-brand small { display: block; font-weight: 500; font-size: 11px; color: var(--fg-faint); }
+  .doc-top .sp { flex: 1; }
+  .doc-date { font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; background: var(--panel); }
+  .eyebrow { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-top: 44px; }
+  h1 { font-size: 32px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; margin: 12px 0 0; max-width: 26ch; }
+  .lede { font-size: 15.5px; line-height: 1.65; color: var(--fg-muted); margin: 16px 0 0; max-width: 66ch; text-wrap: pretty; }
+  .lede b { color: var(--fg); font-weight: 600; }
+  h2 { font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin: 54px 0 0; padding-bottom: 12px; border-bottom: 1px solid var(--line); display: flex; align-items: baseline; gap: 12px; }
+  h2 .n { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); font-weight: 600; }
+  p { font-size: 14px; line-height: 1.65; color: var(--fg-muted); margin: 12px 0 0; max-width: 70ch; text-wrap: pretty; }
+  p b { color: var(--fg); font-weight: 600; }
+  code { font-family: var(--font-mono); font-size: .92em; background: var(--bg-subtle); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 16px; }
+  th { text-align: left; font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-faint); padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: top; line-height: 1.5; color: var(--fg-muted); }
+  td .tt { color: var(--fg); font-weight: 600; }
+  td.num { font-family: var(--font-mono); font-size: 11.5px; white-space: nowrap; }
+  .warn { border: 1px solid color-mix(in srgb, var(--warning) 36%, var(--line)); background: color-mix(in srgb, var(--warning) 7%, var(--panel)); border-radius: var(--r-md); padding: 12px 16px; margin-top: 14px; font-size: 12.5px; line-height: 1.55; color: var(--fg-muted); max-width: 74ch; }
+  .warn b { color: var(--warning); }
+  .callout { border: 1px solid color-mix(in srgb, var(--verified) 36%, var(--line)); background: color-mix(in srgb, var(--verified) 7%, var(--panel)); border-radius: var(--r-lg); padding: 16px 20px; margin-top: 18px; font-size: 14px; line-height: 1.6; color: var(--fg-muted); max-width: 72ch; }
+  .callout b { color: var(--fg); }
+  .phases { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .ph { border: 1px solid var(--line); border-radius: var(--r-md); background: var(--panel); padding: 13px 16px; }
+  .ph .k { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--accent); }
+  .ph .t { font-size: 13.5px; font-weight: 700; margin-top: 4px; }
+  .ph .d { font-size: 12px; line-height: 1.5; color: var(--fg-muted); margin-top: 4px; }
+  .foot { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12px; color: var(--fg-faint); line-height: 1.6; }
+  .foot b { color: var(--fg-muted); font-weight: 600; }
+  @media (max-width: 700px) { .phases { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body class="oh dir-s theme-light">
+<div class="doc">
+
+  <header class="doc-top">
+    <div class="doc-mark">A</div>
+    <div class="doc-brand">AI Done Right<small>internal · inference economics + work queue</small></div>
+    <div class="sp"></div>
+    <div class="doc-date">pass 12 · 2026-06-09</div>
+  </header>
+
+  <div class="eyebrow">LLM spend policy · the long-running backlog</div>
+  <h1>Route by workload class. Work the queue top-down.</h1>
+  <p class="lede">Pass 12 closes the preparation: an <b>inference cost strategy</b> grounded in fresh research (Ollama's fixed-rate cloud, batch economics, the self-hosting trap), and the <b>long-running Claude Code backlog</b> — nine phases, ~35 tasks, every one with its proof and working prompt. Canonical: <code>production/cloud/LLM-ECONOMICS.md</code> · <code>production/CLAUDE-CODE-BACKLOG.md</code>.</p>
+
+  <h2><span class="n">01</span> The five inference lanes</h2>
+  <table>
+    <thead><tr><th>Lane</th><th>Workload</th><th>Backend</th><th>Cost shape</th></tr></thead>
+    <tbody>
+      <tr><td class="tt">L-dev</td><td>local development</td><td>Ollama local — free, unlimited on own hardware, OpenAI-compatible</td><td class="num">$0</td></tr>
+      <tr><td class="tt">L-agent</td><td>long-running agent/coding loops</td><td>Fixed subscriptions (Claude Max; Ollama Cloud $0/$20/$100 flat — explicitly no surprise overage from a runaway loop)</td><td class="num">flat $/mo</td></tr>
+      <tr><td class="tt">L-interactive</td><td>features users wait on</td><td>Provider APIs via the plane; <b>budget class default</b> (~$0.10–0.27/M input), frontier class gated</td><td class="num">$/token</td></tr>
+      <tr><td class="tt">L-batch</td><td><b>Baltor's verification rail</b>, evals, enrichment sweeps</td><td>Batch endpoints (~50% off) or open models, nightly window</td><td class="num">$/token ÷ 2</td></tr>
+      <tr><td class="tt">L-selfhost</td><td>sustained high-volume open-model traffic</td><td>vLLM on rented GPU (H100 ~$2.50–3.50/hr · Hetzner GEX44 €184/mo)</td><td class="num">fixed $/mo</td></tr>
+    </tbody>
+  </table>
+  <p>The strategy in one line: <b>open/cheap models for high-volume inference (classification, summarization, verification checks), frontier APIs only where frontier reasoning is measurably needed</b> — the documented hybrid result is a 60–80% bill cut without quality loss. Model <i>classes</i>, never model names, live in code (S12); the class that served each answer is recorded in its receipt.</p>
+
+  <div class="warn"><b>The self-hosting trap, documented.</b> Real self-host cost runs <b>3–5× the raw GPU rental</b> once ops time is priced; against budget APIs the break-even is billions of tokens/month (one published all-in figure: ~$3,240/mo for a single-A100 deployment serving what a budget API does for a few dollars). So L-selfhost is triple-gated: receipts showing provider spend ≥ 2× all-in GPU cost for 3 consecutive months, OR a privacy mandate; an open-weight model that fits the workload; and vLLM as the stack (TGI is in maintenance; Ollama stays the dev tool). Until then, Ollama Cloud's flat tiers are the zero-ops stepping stone.</div>
+
+  <div class="callout"><b>Batching is a product feature, not just a discount.</b> Baltor's verification rail re-checks thousands of facts on a schedule — the canonical batch workload. Building the batch lane once halves the platform's largest predictable spend line, and the receipts plane already meters it per key.</div>
+
+  <h2><span class="n">02</span> The backlog — nine phases, worked top-down</h2>
+  <div class="phases">
+    <div class="ph"><span class="k">Phase 0</span><div class="t">Make it run</div><div class="d">just plan → up → tunnel (clears G-9) · bench baseline · vault adoption</div></div>
+    <div class="ph"><span class="k">Phase 1</span><div class="t">Identity completion</div><div class="d">ENDPOINTS alignment · /service/* slice · auth into the kit · email console adapter</div></div>
+    <div class="ph"><span class="k">Phase 2</span><div class="t">Events &amp; A/B end-to-end</div><div class="d">beacon · PMF funnel events · A/B readout · PostHog gate</div></div>
+    <div class="ph"><span class="k">Phase 3</span><div class="t">Business plane</div><div class="d">ledger billing from receipts · Resend · Stripe test mode</div></div>
+    <div class="ph"><span class="k">Phase 4</span><div class="t">LLM economics</div><div class="d">model-class routing · batch lane · Ollama adapter · spend dashboard · quotas/streaming</div></div>
+    <div class="ph"><span class="k">Phase 5</span><div class="t">First real registry</div><div class="d">OpenContextHub CRUD+search · signed entries · deploy strip</div></div>
+    <div class="ph"><span class="k">Phase 6</span><div class="t">CI &amp; supply chain</div><div class="d">thin-just workflow · Playwright smokes · magic-literal lint · first signed image · drift check</div></div>
+    <div class="ph"><span class="k">Phase 7</span><div class="t">Monitoring &amp; graduation</div><div class="d">uptime-kuma · L1 named tunnel · deploy receipts → events · weekly report</div></div>
+    <div class="ph"><span class="k">Phase 8</span><div class="t">Product surface</div><div class="d">B-1 Baltor Live Run Console · P1 UX states · first hub-flip rehearsal (= first launch)</div></div>
+  </div>
+  <p>Every task carries its proof and a working prompt; discovered work goes into a phase with a proof defined <i>before</i> building; the stuck protocol (3 different attempts → record gap → next task → return next pass) keeps the loop moving for hours without supervision. START-HERE now points at the backlog as the canonical queue.</p>
+
+  <div class="foot">
+    <b>Self-evaluation.</b> Preparation is now complete end-to-end: architecture, standards, contracts, ops, money, marketing, scenarios, inference economics, and a worked queue with proofs — everything Claude Code needs to run unattended. Remaining before handoff: re-copy the (stale) handoff folder so it ships current. Prices in this doc are Jun-2026 snapshots and say so.
+  </div>
+
+</div>
+</body>
+</html>

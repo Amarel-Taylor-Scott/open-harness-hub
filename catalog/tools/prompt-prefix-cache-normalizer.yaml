@@ -1,0 +1,62 @@
+id: "tool/prompt-prefix-cache-normalizer"
+type: tool
+version: "0.1.0"
+name: "Prompt prefix cache normalizer"
+description: "Normalizes stable system prompts, task preambles, schema blocks, tool signatures, and rubric text so repeated harness calls can maximize provider prefix caching and local fragment reuse."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "serving", "evaluation"]
+modality: ["text", "structured", "code"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.cache"
+tags: ["prompt-cache", "prefix-cache", "cost-savings", "schema-standardization", "trajectory-cache"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    harness_id:
+      type: string
+    system_prompt:
+      type: string
+    task_preamble:
+      type: string
+    output_schema:
+      type: object
+    tool_signatures:
+      type: array
+      items: { type: object }
+    rubric_text:
+      type: string
+  required: ["harness_id", "system_prompt"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    prompt_template_id:
+      type: string
+    prompt_hash:
+      type: string
+    stable_prefix:
+      type: string
+    variable_slots:
+      type: array
+      items: { type: string }
+    cache_savings_hints:
+      type: array
+      items: { type: string }
+side_effects: "none"
+examples:
+  - input:
+      harness_id: "harness/water-quality-multimodal-triage"
+      system_prompt: "You are a careful evidence reviewer."
+    output:
+      ok: true
+      prompt_template_id: "prompt-template/water-quality-multimodal-triage/v1"
+      variable_slots: ["source_evidence", "tenant_policy"]

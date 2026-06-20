@@ -26,10 +26,10 @@ Review a benefits application + supporting docs; determine eligibility + benefit
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `structured_to_prose` | processor | `processor/structured-to-prose` | — |
-| 2 | `redact_pii` | processor | `processor/redact-pii-text` | — |
-| 3 | `grep_flags` | rule_pack | `rule-pack/grep-benefits-eligibility-flags` | — |
-| 4 | `rag_against_rules` | rule_pack | `rule-pack/hybrid-retrieval-policy` | — |
-| 5 | `grade` | processor | `processor/llm-judge` | — |
-| 6 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `structured_to_prose` | processor | `processor/structured-to-prose` | - |
+| 2 | `redact_pii` | processor | `processor/redact-pii-text` | - |
+| 3 | `grep_flags` | rule_pack | `rule-pack/grep-benefits-eligibility-flags` | - |
+| 4 | `rag_against_rules` | rule_pack | `rule-pack/hybrid-retrieval-policy` | - |
+| 5 | `grade` | processor | `processor/llm-judge` | - |
+| 6 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

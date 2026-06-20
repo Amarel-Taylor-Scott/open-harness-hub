@@ -1,0 +1,40 @@
+{
+  "version": "TenantPreferences.v1",
+  "purpose": "The tunable front door per tenant. A tenant declares: a SOFT objective + axis priorities (what to optimize), HARD constraints (blockers that must hold — e.g. MIT-only license, vetted-only sources, no external egress), an accuracy tolerance (how far a descent may drop accuracy), and free-form SUGGESTIONS (advisory hints). This COMPILES to the machinery we already have: hard_constraints -> an OrgGuardrailPolicy (excludes disallowed providers/runners/forks before any selection — safety beats objective), objective_preset/weights -> a CapabilityObjective (ranks the allowed options), accuracy.max_accuracy_drop -> the A/B harness tolerance. Hard blocks; soft ranks; suggestions advise. Data only — read by src/teleon/governance/tenant_preferences.py; never a src.baltor symbol; never serves truth.",
+  "default": {
+    "objective_preset": "balanced",
+    "axis_priorities": ["cost", "determinism"],
+    "hard_constraints": {"allowed_licenses": [], "denied_licenses": [], "allowed_source_domains": [],
+                         "allowed_runtime_classes": [], "required_methodologies": [], "vetted_only": false,
+                         "max_egress": "any"},
+    "accuracy": {"max_accuracy_drop": 0.03},
+    "suggestions": []
+  },
+  "tenants": {
+    "mit-only-bank": {
+      "objective_preset": "maximize_accuracy",
+      "axis_priorities": ["freshness", "verifiability", "determinism"],
+      "hard_constraints": {"allowed_licenses": ["MIT", "Apache-2.0", "BSD-3-Clause", "public"],
+                           "denied_licenses": ["AGPL-3.0", "GPL-3.0", "GPL-2.0"], "vetted_only": true,
+                           "max_egress": "any", "required_methodologies": []},
+      "accuracy": {"max_accuracy_drop": 0.01},
+      "suggestions": ["prefer official/government sources for regulated facts", "re-prove on any rule change"]
+    },
+    "strict-mit-airgapped": {
+      "objective_preset": "minimize_cost",
+      "axis_priorities": ["locality", "cost", "energy"],
+      "hard_constraints": {"allowed_licenses": ["MIT"], "vetted_only": true, "max_egress": "local",
+                           "required_methodologies": []},
+      "accuracy": {"max_accuracy_drop": 0.03},
+      "suggestions": ["everything must run on-prem"]
+    },
+    "cost-first-startup": {
+      "objective_preset": "minimize_cost",
+      "axis_priorities": ["cost", "latency"],
+      "hard_constraints": {"allowed_licenses": [], "vetted_only": false, "max_egress": "any",
+                           "required_methodologies": []},
+      "accuracy": {"max_accuracy_drop": 0.06},
+      "suggestions": ["fine to use cheaper/smaller models broadly", "vetting can come later"]
+    }
+  }
+}

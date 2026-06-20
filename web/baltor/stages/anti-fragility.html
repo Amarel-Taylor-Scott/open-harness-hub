@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor — Anti-Fragility</title>
+<link rel="stylesheet" href="./stage-detail.css?v=anti-dom-1" />
+<style>
+  body.focused-stage .page {
+    width: min(100%, 1180px);
+    display: grid;
+    grid-template-rows: auto auto auto auto;
+    gap: 16px;
+    align-content: center;
+  }
+
+  .focused-canvas {
+    height: auto;
+    min-height: 500px;
+  }
+
+  .anti-diagram {
+    --flow-gap: clamp(10px, 1.4vw, 18px);
+    min-height: 500px;
+    padding: 22px clamp(18px, 3vw, 34px) 28px;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 28px;
+  }
+
+  .diagram-labels {
+    display: grid;
+    grid-template-columns: minmax(235px, .9fr) minmax(260px, 1fr) minmax(260px, 1fr);
+    gap: clamp(18px, 3vw, 44px);
+    text-align: center;
+  }
+
+  .diagram-labels b {
+    display: block;
+    color: #4c8df6;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+  }
+
+  .diagram-labels span {
+    display: block;
+    margin-top: 4px;
+    color: #7f8794;
+    font-size: 12px;
+    font-weight: 650;
+  }
+
+  .diagram-body {
+    display: grid;
+    grid-template-columns: minmax(235px, .9fr) minmax(44px, .12fr) minmax(260px, 1fr) minmax(44px, .12fr) minmax(260px, 1fr);
+    column-gap: var(--flow-gap);
+    align-items: center;
+  }
+
+  .fragile-stack,
+  .promotion-card,
+  .object-card {
+    position: relative;
+    z-index: 2;
+  }
+
+  .fragile-stack {
+    display: grid;
+    gap: 18px;
+  }
+
+  .fragile-card {
+    --accent: #64748b;
+    min-height: 74px;
+    border: 1px solid color-mix(in srgb, var(--accent) 52%, #262d38);
+    border-radius: 10px;
+    background: rgba(12,16,22,.86);
+    padding: 12px 14px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .fragile-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(90deg, transparent 0 8px, rgba(255,255,255,.022) 8px 9px);
+    opacity: .7;
+    pointer-events: none;
+  }
+
+  .fragile-card::after {
+    content: "";
+    position: absolute;
+    right: -5px;
+    top: 50%;
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background: var(--accent);
+    transform: translateY(-50%);
+    opacity: .52;
+    box-shadow: 0 0 0 7px color-mix(in srgb, var(--accent) 9%, transparent);
+  }
+
+  .fragile-card b {
+    position: relative;
+    display: block;
+    color: color-mix(in srgb, var(--accent) 78%, #e7ebf0);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+
+  .fragile-card span {
+    position: relative;
+    display: block;
+    margin-top: 5px;
+    color: #e7ebf0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-weight: 850;
+    font-size: 13px;
+  }
+
+  .fragile-card small {
+    position: relative;
+    display: block;
+    margin-top: 4px;
+    color: #8c95a4;
+    font-size: 11px;
+  }
+
+  .line-stack {
+    display: grid;
+    grid-template-rows: repeat(3, 74px);
+    gap: 18px;
+    align-items: center;
+    min-width: 44px;
+    margin-inline: calc(var(--flow-gap) * -1);
+    padding-inline: var(--flow-gap);
+    z-index: 1;
+  }
+
+  .line-stack.out {
+    grid-template-rows: repeat(3, 64px);
+    gap: 18px;
+    padding-top: 39px;
+    padding-bottom: 39px;
+  }
+
+  .flow-line {
+    --accent: #4c8df6;
+    display: block;
+    position: relative;
+    width: calc(100% + (var(--flow-gap) * 2));
+    height: 1px;
+    margin-inline: calc(var(--flow-gap) * -1);
+    background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 58%, transparent), color-mix(in srgb, var(--accent) 18%, transparent));
+  }
+
+  .flow-line::after,
+  .flow-line .packet {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--accent);
+    transform: translateY(-50%);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 56%, transparent);
+  }
+
+  .flow-line::after { right: 0; }
+
+  .flow-line .packet {
+    left: 14%;
+    width: 7px;
+    height: 7px;
+    opacity: 0;
+    animation: antiPacket 3.8s linear infinite;
+    animation-delay: var(--delay, 0s);
+  }
+
+  .promotion-card,
+  .object-card {
+    border: 1px solid #3a4454;
+    border-radius: 14px;
+    background: rgba(12,16,22,.9);
+    padding: 22px;
+    width: 100%;
+    min-height: 336px;
+    box-shadow: 0 20px 40px rgba(0,0,0,.22);
+  }
+
+  .promotion-card h2,
+  .object-card h2 {
+    margin: 0 0 18px;
+    font-size: 17px;
+    line-height: 1.1;
+  }
+
+  .promotion-steps,
+  .object-rows {
+    display: grid;
+    gap: 13px;
+  }
+
+  .promotion-step,
+  .object-row {
+    min-height: 52px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.035);
+    display: grid;
+    grid-template-columns: 38px 1fr;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 11px;
+  }
+
+  .step-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #071017;
+    font-weight: 900;
+    background: var(--accent, #4c8df6);
+    box-shadow:
+      5px 5px 0 color-mix(in srgb, var(--accent, #4c8df6) 42%, transparent),
+      inset -4px -4px 0 rgba(0,0,0,.18);
+  }
+
+  .promotion-step span,
+  .object-row span {
+    color: #b7c0cc;
+    font-size: 12.5px;
+    line-height: 1.3;
+  }
+
+  .object-row {
+    grid-template-columns: 46px 1fr;
+  }
+
+  .object-cube {
+    position: relative;
+    width: 34px;
+    height: 34px;
+    transform: rotate(45deg);
+    border: 1px solid color-mix(in srgb, var(--accent, #4c8df6) 60%, #dce7ff);
+    background: color-mix(in srgb, var(--accent, #4c8df6) 68%, #122033);
+    box-shadow:
+      5px 5px 0 color-mix(in srgb, var(--accent, #4c8df6) 28%, transparent),
+      inset -5px -5px 0 rgba(0,0,0,.18);
+  }
+
+  .object-cube::before,
+  .object-cube::after {
+    content: "";
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: #d9ae61;
+    box-shadow: 0 0 10px rgba(217,174,97,.5);
+  }
+
+  .object-cube::before { top: -7px; left: 4px; }
+  .object-cube::after { right: -8px; bottom: 5px; }
+
+  .ttl-note {
+    margin-top: 15px;
+    border: 1px solid rgba(76,141,246,.28);
+    border-radius: 10px;
+    background: rgba(76,141,246,.055);
+    padding: 12px;
+    color: #cbd8ee;
+    font-size: 12.5px;
+    line-height: 1.35;
+  }
+
+  @keyframes antiPacket {
+    0% { left: 14%; opacity: 0; }
+    18% { opacity: .88; }
+    84% { opacity: .88; }
+    100% { left: 100%; opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flow-line .packet { animation: none; left: 72%; opacity: .55; }
+  }
+
+  @media (max-width: 900px) {
+    .anti-diagram { min-height: 0; }
+    .diagram-labels { display: none; }
+    .diagram-body { grid-template-columns: 1fr; gap: 16px; }
+    .line-stack { display: none; }
+    .fragile-card::after { display: none; }
+  }
+</style>
+</head>
+<body class="focused-stage">
+<main class="page">
+  <nav class="nav">
+    <a href="../context-stages.html">All stages</a>
+    <a href="../context-engine-hero.html">Main flow</a>
+  </nav>
+
+  <section class="focused-shell" style="--stage:var(--blue)">
+    <header class="focused-head">
+      <div class="focused-title">
+        <div class="eyebrow">02 · Robust objects</div>
+        <h1>Anti-Fragility</h1>
+        <p>Baltor replaces brittle copied values with refreshable context objects. Settings, ownership, limits, and policy facts point back to the right source or tool instead of becoming stale text.</p>
+      </div>
+      <div class="focused-metrics" aria-label="Anti-fragility metrics">
+        <div><span>Fragile facts</span><b>26</b></div>
+        <div><span>Objects promoted</span><b>19</b></div>
+        <div><span>Refresh paths</span><b>12</b></div>
+        <div><span>Freshness</span><b>Live</b></div>
+      </div>
+    </header>
+
+    <div class="focused-canvas">
+      <div class="anti-diagram">
+        <div class="diagram-labels" aria-hidden="true">
+          <div><b>Fragile copied facts</b><span>values that drift when systems change</span></div>
+          <div><b>Anti-fragility promotion</b><span>replace text with maintained context objects</span></div>
+          <div><b>Robust knowledge objects</b><span>refreshable, source-linked, TTL-aware</span></div>
+        </div>
+
+        <div class="diagram-body">
+          <div class="fragile-stack" aria-label="Fragile facts">
+            <div class="fragile-card" style="--accent:#d9ae61"><b>Copied policy value</b><span>refund_window_days = 30</span><small>may change outside this pack</small></div>
+            <div class="fragile-card" style="--accent:#a47ef7"><b>Copied ownership</b><span>owner = alice@example.com</span><small>person-level owner can drift</small></div>
+            <div class="fragile-card" style="--accent:#64748b"><b>Copied limit</b><span>late_fee_cap = "$29"</span><small>external rule may update</small></div>
+          </div>
+
+          <div class="line-stack" aria-hidden="true">
+            <span class="flow-line" style="--accent:#d9ae61; --delay:-.2s"><i class="packet"></i></span>
+            <span class="flow-line" style="--accent:#a47ef7; --delay:-1.1s"><i class="packet"></i></span>
+            <span class="flow-line" style="--accent:#64748b; --delay:-2s"><i class="packet"></i></span>
+          </div>
+
+          <section class="promotion-card" aria-label="Anti-fragility promotion">
+            <h2>Anti-fragility promotion</h2>
+            <div class="promotion-steps">
+              <div class="promotion-step" style="--accent:#4c8df6"><i class="step-icon">1</i><span>Classify whether a fact is volatile, source-dependent, externally governed, or user/team-specific.</span></div>
+              <div class="promotion-step" style="--accent:#4c8df6"><i class="step-icon">2</i><span>Replace copied values with a maintained object, live lookup, source handle, and freshness rule.</span></div>
+              <div class="promotion-step" style="--accent:#4c8df6"><i class="step-icon">3</i><span>Serve the current value only when the object can be resolved and policy allows expansion.</span></div>
+            </div>
+            <div class="ttl-note">Anti-fragility does not guess the latest value. It creates the path that keeps the value current.</div>
+          </section>
+
+          <div class="line-stack out" aria-hidden="true">
+            <span class="flow-line" style="--accent:#4c8df6; --delay:-.5s"><i class="packet"></i></span>
+            <span class="flow-line" style="--accent:#4c8df6; --delay:-1.6s"><i class="packet"></i></span>
+            <span class="flow-line" style="--accent:#4c8df6; --delay:-2.4s"><i class="packet"></i></span>
+          </div>
+
+          <section class="object-card" aria-label="Robust knowledge objects">
+            <h2>Robust knowledge objects</h2>
+            <div class="object-rows">
+              <div class="object-row" style="--accent:#4c8df6"><i class="object-cube"></i><span>Policy object resolves refund window from approved policy source at serve time.</span></div>
+              <div class="object-row" style="--accent:#4c8df6"><i class="object-cube"></i><span>Ownership object resolves current team, reviewers, and escalation path from OrgGraph.</span></div>
+              <div class="object-row" style="--accent:#4c8df6"><i class="object-cube"></i><span>Regulatory limit object requires live validation or external-source enhancement before use.</span></div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage-assurance-card">
+      <div class="assurance-title">
+        <b>Continuous Verification + Adversarial Validation</b>
+        <span>Universal assurance layer</span>
+      </div>
+      <p>During anti-fragility, Baltor asks whether a copied value can drift, what source owns it, how it refreshes, when it expires, and whether a live lookup or human review is required.</p>
+      <div class="assurance-tags">
+        <span>volatile values</span>
+        <span>TTL</span>
+        <span>live lookup</span>
+        <span>object promotion</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="focused-explainer" aria-label="Anti-Fragility stage explanation">
+    <article>
+      <b>What this stage does</b>
+      <p>It identifies facts that are likely to change and promotes them into objects with source handles, refresh rules, TTL, policy checks, and optional live tools.</p>
+    </article>
+    <article>
+      <b>Concrete example</b>
+      <p>Instead of storing “refunds are allowed for 30 days,” Baltor creates a refund-policy object that resolves against the current policy source before a pack is served.</p>
+    </article>
+    <article>
+      <b>Why it matters</b>
+      <p>AI workflows become brittle when they memorize changing values. Anti-fragility keeps context useful as ownership, policies, settings, and external constraints evolve.</p>
+    </article>
+  </section>
+
+  <div class="stage-links">
+    <a href="./source.html">Source</a>
+    <a href="./reconciliation.html">Reconciliation</a>
+    <a class="is-current" href="./anti-fragility.html">Anti-Fragility</a>
+    <a href="./enhancement.html">Enhancement</a>
+    <a href="./optimization.html">Optimization</a>
+    <a href="./consumption.html">Consumption</a>
+  </div>
+</main>
+</body>
+</html>

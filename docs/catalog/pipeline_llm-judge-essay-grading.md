@@ -34,8 +34,8 @@ trying to inflate the score.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `judge` | processor | `processor/llm-judge` | — |
-| 3 | `ensemble_across_seeds` | processor | `processor/self-consistency-sampler` | — |
-| 4 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `judge` | processor | `processor/llm-judge` | - |
+| 3 | `ensemble_across_seeds` | processor | `processor/self-consistency-sampler` | - |
+| 4 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

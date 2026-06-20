@@ -1,0 +1,48 @@
+id: processor/cache-semantic
+type: processor
+version: 0.1.0
+name: Semantic response cache
+description: 'Semantic response cache (GPTCache-style): a paraphrase of a prior query hits the same entry
+  (~61-69% hit rate). NEVER cache personalized/user-specific responses (wrong-user risk).'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+capability:
+- memory
+- retrieval
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- context-layer
+- cache
+created: '2026-05-29'
+updated: '2026-05-29'
+attribution:
+  source_kind: manual
+  author: Open Harness Hub context-layer taxonomy
+  license: MIT
+process_kind: cache.semantic
+deterministic: false
+idempotent: true
+streaming: false
+inputs:
+- name: query
+  type: object
+- name: threshold
+  type: object
+outputs:
+- name: hit
+  type: object
+side_effects: read
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.cache.cache_semantic.run
+  language: python
+links:
+  source: docs/strategy/context-layer-pmf.md

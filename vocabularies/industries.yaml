@@ -3,7 +3,7 @@
 # Open list. New industries are added by PR. Sub-industries are dot-separated
 # (e.g., `healthcare.radiology`, `finance.aml`, `legal.immigration`).
 #
-# An artifact may declare one or many industries.
+# A component may declare one or many industries.
 
 industries:
   - id: healthcare
@@ -517,7 +517,264 @@ industries:
         label: Game design
   - id: personal_productivity
     label: Personal productivity & assistants
+  - id: automotive
+    label: Automotive & mobility
+    sub:
+      - id: automotive.warranty
+        label: Warranty claims and field quality
+      - id: automotive.safety
+        label: Vehicle safety defect review
+      - id: automotive.fleet
+        label: Fleet maintenance and telematics
+  - id: logistics
+    label: Logistics, warehousing & fulfillment
+    sub:
+      - id: logistics.warehouse
+        label: Warehouse safety and inventory controls
+      - id: logistics.last_mile
+        label: Last-mile delivery exceptions
+      - id: logistics.cold_chain
+        label: Cold-chain custody and temperature excursions
+  - id: procurement
+    label: Procurement and vendor management
+    sub:
+      - id: procurement.sourcing
+        label: Strategic sourcing and bid review
+      - id: procurement.vendor_risk
+        label: Vendor risk and onboarding
+      - id: procurement.contracting
+        label: Procurement contracting
+  - id: customer_success
+    label: Customer success and account operations
+    sub:
+      - id: customer_success.renewal
+        label: Renewal risk and expansion review
+      - id: customer_success.escalation
+        label: Customer escalation handling
+  - id: sales_ops
+    label: Sales operations and revenue governance
+    sub:
+      - id: sales_ops.forecasting
+        label: Forecasting and pipeline inspection
+      - id: sales_ops.discounting
+        label: Discount approval and deal desk
+  - id: marketing_ops
+    label: Marketing operations and claims review
+    sub:
+      - id: marketing_ops.claims
+        label: Advertising claim substantiation
+      - id: marketing_ops.consent
+        label: Marketing consent and preference governance
+  - id: product_management
+    label: Product management and product operations
+    sub:
+      - id: product_management.prd
+        label: Product requirements review
+      - id: product_management.launch
+        label: Launch readiness
+  - id: design_ops
+    label: Design operations and UX research
+    sub:
+      - id: design_ops.accessibility
+        label: Accessibility and inclusive design review
+      - id: design_ops.research_ethics
+        label: UX research ethics and consent
+  - id: data_governance
+    label: Data governance and analytics operations
+    sub:
+      - id: data_governance.quality
+        label: Data quality incident review
+      - id: data_governance.lineage
+        label: Data lineage and catalog controls
+  - id: facilities
+    label: Facilities and workplace operations
+    sub:
+      - id: facilities.workplace_safety
+        label: Workplace safety and incident review
+      - id: facilities.maintenance
+        label: Preventive maintenance and work orders
   - id: ai
     label: AI / ML systems & tooling (a "vertical" only in the sense that AI itself is a domain — eg LLM red teaming, model evals, RAG infrastructure).
   - id: cross_industry
     label: Cross-industry (not tied to one domain)
+
+  - id: biotech
+    label: Biotechnology and laboratory operations
+    sub:
+      - id: biotech.lab_ops
+        label: Laboratory operations
+      - id: biotech.assay_validation
+        label: Assay validation
+      - id: biotech.bioinformatics
+        label: Bioinformatics workflows
+  - id: medical_devices
+    label: Medical devices and diagnostics
+    sub:
+      - id: medical_devices.complaints
+        label: Complaint handling
+      - id: medical_devices.qms
+        label: Quality management systems
+      - id: medical_devices.postmarket
+        label: Postmarket surveillance
+  - id: semiconductors
+    label: Semiconductor manufacturing and supply chain
+    sub:
+      - id: semiconductors.fab_ops
+        label: Fab operations
+      - id: semiconductors.yield
+        label: Yield engineering
+      - id: semiconductors.export_controls
+        label: Export-control review
+  - id: chemicals
+    label: Chemical manufacturing and stewardship
+    sub:
+      - id: chemicals.sds
+        label: Safety data sheets
+      - id: chemicals.reach
+        label: REACH and chemical registration
+      - id: chemicals.process_safety
+        label: Process safety
+  - id: utilities
+    label: Utilities and public services
+    sub:
+      - id: utilities.electric
+        label: Electric utility operations
+      - id: utilities.gas
+        label: Gas utility operations
+      - id: utilities.water
+        label: Water utility operations
+  - id: public_safety
+    label: Public safety and emergency response
+    sub:
+      - id: public_safety.dispatch
+        label: Emergency dispatch
+      - id: public_safety.fire
+        label: Fire and rescue
+      - id: public_safety.ems
+        label: Emergency medical services
+  - id: courts
+    label: Courts and justice administration
+    sub:
+      - id: courts.filing
+        label: Court filing review
+      - id: courts.pro_se
+        label: Self-represented litigant support
+      - id: courts.sentencing
+        label: Sentencing and supervision review
+  - id: corrections
+    label: Corrections and reentry services
+    sub:
+      - id: corrections.reentry
+        label: Reentry case planning
+      - id: corrections.health
+        label: Correctional health
+      - id: corrections.grievance
+        label: Resident grievance review
+  - id: housing
+    label: Housing, tenancy, and community development
+    sub:
+      - id: housing.eviction_prevention
+        label: Eviction prevention
+      - id: housing.code_enforcement
+        label: Housing code enforcement
+      - id: housing.affordable
+        label: Affordable housing programs
+  - id: labor
+    label: Labor standards and workforce protection
+    sub:
+      - id: labor.wage_hour
+        label: Wage and hour compliance
+      - id: labor.osha
+        label: Worker safety enforcement
+      - id: labor.union
+        label: Collective bargaining records
+  - id: arts_culture
+    label: Arts, culture, and heritage institutions
+    sub:
+      - id: arts_culture.collections
+        label: Collections management
+      - id: arts_culture.rights
+        label: Rights and reproductions
+      - id: arts_culture.conservation
+        label: Conservation records
+  - id: sports
+    label: Sports operations and integrity
+    sub:
+      - id: sports.athlete_safety
+        label: Athlete safety
+      - id: sports.integrity
+        label: Betting and match integrity
+      - id: sports.event_ops
+        label: Event operations
+  - id: travel
+    label: Travel, tourism, and mobility services
+    sub:
+      - id: travel.disruption
+        label: Disruption care
+      - id: travel.accessibility
+        label: Accessible travel
+      - id: travel.loyalty
+        label: Loyalty operations
+  - id: consumer_products
+    label: Consumer products and product stewardship
+    sub:
+      - id: consumer_products.safety
+        label: Product safety review
+      - id: consumer_products.labeling
+        label: Labeling and claims
+      - id: consumer_products.recalls
+        label: Recall management
+  - id: payments
+    label: Payments and money movement
+    sub:
+      - id: payments.fraud
+        label: Payment fraud
+      - id: payments.disputes
+        label: Disputes and chargebacks
+      - id: payments.wires
+        label: Wire and treasury controls
+  - id: capital_markets
+    label: Capital markets and securities operations
+    sub:
+      - id: capital_markets.surveillance
+        label: Trade surveillance
+      - id: capital_markets.disclosure
+        label: Issuer disclosure
+      - id: capital_markets.research
+        label: Research compliance
+  - id: libraries
+    label: Libraries, archives, and information services
+    sub:
+      - id: libraries.digitization
+        label: Digitization workflows
+      - id: libraries.metadata
+        label: Metadata quality
+      - id: libraries.access
+        label: Access policy
+  - id: faith_based
+    label: Faith-based and community organizations
+    sub:
+      - id: faith_based.safeguarding
+        label: Safeguarding and care
+      - id: faith_based.grants
+        label: Grant stewardship
+      - id: faith_based.records
+        label: Records management
+  - id: child_family_services
+    label: Child and family services
+    sub:
+      - id: child_family_services.intake
+        label: Case intake
+      - id: child_family_services.placement
+        label: Placement review
+      - id: child_family_services.benefits
+        label: Benefits coordination
+  - id: urban_planning
+    label: Urban planning and civic infrastructure
+    sub:
+      - id: urban_planning.zoning
+        label: Zoning review
+      - id: urban_planning.mobility
+        label: Mobility planning
+      - id: urban_planning.resilience
+        label: Resilience planning

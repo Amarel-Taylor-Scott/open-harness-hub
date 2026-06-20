@@ -69,7 +69,7 @@ open-harness-hub/                         # repo root
     ├── workflows/
     │   ├── validate.yml                  # on every PR
     │   ├── pages.yml                     # on push to main → GitHub Pages
-    │   ├── emit.yml                      # on push to main → rebuild dist/ artifacts
+    │   ├── emit.yml                      # on push to main → rebuild dist/ components
     │   ├── release.yml                   # on tag → publish dist/ as Release assets
     │   └── stale.yml                     # housekeeping
     ├── ISSUE_TEMPLATE/
@@ -142,7 +142,7 @@ catalog browser, then publishes `site/` to GitHub Pages via
 Runs the standards emitters on push to `main`:
 
 ```yaml
-name: Emit standards artifacts
+name: Emit standards components
 on:
   push:
     branches: [main]
@@ -158,7 +158,7 @@ jobs:
       - run: python scripts/emit/mcp_server.py
       - run: python scripts/emit/agent_skill.py
       - run: python scripts/db/build_vector_index.py --embedder hash
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-component@v4
         with:
           name: dist
           path: dist/
@@ -170,7 +170,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout -B dist-published
           git add -f dist/
-          git commit -m "ci: rebuild dist artifacts" || true
+          git commit -m "ci: rebuild dist components" || true
           git push -f origin dist-published
 ```
 
@@ -328,7 +328,7 @@ links to `scripts/validate.py` and asks contributors to confirm:
 
 GitHub gives us, free, in this exact order: the catalog source of
 truth (repo), the contributor workflow (PR + CODEOWNERS + branch
-protection), the published artifacts (Releases + Actions), the static
+protection), the published components (Releases + Actions), the static
 site (Pages), the plugin marketplace (dist-published branch +
 marketplace.json), and the discovery layer (topics + Discussions).
 Every other deploy target (HF Spaces, Vercel, Netlify, Cloudflare

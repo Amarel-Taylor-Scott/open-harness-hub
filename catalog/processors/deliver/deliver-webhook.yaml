@@ -1,0 +1,50 @@
+id: processor/deliver-webhook
+type: processor
+version: 0.1.0
+name: Webhook deliver
+description: POST the result to a configured webhook endpoint with a signed payload + retries/backoff.
+  Outbound to an external system. Deliver / emit (outbound) bucket.
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+capability:
+- routing
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- action-bucket
+- deliver
+- outbound
+created: '2026-05-29'
+updated: '2026-05-29'
+attribution:
+  source_kind: manual
+  author: Open Harness Hub action-bucket taxonomy
+  license: MIT
+process_kind: deliver.webhook
+deterministic: false
+idempotent: true
+streaming: false
+inputs:
+- name: result
+  type: object
+- name: endpoint
+  type: object
+- name: signing_key
+  type: object
+outputs:
+- name: delivery_receipt
+  type: object
+side_effects: external_call
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.deliver.deliver_webhook.run
+  language: python
+links:
+  source: docs/concepts/component-taxonomy-and-stages.md

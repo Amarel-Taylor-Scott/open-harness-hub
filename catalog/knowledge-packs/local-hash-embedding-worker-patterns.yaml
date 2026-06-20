@@ -1,0 +1,38 @@
+id: "knowledge-pack/local-hash-embedding-worker-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Local hash embedding worker patterns"
+description: "Operational checks for deterministic local embedding workers that produce replayable vector rows before higher-quality semantic embedding runtimes are wired in."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["embedding", "retrieval", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["embeddings", "vector-search", "pgvector", "daily-factory", "local-worker", "hashing-vectorizer"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+content_types:
+  - "local_hash_embedding_worker_check"
+files:
+  - path: "catalog/knowledge-packs/data/local-hash-embedding-worker-patterns/checks.jsonl"
+    format: "jsonl"
+    schema: "local_hash_embedding_worker_check"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["id", "description", "required_outputs", "failure_route"]
+provenance:
+  sources:
+    - "Open Harness Hub local hash embedding worker"
+    - "Open Harness Hub embedding execution planner"
+    - "Open Harness Hub vector readiness audit"
+  collected_through: "2026-05-26"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "synthetic operational checks only"

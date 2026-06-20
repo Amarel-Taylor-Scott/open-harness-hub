@@ -1,0 +1,76 @@
+id: "tool/blueprint-ab-cost-quality-planner"
+type: tool
+version: "0.1.0"
+name: "Blueprint A/B cost-quality planner"
+description: "Turns route-matrix options into A/B test arms with cost ceilings, quality metrics, regression checks, and promotion criteria."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["evaluation", "planning", "routing", "tool_use"]
+modality: ["structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["ab-testing", "cost-quality", "eval-kits", "route-matrix"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    route_matrix:
+      type: object
+    eval_requirements:
+      type: object
+    cost_policy:
+      type: object
+    promotion_policy:
+      type: object
+  required: ["route_matrix"]
+returns:
+  type: object
+  properties:
+    experiment_id:
+      type: string
+    arms:
+      type: array
+      items:
+        type: object
+    metrics:
+      type: array
+      items:
+        type: string
+    stop_rules:
+      type: array
+      items:
+        type: string
+    promotion_criteria:
+      type: array
+      items:
+        type: string
+side_effects: "none"
+examples:
+  - input:
+      route_matrix:
+        matrix_id: "route-matrix-example"
+        options:
+          - name: "cheap"
+          - name: "balanced"
+      cost_policy:
+        max_usd_per_1000_items: 5.0
+    output:
+      experiment_id: "ab-cost-quality-example"
+      arms:
+        - name: "cheap"
+          max_usd_per_1000_items: 5.0
+        - name: "balanced"
+          max_usd_per_1000_items: 5.0
+      metrics: ["precision_at_review", "false_negative_sample_rate", "cost_per_1000_items", "latency_p95_ms"]
+      stop_rules: ["Stop any arm that exceeds the cost ceiling without approval."]
+      promotion_criteria: ["Promote the cheapest arm that clears risk-tier quality gates."]
+implementations:
+  - kind: "callable"
+    path: "scripts.blueprints.cost_route_matrix.plan_ab_test"
+  - kind: "mcp"
+    path: "mcp/blueprints.plan_ab_cost_quality"

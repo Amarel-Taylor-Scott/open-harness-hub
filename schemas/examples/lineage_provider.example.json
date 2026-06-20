@@ -1,0 +1,27 @@
+{
+  "capability_slot": "lineage_provider",
+  "adapter_id": "lineage.baltor_local@v1",
+  "description": "LineageEvent -> LineageFacet. Renders Baltor lineage into W3C PROV-JSON + OpenLineage RunEvent (and, for claims/deltas, W3C Web Annotation + RFC6902 JSON Patch), each carrying governance facets so the receipt is portable. OpenLineage is the candidate primary behind the same contract; the provider never mutates canonical or launders a claim's status.",
+  "input": {
+    "schema": "LineageEvent",
+    "event_id": "ev-1",
+    "activity": "reconciliation.resolve",
+    "occurred_at": "2026-06-06T00:00:00Z",
+    "inputs": ["ctx://acme/adr-014", "ctx://acme/runbook"],
+    "outputs": ["pack-bill-782"],
+    "agent": "baltor.deterministic_reconciliation",
+    "governance": {"authority": "deterministic_reconciliation", "claim_status": "verified_current", "receipt_id": "rcpt-abc", "held_out": false, "verified_current": true}
+  },
+  "output": {
+    "schema": "LineageFacet",
+    "event_id": "ev-1",
+    "activity": "reconciliation.resolve",
+    "occurred_at": "2026-06-06T00:00:00Z",
+    "governance": {"authority": "deterministic_reconciliation", "claim_status": "verified_current", "receipt_id": "rcpt-abc", "held_out": false, "verified_current": true},
+    "renderings": {
+      "prov": {"prefix": {"baltor": "https://baltor.ai/prov#", "prov": "http://www.w3.org/ns/prov#"}, "activity": {"...": "..."}, "wasGeneratedBy": {"...": "..."}, "wasDerivedFrom": {"...": "..."}},
+      "openlineage": {"eventType": "COMPLETE", "eventTime": "2026-06-06T00:00:00Z", "producer": "https://baltor.ai/openlineage", "run": {"runId": "<deterministic-uuid>", "facets": {"baltor_governance": {"claim_status": "verified_current", "receipt_id": "rcpt-abc"}}}, "job": {"namespace": "baltor", "name": "reconciliation.resolve"}}
+    },
+    "content_hash": "<sha256 of renderings>"
+  }
+}

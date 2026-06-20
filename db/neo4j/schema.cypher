@@ -8,12 +8,12 @@
 //   harness  -- EMITS -->     knowledge-leaf-type
 //
 // This Cypher schema sets constraints + indexes and ingests one sample
-// artifact. Use scripts/db/load_neo4j.py (TBA) for bulk import.
+// component. Use scripts/db/load_neo4j.py (TBA) for bulk import.
 // ----------------------------------------------------------------------------
 
 // Uniqueness constraints
-CREATE CONSTRAINT artifact_id_unique IF NOT EXISTS
-  FOR (a:Artifact) REQUIRE a.id IS UNIQUE;
+CREATE CONSTRAINT component_id_unique IF NOT EXISTS
+  FOR (a:Component) REQUIRE a.id IS UNIQUE;
 
 CREATE CONSTRAINT rule_id_unique IF NOT EXISTS
   FOR (r:Rule) REQUIRE r.id IS UNIQUE;
@@ -28,22 +28,24 @@ CREATE CONSTRAINT capability_id_unique IF NOT EXISTS
   FOR (c:Capability) REQUIRE c.id IS UNIQUE;
 
 // Lookup indexes
-CREATE INDEX artifact_type IF NOT EXISTS
-  FOR (a:Artifact) ON (a.type);
+CREATE INDEX component_type IF NOT EXISTS
+  FOR (a:Component) ON (a.type);
 
-CREATE INDEX artifact_lifecycle IF NOT EXISTS
-  FOR (a:Artifact) ON (a.lifecycle);
+CREATE INDEX component_lifecycle IF NOT EXISTS
+  FOR (a:Component) ON (a.lifecycle);
 
 CREATE INDEX leaf_type IF NOT EXISTS
   FOR (l:KnowledgeLeaf) ON (l.leaf_type);
 
 // Full-text index over name + description
-CREATE FULLTEXT INDEX artifact_fts IF NOT EXISTS
-  FOR (a:Artifact) ON EACH [a.name, a.description, a.tags];
+CREATE FULLTEXT INDEX component_fts IF NOT EXISTS
+  FOR (a:Component) ON EACH [a.name, a.description, a.tags];
 
-// Vector index (Neo4j 5.18+ has native vector indexes)
+// Vector index (Neo4j 5.18+ has native vector indexes).
+// Dimension and similarity are canonical registry values exported by:
+//   python3 -m scripts.db.vector_config_registry --format json
 CREATE VECTOR INDEX catalog_vec IF NOT EXISTS
-  FOR (a:Artifact) ON a.embedding
+  FOR (a:Component) ON a.embedding
   OPTIONS { indexConfig: { `vector.dimensions`: 384, `vector.similarity_function`: 'cosine' } };
 
 CREATE VECTOR INDEX knowledge_vec IF NOT EXISTS
@@ -51,19 +53,19 @@ CREATE VECTOR INDEX knowledge_vec IF NOT EXISTS
   OPTIONS { indexConfig: { `vector.dimensions`: 384, `vector.similarity_function`: 'cosine' } };
 
 // Relationship types used:
-//   (:Artifact)-[:HAS_INDUSTRY]->(:Industry)
-//   (:Artifact)-[:HAS_CAPABILITY]->(:Capability)
-//   (:Artifact)-[:CONSUMES_LEAF_TYPE]->(:LeafType)
-//   (:Artifact)-[:EMITS_LEAF_TYPE]->(:LeafType)
-//   (:Artifact)-[:STEP_OF {position}]->(:Artifact)
-//   (:Artifact)-[:USES {role}]->(:Artifact)
-//   (:Artifact)-[:SUPERSEDED_BY]->(:Artifact)
-//   (:KnowledgeLeaf)-[:IN_PACK]->(:Artifact)
-//   (:Rule)-[:IN_PACK]->(:Artifact)
+//   (:Component)-[:HAS_INDUSTRY]->(:Industry)
+//   (:Component)-[:HAS_CAPABILITY]->(:Capability)
+//   (:Component)-[:CONSUMES_LEAF_TYPE]->(:LeafType)
+//   (:Component)-[:EMITS_LEAF_TYPE]->(:LeafType)
+//   (:Component)-[:STEP_OF {position}]->(:Component)
+//   (:Component)-[:USES {role}]->(:Component)
+//   (:Component)-[:SUPERSEDED_BY]->(:Component)
+//   (:KnowledgeLeaf)-[:IN_PACK]->(:Component)
+//   (:Rule)-[:IN_PACK]->(:Component)
 //   (:Rule)-[:HAS_CATEGORY]->(:Category)
 
 // Sample ingest (one harness)
-MERGE (h:Artifact {id: 'harness/text-safety-review'})
+MERGE (h:Component {id: 'harness/text-safety-review'})
   ON CREATE SET h.type = 'harness',
                 h.name = 'Text Safety Review',
                 h.lifecycle = 'beta',
@@ -75,7 +77,7 @@ MERGE (h)-[:HAS_INDUSTRY]->(i);
 // Useful queries:
 //
 //  // Find all pipelines that use a given harness
-//  MATCH (p:Artifact)-[:STEP_OF]->(h:Artifact {id: 'harness/text-safety-review'})
+//  MATCH (p:Component)-[:STEP_OF]->(h:Component {id: 'harness/text-safety-review'})
 //  WHERE p.type = 'pipeline'
 //  RETURN p.id, p.name;
 //
@@ -85,5 +87,5 @@ MERGE (h)-[:HAS_INDUSTRY]->(i);
 //  RETURN node.id, node.leaf_type, score;
 //
 //  // 2-hop graph: from a pipeline, find all leaf types it consumes
-//  MATCH (p:Artifact {id: 'pipeline/research-entity'})-[:STEP_OF]->(:Artifact)-[:CONSUMES_LEAF_TYPE]->(t:LeafType)
+//  MATCH (p:Component {id: 'pipeline/research-entity'})-[:STEP_OF]->(:Component)-[:CONSUMES_LEAF_TYPE]->(t:LeafType)
 //  RETURN DISTINCT t.id;

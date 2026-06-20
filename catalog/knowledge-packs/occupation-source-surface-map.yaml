@@ -1,0 +1,31 @@
+id: "knowledge-pack/occupation-source-surface-map"
+type: knowledge-pack
+version: "0.1.0"
+name: "Occupation source surface map"
+description: "Source surfaces for converting occupation taxonomies, job descriptions, public role classifications, and job requirements data into work atoms, questions, procedures, facts, and pipeline primitives."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "CC-BY-4.0"
+industry: ["ai", "hr", "education", "cross_industry"]
+capability: ["retrieval", "extraction", "planning", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "volatile"
+tags: ["occupations", "job-descriptions", "work-atoms", "onet", "esco", "bls-ors", "procedure-objects"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types: ["occupation_source_surface", "work_atom_schema", "source_mapping"]
+files:
+  - path: "data/occupation-source-surface-map/surfaces.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    enabled: true
+    embedder: "processor/local-embedder"
+provenance:
+  sources: ["O*NET", "ESCO", "BLS Occupational Requirements Survey", "Open Harness Hub occupation-to-procedure plan"]
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "source map only; no applicant or employer PII"

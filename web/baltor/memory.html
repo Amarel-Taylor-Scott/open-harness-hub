@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor · Memory (candidate · projection-only)</title>
+<style>
+  :root { --bg:#0d1117; --panel:#161b22; --line:#21262d; --fg:#e6edf3; --mut:#8b949e; --ok:#3fb950; --warn:#d29922; --bad:#f85149; --acc:#58a6ff; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  header { padding:14px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  h1 { font-size:15px; margin:0; font-weight:600; }
+  .sub { color:var(--mut); font-size:12px; }
+  button { background:var(--acc); color:#0d1117; border:0; border-radius:6px; padding:8px 14px; font-weight:700; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:wait; }
+  input { background:#0d1117; color:var(--fg); border:1px solid var(--line); border-radius:6px; padding:7px 10px; font:inherit; }
+  main { display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:12px; padding:16px; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:12px; }
+  .panel h2 { font-size:12px; margin:0 0 8px; color:var(--acc); text-transform:uppercase; letter-spacing:.04em; }
+  .wide { grid-column:1/-1; }
+  .row { display:flex; justify-content:space-between; gap:8px; padding:2px 0; border-bottom:1px dashed var(--line); }
+  .mut { color:var(--mut); }
+  .pill { display:inline-block; padding:1px 7px; border-radius:999px; font-size:11px; }
+  .pill.candidate { background:rgba(210,153,34,.15); color:var(--warn); }
+  .pill.promoted { background:rgba(63,185,80,.15); color:var(--ok); }
+  .pill.held { background:rgba(248,81,73,.13); color:var(--bad); }
+  .pill.bad { background:rgba(248,81,73,.13); color:var(--bad); }
+  code { color:var(--acc); word-break:break-all; }
+  .hint { color:var(--mut); font-size:11px; }
+  .empty { color:var(--mut); font-style:italic; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Baltor · Memory</h1>
+  <span class="sub">candidate memory layer · projection-only (this page computes no truth; it reads /api/memory/*)</span>
+  <input id="q" placeholder="recall query…" />
+  <button id="run">Refresh / Recall</button>
+  <span id="status" class="sub"></span>
+</header>
+<div style="padding:0 18px 8px;" class="hint">
+  remembered &ne; verified · retrieved &ne; served · profiled &ne; canonical · candidate memory &ne; promoted fact.
+  Nothing here is a served fact; promotion only happens through the Consumption API (VerificationGate + Reconciliation + ConsumptionGate).
+  Public page — no private memory, no secrets, no durable writes.
+</div>
+<main id="panels">
+  <div class="panel wide" id="banner"><span class="empty">— click Refresh —</span></div>
+</main>
+
+<script>
+// Projection only: fetch the API and RENDER. No truth is computed, stored, or mutated here.
+// No client-side persistence of truth; no durable writes; fetch ONLY /api/memory/*.
+const TENANT = "demo";
+const EP = {
+  artifacts:  "/api/memory/artifacts?tenant_id=" + TENANT,
+  profile:    "/api/memory/profile?tenant_id=" + TENANT,
+  connectors: "/api/memory/connectors",
+  providers:  "/api/memory/providers",
+  traces:     "/api/memory/traces?tenant_id=" + TENANT,
+  search:     (q) => "/api/memory/search?tenant_id=" + TENANT + "&q=" + encodeURIComponent(q || ""),
+};
+const panels = document.getElementById("panels");
+const statusEl = document.getElementById("status");
+
+function esc(s){ return String(s==null?"":s).replace(/[&<>]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+function panel(title){ const d=document.createElement("div"); d.className="panel"; const h=document.createElement("h2"); h.textContent=title; d.appendChild(h); panels.appendChild(d); return d; }
+function wide(title){ const d=panel(title); d.classList.add("wide"); return d; }
+function row(p,k,v){ const r=document.createElement("div"); r.className="row"; r.innerHTML=`<span class="mut">${esc(k)}</span><span>${v}</span>`; p.appendChild(r); }
+function empty(p,msg){ const e=document.createElement("div"); e.className="empty"; e.textContent=msg||"(none)"; p.appendChild(e); }
+function statusPill(s){ const c = s==="promoted"?"promoted":(s==="held_out"?"held":"candidate"); return `<span class="pill ${c}">${esc(s||"candidate")}</span>`; }
+function handle(a){ return a.external_source_handle || a.source_handle || a.upstream_id || a.id || "(unhandled)"; }
+
+async function getJSON(url){ const r = await fetch(url); if(!r.ok && r.status>=500) throw new Error("HTTP "+r.status); return r.json(); }
+
+async function run(){
+  const btn=document.getElementById("run"); btn.disabled=true; statusEl.textContent="loading…";
+  [...panels.querySelectorAll(".panel")].forEach(e=>e.remove());
+  const q = document.getElementById("q").value;
+  try {
+    const [arts, prof, conn, prov, trc, srch] = await Promise.all([
+      getJSON(EP.artifacts), getJSON(EP.profile), getJSON(EP.connectors),
+      getJSON(EP.providers), getJSON(EP.traces), getJSON(EP.search(q)),
+    ]);
+    render({arts, prof, conn, prov, trc, srch});
+    statusEl.textContent = "projected · read-only";
+  } catch(e){
+    const p = wide("Error"); empty(p, "error loading memory projection: " + e);
+    statusEl.textContent = "error";
+  }
+  btn.disabled=false;
+}
+
+function render(d){
+  // 0 banner: claim_status legend + provider summary
+  let p = wide("Claim status · governance");
+  row(p, "default claim_status", statusPill("candidate"));
+  row(p, "memory artifacts are", "candidate (NOT served / canonical)");
+  row(p, "promote via", "Consumption API (gate + reconciliation)");
+
+  // 1 Memory artifacts (candidate) — show claim_status + source handle visibly
+  p = panel("Memory artifacts (candidate)");
+  row(p, "available", d.arts.available ? "yes" : "degraded");
+  row(p, "total", d.arts.total ?? 0);
+  if (!(d.arts.artifacts||[]).length) empty(p, d.arts.note || "no candidate memory");
+  (d.arts.artifacts||[]).forEach(a => {
+    const r=document.createElement("div"); r.className="row";
+    r.innerHTML = `<span>${statusPill(a.claim_status)} <code>${esc(handle(a))}</code><br><span class="mut">${esc(a.value||a.text||a.object||"")}</span></span><span class="mut">${esc(a.scope||"")}</span>`;
+    p.appendChild(r);
+  });
+
+  // 2 Profile: static + dynamic are CANDIDATE provider memory (a provider can't mint canonical facts);
+  //   promoted is the SEPARATE consumption-layer lane (used in panels 10/11 below).
+  p = panel("Profile (static · dynamic)");
+  const pr = (d.prof.profile)||{};
+  row(p, "static (candidate)", (pr.static||[]).length);
+  (pr.static||[]).forEach(s => row(p, statusPill("candidate")+" "+esc(s.response_id||s.id||"memory"), esc(s.answer||s.note||"")));
+  row(p, "dynamic (candidate)", (pr.dynamic||[]).length);
+  if (!(pr.static||[]).length && !(pr.dynamic||[]).length) empty(p, d.prof.note || "no profile yet");
+  (pr.dynamic||[]).forEach(x => row(p, statusPill("candidate")+" "+esc(handle(x)), esc(x.value||x.text||"")));
+
+  // 3 Source documents (from artifacts' source handles)
+  p = panel("Source documents");
+  const docs = (d.arts.artifacts||[]).map(handle).filter(Boolean);
+  if (!docs.length) empty(p, "no source documents"); else docs.forEach(h => row(p, "", `<code>${esc(h)}</code>`));
+
+  // 4 Connectors (candidate)
+  p = panel("Connectors (candidate)");
+  row(p, "available", d.conn.available ? "yes" : "candidate-set");
+  if (!(d.conn.connectors||[]).length) empty(p);
+  (d.conn.connectors||[]).forEach(c => row(p, esc(c.connector_id||c.id), statusPill(c.status)+` <span class="mut">${esc(c.behind_port||"")}</span>`));
+
+  // 5 Sync state
+  p = panel("Sync state");
+  const synced = (d.trc.traces||[]).length;
+  row(p, "provider calls (traced)", synced);
+  row(p, "last op", synced ? esc(d.trc.traces[synced-1].op) : "—");
+  row(p, "as of", synced ? esc(d.trc.traces[synced-1].recorded_at) : "—");
+
+  // 6 Memory graph (summary)
+  p = panel("Memory graph (summary)");
+  row(p, "nodes (artifacts)", (d.arts.artifacts||[]).length);
+  row(p, "candidate edges", "Updates / Extends / Derives → held out unless promoted");
+  row(p, "Derives serves fact?", `<span class="pill bad">never</span>`);
+
+  // 7 Search / recall (candidate)
+  p = panel("Search · recall (candidate)");
+  row(p, "query", `<code>${esc(d.srch.query||"")}</code>`);
+  row(p, "results", d.srch.total ?? 0);
+  if (!(d.srch.results||[]).length) empty(p, d.srch.note || "no results");
+  (d.srch.results||[]).forEach(r => {
+    const e=document.createElement("div"); e.className="row";
+    e.innerHTML = `<span>${statusPill(r.claim_status)} <code>${esc(handle(r))}</code><br><span class="mut">${esc(r.value||r.text||"")}</span></span>`;
+    p.appendChild(e);
+  });
+
+  // 8 Contradictions / updates
+  p = panel("Contradictions · updates");
+  row(p, "resolution", "by AUTHORITY + receipt, never recency-only");
+  row(p, "loser", `${statusPill("held_out")} (held out, NOT forgotten)`);
+
+  // 9 Freshness / expiration
+  p = panel("Freshness · expiration");
+  row(p, "expired memory", "held out (lossless) — never deleted");
+  row(p, "as of", esc(_now(d)));
+
+  // 10 Reconciliation receipts (from PROMOTED facts — the consumption layer, not the provider)
+  p = panel("Reconciliation receipts");
+  if (!(pr.promoted||[]).length) empty(p, "no promotions yet (provider can't mint canonical facts)");
+  (pr.promoted||[]).forEach(s => row(p, "promoted", `<code>${esc(s.response_id||"-")}</code>`));
+
+  // 11 Injected into agent context (ONLY promoted/canonical facts are served)
+  p = panel("Injected into agent context");
+  if (!(pr.promoted||[]).length) empty(p, "nothing served yet (only promoted facts are injected)");
+  (pr.promoted||[]).forEach(s => row(p, statusPill("promoted"), esc(s.answer||s.response_id||"")));
+
+  // 12 Held out (the candidate memory that was NOT promoted)
+  p = panel("Held out (NOT injected)");
+  const heldCount = (d.arts.artifacts||[]).length;  // every candidate is held out until promoted
+  row(p, "candidate (held out of context)", heldCount);
+  if (!heldCount) empty(p, "no candidate memory held out");
+  (d.arts.artifacts||[]).forEach(a => row(p, `${statusPill("held_out")} <code>${esc(handle(a))}</code>`, `<span class="mut">candidate · not served</span>`));
+
+  // 13 Providers (status; no secrets shown)
+  p = panel("Providers");
+  (d.prov.providers||[]).forEach(pv => row(p, esc(pv.provider_id),
+    `${pv.available?'<span class="pill promoted">up</span>':'<span class="pill candidate">'+(pv.kind==="candidate"?"candidate":"down")+'</span>'} <span class="mut">${esc(pv.requires_credential||"")}</span>`));
+
+  // 14 Traces (audit)
+  p = wide("Memory traces (audit · every provider call)");
+  if (!(d.trc.traces||[]).length) empty(p, "no provider calls yet");
+  (d.trc.traces||[]).forEach(t => row(p, `<code>${esc(t.trace_id)}</code> ${esc(t.op)}`,
+    `${statusPill(t.claim_status)} <span class="mut">${esc(t.provider_id)} · n=${t.result_count}</span>`));
+}
+
+function _now(d){ const t=(d.trc.traces||[]); return t.length ? t[t.length-1].recorded_at : "—"; }
+
+document.getElementById("run").addEventListener("click", run);
+run();
+</script>
+</body>
+</html>

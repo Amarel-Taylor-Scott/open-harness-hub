@@ -1,0 +1,98 @@
+# Baltor backend-tool catalog — verified seed
+#
+# Source: verification workflow wsxzk600t (14 web-research lanes, adversarially flagged), 2026-06-04.
+# Narrative + per-tool detail: research/backend-tool-verification.md. Free demo APIs: research/free-demo-apis.md.
+#
+# Discipline (docs/standards/adapter-contract.md once created): Baltor domain code depends on the
+# CAPABILITY (the `key` below), never on a vendor. Each capability has a swappable primary + fallback.
+# Prefer OSS/self-hostable/free for the non-commercial demo. "avoid" = real tools deliberately NOT chosen.
+# "flagged" at the bottom = names from upstream lists that are hallucinated/decayed/mislabeled — do not trust verbatim.
+
+capabilities:
+  - key: parser_manager
+    layer: "Parser Manager"
+    primary: { name: Docling, license: MIT, hosting: local, url: "https://github.com/docling-project/docling", interface: multiple }
+    fallback: { name: Unstructured, license: Apache-2.0, hosting: hybrid, url: "https://github.com/Unstructured-IO/unstructured", interface: multiple }
+    avoid: ["Marker (restricted model weights)", "PyMuPDF4LLM (AGPL-or-commercial)", "LlamaParse/Reducto (cloud-only)"]
+
+  - key: repo_codegraph
+    layer: "Repo Directory / CodeGraph"
+    primary: { name: ast-grep, license: MIT, hosting: local, url: "https://github.com/ast-grep/ast-grep", interface: multiple }
+    primary_companion: { name: "aider repo map", license: Apache-2.0, hosting: local, url: "https://aider.chat/docs/repomap.html", interface: library }
+    fallback: { name: CodeGraphContext, license: MIT, hosting: self_hosted, url: "https://github.com/CodeGraphContext/CodeGraphContext", interface: multiple }
+    avoid: ["Sourcegraph (proprietary)", "SCIP (a format, not an engine)"]
+
+  - key: skills_manager
+    layer: "Skills Manager"
+    primary: { name: "Anthropic Agent Skills (open SKILL.md standard)", license: Apache-2.0, hosting: hybrid, url: "https://github.com/anthropics/skills", interface: multiple }
+    fallback: { name: HarnessKit, license: Apache-2.0, hosting: local, url: "https://github.com/RealZST/HarnessKit", interface: multiple }
+    note: "first-party `gh skill` (GitHub CLI v2.90.0) installs open-spec skills with provenance — useful complement"
+
+  - key: scraping_manager
+    layer: "Scraping Manager"
+    primary: { name: Crawl4AI, license: Apache-2.0, hosting: self_hosted, url: "https://github.com/unclecode/crawl4ai", interface: multiple }
+    fallback: { name: Scrapy, license: BSD-3-Clause, hosting: local, url: "https://github.com/scrapy/scrapy", interface: library }
+    avoid: ["Firecrawl (AGPL core)", "Apify/Bright Data (managed)"]
+
+  - key: api_manager
+    layer: "API Manager (gateway)"
+    primary: { name: LiteLLM, license: MIT, hosting: self_hosted, url: "https://github.com/BerriAI/litellm", interface: multiple, role: "LLM routing" }
+    primary_companion: { name: Kong Gateway, license: Apache-2.0, hosting: self_hosted, url: "https://github.com/Kong/kong", interface: service, role: "generic L7" }
+    fallback: { name: Portkey Gateway, license: Apache-2.0, hosting: hybrid, url: "https://github.com/Portkey-AI/gateway", interface: multiple }
+
+  - key: api_catalog
+    layer: "API Repo / Catalog"
+    primary: { name: Backstage, license: Apache-2.0, hosting: self_hosted, url: "https://backstage.io/", interface: multiple }
+    fallback: { name: Apicurio Registry, license: Apache-2.0, hosting: self_hosted, url: "https://github.com/Apicurio/apicurio-registry", interface: multiple }
+    note: "OpenAPI→MCP generation: cnoe-io/openapi-mcp-codegen (Apache-2.0), awslabs OpenAPI MCP server"
+
+  - key: mcp_gateway
+    layer: "MCP Gateway"
+    primary: { name: "IBM ContextForge", license: Apache-2.0, hosting: hybrid, url: "https://github.com/IBM/mcp-context-forge", interface: multiple }
+    fallback: { name: "Docker MCP Gateway", license: MIT, hosting: hybrid, url: "https://github.com/docker/mcp-gateway", interface: cli }
+    note: "FastMCP (Apache-2.0) for building servers; Bifrost/Portkey strong alternates"
+
+  - key: durable_workflow_engine
+    layer: "Durable Workflow / Agent Engine"
+    primary: { name: DBOS, license: MIT, hosting: self_hosted, url: "https://github.com/dbos-inc", interface: library, note: "checkpoints in existing Postgres — zero extra infra" }
+    fallback: { name: Temporal, license: MIT, hosting: self_hosted, url: "https://github.com/temporalio/temporal", interface: service }
+    agent_framework_primary: { name: "Pydantic AI", license: MIT, hosting: self_hosted, url: "https://github.com/pydantic/pydantic-ai", interface: library }
+    agent_framework_fallback: { name: LangGraph, license: MIT, hosting: hybrid, url: "https://github.com/langchain-ai/langgraph", interface: library }
+
+  - key: claim_graph_memory
+    layer: "Temporal Claim Graph / Memory"
+    primary: { name: Graphiti, license: Apache-2.0, hosting: self_hosted, url: "https://github.com/getzep/graphiti", interface: library, note: "native bi-temporal claim modeling" }
+    fallback: { name: Cognee, license: Apache-2.0, hosting: hybrid, url: "https://github.com/topoteretes/cognee", interface: library }
+
+  - key: graph_db_substrate
+    layer: "Graph DB Substrate"
+    primary: { name: HelixDB, license: AGPL-3.0, hosting: self_hosted, note: "graph+vector, native MCP" }
+    fallback: { name: FalkorDB, license: SSPL, hosting: self_hosted }
+    avoid: ["Kuzu original (archived Oct 2025 — use a maintained fork if needed)"]
+
+  - key: hybrid_retrieval
+    layer: "Hybrid Retrieval"
+    primary: { name: Qdrant, license: Apache-2.0, hosting: hybrid, url: "https://github.com/qdrant/qdrant", interface: multiple }
+    fallback: { name: pgvector, license: "PostgreSQL License", hosting: self_hosted, url: "https://github.com/pgvector/pgvector", note: "keeps retrieval in Postgres for the demo path; pair with FTS" }
+    avoid: ["Pinecone/Turbopuffer (managed)", "Marqo (pivoted to ecommerce, decayed)"]
+
+  - key: observability_evals
+    layer: "Observability + Evals"
+    primary: { name: Langfuse, license: "MIT (core)", hosting: hybrid, url: "https://github.com/langfuse/langfuse", interface: multiple }
+    fallback: { name: "Arize Phoenix + Ragas", license: "ELv2 / Apache-2.0", hosting: self_hosted }
+    standard: "emit OpenTelemetry GenAI semantic conventions for portability"
+
+  - key: sandboxed_execution
+    layer: "Sandboxed Execution"
+    primary: { name: E2B, license: Apache-2.0, hosting: hybrid, url: "https://github.com/e2b-dev", interface: multiple }
+    fallback: { name: microsandbox, license: Apache-2.0, hosting: self_hosted, note: "local-first libkrun" }
+    note: "Firecracker/gVisor/Kata are substrates underneath, not turnkey"
+
+# Names from upstream (other-AI) lists that are NOT trustworthy verbatim — see research/backend-tool-verification.md §2.
+flagged:
+  - { name: "Synapse AI", verdict: "likely hallucinated — no canonical durable-workflow engine by this name" }
+  - { name: "Microsoft Conductor", verdict: "real but wrong-fit (dev-workflow CLI) + collides with Netflix/Orkes conductor-oss" }
+  - { name: "Kuzu", verdict: "archived Oct 2025 — do not adopt original; use a fork" }
+  - { name: "Neo4j GraphRAG", verdict: "a retrieval library, not a graph-memory store; needs a licensed Neo4j server" }
+  - { name: "Marqo", verdict: "pivoted to ecommerce search; decayed for general retrieval" }
+  - { name: "Envoy (as gateway)", verdict: "an L4/L7 proxy — use Envoy Gateway / Envoy AI Gateway" }

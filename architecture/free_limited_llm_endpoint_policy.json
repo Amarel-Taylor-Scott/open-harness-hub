@@ -1,0 +1,26 @@
+{
+  "version": "1.0",
+  "note": "Class -> governance policy for free/limited endpoints, gateway/discovery repos, and browser runtimes. SINGLE SOURCE: the intelligence engine reads max_recommended_phase, executable, secret/data rules from here keyed by the numeric class code in free_endpoint_class_codes.json. Core rule: free endpoint discovery is metadata; official provider docs decide eligibility; the Inference Gateway decides routing; the ModelInvocationReceipt records reality; Baltor never treats model output as truth.",
+  "global_rules": {
+    "raw_keys_forbidden_in_config": true,
+    "secret_ref_required_for_live_calls": true,
+    "third_party_free_claims_are_unverified": true,
+    "official_docs_decide_eligibility": true,
+    "llm_output_is_never_truth": true,
+    "fallback_must_be_recorded_never_silent": true,
+    "customer_sensitive_requires_explicit_data_policy": true
+  },
+  "by_class": {
+    "100": {"role": "candidate_provider", "executable": "gated_through_inference_gateway", "teleon_use": "candidate_non_serving", "baltor_use": "candidate_only_not_truth", "max_recommended_phase": 3, "max_data_class_without_review": "synthetic", "customer_sensitive_allowed": false, "secret_ref_required": true},
+    "200": {"role": "candidate_provider_trial", "executable": "gated_through_inference_gateway", "teleon_use": "candidate_non_serving", "baltor_use": "candidate_only_not_truth", "max_recommended_phase": 2, "max_data_class_without_review": "synthetic", "customer_sensitive_allowed": false, "secret_ref_required": true},
+    "300": {"role": "paid_provider", "executable": "gated_through_inference_gateway", "teleon_use": "candidate_non_serving", "baltor_use": "candidate_only_not_truth", "max_recommended_phase": 5, "max_data_class_without_review": "internal", "customer_sensitive_allowed": true, "secret_ref_required": true},
+    "400": {"role": "candidate_aggregator", "executable": "gated_through_inference_gateway", "teleon_use": "candidate_non_serving", "baltor_use": "candidate_only_not_truth", "max_recommended_phase": 3, "max_data_class_without_review": "synthetic", "customer_sensitive_allowed": false, "secret_ref_required": true},
+    "500": {"role": "lab_candidate_only", "executable": "self_host_dev_only_after_review", "teleon_use": "lab_candidate_non_serving", "baltor_use": "not_a_truth_source", "max_recommended_phase": 2, "max_data_class_without_review": "synthetic", "customer_sensitive_allowed": false, "secret_ref_required": true},
+    "600": {"role": "metadata_only", "executable": "never", "teleon_use": "discovery_metadata", "baltor_use": "not_a_truth_source", "max_recommended_phase": 0, "max_data_class_without_review": "public", "customer_sensitive_allowed": false, "secret_ref_required": false},
+    "700": {"role": "sandbox_runtime_candidate", "executable": "sandbox_gateway_only", "teleon_use": "sandbox_runtime_candidate", "baltor_use": "not_a_truth_source", "max_recommended_phase": 2, "max_data_class_without_review": "synthetic", "customer_sensitive_allowed": false, "secret_ref_required": true, "is_inference_provider": false},
+    "900": {"role": "quarantined", "executable": "never", "teleon_use": "rejected", "baltor_use": "rejected", "max_recommended_phase": -1, "max_data_class_without_review": "none", "customer_sensitive_allowed": false, "secret_ref_required": false},
+    "910": {"role": "quarantined", "executable": "never", "teleon_use": "rejected", "baltor_use": "rejected", "max_recommended_phase": -1, "max_data_class_without_review": "none", "customer_sensitive_allowed": false, "secret_ref_required": false},
+    "990": {"role": "quarantined_pending_official_docs", "executable": "never", "teleon_use": "rejected", "baltor_use": "rejected", "max_recommended_phase": -1, "max_data_class_without_review": "none", "customer_sensitive_allowed": false, "secret_ref_required": false}
+  },
+  "quarantine_markers": ["free api key", "free api keys", "copy/paste", "copy paste", "unlimited", "bypass", "reverse-engineered", "reverse engineered", "shared key", "shared keys", "leaked key", "cracked", "no signup needed key"]
+}

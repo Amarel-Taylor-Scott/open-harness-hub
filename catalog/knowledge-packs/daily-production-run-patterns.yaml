@@ -1,0 +1,38 @@
+id: "knowledge-pack/daily-production-run-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Daily production run patterns"
+description: "Checks for running the daily component candidate, showcase pipeline, coverage, gap-fill, and load-audit workflow as one repeatable production pass."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["generation", "planning", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.scale"
+tags: ["components", "daily-factory", "production-run", "showcase-pipelines", "load-audit", "pgvector"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+content_types:
+  - "daily_production_run_check"
+files:
+  - path: "catalog/knowledge-packs/data/daily-production-run-patterns/checks.jsonl"
+    format: "jsonl"
+    schema: "daily_production_run_check"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["id", "description", "required_outputs", "failure_route"]
+provenance:
+  sources:
+    - "Open Harness Hub daily production target"
+    - "Open Harness Hub object factory workflow"
+    - "Open Harness Hub showcase coverage and gap feedback loop"
+  collected_through: "2026-05-26"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "synthetic operational checks only"

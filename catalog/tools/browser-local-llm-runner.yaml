@@ -1,0 +1,71 @@
+id: "tool/browser-local-llm-runner"
+type: tool
+version: "0.1.0"
+name: "Browser-local LLM runner"
+description: "Profiles whether a small LLM or embedding model can run in the user's browser using WebGPU, WASM, or local extension-backed execution."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["generation", "evaluation", "tool_use"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "volatile"
+tags: ["browser", "local-llm", "webgpu", "wasm", "cost-estimation", "saas"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    task_class:
+      type: string
+      description: "Classification, extraction, summarization, reranking, embedding, or generation."
+    model_family:
+      type: string
+      description: "Candidate browser-capable model family."
+    device_profile:
+      type: object
+      description: "Browser, OS, memory, GPU, and privacy constraints."
+    max_latency_ms:
+      type: integer
+    max_download_mb:
+      type: integer
+  required: ["task_class"]
+returns:
+  type: object
+  properties:
+    feasible:
+      type: boolean
+    runtime:
+      type: string
+    estimated_latency_ms:
+      type: integer
+    estimated_download_mb:
+      type: integer
+    cost_effect:
+      type: string
+    caveats:
+      type: array
+      items:
+        type: string
+side_effects: "none"
+examples:
+  - input:
+      task_class: "classification"
+      device_profile:
+        browser: "chromium"
+        webgpu: true
+    output:
+      feasible: true
+      runtime: "webgpu"
+      estimated_latency_ms: null
+      estimated_download_mb: null
+      cost_effect: "May reduce hosted model calls after initial model download."
+      caveats: ["Benchmark on target devices before production use."]
+implementations:
+  - kind: "callable"
+    path: "tools.browser_local_llm_runner.profile"
+  - kind: "mcp"
+    path: "mcp/browser.profile_local_llm"

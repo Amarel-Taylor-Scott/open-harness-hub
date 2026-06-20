@@ -1,0 +1,21 @@
+{
+  "capability_slot": "parser_manager",
+  "adapter_id": "parser.stub@v1",
+  "description": "RawDocument -> DocumentTree. The stub is deterministic + offline; Docling is the candidate primary behind the same contract.",
+  "input": {
+    "schema": "RawDocument",
+    "source_handle": "ctx://cfpb-sample/reg-e.pdf",
+    "media_type": "application/pdf",
+    "bytes_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "tenant_id": "demo"
+  },
+  "output": {
+    "schema": "DocumentTree",
+    "root_id": "doc-reg-e",
+    "nodes": [
+      {"node_id": "doc-reg-e", "kind": "document", "parent": null},
+      {"node_id": "doc-reg-e#page=1", "kind": "page", "parent": "doc-reg-e"},
+      {"node_id": "doc-reg-e#page=1&block=2", "kind": "paragraph", "parent": "doc-reg-e#page=1", "text": "error resolution within 10 business days"}
+    ]
+  }
+}

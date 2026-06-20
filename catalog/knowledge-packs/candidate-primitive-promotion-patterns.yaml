@@ -1,0 +1,38 @@
+id: "knowledge-pack/candidate-primitive-promotion-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Candidate primitive promotion patterns"
+description: "Scoring criteria and seed decisions for promoting high-volume candidate primitives into curated manifests, review queues, or retained JSONL candidates."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["evaluation", "governance", "planning", "routing"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "hub"
+freshness: "stable"
+lifecycle_position: "cross_cutting.evaluation"
+tags: ["promotion", "candidate-primitives", "quality-gates", "million-primitives", "review-routing"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types:
+  - "promotion_decision"
+  - "promotion_scoring_policy"
+files:
+  - path: "catalog/knowledge-packs/data/candidate-primitive-promotion-patterns/promotion-decisions.jsonl"
+    schema: "schemas/promotion-decision.schema.json"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    fields: ["object_id", "decision", "risk_flags", "recommended_outputs"]
+provenance:
+  sources:
+    - "Open Harness Hub million object goal"
+    - "Open Harness Hub quality gates"
+    - "Open Harness Hub task marketplace archetype intake"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "Synthetic scoring examples only; no real PII, raw job postings, or proprietary listings."

@@ -1,0 +1,48 @@
+id: "rubric/baltor-chief-security-officer-quality"
+type: rubric
+version: "0.1.0"
+name: "Baltor Chief Security Officer quality"
+description: "Chief Security Officer rubric for access control, MCP/tool safety, local memory boundaries, and auditability."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["software", "cyber", "ai_governance"]
+capability: ["evaluation", "safety", "governance", "verification"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["baltor", "security", "mcp", "access-control"]
+created: "2026-06-02"
+updated: "2026-06-02"
+dimensions:
+  - id: "acl_before_model"
+    label: "Source and context permissions are enforced before model, reranker, or agent exposure"
+    weight: 0.24
+    scale: "0.0-1.0"
+    evidence_required: "Access checks occur before retrieval expansion, pack assembly, model calls, and tool invocation."
+  - id: "tool_and_mcp_safety"
+    label: "MCP/tool surface is allowlisted, audited, read-only by default, and protected from excessive agency"
+    weight: 0.18
+    scale: "0.0-1.0"
+    evidence_required: "Tool annotations, deny/ask/allow rules, source action gates, and audit logs are present."
+  - id: "prompt_injection_resilience"
+    label: "Untrusted source content is treated as data, scanned, bounded, and never allowed to override system policy"
+    weight: 0.16
+    scale: "0.0-1.0"
+    evidence_required: "Prompt-injection risk dimensions, sanitization, policy isolation, and raw-source fallback controls exist."
+  - id: "local_memory_boundary"
+    label: "Private encrypted memory, company-readable context, and cached packs have clear security boundaries"
+    weight: 0.16
+    scale: "0.0-1.0"
+    evidence_required: "E2EE sync, local embeddings, cloud visibility limits, TTL cache, and promotion review are documented."
+  - id: "audit_and_forensics"
+    label: "Security can reconstruct what an agent saw, fetched, expanded, and was denied"
+    weight: 0.14
+    scale: "0.0-1.0"
+    evidence_required: "Context trace includes user/client, query, sources searched, sources returned, policy decisions, and source handles."
+  - id: "data_minimization"
+    label: "Architecture minimizes raw source, secrets, customer data, and sensitive derived data exposure"
+    weight: 0.12
+    scale: "0.0-1.0"
+    evidence_required: "Raw source dumps are blocked, embeddings are treated as sensitive, and retention/redaction policies exist."
+scoring_method: "weighted_sum"

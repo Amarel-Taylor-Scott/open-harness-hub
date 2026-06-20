@@ -1,0 +1,85 @@
+id: "pipeline/daily-partitions-to-postgres-load-audit"
+type: pipeline
+version: "0.1.0"
+name: "Daily partitions to Postgres load audit"
+description: "Merges daily component candidate partitions into deduplicated JSONL, checks local relationships, emits psql bulk COPY files, and records the staged proof boundary before a Postgres load."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "retrieval", "serving", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "daily-factory", "postgres", "pgvector", "bulk-load", "audit"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Prepare multiple daily component candidate partitions for canonical Postgres/pgvector staging without overcounting duplicate source and entity rows."
+pipeline_kind: "research_web.daily_partition_load_audit"
+inputs:
+  - name: "partition"
+    type: "array"
+  - name: "output_dir"
+    type: "string"
+  - name: "run_id"
+    type: "string"
+outputs:
+  - name: "merged_jsonl"
+    type: "jsonl"
+  - name: "preflight_report"
+    type: "json"
+  - name: "bulk_copy_manifest"
+    type: "json"
+  - name: "load_sql"
+    type: "sql"
+  - name: "staged_vs_committed_audit"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/daily-partition-load-audit-patterns"
+    - "knowledge-pack/daily-thousand-component-factory-patterns"
+steps:
+  - id: "load-audit-patterns"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/daily-partition-load-audit-patterns"
+    inputs:
+      query: "daily partition merge dedupe primary key preflight bulk copy staged audit"
+      top_k: 20
+  - id: "merge-preflight-and-export"
+    kind: "tool"
+    ref: "tool/daily-partition-load-auditor"
+    inputs:
+      partition: "$.inputs.partition"
+      output_dir: "$.inputs.output_dir"
+      run_id: "$.inputs.run_id"
+  - id: "operator-runs-postgres-load"
+    kind: "tool"
+    ref: "tool/postgres-load-execution-planner"
+    inputs:
+      load_plan_manifest: "$.steps.merge-preflight-and-export.output.load_plan_manifest"
+      target: "operator_selected_postgres"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.merge-preflight-and-export.preflight.ok"
+    op: "=="
+    value: true
+    severity: "critical"
+    label: "Merged rows pass local relationship preflight before any database mutation."
+  - kind: "deterministic"
+    target: "$.merge-preflight-and-export.bulk_manifest.load_sql"
+    op: "is_truthy"
+    value: true
+    severity: "critical"
+    label: "Bulk COPY SQL is emitted for operator review."
+  - kind: "semantic"
+    target: "$.merge-preflight-and-export"
+    must_cover:
+      - "deduplicates by primary key"
+      - "staged_only until committed Postgres counts are supplied"
+      - "keeps YAML definition count separate from database row count"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "The audit preserves the proof boundary between staged and committed data."

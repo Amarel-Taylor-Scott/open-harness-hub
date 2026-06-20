@@ -1,0 +1,30 @@
+id: "knowledge-pack/mortgage-underwriting-qc-frameworks"
+type: knowledge-pack
+version: "0.1.0"
+name: "Mortgage Underwriting QC frameworks"
+description: "Composite context pack for mortgage underwriting qc reviews, including evidence, escalation, and remediation controls."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "CC-BY-4.0"
+industry: ["finance", "finance.lending"]
+capability: ["retrieval", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "dated"
+tags: ["mortgage-underwriting-qc", "expansion-v3"]
+created: "2026-05-24"
+updated: "2026-05-24"
+content_types: ["rag_doc", "checklist", "control_summary", "evidence_matrix"]
+files:
+  - path: "data/mortgage-underwriting-qc/frameworks.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    enabled: true
+    embedder: "adapter/nomic-embed-text-v15"
+provenance:
+  sources: ["Mortgage Underwriting QC control checklist", "Mortgage Underwriting QC evidence matrix", "Mortgage Underwriting QC escalation playbook", "Mortgage Underwriting QC remediation tracker"]
+  collected_through: "2026-05-24"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "composite educational summaries only"

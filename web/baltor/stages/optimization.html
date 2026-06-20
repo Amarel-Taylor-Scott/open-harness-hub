@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor — Optimization</title>
+<link rel="stylesheet" href="./stage-detail.css?v=optimization-dom-1" />
+<style>
+  body.focused-stage .page { width: min(100%, 1180px); display: grid; grid-template-rows: auto auto auto auto; gap: 16px; align-content: center; }
+  .focused-canvas { height: auto; min-height: 500px; }
+  .stage-diagram { --flow-gap: clamp(10px, 1.4vw, 18px); min-height: 500px; padding: 22px clamp(18px,3vw,34px) 28px; display: grid; grid-template-rows: auto 1fr; gap: 28px; }
+  .diagram-labels { display: grid; grid-template-columns: minmax(235px,.9fr) minmax(260px,1fr) minmax(260px,1fr); gap: clamp(18px,3vw,44px); text-align: center; }
+  .diagram-labels b { display: block; color: #a47ef7; font-size: 11px; text-transform: uppercase; letter-spacing: .12em; }
+  .diagram-labels span { display: block; margin-top: 4px; color: #7f8794; font-size: 12px; font-weight: 650; }
+  .diagram-body { display: grid; grid-template-columns: minmax(235px,.9fr) minmax(44px,.12fr) minmax(260px,1fr) minmax(44px,.12fr) minmax(260px,1fr); column-gap: var(--flow-gap); align-items: center; }
+  .stack { display: grid; gap: 18px; position: relative; z-index: 2; }
+  .input-card, .optimizer-card, .pack-card { border: 1px solid #3a4454; border-radius: 14px; background: rgba(12,16,22,.9); box-shadow: 0 20px 40px rgba(0,0,0,.22); }
+  .input-card { --accent:#a47ef7; min-height: 74px; border-color: color-mix(in srgb,var(--accent) 54%,#262d38); border-radius: 10px; padding: 12px 14px; position: relative; background: rgba(12,16,22,.86); }
+  .input-card::after { content:""; position:absolute; right:-5px; top:50%; width:9px; height:9px; border-radius:999px; background:var(--accent); transform:translateY(-50%); opacity:.52; box-shadow:0 0 0 7px color-mix(in srgb,var(--accent) 9%,transparent); }
+  .input-card b { display:block; color:color-mix(in srgb,var(--accent) 78%,#e7ebf0); font-size:11px; text-transform:uppercase; letter-spacing:.08em; }
+  .input-card span { display:block; margin-top:5px; color:#e7ebf0; font-weight:850; line-height:1.25; }
+  .input-card small { display:block; margin-top:4px; color:#8c95a4; font-size:11px; }
+  .line-stack { display:grid; grid-template-rows:repeat(3,74px); gap:18px; align-items:center; min-width:44px; margin-inline:calc(var(--flow-gap)*-1); padding-inline:var(--flow-gap); z-index:1; }
+  .line-stack.out { grid-template-rows:repeat(3,54px); gap:13px; padding-top:54px; padding-bottom:54px; }
+  .flow-line { --accent:#a47ef7; display:block; position:relative; width:calc(100% + (var(--flow-gap)*2)); height:1px; margin-inline:calc(var(--flow-gap)*-1); background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 58%,transparent),color-mix(in srgb,var(--accent) 18%,transparent)); }
+  .flow-line::after,.flow-line .packet { content:""; position:absolute; top:50%; width:8px; height:8px; border-radius:999px; background:var(--accent); transform:translateY(-50%); box-shadow:0 0 14px color-mix(in srgb,var(--accent) 56%,transparent); }
+  .flow-line::after { right:0; }
+  .flow-line .packet { left:14%; width:7px; height:7px; opacity:0; animation:packet 3.8s linear infinite; animation-delay:var(--delay,0s); }
+  .optimizer-card,.pack-card { width:100%; min-height:336px; padding:22px; position:relative; z-index:2; }
+  .optimizer-card h2,.pack-card h2 { margin:0 0 18px; font-size:17px; line-height:1.1; }
+  .rows { display:grid; gap:13px; }
+  .row { min-height:54px; border-radius:8px; background:rgba(255,255,255,.035); display:grid; grid-template-columns:40px 1fr; align-items:center; gap:12px; padding:9px 11px; }
+  .badge { width:30px; height:30px; border-radius:9px; display:inline-flex; align-items:center; justify-content:center; background:var(--accent,#a47ef7); color:#071017; font-weight:900; }
+  .row span { color:#b7c0cc; font-size:12.5px; line-height:1.3; }
+  .pack-shell { border:1px solid rgba(164,126,247,.38); border-radius:12px; padding:14px; background:rgba(164,126,247,.055); }
+  .pack-title { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; }
+  .pack-title b { font-size:15px; }
+  .token-pill { color:#d5c4ff; border:1px solid rgba(164,126,247,.35); border-radius:999px; padding:4px 8px; font-size:11px; font-weight:850; }
+  .pack-lines { display:grid; gap:8px; }
+  .pack-line { height:10px; border-radius:999px; background:rgba(255,255,255,.08); overflow:hidden; }
+  .pack-line i { display:block; height:100%; width:var(--w,70%); border-radius:inherit; background:#a47ef7; }
+  .note { margin-top:15px; border:1px solid rgba(164,126,247,.28); border-radius:10px; background:rgba(164,126,247,.055); padding:12px; color:#d5c4ff; font-size:12.5px; line-height:1.35; }
+  @keyframes packet { 0%{left:14%;opacity:0} 18%{opacity:.88} 84%{opacity:.88} 100%{left:100%;opacity:0} }
+  @media (prefers-reduced-motion: reduce) { .flow-line .packet{animation:none;left:72%;opacity:.55} }
+  @media (max-width:900px) { .stage-diagram{min-height:0}.diagram-labels{display:none}.diagram-body{grid-template-columns:1fr;gap:16px}.line-stack{display:none}.input-card::after{display:none} }
+</style>
+</head>
+<body class="focused-stage">
+<main class="page">
+  <nav class="nav"><a href="../context-stages.html">All stages</a><a href="../context-engine-hero.html">Main flow</a></nav>
+  <section class="focused-shell" style="--stage:var(--violet)">
+    <header class="focused-head">
+      <div class="focused-title"><div class="eyebrow">04 · Pack shaping</div><h1>Optimization</h1><p>Baltor ranks, compresses, structures, and prioritizes enriched context into the smallest useful pack for the task, preserving handles for expansion.</p></div>
+      <div class="focused-metrics"><div><span>Input tokens</span><b>41k</b></div><div><span>Pack tokens</span><b>3k</b></div><div><span>Tool calls saved</span><b>12</b></div><div><span>State</span><b>Shaped</b></div></div>
+    </header>
+    <div class="focused-canvas"><div class="stage-diagram">
+      <div class="diagram-labels"><div><b>Bloated inputs</b><span>threads, docs, claims, handles, graph paths</span></div><div><b>Optimization engine</b><span>rank / structure / compress / prioritize</span></div><div><b>Task-ready pack</b><span>compact, ordered, expandable</span></div></div>
+      <div class="diagram-body">
+        <div class="stack">
+          <div class="input-card" style="--accent:#d9ae61"><b>Long evidence trail</b><span>40-page policy thread</span><small>mostly background context</small></div>
+          <div class="input-card" style="--accent:#32c786"><b>Graph paths</b><span>service → code → owner → tests</span><small>needs ranking for task</small></div>
+          <div class="input-card" style="--accent:#4c8df6"><b>Source handles</b><span>tickets, ADRs, MRs, incidents</span><small>expandable but too large raw</small></div>
+        </div>
+        <div class="line-stack"><span class="flow-line" style="--accent:#d9ae61;--delay:-.2s"><i class="packet"></i></span><span class="flow-line" style="--accent:#32c786;--delay:-1.2s"><i class="packet"></i></span><span class="flow-line" style="--accent:#4c8df6;--delay:-2.1s"><i class="packet"></i></span></div>
+        <section class="optimizer-card"><h2>Optimization engine</h2><div class="rows">
+          <div class="row" style="--accent:#a47ef7"><i class="badge">R</i><span>Rank claims and graph paths by task relevance, authority, freshness, and risk.</span></div>
+          <div class="row" style="--accent:#a47ef7"><i class="badge">S</i><span>Structure unstructured context into requirements, decisions, risks, tests, and conflicts.</span></div>
+          <div class="row" style="--accent:#a47ef7"><i class="badge">C</i><span>Compress summaries while preserving source handles, TTL, lineage, and expansion rights.</span></div>
+        </div><div class="note">Optimization removes prompt bloat without severing provenance.</div></section>
+        <div class="line-stack out"><span class="flow-line" style="--accent:#a47ef7;--delay:-.6s"><i class="packet"></i></span><span class="flow-line" style="--accent:#a47ef7;--delay:-1.7s"><i class="packet"></i></span><span class="flow-line" style="--accent:#a47ef7;--delay:-2.5s"><i class="packet"></i></span></div>
+        <section class="pack-card"><h2>Task-ready pack</h2><div class="pack-shell"><div class="pack-title"><b>review_pack</b><span class="token-pill">3,000 tokens</span></div><div class="pack-lines"><span class="pack-line"><i style="--w:88%"></i></span><span class="pack-line"><i style="--w:72%"></i></span><span class="pack-line"><i style="--w:55%"></i></span><span class="pack-line"><i style="--w:38%"></i></span></div></div><div class="rows" style="margin-top:13px"><div class="row"><i class="badge">1</i><span>Top claims, conflicts, tests, owners, and risks are ordered for use.</span></div><div class="row"><i class="badge">↗</i><span>Every compressed claim keeps handles for controlled source expansion.</span></div></div></section>
+      </div>
+    </div></div>
+    <div class="stage-assurance-card"><div class="assurance-title"><b>Continuous Verification + Adversarial Validation</b><span>Universal assurance layer</span></div><p>During optimization, Baltor checks that compression does not erase conflicts, misrepresent evidence, drop policy decisions, or hide stale source warnings.</p><div class="assurance-tags"><span>citation coverage</span><span>token budget</span><span>ranking</span><span>loss checks</span></div></div>
+  </section>
+  <section class="focused-explainer"><article><b>What this stage does</b><p>It shapes large context into a compact pack that is ranked, structured, and source-linked.</p></article><article><b>Concrete example</b><p>A long policy thread, tickets, and code paths become a 3,000-token review pack with conflicts and source handles preserved.</p></article><article><b>Why it matters</b><p>Useful context is not all context. Optimization reduces latency and cost while keeping the evidence trail available.</p></article></section>
+  <div class="stage-links"><a href="./source.html">Source</a><a href="./reconciliation.html">Reconciliation</a><a href="./anti-fragility.html">Anti-Fragility</a><a href="./enhancement.html">Enhancement</a><a class="is-current" href="./optimization.html">Optimization</a><a href="./consumption.html">Consumption</a></div>
+</main>
+</body>
+</html>

@@ -1,0 +1,54 @@
+id: processor/dosage-range-validator
+type: processor
+version: 0.1.0
+name: Dosage-range validator
+description: 'Validate a medication dose against weight-/age-/renal-adjusted ranges from a governed dosing
+  corpus, flagging out-of-range and suggesting the adjusted range with citation. Deterministic; decision-support
+  for the prescriber, not an autonomous order.
+
+
+  Clinical decision-SUPPORT component — DEFENSIVE only: grounds on a governed corpus, fires a deterministic
+  gate, and/or routes to a clinician; never autonomous medical advice. Lift is measured at the pipeline
+  level.'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- healthcare
+capability:
+- verification
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- clinical
+- decision-support
+- deterministic-gate
+- freezable
+- governed
+created: '2026-05-29'
+updated: '2026-05-29'
+process_kind: verify.dosage_range
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: order
+  type: object
+- name: patient
+  type: object
+- name: dose_corpus
+  type: object
+outputs:
+- name: in_range
+  type: object
+- name: adjusted
+  type: object
+side_effects: read
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.clinical.dosage_range_validator.run
+  language: python

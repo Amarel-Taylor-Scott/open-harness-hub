@@ -21,7 +21,7 @@ Layer 1 - Knowledge packs · Logic packs · Rule packs · Tools · Personas · A
 
 - A **manifest format** (YAML) for every layer, validated against
   JSON Schemas in `schemas/`.
-- A **catalog** of starter artifacts you can copy and adapt.
+- A **catalog** of starter components you can copy and adapt.
 - A **runner** (`scripts/run_pipeline.py`) that walks a pipeline DAG
   step-by-step and produces a trace.
 - A **playground** (`hf-space/`) that exposes the runner over a

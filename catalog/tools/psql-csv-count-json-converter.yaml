@@ -1,0 +1,50 @@
+id: "tool/psql-csv-count-json-converter"
+type: tool
+version: "0.1.0"
+name: "psql CSV count JSON converter"
+description: "Converts psql --csv output from db/postgres/object_count_report.sql into machine-readable JSON rows for staged-versus-committed load audits."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "evaluation", "verification"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["postgres", "psql", "object-counts", "json", "audit"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    csv_stdin:
+      type: string
+    output:
+      type: string
+  required: ["csv_stdin"]
+returns:
+  type: object
+  properties:
+    rows:
+      type: array
+      items:
+        type: object
+side_effects: "write"
+examples:
+  - input:
+      csv_stdin: "object_family,relation_name,row_count\nsource,source_record,155\n"
+      output: "dist/source-surface-scan-partitions/seed/committed-counts.json"
+    output:
+      rows:
+        - object_family: "source"
+          relation_name: "source_record"
+          row_count: 155
+implementations:
+  - kind: "callable"
+    path: "scripts.db.psql_csv_to_count_json.convert_csv_text"
+    language: "python"
+  - kind: "shell"
+    command: "python3 scripts/db/psql_csv_to_count_json.py"

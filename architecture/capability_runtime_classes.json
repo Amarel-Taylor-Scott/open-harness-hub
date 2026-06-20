@@ -1,0 +1,22 @@
+{
+  "version": "1.0",
+  "purpose": "Abstract RUNTIME CLASSES for the Open Capability Task Specification (OCTS). A CapabilityTask/PurposeTask declares allowed_runtime_classes from this vocabulary; the platform binds each class to a CONCRETE execution backend (see architecture/execution_backend_policy_matrix.json) by policy/telemetry/cost/health. This is the layer ABOVE concrete backends — vendor-neutral; vendors map their products onto these classes. The contract declares the CLASS, never a vendor product.",
+  "control_rule": "Branch on the runtime CLASS (an OCTS-portable identifier) + numeric policy, never on a vendor product name. Adding a vendor = a config mapping, not code.",
+  "classes": [
+    {"class": "edge-function", "duration": "short", "state": "stateless", "cold_start": "very-low", "vendors": ["cloudflare_workers@candidate"], "local_equivalent": "execution.local_function_emulator@v1", "use": "request transforms · auth checks · simple fetch"},
+    {"class": "cloud-function", "duration": "short-medium", "state": "stateless", "vendors": ["aws_lambda@candidate", "gcp_cloud_function@candidate", "gcp_cloud_run_function@candidate", "azure_function@candidate"], "local_equivalent": "execution.local_function_emulator@v1", "use": "event handler · lightweight task"},
+    {"class": "serverless-container", "duration": "medium", "state": "stateless", "vendors": ["cloud_run@candidate", "knative@candidate", "azure_container_apps@candidate"], "local_equivalent": "execution.managed_venv@v1", "use": "HTTP service · containerized function"},
+    {"class": "cloud-run-job", "duration": "long", "state": "ephemeral", "vendors": ["cloud_run_job@candidate"], "local_equivalent": "execution.local_cloud_run_job_emulator@v1", "use": "long batch container"},
+    {"class": "kubernetes-job", "duration": "long", "state": "ephemeral", "vendors": ["k8s_job@candidate", "aws_batch@candidate", "kueue@candidate"], "local_equivalent": "execution.local_job_emulator@v1", "use": "batch / ETL / report"},
+    {"class": "kubernetes-worker", "duration": "long", "state": "warm-pool", "vendors": ["k8s_deployment_worker@candidate"], "local_equivalent": "execution.local_worker_pool@v1", "use": "warm/hot pools"},
+    {"class": "queue-worker", "scaling": "event-driven", "vendors": ["keda_scaledobject@candidate", "ecs_service@candidate"], "local_equivalent": "execution.local_worker_pool@v1", "use": "high-volume async processing"},
+    {"class": "durable-workflow", "state": "durable", "vendors": ["temporal@candidate", "dapr_workflow@candidate", "argo_workflow@candidate", "inngest@candidate", "hatchet@candidate"], "local_equivalent": "execution.local_job_emulator@v1", "use": "long-running retries · human approval · multi-step orchestration"},
+    {"class": "browser-worker", "resources": ["browser", "screenshot"], "vendors": ["browser_pool@candidate"], "local_equivalent": "execution.local_worker_pool@v1", "use": "web automation · JS rendering"},
+    {"class": "gpu-worker", "resources": ["gpu"], "vendors": ["gpu_pool@candidate"], "local_equivalent": "execution.local_worker_pool@v1", "use": "OCR · embedding · model inference"},
+    {"class": "batch-job", "duration": "long", "state": "ephemeral", "vendors": ["k8s_job@candidate", "cloud_run_job@candidate", "aws_batch@candidate"], "local_equivalent": "execution.local_job_emulator@v1", "use": "large batch reprocessing"},
+    {"class": "cron-task", "trigger": "schedule", "vendors": ["k8s_cronjob@candidate"], "local_equivalent": "execution.local_function_emulator@v1", "use": "scheduled maintenance"},
+    {"class": "stream-processor", "scaling": "event-driven", "vendors": ["keda_scaledobject@candidate"], "local_equivalent": "execution.local_worker_pool@v1", "use": "continuous stream processing"},
+    {"class": "local-subprocess", "duration": "short-medium", "state": "stateless", "vendors": [], "local_equivalent": "local_subprocess@v1", "use": "dev / offline default"}
+  ],
+  "_note": "Every class declares a local_equivalent (cloud-defer-only-after-local-equivalent). The offline default is local_function_emulator@v1 / local_subprocess@v1; cloud/K8s vendors stay @candidate until creds + proofs exist."
+}

@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor · Native Format Preservation (preview · projection-only)</title>
+<meta name="description" content="Paste a small JSON/CSV/Markdown doc and preview how Baltor returns it in your own shape — with a governance sidecar and a field-level diff. The original is never overwritten. A projection over the live /api/native/* API; this page computes no truth." />
+<style>
+  :root { --bg:#0d1117; --panel:#161b22; --line:#21262d; --fg:#e6edf3; --mut:#8b949e; --ok:#3fb950; --warn:#d29922; --bad:#f85149; --acc:#58a6ff; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  header { padding:14px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  h1 { font-size:15px; margin:0; font-weight:600; }
+  .sub { color:var(--mut); font-size:12px; }
+  button { background:var(--acc); color:#0d1117; border:0; border-radius:6px; padding:8px 14px; font-weight:700; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:wait; }
+  label { color:var(--mut); font-size:11px; text-transform:uppercase; letter-spacing:.04em; display:block; margin:0 0 4px; }
+  select, textarea { background:#0d1117; color:var(--fg); border:1px solid var(--line); border-radius:6px; padding:7px 10px; font:inherit; width:100%; }
+  textarea { min-height:150px; resize:vertical; white-space:pre; }
+  .input-grid { padding:14px 18px 4px; display:grid; grid-template-columns:1fr; gap:12px; }
+  .pickers { display:flex; flex-wrap:wrap; gap:14px; }
+  .pickers > div { flex:1 1 200px; }
+  main { display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:12px; padding:16px; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:12px; }
+  .panel h2 { font-size:12px; margin:0 0 8px; color:var(--acc); text-transform:uppercase; letter-spacing:.04em; }
+  .wide { grid-column:1/-1; }
+  .row { display:flex; justify-content:space-between; gap:8px; padding:2px 0; border-bottom:1px dashed var(--line); }
+  .mut { color:var(--mut); }
+  .pill { display:inline-block; padding:1px 7px; border-radius:999px; font-size:11px; }
+  .pill.ok { background:rgba(63,185,80,.15); color:var(--ok); }
+  .pill.warn { background:rgba(210,153,34,.15); color:var(--warn); }
+  .pill.held { background:rgba(248,81,73,.13); color:var(--bad); }
+  .pill.bad { background:rgba(248,81,73,.13); color:var(--bad); }
+  code { color:var(--acc); word-break:break-all; }
+  .hint { color:var(--mut); font-size:11px; }
+  .empty { color:var(--mut); font-style:italic; }
+  .loading { color:var(--acc); }
+  .err { color:var(--bad); }
+  pre { white-space:pre-wrap; word-break:break-word; max-height:300px; overflow:auto; margin:0; color:var(--mut); background:#0d1117; border:1px solid var(--line); border-radius:6px; padding:8px; }
+  .diff-old { color:var(--bad); text-decoration:line-through; }
+  .diff-new { color:var(--ok); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Baltor · Native Format Preservation</h1>
+  <span class="sub">interactive preview · projection-only (this page computes no truth; it reads /api/native/*)</span>
+  <button id="run">Preview</button>
+  <span id="status" class="sub"></span>
+</header>
+<div style="padding:0 18px 8px;" class="hint">
+  Paste your own JSON / CSV / Markdown. Baltor returns it in <b>your shape</b> (drop-in compatible) plus a
+  governance <b>sidecar</b> (receipts, conflicts, held-out claims, field map) and a field-level <b>diff</b>.
+  The <b>original is never overwritten</b> — ingest stores a source (exact bytes + sha256); a value differs in
+  the native output ONLY when VERIFIED with a matching diff entry, otherwise it stays held out in the sidecar.
+  Public preview — no private memory, no secrets, no durable truth written by this page.
+</div>
+
+<section class="input-grid">
+  <div>
+    <label for="doc">Source document (paste a small JSON / CSV / Markdown doc)</label>
+    <textarea id="doc" spellcheck="false">{
+  "policy": "Reg E error resolution",
+  "investigation_window": "30 days",
+  "provisional_credit": true
+}</textarea>
+  </div>
+  <div class="pickers">
+    <div>
+      <label for="format">Format</label>
+      <select id="format">
+        <option value="json" selected>json</option>
+        <option value="csv">csv</option>
+        <option value="markdown">markdown</option>
+        <option value="text">text</option>
+      </select>
+    </div>
+    <div>
+      <label for="mode">Output mode</label>
+      <select id="mode">
+        <option value="native_passthrough">native_passthrough</option>
+        <option value="native_passthrough_with_sidecar" selected>native_passthrough_with_sidecar</option>
+        <option value="schema_preserving">schema_preserving</option>
+        <option value="schema_preserving_with_sidecar">schema_preserving_with_sidecar</option>
+        <option value="annotated_native">annotated_native</option>
+        <option value="baltor_native">baltor_native</option>
+        <option value="dual">dual</option>
+        <option value="compare">compare</option>
+      </select>
+    </div>
+  </div>
+</section>
+
+<main id="panels">
+  <div class="panel wide" id="banner"><span class="empty">&mdash; click Preview &mdash;</span></div>
+</main>
+
+<script>
+// PROJECTION ONLY. This page fetches the read-only Native API and RENDERS. It computes, stores, and mutates
+// NO canonical truth. It fetches ONLY /api/native/* . Ingest stores a SOURCE (exact bytes + sha256) — it does
+// not write canonical truth and serves no fact. No client-side persistence of truth; no secrets on the page.
+// The page may carry ?token= in the URL for the gated POST (read like hub.html) — never a hardcoded secret.
+const TOKEN = new URLSearchParams(location.search).get("token") || "";
+const tok = u => TOKEN ? (u + (u.includes("?") ? "&" : "?") + "token=" + encodeURIComponent(TOKEN)) : u;
+
+// fetch ONLY /api/native/* — three calls per preview: ingest (POST) → export (GET) reuses sidecar+diff inline.
+const EP = {
+  ingest:  () => tok("/api/native/ingest"),
+  export:  (id, mode) => "/api/native/export/" + encodeURIComponent(id) + "?mode=" + encodeURIComponent(mode),
+  sidecar: (id) => "/api/native/sidecar/" + encodeURIComponent(id),
+  diff:    (id) => "/api/native/diff/" + encodeURIComponent(id),
+};
+const TENANT = "demo";
+
+const panels = document.getElementById("panels");
+const statusEl = document.getElementById("status");
+
+function esc(s){ return String(s==null?"":s).replace(/[&<>]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+function panel(title){ const d=document.createElement("div"); d.className="panel"; const h=document.createElement("h2"); h.textContent=title; d.appendChild(h); panels.appendChild(d); return d; }
+function wide(title){ const d=panel(title); d.classList.add("wide"); return d; }
+function row(p,k,v){ const r=document.createElement("div"); r.className="row"; r.innerHTML=`<span class="mut">${esc(k)}</span><span>${v}</span>`; p.appendChild(r); }
+function empty(p,msg){ const e=document.createElement("div"); e.className="empty"; e.textContent=msg||"(none)"; p.appendChild(e); }
+function loading(p,msg){ const e=document.createElement("div"); e.className="loading"; e.textContent=msg||"loading…"; p.appendChild(e); }
+function pre(p,obj){ const e=document.createElement("pre"); e.textContent = (typeof obj==="string") ? obj : JSON.stringify(obj,null,2); p.appendChild(e); }
+function list(p,items,fn){ if(!items||!items.length){ empty(p); return; } items.forEach(it=>{ const r=document.createElement("div"); r.className="row"; r.innerHTML=fn(it); p.appendChild(r); }); }
+
+// parse the source per the chosen format: json -> object (else fall through to text); everything else -> text.
+function parseSource(text, fmt){
+  if (fmt === "json") { try { return JSON.parse(text); } catch(_){ return text; } }
+  return text;  // csv / markdown / text are preserved as exact text bytes
+}
+
+async function postJSON(url, body){
+  const r = await fetch(url, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(body), cache:"no-store" });
+  let j = null; try { j = await r.json(); } catch(_){ j = null; }
+  return { ok:r.ok, status:r.status, json:j };
+}
+async function getJSON(url){ const r = await fetch(url, {cache:"no-store"}); if(!r.ok && r.status>=500) throw new Error("HTTP "+r.status); return r.json(); }
+
+async function run(){
+  const btn=document.getElementById("run"); btn.disabled=true; statusEl.textContent="previewing…";
+  [...panels.querySelectorAll(".panel")].forEach(e=>e.remove());
+  const fmt = document.getElementById("format").value;
+  const mode = document.getElementById("mode").value;
+  const text = document.getElementById("doc").value;
+
+  const bp = wide("Preview"); loading(bp, "POST /api/native/ingest → GET /api/native/export/<id>?mode=" + mode + " …");
+
+  // 1) ingest a SOURCE (store-only; no canonical truth written; no fact served). Carries ?token= for the gate.
+  let ing;
+  try {
+    ing = await postJSON(EP.ingest(), { tenant_id: TENANT, format: fmt, content: parseSource(text, fmt) });
+  } catch(e){
+    [...panels.querySelectorAll(".panel")].forEach(x=>x.remove());
+    const p = wide("Error"); empty(p, "error contacting /api/native/ingest: " + e);
+    statusEl.textContent = "error"; btn.disabled=false; return;
+  }
+  [...panels.querySelectorAll(".panel")].forEach(x=>x.remove());
+  if (ing.status === 401) {
+    const p = wide("Token required");
+    empty(p, "POST /api/native/ingest is token-gated. Append ?token=<token> to this page's URL to enable Preview.");
+    row(p, "hint", `viewing is open; the ingest POST needs a token`);
+    statusEl.textContent = "token required"; btn.disabled=false; return;
+  }
+  if (!ing.ok || !ing.json || !ing.json.source_id) {
+    const p = wide("Error");
+    empty(p, (ing.json && (ing.json.error || ing.json.note)) || ("ingest failed (HTTP " + ing.status + ")"));
+    statusEl.textContent = "error"; btn.disabled=false; return;
+  }
+  const r = ing.json;
+  const id = r.source_id;
+
+  // 2) export in the chosen mode + 3) sidecar + 4) diff — all GET projections under /api/native/*.
+  let ex=null, side=null, df=null, degraded=false;
+  try {
+    [ex, side, df] = await Promise.all([
+      getJSON(EP.export(id, mode)), getJSON(EP.sidecar(id)), getJSON(EP.diff(id)),
+    ]);
+  } catch(e){
+    const p = wide("Error"); empty(p, "error loading export projection: " + e);
+    statusEl.textContent = "error"; btn.disabled=false; return;
+  }
+  if (ex && ex.available === false) degraded = true;
+
+  render(r, ex, side, df, mode, degraded);
+  statusEl.textContent = degraded ? "projected · degraded (export service stub)" : "projected · read-only";
+  btn.disabled=false;
+}
+
+function render(ing, ex, side, df, mode, degraded){
+  // 0 — ingest result banner: original never overwritten + source_hash + governance copy
+  let p = wide("Ingest · source stored (original never overwritten)");
+  row(p, "source_id", `<code>${esc(ing.source_id)}</code>`);
+  row(p, "source_hash", `<code>${esc(ing.source_hash)}</code>`);
+  row(p, "byte_len", esc(ing.byte_len));
+  row(p, "format", `<code>${esc(ing.format_hint)}</code>`);
+  row(p, "output mode", `<code>${esc(mode)}</code>`);
+  row(p, "original never overwritten", `<span class="pill ok">true</span>`);
+  row(p, "mutated canonical truth", `<span class="pill ${ing.mutated_canonical_truth ? "bad" : "ok"}">${ing.mutated_canonical_truth ? "yes" : "false"}</span>`);
+  row(p, "served fact", `<span class="pill ${ing.served_fact ? "bad" : "ok"}">${ing.served_fact ? "yes" : "false"}</span>`);
+  if (degraded) row(p, "export service", `<span class="pill warn">degraded · passthrough projection</span>`);
+
+  // PANEL 1 — Native output (same shape as input)
+  p = panel("Native output (your shape)");
+  row(p, "mode", `<code>${esc((ex&&ex.mode)||mode)}</code>`);
+  const bi = ex && (ex.byte_identical ?? (ex.native_output && ex.native_output.byte_identical));
+  row(p, "byte_identical", bi==null ? "<span class='mut'>—</span>" : `<span class="pill ${bi?"ok":"warn"}">${bi}</span>`);
+  row(p, "source_hash", `<code>${esc((ex&&ex.source_hash)||ing.source_hash)}</code>`);
+  const nativeOut = ex ? (ex.native_output !== undefined ? ex.native_output : ex) : null;
+  if (nativeOut == null) empty(p, "no native output projected");
+  else pre(p, (nativeOut && nativeOut.preview !== undefined) ? nativeOut.preview : nativeOut);
+
+  // PANEL 2 — Sidecar (field_facts / held_out_claims / conflicts / receipts / field_map)
+  p = panel("Sidecar (governance overlay)");
+  const sc = (side && side.sidecar) || (ex && ex.sidecar) || null;
+  if (!sc) {
+    empty(p, (side && side.note) || "no sidecar (mode emits none, or export service is a stub)");
+  } else {
+    row(p, "field_facts", (sc.field_facts||[]).length);
+    list(p, sc.field_facts, f => `<span><code>${esc(f.native_path||f.path||"")}</code><br><span class="mut">${esc(f.value||f.object||"")} · ${esc(f.source_handle||"")}</span></span>`);
+    row(p, "held_out_claims", (sc.held_out_claims||[]).length);
+    list(p, sc.held_out_claims, h => `<span class="pill held">held&nbsp;out</span> <code>${esc(h.native_path||h.artifact_id||"")}</code> <span class="mut">${esc(h.reason||h.value||"")}</span>`);
+    row(p, "conflicts", (sc.conflicts||[]).length);
+    list(p, sc.conflicts, c => `<span class="pill warn">conflict</span> ${esc(c.conflict_type||"")} → winner <code>${esc(c.winner||"")}</code>`);
+    row(p, "receipts", (sc.verification_receipts||[]).length);
+    list(p, sc.verification_receipts, rc => `<code>${esc(rc.receipt_id||rc.id||"")}</code> <span class="mut">${esc(rc.decision||rc.kind||"")}</span>`);
+    row(p, "field_map", (sc.field_map||[]).length);
+    list(p, sc.field_map, m => `<span><code>${esc(m.native_path||"")}</code> ↔ <code>${esc(m.source_handle||"")}</code><br><span class="mut">${esc(m.claim_status||"")}</span></span>`);
+  }
+
+  // PANEL 3 — Diff (changed_fields with old→new + receipt_id)
+  p = panel("Diff (changed fields)");
+  const d = (df && df.diff) || (ex && ex.diff) || {changed_fields:[]};
+  const changed = d.changed_fields || [];
+  row(p, "diff_id", `<code>${esc(d.diff_id||"-")}</code>`);
+  row(p, "changed fields", changed.length);
+  if (!changed.length) empty(p, "no changed fields — original returned unchanged (held-out stays in the sidecar)");
+  changed.forEach(c => {
+    const e=document.createElement("div"); e.className="row";
+    e.innerHTML = `<span><code>${esc(c.path||c.native_path||"")}</code><br>`+
+      `<span class="diff-old">${esc(c.old)}</span> → <span class="diff-new">${esc(c.new)}</span></span>`+
+      `<span class="mut">${esc(c.decision||"")} · <code>${esc(c.receipt_id||"")}</code></span>`;
+    p.appendChild(e);
+  });
+
+  // governance footer panel
+  p = panel("Governance");
+  row(p, "law", "lossless distillation");
+  row(p, "original", "never overwritten");
+  row(p, "held out", "kept in sidecar, never erased");
+  row(p, "value change", "only when VERIFIED + diffed; else held out");
+  row(p, "this page", "projection-only · writes no canonical truth");
+}
+
+document.getElementById("run").addEventListener("click", run);
+run();
+</script>
+</body>
+</html>

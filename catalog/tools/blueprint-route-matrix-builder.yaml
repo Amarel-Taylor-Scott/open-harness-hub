@@ -1,0 +1,84 @@
+id: "tool/blueprint-route-matrix-builder"
+type: tool
+version: "0.1.0"
+name: "Blueprint route matrix builder"
+description: "Builds cheap, balanced, quality-first, and local-first pipeline route options from a parsed user task, risk tier, modality set, model registry, pricing snapshots, and deployment constraints."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["planning", "routing", "evaluation", "tool_use"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "volatile"
+tags: ["blueprints", "cost-estimation", "model-routing", "deployment-options"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    task_parse:
+      type: object
+      description: "Parsed task, modalities, risk tier, required guardrails, and target deployment environment."
+    model_routes:
+      type: array
+      items:
+        type: object
+    pricing_snapshots:
+      type: array
+      items:
+        type: object
+    runtime_constraints:
+      type: object
+  required: ["task_parse"]
+returns:
+  type: object
+  properties:
+    matrix_id:
+      type: string
+    options:
+      type: array
+      items:
+        type: object
+    required_guardrails:
+      type: array
+      items:
+        type: string
+    review_queues:
+      type: array
+      items:
+        type: string
+    assumptions:
+      type: array
+      items:
+        type: string
+side_effects: "none"
+examples:
+  - input:
+      task_parse:
+        task_type: "image_text_triage"
+        modalities: ["image", "text"]
+        risk_tier: "high"
+        objective: "flag likely human exploitation content for review"
+      runtime_constraints:
+        target: "local_python"
+        prefer_low_cost: true
+    output:
+      matrix_id: "route-matrix-example"
+      options:
+        - name: "cheap"
+          trust_boundary: "local"
+          estimated_cost: {"currency": "USD", "amount": null, "mode": "simulated"}
+        - name: "balanced"
+          trust_boundary: "mixed"
+          estimated_cost: {"currency": "USD", "amount": null, "mode": "simulated"}
+      required_guardrails: ["privacy redaction", "human review for positive or uncertain cases"]
+      review_queues: ["safety_specialist"]
+      assumptions: ["Live pricing lookup required before production use."]
+implementations:
+  - kind: "callable"
+    path: "scripts.blueprints.cost_route_matrix.build_route_matrix"
+  - kind: "mcp"
+    path: "mcp/blueprints.build_route_matrix"

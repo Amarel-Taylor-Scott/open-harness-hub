@@ -1,0 +1,38 @@
+id: "knowledge-pack/esoteric-industry-source-surfaces"
+type: knowledge-pack
+version: "0.1.0"
+name: "Esoteric industry source surfaces"
+description: "Seed source surfaces for automotive sales and brokers, employment agencies, plumbing and HVAC systems, woodworking, offshore oil and gas, and environmental review primitives."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["automotive", "energy", "manufacturing", "construction", "government", "cross_industry"]
+capability: ["extraction", "classification", "retrieval", "governance", "evaluation"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.product"
+tags: ["source-surfaces", "automotive", "employment-agencies", "plumbing", "hvac", "woodworking", "offshore-oil-gas", "environmental-review"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types:
+  - "source_surface_seed"
+  - "candidate_primitive_seed"
+  - "capability_gap_surface"
+files:
+  - path: "catalog/knowledge-packs/data/esoteric-industry-source-surfaces/seeds.jsonl"
+    format: "jsonl"
+    schema: "source-surface-seed"
+indexing:
+  bm25: true
+  dense:
+    recommended_model: "sentence-transformers/all-MiniLM-L6-v2"
+provenance:
+  sources:
+    - "Open Harness Hub contributor-authored synthetic source-surface seeds"
+    - "User-provided vertical examples from the 1M object scaling goal"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "Synthetic source-surface metadata only; no real PII or proprietary manuals."

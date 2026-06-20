@@ -1,0 +1,61 @@
+id: "tool/multimodal-asset-store"
+type: tool
+version: "0.1.0"
+name: "Multimodal asset store"
+description: "Stores and retrieves generated or uploaded image, video, audio, music, document, and 3D assets with previews, hashes, provenance, safety metadata, and lifecycle state."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "media", "cross_industry"]
+capability: ["generation", "retrieval", "governance"]
+modality: ["image", "video", "audio", "music", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+tags: ["multimodal", "asset-store", "image", "video", "audio", "music", "backend"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    asset:
+      type: object
+    metadata:
+      type: object
+    operation:
+      type: string
+      enum: ["put", "get", "update_metadata", "delete_marker", "create_preview"]
+  required: ["operation"]
+returns:
+  type: object
+  properties:
+    asset_ref:
+      type: string
+    preview_ref:
+      type: string
+    content_hash:
+      type: string
+    perceptual_hash:
+      type: string
+    metadata:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      operation: "put"
+      metadata:
+        media_type: "image"
+        model: "example-image-model"
+    output:
+      asset_ref: "asset://example"
+      preview_ref: "asset://example-preview"
+      content_hash: "sha256:example"
+      perceptual_hash: "phash:example"
+      metadata:
+        media_type: "image"
+implementations:
+  - kind: "callable"
+    path: "tools.multimodal_asset_store.run"
+  - kind: "mcp"
+    path: "mcp/assets.store"

@@ -1,0 +1,76 @@
+id: "tool/component-cdc-planner"
+type: tool
+version: "0.1.0"
+name: "Component CDC planner"
+description: "Compares previous and new component version rows, computes canonical definition and content hashes, and emits component change events, index records, review tickets, and a psql load script."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "verification", "retrieval", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.versioning"
+tags: ["components", "cdc", "versioning", "hashing", "postgres", "review-queue", "index-records"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    previous_versions_path:
+      type: string
+    new_versions_path:
+      type: string
+    output_dir:
+      type: string
+    actor_type:
+      type: string
+    actor_ref:
+      type: string
+  required: ["previous_versions_path", "new_versions_path", "output_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    previous_version_count:
+      type: integer
+    new_version_count:
+      type: integer
+    change_event_count:
+      type: integer
+    index_record_count:
+      type: integer
+    review_ticket_count:
+      type: integer
+    change_type_counts:
+      type: object
+    component_change_events:
+      type: array
+    index_records:
+      type: array
+    review_tickets:
+      type: array
+    files:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      previous_versions_path: "dist/component-cdc/previous-component-versions.jsonl"
+      new_versions_path: "dist/component-cdc/new-component-versions.jsonl"
+      output_dir: "dist/component-cdc"
+      actor_type: "worker"
+      actor_ref: "component-cdc-planner"
+    output:
+      ok: true
+      change_event_count: 1
+      review_ticket_count: 1
+implementations:
+  - kind: "callable"
+    path: "scripts.db.component_cdc_plan.create_component_cdc_plan"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.component_cdc_plan"

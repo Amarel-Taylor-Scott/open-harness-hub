@@ -1,0 +1,13 @@
+{
+  "$id": "resources/KeyRef.v1",
+  "title": "KeyRef.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "A reference to an encryption/signing key in a key store — NEVER the key material. The ref string must use the key:// scheme; a material/value field is forbidden.",
+  "required": ["ref"],
+  "properties": {
+    "ref": {"type": "string", "pattern": "^key://", "description": "key://<scope>/<name>"},
+    "purpose": {"type": ["string", "null"], "enum": ["encryption", "signing", "kms", null]},
+    "rotation_class": {"type": ["string", "null"]}
+  }
+}

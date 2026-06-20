@@ -1,0 +1,47 @@
+id: "harness/nonprofit-grant-compliance-review"
+type: harness
+version: "0.1.0"
+name: "Nonprofit Grant Compliance review harness"
+description: "Harness that combines persona, grep flags, RAG grounding, and judge scoring for nonprofit grant compliance packets."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["nonprofit"]
+capability: ["evaluation", "retrieval", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["nonprofit-grant-compliance", "synthetic-expansion"]
+created: "2026-05-24"
+updated: "2026-05-24"
+kind: "model_harness"
+tier: "primary"
+applied_layers: ["persona", "grep", "rag", "privacy"]
+knowledge_packs:
+  - id: "frameworks"
+    label: "Nonprofit Grant Compliance framework summaries"
+    kind: "knowledge_pack"
+    types: ["rag_doc", "checklist", "policy_summary"]
+    required: true
+    trust_boundary: "local"
+    freshness: "dated"
+model_targets:
+  - id: "review_model"
+    label: "Local or hosted review model"
+    transport: "ollama"
+    role: "packet reviewer"
+    capabilities: ["reasoning", "summarization"]
+    required: true
+    default: true
+    trust_boundary: "local"
+model_io:
+  input: "packet text or structured packet converted to prose"
+  output: "findings, score, citations, and remediation checklist"
+  transport: "ollama"
+input_verification: ["redact direct personal identifiers before review", "normalize structured packet fields before retrieval"]
+output_verification: ["all high and critical findings cite packet evidence or retrieved context", "judge score meets the domain rubric threshold"]
+privacy_boundaries:
+  raw_input: "Raw packet remains local unless the deployment explicitly configures an external model adapter."
+  derived_output: "Findings may contain sensitive operational details; publish only redacted summaries."
+  external_calls: "No external calls are required by the harness."
+contributes_to: ["pipeline/nonprofit-grant-compliance-review"]

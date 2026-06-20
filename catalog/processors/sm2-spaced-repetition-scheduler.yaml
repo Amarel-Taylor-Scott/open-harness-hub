@@ -1,0 +1,90 @@
+id: "processor/sm2-spaced-repetition-scheduler"
+type: processor
+version: "0.1.0"
+name: "SM-2 spaced-repetition scheduler for AI-generated flashcards"
+description: |
+  Deterministic SuperMemo SM-2 algorithm implementation that schedules
+  AI-generated flashcards for review. Takes a quality-of-recall score (0-5)
+  and the card's current SM-2 state (easiness factor, interval, repetitions)
+  and emits the next review date and updated state. Wrong answers (score < 3)
+  reset the card to same-day review; correct answers extend the interval by
+  the easiness factor. Designed to run entirely on-device without a network
+  call.
+
+  CAPABILITY LIFT (structural): a language model cannot reliably compute the
+  SM-2 formula deterministically — it samples, and the scheduling arithmetic
+  must be exact (the wrong interval wastes the learner's memory window or
+  burns it by reviewing too late). The algorithm is a deterministic verifier
+  outside the model. lift_reason: deterministic_guarantee; mechanism:
+  sub_token (exact arithmetic below the token boundary).
+
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["education", "education.k12", "education.tutoring", "cross_industry"]
+capability: ["planning", "verification", "format_conversion"]
+modality:   ["structured"]
+lifecycle:  "stable"
+lifecycle_position: "post_api"
+trust_boundary: "local"
+created: "2026-05-28"
+updated: "2026-05-28"
+
+attribution:
+  source_url: "https://github.com/google-gemini/gemma-cookbook"
+  source_kind: "github"
+  author: "GemMate / Offline Village Study Helper (Gemma community); SM-2 algorithm by Piotr Wozniak (public domain)"
+  license: "MIT"
+
+links:
+  paper: "https://www.supermemo.com/en/blog/application-of-a-computer-to-improve-the-results-achieved-in-working-with-the-supermemo-method"
+
+tags:
+  - "spaced-repetition"
+  - "sm2"
+  - "flashcards"
+  - "on-device"
+  - "offline"
+  - "deterministic"
+  - "education"
+  - "structural-lift"
+  - "sub-token"
+
+process_kind: "eval.rubric_deterministic"
+deterministic: true
+idempotent: false
+streaming: false
+latency_budget_ms: 10
+
+inputs:
+  - name: "card_id"
+    type: "string"
+  - name: "quality_score"
+    type: "integer"
+  - name: "easiness_factor"
+    type: "number"
+  - name: "interval_days"
+    type: "integer"
+  - name: "repetitions"
+    type: "integer"
+  - name: "last_review_date"
+    type: "string"
+outputs:
+  - name: "next_review_date"
+    type: "string"
+  - name: "new_interval_days"
+    type: "integer"
+  - name: "new_easiness_factor"
+    type: "number"
+  - name: "new_repetitions"
+    type: "integer"
+  - name: "reset_to_today"
+    type: "boolean"
+
+side_effects: "none"
+on_error: "raise"
+
+implementations:
+  - kind: "callable"
+    path: "scripts.processors.sm2_spaced_repetition_scheduler.run"
+    language: "python"

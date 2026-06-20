@@ -1,0 +1,29 @@
+# Baltor capability worker — KEDA ScaledJob (C-FLEET-2).
+# Maps the batch lifecycle policies batch_min_5 / batch_min_25 / batch_min_100. Each Job pulls a batch of
+# work from the DB task ledger and exits when the batch is drained (Kubernetes work-queue pattern). KEDA
+# starts Jobs based on queue depth; the batch threshold itself lives in worker_batch_policies.json.
+# Placeholders: ${CAPABILITY_ID} ${MAX_WORKERS} ${BATCH_MIN} ${IMAGE} ${BALTOR_DB_URL}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledJob
+metadata:
+  name: baltor-batch-${CAPABILITY_ID}
+spec:
+  jobTargetRef:
+    template:
+      spec:
+        restartPolicy: Never
+        containers:
+          - name: batch-worker
+            image: ${IMAGE}
+            args: ["python3", "scripts/capability_worker.py", "--capability", "${CAPABILITY_ID}", "--batch", "${BATCH_MIN}", "--db", "${BALTOR_DB_URL}"]
+            env:
+              - {name: BALTOR_DB_URL, value: "${BALTOR_DB_URL}"}
+  pollingInterval: 30
+  maxReplicaCount: ${MAX_WORKERS}
+  minReplicaCount: 0                 # batch workers do not run idle — they start on threshold
+  triggers:
+    - type: postgresql
+      metadata:
+        connectionFromEnv: BALTOR_DB_URL
+        query: "SELECT count(*) FROM task_queue WHERE capability_id='${CAPABILITY_ID}' AND status='queued'"
+        targetQueryValue: "${BATCH_MIN}"   # one batch Job per batch_min queued tasks

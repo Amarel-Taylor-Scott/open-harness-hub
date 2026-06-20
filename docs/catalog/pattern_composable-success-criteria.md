@@ -2,7 +2,7 @@
 
 *pattern* · `pattern/composable-success-criteria` · v0.1.0 · beta
 
-Treat success criteria as first-class composable artifacts rather
+Treat success criteria as first-class composable components rather
 than a single rubric+threshold check. Six concrete criterion kinds
 combine via AND / OR / NOT into arbitrary boolean expressions.
 This lets pipelines express realistic acceptance bars without

@@ -1,0 +1,60 @@
+id: knowledge-pack/acute-malnutrition-screening-and-treatment-protocols
+type: knowledge-pack
+version: 0.1.0
+name: Acute Malnutrition Screening And Treatment Protocols
+description: 'Capability-lift knowledge pack for an esoteric area LLMs handle poorly.
+  Gap: confuses MUAC cutoffs, WHZ thresholds, SAM/MAM classification, CMAM/RUTF pathway
+  Grounded in WHO/UNICEF acute-malnutrition guidelines + Sphere nutrition + national
+  CMAM (reusable) via classifier retrieval. Lift: non-commercial decision logic; MUAC/WHZ
+  cutoffs deterministic; child-mortality stakes'
+authors:
+- name: Open Harness Hub capability-gap factory
+license: CC-BY-4.0
+industry:
+- infrastructure
+- cyber
+- compliance
+- government
+capability:
+- retrieval
+- verification
+modality:
+- structured
+- text
+lifecycle: experimental
+trust_boundary: external
+freshness: volatile
+tags:
+- capability-lift
+- esoteric
+- knowledge-pack
+- classifier
+- ingestion-target
+created: '2026-05-28'
+updated: '2026-05-28'
+attribution:
+  source_url: WHO/UNICEF acute-malnutrition guidelines + Sphere nutrition + national
+    CMAM (reusable)
+  source_kind: other
+  author: WHO/UNICEF acute-malnutrition guidelines + Sphere nutrition + national CMAM
+    (reusable)
+  license: see-source
+content_types:
+- fact_table
+- reference_doc
+retrieval:
+- classifier
+files:
+- path: data/esoteric-packs/acute-malnutrition-screening-and-treatment-protocols.jsonl
+  format: jsonl
+  content_type: fact_table
+  schema: capability-gap seed (real facts where stable; else ingestion contract)
+indexing:
+  bm25: true
+  dense:
+    model: all-MiniLM-L6-v2
+provenance:
+  sources:
+  - WHO/UNICEF acute-malnutrition guidelines + Sphere nutrition + national CMAM (reusable)
+  collected_through: '2026-05-28'
+  collected_by: capability-gap factory

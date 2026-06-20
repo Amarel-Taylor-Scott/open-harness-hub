@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/presentation/alias-pack.schema.json",
+  "title": "Alias pack",
+  "description": "An audience/tenant/locale set of display labels for canonical Baltor terms. Canonical ids are stable; alias packs customize copy (docs/standards/presentation-layer.md). Aliases must preserve meaning and must not use blocked terms (e.g. 'oracle', 'truth engine').",
+  "type": "object",
+  "required": ["kind", "id", "name", "audience", "aliases"],
+  "properties": {
+    "kind": { "type": "string", "const": "baltor.alias-pack.v1" },
+    "id": { "type": "string", "pattern": "^alias_pack\\." },
+    "name": { "type": "string" },
+    "audience": { "type": "string" },
+    "version": { "type": "string" },
+    "extends": { "type": "string", "description": "another alias_pack id this one inherits from" },
+    "blocked_terms": { "type": "array", "items": { "type": "string" } },
+    "aliases": {
+      "type": "object",
+      "description": "canonical_id -> { label, subtitle?, description? }",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["label"],
+        "properties": {
+          "label": { "type": "string" },
+          "subtitle": { "type": "string" },
+          "description": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

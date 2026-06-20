@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/context-pack.schema.json",
+  "title": "Context pack",
+  "description": "Task-specific, source-linked bundle of context objects, artifacts, relationships, conflicts, and retrieval trace metadata for agent delivery.",
+  "type": "object",
+  "required": ["kind", "context_pack_id", "pack_type", "source_handles", "created_at"],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "baltor.context-pack.v1"
+    },
+    "context_pack_id": {
+      "type": "string"
+    },
+    "pack_type": {
+      "type": "string",
+      "enum": ["implementation_pack", "review_pack", "debugging_pack", "incident_pack", "architecture_pack", "ticket_pack", "release_pack", "customer_pack", "compliance_pack", "clinical_summary_pack", "financial_risk_pack", "security_triage_pack", "legal_matter_pack", "supply_chain_trace_pack", "custom"]
+    },
+    "task": {
+      "type": "string"
+    },
+    "query": {
+      "type": "string"
+    },
+    "object_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "artifact_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "relationship_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "summary": {
+      "type": "string"
+    },
+    "claims": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "conflicts": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "risks": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "source_handles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^ctx://"
+      }
+    },
+    "trace_id": {
+      "type": "string"
+    },
+    "token_budget": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "token_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

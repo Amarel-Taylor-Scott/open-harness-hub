@@ -1,0 +1,14 @@
+{
+  "kind": "baltor.pipeline-object.v1",
+  "pipeline_id": "pipeline.source-intake",
+  "name": "Source Intake → Reconciliation-ready",
+  "owner": "team:context-assurance",
+  "stages": ["source_intake", "source_snapshot", "document_decomposition", "source_handle_assignment", "parser_quality_scoring", "reconciliation_ready"],
+  "trigger_types": ["source_event", "document_uploaded", "scheduled_sweep"],
+  "retry_policy": {"max_attempts": 5, "backoff": "exponential"},
+  "idempotency_policy": {"key": "content_hash + parser_version"},
+  "timeout_policy": {"per_page_ms": 60000},
+  "fallback_policy": {"on_low_confidence": "route_to_steward_review"},
+  "observability_policy": {"emit": "otel_genai", "trace": true},
+  "version": "1.0.0"
+}

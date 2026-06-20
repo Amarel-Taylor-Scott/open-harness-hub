@@ -1,0 +1,61 @@
+id: "tool/local-smoke-command-gate"
+type: tool
+version: "0.1.0"
+name: "Local smoke command gate"
+description: "Reads a generated local smoke plan, classifies Docker, psql, and audit commands by risk, and emits a dry-run execution ledger plus approval checklist without running commands."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "evaluation", "verification"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "postgres", "pgvector", "smoke-test", "approval-gate", "command-ledger"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    smoke_plan:
+      type: string
+    policy_path:
+      type: string
+    output:
+      type: string
+    run_id:
+      type: string
+  required: ["smoke_plan"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    command_count:
+      type: integer
+    risk_counts:
+      type: object
+    approval_required_count:
+      type: integer
+    approval_items:
+      type: array
+    execution_ledger:
+      type: array
+side_effects: "write"
+examples:
+  - input:
+      smoke_plan: "dist/model-ops-daily-runs/2026-05-26/local-postgres-smoke/component-local-postgres-smoke-plan.json"
+      output: "dist/model-ops-daily-runs/2026-05-26/local-postgres-smoke/command-gate.json"
+    output:
+      ok: true
+      command_count: 8
+      dry_run_only: true
+implementations:
+  - kind: "callable"
+    path: "scripts.db.local_smoke_command_gate.build_local_smoke_command_gate"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.local_smoke_command_gate"

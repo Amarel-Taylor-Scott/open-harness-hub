@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/context-dimension-definition.schema.json",
+  "title": "Context dimension definition",
+  "description": "Registry entry for an extensible scored or classified dimension that can be assessed against context objects, artifacts, relationships, assertions, or packs.",
+  "type": "object",
+  "required": ["kind", "dimension_id", "namespace", "name", "value_type", "created_at"],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "baltor.context-dimension-definition.v1"
+    },
+    "dimension_id": {
+      "type": "string"
+    },
+    "namespace": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "value_type": {
+      "type": "string",
+      "enum": ["number", "integer", "boolean", "categorical", "ordinal", "text", "distribution", "vector", "time_series", "composite"]
+    },
+    "normalized_range": {
+      "type": "object",
+      "properties": {
+        "min": { "type": "number" },
+        "max": { "type": "number" }
+      },
+      "additionalProperties": false
+    },
+    "higher_is": {
+      "type": "string",
+      "enum": ["better", "worse", "neutral", "contextual", "unknown"]
+    },
+    "aggregation": {
+      "type": "string",
+      "enum": ["max", "min", "mean", "median", "latest", "weighted", "any", "all", "custom"]
+    },
+    "display": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,36 @@
+id: "knowledge-pack/object-count-db-bootstrap-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Object count and database bootstrap patterns"
+description: "Patterns for separating curated manifest counts from high-volume generated object counts and bootstrapping Postgres/pgvector as the canonical object store."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "retrieval", "serving", "evaluation"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["postgres", "pgvector", "object-counts", "bootstrap", "million-primitives"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+content_types:
+  - "storage_pattern"
+  - "counting_policy"
+files:
+  - path: "catalog/knowledge-packs/data/object-count-db-bootstrap-patterns/patterns.jsonl"
+    format: "jsonl"
+    schema: "object-count-db-bootstrap-pattern"
+indexing:
+  bm25: true
+  dense:
+    recommended_model: "sentence-transformers/all-MiniLM-L6-v2"
+provenance:
+  sources:
+    - "Open Harness Hub generated-object storage architecture"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "No personal data; architectural patterns only."

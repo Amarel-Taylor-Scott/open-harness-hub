@@ -1,193 +1,877 @@
-id: "rule-pack/grep-code-vulnerabilities"
+id: rule-pack/grep-code-vulnerabilities
 type: rule-pack
-version: "0.1.0"
-name: "Code vulnerability + secret-detection GREP pack"
-description: |
-  GREP detectors for the highest-leverage source-code vulnerabilities
-  + hardcoded secrets + dangerous-function calls. Pair with
-  `pipeline/code-security-review`. Cite each rule with its CWE.
-
-  Covers (cross-language: Python / JS / TS / Java / Go / shell):
-   - **Secrets** (CWE-798): AWS keys, generic API tokens, JWT,
-     private keys, Slack tokens, GitHub tokens
-   - **Injection** (CWE-89 / CWE-78): SQL string concat, shell
-     command via os.system / subprocess shell=True
-   - **Deserialization** (CWE-502): pickle.loads on untrusted input
-   - **Code execution** (CWE-94): eval, exec, Function() in JS
-   - **XSS** (CWE-79): innerHTML / dangerouslySetInnerHTML
-   - **Cryptography** (CWE-327 / CWE-326): MD5, SHA1, DES, RC4 for
-     security; weak random.random for tokens
-   - **Auth** (CWE-306 / CWE-287): missing @login_required, blank
-     password defaults
-   - **SSRF** (CWE-918): requests.get(user_url)
-   - **Path traversal** (CWE-22): open(user_path) without check
-   - **CSRF** (CWE-352): missing csrf_token in forms
-
-  These TRIGGER review, not block — paired with a real SAST tool
-  (Semgrep, Bandit, Snyk Code) for authoritative scanning.
+version: 0.1.0
+name: Code vulnerability + secret-detection GREP pack
+description: "GREP detectors for the highest-leverage source-code vulnerabilities\n\
+  + hardcoded secrets + dangerous-function calls. Pair with\n`pipeline/code-security-review`.\
+  \ Cite each rule with its CWE.\n\nCovers (cross-language: Python / JS / TS / Java\
+  \ / Go / shell):\n - **Secrets** (CWE-798): AWS keys, generic API tokens, JWT,\n\
+  \   private keys, Slack tokens, GitHub tokens\n - **Injection** (CWE-89 / CWE-78):\
+  \ SQL string concat, shell\n   command via os.system / subprocess shell=True\n -\
+  \ **Deserialization** (CWE-502): pickle.loads on untrusted input\n - **Code execution**\
+  \ (CWE-94): eval, exec, Function() in JS\n - **XSS** (CWE-79): innerHTML / dangerouslySetInnerHTML\n\
+  \ - **Cryptography** (CWE-327 / CWE-326): MD5, SHA1, DES, RC4 for\n   security;\
+  \ weak random.random for tokens\n - **Auth** (CWE-306 / CWE-287): missing @login_required,\
+  \ blank\n   password defaults\n - **SSRF** (CWE-918): requests.get(user_url)\n -\
+  \ **Path traversal** (CWE-22): open(user_path) without check\n - **CSRF** (CWE-352):\
+  \ missing csrf_token in forms\n\nThese TRIGGER review, not block \u2014 paired with\
+  \ a real SAST tool\n(Semgrep, Bandit, Snyk Code) for authoritative scanning.\n"
 authors:
-  - name: "Open Harness Hub contributors"
-license: "MIT"
-industry:   ["security", "security.appsec", "software"]
-capability: ["safety_gating", "classification", "verification"]
-modality:   ["text"]
-lifecycle:  "beta"
-trust_boundary: "local"
-freshness:  "volatile"
-tags: ["security", "sast", "cwe", "owasp", "secrets", "injection"]
-created: "2026-05-20"
-updated: "2026-05-20"
-
-family: "grep"
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- security
+- security.appsec
+- software
+capability:
+- safety_gating
+- classification
+- verification
+modality:
+- text
+lifecycle: beta
+trust_boundary: local
+freshness: volatile
+tags:
+- security
+- sast
+- cwe
+- owasp
+- secrets
+- injection
+created: '2026-05-20'
+updated: '2026-05-25'
+family: grep
 rules:
-  # ---------- Secrets in code (CWE-798) ----------
-  - id: "aws_access_key_id"
-    pattern: "(?i)\\b(AKIA|ASIA)[A-Z0-9]{16}\\b"
-    severity: "critical"
-    category: "secrets.aws.access_key"
-
-  - id: "aws_secret_key"
-    pattern: "(?i)aws_secret_access_key\\s*[:=]\\s*['\"]?[A-Za-z0-9/+=]{40}['\"]?"
-    severity: "critical"
-    category: "secrets.aws.secret_key"
-
-  - id: "generic_api_token"
-    pattern: "(?i)(api[_-]?key|api[_-]?token|access[_-]?token|secret[_-]?token)\\s*[:=]\\s*['\"]?[A-Za-z0-9_\\-]{16,}['\"]?(?!\\s*(?:\\$\\{|os\\.environ|process\\.env|\\.env|REDACTED|placeholder|example|<\\w+>))"
-    severity: "critical"
-    category: "secrets.generic.token"
-
-  - id: "private_key_block"
-    pattern: "-----BEGIN (RSA |EC |OPENSSH |DSA |ENCRYPTED |PGP )?PRIVATE KEY-----"
-    severity: "critical"
-    category: "secrets.private_key"
-
-  - id: "jwt_token_in_code"
-    pattern: "\\beyJ[A-Za-z0-9_\\-]+\\.eyJ[A-Za-z0-9_\\-]+\\.[A-Za-z0-9_\\-]+\\b"
-    severity: "high"
-    category: "secrets.jwt"
-
-  - id: "slack_token"
-    pattern: "(xox[baprs]-[A-Za-z0-9-]{10,})"
-    severity: "critical"
-    category: "secrets.slack"
-
-  - id: "github_pat"
-    pattern: "ghp_[A-Za-z0-9]{30,}"
-    severity: "critical"
-    category: "secrets.github"
-
-  # ---------- SQL injection (CWE-89) ----------
-  - id: "sqli_python_format"
-    pattern: "(?i)(execute|cursor\\.execute|raw_sql)\\(\\s*['\"][^'\"]*%[sd][^'\"]*['\"]\\s*%"
-    severity: "critical"
-    category: "injection.sql.python_percent"
-
-  - id: "sqli_python_fstring"
-    pattern: "(?i)(execute|cursor\\.execute|raw_sql)\\(\\s*f['\"](?:[^'\"\\\\]|\\\\.)*?\\{(?:user|input|request|param|name|email|q|search)"
-    severity: "critical"
-    category: "injection.sql.python_fstring"
-
-  - id: "sqli_js_concat"
-    pattern: "(?i)(query|exec(?:sql)?|raw)\\([\\s\\S]{0,80}?['\"`]\\s*\\+\\s*(req\\.|request\\.|input|user)"
-    severity: "critical"
-    category: "injection.sql.js_concat"
-
-  # ---------- Command injection (CWE-78) ----------
-  - id: "cmd_injection_shell_true"
-    pattern: "(?i)subprocess\\.(?:run|Popen|call|check_(?:call|output))\\([^)]*shell\\s*=\\s*True"
-    severity: "high"
-    category: "injection.cmd.subprocess_shell_true"
-
-  - id: "cmd_injection_os_system"
-    pattern: "(?i)os\\.system\\([\\s\\S]{0,80}?\\+\\s*(?:user|input|request|param)"
-    severity: "critical"
-    category: "injection.cmd.os_system_with_input"
-
-  # ---------- Deserialization (CWE-502) ----------
-  - id: "pickle_loads_untrusted"
-    pattern: "(?i)pickle\\.loads?\\([^)]*(?:request|user|input|body|payload|message)"
-    severity: "critical"
-    category: "deserialization.pickle"
-
-  - id: "yaml_unsafe_load"
-    pattern: "(?i)yaml\\.load\\([^)]*(?!Loader\\s*=\\s*SafeLoader|Loader\\s*=\\s*yaml\\.SafeLoader)"
-    severity: "high"
-    category: "deserialization.yaml"
-
-  # ---------- Code execution (CWE-94) ----------
-  - id: "eval_in_python"
-    pattern: "(?i)\\b(eval|exec)\\([\\s\\S]{0,80}?(?:user|input|request|param|content)"
-    severity: "critical"
-    category: "code_execution.eval"
-
-  - id: "function_constructor_js"
-    pattern: "(?i)new Function\\(|Function\\(['\"`]"
-    severity: "high"
-    category: "code_execution.function_constructor"
-
-  # ---------- XSS (CWE-79) ----------
-  - id: "xss_innerhtml"
-    pattern: "(?i)\\.innerHTML\\s*=\\s*(?:[^;]*?(?:user|input|request|param|response))"
-    severity: "high"
-    category: "xss.innerhtml"
-
-  - id: "xss_dangerously_set"
-    pattern: "(?i)dangerouslySetInnerHTML\\s*[:=]\\s*\\{"
-    severity: "medium"
-    category: "xss.react_dangerous_html"
-
-  # ---------- Weak crypto (CWE-327 / CWE-326) ----------
-  - id: "weak_hash_md5"
-    pattern: "(?i)\\bhashlib\\.md5\\b|\\bcrypto\\.createHash\\(['\"]md5['\"]\\)|MessageDigest\\.getInstance\\(['\"]MD5['\"]\\)"
-    severity: "medium"
-    category: "crypto.weak_hash.md5"
-
-  - id: "weak_hash_sha1"
-    pattern: "(?i)\\bhashlib\\.sha1\\b|crypto\\.createHash\\(['\"]sha1['\"]\\)"
-    severity: "medium"
-    category: "crypto.weak_hash.sha1"
-
-  - id: "weak_random_for_token"
-    pattern: "(?i)\\brandom\\.random\\b[\\s\\S]{0,80}?(?:token|password|key|secret|nonce|session)"
-    severity: "high"
-    category: "crypto.weak_random_for_token"
-
-  - id: "weak_cipher_des_rc4"
-    pattern: "(?i)\\b(DES|RC4|Blowfish|TripleDES)\\b.{0,40}(?:cipher|encrypt|decrypt)"
-    severity: "high"
-    category: "crypto.weak_cipher"
-
-  # ---------- Auth (CWE-306 / CWE-287) ----------
-  - id: "missing_auth_decorator_django"
-    pattern: "(?i)def\\s+\\w+\\(request[\\s\\S]{0,300}?(?:return\\s+(?:HttpResponse|JsonResponse|render)|@require_GET|@require_POST)(?<!@login_required\\b)"
-    severity: "low"
-    category: "auth.missing_decorator_heuristic"
-
-  - id: "default_password_blank"
-    pattern: "(?i)(password|pwd|pass)\\s*[:=]\\s*['\"]['\"]"
-    severity: "high"
-    category: "auth.blank_password_default"
-
-  # ---------- SSRF (CWE-918) ----------
-  - id: "ssrf_requests_get_user_url"
-    pattern: "(?i)requests\\.(get|post|put|delete|patch)\\(\\s*(?:url\\s*=\\s*)?(?:user|input|request|param)"
-    severity: "high"
-    category: "ssrf.requests_user_controlled"
-
-  # ---------- Path traversal (CWE-22) ----------
-  - id: "path_traversal_open"
-    pattern: "(?i)open\\(\\s*(?:user|input|request|param|filename)[\\s\\S]{0,40}?,\\s*['\"]r['\"]"
-    severity: "medium"
-    category: "path_traversal.open_user_path"
-
-  # ---------- CSRF (CWE-352) ----------
-  - id: "csrf_exempt_marker"
-    pattern: "(?i)@csrf_exempt|csrfmiddlewaretoken\\s*[:=]\\s*['\"]?'?\\bnull\\b'?['\"]?|csrf\\s*[:=]\\s*false"
-    severity: "high"
-    category: "csrf.exempted"
-
-  # ---------- Debug mode in prod (CWE-489) ----------
-  - id: "debug_true_in_prod_config"
-    pattern: "(?i)\\bDEBUG\\s*=\\s*True\\b"
-    severity: "medium"
-    category: "config.debug_true"
+- id: aws_access_key_id
+  pattern: (?i)\b(AKIA|ASIA)[A-Z0-9]{16}\b
+  severity: critical
+  category: secrets.aws.access_key
+- id: aws_secret_key
+  pattern: (?i)aws_secret_access_key\s*[:=]\s*['"]?[A-Za-z0-9/+=]{40}['"]?
+  severity: critical
+  category: secrets.aws.secret_key
+- id: generic_api_token
+  pattern: (?i)(api[_-]?key|api[_-]?token|access[_-]?token|secret[_-]?token)\s*[:=]\s*['"]?[A-Za-z0-9_\-]{16,}['"]?(?!\s*(?:\$\{|os\.environ|process\.env|\.env|REDACTED|placeholder|example|<\w+>))
+  severity: critical
+  category: secrets.generic.token
+- id: private_key_block
+  pattern: '-----BEGIN (RSA |EC |OPENSSH |DSA |ENCRYPTED |PGP )?PRIVATE KEY-----'
+  severity: critical
+  category: secrets.private_key
+- id: jwt_token_in_code
+  pattern: \beyJ[A-Za-z0-9_\-]+\.eyJ[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+\b
+  severity: high
+  category: secrets.jwt
+- id: slack_token
+  pattern: (xox[baprs]-[A-Za-z0-9-]{10,})
+  severity: critical
+  category: secrets.slack
+- id: github_pat
+  pattern: ghp_[A-Za-z0-9]{30,}
+  severity: critical
+  category: secrets.github
+- id: sqli_python_format
+  pattern: (?i)(execute|cursor\.execute|raw_sql)\(\s*['"][^'"]*%[sd][^'"]*['"]\s*%
+  severity: critical
+  category: injection.sql.python_percent
+- id: sqli_python_fstring
+  pattern: (?i)(execute|cursor\.execute|raw_sql)\(\s*f['"](?:[^'"\\]|\\.)*?\{(?:user|input|request|param|name|email|q|search)
+  severity: critical
+  category: injection.sql.python_fstring
+- id: sqli_js_concat
+  pattern: (?i)(query|exec(?:sql)?|raw)\([\s\S]{0,80}?['"`]\s*\+\s*(req\.|request\.|input|user)
+  severity: critical
+  category: injection.sql.js_concat
+- id: cmd_injection_shell_true
+  pattern: (?i)subprocess\.(?:run|Popen|call|check_(?:call|output))\([^)]*shell\s*=\s*True
+  severity: high
+  category: injection.cmd.subprocess_shell_true
+- id: cmd_injection_os_system
+  pattern: (?i)os\.system\([\s\S]{0,80}?\+\s*(?:user|input|request|param)
+  severity: critical
+  category: injection.cmd.os_system_with_input
+- id: pickle_loads_untrusted
+  pattern: (?i)pickle\.loads?\([^)]*(?:request|user|input|body|payload|message)
+  severity: critical
+  category: deserialization.pickle
+- id: yaml_unsafe_load
+  pattern: (?i)yaml\.load\([^)]*(?!Loader\s*=\s*SafeLoader|Loader\s*=\s*yaml\.SafeLoader)
+  severity: high
+  category: deserialization.yaml
+- id: eval_in_python
+  pattern: (?i)\b(eval|exec)\([\s\S]{0,80}?(?:user|input|request|param|content)
+  severity: critical
+  category: code_execution.eval
+- id: function_constructor_js
+  pattern: (?i)new Function\(|Function\(['"`]
+  severity: high
+  category: code_execution.function_constructor
+- id: xss_innerhtml
+  pattern: (?i)\.innerHTML\s*=\s*(?:[^;]*?(?:user|input|request|param|response))
+  severity: high
+  category: xss.innerhtml
+- id: xss_dangerously_set
+  pattern: (?i)dangerouslySetInnerHTML\s*[:=]\s*\{
+  severity: medium
+  category: xss.react_dangerous_html
+- id: weak_hash_md5
+  pattern: (?i)\bhashlib\.md5\b|\bcrypto\.createHash\(['"]md5['"]\)|MessageDigest\.getInstance\(['"]MD5['"]\)
+  severity: medium
+  category: crypto.weak_hash.md5
+- id: weak_hash_sha1
+  pattern: (?i)\bhashlib\.sha1\b|crypto\.createHash\(['"]sha1['"]\)
+  severity: medium
+  category: crypto.weak_hash.sha1
+- id: weak_random_for_token
+  pattern: (?i)\brandom\.random\b[\s\S]{0,80}?(?:token|password|key|secret|nonce|session)
+  severity: high
+  category: crypto.weak_random_for_token
+- id: weak_cipher_des_rc4
+  pattern: (?i)\b(DES|RC4|Blowfish|TripleDES)\b.{0,40}(?:cipher|encrypt|decrypt)
+  severity: high
+  category: crypto.weak_cipher
+- id: missing_auth_decorator_django
+  pattern: (?i)def\s+\w+\(request[\s\S]{0,300}?(?:return\s+(?:HttpResponse|JsonResponse|render)|@require_GET|@require_POST)(?<!@login_required\b)
+  severity: low
+  category: auth.missing_decorator_heuristic
+- id: default_password_blank
+  pattern: (?i)(password|pwd|pass)\s*[:=]\s*['"]['"]
+  severity: high
+  category: auth.blank_password_default
+- id: ssrf_requests_get_user_url
+  pattern: (?i)requests\.(get|post|put|delete|patch)\(\s*(?:url\s*=\s*)?(?:user|input|request|param)
+  severity: high
+  category: ssrf.requests_user_controlled
+- id: path_traversal_open
+  pattern: (?i)open\(\s*(?:user|input|request|param|filename)[\s\S]{0,40}?,\s*['"]r['"]
+  severity: medium
+  category: path_traversal.open_user_path
+- id: csrf_exempt_marker
+  pattern: (?i)@csrf_exempt|csrfmiddlewaretoken\s*[:=]\s*['"]?'?\bnull\b'?['"]?|csrf\s*[:=]\s*false
+  severity: high
+  category: csrf.exempted
+- id: debug_true_in_prod_config
+  pattern: (?i)\bDEBUG\s*=\s*True\b
+  severity: medium
+  category: config.debug_true
+- id: scale_expansion_v1_critical_signal_01
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_02
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_03
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_04
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_05
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_06
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_07
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_08
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_09
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_10
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_11
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_12
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_13
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_14
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_15
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_16
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_17
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_18
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_19
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_20
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_21
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_22
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_23
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_24
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_25
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_26
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_27
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_28
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_29
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_30
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_31
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_32
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_critical_signal_33
+  pattern: (?i)(?:critical.{0,24}signal|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.critical_signal
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_owner_gap_34
+  pattern: (?i)(?:owner.{0,24}gap|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.owner_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_deadline_risk_35
+  pattern: (?i)(?:deadline.{0,24}risk|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion.deadline_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_redaction_risk_36
+  pattern: (?i)(?:redaction.{0,24}risk|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion.redaction_risk
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_benchmark_gap_37
+  pattern: (?i)(?:benchmark.{0,24}gap|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.benchmark_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_citation_gap_38
+  pattern: (?i)(?:citation.{0,24}gap|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.citation_gap
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_severity_mismatch_39
+  pattern: (?i)(?:severity.{0,24}mismatch|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion.severity_mismatch
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v1_missing_evidence_40
+  pattern: (?i)(?:missing.{0,24}evidence|grep.{0,24}code.{0,24}vulnerabilities).{0,160}(?:evidence|owner|deadline|redaction|benchmark|citation|severity|remediation)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion.missing_evidence
+  notes: Synthetic scale-expansion detector for packet review triage; requires human
+    or downstream verifier confirmation.
+- id: scale_expansion_v2_unsupported_material_claim_001
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-code-vulnerabilities.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_002
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_003
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_004
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_005
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_006
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-code-vulnerabilities.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_007
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_008
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_009
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_010
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_011
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-code-vulnerabilities.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_012
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_013
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_014
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_015
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_016
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-code-vulnerabilities.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_017
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_018
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_019
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_020
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_021
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-code-vulnerabilities.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_022
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_023
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_024
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_025
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_026
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-code-vulnerabilities.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_027
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_028
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_029
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_030
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_031
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-code-vulnerabilities.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_032
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_033
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_034
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_035
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_036
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-code-vulnerabilities.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_037
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_038
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_039
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_040
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_041
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-code-vulnerabilities.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_042
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_043
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_044
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_045
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_046
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-code-vulnerabilities.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_047
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_048
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_049
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_050
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_051
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-code-vulnerabilities.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_052
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_053
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_054
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_055
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_056
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-code-vulnerabilities.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_057
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_058
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_059
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_060
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_061
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-code-vulnerabilities.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_062
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_063
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_064
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_065
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_066
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-code-vulnerabilities.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_067
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_068
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_069
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_070
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_unsupported_material_claim_071
+  pattern: (?i)(?:unsupported.{0,32}material.{0,32}claim|material.{0,32}claim.{0,32}without.{0,32}(?:citation|evidence|source)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-code-vulnerabilities.scale_expansion_v2.unsupported_material_claim
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_missing_owner_072
+  pattern: (?i)(?:missing.{0,32}owner|owner.{0,32}(?:not assigned|unknown|tbd)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.missing_owner
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_stale_evidence_073
+  pattern: (?i)(?:stale.{0,32}evidence|evidence.{0,32}(?:expired|outdated|older than)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.stale_evidence
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_redaction_leak_074
+  pattern: (?i)(?:redaction.{0,32}(?:leak|failure)|(?:ssn|dob|patient|account).{0,32}visible).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.redaction_leak
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_citation_mismatch_075
+  pattern: (?i)(?:citation.{0,32}(?:mismatch|does not support|unsupported)|source.{0,32}contradicts).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.citation_mismatch
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_benchmark_regression_076
+  pattern: (?i)(?:benchmark.{0,32}(?:regression|failure|delta)|score.{0,32}(?:dropped|degraded)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: low
+  category: grep-code-vulnerabilities.scale_expansion_v2.benchmark_regression
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_policy_exception_077
+  pattern: (?i)(?:policy.{0,32}exception|exception.{0,32}(?:approved|pending|missing)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.policy_exception
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_escalation_overdue_078
+  pattern: (?i)(?:escalation.{0,32}(?:overdue|missed|late)|sla.{0,32}(?:breach|missed)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: medium
+  category: grep-code-vulnerabilities.scale_expansion_v2.escalation_overdue
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_tool_side_effect_079
+  pattern: (?i)(?:tool.{0,32}(?:write|external_call|side effect)|side.{0,32}effect.{0,32}(?:unapproved|unexpected)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.tool_side_effect
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.
+- id: scale_expansion_v2_context_poisoning_080
+  pattern: (?i)(?:context.{0,32}(?:poison|injection|override)|retrieved.{0,32}doc.{0,32}(?:ignore|disregard)).{0,180}(?:grep_code_vulnerabilities|evidence|owner|citation|redaction|benchmark|policy|trace)
+  severity: high
+  category: grep-code-vulnerabilities.scale_expansion_v2.context_poisoning
+  notes: Synthetic scale-expansion v2 grep detector for review packets; downstream
+    verifier or human review must confirm materiality.

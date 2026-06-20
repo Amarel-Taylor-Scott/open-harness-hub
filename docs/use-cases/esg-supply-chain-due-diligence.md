@@ -14,7 +14,7 @@
 
 ## Catalog ingredients (v0.2.0 - full E + S + G coverage)
 
-| Layer | Artifact | Role |
+| Layer | Component | Role |
 |---|---|---|
 | Persona | `persona/esg-auditor` | Citation-first auditor covering all 12 jurisdictions, ESRS E1-E5 + S1-S2, ILO core conventions, ISO 37001 |
 | GREP rule pack (**S**) | `rule-pack/grep-esg-forced-labor-red-flags` | 17 detectors for ILO indicators 1-11 + child labor + recruitment-fee abuse + 12 high-risk corridors + 13-language coverage (en/zh/hi/bn/ko/vi/th/id/tl/es/pt/fr/ar) |
@@ -162,7 +162,7 @@ makes structured red-flag detection work.
 
 ## Reference for proposers of this use case
 
-Catalog: `github.com/Amarel-Taylor-Scott/open-harness-hub`. All artifacts
+Catalog: `github.com/Amarel-Taylor-Scott/open-harness-hub`. All components
 listed above validate against `schemas/` and emit to 13 standards
 formats (Croissant, MCP, Agent Skills, HF cards, lm-eval-harness,
 promptfoo, CycloneDX-ML, OpenLineage, C2PA, EU AI Act, SPDX 3.0,

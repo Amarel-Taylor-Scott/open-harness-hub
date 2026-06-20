@@ -1,0 +1,56 @@
+id: knowledge-pack/dea-controlled-substance-scheduling-and-limits
+type: knowledge-pack
+version: 0.1.0
+name: Dea Controlled Substance Scheduling And Limits
+description: 'Capability-lift knowledge pack for an esoteric area LLMs handle poorly.
+  Gap: misstate DEA schedules, rescheduling, refill/partial-fill limits, EPCS rules
+  Grounded in DEA CSA schedules 21 CFR 1308 + Diversion Control (public domain) via
+  exact_id retrieval. Lift: per-substance exact regulatory facts changing via rulemaking;
+  wrong = illegal dispense'
+authors:
+- name: Open Harness Hub capability-gap factory
+license: CC-BY-4.0
+industry:
+- healthcare
+- pharma
+capability:
+- retrieval
+- verification
+modality:
+- structured
+- text
+lifecycle: experimental
+trust_boundary: external
+freshness: volatile
+tags:
+- capability-lift
+- esoteric
+- knowledge-pack
+- exact_id
+- seeded
+created: '2026-05-28'
+updated: '2026-05-28'
+attribution:
+  source_url: DEA CSA schedules 21 CFR 1308 + Diversion Control (public domain)
+  source_kind: other
+  author: DEA CSA schedules 21 CFR 1308 + Diversion Control (public domain)
+  license: see-source
+content_types:
+- fact_table
+- reference_doc
+retrieval:
+- exact_id
+files:
+- path: data/esoteric-packs/dea-controlled-substance-scheduling-and-limits.jsonl
+  format: jsonl
+  content_type: fact_table
+  schema: capability-gap seed (real facts where stable; else ingestion contract)
+indexing:
+  bm25: true
+  dense:
+    model: all-MiniLM-L6-v2
+provenance:
+  sources:
+  - DEA CSA schedules 21 CFR 1308 + Diversion Control (public domain)
+  collected_through: '2026-05-28'
+  collected_by: capability-gap factory

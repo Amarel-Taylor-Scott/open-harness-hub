@@ -1,0 +1,55 @@
+id: "knowledge-pack/specialized-model-signal-surfaces"
+type: knowledge-pack
+version: "0.1.0"
+name: "Specialized model signal surfaces"
+description: "Research-backed seed objects for mining task-specific model cards, fine-tunes, leaderboards, and domain model repositories into reusable knowledge objects and pipeline primitives."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["healthcare", "finance", "legal", "software.devops", "media", "security", "privacy", "government", "cross_industry"]
+capability: ["classification", "extraction", "retrieval", "evaluation", "routing", "governance", "embedding"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "pre_api.ingest"
+tags: ["huggingface", "model-cards", "specialized-models", "fine-tuning", "knowledge-objects", "evaluation"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+domain: "specialized model signal mining"
+facts:
+  - "A task-specific model is evidence that someone invested in labels, data, metrics, and domain context for a narrow capability."
+  - "Model card context can become reusable primitives even when the hub does not host or call the model weights."
+  - "The most reusable fields are task shape, label schema, datasets, eval metrics, limitations, intended use, and model lineage."
+sources:
+  - title: "Specialized model signal seed objects"
+    path: "catalog/knowledge-packs/data/specialized-model-signal-surfaces/models.jsonl"
+content_types:
+  - "source_surface"
+  - "candidate_primitive"
+  - "task_definition"
+  - "label_schema"
+  - "evaluation_seed"
+files:
+  - path: "catalog/knowledge-packs/data/specialized-model-signal-surfaces/models.jsonl"
+    format: "jsonl"
+indexing:
+  bm25: true
+  dense:
+    recommended: true
+    fields: ["source_model_id", "task_shape", "training_context", "labels_or_outputs", "reusable_primitives"]
+provenance:
+  sources:
+    - "https://huggingface.co/docs/hub/model-cards"
+    - "https://huggingface.co/docs/hub/models-tasks"
+    - "https://huggingface.co/OpenMed"
+    - "https://huggingface.co/google/medgemma-4b-pt"
+    - "https://huggingface.co/ProsusAI/finbert"
+    - "https://huggingface.co/nlpaueb/legal-bert-base-uncased"
+    - "https://huggingface.co/microsoft/codebert-base"
+    - "https://huggingface.co/docs/transformers/v4.43.0/en/model_doc/layoutlm"
+  collected_through: "2026-05-25"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "public model metadata only; no private training data copied"
+

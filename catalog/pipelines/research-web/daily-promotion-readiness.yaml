@@ -1,0 +1,83 @@
+id: "pipeline/daily-promotion-readiness"
+type: pipeline
+version: "0.1.0"
+name: "Daily promotion readiness"
+description: "Separates candidate-table load readiness from active component promotion readiness for high-volume daily production and model-ops component runs."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "evaluation", "retrieval", "planning"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "promotion", "daily-factory", "review-gate", "embedding-execution", "postgres"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Audit staged factory rows and produce promotion-readiness and review-queue evidence before database load or active publication."
+pipeline_kind: "research_web.daily_promotion_readiness"
+inputs:
+  - name: "daily_run_dir"
+    type: "string"
+  - name: "run_summary"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "daily_promotion_readiness_plan"
+    type: "json"
+  - name: "promotion_readiness_rows"
+    type: "jsonl"
+  - name: "promotion_review_queue"
+    type: "jsonl"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/daily-promotion-readiness-patterns"
+steps:
+  - id: "load-readiness-patterns"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/daily-promotion-readiness-patterns"
+    inputs:
+      query: "candidate table load readiness active promotion review embedding blockers"
+      top_k: 20
+  - id: "plan-promotion-readiness"
+    kind: "tool"
+    ref: "tool/daily-promotion-readiness-planner"
+    inputs:
+      daily_run_dir: "$.inputs.daily_run_dir"
+      run_summary: "$.inputs.run_summary"
+      output_dir: "$.inputs.output_dir"
+      run_id: "$.inputs.run_id"
+  - id: "route-blocked-candidates"
+    kind: "tool"
+    ref: "tool/object-factory-job-router"
+    inputs:
+      reason: "Rows with review or embedding blockers must remain candidate-only until review and embedding execution complete."
+      excluded_scopes: ["insurance"]
+success_criteria:
+  - kind: "deterministic"
+    target: "$.daily_promotion_readiness_plan.counts.normalized_objects"
+    op: ">"
+    value: 0
+    severity: "high"
+    label: "The readiness plan inspected staged normalized component rows."
+  - kind: "deterministic"
+    target: "$.daily_promotion_readiness_plan.counts.active_promotion_ready"
+    op: "<="
+    value: "$.daily_promotion_readiness_plan.counts.candidate_load_ready"
+    severity: "high"
+    label: "Active promotion-ready rows cannot exceed candidate-load-ready rows."
+  - kind: "semantic"
+    target: "$.daily_promotion_readiness_plan"
+    must_cover:
+      - "candidate-table load readiness"
+      - "active component promotion readiness"
+      - "review tickets"
+      - "embedding execution"
+      - "no Postgres side effects"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Promotion readiness output preserves the proof boundary."

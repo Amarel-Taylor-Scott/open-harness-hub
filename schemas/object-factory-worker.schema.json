@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/object-factory-worker.schema.json",
+  "title": "Object factory worker",
+  "type": "object",
+  "required": ["worker_id", "worker_type", "responsibility", "inputs", "outputs", "privacy_controls"],
+  "properties": {
+    "worker_id": { "type": "string" },
+    "worker_type": {
+      "type": "string",
+      "enum": [
+        "source_ingest",
+        "source_discovery",
+        "crawler_spider",
+        "repository_miner",
+        "workflow_miner",
+        "source_snapshot",
+        "page_to_markdown",
+        "document_digest",
+        "sensitive_data_gate",
+        "entity_linking",
+        "fuzzy_dedupe",
+        "batch_embedding",
+        "llm_polish",
+        "prompt_cache_profile",
+        "verification",
+        "label_dimension",
+        "dedupe_index",
+        "cost_meter",
+        "eval_test",
+        "warehouse_export",
+        "publish_review"
+      ]
+    },
+    "responsibility": { "type": "string" },
+    "runtime": {
+      "type": "object",
+      "properties": {
+        "preferred": { "type": "string" },
+        "container_required": { "type": "boolean" },
+        "gpu_required": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "inputs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "outputs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "privacy_controls": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "model_use": {
+      "type": "object",
+      "properties": {
+        "model_call": { "type": "string", "enum": ["none", "optional", "required"] },
+        "routing_tool": { "type": "string" },
+        "default_quality_tier": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "failure_policy": {
+      "type": "string",
+      "enum": ["retry", "review_ticket", "fail_closed", "skip_with_audit"]
+    }
+  },
+  "additionalProperties": true
+}

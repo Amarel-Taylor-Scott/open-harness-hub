@@ -1,0 +1,46 @@
+id: processor/deliver-return
+type: processor
+version: 0.1.0
+name: Return to caller
+description: 'Return the validated result to the caller as the synchronous API/function response. The
+  default outbound: no external system, just the result handed back. Deliver / emit (outbound) bucket.'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+capability:
+- routing
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- action-bucket
+- deliver
+- outbound
+created: '2026-05-29'
+updated: '2026-05-29'
+attribution:
+  source_kind: manual
+  author: Open Harness Hub action-bucket taxonomy
+  license: MIT
+process_kind: deliver.return_response
+deterministic: true
+idempotent: true
+streaming: false
+inputs:
+- name: result
+  type: object
+outputs:
+- name: response
+  type: object
+side_effects: none
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.deliver.deliver_return.run
+  language: python
+links:
+  source: docs/concepts/component-taxonomy-and-stages.md

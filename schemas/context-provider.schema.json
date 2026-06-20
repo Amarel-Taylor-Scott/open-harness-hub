@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/context-provider.schema.json",
+  "title": "Context provider",
+  "description": "Provider adapter contract for a source system, generated context system, local memory store, search backend, or industry data system that can supply context objects.",
+  "type": "object",
+  "required": ["kind", "provider_id", "provider_type", "capabilities", "created_at"],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "baltor.context-provider.v1"
+    },
+    "provider_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "provider_type": {
+      "type": "string",
+      "enum": [
+        "source_connector",
+        "federated_search",
+        "enterprise_search",
+        "repo_wiki",
+        "architecture_context",
+        "local_memory",
+        "code_intelligence",
+        "vector_index",
+        "keyword_index",
+        "graph_store",
+        "object_store",
+        "industry_system",
+        "policy_engine",
+        "mcp_gateway",
+        "custom"
+      ]
+    },
+    "source_systems": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "capabilities": {
+      "type": "object",
+      "required": ["discover", "fetch", "search"],
+      "properties": {
+        "discover": { "type": "boolean" },
+        "fetch": { "type": "boolean" },
+        "search": { "type": "boolean" },
+        "relationships": { "type": "boolean" },
+        "permissions": { "type": "boolean" },
+        "subscribe": { "type": "boolean" },
+        "actions": { "type": "boolean" },
+        "embeddings": { "type": "boolean" },
+        "artifact_generation": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "connector_modes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["federated", "mirrored", "indexed", "compiled", "link_only", "action_capable"]
+      }
+    },
+    "supported_triggers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["manual", "scheduled_poll", "push_webhook", "merge_request_webhook", "pipeline_artifact", "post_commit_hook", "file_watcher", "release_tag", "source_cdc", "custom"]
+      }
+    },
+    "object_types": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "auth": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["none", "api_key", "oauth", "oidc", "service_account", "local_only", "delegated_source_permissions", "custom"]
+        },
+        "delegates_source_permissions": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "policy": {
+      "type": "object",
+      "properties": {
+        "acl_filter_before_model": { "type": "boolean" },
+        "raw_source_access": { "type": "string", "enum": ["blocked", "fallback", "exact_handle_only", "allowed"] },
+        "writes_require_approval": { "type": "boolean" },
+        "derived_context": { "type": "boolean" },
+        "local_memory_promotion_requires_review": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "interfaces": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "kind": { "type": "string", "enum": ["mcp", "rest", "graphql", "webhook", "sdk", "cli", "file", "database", "custom"] },
+          "uri": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,91 @@
+{
+  "version": "1.0",
+  "note": "Shared AI-AGENT RUNTIME catalog (Teleon-owned). An agent runtime RECEIVES a bounded agent request and is PROVISIONED onto a Teleon execution backend (local emulator / K8s job / sandbox worker / cloud function) via src.teleon.runtime.execution_backend_selector.select_backend -> ExecutionProviderPort. Candidate runtimes (ClawLess/OpenClaw, Hermes) are NEVER imported/executed here -- catalog entries only, naming an env:// runtime/credential ref; the offline correctness invariant is local_emulator@v1. Agent output is NEVER truth (serves_truth=false): agents DISCOVER/ACT and PROPOSE; Baltor stores/verifies/reconciles/consumes. Baltor is a TENANT that submits requests; it does not own this layer. This layer RIDES the existing ExecutionProviderPort + FleetLedger -- it is NOT a second worker framework. No raw keys -- runtime_ref (env://) only.",
+  "positioning": {
+    "owner": "teleon",
+    "provisions_via": "src.teleon.runtime.execution_backend_selector.select_backend -> ExecutionProviderPort",
+    "agents_serve_truth": false,
+    "default_worker_bucket": "open_ended_agent",
+    "law": "agents PROPOSE, Baltor DISPOSES; runtime provisioning is Teleon; an open-ended agent never auto-runs on a generic cloud function (hard guard) -- it provisions onto a K8s job / sandbox worker unless a policy override asserts a proof; never a second worker framework (rides FleetLedger + ExecutionProviderPort)."
+  },
+  "runtimes": [
+    {
+      "runtime_id": "local_emulator@v1",
+      "display_name": "Local Agent Runtime Emulator",
+      "status": "active",
+      "imported": true,
+      "executed": true,
+      "is_browser_runtime": false,
+      "sandbox_profile": "local-deterministic",
+      "default_worker_bucket": "utility",
+      "serves_truth": false,
+      "runtime_ref": null,
+      "note": "offline correctness invariant -- runs a bounded deterministic agent task; no network; no real container; output is a candidate proposal, never truth."
+    },
+    {
+      "runtime_id": "clawless_openclaw@candidate",
+      "display_name": "ClawLess / OpenClaw (browser WebContainer agent runtime)",
+      "status": "candidate",
+      "imported": false,
+      "executed": false,
+      "is_browser_runtime": true,
+      "sandbox_profile": "browser-webcontainer",
+      "default_worker_bucket": "open_ended_agent",
+      "serves_truth": false,
+      "runtime_ref": "env://AGENT_RUNTIME_CLAWLESS_ENDPOINT",
+      "note": "browser/WASM WebContainer agent lab -- candidate only; never imported/executed; dev-only keys behind owner gate; provision onto sandbox_worker / k8s_job, NOT a generic cloud function by default. It is an agent runtime/sandbox, NOT a free LLM endpoint (that distinction lives in free_endpoint_intel)."
+    },
+    {
+      "runtime_id": "hermes@candidate",
+      "display_name": "Hermes (open-ended agent runtime)",
+      "status": "candidate",
+      "imported": false,
+      "executed": false,
+      "is_browser_runtime": false,
+      "sandbox_profile": "container-sandbox",
+      "default_worker_bucket": "open_ended_agent",
+      "serves_truth": false,
+      "runtime_ref": "env://AGENT_RUNTIME_HERMES_ENDPOINT",
+      "note": "open-ended agent runtime -- candidate only; never imported/executed; provision onto k8s_job / sandbox_worker behind owner gate; output is a candidate proposal that returns to Baltor's governance rail."
+    },
+    {
+      "runtime_id": "codex@candidate",
+      "display_name": "OpenAI Codex (agentic coding harness)",
+      "status": "candidate",
+      "imported": false,
+      "executed": false,
+      "is_browser_runtime": false,
+      "sandbox_profile": "container-sandbox",
+      "default_worker_bucket": "open_ended_agent",
+      "serves_truth": false,
+      "runtime_ref": "env://AGENT_RUNTIME_CODEX_ENDPOINT",
+      "note": "coding-agent HARNESS for backend operations that require an LLM (Stage-2 candidate confirm, distilling a deterministic rule from traces, code-map generation) -- the agentic counterpart to the model.openai.codex inference lane; candidate only, never imported/executed without an owner-gated runtime_ref; provision onto k8s_job / sandbox_worker, never a generic cloud function; output is a candidate proposal, never truth."
+    },
+    {
+      "runtime_id": "claude_code@candidate",
+      "display_name": "Claude Code (agentic coding harness)",
+      "status": "candidate",
+      "imported": false,
+      "executed": false,
+      "is_browser_runtime": false,
+      "sandbox_profile": "container-sandbox",
+      "default_worker_bucket": "open_ended_agent",
+      "serves_truth": false,
+      "runtime_ref": "env://AGENT_RUNTIME_CLAUDE_CODE_ENDPOINT",
+      "note": "coding-agent HARNESS (alternative to Codex) for backend LLM operations; candidate only, never imported/executed without an owner-gated runtime_ref; sandboxed; output is a candidate proposal, never truth."
+    },
+    {
+      "runtime_id": "openhands@candidate",
+      "display_name": "OpenHands (open-source SWE agent harness)",
+      "status": "candidate",
+      "imported": false,
+      "executed": false,
+      "is_browser_runtime": false,
+      "sandbox_profile": "container-sandbox",
+      "default_worker_bucket": "open_ended_agent",
+      "serves_truth": false,
+      "runtime_ref": "env://AGENT_RUNTIME_OPENHANDS_ENDPOINT",
+      "note": "open-source SWE-agent HARNESS (self-hostable alternative to Codex/Claude Code) for backend LLM operations; candidate only, never imported/executed without an owner-gated runtime_ref; sandboxed; output is a candidate proposal, never truth."
+    }
+  ]
+}

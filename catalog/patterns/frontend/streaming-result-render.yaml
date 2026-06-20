@@ -1,0 +1,57 @@
+id: "pattern/streaming-result-render"
+type: pattern
+version: "0.1.0"
+name: "Streaming Result Render"
+description: |
+  Token-wise streaming combined with progressive disclosure of the assembled
+  pipeline. Rather than waiting for the full blueprint before rendering, the
+  UI materialises each pipeline section as tokens arrive: intent summary first,
+  then component cards one-by-one, then the cost estimate, then the final
+  serialized manifest. Users can read, react, and interrupt at any stage.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "cross_industry"]
+capability: ["generation", "dialogue", "format_conversion"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "hub"
+tags: ["streaming", "progressive-disclosure", "ux", "frontend", "server-sent-events"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+structural_shape:
+  - "LLM backend emits tokens via SSE (Server-Sent Events) or WebSocket chunked stream"
+  - "stream-parser layer segments raw token stream into named sections using delimiter tokens or structured JSON lines"
+  - "section-router maps each section label (intent / component / cost / manifest) to a dedicated UI widget"
+  - "intent-card widget renders as soon as the intent section closes — user sees task classification immediately"
+  - "component-card widget streams per-component: name, role, capability badges, and trust boundary rendered progressively"
+  - "cost-band widget appears after assembly section; shows per-component token budget and infra tier"
+  - "manifest-download button activates only after the final manifest section token is received and validated client-side"
+  - "interrupt control allows user to stop generation mid-stream and redirect with a follow-up constraint"
+
+when_to_use:
+  - "Assembly LLM response takes more than 2 seconds — streaming eliminates perceived wait time"
+  - "Pipeline blueprints have multiple independent sections that can be useful before the full response is complete"
+  - "Mobile or low-bandwidth contexts where progressive rendering avoids blank-screen wait"
+  - "Iterative refinement UX where users frequently interrupt and redirect before the full answer is produced"
+
+when_not_to_use:
+  - "Batch / headless API mode where there is no UI consumer (stream overhead adds no value)"
+  - "Short responses (under 200 tokens) where full-response render is equally fast"
+  - "Environments where SSE/WebSocket is not available (fallback to polling or one-shot fetch)"
+
+variants:
+  - "JSON-lines streaming: each line is a valid JSON object representing one pipeline section"
+  - "Markdown-fenced streaming: sections delimited by triple-backtick fences with section tags"
+  - "Partial-hydration: server renders skeleton HTML; client replaces placeholders as chunks arrive"
+
+counter_patterns:
+  - "pattern/strict-output-format-contract (wait for full structured output before rendering)"
+
+tradeoffs:
+  latency: "Near-zero perceived latency — first token renders in < 500ms on fast models"
+  cost: "No additional model cost; small stream-parsing CPU overhead client-side"
+  quality: "Requires robust section-delimiter contract; partial renders must degrade gracefully on malformed tokens"
+  complexity: "Medium — stream-parser state machine + section-router + per-widget hydration logic"
+  explainability: "High — each section appears in arrival order, making the assembly logic transparent to the user"

@@ -1,0 +1,75 @@
+id: "tool/index-record-emitter"
+type: tool
+version: "0.1.0"
+name: "Index record emitter"
+description: "Emits keyword, vector, graph, facet, quality, freshness, and cost index records from normalized objects and canonical entities."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["format_conversion", "retrieval", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["indexing", "keyword-search", "vector-search", "graph", "facets", "quality", "partition-delta"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    normalized_objects:
+      type: array
+      items:
+        type: object
+    canonical_entities:
+      type: array
+      items:
+        type: object
+    emit:
+      type: array
+      items:
+        type: string
+  required: ["normalized_objects"]
+returns:
+  type: object
+  properties:
+    keyword_records:
+      type: array
+      items:
+        type: object
+    vector_records:
+      type: array
+      items:
+        type: object
+    graph_edges:
+      type: array
+      items:
+        type: object
+    facet_records:
+      type: array
+      items:
+        type: object
+    review_tickets:
+      type: array
+      items:
+        type: object
+side_effects: "write"
+examples:
+  - input:
+      normalized_objects:
+        - object_id: "question/aml/customer-profile-fit"
+          object_type: "review_question"
+      emit: ["keyword", "vector", "graph", "facet"]
+    output:
+      keyword_records: []
+      vector_records: []
+      graph_edges: []
+      facet_records: []
+      review_tickets: []
+implementations:
+  - kind: "callable"
+    path: "tools.index_record_emitter.run"
+  - kind: "mcp"
+    path: "mcp/index.emit_records"

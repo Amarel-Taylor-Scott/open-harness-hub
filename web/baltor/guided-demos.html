@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baltor · Guided Demos — data examples</title>
+<meta name="description" content="Pick a dataset. Watch Baltor govern the answer: each example takes a real source conflict, runs the seven-stage pipeline, serves the verified cited answer with receipts, and holds the contradiction out where you can still see it. The model never decides the truth. (Implemented from the Claude Design 'Baltor Guided Demos' handoff onto the repo's oh-* design system; CFPB is the runnable demo today, the rest are governed previews.)" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles/oh-tokens.css" />
+<link rel="stylesheet" href="styles/oh-components.css" />
+<style>
+  /* cd-* layer — from the Claude Design guided-demo.css handoff; resolves against the repo's oh-tokens (dir-d). */
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--font-display); -webkit-font-smoothing: antialiased; }
+  .cd-wrap { max-width: 1100px; margin: 0 auto; padding: 0 28px 80px; }
+  .cd-top { display: flex; align-items: center; gap: 14px; padding: 20px 0 16px; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20;
+            background: color-mix(in srgb, var(--bg) 90%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .cd-logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 16px; letter-spacing: -.02em; text-decoration: none; color: var(--fg); }
+  .cd-mark { width: 27px; height: 27px; border-radius: 7px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-size: 14px; flex: 0 0 auto; }
+  .cd-logo small { display: block; font-weight: 500; font-size: 11px; color: var(--fg-faint); }
+  .cd-top .sp { flex: 1; }
+  .cd-tag { font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; background: var(--panel); }
+  .cd-hero { padding: 30px 0 6px; }
+  .cd-eyebrow { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+  .cd-hero h1 { font-size: 30px; font-weight: 800; letter-spacing: -.03em; margin: 12px 0 0; max-width: 24ch; line-height: 1.08; }
+  .cd-hero p { font-size: 15px; line-height: 1.6; color: var(--fg-muted); margin: 13px 0 0; max-width: 64ch; }
+  .cd-idx-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 18px; }
+  @media (max-width: 760px) { .cd-idx-grid { grid-template-columns: 1fr; } }
+  .cd-idx-card { display: flex; flex-direction: column; align-items: flex-start; padding: 20px 22px; text-decoration: none; border-left: 3px solid var(--accent); }
+  a.cd-idx-card:hover { box-shadow: var(--e1); transform: translateY(-1px); }
+  .cd-modes { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .cd-mode { font-family: var(--font-mono); font-size: 10.5px; line-height: 1; padding: 4px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted, #9aa7b4); text-transform: capitalize; }
+  .cd-idx-head { display: flex; align-items: center; gap: 8px; width: 100%; }
+  .cd-idx-dom { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line)); background: var(--accent-weak); border-radius: 999px; padding: 3px 9px; }
+  .cd-idx-status { margin-left: auto; font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; border-radius: 999px; padding: 3px 9px; }
+  .cd-idx-status.live { color: var(--success); border: 1px solid color-mix(in srgb, var(--success) 34%, var(--line)); background: color-mix(in srgb, var(--success) 9%, transparent); }
+  .cd-idx-status.preview { color: var(--fg-faint); border: 1px solid var(--line); background: var(--bg-subtle); }
+  .cd-idx-title { font-size: 18px; font-weight: 700; letter-spacing: -.01em; color: var(--fg); margin: 12px 0 0; }
+  .cd-idx-q { font-size: 13px; color: var(--fg-muted); font-style: italic; margin: 7px 0 0; line-height: 1.45; }
+  .cd-idx-ans { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 14px; padding-top: 13px; border-top: 1px solid var(--line); width: 100%; font-size: 12.5px; }
+  .cd-idx-ans .served { color: var(--success); font-weight: 600; } .cd-idx-ans .served b { font-family: var(--font-mono); }
+  .cd-idx-ans .held { color: var(--warning); } .cd-idx-ans .held b { font-family: var(--font-mono); }
+  .cd-idx-go { margin-top: 13px; font-size: 12.5px; font-weight: 600; color: var(--accent); }
+  .cd-idx-go.muted { color: var(--fg-faint); font-weight: 500; }
+  .cd-note { margin-top: 22px; padding: 15px 18px; border: 1px solid color-mix(in srgb, var(--accent) 26%, var(--line)); border-radius: var(--r-md); background: var(--accent-weak); display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--fg); }
+  .cd-foot { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12px; color: var(--fg-faint); line-height: 1.6; }
+  .cd-foot b { color: var(--fg-muted); font-weight: 600; }
+</style>
+</head>
+<body class="oh dir-d theme-dark oh-site cd">
+<div class="cd-top"><div class="cd-wrap" style="display:flex;align-items:center;gap:14px;padding-top:0;padding-bottom:0;width:100%;box-sizing:border-box;">
+  <a class="cd-logo" href="/"><span class="cd-mark">◳</span><span>Baltor<small>guided demos · data examples</small></span></a>
+  <span class="sp"></span>
+  <span class="cd-tag">Each example: a real contradiction, governed</span>
+</div></div>
+
+<div class="cd-wrap">
+  <section class="cd-hero">
+    <div class="cd-eyebrow">Governed context · data examples</div>
+    <h1>Pick a dataset. Watch Baltor govern the answer.</h1>
+    <p>Each example takes a real source conflict, runs the same seven-stage pipeline, and serves the verified answer with receipts — holding the contradiction out where you can still see it. Same governance, different data. The model never decides the truth.</p>
+  </section>
+
+  <div class="cd-idx-grid" id="grid"></div>
+
+  <div class="cd-note">
+    <span><b>One is runnable today.</b> The <b>CFPB</b> example runs end-to-end in this build (seven stages, receipts, the held-out FAQ). The others are worked governance examples — the same held-out-contradiction pattern across regulated datasets, previewed here, runnable as they are wired.</span>
+    <a class="oh-btn oh-btn--primary oh-btn--sm" style="margin-left:auto;" href="/consume">Run the live CFPB demo →</a>
+  </div>
+
+  <div class="cd-foot"><b>Why several examples.</b> Governed context isn't a one-off trick — the same pipeline resolves a regulation citation, a sanctions screen, a regulatory-date change, and an internal-policy conflict. <b>It does not</b> show a raw model answer; the contradiction is always held out, never served. <b>These examples illustrate governance against cited public rules — they are not legal, medical, or compliance advice.</b></div>
+</div>
+
+<script>
+  // The 14 governed data examples (from the Claude Design handoff). status: 'live' = runnable in this build; 'preview' = worked example.
+  const DEMOS = [
+    { key:'cfpb', dom:'Reg E · error-resolution deadline', title:'Integrate CFPB data', q:'"What’s the error-resolution deadline under Regulation E?"', serves:'10 business days', holds:'FAQ said “30 days”', modes:['TIME_FRAGILE','AUTHORITY_FRAGILE','COMPLIANCE_FRAGILE','JURISDICTION_FRAGILE'], status:'live', href:'/consume' },
+    { key:'sanctions', dom:'OFAC SDN · sanctions screening', title:'Screen against OFAC SDN', q:'"Is counterparty Northwind Trading LLC sanctioned?"', serves:'Match — sanctioned', holds:'Internal list: “no match”', modes:['FRESHNESS_FRAGILE','AUTHORITY_FRAGILE','ACTION_FRAGILE','COMPLIANCE_FRAGILE'], status:'preview' },
+    { key:'eudr', dom:'EUDR · application-date change', title:'Integrate EUR-Lex change', q:'"When does the EU Deforestation Regulation apply for large operators?"', serves:'30 December 2025', holds:'Internal guidance: “30 Dec 2024”', modes:['TIME_FRAGILE','JURISDICTION_FRAGILE','AUTHORITY_FRAGILE','ACTION_FRAGILE'], status:'preview' },
+    { key:'refund', dom:'Internal policy · refund window', title:'Reconcile refund policy', q:'"What’s our refund window?"', serves:'21 days', holds:'Jira “30 days” · wiki “14 days”', modes:['CONFLICT_FRAGILE','AUTHORITY_FRAGILE','CUSTOMER_FRAGILE','SOURCE_FRAGILE'], status:'preview' },
+    { key:'tariff', dom:'WCO HS · tariff classification', title:'Classify against WCO HS', q:'"What’s the HS code for lithium-ion battery packs?"', serves:'HS 8507.60', holds:'Internal map: “8507.80”', modes:['AUTHORITY_FRAGILE','JURISDICTION_FRAGILE','ACTION_FRAGILE','TIME_FRAGILE'], status:'preview' },
+    { key:'dgr', dom:'IATA DGR · dangerous-goods shipping', title:'Check dangerous-goods rule', q:'"Can we ship these lithium-ion batteries by air, at what state of charge?"', serves:'Max 30% state of charge', holds:'SOP: “no SoC limit”', modes:['AUTHORITY_FRAGILE','ACTION_FRAGILE','COMPLIANCE_FRAGILE','SOURCE_FRAGILE'], status:'preview' },
+    { key:'transit', dom:'Ocean freight · transit-time SLA', title:'Reconcile transit SLA', q:'"What’s the committed transit time, EU→US East Coast ocean freight?"', serves:'18–21 days (committed)', holds:'Marketing page: “12 days”', modes:['CONFLICT_FRAGILE','ACTION_FRAGILE','CUSTOMER_FRAGILE','SOURCE_FRAGILE'], status:'preview' },
+    { key:'water', dom:'EPA LCRR · drinking-water safety', title:'Integrate EPA lead rule', q:'"What’s the lead limit for our drinking-water system?"', serves:'15 ppb action + 10 ppb trigger', holds:'SOP: “15 ppb only”', modes:['AUTHORITY_FRAGILE','JURISDICTION_FRAGILE','COMPLIANCE_FRAGILE','ACTION_FRAGILE'], status:'preview' },
+    { key:'freight', dom:'FMCSA HOS · freight delivery time', title:'Reconcile driving-hours rule', q:'"What’s the max daily driving time for our US delivery drivers?"', serves:'11 hrs driving / 14-hr window', holds:'Dispatch SOP: “10 hrs”', modes:['AUTHORITY_FRAGILE','COMPLIANCE_FRAGILE','ACTION_FRAGILE','CONFLICT_FRAGILE'], status:'preview' },
+    { key:'reserves', dom:'SEC reserves · oil & gas booking', title:'Reconcile reserves basis', q:'"Can we book these barrels as proved reserves at today’s price?"', serves:'12-month average price basis', holds:'Model: “spot price”', modes:['AUTHORITY_FRAGILE','COMPLIANCE_FRAGILE','MODEL_FRAGILE','ACTION_FRAGILE'], status:'preview' },
+    { key:'bunker', dom:'IMO 2020 / MARPOL · marine fuel', title:'Check marine-fuel sulphur cap', q:'"What’s the max sulphur content for the marine fuel we deliver?"', serves:'0.50% sulphur (0.10% in ECA)', holds:'Spec: “3.50%”', modes:['AUTHORITY_FRAGILE','JURISDICTION_FRAGILE','COMPLIANCE_FRAGILE','ACTION_FRAGILE'], status:'preview' },
+    { key:'fda', dom:'FDA · 21 CFR drug labeling', title:'Integrate FDA limit', q:'"What’s the max acetaminophen per dosage unit in a combination?"', serves:'325 mg per dosage unit', holds:'Monograph: “500 mg”', modes:['AUTHORITY_FRAGILE','COMPLIANCE_FRAGILE','ACTION_FRAGILE','TIME_FRAGILE'], status:'preview' },
+    { key:'icd', dom:'WHO ICD-11 · clinical coding', title:'Integrate ICD-11 code', q:'"Which diagnostic code applies under the current classification?"', serves:'ICD-11 code in force', holds:'Map: prior-edition code', modes:['TIME_FRAGILE','AUTHORITY_FRAGILE','JURISDICTION_FRAGILE','ACTION_FRAGILE'], status:'preview' },
+    { key:'osha', dom:'OSHA · 29 CFR exposure limit', title:'Integrate OSHA PEL', q:'"What’s the PEL for respirable crystalline silica?"', serves:'50 µg/m³ (8-hr TWA)', holds:'Safety sheet: “100 µg/m³”', modes:['AUTHORITY_FRAGILE','COMPLIANCE_FRAGILE','JURISDICTION_FRAGILE','ACTION_FRAGILE'], status:'preview' },
+  ];
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  document.getElementById('grid').innerHTML = DEMOS.map(d => {
+    const live = d.status === 'live';
+    const tag = `<span class="cd-idx-status ${live ? 'live' : 'preview'}">${live ? '✓ live' : 'preview'}</span>`;
+    const inner = `<div class="cd-idx-head"><span class="cd-idx-dom">${esc(d.dom)}</span>${tag}</div>
+      <div class="cd-idx-title">${esc(d.title)}</div>
+      <div class="cd-idx-q">${esc(d.q)}</div>
+      <div class="cd-idx-ans">
+        <span class="served">✓ serves <b>${esc(d.serves)}</b></span>
+        <span class="held">⚠ holds out <b>${esc(d.holds)}</b> — never served</span>
+      </div>
+      <div class="cd-modes">${(d.modes||[]).map(m => `<span class="cd-mode">${esc(m.replace('_FRAGILE','').toLowerCase())}</span>`).join('')}</div>
+      <span class="cd-idx-go${live ? '' : ' muted'}">${live ? 'Open the live demo →' : 'Governed example · preview'}</span>`;
+    return live
+      ? `<a class="oh-card cd-idx-card" href="${esc(d.href)}">${inner}</a>`
+      : `<div class="oh-card cd-idx-card" aria-disabled="true">${inner}</div>`;
+  }).join('');
+</script>
+</body>
+</html>

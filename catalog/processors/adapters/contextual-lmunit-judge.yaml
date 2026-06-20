@@ -1,0 +1,133 @@
+id: "processor/contextual-lmunit-judge"
+type: processor
+version: "0.1.0"
+name: "Contextual AI LMUnit adapter (natural-language unit-test judge → 1-5 score)"
+description: |
+  GOVERNED ADAPTER that WRAPS Contextual AI's LMUnit evaluation model
+  (`POST /lmunit`) as an Open Harness Hub processor component, selectable
+  as the judge model behind OHH's `processor/llm-judge` and the rubric
+  tree. This is a thin wrapper over a third-party best-of-breed engine —
+  OHH does NOT rebuild it. LMUnit takes {query, response, unit_test}
+  (<=7000 tokens) and returns a continuous 1-5 score for that natural-
+  language unit test. It beats GPT-4o / Claude 3.5 as a judge on scoring
+  unit tests (RewardBench2 82.1% top-2, RewardBench 93.5% top-5, SOTA on
+  FLASK / BigGenBench) and is the highest-value wrap of the four:
+  Contextual open-sourced it in Jul 2025 (`ContextualAI/LMUnit`;
+  `LMUnit-llama3.1-70b`, `LMUnit-qwen2.5-72b` on Hugging Face;
+  arXiv:2412.13091), so it can run hosted OR self-hosted.
+
+  WRAP, NOT REPLACE — and the distinction OHH leads with: LMUnit grades
+  ANSWER QUALITY (it is the judge); it does NOT measure the LIFT a
+  pipeline-over-a-corpus adds versus the same bare model, and it carries
+  no will-it-survive-the-next-model durability axis. What OHH adds ON TOP:
+    - LMUnit is the JUDGE MODEL, not the gate. OHH's two-axis admission
+      gate (`scripts/foundry/measure.py` paired pipeline-vs-bare +
+      `scripts/eval/reason_codes.py` durability_class) sits ABOVE it; the
+      judge's 1-5 score is an input to that gate, not a substitute for it.
+    - PER-DOMAIN RUBRICS: OHH's ~230 scored rubrics + verify family supply
+      the domain-specific unit tests LMUnit scores; LMUnit is one general
+      judge, the rubrics are the governed criteria.
+    - PROVENANCE & COMPOSITION: scores attach to the governed pipeline run
+      and slot into the seven-primitive grammar as a post-API evaluation
+      Action.
+
+  DETERMINISTIC / LOCAL FALLBACK: when no Contextual credentials are
+  configured, the pipeline falls back to `processor/llm-judge` (generic
+  LLM-as-judge over local/frontier model targets, with deterministic
+  fallback). LMUnit is a stronger judge engine; the local judge keeps
+  evaluation runnable offline.
+
+  Hosted engine, external trust boundary, external_call side effect:
+  routed to the external-metered worker pool (see
+  docs/architecture/component-execution-and-runtime-routing.md). Requires
+  a Contextual AI API key for the hosted path (the open weights can run
+  on the local model tier). Cost (Contextual list pricing, 2026): $3 per
+  M input tokens — metered per call.
+authors:
+  - name: "Contextual AI"
+    url: "https://contextual.ai"
+  - name: "Open Harness Hub contributors (governance wrapper)"
+license: "proprietary-saas-wrapped"
+industry:   ["ai", "cross_industry"]
+capability: ["evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+lifecycle_position: "post_api.evaluation"
+trust_boundary: "external"
+links:
+  source:      "https://docs.contextual.ai/api-reference/lmunit/lmunit.md"
+  homepage:    "https://contextual.ai/lmunit/"
+  paper:       "https://arxiv.org/abs/2412.13091"
+  huggingface: "https://huggingface.co/ContextualAI/LMUnit-qwen2.5-72b"
+attribution:
+  source_url:  "https://github.com/ContextualAI/LMUnit"
+  source_kind: "github"
+  author:      "Contextual AI (Douwe Kiela, Amanpreet Singh)"
+  license:     "open weights (LMUnit) / Contextual AI commercial terms (hosted endpoint)"
+tags:
+  - "contextual-ai"
+  - "wrapped-third-party"
+  - "hosted"
+  - "open-weights"
+  - "lmunit"
+  - "llm-judge"
+  - "unit-test-eval"
+  - "judge-model"
+  - "grading-not-lift"
+  - "external-metered"
+  - "governance-wrapper"
+created: "2026-05-29"
+updated: "2026-05-29"
+
+process_kind: "eval.rubric_llm_judge"
+deterministic: false
+idempotent: true
+streaming: false
+latency_budget_ms: 15000
+
+inputs:
+  - name: "query"
+    type: "string"
+  - name: "response"
+    type: "string"
+  - name: "unit_test"
+    type: "string"
+  - name: "model"
+    type: "string"
+outputs:
+  - name: "score"
+    type: "number"
+  - name: "rationale"
+    type: "string"
+  - name: "model"
+    type: "string"
+
+side_effects: "external_call"
+on_error: "fallback"
+retry:
+  max_attempts: 2
+  backoff: "exponential"
+
+model_targets:
+  - id: "lmunit_hosted"
+    label: "Contextual AI LMUnit (hosted endpoint)"
+    transport: "openai_compatible"
+    role: "Hosted NL unit-test judge; default when Contextual credentials are configured."
+    capabilities: [text_generation, evaluation]
+    required: false
+    default: true
+    trust_boundary: "external"
+  - id: "lmunit_local"
+    label: "LMUnit open weights (LMUnit-qwen2.5-72b / LMUnit-llama3.1-70b)"
+    transport: "vllm"
+    role: "Self-hosted judge using the open LMUnit weights on the local model tier."
+    capabilities: [text_generation, evaluation]
+    required: false
+    default: false
+    trust_boundary: "local"
+
+implementations:
+  - kind: "http"
+    url: "https://api.contextual.ai/v1/lmunit"
+  - kind: "callable"
+    path: "processors.llm_judge.run"

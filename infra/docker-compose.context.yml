@@ -1,0 +1,114 @@
+# Local cloud-parity stack for Context Fidelity workers.
+#
+# Fast local path with no services:
+#   python -m scripts.context_workers.runner --self-test
+#
+# Redis/KEDA-like local path:
+#   docker compose -f infra/docker-compose.context.yml up --build
+#
+# Optional Celery:
+#   docker compose -f infra/docker-compose.context.yml --profile celery up --build
+#
+# Optional Temporal service:
+#   docker compose -f infra/docker-compose.context.yml --profile temporal up
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: ohh
+      POSTGRES_PASSWORD: ohh
+      POSTGRES_DB: ohh
+    ports: ["5432:5432"]
+    volumes: ["context_pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ohh"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+
+  ollama:
+    image: ollama/ollama:0.24.0
+    environment:
+      OLLAMA_KEEP_ALIVE: "30m"
+      OLLAMA_NUM_PARALLEL: "1"
+    ports: ["11434:11434"]
+    volumes: ["context_ollama:/root/.ollama"]
+
+  ollama-pull:
+    image: ollama/ollama:0.24.0
+    profiles: ["models"]
+    entrypoint: ["/bin/sh", "-lc"]
+    command: ["ollama pull $${OH_LLM_MODEL:-batiai/gemma4-e2b:q4}"]
+    environment:
+      OLLAMA_HOST: "http://ollama:11434"
+      OH_LLM_MODEL: "${OH_LLM_MODEL:-batiai/gemma4-e2b:q4}"
+    depends_on:
+      ollama: { condition: service_started }
+    volumes: ["context_ollama:/root/.ollama"]
+
+  context-worker:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args: { INSTALL_CONTEXT_LOCAL: "1" }
+    command: ["python", "-m", "scripts.context_workers.runner", "--watch"]
+    environment:
+      DATABASE_URL: "postgresql://ohh:ohh@postgres:5432/ohh"
+      REDIS_URL: "redis://redis:6379/0"
+      CONTEXT_QUEUE_KEY: "ohh:context:jobs"
+      CONTEXT_WORKER_EVENT_STREAM: "ohh:context:events"
+      CONTEXT_ENABLED_ADAPTERS: "local"
+      NODE_RESEARCH_ENABLE_EXTERNAL: "${NODE_RESEARCH_ENABLE_EXTERNAL:-false}"
+      OH_LLM_BASE_URL: "http://ollama:11434/v1"
+      OH_LLM_MODEL: "${OH_LLM_MODEL:-batiai/gemma4-e2b:q4}"
+      OH_LLM_ROUTES: >-
+        [
+          {"adapter":"ollama-gemma4-e2b-local","lane":"local_efficient","backend":"http-openai","model":"${OH_LLM_MODEL:-batiai/gemma4-e2b:q4}","base_url":"http://ollama:11434/v1","provider":"ollama","trust_boundary":"local","quality_tier":"small_open_weight","capabilities":["*"],"modalities":["text"],"data_retention":"local","estimated_cost_usd":0.0},
+          {"adapter":"ollama-gemma4-e2b-mid","lane":"open_weight_medium","backend":"http-openai","model":"${OH_LLM_MODEL:-batiai/gemma4-e2b:q4}","base_url":"http://ollama:11434/v1","provider":"ollama","trust_boundary":"local","quality_tier":"mid_open_weight_cpu","capabilities":["*"],"modalities":["text"],"data_retention":"local","estimated_cost_usd":0.0},
+          {"adapter":"ollama-gemma4-e2b-large-placeholder","lane":"open_weight_large","backend":"http-openai","model":"${OH_LLM_MODEL:-batiai/gemma4-e2b:q4}","base_url":"http://ollama:11434/v1","provider":"ollama","trust_boundary":"local","quality_tier":"large_open_weight_route_stub","capabilities":["*"],"modalities":["text"],"data_retention":"local","estimated_cost_usd":0.0}
+        ]
+    volumes:
+      - ../dist:/app/dist
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_started }
+      ollama: { condition: service_started }
+
+  celery-worker:
+    profiles: ["celery"]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args: { INSTALL_PLATFORM: "1" }
+    command: ["celery", "-A", "scripts.context_workers.backends.celery_app", "worker", "--loglevel=INFO", "--concurrency=4"]
+    environment:
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      CELERY_RESULT_BACKEND: "redis://redis:6379/1"
+      CONTEXT_QUEUE_KEY: "ohh.context.default"
+    depends_on:
+      redis: { condition: service_started }
+
+  temporal:
+    profiles: ["temporal"]
+    image: temporalio/auto-setup:1.25
+    ports: ["7233:7233"]
+    environment:
+      DB: "sqlite"
+
+  temporal-ui:
+    profiles: ["temporal"]
+    image: temporalio/ui:2.31.2
+    ports: ["8233:8080"]
+    environment:
+      TEMPORAL_ADDRESS: "temporal:7233"
+    depends_on:
+      temporal: { condition: service_started }
+
+volumes:
+  context_pgdata: {}
+  context_ollama: {}

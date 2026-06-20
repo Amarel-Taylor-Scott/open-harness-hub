@@ -1,0 +1,62 @@
+id: "processor/catalog-search"
+type: processor
+version: "0.1.0"
+name: "Catalog search (BM25 + tag-set Jaccard) — stage 1 of pipeline recommendation"
+description: |
+  Lightweight, stdlib-only retrieval over the OHH catalog. Stage 1 of
+  the pipeline-recommendation flow that powers "I need a pipeline to
+  do XYZ":
+
+   1. catalog-search  — BM25 + tag-set Jaccard → top 30 candidates
+   2. gemma-reranker  — Gemma 4 (or any local LLM) → top 5
+   3. pipeline-recommender — composition sketch + rationale
+
+  Signals combined:
+   - BM25 token overlap on (name + description + tags) — primary
+   - Tag-set Jaccard on (industry, capability, modality, tags) — boost
+   - Type bias — pipelines + harnesses + tools weighted up
+   - Heuristic structural hints from the prompt (ESG, CSDDD, GDPR,
+     etc. → industry/tag hints)
+
+  Cheap. No embedding model required. Optional embedding signal can
+  be added later by attaching a precomputed vector index.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["software", "ai", "cross_industry"]
+capability: ["retrieval", "reranking"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+tags: ["meta", "recommender", "search", "bm25", "stage-1"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+process_kind: "retrieve.bm25"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 2000
+
+inputs:
+  - name: "prompt"
+    type: "string"
+  - name: "top_k"
+    type: "integer"
+  - name: "types_filter"
+    type: "string[]"
+  - name: "intent_tags"
+    type: "string[]"
+outputs:
+  - name: "candidates"
+    type: "object[]"
+  - name: "stats"
+    type: "object"
+
+side_effects: "read"
+on_error: "raise"
+
+implementations:
+  - kind: "callable"
+    path: "scripts.processors.catalog_search.run"
+    language: "python"

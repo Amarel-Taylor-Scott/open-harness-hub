@@ -1,0 +1,55 @@
+id: knowledge-pack/pairwise-preference-judge-rubric-and-bias-controls
+type: knowledge-pack
+version: 0.1.0
+name: Pairwise Preference Judge Rubric And Bias Controls
+description: 'Capability-lift knowledge pack for an esoteric area LLMs handle poorly.
+  Gap: position/length/self-preference bias; miscalibrated to human-vote distribution
+  Grounded in LMSYS Chatbot Arena + WSDM multilingual preference data (CC) via classifier
+  retrieval. Lift: top solutions fine-tuned calibrated classifier w/ order-swap +
+  length-debias; lowers log-loss vs human votes'
+authors:
+- name: Open Harness Hub capability-gap factory
+license: CC-BY-4.0
+industry:
+- cross_industry
+capability:
+- retrieval
+- verification
+modality:
+- structured
+- text
+lifecycle: experimental
+trust_boundary: external
+freshness: volatile
+tags:
+- capability-lift
+- esoteric
+- knowledge-pack
+- classifier
+- ingestion-target
+created: '2026-05-28'
+updated: '2026-05-28'
+attribution:
+  source_url: LMSYS Chatbot Arena + WSDM multilingual preference data (CC)
+  source_kind: other
+  author: LMSYS Chatbot Arena + WSDM multilingual preference data (CC)
+  license: see-source
+content_types:
+- fact_table
+- reference_doc
+retrieval:
+- classifier
+files:
+- path: data/esoteric-packs/pairwise-preference-judge-rubric-and-bias-controls.jsonl
+  format: jsonl
+  content_type: fact_table
+  schema: capability-gap seed (real facts where stable; else ingestion contract)
+indexing:
+  bm25: true
+  dense:
+    model: all-MiniLM-L6-v2
+provenance:
+  sources:
+  - LMSYS Chatbot Arena + WSDM multilingual preference data (CC)
+  collected_through: '2026-05-28'
+  collected_by: capability-gap factory

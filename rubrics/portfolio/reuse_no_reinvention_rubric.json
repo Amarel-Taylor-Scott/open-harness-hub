@@ -1,0 +1,56 @@
+{
+  "name": "Reuse / No Reinvention",
+  "pass_threshold": 100,
+  "items": [
+    {
+      "rubric_id": "reuse.discovery",
+      "description": "Discovery file exists + records artifacts",
+      "weight": 20,
+      "blocker": true,
+      "evidence_required": ".agent/portfolio-website-discovery.json",
+      "proof_script": "scripts/check_portfolio_reuse_no_reinvention.py",
+      "pass_condition": "discovery json present with brand names + artifacts",
+      "fail_message": "discovery record missing"
+    },
+    {
+      "rubric_id": "reuse.no_dup_folder",
+      "description": "No duplicate site folder for a brand",
+      "weight": 20,
+      "blocker": true,
+      "evidence_required": "websites/ tree",
+      "proof_script": "scripts/check_portfolio_reuse_no_reinvention.py",
+      "pass_condition": "exactly one folder per brand",
+      "fail_message": "duplicate brand folder created"
+    },
+    {
+      "rubric_id": "reuse.no_overwrite",
+      "description": "No existing working script replaced without receipt",
+      "weight": 15,
+      "blocker": true,
+      "evidence_required": "discovery files_not_to_touch",
+      "proof_script": "scripts/check_portfolio_reuse_no_reinvention.py",
+      "pass_condition": "existing serve_*.sh untouched",
+      "fail_message": "existing script overwritten"
+    },
+    {
+      "rubric_id": "reuse.baltor_green",
+      "description": "Baltor demo/flywheel remain green",
+      "weight": 25,
+      "blocker": true,
+      "evidence_required": "flywheel + demo proofs",
+      "proof_script": "scripts/baltor_flywheel.py",
+      "pass_condition": "baseline regression green",
+      "fail_message": "baltor regression broke"
+    },
+    {
+      "rubric_id": "reuse.boundaries",
+      "description": "Architecture boundaries not weakened",
+      "weight": 20,
+      "blocker": true,
+      "evidence_required": "portfolio_dependency_law + company map",
+      "proof_script": "scripts/check_company_portfolio_boundaries.py",
+      "pass_condition": "dependency law + boundary proofs green",
+      "fail_message": "boundary guardrail weakened"
+    }
+  ]
+}

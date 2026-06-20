@@ -1,0 +1,57 @@
+id: "tool/approved-promotion-smoke-planner"
+type: tool
+version: "0.1.0"
+name: "Approved promotion smoke planner"
+description: "Creates a synthetic approved component candidate and runs it through approved promotion, promotion-to-CDC bridging, index projection, and review-ticket routing."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "verification", "evaluation", "retrieval"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.testing"
+tags: ["components", "promotion", "cdc", "smoke-test", "postgres", "review-gate"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    output_dir:
+      type: string
+  required: ["output_dir"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    promotion:
+      type: object
+    bridge:
+      type: object
+    files:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      output_dir: "dist/approved-promotion-smoke"
+    output:
+      ok: true
+      promotion:
+        approved_component_count: 1
+        approved_component_version_count: 1
+        approved_subcomponent_count: 1
+      bridge:
+        cdc:
+          change_event_count: 1
+          index_record_count: 1
+          review_ticket_count: 1
+implementations:
+  - kind: "callable"
+    path: "scripts.db.approved_promotion_smoke_plan.create_approved_promotion_smoke_plan"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.approved_promotion_smoke_plan"

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/queue/worker-run.schema.json",
+  "title": "Worker run",
+  "description": "One execution of a worker processing a queue message: SourceEvent → QueueMessage → WorkerRun → artifacts/claims/rot/receipts. Carries status, retry accounting, and a dead_letter flag (a failed run retries → dead-letters → human review).",
+  "type": "object",
+  "required": ["kind", "worker_run_id", "queue_message_ref", "status"],
+  "properties": {
+    "kind": { "type": "string", "const": "baltor.worker-run.v1" },
+    "worker_run_id": { "type": "string" },
+    "queue_message_ref": { "type": "string", "description": "the queue-message this run consumed" },
+    "worker": { "type": "string" },
+    "status": { "type": "string", "enum": ["running", "succeeded", "failed", "retrying", "dead_letter"] },
+    "started_at": { "type": "string" },
+    "completed_at": { "type": "string" },
+    "outputs": { "type": "array", "items": { "type": "string" }, "description": "refs to artifacts/claims/receipts produced" },
+    "retry_count": { "type": "integer", "minimum": 0 },
+    "dead_letter": { "type": "boolean" },
+    "error": { "type": "string" },
+    "correlation_id": { "type": "string" },
+    "trace_context": { "type": "object" }
+  },
+  "additionalProperties": true
+}

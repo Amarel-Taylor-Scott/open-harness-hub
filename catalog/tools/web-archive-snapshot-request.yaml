@@ -1,0 +1,66 @@
+id: "tool/web-archive-snapshot-request"
+type: tool
+version: "0.1.0"
+name: "Web archive snapshot request"
+description: "Requests a new archive capture through Save Page Now-compatible services or a private WARC capture worker when policy allows."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "government", "healthcare.public_health", "cross_industry"]
+capability: ["retrieval", "verification", "governance", "tool_use"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "volatile"
+tags: ["wayback", "save-page-now", "warc", "versioned-facts", "cdc"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    url:
+      type: string
+    capture_policy:
+      type: object
+    archive_provider:
+      type: string
+    requester:
+      type: object
+  required: ["url", "capture_policy"]
+returns:
+  type: object
+  properties:
+    request_status:
+      type: string
+      enum: ["submitted", "skipped", "rejected", "completed", "needs_review"]
+    capture_url:
+      type: string
+    archive_timestamp:
+      type: string
+    content_hash:
+      type: string
+    review_notes:
+      type: array
+      items:
+        type: string
+side_effects: "external_call"
+examples:
+  - input:
+      url: "https://www.cdc.gov/example/guidance"
+      archive_provider: "internet_archive"
+      capture_policy:
+        allow_public_snapshot: true
+    output:
+      request_status: "needs_review"
+      capture_url: ""
+      archive_timestamp: ""
+      content_hash: ""
+      review_notes: ["Example only; do not snapshot pages unless allowed by policy."]
+implementations:
+  - kind: "http"
+    url: "https://web.archive.org/save"
+  - kind: "callable"
+    path: "tools.web_archive_snapshot_request.run"
+  - kind: "mcp"
+    path: "mcp/web_archive.request_snapshot"

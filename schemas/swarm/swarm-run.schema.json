@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/swarm/swarm-run.schema.json",
+  "title": "Swarm run",
+  "description": "A full 'swarm this object' run: the bounded agents that ran, their findings, the aggregated SwarmConsensus, any routed steward-review-requests, and a receipt. Governance is enforced at the schema level: canonical_mutated is const false — the swarm proposes a patch + routes review for high-risk findings, but never overwrites a canonical object.",
+  "type": "object",
+  "required": ["kind", "swarm_run_id", "object_ref", "purpose", "agents_run", "findings", "consensus", "canonical_mutated", "created_at"],
+  "properties": {
+    "kind": { "type": "string", "const": "baltor.swarm-run.v1" },
+    "swarm_run_id": { "type": "string" },
+    "object_ref": { "type": "string" },
+    "purpose": { "type": "string", "enum": ["verify", "expand", "improve", "validate", "challenge"] },
+    "agents_run": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "findings": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+    "consensus": { "type": "object", "additionalProperties": true },
+    "review_requests": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+    "canonical_mutated": { "const": false },
+    "receipt": { "type": "object", "additionalProperties": true },
+    "deterministic": { "type": "boolean" },
+    "llm_used": { "type": "boolean" },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": true
+}

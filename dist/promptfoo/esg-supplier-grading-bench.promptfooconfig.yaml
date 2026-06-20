@@ -105,10 +105,7 @@ defaultTest:
     value: 'X: Findings reference the lead company''s code of conduct section. non-empty code_of_conduct_section field'
     metric: x_lead_policy_alignment
     weight: 0.04
-tests:
-- description: Sample row 0 from dataset/supplier-disclosure-pack-schema
-  vars:
-    prompt: 'TODO: replace with rows from dataset'
+tests: file://../../data/supplier-disclosure-samples/*.json
 outputPath: ./reports/esg-supplier-grading-bench.json
 writeLatestResults: true
 metadata:
@@ -121,3 +118,6 @@ metadata:
     run_date: '2026-05-19'
     hardware: Apple M1 (16GB) for ollama arm; T4 16GB for vLLM arm
     seed: 42
+  dataset: dataset/supplier-disclosure-pack-schema
+  dataset_split: test
+  dataset_rows: 3

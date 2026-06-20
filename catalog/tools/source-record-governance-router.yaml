@@ -1,0 +1,67 @@
+id: "tool/source-record-governance-router"
+type: tool
+version: "0.1.0"
+name: "Source record governance router"
+description: "Classifies source records by trust tier, license, privacy boundary, freshness, review need, and allowed downstream uses before extraction or indexing."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "verification", "routing"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+tags: ["source-governance", "license", "privacy", "trust-tier", "review-routing"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    source_record:
+      type: object
+    source_policy:
+      type: object
+    tenant_policy:
+      type: object
+  required: ["source_record"]
+returns:
+  type: object
+  properties:
+    trust_tier:
+      type: string
+    allowed_uses:
+      type: array
+      items:
+        type: string
+    privacy_boundary:
+      type: string
+    freshness_policy:
+      type: object
+    review_required:
+      type: boolean
+    review_reasons:
+      type: array
+      items:
+        type: string
+side_effects: "none"
+examples:
+  - input:
+      source_record:
+        source_url: "https://example.gov/policy"
+        publisher: "example agency"
+        license: "public-domain"
+    output:
+      trust_tier: "verified_publisher"
+      allowed_uses: ["retrieve", "summarize", "embed", "cite"]
+      privacy_boundary: "public"
+      freshness_policy:
+        mode: "volatile"
+      review_required: true
+      review_reasons: ["example only"]
+implementations:
+  - kind: "callable"
+    path: "tools.source_record_governance_router.run"
+  - kind: "mcp"
+    path: "mcp/source_governance.route"

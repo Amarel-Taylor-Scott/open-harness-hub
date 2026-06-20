@@ -1,0 +1,69 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/dataset/gxp-validation-samples",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Synthetic GxP validation samples (3 cases)",
+  "description": "Three synthetic GxP-validated-system packets for testing\n`pipeline/gxp-validation-review`. Fully synthetic.\n\nCases:\n - sample-validated-LIMS.json — fully compliant LIMS: audit trail\n   on + reviewed quarterly, individual accounts, IQ/OQ/PQ current,\n   2-factor signatures, ALCOA+ reviewed. Expected high grade.\n - sample-flagged-MES.json — MES with multiple critical findings:\n   audit trail disabled on batch records, shared 'operator-night'\n   account, OQ incomplete on a production module, single-factor\n   signatures, backup-as-archive, post-hoc backdated alteration.\n   Expected many critical findings.\n - sample-mixed-CTMS.json — CTMS mixed: audit trail enabled but\n   not reviewed quarterly per risk-based schedule, uncontrolled\n   blank CRF templates, batch-approved changes. Mixed signals.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/MIT.html",
+  "url": "https://open-harness-hub.dev/dataset/gxp-validation-samples",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-20",
+  "keywords": [
+    "pharma",
+    "gxp",
+    "21-cfr-11",
+    "synthetic",
+    "validation"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-20"
+}

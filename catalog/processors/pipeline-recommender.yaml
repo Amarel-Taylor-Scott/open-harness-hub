@@ -1,0 +1,67 @@
+id: "processor/pipeline-recommender"
+type: processor
+version: "0.1.0"
+name: "Pipeline recommender (end-to-end orchestrator: search → rerank → sketch)"
+description: |
+  End-to-end orchestrator for "I need a pipeline to do XYZ":
+
+   1. processor/catalog-search    — BM25 + Jaccard → top 30
+   2. processor/gemma-reranker    — Gemma 4 rerank → top 5 + rationale
+   3. heuristic composition-sketch — "use X with Y; pipe to Z"
+
+  Returns a single dict with all three stages plus a usage hint based
+  on the top candidate's component type.
+
+  CLI usage (also embeddable as a processor in larger pipelines):
+
+    python -m scripts.processors.pipeline_recommender \\
+        --prompt "I need a pipeline to grade an ESG supplier disclosure"
+
+  Pairs with `pipeline/recommend-pipeline-from-prompt` for a manifest-
+  declared invocation.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["software", "ai", "cross_industry"]
+capability: ["retrieval", "reranking", "reasoning"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+tags: ["meta", "recommender", "search-and-rerank", "composition", "stage-3"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+process_kind: "route.recommendation"
+deterministic: false
+idempotent: true
+streaming: false
+latency_budget_ms: 35000
+
+inputs:
+  - name: "prompt"
+    type: "string"
+  - name: "retrieval_top_k"
+    type: "integer"
+  - name: "rerank_top_k"
+    type: "integer"
+  - name: "types_filter"
+    type: "string[]"
+  - name: "model"
+    type: "string"
+  - name: "simulate_rerank"
+    type: "boolean"
+outputs:
+  - name: "stage_1_retrieval"
+    type: "object"
+  - name: "stage_2_rerank"
+    type: "object"
+  - name: "stage_3_composition_sketch"
+    type: "object"
+
+side_effects: "external_call"
+on_error: "fallback"
+
+implementations:
+  - kind: "callable"
+    path: "scripts.processors.pipeline_recommender.run"
+    language: "python"

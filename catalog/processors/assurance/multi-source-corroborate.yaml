@@ -1,0 +1,108 @@
+id: "processor/multi-source-corroborate"
+type: processor
+version: "0.1.0"
+name: "Multi-source corroborate (a claim is corroborated only when >= N independent sources agree)"
+description: |
+  CONTEXT-ASSURANCE component. Decides whether a claim is CORROBORATED by
+  requiring that at least N INDEPENDENT sources agree on it. A claim supported by
+  one source — or supported by several sources that share a single origin — is
+  NOT corroborated; a claim that any source contradicts is flagged. This is the
+  runtime form of the change-verification contract (docs/codex/
+  change-verification-contract.md): >= 2 independent agreeing sources, where one
+  source — or one agent's assertion — is not corroboration.
+
+  WHY THIS IS THE MOAT, NOT FAITHFULNESS: faithfulness-only RAG evaluation asks
+  "did the answer match the retrieved context". That passes even when the context
+  itself is a single unverified document (or a planted one — see
+  processor/corpus-integrity-check). This processor instead asks "do enough
+  INDEPENDENT sources agree that this claim is TRUE", which is the job a
+  faithfulness check structurally cannot do.
+
+  Procedure (deterministic over governed inputs):
+    1. Group the supporting and contradicting evidence by the claim each piece
+       asserts, every piece carrying its source_record (publisher, origin,
+       content_hash — see schemas/source-record.schema.json).
+    2. Collapse non-independence — evidence that traces to the SAME origin
+       (same publisher, syndication root, or mirror) counts once, so a single
+       story republished N times cannot manufacture corroboration. Independence
+       is judged from governed provenance, not from text similarity.
+    3. Count independent agreement against the declared threshold N (a governed
+       parameter, default >= 2; a domain may raise it). Emit a corroboration
+       verdict: corroborated | single_source | insufficient_independent |
+       contradicted, each carrying the warrant (which independent sources agreed
+       or disagreed, and on which field).
+    4. Open a review_ticket when the verdict is single_source, contradicted, or
+       insufficient_independent on a field declared must-verify.
+
+  This processor does NOT itself fetch the web; it adjudicates evidence already
+  gathered (e.g. by processor/web-search-verify and processor/authority-fetch-diff,
+  which run under their own external trust boundary). It is therefore a local
+  read-only decision over governed inputs.
+
+  GOVERNANCE (honest framing): this is a governed DEFINITION of an independent-
+  corroboration rule, not a measured-lift claim. It describes the independence
+  test, the threshold N, and the deterministic verdicts and warrants. It does NOT
+  assert a populated agreement rate or detection number. The implementation is
+  built by the code lane at the path below.
+
+authors:
+  - name: "Open Harness Hub contributors"
+license: "Apache-2.0"
+industry:   ["cross_industry", "ai", "media.factcheck", "government.regulatory"]
+capability: ["verification", "governance"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+lifecycle_position: "post_api.audit"
+trust_boundary: "hub"
+freshness: "volatile"
+created: "2026-05-29"
+updated: "2026-05-29"
+
+tags:
+  - "context-assurance"
+  - "corroboration"
+  - "independent-sources"
+  - "change-verification-contract"
+  - "n-of-m-agreement"
+  - "single-source-flag"
+  - "contradiction-detection"
+  - "provenance"
+  - "verified-corpus-commons"
+  - "governance"
+
+process_kind: "verify.multi_source_corroborate"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 3000
+
+inputs:
+  - name: "claim"
+    type: "object"
+  - name: "supporting_evidence"
+    type: "object[]"
+    schema: "source-record.schema.json"
+  - name: "contradicting_evidence"
+    type: "object[]"
+    schema: "source-record.schema.json"
+  - name: "min_independent_sources"
+    type: "integer"
+  - name: "must_verify_fields"
+    type: "string[]"
+outputs:
+  - name: "corroboration_verdict"
+    type: "string"
+  - name: "independent_agreement_count"
+    type: "integer"
+  - name: "findings"
+    type: "object[]"
+  - name: "review_ticket"
+    type: "object"
+
+side_effects: "read"
+on_error: "raise"
+
+implementations:
+  - kind: "callable"
+    path: "scripts.processors.assurance.multi_source_corroborate.run"
+    language: "python"

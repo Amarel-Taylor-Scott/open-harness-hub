@@ -1,0 +1,84 @@
+id: "tool/model-pricing-lookup"
+type: tool
+version: "0.1.0"
+name: "Active model pricing lookup"
+description: "Fetches or normalizes current model pricing for provider, model, region, context window, and billing unit. Pricing is volatile and should be stored as a run-scoped snapshot."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "cross_industry"]
+capability: ["tool_use", "evaluation"]
+modality: ["structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "volatile"
+tags: ["pricing", "models", "cost-estimation", "saas"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    provider:
+      type: string
+      description: "Model provider or compatible endpoint family."
+    model:
+      type: string
+      description: "Model id or pattern."
+    region:
+      type: string
+      description: "Cloud or API region."
+    currency:
+      type: string
+      description: "ISO currency code."
+    usage_shape:
+      type: object
+      description: "Expected input tokens, output tokens, calls, cache hit rate, and batch size."
+  required: ["provider"]
+returns:
+  type: object
+  properties:
+    snapshot_id:
+      type: string
+    collected_at:
+      type: string
+    provider:
+      type: string
+    model:
+      type: string
+    pricing:
+      type: object
+    assumptions:
+      type: array
+      items:
+        type: string
+    source_urls:
+      type: array
+      items:
+        type: string
+side_effects: "external_call"
+examples:
+  - input:
+      provider: "openai_compatible"
+      model: "gpt-class"
+      currency: "USD"
+      usage_shape:
+        input_tokens: 1000
+        output_tokens: 300
+        calls: 1000
+    output:
+      snapshot_id: "pricing-snapshot-example"
+      collected_at: "2026-05-25T00:00:00Z"
+      provider: "openai_compatible"
+      model: "gpt-class"
+      pricing:
+        unit: "per-token"
+        input_per_million: null
+        output_per_million: null
+      assumptions: ["Example shape only; live lookup required before production use."]
+      source_urls: []
+implementations:
+  - kind: "callable"
+    path: "tools.model_pricing_lookup.run"
+  - kind: "mcp"
+    path: "mcp/pricing.lookup_model"

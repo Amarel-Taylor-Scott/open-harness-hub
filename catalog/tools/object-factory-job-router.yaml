@@ -1,0 +1,82 @@
+id: "tool/object-factory-job-router"
+type: tool
+version: "0.1.0"
+name: "Object factory job router"
+description: "Plans object-factory jobs across local workers, Render background workers, Cloud Run containers, GPU workers, and tenant-hosted endpoints by task, cost, trust boundary, and runtime needs."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["routing", "planning", "governance", "tool_use"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.factory"
+tags: ["object-factory", "workers", "queues", "cloud-run", "render", "cost-routing"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+parameters:
+  type: object
+  properties:
+    job:
+      type: object
+    worker_registry:
+      type: array
+      items:
+        type: object
+    trust_policy:
+      type: object
+    cost_policy:
+      type: object
+    queue_policy:
+      type: object
+  required: ["job", "worker_registry"]
+returns:
+  type: object
+  properties:
+    selected_worker:
+      type: string
+    runtime:
+      type: string
+    queue:
+      type: string
+    route_reason:
+      type: string
+    fallback_workers:
+      type: array
+      items:
+        type: string
+    estimated_cost:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      job:
+        job_type: "page_to_markdown"
+        tenant_id: "tenant-demo"
+        policy:
+          trust_boundary: "hub"
+      worker_registry:
+        - worker_id: "page-to-markdown-worker"
+          runtime:
+            preferred: "cloud-run-container"
+            container_required: true
+      trust_policy:
+        allowed_boundaries: ["hub"]
+      cost_policy:
+        prefer_low_cost: true
+    output:
+      selected_worker: "page-to-markdown-worker"
+      runtime: "cloud-run-container"
+      queue: "object-factory-conversion"
+      route_reason: "Document conversion requires container dependencies and hub boundary is allowed."
+      fallback_workers: []
+      estimated_cost: {}
+implementations:
+  - kind: "callable"
+    path: "tools.object_factory_job_router.route"
+  - kind: "mcp"
+    path: "mcp/object_factory.route_job"
+

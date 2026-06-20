@@ -1,0 +1,17 @@
+{
+  "$id": "teleon/lift/RuntimeProfile.v1", "title": "RuntimeProfile.v1", "type": "object", "additionalProperties": false,
+  "description": "How an imported workload actually behaves, built ONLY from supplied telemetry observations. When no telemetry is available, source='unavailable' and the numeric fields are null — Teleon Lift never fabricates evidence (explicit empty state).",
+  "required": ["schema_version", "workload_id", "source", "observed_window", "invocations", "p50_latency_ms", "p95_latency_ms", "error_rate", "timeout_rate", "estimated_cost_usd"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["RuntimeProfile.v1"]},
+    "workload_id": {"type": "string"},
+    "source": {"type": "string", "enum": ["observed", "unavailable"]},
+    "observed_window": {"type": "string"},
+    "invocations": {"type": ["integer", "number", "null"]},
+    "p50_latency_ms": {"type": ["integer", "number", "null"]},
+    "p95_latency_ms": {"type": ["integer", "number", "null"]},
+    "error_rate": {"type": ["number", "null"]},
+    "timeout_rate": {"type": ["number", "null"]},
+    "estimated_cost_usd": {"type": ["number", "null"]}
+  }
+}

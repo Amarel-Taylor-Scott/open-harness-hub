@@ -37,8 +37,8 @@ Train stacked bidirectional LSTM (often + 1D-CNN front-end) for sequence-to-* ta
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `train` | processor | `processor/iterative-revise-loop` | — |
-| 3 | `ensemble_folds` | processor | `processor/multi-vector-fusion` | — |
-| 4 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `train` | processor | `processor/iterative-revise-loop` | - |
+| 3 | `ensemble_folds` | processor | `processor/multi-vector-fusion` | - |
+| 4 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

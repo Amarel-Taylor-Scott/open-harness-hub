@@ -1,0 +1,184 @@
+{
+  "$id": "runtime/ExecutionEnvironmentProfile.v1",
+  "title": "ExecutionEnvironmentProfile.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "Portable profile for a Teleon runtime class: shared characteristics, requirements, policy preferences, pre-autotune defaults, observability, and immutable safety boundaries.",
+  "required": [
+    "runtime_class",
+    "surface_family",
+    "execution_shape",
+    "default_local_backend",
+    "preferred_candidate_backends",
+    "requirements",
+    "policy_preferences",
+    "pre_autotune_defaults",
+    "autotuning_policy_id",
+    "observability",
+    "preferred_when",
+    "avoid_when"
+  ],
+  "properties": {
+    "runtime_class": {
+      "type": "string"
+    },
+    "surface_family": {
+      "type": "string"
+    },
+    "execution_shape": {
+      "type": "string"
+    },
+    "default_local_backend": {
+      "type": "string"
+    },
+    "preferred_candidate_backends": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "requirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "min_resource_class",
+        "requires_gpu",
+        "requires_browser",
+        "state_model",
+        "trigger_models",
+        "supports_scale_to_zero",
+        "max_duration_class",
+        "network_policy_default"
+      ],
+      "properties": {
+        "min_resource_class": {
+          "type": "string"
+        },
+        "requires_gpu": {
+          "type": "boolean"
+        },
+        "requires_browser": {
+          "type": "boolean"
+        },
+        "state_model": {
+          "type": "string"
+        },
+        "trigger_models": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "supports_scale_to_zero": {
+          "type": "boolean"
+        },
+        "max_duration_class": {
+          "type": "string"
+        },
+        "network_policy_default": {
+          "type": "string"
+        }
+      }
+    },
+    "policy_preferences": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "default_lifecycle_policy_id",
+        "default_sla_policy_id",
+        "egress_route_policy_id",
+        "identity_mode",
+        "secret_access_default",
+        "tenant_data_access_default"
+      ],
+      "properties": {
+        "default_lifecycle_policy_id": {
+          "type": "string"
+        },
+        "default_sla_policy_id": {
+          "type": "string"
+        },
+        "egress_route_policy_id": {
+          "type": "string"
+        },
+        "identity_mode": {
+          "type": "string"
+        },
+        "secret_access_default": {
+          "type": "boolean"
+        },
+        "tenant_data_access_default": {
+          "type": "boolean"
+        }
+      }
+    },
+    "pre_autotune_defaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "concurrency_source",
+        "timeout_source",
+        "scale_to_zero",
+        "min_instances"
+      ],
+      "properties": {
+        "concurrency_source": {
+          "type": "string"
+        },
+        "timeout_source": {
+          "type": "string"
+        },
+        "scale_to_zero": {
+          "type": "boolean"
+        },
+        "min_instances": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "autotuning_policy_id": {
+      "type": "string"
+    },
+    "observability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required_receipts",
+        "egress_observation_required_when_outbound",
+        "serves_truth"
+      ],
+      "properties": {
+        "required_receipts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "egress_observation_required_when_outbound": {
+          "type": "boolean"
+        },
+        "serves_truth": {
+          "type": "boolean",
+          "const": false
+        }
+      }
+    },
+    "preferred_when": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "avoid_when": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    }
+  }
+}

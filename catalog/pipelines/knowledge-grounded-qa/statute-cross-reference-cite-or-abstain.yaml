@@ -1,0 +1,242 @@
+id: "pipeline/statute-cross-reference-cite-or-abstain"
+type: pipeline
+version: "0.1.0"
+name: "Statute cross-reference resolution (cite-or-abstain)"
+description: |
+  Resolve the internal cross-references in a statute or regulation
+  ("subject to subsection (b)", "as defined in §3", "notwithstanding
+  paragraph (2)") and answer what the cross-referenced provision
+  actually says — with an EXACT-section citation for every resolved
+  reference, or abstain. High-precision legal/regulated RAG bundle
+  (Bundle B) with an exact-id retrieval leg as the load-bearing lock:
+
+   - GREP/regex triage extracts the section/paragraph identifiers and
+     defined-term references in the input;
+   - hybrid retrieval (the exact-id leg matches §/¶ numbers that
+     embeddings blur; the dense leg covers defined-term phrasing) over
+     the statute citation + cross-reference grounding corpus, fused +
+     cross-encoder reranked;
+   - cite-first counsel persona + statute-clarity harness resolves each
+     reference to the provision it points at, with a per-reference
+     citation;
+   - DETERMINISTIC cite-or-abstain gate: a resolved cross-reference
+     with no citation to the target provision fails citation-coverage
+     and blocks publication — the model may NOT assert what an
+     unretrieved §X says.
+
+  Negative-space task: base models hallucinate the content of a
+  cross-referenced section ("§4(b) requires written notice") when the
+  section was never retrieved. Exact-id matching + cite-or-abstain
+  make the resolution verifiable instead of fluent-but-wrong.
+
+  NOT legal advice; descriptive over the cited authorities only.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["legal", "legal.compliance", "government", "government.regulatory"]
+capability: ["extraction", "retrieval", "verification", "evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "stable"
+tags: ["knowledge-grounded-qa", "cite-or-abstain", "bundle-b", "statute", "cross-reference", "exact-id"]
+created: "2026-05-29"
+updated: "2026-05-29"
+
+attribution:
+  source_url: "https://www.law.cornell.edu/uscode/text"
+  source_kind: "other"
+  author: "Statute citation + cross-reference grounding corpus (composite of primary authorities)"
+  license: "CC-BY-4.0"
+
+task: |
+  Given a statute/regulation excerpt containing internal
+  cross-references, resolve each reference to the provision it points
+  at and state what that provision says, with an exact-section
+  citation per resolved reference, or abstain. Publication is blocked
+  unless citation coverage and the hallucination score clear
+  threshold.
+pipeline_kind: "rag_pack"
+
+examples:
+  - name: "Resolve an internal cross-reference to the section it points at, with exact-id citation"
+    input:
+      statute_text: >
+        (a) A covered entity shall file the report required under
+        subsection (c) within 30 days. (c) The report under this
+        section must include the information described in section
+        4(b)(2), except as limited by paragraph (d).
+      jurisdiction: "US-Model"
+      statute_type: "regulation"
+    expected_output:
+      abstained: false
+      citation_coverage: 1.0
+      resolved_references:
+        - reference: "subsection (c)"
+          resolves_to: "§ (this section)(c)"
+          says: "Defines the contents of the report (the information described in section 4(b)(2), as limited by paragraph (d))."
+          citation: "[§(c)] retrieved provision span"
+        - reference: "section 4(b)(2)"
+          resolves_to: "§ 4(b)(2)"
+          says: "Enumerates the specific data fields the report must include."
+          citation: "[§4(b)(2)] retrieved provision span"
+        - reference: "paragraph (d)"
+          resolves_to: "§ (this section)(d)"
+          says: "Limits the section 4(b)(2) information set for this report."
+          citation: "[§(d)] retrieved provision span"
+      answer_markdown: >
+        The 30-day filing duty in (a) is tied to the report defined in
+        (c) [1]; that report must contain the fields listed in §4(b)(2)
+        [2], narrowed by the limitation in paragraph (d) [3].
+      notes: >
+        Each resolved cross-reference cites the exact provision it
+        points at (exact-id retrieval leg), so citation-coverage passes.
+  - name: "Abstain: cross-reference target is not in the retrieved corpus"
+    input:
+      statute_text: >
+        (a) Penalties shall be assessed as provided in section 12 of the
+        Enforcement Schedule.
+      jurisdiction: "US-Model"
+      statute_type: "regulation"
+    expected_output:
+      abstained: true
+      citation_coverage: 0.0
+      resolved_references:
+        - reference: "section 12 of the Enforcement Schedule"
+          resolves_to: null
+          says: null
+          citation: null
+      answer_markdown: >
+        ABSTAIN — the referenced "section 12 of the Enforcement
+        Schedule" was not retrieved from the corpus, so its contents
+        cannot be stated. Routed to review; no fabricated penalty text
+        is published.
+      notes: >
+        The target provision was never retrieved, so there is no span to
+        cite; citation-coverage fails and the cite-or-abstain gate
+        blocks an invented description of §12.
+
+inputs:
+  - name: "statute_text"
+    type: "string"
+  - name: "jurisdiction"
+    type: "string"
+  - name: "statute_type"
+    type: "string"
+outputs:
+  - name: "resolved_references"
+    type: "object[]"
+  - name: "answer_markdown"
+    type: "string"
+  - name: "citation_coverage"
+    type: "number"
+  - name: "abstained"
+    type: "boolean"
+  - name: "trace"
+    type: "object[]"
+
+defaults:
+  persona: "persona/legal-clarity-analyst"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/statute-citation-and-crossref-grounding"
+    - "knowledge-pack/legal-interpretation-canons"
+  rule_packs:
+    - "rule-pack/grep-statute-ambiguity-flags"
+    - "rule-pack/hybrid-retrieval-policy"
+
+steps:
+  - id: "normalize"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs:
+      data: "$.inputs.statute_text"
+
+  - id: "chunk_statute"
+    kind: "chunker"
+    ref: "processor/page-aware-chunker"
+    inputs:
+      text: "$.steps.normalize.output.prose"
+
+  - id: "grep_refs"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-statute-ambiguity-flags"
+    inputs:
+      text: "$.steps.normalize.output.prose"
+
+  - id: "retrieve_targets"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.steps.grep_refs.output.hits"
+      corpus: "knowledge-pack/statute-citation-and-crossref-grounding"
+      top_k: 12
+
+  - id: "rerank"
+    kind: "processor"
+    ref: "processor/cross-encoder-reranker"
+    inputs:
+      query: "$.steps.normalize.output.prose"
+      passages: "$.steps.retrieve_targets.output.passages"
+      top_k: 6
+
+  - id: "resolve"
+    kind: "harness"
+    ref: "harness/statute-clarity-review"
+    inputs:
+      statute_text: "$.steps.normalize.output.prose"
+      jurisdiction: "$.inputs.jurisdiction"
+      statute_type: "$.inputs.statute_type"
+      context: "$.steps.rerank.output.passages"
+
+  - id: "citation_coverage"
+    kind: "processor"
+    ref: "processor/citation-coverage"
+    inputs:
+      response_markdown: "$.steps.resolve.output"
+
+  - id: "hallucination_check"
+    kind: "processor"
+    ref: "processor/hallucination-scorer"
+    inputs:
+      response: "$.steps.resolve.output"
+      prompt: "$.steps.normalize.output.prose"
+      n_samples: 5
+
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.resolve.output"
+      rubric_ref: "rubric/statute-clarity-v1"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "statute-cross-reference-cite-or-abstain"
+      applied_layers: ["persona", "chunk", "grep", "rag", "rerank", "harness", "citation_coverage", "hallucination", "judge"]
+
+success_criteria:
+  - rubric: "rubric/statute-clarity-v1"
+    threshold: 0.7
+    label: "cross-reference resolution grounded + scored to rubric"
+  - kind: "deterministic"
+    target: "$.steps.citation_coverage.output.passes"
+    op: "=="
+    value: true
+    severity: "critical"
+    label: "every resolved cross-reference cites its target provision (else abstain)"
+  - kind: "deterministic"
+    target: "$.steps.citation_coverage.output.coverage"
+    op: ">="
+    value: 0.95
+    severity: "critical"
+    label: "citation coverage >= 0.95"
+  - kind: "deterministic"
+    target: "$.steps.hallucination_check.output.overall_score"
+    op: "<="
+    value: 0.15
+    severity: "high"
+    label: "self-consistency hallucination score <= 0.15"

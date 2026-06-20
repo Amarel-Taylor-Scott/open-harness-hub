@@ -1,0 +1,25 @@
+{
+  "$id": "ingestion/IngestionRun.v1", "title": "IngestionRun.v1", "type": "object", "additionalProperties": false,
+  "description": "One execution of a connector against a source: the plan it ran, the cursor window it covered, counts of artifacts written, and the terminal status. Groups every SourceArtifact + IngestionReceipt + IngestionError produced in that run under one run_id for replay and audit. The run is content-addressed and deterministic when time is injected.",
+  "required": ["schema_version", "run_id", "tenant_id", "source_id", "adapter_id", "sync_mode", "status", "started_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["IngestionRun.v1"]},
+    "run_id": {"type": "string"},
+    "tenant_id": {"type": "string"},
+    "source_id": {"type": "string"},
+    "source_version": {"type": "string"},
+    "adapter_id": {"type": "string"},
+    "scope": {"type": "string", "enum": ["global_public", "tenant_private", "tenant_shared"]},
+    "sync_mode": {"type": "string", "enum": ["full_sync", "incremental_sync", "backfill", "webhook_push"]},
+    "status": {"type": "string", "enum": ["planned", "running", "succeeded", "partial", "failed"]},
+    "started_at": {"type": "string"},
+    "finished_at": {"type": "string"},
+    "from_cursor": {"type": "string"},
+    "to_cursor": {"type": "string"},
+    "artifacts_written": {"type": "integer"},
+    "artifacts_duplicate": {"type": "integer"},
+    "errors_count": {"type": "integer"},
+    "receipt_ids": {"type": "array", "items": {"type": "string"}},
+    "error_ids": {"type": "array", "items": {"type": "string"}}
+  }
+}

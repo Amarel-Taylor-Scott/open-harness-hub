@@ -5,7 +5,7 @@
 Placeholder reference that ESG / vendor pipelines accept as the
 lead-company-specific code of conduct. Real instances would replace
 this with the deploying organization's actual code (a vendor-
-required policy artifact).
+required policy component).
 
 Ships with one composite example entry — enough for pipelines to
 pass validation in synthetic-demo mode without exposing a real

@@ -1,0 +1,37 @@
+id: "knowledge-pack/theory-to-component-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Theory to component patterns"
+description: "Seed theories and expansion rules for turning technical postmortems, architecture critiques, and research notes into database-backed component candidates."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "security.defensive", "cross_industry"]
+capability: ["planning", "generation", "governance", "evaluation"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.scale"
+tags: ["theory-to-components", "daily-factory", "postmortems", "component-candidates", "review-gate"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+content_types:
+  - "theory_component_seed"
+files:
+  - path: "catalog/knowledge-packs/data/theory-to-component-patterns/theory-seeds.jsonl"
+    format: "jsonl"
+    schema: "theory_component_seed"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["id", "name", "domain", "capability_gap", "expansion_axes", "constraints"]
+provenance:
+  sources:
+    - "Open Harness Hub user-provided technical theory and postmortem seeds"
+    - "Open Harness Hub component factory patterns"
+  collected_through: "2026-05-26"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "defensive summaries and synthetic expansion axes only"

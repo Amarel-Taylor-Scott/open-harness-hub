@@ -1,0 +1,65 @@
+id: "tool/component-id-index-builder"
+type: tool
+version: "0.2.0"
+name: "Component ID index builder"
+description: "Builds, incrementally updates, and freshness-checks a lightweight component-id cache used for fast selected validation and release-style reference checks without reparsing every manifest."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "verification", "retrieval", "serving"]
+modality: ["structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.validation"
+tags: ["validation", "component-index", "cache", "incremental-build", "million-primitives"]
+created: "2026-05-25"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    check_fresh:
+      type: boolean
+      description: "When true, report whether dist/catalog-component-ids.json matches current manifest paths, mtimes, and sizes."
+    update:
+      type: array
+      items:
+        type: string
+      description: "Optional changed manifest paths to update incrementally without rebuilding the full cache."
+returns:
+  type: object
+  properties:
+    component_count:
+      type: integer
+    fresh:
+      type: boolean
+    reason:
+      type: string
+    output_path:
+      type: string
+    last_incremental_update:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      check_fresh: false
+    output:
+      component_count: 4079
+      fresh: true
+      reason: "rebuilt"
+      output_path: "dist/catalog-component-ids.json"
+  - input:
+      update:
+        - "catalog/tools/fast-factory-closeout-reporter.yaml"
+    output:
+      component_count: 4322
+      last_incremental_update:
+        changed_paths:
+          - "catalog/tools/fast-factory-closeout-reporter.yaml"
+implementations:
+  - kind: "shell"
+    command: "python3 scripts/build_component_id_index.py"
+  - kind: "shell"
+    command: "python3 scripts/build_component_id_index.py --update"

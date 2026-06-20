@@ -16,7 +16,7 @@ No single pipeline - assemble from primitives. Eventually:
 
 ## Primitives to compose
 
-| Layer | Artifact |
+| Layer | Component |
 |---|---|
 | Input attacks | `rule-pack/grep-prompt-injection-heuristics` (the heuristic battery used by garak's `promptinject`, `latentinjection`, `ansiescape`, `dan`) |
 | Secret canaries | `rule-pack/grep-ai-vendor-keys` (planted in the system prompt; check output for leaks) |

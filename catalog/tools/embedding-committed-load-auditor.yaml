@@ -1,0 +1,63 @@
+id: "tool/embedding-committed-load-auditor"
+type: tool
+version: "0.1.0"
+name: "Embedding committed load auditor"
+description: "Audits planned embedding rows, vector readiness, pgvector load evidence, and optional Postgres committed counts before vector search is marked product-ready."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["embedding", "retrieval", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["embeddings", "vector-search", "pgvector", "postgres", "daily-factory", "readiness-audit"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    embedding_execution_plan:
+      type: string
+    vector_readiness_summary:
+      type: string
+    pgvector_load_plan_summary:
+      type: string
+    committed_counts:
+      type: string
+    output:
+      type: string
+    run_id:
+      type: string
+  required: ["embedding_execution_plan", "vector_readiness_summary", "pgvector_load_plan_summary"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    audit_status:
+      type: string
+    counts:
+      type: object
+    readiness_decision:
+      type: object
+side_effects: "write"
+examples:
+  - input:
+      embedding_execution_plan: "dist/daily-embedding-execution/2026-05-31/embedding-plan/embedding-execution-plan.json"
+      vector_readiness_summary: "dist/local-hash-embedding-worker/2026-05-31/vector-readiness/vector-readiness-summary.json"
+      pgvector_load_plan_summary: "dist/pgvector-embedding-load-plan/2026-05-31/pgvector-embedding-load-plan-summary.json"
+    output:
+      ok: true
+      audit_status: "load_planned_not_committed"
+      readiness_decision:
+        vector_search_product_ready: false
+implementations:
+  - kind: "callable"
+    path: "scripts.db.embedding_committed_load_audit.audit_embedding_committed_load"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.embedding_committed_load_audit"

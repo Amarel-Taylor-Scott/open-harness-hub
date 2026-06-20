@@ -22,7 +22,7 @@ The rubric is load-bearing on five things:
 4. **>=2 co-occurring indicators (or 1 critical-tier rule) before escalation.** Single non-critical hits become moderator queue entries with the surfaced indicator, not auto-actions.
 5. **Polaris hotline referral is opt-in per jurisdiction.** EU deployments default to local equivalents (e.g. BKA / La Strada); the referral-packet processor reads the jurisdiction from `content_packet.locale`.
 
-## Artifacts
+## Components
 
 - Persona: [`persona/trust-and-safety-reviewer`](https://github.com/Amarel-Taylor-Scott/open-harness-hub/blob/main/catalog/personas/trust-and-safety-reviewer.yaml)
 - Adapter: [`adapter/gemma-4-26b-vision`](https://github.com/Amarel-Taylor-Scott/open-harness-hub/blob/main/catalog/adapters/gemma-4-26b-vision.yaml) (multimodal: text + image)
@@ -36,7 +36,7 @@ The rubric is load-bearing on five things:
 
 ## How the catalog finds this for you
 
-Given the free-text task `"detect illicit social media posts related to human trafficking on UGC platforms with Gemma 4"`, the scaffolder script returns the artifacts above in ranked order. Run:
+Given the free-text task `"detect illicit social media posts related to human trafficking on UGC platforms with Gemma 4"`, the scaffolder script returns the components above in ranked order. Run:
 
 ```bash
 python3 scripts/scaffold_pipeline_from_task.py \

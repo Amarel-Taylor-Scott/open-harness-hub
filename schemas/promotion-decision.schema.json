@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/promotion-decision.schema.json",
+  "title": "Promotion decision",
+  "description": "Scored promotion decision for a candidate primitive before it becomes a curated catalog object.",
+  "type": "object",
+  "required": ["decision_id", "object_id", "score", "decision", "criteria"],
+  "properties": {
+    "decision_id": { "type": "string" },
+    "object_id": { "type": "string" },
+    "source_record_id": { "type": "string" },
+    "score": { "type": "number" },
+    "max_score": { "type": "number" },
+    "decision": {
+      "type": "string",
+      "enum": ["promote_candidate", "review_before_promotion", "hold", "reject"]
+    },
+    "criteria": {
+      "type": "object",
+      "additionalProperties": { "type": "number" }
+    },
+    "risk_flags": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "review_reasons": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "recommended_outputs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "created_at": { "type": "string" }
+  },
+  "additionalProperties": true
+}

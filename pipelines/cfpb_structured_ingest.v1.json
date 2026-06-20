@@ -1,0 +1,22 @@
+{
+  "pipeline_id": "cfpb_structured_ingest",
+  "pipeline_version": "v1",
+  "status": "active",
+  "description": "CFPB complaint records -> governed atomic facts -> context pack",
+  "input_schema": "SourceBatch.v1",
+  "output_schema": "ContextPack.v1",
+  "partition_key": "tenant_id",
+  "idempotency_key_template": "{tenant_id}:{source_id}:{document_version}:{pipeline_id}:{pipeline_version}",
+  "isolation": "shared",
+  "steps": [
+    {"step_id": "source", "processor": "source.cfpb_fixture@v1", "queue": "pipeline.cfpb.source",
+     "outputs": ["SourceRecordBatch.v1"]},
+    {"step_id": "decompose", "processor": "decompose.structured_atomic@v1", "queue": "pipeline.cfpb.decompose",
+     "inputs": ["SourceRecordBatch.v1"], "outputs": ["AtomicFactSet.v1", "HeldOutAllegationSet.v1"], "depends_on": ["source"]},
+    {"step_id": "govern", "processor": "verify.governance@v1", "queue": "pipeline.cfpb.verify",
+     "inputs": ["AtomicFactSet.v1"], "outputs": ["VerifiedFactSet.v1"], "depends_on": ["decompose"]},
+    {"step_id": "package", "processor": "package.context_pack@v1", "queue": "pipeline.cfpb.package",
+     "inputs": ["VerifiedFactSet.v1", "HeldOutAllegationSet.v1"], "outputs": ["ContextPack.v1", "Receipt.v1"], "depends_on": ["govern"]}
+  ],
+  "gates": ["all_atomic_facts_have_source_handles", "narratives_are_not_promotion_eligible", "pack_receipt_counts_match_fact_counts"]
+}

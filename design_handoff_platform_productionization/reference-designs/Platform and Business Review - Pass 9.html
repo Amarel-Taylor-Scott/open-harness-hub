@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"></meta>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+<title>Platform &amp; Business Review — Pass 9</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"></link>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"></link>
+<link rel="stylesheet" href="shared/oh-tokens.css"></link>
+<style>
+  html, body { margin: 0; }
+  body.oh { background: var(--bg); color: var(--fg); font-family: var(--font-display); -webkit-font-smoothing: antialiased; }
+  .doc { max-width: 940px; margin: 0 auto; padding: 0 32px 96px; }
+  .doc-top { display: flex; align-items: center; gap: 12px; padding: 22px 0 18px; border-bottom: 1px solid var(--line); }
+  .doc-mark { width: 28px; height: 28px; border-radius: 7px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 800; font-size: 13px; }
+  .doc-brand { font-weight: 800; font-size: 15px; letter-spacing: -.02em; }
+  .doc-brand small { display: block; font-weight: 500; font-size: 11px; color: var(--fg-faint); }
+  .doc-top .sp { flex: 1; }
+  .doc-date { font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; background: var(--panel); }
+  .eyebrow { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-top: 44px; }
+  h1 { font-size: 32px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; margin: 12px 0 0; max-width: 26ch; }
+  .lede { font-size: 15.5px; line-height: 1.65; color: var(--fg-muted); margin: 16px 0 0; max-width: 66ch; text-wrap: pretty; }
+  .lede b { color: var(--fg); font-weight: 600; }
+  h2 { font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin: 54px 0 0; padding-bottom: 12px; border-bottom: 1px solid var(--line); display: flex; align-items: baseline; gap: 12px; }
+  h2 .n { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); font-weight: 600; }
+  p { font-size: 14px; line-height: 1.65; color: var(--fg-muted); margin: 12px 0 0; max-width: 70ch; text-wrap: pretty; }
+  p b { color: var(--fg); font-weight: 600; }
+  code { font-family: var(--font-mono); font-size: .92em; background: var(--bg-subtle); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 16px; }
+  th { text-align: left; font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-faint); padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: top; line-height: 1.5; color: var(--fg-muted); }
+  td .tt { color: var(--fg); font-weight: 600; }
+  .v { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; white-space: nowrap; }
+  .v.keep { color: var(--success); border-color: color-mix(in srgb, var(--success) 32%, var(--line)); }
+  .v.later { color: var(--warning); border-color: color-mix(in srgb, var(--warning) 32%, var(--line)); }
+  .v.no { color: var(--fg-faint); }
+  .funnel { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; align-items: center; }
+  .funnel .f { border: 1px solid var(--line); background: var(--panel); border-radius: var(--r-md); padding: 9px 14px; font-size: 12.5px; font-weight: 600; }
+  .funnel .f small { display: block; font-family: var(--font-mono); font-size: 10px; font-weight: 500; color: var(--fg-faint); margin-top: 2px; }
+  .funnel .f.hot { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); color: var(--accent); }
+  .funnel .arr { color: var(--fg-faint); }
+  ul.rules { margin: 14px 0 0; padding: 0 0 0 2px; list-style: none; }
+  ul.rules li { font-size: 13.5px; line-height: 1.6; color: var(--fg-muted); padding: 8px 0 8px 26px; position: relative; border-bottom: 1px solid var(--line); max-width: 74ch; }
+  ul.rules li:last-child { border-bottom: none; }
+  ul.rules li::before { content: "✓"; position: absolute; left: 2px; color: var(--verified); font-weight: 700; }
+  ul.rules b { color: var(--fg); font-weight: 600; }
+  .foot { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12px; color: var(--fg-faint); line-height: 1.6; }
+  .foot b { color: var(--fg-muted); font-weight: 600; }
+</style>
+</head>
+<body class="oh dir-s theme-light">
+<div class="doc">
+
+  <header class="doc-top">
+    <div class="doc-mark">A</div>
+    <div class="doc-brand">AI Done Right<small>internal · platform &amp; business decision record</small></div>
+    <div class="sp"></div>
+    <div class="doc-date">pass 9 · 2026-06-09</div>
+  </header>
+
+  <div class="eyebrow">Hosting · data · K8s readiness · business plane · anti-fragility</div>
+  <h1>Vendors are adapters. The manifest is the architecture.</h1>
+  <p class="lede">Pass 9 reviews the 2026 hosting/data field (Render, Fly.io, Cloud Run, Lambda, Railway, K8s, BigQuery), wires in the business plane (analytics, transactional email, payments, PMF instrumentation), and locks the anti-fragility standard: <b>ports &amp; adapters for every vendor, no magic words or numbers, K8s-and-function-ready without adopting either</b>. Full records: <code>production/cloud/PLATFORM-REVIEW.md</code>, <code>production/contracts/BUSINESS-PLANE.md</code>, standards <code>S12–S13</code>.</p>
+
+  <h2><span class="n">01</span> Hosting verdicts (prices Jun 2026 — re-verify at adoption)</h2>
+  <table>
+    <thead><tr><th>Platform</th><th>Shape</th><th>Verdict for AIDR</th><th></th></tr></thead>
+    <tbody>
+      <tr><td class="tt">Hetzner / DO VM</td><td>~$5–15/mo flat</td><td><b>L2 default</b> — runs the same <code>just up</code> as the laptop; zero new concepts; our deploy is already self-orienting.</td><td><span class="v keep">adopt at L2</span></td></tr>
+      <tr><td class="tt">GCP Cloud Run</td><td>per-request, scale-to-zero, free tier</td><td><b>L3 first choice for stateless planes</b> — bursty hub traffic fits scale-to-zero; containers ship unchanged.</td><td><span class="v later">L3</span></td></tr>
+      <tr><td class="tt">Fly.io</td><td>usage-based; small VMs ~$2–3/mo; 30+ regions</td><td>The alternative if edge latency ever becomes the <i>measured</i> breach; more Fly-specific ops.</td><td><span class="v later">watch</span></td></tr>
+      <tr><td class="tt">Render</td><td>per-user + per-service (~$7/mo starter; PG from ~$6)</td><td>Best Heroku-successor DX, but always-on pricing duplicates what our deploy does for free.</td><td><span class="v no">pass</span></td></tr>
+      <tr><td class="tt">AWS Lambda</td><td>GB-seconds + required API Gateway</td><td>Only option with a paid gateway tax; function packaging diverges from our containers.</td><td><span class="v no">pass</span></td></tr>
+      <tr><td class="tt">Kubernetes</td><td>managed (GKE Autopilot/EKS) only</td><td>Adopt at &gt;1 host + &gt;10 containers, never self-managed at this team size. Until then: <b>K8s-ready, not K8s-run</b>.</td><td><span class="v later">trigger-gated</span></td></tr>
+    </tbody>
+  </table>
+  <p><b>K8s/function readiness without adoption (S12):</b> 12-factor discipline everywhere (env-only config, stateless containers, stdout logs, declared volumes); <code>services.json</code> is the portable topology — compose is generated-from-manifest today, Helm/K8s manifests can be generated the same way later; HTTP handlers stay framework-thin so any plane repackages as a cloud function. Moving clouds is a relocation, not a rewrite.</p>
+
+  <h2><span class="n">02</span> Data layer</h2>
+  <p><b>Flexible schemas without lock-in:</b> relational spine + <b>JSONB</b> for the open part; every record carries <code>schema_version</code>; events/receipts are append-only; migrations forward-only. Platform state graduates JSON-file → Postgres via one storage module (<code>DATABASE_URL</code> flips it). Analytics: events JSONL → <b>DuckDB</b> locally ($0) → <b>BigQuery</b> only when &gt;1M events/mo or cross-product funnels demand a warehouse. The events-plane POST is the contract; warehouses are downstream sinks.</p>
+
+  <h2><span class="n">03</span> The business plane (S13)</h2>
+  <table>
+    <thead><tr><th>Plane</th><th>Port (ours)</th><th>Adapters, in adoption order</th></tr></thead>
+    <tbody>
+      <tr><td class="tt">Analytics</td><td><code>POST /api/events</code> (shipped)</td><td>core JSONL/summary (now) → <b>PostHog</b> (funnels/retention; self-hostable) → DuckDB/BigQuery</td></tr>
+      <tr><td class="tt">Transactional email</td><td><code>email.send(realm, template, to, props)</code></td><td><b>console adapter</b> (dev — renders to audit log, never silently sends) → <b>Resend</b> (free 3k/mo) → <b>Postmark</b> if deliverability critical ($15/mo, hard stream separation) → <b>SES</b> at scale ($0.10/1k)</td></tr>
+      <tr><td class="tt">Payments</td><td>billing plane fed by existing receipts</td><td><b>ledger-only adapter</b> (proves the meter before charging, runs forever in parallel) → <b>Stripe</b> usage-based → Paddle/Lemon Squeezy if merchant-of-record needed at international revenue</td></tr>
+    </tbody>
+  </table>
+  <p>The house thesis applied to our own billing: <b>receipts reconcile Stripe, not vice versa.</b> LLM spend is already attributable per key via invocation receipts — that's the metered-billing feed, shipped before any processor exists.</p>
+
+  <h2><span class="n">04</span> PMF instrumentation — one named event per stage</h2>
+  <div class="funnel">
+    <span class="f">discover<small>hub page view</small></span><span class="arr">→</span>
+    <span class="f">engage<small>demo run · browse</small></span><span class="arr">→</span>
+    <span class="f">signup<small>realm register</small></span><span class="arr">→</span>
+    <span class="f hot">activate<small>Baltor: first pack served · Teleon: first capability proven · hub: first pull/publish</small></span><span class="arr">→</span>
+    <span class="f">retain<small>7-day return</small></span><span class="arr">→</span>
+    <span class="f">revenue<small>key + billing</small></span>
+  </div>
+  <p>Activation is the PMF signal, reviewed weekly per realm. Promotion stays the architecture itself: the 21 hubs are the top-of-funnel content engine (every registry entry is an indexable page), each private→live flip is a launch event, and receipts/provenance are the differentiated story. The A/B engine (OHExp) already covers experiment assignment; exposures and conversions now have a real sink.</p>
+
+  <h2><span class="n">05</span> Anti-fragility rules now binding (S12)</h2>
+  <ul class="rules">
+    <li><b>Ports &amp; adapters everywhere.</b> Code outside an adapter file never names a vendor — <code>email.send()</code>, never <code>resend.send()</code>. Live adapter choice is config, not code.</li>
+    <li><b>No magic words or numbers.</b> Every meaningful literal has exactly one home: manifest (routes/budgets/ports), scope vocabulary, realm ids, plan config, named constants. Lint flags bare literals; "where is this defined?" always has a one-place answer.</li>
+    <li><b>Naming survives rebrands.</b> Only stable internal ids cross seams; renaming a brand touches <code>products.js</code> + docs, zero code.</li>
+    <li><b>Schema changes never break readers.</b> JSONB for the open part, <code>schema_version</code> on every record, append-only events, forward-only migrations.</li>
+    <li><b>Switch-back is a feature.</b> Every adoption in this doc has a recorded reversal path; an adapter that can't be swapped in a day is a defect.</li>
+  </ul>
+
+  <div class="foot">
+    <b>Self-evaluation.</b> Improved: the platform now has explicit answers for hosting economics, K8s/functions readiness, flexible data, and the entire business layer — all behind seams that keep every decision reversible, with PMF measurable per realm. Deliberately deferred: K8s (trigger-gated), BigQuery (volume-gated), Stripe (ledger first), PostHog (first-users-gated). Next adoption-queue items: magic-literal lint in <code>just lint</code> · ledger-only billing statement over LLM receipts · email port with console adapter.
+  </div>
+
+</div>
+</body>
+</html>

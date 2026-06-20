@@ -1,0 +1,72 @@
+id: "tool/embedding-execution-planner"
+type: tool
+version: "0.1.0"
+name: "Embedding execution planner"
+description: "Plans provider-neutral embedding batches from staged object_embedding rows, estimates token units and cost when profiles provide pricing, and emits planned completion records without calling embedding providers."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "embedding", "governance", "evaluation", "serving"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["embeddings", "pgvector", "batching", "cost-estimation", "audit", "vector-search"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+parameters:
+  type: object
+  properties:
+    object_embeddings_jsonl:
+      type: string
+    output_dir:
+      type: string
+    run_id:
+      type: string
+    default_profile:
+      type: string
+    model_profiles_json:
+      type: string
+    max_items_per_batch:
+      type: integer
+    max_tokens_per_batch:
+      type: integer
+  required: ["object_embeddings_jsonl"]
+returns:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    input_embedding_rows:
+      type: integer
+    planned_batch_count:
+      type: integer
+    planned_completion_rows:
+      type: integer
+    cost_by_profile:
+      type: object
+    files:
+      type: object
+    safety_notes:
+      type: array
+      items:
+        type: string
+side_effects: "write"
+examples:
+  - input:
+      object_embeddings_jsonl: "dist/source-surface-scan-partitions/seed/rows/object-embeddings.jsonl"
+      output_dir: "dist/source-surface-scan-partitions/seed/embedding-plan"
+      default_profile: "local-bge-small-en"
+    output:
+      ok: true
+      input_embedding_rows: 620
+      planned_completion_rows: 620
+implementations:
+  - kind: "callable"
+    path: "scripts.db.embedding_execution_plan.plan_embedding_execution"
+    language: "python"
+  - kind: "shell"
+    command: "python3 -m scripts.db.embedding_execution_plan"

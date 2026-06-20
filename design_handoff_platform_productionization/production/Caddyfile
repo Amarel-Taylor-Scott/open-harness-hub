@@ -1,0 +1,26 @@
+# Caddyfile — GENERATED from services.json by scripts/gen_caddy.py. Do not hand-edit.
+# Route truth lives in services.json; `just routes` regenerates; CI checks drift.
+:80 {
+	encode gzip
+	handle /api/identity/* {
+		reverse_proxy host.docker.internal:9410
+	}
+	handle /api/core/* {
+		uri strip_prefix /api/core
+		reverse_proxy core:8787
+	}
+	handle /api/events/* {
+		uri strip_prefix /api/events
+		rewrite * /v1/events{uri}
+		reverse_proxy core:8787
+	}
+	handle /llm/* {
+		uri strip_prefix /llm
+		rewrite * /llm{uri}
+		reverse_proxy core:8787
+	}
+	handle {
+		root * /srv/sites
+		file_server browse
+	}
+}

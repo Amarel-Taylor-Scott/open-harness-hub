@@ -1,0 +1,47 @@
+id: processor/llmlingua-compress
+type: processor
+version: 0.1.0
+name: LLMLingua compress
+description: 'LLMLingua prompt compression: a small model drops low-information tokens (up to ~20x); LongLLMLingua
+  mitigates ''lost in the middle''. MEASURE the breakeven — gains only when length/ratio/hardware match.'
+authors:
+- name: Open Harness Hub contributors
+license: MIT
+industry:
+- cross_industry
+capability:
+- summarization
+modality:
+- text
+- structured
+lifecycle: experimental
+trust_boundary: local
+tags:
+- context-layer
+- retrieval
+created: '2026-05-29'
+updated: '2026-05-29'
+attribution:
+  source_kind: manual
+  author: Open Harness Hub context-layer taxonomy
+  license: MIT
+process_kind: summarize.llmlingua
+deterministic: false
+idempotent: true
+streaming: false
+inputs:
+- name: context
+  type: object
+- name: ratio
+  type: object
+outputs:
+- name: compressed
+  type: object
+side_effects: none
+on_error: raise
+implementations:
+- kind: callable
+  path: scripts.processors.retrieval.llmlingua_compress.run
+  language: python
+links:
+  source: docs/strategy/context-layer-pmf.md

@@ -1,0 +1,281 @@
+id: "pipeline/worker-voice-ilo-indicator-extract"
+type: pipeline
+version: "0.1.0"
+name: "Worker-voice ILO 11-indicator extraction (grievance / interview transcripts)"
+description: |
+  DEFENSIVE worker-protection pipeline. Reads an *anonymized worker-voice
+  artifact* — a grievance-line transcript, exit-interview note, or social-
+  audit worker-interview summary — and extracts which of the ILO 11 forced-
+  labour indicators are *evidenced* in the worker's own words, returning a
+  per-indicator present / absent / insufficient-evidence verdict with the
+  quoted span and the ILO indicator definition for each.
+
+  Negative-space task: worker testimony is colloquial, multilingual, and
+  partial; the same lived experience maps to ILO indicators only through a
+  fixed definitional frame ("they keep my passport" -> retention of identity
+  documents; "I owe the agent and work it off" -> debt bondage). A bare model
+  over-reads — inferring "abuse of vulnerability" or "intimidation" from tone
+  alone — or under-reads, missing an indicator stated obliquely. The durable
+  lift is disciplined, cited mapping of testimony spans to the eleven
+  indicator definitions, with hard abstention where the text does not support
+  a mapping. Over-attribution in this domain is a safety harm: it can
+  mislabel a worker's account.
+
+  Bundle: Agentic / CRAG (taxonomy Bundle D) — a corrective retrieval gate
+  grades whether the retrieved ILO indicator definitions actually cover the
+  testimony before the model maps; if coverage is weak the query is
+  decomposed and re-retrieved, and the model is held to insufficient-evidence
+  rather than guessing. `pattern/refuse-on-redacted` enforces abstention on
+  redacted/missing spans. Output is a cited indicator map for a trained
+  caseworker / auditor, NOT a victim determination and NOT a referral by
+  itself.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["humanitarian.trafficking", "esg.modern_slavery", "supply_chain.audit", "legal.immigration"]
+capability: ["extraction", "classification", "retrieval", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "stable"
+tags: ["anti-trafficking", "forced-labor", "ilo-indicators", "worker-voice", "grievance", "corrective-rag"]
+created: "2026-05-29"
+updated: "2026-05-29"
+
+attribution:
+  source_url: "https://www.ilo.org/publications/hard-see-harder-count-survey-guidelines-estimate-forced-labour-adults-and"
+  source_kind: "other"
+  author: "ILO Hard to See, Harder to Count (2012) — 11 forced-labour indicators; ILO Indicators of Forced Labour booklet"
+  license: "public-resource"
+  notes: |
+    Maps anonymized worker testimony spans to the ILO 11 indicator
+    definitions with abstention. NOT a victim determination; produces a cited
+    indicator map for a trained caseworker / auditor.
+
+task: "Extract which of the ILO 11 forced-labour indicators are evidenced in an anonymized worker-voice transcript (present | absent | insufficient-evidence), citing the testimony span and the ILO indicator definition, abstaining where unsupported."
+pipeline_kind: "extract"
+
+inputs:
+  - name: "worker_voice_packet"
+    type: "string|object"
+    description: "{ transcript_text: string, artifact_type: string (grievance_line|exit_interview|audit_interview), site_country: string, sector: string, language: string, anonymized: boolean }"
+
+outputs:
+  - name: "indicator_map"
+    type: "object[]"
+    description: "Each of 11 indicators: {indicator_id, ilo_definition, verdict (present|absent|insufficient-evidence), testimony_span|null, confidence}"
+  - name: "present_indicator_count"
+    type: "integer"
+  - name: "caseworker_handoff"
+    type: "object"
+    description: "{recommend_specialist_review: bool, rationale}"
+  - name: "evidence_gaps"
+    type: "object[]"
+
+defaults:
+  persona: "persona/apparel-forced-labor-analyst"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs: ["knowledge-pack/csddd-and-forced-labor-indicators"]
+  rule_packs:
+    - "rule-pack/grep-human-trafficking-ugc-flags"
+    - "rule-pack/hybrid-retrieval-policy"
+
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.worker_voice_packet" }
+
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+
+  - id: "grep_indicator_cues"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-human-trafficking-ugc-flags"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+
+  - id: "decompose_indicators"
+    kind: "processor"
+    ref: "processor/sub-question-decomposer"
+    inputs:
+      question: "For each ILO forced-labour indicator, is there testimony in this transcript that evidences it?"
+      context: "$.steps.redact_pii.output.text"
+
+  - id: "retrieve_definitions"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.steps.decompose_indicators.output.sub_questions"
+      corpus: "knowledge-pack/csddd-and-forced-labor-indicators"
+      top_k: 12
+
+  - id: "grade_retrieval"
+    kind: "processor"
+    ref: "processor/document-grader"
+    inputs:
+      query: "$.steps.decompose_indicators.output.sub_questions"
+      passages: "$.steps.retrieve_definitions.output.passages"
+
+  - id: "rerank_definitions"
+    kind: "processor"
+    ref: "processor/cross-encoder-reranker"
+    inputs:
+      query: "$.steps.decompose_indicators.output.sub_questions"
+      passages: "$.steps.retrieve_definitions.output.passages"
+      top_k: 8
+
+  - id: "extract_spans"
+    kind: "processor"
+    ref: "processor/faithful-extract-before-model"
+    inputs:
+      text: "$.steps.redact_pii.output.text"
+      fields: ["control_statements", "fee_or_debt_statements", "document_statements", "movement_statements", "pay_statements", "threat_statements"]
+
+  - id: "map_indicators"
+    kind: "harness"
+    ref: "harness/apparel-forced-labor-trace-review"
+    inputs:
+      packet: "$.steps.extract_spans.output.result"
+      context: "$.steps.rerank_definitions.output.passages"
+      evidence: "$.steps.grep_indicator_cues.output.fired"
+
+  - id: "iterate_if_weak"
+    kind: "loop"
+    ref: "pattern/corrective-rag"
+    when: "$.steps.grade_retrieval.output.result.coverage_weak == true"
+    inputs:
+      query: "$.steps.decompose_indicators.output.sub_questions"
+      corpus: "knowledge-pack/csddd-and-forced-labor-indicators"
+      max_iterations: 3
+
+  - id: "calibrate_severity"
+    kind: "processor"
+    ref: "processor/severity-calibrator"
+    inputs: { trace: "$.steps.map_indicators.output", config: {} }
+
+  - id: "extract_evidence_gaps"
+    kind: "processor"
+    ref: "processor/evidence-gap-extractor"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+
+  - id: "check_citations"
+    kind: "processor"
+    ref: "processor/citation-span-checker"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.calibrate_severity.output.result"
+      rubric_ref: "rubric/apparel-forced-labor-trace-quality-v1"
+
+  - id: "redaction_audit"
+    kind: "processor"
+    ref: "processor/packet-redaction-audit"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+
+  - id: "caseworker_handoff"
+    kind: "processor"
+    ref: "processor/escalate-human-review"
+    inputs:
+      trace: "$.steps.calibrate_severity.output.result"
+      reason: "present indicators evidenced in worker testimony; route to a trained specialist caseworker for next steps"
+
+  - id: "summary"
+    kind: "processor"
+    ref: "processor/review-summary-composer"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "worker-voice-ilo-indicator-extract"
+      applied_layers: ["privacy", "grep", "rag", "harness", "heuristic"]
+
+success_criteria:
+  - rubric: "rubric/apparel-forced-labor-trace-quality-v1"
+    threshold: 0.72
+  - kind: "deterministic"
+    target: "$.steps.check_citations.output.result.pass"
+    op: "=="
+    value: true
+    severity: "critical"
+    label: "every present-indicator verdict cites a testimony span (no over-attribution)"
+  - kind: "deterministic"
+    target: "$.steps.redaction_audit.output.result.pass"
+    op: "=="
+    value: true
+    severity: "critical"
+    label: "worker testimony fully redacted before any handoff"
+
+related_patterns:
+  - "pattern/corrective-rag"
+  - "pattern/refuse-on-redacted"
+  - "pattern/two-stage-retrieve-rerank"
+
+examples:
+  - name: "Exit-interview note evidencing three ILO indicators"
+    input:
+      worker_voice_packet:
+        transcript_text: >
+          Worker states: the agent took my passport when I arrived and still
+          has it. I borrowed the recruitment fee from him and I am working to
+          pay it back, so I cannot leave until it is cleared. We are paid, but
+          they keep two months of wages "as security". The food and dormitory
+          are okay. I can use my phone in the evenings.
+        artifact_type: "exit_interview"
+        site_country: "Malaysia"
+        sector: "electronics"
+        language: "en"
+        anonymized: true
+    expected_output:
+      present_indicator_count: 3
+      indicator_map:
+        - indicator_id: "ilo.indicator.retention_of_identity_documents"
+          ilo_definition: "ILO Indicator: Retention of identity documents by employer/agent."
+          verdict: "present"
+          testimony_span: "the agent took my passport when I arrived and still has it"
+          confidence: 0.92
+        - indicator_id: "ilo.indicator.debt_bondage"
+          ilo_definition: "ILO Indicator: Debt bondage — working to pay off a recruitment-related debt."
+          verdict: "present"
+          testimony_span: "I borrowed the recruitment fee from him and I am working to pay it back"
+          confidence: 0.9
+        - indicator_id: "ilo.indicator.withholding_of_wages"
+          ilo_definition: "ILO Indicator: Withholding of wages — pay retained to bind the worker."
+          verdict: "present"
+          testimony_span: "they keep two months of wages 'as security'"
+          confidence: 0.85
+        - indicator_id: "ilo.indicator.restriction_of_movement"
+          ilo_definition: "ILO Indicator: Restriction of movement."
+          verdict: "insufficient-evidence"
+          testimony_span: "I cannot leave until it is cleared"
+          confidence: 0.4
+        - indicator_id: "ilo.indicator.isolation"
+          ilo_definition: "ILO Indicator: Isolation from the outside world."
+          verdict: "absent"
+          testimony_span: null
+          confidence: 0.9
+        - indicator_id: "ilo.indicator.physical_sexual_violence"
+          ilo_definition: "ILO Indicator: Physical and sexual violence."
+          verdict: "absent"
+          testimony_span: null
+          confidence: 0.95
+      caseworker_handoff:
+        recommend_specialist_review: true
+        rationale: "Three indicators (document retention, debt bondage, wage withholding) evidenced in the worker's own words; warrants specialist caseworker review."
+      evidence_gaps:
+        - field: "freedom_to_resign"
+          note: "'cannot leave until it is cleared' is debt-linked but does not by itself establish restriction-of-movement; marked insufficient-evidence rather than present to avoid over-attribution."
+      notes: >
+        The "cannot leave" statement is mapped to debt bondage (evidenced) but
+        held to insufficient-evidence for restriction-of-movement, because the
+        corrective grader found the testimony ambiguous on physical movement.
+        Phone access and adequate food correctly drive isolation/violence to
+        absent. Every present verdict cites a quoted span; the pipeline
+        produces a cited map for a caseworker, not a determination.

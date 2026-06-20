@@ -1,0 +1,38 @@
+id: "knowledge-pack/daily-promotion-readiness-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Daily promotion readiness patterns"
+description: "Checks for separating candidate-table load readiness from active component promotion readiness after large daily production runs."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "evaluation", "retrieval", "planning"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "promotion", "daily-factory", "review-gate", "embedding-execution", "postgres"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+content_types:
+  - "daily_promotion_readiness_check"
+files:
+  - path: "catalog/knowledge-packs/data/daily-promotion-readiness-patterns/checks.jsonl"
+    format: "jsonl"
+    schema: "daily_promotion_readiness_check"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["id", "description", "required_outputs", "failure_route"]
+provenance:
+  sources:
+    - "Open Harness Hub daily production runner"
+    - "Open Harness Hub promotion planners"
+    - "Open Harness Hub component-store load plan"
+  collected_through: "2026-05-26"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "synthetic operational checks only"

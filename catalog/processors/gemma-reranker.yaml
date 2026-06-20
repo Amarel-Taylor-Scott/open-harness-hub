@@ -1,0 +1,92 @@
+id: "processor/gemma-reranker"
+type: processor
+version: "0.1.0"
+name: "Gemma 4 post-RAG reranker (stage 2 of pipeline recommendation)"
+description: |
+  Lightweight LLM-based reranker that takes a small candidate set
+  (typically top 20-30 from `processor/catalog-search`) plus a user
+  prompt, and re-orders the candidates by relevance using a small
+  local model. Default: Gemma 4 via Ollama; any chat-capable adapter
+  works (set OH_RERANK_MODEL or pass model id explicitly).
+
+  The reranker emits a STRUCTURED RANKING with per-candidate score +
+  one-sentence rationale, plus an overall recommendation paragraph.
+  Structure lets downstream code use the ranking programmatically and
+  lets a human read the rationale.
+
+  Falls back gracefully to DETERMINISTIC SIMULATION when no model is
+  reachable (Ollama down, env not set), preserving the initial BM25
+  order and tagging results with `simulated: true`. This means the
+  pipeline shape exercises without LLM cost during CI / offline runs.
+
+  Stage 2 of the recommend-from-prompt flow:
+   - stage 1: `processor/catalog-search` (BM25 + Jaccard)
+   - stage 2: `processor/gemma-reranker` (this)
+   - stage 3: `processor/pipeline-recommender` (composition sketch)
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["software", "ai", "cross_industry"]
+capability: ["reranking", "evaluation", "reasoning"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+tags: ["meta", "recommender", "rerank", "gemma", "post-rag", "stage-2"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+process_kind: "rerank.cross_encoder"
+deterministic: false
+idempotent: true
+streaming: false
+latency_budget_ms: 30000
+
+inputs:
+  - name: "prompt"
+    type: "string"
+  - name: "candidates"
+    type: "object[]"
+  - name: "top_k"
+    type: "integer"
+  - name: "model"
+    type: "string"
+  - name: "simulate"
+    type: "boolean"
+outputs:
+  - name: "ranked_candidates"
+    type: "object[]"
+  - name: "recommendation"
+    type: "string"
+  - name: "model"
+    type: "string"
+  - name: "simulated"
+    type: "boolean"
+
+side_effects: "external_call"
+on_error: "fallback"
+retry:
+  max_attempts: 1
+  backoff: "none"
+
+model_targets:
+  - id: "local_gemma"
+    label: "Local Gemma 4 via Ollama (default)"
+    transport: "ollama"
+    role: "Default local reranker; reproducible without API keys."
+    capabilities: [text_generation, chat]
+    required: false
+    default: true
+    trust_boundary: "local"
+  - id: "anthropic_reranker"
+    label: "Anthropic Claude (frontier reranker)"
+    transport: "anthropic"
+    role: "Optional frontier reranker for high-stakes recommendation runs."
+    capabilities: [text_generation, chat]
+    required: false
+    default: false
+    trust_boundary: "external"
+
+implementations:
+  - kind: "callable"
+    path: "scripts.processors.gemma_reranker.run"
+    language: "python"

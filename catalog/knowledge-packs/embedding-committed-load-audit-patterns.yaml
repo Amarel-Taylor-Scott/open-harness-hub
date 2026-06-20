@@ -1,0 +1,38 @@
+id: "knowledge-pack/embedding-committed-load-audit-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Embedding committed load audit patterns"
+description: "Checks for gating vector search readiness on planned, stored, load-planned, and committed Postgres embedding counts."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["embedding", "retrieval", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["embeddings", "vector-search", "pgvector", "postgres", "daily-factory", "readiness-audit"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+content_types:
+  - "embedding_committed_load_audit_check"
+files:
+  - path: "catalog/knowledge-packs/data/embedding-committed-load-audit-patterns/checks.jsonl"
+    format: "jsonl"
+    schema: "embedding_committed_load_audit_check"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["id", "description", "required_outputs", "failure_route"]
+provenance:
+  sources:
+    - "Open Harness Hub embedding committed load audit"
+    - "Open Harness Hub pgvector embedding load plan"
+    - "Open Harness Hub object count report"
+  collected_through: "2026-05-26"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "synthetic operational checks only"

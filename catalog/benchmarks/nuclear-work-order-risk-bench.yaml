@@ -1,0 +1,35 @@
+id: "benchmark/nuclear-work-order-risk-bench"
+type: benchmark
+version: "0.1.0"
+name: "Nuclear Work Order Risk benchmark"
+description: "Synthetic benchmark for nuclear work order risk review quality, evidence grounding, citation checks, and redaction safety."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["nuclear.power", "energy.grid"]
+capability: ["evaluation", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["nuclear-work-order-risk", "expansion-v6"]
+created: "2026-05-24"
+updated: "2026-05-24"
+pipeline: "pipeline/nuclear-work-order-risk-review"
+dataset: "dataset/nuclear-work-order-risk-samples"
+rubric: "rubric/nuclear-work-order-risk-quality-v1"
+judge: "local_model"
+model_arms:
+  - label: "ollama-default"
+    adapter_ref: "adapter/ollama-default"
+    harness_override: "harness/nuclear-work-order-risk-review"
+    rule_pack_override: ["rule-pack/grep-nuclear-work-order-risk-flags", "rule-pack/rag-nuclear-work-order-risk-retrieval-policy"]
+headline_metric: "rubric_weighted_sum_with_redaction_and_citation_gates"
+reproducibility:
+  commit_sha: "worktree-generated-2026-05-24"
+  dataset_version: "0.1.0"
+  run_date: "2026-05-24"
+  hardware: "local-dev"
+  seed: 29
+report:
+  output: "dist/benchmarks/nuclear-work-order-risk/report.json"
+  summary: "Synthetic benchmark manifest; no real benchmark run results are claimed."

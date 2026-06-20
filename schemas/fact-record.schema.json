@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/schemas/fact-record.schema.json",
+  "title": "Fact record",
+  "description": "Operational record for a candidate, verified, served, superseded, or rejected fact with evidence lineage.",
+  "type": "object",
+  "required": ["fact_id", "claim", "state", "created_at"],
+  "properties": {
+    "fact_id": { "type": "string" },
+    "claim": { "type": "string" },
+    "subject": { "type": "string" },
+    "predicate": { "type": "string" },
+    "object": {},
+    "scope": { "type": "string" },
+    "jurisdiction": { "type": "string" },
+    "effective_date": { "type": "string" },
+    "expires_at": { "type": "string" },
+    "state": { "$ref": "_common.schema.json#/$defs/factState" },
+    "state_history": {
+      "type": "array",
+      "items": { "$ref": "_common.schema.json#/$defs/stateEvent" }
+    },
+    "original_customer_fact_id": { "type": "string" },
+    "supersedes_fact_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "superseded_by_fact_id": { "type": "string" },
+    "supporting_source_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "independent_source_count": { "type": "integer", "minimum": 0 },
+    "authoritative_source_count": { "type": "integer", "minimum": 0 },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source_record_id", "source_role"],
+        "properties": {
+          "source_record_id": { "type": "string" },
+          "source_role": { "$ref": "_common.schema.json#/$defs/sourceRole" },
+          "retrieved_at": { "type": "string", "format": "date-time" },
+          "content_hash": { "type": "string" },
+          "archive_status": { "$ref": "_common.schema.json#/$defs/archiveStatus" },
+          "trust_score": { "type": "number", "minimum": 0, "maximum": 1 },
+          "evidence_span": { "type": "string" },
+          "supports_claim": { "type": "boolean" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "adoption": {
+      "type": "object",
+      "properties": {
+        "decision": {
+          "type": "string",
+          "enum": ["promote", "hold", "needs_more_sources", "needs_reconciliation", "reject"]
+        },
+        "reason": { "type": "string" },
+        "decided_at": { "type": "string", "format": "date-time" },
+        "decided_by": { "type": "string" },
+        "serving_mode": {
+          "type": "string",
+          "enum": ["current_only", "current_with_sources", "full_provenance", "held_out"]
+        }
+      },
+      "additionalProperties": true
+    },
+    "priority": { "$ref": "_common.schema.json#/$defs/queuePriority" },
+    "priority_signals": { "$ref": "_common.schema.json#/$defs/prioritySignals" },
+    "queue_policy": { "$ref": "_common.schema.json#/$defs/queuePolicy" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "last_verified_at": { "type": "string", "format": "date-time" },
+    "next_refresh_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": true
+}

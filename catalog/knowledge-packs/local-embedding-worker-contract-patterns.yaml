@@ -1,0 +1,38 @@
+id: "knowledge-pack/local-embedding-worker-contract-patterns"
+type: knowledge-pack
+version: "0.1.0"
+name: "Local embedding worker contract patterns"
+description: "Checks for proving a local embedding worker can emit vector metadata rows that match planned completion stubs before production vector execution is enabled."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "CC-BY-4.0"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["embedding", "retrieval", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["embeddings", "vector-search", "pgvector", "daily-factory", "worker-contract", "readiness"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+content_types:
+  - "local_embedding_worker_contract_check"
+files:
+  - path: "catalog/knowledge-packs/data/local-embedding-worker-contract-patterns/checks.jsonl"
+    format: "jsonl"
+    schema: "local_embedding_worker_contract_check"
+indexing:
+  bm25: true
+  dense:
+    model: "bge-small-en"
+    fields: ["id", "description", "required_outputs", "failure_route"]
+provenance:
+  sources:
+    - "Open Harness Hub local embedding worker contract"
+    - "Open Harness Hub vector readiness audit"
+    - "Open Harness Hub daily embedding execution planner"
+  collected_through: "2026-05-26"
+  collected_by: "Open Harness Hub contributors"
+  anonymization: "synthetic operational checks only"

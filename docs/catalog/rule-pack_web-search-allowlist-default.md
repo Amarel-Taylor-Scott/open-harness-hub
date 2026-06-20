@@ -31,6 +31,6 @@ composed into any pipeline that does outbound web search.
 | `allow_major_news` | low | allowlist.news | `reuters.com OR apnews.com OR bbc.com OR bbc.co.uk OR ft.com OR economist.com ...` |
 | `block_known_misinformation_pattern` | high | blocklist.misinformation | `<misinfo-domains-placeholder>` |
 | `sanitize_pii_in_query` | critical | policy.privacy | `ANY pii_regex matches` |
-| `freshness_window_default` | — | policy.freshness | `30d` |
+| `freshness_window_default` | - | policy.freshness | `30d` |
 | `min_corroboration` | high | policy.corroboration | `3` |
 

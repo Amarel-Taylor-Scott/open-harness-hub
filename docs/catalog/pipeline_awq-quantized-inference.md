@@ -37,7 +37,7 @@ logprobs. Drop-in alternative to bitsandbytes nf4.
 
 | # | id | kind | ref | when |
 |---|---|---|---|---|
-| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | — |
-| 2 | `infer` | processor | `processor/vllm-batched-sampling` | — |
-| 3 | `audit` | processor | `processor/audit-trace-emitter` | — |
+| 1 | `guard` | rule_pack | `rule-pack/grep-prompt-injection-heuristics` | - |
+| 2 | `infer` | processor | `processor/vllm-batched-sampling` | - |
+| 3 | `audit` | processor | `processor/audit-trace-emitter` | - |
 

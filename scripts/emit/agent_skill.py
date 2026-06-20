@@ -106,7 +106,7 @@ def render_harness_skill(manifest: dict) -> str:
 
     body_lines.append("## Provenance")
     body_lines.append("")
-    body_lines.append(f"- Hub artifact: `{manifest['id']}` v{manifest.get('version','?')}")
+    body_lines.append(f"- Hub component: `{manifest['id']}` v{manifest.get('version','?')}")
     body_lines.append(f"- License: `{manifest.get('license','?')}`")
     body_lines.append(f"- Lifecycle: `{manifest.get('lifecycle','experimental')}`")
     if manifest.get("links"):
@@ -188,7 +188,7 @@ def render_pipeline_skill(manifest: dict) -> str:
 
     body_lines.append("## Provenance")
     body_lines.append("")
-    body_lines.append(f"- Hub artifact: `{manifest['id']}` v{manifest.get('version','?')}")
+    body_lines.append(f"- Hub component: `{manifest['id']}` v{manifest.get('version','?')}")
     body_lines.append(f"- License: `{manifest.get('license','?')}`")
     body_lines.append(f"- Industry: {', '.join(manifest.get('industry', []) or []) or 'cross_industry'}")
     body_lines.append("- Full source manifest: see `references/manifest.yaml`")
@@ -253,7 +253,7 @@ def main() -> int:
 
     catalog = load_catalog()
 
-    written: list[tuple[str, str, str]] = []  # (kind, slug, artifact_id)
+    written: list[tuple[str, str, str]] = []  # (kind, slug, component_id)
 
     for path, m in by_type(catalog, "harness"):
         slug = slug_only(m["id"])
@@ -269,8 +269,8 @@ def main() -> int:
 
     # INDEX.md
     index_lines = ["# Agent Skills bundle", "", MARKETPLACE_README.strip(), "", "## Skills in this bundle", ""]
-    for kind, slug, artifact_id in written:
-        index_lines.append(f"- `{slug}/SKILL.md` — {kind} (`{artifact_id}`)")
+    for kind, slug, component_id in written:
+        index_lines.append(f"- `{slug}/SKILL.md` — {kind} (`{component_id}`)")
     (out_root / "INDEX.md").write_text("\n".join(index_lines) + "\n")
 
     # Claude-Code-specific plugin marketplace manifest.
@@ -291,8 +291,8 @@ def main() -> int:
     (cp_dir / "marketplace.json").write_text(json.dumps(marketplace, indent=2) + "\n")
 
     print(f"wrote {len(written)} Agent Skills to dist/agent-skills/")
-    for kind, slug, artifact_id in written:
-        print(f"  {kind:8s}  {slug:40s}  ({artifact_id})")
+    for kind, slug, component_id in written:
+        print(f"  {kind:8s}  {slug:40s}  ({component_id})")
     print(f"\nINDEX.md and .claude-plugin/marketplace.json also written.")
     return 0
 

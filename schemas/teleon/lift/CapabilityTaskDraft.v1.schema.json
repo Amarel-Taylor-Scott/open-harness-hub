@@ -1,0 +1,14 @@
+{
+  "$id": "teleon/lift/CapabilityTaskDraft.v1", "title": "CapabilityTaskDraft.v1", "type": "object", "additionalProperties": false,
+  "description": "The operational capability derived from a PurposeTaskDraft: the abstract runtime classes the task may bind to (from the capability_runtime_classes vocabulary) and candidate runtime moves (e.g. cloud-function → kubernetes-job when timeout-prone). A DRAFT — requires_human_review is always true.",
+  "required": ["schema_version", "name", "source_workload_id", "capability_summary", "allowed_runtime_classes", "candidate_runtime_changes", "requires_human_review"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["CapabilityTaskDraft.v1"]},
+    "name": {"type": "string"},
+    "source_workload_id": {"type": "string"},
+    "capability_summary": {"type": "string"},
+    "allowed_runtime_classes": {"type": "array", "items": {"type": "string"}},
+    "candidate_runtime_changes": {"type": "array", "items": {"type": "object"}},
+    "requires_human_review": {"type": "boolean", "const": true}
+  }
+}

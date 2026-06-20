@@ -16,7 +16,7 @@ The rubric is load-bearing on five things:
 4. Severity 1 to 4 aligned with the documented severity-to-action map.
 5. Ambiguous and policy-silent cases escalate to human review.
 
-## Artifacts
+## Components
 
 - Persona: `persona/trust-and-safety-reviewer`
 - Knowledge pack: `knowledge-pack/platform-content-policy-frameworks` (DSA + UK OSA + COPPA + NCMEC + GIFCT + NetzDG)
