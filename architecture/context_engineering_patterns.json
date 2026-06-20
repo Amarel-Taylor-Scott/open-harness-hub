@@ -1,0 +1,58 @@
+{
+  "schema_version": "context-engineering-patterns.v1",
+  "intake_date": "2026-06-20",
+  "source": {
+    "repo": "langchain-ai/deep-agents-from-scratch",
+    "license": "MIT",
+    "kind": "educational",
+    "productized_as": "deepagents (pip package)",
+    "built_on": "langgraph",
+    "intake_mode": "learn-from-patterns",
+    "runtime_classification": "foil"
+  },
+  "principle": "The patterns this course teaches all reduce tokens and maintain focus — i.e. they ARE the 'unbounded & inefficient -> most-bounded & most-efficient' descent we already formalize. We LEARN the patterns; we never vendor or execute the LangGraph/deepagents orchestration runtime (that is the foil, not our runtime); every pattern output is a CANDIDATE the verification rail dispositions, never truth-by-assertion.",
+  "wedge": "deep-agents teaches how to MANAGE context (where it lives, how little to carry). Baltor/Teleon governs whether that context is TRUE, CURRENT, and PROVABLE. The offloaded file, the sub-agent's output, and the summary are candidates, not facts — same framing as the context-layer-openness thesis: they manage where context lives; we govern whether it's true.",
+  "patterns": [
+    {
+      "id": "todo_plan_tracking",
+      "name": "TODO / plan tracking",
+      "does": "an explicit pending/in_progress/completed plan keeps a long-running agent focused and bounded",
+      "maps_to": "worker bucket: orchestration; descent: bound the task scope",
+      "candidate": true,
+      "serves_truth": false,
+      "governed_note": "a plan is a candidate control structure, not a source of truth; it never promotes a fact"
+    },
+    {
+      "id": "context_offload_vfs",
+      "name": "virtual-filesystem context offloading",
+      "does": "persist information outside the prompt window (to files) so the live context stays small",
+      "maps_to": "descent axis: token_reduction",
+      "candidate": true,
+      "serves_truth": false,
+      "governed_note": "offloaded content is a candidate; its provenance + verification status ride in the sidecar, not inline"
+    },
+    {
+      "id": "subagent_delegation",
+      "name": "sub-agent delegation with focused tool sets",
+      "does": "isolate context per sub-agent so specialized work does not interfere with the main thread",
+      "maps_to": "worker bucket: bounded-agent provisioning behind a port (sandboxed)",
+      "candidate": true,
+      "serves_truth": false,
+      "governed_note": "a sub-agent is a candidate bounded agent; sandboxed; its output is dispositioned, never served as truth"
+    },
+    {
+      "id": "summarization_compression",
+      "name": "summarization / ReAct history compression",
+      "does": "compress conversation/history to stay within a token budget while keeping the thread coherent",
+      "maps_to": "descent axis: compression",
+      "candidate": true,
+      "serves_truth": false,
+      "governed_note": "LOSSLESS DISTILLATION applies: a summary may shrink the surface only if answer-critical facts + source handles + held-out warnings survive; raw + lineage preserved"
+    }
+  ],
+  "non_goals": [
+    "do NOT vendor or pip-install deepagents/langgraph as a runtime",
+    "do NOT let any pattern output serve truth without passing the verification rail",
+    "do NOT treat a sub-agent or summary as a promotion authority"
+  ]
+}

@@ -240,6 +240,10 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_cascade_measurement.py", "check_cascade_measurement"),
     # ── SCHEMA TEMPLATES (extraction is USER-DEFINED; templates are OPTIONAL): any field the user writes runs the real cascade; code/DB showcase templates are a chooser that prefills an editable schema box (employment_agency single-sourced from the cascade, no duplicated field list); one parser grammar; chosen templates round-trip render→parse; never serves truth ──
     ("scripts/check_schema_templates.py", "check_schema_templates"),
+    # ── FLYWHEEL PARALLELISM (throughput): the flywheel runs proof self-tests concurrently (FLYWHEEL_WORKERS, default=cores capped 16; ~5x faster ticks) and the shared portfolio-site build writes ATOMICALLY (temp + os.replace), so concurrent builders never expose a half-written file; regression-guards the race the speedup surfaced (14 check_portfolio_* siblings rebuild the same dist files); never serves truth ──
+    ("scripts/check_flywheel_parallelism.py", "check_flywheel_parallelism"),
+    # ── CONTEXT-ENGINEERING PATTERNS (governed intake of LangChain's MIT deep-agents course): plan/offload/delegate/summarize captured as CANDIDATE techniques mapped to our descent axes + worker buckets — learn-from (runtime is the foil, never vendored/executed), every output candidate≠truth, summarization bound by the lossless law; wedge = we VERIFY the managed context, not just manage it; never serves truth ──
+    ("scripts/check_context_engineering_patterns.py", "check_context_engineering_patterns"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),
