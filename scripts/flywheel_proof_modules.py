@@ -228,6 +228,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_capability_pr_workflow.py", "check_capability_pr_workflow"),
     # ── FRAMEWORK INTEGRATION (both directions): EXPORT a governed capability as a native tool for MCP/OpenAI/Anthropic/LangGraph/CrewAI/AutoGen (carrying its receipt + serves_truth=false); WRAP a framework agent as a governed CANDIDATE behind a port (sandboxed, never truth); Teleon imports no framework (emits/consumes specs); never serves truth ──
     ("scripts/check_framework_integration.py", "check_framework_integration"),
+    # ── MODALITY CAPABILITY CATALOG: AI-startup capabilities across document/image/text/video/audio/multimodal reverse-engineered into input→output pipelines that all share a DETERMINISTIC spine wrapping an irreducible MODEL CORE; each a tunable cascade (run the spine cheap, escalate to cheapest-capable model core); fully deterministic only where there is no model core; discovery≠trust, never serves truth ──
+    ("scripts/check_modality_capability_catalog.py", "check_modality_capability_catalog"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),
