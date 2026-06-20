@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -22,12 +23,30 @@ _EXTERNAL_MARKERS = ('src="http', "src='http", 'href="http', "href='http", "cdn.
                      "analytics", "gtag(")
 
 
+def _atomic_write_text(path: Path, text: str, encoding: str = "utf-8") -> None:
+    """Write atomically (unique temp file + os.replace) so a CONCURRENT reader sees either the old or the complete
+    new file, never a half-written one. The flywheel runs many proof self-tests in parallel and several of them
+    rebuild these same site files; the build is deterministic, so any complete version is correct. ``mkstemp`` gives
+    a guaranteed-unique temp per call, so this is safe under concurrent THREADS and PROCESSES alike."""
+    fd, tmp = tempfile.mkstemp(dir=str(path.parent), prefix=f".{path.name}.", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding=encoding) as f:
+            f.write(text)
+        os.replace(tmp, path)
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
+
+
 def _ensure_website_source(site_id: str, s: dict) -> None:
     d = _WEB / site_id
     d.mkdir(parents=True, exist_ok=True)
     md = d / "content.md"
     if not md.exists():  # reuse if present; only generate when absent
-        md.write_text(
+        _atomic_write_text(md,
             f"# {s['title']}\n\n> {s['one_liner']}\n\n**Kind:** {s['kind']}\n\n**Audience:** {s['audience']}\n\n"
             f"## What it is\n" + "".join(f"- {x}\n" for x in s["what_it_is"]) +
             f"\n## What it is not\n" + "".join(f"- {x}\n" for x in s["what_it_is_not"]) +
@@ -45,7 +64,7 @@ def build_all() -> dict:
         out = P.dist_path(site_id)
         out.parent.mkdir(parents=True, exist_ok=True)
         htmltext = P.render_site(site_id)
-        out.write_text(htmltext, encoding="utf-8")
+        _atomic_write_text(out, htmltext, encoding="utf-8")
         ext = sum(htmltext.count(m) for m in _EXTERNAL_MARKERS)
         results["external_script_refs"] += ext
         results["sites"][site_id] = {"path": str(out.relative_to(P.REPO)), "bytes": len(htmltext),
@@ -53,7 +72,7 @@ def build_all() -> dict:
     for legacy_id, target_id in P.LEGACY_SITE_REDIRECTS.items():
         out = P.dist_path(legacy_id)
         out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(f"""<!doctype html>
+        _atomic_write_text(out, f"""<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -69,9 +88,9 @@ def build_all() -> dict:
     hub_html = P.render_hub()
     hub = P.DIST / "portfolio" / "index.html"
     hub.parent.mkdir(parents=True, exist_ok=True)
-    hub.write_text(hub_html, encoding="utf-8")
+    _atomic_write_text(hub, hub_html, encoding="utf-8")
     root_hub = P.DIST / "index.html"
-    root_hub.write_text(hub_html, encoding="utf-8")
+    _atomic_write_text(root_hub, hub_html, encoding="utf-8")
     results["hub"] = {"path": str(hub.relative_to(P.REPO)), "root_path": str(root_hub.relative_to(P.REPO))}
     # standards-interoperability page, generated from architecture/standards_interop_manifest.json (its own
     # source of truth). Kept out of the per-site renderer; never block the site build on it.
@@ -80,7 +99,7 @@ def build_all() -> dict:
         results["interop_pages"] = _write_interop()
     except Exception as e:  # pragma: no cover
         results["interop_pages_error"] = str(e)
-    _BUILD_MANIFEST.write_text(json.dumps(results, indent=2), encoding="utf-8")
+    _atomic_write_text(_BUILD_MANIFEST, json.dumps(results, indent=2), encoding="utf-8")
     return results
 
 

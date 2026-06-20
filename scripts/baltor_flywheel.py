@@ -32,6 +32,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import concurrent.futures
 import subprocess
 import sys
 import time
@@ -72,6 +73,26 @@ def _run(module_args: list[str], timeout: int) -> tuple[bool, str]:
         return False, f"ERROR {type(e).__name__}: {e}"
 
 
+def _proof_workers() -> int:
+    """How many proof subprocesses to run concurrently. Default = the core count (capped at 16); override with
+    FLYWHEEL_WORKERS. Parallelism is safe here: each proof runs in an isolated subprocess and the tick only
+    aggregates pass/fail counts (order-independent; the module is explicitly not required to be deterministic)."""
+    raw = os.environ.get("FLYWHEEL_WORKERS", "").strip()
+    if raw:
+        try:
+            return max(1, int(raw))
+        except ValueError:
+            pass
+    return max(1, min(16, os.cpu_count() or 4))
+
+
+def _run_proof(item: tuple) -> tuple:
+    """Run one proof's --self-test; return (label, record). Never raises (``_run`` swallows everything)."""
+    path, label = item
+    ok, last = _run([path, "--self-test"], _SELFTEST_TIMEOUT_S)
+    return label, {"ok": ok, "detail": last}
+
+
 def _live_freshness() -> dict:
     """CDC-watch the live sources via STABLE payload content hashes (not stdout — which carries a
     per-fetch timestamp). Imports the connectors; read-only public fetches; never raises."""
@@ -89,9 +110,17 @@ def _live_freshness() -> dict:
 def tick(*, live: bool, prev: dict | None) -> dict:
     """Run one flywheel tick: all proof self-tests (+ optional live CDC). Returns a health record."""
     results = {}
-    for path, label in PROOF_MODULES:
-        ok, last = _run([path, "--self-test"], _SELFTEST_TIMEOUT_S)
-        results[label] = {"ok": ok, "detail": last}
+    workers = _proof_workers()
+    if workers <= 1:
+        for item in PROOF_MODULES:
+            label, rec = _run_proof(item)
+            results[label] = rec
+    else:
+        # threads, not processes: each _run_proof blocks on its own subprocess, so the GIL is released
+        # during the wait and the subprocesses run truly in parallel — ~Nx faster wall-clock per tick.
+        with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as ex:
+            for label, rec in ex.map(_run_proof, PROOF_MODULES):
+                results[label] = rec
     all_green = all(r["ok"] for r in results.values())
 
     live_rec: dict = {}
