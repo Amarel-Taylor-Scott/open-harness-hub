@@ -246,6 +246,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_flywheel_parallelism.py", "check_flywheel_parallelism"),
     # ── CONTEXT-ENGINEERING PATTERNS (governed intake of LangChain's MIT deep-agents course): plan/offload/delegate/summarize captured as CANDIDATE techniques mapped to our descent axes + worker buckets — learn-from (runtime is the foil, never vendored/executed), every output candidate≠truth, summarization bound by the lossless law; wedge = we VERIFY the managed context, not just manage it; never serves truth ──
     ("scripts/check_context_engineering_patterns.py", "check_context_engineering_patterns"),
+    # ── PARALLEL DEV FLEET (faster cycles, no same-file edits): Claude Code + Ollama agents run in parallel, each in its OWN git worktree (physical isolation) owning a DISJOINT file set; the proof registry + count token are SERIALIZED (owned by no lane, merged one at a time); heterogeneous brains by the unbounded->bounded policy (ollama for narrow/deterministic lanes, claude for design); pure dry-run plan, never serves truth ──
+    ("scripts/check_parallel_dev_lanes.py", "check_parallel_dev_lanes"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),
