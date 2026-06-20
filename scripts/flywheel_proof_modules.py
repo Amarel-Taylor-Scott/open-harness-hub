@@ -184,6 +184,14 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_standards_interop_manifest.py", "check_standards_interop_manifest"),
     # ── OKF + FRESHNESS LIVE E2E (capstone, fully local): ingest OKF → bind the fragile fact to the local source emulator → serve fresh → source changes → stale held out → re-sync → export OKF provably current with the change in log.md; round-trip stays lossless; "OKF carries context, Baltor governs whether it's true+current"; never serves truth ──
     ("scripts/check_okf_freshness_live_e2e.py", "check_okf_freshness_live_e2e"),
+    # ── FtM INTEROP: map governed entity records → FollowTheMoney EntityProxy at the edge (entity_type→schema, fields→real list-valued FtM props, id=lei-<LEI> else dc-<sha1>, topics promoted CONSERVATIVELY from governed flags only); FtM is a candidate projection, the governed record stays the core; imported from the DueCare entity-intelligence reference; never serves truth ──
+    ("scripts/check_ftm_interop.py", "check_ftm_interop"),
+    # ── ENTITY-INTELLIGENCE candidate feed (governed cross-project ingestion): stage the DueCare catalog (GLEIF/BODS/OFAC/DOJ/DOL/registries) as CANDIDATES with determinism_ceiling + license + fragility (real taxonomy modes); `adoptable` cross-checks the org-guardrail AVOID ledger (AVOID-* rows recorded NON-adoptable); discovery≠trust, nothing promoted, serves_truth=false ──
+    ("scripts/ingest_entity_intelligence_catalog.py", "ingest_entity_intelligence_catalog"),
+    # ── GITHUB SIGNAL intake (owner-shared repos, reviewed live): 10 targets staged as governed candidates w/ disposition (ADOPT/CONSIDER/WATCH/AVOID); copyleft/unstated/proprietary can NEVER be adoptable (org-guardrail cross-check); provenance corrections + unscrapeable links recorded honestly; discovery≠trust, serves_truth=false ──
+    ("scripts/ingest_github_signal_intake.py", "ingest_github_signal_intake"),
+    # ── CAPABILITY SEEDS (learn-from-them, clean-room): all 10 reviewed repos implemented as 11 governed seeds in src/teleon/seeds — drop-in only for clean licenses, technique-only for copyleft/unstated; each runs real logic + records the lesson + emits a PurposeTask candidate; court-deadline + inference-routing seeds deterministically CORRECT; never serves truth, nothing promoted ──
+    ("scripts/check_capability_seeds.py", "check_capability_seeds"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),
