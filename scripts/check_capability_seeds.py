@@ -65,9 +65,10 @@ def _self_test() -> int:
     # (3) drop-in discipline: copyleft/unstated/proprietary sources are NEVER drop-in (clean-room only)
     leaky = [s.slot for s in seeds if not vendorable(s.source_license) and s.is_drop_in()]
     ck("no copyleft/unstated/proprietary seed is drop-in (clean-room only)", not leaky, str(leaky))
-    drop_ins = [s.slot for s in seeds if s.is_drop_in()]
-    ck("drop-in seeds are clean-permissive (the MIT pair: marketing + source-discovery)",
-       set(drop_ins) == {"marketing-copy-brief", "web-source-discovery"}, str(drop_ins))
+    drop_ins = [s for s in seeds if s.is_drop_in()]
+    ck("every drop-in seed is clean-permissive (vendorable license — never copyleft/unstated)",
+       all(vendorable(s.source_license) for s in drop_ins),
+       str([s.slot for s in drop_ins if not vendorable(s.source_license)]))
 
     # (4) determinism: every determinism_ceiling==1.0 seed is deterministic (run twice → identical)
     nondet = [s.slot for s in seeds if s.determinism_ceiling == 1.0 and s.run({"x": 1}) != s.run({"x": 1})]

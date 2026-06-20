@@ -13,7 +13,10 @@ from dataclasses import dataclass, field
 from typing import Any, Callable
 
 #: license tokens that forbid vendoring the source code → a seed must be technique-only (drop_in=False).
-_NON_VENDORABLE = ("agpl", "gpl", "lgpl", "proprietary", "private", "unstated", "n/a", "")
+#: includes copyleft (GPL family), NonCommercial/NoDerivatives CC (by-nc / nc-nd), and source-available
+#: (BSL / Elastic v2 / "source-available") — none are clean-permissive, so none may be vendored.
+_NON_VENDORABLE = ("agpl", "gpl", "lgpl", "proprietary", "private", "by-nc", "nc-nd", "bsl", "elv2",
+                   "source-available", "unstated", "n/a", "")
 
 
 def vendorable(license_: str) -> bool:
@@ -74,7 +77,7 @@ def register(seed: CapabilitySeed) -> CapabilitySeed:
 
 def all_seeds() -> list[CapabilitySeed]:
     # import the seed packs so registration happens on first access (deterministic order by slot)
-    from src.teleon.seeds import github_signal_seeds  # noqa: F401
+    from src.teleon.seeds import api_and_feed_seeds, github_signal_seeds  # noqa: F401
     return sorted(_REGISTRY, key=lambda s: s.slot)
 
 

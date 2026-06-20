@@ -52,7 +52,7 @@ unusual for pre-seed and it is the thing to lead with.
 | Native-format preservation + governed sidecars; temporal fact graph; context-rot/freshness CDC; memory-as-candidate-context (never truth) | **working** | respective `check_*` proofs |
 | **Governance spine**: every served fact has source handles + receipt + lineage; promotion boundary (candidate ≠ tenant-visible); LLM/agent/memory/browser output is never truth | **enforced by proofs** | the no-bypass / no-truth redteam proofs |
 
-**Deterministic proof count (computed, recompute with `python3 -c "from scripts.flywheel_proof_modules import PROOF_MODULES; print(len(PROOF_MODULES))"`):** **⟦computed: 527⟧ green** as of 2026-06-20. A stdlib-only Python 3.14 watchdog re-runs all ⟦computed: 527⟧ every ~10 min; any regression is caught within one tick.
+**Deterministic proof count (computed, recompute with `python3 -c "from scripts.flywheel_proof_modules import PROOF_MODULES; print(len(PROOF_MODULES))"`):** **⟦computed: 530⟧ green** as of 2026-06-20. A stdlib-only Python 3.14 watchdog re-runs all ⟦computed: 530⟧ every ~10 min; any regression is caught within one tick.
 
 **Catalog snapshot (dated; recompute `find catalog/<type> -name '*.yaml' | wc -l`):** as of 2026-06-20 —
 adapters 33 · personas 233 · processors 180 · harnesses 195 · rubrics 245 · tools 173 (**1,059 components**) ·
@@ -265,7 +265,7 @@ provenance/eval contract. Bottom-up wedge first (regulated-context buyers), expa
 12. **Competition** — 2×2 / table: enterprise search (Glean), RAG platforms (Contextual AI — absorbed into
     Google DeepMind May 2026), vector DBs, knowledge graphs, GRC tools, source intelligence. Baltor's column:
     *verify + package + prove facts before agents use them; lifecycle-managed fact state with history.*
-13. **Traction / milestones** — *be honest:* a working governed engine (⟦computed: 527⟧ deterministic proofs, full offline
+13. **Traction / milestones** — *be honest:* a working governed engine (⟦computed: 530⟧ deterministic proofs, full offline
     demo, OFAC: an always-green synthetic conformance proof AND a dated 2026-06-14 `--live` catch on the real SDN list) + locked brand + owned domains. Seed-readiness gates: 3 design partners, 1 paid
     pilot, 1 exported package consumed by a real downstream agent/RAG stack, measured stale-fact catch + manual-
     review reduction.
@@ -338,6 +338,6 @@ unilaterally on brand/strategy — confirm with owner, then supersede the stale 
 
 *Warrant: written on clear owner intent (this request). Grounded in the LOCKED brand
 (`brand-architecture.md`), the authoritative pricing pro forma, the PMF/TAM doc, the live execution-backend
-work (⟦computed: 527⟧ green proofs as of 2026-06-20), and the capability catalog. Pricing, raise size, TAM math, and
+work (⟦computed: 530⟧ green proofs as of 2026-06-20), and the capability catalog. Pricing, raise size, TAM math, and
 public tier names are flagged ⟦DECISION⟧ and must not be treated as decided. No brand/strategy decision was
 made unilaterally; §6 lists the supersessions to confirm with the owner.*

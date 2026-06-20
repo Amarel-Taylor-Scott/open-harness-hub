@@ -206,6 +206,12 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_model_index.py", "check_model_index"),
     # ── DESCENT METHOD CATALOG: for every improvement dimension (all 17 descent axes) the concrete METHODS to accomplish it (e.g. reduce skill tokens via compression / redundant-text dedupe), each grounded in a VARIETY of researched candidate modules; license class governs vendorability (copyleft/source-available/unstated/unverified = behind-a-port); generated how-to map; discovery≠trust, never serves truth ──
     ("scripts/check_descent_method_catalog.py", "check_descent_method_catalog"),
+    # ── SELF-OPTIMIZING capability unit (the flagship): a capability MEASURES itself + auto-applies the best GOVERNED method per dimension (compress tokens / distill to a deterministic rule or cheaper model / bind a fragile fact to its source / route to the cheapest capable model), emitting a real before→after receipt; lossless + within-policy + accuracy-floored; HONEST when a task can't be made deterministic; deterministic + idempotent; never serves truth ──
+    ("scripts/check_self_optimizing_unit.py", "check_self_optimizing_unit"),
+    # ── PITCH DECK (slides/demo for technical + investors): generated from architecture/teleon_pitch_deck.json with EVERY number computed live (proof count, the actual self-optimizing receipt, method/profession/standards counts); consistent single-source language; no hand-typed metrics; carries the governance + honest-gap language; serves_truth=false ──
+    ("scripts/build_pitch_deck.py", "build_pitch_deck"),
+    # ── API-HUB intake + GOVERNED feed-intake (+ repo-batch seeds): the feed-intake REFUSES ToS-violating scraping / anti-bot evasion / bulk-PII-harvest and ingests only via legitimate paths (official API / owner-paste / RSS), logging inaccessible sources honestly; the API-hub intake catalogs governed endpoint candidates (RapidAPI/Nokia CAMARA) behind a port; discovery≠trust, never serves truth ──
+    ("scripts/check_api_and_feed_seeds.py", "check_api_and_feed_seeds"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),
