@@ -83,7 +83,7 @@ def _self_test() -> int:
         if part:
             b = _before(part); a, strat, outcome, _ = descend(part)
             ck("a partial capability gets cheaper at a cheap model tier (model_downgrade, improved)",
-               a["cost"] < b["cost"] and a["model_tier"] == 8 and strat == "model_downgrade")
+               a["cost"] < b["cost"] and a["llm_usage"] == b["llm_usage"] and strat == "model_downgrade")
 
         # the brain is now usable: training corpus + computed meta-learner readout
         ex = store.training_examples()

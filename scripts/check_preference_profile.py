@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """check_preference_profile — proof that "efficient" is the USER's multi-objective trade-off, not one fixed metric.
-A user-set PreferenceProfile (weights over cost/latency/token_burn/determinism/freshness + hard constraints) drives
+A user-set PreferenceProfile (weights over cost/latency/tokens_in/determinism/freshness + hard constraints) drives
 which bounded implementation Teleon picks: a cost-first user gets the cheapest, a latency-first user gets the fastest,
 a determinism-required user gets the deterministic one even if pricier, and a constraint that excludes everything is
 reported honestly (no fabricated pick). Generalizes the single-objective selector. serves_truth=false.
@@ -23,9 +23,9 @@ from src.teleon.inference.preference_profile import (
 
 # three bounded implementations of the same capability (the descent's candidate outputs)
 _CANDS = [
-    {"id": "deterministic_rule", "cost": 0.000, "latency_ms": 5,   "token_burn": 0,    "determinism": 1.0, "freshness": 1.0},
-    {"id": "cheap_llm",         "cost": 0.010, "latency_ms": 250, "token_burn": 400,  "determinism": 0.6, "freshness": 0.8},
-    {"id": "frontier_llm",      "cost": 0.120, "latency_ms": 900, "token_burn": 1200, "determinism": 0.6, "freshness": 0.9},
+    {"id": "deterministic_rule", "cost": 0.000, "latency": 5,   "tokens_in": 0,    "determinism": 1.0, "freshness": 1.0},
+    {"id": "cheap_llm",         "cost": 0.010, "latency": 250, "tokens_in": 400,  "determinism": 0.6, "freshness": 0.8},
+    {"id": "frontier_llm",      "cost": 0.120, "latency": 900, "tokens_in": 1200, "determinism": 0.6, "freshness": 0.9},
 ]
 
 
@@ -42,8 +42,8 @@ def _self_test() -> int:
 
     # a latency-first user gets the fastest (here also the rule, so use a set where fastest != cheapest)
     cands2 = [
-        {"id": "fast_small_model", "cost": 0.05, "latency_ms": 20, "token_burn": 100, "determinism": 0.6, "freshness": 0.9},
-        {"id": "cheapest_slow",    "cost": 0.00, "latency_ms": 800, "token_burn": 0,  "determinism": 1.0, "freshness": 1.0},
+        {"id": "fast_small_model", "cost": 0.05, "latency": 20, "tokens_in": 100, "determinism": 0.6, "freshness": 0.9},
+        {"id": "cheapest_slow",    "cost": 0.00, "latency": 800, "tokens_in": 0,  "determinism": 1.0, "freshness": 1.0},
     ]
     ck("latency-first profile picks the fastest even when it is NOT the cheapest",
        choose(cands2, latency_first())["chosen"] == "fast_small_model")
@@ -59,13 +59,13 @@ def _self_test() -> int:
        res["chosen"] == "deterministic_rule")
 
     # a hard constraint that nothing can meet is reported honestly (no fabricated pick)
-    impossible = PreferenceProfile(weights={"cost": 1.0}, max_latency_ms=1)
+    impossible = PreferenceProfile(weights={"cost": 1.0}, max_latency=1)
     none = choose(_CANDS, impossible)
     ck("when no candidate meets the hard constraints, chosen is None with a reason (not fabricated)",
        none["chosen"] is None and "violations" in none and none["reason"])
 
     # weights normalize and actually drive the score (changing weights changes the composite ordering)
-    p = PreferenceProfile(weights={"cost": 3.0, "latency_ms": 1.0})
+    p = PreferenceProfile(weights={"cost": 3.0, "latency": 1.0})
     ck("weights normalize to sum 1", abs(sum(p.normalized_weights().values()) - 1.0) < 1e-9)
     ck("the composite score is computed from weights (cheapest gets the best score under a cost-weighted profile)",
        score_candidates(_CANDS, cost_first())[0] == min(score_candidates(_CANDS, cost_first())))
@@ -76,11 +76,11 @@ def _self_test() -> int:
     # determinism + honesty
     ck("deterministic (same inputs -> same pick)", choose(_CANDS, cost_first()) == choose(_CANDS, cost_first()))
     ck("never serves truth", dr["serves_truth"] is False and none["serves_truth"] is False)
-    ck("covers all five objectives (cost, latency, token_burn, determinism, freshness)",
-       set(OBJECTIVES) == {"cost", "latency_ms", "token_burn", "determinism", "freshness"})
+    ck("covers all five objectives (cost, latency, tokens_in, determinism, freshness)",
+       set(OBJECTIVES) == {"cost", "latency", "tokens_in", "determinism", "freshness"})
 
     print("\n" + ("PASS - check_preference_profile: 'efficient' is the USER's multi-objective trade-off — a user-set "
-                  "PreferenceProfile (weights over cost/latency/token_burn/determinism/freshness + hard constraints) "
+                  "PreferenceProfile (weights over cost/latency/tokens_in/determinism/freshness + hard constraints) "
                   "drives which bounded implementation Teleon picks; cost-first->cheapest, latency-first->fastest, "
                   "determinism-required->deterministic, impossible-constraint->honest no-pick. serves_truth=false."
                   if not fails else f"{len(fails)} FAILURES: {fails}"))

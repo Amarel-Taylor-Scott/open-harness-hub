@@ -11,9 +11,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-#: each objective + whether lower or higher is better. cost/latency/token_burn: minimize; determinism/freshness: maximize.
-OBJECTIVES = ("cost", "latency_ms", "token_burn", "determinism", "freshness")
-_MAXIMIZE = ("determinism", "freshness")   # the rest are minimized
+from src.teleon.evolution.descent_axes import HIGHER_IS_BETTER_AXES, is_axis
+
+#: the user-weighable objectives — a SUBSET of the canonical single source (descent_axes.DESCENT_AXES), so "efficient"
+#: speaks the same axis vocabulary as the descent/brain. cost/latency/tokens_in minimize; determinism/freshness maximize.
+OBJECTIVES = ("cost", "latency", "tokens_in", "determinism", "freshness")
+assert all(is_axis(o) for o in OBJECTIVES), "preference objectives must be canonical descent_axes names"
+_MAXIMIZE = tuple(o for o in OBJECTIVES if o in HIGHER_IS_BETTER_AXES)   # determinism, freshness
 
 
 @dataclass(frozen=True)
@@ -22,8 +26,8 @@ class PreferenceProfile:
     missing weight defaults to 0 (the user doesn't care about that objective)."""
     weights: dict = field(default_factory=lambda: {o: 1.0 for o in OBJECTIVES})
     max_cost: float | None = None
-    max_latency_ms: float | None = None
-    max_token_burn: int | None = None
+    max_latency: float | None = None
+    max_tokens_in: int | None = None
     min_determinism: float | None = None
     min_freshness: float | None = None
 
@@ -36,10 +40,10 @@ class PreferenceProfile:
         out = []
         if self.max_cost is not None and cand.get("cost", 0.0) > self.max_cost:
             out.append(f"cost {cand.get('cost')} > max {self.max_cost}")
-        if self.max_latency_ms is not None and cand.get("latency_ms", 0) > self.max_latency_ms:
-            out.append(f"latency {cand.get('latency_ms')}ms > max {self.max_latency_ms}ms")
-        if self.max_token_burn is not None and cand.get("token_burn", 0) > self.max_token_burn:
-            out.append(f"token_burn {cand.get('token_burn')} > max {self.max_token_burn}")
+        if self.max_latency is not None and cand.get("latency", 0) > self.max_latency:
+            out.append(f"latency {cand.get('latency')}ms > max {self.max_latency}ms")
+        if self.max_tokens_in is not None and cand.get("tokens_in", 0) > self.max_tokens_in:
+            out.append(f"tokens_in {cand.get('tokens_in')} > max {self.max_tokens_in}")
         if self.min_determinism is not None and cand.get("determinism", 0.0) < self.min_determinism:
             out.append(f"determinism {cand.get('determinism')} < min {self.min_determinism}")
         if self.min_freshness is not None and cand.get("freshness", 0.0) < self.min_freshness:
@@ -91,11 +95,11 @@ def cost_first() -> PreferenceProfile:
 
 
 def latency_first() -> PreferenceProfile:
-    return PreferenceProfile(weights={"latency_ms": 1.0})
+    return PreferenceProfile(weights={"latency": 1.0})
 
 
 def token_thrifty() -> PreferenceProfile:
-    return PreferenceProfile(weights={"token_burn": 1.0})
+    return PreferenceProfile(weights={"tokens_in": 1.0})
 
 
 def determinism_required() -> PreferenceProfile:

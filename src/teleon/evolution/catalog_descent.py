@@ -24,8 +24,6 @@ _CATALOG = _REPO / "architecture" / "modality_capability_catalog.json"
 
 _MODEL_STAGE_COST = 0.05   # estimated cost of one non-deterministic (model-core) stage at frontier tier
 _DET_STAGE_COST = 0.002    # estimated cost of one deterministic stage
-_FRONTIER_TIER = 75        # model-index-style tier number for a frontier model
-_CHEAP_TIER = 8            # a cheap capable model (e.g. the Ollama default brain)
 _CHEAP_FACTOR = 0.1        # a cheap model runs a model-core stage at ~10% of the frontier cost
 
 
@@ -34,13 +32,13 @@ def load_catalog() -> list[dict]:
 
 
 def _before(cap: dict) -> dict:
+    """Before-state on the canonical descent axes: llm_usage = # model-core stages; freshness = deterministic fraction."""
     stages = cap.get("pipeline", [])
     n = len(stages) or 1
     n_model = sum(1 for s in stages if not s.get("deterministic"))
     det = round((n - n_model) / n, 4)
     return {"cost": round(n_model * _MODEL_STAGE_COST + (n - n_model) * _DET_STAGE_COST, 4),
-            "determinism": det, "tokens": n_model * 400,
-            "model_tier": _FRONTIER_TIER if n_model else 0, "stale_risk": round(n_model / n, 4)}
+            "determinism": det, "tokens_in": n_model * 400, "llm_usage": n_model, "freshness": det}
 
 
 def descend(cap: dict) -> tuple[dict, str, str, tuple]:
@@ -51,17 +49,17 @@ def descend(cap: dict) -> tuple[dict, str, str, tuple]:
     ach = cap.get("deterministic_achievable")
     before = _before(cap)
     if n_model == 0 or ach == "full":
-        after = {"cost": round(n * _DET_STAGE_COST, 4), "determinism": 1.0, "tokens": 0,
-                 "model_tier": 0, "stale_risk": 0.0}
+        after = {"cost": round(n * _DET_STAGE_COST, 4), "determinism": 1.0, "tokens_in": 0,
+                 "llm_usage": 0, "freshness": 1.0}
         return after, "llm_to_rule", "converged", ("model_downgrade",)
     if ach == "partial":
         after = {"cost": round(n_model * _MODEL_STAGE_COST * _CHEAP_FACTOR + (n - n_model) * _DET_STAGE_COST, 4),
-                 "determinism": before["determinism"], "tokens": n_model * 200,
-                 "model_tier": _CHEAP_TIER, "stale_risk": before["stale_risk"]}
+                 "determinism": before["determinism"], "tokens_in": n_model * 200,
+                 "llm_usage": n_model, "freshness": before["freshness"]}
         return after, "model_downgrade", "improved", ("llm_to_rule",)
-    # 'none' / unknown: can't bound the structure; downgrade the model tier only
+    # 'none' / unknown: can't bound the structure; downgrade the model tier only (fewer/cheaper model calls)
     after = {"cost": round(before["cost"] * 0.5, 4), "determinism": before["determinism"],
-             "tokens": before["tokens"] // 2, "model_tier": _CHEAP_TIER, "stale_risk": before["stale_risk"]}
+             "tokens_in": before["tokens_in"] // 2, "llm_usage": before["llm_usage"], "freshness": before["freshness"]}
     outcome = "improved" if after["cost"] < before["cost"] else "no_change"
     return after, "model_downgrade", outcome, ("llm_to_rule",)
 

@@ -256,6 +256,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/convert_catalog_demo.py", "convert_catalog_demo"),
     # ── PREFERENCE PROFILE (efficient = the USER's multi-objective trade-off): a user-set PreferenceProfile (weights over cost/latency/token_burn/determinism/freshness + hard constraints) drives which bounded implementation Teleon picks — cost-first->cheapest, latency-first->fastest, determinism-required->deterministic, impossible-constraint->honest no-pick; generalizes the single-objective selector; never serves truth ──
     ("scripts/check_preference_profile.py", "check_preference_profile"),
+    # ── REGISTRY DESCENT (converter spans ALL capability-bearing registries -> the brain): runs the unbounded->bounded descent across the modality catalog + the implementation registry + the tunable-task catalog and records every attempt into the DescentAttemptStore, so the brain learns from more than one registry (more training data); model/context/harness/skill registries are the selection substrate, not items to bound; idempotent; never serves truth ──
+    ("scripts/check_registry_descent.py", "check_registry_descent"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),

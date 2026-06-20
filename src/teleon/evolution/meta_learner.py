@@ -122,6 +122,27 @@ class DistillationMetaLearner:
         return {"classes_learned": len(classes), "classes": classes, "distill_cost_saved_vs_worst": round(saved, 6)}
 
 
+def from_brain(attempts: list[dict]) -> "DistillationMetaLearner":
+    """Build the meta-learner FROM THE CANONICAL DESCENT BRAIN (descent_attempt_store records). The brain is the single
+    store of every unbounded->bounded attempt; the meta-learner LEARNS over it instead of keeping a parallel store.
+    Mapping: unit_id prefix -> category (the registry); after.determinism -> the ceiling/band; success -> applied +
+    coverage; before/after.cost -> per-call cost; a flat distill cost (the brain tracks bounding, not distill spend)."""
+    ml = DistillationMetaLearner()
+    for r in attempts:
+        before, after = r.get("before", {}) or {}, r.get("after", {}) or {}
+        ml.record({
+            "category": str(r.get("unit_id", "?")).split(":")[0],
+            "strategy": r.get("strategy", "unknown"),
+            "determinism_ceiling": float(after.get("determinism", 0.0)),
+            "applied": bool(r.get("success")),
+            "coverage": 1.0 if r.get("success") else 0.0,
+            "per_call_cost_before": float(before.get("cost", 0.0)),
+            "per_call_cost_after": float(after.get("cost", 0.0)),
+            "distill_cost": 0.001,
+        })
+    return ml
+
+
 def _neg(s: str) -> tuple:
     """Tie-break key: after maximizing, the LOWEST name wins (deterministic)."""
     return tuple(-ord(c) for c in s)
