@@ -226,6 +226,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_tunable_task_catalog.py", "check_tunable_task_catalog"),
     # ── CAPABILITY PR WORKFLOW (GitHub-familiar bridge): a capability unit is a familiar git repo — branches/PRs/checks/merge — where the eval-LIFT gate IS the CI check (a regressing or out-of-policy fork CANNOT merge); same workflow on internal git OR the client's GitHub/GitLab/Gitea (operation parity map); governance rides in the notes sidecar; familiar UI rendered; never serves truth ──
     ("scripts/check_capability_pr_workflow.py", "check_capability_pr_workflow"),
+    # ── FRAMEWORK INTEGRATION (both directions): EXPORT a governed capability as a native tool for MCP/OpenAI/Anthropic/LangGraph/CrewAI/AutoGen (carrying its receipt + serves_truth=false); WRAP a framework agent as a governed CANDIDATE behind a port (sandboxed, never truth); Teleon imports no framework (emits/consumes specs); never serves truth ──
+    ("scripts/check_framework_integration.py", "check_framework_integration"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),
