@@ -1,0 +1,711 @@
+{
+  "version": "1.0",
+  "updated": "2026-06-20",
+  "principle": "AI-startup capabilities across modalities (document/image/text/video/audio/multimodal), reverse-engineered into input\u2192output pipelines. EVERY pipeline shares one shape: ingest \u2192 parse/segment \u2192 [MODEL CORE] \u2192 validate/ground/rerank \u2192 structured output. The model core (OCR, embeddings, ASR, diarization, abstractive generation) is irreducible; the WRAPPER stages (preprocess, segmentation, timestamp/coordinate alignment, schema validation, ANN search, output shaping) are DETERMINISTIC \u2014 the governable, tunable spine. Each capability is therefore a tunable cascade: run the deterministic spine cheaply, escalate to the cheapest-capable model core only for what it must. Fully deterministic only where there is NO model core (web-content-extraction, scene-segmentation). Discovery!=trust; example startups are inferred from public product info; serves_truth=false.",
+  "deterministic_achievable_enum": [
+    "full",
+    "partial",
+    "no"
+  ],
+  "modalities": [
+    "audio",
+    "document",
+    "image",
+    "multimodal",
+    "text",
+    "video"
+  ],
+  "serves_truth": false,
+  "capabilities": [
+    {
+      "capability": "document-schema-extraction",
+      "modality": "document",
+      "pipeline": [
+        {
+          "stage": "ingest",
+          "deterministic": true
+        },
+        {
+          "stage": "ocr/text-layer",
+          "deterministic": false
+        },
+        {
+          "stage": "layout-segment",
+          "deterministic": true
+        },
+        {
+          "stage": "field-extract",
+          "deterministic": false
+        },
+        {
+          "stage": "validate/reconcile",
+          "deterministic": true
+        },
+        {
+          "stage": "structured-output",
+          "deterministic": true
+        }
+      ],
+      "deterministic_spine": [
+        "ingest",
+        "layout-segment",
+        "validate/reconcile",
+        "structured-output"
+      ],
+      "model_core": [
+        "ocr/text-layer",
+        "field-extract"
+      ],
+      "deterministic_achievable": "partial",
+      "tunable": true,
+      "example_startups": [
+        "Reducto",
+        "Unstructured",
+        "Mindee",
+        "Docsumo",
+        "Veryfi",
+        "Extend",
+        "Landing AI"
+      ],
+      "governed": "candidate",
+      "serves_truth": false
+    },
+    {
+      "capability": "table-extraction",
+      "modality": "document",
+      "pipeline": [
+        {
+          "stage": "detect-table-region",
+          "deterministic": true
+        },
+        {
+          "stage": "grid-reconstruct",
+          "deterministic": true
+        },
+        {
+          "stage": "cell-ocr",
+          "deterministic": false
+        },
+        {
+          "stage": "schema-map",
+          "deterministic": true
+        }
+      ],
+      "deterministic_spine": [
+        "detect-table-region",
+        "grid-reconstruct",
+        "schema-map"
+      ],
+      "model_core": [
+        "cell-ocr"
+      ],
+      "deterministic_achievable": "partial",
+      "tunable": true,
+      "example_startups": [
+        "Reducto",
+        "Docsumo"
+      ],
+      "governed": "candidate",
+      "serves_truth": false
+    },
+    {
+      "capability": "object-detection-recognition",
+      "modality": "image",
+      "pipeline": [
+        {
+          "stage": "preprocess/augment",
+          "deterministic": true
+        },
+        {
+          "stage": "model-inference",
+          "deterministic": false
+        },
+        {
+          "stage": "nms/box-postprocess",
+          "deterministic": true
+        },
+        {
+          "stage": "classical-cv-blocks",
+          "deterministic": true
+        },
+        {
+          "stage": "route/output",
+          "deterministic": true
+        }
+      ],
+      "deterministic_spine": [
+        "preprocess/augment",
+        "nms/box-postprocess",
+        "classical-cv-blocks",
+        "route/output"
+      ],
+      "model_core": [
+        "model-inference"
+      ],
+      "deterministic_achievable": "partial",
+      "tunable": true,
+      "example_startups": [
+        "Roboflow",
+        "Clarifai",
+        "Landing AI"
+      ],
+      "governed": "candidate",
+      "serves_truth": false
+    },
+    {
+      "capability": "visual-document-grounding",
+      "modality": "image",
+      "pipeline": [
+        {
+          "stage": "ingest",
+          "deterministic": true
+        },
+        {
+          "stage": "visual-layout-parse",
+          "deterministic": false
+        },
+        {
+          "stage": "element-extract",
+          "deterministic": false
+        },
+        {
+          "stage": "coordinate-ground",
+          "deterministic": true
+        },
+        {
+          "stage": "provenance-output",
+          "deterministic": true
+        }
+      ],
+      "deterministic_spine": [
+        "ingest",
+        "coordinate-ground",
+        "provenance-output"
+      ],
+      "model_core": [
+        "visual-layout-parse",
+        "element-extract"
+      ],
+      "deterministic_achievable": "partial",
+      "tunable": true,
+      "example_startups": [
+        "Landing AI",
+        "Reducto"
+      ],
+      "governed": "candidate",
+      "serves_truth": false
+    },
+    {
+      "capability": "semantic-retrieval-rerank",
+      "modality": "text",
+      "pipeline": [
+        {
+          "stage": "chunk",
+          "deterministic": true
+        },
+        {
+          "stage": "embed",
+          "deterministic": false
+        },
+        {
+          "stage": "ann-search",
+          "deterministic": true
+        },
+        {
+          "stage": "rerank",
+          "deterministic": false
+        },
+        {
+          "stage": "topk-cutoff/assemble",
+          "deterministic": true
+        }
+      ],
+      "deterministic_spine": [
+        "chunk",
+        "ann-search",
+        "topk-cutoff/assemble"
+      ],
+      "model_core": [
+        "embed",
+        "rerank"
+      ],
+      "deterministic_achievable": "partial",
+      "tunable": true,
+      "example_startups": [
+        "Cohere",
+        "Jina",
+        "Voyage AI"
+      ],
+      "governed": "candidate",
+      "serves_truth": false
+    },
+    {
+      "capability": "web-content-extraction",
+      "modality": "text",
+      "pipeline": [
+        {
+          "stage": "fetch",
+          "deterministic": true
+        },
+        {
+          "stage": "html-to-clean-text",
+          "deterministic": true
+        },
+        {
+          "stage": "boilerplate-strip",
+          "deterministic": true
+        },
+        {
+          "stage": "structure-output",
+          "deterministic": true
+        }
+      ],
+      "deterministic_spine": [
+        "fetch",
+        "html-to-clean-text",
+        "boilerplate-strip",
+        "structure-output"
+      ],
+      "model_core": [],
+      "deterministic_achievable": "full",
+      "tunable": true,
+      "example_startups": [
+        "Jina Reader"
+      ],
+      "governed": "candidate",
+      "serves_truth": false
+    },
+    {
+      "capability": "rag-generation",
+      "modality": "text",
+      "pipeline": [
+        {
+          "stage": "retrieve",
+          "deterministic": true
+        },
+        {
+          "stage": "rerank",
+          "deterministic": false
+        },
+        {
+          "stage": "prompt-assemble",
+          "deterministic": true
+        },
+        {
+          "stage": "generate",
+          "deterministic": false
+        },
+        {
+          "stage": "cite/ground",
+          "deterministic": true
+        }
+      ],
+      "deterministic_spine": [
+        "retrieve",
+        "prompt-assemble",
+        "cite/ground"
+      ],
+      "model_core": [
+        "rerank",
+        "generate"
+      ],
+      "deterministic_achievable": "partial",
+      "tunable": true,
+      "example_startups": [
+        "Cohere",
+        "Jina"
+      ],
+      "governed": "candidate",
+      "serves_truth": false
+    },
+    {
+      "capability": "video-summarization",
+      "modality": "video",
+      "pipeline": [
+        {
+          "stage": "decode",
+          "deterministic": true
+        },
+        {
+          "stage": "scene/shot-segment",
+          "deterministic": true
+        },
+        {
+          "stage": "keyframe-sample",
+          "deterministic": true
+        },
+        {
+          "stage": "asr-transcript",
+          "deterministic": false
+        },
+        {
+          "stage": "align",
+          "deterministic": true
+        },
+        {
+          "stage": "summarize",
+          "deterministic": false
+        },
+        {
+          "stage": "timestamped-output",
+          "deterministic": true
+        }
+      ],
+      "deterministic_spine": [
+        "decode",
+        "scene/shot-segment",
+        "keyframe-sample",
+        "align",
+        "timestamped-output"
+      ],
+      "model_core": [
+        "asr-transcript",
+        "summarize"
+      ],
+      "deterministic_achievable": "partial",
+      "tunable": true,
+      "example_startups": [
+        "Twelve Labs",
+        "Memories.ai",
+        "Notta/ScreenApp/tl;dv (class)"
+      ],
+      "governed": "candidate",
+      "serves_truth": false
+    },
+    {
+      "capability": "video-semantic-search",
+      "modality": "video",
+      "pipeline": [
+        {
+          "stage": "decode",
+          "deterministic": true
+        },
+        {
+          "stage": "segment",
+          "deterministic": true
+        },
+        {
+          "stage": "multimodal-embed",
+          "deterministic": false
+        },
+        {
+          "stage": "vector-index",
+          "deterministic": true
+        },
+        {
+          "stage": "ann-query",
+          "deterministic": true
+        }
+      ],
+      "deterministic_spine": [
+        "decode",
+        "segment",
+        "vector-index",
+        "ann-query"
+      ],
+      "model_core": [
+        "multimodal-embed"
+      ],
+      "deterministic_achievable": "partial",
+      "tunable": true,
+      "example_startups": [
+        "Twelve Labs (Marengo)",
+        "Memories.ai"
+      ],
+      "governed": "candidate",
+      "serves_truth": false
+    },
+    {
+      "capability": "scene-segmentation",
+      "modality": "video",
+      "pipeline": [
+        {
+          "stage": "decode",
+          "deterministic": true
+        },
+        {
+          "stage": "shot-cut-detect",
+          "deterministic": true
+        },
+        {
+          "stage": "keyframe-extract",
+          "deterministic": true
+        },
+        {
+          "stage": "output",
+          "deterministic": true
+        }
+      ],
+      "deterministic_spine": [
+        "decode",
+        "shot-cut-detect",
+        "keyframe-extract",
+        "output"
+      ],
+      "model_core": [],
+      "deterministic_achievable": "full",
+      "tunable": true,
+      "example_startups": [
+        "Sieve"
+      ],
+      "governed": "candidate",
+      "serves_truth": false
+    },
+    {
+      "capability": "speech-transcription",
+      "modality": "audio",
+      "pipeline": [
+        {
+          "stage": "decode/resample",
+          "deterministic": true
+        },
+        {
+          "stage": "vad",
+          "deterministic": true
+        },
+        {
+          "stage": "asr",
+          "deterministic": false
+        },
+        {
+          "stage": "punctuate/format",
+          "deterministic": true
+        },
+        {
+          "stage": "word-timestamp-align",
+          "deterministic": true
+        },
+        {
+          "stage": "structured-transcript",
+          "deterministic": true
+        }
+      ],
+      "deterministic_spine": [
+        "decode/resample",
+        "vad",
+        "punctuate/format",
+        "word-timestamp-align",
+        "structured-transcript"
+      ],
+      "model_core": [
+        "asr"
+      ],
+      "deterministic_achievable": "partial",
+      "tunable": true,
+      "example_startups": [
+        "AssemblyAI",
+        "Deepgram",
+        "Gladia",
+        "Speechmatics",
+        "ElevenLabs"
+      ],
+      "governed": "candidate",
+      "serves_truth": false
+    },
+    {
+      "capability": "speaker-diarization",
+      "modality": "audio",
+      "pipeline": [
+        {
+          "stage": "decode/resample",
+          "deterministic": true
+        },
+        {
+          "stage": "vad",
+          "deterministic": true
+        },
+        {
+          "stage": "diarize-embed",
+          "deterministic": false
+        },
+        {
+          "stage": "cluster",
+          "deterministic": true
+        },
+        {
+          "stage": "label-per-word",
+          "deterministic": true
+        }
+      ],
+      "deterministic_spine": [
+        "decode/resample",
+        "vad",
+        "cluster",
+        "label-per-word"
+      ],
+      "model_core": [
+        "diarize-embed"
+      ],
+      "deterministic_achievable": "partial",
+      "tunable": true,
+      "example_startups": [
+        "AssemblyAI",
+        "Deepgram",
+        "Gladia",
+        "pyannote"
+      ],
+      "governed": "candidate",
+      "serves_truth": false
+    },
+    {
+      "capability": "conversation-intelligence",
+      "modality": "audio",
+      "pipeline": [
+        {
+          "stage": "ingest",
+          "deterministic": true
+        },
+        {
+          "stage": "asr",
+          "deterministic": false
+        },
+        {
+          "stage": "diarize",
+          "deterministic": false
+        },
+        {
+          "stage": "keyword/tracker-match",
+          "deterministic": true
+        },
+        {
+          "stage": "topics/action-items",
+          "deterministic": false
+        },
+        {
+          "stage": "structured-insights",
+          "deterministic": true
+        }
+      ],
+      "deterministic_spine": [
+        "ingest",
+        "keyword/tracker-match",
+        "structured-insights"
+      ],
+      "model_core": [
+        "asr",
+        "diarize",
+        "topics/action-items"
+      ],
+      "deterministic_achievable": "partial",
+      "tunable": true,
+      "example_startups": [
+        "Symbl.ai",
+        "Gladia"
+      ],
+      "governed": "candidate",
+      "serves_truth": false
+    },
+    {
+      "capability": "pii-redaction-audio",
+      "modality": "audio",
+      "pipeline": [
+        {
+          "stage": "asr",
+          "deterministic": false
+        },
+        {
+          "stage": "entity-span-detect",
+          "deterministic": false
+        },
+        {
+          "stage": "span-mask",
+          "deterministic": true
+        },
+        {
+          "stage": "redacted-output",
+          "deterministic": true
+        }
+      ],
+      "deterministic_spine": [
+        "span-mask",
+        "redacted-output"
+      ],
+      "model_core": [
+        "asr",
+        "entity-span-detect"
+      ],
+      "deterministic_achievable": "partial",
+      "tunable": true,
+      "example_startups": [
+        "ElevenLabs",
+        "AssemblyAI"
+      ],
+      "governed": "candidate",
+      "serves_truth": false
+    },
+    {
+      "capability": "multimodal-retrieval",
+      "modality": "multimodal",
+      "pipeline": [
+        {
+          "stage": "ingest",
+          "deterministic": true
+        },
+        {
+          "stage": "any-modality-embed",
+          "deterministic": false
+        },
+        {
+          "stage": "unified-vector-index",
+          "deterministic": true
+        },
+        {
+          "stage": "ann-search",
+          "deterministic": true
+        }
+      ],
+      "deterministic_spine": [
+        "ingest",
+        "unified-vector-index",
+        "ann-search"
+      ],
+      "model_core": [
+        "any-modality-embed"
+      ],
+      "deterministic_achievable": "partial",
+      "tunable": true,
+      "example_startups": [
+        "Twelve Labs (Marengo)"
+      ],
+      "governed": "candidate",
+      "serves_truth": false
+    },
+    {
+      "capability": "multimodal-reasoning",
+      "modality": "multimodal",
+      "pipeline": [
+        {
+          "stage": "decode",
+          "deterministic": true
+        },
+        {
+          "stage": "frame/audio-sample",
+          "deterministic": true
+        },
+        {
+          "stage": "unified-tokenize-reason",
+          "deterministic": false
+        },
+        {
+          "stage": "text-output",
+          "deterministic": false
+        }
+      ],
+      "deterministic_spine": [
+        "decode",
+        "frame/audio-sample"
+      ],
+      "model_core": [
+        "unified-tokenize-reason",
+        "text-output"
+      ],
+      "deterministic_achievable": "no",
+      "tunable": true,
+      "example_startups": [
+        "Reka"
+      ],
+      "governed": "candidate",
+      "serves_truth": false
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "version": "1.0",
+  "updated": "2026-06-20",
+  "principle": "Teleon interoperates with the common agent frameworks BOTH directions: (1) EXPORT a governed capability as a framework-native tool (MCP/OpenAI/Anthropic/LangGraph/CrewAI/AutoGen) so any framework can call a governed capability; (2) WRAP a framework agent as a governed CANDIDATE behind a port (sandboxed, never serves truth). Frameworks are how capabilities are consumed + candidate runtimes to govern \u2014 never a second source of truth. Teleon imports no framework; it emits/consumes specs.",
+  "directions": [
+    "export_capability",
+    "wrap_agent_as_candidate"
+  ],
+  "serves_truth": false,
+  "frameworks": [
+    {
+      "framework": "mcp",
+      "export_as": "MCP tool (name/description/inputSchema)",
+      "wrap_as": "an MCP-server agent as a governed candidate behind a port",
+      "exporter": "to_mcp_tool",
+      "export_governance": "the exported tool carries the capability's receipt + serves_truth=false (a governed capability, not a bare function)",
+      "wrap_governance": "the framework agent runs sandboxed as a CANDIDATE; output is evidence, never truth; a gate promotes"
+    },
+    {
+      "framework": "openai",
+      "export_as": "OpenAI function tool",
+      "wrap_as": "an Assistants/agent run as a governed candidate",
+      "exporter": "to_openai_tool",
+      "export_governance": "the exported tool carries the capability's receipt + serves_truth=false (a governed capability, not a bare function)",
+      "wrap_governance": "the framework agent runs sandboxed as a CANDIDATE; output is evidence, never truth; a gate promotes"
+    },
+    {
+      "framework": "anthropic",
+      "export_as": "Anthropic / Claude-Agent-SDK tool",
+      "wrap_as": "a subagent as a governed candidate",
+      "exporter": "to_anthropic_tool",
+      "export_governance": "the exported tool carries the capability's receipt + serves_truth=false (a governed capability, not a bare function)",
+      "wrap_governance": "the framework agent runs sandboxed as a CANDIDATE; output is evidence, never truth; a gate promotes"
+    },
+    {
+      "framework": "langgraph",
+      "export_as": "a LangGraph tool node",
+      "wrap_as": "a LangGraph agent as a governed candidate",
+      "exporter": "to_langgraph_node",
+      "export_governance": "the exported tool carries the capability's receipt + serves_truth=false (a governed capability, not a bare function)",
+      "wrap_governance": "the framework agent runs sandboxed as a CANDIDATE; output is evidence, never truth; a gate promotes"
+    },
+    {
+      "framework": "crewai",
+      "export_as": "a CrewAI tool",
+      "wrap_as": "a Crew agent as a governed candidate",
+      "exporter": "to_crewai_tool",
+      "export_governance": "the exported tool carries the capability's receipt + serves_truth=false (a governed capability, not a bare function)",
+      "wrap_governance": "the framework agent runs sandboxed as a CANDIDATE; output is evidence, never truth; a gate promotes"
+    },
+    {
+      "framework": "autogen",
+      "export_as": "an AutoGen registered function",
+      "wrap_as": "an AutoGen agent as a governed candidate",
+      "exporter": "to_openai_tool",
+      "export_governance": "the exported tool carries the capability's receipt + serves_truth=false (a governed capability, not a bare function)",
+      "wrap_governance": "the framework agent runs sandboxed as a CANDIDATE; output is evidence, never truth; a gate promotes"
+    }
+  ]
+}

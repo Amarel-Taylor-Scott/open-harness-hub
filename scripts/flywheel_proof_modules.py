@@ -224,6 +224,22 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_intelligence_source_registry.py", "check_intelligence_source_registry"),
     # ── TUNABLE TASK CATALOG (generalize the doc-extraction idea): 13 agentic tasks that each fit AUTOMATED SETUP TUNING — tiered method grid (deterministic floor → small model → frontier LLM), cheapest-first, escalate only as far as the requirement forces; the auto-tuner key-gates LLM tiers + lets deterministic-possible tasks finish with no LLM; never serves truth ──
     ("scripts/check_tunable_task_catalog.py", "check_tunable_task_catalog"),
+    # ── CAPABILITY PR WORKFLOW (GitHub-familiar bridge): a capability unit is a familiar git repo — branches/PRs/checks/merge — where the eval-LIFT gate IS the CI check (a regressing or out-of-policy fork CANNOT merge); same workflow on internal git OR the client's GitHub/GitLab/Gitea (operation parity map); governance rides in the notes sidecar; familiar UI rendered; never serves truth ──
+    ("scripts/check_capability_pr_workflow.py", "check_capability_pr_workflow"),
+    # ── FRAMEWORK INTEGRATION (both directions): EXPORT a governed capability as a native tool for MCP/OpenAI/Anthropic/LangGraph/CrewAI/AutoGen (carrying its receipt + serves_truth=false); WRAP a framework agent as a governed CANDIDATE behind a port (sandboxed, never truth); Teleon imports no framework (emits/consumes specs); never serves truth ──
+    ("scripts/check_framework_integration.py", "check_framework_integration"),
+    # ── MODALITY CAPABILITY CATALOG: AI-startup capabilities across document/image/text/video/audio/multimodal reverse-engineered into input→output pipelines that all share a DETERMINISTIC spine wrapping an irreducible MODEL CORE; each a tunable cascade (run the spine cheap, escalate to cheapest-capable model core); fully deterministic only where there is no model core; discovery≠trust, never serves truth ──
+    ("scripts/check_modality_capability_catalog.py", "check_modality_capability_catalog"),
+    # ── DEFAULT BRAIN POLICY: the cheap Ollama brain (GLM-5.2 orchestrator/distiller-judge, Kimi-k2.7-code reviewer) is the DEFAULT, verifiably cheaper than its frontier escalation (cross-checked vs the model index), which fires only when a confidence/quality bar fails — the descent applied to the brain itself; auth via OLLAMA_API_KEY env ref (value gitignored); never serves truth ──
+    ("scripts/check_default_brain_policy.py", "check_default_brain_policy"),
+    # ── DOCUMENT CASCADE DEMO (fully-working local page): write in a capability (schema + doc profile + key) and the REAL document→schema cheapest-that-meets cascade runs (stdlib http.server) — cheapest path, per-step cost, deterministic-vs-LLM, savings vs frontier, missing fields reported honestly; in-process proof (no port); never serves truth ──
+    ("scripts/serve_document_cascade_demo.py", "serve_document_cascade_demo"),
+    # ── INPUT ACQUIRE (generalize across input types): pdf/office/text/email+attachments/web-page/rss/social/image/audio each normalized by a cheapest-first acquire ladder (deterministic where possible; model only when forced; web/social via LEGITIMATE paths, never scraping) then fed the SAME extraction cascade; combined acquire+extract receipt; never serves truth ──
+    ("scripts/check_input_acquire.py", "check_input_acquire"),
+    # ── CASCADE MEASUREMENT (cheapest-that-meets is MEASURED, not assumed): each extract method scored vs offline ground-truth fixtures; per field the cascade picks the cheapest method whose MEASURED accuracy clears the confidence floor; the floor is a live A/B (cheap_llm below it, frontier above it, cost rises with the bar); accuracy computed from fixtures (no hidden table); missing fields honest; never serves truth ──
+    ("scripts/check_cascade_measurement.py", "check_cascade_measurement"),
+    # ── SCHEMA TEMPLATES (extraction is USER-DEFINED; templates are OPTIONAL): any field the user writes runs the real cascade; code/DB showcase templates are a chooser that prefills an editable schema box (employment_agency single-sourced from the cascade, no duplicated field list); one parser grammar; chosen templates round-trip render→parse; never serves truth ──
+    ("scripts/check_schema_templates.py", "check_schema_templates"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),

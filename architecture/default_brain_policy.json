@@ -1,0 +1,33 @@
+{
+  "version": "1.0",
+  "updated": "2026-06-20",
+  "principle": "The LLM BRAIN itself runs CHEAP by default \u2014 GLM-5.2 / Kimi-k2.7-code via Ollama (cloud or local) \u2014 as the orchestrator, reviewer, and distiller-judge that drives a capability from unbounded+inefficient toward most-bounded+most-efficient. Escalate to a frontier model ONLY when the cheap default fails a confidence/quality bar. This is the descent applied to the brain itself: cheapest-capable orchestration, frontier only when it must. Auth via OLLAMA_API_KEY (env ref; the value lives in the gitignored .env, never tracked). The brain PROPOSES; the eval/policy gates DISPOSE \u2014 serves_truth=false.",
+  "auth_env_ref": "OLLAMA_API_KEY",
+  "serves_truth": false,
+  "roles": [
+    {
+      "role": "orchestrator",
+      "default_model": "glm-5.2",
+      "default_provider": "ollama",
+      "escalation_model": "claude-sonnet-4-6",
+      "escalate_when": "a multi-step plan fails validation or planning confidence < bar",
+      "auth_env_ref": "OLLAMA_API_KEY"
+    },
+    {
+      "role": "reviewer",
+      "default_model": "kimi-k2.7-code",
+      "default_provider": "ollama",
+      "escalation_model": "claude-opus-4-8",
+      "escalate_when": "review uncertainty is high or the change is high-blast-radius",
+      "auth_env_ref": "OLLAMA_API_KEY"
+    },
+    {
+      "role": "distiller-judge",
+      "default_model": "glm-5.2",
+      "default_provider": "ollama",
+      "escalation_model": "gpt-o3",
+      "escalate_when": "eval judges disagree or the measured lift is borderline",
+      "auth_env_ref": "OLLAMA_API_KEY"
+    }
+  ]
+}

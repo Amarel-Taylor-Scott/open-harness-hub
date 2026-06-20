@@ -1,0 +1,102 @@
+{
+  "version": "1.0",
+  "updated": "2026-06-20",
+  "principle": "Every capability-repo operation maps to a FAMILIAR git-platform operation on GitHub, GitLab, and Gitea \u2014 same abstraction, native terms (Pull Request == Merge Request; Checks == Pipelines). The governed metadata (lift/receipt) rides in the notes sidecar on every platform, so the client's code stays clean. The eval/lift gate is the status CHECK. Adoption via familiarity; the governed abstraction is the bonus on top.",
+  "naming_differences": {
+    "pull_request": "GitHub PR == GitLab MR",
+    "status_check": "GitHub Checks == GitLab Pipelines"
+  },
+  "serves_truth": false,
+  "operations": [
+    {
+      "operation": "create_repo",
+      "meaning": "create the capability repo",
+      "github": "POST /user/repos",
+      "gitlab": "POST /projects",
+      "gitea": "POST /user/repos",
+      "port_method": "ensure",
+      "parity": true
+    },
+    {
+      "operation": "branch",
+      "meaning": "a proposed-fork branch",
+      "github": "git refs/heads/*",
+      "gitlab": "git refs/heads/*",
+      "gitea": "git refs/heads/*",
+      "port_method": "commit(branch)",
+      "parity": true
+    },
+    {
+      "operation": "commit",
+      "meaning": "a versioned capability revision",
+      "github": "Commits API",
+      "gitlab": "Commits API",
+      "gitea": "Commits API",
+      "port_method": "commit",
+      "parity": true
+    },
+    {
+      "operation": "pull_request",
+      "meaning": "propose a capability fork",
+      "github": "Pull Request",
+      "gitlab": "Merge Request",
+      "gitea": "Pull Request",
+      "port_method": "open_pr",
+      "parity": true
+    },
+    {
+      "operation": "status_check",
+      "meaning": "the eval/lift gate as CI",
+      "github": "Checks/Statuses API",
+      "gitlab": "Pipelines/commit status",
+      "gitea": "Statuses API",
+      "port_method": "checks",
+      "parity": true
+    },
+    {
+      "operation": "review",
+      "meaning": "human/peer review",
+      "github": "PR review",
+      "gitlab": "MR approval",
+      "gitea": "PR review",
+      "port_method": "review",
+      "parity": true
+    },
+    {
+      "operation": "merge",
+      "meaning": "land the fork (gated on checks)",
+      "github": "Merge PR",
+      "gitlab": "Merge MR",
+      "gitea": "Merge PR",
+      "port_method": "merge",
+      "parity": true
+    },
+    {
+      "operation": "tag_release",
+      "meaning": "tag a promoted version",
+      "github": "Releases/Tags",
+      "gitlab": "Releases/Tags",
+      "gitea": "Releases/Tags",
+      "port_method": "tag",
+      "parity": true
+    },
+    {
+      "operation": "governance_notes",
+      "meaning": "governed metadata sidecar (lift/receipt)",
+      "github": "git notes / PR comment",
+      "gitlab": "git notes / MR note",
+      "gitea": "git notes",
+      "port_method": "attach_governance",
+      "parity": true
+    },
+    {
+      "operation": "diff",
+      "meaning": "code + behavior(eval) diff",
+      "github": "Compare API",
+      "gitlab": "Compare API",
+      "gitea": "Compare API",
+      "port_method": "diff",
+      "parity": true
+    }
+  ]
+}

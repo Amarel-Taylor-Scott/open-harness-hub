@@ -51,8 +51,11 @@ def _self_test() -> int:
     ck("selects the cheapest fresh hosted model at the mid quality floor (deepseek-v4-flash)",
        pick_mid["picked"] == "deepseek-v4-flash", str(pick_mid))
     pick_frontier = select_best(idx, quality_floor_rank=_FRONTIER, kinds=("hosted_api",))
-    ck("selects the cheapest fresh FRONTIER hosted model (gpt-o3 over gemini/opus)",
-       pick_frontier["picked"] == "gpt-o3", str(pick_frontier))
+    _fpool = [e for e in idx if e["kind"] == "hosted_api" and e["quality_rank"] >= _FRONTIER and e["freshness"]["status"] == STATUS_FRESH]
+    _fpicked = next(e for e in idx if e["model_id"] == pick_frontier["picked"])
+    ck("selects the cheapest-cost fresh FRONTIER hosted model (whichever is currently cheapest)",
+       _fpicked["quality_rank"] >= _FRONTIER and _fpicked["cost_per_mtok_out"] == min(e["cost_per_mtok_out"] for e in _fpool),
+       str(pick_frontier))
     pick_local = select_best(idx, quality_floor_rank=_MID, prefer_local=True)
     ck("prefer_local picks a 0-cost local model, highest quality on the cost tie (qwen3)",
        pick_local["picked"] == "qwen3-next-80b" and pick_local["cost_per_mtok_out"] == 0.0, str(pick_local))
@@ -62,8 +65,11 @@ def _self_test() -> int:
     # FRESHNESS GOVERNANCE (the wedge): a stale model is HELD OUT and never selected
     staled = mark_stale(idx, "deepseek-v4-flash")
     pick_after = select_best(staled, quality_floor_rank=_MID, kinds=("hosted_api",))
-    ck("a CDC-staled model is excluded; selection falls back to the next cheapest FRESH model (haiku)",
-       pick_after["picked"] == "claude-haiku-4-5" and "deepseek-v4-flash" in pick_after["excluded_stale"], str(pick_after))
+    _spool = [e for e in staled if e["kind"] == "hosted_api" and e["quality_rank"] >= _MID and e["freshness"]["status"] == STATUS_FRESH]
+    _spicked = next(e for e in staled if e["model_id"] == pick_after["picked"])
+    ck("a CDC-staled model is excluded; selection falls back to the next cheapest FRESH model",
+       "deepseek-v4-flash" in pick_after["excluded_stale"] and pick_after["picked"] != "deepseek-v4-flash"
+       and _spicked["cost_per_mtok_out"] == min(e["cost_per_mtok_out"] for e in _spool), str(pick_after))
     pick_resynced = select_best(resync(staled, "deepseek-v4-flash", now="2026-06-20"), quality_floor_rank=_MID, kinds=("hosted_api",))
     ck("re-verifying makes it selectable again (back to deepseek)", pick_resynced["picked"] == "deepseek-v4-flash")
 
