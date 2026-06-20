@@ -1,0 +1,137 @@
+{
+  "title": "Baltor / Teleon — standards interoperability",
+  "principle": "They standardize where context lives; Baltor governs whether it's true.",
+  "stance": "Adopt open formats at the EDGES (ingest + emit) and govern ABOVE them. Every adopted standard is a projection; the governed object stays the core. We add the assurance the formats themselves don't carry — verification, freshness/CDC, earned source-authority, portable receipts. Proprietary data-gravity layers are declined, not adopted.",
+  "updated": "2026-06-20",
+  "direction_enum": ["ingest+emit", "emit", "ingest", "mapping", "n/a"],
+  "status_enum": ["built", "emitted", "mapped", "declined"],
+  "standards": [
+    {
+      "id": "okf",
+      "name": "Open Knowledge Format (OKF)",
+      "owner": "Google Cloud",
+      "kind": "portable knowledge format",
+      "direction": "ingest+emit",
+      "status": "built",
+      "module": "src.baltor.native.okf_adapter",
+      "proof": "scripts/check_okf_interop.py",
+      "governance_added": "verification, freshness/CDC (a reconstructed log.md), source-authority, receipts — none of which OKF mandates",
+      "note": "Import an OKF repo into governed objects; export governed objects as conformant OKF with our assurance in the frontmatter. Round-trip lossless. Candidate projection (OKF is v0.1 / single-vendor)."
+    },
+    {
+      "id": "native-format",
+      "name": "Native format preservation (JSON / CSV / Markdown)",
+      "owner": "Baltor",
+      "kind": "same-shape-in/out",
+      "direction": "ingest+emit",
+      "status": "built",
+      "module": "src.baltor.native.native_format_preserver",
+      "proof": "scripts/check_native_format_full_stack.py",
+      "governance_added": "a governed sidecar (lineage + receipts) alongside the byte-identical native output",
+      "note": "Detect a customer source's native shape, freeze it, and reproduce the same format on the way out — assurance travels in a sidecar, never by mutating the source."
+    },
+    {
+      "id": "prov-json",
+      "name": "W3C PROV-JSON",
+      "owner": "W3C",
+      "kind": "provenance",
+      "direction": "emit",
+      "status": "emitted",
+      "module": "src.baltor.observability.projections.standards",
+      "proof": "scripts/check_lineage_standards_adapters.py",
+      "governance_added": "a baltor_governance facet so the provenance is portable into any PROV consumer",
+      "note": "Emit governed lineage events as a W3C PROV-JSON document (entities/activities/agents + used/wasGeneratedBy)."
+    },
+    {
+      "id": "openlineage",
+      "name": "OpenLineage RunEvent",
+      "owner": "OpenLineage (LF AI & Data)",
+      "kind": "runtime lineage",
+      "direction": "emit",
+      "status": "emitted",
+      "module": "src.baltor.observability.projections.standards",
+      "proof": "scripts/check_lineage_standards_adapters.py",
+      "governance_added": "a baltor_governance custom facet on the run + every output dataset",
+      "note": "Map a lineage event to an OpenLineage RunEvent (spec 2-0-2) — portable into any OpenLineage backend (Marquez, Atlas, Purview)."
+    },
+    {
+      "id": "web-annotation",
+      "name": "W3C Web Annotation",
+      "owner": "W3C",
+      "kind": "claim ↔ source binding",
+      "direction": "emit",
+      "status": "emitted",
+      "module": "src.baltor.observability.projections.standards",
+      "proof": "scripts/check_lineage_standards_adapters.py",
+      "governance_added": "the annotation binds a verified claim to the exact source fragment it was earned from",
+      "note": "Emit a claim→source binding as a W3C Web Annotation (body + target + selector)."
+    },
+    {
+      "id": "json-patch",
+      "name": "JSON-Patch (RFC 6902)",
+      "owner": "IETF",
+      "kind": "change set",
+      "direction": "emit",
+      "status": "emitted",
+      "module": "src.baltor.observability.projections.standards",
+      "proof": "scripts/check_lineage_standards_adapters.py",
+      "governance_added": "each patch carries the governance under which the change was promoted (no silent edits)",
+      "note": "Emit a before→after context change as an RFC-6902 JSON-Patch with its governance."
+    },
+    {
+      "id": "json-ld-context",
+      "name": "JSON-LD @context (schema.org · DCAT · SKOS · PROV-O · DPV · SPDX · Croissant · MCP)",
+      "owner": "W3C / community",
+      "kind": "vocabulary mapping",
+      "direction": "mapping",
+      "status": "mapped",
+      "module": "docs/ns/context.jsonld",
+      "proof": "scripts/check_standards_interop_manifest.py",
+      "governance_added": "hub terms map to the public vocabularies so emitted records are linked-data-resolvable",
+      "note": "A JSON-LD @context maps hub terms to the standard vocabularies; renderers emit standards-conformant records."
+    },
+    {
+      "id": "mcp",
+      "name": "Model Context Protocol (MCP)",
+      "owner": "Anthropic / community",
+      "kind": "tool/transport",
+      "direction": "mapping",
+      "status": "mapped",
+      "module": "docs/ns/context.jsonld",
+      "proof": "scripts/check_standards_interop_manifest.py",
+      "governance_added": "MCP is the transport; the governance/receipts ride above it as a candidate gateway, never truth",
+      "note": "MCP is the universal transport every platform adopts; we ride it for tool/context access and govern above it."
+    },
+    {
+      "id": "bedrock-knowledge-bases",
+      "name": "AWS Bedrock Knowledge Bases",
+      "owner": "AWS",
+      "kind": "managed RAG service",
+      "direction": "n/a",
+      "status": "declined",
+      "reason": "a proprietary managed-retrieval SERVICE with no open knowledge format — adopting it is lock-in, not interoperability. We consume open inputs and ride above any serving layer.",
+      "note": "Declined as a format; can be wrapped as one candidate retrieval backend behind a port, never a source of truth."
+    },
+    {
+      "id": "unity-catalog-managed",
+      "name": "Databricks Unity Catalog (managed)",
+      "owner": "Databricks",
+      "kind": "catalog / brokering authority",
+      "direction": "n/a",
+      "status": "declined",
+      "reason": "UC-OSS + Delta catalog-commits are open, but the managed brokering AUTHORITY (data gravity) is the lock-in. We ingest the open table/lineage signals, not the managed authority.",
+      "note": "Open table/lineage edges are candidate inputs; the managed catalog authority is declined."
+    },
+    {
+      "id": "purview-control-plane",
+      "name": "Microsoft Purview / Fabric control plane",
+      "owner": "Microsoft",
+      "kind": "governance control plane",
+      "direction": "n/a",
+      "status": "declined",
+      "reason": "Purview emits OpenLineage→Atlas (which we consume), but the catalog/identity control plane (Entra/Fabric) is proprietary lock-in. Ride the open lineage edge, decline the control plane.",
+      "note": "OpenLineage edge is a candidate input; the proprietary control plane is declined."
+    }
+  ],
+  "serves_truth": false
+}

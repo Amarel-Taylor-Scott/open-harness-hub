@@ -180,6 +180,10 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_native_format_full_stack.py", "check_native_format_full_stack"),
     # ── OKF INTEROP: import/export Google's Open Knowledge Format at the EDGES (markdown+YAML, type-required, reserved index.md/log.md) WITHOUT surrendering the core — our governance (verified/source/freshness/receipt) rides in the frontmatter OKF doesn't mandate + a CDC log.md; round-trip lossless (governance + arbitrary keys survive); OKF is a candidate projection, our object stays the core; never serves truth ──
     ("scripts/check_okf_interop.py", "check_okf_interop"),
+    # ── STANDARDS INTEROP MANIFEST (single source of truth): every adopted/declined standard (OKF/PROV/OpenLineage/WebAnnotation/JSON-Patch/JSON-LD/MCP; declined data-gravity moats) with direction+status+module+proof; every built/emitted claim import-verified + proof-gated; the public interop page is GENERATED from the manifest (no hand-typed conformance, fails on drift); never serves truth ──
+    ("scripts/check_standards_interop_manifest.py", "check_standards_interop_manifest"),
+    # ── OKF + FRESHNESS LIVE E2E (capstone, fully local): ingest OKF → bind the fragile fact to the local source emulator → serve fresh → source changes → stale held out → re-sync → export OKF provably current with the change in log.md; round-trip stays lossless; "OKF carries context, Baltor governs whether it's true+current"; never serves truth ──
+    ("scripts/check_okf_freshness_live_e2e.py", "check_okf_freshness_live_e2e"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),
