@@ -133,10 +133,12 @@ def _self_test() -> int:
     f = facts()
     page = render_deck(deck)
 
-    ck("deck has the core slides incl. the flagship self-optimizing unit",
-       {s["id"] for s in deck["slides"]} >= {"title", "wedge", "flagship", "distillation", "moat", "traction"})
-    ck("consistent single-source language is present (wedge + thesis + proposition)",
-       all(html.escape(deck["language"][k]) in page for k in ("wedge", "thesis", "proposition")))
+    ck("deck has the core slides incl. the flagship + the unbounded→bounded DESCENT slide",
+       {s["id"] for s in deck["slides"]} >= {"title", "wedge", "flagship", "descent", "distillation", "moat", "traction"})
+    ck("consistent single-source language is present (wedge + thesis + proposition + descent)",
+       all(html.escape(deck["language"][k]) in page for k in ("wedge", "thesis", "proposition", "descent")))
+    ck("the deck formalizes the unbounded→bounded, inefficient→efficient thesis",
+       "unbounded" in page.lower() and "most-bounded" in page.lower() and "most-efficient" in page.lower())
     # numbers are COMPUTED, not hand-typed: every {placeholder} resolves + the live receipt numbers appear
     ck("no unresolved {placeholders} remain (every number computed)", not re.search(r"\{[a-z_]+\}", page),
        str(re.findall(r"\{[a-z_]+\}", page)[:5]))
