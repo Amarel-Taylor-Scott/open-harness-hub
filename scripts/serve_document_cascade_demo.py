@@ -24,20 +24,27 @@ if __name__ == "__main__" and __package__ in (None, ""):  # pragma: no cover
     if _R not in sys.path:
         sys.path.insert(0, _R)
 
-from src.teleon.extraction.document_extraction_cascade import extract
+from src.teleon.extraction.document_extraction_cascade import extract_measured
 from src.teleon.extraction.schema_templates import parse_user_schema, render_template, template_names
 
 _FRONTIER_ONLY_COST = 0.302   # the naive baseline: acquire + send the whole doc to a frontier LLM
+_DEFAULT_FLOOR = 0.8          # the measured-accuracy bar a method must clear to be chosen for a field
 
 
 def run_extract(spec: dict) -> dict:
-    """Run the REAL cascade on the USER-DEFINED capability and add the savings-vs-frontier comparison."""
+    """Run the REAL *measured* cascade on the USER-DEFINED capability: per field the cheapest method whose MEASURED
+    accuracy clears the confidence floor. Add the savings-vs-frontier comparison."""
     required = parse_user_schema(spec.get("schema", ""))
     doc = {"has_text_layer": bool(spec.get("has_text_layer", True)), "scanned": bool(spec.get("scanned", False))}
     keys = ("LLM_API_KEY",) if spec.get("has_llm_key", True) else ()
+    try:
+        floor = float(spec.get("confidence_floor", _DEFAULT_FLOOR))
+    except (TypeError, ValueError):
+        floor = _DEFAULT_FLOOR
+    floor = min(1.0, max(0.0, floor))
     if not required:
         return {"error": "write at least one schema field, e.g. 'agency_license_no: structured'", "serves_truth": False}
-    r = extract(required, doc, available_keys=keys)
+    r = extract_measured(required, doc, available_keys=keys, confidence_floor=floor)
     r["frontier_only_cost"] = _FRONTIER_ONLY_COST
     r["savings_vs_frontier"] = round(_FRONTIER_ONLY_COST - r["total_cost"], 4)
     r["savings_pct"] = round(100.0 * (_FRONTIER_ONLY_COST - r["total_cost"]) / _FRONTIER_ONLY_COST, 1)
@@ -82,8 +89,10 @@ payment_terms: unstructured</textarea>
   <div class="chk"><input type="checkbox" id="textlayer" checked><label style="margin:0">document has a text layer (else OCR)</label></div>
   <div class="chk"><input type="checkbox" id="scanned"><label style="margin:0">document is a scan</label></div>
   <div class="chk"><input type="checkbox" id="llmkey" checked><label style="margin:0">an LLM key is available</label></div>
+  <label>Confidence floor: <b id="floorval">0.80</b> <span style="color:var(--mut)">(the MEASURED accuracy a method must clear to be chosen)</span></label>
+  <input type="range" id="floor" min="0.5" max="1" step="0.05" value="0.8" style="width:100%" oninput="document.getElementById('floorval').textContent=(+this.value).toFixed(2)" onchange="runCascade()">
   <button onclick="runCascade()">Run cascade ▶</button>
-  <div class="note">Tip: an all-<code>structured</code> schema fills by regex with NO LLM. Uncheck the LLM key to see unstructured fields reported missing honestly.</div>
+  <div class="note">Tip: drag the floor up — watch unstructured fields escalate from the cheap LLM to the frontier (cost rises only to clear the higher measured bar). An all-<code>structured</code> schema fills by regex with NO LLM. Uncheck the LLM key to see fields reported missing honestly.</div>
  </div>
  <div class="panel" id="out"><div class="sub">Results will appear here.</div></div>
 </main>
@@ -97,21 +106,23 @@ async function runCascade(){
  const spec={schema:document.getElementById('schema').value,
    has_text_layer:document.getElementById('textlayer').checked,
    scanned:document.getElementById('scanned').checked,
-   has_llm_key:document.getElementById('llmkey').checked};
+   has_llm_key:document.getElementById('llmkey').checked,
+   confidence_floor:parseFloat(document.getElementById('floor').value)};
  const out=document.getElementById('out'); out.innerHTML='<div class="sub">running…</div>';
  try{
   const res=await fetch('/extract',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(spec)});
   const r=await res.json();
   if(r.error){out.innerHTML='<div class="bad">'+r.error+'</div>';return;}
+  const sc=f=>(r.field_scores&&r.field_scores[f]!=null)?(' <span class=sub>('+r.field_scores[f].toFixed(2)+')</span>'):'';
   let rows=r.receipt.map(s=>'<tr><td>'+s.stage+'</td><td><code>'+s.method+'</code></td><td>$'+(s.cost||0)+'</td>'
-    +'<td>'+(s.skipped?('<span class=bad>skipped: '+s.skipped+'</span>'):(s.deterministic===false?'<span class="pill llm">LLM</span>':'<span class="pill det">deterministic</span>'))+'</td>'
-    +'<td>'+((s.filled||[]).join(', '))+'</td></tr>').join('');
+    +'<td>'+(s.skipped?('<span class=bad>skipped: '+s.skipped+'</span>'):(s.stage==='llm_extract'?'<span class="pill llm">LLM</span>':'<span class="pill det">deterministic</span>'))+'</td>'
+    +'<td>'+((s.filled||[]).map(f=>f+sc(f)).join(', '))+'</td></tr>').join('');
   out.innerHTML=
    '<div class="big '+(r.met_requirement?'ok':'bad')+'">'+(r.met_requirement?'✓ requirement met':'✗ requirement NOT met')+'</div>'
-   +'<div class="sub">total cost <b>$'+r.total_cost+'</b> · vs frontier-only $'+r.frontier_only_cost+' → <span class=ok>'+r.savings_pct+'% cheaper</span> · used LLM: '+r.used_llm+'</div>'
-   +(r.missing.length?'<div class="bad">missing (no available method could fill, not fabricated): '+r.missing.join(', ')+'</div>':'')
-   +'<table><tr><th>stage</th><th>method</th><th>cost</th><th>type</th><th>filled</th></tr>'+rows+'</table>'
-   +'<div class="note">serves_truth='+r.serves_truth+' · the cheapest variation that meets the schema; escalates only as far as needed.</div>';
+   +'<div class="sub">floor <b>'+r.confidence_floor.toFixed(2)+'</b> · total cost <b>$'+r.total_cost+'</b> · vs frontier-only $'+r.frontier_only_cost+' → <span class=ok>'+r.savings_pct+'% cheaper</span> · used LLM: '+r.used_llm+'</div>'
+   +(r.missing.length?'<div class="bad">missing (no available method cleared the floor, not fabricated): '+r.missing.join(', ')+'</div>':'')
+   +'<table><tr><th>stage</th><th>method</th><th>cost</th><th>type</th><th>filled (measured score)</th></tr>'+rows+'</table>'
+   +'<div class="note">serves_truth='+r.serves_truth+' · per field: the cheapest method whose MEASURED accuracy clears the floor; escalates only as far as the bar forces.</div>';
  }catch(e){out.innerHTML='<div class="bad">'+e+'</div>';}
 }
 window.onload=runCascade;
@@ -162,8 +173,9 @@ def _self_test() -> int:
             fails.append(name)
 
     page = _render_page()
-    ck("the page renders the write-in form (schema textarea + run button + doc-profile toggles)",
-       "<textarea id=\"schema\">" in page and "Run cascade" in page and "textlayer" in page and "llmkey" in page)
+    ck("the page renders the write-in form (schema textarea + run button + doc-profile toggles + floor slider)",
+       "<textarea id=\"schema\">" in page and "Run cascade" in page and "textlayer" in page and "llmkey" in page
+       and 'id="floor"' in page)
     # USER-DEFINED schemas are the real path; templates are an OPTIONAL chooser that prefills the editable box
     ck("the page offers a template chooser AND a 'write your own' option (templates are optional, not the surface)",
        'id="template"' in page and "Write your own schema" in page and ">employment agency<" in page)
@@ -181,6 +193,12 @@ def _self_test() -> int:
     r2 = run_extract({"schema": "a: structured\nc: unstructured", "has_text_layer": True, "has_llm_key": True})
     ck("a schema with an unstructured field escalates to the LLM but beats frontier-only",
        r2["met_requirement"] and r2["used_llm"] and r2["total_cost"] < r2["frontier_only_cost"])
+    # the floor is a live A/B in the demo: a higher floor escalates the unstructured field's tier and raises cost
+    lo = run_extract({"schema": "a: structured\nc: unstructured", "has_llm_key": True, "confidence_floor": 0.6})
+    hi = run_extract({"schema": "a: structured\nc: unstructured", "has_llm_key": True, "confidence_floor": 0.95})
+    ck("the confidence floor is a live A/B: a higher floor raises the cost (escalates to a stronger method)",
+       hi["total_cost"] > lo["total_cost"] and lo["filled"]["c"] != hi["filled"]["c"], f"{lo['total_cost']} vs {hi['total_cost']}")
+    ck("results carry the MEASURED per-field scores", "field_scores" in r2 and r2["field_scores"].get("a") is not None)
     # honesty: no LLM key -> unstructured field reported missing, not fabricated
     r3 = run_extract({"schema": "a: structured\nc: unstructured", "has_llm_key": False})
     ck("no LLM key -> the unstructured field is reported MISSING (not fabricated)",
@@ -190,8 +208,9 @@ def _self_test() -> int:
     ck("deterministic", run_extract({"schema": "a: structured\nb: structured"}) == r1)
 
     print("\n" + ("PASS - serve_document_cascade_demo: a fully-working local page (stdlib http.server) where you write "
-                  "in a capability (schema + doc profile + key) and the REAL document→schema cascade runs — cheapest "
-                  "path, per-step cost, deterministic-vs-LLM, savings vs frontier, missing fields reported honestly. "
+                  "in a USER-DEFINED capability (or pick an editable template) and the REAL document→schema MEASURED "
+                  "cascade runs — drag the confidence floor to watch fields escalate from the cheap LLM to frontier; "
+                  "per-step cost, measured scores, deterministic-vs-LLM, savings vs frontier, missing fields honest. "
                   "Run: PYTHONPATH=. python3 scripts/serve_document_cascade_demo.py --serve. Never serves truth."
                   if not fails else f"{len(fails)} FAILURES: {fails}"))
     return 0 if not fails else 1

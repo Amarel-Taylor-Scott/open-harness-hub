@@ -285,6 +285,7 @@ def extract_measured(required_fields: dict, doc: dict, *, available_keys: tuple 
         c = d["base_cost"] * (_COMPRESS_LLM_DISCOUNT if (compressed and d["stage"] == "llm_extract") else 1.0)
         cost += c
         steps.append({"stage": d["stage"], "method": d["method"], "cost": round(c, 4),
+                      "deterministic": d["stage"] != "llm_extract",
                       "filled": sorted(f for f in chosen if chosen[f]["method"] == d["method"]),
                       "measured_score": d["score"]})
 
