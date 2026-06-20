@@ -224,6 +224,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_intelligence_source_registry.py", "check_intelligence_source_registry"),
     # ── TUNABLE TASK CATALOG (generalize the doc-extraction idea): 13 agentic tasks that each fit AUTOMATED SETUP TUNING — tiered method grid (deterministic floor → small model → frontier LLM), cheapest-first, escalate only as far as the requirement forces; the auto-tuner key-gates LLM tiers + lets deterministic-possible tasks finish with no LLM; never serves truth ──
     ("scripts/check_tunable_task_catalog.py", "check_tunable_task_catalog"),
+    # ── CAPABILITY PR WORKFLOW (GitHub-familiar bridge): a capability unit is a familiar git repo — branches/PRs/checks/merge — where the eval-LIFT gate IS the CI check (a regressing or out-of-policy fork CANNOT merge); same workflow on internal git OR the client's GitHub/GitLab/Gitea (operation parity map); governance rides in the notes sidecar; familiar UI rendered; never serves truth ──
+    ("scripts/check_capability_pr_workflow.py", "check_capability_pr_workflow"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),
