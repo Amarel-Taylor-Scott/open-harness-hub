@@ -248,6 +248,10 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_context_engineering_patterns.py", "check_context_engineering_patterns"),
     # ── PARALLEL DEV FLEET (faster cycles, no same-file edits): Claude Code + Ollama agents run in parallel, each in its OWN git worktree (physical isolation) owning a DISJOINT file set; the proof registry + count token are SERIALIZED (owned by no lane, merged one at a time); heterogeneous brains by the unbounded->bounded policy (ollama for narrow/deterministic lanes, claude for design); pure dry-run plan, never serves truth ──
     ("scripts/check_parallel_dev_lanes.py", "check_parallel_dev_lanes"),
+    # ── PORTFOLIO CONNECTION MAP (memorialize how everything connects): all 22 Open*Hubs (9 live + 13 private-bench) mapped to the core products (Baltor, Teleon) they FEED (context packs / harnesses / model info / methods / receipts), with the Amazon internal-infra->public-revenue stage per hub; coverage cross-checked against products.js so no surface is omitted; renders a Mermaid diagram; dependency law hub->core never reverse; never serves truth ──
+    ("scripts/build_portfolio_connection_map.py", "build_portfolio_connection_map"),
+    # ── DESCENT ATTEMPT STORE (the BRAIN: smarter over time): canonical append-only, lossless store of EVERY unbounded->bounded attempt — keeps failures + losers as training NEGATIVES; doubles as the meta-learner memory (best_strategy_for computed from records) and the training corpus (features+label+reward) for a descent-policy model; internal infra now, OpenDistillationHub public-revenue candidate later; never serves truth ──
+    ("scripts/check_descent_attempt_store.py", "check_descent_attempt_store"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),
