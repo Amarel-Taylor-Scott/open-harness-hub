@@ -24,7 +24,7 @@ _REPO = Path(__file__).resolve().parents[1]
 #: raw-key shapes that must NEVER appear in tracked source.
 _RAW_KEY = re.compile(r"\bsk-[A-Za-z0-9_\-]{16,}\b")
 _INLINE_KEY = re.compile(r'"api_key"\s*:\s*"(?!env://|secret://)[^"]+"')
-_SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv", "_reference", "artifacts", ".codegraph"}
+_SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv", "_reference", "repo_reference", "artifacts", ".codegraph"}
 _SCAN_EXT = {".py", ".json", ".md", ".txt", ".yaml", ".yml", ".html", ".js", ".mjs", ".env", ".example"}
 #: files that intentionally contain SYNTHETIC example keys to TEST redaction/PII scrubbing. Allowlisted —
 #: but each match in them must be a KNOWN synthetic fixture, so a REAL key in these files still fails.

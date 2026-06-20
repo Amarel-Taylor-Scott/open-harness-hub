@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 from typing import Any, Callable
 
 #: license tokens that forbid vendoring the source code → a seed must be technique-only (drop_in=False).
-_NON_VENDORABLE = ("agpl", "gpl", "lgpl", "proprietary", "unstated", "n/a", "")
+_NON_VENDORABLE = ("agpl", "gpl", "lgpl", "proprietary", "private", "unstated", "n/a", "")
 
 
 def vendorable(license_: str) -> bool:
