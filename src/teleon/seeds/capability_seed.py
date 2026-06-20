@@ -77,7 +77,7 @@ def register(seed: CapabilitySeed) -> CapabilitySeed:
 
 def all_seeds() -> list[CapabilitySeed]:
     # import the seed packs so registration happens on first access (deterministic order by slot)
-    from src.teleon.seeds import api_and_feed_seeds, github_signal_seeds  # noqa: F401
+    from src.teleon.seeds import api_and_feed_seeds, github_signal_seeds, profession_calculators  # noqa: F401
     return sorted(_REGISTRY, key=lambda s: s.slot)
 
 
