@@ -188,6 +188,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_ftm_interop.py", "check_ftm_interop"),
     # ── ENTITY-INTELLIGENCE candidate feed (governed cross-project ingestion): stage the DueCare catalog (GLEIF/BODS/OFAC/DOJ/DOL/registries) as CANDIDATES with determinism_ceiling + license + fragility (real taxonomy modes); `adoptable` cross-checks the org-guardrail AVOID ledger (AVOID-* rows recorded NON-adoptable); discovery≠trust, nothing promoted, serves_truth=false ──
     ("scripts/ingest_entity_intelligence_catalog.py", "ingest_entity_intelligence_catalog"),
+    # ── GITHUB SIGNAL intake (owner-shared repos, reviewed live): 10 targets staged as governed candidates w/ disposition (ADOPT/CONSIDER/WATCH/AVOID); copyleft/unstated/proprietary can NEVER be adoptable (org-guardrail cross-check); provenance corrections + unscrapeable links recorded honestly; discovery≠trust, serves_truth=false ──
+    ("scripts/ingest_github_signal_intake.py", "ingest_github_signal_intake"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),
