@@ -212,6 +212,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/build_pitch_deck.py", "build_pitch_deck"),
     # ── API-HUB intake + GOVERNED feed-intake (+ repo-batch seeds): the feed-intake REFUSES ToS-violating scraping / anti-bot evasion / bulk-PII-harvest and ingests only via legitimate paths (official API / owner-paste / RSS), logging inaccessible sources honestly; the API-hub intake catalogs governed endpoint candidates (RapidAPI/Nokia CAMARA) behind a port; discovery≠trust, never serves truth ──
     ("scripts/check_api_and_feed_seeds.py", "check_api_and_feed_seeds"),
+    # ── OPENAPI DECONSTRUCTOR: deconstruct an API hub's endpoint SPECS (OpenAPI — how RapidAPI describes every endpoint) into governed capability-seed candidates (input/output contract + endpoint + auth + high determinism); a deconstructed endpoint distills to a deterministic capability via direct_api_rule; the live Playwright/owner-session harvest has a built local emulator (DEFER GATE); discovery≠trust, never serves truth ──
+    ("scripts/check_openapi_deconstructor.py", "check_openapi_deconstructor"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),
