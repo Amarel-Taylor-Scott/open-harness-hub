@@ -1,6 +1,6 @@
 # Proof Inventory
 
-**516** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
+**536** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
 
 - `scripts/ingest/context_rot.py`
 - `scripts/ingest/document_decompose.py`
@@ -157,6 +157,26 @@
 - `scripts/check_okf_interop.py`
 - `scripts/check_standards_interop_manifest.py`
 - `scripts/check_okf_freshness_live_e2e.py`
+- `scripts/check_ftm_interop.py`
+- `scripts/check_skill_md_interop.py`
+- `scripts/ingest_entity_intelligence_catalog.py`
+- `scripts/ingest_github_signal_intake.py`
+- `scripts/check_capability_seeds.py`
+- `scripts/check_profession_capability_seeder.py`
+- `scripts/check_repo_reference_manifest.py`
+- `scripts/check_fundamental_primitives_taxonomy.py`
+- `scripts/code_graph.py`
+- `scripts/check_model_index.py`
+- `scripts/check_descent_method_catalog.py`
+- `scripts/check_self_optimizing_unit.py`
+- `scripts/build_pitch_deck.py`
+- `scripts/check_api_and_feed_seeds.py`
+- `scripts/check_openapi_deconstructor.py`
+- `scripts/check_git_backend_port.py`
+- `scripts/check_capability_implementation_registry.py`
+- `scripts/check_document_extraction_cascade.py`
+- `scripts/check_intelligence_source_registry.py`
+- `scripts/check_tunable_task_catalog.py`
 - `scripts/check_lossless_distillation_contracts.py`
 - `scripts/check_lossless_artifact_store.py`
 - `scripts/check_lineage_bundle_complete.py`

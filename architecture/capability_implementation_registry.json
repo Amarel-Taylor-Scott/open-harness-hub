@@ -1,0 +1,375 @@
+{
+  "version": "1.0",
+  "updated": "2026-06-20",
+  "principle": "A capability is facilitated by a VARIETY of implementation options \u2014 internal repos, libraries, API hubs, models, LLMs \u2014 in different combinations. Each option declares the tools/models/API-keys (by NAME, env refs only) it needs, its cost tier, and its determinism ceiling. The runtime SELECTS the best combination by what's available + the objective (cheapest capable / most deterministic), and falls back. Discovery!=trust; nothing promoted; serves_truth=false.",
+  "kind_enum": [
+    "internal_repo",
+    "library",
+    "api",
+    "llm",
+    "model",
+    "tool",
+    "api_hub"
+  ],
+  "serves_truth": false,
+  "capabilities": [
+    {
+      "capability": "entity-resolution",
+      "implementations": [
+        {
+          "impl_id": "bq-entity-resolution",
+          "kind": "internal_repo",
+          "models": [],
+          "api_keys": [],
+          "cost_tier": "low",
+          "determinism_ceiling": 0.9,
+          "source": "repos/bq-entity-resolution (leaf-based N\u00d7M, BigQuery/DuckDB)",
+          "governed": "candidate",
+          "serves_truth": false
+        },
+        {
+          "impl_id": "splink",
+          "kind": "library",
+          "models": [],
+          "api_keys": [],
+          "cost_tier": "low",
+          "determinism_ceiling": 0.85,
+          "source": "moj-analytical-services/splink (probabilistic linkage)",
+          "governed": "candidate",
+          "serves_truth": false
+        },
+        {
+          "impl_id": "rapidfuzz-dedupe",
+          "kind": "library",
+          "models": [],
+          "api_keys": [],
+          "cost_tier": "free",
+          "determinism_ceiling": 0.8,
+          "source": "rapidfuzz token_sort_ratio + connected-components",
+          "governed": "candidate",
+          "serves_truth": false
+        },
+        {
+          "impl_id": "llm-judge-match",
+          "kind": "llm",
+          "models": [
+            "claude-haiku-4-5"
+          ],
+          "api_keys": [
+            "ANTHROPIC_API_KEY"
+          ],
+          "cost_tier": "mid",
+          "determinism_ceiling": 0.4,
+          "source": "LLM adjudication for ambiguous pairs (candidate, never truth)",
+          "governed": "candidate",
+          "serves_truth": false
+        }
+      ]
+    },
+    {
+      "capability": "grounded-search",
+      "implementations": [
+        {
+          "impl_id": "gemini-grounded",
+          "kind": "api",
+          "models": [
+            "gemini-2.5-pro"
+          ],
+          "api_keys": [
+            "GEMINI_API_KEY"
+          ],
+          "cost_tier": "per_call",
+          "determinism_ceiling": 0.6,
+          "source": "Gemini grounded search (citations)",
+          "governed": "candidate",
+          "serves_truth": false
+        },
+        {
+          "impl_id": "brave-serper",
+          "kind": "api",
+          "models": [],
+          "api_keys": [
+            "BRAVE_API_KEY"
+          ],
+          "cost_tier": "per_call",
+          "determinism_ceiling": 0.7,
+          "source": "Brave/Serper web search + page fetch",
+          "governed": "candidate",
+          "serves_truth": false
+        },
+        {
+          "impl_id": "smartsearch",
+          "kind": "tool",
+          "models": [],
+          "api_keys": [],
+          "cost_tier": "free",
+          "determinism_ceiling": 0.5,
+          "source": "konbakuyomu/smartsearch CLI source-discovery (behind a port)",
+          "governed": "candidate",
+          "serves_truth": false
+        }
+      ]
+    },
+    {
+      "capability": "image-processing",
+      "implementations": [
+        {
+          "impl_id": "real-esrgan",
+          "kind": "internal_repo",
+          "models": [],
+          "api_keys": [],
+          "cost_tier": "low",
+          "determinism_ceiling": 0.9,
+          "source": "repos/Real-ESRGAN-2025 (4x upscale, face enhance)",
+          "governed": "candidate",
+          "serves_truth": false
+        },
+        {
+          "impl_id": "image-enhance-opencv",
+          "kind": "library",
+          "models": [],
+          "api_keys": [],
+          "cost_tier": "free",
+          "determinism_ceiling": 0.95,
+          "source": "deterministic deskew/denoise/sharpen/CLAHE (image_enhance)",
+          "governed": "candidate",
+          "serves_truth": false
+        },
+        {
+          "impl_id": "opennsfw2-safety",
+          "kind": "library",
+          "models": [],
+          "api_keys": [],
+          "cost_tier": "free",
+          "determinism_ceiling": 0.9,
+          "source": "opennsfw2 NSFW audit (safety gate)",
+          "governed": "candidate",
+          "serves_truth": false
+        },
+        {
+          "impl_id": "gemini-imagen",
+          "kind": "api",
+          "models": [
+            "imagen-3"
+          ],
+          "api_keys": [
+            "GEMINI_API_KEY"
+          ],
+          "cost_tier": "per_call",
+          "determinism_ceiling": 0.3,
+          "source": "generative image (candidate)",
+          "governed": "candidate",
+          "serves_truth": false
+        }
+      ]
+    },
+    {
+      "capability": "inbox-digest",
+      "implementations": [
+        {
+          "impl_id": "email-info-digesting",
+          "kind": "internal_repo",
+          "models": [
+            "claude-haiku-4-5"
+          ],
+          "api_keys": [
+            "ANTHROPIC_API_KEY"
+          ],
+          "cost_tier": "mid",
+          "determinism_ceiling": 0.6,
+          "source": "repos/email_info_digesting (4-layer, fallback chains)",
+          "governed": "candidate",
+          "serves_truth": false
+        },
+        {
+          "impl_id": "imap-rules",
+          "kind": "library",
+          "models": [],
+          "api_keys": [],
+          "cost_tier": "free",
+          "determinism_ceiling": 0.95,
+          "source": "deterministic IMAP fetch + rule-based extraction",
+          "governed": "candidate",
+          "serves_truth": false
+        }
+      ]
+    },
+    {
+      "capability": "trafficking-safety-eval",
+      "implementations": [
+        {
+          "impl_id": "llm-safety-framework",
+          "kind": "internal_repo",
+          "models": [
+            "claude-sonnet-4-6"
+          ],
+          "api_keys": [
+            "ANTHROPIC_API_KEY"
+          ],
+          "cost_tier": "mid",
+          "determinism_ceiling": 0.7,
+          "source": "repos/llm-safety-framework (refusal eval, ILO indicators)",
+          "governed": "candidate",
+          "serves_truth": false
+        },
+        {
+          "impl_id": "grep-rule-screen",
+          "kind": "library",
+          "models": [],
+          "api_keys": [],
+          "cost_tier": "free",
+          "determinism_ceiling": 1.0,
+          "source": "deterministic GREP indicator rules (DueCare 318 rules)",
+          "governed": "candidate",
+          "serves_truth": false
+        }
+      ]
+    },
+    {
+      "capability": "quant-forecasting",
+      "implementations": [
+        {
+          "impl_id": "giga-trader",
+          "kind": "internal_repo",
+          "models": [],
+          "api_keys": [
+            "ALPACA_API_KEY"
+          ],
+          "cost_tier": "low",
+          "determinism_ceiling": 0.5,
+          "source": "repos/giga-trader (27-phase, anti-overfit; research only)",
+          "governed": "candidate",
+          "serves_truth": false
+        },
+        {
+          "impl_id": "deterministic-ta",
+          "kind": "library",
+          "models": [],
+          "api_keys": [],
+          "cost_tier": "free",
+          "determinism_ceiling": 1.0,
+          "source": "deterministic technical-indicator computation",
+          "governed": "candidate",
+          "serves_truth": false
+        }
+      ]
+    },
+    {
+      "capability": "on-device-llm",
+      "implementations": [
+        {
+          "impl_id": "duecare-journey-litert",
+          "kind": "internal_repo",
+          "models": [
+            "gemma-4-e2b"
+          ],
+          "api_keys": [],
+          "cost_tier": "free",
+          "determinism_ceiling": 0.4,
+          "source": "repos/duecare-journey-android (LiteRT, fully offline)",
+          "governed": "candidate",
+          "serves_truth": false
+        },
+        {
+          "impl_id": "llama-cpp",
+          "kind": "library",
+          "models": [
+            "gemma-4-26b"
+          ],
+          "api_keys": [],
+          "cost_tier": "free",
+          "determinism_ceiling": 0.4,
+          "source": "ggml-org/llama.cpp GGUF CPU inference",
+          "governed": "candidate",
+          "serves_truth": false
+        }
+      ]
+    },
+    {
+      "capability": "video-generation",
+      "implementations": [
+        {
+          "impl_id": "web-animation",
+          "kind": "internal_repo",
+          "models": [],
+          "api_keys": [],
+          "cost_tier": "free",
+          "determinism_ceiling": 0.8,
+          "source": "repos/web_animation (parametric WebGL/Canvas, deterministic seed)",
+          "governed": "candidate",
+          "serves_truth": false
+        },
+        {
+          "impl_id": "manimml",
+          "kind": "library",
+          "models": [],
+          "api_keys": [],
+          "cost_tier": "free",
+          "determinism_ceiling": 0.9,
+          "source": "repos/ManimML (deterministic ML-concept animation)",
+          "governed": "candidate",
+          "serves_truth": false
+        },
+        {
+          "impl_id": "tensorart-video",
+          "kind": "api",
+          "models": [
+            "tensorart"
+          ],
+          "api_keys": [
+            "TENSORART_API_KEY"
+          ],
+          "cost_tier": "per_call",
+          "determinism_ceiling": 0.3,
+          "source": "TensorArt 3-15s clips (candidate)",
+          "governed": "candidate",
+          "serves_truth": false
+        }
+      ]
+    },
+    {
+      "capability": "lead-discovery",
+      "implementations": [
+        {
+          "impl_id": "agency-email-scraper",
+          "kind": "internal_repo",
+          "models": [],
+          "api_keys": [],
+          "cost_tier": "free",
+          "determinism_ceiling": 0.7,
+          "source": "repos/agency_email_scraper (registry-pattern, governed/legitimate)",
+          "governed": "candidate",
+          "serves_truth": false
+        },
+        {
+          "impl_id": "rapidapi-leads",
+          "kind": "api_hub",
+          "models": [],
+          "api_keys": [
+            "RAPIDAPI_KEY"
+          ],
+          "cost_tier": "per_call",
+          "determinism_ceiling": 0.8,
+          "source": "RapidAPI lead/contact endpoints (behind a port)",
+          "governed": "candidate",
+          "serves_truth": false
+        },
+        {
+          "impl_id": "llm-extract-contacts",
+          "kind": "llm",
+          "models": [
+            "claude-haiku-4-5"
+          ],
+          "api_keys": [
+            "ANTHROPIC_API_KEY"
+          ],
+          "cost_tier": "mid",
+          "determinism_ceiling": 0.5,
+          "source": "LLM contact extraction from public pages (candidate)",
+          "governed": "candidate",
+          "serves_truth": false
+        }
+      ]
+    }
+  ]
+}
