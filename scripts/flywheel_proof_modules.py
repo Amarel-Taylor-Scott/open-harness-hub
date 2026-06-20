@@ -198,6 +198,10 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_repo_reference_manifest.py", "check_repo_reference_manifest"),
     # ── FUNDAMENTAL PRIMITIVES taxonomy: ONE canonical map of the system's primitives (data storage/transfer/computation/unit/medium · interop/context/skill standards · k8s/cloud-fn/execution/environment runtime · seven-primitive grammar · the assurance wedge), each mapped to a REAL artifact; all owner-requested families covered; assurance first-class; generated code/file map (no drift); non-destructive index ──
     ("scripts/check_fundamental_primitives_taxonomy.py", "check_fundamental_primitives_taxonomy"),
+    # ── CODE GRAPH: deterministic ast-based dependency graph (file→file imports + crossing symbols) over src/scripts/local_emulators; upstream/downstream are exact inverses; impact = transitive blast radius; neighbors by file path → "edit 1 file, see what breaks"; stdlib-only, always available; never serves truth ──
+    ("scripts/code_graph.py", "code_graph"),
+    # ── MODEL INDEX (best+cheapest+effective, FRESHNESS-governed): unified index of model cost + live endpoint + download location + quality; selector picks the cheapest FRESH model within a quality floor; stale model facts are HELD OUT and never selected until re-verified (kept-up-to-date is the wedge); never serves truth ──
+    ("scripts/check_model_index.py", "check_model_index"),
     # ── LOSSLESS DISTILLATION SUBSYSTEM (core; workflow w2bds1nzd) ──
     ("scripts/check_lossless_distillation_contracts.py", "check_lossless_distillation_contracts"),
     ("scripts/check_lossless_artifact_store.py", "check_lossless_artifact_store"),

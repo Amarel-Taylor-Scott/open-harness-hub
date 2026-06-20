@@ -1,0 +1,212 @@
+{
+  "version": "1.0",
+  "updated": "2026-06-20",
+  "note": "Unified model index: pick the best + cheapest STILL-EFFECTIVE model \u2014 but ONLY from FRESH entries. Model cost/endpoint/download facts are volatile; a stale entry is HELD OUT (never selected) until re-verified. That freshness governance is the wedge (a stale price/endpoint is worse than none). Consolidates architecture/lowcost_llm_endpoint_registry.json + free_limited_llm_endpoint_registry.json + model_quality_tier_codes.json; extends them with download_location + unified cost + freshness.",
+  "cost_unit": "USD per 1,000,000 tokens",
+  "kinds": [
+    "hosted_api",
+    "local_weights",
+    "browser"
+  ],
+  "serves_truth": false,
+  "entries": [
+    {
+      "model_id": "claude-opus-4-8",
+      "provider": "anthropic",
+      "kind": "hosted_api",
+      "cost_per_mtok_in": 15.0,
+      "cost_per_mtok_out": 75.0,
+      "quality_tier": "frontier",
+      "quality_rank": 4,
+      "specialization": "reasoning",
+      "live_endpoint": "https://api.anthropic.com/v1/messages",
+      "download_location": "",
+      "freshness": {
+        "last_verified": "2026-06-20",
+        "volatility_class": "high",
+        "status": "fresh"
+      },
+      "serves_truth": false
+    },
+    {
+      "model_id": "claude-sonnet-4-6",
+      "provider": "anthropic",
+      "kind": "hosted_api",
+      "cost_per_mtok_in": 3.0,
+      "cost_per_mtok_out": 15.0,
+      "quality_tier": "high",
+      "quality_rank": 3,
+      "specialization": "general",
+      "live_endpoint": "https://api.anthropic.com/v1/messages",
+      "download_location": "",
+      "freshness": {
+        "last_verified": "2026-06-20",
+        "volatility_class": "high",
+        "status": "fresh"
+      },
+      "serves_truth": false
+    },
+    {
+      "model_id": "claude-haiku-4-5",
+      "provider": "anthropic",
+      "kind": "hosted_api",
+      "cost_per_mtok_in": 1.0,
+      "cost_per_mtok_out": 5.0,
+      "quality_tier": "mid",
+      "quality_rank": 2,
+      "specialization": "fast",
+      "live_endpoint": "https://api.anthropic.com/v1/messages",
+      "download_location": "",
+      "freshness": {
+        "last_verified": "2026-06-20",
+        "volatility_class": "high",
+        "status": "fresh"
+      },
+      "serves_truth": false
+    },
+    {
+      "model_id": "gpt-o3",
+      "provider": "openai",
+      "kind": "hosted_api",
+      "cost_per_mtok_in": 2.0,
+      "cost_per_mtok_out": 8.0,
+      "quality_tier": "frontier",
+      "quality_rank": 4,
+      "specialization": "reasoning",
+      "live_endpoint": "https://api.openai.com/v1/chat/completions",
+      "download_location": "",
+      "freshness": {
+        "last_verified": "2026-06-20",
+        "volatility_class": "high",
+        "status": "fresh"
+      },
+      "serves_truth": false
+    },
+    {
+      "model_id": "gemini-2.5-pro",
+      "provider": "google",
+      "kind": "hosted_api",
+      "cost_per_mtok_in": 1.25,
+      "cost_per_mtok_out": 10.0,
+      "quality_tier": "frontier",
+      "quality_rank": 4,
+      "specialization": "multimodal",
+      "live_endpoint": "https://generativelanguage.googleapis.com",
+      "download_location": "",
+      "freshness": {
+        "last_verified": "2026-06-20",
+        "volatility_class": "high",
+        "status": "fresh"
+      },
+      "serves_truth": false
+    },
+    {
+      "model_id": "deepseek-v4-flash",
+      "provider": "deepseek",
+      "kind": "hosted_api",
+      "cost_per_mtok_in": 0.14,
+      "cost_per_mtok_out": 0.28,
+      "quality_tier": "mid",
+      "quality_rank": 2,
+      "specialization": "cheap-bulk",
+      "live_endpoint": "https://api.deepseek.com/v1/chat/completions",
+      "download_location": "",
+      "freshness": {
+        "last_verified": "2026-06-20",
+        "volatility_class": "high",
+        "status": "fresh"
+      },
+      "serves_truth": false
+    },
+    {
+      "model_id": "mistral-large-2",
+      "provider": "mistral",
+      "kind": "hosted_api",
+      "cost_per_mtok_in": 2.0,
+      "cost_per_mtok_out": 6.0,
+      "quality_tier": "high",
+      "quality_rank": 3,
+      "specialization": "general",
+      "live_endpoint": "https://api.mistral.ai/v1/chat/completions",
+      "download_location": "",
+      "freshness": {
+        "last_verified": "2026-06-20",
+        "volatility_class": "high",
+        "status": "fresh"
+      },
+      "serves_truth": false
+    },
+    {
+      "model_id": "gemma-4-26b",
+      "provider": "google",
+      "kind": "local_weights",
+      "cost_per_mtok_in": 0.0,
+      "cost_per_mtok_out": 0.0,
+      "quality_tier": "mid",
+      "quality_rank": 2,
+      "specialization": "cpu-batch",
+      "live_endpoint": "http://localhost:11434/v1/chat/completions",
+      "download_location": "https://huggingface.co/google/gemma-4-26b",
+      "freshness": {
+        "last_verified": "2026-06-20",
+        "volatility_class": "low",
+        "status": "fresh"
+      },
+      "serves_truth": false
+    },
+    {
+      "model_id": "qwen3-next-80b",
+      "provider": "alibaba",
+      "kind": "local_weights",
+      "cost_per_mtok_in": 0.0,
+      "cost_per_mtok_out": 0.0,
+      "quality_tier": "high",
+      "quality_rank": 3,
+      "specialization": "reasoning",
+      "live_endpoint": "http://localhost:11434/v1/chat/completions",
+      "download_location": "https://huggingface.co/Qwen/Qwen3-Next-80B",
+      "freshness": {
+        "last_verified": "2026-06-20",
+        "volatility_class": "low",
+        "status": "fresh"
+      },
+      "serves_truth": false
+    },
+    {
+      "model_id": "llama-4-70b",
+      "provider": "meta",
+      "kind": "local_weights",
+      "cost_per_mtok_in": 0.0,
+      "cost_per_mtok_out": 0.0,
+      "quality_tier": "mid",
+      "quality_rank": 2,
+      "specialization": "general",
+      "live_endpoint": "http://localhost:11434/v1/chat/completions",
+      "download_location": "https://huggingface.co/meta-llama/Llama-4-70B",
+      "freshness": {
+        "last_verified": "2026-06-20",
+        "volatility_class": "low",
+        "status": "fresh"
+      },
+      "serves_truth": false
+    },
+    {
+      "model_id": "nomic-embed-text",
+      "provider": "nomic",
+      "kind": "local_weights",
+      "cost_per_mtok_in": 0.0,
+      "cost_per_mtok_out": 0.0,
+      "quality_tier": "embedding",
+      "quality_rank": 0,
+      "specialization": "embedding",
+      "live_endpoint": "http://localhost:11434/api/embeddings",
+      "download_location": "https://huggingface.co/nomic-ai/nomic-embed-text-v1.5",
+      "freshness": {
+        "last_verified": "2026-06-20",
+        "volatility_class": "stable",
+        "status": "fresh"
+      },
+      "serves_truth": false
+    }
+  ]
+}
