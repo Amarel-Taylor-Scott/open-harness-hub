@@ -1,6 +1,6 @@
 # Proof Inventory
 
-**484** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
+**516** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
 
 - `scripts/ingest/context_rot.py`
 - `scripts/ingest/document_decompose.py`
@@ -154,6 +154,9 @@
 - `scripts/check_native_export_rehydration.py`
 - `scripts/check_native_api.py`
 - `scripts/check_native_format_full_stack.py`
+- `scripts/check_okf_interop.py`
+- `scripts/check_standards_interop_manifest.py`
+- `scripts/check_okf_freshness_live_e2e.py`
 - `scripts/check_lossless_distillation_contracts.py`
 - `scripts/check_lossless_artifact_store.py`
 - `scripts/check_lineage_bundle_complete.py`
@@ -332,6 +335,35 @@
 - `scripts/check_purpose_task_projection_redaction.py`
 - `scripts/check_adaptation_ladder.py`
 - `scripts/teleon_preseed_capabilities.py`
+- `scripts/check_teleon_capability_objectives.py`
+- `scripts/check_teleon_run_telemetry.py`
+- `scripts/check_teleon_unit_placement.py`
+- `scripts/check_teleon_objective_gated_descent.py`
+- `scripts/check_teleon_tenant_objective_binding.py`
+- `scripts/check_teleon_capability_evolution_graph.py`
+- `scripts/capability_seeder.py`
+- `scripts/context_workers/capability_discovery_runner.py`
+- `scripts/check_teleon_endpoint_registry.py`
+- `scripts/check_teleon_org_guardrail_policy.py`
+- `scripts/check_teleon_codex_lane.py`
+- `scripts/check_teleon_distillation.py`
+- `scripts/context_workers/distillation_runner.py`
+- `scripts/check_teleon_distillation_training.py`
+- `scripts/check_teleon_bulk_registry_ingest.py`
+- `scripts/check_teleon_capability_network.py`
+- `scripts/check_teleon_impl_finder.py`
+- `scripts/check_teleon_descent_axes.py`
+- `scripts/check_teleon_descent_strategies.py`
+- `scripts/check_teleon_token_reduction.py`
+- `scripts/eval/rulearena_benchmark.py`
+- `scripts/check_teleon_ab_harness.py`
+- `scripts/check_teleon_assurance_pipeline_e2e.py`
+- `scripts/check_teleon_tenant_preferences.py`
+- `scripts/eval/vertical_eval_suites.py`
+- `scripts/check_teleon_freshness_e2e.py`
+- `scripts/demo_assurance_descent.py`
+- `scripts/check_teleon_go_live_readiness.py`
+- `scripts/check_teleon_local_emulation.py`
 - `scripts/check_runtime_class_binding.py`
 - `scripts/check_execution_dispatch_fail_loud.py`
 - `scripts/check_portfolio_dependency_law.py`
