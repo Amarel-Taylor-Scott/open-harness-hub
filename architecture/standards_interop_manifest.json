@@ -31,6 +31,18 @@
       "note": "Detect a customer source's native shape, freeze it, and reproduce the same format on the way out — assurance travels in a sidecar, never by mutating the source."
     },
     {
+      "id": "followthemoney",
+      "name": "FollowTheMoney (FtM) entity schema",
+      "owner": "OpenSanctions / Aleph (OCCRP)",
+      "kind": "canonical entity schema",
+      "direction": "emit",
+      "status": "built",
+      "module": "src.baltor.native.ftm_adapter",
+      "proof": "scripts/check_ftm_interop.py",
+      "governance_added": "verified source-authority + freshness + receipts + topics promoted only from governed flags (never inferred from free text) — assurance FtM itself does not carry",
+      "note": "Map governed entity records -> FtM EntityProxy (Aleph-loadable; id=lei-<LEI> else dc-<sha1>; schema adopted, library optional via a PyICU-free pure-Python serializer). Imported as a candidate standard from the DueCare entity-intelligence reference (2026-06) — same adopt-the-schema-govern-above pattern as OKF."
+    },
+    {
       "id": "prov-json",
       "name": "W3C PROV-JSON",
       "owner": "W3C",
