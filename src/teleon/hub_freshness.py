@@ -23,7 +23,7 @@ def _key(cand: dict) -> tuple:
 
 
 def keep_hub_fresh(hub: str, intent: str, *, hub_engines: dict, openclaw, tools: list,
-                   brain=None, freshness_floor: float = 0.5, tenant: str = "_global") -> dict:
+                   brain=None, freshness_floor: float | None = None, tenant: str = "_global", settings=None) -> dict:
     """Run the freshness capability for one hub and DESCEND the discovery cost. Returns a governed summary.
 
     1. UNBOUNDED: measure each tool's yield (run the hub's plugins with that single tool); union = max freshness.
@@ -31,6 +31,19 @@ def keep_hub_fresh(hub: str, intent: str, *, hub_engines: dict, openclaw, tools:
     3. DESCEND: pick the cheapest tool whose yield ≥ freshness_floor × the unbounded union → the bounded path.
     4. RECORD the descent (unbounded all-tools cost → bounded single-tool cost) into the descent brain.
     """
+    # 0. resolve the SETTINGS PLANE (enabled / tool allowlist / rate limit / auto-verify / freshness bar)
+    if settings is None:
+        from src.openharnesshub.hub_settings import load_settings
+        settings = load_settings(hub)
+    if not settings.enabled:
+        return {"hub": hub, "intent": intent, "skipped": True, "reason": "disabled in hub_settings",
+                "discovered": 0, "ingested": 0, "verified": 0, "unbounded_cost": 0, "bounded_tool": None,
+                "bounded_cost": 0, "pct_saved": 0.0, "serves_truth": False}
+    from src.openharnesshub.hub_settings import tools_for
+    tools = tools_for(settings, tools)                       # honor the per-hub tool allowlist
+    if freshness_floor is None:
+        freshness_floor = settings.freshness_bar
+
     # 1. unbounded exploration — per-tool yield + the union
     per_tool, union = [], {}
     for t in tools:
@@ -41,16 +54,18 @@ def keep_hub_fresh(hub: str, intent: str, *, hub_engines: dict, openclaw, tools:
     unbounded_cost = sum(pt["cost"] for pt in per_tool) or 1
     unbounded_yield = len(union)
 
-    # 2. digest the union into the hub (continuous append; governed)
-    ingested = 0
+    # 2. digest the union into the hub — capped by rate_limit, auto-verify per the settings (continuous append; governed)
+    ingested = verified = 0
     eng = hub_engines.get(hub)
     if eng is not None:
-        for c in union.values():
+        for c in list(union.values())[: settings.rate_limit_per_cycle]:
             raw = c["raw"]
             body = dict(raw) if isinstance(raw, dict) else {"name": str(raw)}
             body["discovered_via"], body["tool"] = c.get("via_plugin"), c.get("via_tool")
-            eng.ingest(body, tenant=tenant)
+            rec = eng.ingest(body, tenant=tenant)
             ingested += 1
+            if settings.auto_verify and eng.verify(rec):     # run the verify gate now (else candidates wait for manual verify)
+                verified += 1
 
     # 3. descend — cheapest BOUNDED tool that still meets the freshness bar
     bar = max(1, int(freshness_floor * unbounded_yield))
@@ -76,9 +91,9 @@ def keep_hub_fresh(hub: str, intent: str, *, hub_engines: dict, openclaw, tools:
         except Exception:  # noqa: BLE001 — recording is annotation; never block freshness
             pass
 
-    return {"hub": hub, "intent": intent, "discovered": unbounded_yield, "ingested": ingested,
-            "unbounded_cost": unbounded_cost, "bounded_tool": bounded["tool"], "bounded_cost": bounded_cost,
-            "pct_saved": pct, "serves_truth": False}
+    return {"hub": hub, "intent": intent, "skipped": False, "discovered": unbounded_yield, "ingested": ingested,
+            "verified": verified, "unbounded_cost": unbounded_cost, "bounded_tool": bounded["tool"],
+            "bounded_cost": bounded_cost, "pct_saved": pct, "serves_truth": False}
 
 
 __all__ = ["keep_hub_fresh"]

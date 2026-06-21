@@ -141,6 +141,43 @@ def fresh(query: str) -> int:
     return 0
 
 
+def settings(hub: str | None) -> int:
+    """View the resolved per-hub SETTINGS PLANE (operational policy merged with the strategy)."""
+    from src.openharnesshub.hub_settings import all_settings, load_settings
+    items = {hub: load_settings(hub)} if hub else all_settings()
+    for h, s in items.items():
+        allow = ",".join(s.tool_allowlist) or "all"
+        print(f"  {h:<22} enabled={s.enabled} cadence={s.cadence} rate={s.rate_limit_per_cycle} "
+              f"auto_verify={s.auto_verify} visibility={s.visibility} tools={allow} freshness_bar={s.freshness_bar}")
+    print("edit: scripts/hub_engine_runner.py --set <hub> enabled=false rate_limit_per_cycle=10 ...")
+    return 0
+
+
+def set_setting(hub: str, kvs: list[str]) -> int:
+    """Set + validate one or more operational settings for a hub (the operator/UI write path)."""
+    from src.openharnesshub.hub_settings import save_settings
+    updates = {}
+    for kv in kvs:
+        if "=" not in kv:
+            continue
+        k, v = kv.split("=", 1)
+        if v.lower() in ("true", "false"):
+            updates[k] = v.lower() == "true"
+        elif v.isdigit():
+            updates[k] = int(v)
+        elif k == "tool_allowlist":
+            updates[k] = [x for x in v.split(",") if x]
+        else:
+            updates[k] = v
+    try:
+        s = save_settings(hub, **updates)
+        print(f"updated {hub}: enabled={s.enabled} cadence={s.cadence} rate={s.rate_limit_per_cycle} auto_verify={s.auto_verify} visibility={s.visibility}")
+        return 0
+    except ValueError as e:
+        print(f"rejected (validation): {e}")
+        return 1
+
+
 def _self_test() -> int:
     import tempfile
     from src.openharnesshub.component_store import ComponentStore
@@ -178,7 +215,13 @@ def _main(argv=None):
     if "--fresh" in argv:
         i = argv.index("--fresh")
         return fresh(argv[i + 1] if i + 1 < len(argv) and not argv[i + 1].startswith("-") else "continuously update with public repos/skills/context")
-    print("usage: hub_engine_runner.py --all | --hub <HubId> | --feed [HubId] | --discover [q] | --fresh [q] | --self-test")
+    if "--settings" in argv:
+        i = argv.index("--settings")
+        return settings(argv[i + 1] if i + 1 < len(argv) and not argv[i + 1].startswith("-") else None)
+    if "--set" in argv:
+        i = argv.index("--set")
+        return set_setting(argv[i + 1], argv[i + 2:]) if i + 2 < len(argv) else 1
+    print("usage: hub_engine_runner.py --all | --hub <H> | --feed [H] | --discover [q] | --fresh [q] | --settings [H] | --set <H> k=v | --self-test")
     return 0
 
 

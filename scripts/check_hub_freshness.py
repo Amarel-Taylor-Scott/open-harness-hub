@@ -23,6 +23,7 @@ def _self_test() -> int:
     from src.openharnesshub.component_store import ComponentStore
     from src.openharnesshub.hub_engine import engines_for_all_hubs
     from src.openharnesshub.discovery import OpenClaw, default_plugins, stub_tools
+    from src.openharnesshub.hub_settings import HubSettings
     from src.teleon.evolution.descent_attempt_store import DescentAttemptStore
     from src.teleon.hub_freshness import keep_hub_fresh
     fails = []
@@ -38,8 +39,10 @@ def _self_test() -> int:
         brain = DescentAttemptStore(os.path.join(d, "brain.jsonl"))
         hub = "OpenContextHub"
 
-        r = keep_hub_fresh(hub, "continuously update with public repos, skills, context",
-                           hub_engines=engines, openclaw=oc, tools=tools, brain=brain, freshness_floor=0.5)
+        # auto_verify=False here so we can assert the discovery≠trust governance (candidates withheld until verified)
+        r = keep_hub_fresh(hub, "continuously update with public repos, skills, context", hub_engines=engines,
+                           openclaw=oc, tools=tools, brain=brain, freshness_floor=0.5,
+                           settings=HubSettings(hub_id=hub, auto_verify=False, freshness_bar=0.5))
 
         ck("plain-text intent ran discovery + digested into the hub (continuous append)", r["ingested"] >= 1, str(r))
         ck("DESCENDED unbounded all-tools -> a cheaper BOUNDED tool (pct_saved > 0)", r["pct_saved"] > 0, f"{r['pct_saved']}%")

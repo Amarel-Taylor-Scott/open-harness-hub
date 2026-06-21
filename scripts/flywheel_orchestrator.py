@@ -143,8 +143,10 @@ def _fw_hubs(state: dict) -> dict:
         state["hubs_cursor"] = i + 1
         r = keep_hub_fresh(hub, f"continuously update with public sources :: {hub_query(hub)}",
                            hub_engines=_engines(), openclaw=oc, tools=_tools())
-        return {"summary": f"hub freshness: {hub} +{r['ingested']} ingested, descend->{r['bounded_tool']} ({r['pct_saved']}% cheaper)",
-                "signal": "ok"}
+        if r.get("skipped"):
+            return {"summary": f"hub freshness: {hub} skipped ({r.get('reason')})", "signal": "ok"}
+        return {"summary": f"hub freshness: {hub} +{r['ingested']} ingested ({r.get('verified', 0)} verified), "
+                           f"descend->{r['bounded_tool']} ({r['pct_saved']}% cheaper)", "signal": "ok"}
     except Exception as e:  # noqa: BLE001
         return {"summary": f"hub freshness unavailable: {e}", "signal": "ok"}
 
