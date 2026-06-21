@@ -1,0 +1,26 @@
+MODULE src/teleon/environments/local_environment_provider.py
+## API signatures
+```python
+"""src.teleon.environments.local_environment_provider — the OFFLINE local-first environment (the correctness invariant)."""
+LOCAL_ENVIRONMENT_PROVIDER_ID = ...
+HASH_PREFIX = ...
+MAX_LOCAL_STEPS = ...
+def _content_hash(value: Any) -> str
+    # A ``sha256:<hex>`` content hash over the canonical bytes of ``value`` (tamper-evident; deterministic).
+def _stub_answer(request: dict) -> dict
+    # A deterministic, offline stub 'agent output' derived ONLY from the request input.
+class LocalEnvironmentProvider:
+    # The offline correctness-invariant environment. Runs an agent output through a governed, bounded local
+    def describe(self) -> dict
+        # EnvironmentProviderNode-shaped card: local-first, no docker/network, IS its own local_equivalent.
+    def status(self) -> dict
+        # Always available — it needs nothing external. (The honest fallback when candidates are unavailable.)
+    def run(self, request: dict, *, now: str, candidate_output: dict | str | None=None) -> dict
+        # Run ``request`` offline and return an ``(EnvironmentRunResult, EnvironmentRunReceipt)`` pair as a dict
+    def unavailable(self, request: dict, *, reason: str) -> EnvironmentUnavailableResult
+        # Build a graceful EnvironmentUnavailableResult (used when a routed candidate environment can't run).
+```
+## intra-module call edges
+src.teleon.environments.local_environment_provider.run -> src.teleon.environments.local_environment_provider._content_hash
+src.teleon.environments.local_environment_provider.run -> src.teleon.environments.local_environment_provider._content_hash
+src.teleon.environments.local_environment_provider.run -> src.teleon.environments.local_environment_provider._stub_answer

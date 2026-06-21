@@ -336,9 +336,11 @@ def supervise() -> int:
     alive, pid = _alive()
     if not alive:
         LOG.parent.mkdir(parents=True, exist_ok=True)
-        proc = subprocess.Popen([sys.executable, str(Path(__file__).resolve()), "--forever"], cwd=str(REPO),
+        # -u + PYTHONUNBUFFERED: stdout is block-buffered when redirected to a file, which would make `./loop logs`
+        # (and the problem-Monitor tailing the log) show stale output until a flush. Run unbuffered so updates are LIVE.
+        proc = subprocess.Popen([sys.executable, "-u", str(Path(__file__).resolve()), "--forever"], cwd=str(REPO),
                                 stdout=open(LOG, "a"), stderr=subprocess.STDOUT, start_new_session=True,
-                                env={**os.environ, "PYTHONPATH": "."})
+                                env={**os.environ, "PYTHONPATH": ".", "PYTHONUNBUFFERED": "1"})
         print(f"started flywheel orchestrator (pid {proc.pid}) — log: {LOG.relative_to(REPO)}"
               + (f" (previous pid {pid} was gone)" if pid else ""))
     else:
@@ -359,7 +361,7 @@ def run_forever(*, max_cycles: int | None = None) -> int:
             if max_cycles is not None and ran >= max_cycles:
                 print(f"reached --max-cycles {max_cycles} (state preserved; re-run to continue)."); return 0
             name, res = run_cycle(state)
-            print(f"[cycle {state['cycle']}] flywheel={name} · {res.get('summary', '')}")
+            print(f"[cycle {state['cycle']}] flywheel={name} · {res.get('summary', '')}", flush=True)
             ran += 1
     finally:
         try:

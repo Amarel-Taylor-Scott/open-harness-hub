@@ -10,6 +10,7 @@
 #   ./loop            start (if down) + show the monitor   (the everyday command; safe to re-run)
 #   ./loop status     read-only monitor (don't start anything)
 #   ./loop yc         print the YC-readiness scorecard + the top gaps (the marching orders)
+#   ./loop review     what's ready for YOU to review (demos, decisions, queued proposals, recent checkpoints)
 #   ./loop run        run ONE cycle in the foreground (debug)
 #   ./loop stop       request a clean stop (.agent/STOP_REQUESTED)
 #   ./loop resume     clear the stop flag (so the next ./loop can start again)
@@ -26,9 +27,10 @@ case "${1:-start}" in
   status|monitor) exec "$PY" "$ORCH" --monitor ;;
   run)        exec "$PY" "$ORCH" --run ;;
   yc|readiness) exec "$PY" scripts/yc_readiness.py --report ;;
+  review)     exec "$PY" scripts/review_digest.py --report ;;
   demo)       exec "$PY" scripts/demo_readiness.py --report ;;
   stop)       mkdir -p .agent && : > "$STOP" && echo "stop requested — the loop will halt after the current cycle (state preserved). './loop resume' to re-enable." ;;
   resume)     rm -f "$STOP" && echo "stop flag cleared — './loop' will start the flywheels again." ;;
   logs)       tail -n 40 -f data/dev-intel/flywheel.log ;;
-  *) echo "usage: ./loop [start|status|yc|demo|run|stop|resume|logs]"; exit 2 ;;
+  *) echo "usage: ./loop [start|status|yc|review|demo|run|stop|resume|logs]"; exit 2 ;;
 esac

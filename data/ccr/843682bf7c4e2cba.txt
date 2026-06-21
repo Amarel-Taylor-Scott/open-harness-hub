@@ -1,0 +1,22 @@
+MODULE src/teleon/evolution/ab_harness.py
+## API signatures
+```python
+"""src.teleon.evolution.ab_harness — A/B the descent STRATEGIES per capability, pick the measured winner, and
+feed the meta-learner real evidence. This is what makes "we learn the most efficient path" MEASURED, not assumed."""
+_AB_STRATEGIES = ...
+_DETERMINISTIC = ...
+KEEP_MODEL = ...
+_DEFAULT_MAX_ACCURACY_DROP = ...
+_DEFAULT_PROMPT_TOKENS_IN = ...
+_DEFAULT_TOKENS_OUT = ...
+def ceiling_scorer(capability: dict, strategy: str) -> float
+    # A deterministic representative scorer: a deterministic strategy is as accurate as the capability's
+def rulearena_scorer(capability: dict, strategy: str) -> float
+    # A scorer wired to the RuleArena benchmark for RULE-GUIDED capabilities: deterministic forks compute the rule
+def ab_test(capability: dict, *, scorer=ceiling_scorer, max_accuracy_drop: float=_DEFAULT_MAX_ACCURACY_DROP, policy=None, skill_text: str | None=None) -> dict
+    # A/B the strategies for one capability: score each (accuracy + cost + TOKENS in/out), keep the org-allowed
+def ab_test_corpus(capabilities: list[dict], *, scorer=ceiling_scorer, max_accuracy_drop: float=_DEFAULT_MAX_ACCURACY_DROP, policy=None) -> dict
+    # Run the A/B per capability, feed the winners to the meta-learner, and report the measured improvement:
+```
+## intra-module call edges
+src.teleon.evolution.ab_harness.ab_test_corpus -> src.teleon.evolution.ab_harness.ab_test

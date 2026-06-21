@@ -1,0 +1,17 @@
+MODULE src/teleon/evolution/auto_tuning.py
+## API signatures
+```python
+"""src.teleon.evolution.auto_tuning — automated SETUP TUNING for any agentic task."""
+_CATALOG = ...
+def load_catalog() -> dict
+def get_task(task_id: str) -> dict | None
+def tuning_ladder(task: dict) -> list[dict]
+    # The task's method tiers, cheapest-first (the escalation order).
+def auto_tune_setup(task_id: str, *, available_keys: tuple=(), require_deterministic: bool=False) -> dict
+    # The automated setup plan for a task: the reachable tiers (filtered by available keys), cheapest-first, the
+```
+## intra-module call edges
+src.teleon.evolution.auto_tuning.get_task -> src.teleon.evolution.auto_tuning.load_catalog
+src.teleon.evolution.auto_tuning.auto_tune_setup -> src.teleon.evolution.auto_tuning.get_task
+src.teleon.evolution.auto_tuning.auto_tune_setup -> src.teleon.evolution.auto_tuning.tuning_ladder
+src.teleon.evolution.auto_tuning.auto_tune_setup -> src.teleon.evolution.auto_tuning.tuning_ladder
