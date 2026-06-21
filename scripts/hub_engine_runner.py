@@ -55,6 +55,50 @@ def feed(hub_id: str | None) -> int:
     return 0
 
 
+def _tools(real: bool = True):
+    """The TOOL REPOSITORY for OpenClaw. Prefer the REAL research_radar (live GitHub discovery) — our already-generated
+    tool — falling back to deterministic stubs offline. Real web-search / JS-scraping tools register here too."""
+    if real:
+        try:
+            from scripts.research_radar import research
+            from src.openharnesshub.discovery import Tool, stub_tools
+
+            def _gh(q: str) -> list:
+                try:
+                    return research(q, "github", n=5) or []
+                except Exception:  # noqa: BLE001
+                    return []
+            real_list = [Tool("research_radar_github", "api", 2, _gh)]
+            # keep the stub search/scrape as the unbounded fallback tiers (the descent still has tiers to descend from)
+            return real_list + [t for t in stub_tools() if t.tier != "api"]
+        except Exception:  # noqa: BLE001
+            pass
+    from src.openharnesshub.discovery import stub_tools
+    return stub_tools()
+
+
+def discover(query: str) -> int:
+    """Stateless OpenClaw/Hermes discovery sweep across every hub (continuous append). Stub tools here; inject
+    web-search / JS-scraping / research_radar-backed tools for live discovery."""
+    from src.openharnesshub.discovery import OpenClaw, Hermes, default_plugins
+    eng, oc, h = _engines(), OpenClaw(default_plugins()), Hermes()
+    for r in h.sweep(query, openclaw=oc, hub_engines=eng, tools=_tools()):
+        print(f"  {r['hub']:<22} discovered {r['discovered']} -> ingested {r['ingested']}")
+    print("(stub tools — inject web-search / scraping / research_radar tools for live discovery)")
+    return 0
+
+
+def fresh(query: str) -> int:
+    """Run Teleon's 'keep this hub fresh' capability per hub: plain text -> unbounded discovery -> descend to bounded."""
+    from src.openharnesshub.discovery import OpenClaw, default_plugins
+    from src.teleon.hub_freshness import keep_hub_fresh
+    eng, oc, tools = _engines(), OpenClaw(default_plugins()), _tools()
+    for hub in sorted({p.target_hub for p in oc.plugins}):
+        r = keep_hub_fresh(hub, query, hub_engines=eng, openclaw=oc, tools=tools)
+        print(f"  {r['hub']:<22} discovered {r['discovered']} ingested {r['ingested']} | descended -> {r['bounded_tool']} ({r['pct_saved']}% cheaper)")
+    return 0
+
+
 def _self_test() -> int:
     import tempfile
     from src.openharnesshub.component_store import ComponentStore
@@ -86,7 +130,13 @@ def _main(argv=None):
     if "--feed" in argv:
         i = argv.index("--feed")
         return feed(argv[i + 1] if i + 1 < len(argv) and not argv[i + 1].startswith("-") else None)
-    print("usage: hub_engine_runner.py --all | --hub <HubId> | --feed [HubId] | --self-test")
+    if "--discover" in argv:
+        i = argv.index("--discover")
+        return discover(argv[i + 1] if i + 1 < len(argv) and not argv[i + 1].startswith("-") else "2026")
+    if "--fresh" in argv:
+        i = argv.index("--fresh")
+        return fresh(argv[i + 1] if i + 1 < len(argv) and not argv[i + 1].startswith("-") else "continuously update with public repos/skills/context")
+    print("usage: hub_engine_runner.py --all | --hub <HubId> | --feed [HubId] | --discover [q] | --fresh [q] | --self-test")
     return 0
 
 
