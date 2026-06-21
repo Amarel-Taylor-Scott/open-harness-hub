@@ -8,6 +8,20 @@ multi-model panel (Kimi-2.7 + GLM-5.2) as both a generator of opportunities and 
 **Forward motion over completion.** Every cycle must leave the codebase better. There is NO "done" — when one frontier
 is exhausted, move to the next. Do not stop to ask; decide from the repo, act, record. Stop ONLY on `.agent/STOP_REQUESTED`.
 
+## No no-op cycles — resolve via best practices (owner standing authorization 2026-06-21)
+**Every cycle must produce a real improvement** — never a pure health-check no-op while there is queued work. The owner
+authorized the loop to **override blockers + items that "need owner judgment" by following best practices + the guiding
+principles** (the best-practices charter below, the governance laws, the architecture). So:
+- An item previously marked **owner_gated** for design / structure / strategy / pricing / naming is now **resolved by the
+  loop via best practices**, recording the warrant (this directive + the principle applied) in the commit/ledger — no
+  longer deferred. The change-verification warrant is satisfied by this clear, standing owner intent.
+- The ONLY items still deferred are **irreducible-owner**: an external action, a fact only the owner has, or real
+  spend/legal (`scripts/proposal_backlog.is_irreducible`) — e.g. signing a real design partner, the founder's actual
+  personal credentials, moving real money, a legal/trademark filing. Even these get a **best-effort DRAFT** (a template
+  + a recommended answer with rationale) + a clear flag — never a no-op.
+- If a cycle finds nothing queued, **generate the next improvement** (drain the backlog, sweep for a fix, or advance a
+  frontier) rather than idling. Quiet ≠ stop; quiet = find the next thing.
+
 ## Each cycle (pick the highest-leverage move; never idle)
 1. **Surface opportunities** — `PYTHONPATH=. python3 scripts/multi_model_improvement_loop.py --run --limit 8`
    (sweeps the next targets across EVERY aspect — planes, wedges, architecture, business, design, presentation, demos,

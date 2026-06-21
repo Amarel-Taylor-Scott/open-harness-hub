@@ -89,6 +89,21 @@ def assess_comfort(text: str) -> dict:
     return {"comfort": comfort, "kind": kind, "risk": risk, "reversibility": rev, "confidence": conf, "reasons": reasons}
 
 
+#: Truly OWNER-ONLY items the loop CANNOT complete even via best practices — an EXTERNAL action, a fact only the owner
+#: has, or real spend/legal. Everything ELSE (incl. design / structure / strategy / pricing / naming) the autonomous
+#: loop NOW resolves by best practices + guiding principles (owner standing authorization 2026-06-21), recording the
+#: warrant. Irreducible items still get a best-effort DRAFT (template + recommendation) + a clear flag — never a no-op.
+_IRREDUCIBLE = ("sign a design partner", "design partner", "paid pilot", "send ", "email ", "outreach", "publish to",
+                "raise size", "wire ", "payment", "billing", "trademark", "legal filing", "incorporat",
+                "founder's personal", "your credentials", "real customer", "real money", "go live with billing")
+
+
+def is_irreducible(text: str) -> bool:
+    """True ONLY for items needing an external action / a fact only the owner has / real spend or legal — the loop
+    drafts the best-effort artifact but cannot complete these. Everything else is best-practice-resolvable now."""
+    return any(k in (text or "").lower() for k in _IRREDUCIBLE)
+
+
 def propose(p: Proposal) -> dict:
     """Append a proposal (idempotent by title-hash). Returns the record."""
     rec = asdict(p)
@@ -191,6 +206,8 @@ def _self_test() -> int:
         finally:
             LEDGER, PRIORITIZED = _L, _P
     ck("five backlog kinds supported (opportunity/proposal/plan/potential/risk)", set(KINDS) == {"opportunity", "proposal", "plan", "potential", "risk"})
+    ck("is_irreducible flags external/owner-only (design partner) but NOT design/strategy (best-practice-resolvable now)",
+       is_irreducible("sign a design partner + paid pilot") and not is_irreducible("rename the product / lock the one-liner"))
     print("\n" + ("PASS - proposal_backlog: a comfort gate (owner_gated/propose/auto) routes findings — trivial+reversible "
                   "auto, riskier/owner-gated become SCORED, PRIORITIZED proposals (plans/opportunities/risks) for review. "
                   "Idempotent, grouped backlog, serves_truth=false."

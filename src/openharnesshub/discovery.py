@@ -123,7 +123,21 @@ def _finder(content_kind: str) -> Callable[[str, Tool], list]:
 
 
 def default_plugins() -> list[Plugin]:
-    """A finder per content kind. Real deployments add/override plugins; the finder uses whatever tool OpenClaw picks."""
+    """A finder per hub, DERIVED from architecture/hub_population_strategy.json (single source: add a hub to the
+    strategy -> it automatically gets an OpenClaw plugin, no code edit). Falls back to the hardcoded map if the
+    strategy is unreadable. The finder uses whatever tool OpenClaw picks (the descent)."""
+    try:
+        import json
+        from pathlib import Path
+        strat = json.loads((Path(__file__).resolve().parents[2] / "architecture" / "hub_population_strategy.json")
+                           .read_text(encoding="utf-8")).get("hubs", {})
+        plugins = [Plugin(name=f"find_{cfg.get('content_kind', _slug(hub))}", target_hub=hub,
+                          content_kind=cfg.get("content_kind", _slug(hub)), tool_tier=cfg.get("tool_tier", "search"),
+                          finder=_finder(cfg.get("content_kind", _slug(hub)))) for hub, cfg in strat.items()]
+        if plugins:
+            return plugins
+    except Exception:  # noqa: BLE001 — fall back to the static map
+        pass
     return [Plugin(name=f"find_{ck}", target_hub=hub, content_kind=ck, tool_tier=tier, finder=_finder(ck))
             for ck, hub, tier in _DEFAULT_PLUGIN_MAP]
 
