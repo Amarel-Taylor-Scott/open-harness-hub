@@ -1,0 +1,53 @@
+MODULE src/teleon/stateful_swarms/local_swarm.py
+## API signatures
+```python
+"""src.teleon.stateful_swarms.local_swarm — the OFFLINE local stateful-swarm runner (the correctness invariant)."""
+LOCAL_SWARM_PROVIDER_ID = ...
+DEFAULT_TENANT_SCOPE = ...
+WORKER_SEED_PLANNER = ...
+WORKER_OBSERVATION_EXTRACTOR = ...
+WORKER_GAP_DETECTOR = ...
+WORKER_ENTITY_RESOLVER = ...
+WORKER_SYNTHESIS = ...
+WORKER_GOVERNED_PROJECTION = ...
+SWARM_WORKER_ORDER = ...
+def _receipt(worker_id: str, worker_kind: str, *, now: str) -> dict
+    # A minimal BlackboardWorkerReceipt-shaped dict (hashes are filled in by the store from the entry lineage).
+def _default_fixture() -> dict
+    # A small deterministic offline fixture (used when the caller passes none).
+class LocalStatefulSwarm:
+    # The offline correctness-invariant stateful-swarm runner. Deterministic, stdlib, no-key, no-network.
+    def __init__(self, *, blackboard: LocalSqliteBlackboard | None=None, fixture: dict | None=None) -> None
+    def describe(self) -> dict
+        # Local-first golden-path card: no network, no keys, IS its own local_equivalent, never truth.
+    def _seed_planner(self, blackboard_id: str, tenant_scope: str, *, now: str) -> SwarmWorkerResult
+        # WORKER 1 — post SIGNALS (open questions) directing the swarm. Procedural; no sources required.
+    def _observation_extractor(self, blackboard_id: str, tenant_scope: str, *, now: str) -> SwarmWorkerResult
+        # WORKER 2 — for each fixture document, post a SOURCE handle then an OBSERVATION that CITES it.
+    def _gap_detector(self, blackboard_id: str, tenant_scope: str, *, now: str) -> SwarmWorkerResult
+        # WORKER 3 — read the BOARD's observations + held-out items and post explicit GAPS (named holes).
+    def _entity_resolver(self, blackboard_id: str, tenant_scope: str, *, now: str) -> SwarmWorkerResult
+        # WORKER 4 — read the BOARD's observations, reconcile/link them to a canonical entity (an ANALYSIS with
+    def _synthesis(self, blackboard_id: str, tenant_scope: str, *, now: str) -> SwarmWorkerResult
+        # WORKER 5 — read the BLACKBOARD ENTRIES (NOT the raw docs) and post a SYNTHESIS.
+    def _governed_projection(self, blackboard_id: str, tenant_scope: str, synthesis_entry_id: str, *, now: str) -> tuple[SwarmWorkerResult, dict]
+        # WORKER 6 — project a :class:`GovernedBlackboardEntry`-shaped governance verdict OVER the synthesis.
+    def run(self, task: str, *, blackboard_id: str, now: str) -> dict
+        # Orchestrate the six bounded workers writing typed entries to ``blackboard_id``; return the envelope.
+```
+## intra-module call edges
+src.teleon.stateful_swarms.local_swarm.__init__ -> src.teleon.stateful_swarms.local_swarm._default_fixture
+src.teleon.stateful_swarms.local_swarm._seed_planner -> src.teleon.stateful_swarms.local_swarm._receipt
+src.teleon.stateful_swarms.local_swarm._observation_extractor -> src.teleon.stateful_swarms.local_swarm._receipt
+src.teleon.stateful_swarms.local_swarm._observation_extractor -> src.teleon.stateful_swarms.local_swarm._receipt
+src.teleon.stateful_swarms.local_swarm._gap_detector -> src.teleon.stateful_swarms.local_swarm._receipt
+src.teleon.stateful_swarms.local_swarm._entity_resolver -> src.teleon.stateful_swarms.local_swarm._receipt
+src.teleon.stateful_swarms.local_swarm._entity_resolver -> src.teleon.stateful_swarms.local_swarm._receipt
+src.teleon.stateful_swarms.local_swarm._synthesis -> src.teleon.stateful_swarms.local_swarm._receipt
+src.teleon.stateful_swarms.local_swarm._governed_projection -> src.teleon.stateful_swarms.local_swarm._receipt
+src.teleon.stateful_swarms.local_swarm.run -> src.teleon.stateful_swarms.local_swarm.LocalStatefulSwarm._synthesis
+src.teleon.stateful_swarms.local_swarm.run -> src.teleon.stateful_swarms.local_swarm.LocalStatefulSwarm._governed_projection
+src.teleon.stateful_swarms.local_swarm.run -> src.teleon.stateful_swarms.local_swarm.LocalStatefulSwarm._seed_planner
+src.teleon.stateful_swarms.local_swarm.run -> src.teleon.stateful_swarms.local_swarm.LocalStatefulSwarm._observation_extractor
+src.teleon.stateful_swarms.local_swarm.run -> src.teleon.stateful_swarms.local_swarm.LocalStatefulSwarm._gap_detector
+src.teleon.stateful_swarms.local_swarm.run -> src.teleon.stateful_swarms.local_swarm.LocalStatefulSwarm._entity_resolver

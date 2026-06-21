@@ -1,0 +1,25 @@
+MODULE src/teleon/seeds/capability_seed.py
+## API signatures
+```python
+"""src.teleon.seeds.capability_seed — the CapabilitySeed framework: turn a lesson learned from an external repo
+into a governed, runnable capability candidate."""
+_NON_VENDORABLE = ...
+def vendorable(license_: str) -> bool
+    # True only for clean permissive licenses (MIT/Apache/BSD/ISC/CC0...). Copyleft/unstated/proprietary → False.
+class SeedResult:
+class CapabilitySeed:
+    def is_drop_in(self) -> bool
+    def run(self, payload: Any=None) -> dict
+        # Run the clean-room logic. serves_truth is ALWAYS False — the framework refuses to let a seed serve truth.
+    def as_purpose_task_candidate(self) -> dict
+        # A PurposeTask-spec-shaped CANDIDATE dict (round-trips through PurposeTaskSpec) for the normal pipeline.
+def register(seed: CapabilitySeed) -> CapabilitySeed
+    # Register a seed (idempotent on slot — a re-registered slot replaces the prior).
+def all_seeds() -> list[CapabilitySeed]
+def seeds_for_source(source_substr: str) -> list[CapabilitySeed]
+```
+## intra-module call edges
+src.teleon.seeds.capability_seed.seeds_for_source -> src.teleon.seeds.capability_seed.all_seeds
+src.teleon.seeds.capability_seed.is_drop_in -> src.teleon.seeds.capability_seed.vendorable
+src.teleon.seeds.capability_seed.run -> src.teleon.seeds.capability_seed.CapabilitySeed.is_drop_in
+src.teleon.seeds.capability_seed.as_purpose_task_candidate -> src.teleon.seeds.capability_seed.CapabilitySeed.is_drop_in

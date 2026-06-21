@@ -1,0 +1,35 @@
+MODULE src/teleon/training/capability_network.py
+## API signatures
+```python
+"""src.teleon.training.capability_network — the cross-capability NETWORK GRAPH + per-capability metadata profile."""
+EDGE_ALTERNATIVE = ...
+_STOP = ...
+_ALT_JACCARD = ...
+_PIPELINE_ADJACENCY = ...
+def _tokens(intent: str) -> set
+def _jaccard(a: set, b: set) -> float
+class CapabilityNetwork:
+    # The relationship graph over a capability corpus + per-capability profiles/features for training.
+    def __init__(self) -> None
+    def build(self, candidates: list[dict]) -> 'CapabilityNetwork'
+    def alternatives(self, slot: str) -> list[str]
+        # The capability's endpoint-set peers (same need, different provider).
+    def downstream_categories(self, slot: str) -> list[str]
+    def _downstream_capability_count(self, slot: str) -> int
+    def profile(self, slot: str) -> dict
+        # Per-capability metadata + graph position — the 'map' for one capability (alongside its evolution lineage).
+    def network_features(self, slot: str) -> dict
+        # Numeric graph features to EXTEND the skills-DB feature vector (what the policy learns structure from).
+    def summary(self) -> dict
+def enrich_features(candidate: dict, network: CapabilityNetwork) -> dict
+    # The skills-DB feature vector + the capability's network features — the richer training signal. Keeps
+```
+## intra-module call edges
+src.teleon.training.capability_network.enrich_features -> src.teleon.training.capability_network.CapabilityNetwork.network_features
+src.teleon.training.capability_network.build -> src.teleon.training.capability_network._tokens
+src.teleon.training.capability_network.build -> src.teleon.training.capability_network._jaccard
+src.teleon.training.capability_network._downstream_capability_count -> src.teleon.training.capability_network.CapabilityNetwork.downstream_categories
+src.teleon.training.capability_network.profile -> src.teleon.training.capability_network.CapabilityNetwork.alternatives
+src.teleon.training.capability_network.profile -> src.teleon.training.capability_network.CapabilityNetwork.downstream_categories
+src.teleon.training.capability_network.profile -> src.teleon.training.capability_network.CapabilityNetwork._downstream_capability_count
+src.teleon.training.capability_network.network_features -> src.teleon.training.capability_network.CapabilityNetwork.profile

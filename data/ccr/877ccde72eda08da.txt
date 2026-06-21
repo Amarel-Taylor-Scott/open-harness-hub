@@ -1,0 +1,66 @@
+MODULE src/teleon/storage/git_backend_port.py
+## API signatures
+```python
+"""src.teleon.storage.git_backend_port — a PLUGGABLE git backend for Teleon capability units."""
+SUPPORTED_PLATFORMS = ...
+GOVERNANCE_NOTES_REF = ...
+def _sha(parent: str, content: str) -> str
+class CommitRef:
+    def as_dict(self) -> dict
+class GitBackendPort:
+    # The minimal VCS surface a capability unit needs — implementable on internal git OR any client platform.
+    def commit(self, unit: str, content: str, *, message: str, now: str) -> CommitRef
+    def read(self, unit: str, rev: str) -> str
+    def history(self, unit: str) -> list[CommitRef]
+    def diff(self, unit: str, rev_a: str, rev_b: str) -> str
+    def tag(self, unit: str, rev: str, name: str) -> None
+    def attach_governance(self, unit: str, rev: str, meta: dict) -> None
+    def read_governance(self, unit: str, rev: str) -> dict
+class LocalGitBackend:
+    # In-memory, content-addressed git backend (our internal-git default + the DEFER-GATE local equivalent of the
+    def __init__(self, platform: str='internal') -> None
+    def commit(self, unit: str, content: str, *, message: str, now: str) -> CommitRef
+    def read(self, unit: str, rev: str) -> str
+    def history(self, unit: str) -> list[CommitRef]
+    def diff(self, unit: str, rev_a: str, rev_b: str) -> str
+    def tag(self, unit: str, rev: str, name: str) -> None
+    def attach_governance(self, unit: str, rev: str, meta: dict) -> None
+    def read_governance(self, unit: str, rev: str) -> dict
+class ClientPlatformBackend:
+    # Maps the port onto a CLIENT platform (github/gitlab/gitea/...). The unit's code lives in THE CLIENT'S repo;
+    def __init__(self, platform: str, repo: str, *, live: bool=False) -> None
+    def _guard(self) -> None
+    def commit(self, unit, content, *, message, now)
+    def read(self, unit, rev)
+    def history(self, unit)
+    def diff(self, unit, rev_a, rev_b)
+    def tag(self, unit, rev, name)
+    def attach_governance(self, unit, rev, meta)
+    def read_governance(self, unit, rev)
+class CapabilityUnitVCS:
+    # Govern a capability unit's lifecycle on ANY git backend: commit the code, version it, diff it, and attach the
+    def commit_unit(self, unit: str, code: str, *, message: str, now: str, governance: dict | None=None) -> dict
+    def history(self, unit: str) -> list[dict]
+    def diff(self, unit: str, rev_a: str, rev_b: str) -> str
+```
+## intra-module call edges
+src.teleon.storage.git_backend_port.commit -> src.teleon.storage.git_backend_port._sha
+src.teleon.storage.git_backend_port.commit -> src.teleon.storage.git_backend_port.CommitRef
+src.teleon.storage.git_backend_port.__init__ -> src.teleon.storage.git_backend_port.LocalGitBackend
+src.teleon.storage.git_backend_port.commit -> src.teleon.storage.git_backend_port.ClientPlatformBackend._guard
+src.teleon.storage.git_backend_port.commit -> src.teleon.storage.git_backend_port.GitBackendPort.commit
+src.teleon.storage.git_backend_port.read -> src.teleon.storage.git_backend_port.ClientPlatformBackend._guard
+src.teleon.storage.git_backend_port.read -> src.teleon.storage.git_backend_port.GitBackendPort.read
+src.teleon.storage.git_backend_port.history -> src.teleon.storage.git_backend_port.ClientPlatformBackend._guard
+src.teleon.storage.git_backend_port.history -> src.teleon.storage.git_backend_port.GitBackendPort.history
+src.teleon.storage.git_backend_port.diff -> src.teleon.storage.git_backend_port.ClientPlatformBackend._guard
+src.teleon.storage.git_backend_port.diff -> src.teleon.storage.git_backend_port.GitBackendPort.diff
+src.teleon.storage.git_backend_port.tag -> src.teleon.storage.git_backend_port.ClientPlatformBackend._guard
+src.teleon.storage.git_backend_port.tag -> src.teleon.storage.git_backend_port.GitBackendPort.tag
+src.teleon.storage.git_backend_port.attach_governance -> src.teleon.storage.git_backend_port.ClientPlatformBackend._guard
+src.teleon.storage.git_backend_port.attach_governance -> src.teleon.storage.git_backend_port.GitBackendPort.attach_governance
+src.teleon.storage.git_backend_port.read_governance -> src.teleon.storage.git_backend_port.ClientPlatformBackend._guard
+src.teleon.storage.git_backend_port.read_governance -> src.teleon.storage.git_backend_port.GitBackendPort.read_governance
+src.teleon.storage.git_backend_port.commit_unit -> src.teleon.storage.git_backend_port.GitBackendPort.commit
+src.teleon.storage.git_backend_port.commit_unit -> src.teleon.storage.git_backend_port.GitBackendPort.attach_governance
+src.teleon.storage.git_backend_port.commit_unit -> src.teleon.storage.git_backend_port.CommitRef.as_dict

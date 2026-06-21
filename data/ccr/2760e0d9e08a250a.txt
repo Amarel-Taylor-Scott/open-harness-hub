@@ -1,0 +1,14 @@
+MODULE src/teleon/runtime/execution_providers/provider_unavailable.py
+## API signatures
+```python
+"""src.teleon.runtime.execution_providers.provider_unavailable — the canonical non-consumable result for
+an unconfigured/unreachable backend (cloud creds missing, Docker/K8s absent). A provider that ALWAYS
+returns ProviderUnavailableResult — so a missing cloud backend degrades to a structured, safe fallback
+signal, never a crash and never truth."""
+PROVIDER_ID = ...
+class ProviderUnavailable:
+    def __init__(self, reason: str='backend unavailable') -> None
+    def describe(self) -> dict
+    def health(self) -> dict
+    def invoke(self, task: dict)
+```
