@@ -1,6 +1,6 @@
 # Prioritized proposal backlog (development plane; serves_truth=false)
 
-161 proposals. The loop FILES these when it's uncomfortable applying directly; you prioritize.
+201 proposals. The loop FILES these when it's uncomfortable applying directly; you prioritize.
 
 Score = value x confidence x reversibility / (effort x risk). Higher = do sooner.
 
@@ -43,7 +43,7 @@ Score = value x confidence x reversibility / (effort x risk). Higher = do sooner
 - **[0.32]** (risk) [plane:open-star-hubs] Open*Hubs — Registry Surfaces Feeding Teleon's Selection Substrate  ·  _default: propose for review (not clearly trivial)_
 - **[0.32]** (risk) [wedge:open-star-hubs] We need review a wedge for improvement opportunities. Need act as senior staff engineer + product/design lead. Need asse  ·  _default: propose for review (not clearly trivial)_
 - **[0.32]** (risk) [plane:teleon-demos] Review: teleon-demos surface  ·  _default: propose for review (not clearly trivial)_
-  … (+94 more)
+  … (+122 more)
 
 ## 🟢 Auto-eligible (trivial + reversible — the autofix/agent can apply)
 - **[1.6]** (risk) [module:src/teleon/agents/agent_runtime_provider] We need review module based only on API signatures and call edges. Need find concrete actionable improvement opportuniti  ·  _trivial + reversible_
@@ -71,5 +71,5 @@ Score = value x confidence x reversibility / (effort x risk). Higher = do sooner
 - **[1.6]** (plan) [module:src/teleon/experiments/path_comparator.p] We need review module path_comparator.py. User provided only signatures and call graph, no actual code body. We need fin  ·  _trivial + reversible_
 - **[1.6]** (risk) [module:src/teleon/experiments/path_promotion.py] This module is **not solid** as shown. The signatures reveal a governance-critical component (the sole promotion authori  ·  _trivial + reversible_
 - **[1.6]** (plan) [module:src/teleon/exploration/dispatch.py] We need review module src/teleon/exploration/dispatch.py. User provided only signatures and docstring, no actual code bo  ·  _trivial + reversible_
-  … (+6 more)
+  … (+18 more)
 

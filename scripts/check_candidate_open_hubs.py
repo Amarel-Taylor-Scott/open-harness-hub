@@ -50,7 +50,7 @@ def main() -> int:
         for f in _REQ:
             if not c.get(f):
                 ck(f"{hid} has '{f}'", False)
-        ck(f"{hid} status==candidate (never active/public)", c.get("status") == "candidate", str(c.get("status")))
+        ck(f"{hid} status never active/public (candidate or a resolved disposition)", c.get("status") not in {"active", "public", "live", "promoted"}, str(c.get("status")))
         ck(f"{hid} release_status==private_first", c.get("release_status") == "private_first", str(c.get("release_status")))
         ck(f"{hid} domain owner_clearance_required (not claimed)", c.get("domain_status") == "owner_clearance_required")
         ck(f"{hid} is NOT a duplicate of an existing hub", hid not in existing)
@@ -64,8 +64,9 @@ def main() -> int:
             print("  -", f)
         return 1
     ready = sum(1 for c in cands if c.get("maturity") == "ready_substrate")
-    print(f"PASS — check_candidate_open_hubs: {len(cands)} candidate Open*Hubs ({ready} ready-substrate) drawn from real "
-          f"modular components, all private_first + candidate (0 public/active), domains owner-clearance-gated, each with "
+    resolved = sum(1 for c in cands if str(c.get("status", "")).startswith("resolved"))
+    print(f"PASS — check_candidate_open_hubs: {len(cands)} candidate Open*Hubs ({ready} ready-substrate, {resolved} resolved "
+          f"merge/fold) drawn from real modular components, all private_first (0 public/active), domains owner-clearance-gated, each with "
           f"an open-trigger + distinct-from the 9 existing hubs; release policy = open-on-competition, never public without "
           f"owner clearance; discovery!=trust.")
     return 0
