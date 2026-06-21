@@ -7,9 +7,11 @@ inject per-hub scraper + model ports (a real source poller + scripts._llm_client
 DEVELOPMENT plane (the operator surface); the engines + store are PRODUCT (src/openharnesshub).
 
   --hub <HubId>   run one hub's cycle      --all   run a cycle for every hub
+  --ingest <HubId> [--links u1,u2] [--okf f1,f2] [--text '...'|@file] [--improve] [--llm]  OWNER intake of raw materials
+  --discover [q]  autonomous OpenClaw/Hermes sweep   --fresh [q]  Teleon keep_hub_fresh (unbounded→bounded)
   --feed [HubId]  print the substrate_feed (what Teleon/Baltor consume)
   --self-test     offline: the runner wires every hub + runs a cycle
-CLI: PYTHONPATH=. python3 scripts/hub_engine_runner.py --all
+CLI: PYTHONPATH=. python3 scripts/hub_engine_runner.py --ingest OpenSkillsHub --okf my_skill.md --improve
 """
 from __future__ import annotations
 
@@ -22,10 +24,35 @@ if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
 
-def _engines(store=None):
+def _engines(store=None, *, model=None):
     from src.openharnesshub.component_store import ComponentStore
     from src.openharnesshub.hub_engine import engines_for_all_hubs
-    return engines_for_all_hubs(store or ComponentStore())
+    return engines_for_all_hubs(store or ComponentStore(), model=model)
+
+
+def _model_port(use_llm: bool = False):
+    """Real digest/improve model port (the ollama-cloud lane) when --llm is set + configured; else None (the engine
+    falls back to its deterministic digest/improve). Resilient: a model error degrades to deterministic, never crashes."""
+    if not use_llm:
+        return None
+    try:
+        from scripts._llm_client import resolve_provider, chat
+        prov = resolve_provider("ollama")
+        if not prov.get("key"):
+            print("  (--llm requested but the ollama lane isn't configured — using deterministic digest/improve)")
+            return None
+        import os
+        model = os.environ.get("OH_LLM_MODEL") or prov.get("model") or "qwen2.5:7b"
+
+        def m(prompt: str) -> str:
+            try:
+                return chat(model, "You enrich/improve governed Open*Hub components. Be concrete and terse.",
+                            prompt, prov, max_tokens=400).get("text", "")
+            except Exception:  # noqa: BLE001 — degrade to deterministic
+                return ""
+        return m
+    except Exception:  # noqa: BLE001
+        return None
 
 
 def run_all() -> int:
@@ -141,6 +168,29 @@ def fresh(query: str) -> int:
     return 0
 
 
+def ingest_cmd(hub: str, *, links=(), okf_files=(), texts=(), improve=False, tenant="_global", use_llm=False) -> int:
+    """OWNER INTAKE: feed raw materials YOU provide (OKF docs / links / pasted text) into one hub's lifecycle
+    (digest → optional improve → verify → version). The complement to autonomous --discover/--fresh."""
+    from src.openharnesshub.intake import ingest_materials
+    eng = _engines(model=_model_port(use_llm))
+    if hub not in eng:
+        print(f"unknown hub {hub!r} (one of {sorted(eng)[:6]}...)"); return 1
+    okf_docs = []
+    for f in okf_files:
+        try:
+            okf_docs.append(Path(f).read_text(encoding="utf-8"))
+        except Exception as e:  # noqa: BLE001
+            print(f"  (skip okf {f}: {e})")
+    txts = []
+    for t in texts:
+        txts.append(Path(t[1:]).read_text(encoding="utf-8") if t.startswith("@") and Path(t[1:]).exists() else t)
+    r = ingest_materials(eng[hub], links=links, okf=okf_docs, texts=txts, improve=improve, tenant=tenant)
+    print(json.dumps(r, indent=1))
+    print(f"\n{r['ingested']} ingested, {r['verified']} verified, {r['improved']} improved into {hub} "
+          f"(tenant={tenant}) — serves_truth=false; only verified versions serve. View: --feed {hub}")
+    return 0
+
+
 def settings(hub: str | None) -> int:
     """View the resolved per-hub SETTINGS PLANE (operational policy merged with the strategy)."""
     from src.openharnesshub.hub_settings import all_settings, load_settings
@@ -191,16 +241,41 @@ def _self_test() -> int:
         s = eng["OpenToolsHub"].run_cycle(raw_candidates=[{"name": "a governed tool"}])
         ck("runner runs a hub cycle (ingest+verify+serve)", s["ingested"] == 1 and s["served"] == 1)
         ck("runner exposes the substrate feed (Teleon/Baltor consume it)", "funnel" in eng["OpenToolsHub"].substrate_feed())
+        # OWNER INTAKE: OKF + a raw dict -> digest -> improve (lossless new version) -> verify
+        from src.openharnesshub.intake import ingest_materials, parse_okf
+        okf = "---\nname: A Skill\ntype: skill\n---\n# A Skill\nDoes a thing.\n"
+        b = parse_okf(okf)
+        ck("parse_okf reads frontmatter + keeps the raw doc (lossless)", b["name"] == "A Skill" and b["raw_okf"] == okf)
+        r = ingest_materials(eng["OpenSkillsHub"], okf=[okf], dicts=[{"name": "manual skill", "summary": "x"}], improve=True)
+        ck("owner intake: OKF + dict ingested, verified, improved (lossless new versions)",
+           r["ingested"] == 2 and r["verified"] >= 1 and r["improved"] == 2 and r["serves_truth"] is False)
     print("\nPASS - hub_engine_runner: the per-hub orchestrator/supervisor — runs the ONE shared engine across all 22 "
           "Open*Hubs, reports served + the funnel, exposes substrate_feed. serves_truth=false."
           if not fails else f"FAIL: {fails}")
     return 0 if not fails else 1
 
 
+def _val(argv, flag, default=""):
+    return argv[argv.index(flag) + 1] if flag in argv and argv.index(flag) + 1 < len(argv) else default
+
+
+def _csv(s):
+    return [x.strip() for x in s.split(",") if x.strip()]
+
+
 def _main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
     if "--self-test" in argv:
         return _self_test()
+    if "--ingest" in argv:
+        hub = _val(argv, "--ingest")
+        if not hub or hub.startswith("-"):
+            print("usage: --ingest <Hub> [--links u1,u2] [--okf f1,f2] [--text '...'|@file] [--improve] [--tenant T] [--llm]")
+            return 1
+        return ingest_cmd(hub, links=_csv(_val(argv, "--links")), okf_files=_csv(_val(argv, "--okf")),
+                          texts=[_val(argv, "--text")] if _val(argv, "--text") else [],
+                          improve="--improve" in argv, tenant=_val(argv, "--tenant", "_global"),
+                          use_llm="--llm" in argv)
     if "--all" in argv:
         return run_all()
     if "--hub" in argv:
@@ -221,7 +296,8 @@ def _main(argv=None):
     if "--set" in argv:
         i = argv.index("--set")
         return set_setting(argv[i + 1], argv[i + 2:]) if i + 2 < len(argv) else 1
-    print("usage: hub_engine_runner.py --all | --hub <H> | --feed [H] | --discover [q] | --fresh [q] | --settings [H] | --set <H> k=v | --self-test")
+    print("usage: hub_engine_runner.py --all | --hub <H> | --ingest <H> [--links|--okf|--text|--improve|--llm] | "
+          "--feed [H] | --discover [q] | --fresh [q] | --settings [H] | --set <H> k=v | --self-test")
     return 0
 
 
