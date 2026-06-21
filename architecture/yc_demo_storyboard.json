@@ -1,0 +1,26 @@
+{
+  "version": "0.1.0",
+  "note": "Storyboard for the narrated YC-demo video. Drives e2e/record_yc_demo.mjs (Playwright native video + caption overlays) AND the audio voiceover step (narration -> TTS -> ffmpeg mux). Targets are served from the containerized demo web server (deploy/demo-web.Dockerfile) at base_url, or via file:// for a quick local pass. Validated offline by scripts/check_yc_demo_recording.py. serves_truth=false.",
+  "base_url": "http://127.0.0.1:8088/",
+  "voice": {"engine": "tts (any: piper / say / edge-tts)", "wpm": 165, "note": "narration -> wav per scene -> concat -> ffmpeg -i video -i audio -shortest mux"},
+  "scenes": [
+    {"id": "cover", "target": "dist/yc-demo/index.html", "url": "yc-demo/index.html", "seconds": 7,
+     "caption": "AI Done Right — two products on one governed engine",
+     "narration": "AI Done Right is a holding company over two products that share one governed engine, plus an open store of components both consume."},
+    {"id": "two-products", "target": "dist/yc-demo/index.html", "url": "yc-demo/index.html", "seconds": 10, "scroll_to": ".two",
+     "caption": "Baltor governs TRUTH · Teleon governs EFFICIENCY",
+     "narration": "Baltor is fully managed governed context — company, department, or initiative wide. Teleon lets you program a capability in plain text and it adapts to the cheapest bounded form within your guardrails."},
+    {"id": "showcase", "target": "dist/teleon-demos/showcase.html", "url": "teleon-demos/showcase.html", "seconds": 11,
+     "caption": "Live: capabilities descend unbounded → bounded",
+     "narration": "Here are three capabilities running live — document extraction, search enrichment, and model routing — each descending from the expensive default to the cheapest bounded path that still meets the requirement."},
+    {"id": "control-chart", "target": "dist/teleon-demos/showcase.html", "url": "teleon-demos/showcase.html", "seconds": 9, "scroll_to": ".control",
+     "caption": "Efficiency climbs, safety holds in control",
+     "narration": "The control chart proves the point: efficiency climbs while safety stays pinned at the ceiling. We never trade a correct or grounded answer for a cheaper one."},
+    {"id": "architecture", "target": "dist/architecture/index.html", "url": "architecture/index.html", "seconds": 10,
+     "caption": "Two products + the open store, by the dependency law",
+     "narration": "The architecture, top to bottom by the enforced dependency law: Baltor, then Teleon, then the open store of components — context, tools, models, reconciliation, robustness, and enrichment rules."},
+    {"id": "ask", "target": "dist/yc-demo/deck.html", "url": "yc-demo/deck.html", "seconds": 9, "scroll_to": "#ask",
+     "caption": "The proof is real — OFAC live receipt, 553 green proofs",
+     "narration": "And it is real today: a live OFAC sanctions receipt, a working offline engine, and hundreds of deterministic proofs. That is the ask."}
+  ]
+}

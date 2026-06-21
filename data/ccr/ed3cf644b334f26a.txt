@@ -1,0 +1,17 @@
+MODULE src/teleon/runtime/execution_providers/container_image_emulator.py
+## API signatures
+```python
+"""src.teleon.runtime.execution_providers.container_image_emulator — the local equivalent for a
+Docker/container-image task. If Docker is approved + available a candidate Docker provider could run; when
+it is not (the default offline case), it FALLS BACK to the managed-venv runner so a container-style task is
+never blocked. No privileged mounts, no secrets; same ExecutionResult contract."""
+PROVIDER_ID = ...
+class ContainerImageEmulator:
+    def __init__(self, *, docker_available: bool=False, docker_approved: bool=False) -> None
+    def describe(self) -> dict
+    def health(self) -> dict
+    def run(self, *, image: str, command: list[str], cache_key: str | None=None, task_id: str='ci-task', timeout_s: int=20) -> dict
+        # Run a container-style command. Docker stays CANDIDATE; offline → managed-venv fallback.
+```
+## intra-module call edges
+src.teleon.runtime.execution_providers.container_image_emulator.run -> src.teleon.runtime.execution_providers.container_image_emulator.ContainerImageEmulator.run

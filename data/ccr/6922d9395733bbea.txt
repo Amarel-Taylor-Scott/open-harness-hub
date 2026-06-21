@@ -1,0 +1,31 @@
+MODULE src/teleon/runtime/execution_backend_selector.py
+## API signatures
+```python
+"""src.teleon.runtime.execution_backend_selector — choose an EXECUTION BACKEND for a CapabilityTask by
+POLICY + PRICEBOOK + provider health + available credentials. Pure + deterministic (all inputs injected).
+Canonical TELEON home (runtime selection is a Teleon concern); imports only the stdlib (never Baltor). Baltor
+consumes this through a re-export shim at src/baltor/workers/execution_backend_selec"""
+_A = ...
+GENERIC_FUNCTIONS = ...
+_FALLBACK_ORDER = ...
+def generic_functions(policy_matrix: dict | None=None) -> set
+    # The serverless-function family, sourced from CONFIG (`generic_cloud_functions` in the policy matrix) so
+ACTIONS = ...
+def _action_for(backend: str) -> str
+    # Provider-agnostic action: any serverless-function backend → 'use_cloud_function' (no per-vendor literal).
+def _load(name: str) -> dict
+def _est_cost(backend: str, pricebook: dict, runtime_ms: int) -> float
+def _decision(action: str, backend: str, reason: str, **extra) -> dict
+def select_backend(task: dict, *, policy_matrix: dict | None=None, pricebook: dict | None=None, provider_health: dict | None=None, available_creds: set | None=None, policy_override: dict | None=None) -> dict
+    # Decide the execution backend for `task`. `task`: {capability_id, worker_bucket, estimated_runtime_ms,
+```
+## intra-module call edges
+src.teleon.runtime.execution_backend_selector.generic_functions -> src.teleon.runtime.execution_backend_selector._load
+src.teleon.runtime.execution_backend_selector.select_backend -> src.teleon.runtime.execution_backend_selector.generic_functions
+src.teleon.runtime.execution_backend_selector.select_backend -> src.teleon.runtime.execution_backend_selector._decision
+src.teleon.runtime.execution_backend_selector.select_backend -> src.teleon.runtime.execution_backend_selector._load
+src.teleon.runtime.execution_backend_selector.select_backend -> src.teleon.runtime.execution_backend_selector._load
+src.teleon.runtime.execution_backend_selector.select_backend -> src.teleon.runtime.execution_backend_selector._decision
+src.teleon.runtime.execution_backend_selector.select_backend -> src.teleon.runtime.execution_backend_selector._action_for
+src.teleon.runtime.execution_backend_selector.select_backend -> src.teleon.runtime.execution_backend_selector._est_cost
+src.teleon.runtime.execution_backend_selector.select_backend -> src.teleon.runtime.execution_backend_selector._est_cost

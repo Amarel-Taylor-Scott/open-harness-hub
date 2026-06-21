@@ -1,0 +1,11 @@
+MODULE src/teleon/runtime/execution_providers/cloud_function.py
+## API signatures
+```python
+"""src.teleon.runtime.execution_providers.cloud_function — BYO serverless function execution (Lambda/GCP/Azure)."""
+_FLAVORS = ...
+class CloudFunctionProvider:
+    def __init__(self, *, flavor: str='aws_lambda', **kw) -> None
+    def _live(self, task: dict) -> Any
+```
+## intra-module call edges
+src.teleon.runtime.execution_providers.cloud_function.__init__ -> src.teleon.runtime.execution_providers.cloud_function.CloudFunctionProvider.__init__

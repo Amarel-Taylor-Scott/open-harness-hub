@@ -1,0 +1,13 @@
+MODULE src/teleon/runtime/execution_providers/factory.py
+## API signatures
+```python
+"""src.teleon.runtime.execution_providers.factory — backend id -> an ExecutionProviderPort instance."""
+_SERVERLESS = ...
+_K8S = ...
+_LOCAL = ...
+def supported_backends() -> list[str]
+def get_execution_provider(backend: str, *, secret_refs: dict | None=None, resolve_secret: Callable[[str], str | None] | None=None, network_ok: bool=False, account_id: str | None=None, endpoint: str | None=None) -> Any
+    # Instantiate the provider for ``backend``. ``secret_refs`` maps logical secret name -> SecretRef; ``resolve_secret``
+```
+## intra-module call edges
+src.teleon.runtime.execution_providers.factory.get_execution_provider -> src.teleon.runtime.execution_providers.factory.supported_backends

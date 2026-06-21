@@ -1,0 +1,23 @@
+MODULE src/teleon/runtime/execution_providers/cloudflare_workers.py
+## API signatures
+```python
+"""src.teleon.runtime.execution_providers.cloudflare_workers — BYO-compute execution on the CUSTOMER's account."""
+PROVIDER_ID = ...
+OFFLINE_EQUIVALENT = ...
+class CloudflareWorkersProvider:
+    # BYO Cloudflare Workers execution. ``token_secret_ref`` is a tenant SecretRef (e.g.
+    def __init__(self, *, account_id: str | None=None, token_secret_ref: str | None=None, resolve_secret: Callable[[str], str | None] | None=None, network_ok: bool=False) -> None
+    def _token(self) -> str | None
+    def describe(self) -> dict
+    def health(self) -> dict
+    def eligible(self, task: dict, policy: dict) -> dict
+        # Eligible only if this backend is allowed by policy AND a customer token is present. SAFETY/CONFIG beats
+    def estimate(self, task: dict, policy: dict) -> dict
+    def invoke(self, task: dict) -> Any
+        # Run the task on the customer's Cloudflare account. LIVE PATH = a real Cloudflare Workers AI call (the
+```
+## intra-module call edges
+src.teleon.runtime.execution_providers.cloudflare_workers.health -> src.teleon.runtime.execution_providers.cloudflare_workers.CloudflareWorkersProvider._token
+src.teleon.runtime.execution_providers.cloudflare_workers.health -> src.teleon.runtime.execution_providers.cloudflare_workers.CloudflareWorkersProvider._token
+src.teleon.runtime.execution_providers.cloudflare_workers.eligible -> src.teleon.runtime.execution_providers.cloudflare_workers.CloudflareWorkersProvider._token
+src.teleon.runtime.execution_providers.cloudflare_workers.invoke -> src.teleon.runtime.execution_providers.cloudflare_workers.CloudflareWorkersProvider._token

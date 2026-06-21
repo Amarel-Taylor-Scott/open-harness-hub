@@ -1,0 +1,15 @@
+MODULE src/teleon/runtime/execution_provider.py
+## API signatures
+```python
+"""src.teleon.runtime.execution_provider — the EXECUTION BACKEND port (canonical TELEON home)."""
+class ProviderUnavailableResult:
+    # Returned (NOT raised) when a backend is unconfigured/unreachable — e.g. a cloud function with no
+class ExecutionResult:
+class ExecutionProviderPort:
+    # One execution backend. Real cloud providers are CANDIDATE until credentials + proofs exist; the
+    def describe(self) -> dict
+    def health(self) -> dict
+    def eligible(self, task: dict, policy: dict) -> dict
+    def estimate(self, task: dict, policy: dict) -> dict
+    def invoke(self, task: dict) -> Any
+```
