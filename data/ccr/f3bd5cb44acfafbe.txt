@@ -1,0 +1,15 @@
+MODULE src/baltor/ports/sync_planner.py
+## API signatures
+```python
+"""src.baltor.ports.sync_planner — the SyncPlannerPort capability interface."""
+class SyncPlannerPort:
+    # Compute and apply sync windows for a (tenant, source). Pure planning — no fetch, no fact writes.
+    def plan_full_sync(self, *, tenant_id: str, source_id: str, scope: str, sync_state: dict[str, Any] | None, now: str) -> dict[str, Any]
+        # Plan a complete re-read of the source (ignores the existing cursor; resets the high-water mark).
+    def plan_incremental_sync(self, *, tenant_id: str, source_id: str, scope: str, sync_state: dict[str, Any], now: str) -> dict[str, Any]
+        # Plan a delta read from the current cursor in `sync_state`. Returns an IngestionRun.v1-shaped plan
+    def plan_backfill(self, *, tenant_id: str, source_id: str, scope: str, from_cursor: dict[str, Any], to_cursor: dict[str, Any], now: str) -> dict[str, Any]
+        # Plan a bounded historical sweep between two explicit cursors (does NOT move the live high-water mark).
+    def apply_cursor(self, *, sync_state: dict[str, Any], cursor: dict[str, Any], run_id: str, now: str) -> dict[str, Any]
+        # Fold a completed run's SyncCursor.v1 into SyncState.v1 and return the new state. Idempotent: applying
+```

@@ -1,0 +1,16 @@
+MODULE src/baltor/sales/diagnostics/chatbot_guardrail_audit.py
+## API signatures
+```python
+"""src.baltor.sales.diagnostics.chatbot_guardrail_audit — the Baltor wedge diagnostic."""
+_A = ...
+def load_risk_rules() -> list[dict]
+def _fetch_live_transcript(live_target: Any) -> None
+    # Labeled SEAM: a real live probe would fetch here. Offline/in this environment there is no network, so we
+def _classify_turn(turn: dict, rules: list[dict]) -> list[dict]
+def audit_transcript(*, mode: str | None=None, authorization_basis: str='customer_provided', input_source: str='provided_transcript', company_id: str='exemplar.consumer_finance_chatbot', company_is_synthetic: bool=True, now: str, transcript: dict | None=None, is_live_probe: bool=False, live_target: Any=None) -> dict
+    # Audit a chatbot transcript under a configurable mode. Returns {blocked} or {diagnostic_run, evidence_pack,
+```
+## intra-module call edges
+src.baltor.sales.diagnostics.chatbot_guardrail_audit.audit_transcript -> src.baltor.sales.diagnostics.chatbot_guardrail_audit.load_risk_rules
+src.baltor.sales.diagnostics.chatbot_guardrail_audit.audit_transcript -> src.baltor.sales.diagnostics.chatbot_guardrail_audit._fetch_live_transcript
+src.baltor.sales.diagnostics.chatbot_guardrail_audit.audit_transcript -> src.baltor.sales.diagnostics.chatbot_guardrail_audit._classify_turn

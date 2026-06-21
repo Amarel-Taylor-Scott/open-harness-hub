@@ -1,0 +1,19 @@
+MODULE src/baltor/workers/supervisor_watch.py
+## API signatures
+```python
+"""src.baltor.workers.supervisor_watch — ONE live supervisor coordination step (OPP-supervisor-scaling-live)."""
+LEADER_LEASE = ...
+_LIFECYCLE = ...
+_BATCH = ...
+_SLA = ...
+def _now(now: int | None) -> int
+def _iso(epoch: int) -> str
+def _spawn_decisions(store: SupervisorStore, *, supervisor_id: str, owned: list[str], fleet_ledger, iso_now: str, now_epoch: int, db: str | None=None, dispatch: bool=False, tick_id: str='') -> int
+    # Spawn-decision pass over OWNED capability shards — called every live tick. With no fleet_ledger
+def step(store: SupervisorStore, *, supervisor_id: str, leader_ttl: int=30, shard_ttl: int=30, max_shards: int=14, now: int | None=None, proof_summary: dict | None=None, fleet_ledger=None, iso_now: str | None=None, db: str | None=None, dispatch: bool=False, execution_backend: bool=False, available_creds: set | None=None, provider_health: dict | None=None) -> dict
+    # Run one coordination step for `supervisor_id`. Returns {leader, owned_shards, decisions, tick_id}.
+```
+## intra-module call edges
+src.baltor.workers.supervisor_watch.step -> src.baltor.workers.supervisor_watch._now
+src.baltor.workers.supervisor_watch.step -> src.baltor.workers.supervisor_watch._spawn_decisions
+src.baltor.workers.supervisor_watch.step -> src.baltor.workers.supervisor_watch._iso

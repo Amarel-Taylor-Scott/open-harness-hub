@@ -1,0 +1,39 @@
+MODULE src/baltor/teleon_client/client.py
+## API signatures
+```python
+"""src.baltor.teleon_client.client — the versioned TeleonClient (Baltor → Teleon tenant boundary)."""
+CLIENT_CONTRACT_VERSION = ...
+def capabilities() -> list[str]
+    # The versioned capability surface (sorted, stable).
+class TeleonClient:
+    # Baltor's tenant client for Teleon. Offline-first local calls; graceful fallback from a remote seam.
+    def __init__(self, *, mode: str='local', remote: Callable[[str, dict], Any] | None=None) -> None
+    def call(self, capability: str, **params: Any) -> dict[str, Any]
+        # Invoke a Teleon capability. Returns an inspectable envelope; records it in ``self.calls``.
+    def classify_change(self, change_type: str) -> dict[str, Any]
+    def change_gate(self, change_type: str) -> str
+    def autonomy_forbidden(self, change_type: str) -> bool
+    def default_backend(self, policy_matrix: dict | None=None) -> str
+    def bind_runtime(self, runtime_class: str, **kw: Any) -> dict[str, Any]
+def _self_test() -> int
+```
+## intra-module call edges
+src.baltor.teleon_client.client._self_test -> src.baltor.teleon_client.client.capabilities
+src.baltor.teleon_client.client._self_test -> src.baltor.teleon_client.client.TeleonClient
+src.baltor.teleon_client.client._self_test -> src.baltor.teleon_client.client.TeleonClient.call
+src.baltor.teleon_client.client._self_test -> src.baltor.teleon_client.client.TeleonClient
+src.baltor.teleon_client.client._self_test -> src.baltor.teleon_client.client.TeleonClient
+src.baltor.teleon_client.client._self_test -> src.baltor.teleon_client.client.TeleonClient.call
+src.baltor.teleon_client.client._self_test -> src.baltor.teleon_client.client.TeleonClient
+src.baltor.teleon_client.client._self_test -> src.baltor.teleon_client.client.TeleonClient.call
+src.baltor.teleon_client.client._self_test -> src.baltor.teleon_client.client.TeleonClient
+src.baltor.teleon_client.client._self_test -> src.baltor.teleon_client.client.TeleonClient.call
+src.baltor.teleon_client.client._self_test -> src.baltor.teleon_client.client.TeleonClient
+src.baltor.teleon_client.client._self_test -> src.baltor.teleon_client.client.TeleonClient.call
+src.baltor.teleon_client.client._self_test -> src.baltor.teleon_client.client.TeleonClient.call
+src.baltor.teleon_client.client.call -> src.baltor.teleon_client.client.capabilities
+src.baltor.teleon_client.client.classify_change -> src.baltor.teleon_client.client.TeleonClient.call
+src.baltor.teleon_client.client.change_gate -> src.baltor.teleon_client.client.TeleonClient.call
+src.baltor.teleon_client.client.autonomy_forbidden -> src.baltor.teleon_client.client.TeleonClient.call
+src.baltor.teleon_client.client.default_backend -> src.baltor.teleon_client.client.TeleonClient.call
+src.baltor.teleon_client.client.bind_runtime -> src.baltor.teleon_client.client.TeleonClient.call

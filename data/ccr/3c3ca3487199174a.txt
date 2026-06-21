@@ -1,0 +1,39 @@
+MODULE src/teleon/agent_gateway/capabilities.py
+## API signatures
+```python
+"""src.teleon.agent_gateway.capabilities — the LOCAL, DETERMINISTIC capability cards + handlers."""
+DETERMINISTIC_FIRST = ...
+TELEON_ROLE_EVIDENCE_ONLY = ...
+SERVED_TRUTH_OWNER_BALTOR = ...
+def _bounded(value: Any, *, limit: int=512) -> Any
+    # Return ``value`` if it is small; otherwise a bounded marker. Keeps a handler's output COMPACT — a
+def _handle_utility_hash(payload: dict, *, now: str) -> dict
+    # ``utility.hash`` — return the canonical sha256 of ``payload['payload']`` (or the whole payload). Pure;
+def _handle_cfpb_deadline_verify(payload: dict, *, now: str) -> dict
+    # ``cfpb.deadline.verify`` — return the authoritative Reg E §1005.11 EFT-error resolution deadline as
+def _handle_json_schema_validate(payload: dict, *, now: str) -> dict
+    # ``json.schema.validate`` — a deterministic REQUIRED-KEYS check (a tiny offline validator, not a full
+def _handle_tariff_hs_classify_reference(payload: dict, *, now: str) -> dict
+    # ``tariff.hs.classify.reference`` — a DETERMINISTIC reference-table lookup (a synthetic stub, NOT a live
+def _resolve_governed_fixture(question: str) -> dict
+    # Pick the governed fixture for ``question`` and normalise it to a single shape
+def _handle_context_governed_answer_evidence(payload: dict, *, now: str) -> dict
+    # ``context.governed_answer.evidence`` — answer a governed-context QUESTION as compact EVIDENCE, never as
+def _card(capability_id: str, *, purpose: str, input_contract: dict, output_contract: dict, allowed_use: list[str], forbidden_use: list[str], expected_cost: dict, expected_latency: dict, freshness_policy: dict, policy_notes: str, llm_fallback_allowed: bool=False) -> dict
+    # Build an AgentCapabilityCard-shaped dict. ``deterministic_first`` and ``receipt_required`` are pinned
+def capability_ids() -> list[str]
+    # The sorted list of registered capability ids (stable ordering for deterministic listing).
+def get_card(capability_id: str) -> dict | None
+    # Return a COPY of the public card dict for ``capability_id`` (or ``None`` if unknown). A copy so a
+def get_handler(capability_id: str) -> Callable[..., dict] | None
+    # Return the deterministic handler callable for ``capability_id`` (or ``None`` if unknown).
+```
+## intra-module call edges
+src.teleon.agent_gateway.capabilities._handle_cfpb_deadline_verify -> src.teleon.agent_gateway.capabilities._bounded
+src.teleon.agent_gateway.capabilities._handle_json_schema_validate -> src.teleon.agent_gateway.capabilities._bounded
+src.teleon.agent_gateway.capabilities._handle_json_schema_validate -> src.teleon.agent_gateway.capabilities._bounded
+src.teleon.agent_gateway.capabilities._handle_tariff_hs_classify_reference -> src.teleon.agent_gateway.capabilities._bounded
+src.teleon.agent_gateway.capabilities._handle_tariff_hs_classify_reference -> src.teleon.agent_gateway.capabilities._bounded
+src.teleon.agent_gateway.capabilities._handle_context_governed_answer_evidence -> src.teleon.agent_gateway.capabilities._resolve_governed_fixture
+src.teleon.agent_gateway.capabilities._handle_context_governed_answer_evidence -> src.teleon.agent_gateway.capabilities._bounded
+src.teleon.agent_gateway.capabilities._handle_context_governed_answer_evidence -> src.teleon.agent_gateway.capabilities._bounded

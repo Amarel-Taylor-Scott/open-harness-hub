@@ -1,0 +1,15 @@
+MODULE src/baltor/ports/source_artifact_store.py
+## API signatures
+```python
+"""src.baltor.ports.source_artifact_store — the SourceArtifactStorePort capability interface."""
+class SourceArtifactStorePort:
+    # Append-only, tenant-scoped, idempotent store of SourceArtifact.v1 records.
+    def write_source_artifacts(self, artifacts: list[dict[str, Any]], *, tenant_id: str, run_id: str, now: str) -> dict[str, Any]
+        # Append governed SourceArtifacts for one run. Idempotent on (tenant_id, source_id, content_hash):
+    def read_source_artifact(self, artifact_id: str, *, tenant_id: str) -> dict[str, Any] | None
+        # Read one SourceArtifact by id, scoped to `tenant_id`. Returns None if not found OR if it belongs to a
+    def query_source_artifacts(self, *, tenant_id: str, source_id: str | None=None, scope: str | None=None, since_cursor: dict[str, Any] | None=None) -> list[dict[str, Any]]
+        # List SourceArtifacts visible to `tenant_id` (its own tenant_private/tenant_shared + global_public),
+    def diff_source_artifacts(self, *, tenant_id: str, source_id: str, from_cursor: dict[str, Any], to_cursor: dict[str, Any]) -> dict[str, Any]
+        # Return the added/changed/unchanged content hashes between two cursors for a source (for CDC + dedupe
+```

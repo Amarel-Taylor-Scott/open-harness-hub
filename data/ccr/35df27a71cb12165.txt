@@ -1,0 +1,29 @@
+MODULE src/baltor/sales/claim_guard.py
+## API signatures
+```python
+"""src.baltor.sales.claim_guard — deterministic guards that make the sales/lead-proof system safe."""
+_A = ...
+def load_public_claim_policy() -> dict
+def load_engagement_policy() -> dict
+def classify_claim_language(text: str) -> dict
+    # Classify a claim string. legal_conclusion (forbidden) > accusatory > safe. Returns class + flagged terms.
+def safe_rewrite(text: str) -> str
+    # Replace forbidden/accusatory terms with policy-approved softer wording (longest keys first).
+def authorization_ok(diagnostic: dict) -> tuple[bool, list[str]]
+    # A diagnostic run is allowed only with a valid authorization basis; a live third-party probe REQUIRES
+def gate_evidence_pack(pack: dict, *, claim_text: str='') -> tuple[bool, list[str]]
+    # Decide whether an evidence pack may be treated as PUBLISHABLE/public-safe. Returns (publishable, reasons).
+def gate_outreach(outreach: dict) -> tuple[bool, list[str]]
+    # Outreach must be draft-only, evidence-based, no public accusation, with an opt-out.
+def product_message_ok(product: str, blurb: str) -> tuple[bool, list[str]]
+    # Block forbidden product claims (Baltor: legal advice/guarantees; Teleon: replaces K8s/cloud functions).
+```
+## intra-module call edges
+src.baltor.sales.claim_guard.classify_claim_language -> src.baltor.sales.claim_guard.load_public_claim_policy
+src.baltor.sales.claim_guard.safe_rewrite -> src.baltor.sales.claim_guard.load_public_claim_policy
+src.baltor.sales.claim_guard.authorization_ok -> src.baltor.sales.claim_guard.load_engagement_policy
+src.baltor.sales.claim_guard.gate_evidence_pack -> src.baltor.sales.claim_guard.load_public_claim_policy
+src.baltor.sales.claim_guard.gate_evidence_pack -> src.baltor.sales.claim_guard.classify_claim_language
+src.baltor.sales.claim_guard.gate_outreach -> src.baltor.sales.claim_guard.load_engagement_policy
+src.baltor.sales.claim_guard.gate_outreach -> src.baltor.sales.claim_guard.classify_claim_language
+src.baltor.sales.claim_guard.product_message_ok -> src.baltor.sales.claim_guard.load_public_claim_policy

@@ -1,0 +1,19 @@
+MODULE src/baltor/ports/source_adapter.py
+## API signatures
+```python
+"""src.baltor.ports.source_adapter — the SourceAdapterPort capability interface."""
+class SourceAdapterPort:
+    # One governed source connector. Every method is side-effect-bounded to producing SourceArtifacts /
+    def describe(self) -> dict[str, Any]
+        # Return the static capability card: adapter_id, source_class, supported sync_modes, cursor_strategy,
+    def plan(self, *, tenant_id: str, source_id: str, scope: str, authority: str, sync_mode: str, cursor: dict[str, Any] | None, now: str) -> dict[str, Any]
+        # Produce a deterministic IngestionRun plan (run_id, mode, cursor window) for this source WITHOUT
+    def scan(self, *, tenant_id: str, source_id: str, scope: str, cursor: dict[str, Any] | None, now: str) -> list[dict[str, Any]]
+        # Cheaply enumerate candidate items in the cursor window (locator + upstream metadata, no full bodies),
+    def fetch(self, *, tenant_id: str, source_id: str, scope: str, locator: str, now: str) -> bytes | str | dict[str, Any]
+        # Fetch ONE raw object by locator. May read from an upstream OR a deterministic local fixture when the
+    def normalize(self, payload: Any, *, tenant_id: str, source_id: str, source_version: str, scope: str, authority: str, now: str) -> dict[str, Any]
+        # Turn one raw payload into governed SourceArtifact.v1 records + the per-type source handles. MUST set
+    def health(self) -> dict[str, Any]
+        # Return liveness/reachability for this connector: {'status': healthy|degraded|unavailable,
+```

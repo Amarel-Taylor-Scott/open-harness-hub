@@ -1,0 +1,44 @@
+MODULE src/teleon/agent_gateway/mcp_projection.py
+## API signatures
+```python
+"""src.teleon.agent_gateway.mcp_projection — a LOCAL MCP PROJECTION of the Teleon Agent Capability Gateway."""
+TOOL_LIST_CAPABILITIES = ...
+TOOL_DESCRIBE_CAPABILITY = ...
+TOOL_RUN_CAPABILITY = ...
+TOOL_GET_RECEIPT = ...
+TOOL_REQUEST_BOUNDARY_EXPANSION = ...
+EXPOSED_TOOL_COUNT = ...
+ERROR_UNKNOWN_TOOL = ...
+ERROR_BAD_INPUT = ...
+def _is_forbidden_key(key: str) -> bool
+    # True if ``key`` looks like it could carry a secret / backend internal. A belt-and-braces guard: the
+def _scrub(value: Any) -> Any
+    # Recursively drop any dict key whose name looks secret/backend-internal. The gateway's public dicts do
+def _project(source: dict, fields: tuple[str, ...]) -> dict
+    # Return a COMPACT projection of ``source`` containing only ``fields`` that are present, each scrubbed of
+class TeleonMcpProjection:
+    # A LOCAL MCP projection over an :class:`AgentCapabilityGateway`.
+    def __init__(self, gateway: AgentCapabilityGateway | None=None) -> None
+    def tool_descriptors(self) -> list[dict]
+        # Return the FIVE MCP-style tool descriptors (``{name, description, input_schema}``), in stable order.
+    def call_tool(self, name: str, input: dict | None=None, *, now: str) -> dict
+        # Dispatch ONE of the five tools by ``name`` and return its dict. ``now`` is injected (determinism).
+    def _tool_list_capabilities(self, input: dict, now: str) -> dict
+        # ``teleon_list_capabilities`` — COMPACT cards, optionally filtered. Delegates to
+    def _tool_describe_capability(self, input: dict, now: str) -> dict
+        # ``teleon_describe_capability`` — one COMPACT card. Delegates to ``gateway.describe(capability_id)``;
+    def _tool_run_capability(self, input: dict, now: str) -> dict
+        # ``teleon_run_capability`` — run a capability end-to-end and return a COMPACT result + ``receipt_id``.
+    def _tool_get_receipt(self, input: dict, now: str) -> dict
+        # ``teleon_get_receipt`` — fetch a stored receipt by id. Delegates to ``gateway.get_receipt(...)`` and
+    def _tool_request_boundary_expansion(self, input: dict, now: str) -> dict
+        # ``teleon_request_boundary_expansion`` — queue a boundary-expansion REQUEST (never grant it).
+```
+## intra-module call edges
+src.teleon.agent_gateway.mcp_projection._scrub -> src.teleon.agent_gateway.mcp_projection._is_forbidden_key
+src.teleon.agent_gateway.mcp_projection._project -> src.teleon.agent_gateway.mcp_projection._scrub
+src.teleon.agent_gateway.mcp_projection._tool_list_capabilities -> src.teleon.agent_gateway.mcp_projection._project
+src.teleon.agent_gateway.mcp_projection._tool_describe_capability -> src.teleon.agent_gateway.mcp_projection._project
+src.teleon.agent_gateway.mcp_projection._tool_run_capability -> src.teleon.agent_gateway.mcp_projection._project
+src.teleon.agent_gateway.mcp_projection._tool_get_receipt -> src.teleon.agent_gateway.mcp_projection._scrub
+src.teleon.agent_gateway.mcp_projection._tool_request_boundary_expansion -> src.teleon.agent_gateway.mcp_projection._scrub

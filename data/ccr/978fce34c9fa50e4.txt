@@ -1,0 +1,23 @@
+MODULE src/baltor/workers/policy_recommender.py
+## API signatures
+```python
+"""src.baltor.workers.policy_recommender — turn TELEMETRY into POLICY RECOMMENDATIONS (C-FLEET-2)."""
+SLA_MISS_HIGH = ...
+IDLE_BURN_HIGH_MS = ...
+TASKS_PER_START_GOOD = ...
+BATCH_FILL_HIGH = ...
+PROVIDER_FAILURE_HIGH = ...
+QUEUE_AGE_HIGH_S = ...
+def _rec(kind: str, reason: str, **extra) -> dict
+def recommend(telemetry: dict, *, current_lifecycle_policy_id: str, sla_miss_count: int=0, idle_burn_ms: int=0) -> list[dict]
+    # Return an ordered list of policy recommendations (most impactful first). Empty = steady state.
+```
+## intra-module call edges
+src.baltor.workers.policy_recommender.recommend -> src.baltor.workers.policy_recommender._rec
+src.baltor.workers.policy_recommender.recommend -> src.baltor.workers.policy_recommender._rec
+src.baltor.workers.policy_recommender.recommend -> src.baltor.workers.policy_recommender._rec
+src.baltor.workers.policy_recommender.recommend -> src.baltor.workers.policy_recommender._rec
+src.baltor.workers.policy_recommender.recommend -> src.baltor.workers.policy_recommender._rec
+src.baltor.workers.policy_recommender.recommend -> src.baltor.workers.policy_recommender._rec
+src.baltor.workers.policy_recommender.recommend -> src.baltor.workers.policy_recommender._rec
+src.baltor.workers.policy_recommender.recommend -> src.baltor.workers.policy_recommender._rec

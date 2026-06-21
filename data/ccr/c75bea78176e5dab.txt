@@ -1,0 +1,17 @@
+MODULE src/baltor/workers/failure_taxonomy.py
+## API signatures
+```python
+"""src.baltor.workers.failure_taxonomy — loader for architecture/worker_failure_taxonomy.json."""
+_PATH = ...
+def _taxonomy() -> dict
+def failure_types() -> set
+def failure_policy(failure_type: str) -> dict
+    # Return the taxonomy entry for a failure type, falling back to `unknown` for anything unclassified.
+def is_retryable(failure_type: str) -> bool
+def opens_circuit(failure_type: str) -> bool
+```
+## intra-module call edges
+src.baltor.workers.failure_taxonomy.failure_types -> src.baltor.workers.failure_taxonomy._taxonomy
+src.baltor.workers.failure_taxonomy.failure_policy -> src.baltor.workers.failure_taxonomy._taxonomy
+src.baltor.workers.failure_taxonomy.is_retryable -> src.baltor.workers.failure_taxonomy.failure_policy
+src.baltor.workers.failure_taxonomy.opens_circuit -> src.baltor.workers.failure_taxonomy.failure_policy

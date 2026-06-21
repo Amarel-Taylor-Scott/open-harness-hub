@@ -1,0 +1,33 @@
+MODULE src/baltor/workers/provider_circuit_breaker.py
+## API signatures
+```python
+"""src.baltor.workers.provider_circuit_breaker — per-provider CIRCUIT BREAKER (C-FLEET-2)."""
+_CONSEC_THRESHOLD = ...
+_RATE_THRESHOLD = ...
+_TIMEOUT_RATE_THRESHOLD = ...
+_WINDOW = ...
+_OPEN_SECONDS = ...
+_HALF_OPEN_PROBES = ...
+class CircuitBreaker:
+    def __init__(self, provider_id: str, *, consec_threshold: int=_CONSEC_THRESHOLD, rate_threshold: float=_RATE_THRESHOLD, timeout_rate_threshold: float=_TIMEOUT_RATE_THRESHOLD, window: int=_WINDOW, open_seconds: int=_OPEN_SECONDS, half_open_probes: int=_HALF_OPEN_PROBES)
+    def state(self, *, now: str) -> str
+        # Current state, advancing open→half_open once the cooldown has elapsed.
+    def allow(self, *, now: str) -> bool
+        # May a request go to this provider right now?
+    def _rate(self, kind: str) -> float
+    def record_success(self, *, now: str) -> None
+    def record_failure(self, failure_type: str, *, now: str, timeout: bool=False) -> None
+    def force_open(self, *, now: str) -> None
+        # Forced open from a health-check failure or rate-limit signal.
+    def _trip(self, now: str) -> None
+```
+## intra-module call edges
+src.baltor.workers.provider_circuit_breaker.allow -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker.state
+src.baltor.workers.provider_circuit_breaker.record_success -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker.state
+src.baltor.workers.provider_circuit_breaker.record_failure -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker.state
+src.baltor.workers.provider_circuit_breaker.record_failure -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker._trip
+src.baltor.workers.provider_circuit_breaker.record_failure -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker._trip
+src.baltor.workers.provider_circuit_breaker.record_failure -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker._rate
+src.baltor.workers.provider_circuit_breaker.record_failure -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker._rate
+src.baltor.workers.provider_circuit_breaker.record_failure -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker._rate
+src.baltor.workers.provider_circuit_breaker.force_open -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker._trip

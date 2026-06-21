@@ -1,0 +1,59 @@
+MODULE src/teleon/agent_gateway/gateway.py
+## API signatures
+```python
+"""src.teleon.agent_gateway.gateway — the AgentCapabilityGateway + its P0-shaped contracts."""
+AGENT_GATEWAY_SERVES_TRUTH = ...
+RUNTIME_PATH_DETERMINISTIC = ...
+RUNTIME_PATH_LLM_FALLBACK = ...
+RUN_STATUS_VERIFIED = ...
+RUN_STATUS_SUCCEEDED = ...
+RUN_STATUS_FAILED = ...
+RUN_STATUS_UNAVAILABLE = ...
+BOUNDARY_STATUS_PENDING = ...
+class AgentCapabilityCard:
+    # The public contract for one capability the agent can call. ``deterministic_first`` says the gateway
+    def as_dict(self) -> dict
+class AgentCapabilityRunResult:
+    # The COMPACT, receipt-backed outcome the agent receives. ``output`` is bounded evidence (never a raw
+    def as_dict(self) -> dict
+class AgentCapabilityReceipt:
+    # The provenance receipt every run writes. Records the ACTUAL ``runtime_path`` taken down the ladder, the
+    def as_dict(self) -> dict
+class AgentBoundaryExpansionRequest:
+    # An agent's REQUEST to expand its boundary (a new capability / tool / domain / cost ceiling / loosened
+    def as_dict(self) -> dict
+class AgentConsumer:
+    # The calling agent's bounded identity. ``allowed_capabilities`` is an ALLOW-list (a capability not in it
+    def may_call(self, capability_id: str) -> bool
+class AgentCapabilityGateway:
+    # The deterministic capability runner AI agents call. Holds an in-memory receipt store (write-once,
+    def __init__(self) -> None
+    def list_capabilities(self) -> list[dict]
+        # Return the public cards for every registered capability (stable, sorted by id). ~5, not 300.
+    def describe(self, capability_id: str) -> dict | None
+        # Return the public card for ``capability_id`` (a copy), or ``None`` if unknown.
+    def quote(self, capability_id: str, request: dict | None=None) -> dict
+        # Quote ``{capability_id, known, expected_cost, expected_latency, runtime_path_plan}`` for a call
+    def get_receipt(self, receipt_id: str) -> dict | None
+        # Return a COPY of the stored receipt for ``receipt_id`` (or ``None``). A copy so a caller can never
+    def request_boundary_expansion(self, req: dict, *, now: str) -> dict
+        # Record an agent's boundary-expansion REQUEST. The result is ALWAYS
+    def _unavailable(self, capability_id: str, request_id: str, reason: str, card: dict | None) -> dict
+        # Build an UNAVAILABLE result (refusal / not runnable). No receipt is written (nothing ran). Carries
+    def run(self, request: dict, *, now: str, consumer: AgentConsumer | None=None, allow_live_llm: bool=False, **selector_kwargs) -> dict
+        # Run a capability for an agent consumer and return a COMPACT :class:`AgentCapabilityRunResult` dict
+```
+## intra-module call edges
+src.teleon.agent_gateway.gateway.request_boundary_expansion -> src.teleon.agent_gateway.gateway.AgentCapabilityCard.as_dict
+src.teleon.agent_gateway.gateway.request_boundary_expansion -> src.teleon.agent_gateway.gateway.AgentBoundaryExpansionRequest
+src.teleon.agent_gateway.gateway._unavailable -> src.teleon.agent_gateway.gateway.AgentCapabilityCard.as_dict
+src.teleon.agent_gateway.gateway._unavailable -> src.teleon.agent_gateway.gateway.AgentCapabilityRunResult
+src.teleon.agent_gateway.gateway.run -> src.teleon.agent_gateway.gateway.AgentCapabilityCard.as_dict
+src.teleon.agent_gateway.gateway.run -> src.teleon.agent_gateway.gateway.AgentCapabilityCard.as_dict
+src.teleon.agent_gateway.gateway.run -> src.teleon.agent_gateway.gateway.AgentConsumer
+src.teleon.agent_gateway.gateway.run -> src.teleon.agent_gateway.gateway.AgentCapabilityGateway._unavailable
+src.teleon.agent_gateway.gateway.run -> src.teleon.agent_gateway.gateway.AgentCapabilityGateway._unavailable
+src.teleon.agent_gateway.gateway.run -> src.teleon.agent_gateway.gateway.AgentCapabilityGateway._unavailable
+src.teleon.agent_gateway.gateway.run -> src.teleon.agent_gateway.gateway.AgentCapabilityGateway._unavailable
+src.teleon.agent_gateway.gateway.run -> src.teleon.agent_gateway.gateway.AgentCapabilityReceipt
+src.teleon.agent_gateway.gateway.run -> src.teleon.agent_gateway.gateway.AgentCapabilityRunResult

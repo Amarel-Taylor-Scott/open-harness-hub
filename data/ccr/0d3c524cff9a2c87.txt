@@ -1,0 +1,16 @@
+MODULE src/baltor/workers/local_spawn_manager.py
+## API signatures
+```python
+"""src.baltor.workers.local_spawn_manager — turn a supervisor spawn decision into a LOCAL worker subprocess
+command. Dry-run by default for self-tests (returns the argv, spawns nothing). Real spawn uses subprocess;
+stop by EXACT pid only (no broad/pattern process kills). Maps later to a Kubernetes Job/Deployment/KEDA ScaledObject."""
+_REPO = ...
+def worker_id_for(capability_id: str, seq: str) -> str
+def build_command(*, worker_id: str, capability_id: str, queue: str, db: str, bootstrap_task_id: str='', provider_id: str='', keepalive_seconds: int=120, idle_shutdown_seconds: int=120, max_concurrency: int=1) -> list[str]
+    # The argv to start a capability worker. bootstrap_task_id is a HINT only — ownership begins after an
+def spawn(*, worker_id: str, capability_id: str, queue: str, db: str, dry_run: bool=True, **kw) -> dict
+def stop(pid: int) -> dict
+    # Stop a worker by EXACT pid only (no broad/pattern process kills).
+```
+## intra-module call edges
+src.baltor.workers.local_spawn_manager.spawn -> src.baltor.workers.local_spawn_manager.build_command

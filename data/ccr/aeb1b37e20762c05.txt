@@ -1,0 +1,33 @@
+MODULE src/teleon/blackboard/token_economics.py
+## API signatures
+```python
+"""src.teleon.blackboard.token_economics — a DETERMINISTIC token-economics ESTIMATE for the stateful thesis."""
+_REPO = ...
+CHARS_PER_TOKEN = ...
+ESTIMATE_METHOD = ...
+PER_QUESTION_SHELL_CHARS = ...
+ENTRIES_READ_PER_QUESTION = ...
+CFPB_SAMPLE_DOC_RELPATHS = ...
+def estimate_tokens(text: str) -> int
+    # DETERMINISTIC token ESTIMATE for ``text``: ``ceil(len(text) / CHARS_PER_TOKEN)``.
+def load_cfpb_sample_docs(*, repo: Path | None=None) -> dict[str, str]
+    # Load the CFPB-sample source docs as ``{relpath: text}`` (deterministic key order).
+def _distill_entries(docs: Mapping[str, str]) -> list[dict[str, Any]]
+    # Distill the source docs into compact, source-backed blackboard entries (the STATEFUL state).
+def _entry_chars(entry: Mapping[str, Any]) -> int
+    # Estimated CHARACTER size of one compact blackboard entry as a question would read it.
+def build_blackboard_from_docs(docs: Mapping[str, str], *, tenant_scope: str, now: str, db_path: str | None=None, task: str='CFPB dispute knowledge base — stateful token-economics estimate') -> dict[str, Any]
+    # Run the STATEFUL first pass: read all ``docs`` and APPEND compact source-backed entries to a blackboard.
+def estimate_token_economics(docs: Mapping[str, str], questions: Sequence[str], *, tenant_scope: str='tenant-demo', now: str, db_path: str | None=None) -> dict[str, Any]
+    # Estimate STATELESS vs STATEFUL input-token cost over ``docs`` + a sequence of ``questions``.
+def _crossover_n(*, doc_tokens: int, shell_tokens: int, per_question_stateful: int, first_pass: int) -> int | None
+    # Smallest integer N >= 1 at which the STATEFUL total drops below the STATELESS total.
+```
+## intra-module call edges
+src.teleon.blackboard.token_economics.build_blackboard_from_docs -> src.teleon.blackboard.token_economics._distill_entries
+src.teleon.blackboard.token_economics.estimate_token_economics -> src.teleon.blackboard.token_economics.estimate_tokens
+src.teleon.blackboard.token_economics.estimate_token_economics -> src.teleon.blackboard.token_economics.build_blackboard_from_docs
+src.teleon.blackboard.token_economics.estimate_token_economics -> src.teleon.blackboard.token_economics.estimate_tokens
+src.teleon.blackboard.token_economics.estimate_token_economics -> src.teleon.blackboard.token_economics._crossover_n
+src.teleon.blackboard.token_economics.estimate_token_economics -> src.teleon.blackboard.token_economics.estimate_tokens
+src.teleon.blackboard.token_economics.estimate_token_economics -> src.teleon.blackboard.token_economics._entry_chars

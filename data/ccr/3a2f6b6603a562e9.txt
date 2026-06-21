@@ -1,0 +1,55 @@
+MODULE src/teleon/compiler/__main__.py
+## API signatures
+```python
+"""src.teleon.compiler.__main__ — the compiler CLI + the exhaustive self-test + the drift gate."""
+_PKG_DIR = ...
+EXAMPLES_DIR = ...
+FIXED_NOW = ...
+EXAMPLE_TARGETS = ...
+def _compile_fixture(exec_target: str, *, now: str=FIXED_NOW) -> dict
+    # Compile the deterministic fixture for one exec_target (the committed-example / self-test source).
+def _example_path(exec_target: str) -> Path
+def _render_examples(now: str=FIXED_NOW) -> dict[Path, str]
+    # The committed example units, keyed by path (deterministic JSON text).
+def _compile_for_cli(capability_id: str, exec_target: str, *, now: str | None) -> tuple[dict, str]
+    # Compile ``capability_id`` from the LIVE runtime state if present, else the fixture. Returns (unit, source).
+def cmd_compile(capability_id: str, exec_target: str, *, do_emit: bool, now: str | None) -> int
+    # Compile ``capability_id`` from the LIVE runtime state if present, else the fixture. Prints the unit (and the
+def _open_registry(state_dir: str | None)
+    # Open the registry at ``state_dir`` (the dist/local-services-state/teleon-compiler mount) or the default.
+def cmd_register(capability_id: str, exec_target: str, *, now: str | None, state_dir: str | None) -> int
+    # Compile ``capability_id`` AND register the unit into the durable registry (idempotent by unit_id). On a new
+def cmd_list(state_dir: str | None) -> int
+    # Show the registry: every currently-active compiled unit (one per capability), plus the full history per
+def cmd_rollback(capability_id: str, state_dir: str | None) -> int
+    # Return the rollback-target unit for a capability (the predecessor of the current active unit) — REAL
+def cmd_check() -> int
+def cmd_write_examples() -> int
+def _compile_version(version: int, *, exec_target: str='k8s_job', now: str) -> dict
+    # Compile a fixture capability at a given ``version`` (a real version bump → a new unit_id) for the registry
+def _registry_checks(checks: list[tuple[str, bool]]) -> None
+    # Exercise the durable compiled-unit registry end-to-end under a temp dir (never the real state path):
+def self_test() -> int
+def main(argv: list[str] | None=None) -> int
+```
+## intra-module call edges
+src.teleon.compiler.__main__._render_examples -> src.teleon.compiler.__main__._compile_fixture
+src.teleon.compiler.__main__._render_examples -> src.teleon.compiler.__main__._example_path
+src.teleon.compiler.__main__.cmd_compile -> src.teleon.compiler.__main__._compile_for_cli
+src.teleon.compiler.__main__.cmd_register -> src.teleon.compiler.__main__._open_registry
+src.teleon.compiler.__main__.cmd_register -> src.teleon.compiler.__main__._compile_for_cli
+src.teleon.compiler.__main__.cmd_list -> src.teleon.compiler.__main__._open_registry
+src.teleon.compiler.__main__.cmd_rollback -> src.teleon.compiler.__main__._open_registry
+src.teleon.compiler.__main__.cmd_check -> src.teleon.compiler.__main__._render_examples
+src.teleon.compiler.__main__.cmd_write_examples -> src.teleon.compiler.__main__._render_examples
+src.teleon.compiler.__main__._registry_checks -> src.teleon.compiler.__main__._compile_version
+src.teleon.compiler.__main__._registry_checks -> src.teleon.compiler.__main__._compile_version
+src.teleon.compiler.__main__._registry_checks -> src.teleon.compiler.__main__._compile_version
+src.teleon.compiler.__main__._registry_checks -> src.teleon.compiler.__main__._compile_version
+src.teleon.compiler.__main__.self_test -> src.teleon.compiler.__main__._compile_fixture
+src.teleon.compiler.__main__.self_test -> src.teleon.compiler.__main__._compile_fixture
+src.teleon.compiler.__main__.self_test -> src.teleon.compiler.__main__._render_examples
+src.teleon.compiler.__main__.self_test -> src.teleon.compiler.__main__._example_path
+src.teleon.compiler.__main__.self_test -> src.teleon.compiler.__main__._registry_checks
+src.teleon.compiler.__main__.self_test -> src.teleon.compiler.__main__._compile_fixture
+src.teleon.compiler.__main__.self_test -> src.teleon.compiler.__main__._compile_fixture

@@ -1,0 +1,25 @@
+MODULE src/baltor/workers/supervisor_projection.py
+## API signatures
+```python
+"""src.baltor.workers.supervisor_projection — READ-ONLY projection of live supervisor state
+(OPP-supervisor-scaling-live, API/UI). Powers /api/fleet/* and the /fleet page. It only READS the durable
+SupervisorStore (the source of truth) and never mutates it — the dashboard cannot change supervisor truth."""
+_SECTIONS = ...
+def _now(now: int | None) -> int
+def _execution(s, *, limit: int=50) -> dict
+    # READ-ONLY projection of the live EXECUTION-BACKEND decisions (which backend each capability's work ran
+def _durable_tasks(db_path) -> dict
+    # Read-only summary of the durable CapabilityTask queue (live dispatch state).
+def _count(rows, key) -> dict
+def fleet_projection(db_path=None, *, now: int | None=None, limit: int=50) -> dict
+    # Full read-only snapshot of the control-plane coordination state + the durable task queue.
+def fleet_section(section: str, db_path=None, *, now: int | None=None) -> dict
+    # One named section (for /api/fleet/<section>).
+def supervisor_detail(supervisor_id: str, db_path=None, *, limit: int=50) -> dict
+```
+## intra-module call edges
+src.baltor.workers.supervisor_projection._durable_tasks -> src.baltor.workers.supervisor_projection._count
+src.baltor.workers.supervisor_projection.fleet_projection -> src.baltor.workers.supervisor_projection._now
+src.baltor.workers.supervisor_projection.fleet_projection -> src.baltor.workers.supervisor_projection._durable_tasks
+src.baltor.workers.supervisor_projection.fleet_projection -> src.baltor.workers.supervisor_projection._execution
+src.baltor.workers.supervisor_projection.fleet_section -> src.baltor.workers.supervisor_projection.fleet_projection

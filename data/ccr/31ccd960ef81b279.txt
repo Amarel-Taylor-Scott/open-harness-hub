@@ -1,0 +1,11 @@
+MODULE src/baltor/workers/supervisor_metrics.py
+## API signatures
+```python
+"""src.baltor.workers.supervisor_metrics — LAG metrics for the control-plane supervisor (C-FLEET-3)."""
+OVER_BUDGET_RATIO = ...
+SHARD_LAG_HIGH_S = ...
+DUE_BACKLOG_HIGH = ...
+def lag_metrics(ledger, *, now: str) -> dict
+def should_scale_supervisor(metrics: dict) -> dict
+    # Recommend scaling the CONTROL PLANE (more shard owners / a standby), with the reason. Never
+```
