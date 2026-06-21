@@ -53,7 +53,17 @@ always moves DOWN this ladder rather than stopping — the worst case is a well-
 - **Lossless + governed** — preserve raw + lineage; serves_truth=false for model/run output; receipts where it matters.
 - **Proven** — every change lands with a `--self-test`; the gate suite stays green.
 
-## The flywheels (run-and-forget for days)
+## Three tracks, handled continuously (self-improving, always)
+The loop owns all three tracks at once — two cooperating loops, because a deterministic daemon cannot write feature code:
+1. **Code / organization improvements** — the AGENT loop (this autonomous `/loop`): each tick triages the queued
+   backlog, IMPLEMENTS the highest-leverage SAFE concrete edit (small + reversible + verifiable), runs its `--self-test`
+   + the gate suite, and reverts if anything goes red. Authorized standing work (the owner asked the loop to handle this
+   always) — not "inventing new work," it's draining the loop's own queue.
+2. **Owner-only items** — the `yc` flywheel surfaces and keeps them prioritized (design partner, founder story,
+   raise/pricing/one-liner). The loop CANNOT close these; it makes sure they're never lost or buried.
+3. **Housekeeping** — the daemon's `checkpoint` flywheel auto-commits the working tree when gates are green (reversible,
+   never on the default branch, never pushes), so work never piles up uncommitted.
+
 ## The single command (`./loop`) + the one objective (YC readiness)
 There is ONE command. `./loop` starts the flywheel daemon if it's down/stale and prints the monitor — safe to re-run,
 keeps the flywheels alive for days, restarts them if the process dies. The loop STEERS toward a single measurable
@@ -65,7 +75,7 @@ gaps into the comfort-gated backlog so every cycle moves toward submission.
 - `./loop yc` — the YC-readiness scorecard + the top gaps (the marching orders).  `./loop run` — one cycle (debug).
 - `./loop stop` / `./loop resume` — toggle `.agent/STOP_REQUESTED`.  `./loop logs` — tail the daemon log.
 
-The engine is `scripts/flywheel_orchestrator.py` — EIGHT flywheels on an ADAPTIVE scheduler that runs for days
+The engine is `scripts/flywheel_orchestrator.py` — NINE flywheels on an ADAPTIVE scheduler that runs for days
 unattended (state-persisted, resilient, halts only on `.agent/STOP_REQUESTED`):
 - **sweep** — one Kimi/GLM improvement+research batch -> findings; covers TOP-DOWN architecture + coordination AND
   BOTTOM-UP modules every pass (re-sweeps when a pass completes).
@@ -75,6 +85,7 @@ unattended (state-persisted, resilient, halts only on `.agent/STOP_REQUESTED`):
 - **health** — runs the core proof gates; a red gate JUMPS health to top priority until green.
 - **autofix** — auto-applies ONLY trivial, fully-reversible fixes (lossless doc archive; capped + audited; `--no-autofix`).
 - **cleanup** — scans for stale/superseded docs (report only; the move is owner-gated).
+- **checkpoint** — auto-commits the working tree when gates are green (track 3; reversible; never on main; never pushes).
 - **logjam** — STALL-TRIGGERED: when the loop is persistently stuck (gates red across runs / a flywheel failing
   repeatedly / no new findings), it deliberates (Kimi+GLM) for DIVERGENT options and FORKS them into the backlog
   (cooldown-limited so it never churns).

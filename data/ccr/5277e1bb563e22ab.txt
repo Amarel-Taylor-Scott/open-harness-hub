@@ -1,0 +1,16 @@
+MODULE src/teleon/egress/transports.py
+## API signatures
+```python
+"""Approved egress transport adapters."""
+class EgressTransportError:
+    # Raised when an approved transport cannot complete the request.
+class EgressTransportResponse:
+    def text(self) -> str
+    def content_type(self) -> str
+class UrllibHttpTransport:
+    # Stdlib HTTP transport behind the egress broker.
+    def request(self, *, method: str, url: str, body: bytes | None=None, headers: dict[str, str] | None=None, timeout_s: int=30) -> EgressTransportResponse
+```
+## intra-module call edges
+src.teleon.egress.transports.request -> src.teleon.egress.transports.EgressTransportResponse
+src.teleon.egress.transports.request -> src.teleon.egress.transports.EgressTransportError

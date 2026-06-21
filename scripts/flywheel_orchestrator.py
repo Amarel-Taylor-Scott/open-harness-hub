@@ -169,6 +169,10 @@ def _fw_checkpoint() -> dict:
     changed = [ln for ln in git("status", "--porcelain").stdout.splitlines() if ln.strip()]
     if not changed:
         return {"summary": "checkpoint: nothing to commit", "signal": "ok"}
+    # only checkpoint when there's SUBSTANTIVE work — don't spam commits for the loop's own ledger churn
+    substantive = [ln for ln in changed if not ln[3:].startswith("data/dev-intel/")]
+    if not substantive:
+        return {"summary": f"checkpoint skipped (only loop-ledger churn: {len(changed)} file(s))", "signal": "ok"}
     git("add", "-A")
     msg = (f"chore(loop): checkpoint {len(changed)} change(s) [auto]\n\n"
            "Auto-checkpoint by the flywheel loop (gates green). Squash freely.\n\n"
