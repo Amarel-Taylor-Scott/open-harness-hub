@@ -1,6 +1,6 @@
 # Prioritized proposal backlog (development plane; serves_truth=false)
 
-70 proposals. The loop FILES these when it's uncomfortable applying directly; you prioritize.
+110 proposals. The loop FILES these when it's uncomfortable applying directly; you prioritize.
 
 Score = value x confidence x reversibility / (effort x risk). Higher = do sooner.
 
@@ -36,7 +36,7 @@ Score = value x confidence x reversibility / (effort x risk). Higher = do sooner
 - **[0.32]** (plan) [wedge:teleon-demos] We need review a wedge for improvement opportunities. User provides unit: SURFACE teleon-demos [live], wedge: proof surf  ·  _default: propose for review (not clearly trivial)_
 - **[0.32]** (plan) [plane:design-bundle] Review: design-bundle surface  ·  _default: propose for review (not clearly trivial)_
 - **[0.32]** (risk) [wedge:design-bundle] We need review a wedge for improvement opportunities. Need act as senior staff engineer + product/design lead. The unit   ·  _default: propose for review (not clearly trivial)_
-  … (+33 more)
+  … (+59 more)
 
 ## 🟢 Auto-eligible (trivial + reversible — the autofix/agent can apply)
 - **[1.6]** (risk) [module:src/teleon/agents/agent_runtime_provider] We need review module based only on API signatures and call edges. Need find concrete actionable improvement opportuniti  ·  _trivial + reversible_
@@ -47,4 +47,18 @@ Score = value x confidence x reversibility / (effort x risk). Higher = do sooner
 - **[1.6]** (risk) [plane:teleon] We need review one aspect of governed AI platform: Teleon thin control plane. Need find concrete actionable improvement   ·  _trivial + reversible_
 - **[1.6]** (risk) [wedge:teleon] We need review one aspect of governed AI platform wedge. Need be senior staff engineer + product/design lead. Need concr  ·  _trivial + reversible_
 - **[1.6]** (plan) [architecture:hierarchies] Assessment  ·  _trivial + reversible_
+- **[1.6]** (plan) [module:src/teleon/egress/policy.py] We need review module src/teleon/egress/policy.py. We only have stub signatures and dependency graph. Need find concrete  ·  _trivial + reversible_
+- **[1.6]** (plan) [module:src/teleon/egress/transports.py] The user wants a review of a module `src/teleon/egress/transports.py` with a specific lens: code quality (bugs, fragilit  ·  _trivial + reversible_
+- **[1.6]** (opportunity) [module:src/teleon/enrichment/search_enrich.py] Review: `src/teleon/enrichment/search_enrich.py`  ·  _trivial + reversible_
+- **[1.6]** (risk) [module:src/teleon/environments/baltor_cfpb_cont] We need review module. We have only stub signatures and docstring. Need find concrete actionable improvement opportuniti  ·  _trivial + reversible_
+- **[1.6]** (risk) [module:src/teleon/environments/local_environmen] Review: `local_environment_provider.py`  ·  _trivial + reversible_
+- **[1.6]** (opportunity) [module:src/teleon/environments/reward_runner.py] Review: `reward_runner.py`  ·  _trivial + reversible_
+- **[1.6]** (risk) [module:src/teleon/evolution/catalog_descent.py] Here are the concrete improvement opportunities for `catalog_descent.py`, based on the module's interface, call graph, a  ·  _trivial + reversible_
+- **[1.6]** (opportunity) [module:src/teleon/evolution/catalog_descent.py] We need review module. We have only stub signatures and docstring, no actual code. Need produce improvement opportunitie  ·  _trivial + reversible_
+- **[1.6]** (opportunity) [module:src/teleon/evolution/descender.py] Review: `src/teleon/evolution/descender.py`  ·  _trivial + reversible_
+- **[1.6]** (risk) [module:src/teleon/evolution/descent.py] Review: `src/teleon/evolution/descent.py`  ·  _trivial + reversible_
+- **[1.6]** (risk) [module:src/teleon/evolution/descent.py] The user wants me to review a module called `src/teleon/evolution/descent.py` from their governed AI platform (Baltor co  ·  _trivial + reversible_
+- **[1.6]** (opportunity) [module:src/teleon/evolution/descent_attempt_sto] Verdict: not solid.** The module docstring literally advertises itself as “the BRAIN + data store,” which is the core sm  ·  _trivial + reversible_
+- **[1.6]** (risk) [module:src/teleon/evolution/descent_axes.py] We need review module. Need be senior staff engineer. Need concrete actionable improvements. Lens: code quality bugs, fr  ·  _trivial + reversible_
+- **[1.6]** (risk) [module:src/teleon/evolution/distiller.py] The module shape is **procedural, constant-heavy, and seam-poor**: strategy names are plain strings, costs/ceilings are   ·  _trivial + reversible_
 
