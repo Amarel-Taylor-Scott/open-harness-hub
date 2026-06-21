@@ -1,0 +1,16 @@
+MODULE src/teleon/ports/capability_binding_provider.py
+## API signatures
+```python
+"""src.teleon.ports.capability_binding_provider — the CapabilityTask BINDING port (canonical TELEON home)."""
+BINDING_SERVES_TRUTH = ...
+LOCAL_FUNCTION_TARGET = ...
+class BindingResult:
+    # A successful binding of a CapabilityTask to a target. ``backend`` is the execution backend the policy
+class BindingUnavailableResult:
+    # Returned (NOT raised) when a candidate target has no runtime/owner-authorization in this repo, or the
+class CapabilityTaskBindingProvider:
+    # One binding provider: it wires a declared CapabilityTask onto a target. The active provider binds onto
+    def describe(self) -> dict
+    def status(self) -> dict
+    def bind(self, capability_task: dict, *, now: str) -> dict
+```

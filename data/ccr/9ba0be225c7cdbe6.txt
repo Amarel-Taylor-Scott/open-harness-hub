@@ -1,0 +1,14 @@
+MODULE src/teleon/ports/stateful_swarm_provider.py
+## API signatures
+```python
+"""src.teleon.ports.stateful_swarm_provider — the SHARED STATEFUL-SWARM runner port (canonical TELEON home)."""
+SWARM_SERVES_TRUTH = ...
+class SwarmWorkerResult:
+    # The structured outcome of ONE bounded worker's turn on the shared blackboard.
+class StatefulSwarmProviderPort:
+    # One stateful-swarm runner the spine MAY route an analytical task to.
+    def describe(self) -> dict
+        # Static capability card: ``{provider_id, name, status, requires_network, requires_keys,
+    def run(self, task: str, *, blackboard_id: str, now: str) -> dict
+        # Orchestrate the bounded workers writing typed entries to the blackboard ``blackboard_id`` for ``task``.
+```

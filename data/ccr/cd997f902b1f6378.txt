@@ -1,0 +1,33 @@
+MODULE src/teleon/objectives/objective.py
+## API signatures
+```python
+"""src.teleon.objectives.objective — the capability-level OBJECTIVE policy + measurement + traceable selection."""
+OBJECTIVE_DIMENSIONS = ...
+LOWER_IS_BETTER = ...
+HIGHER_IS_BETTER = ...
+_ROUND = ...
+class ObjectiveError:
+    # Raised on a malformed objective/metric or an empty candidate set — explicit failure, never a silent pick.
+class MetricVector:
+    # The per-implementation MEASUREMENT (telemetry). cost = relative units; latency = ms; llm_usage = model
+    def value(self, dimension: str) -> float
+    def as_dict(self) -> dict
+class CapabilityObjective:
+    # A numeric PRIORITY policy over the measurement dimensions. weights need not sum to 1 (they are normalized
+    def normalized_weights(self) -> dict
+PRESETS = ...
+def _goodness(value: float, lo: float, hi: float, dimension: str) -> float
+    # Map a raw dimension value to a 0..1 'goodness' relative to the candidate set: min-max normalize, then
+def select(candidates: list[tuple[str, MetricVector]], objective: CapabilityObjective, *, forbidden: set | None=None) -> dict
+    # Pick the implementation that best satisfies ``objective`` and return a full SelectionTrace.
+```
+## intra-module call edges
+src.teleon.objectives.objective.select -> src.teleon.objectives.objective.CapabilityObjective.normalized_weights
+src.teleon.objectives.objective.select -> src.teleon.objectives.objective.ObjectiveError
+src.teleon.objectives.objective.select -> src.teleon.objectives.objective.MetricVector.as_dict
+src.teleon.objectives.objective.select -> src.teleon.objectives.objective.MetricVector.value
+src.teleon.objectives.objective.select -> src.teleon.objectives.objective.MetricVector.value
+src.teleon.objectives.objective.select -> src.teleon.objectives.objective._goodness
+src.teleon.objectives.objective.select -> src.teleon.objectives.objective.MetricVector.value
+src.teleon.objectives.objective.as_dict -> src.teleon.objectives.objective.MetricVector.value
+src.teleon.objectives.objective.normalized_weights -> src.teleon.objectives.objective.ObjectiveError

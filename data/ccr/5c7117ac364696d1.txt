@@ -1,0 +1,10 @@
+MODULE src/teleon/ports/reward_provider.py
+## API signatures
+```python
+"""src.teleon.ports.reward_provider — the SHARED REWARD-PROVIDER port (canonical TELEON home)."""
+REWARD_IS_TRUTH = ...
+class RewardProviderPort:
+    # One scorer the spine MAY route a RewardSpec to.
+    def score(self, run_result: dict, reward_spec: dict, *, now: str) -> dict
+        # Score ``run_result`` against ``reward_spec`` and return a RewardResult dict.
+```

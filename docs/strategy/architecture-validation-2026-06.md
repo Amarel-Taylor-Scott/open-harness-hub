@@ -75,5 +75,18 @@ The owner ratified the two biggest items + sharpened the product model:
   (context/tools/models/steps/DAG/reconciliation+robustness+enrichment rules/modules). Code-import law stays
   Baltor→Teleon→OHH; the store is consumed at the content level by both. surface_map / brand / portfolio doc / master-goal
   / the architecture map all reconciled to match; guards green.
-- **Still open (owner):** the remaining hub overlaps (teleon-demos vs OpenHarnessHub proof authority; OpenContextHub vs
-  OpenCurrentContextHub; SkillToTool merge) + the engineering flexibility items remain filed for the loop.
+### The 3 remaining hub overlaps — RESOLVED 2026-06-21 (owner: "be direct, apply them")
+- **teleon-demos vs OpenHarnessHub (proof authority):** OpenHarnessHub owns the proof **INSTRUMENTS** (harnesses,
+  rubrics, eval packs — store components, the "ruler"); teleon-demos owns the **RESULTS** measured with them (evidence,
+  serves_truth=false, **cite the harness**). Neither is a truth authority (mirrors benchmark=evidence-not-authority).
+  Applied to `surface_map.json` (teleon-demos wedge).
+- **OpenContextHub vs OpenCurrentContextHub:** **do NOT ship a separate hub — FOLD freshness/CDC into OpenContextHub**
+  as its freshness dimension (same source-handled artifacts + a watch/changed SIGNAL over them). Freshness is a signal
+  that triggers re-verification, never auto-truth (Baltor decides truth). Applied to `candidate_open_hubs.json`
+  (OpenCurrentContextHub → `status: resolved_fold`).
+- **OpenSkillToTool vs OpenToolToSkillHub:** **MERGE into ONE bidirectional conversion hub** (skill↔tool +
+  certification); do NOT ship a separate reverse hub (conversion is symmetric; a second hub is bloat). Applied to
+  `candidate_open_hubs.json` (OpenToolToSkillHub → `status: resolved_merge`).
+
+- **Still open (owner):** the engineering flexibility items (single-source layer/roster, factory→registry,
+  StorageBackendPort, tenant constant, search selector) remain filed for the loop's agent track.

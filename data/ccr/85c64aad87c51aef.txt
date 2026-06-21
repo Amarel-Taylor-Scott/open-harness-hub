@@ -1,0 +1,22 @@
+MODULE src/teleon/ports/environment_provider.py
+## API signatures
+```python
+"""src.teleon.ports.environment_provider — the SHARED ENVIRONMENT-PROVIDER port (canonical TELEON home)."""
+ENVIRONMENT_SERVES_TRUTH = ...
+STATUS_SUCCEEDED = ...
+STATUS_FAILED = ...
+STATUS_UNAVAILABLE = ...
+ENVIRONMENT_RUN_STATUSES = ...
+class EnvironmentProviderPort:
+    # One environment backend the spine MAY route a run to.
+    def describe(self) -> dict
+        # Static capability card: ``{provider_id, name, status, requires_docker, requires_network,
+    def run(self, request: dict, *, now: str) -> dict
+        # Run ``request`` (an EnvironmentRunRequest dict) and return an EnvironmentRunResult dict.
+    def status(self) -> dict
+        # Liveness/availability: ``{provider_id, status, available, requires_docker, requires_network}``.
+class EnvironmentUnavailableResult:
+    # The graceful-degradation result when an environment cannot run locally (missing docker/network/dep).
+    def as_run_result(self) -> dict
+        # Project to an EnvironmentRunResult dict (status=unavailable; no reward; serves_truth False).
+```

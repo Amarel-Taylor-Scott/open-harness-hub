@@ -1,0 +1,38 @@
+MODULE src/teleon/orchestration/parallel_lanes.py
+## API signatures
+```python
+"""src.teleon.orchestration.parallel_lanes — coordinate a PARALLEL dev fleet (Claude Code + Ollama agents) that never
+edits the same file at once."""
+_REPO = ...
+_MANIFEST = ...
+_WORKTREE_ROOT = ...
+def load_manifest() -> dict
+def lanes() -> list[dict]
+def shared_files() -> list[str]
+def _expand(globs: list[str]) -> set[str]
+    # Expand a lane's owns globs to the set of repo-relative FILE paths they match (supports literal paths, '*',
+def owned_files(lane: dict) -> set[str]
+def validate_disjoint() -> dict
+    # Prove the no-same-file-edit guarantee at the ownership layer: lanes' owned file sets are pairwise disjoint, and
+def brain_command(brain: str) -> str
+    # Resolve the command that drives a brain's agent: claude -> CLAUDE_CODE_CMD (default 'claude -p'); ollama ->
+def worktree_path(lane: dict) -> str
+def lane_prompt(lane: dict) -> str
+    # The scoped self-prompt for a lane's agent: it OWNS only its files, must not touch others or the shared files,
+def plan() -> list[dict]
+    # Dry-run plan: what each lane agent would do. No worktrees created, no agents spawned.
+```
+## intra-module call edges
+src.teleon.orchestration.parallel_lanes.lanes -> src.teleon.orchestration.parallel_lanes.load_manifest
+src.teleon.orchestration.parallel_lanes.shared_files -> src.teleon.orchestration.parallel_lanes.load_manifest
+src.teleon.orchestration.parallel_lanes.owned_files -> src.teleon.orchestration.parallel_lanes._expand
+src.teleon.orchestration.parallel_lanes.validate_disjoint -> src.teleon.orchestration.parallel_lanes.lanes
+src.teleon.orchestration.parallel_lanes.validate_disjoint -> src.teleon.orchestration.parallel_lanes.owned_files
+src.teleon.orchestration.parallel_lanes.validate_disjoint -> src.teleon.orchestration.parallel_lanes.shared_files
+src.teleon.orchestration.parallel_lanes.brain_command -> src.teleon.orchestration.parallel_lanes.load_manifest
+src.teleon.orchestration.parallel_lanes.lane_prompt -> src.teleon.orchestration.parallel_lanes.shared_files
+src.teleon.orchestration.parallel_lanes.plan -> src.teleon.orchestration.parallel_lanes.lanes
+src.teleon.orchestration.parallel_lanes.plan -> src.teleon.orchestration.parallel_lanes.brain_command
+src.teleon.orchestration.parallel_lanes.plan -> src.teleon.orchestration.parallel_lanes.worktree_path
+src.teleon.orchestration.parallel_lanes.plan -> src.teleon.orchestration.parallel_lanes.owned_files
+src.teleon.orchestration.parallel_lanes.plan -> src.teleon.orchestration.parallel_lanes.load_manifest

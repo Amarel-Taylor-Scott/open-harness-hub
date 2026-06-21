@@ -1,0 +1,35 @@
+MODULE src/teleon/purpose_tasks/eval_suite.py
+## API signatures
+```python
+"""src.teleon.purpose_tasks.eval_suite — the EVAL/BENCHMARK as a first-class PurposeTask contract field."""
+EVAL_GATE_SOURCE = ...
+JUDGE_KINDS = ...
+DEFAULT_JUDGE = ...
+EVAL_SOURCE_KEYS = ...
+class BenchmarkNotRegisteredError:
+    # A `benchmark_ref` named a suite that is not in the supplied registry. Raised HONESTLY — the resolver
+    def __init__(self, ref: str, known: tuple[str, ...]=()) -> None
+def default_gate_threshold() -> float
+    # The default promotion gate threshold, read from the ONE canonical source (the live runtime's
+def default_holdout_policy() -> str
+    # The default holdout policy, DERIVED from the runtime's canonical split constants (TRAIN_PARITY +
+def gate_basis() -> str
+    # The basis the runtime gate evaluates the threshold over (e.g. 'train+holdout'). Canonical source:
+def _is_ref(suite: dict[str, Any]) -> bool
+def validate_eval_suite(suite: Any, *, model_built: bool=False) -> list[str]
+    # Return a list of human-readable errors for an eval_suite (empty list == valid). Enforces the rules the
+def normalize_eval_suite(suite: Any, *, model_built: bool=False) -> dict[str, Any]
+    # Validate + fill DEFAULTS, returning a NEW normalized eval_suite the runtime gate + compiler consume.
+def eval_pairs(normalized_suite: dict[str, Any]) -> list[tuple[Any, Any]]
+    # Project an inline normalized suite to the runtime's executable shape: a list of (input, expected)
+def resolve_benchmark_ref(ref: str, registry: dict[str, Any] | None=None) -> dict[str, Any]
+    # Resolve a `benchmark_ref` to its inline suite via a supplied registry {suite_id: eval_suite}.
+```
+## intra-module call edges
+src.teleon.purpose_tasks.eval_suite.validate_eval_suite -> src.teleon.purpose_tasks.eval_suite._is_ref
+src.teleon.purpose_tasks.eval_suite.normalize_eval_suite -> src.teleon.purpose_tasks.eval_suite.validate_eval_suite
+src.teleon.purpose_tasks.eval_suite.normalize_eval_suite -> src.teleon.purpose_tasks.eval_suite.gate_basis
+src.teleon.purpose_tasks.eval_suite.normalize_eval_suite -> src.teleon.purpose_tasks.eval_suite.default_gate_threshold
+src.teleon.purpose_tasks.eval_suite.normalize_eval_suite -> src.teleon.purpose_tasks.eval_suite.default_holdout_policy
+src.teleon.purpose_tasks.eval_suite.resolve_benchmark_ref -> src.teleon.purpose_tasks.eval_suite.BenchmarkNotRegisteredError
+src.teleon.purpose_tasks.eval_suite.__init__ -> src.teleon.purpose_tasks.eval_suite.BenchmarkNotRegisteredError.__init__

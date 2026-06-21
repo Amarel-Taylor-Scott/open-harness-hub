@@ -1,0 +1,22 @@
+MODULE src/teleon/purpose_tasks/projections.py
+## API signatures
+```python
+"""src.teleon.purpose_tasks.projections — ONE truth model, TWO redacted views (staff + customer)."""
+CUSTOMER_SPEC_FIELDS = ...
+CUSTOMER_RUN_FIELDS = ...
+STAFF_ONLY_FORBIDDEN_IN_CUSTOMER = ...
+def staff_projection(spec: dict[str, Any], runs: list[dict[str, Any]] | None=None) -> dict[str, Any]
+    # Full internal view for Baltor operators — everything (purpose, contracts, candidates, runtime decisions,
+def _allow(d: dict[str, Any], fields: tuple[str, ...]) -> dict[str, Any]
+CUSTOMER_EVAL_FIELDS = ...
+def _eval_contract_summary(suite: Any) -> dict[str, Any] | None
+    # Derive the customer-safe eval_suite summary (allowlist; the `expected` answer key never appears). For
+def customer_projection(spec: dict[str, Any], runs: list[dict[str, Any]] | None=None) -> dict[str, Any]
+    # Customer-safe view, built by ALLOWLIST (deny-by-default). Shows purpose · connected systems · allowed/
+def customer_view_is_clean(view: dict[str, Any]) -> bool
+    # True iff a customer projection contains NO staff-only/forbidden key anywhere (deep). The dashboard + the
+```
+## intra-module call edges
+src.teleon.purpose_tasks.projections.customer_projection -> src.teleon.purpose_tasks.projections._allow
+src.teleon.purpose_tasks.projections.customer_projection -> src.teleon.purpose_tasks.projections._eval_contract_summary
+src.teleon.purpose_tasks.projections.customer_projection -> src.teleon.purpose_tasks.projections._allow
