@@ -55,26 +55,67 @@ def feed(hub_id: str | None) -> int:
     return 0
 
 
+def _hn_search(q: str) -> list:
+    """REAL web search via the key-free HN Algolia API (the 'search' tier)."""
+    import json
+    import urllib.parse
+    import urllib.request
+    try:
+        url = "https://hn.algolia.com/api/v1/search?tags=story&query=" + urllib.parse.quote(q)
+        with urllib.request.urlopen(url, timeout=8) as r:  # noqa: S310 — fixed trusted host
+            hits = json.loads(r.read()).get("hits", [])
+        return [{"name": h.get("title") or h.get("story_title"), "url": h.get("url"), "source": "hn-algolia"}
+                for h in hits[:5] if (h.get("title") or h.get("story_title"))]
+    except Exception:  # noqa: BLE001
+        return []
+
+
+def _js_scrape(q: str) -> list:
+    """REAL JS-compatible scrape (the 'scrape' tier) — shells to e2e/scrape_url.mjs (chromium). q is a URL."""
+    import json
+    import subprocess
+    if not q.startswith("http"):
+        return []
+    try:
+        r = subprocess.run(["node", str(REPO / "e2e" / "scrape_url.mjs"), q], cwd=str(REPO),
+                           capture_output=True, text=True, timeout=40)
+        data = json.loads((r.stdout or "{}").strip().splitlines()[-1])
+        return [{"name": l["text"], "url": l["href"], "source": "js-scrape"} for l in data.get("links", [])[:10]]
+    except Exception:  # noqa: BLE001
+        return []
+
+
 def _tools(real: bool = True):
-    """The TOOL REPOSITORY for OpenClaw. Prefer the REAL research_radar (live GitHub discovery) — our already-generated
-    tool — falling back to deterministic stubs offline. Real web-search / JS-scraping tools register here too."""
+    """The TOOL REPOSITORY for OpenClaw — REAL, multi-tier (unbounded→bounded): api (github/HN-search) > search
+    (HN Algolia) > scrape (chromium JS render). All already-generated/installed tools; deterministic stubs offline."""
+    from src.openharnesshub.discovery import Tool, stub_tools
     if real:
         try:
             from scripts.research_radar import research
-            from src.openharnesshub.discovery import Tool, stub_tools
-
             def _gh(q: str) -> list:
                 try:
                     return research(q, "github", n=5) or []
                 except Exception:  # noqa: BLE001
                     return []
-            real_list = [Tool("research_radar_github", "api", 2, _gh)]
-            # keep the stub search/scrape as the unbounded fallback tiers (the descent still has tiers to descend from)
-            return real_list + [t for t in stub_tools() if t.tier != "api"]
+            tools = [Tool("research_radar_github", "api", 2, _gh),
+                     Tool("hn_algolia_search", "search", 3, _hn_search),
+                     Tool("chromium_js_scrape", "scrape", 5, _js_scrape)]
+            return tools or stub_tools()
         except Exception:  # noqa: BLE001
             pass
-    from src.openharnesshub.discovery import stub_tools
     return stub_tools()
+
+
+def hub_query(hub: str) -> str:
+    """Build a discovery query for a hub from architecture/hub_population_strategy.json (the per-hub sources)."""
+    try:
+        import json
+        strat = json.loads((REPO / "architecture" / "hub_population_strategy.json").read_text()).get("hubs", {})
+        src = strat.get(hub, {}).get("sources", {})
+        terms = list(src.get("github_topics", [])) + list(src.get("hackernews", []))
+        return " ".join(terms[:4]) or hub
+    except Exception:  # noqa: BLE001
+        return hub
 
 
 def discover(query: str) -> int:
@@ -94,7 +135,8 @@ def fresh(query: str) -> int:
     from src.teleon.hub_freshness import keep_hub_fresh
     eng, oc, tools = _engines(), OpenClaw(default_plugins()), _tools()
     for hub in sorted({p.target_hub for p in oc.plugins}):
-        r = keep_hub_fresh(hub, query, hub_engines=eng, openclaw=oc, tools=tools)
+        intent = f"{query} :: {hub_query(hub)}"   # the plain-text capability + the hub's strategy sources
+        r = keep_hub_fresh(hub, intent, hub_engines=eng, openclaw=oc, tools=tools)
         print(f"  {r['hub']:<22} discovered {r['discovered']} ingested {r['ingested']} | descended -> {r['bounded_tool']} ({r['pct_saved']}% cheaper)")
     return 0
 

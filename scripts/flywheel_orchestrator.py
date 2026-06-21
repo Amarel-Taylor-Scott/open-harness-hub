@@ -128,6 +128,27 @@ def _fw_yc() -> dict:
         return {"summary": f"yc readiness unavailable: {e}", "signal": "ok"}
 
 
+def _fw_hubs(state: dict) -> dict:
+    """Continuously POPULATE the Open*Hubs: run Teleon's 'keep this hub fresh' capability for ONE hub per cycle
+    (rotating) using the REAL tool repository (github / HN search / chromium JS scrape) + the per-hub strategy. The
+    descent makes each hub's discovery cheaper over time; governed (candidates serves_truth=false; verify gate serves)."""
+    try:
+        from scripts.hub_engine_runner import _engines, _tools, hub_query
+        from src.openharnesshub.discovery import OpenClaw, default_plugins
+        from src.teleon.hub_freshness import keep_hub_fresh
+        oc = OpenClaw(default_plugins())
+        hubs = sorted({p.target_hub for p in oc.plugins})
+        i = state.get("hubs_cursor", 0) % len(hubs)
+        hub = hubs[i]
+        state["hubs_cursor"] = i + 1
+        r = keep_hub_fresh(hub, f"continuously update with public sources :: {hub_query(hub)}",
+                           hub_engines=_engines(), openclaw=oc, tools=_tools())
+        return {"summary": f"hub freshness: {hub} +{r['ingested']} ingested, descend->{r['bounded_tool']} ({r['pct_saved']}% cheaper)",
+                "signal": "ok"}
+    except Exception as e:  # noqa: BLE001
+        return {"summary": f"hub freshness unavailable: {e}", "signal": "ok"}
+
+
 def _record_autoapplied(records: list[dict]) -> None:
     AUTO_APPLIED.parent.mkdir(parents=True, exist_ok=True)
     with open(AUTO_APPLIED, "a", encoding="utf-8") as f:
@@ -207,6 +228,7 @@ FLYWHEELS = {
     "status": {"cadence": 3, "fn": None},          # heartbeat (needs state -> handled specially)
     "yc": {"cadence": 4, "fn": _fw_yc},            # SELF-DIRECTING: score whole-portfolio YC readiness -> file the gaps
     "propose": {"cadence": 5, "fn": _fw_propose},  # distill findings -> scored/prioritized backlog (comfort-gated)
+    "hubs": {"cadence": 7, "fn": None},            # continuously POPULATE the Open*Hubs (one/cycle; needs state -> special)
     "health": {"cadence": 6, "fn": _fw_health},    # proof gates periodically (or on demand when red)
     "autofix": {"cadence": 8, "fn": _fw_autofix},  # auto-apply ONLY trivial reversible fixes (toggle: --no-autofix)
     "cleanup": {"cadence": 12, "fn": _fw_cleanup},
@@ -228,6 +250,7 @@ def load_state() -> dict:
     s.setdefault("no_progress", 0)          # consecutive sweeps with no new findings -> stalled
     s.setdefault("last_findings", None)     # findings count at the last sweep (to detect no-progress)
     s.setdefault("last_logjam", -999)       # cycle of the last logjam-break (cooldown so we don't re-fork every cycle)
+    s.setdefault("hubs_cursor", 0)          # round-robin index for the hubs flywheel (one Open*Hub per cycle)
     return s
 
 
@@ -271,6 +294,8 @@ def run_cycle(state: dict) -> tuple[str, dict]:
             res = _fw_status(state)
         elif name == "logjam":
             res = _fw_logjam(state)              # stall-breaker: needs state to read the stall reasons
+        elif name == "hubs":
+            res = _fw_hubs(state)                # hub population: needs state for the round-robin cursor
         else:
             res = FLYWHEELS[name]["fn"]()
         state["errors"][name] = 0
@@ -378,14 +403,15 @@ def _self_test() -> int:
     def ck(name, ok, detail=""):
         print(f"  [{'ok' if ok else 'FAIL'}] {name}{(': '+detail) if detail and not ok else ''}")
         if not ok: fails.append(name)
-    ck("flywheels registered (sweep/status/yc/propose/health/autofix/cleanup/checkpoint/logjam)", set(FLYWHEELS) == {"sweep", "status", "yc", "propose", "health", "autofix", "cleanup", "checkpoint", "logjam"})
+    ck("flywheels registered (sweep/status/yc/propose/hubs/health/autofix/cleanup/checkpoint/logjam)", set(FLYWHEELS) == {"sweep", "status", "yc", "propose", "hubs", "health", "autofix", "cleanup", "checkpoint", "logjam"})
+    ck("hubs flywheel registered (continuously populates the Open*Hubs)", "hubs" in FLYWHEELS)
     # AUTO-APPLY flywheel: on by default, opt-out via --no-autofix, capped, audited
     ck("auto-apply flywheel registered + on by default", "autofix" in FLYWHEELS and _AUTOFIX is True)
     ck("auto-apply is capped per cycle (small reviewable batches)", _AUTOFIX_CAP <= 10)
     ck("propose flywheel registered (findings -> scored/prioritized backlog)", "propose" in FLYWHEELS and FLYWHEELS["propose"]["fn"] is _fw_propose)
     ck("SELF-DIRECTING yc flywheel registered (scores whole-portfolio YC readiness -> files gaps)", "yc" in FLYWHEELS and FLYWHEELS["yc"]["fn"] is _fw_yc)
     ck("track-3 checkpoint flywheel registered (auto-commit when green)", "checkpoint" in FLYWHEELS and FLYWHEELS["checkpoint"]["fn"] is _fw_checkpoint)
-    overdue_autofix = {"cycle": 20, "last": {"sweep": 19, "status": 19, "yc": 19, "propose": 19, "health": 19, "cleanup": 19, "checkpoint": 19}, "errors": {}, "health": "ok"}
+    overdue_autofix = {"cycle": 20, "last": {"sweep": 19, "status": 19, "yc": 19, "propose": 19, "hubs": 19, "health": 19, "cleanup": 19, "checkpoint": 19}, "errors": {}, "health": "ok"}
     ck("when due, autofix CAN be picked (auto progress unattended)", pick_flywheel(overdue_autofix) == "autofix", pick_flywheel(overdue_autofix))
     _AUTOFIX = False
     ck("--no-autofix disables auto-apply (never picked)", pick_flywheel(overdue_autofix) != "autofix")
@@ -400,7 +426,7 @@ def _self_test() -> int:
     s3 = {"cycle": 2, "last": {"sweep": 1}, "errors": {"sweep": 3}, "health": "ok"}
     ck("ADJUSTMENT: a flywheel in error-cooldown is skipped (not picked)", pick_flywheel(s3) != "sweep")
     # cadence: cleanup becomes most-overdue eventually
-    s4 = {"cycle": 30, "last": {"sweep": 29, "health": 28, "status": 29, "yc": 29, "propose": 29, "autofix": 29, "checkpoint": 29, "cleanup": 0}, "errors": {}, "health": "ok"}
+    s4 = {"cycle": 30, "last": {"sweep": 29, "health": 28, "status": 29, "yc": 29, "propose": 29, "hubs": 29, "autofix": 29, "checkpoint": 29, "cleanup": 0}, "errors": {}, "health": "ok"}
     ck("cadence makes a long-overdue flywheel (cleanup) eligible", pick_flywheel(s4) == "cleanup", pick_flywheel(s4))
     # STALL -> LOGJAM: persistent red gates (health red across enough runs) escalate from health-retry to a logjam-break
     s5 = {"cycle": 10, "last": {"health": 9}, "errors": {}, "health": "red", "health_red_streak": 3, "last_logjam": -999}

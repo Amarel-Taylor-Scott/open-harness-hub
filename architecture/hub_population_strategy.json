@@ -1,0 +1,29 @@
+{
+  "version": "0.1.0",
+  "note": "Single source for AUTO-POPULATING each Open*Hub. Read by src/openharnesshub/discovery.py + src/teleon/hub_freshness.py. The combination is: CUSTOM TOOLS (the tool repository, unbounded->bounded: api > search > scrape) + TELEON-MANAGED CAPABILITIES (each hub gets a plain-text 'continuously update this hub' capability that Teleon descends + plans + breaks down). serves_truth=false: everything discovered is a CANDIDATE, served only after the hub's verify/rank gate (discovery!=trust). Design + the recursive flywheel: docs/architecture/hub-auto-population.md.",
+  "recursive_flywheel": "The tools/skills/harnesses that DO the population are themselves hub components: OpenToolsHub feeds OpenClaw better tools, OpenSkillsHub feeds Teleon better digest/plan skills, OpenHarnessHub feeds the verify/rank gate better ratings. So populating the hubs makes future population better -> the hubs get stronger over time.",
+  "governance": ["candidates serves_truth=false", "served only after verify+rank", "content-hash dedupe", "lossless versioning", "tenant-private never global without opt-in contribute", "respect robots/ToS + official APIs"],
+  "hubs": {
+    "OpenToolsHub": {"content_kind": "repos", "tool_tier": "api",
+      "sources": {"github_topics": ["ai-agent-tools", "llm-tools", "mcp-server", "function-calling"], "hackernews": ["AI agent tools", "LLM tool calling"]},
+      "freshness_bar": 0.5, "verify_bar": "callable + has a name + a source handle"},
+    "OpenHarnessHub": {"content_kind": "harnesses", "tool_tier": "search",
+      "sources": {"github_topics": ["llm-eval", "agent-benchmark", "eval-harness"], "seed_urls": ["https://github.com/topics/llm-evaluation"]},
+      "freshness_bar": 0.5, "verify_bar": "runs a measurable eval + reports a metric"},
+    "OpenContextHub": {"content_kind": "context", "tool_tier": "api",
+      "sources": {"github_topics": ["retrieval-augmented-generation", "knowledge-graph", "context-engineering"], "hackernews": ["context engineering RAG"]},
+      "freshness_bar": 0.5, "verify_bar": "has source handles + a schema"},
+    "OpenSkillsHub": {"content_kind": "skills", "tool_tier": "search",
+      "sources": {"github_topics": ["agent-skills", "prompt-engineering", "claude-skills"], "seed_urls": ["https://github.com/topics/agent-skill"]},
+      "freshness_bar": 0.5, "verify_bar": "evaluated SKILL.md with an example"},
+    "OpenSkillToTool": {"content_kind": "skill_to_tool", "tool_tier": "search",
+      "sources": {"github_topics": ["mcp", "skill-to-tool", "tool-compiler"]},
+      "freshness_bar": 0.5, "verify_bar": "a verified, certified skill<->tool conversion"},
+    "OpenMCPHub": {"content_kind": "mcp", "tool_tier": "api",
+      "sources": {"github_topics": ["model-context-protocol", "mcp-server"], "seed_urls": ["https://github.com/modelcontextprotocol"]},
+      "freshness_bar": 0.5, "verify_bar": "installable MCP server + risk/conformance profile"},
+    "OpenCompressionHub": {"content_kind": "compression", "tool_tier": "search",
+      "sources": {"github_topics": ["prompt-compression", "token-optimization", "context-compression"], "hackernews": ["prompt compression token"]},
+      "freshness_bar": 0.5, "verify_bar": "compression preserves source handles + held-out (fidelity)"}
+  }
+}
