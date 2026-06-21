@@ -1,0 +1,35 @@
+MODULE src/teleon/training/skills_db.py
+## API signatures
+```python
+"""src.teleon.training.skills_db — the SKILLS / DISTILLATION DATABASE: the queryable store + training dataset
+of capabilities and how each was (or should be) distilled toward determinism."""
+FEATURE_KEYS = ...
+def feature_vector(candidate: dict) -> dict
+    # Model-independent features for a capability candidate (what a distillation policy generalizes over).
+class DistillationExample:
+    # One training row: a capability's features + (if distilled) its outcome label. ``label_strategy`` is the
+    def as_dict(self) -> dict
+def _efficiency(rec: dict) -> float
+def build_dataset(candidates: list[dict], records: list[dict]) -> 'DistillationDataset'
+    # Join capability features with their distillation outcomes into a dataset. A capability with a record is a
+class DistillationDataset:
+    # A built dataset of DistillationExamples with deterministic train/holdout split, export, and class queries.
+    def __init__(self, examples: list[DistillationExample]) -> None
+    def labeled(self) -> list[DistillationExample]
+    def split(self, *, holdout_fraction: float=0.25)
+        # Deterministic split of the LABELED examples by content hash (no RNG): the same dataset always splits the
+    def by_class(self) -> dict
+        # Labeled examples grouped by class (category|band) — the skills-DB view used to read the best path.
+    def export_jsonl(self, path: str | Path) -> int
+        # Write the dataset as portable JSONL training data (one example per line). Returns the row count.
+    def summary(self) -> dict
+```
+## intra-module call edges
+src.teleon.training.skills_db.feature_vector -> src.teleon.training.skills_db.DistillationDataset.split
+src.teleon.training.skills_db.build_dataset -> src.teleon.training.skills_db.DistillationDataset
+src.teleon.training.skills_db.build_dataset -> src.teleon.training.skills_db.feature_vector
+src.teleon.training.skills_db.build_dataset -> src.teleon.training.skills_db.DistillationExample
+src.teleon.training.skills_db.build_dataset -> src.teleon.training.skills_db.DistillationExample
+src.teleon.training.skills_db.build_dataset -> src.teleon.training.skills_db._efficiency
+src.teleon.training.skills_db.export_jsonl -> src.teleon.training.skills_db.DistillationExample.as_dict
+src.teleon.training.skills_db.summary -> src.teleon.training.skills_db.DistillationDataset.by_class
