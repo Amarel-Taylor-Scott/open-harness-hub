@@ -128,19 +128,37 @@ def _fw_yc() -> dict:
         return {"summary": f"yc readiness unavailable: {e}", "signal": "ok"}
 
 
+def _due_hub(cyc: int, hub_last: dict, settings_by_hub: dict) -> str | None:
+    """The most-overdue ENABLED hub by its OWN cadence (a never-populated hub is due; a cadence-14 hub runs half as
+    often as cadence-7). None if none is due. Pure -> testable offline."""
+    best, best_overdue = None, 0.0
+    for h, s in settings_by_hub.items():
+        if not s.get("enabled", True):
+            continue
+        cad = max(1, int(s.get("cadence", 7)))
+        overdue = (cyc - hub_last.get(h, cyc - cad)) / cad   # never-seen -> exactly 1.0 (due)
+        if overdue >= 1.0 and overdue > best_overdue:
+            best, best_overdue = h, overdue
+    return best
+
+
 def _fw_hubs(state: dict) -> dict:
-    """Continuously POPULATE the Open*Hubs: run Teleon's 'keep this hub fresh' capability for ONE hub per cycle
-    (rotating) using the REAL tool repository (github / HN search / chromium JS scrape) + the per-hub strategy. The
-    descent makes each hub's discovery cheaper over time; governed (candidates serves_truth=false; verify gate serves)."""
+    """Continuously POPULATE the Open*Hubs: run Teleon's 'keep this hub fresh' capability for the most-overdue hub by
+    its PER-HUB cadence (honors the settings plane: enabled + cadence), using the REAL tool repository (github / HN /
+    chromium JS scrape) + the strategy. The descent makes discovery cheaper over time; governed (verify gate serves)."""
     try:
         from scripts.hub_engine_runner import _engines, _tools, hub_query
         from src.openharnesshub.discovery import OpenClaw, default_plugins
+        from src.openharnesshub.hub_settings import load_settings
         from src.teleon.hub_freshness import keep_hub_fresh
         oc = OpenClaw(default_plugins())
         hubs = sorted({p.target_hub for p in oc.plugins})
-        i = state.get("hubs_cursor", 0) % len(hubs)
-        hub = hubs[i]
-        state["hubs_cursor"] = i + 1
+        settings_by_hub = {h: {"enabled": (s := load_settings(h)).enabled, "cadence": s.cadence} for h in hubs}
+        hub_last = state.setdefault("hub_last", {})
+        hub = _due_hub(state["cycle"], hub_last, settings_by_hub)
+        if hub is None:
+            return {"summary": "no hub due this cycle (per-hub cadence)", "signal": "ok"}
+        hub_last[hub] = state["cycle"]
         r = keep_hub_fresh(hub, f"continuously update with public sources :: {hub_query(hub)}",
                            hub_engines=_engines(), openclaw=oc, tools=_tools())
         if r.get("skipped"):
@@ -252,7 +270,8 @@ def load_state() -> dict:
     s.setdefault("no_progress", 0)          # consecutive sweeps with no new findings -> stalled
     s.setdefault("last_findings", None)     # findings count at the last sweep (to detect no-progress)
     s.setdefault("last_logjam", -999)       # cycle of the last logjam-break (cooldown so we don't re-fork every cycle)
-    s.setdefault("hubs_cursor", 0)          # round-robin index for the hubs flywheel (one Open*Hub per cycle)
+    s.setdefault("hubs_cursor", 0)          # legacy round-robin index (superseded by per-hub cadence)
+    s.setdefault("hub_last", {})            # hub_id -> cycle last populated (drives per-hub cadence in the hubs flywheel)
     return s
 
 
@@ -437,6 +456,9 @@ def _self_test() -> int:
         if not ok: fails.append(name)
     ck("flywheels registered (sweep/status/yc/propose/hubs/health/autofix/cleanup/checkpoint/logjam)", set(FLYWHEELS) == {"sweep", "status", "yc", "propose", "hubs", "health", "autofix", "cleanup", "checkpoint", "logjam"})
     ck("hubs flywheel registered (continuously populates the Open*Hubs)", "hubs" in FLYWHEELS)
+    ck("hubs flywheel honors PER-HUB cadence (_due_hub: most-overdue enabled hub; disabled skipped; not-due -> None)",
+       _due_hub(20, {"A": 10, "B": 19}, {"A": {"enabled": True, "cadence": 7}, "B": {"enabled": True, "cadence": 7}, "C": {"enabled": False, "cadence": 7}}) == "A"
+       and _due_hub(5, {"A": 4}, {"A": {"enabled": True, "cadence": 7}}) is None)
     # AUTO-APPLY flywheel: on by default, opt-out via --no-autofix, capped, audited
     ck("auto-apply flywheel registered + on by default", "autofix" in FLYWHEELS and _AUTOFIX is True)
     ck("auto-apply is capped per cycle (small reviewable batches)", _AUTOFIX_CAP <= 10)
