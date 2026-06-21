@@ -1,0 +1,40 @@
+MODULE src/teleon/runtime/capability_binding.py
+## API signatures
+```python
+"""src.teleon.runtime.capability_binding — bind a declared CapabilityTask to an execution TARGET, abstracting
+all cloud-function / Kubernetes-worker programming behind the binding contract."""
+def target_card(target: str) -> dict | None
+    # Return the registry card for ``target`` (or ``None`` for an unknown target).
+def _selector_task(capability_task: dict) -> dict
+    # Project a declared CapabilityTask onto the execution_backend_selector's task shape so the SAME numeric
+def _capability_id(capability_task: dict) -> str
+def _backend_for(capability_task: dict, **selector_kwargs) -> dict
+    # DELEGATE backend choice to the policy selector (never reinvented). Computed for EVERY target — even a
+class LocalFunctionBinding:
+    # ACTIVE golden path: bind a CapabilityTask onto the offline local function emulator. ``bind`` delegates
+    def describe(self) -> dict
+    def status(self) -> dict
+    def bind(self, capability_task: dict, *, now: str, **selector_kwargs) -> BindingResult
+class CandidateBinding:
+    # A candidate binding target (Nitric/Score/Temporal/Knative/KEDA/Kratix) built from a registry card.
+    def __init__(self, card: dict) -> None
+    def describe(self) -> dict
+    def status(self) -> dict
+    def bind(self, capability_task: dict, *, now: str, **selector_kwargs) -> BindingUnavailableResult
+def get_binding(target: str)
+    # Return a binding provider for ``target``: the live :class:`LocalFunctionBinding` for the one active
+def bind_capability_task(capability_task: dict, *, target: str=LOCAL_FUNCTION_TARGET, now: str, **selector_kwargs)
+    # Dispatch: resolve ``target`` → run the active :class:`LocalFunctionBinding` (returns a
+```
+## intra-module call edges
+src.teleon.runtime.capability_binding._backend_for -> src.teleon.runtime.capability_binding._selector_task
+src.teleon.runtime.capability_binding.get_binding -> src.teleon.runtime.capability_binding.target_card
+src.teleon.runtime.capability_binding.get_binding -> src.teleon.runtime.capability_binding.CandidateBinding
+src.teleon.runtime.capability_binding.get_binding -> src.teleon.runtime.capability_binding.LocalFunctionBinding
+src.teleon.runtime.capability_binding.bind_capability_task -> src.teleon.runtime.capability_binding.get_binding
+src.teleon.runtime.capability_binding.bind_capability_task -> src.teleon.runtime.capability_binding.LocalFunctionBinding.bind
+src.teleon.runtime.capability_binding.bind_capability_task -> src.teleon.runtime.capability_binding._backend_for
+src.teleon.runtime.capability_binding.bind -> src.teleon.runtime.capability_binding._capability_id
+src.teleon.runtime.capability_binding.bind -> src.teleon.runtime.capability_binding._backend_for
+src.teleon.runtime.capability_binding.bind -> src.teleon.runtime.capability_binding._selector_task
+src.teleon.runtime.capability_binding.bind -> src.teleon.runtime.capability_binding._backend_for
