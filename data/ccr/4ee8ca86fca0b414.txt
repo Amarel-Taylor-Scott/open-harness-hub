@@ -1,0 +1,17 @@
+MODULE src/baltor/distillation/rollback.py
+## API signatures
+```python
+"""src.baltor.distillation.rollback — rollback moves the active pointer only; it never deletes anything."""
+class RollbackPlan:
+    # A plan to move ``key``'s active pointer from the promoted candidate back to a prior/baseline version.
+    def to_dict(self) -> dict
+    def of(store: LosslessStore, *, key: str, tenant: str, to_id: str, reason: str='') -> 'RollbackPlan'
+        # Build a plan rolling ``key`` back to ``to_id`` (the current active id becomes ``from_id``).
+class RollbackReceipt:
+    def to_dict(self) -> dict
+def execute(store: LosslessStore, plan: RollbackPlan, *, now: str=EPOCH) -> RollbackReceipt
+    # Execute a rollback: move ``key``'s active pointer ``from_id`` → ``to_id`` and write a receipt.
+```
+## intra-module call edges
+src.baltor.distillation.rollback.execute -> src.baltor.distillation.rollback.RollbackReceipt
+src.baltor.distillation.rollback.of -> src.baltor.distillation.rollback.RollbackPlan

@@ -1,0 +1,28 @@
+MODULE src/baltor/native/ftm_adapter.py
+## API signatures
+```python
+"""src/baltor/native/ftm_adapter — interoperate with the FollowTheMoney (FtM) entity schema at the EDGES, the same
+way okf_adapter does for OKF: map a governed Baltor entity record → an FtM EntityProxy ({id, schema, properties}),
+WITHOUT making FtM our core object. FtM is a projection (like OKF / PROV-JSON / OpenLineage), not the source of truth."""
+SCHEMA_FOR_TYPE = ...
+_DEFAULT_SCHEMA = ...
+PROP_MAP = ...
+TOPIC_MAP = ...
+SERVES_TRUTH = ...
+def _sha1(text: str) -> str
+def _as_list(v) -> list
+def schema_for(entity_type: str) -> str
+def _topics(record: dict) -> list
+    # Promote topics ONLY from governed flags (record['flags'] / explicit topic keys) — never inferred from text.
+def to_entity_proxy(record: dict, *, entity_type: str | None=None) -> dict
+    # Map a governed entity record → an FtM EntityProxy {id, schema, properties:{prop:[values]}}. Aleph-loadable.
+def to_ftm(records: list[dict]) -> list[dict]
+    # Map a list of governed records → FtM EntityProxies (the Aleph bulk-load shape).
+```
+## intra-module call edges
+src.baltor.native.ftm_adapter._topics -> src.baltor.native.ftm_adapter._as_list
+src.baltor.native.ftm_adapter.to_entity_proxy -> src.baltor.native.ftm_adapter.schema_for
+src.baltor.native.ftm_adapter.to_entity_proxy -> src.baltor.native.ftm_adapter._topics
+src.baltor.native.ftm_adapter.to_entity_proxy -> src.baltor.native.ftm_adapter._as_list
+src.baltor.native.ftm_adapter.to_entity_proxy -> src.baltor.native.ftm_adapter._sha1
+src.baltor.native.ftm_adapter.to_ftm -> src.baltor.native.ftm_adapter.to_entity_proxy

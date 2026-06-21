@@ -1,0 +1,31 @@
+MODULE src/baltor/contextops/source_discovery.py
+## API signatures
+```python
+"""src.baltor.contextops.source_discovery — ResearchTask → ranked candidates → report + proposed SourceRecipe."""
+SOURCE_CANDIDATE_SCHEMA_VERSION = ...
+RELIABILITY_SCORE_SCHEMA_VERSION = ...
+_DEFAULT_FACTORS = ...
+_TYPE_CUES = ...
+def _hash(obj: Any) -> str
+def _classify_source_type(authority_note: str, source_handle: str) -> str
+    # Classify a candidate's source_type deterministically. The source_handle is consulted FIRST (it names
+def _composite(factors: dict[str, float], authority_rank: int) -> float
+    # Deterministic 0..1 composite: mean of the positive factors, penalized by contradiction_rate, then
+def _build_candidate(*, source_handle: str, authority_note: str, tenant_id: str, scope: str, discovered_by: str, now: str) -> dict
+def _build_score(*, candidate: dict, now: str) -> dict
+class SourceDiscoveryDriver:
+    # Implements :class:`SourceDiscoveryProviderPort`: ResearchTask → ranked candidates → report + recipe.
+    def __init__(self, *, research_provider: LocalResearchStub | None=None) -> None
+    def discover(self, task: dict[str, Any], *, existing_handles: list[str] | None=None, now: str) -> dict[str, Any]
+def _locator_for(source_handle: str) -> str
+    # Deterministic fixture locator for a source handle in the lean core (offline; no network).
+```
+## intra-module call edges
+src.baltor.contextops.source_discovery._build_candidate -> src.baltor.contextops.source_discovery._classify_source_type
+src.baltor.contextops.source_discovery._build_candidate -> src.baltor.contextops.source_discovery._hash
+src.baltor.contextops.source_discovery._build_score -> src.baltor.contextops.source_discovery._composite
+src.baltor.contextops.source_discovery._build_score -> src.baltor.contextops.source_discovery._hash
+src.baltor.contextops.source_discovery._locator_for -> src.baltor.contextops.source_discovery._hash
+src.baltor.contextops.source_discovery.discover -> src.baltor.contextops.source_discovery._build_candidate
+src.baltor.contextops.source_discovery.discover -> src.baltor.contextops.source_discovery._build_score
+src.baltor.contextops.source_discovery.discover -> src.baltor.contextops.source_discovery._locator_for

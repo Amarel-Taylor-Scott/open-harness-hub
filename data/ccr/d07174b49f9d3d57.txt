@@ -1,0 +1,14 @@
+MODULE src/baltor/contracts/artifacts/watch_policy.py
+## API signatures
+```python
+"""contracts/artifacts/watch_policy — the re-verification CADENCE + escalation rule for a class of facts."""
+def _content_id(prefix: str, body: dict) -> str
+class WatchPolicy:
+    def __post_init__(self) -> None
+    def watch_policy_id(self) -> str
+    def next_verify_at(self, last_verified_at: int) -> int | None
+        # The absolute epoch the fact is due for re-verification, or None for immutable facts.
+    def to_dict(self) -> dict
+```
+## intra-module call edges
+src.baltor.contracts.artifacts.watch_policy.watch_policy_id -> src.baltor.contracts.artifacts.watch_policy._content_id

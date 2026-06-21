@@ -1,0 +1,25 @@
+MODULE src/baltor/contextops/source_recipe.py
+## API signatures
+```python
+"""src.baltor.contextops.source_recipe — the M2 rung: distill a discovered source into a REUSABLE recipe."""
+_ID_PREFIX = ...
+SCHEMA_VERSION = ...
+EXPECTED_OUTPUT_SCHEMA = ...
+DEFAULT_ACCESS_METHOD = ...
+_OFFICIAL_TYPES = ...
+_SECONDARY_TYPES = ...
+_CURRENT_CUES = ...
+def _hash(obj: Any) -> str
+def _is_current_value(fact_key: str, question: str) -> bool
+def cross_source_policy(*, source_type: str, source_scope: str, is_current_value: bool) -> tuple[str, int]
+    # Derive (policy, min_independent_sources) for a source of this type/scope deterministically.
+def watch_triggers(*, source_type: str, is_current_value: bool) -> list[str]
+    # Derive the watch triggers (when the recipe must re-run) deterministically. Always includes
+def build_source_recipe(*, tenant_id: str, source_scope: str, fact_key: str, question: str, source_handle: str, source_type: str, authority_rank: int, officialness: str, access_method: str=DEFAULT_ACCESS_METHOD, locator: str, parser_provider: str='parser.stub@v1', reliability_score_id: str='', derived_from_report_id: str='', rate_limit_per_min: int=30, now: str) -> dict
+    # Distil one discovered, authority-ranked source into a SourceRecipe.v1 dict (the M2 rung).
+```
+## intra-module call edges
+src.baltor.contextops.source_recipe.build_source_recipe -> src.baltor.contextops.source_recipe._is_current_value
+src.baltor.contextops.source_recipe.build_source_recipe -> src.baltor.contextops.source_recipe.cross_source_policy
+src.baltor.contextops.source_recipe.build_source_recipe -> src.baltor.contextops.source_recipe.watch_triggers
+src.baltor.contextops.source_recipe.build_source_recipe -> src.baltor.contextops.source_recipe._hash

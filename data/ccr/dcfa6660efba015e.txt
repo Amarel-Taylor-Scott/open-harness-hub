@@ -1,0 +1,24 @@
+MODULE src/baltor/facts/refresh_planner.py
+## API signatures
+```python
+"""facts/refresh_planner — turn a STALE fragile fact into a durable VerificationTask, then a VerificationResult."""
+_SHARED_SCOPES = ...
+_TENANT_SCOPES = ...
+def _evidence_hash(body: dict) -> str
+def _scope_allowed(evidence_scope: str, fact_scope: str) -> bool
+    # A tenant-scoped refresh may not update a shared (global_public/system_reference) fact.
+class FactRefreshPlanner:
+    # Plans + executes fragile-fact re-verification. No clock/RNG; external fetch is STUBBED to evidence.
+    def plan_task(self, fragility: FragilityMetadata, *, source_handle: str, scope: str, now: int, reason: str='') -> VerificationTask | None
+        # A stale fact (now past horizon) → a durable VerificationTask; a fresh/immutable fact → None.
+    def _stub_external_evidence(self, task: VerificationTask, *, now: int) -> dict
+        # STUB: stand-in for an external-source check. Stores a deterministic EVIDENCE artifact dict — an
+    def refresh(self, task: VerificationTask, policy: WatchPolicy, *, fact_scope: str, now: int, contested: bool=False) -> VerificationResult
+        # Execute a queued task: store evidence, decide the new status, enforce scope isolation.
+    def apply_result(self, fact: CanonicalFact, result: VerificationResult) -> CanonicalFact
+        # Project a VerificationResult onto a CanonicalFact (returns a NEW frozen fact — no mutation).
+```
+## intra-module call edges
+src.baltor.facts.refresh_planner._stub_external_evidence -> src.baltor.facts.refresh_planner._evidence_hash
+src.baltor.facts.refresh_planner.refresh -> src.baltor.facts.refresh_planner.FactRefreshPlanner._stub_external_evidence
+src.baltor.facts.refresh_planner.refresh -> src.baltor.facts.refresh_planner._scope_allowed

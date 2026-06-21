@@ -1,0 +1,30 @@
+MODULE src/baltor/contextops/reliability.py
+## API signatures
+```python
+"""contextops/reliability — DETERMINISTIC source-reliability scoring (Lane D)."""
+FACTOR_NAMES = ...
+_INVERTED_FACTORS = ...
+_AUTHORITY_WEIGHT = ...
+_FACTOR_WEIGHT = ...
+_AUTHORITY_SCALE = ...
+_ROUND = ...
+class ReliabilityError:
+    # Raised on a malformed factor set — an explicit failure, never a silently-defaulted score.
+class SourceReliabilityScore:
+    # A derived reliability assessment of one SourceCandidate. RANKS sources; never a served fact.
+    def __post_init__(self) -> None
+    def overall(self) -> float
+        # The derived 0..1 composite: a weighted blend of normalized authority_rank and the eight factors.
+    def score_id(self) -> str
+    def to_dict(self) -> dict
+def score_source(*, candidate_id: str, source_type: str, factors: dict, tenant_id: str='', source_scope: str='global_public', fact_scope: str | None=None, rate_limit_risk: str='none', authority_rank: int | None=None, scored_at: int=0) -> SourceReliabilityScore
+    # Score one SourceCandidate deterministically.
+def outranks(a: SourceReliabilityScore, b: SourceReliabilityScore) -> bool
+    # True iff ``a`` wins over ``b`` for reconciliation: higher authority_rank, ties broken by overall.
+```
+## intra-module call edges
+src.baltor.contextops.reliability.score_source -> src.baltor.contextops.reliability.SourceReliabilityScore
+src.baltor.contextops.reliability.__post_init__ -> src.baltor.contextops.reliability.ReliabilityError
+src.baltor.contextops.reliability.__post_init__ -> src.baltor.contextops.reliability.ReliabilityError
+src.baltor.contextops.reliability.__post_init__ -> src.baltor.contextops.reliability.ReliabilityError
+src.baltor.contextops.reliability.__post_init__ -> src.baltor.contextops.reliability.ReliabilityError

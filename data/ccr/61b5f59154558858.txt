@@ -1,0 +1,9 @@
+MODULE src/baltor/distillation/rehydration.py
+## API signatures
+```python
+"""src.baltor.distillation.rehydration — prove that every derived artifact rehydrates to its source."""
+def rehydrate(store: LosslessStore, artifact_id: str, tenant: str) -> dict
+    # Rehydrate ``artifact_id`` for ``tenant`` → ``{artifact, raw, source, parents, held_out, rejected,
+def rehydrate_payload(store: LosslessStore, artifact_id: str, tenant: str) -> bytes
+    # Return the EXACT raw bytes behind an artifact (follows ``payload_ref`` to the nearest raw layer).
+```

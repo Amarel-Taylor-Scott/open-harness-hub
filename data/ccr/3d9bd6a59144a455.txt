@@ -1,0 +1,34 @@
+MODULE src/baltor/determinism/shadow_runner.py
+## API signatures
+```python
+"""src.baltor.determinism.shadow_runner — run a candidate rule in SHADOW alongside the live authority."""
+EPOCH = ...
+GLOBAL_PUBLIC = ...
+TENANT_PRIVATE = ...
+def _canon(body: Any) -> bytes
+def _attr(obj: Any, name: str, default=None)
+class ShadowTick:
+    # One shadow observation: live (authoritative) vs shadow (recorded, non-authoritative).
+    def to_dict(self) -> dict
+class ShadowRunReport:
+    # Summary of a shadow run. ``live_authoritative`` is always True (shadow never serves).
+    def to_dict(self) -> dict
+def _live_decision_of(trace: Any, live_decider: Callable[[Any], Any] | None) -> tuple[Any, str]
+    # Resolve the AUTHORITATIVE live decision for a trace. Prefer an injected callable (the real authority);
+def run_shadow(rule: RuleCandidate, traces: list, *, live_decider: Callable[[Any], Any] | None=None, now: str=EPOCH) -> ShadowRunReport
+    # Run ``rule`` in shadow over ``traces``. The live decision is returned UNCHANGED; the shadow verdict is
+```
+## intra-module call edges
+src.baltor.determinism.shadow_runner._live_decision_of -> src.baltor.determinism.shadow_runner._attr
+src.baltor.determinism.shadow_runner._live_decision_of -> src.baltor.determinism.shadow_runner._attr
+src.baltor.determinism.shadow_runner._live_decision_of -> src.baltor.determinism.shadow_runner._attr
+src.baltor.determinism.shadow_runner.run_shadow -> src.baltor.determinism.shadow_runner.ShadowRunReport
+src.baltor.determinism.shadow_runner.run_shadow -> src.baltor.determinism.shadow_runner._live_decision_of
+src.baltor.determinism.shadow_runner.run_shadow -> src.baltor.determinism.shadow_runner._attr
+src.baltor.determinism.shadow_runner.run_shadow -> src.baltor.determinism.shadow_runner.ShadowTick
+src.baltor.determinism.shadow_runner.run_shadow -> src.baltor.determinism.shadow_runner._attr
+src.baltor.determinism.shadow_runner.run_shadow -> src.baltor.determinism.shadow_runner.ShadowTick
+src.baltor.determinism.shadow_runner.run_shadow -> src.baltor.determinism.shadow_runner._attr
+src.baltor.determinism.shadow_runner.run_shadow -> src.baltor.determinism.shadow_runner._attr
+src.baltor.determinism.shadow_runner.run_shadow -> src.baltor.determinism.shadow_runner._canon
+src.baltor.determinism.shadow_runner.to_dict -> src.baltor.determinism.shadow_runner.ShadowTick.to_dict

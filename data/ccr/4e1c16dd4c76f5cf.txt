@@ -1,0 +1,20 @@
+MODULE src/baltor/observability/tracing/provider.py
+## API signatures
+```python
+"""src.baltor.observability.tracing.provider — the OBSERVABILITY PROVIDER seam."""
+class ContextOperationSpan:
+    # One unit of work in a Baltor context operation (a pipeline stage / verifier / worker run).
+class SpanTree:
+    # A read-only projection: nested {span, children:[...]} with a flat count + correlation id.
+class ObservabilityProvider:
+    # Turns spans into a SpanTree. DESCRIBES; never the authority, never writes canonical state.
+    def record(self, spans: list[ContextOperationSpan]) -> SpanTree
+def _node(span: ContextOperationSpan) -> dict
+    # A single tree node — governance is filtered to the allowed keys (no forged-authority leakage).
+class BaltorLocalObservability:
+    # The wired stub (`observability.baltor_local_trace@v1`). Builds an in-process SpanTree with zero
+    def record(self, spans: list[ContextOperationSpan]) -> SpanTree
+```
+## intra-module call edges
+src.baltor.observability.tracing.provider.record -> src.baltor.observability.tracing.provider.SpanTree
+src.baltor.observability.tracing.provider.record -> src.baltor.observability.tracing.provider._node

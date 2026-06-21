@@ -1,0 +1,17 @@
+MODULE src/baltor/observability/projections/lineage.py
+## API signatures
+```python
+"""src.baltor.observability.projections.lineage — the LINEAGE PROVIDER seam."""
+class LineageEvent:
+    # A lineage transition: an `activity` consumed `inputs` and produced `outputs` under an `agent`.
+class LineageFacet:
+    # Baltor's normalized lineage record + standards renderings keyed by standard name + a content
+class LineageProvider:
+    # Turns a LineageEvent into a LineageFacet. DESCRIBES; never mutates canonical, never serves truth.
+    def emit(self, event: LineageEvent) -> LineageFacet
+class BaltorLocalLineage:
+    # The wired stub (`lineage.baltor_local@v1`). Renders PROV-JSON + OpenLineage in-process with the
+    def emit(self, event: LineageEvent) -> LineageFacet
+```
+## intra-module call edges
+src.baltor.observability.projections.lineage.emit -> src.baltor.observability.projections.lineage.LineageFacet

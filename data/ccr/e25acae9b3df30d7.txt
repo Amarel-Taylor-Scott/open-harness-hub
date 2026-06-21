@@ -1,0 +1,23 @@
+MODULE src/baltor/adapters/source/folder_batch.py
+## API signatures
+```python
+"""adapters/source/folder_batch — LocalFolderBatchAdapter (a mixed-extension folder of files as ONE source)."""
+_EXT_TO_TYPE = ...
+_NO_PARSER_TYPES = ...
+def _classify(relpath: str) -> str
+def _content_hash(data) -> str
+def _iter_files(payload) -> list[tuple[str, object]]
+    # Yield ``(relpath, data)`` sorted by relpath for determinism. dict → as-is; path → walked.
+class LocalFolderBatchAdapter:
+    # SourceAdapter for a mixed-extension local folder. Routes each file; never aborts on one bad file.
+    def ingest(self, payload, *, tenant_id, source_id, scope='tenant_private', authority='unknown', now=0) -> dict
+def _self_demo(now: int=0) -> dict
+    # In-memory fixture demo (used by the proof / docs). Deterministic; time injected.
+```
+## intra-module call edges
+src.baltor.adapters.source.folder_batch._self_demo -> src.baltor.adapters.source.folder_batch.LocalFolderBatchAdapter.ingest
+src.baltor.adapters.source.folder_batch._self_demo -> src.baltor.adapters.source.folder_batch.LocalFolderBatchAdapter
+src.baltor.adapters.source.folder_batch.ingest -> src.baltor.adapters.source.folder_batch._iter_files
+src.baltor.adapters.source.folder_batch.ingest -> src.baltor.adapters.source.folder_batch._classify
+src.baltor.adapters.source.folder_batch.ingest -> src.baltor.adapters.source.folder_batch._content_hash
+src.baltor.adapters.source.folder_batch.ingest -> src.baltor.adapters.source.folder_batch.LocalFolderBatchAdapter.ingest

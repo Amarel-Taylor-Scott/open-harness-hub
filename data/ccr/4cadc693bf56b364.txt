@@ -1,0 +1,50 @@
+MODULE src/baltor/adapters/source/markdown_folder.py
+## API signatures
+```python
+"""adapters/source/markdown_folder — MarkdownFolderAdapter (markdown vaults / Obsidian-style notes)."""
+_IGNORED_DIRS = ...
+_PROMOTE_KEYS = ...
+_SCOPE_KEY = ...
+_AUTHORITY_KEY = ...
+_GLOBAL_PUBLIC = ...
+_TENANT_PRIVATE = ...
+_TRUE = ...
+_FALSE = ...
+def _wikilinks(text: str) -> list[str]
+    # Extract ``[[Target]]`` / ``[[Target|alias]]`` link targets, in first-seen order, de-duplicated.
+def _tags(text: str) -> list[str]
+    # Extract ``#tag`` tokens (alnum/_/-/ /), first-seen order, de-duplicated. Ignores ``#`` headings.
+def _parse_frontmatter(text: str) -> tuple[dict, str]
+    # Split a leading ``---`` YAML-ish frontmatter block from the body. STDLIB line parse, no yaml dep.
+def _coerce(val: str)
+    # Coerce a frontmatter scalar string to bool/int/float when unambiguous; else return the string.
+def _is_truthy(val) -> bool
+def _body_paragraphs(body: str) -> list[str]
+    # Body prose, minus headings / list bullets / blank lines, as paragraph blocks (heading-grouped).
+def _iter_notes(payload) -> list[tuple[str, str]]
+    # Yield ``(relpath, text)`` for each ``.md`` note, ignoring tool-config dirs. Accepts a dict OR a path.
+def _ignored(relpath: str) -> bool
+class MarkdownFolderAdapter:
+    # SourceAdapter for a markdown note folder (Obsidian-style vault). Notes are sources, not truth.
+    def ingest(self, payload, *, tenant_id, source_id, scope=_TENANT_PRIVATE, authority='unknown', now=0) -> dict
+    def _ignored_count(payload) -> int
+def _self_demo(now: int=0) -> dict
+    # In-memory fixture demo (used by the proof / docs). Deterministic; time injected.
+```
+## intra-module call edges
+src.baltor.adapters.source.markdown_folder._parse_frontmatter -> src.baltor.adapters.source.markdown_folder._coerce
+src.baltor.adapters.source.markdown_folder._parse_frontmatter -> src.baltor.adapters.source.markdown_folder._coerce
+src.baltor.adapters.source.markdown_folder._parse_frontmatter -> src.baltor.adapters.source.markdown_folder._coerce
+src.baltor.adapters.source.markdown_folder._iter_notes -> src.baltor.adapters.source.markdown_folder._ignored
+src.baltor.adapters.source.markdown_folder._iter_notes -> src.baltor.adapters.source.markdown_folder._ignored
+src.baltor.adapters.source.markdown_folder._self_demo -> src.baltor.adapters.source.markdown_folder.MarkdownFolderAdapter.ingest
+src.baltor.adapters.source.markdown_folder._self_demo -> src.baltor.adapters.source.markdown_folder.MarkdownFolderAdapter
+src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.adapters.source.markdown_folder._iter_notes
+src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.adapters.source.markdown_folder.MarkdownFolderAdapter._ignored_count
+src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.adapters.source.markdown_folder._parse_frontmatter
+src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.adapters.source.markdown_folder._wikilinks
+src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.adapters.source.markdown_folder._tags
+src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.adapters.source.markdown_folder._body_paragraphs
+src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.adapters.source.markdown_folder._is_truthy
+src.baltor.adapters.source.markdown_folder._ignored_count -> src.baltor.adapters.source.markdown_folder._ignored
+src.baltor.adapters.source.markdown_folder._ignored_count -> src.baltor.adapters.source.markdown_folder._ignored

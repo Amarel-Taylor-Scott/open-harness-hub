@@ -1,0 +1,76 @@
+MODULE src/baltor/contextops/extractor_snippets.py
+## API signatures
+```python
+"""contextops/extractor_snippets — the DETERMINISTIC extractor primitives (Lane D)."""
+CANDIDATE_CLAIM_TYPE = ...
+PRODUCES = ...
+EXTRACTOR_TYPES = ...
+_DURATION_UNITS = ...
+_DURATION_KEYS = ...
+_DURATION_RE = ...
+_ISO_DATE_RE = ...
+_NUMERIC_RE = ...
+class ExtractorError:
+    # Base for extractor faults — a fault is an explicit failure, NEVER a silently-faked value.
+class MissingSourceHandleError:
+    # Raised when an extractor is asked to emit a candidate without a source_handle (red-team gate).
+class CanonicalClaimError:
+    # Raised when an extractor is asked to mint anything but a candidate (red-team: served/canonical).
+class NoMatchError:
+    # Raised when a primitive finds no value — an explicit miss, never a fabricated default.
+class FactAssertionCandidate:
+    # An extractor's output: a CANDIDATE assertion tied to a source handle. NEVER served/canonical truth.
+    def __post_init__(self) -> None
+    def candidate_id(self) -> str
+    def to_dict(self) -> dict
+def _candidate(*, fact_key: str, extractor_type: str, value, unit: str, source_handle: str, scope: str, extracted_at: int, tenant_id: str) -> FactAssertionCandidate
+    # The ONE place a candidate is minted — every primitive funnels through it (single source of the pin).
+def extract_regex(payload: str, *, pattern: str, fact_key: str, source_handle: str, group: int=0, scope: str='global_public', extracted_at: int=0, tenant_id: str='') -> FactAssertionCandidate
+    # regex — first match of ``pattern`` (group ``group``) → candidate. No match → NoMatchError.
+def extract_json_path(payload, *, path: str, fact_key: str, source_handle: str, scope: str='global_public', extracted_at: int=0, tenant_id: str='') -> FactAssertionCandidate
+    # json_path — walk a slash-pointer (e.g. ``/a/b/0``) into a JSON object. Missing key → NoMatchError.
+class _TagTextCollector:
+    # Collects the text inside the FIRST occurrence of ``target`` tag (deterministic, stdlib-only).
+    def __init__(self, target: str) -> None
+    def handle_starttag(self, tag, attrs)
+    def handle_endtag(self, tag)
+    def handle_data(self, data)
+def extract_html_selector(payload: str, *, tag: str, fact_key: str, source_handle: str, scope: str='global_public', extracted_at: int=0, tenant_id: str='') -> FactAssertionCandidate
+    # html_selector — text of the first ``tag`` element (stdlib HTMLParser; no external selector lib).
+def extract_csv_field(payload: str, *, column: str, fact_key: str, source_handle: str, row: int=0, scope: str='global_public', extracted_at: int=0, tenant_id: str='') -> FactAssertionCandidate
+    # csv_field — value of ``column`` in row ``row`` of a CSV (stdlib csv). Missing column/row → NoMatchError.
+def extract_markdown_heading(payload: str, *, heading: str, fact_key: str, source_handle: str, scope: str='global_public', extracted_at: int=0, tenant_id: str='') -> FactAssertionCandidate
+    # markdown_heading — the first non-blank body line under a ``# heading`` (deterministic line scan).
+def extract_duration(payload: str, *, fact_key: str, source_handle: str, scope: str='global_public', extracted_at: int=0, tenant_id: str='') -> FactAssertionCandidate
+    # duration_parser — "10 business days" → value 10, unit 'business_days'. The CFPB-reference primitive.
+def extract_date(payload: str, *, fact_key: str, source_handle: str, scope: str='global_public', extracted_at: int=0, tenant_id: str='') -> FactAssertionCandidate
+    # date_parser — first ISO-8601 (YYYY-MM-DD) date, validated for real month/day ranges. → candidate.
+def extract_numeric(payload: str, *, fact_key: str, source_handle: str, unit: str='', scope: str='global_public', extracted_at: int=0, tenant_id: str='') -> FactAssertionCandidate
+    # numeric_parser — first signed integer/decimal → candidate (int when whole, else float).
+def extract_source_hash(payload, *, expected_hash: str, fact_key: str, source_handle: str, scope: str='global_public', extracted_at: int=0, tenant_id: str='') -> FactAssertionCandidate
+    # source_hash_checker — sha256 of the payload; candidate value is True iff it matches ``expected_hash``.
+EXTRACTORS = ...
+def run_extractor(extractor_type: str, payload, **kwargs) -> FactAssertionCandidate
+    # Dispatch to one of the nine primitives by type. Unknown type → ExtractorError (never a fake result).
+```
+## intra-module call edges
+src.baltor.contextops.extractor_snippets._candidate -> src.baltor.contextops.extractor_snippets.FactAssertionCandidate
+src.baltor.contextops.extractor_snippets.extract_regex -> src.baltor.contextops.extractor_snippets._candidate
+src.baltor.contextops.extractor_snippets.extract_regex -> src.baltor.contextops.extractor_snippets.NoMatchError
+src.baltor.contextops.extractor_snippets.extract_json_path -> src.baltor.contextops.extractor_snippets._candidate
+src.baltor.contextops.extractor_snippets.extract_json_path -> src.baltor.contextops.extractor_snippets.NoMatchError
+src.baltor.contextops.extractor_snippets.extract_html_selector -> src.baltor.contextops.extractor_snippets._TagTextCollector
+src.baltor.contextops.extractor_snippets.extract_html_selector -> src.baltor.contextops.extractor_snippets._candidate
+src.baltor.contextops.extractor_snippets.extract_html_selector -> src.baltor.contextops.extractor_snippets.NoMatchError
+src.baltor.contextops.extractor_snippets.extract_csv_field -> src.baltor.contextops.extractor_snippets._candidate
+src.baltor.contextops.extractor_snippets.extract_csv_field -> src.baltor.contextops.extractor_snippets.NoMatchError
+src.baltor.contextops.extractor_snippets.extract_markdown_heading -> src.baltor.contextops.extractor_snippets.NoMatchError
+src.baltor.contextops.extractor_snippets.extract_markdown_heading -> src.baltor.contextops.extractor_snippets._candidate
+src.baltor.contextops.extractor_snippets.extract_duration -> src.baltor.contextops.extractor_snippets.NoMatchError
+src.baltor.contextops.extractor_snippets.extract_duration -> src.baltor.contextops.extractor_snippets._candidate
+src.baltor.contextops.extractor_snippets.extract_date -> src.baltor.contextops.extractor_snippets.NoMatchError
+src.baltor.contextops.extractor_snippets.extract_date -> src.baltor.contextops.extractor_snippets._candidate
+src.baltor.contextops.extractor_snippets.extract_numeric -> src.baltor.contextops.extractor_snippets._candidate
+src.baltor.contextops.extractor_snippets.extract_numeric -> src.baltor.contextops.extractor_snippets.NoMatchError
+src.baltor.contextops.extractor_snippets.extract_source_hash -> src.baltor.contextops.extractor_snippets._candidate
+src.baltor.contextops.extractor_snippets.run_extractor -> src.baltor.contextops.extractor_snippets.ExtractorError

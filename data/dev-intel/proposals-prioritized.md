@@ -1,6 +1,6 @@
 # Prioritized proposal backlog (development plane; serves_truth=false)
 
-241 proposals. The loop FILES these when it's uncomfortable applying directly; you prioritize.
+321 proposals. The loop FILES these when it's uncomfortable applying directly; you prioritize.
 
 Score = value x confidence x reversibility / (effort x risk). Higher = do sooner.
 
@@ -17,6 +17,10 @@ Score = value x confidence x reversibility / (effort x risk). Higher = do sooner
 - **[0.32]** (proposal) [arch-overlap] decide the OpenSkillToTool / OpenToolToSkillHub merge path (forward vs bidirectional)  ·  _from the 3-reviewer architecture audit 2026-06-21_
 - **[0.32]** (plan) [module:src/teleon/frameworks/framework_adapters] We need review module. User provided a stub-like module with docstring and function signatures, no body. Need find concr  ·  _touches owner-gated surface (brand/pricing/structure/strategy)_
 - **[0.32]** (risk) [module:src/teleon/runtime/execution_providers/p] Here are the concrete improvement opportunities for this module, focusing on code quality, abstraction, and governance:  ·  _touches owner-gated surface (brand/pricing/structure/strategy)_
+- **[0.32]** (proposal) [module:src/baltor/adapters/object_store/local_o] 1. OPPORTUNITY: Missing base class/interface for swappability. `LocalContentAddressedObjectStore` is a concrete adapter   ·  _touches owner-gated surface (brand/pricing/structure/strategy)_
+- **[0.32]** (risk) [module:src/baltor/context_audit/optimizer.py] Review: `src/baltor/context_audit/optimizer.py`  ·  _touches owner-gated surface (brand/pricing/structure/strategy)_
+- **[0.32]** (proposal) [module:src/baltor/experiments/parallel_paths.py] Review: `src/baltor/experiments/parallel_paths.py`  ·  _touches owner-gated surface (brand/pricing/structure/strategy)_
+- **[0.32]** (proposal) [module:src/baltor/experiments/path_costing.py] This module is **not solid**: it is an empty file whose docstring claims it is a functional re-export shim. That makes i  ·  _touches owner-gated surface (brand/pricing/structure/strategy)_
 
 ## 🟡 Proposed — review then apply (riskier / not trivial)
 - **[0.6]** (plan) [arch-flex] single-source the surface layer + 22-hub roster (one canonical file) + a consistency check; scattered across 4-5 files today  ·  _from the 3-reviewer architecture audit 2026-06-21_
@@ -44,7 +48,7 @@ Score = value x confidence x reversibility / (effort x risk). Higher = do sooner
 - **[0.32]** (risk) [plane:open-star-hubs] Open*Hubs — Registry Surfaces Feeding Teleon's Selection Substrate  ·  _default: propose for review (not clearly trivial)_
 - **[0.32]** (risk) [wedge:open-star-hubs] We need review a wedge for improvement opportunities. Need act as senior staff engineer + product/design lead. Need asse  ·  _default: propose for review (not clearly trivial)_
 - **[0.32]** (risk) [plane:teleon-demos] Review: teleon-demos surface  ·  _default: propose for review (not clearly trivial)_
-  … (+144 more)
+  … (+199 more)
 
 ## 🟢 Auto-eligible (trivial + reversible — the autofix/agent can apply)
 - **[1.6]** (risk) [module:src/teleon/agents/agent_runtime_provider] We need review module based only on API signatures and call edges. Need find concrete actionable improvement opportuniti  ·  _trivial + reversible_
@@ -72,5 +76,5 @@ Score = value x confidence x reversibility / (effort x risk). Higher = do sooner
 - **[1.6]** (plan) [module:src/teleon/experiments/path_comparator.p] We need review module path_comparator.py. User provided only signatures and call graph, no actual code body. We need fin  ·  _trivial + reversible_
 - **[1.6]** (risk) [module:src/teleon/experiments/path_promotion.py] This module is **not solid** as shown. The signatures reveal a governance-critical component (the sole promotion authori  ·  _trivial + reversible_
 - **[1.6]** (plan) [module:src/teleon/exploration/dispatch.py] We need review module src/teleon/exploration/dispatch.py. User provided only signatures and docstring, no actual code bo  ·  _trivial + reversible_
-  … (+35 more)
+  … (+56 more)
 

@@ -1,0 +1,44 @@
+MODULE src/baltor/determinism/consensus.py
+## API signatures
+```python
+"""src.baltor.determinism.consensus — record multi-model outputs as EVIDENCE, never as truth."""
+_ID_ALGO = ...
+ROUTE_VALIDATOR = ...
+ROUTE_HUMAN_REVIEW = ...
+DEFAULT_AGREEMENT_THRESHOLD = ...
+class ConsensusError:
+    # Base class for consensus-recorder failures.
+def _canon_output(output: Any) -> str
+    # Canonical hash of one model's output body — two byte-identical decisions cluster together.
+class ModelOutput:
+    # One model's (or one run's) structured output for a consensus step.
+    def output_hash(self) -> str
+    def to_dict(self) -> dict
+class ConsensusRun:
+    # A recorded multi-model run: agreement score + disagreement clusters, recorded as EVIDENCE.
+    def can_serve_fact(self) -> bool
+    def is_unanimous(self) -> bool
+    def disagreement_clusters(self) -> tuple[tuple[str, tuple[str, ...]], ...]
+        # Every cluster when there is disagreement (>1 distinct output), else empty.
+    def routing(self) -> str
+        # Where this run routes NEXT. NEITHER destination serves the majority output as the answer:
+    def majority_output(self) -> dict | None
+        # The output of the LARGEST cluster — exposed ONLY as evidence for a human/validator to inspect.
+    def to_trace(self) -> Trace
+        # Project this run as a ``consensus``-kind store trace. ``verified`` is ALWAYS False — a consensus
+    def to_dict(self) -> dict
+def _cluster(outputs: Iterable[ModelOutput]) -> tuple[tuple[str, tuple[str, ...]], ...]
+    # Group model outputs by identical output hash → sorted clusters (largest first, then by hash).
+def record_consensus(*, tenant_id: str, scope: str, workflow_id: str, step_id: str, decision_key: str, outputs: Iterable[ModelOutput], agreement_threshold: float=DEFAULT_AGREEMENT_THRESHOLD, now: str=EPOCH) -> ConsensusRun
+    # Record a multi-model run → :class:`ConsensusRun` (agreement score + disagreement clusters).
+```
+## intra-module call edges
+src.baltor.determinism.consensus.record_consensus -> src.baltor.determinism.consensus._cluster
+src.baltor.determinism.consensus.record_consensus -> src.baltor.determinism.consensus.ConsensusRun
+src.baltor.determinism.consensus.record_consensus -> src.baltor.determinism.consensus.ConsensusError
+src.baltor.determinism.consensus.record_consensus -> src.baltor.determinism.consensus.ConsensusError
+src.baltor.determinism.consensus.record_consensus -> src.baltor.determinism.consensus.ModelOutput.to_dict
+src.baltor.determinism.consensus.output_hash -> src.baltor.determinism.consensus._canon_output
+src.baltor.determinism.consensus.to_trace -> src.baltor.determinism.consensus.ConsensusRun.routing
+src.baltor.determinism.consensus.to_dict -> src.baltor.determinism.consensus.ConsensusRun.routing
+src.baltor.determinism.consensus.to_dict -> src.baltor.determinism.consensus.ModelOutput.to_dict

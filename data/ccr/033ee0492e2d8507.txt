@@ -1,0 +1,15 @@
+MODULE src/baltor/graph/temporal/bridges.py
+## API signatures
+```python
+"""src.baltor.graph.temporal.bridges — wire the temporal graph to the watchtower, reconciliation, and
+consumption WITHOUT replacing any of them. The graph RECORDS freshness/conflict/serve decisions as nodes,
+edges, and projections; the existing authorities still decide."""
+def mark_stale(store: TemporalGraphStore, temporal_fact_id: str, *, now: str=EPOCH) -> None
+    # Watchtower says a fragile fact is stale → set state STALE (the prior verified state stays in the timeline).
+def refresh_observation(store: TemporalGraphStore, *, canonical_fact_key: str, tenant_id: str, scope: str, subject: str, predicate: str, obj: str, value_normalized: str, source_authority: str, source_handles: list, now: str, verify_receipt_id: str, unit: str='', source_version: str='v2') -> dict
+    # A verification task refreshed the fact → append a NEW observation, write VERIFIED_BY, re-project.
+def record_reconciliation(store: TemporalGraphStore, *, winner_id: str, loser_id: str, tenant_id: str, recon_receipt_id: str, now: str=EPOCH) -> list[dict]
+    # Record a reconciliation decision as graph edges (the reconciler decided; the graph records it).
+def select_current_for_consumption(store: TemporalGraphStore, *, tenant_id: str, fact_keys: list[str] | None=None) -> dict
+    # Select ONLY verified_current facts for serving; collect held_out as separate warnings; never serve
+```

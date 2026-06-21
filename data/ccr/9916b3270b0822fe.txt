@@ -1,0 +1,13 @@
+MODULE src/baltor/contextops/authority_rank.py
+## API signatures
+```python
+"""contextops/authority_rank — the ONE canonical source_type→authority_rank map + SCOPE-AWARE precedence."""
+_PRIOR_DISCOVERY_RANKS = ...
+TENANT_PRIVATE_EFFECTIVE_RANK = ...
+def default_authority_rank(source_type: str) -> int
+    # The scope-INDEPENDENT comparative authority for a source_type (source-of-law > FAQ). Unknown → 0.
+def scope_adjusted_rank(source_type: str, source_scope: str='global_public', fact_scope: str | None=None) -> int
+    # The SCOPE-AWARE authority_rank used for precedence (A3). For a tenant_private fact backed by a
+```
+## intra-module call edges
+src.baltor.contextops.authority_rank.scope_adjusted_rank -> src.baltor.contextops.authority_rank.default_authority_rank

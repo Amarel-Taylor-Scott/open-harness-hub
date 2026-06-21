@@ -1,0 +1,9 @@
+MODULE src/baltor/context_audit/optimizer.py
+## API signatures
+```python
+"""src.baltor.context_audit.optimizer — apply a ContextAuditReport LOSSLESSLY (the Context Optimizer)."""
+def apply_manifest(sources: list[dict[str, Any]], report: dict[str, Any]) -> dict[str, Any]
+    # Apply `report` (a ContextAuditReport) to `sources`, returning a lossless optimized-context envelope.
+def rehydrate(optimized_context: dict[str, Any]) -> list[dict[str, Any]]
+    # Reverse the optimization — return the exact original raw bundle (proves the apply was lossless).
+```

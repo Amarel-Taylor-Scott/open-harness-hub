@@ -1,0 +1,15 @@
+MODULE src/baltor/context_audit/audit_bridge.py
+## API signatures
+```python
+"""src.baltor.context_audit.audit_bridge — connect the Context Auditor to the running system."""
+_COMPONENT = ...
+def audit_and_emit(sources: list[dict[str, Any]], bus: Any, *, correlation_id: str='ctx-audit', **audit_kwargs: Any) -> dict[str, Any]
+    # Audit `sources`, publish one event per finding + a `context.audited` summary, return the report.
+def audited_pre_call(sources: list[dict[str, Any]], bus: Any, *, correlation_id: str='ctx-audit', model_hint: str | None=None, **audit_kwargs: Any) -> dict[str, Any]
+    # The governed gateway PRE-CALL path: audit + emit, then signal `inference.requested` with the manifest
+def optimize_pre_call(sources: list[dict[str, Any]], bus: Any, *, correlation_id: str='ctx-audit', **audit_kwargs: Any) -> dict[str, Any]
+    # The full Auditor→Optimizer pre-call path: audit + emit each finding + the context.audited manifest,
+```
+## intra-module call edges
+src.baltor.context_audit.audit_bridge.audited_pre_call -> src.baltor.context_audit.audit_bridge.audit_and_emit
+src.baltor.context_audit.audit_bridge.optimize_pre_call -> src.baltor.context_audit.audit_bridge.audit_and_emit

@@ -1,0 +1,14 @@
+MODULE src/baltor/graph/temporal/builder.py
+## API signatures
+```python
+"""src.baltor.graph.temporal.builder — build the governed temporal graph from observations, and the CFPB
+reference case end-to-end. Records reconciliation/verification as edges + receipts; never serves truth itself."""
+_VERIFIED_KEY = ...
+_VERIFIED_ANSWER = ...
+_HELD_OUT_ANSWER = ...
+def _receipt(op: str, tenant_id: str, node_ids: list, edge_ids: list, *, now: str=EPOCH) -> dict
+def build_cfpb_temporal_graph(store: TemporalGraphStore | None=None, *, tenant_id: str='global', now: str='2026-06-06T00:00:00Z', recon_receipt_id: str='recon-cfpb-regE-10', verify_receipt_id: str='verify-cfpb-regE-10') -> dict
+    # Build the CFPB temporal graph: Reg E '10 business days' (source_of_law) becomes verified_current;
+```
+## intra-module call edges
+src.baltor.graph.temporal.builder.build_cfpb_temporal_graph -> src.baltor.graph.temporal.builder._receipt

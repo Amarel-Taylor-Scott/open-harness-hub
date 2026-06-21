@@ -1,0 +1,15 @@
+MODULE src/baltor/contracts/artifacts/canonical_fact.py
+## API signatures
+```python
+"""contracts/artifacts/canonical_fact — the reconciled, governed fact the system may certify and serve."""
+STATUSES = ...
+SERVABLE_STATUSES = ...
+def _content_id(prefix: str, body: dict) -> str
+class CanonicalFact:
+    def __post_init__(self) -> None
+    def fact_id(self) -> str
+    def servable(self) -> bool
+    def to_dict(self) -> dict
+```
+## intra-module call edges
+src.baltor.contracts.artifacts.canonical_fact.fact_id -> src.baltor.contracts.artifacts.canonical_fact._content_id

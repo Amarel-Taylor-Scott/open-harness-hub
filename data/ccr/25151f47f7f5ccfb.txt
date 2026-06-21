@@ -1,0 +1,13 @@
+MODULE src/baltor/contracts/artifacts/verification_task.py
+## API signatures
+```python
+"""contracts/artifacts/verification_task — a DURABLE unit of work: 're-verify this stale fact'."""
+TASK_STATUSES = ...
+def _content_id(prefix: str, body: dict) -> str
+class VerificationTask:
+    def __post_init__(self) -> None
+    def task_id(self) -> str
+    def to_dict(self) -> dict
+```
+## intra-module call edges
+src.baltor.contracts.artifacts.verification_task.task_id -> src.baltor.contracts.artifacts.verification_task._content_id

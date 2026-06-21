@@ -1,0 +1,42 @@
+MODULE src/baltor/native/native_format_preserver.py
+## API signatures
+```python
+"""src/baltor/native/native_format_preserver — detect the native SHAPE of a customer source and freeze it."""
+FORMAT_JSON = ...
+FORMAT_CSV = ...
+FORMAT_MARKDOWN = ...
+SUPPORTED_FORMATS = ...
+def _sha256(b: bytes) -> str
+def _as_bytes(source) -> bytes
+def _detect_newline(text: str) -> str
+def _flatten_pointers(obj, prefix: str='') -> list[str]
+    # Every leaf JSON-pointer path, in document order. Lists index by position. The set of pointers IS the
+class NativeShapeContract:
+    # How to reproduce the customer's native format on the way out. The frozen, never-mutated source-of-shape.
+    def shape_signature(self) -> dict
+        # The shape-only fingerprint (no values) used to compare input-schema == output-schema.
+    def to_dict(self) -> dict
+class NativeFormatPreserver:
+    # Detect a source's native shape and freeze it into a NativeShapeContract. Never mutates the original.
+    def detect_format(self, source, *, hint: str='') -> str
+    def preserve(self, source, *, hint: str='', mime_type: str='') -> NativeShapeContract
+        # Freeze the source shape. ``original_bytes`` is the exact input; never overwritten downstream.
+    def _json_contract(self, source, original_bytes: bytes, source_hash: str, mime_type: str) -> NativeShapeContract
+    def _csv_contract(self, original_bytes: bytes, source_hash: str, mime_type: str) -> NativeShapeContract
+    def _markdown_contract(self, original_bytes: bytes, source_hash: str, mime_type: str) -> NativeShapeContract
+```
+## intra-module call edges
+src.baltor.native.native_format_preserver.preserve -> src.baltor.native.native_format_preserver.NativeFormatPreserver.detect_format
+src.baltor.native.native_format_preserver.preserve -> src.baltor.native.native_format_preserver._as_bytes
+src.baltor.native.native_format_preserver.preserve -> src.baltor.native.native_format_preserver._sha256
+src.baltor.native.native_format_preserver.preserve -> src.baltor.native.native_format_preserver.NativeFormatPreserver._markdown_contract
+src.baltor.native.native_format_preserver.preserve -> src.baltor.native.native_format_preserver.NativeFormatPreserver._json_contract
+src.baltor.native.native_format_preserver.preserve -> src.baltor.native.native_format_preserver.NativeFormatPreserver._csv_contract
+src.baltor.native.native_format_preserver._json_contract -> src.baltor.native.native_format_preserver._flatten_pointers
+src.baltor.native.native_format_preserver._json_contract -> src.baltor.native.native_format_preserver.NativeShapeContract
+src.baltor.native.native_format_preserver._json_contract -> src.baltor.native.native_format_preserver._sha256
+src.baltor.native.native_format_preserver._csv_contract -> src.baltor.native.native_format_preserver._detect_newline
+src.baltor.native.native_format_preserver._csv_contract -> src.baltor.native.native_format_preserver.NativeShapeContract
+src.baltor.native.native_format_preserver._csv_contract -> src.baltor.native.native_format_preserver._sha256
+src.baltor.native.native_format_preserver._markdown_contract -> src.baltor.native.native_format_preserver.NativeShapeContract
+src.baltor.native.native_format_preserver._markdown_contract -> src.baltor.native.native_format_preserver._detect_newline

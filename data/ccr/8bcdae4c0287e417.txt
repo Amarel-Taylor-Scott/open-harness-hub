@@ -1,0 +1,29 @@
+MODULE src/baltor/native/native_export_service.py
+## API signatures
+```python
+"""src/baltor/native/native_export_service — the one entry point for native-format export across 8 modes."""
+EPOCH = ...
+OUTPUT_MODES = ...
+_PASSTHROUGH_MODES = ...
+_SIDECAR_MODES = ...
+_VALUE_CHANGE_MODES = ...
+_CONTEXT_RESPONSE_MODES = ...
+def _hid(prefix: str, body: dict) -> str
+class NativeExportReceipt:
+    # The auditable record of one native export. References existing artifacts/receipts — no second ledger.
+    def to_dict(self) -> dict
+class NativeExportService:
+    # Orchestrate preserve -> project -> sidecar for any output_mode. Deterministic, offline, original-safe.
+    def __init__(self, preserver: NativeFormatPreserver | None=None, projection_builder: NativeProjectionBuilder | None=None, sidecar_writer: SidecarWriter | None=None) -> None
+    def export(self, source, *, output_mode: str, tenant_id: str='demo', hint: str='', mime_type: str='', verified_changes=None, field_facts=None, held_out_claims=None, conflicts=None, reconciliations=None, verification_receipts=None, warnings=None, field_map=None, context_response: dict | None=None, now: str=EPOCH) -> dict
+    def rehydrate_original(self, contract) -> bytes
+        # Prove the source is recoverable: the frozen original bytes are always available unchanged.
+```
+## intra-module call edges
+src.baltor.native.native_export_service.export -> src.baltor.native.native_export_service.NativeExportReceipt
+src.baltor.native.native_export_service.export -> src.baltor.native.native_export_service.NativeExportReceipt.to_dict
+src.baltor.native.native_export_service.export -> src.baltor.native.native_export_service._hid
+src.baltor.native.native_export_service.export -> src.baltor.native.native_export_service.NativeExportReceipt.to_dict
+src.baltor.native.native_export_service.export -> src.baltor.native.native_export_service.NativeExportReceipt.to_dict
+src.baltor.native.native_export_service.export -> src.baltor.native.native_export_service.NativeExportReceipt.to_dict
+src.baltor.native.native_export_service.export -> src.baltor.native.native_export_service._hid

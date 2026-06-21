@@ -1,0 +1,17 @@
+MODULE src/baltor/contracts/artifacts/fragility_metadata.py
+## API signatures
+```python
+"""contracts/artifacts/fragility_metadata — how perishable a fact is, and when it must be re-verified."""
+VOLATILITY_CLASSES = ...
+def _content_id(prefix: str, body: dict) -> str
+class FragilityMetadata:
+    def __post_init__(self) -> None
+    def fragility_id(self) -> str
+    def horizon(self) -> int | None
+        # The absolute epoch at which this fact goes stale, or None if it never does.
+    def is_stale(self, now: int) -> bool
+    def to_dict(self) -> dict
+```
+## intra-module call edges
+src.baltor.contracts.artifacts.fragility_metadata.fragility_id -> src.baltor.contracts.artifacts.fragility_metadata._content_id
+src.baltor.contracts.artifacts.fragility_metadata.is_stale -> src.baltor.contracts.artifacts.fragility_metadata.FragilityMetadata.horizon

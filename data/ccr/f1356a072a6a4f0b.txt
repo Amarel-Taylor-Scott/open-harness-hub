@@ -1,0 +1,31 @@
+MODULE src/baltor/contextops/research_stub.py
+## API signatures
+```python
+"""src.baltor.contextops.research_stub — the DETERMINISTIC offline research agent + candidate catalog stubs."""
+LOCAL_STUB_PROVIDER_ID = ...
+DISCOVERY_REPORT_SCHEMA_VERSION = ...
+_REPORT_PREFIX = ...
+_TRACE_PREFIX = ...
+def _hash(obj: Any) -> str
+class LocalResearchStub:
+    # ``research.local_stub@v1`` — the deterministic OFFLINE bounded research agent (a working stdlib stub).
+    def __init__(self, *, source_index: dict[str, list[dict[str, str]]] | None=None) -> None
+    def describe(self) -> dict[str, Any]
+    def status(self) -> dict[str, Any]
+    def research(self, task: dict[str, Any], *, now: str) -> dict[str, Any]
+        # Run the bounded discovery loop for ``task`` and return a SourceDiscoveryReport.v1 dict.
+class CandidateResearchStub:
+    # A CATALOG-ONLY candidate research provider (Hermes/OpenClaw/Claude Code/OpenHands/Open SWE).
+    def __init__(self, provider_id: str) -> None
+    def describe(self) -> dict[str, Any]
+    def status(self) -> dict[str, Any]
+    def research(self, task: dict[str, Any], *, now: str) -> dict[str, Any]
+def make_provider(provider_id: str, **kwargs: Any) -> ResearchAgentProviderPort
+    # Return a research provider by id. ``research.local_stub@v1`` → the working :class:`LocalResearchStub`;
+```
+## intra-module call edges
+src.baltor.contextops.research_stub.make_provider -> src.baltor.contextops.research_stub.CandidateResearchStub
+src.baltor.contextops.research_stub.make_provider -> src.baltor.contextops.research_stub.LocalResearchStub
+src.baltor.contextops.research_stub.research -> src.baltor.contextops.research_stub._hash
+src.baltor.contextops.research_stub.research -> src.baltor.contextops.research_stub._hash
+src.baltor.contextops.research_stub.research -> src.baltor.contextops.research_stub._hash

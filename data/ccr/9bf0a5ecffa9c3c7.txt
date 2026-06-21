@@ -1,0 +1,13 @@
+MODULE src/baltor/context_audit/context_object_adapter.py
+## API signatures
+```python
+"""src.baltor.context_audit.context_object_adapter — run the Context Auditor over REAL governed context."""
+_CLAIM_KV = ...
+_STALE_AGE = ...
+def from_context_objects(objects: list[dict[str, Any]]) -> list[dict[str, Any]]
+    # Map context-graph objects → Context Auditor sources (deterministic; does not mutate `objects`).
+def audit_context_graph(seed: dict[str, Any]) -> dict[str, Any]
+    # Audit a context-graph corpus end-to-end: run the Context Auditor over its objects, then FOLD the
+```
+## intra-module call edges
+src.baltor.context_audit.context_object_adapter.audit_context_graph -> src.baltor.context_audit.context_object_adapter.from_context_objects

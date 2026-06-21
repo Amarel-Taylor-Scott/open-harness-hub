@@ -1,0 +1,50 @@
+MODULE src/baltor/observability/projections/standards.py
+## API signatures
+```python
+"""src.baltor.observability.projections.standards — deterministic mappers from Baltor's internal
+lineage/claim records into the four adopted interchange standards:"""
+NAMESPACE = ...
+PROV_NS = ...
+PROV_STD_NS = ...
+OPENLINEAGE_PRODUCER = ...
+OPENLINEAGE_SCHEMA_URL = ...
+WEB_ANNOTATION_CONTEXT = ...
+CTX_FRAGMENT_CONFORMS = ...
+BALTOR_FACET_SCHEMA_URL = ...
+def _hid(prefix: str, *parts: str) -> str
+    # Stable content-hash id: prefix + first 16 hex of sha256 over the joined parts.
+def _det_uuid(seed: str) -> str
+    # A deterministic UUID-shaped string (8-4-4-4-12) derived from `seed` — OpenLineage wants a UUID
+def governance_facet(governance: dict) -> dict
+    # Filter an arbitrary attributes dict down to ONLY the allowed governance keys. This is the
+def _openlineage_facet(governance: dict) -> dict
+    # A governance facet in OpenLineage custom-facet shape (_producer + _schemaURL required).
+def to_prov_json(event) -> dict
+    # Map a LineageEvent (or any object exposing .activity/.occurred_at/.inputs/.outputs/.agent/
+def to_openlineage_run_event(event, *, event_type: str='COMPLETE') -> dict
+    # Map a LineageEvent to an OpenLineage RunEvent (spec 2-0-2). The run + every output dataset carry
+def to_web_annotation(*, annotation_id: str, claim_body: str, source_iri: str, fragment: str, created: str, governance: dict, quote: str | None=None) -> dict
+    # Anchor a claim to a source span as a W3C Web Annotation. `fragment` is the ctx:// fragment
+def _esc(token: str) -> str
+    # RFC 6901 JSON Pointer escaping: ~ -> ~0, / -> ~1.
+def json_patch_ops(before: dict, after: dict) -> list[dict]
+    # Deterministic RFC 6902 op list turning a flat `before` fact dict into `after`. Keys sorted so
+def to_json_patch(*, before: dict, after: dict, governance: dict, from_version: str | None=None, to_version: str | None=None) -> dict
+    # Wrap an RFC 6902 patch with Baltor provenance — a portable, deterministic FACT DELTA. The bare
+def canonical_hash(obj: dict) -> str
+    # Content hash of any rendering (sorted-key JSON) — proves determinism and feeds CDC.
+```
+## intra-module call edges
+src.baltor.observability.projections.standards._openlineage_facet -> src.baltor.observability.projections.standards.governance_facet
+src.baltor.observability.projections.standards.to_prov_json -> src.baltor.observability.projections.standards.governance_facet
+src.baltor.observability.projections.standards.to_prov_json -> src.baltor.observability.projections.standards._hid
+src.baltor.observability.projections.standards.to_prov_json -> src.baltor.observability.projections.standards._hid
+src.baltor.observability.projections.standards.to_prov_json -> src.baltor.observability.projections.standards._hid
+src.baltor.observability.projections.standards.to_openlineage_run_event -> src.baltor.observability.projections.standards._openlineage_facet
+src.baltor.observability.projections.standards.to_openlineage_run_event -> src.baltor.observability.projections.standards._det_uuid
+src.baltor.observability.projections.standards.to_web_annotation -> src.baltor.observability.projections.standards.governance_facet
+src.baltor.observability.projections.standards.json_patch_ops -> src.baltor.observability.projections.standards._esc
+src.baltor.observability.projections.standards.json_patch_ops -> src.baltor.observability.projections.standards._esc
+src.baltor.observability.projections.standards.json_patch_ops -> src.baltor.observability.projections.standards._esc
+src.baltor.observability.projections.standards.to_json_patch -> src.baltor.observability.projections.standards.json_patch_ops
+src.baltor.observability.projections.standards.to_json_patch -> src.baltor.observability.projections.standards.governance_facet

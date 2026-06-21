@@ -1,0 +1,10 @@
+MODULE src/teleon/hub_freshness.py
+## API signatures
+```python
+"""src.teleon.hub_freshness — a Teleon CAPABILITY: "continuously update this hub" descended unbounded → bounded."""
+def _key(cand: dict) -> tuple
+def keep_hub_fresh(hub: str, intent: str, *, hub_engines: dict, openclaw, tools: list, brain=None, freshness_floor: float=0.5, tenant: str='_global') -> dict
+    # Run the freshness capability for one hub and DESCEND the discovery cost. Returns a governed summary.
+```
+## intra-module call edges
+src.teleon.hub_freshness.keep_hub_fresh -> src.teleon.hub_freshness._key

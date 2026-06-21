@@ -1,0 +1,14 @@
+MODULE src/baltor/contracts/artifacts/fact_assertion.py
+## API signatures
+```python
+"""contracts/artifacts/fact_assertion — a single asserted claim from one source, BEFORE canonicalization."""
+SCOPES = ...
+def _content_id(prefix: str, body: dict) -> str
+    # A content-addressed id: prefix + sha256 of the canonical-JSON body. No clock, no RNG.
+class FactAssertion:
+    def __post_init__(self) -> None
+    def assertion_id(self) -> str
+    def to_dict(self) -> dict
+```
+## intra-module call edges
+src.baltor.contracts.artifacts.fact_assertion.assertion_id -> src.baltor.contracts.artifacts.fact_assertion._content_id

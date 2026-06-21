@@ -1,0 +1,20 @@
+MODULE src/baltor/determinism/pattern_miner.py
+## API signatures
+```python
+"""src.baltor.determinism.pattern_miner — mine REPEATED VERIFIED decisions into PatternCandidates."""
+_ID_ALGO = ...
+_CAND_PREFIX = ...
+DEFAULT_MIN_SUPPORT = ...
+class PatternMinerError:
+    # Base class for pattern-miner failures.
+def _candidate_id(decision_key: str, decision_value: str, scope: str, tenant_id: str) -> str
+class PatternCandidate:
+    # A repeated VERIFIED decision worth distilling into a deterministic rule.
+    def to_dict(self) -> dict
+def mine_patterns(store: TraceStore, *, scope: str=GLOBAL_PUBLIC, tenant: str | None=None, min_support: int=DEFAULT_MIN_SUPPORT, now: str=EPOCH) -> list[PatternCandidate]
+    # Mine repeated VERIFIED decisions from ``store`` → :class:`PatternCandidate`s.
+```
+## intra-module call edges
+src.baltor.determinism.pattern_miner.mine_patterns -> src.baltor.determinism.pattern_miner.PatternMinerError
+src.baltor.determinism.pattern_miner.mine_patterns -> src.baltor.determinism.pattern_miner._candidate_id
+src.baltor.determinism.pattern_miner.mine_patterns -> src.baltor.determinism.pattern_miner.PatternCandidate

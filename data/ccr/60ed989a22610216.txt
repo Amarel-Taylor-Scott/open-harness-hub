@@ -1,0 +1,16 @@
+MODULE src/baltor/memory/memory_worker.py
+## API signatures
+```python
+"""src.baltor.memory.memory_worker — C-MEM-2 DELTA: memory operations as DURABLE CAPABILITY TASKS."""
+MEMORY_OPS = ...
+def _trace(op: str, provider_id: str, now: str, produced: list) -> dict
+def process_memory_task(provider, task: dict) -> dict
+    # Execute ONE claimed memory task from its payload. Returns {op, result, trace, error?}. Never returns
+def run_memory_worker_durable(db: str, *, worker_id: str, capability: str='memory.write', provider=None, max_tasks: int=1000) -> dict
+    # Drain `capability` memory tasks from the durable ledger via atomic claim → process → ack.
+```
+## intra-module call edges
+src.baltor.memory.memory_worker.process_memory_task -> src.baltor.memory.memory_worker._trace
+src.baltor.memory.memory_worker.process_memory_task -> src.baltor.memory.memory_worker._trace
+src.baltor.memory.memory_worker.process_memory_task -> src.baltor.memory.memory_worker._trace
+src.baltor.memory.memory_worker.run_memory_worker_durable -> src.baltor.memory.memory_worker.process_memory_task

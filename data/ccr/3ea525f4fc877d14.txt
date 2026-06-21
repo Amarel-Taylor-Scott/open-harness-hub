@@ -1,0 +1,25 @@
+MODULE src/baltor/native/sidecar_writer.py
+## API signatures
+```python
+"""src/baltor/native/sidecar_writer — build the governed SidecarOverlay that rides alongside the native output."""
+def _hid(prefix: str, body: dict) -> str
+def _handles(a: dict) -> list
+    # Source handle(s) for a governed artifact, tolerating either singular or plural key.
+class SidecarOverlay:
+    # The governed overlay for one native source. Pure projection — never holds the second copy of truth.
+    def to_dict(self) -> dict
+class SidecarWriter:
+    # Build a SidecarOverlay from the frozen shape contract + the governed pieces (facts/held-out/receipts).
+    def build(self, *, contract, output_mode: str, tenant_id: str, field_facts=None, held_out_claims=None, conflicts=None, reconciliations=None, verification_receipts=None, warnings=None, field_map=None, now: str='') -> SidecarOverlay
+    def field_fact(native_path: str, *, artifact, receipt_id: str='', claim_status: str='fact') -> dict
+        # A single verified-fact overlay row: which native field, what value, backed by which source handle.
+    def held_out(artifact, *, reason: str) -> dict
+        # A held-out claim row — surfaced separately, never erased (lossless).
+    def map_row(native_path: str, *, source_handle: str, artifact_id: str='', claim_status: str='') -> dict
+        # One native_path <-> source_handle <-> artifact <-> claim_status mapping row (the field_map).
+```
+## intra-module call edges
+src.baltor.native.sidecar_writer.build -> src.baltor.native.sidecar_writer.SidecarOverlay
+src.baltor.native.sidecar_writer.build -> src.baltor.native.sidecar_writer._hid
+src.baltor.native.sidecar_writer.field_fact -> src.baltor.native.sidecar_writer._handles
+src.baltor.native.sidecar_writer.held_out -> src.baltor.native.sidecar_writer._handles
