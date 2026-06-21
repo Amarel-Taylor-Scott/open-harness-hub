@@ -1,0 +1,34 @@
+MODULE src/teleon/inference/preference_profile.py
+## API signatures
+```python
+"""src.teleon.inference.preference_profile — the USER's definition of "efficient", made multi-objective."""
+OBJECTIVES = ...
+_MAXIMIZE = ...
+class PreferenceProfile:
+    # User-set weights (relative importance per objective) + optional hard constraints. Weights are normalized; a
+    def normalized_weights(self) -> dict
+    def unmet_constraints(self, cand: dict) -> list[str]
+def _normalize(values: list[float]) -> dict
+    # Min-max normalize a column to 0..1 so weights across objectives are comparable; all-equal -> all 0.
+def score_candidates(candidates: list[dict], profile: PreferenceProfile) -> list[float]
+    # Weighted composite score per candidate (LOWER is better). Each objective is min-max normalized across the set;
+def choose(candidates: list[dict], profile: PreferenceProfile) -> dict
+    # Choose the bounded implementation that meets EVERY hard constraint with the best weighted score. If none meets
+def cost_first() -> PreferenceProfile
+def latency_first() -> PreferenceProfile
+def token_thrifty() -> PreferenceProfile
+def determinism_required() -> PreferenceProfile
+def balanced() -> PreferenceProfile
+```
+## intra-module call edges
+src.teleon.inference.preference_profile.score_candidates -> src.teleon.inference.preference_profile.PreferenceProfile.normalized_weights
+src.teleon.inference.preference_profile.score_candidates -> src.teleon.inference.preference_profile._normalize
+src.teleon.inference.preference_profile.choose -> src.teleon.inference.preference_profile.score_candidates
+src.teleon.inference.preference_profile.choose -> src.teleon.inference.preference_profile.PreferenceProfile.normalized_weights
+src.teleon.inference.preference_profile.choose -> src.teleon.inference.preference_profile.PreferenceProfile.unmet_constraints
+src.teleon.inference.preference_profile.choose -> src.teleon.inference.preference_profile.PreferenceProfile.unmet_constraints
+src.teleon.inference.preference_profile.cost_first -> src.teleon.inference.preference_profile.PreferenceProfile
+src.teleon.inference.preference_profile.latency_first -> src.teleon.inference.preference_profile.PreferenceProfile
+src.teleon.inference.preference_profile.token_thrifty -> src.teleon.inference.preference_profile.PreferenceProfile
+src.teleon.inference.preference_profile.determinism_required -> src.teleon.inference.preference_profile.PreferenceProfile
+src.teleon.inference.preference_profile.balanced -> src.teleon.inference.preference_profile.PreferenceProfile

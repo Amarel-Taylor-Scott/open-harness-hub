@@ -60,15 +60,15 @@ def render_mermaid(d: dict) -> str:
         "```mermaid",
         "graph TD",
         '  ADR["🏛 AI Done Right — parent / holding brand<br/>(trust narrative: Context · Capability · Proof)"]',
-        '  subgraph APP["Applied product layer (customer-facing)"]',
-        '    BAL["Baltor — governed context engine<br/>ingest→reconcile→harden→enrich→compress→serve · receipts + CDC"]',
+        '  subgraph APP["Product — managed context"]',
+        '    BAL["Baltor — MANAGED governed context (its own product)<br/>company / department / initiative-wide · receipts + CDC · governs TRUTH"]',
         "  end",
-        '  subgraph RT["Runtime / control plane"]',
-        '    TEL["Teleon — descent control plane<br/>selects + governs + LEARNS the cheapest-bounded capability"]',
+        '  subgraph RT["Product — capability runtime"]',
+        '    TEL["Teleon — its OWN product + runtime<br/>program in PLAIN TEXT → adapts to cheapest-BOUNDED within guardrails · governs EFFICIENCY"]',
         "  end",
-        '  subgraph OPEN["Open ecosystem + substrate"]',
+        '  subgraph OPEN["Open ecosystem = the STORE (both products consume)"]',
         '    OHH["OpenHarnessHub + CapabilityTask Spec (open)"]',
-        f'    HUBS["22 Open*Hubs — registries<br/>{lh} live · {ph} private-bench"]',
+        f'    HUBS["22 Open*Hubs — the component store<br/>context · tools · models · steps · DAG · reconciliation/robustness/enrichment rules · modules<br/>{lh} live · {ph} private-bench"]',
         "  end",
         '  SRC[("public / regulated sources")]',
         '  AGENTS(("AI agents"))',
@@ -78,6 +78,7 @@ def render_mermaid(d: dict) -> str:
         "  BAL -->|consumes as a tenant| TEL",
         "  TEL -->|consumes| OHH",
         "  HUBS -->|feed Teleon's selection substrate| TEL",
+        "  HUBS -.->|context + method components (content)| BAL",
         "  BAL -->|ingests| SRC",
         "  TEL -->|serves capabilities| AGENTS",
         "  DEMOS -->|reads| TEL",
@@ -98,12 +99,15 @@ def render_doc(d: dict, validation: str = "") -> str:
          render_mermaid(d), "",
          "## Layers (top → bottom)", "",
          "1. **AI Done Right** — parent / holding brand (the *promise*, not a product; owns no runtime/customer data).",
-         "2. **Baltor** — the applied, customer-facing **governed context engine** (Verified · Current · Provable; "
-         "the first live wedge = compliance / AML / sanctions). *Powered by Teleon.*",
-         "3. **Teleon** — the thin **control / metadata / orchestration plane** that descends each capability to the "
-         "cheapest bounded path that still meets the requirement, receipt-backed. Serves AI agents + Baltor.",
-         "4. **OpenHarnessHub + the 22 Open\\*Hubs** — the open ecosystem + the registries that feed Teleon's selection "
-         "substrate. **Dependency law (enforced): Baltor → Teleon → OpenHarnessHub, never the reverse.**", "",
+         "2. **Baltor** (its own product) — **fully managed governed context**, company / department / initiative-wide "
+         "(Verified · Current · Provable; receipts + CDC; first wedge = compliance / AML / sanctions). Governs what "
+         "becomes TRUE. *Powered by Teleon.*",
+         "3. **Teleon** (its own product + the runtime) — **program a capability in plain text**; it adapts to the most "
+         "**efficient + bounded** form within your guardrails (the descent), receipt-backed. Governs what becomes EFFICIENT.",
+         "4. **OpenHarnessHub + the 22 Open\\*Hubs = the STORE** — a shared catalog of reusable components (context, "
+         "tools, models, steps, DAG components, reconciliation/robustness/enrichment rules, predefined modules) that "
+         "**both Baltor and Teleon consume**. **Code-import law (enforced): Baltor → Teleon → OpenHarnessHub, never the "
+         "reverse; the store is consumed at the content level by both.**", "",
          f"### Open\\*Hub roster ({len(d['live_hubs'])} live · {len(d['private_hubs'])} private-bench = {len(d['live_hubs'])+len(d['private_hubs'])})",
          f"- **Live:** {live}", f"- **Private-bench:** {private}", "",
          "## Surfaces", ""]
@@ -153,17 +157,20 @@ def render_html(d: dict) -> str:
         '<div class="band parent"><span class="tag">parent</span><h2>🏛 AI Done Right</h2>'
         '<p>Holding brand / trust narrative (Context · Capability · Proof). Owns no runtime, no customer data.</p></div>',
         '<div class="flow">▼ holds</div>',
-        '<div class="band"><span class="tag">applied · customer-facing</span><h2>Baltor — governed context engine</h2>'
-        '<p>ingest → reconcile → harden → enrich → compress → serve · Verified/Current/Provable · receipts + CDC. '
-        'First wedge: compliance / AML / sanctions. <b>Powered by Teleon.</b></p></div>',
+        '<div class="band"><span class="tag">product · managed context</span><h2>Baltor — managed governed context</h2>'
+        '<p>Fully MANAGED context — company / department / initiative-wide. Verified/Current/Provable · receipts + CDC · '
+        'ingest→reconcile→harden→enrich→compress→serve. Governs what becomes <b>TRUE</b>. First wedge: compliance / AML / '
+        'sanctions. <b>Powered by Teleon.</b></p></div>',
         '<div class="flow">▼ consumes (as a tenant)</div>',
-        '<div class="band"><span class="tag">runtime · control plane</span><h2>Teleon — descent control plane</h2>'
-        '<p>Selects + governs + LEARNS the cheapest bounded capability that meets the requirement, receipt-backed. '
-        'Serves AI agents + Baltor. The descent brain is the moat.</p></div>',
-        '<div class="flow">▼ consumes · ▲ feed substrate</div>',
-        '<div class="band"><span class="tag">open ecosystem + substrate</span><h2>OpenHarnessHub + 22 Open*Hubs</h2>'
-        '<p>OpenHarnessHub = the open ecosystem + CapabilityTask Spec. The Open*Hubs are registries that feed Teleon\'s '
-        f'selection substrate ({len(d["live_hubs"])} live · {len(d["private_hubs"])} private-bench).</p>'
+        '<div class="band"><span class="tag">product · capability runtime</span><h2>Teleon — plain-text → adaptive capabilities</h2>'
+        '<p>Its OWN product (not just Baltor\'s runtime): program a capability in <b>plain text</b>; Teleon adapts it to the '
+        'cheapest <b>bounded</b> form within your <b>guardrails</b> (the descent), receipt-backed. Governs what becomes '
+        '<b>EFFICIENT</b>. The descent brain is the moat.</p></div>',
+        '<div class="flow">▼ consumes · ▲ feed substrate / supply components to both</div>',
+        '<div class="band"><span class="tag">open ecosystem · the STORE</span><h2>OpenHarnessHub + 22 Open*Hubs — the component store</h2>'
+        '<p>A shared store of reusable components <b>both Baltor and Teleon consume</b>: context · tools · models · steps · '
+        'DAG components · reconciliation / robustness / enrichment rules · predefined modules (run on Teleon OR custom '
+        f'compute) · the open CapabilityTask Spec ({len(d["live_hubs"])} live · {len(d["private_hubs"])} private-bench).</p>'
         f'<div style="margin-top:8px">{lh}{ph}</div></div>',
         '<div class="band"><span class="tag">proof + handoff surfaces</span>'
         '<div class="cards"><div class="card"><b>teleon-demos</b><span>proof surface — measured savings per descent</span></div>'
@@ -200,7 +207,7 @@ def _self_test() -> int:
     doc = render_doc(d, "VALIDATION-HERE")
     ck("doc embeds the diagram + roster + the validation slot", "```mermaid" in doc and "Open\\*Hub roster" in doc and "VALIDATION-HERE" in doc)
     page = render_html(d)
-    ck("html is self-contained + layered (parent→baltor→teleon→open)", "<style>" in page and "Baltor — governed context engine" in page and "22 Open*Hubs" in page and "http" not in page.split("note")[0])
+    ck("html is self-contained + layered (parent→baltor→teleon→open)", "<style>" in page and "Baltor — managed governed context" in page and "22 Open*Hubs" in page and "http" not in page.split("note")[0])
     import tempfile
     global HTML_OUT, DOC_OUT
     _h, _d = HTML_OUT, DOC_OUT

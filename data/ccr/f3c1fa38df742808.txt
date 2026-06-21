@@ -1,0 +1,17 @@
+MODULE src/teleon/lift/semantic_lifter.py
+## API signatures
+```python
+"""src.teleon.lift.semantic_lifter — infer a PurposeTaskDraft + CapabilityTaskDraft from an ImportedWorkload."""
+_PURPOSE_DRAFT_SCHEMA = ...
+_CAP_DRAFT_SCHEMA = ...
+_GENERIC_TOKENS = ...
+_SIGNAL_WEIGHTS = ...
+_RUNTIME_ALTERNATIVES = ...
+def _meaningful_tokens(name: str) -> list[str]
+def infer_purpose_draft(workload: dict, *, runtime_profile: dict | None=None) -> dict[str, Any]
+    # Infer a PurposeTaskDraft from an ImportedWorkload (+ optional RuntimeProfile for success thresholds).
+def infer_capability_draft(workload: dict, purpose_draft: dict) -> dict[str, Any]
+    # Derive a CapabilityTaskDraft (allowed runtime classes + candidate runtime moves) from the workload.
+```
+## intra-module call edges
+src.teleon.lift.semantic_lifter.infer_purpose_draft -> src.teleon.lift.semantic_lifter._meaningful_tokens

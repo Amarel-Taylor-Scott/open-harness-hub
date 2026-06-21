@@ -9,10 +9,14 @@ framing. The dependency law below is enforced by `scripts/check_portfolio_depend
 
 ```
 AI Done Right    (umbrella IP · brands · standards strategy · shared R&D/security/governance · cap table)
-├── Teleon.dev      — purpose-driven runtime / self-adaptive compute SaaS (the runtime layer)
-├── Baltor.ai       — applied, customer-facing context/intelligence product, powered by Teleon (a TENANT)
-└── Open*Hubs       — open ecosystem: context, skills, tools, evals, harnesses, task templates, adapters, examples, + specs
+├── Teleon.dev      — ITS OWN product + the runtime: program capabilities in PLAIN TEXT -> auto-adapt to the cheapest-BOUNDED form within your guardrails (governs EFFICIENCY)
+├── Baltor.ai       — ITS OWN product: fully MANAGED company-/department-/initiative-wide governed context, powered by Teleon (a TENANT) (governs TRUTH)
+└── Open*Hubs       — the open STORE both products consume: context · tools · models · steps · DAG components · reconciliation/robustness/enrichment rules · modules (run on Teleon or custom compute) · skills · harnesses · evals · templates · specs
 ```
+
+**Moat split (LOCKED 2026-06-21):** Baltor governs what becomes **TRUE**; Teleon governs what becomes **EFFICIENT**
+(the descent brain). Both "govern" — different objects, never the same. **Two standalone products**, distinct buyers:
+Baltor = orgs that want managed context; Teleon = people who want to program capabilities in plain text.
 
 The biggest change from before: **PurposeTask is no longer a Baltor subsystem.** It is **Teleon**. Baltor
 becomes the first internal customer (tenant `baltor-internal`). This keeps the runtime independently valuable
@@ -47,6 +51,11 @@ The open ecosystem is a focused hub family, not one junk drawer (bridge graph:
 - **Additional live/private-first registry surfaces** — OpenSkillToTool, OpenMCPHub, OpenCompressionHub,
   OpenBenchmarkHub, OpenReviewHub, the private bench, and the Baltor method spine are captured in the
   AI Done Right design handoff. They remain registry/discovery surfaces; discovery is not trust.
+  - **Method-hub boundary (LOCKED 2026-06-21):** the 5 Baltor method-hubs (Open{Reconciliation,Hardening,Enrichment,
+    Optimization,Verification}Hub) are STORE components — they register **method SPECS only** (candidate; discovery≠trust).
+    **Baltor SELECTS a method (via Teleon) -> RUNS it on customer data -> OWNS the resulting truth.** The spec lives in the
+    store; execution + governed truth live in Baltor (no duplicated implementation). Baltor's moat is the governed DATA +
+    receipts, not the technique — so publishing specs leaks no moat.
 
 **Relationship:** OpenContextHub supplies context → OpenSkillsHub teaches how → OpenToolsHub gives execution →
 OpenHarnessHub proves it works → Teleon runs/evolves capabilities → Baltor governs context + decides truth →

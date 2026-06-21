@@ -1,0 +1,23 @@
+MODULE src/teleon/intel/intelligence_intake.py
+## API signatures
+```python
+"""src.teleon.intel.intelligence_intake — plan a constant intelligence stream from FREE, LEGITIMATE sources."""
+_REGISTRY = ...
+_ACCESS_TO_FEED = ...
+def load_sources() -> list[dict]
+def needs() -> list[str]
+def select_sources(need: str, *, available_keys: tuple=()) -> list[dict]
+    # Free sources for a need whose required keys are available — keyless preferred (lowest setup friction).
+def plan_news_sweep(*, available_keys: tuple=()) -> dict
+    # A complete free news-sweep plan: the selected legitimate sources per need (the rate-limit-proof alternative
+def _feed_intake()
+def pull(source_id: str, *, items: tuple=(), available_keys: tuple=()) -> dict
+    # Pull a source via governed-feed-intake (legitimate path only). Offline/sandbox: pass `items` (owner-pasted /
+```
+## intra-module call edges
+src.teleon.intel.intelligence_intake.select_sources -> src.teleon.intel.intelligence_intake.load_sources
+src.teleon.intel.intelligence_intake.plan_news_sweep -> src.teleon.intel.intelligence_intake.needs
+src.teleon.intel.intelligence_intake.plan_news_sweep -> src.teleon.intel.intelligence_intake.select_sources
+src.teleon.intel.intelligence_intake.plan_news_sweep -> src.teleon.intel.intelligence_intake.select_sources
+src.teleon.intel.intelligence_intake.pull -> src.teleon.intel.intelligence_intake.load_sources
+src.teleon.intel.intelligence_intake.pull -> src.teleon.intel.intelligence_intake._feed_intake

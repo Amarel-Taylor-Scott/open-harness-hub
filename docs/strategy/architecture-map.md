@@ -5,15 +5,15 @@
 ```mermaid
 graph TD
   ADR["🏛 AI Done Right — parent / holding brand<br/>(trust narrative: Context · Capability · Proof)"]
-  subgraph APP["Applied product layer (customer-facing)"]
-    BAL["Baltor — governed context engine<br/>ingest→reconcile→harden→enrich→compress→serve · receipts + CDC"]
+  subgraph APP["Product — managed context"]
+    BAL["Baltor — MANAGED governed context (its own product)<br/>company / department / initiative-wide · receipts + CDC · governs TRUTH"]
   end
-  subgraph RT["Runtime / control plane"]
-    TEL["Teleon — descent control plane<br/>selects + governs + LEARNS the cheapest-bounded capability"]
+  subgraph RT["Product — capability runtime"]
+    TEL["Teleon — its OWN product + runtime<br/>program in PLAIN TEXT → adapts to cheapest-BOUNDED within guardrails · governs EFFICIENCY"]
   end
-  subgraph OPEN["Open ecosystem + substrate"]
+  subgraph OPEN["Open ecosystem = the STORE (both products consume)"]
     OHH["OpenHarnessHub + CapabilityTask Spec (open)"]
-    HUBS["22 Open*Hubs — registries<br/>9 live · 13 private-bench"]
+    HUBS["22 Open*Hubs — the component store<br/>context · tools · models · steps · DAG · reconciliation/robustness/enrichment rules · modules<br/>9 live · 13 private-bench"]
   end
   SRC[("public / regulated sources")]
   AGENTS(("AI agents"))
@@ -23,6 +23,7 @@ graph TD
   BAL -->|consumes as a tenant| TEL
   TEL -->|consumes| OHH
   HUBS -->|feed Teleon's selection substrate| TEL
+  HUBS -.->|context + method components (content)| BAL
   BAL -->|ingests| SRC
   TEL -->|serves capabilities| AGENTS
   DEMOS -->|reads| TEL
@@ -33,9 +34,9 @@ graph TD
 ## Layers (top → bottom)
 
 1. **AI Done Right** — parent / holding brand (the *promise*, not a product; owns no runtime/customer data).
-2. **Baltor** — the applied, customer-facing **governed context engine** (Verified · Current · Provable; the first live wedge = compliance / AML / sanctions). *Powered by Teleon.*
-3. **Teleon** — the thin **control / metadata / orchestration plane** that descends each capability to the cheapest bounded path that still meets the requirement, receipt-backed. Serves AI agents + Baltor.
-4. **OpenHarnessHub + the 22 Open\*Hubs** — the open ecosystem + the registries that feed Teleon's selection substrate. **Dependency law (enforced): Baltor → Teleon → OpenHarnessHub, never the reverse.**
+2. **Baltor** (its own product) — **fully managed governed context**, company / department / initiative-wide (Verified · Current · Provable; receipts + CDC; first wedge = compliance / AML / sanctions). Governs what becomes TRUE. *Powered by Teleon.*
+3. **Teleon** (its own product + the runtime) — **program a capability in plain text**; it adapts to the most **efficient + bounded** form within your guardrails (the descent), receipt-backed. Governs what becomes EFFICIENT.
+4. **OpenHarnessHub + the 22 Open\*Hubs = the STORE** — a shared catalog of reusable components (context, tools, models, steps, DAG components, reconciliation/robustness/enrichment rules, predefined modules) that **both Baltor and Teleon consume**. **Code-import law (enforced): Baltor → Teleon → OpenHarnessHub, never the reverse; the store is consumed at the content level by both.**
 
 ### Open\*Hub roster (9 live · 13 private-bench = 22)
 - **Live:** OpenContextHub, OpenSkillsHub, OpenToolsHub, OpenSkillToTool, OpenHarnessHub, OpenMCPHub, OpenCompressionHub, OpenBenchmarkHub, OpenReviewHub
@@ -43,11 +44,11 @@ graph TD
 
 ## Surfaces
 
-- **ai-done-right** [live] — The trust layer for AI — Context, Capability, Proof. The holding brand over a context product, a capability runtime, and an open ecosystem.
-- **baltor** [live] — Governed context engine — Verified, Current, Provable context. 'Models don't fail. Their context does.' Ingest -> reconcile -> harden -> enr
-- **teleon** [live] — Thin CONTROL / METADATA / orchestration plane (not a compute unit): selects + governs + LEARNS the cheapest-that-meets bounded version of a 
-- **openharnesshub** [live] — The open ecosystem + the open CapabilityTask spec (CTS) — evals, harnesses, templates, skills. The community substrate the commercial layers
-- **open-star-hubs** [mixed (9 live + 13 private)] — Each Open*Hub is a registry surface (models, context, compression, skills, tools, benchmarks, receipts, routing, verification, ...) that POP
+- **ai-done-right** [live] — Parent / holding brand — owns no runtime and no customer data; the PROMISE across the family (Context · Capability · Proof). An umbrella ove
+- **baltor** [live] — Fully MANAGED, governed context — company-wide / department-wide / initiative-wide. Verified, Current, Provable. 'Models don't fail. Their c
+- **teleon** [live] — Its OWN product (not just Baltor's runtime): program a capability in PLAIN TEXT and Teleon makes it ADAPT to the most EFFICIENT + BOUNDED fo
+- **openharnesshub** [live] — The open STORE + the open CapabilityTask spec (CTS): a shared catalog of reusable components — context, tools, models, steps, DAG components
+- **open-star-hubs** [mixed (9 live + 13 private)] — The STORE, by category — each Open*Hub registers reusable components BOTH Baltor and Teleon consume: models, context, compression, skills, t
 - **teleon-demos** [live] — The proof surface — every descent demo with its MEASURED saving vs the expensive default (extraction 47-91%, enrichment 86%), governed (serv
 - **design-bundle** [live] — The high-fidelity design/brand handoff bundle (24+ surfaces, 22 hubs) for Claude Code Max — the single source for the portfolio's UI.
 

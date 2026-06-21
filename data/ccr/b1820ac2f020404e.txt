@@ -1,0 +1,14 @@
+MODULE src/teleon/lift/model.py
+## API signatures
+```python
+"""src.teleon.lift.model — Teleon Lift constants, mapping tables, and stable-id helpers."""
+_RUNTIME_CLASSES_PATH = ...
+ENTRY_MODE = ...
+MANAGED_MIN_LEVEL = ...
+def runtime_class_vocabulary() -> set[str]
+    # The valid runtime classes (from capability_runtime_classes.json) — Lift guesses must stay within these.
+def connected_systems_from_env_keys(env_keys: list[str]) -> list[str]
+    # Infer connected-system kinds from env-var KEY NAMES only (values are never imported). Deterministic, sorted.
+def stable_id(prefix: str, *parts: str) -> str
+    # A deterministic id: prefix + short blake2b of the parts (never truncation-only; stable across runs).
+```

@@ -62,3 +62,18 @@ split; "Baltor powered by Teleon") so prose can't drift again.
 
 These are filed into `data/dev-intel/proposals.jsonl` (review via `./loop review`); the loop's `yc` + agent tracks work
 them down. Owner-gated items wait for you.
+
+## RESOLVED 2026-06-21 (owner-confirmed; explicit permission to edit locked memories)
+The owner ratified the two biggest items + sharpened the product model:
+- **Moat split — LOCKED:** *Baltor governs what becomes TRUE; Teleon governs what becomes EFFICIENT (the descent brain).*
+  Applied to `brand.json` (brand_laws), `surface_map.json`, the portfolio doc, and the locked memory.
+- **Method-hub boundary — LOCKED:** the 5 Baltor method-hubs are STORE components (method SPECS only; discovery≠trust);
+  Baltor SELECTS (via Teleon) → RUNS on customer data → OWNS the truth. Spec in the store, execution+truth in Baltor.
+- **Product model sharpened (owner):** **Teleon is its OWN product** (program capabilities in plain text → auto-adapt to
+  cheapest-bounded within guardrails), not only Baltor's runtime. **Baltor is the MANAGED-context product**
+  (company/department/initiative-wide). **The open ecosystem is a STORE** of reusable components both consume
+  (context/tools/models/steps/DAG/reconciliation+robustness+enrichment rules/modules). Code-import law stays
+  Baltor→Teleon→OHH; the store is consumed at the content level by both. surface_map / brand / portfolio doc / master-goal
+  / the architecture map all reconciled to match; guards green.
+- **Still open (owner):** the remaining hub overlaps (teleon-demos vs OpenHarnessHub proof authority; OpenContextHub vs
+  OpenCurrentContextHub; SkillToTool merge) + the engineering flexibility items remain filed for the loop.

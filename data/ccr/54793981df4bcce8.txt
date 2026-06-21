@@ -1,0 +1,22 @@
+MODULE src/teleon/inference/model_index.py
+## API signatures
+```python
+"""src.teleon.inference.model_index — pick the best + cheapest STILL-EFFECTIVE model from a UNIFIED model index,
+governed by FRESHNESS."""
+_INDEX_PATH = ...
+STATUS_FRESH = ...
+STATUS_HELD_OUT_STALE = ...
+_CADENCE_MAX_AGE_DAYS = ...
+def load_index() -> list[dict]
+def _days_between(a: str, b: str) -> int
+def apply_staleness(entries: list[dict], *, now: str) -> list[dict]
+    # Hold out any entry whose `last_verified` is older than its volatility-matched cadence (kept-up-to-date rule).
+def mark_stale(entries: list[dict], model_id: str) -> list[dict]
+    # A CDC 'changed' event for a model's facts → hold it out until re-verified.
+def resync(entries: list[dict], model_id: str, *, now: str) -> list[dict]
+    # Re-verify a model's facts → fresh again (selectable).
+def select_best(entries: list[dict], *, quality_floor_rank: int=0, kinds: tuple=(), max_cost_out=None, prefer_local: bool=False) -> dict
+    # Pick the cheapest FRESH model meeting the quality floor (+ optional kind/cost filters). Stale entries are
+```
+## intra-module call edges
+src.teleon.inference.model_index.apply_staleness -> src.teleon.inference.model_index._days_between

@@ -1,0 +1,18 @@
+MODULE src/teleon/inference/receipts.py
+## API signatures
+```python
+"""src.teleon.inference.receipts — durable, append-only JSONL sink for ModelInvocationReceipts."""
+_REPO_ROOT = ...
+RECEIPTS_JSONL_PATH = ...
+_FORBIDDEN_RECEIPT_KEYS = ...
+def base_host_of(url: str | None) -> str | None
+    # The EFFECTIVE base host of an endpoint URL as ``hostname[:port]`` — never userinfo
+def sanitize_receipt(receipt: dict) -> dict
+    # Drop any raw-content/credential keys (defense in depth — receipts are metadata + hashes only).
+def persist_receipt(receipt: dict, *, plane: str, path: Path | None=None) -> bool
+    # Append one receipt (stamped with its ``plane`` of origin) as a JSONL line under
+def load_receipts(*, limit: int | None=None, path: Path | None=None) -> list[dict]
+    # Read persisted receipts back (rehydration proof + projection feed). Newest-last; ``limit``
+```
+## intra-module call edges
+src.teleon.inference.receipts.persist_receipt -> src.teleon.inference.receipts.sanitize_receipt

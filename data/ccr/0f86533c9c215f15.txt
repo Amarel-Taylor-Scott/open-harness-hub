@@ -1,0 +1,31 @@
+MODULE src/teleon/io/governed_record.py
+## API signatures
+```python
+"""src.teleon.io.governed_record — the ONE thin base every RUNTIME record extends."""
+ENVELOPE_VERSION = ...
+TRUTH_LAW_DEFAULT = ...
+_RESERVED = ...
+def mint_record(schema_version: str, payload: dict | None=None, *, produced_by: str, created_at: str, is_truth: bool=TRUTH_LAW_DEFAULT, source_hash: str | None=None, inputs: list | None=None, trace_id: str | None=None, span_id: str | None=None, extra_provenance: dict | None=None) -> dict
+    # Mint a governed runtime record: the shared envelope + the record's payload. Deterministic
+def validate_record(record: Any, *, require_truth_false: bool=False) -> list[str]
+    # Return a list of envelope problems ([] = valid). `require_truth_false` enforces the standing
+def is_governed(record: Any) -> bool
+    # True iff the record already carries the governed envelope (for incremental migration checks).
+def _self_test() -> int
+def _raises(fn) -> bool
+```
+## intra-module call edges
+src.teleon.io.governed_record.is_governed -> src.teleon.io.governed_record.validate_record
+src.teleon.io.governed_record._self_test -> src.teleon.io.governed_record.mint_record
+src.teleon.io.governed_record._self_test -> src.teleon.io.governed_record.mint_record
+src.teleon.io.governed_record._self_test -> src.teleon.io.governed_record.is_governed
+src.teleon.io.governed_record._self_test -> src.teleon.io.governed_record._raises
+src.teleon.io.governed_record._self_test -> src.teleon.io.governed_record._raises
+src.teleon.io.governed_record._self_test -> src.teleon.io.governed_record.validate_record
+src.teleon.io.governed_record._self_test -> src.teleon.io.governed_record.mint_record
+src.teleon.io.governed_record._self_test -> src.teleon.io.governed_record.mint_record
+src.teleon.io.governed_record._self_test -> src.teleon.io.governed_record.validate_record
+src.teleon.io.governed_record._self_test -> src.teleon.io.governed_record.validate_record
+src.teleon.io.governed_record._self_test -> src.teleon.io.governed_record.mint_record
+src.teleon.io.governed_record._self_test -> src.teleon.io.governed_record.mint_record
+src.teleon.io.governed_record._self_test -> src.teleon.io.governed_record.validate_record

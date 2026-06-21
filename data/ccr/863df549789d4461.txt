@@ -1,0 +1,24 @@
+MODULE src/teleon/lift/connectors.py
+## API signatures
+```python
+"""src.teleon.lift.connectors — inventory connectors behind a port (offline canned + labelled live SEAMS)."""
+class InventoryConnectorPort:
+    # Discover existing workloads. `scan()` returns a list of provider-native resource dicts. READ-ONLY.
+    def scan(self) -> list[dict]
+class CannedK8sConnector:
+    # Offline K8s inventory (the offline default). The live adapter would use the K8s API list/watch.
+    def scan(self) -> list[dict]
+class CannedLambdaConnector:
+    # Offline AWS Lambda inventory (the offline default). The live adapter would call ListFunctions/GetFunction.
+    def scan(self) -> list[dict]
+_LIVE_API_NOTES = ...
+class LiveConnectorSeam:
+    # A labelled live connector that is NOT implemented offline. Documents the real provider API to call.
+    def __init__(self, source: str)
+    def scan(self) -> list[dict]
+def offline_connectors() -> list[InventoryConnectorPort]
+    # The offline default connector set (canned K8s + Lambda) — the whole pipeline runs from these with no cloud.
+```
+## intra-module call edges
+src.teleon.lift.connectors.offline_connectors -> src.teleon.lift.connectors.CannedK8sConnector
+src.teleon.lift.connectors.offline_connectors -> src.teleon.lift.connectors.CannedLambdaConnector

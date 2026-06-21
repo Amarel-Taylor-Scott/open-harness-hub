@@ -1,0 +1,48 @@
+MODULE src/teleon/inference/oips.py
+## API signatures
+```python
+"""src.teleon.inference.oips — the Open Inference Preference Spec engine: preference inheritance + numeric
+provider selection + governed fallback + ModelInvocationReceipt provenance + a local deterministic stub."""
+_A = ...
+OFFLINE_DEFAULT_NODE = ...
+ALLOWED_USE_ORDER = ...
+def _load(name: str) -> dict
+def load_graph() -> dict
+def _tiers() -> dict[str, int]
+def _node_index() -> dict[str, dict]
+def _tier_code(spec: dict) -> int
+    # A model_class_preference's requested tier as a numeric code (accepts tier_code or a tier label).
+def _stable(prefix: str, *parts: str) -> str
+def resolve_preference(layers: list[dict], *, preference_id: str='') -> dict
+    # Merge an ordered inheritance chain (global → product → tenant → environment → object-type → instance →
+def _secret_present(node: dict, available_secrets: set) -> bool
+def _eligible(node: dict, eff: dict, requested_tier: int) -> tuple[bool, str]
+    # Static eligibility (independent of runtime availability): data policy + tier floor + specialization.
+def select_provider(resolved: dict, *, available_secrets: set | None=None, provider_health: dict | None=None, efficiency_ranking: list | None=None) -> dict
+    # Decide which provider NODE to use for a resolved preference. Prefers the object's allowed_provider_nodes
+def _allowed_use(route: dict, executed_node: str) -> str
+    # The strongest downstream use the output qualifies for. NEVER 'served' — Baltor governs serving.
+def build_receipt(*, object_id: str, preference_id: str, requested_model_class: str, route: dict, executed_node: str, executed_model: str, input_text: str, output_text: str, now: str, tokens: dict | None=None, cost: float | None=None, latency_ms: int | None=None, prompt_template: str='', config_version: str='inference_router_config@v1', base_host: str | None=None) -> dict
+def infer_local(*, object_id: str, preference_layers: list[dict], input_text: str, now: str, available_secrets: set | None=None, provider_health: dict | None=None, allow_network: bool=False, use_efficiency_ranking: bool=True) -> dict
+    # End-to-end inference: resolve preference → select provider → DISPATCH execution through the standardized
+```
+## intra-module call edges
+src.teleon.inference.oips.load_graph -> src.teleon.inference.oips._load
+src.teleon.inference.oips._tiers -> src.teleon.inference.oips._load
+src.teleon.inference.oips._node_index -> src.teleon.inference.oips.load_graph
+src.teleon.inference.oips._tier_code -> src.teleon.inference.oips._tiers
+src.teleon.inference.oips.resolve_preference -> src.teleon.inference.oips._stable
+src.teleon.inference.oips.select_provider -> src.teleon.inference.oips._node_index
+src.teleon.inference.oips.select_provider -> src.teleon.inference.oips._tier_code
+src.teleon.inference.oips.select_provider -> src.teleon.inference.oips._eligible
+src.teleon.inference.oips.select_provider -> src.teleon.inference.oips._secret_present
+src.teleon.inference.oips.select_provider -> src.teleon.inference.oips.load_graph
+src.teleon.inference.oips._allowed_use -> src.teleon.inference.oips._node_index
+src.teleon.inference.oips.build_receipt -> src.teleon.inference.oips._stable
+src.teleon.inference.oips.build_receipt -> src.teleon.inference.oips._stable
+src.teleon.inference.oips.build_receipt -> src.teleon.inference.oips._allowed_use
+src.teleon.inference.oips.infer_local -> src.teleon.inference.oips.resolve_preference
+src.teleon.inference.oips.infer_local -> src.teleon.inference.oips.select_provider
+src.teleon.inference.oips.infer_local -> src.teleon.inference.oips.build_receipt
+src.teleon.inference.oips.infer_local -> src.teleon.inference.oips._node_index
+src.teleon.inference.oips.infer_local -> src.teleon.inference.oips._tier_code

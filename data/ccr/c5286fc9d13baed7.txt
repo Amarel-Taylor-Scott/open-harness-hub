@@ -1,0 +1,51 @@
+MODULE src/teleon/monitoring/flywheel.py
+## API signatures
+```python
+"""src.teleon.monitoring.flywheel — cross-surface heartbeats + the monitoring/resolution flywheel."""
+REPO = ...
+SERVICE_REGISTRY = ...
+STATUS_HEALTHY = ...
+STATUS_TRANSIENT = ...
+STATUS_PERSISTENT = ...
+ACTION_NONE = ...
+ACTION_RETRY = ...
+ACTION_RESTART = ...
+ACTION_REHEAL = ...
+ACTION_ESCALATE = ...
+PERSISTENT_AFTER = ...
+ESCALATE_AFTER = ...
+LATENCY_WARN_MS = ...
+_SOURCE_BACKED = ...
+class HeartbeatResult:
+class ResolutionProposal:
+def _surfaces(registry_path: Path=SERVICE_REGISTRY) -> list[dict]
+def urllib_pinger(timeout: float=3.0) -> Callable[[dict], HeartbeatResult]
+    # A REAL pinger: GET the surface's health_url, measure latency. Used live; the self-test injects
+def classify_failure(consecutive_failures: int, surface_id: str) -> tuple[str, str, str]
+    # (status, action, rationale) from the consecutive-failure count — the resolution policy. Named
+class Flywheel:
+    # Holds per-surface consecutive-failure state across ticks; each tick() monitors + proposes.
+    def __init__(self, surfaces: list[dict] | None=None)
+    def tick(self, pinger: Callable[..., HeartbeatResult], *, now: str) -> dict
+        # One monitor→classify→propose pass. Returns {heartbeats, proposals, summary} as governed
+def _self_test() -> int
+def _live(now: str) -> int
+    # One REAL monitoring tick against the running plane (the registry's active surfaces). Prints
+```
+## intra-module call edges
+src.teleon.monitoring.flywheel.urllib_pinger -> src.teleon.monitoring.flywheel.HeartbeatResult
+src.teleon.monitoring.flywheel.urllib_pinger -> src.teleon.monitoring.flywheel.HeartbeatResult
+src.teleon.monitoring.flywheel._self_test -> src.teleon.monitoring.flywheel.Flywheel
+src.teleon.monitoring.flywheel._self_test -> src.teleon.monitoring.flywheel.Flywheel
+src.teleon.monitoring.flywheel._self_test -> src.teleon.monitoring.flywheel.Flywheel.tick
+src.teleon.monitoring.flywheel._self_test -> src.teleon.monitoring.flywheel.Flywheel.tick
+src.teleon.monitoring.flywheel._self_test -> src.teleon.monitoring.flywheel.HeartbeatResult
+src.teleon.monitoring.flywheel._live -> src.teleon.monitoring.flywheel.Flywheel
+src.teleon.monitoring.flywheel._live -> src.teleon.monitoring.flywheel.Flywheel.tick
+src.teleon.monitoring.flywheel._live -> src.teleon.monitoring.flywheel.urllib_pinger
+src.teleon.monitoring.flywheel.ping -> src.teleon.monitoring.flywheel.HeartbeatResult
+src.teleon.monitoring.flywheel.ping -> src.teleon.monitoring.flywheel.HeartbeatResult
+src.teleon.monitoring.flywheel.__init__ -> src.teleon.monitoring.flywheel._surfaces
+src.teleon.monitoring.flywheel.tick -> src.teleon.monitoring.flywheel.classify_failure
+src.teleon.monitoring.flywheel.fake_pinger_at -> src.teleon.monitoring.flywheel.HeartbeatResult
+src.teleon.monitoring.flywheel.ping -> src.teleon.monitoring.flywheel.HeartbeatResult

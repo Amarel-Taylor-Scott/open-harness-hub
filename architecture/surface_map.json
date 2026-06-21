@@ -7,16 +7,16 @@
      "buyer": "n/a (holding brand / fundraising narrative)", "owns": ["baltor", "teleon", "openharnesshub"]},
 
     {"id": "baltor", "kind": "product", "status": "live", "domain": "baltor.ai",
-     "wedge": "Governed context engine — Verified, Current, Provable context. 'Models don't fail. Their context does.' Ingest -> reconcile -> harden -> enrich -> compress -> serve, with receipts + CDC freshness. Powered by Teleon (runs as a tenant on the control plane).",
-     "buyer": "compliance / AML / legal-ops / regulated-data teams (the first live wedge = OFAC sanctions screening)",
+     "wedge": "Fully MANAGED, governed context — company-wide / department-wide / initiative-wide. Verified, Current, Provable. 'Models don't fail. Their context does.' Ingest -> reconcile -> harden -> enrich -> compress -> serve, with receipts + CDC freshness. Powered by Teleon (runs as a tenant). Governs what becomes TRUE.",
+     "buyer": "companies/teams that want fully MANAGED org-/department-/initiative-wide context (first live wedge = compliance / AML / OFAC sanctions screening)",
      "communicates_with": [
        {"to": "teleon", "relation": "consumes (tenant)", "how": "Baltor runs ON Teleon — capability execution, descent, receipts. Direction allowed by the dependency law."},
        {"to": "sources", "relation": "ingests", "how": "pulls signed authoritative sources (source_authority_registry: OFAC, eCFR, Federal Register) with CDC re-sync"}
      ]},
 
-    {"id": "teleon", "kind": "runtime", "status": "live", "domain": "teleon.dev",
-     "wedge": "Thin CONTROL / METADATA / orchestration plane (not a compute unit): selects + governs + LEARNS the cheapest-that-meets bounded version of a capability, receipt-backed. The final unit AND the improvement runs execute EXTERNALLY (Cloudflare Workers/Workers AI, the customer's account, the edge); Teleon tracks results+metadata (the descent brain = the moat) to guide improvement. See docs/architecture/teleon-control-plane-vs-compute.md.",
-     "buyer": "AI agents (primary) + engineering teams bleeding on frontier-model cost/unpredictability",
+    {"id": "teleon", "kind": "product_runtime", "status": "live", "domain": "teleon.dev",
+     "wedge": "Its OWN product (not just Baltor's runtime): program a capability in PLAIN TEXT and Teleon makes it ADAPT to the most EFFICIENT + BOUNDED form that still meets your guardrails (the descent), receipt-backed. Thin control/metadata/orchestration plane — the final unit + improvement runs execute EXTERNALLY (Cloudflare Workers/Workers AI, the customer's account, the edge) while Teleon tracks results+metadata (the descent brain = the moat). Governs what becomes EFFICIENT (Baltor governs truth). See docs/architecture/teleon-control-plane-vs-compute.md.",
+     "buyer": "people/teams who want to program capabilities in plain text + have them auto-optimize to cheapest-bounded within guardrails; AI agents; engineering teams bleeding on frontier-model cost; + Baltor as a tenant",
      "communicates_with": [
        {"to": "openharnesshub", "relation": "consumes", "how": "imports the open CapabilityTask spec + evals/harnesses. Direction allowed by the law (never the reverse)."},
        {"to": "registries", "relation": "selects-from", "how": "the SELECTION SUBSTRATE — model_index, search_provider_registry, pipeline_step_catalog, capability_implementation_registry — the descent picks the cheapest viable row"},
@@ -25,15 +25,15 @@
      ]},
 
     {"id": "openharnesshub", "kind": "open_ecosystem", "status": "live", "domain": "openharnesshub (OSS)",
-     "wedge": "The open ecosystem + the open CapabilityTask spec (CTS) — evals, harnesses, templates, skills. The community substrate the commercial layers ride above.",
-     "buyer": "OSS community / contributors / standards adopters",
+     "wedge": "The open STORE + the open CapabilityTask spec (CTS): a shared catalog of reusable components — context, tools, models, steps, DAG components, skills, harnesses, evals, templates — that BOTH Baltor and Teleon consume. The community substrate the commercial layers ride above.",
+     "buyer": "OSS community / contributors / standards adopters; consumed by both Baltor + Teleon",
      "communicates_with": [
        {"to": "(none)", "relation": "imports-neither", "how": "base layer — OpenHarnessHub imports neither Baltor nor Teleon (the law's floor). Exports specs + harnesses upward."}
      ]},
 
     {"id": "open-star-hubs", "kind": "registry_surfaces", "status": "mixed (9 live + 13 private)", "domain": "per-hub",
-     "wedge": "Each Open*Hub is a registry surface (models, context, compression, skills, tools, benchmarks, receipts, routing, verification, ...) that POPULATES Teleon's selection substrate — more/deeper registries => better descents.",
-     "buyer": "consumed internally by Teleon; opened per trigger + owner clearance",
+     "wedge": "The STORE, by category — each Open*Hub registers reusable components BOTH Baltor and Teleon consume: models, context, compression, skills, tools, benchmarks, receipts, routing + the method components (reconciliation / robustness-hardening / enrichment / optimization / verification RULES) + predefined modules that run on Teleon OR custom compute. Populates Teleon's selection substrate (more/deeper => better descents) AND supplies Baltor's context methods.",
+     "buyer": "consumed by BOTH Baltor (context methods) and Teleon (selection substrate); opened per trigger + owner clearance",
      "communicates_with": [
        {"to": "teleon", "relation": "feeds-substrate", "how": "each hub's rows are a search space for a descent axis (model->cost/specialization, context->freshness, harness->the bar, skill->tokens)"}
      ]},
