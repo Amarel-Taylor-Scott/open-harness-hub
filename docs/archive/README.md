@@ -6,6 +6,17 @@ It is not a trash directory.
 Use this archive when content is superseded, stale, duplicated, or no longer
 canonical but still needs to be preserved for provenance.
 
+## Canonical location + automated mover (reconciled 2026-06-21)
+
+This `docs/archive/` holds the archive **policy** (the rules below) + the
+[archive-candidate-ledger](archive-candidate-ledger.md) (the decision surface).
+The canonical home for **moved content** is the repo-root **`archive/legacy/<original-path>`**, executed by
+**`scripts/archive_legacy_docs.py`** (`--scan` / `--apply`): conservative header-marker detection, lossless `git mv`,
+a status index + manifest at `archive/legacy/README.md` + `archive/legacy/_manifest.jsonl`, and **tombstone
+redirects** left at any original path that live files still reference (so links never dangle). The codemap/context
+builder excludes `archive/` automatically, so archived content drops out of model context while staying tracked in
+git. Restore: `git mv archive/legacy/<path> <path>`. Nothing is ever deleted or untracked.
+
 ## Rules
 
 Before moving content here:

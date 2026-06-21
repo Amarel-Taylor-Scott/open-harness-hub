@@ -1,14 +1,9 @@
-# Vocabularies
+---
+status: archived_tombstone
+moved_to: archive/legacy/docs/reference/vocabularies.md
+---
+# ⚠️ Archived — moved to `archive/legacy/docs/reference/vocabularies.md`
 
-Controlled lists live in `vocabularies/`. Each is YAML - new entries
-are added by PR.
+This document was archived on unspecified (reason: header marker: deprecated.). It is **preserved, not deleted** — this stub keeps existing links resolving.
 
-| File | What |
-|---|---|
-| `industries.yaml` | Open list of industries; sub-industries are dot-separated. |
-| `capabilities.yaml` | What components do (classification, retrieval, safety_gating, …). |
-| `modalities.yaml` | text / image / audio / video / code / structured / tabular / spatial / timeseries / multimodal. |
-| `trust-boundaries.yaml` | local / hub / external / mixed. |
-| `lifecycle.yaml` | experimental / beta / stable / deprecated. |
-| `leaf-types.yaml` | Knowledge-object leaf types harnesses can consume / emit. |
-| `cache-scopes.yaml` | Reuse boundaries for prompt-prefix, KV-cache, trajectory-fragment, and context-pack cache entries. |
+Full content + status index: `archive/legacy/README.md`.

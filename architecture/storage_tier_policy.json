@@ -1,0 +1,129 @@
+{
+  "version": "0.1.0",
+  "note": "Single source for HOW each long-lived data stream is stored across volume tiers. The backend is a CONFIG choice, not a code rewrite: a stream is written through src.teleon.storage.record_store (the one append-only port) and the tier decides the backend. Counts/backends here are read by code + the family/validate checks; never hand-mirror them in prose.",
+  "law": "config-tier = whole-file git-tracked JSON (git IS the store \u2014 a DB would lose PR-review/history/diff for zero scale benefit); operational/history = append-only RecordStore with content-addressed idempotency, a durable JSONL mirror (single on-disk source) + a db-served read index; the cloud backend is a config swap (OH_STORAGE_MODE=cloud), never a caller change. serves_truth=false for every stream (a record is evidence, never a truth claim).",
+  "tiers": {
+    "config": {
+      "scale": "tens-to-hundreds of curated rows",
+      "local_backend": "json_file",
+      "cloud_backend": "json_file",
+      "rationale": "human-edited, PR-reviewed, diffable control-plane config (model lists, strategies, laws). Volume is bounded; git is the right database. Read whole-file, deterministic + offline."
+    },
+    "operational": {
+      "scale": "thousands-to-millions, queried at runtime",
+      "local_backend": "sqlite_wal",
+      "cloud_backend": "postgres",
+      "rationale": "indexed lookups/joins/filters at request time; pgvector for embeddings. The current hot/active rows behind the product."
+    },
+    "history": {
+      "scale": "billions-to-trillions, append-only (history / CDC / versioning)",
+      "local_backend": "sqlite_wal",
+      "cloud_backend": "warehouse",
+      "rationale": "append-only, time/shard-partitioned columnar (BigQuery/ClickHouse) + object-store (Parquet) cold tier; content-addressed idempotency so dedupe is O(1) indexed, never an O(n) rescan; NEVER a single hot table. The materialized 'current' view is derived from the latest-by-key over this log."
+    }
+  },
+  "streams": [
+    {
+      "stream": "descent_attempts",
+      "tier": "history",
+      "status": "active",
+      "jsonl": "data/descent-attempts/{shard}.jsonl",
+      "idempotency_key": "attempt_id",
+      "partition_key": "unit_id",
+      "produced_by": "src.teleon.evolution.descent_attempt_store",
+      "note": "the descent BRAIN \u2014 every unbounded->bounded attempt incl. losers/failures (lossless training negatives). Grows without bound; the canonical trillion-row stream.",
+      "serves_truth": false,
+      "plane": "product"
+    },
+    {
+      "stream": "cdc_events",
+      "tier": "history",
+      "status": "planned",
+      "jsonl": "data/cdc/{shard}.jsonl",
+      "idempotency_key": "event_hash",
+      "partition_key": "event_date",
+      "produced_by": "scripts.db.cdc_event_emitter",
+      "note": "change-data-capture stream for governed facts (regulations/rates/prices) \u2014 revocation + re-sync history.",
+      "serves_truth": false,
+      "plane": "product"
+    },
+    {
+      "stream": "version_history",
+      "tier": "history",
+      "status": "planned",
+      "jsonl": "data/versions/{shard}.jsonl",
+      "idempotency_key": "version_hash",
+      "partition_key": "component_id",
+      "produced_by": "scripts.db.component_cdc_plan",
+      "note": "append-only component/module version log; 'current' = latest-by-(component_id) over this stream (version lives in metadata, never in the id).",
+      "serves_truth": false,
+      "plane": "product"
+    },
+    {
+      "stream": "component_candidates",
+      "tier": "operational",
+      "status": "planned",
+      "jsonl": "data/candidates/{shard}.jsonl",
+      "idempotency_key": "content_hash",
+      "partition_key": "component_type",
+      "produced_by": "scripts.db.component_store_load_plan",
+      "note": "staged candidate rows (the factory's daily output) before promotion; queried/filtered at runtime.",
+      "serves_truth": false,
+      "plane": "product"
+    },
+    {
+      "stream": "object_embeddings",
+      "tier": "operational",
+      "status": "planned",
+      "jsonl": "db/vector/oh_catalog.jsonl",
+      "idempotency_key": "object_hash",
+      "partition_key": "model_id",
+      "produced_by": "scripts.db.build_vector_index",
+      "note": "pgvector/vector-store rows; the cloud backend is postgres+pgvector (or a dedicated vector DB per db/vector/spec.md).",
+      "serves_truth": false,
+      "plane": "product"
+    },
+    {
+      "stream": "panel_reviews",
+      "tier": "history",
+      "status": "active",
+      "jsonl": "data/panel-reviews/{shard}.jsonl",
+      "idempotency_key": "review_id",
+      "partition_key": "round",
+      "produced_by": "scripts.panel_review",
+      "note": "the multi-model executive review board \u2014 Claude/Kimi/GLM reviewing the code+PMF through CEO/COO/CTO/CFO/YC lenses + cross-critiquing each other. Append-only; every round/persona/model is a record. serves_truth=false (model opinions are candidates).",
+      "serves_truth": false,
+      "plane": "development"
+    },
+    {
+      "stream": "model_index",
+      "tier": "config",
+      "status": "active",
+      "json": "architecture/model_index.json",
+      "produced_by": "src.teleon.inference.model_index",
+      "note": "the model registry the descent selects against (a few dozen rows); stays JSON.",
+      "serves_truth": false,
+      "plane": "product"
+    },
+    {
+      "stream": "descent_strategy_registry",
+      "tier": "config",
+      "status": "active",
+      "json": "architecture/descent_strategy_registry.json",
+      "produced_by": "src.teleon.evolution.descent_axes",
+      "note": "the per-axis descent strategy config; a handful of rows; stays JSON.",
+      "serves_truth": false,
+      "plane": "product"
+    },
+    {
+      "stream": "portfolio_dependency_law",
+      "tier": "config",
+      "status": "active",
+      "json": "architecture/portfolio_dependency_law.json",
+      "produced_by": "scripts.check_portfolio_dependency_law",
+      "note": "the Baltor->Teleon->OHH law; tiny, hand-curated, PR-gated; stays JSON.",
+      "serves_truth": false,
+      "plane": "product"
+    }
+  ]
+}

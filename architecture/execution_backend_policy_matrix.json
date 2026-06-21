@@ -10,6 +10,17 @@
   ],
   "generic_cloud_functions": ["aws_lambda@candidate", "gcp_cloud_run_function@candidate", "gcp_cloud_function@candidate", "azure_function@candidate", "cloudflare_workers@candidate", "openfaas_knative@candidate"],
   "offline_default_backend": "local_function_emulator@v1",
+  "compute_ownership": {
+    "note": "WHOSE infra runs the worker — orthogonal to WHICH backend. The easiest onboarding is BYO-via-API-key: a customer supplies a token (e.g. a Cloudflare API token) and workers spin up on THEIR account. Zero infra for us; data-residency for them (their data never leaves their account -> the `locality` descent axis); their compute bill. The DurableFleetLedger + receipts stay OUR truth (we dispatch + record; they execute). Credentials are tenant-scoped SecretRefs (service_auth_consumption_model), never logged.",
+    "modes": {
+      "provider_operated": "we run the backend on our own infra/accounts (default).",
+      "customer_account": "BYO via a customer-supplied API key/token (SecretRef) — we provision/dispatch onto the customer's account (cloudflare_workers, aws_lambda, gcp_cloud_run_function, ...). Easiest start: paste a key.",
+      "customer_managed": "the customer runs the cluster/endpoint themselves (their k8s / openfaas); we dispatch to their endpoint URL + token."
+    },
+    "byo_supported_backends": ["cloudflare_workers@candidate", "k8s_deployment_worker@candidate", "k8s_job@candidate", "aws_lambda@candidate", "gcp_cloud_run_function@candidate", "openfaas_knative@candidate", "docker_container@candidate"],
+    "onboarding": "customer supplies a SecretRef (e.g. secret://tenant/<id>/cloudflare_api_token [+ account_id]); Teleon selects a BYO provider for that tenant by policy; the local_function_emulator stays the offline equivalent so dev never needs a customer key.",
+    "invariants": ["FleetLedger + receipts remain OUR truth even when compute runs on the customer's account", "the customer API key is a tenant SecretRef, never logged, never global", "a BYO provider never owns truth (owns_truth=false) — it only RUNS the task"]
+  },
   "_defer_gate": "A real cloud/K8s/Docker backend may be CANDIDATE only if it declares a local_emulator_provider below that is built + proven. Cloud can wait; capability cannot. Enforced by check_real_execution_candidates_have_emulators + check_no_deferred_execution_surfaces.",
   "candidate_local_equivalents": {
     "aws_lambda@candidate": "execution.local_function_emulator@v1",

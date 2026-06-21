@@ -1,0 +1,50 @@
+# Prioritized proposal backlog (development plane; serves_truth=false)
+
+70 proposals. The loop FILES these when it's uncomfortable applying directly; you prioritize.
+
+Score = value x confidence x reversibility / (effort x risk). Higher = do sooner.
+
+## ⛔ Owner decision required (brand/pricing/structure/strategy)
+- **[0.32]** (plan) [plane:ai-done-right] Review: `ai-done-right [live]` — Scoping & Seams  ·  _touches owner-gated surface (brand/pricing/structure/strategy)_
+- **[0.32]** (risk) [wedge:ai-done-right] We need review a wedge. User asks: Review this wedge for improvement opportunities. Lens: is the wedge sharp, defensible  ·  _touches owner-gated surface (brand/pricing/structure/strategy)_
+- **[0.32]** (risk) [plane:baltor] Assessment  ·  _touches owner-gated surface (brand/pricing/structure/strategy)_
+- **[0.32]** (risk) [plane:openharnesshub] We need review one aspect of governed AI platform: Baltor context engine + Teleon thin control plane. Unit is SURFACE op  ·  _touches owner-gated surface (brand/pricing/structure/strategy)_
+
+## 🟡 Proposed — review then apply (riskier / not trivial)
+- **[0.5333]** (plan) [yc-gap:traction_design_partner] secure 1 design partner + a paid pilot that EXPORTS a package consumed by their own agent/RAG, with a before/after report (the 90-day bottleneck) — owner GTM  ·  _YC readiness 0.667: no signed design partner / paid pilot_
+- **[0.4267]** (plan) [yc-gap:backends_green] run the health flywheel until gates are green: ./loop run  (or scripts/flywheel_orchestrator.py --run)  ·  _YC readiness 0.667: core proof gates: unknown_
+- **[0.4267]** (plan) [yc-gap:founder_market_fit] fill the founder/team story — why you know this better than anyone + the hardest thing you've built — owner  ·  _YC readiness 0.667: founder/team story UNFILLED (the critical blocker)_
+- **[0.32]** (opportunity) [module:src/teleon/compiler/fixtures.py] 1. **OPPORTUNITY:** `fixtures.py` mixes deterministic test fixtures with production live-state I/O. A module named `fixt  ·  _default: propose for review (not clearly trivial)_
+- **[0.32]** (risk) [integration:architecture/agent_environment_research_] We need review integration architecture/agent_environment_research_registry.json. Need find concrete actionable improvem  ·  _default: propose for review (not clearly trivial)_
+- **[0.32]** (plan) [research:context layer for AI agents] Outward Scan: Competitor & White-Space Analysis  ·  _default: propose for review (not clearly trivial)_
+- **[0.32]** (plan) [research:context layer for AI agents] We need review research for improvement opportunities. Lens: OUTWARD scan: competitor/similar product, what they do that  ·  _default: propose for review (not clearly trivial)_
+- **[0.32]** (opportunity) [research:context layer for AI agents] Outward Scan: Context-Layer Competitors  ·  _default: propose for review (not clearly trivial)_
+- **[0.32]** (plan) [research:context layer for AI agents] We need review research for improvement opportunities. User asks: Lens: OUTWARD scan: is this a competitor/similar produ  ·  _default: propose for review (not clearly trivial)_
+- **[0.32]** (plan) [plane:ai-done-right] This plane is **not coherently scoped** against Baltor and Teleon. Right now `ai-done-right` is a fat holding brand that  ·  _default: propose for review (not clearly trivial)_
+- **[0.32]** (risk) [wedge:ai-done-right] Assessment: This is a portfolio narrative, not a wedge.  ·  _default: propose for review (not clearly trivial)_
+- **[0.32]** (risk) [plane:baltor] We need review one aspect of governed AI platform Baltor context engine + Teleon thin control plane. User provided a "pl  ·  _default: propose for review (not clearly trivial)_
+- **[0.32]** (plan) [wedge:teleon] OPPORTUNITY 1: "AI agents" as primary buyers is a fatal GTM flaw.  ·  _default: propose for review (not clearly trivial)_
+- **[0.32]** (plan) [logjam fork · glm-5.2] 1. My Read of the Problem  ·  _logjam: no new findings for 4 cycles; the K8s live-dispatch path is blocked_
+- **[0.32]** (plan) [logjam fork · kimi-k2.7-code] We need answer as expert pair for stuck engineer. User asks: teammate (Claude) stuck. Question: improvement lo  ·  _logjam: no new findings for 4 cycles; the K8s live-dispatch path is blocked_
+- **[0.32]** (plan) [yc-gap:decisions_locked] owner: ratify raise size + pricing + lock the one-liner (owner-gated decisions)  ·  _YC readiness 0.667: raise/pricing/one-liner not ratified_
+- **[0.32]** (opportunity) [wedge:openharnesshub] Verdict:** The wedge is **not sharp yet**. “Open ecosystem + open spec” is a *category*, not a point of insertion. The b  ·  _default: propose for review (not clearly trivial)_
+- **[0.32]** (risk) [plane:open-star-hubs] Open*Hubs — Registry Surfaces Feeding Teleon's Selection Substrate  ·  _default: propose for review (not clearly trivial)_
+- **[0.32]** (risk) [wedge:open-star-hubs] We need review a wedge for improvement opportunities. Need act as senior staff engineer + product/design lead. Need asse  ·  _default: propose for review (not clearly trivial)_
+- **[0.32]** (risk) [plane:teleon-demos] Review: teleon-demos surface  ·  _default: propose for review (not clearly trivial)_
+- **[0.32]** (plan) [plane:teleon-demos] This plane is **not coherently scoped** as described. It mixes measurement, presentation, investor claims, and governanc  ·  _default: propose for review (not clearly trivial)_
+- **[0.32]** (opportunity) [wedge:teleon-demos] Wedge Review: "Proof Surface" Demos  ·  _default: propose for review (not clearly trivial)_
+- **[0.32]** (plan) [wedge:teleon-demos] We need review a wedge for improvement opportunities. User provides unit: SURFACE teleon-demos [live], wedge: proof surf  ·  _default: propose for review (not clearly trivial)_
+- **[0.32]** (plan) [plane:design-bundle] Review: design-bundle surface  ·  _default: propose for review (not clearly trivial)_
+- **[0.32]** (risk) [wedge:design-bundle] We need review a wedge for improvement opportunities. Need act as senior staff engineer + product/design lead. The unit   ·  _default: propose for review (not clearly trivial)_
+  … (+33 more)
+
+## 🟢 Auto-eligible (trivial + reversible — the autofix/agent can apply)
+- **[1.6]** (risk) [module:src/teleon/agents/agent_runtime_provider] We need review module based only on API signatures and call edges. Need find concrete actionable improvement opportuniti  ·  _trivial + reversible_
+- **[1.6]** (risk) [module:src/teleon/blackboard/local_sqlite_black] We need review module based on API signatures and call edges only, no code body. User asks concrete actionable improveme  ·  _trivial + reversible_
+- **[1.6]** (plan) [module:src/teleon/blackboard/token_economics.py] We need review module token_economics.py. We have only API signatures and call edges, not code. Need find concrete actio  ·  _trivial + reversible_
+- **[1.6]** (opportunity) [module:src/teleon/compiler/__main__.py] Review: `src/teleon/compiler/__main__.py`  ·  _trivial + reversible_
+- **[1.6]** (risk) [module:src/teleon/compiler/compile.py] Here are 5 concrete improvement opportunities for the `compile.py` module:  ·  _trivial + reversible_
+- **[1.6]** (risk) [plane:teleon] We need review one aspect of governed AI platform: Teleon thin control plane. Need find concrete actionable improvement   ·  _trivial + reversible_
+- **[1.6]** (risk) [wedge:teleon] We need review one aspect of governed AI platform wedge. Need be senior staff engineer + product/design lead. Need concr  ·  _trivial + reversible_
+- **[1.6]** (plan) [architecture:hierarchies] Assessment  ·  _trivial + reversible_
+

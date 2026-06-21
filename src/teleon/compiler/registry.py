@@ -45,7 +45,7 @@ LAWS:
 
 ARCHITECTURAL LAW — Teleon-layer code: imports only stdlib + ``src.teleon`` siblings + ``scripts`` tooling
 (``scripts._jsonl_store`` — an offline durability engine, NOT a brand layer; ``src/teleon`` already depends on
-``scripts.*`` in ``compiler/fixtures.py`` and ``experiments/*``). It never imports ``src.baltor`` /
+``scripts.*`` in ``compiler/live_capability.py`` and ``experiments/*``). It never imports ``src.baltor`` /
 ``src.openharnesshub`` (the portfolio dependency law; proven by ``--self-test`` and
 ``scripts/check_portfolio_dependency_law.py``).
 """
@@ -57,7 +57,7 @@ from typing import Any, Iterable
 
 # scripts._jsonl_store is the repo's append-log durability engine (SQLite-WAL primary + append-only JSONL mirror,
 # rebuild-on-cold-start from the JSONL). It is TOOLING, not a brand layer — importing it from src.teleon does not
-# cross the portfolio dependency law (same as compiler/fixtures.py importing scripts.teleon_local_runtime).
+# cross the portfolio dependency law (same as compiler/live_capability.py importing scripts.teleon_local_runtime).
 from scripts._jsonl_store import AppendLog
 
 _REPO = Path(__file__).resolve().parents[3]

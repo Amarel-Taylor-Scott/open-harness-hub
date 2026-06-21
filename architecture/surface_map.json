@@ -1,0 +1,56 @@
+{
+  "version": "0.1.0",
+  "note": "Canonical SURFACE MAP — for each surface (product / runtime / open hub / site), its EDGE/WEDGE (the one-line differentiator), buyer, status, AND how it COMMUNICATES with the other surfaces (the inter-surface graph). Consolidates what was scattered across company_portfolio_map.json (company boundaries), brand.json (branding), portfolio_dependency_law.json (import law), and strategy prose. MUST agree with the dependency law: product-layer communication edges follow Baltor->Teleon->OpenHarnessHub, never the reverse (checked by scripts/check_surface_map.py). serves_truth=false for any model-generated surface output.",
+  "surfaces": [
+    {"id": "ai-done-right", "kind": "parent_brand", "status": "live", "domain": "aidoneright.dev",
+     "wedge": "The trust layer for AI — Context, Capability, Proof. The holding brand over a context product, a capability runtime, and an open ecosystem.",
+     "buyer": "n/a (portfolio brand / fundraising narrative)", "owns": ["baltor", "teleon", "openharnesshub"]},
+
+    {"id": "baltor", "kind": "product", "status": "live", "domain": "baltor.ai",
+     "wedge": "Governed context engine — Verified, Current, Provable context. 'Models don't fail. Their context does.' Ingest -> reconcile -> harden -> enrich -> compress -> serve, with receipts + CDC freshness.",
+     "buyer": "compliance / AML / legal-ops / regulated-data teams (the first live wedge = OFAC sanctions screening)",
+     "communicates_with": [
+       {"to": "teleon", "relation": "consumes (tenant)", "how": "Baltor runs ON Teleon — capability execution, descent, receipts. Direction allowed by the dependency law."},
+       {"to": "sources", "relation": "ingests", "how": "pulls signed authoritative sources (source_authority_registry: OFAC, eCFR, Federal Register) with CDC re-sync"}
+     ]},
+
+    {"id": "teleon", "kind": "runtime", "status": "live", "domain": "teleon.dev",
+     "wedge": "Thin CONTROL / METADATA / orchestration plane (not a compute unit): selects + governs + LEARNS the cheapest-that-meets bounded version of a capability, receipt-backed. The final unit AND the improvement runs execute EXTERNALLY (Cloudflare Workers/Workers AI, the customer's account, the edge); Teleon tracks results+metadata (the descent brain = the moat) to guide improvement. See docs/architecture/teleon-control-plane-vs-compute.md.",
+     "buyer": "AI agents (primary) + engineering teams bleeding on frontier-model cost/unpredictability",
+     "communicates_with": [
+       {"to": "openharnesshub", "relation": "consumes", "how": "imports the open CapabilityTask spec + evals/harnesses. Direction allowed by the law (never the reverse)."},
+       {"to": "registries", "relation": "selects-from", "how": "the SELECTION SUBSTRATE — model_index, search_provider_registry, pipeline_step_catalog, capability_implementation_registry — the descent picks the cheapest viable row"},
+       {"to": "baltor", "relation": "serves", "how": "executes Baltor's PurposeTasks; returns governed results + receipts"},
+       {"to": "agents", "relation": "serves", "how": "Agent Capability Gateway — receipt-backed CapabilityTasks for external agents"}
+     ]},
+
+    {"id": "openharnesshub", "kind": "open_ecosystem", "status": "live", "domain": "openharnesshub (OSS)",
+     "wedge": "The open ecosystem + the open CapabilityTask spec (CTS) — evals, harnesses, templates, skills. The community substrate the commercial layers ride above.",
+     "buyer": "OSS community / contributors / standards adopters",
+     "communicates_with": [
+       {"to": "(none)", "relation": "imports-neither", "how": "base layer — OpenHarnessHub imports neither Baltor nor Teleon (the law's floor). Exports specs + harnesses upward."}
+     ]},
+
+    {"id": "open-star-hubs", "kind": "registry_surfaces", "status": "mixed (9 live + 13 private)", "domain": "per-hub",
+     "wedge": "Each Open*Hub is a registry surface (models, context, compression, skills, tools, benchmarks, receipts, routing, verification, ...) that POPULATES Teleon's selection substrate — more/deeper registries => better descents.",
+     "buyer": "consumed internally by Teleon; opened per trigger + owner clearance",
+     "communicates_with": [
+       {"to": "teleon", "relation": "feeds-substrate", "how": "each hub's rows are a search space for a descent axis (model->cost/specialization, context->freshness, harness->the bar, skill->tokens)"}
+     ]},
+
+    {"id": "teleon-demos", "kind": "proof_surface", "status": "live", "domain": "dist/teleon-demos/index.html",
+     "wedge": "The proof surface — every descent demo with its MEASURED saving vs the expensive default (extraction 47-91%, enrichment 86%), governed (serves_truth=false). Shows the runtime is real, not slideware.",
+     "buyer": "prospects / investors / the review board",
+     "communicates_with": [
+       {"to": "teleon", "relation": "reads", "how": "computes live savings from the real demo modules (document_extraction_cascade, search_enrich, the DAG pipelines)"}
+     ]},
+
+    {"id": "design-bundle", "kind": "handoff_site", "status": "live", "domain": "dist/sites/openharness-design",
+     "wedge": "The high-fidelity design/brand handoff bundle (24+ surfaces, 22 hubs) for Claude Code Max — the single source for the portfolio's UI.",
+     "buyer": "internal (design/build handoff)",
+     "communicates_with": [
+       {"to": "ai-done-right", "relation": "renders", "how": "the branded-house UI for the parent + products + hubs (Hanken Grotesk + IBM Plex Mono)"}
+     ]}
+  ],
+  "communication_law": "Product-layer dependency + runtime calls follow Baltor -> Teleon -> OpenHarnessHub, NEVER the reverse (architecture/portfolio_dependency_law.json). Registries/hubs feed Teleon's substrate; Baltor ingests signed sources; Teleon serves agents + Baltor. Co-located for latency, contract-separated for clarity, account-separated for security (company_portfolio_map.json)."
+}

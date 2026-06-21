@@ -311,3 +311,64 @@ def demonstrate_measured(*, available_keys: tuple = ("LLM_API_KEY",)) -> dict:
         "escalation": {f: (lenient["filled"].get(f), strict["filled"].get(f)) for f in EMPLOYMENT_AGENCY_SCHEMA},
         "cost_delta": round(strict["total_cost"] - lenient["total_cost"], 4),
     }
+
+
+# ---------------------------------------------------------------------------
+# The headline margin + brain integration (the descent, recorded — owner 2026-06-21)
+# ---------------------------------------------------------------------------
+# The cascade IS a descent (the naive default — send the whole document to a frontier LLM — descended to the
+# cheapest-that-meets path). Make that explicit: compute the frontier-only baseline vs the cascade (the headline
+# "you don't need the frontier model" margin), name the REAL cheap + frontier models from the model registry
+# (model_index, via substrate_selector — same load-bearing wiring as catalog_descent), and record the move as a
+# DescentAttempt so the extraction descent feeds the same brain/meta-learner. serves_truth stays False.
+
+
+def frontier_only_cost(doc: dict, *, scanned_acquire: float = 0.300) -> float:
+    """What most people pay: acquire + ONE frontier LLM pass over the whole document. The naive baseline."""
+    acquire = 0.002 if doc.get("has_text_layer") else (scanned_acquire if doc.get("scanned") else 0.300)
+    frontier = next(m for m in _LADDER if m.name == "frontier_llm").cost
+    return round(acquire + frontier, 4)
+
+
+def extraction_savings(required_fields: dict | None = None, doc: dict | None = None, *,
+                       available_keys: tuple = ("LLM_API_KEY",), confidence_floor: float = 0.8) -> dict:
+    """The headline: frontier-only baseline vs the measured cascade, at the SAME met-requirement. Names the real
+    cheap+frontier models the tiers map to (lineage from model_index)."""
+    required_fields = required_fields or EMPLOYMENT_AGENCY_SCHEMA
+    doc = doc or {"has_text_layer": True, "scanned": False}
+    casc = extract_measured(required_fields, doc, available_keys=available_keys, confidence_floor=confidence_floor)
+    baseline = frontier_only_cost(doc)
+    lineage = {"cheap_llm": None, "frontier_llm": None}
+    try:
+        from src.teleon.evolution import substrate_selector
+        dg = substrate_selector.model_downgrade()
+        lineage = {"cheap_llm": dg.get("picked_model"), "frontier_llm": dg.get("frontier_model"),
+                   "substrate_ref": dg.get("substrate_ref")}
+    except Exception:  # noqa: BLE001 — lineage is annotation; never block extraction on the registry
+        pass
+    saved = round(baseline - casc["total_cost"], 4)
+    return {"frontier_only_cost": baseline, "cascade_cost": casc["total_cost"], "cost_saved": saved,
+            "pct_saved": round(100 * saved / baseline, 1) if baseline else 0.0,
+            "met_requirement": casc["met_requirement"], "used_llm": casc["used_llm"],
+            "model_lineage": lineage, "path": casc["path"], "serves_truth": False}
+
+
+def record_extraction_descent(store, *, required_fields: dict | None = None, doc: dict | None = None,
+                              available_keys: tuple = ("LLM_API_KEY",), confidence_floor: float = 0.8) -> dict:
+    """Record the extraction cascade as a DescentAttempt (before = frontier-only naive default; after = the measured
+    cascade) into the canonical descent brain, so the meta-learner learns extraction descents too. Returns the
+    savings summary. Uses the brain's 5 canonical axes; serves_truth stays False."""
+    from src.teleon.evolution.descent_attempt_store import DescentAttempt
+    s = extraction_savings(required_fields, doc, available_keys=available_keys, confidence_floor=confidence_floor)
+    before = {"cost": s["frontier_only_cost"], "determinism": 0.2, "tokens_in": 4000, "llm_usage": 1, "freshness": 0.2}
+    after = {"cost": s["cascade_cost"], "determinism": 0.2 if s["used_llm"] else 1.0,
+             "tokens_in": 2000 if s["used_llm"] else 0, "llm_usage": 1 if s["used_llm"] else 0,
+             "freshness": 0.2 if s["used_llm"] else 1.0}
+    outcome = "converged" if not s["used_llm"] else ("improved" if s["cost_saved"] > 0 else "no_change")
+    strategy = "llm_to_rule" if not s["used_llm"] else "model_downgrade"
+    store.append(DescentAttempt(
+        unit_id="extraction:document_schema_cascade", strategy=strategy, before=before, after=after, outcome=outcome,
+        losers=("frontier_llm",), rollback_target="extraction:frontier_only",
+        raw_ref="src/teleon/extraction/document_extraction_cascade.py",
+        substrate_ref=s["model_lineage"].get("substrate_ref", "deterministic_rule")))
+    return s

@@ -203,6 +203,23 @@ global. Run side-by-side before promotion, shadow new rules, monitor after, and 
 the **LOSSLESS DISTILLATION CLAUSE** in every workflow prompt. Full law:
 `docs/codex/lossless-distillation.md`.
 
+## Archived / Legacy Files (move, never delete; never untrack)
+
+Outdated / superseded context is **moved, not deleted, and not untracked** — it stays in git for lineage + rollback,
+relocated under **`archive/legacy/<original-path>`** with its status recorded. Rules:
+
+- **Mover:** `scripts/archive_legacy_docs.py` (`--scan` to list, `--apply` to move losslessly). Conservative,
+  header-marker detection only (superseded-by / deprecated / do-not-use) so a live doc is never archived.
+- **Status label is mandatory:** every move is recorded in `archive/legacy/_manifest.jsonl` (original_path, reason,
+  status, reversible) and surfaced in **`archive/legacy/README.md`** (the human status index + restore instructions).
+- **Codemap/context exclude `archive/`** (`scripts/context_pack_builder.py` `_TREE_EXCLUDE`) so archived files drop
+  out of the model context automatically — but stay on disk + in git.
+- **Restore** = `git mv archive/legacy/<path> <path>` (the manifest has the exact origin).
+- **Status accuracy law:** never mislabel LIVE/GENERATED data as "legacy." The component catalog (root `catalog/` =
+  live registry read by `dev_status.py`/the build; `docs/catalog/*.md` = GENERATED output of
+  `scripts/build_catalog_pages.py`, only `index.md` in the mkdocs nav) is **not** legacy — it carries a `_STATUS.md`
+  marking it generated/live, and is never archived as outdated.
+
 ## Promotion Boundary
 
 Candidate-table load readiness is not active publication readiness.

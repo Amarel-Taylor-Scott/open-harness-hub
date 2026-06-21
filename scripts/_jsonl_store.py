@@ -111,8 +111,18 @@ class AppendLog:
             c.execute("""CREATE TABLE IF NOT EXISTS records(
                 seq INTEGER PRIMARY KEY AUTOINCREMENT,
                 generation INTEGER NOT NULL,
-                body_json TEXT NOT NULL)""")
+                body_json TEXT NOT NULL,
+                idem_key TEXT)""")
             c.execute("CREATE INDEX IF NOT EXISTS idx_records_gen ON records(generation, seq)")
+            # idempotency (additive, default OFF — a NULL idem_key is the legacy/no-key behavior): an
+            # optional content key per record so a re-append is an O(1) INDEXED lookup instead of an
+            # O(n) rescan — the dedupe that lets an append-only history/CDC stream scale past billions of
+            # rows. Pre-existing dbs created before this column get it added in place (lossless). The
+            # index is NON-unique (idempotency is enforced at append under the single-writer lock) so a
+            # legacy mirror that happens to repeat a key can never wedge startup.
+            if "idem_key" not in {r[1] for r in c.execute("PRAGMA table_info(records)").fetchall()}:
+                c.execute("ALTER TABLE records ADD COLUMN idem_key TEXT")
+            c.execute("CREATE INDEX IF NOT EXISTS idx_records_idem ON records(idem_key)")
             c.execute("CREATE TABLE IF NOT EXISTS meta(key TEXT PRIMARY KEY, value TEXT)")
 
     def _current_generation(self) -> int:
@@ -190,15 +200,27 @@ class AppendLog:
         os.replace(tmp, self.jsonl_path)
 
     # -- the append-log API ---------------------------------------------------------------------
-    def append(self, record: dict) -> int:
+    def append(self, record: dict, *, idem_key: str | None = None) -> int:
         """Append one record. The db INSERT is the crash-safe commit; the jsonl mirror line is written
-        from the same canonical bytes under the same lock. Returns the db ``seq`` (a stable id)."""
+        from the same canonical bytes under the same lock. Returns the db ``seq`` (a stable id).
+
+        If ``idem_key`` is given the append is IDEMPOTENT: a second append with the same key is an O(1)
+        INDEXED no-op (no duplicate row, no extra mirror line) that returns the EXISTING seq — the
+        content-addressed dedupe that scales an append-only history/CDC stream past billions of rows
+        without the O(n) rescan a file-based dedupe needs. Omit it for the legacy append-everything
+        behavior (NULL key, never matched)."""
         if not isinstance(record, dict):
             raise TypeError("AppendLog records must be JSON objects (dict)")
         body = self._canon(record)
         with self._lock:
+            if idem_key is not None:
+                row = self.conn.execute(
+                    "SELECT seq FROM records WHERE idem_key=? LIMIT 1", (idem_key,)).fetchone()
+                if row is not None:
+                    return int(row[0])          # idempotent: already present — no dup row, no mirror line
             cur = self.conn.execute(
-                "INSERT INTO records(generation, body_json) VALUES(?,?)", (self._generation, body))
+                "INSERT INTO records(generation, body_json, idem_key) VALUES(?,?,?)",
+                (self._generation, body, idem_key))
             seq = int(cur.lastrowid)
             # mirror AFTER the committed insert (isolation_level=None autocommits the INSERT): the db
             # is the source of truth, so a crash between the two leaves the db right and the mirror is

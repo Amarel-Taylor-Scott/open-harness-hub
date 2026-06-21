@@ -217,7 +217,7 @@ def _self_test() -> int:
         # LOOP honors max_iterations with a hermetic sleep.
         state2 = tdp / "loop-state.json"
         loop = run_loop(feeds_dir=_FEEDS_DIR, state_path=state2, staged_path=tdp / "loop-staged.jsonl",
-                        max_iterations=3, sleep_fn=lambda _s: None, now="t0")
+                        stop_file=tdp / "no-stop-file", max_iterations=3, sleep_fn=lambda _s: None, now="t0")
         ck("the loop runs run_once each iteration and stops at max_iterations",
            loop["iterations"] == 3 and loop["stopped_by"] == "max_iterations")
 

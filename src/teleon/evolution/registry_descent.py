@@ -8,8 +8,12 @@ Registries the converter now spans:
 
 Note: the model / context / harness / skill registries are the SELECTION SUBSTRATE a capability is bounded *against*
 (Teleon consumes them), not themselves items to bound — so the converter spans the capability/impl/task registries and
-selects from the others. Each attempt records before/after on the 5 descent axes + lineage to the registry. Offline +
-deterministic; the live cheap brain (GLM-5.2 / Kimi) proposes conversions in the fleet. serves_truth=false; Teleon-layer.
+SELECTS CONCRETE ROWS from the substrate. The model registry is now load-bearing: catalog_descent picks the cheapest
+fresh model from architecture/model_index.json (via substrate_selector, reusing the model-index selector) for every
+model_downgrade and records WHICH model in the attempt's substrate_ref — so deepening the model registry measurably
+changes the descent (a cheaper fresh model => a larger saving). Each attempt records before/after on the 5 descent axes
++ lineage to the registry + the substrate row. Offline + deterministic; the live cheap brain (GLM-5.2 / Kimi) proposes
+conversions in the fleet. serves_truth=false; Teleon-layer.
 """
 from __future__ import annotations
 

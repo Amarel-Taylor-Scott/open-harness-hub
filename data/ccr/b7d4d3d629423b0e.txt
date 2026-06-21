@@ -1,0 +1,38 @@
+MODULE src/teleon/evolution/descent_attempt_store.py
+## API signatures
+```python
+"""src.teleon.evolution.descent_attempt_store — the BRAIN + data store for EVERY descent/distillation attempt."""
+AXES = ...
+OUTCOMES = ...
+_SUCCESS = ...
+class DescentAttempt:
+    def attempt_id(self) -> str
+def _reward(before: dict, after: dict) -> dict
+    # Computed deltas (the training reward signal) — derived GENERICALLY from the canonical axis directions, so a new
+class DescentAttemptStore:
+    # Append-only JSONL store of descent attempts; idempotent by attempt_id; lossless (keeps negatives).
+    def __init__(self, path: str | Path)
+    def _open(self)
+        # Open the append-only store behind the JSONL durability contract: SQLite-WAL primary + a
+    def all(self) -> list[dict]
+    def append(self, attempt: DescentAttempt) -> dict
+        # Append an attempt; IDEMPOTENT by content-hash attempt_id — an O(1) INDEXED dedupe (no O(n)
+    def training_examples(self) -> list[dict]
+        # The supervised corpus for a descent-policy model: features = the before-state, label = the strategy tried,
+    def stats(self) -> dict
+        # Per-strategy success rate + mean cost saved — the meta-learner's aggregate readout (computed, not typed).
+    def best_strategy_for(self, before: dict) -> str | None
+        # The meta-learner readout: among SUCCESSFUL attempts on units that started near this before-state, the
+```
+## intra-module call edges
+src.teleon.evolution.descent_attempt_store.all -> src.teleon.evolution.descent_attempt_store.DescentAttemptStore.all
+src.teleon.evolution.descent_attempt_store.all -> src.teleon.evolution.descent_attempt_store.DescentAttemptStore._open
+src.teleon.evolution.descent_attempt_store.append -> src.teleon.evolution.descent_attempt_store.DescentAttempt.attempt_id
+src.teleon.evolution.descent_attempt_store.append -> src.teleon.evolution.descent_attempt_store._reward
+src.teleon.evolution.descent_attempt_store.append -> src.teleon.evolution.descent_attempt_store.DescentAttemptStore.append
+src.teleon.evolution.descent_attempt_store.append -> src.teleon.evolution.descent_attempt_store.DescentAttemptStore._open
+src.teleon.evolution.descent_attempt_store.training_examples -> src.teleon.evolution.descent_attempt_store.DescentAttemptStore.all
+src.teleon.evolution.descent_attempt_store.training_examples -> src.teleon.evolution.descent_attempt_store.DescentAttemptStore.append
+src.teleon.evolution.descent_attempt_store.stats -> src.teleon.evolution.descent_attempt_store.DescentAttemptStore.all
+src.teleon.evolution.descent_attempt_store.best_strategy_for -> src.teleon.evolution.descent_attempt_store.DescentAttemptStore.all
+src.teleon.evolution.descent_attempt_store.best_strategy_for -> src.teleon.evolution.descent_attempt_store.DescentAttemptStore.append

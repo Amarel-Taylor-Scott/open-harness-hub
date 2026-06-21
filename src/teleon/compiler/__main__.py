@@ -41,6 +41,7 @@ import importlib
 _c = importlib.import_module("src.teleon.compiler.compile")
 _e = importlib.import_module("src.teleon.compiler.emit")
 _f = importlib.import_module("src.teleon.compiler.fixtures")
+_lc = importlib.import_module("src.teleon.compiler.live_capability")  # live-state reader (split out of fixtures)
 _r = importlib.import_module("src.teleon.compiler.registry")  # the durable compiled-unit registry (deploy_topology analog)
 
 _PKG_DIR = Path(__file__).resolve().parent
@@ -84,7 +85,7 @@ def _compile_for_cli(capability_id: str, exec_target: str, *, now: str | None) -
     used_now = now or FIXED_NOW
     source = "fixture"
     try:
-        cap, receipt_refs = _f.load_live_capability(capability_id)
+        cap, receipt_refs = _lc.load_live_capability(capability_id)
         task_spec = {**_f.fixture_task_spec(), "capability_id": capability_id}
         source = "live runtime state"
     except (FileNotFoundError, KeyError):

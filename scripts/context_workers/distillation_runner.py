@@ -172,7 +172,7 @@ def _self_test() -> int:
 
         # LOOP honors max_iterations + the stop file (durable-runner contract), hermetic sleep.
         loop = run_loop(feeds_dir=_FEEDS_DIR, state_path=Path(td) / "loop.json", min_ceiling=0.99,
-                        max_iterations=2, sleep_fn=lambda _s: None, now="t0")
+                        stop_file=Path(td) / "no-stop-file", max_iterations=2, sleep_fn=lambda _s: None, now="t0")
         ck("the loop runs distillation passes and stops at max_iterations",
            loop["iterations"] == 2 and loop["stopped_by"] == "max_iterations")
         stop = Path(td) / "STOP"

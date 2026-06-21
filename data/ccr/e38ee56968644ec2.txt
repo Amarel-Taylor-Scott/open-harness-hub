@@ -1,0 +1,66 @@
+MODULE src/teleon/egress/traffic_graph.py
+## API signatures
+```python
+"""src.teleon.egress.traffic_graph — Teleon outbound traffic evidence graph."""
+_REPO = ...
+SCHEMA_VERSION = ...
+GRAPH_SCHEMA_VERSION = ...
+LOCAL_EGRESS_GRAPH_PROVIDER_ID = ...
+DEFAULT_DB_PATH = ...
+EGRESS_SERVES_TRUTH = ...
+HASH_PREFIX = ...
+_REDACTED = ...
+_SENSITIVE_QUERY_KEYS = ...
+_URL_RE = ...
+_KEY_PREFIXES = ...
+_DSN_RE = ...
+class TeleonEgressGraphRejected:
+    # Raised when an egress observation would violate the evidence graph contract.
+def _content_hash(value: Any) -> str
+def _looks_secret(value: str) -> bool
+def _redact_url(url: str) -> str
+    # Redact credentials and sensitive query parameters while preserving the evidence endpoint.
+def _redact_string(value: str) -> str
+def _deep_redact(value: Any) -> Any
+    # Redact secrets in nested request/response metadata and URL-looking strings.
+def _destination_parts(destination_url: str) -> dict[str, str]
+def _search_blob(observation: dict) -> str
+def _contains_raw_secret(observation: dict) -> bool
+def make_egress_observation(*, tenant_id: str, run_id: str, worker_id: str, worker_kind: str, query_text: str, operation: str, destination_url: str, started_at: str, completed_at: str, query_id: str | None=None, tool_name: str='', request: dict | None=None, response: dict | None=None, status: str='ok', trace_id: str='', parent_event_id: str='') -> dict
+    # Mint a governed outbound-traffic observation.
+def _validate_observation(observation: Any) -> list[str]
+def _graph_projection(observation: dict) -> tuple[list[dict], list[dict]]
+class LocalEgressGraph:
+    # Append-only local SQLite egress graph.
+    def __init__(self, db_path: str | None=None) -> None
+    def _init_schema(self) -> None
+    def _next_seq(self) -> int
+    def describe(self) -> dict
+    def append(self, observation: dict) -> dict
+    def get_event(self, event_id: str) -> dict | None
+    def search_events(self, *, tenant_id: str, text: str='', query_id: str='', worker_id: str='', destination_host: str='', limit: int=20) -> list[dict]
+        # Search redacted egress observations for one tenant.
+    def graph_for_query(self, *, tenant_id: str, query_id: str='', text: str='') -> dict
+        # Return the nodes/edges induced by a tenant-scoped query search.
+```
+## intra-module call edges
+src.teleon.egress.traffic_graph._redact_url -> src.teleon.egress.traffic_graph.LocalEgressGraph.append
+src.teleon.egress.traffic_graph._redact_url -> src.teleon.egress.traffic_graph._looks_secret
+src.teleon.egress.traffic_graph._redact_url -> src.teleon.egress.traffic_graph._looks_secret
+src.teleon.egress.traffic_graph._redact_url -> src.teleon.egress.traffic_graph._looks_secret
+src.teleon.egress.traffic_graph._redact_string -> src.teleon.egress.traffic_graph._looks_secret
+src.teleon.egress.traffic_graph._redact_string -> src.teleon.egress.traffic_graph._redact_url
+src.teleon.egress.traffic_graph._deep_redact -> src.teleon.egress.traffic_graph._redact_string
+src.teleon.egress.traffic_graph._destination_parts -> src.teleon.egress.traffic_graph._redact_url
+src.teleon.egress.traffic_graph._contains_raw_secret -> src.teleon.egress.traffic_graph._looks_secret
+src.teleon.egress.traffic_graph.make_egress_observation -> src.teleon.egress.traffic_graph._redact_string
+src.teleon.egress.traffic_graph.make_egress_observation -> src.teleon.egress.traffic_graph._deep_redact
+src.teleon.egress.traffic_graph.make_egress_observation -> src.teleon.egress.traffic_graph._deep_redact
+src.teleon.egress.traffic_graph.make_egress_observation -> src.teleon.egress.traffic_graph._destination_parts
+src.teleon.egress.traffic_graph.make_egress_observation -> src.teleon.egress.traffic_graph._content_hash
+src.teleon.egress.traffic_graph.make_egress_observation -> src.teleon.egress.traffic_graph._content_hash
+src.teleon.egress.traffic_graph.make_egress_observation -> src.teleon.egress.traffic_graph._contains_raw_secret
+src.teleon.egress.traffic_graph.make_egress_observation -> src.teleon.egress.traffic_graph.TeleonEgressGraphRejected
+src.teleon.egress.traffic_graph.make_egress_observation -> src.teleon.egress.traffic_graph._content_hash
+src.teleon.egress.traffic_graph.make_egress_observation -> src.teleon.egress.traffic_graph.TeleonEgressGraphRejected
+src.teleon.egress.traffic_graph._validate_observation -> src.teleon.egress.traffic_graph._contains_raw_secret

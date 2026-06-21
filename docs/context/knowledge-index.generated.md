@@ -1,0 +1,265 @@
+# KNOWLEDGE — PMF / strategy / research / design / docs (organized; generated catalog pages excluded)
+
+
+## docs/strategy/ (59 docs)
+  - docs/strategy/acquihire-roadmap.md — Acquihire Roadmap — turning Open Harness Hub into a fully working, acquirable startup: > **Audience & purpose.** A concrete, repo-grounded plan to take Open Harness Hub
+  - docs/strategy/acquisition-positioning.md — Acquisition Positioning — why a frontier lab buys Open Harness Hub: > The deliberate end-state: a clean, focused company whose assets **compound as base
+  - docs/strategy/architecture-swot-hosting-review.md — Architecture · SWOT · Problem→Solution · Hosting — the full review: Date 2026-06-11 (owner-requested). Companion to `docs/status/products-deep-dive.md` (dependency
+  - docs/strategy/assurance-toolkit.md — Assurance toolkit — the context-assurance machinery (the moat) + the next wedges: The canonical catalog of the **context-assurance toolkit**: the verification tools that prove a
+  - docs/strategy/backlog-status-2026-06-12.md — Backlog status — "all items working, fully wired, no orphaned paths" (2026-06-12): Status of every item in the platform 5W1H backlog (`platform-5w1h-analysis-2026-06-12.md`
+  - docs/strategy/baltor-adjacent-market-map.md — Baltor Adjacent Market Map: Updated: 2026-06-02
+  - docs/strategy/baltor-cloud-cost-pricing-pro-forma.md — Baltor Cloud Cost, Pricing, And Pro Forma Plan: As of 2026-05-31, Baltor should price and operate like context-control
+  - docs/strategy/baltor-gtm-fundraising-plan.md — Baltor GTM And Fundraising Plan: Baltor is verified context infrastructure for the world of AI.
+  - docs/strategy/baltor-medallion-context-positioning.md — Baltor Medallion Context Positioning: Date: 2026-06-02
+  - docs/strategy/beat-contextual-positioning.md — Beating Contextual AI — profile + positioning: Companion to [[competitor-contextual-ai.md]] (the engine/Agent-Composer analysis). This is the
+  - docs/strategy/building-safety-dev-countries-worked-example.md — Building-Safety Violation Detection in Developing-Country Contexts — Worked Example: <!--
+  - docs/strategy/capability-plane-backup-business-model.md — Capability Plane — the second business line (backup to the context engine), on one shared substrate: **Date:** 2026-06-06. **Status:** strategy / positioning (owner direction). **Owner intent:** build out the
+  - docs/strategy/ceo-review-2026-06-09.md — CEO Review — every node, edge, condition, promise (2026-06-09): Method: persona-recorded buyer journeys (6 archetypes, now 0 frictions on video), the full-repo
+  - docs/strategy/competitive-landscape-2026.md — Competitive Landscape 2026 — Four Camps, the Durable Edge, the Two Doors: > **Why this doc exists.** In 2026 the "context layer" stopped being our private thesis and
+  - docs/strategy/competitive-positioning-deep-dive.md — Competitive Positioning Deep-Dive — Compete & Integrate: Extends [`competitive-swot.md`](competitive-swot.md). For each player: what it is,
+  - docs/strategy/competitive-swot.md — Competitive SWOT & Landscape: Companion to [`product-market-monetization-brief.md`](product-market-monetization-brief.md).
+  - docs/strategy/competitor-contextual-ai.md — Competitor Deep-Dive: Contextual AI (Douwe Kiela, "RAG 2.0"): Status: net-new competitive intelligence (no prior Contextual / Kiela / LMUnit / RAG-2.0
+  - docs/strategy/context-enrichment-service.md — Baltor.ai — the Context Enrichment service (CEaaS) — product spec: > **Brand (2026-05-29, locked — [[brand-architecture.md]]):** this service is **Baltor.ai** (in prose:
+  - docs/strategy/context-layer-pmf.md — Context-layer PMF — Open Harness Hub on the consumption thesis: **The market the public tape just validated is exactly ours.** In the SNOW (Q1 FY27 product
+  - docs/strategy/corpus-acquisition-grid-spec.md — OHH Collection-Grid / Corpus-Acquisition Subsystem — Build Spec: <!--
+  - docs/strategy/design-bundle-review-2026-06-09.md — Design Bundle Review — full file-by-file (2026-06-09): Source: `https://api.anthropic.com/v1/design/h/_8PmBC6pX8y6qEMwN7AzMQ` (2.7 MB gzip, 317 files).
+  - docs/strategy/evaluation-methodology-and-rigor.md — Evaluation methodology and the rigor roadmap: The two-axis admission bar ([[north-stars]], [[two-axis-lift-gate]]) is the whole product thesis: a
+  - docs/strategy/execution-runbook-2026-05-28.md — OHH Execution Runbook — low-hanging fruit + parallel agent fleet: <!-- Companion to north-stars.md, external-research-brief-2026-05-28.md, corpus-acquisition-grid-spec.md,
+  - docs/strategy/executive-review-rubrics.md — Executive Review & Grading Rubrics: A full-power, multi-lens review of Open Harness Hub: eight C-suite perspectives,
+  - docs/strategy/external-research-brief-2026-05-28.md — Open Harness Hub — External Research Brief (2026-05-28): <!--
+  - docs/strategy/first-live-capability-sanctions-screening.md — First Live Capability — OFAC Sanctions Screening (the compliance wedge): > Status: SCOPE (2026-06-21). Acts on the review board's unanimous verdict (Claude + GLM-5.2 + Kimi-2.7,
+  - docs/strategy/gap-detection-screen-spec.md — Gap-detection screen — knowing a cell is a gap *before* you collect it: <!-- Transcribed from owner research (2026-05-28). Addendum to corpus-acquisition-grid-spec.md.
+  - docs/strategy/gtm-launch-guide.md — GTM Launch Guide: The public launch checklist lives in the parent brand site:
+  - docs/strategy/gtm-onepager-2026-06.md — GTM / Positioning One-Pager — June 2026: > **Status:** synthesis of the June 2026 external market review + the locked brand
+  - docs/strategy/hosting-decision-matrix.md — Hosting Decision Matrix — every lane, verified costs (research date 2026-06-11): Six parallel adversarial research passes (Fly deep-dive · managed scale-to-zero · VPS/k3s ·
+  - docs/strategy/inference-time-capability-watch.md — Inference-Time Capability Watch — two 2026 results vs. the lift+governance thesis: > **Purpose.** A skeptical, precise read of two results the owner flagged in 2026,
+  - docs/strategy/measured-lift-head-to-head.md — Measured-lift head-to-head — the protocol that proves OHH's #1 differentiator: Status: methodology + reproducible harness spec, written 2026-05-29. **No live numbers yet** —
+  - docs/strategy/monetization-mechanisms.md — Monetization Mechanisms — what an export can't freeze: > **The principle.** The export is the commodity — a technical user *should* be able
+  - docs/strategy/north-stars.md — North Stars — Open Harness Hub: The canonical master goal is `docs/codex/master-goal.md`. This file crystallizes
+  - docs/strategy/open-core-line-and-learn-from-contextual.md — The free-vs-paid line + learn-from-Contextual (funnel → moat): The explicit open-core boundary so the **funnel-to-moat handoff is concrete and we never accidentally
+  - docs/strategy/open-core-model.md — Open-Core Model — what "Open" in Open Harness Hub means: > **Name (current):** **Open Harness Hub** / `openharnesshub.com`. We keep the
+  - docs/strategy/oracle-corpus-and-tooling-map.md — Oracle-corpus & tooling map — the build/seed checklist for the commons: The concrete reference for the **verified-corpus commons** wedge ([[beat-contextual-positioning.md]]):
+  - docs/strategy/platform-5w1h-analysis-2026-06-12.md — Platform 5W1H analysis — surfaces, functionality, pipelines (2026-06-12): A who/what/where/when/why/how pass over every surface, function, and pipeline, each
+  - docs/strategy/pmf-swot-2026-06-20.md — Product-market-fit SWOT — 2026-06-20 (news-grounded): > A "further" PMF SWOT (extends the prior per-service SWOT) for the **open, provider-neutral context-ASSURANCE**
+  - docs/strategy/positioning-v2.md — Positioning v2 (canonical) — name · value prop · competitive stance: > **Naming is now locked** ([[brand-architecture.md]], 2026-05-29): the paid SaaS this doc calls
+  - docs/strategy/product-market-monetization-brief.md — Product, Market, and Monetization Brief: Open Harness Hub is a registry and generation platform for reusable AI pipeline
+  - docs/strategy/recommended-stack-and-cloud.md — Recommended stack (cost-aware) + the cloud decision: The single recommended technology set for the shared backend, each layer with **the pick**, **the
+  - docs/strategy/skillsbench-alignment.md — SkillsBench / Skill Lift alignment: **SkillsBench is the field's external proof of the bar we built the registry around.**
+  - docs/strategy/standards-conformance-audit.md — Standards-conformance audit: title: Standards-conformance audit
+  - docs/strategy/strategic-context.md — Strategic context + codebase reconciliation (2026-05-29): The owner's canonical strategic framing, **reconciled with what's actually built**. This doc records the
+  - docs/strategy/teleon-baltor-openharnesshub-portfolio.md — Portfolio architecture — Teleon · Baltor · Open*Hubs (under AI Done Right): **Status:** OWNER-DECIDED 2026-06-06. This is the canonical brand + dependency architecture. It supersedes the
+  - docs/strategy/teleon-git-bridge-and-capability-implementations-2026-06-20.md — Teleon as a governed abstraction over git + a capability's many implementations (2026-06-20): > Two linked brain-blasts, each now backed by a working, proof-gated primitive. The connective thesis: **meet
+  - docs/strategy/teleon-github-bridge-deep-2026-06-20.md — Teleon × git/GitHub — the bridge, explored from every angle (2026-06-20): > Deep exploration of the brain-blast: **a Teleon capability unit IS a git repo; meet teams where their code
+  - docs/strategy/teleon-go-live-readiness-and-sprints-2026-06.md — Teleon/Baltor — go-live readiness + sprint plan (2026-06): **Status:** grounded in `scripts/check_teleon_go_live_readiness.py` (run it for the live snapshot). Honest by
+  - docs/strategy/teleon-naming-and-domain.md — Teleon — Naming & Domain (LOCKED 2026-06-06): **Status:** OWNER-DECIDED 2026-06-06; **domain `teleon.dev` is owned (purchased).** This is the single source
+  - docs/strategy/teleon-self-improving-runtime-vision.md — Teleon — the Self-Improving Capability Runtime (the definitive account): **Status:** synthesis / vision reconciliation, 2026-06-11. READ-ONLY sweep of all
+  - docs/strategy/teleon-unbounded-to-bounded.md — From unbounded & inefficient → most-bounded & most-efficient: > The core motion of Teleon, formalized. Single-source thesis for the deck, the site, and sales — consistent
+  - docs/strategy/two-services-shared-infrastructure.md — Two services, one shared infrastructure plane (decision record): > **Brand note (2026-05-29, locked — [[brand-architecture.md]]):** Service 2 below — the **Context Enrichment
+  - docs/strategy/vertical-use-case-catalog-2026-06-12.md — Vertical use-case catalog — capability-gap negative space (2026-06-12): Twenty-nine vertical use cases across three domain clusters, each built for the **negative
+  - docs/strategy/yc-application-draft-2026-06.md — YC application draft — 2026-06 (OWNER-GATED: review every line before submission): DRAFT ONLY. Outward-facing per the change-verification contract: the owner edits founder
+  - docs/strategy/yc-competitive-landscape-deterministic-ai-2026-06.md — Competitive landscape: the "deterministic AI" wave (2026-06) and where Teleon/Baltor actually wins: **Status:** web-researched 2026-06-19; honest assessment for the YC narrative. Companion to
+  - docs/strategy/yc-context-landscape-2026-06.md — YC Context & Agent-Infra Landscape — June 2026 (verified): Four adversarial research passes (2026-06-11): Kaelio/ktx deep-dive · YC "context for AI"
+  - docs/strategy/yc-master-current-state-business-plan-and-pitch.md — Baltor / AI Done Right (founding thesis: Context is Everything) — YC Master: Current State · Scale · Business Plan · Pitch: **Status:** consolidating master (additive). **Date:** 2026-06-06.
+  - docs/strategy/yc-owner-ratification-proposals-2026-06-14.md — YC Owner-Ratification Proposals - 2026-06-14: Status: **A1, A2, A3 RATIFIED by the owner 2026-06-18** and applied. A1 — the portfolio applies led by
+
+## docs/concepts/ (14 docs)
+  - docs/concepts/capability-valleys.md — Capability Valleys — a theory of *defensible* LLM gaps: This is the foundational "where do we build?" document for Open Harness Hub. A
+  - docs/concepts/component-taxonomy-and-stages.md — Component Taxonomy & Pipeline Stages (canonical): The single, consistent reference for **what every component type is** and **where
+  - docs/concepts/context-layer-and-the-desk.md — The context layer — the analyst's desk (canonical explainer): The product story in one image. **The model is an analyst at a desk. The context window is the
+  - docs/concepts/databases.md — Database representations: Every component in the catalog persists in four representative database
+  - docs/concepts/layers.md — Layers & primitives: Every component lives at one of four layers. Lower layers are the
+  - docs/concepts/model-query-template.md — The model-query template (canonical): A model query is **not** a string assembled once at the end — it is a **structured template of
+  - docs/concepts/multimodal.md — Multimodal pipelines: Image, audio, music, video, document, and 3D pipelines compose the
+  - docs/concepts/overview.md — Overview: The Open Harness Hub is a **specification + content catalog + static
+  - docs/concepts/playground.md — Playground & sample runs: Pipelines should be **viewable** and **runnable** with sample data so
+  - docs/concepts/pre-post-api.md — Pre-API and post-API processes: The hub recognizes a comprehensive taxonomy of pre/post-API processes
+  - docs/concepts/prediction-error-gated-context.md — Context efficiency from model heuristics + consumer behavior — the design space: Open-ended question (owner, 2026-06-12): *can we make context compression and
+  - docs/concepts/recipe-component-map.md — Recipe → component map (canonical, no placeholders): Every step in the governed-model-call recipe (`scripts/showcase/builder.py::harness_recipe`)
+  - docs/concepts/retrieval-and-prompt-taxonomy.md — Retrieval & Prompt-Engineering Taxonomy (canonical): The decision-useful menu of **retrieval** and **prompt-engineering** components,
+  - docs/concepts/taxonomy.md — Taxonomy: The canonical taxonomy is in [`taxonomy/SPEC.md`](../reference/spec.md).
+
+## docs/research/ (52 docs)
+  - docs/research/agent-governance-landscape-2026-06-13.md — Agent-governance & context-layer landscape — 2026-06-13 (web sweep): Fresh competitive scan (live web search, 2026-06-13) to update the YC positioning. **Material change
+  - docs/research/agent-skills-and-app-integration-2026-06.md — Agent Skills catalogs & app-integration/auth layer — research (2026-06): **Date:** 2026-06-06. **Owner-supplied, verify-first.** Subject: `membranedev/application-skills` and the
+  - docs/research/agent-tooling-and-doc-parsing-2026-06.md — Agent tooling & document-parsing batch — research (2026-06): **Date:** 2026-06-06. **Owner-supplied, verify-first** (sources cited; "changes everything / greatest minds"
+  - docs/research/agent-workflow-system-reference-intake.md — Agent Workflow System Reference Intake: Open Harness Hub should study mature agent and workflow ecosystems as reference sources for workflow shapes, skill formats, tool permissioning, memory designs, hub/marketplace patterns, and deployment models.
+  - docs/research/agentic-tools-landscape.md — Agentic / browser / computer-use tools — candidates for ContextOps (owner research 2026-06-05): Reference for [[contextops-verification-foundry]]: the BOUNDED agents ContextOps commissions to DISCOVER
+  - docs/research/antigravity-ingest.md — Antigravity 2.0 ingestion plan: > Researched via Playwright (the antigravity.google site is heavily
+  - docs/research/baltor-worker-orchestration-research.md — Baltor Worker And Orchestration Research: Date: 2026-05-31
+  - docs/research/candidate-primitive-promotion-scoring.md — Candidate Primitive Promotion Scoring: Object factories should not promote every generated object. A candidate primitive needs enough usefulness, demand, verifiability, deployment value, and capability-gap value to justify curation. It also needs acceptable p
+  - docs/research/capability-binding-and-ifc-landscape.md — Capability Binding & Infrastructure-from-Code Landscape: **Question this answers:** *Are there tools that do purpose / capability / contract-defined programming that completely abstracts out cloud-function and K8s-worker programming?* — i.e. the **infrastructure-from-code / wo
+  - docs/research/capability-gap-discovery-browsers.md — Capability gap discovery browsers: This internal workflow uses multiple browser/search agents to find areas where out-of-box LLMs are weak, but structured pipelines can create a meaningful capability lift.
+  - docs/research/chinese-lowcost-llm-endpoints.md — Cheaper Chinese / China-adjacent LLM endpoints — a GOVERNED LOW-COST PAID lane: Status: research + governed catalog. Companion registry:
+  - docs/research/claude-code-skills.md — Overlap with Claude Code skills (and the Agent Skills open standard): > The short answer: **yes, there's overlap, but the hub is a superset and
+  - docs/research/community-moderation-knowledge-objects.md — Community Moderation Knowledge Objects: Social platforms, group chats, forums, marketplaces, creator communities, and
+  - docs/research/context-compression-tools.md — Context Compression Tools — research for the Baltor **Compress** module: **Date:** 2026-06-06. **Owner request:** "research compression tools like Headroom; we have not done
+  - docs/research/context-engineering-tool-landscape.md — Context-Engineering Tool Landscape (governed CANDIDATES): > **Status: research candidates, never adopted runtime.** The tools below are a *due-diligence
+  - docs/research/context-layer-landscape.md — Context-layer landscape & Baltor's wedge (owner research 2026-06-05): **Thesis:** Baltor should NOT be another memory product / vector DB / GraphRAG framework / generic
+  - docs/research/context-layer-openness-2026-06-19.md — Context-layer openness: OKF + the hyperscaler knowledge/metadata layers — 2026-06-19: > Deep-research sweep (102-agent harness, adversarially verified, all findings `high` confidence) for
+  - docs/research/cross-domain-use-case-seed-surfaces.md — Cross-Domain Use Case Seed Surfaces: The registry needs broad seed surfaces that can generate many practical
+  - docs/research/deeprepo-github-intake-2026-06-18.md — DeepRepo GitHub intake + reference-architecture consideration — 2026-06-18: > **Source.** The owner relayed GitHub repos posted to the "DeepRepo" Facebook feed
+  - docs/research/edge-ai-semantic-gap-guardrail-components.md — Edge AI Semantic Gap Guardrail Components: Regex-only guardrails create a semantic gap: they inspect the visible string, while the risky instruction may live inside an encoded, nested, or transformed segment. This is especially important for edge AI because mobil
+  - docs/research/enterprise-context-database-phases.md — Enterprise Context Databases: Build Phases And Patterns: Updated: 2026-06-01
+  - docs/research/esoteric-industry-source-surfaces.md — Esoteric Industry Source Surfaces: Many valuable primitives will come from industries where public LLM training
+  - docs/research/factory-scale-briefing.md — Open Harness Hub — Factory + Scale Briefing: > **Use this document as cold-start context for a Claude ideation session.**
+  - docs/research/github-hosting.md — GitHub hosting plan: A concrete, end-to-end plan for hosting the Open Harness Hub on GitHub
+  - docs/research/github-repo-intel-2026-06-12.md — GitHub repo intel — 2026-06-12 intake batch: Eleven repos run through the governed intake engine (`scripts/repo_intel/engine.py`;
+  - docs/research/github-signal-intake-2026-06-20.md — GitHub Signal intake — 2026-06-20: > Owner-shared repo list, reviewed live (WebFetch/WebSearch) as **governed candidates**. The GitHub Signal
+  - docs/research/inspiration-bibliography.md — Inspiration bibliography — the works that shaped the platform: **Warrant: corroboration — the cited works themselves.** This is a *curated* bibliography, not a
+  - docs/research/leaf-convergence-and-content-addressed-sync.md — Leaf-convergence & content-addressed sync — systems-design research: **Date:** 2026-06-06. **Owner-supplied, verify-first** (GitHub repos cited below; none adopted as runtime —
+  - docs/research/masfactory.md — MASFactory — verified research + Baltor positioning (2026-06-04): - **Repo:** https://github.com/BUPT-GAMMA/MASFactory (BUPT GAMMA Lab — a known graph-ML group).
+  - docs/research/metaheuristic-optimization-mealpy.md — Research triage — mealpy (metaheuristic optimization): Source: https://github.com/thieu1995/mealpy · MIT · ~1.2k★ · 233 gradient-free
+  - docs/research/moat-cluster-deep-dives-2026-06-12.md — Moat-cluster deep dives — verification-adjacent repos (2026-06-12): Five web-grounded strategic deep dives (live-fetched from the repos, not training knowledge)
+  - docs/research/occupation-to-procedure-objects.md — Occupation Descriptions to Procedure Objects: Job descriptions are dense sources of reusable pipeline primitives. They describe what workers do, what questions they answer, what facts they use, what evidence they collect, what tools they operate, what policies const
+  - docs/research/openai-ona-acquisition-2026-06-11.md — OpenAI acquires Ona (ex-Gitpod) — what it proves and threatens for Teleon: Research date 2026-06-12 (announcement 2026-06-11). Sources: the OpenAI announcement
+  - docs/research/openhubs-backend-powering.md — Powering the Open\*Hubs Backends — Governed OSS Candidate Catalog: **Question:** which open-source repos could power the BACKEND COMPONENTS of the Open\*Hubs websites
+  - docs/research/primitive-source-surface-map.md — Primitive source surface map: This map defines the surfaces to scan routinely when building a large primitive database. The target shape is a searchable, embeddable, tagged corpus with more than one million primitives across tools, rules, rubrics, da
+  - docs/research/public-source-blueprint-catalog.md — Public Source Blueprint Catalog: Esoteric industry primitives should start with source blueprints, not raw
+  - docs/research/repo-wiki-context-tools.md — Repo Wiki And Code Context Tools: Updated: 2026-06-01
+  - docs/research/repo2rlenv-and-rl-env-synthesis.md — Repo2RLEnv + RL-environment synthesis tools — fit assessment: **Question (owner, 2026-06-08):** is `huggingface/Repo2RLEnv` and similar repos helpful to our companies/infra?
+  - docs/research/skillclaw-skill-to-deterministic-tool.md — SkillClaw -> the GOVERNED "skill -> deterministic tool" compiler (research infra): > **Status: research_candidate. Not production infra.** SkillClaw is MIT-licensed and presented as
+  - docs/research/specialized-model-signal-surfaces.md — Specialized Model Signal Surfaces: Task-specific models are high-value source signals for Open Harness Hub because a publisher has already spent time collecting data, defining labels, choosing metrics, and validating a narrow capability. The model weights
+  - docs/research/standards-landscape.md — Standards landscape & alignment plan: > Draft research synthesis. Maps the Open Harness Hub taxonomy against
+  - docs/research/standards-regulatory-source-map.md — Standards and Regulatory Source Map: Standards, regulatory, and public enforcement sources are high-value inputs for the million-object registry because they contain structured procedures, controls, definitions, exceptions, deadlines, forms, evidence requir
+  - docs/research/stateful-swarms-irys.md — Stateful Swarms (Irys) and the persistent-blackboard / agent-memory landscape: **Verified via web research, June 2026.** Is this relevant, and how does it fit our portfolio? **Yes — strongly
+  - docs/research/supermemory.md — Supermemory — positioning vs Baltor (verified 2026-06-05): Source: `_reference/supermemory` (cloned full history, HEAD ad5734cd 2026-06-05; MIT). Repo:
+  - docs/research/task-marketplace-archetype-intake.md — Task Marketplace Archetype Intake: Hiring and task marketplaces are useful demand sensors because they expose recurring work people already pay humans to complete. The hub should mine them for reusable task archetypes, workflow steps, acceptance criteria,
+  - docs/research/teleon-adjacent-landscape-deep.md — Teleon-adjacent landscape — deep dive (capability-slot + validation-risk, 2026-06): **Companion to** [`architecture/teleon_runtime_landscape.json`](../../architecture/teleon_runtime_landscape.json)
+  - docs/research/theory-batch-governance-bridge.md — Theory Batch Governance Bridge: Theory-derived component candidates need the same governance boundary as daily production rows. The bridge reads a theory batch summary plus its staged load-audit summary, then emits:
+  - docs/research/theory-local-postgres-smoke.md — Theory Local Postgres Smoke: The theory local Postgres smoke plan is the operator-review bridge from staged JSONL and generated SQL to committed local database evidence. It does not execute Docker or `psql`; it emits commands and output paths so a h
+  - docs/research/theory-to-component-factory.md — Theory To Component Factory: Technical theories, postmortems, and architecture critiques should not remain isolated prose. When they describe a recurring capability gap, the factory can convert them into component candidates that are searchable, rev
+  - docs/research/theory-vector-readiness-to-pgvector.md — Theory Vector Readiness To Pgvector: Theory-derived components should not become tenant-visible search results just because they were generated. The vector path has four distinct states:
+  - docs/research/tokentamer-context-compression.md — TokenTamer — context compression for the inference plane (fork research): **Date:** 2026-06-08. **Owner request:** "Research TokenTamer and design a GOVERNED context-compression
+  - docs/research/weekly-github-signal-watch.md — Weekly GitHub Signal Watch: _generated 2026-06-06T00:00:00Z · data confidence: owner_provided_unverified_
+
+## docs/design/ (9 docs)
+  - docs/design/claude-design-handoff.md — Claude Design Handoff — pages, routes, marketing copy, and design needs: _Snapshot: 2026-06-07. A self-contained brief for designing the portfolio surfaces with the **Claude Design**
+  - docs/design/claude-design-prompt.md — Claude Design Prompt — Open Harness Hub UI (explore multiple directions): > **How to use.** Paste this whole file into Claude with design/artifact generation.
+  - docs/design/openharness-claude-design/FAMILY-README.md — AI Done Right - Brand Family Prototype Summary: This tracked design note records the current AI Done Right family handoff. The
+  - docs/design/openharness-claude-design/HANDOFF.md — AI Done Right - Tracked Design Handoff: This tracked handoff supersedes the older three-brand OpenHarness prototype
+  - docs/design/openharness-claude-design/MARKETING.md — Marketing & Messaging — AI Done Right (founding thesis: ContextIsEverything): Canonical positioning and copy for the brand family. Source of truth for product/brand
+  - docs/design/openharness-claude-design/shared/README.md — shared/ — design system + brand registry: The single foundation all three sites consume. **Change something here and every site
+  - docs/design/openharness-zip-integration-review.md — OpenHarness Zip Integration Review: Date: 2026-05-31
+  - docs/design/product-ui-and-design-system.md — Open Harness Hub — Product Pages & Design System: > **What this file is.** A single, self-contained design brief you can paste into
+  - docs/design/value-propositions.md — Value propositions — what every surface must say: The single source of truth for the product's promise. The `/polish` loop pulls from this to
+
+## docs/use-cases/ (22 docs)
+  - docs/use-cases/README.md — Use cases — where the capability-lift bar actually bites: This is the **strategy-level index** to the use-case library: who buys, what
+  - docs/use-cases/aml-screening.md — Use case 6 - AML transaction review: > Sanctions-first transaction review with FATF typology matches and SAR-style narrative drafts.
+  - docs/use-cases/baltor-public-source-demo-catalog.md — Baltor Public Source Demo Catalog: Date: 2026-06-04
+  - docs/use-cases/cfpb-consumer-complaints-context-demo.md — CFPB Consumer Complaints Context Demo: Date: 2026-06-04
+  - docs/use-cases/clinical-decision-support.md — Use case 5 - Clinical decision support: > Differential diagnosis with red-flag escalation, cited guidelines, and ICD-10 lookups. PHI-safe.
+  - docs/use-cases/code-review.md — Use case 2 - Code review with security: > Review a diff. Get file:line comments, OWASP/CWE/MITRE citations, and a numeric risk score.
+  - docs/use-cases/cost-aware-pipeline-generation.md — Cost-aware pipeline generation scenarios: These scenarios test whether the hub can turn a natural-language request into a safe, cost-bounded pipeline plan. They are deliberately written as synthetic request prompts, not as real moderation cases.
+  - docs/use-cases/customer-support.md — Use case 4 - Customer-support email triage + draft: > Classify intent, retrieve account context, draft a reply, escalate sensitive issues.
+  - docs/use-cases/deep-research.md — Use case 3 - Deep research with citations: > The "Perplexity / OpenAI deep research" pattern. Multi-source web search with verified citations.
+  - docs/use-cases/document-to-knowledge-graph.md — Use case: Document to knowledge graph (nodes + edges with source anchors): Extract a typed, source-anchored knowledge graph from any structured document. Contract becomes clauses + cross-references. SOP becomes steps + dependencies. Regulatory framework becomes obligations + applies-to edges. S
+  - docs/use-cases/esg-supply-chain-due-diligence.md — Use case: ESG / Supply-Chain Due Diligence (CSDDD + CSRD + 12 jurisdictions): > "We need to audit our deep-tier supplier networks (tier 3 and tier
+  - docs/use-cases/human-trafficking-ugc-detection.md — Use case: Human-trafficking signal triage on UGC platforms (Trust + Safety): A defensive Trust + Safety triage pipeline that reviews user-generated content (job posts, classifieds, escort/massage directories, immigration forums, dating-app messages) for human-trafficking **recruitment** and **sol
+  - docs/use-cases/illicit-content-detection.md — Use case: Illicit content + platform moderation (Trust + Safety): A defensive Trust + Safety triage pipeline that applies a documented platform policy to user-generated content. Surfaces illicit + harmful patterns, routes CSAM suspicion to a human queue + NCMEC referral packet without 
+  - docs/use-cases/image-gen.md — Use case 7 - Brand-safe image generation: > Style-RAG + lens-physics + guard rules + output-safety screened image generation.
+  - docs/use-cases/index.md — Use cases — what you can build today: Eight one-page recipes that show how to compose the hub's primitives
+  - docs/use-cases/llm-pipeline-saas-blueprint.md — LLM pipeline-as-a-service blueprint: This product direction turns Open Harness Hub into a SaaS that helps a user describe what they want to accomplish with LLMs inside their own hosting environment, then returns deployable pipeline options with cost, risk, 
+  - docs/use-cases/llm-red-team.md — Use case 8 - LLM red-teaming: > Prompt-injection + jailbreak + safety probe battery against any LLM endpoint.
+  - docs/use-cases/local-first-research-wiki.md — Use case - Local-first research wiki for PDFs (CiteMind shape): Turn a single PDF (paper, textbook chapter, technical report, regulatory framework) into a **persistent local study workspace**:
+  - docs/use-cases/local-sentence-to-pipeline-demo.md — Local Sentence-To-Pipeline Demo: The simplest demo should be a downloadable local Python app.
+  - docs/use-cases/more-ideas.md — More use cases - ideation roundup: > Grounded in production-repo ports + landscape research, plus
+  - docs/use-cases/qa-on-documents.md — Use case 1 - Internal Q&A on documents: > Upload PDFs, ask questions, get cited answers.
+  - docs/use-cases/refugee-bureaucracy-translation.md — Use case: Refugee bureaucracy translation (Bill_info AI integration): > "A Ukrainian refugee in Germany photographs a German payment letter
+
+## docs/comparison/ (3 docs)
+  - docs/comparison/google-agent-builder.md — Google Agent Builder comparison: Google Vertex AI Agent Builder is a strong managed enterprise platform for building, deploying, scaling, and governing AI agents on Google Cloud. Google positions it around three pillars: build, scale, and govern. Its cu
+  - docs/comparison/peer-registries.md — Peer registries - what already exists, what this hub adds: A side-by-side of the LLM-ecosystem registries Hassan mentioned
+  - docs/comparison/workflow-builders.md — Workflow builder inspiration: The primitive platform should learn from mature workflow systems, not only from LLM agent builders. A useful target is:
+
+## docs/sales/ (2 docs)
+  - docs/sales/fragile-context-audit-offers.md — Fragile Context Audit — offer catalogue: > GENERATED from `architecture/fragile_context_atlas.json` by `python3 scripts/check_fragile_context_audit_offers.py --emit`. Do not hand-edit — edit the atlas and regenerate; the proof asserts this file is in lock-step 
+  - docs/sales/public-claim-and-engagement-policy.md — Sales — public-claim + engagement policy (the safety gate): The sales/lead-proof system is **proof-first selling**: Open\*Hub attracts → diagnostics prove → evidence packs
+
+## docs/portfolio/ (6 docs)
+  - docs/portfolio/brand-boundaries.md — Portfolio brand boundaries (websites): Proven by `scripts/check_portfolio_brand_boundaries.py`. Each page carries delimited `<!--IDENTITY-->`
+  - docs/portfolio/infrastructure-topology.md — Portfolio infrastructure topology — close, but separable: **Status:** owner-directed 2026-06-06; parent brand updated 2026-06-09. Canonical configs: `architecture/company_portfolio_map.json` (the
+  - docs/portfolio/local-preview-not-production.md — Local preview — not production: These portfolio sites are **static local previews**, not production hosting.
+  - docs/portfolio/trycloudflare-portfolio-launch.md — TryCloudflare portfolio launch: `scripts/launch_portfolio_trycloudflare.py` runs one `cloudflared tunnel --url http://127.0.0.1:<port>` per
+  - docs/portfolio/website-rubrics.md — Portfolio website rubrics: Seven rubrics (`rubrics/portfolio/*.json`), each item: rubric_id · description · weight · blocker ·
+  - docs/portfolio/websites.md — Portfolio websites - build, serve, launch: Rubric-gated static launch sites (one source: `scripts/portfolio_lib.py`).
+
+## docs/standards/ (15 docs)
+  - docs/standards/DESIGN.md — Baltor — DESIGN.md: A single, droppable design-system reference (schema from `VoltAgent/awesome-design-md`, ~87.5k★ —
+  - docs/standards/README.md — Component standards + templates: This is the **single source** for how the Baltor Context Engine builds new components and subcomponents. A
+  - docs/standards/adapter-contract.md — Adapter contract (swappable backend infra): Baltor domain code depends on a **capability** (a `*Provider` port), never on a vendor SDK. Each
+  - docs/standards/capability-task-architecture-doctrine.md — CapabilityTask Architecture Doctrine — intent-native, eval-gated, self-adaptive compute: **Date:** 2026-06-06. **Status:** doctrine (the architectural constitution behind CTS + PurposeTask).
+  - docs/standards/configuration-standards.md — Configuration standards (the shape every config must satisfy): Config is the seam where operators tune the system **without editing code** — so config drift is as
+  - docs/standards/design-principles.md — Baltor design principles: The non-negotiables every change honors. Enforced in practice by the proof-per-increment
+  - docs/standards/open-capability-task-specification.md — Capability Task Specification (CTS) — a portable standard for autonomous-but-bounded cloud work: **Date:** 2026-06-06. **Status:** vision / draft standard (v0.1). **Owner intent:** create an **industry
+  - docs/standards/pattern-system.md — The Pattern System: > How a one-off becomes a governed standard in the Baltor Context Engine monorepo, and how the
+  - docs/standards/routine-library.md — Routine library (the blessed way to do X, and where it's already done): The routine library (`architecture/routine_library.json`) is the canonical inventory of **reusable
+  - docs/standards/self-reorientation.md — Self-reorientation protocol: Run at the start of every working pass (especially a fresh context window). It is why the
+  - docs/standards/standards-api.md — Standards API + `/standards` page: The Standards API is a **projection-only** read surface over the standards-system truth files. It never
+  - docs/standards/standards-linter.md — Standards linter (`check_new_code_uses_standards`): The standards linter is the forcing function that keeps new code shaped like the patterns it
+  - docs/standards/table-shape-guidelines.md — Table-shape guidelines (the storage rule): Canonical state is **NOT** text files. Text files are for docs, schemas, skills, prompts,
+  - docs/standards/template-authoring.md — Authoring a component template: A template lets the factory generate a new component that already conforms to a standard. This page is the
+  - docs/standards/waivers.md — Pattern waivers (the time-boxed exceptions): The standards linter is strict by design. When a real file legitimately deviates from a pattern —
+
+## docs/status/ (24 docs)
+  - docs/status/baltor-current-state-and-opportunities.md — Baltor Current State and Opportunities: > Generated by `scripts/report_current_state.py` from `architecture/section_maturity_matrix.json`,
+  - docs/status/current-state.md — Current State (summary): See [baltor-current-state-and-opportunities.md](baltor-current-state-and-opportunities.md).
+  - docs/status/full-proof-suite-run-2026-06-11.md — Full Proof-Suite Run — 2026-06-11: Run-don't-read execution of **every** `scripts/check_*.py` self-test plus the catalog/index/law
+  - docs/status/full-verification-sweep-2026-06-11.md — Full Verification Sweep — 2026-06-11: Adversarial, run-don't-read verification backstop for the long session. Method: ran every
+  - docs/status/multi-source-regression.md — Multi-source regression status: The multi-source regression proves that **every supported source TYPE** walks the same
+  - docs/status/next-implementation-plan.md — Next Implementation Plan: - **OPP-api-serve** (api_runtime, M, risk medium) — Expose POST /api/context/serve returning ContextResponse.v1. Done when: POST /api/context/serve returns schema-valid ContextResponse.v1
+  - docs/status/openharnesshub-investor-demo.md — OpenHarnessHub.io — investor demo (public URL, fully wired): Status 2026-06-10: **live and verified end-to-end through the public URL.**
+  - docs/status/opportunities.md — Opportunities: From `architecture/opportunities.json`.
+  - docs/status/p1-baltor-gateway-hardening.md — P1 — Baltor Context Gateway Hardening: **Warrant:** `docs/architecture/capability-rubric-and-deep-dive-2026-06-11.md` (code-verified deep dive).
+  - docs/status/p1-sqlite-state-migration.md — P1 — SQLite (WAL) state engines for the three shared local services: Status: **DONE + verified** (2026-06-11). Owner of this work: the agent that owns
+  - docs/status/p1-teleon-async-runs.md — P1 — Async Teleon runs: **File:** `scripts/teleon_local_runtime.py` (the local Teleon capability runtime).
+  - docs/status/p2-baltor-tenancy.md — P2 — Baltor Context Gateway: Tenancy + `ctxv://` Versioned Fetch: **Warrant:** the capability-rubric tenancy-gap finding —
+  - docs/status/p2-catalog-integrity.md — P2 — Catalog Implementation-Ref Integrity (honest catalog): Status pass over the advisory drift in `scripts/validate.py`: dangling
+  - docs/status/p2-measured-lift-promotion.md — P2 — Measured-Lift Promotion Bridge: Status: **bridge module landed + verified** (the callable). Wire-in to the two
+  - docs/status/pattern-miner-report.md — Pattern Miner Report: > Generated by `scripts/pattern_miner.py --scan`. Do not hand-edit; re-run the miner. Every path below is real (it existed on disk at scan time).
+  - docs/status/products-deep-dive.md — Products deep dive — Baltor · Teleon · OpenHarnessHub and everything they touch: Date 2026-06-11. Owner-requested. Sources: three exhaustive dependency scouts (Baltor, Teleon,
+  - docs/status/proof-inventory.md — Proof Inventory: **553** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
+  - docs/status/qa-audit-2026-06-10.md — QA Audit — full-path & multi-front-end adversarial validation (2026-06-10): Scope: adversarially validate the full signup/auth paths for EVERY front end (not just Baltor),
+  - docs/status/risks-and-gaps.md — Risks and Gaps: From `architecture/risk_register.json`.
+  - docs/status/session-change-log-2026-06-12.md — Session change log — 2026-06-12 → 06-13: A complete record of everything changed in this working session, written because the model switched
+  - docs/status/sqlite-state-migration-2026-06-11.md — SQLite state migration — identity / registry / events — 2026-06-11: Status: **DONE + verified green** (all named gates; three pre-existing, out-of-scope check
+  - docs/status/teleon-demo.md — Teleon.dev — wired demo (public URL, verified end to end): Status 2026-06-10: **live and verified through the public URL.**
+  - docs/status/user-journey-videos.md — User-journey videos — every website in the family: Generated 2026-06-11T02:08:18.190Z by `e2e/record_user_journeys.mjs` (1600×900; OHH + Teleon record
+  - docs/status/web-full-design-parity-report.md — PARITY REPORT — full-design transplant into the wired web/ apps: Date: 2026-06-10 · Per `dist/sites/openharness-design/DESIGN-CONTRACT.md` Rule 7/9.
+
+## docs/codex/ (35 docs)
+  - docs/codex/ai-done-right-family-polish-goal.md — Goal: AI Done Right Family Polish And Research Loop: This is the Codex/Claude Code Max handoff goal for polishing and researching
+  - docs/codex/app-polish-loop.md — App-Polish Loop — make the product undeniable, one surface at a time: Runnable goal for `/polish`. The job: take the Open Harness Hub product front-end (`web/`,
+  - docs/codex/autonomous-session-runbook.md — Autonomous Session Runbook — Work For Hours Without Stalling: > A robust, self-sustaining work loop for a single multi-hour agent session
+  - docs/codex/baltor-always-in-memory-context.md — Baltor Always-In-Memory Context: Date: 2026-06-02
+  - docs/codex/baltor-autonomous-goal.md — Baltor Autonomous Goal: This is the canonical `/goal` objective for long-running autonomous work.
+  - docs/codex/baltor-claude-code-context-kit.md — Baltor Claude Code Context Kit: Updated: 2026-06-09
+  - docs/codex/baltor-clean-context.md — Baltor Clean Context: This is the compact context agents should read before long autonomous runs. It
+  - docs/codex/baltor-context-control-current-state.md — Baltor Context-Control Current State: Updated: 2026-06-01
+  - docs/codex/baltor-context-control-iteration-plan.md — Baltor Context-Control Iteration Plan: Updated: 2026-06-01
+  - docs/codex/baltor-context-control-session-ledger.md — Baltor Context-Control Session Ledger: This ledger is for long-running context-control/admin-demo work. Append concise
+  - docs/codex/baltor-context-control-test-plan.md — Baltor Context-Control Test Plan: Updated: 2026-06-01
+  - docs/codex/baltor-database-backed-context-current-state.md — Baltor Database-Backed Context Current State: Date: 2026-06-02
+  - docs/codex/baltor-perpetual-parallel-improvement-runbook.md — Baltor Perpetual Parallel Improvement Runbook: Use this runbook with:
+  - docs/codex/billion-component-goal.md — Billion Component Goal: > The north-star goal for Open Harness Hub. It mirrors and supersedes
+  - docs/codex/change-verification-contract.md — Change-verification contract — warrant before change: Every update or design change carries a **warrant** before it is committed: evidence for *why it is
+  - docs/codex/claude-agent-efficiency.md — Claude Agent Efficiency Plan: This guide is for using Claude 4.x/4.8/4.7-style coding agents to reorganize Open Harness Hub without falling into slow static-site or one-file-per-row loops.
+  - docs/codex/codebase-review-2026-06-09.md — Full Codebase Review — 2026-06-09: Method: seven parallel read-only explorations (strategy/goals, runtime code,
+  - docs/codex/daily-production-targets.md — Daily Production Targets: This goal should keep moving every day. The practical operating target is:
+  - docs/codex/foundry-build-loop.md — Foundry Build Loop — a runnable goal for the evidence-driven factory: > **What this is.** A long-horizon, never-stop goal an agent (Claude Code) runs to
+  - docs/codex/handoff-2026-05-28-capability-requests.md — Handoff checkpoint — Capability requests & build-on-demand (2026-05-28): Self-contained brief for the next agent. Read this top to bottom; it links the
+  - docs/codex/index.md — Codex Operating Guide: This folder gives Codex sessions a stable operating model for scaling Open Harness Hub toward more than one million reusable AI primitives, procedure objects, facts, tools, and pipeline components.
+  - docs/codex/lossless-distillation.md — Lossless Distillation — a Baltor top-level law: Adopted 2026-06-05 (owner directive). Sits alongside [Change Verification](change-verification-contract.md)
+  - docs/codex/master-goal.md — Master Goal — The Long-Horizon Program: > **Baltor-first update (2026-05-31):** active `/goal` runs should read
+  - docs/codex/million-object-goal.md — Million Component Goal: Scale Open Harness Hub into a validated, searchable, signed, versioned, and deployable registry of more than one million AI pipeline components and subcomponents.
+  - docs/codex/multi-day-goal-runbook.md — Multi-Day /goal Runbook: Use this runbook when running Codex repeatedly or continuously against the million-component goal.
+  - docs/codex/no-magic-values.md — No Magic Values — Single Source of Truth: > Context and rules for every agent and contributor (Codex, Claude Code,
+  - docs/codex/north-star.md — North Star (v2, 2026-05-29) — the goal + the execution sequence: > **Active run note (2026-05-31):** use
+  - docs/codex/object-factory-workflow.md — Object Factory Workflow: Object factories turn large source surfaces into validated, indexed primitives.
+  - docs/codex/quality-gates.md — Quality Gates: Scaling to a million objects is only useful if objects are trustworthy, searchable, and deployable.
+  - docs/codex/repo-polish-loop-command.md — Repo Polish Loop Command: Copy and paste this as one line. It runs the repo polish goal forever with the
+  - docs/codex/repo-polish-loop-goal.md — Goal: Dynamic Repo Polish Loop: This is a long-horizon goal for Codex, Claude Code, or another repo agent. It
+  - docs/codex/schema-extensibility.md — Schema extensibility — attribute over column (avoid fragile schemas): **Rule:** a new *facet* of a component is an **attribute row**, not a new **column** on the envelope.
+  - docs/codex/speed-guardrails.md — Speed Guardrails: The million-component goal cannot rely on full static-site rebuilds after every factory turn. Static docs are a public product surface. The database, JSONL partitions, load plans, and search indexes are the scaling surfa
+  - docs/codex/three-sites-live-goal.md — Goal: three sites live — three functional trycloudflare URLs, no-stop until green: A **runnable, self-healing goal**: do not stop until all **three brand surfaces** are reachable on a
+  - docs/codex/yc-readiness-handoff-2026-06-13.md — YC-Readiness Handoff — 2026-06-13 (Opus 4.8 session → next agent / owner): > **Purpose.** A clean handoff so another agent (Codex 5.5 / Claude Code) or the owner can pick up the

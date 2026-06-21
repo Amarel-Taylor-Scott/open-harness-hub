@@ -625,7 +625,8 @@ class Runtime:
         failure returns {compiled: False, reason} — the promotion already stands."""
         try:
             from src.teleon.compiler import compile_capability, open_registry
-            from src.teleon.compiler.fixtures import load_live_capability, fixture_task_spec
+            from src.teleon.compiler.live_capability import load_live_capability
+            from src.teleon.compiler.fixtures import fixture_task_spec
             capability, receipt_refs = load_live_capability(cap_id, state_dir=STATE_DIR)
             task_spec = dict(fixture_task_spec())
             task_spec["capability_id"] = cap_id

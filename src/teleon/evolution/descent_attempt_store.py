@@ -40,6 +40,7 @@ class DescentAttempt:
     losers: tuple = ()                # rejected strategies tried for this unit (kept for training negatives)
     rollback_target: str = ""         # what to restore to (lossless)
     raw_ref: str = ""                 # handle to the preserved raw layer
+    substrate_ref: str = ""           # the CONCRETE substrate row this descent selected INTO (model/source/skill) — lineage
     serves_truth: bool = False
 
     def attempt_id(self) -> str:
@@ -66,14 +67,28 @@ class DescentAttemptStore:
 
     def __init__(self, path: str | Path):
         self.path = Path(path)
+        self._store = None   # lazily-opened backend-swappable append-only store (record_store)
+
+    def _open(self):
+        """Open the append-only store behind the JSONL durability contract: SQLite-WAL primary + a
+        durable JSONL mirror via src.teleon.storage.record_store, with O(1) content-addressed
+        idempotency. Lazy so merely constructing the store never creates an index file. The storage
+        backend is a CONFIG choice (architecture/storage_tier_policy.json: descent_attempts -> history
+        tier) — local sqlite_wal now, the warehouse swap for the trillion-row scale, no caller change."""
+        if self._store is None:
+            from src.teleon.storage.record_store import LocalRecordStore
+            self._store = LocalRecordStore(self.path)
+        return self._store
 
     def all(self) -> list[dict]:
-        if not self.path.exists():
+        if self._store is None and not self.path.exists():
             return []
-        return [json.loads(ln) for ln in self.path.read_text(encoding="utf-8").splitlines() if ln.strip()]
+        return self._open().all()
 
     def append(self, attempt: DescentAttempt) -> dict:
-        """Append an attempt; idempotent — re-appending the same attempt does NOT duplicate it."""
+        """Append an attempt; IDEMPOTENT by content-hash attempt_id — an O(1) INDEXED dedupe (no O(n)
+        full-file rescan), so the brain scales to billions of attempts. The durable JSONL mirror is
+        preserved (lossless); failures/losers are kept as training negatives."""
         if attempt.outcome not in OUTCOMES:
             raise ValueError(f"unknown outcome {attempt.outcome!r}")
         bad = sorted({k for k in (*attempt.before, *attempt.after) if not is_axis(k)})
@@ -83,11 +98,7 @@ class DescentAttemptStore:
         rec["attempt_id"] = attempt.attempt_id()
         rec["reward"] = _reward(attempt.before, attempt.after)
         rec["success"] = attempt.outcome in _SUCCESS
-        if any(r["attempt_id"] == rec["attempt_id"] for r in self.all()):
-            return rec
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        with open(self.path, "a", encoding="utf-8") as f:
-            f.write(json.dumps(rec, sort_keys=True) + "\n")
+        self._open().append(rec, idem_key=rec["attempt_id"])   # O(1) idempotent (was an O(n) rescan)
         return rec
 
     def training_examples(self) -> list[dict]:

@@ -1,0 +1,14 @@
+MODULE src/teleon/compiler/live_capability.py
+## API signatures
+```python
+"""src.teleon.compiler.live_capability — read the LIVE teleon runtime state for the compiler CLI."""
+def _state_dir() -> Path
+    # The live teleon-runtime STATE_DIR — imported (lazily) from its single definition (no re-typed path).
+def _latest_promoting_run(runs_path: Path, capability_id: str) -> dict[str, Any] | None
+    # The most recent run that PROMOTED this capability (latest-line-wins fold over the append-only event log).
+def load_live_capability(capability_id: str, *, state_dir: Path | None=None) -> tuple[dict[str, Any], list[str]]
+    # Read the LIVE capability record for ``capability_id`` and ENRICH it with the gate evidence + receipt refs
+```
+## intra-module call edges
+src.teleon.compiler.live_capability.load_live_capability -> src.teleon.compiler.live_capability._latest_promoting_run
+src.teleon.compiler.live_capability.load_live_capability -> src.teleon.compiler.live_capability._state_dir

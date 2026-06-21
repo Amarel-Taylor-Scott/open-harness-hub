@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# ./loop — the ONE command for the self-improving, self-directing flywheel loop.
+#
+# Runs the flywheel orchestrator (sweep · status · yc · propose · health · autofix · cleanup · logjam) as a detached
+# daemon and supervises it: each `./loop` STARTS it if it's down/stale and prints the MONITOR. It steers itself toward
+# YC READINESS (the `yc` flywheel scores the whole portfolio — proof, demo, traction, founder-market fit, moat, RFS-fit
+# — and files the top gaps into the proposal backlog), applies ONLY trivial reversible fixes unattended, and forks
+# options when it stalls. Halts only on STOP.
+#
+#   ./loop            start (if down) + show the monitor   (the everyday command; safe to re-run)
+#   ./loop status     read-only monitor (don't start anything)
+#   ./loop yc         print the YC-readiness scorecard + the top gaps (the marching orders)
+#   ./loop run        run ONE cycle in the foreground (debug)
+#   ./loop stop       request a clean stop (.agent/STOP_REQUESTED)
+#   ./loop resume     clear the stop flag (so the next ./loop can start again)
+#   ./loop logs       tail the daemon log
+set -euo pipefail
+cd "$(dirname "$(readlink -f "$0")")"
+export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}."
+PY="${PYTHON:-python3}"
+ORCH="scripts/flywheel_orchestrator.py"
+STOP=".agent/STOP_REQUESTED"
+
+case "${1:-start}" in
+  start|"")   exec "$PY" "$ORCH" --supervise ;;
+  status|monitor) exec "$PY" "$ORCH" --monitor ;;
+  run)        exec "$PY" "$ORCH" --run ;;
+  yc|readiness) exec "$PY" scripts/yc_readiness.py --report ;;
+  demo)       exec "$PY" scripts/demo_readiness.py --report ;;
+  stop)       mkdir -p .agent && : > "$STOP" && echo "stop requested — the loop will halt after the current cycle (state preserved). './loop resume' to re-enable." ;;
+  resume)     rm -f "$STOP" && echo "stop flag cleared — './loop' will start the flywheels again." ;;
+  logs)       tail -n 40 -f data/dev-intel/flywheel.log ;;
+  *) echo "usage: ./loop [start|status|yc|demo|run|stop|resume|logs]"; exit 2 ;;
+esac

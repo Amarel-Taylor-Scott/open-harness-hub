@@ -1,0 +1,63 @@
+{
+  "version": "0.1.0",
+  "note": "The reusable STEP/PRIMITIVE library for composable extraction + enrichment DAGs. Extraction/enrichment are NOT linear (OCR->cheapest-model); they are a DAG of steps — acquire, filter, chunk, retrieve, rerank, route, extract, synthesize, verify, merge. Teleon descends by choosing the CHEAPEST viable step per choice-point (alt_group) that meets the requirement floor. Every step maps to one of the seven canonical primitives (Input · Knowledge Corpus · If Statement · Action · Loop · Stop/End · Output; see docs/concepts/component-taxonomy-and-stages.md). cost = relative units (consistent with document_extraction_cascade). serves_truth=false (a step output is a candidate the verification rail dispositions).",
+  "alt_groups": {
+    "acquire": "how to get text out of the source (cheapest viable: text-layer < OCR < enhanced OCR < vision-LLM)",
+    "chunk": "how to split long content (fixed < layout < semantic)",
+    "extract": "how to fill schema fields (regex < nlp < heuristics < cheap-LLM < frontier-LLM)",
+    "search": "where to get grounded sources (free/cheap search < premium grounded-synthesis)",
+    "synthesize": "how to compose an answer (cheap model < grounded-synthesis provider)"
+  },
+  "steps": [
+    {"id": "raw_input", "primitive": "Input", "stage": "input", "consumes": [], "produces": "source", "cost": 0.0, "deterministic": true, "axes": []},
+
+    {"id": "pdf_text_extract", "primitive": "Action", "stage": "acquire", "alt_group": "acquire", "consumes": ["source"], "produces": "text", "cost": 0.002, "deterministic": true, "axes": ["cost"], "requires": "has_text_layer"},
+    {"id": "ocr", "primitive": "Action", "stage": "acquire", "alt_group": "acquire", "consumes": ["source"], "produces": "text", "cost": 0.020, "deterministic": true, "axes": ["cost"], "requires": "scanned"},
+    {"id": "image_enhance_ocr", "primitive": "Action", "stage": "acquire", "alt_group": "acquire", "consumes": ["source"], "produces": "text", "cost": 0.045, "deterministic": true, "axes": ["cost"], "requires": "scanned"},
+    {"id": "vision_llm", "primitive": "Action", "stage": "acquire", "alt_group": "acquire", "consumes": ["source"], "produces": "text", "cost": 0.300, "deterministic": false, "axes": ["cost"], "requires_keys": ["LLM_API_KEY"]},
+
+    {"id": "clean_normalize", "primitive": "Action", "stage": "preprocess", "consumes": ["text"], "produces": "text", "cost": 0.001, "deterministic": true, "axes": ["cost"]},
+    {"id": "detect_language", "primitive": "Action", "stage": "preprocess", "consumes": ["text"], "produces": "lang", "cost": 0.001, "deterministic": true, "axes": []},
+
+    {"id": "relevance_filter", "primitive": "If", "stage": "filter", "consumes": ["passages"], "produces": "passages", "cost": 0.002, "deterministic": true, "axes": ["tokens_in", "cost"], "note": "drop passages unlikely to contain a required field/answer BEFORE any model call"},
+    {"id": "dedupe_passages", "primitive": "Action", "stage": "filter", "consumes": ["passages"], "produces": "passages", "cost": 0.002, "deterministic": true, "axes": ["tokens_in"]},
+    {"id": "pii_redact", "primitive": "Action", "stage": "filter", "consumes": ["text"], "produces": "text", "cost": 0.004, "deterministic": true, "axes": ["privacy"], "note": "deterministic NER+regex redaction before egress to any external model"},
+
+    {"id": "fixed_chunk", "primitive": "Loop", "stage": "chunk", "alt_group": "chunk", "consumes": ["text"], "produces": "passages", "cost": 0.001, "deterministic": true, "axes": ["tokens_in"], "fans_out": true},
+    {"id": "layout_chunk", "primitive": "Loop", "stage": "chunk", "alt_group": "chunk", "consumes": ["text"], "produces": "passages", "cost": 0.004, "deterministic": true, "axes": ["tokens_in"], "fans_out": true},
+    {"id": "semantic_chunk", "primitive": "Loop", "stage": "chunk", "alt_group": "chunk", "consumes": ["text"], "produces": "passages", "cost": 0.010, "deterministic": false, "axes": ["tokens_in"], "fans_out": true},
+
+    {"id": "prune_unimportant", "primitive": "Action", "stage": "reduce", "consumes": ["passages"], "produces": "passages", "cost": 0.003, "deterministic": true, "axes": ["tokens_in"], "reduces_llm_cost": true},
+    {"id": "compress_context", "primitive": "Action", "stage": "reduce", "consumes": ["passages"], "produces": "passages", "cost": 0.003, "deterministic": true, "axes": ["tokens_in"], "reduces_llm_cost": true},
+    {"id": "extractive_select", "primitive": "Action", "stage": "reduce", "consumes": ["passages"], "produces": "passages", "cost": 0.002, "deterministic": true, "axes": ["tokens_in"]},
+
+    {"id": "embed", "primitive": "Knowledge Corpus", "stage": "retrieve", "consumes": ["passages"], "produces": "vectors", "cost": 0.002, "deterministic": true, "axes": ["cost"]},
+    {"id": "retrieve_topk", "primitive": "Knowledge Corpus", "stage": "retrieve", "consumes": ["vectors", "query"], "produces": "passages", "cost": 0.002, "deterministic": true, "axes": ["tokens_in"]},
+    {"id": "rerank", "primitive": "Action", "stage": "retrieve", "consumes": ["passages", "query"], "produces": "passages", "cost": 0.005, "deterministic": true, "axes": ["cost"]},
+
+    {"id": "route_by_doc_type", "primitive": "If", "stage": "branch", "consumes": ["source"], "produces": "route", "cost": 0.0, "deterministic": true, "axes": [], "note": "text-layer -> text path; scanned -> OCR path; the If primitive that picks the acquire branch"},
+    {"id": "confidence_gate", "primitive": "If", "stage": "branch", "consumes": ["candidate"], "produces": "gate", "cost": 0.0, "deterministic": true, "axes": [], "note": "escalate to a costlier step ONLY if the cheap step's measured confidence is below floor"},
+
+    {"id": "regex_keyword", "primitive": "Action", "stage": "extract", "alt_group": "extract", "consumes": ["passages"], "produces": "fields", "cost": 0.001, "deterministic": true, "axes": ["determinism", "cost"]},
+    {"id": "deterministic_nlp", "primitive": "Action", "stage": "extract", "alt_group": "extract", "consumes": ["passages"], "produces": "fields", "cost": 0.005, "deterministic": true, "axes": ["determinism", "cost"]},
+    {"id": "heuristic_patterns", "primitive": "Action", "stage": "extract", "alt_group": "extract", "consumes": ["passages"], "produces": "fields", "cost": 0.008, "deterministic": true, "axes": ["determinism"]},
+    {"id": "cheap_llm_extract", "primitive": "Action", "stage": "extract", "alt_group": "extract", "consumes": ["passages"], "produces": "fields", "cost": 0.030, "deterministic": false, "axes": ["cost"], "requires_keys": ["LLM_API_KEY"]},
+    {"id": "frontier_llm_extract", "primitive": "Action", "stage": "extract", "alt_group": "extract", "consumes": ["passages"], "produces": "fields", "cost": 0.300, "deterministic": false, "axes": [], "requires_keys": ["LLM_API_KEY"]},
+
+    {"id": "web_search_cheap", "primitive": "Knowledge Corpus", "stage": "search", "alt_group": "search", "consumes": ["query"], "produces": "sources", "cost": 0.005, "deterministic": false, "axes": ["cost", "freshness"], "note": "Brave/Exa/Tavily — returns sources, no synthesis"},
+    {"id": "grounded_search_premium", "primitive": "Knowledge Corpus", "stage": "search", "alt_group": "search", "consumes": ["query"], "produces": "sources", "cost": 0.035, "deterministic": false, "axes": ["freshness"], "note": "Gemini Grounded — search + synthesis in one expensive call (the baseline)"},
+
+    {"id": "cheap_synthesize", "primitive": "Action", "stage": "synthesize", "alt_group": "synthesize", "consumes": ["sources", "query"], "produces": "answer", "cost": 0.001, "deterministic": false, "axes": ["cost"], "requires_keys": ["LLM_API_KEY"]},
+    {"id": "grounded_synthesize", "primitive": "Action", "stage": "synthesize", "alt_group": "synthesize", "consumes": ["sources", "query"], "produces": "answer", "cost": 0.030, "deterministic": false, "axes": []},
+
+    {"id": "schema_validate", "primitive": "Action", "stage": "verify", "consumes": ["fields"], "produces": "fields", "cost": 0.001, "deterministic": true, "axes": ["verifiability", "reliability"]},
+    {"id": "source_attribution", "primitive": "Action", "stage": "verify", "consumes": ["answer", "sources"], "produces": "answer", "cost": 0.001, "deterministic": true, "axes": ["verifiability"], "note": "every claim must carry a source handle; ungrounded -> held out"},
+    {"id": "confidence_score", "primitive": "Action", "stage": "verify", "consumes": ["candidate"], "produces": "score", "cost": 0.001, "deterministic": true, "axes": ["reliability"]},
+
+    {"id": "merge_fields", "primitive": "Action", "stage": "merge", "consumes": ["fields"], "produces": "schema", "cost": 0.001, "deterministic": true, "axes": []},
+    {"id": "merge_chunks", "primitive": "Action", "stage": "merge", "consumes": ["passages"], "produces": "fields", "cost": 0.001, "deterministic": true, "axes": [], "fans_in": true},
+
+    {"id": "emit_schema", "primitive": "Output", "stage": "output", "consumes": ["schema"], "produces": "output", "cost": 0.0, "deterministic": true, "axes": []},
+    {"id": "emit_answer", "primitive": "Output", "stage": "output", "consumes": ["answer"], "produces": "output", "cost": 0.0, "deterministic": true, "axes": []}
+  ]
+}
