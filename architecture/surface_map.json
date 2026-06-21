@@ -3,11 +3,11 @@
   "note": "Canonical SURFACE MAP — for each surface (product / runtime / open hub / site), its EDGE/WEDGE (the one-line differentiator), buyer, status, AND how it COMMUNICATES with the other surfaces (the inter-surface graph). Consolidates what was scattered across company_portfolio_map.json (company boundaries), brand.json (branding), portfolio_dependency_law.json (import law), and strategy prose. MUST agree with the dependency law: product-layer communication edges follow Baltor->Teleon->OpenHarnessHub, never the reverse (checked by scripts/check_surface_map.py). serves_truth=false for any model-generated surface output.",
   "surfaces": [
     {"id": "ai-done-right", "kind": "parent_brand", "status": "live", "domain": "aidoneright.dev",
-     "wedge": "The trust layer for AI — Context, Capability, Proof. The holding brand over a context product, a capability runtime, and an open ecosystem.",
-     "buyer": "n/a (portfolio brand / fundraising narrative)", "owns": ["baltor", "teleon", "openharnesshub"]},
+     "wedge": "Parent / holding brand — owns no runtime and no customer data; the PROMISE across the family (Context · Capability · Proof). An umbrella over Baltor (context), Teleon (runtime), and the open ecosystem — NOT a customer-facing product.",
+     "buyer": "n/a (holding brand / fundraising narrative)", "owns": ["baltor", "teleon", "openharnesshub"]},
 
     {"id": "baltor", "kind": "product", "status": "live", "domain": "baltor.ai",
-     "wedge": "Governed context engine — Verified, Current, Provable context. 'Models don't fail. Their context does.' Ingest -> reconcile -> harden -> enrich -> compress -> serve, with receipts + CDC freshness.",
+     "wedge": "Governed context engine — Verified, Current, Provable context. 'Models don't fail. Their context does.' Ingest -> reconcile -> harden -> enrich -> compress -> serve, with receipts + CDC freshness. Powered by Teleon (runs as a tenant on the control plane).",
      "buyer": "compliance / AML / legal-ops / regulated-data teams (the first live wedge = OFAC sanctions screening)",
      "communicates_with": [
        {"to": "teleon", "relation": "consumes (tenant)", "how": "Baltor runs ON Teleon — capability execution, descent, receipts. Direction allowed by the dependency law."},

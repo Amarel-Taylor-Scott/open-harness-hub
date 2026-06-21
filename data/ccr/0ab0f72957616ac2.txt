@@ -1,0 +1,13 @@
+MODULE src/teleon/extraction/schema_templates.py
+## API signatures
+```python
+"""src.teleon.extraction.schema_templates — SHOWCASE schema templates + the shared user-schema parser."""
+VALID_CLASSES = ...
+def template_names() -> list[str]
+def get_template(name: str) -> dict | None
+    # A COPY of a showcase template (or None) — callers may mutate it freely as their own starting point.
+def parse_user_schema(text: str) -> dict
+    # SINGLE SOURCE of the 'field_name: structured|semi|unstructured' grammar. One field per line; '#' lines are
+def render_template(name: str) -> str
+    # The 'name: class' text a chosen template drops into the user's EDITABLE schema box (empty for unknown names).
+```

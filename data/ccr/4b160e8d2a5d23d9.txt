@@ -1,0 +1,15 @@
+MODULE src/teleon/inference/implementation_selector.py
+## API signatures
+```python
+"""src.teleon.inference.implementation_selector — pick the best IMPLEMENTATION COMBINATION for a capability."""
+_REGISTRY = ...
+_COST_RANK = ...
+_DET_FLOOR = ...
+def load_registry() -> dict
+def implementations_for(capability: str) -> list[dict]
+def select_implementation(capability: str, *, available_keys: tuple=(), objective: str='cheapest', require_deterministic: bool=False) -> dict
+    # Pick the best implementation whose required API keys are ALL available, by objective. Returns the pick +
+```
+## intra-module call edges
+src.teleon.inference.implementation_selector.implementations_for -> src.teleon.inference.implementation_selector.load_registry
+src.teleon.inference.implementation_selector.select_implementation -> src.teleon.inference.implementation_selector.implementations_for

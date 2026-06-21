@@ -1,0 +1,10 @@
+MODULE src/teleon/experiments/boundary_approval.py
+## API signatures
+```python
+"""src.teleon.experiments.boundary_approval — the human-approval gate for BOUNDARY EXPANSION."""
+BOUNDARY_KINDS = ...
+_APPROVER_ROLES = ...
+def mint_human_approval_receipt(*, subject_ref: str, boundary_kind: str, approver_role: str, status: str, now: str, requested_by: str='', justification: str='') -> dict
+def gate_boundary_expansion(*, boundary_expanding: bool, approval: dict | None=None, subject_ref: str='') -> tuple[bool, list[str]]
+    # Return (ok, reasons). A non-boundary-expanding promotion is always ok. A boundary-expanding one is ok ONLY
+```

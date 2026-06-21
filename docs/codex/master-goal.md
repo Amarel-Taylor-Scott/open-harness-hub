@@ -19,6 +19,15 @@
 > RIGHT, not just current."* This component-registry mission is the **substrate**; the current product focus
 > + execution sequence (M1–M5) live in **[north-star.md](north-star.md)** — it leads on *what to build
 > first*; this doc leads on the substrate + usefulness bar.
+>
+> **North Star v3 — RECONCILED (LOCKED + enforced 2026-06-06; supersedes the "two products" framing above):**
+> the portfolio is **three layers** — **Baltor** (applied governed context engine) → **Teleon** (runtime / control
+> plane; the descent brain) → **OpenHarnessHub** (open ecosystem) — under the **AI Done Right** holding brand
+> (which owns no runtime/customer data). Enforced by the dependency law Baltor→Teleon→OHH
+> (`architecture/portfolio_dependency_law.json`). Moat split (locked): **Baltor governs what becomes TRUE; Teleon
+> governs what becomes EFFICIENT.** The component registry remains the **substrate**. Canonical:
+> `docs/strategy/teleon-baltor-openharnesshub-portfolio.md`; visual map: `docs/strategy/architecture-map.md`;
+> the 2026-06-21 adversarial review that drove this reconciliation: `docs/strategy/architecture-validation-2026-06.md`.
 
 ## Mission (one sentence)
 

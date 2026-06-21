@@ -4,6 +4,14 @@ The canonical master goal is `docs/codex/master-goal.md`. This file crystallizes
 the strategic north stars that the 2026-05-28 research arc sharpened. When a
 decision is ambiguous, optimize these.
 
+> **Architecture at a glance (the honest map):** the three-layer portfolio —
+> **Baltor** (applied governed context engine) → **Teleon** (runtime / control plane) →
+> **OpenHarnessHub + 22 Open\*Hubs** (open ecosystem + substrate), under the **AI Done Right**
+> holding brand; dependency law Baltor→Teleon→OHH (enforced). **Visual + documented map:**
+> [`architecture-map.md`](architecture-map.md) (and `dist/architecture/index.html`). **Adversarial
+> validation + reconciliation plan:** [`architecture-validation-2026-06.md`](architecture-validation-2026-06.md).
+> Regenerate the map: `python3 scripts/build_architecture_map.py --build`.
+
 ## 1. Build our own corpus aggregators for the NEGATIVE SPACE
 
 The product is not what LLMs already know — that's the head of the distribution.

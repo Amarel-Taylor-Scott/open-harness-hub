@@ -1,0 +1,53 @@
+MODULE src/teleon/inference/free_endpoint_intel.py
+## API signatures
+```python
+"""src.teleon.inference.free_endpoint_intel — FREE / LIMITED LLM ENDPOINT INTELLIGENCE."""
+_A = ...
+def _load(name: str) -> dict
+def _codes() -> dict[str, Any]
+def _policy() -> dict[str, Any]
+def _class_label(code: int) -> str
+def _quarantine_floor() -> int
+_KEY_PREFIXES = ...
+_MARKER_RE = ...
+def _has_raw_key(blob: str) -> bool
+def _string_values(obj: Any) -> list[str]
+    # Recursively collect string VALUES (never dict keys) — so field names like 'reverse_engineered_markers'
+def classify(*, signals: dict, free_text: str='', declared_role: str | None=None) -> tuple[int, list[str]]
+    # Return (class_code, reasons). Driven by SIGNAL booleans + an EXPLICIT markers_text (the repo's own
+_RISK_DIMS = ...
+def score_risk(class_code: int, signals: dict) -> tuple[int, dict]
+    # Deterministic risk across dimensions (each 0=low .. 100=high). Quarantine classes pin to max risk.
+def _phase_from_risk(risk: int) -> int
+def due_diligence(endpoint: dict) -> dict
+    # Full per-endpoint verdict: classify -> risk -> policy-capped recommended phase + governed uses.
+def propose_provider_node(endpoint: dict, class_code: int) -> dict
+    # Propose a model_provider_graph node (status candidate) for an official endpoint. This is a PROPOSAL only
+def assess_gateway_repo(repo: dict) -> dict
+    # Assess a gateway/discovery repo or browser runtime. Metadata only — never imports/executes the repo.
+def to_opentools_metadata(report: dict) -> dict
+    # Project a due-diligence report into OpenToolsHub ToolArtifact-style METADATA. Executable use is gated
+def run_registry() -> list[dict]
+def run_watchlist() -> list[dict]
+```
+## intra-module call edges
+src.teleon.inference.free_endpoint_intel._codes -> src.teleon.inference.free_endpoint_intel._load
+src.teleon.inference.free_endpoint_intel._policy -> src.teleon.inference.free_endpoint_intel._load
+src.teleon.inference.free_endpoint_intel._class_label -> src.teleon.inference.free_endpoint_intel._codes
+src.teleon.inference.free_endpoint_intel._quarantine_floor -> src.teleon.inference.free_endpoint_intel._codes
+src.teleon.inference.free_endpoint_intel.classify -> src.teleon.inference.free_endpoint_intel._has_raw_key
+src.teleon.inference.free_endpoint_intel.score_risk -> src.teleon.inference.free_endpoint_intel._quarantine_floor
+src.teleon.inference.free_endpoint_intel.due_diligence -> src.teleon.inference.free_endpoint_intel.classify
+src.teleon.inference.free_endpoint_intel.due_diligence -> src.teleon.inference.free_endpoint_intel.score_risk
+src.teleon.inference.free_endpoint_intel.due_diligence -> src.teleon.inference.free_endpoint_intel._has_raw_key
+src.teleon.inference.free_endpoint_intel.due_diligence -> src.teleon.inference.free_endpoint_intel._string_values
+src.teleon.inference.free_endpoint_intel.due_diligence -> src.teleon.inference.free_endpoint_intel.score_risk
+src.teleon.inference.free_endpoint_intel.due_diligence -> src.teleon.inference.free_endpoint_intel._phase_from_risk
+src.teleon.inference.free_endpoint_intel.due_diligence -> src.teleon.inference.free_endpoint_intel.propose_provider_node
+src.teleon.inference.free_endpoint_intel.due_diligence -> src.teleon.inference.free_endpoint_intel._class_label
+src.teleon.inference.free_endpoint_intel.due_diligence -> src.teleon.inference.free_endpoint_intel._policy
+src.teleon.inference.free_endpoint_intel.due_diligence -> src.teleon.inference.free_endpoint_intel._quarantine_floor
+src.teleon.inference.free_endpoint_intel.due_diligence -> src.teleon.inference.free_endpoint_intel._policy
+src.teleon.inference.free_endpoint_intel.due_diligence -> src.teleon.inference.free_endpoint_intel._phase_from_risk
+src.teleon.inference.free_endpoint_intel.assess_gateway_repo -> src.teleon.inference.free_endpoint_intel.classify
+src.teleon.inference.free_endpoint_intel.assess_gateway_repo -> src.teleon.inference.free_endpoint_intel._has_raw_key

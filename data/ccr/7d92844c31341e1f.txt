@@ -1,0 +1,53 @@
+MODULE src/teleon/extraction/document_extraction_cascade.py
+## API signatures
+```python
+"""src.teleon.extraction.document_extraction_cascade — PDF/document → schema extraction as a CHEAPEST-THAT-MEETS-
+REQUIREMENTS cascade over a hyperparameter grid of methods."""
+_ACQUIRE = ...
+class Method:
+_LADDER = ...
+_COMPRESS_LLM_DISCOUNT = ...
+def _pick_acquire(doc: dict, have: set) -> tuple | None
+    # Cheapest acquire method the document supports (text-layer < OCR < enhanced OCR < vision-LLM).
+def extract(required_fields: dict, doc: dict, *, available_keys: tuple=(), confidence_floor: float=0.0) -> dict
+    # Fill ``required_fields`` (``{field: class}``) from a document, cheapest-first, stopping when every required
+EMPLOYMENT_AGENCY_SCHEMA = ...
+def demonstrate(*, available_keys: tuple=('LLM_API_KEY',)) -> dict
+    # Extract the employment-agency schema from a clean text-layer PDF, cheapest-first.
+class Fixture:
+_EXTRACTORS = ...
+_PRUNE = ...
+def _recover(method_name: str, fx: Fixture, doc_index: int) -> str | None
+    # Deterministic OFFLINE simulation of what a method recovers for a fixture, grounded in field class. This is a
+def _score(pred: str | None, truth: str, field_class: str) -> float
+    # Exact match for structured fields; token recall (|pred∩truth|/|truth|) for semi/unstructured.
+def measured_field_accuracy(method_name: str, field: str) -> float | None
+    # MEASURED accuracy of a method on a field = mean over that field's fixtures of score(recovered, truth).
+def measured_class_accuracy(method_name: str, field_class: str) -> float | None
+    # Fallback when a field has no fixtures: mean measured accuracy of a method over all fixtures of its class.
+def extract_measured(required_fields: dict, doc: dict, *, available_keys: tuple=(), confidence_floor: float=0.8) -> dict
+    # Like ``extract``, but selection is MEASURED: per field, choose the cheapest extractor whose measured
+def demonstrate_measured(*, available_keys: tuple=('LLM_API_KEY',)) -> dict
+    # Run the measured cascade at a lenient and a strict floor — the A/B that moves the chosen tier and the cost.
+def frontier_only_cost(doc: dict, *, scanned_acquire: float=0.3) -> float
+    # What most people pay: acquire + ONE frontier LLM pass over the whole document. The naive baseline.
+def extraction_savings(required_fields: dict | None=None, doc: dict | None=None, *, available_keys: tuple=('LLM_API_KEY',), confidence_floor: float=0.8) -> dict
+    # The headline: frontier-only baseline vs the measured cascade, at the SAME met-requirement. Names the real
+def record_extraction_descent(store, *, required_fields: dict | None=None, doc: dict | None=None, available_keys: tuple=('LLM_API_KEY',), confidence_floor: float=0.8) -> dict
+    # Record the extraction cascade as a DescentAttempt (before = frontier-only naive default; after = the measured
+```
+## intra-module call edges
+src.teleon.extraction.document_extraction_cascade.extract -> src.teleon.extraction.document_extraction_cascade._pick_acquire
+src.teleon.extraction.document_extraction_cascade.demonstrate -> src.teleon.extraction.document_extraction_cascade.extract
+src.teleon.extraction.document_extraction_cascade.measured_field_accuracy -> src.teleon.extraction.document_extraction_cascade._score
+src.teleon.extraction.document_extraction_cascade.measured_field_accuracy -> src.teleon.extraction.document_extraction_cascade._recover
+src.teleon.extraction.document_extraction_cascade.measured_class_accuracy -> src.teleon.extraction.document_extraction_cascade._score
+src.teleon.extraction.document_extraction_cascade.measured_class_accuracy -> src.teleon.extraction.document_extraction_cascade._recover
+src.teleon.extraction.document_extraction_cascade.extract_measured -> src.teleon.extraction.document_extraction_cascade._pick_acquire
+src.teleon.extraction.document_extraction_cascade.extract_measured -> src.teleon.extraction.document_extraction_cascade.measured_field_accuracy
+src.teleon.extraction.document_extraction_cascade.extract_measured -> src.teleon.extraction.document_extraction_cascade.measured_class_accuracy
+src.teleon.extraction.document_extraction_cascade.demonstrate_measured -> src.teleon.extraction.document_extraction_cascade.extract_measured
+src.teleon.extraction.document_extraction_cascade.demonstrate_measured -> src.teleon.extraction.document_extraction_cascade.extract_measured
+src.teleon.extraction.document_extraction_cascade.extraction_savings -> src.teleon.extraction.document_extraction_cascade.extract_measured
+src.teleon.extraction.document_extraction_cascade.extraction_savings -> src.teleon.extraction.document_extraction_cascade.frontier_only_cost
+src.teleon.extraction.document_extraction_cascade.record_extraction_descent -> src.teleon.extraction.document_extraction_cascade.extraction_savings

@@ -1,0 +1,16 @@
+MODULE src/teleon/inference/default_brain.py
+## API signatures
+```python
+"""src.teleon.inference.default_brain — the cheap DEFAULT brain (Ollama: GLM-5.2 / Kimi-k2.7-code) as orchestrator,
+reviewer, and distiller-judge, escalating to a frontier model only when a confidence/quality bar fails."""
+_POLICY = ...
+def load_policy() -> dict
+def roles() -> list[str]
+def _role(role: str) -> dict | None
+def brain_for(role: str, *, available_keys: tuple=(), force_frontier: bool=False) -> dict
+    # Pick the model for a brain role: the cheap Ollama default when OLLAMA_API_KEY is available and no escalation
+```
+## intra-module call edges
+src.teleon.inference.default_brain.roles -> src.teleon.inference.default_brain.load_policy
+src.teleon.inference.default_brain._role -> src.teleon.inference.default_brain.load_policy
+src.teleon.inference.default_brain.brain_for -> src.teleon.inference.default_brain._role

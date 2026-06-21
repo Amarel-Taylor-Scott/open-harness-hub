@@ -1,0 +1,26 @@
+MODULE src/teleon/governance/tenant_preferences.py
+## API signatures
+```python
+"""src.teleon.governance.tenant_preferences — the tunable front door: a tenant's wishes compiled to the policy +
+objective machinery."""
+_PREFS_PATH = ...
+class TenantPreferences:
+    def to_objective(self) -> CapabilityObjective
+        # The SOFT preference -> a CapabilityObjective that ranks the allowed options.
+    def to_org_policy(self) -> OrgGuardrailPolicy
+        # The HARD constraints -> an OrgGuardrailPolicy (the blockers). MIT-only -> allowed_licenses=[MIT];
+    def resolve(self) -> dict
+        # The full resolved view: the compiled policy + objective + tolerance + priorities + advisory suggestions.
+def _load(registry: dict | None=None) -> dict
+def _from_dict(tenant_id: str, d: dict) -> TenantPreferences
+def preferences_for(tenant_id: str, *, registry: dict | None=None) -> TenantPreferences
+    # Resolve a tenant's tunable preferences (its own entry, else the documented default). Validation of the soft
+def known_tenants(*, registry: dict | None=None) -> list[str]
+```
+## intra-module call edges
+src.teleon.governance.tenant_preferences._from_dict -> src.teleon.governance.tenant_preferences.TenantPreferences
+src.teleon.governance.tenant_preferences.preferences_for -> src.teleon.governance.tenant_preferences._load
+src.teleon.governance.tenant_preferences.preferences_for -> src.teleon.governance.tenant_preferences._from_dict
+src.teleon.governance.tenant_preferences.known_tenants -> src.teleon.governance.tenant_preferences._load
+src.teleon.governance.tenant_preferences.resolve -> src.teleon.governance.tenant_preferences.TenantPreferences.to_objective
+src.teleon.governance.tenant_preferences.resolve -> src.teleon.governance.tenant_preferences.TenantPreferences.to_org_policy

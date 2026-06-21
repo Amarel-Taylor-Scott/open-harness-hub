@@ -1,0 +1,14 @@
+MODULE src/teleon/extraction/input_acquire.py
+## API signatures
+```python
+"""src.teleon.extraction.input_acquire — generalize the document cascade's ACQUIRE stage across input types."""
+def supported_input_types() -> list[str]
+def _supports(needs: tuple, source: dict, have: set) -> bool
+def acquire(input_type: str, source: dict | None=None, *, available_keys: tuple=()) -> dict
+    # Pick the cheapest acquire method this input supports → normalized text/structure for the extraction cascade.
+def extract_from(input_type: str, source: dict, required_fields: dict, *, available_keys: tuple=()) -> dict
+    # Acquire the input (any type) → run the cheapest-that-meets extraction cascade on it. One combined receipt.
+```
+## intra-module call edges
+src.teleon.extraction.input_acquire.acquire -> src.teleon.extraction.input_acquire._supports
+src.teleon.extraction.input_acquire.extract_from -> src.teleon.extraction.input_acquire.acquire

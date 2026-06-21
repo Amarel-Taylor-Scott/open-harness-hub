@@ -1,0 +1,20 @@
+MODULE src/teleon/experiments/parallel_paths.py
+## API signatures
+```python
+"""src/teleon/experiments/parallel_paths — run a baseline path + candidate paths on the SAME input."""
+SCHEMA_VERSION = ...
+SERVABLE_MODES = ...
+CHALLENGER_MODES = ...
+def _coverage(handles: Any, baseline_handles: list[str]) -> float
+    # Fraction in [0,1] of the BASELINE's grounding handles this path also grounded on.
+def _result_record(*, path: dict[str, Any], result: RunnerResult, mode_field: str, baseline_handles: list[str], run_input_snapshot_hash: str) -> dict[str, Any]
+    # Build one per-path result record (baseline or candidate) for the ParallelPathRun.
+def run_parallel(capability_slot: str, input_snapshot: Any, baseline_path: dict[str, Any], candidate_paths: list[dict[str, Any]], *, runner: Runner, now: str, validate: bool=True) -> dict[str, Any]
+    # Run the baseline + each candidate on the SAME ``input_snapshot``; return a ``ParallelPathRun.v1`` dict.
+def served_output(run: dict[str, Any]) -> dict[str, Any]
+    # Return the ONLY output the engine may serve: the baseline result.
+```
+## intra-module call edges
+src.teleon.experiments.parallel_paths._result_record -> src.teleon.experiments.parallel_paths._coverage
+src.teleon.experiments.parallel_paths.run_parallel -> src.teleon.experiments.parallel_paths._result_record
+src.teleon.experiments.parallel_paths.run_parallel -> src.teleon.experiments.parallel_paths._result_record

@@ -1,0 +1,19 @@
+MODULE src/teleon/inference/lane_selection.py
+## API signatures
+```python
+"""src.teleon.inference.lane_selection — choose the INFERENCE LANE by objective, bounded by org policy."""
+_PROFILES_PATH = ...
+_LANE_DETERMINISM = ...
+def _load(profiles: dict | None=None) -> dict
+def lanes(*, profiles: dict | None=None) -> list[dict]
+def _metric_vector(lane: dict) -> MetricVector
+def forbidden_lanes(policy, *, profiles: dict | None=None) -> set
+    # The lane_ids an org guardrail policy disallows — a cloud lane under an air-gapped (no_external_egress)
+def select_lane(objective, *, forbidden: set | None=None, profiles: dict | None=None) -> dict
+    # Pick the inference lane that best fits ``objective`` (minimize_cost -> free local; capability priority ->
+```
+## intra-module call edges
+src.teleon.inference.lane_selection.lanes -> src.teleon.inference.lane_selection._load
+src.teleon.inference.lane_selection.forbidden_lanes -> src.teleon.inference.lane_selection.lanes
+src.teleon.inference.lane_selection.select_lane -> src.teleon.inference.lane_selection.lanes
+src.teleon.inference.lane_selection.select_lane -> src.teleon.inference.lane_selection._metric_vector
