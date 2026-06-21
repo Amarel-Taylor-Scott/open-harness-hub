@@ -58,10 +58,21 @@ def validate(sb: dict) -> list[str]:
     return problems
 
 
+def _ffmpeg_present() -> bool:
+    """ffmpeg on PATH, OR at the gate_common path (~/.local/share/aidr-tools/ffmpeg), OR via pip imageio-ffmpeg."""
+    if shutil.which("ffmpeg") or (Path.home() / ".local" / "share" / "aidr-tools" / "ffmpeg").exists():
+        return True
+    try:
+        import imageio_ffmpeg
+        return bool(imageio_ffmpeg.get_ffmpeg_exe())
+    except Exception:  # noqa: BLE001
+        return False
+
+
 def tool_status() -> dict:
     """What's installed for a REAL recording (honest GO/NO-GO inputs)."""
     pw = (REPO / "node_modules" / ".bin" / "playwright").exists() or bool(shutil.which("playwright"))
-    ffmpeg = bool(shutil.which("ffmpeg"))
+    ffmpeg = _ffmpeg_present()
     tts = next((t for t in ("piper", "edge-tts", "say", "espeak-ng") if shutil.which(t)), None)
     return {"playwright": pw, "ffmpeg": ffmpeg, "tts": tts,
             "recorder_present": RECORDER.exists(), "dockerfile_present": DOCKERFILE.exists()}

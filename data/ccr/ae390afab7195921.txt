@@ -1,0 +1,58 @@
+MODULE src/baltor/adapters/object_store/local_object_store.py
+## API signatures
+```python
+"""src.baltor.adapters.object_store.local_object_store — content-addressed in-memory object store adapter."""
+_REF_SCHEME = ...
+_REF_ALGO = ...
+_REF_PREFIX = ...
+DEFAULT_MIME_TYPE = ...
+class ObjectStoreError:
+    # Base class for object-store failures.
+class ForgedRefError:
+    # The payload_ref is malformed, unknown, or points at a tenant that does not hold the blob.
+class CorruptObjectError:
+    # The stored bytes no longer hash to the value embedded in the ref (tamper / bit-rot).
+def _hash_bytes(b: bytes) -> str
+def make_ref(content_hash_hex: str, tenant_id: str) -> str
+    # Build the opaque content-addressed ref. ``objref:sha256:<hex>:<tenant>``.
+def parse_ref(ref: str) -> tuple[str, str]
+    # Parse an opaque ref → ``(content_hash_hex, tenant_id)``. Raise ForgedRefError on any malformation.
+class _StoredObject:
+    # The bytes plus the tenant + mime metadata kept alongside them (never inlined into artifacts).
+    def size_bytes(self) -> int
+class LocalContentAddressedObjectStore:
+    # In-memory, content-addressed object store. Satisfies ObjectStorePort and verifies on read.
+    def __init__(self) -> None
+    def _to_bytes(data: Any) -> bytes
+    def put(self, tenant_id: str, data: Any, *, mime_type: str=DEFAULT_MIME_TYPE) -> dict
+        # Store ``data`` for ``tenant_id`` and return the artifact-ledger reference dict.
+    def get(self, ref: str) -> bytes
+        # Resolve ``ref`` to the exact stored bytes, verifying the content hash on the way out.
+    def exists(self, ref: str) -> bool
+        # True iff ``ref`` is well-formed AND resolves to a stored, tenant-scoped object. A forged/malformed
+    def head(self, ref: str) -> dict
+        # Return the metadata for a ref WITHOUT the bytes: ``{payload_ref, tenant_id, mime_type,
+    def tenant_of(self, ref: str) -> str
+        # The tenant a ref is scoped to (parsed from the opaque ref; raises on a forged ref).
+```
+## intra-module call edges
+src.baltor.adapters.object_store.local_object_store.parse_ref -> src.baltor.adapters.object_store.local_object_store.ForgedRefError
+src.baltor.adapters.object_store.local_object_store.parse_ref -> src.baltor.adapters.object_store.local_object_store.ForgedRefError
+src.baltor.adapters.object_store.local_object_store.parse_ref -> src.baltor.adapters.object_store.local_object_store.ForgedRefError
+src.baltor.adapters.object_store.local_object_store.parse_ref -> src.baltor.adapters.object_store.local_object_store.ForgedRefError
+src.baltor.adapters.object_store.local_object_store.put -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore._to_bytes
+src.baltor.adapters.object_store.local_object_store.put -> src.baltor.adapters.object_store.local_object_store._hash_bytes
+src.baltor.adapters.object_store.local_object_store.put -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
+src.baltor.adapters.object_store.local_object_store.put -> src.baltor.adapters.object_store.local_object_store.make_ref
+src.baltor.adapters.object_store.local_object_store.put -> src.baltor.adapters.object_store.local_object_store.ObjectStoreError
+src.baltor.adapters.object_store.local_object_store.put -> src.baltor.adapters.object_store.local_object_store._StoredObject
+src.baltor.adapters.object_store.local_object_store.get -> src.baltor.adapters.object_store.local_object_store.parse_ref
+src.baltor.adapters.object_store.local_object_store.get -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
+src.baltor.adapters.object_store.local_object_store.get -> src.baltor.adapters.object_store.local_object_store._hash_bytes
+src.baltor.adapters.object_store.local_object_store.get -> src.baltor.adapters.object_store.local_object_store.ForgedRefError
+src.baltor.adapters.object_store.local_object_store.get -> src.baltor.adapters.object_store.local_object_store.CorruptObjectError
+src.baltor.adapters.object_store.local_object_store.exists -> src.baltor.adapters.object_store.local_object_store.parse_ref
+src.baltor.adapters.object_store.local_object_store.head -> src.baltor.adapters.object_store.local_object_store.parse_ref
+src.baltor.adapters.object_store.local_object_store.head -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
+src.baltor.adapters.object_store.local_object_store.head -> src.baltor.adapters.object_store.local_object_store.ForgedRefError
+src.baltor.adapters.object_store.local_object_store.tenant_of -> src.baltor.adapters.object_store.local_object_store.parse_ref

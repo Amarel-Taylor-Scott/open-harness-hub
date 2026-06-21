@@ -1,0 +1,36 @@
+MODULE src/baltor/adapters/memory/supermemory_mcp.py
+## API signatures
+```python
+"""adapters/memory/supermemory_mcp — mcp.supermemory@candidate: a CONTRACT STUB for the memory MCP tools."""
+PROVIDER_ID = ...
+CREDENTIAL_REF = ...
+TOOLS = ...
+_STATUS_UNAVAILABLE = ...
+def _credentials_present() -> bool
+    # True only if the MCP credential is configured (checked via the env:// ref, never logged/echoed).
+class SupermemoryMcpProvider:
+    # CANDIDATE Supermemory MCP wrapper. Satisfies MemoryMCPProviderPort. With no creds every tool raises
+    def tools(self) -> list[str]
+    def _require_credentials(self) -> None
+    def memory(self, request: dict[str, Any]) -> dict[str, Any]
+        # MCP ``memory`` tool (remember). Stub: raises UnavailableProvider naming the env:// credential.
+    def recall(self, request: dict[str, Any]) -> dict[str, Any]
+        # MCP ``recall`` tool (search). Stub: raises UnavailableProvider naming the env:// credential.
+    def context(self, scope: dict[str, Any]) -> dict[str, Any]
+        # MCP ``context`` tool (profile static/dynamic). Stub: raises UnavailableProvider.
+    def status(self) -> dict[str, Any]
+def _self_demo() -> dict[str, Any]
+    # Deterministic offline demo used by the proof: status() green-unavailable; each tool raises Unavailable.
+```
+## intra-module call edges
+src.baltor.adapters.memory.supermemory_mcp._self_demo -> src.baltor.adapters.memory.supermemory_mcp.SupermemoryMcpProvider
+src.baltor.adapters.memory.supermemory_mcp._self_demo -> src.baltor.adapters.memory.supermemory_mcp.SupermemoryMcpProvider.status
+src.baltor.adapters.memory.supermemory_mcp._self_demo -> src.baltor.adapters.memory.supermemory_mcp.SupermemoryMcpProvider.tools
+src.baltor.adapters.memory.supermemory_mcp._self_demo -> src.baltor.adapters.memory.supermemory_mcp.SupermemoryMcpProvider.memory
+src.baltor.adapters.memory.supermemory_mcp._self_demo -> src.baltor.adapters.memory.supermemory_mcp.SupermemoryMcpProvider.recall
+src.baltor.adapters.memory.supermemory_mcp._self_demo -> src.baltor.adapters.memory.supermemory_mcp.SupermemoryMcpProvider.context
+src.baltor.adapters.memory.supermemory_mcp._require_credentials -> src.baltor.adapters.memory.supermemory_mcp._credentials_present
+src.baltor.adapters.memory.supermemory_mcp.memory -> src.baltor.adapters.memory.supermemory_mcp.SupermemoryMcpProvider._require_credentials
+src.baltor.adapters.memory.supermemory_mcp.recall -> src.baltor.adapters.memory.supermemory_mcp.SupermemoryMcpProvider._require_credentials
+src.baltor.adapters.memory.supermemory_mcp.context -> src.baltor.adapters.memory.supermemory_mcp.SupermemoryMcpProvider._require_credentials
+src.baltor.adapters.memory.supermemory_mcp.status -> src.baltor.adapters.memory.supermemory_mcp._credentials_present
