@@ -338,6 +338,26 @@ def _alive() -> tuple[bool, int | None]:
         return False, pid                        # stale pidfile (process gone)
 
 
+def _stray_daemon_pids(keep: int | None = None) -> list[int]:
+    """PIDs of running '--forever' orchestrator processes other than ``keep`` (and other than this process). A prior
+    manual restart can leave strays the pidfile doesn't track; supervise() uses this to enforce a SINGLE instance.
+    Matches by full argv (not pkill -f, which self-matches)."""
+    try:
+        out = subprocess.run(["ps", "-eo", "pid,args"], capture_output=True, text=True, timeout=10).stdout
+    except Exception:  # noqa: BLE001
+        return []
+    pids = []
+    for line in out.splitlines():
+        if "flywheel_orchestrator.py" in line and "--forever" in line:
+            try:
+                p = int(line.split(None, 1)[0])
+            except (ValueError, IndexError):
+                continue
+            if p != os.getpid() and p != keep:
+                pids.append(p)
+    return pids
+
+
 def monitor() -> dict:
     """Read-only MONITOR of the flywheels: is it running, which cycle, health, heartbeat age, and the ledgers."""
     st = load_state()
@@ -359,6 +379,16 @@ def supervise() -> int:
     """Ensure a --forever orchestrator is RUNNING (start it detached if down/stale), then print the monitor. This is
     the `/loop` entry: it starts the flywheels and watches them, restarting if the process died."""
     alive, pid = _alive()
+    # single-instance guard: kill any stray --forever daemons the pidfile doesn't track (a prior manual restart can
+    # leave duplicates that would double the work + race the shared state). Keep only the tracked-alive one.
+    strays = _stray_daemon_pids(keep=pid if alive else None)
+    for p in strays:
+        try:
+            os.kill(p, 9)
+        except OSError:
+            pass
+    if strays:
+        print(f"single-instance guard: killed {len(strays)} stray daemon(s) {strays}")
     if not alive:
         LOG.parent.mkdir(parents=True, exist_ok=True)
         # -u + PYTHONUNBUFFERED: stdout is block-buffered when redirected to a file, which would make `./loop logs`
@@ -455,6 +485,8 @@ def _self_test() -> int:
        all(k in m for k in ("running", "pid", "cycle", "health", "heartbeat_age_sec", "stale", "findings", "auto_applied", "errors")))
     ck("_alive() returns (bool, pid|None) for liveness", isinstance(_alive(), tuple) and isinstance(_alive()[0], bool))
     ck("supervise() is the /loop entry (start-if-down + monitor)", callable(supervise))
+    ck("single-instance guard present (kills stray --forever daemons; excludes self)",
+       callable(_stray_daemon_pids) and isinstance(_stray_daemon_pids(), list) and os.getpid() not in _stray_daemon_pids())
     ck("a no-heartbeat / stale loop is detectable (stale flag)", "stale" in m)
     print("\n" + ("PASS - flywheel_orchestrator: 9 flywheels (sweep/status/yc/propose/health/autofix/cleanup/checkpoint/logjam) "
                   "on an ADAPTIVE scheduler — SELF-DIRECTING (YC readiness files its own gaps), auto-checkpoint commits when "
