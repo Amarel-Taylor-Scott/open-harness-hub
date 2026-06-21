@@ -1,0 +1,27 @@
+MODULE src/baltor/adapters/memory/supermemory_emulator.py
+## API signatures
+```python
+"""adapters/memory/supermemory_emulator — memory.supermemory_emulator@v1: the DETERMINISTIC offline emulator."""
+PROVIDER_ID = ...
+_STATUS_EMULATED = ...
+EMULATES_CREDENTIAL_REF = ...
+def _upstream_id(*, tenant_id: str, project: str, content: Any) -> str
+    # Deterministic supermemory-ish upstream id: ``sm_<contenthash>``. Content-addressed, no RNG.
+class SupermemoryEmulatorProvider:
+    # Deterministic offline emulator. Satisfies MemoryProviderPort + MemoryProfileProviderPort with NO creds.
+    def __init__(self) -> None
+    def write(self, request: dict[str, Any]) -> dict[str, Any]
+    def search(self, request: dict[str, Any]) -> dict[str, Any]
+    def profile(self, scope: dict[str, Any]) -> dict[str, Any]
+    def status(self) -> dict[str, Any]
+def _self_demo(now: int=1000000) -> dict[str, Any]
+    # Deterministic offline demo used by the proof. Time injected; offline; no RNG; no creds.
+```
+## intra-module call edges
+src.baltor.adapters.memory.supermemory_emulator._self_demo -> src.baltor.adapters.memory.supermemory_emulator.SupermemoryEmulatorProvider
+src.baltor.adapters.memory.supermemory_emulator._self_demo -> src.baltor.adapters.memory.supermemory_emulator.SupermemoryEmulatorProvider.write
+src.baltor.adapters.memory.supermemory_emulator._self_demo -> src.baltor.adapters.memory.supermemory_emulator.SupermemoryEmulatorProvider.write
+src.baltor.adapters.memory.supermemory_emulator._self_demo -> src.baltor.adapters.memory.supermemory_emulator.SupermemoryEmulatorProvider.search
+src.baltor.adapters.memory.supermemory_emulator._self_demo -> src.baltor.adapters.memory.supermemory_emulator.SupermemoryEmulatorProvider.profile
+src.baltor.adapters.memory.supermemory_emulator._self_demo -> src.baltor.adapters.memory.supermemory_emulator.SupermemoryEmulatorProvider.status
+src.baltor.adapters.memory.supermemory_emulator.write -> src.baltor.adapters.memory.supermemory_emulator._upstream_id

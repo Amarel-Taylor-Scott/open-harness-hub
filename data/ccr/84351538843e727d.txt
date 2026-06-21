@@ -1,0 +1,20 @@
+MODULE src/teleon/workers/function_emulator.py
+## API signatures
+```python
+"""src.teleon.workers.function_emulator — the LOCAL FUNCTION EMULATOR execution backend (offline reference
+path). It is contract-identical to a cloud function: given a capability, it atomically CLAIMS tasks from the
+DurableFleetLedger, runs a registered lightweight handler, writes the result, and ack/nacks — idempotent,
+retry/DLQ-preserving. It publishes NO truth. This is what proves the execution-ba"""
+def _echo_handler(task: dict) -> list
+    # Default deterministic handler: 'process' a task into a result id (no truth, no side effects).
+class LocalFunctionEmulator:
+    def __init__(self, handlers: dict | None=None) -> None
+    def describe(self) -> dict
+    def health(self) -> dict
+    def invoke(self, task: dict)
+        # Run ONE pre-claimed task (handler dispatch). Returns ExecutionResult (never truth).
+    def invoke_durable(self, db: str, *, worker_id: str='fn-emu', capability: str, max_tasks: int=1000) -> dict
+        # Drain `capability` tasks from the durable ledger via ATOMIC CLAIM → handler → ack. Idempotent,
+```
+## intra-module call edges
+src.teleon.workers.function_emulator.invoke_durable -> src.teleon.workers.function_emulator.LocalFunctionEmulator.invoke

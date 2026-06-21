@@ -16,6 +16,29 @@ Companion adversarial narrative: `architecture-swot-hosting-review.md` §7.
 5. Cloudflare stays in front (DNS/CDN/tunnel); static frontends can ride Cloudflare Pages free.
 6. Owner leaning at research time: **Fly.io + custom Machines controller**.
 
+## Adjustments (2026-06-21 — after the two-product / store / repo-emit context changes)
+The provider CHOICE is unchanged (Fly compute/data + Cloudflare front still fit). What shifts is the SIZING — toward
+**cheaper / thinner**:
+- **Repo-emit (GitOps) output makes us thinner.** A new Teleon output emits a compiled capability as a REPOSITORY the
+  customer runs in THEIR OWN dev→test→prod + CI/CD (`src/teleon/compiler/emit.py::emit_repo`). That + customer-account /
+  Cloudflare Workers compute means much of the capability execution runs OFF our infra — the original "burst workers
+  0→8 fleet" sizing is now an UPPER bound, not the default. We host the control plane + metadata + the descent brain.
+- **Two standalone products (Baltor + Teleon).** Both need an independent deployable + public surface — already
+  supported by the separable plan (same region/private network, separate service/data/identity). No provider change.
+- **The open ecosystem is now a STORE both products consume + users version their own components.** Adds a
+  registry/versioning service + storage line: Postgres for the component index + **R2 (object storage)** for the
+  versioned component bodies + artifacts (and the demo videos). Cheap at launch; the growth line to watch.
+- **Per-hub engines (orchestrators/flywheels/agents).** More background improvement loops, but they ride the existing
+  **scale-to-zero / scheduled** flywheel model (lightweight control plane 24/7; expensive workers scale to zero) —
+  modest, fits the budget.
+- **Cloudflare's role grows:** Workers/Workers AI (burst/edge compute), **R2** (the store + versioned components + video
+  artifacts), Pages (the static surfaces), DNS/tunnel. The OpenTofu module (`deploy/tofu/cloudflare/main.tf`) is the
+  seam to extend (add R2 store buckets + Workers).
+
+**Net:** keep **Fly + Cloudflare**; size SMALLER on provider-operated burst compute (repo-emit + customer compute push
+it out); add an **R2 storage line** for the store + user-versioned components. The "agent sets up everything after
+account+billing" requirement is unchanged and now even easier (less to run).
+
 ## Workload shape priced everywhere
 
 - 6 always-on small backend services (Python, 256–512MB each, low idle CPU)

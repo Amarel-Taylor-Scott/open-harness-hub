@@ -1,0 +1,62 @@
+MODULE src/teleon/workers/fleet_ledger.py
+## API signatures
+```python
+"""src.teleon.workers.fleet_ledger — the DB-backed capability-task ledger: the SOURCE OF TRUTH for the
+worker fleet. Workers do NOT own a task until an atomic claim succeeds. In-memory + deterministic for
+self-tests (injected `now`, hashlib ids, no RNG); the same shape maps to SQLite (BEGIN IMMEDIATE) and later
+Postgres (SELECT ... FOR UPDATE SKIP LOCKED) without changing the task/worker contracts."""
+EPOCH = ...
+_VALID_TRANSITIONS = ...
+class FleetLedgerError:
+def _hid(prefix: str, *parts: Any) -> str
+class FleetLedger:
+    def __init__(self) -> None
+    def register_worker(self, *, worker_id: str, capability_ids: list, worker_bucket: str='', provider_id: str='', queue_names: list | None=None, resource_class: str='standard_cpu', max_concurrency: int=1, shutdown_after_idle_seconds: int=120, now: str=EPOCH) -> dict
+    def set_worker_status(self, worker_id: str, status: str, *, now: str=EPOCH, cooldown_until: str='') -> None
+    def heartbeat_worker(self, worker_id: str, now: str) -> None
+    def mark_worker_stale(self, worker_id: str, now: str) -> None
+    def live_workers(self, capability_id: str | None=None, *, now: str=EPOCH, stale_after_s: int=60) -> list[dict]
+    def enqueue_task(self, *, tenant_id: str, capability_id: str, idempotency_key: str, now: str, worker_bucket: str='', task_type: str='', priority_class: str='standard', queue_name: str='', payload_ref: str='', required_provider: str='', fallback_providers: list | None=None, batch_policy_id: str='on_demand_immediate', lifecycle_policy_id: str='burst_keepalive', sla_policy_id: str='standard_2m', max_attempts: int=3, not_before: str='', deadline_at: str='') -> dict
+    def _transition(self, task_id: str, new: str, *, worker_id: str='', reason: str='', now: str=EPOCH) -> None
+    def _ready(self, t: dict, capability_id: str, queue_names: list | None, now: str) -> bool
+    def claim_task(self, *, worker_id: str, capability_id: str, now: str, queue_names: list | None=None, lease_seconds: int=60) -> dict | None
+        # ATOMIC claim: the oldest ready task for this capability → exactly one worker. (SQLite: wrap in
+    def claim_batch(self, *, worker_id: str, capability_id: str, now: str, batch_min: int, queue_names: list | None=None, lease_seconds: int=300) -> list[dict]
+    def _provider_for(self, t: dict) -> str
+    def start_task(self, task_id: str, worker_id: str, now: str) -> dict
+    def update_progress(self, task_id: str, worker_id: str, progress: dict, now: str) -> None
+    def ack_task(self, task_id: str, worker_id: str, result_artifact_ids: list | None, now: str) -> dict
+    def nack_task(self, task_id: str, worker_id: str, error: dict, *, retryable: bool, now: str) -> dict
+    def reclaim_expired_leases(self, now: str) -> list[str]
+    def record_attempt(self, task_id: str, worker_id: str, provider_id: str, status: str) -> None
+    def task(self, task_id: str) -> dict | None
+    def queued_tasks(self, capability_id: str | None=None) -> list[dict]
+    def tasks_by_status(self, status: str) -> list[dict]
+    def attempts(self, task_id: str) -> list[dict]
+    def transitions(self, task_id: str) -> list[dict]
+    def snapshot(self, *, now: str=EPOCH) -> dict
+def _age_s(ts_from: str, ts_to: str) -> float
+def _epoch(ts: str) -> float
+def _plus_s(ts: str, s: int) -> str
+```
+## intra-module call edges
+src.teleon.workers.fleet_ledger._age_s -> src.teleon.workers.fleet_ledger._epoch
+src.teleon.workers.fleet_ledger._age_s -> src.teleon.workers.fleet_ledger._epoch
+src.teleon.workers.fleet_ledger.live_workers -> src.teleon.workers.fleet_ledger._age_s
+src.teleon.workers.fleet_ledger.enqueue_task -> src.teleon.workers.fleet_ledger._hid
+src.teleon.workers.fleet_ledger._transition -> src.teleon.workers.fleet_ledger.FleetLedgerError
+src.teleon.workers.fleet_ledger.claim_task -> src.teleon.workers.fleet_ledger.FleetLedger._transition
+src.teleon.workers.fleet_ledger.claim_task -> src.teleon.workers.fleet_ledger._plus_s
+src.teleon.workers.fleet_ledger.claim_task -> src.teleon.workers.fleet_ledger.FleetLedger.record_attempt
+src.teleon.workers.fleet_ledger.claim_task -> src.teleon.workers.fleet_ledger.FleetLedgerError
+src.teleon.workers.fleet_ledger.claim_task -> src.teleon.workers.fleet_ledger.FleetLedger._provider_for
+src.teleon.workers.fleet_ledger.claim_task -> src.teleon.workers.fleet_ledger.FleetLedger._ready
+src.teleon.workers.fleet_ledger.claim_batch -> src.teleon.workers.fleet_ledger.FleetLedger.claim_task
+src.teleon.workers.fleet_ledger.start_task -> src.teleon.workers.fleet_ledger.FleetLedger._transition
+src.teleon.workers.fleet_ledger.start_task -> src.teleon.workers.fleet_ledger.FleetLedgerError
+src.teleon.workers.fleet_ledger.update_progress -> src.teleon.workers.fleet_ledger.FleetLedgerError
+src.teleon.workers.fleet_ledger.ack_task -> src.teleon.workers.fleet_ledger.FleetLedger._transition
+src.teleon.workers.fleet_ledger.ack_task -> src.teleon.workers.fleet_ledger.FleetLedger.record_attempt
+src.teleon.workers.fleet_ledger.ack_task -> src.teleon.workers.fleet_ledger.FleetLedgerError
+src.teleon.workers.fleet_ledger.ack_task -> src.teleon.workers.fleet_ledger.FleetLedger._provider_for
+src.teleon.workers.fleet_ledger.nack_task -> src.teleon.workers.fleet_ledger.FleetLedger.record_attempt

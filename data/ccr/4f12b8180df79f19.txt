@@ -1,0 +1,32 @@
+MODULE src/baltor/adapters/memory/supermemory_api.py
+## API signatures
+```python
+"""adapters/memory/supermemory_api — memory.supermemory_api@candidate: a CONTRACT STUB (no SDK, no network)."""
+PROVIDER_ID = ...
+CREDENTIAL_REF = ...
+_STATUS_UNAVAILABLE = ...
+def _credentials_present() -> bool
+    # True only if the real credential is configured. Checked via the env:// ref WITHOUT logging/echoing its
+class SupermemoryApiProvider:
+    # CANDIDATE Supermemory API wrapper. Satisfies MemoryProviderPort + MemoryProfileProviderPort. With no
+    def _require_credentials(self) -> None
+    def write(self, request: dict[str, Any]) -> dict[str, Any]
+        # Would POST add(...) to Supermemory and return a governed candidate MemoryArtifact. Stub: raises.
+    def search(self, request: dict[str, Any]) -> dict[str, Any]
+        # Would POST search(...) and return candidate MemoryArtifacts. Stub: raises UnavailableProvider.
+    def profile(self, scope: dict[str, Any]) -> dict[str, Any]
+        # Would GET profile (static/dynamic) as candidate MemoryArtifacts. Stub: raises UnavailableProvider.
+    def status(self) -> dict[str, Any]
+        # Report liveness WITHOUT raising. Names the env:// credential ref; never echoes a value.
+def _self_demo() -> dict[str, Any]
+    # Deterministic offline demo used by the proof: status() is green-unavailable; ops raise UnavailableProvider.
+```
+## intra-module call edges
+src.baltor.adapters.memory.supermemory_api._self_demo -> src.baltor.adapters.memory.supermemory_api.SupermemoryApiProvider
+src.baltor.adapters.memory.supermemory_api._self_demo -> src.baltor.adapters.memory.supermemory_api.SupermemoryApiProvider.status
+src.baltor.adapters.memory.supermemory_api._self_demo -> src.baltor.adapters.memory.supermemory_api.SupermemoryApiProvider.search
+src.baltor.adapters.memory.supermemory_api._require_credentials -> src.baltor.adapters.memory.supermemory_api._credentials_present
+src.baltor.adapters.memory.supermemory_api.write -> src.baltor.adapters.memory.supermemory_api.SupermemoryApiProvider._require_credentials
+src.baltor.adapters.memory.supermemory_api.search -> src.baltor.adapters.memory.supermemory_api.SupermemoryApiProvider._require_credentials
+src.baltor.adapters.memory.supermemory_api.profile -> src.baltor.adapters.memory.supermemory_api.SupermemoryApiProvider._require_credentials
+src.baltor.adapters.memory.supermemory_api.status -> src.baltor.adapters.memory.supermemory_api._credentials_present

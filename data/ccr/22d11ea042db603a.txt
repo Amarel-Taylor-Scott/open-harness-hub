@@ -1,0 +1,22 @@
+MODULE src/baltor/adapters/memory/baltor_local.py
+## API signatures
+```python
+"""adapters/memory/baltor_local — memory.baltor_local@v1: the working LOCAL memory provider."""
+PROVIDER_ID = ...
+_STATUS_AVAILABLE = ...
+class BaltorLocalMemoryProvider:
+    # Working local memory/recall/profile provider. Satisfies MemoryProviderPort + MemoryProfileProviderPort.
+    def __init__(self) -> None
+    def write(self, request: dict[str, Any]) -> dict[str, Any]
+    def search(self, request: dict[str, Any]) -> dict[str, Any]
+    def profile(self, scope: dict[str, Any]) -> dict[str, Any]
+    def status(self) -> dict[str, Any]
+def _self_demo(now: int=1000000) -> dict[str, Any]
+    # Deterministic in-memory demo used by the proof. Time injected; offline; no RNG.
+```
+## intra-module call edges
+src.baltor.adapters.memory.baltor_local._self_demo -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider
+src.baltor.adapters.memory.baltor_local._self_demo -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.write
+src.baltor.adapters.memory.baltor_local._self_demo -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.write
+src.baltor.adapters.memory.baltor_local._self_demo -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.search
+src.baltor.adapters.memory.baltor_local._self_demo -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.profile
