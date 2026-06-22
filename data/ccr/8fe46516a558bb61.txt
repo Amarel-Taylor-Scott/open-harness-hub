@@ -1,0 +1,22 @@
+MODULE src/teleon/runtime/key_holder.py
+## API signatures
+```python
+"""src.teleon.runtime.key_holder — the runtime KEY HOLDER (developer-key side of the credential plane)."""
+_HEADER_STYLE = ...
+class KeyHolder:
+    # Holds + resolves developer/platform keys for the pipeline. No values are stored on the instance; each call reads
+    def held(self, env: dict | None=None, tenant_keys: set | None=None) -> set[str]
+        # Service ids whose key is currently available (a developer added it, or it's keyless/platform-within-limits).
+    def resolve(self, service_id: str, env: dict | None=None, *, tenant_keys: set | None=None) -> str | None
+        # The secret VALUE for a reachable service (its first env var), or None. NEVER log the return value.
+    def auth_headers(self, service_id: str, env: dict | None=None, *, tenant_keys: set | None=None) -> dict
+        # Ready-to-use auth header(s) for the service ({} if no key is held) — so callers never touch the raw value.
+    def missing(self, service_id: str, env: dict | None=None) -> list[str]
+        # The env var(s) a developer must set to enable this service ([] if held). For honest 'needs X' messages.
+    def status(self, env: dict | None=None, tenant_keys: set | None=None) -> dict
+        # REDACTED snapshot for display: which services are held vs missing, the mode (byo/platform), and limits — NO
+HOLDER = ...
+```
+## intra-module call edges
+src.teleon.runtime.key_holder.auth_headers -> src.teleon.runtime.key_holder.KeyHolder.resolve
+src.teleon.runtime.key_holder.status -> src.teleon.runtime.key_holder.KeyHolder.held

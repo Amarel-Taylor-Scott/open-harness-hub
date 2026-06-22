@@ -1,0 +1,18 @@
+MODULE src/teleon/extraction/pdf_profiler.py
+## API signatures
+```python
+"""src.teleon.extraction.pdf_profiler — profile a PDF cheaply, classify its layout, SHORTCUT to the right extraction path."""
+_ROUTES = ...
+_ALL_RUNGS = ...
+def classify_layout(profile: dict) -> str
+    # Deterministic layout class from cheap signals (most-decisive-first). profile keys: encrypted, page_count,
+def route(layout: str) -> list[str]
+    # The extraction rungs to run for a layout class (the rest of the ladder is shortcut away).
+def shortcut_plan(profile: dict) -> dict
+    # Profile -> layout -> the shortcut plan: which rungs to run, which are SKIPPED, and an honest blocker if any.
+def profile_pdf(path) -> dict
+    # Reader ADAPTER: cheap deterministic signals via pypdf. Honest: if pypdf is absent/unreadable, returns
+```
+## intra-module call edges
+src.teleon.extraction.pdf_profiler.shortcut_plan -> src.teleon.extraction.pdf_profiler.classify_layout
+src.teleon.extraction.pdf_profiler.shortcut_plan -> src.teleon.extraction.pdf_profiler.route

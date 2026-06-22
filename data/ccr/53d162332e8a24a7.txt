@@ -1,0 +1,21 @@
+MODULE src/teleon/synthesis/strategist.py
+## API signatures
+```python
+"""src.teleon.synthesis.strategist — resilient synthesis: when backtracking exhausts the tree, ESCAPE the dead-end."""
+_REPO = ...
+def _load(name)
+class EscapeAttempt:
+def resilient_synthesize(base_points, tester, *, intent: str='', strategies=())
+    # Try base_points; on failure, try each escape strategy (a fn(history_of_tried_plans) -> new_points | None) in order.
+def _planes_for_intent(intent: str) -> dict
+def default_strategies(intent: str)
+```
+## intra-module call edges
+src.teleon.synthesis.strategist.resilient_synthesize -> src.teleon.synthesis.strategist.EscapeAttempt
+src.teleon.synthesis.strategist.default_strategies -> src.teleon.synthesis.strategist._planes_for_intent
+src.teleon.synthesis.strategist.default_strategies -> src.teleon.synthesis.strategist._load
+src.teleon.synthesis.strategist.default_strategies -> src.teleon.synthesis.strategist._load
+src.teleon.synthesis.strategist.default_strategies -> src.teleon.synthesis.strategist._load
+src.teleon.synthesis.strategist.default_strategies -> src.teleon.synthesis.strategist._load
+src.teleon.synthesis.strategist.run -> src.teleon.synthesis.strategist.EscapeAttempt
+src.teleon.synthesis.strategist.reframe_ladder -> src.teleon.synthesis.strategist._load

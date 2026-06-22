@@ -1,0 +1,22 @@
+MODULE src/teleon/runtime/entitlements.py
+## API signatures
+```python
+"""src.teleon.runtime.entitlements — bridge the registries to the access policy: build resource dicts + filter by principal."""
+_REPO = ...
+_EVASION_TOOLS = ...
+def _tool_planes() -> dict
+def tool_resource(tool_id: str, *, plane: str | None=None, governance: str | None=None) -> dict
+    # A resource dict for a tool: its plane, the governance in force (the rung's, or evasion/social inferred), and the
+def credential_resource(service_id: str) -> dict
+def entitled_key(principal, service_id: str) -> bool
+def entitled_tools(principal, tool_ids, *, plane: str | None=None, governance: str | None=None) -> list[str]
+    # The subset of tool ids the principal may use (plane/governance carry the rung's context).
+def gate_options(principal, options, *, plane=None, governance=None) -> list[str]
+    # Filter a DAG node's options to the entitled ones; if NONE are entitled, return an HONEST blocked sentinel naming
+```
+## intra-module call edges
+src.teleon.runtime.entitlements.tool_resource -> src.teleon.runtime.entitlements._tool_planes
+src.teleon.runtime.entitlements.entitled_key -> src.teleon.runtime.entitlements.credential_resource
+src.teleon.runtime.entitlements.entitled_tools -> src.teleon.runtime.entitlements.tool_resource
+src.teleon.runtime.entitlements.gate_options -> src.teleon.runtime.entitlements.entitled_tools
+src.teleon.runtime.entitlements.gate_options -> src.teleon.runtime.entitlements.tool_resource

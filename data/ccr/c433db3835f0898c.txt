@@ -1,0 +1,20 @@
+MODULE src/teleon/synthesis/synthesis_trace.py
+## API signatures
+```python
+"""src.teleon.synthesis.synthesis_trace — per-step DATA TRACKING for capability synthesis (the telemetry layer)."""
+class SynthesisStep:
+class SynthesisTrace:
+    def from_tree(cls, tree, *, intent: str='', strategy: str='base') -> 'SynthesisTrace'
+    def total_cost(self) -> float
+    def deterministic_ratio(self) -> float
+        # share of explored choices that were deterministic (model:/llm: choices are not) — the descent's health.
+    def explored_vs_committed(self) -> dict
+        # did we 'jump down too fast'? high explored-but-not-committed = healthy breadth; 0 alternatives = a red flag.
+    def summary(self) -> dict
+    def to_jsonl(self) -> str
+```
+## intra-module call edges
+src.teleon.synthesis.synthesis_trace.from_tree -> src.teleon.synthesis.synthesis_trace.SynthesisStep
+src.teleon.synthesis.synthesis_trace.summary -> src.teleon.synthesis.synthesis_trace.SynthesisTrace.total_cost
+src.teleon.synthesis.synthesis_trace.summary -> src.teleon.synthesis.synthesis_trace.SynthesisTrace.deterministic_ratio
+src.teleon.synthesis.synthesis_trace.summary -> src.teleon.synthesis.synthesis_trace.SynthesisTrace.explored_vs_committed

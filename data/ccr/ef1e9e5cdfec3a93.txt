@@ -1,0 +1,23 @@
+MODULE src/teleon/runtime/access_policy.py
+## API signatures
+```python
+"""src.teleon.runtime.access_policy — WHO may use a tool/key/capability (authorization over the registries)."""
+_REPO = ...
+def _cfg() -> dict
+class Principal:
+    def from_role(cls, role: str, *, byo_keys=None) -> 'Principal'
+def classify(resource: dict) -> dict
+    # Resource dict (fields: internal?, governance?, plane?, key_ownership?, key_service?, keyless?, deterministic?, kind?)
+def can_access(principal: Principal, resource: dict) -> tuple[bool, str]
+    # (allowed, reason). Deny-by-default.
+def accessible(principal: Principal, resources: list[dict]) -> list[dict]
+    # Filter a list of resource dicts (each must carry an 'id') to those the principal may use.
+def explain(principal: Principal, resources: list[dict]) -> list[dict]
+```
+## intra-module call edges
+src.teleon.runtime.access_policy.can_access -> src.teleon.runtime.access_policy.classify
+src.teleon.runtime.access_policy.can_access -> src.teleon.runtime.access_policy._cfg
+src.teleon.runtime.access_policy.accessible -> src.teleon.runtime.access_policy.can_access
+src.teleon.runtime.access_policy.explain -> src.teleon.runtime.access_policy.can_access
+src.teleon.runtime.access_policy.explain -> src.teleon.runtime.access_policy.classify
+src.teleon.runtime.access_policy.from_role -> src.teleon.runtime.access_policy._cfg
