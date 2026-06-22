@@ -40,7 +40,7 @@ _REGISTRY = _REPO / "architecture" / "lowcost_llm_endpoint_registry.json"
 
 # Data classes that low-cost / China-region lanes must NEVER carry. Single source for this check.
 FORBIDDEN_DATA_CLASSES = ("customer", "regulated", "secrets", "confidential", "pii")
-ALLOWED_COST_CLASSES = ("lowcost_usd", "paid")
+ALLOWED_COST_CLASSES = ("lowcost_usd", "paid", "byo_customer_account")  # the catalog also holds BYO edge lanes (compute on the customer account)
 EXPECTED_ADMIT_TIERS = ["admit_first", "probation", "watchlist", "exclude"]
 EXPECTED_STATUSES = {"candidate", "probation", "watchlist", "exclude"}
 REQUIRED_FIELDS = (
