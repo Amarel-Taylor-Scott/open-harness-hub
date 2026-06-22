@@ -326,6 +326,25 @@ def _fw_adapters() -> dict:
             "signal": "gates_red" if not ok else "ok", "gaps": gaps}
 
 
+def _fw_harvest() -> dict:
+    """Scheduled tool DISCOVERY: harvest a small batch of real tools into the staged massive layer (resumable cursor,
+    rate-limit-honest) + PROMOTE the license-clean ones past the boundary. Grows the registry unattended. Network-gated
+    (honest no-op offline) + bounded per tick (a few queries) to respect rate limits."""
+    try:
+        from src.teleon.research.source_search import network_allowed
+        if not network_allowed():
+            return {"summary": "harvest skipped (network not allowed)", "signal": "ok"}
+        import scripts.harvest_tools as _H
+        import scripts.promote_tools as _PR
+        h = _H.harvest(max_queries=5)
+        p = _PR.promote()
+        return {"summary": f"harvest +{h['new_staged']} staged ({h['total_staged']} total, cursor {h['cursor']}/{h['of']}"
+                           f"{', rate-limited' if h['rate_limited'] else ''}); promote +{p['promoted']} ({p['total_promoted']} total)",
+                "signal": "ok"}
+    except Exception as e:  # noqa: BLE001
+        return {"summary": f"harvest unavailable: {type(e).__name__}", "signal": "ok"}
+
+
 #: name -> {cadence (run roughly every N cycles), fn}. The scheduler picks the most-overdue, with adjustments.
 FLYWHEELS = {
     "sweep": {"cadence": 1, "fn": _fw_sweep},      # the main engine — every cycle by default
@@ -339,6 +358,7 @@ FLYWHEELS = {
     "surfaces": {"cadence": 10, "fn": _fw_surfaces},  # keep the public sites fresh + validated (rebuild from registries)
     "adapters": {"cadence": 11, "fn": _fw_adapters},  # keep components swappable behind wrappers (drop-in test + gaps)
     "checkpoint": {"cadence": 15, "fn": _fw_checkpoint},  # track-3: auto-commit checkpoints when gates are green
+    "harvest": {"cadence": 13, "fn": _fw_harvest},  # scheduled DISCOVERY: grow the staged tool registry + promote (network-gated)
     "logjam": {"cadence": 999, "fn": None},        # STALL-triggered only (needs state -> handled specially); not rotated
 }
 
@@ -541,7 +561,7 @@ def _self_test() -> int:
         print(f"  [{'ok' if ok else 'FAIL'}] {name}{(': '+detail) if detail and not ok else ''}")
         if not ok: fails.append(name)
     ck("flywheels registered (sweep/status/yc/propose/hubs/health/autofix/cleanup/surfaces/adapters/checkpoint/logjam)",
-       set(FLYWHEELS) == {"sweep", "status", "yc", "propose", "hubs", "health", "autofix", "cleanup", "surfaces", "adapters", "checkpoint", "logjam"})
+       set(FLYWHEELS) == {"sweep", "status", "yc", "propose", "hubs", "health", "autofix", "cleanup", "surfaces", "adapters", "checkpoint", "harvest", "logjam"})
     ck("surfaces flywheel keeps the public sites fresh + validated", FLYWHEELS["surfaces"]["fn"] is _fw_surfaces)
     ck("adapters flywheel keeps components swappable behind wrappers (drop-in + gap proposals)", FLYWHEELS["adapters"]["fn"] is _fw_adapters)
     ck("hubs flywheel registered (continuously populates the Open*Hubs)", "hubs" in FLYWHEELS)
@@ -569,7 +589,7 @@ def _self_test() -> int:
     s3 = {"cycle": 2, "last": {"sweep": 1}, "errors": {"sweep": 3}, "health": "ok"}
     ck("ADJUSTMENT: a flywheel in error-cooldown is skipped (not picked)", pick_flywheel(s3) != "sweep")
     # cadence: cleanup becomes most-overdue eventually
-    s4 = {"cycle": 30, "last": {"sweep": 29, "health": 28, "status": 29, "yc": 29, "propose": 29, "hubs": 29, "autofix": 29, "surfaces": 29, "adapters": 29, "checkpoint": 29, "cleanup": 0}, "errors": {}, "health": "ok"}
+    s4 = {"cycle": 30, "last": {"sweep": 29, "health": 28, "status": 29, "yc": 29, "propose": 29, "hubs": 29, "autofix": 29, "surfaces": 29, "adapters": 29, "checkpoint": 29, "harvest": 29, "cleanup": 0}, "errors": {}, "health": "ok"}
     ck("cadence makes a long-overdue flywheel (cleanup) eligible", pick_flywheel(s4) == "cleanup", pick_flywheel(s4))
     # STALL -> LOGJAM: persistent red gates (health red across enough runs) escalate from health-retry to a logjam-break
     s5 = {"cycle": 10, "last": {"health": 9}, "errors": {}, "health": "red", "health_red_streak": 3, "last_logjam": -999}
