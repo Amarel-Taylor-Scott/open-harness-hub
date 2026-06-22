@@ -11,6 +11,7 @@ DEVELOPMENT plane (the operator surface); the engines + store are PRODUCT (src/o
   --discover [q]  autonomous OpenClaw/Hermes sweep   --fresh [q]  Teleon keep_hub_fresh (unbounded→bounded)
   --generate [HubId]  GENERATE channel: emit candidates from our own systems (method catalog / descent brain)
   --capability "<plain text>" [--plan-only] [--rounds N]  plan + run an OPEN-ENDED capability (iterative/scheduled/multi-component)
+  --browse <url> [--goal "..."] [--steps N]  run the low-cost-LLM-driven browser (the research descent's deep-detail tier)
   --feed [HubId]  print the substrate_feed (what Teleon/Baltor consume)
   --self-test     offline: the runner wires every hub + runs a cycle
 CLI: PYTHONPATH=. python3 scripts/hub_engine_runner.py --ingest OpenSkillsHub --okf my_skill.md --improve
@@ -238,6 +239,19 @@ def generate_cmd(hub: str | None, *, tenant="_global", use_llm=False) -> int:
     return 0
 
 
+def browse_cmd(url: str, *, goal: str = "the page's main content", steps: int = 3) -> int:
+    """Run the REAL low-cost-LLM-driven browser (the catalog's browse-tier component) on a URL — the expensive tier
+    the research descent escalates to only for deep detail. Renders via chromium, the cheap LLM extracts the goal
+    (deterministic fallback if no LLM lane), bounded steps+tokens, prints the receipt. serves_truth=false."""
+    from src.teleon.research.llm_browser import LLMBrowserDriver
+    r = LLMBrowserDriver(max_steps=steps).browse(url, goal=goal)
+    print(json.dumps(r.as_dict(), indent=1))
+    print(f"\nfound={r.found} pages={r.pages_visited} steps={r.steps} llm_calls={r.llm_calls} ~tokens={r.approx_tokens} — serves_truth=false")
+    if r.note:
+        print(f"note: {r.note}")
+    return 0
+
+
 def capability_cmd(intent: str, *, plan_only: bool = False, rounds: int = 5, tenant: str = "_global") -> int:
     """Process an OPEN-ENDED capability ('scrape the internet for more skills for openskillshub.io'): the planner
     recognizes iterative/scheduled, resolves the hub, descends the research catalog, decomposes into steps, executes."""
@@ -368,6 +382,13 @@ def _main(argv=None):
     if "--feed" in argv:
         i = argv.index("--feed")
         return feed(argv[i + 1] if i + 1 < len(argv) and not argv[i + 1].startswith("-") else None)
+    if "--browse" in argv:
+        url = _val(argv, "--browse")
+        if not url or url.startswith("-"):
+            print('usage: --browse <url> [--goal "what to extract"] [--steps N]')
+            return 1
+        return browse_cmd(url, goal=_val(argv, "--goal", "the page's main content"),
+                          steps=int(_val(argv, "--steps", "3") or 3))
     if "--capability" in argv:
         intent = _val(argv, "--capability")
         if not intent:

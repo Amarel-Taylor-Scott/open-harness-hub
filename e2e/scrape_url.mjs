@@ -25,6 +25,8 @@ try {
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 });
   const out = await page.evaluate(() => ({
     title: document.title,
+    // body text (capped) so the LLM-driven browser can extract a target field; additive — link-only callers ignore it.
+    text: ((document.body && document.body.innerText) || '').replace(/\s+/g, ' ').trim().slice(0, 12000),
     links: [...document.querySelectorAll('a[href]')].slice(0, 40)
       .map((a) => ({ text: (a.textContent || '').trim().slice(0, 80), href: a.href }))
       .filter((x) => x.text),
