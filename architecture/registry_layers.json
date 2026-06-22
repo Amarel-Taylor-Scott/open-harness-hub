@@ -1,0 +1,13 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-22",
+  "principle": "MASSIVE registries of all tools, layered + governed — never hand-typed filler, never fabricated counts. The curated CORE (architecture/tool_registry.json, ~hundreds) is vetted + promoted; the massive STAGED layer (JSONL, thousands -> millions) is scraped by the harvester (discovery≠trust: candidate-only, license-classified, deduped by content hash); a row is PROMOTED core <- staged only when license-clean + vetted (the promotion boundary). Counts are COMPUTED (registry_stats), never written into prose. Scale path: JSONL staging -> Postgres/pgvector load plan (per the factory model). serves_truth=false.",
+  "serves_truth": false,
+  "layers": [
+    {"layer": "core_curated", "store": "architecture/tool_registry.json", "scale": "hundreds", "status": "vetted/promoted", "hand_authored": true, "note": "the descent + checks read this; every row real + license-classified"},
+    {"layer": "staged_massive", "store": "data/dev-intel/tool_registry_staging.jsonl", "scale": "thousands -> millions", "status": "candidate (discovery≠trust)", "hand_authored": false, "note": "scraped by scripts/harvest_tools.py; deduped by content hash; license + plane classified; NOT read by the descent until promoted"},
+    {"layer": "candidate_feeds", "store": "data/dev-intel/discovered_*.jsonl", "scale": "ongoing", "status": "ideated candidates", "hand_authored": false, "note": "discovery_pipeline / discover_tools output -> feed the staged layer"}
+  ],
+  "promotion_boundary": "staged -> core requires: permissive license (vendorable) OR a service/technique tag, a real source URL, dedupe-clean, and a vetting pass. NOTHING in staging is read by the descent.",
+  "harvester": "scripts/harvest_tools.py (resumable cursor over generated queries; honest rate-limit stop); counts via scripts/registry_stats.py"
+}
