@@ -1,0 +1,58 @@
+MODULE src/teleon/capability_planner.py
+## API signatures
+```python
+"""src.teleon.capability_planner — turn an OPEN-ENDED plain-text capability into an executable, possibly-iterative,
+possibly-scheduled, MULTI-COMPONENT plan."""
+_ITERATIVE_HINTS = ...
+_SCHEDULE_HINTS = ...
+_EVERY = ...
+_DEEP_HINTS = ...
+_TEXT_HINTS = ...
+_IMPROVE_HINTS = ...
+_CONTRIBUTE_HINTS = ...
+class PlanStep:
+class CapabilityPlan:
+    def as_dict(self) -> dict
+_DOCEXTRACT_HINTS = ...
+def _match_task(t: str) -> str | None
+    # First catalog task whose keyword appears (most-specific-first). Returns a task_id or None.
+def classify_capability_type(intent: str) -> str
+    # Route an open-ended capability to a TYPE: hub_population (populate a hub), document_extraction (the richer
+def resolve_schema(intent: str) -> str | None
+    # Map free text to a known extraction schema template (land lease / oil & gas / invoice / …), or None.
+def classify(intent: str) -> dict
+    # Recognize whether an open-ended capability is iterative and/or scheduled (the core 'be intelligent' step).
+def resolve_hub(intent: str, hubs: list[str], *, kinds: dict | None=None) -> str | None
+    # Map free text to a hub: exact name, domain (openskillshub.io), or the hub's content_kind keyword.
+def infer_capability(intent: str) -> str
+    # Which research capability the detail needs → drives the research-catalog descent (browser only for deep detail).
+def _plan_document_extraction(intent: str) -> CapabilityPlan
+    # A capability like 'intake a PDF/email and extract this schema' → routed to the document cascade (the efficient
+def _plan_tunable_task(intent: str, task_id: str, *, available_keys: tuple=('LLM_API_KEY',)) -> CapabilityPlan
+    # A capability like 'classify these tickets' / 'answer with citations' / 'summarize' → routed to the tunable-task
+def plan(intent: str, *, hubs: list[str], kinds: dict | None=None, available: set | None=None, max_rounds: int=5, no_new_rounds: int=2) -> CapabilityPlan
+    # Decompose an open-ended capability into a typed, executable plan. document_extraction → the cascade; a tunable
+def execute(p: CapabilityPlan, *, hub_engines: dict, openclaw=None, tools: list | None=None, brain=None, tenant: str='_global', run_round=None) -> dict
+    # Execute the plan as a BOUNDED loop. Each round runs one freshness pass (keep_hub_fresh by default; injectable).
+```
+## intra-module call edges
+src.teleon.capability_planner.classify_capability_type -> src.teleon.capability_planner._match_task
+src.teleon.capability_planner._plan_document_extraction -> src.teleon.capability_planner.resolve_schema
+src.teleon.capability_planner._plan_document_extraction -> src.teleon.capability_planner.CapabilityPlan
+src.teleon.capability_planner._plan_document_extraction -> src.teleon.capability_planner.PlanStep
+src.teleon.capability_planner._plan_document_extraction -> src.teleon.capability_planner.PlanStep
+src.teleon.capability_planner._plan_document_extraction -> src.teleon.capability_planner.PlanStep
+src.teleon.capability_planner._plan_document_extraction -> src.teleon.capability_planner.PlanStep
+src.teleon.capability_planner._plan_document_extraction -> src.teleon.capability_planner.PlanStep
+src.teleon.capability_planner._plan_tunable_task -> src.teleon.capability_planner.CapabilityPlan
+src.teleon.capability_planner._plan_tunable_task -> src.teleon.capability_planner.PlanStep
+src.teleon.capability_planner.plan -> src.teleon.capability_planner.classify_capability_type
+src.teleon.capability_planner.plan -> src.teleon.capability_planner.classify
+src.teleon.capability_planner.plan -> src.teleon.capability_planner.infer_capability
+src.teleon.capability_planner.plan -> src.teleon.capability_planner.CapabilityPlan
+src.teleon.capability_planner.plan -> src.teleon.capability_planner._plan_document_extraction
+src.teleon.capability_planner.plan -> src.teleon.capability_planner._plan_tunable_task
+src.teleon.capability_planner.plan -> src.teleon.capability_planner.resolve_hub
+src.teleon.capability_planner.plan -> src.teleon.capability_planner.PlanStep
+src.teleon.capability_planner.plan -> src.teleon.capability_planner.PlanStep
+src.teleon.capability_planner.plan -> src.teleon.capability_planner.PlanStep
