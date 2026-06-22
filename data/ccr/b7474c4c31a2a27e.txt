@@ -1,0 +1,22 @@
+MODULE src/teleon/repo_strategy.py
+## API signatures
+```python
+"""src.teleon.repo_strategy — decompose GitHub repos + strategize how they (or variations, or our code) could integrate."""
+DISPOSITIONS = ...
+_HUB_KEYWORDS = ...
+_DEFAULT_HUB = ...
+def normalize_repo_urls(text: str) -> list[dict]
+    # Extract clean github repos from messy input — strips ?fbclid/tracking + #frags, splits CONCATENATED urls
+def decompose(meta: dict, readme: str='') -> dict
+    # Structured decomposition of a repo from its metadata + README (deterministic; no LLM needed).
+def map_to_hub(decomp: dict) -> str
+    # Which Open*Hub this repo most naturally feeds (keyword map over name+topics+what).
+def strategize(decomp: dict, hub: str | None=None) -> dict
+    # How this repo / a variation / our code could integrate + improve — with a governed disposition.
+def build_record(owner: str, repo: str, url: str, meta: dict | None, readme: str='', *, fetched: bool=True) -> dict
+    # ONE governed candidate record. adoptable = ADOPT-CANDIDATE AND vendorable (copyleft/unstated never adoptable).
+```
+## intra-module call edges
+src.teleon.repo_strategy.strategize -> src.teleon.repo_strategy.map_to_hub
+src.teleon.repo_strategy.build_record -> src.teleon.repo_strategy.decompose
+src.teleon.repo_strategy.build_record -> src.teleon.repo_strategy.strategize

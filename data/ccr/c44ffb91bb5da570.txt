@@ -1,0 +1,45 @@
+MODULE src/teleon/research/llm_browser.py
+## API signatures
+```python
+"""src.teleon.research.llm_browser — the REAL low-cost-LLM-driven browser driver (the catalog's browse-tier component)."""
+_REPO = ...
+_RENDER_MJS = ...
+_MAX_STEPS = ...
+_MAX_CHARS = ...
+class BrowseResult:
+    def as_dict(self) -> dict
+def _default_render(url: str) -> dict
+    # Render via the default browser PORT (engine-agnostic; single-sourced in browser_port.PlaywrightBrowser).
+def _deterministic_extract(goal: str, text: str) -> str
+    # No-LLM fallback: return the sentence/line best matching the goal terms (honest, not invented).
+def _pick_link(goal: str, links: list, visited: set) -> str | None
+class LLMBrowserDriver:
+    # Low-cost-LLM-driven, bounded browser. browse(url, goal) → BrowseResult (+ receipt). serves_truth=false.
+    def __init__(self, *, render=None, browser=None, llm='auto', max_steps: int=_MAX_STEPS, max_chars: int=_MAX_CHARS)
+    def _extract(self, goal: str, text: str) -> tuple[str, int, int]
+        # Return (answer, llm_calls, approx_tokens). LLM if available, else deterministic. 'NOT_FOUND'/'' = not found.
+    def browse(self, url: str, *, goal: str, budget_steps: int | None=None) -> BrowseResult
+def make_browser_component(**kw)
+    # Build the injectable research component the catalog references (mirrors generators.make_descent_brain_generator).
+def _self_test() -> int
+```
+## intra-module call edges
+src.teleon.research.llm_browser.make_browser_component -> src.teleon.research.llm_browser.LLMBrowserDriver
+src.teleon.research.llm_browser.make_browser_component -> src.teleon.research.llm_browser.BrowseResult.as_dict
+src.teleon.research.llm_browser.make_browser_component -> src.teleon.research.llm_browser.LLMBrowserDriver.browse
+src.teleon.research.llm_browser._self_test -> src.teleon.research.llm_browser.LLMBrowserDriver
+src.teleon.research.llm_browser._self_test -> src.teleon.research.llm_browser.LLMBrowserDriver.browse
+src.teleon.research.llm_browser._self_test -> src.teleon.research.llm_browser.LLMBrowserDriver
+src.teleon.research.llm_browser._self_test -> src.teleon.research.llm_browser.LLMBrowserDriver.browse
+src.teleon.research.llm_browser._self_test -> src.teleon.research.llm_browser.LLMBrowserDriver
+src.teleon.research.llm_browser._self_test -> src.teleon.research.llm_browser.LLMBrowserDriver.browse
+src.teleon.research.llm_browser._self_test -> src.teleon.research.llm_browser.LLMBrowserDriver
+src.teleon.research.llm_browser._self_test -> src.teleon.research.llm_browser.LLMBrowserDriver.browse
+src.teleon.research.llm_browser._extract -> src.teleon.research.llm_browser._deterministic_extract
+src.teleon.research.llm_browser.browse -> src.teleon.research.llm_browser.BrowseResult
+src.teleon.research.llm_browser.browse -> src.teleon.research.llm_browser.LLMBrowserDriver._extract
+src.teleon.research.llm_browser.browse -> src.teleon.research.llm_browser._pick_link
+src.teleon.research.llm_browser.browse -> src.teleon.research.llm_browser.BrowseResult
+src.teleon.research.llm_browser.browse -> src.teleon.research.llm_browser.BrowseResult
+src.teleon.research.llm_browser.run -> src.teleon.research.llm_browser.BrowseResult.as_dict
+src.teleon.research.llm_browser.run -> src.teleon.research.llm_browser.LLMBrowserDriver.browse
