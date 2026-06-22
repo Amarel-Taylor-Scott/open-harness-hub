@@ -13,9 +13,11 @@ from src.teleon.runtime import credentials as C
 #: per-service auth header SHAPE (how the resolved key is presented to that API). Default = bearer.
 _HEADER_STYLE = {
     "github": lambda v: {"Authorization": f"Bearer {v}", "Accept": "application/vnd.github+json"},
+    "gitlab": lambda v: {"PRIVATE-TOKEN": v},
     "rapidapi": lambda v: {"X-RapidAPI-Key": v},
     "apify": lambda v: {"Authorization": f"Bearer {v}"},
     "anthropic": lambda v: {"x-api-key": v, "anthropic-version": "2023-06-01"},
+    "fly": lambda v: {"Authorization": f"Bearer {v}"},
 }
 
 

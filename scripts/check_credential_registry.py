@@ -45,7 +45,7 @@ def _self_test() -> int:
     planes = {p["plane"] for p in _load("tool_planes.json")["planes"]}
     tool_ids = {t["id"] for t in _load("tool_registry.json")["tools"]}
     tool_ids |= {p.get("id") for p in _load("ocr_provider_registry.json")["providers"]}
-    sources = {"github", "pypi", "pypi_keyword", "npm", "crates"}
+    sources = {"github", "gitlab", "pypi", "pypi_keyword", "npm", "crates"}
     catalogued = {v for s in svcs for v in s["env_vars"]}
     fails = []
     def ck(n, ok, d=""):

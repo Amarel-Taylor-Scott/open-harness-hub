@@ -85,6 +85,16 @@ def _svc(service_id: str) -> dict | None:
     return next((s for s in _services() if s["id"] == service_id), None)
 
 
+def credential_kind(service_id: str) -> str:
+    """The credential KIND (api_key default | git_token | deploy_token | oauth | deploy_key | webhook_secret | signing_key)."""
+    s = _svc(service_id)
+    return (s.get("kind", "api_key") if s else "api_key")
+
+
+def services_by_kind(kind: str) -> list[str]:
+    return [s["id"] for s in _services() if s.get("kind", "api_key") == kind]
+
+
 def key_ownership(service_id: str) -> str:
     """How a service's key may be supplied: 'byo' (tenant pastes their own) | 'platform' (our shared key within limits) |
     'both'. Mirrors compute key-ownership (see byo-compute)."""
