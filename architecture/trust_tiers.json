@@ -1,0 +1,14 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-22",
+  "principle": "The trust-agnostic seam: curated / community / discovered / experimental components coexist under GRADED sandboxing. The trust tier gates the EXECUTION environment and WHAT DATA may flow — not merely visibility. This is load-bearing, not a someday feature: running third-party code/servers at scale is a real security minefield (MCP's 2026 ecosystem alone: 30+ CVEs in two months, a cross-tenant leak, path-traversal, tool-poisoning). Deny-by-default: an unknown tier gets the most restrictive treatment. serves_truth=false.",
+  "serves_truth": false,
+  "data_classes_by_sensitivity": ["public", "synthetic", "internal", "customer"],
+  "sandbox_levels": ["none", "container", "hard"],
+  "tiers": [
+    {"tier": "curated", "trust": 4, "sandbox": "none", "max_data_class": "customer", "note": "manually verified (pymupdf, playwright, named model APIs) — full trust"},
+    {"tier": "community", "trust": 3, "sandbox": "container", "max_data_class": "internal", "note": "crowd-scored; sandboxed; NO customer data"},
+    {"tier": "discovered", "trust": 2, "sandbox": "hard", "max_data_class": "synthetic", "note": "crawler-found, unverified; HARD sandbox (gVisor/Firecracker/WASM), synthetic inputs only"},
+    {"tier": "experimental", "trust": 1, "sandbox": "hard", "max_data_class": "synthetic", "note": "user-uploaded custom; isolated; synthetic inputs only"}
+  ]
+}
