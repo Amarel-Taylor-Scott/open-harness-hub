@@ -170,6 +170,18 @@
       "note": "the VETTED core the descent reads (hundreds); stays JSON/git. tool_registry_promoted.json (auto-promoted, vetted=false) + every other architecture/*.json registry (planes/ladders/credentials/access_policy/ml_models/microsteps) are config-tier too: bounded, PR-reviewed, diffable.",
       "serves_truth": false,
       "plane": "product"
+    },
+    {
+      "stream": "economic_observations",
+      "tier": "operational",
+      "status": "active",
+      "jsonl": "data/dev-intel/economic_observations.jsonl",
+      "idempotency_key": "obs_key",
+      "partition_key": "resource_id",
+      "produced_by": "src.teleon.economics.observation_store",
+      "note": "LIVE economic + quality facets per computational resource (model/provider/endpoint/backend) from provider price crawls (System 20) + measured executions (the telemetry write-back); drives the cost model (System 21) + dynamic routing (System 22). cloud backend postgres.",
+      "serves_truth": false,
+      "plane": "product"
     }
   ]
 }
