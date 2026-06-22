@@ -19,6 +19,7 @@ from __future__ import annotations
 
 from src.teleon.dag.pipeline_dag import DAG, DAGError, Node
 from src.teleon.synthesis.io_contracts import edge_compatible, plane_io
+from src.teleon.synthesis.type_system import bridge
 
 # the types a capability typically has in hand at the graph boundary (a source document / text / a query / a record).
 DEFAULT_GRAPH_INPUTS = ("document", "bytes", "image", "text", "query", "record")
@@ -75,6 +76,15 @@ def verify_buildable_dag(nodes: list, edges: list, *, graph_inputs: tuple = DEFA
 
     # (2) edge type-compatibility — GATING (a producer output type the consumer cannot accept)
     type_incompatible = [[a, b] for a, b in edges if not edge_compatible(steps[a].get("plane"), steps[b].get("plane"))]
+    # ...but an incompatible edge may be COERCIBLE — a converter component can bridge the types (html→markdown). The
+    # compiler can auto-insert these (System 6), so we surface them rather than just rejecting (additive suggestion).
+    coercible = []
+    for a, b in type_incompatible:
+        pa, pb = plane_io(steps[a].get("plane")), plane_io(steps[b].get("plane"))
+        if pa and pb:
+            br = bridge(pa.get("produces", []), pb.get("consumes", []))
+            if br:
+                coercible.append({"edge": [a, b], "via": br})
 
     # (3) data-flow type satisfiability — every consumed type comes from a direct predecessor or a graph input
     preds: dict = {s: [] for s in steps}
@@ -108,5 +118,5 @@ def verify_buildable_dag(nodes: list, edges: list, *, graph_inputs: tuple = DEFA
 
     verified = bool(steps) and acyclic and not type_incompatible and not unsatisfied and bool(output_nodes) and dry_ok is not False
     return {"verified_working": verified, "acyclic": acyclic, "type_incompatible_edges": type_incompatible,
-            "unsatisfied_inputs": unsatisfied, "output_nodes": output_nodes, "dry_run_ok": dry_ok,
-            "dry_run_error": dry_err, "n_components": len(steps), "serves_truth": False}
+            "coercible_edges": coercible, "unsatisfied_inputs": unsatisfied, "output_nodes": output_nodes,
+            "dry_run_ok": dry_ok, "dry_run_error": dry_err, "n_components": len(steps), "serves_truth": False}

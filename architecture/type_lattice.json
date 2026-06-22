@@ -1,0 +1,22 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-22",
+  "principle": "Subtyping lattice + coercion graph for the type system (System 6), over plane_io_contracts' type vocabulary. SUBTYPING: a producer of a SUBTYPE satisfies a consumer of its SUPERTYPE (a jpeg can be used where an image is expected) — this widens what composes for free. COERCION: when two types don't match even by subtyping, a converter COMPONENT can bridge them (html -> markdown) and the compiler auto-inserts it (a compiler pass, like LLVM inserting a cast). Coercion converters are registry components (deterministic where possible). serves_truth=false.",
+  "serves_truth": false,
+  "subtypes": {
+    "jpeg": "image", "png": "image", "webp": "image", "tiff": "image", "gif": "image",
+    "pdf": "document", "born_digital_pdf": "document", "scanned_pdf": "document", "docx": "document",
+    "csv": "table", "tsv": "table", "xlsx": "table",
+    "json": "record", "yaml": "record", "toml": "record"
+  },
+  "coercions": [
+    {"from": "html", "to": "markdown", "via": "html_to_markdown", "deterministic": true},
+    {"from": "html", "to": "text", "via": "html_strip", "deterministic": true},
+    {"from": "markdown", "to": "text", "via": "markdown_strip", "deterministic": true},
+    {"from": "table", "to": "record", "via": "table_to_records", "deterministic": true},
+    {"from": "record", "to": "text", "via": "serialize_json", "deterministic": true},
+    {"from": "document", "to": "bytes", "via": "file_read", "deterministic": true},
+    {"from": "text", "to": "text_chunks", "via": "chunker", "deterministic": true},
+    {"from": "fields", "to": "record", "via": "fields_to_record", "deterministic": true}
+  ]
+}
