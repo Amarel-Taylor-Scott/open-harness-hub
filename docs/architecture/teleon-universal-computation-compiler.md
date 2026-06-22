@@ -1,4 +1,4 @@
-# Teleon as a universal computation compiler — the 13 (+9) core systems, incl. the economic/market layer
+# Teleon as a universal computation compiler — one loop, seven seams
 
 A deep architecture for the reframe: **Teleon is not an agent framework, a workflow builder, or "NL → pipelines." It is a
 universal compiler/runtime that transforms ambiguous capability requests into globally optimized, verified executable
@@ -17,6 +17,64 @@ measured metadata → better routing → more agents — and that flywheel at in
 position. Bigger than any single product. Every system below is engineered to *reach and operate at that scale*; nothing
 here caps it. The "pruner" architecture and the interface/implementation split that follow are precisely *how* you make
 billions-to-trillions of components searchable, composable, and safe — they are the scaling mechanism, not a ceiling.
+
+---
+
+## The architecture is SMALL — one loop, seven seams (grounded)
+A system *count* is the failure mode, not the goal. The architecture is **one loop** —
+`specify → retrieve → compose → verify → optimize → execute → measure → learn` — where **every stage is a pruner**, held
+together by **seven abstraction seams** that keep components, providers, front-ends, and runtimes swappable. Get the seams
+right and everything below is implementation detail. (The detailed "systems" later in this doc are the *implementation* of
+these seams + the loop — read them as the seams in depth, never as a headline count.)
+
+| Seam | What stays swappable | Built / where |
+|---|---|---|
+| **Front-end agnostic** | NL · declarative spec · visual DAG · agent API → one IR | compiler intent→DAG (`compile_capability_live`) |
+| **Component agnostic** | python · docker · OpenAPI · MCP · CLI · SQL · browser · remote inference | **built** — `src/teleon/components/` (uniform `invoke`) |
+| **Provider agnostic** | same logical model, many vendors/regions, chosen at runtime | **built** — `economics/{economic_graph,routing_engine}` |
+| **Representation agnostic** | jpeg/png = image; html→markdown auto-coerced | **built** — `synthesis/type_system.py` (lattice + coercion) |
+| **Objective agnostic** | one compiler, user weights → cheap-/accuracy-/privacy-mode | **built** — `PreferenceProfile` + `economics/cost_model` |
+| **Runtime agnostic** | dev local; prod Temporal/Dagster — nothing above the IR changes | `dag/pipeline_dag` + `runtime/execution_providers` |
+| **Trust agnostic** | curated/community/discovered/experimental under graded sandbox | trust tiers (curated today; sandbox = next) |
+
+This is **the fusion of three mature research areas** — standing on them means the hard parts are *known* hard parts:
+- **Type-directed component-based program synthesis** — SyPeT (typed library as a Petri net, compose by reachability),
+  TYGAR (polymorphism), **APIphany** (PLDI 2022: *semantic* types specify intent + direct search, and **simulated
+  execution** scores candidates without real calls — exactly our analytic simulator, already built).
+- **LLM cascades / model routing** — **FrugalGPT** (router + answer-scorer + stop-judger; up to ~98% cost cut at equal
+  quality) and *agreement-based cascading* (escalate on ensemble disagreement, training-free). This is the descent.
+- **Provider routing / inference economics** — **OpenRouter** (~100T tokens/mo across 80+ providers), LiteLLM, Portkey.
+
+### What the research changes (honest findings — adopt these)
+1. **Synthesis scales poorly with library size** (a known result; it's why graph/Petri-net methods exist). MCTS/beam do
+   **not** dissolve the blowup — **templates carry the common case** (retrieve-and-mutate), synthesis is the long-tail
+   fallback, and we accept *"first valid candidate over the cost threshold,"* not global optimality. Retrieval recall is
+   imperfect (Gorilla) → plan for misses (family fallbacks, graceful degradation).
+2. **Reliability is a first-class objective from day one.** OpenRouter's lesson: the same model's price spans 3–10× across
+   providers, the cheapest endpoint is often a *quantized/degraded* one, and naive cheapest-routing is **unstable** (the
+   cheapest provider saturates first, degrades first, recovers slowest). Their fix: skip recently-failing providers and
+   weight survivors by the **inverse square of price**. → Our cost model folds availability+success into effective cost;
+   the next refinement is explicit reliability weighting + skip-failing in `routing_engine`.
+3. **The moat is the flywheel, not the registry.** Quality is the one objective term you **cannot buy** — only earn by
+   running things and measuring (the telemetry write-back). Anyone can crawl PyPI; nobody else has *your measured quality*.
+4. **"Equivalence" is empirical, not proven.** General program equivalence is undecidable; two pipelines are equivalent
+   *only to within your benchmark corpus* (the agreement signal). Treat equivalence classes as **learned, benchmark-
+   relative artifacts**, never theorems.
+5. **MCP is one adapter type + a real security surface** (~97M monthly SDK downloads, Linux Foundation — but 30+ CVEs in
+   early 2026, a cross-tenant leak, tool-poisoning). It sits *above* function-calling (overhead on latency-critical
+   paths). → Treat MCP as one adapter factory among several; the **trust/sandbox tier is load-bearing, not someday**.
+
+### Build order — and what NOT to build yet
+**Build (each unblocks the next):** (1) close the **metadata write-back loop** [**done** — `economics/observation_store`
++ `provider_intel.record_measured_run`]; (2) the **analytic simulator** [**done** — `economics/simulator`, APIphany-style];
+(3) **template library + retrieve-and-mutate** [next — biggest lever]; (4) **beam composition + the type lattice/coercion**
+[lattice **done**; beam next]; (5) **PassManager + cost model** [cost model **done**; passes next]; (6) **sandbox +
+trust-tier execution**, then **adapter factories** (OpenAPI/Docker/MCP), then discovery + canonicalization.
+**Do NOT build yet** (destinations, not Monday's work): self-expanding discovery at internet scale; "capability futures"
+/ a 10-billion-component registry / billions-of-DAGs search; a *formal* IR + verifier (start with the typed-DAG data
+structure + pass functions we already have). **Win one vertical first** — document/invoice extraction (PyMuPDF→regex→
+schema-validate, LLM only as fallback) or LLM-routing for one high-volume workload — *provably 10× cheaper at equal
+quality, with the telemetry to prove it.* Scale is the destination; a measurably-cheaper vertical is the proof you earned it.
 
 ---
 
@@ -98,7 +156,9 @@ canonicalization, sandboxed discovery).
 
 ---
 
-## The 13 systems — deep dive
+## The seams in detail (the "systems" are their implementation — not a headline count)
+*The enumeration below is the implementation depth behind the seven seams + the loop above. It is a reference for the
+contracts, the prior art, and the hard parts of each piece — read it that way, never as "build 22 systems."*
 
 ### 1. Universal Capability Representation Layer
 **Purpose.** Make every computational primitive machine-understandable as a *capability object* — a transformation, not a
