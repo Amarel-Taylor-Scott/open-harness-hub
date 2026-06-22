@@ -1,0 +1,35 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-22",
+  "principle": "Teleon targets the STRUCTURAL pattern of claims-style adjudication — unstructured intake → extraction → validation → policy/rules lookup → decision → downstream action — WITHOUT touching insurance (owner non-compete + CLAUDE.md: stay away from insurance, never expand legacy insurance examples). These adjacent, document-heavy / policy-heavy / repetitive-decision verticals share that shape and each maps to an agentic loop we already catalog. Pitch the PATTERN, not a vertical. serves_truth=false.",
+  "serves_truth": false,
+  "shared_pipeline": ["intake", "extract", "validate", "policy/rules lookup", "decide", "downstream action"],
+  "avoid": {"sector": "insurance", "reason": "owner non-compete + CLAUDE.md", "enforced_by": "scripts/check_adjacent_verticals.py"},
+  "positioning": [
+    "We observe expensive AI-driven enterprise workflows and progressively compile them into optimized, bounded systems that cut inference cost by replacing generalized reasoning with specialized execution.",
+    "Complex document-driven operational workflows · policy-intensive enterprise decision pipelines · high-volume unstructured intake · multi-stage verification & adjudication — without naming any one restricted vertical."
+  ],
+  "verticals": [
+    {"id": "accounts_payable", "name": "Accounts payable / finance ops", "sector": "finance", "maps_to": "financial_ops",
+      "pipeline": ["email arrives", "attachment ingestion", "invoice extraction", "vendor verification", "PO reconciliation", "approval routing", "payment execution"], "demo": "invoice processing"},
+    {"id": "loan_underwriting", "name": "Loan origination & underwriting", "sector": "lending", "maps_to": "financial_ops",
+      "pipeline": ["upload tax returns", "read bank statements", "verify income", "calc debt ratios", "check eligibility", "approve/reject"], "demo": "loan underwriting"},
+    {"id": "procurement_vendor", "name": "Procurement & vendor operations", "sector": "procurement", "maps_to": "procurement_supply_chain",
+      "pipeline": ["vendor request", "contract retrieval", "supplier verification", "pricing comparison", "compliance review", "PO generation"], "demo": "procurement workflow"},
+    {"id": "contract_review", "name": "Enterprise contract review", "sector": "legal", "maps_to": "legal_analysis",
+      "pipeline": ["upload contract", "identify clauses", "compare against policy", "find deviations", "flag risky language", "review report"], "demo": "contract review"},
+    {"id": "healthcare_admin", "name": "Healthcare administration (non-clinical back office)", "sector": "healthcare_admin", "maps_to": "extraction",
+      "pipeline": ["receive provider docs", "extract fields", "validate forms", "check authorization", "route approvals", "update systems"], "demo": "form adjudication", "note": "operational admin only — NO diagnosis/treatment/clinical claims"},
+    {"id": "compliance_review", "name": "Compliance review pipelines", "sector": "compliance", "maps_to": "legal_analysis",
+      "pipeline": ["collect documents", "read regulatory requirements", "compare against internal policy", "identify violations", "remediation report"], "demo": "compliance review"},
+    {"id": "support_resolution", "name": "Customer support resolution", "sector": "support", "maps_to": "support",
+      "pipeline": ["submit issue", "classify intent", "retrieve account history", "check policies", "determine action", "execute workflow"], "demo": "support automation"},
+    {"id": "kyc_identity", "name": "KYC / identity verification", "sector": "identity", "maps_to": "extraction",
+      "pipeline": ["upload ID docs", "OCR extraction", "cross-check identity", "validate compliance", "risk scoring", "approve account"], "demo": "KYC verification"},
+    {"id": "government_forms", "name": "Government form processing", "sector": "government", "maps_to": "extraction",
+      "pipeline": ["receive forms", "parse scanned/handwritten", "validate fields", "check eligibility", "route approval", "update systems"], "demo": "form processing"},
+    {"id": "data_ingestion", "name": "Enterprise data ingestion pipelines", "sector": "data", "maps_to": "data_engineering",
+      "pipeline": ["receive documents", "parse PDFs", "extract metadata", "chunk", "semantic indexing", "store knowledge graph"], "demo": "ingestion pipeline"}
+  ],
+  "favorite_demos": ["invoice processing", "contract review", "loan underwriting", "support automation", "procurement workflow"]
+}
