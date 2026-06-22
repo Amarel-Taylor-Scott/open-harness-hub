@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from src.teleon.evolution.freshness_runtime import FreshnessSyncedCapability
 from src.teleon.evolution.source_poller import content_hash, poll_source, reheal_from_event
+import uuid
 from src.teleon.storage import record_store as RS
 
 
@@ -21,7 +22,7 @@ def _self_test() -> int:
         print(f"  [{'ok' if ok else 'FAIL'}] {n}{(': ' + d) if d and not ok else ''}")
         if not ok: fails.append(n)
 
-    sid = "check_src_poller_unit"
+    sid = "check_src_poller_" + uuid.uuid4().hex[:8]
     vals = iter(["STATE_A", "STATE_A", "STATE_B"])
     f = lambda: next(vals)
     e1 = poll_source(sid, f, now="2026-06-22T00:00:00Z")

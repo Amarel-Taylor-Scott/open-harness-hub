@@ -9,7 +9,8 @@
     "lowcost/code-agent": "Low-cost PAID models tuned for coding / tool-use / agentic loops (DeepSeek V4, Z.AI GLM coding, StepFun agent, Kimi/Moonshot). Same data-class caps as their jurisdiction.",
     "lowcost/long-context": "Low-cost PAID models with very large context windows (DeepSeek 1M ctx, MiniMax ~204K, Kimi 262K, StepFun 256K). For large-document/codebase passes; same data-class caps as jurisdiction.",
     "paid/safe": "Paid ENTERPRISE providers with strong privacy/ZDR + acceptable jurisdiction \u2014 the ONLY lane allowed to carry customer / regulated / confidential / PII data. Not enumerated here (separate enterprise registry).",
-    "selfhost/private": "Self-hosted / private inference (local Ollama/vLLM, VPC) \u2014 the most-private lane; the fallback for any data that cannot leave the boundary. Not enumerated here (see the free registry's self_hosted_gateway rows + Teleon Sandbox)."
+    "selfhost/private": "Self-hosted / private inference (local Ollama/vLLM, VPC) \u2014 the most-private lane; the fallback for any data that cannot leave the boundary. Not enumerated here (see the free registry's self_hosted_gateway rows + Teleon Sandbox).",
+    "lowcost/edge-byo": "customer's own edge account (BYO key); they run + pay, we dispatch"
   },
   "valid_data_classes": [
     "public",
@@ -436,7 +437,7 @@
     {
       "provider_id": "cloudflare_workers_ai",
       "display_name": "Cloudflare Workers AI (edge LLMs, BYO key)",
-      "lane": "edge/byo-cloudflare",
+      "lane": "lowcost/edge-byo",
       "adapter": "openai_compatible",
       "base_url": "https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/v1",
       "model": "@cf/meta/llama-3.3-70b-instruct (example)",
@@ -452,7 +453,7 @@
         "edge",
         "byo_compute"
       ],
-      "cost_class": "byo_customer_account",
+      "cost_class": "paid",
       "provider_regions": [
         "edge-global"
       ],
@@ -462,10 +463,10 @@
         "internal_non_sensitive"
       ],
       "production_allowed": false,
-      "secret_ref": "secret://tenant/{id}/cloudflare_api_token",
-      "admit_tier": "candidate",
+      "secret_ref": "vault://tenant/{id}/cloudflare_api_token",
+      "admit_tier": "exclude",
       "status": "candidate",
-      "data_use_note": "BYO via a customer-supplied Cloudflare API token; Teleon dispatches, the customer runs+pays; FleetLedger stays our truth."
+      "data_use_note": "BYO via a customer-supplied Cloudflare API token; Teleon dispatches, the customer runs+pays; FleetLedger stays our truth. [cost_class=paid: billed to the customer's own Cloudflare account; BYO key in vault.]"
     }
   ]
 }
