@@ -42,9 +42,10 @@ class CallableBrowser:
 class PlaywrightBrowser:
     """The chromium adapter (via e2e/scrape_url.mjs). Honest 'render unavailable' when node/chromium/network is missing."""
     name = "playwright"
-    def render(self, url: str, *, timeout: int = 40) -> dict:
+    def render(self, url: str, *, timeout: int = 40, mode: str = "headless") -> dict:
+        """mode = headless (default) | headed — a rung on architecture/browser_escalation_ladder.json."""
         try:
-            r = subprocess.run(["node", str(_RENDER_MJS), url], cwd=str(_REPO), capture_output=True, text=True, timeout=timeout)
+            r = subprocess.run(["node", str(_RENDER_MJS), url, mode], cwd=str(_REPO), capture_output=True, text=True, timeout=timeout)
             line = (r.stdout or "{}").strip().splitlines()[-1] if (r.stdout or "").strip() else "{}"
             return json.loads(line)
         except Exception as e:  # noqa: BLE001

@@ -160,22 +160,42 @@ class GitHubSearch(SourceSearchPort):
         return hits
 
 
-def search_via_browser(search_url: str, *, timeout: int = 60) -> dict:
-    """ESCALATION tier: render a source's search PAGE with the LLM-directed browser (PlaywrightBrowser), as a user would
-    — the rung ABOVE a deterministic API, used when the API is blocked/absent. Honest: a bot 'Client Challenge'/captcha
-    raises pointing at the NEXT rung — a stealth/undetected browser (selenium / undetected_chromedriver / nodriver /
-    patchright are cataloged in web_browsing_stack_registry, GOVERNED by research_guardrail_policy = robots/ToS, not
-    wired). This is the descent climbing, not giving up."""
-    from src.teleon.research.browser_port import PlaywrightBrowser
-    r = PlaywrightBrowser().render(search_url, timeout=timeout)
-    if r.get("error"):
-        raise SourceSearchUnavailable(f"browser render failed: {r['error']}")
+#: WIRED rungs we actually try here (climb in order); the rest of the ladder is cataloged in
+#: architecture/browser_escalation_ladder.json (undetected_driver / vision_coordinate / proxy — governed, not wired).
+_WIRED_BROWSER_RUNGS = ("headless", "headed")
+_BLOCK_WORDS = ("challenge", "captcha", "are you a robot", "access denied", "verify you are human")
+
+
+def _looks_blocked(r: dict) -> str:
     title = (r.get("title") or "").lower()
-    if any(w in title for w in ("challenge", "captcha", "are you a robot", "access denied")):
-        raise SourceSearchUnavailable(
-            f"bot challenge ('{r.get('title')}') — next rung: a stealth/undetected browser "
-            "(undetected_chromedriver / nodriver / patchright — cataloged + governed, not wired)")
-    return r
+    if any(w in title for w in _BLOCK_WORDS):
+        return f"bot wall ('{r.get('title')}')"
+    if not (r.get("links") or (r.get("text") or "").strip()):
+        return "rendered empty (likely a stub/challenge)"
+    return ""
+
+
+def search_via_browser(search_url: str, *, timeout: int = 60) -> dict:
+    """ESCALATION: render a source's search PAGE with the LLM-directed browser as a user would — the rung ABOVE the
+    deterministic API. A production tool NEVER gives up at rung 1: this CLIMBS every WIRED rung (headless real-UA +
+    stealth-lite, then headed) and only raises after EXHAUSTING them, naming the next cataloged rung (undetected driver /
+    vision-coordinate, governed). Returns the first rung whose page isn't bot-walled/empty. Never fabricates."""
+    from src.teleon.research.browser_port import PlaywrightBrowser
+    bp, trace = PlaywrightBrowser(), []
+    for mode in _WIRED_BROWSER_RUNGS:
+        r = bp.render(search_url, timeout=timeout, mode=mode)
+        if r.get("error"):
+            trace.append(f"{mode}: error {r['error']}")
+            continue
+        blocked = _looks_blocked(r)
+        if blocked:
+            trace.append(f"{mode}: {blocked}")
+            continue
+        return r  # a rung that worked
+    raise SourceSearchUnavailable(
+        "exhausted wired browser rungs [" + "; ".join(trace) + "] — next cataloged rungs: undetected_driver "
+        "(undetected_chromedriver/nodriver/patchright) -> vision_coordinate (screenshot+grounding) -> residential_proxy; "
+        "all GOVERNED (robots/ToS) + not wired. See architecture/browser_escalation_ladder.json")
 
 
 class PyPIBrowserSearch(SourceSearchPort):

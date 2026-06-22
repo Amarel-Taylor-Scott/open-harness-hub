@@ -1,0 +1,23 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-22",
+  "principle": "A production browsing tool NEVER gives up at the first wall — it CLIMBS this ladder of methods until one works or every rung is exhausted, then reports honestly WHICH rungs it tried + which need wiring. Each rung is cheaper-but-weaker below, costlier-but-stronger above; the descent tries the cheapest that gets the content within guardrails. Methods reference real entries in web_browsing_stack_registry (browsers + driving_components). Evasion rungs are GOVERNED by research_guardrail_policy (honor robots/ToS, refuse login-walled hosts) — cataloged != unconditionally used. serves_truth=false.",
+  "serves_truth": false,
+  "policy": "exhaust every WIRED rung before concluding unavailable; on exhaustion, name the next cataloged rung. Never silently stop at rung 1.",
+  "rungs": [
+    {"rung": 0, "id": "http_fetch", "mode": "none", "method": "raw HTTP GET, no JS", "defeats": "nothing (fails on JS-rendered or UA-sniffed pages)", "cost_rank": 0, "status": "wired", "tools": ["beautifulsoup", "trafilatura", "lxml"], "governance": "robots/ToS"},
+    {"rung": 1, "id": "headless_render", "mode": "headless", "method": "Playwright headless Chromium, default UA, domcontentloaded", "defeats": "client-side JS rendering", "cost_rank": 1, "status": "wired", "tools": ["playwright"], "governance": "robots/ToS"},
+    {"rung": 2, "id": "headless_real_ua", "mode": "headless", "method": "headless + real UA + viewport + networkidle settle (what a user sees)", "defeats": "naive UA/headless sniffing, late-rendered content", "cost_rank": 2, "status": "wired", "tools": ["playwright"], "governance": "robots/ToS"},
+    {"rung": 3, "id": "stealth_lite", "mode": "headless", "method": "headless + evasion init script (navigator.webdriver, plugins, languages, chrome object)", "defeats": "basic bot fingerprint checks", "cost_rank": 3, "status": "wired", "tools": ["playwright", "playwright_stealth"], "governance": "evasion_restricted"},
+    {"rung": 4, "id": "headed_render", "mode": "headed", "method": "real headed browser (display / xvfb) — not headless at all", "defeats": "headless-only detection", "cost_rank": 4, "status": "wired", "tools": ["playwright", "selenium"], "governance": "evasion_restricted", "needs": ["display_or_xvfb"]},
+    {"rung": 5, "id": "undetected_driver", "mode": "headed_or_headless", "method": "undetected/patched driver with real fingerprint", "defeats": "advanced fingerprinting + managed challenges (e.g. PyPI's Fastly 'Client Challenge')", "cost_rank": 5, "status": "cataloged", "tools": ["undetected_chromedriver", "nodriver", "patchright", "seleniumbase", "botasaurus"], "governance": "evasion_restricted"},
+    {"rung": 6, "id": "vision_coordinate", "mode": "headed_or_headless", "method": "screenshot -> grounding model -> click by coordinate (no stable DOM/selectors needed)", "defeats": "no/obfuscated DOM, canvas UIs, dynamic layouts", "cost_rank": 6, "status": "cataloged", "tools": ["screenshot_capture", "seeclick", "uground", "omniparser", "set_of_marks_prompting"], "governance": "evasion_restricted"},
+    {"rung": 7, "id": "residential_proxy_or_human", "mode": "any", "method": "rotate residential proxy / hand off CAPTCHA to a human-in-loop", "defeats": "IP reputation blocks, CAPTCHA", "cost_rank": 7, "status": "cataloged", "tools": [], "governance": "evasion_restricted_high_cost — ToS + spend gate; never auto-solve CAPTCHA"}
+  ],
+  "extraction_modes": {
+    "note": "ORTHOGONAL to the rungs — once a page is open, how the target is located:",
+    "by_selector": {"tools": ["structured_extraction_css", "structured_extraction_xpath"], "when": "stable DOM"},
+    "by_accessibility": {"tools": ["accessibility_tree_extraction"], "when": "semantic roles available"},
+    "by_vision_coordinate": {"tools": ["seeclick", "uground", "omniparser"], "when": "no stable selectors; click by pixel"}
+  }
+}
