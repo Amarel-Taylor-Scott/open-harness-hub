@@ -876,6 +876,7 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_beam.py", "check_beam"),
     ("scripts/check_passes.py", "check_passes"),
     ("scripts/check_equivalence.py", "check_equivalence"),
+    ("scripts/check_cascade.py", "check_cascade"),
     ("scripts/check_component_standardization.py", "check_component_standardization"),
     ("scripts/check_adapter_factory.py", "check_adapter_factory"),
     ("scripts/check_trust_tiers.py", "check_trust_tiers"),
