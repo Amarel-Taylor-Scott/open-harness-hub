@@ -12,6 +12,7 @@ DEVELOPMENT plane (the operator surface); the engines + store are PRODUCT (src/o
   --generate [HubId]  GENERATE channel: emit candidates from our own systems (method catalog / descent brain)
   --capability "<plain text>" [--plan-only] [--rounds N]  plan + run an OPEN-ENDED capability (iterative/scheduled/multi-component)
   --browse <url> [--goal "..."] [--steps N]  run the low-cost-LLM-driven browser (the research descent's deep-detail tier)
+  --browsing-stack [--needs "deep_detail,js_render"] [--allow-restricted] [--all-licenses]  registry coverage + compose a governed stack
   --feed [HubId]  print the substrate_feed (what Teleon/Baltor consume)
   --self-test     offline: the runner wires every hub + runs a cycle
 CLI: PYTHONPATH=. python3 scripts/hub_engine_runner.py --ingest OpenSkillsHub --okf my_skill.md --improve
@@ -239,6 +240,21 @@ def generate_cmd(hub: str | None, *, tenant="_global", use_llm=False) -> int:
     return 0
 
 
+def browsing_stack_cmd(needs_csv: str = "", *, allow_restricted: bool = False, vendorable_only: bool = True) -> int:
+    """Show the web-browsing stack registry coverage + (optionally) compose a governed stack for the needed caps."""
+    from src.openharnesshub.browsing_registry import coverage, load_registry, select_stack
+    cov = coverage(load_registry())
+    b, dc = cov["browsers"], cov["driving_components"]
+    print(f"browsers: {b['have']}/{b['target']} (target met={b['met']})")
+    print(f"driving components: {dc['have']}/{dc['target']} ({dc['models']} models + {dc['logic']} logic) — "
+          f"gap {dc['gap']} to fill via {cov['fill_via']}")
+    if needs_csv:
+        needs = [n.strip() for n in needs_csv.split(",") if n.strip()]
+        print(f"\ncompose stack for {needs} (vendorable_only={vendorable_only}, allow_restricted={allow_restricted}):")
+        print(json.dumps(select_stack(needs, vendorable_only=vendorable_only, allow_restricted=allow_restricted), indent=1))
+    return 0
+
+
 def browse_cmd(url: str, *, goal: str = "the page's main content", steps: int = 3) -> int:
     """Run the REAL low-cost-LLM-driven browser (the catalog's browse-tier component) on a URL — the expensive tier
     the research descent escalates to only for deep detail. Renders via chromium, the cheap LLM extracts the goal
@@ -382,6 +398,9 @@ def _main(argv=None):
     if "--feed" in argv:
         i = argv.index("--feed")
         return feed(argv[i + 1] if i + 1 < len(argv) and not argv[i + 1].startswith("-") else None)
+    if "--browsing-stack" in argv:
+        return browsing_stack_cmd(_val(argv, "--needs", ""), allow_restricted="--allow-restricted" in argv,
+                                  vendorable_only="--all-licenses" not in argv)
     if "--browse" in argv:
         url = _val(argv, "--browse")
         if not url or url.startswith("-"):

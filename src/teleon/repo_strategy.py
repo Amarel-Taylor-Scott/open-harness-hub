@@ -18,11 +18,10 @@ from __future__ import annotations
 
 import re
 
+from src.openharnesshub.licenses import classify_license  # single-source license classifier (open layer)
+
 #: disposition vocabulary (single source; mirrors the GitHub-signal intake).
 DISPOSITIONS = ("ADOPT-CANDIDATE", "CONSIDER", "WATCH", "AVOID")
-#: license → class. permissive ⇒ vendorable; copyleft/unstated ⇒ technique-only (never vendored).
-_PERMISSIVE = ("MIT", "APACHE", "BSD", "ISC", "UNLICENSE", "0BSD", "ZLIB", "PYTHON-2")
-_COPYLEFT = ("GPL", "AGPL", "LGPL", "MPL", "EPL", "CDDL", "OSL", "EUPL", "CC-BY-SA")
 #: name/topic keyword → the Open*Hub a repo most naturally feeds (single source; extend freely).
 _HUB_KEYWORDS = [
     ("mcp", "OpenMCPHub"), ("model-context-protocol", "OpenMCPHub"),
@@ -54,18 +53,6 @@ def normalize_repo_urls(text: str) -> list[dict]:
         seen.add(key)
         out.append({"owner": owner, "repo": repo, "url": f"https://github.com/{owner}/{repo}"})
     return out
-
-
-def classify_license(license_str: str | None) -> tuple[str, bool]:
-    """(license_class, vendorable). permissive ⇒ vendorable; copyleft/unstated ⇒ NOT vendorable (technique-only)."""
-    s = (license_str or "").upper().strip()
-    if not s or s in ("NOASSERTION", "NONE", "UNKNOWN", "OTHER"):
-        return "unstated", False
-    if any(k in s for k in _COPYLEFT):
-        return "copyleft", False
-    if any(k in s for k in _PERMISSIVE):
-        return "permissive", True
-    return "unstated", False
 
 
 def decompose(meta: dict, readme: str = "") -> dict:
