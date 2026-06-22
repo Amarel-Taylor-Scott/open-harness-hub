@@ -245,6 +245,57 @@ def _fw_status(state: dict) -> dict:
     return {"summary": f"heartbeat written ({n_find} findings, {n_radar} radar hits)", "signal": "ok"}
 
 
+def _green(mod: str) -> bool:
+    """Run a script's --self-test in a subprocess; True iff it exits 0. Never raises."""
+    try:
+        return subprocess.run([sys.executable, f"scripts/{mod}.py", "--self-test"], cwd=REPO, capture_output=True,
+                              text=True, timeout=150, env={**os.environ, "PYTHONPATH": "."}).returncode == 0
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def _fw_surfaces() -> dict:
+    """Keep the public SURFACES current: rebuild the intro site (computed counts + the task/hub catalogs auto-update)
+    and the 22 hub pages, then run their self-tests. Catches drift (a registry grew but a page didn't) and keeps the
+    demo fresh every cycle. Report-only (a red self-test signals; the agent/sweep improves the copy)."""
+    results = {}
+    for mod in ("build_intro_site", "build_hub_sites"):
+        try:
+            subprocess.run([sys.executable, f"scripts/{mod}.py"], cwd=REPO, capture_output=True, text=True,
+                           timeout=150, env={**os.environ, "PYTHONPATH": "."})    # rebuild from current registries
+        except Exception:  # noqa: BLE001
+            pass
+        results[mod] = _green(mod)                                                 # validate structure
+    failed = [m for m, ok in results.items() if not ok]
+    return {"summary": f"surfaces rebuilt + validated ({len(results) - len(failed)}/{len(results)} green)"
+                       + (f"; RED: {failed}" if failed else ""),
+            "signal": "gates_red" if failed else "ok", "failed": failed}
+
+
+def _fw_adapters() -> dict:
+    """Keep components INTERCHANGEABLE behind agnostic wrappers: run the drop-in test (a future provider must drop in
+    with zero component change) + the adapter-layers coverage audit, and file any port GAP as a comfort-gated proposal
+    (idempotent — deduped by title). The loop's mechanism for 'create wrappers for selectable components'."""
+    dropin, audit = _green("check_agnostic_adapters"), _green("check_adapter_layers")
+    gaps, filed = [], 0
+    try:
+        import json as _json
+        layers = _json.loads((REPO / "architecture" / "adapter_layers.json").read_text(encoding="utf-8"))["layers"]
+        gaps = [L["layer"] for L in layers if L.get("status") == "gap"]
+        if gaps:
+            from scripts.proposal_backlog import Proposal, propose
+            for g in gaps:
+                propose(Proposal(title=f"agnostic adapter gap: add a {g} port + adapters + drop-in test", kind="opportunity",
+                                 rationale="docs/architecture/agnostic-adapters.md — components must stay swappable for future providers"))
+            filed = len(gaps)
+    except Exception:  # noqa: BLE001
+        pass
+    ok = dropin and audit
+    return {"summary": f"adapters: drop-in {'green' if dropin else 'RED'} + coverage {'green' if audit else 'RED'}; "
+                       f"{len(gaps)} port gap(s){' filed' if filed else ''}",
+            "signal": "gates_red" if not ok else "ok", "gaps": gaps}
+
+
 #: name -> {cadence (run roughly every N cycles), fn}. The scheduler picks the most-overdue, with adjustments.
 FLYWHEELS = {
     "sweep": {"cadence": 1, "fn": _fw_sweep},      # the main engine — every cycle by default
@@ -255,6 +306,8 @@ FLYWHEELS = {
     "health": {"cadence": 6, "fn": _fw_health},    # proof gates periodically (or on demand when red)
     "autofix": {"cadence": 8, "fn": _fw_autofix},  # auto-apply ONLY trivial reversible fixes (toggle: --no-autofix)
     "cleanup": {"cadence": 12, "fn": _fw_cleanup},
+    "surfaces": {"cadence": 10, "fn": _fw_surfaces},  # keep the public sites fresh + validated (rebuild from registries)
+    "adapters": {"cadence": 11, "fn": _fw_adapters},  # keep components swappable behind wrappers (drop-in test + gaps)
     "checkpoint": {"cadence": 15, "fn": _fw_checkpoint},  # track-3: auto-commit checkpoints when gates are green
     "logjam": {"cadence": 999, "fn": None},        # STALL-triggered only (needs state -> handled specially); not rotated
 }
@@ -457,7 +510,10 @@ def _self_test() -> int:
     def ck(name, ok, detail=""):
         print(f"  [{'ok' if ok else 'FAIL'}] {name}{(': '+detail) if detail and not ok else ''}")
         if not ok: fails.append(name)
-    ck("flywheels registered (sweep/status/yc/propose/hubs/health/autofix/cleanup/checkpoint/logjam)", set(FLYWHEELS) == {"sweep", "status", "yc", "propose", "hubs", "health", "autofix", "cleanup", "checkpoint", "logjam"})
+    ck("flywheels registered (sweep/status/yc/propose/hubs/health/autofix/cleanup/surfaces/adapters/checkpoint/logjam)",
+       set(FLYWHEELS) == {"sweep", "status", "yc", "propose", "hubs", "health", "autofix", "cleanup", "surfaces", "adapters", "checkpoint", "logjam"})
+    ck("surfaces flywheel keeps the public sites fresh + validated", FLYWHEELS["surfaces"]["fn"] is _fw_surfaces)
+    ck("adapters flywheel keeps components swappable behind wrappers (drop-in + gap proposals)", FLYWHEELS["adapters"]["fn"] is _fw_adapters)
     ck("hubs flywheel registered (continuously populates the Open*Hubs)", "hubs" in FLYWHEELS)
     ck("hubs flywheel honors PER-HUB cadence (_due_hub: most-overdue enabled hub; disabled skipped; not-due -> None)",
        _due_hub(20, {"A": 10, "B": 19}, {"A": {"enabled": True, "cadence": 7}, "B": {"enabled": True, "cadence": 7}, "C": {"enabled": False, "cadence": 7}}) == "A"
@@ -483,7 +539,7 @@ def _self_test() -> int:
     s3 = {"cycle": 2, "last": {"sweep": 1}, "errors": {"sweep": 3}, "health": "ok"}
     ck("ADJUSTMENT: a flywheel in error-cooldown is skipped (not picked)", pick_flywheel(s3) != "sweep")
     # cadence: cleanup becomes most-overdue eventually
-    s4 = {"cycle": 30, "last": {"sweep": 29, "health": 28, "status": 29, "yc": 29, "propose": 29, "hubs": 29, "autofix": 29, "checkpoint": 29, "cleanup": 0}, "errors": {}, "health": "ok"}
+    s4 = {"cycle": 30, "last": {"sweep": 29, "health": 28, "status": 29, "yc": 29, "propose": 29, "hubs": 29, "autofix": 29, "surfaces": 29, "adapters": 29, "checkpoint": 29, "cleanup": 0}, "errors": {}, "health": "ok"}
     ck("cadence makes a long-overdue flywheel (cleanup) eligible", pick_flywheel(s4) == "cleanup", pick_flywheel(s4))
     # STALL -> LOGJAM: persistent red gates (health red across enough runs) escalate from health-retry to a logjam-break
     s5 = {"cycle": 10, "last": {"health": 9}, "errors": {}, "health": "red", "health_red_streak": 3, "last_logjam": -999}
@@ -515,7 +571,7 @@ def _self_test() -> int:
     ck("single-instance guard present (kills stray --forever daemons; excludes self)",
        callable(_stray_daemon_pids) and isinstance(_stray_daemon_pids(), list) and os.getpid() not in _stray_daemon_pids())
     ck("a no-heartbeat / stale loop is detectable (stale flag)", "stale" in m)
-    print("\n" + ("PASS - flywheel_orchestrator: 9 flywheels (sweep/status/yc/propose/health/autofix/cleanup/checkpoint/logjam) "
+    print("\n" + ("PASS - flywheel_orchestrator: 12 flywheels (sweep/status/yc/propose/hubs/health/autofix/cleanup/surfaces/adapters/checkpoint/logjam) "
                   "on an ADAPTIVE scheduler — SELF-DIRECTING (YC readiness files its own gaps), auto-checkpoint commits when "
                   "green, health-red priority, error "
                   "cooldown, cadence, AND stall->logjam escalation (persistent red / repeated failure / no progress -> "

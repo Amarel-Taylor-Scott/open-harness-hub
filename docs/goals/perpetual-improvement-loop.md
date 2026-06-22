@@ -89,7 +89,7 @@ gaps into the comfort-gated backlog so every cycle moves toward submission.
 - `./loop yc` — the YC-readiness scorecard + the top gaps (the marching orders).  `./loop run` — one cycle (debug).
 - `./loop stop` / `./loop resume` — toggle `.agent/STOP_REQUESTED`.  `./loop logs` — tail the daemon log.
 
-The engine is `scripts/flywheel_orchestrator.py` — NINE flywheels on an ADAPTIVE scheduler that runs for days
+The engine is `scripts/flywheel_orchestrator.py` — TWELVE flywheels on an ADAPTIVE scheduler that runs for days
 unattended (state-persisted, resilient, halts only on `.agent/STOP_REQUESTED`):
 - **sweep** — one Kimi/GLM improvement+research batch -> findings; covers TOP-DOWN architecture + coordination AND
   BOTTOM-UP modules every pass (re-sweeps when a pass completes).
@@ -99,6 +99,10 @@ unattended (state-persisted, resilient, halts only on `.agent/STOP_REQUESTED`):
 - **health** — runs the core proof gates; a red gate JUMPS health to top priority until green.
 - **autofix** — auto-applies ONLY trivial, fully-reversible fixes (lossless doc archive; capped + audited; `--no-autofix`).
 - **cleanup** — scans for stale/superseded docs (report only; the move is owner-gated).
+- **surfaces** — keeps the public sites fresh + validated: rebuilds the intro site + the 22 hub pages from the current
+  registries (computed counts/catalogs auto-update) and runs their self-tests (catches drift; keeps the demo current).
+- **adapters** — keeps components swappable behind agnostic wrappers: runs the drop-in test + the adapter-layers
+  coverage audit (`architecture/adapter_layers.json`) and files any port GAP as a comfort-gated proposal for the agent.
 - **checkpoint** — auto-commits the working tree when gates are green (track 3; reversible; never on main; never pushes).
 - **logjam** — STALL-TRIGGERED: when the loop is persistently stuck (gates red across runs / a flywheel failing
   repeatedly / no new findings), it deliberates (Kimi+GLM) for DIVERGENT options and FORKS them into the backlog
