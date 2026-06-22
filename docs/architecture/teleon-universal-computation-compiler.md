@@ -1,4 +1,4 @@
-# Teleon as a universal computation compiler — the 13 (+6) core systems
+# Teleon as a universal computation compiler — the 13 (+9) core systems, incl. the economic/market layer
 
 A deep architecture for the reframe: **Teleon is not an agent framework, a workflow builder, or "NL → pipelines." It is a
 universal compiler/runtime that transforms ambiguous capability requests into globally optimized, verified executable
@@ -261,7 +261,8 @@ winning subgraphs into templates.
 - **16. Cost & Economics Model.** The objective the whole compiler optimizes is multi-dimensional: **$ · latency · tokens
   · quality · privacy/risk · carbon**. Make it one explicit, **user-weighted** function — we already have a
   `PreferenceProfile` ("efficient" = the user's trade-off). Every pass (§8) and the simulator (§12) consult it. Without a
-  single cost model, "most efficient" is undefined.
+  single cost model, "most efficient" is undefined. **→ Expanded into the full economic/market layer below (§20–22): the
+  registry is a *market*, and the cost model must run over LIVE provider economics, not static metadata.**
 - **17. Security & Sandboxing / Trust (cross-cutting).** Executing Tier C/D components safely: gVisor/Firecracker/WASM
   isolation, egress allow-lists, resource caps, secret scoping (`SecretRef`), and the trust tier gating *execution*. This
   is `discovery ≠ trust` made operational, and it's a prerequisite for §13 at scale.
@@ -272,6 +273,69 @@ winning subgraphs into templates.
   decide *truth*. Every compute output is `serves_truth=false` — a candidate — and **Baltor** dispositions truth-bearing
   outputs with provenance, verification, and CDC. This separation (Teleon = efficiency, Baltor = truth) is what lets the
   system be both aggressive about cost and trustworthy about results.
+
+---
+
+## The registry is a MARKET — the economic layer (Systems 20–22)
+**The biggest expansion after the reframe (owner + external review):** a registry of *callable components* is too narrow.
+**The real abstraction is a registry of executable ECONOMIC OPPORTUNITIES.** The same capability is realized by many
+implementations; the same model is served by many providers (official *and* secondary) at different prices, latencies, and
+availabilities; and those economics **change continuously**. So Teleon must think in **markets, not a static catalog**: a
+real-time **exchange** that knows the price, capability, latency, quality, trust, and availability of *all computation* — a
+**Bloomberg Terminal for computation**. At agent scale this is not a feature, it is the **most valuable layer**, and it
+*compounds the data-flywheel moat*: you own live price/latency/availability across every provider, not just quality.
+
+### Distinct entity types — ONE joined economic graph
+The right model is several distinct **entity types** that **join into one graph**, so the router traverses
+`capability → component → model → provider → endpoint → live-economics` in a single path (you cannot route if the price
+data is siloed from the implementations). We already have the seed of exactly this: `model_provider_graph.json`
+(model⇄provider nodes + edges). The entity types, mapped to what exists vs. the gap:
+
+| # | Registry (entity type) | Have today | Gap |
+|---|---|---|---|
+| 1 | Capability (interface) | `capability_taxonomy.json`, `evolution/capability_graph.py` | full CapabilityID rows |
+| 2 | Component (implementation) | `tool_registry.json`, staged JSONL, search index | scale + measured metadata |
+| 3 | **API Endpoint** | `capability_endpoint_registry.json` (cost_units), `external_api_registry.json` | per-endpoint rate-limit/batch/latency at scale; secondary providers |
+| 4 | **Model** | `model_index.json`, `ml_model_registry.json`, `model_quality_tier_codes.json`, `model_specialization_codes.json` | continuous benchmark dims (reasoning/OCR/JSON/hallucination) |
+| 5 | **Provider** | `model_provider_graph.json`, `competitive_provider_mappings.json`, `ocr/search_provider_registry.json`, provider status codes | the model×provider economic edges, populated + LIVE |
+| 6 | **Infrastructure** | `execution_backend_pricebook.json`, sandbox/blackboard/swarm/compression provider catalogs | vector-db / browser / GPU providers at scale |
+| 7 | Workflow Template | `module_bundles.json` (seed) | the 10⁴–10⁵ library (§14) |
+| 8 | **Economic** | `execution_backend_pricebook.json` (request/duration cost + `last_reviewed_at` + source + confidence), `inference_lane_profiles.json` (cost/latency/egress), free/lowcost endpoint registries | **LIVE** facets across all of the above |
+
+The skeleton of all 8 exists. The work is **scale + the JOIN + making the economic facets LIVE**.
+
+### System 20 — Provider Intelligence Engine (make the economics LIVE)
+Prices/latency/availability change daily; static cost metadata rots. A **pricing + latency crawler** monitors **official**
+providers (OpenAI/Anthropic/Google) and **secondary** providers (OpenRouter/Together/Groq/Fireworks/Replicate, and
+self-hosted vLLM/k8s) → emits **CDC events** → updates the economic facets. We already have the CDC/freshness machinery
+(`evolution/freshness_runtime.py`, `evolution/source_poller.py`) and the pricebook already carries `last_reviewed_at` +
+`source` + `confidence`. **Build:** point the crawler at provider pricing and stream economic-CDC.
+
+### System 21 — Computational Economics Engine (one objective function)
+"Most efficient" must be **one explicit, user-weighted multi-objective function** over **$ · latency · energy ·
+privacy/risk · hallucination-risk · failure-rate · availability**. The pieces exist — `PreferenceProfile` (the user's
+trade-off, already built), `inference/model_efficiency.py`, the pricebook, the lane profiles — but not ONE engine the
+simulator (§12), the optimization passes (§8), and the router (§22) all consult. **Build:** a single
+`cost_model(candidate, profile) → score` every layer calls. (This subsumes and replaces §16.)
+
+### System 22 — Dynamic Routing Engine (BGP for computation)
+Like internet routing: when a provider degrades or a cheaper/faster route appears, **re-route and recompile** the affected
+pipelines automatically. We have *selection* (`inference/lane_selection.py`, `inference/implementation_selector.py`,
+`evolution/substrate_selector.py`) + the descent; the gap is the **live loop**: economic-CDC (§20) → re-score (§21) →
+reroute + recompile (the optimization engine §8). **Secondary-provider arbitrage** is first-class: the same model on Groq
+vs Together vs OpenAI vs self-hosted is four routes with different economics; the router picks per the live cost model over
+the `model_provider_graph`. **Build:** the reroute-on-CDC loop + arbitrage traversal.
+
+### Capability futures — recompile on discovery
+When discovery (§13) + the benchmark swarm (§12) find a component that dominates (a new OCR repo at 0.95 quality /
+$0.0003), the system **re-scores and recompiles** the thousands of pipelines whose best route just changed — a
+forward-looking "the best pipeline for X just changed" signal. Discovery + learning + routing, closing the loop.
+
+### The phases (where we are)
+1. Registry of **tools** — *done*. 2. Registry of **computational primitives** — *mostly done* (planes, ladders, ML
+models, endpoints). 3. Registry of **computational markets** — *the current frontier* (the 8 entity types exist; the JOIN
++ LIVE economics is the work). 4. **Global routing layer for machine intelligence** — the exchange every agent routes
+through (the scale goal; §22 at internet scale, the Google/Bloomberg-of-computation position).
 
 ---
 
@@ -297,14 +361,20 @@ request's priors, and Baltor keeps truth separable from efficiency.
 ---
 
 ## Sequencing — what to build, in order (honest priorities)
-1. **Close the metadata loop** (§10 write-back → §1 measured cost/latency/quality). Cheap; turns logs into the moat.
-2. **The simulator** (§12). Unblocks real multi-candidate search; everything downstream depends on cheap scoring.
+1. **Close the metadata loop** (§10 write-back → §1 measured cost/latency/quality) **and join + make LIVE the economic
+   registries** (§20: point the existing freshness/CDC machinery at the `execution_backend_pricebook` + provider prices).
+   Cheap; turns logs + prices into the moat — this *is* the data flywheel.
+2. **The simulator** (§12) **over the unified cost model** (§21). Unblocks real multi-candidate search + live routing;
+   everything downstream depends on cheap economic scoring.
 3. **Template library + retrieve-and-mutate** (§14). Biggest efficiency lever for the common case.
 4. **Beam search composition** (§5) + **type lattice & coercion** (§6). Multi-candidate, wider composability.
 5. **PassManager + cost model** (§8 + §16). Scale the optimization that is the core IP.
 6. **Sandbox + trust-tier execution** (§17/§7) → unlocks **discovery at scale** (§13) and the move to millions.
 7. **Adapter factories** (§3: OpenAPI, Docker) and **equivalence/canonicalization** (§15) in parallel — they make the
    registry both *grow* and *generalize*.
+8. **Dynamic Routing Engine** (§22) — once live economics (§20) + the cost model (§21) exist, close the reroute-on-CDC +
+   recompile loop and exploit secondary-provider arbitrage over the `model_provider_graph`. This is the exchange layer —
+   the global routing position every agent flows through, and the endgame of the scale thesis.
 
 ## The thesis
 Models will keep getting smarter; that is not our bet. **Our bet is that the larger, more durable value is a system that
