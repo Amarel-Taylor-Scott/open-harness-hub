@@ -9,7 +9,7 @@
       {"capability": "extraction", "name": "Extract structured data", "sub": [
         {"id": "doc-schema-extract", "name": "PDF/scan/email → schema", "task_id": "document-schema-extraction", "status": "mapped", "tool_planes": ["ocr", "llm"]},
         {"id": "key-value-extract", "name": "key-value / form fields", "task_id": "slot-filling", "status": "mapped", "tool_planes": ["ocr", "llm"]},
-        {"id": "table-extract", "name": "table extraction", "task_id": null, "status": "candidate", "tool_planes": ["ocr", "llm"]},
+        {"id": "table-extract", "name": "table extraction", "task_id": null, "status": "candidate", "tool_planes": ["ocr", "data_extraction", "llm"]},
         {"id": "ner-relation-extract", "name": "entities & relations", "task_id": null, "status": "candidate", "tool_planes": ["llm"]}
       ]},
       {"capability": "classification", "name": "Label & classify", "sub": [
@@ -17,15 +17,15 @@
         {"id": "image-tag", "name": "classify/tag images", "task_id": "image-tagging", "status": "mapped", "tool_planes": ["vision", "llm"]},
         {"id": "moderate", "name": "flag unsafe content", "task_id": "content-moderation", "status": "mapped", "tool_planes": ["llm"]},
         {"id": "sentiment", "name": "sentiment / emotion", "task_id": null, "status": "candidate", "tool_planes": ["llm"]},
-        {"id": "language-detect", "name": "language detection", "task_id": null, "status": "candidate", "tool_planes": []}
+        {"id": "language-detect", "name": "language detection", "task_id": null, "status": "candidate", "tool_planes": ["classical_ml"]}
       ]},
       {"capability": "reconciliation", "name": "Resolve & dedupe", "sub": [
-        {"id": "entity-resolve", "name": "records → canonical entities", "task_id": "entity-resolution", "status": "mapped", "tool_planes": ["embedding", "llm"]},
-        {"id": "near-dup", "name": "detect near-duplicates", "task_id": "dedup-near-duplicate", "status": "mapped", "tool_planes": ["embedding"]},
+        {"id": "entity-resolve", "name": "records → canonical entities", "task_id": "entity-resolution", "status": "mapped", "tool_planes": ["embedding", "fuzzy_matching", "llm"]},
+        {"id": "near-dup", "name": "detect near-duplicates", "task_id": "dedup-near-duplicate", "status": "mapped", "tool_planes": ["embedding", "fuzzy_matching"]},
         {"id": "schema-match", "name": "schema / column matching", "task_id": null, "status": "candidate", "tool_planes": ["embedding", "llm"]}
       ]},
       {"capability": "validation", "name": "Validate & repair data", "sub": [
-        {"id": "data-quality", "name": "data quality / anomaly", "task_id": null, "status": "candidate", "tool_planes": ["llm"]},
+        {"id": "data-quality", "name": "data quality / anomaly", "task_id": null, "status": "candidate", "tool_planes": ["validation", "diff_compare", "llm"]},
         {"id": "schema-infer", "name": "schema inference", "task_id": null, "status": "candidate", "tool_planes": ["llm"]}
       ]}
     ]},
