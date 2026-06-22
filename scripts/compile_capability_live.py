@@ -21,6 +21,7 @@ from src.teleon.synthesis import intent_to_dag as I
 from src.teleon.synthesis.io_contracts import edge_compatible, plane_io
 from src.teleon.synthesis.dag_contract import verify_buildable_dag
 from src.teleon.economics import simulator as SIM
+from src.teleon.synthesis import templates as T
 
 REPO = Path(__file__).resolve().parents[1]
 RECEIPT = REPO / "data" / "dev-intel" / "live-compile-smoke.json"
@@ -111,6 +112,11 @@ def intelligent_compile(intent: str, *, llm=None) -> dict:
             return None, "did not return parseable JSON"
 
     base = _prompt(intent, pool)
+    tmpl = T.retrieve_template(intent)                       # RETRIEVE-AND-MUTATE: prefer a proven skeleton over scratch
+    if tmpl:
+        skel = " -> ".join(s["step"] for s in tmpl["slots"])
+        base += (f"\nA PROVEN TEMPLATE matches this intent: '{tmpl['template_id']}' (skeleton: {skel}). PREFER mutating "
+                 "it — fill each step with a deterministic component from the list above where possible.")
     v, parse_err = _attempt(base)
     repaired = False
     if v is None or not v["accepted"]:                       # VALIDATION + REPAIR RETRY (the universal best practice)
@@ -134,7 +140,8 @@ def intelligent_compile(intent: str, *, llm=None) -> dict:
             "composed_dag": {"nodes": v["nodes"], "edges": v["edges"]}, "deterministic_ratio": v["deterministic_ratio"],
             "hallucinated_rejected": v["hallucinated"], "acyclic": v["acyclic"], "type_warnings": v.get("type_warnings"),
             "accepted": v["accepted"], "verified_working": build["verified_working"], "build_verdict": build,
-            "simulated": simulated, "repaired": repaired, "serves_truth": False}
+            "simulated": simulated, "matched_template": (tmpl or {}).get("template_id"), "repaired": repaired,
+            "serves_truth": False}
 
 
 def compile_and_run(intent: str, *, llm=None, graph_inputs: dict | None = None) -> dict:
@@ -196,6 +203,8 @@ def _self_test() -> int:
        isinstance(art.get("verified_working"), bool) and "build_verdict" in art)
     ck("compiler attaches a SIMULATED economic estimate over the composed DAG (System 12)",
        "simulated" in art and art["simulated"]["n_nodes"] == len(art["composed_dag"]["nodes"]))
+    ck("compiler retrieves a proven TEMPLATE to mutate (retrieve-and-mutate, not from scratch)",
+       art.get("matched_template") == "document_extraction")
     ck("the prompt grounds candidates with their I/O types (type-aware composition, Langflow port-typing)",
        "io=" in _prompt(intent, pool) and "->" in _prompt(intent, pool))
     ck("serves_truth=false", art["serves_truth"] is False)

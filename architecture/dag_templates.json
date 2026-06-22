@@ -1,0 +1,75 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-22",
+  "principle": "Canonical DAG templates — typed parameterized SKELETONS with named SLOTS (each slot is a plane to fill with a component). Composition RETRIEVES a matching template and MUTATES its slots (swap the OCR rung, add a validator, drop an unused optional step) rather than synthesizing from scratch. This is the dominant path for the common case: classical component synthesis scales poorly with library size, so templates carry the common case and synthesis is the long-tail fallback. Templates are MINED from winning traces (the library grows itself) and ranked by telemetry success_count. serves_truth=false.",
+  "serves_truth": false,
+  "templates": [
+    {
+      "template_id": "document_extraction",
+      "capability_family": "document_extraction",
+      "keywords": ["extract", "pdf", "document", "invoice", "lease", "fields", "ocr", "schema", "form"],
+      "slots": [
+        {"step": "parse", "plane": "data_extraction"},
+        {"step": "ocr_fallback", "plane": "ocr", "optional": true},
+        {"step": "fields", "plane": "field_parsing"},
+        {"step": "validate", "plane": "validation"}
+      ],
+      "edges": [["parse", "fields"], ["ocr_fallback", "fields"], ["fields", "validate"]],
+      "success_count": 0,
+      "failure_modes": ["handwriting", "rotated_scan", "multi_column"]
+    },
+    {
+      "template_id": "rag_qa",
+      "capability_family": "retrieval_qa",
+      "keywords": ["question", "answer", "qa", "rag", "retrieve", "documents", "search", "context", "grounded"],
+      "slots": [
+        {"step": "embed", "plane": "embedding"},
+        {"step": "retrieve", "plane": "vector_store"},
+        {"step": "rerank", "plane": "reranker", "optional": true},
+        {"step": "generate", "plane": "llm"}
+      ],
+      "edges": [["embed", "retrieve"], ["retrieve", "rerank"], ["rerank", "generate"], ["retrieve", "generate"]],
+      "success_count": 0,
+      "failure_modes": ["low_recall", "stale_index"]
+    },
+    {
+      "template_id": "web_research",
+      "capability_family": "web_research",
+      "keywords": ["research", "web", "search", "scrape", "crawl", "browse", "find", "online", "company"],
+      "slots": [
+        {"step": "search", "plane": "search"},
+        {"step": "fetch", "plane": "browser"},
+        {"step": "extract", "plane": "field_parsing"},
+        {"step": "synthesize", "plane": "llm"}
+      ],
+      "edges": [["search", "fetch"], ["fetch", "extract"], ["extract", "synthesize"]],
+      "success_count": 0,
+      "failure_modes": ["bot_blocking", "js_heavy"]
+    },
+    {
+      "template_id": "entity_enrichment",
+      "capability_family": "entity_enrichment",
+      "keywords": ["enrich", "entity", "company", "contact", "lookup", "resolve", "match"],
+      "slots": [
+        {"step": "lookup", "plane": "search"},
+        {"step": "enrich", "plane": "entity_enrichment"},
+        {"step": "validate", "plane": "validation"}
+      ],
+      "edges": [["lookup", "enrich"], ["enrich", "validate"]],
+      "success_count": 0,
+      "failure_modes": ["ambiguous_entity", "stale_record"]
+    },
+    {
+      "template_id": "classification",
+      "capability_family": "classification",
+      "keywords": ["classify", "category", "label", "stance", "sentiment", "detect", "tag"],
+      "slots": [
+        {"step": "features", "plane": "field_parsing"},
+        {"step": "classify", "plane": "classical_ml"}
+      ],
+      "edges": [["features", "classify"]],
+      "success_count": 0,
+      "failure_modes": ["class_imbalance", "drift"]
+    }
+  ]
+}
