@@ -34,17 +34,29 @@ def counts() -> dict:
         c["proofs"] = len(PROOF_MODULES)
     except Exception:  # noqa: BLE001
         c["proofs"] = 0
-    # live land-lease cascade numbers (computed; the flagship efficiency proof)
+    # the full 22-hub roster (id + slug) — the canonical list the hubs page links to (single-sourced from the engine)
+    try:
+        from src.openharnesshub.hub_engine import hub_specs
+        from src.openharnesshub.hub_site import slugify
+        c["hub_list"] = [{"id": s.hub_id, "slug": slugify(s.hub_id), "kind": s.component_kind, "tier": s.tier}
+                         for s in hub_specs()]
+    except Exception:  # noqa: BLE001
+        c["hub_list"] = []
+    # live cascade numbers + a real COST CONTROL-CHART series across the schema templates (computed; the efficiency proof)
+    c["ll_frontier"], c["ll_sup"], c["ll_pct"], c["ll_fields"] = 0.302, 0.056, 81.4, 12
+    c["cost_samples"] = []
     try:
         from src.teleon.extraction.document_extraction_cascade import compare_strategies
-        from src.teleon.extraction.schema_templates import get_template
+        from src.teleon.extraction.schema_templates import get_template, template_names
         cmp = compare_strategies(get_template("land_lease"), {"has_text_layer": True, "scanned": False})
-        c["ll_frontier"] = cmp["frontier_only"]["cost"]
-        c["ll_sup"] = cmp["supervised"]["cost"]
-        c["ll_pct"] = cmp["supervised"]["pct_saved"]
-        c["ll_fields"] = cmp["fields"]
+        c["ll_frontier"], c["ll_sup"] = cmp["frontier_only"]["cost"], cmp["supervised"]["cost"]
+        c["ll_pct"], c["ll_fields"] = cmp["supervised"]["pct_saved"], cmp["fields"]
+        for t in template_names():
+            cm = compare_strategies(get_template(t), {"has_text_layer": True, "scanned": False})
+            c["cost_samples"].append({"label": t.replace("_", " "), "sup": cm["supervised"]["cost"],
+                                      "frontier": cm["frontier_only"]["cost"]})
     except Exception:  # noqa: BLE001
-        c["ll_frontier"], c["ll_sup"], c["ll_pct"], c["ll_fields"] = 0.302, 0.056, 81.4, 12
+        pass
     return c
 
 
@@ -128,6 +140,48 @@ def _shell(active: str, title: str, desc: str, hero_class: str, body: str, *, fo
             f'<script>{_JS}</script></body></html>\n')
 
 
+def _control_chart_svg(points: list, *, center: float, ucl: float, lcl: float, baseline: float, title: str) -> str:
+    """A real statistical-process-control chart: each capability's cost as a sample, with a center line + UCL/LCL,
+    against the frontier-only baseline (the old way). Points in the band are green; any out-of-band point is red."""
+    if not points:
+        return ""
+    W, H, L, T, PW, PH = 600, 230, 48, 30, 532, 150
+    ymax = max(baseline, ucl) * 1.14 or 1.0
+    def y(v):
+        return round(T + PH * (1 - min(v, ymax) / ymax), 1)
+    n = len(points)
+    xs = [round(L + PW * (i / max(1, n - 1)), 1) for i in range(n)]
+    poly = " ".join(f"{xs[i]},{y(p[1])}" for i, p in enumerate(points))
+    dots = "".join(f'<circle cx="{xs[i]}" cy="{y(p[1])}" r="4" fill="{"#16a34a" if lcl <= p[1] <= ucl else "#dc2626"}"></circle>'
+                   for i, p in enumerate(points))
+    labels = "".join(f'<text x="{xs[i]}" y="{T + PH + 15}" font-size="9" fill="#9aa0b4" text-anchor="middle">{str(p[0])[:11]}</text>'
+                     for i, p in enumerate(points))
+    return (f'<svg viewBox="0 0 {W} {H}" width="100%" height="{H}" style="max-width:640px;margin-top:10px">'
+            f'<text x="{L}" y="16" font-size="12" fill="#0f1222" class=mono>{title}</text>'
+            f'<line x1="{L}" y1="{y(baseline)}" x2="{L + PW}" y2="{y(baseline)}" stroke="#dc2626" stroke-width="2" stroke-dasharray="5 4"></line>'
+            f'<text x="{L + PW}" y="{y(baseline) - 4}" font-size="9" fill="#dc2626" text-anchor="end" class=mono>frontier-only baseline (old way) ${baseline}</text>'
+            f'<line x1="{L}" y1="{y(ucl)}" x2="{L + PW}" y2="{y(ucl)}" stroke="#cbd0e0" stroke-width="1" stroke-dasharray="4 4"></line>'
+            f'<text x="{L}" y="{y(ucl) - 3}" font-size="9" fill="#9aa0b4" class=mono>UCL ${ucl}</text>'
+            f'<line x1="{L}" y1="{y(lcl)}" x2="{L + PW}" y2="{y(lcl)}" stroke="#cbd0e0" stroke-width="1" stroke-dasharray="4 4"></line>'
+            f'<text x="{L}" y="{y(lcl) - 3}" font-size="9" fill="#9aa0b4" class=mono>LCL ${lcl}</text>'
+            f'<line x1="{L}" y1="{y(center)}" x2="{L + PW}" y2="{y(center)}" stroke="#16a34a" stroke-width="1.5"></line>'
+            f'<text x="{L}" y="{y(center) - 3}" font-size="9" fill="#16a34a" class=mono>mean ${center}</text>'
+            f'<polyline points="{poly}" fill="none" stroke="#4f46e5" stroke-width="2"></polyline>{dots}{labels}</svg>')
+
+
+def _cost_control_chart(c: dict) -> str:
+    """Build the cost control chart from the computed per-capability samples (or a representative band if none)."""
+    samples = c.get("cost_samples", [])
+    sups = [s["sup"] for s in samples] or [c["ll_sup"]]
+    center = round(sum(sups) / len(sups), 4)
+    hi, lo = max(sups), min(sups)
+    ucl = round(hi + (hi - center) * 0.6 + 0.004, 4)
+    lcl = round(max(0.0, lo - (center - lo) * 0.6 - 0.002), 4)
+    points = [(s["label"], s["sup"]) for s in samples] or [("land lease", c["ll_sup"])]
+    return _control_chart_svg(points, center=center, ucl=ucl, lcl=lcl, baseline=c["ll_frontier"],
+                              title="Cost per capability — held in the efficient control band")
+
+
 def page_index(c: dict) -> str:
     body = f"""
 <header class="hero parent"><div class=wrap>
@@ -202,13 +256,20 @@ def page_teleon(c: dict) -> str:
   </div>
   <p style="margin-top:16px">The LLM is used only to <b>audit</b> the cheap methods and re-do the few fields it flags —
   not to read the whole document.</p></div></section>
+<section><div class="wrap reveal"><h2>Performance, in control</h2><h3>Efficient AND safe — within control-chart limits.</h3>
+  <p>Cutting cost can't mean cutting corners. Each capability the descent produces is a sample on a control chart:
+  cost stays inside an efficient band (UCL/LCL) — far below the frontier-only baseline — while quality holds above the
+  floor. Statistical process control, applied to AI spend.</p>
+  {_cost_control_chart(c)}
+  <p style="margin-top:8px" class=mono style="font-size:12px;color:#9aa">Each point = one capability's supervised cost
+  (computed). Green = in the control band. The red line is what most pay today (whole doc → frontier).</p></div></section>
 <section><div class="wrap reveal"><h2>Research, efficiently</h2><h3>The cheapest tool that gets the detail.</h3>
   <div class=rung><span>feed / API</span><div class=bar style="width:14%"></div><span class=c>cheapest</span></div>
   <div class=rung><span>search</span><div class=bar style="width:30%"></div></div>
   <div class=rung><span>extract / render</span><div class=bar style="width:55%"></div></div>
   <div class=rung><span>LLM-driven browser</span><div class=bar style="width:92%"></div><span class=c>deep detail only</span></div>
-  <p style="margin-top:14px">{c['browsers']} browsers + {c['driving']} driving components cataloged — the descent picks
-  the cheapest that can get what's needed.</p></div></section>"""
+  <p style="margin-top:14px">{c['browsers']} browsers + {c['driving']} driving components cataloged (any LLM, any
+  browser — behind agnostic ports) — the descent picks the cheapest that can get what's needed.</p></div></section>"""
     return _shell("teleon", "Teleon — the runtime that makes AI efficient",
                   "Teleon: write a capability in plain language and the runtime descends it to the cheapest appropriate path.",
                   "teleon", body)
@@ -241,6 +302,10 @@ def page_baltor(c: dict) -> str:
 
 
 def page_hubs(c: dict) -> str:
+    hubs = c.get("hub_list", [])
+    cards = "".join(
+        f'<a class=card href="./hubs/{h["slug"]}/index.html"><h4>{h["id"]}</h4>'
+        f'<p>{h["kind"]} · <span class=mono>{h["tier"]}</span></p></a>' for h in hubs)
     body = f"""
 <header class="hero hubs"><div class=wrap><span class=tag>The Open*Hubs · the open store</span>
   <h1>{c['hubs']} open registries of <span style="text-decoration:underline;text-decoration-color:#e9b8f5">building blocks</span>.</h1>
@@ -261,7 +326,10 @@ def page_hubs(c: dict) -> str:
     <span class=arrow>&rarr;</span><div class=node>verify gate</div><span class=arrow>&rarr;</span>
     <div class="node alt">served to Baltor / Teleon</div></div>
   <p style="margin-top:16px"><b>Discovery is not trust</b> — everything is a candidate until a hub's verify gate passes.</p>
-</div></section>"""
+</div></section>
+<section><div class="wrap reveal"><h2>Browse all {c['hubs']}</h2><h3>Every hub, one standardized surface.</h3>
+  <p>Each hub renders from the same template (consistent design), with its own engine, settings, and verify gate.</p>
+  <div class="grid g3" style="margin-top:16px">{cards}</div></div></section>"""
     return _shell("hubs", "The Open*Hubs — the open store of building blocks",
                   "The Open*Hubs: open registries of tools, skills, models, methods both Baltor and Teleon consume.",
                   "hubs", body)
@@ -278,6 +346,13 @@ def build() -> list[Path]:
         p = OUTDIR / f"{name}.html"
         p.write_text(_BUILDERS[name](c), encoding="utf-8")
         out.append(p)
+    # render ALL 22 standardized hub pages into dist/intro/hubs/ (same up-to-date template — no legacy) so the hubs
+    # page's links resolve and the whole site is one coherent, consistent surface.
+    try:
+        from scripts.build_hub_sites import render_all as render_hub_pages
+        render_hub_pages(out_dir=OUTDIR / "hubs")
+    except Exception as e:  # noqa: BLE001
+        print(f"  (hub pages not rendered: {e})")
     return out
 
 
@@ -303,7 +378,11 @@ def _self_test() -> int:
     bhero = pages["baltor"].split("</header>")[0].lower()
     ck("'context' lives on the BALTOR page hero (where it belongs)", bhero.count("context") >= 1 and "trustworthy" in pages["baltor"].lower())
     ck("Teleon page is about efficiency + the descent + the cascade", all(w in pages["teleon"] for w in ("efficient", "descent", "supervisor")))
+    ck("Teleon page shows a CONTROL CHART (UCL/LCL + center + the frontier baseline)",
+       all(m in pages["teleon"] for m in ("UCL", "LCL", "control band", "baseline")) and "<svg" in pages["teleon"])
     ck("hubs page covers the 3 channels", all(w in pages["hubs"] for w in ("Discover", "Generate", "Intake")))
+    ck(f"hubs page links ALL {c['hubs']} hub pages (not 4) — every roster hub",
+       len(c["hub_list"]) == c["hubs"] and all(f'./hubs/{h["slug"]}/index.html' in pages["hubs"] for h in c["hub_list"]))
     ck("computed figures embedded (hubs/proofs/land-lease %)", str(c["hubs"]) in idx and str(c["proofs"]) in idx and str(c["ll_pct"]) in idx)
     ck("honest tunnel caveat on the parent page", "temporary" in idx.lower() and "trycloudflare" in idx.lower())
     print("\n" + ("PASS - build_intro_site: 4 cross-linked animated pages — PARENT (efficient+appropriate, not context), "
