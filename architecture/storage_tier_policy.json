@@ -124,6 +124,52 @@
       "note": "the Baltor->Teleon->OHH law; tiny, hand-curated, PR-gated; stays JSON.",
       "serves_truth": false,
       "plane": "product"
+    },
+    {
+      "stream": "tool_registry_staged",
+      "tier": "operational",
+      "status": "active",
+      "jsonl": "data/dev-intel/tool_registry_staging.jsonl",
+      "idempotency_key": "id",
+      "partition_key": "plane",
+      "produced_by": "scripts.harvest_tools",
+      "note": "the MASSIVE staged tool layer (scraped, thousands->millions). JSONL is the interchange/staging component; the operational backend is SQLite (local) / Postgres+pgvector (cloud) via the record_store port. NOT read by the descent until promoted.",
+      "serves_truth": false,
+      "plane": "development"
+    },
+    {
+      "stream": "discovered_tools",
+      "tier": "operational",
+      "status": "active",
+      "jsonl": "data/dev-intel/discovered_tools.jsonl",
+      "idempotency_key": "id",
+      "partition_key": "plane",
+      "produced_by": "scripts.discover_tools",
+      "note": "ideated tool/plugin/capability candidates from the discovery pipeline; queried/filtered at runtime; -> the staged layer.",
+      "serves_truth": false,
+      "plane": "development"
+    },
+    {
+      "stream": "component_search_index",
+      "tier": "operational",
+      "status": "active",
+      "jsonl": "data/dev-intel/component_search_index.jsonl",
+      "idempotency_key": "id",
+      "partition_key": "kind",
+      "produced_by": "scripts.build_component_index",
+      "note": "the searchable index over ALL components (text + keywords + vector) so the synthesizer can FIND + COMPOSE components by meaning; cloud backend is postgres+pgvector (the object_embeddings pattern).",
+      "serves_truth": false,
+      "plane": "product"
+    },
+    {
+      "stream": "tool_registry_core",
+      "tier": "config",
+      "status": "active",
+      "json": "architecture/tool_registry.json",
+      "produced_by": "hand-curated + scripts.promote_tools",
+      "note": "the VETTED core the descent reads (hundreds); stays JSON/git. tool_registry_promoted.json (auto-promoted, vetted=false) + every other architecture/*.json registry (planes/ladders/credentials/access_policy/ml_models/microsteps) are config-tier too: bounded, PR-reviewed, diffable.",
+      "serves_truth": false,
+      "plane": "product"
     }
   ]
 }
