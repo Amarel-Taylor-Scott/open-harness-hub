@@ -1,0 +1,19 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-22",
+  "principle": "A developer-run pipeline that scrapes GitHub + (governed) Facebook for new AI tools/repos and CONSUMES them into ideas -> candidate tools / plugins / capabilities for our registries. Keys come from the runtime KEY HOLDER (BYO: a developer sets the env var -> their account/plan; or platform-within-limits). Everything stays a CANDIDATE: license-classified, deduped vs our registries, candidate-only feed + proposals — NOT auto-added (promotion boundary; discovery≠trust). Social sources are PUBLIC-only, no-PII, ToS-honoring, honest-unavailable without a held key. serves_truth=false.",
+  "serves_truth": false,
+  "sources": [
+    {"id": "github", "via": "src/teleon/research/source_search.py:GitHubSearch", "key_service": "github", "status": "wired", "note": "keyless works; OH_GITHUB_TOKEN (held) lifts the rate"},
+    {"id": "facebook", "via": "external_api_registry:fb_page_scrape", "key_service": "rapidapi", "status": "candidate", "governance": "PUBLIC page metadata only, no PII, honor Meta ToS; needs a held RAPIDAPI_KEY else honest-unavailable", "note": "FB public pages/groups SHARE AI tools -> extract links -> resolve GitHub repos"},
+    {"id": "browser_fallback", "via": "browser_escalation_ladder", "key_service": null, "status": "wired", "note": "the governed browser ladder when an API path is blocked"}
+  ],
+  "stages": [
+    {"stage": "discover", "do": "query each reachable source (key holder gates social); collect hits with provenance", "honest": "a source with no held key -> honest 'needs <ENV_VAR>', never fabricated"},
+    {"stage": "classify", "do": "license-classify (single source) + map each hit to the tool-plane/capability it serves"},
+    {"stage": "ideate", "do": "turn each into idea kinds: TOOL (a tool_registry candidate for a plane) / PLUGIN (an integration/add-on) / CAPABILITY (could seed a new ladder, esp. a thin plane)"},
+    {"stage": "govern", "do": "dedupe vs our registries; permissive -> vendorable, copyleft/unstated -> technique-only; write candidate feed + proposals; NOTHING auto-promoted"}
+  ],
+  "ideation_kinds": ["tool", "plugin", "capability"],
+  "feed": "data/dev-intel/discovered_pipeline.jsonl"
+}

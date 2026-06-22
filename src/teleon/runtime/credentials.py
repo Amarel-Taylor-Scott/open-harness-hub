@@ -39,6 +39,11 @@ def _env_value(name: str, env: dict | None) -> str:
     return (os.environ.get(name) or _dotenv().get(name) or "").strip()
 
 
+def env_value(name: str, env: dict | None = None) -> str:
+    """Resolve a single env-var VALUE (os.environ then .env). Used by the key holder — callers must NOT log the result."""
+    return _env_value(name, env)
+
+
 def is_present(service_id: str, env: dict | None = None) -> bool:
     """A service is PRESENT when all of its env vars are set (keyless services are present even with none set)."""
     svc = next((s for s in _services() if s["id"] == service_id), None)
