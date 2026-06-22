@@ -1,0 +1,32 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-22",
+  "principle": "The AUTHORIZATION layer over the registries: registries say what EXISTS, the credential plane says what's REACHABLE, this says WHO MAY USE IT. Not every tool/key/capability is open to every user. DENY-BY-DEFAULT for sensitive resources (least privilege). A principal may ALWAYS use a credential service they brought their OWN key for (it's theirs) — but a BYO key does NOT grant restricted tools. Platform keys + expensive services are plan-gated (cost/abuse); evasion/social/PII tools need an explicit GRANT; private-bench/internal registries are staff-only. Per-product realms (no SSO) — entitlements are per tenant/product. serves_truth=false.",
+  "serves_truth": false,
+  "tiers": [
+    {"tier": "public", "rank": 0, "requires": "nothing (keyless deterministic tools, open registries)"},
+    {"tier": "authenticated", "rank": 1, "requires": "any signed-in principal (role != anonymous)"},
+    {"tier": "plan_gated", "rank": 2, "requires": "a paid plan OR the principal's OWN key for the service (BYO)"},
+    {"tier": "restricted", "rank": 3, "requires": "an explicit GRANT (evasion / social_scrape / pii) + signed-in"},
+    {"tier": "internal", "rank": 4, "requires": "staff / internal plan only (private-bench, the brain, dev tooling)"}
+  ],
+  "paid_plans": ["pro", "enterprise", "internal"],
+  "grants": ["evasion", "social_scrape", "pii"],
+  "roles": {
+    "anonymous": {"plan": "free", "grants": []},
+    "user": {"plan": "free", "grants": []},
+    "developer": {"plan": "pro", "grants": []},
+    "staff": {"plan": "internal", "grants": ["evasion", "social_scrape", "pii"]}
+  },
+  "rule_precedence": [
+    "internal flag -> internal",
+    "governance 'evasion' -> restricted/evasion",
+    "governance 'ToS'/'social' or plane 'social_scrape' -> restricted/social_scrape",
+    "governance 'pii' -> restricted/pii",
+    "credential key_ownership platform|both (our key) -> plan_gated (key_service)",
+    "credential key_ownership byo (owner-only key) -> plan_gated (BYO satisfies it)",
+    "keyless deterministic tool / open registry -> public",
+    "default -> authenticated"
+  ],
+  "byo_rule": "a principal may always use a credential service in their byo_keys (their own account/plan); this satisfies a plan_gated KEY gate but never a restricted TOOL grant"
+}
