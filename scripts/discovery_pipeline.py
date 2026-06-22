@@ -30,6 +30,9 @@ _PLANE_HINTS = [
     ("contradict", "stance_nli"), ("entailment", "stance_nli"), ("nli", "stance_nli"),
     ("fuzzy", "fuzzy_matching"), ("dedupe", "fuzzy_matching"), ("record linkage", "fuzzy_matching"),
     ("classif", "classical_ml"), ("solver", "constraint_solver"), ("constraint", "constraint_solver"),
+    ("forecast", "time_series"), ("time series", "time_series"), ("time-series", "time_series"), ("arima", "time_series"),
+    ("anomaly", "time_series"), ("outlier", "time_series"), ("random forest", "classical_ml"), ("gradient boost", "classical_ml"),
+    ("xgboost", "classical_ml"), ("cluster", "classical_ml"), ("recommend", "classical_ml"), ("regression", "classical_ml"),
     ("scrap", "search"), ("crawl", "browser"), ("browser", "browser"), ("playwright", "browser"), ("selenium", "browser"),
     ("pdf", "data_extraction"), ("table", "data_extraction"), ("docx", "data_extraction"), ("parse", "parsing_grammar"),
     ("address", "field_parsing"), ("phone", "field_parsing"), ("date", "field_parsing"),
@@ -62,11 +65,19 @@ def ideate(cand: dict, thin: set[str]) -> dict:
         kinds.append("plugin")                                 # an integratable add-on behind a port
     if plane in thin:
         kinds.append("capability")                             # could seed/strengthen a thin plane or a missing ladder
+    if plane in ("classical_ml", "time_series"):
+        kinds.append("ml_model")                               # candidate for the ml_model_registry (predictive/deterministic tier)
     why = []
     if "tool" in kinds: why.append(f"vendorable {cand.get('license')} component for the {plane} plane")
+    if "ml_model" in kinds: why.append(f"predictive ML model for the {plane} plane -> ml_model_registry candidate")
     if "capability" in kinds: why.append(f"{plane} is under-covered — could seed a ladder/plane")
     if not cand.get("vendorable"): why.append(f"technique-only ({cand.get('license_class')}) — study/service-lane, don't vendor")
     return {**cand, "idea_kinds": kinds or ["watch"], "idea_rationale": "; ".join(why) or "candidate"}
+
+
+#: the ML-model scraper sweep (run on a schedule via the discovery flywheel to keep ml_model_registry current)
+ML_QUERIES = ["random forest", "gradient boosting", "time series forecasting", "anomaly detection",
+              "recommender system", "clustering algorithm", "survival analysis", "online learning ml"]
 
 
 def discover_sources(query: str, *, limit: int = 8, env: dict | None = None) -> tuple[list, dict]:
