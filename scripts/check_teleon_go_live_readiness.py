@@ -54,10 +54,21 @@ def _built() -> list[dict]:
     return out
 
 
+def _live_llm_verified() -> bool:
+    """Blocking is DERIVED from a real artifact (not a hand-flip): a recorded, verified live-inference smoke receipt."""
+    import json
+    p = _REPO / "data" / "dev-intel" / "live-llm-smoke.json"
+    try:
+        return bool(json.loads(p.read_text(encoding="utf-8")).get("verified"))
+    except Exception:  # noqa: BLE001
+        return False
+
+
 def _seams() -> list[dict]:
     """The live-wiring gaps to close for real cloud go-live — honest, with the owning sprint."""
+    _llm_live = _live_llm_verified()
     return [
-        {"seam": "live LLM inference", "owner_action": "set provider keys + a live smoke per inference lane (Codex/Ollama/Gemma); today lanes degrade to provider_unavailable offline", "sprint": "S1-live-adapters", "blocking": True},
+        {"seam": "live LLM inference", "owner_action": ("primary Ollama/Gemma lane LIVE-verified (data/dev-intel/live-llm-smoke.json); other lanes (Cloudflare/hosted) are key-gated add-ons" if _llm_live else "set provider keys + a live smoke per inference lane; today lanes degrade to provider_unavailable offline"), "sprint": "S1-live-adapters", "blocking": not _llm_live},
         {"seam": "live source fetch + CDC freshness", "owner_action": "wire a real source poller -> freshness CDC 'changed' events -> self_healing reheal; today freshness uses passed-in values", "sprint": "S1-live-adapters", "blocking": True},
         {"seam": "real distillation (LLM -> deterministic rule generation)", "owner_action": "wire the determinism factory to a model to GENERATE the rule a fork represents (today forks are governed specs)", "sprint": "S2-distill-live", "blocking": True},
         {"seam": "real per-vertical eval data", "owner_action": "ingest real benchmark datasets (RuleArena + vertical evals) so the A/B scorer is live, not representative", "sprint": "S2-distill-live", "blocking": True},
@@ -101,9 +112,11 @@ def _self_test() -> int:
        r["n_seams"] >= 8 and all(s.get("owner_action") and s.get("sprint") for s in r["seams"]))
     ck("go_live_ready is honestly FALSE while blocking live seams remain (no premature green)",
        r["go_live_ready"] is False and r["n_blocking_seams"] >= 1)
-    ck("the blocking seams name the real gaps (live LLM, live source/CDC, distillation, Postgres, auth, hosting)",
-       {"live LLM inference", "Postgres/pgvector load + live promotion boundary", "auth + tenancy (separate realms)",
+    ck("the blocking seams name the real REMAINING gaps (live source/CDC, distillation, Postgres, auth, hosting)",
+       {"Postgres/pgvector load + live promotion boundary", "auth + tenancy (separate realms)",
         "hosting deploy executed + verified"} <= set(r["blocking_seams"]), str(r["blocking_seams"]))
+    ck("live LLM inference is VERIFIED-live (real smoke receipt), no longer a blocking seam",
+       "live LLM inference" not in r["blocking_seams"])
     ck("the readiness report never serves truth", r["serves_truth"] is False)
     ck("deterministic", readiness_report()["go_live_ready"] == r["go_live_ready"])
 

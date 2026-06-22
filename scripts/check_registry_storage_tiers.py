@@ -51,6 +51,18 @@ def _self_test() -> int:
         finally:
             st.close()
         ck(f"staged JSONL ({n_lines}) round-trips through the operational store (count parity)", n_store == n_lines, f"store={n_store} jsonl={n_lines}")
+        # NO SHORTCUT: the operational tier must materialize a REAL indexed SQLite DB (JSONL is only the durable append-log)
+        import sqlite3
+        from scripts._jsonl_store import _db_path_for
+        dbp = _db_path_for(jsonl)
+        ck("operational store is a REAL SQLite DB (not a JSONL shortcut)", dbp.exists())
+        if dbp.exists():
+            con = sqlite3.connect(str(dbp))
+            try:
+                rows = con.execute("SELECT count(*) FROM records").fetchone()[0]
+            finally:
+                con.close()
+            ck("the SQLite DB holds the rows (indexed query store, not a re-read of JSONL)", rows == n_lines, f"db={rows} jsonl={n_lines}")
     else:
         ck("staged stream not yet populated (harvester not run) — tiering still verified", True)
 
