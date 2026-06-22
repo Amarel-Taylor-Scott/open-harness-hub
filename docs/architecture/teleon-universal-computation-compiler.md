@@ -1,0 +1,301 @@
+# Teleon as a universal computation compiler — the 13 (+6) core systems
+
+A deep architecture for the reframe: **Teleon is not an agent framework, a workflow builder, or "NL → pipelines." It is a
+universal compiler/runtime that transforms ambiguous capability requests into globally optimized, verified executable
+graphs over an internet-scale registry of computational primitives.** This is the already-ratified *cognitive-work
+compiler* thesis (`docs/strategy/teleon-cognitive-compiler-2026-06.md`), taken to its full conclusion.
+
+The north star, stated sharply: **the future is not models getting smarter — it is systems getting better at deciding when
+intelligence is unnecessary.** Teleon's job is to *remove unnecessary intelligence from computation* — to compile a request
+down to the cheapest deterministic path that provably works, and call a model only for the irreducible residual. That is
+exactly the **descent** (`src/teleon/evolution/descent.py`): make it work, then make it efficient.
+
+---
+
+## The central problem — and why every layer is a *pruner*
+The hard part is not DAG generation. It is **searching an effectively infinite universe of computational possibilities.**
+The resolution is the single most important architectural principle here:
+
+> **We never enumerate the universe. Every layer is a pruner that shrinks the search before the next layer sees it.**
+
+```
+millions of components ──(retrieval: lexical+vector+graph+constraints)──▶ dozens
+       dozens ──(templates: don't synthesize from scratch; mutate a known-good skeleton)──▶ a few skeletons
+   a few skeletons ──(type system: reject every type-invalid wiring)──▶ valid candidates only
+ valid candidates ──(simulation: analytic cost/quality from metadata, no execution)──▶ top-k
+        top-k ──(benchmark: run only these on real data)──▶ 1 winner
+       1 winner ──(optimization passes: LLVM-style rewrites)──▶ the cheapest bounded graph
+```
+
+This is **program synthesis**, and synthesis only works when the space is aggressively pruned by **types, priors
+(templates + learning), and cheap scoring (simulation)** — so the expensive steps (benchmark, execute) run on a handful
+of candidates, never the universe.
+
+---
+
+## Honest map — what already exists vs. the gap
+| # | System | Status | The real artifact today |
+|---|---|---|---|
+| 1 | Universal Capability Representation | **partial** | `tool_planes.json`, `plane_io_contracts.json`, `capability_taxonomy.json`, `capability_ladders.json`, `evolution/capability_graph.py` (capability→runners) |
+| 2 | Registry (millions/billions) | **partial** | `registry_layers.json`, `tool_registry.json`, `tool_registry_staging.jsonl`, `harvest_tools.py`, `storage_tier_policy.json`, promotion boundary |
+| 3 | Universal Adapter | **built (v1)** | `src/teleon/components/` (`invoke`/`lower`/`conformance`) + agnostic ports + `runtime/execution_providers/` |
+| 4 | Retrieval Engine | **partial** | `synthesis/component_search.py`, `retrieval/hybrid.py` (RRF), ladders (families), `evolution/capability_graph.py` |
+| 5 | DAG Composition | **partial** | `compile_capability_live.py`, `synthesis/synthesis_tree.py` (backtracking), `strategist.py`, `evolution/impl_finder.py` |
+| 6 | Type System + Contracts | **partial** | `plane_io_contracts.json`, `io_contracts.py`, `dag_contract.py` |
+| 7 | Verification | **partial** | `dag_contract.verify_buildable_dag`, `components/conformance.py`, `run_proofs.py` |
+| 8 | Optimization Passes | **partial** | `optimization_passes.json`, `pipeline_dag.choose` (descent), `evolution/{descent,token_reduction,distiller,substrate_selector}.py`, `inefficient_pipeline_archetypes.json` |
+| 9 | Execution Runtime | **partial** | `dag/pipeline_dag.py`, `components/lowering.run_compiled`, `runtime/execution_providers/`, `workers/function_emulator.py` |
+| 10 | Telemetry + Observability | **partial** | `synthesis/synthesis_trace.py`, `evolution/{descent_attempt_store,descent_measurement}.py`, receipts, OpenLineage adoption |
+| 11 | Learning Engine | **partial** | `evolution/{meta_learner,external_outcomes,auto_tuning,rule_generator,self_optimizing_unit}.py`, the brain |
+| 12 | Benchmarking + Simulation | **partial (bench yes / sim no)** | `evolution/ab_harness.py`, `live_eval.py`, eval datasets, `eval/durable_gap_harness.py` |
+| 13 | Self-Expanding Discovery | **partial** | `discovery_pipeline`, `harvest_tools.py`, `research/source_search.py`, `research_queue` |
+| 14 | **Template Library + Mutation** | **seed only** | `module_bundles.json` (8 recipes) → needs to become a 10⁴–10⁵ template library |
+
+Read that as: the *skeleton of all 14 exists*; the work is **depth, scale, and three missing pieces** (simulation,
+canonicalization, sandboxed discovery).
+
+---
+
+## Six refinements — where the vision needs correcting (the valuable part)
+1. **Not 10M capability *classes* — a bounded ontology of capabilities + millions of *implementations*.** A capability is
+   an **interface** (`extract_text_from_image: image → structured_text`); a component is an **implementation** of it
+   (paddleocr, tesseract, a vision-LLM). We already split this (`capability_graph.py`: a capability → its evolving
+   *runners*). Conflating them makes retrieval, fallback, and learning impossible. Target: **~10³–10⁴ capabilities**,
+   **10⁸ components**. The capability is the type; the component is the value.
+2. **The registry is *not* the moat — measured + learned + governed metadata is.** Anyone can crawl PyPI/npm/HF; raw
+   component count is commoditized within months. The defensible asset is (a) **measured** cost/latency/quality/failure
+   from your own execution telemetry, (b) **learned** which compositions actually win, (c) **governed** provenance +
+   trust (this is Baltor). A row that says "paddleocr exists" is free; a row that says "paddleocr costs $0.002, p95 210ms,
+   0.94 quality on *your* traffic, fails on handwriting, and is dominated by surya for invoices" is the moat.
+3. **Don't benchmark every candidate — *simulate* first.** Benchmarking on a 500-doc set per candidate makes the
+   benchmark engine the bottleneck. Add an **analytic simulator** that scores a candidate DAG's cost/latency/quality from
+   component metadata *without executing it*, prune to the top-k, then benchmark only those. Simulation is what makes the
+   search tractable; it's the biggest missing piece in §12.
+4. **Equivalence & canonicalization is the unlisted hard problem.** Knowing paddleocr ≈ easyocr ≈ tesseract ≈ vision-LLM
+   for `extract_text` is what makes fallbacks, ladders, dedupe, and learning *generalize*. Without it, 100M components is
+   100M unrelated rows and the model can't transfer a lesson from one to another. This deserves its own system (§15).
+5. **RL over pipelines is the wrong starting point.** Cold-start (no data on day one), credit assignment (which node
+   caused the win?), and non-stationarity (the registry changes under you) make deep RL brittle here. Start with
+   **contextual bandits + template mining from winning traces + supervised priors**, and only graduate to RL where the
+   signal is dense. Be honest about the cold-start: templates + simulation + transfer carry you until telemetry exists.
+6. **Auto-discovery is a security surface, not just a metadata surface.** Tiers C/D (auto-discovered / user-uploaded) are
+   *arbitrary code*. The trust tier must gate **execution** (hard sandbox: gVisor/Firecracker/WASM, egress control,
+   resource caps), not merely visibility. This is exactly our `discovery ≠ trust` law made executable (§17).
+
+---
+
+## The 13 systems — deep dive
+
+### 1. Universal Capability Representation Layer
+**Purpose.** Make every computational primitive machine-understandable as a *capability object* — a transformation, not a
+function. **Have.** Planes (`tool_planes.json`), typed I/O per plane (`plane_io_contracts.json`), a capability hierarchy
+(`capability_taxonomy.json`), cost-ordered fallback ladders (`capability_ladders.json`), and the capability→runners
+evolution graph (`capability_graph.py`). **Hard problem.** A single schema rich enough to drive retrieval, typing,
+composition, simulation, and learning — without 10M ad-hoc classes. **Architecture.** Two-level model: a **CapabilityID**
+(the interface: typed input→output contract + a node in the ontology) and **ComponentRecords** (implementations) carrying
+`{input_contract, output_contract, cost_per_call, p50/p95_latency, deterministic, quality_score, failure_modes,
+fallbacks, dependencies, trust_tier, measured_from}`. `fallbacks` is *already* the ladder; `quality/latency/cost` are
+*measured*, written back by telemetry (§10) — the object is a living record, not a static manifest. Capabilities and
+components both get embeddings (for §4). **Build next.** Promote the component schema to this full object; back-fill
+`cost/latency/quality` from `descent_measurement.py`; make `CapabilityID` a first-class row distinct from components.
+
+### 2. Registry Layer (the substrate, not the moat)
+**Purpose.** Hold 10⁸ components with trust + provenance. **Have.** The layered model (`registry_layers.json`: curated
+core / staged-massive / feeds), the GitHub harvester (`harvest_tools.py`, content-hash dedupe + license classify),
+staging JSONL → Postgres+pgvector, the promotion boundary. **Hard problem.** Trust at scale + dedupe at the *capability*
+level, not just content hash. **Architecture.** Four **trust tiers** as an admission/execution gate: **A** trusted-curated
+(hand-verified; may run unsandboxed) · **B** community-verified (crowd + benchmark score) · **C** auto-discovered
+(crawler; sandbox-only until benchmarked) · **D** experimental/user-uploaded (sandbox-only, never global). Each tier has
+explicit promotion criteria (source, dedupe, content-hash, license, **security_score**, **reliability**, benchmark
+results). Sources to add beyond GitHub/PyPI/RapidAPI: **npm, Docker Hub, Hugging Face**. **Build next.** Add the
+`trust_tier` + `security_score` + `reliability` fields and make them gate execution (§7/§17); wire npm/HF/Docker harvesters.
+
+### 3. Universal Adapter Layer (built — v1)
+**Purpose.** Erase bespoke integrations: everything is `invoke(inputs) → outputs`. **Have.** `src/teleon/components/`
+(`Component.invoke` over bespoke ports, `register_component_invoker` drop-in, `assert_conforms` gate, `lower_to_dag` +
+`run_compiled`) + the agnostic ports (llm/embedding/reranker/search/ocr/browser) + `runtime/execution_providers/`
+(docker/k8s/serverless/cloudflare/byo). **Hard problem.** Auto-generating a conformant adapter for *any* external surface.
+**Architecture.** An **adapter factory** per surface kind that emits a `Component`: **OpenAPI/Swagger** spec → typed
+component; **Docker image** → component (run container, map stdin/stdout to typed I/O); **MCP server** → component (we have
+the MCP gateway); **CLI** → component (argv/stdin/stdout schema); **SQL** → component (parameterized query); **remote
+inference** (vLLM/Together/Replicate) → component; **Python callable** → component (introspect signature). Each generated
+adapter must pass `assert_conforms` before entering the registry. **Build next.** Ship the OpenAPI and Docker adapter
+factories first (highest fan-out: they turn whole ecosystems into components automatically).
+
+### 4. Retrieval Engine (millions → dozens, as a *subgraph*)
+**Purpose.** Find the right few components from millions. **Have.** Lexical+vector search (`component_search.py`), RRF
+hybrid (`retrieval/hybrid.py`), ladders as capability families, access-policy filtering, and `capability_graph.py` as a
+graph substrate. **Hard problem.** Retrieving a **composable subgraph**, not a bag of individually-relevant components.
+**Architecture.** A hierarchical funnel: **(1)** lexical BM25 → **(2)** vector over capability embeddings → **(3)** graph
+retrieval over a **component compatibility graph** (edges = type-compatible *and* historically-co-occurring, from §10
+telemetry) so you pull components that *connect* → **(4)** capability families (the ladder gives you the fallback set for
+free) → **(5)** constraint pushdown (local-only / cheap-only / low-latency / gpu / privacy-safe). Tools at scale: Qdrant/
+FAISS for vectors, a graph store for (3). **Build next.** Build the compatibility graph from execution traces and add
+constraint pushdown; this is what turns retrieval from "relevant" into "composable."
+
+### 5. DAG Composition Engine (program synthesis, not single-shot)
+**Purpose.** Turn the candidate pool into candidate DAGs. **Have.** LLM-orchestrated composition (`compile_capability_live`:
+candidate pool → LLM picks real components → validate + repair + type-aware grounding), backtracking
+(`synthesis_tree.py`), escape strategies (`strategist.py`), implementation search (`impl_finder.py`). **Hard problem.** It
+currently produces *one* DAG; synthesis needs *many* scored candidates. **Architecture.** Treat the LLM as the **proposal
+distribution** and the registry+types as the **constraint**; search with **beam search** (keep top-N partial DAGs) or
+**MCTS** over the composition tree, seeded by **templates** (§14) so most requests are *mutations of a known-good skeleton*
+rather than from-scratch synthesis. Score partials with the **simulator** (§12). **Build next.** Add beam search returning
+k candidate DAGs (it already validates each); feed them to simulation→benchmark instead of committing to the first.
+
+### 6. Type System + Contracts Engine (LLVM-style)
+**Purpose.** Reject invalid wirings at compile time. **Have.** Typed plane I/O (`plane_io_contracts.json`),
+`edge_compatible`, type-level satisfiability in `dag_contract.py`. **Hard problem.** Flat types are too coarse — `jpeg`,
+`png`, `webp` are all `image`; `html` can become `markdown` via a converter. **Architecture.** A **type lattice**
+(subtyping: `jpeg <: image`), so a producer of `jpeg` satisfies a consumer of `image`; and a **coercion graph** (types as
+nodes, converter components as edges) so when an edge *doesn't* type-check, the compiler searches for a shortest coercion
+path and **auto-inserts a converter** (this is a compiler optimization pass too, §8). Contracts become richer than types:
+pre/post-conditions, units, PII flags. **Build next.** Add the subtyping lattice + the coercion graph with auto-insert;
+this single feature massively widens what composes.
+
+### 7. Verification Engine (never trust the planner *or* the component)
+**Purpose.** Prove a DAG is safe and working before it runs. **Have.** `verify_buildable_dag` (acyclic + type-compatible
++ satisfiable inputs + terminal output + dry-run), `assert_conforms`, 613 proofs. **Hard problem.** Verifying *untrusted*
+components and *real* behavior, not just structure. **Architecture.** A **verification ladder** (cheapest first):
+static (acyclic/types/satisfiable) → dry-run (synthetic typed data through the real executor) → **sandbox execution**
+(Tier C/D in gVisor/Firecracker/WASM with egress + resource caps) → **synthetic-data test** (run on a few held-out
+examples, check the output contract holds) → **security audit** (unsafe endpoints/secrets/egress) → benchmark (§12). A DAG
+is promotable only at the rung its trust tier requires. **Build next.** Sandbox execution + synthetic-data testing — the
+two rungs that make auto-discovered components safe to run.
+
+### 8. Optimization Pass Engine (LLVM for cognition — our core IP)
+**Purpose.** Rewrite a valid DAG into the cheapest equivalent one. **Have.** `optimization_passes.json` (10 passes), the
+descent (`pipeline_dag.choose` cheapest-viable; `evolution/descent.py`, `descent_axes.py`), and concrete passes already in
+code: `token_reduction.py`, `distiller.py` (LLM→deterministic rule), `substrate_selector.py` (cheapest backend),
+`inefficient_pipeline_archetypes.json`. **Hard problem.** Scaling to *hundreds* of passes with correct ordering and a
+cost model. **Architecture.** A **PassManager** like LLVM: **analysis passes** (cost/latency/criticality estimate) feed
+**transform passes**, run to a **fixpoint**, each pass **legality-checked** to preserve the verified contract (a pass may
+never break §7). The catalog grows well past 10: token reduction · model downgrade (frontier→small) · **deterministic
+replacement** (LLM→regex/parser) · parallelization · cache insertion · **browser→direct-API** · retrieval reduction
+(20 chunks→3) · API fusion · request batching · precomputation · coercion-insert (§6) · dead-branch elimination ·
+common-subgraph elimination (§18 memoization). **Build next.** A real PassManager + cost model; migrate the JSON passes
+into legality-checked transforms; this is where "remove unnecessary intelligence" literally happens.
+
+### 9. Execution Runtime (production-grade, distributed)
+**Purpose.** Run the graph reliably. **Have.** `pipeline_dag.DAG.run` (data-flow order, If/Loop/choice/merge, receipt),
+`run_compiled`, the execution-provider port (docker/k8s/serverless/cloudflare/byo), a durable function emulator. **Hard
+problem.** Distribution + durability at scale. **Architecture.** Data-flow execution where each node's output is a
+**content-addressed artifact** (enables checkpoint/resume, memoization §18, and references-not-blobs); the
+**execution-provider port** places nodes on the right backend (local/serverless/gpu/byo via `substrate_selector.py`); add
+retry/backoff, **rate-limit handling**, **streaming** between nodes, partial rollback, and resource allocation. Reference
+designs: Temporal (durability) and Dagster (asset graph). **Build next.** Content-addressed artifacts + checkpoint/resume
+and rate-limit-aware scheduling — the two that make long internet-scale graphs survivable.
+
+### 10. Telemetry + Observability Engine (the data that *is* the moat)
+**Purpose.** Capture every execution forever. **Have.** Per-step traces (`synthesis_trace.py`), the descent attempt store
++ measurement (`descent_attempt_store.py`, `descent_measurement.py`), receipts, OpenLineage adoption. **Hard problem.** A
+unified, queryable trace at internet scale that *closes the loop* into capability metadata and learning. **Architecture.**
+Every run emits an **OpenLineage-shaped event** (Job/Run/Dataset + facets): `{pipeline_id, capability, per-node
+{component, cost, latency, tokens, success}, failure_points, total}`. Land it in the **history tier** (warehouse). Two
+write-backs make it the moat: (a) update each component's **measured** cost/latency/quality (§1), (b) reinforce the
+**compatibility graph** (§4) and **template** stats (§14). **Build next.** The OpenLineage event + the two write-backs —
+without them, telemetry is logs; with them, it's a self-improving registry.
+
+### 11. Learning Engine (bandits + mining first, RL later)
+**Purpose.** Get better at composing over time. **Have.** `meta_learner.py`, `external_outcomes.py` (learn from runs we
+never ran), `auto_tuning.py`, `rule_generator.py` (LLM→deterministic rule), `self_optimizing_unit.py`, the brain. **Hard
+problem.** Cold-start, credit assignment, non-stationarity. **Architecture.** Five learning targets, easiest signal first:
+(1) **measured metadata** (just averaging telemetry — trivial, do first); (2) **retrieval ranking** (which components/
+subgraphs win → a bandit over candidates); (3) **template mining** (cluster winning traces → new templates, §14);
+(4) **composition priors** (fine-tune the proposal distribution / few-shot from winners); (5) **pass selection** (when does
+each optimization pass pay off). Keep losers (lossless law) to avoid re-exploring dead ends. **Build next.** (1) + (3) —
+measured write-back and template mining — before any RL; they carry the cold-start.
+
+### 12. Benchmarking + Simulation Engine (simulate, *then* benchmark)
+**Purpose.** Pick the best candidate DAG before deploying. **Have.** A/B harness (`ab_harness.py`), `live_eval.py`,
+ground-truth eval datasets, the durable gap harness. **Missing.** The **simulator**. **Architecture.** Two stages:
+**Simulate** — an analytic model that, from component metadata (§1), estimates a candidate DAG's cost/latency/quality and
+**probability of success** *without executing it*, so beam search (§5) can rank k candidates cheaply. **Benchmark** — run
+only the top-k against a **per-capability benchmark dataset** (e.g. 500 invoices with ground truth), measure
+accuracy/latency/cost, pick the winner; then **shadow** it before promotion. **Build next.** The simulator (it unblocks
+real multi-candidate search) + a benchmark-dataset registry keyed by capability.
+
+### 13. Self-Expanding Discovery Engine
+**Purpose.** Continuously grow the registry from the open world. **Have.** The discovery pipeline (scrape→classify→ideate→
+govern), `harvest_tools.py`, `source_search.py`, the research queue. **Hard problem.** Inferring a *capability + types*
+from a repo and proving it's safe/useful. **Architecture.** crawl (GitHub/PyPI/npm/HF/Docker) → read README/code → **LLM
+infers capability + input/output contracts** (proposes; never trusted) → **sandbox test** (§7) → **benchmark** (§12) →
+**assign trust tier** (§2) + **measured metadata** (§1) → register. discovery ≠ trust is the law: an inferred capability is
+a candidate until the sandbox+benchmark confirm it. **Build next.** README→capability/type inference + the sandbox+
+benchmark gate that auto-sets the trust tier; this is the loop that takes the registry from hundreds to millions.
+
+---
+
+## 14. Template Library + Mutation Engine (your "missing thing" — strongly agree)
+**Most requests are not novel.** Synthesizing from scratch every time is the expensive path; **mutating a known-good
+skeleton** is cheap and reliable. **Have.** `module_bundles.json` (8 recipes) — the seed. **Architecture.** A library of
+**canonical templates** (Document-Extraction, Web-Research, Browser-Automation, Enrichment, RAG-QA, ETL, …) each a typed
+parameterized DAG skeleton with named slots; composition (§5) first **retrieves a matching template** and the LLM
+**fills/mutates slots** (swap the OCR rung, add a validation step) rather than building from zero. Templates are **mined**
+from winning traces (§11) and ranked by §10 telemetry, so the library *grows itself*. Target: 10⁴–10⁵ templates. **Why it
+matters.** It collapses the search space (§5) for the common case and is the single biggest efficiency lever after the
+descent. **Build next.** A template schema + "retrieve-and-mutate" mode in the compiler + a miner that promotes recurring
+winning subgraphs into templates.
+
+---
+
+## Systems you're underweighting (15–19)
+- **15. Capability Equivalence & Canonicalization.** The unlisted hard problem (refinement #4). Cluster components that
+  realize the same `CapabilityID`; assign canonical capability identities; dedupe at the *capability* level. Without it,
+  fallbacks/ladders/learning can't generalize across the registry. Signals: shared I/O contract + benchmark-output
+  agreement on a probe set + embedding proximity.
+- **16. Cost & Economics Model.** The objective the whole compiler optimizes is multi-dimensional: **$ · latency · tokens
+  · quality · privacy/risk · carbon**. Make it one explicit, **user-weighted** function — we already have a
+  `PreferenceProfile` ("efficient" = the user's trade-off). Every pass (§8) and the simulator (§12) consult it. Without a
+  single cost model, "most efficient" is undefined.
+- **17. Security & Sandboxing / Trust (cross-cutting).** Executing Tier C/D components safely: gVisor/Firecracker/WASM
+  isolation, egress allow-lists, resource caps, secret scoping (`SecretRef`), and the trust tier gating *execution*. This
+  is `discovery ≠ trust` made operational, and it's a prerequisite for §13 at scale.
+- **18. Caching & Memoization substrate.** Content-addressed artifacts (§9) → **memoize sub-DAGs**: identical (component,
+  inputs) returns the cached output; common-subgraph elimination across pipelines (§8). We have a trajectory-fragment
+  cache; generalize it. Often the single biggest cost win on repeated traffic.
+- **19. Governance & Provenance = Baltor (the truth authority).** The compiler optimizes *efficiency*; it must never
+  decide *truth*. Every compute output is `serves_truth=false` — a candidate — and **Baltor** dispositions truth-bearing
+  outputs with provenance, verification, and CDC. This separation (Teleon = efficiency, Baltor = truth) is what lets the
+  system be both aggressive about cost and trustworthy about results.
+
+---
+
+## The compile loop (your first-principles loop, refined with the pruners)
+```
+Human intent
+  → Capability representation            (§1: interface, not implementation)
+  → Retrieve a composable subgraph        (§4: millions → dozens, PRUNE)
+  → Retrieve / mutate a template          (§14: skeleton, not scratch, PRUNE)
+  → Compose k candidate DAGs (beam/MCTS)  (§5: LLM proposes under type+template constraints)
+  → Type-verify + auto-coerce             (§6: reject invalid wirings, PRUNE)
+  → Simulate → rank → benchmark top-k      (§12: cheap score first, run few, PRUNE)
+  → Verify (static→dry-run→sandbox→test)   (§7: never trust planner or component)
+  → Optimization passes (PassManager)      (§8: rewrite to cheapest equivalent)
+  → Execute cheapest viable graph          (§9: durable, distributed, memoized §18)
+  → Observe execution trace                (§10: OpenLineage, store forever)
+  → Learn: metadata, templates, ranking    (§11: write back to §1/§4/§14)
+  → Govern truth                           (§19: Baltor dispositions; serves_truth=false)
+```
+The loop is a **funnel of pruners** wrapped in a **learning cycle**: each pass narrows the space, telemetry feeds the next
+request's priors, and Baltor keeps truth separable from efficiency.
+
+---
+
+## Sequencing — what to build, in order (honest priorities)
+1. **Close the metadata loop** (§10 write-back → §1 measured cost/latency/quality). Cheap; turns logs into the moat.
+2. **The simulator** (§12). Unblocks real multi-candidate search; everything downstream depends on cheap scoring.
+3. **Template library + retrieve-and-mutate** (§14). Biggest efficiency lever for the common case.
+4. **Beam search composition** (§5) + **type lattice & coercion** (§6). Multi-candidate, wider composability.
+5. **PassManager + cost model** (§8 + §16). Scale the optimization that is the core IP.
+6. **Sandbox + trust-tier execution** (§17/§7) → unlocks **discovery at scale** (§13) and the move to millions.
+7. **Adapter factories** (§3: OpenAPI, Docker) and **equivalence/canonicalization** (§15) in parallel — they make the
+   registry both *grow* and *generalize*.
+
+## The thesis
+Models will keep getting smarter; that is not our bet. **Our bet is that the larger, more durable value is a system that
+decides when intelligence is unnecessary** — that compiles an ambiguous request down to the cheapest deterministic graph
+that provably works, calling a model only for the irreducible residual, and that learns to need the model less over time.
+That is a new **systems architecture layer for computation**, not a product feature. Teleon is the compiler; Baltor is the
+truth authority; the registry is the substrate; the descent is the optimizer; and *removing unnecessary intelligence* is
+the objective function.
