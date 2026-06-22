@@ -1,0 +1,23 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-22",
+  "principle": "Not every tool component is self-built — some are EXTERNAL APIs (RapidAPI / Apify marketplaces), often MORE deterministic + reliable than driving a browser (e.g. a hosted FB-page scraper vs fighting FB anti-bot). These are first-class rungs the descent can select, behind the credential plane's key-ownership model (byo OR platform-within-limits). GOVERNED: scraping/enrichment entries honor source ToS, use PUBLIC metadata only, store NO PII, and are cataloged-not-auto-enabled. discovery≠trust; serves_truth=false. The marketplace key resolves via architecture/credential_registry.json (rapidapi/apify).",
+  "serves_truth": false,
+  "governance": "ToS-sensitive entries (social_scrape, web_unlocker) are CATALOGED so the descent KNOWS the option exists, but are gated by research_guardrail_policy + an explicit enable + public-metadata-only + no-PII. Cataloged != used.",
+  "apis": [
+    {"id": "fb_page_scrape", "name": "Facebook page (public) scraper", "marketplace": "rapidapi", "plane": "social_scrape", "deterministic": true, "key_ownership": "both", "governance": "ToS_sensitive: public page metadata only, no PII, honor Meta ToS; enable explicitly", "status": "candidate"},
+    {"id": "instagram_profile_public", "name": "Instagram public profile", "marketplace": "rapidapi", "plane": "social_scrape", "deterministic": true, "key_ownership": "both", "governance": "ToS_sensitive: public only, no PII", "status": "candidate"},
+    {"id": "linkedin_company_public", "name": "LinkedIn company (public)", "marketplace": "rapidapi", "plane": "social_scrape", "deterministic": true, "key_ownership": "byo", "governance": "ToS_sensitive: public firmographic only, no scraping of people PII; BYO key", "status": "candidate"},
+    {"id": "x_posts_public", "name": "X/Twitter public posts", "marketplace": "apify", "plane": "social_scrape", "deterministic": true, "key_ownership": "both", "governance": "ToS_sensitive: public posts only", "status": "candidate"},
+    {"id": "company_enrichment", "name": "Company firmographic enrichment", "marketplace": "rapidapi", "plane": "entity_enrichment", "deterministic": true, "key_ownership": "both", "governance": "public firmographic data + provenance", "status": "candidate"},
+    {"id": "domain_whois", "name": "Domain WHOIS / DNS", "marketplace": "rapidapi", "plane": "entity_enrichment", "deterministic": true, "key_ownership": "both", "governance": "public registry data", "status": "candidate"},
+    {"id": "email_verify", "name": "Email deliverability verify", "marketplace": "rapidapi", "plane": "entity_enrichment", "deterministic": true, "key_ownership": "both", "governance": "no inbox access; SMTP probe only", "status": "candidate"},
+    {"id": "phone_validate_api", "name": "Phone validate/lookup", "marketplace": "rapidapi", "plane": "entity_enrichment", "deterministic": true, "key_ownership": "both", "governance": "carrier/format lookup; no PII store", "status": "candidate"},
+    {"id": "maps_geocode", "name": "Geocoding / address normalize", "marketplace": "rapidapi", "plane": "entity_enrichment", "deterministic": true, "key_ownership": "both", "governance": "public geo data", "status": "candidate"},
+    {"id": "serp_search_api", "name": "Google/Bing SERP via marketplace", "marketplace": "rapidapi", "plane": "search", "deterministic": true, "key_ownership": "both", "governance": "search results metadata", "status": "candidate"},
+    {"id": "web_unlocker", "name": "Managed scraping proxy / unlocker", "marketplace": "rapidapi", "plane": "search", "deterministic": true, "key_ownership": "byo", "governance": "evasion_restricted: ToS + spend gate; BYO only; the rung-7 alternative to running our own proxy", "status": "candidate"},
+    {"id": "pdf_extract_api", "name": "Hosted PDF/document extraction", "marketplace": "rapidapi", "plane": "data_extraction", "deterministic": true, "key_ownership": "both", "governance": "no document retention", "status": "candidate"},
+    {"id": "table_extract_api", "name": "Hosted table extraction", "marketplace": "rapidapi", "plane": "data_extraction", "deterministic": true, "key_ownership": "both", "governance": "no document retention", "status": "candidate"},
+    {"id": "doc_classify_api", "name": "Hosted document classification", "marketplace": "rapidapi", "plane": "classical_ml", "deterministic": true, "key_ownership": "both", "governance": "no document retention", "status": "candidate"}
+  ]
+}

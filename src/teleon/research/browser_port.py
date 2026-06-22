@@ -66,12 +66,44 @@ class NotWiredBrowser:
         return {"error": f"browser '{self.name}' (engine '{self._engine}') not wired — register a '{self._engine}' adapter"}
 
 
+class UndetectedBrowser:
+    """Rung 5 of the browser ladder (architecture/browser_escalation_ladder.json): a stealth/undetected driver
+    (undetected-chromedriver / nodriver / patchright). These are COPYLEFT/technique-only (GPL etc.) so we do NOT vendor
+    them — this adapter is BYO + GOVERNED: it runs only when the tenant has installed the package AND explicitly enabled
+    it (OH_ENABLE_UNDETECTED), and research_guardrail_policy still governs (robots/ToS, no login-walls). Otherwise it
+    returns an HONEST 'not enabled' error naming exactly what's needed — never fabricates, never silently fails."""
+    def __init__(self, name: str = "undetected_chromedriver"):
+        self.name = name
+
+    def _enabled(self) -> bool:
+        import importlib.util
+        if (_REPO / ".env").exists():
+            for ln in (_REPO / ".env").read_text(encoding="utf-8").splitlines():
+                if ln.startswith("OH_ENABLE_UNDETECTED=") and ln.split("=", 1)[1].strip().strip('"') in ("1", "true", "True", "yes"):
+                    return importlib.util.find_spec("undetected_chromedriver") is not None
+        return False
+
+    def render(self, url: str, *, timeout: int = 60, mode: str = "headed") -> dict:
+        if not self._enabled():
+            return {"error": f"stealth rung '{self.name}' not enabled — BYO + governed: pip install {self.name.replace('_', '-')} "
+                             "+ set OH_ENABLE_UNDETECTED=1 (GPL technique-only, never vendored; governed by research_guardrail_policy)"}
+        # BYO path (tenant installed it): drive their copy — kept minimal + behind the honest gate above.
+        return {"error": "undetected driver enabled but the BYO driver harness is tenant-provided (wire your runner)",
+                "enabled": True}
+
+
 #: engine -> adapter factory. A FUTURE engine = register one adapter; every chromium-engine browser in the registry
 #: reuses Playwright automatically (zero code).
 _ENGINE_ADAPTERS: dict[str, Callable[[], BrowserPort]] = {"chromium": PlaywrightBrowser}
-#: name/id -> adapter factory (explicit overrides + non-engine entries).
+#: name/id -> adapter factory (explicit overrides + non-engine entries). Stealth/undetected ids resolve to the honest
+#: BYO+governed UndetectedBrowser (rung 5) rather than silently reusing Playwright.
 _NAME_ADAPTERS: dict[str, Callable[[], BrowserPort]] = {
     "auto": PlaywrightBrowser, "playwright": PlaywrightBrowser, "stub": StubBrowser,
+    "undetected_chromedriver": lambda: UndetectedBrowser("undetected_chromedriver"),
+    "nodriver": lambda: UndetectedBrowser("nodriver"),
+    "patchright": lambda: UndetectedBrowser("patchright"),
+    "seleniumbase": lambda: UndetectedBrowser("seleniumbase"),
+    "botasaurus": lambda: UndetectedBrowser("botasaurus"),
 }
 
 

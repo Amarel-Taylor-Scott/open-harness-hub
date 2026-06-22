@@ -82,6 +82,20 @@ def _self_test() -> int:
        {"llm", "reranker"} <= C.reachable_planes(env_have))
     ck("services_for_tool maps a tool to its key (cohere_rerank -> cohere)", "cohere" in C.services_for_tool("cohere_rerank"))
     ck("status() exposes no secret values", all(not _VALUE_LOOKING.search(x) for x in C.status(env_have)["reachable"]))
+
+    # key-ownership model (BYO vs platform-within-limits) — the add-on flexibility
+    ck("every service declares key_ownership in {byo, platform, both}",
+       all(s.get("key_ownership") in ("byo", "platform", "both") for s in svcs))
+    ck("platform-usable services declare platform_limits (the cap on OUR key)",
+       all(s.get("platform_limits") for s in svcs if s["key_ownership"] in ("platform", "both")))
+    ck("byo-only services declare no platform_limits (their plan, no platform cap)",
+       all(s.get("platform_limits") in (None, {}) for s in svcs if s["key_ownership"] == "byo"))
+    ck("a marketplace add-on is catalogued (RapidAPI) for external-API components", any(s["id"] == "rapidapi" for s in svcs))
+    # key_mode resolves byo vs platform correctly
+    ck("key_mode: tenant byo key preferred", C.key_mode("openai", {}, byo={"openai"}) == "byo")
+    ck("key_mode: platform key within limits when no byo", C.key_mode("anthropic", {"ANTHROPIC_API_KEY": "x"}) == "platform")
+    ck("key_mode: byo-only blocked on platform with no key", C.key_mode("serpapi", {}) is None)
+    ck("status() splits byo_only vs platform_capable", "byo_only" in C.status(env_have) and "platform_capable" in C.status(env_have))
     ck("serves_truth=false", reg.get("serves_truth") is False)
 
     print("\n" + (f"PASS - check_credential_registry: {len(svcs)} services single-sourced; {len(read)} product-read keys "

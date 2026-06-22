@@ -76,6 +76,37 @@ def services_for_tool(tool_id: str) -> list[str]:
     return [s["id"] for s in _services() if tool_id in s.get("unlocks", {}).get("tools", [])]
 
 
+def _svc(service_id: str) -> dict | None:
+    return next((s for s in _services() if s["id"] == service_id), None)
+
+
+def key_ownership(service_id: str) -> str:
+    """How a service's key may be supplied: 'byo' (tenant pastes their own) | 'platform' (our shared key within limits) |
+    'both'. Mirrors compute key-ownership (see byo-compute)."""
+    s = _svc(service_id)
+    return s.get("key_ownership", "byo") if s else "byo"
+
+
+def platform_limits(service_id: str) -> dict | None:
+    """The cap when using OUR key (None if byo-only). The runtime meters against this; here we expose it for the descent."""
+    s = _svc(service_id)
+    return s.get("platform_limits") if s else None
+
+
+def key_mode(service_id: str, env: dict | None = None, *, byo: set | None = None) -> str | None:
+    """Resolve HOW this service is usable right now: 'byo' (the tenant supplied a key — preferred, no platform cap),
+    'platform' (our shared key/keyless, used WITHIN platform_limits), or None (blocked: no key + byo-only or not present).
+    `byo` = the set of service ids the tenant brought their own key for."""
+    own = key_ownership(service_id)
+    if byo and service_id in byo and own in ("byo", "both"):
+        return "byo"
+    if own in ("platform", "both") and is_present(service_id, env):
+        return "platform"
+    if own == "byo" and is_present(service_id, env):
+        return "byo"            # the present key IS a byo key in single-tenant/dev
+    return None
+
+
 def status(env: dict | None = None) -> dict:
     """A governed snapshot: reachable services, unlocked planes, and the keyless-vs-keyed split (no secret values)."""
     svcs = _services()
@@ -85,5 +116,7 @@ def status(env: dict | None = None) -> dict:
         "blocked": sorted(s["id"] for s in svcs if s["id"] not in reach),
         "planes_unlocked": sorted(reachable_planes(env)),
         "keyless": sorted(s["id"] for s in svcs if s.get("keyless")),
+        "byo_only": sorted(s["id"] for s in svcs if s.get("key_ownership") == "byo"),
+        "platform_capable": sorted(s["id"] for s in svcs if s.get("key_ownership") in ("platform", "both")),
         "serves_truth": False,
     }
