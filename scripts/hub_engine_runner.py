@@ -9,6 +9,7 @@ DEVELOPMENT plane (the operator surface); the engines + store are PRODUCT (src/o
   --hub <HubId>   run one hub's cycle      --all   run a cycle for every hub
   --ingest <HubId> [--links u1,u2] [--okf f1,f2] [--text '...'|@file] [--improve] [--llm]  OWNER intake of raw materials
   --discover [q]  autonomous OpenClaw/Hermes sweep   --fresh [q]  Teleon keep_hub_fresh (unbounded→bounded)
+  --generate [HubId]  GENERATE channel: emit candidates from our own systems (method catalog / descent brain)
   --feed [HubId]  print the substrate_feed (what Teleon/Baltor consume)
   --self-test     offline: the runner wires every hub + runs a cycle
 CLI: PYTHONPATH=. python3 scripts/hub_engine_runner.py --ingest OpenSkillsHub --okf my_skill.md --improve
@@ -191,6 +192,51 @@ def ingest_cmd(hub: str, *, links=(), okf_files=(), texts=(), improve=False, ten
     return 0
 
 
+def _extra_generators() -> dict:
+    """Operator-layer generators that read Teleon internals — INJECTED so OHH never imports Teleon (dependency law).
+    The runner is the wiring plane (it may import the product); the open hub layer stays clean."""
+    gens: dict = {}
+    try:
+        from src.teleon.evolution.descent_attempt_store import DescentAttemptStore
+        from src.openharnesshub.generators import make_descent_brain_generator
+        gens["descent_brain"] = make_descent_brain_generator(lambda: DescentAttemptStore().all())
+    except Exception:  # noqa: BLE001
+        pass
+    return gens
+
+
+def generate_cmd(hub: str | None, *, tenant="_global", use_llm=False) -> int:
+    """GENERATE channel: emit candidates from OUR systems (method catalog / descent brain / ...) -> ingest -> verify.
+    The complement to --discover (public) and --ingest (owner). --generate with no hub runs every wired generator."""
+    from src.openharnesshub.generators import generate_for
+    eng = _engines(model=_model_port(use_llm))
+    extra = _extra_generators()
+    hubs = [hub] if hub else list(eng)
+    total_gen = total_ver = wired = 0
+    for h in hubs:
+        if h not in eng:
+            print(f"  unknown hub {h!r}"); continue
+        g = generate_for(h, extra_generators=extra)
+        if g["pending"]:
+            if hub:  # only chatter about pending when a single hub was asked for
+                print(f"  {h:<22} generate PENDING — {g['reason']} (discover/intake still populate it)")
+            continue
+        wired += 1
+        gi = gv = 0
+        for cand in g["candidates"]:
+            try:
+                rec = eng[h].ingest(cand, tenant=tenant)
+                gi += 1
+                gv += int(eng[h].verify(rec))
+            except Exception:  # noqa: BLE001
+                continue
+        total_gen += gi
+        total_ver += gv
+        print(f"  {h:<22} generated {gi:>3} via {g['generator']:<22} -> {gv} verified")
+    print(f"generate channel: {wired} wired generators, {total_gen} candidates, {total_ver} verified (serves_truth=false)")
+    return 0
+
+
 def settings(hub: str | None) -> int:
     """View the resolved per-hub SETTINGS PLANE (operational policy merged with the strategy)."""
     from src.openharnesshub.hub_settings import all_settings, load_settings
@@ -249,6 +295,13 @@ def _self_test() -> int:
         r = ingest_materials(eng["OpenSkillsHub"], okf=[okf], dicts=[{"name": "manual skill", "summary": "x"}], improve=True)
         ck("owner intake: OKF + dict ingested, verified, improved (lossless new versions)",
            r["ingested"] == 2 and r["verified"] >= 1 and r["improved"] == 2 and r["serves_truth"] is False)
+        # GENERATE channel: real method primitives from the catalog; honest 'pending' for unwired generators
+        from src.openharnesshub.generators import generate_for
+        g = generate_for("OpenOptimizationHub")
+        ck("generate channel emits real method primitives (method_catalog single source)",
+           not g["pending"] and len(g["candidates"]) >= 3 and g["candidates"][0]["serves_truth"] is False)
+        gp = generate_for("OpenSkillToTool")
+        ck("unwired generator returns honest 'pending' (never fabricates candidates)", gp["pending"] and gp["candidates"] == [])
     print("\nPASS - hub_engine_runner: the per-hub orchestrator/supervisor — runs the ONE shared engine across all 22 "
           "Open*Hubs, reports served + the funnel, exposes substrate_feed. serves_truth=false."
           if not fails else f"FAIL: {fails}")
@@ -284,6 +337,10 @@ def _main(argv=None):
     if "--feed" in argv:
         i = argv.index("--feed")
         return feed(argv[i + 1] if i + 1 < len(argv) and not argv[i + 1].startswith("-") else None)
+    if "--generate" in argv:
+        i = argv.index("--generate")
+        hub = argv[i + 1] if i + 1 < len(argv) and not argv[i + 1].startswith("-") else None
+        return generate_cmd(hub, tenant=_val(argv, "--tenant", "_global"), use_llm="--llm" in argv)
     if "--discover" in argv:
         i = argv.index("--discover")
         return discover(argv[i + 1] if i + 1 < len(argv) and not argv[i + 1].startswith("-") else "2026")

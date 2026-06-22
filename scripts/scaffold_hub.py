@@ -85,9 +85,10 @@ def scaffold(name: str, *, kind: str, provides: str, sources: dict, tier: str = 
     s = _load(strat)
     sh = s.setdefault("hubs", {})
     if name not in sh:
-        sh[name] = {"content_kind": kind, "tool_tier": "search", "sources": sources,
+        sh[name] = {"content_kind": kind, "contribution_mode": "discover", "generator": "", "tool_tier": "search",
+                    "sources": sources or {"github_topics": [slug]},  # never stranded: default a discover source
                     "freshness_bar": 0.5, "verify_bar": f"a verified {kind[:-1] if kind.endswith('s') else kind}"}
-        changes.append(f"strategy += {name} (kind={kind}, sources={list(sources)})")
+        changes.append(f"strategy += {name} (kind={kind}, mode=discover, sources={list(sources) or [slug]})")
         _write(strat, s)
     # 3. settings (the operational settings object; defaults)
     g = _load(settings)
