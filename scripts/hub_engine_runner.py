@@ -10,6 +10,7 @@ DEVELOPMENT plane (the operator surface); the engines + store are PRODUCT (src/o
   --ingest <HubId> [--links u1,u2] [--okf f1,f2] [--text '...'|@file] [--improve] [--llm]  OWNER intake of raw materials
   --discover [q]  autonomous OpenClaw/Hermes sweep   --fresh [q]  Teleon keep_hub_fresh (unbounded→bounded)
   --generate [HubId]  GENERATE channel: emit candidates from our own systems (method catalog / descent brain)
+  --capability "<plain text>" [--plan-only] [--rounds N]  plan + run an OPEN-ENDED capability (iterative/scheduled/multi-component)
   --feed [HubId]  print the substrate_feed (what Teleon/Baltor consume)
   --self-test     offline: the runner wires every hub + runs a cycle
 CLI: PYTHONPATH=. python3 scripts/hub_engine_runner.py --ingest OpenSkillsHub --okf my_skill.md --improve
@@ -237,6 +238,36 @@ def generate_cmd(hub: str | None, *, tenant="_global", use_llm=False) -> int:
     return 0
 
 
+def capability_cmd(intent: str, *, plan_only: bool = False, rounds: int = 5, tenant: str = "_global") -> int:
+    """Process an OPEN-ENDED capability ('scrape the internet for more skills for openskillshub.io'): the planner
+    recognizes iterative/scheduled, resolves the hub, descends the research catalog, decomposes into steps, executes."""
+    from src.openharnesshub.discovery import OpenClaw, default_plugins
+    from src.openharnesshub.hub_engine import hub_specs
+    from src.teleon.capability_planner import plan as make_plan, execute as run_plan
+    specs = hub_specs()
+    hubs = [s.hub_id for s in specs]
+    kinds = {s.hub_id: s.component_kind for s in specs}
+    p = make_plan(intent, hubs=hubs, kinds=kinds, max_rounds=rounds)
+    print(f"INTENT: {intent}")
+    print(f"  -> hub={p.hub}  cadence={p.cadence}  iterative={p.iterative}  scheduled={p.scheduled}"
+          + (f"  every={p.schedule_every} cycles" if p.scheduled else ""))
+    print(f"  -> research need='{p.needed_capability}'  descent selects={p.research_descent.get('selected')}"
+          f"  escalation={p.research_descent.get('escalation')}")
+    print("  -> plan (multi-component):")
+    for i, s in enumerate(p.steps, 1):
+        print(f"       {i}. {s.name:<15} via {s.binds_to}")
+    print(f"  -> stop: {p.stop}")
+    if plan_only:
+        return 0
+    eng, oc, tools = _engines(), OpenClaw(default_plugins()), _tools()
+    r = run_plan(p, hub_engines=eng, openclaw=oc, tools=tools, tenant=tenant)
+    print(f"\nEXECUTED {r['rounds_run']} round(s) — stopped: {r['stopped_because']}; totals={r['totals']}")
+    if r["schedule"]:
+        print(f"SCHEDULE: recurring every {r['schedule']['every_cycles']} — honored by {r['schedule']['honored_by']}")
+    print("serves_truth=false; candidates served only after the hub verify gate.")
+    return 0
+
+
 def settings(hub: str | None) -> int:
     """View the resolved per-hub SETTINGS PLANE (operational policy merged with the strategy)."""
     from src.openharnesshub.hub_settings import all_settings, load_settings
@@ -337,6 +368,13 @@ def _main(argv=None):
     if "--feed" in argv:
         i = argv.index("--feed")
         return feed(argv[i + 1] if i + 1 < len(argv) and not argv[i + 1].startswith("-") else None)
+    if "--capability" in argv:
+        intent = _val(argv, "--capability")
+        if not intent:
+            print('usage: --capability "scrape the internet for more skills for openskillshub.io" [--plan-only] [--rounds N]')
+            return 1
+        return capability_cmd(intent, plan_only="--plan-only" in argv,
+                              rounds=int(_val(argv, "--rounds", "5") or 5), tenant=_val(argv, "--tenant", "_global"))
     if "--generate" in argv:
         i = argv.index("--generate")
         hub = argv[i + 1] if i + 1 < len(argv) and not argv[i + 1].startswith("-") else None
