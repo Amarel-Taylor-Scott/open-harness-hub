@@ -1,0 +1,16 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-22",
+  "principle": "GROUPED MODULES: components that commonly compose into a working sub-DAG, so the synthesizer can drop in a vetted bundle as a macro-node instead of re-deriving it. Each bundle names real tool_registry components + the planes it spans + what it's for. A bundle is a CANDIDATE recipe (discovery≠trust); the synthesis tree still tests + can swap any member. serves_truth=false.",
+  "serves_truth": false,
+  "bundles": [
+    {"id": "doc_intake", "name": "Document intake", "planes": ["data_extraction", "ocr", "validation"], "components": ["pdfplumber", "pymupdf", "camelot", "tesseract", "pydantic"], "use_for": "PDF/scan/email -> structured records"},
+    {"id": "web_research", "name": "Web research", "planes": ["search", "ner"], "components": ["searxng", "trafilatura", "beautifulsoup", "spacy"], "use_for": "bounded search + fetch + extract"},
+    {"id": "entity_resolve", "name": "Entity resolution", "planes": ["fuzzy_matching", "embedding"], "components": ["rapidfuzz", "jellyfish", "splink", "sentence_transformers"], "use_for": "records -> canonical entities + dedupe"},
+    {"id": "retrieval_rag", "name": "Retrieval (RAG)", "planes": ["embedding", "vector_store", "reranker"], "components": ["sentence_transformers", "faiss", "bge_reranker", "rank_bm25"], "use_for": "index + retrieve + rerank top-k"},
+    {"id": "stance_audit", "name": "Stance / contradiction audit", "planes": ["ner", "diff_compare", "stance_nli"], "components": ["spacy", "deepdiff", "roberta_mnli", "deberta_mnli"], "use_for": "do statements contradict / position changed"},
+    {"id": "field_parse", "name": "Deterministic field parsers", "planes": ["field_parsing", "validation"], "components": ["phonenumbers", "libpostal", "usaddress", "dateparser", "email_validator", "pydantic"], "use_for": "parse typed fields without a model"},
+    {"id": "classify_route", "name": "Classify / route", "planes": ["classical_ml", "ner"], "components": ["fasttext", "setfit", "scikit_learn", "spacy"], "use_for": "deterministic routing/classification before any LLM"},
+    {"id": "plan_solve", "name": "Constraint solve / plan", "planes": ["constraint_solver"], "components": ["ortools", "z3", "pulp", "networkx"], "use_for": "scheduling/allocation/planning without LLM re-planning"}
+  ]
+}

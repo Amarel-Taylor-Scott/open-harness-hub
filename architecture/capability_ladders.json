@@ -94,6 +94,33 @@
       {"rung": 2, "tier": "cluster_claims", "method": "group statements by the same underlying claim/topic", "deterministic": true, "cost_rank": 2, "status": "wired", "tools": ["sentence_transformers", "rapidfuzz"], "planes": ["embedding", "fuzzy_matching"]},
       {"rung": 3, "tier": "detect_contradiction", "method": "deterministic numeric/temporal/negation flip (diff) + NLI entailment-contradiction-neutral between statements", "deterministic": true, "cost_rank": 3, "status": "wired", "tools": ["deepdiff", "roberta_mnli", "deberta_mnli"], "planes": ["diff_compare", "stance_nli"]},
       {"rung": 4, "tier": "llm_adjudicate", "method": "LLM ONLY for nuanced/context-dependent pairs the NLI flags — proposes a CANDIDATE conflict, never asserts; Baltor verify gate confirms before publish", "deterministic": false, "cost_rank": 4, "status": "wired", "planes": ["llm"]}
+    ]},
+    {"capability": "meeting_notes_to_actions", "plane": "ner", "rungs": [
+      {"rung": 0, "tier": "segment_extract", "method": "split notes; extract candidate action items (imperatives) via regex/dependency", "deterministic": true, "cost_rank": 0, "status": "wired", "tools": ["spacy", "commonregex"], "planes": ["ner"]},
+      {"rung": 1, "tier": "owner_due", "method": "parse owner + due date deterministically", "deterministic": true, "cost_rank": 1, "status": "wired", "tools": ["dateparser", "spacy"], "planes": ["field_parsing", "ner"]},
+      {"rung": 2, "tier": "dedupe", "method": "merge duplicate actions", "deterministic": true, "cost_rank": 2, "status": "wired", "tools": ["rapidfuzz"], "planes": ["fuzzy_matching"]},
+      {"rung": 3, "tier": "llm_polish", "method": "LLM only to phrase/disambiguate unclear items", "deterministic": false, "cost_rank": 3, "status": "wired", "planes": ["llm"]}
+    ]},
+    {"capability": "contract_clause_extraction", "plane": "data_extraction", "rungs": [
+      {"rung": 0, "tier": "text_layer", "method": "PDF text / OCR for scans", "deterministic": true, "cost_rank": 0, "status": "wired", "tools": ["pdfplumber", "tesseract"], "planes": ["data_extraction", "ocr"]},
+      {"rung": 1, "tier": "clause_segment", "method": "segment into clauses (headings/numbering rules)", "deterministic": true, "cost_rank": 1, "status": "wired", "tools": ["spacy", "commonregex"], "planes": ["ner"]},
+      {"rung": 2, "tier": "clause_classify", "method": "classify clause type (trained classifier, no LLM)", "deterministic": true, "cost_rank": 2, "status": "wired", "tools": ["setfit", "fasttext"], "planes": ["classical_ml"]},
+      {"rung": 3, "tier": "field_parse", "method": "parse dates/amounts/parties deterministically", "deterministic": true, "cost_rank": 3, "status": "wired", "tools": ["dateparser", "price_parser"], "planes": ["field_parsing"]},
+      {"rung": 4, "tier": "llm_ambiguous", "method": "LLM only for ambiguous/novel clauses", "deterministic": false, "cost_rank": 4, "status": "wired", "planes": ["llm"]}
+    ]},
+    {"capability": "brand_monitoring", "plane": "social_scrape", "governance": "PUBLIC mentions only, provenance per mention, no private PII, honor ToS", "rungs": [
+      {"rung": 0, "tier": "gather_mentions", "method": "search + governed public social for brand mentions", "deterministic": true, "cost_rank": 0, "status": "wired", "tools": ["searxng", "trafilatura"], "external_apis": ["serp_search_api", "x_posts_public"], "planes": ["search", "social_scrape"]},
+      {"rung": 1, "tier": "extract", "method": "extract mention + source + date", "deterministic": true, "cost_rank": 1, "status": "wired", "tools": ["spacy", "dateparser"], "planes": ["ner", "field_parsing"]},
+      {"rung": 2, "tier": "sentiment_stance", "method": "deterministic sentiment/stance classifier", "deterministic": true, "cost_rank": 2, "status": "wired", "tools": ["setfit", "roberta_mnli"], "planes": ["classical_ml", "stance_nli"]},
+      {"rung": 3, "tier": "cluster", "method": "cluster into topics/themes", "deterministic": true, "cost_rank": 3, "status": "wired", "tools": ["sentence_transformers", "rapidfuzz"], "planes": ["embedding", "fuzzy_matching"]},
+      {"rung": 4, "tier": "llm_summarize", "method": "LLM only to summarize flagged themes", "deterministic": false, "cost_rank": 4, "status": "wired", "planes": ["llm"]}
+    ]},
+    {"capability": "lead_research", "plane": "entity_enrichment", "governance": "public data + provenance; no private PII", "rungs": [
+      {"rung": 0, "tier": "cache", "method": "cached prior lead record within TTL", "deterministic": true, "cost_rank": 0, "status": "wired", "tools": ["diskcache"], "planes": ["caching"]},
+      {"rung": 1, "tier": "normalize", "method": "deterministic normalize (domain/email/phone)", "deterministic": true, "cost_rank": 1, "status": "wired", "tools": ["libpostal", "email_validator", "phonenumbers"], "planes": ["field_parsing"]},
+      {"rung": 2, "tier": "enrichment_api", "method": "external firmographic/WHOIS enrichment", "deterministic": true, "cost_rank": 2, "status": "candidate", "external_apis": ["company_enrichment", "domain_whois"], "planes": ["entity_enrichment"]},
+      {"rung": 3, "tier": "search_browser", "method": "search + web_browsing ladder for gaps", "deterministic": true, "cost_rank": 3, "status": "wired", "tools": ["searxng", "playwright"], "planes": ["search", "browser"]},
+      {"rung": 4, "tier": "llm_qualify", "method": "LLM only to qualify/score the lead", "deterministic": false, "cost_rank": 4, "status": "wired", "planes": ["llm"]}
     ]}
   ]
 }
