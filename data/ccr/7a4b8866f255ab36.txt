@@ -1,0 +1,29 @@
+MODULE src/teleon/synthesis/synthesis_tree.py
+## API signatures
+```python
+"""src.teleon.synthesis.synthesis_tree — versioned decision tree with BACKTRACKING for capability synthesis."""
+class Decision:
+    # One versioned decision: at point `id`, we CHOSE `choice`; the untried `alternatives` are recorded, not discarded.
+class Attempt:
+class SynthesisNode:
+    # A node = a taken decision. status: open -> working (a leaf/subtree that solves) | dead_end (this choice failed its
+    def __init__(self, decision: Decision | None, parent: 'SynthesisNode | None'=None)
+    def version(self) -> str
+        # Path of choices from the root = a deterministic version id (so every decision is addressable + replayable).
+    def walk(self)
+class SynthesisTree:
+    # DFS-with-backtracking over ordered decision POINTS. points = [(point_id, [options cheapest-first]), ...]. A tester
+    def __init__(self)
+    def synthesize(self, points, tester) -> list[Decision] | None
+    def branches(self) -> list[dict]
+    def summary(self) -> dict
+```
+## intra-module call edges
+src.teleon.synthesis.synthesis_tree.walk -> src.teleon.synthesis.synthesis_tree.SynthesisNode.walk
+src.teleon.synthesis.synthesis_tree.__init__ -> src.teleon.synthesis.synthesis_tree.SynthesisNode
+src.teleon.synthesis.synthesis_tree.synthesize -> src.teleon.synthesis.synthesis_tree.SynthesisNode
+src.teleon.synthesis.synthesis_tree.synthesize -> src.teleon.synthesis.synthesis_tree.Decision
+src.teleon.synthesis.synthesis_tree.branches -> src.teleon.synthesis.synthesis_tree.SynthesisNode.walk
+src.teleon.synthesis.synthesis_tree.summary -> src.teleon.synthesis.synthesis_tree.SynthesisTree.branches
+src.teleon.synthesis.synthesis_tree.rec -> src.teleon.synthesis.synthesis_tree.SynthesisNode
+src.teleon.synthesis.synthesis_tree.rec -> src.teleon.synthesis.synthesis_tree.Decision

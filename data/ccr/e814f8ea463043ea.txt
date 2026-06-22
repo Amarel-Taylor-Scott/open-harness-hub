@@ -1,0 +1,58 @@
+MODULE src/teleon/research/source_search.py
+## API signatures
+```python
+"""src.teleon.research.source_search — specialized, DETERMINISTIC source searchers for tool discovery."""
+_REPO = ...
+_PYPI_SEARCH = ...
+_PYPI_JSON = ...
+_GH_SEARCH = ...
+_UA = ...
+_PYPI_NAME_RE = ...
+_PYPI_DESC_RE = ...
+class SourceSearchUnavailable:
+    # Raised when a source searcher cannot run (network off / endpoint blocked) — caller falls back.
+class ToolHit:
+    # One discovered candidate tool. CANDIDATE only — license is the RAW string from the source, classified downstream.
+    def key(self) -> str
+def _env(var: str) -> str
+def network_allowed() -> bool
+def _get(url: str, *, headers: dict | None=None, timeout: int=20) -> str
+class SourceSearchPort:
+    # Agnostic search plane: a future source (npm, crates.io, HF Hub) drops in as another subclass — zero caller change.
+    def search(self, query: str, *, limit: int=10) -> list[ToolHit]
+class PyPISearch:
+    # PyPI: keyless KEYWORD search was removed by PyPI (XML-RPC search disabled; the HTML page is JS/challenge-gated), so
+    def search(self, query: str, *, limit: int=10, enrich: bool=True) -> list[ToolHit]
+    def describe(self, name: str) -> ToolHit | None
+        # Deterministic per-project lookup via the JSON API. Returns a ToolHit with real license/summary, or None if the
+    def _enrich(self, name: str) -> tuple[str | None, str]
+        # Per-project JSON API: license (info.license or a 'License ::' classifier) + summary. Best-effort.
+class GitHubSearch:
+    def search(self, query: str, *, limit: int=10, language: str | None='python') -> list[ToolHit]
+_SOURCES = ...
+def select_source_search(source: str='auto') -> list[SourceSearchPort]
+    # 'pypi' / 'github' -> that one; 'auto' (or 'all') -> both (the descent runs the cheapest reachable, falls back).
+def discover(query: str, *, source: str='auto', limit: int=10) -> list[ToolHit]
+    # Run the selected source searcher(s), merge + dedupe by (source,name). Honest: if every reachable source is
+```
+## intra-module call edges
+src.teleon.research.source_search.network_allowed -> src.teleon.research.source_search._env
+src.teleon.research.source_search.select_source_search -> src.teleon.research.source_search.PyPISearch
+src.teleon.research.source_search.select_source_search -> src.teleon.research.source_search.GitHubSearch
+src.teleon.research.source_search.discover -> src.teleon.research.source_search.select_source_search
+src.teleon.research.source_search.discover -> src.teleon.research.source_search.SourceSearchUnavailable
+src.teleon.research.source_search.discover -> src.teleon.research.source_search.SourceSearchPort.search
+src.teleon.research.source_search.search -> src.teleon.research.source_search.network_allowed
+src.teleon.research.source_search.search -> src.teleon.research.source_search.SourceSearchUnavailable
+src.teleon.research.source_search.search -> src.teleon.research.source_search._get
+src.teleon.research.source_search.search -> src.teleon.research.source_search.SourceSearchUnavailable
+src.teleon.research.source_search.search -> src.teleon.research.source_search.SourceSearchUnavailable
+src.teleon.research.source_search.search -> src.teleon.research.source_search.PyPISearch._enrich
+src.teleon.research.source_search.search -> src.teleon.research.source_search.ToolHit
+src.teleon.research.source_search.describe -> src.teleon.research.source_search.PyPISearch._enrich
+src.teleon.research.source_search.describe -> src.teleon.research.source_search.ToolHit
+src.teleon.research.source_search.describe -> src.teleon.research.source_search.network_allowed
+src.teleon.research.source_search.describe -> src.teleon.research.source_search.SourceSearchUnavailable
+src.teleon.research.source_search._enrich -> src.teleon.research.source_search._get
+src.teleon.research.source_search.search -> src.teleon.research.source_search._env
+src.teleon.research.source_search.search -> src.teleon.research.source_search.network_allowed
