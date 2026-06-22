@@ -255,6 +255,10 @@ def _green(mod: str) -> bool:
 
 
 def _fw_surfaces() -> dict:
+    try:
+        import scripts.build_capability_assurance_surface as _cas; _cas.build()
+    except Exception:  # noqa: BLE001
+        pass
     """Keep the public SURFACES current: rebuild the intro site (computed counts + the task/hub catalogs auto-update)
     and the 22 hub pages, then run their self-tests. Catches drift (a registry grew but a page didn't) and keeps the
     demo fresh every cycle. Report-only (a red self-test signals; the agent/sweep improves the copy)."""
