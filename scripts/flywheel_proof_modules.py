@@ -851,6 +851,7 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_synthesis_discipline.py", "check_synthesis_discipline"),
     ("scripts/check_discovery_pipeline.py", "check_discovery_pipeline"),
     ("scripts/check_access_policy.py", "check_access_policy"),
+    ("scripts/check_input_profilers.py", "check_input_profilers"),
     ("scripts/check_external_api_registry.py", "check_external_api_registry"),
     ("scripts/check_adjacent_verticals.py", "check_adjacent_verticals"),
     ("scripts/build_agentic_loop_viz.py", "build_agentic_loop_viz"),

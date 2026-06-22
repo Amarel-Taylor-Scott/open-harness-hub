@@ -1,0 +1,30 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-22",
+  "principle": "Before running a capability ladder, PROFILE the input cheaply + deterministically, CLASSIFY it, and SHORTCUT to only the rungs that apply — skipping the expensive ones. A born-digital text PDF needs no OCR; a scanned image needs no text-layer pass; an AcroForm reads fields directly. The classification is a CANDIDATE prediction (serves_truth=false) — if it's wrong the cascade still verifies + escalates to the fuller path ('mixed'); a good guess saves the most expensive rungs. This is the cheapest rung-0 of an extraction ladder. Engine: src/teleon/extraction/pdf_profiler.py (PDF, wired); others are the same pattern.",
+  "serves_truth": false,
+  "profilers": [
+    {"input": "pdf", "status": "wired", "engine": "src/teleon/extraction/pdf_profiler.py",
+     "signals": ["encrypted", "page_count", "has_text_layer", "text_density", "has_images", "has_acroform", "table_hint", "producer"],
+     "classes": {
+       "born_digital_text": ["text_layer", "field_parse"],
+       "scanned_image": ["ocr", "field_parse"],
+       "form": ["text_layer", "field_parse"],
+       "tabular": ["text_layer", "tables", "field_parse"],
+       "mixed": ["text_layer", "tables", "ocr", "field_parse"],
+       "encrypted": ["decrypt"],
+       "empty": []}},
+    {"input": "image", "status": "candidate", "engine": null,
+     "signals": ["has_barcode", "is_photo", "is_document_scan", "dpi"],
+     "classes": {"barcode": ["pyzbar_decode"], "document_scan": ["ocr", "field_parse"], "scene_photo": ["vision_detect"]}},
+    {"input": "email", "status": "candidate", "engine": null,
+     "signals": ["has_attachments", "is_thread", "is_html", "has_calendar_invite"],
+     "classes": {"plain_latest": ["strip_thread", "field_parse"], "thread": ["strip_thread", "latest_only", "field_parse"], "with_attachments": ["strip_thread", "route_attachments"]}},
+    {"input": "html", "status": "candidate", "engine": null,
+     "signals": ["has_jsonld", "has_microdata", "is_article", "needs_js"],
+     "classes": {"structured_meta": ["extruct"], "article": ["readability"], "js_rendered": ["browser_ladder"]}},
+    {"input": "audio", "status": "candidate", "engine": null,
+     "signals": ["duration", "has_speech", "channels", "sample_rate"],
+     "classes": {"speech": ["vad", "asr"], "music_or_noise": ["skip_or_flag"]}}
+  ]
+}

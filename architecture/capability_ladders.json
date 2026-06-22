@@ -13,8 +13,9 @@
       {"rung": 4, "tier": "managed_unlocker", "method": "external managed scraping proxy", "deterministic": true, "cost_rank": 6, "status": "candidate", "external_apis": ["web_unlocker"], "planes": ["browser"], "governance": "evasion_restricted_byo"},
       {"rung": 5, "tier": "vision_coordinate", "method": "screenshot + grounding model + coordinate click", "deterministic": false, "cost_rank": 7, "status": "cataloged", "tools": ["screenshot_capture", "uground"], "planes": ["vision"]}
     ]},
-    {"capability": "document_extraction", "plane": "data_extraction", "rungs": [
-      {"rung": 0, "tier": "text_layer", "method": "PDF text layer", "deterministic": true, "cost_rank": 0, "status": "wired", "tools": ["pdfplumber", "pymupdf"], "planes": ["data_extraction"]},
+    {"capability": "document_extraction", "plane": "data_extraction", "router": "src/teleon/extraction/pdf_profiler.py:shortcut_plan", "rungs": [
+      {"rung": 0, "tier": "profile_route", "method": "cheap PDF profile (metadata/text-layer/scan/form/table signals) -> classify layout -> SHORTCUT to only the applicable rungs (e.g. skip OCR for born-digital text)", "deterministic": true, "cost_rank": 0, "status": "wired", "planes": ["data_extraction"]},
+      {"rung": 1, "tier": "text_layer", "method": "PDF text layer", "deterministic": true, "cost_rank": 0, "status": "wired", "tools": ["pdfplumber", "pymupdf"], "planes": ["data_extraction"]},
       {"rung": 1, "tier": "tables", "method": "table detect -> dataframe", "deterministic": true, "cost_rank": 1, "status": "wired", "tools": ["camelot", "tabula", "polars"], "planes": ["data_extraction"]},
       {"rung": 2, "tier": "ocr", "method": "local OCR for scans", "deterministic": true, "cost_rank": 2, "status": "wired", "tools": ["tesseract", "paddleocr"], "planes": ["ocr"]},
       {"rung": 3, "tier": "field_parse", "method": "deterministic typed-field parsers", "deterministic": true, "cost_rank": 3, "status": "wired", "tools": ["dateparser", "commonregex", "price_parser"], "planes": ["field_parsing"]},
