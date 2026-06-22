@@ -410,10 +410,14 @@ def pick_flywheel(state: dict) -> str:
     cadence, skipping any in error cooldown. logjam is stall-triggered only (never rotated)."""
     from scripts.stall_breaker import detect_stall, _HEALTH_RED_RUNS
     cyc = state["cycle"]
-    # (1) red gate -> run health to try to recover, UNTIL it's been red across enough runs to count as a real logjam
-    if (state.get("health") == "red" and state.get("health_red_streak", 0) < _HEALTH_RED_RUNS
-            and (cyc - state["last"].get("health", -99)) >= 1):
-        return "health"
+    # (1) red gate -> run HEALTH to (re)verify + recover. While the streak is short, re-run every cycle (fast recovery).
+    # Even at a PERSISTENT streak, periodically re-run health (every _LOGJAM_COOLDOWN cycles) so a STALE red (one already
+    # fixed out of band) self-clears instead of starving recovery and letting logjam churn forks off a false stall.
+    # Health is checked BEFORE logjam below, so we always re-verify the gate before escalating to a fork.
+    if state.get("health") == "red" and (cyc - state["last"].get("health", -99)) >= 1:
+        streak = state.get("health_red_streak", 0)
+        if streak < _HEALTH_RED_RUNS or (cyc - state["last"].get("health", -99)) >= _LOGJAM_COOLDOWN:
+            return "health"
     # (2) persistent stall (gates stuck red / a flywheel failing / no progress) -> break the logjam (cooldown-limited)
     if detect_stall(state) and (cyc - state.get("last_logjam", -999)) >= _LOGJAM_COOLDOWN:
         return "logjam"
@@ -618,6 +622,10 @@ def _self_test() -> int:
     # logjam is STALL-TRIGGERED ONLY: a healthy, fully-overdue state never rotates into it
     s7 = {"cycle": 50, "last": {}, "errors": {}, "health": "ok"}
     ck("LOGJAM is stall-triggered only (never picked without a stall)", pick_flywheel(s7) != "logjam")
+    # STARVATION FIX: a persistent red whose health hasn't re-verified in a cooldown window RE-RUNS health (so a stale red,
+    # already fixed out of band, self-clears) and is checked BEFORE logjam -> we never fork options off an already-fixed red.
+    s8 = {"cycle": 20, "last": {"health": 9}, "errors": {}, "health": "red", "health_red_streak": 3, "last_logjam": 18}
+    ck("STARVATION FIX: a persistent red re-verifies via HEALTH (not permanently starved by logjam)", pick_flywheel(s8) == "health", pick_flywheel(s8))
     # HEALTH gate is RACE-TOLERANT: a check that fails once then passes (a transient concurrent-write / edit window) is
     # NOT counted red -> no false logjam-fork; a check that always fails stays red (real breakage is never masked).
     _transient = iter([False, True])
