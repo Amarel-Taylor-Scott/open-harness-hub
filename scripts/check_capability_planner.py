@@ -96,6 +96,15 @@ def _self_test() -> int:
         "route and triage my inbox": "task:email-triage",
         "transcribe this audio": "task:transcription-asr",
         "turn this into a SQL query over the schema": "task:sql-generation",
+        "draft a reply to this customer email": "task:email-reply",
+        "route this request to another agent": "task:agent-routing",
+        "create a jira task for this bug": "task:jira-task-sync",
+        "draft a confluence page for the release": "task:wiki-page-draft",
+        "traverse the context to find inconsistencies": "task:inconsistency-detection",
+        "find fragile facts in our knowledge base": "task:fragile-fact-detection",
+        "redact PII before we store this": "task:pii-redaction",
+        "decide whether to escalate to a human": "task:escalation-decision",
+        "which tool should the agent call": "task:tool-selection",
     }
     for intent_text, want in type_cases.items():
         ck(f"classifies '{intent_text[:32]}...' → {want}", classify_capability_type(intent_text) == want)

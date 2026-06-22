@@ -74,8 +74,18 @@ _DOCEXTRACT_HINTS = ("extract", "pull out", "pull the", "ocr", "schema from", "f
 # Capability TYPES beyond extraction — routed to the tunable-task method grids (rules → small model → LLM, cheapest
 # that meets the bar). Ordered most-specific-first; matched by keyword (the catalog has no triggers, so they live here).
 _TASK_KEYWORDS: list = [
+    ("jira-task-sync", ["jira task", "jira issue", "jira ticket", "create a jira", "update a jira", "create an issue", "create a ticket in"]),
+    ("wiki-page-draft", ["confluence", "jira page", "wiki page", "draft a page", "update the page", "documentation page", "knowledge base page"]),
     ("transcription-asr", ["transcrib", "audio to text", "speech to text", "speech-to-text", " asr", "voice to text"]),
     ("image-tagging", ["classify an image", "classify images", "tag an image", "tag images", "image classif", "label an image", "image label", "tag photos"]),
+    ("pii-redaction", ["redact", "pii", "scrub personal", "mask personal", "de-identif", "remove personal information", "mask pii"]),
+    ("fragile-fact-detection", ["fragile fact", "stale fact", "facts that will change", "facts likely to", "volatile fact", "unsourced claim", "facts that go stale", "find fragile"]),
+    ("inconsistency-detection", ["inconsisten", "contradict", "conflicting fact", "conflicting claim", "find conflicts", "discrepanc", "reconcile conflicts", "mismatched facts"]),
+    ("email-reply", ["reply to", "draft a reply", "draft an email", "email reply", "respond to the email", "write a reply", "answer the email", "respond to this message"]),
+    ("agent-routing", ["to another agent", "to an agent", "to a specialist", "to the right agent", "to an expert", "another agent", "hand off to", "handoff", "delegate to", "which agent", "assign to an agent", "route to an agent"]),
+    ("escalation-decision", ["escalate to a human", "escalate to a person", "should we escalate", "escalation decision", "needs a human", "route to a human", "hand to a human"]),
+    ("tool-selection", ["which tool", "select a tool", "pick a tool", "choose a tool", "tool to call", "function to call", "tool selection", "pick the function"]),
+    ("intent-detection", ["detect intent", "user intent", "intent detection", "what does the user want", "classify intent", "identify intent"]),
     ("sql-generation", ["nl to sql", "nl2sql", "text to sql", "text-to-sql", "generate sql", "sql query", " sql ", "to sql", "query the database", "query the db", "natural language to sql"]),
     ("code-review", ["code review", "review a code", "review the code", "review this pr", "review a pr", "pull request review", "diff review"]),
     ("content-moderation", ["moderat", "unsafe content", "flag unsafe", "toxic", "abusive content", "content safety", "safety filter"]),
@@ -84,6 +94,7 @@ _TASK_KEYWORDS: list = [
     ("translation", ["translate", "translation"]),
     ("summarization", ["summari", "tl;dr", "tldr", "abstract of", "condense"]),
     ("grounded-answer", ["answer a question", "answer questions", "with citation", "cite sources", "q&a", "question answering", "grounded answer", "answer with", "look up the answer", "search and answer", "rag"]),
+    ("slot-filling", ["fill the slots", "slot filling", "fill in the fields", "fill the fields", "fill the required", "fill out the", "gather the required", "collect the required fields", "fill the form fields", "fill required fields"]),
     ("text-classification", ["classif", "categor", "label text", "label these", "tag text", "taxonomy", "label the"]),
     ("email-triage", ["triage", "route the inbox", "route inbox", "inbox", "sort emails", "assign tickets", "route emails"]),
     ("document-schema-extraction", ["extract", "pull out", "fields from", "schema from", "ocr", "invoice", "lease", "contract", "form fields"]),

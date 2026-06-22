@@ -470,6 +470,391 @@
           ]
         }
       ]
+    },
+    {
+      "task_id": "email-reply",
+      "name": "draft a reply to an email/message",
+      "requirement_metric": "appropriateness / adequacy",
+      "deterministic_possible": false,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "template",
+          "methods": "canned/templated responses for known intents",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "small-model",
+          "methods": "small instruction-tuned reply generator",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "llm",
+          "methods": "LLM drafts the reply for novel/sensitive threads",
+          "deterministic": false,
+          "cost_tier": "mid",
+          "cost_rank": 2,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "agent-routing",
+      "name": "route a request to the right agent/specialist",
+      "requirement_metric": "routing accuracy",
+      "deterministic_possible": false,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "rules",
+          "methods": "intent/keyword \u2192 agent map + capability registry match",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "small-model",
+          "methods": "small intent classifier \u2192 agent",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "llm",
+          "methods": "LLM routes the ambiguous residual",
+          "deterministic": false,
+          "cost_tier": "mid",
+          "cost_rank": 2,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "tool-selection",
+      "name": "pick which tool/function to call",
+      "requirement_metric": "top-k accuracy",
+      "deterministic_possible": false,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "rules",
+          "methods": "intent \u2192 tool map + JSON-schema argument match",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "small-model",
+          "methods": "small ranker over the tool catalog",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "llm",
+          "methods": "LLM function-calling on the residual",
+          "deterministic": false,
+          "cost_tier": "mid",
+          "cost_rank": 2,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "intent-detection",
+      "name": "detect the user's intent",
+      "requirement_metric": "accuracy",
+      "deterministic_possible": false,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "rules",
+          "methods": "regex/keyword intent patterns",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "small-model",
+          "methods": "small intent encoder",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "llm",
+          "methods": "LLM zero/few-shot on the residual",
+          "deterministic": false,
+          "cost_tier": "mid",
+          "cost_rank": 2,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "escalation-decision",
+      "name": "decide whether to escalate to a human",
+      "requirement_metric": "recall @ precision",
+      "deterministic_possible": true,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "rules",
+          "methods": "confidence threshold + policy rules (PII/high-risk \u2192 escalate)",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "small-model",
+          "methods": "learned risk classifier",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "llm",
+          "methods": "LLM judges the borderline residual",
+          "deterministic": false,
+          "cost_tier": "mid",
+          "cost_rank": 2,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "slot-filling",
+      "name": "fill the required slots/fields for an action",
+      "requirement_metric": "field coverage @ confidence",
+      "deterministic_possible": false,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "rules",
+          "methods": "regex/grammar slot extractors",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "small-model",
+          "methods": "small span extractor",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "llm",
+          "methods": "LLM fills the unresolved slots",
+          "deterministic": false,
+          "cost_tier": "mid",
+          "cost_rank": 2,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "pii-redaction",
+      "name": "redact PII before sending/storing",
+      "requirement_metric": "recall @ precision",
+      "deterministic_possible": true,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "regex-rules",
+          "methods": "regex + dictionary PII matchers (emails/SSNs/cards/phones)",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "ner-model",
+          "methods": "small NER model for names/orgs/locations",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "llm",
+          "methods": "LLM catches context-dependent residual PII",
+          "deterministic": false,
+          "cost_tier": "mid",
+          "cost_rank": 2,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "jira-task-sync",
+      "name": "create/update a Jira task from a request",
+      "requirement_metric": "field coverage @ confidence",
+      "deterministic_possible": false,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "template",
+          "methods": "field mapping from a structured request (type/priority/labels)",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "small-model",
+          "methods": "small extractor for title/labels/components",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "llm",
+          "methods": "LLM drafts title + description from free-text intent",
+          "deterministic": false,
+          "cost_tier": "mid",
+          "cost_rank": 2,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "wiki-page-draft",
+      "name": "draft/update a Jira/Confluence page",
+      "requirement_metric": "ROUGE / faithfulness",
+      "deterministic_possible": false,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "template",
+          "methods": "section-template fill from structured data",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "small-model",
+          "methods": "extractive draft from the sources",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "llm",
+          "methods": "LLM drafts/updates the prose (faithful to sources)",
+          "deterministic": false,
+          "cost_tier": "mid",
+          "cost_rank": 2,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "inconsistency-detection",
+      "name": "traverse context to find inconsistencies/contradictions",
+      "requirement_metric": "pairwise F1",
+      "deterministic_possible": false,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "rules",
+          "methods": "same-field-different-value + constraint/assertion checks",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "small-model",
+          "methods": "NLI contradiction classifier over candidate pairs",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "llm",
+          "methods": "LLM adjudicates the flagged contradictions",
+          "deterministic": false,
+          "cost_tier": "mid",
+          "cost_rank": 2,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "fragile-fact-detection",
+      "name": "traverse context to find fragile facts (stale/volatile/unsourced)",
+      "requirement_metric": "recall @ precision",
+      "deterministic_possible": true,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "rules",
+          "methods": "volatile-pattern heuristics (dates/prices/versions/'current') + missing source handle",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "small-model",
+          "methods": "fragility classifier",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "llm",
+          "methods": "LLM judges the borderline residual",
+          "deterministic": false,
+          "cost_tier": "mid",
+          "cost_rank": 2,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
     }
   ]
 }
