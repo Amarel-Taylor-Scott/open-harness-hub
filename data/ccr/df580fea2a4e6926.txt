@@ -1,0 +1,44 @@
+MODULE src/teleon/extraction/ocr_port.py
+## API signatures
+```python
+"""src.teleon.extraction.ocr_port — the OCR / document-parse ABSTRACTION LAYER: any OCR engine behind ONE port."""
+_REGISTRY = ...
+class OCRPort:
+    def available(self) -> bool
+    def extract(self, source: str) -> str
+class CallableOCR:
+    # Wrap any (source)->str extractor (tests / a real engine binding).
+    def __init__(self, fn: Callable[[str], str], *, name: str='callable', available: bool=True)
+    def available(self) -> bool
+    def extract(self, source: str) -> str
+class UnavailableOCR:
+    # Honest no-engine port — reports unavailable + never fabricates text (the caller falls back / reports MISSING).
+    def __init__(self, name: str='unavailable', reason: str='engine not installed/configured')
+    def available(self) -> bool
+    def extract(self, source: str) -> str
+def _provider(pid: str) -> dict
+def _needs_met(needs: list) -> bool
+    # A provider is available iff its needs are satisfied: a binary on PATH, an importable package, or an env key.
+def register_ocr_adapter(name: str, factory: Callable[[], OCRPort]) -> None
+def load_registry(path: Path | None=None) -> dict
+def available_ocr() -> dict
+    # Selectable OCR engines POPULATED FROM the registry + registered adapters, with which are reachable now.
+def select_ocr(name: str='auto', *, require_reachable: bool=True) -> OCRPort
+    # Resolve a name to an OCRPort. 'auto' → the CHEAPEST reachable engine from the registry (text-layer → local →
+def descent_order(**kw) -> list[str]
+    # The cheapest-first OCR escalation order among reachable engines (the acquire-stage descent).
+```
+## intra-module call edges
+src.teleon.extraction.ocr_port._provider -> src.teleon.extraction.ocr_port.load_registry
+src.teleon.extraction.ocr_port.available_ocr -> src.teleon.extraction.ocr_port.load_registry
+src.teleon.extraction.ocr_port.available_ocr -> src.teleon.extraction.ocr_port._needs_met
+src.teleon.extraction.ocr_port.select_ocr -> src.teleon.extraction.ocr_port.load_registry
+src.teleon.extraction.ocr_port.select_ocr -> src.teleon.extraction.ocr_port._needs_met
+src.teleon.extraction.ocr_port.select_ocr -> src.teleon.extraction.ocr_port._provider
+src.teleon.extraction.ocr_port.select_ocr -> src.teleon.extraction.ocr_port.CallableOCR
+src.teleon.extraction.ocr_port.select_ocr -> src.teleon.extraction.ocr_port.UnavailableOCR
+src.teleon.extraction.ocr_port.select_ocr -> src.teleon.extraction.ocr_port.UnavailableOCR
+src.teleon.extraction.ocr_port.select_ocr -> src.teleon.extraction.ocr_port.UnavailableOCR
+src.teleon.extraction.ocr_port.select_ocr -> src.teleon.extraction.ocr_port._needs_met
+src.teleon.extraction.ocr_port.descent_order -> src.teleon.extraction.ocr_port.load_registry
+src.teleon.extraction.ocr_port.descent_order -> src.teleon.extraction.ocr_port._needs_met
