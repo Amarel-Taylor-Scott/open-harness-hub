@@ -306,12 +306,23 @@ def _fw_adapters() -> dict:
                              rationale=f"tool_registry has {n_tools} tools; aim ~{_EXPAND_TARGET}/plane toward hundreds. "
                                        f"Thinnest now: {', '.join(f'{p}={per[p]}' for p in thin[:6])}. Feed via the discovery "
                                        "flywheels (license-classified, serves_truth=false, drop-in as one row)."))
+        # ladders-for-everything coverage: which planes still lack a capability ladder (owner: ladders for EVERY subcomponent)
+        all_planes = {p["plane"] for p in planes}
+        laddered = {L.get("plane") for L in _json.loads((REPO / "architecture" / "capability_ladders.json").read_text(encoding="utf-8"))["ladders"]}
+        no_ladder = sorted(all_planes - laddered)
+        if no_ladder:
+            propose(Proposal(title="add capability ladders for the remaining planes (a ladder for every subcomponent)",
+                             kind="opportunity",
+                             rationale=f"{len(laddered & all_planes)}/{len(all_planes)} planes have a descent ladder; "
+                                       f"add next: {', '.join(no_ladder[:8])}. Each = cost-ordered deterministic-first rungs "
+                                       "(architecture/capability_ladders.json)."))
     except Exception:  # noqa: BLE001
-        pass
+        no_ladder = []
     ok = dropin and audit and tax and reg_ok
     return {"summary": f"adapters: drop-in {'green' if dropin else 'RED'} + coverage {'green' if audit else 'RED'}; "
                        f"{len(gaps)} port gap(s){' filed' if filed else ''}; tool_registry {n_tools} tools"
-                       f"{f', {len(thin)} plane(s) below target' if thin else ''}",
+                       f"{f', {len(thin)} plane(s) below target' if thin else ''}"
+                       f"{f'; {len(no_ladder)} plane(s) need a ladder' if no_ladder else ''}",
             "signal": "gates_red" if not ok else "ok", "gaps": gaps}
 
 
