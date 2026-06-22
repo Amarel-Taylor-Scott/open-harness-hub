@@ -834,6 +834,7 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_research_catalog.py", "check_research_catalog"),
     ("src/teleon/research/llm_browser.py", "llm_browser"),
     ("scripts/check_capability_planner.py", "check_capability_planner"),
+    ("scripts/repo_intake_strategize.py", "repo_intake_strategize"),
     ("scripts/check_repo_emit.py", "check_repo_emit"),
     ("scripts/build_hub_sites.py", "build_hub_sites"),
     ("scripts/scaffold_hub.py", "scaffold_hub"),
