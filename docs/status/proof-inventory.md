@@ -1,6 +1,6 @@
 # Proof Inventory
 
-**572** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
+**579** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
 
 - `scripts/ingest/context_rot.py`
 - `scripts/ingest/document_decompose.py`
@@ -565,6 +565,13 @@
 - `scripts/check_agnostic_adapters.py`
 - `scripts/check_adapter_layers.py`
 - `scripts/check_ocr_port.py`
+- `scripts/check_capability_taxonomy.py`
+- `scripts/check_agentic_loop_catalog.py`
+- `scripts/check_optimization_passes.py`
+- `scripts/check_inefficient_pipeline_archetypes.py`
+- `scripts/check_tool_registry.py`
+- `scripts/check_adjacent_verticals.py`
+- `scripts/build_agentic_loop_viz.py`
 - `src/teleon/research/llm_browser.py`
 - `scripts/check_capability_planner.py`
 - `scripts/repo_intake_strategize.py`
