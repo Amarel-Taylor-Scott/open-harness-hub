@@ -259,7 +259,7 @@ def _fw_surfaces() -> dict:
     and the 22 hub pages, then run their self-tests. Catches drift (a registry grew but a page didn't) and keeps the
     demo fresh every cycle. Report-only (a red self-test signals; the agent/sweep improves the copy)."""
     results = {}
-    for mod in ("build_intro_site", "build_hub_sites"):
+    for mod in ("build_intro_site", "build_hub_sites", "build_agentic_loop_viz"):
         try:
             subprocess.run([sys.executable, f"scripts/{mod}.py"], cwd=REPO, capture_output=True, text=True,
                            timeout=150, env={**os.environ, "PYTHONPATH": "."})    # rebuild from current registries

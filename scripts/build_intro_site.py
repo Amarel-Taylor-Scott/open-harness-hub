@@ -304,6 +304,10 @@ def page_teleon(c: dict) -> str:
 <section><div class="wrap reveal"><h2>More examples</h2><h3>Every capability descends — here are a few.</h3>
   <p>Each is the same motion: deterministic + cheap first, the frontier reserved for supervision. Costs are computed.</p>
   <div class="grid g3" style="margin-top:16px">{_teleon_examples(c)}</div></div></section>
+<section><div class="wrap reveal"><h2>Whole loops descend too</h2><h3>Not just single steps — entire agent loops.</h3>
+  <p>Research, browser-use, support, coding, financial-ops — each operational loop (perceive → reason → act → verify →
+  iterate) starts unbounded (frontier every step) and descends to the cheapest bounded path that still completes it.
+  <a href="./loops/index.html">See every agent loop descend →</a></p></div></section>
 <section><div class="wrap reveal"><h2>Not just extraction</h2><h3>Classify, search, summarize, translate, route, and more.</h3>
   <p>Write any common AI task in plain language — <i>classify these tickets</i>, <i>answer with citations</i>,
   <i>summarize</i>, <i>translate</i>, <i>detect duplicates</i>, <i>route the inbox</i>, <i>transcribe</i>,
