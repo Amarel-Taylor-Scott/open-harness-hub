@@ -1,0 +1,71 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-22",
+  "principle": "Concrete end-to-end capability examples, each traced unbounded->bounded through the REAL artifacts: the planner classifies the request (check_worked_examples re-runs classify_capability_type, so an example can't drift from the router), it maps to an agentic loop + a waste archetype, and the bounded path is an ordered descent where each step names a tool-plane + registry tools + whether it's deterministic + the LLM's role (none / residual / supervisor). Costs are REPRESENTATIVE (not live). Truth-bearing outputs are Baltor-governed (provenance + freshness + honest-MISSING); the descent itself is Teleon (serves_truth=false).",
+  "cost_note": "representative — not a live measurement",
+  "examples": [
+    {
+      "id": "find_company_contact",
+      "request": "find the latest contact information of Acme Robotics located at Austin, TX",
+      "capability_type": "task:entity-fact-lookup",
+      "loop": "research",
+      "archetype": "search_research",
+      "unbounded": {"approach": "frontier LLM with web browsing reasons over each page, reads full pages, re-searches in a loop until it 'feels done' — unbounded steps, whole pages in context", "est_cost_usd": 0.42},
+      "bounded": {
+        "est_cost_usd": 0.02,
+        "steps": [
+          {"step": "cache / known-source", "plane": "vector_store", "registry_tools": ["faiss"], "methods": "freshness-TTL cache keyed by entity; return prior verified record if still fresh (provenance kept)", "deterministic": true, "llm_role": "none"},
+          {"step": "bounded search for the official source", "plane": "search", "registry_tools": ["searxng", "tavily"], "methods": "keyless SearXNG first; cap to top sources (official site, public registry); stop when found", "deterministic": true, "llm_role": "none"},
+          {"step": "fetch + strip to main content", "plane": "search", "registry_tools": ["trafilatura", "beautifulsoup"], "methods": "fetch the contact/about page; remove boilerplate", "deterministic": true, "llm_role": "none"},
+          {"step": "extract contact fields", "plane": "ner", "registry_tools": ["spacy", "presidio"], "methods": "regex for email/phone/URL + NER for org/address; format-validate each", "deterministic": true, "llm_role": "none"},
+          {"step": "structure + validate", "plane": "validation", "registry_tools": ["pydantic", "jsonschema"], "methods": "coerce to ContactInfo schema; fields not found -> null (never fabricated)", "deterministic": true, "llm_role": "none"},
+          {"step": "LLM supervisor (only on ambiguity)", "plane": "llm", "registry_tools": [], "methods": "cheapest-capable model ONLY when >1 candidate entity or low confidence: disambiguate which 'Acme' + confirm freshness; never invent a value", "deterministic": false, "llm_role": "supervisor"}
+        ]
+      },
+      "heuristics": ["unbounded_search_to_bounded", "structured_parse_to_parser"],
+      "governance": {"truth_owner": "baltor", "efficiency_owner": "teleon", "serves_truth": true, "provenance": "every field carries its source URL + fetch timestamp", "freshness_cdc": "freshness TTL + re-verify on read; CDC re-check when the source changes", "honest_missing": "unfound fields -> null/MISSING, never invented", "schema_validation": "ContactInfo (name, phones[], emails[], address, website) via Pydantic"}
+    },
+    {
+      "id": "emails_to_schema",
+      "request": "extract information and put it in this JSON schema from this set of emails and attachments",
+      "capability_type": "document_extraction",
+      "loop": "extraction",
+      "archetype": "extraction",
+      "unbounded": {"approach": "concatenate the whole thread + every attachment and send to a frontier multimodal model, ask it to fill the schema", "est_cost_usd": 0.31},
+      "bounded": {
+        "est_cost_usd": 0.04,
+        "steps": [
+          {"step": "parse emails (strip the thread)", "plane": "data_extraction", "registry_tools": [], "methods": "Python email/MIME parser: drop quoted history, keep the latest message, pull headers (from/to/date/subject), split out attachments", "deterministic": true, "llm_role": "none"},
+          {"step": "extract attachment text", "plane": "data_extraction", "registry_tools": ["pdfplumber", "pymupdf", "apache_tika"], "methods": "PDF text layer; route scanned/image attachments to the OCR plane (tesseract/paddleocr); prune to relevant pages", "deterministic": true, "llm_role": "none"},
+          {"step": "extract tables", "plane": "data_extraction", "registry_tools": ["camelot", "tabula"], "methods": "detect + extract line-item tables to dataframes", "deterministic": true, "llm_role": "none"},
+          {"step": "rule-extract the deterministic fields", "plane": "ner", "registry_tools": ["spacy"], "methods": "regex/NER for dates, amounts, IDs, emails — every field a parser can get", "deterministic": true, "llm_role": "none"},
+          {"step": "cheap LLM for residual fields", "plane": "llm", "registry_tools": [], "methods": "cheapest-capable LLM ONLY for the ambiguous free-text fields the parsers couldn't fill", "deterministic": false, "llm_role": "residual"},
+          {"step": "validate to the target schema", "plane": "validation", "registry_tools": ["pydantic", "jsonschema"], "methods": "enforce the supplied JSON Schema (deterministic floor); missing -> null; reject malformed", "deterministic": true, "llm_role": "none"},
+          {"step": "LLM supervisor audit", "plane": "llm", "registry_tools": [], "methods": "audit low-confidence fields; escalate only the flagged ones to a frontier model", "deterministic": false, "llm_role": "supervisor"}
+        ]
+      },
+      "heuristics": ["big_doc_to_segment", "structured_parse_to_parser"],
+      "governance": {"truth_owner": "baltor", "efficiency_owner": "teleon", "serves_truth": true, "provenance": "every extracted value points to its email/attachment/page/cell", "freshness_cdc": "point-in-time documents; re-extract on document update", "honest_missing": "absent fields -> null, never fabricated", "schema_validation": "the caller-supplied JSON Schema, enforced by Pydantic/jsonschema"}
+    },
+    {
+      "id": "vendor_invoices_to_schema",
+      "request": "extract the invoice number, vendor, line items and total from these vendor emails into our schema",
+      "capability_type": "document_extraction",
+      "loop": "extraction",
+      "archetype": "large_doc_ingestion",
+      "unbounded": {"approach": "send each full invoice PDF to a frontier model and ask for the fields", "est_cost_usd": 0.18},
+      "bounded": {
+        "est_cost_usd": 0.03,
+        "steps": [
+          {"step": "email + attachment parse", "plane": "data_extraction", "registry_tools": ["pdfplumber", "pymupdf"], "methods": "MIME split; PDF text layer; OCR plane only for scanned invoices", "deterministic": true, "llm_role": "none"},
+          {"step": "line-item table extraction", "plane": "data_extraction", "registry_tools": ["camelot", "tabula", "polars"], "methods": "table detect -> dataframe -> sum check vs stated total", "deterministic": true, "llm_role": "none"},
+          {"step": "field patterns", "plane": "ner", "registry_tools": ["spacy"], "methods": "regex for invoice no / dates / currency amounts; vendor via NER", "deterministic": true, "llm_role": "none"},
+          {"step": "validate", "plane": "validation", "registry_tools": ["pydantic", "pandera"], "methods": "Invoice schema; arithmetic check (line items == total); missing -> null", "deterministic": true, "llm_role": "none"},
+          {"step": "LLM supervisor (only flagged)", "plane": "llm", "registry_tools": [], "methods": "escalate only invoices where the total fails the arithmetic check or a field is low-confidence", "deterministic": false, "llm_role": "supervisor"}
+        ]
+      },
+      "heuristics": ["big_doc_to_segment", "structured_parse_to_parser"],
+      "governance": {"truth_owner": "baltor", "efficiency_owner": "teleon", "serves_truth": true, "provenance": "each field -> source page/cell; arithmetic cross-check recorded", "freshness_cdc": "point-in-time; re-extract on new invoice", "honest_missing": "unparseable fields -> null + review ticket, never guessed", "schema_validation": "Invoice (invoice_number, vendor, line_items[], total) via Pydantic + Pandera"}
+    }
+  ]
+}

@@ -167,6 +167,49 @@
       ]
     },
     {
+      "task_id": "entity-fact-lookup",
+      "name": "find current facts about an entity (contact info / address / website)",
+      "requirement_metric": "field coverage @ verified freshness",
+      "deterministic_possible": false,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "cache",
+          "methods": "known-source / cached prior lookup within freshness TTL (provenance kept)",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "authoritative-fetch",
+          "methods": "fetch the official site / public registry + deterministic extract (Trafilatura main-content + regex/NER for phone/email/address)",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "search",
+          "methods": "keyless search (SearXNG/scrape) or search API -> fetch top sources -> deterministic extract",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "llm-supervise",
+          "methods": "LLM supervisor ONLY to disambiguate the entity + confirm freshness on flagged fields (never to invent a value)",
+          "deterministic": false,
+          "cost_tier": "mid",
+          "cost_rank": 2,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
+    },
+    {
       "task_id": "translation",
       "name": "translate text",
       "requirement_metric": "BLEU / adequacy",

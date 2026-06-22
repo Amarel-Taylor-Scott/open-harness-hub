@@ -93,6 +93,7 @@ _TASK_KEYWORDS: list = [
     ("entity-resolution", ["entity resolution", "canonical entit", "record linkage", "resolve records", "match records", "link records", "resolve duplicates to"]),
     ("translation", ["translate", "translation"]),
     ("summarization", ["summari", "tl;dr", "tldr", "abstract of", "condense"]),
+    ("entity-fact-lookup", ["contact information", "contact info", "contact details", "find the latest contact", "current contact", "phone number of", "email address of", "mailing address of", "find the address of", "headquarters of", "company located at", "get in touch with", "company website", "reach the company"]),
     ("grounded-answer", ["answer a question", "answer questions", "with citation", "cite sources", "q&a", "question answering", "grounded answer", "answer with", "look up the answer", "search and answer", "rag"]),
     ("slot-filling", ["fill the slots", "slot filling", "fill in the fields", "fill the fields", "fill the required", "fill out the", "gather the required", "collect the required fields", "fill the form fields", "fill required fields"]),
     ("text-classification", ["classif", "categor", "label text", "label these", "tag text", "taxonomy", "label the"]),
