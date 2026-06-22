@@ -1,0 +1,23 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-22",
+  "principle": "Each TOOL CATEGORY is an agnostic PLANE: an open registry that can hold HUNDREDS of pluggable tools behind ONE port, so the supervisor (the descent/planner) selects the cheapest tool that meets the bar when composing a capability. A new tool drops in by a registry row (or an adapter) with zero caller change — exactly the OCR case (hundreds of OCR engines, one ocr_port). Planes are populated from internal catalogs + the discovery flywheels (mining repos/products/startups that use LLMs). A capability leaf (architecture/capability_taxonomy.json) names the planes it draws on. serves_truth=false.",
+  "serves_truth": false,
+  "status_legend": {"wired": "has a port behind which tools plug in", "partial": "a port-ish exists; formalize as a clean plane", "gap": "no port yet — wrap next (the adapters flywheel files it)"},
+  "planes": [
+    {"plane": "llm", "name": "Language models", "port_module": "src/teleon/llm_port.py", "registry": "model_index + provider lanes", "status": "wired", "scales_to": "hundreds", "supervisor_selectable": true},
+    {"plane": "browser", "name": "Web browsers / automation", "port_module": "src/teleon/research/browser_port.py", "registry": "web_browsing_stack_registry", "status": "wired", "scales_to": "hundreds", "supervisor_selectable": true},
+    {"plane": "ocr", "name": "OCR / document parse", "port_module": "src/teleon/extraction/ocr_port.py", "registry": "ocr_provider_registry", "status": "wired", "scales_to": "hundreds", "supervisor_selectable": true},
+    {"plane": "search", "name": "Web/API search", "port_module": null, "registry": "research_component_catalog (search tier)", "status": "partial", "scales_to": "hundreds", "supervisor_selectable": true},
+    {"plane": "embedding", "name": "Embedding models", "port_module": null, "registry": "(EmbeddingBackend exists; formalize a plane + registry)", "status": "partial", "scales_to": "hundreds", "supervisor_selectable": true},
+    {"plane": "vector_store", "name": "Vector stores", "port_module": null, "registry": "(VectorProvider exists; formalize a plane + registry)", "status": "partial", "scales_to": "dozens", "supervisor_selectable": true},
+    {"plane": "reranker", "name": "Rerankers", "port_module": null, "registry": "Cohere rerank / BGE / cross-encoders", "status": "gap", "scales_to": "dozens", "supervisor_selectable": true},
+    {"plane": "asr", "name": "Speech-to-text", "port_module": null, "registry": "Whisper / local-ASR / cloud ASR", "status": "gap", "scales_to": "dozens", "supervisor_selectable": true},
+    {"plane": "tts", "name": "Text-to-speech", "port_module": null, "registry": "edge-tts / Piper / cloud TTS", "status": "gap", "scales_to": "dozens", "supervisor_selectable": true},
+    {"plane": "image_gen", "name": "Image generation", "port_module": null, "registry": "SD / FLUX / cloud image APIs", "status": "gap", "scales_to": "dozens", "supervisor_selectable": true},
+    {"plane": "vision", "name": "Vision / grounding models", "port_module": null, "registry": "(in web_browsing_stack_registry driving_components; formalize a vision plane)", "status": "partial", "scales_to": "dozens", "supervisor_selectable": true},
+    {"plane": "mt", "name": "Machine translation", "port_module": null, "registry": "Marian / NLLB / cloud MT", "status": "gap", "scales_to": "dozens", "supervisor_selectable": true},
+    {"plane": "ner", "name": "NER / entity taggers", "port_module": null, "registry": "spaCy / Presidio / cloud NER", "status": "gap", "scales_to": "dozens", "supervisor_selectable": true},
+    {"plane": "static_analysis", "name": "Static analysis / linters", "port_module": null, "registry": "ruff / semgrep / CodeQL", "status": "gap", "scales_to": "dozens", "supervisor_selectable": true}
+  ]
+}

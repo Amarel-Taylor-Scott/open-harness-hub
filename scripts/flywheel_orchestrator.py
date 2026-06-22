@@ -277,20 +277,24 @@ def _fw_adapters() -> dict:
     with zero component change) + the adapter-layers coverage audit, and file any port GAP as a comfort-gated proposal
     (idempotent — deduped by title). The loop's mechanism for 'create wrappers for selectable components'."""
     dropin, audit = _green("check_agnostic_adapters"), _green("check_adapter_layers")
+    tax = _green("check_capability_taxonomy")
     gaps, filed = [], 0
     try:
         import json as _json
         layers = _json.loads((REPO / "architecture" / "adapter_layers.json").read_text(encoding="utf-8"))["layers"]
         gaps = [L["layer"] for L in layers if L.get("status") == "gap"]
+        # also the TOOL PLANES (categories) not yet wrapped — the supervisor needs every category behind a plane
+        planes = _json.loads((REPO / "architecture" / "tool_planes.json").read_text(encoding="utf-8"))["planes"]
+        gaps += [f"{p['plane']}-plane" for p in planes if p.get("status") in ("gap", "partial")]
         if gaps:
             from scripts.proposal_backlog import Proposal, propose
             for g in gaps:
                 propose(Proposal(title=f"agnostic adapter gap: add a {g} port + adapters + drop-in test", kind="opportunity",
-                                 rationale="docs/architecture/agnostic-adapters.md — components must stay swappable for future providers"))
+                                 rationale="docs/architecture/agnostic-adapters.md + tool_planes.json — every tool category needs an agnostic plane the supervisor selects from"))
             filed = len(gaps)
     except Exception:  # noqa: BLE001
         pass
-    ok = dropin and audit
+    ok = dropin and audit and tax
     return {"summary": f"adapters: drop-in {'green' if dropin else 'RED'} + coverage {'green' if audit else 'RED'}; "
                        f"{len(gaps)} port gap(s){' filed' if filed else ''}",
             "signal": "gates_red" if not ok else "ok", "gaps": gaps}

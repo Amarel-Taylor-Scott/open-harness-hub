@@ -1,0 +1,94 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-22",
+  "principle": "Capabilities form a HIERARCHY: domain → capability → sub-capability (leaf). A leaf is what someone actually asks for ('extract a land lease', 'classify tickets', 'rerank results'); when it maps to a tunable-task method grid (architecture/tunable_task_catalog.json) it is RUNNABLE today; otherwise it is a CANDIDATE (a real unbounded/inefficient AI use we can build a grid for next). Each leaf draws on one or more TOOL PLANES (architecture/tool_planes.json) — agnostic registries of many pluggable tools the supervisor selects from to build the cheapest capability. New leaves are sourced by the discovery flywheels (mining repos/products/startups that use LLMs). serves_truth=false.",
+  "serves_truth": false,
+  "leaf_status": {"mapped": "has a tunable-task method grid (runnable)", "candidate": "a real AI use; grid not built yet (discovery/next)"},
+  "domains": [
+    {"domain": "document_and_data", "name": "Document & data processing", "capabilities": [
+      {"capability": "extraction", "name": "Extract structured data", "sub": [
+        {"id": "doc-schema-extract", "name": "PDF/scan/email → schema", "task_id": "document-schema-extraction", "status": "mapped", "tool_planes": ["ocr", "llm"]},
+        {"id": "key-value-extract", "name": "key-value / form fields", "task_id": "slot-filling", "status": "mapped", "tool_planes": ["ocr", "llm"]},
+        {"id": "table-extract", "name": "table extraction", "task_id": null, "status": "candidate", "tool_planes": ["ocr", "llm"]},
+        {"id": "ner-relation-extract", "name": "entities & relations", "task_id": null, "status": "candidate", "tool_planes": ["llm"]}
+      ]},
+      {"capability": "classification", "name": "Label & classify", "sub": [
+        {"id": "text-classify", "name": "label text", "task_id": "text-classification", "status": "mapped", "tool_planes": ["llm"]},
+        {"id": "image-tag", "name": "classify/tag images", "task_id": "image-tagging", "status": "mapped", "tool_planes": ["vision", "llm"]},
+        {"id": "moderate", "name": "flag unsafe content", "task_id": "content-moderation", "status": "mapped", "tool_planes": ["llm"]},
+        {"id": "sentiment", "name": "sentiment / emotion", "task_id": null, "status": "candidate", "tool_planes": ["llm"]},
+        {"id": "language-detect", "name": "language detection", "task_id": null, "status": "candidate", "tool_planes": []}
+      ]},
+      {"capability": "reconciliation", "name": "Resolve & dedupe", "sub": [
+        {"id": "entity-resolve", "name": "records → canonical entities", "task_id": "entity-resolution", "status": "mapped", "tool_planes": ["embedding", "llm"]},
+        {"id": "near-dup", "name": "detect near-duplicates", "task_id": "dedup-near-duplicate", "status": "mapped", "tool_planes": ["embedding"]},
+        {"id": "schema-match", "name": "schema / column matching", "task_id": null, "status": "candidate", "tool_planes": ["embedding", "llm"]}
+      ]},
+      {"capability": "validation", "name": "Validate & repair data", "sub": [
+        {"id": "data-quality", "name": "data quality / anomaly", "task_id": null, "status": "candidate", "tool_planes": ["llm"]},
+        {"id": "schema-infer", "name": "schema inference", "task_id": null, "status": "candidate", "tool_planes": ["llm"]}
+      ]}
+    ]},
+    {"domain": "knowledge_and_retrieval", "name": "Knowledge & retrieval", "capabilities": [
+      {"capability": "qa", "name": "Answer questions", "sub": [
+        {"id": "grounded-qa", "name": "answer with citations", "task_id": "grounded-answer", "status": "mapped", "tool_planes": ["search", "vector_store", "reranker", "llm"]},
+        {"id": "query-rewrite", "name": "query rewrite / expand", "task_id": null, "status": "candidate", "tool_planes": ["llm"]},
+        {"id": "rerank", "name": "rerank retrieved results", "task_id": null, "status": "candidate", "tool_planes": ["reranker"]}
+      ]},
+      {"capability": "transform", "name": "Transform text", "sub": [
+        {"id": "summarize", "name": "summarize a document", "task_id": "summarization", "status": "mapped", "tool_planes": ["llm"]},
+        {"id": "translate", "name": "translate text", "task_id": "translation", "status": "mapped", "tool_planes": ["mt", "llm"]},
+        {"id": "nl-to-sql", "name": "NL → SQL", "task_id": "sql-generation", "status": "mapped", "tool_planes": ["llm"]}
+      ]}
+    ]},
+    {"domain": "agentic_orchestration", "name": "Agentic orchestration", "capabilities": [
+      {"capability": "routing", "name": "Route & select", "sub": [
+        {"id": "agent-route", "name": "route to another agent", "task_id": "agent-routing", "status": "mapped", "tool_planes": ["llm"]},
+        {"id": "inbox-triage", "name": "route/triage an inbox", "task_id": "email-triage", "status": "mapped", "tool_planes": ["llm"]},
+        {"id": "tool-select", "name": "pick which tool to call", "task_id": "tool-selection", "status": "mapped", "tool_planes": ["llm"]},
+        {"id": "intent-detect", "name": "detect user intent", "task_id": "intent-detection", "status": "mapped", "tool_planes": ["llm"]}
+      ]},
+      {"capability": "drafting", "name": "Draft & sync artifacts", "sub": [
+        {"id": "email-reply", "name": "draft an email reply", "task_id": "email-reply", "status": "mapped", "tool_planes": ["llm"]},
+        {"id": "jira-sync", "name": "create/update a Jira task", "task_id": "jira-task-sync", "status": "mapped", "tool_planes": ["llm"]},
+        {"id": "wiki-page", "name": "draft a Jira/Confluence page", "task_id": "wiki-page-draft", "status": "mapped", "tool_planes": ["llm"]}
+      ]},
+      {"capability": "decisioning", "name": "Decide & plan", "sub": [
+        {"id": "escalate", "name": "escalate to a human?", "task_id": "escalation-decision", "status": "mapped", "tool_planes": ["llm"]},
+        {"id": "plan-decompose", "name": "plan / decompose a task", "task_id": null, "status": "candidate", "tool_planes": ["llm"]},
+        {"id": "reflect-critique", "name": "self-reflect / critique", "task_id": null, "status": "candidate", "tool_planes": ["llm"]}
+      ]}
+    ]},
+    {"domain": "governance_and_verification", "name": "Governance & verification (feeds Baltor)", "capabilities": [
+      {"capability": "context_audit", "name": "Audit context", "sub": [
+        {"id": "find-inconsistency", "name": "find inconsistencies", "task_id": "inconsistency-detection", "status": "mapped", "tool_planes": ["llm"]},
+        {"id": "find-fragile", "name": "find fragile facts", "task_id": "fragile-fact-detection", "status": "mapped", "tool_planes": ["llm"]},
+        {"id": "claim-verify", "name": "verify a claim → source", "task_id": null, "status": "candidate", "tool_planes": ["search", "llm"]}
+      ]},
+      {"capability": "safety", "name": "Safety & privacy", "sub": [
+        {"id": "redact-pii", "name": "redact PII", "task_id": "pii-redaction", "status": "mapped", "tool_planes": ["ner", "llm"]},
+        {"id": "code-review", "name": "review a code change", "task_id": "code-review", "status": "mapped", "tool_planes": ["static_analysis", "llm"]}
+      ]}
+    ]},
+    {"domain": "media", "name": "Media & multimodal", "capabilities": [
+      {"capability": "speech", "name": "Speech", "sub": [
+        {"id": "transcribe", "name": "audio → text", "task_id": "transcription-asr", "status": "mapped", "tool_planes": ["asr"]},
+        {"id": "tts", "name": "text → speech", "task_id": null, "status": "candidate", "tool_planes": ["tts"]},
+        {"id": "diarize", "name": "speaker diarization", "task_id": null, "status": "candidate", "tool_planes": ["asr"]}
+      ]},
+      {"capability": "vision_gen", "name": "Image & video", "sub": [
+        {"id": "image-caption", "name": "caption an image", "task_id": null, "status": "candidate", "tool_planes": ["vision", "llm"]},
+        {"id": "image-gen", "name": "generate an image", "task_id": null, "status": "candidate", "tool_planes": ["image_gen"]},
+        {"id": "video-summary", "name": "summarize a video", "task_id": null, "status": "candidate", "tool_planes": ["asr", "vision", "llm"]}
+      ]}
+    ]},
+    {"domain": "analytics_and_prediction", "name": "Analytics & prediction (often misused with LLMs)", "capabilities": [
+      {"capability": "scoring", "name": "Score & rank", "sub": [
+        {"id": "recommend", "name": "recommendation / ranking", "task_id": null, "status": "candidate", "tool_planes": ["embedding", "reranker"]},
+        {"id": "lead-score", "name": "lead / risk scoring", "task_id": null, "status": "candidate", "tool_planes": ["llm"]},
+        {"id": "anomaly", "name": "anomaly / fraud detection", "task_id": null, "status": "candidate", "tool_planes": []},
+        {"id": "forecast", "name": "forecast / time-series", "task_id": null, "status": "candidate", "tool_planes": []}
+      ]}
+    ]}
+  ]
+}
