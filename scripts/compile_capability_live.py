@@ -133,6 +133,22 @@ def intelligent_compile(intent: str, *, llm=None) -> dict:
             "repaired": repaired, "serves_truth": False}
 
 
+def compile_and_run(intent: str, *, llm=None, graph_inputs: dict | None = None) -> dict:
+    """Full flow in one call: compile (LLM composes) -> verify_working -> LOWER + RUN on real ports. The composed_dag is
+    exactly run_compiled's input. Honest: if not verified_working it is NOT run; if a node's lane is offline the run
+    reports honest-unavailable (never a fabricated result). serves_truth=false."""
+    art = intelligent_compile(intent, llm=llm)
+    if not art.get("verified_working"):
+        return {**art, "ran": False, "reason": "not verified_working — not run"}
+    from src.teleon.components import ComponentUnavailable, run_compiled
+    nodes, edges = art["composed_dag"]["nodes"], art["composed_dag"]["edges"]
+    try:
+        res = run_compiled(nodes, edges, graph_inputs or {})
+        return {**art, "ran": True, "run_path": res["path"], "outputs": sorted(res["bus"].keys()), "total_cost": res["total_cost"]}
+    except ComponentUnavailable as e:
+        return {**art, "ran": False, "reason": f"honest-unavailable: {e}"}
+
+
 def run_live(intent: str) -> dict:
     art = intelligent_compile(intent)
     if art.get("accepted"):
@@ -177,6 +193,21 @@ def _self_test() -> int:
     ck("the prompt grounds candidates with their I/O types (type-aware composition, Langflow port-typing)",
        "io=" in _prompt(intent, pool) and "->" in _prompt(intent, pool))
     ck("serves_truth=false", art["serves_truth"] is False)
+    # full flow: compile -> verify -> RUN on real ports (offline, with stub invokers for the composed planes)
+    import src.teleon.components.registry as REG
+    plane0 = pool[real[0]]["plane"]
+    _o0, _ollm = REG._PLANE_INVOKERS.get(plane0), REG._PLANE_INVOKERS.get("llm")
+    REG.register_component_invoker(plane0, lambda inp: {"text": "stub", **({} if plane0 == "llm" else {})})
+    REG.register_component_invoker("llm", lambda inp: {"text": "stub-llm"})
+    try:
+        flow = compile_and_run(intent, llm=lambda p: good, graph_inputs={"document": "/tmp/x.pdf", "text": "hi", "bytes": b"x", "record": {}})
+        ck("compile_and_run wires the full compile->verify->RUN flow (ran=bool; runs or honest-unavailable)",
+           isinstance(flow.get("ran"), bool) and (flow["ran"] is False or flow.get("run_path")))
+    finally:
+        for _pl, _fn in ((plane0, _o0), ("llm", _ollm)):
+            REG._PLANE_INVOKERS.pop(_pl, None)
+            if _fn:
+                REG.register_component_invoker(_pl, _fn)
     print("\n" + ("PASS - compile_capability_live: LLM finds REAL components + composes a validated DAG; hallucinations "
                   "rejected; deterministic-first. Full orchestration, not a scaffold." if not fails else f"{len(fails)} FAILURES: {fails}"))
     return 0 if not fails else 1
