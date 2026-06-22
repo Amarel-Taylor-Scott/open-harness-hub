@@ -19,6 +19,7 @@ from pathlib import Path
 from src.teleon.synthesis import component_search as CS
 from src.teleon.synthesis import intent_to_dag as I
 from src.teleon.synthesis.io_contracts import edge_compatible, plane_io
+from src.teleon.synthesis.dag_contract import verify_buildable_dag
 
 REPO = Path(__file__).resolve().parents[1]
 RECEIPT = REPO / "data" / "dev-intel" / "live-compile-smoke.json"
@@ -122,10 +123,14 @@ def intelligent_compile(intent: str, *, llm=None) -> dict:
     if v is None:
         return {"intent": intent, "live": True, "accepted": False, "reason": "no parseable DAG after repair retry",
                 "repaired": repaired, "pool_size": len(pool), "serves_truth": False}
+    # stricter tier above 'accepted': prove the composed DAG is a VERIFIED WORKING build (type-compatible edges + every
+    # input satisfied + a terminal output + a real-executor dry-run), not merely acyclic + hallucination-free.
+    build = verify_buildable_dag(v["nodes"], v["edges"])
     return {"intent": intent, "capability": I.outline(intent).get("capability"), "live": True, "pool_size": len(pool),
             "composed_dag": {"nodes": v["nodes"], "edges": v["edges"]}, "deterministic_ratio": v["deterministic_ratio"],
             "hallucinated_rejected": v["hallucinated"], "acyclic": v["acyclic"], "type_warnings": v.get("type_warnings"),
-            "accepted": v["accepted"], "repaired": repaired, "serves_truth": False}
+            "accepted": v["accepted"], "verified_working": build["verified_working"], "build_verdict": build,
+            "repaired": repaired, "serves_truth": False}
 
 
 def run_live(intent: str) -> dict:
@@ -167,6 +172,8 @@ def _self_test() -> int:
     ck("type-aware edge check: ocr(text)->field_parsing(text) compatible; tts(audio)->field_parsing(text) NOT",
        edge_compatible("ocr", "field_parsing") and not edge_compatible("tts", "field_parsing"))
     ck("compiler surfaces type_warnings (a producer output no consumer input accepts)", "type_warnings" in art)
+    ck("compiler reports a stricter VERIFIED-WORKING build verdict (type-compatible + satisfiable + dry-run)",
+       isinstance(art.get("verified_working"), bool) and "build_verdict" in art)
     ck("the prompt grounds candidates with their I/O types (type-aware composition, Langflow port-typing)",
        "io=" in _prompt(intent, pool) and "->" in _prompt(intent, pool))
     ck("serves_truth=false", art["serves_truth"] is False)
