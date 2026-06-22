@@ -43,6 +43,18 @@ def _self_test() -> int:
     bad_hub = [c.id for c in comps if c.feeds_hub and c.feeds_hub not in roster]
     ck("every component feeds a real roster hub (recursive: research tools are themselves hub content)", not bad_hub, str(bad_hub))
 
+    # license governance: a COPYLEFT (AGPL/GPL) candidate must be marked NOT vendorable (org-guardrail; technique-only)
+    import json as _json
+    raw = _json.loads((REPO / "architecture" / "research_component_catalog.json").read_text(encoding="utf-8"))["components"]
+    copyleft_vendorable = [c["id"] for c in raw
+                           if any(k in str(c.get("license", "")).upper() for k in ("AGPL", "GPL")) and c.get("vendorable") is True]
+    ck("copyleft research components are NOT marked vendorable (license discipline)", not copyleft_vendorable, str(copyleft_vendorable))
+    browse = [c for c in comps if c.tier == "browse"]
+    wired_cost = next((c.cost for c in browse if c.id == "llm_driven_browser"), None)
+    candidate_costs = [c.cost for c in browse if c.id != "llm_driven_browser"]
+    ck("multiple llm-driven browsers cataloged; candidates priced ABOVE the wired driver (descent still prefers it)",
+       len(browse) >= 4 and wired_cost == 5 and all(cc > wired_cost for cc in candidate_costs))
+
     # guardrails: login-walled refused, normal allowed
     ck("login-walled host is REFUSED (facebook) — use owner --ingest instead", host_allowed("https://www.facebook.com/x", g)[0] is False)
     ck("a normal host is allowed (api.github.com)", host_allowed("https://api.github.com/repos", g)[0] is True)
