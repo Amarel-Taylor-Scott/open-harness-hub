@@ -20,6 +20,7 @@ from src.teleon.synthesis import component_search as CS
 from src.teleon.synthesis import intent_to_dag as I
 from src.teleon.synthesis.io_contracts import edge_compatible, plane_io
 from src.teleon.synthesis.dag_contract import verify_buildable_dag
+from src.teleon.economics import simulator as SIM
 
 REPO = Path(__file__).resolve().parents[1]
 RECEIPT = REPO / "data" / "dev-intel" / "live-compile-smoke.json"
@@ -126,11 +127,14 @@ def intelligent_compile(intent: str, *, llm=None) -> dict:
     # stricter tier above 'accepted': prove the composed DAG is a VERIFIED WORKING build (type-compatible edges + every
     # input satisfied + a terminal output + a real-executor dry-run), not merely acyclic + hallucination-free.
     build = verify_buildable_dag(v["nodes"], v["edges"])
+    # SIMULATE (System 12): estimate the composed DAG's economics from the live economic graph WITHOUT executing — cost
+    # is additive, latency is the critical path; zero/unknown where a component has no observed economics yet (honest).
+    simulated = SIM.simulate_dag(v["nodes"], v["edges"])
     return {"intent": intent, "capability": I.outline(intent).get("capability"), "live": True, "pool_size": len(pool),
             "composed_dag": {"nodes": v["nodes"], "edges": v["edges"]}, "deterministic_ratio": v["deterministic_ratio"],
             "hallucinated_rejected": v["hallucinated"], "acyclic": v["acyclic"], "type_warnings": v.get("type_warnings"),
             "accepted": v["accepted"], "verified_working": build["verified_working"], "build_verdict": build,
-            "repaired": repaired, "serves_truth": False}
+            "simulated": simulated, "repaired": repaired, "serves_truth": False}
 
 
 def compile_and_run(intent: str, *, llm=None, graph_inputs: dict | None = None) -> dict:
@@ -190,6 +194,8 @@ def _self_test() -> int:
     ck("compiler surfaces type_warnings (a producer output no consumer input accepts)", "type_warnings" in art)
     ck("compiler reports a stricter VERIFIED-WORKING build verdict (type-compatible + satisfiable + dry-run)",
        isinstance(art.get("verified_working"), bool) and "build_verdict" in art)
+    ck("compiler attaches a SIMULATED economic estimate over the composed DAG (System 12)",
+       "simulated" in art and art["simulated"]["n_nodes"] == len(art["composed_dag"]["nodes"]))
     ck("the prompt grounds candidates with their I/O types (type-aware composition, Langflow port-typing)",
        "io=" in _prompt(intent, pool) and "->" in _prompt(intent, pool))
     ck("serves_truth=false", art["serves_truth"] is False)

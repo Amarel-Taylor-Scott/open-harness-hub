@@ -873,6 +873,7 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_dag_contract.py", "check_dag_contract"),
     ("scripts/check_component_standardization.py", "check_component_standardization"),
     ("scripts/check_economic_layer.py", "check_economic_layer"),
+    ("scripts/check_simulator.py", "check_simulator"),
     ("scripts/compile_capability_live.py", "compile_capability_live"),
     ("scripts/harvest_tools.py", "harvest_tools"),
     ("scripts/check_external_api_registry.py", "check_external_api_registry"),

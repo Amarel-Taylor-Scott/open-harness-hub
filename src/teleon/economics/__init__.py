@@ -5,9 +5,10 @@
 - economic_graph    : the JOIN — capability/model → providers → endpoints → live economics (one traversable graph).
 - cost_model        : System 21 — the ONE multi-objective cost function (reuses the user-weighted PreferenceProfile).
 - routing_engine    : System 22 — cheapest viable route, secondary-provider arbitrage, reroute-on-change (BGP for compute).
+- simulator         : System 12 — estimate a candidate DAG's cost/latency/quality WITHOUT executing (beam-search ranking).
 
 Import submodules directly (e.g. `from src.teleon.economics import routing_engine`); this package __init__ stays minimal
 to avoid import-ordering cycles. serves_truth=false throughout: this layer prices/routes computation; truth is Baltor's.
 """
 
-__all__ = ["observation_store", "provider_intel", "economic_graph", "cost_model", "routing_engine"]
+__all__ = ["observation_store", "provider_intel", "economic_graph", "cost_model", "routing_engine", "simulator"]
