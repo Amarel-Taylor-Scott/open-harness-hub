@@ -28,6 +28,42 @@ def _strategy() -> dict:
         return {}
 
 
+#: legacy portfolio hub site id -> roster hub id (the convergence map).
+_PORTFOLIO_HUB_MAP = {"opencontexthub": "OpenContextHub", "openskillshub": "OpenSkillsHub",
+                      "opentoolshub": "OpenToolsHub", "openharnesshub": "OpenHarnessHub"}
+
+
+def portfolio_hub_section(portfolio_id: str):
+    """The ONE shared operational summary for a legacy portfolio hub page — computed from the SAME registries the 22
+    standardized hub pages use (hub_specs + strategy + settings). The convergence: the portfolio hub page's operational
+    content is single-sourced with build_hub_sites and can't drift. Returns (title, plain-text body) or None."""
+    rid = _PORTFOLIO_HUB_MAP.get(portfolio_id)
+    if not rid:
+        return None
+    try:
+        from src.openharnesshub.hub_engine import hub_specs
+        from src.openharnesshub.hub_settings import load_settings
+        spec = next((s for s in hub_specs() if s.hub_id == rid), None)
+        if not spec:
+            return None
+        strat = _strategy().get(rid, {})
+        st = load_settings(rid)
+        srcs = []
+        for k, v in (strat.get("sources") or {}).items():
+            srcs += [f"{k}:{x}" for x in (v if isinstance(v, list) else [v])]
+        gen = strat.get("generator") or "—"
+        n = len(hub_specs())
+        body = (f"Rendered by the same standardized hub engine as all {n} Open*Hubs (one template, no duplicate). "
+                f"Stores {spec.component_kind}. Populated by three governed channels: discover (public sources: "
+                f"{', '.join(srcs[:4]) or 'curated'}), generate ({gen}), and intake (owner OKF/links/text). "
+                f"Bar to serve: {strat.get('verify_bar', 'verified + named + sourced')}. Served only after the verify "
+                f"gate — discovery is not trust (serves_truth=false). Consumed by {spec.consumed_by or 'Teleon/Baltor'}; "
+                f"cadence {st.cadence} cycles. Users keep their own versioned components; opt-in contribute promotes to global.")
+        return (f"How {rid} is populated & governed", body)
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def render_all(out_dir: Path = SITE_DIR, store=None) -> list[tuple[str, str]]:
     """Render every roster hub. Returns [(hub_id, html)]; writes <slug>/index.html + an index page."""
     from src.openharnesshub.component_store import ComponentStore

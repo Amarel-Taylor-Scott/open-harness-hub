@@ -383,9 +383,17 @@ def render_site(site_id: str) -> str:
     cta2_label, cta2_href = s["cta_secondary"]
     cta3 = s.get("cta_tertiary")  # optional 3rd CTA (a relative page link, not an in-page anchor)
     cta3_html = f'\n    <a class="btn secondary" href="{_esc(cta3[1])}">{_esc(cta3[0])}</a>' if cta3 else ""
+    sections = list(s["sections"])
+    try:  # CONVERGENCE: a hub site's operational content is single-sourced from build_hub_sites (the 22-hub engine)
+        from scripts.build_hub_sites import portfolio_hub_section
+        _hub_sec = portfolio_hub_section(site_id)
+        if _hub_sec:
+            sections.append(_hub_sec)
+    except Exception:  # noqa: BLE001
+        pass
     sections_html = "".join(
         f'<section id="{_esc(h.lower().split(" ")[0])}"><h2>{_esc(h)}</h2>'
-        f'<p>{_esc(b)}</p></section>' for h, b in s["sections"])
+        f'<p>{_esc(b)}</p></section>' for h, b in sections)
     css = SHARED_CSS.replace("__ACCENT__", s["accent"])
     footer_links = " · ".join(f'<a href="../{t}/index.html">{_esc(SITES[t]["title"])}</a>' for t in SITE_ORDER)
     return f"""<!doctype html>
