@@ -63,6 +63,17 @@ def _self_test() -> int:
     ck("router reroutes to the cheaper route when economics shift (signals recompile)", rr["changed"] is True and rr["new"] == "r_cheap")
     arb = RE.arbitrage(a_node)
     ck("arbitrage ranks the provider set cheapest-first + picks one", isinstance(arb["ranked"], list) and arb["chosen"] is not None)
+    # reliability is FIRST-CLASS (OpenRouter): skip failing routes; load-balance survivors by reliability/price^2
+    h_cheap = {"resource_id": "rel_cheap", "economics": {"cost": 0.001, "availability": 1.0, "success_rate": 1.0}}
+    h_pricey = {"resource_id": "rel_pricey", "economics": {"cost": 0.010, "availability": 1.0, "success_rate": 1.0}}
+    failing = {"resource_id": "rel_fail", "economics": {"cost": 0.0005, "availability": 0.3, "success_rate": 0.4}}  # cheapest but FAILING
+    ck("reliability = availability*success", abs(RE.reliability(failing) - 0.12) < 1e-9)
+    viable = RE.viable_routes([h_cheap, h_pricey, failing], min_reliability=0.5)
+    ck("skip recently-failing routes (the cheapest-but-failing one is dropped, not just priced in)",
+       {r["resource_id"] for r in viable} == {"rel_cheap", "rel_pricey"})
+    w = RE.balance_weights([h_cheap, h_pricey], min_reliability=0.5)
+    ck("load balanced by inverse-square price (cheaper healthy survivor gets more, but pricier still gets some)",
+       w["rel_cheap"] > w["rel_pricey"] > 0)
 
     # 5. provider_intel: telemetry write-back ingests; crawl is HONESTLY offline (no fabricated prices)
     rid2 = f"test.measured.{uuid.uuid4().hex[:10]}"
