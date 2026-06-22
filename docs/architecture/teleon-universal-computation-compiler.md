@@ -10,6 +10,14 @@ intelligence is unnecessary.** Teleon's job is to *remove unnecessary intelligen
 down to the cheapest deterministic path that provably works, and call a model only for the irreducible residual. That is
 exactly the **descent** (`src/teleon/evolution/descent.py`): make it work, then make it efficient.
 
+**Scale is the goal, not a constraint — and not something to hedge.** The target is to be the routing/compilation layer
+that *every* agent goes through to get computation done: **billions, then trillions, of components**, and the default
+substrate for autonomous work. If agents route to us, a data flywheel takes over — more agents → more traffic → better
+measured metadata → better routing → more agents — and that flywheel at internet scale is the **Google-of-computation**
+position. Bigger than any single product. Every system below is engineered to *reach and operate at that scale*; nothing
+here caps it. The "pruner" architecture and the interface/implementation split that follow are precisely *how* you make
+billions-to-trillions of components searchable, composable, and safe — they are the scaling mechanism, not a ceiling.
+
 ---
 
 ## The central problem — and why every layer is a *pruner*
@@ -56,17 +64,23 @@ canonicalization, sandboxed discovery).
 
 ---
 
-## Six refinements — where the vision needs correcting (the valuable part)
-1. **Not 10M capability *classes* — a bounded ontology of capabilities + millions of *implementations*.** A capability is
-   an **interface** (`extract_text_from_image: image → structured_text`); a component is an **implementation** of it
-   (paddleocr, tesseract, a vision-LLM). We already split this (`capability_graph.py`: a capability → its evolving
-   *runners*). Conflating them makes retrieval, fallback, and learning impossible. Target: **~10³–10⁴ capabilities**,
-   **10⁸ components**. The capability is the type; the component is the value.
-2. **The registry is *not* the moat — measured + learned + governed metadata is.** Anyone can crawl PyPI/npm/HF; raw
-   component count is commoditized within months. The defensible asset is (a) **measured** cost/latency/quality/failure
-   from your own execution telemetry, (b) **learned** which compositions actually win, (c) **governed** provenance +
-   trust (this is Baltor). A row that says "paddleocr exists" is free; a row that says "paddleocr costs $0.002, p95 210ms,
-   0.94 quality on *your* traffic, fails on handwriting, and is dominated by surya for invoices" is the moat.
+## Six refinements — how to make internet-scale actually work (scale is the goal)
+1. **A bounded capability ontology is what lets the implementations be UNBOUNDED.** A capability is an **interface**
+   (`extract_text_from_image: image → structured_text`); a component is an **implementation** of it (paddleocr, tesseract,
+   a vision-LLM, and a million others). We already split this (`capability_graph.py`: a capability → its evolving
+   *runners*). This is **not a cap on scale — it is the index that makes billions-to-trillions of components searchable**,
+   exactly as a bounded query grammar makes Google's billions of pages searchable. So: capabilities = the interface layer
+   (a curated **ontology**, ~10³–10⁴); components = the implementations (**unbounded — 10⁸, 10¹², and up**). The *more*
+   implementations per capability, the better — more fallbacks, more competition, more data for the flywheel. The capability
+   is the type; the component is the value; the value space is meant to be effectively infinite.
+2. **At this scale the registry IS the moat — and it compounds the bigger it gets.** Being the substrate every agent
+   routes through is a **network-effect + data-flywheel** moat, like Google's index: the components themselves may be
+   public, but the **scale**, the **measured** metadata harvested from all the traffic (cost/latency/quality/failure on
+   real workloads), the **learned** winning compositions, and the **governed** provenance (Baltor) all compound with every
+   request — more agents → more traffic → better metadata → better routing → more agents. "paddleocr exists" is free to
+   anyone; *"across billions of runs, for invoices, paddleocr is dominated by surya at $0.002/210ms/0.94"* exists only here,
+   and only because of the scale. Scale is not separate from the moat — **scale is what makes the flywheel turn**, and the
+   flywheel is the moat.
 3. **Don't benchmark every candidate — *simulate* first.** Benchmarking on a 500-doc set per candidate makes the
    benchmark engine the bottleneck. Add an **analytic simulator** that scores a candidate DAG's cost/latency/quality from
    component metadata *without executing it*, prune to the top-k, then benchmark only those. Simulation is what makes the
