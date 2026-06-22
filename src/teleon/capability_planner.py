@@ -80,6 +80,7 @@ _TASK_KEYWORDS: list = [
     ("image-tagging", ["classify an image", "classify images", "tag an image", "tag images", "image classif", "label an image", "image label", "tag photos"]),
     ("pii-redaction", ["redact", "pii", "scrub personal", "mask personal", "de-identif", "remove personal information", "mask pii"]),
     ("fragile-fact-detection", ["fragile fact", "stale fact", "facts that will change", "facts likely to", "volatile fact", "unsourced claim", "facts that go stale", "find fragile"]),
+    ("stance-contradiction-detection", ["stance", "position change", "changed position", "changing position", "flip-flop", "flip flop", "public statement", "public statements", "track statements", "statements over time", "conflicting statements", "what they said about", "said in the past", "changed their tune", "walk back"]),
     ("inconsistency-detection", ["inconsisten", "contradict", "conflicting fact", "conflicting claim", "find conflicts", "discrepanc", "reconcile conflicts", "mismatched facts"]),
     ("email-reply", ["reply to", "draft a reply", "draft an email", "email reply", "respond to the email", "write a reply", "answer the email", "respond to this message"]),
     ("agent-routing", ["to another agent", "to an agent", "to a specialist", "to the right agent", "to an expert", "another agent", "hand off to", "handoff", "delegate to", "which agent", "assign to an agent", "route to an agent"]),

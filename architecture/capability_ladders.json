@@ -87,6 +87,13 @@
       {"rung": 2, "tier": "enrichment_api", "method": "external contact/firmographic API", "deterministic": true, "cost_rank": 2, "status": "candidate", "external_apis": ["company_enrichment"], "planes": ["entity_enrichment"]},
       {"rung": 3, "tier": "search_browser", "method": "search + web_browsing ladder", "deterministic": true, "cost_rank": 3, "status": "wired", "tools": ["searxng", "playwright"], "planes": ["search", "browser"]},
       {"rung": 4, "tier": "llm_supervise", "method": "LLM disambiguate + confirm freshness", "deterministic": false, "cost_rank": 4, "status": "wired", "planes": ["llm"]}
+    ]},
+    {"capability": "public_statement_tracking", "plane": "stance_nli", "governance": "BALTOR truth-domain. PUBLIC statements only; every statement carries provenance (source URL + date + speaker); a position change is a CDC event on a timeline; a flagged contradiction is a CANDIDATE (verify the quote is real + correctly attributed + in-context BEFORE asserting — discovery≠trust); neutral SOURCED documentation only (quotes + citations, never editorializing/defamation); no private PII; honor source ToS; honest-MISSING when not found.", "rungs": [
+      {"rung": 0, "tier": "gather", "method": "find public statements (search + news + governed social) via the search/social ladders", "deterministic": true, "cost_rank": 0, "status": "wired", "tools": ["searxng", "trafilatura"], "external_apis": ["serp_search_api", "x_posts_public", "fb_page_scrape"], "planes": ["search", "social_scrape"]},
+      {"rung": 1, "tier": "extract_statements", "method": "extract statement units: speaker + quote + date + claim (deterministic quote/attribution + dates)", "deterministic": true, "cost_rank": 1, "status": "wired", "tools": ["spacy", "dateparser", "commonregex"], "planes": ["ner", "field_parsing"]},
+      {"rung": 2, "tier": "cluster_claims", "method": "group statements by the same underlying claim/topic", "deterministic": true, "cost_rank": 2, "status": "wired", "tools": ["sentence_transformers", "rapidfuzz"], "planes": ["embedding", "fuzzy_matching"]},
+      {"rung": 3, "tier": "detect_contradiction", "method": "deterministic numeric/temporal/negation flip (diff) + NLI entailment-contradiction-neutral between statements", "deterministic": true, "cost_rank": 3, "status": "wired", "tools": ["deepdiff", "roberta_mnli", "deberta_mnli"], "planes": ["diff_compare", "stance_nli"]},
+      {"rung": 4, "tier": "llm_adjudicate", "method": "LLM ONLY for nuanced/context-dependent pairs the NLI flags — proposes a CANDIDATE conflict, never asserts; Baltor verify gate confirms before publish", "deterministic": false, "cost_rank": 4, "status": "wired", "planes": ["llm"]}
     ]}
   ]
 }

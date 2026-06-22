@@ -210,6 +210,41 @@
       ]
     },
     {
+      "task_id": "stance-contradiction-detection",
+      "name": "do two public statements contradict / has a position changed (NLI)",
+      "requirement_metric": "contradiction precision @ provenance",
+      "deterministic_possible": false,
+      "objective": "cheapest_that_meets_requirement",
+      "tiers": [
+        {
+          "tier": "rule-flip",
+          "methods": "deterministic negation / numeric / temporal flip detection (spaCy dependency + rules) — catches polarity + number/date reversals",
+          "deterministic": true,
+          "cost_tier": "free",
+          "cost_rank": 0,
+          "requires_keys": []
+        },
+        {
+          "tier": "nli-model",
+          "methods": "NLI cross-encoder (roberta/deberta/bart-mnli) -> entailment | contradiction | neutral between the two statements (deterministic given weights)",
+          "deterministic": true,
+          "cost_tier": "low",
+          "cost_rank": 1,
+          "requires_keys": []
+        },
+        {
+          "tier": "llm-adjudicate",
+          "methods": "LLM ONLY for nuanced/context-dependent pairs the NLI model flags low-confidence (sarcasm, scope, time-conditioned) — proposes, never asserts; a contradiction stays a CANDIDATE until verified",
+          "deterministic": false,
+          "cost_tier": "mid",
+          "cost_rank": 2,
+          "requires_keys": [
+            "LLM_API_KEY"
+          ]
+        }
+      ]
+    },
+    {
       "task_id": "translation",
       "name": "translate text",
       "requirement_metric": "BLEU / adequacy",

@@ -66,6 +66,26 @@
       },
       "heuristics": ["big_doc_to_segment", "structured_parse_to_parser"],
       "governance": {"truth_owner": "baltor", "efficiency_owner": "teleon", "serves_truth": true, "provenance": "each field -> source page/cell; arithmetic cross-check recorded", "freshness_cdc": "point-in-time; re-extract on new invoice", "honest_missing": "unparseable fields -> null + review ticket, never guessed", "schema_validation": "Invoice (invoice_number, vendor, line_items[], total) via Pydantic + Pandera"}
+    },
+    {
+      "id": "track_public_statements_conflicts",
+      "request": "find and document Senator Doe public statements on the carbon tax and flag any changed positions or conflicting statements over time",
+      "capability_type": "task:stance-contradiction-detection",
+      "loop": "research",
+      "archetype": "search_research",
+      "unbounded": {"approach": "dump every speech/article/post into a frontier LLM and ask 'did they contradict themselves?' — expensive, unverifiable, no provenance", "est_cost_usd": 0.55},
+      "bounded": {
+        "est_cost_usd": 0.05,
+        "steps": [
+          {"step": "gather public statements (bounded)", "plane": "search", "registry_tools": ["searxng", "trafilatura"], "methods": "search + news + governed public social; cap sources; each kept with source URL + date", "deterministic": true, "llm_role": "none"},
+          {"step": "extract statement units", "plane": "ner", "registry_tools": ["spacy", "dateparser"], "methods": "speaker + quote + date + claim (deterministic quote/attribution + date parse)", "deterministic": true, "llm_role": "none"},
+          {"step": "cluster by claim/topic", "plane": "embedding", "registry_tools": ["sentence_transformers", "rapidfuzz"], "methods": "group statements about the same underlying claim", "deterministic": true, "llm_role": "none"},
+          {"step": "detect contradiction / position change", "plane": "stance_nli", "registry_tools": ["deepdiff", "roberta_mnli"], "methods": "deterministic numeric/temporal/negation flip (diff) + NLI entailment-contradiction-neutral between paired statements", "deterministic": true, "llm_role": "none"},
+          {"step": "adjudicate nuanced pairs only", "plane": "llm", "registry_tools": [], "methods": "LLM ONLY for low-confidence/context-dependent pairs; proposes a CANDIDATE conflict, never asserts", "deterministic": false, "llm_role": "supervisor"}
+        ]
+      },
+      "heuristics": ["unbounded_search_to_bounded", "simple_routing_to_small_model"],
+      "governance": {"truth_owner": "baltor", "efficiency_owner": "teleon", "serves_truth": true, "provenance": "every statement -> source URL + date + speaker; every flagged conflict cites both statements", "freshness_cdc": "a position change is a CDC event on the speaker/claim timeline; re-monitor on schedule", "honest_missing": "no statement found -> MISSING (never invented); a flagged contradiction stays a CANDIDATE until the quote is verified real + correctly attributed + in-context", "schema_validation": "StatementRecord (speaker, claim, stance, quote, source_url, date) + Contradiction (a, b, type, verdict) — PUBLIC statements only, neutral sourced documentation, no private PII"}
     }
   ]
 }
