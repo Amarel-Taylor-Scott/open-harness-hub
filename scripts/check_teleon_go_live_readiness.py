@@ -64,6 +64,16 @@ def _live_llm_verified() -> bool:
         return False
 
 
+def _live_eval_verified() -> bool:
+    """Derived: a real per-vertical ground-truth eval was scored (measured, not representative)."""
+    import json
+    p = _REPO / "data" / "dev-intel" / "live-eval-smoke.json"
+    try:
+        return bool(json.loads(p.read_text(encoding="utf-8")).get("verified"))
+    except Exception:  # noqa: BLE001
+        return False
+
+
 def _live_distillation_verified() -> bool:
     """Derived: a real model GENERATED a deterministic rule that passed held-out validation (lossless distillation)."""
     import json
@@ -93,11 +103,12 @@ def _seams() -> list[dict]:
     _llm_live = _live_llm_verified()
     _cdc_live = _live_cdc_verified()
     _distill_live = _live_distillation_verified()
+    _eval_live = _live_eval_verified()
     return [
         {"seam": "live LLM inference", "owner_action": ("primary Ollama/Gemma lane LIVE-verified (data/dev-intel/live-llm-smoke.json); other lanes (Cloudflare/hosted) are key-gated add-ons" if _llm_live else "set provider keys + a live smoke per inference lane; today lanes degrade to provider_unavailable offline"), "sprint": "S1-live-adapters", "blocking": not _llm_live},
         {"seam": "live source fetch + CDC freshness", "owner_action": ("LIVE-verified: source_poller polls the real US Federal Register -> real CDC event (cdc_events) -> reheal holds stale out; scheduled polling = wire as a flywheel" if _cdc_live else "wire a real source poller -> freshness CDC 'changed' events -> self_healing reheal; today freshness uses passed-in values"), "sprint": "S1-live-adapters", "blocking": not _cdc_live},
         {"seam": "real distillation (LLM -> deterministic rule generation)", "owner_action": ("LIVE-verified: rule_generator had a live model GENERATE a deterministic rule, accepted only on held-out match (data/dev-intel/live-distillation-smoke.json); lossless (rejects keep the LLM)" if _distill_live else "wire the determinism factory to a model to GENERATE the rule a fork represents (today forks are governed specs)"), "sprint": "S2-distill-live", "blocking": not _distill_live},
-        {"seam": "real per-vertical eval data", "owner_action": "ingest real benchmark datasets (RuleArena + vertical evals) so the A/B scorer is live, not representative", "sprint": "S2-distill-live", "blocking": True},
+        {"seam": "real per-vertical eval data", "owner_action": ("LIVE-verified: scripts/live_eval A/B'd the distilled rule vs the LLM vs REAL ground truth (data/eval/refund_policy_eval.json) -> measured, not representative; more verticals extend it" if _eval_live else "ingest real benchmark datasets (RuleArena + vertical evals) so the A/B scorer is live, not representative"), "sprint": "S2-distill-live", "blocking": not _eval_live},
         {"seam": "vetting workflow (the vetted_only producer)", "owner_action": "a human/eval vetting gate that sets vetted=true on a candidate; today the flag has no producer", "sprint": "S3-governance-live", "blocking": False},
         {"seam": "Postgres/pgvector load + live promotion boundary", "owner_action": "load staged candidates -> Postgres/pgvector; enforce candidate!=tenant-visible at the DB", "sprint": "S3-governance-live", "blocking": True},
         {"seam": "auth + tenancy (separate realms)", "owner_action": "wire the auth_kit per product + per-tenant isolation + API keys/service accounts", "sprint": "S4-auth-tenancy", "blocking": True},

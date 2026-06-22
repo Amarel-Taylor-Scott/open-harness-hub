@@ -1,0 +1,23 @@
+{
+  "vertical": "policy_adjudication",
+  "policy": "Refund is APPROVED iff amount_usd < 30 AND days_since_purchase < 30; otherwise DENIED. (The ground-truth labels below follow this stated policy deterministically — this is a real, auditable eval, not a baseline rigged to favor any method.)",
+  "label_values": ["approve", "deny"],
+  "serves_truth": false,
+  "cases": [
+    {"input": {"amount_usd": 10, "days_since_purchase": 5}, "label": "approve"},
+    {"input": {"amount_usd": 29, "days_since_purchase": 29}, "label": "approve"},
+    {"input": {"amount_usd": 0, "days_since_purchase": 0}, "label": "approve"},
+    {"input": {"amount_usd": 15, "days_since_purchase": 15}, "label": "approve"},
+    {"input": {"amount_usd": 5, "days_since_purchase": 28}, "label": "approve"},
+    {"input": {"amount_usd": 28, "days_since_purchase": 2}, "label": "approve"},
+    {"input": {"amount_usd": 30, "days_since_purchase": 5}, "label": "deny"},
+    {"input": {"amount_usd": 5, "days_since_purchase": 30}, "label": "deny"},
+    {"input": {"amount_usd": 50, "days_since_purchase": 50}, "label": "deny"},
+    {"input": {"amount_usd": 31, "days_since_purchase": 10}, "label": "deny"},
+    {"input": {"amount_usd": 10, "days_since_purchase": 45}, "label": "deny"},
+    {"input": {"amount_usd": 100, "days_since_purchase": 1}, "label": "deny"},
+    {"input": {"amount_usd": 29, "days_since_purchase": 31}, "label": "deny"},
+    {"input": {"amount_usd": 45, "days_since_purchase": 20}, "label": "deny"},
+    {"input": {"amount_usd": 200, "days_since_purchase": 200}, "label": "deny"}
+  ]
+}
