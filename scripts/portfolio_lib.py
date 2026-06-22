@@ -74,10 +74,11 @@ SITES: dict[str, dict] = {
         "accent": "#2563eb",
         "kind": "Holding company · portfolio",
         "category": "Holding company · portfolio · research · brand architecture",
-        "one_liner": "Infrastructure for governed, self-improving AI systems.",
+        "one_liner": "Build AI the efficient, appropriate way — made easy.",
         "audience": "Founders, investors, partners, and researchers evaluating the portfolio.",
-        "problem": "Governed, self-improving AI needs more than one product — it needs a coordinated runtime, a "
-                   "governed-context layer, and an open ecosystem, kept distinct yet aligned.",
+        "problem": "Most teams build AI the expensive, one-size-fits-all way — sending everything to the most "
+                   "expensive frontier model. The efficient, appropriate way needs a runtime, a trust engine, and an "
+                   "open ecosystem of building blocks, kept distinct yet aligned.",
         "use_case": "Understand how Teleon, Baltor, and OpenHarnessHub fit together and who owns what.",
         "what_it_is": ["A holding company coordinating a portfolio of governed-AI infrastructure.",
                        "The home of shared research, brand architecture, open standards, and IP coordination."],
@@ -89,14 +90,15 @@ SITES: dict[str, dict] = {
         "relationship": "OpenHarnessHub supplies reusable capability parts. Teleon runs and evolves capabilities. "
                         "Baltor governs the context they produce. AI Done Right coordinates the portfolio.",
         "sections": [
-            ("Portfolio thesis", "A model is only as good as the context and the runtime behind it. We build the "
-             "governed, self-improving infrastructure underneath — coordinated across three focused companies."),
-            ("Portfolio companies", "Teleon (the purpose-driven runtime), Baltor (governed context), and "
-             "OpenHarnessHub (the open capability ecosystem)."),
+            ("Portfolio thesis", "Write a capability in plain language; the system picks the right model, method, and "
+             "cost for each task — the efficient, appropriate way — instead of one expensive default. Coordinated "
+             "across three focused companies."),
+            ("Portfolio companies", "Teleon (the runtime that makes capabilities efficient), Baltor (the engine that "
+             "makes them trustworthy), and OpenHarnessHub (the open store of building blocks)."),
         ],
         "cta_primary": ("Explore the portfolio", "#portfolio"),
         "cta_secondary": ("Read the portfolio thesis", "#portfolio"),
-        "required_phrases": ["Infrastructure for governed, self-improving AI systems.", "Teleon", "Baltor",
+        "required_phrases": ["Build AI the efficient, appropriate way — made easy.", "Teleon", "Baltor",
                              "OpenHarnessHub", "portfolio", "OpenHarnessHub → Teleon → Baltor", "does not own"],
         "forbidden_identity": ["self-adaptive capabilities", "governed context", "open capability ecosystem"],
     },
