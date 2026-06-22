@@ -1,0 +1,24 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-22",
+  "principle": "Teleon is a COMPILER for cognitive work: it takes an unbounded brute-force agent (correctness first) and runs OPTIMIZATION PASSES that progressively distill expensive general reasoning into cheap, deterministic, bounded execution (efficiency next) — the descent. This file is the single source mapping the canonical passes to our real descent AXES (architecture/descent_method_catalog.json), the REGISTRY each draws replacement candidates from, the MODULE that implements it today, and an honest status. The descent brain (descent_attempt_store) records every pass applied so the compiler learns. serves_truth=false.",
+  "serves_truth": false,
+  "status_legend": {"have": "implemented + proof-gated", "partial": "mechanism exists; not yet an auto-discovered pass", "gap": "not built"},
+  "passes": [
+    {"pass": "context_minimization", "axis": "tokens_in", "registry": "context packs (OpenContextHub) + compressor", "module": "src/teleon/context/compressor.py", "status": "have", "note": "drop low-information tokens; reversible"},
+    {"pass": "retrieval_compression", "axis": "tokens_in", "registry": "research_component_catalog + vector/reranker planes", "module": null, "status": "partial", "note": "retrieve + rerank to top-k (reranker plane is a gap)"},
+    {"pass": "deterministic_replacement", "axis": "determinism", "registry": "descent_method_catalog + tool_planes", "module": "src/teleon/extraction/document_extraction_cascade.py", "status": "have", "note": "regex/parsers/APIs answer before the LLM"},
+    {"pass": "model_downgrading", "axis": "llm_usage", "registry": "model_index", "module": "src/teleon/evolution/substrate_selector.py", "status": "have", "note": "route to the cheapest capable model"},
+    {"pass": "state_compression", "axis": "tokens_in", "registry": "storage_tier_policy + compressor", "module": "src/teleon/context/compressor.py", "status": "partial", "note": "shrink the working-state footprint"},
+    {"pass": "parallelization", "axis": "latency", "registry": "pipeline_step_catalog (DAG)", "module": "src/teleon/dag", "status": "partial", "note": "the DAG can fan out; auto-parallel-discovery not yet"},
+    {"pass": "tool_specialization", "axis": "specialization", "registry": "tool_planes + research_component_catalog", "module": "src/openharnesshub/research_catalog.py", "status": "have", "note": "generic tool → the cheapest specialized plane tool"},
+    {"pass": "caching", "axis": "latency", "registry": "(memoization store)", "module": null, "status": "partial", "note": "compressor caches; a general memoization pass is a gap"},
+    {"pass": "boundary_detection", "axis": "safety", "registry": "org_guardrail_policy + planner stop conditions", "module": "src/teleon/capability_planner.py", "status": "have", "note": "max iters / budget / no-new-for-K / confidence floor — turn unbounded into bounded"},
+    {"pass": "reasoning_distillation", "axis": "determinism", "registry": "descent_method_catalog (llm_to_rule) + the determinism factory", "module": "src/teleon/evolution/catalog_descent.py", "status": "have", "note": "repeated reasoning → a deterministic rule (distill from VERIFIED outcomes; lossless)"}
+  ],
+  "engine_gaps": [
+    "intent_to_dag_compiler — plain English → a multi-node task GRAPH (we route to one capability + have a DAG; not full decomposition from English)",
+    "per_step_execution_telemetry — token/latency/failure/confidence PER node (the trace-collection layer; brain records descents, not per-step traces yet)",
+    "self_rewriting_workflow_graph — versioned v1→v6 workflow rewrite from the trace (we have versioned descent attempts, not a rewritten DAG)"
+  ]
+}
