@@ -69,16 +69,30 @@ def _fw_sweep() -> dict:
     return {"summary": f"swept a batch ({remaining} were remaining)", "signal": "ok"}
 
 
-def _fw_health() -> dict:
+def _run_one_health(c: str) -> bool:
+    try:
+        r = subprocess.run([sys.executable, f"scripts/{c}.py", "--self-test"], cwd=REPO,
+                           capture_output=True, text=True, timeout=180, env={**os.environ, "PYTHONPATH": "."})
+        return r.returncode == 0
+    except Exception:
+        return False
+
+
+def _health_verdict(run_fn, checks: list) -> tuple:
+    """Apply the retry policy: a failing check is retried ONCE before counting it red. A health gate must not false-RED on
+    a transient race (a check reading a file the sweep/hubs flywheel is mid-write) or a brief edit window — a false red
+    fires a wasteful logjam-fork. A genuinely-broken check fails both runs and stays red. Pure (run_fn injected) -> testable."""
     results = {}
-    for c in _HEALTH_CHECKS:
-        try:
-            r = subprocess.run([sys.executable, f"scripts/{c}.py", "--self-test"], cwd=REPO,
-                               capture_output=True, text=True, timeout=180, env={**os.environ, "PYTHONPATH": "."})
-            results[c] = (r.returncode == 0)
-        except Exception:
-            results[c] = False
-    failed = [c for c, ok in results.items() if not ok]
+    for c in checks:
+        ok = run_fn(c)
+        if not ok:
+            ok = run_fn(c)                  # one retry tolerates a concurrent-write race; a real failure persists
+        results[c] = ok
+    return results, [c for c, ok in results.items() if not ok]
+
+
+def _fw_health() -> dict:
+    results, failed = _health_verdict(_run_one_health, _HEALTH_CHECKS)
     return {"summary": f"{len(results) - len(failed)}/{len(results)} gates green" + (f"; RED: {failed}" if failed else ""),
             "signal": "gates_red" if failed else "ok", "failed": failed}
 
@@ -604,6 +618,15 @@ def _self_test() -> int:
     # logjam is STALL-TRIGGERED ONLY: a healthy, fully-overdue state never rotates into it
     s7 = {"cycle": 50, "last": {}, "errors": {}, "health": "ok"}
     ck("LOGJAM is stall-triggered only (never picked without a stall)", pick_flywheel(s7) != "logjam")
+    # HEALTH gate is RACE-TOLERANT: a check that fails once then passes (a transient concurrent-write / edit window) is
+    # NOT counted red -> no false logjam-fork; a check that always fails stays red (real breakage is never masked).
+    _transient = iter([False, True])
+    _, f_transient = _health_verdict(lambda c: next(_transient), ["t"])
+    ck("HEALTH retry tolerates a transient race (fail-then-pass -> green, no false logjam)", f_transient == [])
+    _, f_real = _health_verdict(lambda c: False, ["x"])
+    ck("HEALTH a genuinely-broken check stays RED after the retry (breakage never masked)", f_real == ["x"])
+    _, f_ok = _health_verdict(lambda c: True, ["a", "b"])
+    ck("HEALTH all-pass -> no red", f_ok == [])
     # state roundtrip + status heartbeat
     with tempfile.TemporaryDirectory() as d:
         global STATE, STATUS

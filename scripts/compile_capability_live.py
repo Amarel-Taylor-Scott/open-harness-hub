@@ -18,6 +18,7 @@ from pathlib import Path
 
 from src.teleon.synthesis import component_search as CS
 from src.teleon.synthesis import intent_to_dag as I
+from src.teleon.synthesis.io_contracts import edge_compatible
 
 REPO = Path(__file__).resolve().parents[1]
 RECEIPT = REPO / "data" / "dev-intel" / "live-compile-smoke.json"
@@ -75,8 +76,12 @@ def _validate(spec: dict, pool: dict) -> dict:
                     q.append(b)
     acyclic = len(order) == len(steps)
     det = sum(1 for n in nodes if n["deterministic"])
+    # type-aware edge check (Haystack/Langflow pre-runtime port typing): an edge whose producer output type no consumer
+    # input accepts is a WARNING (coverage is partial; we surface mismatches, we don't block on an un-typed plane).
+    plane_of = {n["step"]: n.get("plane") for n in nodes}
+    type_warnings = [[a, b] for a, b in edges if not edge_compatible(plane_of.get(a), plane_of.get(b))]
     return {"nodes": nodes, "edges": edges, "hallucinated": hallucinated, "acyclic": acyclic,
-            "deterministic_ratio": round(det / len(nodes), 3) if nodes else 0.0,
+            "deterministic_ratio": round(det / len(nodes), 3) if nodes else 0.0, "type_warnings": type_warnings,
             "accepted": bool(nodes) and acyclic and det >= 1}
 
 
@@ -112,8 +117,8 @@ def intelligent_compile(intent: str, *, llm=None) -> dict:
                 "repaired": repaired, "pool_size": len(pool), "serves_truth": False}
     return {"intent": intent, "capability": I.outline(intent).get("capability"), "live": True, "pool_size": len(pool),
             "composed_dag": {"nodes": v["nodes"], "edges": v["edges"]}, "deterministic_ratio": v["deterministic_ratio"],
-            "hallucinated_rejected": v["hallucinated"], "acyclic": v["acyclic"], "accepted": v["accepted"],
-            "repaired": repaired, "serves_truth": False}
+            "hallucinated_rejected": v["hallucinated"], "acyclic": v["acyclic"], "type_warnings": v.get("type_warnings"),
+            "accepted": v["accepted"], "repaired": repaired, "serves_truth": False}
 
 
 def run_live(intent: str) -> dict:
@@ -151,6 +156,10 @@ def _self_test() -> int:
     artb = intelligent_compile(intent, llm=lambda p: bad)
     ck("a hallucinated component is REJECTED (registry guardrail)", "totally_made_up_tool_xyz" in artb["hallucinated_rejected"] and not artb["accepted"])
     ck("the LLM cannot invent components — only real registry ones compose", all(n["component"] in pool for n in art["composed_dag"]["nodes"]))
+    # type-aware edge check (Haystack/Langflow pre-runtime port typing) — surfaced as warnings, grounded in plane_io_contracts
+    ck("type-aware edge check: ocr(text)->field_parsing(text) compatible; tts(audio)->field_parsing(text) NOT",
+       edge_compatible("ocr", "field_parsing") and not edge_compatible("tts", "field_parsing"))
+    ck("compiler surfaces type_warnings (a producer output no consumer input accepts)", "type_warnings" in art)
     ck("serves_truth=false", art["serves_truth"] is False)
     print("\n" + ("PASS - compile_capability_live: LLM finds REAL components + composes a validated DAG; hallucinations "
                   "rejected; deterministic-first. Full orchestration, not a scaffold." if not fails else f"{len(fails)} FAILURES: {fails}"))

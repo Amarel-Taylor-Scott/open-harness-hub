@@ -17,6 +17,8 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
+if str(REPO) not in sys.path:                       # self-bootstrap: work regardless of CWD/PYTHONPATH (a gate must not
+    sys.path.insert(0, str(REPO))                   # silently false-RED just because the caller forgot PYTHONPATH=.)
 from scripts.flywheel_proof_modules import PROOF_MODULES  # noqa: E402
 
 _TIMEOUT = int(os.environ.get("RUN_PROOFS_TIMEOUT", "150"))
