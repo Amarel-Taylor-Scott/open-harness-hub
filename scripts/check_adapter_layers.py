@@ -42,8 +42,8 @@ def _self_test() -> int:
     bad_gap = [L["layer"] for L in layers if L.get("status") == "gap" and L.get("port_module")]
     ck("every GAP layer is honest (no port_module) — not falsely claimed wired", not bad_gap, str(bad_gap))
     ck("the flagship layers are drop-in tested (llm + browser + ocr)", {"llm", "browser", "ocr_document_parse"} <= set(cov["drop_in_tested"]))
-    ck("remaining gaps are surfaced honestly (reranker/tts-stt — for the agent to wrap)",
-       "reranker" in cov["gaps"] and "tts_stt_generation" in cov["gaps"])
+    ck("reranker layer is now WIRED (loop adapter-gap closed with a real port)", "reranker" not in cov["gaps"])
+    ck("remaining gaps are surfaced honestly (e.g. tts-stt — for the agent to wrap)", "tts_stt_generation" in cov["gaps"])
     ck("status is one of wired|gap; serves_truth=false", all(L.get("status") in ("wired", "gap") for L in layers)
        and cov["serves_truth"] is False)
 
