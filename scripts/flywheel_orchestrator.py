@@ -277,26 +277,41 @@ def _fw_adapters() -> dict:
     with zero component change) + the adapter-layers coverage audit, and file any port GAP as a comfort-gated proposal
     (idempotent — deduped by title). The loop's mechanism for 'create wrappers for selectable components'."""
     dropin, audit = _green("check_agnostic_adapters"), _green("check_adapter_layers")
-    tax = _green("check_capability_taxonomy")
-    gaps, filed = [], 0
+    tax, reg_ok = _green("check_capability_taxonomy"), _green("check_tool_registry")
+    gaps, filed, n_tools, thin = [], 0, 0, []
+    _EXPAND_TARGET = 12  # candidate tools/plane to aim for on the way to "hundreds"; thinnest planes get a discovery nudge
     try:
         import json as _json
+        from collections import Counter as _Counter
         layers = _json.loads((REPO / "architecture" / "adapter_layers.json").read_text(encoding="utf-8"))["layers"]
         gaps = [L["layer"] for L in layers if L.get("status") == "gap"]
         # also the TOOL PLANES (categories) not yet wrapped — the supervisor needs every category behind a plane
         planes = _json.loads((REPO / "architecture" / "tool_planes.json").read_text(encoding="utf-8"))["planes"]
         gaps += [f"{p['plane']}-plane" for p in planes if p.get("status") in ("gap", "partial")]
+        from scripts.proposal_backlog import Proposal, propose
         if gaps:
-            from scripts.proposal_backlog import Proposal, propose
             for g in gaps:
                 propose(Proposal(title=f"agnostic adapter gap: add a {g} port + adapters + drop-in test", kind="opportunity",
                                  rationale="docs/architecture/agnostic-adapters.md + tool_planes.json — every tool category needs an agnostic plane the supervisor selects from"))
             filed = len(gaps)
+        # registry expansion: the moat is a continuously-growing deterministic-replacement registry. Report coverage +
+        # nudge discovery on the thinnest planes (STABLE title => idempotent; dynamic detail in the rationale).
+        reg = _json.loads((REPO / "architecture" / "tool_registry.json").read_text(encoding="utf-8"))["tools"]
+        n_tools = len(reg)
+        per = _Counter(t["plane"] for t in reg)
+        thin = sorted((p for p in per if per[p] < _EXPAND_TARGET), key=lambda p: per[p])
+        if thin:
+            propose(Proposal(title="expand the deterministic-replacement tool_registry (more candidate tools per plane)",
+                             kind="opportunity",
+                             rationale=f"tool_registry has {n_tools} tools; aim ~{_EXPAND_TARGET}/plane toward hundreds. "
+                                       f"Thinnest now: {', '.join(f'{p}={per[p]}' for p in thin[:6])}. Feed via the discovery "
+                                       "flywheels (license-classified, serves_truth=false, drop-in as one row)."))
     except Exception:  # noqa: BLE001
         pass
-    ok = dropin and audit and tax
+    ok = dropin and audit and tax and reg_ok
     return {"summary": f"adapters: drop-in {'green' if dropin else 'RED'} + coverage {'green' if audit else 'RED'}; "
-                       f"{len(gaps)} port gap(s){' filed' if filed else ''}",
+                       f"{len(gaps)} port gap(s){' filed' if filed else ''}; tool_registry {n_tools} tools"
+                       f"{f', {len(thin)} plane(s) below target' if thin else ''}",
             "signal": "gates_red" if not ok else "ok", "gaps": gaps}
 
 
