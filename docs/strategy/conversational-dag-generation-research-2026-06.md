@@ -43,7 +43,9 @@ are exactly where we're strong (microsteps + per-component test + validation; re
    errors back to the LLM (the universal best practice). *(implemented this pass.)*
 2. **Schema-constrained / structured-output mode** — request native structured output from the lane (Ollama/vLLM grammar)
    so the DAG JSON can't be malformed — upgrade from parse-with-try/except. *(next; via the llm_port.)*
-3. **Port/plane-typed candidate filtering** — Langflow-style: filter the candidate pool by what the previous node outputs
-   (type-aware composition), not just intent-relevance.
+3. **Port/plane-typed candidate filtering** — Langflow-style type-aware composition. *(implemented: each plane has a
+   typed I/O contract [architecture/plane_io_contracts.json]; the compiler prompt grounds every candidate with its
+   io=consumes->produces so the LLM composes TYPE-COMPATIBLE edges, and `_validate` surfaces any remaining mismatch as
+   `type_warnings` — see registry-pipeline-io-orchestration-research-2026-06.md.)*
 4. **Review-before-run + config correctness** — Zapier's hard part; lean on our microsteps + the per-node test + a
    human/govern confirmation gate before a capability goes tenant-visible (the promotion boundary already does this).

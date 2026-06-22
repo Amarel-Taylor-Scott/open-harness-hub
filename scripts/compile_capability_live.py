@@ -18,7 +18,7 @@ from pathlib import Path
 
 from src.teleon.synthesis import component_search as CS
 from src.teleon.synthesis import intent_to_dag as I
-from src.teleon.synthesis.io_contracts import edge_compatible
+from src.teleon.synthesis.io_contracts import edge_compatible, plane_io
 
 REPO = Path(__file__).resolve().parents[1]
 RECEIPT = REPO / "data" / "dev-intel" / "live-compile-smoke.json"
@@ -42,12 +42,19 @@ def candidate_pool(intent: str, *, k: int = 28) -> dict:
     return pool
 
 
+def _io_hint(plane) -> str:
+    """The component's typed I/O (consumes->produces) so the LLM composes TYPE-COMPATIBLE edges (Langflow port-typing)."""
+    io = plane_io(plane)
+    return f", io={'/'.join(io.get('consumes', []))}->{'/'.join(io.get('produces', []))}" if io else ""
+
+
 def _prompt(intent: str, pool: dict) -> str:
-    lines = [f"  - {cid} (plane={v['plane']}, deterministic={v['deterministic']})" for cid, v in pool.items()]
+    lines = [f"  - {cid} (plane={v['plane']}, deterministic={v['deterministic']}{_io_hint(v['plane'])})" for cid, v in pool.items()]
     return ("You are a capability COMPILER. Compose a DAG that solves the intent using ONLY the components listed (do not "
             "invent components). Put DETERMINISTIC components first; use 'llm' ONLY for the residual a deterministic "
-            "component cannot do. Output ONLY JSON: {\"nodes\":[{\"step\":\"name\",\"component\":\"<id from the list>\"}],"
-            "\"edges\":[[\"step_a\",\"step_b\"]]}.\n"
+            "component cannot do. Each component shows io=consumes->produces; only connect an edge when the upstream "
+            "component PRODUCES a type the downstream CONSUMES (type-compatible). Output ONLY JSON: "
+            "{\"nodes\":[{\"step\":\"name\",\"component\":\"<id from the list>\"}],\"edges\":[[\"step_a\",\"step_b\"]]}.\n"
             f"INTENT: {intent}\nAVAILABLE COMPONENTS:\n" + "\n".join(lines))
 
 
@@ -160,6 +167,8 @@ def _self_test() -> int:
     ck("type-aware edge check: ocr(text)->field_parsing(text) compatible; tts(audio)->field_parsing(text) NOT",
        edge_compatible("ocr", "field_parsing") and not edge_compatible("tts", "field_parsing"))
     ck("compiler surfaces type_warnings (a producer output no consumer input accepts)", "type_warnings" in art)
+    ck("the prompt grounds candidates with their I/O types (type-aware composition, Langflow port-typing)",
+       "io=" in _prompt(intent, pool) and "->" in _prompt(intent, pool))
     ck("serves_truth=false", art["serves_truth"] is False)
     print("\n" + ("PASS - compile_capability_live: LLM finds REAL components + composes a validated DAG; hallucinations "
                   "rejected; deterministic-first. Full orchestration, not a scaffold." if not fails else f"{len(fails)} FAILURES: {fails}"))
