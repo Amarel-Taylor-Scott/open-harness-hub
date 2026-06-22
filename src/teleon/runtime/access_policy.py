@@ -47,12 +47,14 @@ def classify(resource: dict) -> dict:
         return {"tier": "restricted", "grant": "social_scrape", "reason": "social/ToS-sensitive — governed"}
     if "pii" in gov:
         return {"tier": "restricted", "grant": "pii", "reason": "PII-touching — governed"}
+    if resource.get("keyless") or resource.get("kind") in ("open_hub", "public"):
+        return {"tier": "public", "reason": "keyless (free) / open — no special entitlement"}
     own = resource.get("key_ownership")
     if own in ("platform", "both", "byo"):
         return {"tier": "plan_gated", "key_service": resource.get("key_service") or resource.get("id"),
                 "reason": "needs a platform key (cost) or your own key (BYO)"}
-    if resource.get("keyless") and resource.get("deterministic") or resource.get("kind") in ("open_hub", "public"):
-        return {"tier": "public", "reason": "keyless deterministic / open"}
+    if resource.get("deterministic"):
+        return {"tier": "public", "reason": "deterministic, no key"}
     return {"tier": "authenticated", "reason": "default — any signed-in principal"}
 
 

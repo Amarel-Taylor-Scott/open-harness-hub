@@ -27,10 +27,16 @@ class KeyHolder:
         """Service ids whose key is currently available (a developer added it, or it's keyless/platform-within-limits)."""
         return {s["id"] for s in C._services() if C.key_mode(s["id"], env, byo=tenant_keys) is not None}
 
-    def resolve(self, service_id: str, env: dict | None = None, *, tenant_keys: set | None = None) -> str | None:
-        """The secret VALUE for a reachable service (its first env var), or None. NEVER log the return value."""
+    def resolve(self, service_id: str, env: dict | None = None, *, tenant_keys: set | None = None, principal=None) -> str | None:
+        """The secret VALUE for a reachable service (its first env var), or None. NEVER log the return value. When a
+        `principal` is given, the key is ALSO gated by the access policy: a free user can't use a platform key, but can
+        use their own BYO key (entitlement on top of mere reachability)."""
         if C.key_mode(service_id, env, byo=tenant_keys) is None:
             return None
+        if principal is not None:
+            from src.teleon.runtime import entitlements as E
+            if not E.entitled_key(principal, service_id):
+                return None                        # reachable but NOT entitled -> denied (no value leaves)
         svc = C._svc(service_id)
         if not svc or not svc.get("env_vars"):
             return None
@@ -47,16 +53,24 @@ class KeyHolder:
         """The env var(s) a developer must set to enable this service ([] if held). For honest 'needs X' messages."""
         return C.missing_for(service_id, env)
 
-    def status(self, env: dict | None = None, tenant_keys: set | None = None) -> dict:
-        """REDACTED snapshot for display: which services are held vs missing, the mode (byo/platform), and limits — NO
-        values, ever. This is what a developer-facing 'key holder' UI renders."""
+    def status(self, env: dict | None = None, tenant_keys: set | None = None, *, principal=None) -> dict:
+        """REDACTED snapshot for display: which services are held vs missing, the mode (byo/platform), limits, and — when
+        a `principal` is given — whether THEY are entitled to use it (held != entitled). NO values, ever."""
         held = self.held(env, tenant_keys)
+        ent = None
+        if principal is not None:
+            from src.teleon.runtime import entitlements as E
+            ent = {s["id"] for s in C._services() if E.entitled_key(principal, s["id"])}
         rows = []
         for s in C._services():
             sid = s["id"]
-            rows.append({"service": sid, "held": sid in held, "mode": C.key_mode(sid, env, byo=tenant_keys),
-                         "ownership": C.key_ownership(sid), "needs": ([] if sid in held else s["env_vars"]),
-                         "platform_limits": C.platform_limits(sid)})
+            row = {"service": sid, "held": sid in held, "mode": C.key_mode(sid, env, byo=tenant_keys),
+                   "ownership": C.key_ownership(sid), "needs": ([] if sid in held else s["env_vars"]),
+                   "platform_limits": C.platform_limits(sid)}
+            if ent is not None:
+                row["entitled"] = sid in ent
+                row["usable"] = (sid in held) and (sid in ent)
+            rows.append(row)
         return {"held": sorted(held), "services": rows, "serves_truth": False}
 
 

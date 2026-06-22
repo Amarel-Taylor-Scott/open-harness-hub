@@ -73,16 +73,26 @@ def build_dag(intent: str) -> dict:
     for r in rungs:
         opts = list(r.get("tools", [])) + list(r.get("external_apis", []))
         nodes.append({"id": r["tier"], "planes": r.get("planes", []), "options": opts,
+                      "governance": r.get("governance") or lad.get("governance"),
                       "deterministic": r["deterministic"], "status": r["status"]})
     edges = [(rungs[i]["tier"], rungs[i + 1]["tier"]) for i in range(len(rungs) - 1)]
     return {"capability": lad["capability"], "nodes": nodes, "edges": edges}
 
 
-def decision_points(intent: str) -> list:
+def decision_points(intent: str, *, principal=None) -> list:
     """The ordered (point_id, [options]) for SynthesisTree — branch over the component choice at each DAG node. A node
-    with no concrete tool (pure-LLM rung) gets a single 'llm' option (still a decision, still testable)."""
+    with no concrete tool (pure-LLM rung) gets a single 'llm' option. When a `principal` is given, each node's options are
+    GATED to what they're entitled to (restricted/plan-gated tools they lack drop out; a node with none left gets an
+    honest 'blocked:needs-<grant/tier>' option) — so the descent only ever proposes tools the principal may use."""
     dag = build_dag(intent)
-    return [(n["id"], n["options"] or ["llm:" + (n["planes"][0] if n["planes"] else "model")]) for n in dag["nodes"]]
+    out = []
+    for n in dag["nodes"]:
+        opts = n["options"] or ["llm:" + (n["planes"][0] if n["planes"] else "model")]
+        if principal is not None and n["options"]:
+            from src.teleon.runtime import entitlements as E
+            opts = E.gate_options(principal, n["options"], plane=(n["planes"] or [None])[0], governance=n.get("governance"))
+        out.append((n["id"], opts))
+    return out
 
 
 def verification_ladder(node: dict) -> dict:
