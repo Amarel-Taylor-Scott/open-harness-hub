@@ -5,7 +5,7 @@ FOUR self-contained, cross-linked pages (no external resources; branded Hanken G
   index.html  — AI Done Right (PARENT): build AI the EFFICIENT + APPROPRIATE way, made easy. NOT about context.
   baltor.html — Baltor: the engine that makes AI trustworthy (context/truth — this is where 'context' lives).
   teleon.html — Teleon: the runtime that makes any capability efficient (the descent + the document cascade).
-  hubs.html   — the Open*Hubs: the open store of building blocks both products consume.
+  hubs.html   — the Open*Hubs: the open component registries both products consume.
 Every NUMBER is COMPUTED from the registries + the live cascade (no-magic-values). serves_truth=false.
 
   PYTHONPATH=. python3 scripts/build_intro_site.py [--self-test]
@@ -182,17 +182,50 @@ def _cost_control_chart(c: dict) -> str:
                               title="Cost per capability — held in the efficient control band")
 
 
+def _teleon_examples(c: dict) -> str:
+    """Example cards for Teleon — real per-capability cascade savings (computed) + 2 representative descents."""
+    pick = c.get("cost_samples", [])[:4] or [{"label": "land lease", "sup": c["ll_sup"], "frontier": c["ll_frontier"]}]
+    cards = ""
+    for s in pick:
+        pct = round(100 * (s["frontier"] - s["sup"]) / s["frontier"], 1) if s["frontier"] else 0
+        cards += (f'<div class=card><h4>{str(s["label"]).title()}</h4>'
+                  f'<p><b class=ok>{pct}% cheaper</b> · ${s["frontier"]} &rarr; ${s["sup"]}<br>'
+                  f'<span class=mono style="font-size:12px;color:#9aa">whole-doc&rarr;frontier vs cascade + LLM-supervisor</span></p></div>')
+    cards += ('<div class=card><h4>Search enrichment</h4><p><b class=ok>≈$0 vs ~$0.035</b> per call<br>'
+              '<span class=mono style="font-size:12px;color:#9aa">cheap retrieve + extract vs a grounded-search API (representative)</span></p></div>')
+    cards += ('<div class=card><h4>Model routing</h4><p><b class=ok>cheapest capable model</b>, frontier only on demand<br>'
+              '<span class=mono style="font-size:12px;color:#9aa">route by the quality bar, not by default (representative)</span></p></div>')
+    return cards
+
+
+#: Baltor example pipelines (REAL governed showcases in the repo) — what each verifies + the wedge. serves_truth governed.
+_BALTOR_EXAMPLES = [
+    ("Sanctions screening (OFAC)", "Screen a name against the OFAC SDN list &rarr; a governed BLOCKED / CLEAR verdict "
+     "with the matched entry + its source. The one place output IS truth — because it's verified."),
+    ("Beneficial ownership + 50% rule", "Resolve the authoritative parent from CONFLICTING ownership claims (an SEC 8-K "
+     "beats a press rumor), then propagate an SDN block down every &ge;50% ownership edge — an inherited block a bare model can't compute."),
+    ("Drug-label claim review (FDA)", "Substantiate each promotional claim against the FDA-approved label; an efficacy "
+     "overclaim is HELD OUT + escalated. Flip the source &rarr; the verdict flips."),
+    ("Export-control screening (BIS)", "A stale vendor &lsquo;clear&rsquo; is HELD OUT; an export to a LISTED end-user "
+     "REQUIRES A LICENSE. Authority is earned, not assumed."),
+]
+
+
+def _baltor_examples() -> str:
+    return "".join(f'<div class=card><h4>{t}</h4><p>{d}</p></div>' for t, d in _BALTOR_EXAMPLES)
+
+
 def page_index(c: dict) -> str:
     body = f"""
 <header class="hero parent"><div class=wrap>
   <span class=tag>AI, done right.</span>
-  <h1>Build AI the <span style="text-decoration:underline;text-decoration-color:#8b84f5">efficient, appropriate</span> way.</h1>
-  <p class=lead>The right model, the right method, the right cost for <i>each</i> task — instead of sending everything to
-  the most expensive model. Made easy: write what you want in plain language, and the system finds the cheapest path
-  that still meets the bar.</p>
+  <h1>The right model for <span style="text-decoration:underline;text-decoration-color:#8b84f5">every task</span>.</h1>
+  <p class=lead>Most teams send everything to the most expensive model. AI Done Right uses the <b>efficient, appropriate</b>
+  path for each task — the right model, method, and cost — and makes it easy to build: write what you want in plain
+  language, and the system finds the cheapest path that still meets the bar.</p>
   <div class=kpis>
     <div class=kpi><b>{c['ll_pct']}%</b><span>cost cut on a real extraction task</span></div>
-    <div class=kpi><b>{c['hubs']}</b><span>open building-block registries</span></div>
+    <div class=kpi><b>{c['hubs']}</b><span>open component registries</span></div>
     <div class=kpi><b>{c['proofs']}</b><span>self-tests kept green</span></div>
   </div>
 </div></header>
@@ -216,13 +249,13 @@ def page_index(c: dict) -> str:
 </div></section>
 
 <section><div class="wrap reveal">
-  <h2>Three parts</h2><h3>One holding company, two products, one open store.</h3>
+  <h2>Three parts</h2><h3>One holding company, two products, open component registries.</h3>
   <div class="grid g3">
     <a class=card href="teleon.html"><h4>Teleon</h4><p>The runtime that makes any capability efficient — the descent
       brain. Write a capability; it picks the cheapest appropriate path.</p><span class=more>How Teleon works →</span></a>
     <a class=card href="baltor.html"><h4>Baltor</h4><p>The engine that makes AI <b>trustworthy</b> — governs what
       becomes true (provenance, verification, receipts).</p><span class=more>How Baltor works →</span></a>
-    <a class=card href="hubs.html"><h4>{c['hubs']} Open*Hubs</h4><p>The open store of building blocks — tools, skills,
+    <a class=card href="hubs.html"><h4>{c['hubs']} Open*Hubs</h4><p>Open component registries — tools, skills,
       models, methods — that both products consume.</p><span class=more>See the hubs →</span></a>
   </div>
   <p style="margin-top:18px" class=mono>Architecture law: Baltor &rarr; Teleon &rarr; Open*Hubs. Never the reverse.</p>
@@ -256,6 +289,9 @@ def page_teleon(c: dict) -> str:
   </div>
   <p style="margin-top:16px">The LLM is used only to <b>audit</b> the cheap methods and re-do the few fields it flags —
   not to read the whole document.</p></div></section>
+<section><div class="wrap reveal"><h2>More examples</h2><h3>Every capability descends — here are a few.</h3>
+  <p>Each is the same motion: deterministic + cheap first, the frontier reserved for supervision. Costs are computed.</p>
+  <div class="grid g3" style="margin-top:16px">{_teleon_examples(c)}</div></div></section>
 <section><div class="wrap reveal"><h2>Performance, in control</h2><h3>Efficient AND safe — within control-chart limits.</h3>
   <p>Cutting cost can't mean cutting corners. Each capability the descent produces is a sample on a control chart:
   cost stays inside an efficient band (UCL/LCL) — far below the frontier-only baseline — while quality holds above the
@@ -276,12 +312,26 @@ def page_teleon(c: dict) -> str:
 
 
 def page_baltor(c: dict) -> str:
-    body = """
+    body = f"""
 <header class="hero baltor"><div class=wrap><span class=tag>Baltor · the trust engine</span>
   <h1>Models don't fail.<br>Their <span style="text-decoration:underline;text-decoration-color:#6ee7b7">context</span> does.</h1>
   <p class=lead>Baltor governs what becomes <b>true</b>: provenance, verification, signed facts, and change-data-capture.
   Agents propose; Baltor disposes. Nothing serves as truth until it passes the verify gate.</p>
 </div></header>
+<section><div class="wrap reveal"><h2>How Baltor works</h2><h3>Propose &rarr; verify &rarr; serve (or hold out).</h3>
+  <div class=flow><div class=node>agent proposes a fact</div><span class=arrow>&rarr;</span>
+    <div class=node>verify vs the authoritative source</div><span class=arrow>&rarr;</span>
+    <div class="node alt">serve — or HELD OUT if unverified / stale</div></div>
+  <h3 style="margin-top:28px">Conflicting sources? Authority decides.</h3>
+  <div class=flow><div class=node>conflicting claims</div><span class=arrow>&rarr;</span>
+    <div class=node>rank by authority (SEC&nbsp;8-K &gt; press rumor)</div><span class=arrow>&rarr;</span>
+    <div class="node alt">the governing source wins</div></div>
+  <h3 style="margin-top:28px">Facts go stale? Held out, then re-verified.</h3>
+  <div class=flow><div class=node>fact bound to its source</div><span class=arrow>&rarr;</span>
+    <div class=node>source changes (CDC)</div><span class=arrow>&rarr;</span>
+    <div class=node>stale value HELD OUT</div><span class=arrow>&rarr;</span>
+    <div class="node alt">re-verified &amp; current</div></div>
+</div></section>
 <section><div class="wrap reveal"><h2>What Baltor does</h2><h3>Governed context, not guesses.</h3>
   <div class="grid g2">
     <div class=card><h4>Verify before serve</h4><p>Every fact is a candidate (<span class=mono>serves_truth=false</span>)
@@ -293,6 +343,10 @@ def page_baltor(c: dict) -> str:
     <div class=card><h4>Powered by Teleon</h4><p>Baltor runs on Teleon (a tenant) — trustworthy context, delivered the
       efficient way.</p></div>
   </div></div></section>
+<section><div class="wrap reveal"><h2>Examples</h2><h3>Regulated-fact verdicts you can prove.</h3>
+  <p>Each is a real governed pipeline: a verdict bound to an authoritative source, with stale/overclaimed inputs held
+  out — not an LLM guess.</p>
+  <div class="grid g2" style="margin-top:16px">{_baltor_examples()}</div></div></section>
 <section><div class="wrap reveal"><h2>Why it matters</h2><h3>Discovery is not trust. Output is not truth.</h3>
   <p>An LLM that sounds confident is not a source. Baltor is the rail that turns proposed context into governed,
   provable truth — so the agents built on top can be relied on.</p></div></section>"""
@@ -307,10 +361,10 @@ def page_hubs(c: dict) -> str:
         f'<a class=card href="./hubs/{h["slug"]}/index.html"><h4>{h["id"]}</h4>'
         f'<p>{h["kind"]} · <span class=mono>{h["tier"]}</span></p></a>' for h in hubs)
     body = f"""
-<header class="hero hubs"><div class=wrap><span class=tag>The Open*Hubs · the open store</span>
-  <h1>{c['hubs']} open registries of <span style="text-decoration:underline;text-decoration-color:#e9b8f5">building blocks</span>.</h1>
-  <p class=lead>Tools, skills, models, methods, harnesses, receipts — the open ecosystem both Baltor and Teleon consume.
-  Continuously populated, governed, and verify-gated.</p>
+<header class="hero hubs"><div class=wrap><span class=tag>The Open*Hubs · open component registries</span>
+  <h1>{c['hubs']} open <span style="text-decoration:underline;text-decoration-color:#e9b8f5">component registries</span>.</h1>
+  <p class=lead>Tools, skills, models, methods, harnesses, receipts — the open component registries both Baltor and
+  Teleon consume. Continuously populated, governed, and verify-gated.</p>
   <div class=kpis><div class=kpi><b>{c['hubs']}</b><span>Open*Hubs</span></div>
   <div class=kpi><b>{c['browsers']}</b><span>browsers cataloged</span></div>
   <div class=kpi><b>{c['driving']}</b><span>driving components/models</span></div></div>
@@ -330,8 +384,8 @@ def page_hubs(c: dict) -> str:
 <section><div class="wrap reveal"><h2>Browse all {c['hubs']}</h2><h3>Every hub, one standardized surface.</h3>
   <p>Each hub renders from the same template (consistent design), with its own engine, settings, and verify gate.</p>
   <div class="grid g3" style="margin-top:16px">{cards}</div></div></section>"""
-    return _shell("hubs", "The Open*Hubs — the open store of building blocks",
-                  "The Open*Hubs: open registries of tools, skills, models, methods both Baltor and Teleon consume.",
+    return _shell("hubs", "The Open*Hubs — open component registries",
+                  "The Open*Hubs: open component registries of tools, skills, models, methods both Baltor and Teleon consume.",
                   "hubs", body)
 
 
@@ -385,8 +439,19 @@ def _self_test() -> int:
        len(c["hub_list"]) == c["hubs"] and all(f'./hubs/{h["slug"]}/index.html' in pages["hubs"] for h in c["hub_list"]))
     ck("computed figures embedded (hubs/proofs/land-lease %)", str(c["hubs"]) in idx and str(c["proofs"]) in idx and str(c["ll_pct"]) in idx)
     ck("honest tunnel caveat on the parent page", "temporary" in idx.lower() and "trycloudflare" in idx.lower())
+    # messaging fixes (owner 2026-06-21): no weird 'Build AI the ... way' phrase; no vague 'store' — use 'component registries'
+    ck("parent drops the weird 'Build AI the ... way' phrase", "Build AI the" not in idx)
+    ck("no vague 'store' language anywhere — 'component registries' instead",
+       not any("open store" in h.lower() or "store of building" in h.lower() for h in pages.values())
+       and "component registries" in pages["hubs"])
+    # more examples + diagrams on Baltor and Teleon (owner request)
+    ck("Baltor shows MULTIPLE examples + the propose→verify→serve + authority + CDC diagrams",
+       all(x in pages["baltor"] for x in ("Sanctions screening", "Drug-label", "Export-control",
+                                          "verify vs the authoritative source", "HELD OUT", "the governing source wins")))
+    ck("Teleon shows MULTIPLE examples (beyond the one worked example)",
+       "More examples" in pages["teleon"] and pages["teleon"].count("% cheaper") >= 3)
     print("\n" + ("PASS - build_intro_site: 4 cross-linked animated pages — PARENT (efficient+appropriate, not context), "
-                  "Baltor (trust/context), Teleon (efficiency/descent/cascade), Open*Hubs (the store); figures computed; "
+                  "Baltor (trust/context), Teleon (efficiency/descent/cascade), Open*Hubs (component registries); figures computed; "
                   "honest preview caveat." if not fails else f"{len(fails)} FAILURES: {fails}"))
     return 0 if not fails else 1
 
