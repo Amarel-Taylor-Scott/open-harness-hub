@@ -34,6 +34,19 @@ SCHEMA_TEMPLATES: dict[str, dict] = {
         "report_id": STRUCTURED, "collected_date": STRUCTURED, "patient_id": STRUCTURED,
         "analyte_values": SEMI, "reference_ranges": SEMI, "interpretation": UNSTRUCTURED,
     },
+    # the flagship cost-reduction vertical: companies today send the ENTIRE lease PDF/scan to a frontier model.
+    # Most of these fields are STRUCTURED/SEMI — answerable by OCR + patterns BEFORE any LLM; the LLM (if used) only
+    # supervises accuracy. Synthetic showcase schema (no real parties).
+    "land_lease": {
+        "lessor_name": STRUCTURED, "lessee_name": STRUCTURED, "agency_name": STRUCTURED, "principal_name": STRUCTURED,
+        "effective_date": STRUCTURED, "term_years": STRUCTURED, "royalty_rate": STRUCTURED, "bonus_payment": STRUCTURED,
+        "acreage": STRUCTURED, "county_state": STRUCTURED, "legal_description": SEMI, "special_provisions": UNSTRUCTURED,
+    },
+    "oil_gas_lease": {
+        "lessor_name": STRUCTURED, "lessee_name": STRUCTURED, "effective_date": STRUCTURED, "primary_term": STRUCTURED,
+        "royalty_fraction": STRUCTURED, "delay_rental": STRUCTURED, "shut_in_royalty": STRUCTURED, "acreage": STRUCTURED,
+        "legal_description": SEMI, "depth_clause": UNSTRUCTURED, "pugh_clause": UNSTRUCTURED,
+    },
 }
 
 

@@ -73,6 +73,21 @@ def _self_test() -> int:
     ck("extraction never serves truth (a candidate for the verification rail)", r2["serves_truth"] is False)
     ck("deterministic (same doc+schema+keys → identical receipt)", demonstrate() == r2)
 
+    # 8) LLM-as-CONTROL-SUPERVISOR (owner 2026-06-21): cheap methods extract all; LLM only audits + escalates flagged
+    from src.teleon.extraction.document_extraction_cascade import supervise_extraction, compare_strategies
+    from src.teleon.extraction.schema_templates import get_template
+    land = get_template("land_lease")
+    ck("land_lease + oil_gas_lease showcase templates exist (the flagship vertical)",
+       land is not None and get_template("oil_gas_lease") is not None and "royalty_rate" in land)
+    sup = supervise_extraction(land, {"has_text_layer": True, "scanned": False}, available_keys=("LLM_API_KEY",))
+    ck("supervisor: cheap methods fill all, LLM ROLE is supervisor (audits, doesn't extract everything)",
+       sup["llm_role"].startswith("supervisor") and len(sup["rule_filled"]) >= 10 and len(sup["escalated"]) <= 2)
+    cmp = compare_strategies(land, {"has_text_layer": True, "scanned": False})
+    ck("3-way: supervised is CHEAPEST < cascade < frontier-only (the whole-doc→Gemini baseline)",
+       cmp["supervised"]["cost"] < cmp["cascade"]["cost"] < cmp["frontier_only"]["cost"] and cmp["supervised"]["pct_saved"] >= 70)
+    sup_nokey = supervise_extraction(land, {"has_text_layer": True, "scanned": False}, available_keys=())
+    ck("no LLM key → audit-flagged fields reported MISSING, never fabricated", sup_nokey["missing"] and sup_nokey["escalated"] == [])
+
     print("\n" + (f"PASS - check_document_extraction_cascade: PDF→schema as a cheapest-that-meets cascade over a "
                   f"method grid — deterministic rules before LLM, cheapest-capable LLM before frontier, "
                   f"compress-only-when-needed; full schema in ${r2['total_cost']} vs ${frontier_only} frontier-only; "

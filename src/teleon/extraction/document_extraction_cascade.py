@@ -372,3 +372,85 @@ def record_extraction_descent(store, *, required_fields: dict | None = None, doc
         raw_ref="src/teleon/extraction/document_extraction_cascade.py",
         substrate_ref=s["model_lineage"].get("substrate_ref", "deterministic_rule")))
     return s
+
+
+# ---------------------------------------------------------------------------
+# LLM-as-CONTROL-SUPERVISOR (owner 2026-06-21): the cheapest mode — deterministic/cheap methods extract EVERY field,
+# and the LLM is used ONLY to AUDIT a sample of that output for accuracy (not to extract), then escalate ONLY the
+# fields the audit flags below the floor. "LLM calls only as a control supervisor checking accuracy of the cheaper
+# methods/heuristics." Far cheaper than a frontier pass over the whole document. serves_truth stays False.
+# ---------------------------------------------------------------------------
+def supervise_extraction(required_fields: dict, doc: dict, *, available_keys: tuple = ("LLM_API_KEY",),
+                         audit_fraction: float = 0.34, audit_floor: float = 0.9) -> dict:
+    """Deterministic methods fill ALL fields; the LLM AUDITS a `audit_fraction` sample for accuracy (cost = a fraction
+    of ONE cheap-LLM call), then ONLY the audit-flagged fields escalate to the cheap LLM. Returns a cost/path receipt;
+    a flagged field with no LLM key is reported MISSING, never fabricated. Deterministic (measured fixtures stand in
+    for the audit verdict)."""
+    import math
+    have = {k.upper() for k in available_keys}
+    has_llm = "LLM_API_KEY" in have
+    acq = _pick_acquire(doc, have)
+    steps: list[dict] = []
+    cost = 0.0
+    if acq:
+        steps.append({"stage": "acquire", "method": acq[0], "cost": acq[1]}); cost += acq[1]
+    # 1. deterministic extraction of ALL fields — answers BEFORE any LLM (distinct rule-method costs, once)
+    rule_methods = [m for m in _LADDER if m.stage == "rule_extract"]
+    det_cost = round(sum(m.cost for m in rule_methods), 4)
+    cost += det_cost
+    steps.append({"stage": "rule_extract", "method": "+".join(m.name for m in rule_methods), "cost": det_cost,
+                  "effect": "deterministic fill of all fields (OCR/text + patterns + dedupe)"})
+    field_acc: dict[str, float] = {}
+    for field, cls in required_fields.items():
+        best = 0.0
+        for m in rule_methods:
+            a = measured_field_accuracy(m.name, field)
+            a = a if a is not None else (measured_class_accuracy(m.name, cls) or 0.0)
+            best = max(best, a)
+        field_acc[field] = round(best, 4)
+    rule_filled = [f for f, a in field_acc.items() if a > 0]
+    # 2. LLM SUPERVISOR audits a SAMPLE for accuracy (does NOT extract) — cost = fraction of one cheap-LLM call
+    fields = list(required_fields)
+    sample_n = max(1, math.ceil(audit_fraction * len(fields))) if fields else 0
+    sample = fields[:sample_n]
+    cheap = next(m.cost for m in _LADDER if m.name == "cheap_llm")
+    audit_cost = round(audit_fraction * cheap, 4) if (has_llm and sample) else 0.0
+    cost += audit_cost
+    audit_accuracy = round(sum(field_acc[f] for f in sample) / len(sample), 4) if sample else 1.0
+    if has_llm:
+        steps.append({"stage": "supervise", "method": "cheap_llm_audit", "cost": audit_cost, "audited": sample,
+                      "audit_accuracy": audit_accuracy, "role": "supervisor — checks the cheap methods, does not extract"})
+    # 3. escalate ONLY the fields the audit flags below the floor → one cheap-LLM pass
+    flagged = [f for f, a in field_acc.items() if a < audit_floor]
+    used_escalation = bool(flagged and has_llm)
+    if used_escalation:
+        cost += cheap
+        steps.append({"stage": "llm_extract", "method": "cheap_llm", "cost": cheap, "escalated": flagged,
+                      "effect": "re-extract ONLY the audit-flagged fields (chunked, cheap)"})
+    missing = [] if has_llm else flagged
+    return {"required": dict(required_fields), "rule_filled": rule_filled, "audited_sample": sample,
+            "audit_accuracy": audit_accuracy, "escalated": flagged if has_llm else [], "missing": missing,
+            "llm_role": "supervisor" + ("+targeted_escalation" if used_escalation else ""),
+            "total_cost": round(cost, 4), "steps": steps, "serves_truth": False}
+
+
+def compare_strategies(required_fields: dict | None = None, doc: dict | None = None, *,
+                       available_keys: tuple = ("LLM_API_KEY",), confidence_floor: float = 0.8,
+                       audit_floor: float = 0.9) -> dict:
+    """The flagship 3-way for slides/demos: (1) frontier-only — send the WHOLE PDF/email to the frontier model (what
+    most companies do today), (2) the cheapest-that-meets cascade, (3) LLM-as-supervisor. Costs computed; serves_truth
+    False. This is the land-lease / oil & gas extraction story made concrete."""
+    required_fields = required_fields or EMPLOYMENT_AGENCY_SCHEMA
+    doc = doc or {"has_text_layer": True, "scanned": False}
+    baseline = frontier_only_cost(doc)
+    casc = extract_measured(required_fields, doc, available_keys=available_keys, confidence_floor=confidence_floor)
+    sup = supervise_extraction(required_fields, doc, available_keys=available_keys, audit_floor=audit_floor)
+    def pct(c: float) -> float:
+        return round(100 * (baseline - c) / baseline, 1) if baseline else 0.0
+    return {"fields": len(required_fields),
+            "frontier_only": {"cost": baseline, "note": "send the entire PDF/email to the frontier model (Gemini-class)"},
+            "cascade": {"cost": casc["total_cost"], "pct_saved": pct(casc["total_cost"]),
+                        "used_llm": casc["used_llm"], "path": casc["path"]},
+            "supervised": {"cost": sup["total_cost"], "pct_saved": pct(sup["total_cost"]), "llm_role": sup["llm_role"],
+                           "rule_filled": len(sup["rule_filled"]), "escalated": len(sup["escalated"])},
+            "serves_truth": False}
