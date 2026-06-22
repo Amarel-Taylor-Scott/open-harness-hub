@@ -42,4 +42,6 @@ shared-I/O spine + the compiler. discovery≠trust.
    architecture/plane_io_contracts.json + check_plane_io_contracts.)*
 2. **ResourceRef threading** — the composed DAG passes typed refs (pointers) between nodes, not blobs (confirm + wire).
 3. **OpenLineage-shaped run events** — emit each component run as a Job/Run/Dataset event + facets (our receipts/trace → OL).
-4. **Reciprocal Rank Fusion** — add RRF as the hybrid-retrieval combine microstep.
+4. **Reciprocal Rank Fusion** — the hybrid-retrieval combine. *(implemented this pass: src/teleon/retrieval/hybrid.py
+   `reciprocal_rank_fusion` + `hybrid_search` fusing the vector + lexical(BM25) ports on RANK — no score calibration —
+   + check_hybrid_retrieval.)*

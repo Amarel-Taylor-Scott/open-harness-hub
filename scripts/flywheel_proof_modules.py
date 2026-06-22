@@ -868,6 +868,7 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_reranker_port.py", "check_reranker_port"),
     ("scripts/check_embedding_port.py", "check_embedding_port"),
     ("scripts/check_search_port.py", "check_search_port"),
+    ("scripts/check_hybrid_retrieval.py", "check_hybrid_retrieval"),
     ("scripts/check_plane_io_contracts.py", "check_plane_io_contracts"),
     ("scripts/compile_capability_live.py", "compile_capability_live"),
     ("scripts/harvest_tools.py", "harvest_tools"),
