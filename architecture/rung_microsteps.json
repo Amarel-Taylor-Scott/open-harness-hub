@@ -1,0 +1,53 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-22",
+  "principle": "A ladder rung is not atomic — it decomposes into smaller MICRO-STEPS, each a finer component typed by the seven primitives (input / knowledge_corpus / if_statement / action / loop / stop / output). Smaller rungs = more places the descent can substitute a cheaper/deterministic component, test in isolation, and back out of. This seeds the decomposition; the synthesizer GENERATES micro-steps for any not-yet-decomposed rung via generate_microstep_prompt (more components). serves_truth=false.",
+  "serves_truth": false,
+  "primitives": ["input", "knowledge_corpus", "if_statement", "action", "loop", "stop", "output"],
+  "decompositions": [
+    {"capability": "document_extraction", "rung": "text_layer", "microsteps": [
+      {"id": "open_document", "does": "load the file bytes", "primitive": "input", "plane_hint": "data_extraction", "deterministic": true},
+      {"id": "detect_mime", "does": "sniff the document type", "primitive": "action", "plane_hint": "data_extraction", "deterministic": true},
+      {"id": "detect_encoding", "does": "charset detection", "primitive": "action", "plane_hint": "data_extraction", "deterministic": true},
+      {"id": "extract_text_layer", "does": "pull the embedded text", "primitive": "action", "plane_hint": "data_extraction", "deterministic": true},
+      {"id": "normalize_whitespace", "does": "collapse/clean whitespace", "primitive": "action", "plane_hint": "data_extraction", "deterministic": true},
+      {"id": "segment_pages", "does": "split into page/section blocks", "primitive": "output", "plane_hint": "data_extraction", "deterministic": true}
+    ]},
+    {"capability": "entity_enrichment", "rung": "field_parse", "microsteps": [
+      {"id": "tokenize_fields", "does": "split candidate field spans", "primitive": "action", "plane_hint": "ner", "deterministic": true},
+      {"id": "detect_field_type", "does": "is it a phone/email/address/date?", "primitive": "if_statement", "plane_hint": "field_parsing", "deterministic": true},
+      {"id": "parse_phone", "does": "phonenumbers parse+validate", "primitive": "action", "plane_hint": "field_parsing", "deterministic": true},
+      {"id": "parse_email", "does": "email-validator", "primitive": "action", "plane_hint": "field_parsing", "deterministic": true},
+      {"id": "parse_address", "does": "libpostal/usaddress", "primitive": "action", "plane_hint": "field_parsing", "deterministic": true},
+      {"id": "validate_format", "does": "schema/format check; flag if invalid", "primitive": "if_statement", "plane_hint": "validation", "deterministic": true}
+    ]},
+    {"capability": "public_statement_tracking", "rung": "extract_statements", "microsteps": [
+      {"id": "split_sentences", "does": "sentence segmentation", "primitive": "action", "plane_hint": "ner", "deterministic": true},
+      {"id": "detect_quotes", "does": "find quoted spans", "primitive": "action", "plane_hint": "ner", "deterministic": true},
+      {"id": "attribute_speaker", "does": "who said it (NER + coref)", "primitive": "action", "plane_hint": "ner", "deterministic": true},
+      {"id": "parse_date", "does": "when (dateparser)", "primitive": "action", "plane_hint": "field_parsing", "deterministic": true},
+      {"id": "link_claim", "does": "attach to the underlying claim", "primitive": "output", "plane_hint": "embedding", "deterministic": true}
+    ]},
+    {"capability": "ocr", "rung": "local_ocr", "microsteps": [
+      {"id": "load_image", "does": "read the page image", "primitive": "input", "plane_hint": "vision", "deterministic": true},
+      {"id": "deskew_denoise", "does": "preprocess (OpenCV)", "primitive": "action", "plane_hint": "vision", "deterministic": true},
+      {"id": "binarize", "does": "threshold to b/w", "primitive": "action", "plane_hint": "vision", "deterministic": true},
+      {"id": "run_ocr", "does": "tesseract/paddleocr recognize", "primitive": "action", "plane_hint": "ocr", "deterministic": true},
+      {"id": "postprocess_text", "does": "spellfix/normalize", "primitive": "output", "plane_hint": "data_extraction", "deterministic": true}
+    ]},
+    {"capability": "retrieval", "rung": "rerank", "microsteps": [
+      {"id": "candidate_set", "does": "take the top-N retrieved", "primitive": "input", "plane_hint": "vector_store", "deterministic": true},
+      {"id": "featurize_pairs", "does": "build (query, doc) pairs", "primitive": "action", "plane_hint": "reranker", "deterministic": true},
+      {"id": "score_pairs", "does": "cross-encoder score", "primitive": "action", "plane_hint": "reranker", "deterministic": true},
+      {"id": "sort_topk", "does": "sort + cut to k", "primitive": "action", "plane_hint": "reranker", "deterministic": true},
+      {"id": "threshold", "does": "drop below a relevance floor", "primitive": "if_statement", "plane_hint": "reranker", "deterministic": true}
+    ]},
+    {"capability": "search_research", "rung": "keyless_search", "microsteps": [
+      {"id": "build_query", "does": "construct the search query", "primitive": "action", "plane_hint": "search", "deterministic": true},
+      {"id": "call_search", "does": "hit the keyless engine", "primitive": "action", "plane_hint": "search", "deterministic": true},
+      {"id": "fetch_pages", "does": "fetch each top result", "primitive": "loop", "plane_hint": "search", "deterministic": true},
+      {"id": "extract_main", "does": "strip to main content (trafilatura)", "primitive": "action", "plane_hint": "search", "deterministic": true},
+      {"id": "dedupe_sources", "does": "drop duplicate sources", "primitive": "action", "plane_hint": "fuzzy_matching", "deterministic": true}
+    ]}
+  ]
+}
