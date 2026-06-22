@@ -25,6 +25,8 @@ class Decision:
 class Attempt:
     ok: bool
     note: str = ""
+    cost: float = 0.0            # tracked per step (the descent's currency); summed into the trace
+    confidence: float | None = None  # the tester's confidence in this component/assembly (for the discipline gate)
 
 
 class SynthesisNode:

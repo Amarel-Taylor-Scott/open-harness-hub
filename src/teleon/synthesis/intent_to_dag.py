@@ -110,17 +110,17 @@ def alternatives_ladder(node: dict) -> dict:
 
 
 def frontier_prompts(intent: str) -> list[dict]:
-    """The 5 prompts to a frontier LLM (the owner's flow). Context = the selected ladder + registries; sent via the LLM
-    PORT when available, else the deterministic scaffold above stands in (honest — never a fabricated DAG)."""
+    """Disciplined per-stage prompts from architecture/synthesis_prompt_templates.json (enumerate-before-commit,
+    deterministic-before-model, test-before-descend, troubleshoot-before-backtrack, track-data-every-step) + live
+    context. Sent via the LLM PORT when available; the deterministic scaffold stands in offline (never a fabricated DAG)."""
+    tmpl = _load("synthesis_prompt_templates.json")
     o = outline(intent)
-    ctx = f"capability={o.get('capability')} plane={o.get('plane')} governance={bool(o.get('governance'))}"
-    return [
-        {"stage": "outline", "prompt": f"How can we make this work? Outline the steps. Intent: {intent}. Context: {ctx}. "
-                                       "Prefer the cheapest deterministic method per step; escalate only when needed."},
-        {"stage": "fill", "prompt": f"Fill in this outline with concrete components from the registries: {o['steps']}."},
-        {"stage": "dag_test", "prompt": "Assemble these into a DAG and define a test for EACH component + the whole DAG."},
-        {"stage": "verify", "prompt": f"For each DAG node/group answer the 5W1H verification ladder {list(_5W1H)} "
-                                      "(provenance, freshness, why-this-rung, honest-failure)."},
-        {"stage": "alternatives", "prompt": "For each node/group: is this the best way? alternatives? pros/cons "
-                                            "(cost/latency/license/determinism/governance)? Could a deterministic tool replace a model?"},
-    ]
+    ctx = f"capability={o.get('capability')} plane={o.get('plane')} governance={bool(o.get('governance'))} steps={[s['step'] for s in o.get('steps', [])]}"
+    discipline = "; ".join(d["rule"] for d in tmpl["discipline"])
+    out = []
+    for s in tmpl["stages"]:
+        out.append({"stage": s["stage"], "goal": s["goal"],
+                    "prompt": f"{s['prompt']}\nContext: {ctx}.\nMUST: {s['must']}. AVOID: {s['avoid']}. "
+                              f"TRACK (record this data): {s['track']}.\nDiscipline in force: {discipline}.",
+                    "must": s["must"], "avoid": s["avoid"], "track": s["track"]})
+    return out
