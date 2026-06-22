@@ -89,15 +89,31 @@ def intelligent_compile(intent: str, *, llm=None) -> dict:
         if not llm_available():
             return {"intent": intent, "live": False, "reason": "LLM lane offline", "pool_size": len(pool), "serves_truth": False}
         call = lambda p: real_llm(p, system="You output ONLY compact JSON.", max_tokens=500, timeout=80).get("text", "")
-    raw = call(_prompt(intent, pool))
-    try:
-        spec = json.loads(raw[raw.index("{"):raw.rindex("}") + 1])
-    except Exception:  # noqa: BLE001
-        return {"intent": intent, "live": True, "accepted": False, "reason": "LLM did not return a parseable DAG", "pool_size": len(pool), "serves_truth": False}
-    v = _validate(spec, pool)
+    def _attempt(prompt):
+        raw = call(prompt)
+        try:
+            return _validate(json.loads(raw[raw.index("{"):raw.rindex("}") + 1]), pool), None
+        except Exception:  # noqa: BLE001
+            return None, "did not return parseable JSON"
+
+    base = _prompt(intent, pool)
+    v, parse_err = _attempt(base)
+    repaired = False
+    if v is None or not v["accepted"]:                       # VALIDATION + REPAIR RETRY (the universal best practice)
+        errs = parse_err or (f"rejected invented components {v['hallucinated']}" if v and v["hallucinated"] else
+                             ("the DAG had a cycle" if v and not v["acyclic"] else "include at least one deterministic component"))
+        v2, _ = _attempt(base + f"\nYour previous attempt FAILED: {errs}. Output ONLY valid JSON, use ONLY listed "
+                                 "components, keep it acyclic, and include >=1 deterministic component.")
+        repaired = True
+        if v2 is not None and (v is None or v2["accepted"]):
+            v = v2
+    if v is None:
+        return {"intent": intent, "live": True, "accepted": False, "reason": "no parseable DAG after repair retry",
+                "repaired": repaired, "pool_size": len(pool), "serves_truth": False}
     return {"intent": intent, "capability": I.outline(intent).get("capability"), "live": True, "pool_size": len(pool),
             "composed_dag": {"nodes": v["nodes"], "edges": v["edges"]}, "deterministic_ratio": v["deterministic_ratio"],
-            "hallucinated_rejected": v["hallucinated"], "acyclic": v["acyclic"], "accepted": v["accepted"], "serves_truth": False}
+            "hallucinated_rejected": v["hallucinated"], "acyclic": v["acyclic"], "accepted": v["accepted"],
+            "repaired": repaired, "serves_truth": False}
 
 
 def run_live(intent: str) -> dict:
