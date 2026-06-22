@@ -1,0 +1,27 @@
+MODULE src/teleon/retrieval/search_port.py
+## API signatures
+```python
+"""src.teleon.retrieval.search_port — the SEARCH abstraction: any grounded-search provider behind ONE port (agnostic)."""
+_REPO = ...
+_KEYED = ...
+class SearchPort:
+    def search(self, query: str, *, limit: int=3) -> list[dict]
+class GroundedSearch:
+    # Keyless grounded search (Wikipedia / Federal Register), provider SELECTED from the registry. Network-gated:
+    def __init__(self, provider: str | None=None)
+    def search(self, query: str, *, limit: int=3) -> list[dict]
+class NotWiredSearch:
+    # A keyed provider whose key isn't present — honest, never fabricates results.
+    def __init__(self, name: str)
+    def search(self, query: str, *, limit: int=3) -> list[dict]
+_NAME_ADAPTERS = ...
+def register_search_adapter(name: str, factory) -> None
+    # Future-proofing hook: wire a real search provider by name; callers of select_search never change.
+def available_search() -> dict
+def select_search(provider: str='auto') -> SearchPort
+    # Resolve a search provider. 'auto' -> the registry-selected keyless grounded baseline; a keyed provider not yet
+```
+## intra-module call edges
+src.teleon.retrieval.search_port.select_search -> src.teleon.retrieval.search_port.GroundedSearch
+src.teleon.retrieval.search_port.select_search -> src.teleon.retrieval.search_port.NotWiredSearch
+src.teleon.retrieval.search_port.select_search -> src.teleon.retrieval.search_port.GroundedSearch

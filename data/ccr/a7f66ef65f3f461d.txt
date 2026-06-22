@@ -1,0 +1,28 @@
+MODULE src/teleon/synthesis/type_system.py
+## API signatures
+```python
+"""type_system — System 6 / the representation-agnostic seam: the type LATTICE (subtyping) + coercion graph."""
+_LATTICE = ...
+def _lattice() -> dict
+def supertype_chain(t: str) -> list
+    # [t, supertype(t), ...] up to the root, cycle-safe.
+def is_subtype(a: str, b: str) -> bool
+    # a <: b — a value of type a is usable where b is expected (a == b, or b is a supertype of a).
+def types_compatible(produced, consumed) -> bool
+    # A producer (any of `produced`) can feed a consumer (any of `consumed`) iff some produced type IS-A some consumed
+def _coercion_adj() -> dict
+def coercion_path(from_t: str, to_t: str) -> list | None
+    # Shortest sequence of converter components turning from_t into something IS-A to_t (subtyping is free). [] if
+def bridge(produced, consumed) -> list | None
+    # [] if already type-compatible; the shortest converter sequence if a coercion bridges some produced→consumed pair;
+```
+## intra-module call edges
+src.teleon.synthesis.type_system.supertype_chain -> src.teleon.synthesis.type_system._lattice
+src.teleon.synthesis.type_system.is_subtype -> src.teleon.synthesis.type_system.supertype_chain
+src.teleon.synthesis.type_system.types_compatible -> src.teleon.synthesis.type_system.is_subtype
+src.teleon.synthesis.type_system._coercion_adj -> src.teleon.synthesis.type_system._lattice
+src.teleon.synthesis.type_system.coercion_path -> src.teleon.synthesis.type_system.is_subtype
+src.teleon.synthesis.type_system.coercion_path -> src.teleon.synthesis.type_system._coercion_adj
+src.teleon.synthesis.type_system.coercion_path -> src.teleon.synthesis.type_system.is_subtype
+src.teleon.synthesis.type_system.bridge -> src.teleon.synthesis.type_system.types_compatible
+src.teleon.synthesis.type_system.bridge -> src.teleon.synthesis.type_system.coercion_path

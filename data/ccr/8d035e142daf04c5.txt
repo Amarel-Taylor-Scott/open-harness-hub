@@ -1,0 +1,18 @@
+MODULE src/teleon/synthesis/variation_store.py
+## API signatures
+```python
+"""src.teleon.synthesis.variation_store — store a capability's VARIATIONS in git (GitHub/GitLab) + the version log."""
+_STREAM = ...
+def version_hash(capability: str, decision_path: str) -> str
+def record_variations(capability: str, variations: list[dict]) -> dict
+    # Append each variation to the durable version_history stream (idempotent by version_hash; winners + losers kept).
+def list_variations(capability: str) -> list[dict]
+def _branch(capability: str, v: dict) -> str
+def commit_to_git(capability: str, variations: list[dict], *, platform: str='internal', repo: str='capabilities', now: str, token_present: bool=False) -> dict
+    # Store variations in git: the WINNING variation -> main; each explored loser -> a PR branch (lossless review trail).
+```
+## intra-module call edges
+src.teleon.synthesis.variation_store.record_variations -> src.teleon.synthesis.variation_store.version_hash
+src.teleon.synthesis.variation_store._branch -> src.teleon.synthesis.variation_store.version_hash
+src.teleon.synthesis.variation_store.commit_to_git -> src.teleon.synthesis.variation_store._branch
+src.teleon.synthesis.variation_store.commit_to_git -> src.teleon.synthesis.variation_store._branch

@@ -1,0 +1,10 @@
+MODULE src/teleon/components/conformance.py
+## API signatures
+```python
+"""conformance — the single gate every component/adapter must pass to be swappable: invoked with synthetic inputs for
+its declared CONSUMED types, it must either (a) return a dict whose keys include >=1 declared PRODUCED type, or (b) raise
+ComponentUnavailable honestly (a wired-but-offline lane). Anything else — wrong output shape, an undeclared output, a
+silent None — is non-conformant. This makes """"
+def assert_conforms(component: Component) -> dict
+    # Verdict: {component, conformant, reason}. A non-conformant adapter must NOT be swapped in.
+```

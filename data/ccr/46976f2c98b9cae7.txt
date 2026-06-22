@@ -1,0 +1,16 @@
+MODULE src/teleon/economics/simulator.py
+## API signatures
+```python
+"""simulator — System 12 (the SIMULATE stage): estimate a candidate DAG's cost / latency / quality from component
+economics WITHOUT executing it, so beam search (System 5) can rank many candidates cheaply and only the top-k are
+benchmarked on real data. Reads the live economic graph (merged economics per resource) + the unified cost model."""
+def _critical_path_latency(lat: dict, edges: list) -> float
+    # Longest path through the DAG by per-node latency. No edges → conservative linear sum (unknown ordering).
+def simulate_dag(nodes: list, edges: list | None=None, *, shard: str='000') -> dict
+    # nodes: [{step, resource_id|component|plane, deterministic?}]; edges: [[step_a, step_b]]. Returns the estimate:
+def rank_candidates(candidate_dags: list, *, profile: PreferenceProfile | None=None, shard: str='000') -> list
+    # Score many candidate DAGs by SIMULATED economics (per the user's profile) — beam-search ranking with NO execution.
+```
+## intra-module call edges
+src.teleon.economics.simulator.simulate_dag -> src.teleon.economics.simulator._critical_path_latency
+src.teleon.economics.simulator.rank_candidates -> src.teleon.economics.simulator.simulate_dag

@@ -1,0 +1,26 @@
+MODULE src/teleon/synthesis/microsteps.py
+## API signatures
+```python
+"""src.teleon.synthesis.microsteps — decompose a ladder rung into smaller MICRO-STEPS (finer components, more substitution)."""
+_REPO = ...
+_PRIMITIVES = ...
+def _decomps() -> dict
+def _plane_tools() -> dict
+def microsteps_for(capability: str, tier: str) -> list[dict]
+    # The atomic sub-steps a rung decomposes into ([] if not decomposed yet — use generate_microstep_prompt).
+def expand_to_micro_dag(intent: str) -> dict
+    # A FINER DAG: each rung that has micro-steps becomes its sub-step chain; un-decomposed rungs stay one node.
+def micro_decision_points(intent: str) -> list
+    # Decision points at MICRO granularity for the synthesis tree: each micro-step -> the tools on its plane (the finer
+def generate_microstep_prompt(capability: str, tier: str, method: str='') -> str
+    # The GENERATOR (more components): ask the LLM to decompose a rung into atomic micro-steps typed by the 7 primitives.
+def coverage() -> dict
+    # Which ladder rungs are decomposed into micro-steps (the rest are candidates for the generator).
+```
+## intra-module call edges
+src.teleon.synthesis.microsteps.microsteps_for -> src.teleon.synthesis.microsteps._decomps
+src.teleon.synthesis.microsteps.expand_to_micro_dag -> src.teleon.synthesis.microsteps.microsteps_for
+src.teleon.synthesis.microsteps.micro_decision_points -> src.teleon.synthesis.microsteps._plane_tools
+src.teleon.synthesis.microsteps.micro_decision_points -> src.teleon.synthesis.microsteps.expand_to_micro_dag
+src.teleon.synthesis.microsteps.coverage -> src.teleon.synthesis.microsteps._decomps
+src.teleon.synthesis.microsteps.coverage -> src.teleon.synthesis.microsteps._decomps

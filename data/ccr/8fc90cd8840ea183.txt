@@ -1,0 +1,33 @@
+MODULE src/teleon/synthesis/intent_to_dag.py
+## API signatures
+```python
+"""src.teleon.synthesis.intent_to_dag — intent -> outline -> component DAG -> verification ladder -> alternatives ladder."""
+_REPO = ...
+_5W1H = ...
+_TYPE_TO_LADDER = ...
+def _load(name)
+def _ladders() -> dict
+def pick_ladder(intent: str) -> dict | None
+    # Stage 1 routing: classify -> a ladder; fall back to a keyword match on ladder ids; else search_research.
+def outline(intent: str) -> dict
+    # Stages 1-2: the capability + its ordered outline (the ladder's rungs as steps).
+def build_dag(intent: str) -> dict
+    # Stage 3: a DAG of component nodes (one per rung) with cheapest-first OPTIONS; edges = the descent order.
+def decision_points(intent: str, *, principal=None) -> list
+    # The ordered (point_id, [options]) for SynthesisTree — branch over the component choice at each DAG node. A node
+def verification_ladder(node: dict) -> dict
+    # Stage 4: the 5W1H verification questions for a DAG node (governance-aware — provenance/why-this-rung/honest-fail).
+def alternatives_ladder(node: dict) -> dict
+    # Stage 5: the critique ladder for a node — other components on its plane + the best-way / pros-cons prompts.
+def frontier_prompts(intent: str) -> list[dict]
+    # Disciplined per-stage prompts from architecture/synthesis_prompt_templates.json (enumerate-before-commit,
+```
+## intra-module call edges
+src.teleon.synthesis.intent_to_dag._ladders -> src.teleon.synthesis.intent_to_dag._load
+src.teleon.synthesis.intent_to_dag.pick_ladder -> src.teleon.synthesis.intent_to_dag._ladders
+src.teleon.synthesis.intent_to_dag.outline -> src.teleon.synthesis.intent_to_dag.pick_ladder
+src.teleon.synthesis.intent_to_dag.build_dag -> src.teleon.synthesis.intent_to_dag.pick_ladder
+src.teleon.synthesis.intent_to_dag.decision_points -> src.teleon.synthesis.intent_to_dag.build_dag
+src.teleon.synthesis.intent_to_dag.alternatives_ladder -> src.teleon.synthesis.intent_to_dag._load
+src.teleon.synthesis.intent_to_dag.frontier_prompts -> src.teleon.synthesis.intent_to_dag._load
+src.teleon.synthesis.intent_to_dag.frontier_prompts -> src.teleon.synthesis.intent_to_dag.outline

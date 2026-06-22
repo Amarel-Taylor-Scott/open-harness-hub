@@ -1,0 +1,33 @@
+MODULE src/teleon/components/registry.py
+## API signatures
+```python
+"""registry — the uniform Component model + the plane-invoker registry (seam 1: one invoke shape over bespoke ports)."""
+_REPO = ...
+class ComponentUnavailable:
+    # The plane has no wired invoker, or its lane/provider is offline — an HONEST 'cannot run', not a fake result.
+def register_component_invoker(plane: str, fn: Callable[[dict], dict]) -> None
+    # Wire (or override) the uniform invoker for a plane. The future-proofing hook — callers of make_component/invoke
+def available_invokers() -> list
+def _tool_index() -> dict
+def _plane_of(component_id: str) -> str | None
+class Component:
+    # A registry component behind the uniform interface: invoke(typed_inputs) -> typed_outputs. consumes/produces are
+    def invoke(self, inputs: dict) -> dict
+def make_component(component_id: str, *, plane: str | None=None) -> Component
+    # Resolve a component id (or a bare plane) to the uniform Component, typed from plane_io_contracts.
+def _llm_invoker(inputs: dict) -> dict
+def _embedding_invoker(inputs: dict) -> dict
+def _reranker_invoker(inputs: dict) -> dict
+def _search_invoker(inputs: dict) -> dict
+def _ocr_invoker(inputs: dict) -> dict
+```
+## intra-module call edges
+src.teleon.components.registry._plane_of -> src.teleon.components.registry._tool_index
+src.teleon.components.registry.make_component -> src.teleon.components.registry.Component
+src.teleon.components.registry.make_component -> src.teleon.components.registry._plane_of
+src.teleon.components.registry.make_component -> src.teleon.components.registry._tool_index
+src.teleon.components.registry._llm_invoker -> src.teleon.components.registry.ComponentUnavailable
+src.teleon.components.registry._search_invoker -> src.teleon.components.registry.ComponentUnavailable
+src.teleon.components.registry._ocr_invoker -> src.teleon.components.registry.ComponentUnavailable
+src.teleon.components.registry.invoke -> src.teleon.components.registry.ComponentUnavailable
+src.teleon.components.registry.invoke -> src.teleon.components.registry.ComponentUnavailable

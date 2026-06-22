@@ -1,0 +1,19 @@
+MODULE src/teleon/evolution/rule_generator.py
+## API signatures
+```python
+"""src.teleon.evolution.rule_generator — GENERATE a deterministic rule from LLM decisions, validate it LOSSLESSLY."""
+_OPS = ...
+def _num(x)
+def apply_rule(rule: dict, row: dict)
+    # SAFE deterministic interpreter (no eval): first matching rule's `then`, else `default`.
+def _prompt(train: list) -> str
+def _parse_rule(text: str) -> dict | None
+def generate_rule(examples: list, *, llm, holdout_frac: float=0.34, accept_at: float=0.9) -> dict
+    # examples = [(input_dict, label), ...]. Split train/holdout; LLM proposes a structured rule from train; apply it
+def real_llm_caller()
+    # A live LLM caller (the held lane) -> a string. Network-gated; raises offline so the caller falls back/injects.
+```
+## intra-module call edges
+src.teleon.evolution.rule_generator.generate_rule -> src.teleon.evolution.rule_generator._parse_rule
+src.teleon.evolution.rule_generator.generate_rule -> src.teleon.evolution.rule_generator._prompt
+src.teleon.evolution.rule_generator.generate_rule -> src.teleon.evolution.rule_generator.apply_rule

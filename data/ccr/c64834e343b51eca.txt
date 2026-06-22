@@ -1,0 +1,17 @@
+MODULE src/teleon/retrieval/hybrid.py
+## API signatures
+```python
+"""hybrid — Reciprocal Rank Fusion (RRF), the standard hybrid-retrieval combine (Milvus / Llama Stack / Elastic):
+merge a VECTOR ranking and a LEXICAL (BM25) ranking into one. A doc strong on EITHER signal ranks well, and — because
+RRF fuses on RANK, not score — no score-scale calibration between the two retrievers is needed (the classic failure of
+naive score-blending). Deterministic, pure-Python, a"""
+RRF_K = ...
+def reciprocal_rank_fusion(rankings: list, k: int=RRF_K) -> list
+    # rankings: a list of ranked lists, each a sequence of doc KEYS best-first. Returns [(key, rrf_score)] best-first.
+def _cosine(a: list, b: list) -> float
+def hybrid_search(query: str, docs: list, *, embedder=None, reranker=None, k: int=RRF_K, top: int | None=None) -> list
+    # Fuse a VECTOR ranking (embedding cosine) and a LEXICAL ranking (reranker/BM25) over `docs` via RRF.
+```
+## intra-module call edges
+src.teleon.retrieval.hybrid.hybrid_search -> src.teleon.retrieval.hybrid.reciprocal_rank_fusion
+src.teleon.retrieval.hybrid.hybrid_search -> src.teleon.retrieval.hybrid._cosine

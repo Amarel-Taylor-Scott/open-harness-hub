@@ -1,0 +1,25 @@
+MODULE src/teleon/synthesis/component_search.py
+## API signatures
+```python
+"""src.teleon.synthesis.component_search — label every component with text+keywords+vector + SEARCH/COMPOSE over them."""
+_REPO = ...
+INDEX_PATH = ...
+INDEX_DIM = ...
+_TOK = ...
+def embed(text: str) -> list[float]
+    # Deterministic, offline LEXICAL embedding: char-trigrams + tokens hashed into a fixed dim, L2-normalized.
+def index_entry(id: str, kind: str, text: str, keywords: list[str]) -> dict
+def _cos(a: list[float], b: list[float]) -> float
+def load_index() -> tuple
+def search(query: str, *, k: int=10, index=None, kind: str | None=None) -> list[dict]
+    # Rank components by lexical-vector cosine + a keyword-overlap boost. Returns top-k {id, kind, score, keywords}.
+def compose(capability: str, *, k: int=5, index=None) -> dict
+    # COMPOSE: for a capability's ladder rungs, search the index for candidate components per rung (by the rung's plane +
+```
+## intra-module call edges
+src.teleon.synthesis.component_search.index_entry -> src.teleon.synthesis.component_search.embed
+src.teleon.synthesis.component_search.search -> src.teleon.synthesis.component_search.load_index
+src.teleon.synthesis.component_search.search -> src.teleon.synthesis.component_search.embed
+src.teleon.synthesis.component_search.search -> src.teleon.synthesis.component_search._cos
+src.teleon.synthesis.component_search.compose -> src.teleon.synthesis.component_search.load_index
+src.teleon.synthesis.component_search.compose -> src.teleon.synthesis.component_search.search

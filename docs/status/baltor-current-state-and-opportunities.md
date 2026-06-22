@@ -6,7 +6,7 @@
 ## 1. Executive summary
 Baltor's local runtime correctness invariant runs ingestion → consumption end-to-end through the approved runtime, proven
 by `check_baltor_full_stack_perfect` and `check_cfpb_to_consumption_end_to_end`. **31/31**
-critical-path sections are M10-complete with a registered proof. **599** proofs are green in the flywheel.
+critical-path sections are M10-complete with a registered proof. **616** proofs are green in the flywheel.
 Non-reference surfaces (unstructured_document_decomposition) are honestly flagged candidate/pending.
 
 ## 2. Correctness invariant status

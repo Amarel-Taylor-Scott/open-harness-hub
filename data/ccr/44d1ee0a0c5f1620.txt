@@ -1,0 +1,19 @@
+MODULE src/teleon/synthesis/dag_contract.py
+## API signatures
+```python
+"""dag_contract — verify a COMPOSED DAG is a *verified working build*, not just an acyclic spec."""
+DEFAULT_GRAPH_INPUTS = ...
+def component_types(plane) -> tuple
+    # (consumes, produces) types for a plane, or ([],[]) if the plane is not (yet) typed.
+def _acyclic_order(steps: set, edges: list) -> list
+def _synthetic_dag(nodes: list, edges: list) -> DAG
+    # Lower the abstract spec to a real pipeline_dag.DAG whose fns emit a synthetic typed placeholder — so DAG.run
+def verify_buildable_dag(nodes: list, edges: list, *, graph_inputs: tuple=DEFAULT_GRAPH_INPUTS, dry_run: bool=True) -> dict
+    # nodes: [{"step": str, "plane": str, ...}]; edges: [[step_a, step_b]]. Returns the verdict (see module docstring).
+```
+## intra-module call edges
+src.teleon.synthesis.dag_contract._synthetic_dag -> src.teleon.synthesis.dag_contract.component_types
+src.teleon.synthesis.dag_contract.verify_buildable_dag -> src.teleon.synthesis.dag_contract._acyclic_order
+src.teleon.synthesis.dag_contract.verify_buildable_dag -> src.teleon.synthesis.dag_contract.component_types
+src.teleon.synthesis.dag_contract.verify_buildable_dag -> src.teleon.synthesis.dag_contract.component_types
+src.teleon.synthesis.dag_contract.verify_buildable_dag -> src.teleon.synthesis.dag_contract._synthetic_dag

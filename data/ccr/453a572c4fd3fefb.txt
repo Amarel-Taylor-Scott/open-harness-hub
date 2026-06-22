@@ -1,0 +1,17 @@
+MODULE src/teleon/economics/cost_model.py
+## API signatures
+```python
+"""cost_model — System 21: the ONE multi-objective cost function the simulator, the optimization passes, and the router
+all consult. Reuses the user-weighted PreferenceProfile scorer (the multi-objective min-max weighted composite already
+built + tested); turns each route's LIVE economics into a candidate, folding AVAILABILITY + SUCCESS into an EFFECTIVE cost
+(a flaky / low-availability resource cost"""
+def route_to_candidate(route: dict) -> dict
+    # Map a route's economics to a PreferenceProfile candidate (keys = the OBJECTIVES: cost/latency/tokens_in/
+def score_routes(routes: list, profile: PreferenceProfile) -> list
+    # [(route, score)] — lower score is better, per the user's weights. Empty input → [].
+def choose_route(routes: list, profile: PreferenceProfile) -> dict
+    # The constraint-respecting best route (honest chosen=None + reason if none meets the hard constraints) — reuses the
+```
+## intra-module call edges
+src.teleon.economics.cost_model.score_routes -> src.teleon.economics.cost_model.route_to_candidate
+src.teleon.economics.cost_model.choose_route -> src.teleon.economics.cost_model.route_to_candidate

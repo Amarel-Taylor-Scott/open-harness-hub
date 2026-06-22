@@ -1,0 +1,42 @@
+MODULE src/teleon/research/browser_port.py
+## API signatures
+```python
+"""src.teleon.research.browser_port — the BROWSER ABSTRACTION LAYER: any browser engine behind ONE uniform port."""
+_REPO = ...
+_RENDER_MJS = ...
+_REGISTRY = ...
+class BrowserPort:
+    def render(self, url: str) -> dict
+class CallableBrowser:
+    # Wrap any (url)->dict render callable (tests / custom integrations).
+    def __init__(self, fn: Callable[[str], dict], *, name: str='callable')
+    def render(self, url: str) -> dict
+class PlaywrightBrowser:
+    # The chromium adapter (via e2e/scrape_url.mjs). Honest 'render unavailable' when node/chromium/network is missing.
+    def render(self, url: str, *, timeout: int=40, mode: str='headless') -> dict
+        # mode = headless (default) | headed — a rung on architecture/browser_escalation_ladder.json.
+class StubBrowser:
+    def render(self, url: str) -> dict
+class NotWiredBrowser:
+    # A browser DECLARED in the registry whose engine adapter isn't wired yet — honest, never fabricates a page.
+    def __init__(self, name: str, engine: str)
+    def render(self, url: str) -> dict
+class UndetectedBrowser:
+    # Rung 5 of the browser ladder (architecture/browser_escalation_ladder.json): a stealth/undetected driver
+    def __init__(self, name: str='undetected_chromedriver')
+    def _enabled(self) -> bool
+    def render(self, url: str, *, timeout: int=60, mode: str='headed') -> dict
+def register_browser_adapter(name: str, factory: Callable[[], BrowserPort], *, engine: bool=False) -> None
+    # Register a new browser adapter — by NAME, or by ENGINE (engine=True) so every registry browser on that engine
+def _registry() -> dict
+def available_browsers() -> dict
+    # Selectable browsers, POPULATED FROM the registry: every browser id + the registered name/engine adapters.
+def select_browser(engine_or_id: str='auto', **kw) -> BrowserPort
+    # Resolve a name / engine / registry-browser-id to a BrowserPort. A registry browser maps to its engine's adapter
+```
+## intra-module call edges
+src.teleon.research.browser_port.available_browsers -> src.teleon.research.browser_port._registry
+src.teleon.research.browser_port.select_browser -> src.teleon.research.browser_port.PlaywrightBrowser
+src.teleon.research.browser_port.select_browser -> src.teleon.research.browser_port._registry
+src.teleon.research.browser_port.select_browser -> src.teleon.research.browser_port.NotWiredBrowser
+src.teleon.research.browser_port.render -> src.teleon.research.browser_port.UndetectedBrowser._enabled

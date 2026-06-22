@@ -6,7 +6,7 @@ The single self-directing objective: `./loop`'s `yc` flywheel files the open gap
 
 | dimension | weight | status | detail |
 |---|---|---|---|
-| proof_point | 3 | ✅ | 3 live backend receipt(s) — a real run was executed |
+| proof_point | 3 | ✅ | 1 live backend receipt(s) — a real run was executed |
 | working_demo | 3 | ✅ | clean showcase built |
 | traction_design_partner | 3 | ⬜ | no signed design partner / paid pilot |
 | backends_green | 2 | ✅ | core proof gates: ok |

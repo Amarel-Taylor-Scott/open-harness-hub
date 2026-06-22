@@ -1,0 +1,55 @@
+MODULE src/teleon/runtime/credentials.py
+## API signatures
+```python
+"""src.teleon.runtime.credentials — the credential PLANE: which external services are reachable given the present keys."""
+_REPO = ...
+_REGISTRY = ...
+def _services() -> list[dict]
+def _dotenv() -> dict[str, str]
+def _env_value(name: str, env: dict | None) -> str
+def env_value(name: str, env: dict | None=None) -> str
+    # Resolve a single env-var VALUE (os.environ then .env). Used by the key holder — callers must NOT log the result.
+def is_present(service_id: str, env: dict | None=None) -> bool
+    # A service is PRESENT when all of its env vars are set (keyless services are present even with none set).
+def reachable(env: dict | None=None) -> set[str]
+    # Service ids reachable right now (keyless OR all env vars present).
+def reachable_planes(env: dict | None=None) -> set[str]
+    # Tool-planes unlocked by the present credentials (a plane is reachable if any service that unlocks it is present).
+def missing_for(service_id: str, env: dict | None=None) -> list[str]
+    # The env vars still needed to reach a service ([] if reachable). For honest 'needs X' messages.
+def services_for_tool(tool_id: str) -> list[str]
+    # Which credential service(s) unlock a given tool_registry/ocr tool (for the descent's reachability check).
+def _svc(service_id: str) -> dict | None
+def credential_kind(service_id: str) -> str
+    # The credential KIND (api_key default | git_token | deploy_token | oauth | deploy_key | webhook_secret | signing_key).
+def services_by_kind(kind: str) -> list[str]
+def key_ownership(service_id: str) -> str
+    # How a service's key may be supplied: 'byo' (tenant pastes their own) | 'platform' (our shared key within limits) |
+def platform_limits(service_id: str) -> dict | None
+    # The cap when using OUR key (None if byo-only). The runtime meters against this; here we expose it for the descent.
+def key_mode(service_id: str, env: dict | None=None, *, byo: set | None=None) -> str | None
+    # Resolve HOW this service is usable right now: 'byo' (the tenant supplied a key — preferred, no platform cap),
+def status(env: dict | None=None) -> dict
+    # A governed snapshot: reachable services, unlocked planes, and the keyless-vs-keyed split (no secret values).
+```
+## intra-module call edges
+src.teleon.runtime.credentials._env_value -> src.teleon.runtime.credentials._dotenv
+src.teleon.runtime.credentials.env_value -> src.teleon.runtime.credentials._env_value
+src.teleon.runtime.credentials.is_present -> src.teleon.runtime.credentials._services
+src.teleon.runtime.credentials.is_present -> src.teleon.runtime.credentials._env_value
+src.teleon.runtime.credentials.reachable -> src.teleon.runtime.credentials._services
+src.teleon.runtime.credentials.reachable -> src.teleon.runtime.credentials.is_present
+src.teleon.runtime.credentials.reachable_planes -> src.teleon.runtime.credentials._services
+src.teleon.runtime.credentials.reachable_planes -> src.teleon.runtime.credentials.is_present
+src.teleon.runtime.credentials.missing_for -> src.teleon.runtime.credentials.is_present
+src.teleon.runtime.credentials.missing_for -> src.teleon.runtime.credentials._services
+src.teleon.runtime.credentials.missing_for -> src.teleon.runtime.credentials._env_value
+src.teleon.runtime.credentials.services_for_tool -> src.teleon.runtime.credentials._services
+src.teleon.runtime.credentials._svc -> src.teleon.runtime.credentials._services
+src.teleon.runtime.credentials.credential_kind -> src.teleon.runtime.credentials._svc
+src.teleon.runtime.credentials.services_by_kind -> src.teleon.runtime.credentials._services
+src.teleon.runtime.credentials.key_ownership -> src.teleon.runtime.credentials._svc
+src.teleon.runtime.credentials.platform_limits -> src.teleon.runtime.credentials._svc
+src.teleon.runtime.credentials.key_mode -> src.teleon.runtime.credentials.key_ownership
+src.teleon.runtime.credentials.key_mode -> src.teleon.runtime.credentials.is_present
+src.teleon.runtime.credentials.key_mode -> src.teleon.runtime.credentials.is_present

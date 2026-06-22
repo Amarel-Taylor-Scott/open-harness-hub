@@ -1,0 +1,11 @@
+MODULE src/teleon/economics/routing_engine.py
+## API signatures
+```python
+"""routing_engine — System 22: BGP for computation."""
+def route_model(model_node_id: str, *, profile: PreferenceProfile | None=None, shard: str='000') -> dict
+    # Choose the best route for a model across its substitutable alternatives (arbitrage over providers).
+def arbitrage(model_node_id: str, *, profile: PreferenceProfile | None=None, shard: str='000') -> dict
+    # The explicit arbitrage view: every equivalent provider ranked cheapest-first + the chosen route.
+def reroute(prev_resource_id: str, routes: list, *, profile: PreferenceProfile | None=None) -> dict
+    # After a live economic change (a price-change CDC), recompute the best route over `routes` and report whether it
+```
