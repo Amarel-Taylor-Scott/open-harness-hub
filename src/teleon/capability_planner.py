@@ -51,16 +51,51 @@ class CapabilityPlan:
     scheduled: bool
     cadence: str                  # run_once | iterate | schedule
     schedule_every: int | None    # cycles between runs (schedule cadence)
-    needed_capability: str        # research capability (list / text / deep_detail)
+    needed_capability: str        # research capability (list / text / deep_detail) | "document_extraction"
     research_descent: dict        # the descent over the research catalog (selected + escalation order)
     steps: tuple = field(default_factory=tuple)
     stop: dict = field(default_factory=dict)
+    capability_type: str = "hub_population"   # hub_population | document_extraction
+    route: dict = field(default_factory=dict)  # engine route (e.g. the document cascade) for non-hub capabilities
     serves_truth: bool = False
 
     def as_dict(self) -> dict:
         d = self.__dict__.copy()
         d["steps"] = [s.__dict__ for s in self.steps]
         return d
+
+
+#: a capability that EXTRACTS a schema from documents (PDF/email/scan) routes to the document cascade, not the hubs.
+_DOCEXTRACT_HINTS = ("extract", "pull out", "pull the", "ocr", "schema from", "fields from", "invoice", "lease",
+                     "contract", "from these pdf", "from the pdf", "from a pdf", "from the email", "from emails",
+                     "from scans", "from documents", "email attachment", "attachments and extract")
+
+
+def classify_capability_type(intent: str) -> str:
+    """document_extraction (extract a schema from PDFs/emails/scans → the cascade) vs hub_population (populate a hub)."""
+    t = (intent or "").lower()
+    if re.search(r"\b(scrape|crawl)\b.*\b(internet|web|github|sources?)\b", t) or "hub" in t:
+        return "hub_population"          # populating a hub, even if it says 'extract'
+    if any(h in t for h in _DOCEXTRACT_HINTS) and re.search(r"\b(pdf|email|scan|document|doc|attachment|schema|extract|lease|invoice|contract|form)\b", t):
+        return "document_extraction"
+    return "hub_population"
+
+
+def resolve_schema(intent: str) -> str | None:
+    """Map free text to a known extraction schema template (land lease / oil & gas / invoice / …), or None."""
+    t = (intent or "").lower()
+    if "lease" in t and ("oil" in t or "gas" in t):
+        return "oil_gas_lease"
+    if "lease" in t or ("land" in t and "agreement" in t):
+        return "land_lease"
+    try:
+        from src.teleon.extraction.schema_templates import template_names
+        for name in template_names():
+            if name in t or name.replace("_", " ") in t:
+                return name
+    except Exception:  # noqa: BLE001
+        pass
+    return None
 
 
 def classify(intent: str) -> dict:
@@ -98,9 +133,34 @@ def infer_capability(intent: str) -> str:
     return "list"
 
 
+def _plan_document_extraction(intent: str) -> CapabilityPlan:
+    """A capability like 'intake a PDF/email and extract this schema' → routed to the document cascade (the efficient
+    way), NOT the hub pipeline. The owner's point: write the capability; the system makes it most efficient."""
+    schema = resolve_schema(intent)
+    steps = (
+        PlanStep("acquire", "extraction.document_extraction_cascade._pick_acquire",
+                 "OCR / text extraction — cheapest acquire the document supports"),
+        PlanStep("prune_compress", "extraction.document_extraction_cascade (prune_compress)",
+                 "cut gibberish + redundant text → fewer tokens before any LLM"),
+        PlanStep("patterns", "extraction.document_extraction_cascade (regex/heuristic_patterns)",
+                 "deterministic pattern extraction — answers BEFORE any LLM call"),
+        PlanStep("cheap_llm", "extraction.document_extraction_cascade (cheap_llm)",
+                 "cheapest-capable LLM on ONLY the unfilled fields, chunked"),
+        PlanStep("supervise", "extraction.document_extraction_cascade.supervise_extraction",
+                 "LLM as CONTROL SUPERVISOR — audits the cheap methods, escalates only the flagged fields"),
+    )
+    return CapabilityPlan(intent=intent, hub="", iterative=False, scheduled=False, cadence="per_document",
+                          schedule_every=None, needed_capability="document_extraction", research_descent={},
+                          steps=steps, stop={"mode": "cascade"}, capability_type="document_extraction",
+                          route={"engine": "document_extraction_cascade", "schema_template": schema})
+
+
 def plan(intent: str, *, hubs: list[str], kinds: dict | None = None, available: set | None = None,
          max_rounds: int = 5, no_new_rounds: int = 2) -> CapabilityPlan:
-    """Decompose an open-ended capability into a typed, executable plan (classification + hub + research descent + steps)."""
+    """Decompose an open-ended capability into a typed, executable plan. A document-extraction capability routes to the
+    cascade (efficient by construction); a hub-population capability gets the classify + hub + research-descent plan."""
+    if classify_capability_type(intent) == "document_extraction":
+        return _plan_document_extraction(intent)
     c = classify(intent)
     hub = resolve_hub(intent, hubs, kinds=kinds) or (hubs[0] if hubs else "")
     cap = infer_capability(intent)
@@ -142,6 +202,20 @@ def execute(p: CapabilityPlan, *, hub_engines: dict, openclaw=None, tools: list 
     Iterates until: a round adds nothing new for ``stop_when_no_new_rounds`` consecutive rounds, OR ``max_rounds`` is
     hit. For a scheduled plan it still runs the rounds NOW and ALSO returns a schedule descriptor for the flywheel/cron
     to honor (this function never sleeps). serves_truth=false."""
+    # document-extraction capabilities route to the cascade (efficient by construction), not the hub loop
+    if p.capability_type == "document_extraction":
+        from src.teleon.extraction.document_extraction_cascade import compare_strategies
+        from src.teleon.extraction.schema_templates import get_template
+        schema = get_template(p.route.get("schema_template")) if p.route.get("schema_template") else None
+        required = schema or {"party_a": "structured", "party_b": "structured", "effective_date": "structured",
+                              "terms": "semi", "special_provisions": "unstructured"}
+        cmp = compare_strategies(required, {"has_text_layer": True, "scanned": False})
+        return {"capability_type": "document_extraction", "schema_template": p.route.get("schema_template"),
+                "fields": cmp["fields"], "frontier_only_cost": cmp["frontier_only"]["cost"],
+                "cascade_cost": cmp["cascade"]["cost"], "supervised_cost": cmp["supervised"]["cost"],
+                "pct_saved": cmp["supervised"]["pct_saved"], "llm_role": cmp["supervised"]["llm_role"],
+                "made_efficient": True, "serves_truth": False}
+
     if run_round is None:
         from src.teleon.hub_freshness import keep_hub_fresh
         def run_round(hub, intent):  # noqa: E306
@@ -175,4 +249,5 @@ def execute(p: CapabilityPlan, *, hub_engines: dict, openclaw=None, tools: list 
             "research_selected": p.research_descent.get("selected"), "serves_truth": False}
 
 
-__all__ = ["PlanStep", "CapabilityPlan", "classify", "resolve_hub", "infer_capability", "plan", "execute"]
+__all__ = ["PlanStep", "CapabilityPlan", "classify", "classify_capability_type", "resolve_hub", "resolve_schema",
+           "infer_capability", "plan", "execute"]

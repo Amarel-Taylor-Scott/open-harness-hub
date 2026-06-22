@@ -70,6 +70,22 @@ def _self_test() -> int:
     r1 = execute(p1, hub_engines={}, run_round=lambda hub, intent: {"discovered": 1, "ingested": 1, "verified": 1})
     ck("a one-shot capability runs exactly ONE round", r1["rounds_run"] == 1 and r1["cadence"] == "run_once")
 
+    # DOCUMENT-EXTRACTION capability routes to the cascade (the owner's "write the capability → made efficient")
+    from src.teleon.capability_planner import classify_capability_type
+    ck("classifies a doc-extraction capability ('extract ... from these PDFs')",
+       classify_capability_type("intake these land lease PDFs and extract lessor, royalty, acreage") == "document_extraction")
+    ck("a hub-scrape capability is NOT misread as doc-extraction",
+       classify_capability_type("scrape the internet for additional skills for openskillshub.io") == "hub_population")
+    pdoc = plan("intake a PDF/email and extract the land lease schema", hubs=hubs, kinds=kinds)
+    dnames = [s.name for s in pdoc.steps]
+    ck("doc-extraction plan routes to the cascade (acquire→prune→patterns→cheap_llm→supervise)",
+       pdoc.capability_type == "document_extraction" and dnames == ["acquire", "prune_compress", "patterns", "cheap_llm", "supervise"]
+       and pdoc.route.get("schema_template") == "land_lease")
+    rdoc = execute(pdoc, hub_engines={})
+    ck("executing a doc-extraction plan runs the cascade + returns computed savings (supervised < frontier)",
+       rdoc["capability_type"] == "document_extraction" and rdoc["supervised_cost"] < rdoc["frontier_only_cost"]
+       and rdoc["pct_saved"] >= 70 and rdoc["made_efficient"] is True)
+
     # scheduled -> a schedule descriptor is emitted
     ps = plan("keep openskillshub fresh daily", hubs=hubs, kinds=kinds)
     rs = execute(ps, hub_engines={}, run_round=lambda hub, intent: {"discovered": 0, "ingested": 0, "verified": 0})

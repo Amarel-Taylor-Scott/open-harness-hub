@@ -279,22 +279,29 @@ def capability_cmd(intent: str, *, plan_only: bool = False, rounds: int = 5, ten
     kinds = {s.hub_id: s.component_kind for s in specs}
     p = make_plan(intent, hubs=hubs, kinds=kinds, max_rounds=rounds)
     print(f"INTENT: {intent}")
-    print(f"  -> hub={p.hub}  cadence={p.cadence}  iterative={p.iterative}  scheduled={p.scheduled}"
-          + (f"  every={p.schedule_every} cycles" if p.scheduled else ""))
-    print(f"  -> research need='{p.needed_capability}'  descent selects={p.research_descent.get('selected')}"
-          f"  escalation={p.research_descent.get('escalation')}")
+    print(f"  -> capability_type={p.capability_type}")
+    if p.capability_type == "document_extraction":
+        print(f"  -> route: document-extraction cascade  schema_template={p.route.get('schema_template')}")
+    else:
+        print(f"  -> hub={p.hub}  cadence={p.cadence}  iterative={p.iterative}  scheduled={p.scheduled}"
+              + (f"  every={p.schedule_every} cycles" if p.scheduled else ""))
+        print(f"  -> research need='{p.needed_capability}'  descent selects={p.research_descent.get('selected')}"
+              f"  escalation={p.research_descent.get('escalation')}")
     print("  -> plan (multi-component):")
     for i, s in enumerate(p.steps, 1):
         print(f"       {i}. {s.name:<15} via {s.binds_to}")
-    print(f"  -> stop: {p.stop}")
     if plan_only:
         return 0
     eng, oc, tools = _engines(), OpenClaw(default_plugins()), _tools()
     r = run_plan(p, hub_engines=eng, openclaw=oc, tools=tools, tenant=tenant)
-    print(f"\nEXECUTED {r['rounds_run']} round(s) — stopped: {r['stopped_because']}; totals={r['totals']}")
-    if r["schedule"]:
-        print(f"SCHEDULE: recurring every {r['schedule']['every_cycles']} — honored by {r['schedule']['honored_by']}")
-    print("serves_truth=false; candidates served only after the hub verify gate.")
+    if p.capability_type == "document_extraction":
+        print(f"\nMADE EFFICIENT via the cascade ({r['fields']} fields): frontier-only ${r['frontier_only_cost']} "
+              f"-> supervised ${r['supervised_cost']} ({r['pct_saved']}% cheaper; LLM role: {r['llm_role']}).")
+    else:
+        print(f"\nEXECUTED {r['rounds_run']} round(s) — stopped: {r['stopped_because']}; totals={r['totals']}")
+        if r["schedule"]:
+            print(f"SCHEDULE: recurring every {r['schedule']['every_cycles']} — honored by {r['schedule']['honored_by']}")
+    print("serves_truth=false; candidates served only after the verify gate.")
     return 0
 
 
