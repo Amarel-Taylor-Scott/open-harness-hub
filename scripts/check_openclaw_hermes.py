@@ -28,13 +28,17 @@ def _self_test() -> int:
         print(f"  [{'ok' if ok else 'FAIL'}] {name}{(': '+detail) if detail and not ok else ''}")
         if not ok: fails.append(name)
 
+    import json
+    strat = json.loads((REPO / "architecture" / "hub_population_strategy.json").read_text(encoding="utf-8"))["hubs"]
     oc = OpenClaw(default_plugins())
     tools = stub_tools()
-    ck("OpenClaw is plugin-based, one finder per content kind (repos/harnesses/context/skills/skill_to_tool/mcp/compression)",
-       {p.content_kind for p in oc.plugins} >= {"repos", "harnesses", "context", "skills", "skill_to_tool", "mcp", "compression"})
+    ck("OpenClaw is plugin-based: ONE finder per hub, auto-derived from the strategy (single source — covers all hubs)",
+       {p.target_hub for p in oc.plugins} == set(strat) and len(oc.plugins) == len(strat))
+    ck("plugin content kinds match the strategy (e.g. tools/skills/context/harnesses/compression)",
+       {p.content_kind for p in oc.plugins} >= {"tools", "skills", "context", "harnesses", "compression"})
 
-    # unbounded -> bounded tool DESCENT
-    repo_plugin = next(p for p in oc.plugins if p.content_kind == "repos")
+    # unbounded -> bounded tool DESCENT (OpenToolsHub declares tool_tier=api in the strategy)
+    repo_plugin = next(p for p in oc.plugins if p.target_hub == "OpenToolsHub")
     picked = oc.pick_tool(repo_plugin, tools)
     ck("picks the MOST BOUNDED available tool (api over search/scrape) — the descent", picked.tier == "api", picked.tier)
 

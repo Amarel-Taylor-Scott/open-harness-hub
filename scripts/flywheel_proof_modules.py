@@ -825,4 +825,16 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/build_examples_gallery.py", "build_examples_gallery"),
     # ── ADVERSARIAL gallery-video verifier gated: scripts/check_examples_video_verifier.py — a recorder asserting "the DOM had the verdict" never proves the VIDEO FILE shows anything. e2e/verify_examples_gallery_videos.mjs inspects the bytes (size / duration / 1600x900 / not-blank via luma range / not-black / not-frozen via start-vs-end PSNR) and its --self-test synthesises blank/black/frozen/short/wrong-size videos and proves it REJECTS each on the right check. The recorder runs the verifier on every full run AND strengthens its own in-page checks (chip visible + in-viewport + FULL verdict text + card not half-rendered + no overflow/console errors). Environment-tolerant: runs the discrimination self-test where node+ffmpeg exist, skips honestly otherwise. ──
     ("scripts/check_examples_video_verifier.py", "check_examples_video_verifier"),
+    # ── OPEN*HUB AUTOMATION: all 22 hubs auto-populate via THREE channels — DISCOVER (OpenClaw/Hermes + keep_hub_fresh, unbounded→bounded), GENERATE (method_catalog single-source + operator-injected descent_brain), INTAKE (owner OKF/links/text via --ingest). Research itself is a descent-selectable catalog (cheapest component that gets the detail; the LLM-driven browser only for deep_detail). The capability planner turns open-ended text ("scrape the internet for more skills for openskillshub.io") into iterative/scheduled/multi-component plans. ONE standardized template renders all 22 surfaces. The coverage guard means no hub is silently stranded. Registered so CI + the health flywheel GUARD the hub system — it was previously unguarded (a content_kind rename silently broke check_openclaw_hermes; caught + fixed by this registration). serves_truth=false throughout; verify gate applies (discovery≠trust). ──
+    ("scripts/check_hub_engines.py", "check_hub_engines"),
+    ("scripts/check_openclaw_hermes.py", "check_openclaw_hermes"),
+    ("scripts/check_hub_freshness.py", "check_hub_freshness"),
+    ("scripts/check_hub_settings.py", "check_hub_settings"),
+    ("scripts/check_hub_population_coverage.py", "check_hub_population_coverage"),
+    ("scripts/check_research_catalog.py", "check_research_catalog"),
+    ("scripts/check_capability_planner.py", "check_capability_planner"),
+    ("scripts/check_repo_emit.py", "check_repo_emit"),
+    ("scripts/build_hub_sites.py", "build_hub_sites"),
+    ("scripts/scaffold_hub.py", "scaffold_hub"),
+    ("scripts/hub_engine_runner.py", "hub_engine_runner"),
 ]

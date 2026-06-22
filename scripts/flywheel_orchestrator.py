@@ -39,7 +39,10 @@ STALE_AFTER_SEC = 900                                    # no heartbeat in 15 mi
 STOP = REPO / ".agent" / "STOP_REQUESTED"
 _HEALTH_CHECKS = ["check_plane_separation", "check_surface_map", "check_byo_compute", "check_teleon_control_plane",
                   "check_context_compressor", "check_medium_config", "check_execution_provider_factory",
-                  "check_dag_pipeline", "check_teleon_example_descents", "check_descent_attempt_store"]
+                  "check_dag_pipeline", "check_teleon_example_descents", "check_descent_attempt_store",
+                  # hub-automation core (all 22 hubs auto-populate via 3 channels; research descent; capability planner)
+                  "check_hub_population_coverage", "check_openclaw_hermes", "check_research_catalog",
+                  "check_capability_planner"]
 _ERROR_COOLDOWN = 3          # after this many consecutive errors, a flywheel waits...
 _COOLDOWN_CYCLES = 10        # ...this many cycles before retrying
 _AUTOFIX = True              # auto-apply ONLY trivial, fully-reversible fixes unattended (--no-autofix to disable)
