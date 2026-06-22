@@ -64,12 +64,27 @@ def _live_llm_verified() -> bool:
         return False
 
 
+def _live_cdc_verified() -> bool:
+    """Derived: a real CDC event from a LIVE authoritative-source poll (not a passed-in value) is recorded in cdc_events."""
+    try:
+        from src.teleon.storage import record_store as RS
+        st = RS.open_record_store("cdc_events")
+        try:
+            return any(str(e.get("source", "")).startswith("us_federal_register") and e.get("kind") in ("new", "changed")
+                       for e in st.all())
+        finally:
+            st.close()
+    except Exception:  # noqa: BLE001
+        return False
+
+
 def _seams() -> list[dict]:
     """The live-wiring gaps to close for real cloud go-live — honest, with the owning sprint."""
     _llm_live = _live_llm_verified()
+    _cdc_live = _live_cdc_verified()
     return [
         {"seam": "live LLM inference", "owner_action": ("primary Ollama/Gemma lane LIVE-verified (data/dev-intel/live-llm-smoke.json); other lanes (Cloudflare/hosted) are key-gated add-ons" if _llm_live else "set provider keys + a live smoke per inference lane; today lanes degrade to provider_unavailable offline"), "sprint": "S1-live-adapters", "blocking": not _llm_live},
-        {"seam": "live source fetch + CDC freshness", "owner_action": "wire a real source poller -> freshness CDC 'changed' events -> self_healing reheal; today freshness uses passed-in values", "sprint": "S1-live-adapters", "blocking": True},
+        {"seam": "live source fetch + CDC freshness", "owner_action": ("LIVE-verified: source_poller polls the real US Federal Register -> real CDC event (cdc_events) -> reheal holds stale out; scheduled polling = wire as a flywheel" if _cdc_live else "wire a real source poller -> freshness CDC 'changed' events -> self_healing reheal; today freshness uses passed-in values"), "sprint": "S1-live-adapters", "blocking": not _cdc_live},
         {"seam": "real distillation (LLM -> deterministic rule generation)", "owner_action": "wire the determinism factory to a model to GENERATE the rule a fork represents (today forks are governed specs)", "sprint": "S2-distill-live", "blocking": True},
         {"seam": "real per-vertical eval data", "owner_action": "ingest real benchmark datasets (RuleArena + vertical evals) so the A/B scorer is live, not representative", "sprint": "S2-distill-live", "blocking": True},
         {"seam": "vetting workflow (the vetted_only producer)", "owner_action": "a human/eval vetting gate that sets vetted=true on a candidate; today the flag has no producer", "sprint": "S3-governance-live", "blocking": False},
