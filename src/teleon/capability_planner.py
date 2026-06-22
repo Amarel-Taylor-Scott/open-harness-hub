@@ -71,13 +71,45 @@ _DOCEXTRACT_HINTS = ("extract", "pull out", "pull the", "ocr", "schema from", "f
                      "from scans", "from documents", "email attachment", "attachments and extract")
 
 
+# Capability TYPES beyond extraction — routed to the tunable-task method grids (rules → small model → LLM, cheapest
+# that meets the bar). Ordered most-specific-first; matched by keyword (the catalog has no triggers, so they live here).
+_TASK_KEYWORDS: list = [
+    ("transcription-asr", ["transcrib", "audio to text", "speech to text", "speech-to-text", " asr", "voice to text"]),
+    ("image-tagging", ["classify an image", "classify images", "tag an image", "tag images", "image classif", "label an image", "image label", "tag photos"]),
+    ("sql-generation", ["nl to sql", "nl2sql", "text to sql", "text-to-sql", "generate sql", "sql query", " sql ", "to sql", "query the database", "query the db", "natural language to sql"]),
+    ("code-review", ["code review", "review a code", "review the code", "review this pr", "review a pr", "pull request review", "diff review"]),
+    ("content-moderation", ["moderat", "unsafe content", "flag unsafe", "toxic", "abusive content", "content safety", "safety filter"]),
+    ("dedup-near-duplicate", ["near-duplicate", "near duplicate", "deduplicat", "dedupe", "detect duplicate", "find duplicate"]),
+    ("entity-resolution", ["entity resolution", "canonical entit", "record linkage", "resolve records", "match records", "link records", "resolve duplicates to"]),
+    ("translation", ["translate", "translation"]),
+    ("summarization", ["summari", "tl;dr", "tldr", "abstract of", "condense"]),
+    ("grounded-answer", ["answer a question", "answer questions", "with citation", "cite sources", "q&a", "question answering", "grounded answer", "answer with", "look up the answer", "search and answer", "rag"]),
+    ("text-classification", ["classif", "categor", "label text", "label these", "tag text", "taxonomy", "label the"]),
+    ("email-triage", ["triage", "route the inbox", "route inbox", "inbox", "sort emails", "assign tickets", "route emails"]),
+    ("document-schema-extraction", ["extract", "pull out", "fields from", "schema from", "ocr", "invoice", "lease", "contract", "form fields"]),
+]
+
+
+def _match_task(t: str) -> str | None:
+    """First catalog task whose keyword appears (most-specific-first). Returns a task_id or None."""
+    for task_id, kws in _TASK_KEYWORDS:
+        if any(k in t for k in kws):
+            return task_id
+    return None
+
+
 def classify_capability_type(intent: str) -> str:
-    """document_extraction (extract a schema from PDFs/emails/scans → the cascade) vs hub_population (populate a hub)."""
+    """Route an open-ended capability to a TYPE: hub_population (populate a hub), document_extraction (the richer
+    extraction cascade), or task:<id> for any of the other tunable-task capability types (classify / answer / summarize
+    / translate / dedupe / route / transcribe / sql / moderate / entity-resolution / image-tag)."""
     t = (intent or "").lower()
     if re.search(r"\b(scrape|crawl)\b.*\b(internet|web|github|sources?)\b", t) or "hub" in t:
         return "hub_population"          # populating a hub, even if it says 'extract'
-    if any(h in t for h in _DOCEXTRACT_HINTS) and re.search(r"\b(pdf|email|scan|document|doc|attachment|schema|extract|lease|invoice|contract|form)\b", t):
-        return "document_extraction"
+    task = _match_task(t)
+    if task == "document-schema-extraction":
+        return "document_extraction"     # the richer dedicated cascade (acquire→prune→patterns→cheap→supervise)
+    if task:
+        return "task:" + task            # the tunable-task method grid (cheapest tier that meets the bar)
     return "hub_population"
 
 
@@ -155,12 +187,34 @@ def _plan_document_extraction(intent: str) -> CapabilityPlan:
                           route={"engine": "document_extraction_cascade", "schema_template": schema})
 
 
+def _plan_tunable_task(intent: str, task_id: str, *, available_keys: tuple = ("LLM_API_KEY",)) -> CapabilityPlan:
+    """A capability like 'classify these tickets' / 'answer with citations' / 'summarize' → routed to the tunable-task
+    method grid (rules/cheap → small model → LLM), cheapest tier that meets the bar. The same efficiency motion as
+    extraction, generalized across the 13 capability types."""
+    from src.teleon.evolution import auto_tuning
+    task = auto_tuning.get_task(task_id) or {}
+    setup = auto_tuning.auto_tune_setup(task_id, available_keys=available_keys)
+    steps = tuple(PlanStep(t["tier"], f"teleon.evolution.auto_tuning ({task_id})",
+                           f"{t.get('methods', '')}" + (" · deterministic" if t.get("deterministic") else ""))
+                  for t in task.get("tiers", []))
+    return CapabilityPlan(intent=intent, hub="", iterative=False, scheduled=False, cadence="per_request",
+                          schedule_every=None, needed_capability=task_id, research_descent={}, steps=steps,
+                          stop={"objective": task.get("objective"), "metric": task.get("requirement_metric")},
+                          capability_type="task:" + task_id,
+                          route={"engine": "tunable_task_harness", "task_id": task_id, "name": task.get("name"),
+                                 "cheapest_tier": setup.get("cheapest_tier"), "escalation_order": setup.get("escalation_order"),
+                                 "deterministic_possible": task.get("deterministic_possible")})
+
+
 def plan(intent: str, *, hubs: list[str], kinds: dict | None = None, available: set | None = None,
          max_rounds: int = 5, no_new_rounds: int = 2) -> CapabilityPlan:
-    """Decompose an open-ended capability into a typed, executable plan. A document-extraction capability routes to the
-    cascade (efficient by construction); a hub-population capability gets the classify + hub + research-descent plan."""
-    if classify_capability_type(intent) == "document_extraction":
+    """Decompose an open-ended capability into a typed, executable plan. document_extraction → the cascade; a tunable
+    task (classify/answer/summarize/...) → its method grid; hub_population → the classify + hub + research-descent plan."""
+    ctype = classify_capability_type(intent)
+    if ctype == "document_extraction":
         return _plan_document_extraction(intent)
+    if ctype.startswith("task:"):
+        return _plan_tunable_task(intent, ctype.split(":", 1)[1])
     c = classify(intent)
     hub = resolve_hub(intent, hubs, kinds=kinds) or (hubs[0] if hubs else "")
     cap = infer_capability(intent)
@@ -214,6 +268,14 @@ def execute(p: CapabilityPlan, *, hub_engines: dict, openclaw=None, tools: list 
                 "fields": cmp["fields"], "frontier_only_cost": cmp["frontier_only"]["cost"],
                 "cascade_cost": cmp["cascade"]["cost"], "supervised_cost": cmp["supervised"]["cost"],
                 "pct_saved": cmp["supervised"]["pct_saved"], "llm_role": cmp["supervised"]["llm_role"],
+                "made_efficient": True, "serves_truth": False}
+    # any other tunable-task capability → the method-grid descent (cheapest tier that meets the bar)
+    if p.capability_type.startswith("task:"):
+        r = p.route
+        return {"capability_type": p.capability_type, "task_id": r.get("task_id"), "name": r.get("name"),
+                "cheapest_tier": r.get("cheapest_tier"), "escalation_order": r.get("escalation_order"),
+                "deterministic_possible": r.get("deterministic_possible"),
+                "objective": p.stop.get("objective"), "metric": p.stop.get("metric"),
                 "made_efficient": True, "serves_truth": False}
 
     if run_round is None:

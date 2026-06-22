@@ -215,6 +215,18 @@ def _baltor_examples() -> str:
     return "".join(f'<div class=card><h4>{t}</h4><p>{d}</p></div>' for t, d in _BALTOR_EXAMPLES)
 
 
+def _capability_types() -> str:
+    """Cards for the tunable-task capability TYPES (computed from the catalog) — each with its cheapest-first grid."""
+    try:
+        tasks = json.loads((REPO / "architecture" / "tunable_task_catalog.json").read_text(encoding="utf-8"))["tasks"]
+    except Exception:  # noqa: BLE001
+        return ""
+    return "".join(
+        f'<div class=card><h4>{t["name"].title()}</h4>'
+        f'<p class=mono style="font-size:12px;color:#9aa">{" → ".join(x["tier"] for x in t.get("tiers", []))}</p></div>'
+        for t in tasks)
+
+
 def page_index(c: dict) -> str:
     body = f"""
 <header class="hero parent"><div class=wrap>
@@ -292,6 +304,11 @@ def page_teleon(c: dict) -> str:
 <section><div class="wrap reveal"><h2>More examples</h2><h3>Every capability descends — here are a few.</h3>
   <p>Each is the same motion: deterministic + cheap first, the frontier reserved for supervision. Costs are computed.</p>
   <div class="grid g3" style="margin-top:16px">{_teleon_examples(c)}</div></div></section>
+<section><div class="wrap reveal"><h2>Not just extraction</h2><h3>Classify, search, summarize, translate, route, and more.</h3>
+  <p>Write any common AI task in plain language — <i>classify these tickets</i>, <i>answer with citations</i>,
+  <i>summarize</i>, <i>translate</i>, <i>detect duplicates</i>, <i>route the inbox</i>, <i>transcribe</i>,
+  <i>NL&rarr;SQL</i> — and it runs the cheapest tier first, escalating only as the quality bar forces.</p>
+  <div class="grid g3" style="margin-top:16px">{_capability_types()}</div></div></section>
 <section><div class="wrap reveal"><h2>Performance, in control</h2><h3>Efficient AND safe — within control-chart limits.</h3>
   <p>Cutting cost can't mean cutting corners. Each capability the descent produces is a sample on a control chart:
   cost stays inside an efficient band (UCL/LCL) — far below the frontier-only baseline — while quality holds above the
@@ -450,6 +467,8 @@ def _self_test() -> int:
                                           "verify vs the authoritative source", "HELD OUT", "the governing source wins")))
     ck("Teleon shows MULTIPLE examples (beyond the one worked example)",
        "More examples" in pages["teleon"] and pages["teleon"].count("% cheaper") >= 3)
+    ck("Teleon shows MORE capability TYPES (not just extraction): classify/answer/summarize/translate/route",
+       "Not just extraction" in pages["teleon"] and all(w in pages["teleon"] for w in ("Classify", "Translate", "Summarize")))
     print("\n" + ("PASS - build_intro_site: 4 cross-linked animated pages — PARENT (efficient+appropriate, not context), "
                   "Baltor (trust/context), Teleon (efficiency/descent/cascade), Open*Hubs (component registries); figures computed; "
                   "honest preview caveat." if not fails else f"{len(fails)} FAILURES: {fails}"))

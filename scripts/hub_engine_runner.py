@@ -270,6 +270,9 @@ def capability_cmd(intent: str, *, plan_only: bool = False, rounds: int = 5, ten
     print(f"  -> capability_type={p.capability_type}")
     if p.capability_type == "document_extraction":
         print(f"  -> route: document-extraction cascade  schema_template={p.route.get('schema_template')}")
+    elif p.capability_type.startswith("task:"):
+        print(f"  -> route: tunable-task '{p.route.get('name')}'  method grid (cheapest-first): "
+              f"{p.route.get('escalation_order')}  cheapest={p.route.get('cheapest_tier')}")
     else:
         print(f"  -> hub={p.hub}  cadence={p.cadence}  iterative={p.iterative}  scheduled={p.scheduled}"
               + (f"  every={p.schedule_every} cycles" if p.scheduled else ""))
@@ -285,6 +288,9 @@ def capability_cmd(intent: str, *, plan_only: bool = False, rounds: int = 5, ten
     if p.capability_type == "document_extraction":
         print(f"\nMADE EFFICIENT via the cascade ({r['fields']} fields): frontier-only ${r['frontier_only_cost']} "
               f"-> supervised ${r['supervised_cost']} ({r['pct_saved']}% cheaper; LLM role: {r['llm_role']}).")
+    elif p.capability_type.startswith("task:"):
+        print(f"\nMADE EFFICIENT via the method grid: try {r['cheapest_tier']} first, escalate only as the "
+              f"{r['metric']} bar forces -> {r['escalation_order']} (deterministic_possible={r['deterministic_possible']}).")
     else:
         print(f"\nEXECUTED {r['rounds_run']} round(s) — stopped: {r['stopped_because']}; totals={r['totals']}")
         if r["schedule"]:

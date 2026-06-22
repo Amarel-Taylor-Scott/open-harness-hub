@@ -86,6 +86,28 @@ def _self_test() -> int:
        rdoc["capability_type"] == "document_extraction" and rdoc["supervised_cost"] < rdoc["frontier_only_cost"]
        and rdoc["pct_saved"] >= 70 and rdoc["made_efficient"] is True)
 
+    # MORE capability types (owner): classify / answer / summarize / translate / dedupe / route / transcribe / sql ...
+    type_cases = {
+        "classify these support tickets into categories": "task:text-classification",
+        "answer this question with citations": "task:grounded-answer",
+        "summarize this contract": "task:summarization",
+        "translate these emails": "task:translation",
+        "detect near-duplicate records": "task:dedup-near-duplicate",
+        "route and triage my inbox": "task:email-triage",
+        "transcribe this audio": "task:transcription-asr",
+        "turn this into a SQL query over the schema": "task:sql-generation",
+    }
+    for intent_text, want in type_cases.items():
+        ck(f"classifies '{intent_text[:32]}...' → {want}", classify_capability_type(intent_text) == want)
+    pcl = plan("classify these support tickets into categories", hubs=hubs, kinds=kinds)
+    ck("a tunable-task plan carries the method-grid tiers (cheapest-first descent)",
+       pcl.capability_type == "task:text-classification" and [s.name for s in pcl.steps] == ["rules", "small-model", "llm"])
+    rcl = execute(pcl, hub_engines={})
+    ck("executing a tunable-task returns the escalation order + cheapest tier (made efficient)",
+       rcl["cheapest_tier"] == "rules" and rcl["escalation_order"][0] == "rules" and rcl["made_efficient"] is True)
+    ck("an image-classify intent routes to image-tagging (not text-classification)",
+       classify_capability_type("classify an image of a product") == "task:image-tagging")
+
     # scheduled -> a schedule descriptor is emitted
     ps = plan("keep openskillshub fresh daily", hubs=hubs, kinds=kinds)
     rs = execute(ps, hub_engines={}, run_round=lambda hub, intent: {"discovered": 0, "ingested": 0, "verified": 0})
