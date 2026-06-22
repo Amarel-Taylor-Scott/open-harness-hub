@@ -65,6 +65,32 @@ def _self_test() -> int:
     finally:
         ss.select_source_search = orig
 
+    # the DESCENT climbs: a failing API source escalates to its browser-render tier (escalate=True), else stays honest
+    orig2, orig_esc = ss.select_source_search, dict(ss._ESCALATION)
+    def _raises(fn):
+        try:
+            fn(); return False
+        except SourceSearchUnavailable:
+            return True
+    try:
+        ss.select_source_search = lambda s="auto": [_Fake("pypi", fail=True)]
+        class _Esc(SourceSearchPort):
+            source = "pypi"
+            def search(self, q, *, limit=10):
+                return [ToolHit("pypi", "escalated_hit", "u")]
+        ss._ESCALATION = {"pypi": _Esc}
+        ck("escalate=False does NOT climb (stays honest-unavailable)", _raises(lambda: discover("q", source="pypi")))
+        ck("escalate=True climbs API->browser tier", [h.name for h in discover("q", source="pypi", escalate=True)] == ["escalated_hit"])
+        class _EscFail(SourceSearchPort):
+            source = "pypi"
+            def search(self, q, *, limit=10):
+                raise SourceSearchUnavailable("bot challenge")
+        ss._ESCALATION = {"pypi": _EscFail}
+        ck("all tiers down -> raises with no fabrication", _raises(lambda: discover("q", source="pypi", escalate=True)))
+    finally:
+        ss.select_source_search, ss._ESCALATION = orig2, orig_esc
+    ck("PyPI browser-escalation tier exists (don't give up — climb)", hasattr(ss, "PyPIBrowserSearch") and callable(ss.search_via_browser))
+
     # network gating is real (offline -> Unavailable, not a silent empty)
     orig_net = ss.network_allowed
     try:

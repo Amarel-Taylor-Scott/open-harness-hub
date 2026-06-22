@@ -160,7 +160,49 @@ class GitHubSearch(SourceSearchPort):
         return hits
 
 
+def search_via_browser(search_url: str, *, timeout: int = 60) -> dict:
+    """ESCALATION tier: render a source's search PAGE with the LLM-directed browser (PlaywrightBrowser), as a user would
+    — the rung ABOVE a deterministic API, used when the API is blocked/absent. Honest: a bot 'Client Challenge'/captcha
+    raises pointing at the NEXT rung — a stealth/undetected browser (selenium / undetected_chromedriver / nodriver /
+    patchright are cataloged in web_browsing_stack_registry, GOVERNED by research_guardrail_policy = robots/ToS, not
+    wired). This is the descent climbing, not giving up."""
+    from src.teleon.research.browser_port import PlaywrightBrowser
+    r = PlaywrightBrowser().render(search_url, timeout=timeout)
+    if r.get("error"):
+        raise SourceSearchUnavailable(f"browser render failed: {r['error']}")
+    title = (r.get("title") or "").lower()
+    if any(w in title for w in ("challenge", "captcha", "are you a robot", "access denied")):
+        raise SourceSearchUnavailable(
+            f"bot challenge ('{r.get('title')}') — next rung: a stealth/undetected browser "
+            "(undetected_chromedriver / nodriver / patchright — cataloged + governed, not wired)")
+    return r
+
+
+class PyPIBrowserSearch(SourceSearchPort):
+    """PyPI escalation: render pypi.org/search as a user (Playwright) + parse /project/ links. (PyPI currently serves a
+    'Client Challenge' to headless browsers -> honest-unavailable -> the stealth rung; works for non-walled sources.)"""
+    source = "pypi"
+
+    def search(self, query: str, *, limit: int = 10) -> list[ToolHit]:
+        if not network_allowed():
+            raise SourceSearchUnavailable("network not allowed (OH_INFERENCE_ALLOW_NETWORK)")
+        r = search_via_browser(_PYPI_SEARCH + urllib.parse.quote(query))  # raises on challenge (honest)
+        names, seen = [], set()
+        for l in r.get("links") or []:
+            href = l.get("href", "")
+            if "/project/" in href:
+                n = href.split("/project/")[1].strip("/").split("/")[0]
+                if n and n not in seen:
+                    seen.add(n)
+                    names.append(n)
+        if not names:
+            raise SourceSearchUnavailable("browser rendered the page but found no /project/ links")
+        return [ToolHit("pypi", n, f"https://pypi.org/project/{n}/", "", None) for n in names[:limit]]
+
+
 _SOURCES = {"pypi": PyPISearch, "github": GitHubSearch}
+#: the browser-render escalation version per source (the rung above the deterministic API)
+_ESCALATION = {"pypi": PyPIBrowserSearch}
 
 
 def select_source_search(source: str = "auto") -> list[SourceSearchPort]:
@@ -172,18 +214,28 @@ def select_source_search(source: str = "auto") -> list[SourceSearchPort]:
     return [_SOURCES[source]()]
 
 
-def discover(query: str, *, source: str = "auto", limit: int = 10) -> list[ToolHit]:
-    """Run the selected source searcher(s), merge + dedupe by (source,name). Honest: if every reachable source is
-    unavailable, raises SourceSearchUnavailable (never fabricates a result)."""
+def discover(query: str, *, source: str = "auto", limit: int = 10, escalate: bool = False) -> list[ToolHit]:
+    """Run the selected source searcher(s), merge + dedupe by (source,name). The DESCENT: a source's deterministic API
+    is the cheap tier; with escalate=True, an API that's unavailable ESCALATES to the browser-render tier for that
+    source (climb the ladder, don't give up). Honest: if every tier of every reachable source is unavailable, raises
+    SourceSearchUnavailable with the full escalation trace — never fabricates."""
     seen, out, errs = set(), [], []
+    def take(hits):
+        for h in hits:
+            if h.name and h.key not in seen:
+                seen.add(h.key)
+                out.append(h)
     for s in select_source_search(source):
         try:
-            for h in s.search(query, limit=limit):
-                if h.name and h.key not in seen:
-                    seen.add(h.key)
-                    out.append(h)
+            take(s.search(query, limit=limit))
         except SourceSearchUnavailable as e:
-            errs.append(str(e))
+            errs.append(f"{s.source}:api {e}")
+            if escalate and s.source in _ESCALATION:
+                try:
+                    take(_ESCALATION[s.source]().search(query, limit=limit))
+                    errs.append(f"{s.source}:escalated->browser ok")
+                except SourceSearchUnavailable as e2:
+                    errs.append(f"{s.source}:browser {e2}")
     if not out and errs:
         raise SourceSearchUnavailable("; ".join(errs))
     return out

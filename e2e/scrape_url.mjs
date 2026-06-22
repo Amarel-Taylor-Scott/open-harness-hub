@@ -21,8 +21,15 @@ const url = process.argv[2];
 if (!url) { console.log(JSON.stringify({ error: 'usage: scrape_url.mjs <url>' })); process.exit(0); }
 const browser = await chromium.launch({ headless: true, executablePath: process.env.CHROME_BIN || findChrome(), args: ['--no-sandbox', '--disable-dev-shm-usage'] });
 try {
-  const page = await (await browser.newContext()).newPage();
+  // a real UA + viewport so sites that serve a stub/challenge to headless defaults (e.g. PyPI search behind Fastly)
+  // return the same page a human sees — this is what makes the browser tier succeed where a raw HTTP fetch is blocked.
+  const page = await (await browser.newContext({
+    userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36',
+    viewport: { width: 1280, height: 900 },
+  })).newPage();
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 });
+  // best-effort: let JS-rendered / late content settle (capped) so we read what a user would, not the pre-hydration DOM.
+  await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
   const out = await page.evaluate(() => ({
     title: document.title,
     // body text (capped) so the LLM-driven browser can extract a target field; additive — link-only callers ignore it.
