@@ -26,6 +26,7 @@ import json
 import sys
 from dataclasses import asdict
 
+from src.teleon.runtime.tenancy import INTERNAL_TENANT_ID
 from src.teleon.exploration.ladder import (
     escalation_decision,
     EscalationPolicy,
@@ -102,7 +103,7 @@ def _self_test() -> int:
        de.tier == T3_EXPLORATION and de.signals.get("task_class") == TASK_CLASS_RESEARCH)
 
     # ── DISPATCH: a T3 decision re-enters as a CANDIDATE on the offline emulator (no candidate executed) ──────
-    prop = dispatch_exploration(d3, intent="explore the negative space", now=_NOW, tenant_id="baltor-internal")
+    prop = dispatch_exploration(d3, intent="explore the negative space", now=_NOW, tenant_id=INTERNAL_TENANT_ID)
     ck("dispatch: a T3 decision produces a CANDIDATE proposal (serves_truth=False, reenters the gate)",
        isinstance(prop, ExplorationProposal) and prop.serves_truth is False and prop.reenters_gate is True)
     ck("dispatch: the offline default ran the local_emulator@v1 invariant (status produced)",
@@ -165,7 +166,7 @@ def _self_test() -> int:
     # ── DETERMINISM: same input → identical decision id AND identical proposal/receipt ids ────────────────────
     d3_again = escalation_decision(TaskClass("t-routine", intent="normalize messy citations"), exhausted_llm)
     prop_again = dispatch_exploration(d3_again, intent="explore the negative space", now=_NOW,
-                                      tenant_id="baltor-internal")
+                                      tenant_id=INTERNAL_TENANT_ID)
     ck("determinism: same task+history → byte-identical escalation decision id",
        d3.decision_id == d3_again.decision_id and asdict(d3) == asdict(d3_again))
     ck("determinism: same decision + now → byte-identical proposal id AND receipt id",

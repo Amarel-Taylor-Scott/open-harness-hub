@@ -10,6 +10,7 @@ truth-free.
 from __future__ import annotations
 
 import json
+from src.teleon.runtime.tenancy import INTERNAL_TENANT_ID
 import os
 import sys
 
@@ -30,7 +31,7 @@ from src.teleon.egress.traffic_graph import (
 
 def _obs(**overrides):
     base = {
-        "tenant_id": "baltor-internal",
+        "tenant_id": INTERNAL_TENANT_ID,
         "run_id": "run-ph-license-2026-06-14",
         "worker_id": "worker-ph-license-watchtower",
         "worker_kind": "official-source-fetcher",
@@ -93,24 +94,24 @@ def _self_test() -> int:
 
     check("observations use the Teleon egress schema", out1["schema_version"] == SCHEMA_VERSION)
     check("egress evidence never serves truth", out1["serves_truth"] is False and EGRESS_SERVES_TRUTH is False)
-    blob = json.dumps(store.graph_for_query(tenant_id="baltor-internal", text="Island Recruiters"), sort_keys=True)
+    blob = json.dumps(store.graph_for_query(tenant_id=INTERNAL_TENANT_ID, text="Island Recruiters"), sort_keys=True)
     check("URL query credentials and authorization headers are redacted",
           "fixture-secret-value" not in blob and "Bearer abcdef" not in blob
           and "fixture-client-secret" not in blob, blob)
     check("redacted destination preserves the authoritative host for graph search",
           "onlineservices.dmw.gov.ph" in blob and "www.dole.gov.ph" in blob, blob)
 
-    by_query = store.search_events(tenant_id="baltor-internal", text="Island Recruiters")
+    by_query = store.search_events(tenant_id=INTERNAL_TENANT_ID, text="Island Recruiters")
     check("tenant-scoped query search returns both Baltor egress events only",
           len(by_query) == 2 and {e["worker_id"] for e in by_query} == {
               "worker-ph-license-watchtower", "worker-dole-advisory-search"}, str(by_query))
     check("destination-host search works",
-          len(store.search_events(tenant_id="baltor-internal", destination_host="onlineservices.dmw.gov.ph")) == 1)
+          len(store.search_events(tenant_id=INTERNAL_TENANT_ID, destination_host="onlineservices.dmw.gov.ph")) == 1)
     check("worker search works",
-          store.search_events(tenant_id="baltor-internal", worker_id="worker-dole-advisory-search")[0]["status"]
+          store.search_events(tenant_id=INTERNAL_TENANT_ID, worker_id="worker-dole-advisory-search")[0]["status"]
           == "source_unavailable_requires_browser")
 
-    graph = store.graph_for_query(tenant_id="baltor-internal", text="Island Recruiters")
+    graph = store.graph_for_query(tenant_id=INTERNAL_TENANT_ID, text="Island Recruiters")
     node_types = {n["node_type"] for n in graph["nodes"]}
     edge_types = {e["edge_type"] for e in graph["edges"]}
     check("graph projection includes query/worker/tool/destination/response nodes",

@@ -24,6 +24,7 @@ CLI: python3 scripts/check_eval_suite_contract.py --self-test  → exit 0/1.
 from __future__ import annotations
 
 import json
+from src.teleon.runtime.tenancy import INTERNAL_TENANT_ID
 import sys
 from pathlib import Path
 
@@ -59,7 +60,7 @@ def _pt_base() -> dict:
 
 
 def _ct_base() -> dict:
-    return {"task_id": "ct.eval_demo@v1#h002", "tenant_id": "baltor-internal", "capability_id": "cap-dates",
+    return {"task_id": "ct.eval_demo@v1#h002", "tenant_id": INTERNAL_TENANT_ID, "capability_id": "cap-dates",
             "status": "queued", "idempotency_key": "k-001", "max_attempts": 3, "attempt": 0,
             "created_at": _NOW}
 

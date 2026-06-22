@@ -143,11 +143,32 @@ def real_federal_register(query: str, *, limit: int = 3) -> list[dict]:
              "published": r.get("publication_date", "")} for r in res[:limit]]
 
 
-def real_search(query: str, *, provider: str = "wikipedia", limit: int = 3) -> list[dict]:
-    """Dispatch to a real free grounded provider (wikipedia | federal_register)."""
-    if provider == "federal_register":
-        return real_federal_register(query, limit=limit)
-    return real_wikipedia(query, limit=limit)
+#: wired grounded-source adapters (handler per provider_id). A new ACTIVE registry provider becomes selectable by adding
+#: its adapter here — the SELECTION is registry-driven, not a hardcoded default.
+_WIRED_SEARCH = {"wikipedia": real_wikipedia, "federal_register": real_federal_register}
+_SEARCH_REGISTRY = _REPO / "architecture" / "search_provider_registry.json"
+
+
+def _active_search_providers() -> list[dict]:
+    return [p for p in json.loads(_SEARCH_REGISTRY.read_text(encoding="utf-8"))["providers"] if p.get("status") == "active"]
+
+
+def default_search_provider() -> str:
+    """The cheapest ACTIVE registry provider that has a wired adapter (registry-driven; not the hardcoded 'wikipedia')."""
+    for p in sorted(_active_search_providers(), key=lambda p: (p.get("cost_per_query_usd", 9.9), -p.get("quality_rank", 0))):
+        if p["provider_id"] in _WIRED_SEARCH:
+            return p["provider_id"]
+    return next(iter(_WIRED_SEARCH))
+
+
+def real_search(query: str, *, provider: str | None = None, limit: int = 3) -> list[dict]:
+    """Dispatch to a real grounded provider SELECTED from architecture/search_provider_registry.json. provider=None ->
+    the cheapest active WIRED provider; an unknown/unwired provider raises honestly (no silent hardcoded fallback)."""
+    provider = provider or default_search_provider()
+    if provider not in _WIRED_SEARCH:
+        raise ValueError(f"search provider {provider!r} not wired; active registry providers: "
+                         f"{[p['provider_id'] for p in _active_search_providers()]}; wired: {sorted(_WIRED_SEARCH)}")
+    return _WIRED_SEARCH[provider](query, limit=limit)
 
 
 # ── real text acquire ──────────────────────────────────────────────────────────────────────────────
