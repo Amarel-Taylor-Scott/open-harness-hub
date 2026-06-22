@@ -861,6 +861,7 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_component_search.py", "check_component_search"),
     ("scripts/check_variation_store.py", "check_variation_store"),
     ("scripts/check_source_poller.py", "check_source_poller"),
+    ("scripts/check_rule_generator.py", "check_rule_generator"),
     ("scripts/harvest_tools.py", "harvest_tools"),
     ("scripts/check_external_api_registry.py", "check_external_api_registry"),
     ("scripts/check_adjacent_verticals.py", "check_adjacent_verticals"),
