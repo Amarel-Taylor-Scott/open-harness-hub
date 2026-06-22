@@ -48,35 +48,15 @@ class BrowseResult:
         return self.__dict__.copy()
 
 
-def _default_render(url: str, *, timeout: int = 40) -> dict:
-    """Render a page with chromium via e2e/scrape_url.mjs. Returns {title,text,links} or {error:...} — never raises."""
-    try:
-        r = subprocess.run(["node", str(_RENDER_MJS), url], cwd=str(_REPO), capture_output=True, text=True, timeout=timeout)
-        line = (r.stdout or "{}").strip().splitlines()[-1] if (r.stdout or "").strip() else "{}"
-        return json.loads(line)
-    except Exception as e:  # noqa: BLE001 — node/chromium/network missing → honest unavailable
-        return {"error": f"render unavailable: {type(e).__name__}: {str(e)[:80]}"}
+def _default_render(url: str) -> dict:
+    """Render via the default browser PORT (engine-agnostic; single-sourced in browser_port.PlaywrightBrowser).
+    Kept for back-compat — new code injects a BrowserPort. Returns {title,text,links} or {error:...}; never raises."""
+    from src.teleon.research.browser_port import select_browser
+    return select_browser("auto").render(url)
 
 
-def _ollama_llm():
-    """The low-cost LLM lane as a (prompt)->str port, or None if the lane isn't configured (→ deterministic fallback)."""
-    try:
-        from scripts._llm_client import resolve_provider, chat
-        prov = resolve_provider("ollama")
-        if not prov.get("key"):
-            return None
-        import os
-        model = os.environ.get("OH_LLM_MODEL") or prov.get("model") or "qwen2.5:7b"
-
-        def llm(prompt: str) -> str:
-            try:
-                return chat(model, "You extract a specific field from page text. Answer ONLY the value, or 'NOT_FOUND'.",
-                            prompt, prov, max_tokens=200).get("text", "")
-            except Exception:  # noqa: BLE001
-                return ""
-        return llm
-    except Exception:  # noqa: BLE001
-        return None
+# LLM selection now goes through the model-AGNOSTIC port (src.teleon.llm_port.as_callable) — any provider, populated
+# from the model index + lanes — so a future model drops in with no change here. (was a hardcoded ollama helper.)
 
 
 def _deterministic_extract(goal: str, text: str) -> str:
@@ -108,9 +88,20 @@ def _pick_link(goal: str, links: list, visited: set) -> str | None:
 class LLMBrowserDriver:
     """Low-cost-LLM-driven, bounded browser. browse(url, goal) → BrowseResult (+ receipt). serves_truth=false."""
 
-    def __init__(self, *, render=None, llm="auto", max_steps: int = _MAX_STEPS, max_chars: int = _MAX_CHARS):
-        self.render = render or _default_render
-        self.llm = _ollama_llm() if llm == "auto" else llm   # None → deterministic fallback (honest)
+    def __init__(self, *, render=None, browser=None, llm="auto", max_steps: int = _MAX_STEPS, max_chars: int = _MAX_CHARS):
+        from src.teleon.llm_port import as_callable
+        from src.teleon.research.browser_port import select_browser
+        # BROWSER port (engine-agnostic): a BrowserPort, a (url)->dict callable, a name/id, or the default engine.
+        if browser is not None:
+            self.render = browser.render if hasattr(browser, "render") else (
+                browser if callable(browser) else select_browser(browser).render)
+        elif render is not None:
+            self.render = render                              # back-compat: an injected render callable
+        else:
+            self.render = select_browser("auto").render
+        # LLM port (model-agnostic): a port, a (prompt)->str callable, a name, or None — as_callable normalizes it
+        # (returns None when no LLM is available → the deterministic fallback below, honest).
+        self.llm = as_callable(llm)
         self.max_steps = max_steps
         self.max_chars = max_chars
 

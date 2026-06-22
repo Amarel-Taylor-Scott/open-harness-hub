@@ -35,28 +35,16 @@ def _engines(store=None, *, model=None):
 
 
 def _model_port(use_llm: bool = False):
-    """Real digest/improve model port (the ollama-cloud lane) when --llm is set + configured; else None (the engine
-    falls back to its deterministic digest/improve). Resilient: a model error degrades to deterministic, never crashes."""
+    """The hub digest/improve model port — model-AGNOSTIC via src.teleon.llm_port (any provider, populated from the
+    model index + lanes), so a future model needs no change here. None when --llm is off or no lane is configured
+    (→ the engine's deterministic digest/improve). Resilient — never crashes the cycle."""
     if not use_llm:
         return None
-    try:
-        from scripts._llm_client import resolve_provider, chat
-        prov = resolve_provider("ollama")
-        if not prov.get("key"):
-            print("  (--llm requested but the ollama lane isn't configured — using deterministic digest/improve)")
-            return None
-        import os
-        model = os.environ.get("OH_LLM_MODEL") or prov.get("model") or "qwen2.5:7b"
-
-        def m(prompt: str) -> str:
-            try:
-                return chat(model, "You enrich/improve governed Open*Hub components. Be concrete and terse.",
-                            prompt, prov, max_tokens=400).get("text", "")
-            except Exception:  # noqa: BLE001 — degrade to deterministic
-                return ""
-        return m
-    except Exception:  # noqa: BLE001
-        return None
+    from src.teleon.llm_port import as_callable
+    fn = as_callable("auto")            # the gateway picks the lane; None if nothing is configured
+    if fn is None:
+        print("  (--llm requested but no LLM lane is configured — using deterministic digest/improve)")
+    return fn
 
 
 def run_all() -> int:
