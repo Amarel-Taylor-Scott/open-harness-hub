@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/registry/RegistryObject.v1.schema.json",
+  "title": "RegistryObject",
+  "version": "1.0",
+  "description": "The universal base shape EVERY item inside EVERY registry inherits — a Model, API, Provider, Template, Dataset, Adapter, Policy, Prompt, Validator, Benchmark all share this shape. This is what lets one universal interface (Registry<T>) and one universal dashboard work across 55+ registries. ANTI-FRAGMENTATION: this is the single source of truth for the cross-registry object shape (owner's #1 risk). serves_truth=false — a registry object is a pointer/score/shape, never a truth claim (the verification rail disposes truth).",
+  "type": "object",
+  "required": ["id", "name", "type"],
+  "properties": {
+    "id": {"type": "string", "description": "stable, hash-suffixed id (never truncation-only; version lives in metadata, never in the id)"},
+    "name": {"type": "string"},
+    "type": {"type": "string", "description": "the registry this object belongs to (e.g. model, provider, prompt, validator, benchmark)"},
+    "versions": {"type": "array", "description": "version history (lossless; version in metadata, not the name)", "items": {"type": "object"}},
+    "metrics": {"type": "object", "description": "measured per-registry metrics (accuracy, latency, determinism, cost…) — evidence, not authority"},
+    "benchmarks": {"type": "array", "items": {"type": "object"}},
+    "dependencies": {"type": "array", "items": {"type": "string"}},
+    "cost_model": {"type": "object"},
+    "security_profile": {"type": "object", "description": "license / CVE / supply-chain posture"},
+    "trust_score": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+    "historical_runs": {"type": "array", "description": "execution memory (aggregate, not raw PII)", "items": {"type": "object"}},
+    "relationships": {"type": "array", "description": "graph edges (depends_on / related_to / fallback_to)", "items": {"type": "object"}},
+    "provenance": {"type": "object", "description": "source handles + lineage — discovery != trust"}
+  }
+}

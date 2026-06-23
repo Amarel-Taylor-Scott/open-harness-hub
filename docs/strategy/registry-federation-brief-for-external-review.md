@@ -24,11 +24,22 @@ compiler. The endgame is not workflow automation; it is the machine-readable mod
 transformations, costs, and strategies.
 
 Two load-bearing claims to critique:
-- **The federation is mostly already built.** Of 35 proposed registries, **32 have real backing on disk**
-  (10 `live` + 22 `partial`); only **3 are true gaps**. The repo carries **~180 `architecture/*.json`
-  registries + 48 `src/teleon/` modules + 45 `schemas/` dirs** today.
-- **The moat is the flywheel, not the registry count.** 35 empty catalogs is not a moat; the moat is the
-  loop that *fills and scores* registries from real runs.
+- **The federation is mostly already built.** Of **72** proposed registries (across 5 layers; count computed
+  by `check_registry_ontology.py`), **67 have real backing on disk** (13 `live` + 54 `partial`); only **5 are
+  true gaps**. The repo carries **~180 `architecture/*.json` registries + 48 `src/teleon/` modules + 45
+  `schemas/` dirs** today.
+- **The moat is the flywheel, not the registry count.** A wall of empty catalogs is not a moat; the moat is
+  the loop that *fills and scores* registries from real runs. The likely moat layers are **Layer 0
+  (Discovery)** and **Layer 4 (Verification)** — see §3.5, §3.7.
+
+**The 5-layer model (architectural spine).** Every registry belongs to exactly one layer (enforced as a clean
+partition): **(0) Discovery** — continuously map the external computational supply chain (the "search engine
+for global machine capability"); feeds all · **(1) Capability** — what computation can do · **(2) Execution**
+— what runs it · **(3) Optimization** — make it cheaper/faster/more deterministic · **(4) Verification** —
+know it was correct + continuously improve. Layers 1–3 are heavily modeled; **Layers 0 and 4 are the
+underbuilt moats**. Orthogonal `kind` axis (enforced): **static** (curated/indexed) · **discovery** (crawls
+the world) · **meta** (pointer-only index of *where external registries live* — stores no content; pointer ≠
+copy, the governance-correct default for external sources).
 
 ---
 
@@ -61,9 +72,13 @@ Canonical machine-readable source: `architecture/registry_ontology.json` (with `
 
 ---
 
-## 3. The full registry catalog (35)
+## 3. The full registry catalog (72, in 5 layers)
 
-`stage` ∈ {pre_llm, model, post_llm, runtime, cross_cutting}. `status` grounded against disk.
+`stage` ∈ {pre_llm, model, post_llm, runtime, cross_cutting}. `status` grounded against disk. The table below
+is Layers 1–3 (registries 1–35); **§3.5 is Layer 4 (Verification, 36–55)**; **§3.7 is Layer 0 (Discovery,
+56–69) + three Execution additions (70 `agent_systems` — pre-built agents that already DO things; 71
+`external_systems` — AI-compatible SaaS/tools/infra; 72 `lookup_portals` — META: where to look up a license/
+property/tax/weather, pointer-only)**.
 
 | # | Registry | Holds | Status | Stage | Backing (evidence) |
 |---|---|---|---|---|---|
@@ -103,8 +118,71 @@ Canonical machine-readable source: `architecture/registry_ontology.json` (with `
 | 34 | capability_relationship_graph | OCR→preprocessing→{tesseract,paddle,vision} edges | partial | cross | `capability_taxonomy.json`, `open_hubs_bridge_graph.json` |
 | 35 | execution_pattern | learned patterns (scraping fails on Cloudflare→API) | partial | cross | `pattern_registry.json`, `inefficient_pipeline_archetypes.json` |
 
-**The 3 true gaps:** `agent_behavior` (14), `semantic_ontology` (20), `observability` (33). Owner-flagged
-moat gaps to fill first: `failure` (7), `equivalence` (11), `semantic_ontology` (20).
+### 3.5 Layer 4 — the Verification Universe (registries 36–55)
+
+The higher-order layer: *how do autonomous systems know computation is correct, safe, reproducible,
+explainable, and continuously improvable?* `status` grounded against disk.
+
+| # | Registry | Holds | Status | Backing (evidence) |
+|---|---|---|---|---|
+| 36 | validation | output-correctness validators (schema/regex/cross-doc/reconciliation/confidence) | live | `validate.py`, `dag_contract.py`, `conformance.py` |
+| 37 | benchmark | **multidimensional** benchmarks (accuracy/cost/latency/determinism/hallucination/security/adversarial/edge) | partial | `open_benchmark_registry.json`, `check_teleon_ab_harness.py` |
+| 38 | regression | regression history per optimization (downgrade→−7% accuracy) — compiler memory | partial | `eval/measured_lift_headtohead.py` |
+| 39 | ai_testing | prompt-injection/jailbreak/hallucination/malformed-schema suites (Promptfoo/DeepEval) | partial | `run_proofs.py`, `eval/rulearena_benchmark.py` |
+| 40 | ui_testing | selector-drift/layout-shift/CAPTCHA/mobile-render (Playwright/Cypress) | partial | `research/browser_port.py`, `browser_escalation_ladder.json` |
+| 41 | magic_number_audit | every hidden constant + provenance ("why 0.83? validated?") | **gap** | — (discipline doc only; no scanner) |
+| 42 | synthetic_data | auto edge-case generation (rotated/blurry/multilingual/handwritten) | partial | `eval/vertical_eval_suites.py`, `worked_examples.json` |
+| 43 | adversarial | malicious-input testing (injection/payloads/unicode) + success_rate | partial | `check_adversarial_auth_all_realms.py` |
+| 44 | explainability | reasoning chain — why the compiler chose this DAG | partial | `src/teleon/evolution`, `descent_method_catalog.json` |
+| 45 | drift | behavior-change detection (site/API/model/OCR changed) | partial | `fragile_context_atlas.json` |
+| 46 | agent_qa | agent-waste telemetry (loops/hallucinated calls/wasted tokens) | **gap** | — (needs per-step telemetry seam) |
+| 47 | code_audit | generated-code analysis (vulns/dead-code/races) — Semgrep/CodeQL | partial | `panel_review.py`, `risk_register.json` |
+| 48 | formal_verification | DAG correctness — constraints/leak/deadlock (Z3/SMT) | partial | `dag_contract.py`, `conformance.py` |
+| 49 | experiment | every change is an A/B → winner + cost_reduction (CI-automated loop) | live | `src/teleon/experiments`, `ci_check.py` |
+| 50 | human_preference | per-user optimization target (accuracy/cost/no-external-APIs) | live | `tenant_preferences.json`, `tenant_objective_bindings.json` |
+| 51 | determinism | per-component determinism score (regex 1.0, GPT 0.42) | partial | `schemas/determinism`, `configuration_standards.json` |
+| 52 | failure_recovery | recovery trees (OCR fail→2nd→preprocess→vision→human) | partial | `src/teleon/self_healing`, `capability_ladders.json` |
+| 53 | provenance | field-level output lineage (JSON←PDF p4←PaddleOCR←regex v7) | partial | `source_authority_registry.json`, `io/governed_record.py` |
+| 54 | observed_reality | production truth vs docs (doc 300ms, observed 1800ms) | partial | `src/teleon/monitoring`, `multi_source_run_matrix.json` |
+| 55 | economic_opportunity | detect expensive workflows + optimization potential | partial | `opportunities.json`, `inefficient_pipeline_archetypes.json` |
+
+**The 5 true gaps (status=gap):** `agent_behavior` (14), `semantic_ontology` (20), `observability` (33),
+`magic_number_audit` (41), `agent_qa` (46). Owner-flagged moat gaps to fill first: `magic_number_audit`
+(41), `failure` (7), `equivalence` (11), `semantic_ontology` (20).
+
+### 3.6 Anti-fragmentation — the rigid schema spine (the owner's #1 concern)
+
+With 55+ registries the failure mode is *ontology fragmentation*. The discipline that prevents it:
+- **One rigid entry schema** every registry conforms to: `schemas/registry/RegistryOntologyEntry.v1.schema.json`
+  — the single source of truth for the entry shape. The proof check *reads* this schema's `required`/`enum`/
+  `pattern` and enforces it on every entry, so adding a field/value means editing the schema, not the check.
+- **One universal object shape** every *item inside* a registry inherits:
+  `schemas/registry/RegistryObject.v1.schema.json` (`id/name/type/versions/metrics/benchmarks/dependencies/
+  cost_model/security_profile/trust_score/historical_runs/relationships`). This is what makes one universal
+  interface and one universal dashboard work across all registries.
+- **Clean universe partition:** the 4 universes are defined as id-lists in one place; the check enforces every
+  registry id appears in exactly one universe. No registry can drift between or out of the model.
+- All of the above is enforced by `scripts/check_registry_ontology.py` in the proof gate (458 assertions).
+
+### 3.7 Layer 0 — the Discovery Universe (registries 56–69) + the meta-registry keystone
+
+The intake layer that continuously maps the **external** computational supply chain (Kaggle/HF/PyPI/npm/
+arXiv/RapidAPI/Crunchbase/cloud) and feeds Layers 1–4. **Static registry** (curated, indexed) vs **discovery
+registry** (continuously crawls + benchmarks + scores) vs **meta registry** (knows *where* public registries
+are; stores pointers, never content). Registries: `dataset_discovery` (56), `model_discovery` (57),
+`package_discovery` (58, GitHub/PyPI **proven-live**), `paper_discovery` (59), `api_discovery` (60),
+`benchmark_discovery` (61), `competitor_intel` (62), `provider_arbitrage` (63, cheapest-provider routing),
+`workflow_discovery` (64, autonomous market discovery), `synthetic_capability_discovery` (65),
+`repo_discovery` (66, **proven-live**), `infra_discovery` (67), `agent_marketplace_discovery` (68) — all
+`partial`, all backed by a real, partly-proven crawl pipeline (`harvest_tools.py`, `github_repo_harvester.py`,
+`source_search.py`, `research_radar.py`, `discovery_pipeline.py`).
+
+**The meta-registry keystone (69 `external_registry_index`).** The governance-correct answer to "index all of
+HF/Kaggle/PyPI": we do **not** copy. A meta-registry stores only *where* an external registry lives + access/
+license/freshness; content is fetched on demand and lands as a **candidate** in the `staged_massive` tier
+(`architecture/registry_layers.json` = core_curated | staged_massive | feeds), not read until promoted past a
+license-gated boundary. *Pointer ≠ copy; discovery ≠ trust; no data dump.* The proposed crawl→classify→
+benchmark→audit→populate subsystem (`discovery.aidoneright.com`) is owner-gated (recorded, not claimed).
 
 ---
 
@@ -205,7 +283,7 @@ index records) from "tenant-visible" (no open review tickets / placeholders / un
 
 ## 5. Honest status summary
 
-- Registries: **10 live, 22 partial, 3 gap** (of 35). ~180 registry JSONs exist repo-wide.
+- Registries: **13 live, 54 partial, 5 gap** (of 72, across 5 layers + static/discovery/meta kinds). ~180 registry JSONs exist repo-wide.
 - Backbone primitives for all 10 universal-interface verbs **exist**; the single conformance **contract
   does not** (highest-leverage next step).
 - RAG/search/embeddings/storage/IO/ports/front-end-engine: **all have real, grounded backing** (paths
@@ -219,7 +297,7 @@ index records) from "tenant-visible" (no open review tickets / placeholders / un
 
 ## 6. Questions for GPT 5.5
 
-1. **Ontology completeness/cuts:** Of the 35, which are genuinely orthogonal vs which should *merge*
+1. **Ontology completeness/cuts:** Of the 55, which are genuinely orthogonal vs which should *merge*
    (e.g., is `trust` (24) just a view of `security` (23) + `execution_memory` (29)? is `latency` (25) a
    slice of `provider` (5)?)? What registry is *missing* entirely?
 2. **Universal interface:** Is a single `Registry<T>` contract the right abstraction, or does forcing 10
@@ -238,5 +316,13 @@ index records) from "tenant-visible" (no open review tickets / placeholders / un
    defensibility actually in 2–3 specific registries (`failure`, `equivalence`, `execution_memory`)?
 7. **Subdomain federation:** independent `*.aidoneright.com` services per registry vs one monolith with
    logical namespaces — at what scale does the split pay for its operational cost?
-8. **Sequencing:** given 32/35 already have backing, where would *you* spend the next unit of effort —
-   the interface contract, the 3 gaps, or depth on an existing `partial`?
+8. **Sequencing:** given 50/55 already have backing, where would *you* spend the next unit of effort —
+   the interface contract, the 5 gaps, or depth on an existing `partial`?
+9. **Layer 4 as moat:** is "Verification Universe" (correctness/regression/drift/provenance/observed-reality)
+   genuinely more defensible than Layers 1–3, or is it table-stakes that every serious player will also build?
+10. **Schema discipline:** is one rigid `RegistryObject` + one entry schema enough to prevent fragmentation
+    across 55+ registries, or do you need a per-registry schema *registry* (schemas that validate schemas)?
+    Where does the single-shape discipline start producing dishonest stubs?
+11. **Second product family:** does Layer 4 want its OWN brand/product family (`verify.aidoneright.com` /
+    `audit` / `drift` / `observe` …) separate from Teleon, or is it a feature *of* Teleon? What's the
+    customer/buyer difference that would justify the split?
