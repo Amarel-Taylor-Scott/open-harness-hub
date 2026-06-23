@@ -204,7 +204,16 @@
       "Bash(PYTHONPATH=. python3 scripts/deploy/preflight.py)",
       "Bash(echo \"PREFLIGHT_EXIT=$?\")",
       "Bash(PYTHONPATH=. python3 scripts/check_offline_full_demo.py --self-test)",
-      "Bash(PYTHONPATH=. python3 scripts/check_demo_control_tower.py --self-test)"
+      "Bash(PYTHONPATH=. python3 scripts/check_demo_control_tower.py --self-test)",
+      "Bash(echo \"=== exit: $? ===\")",
+      "Bash(echo \"ontology exit=$?\")",
+      "Bash(echo \"profiles exit=$?\")",
+      "Bash(echo \"candidates exit=$?\")",
+      "Bash(PYTHONPATH=. python3 scripts/run_proofs.py hub)",
+      "Bash(PYTHONPATH=. python3 scripts/run_proofs.py registry_ontology)",
+      "Bash(PYTHONPATH=. python3 scripts/run_proofs.py hub_profiles)",
+      "Bash(PYTHONPATH=. python3 scripts/run_proofs.py check_hub_profiles)",
+      "Bash(PYTHONPATH=. python3 scripts/run_proofs.py check_registry_ontology)"
     ]
   },
   "enableAllProjectMcpServers": true,

@@ -184,6 +184,58 @@
       "release_status": "private_first",
       "open_trigger": "open as a portable cross-industry source/registry catalog competitor appears OR at the directory-freshness product launch \u2014 whichever first",
       "maturity": "ready_substrate"
+    },
+    {
+      "hub_id": "OpenRedactionHub",
+      "proposed_domain": "openredactionhub.io",
+      "domain_status": "owner_clearance_required",
+      "thesis": "Open, portable RULES for detecting + redacting sensitive data (PII / PHI / secrets / faces / voices) across text, structured records, and media. DURABLE negative space: privacy rules do NOT close as models improve, and the volume of AI-handled data only grows. Owner-proposed 2026-06-23.",
+      "registers": "RedactionRuleset cards (entity-type detectors, masking/hashing/tokenization policies, retention + jurisdiction rules) + review-tier thresholds \u2014 rules and policies only, never a store of the sensitive data itself",
+      "modular_component_source": "the do-not-store-PII governance + SecretRef redaction-safe pattern + access_policy PII grants + the directory review-queue (handles sensitive fields) \u2014 substrate emerging",
+      "distinct_from": "OpenLinkingHub MATCHES entities; OpenRedactionHub SCRUBS sensitive fields before storage/serving. Cross-cuts every vertical (the no-PII rail). Candidate, never active, never serves sensitive data or truth.",
+      "status": "candidate",
+      "release_status": "private_first",
+      "open_trigger": "open as a portable redaction/PII-policy registry competitor appears OR at a regulated-vertical product launch \u2014 whichever first",
+      "maturity": "emerging"
+    },
+    {
+      "hub_id": "OpenProvenanceHub",
+      "proposed_domain": "openprovenancehub.io",
+      "domain_status": "owner_clearance_required",
+      "thesis": "Open, portable shapes for PROVENANCE + authenticity: source handles, edit/lineage history, content-credential (C2PA-style) signatures, and the 'is this real?' signal for media + claims. DURABLE: as AI media/text floods the world, authenticity is worth MORE, not less \u2014 the truth-edge of media. Owner-proposed 2026-06-23.",
+      "registers": "ProvenanceRecord / lineage shapes + content-credential signature cards + authenticity/synthetic-detection signal schemas \u2014 provenance shapes only, never an asset store or a truth verdict (Baltor disposes truth)",
+      "modular_component_source": "the OpenReceiptHub bench hub + the execution/run receipts + the directory audit trail (provenance per change) + Baltor's verification rail",
+      "distinct_from": "OpenReceiptHub records what a RUN did; OpenProvenanceHub records where DATA/MEDIA came from + whether it's authentic. Extends the receipts rail to provenance. Candidate, never active; a provenance record is a signal, never auto-truth.",
+      "status": "candidate",
+      "release_status": "private_first",
+      "open_trigger": "open as a portable provenance / content-authenticity registry competitor (C2PA-adjacent) appears OR at a media/claims-verification product launch \u2014 whichever first",
+      "maturity": "ready_substrate"
+    },
+    {
+      "hub_id": "OpenGeoHub",
+      "proposed_domain": "opengeohub.io",
+      "domain_status": "owner_clearance_required",
+      "thesis": "Open, portable RULES for address standardization + geocoding + location matching: USPS-style normalization, directionals/units, address parsing, and location-equivalence \u2014 deterministic, durable, and reused across every directory vertical. Owner-proposed 2026-06-23.",
+      "registers": "AddressNormalizationRuleset cards (abbreviations, directionals, unit parsing) + location-match comparators + geocode-policy cards \u2014 rules only, never a geocoding-data dump or a paid-API runtime",
+      "modular_component_source": "the address normalizer + 'address' ruleset in src/teleon/resolution/entity_resolver.py + the 'address' entity type in entity_resolution_rules.json \u2014 graduates from OpenLinkingHub",
+      "distinct_from": "OpenLinkingHub holds ALL entity rulesets; OpenGeoHub graduates the ADDRESS/location rules into a focused, reusable hub (addresses appear in every vertical). Candidate, never active.",
+      "status": "candidate",
+      "release_status": "private_first",
+      "open_trigger": "open as a portable address-normalization / geocoding-policy registry competitor appears OR when address-heavy verticals scale \u2014 whichever first",
+      "maturity": "ready_substrate"
+    },
+    {
+      "hub_id": "OpenContradictionHub",
+      "proposed_domain": "opencontradictionhub.io",
+      "domain_status": "owner_clearance_required",
+      "thesis": "Open, portable RULES for claim / stance / contradiction detection: rule-flip \u2192 NLI \u2192 LLM-adjudicate ladders, position-change-over-time detection, and conflicting-source flagging \u2014 deterministic-first, governed (flagged conflict = candidate, verify before assert). The truth-conflict rail. Owner-proposed 2026-06-23.",
+      "registers": "StanceContradictionRuleset cards (rule-flip patterns, NLI thresholds, adjudication ladders) + position-change/CDC signals \u2014 rules only, never an asserted verdict (a flagged conflict is a candidate Baltor disposes)",
+      "modular_component_source": "the stance_nli plane + the stance-contradiction-detection tunable task + the public_statement_tracking ladder",
+      "distinct_from": "OpenLinkingHub MATCHES entities; OpenContradictionHub detects CONFLICTS between claims/sources. Pairs with Baltor's truth wedge (conflict = signal to verify). Candidate, never active; a flagged conflict is never auto-truth.",
+      "status": "candidate",
+      "release_status": "private_first",
+      "open_trigger": "open as a portable claim/contradiction-detection registry competitor appears OR at a public-statement-tracking product launch \u2014 whichever first",
+      "maturity": "ready_substrate"
     }
   ]
 }
