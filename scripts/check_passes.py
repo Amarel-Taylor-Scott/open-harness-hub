@@ -16,9 +16,12 @@ from src.teleon.synthesis import passes as P
 from src.teleon.inference.preference_profile import cost_first
 
 
+_SHARD = uuid.uuid4().hex[:12]   # isolate this check's economic store from concurrent proof subprocesses (no torn reads)
+
+
 def _seed(cost):
     rid = f"test.pass.{uuid.uuid4().hex[:10]}"
-    OBS.record_observation(rid, source="test", cost=cost, latency_ms=10)
+    OBS.record_observation(rid, source="test", cost=cost, latency_ms=10, shard=_SHARD)
     return rid
 
 
@@ -31,14 +34,14 @@ def _self_test() -> int:
     r = _seed(0.001)
     # CSE: two identical embedding nodes (same component, plane, no preds) -> merged to one
     dup = {"nodes": [{"step": "a", "component": r, "plane": "embedding"}, {"step": "b", "component": r, "plane": "embedding"}], "edges": []}
-    res = P.run_passes(dup, passes=["cse"])
+    res = P.run_passes(dup, passes=["cse"], shard=_SHARD)
     ck("CSE merges duplicate nodes (2 identical -> 1)", len(res["dag"]["nodes"]) == 1 and res["applied"][0]["applied"])
 
     # deterministic-replacement: ocr -> llm(expensive); replace llm with a cheaper deterministic field_parser
     r_ocr, r_llm_exp, r_det_cheap = _seed(0.001), _seed(0.050), _seed(0.001)
     dag = {"nodes": [{"step": "x", "component": r_ocr, "plane": "ocr"}, {"step": "y", "component": r_llm_exp, "plane": "llm"}], "edges": [["x", "y"]]}
     sub_ok = {"y": {"component": r_det_cheap, "plane": "field_parsing"}}
-    res2 = P.run_passes(dag, passes=["deterministic_replacement"], substitutions=sub_ok)
+    res2 = P.run_passes(dag, passes=["deterministic_replacement"], substitutions=sub_ok, shard=_SHARD)
     yplane = next(n["plane"] for n in res2["dag"]["nodes"] if n["step"] == "y")
     ck("deterministic-replacement swaps llm -> deterministic (the descent) when it re-verifies + lowers cost",
        res2["applied"][0]["applied"] and yplane == "field_parsing" and res2["savings"] > 0, str(res2["savings"]))
@@ -46,11 +49,11 @@ def _self_test() -> int:
     # cost gate: replacing a CHEAP llm with an EXPENSIVE deterministic is rejected (would worsen the objective)
     r_llm_cheap, r_det_exp = _seed(0.001), _seed(0.050)
     dag_c = {"nodes": [{"step": "x", "component": r_ocr, "plane": "ocr"}, {"step": "y", "component": r_llm_cheap, "plane": "llm"}], "edges": [["x", "y"]]}
-    res3 = P.run_passes(dag_c, passes=["deterministic_replacement"], substitutions={"y": {"component": r_det_exp, "plane": "field_parsing"}})
+    res3 = P.run_passes(dag_c, passes=["deterministic_replacement"], substitutions={"y": {"component": r_det_exp, "plane": "field_parsing"}}, shard=_SHARD)
     ck("cost gate REJECTS a rewrite that would worsen the objective", not res3["applied"][0]["applied"] and "worsen" in res3["applied"][0]["reason"])
 
     # legality gate: a type-breaking replacement (llm -> asr: consumes audio, but ocr upstream produces text) is rejected
-    res4 = P.run_passes(dag, passes=["deterministic_replacement"], substitutions={"y": {"component": r_det_cheap, "plane": "asr"}})
+    res4 = P.run_passes(dag, passes=["deterministic_replacement"], substitutions={"y": {"component": r_det_cheap, "plane": "asr"}}, shard=_SHARD)
     ck("legality gate REJECTS an illegal (type-breaking) rewrite via re-verification",
        not res4["applied"][0]["applied"] and "re-verify" in res4["applied"][0]["reason"])
     ck("serves_truth=false", res2["serves_truth"] is False)

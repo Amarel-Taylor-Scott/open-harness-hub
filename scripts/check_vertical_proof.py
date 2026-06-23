@@ -15,6 +15,9 @@ import uuid
 from src.teleon.economics import vertical_proof as VP
 
 
+_SHARD = uuid.uuid4().hex[:12]   # isolate this check's economic store from concurrent subprocesses
+
+
 def _self_test() -> int:
     fails = []
     def ck(n, ok, d=""):
@@ -27,7 +30,7 @@ def _self_test() -> int:
     r_parse = f"doc.{tag}.pdf_parse"            # deterministic descent: parse -> regex fields -> validate
     r_fields = f"doc.{tag}.regex_fields"
     r_validate = f"doc.{tag}.schema_validate"
-    VP.record_runs([
+    VP.record_runs(shard=_SHARD, component_measurements=[
         {"resource_id": r_llm, "cost": 0.05, "latency_ms": 1800, "quality": 0.90, "success": True},
         {"resource_id": r_parse, "cost": 0.0005, "latency_ms": 40, "quality": 1.0, "success": True},
         {"resource_id": r_fields, "cost": 0.0005, "latency_ms": 15, "quality": 0.90, "success": True},
@@ -40,7 +43,7 @@ def _self_test() -> int:
                            {"step": "validate", "component": r_validate, "plane": "validation"}],
                  "edges": [["parse", "fields"], ["fields", "validate"]]}
 
-    rcpt = VP.compare(baseline, optimized)
+    rcpt = VP.compare(baseline, optimized, shard=_SHARD)
     ck("the deterministic pipeline is materially cheaper than always-LLM", rcpt["optimized_cost"] < rcpt["baseline_cost"])
     ck("savings are large (>90% on this vertical)", rcpt["savings_pct"] > 90, str(rcpt["savings_pct"]))
     ck("quality is EQUAL (the savings are not bought with worse output)", rcpt["equal_quality"] is True,

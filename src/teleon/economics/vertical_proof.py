@@ -10,21 +10,21 @@ from src.teleon.economics import provider_intel as PI
 from src.teleon.economics import simulator as SIM
 
 
-def record_runs(component_measurements: list) -> dict:
+def record_runs(component_measurements: list, *, shard: str = "000") -> dict:
     """component_measurements: [{resource_id, cost, latency_ms, quality, success}] from REAL executions → the telemetry
     write-back into the live economics. Returns {recorded, cdc_emitted}."""
-    return PI.ingest([{**m, "source": "measured"} for m in component_measurements])
+    return PI.ingest([{**m, "source": "measured"} for m in component_measurements], shard=shard)
 
 
-def compare(baseline_dag: dict, optimized_dag: dict) -> dict:
+def compare(baseline_dag: dict, optimized_dag: dict, *, shard: str = "000") -> dict:
     """Simulate both pipelines from the MEASURED economics and return the receipt: baseline vs optimized cost, the
     savings %, both qualities, whether quality is equal (within 5pts), and whether every node's economics is telemetry-
     backed (live observations, not config defaults)."""
-    b = SIM.simulate_dag(baseline_dag["nodes"], baseline_dag.get("edges"))
-    o = SIM.simulate_dag(optimized_dag["nodes"], optimized_dag.get("edges"))
+    b = SIM.simulate_dag(baseline_dag["nodes"], baseline_dag.get("edges"), shard=shard)
+    o = SIM.simulate_dag(optimized_dag["nodes"], optimized_dag.get("edges"), shard=shard)
     bc, oc = b["total_cost"], o["total_cost"]
     savings = (1.0 - oc / bc) if bc > 0 else 0.0
-    backed = all(EG.merged_economics(n["component"]).get("live")
+    backed = all(EG.merged_economics(n["component"], shard=shard).get("live")
                  for n in (baseline_dag["nodes"] + optimized_dag["nodes"]) if n.get("component"))
     return {"baseline_cost": bc, "optimized_cost": oc, "savings_pct": round(savings * 100, 1),
             "quality_baseline": b["est_quality"], "quality_optimized": o["est_quality"],

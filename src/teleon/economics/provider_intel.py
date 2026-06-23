@@ -20,7 +20,7 @@ REPO = Path(__file__).resolve().parents[3]
 _SOURCES = REPO / "architecture" / "pricing_sources.json"
 
 
-def ingest(observations: list, *, default_source: str = "ingest") -> dict:
+def ingest(observations: list, *, default_source: str = "ingest", shard: str = "000") -> dict:
     """Record a batch of observations. Each item: {resource_id, [observed_at], [source], cost?, latency_ms?, quality?,
     success?, availability?}. Returns {recorded, cdc_emitted}."""
     recorded = cdc = 0
@@ -30,16 +30,16 @@ def ingest(observations: list, *, default_source: str = "ingest") -> dict:
             continue
         res = OBS.record_observation(rid, source=o.get("source", default_source), observed_at=o.get("observed_at"),
                                      cost=o.get("cost"), latency_ms=o.get("latency_ms"), quality=o.get("quality"),
-                                     success=o.get("success"), availability=o.get("availability"))
+                                     success=o.get("success"), availability=o.get("availability"), shard=shard)
         recorded += 1
         cdc += 1 if res["cdc_emitted"] else 0
     return {"recorded": recorded, "cdc_emitted": cdc, "serves_truth": False}
 
 
-def record_measured_run(resource_id: str, *, cost=None, latency_ms=None, quality=None, success=None) -> dict:
+def record_measured_run(resource_id: str, *, cost=None, latency_ms=None, quality=None, success=None, shard: str = "000") -> dict:
     """The telemetry write-back (§10→§1): a real execution's measured economics become an observation (source=measured)."""
     return OBS.record_observation(resource_id, source="measured", cost=cost, latency_ms=latency_ms,
-                                  quality=quality, success=success)
+                                  quality=quality, success=success, shard=shard)
 
 
 def pricing_sources() -> list:

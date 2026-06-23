@@ -60,16 +60,17 @@ _PASS_TABLE = {"cse": (pass_cse, False), "deterministic_replacement": (pass_dete
 DEFAULT_PASSES = ["cse", "deterministic_replacement"]
 
 
-def _cost(dag: dict) -> float:
-    return SIM.simulate_dag(dag["nodes"], dag.get("edges"))["total_cost"]
+def _cost(dag: dict, shard: str = "000") -> float:
+    return SIM.simulate_dag(dag["nodes"], dag.get("edges"), shard=shard)["total_cost"]
 
 
-def run_passes(dag: dict, *, passes: list | None = None, profile: PreferenceProfile | None = None, **opts) -> dict:
+def run_passes(dag: dict, *, passes: list | None = None, profile: PreferenceProfile | None = None,
+               shard: str = "000", **opts) -> dict:
     """Run the pass pipeline. Each pass: legality (re-verify if behavior-changing) + a cost gate (never worsen the
     objective). Returns {dag, applied:[{pass, applied, note|reason}], before_cost, after_cost, savings}."""
     profile = profile or cost_first()
     cur = {"nodes": list(dag["nodes"]), "edges": [list(e) for e in dag.get("edges", [])]}
-    before, applied = _cost(cur), []
+    before, applied = _cost(cur, shard), []
     for name in (passes or DEFAULT_PASSES):
         fn, reverify = _PASS_TABLE[name]
         new, changed, note = fn(cur, **opts)
@@ -79,11 +80,11 @@ def run_passes(dag: dict, *, passes: list | None = None, profile: PreferenceProf
         if reverify and not verify_buildable_dag(new["nodes"], new.get("edges") or [])["verified_working"]:
             applied.append({"pass": name, "applied": False, "reason": "re-verify failed (illegal rewrite)"})
             continue
-        if _cost(new) > _cost(cur) + 1e-12:                       # cost gate: never worsen the objective
+        if _cost(new, shard) > _cost(cur, shard) + 1e-12:        # cost gate: never worsen the objective
             applied.append({"pass": name, "applied": False, "reason": "would worsen the objective"})
             continue
         cur = new
         applied.append({"pass": name, "applied": True, "note": note})
-    after = _cost(cur)
+    after = _cost(cur, shard)
     return {"dag": cur, "applied": applied, "before_cost": round(before, 8), "after_cost": round(after, 8),
             "savings": round(before - after, 8), "serves_truth": False}

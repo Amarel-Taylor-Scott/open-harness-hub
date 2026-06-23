@@ -26,6 +26,9 @@ from src.teleon.inference.preference_profile import cost_first
 REPO = Path(__file__).resolve().parents[1]
 
 
+_SHARD = uuid.uuid4().hex[:12]   # isolate this check's economic store from concurrent subprocesses
+
+
 def _self_test() -> int:
     fails = []
     def ck(n, ok, d=""):
@@ -35,19 +38,19 @@ def _self_test() -> int:
     rid = f"test.economic.{uuid.uuid4().hex[:10]}"   # unique per run -> no persistent-store accumulation/collision
 
     # 1. observation store: record + rolling current economics + price-change CDC
-    OBS.record_observation(rid, source="crawl", observed_at="2026-06-22T00:00:00Z", cost=0.010, latency_ms=200, availability=0.99)
-    r2 = OBS.record_observation(rid, source="crawl", observed_at="2026-06-22T01:00:00Z", cost=0.020, latency_ms=300, availability=0.98)
-    cur = OBS.current_economics(rid)
+    OBS.record_observation(rid, source="crawl", observed_at="2026-06-22T00:00:00Z", cost=0.010, latency_ms=200, availability=0.99, shard=_SHARD)
+    r2 = OBS.record_observation(rid, source="crawl", observed_at="2026-06-22T01:00:00Z", cost=0.020, latency_ms=300, availability=0.98, shard=_SHARD)
+    cur = OBS.current_economics(rid, shard=_SHARD)
     ck("observations roll up to current economics (mean of recent)", abs(cur["cost"] - 0.015) < 1e-9 and cur["n"] == 2, str(cur))
     ck("a >=10% cost move emits a price-change CDC", r2["cdc_emitted"] is True)
 
     # 2. economic_graph: live observation overlays the config default; real routes exist
-    merged = EG.merged_economics(rid)
+    merged = EG.merged_economics(rid, shard=_SHARD)
     ck("merged_economics surfaces the LIVE observation (live=true, cost from obs)", merged["live"] is True and abs(merged["cost"] - 0.015) < 1e-9)
-    lanes = EG.routes_for_lanes()
+    lanes = EG.routes_for_lanes(shard=_SHARD)
     ck("routes_for_lanes returns the lane market with economics", len(lanes) >= 1 and all("economics" in r for r in lanes))
     a_node = json.loads((REPO / "architecture" / "model_provider_graph.json").read_text())["nodes"][0]["node_id"]
-    mroutes = EG.routes_for_model(a_node)
+    mroutes = EG.routes_for_model(a_node, shard=_SHARD)
     ck("routes_for_model returns >=1 real route (model + substitutable alternatives)", len(mroutes) >= 1 and mroutes[0]["resource_id"] == a_node)
 
     # 3. cost model: availability/success fold into an EFFECTIVE cost -> reliable pricier beats flaky cheap
@@ -61,7 +64,7 @@ def _self_test() -> int:
     exp = {"resource_id": "r_exp", "deterministic": False, "economics": {"cost": 0.05, "latency_ms": 400, "availability": 0.9, "success_rate": 0.8}}
     rr = RE.reroute("r_exp", [cheap, exp], profile=cost_first())
     ck("router reroutes to the cheaper route when economics shift (signals recompile)", rr["changed"] is True and rr["new"] == "r_cheap")
-    arb = RE.arbitrage(a_node)
+    arb = RE.arbitrage(a_node, shard=_SHARD)
     ck("arbitrage ranks the provider set cheapest-first + picks one", isinstance(arb["ranked"], list) and arb["chosen"] is not None)
     # reliability is FIRST-CLASS (OpenRouter): skip failing routes; load-balance survivors by reliability/price^2
     h_cheap = {"resource_id": "rel_cheap", "economics": {"cost": 0.001, "availability": 1.0, "success_rate": 1.0}}
@@ -77,8 +80,8 @@ def _self_test() -> int:
 
     # 5. provider_intel: telemetry write-back ingests; crawl is HONESTLY offline (no fabricated prices)
     rid2 = f"test.measured.{uuid.uuid4().hex[:10]}"
-    PI.record_measured_run(rid2, cost=0.003, latency_ms=120, success=True)
-    ck("telemetry write-back records a measured run as a live observation (§10->§1)", OBS.current_economics(rid2)["n"] == 1)
+    PI.record_measured_run(rid2, cost=0.003, latency_ms=120, success=True, shard=_SHARD)
+    ck("telemetry write-back records a measured run as a live observation (§10->§1)", OBS.current_economics(rid2, shard=_SHARD)["n"] == 1)
     crawl = PI.crawl(network_allowed=False)
     ck("crawl is HONESTLY unavailable offline (no fabricated prices)", crawl["available"] is False and crawl["ingested"] == 0)
 
