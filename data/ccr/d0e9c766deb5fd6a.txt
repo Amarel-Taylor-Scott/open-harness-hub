@@ -1,0 +1,15 @@
+MODULE src/teleon/registry/populate.py
+## API signatures
+```python
+"""registry.populate — the DOGFOOD population pipeline: discovered signals -> governed registry RECORDS."""
+_GITHUB_API = ...
+def repo_to_record(slug: str, *, source: str='harvest', desc: str='', stars: int | None=None, license_id: str | None=None) -> dict
+    # A GitHub repo slug ('owner/name') -> a candidate component record (no network).
+def fetch_repo_meta(slug: str) -> dict
+    # OPTIONAL live enrichment via the GitHub API (keyless, honest-offline). Returns {} on any failure.
+def populate(slugs: list[str], *, source: str='harvest', live: bool=False) -> list[dict]
+    # Repo slugs -> ENRICHED candidate records for the component/tool registry.
+```
+## intra-module call edges
+src.teleon.registry.populate.populate -> src.teleon.registry.populate.repo_to_record
+src.teleon.registry.populate.populate -> src.teleon.registry.populate.fetch_repo_meta

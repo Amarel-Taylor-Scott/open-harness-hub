@@ -32,8 +32,8 @@ capabilities instead of burning tokens re-deriving them. Corollary (the sequenci
 DAG-builder reads is dead weight** — fill what the buffet is actually asked for.
 
 Two load-bearing claims to critique:
-- **The federation is mostly already built.** Of **88** proposed registries (across 5 layers; count computed
-  by `check_registry_ontology.py`), **86 have real backing on disk** (13 `live` + 73 `partial`); only **2 are
+- **The federation is mostly already built.** Of **98** proposed registries (across 5 layers; count computed
+  by `check_registry_ontology.py`), **96 have real backing on disk** (13 `live` + 83 `partial`); only **2 are
   true gaps** (`agent_behavior`, `agent_qa` — both need a per-step agent-telemetry seam). The repo carries
   **~180 `architecture/*.json` registries + 48 `src/teleon/` modules + 45 `schemas/` dirs** today. Adjacent
   registries are kept non-redundant by a single-source `boundaries` block + per-entry `distinct_from` (enforced).

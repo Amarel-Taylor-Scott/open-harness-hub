@@ -1,0 +1,21 @@
+MODULE src/teleon/registry/compose.py
+## API signatures
+```python
+"""registry.compose — compile a vertical PLAYBOOK (or a universal intent) into a DAG plan FROM the registries."""
+_REPO = ...
+_PLAYBOOKS = ...
+_TOP = ...
+def _playbooks() -> dict
+def _label(rec: dict) -> str
+def _resolve(registry_id: str, query: str | None=None) -> dict
+    # Resolve a composing registry to ingredients via the menu (honest when it isn't a queryable catalog).
+def compile_playbook(playbook_id: str) -> dict
+    # A vertical playbook -> a DAG plan: the loop stages + the composing registries resolved to candidate ingredients.
+def compile_universal(intent: str, registries: list[str] | None=None) -> dict
+    # A MIXED/universal tool: an intent -> picks across chosen registries (default: a public-fact + knowledge + risk lookup).
+```
+## intra-module call edges
+src.teleon.registry.compose._resolve -> src.teleon.registry.compose._label
+src.teleon.registry.compose.compile_playbook -> src.teleon.registry.compose._resolve
+src.teleon.registry.compose.compile_playbook -> src.teleon.registry.compose._playbooks
+src.teleon.registry.compose.compile_universal -> src.teleon.registry.compose._resolve

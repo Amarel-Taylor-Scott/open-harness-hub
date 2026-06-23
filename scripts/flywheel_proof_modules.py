@@ -748,6 +748,16 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_registry_enrich.py", "check_registry_enrich"),
     # ── ingest_fb_page_links (#75 community intake): governed harvest of GitHub repos linked from FB feed pages (theaiempire/DeepRepo) — extracts + CLEANS the links (strips fbclid), candidate-only (discovery!=trust); FB direct-scrape is ToS-restricted, governed fetch = owner-paste OR fb_page_scrape (RAPIDAPI_KEY/APIFY_TOKEN, names only); no PII; serves_truth=false ──
     ("scripts/ingest_fb_page_links.py", "ingest_fb_page_links"),
+    # ── registry_populate (#90, the DOGFOOD population loop): repo slugs -> candidate RECORDS -> ENRICHED (#84) -> governed candidate (discovery!=trust); tools/web_fetch = the basic governed fetch floor (honest-fail); how registries GROW records; serves_truth=false ──
+    ("scripts/check_registry_populate.py", "check_registry_populate"),
+    # ── vertical_playbooks (#93): each business vertical's management-workflow SHAPE + the registries that COMPOSE it into a DAG (dental/vet clinic, agency, SaaS-mgmt, group, AP, contract, support) — a vertical 'management tool' = a DAG the federation assembles; check ties each playbook to REAL registries; NO insurance; serves_truth=false ──
+    ("scripts/check_vertical_playbooks.py", "check_vertical_playbooks"),
+    # ── registry_compose: the PLAYBOOK->DAG compiler ('how registries become a TOOL') — compiles a vertical playbook OR a universal intent into a candidate DAG plan, each stage picking ingredients from the registries via the RegistryPort menu; governed + candidate-only; serves_truth=false ──
+    ("scripts/check_registry_compose.py", "check_registry_compose"),
+    # ── distill_kaggle_kernels (#88 LLM population): distills the mined Kaggle kernels -> candidate registry ENTRIES (deterministic floor maps pattern->registry + frequency/lineage; LLM path Kimi/GLM/Claude via ollama when OH_LLM_API_KEY). LOSSLESS (keeps raw freq + lineage); candidates only; serves_truth=false ──
+    ("scripts/distill_kaggle_kernels.py", "distill_kaggle_kernels"),
+    # ── formula_registry (#98): named DETERMINISTIC formulas the compiler applies instead of an LLM (compound interest/Ohm's law/Reynolds/z-score/BMI) — the 'deterministic > probabilistic' core; spec-only (expression+variables+units, no eval), self-consistent (variables in expression); serves_truth=false ──
+    ("scripts/check_formula_registry.py", "check_formula_registry"),
     # ── Governed blackboard spine P2: blackboard.local_sqlite@v1 (BlackboardProviderPort) — APPEND-ONLY sqlite store; rejects sourceless observations / serves_truth=true / missing-tenant-scope / mutate-existing; every append requires a worker_receipt; deterministic query (seq then entry_id); content-addressed ids; Teleon never imports Baltor; output never truth ──
     ("scripts/check_local_blackboard_provider.py", "check_local_blackboard_provider"),
     # ── Stateful-swarm spine P3: swarm.local_stub@v1 (StatefulSwarmProviderPort) + 6 deterministic workers (seed_planner/observation_extractor/gap_detector/entity_resolver/synthesis/governed_projection) writing typed entries + receipts to the local_sqlite blackboard; synthesis reads the BOARD not raw docs; gaps explicit; no live LLM; output never truth ──

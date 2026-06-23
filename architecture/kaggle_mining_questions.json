@@ -1,0 +1,36 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-23",
+  "principle": "Question bank + pattern->registry map for DISTILLING Kaggle notebooks into candidate registry ENTRIES (the LLM population of #88 + the registries it feeds). Each notebook is investigated via the LLM lane (Kimi/GLM/Claude over the ollama gateway, OH_LLM_API_KEY); the deterministic FLOOR maps detected patterns -> candidate entries when no lane. LOSSLESS DISTILLATION CLAUSE: distillation is NEVER replacement — keep the raw kernel + patterns + LLM output + lineage. serves_truth=false (a distilled insight is a CANDIDATE; verify + promotion boundary before adoption).",
+  "serves_truth": false,
+  "questions": [
+    {"id": "pipeline", "intent": "pipeline_extraction", "prompt": "What is the core end-to-end pipeline (data -> model -> output)? List the stages in order.", "yields": "execution_pattern candidate (#35)"},
+    {"id": "lift", "intent": "lift_technique", "prompt": "What single technique most drives this notebook's score/lift, and why does it work?", "yields": "optimization_pass candidate (#10)"},
+    {"id": "reusable", "intent": "reusability", "prompt": "What here is reusable as a governed COMPONENT (a tool/step) vs competition-specific glue?", "yields": "component candidate (#2)"},
+    {"id": "model", "intent": "model_strategy", "prompt": "Which models + quantization/serving (4bit/8bit/vLLM/PEFT)? Why those?", "yields": "model + determinism candidate (#4/#51)"},
+    {"id": "prompt", "intent": "prompt_strategy", "prompt": "What prompting pattern (CoT / few-shot / constrained / chat-template)?", "yields": "prompt candidate (#6)"},
+    {"id": "novelty", "intent": "novelty", "prompt": "What is NOVEL vs standard practice? What would a strong baseline miss?", "yields": "idea / research candidate"},
+    {"id": "registry", "intent": "registry_entry", "prompt": "Does this suggest a NEW registry or a new ENTRY in an existing one? Which registry, and what shape?", "yields": "registry-entry candidate"}
+  ],
+  "pattern_to_registry": {
+    "import_transformers": "component(2): HuggingFace transformers",
+    "ensemble_average": "execution_pattern(35): ensemble averaging",
+    "kfold_split": "experiment(49): k-fold cross-validation",
+    "kfold_cross_validation": "experiment(49): k-fold cross-validation",
+    "import_bitsandbytes": "model(4)+determinism(51): quantized (bitsandbytes) serving",
+    "model_load_4bit": "model(4)+determinism(51): 4-bit quantization",
+    "model_load_8bit": "model(4)+determinism(51): 8-bit quantization",
+    "generate_kwargs": "prompt(6): decoding params",
+    "trust_remote_code": "security(23): trust_remote_code RISK flag",
+    "system_prompt": "prompt(6): system-prompt pattern",
+    "chat_template": "prompt(6): chat-template pattern",
+    "import_peft": "optimization_pass(10): PEFT / LoRA fine-tuning",
+    "lightgbm": "component(2): LightGBM gradient boosting",
+    "import_lightgbm": "component(2): LightGBM",
+    "vllm": "optimization_pass(10): vLLM serving",
+    "logits_processor": "optimization_pass(10): constrained decoding",
+    "few_shot": "prompt(6): few-shot prompting",
+    "import_torch": "component(2): PyTorch",
+    "import_sklearn": "component(2): scikit-learn"
+  }
+}

@@ -68,14 +68,16 @@ class JsonCatalogRegistry:
         return self.lookup(record_id)
 
     def search(self, query: str, *, limit: int = _DEFAULT_LIMIT) -> list[dict]:
-        """Deterministic lexical match: a record matches if every query token appears in its flattened text;
-        score = total token-hit count (a learned ranker drops in behind this same signature)."""
+        """Deterministic lexical match: a record matches if ANY query token appears in its flattened text; ranked
+        by (# distinct tokens matched, total occurrences) so multi-word queries work + more-relevant rank higher.
+        A learned ranker drops in behind this same signature."""
         tokens = [t for t in query.lower().split() if t]
-        scored: list[tuple[int, dict]] = []
+        scored: list[tuple[tuple[int, int], dict]] = []
         for r in self._records():
             hay = " ".join(str(v).lower() for v in r.values() if isinstance(v, (str, int, float)))
-            if tokens and all(t in hay for t in tokens):
-                scored.append((sum(hay.count(t) for t in tokens), r))
+            matched = [t for t in tokens if t in hay]
+            if matched:
+                scored.append(((len(matched), sum(hay.count(t) for t in matched)), r))
         scored.sort(key=lambda sr: sr[0], reverse=True)
         return [r for _, r in scored[:limit]]
 

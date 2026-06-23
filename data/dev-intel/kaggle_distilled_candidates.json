@@ -1,0 +1,196 @@
+{
+  "version": "0.1.0",
+  "principle": "LOSSLESS distillation of mined Kaggle kernels -> candidate registry entries; keeps raw freq + lineage; serves_truth=false; candidates only (promotion boundary applies).",
+  "serves_truth": false,
+  "generated_from": "data/kaggle-mining-findings-*.json",
+  "raw": {
+    "total_kernels": 94,
+    "total_pattern_hits": 370
+  },
+  "llm_used": false,
+  "llm_note": "set OH_LLM_API_KEY + --live for Kimi/GLM/Claude per-kernel distillation",
+  "distilled_candidates": [
+    {
+      "pattern": "import_transformers",
+      "registry_candidate": "component(2): HuggingFace transformers",
+      "kernels": 39,
+      "example_kernels": [
+        "aatiffraz_prompt-prediction-w-mixtral-mistral7b-gemma-llama",
+        "abdurrafae_improved-code-interpretation",
+        "abhishek_distilbert-use-features-oof"
+      ],
+      "via": "deterministic_floor",
+      "candidate": true,
+      "serves_truth": false
+    },
+    {
+      "pattern": "kfold_split",
+      "registry_candidate": "experiment(49): k-fold cross-validation",
+      "kernels": 29,
+      "example_kernels": [
+        "abhishek_distilbert-use-features-oof",
+        "akensert_quest-bert-base-tf2-0",
+        "andretugan_commonlit-two-models"
+      ],
+      "via": "deterministic_floor",
+      "candidate": true,
+      "serves_truth": false
+    },
+    {
+      "pattern": "ensemble_average",
+      "registry_candidate": "execution_pattern(35): ensemble averaging",
+      "kernels": 28,
+      "example_kernels": [
+        "abhishek_distilbert-use-features-oof",
+        "aritrag_kerascv-starter-notebook-infer",
+        "awsaf49_uwmgi-unet-train-pytorch"
+      ],
+      "via": "deterministic_floor",
+      "candidate": true,
+      "serves_truth": false
+    },
+    {
+      "pattern": "kfold_cross_validation",
+      "registry_candidate": "experiment(49): k-fold cross-validation",
+      "kernels": 25,
+      "example_kernels": [
+        "abhishek_distilbert-use-features-oof",
+        "akensert_quest-bert-base-tf2-0",
+        "awsaf49_detect-fake-text-kerasnlp-tf-torch-jax-train"
+      ],
+      "via": "deterministic_floor",
+      "candidate": true,
+      "serves_truth": false
+    },
+    {
+      "pattern": "import_bitsandbytes",
+      "registry_candidate": "model(4)+determinism(51): quantized (bitsandbytes) serving",
+      "kernels": 15,
+      "example_kernels": [
+        "aatiffraz_prompt-prediction-w-mixtral-mistral7b-gemma-llama",
+        "abdurrafae_improved-code-interpretation",
+        "aerdem4_eedi-qwen32b-vllm-with-logits-processor-zoo"
+      ],
+      "via": "deterministic_floor",
+      "candidate": true,
+      "serves_truth": false
+    },
+    {
+      "pattern": "generate_kwargs",
+      "registry_candidate": "prompt(6): decoding params",
+      "kernels": 15,
+      "example_kernels": [
+        "aatiffraz_prompt-prediction-w-mixtral-mistral7b-gemma-llama",
+        "abdurrafae_improved-code-interpretation",
+        "aerdem4_eedi-qwen32b-vllm-with-logits-processor-zoo"
+      ],
+      "via": "deterministic_floor",
+      "candidate": true,
+      "serves_truth": false
+    },
+    {
+      "pattern": "trust_remote_code",
+      "registry_candidate": "security(23): trust_remote_code RISK flag",
+      "kernels": 14,
+      "example_kernels": [
+        "aatiffraz_prompt-prediction-w-mixtral-mistral7b-gemma-llama",
+        "abdurrafae_improved-code-interpretation",
+        "aerdem4_eedi-qwen32b-vllm-with-logits-processor-zoo"
+      ],
+      "via": "deterministic_floor",
+      "candidate": true,
+      "serves_truth": false
+    },
+    {
+      "pattern": "lightgbm",
+      "registry_candidate": "component(2): LightGBM gradient boosting",
+      "kernels": 13,
+      "example_kernels": [
+        "batprem_llm-daigt-analyse-edge-cases",
+        "cody11null_tuned-debertav3-lgbm-autocorrect",
+        "corochann_bengali-seresnext-prediction-with-pytorch"
+      ],
+      "via": "deterministic_floor",
+      "candidate": true,
+      "serves_truth": false
+    },
+    {
+      "pattern": "import_lightgbm",
+      "registry_candidate": "component(2): LightGBM",
+      "kernels": 12,
+      "example_kernels": [
+        "batprem_llm-daigt-analyse-edge-cases",
+        "cody11null_tuned-debertav3-lgbm-autocorrect",
+        "corochann_bengali-seresnext-prediction-with-pytorch"
+      ],
+      "via": "deterministic_floor",
+      "candidate": true,
+      "serves_truth": false
+    },
+    {
+      "pattern": "system_prompt",
+      "registry_candidate": "prompt(6): system-prompt pattern",
+      "kernels": 11,
+      "example_kernels": [
+        "aatiffraz_prompt-prediction-w-mixtral-mistral7b-gemma-llama",
+        "aerdem4_eedi-qwen32b-vllm-with-logits-processor-zoo",
+        "anhvth226_eedi-11-21-14b"
+      ],
+      "via": "deterministic_floor",
+      "candidate": true,
+      "serves_truth": false
+    },
+    {
+      "pattern": "import_peft",
+      "registry_candidate": "optimization_pass(10): PEFT / LoRA fine-tuning",
+      "kernels": 10,
+      "example_kernels": [
+        "aerdem4_eedi-qwen32b-vllm-with-logits-processor-zoo",
+        "anhvth226_eedi-11-21-14b",
+        "emiz6413_inference-gemma-2-9b-4-bit-qlora"
+      ],
+      "via": "deterministic_floor",
+      "candidate": true,
+      "serves_truth": false
+    },
+    {
+      "pattern": "chat_template",
+      "registry_candidate": "prompt(6): chat-template pattern",
+      "kernels": 9,
+      "example_kernels": [
+        "aatiffraz_prompt-prediction-w-mixtral-mistral7b-gemma-llama",
+        "aerdem4_eedi-qwen32b-vllm-with-logits-processor-zoo",
+        "anhvth226_eedi-11-21-14b"
+      ],
+      "via": "deterministic_floor",
+      "candidate": true,
+      "serves_truth": false
+    },
+    {
+      "pattern": "model_load_4bit",
+      "registry_candidate": "model(4)+determinism(51): 4-bit quantization",
+      "kernels": 8,
+      "example_kernels": [
+        "aatiffraz_prompt-prediction-w-mixtral-mistral7b-gemma-llama",
+        "abdurrafae_improved-code-interpretation",
+        "aerdem4_eedi-qwen32b-vllm-with-logits-processor-zoo"
+      ],
+      "via": "deterministic_floor",
+      "candidate": true,
+      "serves_truth": false
+    },
+    {
+      "pattern": "model_load_8bit",
+      "registry_candidate": "model(4)+determinism(51): 8-bit quantization",
+      "kernels": 2,
+      "example_kernels": [
+        "aatiffraz_prompt-prediction-w-mixtral-mistral7b-gemma-llama",
+        "kishanvavdara_inference-llama-3-8b"
+      ],
+      "via": "deterministic_floor",
+      "candidate": true,
+      "serves_truth": false
+    }
+  ],
+  "llm_distilled": []
+}

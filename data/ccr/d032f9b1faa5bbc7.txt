@@ -1,0 +1,10 @@
+MODULE src/teleon/tools/web_fetch.py
+## API signatures
+```python
+"""tools.web_fetch — a basic, GOVERNED HTTP fetch primitive (the 'basic browser/automation' floor)."""
+_TIMEOUT_S = ...
+_MAX_BYTES = ...
+_UA = ...
+def fetch(url: str, *, timeout: int=_TIMEOUT_S, max_bytes: int=_MAX_BYTES) -> dict
+    # GET `url` -> {url, status, text, bytes, error}. On any failure returns error set, text empty (no raise).
+```

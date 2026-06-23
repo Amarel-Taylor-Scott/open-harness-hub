@@ -1,0 +1,20 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-23",
+  "principle": "Formula/equation registry (backs registry #98): named DETERMINISTIC formulas the compiler applies instead of an LLM (the 'deterministic > probabilistic' core — compute it, don't ask a model). Each is a SPEC (expression string + variables + units + domain + source), NOT eval'd here — the compiler binds it to a safe evaluator at runtime. serves_truth=false (a formula is a tool spec; the inputs + result belong to the caller). This is the cheapest, most-verifiable rung of the descent for any closed-form computation.",
+  "serves_truth": false,
+  "formulas": [
+    {"id": "compound_interest", "domain": "finance", "expression": "A = P * (1 + r/n)^(n*t)", "variables": {"A": "final amount", "P": "principal", "r": "annual rate", "n": "compounds/yr", "t": "years"}, "units": "currency", "source": "standard finance"},
+    {"id": "simple_interest", "domain": "finance", "expression": "I = P * r * t", "variables": {"I": "interest", "P": "principal", "r": "rate", "t": "time"}, "units": "currency", "source": "standard finance"},
+    {"id": "roi", "domain": "finance", "expression": "ROI = (gain - cost) / cost", "variables": {"gain": "return", "cost": "investment"}, "units": "ratio", "source": "standard finance"},
+    {"id": "loan_payment", "domain": "finance", "expression": "M = P * r * (1+r)^n / ((1+r)^n - 1)", "variables": {"M": "monthly payment", "P": "principal", "r": "monthly rate", "n": "n payments"}, "units": "currency", "source": "amortization"},
+    {"id": "bmi", "domain": "health", "expression": "BMI = kg / (m^2)", "variables": {"kg": "mass kg", "m": "height m"}, "units": "kg/m^2", "source": "WHO"},
+    {"id": "ohms_law", "domain": "engineering", "expression": "V = I * R", "variables": {"V": "volts", "I": "amps", "R": "ohms"}, "units": "SI", "source": "physics"},
+    {"id": "kinetic_energy", "domain": "physics", "expression": "KE = 0.5 * m * v^2", "variables": {"m": "mass kg", "v": "velocity m/s"}, "units": "joules", "source": "physics"},
+    {"id": "reynolds_number", "domain": "engineering", "expression": "Re = (rho * v * L) / mu", "variables": {"rho": "density", "v": "velocity", "L": "length", "mu": "viscosity"}, "units": "dimensionless", "source": "fluid dynamics"},
+    {"id": "z_score", "domain": "statistics", "expression": "z = (x - mean) / sd", "variables": {"x": "value", "mean": "mean", "sd": "std dev"}, "units": "dimensionless", "source": "statistics"},
+    {"id": "celsius_to_fahrenheit", "domain": "units", "expression": "F = C * 9/5 + 32", "variables": {"C": "celsius", "F": "fahrenheit"}, "units": "temperature", "source": "SI"},
+    {"id": "distance_rate_time", "domain": "physics", "expression": "d = v * t", "variables": {"d": "distance", "v": "speed", "t": "time"}, "units": "SI", "source": "kinematics"},
+    {"id": "percent_change", "domain": "math", "expression": "pct = (new - old) / old * 100", "variables": {"new": "new value", "old": "old value"}, "units": "percent", "source": "arithmetic"}
+  ]
+}
