@@ -1,0 +1,26 @@
+MODULE src/teleon/verticals/provider_sources.py
+## API signatures
+```python
+"""provider_sources — the 'search trusted sources' rung of the provider-directory pipeline, as a COST-ORDERED DESCENT."""
+_SOURCES = ...
+_HIGH_AUTHORITY = ...
+def _registry() -> dict
+def _cost_rank(tier: str) -> int
+def source_ladder(field: str | None=None) -> list
+    # The cost-ordered source rungs (cheapest first; ties by authority), optionally filtered to those covering `field`.
+def plan_acquisition(fields, *, max_cost_tier: str='stealth', min_sources: int=2) -> dict
+    # The DESCENT plan: per needed field, the ordered source attempts (cheapest authoritative first), capped at
+def refresh_record(record: dict, *, observations: dict | None=None, stale_fields=None, max_cost_tier: str='stealth') -> dict
+    # End-to-end: PLAN which trusted sources to query for the (stale, or all) fields — cheapest authoritative first —
+def fetch(source_id: str, query: str, *, network_allowed=None) -> dict
+    # Execute ONE source via its plane (search/browser). Network-gated + honest-offline (never fabricates); a keyed
+```
+## intra-module call edges
+src.teleon.verticals.provider_sources._cost_rank -> src.teleon.verticals.provider_sources._registry
+src.teleon.verticals.provider_sources.source_ladder -> src.teleon.verticals.provider_sources._registry
+src.teleon.verticals.provider_sources.source_ladder -> src.teleon.verticals.provider_sources._cost_rank
+src.teleon.verticals.provider_sources.plan_acquisition -> src.teleon.verticals.provider_sources._cost_rank
+src.teleon.verticals.provider_sources.plan_acquisition -> src.teleon.verticals.provider_sources.source_ladder
+src.teleon.verticals.provider_sources.plan_acquisition -> src.teleon.verticals.provider_sources._cost_rank
+src.teleon.verticals.provider_sources.refresh_record -> src.teleon.verticals.provider_sources.plan_acquisition
+src.teleon.verticals.provider_sources.fetch -> src.teleon.verticals.provider_sources._registry

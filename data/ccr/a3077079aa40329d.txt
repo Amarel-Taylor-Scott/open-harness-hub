@@ -1,0 +1,19 @@
+MODULE src/teleon/verticals/provider_directory_capability.py
+## API signatures
+```python
+"""provider_directory_capability — the provider-directory vertical expressed as a COMPOSITION OF THE SHARED FRAMEWORK,
+not a silo. The pipeline is a DAG of shared planes (search → field_parsing → validation); it is retrieved as a shared
+TEMPLATE, verified by the shared VERIFIER (verify_buildable_dag), costed by the shared SIMULATOR + ECONOMIC layer
+(telemetry write-back), and routed by the shared cos"""
+_NODES = ...
+_EDGES = ...
+def composed_dag() -> dict
+def compose_from_template(intent: str='keep our provider and practice directory accurate and up to date') -> dict
+    # Retrieve the shared provider_directory TEMPLATE and mutate its slots with the vertical's components — the
+def verify() -> dict
+    # Run the vertical's DAG through the SHARED verifier — is it a verified-working build?
+def estimate(*, shard: str='000') -> dict
+    # Cost/latency estimate via the SHARED simulator (over the economic graph).
+def record_baseline_economics(*, shard: str='000') -> dict
+    # Write the vertical's measured deterministic-component economics into the SHARED economic layer (telemetry write-
+```
