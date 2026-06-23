@@ -1,0 +1,19 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-22",
+  "principle": "Source-reliability weights for the provider-directory freshness pipeline (healthcare-admin vertical — directory data only, NOT insurance). The confidence formula weights cross-source agreement by these. Single source of truth (no magic values); tunable. serves_truth=false — it ranks source TRUST; the verify gate + human review disposition truth.",
+  "serves_truth": false,
+  "default_weight": 0.5,
+  "sources": {
+    "NPI Registry": 0.95,
+    "CMS": 0.95,
+    "State Medical Board": 0.9,
+    "Hospital Directory": 0.75,
+    "Practice Website": 0.7,
+    "Health Plan Directory": 0.6,
+    "Aggregator": 0.4
+  },
+  "auto_update_threshold": 0.85,
+  "human_review_band": 0.75,
+  "coverage_full_weight": 1.8
+}
