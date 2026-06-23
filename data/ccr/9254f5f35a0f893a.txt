@@ -1,0 +1,18 @@
+MODULE src/teleon/synthesis/cascade.py
+## API signatures
+```python
+"""cascade — the LLM cascade's escalate-or-stop judge (the descent's stop logic, made explicit). FrugalGPT frames a
+cascade as three parts — a ROUTER (which model first; that's our routing_engine), a SCORER (is this answer good enough),
+and a STOP-JUDGER (return or escalate). The training-free variant (agreement-based cascading) bases the escalate decision
+on AGREEMENT among an ensemble of cheap-mode"""
+def agreement_score(responses: list) -> dict
+    # The fraction of the ensemble that gives the MAJORITY answer (the training-free confidence signal). Returns
+def should_escalate(responses: list, *, threshold: float=0.7) -> dict
+    # Decide STOP vs ESCALATE from ensemble agreement (no trained scorer). agreement ≥ threshold → STOP with the
+def run_cascade(stages: list, *, threshold: float=0.7) -> dict
+    # Walk a cost-ordered cascade of stages until one is confident enough to STOP. stages: [{name, responses}] from
+```
+## intra-module call edges
+src.teleon.synthesis.cascade.should_escalate -> src.teleon.synthesis.cascade.agreement_score
+src.teleon.synthesis.cascade.run_cascade -> src.teleon.synthesis.cascade.should_escalate
+src.teleon.synthesis.cascade.run_cascade -> src.teleon.synthesis.cascade.agreement_score

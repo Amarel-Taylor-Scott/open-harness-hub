@@ -1,0 +1,30 @@
+MODULE src/teleon/runtime/trust_tiers.py
+## API signatures
+```python
+"""trust_tiers — the trust-agnostic seam: a component's trust tier gates its EXECUTION environment (which sandbox) and
+WHAT DATA may flow to it (data class). Deny-by-default: an unknown/missing tier is treated as the most restrictive. This
+is the operational form of `discovery ≠ trust` — a discovered component may be in the registry but may only run in a hard
+sandbox on synthetic inputs until it earn"""
+_POLICY = ...
+def _policy() -> dict
+def _tiers() -> dict
+def _sensitivity(data_class: str) -> int
+def tier_of(component: dict) -> str
+    # A component's trust tier, defaulting to the most restrictive ('experimental') when unset — deny-by-default.
+def required_sandbox(tier: str) -> str
+    # The sandbox level this tier MUST run in ('hard' for an unknown tier).
+def can_execute(tier: str, data_class: str) -> dict
+    # May a component of `tier` execute on data of `data_class`? Allowed only if the data is no more sensitive than the
+def gate_component(component: dict, data_class: str) -> dict
+    # Convenience: resolve a component's tier and decide if it may run on this data class.
+```
+## intra-module call edges
+src.teleon.runtime.trust_tiers._tiers -> src.teleon.runtime.trust_tiers._policy
+src.teleon.runtime.trust_tiers._sensitivity -> src.teleon.runtime.trust_tiers._policy
+src.teleon.runtime.trust_tiers.tier_of -> src.teleon.runtime.trust_tiers._tiers
+src.teleon.runtime.trust_tiers.required_sandbox -> src.teleon.runtime.trust_tiers._tiers
+src.teleon.runtime.trust_tiers.can_execute -> src.teleon.runtime.trust_tiers._sensitivity
+src.teleon.runtime.trust_tiers.can_execute -> src.teleon.runtime.trust_tiers._sensitivity
+src.teleon.runtime.trust_tiers.can_execute -> src.teleon.runtime.trust_tiers._tiers
+src.teleon.runtime.trust_tiers.gate_component -> src.teleon.runtime.trust_tiers.can_execute
+src.teleon.runtime.trust_tiers.gate_component -> src.teleon.runtime.trust_tiers.tier_of

@@ -1,0 +1,14 @@
+MODULE src/teleon/synthesis/beam.py
+## API signatures
+```python
+"""beam — System 5 (multi-candidate composition). Turn "one DAG" into "the best of many" WITHOUT executing them: VERIFY
+each candidate (type-compatible + satisfiable + dry-run), SIMULATE each (cheap economic scoring, no real calls), and keep
+the top `beam_width` by the cost model. The simulator (System 12) is what makes this affordable — only the winner is
+built/run. Honest finding baked in: classica"""
+def rank_candidates(candidates: list, *, profile: PreferenceProfile | None=None, require_verified: bool=True, shard: str='000') -> list
+    # candidates: [{nodes, edges, ...}]. VERIFY each, then SIMULATE-rank the survivors. Returns
+def beam_compose(candidates: list, *, profile: PreferenceProfile | None=None, beam_width: int=3, require_verified: bool=True, shard: str='000') -> dict
+    # Keep the top `beam_width` VERIFIED candidates by simulated cost; the best is the chosen DAG. Honest empty when
+```
+## intra-module call edges
+src.teleon.synthesis.beam.beam_compose -> src.teleon.synthesis.beam.rank_candidates
