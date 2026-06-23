@@ -883,6 +883,7 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_economic_layer.py", "check_economic_layer"),
     ("scripts/check_vertical_proof.py", "check_vertical_proof"),
     ("scripts/check_provider_directory.py", "check_provider_directory"),
+    ("scripts/check_provider_sources.py", "check_provider_sources"),
     ("scripts/check_simulator.py", "check_simulator"),
     ("scripts/compile_capability_live.py", "compile_capability_live"),
     ("scripts/harvest_tools.py", "harvest_tools"),

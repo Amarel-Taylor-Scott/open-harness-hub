@@ -1,0 +1,18 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-23",
+  "principle": "Trusted-source acquisition map for provider-directory freshness — the 'search trusted sources' rung as a COST-ORDERED DESCENT. It COMPOSES the existing tool planes (search via search_provider_registry, browser via browser_port + the escalation ladder) into provider-data sources, each with an authority weight (provider_source_authority) + field coverage + access tier. Honoring HealthLynked's 'avoid unnecessary paid APIs': try free public registries first, then your OWN browser, and climb to PAID search / grounded / stealth only when cheaper rungs can't supply the needed fields. Honest-offline. serves_truth=false.",
+  "serves_truth": false,
+  "cost_order": ["free", "browser", "keyed", "keyed_premium", "stealth"],
+  "rungs": [
+    {"id": "npi_registry", "kind": "registry_api", "plane": "search", "display": "NPI Registry (CMS NPPES public API)", "authority": "NPI Registry", "access": "public_keyless", "cost_tier": "free", "fields": ["provider_name", "npi", "specialty", "practice_name", "address", "phone", "status"], "note": "authoritative, free, structured — always tried first"},
+    {"id": "cms", "kind": "registry_api", "plane": "search", "display": "CMS Care Compare", "authority": "CMS", "access": "public_keyless", "cost_tier": "free", "fields": ["provider_name", "npi", "specialty", "practice_name", "address", "status"]},
+    {"id": "state_medical_board", "kind": "registry_lookup", "plane": "browser", "display": "State Medical Board license lookup", "authority": "State Medical Board", "access": "public_keyless", "cost_tier": "browser", "fields": ["provider_name", "specialty", "status", "credentials"]},
+    {"id": "practice_website", "kind": "browser", "plane": "browser", "display": "Practice website (Playwright headless)", "authority": "Practice Website", "access": "public_keyless", "cost_tier": "browser", "fields": ["practice_name", "address", "phone", "website", "specialty"]},
+    {"id": "brave_search", "kind": "structured_search", "plane": "search", "display": "Brave Search API", "authority": "Aggregator", "access": "keyed", "cost_tier": "keyed", "fields": ["practice_name", "address", "phone", "website"]},
+    {"id": "serpapi", "kind": "structured_search", "plane": "search", "display": "SerpAPI", "authority": "Aggregator", "access": "keyed", "cost_tier": "keyed", "fields": ["practice_name", "address", "phone", "website"]},
+    {"id": "news_search", "kind": "news_search", "plane": "search", "display": "News search (closures / mergers / rebrands)", "authority": "Aggregator", "access": "keyed", "cost_tier": "keyed", "fields": ["practice_name", "status", "affiliations"]},
+    {"id": "google_grounded", "kind": "grounded_search", "plane": "search", "display": "Google grounded search / Gemini grounding", "authority": "Aggregator", "access": "keyed", "cost_tier": "keyed_premium", "fields": ["practice_name", "address", "phone", "status", "affiliations"]},
+    {"id": "stealth_browser", "kind": "stealth_browser", "plane": "browser", "display": "Bot-blocked site (undetected/stealth + screenshot/coords)", "authority": "Practice Website", "access": "public_keyless", "cost_tier": "stealth", "fields": ["practice_name", "address", "phone"]}
+  ]
+}
