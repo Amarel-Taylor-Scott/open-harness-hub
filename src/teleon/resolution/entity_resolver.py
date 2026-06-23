@@ -114,7 +114,8 @@ _COMPANY_ABBR = {"grp": "group", "assoc": "associates", "assocs": "associates", 
 
 
 def normalize_person_name(n) -> str:
-    n = _NAME_SUFFIX.sub(" ", str(n or "").lower())
+    n = str(n or "").lower().replace(".", "")          # "m.d." -> "md" so dotted suffixes strip
+    n = _NAME_SUFFIX.sub(" ", n)
     n = re.sub(r"[^\w\s]", " ", n)
     toks = [_NICKNAMES.get(t, t) for t in re.sub(r"\s+", " ", n).strip().split()]
     return " ".join(toks)
@@ -129,9 +130,17 @@ def normalize_company_name(c) -> str:
     return " ".join(toks)
 
 
+_ADDR_ABBR = [(r"\bStreet\b", "St"), (r"\bAvenue\b", "Ave"), (r"\bDrive\b", "Dr"), (r"\bSuite\b", "Ste"),
+              (r"\bRoad\b", "Rd"), (r"\bBoulevard\b", "Blvd"), (r"\bParkway\b", "Pkwy")]
+
+
 def _norm_address(a) -> str:
-    from src.teleon.verticals.provider_directory import normalize_address
-    return (normalize_address(a) or "").lower()
+    """Self-contained address normalizer — the resolution layer must not import UP into a vertical (correct layering:
+    verticals depend on resolution, not the reverse)."""
+    a = re.sub(r"\s+", " ", str(a or "").strip())
+    for pat, rep in _ADDR_ABBR:
+        a = re.sub(pat, rep, a, flags=re.I)
+    return a.lower()
 
 
 _NORMALIZERS = {"person_name": normalize_person_name, "company_name": normalize_company_name, "address": _norm_address,
@@ -183,29 +192,40 @@ def blocking_key(ruleset_name: str, record: dict) -> str:
 def resolve_entities(records: list, ruleset_name: str) -> dict:
     """Cluster records into entities: BLOCK, compare within blocks, union the matches; collect 'review' pairs for a human.
     Returns {entities: [[ids]], review_pairs: [(id,id,score)], comparisons, naive_comparisons}. ids = provider_id or index."""
+    rs = ruleset(ruleset_name)
+    idf = rs.get("identifier_field")
     ids = [r.get("provider_id", r.get("id", i)) for i, r in enumerate(records)]
-    blocks: dict = {}
+    # MULTI-KEY blocking: each record gets its name/company block key AND (if present) its identifier as a key — so two
+    # records sharing an identifier are ALWAYS compared (the identifier override must never be gated by name-blocking).
+    key_to_idx: dict = {}
     for i, r in enumerate(records):
-        blocks.setdefault(blocking_key(ruleset_name, r), []).append(i)
+        keys = {blocking_key(ruleset_name, r)}
+        if idf and str(r.get(idf) or "").strip():
+            keys.add("ID:" + str(r.get(idf)).strip())
+        for k in keys:
+            key_to_idx.setdefault(k, []).append(i)
     parent = list(range(len(records)))
     def find(x):
         while parent[x] != x:
             parent[x] = parent[parent[x]]
             x = parent[x]
         return x
-    review, comparisons = [], 0
-    for idxs in blocks.values():
+    review, compared = [], set()
+    for idxs in key_to_idx.values():
         for p in range(len(idxs)):
             for q in range(p + 1, len(idxs)):
-                comparisons += 1
-                res = compare(ruleset_name, records[idxs[p]], records[idxs[q]])
+                a, b = (idxs[p], idxs[q]) if idxs[p] < idxs[q] else (idxs[q], idxs[p])
+                if (a, b) in compared:
+                    continue
+                compared.add((a, b))
+                res = compare(ruleset_name, records[a], records[b])
                 if res["decision"] == "match":
-                    parent[find(idxs[p])] = find(idxs[q])
+                    parent[find(a)] = find(b)
                 elif res["decision"] == "review":
-                    review.append((ids[idxs[p]], ids[idxs[q]], res["score"]))
+                    review.append((ids[a], ids[b], res["score"]))
     groups: dict = {}
     for i in range(len(records)):
         groups.setdefault(find(i), []).append(ids[i])
     n = len(records)
     return {"entities": [sorted(g, key=str) for g in groups.values()], "review_pairs": review,
-            "comparisons": comparisons, "naive_comparisons": n * (n - 1) // 2, "serves_truth": False}
+            "comparisons": len(compared), "naive_comparisons": n * (n - 1) // 2, "serves_truth": False}

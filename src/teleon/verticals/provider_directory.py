@@ -168,24 +168,12 @@ _INACTIVE_STATES = {"inactive", "retired", "deceased", "closed", "not practicing
 
 
 def find_duplicates(records: list, *, fuzzy_threshold: float = 0.9) -> list:
-    """Cluster records that refer to the SAME provider: valid-NPI-exact first, then fuzzy name+address (union-find).
-    Returns the duplicate clusters (provider_ids, size >= 2) — the merge-review candidates. Deterministic, ~$0."""
-    n = len(records)
-    parent = list(range(n))
-    def find(x):
-        while parent[x] != x:
-            parent[x] = parent[parent[x]]
-            x = parent[x]
-        return x
-    for i in range(n):
-        for j in range(i + 1, n):
-            m = match_records(records[i], records[j], fuzzy_threshold=fuzzy_threshold)
-            if m["match"] and m["method"] in ("npi_exact", "fuzzy"):
-                parent[find(i)] = find(j)
-    groups: dict = {}
-    for i in range(n):
-        groups.setdefault(find(i), []).append(records[i].get("provider_id", i))
-    return [sorted(g, key=str) for g in groups.values() if len(g) >= 2]
+    """Cluster records that refer to the SAME provider, using the SHARED entity resolver (the 'person' ruleset:
+    typo-robust comparators + identifier override + blocking) instead of the simple seed matcher. Returns the duplicate
+    clusters (provider_ids, size >= 2) — the merge-review candidates. Deterministic, ~$0."""
+    from src.teleon.resolution.entity_resolver import resolve_entities   # vertical -> resolution (correct layering)
+    mapped = [{**r, "name": r.get("name") or r.get("provider_name")} for r in records]   # the resolver keys on 'name'
+    return [c for c in resolve_entities(mapped, "person")["entities"] if len(c) >= 2]
 
 
 def detect_inactive(record: dict, source_observations: dict) -> dict:
