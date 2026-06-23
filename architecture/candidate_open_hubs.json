@@ -158,6 +158,32 @@
       "release_status": "private_first",
       "open_trigger": "open as a portable model-routing / LLM-gateway-policy registry competitor appears (e.g. an OpenRouter-style preference-spec standard) OR at the inference-gateway public release \u2014 whichever first",
       "maturity": "ready_substrate"
+    },
+    {
+      "hub_id": "OpenLinkingHub",
+      "proposed_domain": "openlinkinghub.io",
+      "domain_status": "owner_clearance_required",
+      "thesis": "Open, portable ABSTRACTS for ENTITY RESOLUTION + record-linkage POLICY: per-entity-type rulesets (person/company/organization/address) of comparators (Jaro-Winkler / token-set / phonetic Soundex) + normalizers (nickname expansion, legal-suffix stripping), weighted match/review thresholds, identifier overrides, blocking keys, and per-INDUSTRY linking rules (which ruleset per role + how entities link across types). Robust to typos in any column. Owner-proposed 2026-06-23.",
+      "registers": "EntityResolutionRuleset cards (comparators / normalizers / thresholds / blocking) + IndustryLinkingRules (role->ruleset + cross-entity linkage) \u2014 rules and registries only, never a customer data dump or a resolution runtime",
+      "modular_component_source": "src/teleon/resolution (entity_resolver + industry_links) + architecture/entity_resolution_rules.json + architecture/industry_linking_rules.json",
+      "distinct_from": "OpenSourcesHub catalogs WHERE to find data (sources); OpenLinkingHub catalogs HOW to match/link it (resolution rules). The directory verticals are the RUNTIME that consume the rules; the hub is the open registry of the rules (candidate, never active, never serves customer data or truth).",
+      "status": "candidate",
+      "release_status": "private_first",
+      "open_trigger": "open as a portable entity-resolution / record-linkage rule-registry competitor appears OR at the licensed-directory product launch \u2014 whichever first",
+      "maturity": "ready_substrate"
+    },
+    {
+      "hub_id": "OpenSourcesHub",
+      "proposed_domain": "opensourceshub.io",
+      "domain_status": "owner_clearance_required",
+      "thesis": "Open, portable registry of authoritative DATA SOURCES across industries/systems: where to find/verify data \u2014 public registries (NPI/CMS, state Secretary-of-State incorporation registries, FINRA/SEC, NCEES, state boards), open datasets (data.gov / SAM.gov / USAspending), and websites \u2014 each with coverage (industry/entity/field), access tier, cost tier, the tool plane that reaches it, a recorded authority, and jurisdiction. Plural 'Sources' disambiguates from 'open source' (FOSS). Owner-proposed 2026-06-23.",
+      "registers": "SourceDescriptor cards (coverage / access / cost / plane / authority / jurisdiction) per source + cost-ordered acquisition descents \u2014 source POINTERS and policy only, never a scraped data dump; sources are candidates (discovery!=trust)",
+      "modular_component_source": "src/teleon/sources/source_registry.py + architecture/source_registry.json + the healthcare-specific architecture/provider_directory_sources.json it generalizes",
+      "distinct_from": "OpenEndpointHub catalogs model/inference ENDPOINTS; OpenSourcesHub catalogs DATA sources (registries / datasets / sites). OpenLinkingHub is HOW to match data once fetched; OpenSourcesHub is WHERE to fetch it. The hub is the open registry of source pointers (candidate, never active, never serves a data dump or truth).",
+      "status": "candidate",
+      "release_status": "private_first",
+      "open_trigger": "open as a portable cross-industry source/registry catalog competitor appears OR at the directory-freshness product launch \u2014 whichever first",
+      "maturity": "ready_substrate"
     }
   ]
 }
