@@ -2,7 +2,7 @@
 
 See [baltor-current-state-and-opportunities.md](baltor-current-state-and-opportunities.md).
 
-Reference M10: 31/31 · proofs green: 647 · candidates: unstructured_document_decomposition.
+Reference M10: 31/31 · proofs green: 648 · candidates: unstructured_document_decomposition.
 
 | Section | Status | Reference | Proof | Docs |
 |---|---|---|---|---|

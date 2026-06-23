@@ -746,6 +746,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/build_registry_dependency_graph.py", "build_registry_dependency_graph"),
     # ── registry_enrichment (registry #84): the maintenance/ENRICH worker (Baltor Enhance on the registries) — GENERATES deterministic embedding/description/long_description/use_cases/labels/keywords per record via the RegistryPort menu; learned/LLM enricher swaps behind the same port; serves_truth=false ──
     ("scripts/check_registry_enrich.py", "check_registry_enrich"),
+    # ── ingest_fb_page_links (#75 community intake): governed harvest of GitHub repos linked from FB feed pages (theaiempire/DeepRepo) — extracts + CLEANS the links (strips fbclid), candidate-only (discovery!=trust); FB direct-scrape is ToS-restricted, governed fetch = owner-paste OR fb_page_scrape (RAPIDAPI_KEY/APIFY_TOKEN, names only); no PII; serves_truth=false ──
+    ("scripts/ingest_fb_page_links.py", "ingest_fb_page_links"),
     # ── Governed blackboard spine P2: blackboard.local_sqlite@v1 (BlackboardProviderPort) — APPEND-ONLY sqlite store; rejects sourceless observations / serves_truth=true / missing-tenant-scope / mutate-existing; every append requires a worker_receipt; deterministic query (seq then entry_id); content-addressed ids; Teleon never imports Baltor; output never truth ──
     ("scripts/check_local_blackboard_provider.py", "check_local_blackboard_provider"),
     # ── Stateful-swarm spine P3: swarm.local_stub@v1 (StatefulSwarmProviderPort) + 6 deterministic workers (seed_planner/observation_extractor/gap_detector/entity_resolver/synthesis/governed_projection) writing typed entries + receipts to the local_sqlite blackboard; synthesis reads the BOARD not raw docs; gaps explicit; no live LLM; output never truth ──
