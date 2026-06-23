@@ -1,0 +1,31 @@
+MODULE src/teleon/verticals/licensed_directory.py
+## API signatures
+```python
+"""licensed_directory — the GENERAL 'licensed/credentialed entity directory freshness' capability. The provider-directory
+pipeline (validate identifier -> normalize -> match -> cross-source agreement -> auto_update/human_review -> audit) is
+profession-AGNOSTIC; this module instantiates it for ANY profession (physician, lawyer, engineer, CPA, financial advisor,
+pharmacist, …) by swapping THREE things """
+_REGISTRY = ...
+_COST_RANK = ...
+def _registry() -> dict
+def professions() -> list
+def profession(profession_id: str) -> dict | None
+    # The profession's config, or None if unknown or EXCLUDED (insurance).
+def authority_for(profession_id: str)
+    # A source->weight function from THIS profession's sources (default 0.5) — what makes resolve profession-specific.
+def validate_identifier(profession_id: str, value) -> bool
+    # Dispatch to the profession's identifier validator: NPI Luhn (physicians/dentists/optometrists), numeric (CRD),
+def source_descent(profession_id: str) -> list
+    # The profession's authoritative sources, cost-ordered (free public registries first, then your own browser …) —
+def resolve(profession_id: str, record: dict, source_observations: dict) -> dict
+    # The SAME resolve pipeline, parameterized for this profession (its tracked fields + source authority). Returns the
+```
+## intra-module call edges
+src.teleon.verticals.licensed_directory.professions -> src.teleon.verticals.licensed_directory._registry
+src.teleon.verticals.licensed_directory.profession -> src.teleon.verticals.licensed_directory._registry
+src.teleon.verticals.licensed_directory.authority_for -> src.teleon.verticals.licensed_directory.profession
+src.teleon.verticals.licensed_directory.validate_identifier -> src.teleon.verticals.licensed_directory.profession
+src.teleon.verticals.licensed_directory.source_descent -> src.teleon.verticals.licensed_directory.profession
+src.teleon.verticals.licensed_directory.resolve -> src.teleon.verticals.licensed_directory.profession
+src.teleon.verticals.licensed_directory.resolve -> src.teleon.verticals.licensed_directory.validate_identifier
+src.teleon.verticals.licensed_directory.resolve -> src.teleon.verticals.licensed_directory.authority_for
