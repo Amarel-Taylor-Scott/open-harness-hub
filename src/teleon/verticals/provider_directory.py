@@ -163,6 +163,67 @@ def resolve_record(record: dict, source_observations: dict, *, fields=_FIELDS) -
             "recommended_action": action, "reason": reason, "audit_trail": audit, "serves_truth": False}
 
 
+_INACTIVE_STATES = {"inactive", "retired", "deceased", "closed", "not practicing", "left practice"}
+
+
+def find_duplicates(records: list, *, fuzzy_threshold: float = 0.9) -> list:
+    """Cluster records that refer to the SAME provider: valid-NPI-exact first, then fuzzy name+address (union-find).
+    Returns the duplicate clusters (provider_ids, size >= 2) — the merge-review candidates. Deterministic, ~$0."""
+    n = len(records)
+    parent = list(range(n))
+    def find(x):
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+    for i in range(n):
+        for j in range(i + 1, n):
+            m = match_records(records[i], records[j], fuzzy_threshold=fuzzy_threshold)
+            if m["match"] and m["method"] in ("npi_exact", "fuzzy"):
+                parent[find(i)] = find(j)
+    groups: dict = {}
+    for i in range(n):
+        groups.setdefault(find(i), []).append(records[i].get("provider_id", i))
+    return [sorted(g, key=str) for g in groups.values() if len(g) >= 2]
+
+
+def detect_inactive(record: dict, source_observations: dict) -> dict:
+    """Inactive/retired signal: an AUTHORITATIVE source (weight >= 0.6) reports a non-active status. Evidence-bearing,
+    never asserted — a candidate for review. serves_truth=false."""
+    ev = [{"source": s, "status": st, "authority": authority_of(s)}
+          for s, v in source_observations.items()
+          for st in [str(v.get("status") or "").strip().lower()]
+          if st in _INACTIVE_STATES and authority_of(s) >= 0.6]
+    return {"inactive_candidate": bool(ev), "evidence": ev, "serves_truth": False}
+
+
+def detect_movement(resolved: dict) -> dict:
+    """Provider-movement / practice-change signal from a resolved record: did address or practice_name change?"""
+    moved = sorted({c["field"] for c in resolved.get("changes", []) if c["field"] in ("address", "practice_name")})
+    return {"moved": bool(moved), "fields": moved, "serves_truth": False}
+
+
+def freshness_run(items: list) -> dict:
+    """The repeatable BATCH pipeline (continuous/periodic, not one-time). items: [{record, source_observations}].
+    Resolves each record, partitions into the no_change / auto_update / human_review queues (the review dashboard),
+    detects duplicates + inactive + movement, and estimates cost from the ACTUAL human-review rate this batch. serves_truth=false."""
+    records = [it["record"] for it in items]
+    resolved = [resolve_record(it["record"], it.get("source_observations", {})) for it in items]
+    queues = {"no_change": [], "auto_update": [], "human_review": []}
+    for r in resolved:
+        queues[r["recommended_action"]].append(r["provider_id"])
+    inactive = [it["record"].get("provider_id") for it in items
+                if detect_inactive(it["record"], it.get("source_observations", {}))["inactive_candidate"]]
+    moved = [resolved[i]["provider_id"] for i in range(len(items)) if detect_movement(resolved[i])["moved"]]
+    n = len(items) or 1
+    manual_fraction = len(queues["human_review"]) / n
+    return {"n_records": len(items), "queues": {k: len(v) for k, v in queues.items()},
+            "review_queue": queues["human_review"], "auto_update_queue": queues["auto_update"],
+            "duplicates": find_duplicates(records), "inactive_candidates": inactive, "moved_providers": moved,
+            "recommendations": resolved, "cost_estimate_per_1000": cost_per_1000(manual_fraction=manual_fraction),
+            "serves_truth": False}
+
+
 def cost_per_1000(*, llm_fraction: float = 0.05, manual_fraction: float = 0.05, llm_cost: float = 0.002,
                   manual_cost: float = 2.0) -> dict:
     """Cost per 1,000 records under the descent: deterministic steps (NPI/normalize/match/agreement) are ~$0; an LLM runs

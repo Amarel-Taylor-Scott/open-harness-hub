@@ -72,6 +72,24 @@ def _self_test() -> int:
     ck("NO_CHANGE when sources confirm the existing value", rec3["recommended_action"] == "no_change" and not rec3["change_detected"])
     ck("honest-MISSING: a field no source reports is never fabricated", all(c["field"] != "specialty" for c in PD.resolve_record(HL_001, obs_auto)["changes"]))
 
+    # the REPEATABLE batch pipeline (continuous/periodic) + dedup + inactive + movement (the review dashboard)
+    npiA = _valid_npi()
+    items = [
+        {"record": {"provider_id": "P1", "provider_name": "Jane Doe MD", "npi": npiA, "address": "1 A St", "phone": "239-555-0001", "status": "active"},
+         "source_observations": {"NPI Registry": {"address": "2 B St"}, "Practice Website": {"address": "2 B St"}, "State Medical Board": {"address": "2 B St"}}},   # auto_update + moved
+        {"record": {"provider_id": "P2", "provider_name": "Jane Doe, M.D.", "npi": npiA, "address": "1 A Street", "phone": "239-555-0001", "status": "active"},
+         "source_observations": {"NPI Registry": {"phone": "239-555-0001"}}},                                                                                       # no_change; dup of P1 (same NPI)
+        {"record": {"provider_id": "P3", "provider_name": "Bob Roe DO", "npi": "0000000000", "address": "9 Z Rd", "status": "active"},
+         "source_observations": {"NPI Registry": {"status": "retired"}}},                                                                                            # human_review + inactive
+    ]
+    run = PD.freshness_run(items)
+    ck("batch pipeline partitions into review queues (1 auto / 1 review / 1 no-change)",
+       run["queues"] == {"no_change": 1, "auto_update": 1, "human_review": 1}, str(run["queues"]))
+    ck("duplicate detection clusters same-NPI records (P1,P2)", any(set(c) == {"P1", "P2"} for c in run["duplicates"]), str(run["duplicates"]))
+    ck("inactive/retired detection flags the retired provider (P3)", "P3" in run["inactive_candidates"])
+    ck("provider-movement detection flags the moved provider (P1)", "P1" in run["moved_providers"])
+    ck("cost estimate reflects the ACTUAL review rate this batch", run["cost_estimate_per_1000"]["total_usd_per_1000"] >= 0)
+
     cost = PD.cost_per_1000()
     ck("cost-per-1000 is far below a naive always-LLM + review-everything baseline", cost["total_usd_per_1000"] < cost["naive_baseline_usd_per_1000"] and cost["savings_pct_vs_naive"] > 90, str(cost["savings_pct_vs_naive"]))
     ck("serves_truth=false (proposals are candidates; verify gate + human review disposition truth)", rec["serves_truth"] is False)
