@@ -16,7 +16,7 @@ _REPO = Path(__file__).resolve().parents[1]
 if str(_REPO) not in sys.path:
     sys.path.insert(0, str(_REPO))
 
-from src.teleon.registry import RegistryPort, available, catalog  # noqa: E402
+from src.teleon.registry import CATALOGS, RegistryPort, available, catalog  # noqa: E402
 
 # (registry id, query, an id the query must surface) — real picks across different catalogs.
 _CASES = [
@@ -53,7 +53,7 @@ def main() -> int:
         ck(f"{name}: conforms to RegistryPort", isinstance(reg, RegistryPort))
         recs = reg.list()
         ck(f"{name}: list() non-empty", len(recs) >= 1, str(len(recs)))
-        first_id = recs[0].get("id") or recs[0].get("canonical")
+        first_id = recs[0].get(CATALOGS[name]["id_field"])
         ck(f"{name}: lookup(first) round-trips", reg.lookup(first_id) is not None, str(first_id))
         ck(f"{name}: search subset of list", len(reg.search("a", limit=999)) <= len(recs))
 

@@ -45,11 +45,11 @@ def main() -> int:
     # TROUBLESHOOT: diagnostic registries; on-menu queried, off-menu honestly surfaced
     t = troubleshoot("cve")
     ck("troubleshoot queries vulnerability_sources", "vulnerability_sources" in t["found"], str(list(t["found"])))
-    ck("troubleshoot surfaces off-menu diagnostic registries", "failure" in t["relevant_not_yet_on_menu"])
+    ck("troubleshoot surfaces off-menu diagnostic registries", "failure_recovery" in t["relevant_not_yet_on_menu"])
 
     # IMPROVE: improvement registries surfaced (mostly off-menu today, honestly)
     im = improve("extraction")
-    ck("improve surfaces optimization registries", "optimization_pass" in im["relevant_not_yet_on_menu"])
+    ck("improve surfaces off-menu improvement registries", "equivalence" in im["relevant_not_yet_on_menu"])
     ck("improve is governed", im["serves_truth"] is False)
 
     if fails:

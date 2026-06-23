@@ -754,6 +754,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_vertical_playbooks.py", "check_vertical_playbooks"),
     # ── registry_compose: the PLAYBOOK->DAG compiler ('how registries become a TOOL') — compiles a vertical playbook OR a universal intent into a candidate DAG plan, each stage picking ingredients from the registries via the RegistryPort menu; governed + candidate-only; serves_truth=false ──
     ("scripts/check_registry_compose.py", "check_registry_compose"),
+    # ── registry_search: FEDERATED search across ALL registries (how a DAG builder uses the buffet) — search_all + the 3 builder workflows BUILD/TROUBLESHOOT/IMPROVE; on-menu registries queried, off-menu honestly surfaced; serves_truth=false ──
+    ("scripts/check_registry_search.py", "check_registry_search"),
     # ── distill_kaggle_kernels (#88 LLM population): distills the mined Kaggle kernels -> candidate registry ENTRIES (deterministic floor maps pattern->registry + frequency/lineage; LLM path Kimi/GLM/Claude via ollama when OH_LLM_API_KEY). LOSSLESS (keeps raw freq + lineage); candidates only; serves_truth=false ──
     ("scripts/distill_kaggle_kernels.py", "distill_kaggle_kernels"),
     # ── formula_registry (#98): named DETERMINISTIC formulas the compiler applies instead of an LLM (compound interest/Ohm's law/Reynolds/z-score/BMI) — the 'deterministic > probabilistic' core; spec-only (expression+variables+units, no eval), self-consistent (variables in expression); serves_truth=false ──

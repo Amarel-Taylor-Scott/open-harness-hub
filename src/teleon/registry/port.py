@@ -31,6 +31,15 @@ CATALOGS: dict[str, dict[str, str]] = {
     "knowledge_taxonomies":  {"file": "knowledge_taxonomies.json",     "list_key": "taxonomies",  "id_field": "id"},
     "human_expert_sources":  {"file": "human_expert_sources.json",     "list_key": "sources",     "id_field": "id"},
     "semantic_ontology":     {"file": "semantic_field_ontology.json",  "list_key": "fields",      "id_field": "canonical"},
+    # menu expansion (the federated-search rollout): high-value existing catalogs + the new ones, keyed by their
+    # ontology registry id so the search facets (build/troubleshoot/improve) query them directly.
+    "component":             {"file": "tool_registry.json",            "list_key": "tools",       "id_field": "id"},
+    "capability":            {"file": "capability_ladders.json",       "list_key": "ladders",     "id_field": "canonical"},
+    "failure":               {"file": "worker_failure_taxonomy.json",  "list_key": "failures",    "id_field": "failure_type"},
+    "optimization_pass":     {"file": "optimization_passes.json",      "list_key": "passes",      "id_field": "pass"},
+    "formulas":              {"file": "formula_registry.json",         "list_key": "formulas",    "id_field": "id"},
+    "vertical_playbooks":    {"file": "vertical_playbooks.json",       "list_key": "playbooks",   "id_field": "id"},
+    "information_acquisition": {"file": "acquisition_strategies.json",  "list_key": "strategies",  "id_field": "id"},
 }
 
 
