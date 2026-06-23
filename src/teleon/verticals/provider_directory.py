@@ -101,18 +101,18 @@ def match_records(a: dict, b: dict, *, fuzzy_threshold: float = 0.88) -> dict:
 
 
 # --- the confidence formula ------------------------------------------------------------------------------------------
-def field_confidence(existing, observations: dict) -> dict:
+def field_confidence(existing, observations: dict, *, authority_fn=authority_of) -> dict:
     """observations: {source: reported_value (normalized)}. Confidence that a field should change to a NEW value:
     agreement = (authority weight backing the winning value) / (total authority reporting the field), scaled by coverage
-    (how much authoritative evidence exists). A competing value with real weight => conflict. Returns the winner, its
-    confidence, the supporting sources, and whether it's a change / a conflict."""
+    (how much authoritative evidence exists). A competing value with real weight => conflict. `authority_fn` supplies the
+    per-source weight — defaulting to the physician sources, overridden per profession (the same logic, any directory)."""
     if not observations:
         return {"value": existing, "confidence": 0.0, "supporting_sources": [], "change": False, "conflict": False}
     groups: dict = {}
     for src, val in observations.items():
         groups.setdefault(val, []).append(src)
-    total_w = sum(authority_of(s) for s in observations)
-    weight = {v: sum(authority_of(s) for s in srcs) for v, srcs in groups.items()}
+    total_w = sum(authority_fn(s) for s in observations)
+    weight = {v: sum(authority_fn(s) for s in srcs) for v, srcs in groups.items()}
     winner = max(weight, key=lambda v: (weight[v], str(v)))
     win_w = weight[winner]
     coverage = min(1.0, total_w / _policy().get("coverage_full_weight", 1.8))
@@ -136,17 +136,18 @@ def decide_action(change_detected: bool, overall: float, conflict: bool) -> tupl
     return "human_review", "Confidence between the review band and auto-update threshold; manual review recommended."
 
 
-def resolve_record(record: dict, source_observations: dict, *, fields=_FIELDS) -> dict:
-    """The per-record pipeline. record: the current HealthLynked record. source_observations: {source: {field: value}}
-    collected from trusted sources (live fetch is honest-offline elsewhere; this resolves provided/synthetic observations
-    deterministically). Returns the structured recommendation in HealthLynked's format + an audit trail. serves_truth=false."""
+def resolve_record(record: dict, source_observations: dict, *, fields=_FIELDS, authority_fn=authority_of) -> dict:
+    """The per-record pipeline — profession-AGNOSTIC. record: the current directory record. source_observations:
+    {source: {field: value}} collected from trusted sources (live fetch is honest-offline elsewhere; this resolves
+    provided/synthetic observations deterministically). `fields` + `authority_fn` parameterize it per profession (the same
+    logic serves physicians, lawyers, engineers, …). Returns the structured recommendation + an audit trail. serves_truth=false."""
     changes, field_confs, any_conflict, audit = [], [], False, []
     for f in fields:
         existing = normalize_field(f, record.get(f))
         obs = {src: normalize_field(f, v[f]) for src, v in source_observations.items() if v.get(f) is not None}
         if not obs:                                  # honest-MISSING: no source reports it -> claim nothing
             continue
-        fc = field_confidence(existing, obs)
+        fc = field_confidence(existing, obs, authority_fn=authority_fn)
         audit.append({"field": f, "old_value": record.get(f), "winning_value": fc["value"],
                       "supporting_sources": fc["supporting_sources"], "confidence": fc["confidence"],
                       "conflict": fc["conflict"], "changed": fc["change"]})
