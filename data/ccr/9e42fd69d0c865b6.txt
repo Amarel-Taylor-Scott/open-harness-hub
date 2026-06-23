@@ -1,0 +1,20 @@
+MODULE src/teleon/synthesis/templates.py
+## API signatures
+```python
+"""templates — the template library (the biggest efficiency lever). Canonical typed DAG SKELETONS with named slots;
+composition RETRIEVES a matching template and MUTATES its slots (fill each slot's plane with a component, drop unused
+optional slots) instead of synthesizing from scratch. The honest reason: classical component synthesis scales poorly with
+library size, so templates carry the common cas"""
+_TEMPLATES = ...
+def load_templates() -> list
+def _tok(s: str) -> set
+def retrieve_template(query: str, *, capability_family: str | None=None) -> dict | None
+    # The best-matching template by keyword/family overlap, or None when nothing matches. Ties break by telemetry
+def mutate(template: dict, fills: dict, *, drop_unfilled_optional: bool=True) -> dict
+    # Fill a template's slots into a concrete DAG. fills: {step: component_id}. An unfilled OPTIONAL slot is dropped (its
+def mine_template(nodes: list, edges: list, *, capability_family: str, keywords: list | None=None) -> dict
+    # Propose a NEW template from a winning trace — slots = the planes of the trace nodes. The library grows itself
+```
+## intra-module call edges
+src.teleon.synthesis.templates.retrieve_template -> src.teleon.synthesis.templates._tok
+src.teleon.synthesis.templates.retrieve_template -> src.teleon.synthesis.templates.load_templates

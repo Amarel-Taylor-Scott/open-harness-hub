@@ -1,0 +1,17 @@
+MODULE src/teleon/synthesis/equivalence.py
+## API signatures
+```python
+"""equivalence — canonicalization done HONESTLY. Knowing that paddleocr ≈ tesseract ≈ a vision-LLM for `extract_text` is
+what makes fallbacks, ladders, dedupe, and learning GENERALIZE across the registry. But general program equivalence is
+UNDECIDABLE — so two components/pipelines are equivalent only *to within a benchmark/probe set* (they agree on it). We
+treat equivalence classes as **learned, benc"""
+def agreement(outputs_a: list, outputs_b: list) -> float
+    # Fraction of probe items where two runners produced the SAME output. Empty/length-mismatch → 0.0 (can't claim
+def equivalent(outputs_a: list, outputs_b: list, *, threshold: float=0.95) -> dict
+    # Benchmark-relative equivalence: agreement on the probe set ≥ threshold. NOT a proof. Returns {equivalent,
+def equivalence_classes(runner_outputs: dict, *, threshold: float=0.95) -> dict
+    # Cluster runners by pairwise agreement on a SHARED probe set into benchmark-relative equivalence classes.
+```
+## intra-module call edges
+src.teleon.synthesis.equivalence.equivalent -> src.teleon.synthesis.equivalence.agreement
+src.teleon.synthesis.equivalence.equivalence_classes -> src.teleon.synthesis.equivalence.agreement

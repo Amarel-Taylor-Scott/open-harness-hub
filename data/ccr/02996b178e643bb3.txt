@@ -1,0 +1,22 @@
+MODULE src/teleon/synthesis/passes.py
+## API signatures
+```python
+"""passes — System 8/9: the PassManager (LLVM for cognition). Optimization passes are IR→IR rewrites, each gated by a
+LEGALITY check (re-verify the DAG if the pass changes observable behavior) and a COST gate (a pass fires only if it does
+NOT worsen the objective, scored by the analytic simulator). A handful of rigorously-gated passes beats a pile of unsafe
+ones — pass phase-ordering is unsolved in g"""
+def pass_cse(dag: dict, **_) -> tuple
+    # Common-subexpression elimination: nodes with identical (component, plane, predecessors) are duplicates → keep one,
+def pass_deterministic_replacement(dag: dict, *, substitutions: dict | None=None, **_) -> tuple
+    # Replace an llm node with a DETERMINISTIC substitute (the core descent move — remove unnecessary intelligence).
+_PASS_TABLE = ...
+DEFAULT_PASSES = ...
+def _cost(dag: dict, shard: str='000') -> float
+def run_passes(dag: dict, *, passes: list | None=None, profile: PreferenceProfile | None=None, shard: str='000', **opts) -> dict
+    # Run the pass pipeline. Each pass: legality (re-verify if behavior-changing) + a cost gate (never worsen the
+```
+## intra-module call edges
+src.teleon.synthesis.passes.run_passes -> src.teleon.synthesis.passes._cost
+src.teleon.synthesis.passes.run_passes -> src.teleon.synthesis.passes._cost
+src.teleon.synthesis.passes.run_passes -> src.teleon.synthesis.passes._cost
+src.teleon.synthesis.passes.run_passes -> src.teleon.synthesis.passes._cost
