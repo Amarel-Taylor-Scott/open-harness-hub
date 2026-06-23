@@ -1,0 +1,25 @@
+MODULE src/teleon/registry/search.py
+## API signatures
+```python
+"""registry.search — FEDERATED search across ALL registries (how a DAG/pipeline builder uses the buffet)."""
+_TROUBLESHOOT = ...
+_IMPROVE = ...
+_PER_CATALOG = ...
+def _label(rec: dict) -> str
+def search_all(query: str, *, per_catalog: int=_PER_CATALOG) -> list[dict]
+    # One query across EVERY catalog on the menu -> registry-tagged hits (the federated search).
+def _facet(query: str, registry_ids: list[str], workflow: str) -> dict
+    # Query the on-menu registries for a workflow; honestly surface the relevant ones not yet on the menu.
+def build_capability(intent: str) -> dict
+    # BUILD: ingredients across every registry, grouped by registry, ready to compose into a DAG.
+def troubleshoot(symptom: str) -> dict
+    # TROUBLESHOOT: search the diagnostic registries for a symptom / error.
+def improve(capability: str) -> dict
+    # IMPROVE: search the improvement registries for cheaper / faster / more-deterministic alternatives.
+```
+## intra-module call edges
+src.teleon.registry.search.search_all -> src.teleon.registry.search._label
+src.teleon.registry.search._facet -> src.teleon.registry.search._label
+src.teleon.registry.search.build_capability -> src.teleon.registry.search.search_all
+src.teleon.registry.search.troubleshoot -> src.teleon.registry.search._facet
+src.teleon.registry.search.improve -> src.teleon.registry.search._facet
