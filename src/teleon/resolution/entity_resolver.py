@@ -175,6 +175,8 @@ def blocking_key(ruleset_name: str, record: dict) -> str:
     if rs.get("blocking") == "company_token":
         toks = normalize_company_name(record.get("name")).split()
         return toks[0] if toks else ""
+    if rs.get("blocking") == "zip":
+        return re.sub(r"\D", "", str(record.get("zip") or ""))[:5]
     return ""
 
 

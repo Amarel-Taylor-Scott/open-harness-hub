@@ -21,6 +21,20 @@
         {"field": "address", "comparator": "token_set", "normalizer": "address", "weight": 0.3},
         {"field": "phone", "comparator": "exact", "normalizer": "phone", "weight": 0.1}
       ]
+    },
+    "organization": {
+      "identifier_field": null, "match_threshold": 0.80, "review_threshold": 0.66, "blocking": "company_token",
+      "columns": [
+        {"field": "name", "comparator": "token_set", "normalizer": "company_name", "weight": 0.6},
+        {"field": "address", "comparator": "token_set", "normalizer": "address", "weight": 0.4}
+      ]
+    },
+    "address": {
+      "identifier_field": null, "match_threshold": 0.85, "review_threshold": 0.72, "blocking": "zip",
+      "columns": [
+        {"field": "address", "comparator": "token_set", "normalizer": "address", "weight": 0.7},
+        {"field": "zip", "comparator": "exact", "normalizer": "none", "weight": 0.3}
+      ]
     }
   }
 }

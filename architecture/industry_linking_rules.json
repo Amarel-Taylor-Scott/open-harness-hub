@@ -1,0 +1,36 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-23",
+  "principle": "The per-INDUSTRY linking-rules surface (the OpenLinkingHub substrate). For each industry it declares (a) which entity-resolution RULESET (entity_resolution_rules.json) applies to each entity ROLE, and (b) the cross-entity LINKAGE rules — how a person links to an organization, an org to a location, etc., matched on declared fields (from_field:to_field). The SAME resolution engine + rulesets, composed per industry. INSURANCE excluded (non-compete). serves_truth=false: links are proposed; a review tier + governance disposition.",
+  "serves_truth": false,
+  "excluded": ["insurance"],
+  "industries": {
+    "healthcare": {
+      "entities": {"provider": "person", "practice": "organization", "location": "address"},
+      "links": [
+        {"from": "provider", "to": "practice", "type": "affiliated_with", "link_on": ["practice_name:name", "address"], "threshold": 0.80},
+        {"from": "practice", "to": "location", "type": "located_at", "link_on": ["address"], "threshold": 0.85}
+      ]
+    },
+    "legal": {
+      "entities": {"attorney": "person", "firm": "organization", "office": "address"},
+      "links": [{"from": "attorney", "to": "firm", "type": "affiliated_with", "link_on": ["firm_name:name", "address"], "threshold": 0.80}]
+    },
+    "finance": {
+      "entities": {"advisor": "person", "firm": "organization"},
+      "links": [{"from": "advisor", "to": "firm", "type": "affiliated_with", "link_on": ["firm_name:name"], "threshold": 0.82}]
+    },
+    "engineering": {
+      "entities": {"engineer": "person", "firm": "organization"},
+      "links": [{"from": "engineer", "to": "firm", "type": "affiliated_with", "link_on": ["firm_name:name", "address"], "threshold": 0.80}]
+    },
+    "real_estate": {
+      "entities": {"agent": "person", "brokerage": "organization"},
+      "links": [{"from": "agent", "to": "brokerage", "type": "affiliated_with", "link_on": ["brokerage:name", "address"], "threshold": 0.80}]
+    },
+    "accounting": {
+      "entities": {"cpa": "person", "firm": "organization"},
+      "links": [{"from": "cpa", "to": "firm", "type": "affiliated_with", "link_on": ["firm_name:name"], "threshold": 0.82}]
+    }
+  }
+}
