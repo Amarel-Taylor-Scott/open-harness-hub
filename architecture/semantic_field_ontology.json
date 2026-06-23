@@ -1,0 +1,29 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-23",
+  "principle": "Canonical FIELD ontology (backs registry #20 semantic_ontology). Maps surface field names -> ONE canonical field id, so extraction + entity-linking treat invoice_number = invoice_id = bill_number as the same field. Cross-domain. Deterministic (normalize then alias-match; LLM only as a last resort for novel fields). serves_truth=false (a naming/alias map, never data). Complements entity_resolution_rules.json (which normalizes VALUES); this normalizes FIELD NAMES.",
+  "serves_truth": false,
+  "normalization": "lowercase; non-alphanumeric runs -> '_'; strip leading/trailing '_'. A surface name matches a field if its normalized form equals the canonical or any normalized alias.",
+  "fields": [
+    {"canonical": "invoice_identifier", "domain": "invoice", "type": "string", "aliases": ["invoice_number", "invoice_id", "invoice_no", "bill_number", "inv_no", "invoice"]},
+    {"canonical": "total_amount", "domain": "invoice", "type": "money", "aliases": ["total", "amount_due", "grand_total", "balance_due", "amount", "total_due"]},
+    {"canonical": "subtotal_amount", "domain": "invoice", "type": "money", "aliases": ["subtotal", "sub_total", "net_amount"]},
+    {"canonical": "tax_amount", "domain": "invoice", "type": "money", "aliases": ["tax", "vat_amount", "sales_tax", "gst_amount"]},
+    {"canonical": "due_date", "domain": "invoice", "type": "date", "aliases": ["due", "payment_due", "pay_by", "payment_date"]},
+    {"canonical": "date_issued", "domain": "document", "type": "date", "aliases": ["issue_date", "invoice_date", "created_date", "doc_date", "date_created", "issued_on"]},
+    {"canonical": "person_full_name", "domain": "person", "type": "string", "aliases": ["full_name", "contact_name", "customer_name", "client_name"]},
+    {"canonical": "given_name", "domain": "person", "type": "string", "aliases": ["first_name", "fname", "forename"]},
+    {"canonical": "family_name", "domain": "person", "type": "string", "aliases": ["last_name", "lname", "surname"]},
+    {"canonical": "email_address", "domain": "contact", "type": "email", "aliases": ["email", "e_mail", "email_addr", "contact_email"]},
+    {"canonical": "phone_number", "domain": "contact", "type": "phone", "aliases": ["phone", "tel", "telephone", "mobile", "cell", "contact_phone", "phone_no"]},
+    {"canonical": "postal_address", "domain": "address", "type": "address", "aliases": ["street_address", "mailing_address", "address_line", "addr"]},
+    {"canonical": "city", "domain": "address", "type": "string", "aliases": ["town", "municipality", "city_name"]},
+    {"canonical": "postal_code", "domain": "address", "type": "string", "aliases": ["zip", "zip_code", "postcode", "zipcode", "postal"]},
+    {"canonical": "country", "domain": "address", "type": "string", "aliases": ["country_code", "nation", "country_name"]},
+    {"canonical": "organization_name", "domain": "company", "type": "string", "aliases": ["company", "company_name", "org", "organization", "business_name", "vendor_name", "supplier_name"]},
+    {"canonical": "tax_identifier", "domain": "company", "type": "string", "aliases": ["ein", "tin", "vat_number", "tax_number", "tax_id", "abn"]},
+    {"canonical": "national_provider_identifier", "domain": "healthcare", "type": "string", "aliases": ["npi", "npi_number", "provider_id", "provider_npi"]},
+    {"canonical": "license_number", "domain": "professional", "type": "string", "aliases": ["license", "license_no", "lic_no", "license_num"]},
+    {"canonical": "account_number", "domain": "finance", "type": "string", "aliases": ["account", "account_no", "acct", "acct_no"]}
+  ]
+}

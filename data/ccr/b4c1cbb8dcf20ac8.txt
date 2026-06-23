@@ -1,0 +1,19 @@
+MODULE src/teleon/resolution/field_ontology.py
+## API signatures
+```python
+"""field_ontology — canonicalize surface field names to one canonical id (backs registry #20 semantic_ontology)."""
+_REPO = ...
+_ONTOLOGY = ...
+_NON_ALNUM = ...
+def normalize(name: str) -> str
+    # lowercase; non-alphanumeric runs -> '_'; strip leading/trailing '_'.
+def _alias_index() -> dict[str, str]
+    # normalized surface name -> canonical id (canonical itself + every alias).
+def canonicalize(field_name: str) -> str | None
+    # Surface field name -> canonical id, or None if unknown (caller may escalate to the LLM).
+def aliases_of(canonical: str) -> list[str]
+```
+## intra-module call edges
+src.teleon.resolution.field_ontology._alias_index -> src.teleon.resolution.field_ontology.normalize
+src.teleon.resolution.field_ontology.canonicalize -> src.teleon.resolution.field_ontology.normalize
+src.teleon.resolution.field_ontology.canonicalize -> src.teleon.resolution.field_ontology._alias_index

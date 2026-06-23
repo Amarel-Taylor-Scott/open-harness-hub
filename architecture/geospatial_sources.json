@@ -1,0 +1,22 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-23",
+  "principle": "POINTER-ONLY catalog of public GEOSPATIAL data sources (backs registry #77 geospatial_sources): geocoding, boundaries, population, points-of-interest, routing, elevation, basemaps, place-names — OpenStreetMap / US Census / Natural Earth / GeoNames / WorldPop class. Each entry says WHERE + what it returns + access + LICENSE, never a copy of the data. serves_truth=false. Exposed via OpenGeoHub; the descent queries cheapest-first (free official/open before paid).",
+  "serves_truth": false,
+  "access_legend": {"free": "open, no key", "key": "free key", "paid": "paid"},
+  "cost_legend": {"free": "no cost", "freemium": "free tier + paid", "paid": "paid only"},
+  "sources": [
+    {"id": "osm_nominatim", "domain": "geocode", "name": "OSM Nominatim", "returns": "address <-> lat/lon (geocode + reverse)", "access": "free", "cost_tier": "free", "jurisdiction": "global", "license": "ODbL", "ref": "nominatim.openstreetmap.org"},
+    {"id": "osm_overpass", "domain": "poi", "name": "OSM Overpass API", "returns": "points-of-interest + map features by query", "access": "free", "cost_tier": "free", "jurisdiction": "global", "license": "ODbL", "ref": "overpass-api.de"},
+    {"id": "osrm", "domain": "routing", "name": "OSRM", "returns": "routes, distances, travel-time matrices", "access": "free", "cost_tier": "free", "jurisdiction": "global", "license": "ODbL/BSD", "ref": "project-osrm.org"},
+    {"id": "census_tiger", "domain": "boundaries", "name": "US Census TIGER/Line", "returns": "US boundaries (states/counties/tracts/blocks) shapefiles", "access": "free", "cost_tier": "free", "jurisdiction": "US", "license": "public-domain", "ref": "census.gov/geographies/mapping-files"},
+    {"id": "census_acs", "domain": "population", "name": "US Census ACS / Decennial", "returns": "population + demographics by geography", "access": "key", "cost_tier": "free", "jurisdiction": "US", "license": "public-domain", "ref": "api.census.gov"},
+    {"id": "worldpop", "domain": "population", "name": "WorldPop", "returns": "global gridded population estimates", "access": "free", "cost_tier": "free", "jurisdiction": "global", "license": "CC-BY", "ref": "worldpop.org"},
+    {"id": "natural_earth", "domain": "basemap", "name": "Natural Earth", "returns": "global basemap vectors (countries, rivers, roads)", "access": "free", "cost_tier": "free", "jurisdiction": "global", "license": "public-domain", "ref": "naturalearthdata.com"},
+    {"id": "geonames", "domain": "placenames", "name": "GeoNames", "returns": "place names, admin hierarchy, lat/lon, population", "access": "key", "cost_tier": "freemium", "jurisdiction": "global", "license": "CC-BY", "ref": "geonames.org"},
+    {"id": "openaddresses", "domain": "geocode", "name": "OpenAddresses", "returns": "open address point dataset", "access": "free", "cost_tier": "free", "jurisdiction": "global", "license": "varies-by-source", "ref": "openaddresses.io"},
+    {"id": "usgs_3dep", "domain": "elevation", "name": "USGS 3DEP", "returns": "US elevation / terrain", "access": "free", "cost_tier": "free", "jurisdiction": "US", "license": "public-domain", "ref": "usgs.gov/3dep"},
+    {"id": "overture", "domain": "poi", "name": "Overture Maps", "returns": "open POI / places / buildings / transportation", "access": "free", "cost_tier": "free", "jurisdiction": "global", "license": "CDLA/ODbL", "ref": "overturemaps.org"},
+    {"id": "osm_planet", "domain": "basemap", "name": "OpenStreetMap Planet", "returns": "full OSM map data extracts", "access": "free", "cost_tier": "free", "jurisdiction": "global", "license": "ODbL", "ref": "planet.openstreetmap.org"}
+  ]
+}

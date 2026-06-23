@@ -1,0 +1,41 @@
+MODULE src/teleon/registry/enrich.py
+## API signatures
+```python
+"""registry.enrich — the registry maintenance / ENRICHMENT worker (Baltor 'Enhance' on the registries)."""
+_EMBED_DIM = ...
+_TOP_KEYWORDS = ...
+_MIN_TOKEN_LEN = ...
+_TOKEN_RE = ...
+_STOP = ...
+_LABEL_FIELDS = ...
+_WHAT_FIELDS = ...
+_DETAIL_FIELDS = ...
+def _text(record: dict) -> str
+def _tokens(text: str) -> list[str]
+def keywords(record: dict) -> list[str]
+def embedding(record: dict) -> list[float]
+    # Deterministic lexical hash embedding (L2-normalized); a learned embedder drops in behind this signature.
+def labels(record: dict) -> list[str]
+def description(record: dict) -> str
+def long_description(record: dict) -> str
+def use_cases(record: dict) -> list[str]
+def enrich_record(record: dict) -> dict
+    # Return the record with a derived `_enrichment` block (embedding/description/use_cases/labels/keywords).
+def enrich_catalog(name: str) -> list[dict]
+    # Enrich every record in a registered catalog (via the RegistryPort menu).
+def enrich_all() -> dict[str, list[dict]]
+```
+## intra-module call edges
+src.teleon.registry.enrich.keywords -> src.teleon.registry.enrich._tokens
+src.teleon.registry.enrich.keywords -> src.teleon.registry.enrich._text
+src.teleon.registry.enrich.embedding -> src.teleon.registry.enrich._tokens
+src.teleon.registry.enrich.embedding -> src.teleon.registry.enrich._text
+src.teleon.registry.enrich.long_description -> src.teleon.registry.enrich.description
+src.teleon.registry.enrich.enrich_record -> src.teleon.registry.enrich.embedding
+src.teleon.registry.enrich.enrich_record -> src.teleon.registry.enrich.description
+src.teleon.registry.enrich.enrich_record -> src.teleon.registry.enrich.long_description
+src.teleon.registry.enrich.enrich_record -> src.teleon.registry.enrich.keywords
+src.teleon.registry.enrich.enrich_record -> src.teleon.registry.enrich.labels
+src.teleon.registry.enrich.enrich_record -> src.teleon.registry.enrich.use_cases
+src.teleon.registry.enrich.enrich_catalog -> src.teleon.registry.enrich.enrich_record
+src.teleon.registry.enrich.enrich_all -> src.teleon.registry.enrich.enrich_catalog

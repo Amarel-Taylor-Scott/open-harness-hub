@@ -1,6 +1,6 @@
 # Proof Inventory
 
-**634** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
+**647** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
 
 - `scripts/ingest/context_rot.py`
 - `scripts/ingest/document_decompose.py`
@@ -499,6 +499,19 @@
 - `scripts/check_candidate_open_hubs.py`
 - `scripts/check_hub_profiles.py`
 - `scripts/check_registry_ontology.py`
+- `scripts/audit_magic_numbers.py`
+- `scripts/check_lookup_portals.py`
+- `scripts/check_provider_arbitrage.py`
+- `scripts/check_semantic_field_ontology.py`
+- `scripts/check_human_expert_sources.py`
+- `scripts/check_observability_providers.py`
+- `scripts/check_geospatial_sources.py`
+- `scripts/check_vulnerability_sources.py`
+- `scripts/check_knowledge_taxonomies.py`
+- `scripts/check_registry_port.py`
+- `scripts/check_acquisition_strategies.py`
+- `scripts/build_registry_dependency_graph.py`
+- `scripts/check_registry_enrich.py`
 - `scripts/check_local_blackboard_provider.py`
 - `scripts/check_stateful_swarm_local_stub.py`
 - `scripts/check_baltor_governed_blackboard_demo.py`

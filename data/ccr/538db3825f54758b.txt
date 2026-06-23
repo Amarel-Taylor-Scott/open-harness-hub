@@ -1,0 +1,58 @@
+MODULE src/teleon/verticals/provider_directory.py
+## API signatures
+```python
+"""provider_directory — a repeatable, cost-efficient provider/practice directory freshness pipeline (the HealthLynked
+problem). Healthcare-admin vertical: directory data only (name, NPI, specialty, practice, address, phone, website,
+status) — NOT insurance."""
+_AUTHORITY = ...
+_FIELDS = ...
+def _policy() -> dict
+def authority_of(source: str) -> float
+def _npi_check_digit(base9: str) -> int
+def validate_npi(npi) -> bool
+    # True iff `npi` is a 10-digit NPI with a valid Luhn check digit (deterministic, free — no API/LLM).
+def normalize_phone(p) -> str | None
+def normalize_address(a) -> str | None
+def _norm_text(s) -> str | None
+def normalize_field(field: str, value)
+def _sim(a, b) -> float
+def match_records(a: dict, b: dict, *, fuzzy_threshold: float=0.88) -> dict
+    # How two records match. NPI exact (deterministic, certain) beats a fuzzy name+address match; below the fuzzy
+def field_confidence(existing, observations: dict, *, authority_fn=authority_of) -> dict
+    # observations: {source: reported_value (normalized)}. Confidence that a field should change to a NEW value:
+def decide_action(change_detected: bool, overall: float, conflict: bool) -> tuple
+def resolve_record(record: dict, source_observations: dict, *, fields=_FIELDS, authority_fn=authority_of) -> dict
+    # The per-record pipeline — profession-AGNOSTIC. record: the current directory record. source_observations:
+_INACTIVE_STATES = ...
+def find_duplicates(records: list, *, fuzzy_threshold: float=0.9) -> list
+    # Cluster records that refer to the SAME provider, using the SHARED entity resolver (the 'person' ruleset:
+def detect_inactive(record: dict, source_observations: dict) -> dict
+    # Inactive/retired signal: an AUTHORITATIVE source (weight >= 0.6) reports a non-active status. Evidence-bearing,
+def detect_movement(resolved: dict) -> dict
+    # Provider-movement / practice-change signal from a resolved record: did address or practice_name change?
+def freshness_run(items: list) -> dict
+    # The repeatable BATCH pipeline (continuous/periodic, not one-time). items: [{record, source_observations}].
+def cost_per_1000(*, llm_fraction: float=0.05, manual_fraction: float=0.05, llm_cost: float=0.002, manual_cost: float=2.0) -> dict
+    # Cost per 1,000 records under the descent: deterministic steps (NPI/normalize/match/agreement) are ~$0; an LLM runs
+```
+## intra-module call edges
+src.teleon.verticals.provider_directory.authority_of -> src.teleon.verticals.provider_directory._policy
+src.teleon.verticals.provider_directory.validate_npi -> src.teleon.verticals.provider_directory._npi_check_digit
+src.teleon.verticals.provider_directory.normalize_field -> src.teleon.verticals.provider_directory._norm_text
+src.teleon.verticals.provider_directory.normalize_field -> src.teleon.verticals.provider_directory.normalize_phone
+src.teleon.verticals.provider_directory.normalize_field -> src.teleon.verticals.provider_directory.normalize_address
+src.teleon.verticals.provider_directory.normalize_field -> src.teleon.verticals.provider_directory._norm_text
+src.teleon.verticals.provider_directory.match_records -> src.teleon.verticals.provider_directory.validate_npi
+src.teleon.verticals.provider_directory.match_records -> src.teleon.verticals.provider_directory._sim
+src.teleon.verticals.provider_directory.match_records -> src.teleon.verticals.provider_directory._sim
+src.teleon.verticals.provider_directory.match_records -> src.teleon.verticals.provider_directory.normalize_field
+src.teleon.verticals.provider_directory.match_records -> src.teleon.verticals.provider_directory.normalize_field
+src.teleon.verticals.provider_directory.match_records -> src.teleon.verticals.provider_directory.normalize_address
+src.teleon.verticals.provider_directory.match_records -> src.teleon.verticals.provider_directory.normalize_address
+src.teleon.verticals.provider_directory.field_confidence -> src.teleon.verticals.provider_directory._policy
+src.teleon.verticals.provider_directory.decide_action -> src.teleon.verticals.provider_directory._policy
+src.teleon.verticals.provider_directory.resolve_record -> src.teleon.verticals.provider_directory.decide_action
+src.teleon.verticals.provider_directory.resolve_record -> src.teleon.verticals.provider_directory.normalize_field
+src.teleon.verticals.provider_directory.resolve_record -> src.teleon.verticals.provider_directory.field_confidence
+src.teleon.verticals.provider_directory.resolve_record -> src.teleon.verticals.provider_directory.validate_npi
+src.teleon.verticals.provider_directory.resolve_record -> src.teleon.verticals.provider_directory.normalize_field

@@ -1,0 +1,20 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-23",
+  "principle": "ACQUISITION-STRATEGY registry (backs registry #82 information_acquisition) — the AGENCY layer: when an agent LACKS the information/visibility to finish a task, what ACTIONS can it take to GENERATE or acquire it? Each strategy is an ACTION that produces information (not a passive source). Cost-ordered (cheapest + least-invasive first) and GOVERNED: an invasive/side-effecting action is boundary-approved; an estimate must be flagged, never asserted as truth. serves_truth=false (an acquired signal is a CANDIDATE; verify before assert). Realizes the descent's 'escalate before concluding unavailable' as first-class strategies the buffet can pick.",
+  "serves_truth": false,
+  "cost_legend": {"free": "no cost", "low": "cheap", "medium": "moderate", "high": "expensive/slow", "variable": "depends on action"},
+  "invasiveness_legend": {"none": "read-only / no external effect", "low": "benign request", "medium": "scraping/automation", "high": "real side effects (writes/transactions)"},
+  "strategies": [
+    {"id": "reformulate_query", "action": "rewrite / expand the query, try synonyms + the field ontology", "yields": "better search recall", "cost_tier": "free", "invasiveness": "none", "governance": "none", "when": "search returned too little"},
+    {"id": "decompose_task", "action": "split the task into sub-questions and acquire each", "yields": "partial answers to compose", "cost_tier": "low", "invasiveness": "none", "governance": "none", "when": "the task is too broad to answer directly"},
+    {"id": "cross_reference", "action": "check a second independent source to fill or confirm a gap", "yields": "corroboration or the missing field", "cost_tier": "low", "invasiveness": "none", "governance": "none", "when": "a field is missing or unverified"},
+    {"id": "source_escalate", "action": "climb the descent ladder (API -> browser -> stealth -> vision)", "yields": "data the cheaper rung could not reach", "cost_tier": "medium", "invasiveness": "medium", "governance": "ToS-respecting; restricted rungs need an access grant", "when": "the cheap rung is blocked or empty"},
+    {"id": "active_probe", "action": "send a benign, non-destructive test request to reveal state (exists? what shape? available?)", "yields": "existence / shape / availability signal", "cost_tier": "low", "invasiveness": "low", "governance": "rate-limited, read-only, non-destructive only", "when": "state is unknown and cheaply observable"},
+    {"id": "trigger_action_observe", "action": "take a real action that PRODUCES an observation (submit a form, run a job, place a transaction)", "yields": "the result / receipt the action generates", "cost_tier": "variable", "invasiveness": "high", "governance": "BOUNDARY-APPROVED — has side effects; never irreversible without explicit approval", "when": "the only way to get the info is to act"},
+    {"id": "request_access", "action": "obtain a credential / key / permission to unlock a gated source", "yields": "access to a restricted source", "cost_tier": "variable", "invasiveness": "low", "governance": "owner / credential approval required", "when": "the source exists but is gated"},
+    {"id": "subscribe_watch", "action": "set up a feed / watch / webhook so future changes arrive", "yields": "future updates over time", "cost_tier": "low", "invasiveness": "none", "governance": "none (uses feed_sources #73)", "when": "the info will change or is not available yet"},
+    {"id": "ask_human", "action": "route the gap to a human (expert / reviewer / crowd)", "yields": "human-provided info or judgment", "cost_tier": "high", "invasiveness": "none", "governance": "routes to human_expert_sources #74 / review #27; PII-safe", "when": "autonomous acquisition is insufficient"},
+    {"id": "synthesize_estimate", "action": "compute a best estimate from partial signals and flag the uncertainty", "yields": "a provisional answer + confidence", "cost_tier": "low", "invasiveness": "none", "governance": "MUST flag as estimate, never asserted as truth", "when": "no source can give a definitive answer within budget"}
+  ]
+}

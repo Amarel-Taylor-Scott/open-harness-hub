@@ -23,11 +23,21 @@ Every optimization decision reads one or more registries. So the registries **ar
 compiler. The endgame is not workflow automation; it is the machine-readable model of *all* computation,
 transformations, costs, and strategies.
 
+**Consumption model (the demand side).** The registries are a **buffet** an AI **agent** (the customer)
+consumes to assemble a functional, value-add DAG: *supply* = the registries, the *menu* = the universal
+`Registry<T>` interface (search/lookup/score/benchmark), *demand* = agents building DAGs via the synthesis
+compiler. An agent doesn't hand-write a DAG — it **picks** ingredients under its constraints, then the compiler
+*composes → verifies → optimizes → executes → measures*. Agents-as-customers: they call stable receipt-backed
+capabilities instead of burning tokens re-deriving them. Corollary (the sequencing law): **a registry no
+DAG-builder reads is dead weight** — fill what the buffet is actually asked for.
+
 Two load-bearing claims to critique:
-- **The federation is mostly already built.** Of **72** proposed registries (across 5 layers; count computed
-  by `check_registry_ontology.py`), **67 have real backing on disk** (13 `live` + 54 `partial`); only **5 are
-  true gaps**. The repo carries **~180 `architecture/*.json` registries + 48 `src/teleon/` modules + 45
-  `schemas/` dirs** today.
+- **The federation is mostly already built.** Of **88** proposed registries (across 5 layers; count computed
+  by `check_registry_ontology.py`), **86 have real backing on disk** (13 `live` + 73 `partial`); only **2 are
+  true gaps** (`agent_behavior`, `agent_qa` — both need a per-step agent-telemetry seam). The repo carries
+  **~180 `architecture/*.json` registries + 48 `src/teleon/` modules + 45 `schemas/` dirs** today. Adjacent
+  registries are kept non-redundant by a single-source `boundaries` block + per-entry `distinct_from` (enforced).
+  The whole suite is green (`642/642` proofs).
 - **The moat is the flywheel, not the registry count.** A wall of empty catalogs is not a moat; the moat is
   the loop that *fills and scores* registries from real runs. The likely moat layers are **Layer 0
   (Discovery)** and **Layer 4 (Verification)** — see §3.5, §3.7.
@@ -65,10 +75,13 @@ pattern, like `makeHub(config)` — not 35 bespoke services). Each verb already 
 Policies, Prompts all the same shape): `{ id, name, type, versions, metrics, benchmarks, dependencies,
 cost_model, security_profile, trust_score, historical_runs, relationships }`.
 
-**Status to critique:** the *primitives* exist; a *single declared interface contract* all registries
-conform to does **not** yet exist. The claim is that declaring it is the highest-leverage next move.
-Canonical machine-readable source: `architecture/registry_ontology.json` (with `universal_interface` +
-`universal_object` blocks).
+**Status (updated):** the contract is now **declared + conformant** — `src/teleon/registry/port.py` is the
+`RegistryPort` menu (`list/lookup/search/explain`) over **7 source catalogs** (lookup_portals, observability,
+geospatial, vulnerability, knowledge_taxonomies, human_expert, semantic), proven uniform by
+`check_registry_port` (an agent picks ingredients with identical call shape across all of them). Remaining
+verbs (`benchmark/score/health/relationships/history/mutate/simulate`) wire to their named primitives next, and
+more catalogs join the menu. Canonical machine-readable source: `architecture/registry_ontology.json`
+(`universal_interface.contract` + `consumption_model` + `universal_object`).
 
 ---
 
@@ -283,7 +296,12 @@ index records) from "tenant-visible" (no open review tickets / placeholders / un
 
 ## 5. Honest status summary
 
-- Registries: **13 live, 54 partial, 5 gap** (of 72, across 5 layers + static/discovery/meta kinds). ~180 registry JSONs exist repo-wide.
+- Registries: **13 live, 65 partial, 2 gap** (of 80, across 5 layers + static/discovery/meta kinds). ~180 registry JSONs exist repo-wide.
+- Gap-fills shipped (gap→partial, in the gate): #20 `semantic_field_ontology` (canonical field→aliases resolver), #74 `human_expert_sources`, #33 `observability_providers`. New source registries: #77 `geospatial` (OSM/Census), #78 `vulnerability` (CVE/OSV/GHSA), #79 `reverse_engineering` (governed/restricted), #80 `industry_classification` (NAICS/DUNS). Remaining 2 gaps need a per-step agent-telemetry seam.
+- Three tools shipped this round (in the gate): `audit_magic_numbers` (#41 scanner — flags unnamed literals),
+  `lookup_portals.json` (#72 — 14 pointer-only fact portals), `provider_arbitrage.py` (#63 — cross-provider
+  price spread). New intake registries: 73 feed_sources (RSS/email), 74 human_expert_sources (Upwork/hackathons),
+  75 community_sources (governed social), 76 website_navigation (per-site click-path recipes).
 - Backbone primitives for all 10 universal-interface verbs **exist**; the single conformance **contract
   does not** (highest-leverage next step).
 - RAG/search/embeddings/storage/IO/ports/front-end-engine: **all have real, grounded backing** (paths

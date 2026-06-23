@@ -718,8 +718,34 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_candidate_open_hubs.py", "check_candidate_open_hubs"),
     # ── hub_profiles.json = the SYSTEM-FACING map: every Open*Hub as a DIRECTORY the compiler/runtime pulls from (TYPES of rules/context/modules per hub). Anti-drift: every profiled id is a real hub, every real hub (9 live + active candidates + 5 method) is profiled; serves_truth=false ──
     ("scripts/check_hub_profiles.py", "check_hub_profiles"),
-    # ── registry_ontology.json = the registry-of-registries (owner federation vision): indexes the 35 load-bearing knowledge registries, each mapped to its REAL backing module/file + hub + compiler stage + status live|partial|gap. GROUNDING: every live/partial backing path is existence-checked on disk (anti-hallucination for an architecture map); serves_truth=false ──
+    # ── registry_ontology.json = the registry-of-registries (owner federation vision): indexes the load-bearing knowledge registries in a 5-layer model, each mapped to its REAL backing module/file + hub + stage + status live|partial|gap. GROUNDING: every live/partial backing path is existence-checked on disk (anti-hallucination for an architecture map); rigid entry schema + universe/kind partitions enforced; serves_truth=false ──
     ("scripts/check_registry_ontology.py", "check_registry_ontology"),
+    # ── audit_magic_numbers = the no-magic-values AUDITOR (backs registry #41): AST scan flagging UNNAMED numeric literals (inline 0.83/1800/256) that carry no provenance, so the no-magic-values discipline has an actual scanner not just a doc ──
+    ("scripts/audit_magic_numbers.py", "audit_magic_numbers"),
+    # ── lookup_portals.json (backs registry #72): META, POINTER-ONLY catalog of authoritative fact-lookup portals (weather/license/property/tax-address/sanctions/business) — WHERE to look up a fact + how to access, NEVER a data copy; generalizes the healthcare starter vertical's free-registries-first descent; serves_truth=false ──
+    ("scripts/check_lookup_portals.py", "check_lookup_portals"),
+    # ── provider_arbitrage (backs registry #63): cross-provider price spread for the SAME model from model_index entries (cheapest vs dearest = the savings); complements routing_engine.route_model; honest on single-provider/absent; serves_truth=false ──
+    ("scripts/check_provider_arbitrage.py", "check_provider_arbitrage"),
+    # ── semantic_field_ontology (backs registry #20, GAP->partial): canonical field -> aliases (invoice_number=bill_number=NPI) so extraction/linking treat one field as one; deterministic normalize+alias-match resolver; UNAMBIGUOUS (no surface maps to 2 canonicals); serves_truth=false ──
+    ("scripts/check_semantic_field_ontology.py", "check_semantic_field_ontology"),
+    # ── human_expert_sources (backs registry #74, GAP->partial): META pointer-only catalog of EXTERNAL human-labor channels (Upwork/Toptal/MTurk/hackathons/bounties) — the human tier of the descent; NO worker-PII; serves_truth=false ──
+    ("scripts/check_human_expert_sources.py", "check_human_expert_sources"),
+    # ── observability_providers (backs registry #33, GAP->partial): pointer-only catalog of external observability providers (prometheus/otel/datadog/sentry/langfuse) a compiled workflow can auto-instrument with; serves_truth=false ──
+    ("scripts/check_observability_providers.py", "check_observability_providers"),
+    # ── geospatial_sources (backs registry #77): pointer-only catalog of public geo data sources (OSM/Census/NaturalEarth/GeoNames/WorldPop) — geocode/boundaries/population/POI/routing/elevation, licensed, exposed via OpenGeoHub; serves_truth=false ──
+    ("scripts/check_geospatial_sources.py", "check_geospatial_sources"),
+    # ── vulnerability_sources (backs registry #78): pointer-only catalog of public vuln/advisory feeds (CVE/NVD, GHSA, OSV, CWE, CISA KEV, ecosystem advisories) that feed registry #23 security + #47 code_audit; discovered advisory = candidate signal; serves_truth=false ──
+    ("scripts/check_vulnerability_sources.py", "check_vulnerability_sources"),
+    # ── knowledge_taxonomies (backs registry #81): pointer-only catalog of standard knowledge/subject/NEWS classification systems (Dewey/LCC/Wikidata/MeSH/ACM/JEL/EuroVoc/IPTC/O*NET/Schema.org) — the 'what is this about' map; distinct from #20 (field-name aliases); serves_truth=false ──
+    ("scripts/check_knowledge_taxonomies.py", "check_knowledge_taxonomies"),
+    # ── registry_port = the universal Registry<T> MENU realized: ONE ordering protocol (list/lookup/search/explain) over the federation's source catalogs, so an agent picks ingredients UNIFORMLY across lookup_portals/observability/geospatial/vulnerability/knowledge_taxonomies/human_expert/semantic; the demand-side buffet made callable; serves_truth=false ──
+    ("scripts/check_registry_port.py", "check_registry_port"),
+    # ── acquisition_strategies (backs registry #82): the AGENCY layer — cost-ordered ACTIONS an agent takes to GENERATE/acquire missing info (reformulate/decompose/cross-ref/source-escalate/probe/trigger-action/request-access/subscribe/ask-human/estimate); GOVERNED safety rail: high-invasiveness=boundary-approved, estimate=flagged-non-truth; serves_truth=false ──
+    ("scripts/check_acquisition_strategies.py", "check_acquisition_strategies"),
+    # ── registry_dependency_graph (registry #83, the META-REGISTRY): dependency graph COMPUTED from registry_ontology cross-refs (the #N / 'vs N' mentions) — nodes=registries, edges=references, most-depended-on; the ontology-about-the-ontology; --self-test validates consistency + FRESHNESS (computed-not-typed); serves_truth=false ──
+    ("scripts/build_registry_dependency_graph.py", "build_registry_dependency_graph"),
+    # ── registry_enrichment (registry #84): the maintenance/ENRICH worker (Baltor Enhance on the registries) — GENERATES deterministic embedding/description/long_description/use_cases/labels/keywords per record via the RegistryPort menu; learned/LLM enricher swaps behind the same port; serves_truth=false ──
+    ("scripts/check_registry_enrich.py", "check_registry_enrich"),
     # ── Governed blackboard spine P2: blackboard.local_sqlite@v1 (BlackboardProviderPort) — APPEND-ONLY sqlite store; rejects sourceless observations / serves_truth=true / missing-tenant-scope / mutate-existing; every append requires a worker_receipt; deterministic query (seq then entry_id); content-addressed ids; Teleon never imports Baltor; output never truth ──
     ("scripts/check_local_blackboard_provider.py", "check_local_blackboard_provider"),
     # ── Stateful-swarm spine P3: swarm.local_stub@v1 (StatefulSwarmProviderPort) + 6 deterministic workers (seed_planner/observation_extractor/gap_detector/entity_resolver/synthesis/governed_projection) writing typed entries + receipts to the local_sqlite blackboard; synthesis reads the BOARD not raw docs; gaps explicit; no live LLM; output never truth ──

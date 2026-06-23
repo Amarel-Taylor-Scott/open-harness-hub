@@ -88,7 +88,20 @@ def main() -> int:
 
     ck("serves_truth is false", doc.get("serves_truth") is False)
     ck("universal_interface declares verbs", len(doc.get("universal_interface", {}).get("verbs", {})) >= 8)
+    ui_contract = doc.get("universal_interface", {}).get("contract", "")
+    ck("universal_interface.contract points at a real file (the menu is realized)",
+       bool(ui_contract) and (_REPO / ui_contract).exists(), str(ui_contract))
     ck("universal_object declares fields", len(doc.get("universal_object", {}).get("fields", [])) >= 8)
+
+    # the BUFFET / consumption model (demand side): agents pick from registries to build value-add DAGs.
+    cm = doc.get("consumption_model", {})
+    ck("consumption_model declares a >=4-step flow", len(cm.get("flow", [])) >= 4, str(len(cm.get("flow", []))))
+    for p in cm.get("backing", []):
+        ck(f"consumption_model backing exists '{p}'", (_REPO / p).exists())
+
+    # the three super-systems (Discovery / Compiler / Intelligence engine) — grounded backing
+    for p in doc.get("engines", {}).get("backing", []):
+        ck(f"engines backing exists '{p}'", (_REPO / p).exists())
 
     # ---- anti-fragmentation: the rigid schemas must exist (single sources of truth) ----
     obj_schema_path = doc.get("universal_object", {}).get("schema", "")

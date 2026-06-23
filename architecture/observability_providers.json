@@ -1,0 +1,21 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-23",
+  "principle": "Registry of external OBSERVABILITY providers (backs registry #33 observability) — metrics / traces / logs / errors / LLM-trace systems a compiled workflow can AUTO-INSTRUMENT with. POINTER-ONLY (where + which signal + deploy model + access), never telemetry data. serves_truth=false. Distinct from OUR run telemetry (schemas/observability + src/teleon/monitoring): this catalogs EXTERNAL providers the compiler can wire output to.",
+  "serves_truth": false,
+  "signal_legend": {"metrics": "time-series", "traces": "distributed traces", "logs": "log streams", "errors": "exception tracking", "llm_traces": "prompt/span/eval tracing", "all": "metrics+traces+logs"},
+  "providers": [
+    {"id": "opentelemetry", "name": "OpenTelemetry", "signal": "all", "model": "standard", "open_source": true, "otel_compatible": true, "ref": "opentelemetry.io"},
+    {"id": "prometheus", "name": "Prometheus", "signal": "metrics", "model": "self_host", "open_source": true, "otel_compatible": true, "ref": "prometheus.io"},
+    {"id": "grafana", "name": "Grafana", "signal": "metrics", "model": "self_host_or_cloud", "open_source": true, "otel_compatible": true, "ref": "grafana.com"},
+    {"id": "loki", "name": "Grafana Loki", "signal": "logs", "model": "self_host", "open_source": true, "otel_compatible": true, "ref": "grafana.com/oss/loki"},
+    {"id": "jaeger", "name": "Jaeger", "signal": "traces", "model": "self_host", "open_source": true, "otel_compatible": true, "ref": "jaegertracing.io"},
+    {"id": "datadog", "name": "Datadog", "signal": "all", "model": "saas", "open_source": false, "otel_compatible": true, "ref": "datadoghq.com"},
+    {"id": "sentry", "name": "Sentry", "signal": "errors", "model": "saas_or_self_host", "open_source": true, "otel_compatible": true, "ref": "sentry.io"},
+    {"id": "honeycomb", "name": "Honeycomb", "signal": "traces", "model": "saas", "open_source": false, "otel_compatible": true, "ref": "honeycomb.io"},
+    {"id": "new_relic", "name": "New Relic", "signal": "all", "model": "saas", "open_source": false, "otel_compatible": true, "ref": "newrelic.com"},
+    {"id": "elastic_apm", "name": "Elastic APM", "signal": "all", "model": "self_host_or_cloud", "open_source": true, "otel_compatible": true, "ref": "elastic.co/apm"},
+    {"id": "langsmith", "name": "LangSmith", "signal": "llm_traces", "model": "saas", "open_source": false, "otel_compatible": false, "ref": "smith.langchain.com"},
+    {"id": "langfuse", "name": "Langfuse", "signal": "llm_traces", "model": "saas_or_self_host", "open_source": true, "otel_compatible": true, "ref": "langfuse.com"}
+  ]
+}
