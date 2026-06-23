@@ -1,0 +1,26 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-23",
+  "principle": "Registries of ENTITY-RESOLUTION rules for record matching that is robust to typos in ANY column. Three layers: COMPARATORS (column similarity functions), per-entity-type NORMALIZERS (person-name nickname/suffix handling, company legal-suffix stripping, address/phone standardization), and RULESETS (weighted column comparators + match/review thresholds + an IDENTIFIER override + a BLOCKING key for scale). The SAME record-linkage engine, parameterized per entity type (person / company / ...). A 'review' tier sends ambiguous pairs to a human (never an unsafe auto-merge). serves_truth=false.",
+  "serves_truth": false,
+  "comparators": ["exact", "jaro_winkler", "levenshtein_ratio", "token_set", "soundex", "numeric_exact"],
+  "normalizers": ["person_name", "company_name", "address", "phone", "lower", "none"],
+  "rulesets": {
+    "person": {
+      "identifier_field": "npi", "match_threshold": 0.85, "review_threshold": 0.70, "blocking": "soundex_name",
+      "columns": [
+        {"field": "name", "comparator": "jaro_winkler", "normalizer": "person_name", "weight": 0.5},
+        {"field": "address", "comparator": "token_set", "normalizer": "address", "weight": 0.3},
+        {"field": "phone", "comparator": "exact", "normalizer": "phone", "weight": 0.2}
+      ]
+    },
+    "company": {
+      "identifier_field": null, "match_threshold": 0.82, "review_threshold": 0.68, "blocking": "company_token",
+      "columns": [
+        {"field": "name", "comparator": "token_set", "normalizer": "company_name", "weight": 0.6},
+        {"field": "address", "comparator": "token_set", "normalizer": "address", "weight": 0.3},
+        {"field": "phone", "comparator": "exact", "normalizer": "phone", "weight": 0.1}
+      ]
+    }
+  }
+}
