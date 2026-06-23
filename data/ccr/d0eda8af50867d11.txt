@@ -1,0 +1,60 @@
+MODULE src/teleon/dag/real_steps.py
+## API signatures
+```python
+"""src.teleon.dag.real_steps — REAL infrastructure adapters for DAG nodes (no stand-ins)."""
+_REPO = ...
+REAL_CHEAP_MODEL = ...
+REAL_FRONTIER_MODEL = ...
+_WIKI_SUMMARY = ...
+_WIKI_SEARCH = ...
+_FEDREG = ...
+class RealStepUnavailable:
+    # Raised when a real adapter cannot run (no key, network off) — caller may fall back to the offline stand-in.
+def _env(var: str) -> str
+def network_allowed() -> bool
+def llm_available() -> bool
+def _get_json(url: str, *, timeout: int=25) -> dict
+def real_llm(prompt: str, *, system: str='You are a precise extraction/synthesis engine.', model: str | None=None, max_tokens: int=1200, timeout: int=240) -> dict
+    # A REAL model call via the Ollama lane (reuses the proven OpenAI-compatible client). Returns {text, model,
+_CF_AI_BASE = ...
+_CF_DEFAULT_MODEL = ...
+def _cf_token() -> str
+def _cf_account() -> str
+def cloudflare_ai_available() -> bool
+def real_cloudflare_ai(prompt: str, *, system: str='You are a precise extraction/synthesis engine.', model: str=_CF_DEFAULT_MODEL, max_tokens: int=800, timeout: int=240, token: str | None=None, account_id: str | None=None) -> dict
+    # A REAL LLM call on the customer's Cloudflare Workers AI (OpenAI-compatible endpoint). BYO: uses the customer
+def real_wikipedia(query: str, *, limit: int=3) -> list[dict]
+    # Real Wikipedia grounding: search → top page summaries with citable URLs. serves_truth=false (a source).
+def real_federal_register(query: str, *, limit: int=3) -> list[dict]
+    # Real US Federal Register grounding (signed GPO source-of-record). On-thesis for the compliance wedge.
+_WIRED_SEARCH = ...
+_SEARCH_REGISTRY = ...
+def _active_search_providers() -> list[dict]
+def default_search_provider() -> str
+    # The cheapest ACTIVE registry provider that has a wired adapter (registry-driven; not the hardcoded 'wikipedia').
+def real_search(query: str, *, provider: str | None=None, limit: int=3) -> list[dict]
+    # Dispatch to a real grounded provider SELECTED from architecture/search_provider_registry.json. provider=None ->
+def real_text(path: str | Path) -> str
+    # Real text-layer extraction from a real file (PDF/scan need pypdf/tesseract — absent — so text/markdown is the
+```
+## intra-module call edges
+src.teleon.dag.real_steps.network_allowed -> src.teleon.dag.real_steps._env
+src.teleon.dag.real_steps.llm_available -> src.teleon.dag.real_steps.network_allowed
+src.teleon.dag.real_steps.llm_available -> src.teleon.dag.real_steps._env
+src.teleon.dag.real_steps.llm_available -> src.teleon.dag.real_steps._env
+src.teleon.dag.real_steps.real_llm -> src.teleon.dag.real_steps.llm_available
+src.teleon.dag.real_steps.real_llm -> src.teleon.dag.real_steps.RealStepUnavailable
+src.teleon.dag.real_steps.real_llm -> src.teleon.dag.real_steps.RealStepUnavailable
+src.teleon.dag.real_steps._cf_token -> src.teleon.dag.real_steps._env
+src.teleon.dag.real_steps._cf_account -> src.teleon.dag.real_steps._env
+src.teleon.dag.real_steps.cloudflare_ai_available -> src.teleon.dag.real_steps.network_allowed
+src.teleon.dag.real_steps.cloudflare_ai_available -> src.teleon.dag.real_steps._cf_token
+src.teleon.dag.real_steps.cloudflare_ai_available -> src.teleon.dag.real_steps._cf_account
+src.teleon.dag.real_steps.real_cloudflare_ai -> src.teleon.dag.real_steps.RealStepUnavailable
+src.teleon.dag.real_steps.real_cloudflare_ai -> src.teleon.dag.real_steps.RealStepUnavailable
+src.teleon.dag.real_steps.real_cloudflare_ai -> src.teleon.dag.real_steps._cf_token
+src.teleon.dag.real_steps.real_cloudflare_ai -> src.teleon.dag.real_steps._cf_account
+src.teleon.dag.real_steps.real_cloudflare_ai -> src.teleon.dag.real_steps.network_allowed
+src.teleon.dag.real_steps.real_wikipedia -> src.teleon.dag.real_steps.network_allowed
+src.teleon.dag.real_steps.real_wikipedia -> src.teleon.dag.real_steps.RealStepUnavailable
+src.teleon.dag.real_steps.real_wikipedia -> src.teleon.dag.real_steps._get_json

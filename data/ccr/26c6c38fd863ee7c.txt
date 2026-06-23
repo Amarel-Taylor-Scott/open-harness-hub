@@ -1,0 +1,12 @@
+MODULE src/teleon/economics/vertical_proof.py
+## API signatures
+```python
+"""vertical_proof — turn the flywheel on a real vertical. Record MEASURED economics from executions (the telemetry
+write-back), then prove the OPTIMIZED (deterministic-first) pipeline is cheaper than the BASELINE (always-LLM) pipeline AT
+EQUAL QUALITY — backed by telemetry, not estimates. This is the moat: measured quality you can only earn by running
+things, that competitors can't replicate without """
+def record_runs(component_measurements: list, *, shard: str='000') -> dict
+    # component_measurements: [{resource_id, cost, latency_ms, quality, success}] from REAL executions → the telemetry
+def compare(baseline_dag: dict, optimized_dag: dict, *, shard: str='000') -> dict
+    # Simulate both pipelines from the MEASURED economics and return the receipt: baseline vs optimized cost, the
+```

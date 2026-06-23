@@ -1,0 +1,24 @@
+MODULE src/teleon/economics/routing_engine.py
+## API signatures
+```python
+"""routing_engine — System 22: BGP for computation."""
+def reliability(route: dict) -> float
+    # availability × success_rate (1.0 when unobserved). The uptime term OpenRouter makes first-class — the cheapest
+def viable_routes(routes: list, *, min_reliability: float=0.0) -> list
+    # Skip recently-failing routes (reliability below the floor) BEFORE choosing — OpenRouter's stability rule.
+def balance_weights(routes: list, *, min_reliability: float=0.0) -> dict
+    # Distribute load across HEALTHY survivors by reliability ÷ price² (OpenRouter's inverse-square-of-price, modulated
+def route_model(model_node_id: str, *, profile: PreferenceProfile | None=None, min_reliability: float=0.0, shard: str='000') -> dict
+    # Choose the best route for a model across its substitutable alternatives (arbitrage over providers), AFTER skipping
+def arbitrage(model_node_id: str, *, profile: PreferenceProfile | None=None, min_reliability: float=0.0, shard: str='000') -> dict
+    # The explicit arbitrage view: healthy equivalent providers ranked cheapest-first + the chosen route + the load
+def reroute(prev_resource_id: str, routes: list, *, profile: PreferenceProfile | None=None) -> dict
+    # After a live economic change (a price-change CDC), recompute the best route over `routes` and report whether it
+```
+## intra-module call edges
+src.teleon.economics.routing_engine.viable_routes -> src.teleon.economics.routing_engine.reliability
+src.teleon.economics.routing_engine.balance_weights -> src.teleon.economics.routing_engine.viable_routes
+src.teleon.economics.routing_engine.balance_weights -> src.teleon.economics.routing_engine.reliability
+src.teleon.economics.routing_engine.route_model -> src.teleon.economics.routing_engine.viable_routes
+src.teleon.economics.routing_engine.arbitrage -> src.teleon.economics.routing_engine.viable_routes
+src.teleon.economics.routing_engine.arbitrage -> src.teleon.economics.routing_engine.balance_weights

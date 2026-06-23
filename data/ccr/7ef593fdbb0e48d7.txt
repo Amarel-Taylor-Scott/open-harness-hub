@@ -1,0 +1,22 @@
+MODULE src/teleon/components/adapter_factory.py
+## API signatures
+```python
+"""adapter_factory — the component-agnostic seam's force-multiplier. Don't onboard components one at a time; write
+FACTORIES that turn whole ecosystems into components. from_openapi(spec) emits one typed component per endpoint, with I/O
+types inferred from the schema — collapsing the N×M integration problem to N+M (ToolRegistry/MCP's thesis). The HTTP
+invoke is network-gated + honest offline (never a"""
+_VERBS = ...
+def _infer_in_types(op: dict) -> list
+    # Request → our type vocabulary: a body object is a `record`; query/path params alone are a `query`.
+def _infer_out_types(op: dict) -> list
+    # Response → our type vocabulary: JSON object/array is a `record`; a bare string is `text`; default `record`.
+def _op_id(method: str, path: str, op: dict) -> str
+def from_openapi(spec: dict, *, default_plane: str='external_api') -> list
+    # One typed component descriptor per operation in an OpenAPI spec. Each: {component_id, plane, method, path,
+def http_invoke(descriptor: dict, inputs: dict, *, network_allowed=None, timeout: int=20) -> dict
+    # Invoke an OpenAPI-derived component (the live path). Network-gated + honest: offline it returns an honest
+```
+## intra-module call edges
+src.teleon.components.adapter_factory.from_openapi -> src.teleon.components.adapter_factory._op_id
+src.teleon.components.adapter_factory.from_openapi -> src.teleon.components.adapter_factory._infer_in_types
+src.teleon.components.adapter_factory.from_openapi -> src.teleon.components.adapter_factory._infer_out_types
