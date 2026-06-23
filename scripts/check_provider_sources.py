@@ -43,7 +43,14 @@ def _self_test() -> int:
     keyed = PS.fetch("brave_search", "ABC Heart Group Naples", network_allowed=True)
     ck("a KEYED source honestly reports it needs a credential", keyed["available"] is False and keyed.get("needs_key") is True)
     ck("an unknown source is honest (not fabricated)", PS.fetch("not_a_source", "x")["available"] is False)
-    ck("serves_truth=false", addr["serves_truth"] is False)
+    # end-to-end: refresh_record ties PLAN (acquire trusted sources) -> RESOLVE (recommendation)
+    hl = {"provider_id": "HL_001", "address": "100 Main St, Naples, FL 34102", "phone": "239-555-1234", "status": "active"}
+    obs = {"NPI Registry": {"address": "250 Health Park Dr"}, "Practice Website": {"address": "250 Health Park Dr"}, "State Medical Board": {"address": "250 Health Park Dr"}}
+    e2e = PS.refresh_record(hl, observations=obs)
+    ck("refresh_record (with observations) PLANS sources + RESOLVES to a recommendation", e2e["plan"] and e2e["recommended_action"] in ("auto_update", "human_review", "no_change"))
+    planned = PS.refresh_record(hl)
+    ck("refresh_record (no observations) returns the PLAN + honest 'planned only' (no fabricated fetch)", planned["resolved"] is None and "planned only" in planned["reason"])
+    ck("serves_truth=false", addr["serves_truth"] is False and e2e["serves_truth"] is False)
 
     print("\n" + ("PASS - check_provider_sources: cost-ordered source descent — free public registries first, own browser "
                   "before paid APIs, stealth last; honest-offline + keyed-needs-key." if not fails else f"{len(fails)} FAILURES: {fails}"))

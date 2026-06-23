@@ -55,6 +55,21 @@ def plan_acquisition(fields, *, max_cost_tier: str = "stealth", min_sources: int
             "serves_truth": False}
 
 
+def refresh_record(record: dict, *, observations: dict | None = None, stale_fields=None,
+                   max_cost_tier: str = "stealth") -> dict:
+    """End-to-end: PLAN which trusted sources to query for the (stale, or all) fields — cheapest authoritative first —
+    then, when observations are supplied (or fetched online), RESOLVE the record into a HealthLynked recommendation.
+    Offline with no observations: returns the plan + an honest note (planning only; fetch is network-gated). serves_truth=false."""
+    from src.teleon.verticals.provider_directory import _FIELDS, resolve_record
+    fields = list(stale_fields) if stale_fields else [f for f in _FIELDS]
+    plan = plan_acquisition(fields, max_cost_tier=max_cost_tier)
+    if observations:
+        rec = resolve_record(record, observations)
+        return {"plan": plan["plan"], "resolved": rec, "recommended_action": rec["recommended_action"], "serves_truth": False}
+    return {"plan": plan["plan"], "resolved": None,
+            "reason": "planned only — supply observations or run fetch() online (honest, no fabricated data)", "serves_truth": False}
+
+
 def fetch(source_id: str, query: str, *, network_allowed=None) -> dict:
     """Execute ONE source via its plane (search/browser). Network-gated + honest-offline (never fabricates); a keyed
     source honestly reports it needs a credential. Online + public dispatches to the real port."""
