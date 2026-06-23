@@ -888,6 +888,7 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_licensed_directory.py", "check_licensed_directory"),
     ("scripts/check_entity_resolver.py", "check_entity_resolver"),
     ("scripts/check_industry_links.py", "check_industry_links"),
+    ("scripts/check_source_registry.py", "check_source_registry"),
     ("scripts/check_simulator.py", "check_simulator"),
     ("scripts/compile_capability_live.py", "compile_capability_live"),
     ("scripts/harvest_tools.py", "harvest_tools"),
