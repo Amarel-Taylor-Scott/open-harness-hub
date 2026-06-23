@@ -70,6 +70,19 @@
       "edges": [["features", "classify"]],
       "success_count": 0,
       "failure_modes": ["class_imbalance", "drift"]
+    },
+    {
+      "template_id": "provider_directory",
+      "capability_family": "provider_directory",
+      "keywords": ["provider", "practice", "directory", "doctor", "npi", "healthcare", "freshness", "physician", "credential", "specialty"],
+      "slots": [
+        {"step": "acquire", "plane": "search"},
+        {"step": "extract", "plane": "field_parsing"},
+        {"step": "validate", "plane": "validation"}
+      ],
+      "edges": [["acquire", "extract"], ["extract", "validate"]],
+      "success_count": 0,
+      "failure_modes": ["source_conflict", "stale_source", "ambiguous_match"]
     }
   ]
 }
