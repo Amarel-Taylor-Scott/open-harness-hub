@@ -53,13 +53,32 @@ def _iter_py(roots: list[str]):
                     yield f
 
 
+def _call_name(fn: ast.AST) -> str | None:
+    return fn.id if isinstance(fn, ast.Name) else (fn.attr if isinstance(fn, ast.Attribute) else None)
+
+
+def _import_bindings(tree: ast.AST) -> dict[str, str]:
+    """local-name -> the in-repo source module it was imported from (level==0 `from X import name`). Lets a call to
+    ``name`` resolve to the module it actually came from instead of any same-named def elsewhere in the repo."""
+    binds: dict[str, str] = {}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
+            for a in node.names:
+                binds[a.asname or a.name] = node.module
+    return binds
+
+
 def build_graph(roots: list[str] | None = None) -> dict:
-    """Return {nodes, edges}. nodes: module/class/function/method. edges: contains / inherits / calls (calls resolved
-    to a repo-defined symbol by simple name; cross-module best-effort)."""
+    """Return {nodes, edges}. nodes: module/class/function/method. edges: contains / inherits / calls, each WEIGHTED
+    (call ``weight`` = distinct call sites) and tagged ``confidence`` ("exact" = same-module/import-/unique-name
+    resolution; "name" = ambiguous global-name fallback). Calls are deduplicated per (src,dst) into one weighted edge.
+    Resolution is module-aware: same-module def -> import binding -> globally-unique name -> ambiguous first-match."""
     roots = roots or ["src"]
     nodes: list[dict] = []
     edges: list[dict] = []
-    defs_by_name: dict[str, list[str]] = defaultdict(list)
+    defs_by_name: dict[str, list[str]] = defaultdict(list)        # short name -> [qualified ids] (global fallback)
+    defs_in_module: dict[str, dict[str, str]] = defaultdict(dict)  # module -> {short name -> qualified id}
+    binds_by_mod: dict[str, dict[str, str]] = {}
     trees: dict[str, ast.AST] = {}
 
     for f in _iter_py(roots):
@@ -69,71 +88,102 @@ def build_graph(roots: list[str] | None = None) -> dict:
         except Exception:
             continue
         trees[mod] = tree
+        binds_by_mod[mod] = _import_bindings(tree)
         nodes.append({"id": mod, "kind": "module", "file": str(f.relative_to(REPO))})
         for node in tree.body:
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 q = f"{mod}.{node.name}"
                 nodes.append({"id": q, "kind": "function", "module": mod})
                 defs_by_name[node.name].append(q)
+                defs_in_module[mod][node.name] = q
             elif isinstance(node, ast.ClassDef):
                 q = f"{mod}.{node.name}"
                 nodes.append({"id": q, "kind": "class", "module": mod})
                 defs_by_name[node.name].append(q)
+                defs_in_module[mod][node.name] = q
                 for sub in node.body:
                     if isinstance(sub, (ast.FunctionDef, ast.AsyncFunctionDef)):
                         mq = f"{q}.{sub.name}"
                         nodes.append({"id": mq, "kind": "method", "class": q})
-                        edges.append({"src": q, "dst": mq, "type": "contains"})
+                        edges.append({"src": q, "dst": mq, "type": "contains", "weight": 1, "confidence": "exact"})
                         defs_by_name[sub.name].append(mq)
+                        defs_in_module[mod].setdefault(sub.name, mq)  # first method def wins the bare name in-module
 
-    def _resolve(name: str | None) -> str | None:
-        cands = defs_by_name.get(name or "", [])
-        return cands[0] if cands else None
+    def _resolve(name: str | None, caller_mod: str) -> tuple[str | None, str | None]:
+        """(qualified_id, confidence) | (None, None). Module-aware, cheapest-confident-first."""
+        if not name:
+            return None, None
+        local = defs_in_module.get(caller_mod, {})
+        if name in local:                                    # 1) defined right here
+            return local[name], "exact"
+        tgt = binds_by_mod.get(caller_mod, {}).get(name)     # 2) imported from a module that defines it
+        if tgt and name in defs_in_module.get(tgt, {}):
+            return defs_in_module[tgt][name], "exact"
+        cands = defs_by_name.get(name, [])
+        if len(cands) == 1:                                  # 3) globally unique name -> unambiguous
+            return cands[0], "exact"
+        if cands:                                            # 4) ambiguous -> first-match, flagged as a guess
+            return cands[0], "name"
+        return None, None
 
+    call_acc: dict[tuple[str, str], list] = {}               # (caller, callee) -> [weight, confidence]
     for mod, tree in trees.items():
         for node in tree.body:
             if isinstance(node, ast.ClassDef):
                 for base in node.bases:
                     bn = base.id if isinstance(base, ast.Name) else (base.attr if isinstance(base, ast.Attribute) else None)
-                    r = _resolve(bn)
+                    r, conf = _resolve(bn, mod)
                     if r:
-                        edges.append({"src": f"{mod}.{node.name}", "dst": r, "type": "inherits"})
+                        edges.append({"src": f"{mod}.{node.name}", "dst": r, "type": "inherits", "weight": 1, "confidence": conf})
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 caller = f"{mod}.{node.name}"
                 for sub in ast.walk(node):
                     if isinstance(sub, ast.Call):
-                        fn = sub.func
-                        nm = fn.id if isinstance(fn, ast.Name) else (fn.attr if isinstance(fn, ast.Attribute) else None)
-                        r = _resolve(nm)
+                        r, conf = _resolve(_call_name(sub.func), mod)
                         if r and r != caller:
-                            edges.append({"src": caller, "dst": r, "type": "calls"})
+                            slot = call_acc.get((caller, r))
+                            if slot:
+                                slot[0] += 1
+                                if conf == "exact":
+                                    slot[1] = "exact"
+                            else:
+                                call_acc[(caller, r)] = [1, conf]
+    for (s, d), (w, conf) in sorted(call_acc.items()):
+        edges.append({"src": s, "dst": d, "type": "calls", "weight": w, "confidence": conf})
     return {"nodes": nodes, "edges": edges}
+
+
+def load_bearing(edges: list[dict]) -> Counter:
+    """symbol -> weighted call in-degree (Σ weight·confidence_weight over incoming calls) — the change-carefully set."""
+    score: Counter = Counter()
+    for e in edges:
+        if e["type"] == "calls":
+            score[e["dst"]] += e.get("weight", 1) * CONFIDENCE_WEIGHT.get(e.get("confidence", "name"), 0.25)
+    return score
 
 
 def render(graph: dict) -> str:
     nodes, edges = graph["nodes"], graph["edges"]
     inherits = sorted({(e["src"], e["dst"]) for e in edges if e["type"] == "inherits"})
-    calls = [(e["src"], e["dst"]) for e in edges if e["type"] == "calls"]
-    indeg = Counter(d for _, d in calls)
+    calls = [e for e in edges if e["type"] == "calls"]                      # already deduped per (src,dst), weighted
+    ambiguous = sum(1 for e in calls if e.get("confidence") == "name")
     by_kind = Counter(n["kind"] for n in nodes)
-    out = ["# SYMBOL GRAPH (AST nodes + edges — how functions/classes/methods RELATE)\n",
-           f"nodes: {dict(by_kind)} · inherits={len(inherits)} · call-edges={len(set(calls))}\n"]
+    out = ["# SYMBOL GRAPH (AST nodes + WEIGHTED edges — how functions/classes/methods RELATE)\n",
+           f"nodes: {dict(by_kind)} · inherits={len(inherits)} · call-edges={len(calls)} "
+           f"(weight=call-sites; {ambiguous} are confidence=name/ambiguous)\n"]
     if inherits:
         out.append("\n## Class hierarchy (class -> base)")
         out += [f"  {s} -> {d}" for s, d in inherits]
-    out.append("\n## Call graph (caller -> callee, intra-repo resolved)")
-    seen: set = set()
-    for s, d in calls:
-        if (s, d) in seen:
-            continue
-        seen.add((s, d))
-        if len(seen) > _MAX_CALL_EDGES:
-            out.append(f"  … ({len(set(calls)) - _MAX_CALL_EDGES} more call edges omitted)")
-            break
-        out.append(f"  {s} -> {d}")
-    out.append("\n## Load-bearing symbols (highest call in-degree — change carefully)")
-    out += [f"  {sym}  (called by {c})" for sym, c in indeg.most_common(25)]
+    out.append("\n## Call graph (caller -> callee · xN call sites · ~=ambiguous; strongest first)")
+    ranked = sorted(calls, key=lambda e: (-e.get("weight", 1), e["src"], e["dst"]))
+    for e in ranked[:_MAX_CALL_EDGES]:
+        mark = "~" if e.get("confidence") == "name" else ""
+        out.append(f"  {e['src']} -> {e['dst']}  x{e.get('weight', 1)}{mark}")
+    if len(ranked) > _MAX_CALL_EDGES:
+        out.append(f"  … ({len(ranked) - _MAX_CALL_EDGES} weaker call edges omitted)")
+    out.append("\n## Load-bearing symbols (highest WEIGHTED call in-degree — change carefully)")
+    out += [f"  {sym}  (in-strength {score:.2f})" for sym, score in load_bearing(edges).most_common(25)]
     return "\n".join(out)
 
 
@@ -149,16 +199,26 @@ def _self_test() -> int:
     g = build_graph(["src/teleon"])
     kinds = {n["kind"] for n in g["nodes"]}
     etypes = {e["type"] for e in g["edges"]}
+    calls = [e for e in g["edges"] if e["type"] == "calls"]
     ck("nodes include module/class/function/method", {"module", "class", "function", "method"} <= kinds, str(kinds))
     ck("edges include contains + calls (relationships)", {"contains", "calls"} <= etypes, str(etypes))
+    ck("every call edge carries weight>=1 and a valid confidence",
+       all(e.get("weight", 0) >= 1 and e.get("confidence") in CONFIDENCE_WEIGHT for e in calls))
+    ck("call edges are deduplicated per (src,dst) into one weighted edge",
+       len({(e["src"], e["dst"]) for e in calls}) == len(calls))
+    ck("multiplicity is captured (some call edge has weight>1)", any(e.get("weight", 1) > 1 for e in calls))
+    ck("module-aware resolution yields exact-confidence edges", any(e.get("confidence") == "exact" for e in calls))
+    lb = load_bearing(g["edges"])
+    ck("load-bearing scoring is weighted + non-empty", bool(lb) and all(s > 0 for s in lb.values()))
     txt = render(g)
     ck("render produces a call graph", "Call graph" in txt and " -> " in txt)
-    ck("render surfaces load-bearing symbols (in-degree)", "Load-bearing" in txt)
+    ck("render surfaces load-bearing symbols (weighted in-degree)", "Load-bearing" in txt and "in-strength" in txt)
     ck("a known real call edge is captured (catalog_descent -> substrate_selector.*)",
        any("catalog_descent" in s and "substrate_selector" in d for s, d in [(e["src"], e["dst"]) for e in g["edges"]]) or "substrate_selector" in txt)
-    print(f"  ({len(g['nodes'])} nodes, {len(g['edges'])} edges over src/teleon)")
-    print("\n" + ("PASS - symbol_graph --self-test: symbol-level nodes (class/function/method) + edges "
-                  "(contains/inherits/calls) + load-bearing symbols — the relationships, not just files. serves_truth=false."
+    print(f"  ({len(g['nodes'])} nodes, {len(g['edges'])} edges over src/teleon; {len(calls)} weighted call edges)")
+    print("\n" + ("PASS - symbol_graph --self-test: symbol-level nodes (class/function/method) + WEIGHTED edges "
+                  "(contains/inherits/calls, module-aware confidence) + weighted load-bearing symbols — the "
+                  "relationships with strength, not just files. serves_truth=false."
                   if not fails else f"{len(fails)} FAILURES: {fails}"))
     return 0 if not fails else 1
 
