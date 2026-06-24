@@ -1,20 +1,20 @@
 # Flywheel heartbeat (development plane; serves_truth=false)
 
-cycle: **7013** · health: **ok**
-findings recorded: 32806 · research-radar hits: 46
+cycle: **7048** · health: **ok**
+findings recorded: 32962 · research-radar hits: 46
 
 ## Flywheels (last cycle run / errors)
-- sweep: last @ cycle 7011 · errors 0
-- status: last @ cycle 7006 · errors 0
-- yc: last @ cycle 7004 · errors 0
-- propose: last @ cycle 7010 · errors 0
-- hubs: last @ cycle 7012 · errors 0
-- health: last @ cycle 7002 · errors 0
-- autofix: last @ cycle 7008 · errors 0
-- cleanup: last @ cycle 6994 · errors 0
-- checkpoint: last @ cycle 6983 · errors 0
+- sweep: last @ cycle 7046 · errors 0
+- status: last @ cycle 7041 · errors 0
+- yc: last @ cycle 7039 · errors 0
+- propose: last @ cycle 7045 · errors 0
+- hubs: last @ cycle 7042 · errors 0
+- health: last @ cycle 7044 · errors 0
+- autofix: last @ cycle 7037 · errors 0
+- cleanup: last @ cycle 7047 · errors 0
+- checkpoint: last @ cycle 7018 · errors 0
 - logjam: last @ cycle 624 · errors 0
 
-last flywheel: hubs — hub freshness: OpenCompressionHub +0 ingested (0 verified), descend->research_radar_github (80.0% cheaper)
+last flywheel: cleanup — 0 stale-doc archive candidate(s) (move is owner-gated)
 
 Stop with: `touch .agent/STOP_REQUESTED`
