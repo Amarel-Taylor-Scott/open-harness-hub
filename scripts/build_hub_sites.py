@@ -154,7 +154,14 @@ def _self_test() -> int:
            all("Hanken Grotesk" in pg and "IBM Plex Mono" in pg for _, pg in pages))
         ck("every surface carries the governance badge (serves_truth=false)",
            all("serves_truth=false" in pg for _, pg in pages))
-        ck("the index lists all 22 hubs", (Path(d) / "index.html").exists() and "(22)" in (Path(d) / "index.html").read_text())
+        page_map = dict(pages)
+        ck("every hub renders its model-authored value-prop (no generic fallback line)",
+           not any("continuously updated, verify-gated" in pg for _, pg in pages))
+        ck("a known hub's real one_liner is rendered",
+           "Reliability-weighted model-routing" in page_map.get("OpenRoutingHub", ""))
+        idx = (Path(d) / "index.html").read_text() if (Path(d) / "index.html").exists() else ""
+        ck("the index lists all 22 hubs", "(22)" in idx)
+        ck("the index surfaces per-hub use-cases", "e.g." in idx)
         ck("per-hub files written (slug/index.html)", (Path(d) / "openskillshub" / "index.html").exists())
     print("\n" + ("PASS - build_hub_sites: ONE standardized template renders all 22 Open*Hub surfaces with the same "
                   "sections + design system + governance badge, plus an index. Counts computed; serves_truth=false."

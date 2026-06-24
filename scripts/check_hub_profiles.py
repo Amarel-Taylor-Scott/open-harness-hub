@@ -92,6 +92,10 @@ def main() -> int:
             ck(f"{hid}: pulls.{kind} is a list", isinstance(pulls.get(kind), list))
         ck(f"{hid}: declares at least one pullable type",
            any(pulls.get(k) for k in _PULL_KINDS))
+        # model-authored display copy (rendered by build_hub_sites): value-prop + concrete use-cases.
+        ck(f"{hid}: has a model-authored one_liner", bool(p.get("one_liner")))
+        ck(f"{hid}: has >=2 use_cases",
+           isinstance(p.get("use_cases"), list) and len(p.get("use_cases", [])) >= 2)
 
     # ---- reverse: every real hub HAS a profile (the map can't fall behind the policy) ----
     profiled = set(profiles)
