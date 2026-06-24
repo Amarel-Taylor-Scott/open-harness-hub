@@ -758,6 +758,26 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_registry_search.py", "check_registry_search"),
     # ── reinvention_guard: the 'you're reinventing a solved problem' guardrail GROUNDED in the federation (the descent thesis as a product) — tiered cascade (heuristic -> cheap gate -> Tier2 search_all grounding); FIRES with real matches on solved problems, QUIET on genuinely-novel work; serves_truth=false ──
     ("scripts/check_reinvention_guard.py", "check_reinvention_guard"),
+    # ── observer.review: the POST-SESSION REVIEWER (the Observer's non-invasive adoption wedge) — runs the guardrail+federation funnel in BATCH over a finished transcript -> confidence-scored reinvention + waste (oversized/duplicate context) report; review == router.route_session(review_only); QUIET on genuinely-novel work; governed human-triaged candidates; serves_truth=false ──
+    ("scripts/check_observer_review.py", "check_observer_review"),
+    # ── observer.router: the Spotter ROUTER over the intervention TAXONOMY — Tier-0 classify -> wake plausible typed MODULES (reinvention[grounded]/footgun[pattern,can block]/adversarial[question-templates]/waste) -> per-type floor + GLOBAL interruption budget + graduated modes (silent->review->advisory->active->enforcing); one engine, review == router in batch; footgun evidence REDACTED; patterns single-sourced from behavioral_heuristics.json; serves_truth=false ──
+    ("scripts/check_observer_router.py", "check_observer_router"),
+    # ── capability_mvp: the MVP SHOWCASE — wires the whole federation end-to-end (guardrail + build-a-capability live over the registries) into a self-contained dist/capability-mvp/index.html that funnels to Teleon/Baltor; counts COMPUTED from registry_ontology; serves_truth=false ──
+    ("scripts/build_capability_mvp.py", "build_capability_mvp"),
+    # ── registry_records: SCALE — every menu registry wired to >=1000 records (REAL from catalogs + flagged SYNTHETIC candidates), each ENRICHED (embedding/description/metadata), pgvector DDL+search (vector dim single-sourced from EMBED_DIM); honest real-vs-synthetic ledger; high-volume->DB not git; candidate-only; serves_truth=false ──
+    ("scripts/build_registry_records.py", "build_registry_records"),
+    # ── registry_discover: AUTO-DISCOVERY — scans architecture/*.json + registers every VALIDATED catalog-shaped registry so federated search spans them all (147, was 14 curated); each validated (list + lookup round-trips); resolves the menu-coverage roadblock ──
+    ("scripts/check_registry_discover.py", "check_registry_discover"),
+    # ── registry_loop: the refresh LOOP body (discover -> dependency-graph -> records -> MVP; + credential-gated population) — run on a cadence to keep the federation current; everything downstream of the registries is computed ──
+    ("scripts/registry_loop.py", "registry_loop"),
+    # ── local_embedder: semantic embeddings run LOCALLY via Ollama nomic-embed-text — NO API KEY (one fork, not a default); best_embedder = local_first policy over the plane; gate-safe ──
+    ("scripts/check_local_embedder.py", "check_local_embedder"),
+    # ── plane_selection (FORK/VARIATION law): generic policy-driven selection over a PLANE of candidate adapters (forks) — local_first/keyless_first/cheapest/best_quality policies DIVERGE, fallback chain, extensible; replaces hardcoded best_X() wrappers; see docs/codex/fork-and-variation-rigor.md ──
+    ("scripts/check_plane_selection.py", "check_plane_selection"),
+    # ── record_variations (FORK/VARIATION law applied to DATA): any registry row -> governed candidate variations across industry/region/scale/approach + the fork questions; discovery!=trust; serves_truth=false ──
+    ("scripts/check_record_variations.py", "check_record_variations"),
+    # ── million_records: SCALE past 1M via VARIATION MUTATION — real seeds x cartesian product of axes (industry x geography x season x time x scale x approach) = ~89M governed CANDIDATE variations (computed count, streamed to pgvector not git, candidate-only, serves_truth=false; never fabricated as verified fact) ──
+    ("scripts/build_million_records.py", "build_million_records"),
     # ── distill_kaggle_kernels (#88 LLM population): distills the mined Kaggle kernels -> candidate registry ENTRIES (deterministic floor maps pattern->registry + frequency/lineage; LLM path Kimi/GLM/Claude via ollama when OH_LLM_API_KEY). LOSSLESS (keeps raw freq + lineage); candidates only; serves_truth=false ──
     ("scripts/distill_kaggle_kernels.py", "distill_kaggle_kernels"),
     # ── formula_registry (#98): named DETERMINISTIC formulas the compiler applies instead of an LLM (compound interest/Ohm's law/Reynolds/z-score/BMI) — the 'deterministic > probabilistic' core; spec-only (expression+variables+units, no eval), self-consistent (variables in expression); serves_truth=false ──

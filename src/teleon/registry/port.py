@@ -91,14 +91,61 @@ class JsonCatalogRegistry:
         return [r for _, r in scored[:limit]]
 
 
+_MIN_DISCOVER_RECORDS = 3
+_DISCOVER_CACHE: dict[str, dict[str, str]] | None = None
+
+
+def discover_catalogs() -> dict[str, dict[str, str]]:
+    """AUTO-DISCOVER catalog-shaped registries: scan architecture/*.json for a list-of-records with a usable id
+    field, and register the VALIDATED ones not already curated. Resolves the 'only N on the menu' roadblock so
+    federated search spans every record catalog automatically (curated keys win). Cached (one scan). Registries
+    that are policy / runtime / derived (no record list) are NOT here — they surface via their backing module."""
+    global _DISCOVER_CACHE
+    if _DISCOVER_CACHE is not None:
+        return _DISCOVER_CACHE
+    found: dict[str, dict[str, str]] = {}
+    curated_files = {c["file"] for c in CATALOGS.values()}
+    for path in sorted(_ARCH.glob("*.json")):
+        if path.name in curated_files:
+            continue
+        try:
+            d = json.loads(path.read_text())
+        except (ValueError, OSError):
+            continue
+        if not isinstance(d, dict):
+            continue
+        for key, val in d.items():
+            if isinstance(val, list) and len(val) >= _MIN_DISCOVER_RECORDS and isinstance(val[0], dict):
+                rec = val[0]
+                id_field = next((f for f in ("id", "canonical", "name", "key", "code") if f in rec), None)
+                if id_field is None:
+                    id_field = next((k for k, v in rec.items() if isinstance(v, str) and v), None)
+                if id_field and all(isinstance(r, dict) and id_field in r for r in val[:_MIN_DISCOVER_RECORDS]):
+                    found[path.stem] = {"file": path.name, "list_key": key, "id_field": id_field}
+                break  # only the first/main list per file
+    _DISCOVER_CACHE = found
+    return found
+
+
+def all_catalogs() -> dict[str, dict[str, str]]:
+    """Curated + auto-discovered catalogs (curated keys take precedence)."""
+    return {**discover_catalogs(), **CATALOGS}
+
+
 def available() -> list[str]:
-    """Registry ids reachable through the menu."""
+    """Curated registry ids on the menu (stable; the facets + proofs key off these)."""
     return sorted(CATALOGS)
 
 
+def available_all() -> list[str]:
+    """EVERY searchable catalog (curated + auto-discovered) — the full federated-search surface."""
+    return sorted(all_catalogs())
+
+
 def catalog(name: str) -> JsonCatalogRegistry:
-    """Return the RegistryPort adapter for a registered registry id (raises KeyError if unknown)."""
-    if name not in CATALOGS:
-        raise KeyError(f"unknown registry '{name}'; available: {available()}")
-    spec = CATALOGS[name]
+    """Return the RegistryPort adapter for a registered/discovered registry id (raises KeyError if unknown)."""
+    cats = all_catalogs()
+    if name not in cats:
+        raise KeyError(f"unknown registry '{name}'; available: {available_all()[:8]}...")
+    spec = cats[name]
     return JsonCatalogRegistry(_ARCH / spec["file"], spec["list_key"], spec.get("id_field", "id"))

@@ -12,7 +12,7 @@ queryable yet (policy/runtime registries, until they join the universal interfac
 """
 from __future__ import annotations
 
-from .port import CATALOGS, available, catalog
+from .port import all_catalogs, available_all, catalog
 
 # the registries each workflow consults (ontology ids). Queried when on the menu; else surfaced as 'relevant'.
 _TROUBLESHOOT = ["failure", "failure_recovery", "drift", "agent_qa", "vulnerability_sources", "observability"]
@@ -30,7 +30,7 @@ def _label(rec: dict) -> str:
 def search_all(query: str, *, per_catalog: int = _PER_CATALOG) -> list[dict]:
     """One query across EVERY catalog on the menu -> registry-tagged hits (the federated search)."""
     out = []
-    for name in available():
+    for name in available_all():
         for rec in catalog(name).search(query, limit=per_catalog):
             out.append({"registry": name, "name": _label(rec)})
     return out
@@ -40,8 +40,9 @@ def _facet(query: str, registry_ids: list[str], workflow: str) -> dict:
     """Query the on-menu registries for a workflow; honestly surface the relevant ones not yet on the menu."""
     found: dict[str, list[str]] = {}
     relevant_offmenu: list[str] = []
+    cats = all_catalogs()
     for rid in registry_ids:
-        if rid in CATALOGS:
+        if rid in cats:
             hits = [_label(rec) for rec in catalog(rid).search(query, limit=_PER_CATALOG)]
             if hits:
                 found[rid] = hits
