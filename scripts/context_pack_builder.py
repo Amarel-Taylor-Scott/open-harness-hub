@@ -255,20 +255,26 @@ def all_signatures(roots: list[str] | None = None) -> str:
 
 
 def code_graph_section() -> str:
-    """Code RELATIONSHIPS (not just files): the module import graph + stats (reusing scripts.code_graph) plus the
-    symbol-level call/inherit graph + load-bearing symbols (scripts.symbol_graph). So the model understands how the
-    code connects, not only what exists."""
-    parts = ["# CODE GRAPH — how the code RELATES (nodes + edges, AST-derived)\n"]
+    """Code RELATIONSHIPS (not just files), WEIGHTED + with the change-audit protocol. Leads with the unified
+    codegraph overview (file imports + symbol calls/inherits, strongest load-bearing symbols + most-depended
+    modules + the CHANGE-AUDIT PROTOCOL) so the model knows to audit a change's strong connections; then keeps the
+    detailed src/ call-graph dump (lossless). So the model understands how the code connects, not only what exists."""
+    parts = ["# CODE GRAPH — how the code RELATES (nodes + WEIGHTED edges, AST-derived)\n"]
     try:
-        from scripts.code_graph import graph as module_graph
-        st = module_graph().stats()
-        parts.append(f"Module import graph: {st.get('modules')} modules, {st.get('edges')} import edges, "
-                     f"{st.get('roots')} roots, {st.get('leaves')} leaves.\n")
-    except Exception as e:  # noqa: BLE001
-        parts.append(f"(module graph unavailable: {e})\n")
+        from scripts.codegraph import Unified, render_overview
+        parts.append(render_overview(Unified()))                       # protocol + stats + load-bearing + most-depended
+    except Exception as e:  # noqa: BLE001 — fall back to the layer graphs so context is never empty
+        parts.append(f"(unified codegraph unavailable: {e})")
+        try:
+            from scripts.code_graph import graph as module_graph
+            st = module_graph().stats()
+            parts.append(f"Module import graph: {st.get('modules')} modules, {st.get('edges')} import edges, "
+                         f"{st.get('roots')} roots, {st.get('leaves')} leaves.\n")
+        except Exception as e2:  # noqa: BLE001
+            parts.append(f"(module graph unavailable: {e2})\n")
     try:
         from scripts.symbol_graph import graph_text
-        parts.append(graph_text(["src"]))
+        parts.append("\n## Detailed src/ call graph (caller -> callee · xN call sites)\n" + graph_text(["src"]))
     except Exception as e:  # noqa: BLE001
         parts.append(f"(symbol graph unavailable: {e})")
     return "\n".join(parts)

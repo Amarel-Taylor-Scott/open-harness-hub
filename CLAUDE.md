@@ -103,6 +103,22 @@ python3 scripts/build_catalog_pages.py
 
 If a full rebuild takes too long, do not keep repeating it. Capture the bottleneck and improve the incremental path.
 
+## Code-Graph Change Audit (audit neighbors before/after a code change)
+
+Before AND after editing a `.py` file/function/class/method, audit its **strong connections** on the unified
+weighted code graph and update load-bearing neighbors in the **same** change — a green suite says the code runs, the
+graph says what else the change can break:
+
+```bash
+PYTHONPATH=. python3 scripts/codegraph.py --audit <file-path | dotted.module | symbol.name>
+```
+
+It ranks (by strength = call-sites × resolution-confidence) the importers/callers that break if the API changes,
+plus the transitive blast radius. Resolution is confident-only (ambiguous/builtin-shadow calls are dropped+counted,
+never guessed), so the ranking is trustworthy. The graph is a seam: `codegraph.py` / `symbol_graph.py` /
+`code_graph.py` carry `--self-test` (in `run_proofs.py`); regenerate artifacts with `scripts/codegraph.py --emit`.
+Full protocol: `docs/codex/codegraph-change-audit-protocol.md`.
+
 ## Daily Factory Target
 
 Every serious development turn should improve at least one of these:
