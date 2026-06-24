@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# ./enrich — the WHOLE-SURFACE enrichment loop (Baltor · Teleon · Hubs · Observer/Spotter · Discovery).
+#
+# A dedicated long-running loop that, every ~30 minutes, picks the most-overdue enrichment task and generates
+# records / metadata / embeddings / tools / descriptions / use-cases across every surface, runs the proof gate
+# periodically to stay honest, and checkpoints state so a restart resumes. Separate from ./loop (the YC/sweep
+# daemon) with its OWN stop flag, so both can run at once. Context + marching orders:
+# docs/goals/full-surface-enrichment-loop.md
+#
+#   ./enrich            start the 3-day loop (every 30 min) in the foreground   [Ctrl-C or ./enrich stop to halt]
+#   ./enrich bg         start it DETACHED (nohup) so it survives the terminal closing
+#   ./enrich run        run ONE cycle now (foreground)
+#   ./enrich status     read-only monitor
+#   ./enrich stop       request a clean stop (after the current cycle; state preserved)
+#   ./enrich resume     clear the stop flag
+#   ./enrich logs       tail the loop log
+#   pass extra flags through, e.g.:  ./enrich start --days 3 --interval-min 30 --offline
+set -euo pipefail
+cd "$(dirname "$(readlink -f "$0")")"
+export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}."
+PY="${PYTHON:-python3}"
+LOOP="scripts/enrichment_loop.py"
+STOP=".agent/ENRICHMENT_STOP_REQUESTED"
+LOG="data/dev-intel/enrichment_loop.log"
+
+cmd="${1:-start}"; shift || true
+case "$cmd" in
+  start|"")  rm -f "$STOP"; exec "$PY" "$LOOP" --supervise "$@" ;;
+  bg)        rm -f "$STOP"; mkdir -p data/dev-intel
+             nohup "$PY" "$LOOP" --supervise "$@" >>"$LOG" 2>&1 &
+             echo "enrichment loop started detached (pid $!). './enrich status' to monitor, './enrich stop' to halt." ;;
+  run)       exec "$PY" "$LOOP" --run "$@" ;;
+  status|monitor) exec "$PY" "$LOOP" --status ;;
+  stop)      mkdir -p .agent && : > "$STOP" && echo "stop requested — halts after the current cycle (state preserved). './enrich resume' to re-enable." ;;
+  resume)    rm -f "$STOP" && echo "stop flag cleared." ;;
+  logs)      touch "$LOG"; tail -n 40 -f "$LOG" ;;
+  *) echo "usage: ./enrich [start|bg|run|status|stop|resume|logs] [--days N --interval-min N --offline --gate-every N]"; exit 2 ;;
+esac

@@ -770,6 +770,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/build_code_genome_index.py", "build_code_genome_index"),
     # ── spotter_surface: the demoable face of the Observer/Spotter subsystem -> self-contained dist/spotter/index.html ('coaching not surveillance', the live taxonomy, a reproducible post-session review embedded, the knowledge-graph engines, funnels to Teleon); ALL counts computed from the live router+registries (no-magic-values); serves_truth=false ──
     ("scripts/build_spotter_surface.py", "build_spotter_surface"),
+    # ── enrichment_loop: the 3-day WHOLE-SURFACE enrichment loop (./enrich) — a cadence scheduler over the real worker scripts across ALL 5 surfaces (Baltor/Teleon/Hubs/Observer/Discovery) generating records/metadata/embeddings/tools/descriptions/use-cases every ~30min, full-gate every 4th cycle, STOP-aware + resumable; self-test validates rotation/offline/duration wiring (no subprocess); schedules generation+gating, adds no truth; serves_truth=false ──
+    ("scripts/enrichment_loop.py", "enrichment_loop"),
     # ── capability_mvp: the MVP SHOWCASE — wires the whole federation end-to-end (guardrail + build-a-capability live over the registries) into a self-contained dist/capability-mvp/index.html that funnels to Teleon/Baltor; counts COMPUTED from registry_ontology; serves_truth=false ──
     ("scripts/build_capability_mvp.py", "build_capability_mvp"),
     # ── registry_records: SCALE — every menu registry wired to >=1000 records (REAL from catalogs + flagged SYNTHETIC candidates), each ENRICHED (embedding/description/metadata), pgvector DDL+search (vector dim single-sourced from EMBED_DIM); honest real-vs-synthetic ledger; high-volume->DB not git; candidate-only; serves_truth=false ──
