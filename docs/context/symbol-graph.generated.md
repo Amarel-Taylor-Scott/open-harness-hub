@@ -1,6 +1,6 @@
-# SYMBOL GRAPH (AST nodes + edges — how functions/classes/methods RELATE)
+# SYMBOL GRAPH (AST nodes + WEIGHTED edges — how functions/classes/methods RELATE)
 
-nodes: {'module': 372, 'function': 924, 'class': 255, 'method': 727} · inherits=21 · call-edges=2795
+nodes: {'module': 481, 'function': 1390, 'class': 328, 'method': 902} · inherits=37 · call-edges=2216 (weight=call-sites, all confidently resolved; 36 ambiguous calls dropped, not guessed)
 
 
 ## Class hierarchy (class -> base)
@@ -20,1538 +20,1554 @@ nodes: {'module': 372, 'function': 924, 'class': 255, 'method': 727} · inherits
   src.teleon.inference.adapters.LocalStubAdapter -> src.teleon.inference.adapters.InferenceProviderAdapter
   src.teleon.inference.adapters.OllamaNativeAdapter -> src.teleon.inference.adapters._HttpAdapter
   src.teleon.inference.adapters._HttpAdapter -> src.teleon.inference.adapters.InferenceProviderAdapter
+  src.teleon.observer.router.AdversarialModule -> src.teleon.observer.router.InterventionModule
+  src.teleon.observer.router.AlternativeModule -> src.teleon.observer.router.InterventionModule
+  src.teleon.observer.router.DuplicateContextModule -> src.teleon.observer.router.InterventionModule
+  src.teleon.observer.router.FootgunModule -> src.teleon.observer.router.InterventionModule
+  src.teleon.observer.router.GuidanceModule -> src.teleon.observer.router.InterventionModule
+  src.teleon.observer.router.OversizedContextModule -> src.teleon.observer.router.InterventionModule
+  src.teleon.observer.router.ProductReinventionModule -> src.teleon.observer.router.InterventionModule
+  src.teleon.observer.router.ReinventionClusterModule -> src.teleon.observer.router.InterventionModule
+  src.teleon.observer.router.ReinventionModule -> src.teleon.observer.router.InterventionModule
+  src.teleon.observer.router.ShortcutModule -> src.teleon.observer.router.InterventionModule
+  src.teleon.observer.router.StackReinventionModule -> src.teleon.observer.router.InterventionModule
+  src.teleon.research.source_search.GitHubSearch -> src.teleon.research.source_search.SourceSearchPort
+  src.teleon.research.source_search.PyPIBrowserSearch -> src.teleon.research.source_search.SourceSearchPort
+  src.teleon.research.source_search.PyPISearch -> src.teleon.research.source_search.SourceSearchPort
+  src.teleon.runtime.execution_providers.cloud_function.CloudFunctionProvider -> src.teleon.runtime.execution_providers._byo_base.ByoComputeProvider
+  src.teleon.runtime.execution_providers.kubernetes.KubernetesProvider -> src.teleon.runtime.execution_providers._byo_base.ByoComputeProvider
   src.teleon.storage.record_store.LocalRecordStore -> src.teleon.storage.record_store.RecordStore
   src.teleon.storage.record_store.PostgresRecordStore -> src.teleon.storage.record_store._UnwiredCloudStore
   src.teleon.storage.record_store.WarehouseRecordStore -> src.teleon.storage.record_store._UnwiredCloudStore
   src.teleon.storage.record_store._UnwiredCloudStore -> src.teleon.storage.record_store.RecordStore
   src.teleon.workers.execution_providers.local_job_emulator.LocalCloudRunJobEmulator -> src.teleon.workers.execution_providers.local_job_emulator.LocalJobEmulator
 
-## Call graph (caller -> callee, intra-repo resolved)
-  src.baltor.adapters.memory.__init__.make_memory_artifact -> src.baltor.adapters.memory.__init__.memory_content_hash
-  src.baltor.adapters.memory.__init__.make_memory_artifact -> src.baltor.adapters.memory.__init__.external_source_handle
-  src.baltor.adapters.memory.baltor_local._self_demo -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider
-  src.baltor.adapters.memory.baltor_local._self_demo -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.write
-  src.baltor.adapters.memory.baltor_local._self_demo -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.search
-  src.baltor.adapters.memory.baltor_local._self_demo -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.profile
-  src.baltor.adapters.memory.baltor_local._self_demo -> src.baltor.determinism.trace_store.TraceStore.all
-  src.baltor.adapters.memory.baltor_local.write -> src.baltor.adapters.memory.__init__.make_memory_artifact
-  src.baltor.adapters.memory.baltor_local.write -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.adapters.memory.baltor_local.search -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.adapters.memory.baltor_local.search -> src.teleon.training.skills_db.DistillationDataset.split
-  src.baltor.adapters.memory.baltor_local.search -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.adapters.memory.baltor_local.search -> src.teleon.evolution.meta_learner.DistillationMetaLearner.count
-  src.baltor.adapters.memory.baltor_local.profile -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.adapters.memory.supermemory_api._credentials_present -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.adapters.memory.supermemory_api._self_demo -> src.baltor.adapters.memory.supermemory_api.SupermemoryApiProvider
-  src.baltor.adapters.memory.supermemory_api._self_demo -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.status
-  src.baltor.adapters.memory.supermemory_api._self_demo -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.search
-  src.baltor.adapters.memory.supermemory_api._require_credentials -> src.baltor.graph.providers.temporal_graph_provider.UnavailableProvider
-  src.baltor.adapters.memory.supermemory_api._require_credentials -> src.baltor.adapters.memory.supermemory_api._credentials_present
-  src.baltor.adapters.memory.supermemory_api.write -> src.baltor.adapters.memory.supermemory_api.SupermemoryApiProvider._require_credentials
-  src.baltor.adapters.memory.supermemory_api.search -> src.baltor.adapters.memory.supermemory_api.SupermemoryApiProvider._require_credentials
-  src.baltor.adapters.memory.supermemory_api.profile -> src.baltor.adapters.memory.supermemory_api.SupermemoryApiProvider._require_credentials
-  src.baltor.adapters.memory.supermemory_api.status -> src.baltor.adapters.memory.supermemory_api._credentials_present
-  src.baltor.adapters.memory.supermemory_emulator._upstream_id -> src.baltor.adapters.memory.__init__.memory_content_hash
-  src.baltor.adapters.memory.supermemory_emulator._self_demo -> src.baltor.adapters.memory.supermemory_emulator.SupermemoryEmulatorProvider
-  src.baltor.adapters.memory.supermemory_emulator._self_demo -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.write
-  src.baltor.adapters.memory.supermemory_emulator._self_demo -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.search
-  src.baltor.adapters.memory.supermemory_emulator._self_demo -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.profile
-  src.baltor.adapters.memory.supermemory_emulator._self_demo -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.status
-  src.baltor.adapters.memory.supermemory_emulator._self_demo -> src.baltor.determinism.trace_store.TraceStore.all
-  src.baltor.adapters.memory.supermemory_emulator.write -> src.baltor.adapters.memory.supermemory_emulator._upstream_id
-  src.baltor.adapters.memory.supermemory_emulator.write -> src.baltor.adapters.memory.__init__.make_memory_artifact
-  src.baltor.adapters.memory.supermemory_emulator.write -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.adapters.memory.supermemory_emulator.search -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.adapters.memory.supermemory_emulator.search -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.adapters.memory.supermemory_emulator.search -> src.teleon.training.skills_db.DistillationDataset.split
-  src.baltor.adapters.memory.supermemory_emulator.search -> src.teleon.evolution.meta_learner.DistillationMetaLearner.count
-  src.baltor.adapters.memory.supermemory_emulator.profile -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.adapters.memory.supermemory_mcp._credentials_present -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.adapters.memory.supermemory_mcp._self_demo -> src.baltor.adapters.memory.supermemory_mcp.SupermemoryMcpProvider
-  src.baltor.adapters.memory.supermemory_mcp._self_demo -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.status
-  src.baltor.adapters.memory.supermemory_mcp._self_demo -> src.baltor.adapters.memory.supermemory_mcp.SupermemoryMcpProvider.tools
-  src.baltor.adapters.memory.supermemory_mcp._self_demo -> src.baltor.teleon_client.client.TeleonClient.call
-  src.baltor.adapters.memory.supermemory_mcp._self_demo -> src.baltor.determinism.trace_store.TraceStore.all
-  src.baltor.adapters.memory.supermemory_mcp._self_demo -> src.baltor.adapters.memory.supermemory_mcp.SupermemoryMcpProvider.memory
-  src.baltor.adapters.memory.supermemory_mcp._self_demo -> src.baltor.adapters.memory.supermemory_mcp.SupermemoryMcpProvider.recall
-  src.baltor.adapters.memory.supermemory_mcp._self_demo -> src.baltor.adapters.memory.supermemory_mcp.SupermemoryMcpProvider.context
-  src.baltor.adapters.memory.supermemory_mcp._require_credentials -> src.baltor.graph.providers.temporal_graph_provider.UnavailableProvider
-  src.baltor.adapters.memory.supermemory_mcp._require_credentials -> src.baltor.adapters.memory.supermemory_api._credentials_present
-  src.baltor.adapters.memory.supermemory_mcp.memory -> src.baltor.adapters.memory.supermemory_api.SupermemoryApiProvider._require_credentials
-  src.baltor.adapters.memory.supermemory_mcp.recall -> src.baltor.adapters.memory.supermemory_api.SupermemoryApiProvider._require_credentials
-  src.baltor.adapters.memory.supermemory_mcp.context -> src.baltor.adapters.memory.supermemory_api.SupermemoryApiProvider._require_credentials
-  src.baltor.adapters.memory.supermemory_mcp.status -> src.baltor.adapters.memory.supermemory_api._credentials_present
-  src.baltor.adapters.object_store.local_object_store.parse_ref -> src.teleon.training.skills_db.DistillationDataset.split
-  src.baltor.adapters.object_store.local_object_store.parse_ref -> src.baltor.adapters.object_store.local_object_store.ForgedRefError
-  src.baltor.adapters.object_store.local_object_store.put -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore._to_bytes
-  src.baltor.adapters.object_store.local_object_store.put -> src.baltor.adapters.object_store.local_object_store._hash_bytes
-  src.baltor.adapters.object_store.local_object_store.put -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.adapters.object_store.local_object_store.put -> src.baltor.adapters.object_store.local_object_store.make_ref
-  src.baltor.adapters.object_store.local_object_store.put -> src.baltor.adapters.object_store.local_object_store.ObjectStoreError
-  src.baltor.adapters.object_store.local_object_store.put -> src.baltor.adapters.object_store.local_object_store._StoredObject
-  src.baltor.adapters.object_store.local_object_store.get -> src.baltor.adapters.object_store.local_object_store.parse_ref
-  src.baltor.adapters.object_store.local_object_store.get -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.adapters.object_store.local_object_store.get -> src.baltor.adapters.object_store.local_object_store._hash_bytes
-  src.baltor.adapters.object_store.local_object_store.get -> src.baltor.adapters.object_store.local_object_store.ForgedRefError
-  src.baltor.adapters.object_store.local_object_store.get -> src.baltor.adapters.object_store.local_object_store.CorruptObjectError
-  src.baltor.adapters.object_store.local_object_store.exists -> src.baltor.adapters.object_store.local_object_store.parse_ref
-  src.baltor.adapters.object_store.local_object_store.head -> src.baltor.adapters.object_store.local_object_store.parse_ref
-  src.baltor.adapters.object_store.local_object_store.head -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.adapters.object_store.local_object_store.head -> src.baltor.adapters.object_store.local_object_store.ForgedRefError
-  src.baltor.adapters.object_store.local_object_store.tenant_of -> src.baltor.adapters.object_store.local_object_store.parse_ref
-  src.baltor.adapters.source.folder_batch._classify -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.adapters.source.folder_batch._content_hash -> src.baltor.contextops.research_stub._hash
-  src.baltor.adapters.source.folder_batch._iter_files -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.adapters.source.folder_batch._iter_files -> src.teleon.storage.git_backend_port.GitBackendPort.read
-  src.baltor.adapters.source.folder_batch._self_demo -> src.baltor.adapters.source.folder_batch.LocalFolderBatchAdapter.ingest
-  src.baltor.adapters.source.folder_batch._self_demo -> src.baltor.adapters.source.folder_batch.LocalFolderBatchAdapter
-  src.baltor.adapters.source.folder_batch.ingest -> src.baltor.adapters.source.folder_batch._iter_files
-  src.baltor.adapters.source.folder_batch.ingest -> src.baltor.contextops.research_stub._hash
-  src.baltor.adapters.source.folder_batch.ingest -> src.baltor.adapters.source.folder_batch._classify
-  src.baltor.adapters.source.folder_batch.ingest -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.adapters.source.folder_batch.ingest -> src.baltor.adapters.source.folder_batch._content_hash
-  src.baltor.adapters.source.folder_batch.ingest -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.adapters.source.folder_batch.ingest -> src.baltor.adapters.source.folder_batch.LocalFolderBatchAdapter.ingest
-  src.baltor.adapters.source.folder_batch.ingest -> src.baltor.ports.source_adapter.SourceAdapterPort.normalize
-  src.baltor.adapters.source.folder_batch.ingest -> src.baltor.adapters.source.markdown_folder.MarkdownFolderAdapter
-  src.baltor.adapters.source.markdown_folder._wikilinks -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.adapters.source.markdown_folder._wikilinks -> src.teleon.training.skills_db.DistillationDataset.split
-  src.baltor.adapters.source.markdown_folder._tags -> src.teleon.training.skills_db.DistillationDataset.split
-  src.baltor.adapters.source.markdown_folder._tags -> src.baltor.determinism.trace_store.TraceStore.all
-  src.baltor.adapters.source.markdown_folder._tags -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.adapters.source.markdown_folder._parse_frontmatter -> src.baltor.workers.batch_windows.partition
-  src.baltor.adapters.source.markdown_folder._parse_frontmatter -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.adapters.source.markdown_folder._parse_frontmatter -> src.baltor.adapters.source.markdown_folder._coerce
-  src.baltor.adapters.source.markdown_folder._parse_frontmatter -> src.teleon.training.skills_db.DistillationDataset.split
-  src.baltor.adapters.source.markdown_folder._body_paragraphs -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.adapters.source.markdown_folder._iter_notes -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.adapters.source.markdown_folder._iter_notes -> src.baltor.adapters.source.markdown_folder._ignored
-  src.baltor.adapters.source.markdown_folder._iter_notes -> src.teleon.storage.git_backend_port.GitBackendPort.read
-  src.baltor.adapters.source.markdown_folder._ignored -> src.teleon.training.skills_db.DistillationDataset.split
-  src.baltor.adapters.source.markdown_folder._self_demo -> src.baltor.adapters.source.folder_batch.LocalFolderBatchAdapter.ingest
-  src.baltor.adapters.source.markdown_folder._self_demo -> src.baltor.adapters.source.markdown_folder.MarkdownFolderAdapter
-  src.baltor.adapters.source.markdown_folder.flush -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.adapters.source.markdown_folder._iter_notes
-  src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.adapters.source.markdown_folder.MarkdownFolderAdapter._ignored_count
-  src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.contextops.research_stub._hash
-  src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.adapters.source.markdown_folder._parse_frontmatter
-  src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.adapters.source.markdown_folder._wikilinks
-  src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.adapters.source.markdown_folder._tags
-  src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.adapters.source.markdown_folder._body_paragraphs
-  src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.adapters.source.markdown_folder._is_truthy
-  src.baltor.adapters.source.markdown_folder._ignored_count -> src.baltor.adapters.source.markdown_folder._ignored
-  src.baltor.context_audit.audit_bridge.audit_and_emit -> src.baltor.context_audit.context_auditor.audit
-  src.baltor.context_audit.audit_bridge.audited_pre_call -> src.baltor.context_audit.audit_bridge.audit_and_emit
-  src.baltor.context_audit.audit_bridge.optimize_pre_call -> src.baltor.context_audit.audit_bridge.audit_and_emit
-  src.baltor.context_audit.audit_bridge.optimize_pre_call -> src.baltor.context_audit.optimizer.apply_manifest
-  src.baltor.context_audit.context_auditor._tokens -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.context_audit.context_auditor._authority -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.context_audit.context_auditor._shingles -> src.teleon.training.skills_db.DistillationDataset.split
-  src.baltor.context_audit.context_auditor._keep_drop -> src.baltor.context_audit.context_auditor._authority
-  src.baltor.context_audit.context_auditor._keep_drop -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.context_audit.context_auditor.audit -> src.baltor.context_audit.context_auditor._shingles
-  src.baltor.context_audit.context_auditor.audit -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.context_audit.context_auditor.audit -> src.baltor.context_audit.context_auditor._tokens
-  src.baltor.context_audit.context_auditor.audit -> src.baltor.context_audit.context_auditor._jaccard
-  src.baltor.context_audit.context_auditor.audit -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.context_audit.context_auditor.audit -> src.baltor.context_audit.context_auditor._keep_drop
-  src.baltor.context_audit.context_auditor.audit -> src.baltor.context_audit.context_auditor._authority
-  src.baltor.context_audit.context_auditor._self_test -> src.baltor.context_audit.context_auditor._fixture
-  src.baltor.context_audit.context_auditor._self_test -> src.baltor.context_audit.context_auditor.audit
-  src.baltor.context_audit.context_auditor._self_test -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.context_audit.context_auditor._self_test -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.context_audit.context_auditor._self_test -> src.baltor.context_audit.context_auditor._authority
-  src.baltor.context_audit.context_auditor.key -> src.baltor.context_audit.context_auditor._authority
-  src.baltor.context_audit.context_auditor.key -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.context_audit.context_auditor.ck -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.context_audit.context_object_adapter.from_context_objects -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.context_audit.context_object_adapter.from_context_objects -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.context_audit.context_object_adapter.audit_context_graph -> src.baltor.context_audit.context_auditor.audit
-  src.baltor.context_audit.context_object_adapter.audit_context_graph -> src.baltor.context_audit.context_object_adapter.from_context_objects
-  src.baltor.context_audit.context_object_adapter.audit_context_graph -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.context_audit.context_object_adapter.audit_context_graph -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.context_audit.optimizer.apply_manifest -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.context_audit.optimizer.apply_manifest -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.context_audit.optimizer.apply_manifest -> src.baltor.context_audit.context_auditor._keep_drop
-  src.baltor.context_audit.optimizer.apply_manifest -> src.baltor.context_audit.context_auditor._tokens
-  src.baltor.context_audit.optimizer.apply_manifest -> src.baltor.context_audit.context_auditor._authority
-  src.baltor.contextops.authority_rank.default_authority_rank -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.contextops.authority_rank.scope_adjusted_rank -> src.baltor.contextops.authority_rank.default_authority_rank
-  src.baltor.contextops.cost_tracking.compute_cost_ladder -> src.baltor.contextops.cost_tracking.CostLadderMetrics
-  src.baltor.contextops.cost_tracking.compute_cost_ladder -> src.baltor.contextops.cost_tracking.CostTrackingError
-  src.baltor.contextops.cost_tracking.compute_cost_ladder -> src.baltor.contextops.cost_tracking._ladder_id
-  src.baltor.contextops.cost_tracking.cfpb_reference_lifecycle -> src.baltor.contextops.cost_tracking.CostEvent
-  src.baltor.contextops.cost_tracking.__post_init__ -> src.baltor.contextops.cost_tracking.CostTrackingError
-  src.baltor.contextops.cross_source_confirmation._independent -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.contextops.cross_source_confirmation.confirm -> src.baltor.contextops.cross_source_confirmation._independent
-  src.baltor.contextops.cross_source_confirmation.confirm -> src.baltor.contextops.cross_source_confirmation.ConfirmationResult
-  src.baltor.contextops.cross_source_confirmation.confirm -> src.baltor.contextops.cross_source_confirmation.CrossSourceError
-  src.baltor.contextops.cross_source_confirmation.effective_rank -> src.baltor.contextops.authority_rank.default_authority_rank
-  src.baltor.contextops.extractor_snippets._candidate -> src.baltor.contextops.extractor_snippets.FactAssertionCandidate
-  src.baltor.contextops.extractor_snippets.extract_regex -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.search
-  src.baltor.contextops.extractor_snippets.extract_regex -> src.baltor.contextops.extractor_snippets._candidate
-  src.baltor.contextops.extractor_snippets.extract_regex -> src.baltor.contextops.extractor_snippets.NoMatchError
-  src.baltor.contextops.extractor_snippets.extract_json_path -> src.baltor.contextops.extractor_snippets._candidate
-  src.baltor.contextops.extractor_snippets.extract_json_path -> src.teleon.training.skills_db.DistillationDataset.split
-  src.baltor.contextops.extractor_snippets.extract_json_path -> src.baltor.contextops.extractor_snippets.NoMatchError
-  src.baltor.contextops.extractor_snippets.extract_html_selector -> src.baltor.contextops.extractor_snippets._TagTextCollector
-  src.baltor.contextops.extractor_snippets.extract_html_selector -> src.baltor.contextops.extractor_snippets._candidate
-  src.baltor.contextops.extractor_snippets.extract_html_selector -> src.baltor.contextops.extractor_snippets.NoMatchError
-  src.baltor.contextops.extractor_snippets.extract_csv_field -> src.baltor.contextops.extractor_snippets._candidate
-  src.baltor.contextops.extractor_snippets.extract_csv_field -> src.baltor.contextops.extractor_snippets.NoMatchError
-  src.baltor.contextops.extractor_snippets.extract_markdown_heading -> src.baltor.contextops.extractor_snippets.NoMatchError
-  src.baltor.contextops.extractor_snippets.extract_markdown_heading -> src.baltor.contextops.extractor_snippets._candidate
-  src.baltor.contextops.extractor_snippets.extract_duration -> src.baltor.contextops.extractor_snippets.NoMatchError
-  src.baltor.contextops.extractor_snippets.extract_duration -> src.baltor.contextops.extractor_snippets._candidate
-  src.baltor.contextops.extractor_snippets.extract_date -> src.baltor.contextops.extractor_snippets.NoMatchError
-  src.baltor.contextops.extractor_snippets.extract_date -> src.baltor.contextops.extractor_snippets._candidate
-  src.baltor.contextops.extractor_snippets.extract_numeric -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.search
-  src.baltor.contextops.extractor_snippets.extract_numeric -> src.baltor.contextops.extractor_snippets._candidate
-  src.baltor.contextops.extractor_snippets.extract_numeric -> src.baltor.contextops.extractor_snippets.NoMatchError
-  src.baltor.contextops.extractor_snippets.extract_source_hash -> src.baltor.contextops.extractor_snippets._candidate
-  src.baltor.contextops.extractor_snippets.run_extractor -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.contextops.extractor_snippets.run_extractor -> src.baltor.contextops.extractor_snippets.ExtractorError
-  src.baltor.contextops.extractor_snippets.__post_init__ -> src.baltor.contextops.extractor_snippets.MissingSourceHandleError
-  src.baltor.contextops.extractor_snippets.__post_init__ -> src.baltor.contextops.extractor_snippets.CanonicalClaimError
-  src.baltor.contextops.extractor_snippets.__post_init__ -> src.baltor.contextops.extractor_snippets.ExtractorError
-  src.baltor.contextops.extractor_snippets.__init__ -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.__init__
-  src.baltor.contextops.extractor_snippets.handle_data -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.contextops.reliability.score_source -> src.baltor.contextops.reliability.SourceReliabilityScore
-  src.baltor.contextops.reliability.score_source -> src.baltor.contextops.authority_rank.scope_adjusted_rank
-  src.baltor.contextops.reliability.score_source -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.contextops.reliability.__post_init__ -> src.baltor.contextops.reliability.ReliabilityError
-  src.baltor.contextops.reliability.overall -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.contextops.research_stub.make_provider -> src.baltor.contextops.research_stub.CandidateResearchStub
-  src.baltor.contextops.research_stub.make_provider -> src.baltor.contextops.research_stub.LocalResearchStub
-  src.baltor.contextops.research_stub.research -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.contextops.research_stub.research -> src.baltor.ports.research_agent_provider.ResearchAgentUnavailable
-  src.baltor.contextops.research_stub.research -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.contextops.research_stub.research -> src.baltor.contextops.research_stub._hash
-  src.baltor.contextops.sandbox_gate.static_scan -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.search
-  src.baltor.contextops.sandbox_gate.static_scan -> src.teleon.training.skills_db.DistillationDataset.split
-  src.baltor.contextops.sandbox_gate.run_in_sandbox -> src.baltor.contextops.sandbox_gate.static_scan
-  src.baltor.contextops.sandbox_gate.run_in_sandbox -> src.baltor.contextops.sandbox_gate.SandboxReport
-  src.baltor.contextops.sandbox_gate.run_in_sandbox -> src.baltor.contextops.sandbox_gate.SandboxViolation
-  src.baltor.contextops.sandbox_gate.run_in_sandbox -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.contextops.sandbox_gate.gate_snippet -> src.baltor.contextops.sandbox_gate.GateResult
-  src.baltor.contextops.sandbox_gate.gate_snippet -> src.baltor.contextops.sandbox_gate._snippet_id
-  src.baltor.contextops.sandbox_gate.gate_snippet -> src.baltor.contextops.sandbox_gate.run_in_sandbox
-  src.baltor.contextops.sandbox_gate.gate_snippet -> src.baltor.contextops.sandbox_gate.SandboxReport
-  src.baltor.contextops.sandbox_gate.to_dict -> src.baltor.contextops.cost_tracking.CostLadderMetrics.to_dict
-  src.baltor.contextops.source_discovery._build_candidate -> src.baltor.contextops.source_discovery._classify_source_type
-  src.baltor.contextops.source_discovery._build_candidate -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.contextops.source_discovery._build_candidate -> src.baltor.contextops.research_stub._hash
-  src.baltor.contextops.source_discovery._build_score -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.contextops.source_discovery._build_score -> src.baltor.contextops.source_discovery._composite
-  src.baltor.contextops.source_discovery._build_score -> src.baltor.contextops.research_stub._hash
-  src.baltor.contextops.source_discovery._locator_for -> src.baltor.contextops.research_stub._hash
-  src.baltor.contextops.source_discovery.__init__ -> src.baltor.contextops.research_stub.LocalResearchStub
-  src.baltor.contextops.source_discovery.discover -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.contextops.source_discovery.discover -> src.baltor.contextops.research_stub.LocalResearchStub.research
-  src.baltor.contextops.source_discovery.discover -> src.baltor.contextops.source_discovery._build_candidate
-  src.baltor.contextops.source_discovery.discover -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.contextops.source_discovery.discover -> src.baltor.contextops.source_recipe.build_source_recipe
-  src.baltor.contextops.source_discovery.discover -> src.baltor.contextops.source_discovery._build_score
-  src.baltor.contextops.source_discovery.discover -> src.baltor.contextops.source_discovery._locator_for
-  src.baltor.contextops.source_recipe.build_source_recipe -> src.baltor.contextops.source_recipe._is_current_value
-  src.baltor.contextops.source_recipe.build_source_recipe -> src.baltor.contextops.source_recipe.cross_source_policy
-  src.baltor.contextops.source_recipe.build_source_recipe -> src.baltor.contextops.source_recipe.watch_triggers
-  src.baltor.contextops.source_recipe.build_source_recipe -> src.baltor.contextops.research_stub._hash
-  src.baltor.contextops.triage.make_triage_id -> src.baltor.contextops.triage._canon
-  src.baltor.contextops.triage.classify -> src.baltor.contextops.triage.ContextTriageClassifier._is_low_authority
-  src.baltor.contextops.triage.classify -> src.baltor.contextops.triage.ContextTriageClassifier._is_source_of_law
-  src.baltor.contextops.triage.classify -> src.baltor.contextops.triage._has_cue
-  src.baltor.contextops.triage.classify -> src.baltor.contextops.triage.make_triage_id
-  src.baltor.contextops.triage.classify -> src.baltor.contextops.triage.ContextTriageResult
-  src.baltor.contextops.triage.classify -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.contextops.triage.classify -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.contextops.verification_recipe.freshness_policy -> src.baltor.contextops.source_recipe._is_current_value
-  src.baltor.contextops.verification_recipe.build_verification_recipe -> src.baltor.contextops.research_stub._hash
-  src.baltor.contextops.verification_recipe.build_verification_recipe -> src.baltor.contextops.verification_recipe.freshness_policy
-  src.baltor.contextops.verification_recipe.build_verification_recipe -> src.baltor.contextops.source_recipe._is_current_value
-  src.baltor.contracts.artifacts.canonical_fact.fact_id -> src.baltor.contracts.artifacts.canonical_fact._content_id
-  src.baltor.contracts.artifacts.fact_assertion.assertion_id -> src.baltor.contracts.artifacts.canonical_fact._content_id
-  src.baltor.contracts.artifacts.fragility_metadata.fragility_id -> src.baltor.contracts.artifacts.canonical_fact._content_id
-  src.baltor.contracts.artifacts.fragility_metadata.is_stale -> src.baltor.contracts.artifacts.fragility_metadata.FragilityMetadata.horizon
-  src.baltor.contracts.artifacts.verification_result.result_id -> src.baltor.contracts.artifacts.canonical_fact._content_id
-  src.baltor.contracts.artifacts.verification_task.task_id -> src.baltor.contracts.artifacts.canonical_fact._content_id
-  src.baltor.contracts.artifacts.watch_policy.watch_policy_id -> src.baltor.contracts.artifacts.canonical_fact._content_id
-  src.baltor.determinism.consensus._canon_output -> src.baltor.contextops.research_stub._hash
-  src.baltor.determinism.consensus._cluster -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.determinism.consensus.record_consensus -> src.baltor.determinism.consensus._cluster
-  src.baltor.determinism.consensus.record_consensus -> src.baltor.determinism.trace_store.make_trace_id
-  src.baltor.determinism.consensus.record_consensus -> src.baltor.determinism.consensus.ConsensusRun
-  src.baltor.determinism.consensus.record_consensus -> src.baltor.determinism.consensus.ConsensusError
-  src.baltor.determinism.consensus.record_consensus -> src.baltor.contextops.research_stub._hash
-  src.baltor.determinism.consensus.record_consensus -> src.baltor.contextops.cost_tracking.CostLadderMetrics.to_dict
-  src.baltor.determinism.consensus.output_hash -> src.baltor.determinism.consensus._canon_output
-  src.baltor.determinism.consensus.to_trace -> src.baltor.determinism.trace_store.Trace
-  src.baltor.determinism.consensus.to_trace -> src.baltor.determinism.consensus.ConsensusRun.routing
-  src.baltor.determinism.consensus.to_trace -> src.baltor.contextops.research_stub._hash
-  src.baltor.determinism.consensus.to_dict -> src.baltor.determinism.consensus.ConsensusRun.routing
-  src.baltor.determinism.consensus.to_dict -> src.baltor.contextops.cost_tracking.CostLadderMetrics.to_dict
-  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.trace_store.TraceStore
-  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.consensus.record_consensus
-  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.trace_store.TraceStore.append_trace
-  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.pattern_miner.mine_patterns
-  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.consensus.ConsensusRun.to_trace
-  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.rule_candidate_generator.from_pattern
-  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.replay_engine.replay
-  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.shadow_runner.run_shadow
-  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.rule_promotion_gate.evaluate
-  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.fallback_router.activate
-  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.fallback_router.route
-  src.baltor.determinism.demo.build_demo -> src.baltor.contextops.cost_tracking.CostLadderMetrics.to_dict
-  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.trace_store.TraceStore.query
-  src.baltor.determinism.demo.build_demo -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.consensus.ModelOutput
-  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.rule_candidate_generator.FallbackPolicy
-  src.baltor.determinism.fallback_router._attr -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.determinism.fallback_router._input_signature -> src.baltor.contextops.triage._canon
-  src.baltor.determinism.fallback_router.route -> src.baltor.determinism.fallback_router._input_signature
-  src.baltor.determinism.fallback_router.route -> src.baltor.determinism.fallback_router._is_ood
-  src.baltor.determinism.fallback_router.route -> src.baltor.determinism.replay_engine.evaluate_rule
-  src.baltor.determinism.fallback_router.route -> src.baltor.determinism.fallback_router.RoutingEvent
-  src.baltor.determinism.fallback_router.route -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.determinism.fallback_router.route -> src.baltor.contextops.triage._canon
-  src.baltor.determinism.fallback_router.activate -> src.baltor.determinism.fallback_router._attr
-  src.baltor.determinism.fallback_router.event -> src.baltor.determinism.fallback_router.RoutingEvent
-  src.baltor.determinism.fallback_router.event -> src.baltor.contextops.triage._canon
-  src.baltor.determinism.fallback_router.fallback -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.determinism.pattern_miner._candidate_id -> src.baltor.contextops.research_stub._hash
-  src.baltor.determinism.pattern_miner.mine_patterns -> src.baltor.determinism.trace_store.TraceStore.mining_set
-  src.baltor.determinism.pattern_miner.mine_patterns -> src.baltor.determinism.pattern_miner.PatternMinerError
-  src.baltor.determinism.pattern_miner.mine_patterns -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.determinism.pattern_miner.mine_patterns -> src.baltor.determinism.pattern_miner._candidate_id
-  src.baltor.determinism.pattern_miner.mine_patterns -> src.baltor.contextops.research_stub._hash
-  src.baltor.determinism.pattern_miner.mine_patterns -> src.baltor.determinism.pattern_miner.PatternCandidate
-  src.baltor.determinism.replay_engine._attr -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.determinism.replay_engine.evaluate_rule -> src.baltor.determinism.fallback_router._attr
-  src.baltor.determinism.replay_engine.evaluate_rule -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.determinism.replay_engine.evaluate_rule -> src.baltor.determinism.replay_engine._resolve_then
-  src.baltor.determinism.replay_engine.replay -> src.baltor.determinism.replay_engine.RuleReplayReport
-  src.baltor.determinism.replay_engine.replay -> src.baltor.determinism.fallback_router._attr
-  src.baltor.determinism.replay_engine.replay -> src.baltor.determinism.replay_engine.evaluate_rule
-  src.baltor.determinism.replay_engine.replay -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.determinism.replay_engine.replay -> src.baltor.determinism.replay_engine.TraceVerdict
-  src.baltor.determinism.replay_engine.replay -> src.baltor.contextops.triage._canon
-  src.baltor.determinism.replay_engine.to_dict -> src.baltor.contextops.cost_tracking.CostLadderMetrics.to_dict
-  src.baltor.determinism.replay_engine.field -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.determinism.replay_engine.field -> src.baltor.determinism.fallback_router._attr
-  src.baltor.determinism.rule_candidate_generator._rule_id -> src.baltor.contextops.triage._canon
-  src.baltor.determinism.rule_candidate_generator._attr -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.fallback_router._attr
-  src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.rule_candidate_generator.is_truth_serving
-  src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.rule_candidate_generator.RuleCandidate
-  src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.rule_candidate_generator.RuleCandidateError
-  src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.rule_candidate_generator.ConsensusOnlyError
-  src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.rule_candidate_generator.NoVerifiedTraceError
-  src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.rule_candidate_generator.FallbackPolicy
-  src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.rule_candidate_generator._rule_id
-  src.baltor.determinism.rule_candidate_generator.to_dict -> src.baltor.contextops.cost_tracking.CostLadderMetrics.to_dict
-  src.baltor.determinism.rule_promotion_gate._handles_preserved -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.determinism.rule_promotion_gate._handles_preserved -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.determinism.rule_promotion_gate.evaluate -> src.baltor.determinism.rule_promotion_gate._is_schema_valid
-  src.baltor.determinism.rule_promotion_gate.evaluate -> src.baltor.determinism.rule_promotion_gate._handles_preserved
-  src.baltor.determinism.rule_promotion_gate.evaluate -> src.baltor.determinism.rule_promotion_gate.RulePromotionReceipt
-  src.baltor.determinism.rule_promotion_gate.evaluate -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.determinism.rule_promotion_gate.evaluate -> src.baltor.determinism.rule_promotion_gate.GateCheck
-  src.baltor.determinism.rule_promotion_gate.evaluate -> src.baltor.contextops.triage._canon
-  src.baltor.determinism.rule_promotion_gate.to_dict -> src.baltor.contextops.cost_tracking.CostLadderMetrics.to_dict
-  src.baltor.determinism.rule_promotion_gate.add -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.determinism.rule_promotion_gate.add -> src.baltor.determinism.rule_promotion_gate.GateCheck
-  src.baltor.determinism.shadow_runner._attr -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.determinism.shadow_runner._live_decision_of -> src.baltor.determinism.fallback_router._attr
-  src.baltor.determinism.shadow_runner.run_shadow -> src.baltor.determinism.shadow_runner.ShadowRunReport
-  src.baltor.determinism.shadow_runner.run_shadow -> src.baltor.determinism.shadow_runner._live_decision_of
-  src.baltor.determinism.shadow_runner.run_shadow -> src.baltor.determinism.replay_engine.evaluate_rule
-  src.baltor.determinism.shadow_runner.run_shadow -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.determinism.shadow_runner.run_shadow -> src.baltor.determinism.fallback_router._attr
-  src.baltor.determinism.shadow_runner.run_shadow -> src.baltor.determinism.shadow_runner.ShadowTick
-  src.baltor.determinism.shadow_runner.run_shadow -> src.baltor.contextops.triage._canon
-  src.baltor.determinism.shadow_runner.to_dict -> src.baltor.contextops.cost_tracking.CostLadderMetrics.to_dict
-  src.baltor.determinism.trace_store._hash -> src.baltor.contextops.triage._canon
-  src.baltor.determinism.trace_store.parse_trace_id -> src.teleon.training.skills_db.DistillationDataset.split
-  src.baltor.determinism.trace_store.parse_trace_id -> src.baltor.determinism.trace_store.TraceStoreError
-  src.baltor.determinism.trace_store.append -> src.baltor.contextops.research_stub._hash
-  src.baltor.determinism.trace_store.append -> src.baltor.determinism.trace_store.make_trace_id
-  src.baltor.determinism.trace_store.append -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.determinism.trace_store.append -> src.baltor.determinism.trace_store.Trace
-  src.baltor.determinism.trace_store.append -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.determinism.trace_store.append -> src.baltor.determinism.trace_store.TraceStoreError
-  src.baltor.determinism.trace_store.append -> src.baltor.determinism.trace_store._as_tuple
-  src.baltor.determinism.trace_store.append_trace -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.determinism.trace_store.get -> src.baltor.determinism.trace_store.parse_trace_id
-  src.baltor.determinism.trace_store.get -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.determinism.trace_store.get -> src.baltor.determinism.trace_store.TraceStoreError
-  src.baltor.determinism.trace_store.get -> src.baltor.determinism.trace_store.TenantBoundaryError
-  src.baltor.determinism.trace_store.query -> src.baltor.determinism.trace_store.TraceStore.all
-  src.baltor.determinism.trace_store.mining_set -> src.baltor.determinism.trace_store.TraceStore.all
-  src.baltor.determinism.trace_store.mining_set -> src.baltor.determinism.trace_store.TraceStoreError
-  src.baltor.determinism.trace_store.mining_set -> src.baltor.determinism.trace_store.TenantBoundaryError
-  src.baltor.determinism.trace_store.mining_set -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.determinism.trace_store.assert_mineable_global -> src.baltor.determinism.trace_store.TenantBoundaryError
-  src.baltor.determinism.trace_store.assert_mineable_global -> src.baltor.determinism.trace_store.TraceStoreError
-  src.baltor.distillation.lineage.is_complete -> src.baltor.distillation.lineage.LineageBundle.reaches_raw
-  src.baltor.distillation.lineage.is_complete -> src.baltor.distillation.lineage.LineageBundle.reaches_source
-  src.baltor.distillation.lineage.build -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.distillation.lineage.build -> src.baltor.distillation.lossless_store.LosslessStore.versions
-  src.baltor.distillation.lineage.build -> src.baltor.distillation.lineage.LineageBundle
-  src.baltor.distillation.lineage.build -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.distillation.lineage.build -> src.baltor.determinism.trace_store.TenantBoundaryError
-  src.baltor.distillation.lineage._dedup -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.distillation.lossless_store._hash -> src.baltor.contextops.triage._canon
-  src.baltor.distillation.lossless_store.parse_id -> src.teleon.training.skills_db.DistillationDataset.split
-  src.baltor.distillation.lossless_store.parse_id -> src.baltor.distillation.lossless_store.DistillationStoreError
-  src.baltor.distillation.lossless_store.__init__ -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore
-  src.baltor.distillation.lossless_store._put -> src.baltor.contextops.research_stub._hash
-  src.baltor.distillation.lossless_store._put -> src.baltor.distillation.lossless_store.make_id
-  src.baltor.distillation.lossless_store._put -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.distillation.lossless_store._put -> src.baltor.distillation.lossless_store.LosslessStoreEntry
-  src.baltor.distillation.lossless_store._put -> src.baltor.distillation.lossless_store.LosslessStore._track_version
-  src.baltor.distillation.lossless_store._put -> src.baltor.distillation.lossless_store.DistillationStoreError
-  src.baltor.distillation.lossless_store._put -> src.baltor.determinism.trace_store._as_tuple
-  src.baltor.distillation.lossless_store._put -> src.baltor.determinism.trace_store.TenantBoundaryError
-  src.baltor.distillation.lossless_store._track_version -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.distillation.lossless_store.put_raw -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.put
-  src.baltor.distillation.lossless_store.put_raw -> src.baltor.distillation.lossless_store.LosslessStore._put
-  src.baltor.distillation.lossless_store.put_source -> src.baltor.distillation.lossless_store.LosslessStore._put
-  src.baltor.distillation.lossless_store.put_derived -> src.baltor.distillation.lossless_store.LosslessStore._put
-  src.baltor.distillation.lossless_store.get -> src.baltor.distillation.lossless_store.parse_id
-  src.baltor.distillation.lossless_store.get -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.distillation.lossless_store.get -> src.baltor.distillation.lossless_store.DistillationStoreError
-  src.baltor.distillation.lossless_store.get -> src.baltor.determinism.trace_store.TenantBoundaryError
-  src.baltor.distillation.lossless_store.versions -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.distillation.lossless_store.current_id -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.distillation.lossless_store.current -> src.baltor.distillation.lossless_store.LosslessStore.current_id
-  src.baltor.distillation.lossless_store.set_current -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.distillation.lossless_store.set_current -> src.baltor.distillation.lossless_store.DistillationStoreError
-  src.baltor.distillation.lossless_store.set_current -> src.baltor.determinism.trace_store.TenantBoundaryError
-  src.baltor.distillation.lossless_store.rehydrate_payload -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.distillation.lossless_store.rehydrate_payload -> src.baltor.determinism.trace_store.TenantBoundaryError
-  src.baltor.distillation.lossless_store.rehydrate_payload -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.tenant_of
-  src.baltor.distillation.rehydration.rehydrate -> src.baltor.distillation.lineage.LineageBundle.build
-  src.baltor.distillation.rehydration.rehydrate -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.distillation.rehydration.rehydrate -> src.baltor.contextops.cost_tracking.CostLadderMetrics.to_dict
-  src.baltor.distillation.rehydration.rehydrate_payload -> src.baltor.distillation.lineage.LineageBundle.build
-  src.baltor.distillation.rehydration.rehydrate_payload -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.distillation.rehydration.rehydrate_payload -> src.baltor.distillation.lossless_store.LosslessStore.rehydrate_payload
-  src.baltor.distillation.rehydration._entries -> src.baltor.contextops.cost_tracking.CostLadderMetrics.to_dict
-  src.baltor.distillation.rehydration._entries -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.distillation.retention_report._aid -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.distillation.retention_report._handles -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.distillation.retention_report._is_truth -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.distillation.retention_report.build_retention_report -> src.baltor.distillation.lineage.LineageBundle.build
-  src.baltor.distillation.retention_report.build_retention_report -> src.baltor.distillation.retention_report.InformationRetentionReportBuilder
-  src.baltor.distillation.retention_report.build -> src.baltor.distillation.retention_report.InformationRetentionReport
-  src.baltor.distillation.retention_report.build -> src.baltor.distillation.retention_report._aid
-  src.baltor.distillation.retention_report.build -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.distillation.retention_report.build -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.distillation.retention_report.build -> src.baltor.distillation.retention_report._handles
-  src.baltor.distillation.retention_report.build -> src.baltor.distillation.retention_report._is_truth
-  src.baltor.distillation.retention_report.build -> src.teleon.training.skills_db.DistillationDataset.split
-  src.baltor.distillation.retention_report._lineage_refs -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.distillation.rollback.execute -> src.baltor.distillation.lossless_store.LosslessStore.current_id
-  src.baltor.distillation.rollback.execute -> src.baltor.distillation.lossless_store.LosslessStore.set_current
-  src.baltor.distillation.rollback.execute -> src.baltor.determinism.trace_store.TraceStore.has
-  src.baltor.distillation.rollback.execute -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.distillation.rollback.execute -> src.baltor.distillation.lossless_store.LosslessStore.put_derived
-  src.baltor.distillation.rollback.execute -> src.baltor.distillation.rollback.RollbackReceipt
-  src.baltor.distillation.rollback.execute -> src.baltor.distillation.lossless_store.DistillationStoreError
-  src.baltor.distillation.rollback.of -> src.baltor.distillation.lossless_store.LosslessStore.current_id
-  src.baltor.distillation.rollback.of -> src.baltor.distillation.rollback.RollbackPlan
-  src.baltor.distillation.rollback.of -> src.baltor.distillation.lossless_store.DistillationStoreError
-  src.baltor.distillation.rollback.of -> src.baltor.distillation.lossless_store.LosslessStore.versions
-  src.baltor.facts.classifier.classify_volatility -> src.baltor.contextops.triage._has_cue
-  src.baltor.facts.classifier.recommend_watch_policy -> src.baltor.facts.classifier.classify_volatility
-  src.baltor.facts.classifier.recommend_watch_policy -> src.baltor.contracts.artifacts.watch_policy.WatchPolicy
-  src.baltor.facts.classifier.classify -> src.baltor.facts.classifier.classify_volatility
-  src.baltor.facts.classifier.classify -> src.baltor.facts.classifier.recommend_watch_policy
-  src.baltor.facts.classifier.classify -> src.baltor.contracts.artifacts.watch_policy.WatchPolicy.next_verify_at
-  src.baltor.facts.classifier.classify -> src.baltor.contracts.artifacts.fragility_metadata.FragilityMetadata
-  src.baltor.facts.refresh_planner.plan_task -> src.baltor.contracts.artifacts.fragility_metadata.FragilityMetadata.horizon
-  src.baltor.facts.refresh_planner.plan_task -> src.baltor.contracts.artifacts.verification_task.VerificationTask
-  src.baltor.facts.refresh_planner.plan_task -> src.baltor.contracts.artifacts.fragility_metadata.FragilityMetadata.is_stale
-  src.baltor.facts.refresh_planner._stub_external_evidence -> src.baltor.facts.refresh_planner._evidence_hash
-  src.baltor.facts.refresh_planner.refresh -> src.baltor.facts.refresh_planner.FactRefreshPlanner._stub_external_evidence
-  src.baltor.facts.refresh_planner.refresh -> src.baltor.contracts.artifacts.watch_policy.WatchPolicy.next_verify_at
-  src.baltor.facts.refresh_planner.refresh -> src.baltor.contracts.artifacts.verification_result.VerificationResult
-  src.baltor.facts.refresh_planner.refresh -> src.baltor.facts.refresh_planner._scope_allowed
-  src.baltor.facts.refresh_planner.apply_result -> src.baltor.contracts.artifacts.canonical_fact.CanonicalFact
-  src.baltor.graph.providers.temporal_graph_provider._projection -> src.baltor.graph.temporal.store.TemporalGraphStore.snapshot
-  src.baltor.graph.providers.temporal_graph_provider.project -> src.baltor.graph.providers.temporal_graph_provider._projection
-  src.baltor.graph.providers.temporal_graph_provider.status -> src.baltor.graph.providers.temporal_graph_provider._status
-  src.baltor.graph.providers.temporal_graph_provider.project -> src.baltor.graph.providers.temporal_graph_provider.UnavailableProvider
-  src.baltor.graph.temporal.bridges.mark_stale -> src.baltor.graph.temporal.store.TemporalGraphStore.set_state
-  src.baltor.graph.temporal.bridges.refresh_observation -> src.baltor.graph.temporal.store.TemporalGraphStore.add_observation
-  src.baltor.graph.temporal.bridges.refresh_observation -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.graph.temporal.bridges.refresh_observation -> src.baltor.graph.temporal.store.TemporalGraphStore.add_edge
-  src.baltor.graph.temporal.bridges.refresh_observation -> src.baltor.graph.temporal.policy.project_current
-  src.baltor.graph.temporal.bridges.refresh_observation -> src.baltor.contextops.cost_tracking.CostLadderMetrics.to_dict
-  src.baltor.graph.temporal.bridges.refresh_observation -> src.baltor.graph.temporal.store.TemporalGraphStore.timeline
-  src.baltor.graph.temporal.bridges.record_reconciliation -> src.baltor.graph.temporal.store.TemporalGraphStore.set_state
-  src.baltor.graph.temporal.bridges.record_reconciliation -> src.baltor.graph.temporal.store.TemporalGraphStore.add_edge
-  src.baltor.graph.temporal.bridges.select_current_for_consumption -> src.baltor.graph.temporal.store.TemporalGraphStore.nodes
-  src.baltor.graph.temporal.bridges.select_current_for_consumption -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.graph.temporal.builder._receipt -> src.baltor.graph.temporal.contracts.content_hash
-  src.baltor.graph.temporal.builder.build_cfpb_temporal_graph -> src.baltor.graph.temporal.store.TemporalGraphStore.add_observation
-  src.baltor.graph.temporal.builder.build_cfpb_temporal_graph -> src.baltor.graph.temporal.policy.project_current
-  src.baltor.graph.temporal.builder.build_cfpb_temporal_graph -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.graph.temporal.builder.build_cfpb_temporal_graph -> src.baltor.graph.temporal.builder._receipt
-  src.baltor.graph.temporal.builder.build_cfpb_temporal_graph -> src.baltor.graph.temporal.store.TemporalGraphStore
-  src.baltor.graph.temporal.builder.build_cfpb_temporal_graph -> src.baltor.graph.temporal.store.TemporalGraphStore.add_edge
-  src.baltor.graph.temporal.builder.build_cfpb_temporal_graph -> src.baltor.contextops.cost_tracking.CostLadderMetrics.to_dict
-  src.baltor.graph.temporal.builder.build_cfpb_temporal_graph -> src.baltor.graph.temporal.store.TemporalGraphStore.edges
-  src.baltor.graph.temporal.contracts.content_hash -> src.baltor.contextops.triage._canon
-  src.baltor.graph.temporal.contracts.temporal_fact_id -> src.baltor.contextops.triage._canon
-  src.baltor.graph.temporal.contracts.edge_id -> src.baltor.contextops.triage._canon
-  src.baltor.graph.temporal.contracts.observation_id -> src.baltor.contextops.triage._canon
-  src.baltor.graph.temporal.contracts.__post_init__ -> src.baltor.graph.temporal.contracts.temporal_fact_id
-  src.baltor.graph.temporal.contracts.authority_rank -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.graph.temporal.policy._is_stale -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.graph.temporal.policy.project_current -> src.baltor.graph.temporal.store.TemporalGraphStore.by_fact_key
-  src.baltor.graph.temporal.policy.project_current -> src.baltor.graph.temporal.policy._is_stale
-  src.baltor.graph.temporal.policy.project_current -> src.baltor.graph.temporal.contracts.TemporalFactNode.authority_rank
-  src.baltor.graph.temporal.policy.project_current -> src.baltor.graph.temporal.store.TemporalGraphStore.add_edge
-  src.baltor.graph.temporal.store.upsert_node -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.graph.temporal.store.upsert_node -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.graph.temporal.store.add_observation -> src.baltor.graph.temporal.contracts.content_hash
-  src.baltor.graph.temporal.store.add_observation -> src.baltor.graph.temporal.contracts.TemporalFactNode
-  src.baltor.graph.temporal.store.add_observation -> src.baltor.graph.temporal.store.TemporalGraphStore.upsert_node
-  src.baltor.graph.temporal.store.add_observation -> src.baltor.graph.temporal.contracts.observation_id
-  src.baltor.graph.temporal.store.add_observation -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.graph.temporal.store.add_observation -> src.baltor.graph.temporal.store.TemporalGraphStore.add_edge
-  src.baltor.graph.temporal.store.set_state -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.graph.temporal.store.add_edge -> src.baltor.graph.temporal.contracts.edge_id
-  src.baltor.graph.temporal.store.get_node -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.graph.temporal.store.get_node -> src.baltor.contextops.cost_tracking.CostLadderMetrics.to_dict
-  src.baltor.graph.temporal.store.get_node -> src.baltor.graph.temporal.store.TenantScopeError
-  src.baltor.graph.temporal.store._visible -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.graph.temporal.store.nodes -> src.baltor.contextops.cost_tracking.CostLadderMetrics.to_dict
-  src.baltor.graph.temporal.store.nodes -> src.baltor.graph.temporal.store.TemporalGraphStore._visible
-  src.baltor.graph.temporal.store.edges -> src.baltor.graph.temporal.store.TemporalGraphStore._visible
-  src.baltor.graph.temporal.store.by_fact_key -> src.baltor.graph.temporal.store.TemporalGraphStore._visible
-  src.baltor.graph.temporal.store.by_source_handle -> src.baltor.contextops.cost_tracking.CostLadderMetrics.to_dict
-  src.baltor.graph.temporal.store.by_source_handle -> src.baltor.graph.temporal.store.TemporalGraphStore._visible
-  src.baltor.graph.temporal.store.contradictions -> src.baltor.graph.temporal.store.TemporalGraphStore.edges
-  src.baltor.graph.temporal.store.held_out -> src.baltor.contextops.cost_tracking.CostLadderMetrics.to_dict
-  src.baltor.graph.temporal.store.held_out -> src.baltor.graph.temporal.store.TemporalGraphStore._visible
-  src.baltor.graph.temporal.store.current_nodes -> src.baltor.contextops.cost_tracking.CostLadderMetrics.to_dict
-  src.baltor.graph.temporal.store.current_nodes -> src.baltor.graph.temporal.store.TemporalGraphStore._visible
-  src.baltor.graph.temporal.store.snapshot -> src.baltor.graph.temporal.store.TemporalGraphStore.nodes
-  src.baltor.graph.temporal.store.snapshot -> src.baltor.graph.temporal.store.TemporalGraphStore.edges
-  src.baltor.memory.builder_memory.redact -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.memory.builder_memory._capture -> src.baltor.memory.builder_memory.redact
-  src.baltor.memory.builder_memory._capture -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.write
-  src.baltor.memory.builder_memory.capture_builder_state -> src.baltor.memory.builder_memory._capture
-  src.baltor.memory.builder_memory.capture_proof_result -> src.baltor.memory.builder_memory._capture
-  src.baltor.memory.builder_memory.capture_flywheel_tick -> src.baltor.memory.builder_memory._capture
-  src.baltor.memory.builder_memory.capture_supervisor_decision -> src.baltor.memory.builder_memory._capture
-  src.baltor.memory.builder_memory.capture_failure_trace -> src.baltor.memory.builder_memory._capture
-  src.baltor.memory.builder_memory.capture_next_target -> src.baltor.memory.builder_memory._capture
-  src.baltor.memory.builder_memory.recall_builder_context -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.search
-  src.baltor.memory.builder_memory.recall_builder_context -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.memory.builder_memory.build_session_context_bundle -> src.baltor.memory.builder_memory.recall_builder_context
-  src.baltor.memory.builder_memory.default_provider -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider
-  src.baltor.memory.memory_worker.process_memory_task -> src.baltor.memory.builder_memory.redact
-  src.baltor.memory.memory_worker.process_memory_task -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.write
-  src.baltor.memory.memory_worker.process_memory_task -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.memory.memory_worker.process_memory_task -> src.baltor.memory.builder_memory.capture_builder_state
-  src.baltor.memory.memory_worker.process_memory_task -> src.baltor.memory.memory_worker._trace
-  src.baltor.memory.memory_worker.process_memory_task -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.search
-  src.baltor.memory.memory_worker.process_memory_task -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.profile
-  src.baltor.memory.memory_worker.process_memory_task -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.status
-  src.baltor.memory.memory_worker.run_memory_worker_durable -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger
-  src.baltor.memory.memory_worker.run_memory_worker_durable -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.register_worker
-  src.baltor.memory.memory_worker.run_memory_worker_durable -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.set_worker_status
-  src.baltor.memory.memory_worker.run_memory_worker_durable -> src.baltor.workers.supervisor_store.SupervisorStore.close
-  src.baltor.memory.memory_worker.run_memory_worker_durable -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider
-  src.baltor.memory.memory_worker.run_memory_worker_durable -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.claim_task
-  src.baltor.memory.memory_worker.run_memory_worker_durable -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.start_task
-  src.baltor.memory.memory_worker.run_memory_worker_durable -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.memory.memory_worker.run_memory_worker_durable -> src.baltor.memory.memory_worker.process_memory_task
-  src.baltor.memory.memory_worker.run_memory_worker_durable -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.nack_task
-  src.baltor.memory.memory_worker.run_memory_worker_durable -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.ack_task
-  src.baltor.native.ftm_adapter.schema_for -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.native.ftm_adapter._topics -> src.baltor.native.ftm_adapter._as_list
-  src.baltor.native.ftm_adapter._topics -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.native.ftm_adapter._topics -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.native.ftm_adapter.to_entity_proxy -> src.baltor.native.ftm_adapter.schema_for
-  src.baltor.native.ftm_adapter.to_entity_proxy -> src.baltor.native.ftm_adapter._topics
-  src.baltor.native.ftm_adapter.to_entity_proxy -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.native.ftm_adapter.to_entity_proxy -> src.baltor.native.ftm_adapter._as_list
-  src.baltor.native.ftm_adapter.to_entity_proxy -> src.baltor.native.ftm_adapter._sha1
-  src.baltor.native.ftm_adapter.to_entity_proxy -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.native.ftm_adapter.to_ftm -> src.baltor.native.ftm_adapter.to_entity_proxy
-  src.baltor.native.native_export_service.__init__ -> src.baltor.native.native_format_preserver.NativeFormatPreserver
-  src.baltor.native.native_export_service.__init__ -> src.baltor.native.native_projection_builder.NativeProjectionBuilder
-  src.baltor.native.native_export_service.__init__ -> src.baltor.native.sidecar_writer.SidecarWriter
-  src.baltor.native.native_export_service.export -> src.baltor.native.native_format_preserver.NativeFormatPreserver.preserve
-  src.baltor.native.native_export_service.export -> src.baltor.distillation.lineage.LineageBundle.build
-  src.baltor.native.native_export_service.export -> src.baltor.native.native_export_service.NativeExportReceipt
-  src.baltor.native.native_export_service.export -> src.baltor.contextops.cost_tracking.CostLadderMetrics.to_dict
-  src.baltor.native.native_export_service.export -> src.baltor.native.native_export_service._hid
-  src.baltor.native.native_export_service.export -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.native.native_export_service.export -> src.baltor.native.native_projection_builder.NativeProjection.output_text
-  src.baltor.native.native_format_preserver._flatten_pointers -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.native.native_format_preserver.detect_format -> src.teleon.evolution.meta_learner.DistillationMetaLearner.count
-  src.baltor.native.native_format_preserver.detect_format -> src.teleon.training.skills_db.DistillationDataset.split
-  src.baltor.native.native_format_preserver.detect_format -> src.baltor.determinism.trace_store.TraceStore.all
-  src.baltor.native.native_format_preserver.preserve -> src.baltor.native.native_format_preserver.NativeFormatPreserver.detect_format
-  src.baltor.native.native_format_preserver.preserve -> src.baltor.native.native_format_preserver._as_bytes
-  src.baltor.native.native_format_preserver.preserve -> src.baltor.native.native_format_preserver._sha256
-  src.baltor.native.native_format_preserver.preserve -> src.baltor.native.native_format_preserver.NativeFormatPreserver._markdown_contract
-  src.baltor.native.native_format_preserver.preserve -> src.baltor.native.native_format_preserver.NativeFormatPreserver._json_contract
-  src.baltor.native.native_format_preserver.preserve -> src.baltor.native.native_format_preserver.NativeFormatPreserver._csv_contract
-  src.baltor.native.native_format_preserver._json_contract -> src.baltor.native.native_format_preserver._flatten_pointers
-  src.baltor.native.native_format_preserver._json_contract -> src.baltor.native.native_format_preserver.NativeShapeContract
-  src.baltor.native.native_format_preserver._json_contract -> src.baltor.native.native_format_preserver._sha256
-  src.baltor.native.native_format_preserver._csv_contract -> src.baltor.native.native_format_preserver._detect_newline
-  src.baltor.native.native_format_preserver._csv_contract -> src.baltor.native.native_format_preserver.NativeShapeContract
-  src.baltor.native.native_format_preserver._csv_contract -> src.teleon.evolution.meta_learner.DistillationMetaLearner.count
-  src.baltor.native.native_format_preserver._csv_contract -> src.baltor.native.native_format_preserver._sha256
-  src.baltor.native.native_format_preserver._markdown_contract -> src.baltor.native.native_format_preserver.NativeShapeContract
-  src.baltor.native.native_format_preserver._markdown_contract -> src.baltor.native.native_format_preserver._detect_newline
-  src.baltor.native.native_projection_builder._pointer_get -> src.teleon.training.skills_db.DistillationDataset.split
-  src.baltor.native.native_projection_builder._pointer_set -> src.teleon.training.skills_db.DistillationDataset.split
-  src.baltor.native.native_projection_builder.to_dict -> src.baltor.contextops.cost_tracking.CostLadderMetrics.to_dict
-  src.baltor.native.native_projection_builder.build -> src.baltor.native.native_projection_builder.NativeProjectionBuilder._markdown
-  src.baltor.native.native_projection_builder.build -> src.baltor.native.native_projection_builder.NativeProjectionBuilder._json
-  src.baltor.native.native_projection_builder.build -> src.baltor.native.native_projection_builder.NativeProjectionBuilder._csv
-  src.baltor.native.native_projection_builder.build -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.native.native_projection_builder._json -> src.baltor.native.native_projection_builder.NativeDiff
-  src.baltor.native.native_projection_builder._json -> src.baltor.native.native_export_service._hid
-  src.baltor.native.native_projection_builder._json -> src.baltor.native.native_projection_builder.NativeProjectionBuilder._proj
-  src.baltor.native.native_projection_builder._json -> src.baltor.native.native_projection_builder._pointer_get
-  src.baltor.native.native_projection_builder._json -> src.baltor.native.native_projection_builder._pointer_set
-  src.baltor.native.native_projection_builder._json -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.native.native_projection_builder._json -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.native.native_projection_builder._csv -> src.baltor.native.native_projection_builder.NativeDiff
-  src.baltor.native.native_projection_builder._csv -> src.baltor.native.native_export_service._hid
-  src.baltor.native.native_projection_builder._csv -> src.baltor.native.native_projection_builder.NativeProjectionBuilder._proj
-  src.baltor.native.native_projection_builder._csv -> src.teleon.training.skills_db.DistillationDataset.split
-  src.baltor.native.native_projection_builder._csv -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.native.native_projection_builder._csv -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.native.native_projection_builder._markdown -> src.baltor.native.native_projection_builder.NativeDiff
-  src.baltor.native.native_projection_builder._markdown -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.native.native_projection_builder._markdown -> src.baltor.native.native_projection_builder.NativeProjectionBuilder._proj
-  src.baltor.native.native_projection_builder._markdown -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.native.native_projection_builder._proj -> src.baltor.native.native_projection_builder.NativeProjection
-  src.baltor.native.native_projection_builder._proj -> src.baltor.native.native_export_service._hid
-  src.baltor.native.native_projection_builder._proj -> src.baltor.native.native_format_preserver._sha256
-  src.baltor.native.okf_adapter._parse_scalar -> src.teleon.training.skills_db.DistillationDataset.split
-  src.baltor.native.okf_adapter._split_frontmatter -> src.baltor.workers.batch_windows.partition
-  src.baltor.native.okf_adapter.okf_import_file -> src.baltor.native.okf_adapter._split_frontmatter
-  src.baltor.native.okf_adapter.okf_import_file -> src.baltor.native.okf_adapter.GovernedConcept
-  src.baltor.native.okf_adapter.okf_import_file -> src.baltor.native.okf_adapter._parse_scalar
-  src.baltor.native.okf_adapter.okf_import_file -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.native.okf_adapter.okf_import -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.native.okf_adapter.okf_import -> src.baltor.native.okf_adapter.okf_import_file
-  src.baltor.native.okf_adapter._frontmatter -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.native.okf_adapter._frontmatter -> src.baltor.native.okf_adapter._fmt_scalar
-  src.baltor.native.okf_adapter.okf_export_file -> src.baltor.native.okf_adapter._frontmatter
-  src.baltor.native.okf_adapter._build_index -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.native.okf_adapter._build_index -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.native.okf_adapter._build_log -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.native.okf_adapter._build_log -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.native.okf_adapter.okf_export -> src.baltor.native.okf_adapter.okf_export_file
-  src.baltor.native.okf_adapter.okf_export -> src.baltor.native.okf_adapter._build_index
-  src.baltor.native.okf_adapter.okf_export -> src.baltor.native.okf_adapter._build_log
-  src.baltor.native.okf_adapter.round_trip -> src.baltor.native.okf_adapter.okf_import
-  src.baltor.native.okf_adapter.round_trip -> src.baltor.native.okf_adapter.okf_export
-  src.baltor.native.okf_adapter.content_hash -> src.baltor.native.native_format_preserver._sha256
-  src.baltor.native.okf_adapter.content_hash -> src.baltor.native.okf_adapter.GovernedConcept.as_dict
-  src.baltor.native.sidecar_writer._handles -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.native.sidecar_writer.build -> src.baltor.native.sidecar_writer.SidecarOverlay
-  src.baltor.native.sidecar_writer.build -> src.baltor.native.native_export_service._hid
-  src.baltor.native.sidecar_writer.build -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.native.sidecar_writer.field_fact -> src.baltor.distillation.retention_report._handles
-  src.baltor.native.sidecar_writer.field_fact -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.native.sidecar_writer.held_out -> src.baltor.distillation.retention_report._handles
-  src.baltor.native.sidecar_writer.held_out -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.native.skill_md_adapter._parse_scalar -> src.teleon.training.skills_db.DistillationDataset.split
-  src.baltor.native.skill_md_adapter._split_frontmatter -> src.baltor.workers.batch_windows.partition
-  src.baltor.native.skill_md_adapter.skill_md_import -> src.baltor.native.okf_adapter._split_frontmatter
-  src.baltor.native.skill_md_adapter.skill_md_import -> src.baltor.native.skill_md_adapter.GovernedSkill
-  src.baltor.native.skill_md_adapter.skill_md_import -> src.baltor.native.okf_adapter._parse_scalar
-  src.baltor.native.skill_md_adapter.skill_md_import -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.native.skill_md_adapter._frontmatter -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.native.skill_md_adapter._frontmatter -> src.baltor.native.okf_adapter._fmt_scalar
-  src.baltor.native.skill_md_adapter.skill_md_export -> src.baltor.native.okf_adapter._frontmatter
-  src.baltor.native.skill_md_adapter.round_trip -> src.baltor.native.skill_md_adapter.skill_md_import
-  src.baltor.native.skill_md_adapter.round_trip -> src.baltor.native.skill_md_adapter.skill_md_export
-  src.baltor.native.skill_md_adapter.content_hash -> src.baltor.native.native_format_preserver._sha256
-  src.baltor.native.skill_md_adapter.content_hash -> src.baltor.native.okf_adapter.GovernedConcept.as_dict
-  src.baltor.observability.projections.lineage.emit -> src.baltor.observability.projections.standards.governance_facet
-  src.baltor.observability.projections.lineage.emit -> src.baltor.observability.projections.lineage.LineageFacet
-  src.baltor.observability.projections.lineage.emit -> src.baltor.observability.projections.standards.to_prov_json
-  src.baltor.observability.projections.lineage.emit -> src.baltor.observability.projections.standards.to_openlineage_run_event
-  src.baltor.observability.projections.lineage.emit -> src.baltor.observability.projections.standards.canonical_hash
-  src.baltor.observability.projections.standards._openlineage_facet -> src.baltor.observability.projections.standards.governance_facet
-  src.baltor.observability.projections.standards.to_prov_json -> src.baltor.observability.projections.standards.governance_facet
-  src.baltor.observability.projections.standards.to_prov_json -> src.baltor.native.native_export_service._hid
-  src.baltor.observability.projections.standards.to_prov_json -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.observability.projections.standards.to_openlineage_run_event -> src.baltor.observability.projections.standards._openlineage_facet
-  src.baltor.observability.projections.standards.to_openlineage_run_event -> src.baltor.observability.projections.standards._det_uuid
-  src.baltor.observability.projections.standards.to_web_annotation -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.observability.projections.standards.to_web_annotation -> src.baltor.observability.projections.standards.governance_facet
-  src.baltor.observability.projections.standards.json_patch_ops -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.observability.projections.standards.json_patch_ops -> src.baltor.observability.projections.standards._esc
-  src.baltor.observability.projections.standards.to_json_patch -> src.baltor.observability.projections.standards.json_patch_ops
-  src.baltor.observability.projections.standards.to_json_patch -> src.baltor.observability.projections.standards.governance_facet
-  src.baltor.observability.tracing.provider._node -> src.baltor.observability.projections.standards.governance_facet
-  src.baltor.observability.tracing.provider._node -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.observability.tracing.provider.record -> src.baltor.observability.tracing.provider.SpanTree
-  src.baltor.observability.tracing.provider.record -> src.baltor.observability.tracing.provider._node
-  src.baltor.observability.tracing.provider.record -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.ports.memory_provider.__init__ -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.__init__
-  src.baltor.ports.research_agent_provider.__init__ -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.__init__
-  src.baltor.runtime.registry.capability_registry.flagged_tool_names -> src.teleon.training.skills_db.DistillationDataset.split
-  src.baltor.runtime.registry.capability_registry.load_catalog -> src.baltor.runtime.registry.capability_registry._read
-  src.baltor.runtime.registry.capability_registry.load_health_policy -> src.baltor.runtime.registry.capability_registry._read
-  src.baltor.runtime.registry.capability_registry.load_matrix -> src.baltor.runtime.registry.capability_registry._read
-  src.baltor.runtime.registry.capability_registry._main -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry
-  src.baltor.runtime.registry.capability_registry._main -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry.validate_catalog
-  src.baltor.runtime.registry.capability_registry._main -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry.slot_names
-  src.baltor.runtime.registry.capability_registry.__init__ -> src.baltor.runtime.registry.capability_registry.load_catalog
-  src.baltor.runtime.registry.capability_registry.__init__ -> src.baltor.runtime.registry.capability_registry.load_health_policy
-  src.baltor.runtime.registry.capability_registry.__init__ -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.runtime.registry.capability_registry.adapters_for -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.runtime.registry.capability_registry.adapters_for -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry.get_by_capability_slot
-  src.baltor.runtime.registry.capability_registry.get_adapter -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.runtime.registry.capability_registry.wired_adapter -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry.get_by_capability_slot
-  src.baltor.runtime.registry.capability_registry.wired_adapter -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.runtime.registry.capability_registry.wired_adapter -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry.get_adapter
-  src.baltor.runtime.registry.capability_registry.replacement_candidates -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry.get_by_capability_slot
-  src.baltor.runtime.registry.capability_registry.replacement_candidates -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.runtime.registry.capability_registry.preference_order -> src.baltor.runtime.registry.preference_graph.resolve_order
-  src.baltor.runtime.registry.capability_registry.preference_order -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry.adapters_for
-  src.baltor.runtime.registry.capability_registry.preference_graph -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry.adapters_for
-  src.baltor.runtime.registry.capability_registry.import_modules -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.runtime.registry.capability_registry.approved_adapter_paths -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.runtime.registry.capability_registry.require_cataloged_repo -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.runtime.registry.capability_registry.require_cataloged_repo -> src.baltor.runtime.registry.capability_registry.UncatalogedRepoError
-  src.baltor.runtime.registry.capability_registry.require_cataloged_repo -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry.import_modules
-  src.baltor.runtime.registry.capability_registry.validate_catalog -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.runtime.registry.capability_registry.validate_catalog -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.runtime.registry.capability_registry.covers_backend_tool_keys -> src.baltor.runtime.registry.capability_registry.backend_tool_keys
-  src.baltor.runtime.registry.capability_registry.adopted_flagged_tools -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.runtime.registry.capability_registry.adopted_flagged_tools -> src.baltor.runtime.registry.capability_registry.flagged_tool_names
-  src.baltor.runtime.registry.capability_registry.adopted_flagged_tools -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.search
-  src.baltor.runtime.registry.capability_registry.adopted_flagged_tools -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.runtime.registry.capability_registry.adopted_flagged_tools -> src.teleon.training.skills_db.DistillationDataset.split
-  src.baltor.runtime.registry.preference_graph._status_label_to_code -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.runtime.registry.preference_graph.status_code -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.runtime.registry.preference_graph.status_code -> src.baltor.runtime.registry.preference_graph._status_label_to_code
-  src.baltor.runtime.registry.preference_graph.adapter_priority -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.runtime.registry.preference_graph._runnable -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.runtime.registry.preference_graph.resolve_order -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.runtime.registry.preference_graph.resolve_order -> src.baltor.runtime.registry.preference_graph._runnable
-  src.baltor.runtime.registry.preference_graph.resolve_order -> src.baltor.runtime.registry.preference_graph.adapter_priority
-  src.baltor.runtime.registry.preference_graph.preference_graph -> src.baltor.runtime.registry.preference_graph.resolve_order
-  src.baltor.runtime.registry.preference_graph.preference_graph -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.runtime.registry.preference_graph.preference_graph -> src.baltor.determinism.trace_store.TraceStore.all
-  src.baltor.runtime.registry.preference_graph.preference_graph -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.runtime.registry.preference_graph.preference_graph -> src.baltor.runtime.registry.preference_graph.adapter_priority
-  src.baltor.runtime.registry.preference_graph.preference_graph -> src.baltor.runtime.registry.preference_graph.status_code
-  src.baltor.runtime.registry.preference_graph._key -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.runtime.registry.preference_graph._key -> src.baltor.runtime.registry.preference_graph.adapter_priority
-  src.baltor.sales.claim_guard.classify_claim_language -> src.baltor.sales.claim_guard.load_public_claim_policy
-  src.baltor.sales.claim_guard.safe_rewrite -> src.baltor.sales.claim_guard.load_public_claim_policy
-  src.baltor.sales.claim_guard.authorization_ok -> src.baltor.sales.claim_guard.load_engagement_policy
-  src.baltor.sales.claim_guard.authorization_ok -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.sales.claim_guard.authorization_ok -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.sales.claim_guard.gate_evidence_pack -> src.baltor.sales.claim_guard.load_public_claim_policy
-  src.baltor.sales.claim_guard.gate_evidence_pack -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.sales.claim_guard.gate_evidence_pack -> src.baltor.sales.claim_guard.classify_claim_language
-  src.baltor.sales.claim_guard.gate_evidence_pack -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.sales.claim_guard.gate_outreach -> src.baltor.sales.claim_guard.load_engagement_policy
-  src.baltor.sales.claim_guard.gate_outreach -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.sales.claim_guard.gate_outreach -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.sales.claim_guard.gate_outreach -> src.baltor.sales.claim_guard.classify_claim_language
-  src.baltor.sales.claim_guard.product_message_ok -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.sales.claim_guard.product_message_ok -> src.baltor.sales.claim_guard.load_public_claim_policy
-  src.baltor.sales.diagnostics.chatbot_guardrail_audit._classify_turn -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.sales.diagnostics.chatbot_guardrail_audit._classify_turn -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.sales.diagnostics.chatbot_guardrail_audit._classify_turn -> src.baltor.sales.claim_guard.safe_rewrite
-  src.baltor.sales.diagnostics.chatbot_guardrail_audit._classify_turn -> src.baltor.sales.claim_guard.classify_claim_language
-  src.baltor.sales.diagnostics.chatbot_guardrail_audit.audit_transcript -> src.baltor.sales.diagnostics.runner.start_diagnostic
-  src.baltor.sales.diagnostics.chatbot_guardrail_audit.audit_transcript -> src.baltor.sales.diagnostics.chatbot_guardrail_audit.load_risk_rules
-  src.baltor.sales.diagnostics.chatbot_guardrail_audit.audit_transcript -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.sales.diagnostics.chatbot_guardrail_audit.audit_transcript -> src.baltor.sales.diagnostics.chatbot_guardrail_audit._fetch_live_transcript
-  src.baltor.sales.diagnostics.chatbot_guardrail_audit.audit_transcript -> src.baltor.sales.diagnostics.chatbot_guardrail_audit._classify_turn
-  src.baltor.sales.diagnostics.runner.resolve_mode -> src.baltor.sales.diagnostics.runner.load_modes
-  src.baltor.sales.diagnostics.runner.resolve_mode -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.sales.diagnostics.runner.start_diagnostic -> src.baltor.sales.diagnostics.runner.resolve_mode
-  src.baltor.sales.diagnostics.runner.start_diagnostic -> src.baltor.sales.claim_guard.authorization_ok
-  src.baltor.sales.diagnostics.runner.start_diagnostic -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.sales.diagnostics.runner.start_diagnostic -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.sales.diagnostics.runner.start_diagnostic -> src.baltor.sales.diagnostics.runner._rid
-  src.baltor.teleon_client.client._self_test -> src.baltor.teleon_client.client.capabilities
-  src.baltor.teleon_client.client._self_test -> src.baltor.teleon_client.client.TeleonClient
-  src.baltor.teleon_client.client._self_test -> src.baltor.teleon_client.client.TeleonClient.call
-  src.baltor.teleon_client.client._self_test -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.teleon_client.client._self_test -> src.teleon.purpose_tasks.runtime_binding.offline_default_backend
-  src.baltor.teleon_client.client._self_test -> src.baltor.contextops.triage.ContextTriageClassifier.classify
-  src.baltor.teleon_client.client.call -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.teleon_client.client.call -> src.baltor.teleon_client.client.capabilities
-  src.baltor.teleon_client.client.classify_change -> src.baltor.teleon_client.client.TeleonClient.call
-  src.baltor.teleon_client.client.change_gate -> src.baltor.teleon_client.client.TeleonClient.call
-  src.baltor.teleon_client.client.autonomy_forbidden -> src.baltor.teleon_client.client.TeleonClient.call
-  src.baltor.teleon_client.client.default_backend -> src.baltor.teleon_client.client.TeleonClient.call
-  src.baltor.teleon_client.client.bind_runtime -> src.baltor.teleon_client.client.TeleonClient.call
-  src.baltor.teleon_client.client.ck -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.workers.batch_windows.window_decision -> src.teleon.workers.fleet_ledger._age_s
-  src.baltor.workers.batch_windows.window_decision -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.batch_windows.partition -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.workers.batch_windows.partition -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.batch_windows.plan_dispatch -> src.baltor.workers.batch_windows.window_decision
-  src.baltor.workers.batch_windows.plan_dispatch -> src.baltor.workers.batch_windows.partition
-  src.baltor.workers.batch_windows.plan_dispatch -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.workers.batch_windows.plan_dispatch -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.control_plane.control_plane_tick -> src.baltor.workers.control_plane._caps
-  src.baltor.workers.control_plane.control_plane_tick -> src.baltor.workers.control_plane._load
-  src.baltor.workers.control_plane.control_plane_tick -> src.baltor.workers.supervisor_ledger.SupervisorLedger.acquire_lease
-  src.baltor.workers.control_plane.control_plane_tick -> src.baltor.workers.supervisor_ledger.SupervisorLedger.record_tick
-  src.baltor.workers.control_plane.control_plane_tick -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.control_plane.control_plane_tick -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.queued_tasks
-  src.baltor.workers.control_plane.control_plane_tick -> src.baltor.workers.spawn_decision.decide
-  src.baltor.workers.control_plane.control_plane_tick -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.workers.control_plane.control_plane_tick -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.live_workers
-  src.baltor.workers.control_plane.control_plane_tick -> src.baltor.workers.supervisor_ledger.SupervisorLedger.record_decision
-  src.baltor.workers.cooldown_drain.run_cooldown -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.set_worker_status
-  src.baltor.workers.cooldown_drain.run_cooldown -> src.teleon.workers.fleet_ledger._plus_s
-  src.baltor.workers.cooldown_drain.run_cooldown -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.claim_task
-  src.baltor.workers.cooldown_drain.run_cooldown -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.start_task
-  src.baltor.workers.cooldown_drain.run_cooldown -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.ack_task
-  src.baltor.workers.failure_taxonomy.failure_types -> src.baltor.workers.failure_taxonomy._taxonomy
-  src.baltor.workers.failure_taxonomy.failure_policy -> src.baltor.workers.failure_taxonomy._taxonomy
-  src.baltor.workers.failure_taxonomy.failure_policy -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.failure_taxonomy.is_retryable -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.failure_taxonomy.is_retryable -> src.baltor.workers.failure_taxonomy.failure_policy
-  src.baltor.workers.failure_taxonomy.opens_circuit -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.failure_taxonomy.opens_circuit -> src.baltor.workers.failure_taxonomy.failure_policy
-  src.baltor.workers.fleet_supervisor._free_capacity -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.live_workers
-  src.baltor.workers.fleet_supervisor.decide_for_capability -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.fleet_supervisor.decide_for_capability -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.reclaim_expired_leases
-  src.baltor.workers.fleet_supervisor.decide_for_capability -> src.baltor.workers.fleet_supervisor._free_capacity
-  src.baltor.workers.fleet_supervisor.decide_for_capability -> src.baltor.workers.control_plane._caps
-  src.baltor.workers.fleet_supervisor.decide_for_capability -> src.baltor.workers.control_plane._load
-  src.baltor.workers.fleet_supervisor.decide_for_capability -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.workers.fleet_supervisor.decide_for_capability -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.queued_tasks
-  src.baltor.workers.fleet_supervisor.decide_for_capability -> src.baltor.workers.fleet_supervisor._decision
-  src.baltor.workers.fleet_supervisor.decide_for_capability -> src.teleon.workers.fleet_ledger._age_s
-  src.baltor.workers.fleet_supervisor.decide_for_capability -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.live_workers
-  src.baltor.workers.fleet_supervisor.tick -> src.baltor.workers.control_plane._caps
-  src.baltor.workers.fleet_supervisor.tick -> src.baltor.workers.fleet_supervisor.decide_for_capability
-  src.baltor.workers.fleet_supervisor.tick -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.queued_tasks
-  src.baltor.workers.local_spawn_manager.spawn -> src.baltor.workers.local_spawn_manager.build_command
-  src.baltor.workers.policy_recommender.recommend -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.policy_recommender.recommend -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.workers.policy_recommender.recommend -> src.baltor.workers.policy_recommender._rec
-  src.baltor.workers.provider_circuit_breaker.state -> src.teleon.workers.fleet_ledger._age_s
-  src.baltor.workers.provider_circuit_breaker.allow -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker.state
-  src.baltor.workers.provider_circuit_breaker.record_success -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.workers.provider_circuit_breaker.record_success -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker.state
-  src.baltor.workers.provider_circuit_breaker.record_failure -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.workers.provider_circuit_breaker.record_failure -> src.baltor.workers.failure_taxonomy.opens_circuit
-  src.baltor.workers.provider_circuit_breaker.record_failure -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker.state
-  src.baltor.workers.provider_circuit_breaker.record_failure -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker._trip
-  src.baltor.workers.provider_circuit_breaker.record_failure -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker._rate
-  src.baltor.workers.provider_circuit_breaker.force_open -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker._trip
-  src.baltor.workers.provider_fallback.__init__ -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker
-  src.baltor.workers.provider_fallback.select -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker.allow
-  src.baltor.workers.provider_fallback.record_success -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker.record_success
-  src.baltor.workers.provider_fallback.record_failure -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker.record_failure
-  src.baltor.workers.provider_fallback.force_open -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker.force_open
-  src.baltor.workers.provider_fallback.states -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker.state
-  src.baltor.workers.spawn_decision._free_workers -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.spawn_decision.decide -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.spawn_decision.decide -> src.baltor.workers.spawn_decision._free_workers
-  src.baltor.workers.spawn_decision.decide -> src.baltor.workers.fleet_supervisor._decision
-  src.baltor.workers.spawn_decision.decide -> src.teleon.workers.fleet_ledger._age_s
-  src.baltor.workers.spawn_decision.decide -> src.teleon.workers.fleet_ledger._epoch
-  src.baltor.workers.supervisor_ledger.acquire_lease -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.supervisor_ledger.acquire_lease -> src.teleon.workers.fleet_ledger._epoch
-  src.baltor.workers.supervisor_ledger.acquire_lease -> src.teleon.workers.fleet_ledger._plus_s
-  src.baltor.workers.supervisor_ledger.renew_lease -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.supervisor_ledger.renew_lease -> src.teleon.workers.fleet_ledger._plus_s
-  src.baltor.workers.supervisor_ledger.renew_lease -> src.teleon.workers.fleet_ledger._epoch
-  src.baltor.workers.supervisor_ledger.lease_holder -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.supervisor_ledger.lease_holder -> src.teleon.workers.fleet_ledger._epoch
-  src.baltor.workers.supervisor_ledger.is_leader -> src.baltor.workers.supervisor_ledger.SupervisorLedger.lease_holder
-  src.baltor.workers.supervisor_ledger.claim_shard -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.supervisor_ledger.claim_shard -> src.baltor.workers.supervisor_ledger.SupervisorLedgerError
-  src.baltor.workers.supervisor_ledger.claim_shard -> src.teleon.workers.fleet_ledger._plus_s
-  src.baltor.workers.supervisor_ledger.claim_shard -> src.teleon.workers.fleet_ledger._epoch
-  src.baltor.workers.supervisor_ledger.heartbeat_shard -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.supervisor_ledger.heartbeat_shard -> src.teleon.workers.fleet_ledger._plus_s
-  src.baltor.workers.supervisor_ledger.heartbeat_shard -> src.teleon.workers.fleet_ledger._epoch
-  src.baltor.workers.supervisor_ledger.shards_owned_by -> src.teleon.workers.fleet_ledger._epoch
-  src.baltor.workers.supervisor_ledger.reclaim_stale_shards -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.workers.supervisor_ledger.reclaim_stale_shards -> src.teleon.workers.fleet_ledger._epoch
-  src.baltor.workers.supervisor_ledger.record_decision -> src.baltor.native.native_export_service._hid
-  src.baltor.workers.supervisor_ledger.record_tick -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.workers.supervisor_metrics.lag_metrics -> src.baltor.workers.supervisor_ledger.SupervisorLedger.ticks
-  src.baltor.workers.supervisor_metrics.lag_metrics -> src.teleon.workers.fleet_ledger._age_s
-  src.baltor.workers.supervisor_metrics.should_scale_supervisor -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.workers.supervisor_projection._execution -> src.baltor.workers.supervisor_ledger.SupervisorLedger.decisions
-  src.baltor.workers.supervisor_projection._execution -> src.teleon.training.skills_db.DistillationDataset.split
-  src.baltor.workers.supervisor_projection._execution -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.workers.supervisor_projection._execution -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.supervisor_projection._durable_tasks -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger
-  src.baltor.workers.supervisor_projection._durable_tasks -> src.baltor.workers.supervisor_store.SupervisorStore.close
-  src.baltor.workers.supervisor_projection._durable_tasks -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.queued_tasks
-  src.baltor.workers.supervisor_projection._durable_tasks -> src.baltor.workers.supervisor_projection._count
-  src.baltor.workers.supervisor_projection._durable_tasks -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.tasks_by_status
-  src.baltor.workers.supervisor_projection._count -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.supervisor_projection.fleet_projection -> src.baltor.workers.supervisor_store.SupervisorStore
-  src.baltor.workers.supervisor_projection.fleet_projection -> src.baltor.workers.supervisor_projection._now
-  src.baltor.workers.supervisor_projection.fleet_projection -> src.baltor.workers.supervisor_store.SupervisorStore.close
-  src.baltor.workers.supervisor_projection.fleet_projection -> src.baltor.workers.supervisor_store.SupervisorStore.get_leader
-  src.baltor.workers.supervisor_projection.fleet_projection -> src.baltor.workers.supervisor_store.SupervisorStore.instances
-  src.baltor.workers.supervisor_projection.fleet_projection -> src.baltor.workers.supervisor_store.SupervisorStore.shards
-  src.baltor.workers.supervisor_projection.fleet_projection -> src.baltor.workers.supervisor_store.SupervisorStore.failovers
-  src.baltor.workers.supervisor_projection.fleet_projection -> src.baltor.workers.supervisor_projection._durable_tasks
-  src.baltor.workers.supervisor_projection.fleet_projection -> src.baltor.workers.supervisor_projection._execution
-  src.baltor.workers.supervisor_projection.fleet_projection -> src.baltor.workers.supervisor_ledger.SupervisorLedger.ticks
-  src.baltor.workers.supervisor_projection.fleet_projection -> src.baltor.workers.supervisor_ledger.SupervisorLedger.decisions
-  src.baltor.workers.supervisor_projection.fleet_projection -> src.baltor.workers.supervisor_store.SupervisorStore.spawn_decisions
-  src.baltor.workers.supervisor_projection.fleet_projection -> src.baltor.workers.supervisor_store.SupervisorStore.spawn_requests
-  src.baltor.workers.supervisor_projection.fleet_projection -> src.baltor.workers.supervisor_store.SupervisorStore.capacity_snapshots
-  src.baltor.workers.supervisor_projection.fleet_section -> src.baltor.workers.supervisor_projection.fleet_projection
-  src.baltor.workers.supervisor_projection.supervisor_detail -> src.baltor.workers.supervisor_store.SupervisorStore
-  src.baltor.workers.supervisor_projection.supervisor_detail -> src.baltor.workers.supervisor_store.SupervisorStore.close
-  src.baltor.workers.supervisor_projection.supervisor_detail -> src.baltor.workers.supervisor_store.SupervisorStore.instance
-  src.baltor.workers.supervisor_projection.supervisor_detail -> src.baltor.workers.supervisor_store.SupervisorStore.list_owned_shards
-  src.baltor.workers.supervisor_projection.supervisor_detail -> src.baltor.workers.supervisor_ledger.SupervisorLedger.ticks
-  src.baltor.workers.supervisor_store.__init__ -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.__init__ -> src.baltor.workers.supervisor_store.SupervisorStore._init_schema
-  src.baltor.workers.supervisor_store._init_schema -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.register_instance -> src.baltor.workers.supervisor_projection._now
-  src.baltor.workers.supervisor_store.register_instance -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.register_instance -> src.baltor.workers.supervisor_store.SupervisorStore.instance
-  src.baltor.workers.supervisor_store.heartbeat_instance -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.heartbeat_instance -> src.baltor.workers.supervisor_projection._now
-  src.baltor.workers.supervisor_store.set_instance_status -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.set_instance_status -> src.baltor.workers.supervisor_projection._now
-  src.baltor.workers.supervisor_store.instance -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.instances -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.try_claim_leader -> src.baltor.workers.supervisor_projection._now
-  src.baltor.workers.supervisor_store.try_claim_leader -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.try_claim_leader -> src.baltor.native.native_export_service._hid
-  src.baltor.workers.supervisor_store.renew_leader -> src.baltor.workers.supervisor_projection._now
-  src.baltor.workers.supervisor_store.renew_leader -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.release_leader -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.get_leader -> src.baltor.workers.supervisor_projection._now
-  src.baltor.workers.supervisor_store.get_leader -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.failovers -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.ensure_default_shards -> src.baltor.workers.supervisor_projection._now
-  src.baltor.workers.supervisor_store.ensure_default_shards -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.claim_shard -> src.baltor.workers.supervisor_projection._now
-  src.baltor.workers.supervisor_store.claim_shard -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.claim_available_shards -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.claim_available_shards -> src.baltor.workers.supervisor_ledger.SupervisorLedger.claim_shard
-  src.baltor.workers.supervisor_store.claim_available_shards -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.workers.supervisor_store.renew_shards -> src.baltor.workers.supervisor_projection._now
-  src.baltor.workers.supervisor_store.renew_shards -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.expire_stale_shards -> src.baltor.workers.supervisor_projection._now
-  src.baltor.workers.supervisor_store.expire_stale_shards -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.list_owned_shards -> src.baltor.workers.supervisor_projection._now
-  src.baltor.workers.supervisor_store.list_owned_shards -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.shards -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.record_decision -> src.baltor.workers.supervisor_projection._now
-  src.baltor.workers.supervisor_store.record_decision -> src.baltor.native.native_export_service._hid
-  src.baltor.workers.supervisor_store.record_decision -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.decision_exists -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.record_spawn_decision -> src.baltor.workers.supervisor_projection._now
-  src.baltor.workers.supervisor_store.record_spawn_decision -> src.baltor.workers.supervisor_ledger.SupervisorLedger.record_decision
-  src.baltor.workers.supervisor_store.record_spawn_decision -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.record_spawn_decision -> src.baltor.native.native_export_service._hid
-  src.baltor.workers.supervisor_store.decisions -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.spawn_decisions -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.record_spawn_request -> src.baltor.workers.supervisor_projection._now
-  src.baltor.workers.supervisor_store.record_spawn_request -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.record_spawn_request -> src.baltor.native.native_export_service._hid
-  src.baltor.workers.supervisor_store.spawn_requests -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.record_tick -> src.baltor.workers.supervisor_projection._now
-  src.baltor.workers.supervisor_store.record_tick -> src.baltor.native.native_export_service._hid
-  src.baltor.workers.supervisor_store.record_tick -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.record_tick -> src.baltor.workers.supervisor_ledger.SupervisorLedger.ticks
-  src.baltor.workers.supervisor_store.ticks -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.record_capacity_snapshot -> src.baltor.workers.supervisor_projection._now
-  src.baltor.workers.supervisor_store.record_capacity_snapshot -> src.baltor.native.native_export_service._hid
-  src.baltor.workers.supervisor_store.record_capacity_snapshot -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.record_capacity_snapshot -> src.baltor.workers.supervisor_store.SupervisorStore.capacity_snapshots
-  src.baltor.workers.supervisor_store.capacity_snapshots -> src.baltor.distillation.rollback.execute
-  src.baltor.workers.supervisor_store.close -> src.baltor.workers.supervisor_store.SupervisorStore.close
-  src.baltor.workers.supervisor_watch._spawn_decisions -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.queued_tasks
-  src.baltor.workers.supervisor_watch._spawn_decisions -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.live_workers
-  src.baltor.workers.supervisor_watch._spawn_decisions -> src.baltor.workers.spawn_decision.decide
-  src.baltor.workers.supervisor_watch._spawn_decisions -> src.baltor.workers.supervisor_store.SupervisorStore.record_spawn_decision
-  src.baltor.workers.supervisor_watch._spawn_decisions -> src.baltor.workers.local_spawn_manager.worker_id_for
-  src.baltor.workers.supervisor_watch._spawn_decisions -> src.baltor.workers.local_spawn_manager.spawn
-  src.baltor.workers.supervisor_watch._spawn_decisions -> src.baltor.workers.supervisor_store.SupervisorStore.record_spawn_request
-  src.baltor.workers.supervisor_watch._spawn_decisions -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.supervisor_watch._spawn_decisions -> src.baltor.workers.supervisor_store.SupervisorStore.spawn_requests
-  src.baltor.workers.supervisor_watch.step -> src.baltor.workers.supervisor_projection._now
-  src.baltor.workers.supervisor_watch.step -> src.baltor.workers.supervisor_ledger.SupervisorLedger.heartbeat_instance
-  src.baltor.workers.supervisor_watch.step -> src.baltor.workers.supervisor_store.SupervisorStore.try_claim_leader
-  src.baltor.workers.supervisor_watch.step -> src.baltor.workers.supervisor_store.SupervisorStore.ensure_default_shards
-  src.baltor.workers.supervisor_watch.step -> src.baltor.workers.supervisor_store.SupervisorStore.expire_stale_shards
-  src.baltor.workers.supervisor_watch.step -> src.baltor.workers.supervisor_store.SupervisorStore.list_owned_shards
-  src.baltor.workers.supervisor_watch.step -> src.baltor.workers.supervisor_watch._spawn_decisions
-  src.baltor.workers.supervisor_watch.step -> src.baltor.workers.supervisor_store.SupervisorStore.record_capacity_snapshot
-  src.baltor.workers.supervisor_watch.step -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.supervisor_watch.step -> src.baltor.workers.supervisor_ledger.SupervisorLedger.record_tick
-  src.baltor.workers.supervisor_watch.step -> src.baltor.workers.supervisor_watch._iso
-  src.baltor.workers.supervisor_watch.step -> src.baltor.workers.supervisor_store.SupervisorStore.renew_shards
-  src.baltor.workers.supervisor_watch.step -> src.baltor.workers.supervisor_store.SupervisorStore.claim_available_shards
-  src.baltor.workers.supervisor_watch.step -> src.baltor.workers.supervisor_ledger.SupervisorLedger.record_decision
-  src.baltor.workers.supervisor_watch.step -> src.teleon.workers.execution_dispatch.dispatch_owned_shards
-  src.baltor.workers.telemetry._ms -> src.teleon.workers.fleet_ledger._age_s
-  src.baltor.workers.telemetry.task_metrics -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.telemetry.task_metrics -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.workers.telemetry.task_metrics -> src.baltor.workers.telemetry._ms
-  src.baltor.workers.telemetry.task_metrics -> src.teleon.workers.fleet_ledger.FleetLedger._provider_for
-  src.baltor.workers.telemetry.lifecycle_metrics -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.workers.telemetry.lifecycle_metrics -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.telemetry.queue_metrics -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.queued_tasks
-  src.baltor.workers.telemetry.queue_metrics -> src.teleon.workers.fleet_ledger._age_s
-  src.baltor.workers.telemetry.queue_metrics -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.tasks_by_status
-  src.baltor.workers.telemetry.queue_metrics -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker._rate
-  src.baltor.workers.telemetry.queue_metrics -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.telemetry.provider_metrics -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker._rate
-  src.baltor.workers.telemetry.provider_metrics -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.workers.telemetry.provider_metrics -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.telemetry.cost_metrics -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.tasks_by_status
-  src.baltor.workers.telemetry.failure_metrics -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.telemetry.failure_metrics -> src.baltor.workers.failure_taxonomy.failure_policy
-  src.baltor.workers.telemetry.failure_metrics -> src.baltor.determinism.trace_store.TraceStore.append
-  src.baltor.workers.telemetry.capacity_snapshot -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.live_workers
-  src.baltor.workers.telemetry.capacity_snapshot -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.queued_tasks
-  src.baltor.workers.telemetry.capacity_snapshot -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.tasks_by_status
-  src.baltor.workers.telemetry.capacity_snapshot -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.telemetry.all_metrics -> src.baltor.workers.telemetry.task_metrics
-  src.baltor.workers.telemetry.all_metrics -> src.baltor.workers.telemetry.lifecycle_metrics
-  src.baltor.workers.telemetry.all_metrics -> src.baltor.workers.telemetry.queue_metrics
-  src.baltor.workers.telemetry.all_metrics -> src.baltor.workers.telemetry.provider_metrics
-  src.baltor.workers.telemetry.all_metrics -> src.baltor.workers.telemetry.cost_metrics
-  src.baltor.workers.telemetry.all_metrics -> src.baltor.workers.telemetry.failure_metrics
-  src.baltor.workers.telemetry.all_metrics -> src.baltor.workers.telemetry.capacity_snapshot
-  src.baltor.workers.worker_router.route -> src.baltor.workers.worker_router.load_buckets
-  src.baltor.workers.worker_router.route -> src.baltor.workers.worker_router.WorkerPolicyError
-  src.baltor.workers.worker_router.route -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.worker_router.validate_output -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.worker_router.can_publish_truth -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.baltor.workers.worker_router.check_command -> src.baltor.determinism.fallback_router.route
-  src.baltor.workers.worker_router.check_command -> src.baltor.workers.worker_router.can_publish_truth
-  src.baltor.workers.worker_router.check_command -> src.baltor.workers.worker_router.validate_output
-  src.baltor.workers.worker_router._match_len -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.openharnesshub.auth_kit.realm.make_realm -> src.openharnesshub.auth_kit.realm.Realm
-  src.openharnesshub.auth_kit.realm.make_realm -> src.openharnesshub.auth_kit.realm.CredentialProviderPort
-  src.openharnesshub.auth_kit.realm.verify -> src.baltor.adapters.object_store.local_object_store.make_ref
-  src.openharnesshub.auth_kit.realm.register -> src.openharnesshub.auth_kit.realm._handle
-  src.openharnesshub.auth_kit.realm.register -> src.baltor.adapters.object_store.local_object_store.make_ref
-  src.openharnesshub.auth_kit.realm.onboard -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.openharnesshub.auth_kit.realm.onboard -> src.baltor.determinism.trace_store.TraceStore.append
-  src.openharnesshub.auth_kit.realm.onboard -> src.baltor.determinism.trace_store.TraceStore.all
-  src.openharnesshub.auth_kit.realm.login -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.openharnesshub.auth_kit.realm.login -> src.openharnesshub.auth_kit.realm._handle
-  src.openharnesshub.auth_kit.realm.login -> src.openharnesshub.auth_kit.realm.CredentialProviderPort.verify
-  src.openharnesshub.auth_kit.realm.validate_session -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.openharnesshub.auth_kit.realm.restore -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.agent_gateway.capabilities._handle_utility_hash -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.agent_gateway.capabilities._handle_utility_hash -> src.teleon.experiments.ids.sha256_hex
-  src.teleon.agent_gateway.capabilities._handle_cfpb_deadline_verify -> src.teleon.environments.baltor_cfpb_context_governance.load_fixture
-  src.teleon.agent_gateway.capabilities._handle_cfpb_deadline_verify -> src.teleon.agent_gateway.capabilities._bounded
-  src.teleon.agent_gateway.capabilities._handle_json_schema_validate -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.agent_gateway.capabilities._handle_json_schema_validate -> src.teleon.agent_gateway.capabilities._bounded
-  src.teleon.agent_gateway.capabilities._handle_tariff_hs_classify_reference -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.agent_gateway.capabilities._handle_tariff_hs_classify_reference -> src.teleon.agent_gateway.capabilities._bounded
-  src.teleon.agent_gateway.capabilities._resolve_governed_fixture -> src.teleon.environments.baltor_cfpb_context_governance.load_fixture
-  src.teleon.agent_gateway.capabilities._handle_context_governed_answer_evidence -> src.teleon.agent_gateway.capabilities._resolve_governed_fixture
-  src.teleon.agent_gateway.capabilities._handle_context_governed_answer_evidence -> src.teleon.agent_gateway.capabilities._bounded
-  src.teleon.agent_gateway.capabilities._handle_context_governed_answer_evidence -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.agent_gateway.capabilities.get_card -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.agent_gateway.capabilities.get_handler -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.agent_gateway.gateway.list_capabilities -> src.teleon.agent_gateway.capabilities.get_card
-  src.teleon.agent_gateway.gateway.list_capabilities -> src.teleon.agent_gateway.capabilities.capability_ids
-  src.teleon.agent_gateway.gateway.describe -> src.teleon.agent_gateway.capabilities.get_card
-  src.teleon.agent_gateway.gateway.quote -> src.teleon.agent_gateway.capabilities.get_card
-  src.teleon.agent_gateway.gateway.get_receipt -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.agent_gateway.gateway.request_boundary_expansion -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.agent_gateway.gateway.request_boundary_expansion -> src.teleon.experiments.ids.canonical_id
-  src.teleon.agent_gateway.gateway.request_boundary_expansion -> src.baltor.native.okf_adapter.GovernedConcept.as_dict
-  src.teleon.agent_gateway.gateway.request_boundary_expansion -> src.teleon.experiments.ids.sha256_hex
-  src.teleon.agent_gateway.gateway.request_boundary_expansion -> src.teleon.agent_gateway.gateway.AgentBoundaryExpansionRequest
-  src.teleon.agent_gateway.gateway._unavailable -> src.baltor.native.okf_adapter.GovernedConcept.as_dict
-  src.teleon.agent_gateway.gateway._unavailable -> src.teleon.agent_gateway.gateway.AgentCapabilityRunResult
-  src.teleon.agent_gateway.gateway._unavailable -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.agent_gateway.gateway.run -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.agent_gateway.gateway.run -> src.teleon.agent_gateway.capabilities.get_card
-  src.teleon.agent_gateway.gateway.run -> src.teleon.agent_gateway.capabilities.get_handler
-  src.teleon.agent_gateway.gateway.run -> src.teleon.runtime.capability_binding.bind_capability_task
-  src.teleon.agent_gateway.gateway.run -> src.teleon.experiments.ids.sha256_hex
-  src.teleon.agent_gateway.gateway.run -> src.teleon.experiments.ids.canonical_id
-  src.teleon.agent_gateway.gateway.run -> src.baltor.native.okf_adapter.GovernedConcept.as_dict
-  src.teleon.agent_gateway.gateway.run -> src.teleon.agent_gateway.gateway.AgentConsumer
-  src.teleon.agent_gateway.gateway.run -> src.teleon.agent_gateway.gateway.AgentCapabilityGateway._unavailable
-  src.teleon.agent_gateway.gateway.run -> src.teleon.agent_gateway.gateway.AgentCapabilityReceipt
-  src.teleon.agent_gateway.gateway.run -> src.teleon.agent_gateway.gateway.AgentCapabilityRunResult
-  src.teleon.agent_gateway.mcp_projection._scrub -> src.teleon.agent_gateway.mcp_projection._is_forbidden_key
-  src.teleon.agent_gateway.mcp_projection._project -> src.teleon.agent_gateway.mcp_projection._scrub
-  src.teleon.agent_gateway.mcp_projection.__init__ -> src.teleon.agent_gateway.gateway.AgentCapabilityGateway
-  src.teleon.agent_gateway.mcp_projection.call_tool -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.agent_gateway.mcp_projection._tool_list_capabilities -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.agent_gateway.mcp_projection._tool_list_capabilities -> src.teleon.agent_gateway.gateway.AgentCapabilityGateway.list_capabilities
-  src.teleon.agent_gateway.mcp_projection._tool_list_capabilities -> src.baltor.determinism.trace_store.TraceStore.append
-  src.teleon.agent_gateway.mcp_projection._tool_list_capabilities -> src.teleon.agent_gateway.mcp_projection._project
-  src.teleon.agent_gateway.mcp_projection._tool_describe_capability -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.agent_gateway.mcp_projection._tool_describe_capability -> src.baltor.contextops.research_stub.LocalResearchStub.describe
-  src.teleon.agent_gateway.mcp_projection._tool_describe_capability -> src.teleon.agent_gateway.mcp_projection._project
-  src.teleon.agent_gateway.mcp_projection._tool_run_capability -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.agent_gateway.mcp_projection._tool_run_capability -> src.teleon.agent_gateway.gateway.AgentConsumer
-  src.teleon.agent_gateway.mcp_projection._tool_run_capability -> src.teleon.agent_gateway.gateway.AgentCapabilityGateway.run
-  src.teleon.agent_gateway.mcp_projection._tool_run_capability -> src.teleon.agent_gateway.mcp_projection._project
-  src.teleon.agent_gateway.mcp_projection._tool_run_capability -> src.teleon.agent_gateway.gateway.AgentCapabilityGateway.quote
-  src.teleon.agent_gateway.mcp_projection._tool_get_receipt -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.agent_gateway.mcp_projection._tool_get_receipt -> src.teleon.agent_gateway.gateway.AgentCapabilityGateway.get_receipt
-  src.teleon.agent_gateway.mcp_projection._tool_get_receipt -> src.teleon.agent_gateway.mcp_projection._scrub
-  src.teleon.agent_gateway.mcp_projection._tool_request_boundary_expansion -> src.teleon.agent_gateway.gateway.AgentCapabilityGateway.request_boundary_expansion
-  src.teleon.agent_gateway.mcp_projection._tool_request_boundary_expansion -> src.teleon.agent_gateway.mcp_projection._scrub
-  src.teleon.agent_gateway.mcp_projection._tool_request_boundary_expansion -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.agents.agent_runtime_provider.runtime_card -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.agents.agent_runtime_provider.runtime_card -> src.baltor.runtime.registry.capability_registry.load_catalog
-  src.teleon.agents.agent_runtime_provider.get_runtime -> src.teleon.agents.agent_runtime_provider.runtime_card
-  src.teleon.agents.agent_runtime_provider.get_runtime -> src.teleon.agents.agent_runtime_provider.CandidateAgentRuntime
-  src.teleon.agents.agent_runtime_provider.get_runtime -> src.teleon.agents.agent_runtime_provider.LocalEmulatorAgentRuntime
-  src.teleon.agents.agent_runtime_provider.get_runtime -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.agents.agent_runtime_provider.dispatch_agent_request -> src.teleon.agents.agent_runtime_provider.get_runtime
-  src.teleon.agents.agent_runtime_provider.dispatch_agent_request -> src.teleon.runtime.execution_backend_selector.select_backend
-  src.teleon.agents.agent_runtime_provider.dispatch_agent_request -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.agents.agent_runtime_provider.dispatch_agent_request -> src.teleon.experiments.ids.canonical_id
-  src.teleon.agents.agent_runtime_provider.dispatch_agent_request -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.status
-  src.teleon.agents.agent_runtime_provider.dispatch_agent_request -> src.teleon.agents.agent_runtime_provider.AgentRuntimeProviderPort.run_agent
-  src.teleon.agents.agent_runtime_provider.dispatch_agent_request -> src.baltor.runtime.registry.capability_registry.load_catalog
-  src.teleon.agents.agent_runtime_provider.dispatch_agent_request -> src.teleon.agents.agent_runtime_provider._selector_task
-  src.teleon.agents.agent_runtime_provider.dispatch_agent_request -> src.teleon.agents.agent_runtime_provider.AgentRuntimeUnavailableResult
-  src.teleon.agents.agent_runtime_provider.__init__ -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.__init__
-  src.teleon.agents.agent_runtime_provider.run_agent -> src.teleon.experiments.ids.canonical_id
-  src.teleon.agents.agent_runtime_provider.run_agent -> src.teleon.agents.agent_runtime_provider.AgentRuntimeResult
-  src.teleon.agents.agent_runtime_provider.run_agent -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.agents.agent_runtime_provider.describe -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.agents.agent_runtime_provider.status -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.agents.agent_runtime_provider.run_agent -> src.teleon.agents.agent_runtime_provider.AgentRuntimeUnavailable
-  src.teleon.blackboard.local_sqlite_blackboard._content_hash -> src.teleon.experiments.ids.sha256_hex
-  src.teleon.blackboard.local_sqlite_blackboard.seed_demo_blackboard -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard
-  src.teleon.blackboard.local_sqlite_blackboard.seed_demo_blackboard -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard.create_blackboard
-  src.teleon.blackboard.local_sqlite_blackboard.seed_demo_blackboard -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard.append_entry
-  src.teleon.blackboard.local_sqlite_blackboard.__init__ -> src.baltor.workers.supervisor_store.SupervisorStore._init_schema
-  src.teleon.blackboard.local_sqlite_blackboard._init_schema -> src.teleon.storage.git_backend_port.GitBackendPort.commit
-  src.teleon.blackboard.local_sqlite_blackboard._next_seq -> src.baltor.distillation.rollback.execute
-  src.teleon.blackboard.local_sqlite_blackboard.create_blackboard -> src.teleon.experiments.ids.canonical_id
-  src.teleon.blackboard.local_sqlite_blackboard.create_blackboard -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard._next_seq
-  src.teleon.blackboard.local_sqlite_blackboard.create_blackboard -> src.baltor.distillation.rollback.execute
-  src.teleon.blackboard.local_sqlite_blackboard.create_blackboard -> src.teleon.storage.git_backend_port.GitBackendPort.commit
-  src.teleon.blackboard.local_sqlite_blackboard.create_blackboard -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard._blackboard_row
-  src.teleon.blackboard.local_sqlite_blackboard.create_blackboard -> src.teleon.ports.blackboard_provider.BlackboardWriteRejected
-  src.teleon.blackboard.local_sqlite_blackboard._blackboard_row -> src.teleon.ports.blackboard_provider.BlackboardWriteRejected
-  src.teleon.blackboard.local_sqlite_blackboard._blackboard_row -> src.baltor.distillation.rollback.execute
-  src.teleon.blackboard.local_sqlite_blackboard.append_entry -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard._blackboard_row
-  src.teleon.blackboard.local_sqlite_blackboard.append_entry -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.blackboard.local_sqlite_blackboard.append_entry -> src.baltor.adapters.source.folder_batch._content_hash
-  src.teleon.blackboard.local_sqlite_blackboard.append_entry -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard._record_receipt
-  src.teleon.blackboard.local_sqlite_blackboard.append_entry -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard._next_seq
-  src.teleon.blackboard.local_sqlite_blackboard.append_entry -> src.baltor.distillation.rollback.execute
-  src.teleon.blackboard.local_sqlite_blackboard.append_entry -> src.teleon.storage.git_backend_port.GitBackendPort.commit
-  src.teleon.blackboard.local_sqlite_blackboard.append_entry -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard._entry_row
-  src.teleon.blackboard.local_sqlite_blackboard.append_entry -> src.teleon.ports.blackboard_provider.BlackboardWriteRejected
-  src.teleon.blackboard.local_sqlite_blackboard.append_entry -> src.teleon.experiments.ids.canonical_id
-  src.teleon.blackboard.local_sqlite_blackboard._record_receipt -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.blackboard.local_sqlite_blackboard._record_receipt -> src.baltor.adapters.source.folder_batch._content_hash
-  src.teleon.blackboard.local_sqlite_blackboard._record_receipt -> src.teleon.experiments.ids.canonical_id
-  src.teleon.blackboard.local_sqlite_blackboard._record_receipt -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard._next_seq
-  src.teleon.blackboard.local_sqlite_blackboard._record_receipt -> src.baltor.distillation.rollback.execute
-  src.teleon.blackboard.local_sqlite_blackboard._entry_row -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard._row_to_entry
-  src.teleon.blackboard.local_sqlite_blackboard._entry_row -> src.baltor.distillation.rollback.execute
-  src.teleon.blackboard.local_sqlite_blackboard.query -> src.baltor.determinism.trace_store.TraceStore.append
-  src.teleon.blackboard.local_sqlite_blackboard.query -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard._row_to_entry
-  src.teleon.blackboard.local_sqlite_blackboard.query -> src.baltor.distillation.rollback.execute
-  src.teleon.blackboard.local_sqlite_blackboard.get_receipts -> src.baltor.distillation.rollback.execute
-  src.teleon.blackboard.local_sqlite_blackboard.close -> src.baltor.workers.supervisor_store.SupervisorStore.close
-  src.teleon.blackboard.token_economics._distill_entries -> src.teleon.experiments.ids.canonical_id
-  src.teleon.blackboard.token_economics._distill_entries -> src.baltor.determinism.trace_store.TraceStore.append
-  src.teleon.blackboard.token_economics._distill_entries -> src.teleon.training.skills_db.DistillationDataset.split
-  src.teleon.blackboard.token_economics._entry_chars -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.blackboard.token_economics.build_blackboard_from_docs -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard
-  src.teleon.blackboard.token_economics.build_blackboard_from_docs -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard.create_blackboard
-  src.teleon.blackboard.token_economics.build_blackboard_from_docs -> src.teleon.blackboard.token_economics._distill_entries
-  src.teleon.blackboard.token_economics.build_blackboard_from_docs -> src.baltor.determinism.trace_store.TraceStore.append
-  src.teleon.blackboard.token_economics.build_blackboard_from_docs -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard.append_entry
-  src.teleon.blackboard.token_economics.estimate_token_economics -> src.teleon.blackboard.token_economics.estimate_tokens
-  src.teleon.blackboard.token_economics.estimate_token_economics -> src.teleon.blackboard.token_economics.build_blackboard_from_docs
-  src.teleon.blackboard.token_economics.estimate_token_economics -> src.baltor.determinism.trace_store.TraceStore.query
-  src.teleon.blackboard.token_economics.estimate_token_economics -> src.teleon.blackboard.token_economics._crossover_n
-  src.teleon.blackboard.token_economics.estimate_token_economics -> src.baltor.workers.supervisor_store.SupervisorStore.close
-  src.teleon.blackboard.token_economics.estimate_token_economics -> src.teleon.blackboard.token_economics._entry_chars
-  src.teleon.compiler.__main__._compile_fixture -> src.teleon.compiler.compile.compile_capability
-  src.teleon.compiler.__main__._compile_fixture -> src.teleon.compiler.fixtures.fixture_promoted_capability
-  src.teleon.compiler.__main__._compile_fixture -> src.teleon.compiler.fixtures.fixture_task_spec
-  src.teleon.compiler.__main__._compile_fixture -> src.teleon.compiler.fixtures.fixture_resolved_preference
-  src.teleon.compiler.__main__._render_examples -> src.teleon.compiler.__main__._compile_fixture
-  src.teleon.compiler.__main__._render_examples -> src.teleon.compiler.__main__._example_path
-  src.teleon.compiler.__main__._compile_for_cli -> src.teleon.compiler.compile.compile_capability
-  src.teleon.compiler.__main__._compile_for_cli -> src.teleon.compiler.compile.validate_unit
-  src.teleon.compiler.__main__._compile_for_cli -> src.teleon.compiler.fixtures.load_live_capability
-  src.teleon.compiler.__main__._compile_for_cli -> src.teleon.compiler.fixtures.fixture_task_spec
-  src.teleon.compiler.__main__._compile_for_cli -> src.teleon.compiler.fixtures.fixture_promoted_capability
-  src.teleon.compiler.__main__._compile_for_cli -> src.teleon.compiler.fixtures.fixture_resolved_preference
-  src.teleon.compiler.__main__.cmd_compile -> src.teleon.compiler.__main__._compile_for_cli
-  src.teleon.compiler.__main__.cmd_compile -> src.baltor.observability.projections.lineage.LineageProvider.emit
-  src.teleon.compiler.__main__.cmd_compile -> src.teleon.training.skills_db.DistillationDataset.split
-  src.teleon.compiler.__main__._open_registry -> src.teleon.compiler.registry.open_registry
-  src.teleon.compiler.__main__.cmd_register -> src.teleon.compiler.__main__._open_registry
-  src.teleon.compiler.__main__.cmd_register -> src.teleon.compiler.__main__._compile_for_cli
-  src.teleon.compiler.__main__.cmd_register -> src.openharnesshub.auth_kit.realm.Realm.register
-  src.teleon.compiler.__main__.cmd_register -> src.baltor.workers.supervisor_store.SupervisorStore.close
-  src.teleon.compiler.__main__.cmd_register -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.__main__.cmd_list -> src.teleon.compiler.__main__._open_registry
-  src.teleon.compiler.__main__.cmd_list -> src.teleon.compiler.registry.CompiledUnitRegistry.list_active
-  src.teleon.compiler.__main__.cmd_list -> src.teleon.agent_gateway.capabilities.capability_ids
-  src.teleon.compiler.__main__.cmd_list -> src.baltor.workers.supervisor_store.SupervisorStore.close
-  src.teleon.compiler.__main__.cmd_list -> src.teleon.compiler.registry.CompiledUnitRegistry.history
-  src.teleon.compiler.__main__.cmd_list -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.__main__.cmd_rollback -> src.teleon.compiler.__main__._open_registry
-  src.teleon.compiler.__main__.cmd_rollback -> src.teleon.compiler.registry.CompiledUnitRegistry.latest_active_for
-  src.teleon.compiler.__main__.cmd_rollback -> src.baltor.workers.supervisor_store.SupervisorStore.close
-  src.teleon.compiler.__main__.cmd_rollback -> src.teleon.compiler.registry.CompiledUnitRegistry.rollback_target
-  src.teleon.compiler.__main__.cmd_check -> src.teleon.compiler.__main__._render_examples
-  src.teleon.compiler.__main__.cmd_check -> src.baltor.determinism.trace_store.TraceStore.append
-  src.teleon.compiler.__main__.cmd_write_examples -> src.teleon.compiler.__main__._render_examples
-  src.teleon.compiler.__main__._compile_version -> src.teleon.compiler.compile.compile_capability
-  src.teleon.compiler.__main__._compile_version -> src.teleon.compiler.fixtures.fixture_promoted_capability
-  src.teleon.compiler.__main__._compile_version -> src.teleon.compiler.fixtures.fixture_task_spec
-  src.teleon.compiler.__main__._compile_version -> src.teleon.compiler.fixtures.fixture_resolved_preference
-  src.teleon.compiler.__main__._registry_checks -> src.teleon.compiler.__main__._compile_version
-  src.teleon.compiler.__main__._registry_checks -> src.baltor.determinism.trace_store.TraceStore.append
-  src.teleon.compiler.__main__._registry_checks -> src.teleon.compiler.registry.open_registry
-  src.teleon.compiler.__main__._registry_checks -> src.openharnesshub.auth_kit.realm.Realm.register
-  src.teleon.compiler.__main__._registry_checks -> src.teleon.compiler.registry.CompiledUnitRegistry.history
-  src.teleon.compiler.__main__._registry_checks -> src.teleon.compiler.registry.CompiledUnitRegistry.rollback_to
-  src.teleon.compiler.__main__._registry_checks -> src.teleon.compiler.registry.CompiledUnitRegistry.mark_active
-  src.teleon.compiler.__main__._registry_checks -> src.teleon.compiler.registry.CompiledUnitRegistry.supersede
-  src.teleon.compiler.__main__._registry_checks -> src.teleon.compiler.registry.CompiledUnitRegistry.list_active
-  src.teleon.compiler.__main__._registry_checks -> src.teleon.compiler.registry.CompiledUnitRegistry.all_records
-  src.teleon.compiler.__main__._registry_checks -> src.baltor.workers.supervisor_store.SupervisorStore.close
-  src.teleon.compiler.__main__._registry_checks -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.exists
-  src.teleon.compiler.__main__._registry_checks -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.write
-  src.teleon.compiler.__main__._registry_checks -> src.teleon.compiler.registry.CompiledUnitRegistry.rollback_target
-  src.teleon.compiler.__main__._registry_checks -> src.teleon.compiler.registry.CompiledUnitRegistry.latest_active_for
-  src.teleon.compiler.__main__._registry_checks -> src.teleon.compiler.registry.CompiledUnitRegistry.latest_for
-  src.teleon.compiler.__main__._registry_checks -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.__main__.self_test -> src.teleon.compiler.__main__._compile_fixture
-  src.teleon.compiler.__main__.self_test -> src.baltor.determinism.trace_store.TraceStore.append
-  src.teleon.compiler.__main__.self_test -> src.baltor.observability.projections.lineage.LineageProvider.emit
-  src.teleon.compiler.__main__.self_test -> src.teleon.compiler.compile.compile_capability
-  src.teleon.compiler.__main__.self_test -> src.teleon.compiler.__main__._render_examples
-  src.teleon.compiler.__main__.self_test -> src.teleon.compiler.__main__._example_path
-  src.teleon.compiler.__main__.self_test -> src.teleon.compiler.__main__._registry_checks
-  src.teleon.compiler.__main__.self_test -> src.teleon.compiler.fixtures.fixture_promoted_capability
-  src.teleon.compiler.__main__.self_test -> src.teleon.compiler.fixtures.fixture_task_spec
-  src.teleon.compiler.__main__.self_test -> src.teleon.compiler.compile.validate_unit
-  src.teleon.compiler.__main__.self_test -> src.teleon.compiler.fixtures.fixture_candidate_capability
-  src.teleon.compiler.__main__.self_test -> src.baltor.determinism.trace_store.TraceStore.all
-  src.teleon.compiler.__main__.self_test -> src.teleon.compiler.fixtures.fixture_resolved_preference
-  src.teleon.compiler.__main__.self_test -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.__main__.self_test -> src.teleon.compiler.compile.memory_to_mb
-  src.teleon.compiler.__main__.main -> src.teleon.compiler.__main__.self_test
-  src.teleon.compiler.__main__.main -> src.teleon.compiler.__main__.cmd_write_examples
-  src.teleon.compiler.__main__.main -> src.teleon.compiler.__main__.cmd_check
-  src.teleon.compiler.__main__.main -> src.teleon.compiler.__main__.cmd_register
-  src.teleon.compiler.__main__.main -> src.teleon.compiler.__main__.cmd_list
-  src.teleon.compiler.__main__.main -> src.teleon.compiler.__main__.cmd_rollback
-  src.teleon.compiler.__main__.main -> src.teleon.compiler.__main__.cmd_compile
-  src.teleon.compiler.compile.memory_to_mb -> src.teleon.compiler.compile.CompilerError
-  src.teleon.compiler.compile._resource_class_record -> src.teleon.compiler.compile.CompilerError
-  src.teleon.compiler.compile._resource_class_record -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.compile._resolve_resources -> src.teleon.compiler.compile._resource_class_record
-  src.teleon.compiler.compile._resolve_resources -> src.teleon.compiler.compile.memory_to_mb
-  src.teleon.compiler.compile._resolve_timeout -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.compile._resolve_timeout -> src.teleon.compiler.compile.CompilerError
-  src.teleon.compiler.compile._resolve_max_tokens -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.compile._resolve_budgets -> src.teleon.compiler.compile._resolve_timeout
-  src.teleon.compiler.compile._resolve_budgets -> src.teleon.compiler.compile._resolve_max_tokens
-  src.teleon.compiler.compile._resolve_budgets -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.compile._resolve_budgets -> src.teleon.compiler.compile.CompilerError
-  src.teleon.compiler.compile._resolve_container -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.compile._resolve_container -> src.teleon.compiler.compile.CompilerError
-  src.teleon.compiler.compile._resolve_container -> src.teleon.compiler.compile._default_env_refs
-  src.teleon.compiler.compile._default_env_refs -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.compile._gate_evidence -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.compile.compile_capability -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._resource_class_record
-  src.teleon.compiler.compile.compile_capability -> src.teleon.purpose_tasks.runtime_binding.bind_allowed
-  src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._resolve_resources
-  src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._resolve_budgets
-  src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._resolve_container
-  src.teleon.compiler.compile.compile_capability -> src.baltor.native.native_format_preserver._sha256
-  src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._stable_id
-  src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile.CompilerError
-  src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile.NotPromotedError
-  src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._load_json
-  src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._canonical
-  src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._gate_evidence
-  src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._otel_attrs
-  src.teleon.compiler.compile.validate_unit -> src.teleon.compiler.compile._unit_schema
-  src.teleon.compiler.compile.__init__ -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.__init__
-  src.teleon.compiler.emit._require_exec_target -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.emit.emit_fly_machine -> src.teleon.compiler.emit._require_exec_target
-  src.teleon.compiler.emit.emit_fly_machine -> src.teleon.compiler.emit._cpu_to_fly_cpus
-  src.teleon.compiler.emit.build_k8s_job -> src.teleon.compiler.emit._require_exec_target
-  src.teleon.compiler.emit.build_k8s_job -> src.teleon.compiler.emit._k8s_name
-  src.teleon.compiler.emit.build_k8s_job -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.emit.emit_k8s_job -> src.teleon.compiler.emit.build_k8s_job
-  src.teleon.compiler.emit.emit_local_process -> src.teleon.compiler.emit._require_exec_target
-  src.teleon.compiler.emit.emit -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.fixtures._latest_promoting_run -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.fixtures.load_live_capability -> src.teleon.compiler.fixtures._latest_promoting_run
-  src.teleon.compiler.fixtures.load_live_capability -> src.teleon.compiler.fixtures._state_dir
-  src.teleon.compiler.fixtures.load_live_capability -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.registry._get_path -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.registry._compiled_at -> src.teleon.compiler.registry._get_path
-  src.teleon.compiler.registry._order_key -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.registry._order_key -> src.teleon.compiler.registry._compiled_at
-  src.teleon.compiler.registry.open_registry -> src.teleon.compiler.registry.CompiledUnitRegistry
-  src.teleon.compiler.registry.register_units -> src.teleon.compiler.registry.open_registry
-  src.teleon.compiler.registry.register_units -> src.baltor.workers.supervisor_store.SupervisorStore.close
-  src.teleon.compiler.registry.register_units -> src.openharnesshub.auth_kit.realm.Realm.register
-  src.teleon.compiler.registry.__init__ -> src.teleon.compiler.registry.CompiledUnitRegistry.rebuild
-  src.teleon.compiler.registry.rebuild -> src.teleon.compiler.registry.CompiledUnitRegistry._validate_log
-  src.teleon.compiler.registry._validate_log -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.registry._validate_log -> src.teleon.compiler.registry.RegistryIntegrityError
-  src.teleon.compiler.registry._unit_records -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.registry._active_ids -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.registry.register -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.registry.register -> src.teleon.compiler.registry.CompiledUnitRegistry._append
-  src.teleon.compiler.registry.register -> src.teleon.compiler.registry.RegistryError
-  src.teleon.compiler.registry.register -> src.teleon.compiler.registry.CompiledUnitRegistry.latest_active_for
-  src.teleon.compiler.registry.register -> src.teleon.compiler.registry._compiled_at
-  src.teleon.compiler.registry.supersede -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.registry.supersede -> src.teleon.compiler.registry.CompiledUnitRegistry._append
-  src.teleon.compiler.registry.supersede -> src.teleon.compiler.registry.RegistryError
-  src.teleon.compiler.registry.supersede -> src.teleon.compiler.registry.CompiledUnitRegistry._active_ids
-  src.teleon.compiler.registry.supersede -> src.teleon.compiler.registry._compiled_at
-  src.teleon.compiler.registry.mark_active -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.registry.mark_active -> src.teleon.compiler.registry.CompiledUnitRegistry.latest_active_for
-  src.teleon.compiler.registry.mark_active -> src.teleon.compiler.registry.CompiledUnitRegistry._append
-  src.teleon.compiler.registry.mark_active -> src.teleon.compiler.registry.RegistryError
-  src.teleon.compiler.registry.mark_active -> src.teleon.compiler.registry.CompiledUnitRegistry._active_ids
-  src.teleon.compiler.registry.mark_active -> src.teleon.compiler.registry._compiled_at
-  src.teleon.compiler.registry.rollback_to -> src.teleon.compiler.registry.CompiledUnitRegistry.rollback_target
-  src.teleon.compiler.registry.rollback_to -> src.teleon.compiler.registry.CompiledUnitRegistry.mark_active
-  src.teleon.compiler.registry.rollback_to -> src.teleon.compiler.registry.RegistryError
-  src.teleon.compiler.registry._append -> src.baltor.determinism.trace_store.TraceStore.append
-  src.teleon.compiler.registry._append -> src.teleon.compiler.registry.CompiledUnitRegistry.rebuild
-  src.teleon.compiler.registry.get -> src.teleon.compiler.registry.CompiledUnitRegistry._active_ids
-  src.teleon.compiler.registry.get -> src.teleon.compiler.registry.CompiledUnitRegistry._unit_records
-  src.teleon.compiler.registry.history -> src.teleon.compiler.registry.CompiledUnitRegistry._active_ids
-  src.teleon.compiler.registry.history -> src.teleon.compiler.registry.CompiledUnitRegistry._unit_records
-  src.teleon.compiler.registry.history -> src.baltor.determinism.trace_store.TraceStore.append
-  src.teleon.compiler.registry.history -> src.teleon.compiler.registry._order_key
-  src.teleon.compiler.registry.latest_for -> src.teleon.compiler.registry.CompiledUnitRegistry.history
-  src.teleon.compiler.registry.latest_active_for -> src.teleon.compiler.registry.CompiledUnitRegistry._active_ids
-  src.teleon.compiler.registry.latest_active_for -> src.teleon.compiler.registry.CompiledUnitRegistry._unit_records
-  src.teleon.compiler.registry.rollback_target -> src.teleon.compiler.registry.CompiledUnitRegistry.latest_active_for
-  src.teleon.compiler.registry.rollback_target -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.registry.rollback_target -> src.teleon.compiler.registry.RegistryIntegrityError
-  src.teleon.compiler.registry.list_active -> src.teleon.compiler.registry.CompiledUnitRegistry._active_ids
-  src.teleon.compiler.registry.list_active -> src.teleon.compiler.registry.CompiledUnitRegistry._unit_records
-  src.teleon.compiler.registry.list_active -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.compiler.registry.list_active -> src.teleon.compiler.registry._order_key
-  src.teleon.compiler.registry.capability_ids -> src.teleon.compiler.registry.CompiledUnitRegistry._unit_records
-  src.teleon.compiler.registry.close -> src.baltor.workers.supervisor_store.SupervisorStore.close
-  src.teleon.dag.example_pipelines._acquire -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.dag.example_pipelines.build_extraction_dag -> src.teleon.dag.pipeline_dag.DAG
-  src.teleon.dag.example_pipelines.build_extraction_dag -> src.teleon.dag.pipeline_dag.Node
-  src.teleon.dag.example_pipelines.build_extraction_dag -> src.teleon.dag.example_pipelines._chunk
-  src.teleon.dag.example_pipelines.build_extraction_dag -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.dag.example_pipelines._attribute -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.dag.example_pipelines.build_enrichment_dag -> src.teleon.dag.pipeline_dag.DAG
-  src.teleon.dag.example_pipelines.build_enrichment_dag -> src.teleon.dag.pipeline_dag.Node
-  src.teleon.dag.example_pipelines.build_enrichment_dag -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.dag.pipeline_dag.linear -> src.teleon.dag.pipeline_dag.DAG
-  src.teleon.dag.pipeline_dag.choose -> src.baltor.determinism.trace_store.TraceStore.append
-  src.teleon.dag.pipeline_dag.choose -> src.teleon.dag.pipeline_dag.DAGError
-  src.teleon.dag.pipeline_dag.run -> src.teleon.dag.pipeline_dag.DAG.choose
-  src.teleon.dag.pipeline_dag.run -> src.teleon.dag.pipeline_dag.DAG.by_id
-  src.teleon.dag.pipeline_dag.run -> src.teleon.dag.pipeline_dag.DAGError
-  src.teleon.dag.pipeline_dag.run -> src.baltor.determinism.trace_store.TraceStore.append
-  src.teleon.dag.pipeline_dag.run -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.dag.real_steps._env -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.exists
-  src.teleon.dag.real_steps._env -> src.teleon.training.skills_db.DistillationDataset.split
-  src.teleon.dag.real_steps.network_allowed -> src.teleon.dag.real_steps._env
-  src.teleon.dag.real_steps.llm_available -> src.teleon.dag.real_steps.network_allowed
-  src.teleon.dag.real_steps.llm_available -> src.teleon.dag.real_steps._env
-  src.teleon.dag.real_steps._get_json -> src.teleon.storage.git_backend_port.GitBackendPort.read
-  src.teleon.dag.real_steps.real_llm -> src.teleon.dag.real_steps.llm_available
-  src.teleon.dag.real_steps.real_llm -> src.teleon.dag.real_steps.RealStepUnavailable
-  src.teleon.dag.real_steps.real_llm -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.dag.real_steps.real_wikipedia -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.dag.real_steps.real_wikipedia -> src.teleon.dag.real_steps.network_allowed
-  src.teleon.dag.real_steps.real_wikipedia -> src.teleon.dag.real_steps.RealStepUnavailable
-  src.teleon.dag.real_steps.real_wikipedia -> src.teleon.dag.real_steps._get_json
-  src.teleon.dag.real_steps.real_wikipedia -> src.baltor.determinism.trace_store.TraceStore.append
-  src.teleon.dag.real_steps.real_wikipedia -> src.teleon.agent_gateway.gateway.AgentCapabilityGateway.quote
-  src.teleon.dag.real_steps.real_federal_register -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.dag.real_steps.real_federal_register -> src.teleon.dag.real_steps.network_allowed
-  src.teleon.dag.real_steps.real_federal_register -> src.teleon.dag.real_steps.RealStepUnavailable
-  src.teleon.dag.real_steps.real_federal_register -> src.teleon.dag.real_steps._get_json
-  src.teleon.dag.real_steps.real_search -> src.teleon.dag.real_steps.real_wikipedia
-  src.teleon.dag.real_steps.real_search -> src.teleon.dag.real_steps.real_federal_register
-  src.teleon.dag.real_steps.real_text -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.exists
-  src.teleon.dag.real_steps.real_text -> src.teleon.dag.real_steps.RealStepUnavailable
-  src.teleon.digestion.digester.parse_skill_md -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.digestion.digester.parse_skill_md -> src.teleon.training.skills_db.DistillationDataset.split
-  src.teleon.digestion.digester.is_unsafe -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.digestion.digester.is_unsafe -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.search
-  src.teleon.digestion.digester.digest_skill -> src.teleon.digestion.digester.is_unsafe
-  src.teleon.digestion.digester.digest_skill -> src.teleon.digestion.digester.extract_determinism
-  src.teleon.digestion.digester.digest_skill -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.digestion.model_compatibility._required_spec_codes -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.digestion.model_compatibility.run_model_compatibility -> src.teleon.inference.oips.load_graph
-  src.teleon.digestion.model_compatibility.run_model_compatibility -> src.teleon.digestion.model_compatibility._required_spec_codes
-  src.teleon.digestion.model_compatibility.run_model_compatibility -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.digestion.model_compatibility.run_model_compatibility -> src.baltor.determinism.trace_store.TraceStore.append
-  src.teleon.digestion.open_hub_outputs.emit_open_hub_candidates -> src.teleon.templates.instantiator.compose_object_shell
-  src.teleon.digestion.open_hub_outputs.emit_open_hub_candidates -> src.teleon.digestion.digester.build_runtime_candidate
-  src.teleon.digestion.open_hub_outputs.emit_open_hub_candidates -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.digestion.open_hub_outputs.emit_open_hub_candidates -> src.teleon.digestion.open_hub_outputs._skill_mixins
-  src.teleon.egress.client._body_hash -> src.teleon.experiments.ids.sha256_hex
-  src.teleon.egress.client.__init__ -> src.teleon.egress.ledger.LocalEgressLedger
-  src.teleon.egress.client.__init__ -> src.teleon.egress.traffic_graph.LocalEgressGraph
-  src.teleon.egress.client.__init__ -> src.teleon.egress.transports.UrllibHttpTransport
-  src.teleon.egress.client.request_bytes -> src.teleon.egress.policy.make_egress_intent
-  src.teleon.egress.client.request_bytes -> src.teleon.egress.ledger.LocalEgressLedger.append_intent
-  src.teleon.egress.client.request_bytes -> src.teleon.egress.policy.decide_route
-  src.teleon.egress.client.request_bytes -> src.teleon.egress.ledger.LocalEgressLedger.append_decision
-  src.teleon.egress.client.request_bytes -> src.baltor.workers.supervisor_projection._now
-  src.teleon.egress.client.request_bytes -> src.teleon.egress.client._header_summary
-  src.teleon.egress.client.request_bytes -> src.teleon.egress.client._body_hash
-  src.teleon.egress.client.request_bytes -> src.teleon.egress.client.EgressClient._attempt_record
-  src.teleon.egress.client.request_bytes -> src.teleon.egress.ledger.LocalEgressLedger.append_attempt
-  src.teleon.egress.client.request_bytes -> src.teleon.egress.client.EgressClient._observation
-  src.teleon.egress.client.request_bytes -> src.baltor.determinism.trace_store.TraceStore.append
-  src.teleon.egress.client.request_bytes -> src.teleon.egress.client.EgressBlocked
-  src.teleon.egress.client.request_bytes -> src.teleon.egress.transports.UrllibHttpTransport.request
-  src.teleon.egress.client.request_bytes -> src.teleon.experiments.ids.sha256_hex
-  src.teleon.egress.client.request_json -> src.teleon.egress.client.EgressClient.request_bytes
-  src.teleon.egress.client._attempt_record -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.egress.client._attempt_record -> src.teleon.experiments.ids.canonical_id
-  src.teleon.egress.client._attempt_record -> src.teleon.experiments.ids.sha256_hex
-  src.teleon.egress.client._observation -> src.teleon.egress.traffic_graph.make_egress_observation
-  src.teleon.egress.client._observation -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.egress.ledger._content_hash -> src.teleon.experiments.ids.sha256_hex
-  src.teleon.egress.ledger.__init__ -> src.baltor.workers.supervisor_store.SupervisorStore._init_schema
-  src.teleon.egress.ledger._init_schema -> src.teleon.storage.git_backend_port.GitBackendPort.commit
-  src.teleon.egress.ledger._next_seq -> src.baltor.distillation.rollback.execute
-  src.teleon.egress.ledger._append -> src.baltor.adapters.source.folder_batch._content_hash
-  src.teleon.egress.ledger._append -> src.baltor.distillation.rollback.execute
-  src.teleon.egress.ledger._append -> src.teleon.storage.git_backend_port.GitBackendPort.commit
-  src.teleon.egress.ledger._append -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.egress.ledger._append -> src.teleon.egress.ledger.EgressLedgerRejected
-  src.teleon.egress.ledger._append -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard._next_seq
-  src.teleon.egress.ledger.append_intent -> src.teleon.compiler.registry.CompiledUnitRegistry._append
-  src.teleon.egress.ledger.append_decision -> src.teleon.compiler.registry.CompiledUnitRegistry._append
-  src.teleon.egress.ledger.append_attempt -> src.teleon.compiler.registry.CompiledUnitRegistry._append
-  src.teleon.egress.ledger.append_payload_ref -> src.teleon.compiler.registry.CompiledUnitRegistry._append
-  src.teleon.egress.ledger.records -> src.teleon.egress.ledger.EgressLedgerRejected
-  src.teleon.egress.ledger.records -> src.baltor.distillation.rollback.execute
-  src.teleon.egress.policy.route_policies_by_id -> src.teleon.egress.policy.route_policy_taxonomy
-  src.teleon.egress.policy.approval_required_route_ids -> src.teleon.egress.policy.route_policies_by_id
-  src.teleon.egress.policy.approval_required_route_ids -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.egress.policy._query_id -> src.teleon.experiments.ids.canonical_id
-  src.teleon.egress.policy.make_egress_intent -> src.teleon.egress.policy._redact_url_for_policy
-  src.teleon.egress.policy.make_egress_intent -> src.teleon.egress.policy.EgressPolicyError
-  src.teleon.egress.policy.make_egress_intent -> src.teleon.egress.policy._query_id
-  src.teleon.egress.policy.make_egress_intent -> src.teleon.experiments.ids.canonical_id
-  src.teleon.egress.policy.make_egress_intent -> src.teleon.experiments.ids.sha256_hex
-  src.teleon.egress.policy.decide_route -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.egress.policy.decide_route -> src.teleon.egress.policy.EgressPolicyError
-  src.teleon.egress.policy.decide_route -> src.teleon.egress.policy.route_policies_by_id
-  src.teleon.egress.policy.decide_route -> src.teleon.experiments.ids.canonical_id
-  src.teleon.egress.policy.decide_route -> src.teleon.egress.policy.route_policy_taxonomy
-  src.teleon.egress.traffic_graph._content_hash -> src.teleon.experiments.ids.sha256_hex
-  src.teleon.egress.traffic_graph._looks_secret -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.search
-  src.teleon.egress.traffic_graph._redact_url -> src.baltor.determinism.trace_store.TraceStore.append
-  src.teleon.egress.traffic_graph._redact_url -> src.teleon.egress.traffic_graph._looks_secret
-  src.teleon.egress.traffic_graph._redact_string -> src.teleon.egress.traffic_graph._looks_secret
-  src.teleon.egress.traffic_graph._redact_string -> src.teleon.egress.traffic_graph._redact_url
-  src.teleon.egress.traffic_graph._deep_redact -> src.teleon.io.event_io.redact_secrets
-  src.teleon.egress.traffic_graph._deep_redact -> src.teleon.egress.traffic_graph._redact_string
-  src.teleon.egress.traffic_graph._destination_parts -> src.teleon.egress.traffic_graph._redact_url
-  src.teleon.egress.traffic_graph._search_blob -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.egress.traffic_graph._contains_raw_secret -> src.teleon.egress.traffic_graph._looks_secret
-  src.teleon.egress.traffic_graph.make_egress_observation -> src.teleon.egress.traffic_graph._redact_string
-  src.teleon.egress.traffic_graph.make_egress_observation -> src.teleon.egress.traffic_graph._deep_redact
-  src.teleon.egress.traffic_graph.make_egress_observation -> src.teleon.egress.traffic_graph._destination_parts
-  src.teleon.egress.traffic_graph.make_egress_observation -> src.baltor.adapters.source.folder_batch._content_hash
-  src.teleon.egress.traffic_graph.make_egress_observation -> src.teleon.experiments.ids.canonical_id
-  src.teleon.egress.traffic_graph.make_egress_observation -> src.teleon.egress.traffic_graph._contains_raw_secret
-  src.teleon.egress.traffic_graph.make_egress_observation -> src.teleon.egress.traffic_graph.TeleonEgressGraphRejected
-  src.teleon.egress.traffic_graph._validate_observation -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.egress.traffic_graph._validate_observation -> src.teleon.egress.traffic_graph._contains_raw_secret
-  src.teleon.egress.traffic_graph._validate_observation -> src.baltor.determinism.trace_store.TraceStore.append
-  src.teleon.egress.traffic_graph._graph_projection -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  src.teleon.egress.traffic_graph._graph_projection -> src.baltor.determinism.trace_store.TraceStore.append
-  src.teleon.egress.traffic_graph._graph_projection -> src.teleon.experiments.ids.canonical_id
-  src.teleon.egress.traffic_graph.edge -> src.teleon.experiments.ids.canonical_id
-  src.teleon.egress.traffic_graph.__init__ -> src.baltor.workers.supervisor_store.SupervisorStore._init_schema
-  src.teleon.egress.traffic_graph._init_schema -> src.teleon.storage.git_backend_port.GitBackendPort.commit
-  src.teleon.egress.traffic_graph._next_seq -> src.baltor.distillation.rollback.execute
-  src.teleon.egress.traffic_graph.append -> src.teleon.egress.traffic_graph._validate_observation
-  src.teleon.egress.traffic_graph.append -> src.baltor.adapters.source.folder_batch._content_hash
-  src.teleon.egress.traffic_graph.append -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard._next_seq
-  src.teleon.egress.traffic_graph.append -> src.baltor.distillation.rollback.execute
-  src.teleon.egress.traffic_graph.append -> src.teleon.egress.traffic_graph._graph_projection
-  src.teleon.egress.traffic_graph.append -> src.teleon.storage.git_backend_port.GitBackendPort.commit
-  src.teleon.egress.traffic_graph.append -> src.teleon.egress.traffic_graph.TeleonEgressGraphRejected
-  src.teleon.egress.traffic_graph.append -> src.teleon.egress.traffic_graph.LocalEgressGraph.get_event
-  src.teleon.egress.traffic_graph.append -> src.teleon.egress.traffic_graph._search_blob
-  src.teleon.egress.traffic_graph.get_event -> src.baltor.distillation.rollback.execute
-  src.teleon.egress.traffic_graph.search_events -> src.baltor.determinism.trace_store.TraceStore.append
-  src.teleon.egress.traffic_graph.search_events -> src.baltor.distillation.rollback.execute
-  src.teleon.egress.traffic_graph.graph_for_query -> src.teleon.egress.traffic_graph.LocalEgressGraph.search_events
-  src.teleon.egress.traffic_graph.graph_for_query -> src.baltor.distillation.rollback.execute
-  src.teleon.egress.transports.content_type -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get
-  … (1295 more call edges omitted)
+## Call graph (caller -> callee · xN call sites; strongest first)
+  src.baltor.contextops.cross_source_confirmation.confirm -> src.baltor.contextops.cross_source_confirmation.ConfirmationResult  x14
+  src.teleon.dag.example_pipelines.build_extraction_dag -> src.teleon.dag.pipeline_dag.Node  x14
+  src.baltor.distillation.retention_report.build -> src.baltor.distillation.retention_report._aid  x12
+  src.teleon.exploration.__main__._self_test -> src.teleon.exploration.ladder.TaskClass  x12
+  src.teleon.exploration.__main__._self_test -> src.teleon.exploration.ladder.escalation_decision  x12
+  src.baltor.workers.spawn_decision.decide -> src.baltor.workers.spawn_decision._decision  x11
+  src.teleon.observer.router.ground -> src.teleon.observer.router._iv  x11
+  src.baltor.determinism.trace_store.append -> src.baltor.determinism.trace_store._as_tuple  x10
+  src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.rule_candidate_generator._attr  x8
+  src.baltor.distillation.lossless_store._put -> src.baltor.distillation.lossless_store._as_tuple  x8
+  src.baltor.workers.fleet_supervisor.decide_for_capability -> src.baltor.workers.fleet_supervisor._decision  x8
+  src.baltor.workers.policy_recommender.recommend -> src.baltor.workers.policy_recommender._rec  x8
+  src.openharnesshub.hub_site.render_hub_page -> src.openharnesshub.hub_site._esc  x8
+  src.teleon.capability_planner.plan -> src.teleon.capability_planner.PlanStep  x8
+  src.teleon.dag.example_pipelines.build_enrichment_dag -> src.teleon.dag.pipeline_dag.Node  x8
+  src.teleon.exploration.ladder.escalation_decision -> src.teleon.exploration.ladder._decision  x8
+  src.baltor.determinism.replay_engine.replay -> src.baltor.determinism.replay_engine._attr  x7
+  src.baltor.determinism.trace_store.append -> src.baltor.determinism.trace_store.TraceStoreError  x7
+  src.teleon.blackboard.local_sqlite_blackboard.append_entry -> src.teleon.ports.blackboard_provider.BlackboardWriteRejected  x7
+  src.teleon.evolution.capability_graph.add_edge -> src.teleon.evolution.capability_graph.EvolutionError  x7
+  src.teleon.inference.model_efficiency._self_test -> src.teleon.inference.model_efficiency.rank_models  x7
+  src.teleon.research.source_search.search -> src.teleon.research.source_search.SourceSearchUnavailable  x7
+  src.baltor.distillation.retention_report.build -> src.baltor.distillation.retention_report._handles  x6
+  src.baltor.teleon_client.client._self_test -> src.baltor.teleon_client.client.TeleonClient  x6
+  src.teleon.environments.reward_runner._eval_check -> src.teleon.environments.reward_runner._norm_text  x6
+  src.teleon.io.governed_record._self_test -> src.teleon.io.governed_record.mint_record  x6
+  src.baltor.contextops.cost_tracking.cfpb_reference_lifecycle -> src.baltor.contextops.cost_tracking.CostEvent  x5
+  src.teleon.capability_planner._plan_document_extraction -> src.teleon.capability_planner.PlanStep  x5
+  src.teleon.compiler.registry._validate_log -> src.teleon.compiler.registry.RegistryIntegrityError  x5
+  src.teleon.evolution.self_optimizing_unit.optimize -> src.teleon.evolution.self_optimizing_unit.OptimizationStep  x5
+  src.baltor.adapters.object_store.local_object_store.parse_ref -> src.baltor.adapters.object_store.local_object_store.ForgedRefError  x4
+  src.baltor.contextops.extractor_snippets.__post_init__ -> src.baltor.contextops.extractor_snippets.CanonicalClaimError  x4
+  src.baltor.contextops.reliability.__post_init__ -> src.baltor.contextops.reliability.ReliabilityError  x4
+  src.baltor.contextops.sandbox_gate.gate_snippet -> src.baltor.contextops.sandbox_gate.GateResult  x4
+  src.baltor.determinism.shadow_runner.run_shadow -> src.baltor.determinism.shadow_runner._attr  x4
+  src.baltor.determinism.trace_store.parse_trace_id -> src.baltor.determinism.trace_store.TraceStoreError  x4
+  src.baltor.distillation.lossless_store.parse_id -> src.baltor.distillation.lossless_store.DistillationStoreError  x4
+  src.baltor.workers.spawn_decision.decide -> src.teleon.workers.fleet_ledger._epoch  x4
+  src.baltor.workers.telemetry.queue_metrics -> src.baltor.workers.telemetry._rate  x4
+  src.teleon.agent_gateway.gateway.run -> src.teleon.agent_gateway.gateway.AgentCapabilityGateway._unavailable  x4
+  src.teleon.compiler.__main__._registry_checks -> src.teleon.compiler.__main__._compile_version  x4
+  src.teleon.compiler.__main__.self_test -> src.teleon.compiler.__main__._compile_fixture  x4
+  src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile.CompilerError  x4
+  src.teleon.compiler.registry.supersede -> src.teleon.compiler.registry.CompiledUnitRegistry.get  x4
+  src.teleon.evolution.capability_graph.__post_init__ -> src.teleon.evolution.capability_graph.EvolutionError  x4
+  src.teleon.exploration.__main__._self_test -> src.teleon.exploration.dispatch.dispatch_exploration  x4
+  src.teleon.exploration.ladder.escalation_decision -> src.teleon.exploration.ladder._count_attempts  x4
+  src.teleon.io.governed_record._self_test -> src.teleon.io.governed_record.validate_record  x4
+  src.teleon.knowledge.code_genome._self_test -> src.teleon.knowledge.code_genome.fingerprint  x4
+  src.teleon.knowledge.code_genome._self_test -> src.teleon.knowledge.code_genome.genome_similarity  x4
+  src.teleon.knowledge.product_distance._self_test -> src.teleon.knowledge.product_distance.distance_to_products  x4
+  src.teleon.research.llm_browser._self_test -> src.teleon.research.llm_browser.LLMBrowserDriver  x4
+  src.teleon.runtime.execution_providers.cloudflare_workers.invoke -> src.teleon.runtime.execution_provider.ProviderUnavailableResult  x4
+  src.teleon.seeds.profession_calculators.ship_risk_profile -> src.teleon.seeds.profession_calculators._psc_num  x4
+  src.teleon.self_healing.reheal.reheal_on_source_change -> src.teleon.self_healing.reheal.HealOutcome  x4
+  src.teleon.synthesis.passes.run_passes -> src.teleon.synthesis.passes._cost  x4
+  src.teleon.synthesis.strategist.default_strategies -> src.teleon.synthesis.strategist._load  x4
+  src.teleon.workers.fleet_ledger.nack_task -> src.teleon.workers.fleet_ledger.FleetLedger._transition  x4
+  src.baltor.adapters.source.markdown_folder._parse_frontmatter -> src.baltor.adapters.source.markdown_folder._coerce  x3
+  src.baltor.context_audit.context_auditor._self_test -> src.baltor.context_audit.context_auditor.audit  x3
+  src.baltor.context_audit.context_auditor.audit -> src.baltor.context_audit.context_auditor._tokens  x3
+  src.baltor.contextops.research_stub.research -> src.baltor.contextops.research_stub._hash  x3
+  src.baltor.determinism.replay_engine.evaluate_rule -> src.baltor.determinism.replay_engine._attr  x3
+  src.baltor.determinism.shadow_runner._live_decision_of -> src.baltor.determinism.shadow_runner._attr  x3
+  src.baltor.distillation.retention_report.build -> src.baltor.distillation.retention_report._is_truth  x3
+  src.baltor.facts.refresh_planner.refresh -> src.baltor.contracts.artifacts.verification_result.VerificationResult  x3
+  src.baltor.graph.providers.temporal_graph_provider.status -> src.baltor.graph.providers.temporal_graph_provider._status  x3
+  src.baltor.graph.temporal.policy.project_current -> src.baltor.graph.temporal.policy._is_stale  x3
+  src.baltor.memory.builder_memory.build_session_context_bundle -> src.baltor.memory.builder_memory.recall_builder_context  x3
+  src.baltor.memory.memory_worker.process_memory_task -> src.baltor.memory.memory_worker._trace  x3
+  src.baltor.native.skill_md_adapter._frontmatter -> src.baltor.native.skill_md_adapter._fmt_scalar  x3
+  src.baltor.observability.projections.standards.json_patch_ops -> src.baltor.observability.projections.standards._esc  x3
+  src.baltor.observability.projections.standards.to_prov_json -> src.baltor.observability.projections.standards._hid  x3
+  src.baltor.workers.control_plane.control_plane_tick -> src.baltor.workers.control_plane._load  x3
+  src.baltor.workers.fleet_supervisor.decide_for_capability -> src.baltor.workers.fleet_supervisor._load  x3
+  src.baltor.workers.provider_circuit_breaker.record_failure -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker._rate  x3
+  src.openharnesshub.discovery.default_plugins -> src.openharnesshub.discovery._slug  x3
+  src.openharnesshub.discovery.stub_tools -> src.openharnesshub.discovery.Tool  x3
+  src.openharnesshub.hub_site._browse_html -> src.openharnesshub.hub_site._esc  x3
+  src.teleon.agent_gateway.gateway.run -> src.teleon.experiments.ids.sha256_hex  x3
+  src.teleon.blackboard.token_economics.estimate_token_economics -> src.teleon.blackboard.token_economics.estimate_tokens  x3
+  src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._load_json  x3
+  src.teleon.compiler.registry.register -> src.teleon.compiler.registry.RegistryError  x3
+  src.teleon.egress.client.request_bytes -> src.teleon.egress.client.EgressClient._attempt_record  x3
+  src.teleon.egress.client.request_bytes -> src.teleon.egress.client.EgressClient._observation  x3
+  src.teleon.egress.client.request_bytes -> src.teleon.egress.client._now  x3
+  src.teleon.egress.ledger._append -> src.teleon.egress.ledger.EgressLedgerRejected  x3
+  src.teleon.egress.traffic_graph._redact_url -> src.teleon.egress.traffic_graph._looks_secret  x3
+  src.teleon.egress.traffic_graph.append -> src.teleon.egress.traffic_graph.LocalEgressGraph._next_seq  x3
+  src.teleon.egress.traffic_graph.make_egress_observation -> src.teleon.egress.traffic_graph._content_hash  x3
+  src.teleon.evolution.distiller.distill -> src.teleon.evolution.capability_graph.RunnerNode  x3
+  src.teleon.extraction.ocr_port.select_ocr -> src.teleon.extraction.ocr_port.UnavailableOCR  x3
+  src.teleon.inference.adapters.invoke -> src.teleon.inference.adapters.provider_unavailable  x3
+  src.teleon.inference.model_efficiency.rank_models -> src.teleon.inference.model_efficiency._normalize  x3
+  src.teleon.inference.oips.infer_local -> src.teleon.inference.adapters.resolve_adapter  x3
+  src.teleon.llm_port._delegate -> src.teleon.llm_port.ProviderLLM  x3
+  src.teleon.monitoring.flywheel.ping -> src.teleon.monitoring.flywheel.HeartbeatResult  x3
+  src.teleon.observer.session_store._self_test -> src.teleon.observer.session_store.event_record  x3
+  src.teleon.observer.session_store._self_test -> src.teleon.observer.session_store.outcome_record  x3
+  src.teleon.purpose_tasks.runtime_binding.bind -> src.teleon.purpose_tasks.runtime_binding._decision  x3
+  src.teleon.research.llm_browser.browse -> src.teleon.research.llm_browser.BrowseResult  x3
+  src.teleon.research.source_search.search -> src.teleon.research.source_search.ToolHit  x3
+  src.teleon.research.source_search.search -> src.teleon.research.source_search.network_allowed  x3
+  src.teleon.runtime.execution_providers._byo_base.invoke -> src.teleon.runtime.execution_provider.ProviderUnavailableResult  x3
+  src.teleon.runtime.execution_providers.managed_venv.run -> src.teleon.runtime.execution_provider.ExecutionResult  x3
+  src.teleon.seeds.api_and_feed_seeds._governed_feed_intake -> src.teleon.seeds.capability_seed.SeedResult  x3
+  src.teleon.self_healing.reheal.reheal_on_source_change -> src.teleon.self_healing.reheal.benchmark_health  x3
+  src.baltor.adapters.memory.__init__.make_memory_artifact -> src.baltor.adapters.memory.__init__.memory_content_hash  x2
+  src.baltor.adapters.memory.supermemory_api._require_credentials -> src.baltor.ports.memory_provider.UnavailableProvider  x2
+  src.baltor.adapters.memory.supermemory_mcp._require_credentials -> src.baltor.ports.memory_provider.UnavailableProvider  x2
+  src.baltor.adapters.source.markdown_folder._ignored_count -> src.baltor.adapters.source.markdown_folder._ignored  x2
+  src.baltor.adapters.source.markdown_folder._iter_notes -> src.baltor.adapters.source.markdown_folder._ignored  x2
+  src.baltor.context_audit.context_auditor._keep_drop -> src.teleon.research.source_search.ToolHit.key  x2
+  src.baltor.context_audit.context_auditor._self_test -> src.baltor.context_audit.context_auditor._fixture  x2
+  src.baltor.contextops.research_stub.research -> src.baltor.ports.research_agent_provider.ResearchAgentUnavailable  x2
+  src.baltor.contextops.sandbox_gate.gate_snippet -> src.baltor.contextops.sandbox_gate.SandboxReport  x2
+  src.baltor.contextops.triage.classify -> src.baltor.contextops.triage._has_cue  x2
+  src.baltor.contextops.verification_recipe.build_verification_recipe -> src.baltor.contextops.verification_recipe._is_current_value  x2
+  src.baltor.determinism.consensus.record_consensus -> src.baltor.determinism.consensus.ConsensusError  x2
+  src.baltor.determinism.consensus.to_trace -> src.baltor.determinism.trace_store._hash  x2
+  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.fallback_router.route  x2
+  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.rule_promotion_gate.evaluate  x2
+  src.baltor.determinism.replay_engine.replay -> src.baltor.determinism.replay_engine.TraceVerdict  x2
+  src.baltor.determinism.shadow_runner.run_shadow -> src.baltor.determinism.shadow_runner.ShadowTick  x2
+  src.baltor.determinism.trace_store.append -> src.baltor.determinism.trace_store._hash  x2
+  src.baltor.determinism.trace_store.mining_set -> src.baltor.determinism.trace_store.TraceStore.all  x2
+  src.baltor.distillation.lossless_store._put -> src.baltor.distillation.lossless_store.DistillationStoreError  x2
+  src.baltor.distillation.lossless_store._put -> src.baltor.distillation.lossless_store.LosslessStore._track_version  x2
+  src.baltor.distillation.rollback.execute -> src.baltor.distillation.lossless_store.DistillationStoreError  x2
+  src.baltor.distillation.rollback.of -> src.baltor.distillation.lossless_store.DistillationStoreError  x2
+  src.baltor.facts.classifier.classify_volatility -> src.baltor.facts.classifier._has_cue  x2
+  src.baltor.facts.classifier.recommend_watch_policy -> src.baltor.contracts.artifacts.watch_policy.WatchPolicy  x2
+  src.baltor.graph.providers.temporal_graph_provider.project -> src.baltor.graph.providers.temporal_graph_provider._projection  x2
+  src.baltor.native.native_export_service.export -> src.baltor.native.native_export_service._hid  x2
+  src.baltor.native.native_projection_builder._csv -> src.baltor.native.native_projection_builder.NativeDiff  x2
+  src.baltor.native.native_projection_builder._csv -> src.baltor.native.native_projection_builder.NativeProjectionBuilder._proj  x2
+  src.baltor.native.native_projection_builder._json -> src.baltor.native.native_projection_builder.NativeDiff  x2
+  src.baltor.native.native_projection_builder._json -> src.baltor.native.native_projection_builder.NativeProjectionBuilder._proj  x2
+  src.baltor.native.native_projection_builder._markdown -> src.baltor.native.native_projection_builder.NativeProjectionBuilder._proj  x2
+  src.baltor.native.okf_adapter._frontmatter -> src.baltor.native.okf_adapter._fmt_scalar  x2
+  src.baltor.native.okf_adapter.okf_import_file -> src.baltor.native.okf_adapter._parse_scalar  x2
+  src.baltor.native.skill_md_adapter.skill_md_import -> src.baltor.native.skill_md_adapter._parse_scalar  x2
+  src.baltor.workers.cooldown_drain.run_cooldown -> src.teleon.workers.fleet_ledger._plus_s  x2
+  src.baltor.workers.provider_circuit_breaker.record_failure -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker._trip  x2
+  src.baltor.workers.spawn_decision.decide -> src.baltor.workers.spawn_decision._free_workers  x2
+  src.baltor.workers.supervisor_ledger.acquire_lease -> src.teleon.workers.fleet_ledger._epoch  x2
+  src.baltor.workers.supervisor_ledger.claim_shard -> src.teleon.workers.fleet_ledger._epoch  x2
+  src.baltor.workers.supervisor_ledger.heartbeat_shard -> src.teleon.workers.fleet_ledger._epoch  x2
+  src.baltor.workers.supervisor_ledger.lease_holder -> src.teleon.workers.fleet_ledger._epoch  x2
+  src.baltor.workers.supervisor_ledger.reclaim_stale_shards -> src.teleon.workers.fleet_ledger._epoch  x2
+  src.baltor.workers.supervisor_ledger.renew_lease -> src.teleon.workers.fleet_ledger._epoch  x2
+  src.baltor.workers.supervisor_ledger.shards_owned_by -> src.teleon.workers.fleet_ledger._epoch  x2
+  src.baltor.workers.telemetry.provider_metrics -> src.baltor.workers.telemetry._rate  x2
+  src.baltor.workers.telemetry.task_metrics -> src.baltor.workers.telemetry._ms  x2
+  src.openharnesshub.browsing_registry.select_stack -> src.openharnesshub.browsing_registry.model_view  x2
+  src.openharnesshub.component_store.serve -> src.openharnesshub.component_store.ComponentStore._served_for_tenant  x2
+  src.openharnesshub.discovery.default_plugins -> src.openharnesshub.discovery.Plugin  x2
+  src.openharnesshub.discovery.default_plugins -> src.openharnesshub.discovery._finder  x2
+  src.openharnesshub.hub_engine._normalize -> src.openharnesshub.hub_engine._slug  x2
+  src.openharnesshub.hub_settings.all_hub_ids -> src.openharnesshub.hub_settings._read  x2
+  src.openharnesshub.hub_settings.load_settings -> src.openharnesshub.hub_settings._read  x2
+  src.openharnesshub.hub_settings.save_settings -> src.openharnesshub.hub_settings.load_settings  x2
+  src.openharnesshub.hub_site._channels_html -> src.openharnesshub.hub_site._esc  x2
+  src.openharnesshub.intake._to_body -> src.openharnesshub.intake.parse_okf  x2
+  src.teleon.agent_gateway.capabilities._handle_context_governed_answer_evidence -> src.teleon.agent_gateway.capabilities._bounded  x2
+  src.teleon.agent_gateway.capabilities._handle_json_schema_validate -> src.teleon.agent_gateway.capabilities._bounded  x2
+  src.teleon.agent_gateway.capabilities._handle_tariff_hs_classify_reference -> src.teleon.agent_gateway.capabilities._bounded  x2
+  src.teleon.agent_gateway.gateway.run -> src.teleon.experiments.ids.canonical_id  x2
+  src.teleon.agents.agent_runtime_provider.dispatch_agent_request -> src.teleon.agents.agent_runtime_provider.AgentRuntimeUnavailableResult  x2
+  src.teleon.agents.agent_runtime_provider.run_agent -> src.teleon.experiments.ids.canonical_id  x2
+  src.teleon.blackboard.local_sqlite_blackboard._record_receipt -> src.teleon.blackboard.local_sqlite_blackboard._content_hash  x2
+  src.teleon.blackboard.local_sqlite_blackboard.append_entry -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard._entry_row  x2
+  src.teleon.compiler.__main__.self_test -> src.teleon.compiler.__main__._render_examples  x2
+  src.teleon.compiler.compile.memory_to_mb -> src.teleon.compiler.compile.CompilerError  x2
+  src.teleon.compiler.registry.mark_active -> src.teleon.compiler.registry.CompiledUnitRegistry._append  x2
+  src.teleon.compiler.registry.mark_active -> src.teleon.compiler.registry.CompiledUnitRegistry.get  x2
+  src.teleon.compiler.registry.mark_active -> src.teleon.compiler.registry._compiled_at  x2
+  src.teleon.compiler.registry.register -> src.teleon.compiler.registry.CompiledUnitRegistry._append  x2
+  src.teleon.compiler.registry.register -> src.teleon.compiler.registry.CompiledUnitRegistry.get  x2
+  src.teleon.components.registry.invoke -> src.teleon.components.registry.ComponentUnavailable  x2
+  src.teleon.context.compressor.compress -> src.teleon.evolution.token_reduction.estimate_tokens  x2
+  src.teleon.dag.example_pipelines.build_extraction_dag -> src.teleon.dag.example_pipelines._chunk  x2
+  src.teleon.dag.real_steps.llm_available -> src.teleon.dag.real_steps._env  x2
+  src.teleon.dag.real_steps.real_cloudflare_ai -> src.teleon.dag.real_steps.RealStepUnavailable  x2
+  src.teleon.dag.real_steps.real_llm -> src.teleon.dag.real_steps.RealStepUnavailable  x2
+  src.teleon.dag.real_steps.real_text -> src.teleon.dag.real_steps.RealStepUnavailable  x2
+  src.teleon.dag.real_steps.real_wikipedia -> src.teleon.dag.real_steps._get_json  x2
+  src.teleon.economics.observation_store.record_observation -> src.teleon.economics.observation_store.current_economics  x2
+  src.teleon.economics.vertical_proof.compare -> src.teleon.economics.simulator.simulate_dag  x2
+  src.teleon.egress.client._body_hash -> src.teleon.experiments.ids.sha256_hex  x2
+  src.teleon.egress.client.request_bytes -> src.teleon.experiments.ids.sha256_hex  x2
+  src.teleon.egress.traffic_graph.append -> src.teleon.egress.traffic_graph.LocalEgressGraph.get_event  x2
+  src.teleon.egress.traffic_graph.append -> src.teleon.egress.traffic_graph.TeleonEgressGraphRejected  x2
+  src.teleon.egress.traffic_graph.make_egress_observation -> src.teleon.egress.traffic_graph.TeleonEgressGraphRejected  x2
+  src.teleon.egress.traffic_graph.make_egress_observation -> src.teleon.egress.traffic_graph._deep_redact  x2
+  src.teleon.egress.traffic_graph.make_egress_observation -> src.teleon.experiments.ids.canonical_id  x2
+  src.teleon.endpoints.registry.endpoints_for -> src.teleon.endpoints.registry.EndpointError  x2
+  src.teleon.enrichment.search_enrich.enrichment_savings -> src.teleon.enrichment.search_enrich.baseline_provider  x2
+  src.teleon.environments.local_environment_provider.run -> src.teleon.environments.local_environment_provider._content_hash  x2
+  src.teleon.environments.reward_runner.score -> src.teleon.experiments.ids.canonical_id  x2
+  src.teleon.evolution.auto_tuning.auto_tune_setup -> src.teleon.evolution.auto_tuning.tuning_ladder  x2
+  src.teleon.evolution.capability_graph.add_runner -> src.teleon.evolution.capability_graph.EvolutionError  x2
+  src.teleon.evolution.capability_graph.validate -> src.teleon.evolution.capability_graph.EvolutionError  x2
+  src.teleon.evolution.descender.descend -> src.teleon.evolution.capability_graph.RunnerNode  x2
+  src.teleon.evolution.distiller.distill_robustness -> src.teleon.evolution.capability_graph.RunnerNode  x2
+  src.teleon.evolution.freshness_runtime.serve -> src.teleon.evolution.freshness_runtime.FreshnessSyncedCapability._provenance  x2
+  src.teleon.evolution.impl_finder.find_implementations -> src.teleon.training.capability_network._tokens  x2
+  src.teleon.evolution.registry_descent._impl_registry_attempts -> src.teleon.evolution.registry_descent._axes  x2
+  src.teleon.evolution.registry_descent._tunable_task_attempts -> src.teleon.evolution.registry_descent._axes  x2
+  src.teleon.evolution.self_optimizing_unit.is_converged -> src.teleon.evolution.self_optimizing_unit.SelfOptimizingCapabilityUnit.optimize  x2
+  src.teleon.evolution.source_poller.poll_source -> src.teleon.evolution.source_poller.content_hash  x2
+  src.teleon.evolution.token_reduction.compress_skill -> src.teleon.evolution.token_reduction.estimate_tokens  x2
+  src.teleon.experiments.parallel_paths.run_parallel -> src.teleon.experiments.parallel_paths._result_record  x2
+  src.teleon.experiments.path_comparator._verdict -> src.teleon.experiments.path_comparator._leaks_any  x2
+  src.teleon.exploration.ladder.escalation_decision -> src.teleon.purpose_tasks.adaptation_ladder.is_forbidden_autonomous  x2
+  src.teleon.extraction.document_extraction_cascade.demonstrate_measured -> src.teleon.extraction.document_extraction_cascade.extract_measured  x2
+  src.teleon.extraction.ocr_port.select_ocr -> src.teleon.extraction.ocr_port._needs_met  x2
+  src.teleon.governance.org_policy.evaluate -> src.teleon.governance.org_policy._domain_matches  x2
+  src.teleon.inference.free_endpoint_intel.due_diligence -> src.teleon.inference.free_endpoint_intel._phase_from_risk  x2
+  src.teleon.inference.free_endpoint_intel.due_diligence -> src.teleon.inference.free_endpoint_intel._policy  x2
+  src.teleon.inference.free_endpoint_intel.due_diligence -> src.teleon.inference.free_endpoint_intel.score_risk  x2
+  src.teleon.inference.model_efficiency._aggregate -> src.teleon.inference.model_efficiency._safe_float  x2
+  src.teleon.inference.model_efficiency._self_test -> src.teleon.inference.model_efficiency.quality_from_receipts  x2
+  src.teleon.inference.oips.build_receipt -> src.teleon.inference.oips._stable  x2
+  src.teleon.intel.intelligence_intake.plan_news_sweep -> src.teleon.intel.intelligence_intake.select_sources  x2
+  src.teleon.io.governed_record._self_test -> src.teleon.io.governed_record._raises  x2
+  src.teleon.knowledge.code_genome._self_test -> src.teleon.knowledge.code_genome.decompose  x2
+  src.teleon.knowledge.code_genome._self_test -> src.teleon.knowledge.code_genome.decompose_ast  x2
+  src.teleon.knowledge.code_genome.nearest_genomes -> src.teleon.knowledge.code_genome.fingerprint  x2
+  src.teleon.knowledge.dependency_graph._self_test -> src.teleon.knowledge.dependency_graph.build_graph  x2
+  src.teleon.knowledge.dependency_graph._self_test -> src.teleon.knowledge.dependency_graph.detect_cycle  x2
+  src.teleon.knowledge.dependency_graph._self_test -> src.teleon.knowledge.dependency_graph.stack_exists  x2
+  src.teleon.knowledge.dependency_graph._self_test -> src.teleon.knowledge.dependency_graph.transitive_deps  x2
+  src.teleon.knowledge.dependency_graph.stack_exists -> src.teleon.knowledge.dependency_graph.transitive_deps  x2
+  src.teleon.knowledge.product_distance._self_test -> src.teleon.knowledge.product_distance.load_products  x2
+  src.teleon.lift.adoption.build_adoption_plan -> src.teleon.lift.adoption.mode_record  x2
+  src.teleon.llm_port.select_llm -> src.teleon.llm_port.ProviderLLM  x2
+  src.teleon.monitoring.flywheel._self_test -> src.teleon.monitoring.flywheel.Flywheel  x2
+  src.teleon.monitoring.flywheel.tick -> src.teleon.io.governed_record.mint_record  x2
+  src.teleon.monitoring.flywheel.urllib_pinger -> src.teleon.monitoring.flywheel.HeartbeatResult  x2
+  src.teleon.objectives.tenant_binding._objective_from_binding -> src.teleon.objectives.objective.ObjectiveError  x2
+  src.teleon.observer.capture.normalize_messages -> src.teleon.observer.capture._flatten_content  x2
+  src.teleon.observer.review._self_test -> src.teleon.observer.review.review_session  x2
+  src.teleon.observer.router.plausible -> src.teleon.observer.router._approx_tokens  x2
+  src.teleon.observer.session_store._self_test -> src.teleon.observer.session_store._raises  x2
+  src.teleon.observer.session_store._self_test -> src.teleon.observer.session_store.append  x2
+  src.teleon.observer.session_store._self_test -> src.teleon.observer.session_store.intervention_record  x2
+  src.teleon.observer.session_store._self_test -> src.teleon.observer.session_store.resolve_outcomes  x2
+  src.teleon.observer.session_store._self_test -> src.teleon.observer.session_store.session_record  x2
+  src.teleon.purpose_tasks.projections.customer_projection -> src.teleon.purpose_tasks.projections._allow  x2
+  src.teleon.purpose_tasks.runtime_binding.local_fallback_backend -> src.teleon.purpose_tasks.runtime_binding.offline_default_backend  x2
+  src.teleon.research.llm_browser.__init__ -> src.teleon.research.browser_port.select_browser  x2
+  src.teleon.research.source_search.search -> src.teleon.research.source_search._get  x2
+  src.teleon.resolution.industry_links.industry -> src.teleon.resolution.industry_links._rules  x2
+  src.teleon.resolution.industry_links.link -> src.teleon.resolution.industry_links._rid  x2
+  src.teleon.retrieval.embedding_port._embedding_plane -> src.teleon.registry.plane.Candidate  x2
+  src.teleon.retrieval.search_port.select_search -> src.teleon.retrieval.search_port.GroundedSearch  x2
+  src.teleon.runtime.capability_binding.bind -> src.teleon.runtime.capability_binding._backend_for  x2
+  src.teleon.runtime.credentials.key_mode -> src.teleon.runtime.credentials.is_present  x2
+  src.teleon.runtime.execution_backend_selector.select_backend -> src.teleon.runtime.execution_backend_selector._decision  x2
+  src.teleon.runtime.execution_backend_selector.select_backend -> src.teleon.runtime.execution_backend_selector._est_cost  x2
+  src.teleon.runtime.execution_backend_selector.select_backend -> src.teleon.runtime.execution_backend_selector._load  x2
+  src.teleon.runtime.execution_providers._byo_base.health -> src.teleon.runtime.execution_providers._byo_base.ByoComputeProvider._creds_present  x2
+  src.teleon.runtime.execution_providers.cloudflare_workers.health -> src.teleon.runtime.execution_providers.cloudflare_workers.CloudflareWorkersProvider._token  x2
+  src.teleon.runtime.execution_providers.gcp_cloud_run_function_candidate.health -> src.teleon.runtime.execution_providers.gcp_cloud_run_function_candidate.GcpCloudRunFunctionCandidate.configured  x2
+  src.teleon.runtime.execution_providers.gcp_cloud_run_function_candidate.invoke -> src.teleon.runtime.execution_provider.ProviderUnavailableResult  x2
+  src.teleon.runtime.key_holder.status -> src.teleon.runtime.credentials._services  x2
+  src.teleon.runtime.trust_tiers.can_execute -> src.teleon.runtime.trust_tiers._sensitivity  x2
+  src.teleon.sandbox.gateway.run -> src.teleon.sandbox.gateway._receipt  x2
+  src.teleon.sandbox.gateway.select_provider -> src.teleon.sandbox.gateway.LocalTempdirProvider  x2
+  src.teleon.seeds.openapi_deconstructor.deconstruct_operation -> src.teleon.seeds.openapi_deconstructor._slug  x2
+  src.teleon.seeds.profession_calculators.ship_risk_profile -> src.teleon.seeds.profession_calculators._psc_perf  x2
+  src.teleon.self_healing.reheal.benchmark_health -> src.teleon.self_healing.reheal._norm  x2
+  src.teleon.stateful_swarms.local_swarm._entity_resolver -> src.teleon.stateful_swarms.local_swarm._receipt  x2
+  src.teleon.stateful_swarms.local_swarm._observation_extractor -> src.teleon.stateful_swarms.local_swarm._receipt  x2
+  src.teleon.synthesis.dag_contract.verify_buildable_dag -> src.teleon.synthesis.dag_contract.component_types  x2
+  src.teleon.synthesis.dag_contract.verify_buildable_dag -> src.teleon.synthesis.io_contracts.plane_io  x2
+  src.teleon.synthesis.io_contracts.edge_compatible -> src.teleon.synthesis.io_contracts.plane_io  x2
+  src.teleon.synthesis.microsteps.coverage -> src.teleon.synthesis.microsteps._decomps  x2
+  src.teleon.synthesis.type_system.coercion_path -> src.teleon.synthesis.type_system.is_subtype  x2
+  src.teleon.synthesis.variation_store.commit_to_git -> src.teleon.synthesis.variation_store._branch  x2
+  src.teleon.training.policy.predict -> src.teleon.training.policy._prior_strategy  x2
+  src.teleon.training.policy.train -> src.teleon.training.policy._best_by  x2
+  src.teleon.training.skills_db.build_dataset -> src.teleon.training.skills_db.DistillationExample  x2
+  src.teleon.verticals.provider_directory.detect_inactive -> src.teleon.verticals.provider_directory.authority_of  x2
+  src.teleon.verticals.provider_directory.match_records -> src.teleon.verticals.provider_directory._sim  x2
+  src.teleon.verticals.provider_directory.match_records -> src.teleon.verticals.provider_directory.normalize_address  x2
+  src.teleon.verticals.provider_directory.match_records -> src.teleon.verticals.provider_directory.normalize_field  x2
+  src.teleon.verticals.provider_directory.normalize_field -> src.teleon.verticals.provider_directory._norm_text  x2
+  src.teleon.verticals.provider_directory.resolve_record -> src.teleon.verticals.provider_directory.normalize_field  x2
+  src.teleon.verticals.provider_sources.plan_acquisition -> src.teleon.verticals.provider_sources._cost_rank  x2
+  src.teleon.workers.durable_fleet_ledger.enqueue_task -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.task  x2
+  src.teleon.workers.durable_fleet_ledger.nack_task -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.task  x2
+  src.teleon.workers.fleet_ledger._age_s -> src.teleon.workers.fleet_ledger._epoch  x2
+  src.baltor.adapters.memory.__init__.make_memory_artifact -> src.baltor.adapters.memory.__init__.external_source_handle  x1
+  src.baltor.adapters.memory.baltor_local._self_demo -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider  x1
+  src.baltor.adapters.memory.baltor_local.write -> src.baltor.adapters.memory.__init__.make_memory_artifact  x1
+  src.baltor.adapters.memory.supermemory_api._require_credentials -> src.baltor.adapters.memory.supermemory_api._credentials_present  x1
+  src.baltor.adapters.memory.supermemory_api._self_demo -> src.baltor.adapters.memory.supermemory_api.SupermemoryApiProvider  x1
+  src.baltor.adapters.memory.supermemory_api.profile -> src.baltor.adapters.memory.supermemory_api.SupermemoryApiProvider._require_credentials  x1
+  src.baltor.adapters.memory.supermemory_api.search -> src.baltor.adapters.memory.supermemory_api.SupermemoryApiProvider._require_credentials  x1
+  src.baltor.adapters.memory.supermemory_api.status -> src.baltor.adapters.memory.supermemory_api._credentials_present  x1
+  src.baltor.adapters.memory.supermemory_api.write -> src.baltor.adapters.memory.supermemory_api.SupermemoryApiProvider._require_credentials  x1
+  src.baltor.adapters.memory.supermemory_emulator._self_demo -> src.baltor.adapters.memory.supermemory_emulator.SupermemoryEmulatorProvider  x1
+  src.baltor.adapters.memory.supermemory_emulator._upstream_id -> src.baltor.adapters.memory.__init__.memory_content_hash  x1
+  src.baltor.adapters.memory.supermemory_emulator.write -> src.baltor.adapters.memory.__init__.make_memory_artifact  x1
+  src.baltor.adapters.memory.supermemory_emulator.write -> src.baltor.adapters.memory.supermemory_emulator._upstream_id  x1
+  src.baltor.adapters.memory.supermemory_mcp._require_credentials -> src.baltor.adapters.memory.supermemory_mcp._credentials_present  x1
+  src.baltor.adapters.memory.supermemory_mcp._self_demo -> src.baltor.adapters.memory.supermemory_mcp.SupermemoryMcpProvider  x1
+  src.baltor.adapters.memory.supermemory_mcp._self_demo -> src.baltor.teleon_client.client.TeleonClient.call  x1
+  src.baltor.adapters.memory.supermemory_mcp.context -> src.baltor.adapters.memory.supermemory_mcp.SupermemoryMcpProvider._require_credentials  x1
+  src.baltor.adapters.memory.supermemory_mcp.memory -> src.baltor.adapters.memory.supermemory_mcp.SupermemoryMcpProvider._require_credentials  x1
+  src.baltor.adapters.memory.supermemory_mcp.recall -> src.baltor.adapters.memory.supermemory_mcp.SupermemoryMcpProvider._require_credentials  x1
+  src.baltor.adapters.memory.supermemory_mcp.status -> src.baltor.adapters.memory.supermemory_mcp._credentials_present  x1
+  src.baltor.adapters.object_store.local_object_store.exists -> src.baltor.adapters.object_store.local_object_store.parse_ref  x1
+  src.baltor.adapters.object_store.local_object_store.get -> src.baltor.adapters.object_store.local_object_store.CorruptObjectError  x1
+  src.baltor.adapters.object_store.local_object_store.get -> src.baltor.adapters.object_store.local_object_store.ForgedRefError  x1
+  src.baltor.adapters.object_store.local_object_store.get -> src.baltor.adapters.object_store.local_object_store._hash_bytes  x1
+  src.baltor.adapters.object_store.local_object_store.get -> src.baltor.adapters.object_store.local_object_store.parse_ref  x1
+  src.baltor.adapters.object_store.local_object_store.head -> src.baltor.adapters.object_store.local_object_store.ForgedRefError  x1
+  src.baltor.adapters.object_store.local_object_store.head -> src.baltor.adapters.object_store.local_object_store.parse_ref  x1
+  src.baltor.adapters.object_store.local_object_store.put -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore._to_bytes  x1
+  src.baltor.adapters.object_store.local_object_store.put -> src.baltor.adapters.object_store.local_object_store.ObjectStoreError  x1
+  src.baltor.adapters.object_store.local_object_store.put -> src.baltor.adapters.object_store.local_object_store._StoredObject  x1
+  src.baltor.adapters.object_store.local_object_store.put -> src.baltor.adapters.object_store.local_object_store._hash_bytes  x1
+  src.baltor.adapters.object_store.local_object_store.put -> src.baltor.adapters.object_store.local_object_store.make_ref  x1
+  src.baltor.adapters.object_store.local_object_store.tenant_of -> src.baltor.adapters.object_store.local_object_store.parse_ref  x1
+  src.baltor.adapters.source.folder_batch._self_demo -> src.baltor.adapters.source.folder_batch.LocalFolderBatchAdapter  x1
+  src.baltor.adapters.source.folder_batch.ingest -> src.baltor.adapters.source.folder_batch._classify  x1
+  src.baltor.adapters.source.folder_batch.ingest -> src.baltor.adapters.source.folder_batch._content_hash  x1
+  src.baltor.adapters.source.folder_batch.ingest -> src.baltor.adapters.source.folder_batch._iter_files  x1
+  src.baltor.adapters.source.folder_batch.ingest -> src.baltor.adapters.source.markdown_folder.MarkdownFolderAdapter  x1
+  src.baltor.adapters.source.markdown_folder._self_demo -> src.baltor.adapters.source.markdown_folder.MarkdownFolderAdapter  x1
+  src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.adapters.source.markdown_folder.MarkdownFolderAdapter._ignored_count  x1
+  src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.adapters.source.markdown_folder._body_paragraphs  x1
+  src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.adapters.source.markdown_folder._is_truthy  x1
+  src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.adapters.source.markdown_folder._iter_notes  x1
+  src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.adapters.source.markdown_folder._parse_frontmatter  x1
+  src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.adapters.source.markdown_folder._tags  x1
+  src.baltor.adapters.source.markdown_folder.ingest -> src.baltor.adapters.source.markdown_folder._wikilinks  x1
+  src.baltor.context_audit.audit_bridge.audit_and_emit -> src.baltor.context_audit.context_auditor.audit  x1
+  src.baltor.context_audit.audit_bridge.audited_pre_call -> src.baltor.context_audit.audit_bridge.audit_and_emit  x1
+  src.baltor.context_audit.audit_bridge.optimize_pre_call -> src.baltor.context_audit.audit_bridge.audit_and_emit  x1
+  src.baltor.context_audit.audit_bridge.optimize_pre_call -> src.baltor.context_audit.optimizer.apply_manifest  x1
+  src.baltor.context_audit.context_auditor._keep_drop -> src.baltor.context_audit.context_auditor._authority  x1
+  src.baltor.context_audit.context_auditor._self_test -> src.baltor.context_audit.context_auditor._authority  x1
+  src.baltor.context_audit.context_auditor.audit -> src.baltor.context_audit.context_auditor._authority  x1
+  src.baltor.context_audit.context_auditor.audit -> src.baltor.context_audit.context_auditor._jaccard  x1
+  src.baltor.context_audit.context_auditor.audit -> src.baltor.context_audit.context_auditor._keep_drop  x1
+  src.baltor.context_audit.context_auditor.audit -> src.baltor.context_audit.context_auditor._shingles  x1
+  src.baltor.context_audit.context_auditor.key -> src.baltor.context_audit.context_auditor._authority  x1
+  src.baltor.context_audit.context_object_adapter.audit_context_graph -> src.baltor.context_audit.context_auditor.audit  x1
+  src.baltor.context_audit.context_object_adapter.audit_context_graph -> src.baltor.context_audit.context_object_adapter.from_context_objects  x1
+  src.baltor.context_audit.optimizer.apply_manifest -> src.baltor.context_audit.context_auditor._authority  x1
+  src.baltor.context_audit.optimizer.apply_manifest -> src.baltor.context_audit.context_auditor._keep_drop  x1
+  src.baltor.contextops.authority_rank.scope_adjusted_rank -> src.baltor.contextops.authority_rank.default_authority_rank  x1
+  src.baltor.contextops.cost_tracking.__post_init__ -> src.baltor.contextops.cost_tracking.CostTrackingError  x1
+  src.baltor.contextops.cost_tracking.compute_cost_ladder -> src.baltor.contextops.cost_tracking.CostLadderMetrics  x1
+  src.baltor.contextops.cost_tracking.compute_cost_ladder -> src.baltor.contextops.cost_tracking.CostTrackingError  x1
+  src.baltor.contextops.cost_tracking.compute_cost_ladder -> src.baltor.contextops.cost_tracking._ladder_id  x1
+  src.baltor.contextops.cross_source_confirmation.confirm -> src.baltor.contextops.cross_source_confirmation.CrossSourceError  x1
+  src.baltor.contextops.cross_source_confirmation.confirm -> src.baltor.contextops.cross_source_confirmation._independent  x1
+  src.baltor.contextops.cross_source_confirmation.effective_rank -> src.baltor.contextops.authority_rank.default_authority_rank  x1
+  src.baltor.contextops.extractor_snippets.__post_init__ -> src.baltor.contextops.extractor_snippets.ExtractorError  x1
+  src.baltor.contextops.extractor_snippets.__post_init__ -> src.baltor.contextops.extractor_snippets.MissingSourceHandleError  x1
+  src.baltor.contextops.extractor_snippets._candidate -> src.baltor.contextops.extractor_snippets.FactAssertionCandidate  x1
+  src.baltor.contextops.extractor_snippets.extract_csv_field -> src.baltor.contextops.extractor_snippets.NoMatchError  x1
+  src.baltor.contextops.extractor_snippets.extract_csv_field -> src.baltor.contextops.extractor_snippets._candidate  x1
+  src.baltor.contextops.extractor_snippets.extract_date -> src.baltor.contextops.extractor_snippets.NoMatchError  x1
+  src.baltor.contextops.extractor_snippets.extract_date -> src.baltor.contextops.extractor_snippets._candidate  x1
+  src.baltor.contextops.extractor_snippets.extract_duration -> src.baltor.contextops.extractor_snippets.NoMatchError  x1
+  src.baltor.contextops.extractor_snippets.extract_duration -> src.baltor.contextops.extractor_snippets._candidate  x1
+  src.baltor.contextops.extractor_snippets.extract_html_selector -> src.baltor.contextops.extractor_snippets.NoMatchError  x1
+  src.baltor.contextops.extractor_snippets.extract_html_selector -> src.baltor.contextops.extractor_snippets._TagTextCollector  x1
+  src.baltor.contextops.extractor_snippets.extract_html_selector -> src.baltor.contextops.extractor_snippets._candidate  x1
+  src.baltor.contextops.extractor_snippets.extract_json_path -> src.baltor.contextops.extractor_snippets.NoMatchError  x1
+  src.baltor.contextops.extractor_snippets.extract_json_path -> src.baltor.contextops.extractor_snippets._candidate  x1
+  src.baltor.contextops.extractor_snippets.extract_markdown_heading -> src.baltor.contextops.extractor_snippets.NoMatchError  x1
+  src.baltor.contextops.extractor_snippets.extract_markdown_heading -> src.baltor.contextops.extractor_snippets._candidate  x1
+  src.baltor.contextops.extractor_snippets.extract_numeric -> src.baltor.contextops.extractor_snippets.NoMatchError  x1
+  src.baltor.contextops.extractor_snippets.extract_numeric -> src.baltor.contextops.extractor_snippets._candidate  x1
+  src.baltor.contextops.extractor_snippets.extract_regex -> src.baltor.contextops.extractor_snippets.NoMatchError  x1
+  src.baltor.contextops.extractor_snippets.extract_regex -> src.baltor.contextops.extractor_snippets._candidate  x1
+  src.baltor.contextops.extractor_snippets.extract_source_hash -> src.baltor.contextops.extractor_snippets._candidate  x1
+  src.baltor.contextops.extractor_snippets.run_extractor -> src.baltor.contextops.extractor_snippets.ExtractorError  x1
+  src.baltor.contextops.reliability.score_source -> src.baltor.contextops.authority_rank.scope_adjusted_rank  x1
+  src.baltor.contextops.reliability.score_source -> src.baltor.contextops.reliability.SourceReliabilityScore  x1
+  src.baltor.contextops.research_stub.make_provider -> src.baltor.contextops.research_stub.CandidateResearchStub  x1
+  src.baltor.contextops.research_stub.make_provider -> src.baltor.contextops.research_stub.LocalResearchStub  x1
+  src.baltor.contextops.sandbox_gate.gate_snippet -> src.baltor.contextops.sandbox_gate._snippet_id  x1
+  src.baltor.contextops.sandbox_gate.gate_snippet -> src.baltor.contextops.sandbox_gate.run_in_sandbox  x1
+  src.baltor.contextops.sandbox_gate.run_in_sandbox -> src.baltor.contextops.sandbox_gate.SandboxReport  x1
+  src.baltor.contextops.sandbox_gate.run_in_sandbox -> src.baltor.contextops.sandbox_gate.SandboxViolation  x1
+  src.baltor.contextops.sandbox_gate.run_in_sandbox -> src.baltor.contextops.sandbox_gate.static_scan  x1
+  src.baltor.contextops.source_discovery.__init__ -> src.baltor.contextops.research_stub.LocalResearchStub  x1
+  src.baltor.contextops.source_discovery._build_candidate -> src.baltor.contextops.source_discovery._classify_source_type  x1
+  src.baltor.contextops.source_discovery._build_candidate -> src.baltor.contextops.source_discovery._hash  x1
+  src.baltor.contextops.source_discovery._build_score -> src.baltor.contextops.source_discovery._composite  x1
+  src.baltor.contextops.source_discovery._build_score -> src.baltor.contextops.source_discovery._hash  x1
+  src.baltor.contextops.source_discovery._locator_for -> src.baltor.contextops.source_discovery._hash  x1
+  src.baltor.contextops.source_discovery.discover -> src.baltor.contextops.source_discovery._build_candidate  x1
+  src.baltor.contextops.source_discovery.discover -> src.baltor.contextops.source_discovery._build_score  x1
+  src.baltor.contextops.source_discovery.discover -> src.baltor.contextops.source_discovery._locator_for  x1
+  src.baltor.contextops.source_discovery.discover -> src.baltor.contextops.source_recipe.build_source_recipe  x1
+  src.baltor.contextops.source_recipe.build_source_recipe -> src.baltor.contextops.source_recipe._hash  x1
+  src.baltor.contextops.source_recipe.build_source_recipe -> src.baltor.contextops.source_recipe._is_current_value  x1
+  src.baltor.contextops.source_recipe.build_source_recipe -> src.baltor.contextops.source_recipe.cross_source_policy  x1
+  src.baltor.contextops.source_recipe.build_source_recipe -> src.baltor.contextops.source_recipe.watch_triggers  x1
+  src.baltor.contextops.triage.classify -> src.baltor.contextops.triage.ContextTriageClassifier._is_low_authority  x1
+  src.baltor.contextops.triage.classify -> src.baltor.contextops.triage.ContextTriageClassifier._is_source_of_law  x1
+  src.baltor.contextops.triage.classify -> src.baltor.contextops.triage.ContextTriageResult  x1
+  src.baltor.contextops.triage.classify -> src.baltor.contextops.triage.make_triage_id  x1
+  src.baltor.contextops.triage.make_triage_id -> src.baltor.contextops.triage._canon  x1
+  src.baltor.contextops.verification_recipe.build_verification_recipe -> src.baltor.contextops.verification_recipe._hash  x1
+  src.baltor.contextops.verification_recipe.build_verification_recipe -> src.baltor.contextops.verification_recipe.freshness_policy  x1
+  src.baltor.contextops.verification_recipe.freshness_policy -> src.baltor.contextops.verification_recipe._is_current_value  x1
+  src.baltor.contracts.artifacts.canonical_fact.fact_id -> src.baltor.contracts.artifacts.canonical_fact._content_id  x1
+  src.baltor.contracts.artifacts.fact_assertion.assertion_id -> src.baltor.contracts.artifacts.fact_assertion._content_id  x1
+  src.baltor.contracts.artifacts.fragility_metadata.fragility_id -> src.baltor.contracts.artifacts.fragility_metadata._content_id  x1
+  src.baltor.contracts.artifacts.fragility_metadata.is_stale -> src.baltor.contracts.artifacts.fragility_metadata.FragilityMetadata.horizon  x1
+  src.baltor.contracts.artifacts.verification_result.result_id -> src.baltor.contracts.artifacts.verification_result._content_id  x1
+  src.baltor.contracts.artifacts.verification_task.task_id -> src.baltor.contracts.artifacts.verification_task._content_id  x1
+  src.baltor.contracts.artifacts.watch_policy.watch_policy_id -> src.baltor.contracts.artifacts.watch_policy._content_id  x1
+  src.baltor.determinism.consensus._canon_output -> src.baltor.determinism.trace_store._hash  x1
+  src.baltor.determinism.consensus.output_hash -> src.baltor.determinism.consensus._canon_output  x1
+  src.baltor.determinism.consensus.record_consensus -> src.baltor.determinism.consensus.ConsensusRun  x1
+  src.baltor.determinism.consensus.record_consensus -> src.baltor.determinism.consensus._cluster  x1
+  src.baltor.determinism.consensus.record_consensus -> src.baltor.determinism.trace_store._hash  x1
+  src.baltor.determinism.consensus.record_consensus -> src.baltor.determinism.trace_store.make_trace_id  x1
+  src.baltor.determinism.consensus.to_dict -> src.baltor.determinism.consensus.ConsensusRun.routing  x1
+  src.baltor.determinism.consensus.to_trace -> src.baltor.determinism.consensus.ConsensusRun.routing  x1
+  src.baltor.determinism.consensus.to_trace -> src.baltor.determinism.trace_store.Trace  x1
+  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.consensus.ModelOutput  x1
+  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.consensus.record_consensus  x1
+  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.fallback_router.activate  x1
+  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.pattern_miner.mine_patterns  x1
+  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.replay_engine.replay  x1
+  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.rule_candidate_generator.FallbackPolicy  x1
+  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.rule_candidate_generator.from_pattern  x1
+  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.shadow_runner.run_shadow  x1
+  src.baltor.determinism.demo.build_demo -> src.baltor.determinism.trace_store.TraceStore  x1
+  src.baltor.determinism.fallback_router._input_signature -> src.baltor.determinism.fallback_router._canon  x1
+  src.baltor.determinism.fallback_router.activate -> src.baltor.determinism.fallback_router._attr  x1
+  src.baltor.determinism.fallback_router.event -> src.baltor.determinism.fallback_router.RoutingEvent  x1
+  src.baltor.determinism.fallback_router.event -> src.baltor.determinism.fallback_router._canon  x1
+  src.baltor.determinism.fallback_router.route -> src.baltor.determinism.fallback_router.RoutingEvent  x1
+  src.baltor.determinism.fallback_router.route -> src.baltor.determinism.fallback_router._canon  x1
+  src.baltor.determinism.fallback_router.route -> src.baltor.determinism.fallback_router._input_signature  x1
+  src.baltor.determinism.fallback_router.route -> src.baltor.determinism.fallback_router._is_ood  x1
+  src.baltor.determinism.fallback_router.route -> src.baltor.determinism.replay_engine.evaluate_rule  x1
+  src.baltor.determinism.pattern_miner._candidate_id -> src.baltor.determinism.trace_store._hash  x1
+  src.baltor.determinism.pattern_miner.mine_patterns -> src.baltor.determinism.pattern_miner.PatternCandidate  x1
+  src.baltor.determinism.pattern_miner.mine_patterns -> src.baltor.determinism.pattern_miner.PatternMinerError  x1
+  src.baltor.determinism.pattern_miner.mine_patterns -> src.baltor.determinism.pattern_miner._candidate_id  x1
+  src.baltor.determinism.pattern_miner.mine_patterns -> src.baltor.determinism.trace_store._hash  x1
+  src.baltor.determinism.replay_engine.evaluate_rule -> src.baltor.determinism.replay_engine._resolve_then  x1
+  src.baltor.determinism.replay_engine.field -> src.baltor.determinism.replay_engine._attr  x1
+  src.baltor.determinism.replay_engine.replay -> src.baltor.determinism.replay_engine.RuleReplayReport  x1
+  src.baltor.determinism.replay_engine.replay -> src.baltor.determinism.replay_engine._canon  x1
+  src.baltor.determinism.replay_engine.replay -> src.baltor.determinism.replay_engine.evaluate_rule  x1
+  src.baltor.determinism.rule_candidate_generator._rule_id -> src.baltor.determinism.rule_candidate_generator._canon  x1
+  src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.rule_candidate_generator.ConsensusOnlyError  x1
+  src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.rule_candidate_generator.FallbackPolicy  x1
+  src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.rule_candidate_generator.NoVerifiedTraceError  x1
+  src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.rule_candidate_generator.RuleCandidate  x1
+  src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.rule_candidate_generator.RuleCandidateError  x1
+  src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.rule_candidate_generator._rule_id  x1
+  src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.rule_candidate_generator.is_truth_serving  x1
+  src.baltor.determinism.rule_promotion_gate.add -> src.baltor.determinism.rule_promotion_gate.GateCheck  x1
+  src.baltor.determinism.rule_promotion_gate.evaluate -> src.baltor.determinism.rule_promotion_gate.GateCheck  x1
+  src.baltor.determinism.rule_promotion_gate.evaluate -> src.baltor.determinism.rule_promotion_gate.RulePromotionReceipt  x1
+  src.baltor.determinism.rule_promotion_gate.evaluate -> src.baltor.determinism.rule_promotion_gate._canon  x1
+  src.baltor.determinism.rule_promotion_gate.evaluate -> src.baltor.determinism.rule_promotion_gate._handles_preserved  x1
+  src.baltor.determinism.rule_promotion_gate.evaluate -> src.baltor.determinism.rule_promotion_gate._is_schema_valid  x1
+  src.baltor.determinism.shadow_runner.run_shadow -> src.baltor.determinism.replay_engine.evaluate_rule  x1
+  src.baltor.determinism.shadow_runner.run_shadow -> src.baltor.determinism.shadow_runner.ShadowRunReport  x1
+  src.baltor.determinism.shadow_runner.run_shadow -> src.baltor.determinism.shadow_runner._canon  x1
+  src.baltor.determinism.shadow_runner.run_shadow -> src.baltor.determinism.shadow_runner._live_decision_of  x1
+  src.baltor.determinism.trace_store._hash -> src.baltor.determinism.trace_store._canon  x1
+  src.baltor.determinism.trace_store.append -> src.baltor.determinism.trace_store.Trace  x1
+  src.baltor.determinism.trace_store.append -> src.baltor.determinism.trace_store.make_trace_id  x1
+  src.baltor.determinism.trace_store.append_trace -> src.baltor.determinism.trace_store.TraceStore.append  x1
+  src.baltor.determinism.trace_store.assert_mineable_global -> src.baltor.determinism.trace_store.TenantBoundaryError  x1
+  src.baltor.determinism.trace_store.assert_mineable_global -> src.baltor.determinism.trace_store.TraceStoreError  x1
+  src.baltor.determinism.trace_store.get -> src.baltor.determinism.trace_store.TenantBoundaryError  x1
+  src.baltor.determinism.trace_store.get -> src.baltor.determinism.trace_store.TraceStoreError  x1
+  src.baltor.determinism.trace_store.get -> src.baltor.determinism.trace_store.parse_trace_id  x1
+  src.baltor.determinism.trace_store.mining_set -> src.baltor.determinism.trace_store.TenantBoundaryError  x1
+  src.baltor.determinism.trace_store.mining_set -> src.baltor.determinism.trace_store.TraceStoreError  x1
+  src.baltor.determinism.trace_store.query -> src.baltor.determinism.trace_store.TraceStore.all  x1
+  src.baltor.distillation.lineage.build -> src.baltor.distillation.lineage.LineageBundle  x1
+  src.baltor.distillation.lineage.build -> src.baltor.distillation.lossless_store.TenantBoundaryError  x1
+  src.baltor.distillation.lineage.is_complete -> src.baltor.distillation.lineage.LineageBundle.reaches_raw  x1
+  src.baltor.distillation.lineage.is_complete -> src.baltor.distillation.lineage.LineageBundle.reaches_source  x1
+  src.baltor.distillation.lossless_store.__init__ -> src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore  x1
+  src.baltor.distillation.lossless_store._hash -> src.baltor.distillation.lossless_store._canon  x1
+  src.baltor.distillation.lossless_store._put -> src.baltor.distillation.lossless_store.LosslessStoreEntry  x1
+  src.baltor.distillation.lossless_store._put -> src.baltor.distillation.lossless_store.TenantBoundaryError  x1
+  src.baltor.distillation.lossless_store._put -> src.baltor.distillation.lossless_store._hash  x1
+  src.baltor.distillation.lossless_store._put -> src.baltor.distillation.lossless_store.make_id  x1
+  src.baltor.distillation.lossless_store.current -> src.baltor.distillation.lossless_store.LosslessStore.current_id  x1
+  src.baltor.distillation.lossless_store.get -> src.baltor.distillation.lossless_store.DistillationStoreError  x1
+  src.baltor.distillation.lossless_store.get -> src.baltor.distillation.lossless_store.TenantBoundaryError  x1
+  src.baltor.distillation.lossless_store.get -> src.baltor.distillation.lossless_store.parse_id  x1
+  src.baltor.distillation.lossless_store.put_derived -> src.baltor.distillation.lossless_store.LosslessStore._put  x1
+  src.baltor.distillation.lossless_store.put_raw -> src.baltor.distillation.lossless_store.LosslessStore._put  x1
+  src.baltor.distillation.lossless_store.put_source -> src.baltor.distillation.lossless_store.LosslessStore._put  x1
+  src.baltor.distillation.lossless_store.rehydrate_payload -> src.baltor.distillation.lossless_store.TenantBoundaryError  x1
+  src.baltor.distillation.lossless_store.set_current -> src.baltor.distillation.lossless_store.DistillationStoreError  x1
+  src.baltor.distillation.lossless_store.set_current -> src.baltor.distillation.lossless_store.TenantBoundaryError  x1
+  src.baltor.distillation.retention_report.build -> src.baltor.distillation.retention_report.InformationRetentionReport  x1
+  src.baltor.distillation.retention_report.build_retention_report -> src.baltor.distillation.retention_report.InformationRetentionReportBuilder  x1
+  src.baltor.distillation.rollback.execute -> src.baltor.distillation.rollback.RollbackReceipt  x1
+  src.baltor.distillation.rollback.of -> src.baltor.distillation.rollback.RollbackPlan  x1
+  src.baltor.facts.classifier.classify -> src.baltor.contracts.artifacts.fragility_metadata.FragilityMetadata  x1
+  src.baltor.facts.classifier.classify -> src.baltor.facts.classifier.classify_volatility  x1
+  src.baltor.facts.classifier.classify -> src.baltor.facts.classifier.recommend_watch_policy  x1
+  src.baltor.facts.classifier.recommend_watch_policy -> src.baltor.facts.classifier.classify_volatility  x1
+  src.baltor.facts.refresh_planner._stub_external_evidence -> src.baltor.facts.refresh_planner._evidence_hash  x1
+  src.baltor.facts.refresh_planner.apply_result -> src.baltor.contracts.artifacts.canonical_fact.CanonicalFact  x1
+  src.baltor.facts.refresh_planner.plan_task -> src.baltor.contracts.artifacts.verification_task.VerificationTask  x1
+  src.baltor.facts.refresh_planner.refresh -> src.baltor.facts.refresh_planner.FactRefreshPlanner._stub_external_evidence  x1
+  src.baltor.facts.refresh_planner.refresh -> src.baltor.facts.refresh_planner._scope_allowed  x1
+  src.baltor.graph.providers.temporal_graph_provider.project -> src.baltor.graph.providers.temporal_graph_provider.UnavailableProvider  x1
+  src.baltor.graph.temporal.bridges.refresh_observation -> src.baltor.graph.temporal.policy.project_current  x1
+  src.baltor.graph.temporal.builder.build_cfpb_temporal_graph -> src.baltor.graph.temporal.builder._receipt  x1
+  src.baltor.graph.temporal.builder.build_cfpb_temporal_graph -> src.baltor.graph.temporal.policy.project_current  x1
+  src.baltor.graph.temporal.builder.build_cfpb_temporal_graph -> src.baltor.graph.temporal.store.TemporalGraphStore  x1
+  src.baltor.graph.temporal.contracts.__post_init__ -> src.baltor.graph.temporal.contracts.temporal_fact_id  x1
+  src.baltor.graph.temporal.contracts.content_hash -> src.baltor.graph.temporal.contracts._canon  x1
+  src.baltor.graph.temporal.contracts.edge_id -> src.baltor.graph.temporal.contracts._canon  x1
+  src.baltor.graph.temporal.contracts.observation_id -> src.baltor.graph.temporal.contracts._canon  x1
+  src.baltor.graph.temporal.contracts.temporal_fact_id -> src.baltor.graph.temporal.contracts._canon  x1
+  src.baltor.graph.temporal.store.add_edge -> src.baltor.graph.temporal.contracts.edge_id  x1
+  src.baltor.graph.temporal.store.add_observation -> src.baltor.graph.temporal.contracts.TemporalFactNode  x1
+  src.baltor.graph.temporal.store.add_observation -> src.baltor.graph.temporal.contracts.observation_id  x1
+  src.baltor.graph.temporal.store.add_observation -> src.baltor.graph.temporal.store.TemporalGraphStore.add_edge  x1
+  src.baltor.graph.temporal.store.add_observation -> src.baltor.graph.temporal.store.TemporalGraphStore.upsert_node  x1
+  src.baltor.graph.temporal.store.by_fact_key -> src.baltor.graph.temporal.store.TemporalGraphStore._visible  x1
+  src.baltor.graph.temporal.store.by_source_handle -> src.baltor.graph.temporal.store.TemporalGraphStore._visible  x1
+  src.baltor.graph.temporal.store.contradictions -> src.baltor.graph.temporal.store.TemporalGraphStore.edges  x1
+  src.baltor.graph.temporal.store.current_nodes -> src.baltor.graph.temporal.store.TemporalGraphStore._visible  x1
+  src.baltor.graph.temporal.store.edges -> src.baltor.graph.temporal.store.TemporalGraphStore._visible  x1
+  src.baltor.graph.temporal.store.get_node -> src.baltor.graph.temporal.store.TenantScopeError  x1
+  src.baltor.graph.temporal.store.held_out -> src.baltor.graph.temporal.store.TemporalGraphStore._visible  x1
+  src.baltor.graph.temporal.store.nodes -> src.baltor.graph.temporal.store.TemporalGraphStore._visible  x1
+  src.baltor.graph.temporal.store.snapshot -> src.baltor.graph.temporal.store.TemporalGraphStore.edges  x1
+  src.baltor.graph.temporal.store.snapshot -> src.baltor.graph.temporal.store.TemporalGraphStore.nodes  x1
+  src.baltor.memory.builder_memory._capture -> src.baltor.memory.builder_memory.redact  x1
+  src.baltor.memory.builder_memory.capture_builder_state -> src.baltor.memory.builder_memory._capture  x1
+  src.baltor.memory.builder_memory.capture_failure_trace -> src.baltor.memory.builder_memory._capture  x1
+  src.baltor.memory.builder_memory.capture_flywheel_tick -> src.baltor.memory.builder_memory._capture  x1
+  src.baltor.memory.builder_memory.capture_next_target -> src.baltor.memory.builder_memory._capture  x1
+  src.baltor.memory.builder_memory.capture_proof_result -> src.baltor.memory.builder_memory._capture  x1
+  src.baltor.memory.builder_memory.capture_supervisor_decision -> src.baltor.memory.builder_memory._capture  x1
+  src.baltor.memory.builder_memory.default_provider -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider  x1
+  src.baltor.memory.memory_worker.process_memory_task -> src.baltor.memory.builder_memory.capture_builder_state  x1
+  src.baltor.memory.memory_worker.process_memory_task -> src.baltor.memory.builder_memory.redact  x1
+  src.baltor.memory.memory_worker.run_memory_worker_durable -> src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider  x1
+  src.baltor.memory.memory_worker.run_memory_worker_durable -> src.baltor.memory.memory_worker.process_memory_task  x1
+  src.baltor.memory.memory_worker.run_memory_worker_durable -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger  x1
+  src.baltor.native.ftm_adapter._topics -> src.baltor.native.ftm_adapter._as_list  x1
+  src.baltor.native.ftm_adapter.to_entity_proxy -> src.baltor.native.ftm_adapter._as_list  x1
+  src.baltor.native.ftm_adapter.to_entity_proxy -> src.baltor.native.ftm_adapter._sha1  x1
+  src.baltor.native.ftm_adapter.to_entity_proxy -> src.baltor.native.ftm_adapter._topics  x1
+  src.baltor.native.ftm_adapter.to_entity_proxy -> src.baltor.native.ftm_adapter.schema_for  x1
+  src.baltor.native.ftm_adapter.to_ftm -> src.baltor.native.ftm_adapter.to_entity_proxy  x1
+  src.baltor.native.native_export_service.__init__ -> src.baltor.native.native_format_preserver.NativeFormatPreserver  x1
+  src.baltor.native.native_export_service.__init__ -> src.baltor.native.native_projection_builder.NativeProjectionBuilder  x1
+  src.baltor.native.native_export_service.__init__ -> src.baltor.native.sidecar_writer.SidecarWriter  x1
+  src.baltor.native.native_export_service.export -> src.baltor.native.native_export_service.NativeExportReceipt  x1
+  src.baltor.native.native_format_preserver._csv_contract -> src.baltor.native.native_format_preserver.NativeShapeContract  x1
+  src.baltor.native.native_format_preserver._csv_contract -> src.baltor.native.native_format_preserver._detect_newline  x1
+  src.baltor.native.native_format_preserver._csv_contract -> src.baltor.native.native_format_preserver._sha256  x1
+  src.baltor.native.native_format_preserver._json_contract -> src.baltor.native.native_format_preserver.NativeShapeContract  x1
+  src.baltor.native.native_format_preserver._json_contract -> src.baltor.native.native_format_preserver._flatten_pointers  x1
+  src.baltor.native.native_format_preserver._json_contract -> src.baltor.native.native_format_preserver._sha256  x1
+  src.baltor.native.native_format_preserver._markdown_contract -> src.baltor.native.native_format_preserver.NativeShapeContract  x1
+  src.baltor.native.native_format_preserver._markdown_contract -> src.baltor.native.native_format_preserver._detect_newline  x1
+  src.baltor.native.native_format_preserver.preserve -> src.baltor.native.native_format_preserver.NativeFormatPreserver._csv_contract  x1
+  src.baltor.native.native_format_preserver.preserve -> src.baltor.native.native_format_preserver.NativeFormatPreserver._json_contract  x1
+  src.baltor.native.native_format_preserver.preserve -> src.baltor.native.native_format_preserver.NativeFormatPreserver._markdown_contract  x1
+  src.baltor.native.native_format_preserver.preserve -> src.baltor.native.native_format_preserver.NativeFormatPreserver.detect_format  x1
+  src.baltor.native.native_format_preserver.preserve -> src.baltor.native.native_format_preserver._as_bytes  x1
+  src.baltor.native.native_format_preserver.preserve -> src.baltor.native.native_format_preserver._sha256  x1
+  src.baltor.native.native_projection_builder._csv -> src.baltor.native.native_projection_builder._hid  x1
+  src.baltor.native.native_projection_builder._json -> src.baltor.native.native_projection_builder._hid  x1
+  src.baltor.native.native_projection_builder._json -> src.baltor.native.native_projection_builder._pointer_get  x1
+  src.baltor.native.native_projection_builder._json -> src.baltor.native.native_projection_builder._pointer_set  x1
+  src.baltor.native.native_projection_builder._markdown -> src.baltor.native.native_projection_builder.NativeDiff  x1
+  src.baltor.native.native_projection_builder._proj -> src.baltor.native.native_projection_builder.NativeProjection  x1
+  src.baltor.native.native_projection_builder._proj -> src.baltor.native.native_projection_builder._hid  x1
+  src.baltor.native.native_projection_builder._proj -> src.baltor.native.native_projection_builder._sha256  x1
+  src.baltor.native.native_projection_builder.build -> src.baltor.native.native_projection_builder.NativeProjectionBuilder._csv  x1
+  src.baltor.native.native_projection_builder.build -> src.baltor.native.native_projection_builder.NativeProjectionBuilder._json  x1
+  src.baltor.native.native_projection_builder.build -> src.baltor.native.native_projection_builder.NativeProjectionBuilder._markdown  x1
+  src.baltor.native.okf_adapter.content_hash -> src.baltor.native.okf_adapter.GovernedConcept.as_dict  x1
+  src.baltor.native.okf_adapter.content_hash -> src.baltor.native.okf_adapter._sha256  x1
+  src.baltor.native.okf_adapter.okf_export -> src.baltor.native.okf_adapter._build_index  x1
+  src.baltor.native.okf_adapter.okf_export -> src.baltor.native.okf_adapter._build_log  x1
+  src.baltor.native.okf_adapter.okf_export -> src.baltor.native.okf_adapter.okf_export_file  x1
+  src.baltor.native.okf_adapter.okf_export_file -> src.baltor.native.okf_adapter._frontmatter  x1
+  src.baltor.native.okf_adapter.okf_import -> src.baltor.native.okf_adapter.okf_import_file  x1
+  src.baltor.native.okf_adapter.okf_import_file -> src.baltor.native.okf_adapter.GovernedConcept  x1
+  src.baltor.native.okf_adapter.okf_import_file -> src.baltor.native.okf_adapter._split_frontmatter  x1
+  src.baltor.native.okf_adapter.round_trip -> src.baltor.native.okf_adapter.okf_export  x1
+  src.baltor.native.okf_adapter.round_trip -> src.baltor.native.okf_adapter.okf_import  x1
+  src.baltor.native.sidecar_writer.build -> src.baltor.native.sidecar_writer.SidecarOverlay  x1
+  src.baltor.native.sidecar_writer.build -> src.baltor.native.sidecar_writer._hid  x1
+  src.baltor.native.sidecar_writer.field_fact -> src.baltor.native.sidecar_writer._handles  x1
+  src.baltor.native.sidecar_writer.held_out -> src.baltor.native.sidecar_writer._handles  x1
+  src.baltor.native.skill_md_adapter.content_hash -> src.baltor.native.skill_md_adapter.GovernedSkill.as_dict  x1
+  src.baltor.native.skill_md_adapter.content_hash -> src.baltor.native.skill_md_adapter._sha256  x1
+  src.baltor.native.skill_md_adapter.round_trip -> src.baltor.native.skill_md_adapter.skill_md_export  x1
+  src.baltor.native.skill_md_adapter.round_trip -> src.baltor.native.skill_md_adapter.skill_md_import  x1
+  src.baltor.native.skill_md_adapter.skill_md_export -> src.baltor.native.skill_md_adapter._frontmatter  x1
+  src.baltor.native.skill_md_adapter.skill_md_import -> src.baltor.native.skill_md_adapter.GovernedSkill  x1
+  src.baltor.native.skill_md_adapter.skill_md_import -> src.baltor.native.skill_md_adapter._split_frontmatter  x1
+  src.baltor.observability.projections.lineage.emit -> src.baltor.observability.projections.lineage.LineageFacet  x1
+  src.baltor.observability.projections.lineage.emit -> src.baltor.observability.projections.standards.canonical_hash  x1
+  src.baltor.observability.projections.lineage.emit -> src.baltor.observability.projections.standards.governance_facet  x1
+  src.baltor.observability.projections.lineage.emit -> src.baltor.observability.projections.standards.to_openlineage_run_event  x1
+  src.baltor.observability.projections.lineage.emit -> src.baltor.observability.projections.standards.to_prov_json  x1
+  src.baltor.observability.projections.standards._openlineage_facet -> src.baltor.observability.projections.standards.governance_facet  x1
+  src.baltor.observability.projections.standards.to_json_patch -> src.baltor.observability.projections.standards.governance_facet  x1
+  src.baltor.observability.projections.standards.to_json_patch -> src.baltor.observability.projections.standards.json_patch_ops  x1
+  src.baltor.observability.projections.standards.to_openlineage_run_event -> src.baltor.observability.projections.standards._det_uuid  x1
+  src.baltor.observability.projections.standards.to_openlineage_run_event -> src.baltor.observability.projections.standards._openlineage_facet  x1
+  src.baltor.observability.projections.standards.to_prov_json -> src.baltor.observability.projections.standards.governance_facet  x1
+  src.baltor.observability.projections.standards.to_web_annotation -> src.baltor.observability.projections.standards.governance_facet  x1
+  src.baltor.observability.tracing.provider._node -> src.baltor.observability.projections.standards.governance_facet  x1
+  src.baltor.observability.tracing.provider.record -> src.baltor.observability.tracing.provider.SpanTree  x1
+  src.baltor.observability.tracing.provider.record -> src.baltor.observability.tracing.provider._node  x1
+  src.baltor.runtime.registry.capability_registry.__init__ -> src.baltor.runtime.registry.capability_registry.load_catalog  x1
+  src.baltor.runtime.registry.capability_registry.__init__ -> src.baltor.runtime.registry.capability_registry.load_health_policy  x1
+  src.baltor.runtime.registry.capability_registry._main -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry  x1
+  src.baltor.runtime.registry.capability_registry.adapters_for -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry.get_by_capability_slot  x1
+  src.baltor.runtime.registry.capability_registry.adopted_flagged_tools -> src.baltor.runtime.registry.capability_registry.flagged_tool_names  x1
+  src.baltor.runtime.registry.capability_registry.covers_backend_tool_keys -> src.baltor.runtime.registry.capability_registry.backend_tool_keys  x1
+  src.baltor.runtime.registry.capability_registry.load_catalog -> src.baltor.runtime.registry.capability_registry._read  x1
+  src.baltor.runtime.registry.capability_registry.load_health_policy -> src.baltor.runtime.registry.capability_registry._read  x1
+  src.baltor.runtime.registry.capability_registry.load_matrix -> src.baltor.runtime.registry.capability_registry._read  x1
+  src.baltor.runtime.registry.capability_registry.preference_graph -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry.adapters_for  x1
+  src.baltor.runtime.registry.capability_registry.preference_order -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry.adapters_for  x1
+  src.baltor.runtime.registry.capability_registry.preference_order -> src.baltor.runtime.registry.preference_graph.resolve_order  x1
+  src.baltor.runtime.registry.capability_registry.replacement_candidates -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry.get_by_capability_slot  x1
+  src.baltor.runtime.registry.capability_registry.require_cataloged_repo -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry.import_modules  x1
+  src.baltor.runtime.registry.capability_registry.require_cataloged_repo -> src.baltor.runtime.registry.capability_registry.UncatalogedRepoError  x1
+  src.baltor.runtime.registry.capability_registry.wired_adapter -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry.get_adapter  x1
+  src.baltor.runtime.registry.capability_registry.wired_adapter -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry.get_by_capability_slot  x1
+  src.baltor.runtime.registry.preference_graph._key -> src.baltor.runtime.registry.preference_graph.adapter_priority  x1
+  src.baltor.runtime.registry.preference_graph.preference_graph -> src.baltor.runtime.registry.preference_graph.adapter_priority  x1
+  src.baltor.runtime.registry.preference_graph.preference_graph -> src.baltor.runtime.registry.preference_graph.resolve_order  x1
+  src.baltor.runtime.registry.preference_graph.preference_graph -> src.baltor.runtime.registry.preference_graph.status_code  x1
+  src.baltor.runtime.registry.preference_graph.resolve_order -> src.baltor.runtime.registry.preference_graph._runnable  x1
+  src.baltor.runtime.registry.preference_graph.resolve_order -> src.baltor.runtime.registry.preference_graph.adapter_priority  x1
+  src.baltor.runtime.registry.preference_graph.status_code -> src.baltor.runtime.registry.preference_graph._status_label_to_code  x1
+  src.baltor.sales.claim_guard.authorization_ok -> src.baltor.sales.claim_guard.load_engagement_policy  x1
+  src.baltor.sales.claim_guard.classify_claim_language -> src.baltor.sales.claim_guard.load_public_claim_policy  x1
+  src.baltor.sales.claim_guard.gate_evidence_pack -> src.baltor.sales.claim_guard.classify_claim_language  x1
+  src.baltor.sales.claim_guard.gate_evidence_pack -> src.baltor.sales.claim_guard.load_public_claim_policy  x1
+  src.baltor.sales.claim_guard.gate_outreach -> src.baltor.sales.claim_guard.classify_claim_language  x1
+  src.baltor.sales.claim_guard.gate_outreach -> src.baltor.sales.claim_guard.load_engagement_policy  x1
+  src.baltor.sales.claim_guard.product_message_ok -> src.baltor.sales.claim_guard.load_public_claim_policy  x1
+  src.baltor.sales.claim_guard.safe_rewrite -> src.baltor.sales.claim_guard.load_public_claim_policy  x1
+  src.baltor.sales.diagnostics.chatbot_guardrail_audit._classify_turn -> src.baltor.sales.claim_guard.classify_claim_language  x1
+  src.baltor.sales.diagnostics.chatbot_guardrail_audit._classify_turn -> src.baltor.sales.claim_guard.safe_rewrite  x1
+  src.baltor.sales.diagnostics.chatbot_guardrail_audit.audit_transcript -> src.baltor.sales.diagnostics.chatbot_guardrail_audit._classify_turn  x1
+  src.baltor.sales.diagnostics.chatbot_guardrail_audit.audit_transcript -> src.baltor.sales.diagnostics.chatbot_guardrail_audit._fetch_live_transcript  x1
+  src.baltor.sales.diagnostics.chatbot_guardrail_audit.audit_transcript -> src.baltor.sales.diagnostics.chatbot_guardrail_audit.load_risk_rules  x1
+  src.baltor.sales.diagnostics.chatbot_guardrail_audit.audit_transcript -> src.baltor.sales.diagnostics.runner.start_diagnostic  x1
+  src.baltor.sales.diagnostics.runner.resolve_mode -> src.baltor.sales.diagnostics.runner.load_modes  x1
+  src.baltor.sales.diagnostics.runner.start_diagnostic -> src.baltor.sales.claim_guard.authorization_ok  x1
+  src.baltor.sales.diagnostics.runner.start_diagnostic -> src.baltor.sales.diagnostics.runner._rid  x1
+  src.baltor.sales.diagnostics.runner.start_diagnostic -> src.baltor.sales.diagnostics.runner.resolve_mode  x1
+  src.baltor.teleon_client.client._self_test -> src.baltor.teleon_client.client.capabilities  x1
+  src.baltor.teleon_client.client._self_test -> src.teleon.purpose_tasks.adaptation_ladder.classify  x1
+  src.baltor.teleon_client.client._self_test -> src.teleon.purpose_tasks.runtime_binding.offline_default_backend  x1
+  src.baltor.teleon_client.client.autonomy_forbidden -> src.baltor.teleon_client.client.TeleonClient.call  x1
+  src.baltor.teleon_client.client.bind_runtime -> src.baltor.teleon_client.client.TeleonClient.call  x1
+  src.baltor.teleon_client.client.call -> src.baltor.teleon_client.client.capabilities  x1
+  src.baltor.teleon_client.client.change_gate -> src.baltor.teleon_client.client.TeleonClient.call  x1
+  src.baltor.teleon_client.client.classify_change -> src.baltor.teleon_client.client.TeleonClient.call  x1
+  src.baltor.teleon_client.client.default_backend -> src.baltor.teleon_client.client.TeleonClient.call  x1
+  src.baltor.workers.batch_windows.plan_dispatch -> src.baltor.workers.batch_windows.partition  x1
+  src.baltor.workers.batch_windows.plan_dispatch -> src.baltor.workers.batch_windows.window_decision  x1
+  src.baltor.workers.batch_windows.window_decision -> src.teleon.workers.fleet_ledger._age_s  x1
+  src.baltor.workers.control_plane.control_plane_tick -> src.baltor.workers.control_plane._caps  x1
+  src.baltor.workers.failure_taxonomy.failure_policy -> src.baltor.workers.failure_taxonomy._taxonomy  x1
+  src.baltor.workers.failure_taxonomy.failure_types -> src.baltor.workers.failure_taxonomy._taxonomy  x1
+  src.baltor.workers.failure_taxonomy.is_retryable -> src.baltor.workers.failure_taxonomy.failure_policy  x1
+  src.baltor.workers.failure_taxonomy.opens_circuit -> src.baltor.workers.failure_taxonomy.failure_policy  x1
+  src.baltor.workers.fleet_supervisor.decide_for_capability -> src.baltor.workers.fleet_supervisor._caps  x1
+  src.baltor.workers.fleet_supervisor.decide_for_capability -> src.baltor.workers.fleet_supervisor._free_capacity  x1
+  src.baltor.workers.fleet_supervisor.decide_for_capability -> src.teleon.workers.fleet_ledger._age_s  x1
+  src.baltor.workers.fleet_supervisor.tick -> src.baltor.workers.fleet_supervisor._caps  x1
+  src.baltor.workers.fleet_supervisor.tick -> src.baltor.workers.fleet_supervisor.decide_for_capability  x1
+  src.baltor.workers.local_spawn_manager.spawn -> src.baltor.workers.local_spawn_manager.build_command  x1
+  src.baltor.workers.provider_circuit_breaker.allow -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker.state  x1
+  src.baltor.workers.provider_circuit_breaker.force_open -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker._trip  x1
+  src.baltor.workers.provider_circuit_breaker.record_failure -> src.baltor.workers.failure_taxonomy.opens_circuit  x1
+  src.baltor.workers.provider_circuit_breaker.record_failure -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker.state  x1
+  src.baltor.workers.provider_circuit_breaker.record_success -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker.state  x1
+  src.baltor.workers.provider_circuit_breaker.state -> src.teleon.workers.fleet_ledger._age_s  x1
+  src.baltor.workers.provider_fallback.__init__ -> src.baltor.workers.provider_circuit_breaker.CircuitBreaker  x1
+  src.baltor.workers.spawn_decision.decide -> src.teleon.workers.fleet_ledger._age_s  x1
+  src.baltor.workers.supervisor_ledger.acquire_lease -> src.teleon.workers.fleet_ledger._plus_s  x1
+  src.baltor.workers.supervisor_ledger.claim_shard -> src.baltor.workers.supervisor_ledger.SupervisorLedgerError  x1
+  src.baltor.workers.supervisor_ledger.claim_shard -> src.teleon.workers.fleet_ledger._plus_s  x1
+  src.baltor.workers.supervisor_ledger.heartbeat_shard -> src.teleon.workers.fleet_ledger._plus_s  x1
+  src.baltor.workers.supervisor_ledger.is_leader -> src.baltor.workers.supervisor_ledger.SupervisorLedger.lease_holder  x1
+  src.baltor.workers.supervisor_ledger.record_decision -> src.baltor.workers.supervisor_ledger._hid  x1
+  src.baltor.workers.supervisor_ledger.renew_lease -> src.teleon.workers.fleet_ledger._plus_s  x1
+  src.baltor.workers.supervisor_metrics.lag_metrics -> src.teleon.workers.fleet_ledger._age_s  x1
+  src.baltor.workers.supervisor_projection._durable_tasks -> src.baltor.workers.supervisor_projection._count  x1
+  src.baltor.workers.supervisor_projection._durable_tasks -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger  x1
+  src.baltor.workers.supervisor_projection.fleet_projection -> src.baltor.workers.supervisor_projection._durable_tasks  x1
+  src.baltor.workers.supervisor_projection.fleet_projection -> src.baltor.workers.supervisor_projection._execution  x1
+  src.baltor.workers.supervisor_projection.fleet_projection -> src.baltor.workers.supervisor_projection._now  x1
+  src.baltor.workers.supervisor_projection.fleet_projection -> src.baltor.workers.supervisor_store.SupervisorStore  x1
+  src.baltor.workers.supervisor_projection.fleet_section -> src.baltor.workers.supervisor_projection.fleet_projection  x1
+  src.baltor.workers.supervisor_projection.supervisor_detail -> src.baltor.workers.supervisor_store.SupervisorStore  x1
+  src.baltor.workers.supervisor_store.__init__ -> src.baltor.workers.supervisor_store.SupervisorStore._init_schema  x1
+  src.baltor.workers.supervisor_store.claim_available_shards -> src.baltor.workers.supervisor_store.SupervisorStore.claim_shard  x1
+  src.baltor.workers.supervisor_store.claim_shard -> src.baltor.workers.supervisor_store._now  x1
+  src.baltor.workers.supervisor_store.ensure_default_shards -> src.baltor.workers.supervisor_store._now  x1
+  src.baltor.workers.supervisor_store.expire_stale_shards -> src.baltor.workers.supervisor_store._now  x1
+  src.baltor.workers.supervisor_store.get_leader -> src.baltor.workers.supervisor_store._now  x1
+  src.baltor.workers.supervisor_store.heartbeat_instance -> src.baltor.workers.supervisor_store._now  x1
+  src.baltor.workers.supervisor_store.list_owned_shards -> src.baltor.workers.supervisor_store._now  x1
+  src.baltor.workers.supervisor_store.record_capacity_snapshot -> src.baltor.workers.supervisor_store.SupervisorStore.capacity_snapshots  x1
+  src.baltor.workers.supervisor_store.record_capacity_snapshot -> src.baltor.workers.supervisor_store._hid  x1
+  src.baltor.workers.supervisor_store.record_capacity_snapshot -> src.baltor.workers.supervisor_store._now  x1
+  src.baltor.workers.supervisor_store.record_decision -> src.baltor.workers.supervisor_store._hid  x1
+  src.baltor.workers.supervisor_store.record_decision -> src.baltor.workers.supervisor_store._now  x1
+  src.baltor.workers.supervisor_store.record_spawn_decision -> src.baltor.workers.supervisor_store.SupervisorStore.record_decision  x1
+  src.baltor.workers.supervisor_store.record_spawn_decision -> src.baltor.workers.supervisor_store._hid  x1
+  src.baltor.workers.supervisor_store.record_spawn_decision -> src.baltor.workers.supervisor_store._now  x1
+  src.baltor.workers.supervisor_store.record_spawn_request -> src.baltor.workers.supervisor_store._hid  x1
+  src.baltor.workers.supervisor_store.record_spawn_request -> src.baltor.workers.supervisor_store._now  x1
+  src.baltor.workers.supervisor_store.record_tick -> src.baltor.workers.supervisor_store.SupervisorStore.ticks  x1
+  src.baltor.workers.supervisor_store.record_tick -> src.baltor.workers.supervisor_store._hid  x1
+  src.baltor.workers.supervisor_store.record_tick -> src.baltor.workers.supervisor_store._now  x1
+  src.baltor.workers.supervisor_store.register_instance -> src.baltor.workers.supervisor_store.SupervisorStore.instance  x1
+  src.baltor.workers.supervisor_store.register_instance -> src.baltor.workers.supervisor_store._now  x1
+  src.baltor.workers.supervisor_store.renew_leader -> src.baltor.workers.supervisor_store._now  x1
+  src.baltor.workers.supervisor_store.renew_shards -> src.baltor.workers.supervisor_store._now  x1
+  src.baltor.workers.supervisor_store.set_instance_status -> src.baltor.workers.supervisor_store._now  x1
+  src.baltor.workers.supervisor_store.try_claim_leader -> src.baltor.workers.supervisor_store._hid  x1
+  src.baltor.workers.supervisor_store.try_claim_leader -> src.baltor.workers.supervisor_store._now  x1
+  src.baltor.workers.supervisor_watch.step -> src.baltor.workers.supervisor_watch._iso  x1
+  src.baltor.workers.supervisor_watch.step -> src.baltor.workers.supervisor_watch._now  x1
+  src.baltor.workers.supervisor_watch.step -> src.baltor.workers.supervisor_watch._spawn_decisions  x1
+  src.baltor.workers.telemetry._ms -> src.teleon.workers.fleet_ledger._age_s  x1
+  src.baltor.workers.telemetry.all_metrics -> src.baltor.workers.telemetry.capacity_snapshot  x1
+  src.baltor.workers.telemetry.all_metrics -> src.baltor.workers.telemetry.cost_metrics  x1
+  src.baltor.workers.telemetry.all_metrics -> src.baltor.workers.telemetry.failure_metrics  x1
+  src.baltor.workers.telemetry.all_metrics -> src.baltor.workers.telemetry.lifecycle_metrics  x1
+  src.baltor.workers.telemetry.all_metrics -> src.baltor.workers.telemetry.provider_metrics  x1
+  src.baltor.workers.telemetry.all_metrics -> src.baltor.workers.telemetry.queue_metrics  x1
+  src.baltor.workers.telemetry.all_metrics -> src.baltor.workers.telemetry.task_metrics  x1
+  src.baltor.workers.telemetry.failure_metrics -> src.baltor.workers.failure_taxonomy.failure_policy  x1
+  src.baltor.workers.telemetry.queue_metrics -> src.teleon.workers.fleet_ledger._age_s  x1
+  src.baltor.workers.worker_router.check_command -> src.baltor.workers.worker_router.can_publish_truth  x1
+  src.baltor.workers.worker_router.check_command -> src.baltor.workers.worker_router.route  x1
+  src.baltor.workers.worker_router.check_command -> src.baltor.workers.worker_router.validate_output  x1
+  src.baltor.workers.worker_router.route -> src.baltor.workers.worker_router.WorkerPolicyError  x1
+  src.baltor.workers.worker_router.route -> src.baltor.workers.worker_router.load_buckets  x1
+  src.openharnesshub.auth_kit.realm.login -> src.openharnesshub.auth_kit.realm._handle  x1
+  src.openharnesshub.auth_kit.realm.make_realm -> src.openharnesshub.auth_kit.realm.CredentialProviderPort  x1
+  src.openharnesshub.auth_kit.realm.make_realm -> src.openharnesshub.auth_kit.realm.Realm  x1
+  src.openharnesshub.auth_kit.realm.register -> src.openharnesshub.auth_kit.realm._handle  x1
+  src.openharnesshub.auth_kit.realm.verify -> src.openharnesshub.auth_kit.realm.CredentialProviderPort.make_ref  x1
+  src.openharnesshub.browsing_registry.browser_view -> src.openharnesshub.licenses.classify_license  x1
+  src.openharnesshub.browsing_registry.coverage -> src.openharnesshub.browsing_registry.load_registry  x1
+  src.openharnesshub.browsing_registry.model_view -> src.openharnesshub.licenses.classify_license  x1
+  src.openharnesshub.browsing_registry.select_stack -> src.openharnesshub.browsing_registry.browser_view  x1
+  src.openharnesshub.browsing_registry.select_stack -> src.openharnesshub.browsing_registry.load_registry  x1
+  src.openharnesshub.component_store._served_for_tenant -> src.openharnesshub.component_store.ComponentStore._verified_map  x1
+  src.openharnesshub.component_store.latest -> src.openharnesshub.component_store.ComponentStore.versions  x1
+  src.openharnesshub.component_store.put_version -> src.openharnesshub.component_store.ComponentStore.versions  x1
+  src.openharnesshub.component_store.put_version -> src.openharnesshub.component_store.content_hash  x1
+  src.openharnesshub.discovery._gen -> src.openharnesshub.discovery._slug  x1
+  src.openharnesshub.discovery.discover -> src.openharnesshub.discovery.OpenClaw.pick_tool  x1
+  src.openharnesshub.discovery.discover -> src.openharnesshub.discovery.OpenClaw.plugins_for  x1
+  src.openharnesshub.discovery.fn -> src.openharnesshub.discovery._slug  x1
+  src.openharnesshub.discovery.handle -> src.openharnesshub.discovery._slug  x1
+  src.openharnesshub.discovery.stub_tools -> src.openharnesshub.discovery._slug  x1
+  src.openharnesshub.discovery.sweep -> src.openharnesshub.discovery.Hermes.handle  x1
+  src.openharnesshub.generators._gen_method_catalog -> src.openharnesshub.generators._slug  x1
+  src.openharnesshub.generators.gen -> src.openharnesshub.generators._slug  x1
+  src.openharnesshub.generators.make_descent_brain_generator -> src.openharnesshub.generators._slug  x1
+  src.openharnesshub.hub_engine.engines_for_all_hubs -> src.openharnesshub.hub_engine.HubEngine  x1
+  src.openharnesshub.hub_engine.engines_for_all_hubs -> src.openharnesshub.hub_engine.hub_specs  x1
+  src.openharnesshub.hub_engine.hub_specs -> src.openharnesshub.hub_engine.HubSpec  x1
+  src.openharnesshub.hub_engine.ingest -> src.openharnesshub.hub_engine.HubEngine._normalize  x1
+  src.openharnesshub.hub_engine.ingest -> src.openharnesshub.hub_engine.HubEngine.digest  x1
+  src.openharnesshub.hub_engine.run_cycle -> src.openharnesshub.hub_engine.HubEngine.ingest  x1
+  src.openharnesshub.hub_engine.run_cycle -> src.openharnesshub.hub_engine.HubEngine.verify  x1
+  src.openharnesshub.hub_settings.all_settings -> src.openharnesshub.hub_settings.all_hub_ids  x1
+  src.openharnesshub.hub_settings.all_settings -> src.openharnesshub.hub_settings.load_settings  x1
+  src.openharnesshub.hub_settings.load_settings -> src.openharnesshub.hub_settings.HubSettings  x1
+  src.openharnesshub.hub_settings.save_settings -> src.openharnesshub.hub_settings._read  x1
+  src.openharnesshub.hub_site.render_hub_page -> src.openharnesshub.hub_site._browse_html  x1
+  src.openharnesshub.hub_site.render_hub_page -> src.openharnesshub.hub_site._channels_html  x1
+  src.openharnesshub.intake._to_body -> src.openharnesshub.intake._looks_like_okf  x1
+  src.openharnesshub.intake.ingest_materials -> src.openharnesshub.intake._to_body  x1
+  src.openharnesshub.intake.parse_okf -> src.openharnesshub.intake._first_heading  x1
+  src.openharnesshub.intake.parse_okf -> src.openharnesshub.intake._split_frontmatter  x1
+  src.openharnesshub.research_catalog.descent_plan -> src.openharnesshub.research_catalog.eligible  x1
+  src.openharnesshub.research_catalog.eligible -> src.openharnesshub.research_catalog.host_allowed  x1
+  src.openharnesshub.research_catalog.eligible -> src.openharnesshub.research_catalog.load_catalog  x1
+  src.openharnesshub.research_catalog.eligible -> src.openharnesshub.research_catalog.load_guardrails  x1
+  src.openharnesshub.research_catalog.host_allowed -> src.openharnesshub.research_catalog._host  x1
+  src.openharnesshub.research_catalog.load_catalog -> src.openharnesshub.research_catalog.ResearchComponent  x1
+  src.openharnesshub.research_catalog.load_catalog -> src.openharnesshub.research_catalog._load  x1
+  src.openharnesshub.research_catalog.load_guardrails -> src.openharnesshub.research_catalog._load  x1
+  src.openharnesshub.research_catalog.select_component -> src.openharnesshub.research_catalog.eligible  x1
+  src.teleon.agent_gateway.capabilities._handle_cfpb_deadline_verify -> src.teleon.agent_gateway.capabilities._bounded  x1
+  src.teleon.agent_gateway.capabilities._handle_cfpb_deadline_verify -> src.teleon.environments.baltor_cfpb_context_governance.load_fixture  x1
+  src.teleon.agent_gateway.capabilities._handle_context_governed_answer_evidence -> src.teleon.agent_gateway.capabilities._resolve_governed_fixture  x1
+  src.teleon.agent_gateway.capabilities._handle_utility_hash -> src.teleon.experiments.ids.sha256_hex  x1
+  src.teleon.agent_gateway.capabilities._resolve_governed_fixture -> src.teleon.environments.baltor_cfpb_context_governance.load_fixture  x1
+  src.teleon.agent_gateway.gateway._unavailable -> src.teleon.agent_gateway.gateway.AgentCapabilityRunResult  x1
+  src.teleon.agent_gateway.gateway.describe -> src.teleon.agent_gateway.capabilities.get_card  x1
+  src.teleon.agent_gateway.gateway.list_capabilities -> src.teleon.agent_gateway.capabilities.capability_ids  x1
+  src.teleon.agent_gateway.gateway.list_capabilities -> src.teleon.agent_gateway.capabilities.get_card  x1
+  src.teleon.agent_gateway.gateway.quote -> src.teleon.agent_gateway.capabilities.get_card  x1
+  src.teleon.agent_gateway.gateway.request_boundary_expansion -> src.teleon.agent_gateway.gateway.AgentBoundaryExpansionRequest  x1
+  src.teleon.agent_gateway.gateway.request_boundary_expansion -> src.teleon.experiments.ids.canonical_id  x1
+  src.teleon.agent_gateway.gateway.request_boundary_expansion -> src.teleon.experiments.ids.sha256_hex  x1
+  src.teleon.agent_gateway.gateway.run -> src.teleon.agent_gateway.capabilities.get_card  x1
+  src.teleon.agent_gateway.gateway.run -> src.teleon.agent_gateway.capabilities.get_handler  x1
+  src.teleon.agent_gateway.gateway.run -> src.teleon.agent_gateway.gateway.AgentCapabilityReceipt  x1
+  src.teleon.agent_gateway.gateway.run -> src.teleon.agent_gateway.gateway.AgentCapabilityRunResult  x1
+  src.teleon.agent_gateway.gateway.run -> src.teleon.agent_gateway.gateway.AgentConsumer  x1
+  src.teleon.agent_gateway.gateway.run -> src.teleon.runtime.capability_binding.bind_capability_task  x1
+  src.teleon.agent_gateway.mcp_projection.__init__ -> src.teleon.agent_gateway.gateway.AgentCapabilityGateway  x1
+  src.teleon.agent_gateway.mcp_projection._project -> src.teleon.agent_gateway.mcp_projection._scrub  x1
+  src.teleon.agent_gateway.mcp_projection._scrub -> src.teleon.agent_gateway.mcp_projection._is_forbidden_key  x1
+  src.teleon.agent_gateway.mcp_projection._tool_describe_capability -> src.teleon.agent_gateway.mcp_projection._project  x1
+  src.teleon.agent_gateway.mcp_projection._tool_get_receipt -> src.teleon.agent_gateway.mcp_projection._scrub  x1
+  src.teleon.agent_gateway.mcp_projection._tool_list_capabilities -> src.teleon.agent_gateway.mcp_projection._project  x1
+  src.teleon.agent_gateway.mcp_projection._tool_request_boundary_expansion -> src.teleon.agent_gateway.mcp_projection._scrub  x1
+  src.teleon.agent_gateway.mcp_projection._tool_run_capability -> src.teleon.agent_gateway.gateway.AgentConsumer  x1
+  src.teleon.agent_gateway.mcp_projection._tool_run_capability -> src.teleon.agent_gateway.mcp_projection._project  x1
+  src.teleon.agents.agent_runtime_provider.dispatch_agent_request -> src.teleon.agents.agent_runtime_provider._selector_task  x1
+  src.teleon.agents.agent_runtime_provider.dispatch_agent_request -> src.teleon.agents.agent_runtime_provider.get_runtime  x1
+  src.teleon.agents.agent_runtime_provider.dispatch_agent_request -> src.teleon.agents.agent_runtime_provider.load_catalog  x1
+  src.teleon.agents.agent_runtime_provider.dispatch_agent_request -> src.teleon.experiments.ids.canonical_id  x1
+  src.teleon.agents.agent_runtime_provider.dispatch_agent_request -> src.teleon.runtime.execution_backend_selector.select_backend  x1
+  src.teleon.agents.agent_runtime_provider.get_runtime -> src.teleon.agents.agent_runtime_provider.CandidateAgentRuntime  x1
+  src.teleon.agents.agent_runtime_provider.get_runtime -> src.teleon.agents.agent_runtime_provider.LocalEmulatorAgentRuntime  x1
+  src.teleon.agents.agent_runtime_provider.get_runtime -> src.teleon.agents.agent_runtime_provider.runtime_card  x1
+  src.teleon.agents.agent_runtime_provider.run_agent -> src.teleon.agents.agent_runtime_provider.AgentRuntimeResult  x1
+  src.teleon.agents.agent_runtime_provider.run_agent -> src.teleon.agents.agent_runtime_provider.AgentRuntimeUnavailable  x1
+  src.teleon.agents.agent_runtime_provider.runtime_card -> src.teleon.agents.agent_runtime_provider.load_catalog  x1
+  src.teleon.blackboard.local_sqlite_blackboard.__init__ -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard._init_schema  x1
+  src.teleon.blackboard.local_sqlite_blackboard._blackboard_row -> src.teleon.ports.blackboard_provider.BlackboardWriteRejected  x1
+  src.teleon.blackboard.local_sqlite_blackboard._content_hash -> src.teleon.experiments.ids.sha256_hex  x1
+  src.teleon.blackboard.local_sqlite_blackboard._entry_row -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard._row_to_entry  x1
+  src.teleon.blackboard.local_sqlite_blackboard._record_receipt -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard._next_seq  x1
+  src.teleon.blackboard.local_sqlite_blackboard._record_receipt -> src.teleon.experiments.ids.canonical_id  x1
+  src.teleon.blackboard.local_sqlite_blackboard.append_entry -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard._blackboard_row  x1
+  src.teleon.blackboard.local_sqlite_blackboard.append_entry -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard._next_seq  x1
+  src.teleon.blackboard.local_sqlite_blackboard.append_entry -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard._record_receipt  x1
+  src.teleon.blackboard.local_sqlite_blackboard.append_entry -> src.teleon.blackboard.local_sqlite_blackboard._content_hash  x1
+  src.teleon.blackboard.local_sqlite_blackboard.append_entry -> src.teleon.experiments.ids.canonical_id  x1
+  src.teleon.blackboard.local_sqlite_blackboard.create_blackboard -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard._blackboard_row  x1
+  src.teleon.blackboard.local_sqlite_blackboard.create_blackboard -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard._next_seq  x1
+  src.teleon.blackboard.local_sqlite_blackboard.create_blackboard -> src.teleon.experiments.ids.canonical_id  x1
+  src.teleon.blackboard.local_sqlite_blackboard.create_blackboard -> src.teleon.ports.blackboard_provider.BlackboardWriteRejected  x1
+  src.teleon.blackboard.local_sqlite_blackboard.query -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard._row_to_entry  x1
+  src.teleon.blackboard.local_sqlite_blackboard.seed_demo_blackboard -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard  x1
+  src.teleon.blackboard.token_economics._distill_entries -> src.teleon.experiments.ids.canonical_id  x1
+  src.teleon.blackboard.token_economics.build_blackboard_from_docs -> src.teleon.blackboard.local_sqlite_blackboard.LocalSqliteBlackboard  x1
+  src.teleon.blackboard.token_economics.build_blackboard_from_docs -> src.teleon.blackboard.token_economics._distill_entries  x1
+  src.teleon.blackboard.token_economics.estimate_token_economics -> src.teleon.blackboard.token_economics._crossover_n  x1
+  src.teleon.blackboard.token_economics.estimate_token_economics -> src.teleon.blackboard.token_economics._entry_chars  x1
+  src.teleon.blackboard.token_economics.estimate_token_economics -> src.teleon.blackboard.token_economics.build_blackboard_from_docs  x1
+  src.teleon.capability_planner._plan_document_extraction -> src.teleon.capability_planner.CapabilityPlan  x1
+  src.teleon.capability_planner._plan_document_extraction -> src.teleon.capability_planner.resolve_schema  x1
+  src.teleon.capability_planner._plan_tunable_task -> src.teleon.capability_planner.CapabilityPlan  x1
+  src.teleon.capability_planner._plan_tunable_task -> src.teleon.capability_planner.PlanStep  x1
+  src.teleon.capability_planner._plan_tunable_task -> src.teleon.evolution.auto_tuning.auto_tune_setup  x1
+  src.teleon.capability_planner._plan_tunable_task -> src.teleon.evolution.auto_tuning.get_task  x1
+  src.teleon.capability_planner.classify_capability_type -> src.teleon.capability_planner._match_task  x1
+  src.teleon.capability_planner.execute -> src.teleon.extraction.document_extraction_cascade.compare_strategies  x1
+  src.teleon.capability_planner.execute -> src.teleon.extraction.schema_templates.get_template  x1
+  src.teleon.capability_planner.execute -> src.teleon.hub_freshness.keep_hub_fresh  x1
+  src.teleon.capability_planner.plan -> src.teleon.capability_planner.CapabilityPlan  x1
+  src.teleon.capability_planner.plan -> src.teleon.capability_planner._plan_document_extraction  x1
+  src.teleon.capability_planner.plan -> src.teleon.capability_planner._plan_tunable_task  x1
+  src.teleon.capability_planner.plan -> src.teleon.capability_planner.classify  x1
+  src.teleon.capability_planner.plan -> src.teleon.capability_planner.classify_capability_type  x1
+  src.teleon.capability_planner.plan -> src.teleon.capability_planner.infer_capability  x1
+  src.teleon.capability_planner.plan -> src.teleon.capability_planner.resolve_hub  x1
+  src.teleon.capability_planner.resolve_schema -> src.teleon.extraction.schema_templates.template_names  x1
+  src.teleon.capability_planner.run_round -> src.teleon.hub_freshness.keep_hub_fresh  x1
+  src.teleon.compiler.__main__._render_examples -> src.teleon.compiler.__main__._compile_fixture  x1
+  src.teleon.compiler.__main__._render_examples -> src.teleon.compiler.__main__._example_path  x1
+  src.teleon.compiler.__main__.cmd_check -> src.teleon.compiler.__main__._render_examples  x1
+  src.teleon.compiler.__main__.cmd_compile -> src.teleon.compiler.__main__._compile_for_cli  x1
+  src.teleon.compiler.__main__.cmd_list -> src.teleon.compiler.__main__._open_registry  x1
+  src.teleon.compiler.__main__.cmd_register -> src.teleon.compiler.__main__._compile_for_cli  x1
+  src.teleon.compiler.__main__.cmd_register -> src.teleon.compiler.__main__._open_registry  x1
+  src.teleon.compiler.__main__.cmd_rollback -> src.teleon.compiler.__main__._open_registry  x1
+  src.teleon.compiler.__main__.cmd_write_examples -> src.teleon.compiler.__main__._render_examples  x1
+  src.teleon.compiler.__main__.main -> src.teleon.compiler.__main__.cmd_check  x1
+  src.teleon.compiler.__main__.main -> src.teleon.compiler.__main__.cmd_compile  x1
+  src.teleon.compiler.__main__.main -> src.teleon.compiler.__main__.cmd_list  x1
+  src.teleon.compiler.__main__.main -> src.teleon.compiler.__main__.cmd_register  x1
+  src.teleon.compiler.__main__.main -> src.teleon.compiler.__main__.cmd_rollback  x1
+  src.teleon.compiler.__main__.main -> src.teleon.compiler.__main__.cmd_write_examples  x1
+  src.teleon.compiler.__main__.main -> src.teleon.compiler.__main__.self_test  x1
+  src.teleon.compiler.__main__.self_test -> src.teleon.compiler.__main__._example_path  x1
+  src.teleon.compiler.__main__.self_test -> src.teleon.compiler.__main__._registry_checks  x1
+  src.teleon.compiler.compile._resolve_budgets -> src.teleon.compiler.compile.CompilerError  x1
+  src.teleon.compiler.compile._resolve_budgets -> src.teleon.compiler.compile._resolve_max_tokens  x1
+  src.teleon.compiler.compile._resolve_budgets -> src.teleon.compiler.compile._resolve_timeout  x1
+  src.teleon.compiler.compile._resolve_container -> src.teleon.compiler.compile.CompilerError  x1
+  src.teleon.compiler.compile._resolve_container -> src.teleon.compiler.compile._default_env_refs  x1
+  src.teleon.compiler.compile._resolve_resources -> src.teleon.compiler.compile._resource_class_record  x1
+  src.teleon.compiler.compile._resolve_resources -> src.teleon.compiler.compile.memory_to_mb  x1
+  src.teleon.compiler.compile._resolve_timeout -> src.teleon.compiler.compile.CompilerError  x1
+  src.teleon.compiler.compile._resource_class_record -> src.teleon.compiler.compile.CompilerError  x1
+  src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile.NotPromotedError  x1
+  src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._canonical  x1
+  src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._gate_evidence  x1
+  src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._otel_attrs  x1
+  src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._resolve_budgets  x1
+  src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._resolve_container  x1
+  src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._resolve_resources  x1
+  src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._resource_class_record  x1
+  src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._sha256  x1
+  src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._stable_id  x1
+  src.teleon.compiler.compile.compile_capability -> src.teleon.purpose_tasks.runtime_binding.bind_allowed  x1
+  src.teleon.compiler.compile.validate_unit -> src.teleon.compiler.compile._unit_schema  x1
+  src.teleon.compiler.emit.build_k8s_job -> src.teleon.compiler.emit._k8s_name  x1
+  src.teleon.compiler.emit.build_k8s_job -> src.teleon.compiler.emit._require_exec_target  x1
+  src.teleon.compiler.emit.emit_fly_machine -> src.teleon.compiler.emit._cpu_to_fly_cpus  x1
+  src.teleon.compiler.emit.emit_fly_machine -> src.teleon.compiler.emit._require_exec_target  x1
+  src.teleon.compiler.emit.emit_k8s_job -> src.teleon.compiler.emit.build_k8s_job  x1
+  src.teleon.compiler.emit.emit_local_process -> src.teleon.compiler.emit._require_exec_target  x1
+  src.teleon.compiler.live_capability.load_live_capability -> src.teleon.compiler.live_capability._latest_promoting_run  x1
+  src.teleon.compiler.live_capability.load_live_capability -> src.teleon.compiler.live_capability._state_dir  x1
+  src.teleon.compiler.registry.__init__ -> src.teleon.compiler.registry.CompiledUnitRegistry.rebuild  x1
+  src.teleon.compiler.registry._append -> src.teleon.compiler.registry.CompiledUnitRegistry.rebuild  x1
+  src.teleon.compiler.registry._compiled_at -> src.teleon.compiler.registry._get_path  x1
+  src.teleon.compiler.registry._order_key -> src.teleon.compiler.registry._compiled_at  x1
+  src.teleon.compiler.registry.capability_ids -> src.teleon.compiler.registry.CompiledUnitRegistry._unit_records  x1
+  src.teleon.compiler.registry.get -> src.teleon.compiler.registry.CompiledUnitRegistry._active_ids  x1
+  src.teleon.compiler.registry.get -> src.teleon.compiler.registry.CompiledUnitRegistry._unit_records  x1
+  src.teleon.compiler.registry.history -> src.teleon.compiler.registry.CompiledUnitRegistry._active_ids  x1
+  src.teleon.compiler.registry.history -> src.teleon.compiler.registry.CompiledUnitRegistry._unit_records  x1
+  src.teleon.compiler.registry.history -> src.teleon.compiler.registry._order_key  x1
+  src.teleon.compiler.registry.latest_active_for -> src.teleon.compiler.registry.CompiledUnitRegistry._active_ids  x1
+  src.teleon.compiler.registry.latest_active_for -> src.teleon.compiler.registry.CompiledUnitRegistry._unit_records  x1
+  src.teleon.compiler.registry.latest_for -> src.teleon.compiler.registry.CompiledUnitRegistry.history  x1
+  src.teleon.compiler.registry.list_active -> src.teleon.compiler.registry.CompiledUnitRegistry._active_ids  x1
+  src.teleon.compiler.registry.list_active -> src.teleon.compiler.registry.CompiledUnitRegistry._unit_records  x1
+  src.teleon.compiler.registry.list_active -> src.teleon.compiler.registry._order_key  x1
+  src.teleon.compiler.registry.mark_active -> src.teleon.compiler.registry.CompiledUnitRegistry._active_ids  x1
+  src.teleon.compiler.registry.mark_active -> src.teleon.compiler.registry.CompiledUnitRegistry.latest_active_for  x1
+  src.teleon.compiler.registry.mark_active -> src.teleon.compiler.registry.RegistryError  x1
+  src.teleon.compiler.registry.open_registry -> src.teleon.compiler.registry.CompiledUnitRegistry  x1
+  src.teleon.compiler.registry.rebuild -> src.teleon.compiler.registry.CompiledUnitRegistry._validate_log  x1
+  src.teleon.compiler.registry.register -> src.teleon.compiler.registry.CompiledUnitRegistry.latest_active_for  x1
+  src.teleon.compiler.registry.register -> src.teleon.compiler.registry._compiled_at  x1
+  src.teleon.compiler.registry.register_units -> src.teleon.compiler.registry.open_registry  x1
+  src.teleon.compiler.registry.rollback_target -> src.teleon.compiler.registry.CompiledUnitRegistry.get  x1
+  src.teleon.compiler.registry.rollback_target -> src.teleon.compiler.registry.CompiledUnitRegistry.latest_active_for  x1
+  src.teleon.compiler.registry.rollback_target -> src.teleon.compiler.registry.RegistryIntegrityError  x1
+  src.teleon.compiler.registry.rollback_to -> src.teleon.compiler.registry.CompiledUnitRegistry.mark_active  x1
+  src.teleon.compiler.registry.rollback_to -> src.teleon.compiler.registry.CompiledUnitRegistry.rollback_target  x1
+  src.teleon.compiler.registry.rollback_to -> src.teleon.compiler.registry.RegistryError  x1
+  src.teleon.compiler.registry.supersede -> src.teleon.compiler.registry.CompiledUnitRegistry._active_ids  x1
+  src.teleon.compiler.registry.supersede -> src.teleon.compiler.registry.CompiledUnitRegistry._append  x1
+  src.teleon.compiler.registry.supersede -> src.teleon.compiler.registry.RegistryError  x1
+  src.teleon.compiler.registry.supersede -> src.teleon.compiler.registry._compiled_at  x1
+  src.teleon.components.adapter_factory.from_openapi -> src.teleon.components.adapter_factory._infer_in_types  x1
+  src.teleon.components.adapter_factory.from_openapi -> src.teleon.components.adapter_factory._infer_out_types  x1
+  src.teleon.components.adapter_factory.from_openapi -> src.teleon.components.adapter_factory._op_id  x1
+  src.teleon.components.lowering.lower_to_dag -> src.teleon.components.registry.make_component  x1
+  src.teleon.components.lowering.lower_to_dag -> src.teleon.dag.pipeline_dag.DAG  x1
+  src.teleon.components.lowering.lower_to_dag -> src.teleon.dag.pipeline_dag.Node  x1
+  src.teleon.components.lowering.run_compiled -> src.teleon.components.lowering.lower_to_dag  x1
+  src.teleon.components.registry._embedding_invoker -> src.teleon.retrieval.embedding_port.select_embedder  x1
+  src.teleon.components.registry._llm_invoker -> src.teleon.components.registry.ComponentUnavailable  x1
+  src.teleon.components.registry._llm_invoker -> src.teleon.llm_port.select_llm  x1
+  src.teleon.components.registry._ocr_invoker -> src.teleon.components.registry.ComponentUnavailable  x1
+  src.teleon.components.registry._ocr_invoker -> src.teleon.extraction.ocr_port.select_ocr  x1
+  src.teleon.components.registry._plane_of -> src.teleon.components.registry._tool_index  x1
+  src.teleon.components.registry._reranker_invoker -> src.teleon.retrieval.reranker_port.select_reranker  x1
+  src.teleon.components.registry._search_invoker -> src.teleon.components.registry.ComponentUnavailable  x1
+  src.teleon.components.registry._search_invoker -> src.teleon.dag.real_steps.network_allowed  x1
+  src.teleon.components.registry._search_invoker -> src.teleon.retrieval.search_port.select_search  x1
+  src.teleon.components.registry.make_component -> src.teleon.components.registry.Component  x1
+  src.teleon.components.registry.make_component -> src.teleon.components.registry._plane_of  x1
+  src.teleon.components.registry.make_component -> src.teleon.components.registry._tool_index  x1
+  src.teleon.components.registry.make_component -> src.teleon.synthesis.dag_contract.component_types  x1
+  src.teleon.config.medium_resolver.configured_functions -> src.teleon.config.medium_resolver.load_config  x1
+  src.teleon.config.medium_resolver.resolve_mediums -> src.teleon.config.medium_resolver.available_mediums  x1
+  src.teleon.config.medium_resolver.resolve_mediums -> src.teleon.config.medium_resolver.load_config  x1
+  src.teleon.context.compressor._compress_code -> src.teleon.context.compressor._dedup_lines  x1
+  src.teleon.context.compressor._compress_text -> src.teleon.context.compressor._dedup_lines  x1
+  src.teleon.context.compressor.compress -> src.teleon.context.compressor._detect_kind  x1
+  src.teleon.dag.example_pipelines.build_enrichment_dag -> src.teleon.dag.pipeline_dag.DAG  x1
+  src.teleon.dag.example_pipelines.build_extraction_dag -> src.teleon.dag.pipeline_dag.DAG  x1
+  src.teleon.dag.pipeline_dag.choose -> src.teleon.dag.pipeline_dag.DAGError  x1
+  src.teleon.dag.pipeline_dag.linear -> src.teleon.dag.pipeline_dag.DAG  x1
+  src.teleon.dag.pipeline_dag.run -> src.teleon.dag.pipeline_dag.DAG.by_id  x1
+  src.teleon.dag.pipeline_dag.run -> src.teleon.dag.pipeline_dag.DAG.choose  x1
+  src.teleon.dag.pipeline_dag.run -> src.teleon.dag.pipeline_dag.DAGError  x1
+  src.teleon.dag.real_steps._cf_account -> src.teleon.dag.real_steps._env  x1
+  src.teleon.dag.real_steps._cf_token -> src.teleon.dag.real_steps._env  x1
+  src.teleon.dag.real_steps.cloudflare_ai_available -> src.teleon.dag.real_steps._cf_account  x1
+  src.teleon.dag.real_steps.cloudflare_ai_available -> src.teleon.dag.real_steps._cf_token  x1
+  src.teleon.dag.real_steps.cloudflare_ai_available -> src.teleon.dag.real_steps.network_allowed  x1
+  src.teleon.dag.real_steps.default_search_provider -> src.teleon.dag.real_steps._active_search_providers  x1
+  src.teleon.dag.real_steps.llm_available -> src.teleon.dag.real_steps.network_allowed  x1
+  src.teleon.dag.real_steps.network_allowed -> src.teleon.dag.real_steps._env  x1
+  src.teleon.dag.real_steps.real_cloudflare_ai -> src.teleon.dag.real_steps._cf_account  x1
+  src.teleon.dag.real_steps.real_cloudflare_ai -> src.teleon.dag.real_steps._cf_token  x1
+  src.teleon.dag.real_steps.real_cloudflare_ai -> src.teleon.dag.real_steps.network_allowed  x1
+  src.teleon.dag.real_steps.real_federal_register -> src.teleon.dag.real_steps.RealStepUnavailable  x1
+  src.teleon.dag.real_steps.real_federal_register -> src.teleon.dag.real_steps._get_json  x1
+  src.teleon.dag.real_steps.real_federal_register -> src.teleon.dag.real_steps.network_allowed  x1
+  src.teleon.dag.real_steps.real_llm -> src.teleon.dag.real_steps.llm_available  x1
+  src.teleon.dag.real_steps.real_search -> src.teleon.dag.real_steps._active_search_providers  x1
+  src.teleon.dag.real_steps.real_search -> src.teleon.dag.real_steps.default_search_provider  x1
+  src.teleon.dag.real_steps.real_wikipedia -> src.teleon.dag.real_steps.RealStepUnavailable  x1
+  src.teleon.dag.real_steps.real_wikipedia -> src.teleon.dag.real_steps.network_allowed  x1
+  src.teleon.digestion.digester.digest_skill -> src.teleon.digestion.digester.extract_determinism  x1
+  src.teleon.digestion.digester.digest_skill -> src.teleon.digestion.digester.is_unsafe  x1
+  src.teleon.digestion.model_compatibility.run_model_compatibility -> src.teleon.digestion.model_compatibility._required_spec_codes  x1
+  src.teleon.digestion.model_compatibility.run_model_compatibility -> src.teleon.inference.oips.load_graph  x1
+  src.teleon.digestion.open_hub_outputs.emit_open_hub_candidates -> src.teleon.digestion.digester.build_runtime_candidate  x1
+  src.teleon.digestion.open_hub_outputs.emit_open_hub_candidates -> src.teleon.digestion.open_hub_outputs._skill_mixins  x1
+  src.teleon.digestion.open_hub_outputs.emit_open_hub_candidates -> src.teleon.templates.instantiator.compose_object_shell  x1
+  src.teleon.economics.cost_model.choose_route -> src.teleon.economics.cost_model.route_to_candidate  x1
+  src.teleon.economics.cost_model.choose_route -> src.teleon.inference.preference_profile.choose  x1
+  src.teleon.economics.cost_model.score_routes -> src.teleon.economics.cost_model.route_to_candidate  x1
+  src.teleon.economics.cost_model.score_routes -> src.teleon.inference.preference_profile.score_candidates  x1
+  src.teleon.economics.economic_graph._default_economics -> src.teleon.economics.economic_graph._lanes  x1
+  src.teleon.economics.economic_graph._default_economics -> src.teleon.economics.economic_graph._pricebook  x1
+  src.teleon.economics.economic_graph._route -> src.teleon.economics.economic_graph._provider_of  x1
+  src.teleon.economics.economic_graph._route -> src.teleon.economics.economic_graph.merged_economics  x1
+  src.teleon.economics.economic_graph.merged_economics -> src.teleon.economics.economic_graph._default_economics  x1
+  src.teleon.economics.economic_graph.merged_economics -> src.teleon.economics.observation_store.current_economics  x1
+  src.teleon.economics.economic_graph.routes_for_lanes -> src.teleon.economics.economic_graph._lanes  x1
+  src.teleon.economics.economic_graph.routes_for_lanes -> src.teleon.economics.economic_graph._route  x1
+  src.teleon.economics.economic_graph.routes_for_model -> src.teleon.economics.economic_graph._graph  x1
+  src.teleon.economics.economic_graph.routes_for_model -> src.teleon.economics.economic_graph._route  x1
+  src.teleon.economics.observation_store._emit_price_cdc -> src.teleon.storage.record_store.open_record_store  x1
+  src.teleon.economics.observation_store._open -> src.teleon.storage.record_store.open_record_store  x1
+  src.teleon.economics.observation_store.current_economics -> src.teleon.economics.observation_store._open  x1
+  src.teleon.economics.observation_store.record_observation -> src.teleon.economics.observation_store._emit_price_cdc  x1
+  src.teleon.economics.observation_store.record_observation -> src.teleon.economics.observation_store._open  x1
+  src.teleon.economics.observation_store.record_observation -> src.teleon.economics.observation_store.now_iso  x1
+  src.teleon.economics.provider_arbitrage.all_arbitrage -> src.teleon.economics.provider_arbitrage._load_entries  x1
+  src.teleon.economics.provider_arbitrage.all_arbitrage -> src.teleon.economics.provider_arbitrage.arbitrage_for_model  x1
+  src.teleon.economics.provider_arbitrage.arbitrage_for_model -> src.teleon.economics.provider_arbitrage._blended_cost  x1
+  src.teleon.economics.provider_arbitrage.arbitrage_for_model -> src.teleon.economics.provider_arbitrage._load_entries  x1
+  src.teleon.economics.provider_intel.crawl -> src.teleon.economics.provider_intel.ingest  x1
+  src.teleon.economics.provider_intel.crawl -> src.teleon.economics.provider_intel.pricing_sources  x1
+  src.teleon.economics.provider_intel.ingest -> src.teleon.economics.observation_store.record_observation  x1
+  src.teleon.economics.provider_intel.record_measured_run -> src.teleon.economics.observation_store.record_observation  x1
+  src.teleon.economics.routing_engine.arbitrage -> src.teleon.economics.cost_model.choose_route  x1
+  src.teleon.economics.routing_engine.arbitrage -> src.teleon.economics.cost_model.score_routes  x1
+  src.teleon.economics.routing_engine.arbitrage -> src.teleon.economics.economic_graph.routes_for_model  x1
+  src.teleon.economics.routing_engine.arbitrage -> src.teleon.economics.routing_engine.balance_weights  x1
+  src.teleon.economics.routing_engine.arbitrage -> src.teleon.economics.routing_engine.viable_routes  x1
+  src.teleon.economics.routing_engine.arbitrage -> src.teleon.inference.preference_profile.cost_first  x1
+  src.teleon.economics.routing_engine.balance_weights -> src.teleon.economics.routing_engine.reliability  x1
+  src.teleon.economics.routing_engine.balance_weights -> src.teleon.economics.routing_engine.viable_routes  x1
+  src.teleon.economics.routing_engine.reroute -> src.teleon.economics.cost_model.choose_route  x1
+  src.teleon.economics.routing_engine.reroute -> src.teleon.inference.preference_profile.cost_first  x1
+  src.teleon.economics.routing_engine.route_model -> src.teleon.economics.cost_model.choose_route  x1
+  src.teleon.economics.routing_engine.route_model -> src.teleon.economics.economic_graph.routes_for_model  x1
+  src.teleon.economics.routing_engine.route_model -> src.teleon.economics.routing_engine.viable_routes  x1
+  src.teleon.economics.routing_engine.route_model -> src.teleon.inference.preference_profile.cost_first  x1
+  src.teleon.economics.routing_engine.viable_routes -> src.teleon.economics.routing_engine.reliability  x1
+  src.teleon.economics.simulator.rank_candidates -> src.teleon.economics.cost_model.score_routes  x1
+  src.teleon.economics.simulator.rank_candidates -> src.teleon.economics.simulator.simulate_dag  x1
+  src.teleon.economics.simulator.rank_candidates -> src.teleon.inference.preference_profile.cost_first  x1
+  src.teleon.economics.simulator.simulate_dag -> src.teleon.economics.cost_model.route_to_candidate  x1
+  src.teleon.economics.simulator.simulate_dag -> src.teleon.economics.economic_graph.merged_economics  x1
+  src.teleon.economics.simulator.simulate_dag -> src.teleon.economics.simulator._critical_path_latency  x1
+  src.teleon.economics.vertical_proof.compare -> src.teleon.economics.economic_graph.merged_economics  x1
+  src.teleon.economics.vertical_proof.record_runs -> src.teleon.economics.provider_intel.ingest  x1
+  src.teleon.egress.client.__init__ -> src.teleon.egress.ledger.LocalEgressLedger  x1
+  src.teleon.egress.client.__init__ -> src.teleon.egress.traffic_graph.LocalEgressGraph  x1
+  src.teleon.egress.client.__init__ -> src.teleon.egress.transports.UrllibHttpTransport  x1
+  src.teleon.egress.client._attempt_record -> src.teleon.experiments.ids.canonical_id  x1
+  src.teleon.egress.client._attempt_record -> src.teleon.experiments.ids.sha256_hex  x1
+  src.teleon.egress.client._observation -> src.teleon.egress.traffic_graph.make_egress_observation  x1
+  src.teleon.egress.client.request_bytes -> src.teleon.egress.client.EgressBlocked  x1
+  src.teleon.egress.client.request_bytes -> src.teleon.egress.client._body_hash  x1
+  src.teleon.egress.client.request_bytes -> src.teleon.egress.client._header_summary  x1
+  src.teleon.egress.client.request_bytes -> src.teleon.egress.policy.decide_route  x1
+  src.teleon.egress.client.request_bytes -> src.teleon.egress.policy.make_egress_intent  x1
+  src.teleon.egress.client.request_json -> src.teleon.egress.client.EgressClient.request_bytes  x1
+  src.teleon.egress.ledger.__init__ -> src.teleon.egress.ledger.LocalEgressLedger._init_schema  x1
+  src.teleon.egress.ledger._append -> src.teleon.egress.ledger.LocalEgressLedger._next_seq  x1
+  src.teleon.egress.ledger._append -> src.teleon.egress.ledger._content_hash  x1
+  src.teleon.egress.ledger._content_hash -> src.teleon.experiments.ids.sha256_hex  x1
+  src.teleon.egress.ledger.append_attempt -> src.teleon.egress.ledger.LocalEgressLedger._append  x1
+  src.teleon.egress.ledger.append_decision -> src.teleon.egress.ledger.LocalEgressLedger._append  x1
+  src.teleon.egress.ledger.append_intent -> src.teleon.egress.ledger.LocalEgressLedger._append  x1
+  src.teleon.egress.ledger.append_payload_ref -> src.teleon.egress.ledger.LocalEgressLedger._append  x1
+  src.teleon.egress.ledger.records -> src.teleon.egress.ledger.EgressLedgerRejected  x1
+  src.teleon.egress.policy._query_id -> src.teleon.experiments.ids.canonical_id  x1
+  src.teleon.egress.policy.approval_required_route_ids -> src.teleon.egress.policy.route_policies_by_id  x1
+  src.teleon.egress.policy.decide_route -> src.teleon.egress.policy.EgressPolicyError  x1
+  src.teleon.egress.policy.decide_route -> src.teleon.egress.policy.route_policies_by_id  x1
+  src.teleon.egress.policy.decide_route -> src.teleon.egress.policy.route_policy_taxonomy  x1
+  src.teleon.egress.policy.decide_route -> src.teleon.experiments.ids.canonical_id  x1
+  src.teleon.egress.policy.make_egress_intent -> src.teleon.egress.policy.EgressPolicyError  x1
+  src.teleon.egress.policy.make_egress_intent -> src.teleon.egress.policy._query_id  x1
+  src.teleon.egress.policy.make_egress_intent -> src.teleon.egress.policy._redact_url_for_policy  x1
+  src.teleon.egress.policy.make_egress_intent -> src.teleon.experiments.ids.canonical_id  x1
+  src.teleon.egress.policy.make_egress_intent -> src.teleon.experiments.ids.sha256_hex  x1
+  src.teleon.egress.policy.route_policies_by_id -> src.teleon.egress.policy.route_policy_taxonomy  x1
+  src.teleon.egress.traffic_graph.__init__ -> src.teleon.egress.traffic_graph.LocalEgressGraph._init_schema  x1
+  src.teleon.egress.traffic_graph._contains_raw_secret -> src.teleon.egress.traffic_graph._looks_secret  x1
+  src.teleon.egress.traffic_graph._content_hash -> src.teleon.experiments.ids.sha256_hex  x1
+  src.teleon.egress.traffic_graph._deep_redact -> src.teleon.egress.traffic_graph._redact_string  x1
+  src.teleon.egress.traffic_graph._deep_redact -> src.teleon.io.event_io.redact_secrets  x1
+  src.teleon.egress.traffic_graph._destination_parts -> src.teleon.egress.traffic_graph._redact_url  x1
+  src.teleon.egress.traffic_graph._graph_projection -> src.teleon.experiments.ids.canonical_id  x1
+  src.teleon.egress.traffic_graph._redact_string -> src.teleon.egress.traffic_graph._looks_secret  x1
+  src.teleon.egress.traffic_graph._redact_string -> src.teleon.egress.traffic_graph._redact_url  x1
+  src.teleon.egress.traffic_graph._validate_observation -> src.teleon.egress.traffic_graph._contains_raw_secret  x1
+  src.teleon.egress.traffic_graph.append -> src.teleon.egress.traffic_graph._content_hash  x1
+  src.teleon.egress.traffic_graph.append -> src.teleon.egress.traffic_graph._graph_projection  x1
+  src.teleon.egress.traffic_graph.append -> src.teleon.egress.traffic_graph._search_blob  x1
+  src.teleon.egress.traffic_graph.append -> src.teleon.egress.traffic_graph._validate_observation  x1
+  src.teleon.egress.traffic_graph.edge -> src.teleon.experiments.ids.canonical_id  x1
+  src.teleon.egress.traffic_graph.graph_for_query -> src.teleon.egress.traffic_graph.LocalEgressGraph.search_events  x1
+  src.teleon.egress.traffic_graph.make_egress_observation -> src.teleon.egress.traffic_graph._contains_raw_secret  x1
+  src.teleon.egress.traffic_graph.make_egress_observation -> src.teleon.egress.traffic_graph._destination_parts  x1
+  src.teleon.egress.traffic_graph.make_egress_observation -> src.teleon.egress.traffic_graph._redact_string  x1
+  src.teleon.egress.transports.request -> src.teleon.egress.transports.EgressTransportError  x1
+  src.teleon.egress.transports.request -> src.teleon.egress.transports.EgressTransportResponse  x1
+  src.teleon.endpoints.registry.endpoints_for -> src.teleon.endpoints.registry.ProviderEndpoint  x1
+  src.teleon.endpoints.registry.endpoints_for -> src.teleon.endpoints.registry._load  x1
+  src.teleon.endpoints.registry.metric_vector -> src.teleon.objectives.objective.MetricVector  x1
+  src.teleon.endpoints.registry.registered_capabilities -> src.teleon.endpoints.registry._load  x1
+  src.teleon.endpoints.registry.select_endpoint -> src.teleon.endpoints.registry.endpoints_for  x1
+  src.teleon.enrichment.search_enrich._synth_model -> src.teleon.evolution.substrate_selector.model_downgrade  x1
+  src.teleon.enrichment.search_enrich._synth_model -> src.teleon.inference.model_index.load_index  x1
+  src.teleon.enrichment.search_enrich.baseline_provider -> src.teleon.enrichment.search_enrich.load_providers  x1
+  src.teleon.enrichment.search_enrich.demonstrate -> src.teleon.enrichment.search_enrich.enrichment_savings  x1
+  src.teleon.enrichment.search_enrich.enrich -> src.teleon.enrichment.search_enrich._search  x1
+  src.teleon.enrichment.search_enrich.enrich -> src.teleon.enrichment.search_enrich._synth_model  x1
+  src.teleon.enrichment.search_enrich.enrich -> src.teleon.enrichment.search_enrich._synthesize  x1
+  src.teleon.enrichment.search_enrich.enrich -> src.teleon.enrichment.search_enrich.select_provider  x1
+  src.teleon.enrichment.search_enrich.enrichment_savings -> src.teleon.enrichment.search_enrich.enrich  x1
+  src.teleon.enrichment.search_enrich.record_enrichment_descent -> src.teleon.enrichment.search_enrich.enrich  x1
+  src.teleon.enrichment.search_enrich.record_enrichment_descent -> src.teleon.enrichment.search_enrich.enrichment_savings  x1
+  src.teleon.enrichment.search_enrich.record_enrichment_descent -> src.teleon.evolution.descent_attempt_store.DescentAttempt  x1
+  src.teleon.enrichment.search_enrich.select_provider -> src.teleon.enrichment.search_enrich.baseline_provider  x1
+  src.teleon.enrichment.search_enrich.select_provider -> src.teleon.enrichment.search_enrich.load_providers  x1
+  src.teleon.environments.baltor_cfpb_context_governance.build_request -> src.teleon.environments.baltor_cfpb_context_governance.load_fixture  x1
+  src.teleon.environments.baltor_cfpb_context_governance.build_reward_spec -> src.teleon.environments.baltor_cfpb_context_governance.load_fixture  x1
+  src.teleon.environments.baltor_cfpb_context_governance.run_candidate -> src.teleon.environments.baltor_cfpb_context_governance.build_request  x1
+  src.teleon.environments.baltor_cfpb_context_governance.run_candidate -> src.teleon.environments.baltor_cfpb_context_governance.build_reward_spec  x1
+  src.teleon.environments.baltor_cfpb_context_governance.run_candidate -> src.teleon.environments.baltor_cfpb_context_governance.load_fixture  x1
+  src.teleon.environments.baltor_cfpb_context_governance.run_candidate -> src.teleon.environments.local_environment_provider.LocalEnvironmentProvider  x1
+  src.teleon.environments.baltor_cfpb_context_governance.run_candidate -> src.teleon.environments.reward_runner.RewardRunner  x1
+  src.teleon.environments.local_environment_provider._content_hash -> src.teleon.experiments.ids.sha256_hex  x1
+  src.teleon.environments.local_environment_provider.run -> src.teleon.environments.local_environment_provider._stub_answer  x1
+  src.teleon.environments.local_environment_provider.run -> src.teleon.experiments.ids.canonical_id  x1
+  src.teleon.environments.local_environment_provider.unavailable -> src.teleon.ports.environment_provider.EnvironmentUnavailableResult  x1
+  src.teleon.environments.reward_runner._eval_check -> src.teleon.environments.reward_runner._answer_text  x1
+  src.teleon.environments.reward_runner._eval_check -> src.teleon.environments.reward_runner._output_dict  x1
+  src.teleon.environments.reward_runner.score -> src.teleon.environments.reward_runner._eval_check  x1
+  src.teleon.evolution.ab_harness.ab_test -> src.teleon.evolution.distiller.DistillationRecord  x1
+  src.teleon.evolution.ab_harness.ab_test -> src.teleon.evolution.distiller.choose_strategy  x1
+  src.teleon.evolution.ab_harness.ab_test -> src.teleon.evolution.distiller.distill  x1
+  src.teleon.evolution.ab_harness.ab_test -> src.teleon.evolution.token_reduction.compress_skill  x1
+  src.teleon.evolution.ab_harness.ab_test -> src.teleon.evolution.token_reduction.estimate_tokens  x1
+  src.teleon.evolution.ab_harness.ab_test_corpus -> src.teleon.evolution.ab_harness.ab_test  x1
+  src.teleon.evolution.ab_harness.ab_test_corpus -> src.teleon.evolution.meta_learner.DistillationMetaLearner  x1
+  src.teleon.evolution.auto_tuning.auto_tune_setup -> src.teleon.evolution.auto_tuning.get_task  x1
+  src.teleon.evolution.auto_tuning.get_task -> src.teleon.evolution.auto_tuning.load_catalog  x1
+  src.teleon.evolution.capability_graph.__init__ -> src.teleon.evolution.capability_graph.EvolutionError  x1
+  src.teleon.evolution.capability_graph._check_acyclic -> src.teleon.evolution.capability_graph.EvolutionError  x1
+  src.teleon.evolution.capability_graph.add_edge -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph._check_acyclic  x1
+  src.teleon.evolution.capability_graph.descent_path -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph._children  x1
+  src.teleon.evolution.capability_graph.descent_path -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph.root  x1
+  src.teleon.evolution.capability_graph.document_fork -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph.add_edge  x1
+  src.teleon.evolution.capability_graph.document_fork -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph.add_runner  x1
+  src.teleon.evolution.capability_graph.document_fork -> src.teleon.evolution.capability_graph.EvolutionEdge  x1
+  src.teleon.evolution.capability_graph.lineage -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph._incoming  x1
+  src.teleon.evolution.capability_graph.lineage -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph.node  x1
+  src.teleon.evolution.capability_graph.lineage -> src.teleon.evolution.capability_graph.EvolutionError  x1
+  src.teleon.evolution.capability_graph.most_deterministic_runner -> src.teleon.evolution.capability_graph.EvolutionError  x1
+  src.teleon.evolution.capability_graph.most_deterministic_runner -> src.teleon.evolution.capability_graph._neg_str  x1
+  src.teleon.evolution.capability_graph.node -> src.teleon.evolution.capability_graph.EvolutionError  x1
+  src.teleon.evolution.capability_graph.record_heal -> src.teleon.evolution.capability_graph.EvolutionEdge  x1
+  src.teleon.evolution.capability_graph.root -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph.roots  x1
+  src.teleon.evolution.capability_graph.root -> src.teleon.evolution.capability_graph.EvolutionError  x1
+  src.teleon.evolution.capability_graph.to_dict -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph.descent_path  x1
+  src.teleon.evolution.capability_graph.to_dict -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph.forks  x1
+  src.teleon.evolution.capability_graph.to_dict -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph.root  x1
+  src.teleon.evolution.capability_graph.to_dict -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph.validate  x1
+  src.teleon.evolution.capability_graph.validate -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph._check_acyclic  x1
+  src.teleon.evolution.capability_graph.visit -> src.teleon.evolution.capability_graph.EvolutionError  x1
+  src.teleon.evolution.catalog_descent.convert_catalog -> src.teleon.evolution.catalog_descent._before  x1
+  src.teleon.evolution.catalog_descent.convert_catalog -> src.teleon.evolution.catalog_descent.descend  x1
+  src.teleon.evolution.catalog_descent.convert_catalog -> src.teleon.evolution.catalog_descent.load_catalog  x1
+  src.teleon.evolution.catalog_descent.convert_catalog -> src.teleon.evolution.descent_attempt_store.DescentAttempt  x1
+  src.teleon.evolution.catalog_descent.convert_catalog -> src.teleon.evolution.substrate_selector.model_downgrade  x1
+  src.teleon.evolution.catalog_descent.demonstrate -> src.teleon.evolution.catalog_descent.convert_catalog  x1
+  src.teleon.evolution.catalog_descent.demonstrate -> src.teleon.evolution.descent_attempt_store.DescentAttemptStore  x1
+  src.teleon.evolution.catalog_descent.descend -> src.teleon.evolution.catalog_descent._before  x1
+  src.teleon.evolution.catalog_descent.descend -> src.teleon.evolution.substrate_selector.model_downgrade  x1
+  src.teleon.evolution.descender.descend -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph  x1
+  src.teleon.evolution.descender.descend -> src.teleon.evolution.descent_axes.descent_strategies  x1
+  src.teleon.evolution.descender.descend -> src.teleon.evolution.descent_axes.descent_strategy  x1
+  src.teleon.evolution.descender.descend -> src.teleon.evolution.distiller.DistillationRecord  x1
+  src.teleon.evolution.descender.descend -> src.teleon.governance.org_policy.bounds_runner_change  x1
+  src.teleon.evolution.descent_attempt_store._open -> src.teleon.storage.record_store.LocalRecordStore  x1
+  src.teleon.evolution.descent_attempt_store.all -> src.teleon.evolution.descent_attempt_store.DescentAttemptStore._open  x1
+  src.teleon.evolution.descent_attempt_store.append -> src.teleon.evolution.descent_attempt_store.DescentAttemptStore._open  x1
+  src.teleon.evolution.descent_attempt_store.append -> src.teleon.evolution.descent_attempt_store._reward  x1
+  src.teleon.evolution.descent_attempt_store.append -> src.teleon.evolution.descent_axes.is_axis  x1
+  src.teleon.evolution.descent_attempt_store.best_strategy_for -> src.teleon.evolution.descent_attempt_store.DescentAttemptStore.all  x1
+  src.teleon.evolution.descent_attempt_store.stats -> src.teleon.evolution.descent_attempt_store.DescentAttemptStore.all  x1
+  src.teleon.evolution.descent_attempt_store.training_examples -> src.teleon.evolution.descent_attempt_store.DescentAttemptStore.all  x1
+  src.teleon.evolution.descent_axes.all_descent_strategies -> src.teleon.evolution.descent_axes._strategy_list  x1
+  src.teleon.evolution.descent_axes.descent_strategies -> src.teleon.evolution.descent_axes._strategy_list  x1
+  src.teleon.evolution.descent_axes.descent_strategy -> src.teleon.evolution.descent_axes.all_descent_strategies  x1
+  src.teleon.evolution.descent_axes.strategies_for_axis -> src.teleon.evolution.descent_axes._strategy_list  x1
+  src.teleon.evolution.distiller.distill -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph  x1
+  src.teleon.evolution.distiller.distill -> src.teleon.evolution.distiller.DistillationRecord  x1
+  src.teleon.evolution.distiller.distill -> src.teleon.evolution.distiller.choose_strategy  x1
+  src.teleon.evolution.distiller.distill -> src.teleon.governance.org_policy.bounds_runner_change  x1
+  src.teleon.evolution.distiller.distill_candidate -> src.teleon.evolution.distiller.distill  x1
+  src.teleon.evolution.distiller.distill_robustness -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph  x1
+  src.teleon.evolution.distiller.distill_robustness -> src.teleon.evolution.descent_axes.freshness_policy  x1
+  src.teleon.evolution.distiller.distill_robustness -> src.teleon.evolution.distiller.DistillationRecord  x1
+  src.teleon.evolution.distiller.distill_robustness -> src.teleon.governance.org_policy.bounds_runner_change  x1
+  src.teleon.evolution.external_outcomes.record_external_outcome -> src.teleon.evolution.descent_attempt_store.DescentAttempt  x1
+  src.teleon.evolution.freshness_runtime.__init__ -> src.teleon.evolution.descent_axes.freshness_policy  x1
+  src.teleon.evolution.freshness_runtime.demonstrate_freshness_e2e -> src.teleon.evolution.freshness_runtime.FreshnessSyncedCapability  x1
+  src.teleon.evolution.freshness_runtime.sync -> src.teleon.evolution.freshness_runtime.FreshnessSyncedCapability.serve  x1
+  src.teleon.evolution.impl_finder.find_implementations -> src.teleon.training.capability_network._jaccard  x1
+  src.teleon.evolution.meta_learner.class_key -> src.teleon.evolution.meta_learner.determinism_band  x1
+  src.teleon.evolution.meta_learner.count -> src.teleon.evolution.meta_learner.class_key  x1
+  src.teleon.evolution.meta_learner.efficiency_summary -> src.teleon.evolution.meta_learner._efficiency  x1
+  src.teleon.evolution.meta_learner.efficiency_summary -> src.teleon.evolution.meta_learner._neg  x1
+  src.teleon.evolution.meta_learner.from_brain -> src.teleon.evolution.meta_learner.DistillationMetaLearner  x1
+  src.teleon.evolution.meta_learner.recommend_lane -> src.teleon.evolution.meta_learner.class_key  x1
+  src.teleon.evolution.meta_learner.recommend_strategy -> src.teleon.evolution.distiller.choose_strategy  x1
+  src.teleon.evolution.meta_learner.recommend_strategy -> src.teleon.evolution.meta_learner.DistillationMetaLearner.strategy_stats  x1
+  src.teleon.evolution.meta_learner.recommend_strategy -> src.teleon.evolution.meta_learner._neg  x1
+  src.teleon.evolution.meta_learner.record -> src.teleon.evolution.meta_learner.class_key  x1
+  src.teleon.evolution.meta_learner.strategy_stats -> src.teleon.evolution.meta_learner._efficiency  x1
+  src.teleon.evolution.meta_learner.strategy_stats -> src.teleon.evolution.meta_learner.class_key  x1
+  src.teleon.evolution.registry_descent._impl_registry_attempts -> src.teleon.evolution.descent_attempt_store.DescentAttempt  x1
+  src.teleon.evolution.registry_descent._impl_registry_attempts -> src.teleon.evolution.registry_descent._strategy_outcome  x1
+  src.teleon.evolution.registry_descent._tunable_task_attempts -> src.teleon.evolution.descent_attempt_store.DescentAttempt  x1
+  src.teleon.evolution.registry_descent._tunable_task_attempts -> src.teleon.evolution.registry_descent._strategy_outcome  x1
+  src.teleon.evolution.registry_descent.convert_all_registries -> src.teleon.evolution.catalog_descent.convert_catalog  x1
+  src.teleon.evolution.registry_descent.convert_all_registries -> src.teleon.evolution.registry_descent._impl_registry_attempts  x1
+  src.teleon.evolution.registry_descent.convert_all_registries -> src.teleon.evolution.registry_descent._tunable_task_attempts  x1
+  src.teleon.evolution.registry_descent.demonstrate -> src.teleon.evolution.descent_attempt_store.DescentAttemptStore  x1
+  src.teleon.evolution.registry_descent.demonstrate -> src.teleon.evolution.registry_descent.convert_all_registries  x1
+  src.teleon.evolution.rule_generator.generate_rule -> src.teleon.evolution.rule_generator._parse_rule  x1
+  src.teleon.evolution.rule_generator.generate_rule -> src.teleon.evolution.rule_generator._prompt  x1
+  src.teleon.evolution.rule_generator.generate_rule -> src.teleon.evolution.rule_generator.apply_rule  x1
+  src.teleon.evolution.rule_generator.real_llm_caller -> src.teleon.dag.real_steps.llm_available  x1
+  src.teleon.evolution.rule_generator.real_llm_caller -> src.teleon.dag.real_steps.real_llm  x1
+  src.teleon.evolution.self_optimizing_unit.demonstrate -> src.teleon.evolution.self_optimizing_unit.SelfOptimizingCapabilityUnit  x1
+  src.teleon.evolution.self_optimizing_unit.optimize -> src.teleon.evolution.distiller.distill  x1
+  src.teleon.evolution.self_optimizing_unit.optimize -> src.teleon.evolution.distiller.distill_robustness  x1
+  src.teleon.evolution.self_optimizing_unit.optimize -> src.teleon.evolution.token_reduction.compress_skill  x1
+  src.teleon.evolution.self_optimizing_unit.optimize -> src.teleon.inference.model_index.load_index  x1
+  src.teleon.evolution.self_optimizing_unit.optimize -> src.teleon.inference.model_index.select_best  x1
+  src.teleon.evolution.source_poller._last_hash -> src.teleon.storage.record_store.open_record_store  x1
+  src.teleon.evolution.source_poller.poll_source -> src.teleon.evolution.source_poller._last_hash  x1
+  src.teleon.evolution.source_poller.poll_source -> src.teleon.storage.record_store.open_record_store  x1
+  src.teleon.evolution.source_poller.real_federal_register_fetcher -> src.teleon.dag.real_steps.network_allowed  x1
+  src.teleon.evolution.source_poller.real_federal_register_fetcher -> src.teleon.dag.real_steps.real_federal_register  x1
+  src.teleon.evolution.substrate_selector.model_downgrade -> src.teleon.inference.model_index.load_index  x1
+  src.teleon.evolution.substrate_selector.model_downgrade -> src.teleon.inference.model_index.select_best  x1
+  src.teleon.experiments.ids.canonical_id -> src.teleon.experiments.ids.canonical_bytes  x1
+  src.teleon.experiments.ids.sha256_hex -> src.teleon.experiments.ids.canonical_bytes  x1
+  src.teleon.experiments.parallel_paths._result_record -> src.teleon.experiments.parallel_paths._coverage  x1
+  src.teleon.experiments.parallel_paths.run_parallel -> src.teleon.experiments.ids.canonical_id  x1
+  src.teleon.experiments.parallel_paths.run_parallel -> src.teleon.experiments.ids.sha256_hex  x1
+  src.teleon.experiments.path_comparator._leaks_any -> src.teleon.experiments.path_comparator._output_text  x1
+  src.teleon.experiments.path_comparator._verdict -> src.teleon.experiments.path_comparator._facts_equivalent  x1
+  src.teleon.experiments.path_comparator.compare -> src.teleon.experiments.ids.canonical_id  x1
+  src.teleon.experiments.path_comparator.compare -> src.teleon.experiments.path_comparator._verdict  x1
+  src.teleon.experiments.path_costing.estimate -> src.teleon.experiments.ids.canonical_id  x1
+  src.teleon.experiments.path_costing.estimate -> src.teleon.experiments.path_costing.load_pricebook  x1
+  src.teleon.experiments.path_promotion.authorized_promoted_path_id -> src.teleon.experiments.path_promotion.is_promote_authorized  x1
+  src.teleon.experiments.path_promotion.decide -> src.teleon.experiments.ids.canonical_id  x1
+  src.teleon.experiments.path_promotion.decide -> src.teleon.experiments.path_promotion._cost_acceptable  x1
+  src.teleon.experiments.path_promotion.decide -> src.teleon.experiments.path_promotion._find_verdict  x1
+  src.teleon.experiments.path_rollback.build_rollback_plan -> src.teleon.experiments.ids.canonical_id  x1
+  src.teleon.exploration.__main__._decide -> src.teleon.exploration.dispatch.dispatch_exploration  x1
+  src.teleon.exploration.__main__._decide -> src.teleon.exploration.ladder.escalation_decision  x1
+  src.teleon.exploration.__main__._self_test -> src.teleon.exploration.ladder.EscalationPolicy  x1
+  src.teleon.exploration.__main__.main -> src.teleon.exploration.__main__._decide  x1
+  src.teleon.exploration.__main__.main -> src.teleon.exploration.__main__._self_test  x1
+  src.teleon.exploration.dispatch._receipt -> src.teleon.experiments.ids.canonical_id  x1
+  src.teleon.exploration.dispatch.dispatch_exploration -> src.teleon.agents.agent_runtime_provider.AgentRuntimeRequest  x1
+  src.teleon.exploration.dispatch.dispatch_exploration -> src.teleon.agents.agent_runtime_provider.dispatch_agent_request  x1
+  src.teleon.exploration.dispatch.dispatch_exploration -> src.teleon.experiments.ids.canonical_id  x1
+  src.teleon.exploration.dispatch.dispatch_exploration -> src.teleon.exploration.dispatch.ExplorationProposal  x1
+  src.teleon.exploration.dispatch.dispatch_exploration -> src.teleon.exploration.dispatch._bounds_to_request_caps  x1
+  src.teleon.exploration.dispatch.dispatch_exploration -> src.teleon.exploration.dispatch._receipt  x1
+  src.teleon.exploration.ladder._as_task -> src.teleon.exploration.ladder.TaskClass  x1
+  src.teleon.exploration.ladder._decision -> src.teleon.experiments.ids.canonical_id  x1
+  src.teleon.exploration.ladder._decision -> src.teleon.exploration.ladder.EscalationDecision  x1
+  src.teleon.exploration.ladder.escalation_decision -> src.teleon.exploration.ladder._any_passed  x1
+  src.teleon.exploration.ladder.escalation_decision -> src.teleon.exploration.ladder._as_task  x1
+  src.teleon.exploration.ladder.escalation_decision -> src.teleon.exploration.ladder._last_passing_kind  x1
+  src.teleon.exploration.ladder.escalation_decision -> src.teleon.exploration.ladder._merged_bounds  x1
+  src.teleon.exploration.ladder.escalation_decision -> src.teleon.purpose_tasks.adaptation_ladder.is_ends_change  x1
+  src.teleon.extraction.document_extraction_cascade.compare_strategies -> src.teleon.extraction.document_extraction_cascade.extract_measured  x1
+  src.teleon.extraction.document_extraction_cascade.compare_strategies -> src.teleon.extraction.document_extraction_cascade.frontier_only_cost  x1
+  src.teleon.extraction.document_extraction_cascade.compare_strategies -> src.teleon.extraction.document_extraction_cascade.supervise_extraction  x1
+  src.teleon.extraction.document_extraction_cascade.demonstrate -> src.teleon.extraction.document_extraction_cascade.extract  x1
+  src.teleon.extraction.document_extraction_cascade.extract -> src.teleon.extraction.document_extraction_cascade._pick_acquire  x1
+  src.teleon.extraction.document_extraction_cascade.extract_measured -> src.teleon.extraction.document_extraction_cascade._pick_acquire  x1
+  src.teleon.extraction.document_extraction_cascade.extract_measured -> src.teleon.extraction.document_extraction_cascade.measured_class_accuracy  x1
+  src.teleon.extraction.document_extraction_cascade.extract_measured -> src.teleon.extraction.document_extraction_cascade.measured_field_accuracy  x1
+  src.teleon.extraction.document_extraction_cascade.extraction_savings -> src.teleon.evolution.substrate_selector.model_downgrade  x1
+  src.teleon.extraction.document_extraction_cascade.extraction_savings -> src.teleon.extraction.document_extraction_cascade.extract_measured  x1
+  src.teleon.extraction.document_extraction_cascade.extraction_savings -> src.teleon.extraction.document_extraction_cascade.frontier_only_cost  x1
+  src.teleon.extraction.document_extraction_cascade.measured_class_accuracy -> src.teleon.extraction.document_extraction_cascade._recover  x1
+  src.teleon.extraction.document_extraction_cascade.measured_class_accuracy -> src.teleon.extraction.document_extraction_cascade._score  x1
+  src.teleon.extraction.document_extraction_cascade.measured_field_accuracy -> src.teleon.extraction.document_extraction_cascade._recover  x1
+  src.teleon.extraction.document_extraction_cascade.measured_field_accuracy -> src.teleon.extraction.document_extraction_cascade._score  x1
+  src.teleon.extraction.document_extraction_cascade.record_extraction_descent -> src.teleon.evolution.descent_attempt_store.DescentAttempt  x1
+  src.teleon.extraction.document_extraction_cascade.record_extraction_descent -> src.teleon.extraction.document_extraction_cascade.extraction_savings  x1
+  src.teleon.extraction.document_extraction_cascade.supervise_extraction -> src.teleon.extraction.document_extraction_cascade._pick_acquire  x1
+  src.teleon.extraction.document_extraction_cascade.supervise_extraction -> src.teleon.extraction.document_extraction_cascade.measured_class_accuracy  x1
+  src.teleon.extraction.document_extraction_cascade.supervise_extraction -> src.teleon.extraction.document_extraction_cascade.measured_field_accuracy  x1
+  src.teleon.extraction.input_acquire.acquire -> src.teleon.extraction.input_acquire._supports  x1
+  src.teleon.extraction.input_acquire.extract_from -> src.teleon.extraction.document_extraction_cascade.extract  x1
+  src.teleon.extraction.input_acquire.extract_from -> src.teleon.extraction.input_acquire.acquire  x1
+  src.teleon.extraction.ocr_port._provider -> src.teleon.extraction.ocr_port.load_registry  x1
+  src.teleon.extraction.ocr_port.available_ocr -> src.teleon.extraction.ocr_port._needs_met  x1
+  src.teleon.extraction.ocr_port.available_ocr -> src.teleon.extraction.ocr_port.load_registry  x1
+  src.teleon.extraction.ocr_port.descent_order -> src.teleon.extraction.ocr_port._needs_met  x1
+  src.teleon.extraction.ocr_port.descent_order -> src.teleon.extraction.ocr_port.load_registry  x1
+  src.teleon.extraction.ocr_port.select_ocr -> src.teleon.extraction.ocr_port.CallableOCR  x1
+  src.teleon.extraction.ocr_port.select_ocr -> src.teleon.extraction.ocr_port._provider  x1
+  src.teleon.extraction.ocr_port.select_ocr -> src.teleon.extraction.ocr_port.load_registry  x1
+  src.teleon.extraction.pdf_profiler.shortcut_plan -> src.teleon.extraction.pdf_profiler.classify_layout  x1
+  src.teleon.extraction.pdf_profiler.shortcut_plan -> src.teleon.extraction.pdf_profiler.route  x1
+  src.teleon.frameworks.framework_adapters.to_anthropic_tool -> src.teleon.frameworks.framework_adapters._gov  x1
+  src.teleon.frameworks.framework_adapters.to_crewai_tool -> src.teleon.frameworks.framework_adapters._gov  x1
+  src.teleon.frameworks.framework_adapters.to_langgraph_node -> src.teleon.frameworks.framework_adapters._gov  x1
+  src.teleon.frameworks.framework_adapters.to_mcp_tool -> src.teleon.frameworks.framework_adapters._gov  x1
+  src.teleon.frameworks.framework_adapters.to_openai_tool -> src.teleon.frameworks.framework_adapters._gov  x1
+  src.teleon.governance.org_policy.bounds_runner_change -> src.teleon.governance.org_policy.evaluate_runner  x1
+  src.teleon.governance.org_policy.evaluate -> src.teleon.governance.org_policy.PolicyDecision  x1
+  src.teleon.governance.org_policy.evaluate_endpoint -> src.teleon.governance.org_policy.evaluate  x1
+  src.teleon.governance.org_policy.evaluate_runner -> src.teleon.governance.org_policy.evaluate  x1
+  src.teleon.governance.org_policy.forbidden_endpoints -> src.teleon.endpoints.registry.endpoints_for  x1
+  src.teleon.governance.org_policy.forbidden_endpoints -> src.teleon.governance.org_policy.evaluate_endpoint  x1
+  src.teleon.governance.org_policy.from_dict -> src.teleon.governance.org_policy.OrgGuardrailPolicy  x1
+  src.teleon.governance.org_policy.load_policy -> src.teleon.governance.org_policy.OrgPolicyError  x1
+  src.teleon.governance.org_policy.load_policy -> src.teleon.governance.org_policy._load  x1
+  src.teleon.governance.org_policy.policy_ids -> src.teleon.governance.org_policy._load  x1
+  src.teleon.governance.tenant_preferences._from_dict -> src.teleon.governance.tenant_preferences.TenantPreferences  x1
+  src.teleon.governance.tenant_preferences.known_tenants -> src.teleon.governance.tenant_preferences._load  x1
+  src.teleon.governance.tenant_preferences.preferences_for -> src.teleon.governance.tenant_preferences._from_dict  x1
+  src.teleon.governance.tenant_preferences.preferences_for -> src.teleon.governance.tenant_preferences._load  x1
+  src.teleon.governance.tenant_preferences.resolve -> src.teleon.governance.tenant_preferences.TenantPreferences.to_objective  x1
+  src.teleon.governance.tenant_preferences.resolve -> src.teleon.governance.tenant_preferences.TenantPreferences.to_org_policy  x1
+  src.teleon.governance.tenant_preferences.to_objective -> src.teleon.objectives.objective.CapabilityObjective  x1
+  src.teleon.governance.tenant_preferences.to_objective -> src.teleon.objectives.objective.ObjectiveError  x1
+  src.teleon.governance.tenant_preferences.to_org_policy -> src.teleon.governance.org_policy.OrgGuardrailPolicy  x1
+  src.teleon.hub_freshness.keep_hub_fresh -> src.openharnesshub.hub_settings.load_settings  x1
+  src.teleon.hub_freshness.keep_hub_fresh -> src.openharnesshub.hub_settings.tools_for  x1
+  src.teleon.hub_freshness.keep_hub_fresh -> src.teleon.evolution.descent_attempt_store.DescentAttempt  x1
+  src.teleon.hub_freshness.keep_hub_fresh -> src.teleon.hub_freshness._key  x1
+  src.teleon.inference.adapters.invoke -> src.teleon.egress.client.EgressClient  x1
+  src.teleon.inference.adapters.invoke -> src.teleon.inference.adapters.InferenceProviderAdapter.available  x1
+  src.teleon.inference.adapters.invoke -> src.teleon.inference.adapters._HttpAdapter._auth_headers  x1
+  src.teleon.inference.adapters.invoke -> src.teleon.inference.adapters._HttpAdapter._build_body  x1
+  src.teleon.inference.adapters.invoke -> src.teleon.inference.adapters._HttpAdapter._parse_model  x1
+  src.teleon.inference.adapters.invoke -> src.teleon.inference.adapters._HttpAdapter._parse_output  x1
+  src.teleon.inference.adapters.invoke -> src.teleon.inference.adapters._HttpAdapter._parse_usage  x1
+  src.teleon.inference.adapters.invoke -> src.teleon.inference.adapters.resolve_secret_ref  x1
+  src.teleon.inference.adapters.invoke -> src.teleon.inference.oips._stable  x1
+  src.teleon.inference.adapters.invoke -> src.teleon.inference.receipts.base_host_of  x1
+  src.teleon.inference.adapters.resolve_adapter -> src.teleon.inference.adapters.style_for_node  x1
+  src.teleon.inference.api_projection.all_projections -> src.teleon.inference.api_projection.free_endpoints  x1
+  src.teleon.inference.api_projection.all_projections -> src.teleon.inference.api_projection.health  x1
+  src.teleon.inference.api_projection.all_projections -> src.teleon.inference.api_projection.model_graph  x1
+  src.teleon.inference.api_projection.all_projections -> src.teleon.inference.api_projection.preferences_coverage  x1
+  src.teleon.inference.api_projection.all_projections -> src.teleon.inference.api_projection.providers  x1
+  src.teleon.inference.api_projection.free_endpoints -> src.teleon.inference.free_endpoint_intel.run_registry  x1
+  src.teleon.inference.api_projection.health -> src.teleon.inference.oips.load_graph  x1
+  src.teleon.inference.api_projection.model_graph -> src.teleon.inference.api_projection.providers  x1
+  src.teleon.inference.api_projection.model_graph -> src.teleon.inference.oips.load_graph  x1
+  src.teleon.inference.api_projection.providers -> src.teleon.inference.oips.load_graph  x1
+  src.teleon.inference.api_projection.resolve_preference -> src.teleon.inference.oips.resolve_preference  x1
+  src.teleon.inference.default_brain._role -> src.teleon.inference.default_brain.load_policy  x1
+  src.teleon.inference.default_brain.brain_for -> src.teleon.inference.default_brain._role  x1
+  src.teleon.inference.default_brain.roles -> src.teleon.inference.default_brain.load_policy  x1
+  src.teleon.inference.free_endpoint_intel._class_label -> src.teleon.inference.free_endpoint_intel._codes  x1
+  src.teleon.inference.free_endpoint_intel._codes -> src.teleon.inference.free_endpoint_intel._load  x1
+  src.teleon.inference.free_endpoint_intel._policy -> src.teleon.inference.free_endpoint_intel._load  x1
+  src.teleon.inference.free_endpoint_intel._quarantine_floor -> src.teleon.inference.free_endpoint_intel._codes  x1
+  src.teleon.inference.free_endpoint_intel.assess_gateway_repo -> src.teleon.inference.free_endpoint_intel._class_label  x1
+  src.teleon.inference.free_endpoint_intel.assess_gateway_repo -> src.teleon.inference.free_endpoint_intel._has_raw_key  x1
+  src.teleon.inference.free_endpoint_intel.assess_gateway_repo -> src.teleon.inference.free_endpoint_intel._policy  x1
+  src.teleon.inference.free_endpoint_intel.assess_gateway_repo -> src.teleon.inference.free_endpoint_intel._quarantine_floor  x1
+  src.teleon.inference.free_endpoint_intel.assess_gateway_repo -> src.teleon.inference.free_endpoint_intel._string_values  x1
+  src.teleon.inference.free_endpoint_intel.assess_gateway_repo -> src.teleon.inference.free_endpoint_intel.classify  x1
+  src.teleon.inference.free_endpoint_intel.classify -> src.teleon.inference.free_endpoint_intel._has_raw_key  x1
+  src.teleon.inference.free_endpoint_intel.due_diligence -> src.teleon.inference.free_endpoint_intel._class_label  x1
+  src.teleon.inference.free_endpoint_intel.due_diligence -> src.teleon.inference.free_endpoint_intel._has_raw_key  x1
+  src.teleon.inference.free_endpoint_intel.due_diligence -> src.teleon.inference.free_endpoint_intel._quarantine_floor  x1
+  src.teleon.inference.free_endpoint_intel.due_diligence -> src.teleon.inference.free_endpoint_intel._string_values  x1
+  src.teleon.inference.free_endpoint_intel.due_diligence -> src.teleon.inference.free_endpoint_intel.classify  x1
+  src.teleon.inference.free_endpoint_intel.due_diligence -> src.teleon.inference.free_endpoint_intel.propose_provider_node  x1
+  src.teleon.inference.free_endpoint_intel.run_registry -> src.teleon.inference.free_endpoint_intel._load  x1
+  src.teleon.inference.free_endpoint_intel.run_registry -> src.teleon.inference.free_endpoint_intel.due_diligence  x1
+  src.teleon.inference.free_endpoint_intel.run_watchlist -> src.teleon.inference.free_endpoint_intel._load  x1
+  src.teleon.inference.free_endpoint_intel.run_watchlist -> src.teleon.inference.free_endpoint_intel.assess_gateway_repo  x1
+  src.teleon.inference.free_endpoint_intel.score_risk -> src.teleon.inference.free_endpoint_intel._quarantine_floor  x1
+  src.teleon.inference.implementation_selector.implementations_for -> src.teleon.inference.implementation_selector.load_registry  x1
+  src.teleon.inference.implementation_selector.select_implementation -> src.teleon.inference.implementation_selector.implementations_for  x1
+  src.teleon.inference.lane_selection._metric_vector -> src.teleon.objectives.objective.MetricVector  x1
+  src.teleon.inference.lane_selection.forbidden_lanes -> src.teleon.inference.lane_selection.lanes  x1
+  src.teleon.inference.lane_selection.lanes -> src.teleon.inference.lane_selection._load  x1
+  src.teleon.inference.lane_selection.select_lane -> src.teleon.inference.lane_selection._metric_vector  x1
+  src.teleon.inference.lane_selection.select_lane -> src.teleon.inference.lane_selection.lanes  x1
+  src.teleon.inference.model_efficiency._self_test -> src.teleon.inference.model_efficiency.efficiency_order  x1
+  src.teleon.inference.model_efficiency._self_test -> src.teleon.inference.model_efficiency.external_signals_for_ranking  x1
+  src.teleon.inference.model_efficiency._self_test -> src.teleon.inference.model_efficiency.ingest_external_ranking  x1
+  src.teleon.inference.model_efficiency._self_test -> src.teleon.inference.model_efficiency.load_external_leaderboard  x1
+  src.teleon.inference.model_efficiency.external_signals_for_ranking -> src.teleon.inference.model_efficiency._safe_float  x1
+  src.teleon.inference.model_efficiency.ingest_external_ranking -> src.teleon.inference.model_efficiency._safe_float  x1
+  src.teleon.inference.model_efficiency.load_external_leaderboard -> src.teleon.inference.model_efficiency.external_signals_for_ranking  x1
+  src.teleon.inference.model_efficiency.load_external_leaderboard -> src.teleon.inference.model_efficiency.ingest_external_ranking  x1
+  src.teleon.inference.model_efficiency.quality_from_receipts -> src.teleon.inference.model_efficiency._safe_float  x1
+  src.teleon.inference.model_efficiency.rank_models -> src.teleon.inference.model_efficiency._aggregate  x1
+  src.teleon.inference.model_index.apply_staleness -> src.teleon.evolution.descent_axes.freshness_policy  x1
+  src.teleon.inference.model_index.apply_staleness -> src.teleon.inference.model_index._days_between  x1
+  src.teleon.inference.oips._allowed_use -> src.teleon.inference.oips._node_index  x1
+  src.teleon.inference.oips._node_index -> src.teleon.inference.oips.load_graph  x1
+  src.teleon.inference.oips._tier_code -> src.teleon.inference.oips._tiers  x1
+  src.teleon.inference.oips._tiers -> src.teleon.inference.oips._load  x1
+  src.teleon.inference.oips.build_receipt -> src.teleon.inference.oips._allowed_use  x1
+  src.teleon.inference.oips.infer_local -> src.teleon.inference.model_efficiency.load_external_leaderboard  x1
+  src.teleon.inference.oips.infer_local -> src.teleon.inference.model_efficiency.quality_from_receipts  x1
+  src.teleon.inference.oips.infer_local -> src.teleon.inference.model_efficiency.rank_models  x1
+  src.teleon.inference.oips.infer_local -> src.teleon.inference.oips._node_index  x1
+  src.teleon.inference.oips.infer_local -> src.teleon.inference.oips._tier_code  x1
+  src.teleon.inference.oips.infer_local -> src.teleon.inference.oips.build_receipt  x1
+  src.teleon.inference.oips.infer_local -> src.teleon.inference.oips.resolve_preference  x1
+  src.teleon.inference.oips.infer_local -> src.teleon.inference.oips.select_provider  x1
+  src.teleon.inference.oips.infer_local -> src.teleon.inference.receipts.load_receipts  x1
+  src.teleon.inference.oips.infer_local -> src.teleon.inference.receipts.persist_receipt  x1
+  src.teleon.inference.oips.load_graph -> src.teleon.inference.oips._load  x1
+  src.teleon.inference.oips.resolve_preference -> src.teleon.inference.oips._stable  x1
+  src.teleon.inference.oips.select_provider -> src.teleon.inference.model_efficiency.efficiency_order  x1
+  src.teleon.inference.oips.select_provider -> src.teleon.inference.oips._eligible  x1
+  src.teleon.inference.oips.select_provider -> src.teleon.inference.oips._node_index  x1
+  src.teleon.inference.oips.select_provider -> src.teleon.inference.oips._secret_present  x1
+  src.teleon.inference.oips.select_provider -> src.teleon.inference.oips._tier_code  x1
+  src.teleon.inference.oips.select_provider -> src.teleon.inference.oips.load_graph  x1
+  src.teleon.inference.preference_profile.balanced -> src.teleon.inference.preference_profile.PreferenceProfile  x1
+  src.teleon.inference.preference_profile.choose -> src.teleon.inference.preference_profile.score_candidates  x1
+  src.teleon.inference.preference_profile.cost_first -> src.teleon.inference.preference_profile.PreferenceProfile  x1
+  src.teleon.inference.preference_profile.determinism_required -> src.teleon.inference.preference_profile.PreferenceProfile  x1
+  src.teleon.inference.preference_profile.latency_first -> src.teleon.inference.preference_profile.PreferenceProfile  x1
+  src.teleon.inference.preference_profile.score_candidates -> src.teleon.inference.preference_profile._normalize  x1
+  src.teleon.inference.preference_profile.token_thrifty -> src.teleon.inference.preference_profile.PreferenceProfile  x1
+  src.teleon.inference.receipts.persist_receipt -> src.teleon.inference.receipts.sanitize_receipt  x1
+  src.teleon.ingest.bulk_registry.ingest_dump -> src.teleon.ingest.bulk_registry.map_entry  x1
+  src.teleon.ingest.bulk_registry.ingest_to_feed -> src.teleon.ingest.bulk_registry.ingest_dump  x1
+  src.teleon.ingest.bulk_registry.map_entry -> src.teleon.ingest.bulk_registry._common_entry  x1
+  src.teleon.ingest.bulk_registry.map_entry -> src.teleon.ingest.bulk_registry._infer_category  x1
+  src.teleon.ingest.bulk_registry.map_entry -> src.teleon.ingest.bulk_registry._slug  x1
+  src.teleon.intel.intelligence_intake._feed_intake -> src.teleon.seeds.capability_seed.all_seeds  x1
+  src.teleon.intel.intelligence_intake.plan_news_sweep -> src.teleon.intel.intelligence_intake.needs  x1
+  src.teleon.intel.intelligence_intake.pull -> src.teleon.intel.intelligence_intake._feed_intake  x1
+  src.teleon.intel.intelligence_intake.pull -> src.teleon.intel.intelligence_intake.load_sources  x1
+  src.teleon.intel.intelligence_intake.select_sources -> src.teleon.intel.intelligence_intake.load_sources  x1
+  src.teleon.io.event_io.project_event_envelope -> src.teleon.io.event_io.redact_secrets  x1
+  src.teleon.io.event_io.redact_secrets -> src.teleon.io.event_io._looks_secret  x1
+  src.teleon.io.governed_record._self_test -> src.teleon.io.governed_record.is_governed  x1
+  src.teleon.io.governed_record.is_governed -> src.teleon.io.governed_record.validate_record  x1
+  src.teleon.io.inference_io.make_inference_request -> src.teleon.io.inference_io._sha  x1
+  src.teleon.io.object_shell_migration.migrate_context_artifact -> src.teleon.io.object_shell_migration.migrate_to_shell  x1
+  src.teleon.io.object_shell_migration.migrate_to_shell -> src.teleon.templates.instantiator._content_hash  x1
+  … (716 weaker call edges omitted)
 
-## Load-bearing symbols (highest call in-degree — change carefully)
-  src.baltor.adapters.object_store.local_object_store.LocalContentAddressedObjectStore.get  (called by 1567)
-  src.baltor.determinism.trace_store.TraceStore.append  (called by 489)
-  src.baltor.distillation.rollback.execute  (called by 129)
-  src.teleon.training.skills_db.DistillationDataset.split  (called by 46)
-  src.baltor.determinism.trace_store.TraceStore.all  (called by 37)
-  src.baltor.contextops.cost_tracking.CostLadderMetrics.to_dict  (called by 36)
-  src.baltor.workers.fleet_supervisor._decision  (called by 33)
-  src.teleon.experiments.ids.canonical_id  (called by 30)
-  src.baltor.contextops.research_stub._hash  (called by 29)
-  src.baltor.determinism.fallback_router._attr  (called by 27)
-  src.baltor.adapters.memory.baltor_local.BaltorLocalMemoryProvider.search  (called by 24)
-  src.baltor.workers.control_plane._load  (called by 24)
-  src.baltor.workers.supervisor_store.SupervisorStore.close  (called by 23)
-  src.teleon.dag.pipeline_dag.Node  (called by 22)
-  src.teleon.evolution.capability_graph.EvolutionError  (called by 22)
-  src.baltor.workers.supervisor_projection._now  (called by 21)
-  src.teleon.seeds.capability_seed.SeedResult  (called by 21)
-  src.teleon.workers.fleet_ledger._epoch  (called by 20)
-  src.baltor.determinism.trace_store._as_tuple  (called by 18)
-  src.baltor.native.native_export_service._hid  (called by 18)
-  src.baltor.native.okf_adapter.GovernedConcept.as_dict  (called by 18)
-  src.teleon.experiments.ids.sha256_hex  (called by 16)
-  src.baltor.contextops.cross_source_confirmation.ConfirmationResult  (called by 14)
-  src.baltor.contextops.triage._canon  (called by 14)
-  src.baltor.determinism.trace_store.TraceStoreError  (called by 14)
+## Load-bearing symbols (highest WEIGHTED call in-degree — change carefully)
+  src.teleon.experiments.ids.canonical_id  (in-strength 30.00)
+  src.teleon.dag.pipeline_dag.Node  (in-strength 24.00)
+  src.teleon.evolution.capability_graph.EvolutionError  (in-strength 22.00)
+  src.teleon.seeds.capability_seed.SeedResult  (in-strength 21.00)
+  src.teleon.workers.fleet_ledger._epoch  (in-strength 20.00)
+  src.baltor.workers.supervisor_store._now  (in-strength 16.00)
+  src.teleon.experiments.ids.sha256_hex  (in-strength 16.00)
+  src.baltor.contextops.cross_source_confirmation.ConfirmationResult  (in-strength 14.00)
+  src.baltor.determinism.trace_store.TraceStoreError  (in-strength 14.00)
+  src.teleon.capability_planner.PlanStep  (in-strength 14.00)
+  src.openharnesshub.hub_site._esc  (in-strength 13.00)
+  src.teleon.exploration.ladder.escalation_decision  (in-strength 13.00)
+  src.teleon.exploration.ladder.TaskClass  (in-strength 13.00)
+  src.baltor.distillation.lossless_store.DistillationStoreError  (in-strength 12.00)
+  src.baltor.distillation.retention_report._aid  (in-strength 12.00)
+  src.teleon.runtime.execution_provider.ProviderUnavailableResult  (in-strength 12.00)
+  src.baltor.determinism.replay_engine._attr  (in-strength 11.00)
+  src.baltor.workers.spawn_decision._decision  (in-strength 11.00)
+  src.teleon.observer.router._iv  (in-strength 11.00)
+  src.teleon.runtime.credentials._services  (in-strength 11.00)
+  src.baltor.determinism.trace_store._as_tuple  (in-strength 10.00)
+  src.teleon.compiler.compile.CompilerError  (in-strength 10.00)
+  src.teleon.research.source_search.SourceSearchUnavailable  (in-strength 10.00)
+  src.baltor.contextops.extractor_snippets._candidate  (in-strength 9.00)
+  src.teleon.ports.blackboard_provider.BlackboardWriteRejected  (in-strength 9.00)

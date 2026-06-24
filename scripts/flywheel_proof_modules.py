@@ -204,6 +204,10 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_fundamental_primitives_taxonomy.py", "check_fundamental_primitives_taxonomy"),
     # ── CODE GRAPH: deterministic ast-based dependency graph (file→file imports + crossing symbols) over src/scripts/local_emulators; upstream/downstream are exact inverses; impact = transitive blast radius; neighbors by file path → "edit 1 file, see what breaks"; stdlib-only, always available; never serves truth ──
     ("scripts/code_graph.py", "code_graph"),
+    # ── SYMBOL GRAPH: AST symbol-level nodes (function/class/method) + WEIGHTED edges (calls/inherits/contains); module-aware confident-only resolution (ambiguous/builtin-shadow calls dropped+counted, no false hubs); weighted load-bearing ranking; stdlib-only; never serves truth ──
+    ("scripts/symbol_graph.py", "symbol_graph"),
+    # ── CODEGRAPH (unified+weighted): fuses file-import + symbol call/inherit graphs into one strength-ranked model; `--audit <file|module|symbol>` ranks the strong connections (importers/callers by call-sites×confidence + blast radius) to review when changing something; bounded artifact w/ counted overflow; never serves truth ──
+    ("scripts/codegraph.py", "codegraph"),
     # ── MODEL INDEX (best+cheapest+effective, FRESHNESS-governed): unified index of model cost + live endpoint + download location + quality; selector picks the cheapest FRESH model within a quality floor; stale model facts are HELD OUT and never selected until re-verified (kept-up-to-date is the wedge); never serves truth ──
     ("scripts/check_model_index.py", "check_model_index"),
     # ── DESCENT METHOD CATALOG: for every improvement dimension (all 17 descent axes) the concrete METHODS to accomplish it (e.g. reduce skill tokens via compression / redundant-text dedupe), each grounded in a VARIETY of researched candidate modules; license class governs vendorability (copyleft/source-available/unstated/unverified = behind-a-port); generated how-to map; discovery≠trust, never serves truth ──

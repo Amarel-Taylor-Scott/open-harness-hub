@@ -1,0 +1,4637 @@
+{
+ "version": "0.1.0",
+ "serves_truth": false,
+ "generated_from": [
+  "scripts.code_graph",
+  "scripts.symbol_graph"
+ ],
+ "change_audit_protocol": "CHANGE-AUDIT PROTOCOL \u2014 before AND after editing a file/symbol, run `PYTHONPATH=. python3 scripts/codegraph.py --audit <path-or-symbol>` and review its STRONG connections: the importers/callers that break if its API changes (ranked by strength = call-sites \u00d7 resolution-confidence) plus its blast radius. Update the load-bearing neighbors in the SAME change; a high in-strength symbol is shared infrastructure \u2014 touch it deliberately.",
+ "stats": {
+  "roots": [
+   "src",
+   "scripts",
+   "local_emulators"
+  ],
+  "modules": 1698,
+  "import_edges": 2243,
+  "symbol_nodes": {
+   "module": 1698,
+   "function": 6956,
+   "class": 632,
+   "method": 1755
+  },
+  "call_edges": 11401,
+  "ambiguous_calls_dropped": 5880,
+  "inherits_edges": 68
+ },
+ "most_load_bearing_symbols": [
+  {
+   "id": "scripts.baltor_admin_demo_server.esc",
+   "kind": "function",
+   "in_strength": 143.0,
+   "callers": 16
+  },
+  {
+   "id": "scripts.baltor_admin_demo_server.Handler.send_bytes",
+   "kind": "method",
+   "in_strength": 89.0,
+   "callers": 5
+  },
+  {
+   "id": "scripts.db.factory_jsonl_bulk_copy._str",
+   "kind": "function",
+   "in_strength": 87.0,
+   "callers": 11
+  },
+  {
+   "id": "scripts.runtime.schema_validator.validate_ref",
+   "kind": "function",
+   "in_strength": 62.0,
+   "callers": 26
+  },
+  {
+   "id": "scripts.db.factory_jsonl_to_postgres._sql_string",
+   "kind": "function",
+   "in_strength": 60.0,
+   "callers": 11
+  },
+  {
+   "id": "src.teleon.workers.fleet_ledger.FleetLedger",
+   "kind": "class",
+   "in_strength": 57.0,
+   "callers": 17
+  },
+  {
+   "id": "scripts.baltor_admin_demo_server.log_event",
+   "kind": "function",
+   "in_strength": 52.0,
+   "callers": 9
+  },
+  {
+   "id": "scripts.foundry.contracts.Candidate",
+   "kind": "class",
+   "in_strength": 48.0,
+   "callers": 25
+  },
+  {
+   "id": "scripts.baltor_admin_demo_server.compact_id",
+   "kind": "function",
+   "in_strength": 46.0,
+   "callers": 13
+  },
+  {
+   "id": "scripts.foundry.scrapers.content_hash",
+   "kind": "function",
+   "in_strength": 45.0,
+   "callers": 32
+  },
+  {
+   "id": "scripts.context_workers.common.stable_hash",
+   "kind": "function",
+   "in_strength": 45.0,
+   "callers": 31
+  },
+  {
+   "id": "scripts.security.tenant_catalog.TenantPolicy",
+   "kind": "class",
+   "in_strength": 41.0,
+   "callers": 21
+  },
+  {
+   "id": "scripts.db.factory_jsonl_bulk_copy._empty_to_null",
+   "kind": "function",
+   "in_strength": 40.0,
+   "callers": 1
+  },
+  {
+   "id": "scripts.registry_local_service._Handler._send",
+   "kind": "method",
+   "in_strength": 39.0,
+   "callers": 5
+  },
+  {
+   "id": "src.teleon.workers.durable_fleet_ledger.DurableFleetLedger",
+   "kind": "class",
+   "in_strength": 36.0,
+   "callers": 20
+  },
+  {
+   "id": "scripts.db.component_cdc_plan._str",
+   "kind": "function",
+   "in_strength": 36.0,
+   "callers": 9
+  },
+  {
+   "id": "scripts.foundry.contracts.FoundryContext",
+   "kind": "class",
+   "in_strength": 36.0,
+   "callers": 14
+  },
+  {
+   "id": "scripts.db.content_approval_plan._str",
+   "kind": "function",
+   "in_strength": 34.0,
+   "callers": 6
+  },
+  {
+   "id": "scripts.artifact_graph.source_authority.classify",
+   "kind": "function",
+   "in_strength": 33.0,
+   "callers": 10
+  },
+  {
+   "id": "scripts.showcase.server.Handler._send",
+   "kind": "method",
+   "in_strength": 33.0,
+   "callers": 6
+  },
+  {
+   "id": "scripts.context_events.EventBus",
+   "kind": "class",
+   "in_strength": 32.0,
+   "callers": 15
+  },
+  {
+   "id": "scripts.db.dedupe_resolution_plan._str",
+   "kind": "function",
+   "in_strength": 32.0,
+   "callers": 7
+  },
+  {
+   "id": "src.teleon.evolution.capability_graph.RunnerNode",
+   "kind": "class",
+   "in_strength": 31.0,
+   "callers": 10
+  },
+  {
+   "id": "scripts.context_workers.workers.tool_adapters._enabled",
+   "kind": "function",
+   "in_strength": 31.0,
+   "callers": 26
+  },
+  {
+   "id": "scripts.db.component_store_load_plan._str",
+   "kind": "function",
+   "in_strength": 31.0,
+   "callers": 4
+  },
+  {
+   "id": "scripts.portfolio_lib._esc",
+   "kind": "function",
+   "in_strength": 29.0,
+   "callers": 4
+  },
+  {
+   "id": "src.baltor.workers.supervisor_store.SupervisorStore",
+   "kind": "class",
+   "in_strength": 28.0,
+   "callers": 19
+  },
+  {
+   "id": "scripts.foundry.scrapers.CannedFetcher",
+   "kind": "class",
+   "in_strength": 28.0,
+   "callers": 11
+  },
+  {
+   "id": "scripts.db.approved_component_promotion_plan._str",
+   "kind": "function",
+   "in_strength": 28.0,
+   "callers": 8
+  },
+  {
+   "id": "src.teleon.research.source_search.ToolHit",
+   "kind": "class",
+   "in_strength": 27.0,
+   "callers": 9
+  },
+  {
+   "id": "src.teleon.workers.fleet_ledger._plus_s",
+   "kind": "function",
+   "in_strength": 27.0,
+   "callers": 12
+  },
+  {
+   "id": "scripts.db.catalog_database_migration_smoke.step",
+   "kind": "function",
+   "in_strength": 27.0,
+   "callers": 1
+  },
+  {
+   "id": "scripts.test_baltor_admin_demo_flow.request",
+   "kind": "function",
+   "in_strength": 27.0,
+   "callers": 12
+  },
+  {
+   "id": "scripts.context_workers.workers.tool_adapters._disabled_result",
+   "kind": "function",
+   "in_strength": 26.0,
+   "callers": 24
+  },
+  {
+   "id": "scripts.emit._lib.slug_only",
+   "kind": "function",
+   "in_strength": 26.0,
+   "callers": 23
+  },
+  {
+   "id": "src.teleon.experiments.ids.canonical_id",
+   "kind": "function",
+   "in_strength": 25.0,
+   "callers": 21
+  },
+  {
+   "id": "src.teleon.runtime.execution_backend_selector.select_backend",
+   "kind": "function",
+   "in_strength": 24.0,
+   "callers": 7
+  },
+  {
+   "id": "scripts.context_workers.adversarial_fixtures._assert_eq",
+   "kind": "function",
+   "in_strength": 24.0,
+   "callers": 1
+  },
+  {
+   "id": "src.teleon.dag.pipeline_dag.Node",
+   "kind": "class",
+   "in_strength": 24.0,
+   "callers": 4
+  },
+  {
+   "id": "scripts.api_native_handler.handle",
+   "kind": "function",
+   "in_strength": 23.0,
+   "callers": 3
+  },
+  {
+   "id": "scripts.context_workers.workers.tool_adapters._missing_result",
+   "kind": "function",
+   "in_strength": 23.0,
+   "callers": 21
+  },
+  {
+   "id": "scripts.eval.promotion_bridge.promotion_decision",
+   "kind": "function",
+   "in_strength": 23.0,
+   "callers": 3
+  },
+  {
+   "id": "src.baltor.contextops.cross_source_confirmation.confirm",
+   "kind": "function",
+   "in_strength": 22.0,
+   "callers": 4
+  },
+  {
+   "id": "scripts.foundry.pipeline._fixture",
+   "kind": "function",
+   "in_strength": 22.0,
+   "callers": 7
+  },
+  {
+   "id": "src.teleon.evolution.capability_graph.EvolutionError",
+   "kind": "class",
+   "in_strength": 22.0,
+   "callers": 11
+  },
+  {
+   "id": "src.teleon.inference.oips.load_graph",
+   "kind": "function",
+   "in_strength": 21.0,
+   "callers": 19
+  },
+  {
+   "id": "scripts.durable_store.DurableStore",
+   "kind": "class",
+   "in_strength": 21.0,
+   "callers": 19
+  },
+  {
+   "id": "scripts.db.promotion_decision_load_plan._str",
+   "kind": "function",
+   "in_strength": 21.0,
+   "callers": 3
+  },
+  {
+   "id": "scripts.ingest.source_adapters._hash",
+   "kind": "function",
+   "in_strength": 21.0,
+   "callers": 7
+  },
+  {
+   "id": "src.teleon.seeds.capability_seed.SeedResult",
+   "kind": "class",
+   "in_strength": 21.0,
+   "callers": 19
+  },
+  {
+   "id": "scripts.baltor_admin_demo_server.latest_run",
+   "kind": "function",
+   "in_strength": 20.0,
+   "callers": 11
+  },
+  {
+   "id": "src.baltor.determinism.consensus.ModelOutput",
+   "kind": "class",
+   "in_strength": 20.0,
+   "callers": 4
+  },
+  {
+   "id": "scripts.foundry.queues.SqliteQueue",
+   "kind": "class",
+   "in_strength": 20.0,
+   "callers": 6
+  },
+  {
+   "id": "scripts.check_identity_local_service_runtime._call",
+   "kind": "function",
+   "in_strength": 20.0,
+   "callers": 1
+  },
+  {
+   "id": "scripts.processors.assurance.multi_source_corroborate.run",
+   "kind": "function",
+   "in_strength": 20.0,
+   "callers": 5
+  },
+  {
+   "id": "scripts.context_workers.workers.tool_adapters._has_module",
+   "kind": "function",
+   "in_strength": 20.0,
+   "callers": 19
+  },
+  {
+   "id": "src.teleon.workers.fleet_ledger._epoch",
+   "kind": "function",
+   "in_strength": 20.0,
+   "callers": 9
+  },
+  {
+   "id": "src.teleon.evolution.descent_attempt_store.DescentAttemptStore",
+   "kind": "class",
+   "in_strength": 19.0,
+   "callers": 16
+  },
+  {
+   "id": "src.teleon.inference.preference_profile.cost_first",
+   "kind": "function",
+   "in_strength": 19.0,
+   "callers": 11
+  },
+  {
+   "id": "scripts.check_contextops_contracts._enum_of",
+   "kind": "function",
+   "in_strength": 19.0,
+   "callers": 1
+  },
+  {
+   "id": "scripts.context_swarm._finding",
+   "kind": "function",
+   "in_strength": 19.0,
+   "callers": 8
+  },
+  {
+   "id": "scripts.baltor_admin_demo_server.ownership_change_records",
+   "kind": "function",
+   "in_strength": 18.0,
+   "callers": 6
+  },
+  {
+   "id": "scripts.source_expansion.expand_source_handle",
+   "kind": "function",
+   "in_strength": 18.0,
+   "callers": 6
+  },
+  {
+   "id": "scripts.db.catalog_row_source.iter_components_from_rows",
+   "kind": "function",
+   "in_strength": 18.0,
+   "callers": 18
+  },
+  {
+   "id": "scripts.check_registry_backend._get",
+   "kind": "function",
+   "in_strength": 18.0,
+   "callers": 1
+  },
+  {
+   "id": "scripts.check_temporal_graph_full_stack._row",
+   "kind": "function",
+   "in_strength": 18.0,
+   "callers": 2
+  },
+  {
+   "id": "scripts.context_workers.common.compact",
+   "kind": "function",
+   "in_strength": 18.0,
+   "callers": 13
+  },
+  {
+   "id": "scripts.db.factory_jsonl_to_postgres._sql_json",
+   "kind": "function",
+   "in_strength": 18.0,
+   "callers": 8
+  },
+  {
+   "id": "scripts.ingest.source_adapters._artifact",
+   "kind": "function",
+   "in_strength": 18.0,
+   "callers": 3
+  },
+  {
+   "id": "scripts.ingest.decompose_structured.decompose_cfpb_complaint",
+   "kind": "function",
+   "in_strength": 17.0,
+   "callers": 13
+  },
+  {
+   "id": "scripts.context_graph.ContextGraph",
+   "kind": "class",
+   "in_strength": 17.0,
+   "callers": 11
+  },
+  {
+   "id": "scripts.baltor_context_gateway_mcp.http_json",
+   "kind": "function",
+   "in_strength": 17.0,
+   "callers": 1
+  },
+  {
+   "id": "scripts.baltor_context_gateway_mcp.call_gateway_tool",
+   "kind": "function",
+   "in_strength": 17.0,
+   "callers": 2
+  },
+  {
+   "id": "src.teleon.runtime.access_policy.can_access",
+   "kind": "function",
+   "in_strength": 17.0,
+   "callers": 5
+  },
+  {
+   "id": "src.teleon.exploration.ladder.escalation_decision",
+   "kind": "function",
+   "in_strength": 17.0,
+   "callers": 6
+  },
+  {
+   "id": "scripts.check_profession_calculators._seg",
+   "kind": "function",
+   "in_strength": 17.0,
+   "callers": 1
+  },
+  {
+   "id": "src.teleon.seeds.profession_calculators.ship_risk_profile",
+   "kind": "function",
+   "in_strength": 17.0,
+   "callers": 2
+  },
+  {
+   "id": "src.teleon.inference.oips.infer_local",
+   "kind": "function",
+   "in_strength": 16.0,
+   "callers": 10
+  },
+  {
+   "id": "scripts.context_graph.load_seed",
+   "kind": "function",
+   "in_strength": 16.0,
+   "callers": 10
+  },
+  {
+   "id": "scripts.check_adversarial_auth_all_realms._call",
+   "kind": "function",
+   "in_strength": 16.0,
+   "callers": 1
+  },
+  {
+   "id": "src.teleon.inference.oips.select_provider",
+   "kind": "function",
+   "in_strength": 16.0,
+   "callers": 9
+  },
+  {
+   "id": "src.baltor.contextops.cost_tracking.CostEvent",
+   "kind": "class",
+   "in_strength": 16.0,
+   "callers": 2
+  },
+  {
+   "id": "src.teleon.exploration.ladder.TaskClass",
+   "kind": "class",
+   "in_strength": 16.0,
+   "callers": 5
+  },
+  {
+   "id": "src.teleon.seeds.profession_calculators.controlled_substance",
+   "kind": "function",
+   "in_strength": 16.0,
+   "callers": 2
+  },
+  {
+   "id": "src.teleon.objectives.tenant_binding.objective_for_tenant",
+   "kind": "function",
+   "in_strength": 16.0,
+   "callers": 5
+  },
+  {
+   "id": "scripts.check_worker_fleet_supervisor._actions",
+   "kind": "function",
+   "in_strength": 16.0,
+   "callers": 1
+  },
+  {
+   "id": "scripts.context_workers.runner.queue_key",
+   "kind": "function",
+   "in_strength": 16.0,
+   "callers": 5
+  },
+  {
+   "id": "scripts.deploy.generate_provider_configs.fly_app_name",
+   "kind": "function",
+   "in_strength": 16.0,
+   "callers": 6
+  },
+  {
+   "id": "scripts.hub_engine_runner._val",
+   "kind": "function",
+   "in_strength": 16.0,
+   "callers": 2
+  },
+  {
+   "id": "scripts.portfolio_checks._html",
+   "kind": "function",
+   "in_strength": 16.0,
+   "callers": 6
+  },
+  {
+   "id": "scripts.processors.platform._platform_base.require",
+   "kind": "function",
+   "in_strength": 16.0,
+   "callers": 8
+  },
+  {
+   "id": "src.baltor.workers.supervisor_store._now",
+   "kind": "function",
+   "in_strength": 16.0,
+   "callers": 16
+  },
+  {
+   "id": "src.teleon.experiments.ids.sha256_hex",
+   "kind": "function",
+   "in_strength": 16.0,
+   "callers": 12
+  },
+  {
+   "id": "scripts.baltor_admin_demo_server.context_handle",
+   "kind": "function",
+   "in_strength": 15.0,
+   "callers": 8
+  },
+  {
+   "id": "scripts.pipeline_runtime.store.PipelineLedger",
+   "kind": "class",
+   "in_strength": 15.0,
+   "callers": 11
+  },
+  {
+   "id": "scripts.pipeline_runtime.runner.run_pipeline",
+   "kind": "function",
+   "in_strength": 15.0,
+   "callers": 8
+  },
+  {
+   "id": "scripts.check_contextops_contracts._req",
+   "kind": "function",
+   "in_strength": 15.0,
+   "callers": 1
+  },
+  {
+   "id": "src.teleon.evolution.descent_attempt_store.DescentAttempt",
+   "kind": "class",
+   "in_strength": 15.0,
+   "callers": 12
+  },
+  {
+   "id": "scripts.eval.reason_codes.durability_class",
+   "kind": "function",
+   "in_strength": 15.0,
+   "callers": 11
+  },
+  {
+   "id": "src.baltor.workers.supervisor_watch.step",
+   "kind": "function",
+   "in_strength": 15.0,
+   "callers": 6
+  },
+  {
+   "id": "scripts.api_memory_handler.handle",
+   "kind": "function",
+   "in_strength": 15.0,
+   "callers": 3
+  },
+  {
+   "id": "src.teleon.seeds.profession_calculators.hours_of_service",
+   "kind": "function",
+   "in_strength": 15.0,
+   "callers": 2
+  },
+  {
+   "id": "src.teleon.resources.resource_ref.make_data_resource_spec",
+   "kind": "function",
+   "in_strength": 15.0,
+   "callers": 3
+  },
+  {
+   "id": "src.teleon.resources.resource_ref.validate_resource_spec",
+   "kind": "function",
+   "in_strength": 15.0,
+   "callers": 3
+  },
+  {
+   "id": "scripts.db.catalog_row_integrity.sample",
+   "kind": "function",
+   "in_strength": 15.0,
+   "callers": 6
+  },
+  {
+   "id": "scripts.db.factory_jsonl_bulk_copy._json",
+   "kind": "function",
+   "in_strength": 15.0,
+   "callers": 9
+  },
+  {
+   "id": "scripts.db.factory_jsonl_bulk_copy._json_cast",
+   "kind": "function",
+   "in_strength": 15.0,
+   "callers": 1
+  },
+  {
+   "id": "scripts.db.settings_registry_export._setting_profile_row",
+   "kind": "function",
+   "in_strength": 15.0,
+   "callers": 13
+  },
+  {
+   "id": "scripts.model_gateway.ModelRouteCandidate",
+   "kind": "class",
+   "in_strength": 15.0,
+   "callers": 5
+  },
+  {
+   "id": "scripts.processors.compression.structural_compress.run",
+   "kind": "function",
+   "in_strength": 15.0,
+   "callers": 3
+  },
+  {
+   "id": "scripts.flywheel_orchestrator.pick_flywheel",
+   "kind": "function",
+   "in_strength": 15.0,
+   "callers": 2
+  },
+  {
+   "id": "scripts.foundry.openness.classify",
+   "kind": "function",
+   "in_strength": 15.0,
+   "callers": 1
+  },
+  {
+   "id": "scripts.teleon_local_runtime.Handler._send",
+   "kind": "method",
+   "in_strength": 15.0,
+   "callers": 2
+  },
+  {
+   "id": "scripts.alias_resolver.resolve",
+   "kind": "function",
+   "in_strength": 14.0,
+   "callers": 4
+  },
+  {
+   "id": "scripts.email_port.send",
+   "kind": "function",
+   "in_strength": 14.0,
+   "callers": 6
+  },
+  {
+   "id": "src.teleon.inference.oips.resolve_preference",
+   "kind": "function",
+   "in_strength": 14.0,
+   "callers": 10
+  },
+  {
+   "id": "src.baltor.contextops.extractor_snippets.extract_duration",
+   "kind": "function",
+   "in_strength": 14.0,
+   "callers": 5
+  },
+  {
+   "id": "src.baltor.contextops.reliability.score_source",
+   "kind": "function",
+   "in_strength": 14.0,
+   "callers": 4
+  },
+  {
+   "id": "src.baltor.determinism.replay_engine.replay",
+   "kind": "function",
+   "in_strength": 14.0,
+   "callers": 4
+  },
+  {
+   "id": "src.baltor.determinism.rule_candidate_generator.from_pattern",
+   "kind": "function",
+   "in_strength": 14.0,
+   "callers": 8
+  },
+  {
+   "id": "src.teleon.objectives.objective.MetricVector",
+   "kind": "class",
+   "in_strength": 14.0,
+   "callers": 8
+  },
+  {
+   "id": "src.teleon.governance.org_policy.evaluate_endpoint",
+   "kind": "function",
+   "in_strength": 14.0,
+   "callers": 3
+  },
+  {
+   "id": "scripts.track_user_journey.track",
+   "kind": "function",
+   "in_strength": 14.0,
+   "callers": 3
+  },
+  {
+   "id": "scripts.check_worker_spawn_decision_engine._t",
+   "kind": "function",
+   "in_strength": 14.0,
+   "callers": 1
+  },
+  {
+   "id": "scripts.db.pgvector_embedding_load_plan._sql_string",
+   "kind": "function",
+   "in_strength": 14.0,
+   "callers": 4
+  },
+  {
+   "id": "scripts.factory.candidate_promotion_scorer._list",
+   "kind": "function",
+   "in_strength": 14.0,
+   "callers": 3
+  },
+  {
+   "id": "scripts.factory.source_surface_partition_planner._list",
+   "kind": "function",
+   "in_strength": 14.0,
+   "callers": 3
+  },
+  {
+   "id": "src.baltor.contextops.cross_source_confirmation.ConfirmationResult",
+   "kind": "class",
+   "in_strength": 14.0,
+   "callers": 1
+  },
+  {
+   "id": "src.baltor.determinism.trace_store.TraceStoreError",
+   "kind": "class",
+   "in_strength": 14.0,
+   "callers": 5
+  },
+  {
+   "id": "src.teleon.capability_planner.PlanStep",
+   "kind": "class",
+   "in_strength": 14.0,
+   "callers": 3
+  },
+  {
+   "id": "scripts.baltor_admin_demo_server.stable_hash",
+   "kind": "function",
+   "in_strength": 13.0,
+   "callers": 5
+  },
+  {
+   "id": "scripts.baltor_admin_demo_server.Handler._serve_web",
+   "kind": "method",
+   "in_strength": 13.0,
+   "callers": 1
+  },
+  {
+   "id": "scripts.pipeline_runtime.specs.discover",
+   "kind": "function",
+   "in_strength": 13.0,
+   "callers": 13
+  },
+  {
+   "id": "src.teleon.extraction.document_extraction_cascade.extract_measured",
+   "kind": "function",
+   "in_strength": 13.0,
+   "callers": 7
+  },
+  {
+   "id": "scripts.artifact_graph.cfpb_artifacts.build_artifacts",
+   "kind": "function",
+   "in_strength": 13.0,
+   "callers": 10
+  },
+  {
+   "id": "src.teleon.synthesis.synthesis_tree.Attempt",
+   "kind": "class",
+   "in_strength": 13.0,
+   "callers": 5
+  },
+  {
+   "id": "scripts.api_context_handler.handle",
+   "kind": "function",
+   "in_strength": 13.0,
+   "callers": 4
+  },
+  {
+   "id": "src.baltor.contextops.cross_source_confirmation.ConfirmedSource",
+   "kind": "class",
+   "in_strength": 13.0,
+   "callers": 4
+  },
+  {
+   "id": "scripts.check_parallel_path_contracts._enum_of",
+   "kind": "function",
+   "in_strength": 13.0,
+   "callers": 1
+  },
+  {
+   "id": "scripts.check_service_handshake_slice._call",
+   "kind": "function",
+   "in_strength": 13.0,
+   "callers": 1
+  },
+  {
+   "id": "src.teleon.research.source_search.SourceSearchUnavailable",
+   "kind": "class",
+   "in_strength": 13.0,
+   "callers": 6
+  },
+  {
+   "id": "src.teleon.evolution.ab_harness.ab_test",
+   "kind": "function",
+   "in_strength": 13.0,
+   "callers": 7
+  },
+  {
+   "id": "scripts.check_teleon_agent_gateway_redteam.find_violations",
+   "kind": "function",
+   "in_strength": 13.0,
+   "callers": 1
+  },
+  {
+   "id": "src.baltor.workers.policy_recommender.recommend",
+   "kind": "function",
+   "in_strength": 13.0,
+   "callers": 2
+  },
+  {
+   "id": "scripts.proposal_backlog.load",
+   "kind": "function",
+   "in_strength": 13.0,
+   "callers": 9
+  },
+  {
+   "id": "scripts.emit._lib.by_type",
+   "kind": "function",
+   "in_strength": 13.0,
+   "callers": 9
+  },
+  {
+   "id": "scripts.emit._lib.load_catalog",
+   "kind": "function",
+   "in_strength": 13.0,
+   "callers": 13
+  },
+  {
+   "id": "scripts.enrichment.serve._escape_inline",
+   "kind": "function",
+   "in_strength": 13.0,
+   "callers": 3
+  },
+  {
+   "id": "scripts.factory.candidate_promotion_scorer._clamp",
+   "kind": "function",
+   "in_strength": 13.0,
+   "callers": 1
+  },
+  {
+   "id": "scripts.factory.capability_lift_gate._list",
+   "kind": "function",
+   "in_strength": 13.0,
+   "callers": 4
+  },
+  {
+   "id": "scripts.foundry.store.SqliteStore",
+   "kind": "class",
+   "in_strength": 13.0,
+   "callers": 6
+  },
+  {
+   "id": "scripts.foundry.novelty.NoveltyIndex.check",
+   "kind": "method",
+   "in_strength": 13.0,
+   "callers": 1
+  },
+  {
+   "id": "scripts.foundry.worker.Worker",
+   "kind": "class",
+   "in_strength": 13.0,
+   "callers": 4
+  },
+  {
+   "id": "scripts.foundry.worker.InMemoryQueue",
+   "kind": "class",
+   "in_strength": 13.0,
+   "callers": 4
+  },
+  {
+   "id": "scripts.ingest.context_rot.assess",
+   "kind": "function",
+   "in_strength": 13.0,
+   "callers": 3
+  },
+  {
+   "id": "scripts.processors.memory.memory_confidence_track.run",
+   "kind": "function",
+   "in_strength": 13.0,
+   "callers": 1
+  },
+  {
+   "id": "scripts.state_local_service._Handler._send",
+   "kind": "method",
+   "in_strength": 13.0,
+   "callers": 4
+  },
+  {
+   "id": "scripts.yc_readiness._D",
+   "kind": "function",
+   "in_strength": 13.0,
+   "callers": 1
+  },
+  {
+   "id": "src.openharnesshub.hub_site._esc",
+   "kind": "function",
+   "in_strength": 13.0,
+   "callers": 3
+  },
+  {
+   "id": "scripts.api_standards_handler._as_list",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 6
+  },
+  {
+   "id": "scripts.pipeline_runtime.source_graph.build_cfpb_source_graph",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 6
+  },
+  {
+   "id": "scripts.audit_context_storage.rel",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 6
+  },
+  {
+   "id": "scripts.db.runtime_settings.runtime_setting",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 12
+  },
+  {
+   "id": "scripts.baltor_admin_demo_server.normalize_tenant",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 12
+  },
+  {
+   "id": "src.teleon.storage.record_store.open_record_store",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 12
+  },
+  {
+   "id": "scripts.artifact_graph.reconciliation.reconcile",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 9
+  },
+  {
+   "id": "scripts.runtime.envelopes.CommandEnvelope",
+   "kind": "class",
+   "in_strength": 12.0,
+   "callers": 10
+  },
+  {
+   "id": "src.baltor.contextops.sandbox_gate.gate_snippet",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 2
+  },
+  {
+   "id": "src.baltor.workers.supervisor_ledger.SupervisorLedger",
+   "kind": "class",
+   "in_strength": 12.0,
+   "callers": 8
+  },
+  {
+   "id": "scripts.check_determinism_contracts._enum_of",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 1
+  },
+  {
+   "id": "src.baltor.determinism.rule_candidate_generator.FallbackPolicy",
+   "kind": "class",
+   "in_strength": 12.0,
+   "callers": 9
+  },
+  {
+   "id": "src.baltor.determinism.rule_promotion_gate.evaluate",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 3
+  },
+  {
+   "id": "scripts.check_determinism_redteam._clean_rule",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 1
+  },
+  {
+   "id": "scripts.check_determinism_redteam.promotion_gate",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 1
+  },
+  {
+   "id": "src.baltor.distillation.lossless_store.LosslessStore",
+   "kind": "class",
+   "in_strength": 12.0,
+   "callers": 6
+  },
+  {
+   "id": "src.baltor.distillation.rehydration.rehydrate",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 3
+  },
+  {
+   "id": "scripts.check_eval_suite_contract._pt_base",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 1
+  },
+  {
+   "id": "src.teleon.inference.adapters.resolve_adapter",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 5
+  },
+  {
+   "id": "src.teleon.evolution.distiller.distill",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 7
+  },
+  {
+   "id": "scripts.hub_engine_runner.fresh",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 2
+  },
+  {
+   "id": "scripts.check_teleon_distillation_training._cand",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 1
+  },
+  {
+   "id": "src.teleon.endpoints.registry.select_endpoint",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 2
+  },
+  {
+   "id": "scripts.generate_from_template.generate",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 3
+  },
+  {
+   "id": "scripts.foundry.contracts.Candidate.mark",
+   "kind": "method",
+   "in_strength": 12.0,
+   "callers": 3
+  },
+  {
+   "id": "scripts.db.catalog_row_source.resolve_catalog_row_dir",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 11
+  },
+  {
+   "id": "scripts.db.catalog_manifest_migration_gate._sample",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 3
+  },
+  {
+   "id": "scripts.proposal_backlog.Proposal",
+   "kind": "class",
+   "in_strength": 12.0,
+   "callers": 6
+  },
+  {
+   "id": "scripts.proposal_backlog.propose",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 6
+  },
+  {
+   "id": "scripts.processors.verify.compression_fidelity_check.run",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 3
+  },
+  {
+   "id": "scripts.foundry.queues.SqliteQueue._con",
+   "kind": "method",
+   "in_strength": 12.0,
+   "callers": 12
+  },
+  {
+   "id": "scripts.portfolio_checks._emit",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 12
+  },
+  {
+   "id": "src.baltor.distillation.lossless_store.DistillationStoreError",
+   "kind": "class",
+   "in_strength": 12.0,
+   "callers": 6
+  },
+  {
+   "id": "src.baltor.distillation.retention_report._aid",
+   "kind": "function",
+   "in_strength": 12.0,
+   "callers": 1
+  },
+  {
+   "id": "src.teleon.runtime.execution_provider.ProviderUnavailableResult",
+   "kind": "class",
+   "in_strength": 12.0,
+   "callers": 6
+  },
+  {
+   "id": "scripts._jsonl_store.AppendLog",
+   "kind": "class",
+   "in_strength": 11.0,
+   "callers": 7
+  },
+  {
+   "id": "scripts.artifact_graph.cfpb_artifacts._art",
+   "kind": "function",
+   "in_strength": 11.0,
+   "callers": 2
+  },
+  {
+   "id": "scripts.baltor_admin_demo_server.ownership_conflict_groups",
+   "kind": "function",
+   "in_strength": 11.0,
+   "callers": 6
+  },
+  {
+   "id": "scripts.baltor_admin_demo_server.sync_context_worker_events",
+   "kind": "function",
+   "in_strength": 11.0,
+   "callers": 9
+  },
+  {
+   "id": "scripts.baltor_admin_demo_server.sync_worker_ledger",
+   "kind": "function",
+   "in_strength": 11.0,
+   "callers": 9
+  },
+  {
+   "id": "scripts.context_compress.compress",
+   "kind": "function",
+   "in_strength": 11.0,
+   "callers": 7
+  }
+ ],
+ "most_depended_modules": [
+  {
+   "module": "scripts._config",
+   "path": "scripts/_config.py",
+   "dependents": 59
+  },
+  {
+   "module": "scripts.runtime.schema_validator",
+   "path": "scripts/runtime/schema_validator.py",
+   "dependents": 40
+  },
+  {
+   "module": "scripts.security.tenant_catalog",
+   "path": "scripts/security/tenant_catalog.py",
+   "dependents": 26
+  },
+  {
+   "module": "scripts.context_workers.registry",
+   "path": "scripts/context_workers/registry.py",
+   "dependents": 22
+  },
+  {
+   "module": "scripts.foundry.scrapers",
+   "path": "scripts/foundry/scrapers.py",
+   "dependents": 22
+  },
+  {
+   "module": "src.teleon.inference.oips",
+   "path": "src/teleon/inference/oips.py",
+   "dependents": 22
+  },
+  {
+   "module": "scripts.foundry.contracts",
+   "path": "scripts/foundry/contracts.py",
+   "dependents": 20
+  },
+  {
+   "module": "src.baltor.workers.fleet_ledger",
+   "path": "src/baltor/workers/fleet_ledger.py",
+   "dependents": 20
+  },
+  {
+   "module": "scripts.db.catalog_row_source",
+   "path": "scripts/db/catalog_row_source.py",
+   "dependents": 19
+  },
+  {
+   "module": "scripts.context_events",
+   "path": "scripts/context_events.py",
+   "dependents": 17
+  },
+  {
+   "module": "scripts.durable_store",
+   "path": "scripts/durable_store.py",
+   "dependents": 17
+  },
+  {
+   "module": "src.teleon.evolution.descent_attempt_store",
+   "path": "src/teleon/evolution/descent_attempt_store.py",
+   "dependents": 17
+  },
+  {
+   "module": "src.baltor.workers.supervisor_store",
+   "path": "src/baltor/workers/supervisor_store.py",
+   "dependents": 16
+  },
+  {
+   "module": "src.teleon.experiments.ids",
+   "path": "src/teleon/experiments/ids.py",
+   "dependents": 15
+  },
+  {
+   "module": "scripts.emit._lib",
+   "path": "scripts/emit/_lib.py",
+   "dependents": 14
+  },
+  {
+   "module": "scripts.ingest.decompose_structured",
+   "path": "scripts/ingest/decompose_structured.py",
+   "dependents": 13
+  },
+  {
+   "module": "scripts.pipeline_runtime.specs",
+   "path": "scripts/pipeline_runtime/specs.py",
+   "dependents": 13
+  },
+  {
+   "module": "scripts.portfolio_lib",
+   "path": "scripts/portfolio_lib.py",
+   "dependents": 13
+  },
+  {
+   "module": "src.teleon.dag.real_steps",
+   "path": "src/teleon/dag/real_steps.py",
+   "dependents": 13
+  },
+  {
+   "module": "src.teleon.runtime.execution_provider",
+   "path": "src/teleon/runtime/execution_provider.py",
+   "dependents": 13
+  },
+  {
+   "module": "scripts.artifact_graph.artifact_ledger",
+   "path": "scripts/artifact_graph/artifact_ledger.py",
+   "dependents": 12
+  },
+  {
+   "module": "scripts.pipeline_runtime.store",
+   "path": "scripts/pipeline_runtime/store.py",
+   "dependents": 12
+  },
+  {
+   "module": "scripts.portfolio_checks",
+   "path": "scripts/portfolio_checks.py",
+   "dependents": 12
+  },
+  {
+   "module": "src.baltor.workers.durable_fleet_ledger",
+   "path": "src/baltor/workers/durable_fleet_ledger.py",
+   "dependents": 12
+  },
+  {
+   "module": "scripts.context_workers.common",
+   "path": "scripts/context_workers/common.py",
+   "dependents": 11
+  },
+  {
+   "module": "scripts.db.runtime_settings",
+   "path": "scripts/db/runtime_settings.py",
+   "dependents": 11
+  },
+  {
+   "module": "scripts.eval.reason_codes",
+   "path": "scripts/eval/reason_codes.py",
+   "dependents": 11
+  },
+  {
+   "module": "scripts.processors.deliver.escalate_human",
+   "path": "scripts/processors/deliver/escalate_human.py",
+   "dependents": 11
+  },
+  {
+   "module": "scripts.runtime.consumption",
+   "path": "scripts/runtime/consumption.py",
+   "dependents": 11
+  },
+  {
+   "module": "scripts.runtime.envelopes",
+   "path": "scripts/runtime/envelopes.py",
+   "dependents": 11
+  },
+  {
+   "module": "scripts.runtime.optimization",
+   "path": "scripts/runtime/optimization.py",
+   "dependents": 11
+  },
+  {
+   "module": "src.baltor.determinism.rule_candidate_generator",
+   "path": "src/baltor/determinism/rule_candidate_generator.py",
+   "dependents": 11
+  },
+  {
+   "module": "src.teleon.evolution.descent_axes",
+   "path": "src/teleon/evolution/descent_axes.py",
+   "dependents": 11
+  },
+  {
+   "module": "src.teleon.extraction.document_extraction_cascade",
+   "path": "src/teleon/extraction/document_extraction_cascade.py",
+   "dependents": 11
+  },
+  {
+   "module": "src.teleon.storage.record_store",
+   "path": "src/teleon/storage/record_store.py",
+   "dependents": 11
+  },
+  {
+   "module": "scripts.artifact_graph.cfpb_artifacts",
+   "path": "scripts/artifact_graph/cfpb_artifacts.py",
+   "dependents": 10
+  },
+  {
+   "module": "scripts.pipeline_runtime.runner",
+   "path": "scripts/pipeline_runtime/runner.py",
+   "dependents": 10
+  },
+  {
+   "module": "src.baltor.distillation.lossless_store",
+   "path": "src/baltor/distillation/lossless_store.py",
+   "dependents": 10
+  },
+  {
+   "module": "src.baltor.runtime.registry.capability_registry",
+   "path": "src/baltor/runtime/registry/capability_registry.py",
+   "dependents": 10
+  },
+  {
+   "module": "src.teleon.inference.preference_profile",
+   "path": "src/teleon/inference/preference_profile.py",
+   "dependents": 10
+  },
+  {
+   "module": "scripts.artifact_graph.reconciliation",
+   "path": "scripts/artifact_graph/reconciliation.py",
+   "dependents": 9
+  },
+  {
+   "module": "scripts.artifact_graph.source_authority",
+   "path": "scripts/artifact_graph/source_authority.py",
+   "dependents": 9
+  },
+  {
+   "module": "scripts.baltor_flywheel",
+   "path": "scripts/baltor_flywheel.py",
+   "dependents": 9
+  },
+  {
+   "module": "scripts.pipeline_object",
+   "path": "scripts/pipeline_object.py",
+   "dependents": 9
+  },
+  {
+   "module": "scripts.pipeline_runtime.processors",
+   "path": "scripts/pipeline_runtime/processors.py",
+   "dependents": 9
+  },
+  {
+   "module": "scripts.processors.deliver.deliver_report",
+   "path": "scripts/processors/deliver/deliver_report.py",
+   "dependents": 9
+  },
+  {
+   "module": "scripts.processors.platform._platform_base",
+   "path": "scripts/processors/platform/_platform_base.py",
+   "dependents": 9
+  },
+  {
+   "module": "src.baltor.ports.memory_provider",
+   "path": "src/baltor/ports/memory_provider.py",
+   "dependents": 9
+  },
+  {
+   "module": "src.teleon.runtime.execution_backend_selector",
+   "path": "src/teleon/runtime/execution_backend_selector.py",
+   "dependents": 9
+  },
+  {
+   "module": "scripts.artifact_graph.graph_builder",
+   "path": "scripts/artifact_graph/graph_builder.py",
+   "dependents": 8
+  },
+  {
+   "module": "scripts.foundry.queues",
+   "path": "scripts/foundry/queues.py",
+   "dependents": 8
+  },
+  {
+   "module": "scripts.primitives.base",
+   "path": "scripts/primitives/base.py",
+   "dependents": 8
+  },
+  {
+   "module": "scripts.runtime.processor_registry",
+   "path": "scripts/runtime/processor_registry.py",
+   "dependents": 8
+  },
+  {
+   "module": "scripts.runtime.verification_gate",
+   "path": "scripts/runtime/verification_gate.py",
+   "dependents": 8
+  },
+  {
+   "module": "src.baltor.adapters.memory.baltor_local",
+   "path": "src/baltor/adapters/memory/baltor_local.py",
+   "dependents": 8
+  },
+  {
+   "module": "src.baltor.determinism.trace_store",
+   "path": "src/baltor/determinism/trace_store.py",
+   "dependents": 8
+  },
+  {
+   "module": "src.openharnesshub.component_store",
+   "path": "src/openharnesshub/component_store.py",
+   "dependents": 8
+  },
+  {
+   "module": "src.openharnesshub.hub_engine",
+   "path": "src/openharnesshub/hub_engine.py",
+   "dependents": 8
+  },
+  {
+   "module": "src.openharnesshub.licenses",
+   "path": "src/openharnesshub/licenses.py",
+   "dependents": 8
+  },
+  {
+   "module": "src.teleon.research.source_search",
+   "path": "src/teleon/research/source_search.py",
+   "dependents": 8
+  },
+  {
+   "module": "src.teleon.synthesis.dag_contract",
+   "path": "src/teleon/synthesis/dag_contract.py",
+   "dependents": 8
+  },
+  {
+   "module": "scripts._jsonl_store",
+   "path": "scripts/_jsonl_store.py",
+   "dependents": 7
+  },
+  {
+   "module": "scripts.artifact_graph.conflict_detector",
+   "path": "scripts/artifact_graph/conflict_detector.py",
+   "dependents": 7
+  },
+  {
+   "module": "scripts.context_graph",
+   "path": "scripts/context_graph.py",
+   "dependents": 7
+  },
+  {
+   "module": "scripts.flywheel_proof_modules",
+   "path": "scripts/flywheel_proof_modules.py",
+   "dependents": 7
+  },
+  {
+   "module": "scripts.ingest.document_decompose",
+   "path": "scripts/ingest/document_decompose.py",
+   "dependents": 7
+  },
+  {
+   "module": "scripts.model_routes",
+   "path": "scripts/model_routes.py",
+   "dependents": 7
+  },
+  {
+   "module": "scripts.pipeline_runtime.source_graph",
+   "path": "scripts/pipeline_runtime/source_graph.py",
+   "dependents": 7
+  },
+  {
+   "module": "scripts.processors.retrieval.graphrag_retrieve",
+   "path": "scripts/processors/retrieval/graphrag_retrieve.py",
+   "dependents": 7
+  },
+  {
+   "module": "scripts.security.response_redaction",
+   "path": "scripts/security/response_redaction.py",
+   "dependents": 7
+  },
+  {
+   "module": "src.baltor.determinism.replay_engine",
+   "path": "src/baltor/determinism/replay_engine.py",
+   "dependents": 7
+  },
+  {
+   "module": "src.baltor.workers.supervisor_ledger",
+   "path": "src/baltor/workers/supervisor_ledger.py",
+   "dependents": 7
+  },
+  {
+   "module": "src.baltor.workers.supervisor_watch",
+   "path": "src/baltor/workers/supervisor_watch.py",
+   "dependents": 7
+  },
+  {
+   "module": "src.openharnesshub.hub_settings",
+   "path": "src/openharnesshub/hub_settings.py",
+   "dependents": 7
+  },
+  {
+   "module": "src.teleon.agent_gateway.gateway",
+   "path": "src/teleon/agent_gateway/gateway.py",
+   "dependents": 7
+  },
+  {
+   "module": "src.teleon.evolution.distiller",
+   "path": "src/teleon/evolution/distiller.py",
+   "dependents": 7
+  },
+  {
+   "module": "src.teleon.ports.blackboard_provider",
+   "path": "src/teleon/ports/blackboard_provider.py",
+   "dependents": 7
+  },
+  {
+   "module": "src.teleon.synthesis.intent_to_dag",
+   "path": "src/teleon/synthesis/intent_to_dag.py",
+   "dependents": 7
+  },
+  {
+   "module": "src.teleon.templates.instantiator",
+   "path": "src/teleon/templates/instantiator.py",
+   "dependents": 7
+  },
+  {
+   "module": "scripts.api_context_handler",
+   "path": "scripts/api_context_handler.py",
+   "dependents": 6
+  },
+  {
+   "module": "scripts.api_native_handler",
+   "path": "scripts/api_native_handler.py",
+   "dependents": 6
+  },
+  {
+   "module": "scripts.context_workers.priority",
+   "path": "scripts/context_workers/priority.py",
+   "dependents": 6
+  },
+  {
+   "module": "scripts.db.catalog_row_integrity",
+   "path": "scripts/db/catalog_row_integrity.py",
+   "dependents": 6
+  },
+  {
+   "module": "scripts.embeddings",
+   "path": "scripts/embeddings.py",
+   "dependents": 6
+  },
+  {
+   "module": "scripts.factory.use_case_seed_rows",
+   "path": "scripts/factory/use_case_seed_rows.py",
+   "dependents": 6
+  },
+  {
+   "module": "scripts.foundry.measure",
+   "path": "scripts/foundry/measure.py",
+   "dependents": 6
+  },
+  {
+   "module": "scripts.foundry.model_route",
+   "path": "scripts/foundry/model_route.py",
+   "dependents": 6
+  },
+  {
+   "module": "scripts.ingest.source_adapters",
+   "path": "scripts/ingest/source_adapters.py",
+   "dependents": 6
+  },
+  {
+   "module": "scripts.llm_gateway.types",
+   "path": "scripts/llm_gateway/types.py",
+   "dependents": 6
+  },
+  {
+   "module": "scripts.processors.retrieval.source_precedence_select",
+   "path": "scripts/processors/retrieval/source_precedence_select.py",
+   "dependents": 6
+  },
+  {
+   "module": "scripts.runtime.context",
+   "path": "scripts/runtime/context.py",
+   "dependents": 6
+  },
+  {
+   "module": "src.baltor.contextops.reliability",
+   "path": "src/baltor/contextops/reliability.py",
+   "dependents": 6
+  },
+  {
+   "module": "src.baltor.experiments.path_promotion",
+   "path": "src/baltor/experiments/path_promotion.py",
+   "dependents": 6
+  },
+  {
+   "module": "src.baltor.graph.temporal.bridges",
+   "path": "src/baltor/graph/temporal/bridges.py",
+   "dependents": 6
+  },
+  {
+   "module": "src.teleon.blackboard.local_sqlite_blackboard",
+   "path": "src/teleon/blackboard/local_sqlite_blackboard.py",
+   "dependents": 6
+  },
+  {
+   "module": "src.teleon.config.medium_resolver",
+   "path": "src/teleon/config/medium_resolver.py",
+   "dependents": 6
+  },
+  {
+   "module": "src.teleon.economics.observation_store",
+   "path": "src/teleon/economics/observation_store.py",
+   "dependents": 6
+  },
+  {
+   "module": "src.teleon.economics.simulator",
+   "path": "src/teleon/economics/simulator.py",
+   "dependents": 6
+  },
+  {
+   "module": "src.teleon.inference.adapters",
+   "path": "src/teleon/inference/adapters.py",
+   "dependents": 6
+  },
+  {
+   "module": "src.teleon.inference.model_index",
+   "path": "src/teleon/inference/model_index.py",
+   "dependents": 6
+  },
+  {
+   "module": "src.teleon.seeds.capability_seed",
+   "path": "src/teleon/seeds/capability_seed.py",
+   "dependents": 6
+  },
+  {
+   "module": "scripts.baltor_admin_demo_server",
+   "path": "scripts/baltor_admin_demo_server.py",
+   "dependents": 5
+  },
+  {
+   "module": "scripts.context_compress",
+   "path": "scripts/context_compress.py",
+   "dependents": 5
+  },
+  {
+   "module": "scripts.context_workers.tasks",
+   "path": "scripts/context_workers/tasks.py",
+   "dependents": 5
+  },
+  {
+   "module": "scripts.foundry.sources",
+   "path": "scripts/foundry/sources.py",
+   "dependents": 5
+  },
+  {
+   "module": "scripts.foundry.standardize",
+   "path": "scripts/foundry/standardize.py",
+   "dependents": 5
+  },
+  {
+   "module": "scripts.model_gateway",
+   "path": "scripts/model_gateway.py",
+   "dependents": 5
+  },
+  {
+   "module": "scripts.pipeline.verified_context_flow",
+   "path": "scripts/pipeline/verified_context_flow.py",
+   "dependents": 5
+  },
+  {
+   "module": "scripts.pipeline_runtime.artifact_types",
+   "path": "scripts/pipeline_runtime/artifact_types.py",
+   "dependents": 5
+  },
+  {
+   "module": "scripts.pipeline_runtime.versioning",
+   "path": "scripts/pipeline_runtime/versioning.py",
+   "dependents": 5
+  },
+  {
+   "module": "scripts.proposal_backlog",
+   "path": "scripts/proposal_backlog.py",
+   "dependents": 5
+  },
+  {
+   "module": "scripts.runtime.processor_harness",
+   "path": "scripts/runtime/processor_harness.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.baltor.contextops.extractor_snippets",
+   "path": "src/baltor/contextops/extractor_snippets.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.baltor.contextops.research_stub",
+   "path": "src/baltor/contextops/research_stub.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.baltor.contracts.artifacts.fact_assertion",
+   "path": "src/baltor/contracts/artifacts/fact_assertion.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.baltor.determinism.consensus",
+   "path": "src/baltor/determinism/consensus.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.baltor.determinism.pattern_miner",
+   "path": "src/baltor/determinism/pattern_miner.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.baltor.determinism.shadow_runner",
+   "path": "src/baltor/determinism/shadow_runner.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.baltor.experiments.parallel_paths",
+   "path": "src/baltor/experiments/parallel_paths.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.baltor.experiments.path_comparator",
+   "path": "src/baltor/experiments/path_comparator.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.baltor.native.native_format_preserver",
+   "path": "src/baltor/native/native_format_preserver.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.baltor.observability.projections.standards",
+   "path": "src/baltor/observability/projections/standards.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.openharnesshub.discovery",
+   "path": "src/openharnesshub/discovery.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.teleon.components.registry",
+   "path": "src/teleon/components/registry.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.teleon.economics.economic_graph",
+   "path": "src/teleon/economics/economic_graph.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.teleon.environments.baltor_cfpb_context_governance",
+   "path": "src/teleon/environments/baltor_cfpb_context_governance.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.teleon.evolution.freshness_runtime",
+   "path": "src/teleon/evolution/freshness_runtime.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.teleon.evolution.substrate_selector",
+   "path": "src/teleon/evolution/substrate_selector.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.teleon.exploration.ladder",
+   "path": "src/teleon/exploration/ladder.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.teleon.extraction.schema_templates",
+   "path": "src/teleon/extraction/schema_templates.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.teleon.hub_freshness",
+   "path": "src/teleon/hub_freshness.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.teleon.inference.api_projection",
+   "path": "src/teleon/inference/api_projection.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.teleon.purpose_tasks.purpose_task",
+   "path": "src/teleon/purpose_tasks/purpose_task.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.teleon.retrieval.embedding_port",
+   "path": "src/teleon/retrieval/embedding_port.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.teleon.storage.git_backend_port",
+   "path": "src/teleon/storage/git_backend_port.py",
+   "dependents": 5
+  },
+  {
+   "module": "src.teleon.verticals.provider_directory",
+   "path": "src/teleon/verticals/provider_directory.py",
+   "dependents": 5
+  },
+  {
+   "module": "scripts._llm_client",
+   "path": "scripts/_llm_client.py",
+   "dependents": 4
+  },
+  {
+   "module": "scripts.api_inference_handler",
+   "path": "scripts/api_inference_handler.py",
+   "dependents": 4
+  },
+  {
+   "module": "scripts.api_memory_handler",
+   "path": "scripts/api_memory_handler.py",
+   "dependents": 4
+  },
+  {
+   "module": "scripts.artifact_graph.vector_store",
+   "path": "scripts/artifact_graph/vector_store.py",
+   "dependents": 4
+  },
+  {
+   "module": "scripts.capability_seeder",
+   "path": "scripts/capability_seeder.py",
+   "dependents": 4
+  },
+  {
+   "module": "scripts.context_swarm",
+   "path": "scripts/context_swarm.py",
+   "dependents": 4
+  },
+  {
+   "module": "scripts.context_workers.runtime_io",
+   "path": "scripts/context_workers/runtime_io.py",
+   "dependents": 4
+  },
+  {
+   "module": "scripts.db.catalog_manifest_bridge",
+   "path": "scripts/db/catalog_manifest_bridge.py",
+   "dependents": 4
+  },
+  {
+   "module": "scripts.db.object_governance_registry",
+   "path": "scripts/db/object_governance_registry.py",
+   "dependents": 4
+  },
+  {
+   "module": "scripts.db.vector_readiness_audit",
+   "path": "scripts/db/vector_readiness_audit.py",
+   "dependents": 4
+  },
+  {
+   "module": "scripts.foundry.pipeline",
+   "path": "scripts/foundry/pipeline.py",
+   "dependents": 4
+  },
+  {
+   "module": "scripts.foundry.store",
+   "path": "scripts/foundry/store.py",
+   "dependents": 4
+  },
+  {
+   "module": "scripts.identity_local_service",
+   "path": "scripts/identity_local_service.py",
+   "dependents": 4
+  },
+  {
+   "module": "scripts.local_services_lib",
+   "path": "scripts/local_services_lib.py",
+   "dependents": 4
+  },
+  {
+   "module": "scripts.pipeline_runtime.cfpb_artifacts",
+   "path": "scripts/pipeline_runtime/cfpb_artifacts.py",
+   "dependents": 4
+  },
+  {
+   "module": "scripts.processors.catalog_search",
+   "path": "scripts/processors/catalog_search.py",
+   "dependents": 4
+  },
+  {
+   "module": "scripts.runtime.processor",
+   "path": "scripts/runtime/processor.py",
+   "dependents": 4
+  },
+  {
+   "module": "scripts.sanctions.sanctions_freshness",
+   "path": "scripts/sanctions/sanctions_freshness.py",
+   "dependents": 4
+  },
+  {
+   "module": "scripts.source_expansion",
+   "path": "scripts/source_expansion.py",
+   "dependents": 4
+  },
+  {
+   "module": "scripts.teleon_preseed_capabilities",
+   "path": "scripts/teleon_preseed_capabilities.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.baltor.adapters.memory.supermemory_emulator",
+   "path": "src/baltor/adapters/memory/supermemory_emulator.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.baltor.contextops.cross_source_confirmation",
+   "path": "src/baltor/contextops/cross_source_confirmation.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.baltor.contextops.source_discovery",
+   "path": "src/baltor/contextops/source_discovery.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.baltor.contextops.triage",
+   "path": "src/baltor/contextops/triage.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.baltor.contextops.verification_recipe",
+   "path": "src/baltor/contextops/verification_recipe.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.baltor.determinism.rule_promotion_gate",
+   "path": "src/baltor/determinism/rule_promotion_gate.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.baltor.distillation.lineage",
+   "path": "src/baltor/distillation/lineage.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.baltor.distillation.rehydration",
+   "path": "src/baltor/distillation/rehydration.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.baltor.distillation.rollback",
+   "path": "src/baltor/distillation/rollback.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.baltor.experiments.path_rollback",
+   "path": "src/baltor/experiments/path_rollback.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.baltor.memory.builder_memory",
+   "path": "src/baltor/memory/builder_memory.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.baltor.ports.research_agent_provider",
+   "path": "src/baltor/ports/research_agent_provider.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.baltor.sales.claim_guard",
+   "path": "src/baltor/sales/claim_guard.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.baltor.workers.execution_backend_selector",
+   "path": "src/baltor/workers/execution_backend_selector.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.teleon.agent_gateway.capabilities",
+   "path": "src/teleon/agent_gateway/capabilities.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.teleon.capability_planner",
+   "path": "src/teleon/capability_planner.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.teleon.egress.traffic_graph",
+   "path": "src/teleon/egress/traffic_graph.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.teleon.evolution.meta_learner",
+   "path": "src/teleon/evolution/meta_learner.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.teleon.evolution.token_reduction",
+   "path": "src/teleon/evolution/token_reduction.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.teleon.inference.free_endpoint_intel",
+   "path": "src/teleon/inference/free_endpoint_intel.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.teleon.llm_port",
+   "path": "src/teleon/llm_port.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.teleon.research.browser_port",
+   "path": "src/teleon/research/browser_port.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.teleon.runtime.credentials",
+   "path": "src/teleon/runtime/credentials.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.teleon.runtime.tenancy",
+   "path": "src/teleon/runtime/tenancy.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.teleon.synthesis.component_search",
+   "path": "src/teleon/synthesis/component_search.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.teleon.training.skills_db",
+   "path": "src/teleon/training/skills_db.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.teleon.workers.durable_fleet_ledger",
+   "path": "src/teleon/workers/durable_fleet_ledger.py",
+   "dependents": 4
+  },
+  {
+   "module": "src.teleon.workers.function_emulator",
+   "path": "src/teleon/workers/function_emulator.py",
+   "dependents": 4
+  },
+  {
+   "module": "local_emulators.source_of_truth_emulator",
+   "path": "local_emulators/source_of_truth_emulator.py",
+   "dependents": 3
+  },
+  {
+   "module": "scripts.api_determinism_handler",
+   "path": "scripts/api_determinism_handler.py",
+   "dependents": 3
+  },
+  {
+   "module": "scripts.api_pipeline_handler",
+   "path": "scripts/api_pipeline_handler.py",
+   "dependents": 3
+  },
+  {
+   "module": "scripts.api_standards_handler",
+   "path": "scripts/api_standards_handler.py",
+   "dependents": 3
+  },
+  {
+   "module": "scripts.audit_context_storage",
+   "path": "scripts/audit_context_storage.py",
+   "dependents": 3
+  },
+  {
+   "module": "scripts.build_portfolio_sites",
+   "path": "scripts/build_portfolio_sites.py",
+   "dependents": 3
+  },
+  {
+   "module": "scripts.check_fragile_context_atlas",
+   "path": "scripts/check_fragile_context_atlas.py",
+   "dependents": 3
+  },
+  {
+   "module": "scripts.check_teleon_go_live_readiness",
+   "path": "scripts/check_teleon_go_live_readiness.py",
+   "dependents": 3
+  },
+  {
+   "module": "scripts.db.catalog_operational_view_probe",
+   "path": "scripts/db/catalog_operational_view_probe.py",
+   "dependents": 3
+  },
+  {
+   "module": "scripts.db.component_cdc_plan",
+   "path": "scripts/db/component_cdc_plan.py",
+   "dependents": 3
+  },
+  {
+   "module": "scripts.db.factory_jsonl_bulk_copy",
+   "path": "scripts/db/factory_jsonl_bulk_copy.py",
+   "dependents": 3
+  },
+  {
+   "module": "scripts.db.factory_jsonl_relationship_preflight",
+   "path": "scripts/db/factory_jsonl_relationship_preflight.py",
+   "dependents": 3
+  },
+  {
+   "module": "scripts.db.object_governance_view_probe",
+   "path": "scripts/db/object_governance_view_probe.py",
+   "dependents": 3
+  },
+  {
+   "module": "scripts.demo_full_app",
+   "path": "scripts/demo_full_app.py",
+   "dependents": 3
+  },
+  {
+   "module": "scripts.discover_tools",
+   "path": "scripts/discover_tools.py",
+   "dependents": 3
+  },
+  {
+   "module": "scripts.discovery_pipeline",
+   "path": "scripts/discovery_pipeline.py",
+   "dependents": 3
+  }
+ ],
+ "strongest_call_edges": [
+  {
+   "src": "scripts.baltor_admin_demo_server.do_GET",
+   "dst": "scripts.baltor_admin_demo_server.Handler.send_bytes",
+   "weight": 55,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.factory_jsonl_bulk_copy._table_load_sql",
+   "dst": "scripts.db.factory_jsonl_bulk_copy._empty_to_null",
+   "weight": 40,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.baltor_admin_demo_server.queue_health_panel",
+   "dst": "scripts.baltor_admin_demo_server.esc",
+   "weight": 35,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.baltor_admin_demo_server.do_POST",
+   "dst": "scripts.baltor_admin_demo_server.Handler.send_bytes",
+   "weight": 28,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.catalog_database_migration_smoke.build_smoke_report",
+   "dst": "scripts.db.catalog_database_migration_smoke.step",
+   "weight": 27,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.showcase.server.do_GET",
+   "dst": "scripts.showcase.server.Handler._send",
+   "weight": 26,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.context_workers.adversarial_fixtures.run_fixtures",
+   "dst": "scripts.context_workers.adversarial_fixtures._assert_eq",
+   "weight": 24,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.baltor_admin_demo_server.run_inspector",
+   "dst": "scripts.baltor_admin_demo_server.esc",
+   "weight": 23,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.portfolio_lib.render_site",
+   "dst": "scripts.portfolio_lib._esc",
+   "weight": 23,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_identity_local_service_runtime._self_test",
+   "dst": "scripts.check_identity_local_service_runtime._call",
+   "weight": 20,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.eval.promotion_bridge._self_test",
+   "dst": "scripts.eval.promotion_bridge.promotion_decision",
+   "weight": 20,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.registry_local_service.do_GET",
+   "dst": "scripts.registry_local_service._Handler._send",
+   "weight": 20,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.baltor_admin_demo_server.context_object_graph_records",
+   "dst": "scripts.baltor_admin_demo_server.compact_id",
+   "weight": 19,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_contextops_contracts._self_test",
+   "dst": "scripts.check_contextops_contracts._enum_of",
+   "weight": 19,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.baltor_admin_demo_server.do_POST",
+   "dst": "scripts.baltor_admin_demo_server.log_event",
+   "weight": 18,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_contextops_cross_source_confirmation._self_test",
+   "dst": "src.baltor.contextops.cross_source_confirmation.confirm",
+   "weight": 18,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_registry_backend._self_test",
+   "dst": "scripts.check_registry_backend._get",
+   "weight": 18,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.baltor_context_gateway_mcp.call_gateway_tool",
+   "dst": "scripts.baltor_context_gateway_mcp.http_json",
+   "weight": 17,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_profession_calculators._self_test",
+   "dst": "scripts.check_profession_calculators._seg",
+   "weight": 17,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.baltor_admin_demo_server.do_GET",
+   "dst": "scripts.baltor_admin_demo_server.log_event",
+   "weight": 16,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.baltor_context_gateway_mcp.self_test",
+   "dst": "scripts.baltor_context_gateway_mcp.call_gateway_tool",
+   "weight": 16,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_adversarial_auth_all_realms._self_test",
+   "dst": "scripts.check_adversarial_auth_all_realms._call",
+   "weight": 16,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_consensus_recorder._self_test",
+   "dst": "src.baltor.determinism.consensus.ModelOutput",
+   "weight": 16,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_profession_calculators._self_test",
+   "dst": "src.teleon.seeds.profession_calculators.ship_risk_profile",
+   "weight": 16,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_worker_fleet_supervisor._self_test",
+   "dst": "scripts.check_worker_fleet_supervisor._actions",
+   "weight": 16,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.assurance.multi_source_corroborate._self_test",
+   "dst": "scripts.processors.assurance.multi_source_corroborate.run",
+   "weight": 16,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.baltor_admin_demo_server.outputs_page",
+   "dst": "scripts.baltor_admin_demo_server.esc",
+   "weight": 15,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.baltor_admin_demo_server.testing_page",
+   "dst": "scripts.baltor_admin_demo_server.esc",
+   "weight": 15,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_contextops_contracts._self_test",
+   "dst": "scripts.check_contextops_contracts._req",
+   "weight": 15,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_profession_calculators._self_test",
+   "dst": "src.teleon.seeds.profession_calculators.controlled_substance",
+   "weight": 15,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.factory_jsonl_bulk_copy._table_load_sql",
+   "dst": "scripts.db.factory_jsonl_bulk_copy._json_cast",
+   "weight": 15,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.foundry.openness._self_test",
+   "dst": "scripts.foundry.openness.classify",
+   "weight": 15,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_profession_calculators._self_test",
+   "dst": "src.teleon.seeds.profession_calculators.hours_of_service",
+   "weight": 14,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_worker_spawn_decision_engine._self_test",
+   "dst": "scripts.check_worker_spawn_decision_engine._t",
+   "weight": 14,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.component_cdc_plan._event_csv_row",
+   "dst": "scripts.db.component_cdc_plan._str",
+   "weight": 14,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.flywheel_orchestrator._self_test",
+   "dst": "scripts.flywheel_orchestrator.pick_flywheel",
+   "weight": 14,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.hub_engine_runner._main",
+   "dst": "scripts.hub_engine_runner._val",
+   "weight": 14,
+   "confidence": "exact"
+  },
+  {
+   "src": "src.baltor.contextops.cross_source_confirmation.confirm",
+   "dst": "src.baltor.contextops.cross_source_confirmation.ConfirmationResult",
+   "weight": 14,
+   "confidence": "exact"
+  },
+  {
+   "src": "src.teleon.dag.example_pipelines.build_extraction_dag",
+   "dst": "src.teleon.dag.pipeline_dag.Node",
+   "weight": 14,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.baltor_admin_demo_server.do_GET",
+   "dst": "scripts.baltor_admin_demo_server.Handler._serve_web",
+   "weight": 13,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_access_policy._self_test",
+   "dst": "src.teleon.runtime.access_policy.can_access",
+   "weight": 13,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_parallel_path_contracts._self_test",
+   "dst": "scripts.check_parallel_path_contracts._enum_of",
+   "weight": 13,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_service_handshake_slice._self_test",
+   "dst": "scripts.check_service_handshake_slice._call",
+   "weight": 13,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_source_authority_registry_extended._self_test",
+   "dst": "scripts.artifact_graph.source_authority.classify",
+   "weight": 13,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_teleon_agent_gateway_redteam._self_test",
+   "dst": "scripts.check_teleon_agent_gateway_redteam.find_violations",
+   "weight": 13,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.factory.candidate_promotion_scorer._estimate_criteria",
+   "dst": "scripts.factory.candidate_promotion_scorer._clamp",
+   "weight": 13,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.foundry.novelty._self_test",
+   "dst": "scripts.foundry.novelty.NoveltyIndex.check",
+   "weight": 13,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.compression.structural_compress._selftest",
+   "dst": "scripts.processors.compression.structural_compress.run",
+   "weight": 13,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.memory.memory_confidence_track._selftest",
+   "dst": "scripts.processors.memory.memory_confidence_track.run",
+   "weight": 13,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.yc_readiness.compute_readiness",
+   "dst": "scripts.yc_readiness._D",
+   "weight": 13,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_determinism_contracts._self_test",
+   "dst": "scripts.check_determinism_contracts._enum_of",
+   "weight": 12,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_determinism_redteam._self_test",
+   "dst": "scripts.check_determinism_redteam._clean_rule",
+   "weight": 12,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_determinism_redteam._self_test",
+   "dst": "scripts.check_determinism_redteam.promotion_gate",
+   "weight": 12,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_eval_suite_contract._self_test",
+   "dst": "scripts.check_eval_suite_contract._pt_base",
+   "weight": 12,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_execution_backend_selector._self_test",
+   "dst": "src.teleon.runtime.execution_backend_selector.select_backend",
+   "weight": 12,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_native_api._self_test",
+   "dst": "scripts.api_native_handler.handle",
+   "weight": 12,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_teleon_distillation_training._self_test",
+   "dst": "scripts.check_teleon_distillation_training._cand",
+   "weight": 12,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_teleon_tenant_objective_binding._self_test",
+   "dst": "src.teleon.objectives.tenant_binding.objective_for_tenant",
+   "weight": 12,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_worker_fleet_supervisor_full_stack._self_test",
+   "dst": "src.teleon.workers.fleet_ledger.FleetLedger",
+   "weight": 12,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_worker_policy_recommender._self_test",
+   "dst": "src.baltor.workers.policy_recommender.recommend",
+   "weight": 12,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.context_workers.runner.main",
+   "dst": "scripts.context_workers.runner.queue_key",
+   "weight": 12,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.component_store_load_plan._component_row",
+   "dst": "scripts.db.component_store_load_plan._str",
+   "weight": 12,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.foundry.worker._self_test",
+   "dst": "scripts.foundry.pipeline._fixture",
+   "weight": 12,
+   "confidence": "exact"
+  },
+  {
+   "src": "src.baltor.distillation.retention_report.build",
+   "dst": "src.baltor.distillation.retention_report._aid",
+   "weight": 12,
+   "confidence": "exact"
+  },
+  {
+   "src": "src.teleon.exploration.__main__._self_test",
+   "dst": "src.teleon.exploration.ladder.TaskClass",
+   "weight": 12,
+   "confidence": "exact"
+  },
+  {
+   "src": "src.teleon.exploration.__main__._self_test",
+   "dst": "src.teleon.exploration.ladder.escalation_decision",
+   "weight": 12,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.alias_resolver._self_test",
+   "dst": "scripts.alias_resolver.resolve",
+   "weight": 11,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_contextops_cost_reduction._self_test",
+   "dst": "src.baltor.contextops.cost_tracking.CostEvent",
+   "weight": 11,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_event_integration._self_test",
+   "dst": "scripts.context_events.EventBus",
+   "weight": 11,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_purpose_task_hot_path_guard._self_test",
+   "dst": "scripts.check_purpose_task_hot_path_guard._spec",
+   "weight": 11,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_teleon_agent_gateway_redteam._self_test",
+   "dst": "scripts.hub_engine_runner.fresh",
+   "weight": 11,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_teleon_org_guardrail_policy._self_test",
+   "dst": "src.teleon.governance.org_policy.evaluate_endpoint",
+   "weight": 11,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_verification_gate._self_test",
+   "dst": "scripts.check_verification_gate._fact",
+   "weight": 11,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.cli.oh_baltor._selftest",
+   "dst": "scripts.cli.oh_baltor._run_cli",
+   "weight": 11,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.context_workers.workers.node_research._run_tool",
+   "dst": "scripts.context_workers.workers.node_research._evidence_record",
+   "weight": 11,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.catalog_db_export_plan._export_sql",
+   "dst": "scripts.db.catalog_db_export_plan._copy_statement",
+   "weight": 11,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.component_store_load_plan._source_link_rows",
+   "dst": "scripts.db.component_store_load_plan._str",
+   "weight": 11,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.factory_jsonl_bulk_copy._dimension_value",
+   "dst": "scripts.db.factory_jsonl_bulk_copy._str",
+   "weight": 11,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.factory_jsonl_bulk_copy._label_assignment",
+   "dst": "scripts.db.factory_jsonl_bulk_copy._str",
+   "weight": 11,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.factory_jsonl_bulk_copy._source_record",
+   "dst": "scripts.db.factory_jsonl_bulk_copy._str",
+   "weight": 11,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.foundry.queues._self_test",
+   "dst": "scripts.foundry.queues.SqliteQueue",
+   "weight": 11,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.ingest.context_rot._self_test",
+   "dst": "scripts.ingest.context_rot.assess",
+   "weight": 11,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.model_gateway.default_candidates_from_env",
+   "dst": "scripts.model_gateway._split_csv",
+   "weight": 11,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.cache.cache_semantic._selftest",
+   "dst": "scripts.processors.cache.cache_semantic.run",
+   "weight": 11,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.memory.memory_recall._selftest",
+   "dst": "scripts.processors.memory.memory_recall.run",
+   "weight": 11,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.sm2_spaced_repetition_scheduler._selftest",
+   "dst": "scripts.processors.sm2_spaced_repetition_scheduler.run",
+   "weight": 11,
+   "confidence": "exact"
+  },
+  {
+   "src": "src.baltor.workers.spawn_decision.decide",
+   "dst": "src.baltor.workers.spawn_decision._decision",
+   "weight": 11,
+   "confidence": "exact"
+  },
+  {
+   "src": "src.teleon.observer.router.ground",
+   "dst": "src.teleon.observer.router._iv",
+   "weight": 11,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.artifact_graph.source_authority._self_test",
+   "dst": "scripts.artifact_graph.source_authority.classify",
+   "weight": 10,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_temporal_graph_api._self_test",
+   "dst": "scripts.api_temporal_graph_handler.handle",
+   "weight": 10,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_temporal_graph_full_stack._self_test",
+   "dst": "scripts.check_temporal_graph_full_stack._row",
+   "weight": 10,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.context_workers.lifecycle.execute_task_lifecycle",
+   "dst": "scripts.foundry.contracts.Candidate.mark",
+   "weight": 10,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.factory_jsonl_bulk_copy._normalized_object",
+   "dst": "scripts.db.factory_jsonl_bulk_copy._str",
+   "weight": 10,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.factory_jsonl_to_postgres._normalized_object",
+   "dst": "scripts.db.factory_jsonl_to_postgres._sql_string",
+   "weight": 10,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.factory.candidate_promotion_scorer._estimate_criteria",
+   "dst": "scripts.factory.candidate_promotion_scorer._list",
+   "weight": 10,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.factory.fast_factory_closeout_report.build_fast_factory_closeout_report",
+   "dst": "scripts.factory.fast_factory_closeout_report._nested",
+   "weight": 10,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.factory.source_surface_partition_planner._partition",
+   "dst": "scripts.factory.source_surface_partition_planner._list",
+   "weight": 10,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.foundry.gate._self_test",
+   "dst": "scripts.foundry.contracts.FoundryContext",
+   "weight": 10,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.foundry.gate._self_test",
+   "dst": "scripts.foundry.gate.GateStage",
+   "weight": 10,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.foundry.gate._self_test",
+   "dst": "scripts.foundry.gate._make",
+   "weight": 10,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.foundry.worker._self_test",
+   "dst": "scripts.foundry.worker.InMemoryQueue",
+   "weight": 10,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.foundry.worker._self_test",
+   "dst": "scripts.foundry.worker.Worker",
+   "weight": 10,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.ingest.freshness._self_test",
+   "dst": "scripts.foundry.scrapers.CannedFetcher",
+   "weight": 10,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.cache.cache_kv_reuse._selftest",
+   "dst": "scripts.processors.cache.cache_kv_reuse.run",
+   "weight": 10,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.offline_queue_sync_on_reconnect._selftest",
+   "dst": "scripts.processors.offline_queue_sync_on_reconnect.run",
+   "weight": 10,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.verify.compression_fidelity_check._self_test",
+   "dst": "scripts.processors.verify.compression_fidelity_check.run",
+   "weight": 10,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.track_user_journey._self_test",
+   "dst": "scripts.track_user_journey.track",
+   "weight": 10,
+   "confidence": "exact"
+  },
+  {
+   "src": "src.baltor.determinism.trace_store.append",
+   "dst": "src.baltor.determinism.trace_store._as_tuple",
+   "weight": 10,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.artifact_graph.cfpb_artifacts.build_artifacts",
+   "dst": "scripts.artifact_graph.cfpb_artifacts._art",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.baltor_admin_demo_server.dimension_engine_panel",
+   "dst": "scripts.baltor_admin_demo_server.esc",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.baltor_admin_demo_server.monitor_page",
+   "dst": "scripts.baltor_admin_demo_server.esc",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_capability_binding_provider._self_test",
+   "dst": "src.teleon.runtime.capability_binding.bind_capability_task",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_contextops_cross_source_confirmation._self_test",
+   "dst": "src.baltor.contextops.cross_source_confirmation.ConfirmedSource",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_contextops_sandbox_gate._self_test",
+   "dst": "src.baltor.contextops.sandbox_gate.gate_snippet",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_determinism_full_stack._run",
+   "dst": "scripts.check_determinism_full_stack._print_row",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_determinism_redteam._self_test",
+   "dst": "scripts.check_determinism_redteam._hid",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_local_events_plane._self_test",
+   "dst": "scripts.check_local_events_plane._call",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_model_index._self_test",
+   "dst": "src.teleon.inference.model_index.select_best",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_plane_selection.main",
+   "dst": "src.teleon.registry.plane.select",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_preference_profile._self_test",
+   "dst": "src.teleon.inference.preference_profile.choose",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_runtime_schema_validation._self_test",
+   "dst": "scripts.runtime.schema_validator.is_valid",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_teleon_capability_evolution_graph._self_test",
+   "dst": "src.teleon.evolution.capability_graph.RunnerNode",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_teleon_distillation_training._self_test",
+   "dst": "src.teleon.training.skills_db.feature_vector",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_teleon_endpoint_registry._self_test",
+   "dst": "src.teleon.endpoints.registry.select_endpoint",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_teleon_execution_environment_taxonomy._self_test",
+   "dst": "scripts.check_teleon_execution_environment_taxonomy._load_json",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.catalog_manifest_migration_gate._check_identity",
+   "dst": "scripts.db.catalog_manifest_migration_gate._sample",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.factory_jsonl_relationship_preflight.preflight",
+   "dst": "scripts.db.factory_jsonl_relationship_preflight._load_many",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.factory_jsonl_to_postgres._source_record",
+   "dst": "scripts.db.factory_jsonl_to_postgres._sql_string",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.deploy.teleon_machines_runner.self_test",
+   "dst": "scripts.deploy.teleon_machines_runner._FakeClock",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.eval.measured_lift_headtohead._selftest",
+   "dst": "scripts.eval.measured_lift_headtohead._approx",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.foundry.novelty._self_test",
+   "dst": "scripts.foundry.novelty.simhash_of",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.identity_local_service._self_test",
+   "dst": "src.openharnesshub.auth_kit.realm.Realm.login",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.ingest.source_adapters.ingest",
+   "dst": "scripts.ingest.source_adapters._artifact",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.parser_router._self_test",
+   "dst": "scripts.parser_router.route",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.pipeline_runtime.processors.default_registry",
+   "dst": "scripts.pipeline_runtime.processors.ProcessorSpec",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.assurance.corpus_integrity_check._self_test",
+   "dst": "scripts.processors.assurance.corpus_integrity_check.run",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.cache.cache_exact._selftest",
+   "dst": "scripts.processors.cache.cache_exact.run",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.cache.cache_prompt_prefix._selftest",
+   "dst": "scripts.processors.cache.cache_prompt_prefix.run",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.compression.usage_gated_compress._selftest",
+   "dst": "scripts.processors.compression.usage_gated_compress.run",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.language_lock_respond_in_input_language._selftest",
+   "dst": "scripts.processors.language_lock_respond_in_input_language.run",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.memory.memory_agentic_hierarchy._selftest",
+   "dst": "scripts.processors.memory.memory_agentic_hierarchy.run",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.memory.memory_distilled_write._selftest",
+   "dst": "scripts.processors.memory.memory_distilled_write.run",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.memory.memory_temporal_graph._selftest",
+   "dst": "scripts.processors.memory.memory_temporal_graph.query_at",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.memory.memory_temporal_graph._selftest",
+   "dst": "scripts.processors.memory.memory_temporal_graph.run",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.offline_fallback_gate._selftest",
+   "dst": "scripts.processors.offline_fallback_gate.run",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.retrieval.json_repair_coerce._selftest",
+   "dst": "scripts.processors.retrieval.json_repair_coerce.run",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.structured_json_fence_guard._selftest",
+   "dst": "scripts.processors.structured_json_fence_guard.run",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.showcase.admin_demo.costs.estimate_admin_run_cost",
+   "dst": "scripts.showcase.admin_demo.costs._round_usd",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.acquisition.gap_screen.as_scores",
+   "dst": "scripts.acquisition.gap_screen._clamp01",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.baltor_admin_demo_server.do_GET",
+   "dst": "scripts.baltor_admin_demo_server.Handler.current_run",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.baltor_admin_demo_server.do_POST",
+   "dst": "scripts.baltor_admin_demo_server.Handler._read_json",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.baltor_admin_demo_server.export_payload",
+   "dst": "scripts.baltor_admin_demo_server.ownership_change_records",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.baltor_admin_demo_server.graph_package",
+   "dst": "scripts.baltor_admin_demo_server.compact_id",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.build_hub_browser.build",
+   "dst": "scripts.build_hub_browser._esc",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_hub_settings._self_test",
+   "dst": "src.openharnesshub.hub_settings.HubSettings",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_local_blackboard_provider._self_test",
+   "dst": "scripts.check_local_blackboard_provider._observation",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_memory_api._self_test",
+   "dst": "scripts.api_memory_handler.handle",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_multi_source_ingestion._self_test",
+   "dst": "scripts.ingest.source_adapters.normalize",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_optimization_rejection_rule_distillation._self_test",
+   "dst": "scripts.check_optimization_rejection_rule_distillation.optimization_reject_reasons",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_rule_promotion_gate._self_test",
+   "dst": "src.baltor.determinism.rule_promotion_gate.evaluate",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_simulator._self_test",
+   "dst": "scripts.check_simulator._seed",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_source_classification_rule_distillation._self_test",
+   "dst": "scripts.check_source_classification_rule_distillation.classify_source",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_teleon_bulk_registry_ingest._self_test",
+   "dst": "src.teleon.ingest.bulk_registry.ingest_dump",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_worker_fleet_supervisor._self_test",
+   "dst": "src.baltor.workers.fleet_supervisor.decide_for_capability",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_worker_fleet_supervisor_full_stack._self_test",
+   "dst": "scripts.check_worker_fleet_supervisor_full_stack._act",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_worker_provider_circuit_breaker._self_test",
+   "dst": "scripts.check_worker_provider_circuit_breaker._plus",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_worker_spawn_decision_engine._self_test",
+   "dst": "scripts.check_worker_spawn_decision_engine._w",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.context_workers.priority.decide_followup_for_fact",
+   "dst": "scripts.context_workers.priority.PriorityDecision",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.context_workers.priority.decide_followup_for_fact",
+   "dst": "scripts.context_workers.priority._band",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.component_local_postgres_smoke_plan.build_component_local_postgres_smoke_plan",
+   "dst": "scripts.db.component_local_postgres_smoke_plan._require_path",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.content_approval_plan._approval_csv_row",
+   "dst": "scripts.db.content_approval_plan._str",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.dedupe_resolution_plan._candidate_updates",
+   "dst": "scripts.db.dedupe_resolution_plan._str",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.dedupe_resolution_plan._resolution_csv_row",
+   "dst": "scripts.db.dedupe_resolution_plan._str",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.factory_jsonl_bulk_copy._object_embedding",
+   "dst": "scripts.db.factory_jsonl_bulk_copy._str",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.factory_jsonl_relationship_preflight.preflight",
+   "dst": "scripts.db.factory_jsonl_relationship_preflight._issue",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.theory_local_postgres_smoke_plan.build_theory_local_postgres_smoke_plan",
+   "dst": "scripts.db.theory_local_postgres_smoke_plan._require_path",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.deploy.teleon_machines_runner.self_test",
+   "dst": "scripts.deploy.teleon_machines_runner.Runner",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.deploy.teleon_machines_runner.self_test",
+   "dst": "scripts.deploy.teleon_machines_runner._FakeMachinesAPI",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.enrichment.serve._selftest",
+   "dst": "scripts.enrichment.serve.negotiate_tier",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.eval.promotion_bridge.promotion_decision",
+   "dst": "scripts.eval.promotion_bridge._verdict",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.factory.daily_production_run.run_daily_production",
+   "dst": "scripts.factory.daily_production_run._row_count",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.factory.fast_factory_closeout_report.build_fast_factory_closeout_report",
+   "dst": "scripts.factory.fast_factory_closeout_report._read_json",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.foundry.standardize._self_test",
+   "dst": "scripts.foundry.standardize.content_hash",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.pipeline_runtime.cfpb_artifacts.build_cfpb_artifacts",
+   "dst": "scripts.pipeline_runtime.cfpb_artifacts._derived",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.apqc_pcf_walker._selftest",
+   "dst": "scripts.processors.apqc_pcf_walker.run",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.assurance.oracle_c2pa_attest._self_test",
+   "dst": "scripts.processors.assurance.oracle_c2pa_attest.verify_by_hash",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.clinical.clinical_abstention_gate._selftest",
+   "dst": "scripts.processors.clinical.clinical_abstention_gate.run",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.connectors.mcp_confluence_connector._selftest",
+   "dst": "scripts.processors.connectors.mcp_confluence_connector.run",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.deliver.deliver_notify._selftest",
+   "dst": "scripts.processors.deliver.deliver_notify.run",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.deliver.deliver_report._selftest",
+   "dst": "scripts.processors.deliver.deliver_report.run",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.deliver.deliver_webhook._selftest",
+   "dst": "scripts.processors.deliver.deliver_webhook.run",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.disable_thinking_mode_latency._selftest",
+   "dst": "scripts.processors.disable_thinking_mode_latency.run",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.draft_quality_gate._self_test",
+   "dst": "scripts.processors.draft_quality_gate.run",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.english_pivot_translation._selftest",
+   "dst": "scripts.processors.english_pivot_translation.run",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.on_device_ocr_prepass._selftest",
+   "dst": "scripts.processors.on_device_ocr_prepass.run",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.retrieval.bm25_keyword_retrieve._selftest",
+   "dst": "scripts.processors.retrieval.bm25_keyword_retrieve.run",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.retrieval.exact_id_lookup._selftest",
+   "dst": "scripts.processors.retrieval.exact_id_lookup.run",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.retrieval.grep_agentic_retrieve._selftest",
+   "dst": "scripts.processors.retrieval.grep_agentic_retrieve.run",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.sanctions.sanctions_freshness._selftest",
+   "dst": "scripts.sanctions.sanctions_freshness.flag_stale_context",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.serve_document_cascade_demo._self_test",
+   "dst": "scripts.serve_document_cascade_demo.run_extract",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.showcase.admin_demo.readiness.admin_demo_readiness",
+   "dst": "scripts.showcase.admin_demo.readiness._file_check",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.showcase.builder.run_trace",
+   "dst": "scripts.check_temporal_graph_full_stack._row",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.source_expansion._expand_gate",
+   "dst": "scripts.source_expansion._deny",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.source_expansion._self_test",
+   "dst": "scripts.source_expansion.expand_source_handle",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.teleon_local_runtime.do_POST",
+   "dst": "scripts.teleon_local_runtime.Handler._send",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.test_baltor_admin_demo_flow.assert_context_gateway",
+   "dst": "scripts.test_baltor_admin_demo_flow.request",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "src.baltor.determinism.rule_candidate_generator.from_pattern",
+   "dst": "src.baltor.determinism.rule_candidate_generator._attr",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "src.baltor.distillation.lossless_store._put",
+   "dst": "src.baltor.distillation.lossless_store._as_tuple",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "src.baltor.workers.fleet_supervisor.decide_for_capability",
+   "dst": "src.baltor.workers.fleet_supervisor._decision",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "src.baltor.workers.policy_recommender.recommend",
+   "dst": "src.baltor.workers.policy_recommender._rec",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "src.openharnesshub.hub_site.render_hub_page",
+   "dst": "src.openharnesshub.hub_site._esc",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "src.teleon.capability_planner.plan",
+   "dst": "src.teleon.capability_planner.PlanStep",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "src.teleon.dag.example_pipelines.build_enrichment_dag",
+   "dst": "src.teleon.dag.pipeline_dag.Node",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "src.teleon.exploration.ladder.escalation_decision",
+   "dst": "src.teleon.exploration.ladder._decision",
+   "weight": 8,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.acquisition.cell_priority.cell_priority",
+   "dst": "scripts.acquisition.cell_priority._clamp01",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.baltor_admin_demo_server.build_run",
+   "dst": "scripts.baltor_admin_demo_server.log_event",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.baltor_admin_demo_server.explore_page",
+   "dst": "scripts.baltor_admin_demo_server.esc",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.baltor_admin_demo_server.monitoring_page",
+   "dst": "scripts.baltor_admin_demo_server.esc",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_access_policy._self_test",
+   "dst": "src.teleon.runtime.access_policy.classify",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_capability_ladders._self_test",
+   "dst": "scripts.check_capability_ladders._load",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_capability_planner._self_test",
+   "dst": "src.teleon.capability_planner.plan",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_capability_synthesis._self_test",
+   "dst": "scripts.check_capability_synthesis._load",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_chatbot_guardrail_audit._self_test",
+   "dst": "src.baltor.sales.diagnostics.chatbot_guardrail_audit.audit_transcript",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_component_standardization._self_test",
+   "dst": "src.teleon.components.registry.make_component",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_contextops_reliability_scoring._self_test",
+   "dst": "src.baltor.contextops.reliability.score_source",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_deterministic_rule_fallback._self_test",
+   "dst": "src.baltor.determinism.fallback_router.route",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_distillation_rehydration._self_test",
+   "dst": "src.baltor.distillation.rehydration.rehydrate",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_entity_resolver._self_test",
+   "dst": "src.teleon.resolution.entity_resolver.compare",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_inefficient_pipeline_archetypes._self_test",
+   "dst": "scripts.check_inefficient_pipeline_archetypes._load",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_inference_api_handler._self_test",
+   "dst": "scripts.api_inference_handler.handle",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_live_supervisor_spawn_decisions._self_test",
+   "dst": "src.baltor.workers.supervisor_watch.step",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_local_blackboard_provider._self_test",
+   "dst": "scripts.check_local_blackboard_provider._receipt",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_native_sidecar_lineage._reference_export",
+   "dst": "scripts.check_native_sidecar_lineage._h",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_optimization_harness._self_test",
+   "dst": "scripts.check_optimization_harness._pack",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_pattern_standards_full_stack.analyze",
+   "dst": "scripts.check_pattern_standards_full_stack._load",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_preference_graph_numeric._self_test",
+   "dst": "scripts.check_preference_graph_numeric._ids",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_preference_profile._self_test",
+   "dst": "src.teleon.inference.preference_profile.cost_first",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_purpose_task_rollback._self_test",
+   "dst": "scripts.check_purpose_task_rollback._post_promotion_spec",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_purpose_task_rollback._self_test",
+   "dst": "src.teleon.purpose_tasks.purpose_task.rollback",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_rule_promotion_gate._self_test",
+   "dst": "src.baltor.determinism.replay_engine.replay",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_shared_event_io._self_test",
+   "dst": "src.teleon.io.event_io.project_event_envelope",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_shared_io_resource_spine._self_test",
+   "dst": "src.teleon.resources.resource_ref.make_data_resource_spec",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_shared_io_resource_spine._self_test",
+   "dst": "src.teleon.resources.resource_ref.validate_resource_spec",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_source_search._self_test",
+   "dst": "scripts.check_source_search._Fake",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_source_search._self_test",
+   "dst": "src.teleon.research.source_search.ToolHit",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_teleon_capability_network._self_test",
+   "dst": "scripts.check_teleon_capability_network._c",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_teleon_objective_gated_descent._self_test",
+   "dst": "scripts.teleon_preseed_capabilities.objective_gated_descent",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_tenant_store_resolver._self_test",
+   "dst": "scripts.security.tenant_catalog.TenantPolicy",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_worker_batch_windows._self_test",
+   "dst": "scripts.check_worker_batch_windows._tasks",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.approved_component_promotion_plan.create_approved_component_promotion_plan",
+   "dst": "scripts.db.approved_component_promotion_plan._str",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.catalog_database_promotion_readiness.build_promotion_readiness_report",
+   "dst": "scripts.db.catalog_database_promotion_readiness.read_json",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.catalog_manifest_export_plan.build_export_plan",
+   "dst": "scripts.db.catalog_manifest_export_plan._read_jsonl",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.component_cdc_plan._index_csv_row",
+   "dst": "scripts.db.component_cdc_plan._str",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.content_approval_plan._promotion_csv_row",
+   "dst": "scripts.db.content_approval_plan._str",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.factory_jsonl_bulk_copy._index_record",
+   "dst": "scripts.db.factory_jsonl_bulk_copy._str",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.factory_jsonl_bulk_copy._promotion_decision",
+   "dst": "scripts.db.factory_jsonl_bulk_copy._str",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.factory_jsonl_bulk_copy._review_ticket",
+   "dst": "scripts.db.factory_jsonl_bulk_copy._str",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.factory_jsonl_to_postgres._index_record",
+   "dst": "scripts.db.factory_jsonl_to_postgres._sql_string",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.factory_jsonl_to_postgres._partition_manifest",
+   "dst": "scripts.db.factory_jsonl_to_postgres._sql_string",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.promotion_decision_load_plan._index_row",
+   "dst": "scripts.db.promotion_decision_load_plan._str",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.promotion_decision_load_plan._promotion_row",
+   "dst": "scripts.db.promotion_decision_load_plan._str",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.promotion_decision_load_plan._review_row",
+   "dst": "scripts.db.promotion_decision_load_plan._str",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.deploy.generate_provider_configs.self_test",
+   "dst": "scripts.deploy.generate_provider_configs.fly_app_name",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.deploy.teleon_machines_runner.self_test",
+   "dst": "scripts.deploy.teleon_machines_runner._throwaway_receipts",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.email_port._self_test",
+   "dst": "scripts.email_port.send",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.enrichment.serve.emit_llms_txt",
+   "dst": "scripts.enrichment.serve._escape_inline",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.eval.measured_lift_headtohead._selftest",
+   "dst": "scripts.eval.measured_lift_headtohead.run_headtohead",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.factory.capability_lift_gate._structural_depth",
+   "dst": "scripts.factory.capability_lift_gate._list",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.factory.specialized_model_card_rows.build_model_card_row_families",
+   "dst": "scripts.factory.specialized_model_card_rows._dimension",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.factory.use_case_seed_rows.build_row_families",
+   "dst": "scripts.factory.use_case_seed_rows._add_entity_ref",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.factory.use_case_seed_rows.build_row_families",
+   "dst": "scripts.factory.use_case_seed_rows._dimension",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.foundry.measure._self_test",
+   "dst": "scripts.foundry.contracts.FoundryContext",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.foundry.measure._self_test",
+   "dst": "scripts.foundry.measure.MeasurementStage",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.foundry.measure._self_test",
+   "dst": "scripts.foundry.measure._cand",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.foundry.novelty._self_test",
+   "dst": "scripts.foundry.novelty.source_key",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.ingest.context_rot._self_test",
+   "dst": "scripts.ingest.context_rot.CachedItem",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.ingest.context_rot.assess",
+   "dst": "scripts.ingest.context_rot.RotAssessment",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.ingest.sanctions_feed._selftest",
+   "dst": "scripts.ingest.sanctions_feed.normalize",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.clinical.clinical_redflag_screen._selftest",
+   "dst": "scripts.processors.clinical.clinical_redflag_screen.run",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.clinical.dosage_range_validator._selftest",
+   "dst": "scripts.processors.clinical.dosage_range_validator.run",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.clinical.lab_critical_value_flag._selftest",
+   "dst": "scripts.processors.clinical.lab_critical_value_flag.run",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.connectors.mcp_gitlab_connector._selftest",
+   "dst": "scripts.processors.connectors.mcp_gitlab_connector.run",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.connectors.mcp_postgres_connector._selftest",
+   "dst": "scripts.processors.connectors.mcp_postgres_connector.run",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.deliver.deliver_email._selftest",
+   "dst": "scripts.processors.deliver.deliver_email.run",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.deliver.deliver_return._selftest",
+   "dst": "scripts.processors.deliver.deliver_return.run",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.doc_to_markdown_rag_ingest._selftest",
+   "dst": "scripts.processors.doc_to_markdown_rag_ingest.run",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.memory.memory_reflect._selftest",
+   "dst": "scripts.processors.memory.memory_reflect.run",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.on_device_smart_router._selftest",
+   "dst": "scripts.processors.on_device_smart_router.run",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.retrieval.cross_encoder_reranker._selftest",
+   "dst": "scripts.processors.retrieval.cross_encoder_reranker.run",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.retrieval.dense_vector_retrieve._selftest",
+   "dst": "scripts.processors.retrieval.dense_vector_retrieve.run",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.retrieval.hyde_query_expander._selftest",
+   "dst": "scripts.processors.retrieval.hyde_query_expander.run",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.retrieval.mmr_diversity_select._selftest",
+   "dst": "scripts.processors.retrieval.mmr_diversity_select.run",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.retrieval.multi_query_expander._selftest",
+   "dst": "scripts.processors.retrieval.multi_query_expander.run",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.retrieval.prompt_injection_screen._selftest",
+   "dst": "scripts.processors.retrieval.prompt_injection_screen.run",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.template_field_gem._selftest",
+   "dst": "scripts.processors.template_field_gem.run",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.processors.tts_preprocess_low_resource._selftest",
+   "dst": "scripts.processors.tts_preprocess_low_resource.run",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.registry_local_service._handle_decide",
+   "dst": "scripts.registry_local_service._Handler._send",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.showcase.admin_demo.readiness.admin_demo_readiness",
+   "dst": "scripts.showcase.admin_demo.readiness._module_check",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.teleon_local_runtime.do_GET",
+   "dst": "scripts.teleon_local_runtime.Handler._send",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.test_baltor_admin_demo_flow.assert_connector_run",
+   "dst": "scripts.test_baltor_admin_demo_flow.request",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.wedge.sanctions_screen._self_test",
+   "dst": "scripts.wedge.sanctions_screen.screen",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.yc_readiness.compute_readiness",
+   "dst": "scripts.yc_readiness._glob",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "src.baltor.adapters.source.folder_batch.ingest",
+   "dst": "scripts.ingest.source_adapters._hash",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "src.baltor.determinism.replay_engine.replay",
+   "dst": "src.baltor.determinism.replay_engine._attr",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "src.baltor.determinism.trace_store.append",
+   "dst": "src.baltor.determinism.trace_store.TraceStoreError",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "src.teleon.blackboard.local_sqlite_blackboard.append_entry",
+   "dst": "src.teleon.ports.blackboard_provider.BlackboardWriteRejected",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "src.teleon.evolution.capability_graph.add_edge",
+   "dst": "src.teleon.evolution.capability_graph.EvolutionError",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "src.teleon.inference.model_efficiency._self_test",
+   "dst": "src.teleon.inference.model_efficiency.rank_models",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "src.teleon.research.source_search.search",
+   "dst": "src.teleon.research.source_search.SourceSearchUnavailable",
+   "weight": 7,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.api_inference_handler._get",
+   "dst": "scripts.api_inference_handler._guard",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.audit_context_storage.audit_hardcoded_settings",
+   "dst": "scripts.audit_context_storage.rel",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.baltor_admin_demo_server.context_fetch_payload",
+   "dst": "scripts.baltor_admin_demo_server.gateway_receipt",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.baltor_admin_demo_server.context_object_graph_records",
+   "dst": "scripts.baltor_admin_demo_server.stable_hash",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.baltor_admin_demo_server.do_GET",
+   "dst": "scripts.baltor_admin_demo_server.latest_run",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.build_agentic_loop_viz.render",
+   "dst": "scripts.build_agentic_loop_viz._e",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.build_component_index.collect",
+   "dst": "scripts.build_component_index._load",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_ai_done_right_surface_family._entity_records",
+   "dst": "scripts.check_ai_done_right_surface_family._string_prop",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_capability_self_heal_on_source_change._self_test",
+   "dst": "src.teleon.self_healing.reheal.reheal_on_source_change",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_cascade_measurement._self_test",
+   "dst": "src.teleon.extraction.document_extraction_cascade.measured_field_accuracy",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_consensus_recorder._self_test",
+   "dst": "src.baltor.determinism.consensus.record_consensus",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_consumption_blocks_bad_artifacts._self_test",
+   "dst": "scripts.check_consumption_blocks_bad_artifacts._fact",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_context_compressor._self_test",
+   "dst": "src.teleon.context.compressor.compress",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_context_response_retrieval_api._self_test",
+   "dst": "scripts.api_context_handler.handle",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_contextops_cost_reduction._self_test",
+   "dst": "src.baltor.contextops.cost_tracking.compute_cost_ladder",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_contextops_extractor_snippets._self_test",
+   "dst": "src.baltor.contextops.extractor_snippets.extract_duration",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_durable_fleet_ledger._self_test",
+   "dst": "src.teleon.workers.durable_fleet_ledger.DurableFleetLedger",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_eval_suite_contract._self_test",
+   "dst": "src.teleon.purpose_tasks.eval_suite.validate_eval_suite",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_event_envelope._self_test",
+   "dst": "scripts.pipeline_runtime.envelope.validate_envelope",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_execution_provider_factory._self_test",
+   "dst": "src.teleon.runtime.execution_providers.factory.get_execution_provider",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_flywheel_supervisor_shards._self_test",
+   "dst": "src.teleon.workers.fleet_ledger._plus_s",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_ftm_interop._self_test",
+   "dst": "src.baltor.native.ftm_adapter.to_entity_proxy",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_gold_pack_contract._self_test",
+   "dst": "scripts.check_gold_pack_contract.check_gold_pack",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_inference_provider_adapters._self_test",
+   "dst": "src.teleon.inference.adapters.resolve_adapter",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_input_profilers._self_test",
+   "dst": "src.teleon.extraction.pdf_profiler.classify_layout",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_live_supervisor_api._self_test",
+   "dst": "scripts.check_live_supervisor_api._get",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_live_supervisor_spawn_decisions._self_test",
+   "dst": "scripts.check_live_supervisor_spawn_decisions._fresh_store",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_llm_router_policy._self_test",
+   "dst": "scripts.check_llm_router_policy._status_for",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_local_dev_tunnel_auth_runtime._self_test",
+   "dst": "scripts.check_local_dev_tunnel_auth_runtime._read",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_native_export_rehydration._self_test",
+   "dst": "scripts.api_native_handler.handle",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_native_format_full_stack._print_table",
+   "dst": "scripts.check_native_format_full_stack._fmt_cell",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_parallel_path_redteam._self_test",
+   "dst": "scripts.check_parallel_path_redteam._authorized_served_path",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_passes._self_test",
+   "dst": "scripts.check_passes._seed",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_pipeline_runtime._self_test",
+   "dst": "scripts.pipeline_runtime.runner.run_pipeline",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_plane_io_contracts._self_test",
+   "dst": "src.teleon.synthesis.io_contracts.edge_compatible",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_preference_graph_numeric._self_test",
+   "dst": "src.baltor.runtime.registry.preference_graph.resolve_order",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_purpose_task_contracts._self_test",
+   "dst": "scripts.check_purpose_task_contracts._valid_spec",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_purpose_task_contracts._self_test",
+   "dst": "scripts.runtime.schema_validator.validate_ref",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_registry_backend._self_test",
+   "dst": "scripts.check_registry_backend._post",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_rule_promotion_gate._self_test",
+   "dst": "scripts.check_rule_promotion_gate._clean_traces",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_sales_guardrails._self_test",
+   "dst": "src.baltor.sales.claim_guard.gate_evidence_pack",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_search_port._self_test",
+   "dst": "src.teleon.retrieval.search_port.select_search",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_shared_io_resource_redteam._self_test",
+   "dst": "scripts.check_shared_io_resource_redteam._raises",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_shared_io_resource_redteam._self_test",
+   "dst": "src.teleon.resources.resource_ref.make_data_resource_spec",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_shared_io_resource_redteam._self_test",
+   "dst": "src.teleon.resources.resource_ref.validate_resource_spec",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_shared_openapi_asyncapi_specs._self_test",
+   "dst": "scripts.build_contract_specs._dump",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_source_authority._self_test",
+   "dst": "scripts.artifact_graph.source_authority.corroboration",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_source_search._self_test",
+   "dst": "src.teleon.research.source_search.discover",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_teleon_ab_harness._self_test",
+   "dst": "src.teleon.evolution.ab_harness.ab_test",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_teleon_capability_objectives._self_test",
+   "dst": "src.teleon.objectives.objective.MetricVector",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_teleon_codex_lane._self_test",
+   "dst": "src.teleon.inference.lane_selection.select_lane",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_teleon_impl_finder._self_test",
+   "dst": "scripts.check_teleon_impl_finder._cap",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_teleon_impl_finder._self_test",
+   "dst": "src.teleon.evolution.impl_finder.find_implementations",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_teleon_org_guardrail_policy._self_test",
+   "dst": "src.teleon.governance.org_policy.bounds_runner_change",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_teleon_unit_placement._self_test",
+   "dst": "scripts.teleon_preseed_capabilities._sla_seconds",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_tenant_isolation_policy._self_test",
+   "dst": "scripts.check_tenant_isolation_policy._raises",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_tenant_isolation_policy._self_test",
+   "dst": "scripts.security.tenant_catalog.TenantPolicy",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_tenant_isolation_policy._self_test",
+   "dst": "scripts.security.tenant_catalog.assert_isolated_write",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_trust_tiers._self_test",
+   "dst": "src.teleon.runtime.trust_tiers.can_execute",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_worked_examples._self_test",
+   "dst": "scripts.check_worked_examples._load",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_worker_fleet_redteam._self_test",
+   "dst": "src.teleon.workers.fleet_ledger.FleetLedger",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_worker_fleet_supervisor._self_test",
+   "dst": "src.teleon.workers.fleet_ledger.FleetLedger",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.check_worker_provider_circuit_breaker._self_test",
+   "dst": "src.baltor.workers.provider_circuit_breaker.CircuitBreaker",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.context_workers.runner.process_one",
+   "dst": "scripts.context_workers.runner._publish_worker_event",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.approved_component_promotion_plan._subcomponent_row",
+   "dst": "scripts.db.approved_component_promotion_plan._str",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.component_cdc_plan.create_component_cdc_plan",
+   "dst": "scripts.db.component_cdc_plan._str",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.component_store_load_plan._subcomponent_row",
+   "dst": "scripts.db.component_store_load_plan._str",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.content_approval_plan.create_content_approval_plan",
+   "dst": "scripts.db.content_approval_plan._str",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.dedupe_resolution_plan._decision_for_cluster",
+   "dst": "scripts.db.dedupe_resolution_plan._str",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.factory_jsonl_bulk_copy._canonical_entity",
+   "dst": "scripts.db.factory_jsonl_bulk_copy._str",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.factory_jsonl_bulk_copy._table_load_sql",
+   "dst": "scripts.db.factory_jsonl_bulk_copy._numeric_cast",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.factory_jsonl_to_postgres._index_delta",
+   "dst": "scripts.db.factory_jsonl_to_postgres._sql_string",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.factory_jsonl_to_postgres._review_ticket",
+   "dst": "scripts.db.factory_jsonl_to_postgres._sql_string",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.local_smoke_approved_command_runner._self_test",
+   "dst": "scripts.db.local_smoke_approved_command_runner.build_or_run_approved_local_smoke_commands",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.object_embedding_batch_loader._insert_statement",
+   "dst": "scripts.db.pgvector_embedding_load_plan._sql_string",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.db.pgvector_embedding_load_plan._embedding_insert",
+   "dst": "scripts.db.pgvector_embedding_load_plan._sql_string",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.events_local_service.do_GET",
+   "dst": "scripts.events_local_service._Handler._send",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.factory.public_source_replay_rows.build_replay_row_families",
+   "dst": "scripts.factory.public_source_replay_rows._dimension",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.factory.task_marketplace_intake._task_object",
+   "dst": "scripts.factory.task_marketplace_intake._safe_list",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.foundry.access._self_test",
+   "dst": "scripts.foundry.access.classify_access",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.foundry.batch_inference.batch_server",
+   "dst": "scripts.foundry.batch_inference.BatchLane",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.foundry.interactions._self_test",
+   "dst": "scripts.foundry.interactions.Interaction",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.generate_from_template._self_test",
+   "dst": "scripts.generate_from_template.generate",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.generate_from_template.generate",
+   "dst": "scripts.generate_from_template.GenerationError",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.generate_from_template.generate",
+   "dst": "scripts.generate_from_template._render",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.ingest.freshness._self_test",
+   "dst": "scripts.ingest.freshness.check_all",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.ingest.run._self_test",
+   "dst": "scripts.foundry.scrapers.CannedFetcher",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.mailbox_local_service.do_GET",
+   "dst": "scripts.mailbox_local_service._Handler._send",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.model_gateway._self_test",
+   "dst": "scripts.model_gateway.resolve_model_route",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.multi_model_improvement_loop._self_test",
+   "dst": "scripts.multi_model_improvement_loop.focused_context",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
+   "src": "scripts.portfolio_checks.customer_readiness_rubric",
+   "dst": "scripts.portfolio_checks._html",
+   "weight": 6,
+   "confidence": "exact"
+  }
+ ],
+ "overflow": {
+  "call_edges_not_persisted": 11001,
+  "note": "bounded artifact \u2014 full graph is recomputable via scripts/codegraph.py"
+ }
+}
