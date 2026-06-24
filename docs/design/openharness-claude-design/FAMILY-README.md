@@ -57,7 +57,7 @@ AI Done Right                     parent / portfolio
   Private bench
     OpenTemplatesHub.io
     OpenEndpointHub.io
-    OpenEnvHub.io
+    OpenEnvironmentHub.io
     OpenSandboxHub.io
     OpenAgentHub.io
     OpenReceiptHub.io

@@ -32,7 +32,7 @@ flowchart LR
   subgraph private_bench["Private-bench Open*Hubs (13) — internal-first"]
     OpenTemplatesHub
     OpenEndpointHub
-    OpenEnvHub
+    OpenEnvironmentHub
     OpenSandboxHub
     OpenAgentHub
     OpenReceiptHub
@@ -57,7 +57,7 @@ flowchart LR
   OpenReviewHub -->|capability| teleon
   OpenTemplatesHub -->|schema| teleon
   OpenEndpointHub -->|LLM endpoint + gateway| teleon
-  OpenEnvHub -->|verifiable eval environments +| teleon
+  OpenEnvironmentHub -->|verifiable eval environments +| teleon
   OpenSandboxHub -->|sandbox registry + risk| teleon
   OpenAgentHub -->|agent-runtime adapters + run| teleon
   OpenReceiptHub -->|portable signed receipts| baltor
@@ -95,7 +95,7 @@ flowchart LR
 |---|---|---|---|
 | OpenTemplatesHub | schema/runtime/resource/API-UI/inference/PurposeTask template families | teleon | internal-first: private infra now; a public-revenue candidate when its trigger fires |
 | OpenEndpointHub | LLM endpoint + gateway due-diligence (model info, data-class/jurisdiction) | teleon | internal-first: private infra now; a public-revenue candidate when its trigger fires |
-| OpenEnvHub | verifiable eval environments + reward specs | teleon | internal-first: private infra now; a public-revenue candidate when its trigger fires |
+| OpenEnvironmentHub | verifiable eval environments + reward specs | teleon | internal-first: private infra now; a public-revenue candidate when its trigger fires |
 | OpenSandboxHub | sandbox registry + risk/conformance | teleon | internal-first: private infra now; a public-revenue candidate when its trigger fires |
 | OpenAgentHub | agent-runtime adapters + run receipts | teleon | internal-first: private infra now; a public-revenue candidate when its trigger fires |
 | OpenReceiptHub | portable signed receipts (the attestation face) | both | internal-first: private infra now; a public-revenue candidate when its trigger fires |
