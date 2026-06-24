@@ -1,0 +1,79 @@
+MODULE src/teleon/observer/router.py
+## API signatures
+```python
+"""observer.router — the Spotter ROUTER over the intervention TAXONOMY (the memo's central architecture, made real)."""
+_REPO = ...
+_HEURISTICS_PATH = ...
+ACTIONS = ...
+MODES = ...
+_MODE_CAP = ...
+_LIVE_BUDGET = ...
+_CHARS_PER_TOKEN = ...
+_OVERSIZED_TOKENS = ...
+_DUP_PREFIX_CHARS = ...
+_DUP_MIN_TOKENS = ...
+_CONF_REINVENTION = ...
+_CONF_OVERSIZED = ...
+_CONF_DUPLICATE = ...
+_PER_TYPE_FLOOR = ...
+def _weaker(a: str, b: str) -> str
+def _approx_tokens(text: str) -> int
+def _load_heuristics() -> list[dict]
+def _iv(type_: str, confidence: float, message: str, evidence: str, suggestion: str, max_action: str, source_ref: dict | None=None, dedup_id: str | None=None) -> dict
+    # A governed candidate intervention. `outcome` (accepted|reused|dismissed|ignored) is the accept/reject SIGNAL
+class InterventionModule:
+    def plausible(self, text: str, state: dict) -> bool
+    def ground(self, text: str, state: dict) -> list[dict]
+class ReinventionModule:
+    # Single-message reinvention, GROUNDED in the federation (the reference module — wraps reinvention_guard).
+    def plausible(self, text: str, state: dict) -> bool
+    def ground(self, text: str, state: dict) -> list[dict]
+class FootgunModule:
+    # Deterministic secret/destructive pattern scan — high-trust, may BLOCK. Evidence is REDACTED (no-store-secrets).
+    def __init__(self, heuristics: list[dict])
+    def plausible(self, text: str, state: dict) -> bool
+    def ground(self, text: str, state: dict) -> list[dict]
+class AdversarialModule:
+    # Challenge an assumption BEFORE wasted work — keyed to question templates. Never blocks; failure = irrelevance.
+    def __init__(self, heuristics: list[dict])
+    def plausible(self, text: str, state: dict) -> bool
+    def ground(self, text: str, state: dict) -> list[dict]
+class ReinventionClusterModule:
+    # Session-level: a SEQUENCE of build-signals that together predict rebuilding common infrastructure (§6).
+    def __init__(self, heuristics: list[dict])
+    def plausible(self, text: str, state: dict) -> bool
+    def ground(self, text: str, state: dict) -> list[dict]
+class OversizedContextModule:
+    def plausible(self, text: str, state: dict) -> bool
+    def ground(self, text: str, state: dict) -> list[dict]
+class DuplicateContextModule:
+    def plausible(self, text: str, state: dict) -> bool
+    def ground(self, text: str, state: dict) -> list[dict]
+def default_modules() -> list[InterventionModule]
+def _message_text(m: dict) -> str
+def _apply_budget(findings: list[dict], mode: str) -> list[dict]
+    # The GLOBAL interruption budget. Footguns (protective) always surface; other types compete for _LIVE_BUDGET
+def route_session(events: list[dict], mode: str='review_only', modules: list[InterventionModule] | None=None) -> dict
+    # Run the router over a session. mode picks the restraint level; review_only = the exhaustive post-session report
+```
+## intra-module call edges
+src.teleon.observer.router.default_modules -> src.teleon.observer.router._load_heuristics
+src.teleon.observer.router.default_modules -> src.teleon.observer.router.ReinventionModule
+src.teleon.observer.router.default_modules -> src.teleon.observer.router.FootgunModule
+src.teleon.observer.router.default_modules -> src.teleon.observer.router.AdversarialModule
+src.teleon.observer.router.default_modules -> src.teleon.observer.router.ReinventionClusterModule
+src.teleon.observer.router.default_modules -> src.teleon.observer.router.OversizedContextModule
+src.teleon.observer.router.default_modules -> src.teleon.observer.router.DuplicateContextModule
+src.teleon.observer.router.route_session -> src.teleon.observer.router._apply_budget
+src.teleon.observer.router.route_session -> src.teleon.observer.router.default_modules
+src.teleon.observer.router.route_session -> src.teleon.observer.router._message_text
+src.teleon.observer.router.route_session -> src.teleon.observer.router.InterventionModule.ground
+src.teleon.observer.router.route_session -> src.teleon.observer.router.InterventionModule.plausible
+src.teleon.observer.router.route_session -> src.teleon.observer.router._weaker
+src.teleon.observer.router.ground -> src.teleon.observer.router._iv
+src.teleon.observer.router.ground -> src.teleon.observer.router._iv
+src.teleon.observer.router.ground -> src.teleon.observer.router._iv
+src.teleon.observer.router.ground -> src.teleon.observer.router._iv
+src.teleon.observer.router.plausible -> src.teleon.observer.router._approx_tokens
+src.teleon.observer.router.ground -> src.teleon.observer.router._iv
+src.teleon.observer.router.ground -> src.teleon.observer.router._approx_tokens

@@ -1,0 +1,15 @@
+MODULE src/teleon/knowledge/repo_similarity.py
+## API signatures
+```python
+"""knowledge.repo_similarity — the Repository Embedding + Semantic Similarity Engine (the owner's §2)."""
+_MATCH = ...
+_TOP = ...
+def build_repo_index(repos: list[dict], embed_fn=None) -> list[dict]
+    # repos = [{id, description}] -> embedded index. Use real federation/package records as the corpus.
+def similar_repos(intent: str, index: list[dict], embed_fn=None) -> dict
+    # Rank the corpus by semantic closeness to the intent; surface equivalents + a confidence + a count.
+def _self_test() -> list[str]
+```
+## intra-module call edges
+src.teleon.knowledge.repo_similarity._self_test -> src.teleon.knowledge.repo_similarity.build_repo_index
+src.teleon.knowledge.repo_similarity._self_test -> src.teleon.knowledge.repo_similarity.similar_repos

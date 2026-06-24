@@ -1,0 +1,44 @@
+MODULE src/teleon/registry/port.py
+## API signatures
+```python
+"""registry.port — the universal Registry<T> menu (realizes the ontology's universal_interface)."""
+_REPO = ...
+_ARCH = ...
+_DEFAULT_LIMIT = ...
+class RegistryPort:
+    # The uniform menu every registry exposes (the load-bearing subset of the Registry<T> contract).
+    def list(self) -> list[dict]
+    def lookup(self, record_id: str) -> dict | None
+    def search(self, query: str, *, limit: int=_DEFAULT_LIMIT) -> list[dict]
+    def explain(self, record_id: str) -> dict | None
+class JsonCatalogRegistry:
+    # A RegistryPort over one JSON source catalog: {<list_key>: [{<id_field>: ..., ...}, ...]}.
+    def __init__(self, path: Path, list_key: str, id_field: str='id') -> None
+    def _records(self) -> list[dict]
+    def list(self) -> list[dict]
+    def lookup(self, record_id: str) -> dict | None
+    def explain(self, record_id: str) -> dict | None
+    def search(self, query: str, *, limit: int=_DEFAULT_LIMIT) -> list[dict]
+        # Deterministic lexical match: a record matches if ANY query token appears in its flattened text; ranked
+_MIN_DISCOVER_RECORDS = ...
+def discover_catalogs() -> dict[str, dict[str, str]]
+    # AUTO-DISCOVER catalog-shaped registries: scan architecture/*.json for a list-of-records with a usable id
+def all_catalogs() -> dict[str, dict[str, str]]
+    # Curated + auto-discovered catalogs (curated keys take precedence).
+def available() -> list[str]
+    # Curated registry ids on the menu (stable; the facets + proofs key off these).
+def available_all() -> list[str]
+    # EVERY searchable catalog (curated + auto-discovered) — the full federated-search surface.
+def catalog(name: str) -> JsonCatalogRegistry
+    # Return the RegistryPort adapter for a registered/discovered registry id (raises KeyError if unknown).
+```
+## intra-module call edges
+src.teleon.registry.port.all_catalogs -> src.teleon.registry.port.discover_catalogs
+src.teleon.registry.port.available_all -> src.teleon.registry.port.all_catalogs
+src.teleon.registry.port.catalog -> src.teleon.registry.port.all_catalogs
+src.teleon.registry.port.catalog -> src.teleon.registry.port.JsonCatalogRegistry
+src.teleon.registry.port.catalog -> src.teleon.registry.port.available_all
+src.teleon.registry.port.list -> src.teleon.registry.port.JsonCatalogRegistry._records
+src.teleon.registry.port.lookup -> src.teleon.registry.port.JsonCatalogRegistry._records
+src.teleon.registry.port.explain -> src.teleon.registry.port.RegistryPort.lookup
+src.teleon.registry.port.search -> src.teleon.registry.port.JsonCatalogRegistry._records

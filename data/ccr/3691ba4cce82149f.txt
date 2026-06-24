@@ -1,0 +1,13 @@
+MODULE src/teleon/knowledge/_vec.py
+## API signatures
+```python
+"""knowledge._vec — shared embedding + cosine helpers for the Global Software Knowledge Graph."""
+_DEFAULT = ...
+def _default_embedder()
+def embed(text: str, embed_fn=None) -> list[float]
+def cosine(a: list[float], b: list[float]) -> float
+def lexical_embed_fn()
+    # The deterministic, keyless lexical embedder (one fork) — used by proofs for reproducibility.
+```
+## intra-module call edges
+src.teleon.knowledge._vec.embed -> src.teleon.knowledge._vec._default_embedder

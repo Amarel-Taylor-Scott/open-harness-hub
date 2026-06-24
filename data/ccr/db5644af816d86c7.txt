@@ -1,0 +1,15 @@
+MODULE src/teleon/observer/review.py
+## API signatures
+```python
+"""observer.review — the POST-SESSION REVIEWER: the non-invasive Observer mode, now a thin front-end over the ROUTER."""
+REVIEW_VERSION = ...
+def review_session(messages: list[dict]) -> dict
+    # Run the full taxonomy over a finished session in review mode -> a confidence-ranked report. Reshapes the
+def _self_test() -> int
+def main() -> int
+```
+## intra-module call edges
+src.teleon.observer.review._self_test -> src.teleon.observer.review.review_session
+src.teleon.observer.review._self_test -> src.teleon.observer.review.review_session
+src.teleon.observer.review.main -> src.teleon.observer.review.review_session
+src.teleon.observer.review.main -> src.teleon.observer.review._self_test

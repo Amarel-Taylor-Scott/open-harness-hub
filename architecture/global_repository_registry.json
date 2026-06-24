@@ -1,0 +1,19 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-23",
+  "principle": "Global Repository Registry (the owner's Registry #91) — the index of WHERE the world's machine-executable software lives, so the knowledge graph can ask 'does this already exist?' across ecosystems. This is a DISCOVERY/pointer registry over our existing population substrate (scripts/harvest_tools.py -> data/dev-intel/tool_registry_staging.jsonl, proven on 278 real staged tools; src/teleon/research/source_search.py for live PyPI/GitHub). Each record names a source, its ecosystem, the harvest seam, and what it provides. Records (the actual repos) come from POPULATION, not hand-building (a registry = pointer + shape). serves_truth=false; candidate-only.",
+  "serves_truth": false,
+  "sources": [
+    {"id": "github", "ecosystem": "code", "kind": "forge", "url": "https://github.com", "harvest_seam": "source_search.py (SPDX+stars, keyless, rate-limit->honest 403) + harvest_tools.py", "provides": "repositories, releases, dependency manifests", "license_field": "SPDX"},
+    {"id": "gitlab", "ecosystem": "code", "kind": "forge", "url": "https://gitlab.com", "harvest_seam": "REST API (token-gated for rate)", "provides": "repositories, CI configs", "license_field": "SPDX"},
+    {"id": "bitbucket", "ecosystem": "code", "kind": "forge", "url": "https://bitbucket.org", "harvest_seam": "REST API", "provides": "repositories", "license_field": "SPDX"},
+    {"id": "pypi", "ecosystem": "python", "kind": "package_index", "url": "https://pypi.org", "harvest_seam": "source_search.py describe() (keyless JSON) + simple index", "provides": "packages, declared dependencies, classifiers", "license_field": "classifier/Trove"},
+    {"id": "npm", "ecosystem": "javascript", "kind": "package_index", "url": "https://registry.npmjs.org", "harvest_seam": "registry JSON + npms.io", "provides": "packages, package.json dependency trees", "license_field": "SPDX"},
+    {"id": "cargo", "ecosystem": "rust", "kind": "package_index", "url": "https://crates.io", "harvest_seam": "crates.io API", "provides": "crates, Cargo.toml dependencies", "license_field": "SPDX"},
+    {"id": "maven_central", "ecosystem": "jvm", "kind": "package_index", "url": "https://search.maven.org", "harvest_seam": "search API", "provides": "artifacts, POM dependencies", "license_field": "POM"},
+    {"id": "docker_hub", "ecosystem": "containers", "kind": "image_registry", "url": "https://hub.docker.com", "harvest_seam": "registry v2 API", "provides": "images, layers, base-image lineage", "license_field": "image label"},
+    {"id": "huggingface", "ecosystem": "models", "kind": "model_hub", "url": "https://huggingface.co", "harvest_seam": "HF Hub API (models/datasets/spaces)", "provides": "models, datasets, model cards", "license_field": "card metadata"},
+    {"id": "openapi_directories", "ecosystem": "apis", "kind": "api_catalog", "url": "https://apis.guru", "harvest_seam": "apis.guru list + OpenAPI specs", "provides": "API definitions, endpoints", "license_field": "spec info"},
+    {"id": "mcp_registry", "ecosystem": "agents", "kind": "mcp_index", "url": "https://github.com/modelcontextprotocol", "harvest_seam": "MCP server lists", "provides": "MCP servers, tool schemas", "license_field": "SPDX"}
+  ]
+}

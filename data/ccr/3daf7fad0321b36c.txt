@@ -1,0 +1,33 @@
+MODULE src/teleon/knowledge/dependency_graph.py
+## API signatures
+```python
+"""knowledge.dependency_graph — Dependency Graph Intelligence (the owner's Registry #92 / §3)."""
+_REPO = ...
+_SEED = ...
+def load_packages() -> list[dict]
+def build_graph(packages: list[dict] | None=None) -> dict
+    # Directed graph: {nodes: {id: record}, edges: {id: [requires...]}, provides: {capability: [ids]}}.
+def transitive_deps(graph: dict, node: str) -> list[str]
+    # All packages reachable from `node` (its full dependency closure), excluding `node`. Cycle-safe.
+def detect_cycle(graph: dict) -> list[str]
+    # Return one cycle (node ids) if the dependency graph has one, else [].
+def ecosystem_cluster(graph: dict, node: str) -> list[str]
+    # The connected component (undirected) around `node` — its ecosystem cluster.
+def stack_exists(capabilities: list[str], graph: dict | None=None) -> dict
+    # Does an existing package (with its transitive deps) already cover ALL requested capabilities? The stack-level
+def _self_test() -> list[str]
+```
+## intra-module call edges
+src.teleon.knowledge.dependency_graph.build_graph -> src.teleon.knowledge.dependency_graph.load_packages
+src.teleon.knowledge.dependency_graph.stack_exists -> src.teleon.knowledge.dependency_graph.build_graph
+src.teleon.knowledge.dependency_graph.stack_exists -> src.teleon.knowledge.dependency_graph.transitive_deps
+src.teleon.knowledge.dependency_graph.stack_exists -> src.teleon.knowledge.dependency_graph.transitive_deps
+src.teleon.knowledge.dependency_graph._self_test -> src.teleon.knowledge.dependency_graph.build_graph
+src.teleon.knowledge.dependency_graph._self_test -> src.teleon.knowledge.dependency_graph.build_graph
+src.teleon.knowledge.dependency_graph._self_test -> src.teleon.knowledge.dependency_graph.stack_exists
+src.teleon.knowledge.dependency_graph._self_test -> src.teleon.knowledge.dependency_graph.transitive_deps
+src.teleon.knowledge.dependency_graph._self_test -> src.teleon.knowledge.dependency_graph.transitive_deps
+src.teleon.knowledge.dependency_graph._self_test -> src.teleon.knowledge.dependency_graph.detect_cycle
+src.teleon.knowledge.dependency_graph._self_test -> src.teleon.knowledge.dependency_graph.ecosystem_cluster
+src.teleon.knowledge.dependency_graph._self_test -> src.teleon.knowledge.dependency_graph.detect_cycle
+src.teleon.knowledge.dependency_graph._self_test -> src.teleon.knowledge.dependency_graph.stack_exists

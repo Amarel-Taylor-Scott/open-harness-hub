@@ -4,11 +4,11 @@
   "serves_truth": false,
   "generated_from": "architecture/registry_ontology.json",
   "stats": {
-    "node_count": 98,
-    "edge_count": 76,
+    "node_count": 103,
+    "edge_count": 87,
     "by_status": {
       "live": 13,
-      "partial": 83,
+      "partial": 88,
       "gap": 2
     },
     "most_depended_on": [
@@ -38,6 +38,11 @@
         "in_degree": 3
       },
       {
+        "n": 70,
+        "id": "agent_systems",
+        "in_degree": 3
+      },
+      {
         "n": 71,
         "id": "external_systems",
         "in_degree": 3
@@ -46,11 +51,6 @@
         "n": 81,
         "id": "knowledge_taxonomies",
         "in_degree": 3
-      },
-      {
-        "n": 1,
-        "id": "capability",
-        "in_degree": 2
       }
     ]
   },
@@ -1042,6 +1042,67 @@
         2,
         10
       ]
+    },
+    {
+      "n": 99,
+      "id": "global_repository",
+      "status": "partial",
+      "layer": "layer0_discovery",
+      "kind": "meta",
+      "backing_count": 3,
+      "refs": [
+        82,
+        83
+      ]
+    },
+    {
+      "n": 100,
+      "id": "agent_frameworks",
+      "status": "partial",
+      "layer": "layer1_capability",
+      "kind": "static",
+      "backing_count": 1,
+      "refs": [
+        70,
+        94,
+        99
+      ]
+    },
+    {
+      "n": 101,
+      "id": "package_dependency",
+      "status": "partial",
+      "layer": "layer2_execution",
+      "kind": "static",
+      "backing_count": 2,
+      "refs": [
+        83,
+        99
+      ]
+    },
+    {
+      "n": 102,
+      "id": "product_similarity",
+      "status": "partial",
+      "layer": "layer0_discovery",
+      "kind": "static",
+      "backing_count": 2,
+      "refs": [
+        4,
+        5
+      ]
+    },
+    {
+      "n": 103,
+      "id": "behavioral_heuristics",
+      "status": "partial",
+      "layer": "layer3_optimization",
+      "kind": "static",
+      "backing_count": 2,
+      "refs": [
+        14,
+        96
+      ]
     }
   ],
   "edges": [
@@ -1424,6 +1485,61 @@
       "from": 98,
       "from_id": "formulas",
       "to": 10
+    },
+    {
+      "from": 99,
+      "from_id": "global_repository",
+      "to": 82
+    },
+    {
+      "from": 99,
+      "from_id": "global_repository",
+      "to": 83
+    },
+    {
+      "from": 100,
+      "from_id": "agent_frameworks",
+      "to": 70
+    },
+    {
+      "from": 100,
+      "from_id": "agent_frameworks",
+      "to": 94
+    },
+    {
+      "from": 100,
+      "from_id": "agent_frameworks",
+      "to": 99
+    },
+    {
+      "from": 101,
+      "from_id": "package_dependency",
+      "to": 83
+    },
+    {
+      "from": 101,
+      "from_id": "package_dependency",
+      "to": 99
+    },
+    {
+      "from": 102,
+      "from_id": "product_similarity",
+      "to": 4
+    },
+    {
+      "from": 102,
+      "from_id": "product_similarity",
+      "to": 5
+    },
+    {
+      "from": 103,
+      "from_id": "behavioral_heuristics",
+      "to": 14
+    },
+    {
+      "from": 103,
+      "from_id": "behavioral_heuristics",
+      "to": 96
     }
   ]
 }

@@ -1,0 +1,31 @@
+MODULE src/teleon/knowledge/code_genome.py
+## API signatures
+```python
+"""knowledge.code_genome — the Code Genome (the owner's §9)."""
+_PRIMITIVE_ORDER = ...
+def decompose(text: str) -> list[str]
+    # Which architectural primitives are present in this code/description (deterministic signal scan).
+def fingerprint(text: str) -> list[float]
+    # A genome fingerprint: a vector over the canonical primitive list (1.0 where the primitive is present).
+def genome_similarity(fp_a: list[float], fp_b: list[float]) -> float
+    # Cosine similarity between two genome fingerprints (software similarity %).
+def nearest_genomes(text: str, corpus: list[dict], *, limit: int=5) -> dict
+    # Rank corpus repos by genome similarity to `text`. corpus = [{id, text|fingerprint}]. Governed candidate.
+def _self_test() -> list[str]
+```
+## intra-module call edges
+src.teleon.knowledge.code_genome.fingerprint -> src.teleon.knowledge.code_genome.decompose
+src.teleon.knowledge.code_genome.nearest_genomes -> src.teleon.knowledge.code_genome.fingerprint
+src.teleon.knowledge.code_genome.nearest_genomes -> src.teleon.knowledge.code_genome.decompose
+src.teleon.knowledge.code_genome.nearest_genomes -> src.teleon.knowledge.code_genome.fingerprint
+src.teleon.knowledge.code_genome.nearest_genomes -> src.teleon.knowledge.code_genome.genome_similarity
+src.teleon.knowledge.code_genome._self_test -> src.teleon.knowledge.code_genome.decompose
+src.teleon.knowledge.code_genome._self_test -> src.teleon.knowledge.code_genome.fingerprint
+src.teleon.knowledge.code_genome._self_test -> src.teleon.knowledge.code_genome.fingerprint
+src.teleon.knowledge.code_genome._self_test -> src.teleon.knowledge.code_genome.fingerprint
+src.teleon.knowledge.code_genome._self_test -> src.teleon.knowledge.code_genome.nearest_genomes
+src.teleon.knowledge.code_genome._self_test -> src.teleon.knowledge.code_genome.genome_similarity
+src.teleon.knowledge.code_genome._self_test -> src.teleon.knowledge.code_genome.genome_similarity
+src.teleon.knowledge.code_genome._self_test -> src.teleon.knowledge.code_genome.genome_similarity
+src.teleon.knowledge.code_genome._self_test -> src.teleon.knowledge.code_genome.fingerprint
+src.teleon.knowledge.code_genome._self_test -> src.teleon.knowledge.code_genome.genome_similarity

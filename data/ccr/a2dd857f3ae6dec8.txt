@@ -1,0 +1,23 @@
+MODULE src/teleon/registry/records.py
+## API signatures
+```python
+"""registry.records — the SCALE record pipeline: every registry -> enriched, embedded, pgvector-ready records."""
+EMBED_DIM = ...
+_SYNTH_DOMAINS = ...
+def _to_record(registry: str, raw: dict, *, synthetic: bool=False) -> dict
+def real_records(registry: str) -> list[dict]
+    # REAL records from the catalog (any curated OR auto-discovered catalog).
+def synthetic_records(registry: str, n: int) -> list[dict]
+    # n templated CANDIDATE records (flagged synthetic) — proves storage/search at scale, never claimed as real.
+def build_records(registry: str, *, target: int=1000) -> list[dict]
+    # Real records first, topped up with flagged synthetic candidates to reach `target` (>=1000/registry).
+def _cosine(a: list[float], b: list[float]) -> float
+def record_search(query: str, records: list[dict], *, limit: int=10) -> list[dict]
+    # VECTOR search: rank records by cosine against the query embedding (the pgvector floor; same op pgvector runs).
+```
+## intra-module call edges
+src.teleon.registry.records.real_records -> src.teleon.registry.records._to_record
+src.teleon.registry.records.synthetic_records -> src.teleon.registry.records._to_record
+src.teleon.registry.records.build_records -> src.teleon.registry.records.real_records
+src.teleon.registry.records.build_records -> src.teleon.registry.records.synthetic_records
+src.teleon.registry.records.record_search -> src.teleon.registry.records._cosine

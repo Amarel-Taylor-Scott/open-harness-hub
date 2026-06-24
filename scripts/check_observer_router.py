@@ -47,15 +47,18 @@ def main() -> int:
         {"role": "user", "content": "let me write a pdf parser from scratch"},        # reinvention (grounded)
         {"role": "user", "content": "I need browser automation for the login flow"},   # adversarial (API exists?)
         {"role": "user", "content": _FAKE_SECRET_LINE},                                # footgun (secret, can block)
-        {"role": "user", "content": "now add jwt and a refresh token and oauth flow"}, # cluster (auth infra)
+        {"role": "user", "content": "now add jwt and a refresh token and oauth flow"}, # cluster + stack (auth infra)
+        {"role": "user", "content": "let me build a custom retry with exponential backoff"},  # stack (tenacity)
         {"role": "user", "content": "rm -rf / now"},                                   # footgun (destructive)
     ]
 
     rev = route_session(session, mode="review_only")
     types = {f["type"] for f in rev["report"]}
-    ck("taxonomy fires >=4 distinct module types", len(types) >= 4, str(sorted(types)))
+    ck("taxonomy fires >=5 distinct module types", len(types) >= 5, str(sorted(types)))
     ck("reinvention is grounded in the federation", any(
         f["type"] == "reinvention" and f["source_ref"].get("existing") for f in rev["report"]))
+    ck("stack_reinvention is grounded in the dependency graph", any(
+        f["type"] == "stack_reinvention" and f["source_ref"].get("covering") for f in rev["report"]))
     ck("adversarial fired (assumption challenged)", "adversarial" in types)
     ck("footgun fired on the secret + the destructive command", sum(
         1 for f in rev["report"] if f["type"] == "footgun") >= 2)

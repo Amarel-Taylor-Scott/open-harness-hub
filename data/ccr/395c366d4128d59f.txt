@@ -1,0 +1,18 @@
+MODULE src/teleon/registry/plane.py
+## API signatures
+```python
+"""registry.plane — policy-driven selection over a PLANE of interchangeable adapters (the flexible alternative to
+hardcoded best_X() wrappers)."""
+class Candidate:
+    # One adapter in a plane + the metadata a policy ranks on.
+def _local(c: Candidate) -> int
+DEFAULT_POLICY = ...
+def register_policy(name: str, key: Callable[[Candidate], tuple]) -> None
+    # Add a selection preference; select() never changes.
+def ranked(candidates: list[Candidate], policy: str=DEFAULT_POLICY, *, require_keyless: bool=False) -> list[Candidate]
+    # The candidates ranked by `policy` (filtered to keyless when required) — for selection + introspection.
+def select(candidates: list[Candidate], policy: str=DEFAULT_POLICY, *, require_keyless: bool=False)
+    # Rank by policy, then DESCEND to the first AVAILABLE candidate (the fallback chain). Honest: None if none
+```
+## intra-module call edges
+src.teleon.registry.plane.select -> src.teleon.registry.plane.ranked

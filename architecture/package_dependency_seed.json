@@ -1,0 +1,25 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-23",
+  "principle": "Package Dependency seed (substrate for the owner's Registry #92, Dependency Graph Intelligence) — public 'package -> requires' edges + the capabilities each package PROVIDES, so the graph can answer 'why build a custom X — this whole dependency stack already exists?' (transitive closure / ecosystem clusters). These are public metadata facts (candidate); the full graph is computed by scraping PyPI/npm/Cargo manifests via #91. serves_truth=false.",
+  "serves_truth": false,
+  "packages": [
+    {"id": "ocrmypdf", "ecosystem": "python", "requires": ["pikepdf", "pdfminer-six", "pillow", "tesseract"], "provides": ["ocr", "pdf_text_extraction"]},
+    {"id": "pikepdf", "ecosystem": "python", "requires": ["lxml"], "provides": ["pdf_manipulation"]},
+    {"id": "pdfminer-six", "ecosystem": "python", "requires": ["charset-normalizer"], "provides": ["pdf_text_extraction"]},
+    {"id": "pymupdf", "ecosystem": "python", "requires": [], "provides": ["pdf_text_extraction", "pdf_render"]},
+    {"id": "pypdf", "ecosystem": "python", "requires": [], "provides": ["pdf_manipulation"]},
+    {"id": "pillow", "ecosystem": "python", "requires": [], "provides": ["image_processing"]},
+    {"id": "tenacity", "ecosystem": "python", "requires": [], "provides": ["retry", "exponential_backoff"]},
+    {"id": "authlib", "ecosystem": "python", "requires": ["cryptography"], "provides": ["oauth", "jwt", "openid_connect"]},
+    {"id": "oauthlib", "ecosystem": "python", "requires": [], "provides": ["oauth"]},
+    {"id": "cryptography", "ecosystem": "python", "requires": ["cffi"], "provides": ["encryption", "hashing"]},
+    {"id": "fastapi", "ecosystem": "python", "requires": ["starlette", "pydantic"], "provides": ["web_framework", "api"]},
+    {"id": "starlette", "ecosystem": "python", "requires": ["anyio"], "provides": ["asgi", "routing"]},
+    {"id": "pydantic", "ecosystem": "python", "requires": [], "provides": ["validation", "schema"]},
+    {"id": "qdrant-client", "ecosystem": "python", "requires": ["grpcio", "httpx"], "provides": ["vector_search"]},
+    {"id": "chromadb", "ecosystem": "python", "requires": ["numpy", "httpx"], "provides": ["vector_search", "embedding_store"]},
+    {"id": "celery", "ecosystem": "python", "requires": ["kombu", "billiard"], "provides": ["queue_worker", "scheduler"]},
+    {"id": "redis-py", "ecosystem": "python", "requires": [], "provides": ["cache", "queue"]}
+  ]
+}

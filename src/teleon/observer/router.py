@@ -25,6 +25,7 @@ import json
 import re
 from pathlib import Path
 
+from ..knowledge import dependency_graph as _depgraph
 from ..registry.reinvention_guard import check as _guard_check, detect_intent as _detect_intent
 
 _REPO = Path(__file__).resolve().parents[3]
@@ -47,6 +48,7 @@ _DUP_MIN_TOKENS = 200
 _CONF_REINVENTION = 0.8
 _CONF_OVERSIZED = 0.55
 _CONF_DUPLICATE = 0.7
+_CONF_STACK = 0.82  # stack-level reinvention is graph-grounded (transitive coverage) -> high
 _PER_TYPE_FLOOR = 0.5  # a finding below its module's confidence floor is dropped before the budget even runs
 
 
@@ -165,6 +167,46 @@ class ReinventionClusterModule(InterventionModule):
         return out
 
 
+class StackReinventionModule(InterventionModule):
+    """Stack-level reinvention, GROUNDED in the dependency graph (#101): 'this whole dependency stack already provides
+    it' via transitive coverage — deeper than the single-keyword federation check. Deterministic (no embedder)."""
+    type = "stack_reinvention"
+
+    # generic capability words that appear in ordinary prose ('an api', 'the schema') -> too noisy to fire on alone
+    # (found by DOGFOODING the reviewer on a real session: bare 'schema'/'api' over-fired). Distinctive multi-word or
+    # domain caps (vector_search, exponential_backoff, oauth, ocr, pdf_text_extraction) stay.
+    _AMBIGUOUS = frozenset({"api", "schema", "validation", "routing", "cache", "queue", "search", "encryption",
+                            "hashing", "image_processing"})
+
+    def __init__(self):
+        self._graph = _depgraph.build_graph()
+        # capability vocabulary from what packages PROVIDE; match as word-bounded phrases (underscore or space),
+        # excluding the ambiguous generic words.
+        self._caps = {c: re.compile(rf"\b{re.escape(c.replace('_', ' '))}\b")
+                      for c in self._graph["provides"] if c not in self._AMBIGUOUS}
+
+    def _caps_in(self, text: str) -> list[str]:
+        low = text.lower().replace("_", " ")
+        return sorted(c for c, rx in self._caps.items() if rx.search(low))
+
+    def plausible(self, text: str, state: dict) -> bool:
+        return _detect_intent(text)["build_intent"] and bool(self._caps_in(text))
+
+    def ground(self, text: str, state: dict) -> list[dict]:
+        wanted = self._caps_in(text)
+        if not wanted:
+            return []
+        se = _depgraph.stack_exists(wanted, self._graph)
+        if not se["stack_exists"]:
+            return []
+        pkgs = [c["package"] for c in se["covering_packages"]]
+        return [_iv("stack_reinvention", _CONF_STACK,
+                    "an existing dependency stack already provides this — don't rebuild it",
+                    ", ".join(wanted), f"reuse {', '.join(pkgs[:3])} (covers these via its dependency stack)",
+                    max_action="notice", source_ref={"covering": se["covering_packages"]},
+                    dedup_id="stack:" + ":".join(wanted))]
+
+
 class OversizedContextModule(InterventionModule):
     type = "oversized_context"
 
@@ -196,8 +238,8 @@ class DuplicateContextModule(InterventionModule):
 
 def default_modules() -> list[InterventionModule]:
     h = _load_heuristics()
-    return [ReinventionModule(), FootgunModule(h), AdversarialModule(h), ReinventionClusterModule(h),
-            OversizedContextModule(), DuplicateContextModule()]
+    return [ReinventionModule(), StackReinventionModule(), FootgunModule(h), AdversarialModule(h),
+            ReinventionClusterModule(h), OversizedContextModule(), DuplicateContextModule()]
 
 
 def _message_text(m: dict) -> str:
