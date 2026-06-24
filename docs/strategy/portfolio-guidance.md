@@ -10,8 +10,8 @@ PROPOSALS — owner-gated.** Where evidence is thin the docs say so; this guidan
 
 ## The one-sentence portfolio
 
-**Parent brand: "AI Done Right" — tagline *"AI, done right."*** One holding company over three product layers plus a
-developer-facing review surface:
+**Parent brand: "AI Done Right" — tagline *"AI, done right."*** One holding company over three product layers plus
+Teleon Observer (the AI-usage session-review wedge):
 
 ```
 AI Done Right  (umbrella IP · brands · standards · shared R&D/security/governance)
