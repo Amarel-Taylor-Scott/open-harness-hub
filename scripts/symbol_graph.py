@@ -59,14 +59,33 @@ def _call_name(fn: ast.AST) -> str | None:
 
 
 def _import_bindings(tree: ast.AST) -> dict[str, str]:
-    """local-name -> the in-repo source module it was imported from (level==0 `from X import name`). Lets a call to
-    ``name`` resolve to the module it actually came from instead of any same-named def elsewhere in the repo."""
+    """local-name -> the in-repo source module it was imported from (level==0 `from X import name`). Lets a bare call
+    ``name()`` resolve to the module it actually came from instead of any same-named def elsewhere in the repo."""
     binds: dict[str, str] = {}
     for node in ast.walk(tree):
         if isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
             for a in node.names:
                 binds[a.asname or a.name] = node.module
     return binds
+
+
+def _module_aliases(tree: ast.AST, modules: set[str]) -> dict[str, str]:
+    """local-name -> in-repo MODULE it refers to, so an attribute call ``alias.func()`` can resolve ``func`` inside
+    that module (the only attribute calls we resolve besides ``self``/``cls``). Covers `from pkg import submodule`
+    and `import pkg.sub as alias` — receiver must be a plain Name, so dotted `import a.b.c` (called `a.b.c.f()`) is
+    left unmatched rather than mis-bound."""
+    out: dict[str, str] = {}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
+            for a in node.names:
+                full = f"{node.module}.{a.name}"
+                if full in modules:
+                    out[a.asname or a.name] = full
+        elif isinstance(node, ast.Import):
+            for a in node.names:
+                if a.name in modules:
+                    out[a.asname or a.name] = a.name
+    return out
 
 
 def build_graph(roots: list[str] | None = None) -> dict:
