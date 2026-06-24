@@ -1,16 +1,51 @@
 {
   "version": "0.1.0",
-  "updated": "2026-06-23",
+  "updated": "2026-06-24",
   "principle": "Question bank + pattern->registry map for DISTILLING Kaggle notebooks into candidate registry ENTRIES (the LLM population of #88 + the registries it feeds). Each notebook is investigated via the LLM lane (Kimi/GLM/Claude over the ollama gateway, OH_LLM_API_KEY); the deterministic FLOOR maps detected patterns -> candidate entries when no lane. LOSSLESS DISTILLATION CLAUSE: distillation is NEVER replacement — keep the raw kernel + patterns + LLM output + lineage. serves_truth=false (a distilled insight is a CANDIDATE; verify + promotion boundary before adoption).",
   "serves_truth": false,
   "questions": [
-    {"id": "pipeline", "intent": "pipeline_extraction", "prompt": "What is the core end-to-end pipeline (data -> model -> output)? List the stages in order.", "yields": "execution_pattern candidate (#35)"},
-    {"id": "lift", "intent": "lift_technique", "prompt": "What single technique most drives this notebook's score/lift, and why does it work?", "yields": "optimization_pass candidate (#10)"},
-    {"id": "reusable", "intent": "reusability", "prompt": "What here is reusable as a governed COMPONENT (a tool/step) vs competition-specific glue?", "yields": "component candidate (#2)"},
-    {"id": "model", "intent": "model_strategy", "prompt": "Which models + quantization/serving (4bit/8bit/vLLM/PEFT)? Why those?", "yields": "model + determinism candidate (#4/#51)"},
-    {"id": "prompt", "intent": "prompt_strategy", "prompt": "What prompting pattern (CoT / few-shot / constrained / chat-template)?", "yields": "prompt candidate (#6)"},
-    {"id": "novelty", "intent": "novelty", "prompt": "What is NOVEL vs standard practice? What would a strong baseline miss?", "yields": "idea / research candidate"},
-    {"id": "registry", "intent": "registry_entry", "prompt": "Does this suggest a NEW registry or a new ENTRY in an existing one? Which registry, and what shape?", "yields": "registry-entry candidate"}
+    {
+      "id": "pipeline",
+      "intent": "pipeline_extraction",
+      "prompt": "What is the core end-to-end pipeline (data -> model -> output)? List the stages in order.",
+      "yields": "execution_pattern candidate (#35)"
+    },
+    {
+      "id": "lift",
+      "intent": "lift_technique",
+      "prompt": "What single technique most drives this notebook's score/lift, and why does it work?",
+      "yields": "optimization_pass candidate (#10)"
+    },
+    {
+      "id": "reusable",
+      "intent": "reusability",
+      "prompt": "What here is reusable as a governed COMPONENT (a tool/step) vs competition-specific glue?",
+      "yields": "component candidate (#2)"
+    },
+    {
+      "id": "model",
+      "intent": "model_strategy",
+      "prompt": "Which models + quantization/serving (4bit/8bit/vLLM/PEFT)? Why those?",
+      "yields": "model + determinism candidate (#4/#51)"
+    },
+    {
+      "id": "prompt",
+      "intent": "prompt_strategy",
+      "prompt": "What prompting pattern (CoT / few-shot / constrained / chat-template)?",
+      "yields": "prompt candidate (#6)"
+    },
+    {
+      "id": "novelty",
+      "intent": "novelty",
+      "prompt": "What is NOVEL vs standard practice? What would a strong baseline miss?",
+      "yields": "idea / research candidate"
+    },
+    {
+      "id": "registry",
+      "intent": "registry_entry",
+      "prompt": "Does this suggest a NEW registry or a new ENTRY in an existing one? Which registry, and what shape?",
+      "yields": "registry-entry candidate"
+    }
   ],
   "pattern_to_registry": {
     "import_transformers": "component(2): HuggingFace transformers",
@@ -32,5 +67,160 @@
     "few_shot": "prompt(6): few-shot prompting",
     "import_torch": "component(2): PyTorch",
     "import_sklearn": "component(2): scikit-learn"
-  }
+  },
+  "pattern_enrichment": {
+    "import_transformers": {
+      "description": "The HuggingFace `transformers` library — load pretrained encoder/decoder/causal-LM checkpoints behind a uniform AutoModel/AutoTokenizer API across thousands of architectures.",
+      "use_cases": [
+        "Load an LLM or embedding model by name without architecture-specific code",
+        "Swap model backbones behind one API to compare accuracy/cost",
+        "Tokenize and run inference for classification, generation, or feature extraction"
+      ]
+    },
+    "ensemble_average": {
+      "description": "Average or weight-blend the predictions of several independently-trained models to cut variance and lift accuracy over any single model.",
+      "use_cases": [
+        "Blend folds/seeds to stabilize a noisy single-model score",
+        "Combine diverse families (GBM + NN) whose errors are uncorrelated",
+        "Late-fuse probabilities before thresholding for a calibration gain"
+      ]
+    },
+    "kfold_split": {
+      "description": "Partition the data into k folds, train on k-1 and validate on the held-out fold rotating — estimates generalization without a separate holdout and yields out-of-fold predictions.",
+      "use_cases": [
+        "Estimate true generalization error on small/medium datasets",
+        "Produce out-of-fold predictions for stacking/blending",
+        "Tune hyperparameters against a stable CV score, not one split"
+      ]
+    },
+    "kfold_cross_validation": {
+      "description": "The full cross-validation loop: repeatedly fit and score across folds and aggregate the per-fold metric (mean ± std) as the model-selection signal.",
+      "use_cases": [
+        "Report mean±std across folds rather than one fragile score",
+        "Compare candidate models on identical fold splits for a fair A/B",
+        "Detect overfitting via a large train-vs-CV gap"
+      ]
+    },
+    "import_bitsandbytes": {
+      "description": "The `bitsandbytes` library for 8-bit/4-bit quantized weights and optimizers — fit larger models on limited VRAM with minimal accuracy loss.",
+      "use_cases": [
+        "Serve a model that wouldn't otherwise fit on one consumer GPU",
+        "Cut inference memory/cost while keeping near-FP16 quality",
+        "Use 8-bit Adam to train larger models within a memory budget"
+      ]
+    },
+    "model_load_4bit": {
+      "description": "Load weights in 4-bit (NF4/FP4) precision so a large checkpoint fits in a fraction of the VRAM — a small quality drop for a large memory/cost saving.",
+      "use_cases": [
+        "Run a 13B+ model on a single mid-range GPU",
+        "Stretch a fixed VRAM budget to a larger, more capable model",
+        "Pair with QLoRA to fine-tune a quantized base cheaply"
+      ]
+    },
+    "model_load_8bit": {
+      "description": "Load weights in 8-bit precision — roughly half the memory of FP16 with negligible accuracy loss for most inference.",
+      "use_cases": [
+        "Halve inference memory with near-lossless quality",
+        "Serve more concurrent requests per GPU",
+        "A safer default than 4-bit when quality is critical"
+      ]
+    },
+    "generate_kwargs": {
+      "description": "The decoding parameters (temperature, top_p, top_k, repetition_penalty, max_new_tokens, num_beams) that shape an LLM's output distribution at inference time.",
+      "use_cases": [
+        "Trade determinism vs creativity via temperature/top_p",
+        "Suppress repetition/looping with repetition_penalty/no_repeat_ngram",
+        "Cap latency and cost with max_new_tokens and beam count"
+      ]
+    },
+    "trust_remote_code": {
+      "description": "`trust_remote_code=True` executes arbitrary model-repo Python at load time — a supply-chain RISK that must be gated to vetted publishers, never enabled blindly.",
+      "use_cases": [
+        "Flag/deny loading untrusted checkpoints that require remote code",
+        "Pin to a reviewed commit/publisher before enabling",
+        "Audit which pipeline steps set this flag as a security control"
+      ]
+    },
+    "system_prompt": {
+      "description": "A leading instruction that sets the model's role, constraints, and output contract for the whole conversation, separate from per-turn user input.",
+      "use_cases": [
+        "Pin a persona, tone, or safety policy across a session",
+        "Declare the output schema/format the model must follow",
+        "Inject tool/skill instructions the user shouldn't have to repeat"
+      ]
+    },
+    "chat_template": {
+      "description": "The model-specific token format that frames multi-turn roles (system/user/assistant) — the correct template is required for instruction-tuned models to behave as trained.",
+      "use_cases": [
+        "Format messages with the exact special tokens a chat model expects",
+        "Port a prompt across models by swapping templates, not text",
+        "Avoid silent quality loss from a mismatched or absent template"
+      ]
+    },
+    "import_peft": {
+      "description": "Parameter-Efficient Fine-Tuning (LoRA/adapters/prefix-tuning) — adapt a frozen base by training a tiny set of added weights, cutting fine-tune cost and storage by orders of magnitude.",
+      "use_cases": [
+        "Fine-tune a large model on one GPU by training only adapters",
+        "Ship many task-specific adapters over one shared base",
+        "Combine with a 4-bit base (QLoRA) for cheap domain adaptation"
+      ]
+    },
+    "lightgbm": {
+      "description": "A fast histogram-based gradient-boosted-trees library — a top performer on tabular data with strong defaults, native categorical handling, and low training cost.",
+      "use_cases": [
+        "Strong (often winning) baseline on tabular regression/classification",
+        "Train fast on large row counts where deep nets underperform",
+        "Get feature importance and fast iteration for tabular EDA"
+      ]
+    },
+    "import_lightgbm": {
+      "description": "The `lightgbm` import — entry point to LightGBM's sklearn-style and native training APIs.",
+      "use_cases": [
+        "Drop-in gradient-boosting baseline via LGBMClassifier/LGBMRegressor",
+        "Use the native Dataset/train API for custom objectives/callbacks",
+        "Early-stop on a validation set to avoid overfit"
+      ]
+    },
+    "vllm": {
+      "description": "vLLM — a high-throughput LLM serving engine using PagedAttention and continuous batching to maximize tokens/sec and GPU utilization.",
+      "use_cases": [
+        "Serve an open model at high throughput with continuous batching",
+        "Cut per-token serving cost vs naive HF generate loops",
+        "Expose an OpenAI-compatible endpoint for a self-hosted model"
+      ]
+    },
+    "logits_processor": {
+      "description": "A hook that edits next-token logits during generation to enforce constraints — grammar/JSON validity, allowed vocab, banned tokens — making output machine-parseable by construction.",
+      "use_cases": [
+        "Force valid JSON/structured output without post-hoc repair",
+        "Restrict generation to an allowed label set for classification",
+        "Ban or boost specific tokens for safety or formatting"
+      ]
+    },
+    "few_shot": {
+      "description": "Include a handful of input→output exemplars in the prompt so the model infers the task by analogy, with no weight updates (in-context learning).",
+      "use_cases": [
+        "Teach a task format/label set with 2–8 examples, no training",
+        "Raise accuracy on a niche task handled poorly zero-shot",
+        "Pin output style/schema by demonstration rather than instruction"
+      ]
+    },
+    "import_torch": {
+      "description": "PyTorch — the tensor + autograd framework underpinning most modern deep-learning training and inference, with eager execution and a large ecosystem.",
+      "use_cases": [
+        "Define and train custom neural nets with autograd",
+        "Run GPU tensor compute for inference or feature extraction",
+        "Back HuggingFace/PEFT/vLLM, which build on torch"
+      ]
+    },
+    "import_sklearn": {
+      "description": "scikit-learn — the standard classical-ML toolkit: preprocessing, model selection, and dozens of estimators behind one consistent fit/predict API.",
+      "use_cases": [
+        "Strong non-deep baselines (linear, SVM, RF) on tabular data",
+        "Pipelines for preprocessing + CV + metrics in a few lines",
+        "Train/test split, scaling, and metric utilities"
+      ]
+    }
+  },
+  "pattern_enrichment_provenance": "model_authored (Claude Code enrichment loop, 2026-06-24); candidate metadata, serves_truth=false; raw pattern_to_registry preserved unchanged."
 }

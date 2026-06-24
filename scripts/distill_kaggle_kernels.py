@@ -42,8 +42,15 @@ def _load_findings() -> dict[str, list[str]]:
     return out
 
 
-def distill_floor(findings: dict[str, list[str]], pattern_map: dict[str, str]) -> list[dict]:
-    """Each known pattern -> a candidate registry entry, with cross-kernel frequency + example-kernel lineage."""
+def distill_floor(findings: dict[str, list[str]], pattern_map: dict[str, str],
+                  enrichment: dict[str, dict] | None = None) -> list[dict]:
+    """Each known pattern -> a candidate registry entry, with cross-kernel frequency + example-kernel lineage.
+
+    ``enrichment`` (architecture/kaggle_mining_questions.json -> pattern_enrichment) attaches MODEL-AUTHORED
+    description + use_cases per pattern — the metadata the deterministic floor cannot produce (llm_used=False).
+    Backward-compatible: a pattern with no enrichment simply omits those fields. serves_truth stays false.
+    """
+    enrichment = enrichment or {}
     freq = Counter(p for pats in findings.values() for p in pats)
     candidates = []
     for pattern, registry_candidate in pattern_map.items():
@@ -51,11 +58,18 @@ def distill_floor(findings: dict[str, list[str]], pattern_map: dict[str, str]) -
         if n == 0:
             continue
         lineage = [k for k, pats in findings.items() if pattern in pats][:_TOP_LINEAGE]
-        candidates.append({
+        cand = {
             "pattern": pattern, "registry_candidate": registry_candidate,
             "kernels": n, "example_kernels": lineage,
             "via": "deterministic_floor", "candidate": True, "serves_truth": False,
-        })
+        }
+        meta = enrichment.get(pattern)
+        if meta and meta.get("description") and meta.get("use_cases"):
+            cand["description"] = meta["description"]
+            cand["use_cases"] = list(meta["use_cases"])
+            cand["enriched"] = True
+            cand["enrichment_via"] = "model_authored"
+        candidates.append(cand)
     candidates.sort(key=lambda c: c["kernels"], reverse=True)
     return candidates
 
@@ -84,7 +98,7 @@ def _llm_distill_sample(findings: dict[str, list[str]], qb: dict) -> list[dict]:
 def _build(live: bool = False) -> dict:
     findings = _load_findings()
     qb = json.loads(_QB.read_text())
-    floor = distill_floor(findings, qb.get("pattern_to_registry", {}))
+    floor = distill_floor(findings, qb.get("pattern_to_registry", {}), qb.get("pattern_enrichment", {}))
     llm = _llm_distill_sample(findings, qb) if live else []
     return {
         "version": "0.1.0",
@@ -92,6 +106,7 @@ def _build(live: bool = False) -> dict:
         "serves_truth": False,
         "generated_from": _FINDINGS_GLOB,
         "raw": {"total_kernels": len(findings), "total_pattern_hits": sum(len(p) for p in findings.values())},
+        "enriched_candidates": sum(1 for c in floor if c.get("enriched")),
         "llm_used": bool(llm),
         "llm_note": "set OH_LLM_API_KEY + --live for Kimi/GLM/Claude per-kernel distillation" if not llm else "ollama lane",
         "distilled_candidates": floor,
@@ -132,6 +147,11 @@ def main() -> int:
     ck("every candidate is governed (candidate-only, non-truth)", all(c["candidate"] and not c["serves_truth"] for c in cands))
     ck("sorted by frequency (lossless aggregate)", all(cands[i]["kernels"] >= cands[i + 1]["kernels"] for i in range(len(cands) - 1)))
     ck("honest about the LLM lane", doc["llm_used"] is False and "OH_LLM_API_KEY" in doc["llm_note"])
+    enriched = [c for c in cands if c.get("enriched")]
+    ck("model-authored enrichment attached to candidates", len(enriched) >= 5, str(len(enriched)))
+    ck("enriched candidates carry description + >=2 use_cases", all(c.get("description") and len(c.get("use_cases", [])) >= 2 for c in enriched))
+    ck("enrichment is governed (model_authored, candidate-only)", all(c.get("enrichment_via") == "model_authored" and not c["serves_truth"] for c in enriched))
+    ck("enriched count reported in doc", doc.get("enriched_candidates") == len(enriched))
     ck("serves_truth false", doc["serves_truth"] is False)
 
     if fails:
