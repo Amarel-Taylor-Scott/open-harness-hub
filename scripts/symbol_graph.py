@@ -8,11 +8,12 @@ external CodeGraph dependency); rendered compactly for a context pack and emitta
 
 Edges carry STRENGTH so a change-audit can rank what to review:
   - ``weight``     — call edges: how many distinct call sites (multiplicity); contains/inherits: 1.
-  - ``confidence`` — "exact" (resolved via same-module def or an import binding, or a globally-unique name) vs
-                     "name" (an ambiguous global-name fallback — many defs share the short name, so it is a guess).
-Resolution is MODULE-AWARE: a call to ``foo`` binds to the ``foo`` defined in this module or imported into it before
-falling back to a repo-wide name match — so cross-module call edges are far less likely to point at the wrong same-
-named symbol than a first-match resolver. Offline, stdlib only. serves_truth=false (a static derivation).
+  - ``confidence`` — always "exact": every emitted edge is CONFIDENTLY resolved (kept as a field for shape stability).
+Resolution is MODULE-AWARE and CONFIDENT-ONLY: a call to ``foo`` resolves to the ``foo`` defined in this module, or
+imported into it, or globally UNIQUE in the repo. A name with several same-named defs and no binding is AMBIGUOUS —
+we REFUSE to guess a winner (guessing manufactures false hubs, e.g. one generic ``.get`` absorbing thousands of
+unrelated call sites) and instead DROP it, counted in ``graph["stats"]["ambiguous_calls_dropped"]``. So every call
+edge points at the right symbol, and the load-bearing ranking is trustworthy. Offline, stdlib only. serves_truth=false.
 
   --self-test   prove nodes+edges are extracted (classes/functions/methods + calls/inherits) over src/teleon
   --emit        write docs/context/symbol-graph.generated.json + .md
@@ -109,49 +110,54 @@ def build_graph(roots: list[str] | None = None) -> dict:
                         defs_by_name[sub.name].append(mq)
                         defs_in_module[mod].setdefault(sub.name, mq)  # first method def wins the bare name in-module
 
-    def _resolve(name: str | None, caller_mod: str) -> tuple[str | None, str | None]:
-        """(qualified_id, confidence) | (None, None). Module-aware, cheapest-confident-first."""
+    # CONFIDENT-ONLY resolution. We attribute a call to a concrete symbol ONLY when we can do so without guessing:
+    # (1) the name is defined in the caller's own module, (2) it was imported into the caller from a module that
+    # defines it, or (3) it is globally UNIQUE in the repo. An in-repo name with several same-named definitions and
+    # no binding is AMBIGUOUS — we do NOT pick an arbitrary winner (that manufactures false hubs like a generic
+    # `.get`/`.append` absorbing thousands of unrelated call sites). Ambiguous names are dropped and COUNTED so the
+    # strength signal is trustworthy. (Calls to builtins/stdlib/external names are simply not in-repo → ignored.)
+    AMBIGUOUS = "<ambiguous>"
+
+    def _resolve(name: str | None, caller_mod: str) -> str | None:
         if not name:
-            return None, None
+            return None
         local = defs_in_module.get(caller_mod, {})
         if name in local:                                    # 1) defined right here
-            return local[name], "exact"
+            return local[name]
         tgt = binds_by_mod.get(caller_mod, {}).get(name)     # 2) imported from a module that defines it
         if tgt and name in defs_in_module.get(tgt, {}):
-            return defs_in_module[tgt][name], "exact"
+            return defs_in_module[tgt][name]
         cands = defs_by_name.get(name, [])
         if len(cands) == 1:                                  # 3) globally unique name -> unambiguous
-            return cands[0], "exact"
-        if cands:                                            # 4) ambiguous -> first-match, flagged as a guess
-            return cands[0], "name"
-        return None, None
+            return cands[0]
+        if cands:                                            # ambiguous in-repo name -> refuse to guess
+            return AMBIGUOUS
+        return None                                          # not an in-repo symbol (builtin/stdlib/external)
 
-    call_acc: dict[tuple[str, str], list] = {}               # (caller, callee) -> [weight, confidence]
+    ambiguous_dropped = 0
+    call_acc: dict[tuple[str, str], int] = {}                # (caller, callee) -> weight (distinct call sites)
     for mod, tree in trees.items():
         for node in tree.body:
             if isinstance(node, ast.ClassDef):
                 for base in node.bases:
                     bn = base.id if isinstance(base, ast.Name) else (base.attr if isinstance(base, ast.Attribute) else None)
-                    r, conf = _resolve(bn, mod)
-                    if r:
-                        edges.append({"src": f"{mod}.{node.name}", "dst": r, "type": "inherits", "weight": 1, "confidence": conf})
+                    r = _resolve(bn, mod)
+                    if r and r != AMBIGUOUS:
+                        edges.append({"src": f"{mod}.{node.name}", "dst": r, "type": "inherits", "weight": 1, "confidence": "exact"})
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 caller = f"{mod}.{node.name}"
                 for sub in ast.walk(node):
                     if isinstance(sub, ast.Call):
-                        r, conf = _resolve(_call_name(sub.func), mod)
-                        if r and r != caller:
-                            slot = call_acc.get((caller, r))
-                            if slot:
-                                slot[0] += 1
-                                if conf == "exact":
-                                    slot[1] = "exact"
-                            else:
-                                call_acc[(caller, r)] = [1, conf]
-    for (s, d), (w, conf) in sorted(call_acc.items()):
-        edges.append({"src": s, "dst": d, "type": "calls", "weight": w, "confidence": conf})
-    return {"nodes": nodes, "edges": edges}
+                        r = _resolve(_call_name(sub.func), mod)
+                        if r == AMBIGUOUS:
+                            ambiguous_dropped += 1
+                        elif r and r != caller:
+                            call_acc[(caller, r)] = call_acc.get((caller, r), 0) + 1
+    for (s, d), w in sorted(call_acc.items()):
+        edges.append({"src": s, "dst": d, "type": "calls", "weight": w, "confidence": "exact"})
+    return {"nodes": nodes, "edges": edges,
+            "stats": {"ambiguous_calls_dropped": ambiguous_dropped, "call_edges": len(call_acc)}}
 
 
 def load_bearing(edges: list[dict]) -> Counter:
@@ -167,19 +173,18 @@ def render(graph: dict) -> str:
     nodes, edges = graph["nodes"], graph["edges"]
     inherits = sorted({(e["src"], e["dst"]) for e in edges if e["type"] == "inherits"})
     calls = [e for e in edges if e["type"] == "calls"]                      # already deduped per (src,dst), weighted
-    ambiguous = sum(1 for e in calls if e.get("confidence") == "name")
+    dropped = graph.get("stats", {}).get("ambiguous_calls_dropped", 0)
     by_kind = Counter(n["kind"] for n in nodes)
     out = ["# SYMBOL GRAPH (AST nodes + WEIGHTED edges — how functions/classes/methods RELATE)\n",
            f"nodes: {dict(by_kind)} · inherits={len(inherits)} · call-edges={len(calls)} "
-           f"(weight=call-sites; {ambiguous} are confidence=name/ambiguous)\n"]
+           f"(weight=call-sites, all confidently resolved; {dropped} ambiguous calls dropped, not guessed)\n"]
     if inherits:
         out.append("\n## Class hierarchy (class -> base)")
         out += [f"  {s} -> {d}" for s, d in inherits]
-    out.append("\n## Call graph (caller -> callee · xN call sites · ~=ambiguous; strongest first)")
+    out.append("\n## Call graph (caller -> callee · xN call sites; strongest first)")
     ranked = sorted(calls, key=lambda e: (-e.get("weight", 1), e["src"], e["dst"]))
     for e in ranked[:_MAX_CALL_EDGES]:
-        mark = "~" if e.get("confidence") == "name" else ""
-        out.append(f"  {e['src']} -> {e['dst']}  x{e.get('weight', 1)}{mark}")
+        out.append(f"  {e['src']} -> {e['dst']}  x{e.get('weight', 1)}")
     if len(ranked) > _MAX_CALL_EDGES:
         out.append(f"  … ({len(ranked) - _MAX_CALL_EDGES} weaker call edges omitted)")
     out.append("\n## Load-bearing symbols (highest WEIGHTED call in-degree — change carefully)")
@@ -207,7 +212,10 @@ def _self_test() -> int:
     ck("call edges are deduplicated per (src,dst) into one weighted edge",
        len({(e["src"], e["dst"]) for e in calls}) == len(calls))
     ck("multiplicity is captured (some call edge has weight>1)", any(e.get("weight", 1) > 1 for e in calls))
-    ck("module-aware resolution yields exact-confidence edges", any(e.get("confidence") == "exact" for e in calls))
+    ck("every call edge is confidently resolved (confidence=exact — no guessed targets)",
+       all(e.get("confidence") == "exact" for e in calls))
+    ck("ambiguous calls are dropped + COUNTED (no false hubs, no silent loss)",
+       isinstance(g.get("stats", {}).get("ambiguous_calls_dropped"), int) and g["stats"]["ambiguous_calls_dropped"] >= 0)
     lb = load_bearing(g["edges"])
     ck("load-bearing scoring is weighted + non-empty", bool(lb) and all(s > 0 for s in lb.values()))
     txt = render(g)
