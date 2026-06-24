@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
-"""symbol_graph — a SYMBOL-level AST graph (functions/classes/methods + call/inherit/contains edges).
+"""symbol_graph — a SYMBOL-level AST graph (functions/classes/methods + call/inherit/contains edges, WEIGHTED).
 
 Complements scripts/code_graph.py (which is file/module import-level): this adds the finer nodes + edges a review
 model needs to understand RELATIONSHIPS, not just files — the class hierarchy, the call graph (caller -> callee,
-resolved within the repo), and the load-bearing symbols (highest call in-degree). Built from the AST (no external
-CodeGraph dependency); rendered compactly for a context pack and emittable as JSON {nodes, edges}. Offline, stdlib
-only. serves_truth=false (a static derivation).
+resolved within the repo), and the load-bearing symbols (highest weighted call in-degree). Built from the AST (no
+external CodeGraph dependency); rendered compactly for a context pack and emittable as JSON {nodes, edges}.
+
+Edges carry STRENGTH so a change-audit can rank what to review:
+  - ``weight``     — call edges: how many distinct call sites (multiplicity); contains/inherits: 1.
+  - ``confidence`` — "exact" (resolved via same-module def or an import binding, or a globally-unique name) vs
+                     "name" (an ambiguous global-name fallback — many defs share the short name, so it is a guess).
+Resolution is MODULE-AWARE: a call to ``foo`` binds to the ``foo`` defined in this module or imported into it before
+falling back to a repo-wide name match — so cross-module call edges are far less likely to point at the wrong same-
+named symbol than a first-match resolver. Offline, stdlib only. serves_truth=false (a static derivation).
 
   --self-test   prove nodes+edges are extracted (classes/functions/methods + calls/inherits) over src/teleon
   --emit        write docs/context/symbol-graph.generated.json + .md
@@ -25,6 +32,10 @@ GRAPH_JSON = REPO / "docs" / "context" / "symbol-graph.generated.json"
 GRAPH_MD = REPO / "docs" / "context" / "symbol-graph.generated.md"
 _EXCLUDE = {"__pycache__", "_reference", "repo_reference", "node_modules", ".git"}
 _MAX_CALL_EDGES = 1500          # cap the call-edge render so a pack stays bounded (overflow count noted)
+# How much each confidence tier counts toward a symbol's load-bearing STRENGTH (weighted in-degree). An ambiguous
+# name-only edge is a guess, so it contributes a quarter of an exact (import-/module-resolved) edge. Single source —
+# codegraph.py imports CONFIDENCE_WEIGHT from here rather than re-defining the tiers (no magic values, no drift).
+CONFIDENCE_WEIGHT = {"exact": 1.0, "name": 0.25}
 
 
 def _modname(path: Path) -> str:
