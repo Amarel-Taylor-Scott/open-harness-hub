@@ -1,6 +1,6 @@
 # Proof Inventory
 
-**672** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
+**673** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
 
 - `scripts/ingest/context_rot.py`
 - `scripts/ingest/document_decompose.py`
@@ -169,6 +169,7 @@
 - `scripts/code_graph.py`
 - `scripts/symbol_graph.py`
 - `scripts/codegraph.py`
+- `scripts/check_substrate_layers.py`
 - `scripts/check_model_index.py`
 - `scripts/check_descent_method_catalog.py`
 - `scripts/check_self_optimizing_unit.py`

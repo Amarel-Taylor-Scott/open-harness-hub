@@ -62,6 +62,26 @@ Active `/goal` runs are now Baltor-first. Read
 component registry remains the substrate; Baltor context control is the product
 focus.
 
+### The Foundational Law (owner-installed 2026-06-24 — frames what we build)
+
+We are building a **systems layer for executable capability** (Teleon indexes/optimizes it, Baltor governs its
+truth, Open*Hubs structure it, Observer watches its usage), not point products. Four reconciled filters govern it
+(single source: `architecture/substrate_layers.json` → `foundational_law`; map of layers↔existing-assets↔gaps:
+`docs/strategy/computational-substrate-and-foundational-law.md`):
+
+1. **System filter** — *Does this improve compiler intelligence?* If no, don't build it.
+2. **Execution filter (descent)** — *Can intelligence be removed from this execution path?* Descend toward that
+   forever (the Teleon make-it-work→make-it-cheap→deterministic-substitution thesis).
+3. **Component admission** — must LIFT over the bare model AND the lift must be STRUCTURAL/durable (the
+   Capability-Gap Framework below).
+4. **Binding constraint** — **DEPTH BEFORE BREADTH**: every new layer must serve the ONE vertical being proven to a
+   paying customer (gated by `scripts/proposal_backlog.py`). Breadth without a revenue vertical is the failure mode.
+
+Filter #1 is necessary; #3+#4 make it sufficient. **Before building any "new" layer, check it doesn't already
+exist** — run `scripts/check_substrate_layers.py`, `scripts/codegraph.py --audit`, and the reinvention guard.
+*"This already exists, don't rebuild it"* is the highest-ROI decision in the architecture — including about our own
+work.
+
 Build a database-backed registry of reusable AI pipeline components and subcomponents that can scale from thousands to millions of rows without turning every row into a public static file.
 
 The product is not a pile of static definitions. It is a component network:
