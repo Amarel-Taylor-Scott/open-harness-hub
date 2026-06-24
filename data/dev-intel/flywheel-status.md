@@ -1,20 +1,20 @@
 # Flywheel heartbeat (development plane; serves_truth=false)
 
-cycle: **3772** · health: **ok**
-findings recorded: 17718 · research-radar hits: 46
+cycle: **3794** · health: **ok**
+findings recorded: 17814 · research-radar hits: 46
 
 ## Flywheels (last cycle run / errors)
-- sweep: last @ cycle 3771 · errors 0
-- status: last @ cycle 3765 · errors 0
-- yc: last @ cycle 3766 · errors 0
-- propose: last @ cycle 3770 · errors 0
-- hubs: last @ cycle 3761 · errors 0
-- health: last @ cycle 3763 · errors 0
-- autofix: last @ cycle 3768 · errors 0
-- cleanup: last @ cycle 3755 · errors 0
-- checkpoint: last @ cycle 3743 · errors 0
+- sweep: last @ cycle 3792 · errors 0
+- status: last @ cycle 3787 · errors 0
+- yc: last @ cycle 3793 · errors 0
+- propose: last @ cycle 3791 · errors 0
+- hubs: last @ cycle 3778 · errors 0
+- health: last @ cycle 3789 · errors 0
+- autofix: last @ cycle 3786 · errors 0
+- cleanup: last @ cycle 3783 · errors 0
+- checkpoint: last @ cycle 3774 · errors 0
 - logjam: last @ cycle 624 · errors 0
 
-last flywheel: sweep — swept a batch (122 were remaining)
+last flywheel: yc — YC readiness 0.75 (not yet); filed 3 gap(s) into the backlog
 
 Stop with: `touch .agent/STOP_REQUESTED`
