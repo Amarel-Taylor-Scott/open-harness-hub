@@ -756,6 +756,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_registry_compose.py", "check_registry_compose"),
     # ── registry_search: FEDERATED search across ALL registries (how a DAG builder uses the buffet) — search_all + the 3 builder workflows BUILD/TROUBLESHOOT/IMPROVE; on-menu registries queried, off-menu honestly surfaced; serves_truth=false ──
     ("scripts/check_registry_search.py", "check_registry_search"),
+    # ── reinvention_guard: the 'you're reinventing a solved problem' guardrail GROUNDED in the federation (the descent thesis as a product) — tiered cascade (heuristic -> cheap gate -> Tier2 search_all grounding); FIRES with real matches on solved problems, QUIET on genuinely-novel work; serves_truth=false ──
+    ("scripts/check_reinvention_guard.py", "check_reinvention_guard"),
     # ── distill_kaggle_kernels (#88 LLM population): distills the mined Kaggle kernels -> candidate registry ENTRIES (deterministic floor maps pattern->registry + frequency/lineage; LLM path Kimi/GLM/Claude via ollama when OH_LLM_API_KEY). LOSSLESS (keeps raw freq + lineage); candidates only; serves_truth=false ──
     ("scripts/distill_kaggle_kernels.py", "distill_kaggle_kernels"),
     # ── formula_registry (#98): named DETERMINISTIC formulas the compiler applies instead of an LLM (compound interest/Ohm's law/Reynolds/z-score/BMI) — the 'deterministic > probabilistic' core; spec-only (expression+variables+units, no eval), self-consistent (variables in expression); serves_truth=false ──

@@ -27,7 +27,10 @@ def _playbooks() -> dict:
 
 
 def _label(rec: dict) -> str:
-    return rec.get("name") or rec.get("id") or rec.get("canonical") or "?"
+    for k in ("name", "id", "canonical", "pass", "failure_type"):
+        if rec.get(k):
+            return str(rec[k])
+    return next((v for v in rec.values() if isinstance(v, str) and v), "?")
 
 
 def _resolve(registry_id: str, query: str | None = None) -> dict:

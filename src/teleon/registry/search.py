@@ -21,7 +21,10 @@ _PER_CATALOG = 5
 
 
 def _label(rec: dict) -> str:
-    return rec.get("name") or rec.get("id") or rec.get("canonical") or "?"
+    for k in ("name", "id", "canonical", "pass", "failure_type"):
+        if rec.get(k):
+            return str(rec[k])
+    return next((v for v in rec.values() if isinstance(v, str) and v), "?")
 
 
 def search_all(query: str, *, per_catalog: int = _PER_CATALOG) -> list[dict]:
