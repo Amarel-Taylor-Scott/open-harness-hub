@@ -56,7 +56,9 @@ discovery-at-scale / formal-IR yet").
   domain/trademark clearance (same gate as the Open*Hub `.io` sites). Never claimed.
 - This work does **not** change the family brand count (`products.js` drives that, computed by
   `check_ai_done_right_surface_family.py`). Adding registries is orthogonal to the 22-hub surface.
-- Note: `products.js` still lists `OpenEnvHub` (abbreviated) while the policy file uses
-  `OpenEnvironmentHub` (owner naming pref); and the six newest candidates (Linking/Sources/Redaction/
-  Provenance/Geo/Contradiction) aren't in `products.js` yet, so the family count reads 22, not 28.
-  Reconciling `products.js` is a separate, owner-visible brand change — left untouched here.
+- Note: `products.js` and the policy files now both use `OpenEnvironmentHub` — the `OpenEnvHub`
+  abbreviation is retired (owner directive 2026-06-24: no abbreviations in names). The public brand
+  surface (`products.js`, computed by `check_ai_done_right_surface_family.py`) is a curated SUBSET of
+  the full federation (`architecture/registry_ontology.json`, 103 registries); the newest candidates
+  aren't on the public brand surface yet, so the public family count differs from the federation
+  registry count. Both are COMPUTED from their sources — never hand-typed.
