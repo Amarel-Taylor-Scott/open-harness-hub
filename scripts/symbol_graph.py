@@ -54,10 +54,6 @@ def _iter_py(roots: list[str]):
                     yield f
 
 
-def _call_name(fn: ast.AST) -> str | None:
-    return fn.id if isinstance(fn, ast.Name) else (fn.attr if isinstance(fn, ast.Attribute) else None)
-
-
 def _import_bindings(tree: ast.AST) -> dict[str, str]:
     """local-name -> the in-repo source module it was imported from (level==0 `from X import name`). Lets a bare call
     ``name()`` resolve to the module it actually came from instead of any same-named def elsewhere in the repo."""
@@ -92,7 +88,8 @@ def build_graph(roots: list[str] | None = None) -> dict:
     """Return {nodes, edges}. nodes: module/class/function/method. edges: contains / inherits / calls, each WEIGHTED
     (call ``weight`` = distinct call sites) and tagged ``confidence`` ("exact" = same-module/import-/unique-name
     resolution; "name" = ambiguous global-name fallback). Calls are deduplicated per (src,dst) into one weighted edge.
-    Resolution is module-aware: same-module def -> import binding -> globally-unique name -> ambiguous first-match."""
+    Resolution is confident-only (see below): bare names via module/import/unique; attribute calls only via self/cls
+    or an imported module alias. Ambiguous in-repo names are dropped (counted), never guessed onto an arbitrary def."""
     roots = roots or ["src"]
     nodes: list[dict] = []
     edges: list[dict] = []
@@ -129,29 +126,42 @@ def build_graph(roots: list[str] | None = None) -> dict:
                         defs_by_name[sub.name].append(mq)
                         defs_in_module[mod].setdefault(sub.name, mq)  # first method def wins the bare name in-module
 
-    # CONFIDENT-ONLY resolution. We attribute a call to a concrete symbol ONLY when we can do so without guessing:
-    # (1) the name is defined in the caller's own module, (2) it was imported into the caller from a module that
-    # defines it, or (3) it is globally UNIQUE in the repo. An in-repo name with several same-named definitions and
-    # no binding is AMBIGUOUS — we do NOT pick an arbitrary winner (that manufactures false hubs like a generic
-    # `.get`/`.append` absorbing thousands of unrelated call sites). Ambiguous names are dropped and COUNTED so the
-    # strength signal is trustworthy. (Calls to builtins/stdlib/external names are simply not in-repo → ignored.)
+    modules_set = set(trees)
+    aliases_by_mod = {m: _module_aliases(t, modules_set) for m, t in trees.items()}
+
+    # CONFIDENT-ONLY resolution — attribute a reference to a concrete symbol ONLY when we can do so WITHOUT guessing.
+    # The trap a name-based graph falls into: resolving `path.read_text()` / `x.split()` / `obj.get()` by repo-name
+    # invents huge false hubs (a stdlib method's calls pile onto a same-named repo symbol). So we split by syntax:
+    #   • bare  name()    -> (1) defined in this module, (2) imported here from a module that defines it,
+    #                        (3) globally UNIQUE in the repo. Several same-named defs + no binding = AMBIGUOUS (dropped).
+    #   • recv.attr()     -> resolve ONLY when recv is `self`/`cls` (this module's def) or an imported MODULE alias
+    #                        (that module's def). Any other receiver is an unknown object -> NOT guessed.
+    # Dropped-ambiguous bare names are COUNTED (no silent loss); unresolved attribute calls are simply external.
     AMBIGUOUS = "<ambiguous>"
 
-    def _resolve(name: str | None, caller_mod: str) -> str | None:
+    def _resolve_name(name: str | None, caller_mod: str) -> str | None:
         if not name:
             return None
-        local = defs_in_module.get(caller_mod, {})
-        if name in local:                                    # 1) defined right here
-            return local[name]
-        tgt = binds_by_mod.get(caller_mod, {}).get(name)     # 2) imported from a module that defines it
+        if name in defs_in_module.get(caller_mod, {}):                         # 1) defined right here
+            return defs_in_module[caller_mod][name]
+        tgt = binds_by_mod.get(caller_mod, {}).get(name)                       # 2) imported from a module that defines it
         if tgt and name in defs_in_module.get(tgt, {}):
             return defs_in_module[tgt][name]
         cands = defs_by_name.get(name, [])
-        if len(cands) == 1:                                  # 3) globally unique name -> unambiguous
+        if len(cands) == 1:                                                    # 3) globally unique -> unambiguous
             return cands[0]
-        if cands:                                            # ambiguous in-repo name -> refuse to guess
-            return AMBIGUOUS
-        return None                                          # not an in-repo symbol (builtin/stdlib/external)
+        return AMBIGUOUS if cands else None                                    # ambiguous in-repo vs external
+
+    def _resolve_ref(node: ast.AST, caller_mod: str) -> str | None:
+        """Resolve a call target or base-class ref (ast.Name or ast.Attribute). id | AMBIGUOUS | None."""
+        if isinstance(node, ast.Name):
+            return _resolve_name(node.id, caller_mod)
+        if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name):
+            recv = node.value.id
+            tmod = caller_mod if recv in ("self", "cls") else aliases_by_mod.get(caller_mod, {}).get(recv)
+            if tmod:                                                           # self/cls or an imported module
+                return defs_in_module.get(tmod, {}).get(node.attr)            # that scope's def, else None (no guess)
+        return None
 
     ambiguous_dropped = 0
     call_acc: dict[tuple[str, str], int] = {}                # (caller, callee) -> weight (distinct call sites)
@@ -159,8 +169,7 @@ def build_graph(roots: list[str] | None = None) -> dict:
         for node in tree.body:
             if isinstance(node, ast.ClassDef):
                 for base in node.bases:
-                    bn = base.id if isinstance(base, ast.Name) else (base.attr if isinstance(base, ast.Attribute) else None)
-                    r = _resolve(bn, mod)
+                    r = _resolve_ref(base, mod)
                     if r and r != AMBIGUOUS:
                         edges.append({"src": f"{mod}.{node.name}", "dst": r, "type": "inherits", "weight": 1, "confidence": "exact"})
         for node in ast.walk(tree):
@@ -168,7 +177,7 @@ def build_graph(roots: list[str] | None = None) -> dict:
                 caller = f"{mod}.{node.name}"
                 for sub in ast.walk(node):
                     if isinstance(sub, ast.Call):
-                        r = _resolve(_call_name(sub.func), mod)
+                        r = _resolve_ref(sub.func, mod)
                         if r == AMBIGUOUS:
                             ambiguous_dropped += 1
                         elif r and r != caller:
