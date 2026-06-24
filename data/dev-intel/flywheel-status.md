@@ -1,20 +1,20 @@
 # Flywheel heartbeat (development plane; serves_truth=false)
 
-cycle: **4611** · health: **ok**
-findings recorded: 21606 · research-radar hits: 46
+cycle: **4646** · health: **ok**
+findings recorded: 21786 · research-radar hits: 46
 
 ## Flywheels (last cycle run / errors)
-- sweep: last @ cycle 4609 · errors 0
-- status: last @ cycle 4604 · errors 0
-- yc: last @ cycle 4602 · errors 0
-- propose: last @ cycle 4610 · errors 0
-- hubs: last @ cycle 4607 · errors 0
-- health: last @ cycle 4608 · errors 0
-- autofix: last @ cycle 4605 · errors 0
-- cleanup: last @ cycle 4600 · errors 0
-- checkpoint: last @ cycle 4592 · errors 0
+- sweep: last @ cycle 4645 · errors 0
+- status: last @ cycle 4639 · errors 0
+- yc: last @ cycle 4640 · errors 0
+- propose: last @ cycle 4644 · errors 0
+- hubs: last @ cycle 4637 · errors 0
+- health: last @ cycle 4635 · errors 0
+- autofix: last @ cycle 4642 · errors 0
+- cleanup: last @ cycle 4628 · errors 0
+- checkpoint: last @ cycle 4615 · errors 0
 - logjam: last @ cycle 624 · errors 0
 
-last flywheel: propose — distilled 0 new proposal(s); backlog now 4642 (data/dev-intel/proposals-prioritized.md)
+last flywheel: sweep — swept a batch (188 were remaining)
 
 Stop with: `touch .agent/STOP_REQUESTED`
