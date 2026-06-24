@@ -33,7 +33,7 @@ LIVE_OPEN_HUBS = {
 PRIVATE_BENCH = {
     "openTemplatesHub",
     "openEndpointHub",
-    "openEnvHub",
+    "openEnvironmentHub",
     "openSandboxHub",
     "openAgentHub",
     "openReceiptHub",

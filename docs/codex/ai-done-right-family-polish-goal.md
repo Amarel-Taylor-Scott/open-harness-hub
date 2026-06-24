@@ -72,7 +72,7 @@ As of the 2026-06-09 handoff, the design family is:
 - Live Open*Hubs: OpenContextHub, OpenSkillsHub, OpenToolsHub,
   OpenSkillToTool, OpenMCPHub, OpenCompressionHub, OpenBenchmarkHub,
   OpenReviewHub, OpenHarnessHub.
-- Private bench: OpenTemplatesHub, OpenEndpointHub, OpenEnvHub,
+- Private bench: OpenTemplatesHub, OpenEndpointHub, OpenEnvironmentHub,
   OpenSandboxHub, OpenAgentHub, OpenReceiptHub, OpenStateHub.
 - Baltor method hubs: OpenReconciliationHub, OpenHardeningHub,
   OpenEnrichmentHub, OpenOptimizationHub, OpenVerificationHub.

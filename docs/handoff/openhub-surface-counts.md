@@ -36,7 +36,7 @@ not use it as the source of truth; recompute from
 
 - OpenTemplatesHub
 - OpenEndpointHub
-- OpenEnvHub
+- OpenEnvironmentHub
 - OpenSandboxHub
 - OpenAgentHub
 - OpenReceiptHub

@@ -40,7 +40,7 @@ graph TD
 
 ### Open\*Hub roster (9 live · 13 private-bench = 22)
 - **Live:** OpenContextHub, OpenSkillsHub, OpenToolsHub, OpenSkillToTool, OpenHarnessHub, OpenMCPHub, OpenCompressionHub, OpenBenchmarkHub, OpenReviewHub
-- **Private-bench:** OpenTemplatesHub, OpenEndpointHub, OpenEnvHub, OpenSandboxHub, OpenAgentHub, OpenReceiptHub, OpenStateHub, OpenRoutingHub, OpenReconciliationHub, OpenHardeningHub, OpenEnrichmentHub, OpenOptimizationHub, OpenVerificationHub
+- **Private-bench:** OpenTemplatesHub, OpenEndpointHub, OpenEnvironmentHub, OpenSandboxHub, OpenAgentHub, OpenReceiptHub, OpenStateHub, OpenRoutingHub, OpenReconciliationHub, OpenHardeningHub, OpenEnrichmentHub, OpenOptimizationHub, OpenVerificationHub
 
 ## Surfaces
 
