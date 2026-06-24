@@ -23,10 +23,16 @@ CLI: PYTHONPATH=. python3 scripts/symbol_graph.py --print
 from __future__ import annotations
 
 import ast
+import builtins
 import json
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path
+
+#: Python builtin names (set, list, dict, len, open, id, type, sorted, …). A bare `name()` call to one of these with
+#: no same-module def or explicit import is the BUILTIN, not a repo symbol that happens to share the name — so it is
+#: NOT resolved via the globally-unique fallback (else e.g. a lone method named `set` absorbs every `set(...)` call).
+_PY_BUILTINS = frozenset(dir(builtins))
 
 REPO = Path(__file__).resolve().parents[1]
 GRAPH_JSON = REPO / "docs" / "context" / "symbol-graph.generated.json"
@@ -147,6 +153,8 @@ def build_graph(roots: list[str] | None = None) -> dict:
         tgt = binds_by_mod.get(caller_mod, {}).get(name)                       # 2) imported from a module that defines it
         if tgt and name in defs_in_module.get(tgt, {}):
             return defs_in_module[tgt][name]
+        if name in _PY_BUILTINS:                                               # bare builtin-named call = the builtin
+            return None
         cands = defs_by_name.get(name, [])
         if len(cands) == 1:                                                    # 3) globally unique -> unambiguous
             return cands[0]
