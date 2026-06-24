@@ -18,7 +18,7 @@ AI Done Right  (umbrella IP · brands · standards · shared R&D/security/govern
 ├── Teleon.dev   — runs your capability on the CHEAPEST bounded path that still passes   → governs EFFICIENCY
 ├── Baltor.ai    — managed, verified, provable context, powered by Teleon                → governs TRUTH
 ├── Open*Hubs    — the open STORE both products consume (context·tools·skills·harnesses·specs)
-└── Review surface — rides along while a coding agent (Claude Code/Cursor/Codex) works, and reviews the result
+└── Teleon Observer — watches AI usage; reviews the SESSION (post) + helps intra-session (while)  → Teleon's wedge
 ```
 
 **Moat split (LOCKED):** *Baltor governs what becomes **TRUE**; Teleon governs what becomes **EFFICIENT**.* Both
@@ -113,56 +113,48 @@ the reverse.
 
 ---
 
-## 4 · The Review Surface — for users of coding agents (Claude Code / Cursor / Codex)
+## 4 · Teleon Observer — AI session review + intra-session helper (for Claude Code / Cursor / Codex users)
 
-> **"AI, done right" applied to AI-written code:** ride along **while** your agent codes, and review the result
-> **after.** *(Working framing — a standalone brand is owner-gated; OpenReviewHub is the reserved registry surface.
-> Today this is assembled from existing assets below, not a separate SaaS.)*
+> **"Grammarly / Datadog / a compiler-optimizer — for AI usage."** It watches *how* you use AI, **saves the
+> session**, lets you **review it for learning** (post), and **pops up during the session** (while) — *"this already
+> exists," an adversarial question, a cheaper path, "this prompt has 320k unnecessary tokens."*
 
-This is the **developer-facing front door to the Verification universe** — what a Claude Code user actually
-touches. It has two moments, each backed by a real component already in the repo:
+**This reviews your AI *usage / session*, not your code.** Code-correctness review (PR/diff bugs) is a separate
+concern. The Observer is the **customer-facing wedge for the Teleon engine** — a thin front-end over the existing
+descent + reinvention guardrail + the registry federation (grounding) + economics. Built: `src/teleon/observer/`
+(`capture` · `session_store` · `review` · `router`) + `src/teleon/knowledge/`. `serves_truth=false`; local-first;
+governed. Status: real engine + proofs; the live capture/SaaS front-ends are owner-gated.
 
-**A. WHILE reviewing (intra-session, as the agent edits)**
-- **Structural change-audit** — `scripts/codegraph.py --audit <file|symbol>`: a unified, **weighted** code graph
-  (file imports + symbol calls/inherits) that ranks the **strong connections** (importers/callers by call-sites ×
-  resolution-confidence) plus the transitive blast radius, so you (or the agent) review what a change can break
-  **before and after** the edit. Resolution is confident-only (ambiguous/builtin-shadow calls dropped + counted —
-  no false hubs), so the ranking is trustworthy. Protocol: [codegraph-change-audit-protocol](../codex/codegraph-change-audit-protocol.md).
-- **AI-usage observer (Teleon Observer — owner-gated/proposal)** — a thin layer that watches *how* the developer/
-  agent uses AI in VS Code / Claude Code / Codex, pops up intra-session, and flags **reinvention and token waste**
-  ("6 places you reinvented something already solved"; "this prompt has 320k unnecessary tokens"). Reviews AI
-  **usage**, not code correctness. *"Grammarly / Datadog / a compiler-optimizer — for AI usage."*
-
-**B. POST review (after the work / on the PR)**
-- **Multi-agent diff/PR review** — `/code-review ultra` launches a deep, multi-agent cloud review of the current
-  branch (or a GitHub PR); `/code-review` (low→high) reviews the working diff locally for correctness + reuse/
-  simplification. User-triggered and billed.
-- **Post-session review report** — the Observer's lead artifact: a session recap a developer reviews **for
-  learning** (what was reinvented, wasted, or done well).
-- **Governed review context (Baltor `review_pack`)** — a **Gold** task-ready context pack assembled for a specific
-  ticket/merge so the reviewer (human or agent) cites **verified, source-linked** facts, not raw retrieval.
-
-- **Mission / Vision** — Make the code your AI agent writes **correct** (Baltor/truth), **efficient** (Teleon/
-  efficiency), and **well-understood** (codegraph blast-radius) — by default, in the tools developers already use.
-- **Problem** — Coding agents ship large diffs fast; humans can't hold the blast radius in their head, can't see
-  where the agent reinvented or wasted, and PR review happens too late. AI accelerates writing code far more than
-  it accelerates **trusting** it.
-- **Solution** — A two-moment review that is **in the loop while coding** (graph audit + usage observer) **and on
-  the diff after** (multi-agent review + governed review packs) — one surface spanning both.
+- **Mission / Vision** — Teach developers (and their agents) to **use less unnecessary intelligence**: catch waste,
+  reinvention, and footguns *grounded in a real index of what already exists*, in the tools devs already run.
+- **Problem** — AI coding sessions silently burn tokens, **reinvent things that already exist**, and take footgun/
+  adversarial paths — and the developer never sees it. The pain is in *how the AI is used*, invisible after the fact.
+- **Solution** — One engine on a timeline, two moments:
+  - **POST — session review (lead with this):** ingest the transcript/diff after a session, run the funnel in
+    batch, emit a confidence-scored report a human triages — *"6 places you reinvented something solved,"* where
+    tokens/time were wasted, debugging loops, missed shortcuts. No latency budget; no false-interrupt problem.
+  - **WHILE — intra-session helper:** typed interventions surfaced live — reinvention ("PyMuPDF already does
+    this"), an **adversarial question** ("are you sure a custom parser beats the library?"), a **cheaper path**, a
+    **token optimization** (~96% cheaper) — governed by a **global interruption budget** + **graduated modes**
+    (ambient → post-action → pre-action/block), so it helps without nagging. **Fail-open: degrades to silence,
+    never obstruction.**
 - **Product-Market Fit**
-  - **User:** developers and teams using coding agents (Claude Code first; Cursor/Codex/MCP clients next) — the
-    audience the rest of the portfolio already addresses ("works with the agent you already run").
-  - **Wedge:** the **codegraph change-audit + `/code-review`** are live and free in-repo today (the
-    foot-in-the-door); the Observer + governed `review_pack` are the paid/managed extension.
-  - **Monetization (PROPOSAL):** free open audit/review CLI as the funnel → paid governed review context + usage
-    optimization (Baltor/Teleon recurring) — the same open-core line as the hubs.
-- **Competitors & difference** — PR-review/codebase-AI tools (Greptile, Sourcegraph, GitHub Copilot review, Cursor
-  Bugbot, Graphite, Qodo): they review **code text**. This surface adds two things they don't unify: (1) a
-  **trustworthy weighted blast-radius graph** purpose-built for "what else does this change touch," and (2)
-  **governed truth + efficiency** behind the review (Baltor verifies the facts cited; Teleon flags the waste) —
-  i.e. it reviews not just *the code* but *how the AI produced it* and *whether its context was true.* *Baltor
-  should not compete as generic repo search or a generic coding agent* — the edge is the governance + the graph,
-  not coverage.
+  - **User:** developers/teams using coding agents — **Claude Code** first (clean hook semantics), then Cursor /
+    Codex / any client (via the gateway, zero client buy-in).
+  - **Wedge:** the **post-session reviewer** — "paste a session / connect a repo, get a reinvention + waste
+    report." Smallest, highest-adoption artifact; earns the precision + trust to later interject live.
+  - **Trust ladder:** post-session report → ambient notices → enforced pre-action (the high-value endgame).
+  - **Data residency (deal-lever):** Tier-1 judge + grounding run **on a local model + local registry** — *"your
+    code physically cannot leave your VPC."*
+  - **Monetization (PROPOSAL):** free/low-friction post-session report (funnel) → hosted SaaS + self-hosted VPC
+    server with enforced pre-action guardrail (enterprise) — Teleon recurring.
+- **Competitors & difference** — Anyone can build a hook or a prompt logger; LLM-observability tools (LangSmith,
+  Helicone, PromptLayer) record calls but don't *judge reinvention* or *coach toward cheaper paths*. The two
+  defensible parts are (1) the **grounded index** (the registry federation, kept fresh) that makes the "it already
+  exists" call **precise instead of an LLM guess**, and (2) the **optimization memory** (`descent_attempt_store`)
+  that learns winning paths from real session telemetry across runs. *Honest hard parts:* distribution + clean
+  capture are harder than the AI; a wrong pre-action interrupt gets muted in a day (hence lead post-session); and
+  don't build both Teleon **Compiler** and **Observer** at full depth before one is proven.
 
 ---
 
@@ -170,13 +162,13 @@ touches. It has two moments, each backed by a real component already in the repo
 
 - **Pitch the pattern, lead with proof.** Across all four: lead with **measured fidelity + governance on the
   buyer's own data** and the **receipt**, never with "we compress" / "we have memory" / "we have coverage."
-- **Keep the moat split crisp:** Baltor = TRUTH, Teleon = EFFICIENCY, Open*Hubs = discovery (not truth), Review =
-  the developer front door to both.
+- **Keep the moat split crisp:** Baltor = TRUTH, Teleon = EFFICIENCY, Open*Hubs = discovery (not truth), Teleon
+  Observer = the AI-usage review/helper wedge in front of the Teleon engine (it reviews usage, not code).
 - **Honesty is the brand.** Mark proposals as proposals, representative numbers as representative, and
   `serves_truth=false` for static derivations. That discipline *is* "AI, done right."
 
 **Canonical sources:** [teleon-baltor-openharnesshub-portfolio](./teleon-baltor-openharnesshub-portfolio.md) ·
 [teleon-naming-and-domain](./teleon-naming-and-domain.md) · [positioning-v2](./positioning-v2.md) ·
 [competitive-landscape-2026](./competitive-landscape-2026.md) · [gtm-teleon-baltor-and-phased-launch-2026-06](./gtm-teleon-baltor-and-phased-launch-2026-06.md) ·
-[baltor-adjacent-market-map](./baltor-adjacent-market-map.md) · [teleon-observer-ai-usage-layer](./teleon-observer-ai-usage-layer.md) ·
-[capability-valleys](../concepts/capability-valleys.md) · review surface: [codegraph-change-audit-protocol](../codex/codegraph-change-audit-protocol.md).
+[baltor-adjacent-market-map](./baltor-adjacent-market-map.md) · Observer: [teleon-observer-ai-usage-layer](./teleon-observer-ai-usage-layer.md) ·
+[capability-valleys](../concepts/capability-valleys.md).
