@@ -19,11 +19,20 @@ if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 SITE_DIR = REPO / "dist" / "sites"
 STRATEGY = REPO / "architecture" / "hub_population_strategy.json"
+PROFILES = REPO / "architecture" / "hub_profiles.json"
 
 
 def _strategy() -> dict:
     try:
         return json.loads(STRATEGY.read_text(encoding="utf-8")).get("hubs", {})
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def _profiles() -> dict:
+    """hub_id -> profile (incl. model-authored one_liner + use_cases). Single source of hub display copy."""
+    try:
+        return json.loads(PROFILES.read_text(encoding="utf-8")).get("profiles", {})
     except Exception:  # noqa: BLE001
         return {}
 
@@ -72,16 +81,20 @@ def render_all(out_dir: Path = SITE_DIR, store=None) -> list[tuple[str, str]]:
     from src.openharnesshub.hub_site import render_hub_page, slugify
     store = store or ComponentStore()
     strat = _strategy()
+    profs = _profiles()
     pages = []
     for s in hub_specs():
         cfg = strat.get(s.hub_id, {})
+        prof = profs.get(s.hub_id, {})
+        # Model-authored value-prop from hub_profiles (single source); fall back to the generic computed line.
+        one_liner = prof.get("one_liner") or (s.component_kind and f"{s.component_kind.capitalize()} — governed, continuously updated, verify-gated.")
         try:
             served = store.serve(s.hub_id, "_global")
             funnel = store.funnel_summary(s.hub_id)
         except Exception:  # noqa: BLE001
             served, funnel = [], {"signals": 0}
         page = render_hub_page(
-            s.hub_id, content_kind=s.component_kind, one_liner=s.component_kind and f"{s.component_kind.capitalize()} — governed, continuously updated, verify-gated.",
+            s.hub_id, content_kind=s.component_kind, one_liner=one_liner,
             tier=s.tier, consumed_by=s.consumed_by, contribution_mode=cfg.get("contribution_mode", "both"),
             sources=cfg.get("sources", {}), generator=cfg.get("generator", ""), settings=load_settings(s.hub_id),
             served=served, funnel=funnel, verify_bar=cfg.get("verify_bar", ""))
@@ -89,15 +102,26 @@ def render_all(out_dir: Path = SITE_DIR, store=None) -> list[tuple[str, str]]:
         p = out_dir / slugify(s.hub_id) / "index.html"
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(page, encoding="utf-8")
-    _write_index(out_dir, [h for h, _ in pages])
+    _write_index(out_dir, [h for h, _ in pages], profs)
     return pages
 
 
-def _write_index(out_dir: Path, hub_ids: list[str]) -> None:
+def _write_index(out_dir: Path, hub_ids: list[str], profs: dict | None = None) -> None:
     from src.openharnesshub.hub_site import slugify
-    cards = "".join(
-        f"<a class=card href='./{slugify(h)}/index.html'><h3>{h}</h3><p>open registry · powered by Teleon</p></a>"
-        for h in hub_ids)
+    profs = profs or {}
+
+    def esc(t: object) -> str:
+        return str(t).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+    def card(h: str) -> str:
+        prof = profs.get(h, {})
+        blurb = prof.get("one_liner") or "open registry · powered by Teleon"
+        ucs = prof.get("use_cases") or []
+        uc = f"<span class=uc>e.g. {esc(ucs[0])}</span>" if ucs else ""
+        return (f"<a class=card href='./{slugify(h)}/index.html'><h3>{esc(h)}</h3>"
+                f"<p>{esc(blurb)}</p>{uc}</a>")
+
+    cards = "".join(card(h) for h in hub_ids)
     htmlx = (
         "<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'>"
         "<title>Open*Hubs</title><style>"
@@ -107,6 +131,7 @@ def _write_index(out_dir: Path, hub_ids: list[str]) -> None:
         ".grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px}@media(max-width:680px){.grid{grid-template-columns:1fr}}"
         ".card{display:block;border:1px solid #e6e8ef;border-radius:14px;padding:18px;background:#fff;text-decoration:none;color:inherit}"
         ".card h3{margin:0 0 4px;font-size:16px}.card p{margin:0;font-size:13px;color:#6b7280}"
+        ".card .uc{display:block;margin-top:8px;font-size:12px;color:#9aa0ad}"
         f"</style></head><body><div class=wrap><div class=tag>Open Harness Hub</div><h1>The Open*Hubs ({len(hub_ids)})</h1>"
         "<p style='color:#6b7280;max-width:640px'>The open ecosystem both Teleon and Baltor consume. Each hub is "
         f"continuously populated (discover · generate · intake), governed, and verify-gated.</p><div class=grid>{cards}</div></div></body></html>\n")
