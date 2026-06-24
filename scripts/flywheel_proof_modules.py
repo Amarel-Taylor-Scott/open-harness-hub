@@ -766,6 +766,10 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_knowledge_graph.py", "check_knowledge_graph"),
     # ── observer.capture + session_store: the capture SEAM (normalize Claude Code/Codex JSONL transcripts -> one event stream, drops thinking + slash-command noise, summarizes tool_use; PROVEN on the real 2847-line session -> 1368 events/34 findings) + the session model (session/event/intervention) with the accept/reject OUTCOME loop (append-only, latest-wins, lossless -> per-type tuning stats = the moat signal); serves_truth=false, read-only/local-first ──
     ("scripts/check_observer_capture_store.py", "check_observer_capture_store"),
+    # ── code_genome_index: DOGFOOD the Code Genome (§9) on src/teleon — AST-fingerprint each module, flag high genome overlap as CANDIDATE internal reinvention (worth review, NOT proven duplication); honest sparse genome over abstract framework code; high-volume->DB; serves_truth=false, candidates only ──
+    ("scripts/build_code_genome_index.py", "build_code_genome_index"),
+    # ── spotter_surface: the demoable face of the Observer/Spotter subsystem -> self-contained dist/spotter/index.html ('coaching not surveillance', the live taxonomy, a reproducible post-session review embedded, the knowledge-graph engines, funnels to Teleon); ALL counts computed from the live router+registries (no-magic-values); serves_truth=false ──
+    ("scripts/build_spotter_surface.py", "build_spotter_surface"),
     # ── capability_mvp: the MVP SHOWCASE — wires the whole federation end-to-end (guardrail + build-a-capability live over the registries) into a self-contained dist/capability-mvp/index.html that funnels to Teleon/Baltor; counts COMPUTED from registry_ontology; serves_truth=false ──
     ("scripts/build_capability_mvp.py", "build_capability_mvp"),
     # ── registry_records: SCALE — every menu registry wired to >=1000 records (REAL from catalogs + flagged SYNTHETIC candidates), each ENRICHED (embedding/description/metadata), pgvector DDL+search (vector dim single-sourced from EMBED_DIM); honest real-vs-synthetic ledger; high-volume->DB not git; candidate-only; serves_truth=false ──

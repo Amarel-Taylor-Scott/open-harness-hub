@@ -1,0 +1,14 @@
+MODULE src/teleon/registry/reinvention_guard.py
+## API signatures
+```python
+"""registry.reinvention_guard — the 'you're reinventing a solved problem' guardrail, GROUNDED in the federation."""
+_INTENT_TELLS = ...
+_SOLVED_DOMAINS = ...
+_TOP = ...
+def detect_intent(message: str) -> dict
+    # Tier 0 — is this build-intent, and what solved-domain is it about? (no model, near-zero cost).
+def check(message: str) -> dict
+    # The cascade. Returns a notice ONLY when a solution is GROUNDED in the federation (else stays quiet).
+```
+## intra-module call edges
+src.teleon.registry.reinvention_guard.check -> src.teleon.registry.reinvention_guard.detect_intent

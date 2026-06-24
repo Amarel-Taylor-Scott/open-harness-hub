@@ -49,20 +49,34 @@ def main() -> int:
         {"role": "user", "content": _FAKE_SECRET_LINE},                                # footgun (secret, can block)
         {"role": "user", "content": "now add jwt and a refresh token and oauth flow"}, # cluster + stack (auth infra)
         {"role": "user", "content": "let me build a custom retry with exponential backoff"},  # stack (tenacity)
+        {"role": "user", "content": "try:\n    x()\nexcept:\n    pass"},                # guidance (bare except)
+        {"role": "user", "content": "I'll use os.path.join(base, name) to build the path"},  # alternative (pathlib)
+        {"role": "user", "content": "let me build an open source vector database and similarity search engine for embeddings with filtering"},  # product_reinvention (qdrant)
         {"role": "user", "content": "rm -rf / now"},                                   # footgun (destructive)
     ]
 
     rev = route_session(session, mode="review_only")
     types = {f["type"] for f in rev["report"]}
-    ck("taxonomy fires >=5 distinct module types", len(types) >= 5, str(sorted(types)))
+    ck("taxonomy fires >=8 distinct module types", len(types) >= 8, str(sorted(types)))
     ck("reinvention is grounded in the federation", any(
         f["type"] == "reinvention" and f["source_ref"].get("existing") for f in rev["report"]))
     ck("stack_reinvention is grounded in the dependency graph", any(
         f["type"] == "stack_reinvention" and f["source_ref"].get("covering") for f in rev["report"]))
+    ck("product_reinvention is grounded in latent product space", any(
+        f["type"] == "product_reinvention" and f["source_ref"].get("nearest") for f in rev["report"]))
     ck("adversarial fired (assumption challenged)", "adversarial" in types)
+    ck("guidance fired (bare except)", "guidance" in types)
+    ck("alternative fired (os.path -> pathlib)", "alternative" in types)
     ck("footgun fired on the secret + the destructive command", sum(
         1 for f in rev["report"] if f["type"] == "footgun") >= 2)
     ck("reinvention_cluster fired on the auth signal sequence", "reinvention_cluster" in types)
+
+    # shortcut: the same tool used >= _SHORTCUT_REPEAT times in a session -> fires once
+    tool_session = [{"role": "assistant", "content": f"Read file_{i}.py", "tool": "Read"} for i in range(5)]
+    sc = route_session(tool_session, mode="review_only")
+    shortcuts = [f for f in sc["report"] if f["type"] == "shortcut"]
+    ck("shortcut fires on repeated tool use", len(shortcuts) == 1, f"{len(shortcuts)} shortcut findings")
+    ck("shortcut names the repeated tool", shortcuts and "Read" in shortcuts[0]["evidence"])
 
     # SECURITY: footgun evidence must be REDACTED — the real secret token never appears anywhere in the result.
     blob = json.dumps(rev)

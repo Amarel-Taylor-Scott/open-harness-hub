@@ -11,6 +11,7 @@ here, no magic). serves_truth=false; similarity is a governed signal, not an ass
 """
 from __future__ import annotations
 
+import ast
 import math
 import re
 
@@ -52,6 +53,39 @@ def genome_similarity(fp_a: list[float], fp_b: list[float]) -> float:
     na = math.sqrt(sum(x * x for x in fp_a))
     nb = math.sqrt(sum(y * y for y in fp_b))
     return dot / (na * nb) if na and nb else 0.0
+
+
+def decompose_ast(source: str) -> list[str]:
+    """Higher-fidelity decomposition: parse Python source and read only REAL symbols (imports, call names, def/class
+    names) — so a primitive merely mentioned in a comment/string does NOT count (the precision win over the prose
+    scan). Falls back to the signal scan on a syntax error (partial snippets). tree-sitter is the multi-language fork."""
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return decompose(source)
+    names: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            names.update(a.name.split(".")[0] for a in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            names.add((node.module or "").split(".")[0])
+        elif isinstance(node, ast.Call):
+            f = node.func
+            if isinstance(f, ast.Name):
+                names.add(f.id)
+            elif isinstance(f, ast.Attribute):
+                names.add(f.attr)
+        elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            names.add(node.name)
+    hay = " ".join(n.lower() for n in names if n)
+    return [name for name, tells in PRIMITIVES.items()
+            if any(re.search(rf"\b{re.escape(t.split()[0])}", hay) for t in tells)]
+
+
+def ast_fingerprint(source: str) -> list[float]:
+    """A genome fingerprint from the AST decomposition (symbol-level, comment/string-immune)."""
+    present = set(decompose_ast(source))
+    return [1.0 if name in present else 0.0 for name in _PRIMITIVE_ORDER]
 
 
 def nearest_genomes(text: str, corpus: list[dict], *, limit: int = 5) -> dict:
@@ -98,4 +132,15 @@ def _self_test() -> list[str]:
     res = nearest_genomes(auth_text, corpus)
     ck("nearest_genomes ranks the auth repo first", res["nearest"][0]["id"] == "repo_auth_1")
     ck("verdict is a governed candidate", res["serves_truth"] is False and res["candidate"])
+
+    # AST fork: reads real symbols, ignores a primitive that only appears in a comment/string (precision win)
+    src = ("import jwt\nimport sqlalchemy\n\n"
+           "def login(user):\n    # this is not really a cache layer\n    return jwt.encode(user)\n")
+    ast_prims = decompose_ast(src)
+    ck("AST finds authentication from real imports/defs (jwt, login)", "authentication" in ast_prims)
+    ck("AST finds db_connection from a real import (sqlalchemy)", "db_connection" in ast_prims)
+    ck("AST IGNORES 'cache' that is only in a comment (precision win)", "cache" not in ast_prims)
+    ck("prose scan WOULD wrongly catch the comment 'cache'", "cache" in decompose(src))
+    ck("AST falls back to the signal scan on a syntax error", "retry" in decompose_ast("def f( retry backoff"))
+    ck("ast_fingerprint length == primitive count", len(ast_fingerprint(src)) == len(PRIMITIVES))
     return fails

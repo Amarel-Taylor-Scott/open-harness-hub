@@ -1,0 +1,25 @@
+MODULE src/teleon/registry/variations.py
+## API signatures
+```python
+"""registry.variations — generate FORKS / VARIATIONS of any registry record (the owner's fork-generation discipline
+applied to DATA, not just architecture)."""
+def _base_id(record: dict) -> str
+def fork_questions(record: dict) -> list[str]
+    # The variation questions to ASK for this record (the discipline, made explicit + per-record).
+def variations_of(record: dict, axis: str, values: list[str] | None=None) -> list[dict]
+    # Generate candidate variations of `record` along `axis` (e.g. industry). Each is a governed candidate fork.
+def expand_record(record: dict, axes: list[str] | None=None) -> dict[str, list[dict]]
+    # Generate the full fork set: variations across MULTIPLE axes for one record.
+def mutation_space(axes: list[str]) -> int
+    # Variations PER record across the cartesian product of `axes` = product of axis sizes (computed, not typed).
+def mutate_stream(records, axes: list[str])
+    # LAZILY yield governed candidate variations across the cartesian product of `axes` for each record — so 1M+
+def reachable_count(n_records: int, axes: list[str]) -> int
+    # How many candidate variations `n_records` reach across `axes` (n_records x mutation_space).
+```
+## intra-module call edges
+src.teleon.registry.variations.fork_questions -> src.teleon.registry.variations._base_id
+src.teleon.registry.variations.variations_of -> src.teleon.registry.variations._base_id
+src.teleon.registry.variations.expand_record -> src.teleon.registry.variations.variations_of
+src.teleon.registry.variations.mutate_stream -> src.teleon.registry.variations._base_id
+src.teleon.registry.variations.reachable_count -> src.teleon.registry.variations.mutation_space

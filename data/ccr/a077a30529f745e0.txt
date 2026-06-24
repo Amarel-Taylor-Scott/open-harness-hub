@@ -1,0 +1,25 @@
+MODULE src/teleon/observer/capture.py
+## API signatures
+```python
+"""observer.capture — the capture seam (the Spotter memo §3): normalize heterogeneous AI-tool sessions into ONE
+event stream the router/reviewer consume. Capture and review become the same data used differently."""
+_NOISE_MARKERS = ...
+_TOOL_INPUT_KEYS = ...
+_HEAD = ...
+def _summarize_tool(name: str, tool_input: dict) -> str
+    # A compact 'what the agent did' line: the tool + its most salient input (path/command/etc.).
+def _flatten_content(role: str, content) -> list[dict]
+    # One message -> 0+ normalized events. str content -> one prompt/text; block list -> one event per text/tool_use.
+def normalize_messages(records) -> list[dict]
+    # Generic: an iterable of transcript line-dicts (Claude Code / Codex shape) -> normalized events.
+def from_transcript(path: str | Path) -> list[dict]
+    # Read a Claude Code / Codex JSONL transcript file -> normalized events ready for review_session.
+_SYNTHETIC = ...
+def _self_test() -> int
+```
+## intra-module call edges
+src.teleon.observer.capture._flatten_content -> src.teleon.observer.capture._summarize_tool
+src.teleon.observer.capture.normalize_messages -> src.teleon.observer.capture._flatten_content
+src.teleon.observer.capture.normalize_messages -> src.teleon.observer.capture._flatten_content
+src.teleon.observer.capture.from_transcript -> src.teleon.observer.capture.normalize_messages
+src.teleon.observer.capture._self_test -> src.teleon.observer.capture.normalize_messages

@@ -49,6 +49,7 @@ _CONF_REINVENTION = 0.8
 _CONF_OVERSIZED = 0.55
 _CONF_DUPLICATE = 0.7
 _CONF_STACK = 0.82  # stack-level reinvention is graph-grounded (transitive coverage) -> high
+_SHORTCUT_REPEAT = 4  # same tool used this many times in a session -> suggest batching (observed repetition)
 _PER_TYPE_FLOOR = 0.5  # a finding below its module's confidence floor is dropped before the budget even runs
 
 
@@ -236,10 +237,115 @@ class DuplicateContextModule(InterventionModule):
         return []
 
 
-def default_modules() -> list[InterventionModule]:
+class GuidanceModule(InterventionModule):
+    """Best-practice / convention violations (bare except, mutable default, print-debug). Regex rules; NOTICE-only;
+    failure = pedantic. Post-action by nature."""
+    type = "guidance"
+
+    def __init__(self, heuristics: list[dict]):
+        self._rules = [(h, re.compile(h["match"]["regex"])) for h in heuristics if h["kind"] == "guidance"]
+
+    def plausible(self, text: str, state: dict) -> bool:
+        return True
+
+    def ground(self, text: str, state: dict) -> list[dict]:
+        out = []
+        for h, rx in self._rules:
+            if rx.search(text):
+                out.append(_iv("guidance", h["confidence"], h["message"], text[:120].strip(),
+                               h.get("suggestion", "follow the convention"), max_action=h["max_action"],
+                               source_ref={"rule": h["id"]}, dedup_id=h["id"]))
+        return out
+
+
+class AlternativeModule(InterventionModule):
+    """A simpler/more idiomatic approach exists (os.path->pathlib, manual sum->sum()). Keyword rules; NOTICE-only;
+    failure = taste-dependent. Post-action/post-session."""
+    type = "alternative"
+
+    def __init__(self, heuristics: list[dict]):
+        self._templates = [h for h in heuristics if h["kind"] == "alternative"]
+
+    def plausible(self, text: str, state: dict) -> bool:
+        low = text.lower()
+        return any(any(k.lower() in low for k in h["match"]["keywords"]) for h in self._templates)
+
+    def ground(self, text: str, state: dict) -> list[dict]:
+        low = text.lower()
+        out = []
+        for h in self._templates:
+            if any(k.lower() in low for k in h["match"]["keywords"]):
+                out.append(_iv("alternative", h["confidence"], h["message"], text[:120].strip(),
+                               h.get("suggestion", "consider the simpler idiom"), max_action=h["max_action"],
+                               source_ref={"rule": h["id"]}, dedup_id=h["id"]))
+        return out
+
+
+class ShortcutModule(InterventionModule):
+    """Observed repetition: the same tool used >= _SHORTCUT_REPEAT times in a session -> 'batch/script it'. Grounded
+    in the captured event stream (state['_event'].tool), not a pattern. Fires once per tool when it crosses."""
+    type = "shortcut"
+
+    def plausible(self, text: str, state: dict) -> bool:
+        return bool((state.get("_event") or {}).get("tool"))
+
+    def ground(self, text: str, state: dict) -> list[dict]:
+        tool = (state.get("_event") or {}).get("tool")
+        counts = state.setdefault("tool_counts", {})
+        counts[tool] = counts.get(tool, 0) + 1
+        if counts[tool] == _SHORTCUT_REPEAT:  # fire exactly once, at the crossing
+            return [_iv("shortcut", 0.6, f"you've used {tool} {counts[tool]} times manually in this session",
+                        f"{tool} x{counts[tool]}", "replace the repeated manual action with a batch/loop/glob/script",
+                        max_action="notice", dedup_id=f"shortcut:{tool}")]
+        return []
+
+
+class ProductReinventionModule(InterventionModule):
+    """Product-level reinvention, GROUNDED in latent product space (#102): 'build an AI coding assistant' overlaps
+    heavily with Cursor/Continue/Claude Code. Uses the embedder PLANE (best_embedder runtime; inject lexical floor in
+    proofs). Embeds the product space once, lazily."""
+    type = "product_reinvention"
+    _INTENT_NOUNS = ("build", "create", "app", "platform", "system", "assistant", "framework", "database", "tool",
+                     "engine", "product")
+
+    def __init__(self, embed_fn=None):
+        # default to the deterministic, keyless LEXICAL floor (conservative high_overlap = fewer false alarms,
+        # offline gate). Pass best_embedder() explicitly for semantic recall at runtime (the quality fork).
+        if embed_fn is None:
+            from ..knowledge._vec import lexical_embed_fn
+            embed_fn = lexical_embed_fn()
+        self._embed_fn = embed_fn
+        self._space = None
+
+    def _space_(self):
+        if self._space is None:
+            from ..knowledge.product_distance import build_product_space
+            self._space = build_product_space(embed_fn=self._embed_fn)
+        return self._space
+
+    def plausible(self, text: str, state: dict) -> bool:
+        low = text.lower()
+        return _detect_intent(text)["build_intent"] and any(w in low for w in self._INTENT_NOUNS)
+
+    def ground(self, text: str, state: dict) -> list[dict]:
+        from ..knowledge.product_distance import distance_to_products
+        r = distance_to_products(text, self._space_(), embed_fn=self._embed_fn)
+        if not r["high_overlap"]:
+            return []
+        names = [p["product"] for p in r["nearest_products"][:3]]
+        return [_iv("product_reinvention", min(0.9, max(_PER_TYPE_FLOOR, r["reinvention_probability"])),
+                    f"overlaps heavily with existing products ({r['nearest_cluster']})", text[:120].strip(),
+                    f"compare with {', '.join(names)} before building", max_action="notice",
+                    source_ref={"nearest": r["nearest_products"][:3]}, dedup_id=f"product:{r['nearest_cluster']}")]
+
+
+def default_modules(embed_fn=None) -> list[InterventionModule]:
+    """The full taxonomy. embed_fn is threaded into the embedding-backed module (product_reinvention): None ->
+    best_embedder (runtime quality); inject the lexical floor in proofs for a deterministic, offline gate."""
     h = _load_heuristics()
-    return [ReinventionModule(), StackReinventionModule(), FootgunModule(h), AdversarialModule(h),
-            ReinventionClusterModule(h), OversizedContextModule(), DuplicateContextModule()]
+    return [ReinventionModule(), StackReinventionModule(), ProductReinventionModule(embed_fn), FootgunModule(h),
+            AdversarialModule(h), ReinventionClusterModule(h), GuidanceModule(h), AlternativeModule(h),
+            ShortcutModule(), OversizedContextModule(), DuplicateContextModule()]
 
 
 def _message_text(m: dict) -> str:
@@ -274,6 +380,7 @@ def route_session(events: list[dict], mode: str = "review_only", modules: list[I
         if not text.strip():
             continue
         state["_i"] = i
+        state["_event"] = ev  # expose event metadata (e.g. tool name) to stateful modules (shortcut)
         state["session_text"] += "\n" + text
         for mod in mods:
             if not mod.plausible(text, state):

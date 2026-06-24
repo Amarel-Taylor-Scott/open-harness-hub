@@ -1,0 +1,44 @@
+MODULE src/teleon/retrieval/embedding_port.py
+## API signatures
+```python
+"""src.teleon.retrieval.embedding_port — the EMBEDDING abstraction: any embedder behind ONE port (agnostic, registry-populated)."""
+_OLLAMA_EMBED_URL = ...
+_LOCAL_EMBED_MODEL = ...
+_NOMIC_DIM = ...
+_REPO = ...
+_MODEL_EMBEDDERS = ...
+class EmbeddingPort:
+    def embed(self, text: str) -> list[float]
+class LexicalEmbedder:
+    # Deterministic lexical embedder (char-trigram hash, ALWAYS available — the wired baseline). No model, no network.
+    def embed(self, text: str) -> list[float]
+    def embed_batch(self, texts: list[str]) -> list[list[float]]
+class NotWiredEmbedder:
+    # A registry embedder whose model/key isn't present — honest, never fabricates a vector.
+    def __init__(self, name: str)
+    def embed(self, text: str) -> list[float]
+class LocalOllamaEmbedder:
+    # LOCAL semantic embedder via Ollama (nomic-embed-text) — NO API KEY, runs on localhost, private + free.
+    def embed(self, text: str) -> list[float]
+    def available(self) -> bool
+_NAME_ADAPTERS = ...
+def register_embedder_adapter(name: str, factory) -> None
+    # Future-proofing hook: wire a real embedder by name; callers of select_embedder never change.
+def _embedding_plane() -> list[Candidate]
+def select_embedder_by_policy(policy: str='local_first') -> EmbeddingPort
+    # Pick an embedder by POLICY over the plane (local_first | keyless_first | cheapest | best_quality | …),
+def best_embedder() -> EmbeddingPort
+    # Back-compat alias: the local-first policy over the embedding plane (local-semantic if up, else lexical).
+def available_embedders() -> dict
+def select_embedder(name: str='auto') -> EmbeddingPort
+    # Resolve an embedder by name/registry-id. 'auto' -> the always-available lexical baseline; a model embedder not yet
+```
+## intra-module call edges
+src.teleon.retrieval.embedding_port._embedding_plane -> src.teleon.retrieval.embedding_port.LocalOllamaEmbedder.available
+src.teleon.retrieval.embedding_port._embedding_plane -> src.teleon.retrieval.embedding_port.LocalOllamaEmbedder
+src.teleon.retrieval.embedding_port.select_embedder_by_policy -> src.teleon.retrieval.embedding_port.LexicalEmbedder
+src.teleon.retrieval.embedding_port.select_embedder_by_policy -> src.teleon.retrieval.embedding_port._embedding_plane
+src.teleon.retrieval.embedding_port.best_embedder -> src.teleon.retrieval.embedding_port.select_embedder_by_policy
+src.teleon.retrieval.embedding_port.select_embedder -> src.teleon.retrieval.embedding_port.LexicalEmbedder
+src.teleon.retrieval.embedding_port.select_embedder -> src.teleon.retrieval.embedding_port.NotWiredEmbedder
+src.teleon.retrieval.embedding_port.available -> src.teleon.retrieval.embedding_port.EmbeddingPort.embed
