@@ -22,7 +22,7 @@ SPEC = REPO / "architecture" / "surface_capability_spec.json"
 SVC = REPO / "dist" / "service-plane-tunnel-urls.json"
 OHD_LOG = REPO / "data" / "dev-intel" / "ohd-tunnel.log"
 #: pillar id → the service-plane target id whose live tunnel is that pillar's app
-PILLAR_APP = {"ai-done-right": "context_is_everything_app", "teleon": "teleon_app", "aidevobserver": None,
+PILLAR_APP = {"ai-done-right": "context_is_everything_app", "teleon": "teleon_app", "aidevobserver": "aidevobserver_demo",
               "baltor": "baltor_app", "open-star-hubs": "harness_hub_app"}
 
 
