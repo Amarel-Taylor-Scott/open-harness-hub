@@ -21,6 +21,10 @@ unchanged). Foundational law (the four filters): `architecture/substrate_layers.
 
 ## Surfaces are durable + northstar (the 2026-06-25 pass)
 
+- **One design system** (owner 2026-06-25): Baltor · Teleon · AIDevObserver · Open\*Hubs share the SAME layout /
+  HTML / CSS / fonts — the shared kit (`shared/oh-site.jsx` + `oh-tokens/components/site.css`) — and differ ONLY in
+  color scheme + copy. Enforced by `check_northstar_design` (kit-consistency). AIDevObserver still needs its shared-kit
+  surface (today it has a standalone functional `/demo` only).
 - The high-fidelity **design source `dist/sites/openharness-design/` is now TRACKED in git** (was caught by `/dist/*`
   ignore → root cause of recurring "the design is gone"). It is the source `port_full_design_to_web.py` ports → `web/`.
 - One launcher landing page: `scripts/landing_server.py` → reads live tunnel URLs per request → one URL, all pillars.

@@ -185,8 +185,8 @@
       accent: '#5f7585', futureAccent: '#1f8fd6', glyph: '⇄', url: '../openendpointhub/OpenEndpointHub Prototype.html', status: 'private',
       source: 'endpoint registries + free_endpoint_intel', openTrigger: 'a public governed-endpoint directory launches',
     },
-    openEnvHub: {
-      name: 'OpenEnvHub', wordmark: 'OpenEnvHub.io', domain: 'OpenEnvHub.io', kind: 'Eval environments',
+    openEnvironmentHub: {
+      name: 'OpenEnvironmentHub', wordmark: 'OpenEnvironmentHub.io', domain: 'OpenEnvironmentHub.io', kind: 'Eval environments',
       blurb: 'Verifiable agent eval environments and reward specs — the task world a candidate is run against, not the score it earns.',
       accent: '#5f7a6e', futureAccent: '#2f9e5a', glyph: '⊕', url: '../openenvhub/OpenEnvHub Prototype.html', status: 'private',
       source: 'Environment + Reward Spine', openTrigger: 'a public agent eval-environment registry appears',
@@ -269,7 +269,7 @@
   const LAYERS = [
     { id: 'product', label: 'Products', sub: 'governed products you run', items: ['baltor', 'teleon'] },
     { id: 'open', label: 'Open resources', sub: 'context · skills · tools · skill→tool · mcp · compression · benchmark · review · harnesses', items: ['openContextHub', 'openSkillsHub', 'openToolsHub', 'openSkillToTool', 'openMCPHub', 'openCompressionHub', 'openBenchmarkHub', 'openReviewHub', 'openHarnessHub'] },
-    { id: 'candidate', label: 'Private bench', sub: 'built on the kit · private until a competitor enters the lane', items: ['openTemplatesHub', 'openEndpointHub', 'openEnvHub', 'openSandboxHub', 'openAgentHub', 'openReceiptHub', 'openStateHub', 'openRoutingHub', 'openReconciliationHub', 'openHardeningHub', 'openEnrichmentHub', 'openOptimizationHub', 'openVerificationHub'] },
+    { id: 'candidate', label: 'Private bench', sub: 'built on the kit · private until a competitor enters the lane', items: ['openTemplatesHub', 'openEndpointHub', 'openEnvironmentHub', 'openSandboxHub', 'openAgentHub', 'openReceiptHub', 'openStateHub', 'openRoutingHub', 'openReconciliationHub', 'openHardeningHub', 'openEnrichmentHub', 'openOptimizationHub', 'openVerificationHub'] },
   ];
   // key relationships (ports) — how value flows between entities
   const PORTS = [

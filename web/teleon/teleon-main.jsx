@@ -350,6 +350,8 @@ function App() {
   // marketing + auth surfaces (no app chrome)
   if (route === '/' || route === '') return <Landing theme={theme} onToggle={toggle} />;
   if (route === '/fits') return <WhereFits theme={theme} onToggle={toggle} />;
+  // 'How it works' + 'Lifecycle' are sections OF the landing — render it (was a 404 → app-shell sidebar leak).
+  if (route === '/how' || route === '/lifecycle') return <Landing theme={theme} onToggle={toggle} />;
   if (route === '/signin' || route === '/signup' || route === '/forgot') {
     return <div className={rootCls} style={rootStyle}><OhAuth brand={BRAND} mode={route.slice(1)} /></div>;
   }
@@ -408,14 +410,13 @@ function App() {
       { title: 'Profile', rows: [{ t: 'Display name', d: 'Shown across your workspace', ctrl: <input className="oh-input" defaultValue="Ada Lovelace" /> }, { t: 'Work email', d: 'Used for sign-in and receipts', ctrl: <input className="oh-input" defaultValue="ada@company.com" /> }] },
       { title: 'Preferences', rows: [{ t: 'Auto-rollback', d: 'Roll back any capability that fails its gate', ctrl: <OhSwitch on onToggle={() => {}} /> }, { t: 'Weekly evidence digest', d: 'Email a summary of promotions and rollbacks', ctrl: <OhSwitch on onToggle={() => {}} /> }] },
     ]} />;
-  else if (route === '/docs' || route === '/pricing') page = route === '/pricing'
-    ? <OhPricing tiers={[
+  else if (route === '/pricing') page = <OhPricing tiers={[
         { name: 'Starter', price: '$0', per: '/mo', desc: 'For trying Teleon on a project.', features: ['3 capabilities', 'Shared eval compute', 'Community support'], cta: 'Start free' },
         { name: 'Team', price: '$249', per: '/mo', desc: 'For teams shipping capabilities.', features: ['Up to 25 capabilities', 'Private eval compute', 'Auto-rollback', 'Priority support'], cta: 'Start Team', featured: true },
         { name: 'Enterprise', price: 'Custom', per: '', desc: 'For regulated & at-scale orgs.', features: ['Unlimited capabilities', 'SSO & SCIM', 'Audit & compliance', 'Dedicated support'], cta: 'Contact sales' },
-      ]} />
-    : <SimplePage eyebrow={BRAND.name + BRAND.tld} title="Docs" sub="Coming soon." note="This surface reuses the shared kit skeleton; full content lands next." />;
-  else page = <OhNotFound brand={BRAND} home="/dashboard" links={[['Capabilities', '/app'], ['Docs', '/docs']]} />;
+      ]} />;
+  // unknown route → a MARKETING-framed 404 (home + marketing links), NOT the app shell with its sidebar.
+  else return <div className={rootCls} style={rootStyle}><OhNotFound brand={BRAND} home="/" links={[['Home', '/'], ['Docs', '/docs'], ['Pricing', '/pricing']]} /></div>;
 
   return (
     <div className={rootCls} style={rootStyle}>

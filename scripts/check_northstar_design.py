@@ -30,6 +30,10 @@ SPEC = REPO / "architecture" / "surface_capability_spec.json"
 HARD = re.compile(r"(?i:lorem ipsum|placeholder text|replace[ _]me\b|dummy data|sample sample)|\bPLACEHOLDER\b")
 SOFT = re.compile(r"coming soon|full content lands next|reuses the shared kit skeleton|\bstub\b|\bTODO\b|\bFIXME\b", re.I)
 SURFACE_GLOBS = ("*.html", "*.jsx", "*.js")
+# consistency (owner 2026-06-25): the product surfaces share ONE design system — same layout / HTML / CSS / fonts,
+# differing only in color scheme + copy. Every design-system product loader must reference the shared kit.
+KIT_FILES = ("oh-site.jsx", "oh-tokens.css", "oh-components.css", "oh-site.css")
+DESIGN_PRODUCT_FOLDERS = ("teleon", "context-enrichment", "openharnesshub")  # context-enrichment = Baltor's folder
 
 
 def _surface_roots() -> list[Path]:
@@ -84,10 +88,27 @@ def side_surfaces() -> list[str]:
             if d.is_dir() and d.name not in reg and d.name not in skip and not d.name.startswith((".", "_"))]
 
 
+def kit_consistency() -> list[str]:
+    """Each design-system product loader must reference the shared kit (one layout/CSS/fonts; differ only in color/copy)."""
+    bundle = REPO / "dist" / "sites" / "openharness-design"
+    out: list[str] = []
+    for folder in DESIGN_PRODUCT_FOLDERS:
+        d = bundle / folder
+        if not d.is_dir():
+            continue
+        html = " ".join(p.read_text(encoding="utf-8", errors="replace") for p in d.glob("*.html"))
+        out += [f"{folder}: loader missing shared-kit ref {kf}" for kf in KIT_FILES if kf not in html]
+    return out
+
+
 def check() -> int:
     hard, soft, side = hard_violations(), soft_warnings(), side_surfaces()
     for s in side:
         print(f"  [warn · side surface] {s} — not a registered pillar in surface_capability_spec")
+    for kc in kit_consistency():
+        print(f"  [warn · inconsistent] {kc} — products share one kit (differ only in color/copy)")
+    if not (REPO / "dist/sites/openharness-design/aidevobserver").is_dir():
+        print("  [note] AIDevObserver has no shared-kit surface yet (standalone demo only) — build one for consistency")
     for w in soft[:25]:
         print(f"  [warn · stub] {w}")
     if soft[25:]:
@@ -108,7 +129,9 @@ def self_test() -> int:
     assert isinstance(side_surfaces(), list) and isinstance(soft_warnings(), list)
     hv = hard_violations()
     assert hv == [], f"northstar: hard placeholder(s) found in a surface: {hv[:5]}"   # LIVE guard
-    print(f"check_northstar_design self-test: OK (detector + LIVE guard: 0 hard placeholders across "
+    kc = kit_consistency()
+    assert kc == [], f"northstar: design-system products must load the shared kit (consistency): {kc}"
+    print(f"check_northstar_design self-test: OK (0 hard placeholders + shared-kit consistency across "
           f"{len(_surface_files())} surface files)")
     return 0
 
