@@ -987,4 +987,22 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/build_hub_sites.py", "build_hub_sites"),
     ("scripts/scaffold_hub.py", "scaffold_hub"),
     ("scripts/hub_engine_runner.py", "hub_engine_runner"),
+    # --- 2026-06-25 session seams: registered for gate coverage (closes the governance hole). The search trio is
+    #     slated to consolidate behind retrieval/search_port + synthesis/component_search per the dev contract (#24). ---
+    ("scripts/interrogation_engine.py", "interrogation_engine"),
+    ("scripts/kickstart.py", "kickstart"),
+    ("scripts/seed_ingest.py", "seed_ingest"),
+    ("scripts/bot_swarm.py", "bot_swarm"),
+    ("scripts/populate_loop.py", "populate_loop"),
+    ("scripts/enrich_loop.py", "enrich_loop"),
+    ("scripts/codeblock_enrich.py", "codeblock_enrich"),
+    ("scripts/bench_token_usage.py", "bench_token_usage"),
+    ("scripts/scale_index.py", "scale_index"),
+    ("scripts/hybrid_search.py", "hybrid_search"),
+    ("scripts/record_search.py", "record_search"),
+    ("scripts/work_queue.py", "work_queue"),
+    ("scripts/build_loop.py", "build_loop"),
+    ("scripts/worktree_build.py", "worktree_build"),
+    ("scripts/flywheel_status.py", "flywheel_status"),
+    ("scripts/check_seha_boundary.py", "check_seha_boundary"),
 ]

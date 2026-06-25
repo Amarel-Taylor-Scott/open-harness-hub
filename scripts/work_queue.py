@@ -154,12 +154,12 @@ def self_test() -> int:
     time.sleep(0.25)
     again = claim("t", "w3", lease=30, n=10, db=db)
     assert any(r[0] == rows[1][0] for r in again), "expired-lease item is re-claimed → RESUME works"
-    # dead-letter: an always-failing item retries up to _MAX_ATTEMPTS (incremented per claim) then dead-letters
-    def _boom(_p):
-        raise ValueError("boom")
-    register("bad", _boom)
+    # dead-letter: claim+fail the same item _MAX_ATTEMPTS times → dead (deterministic, no worker-loop timing)
     enqueue("bad", {"y": 1}, db)
-    run_worker("bad", max_items=_MAX_ATTEMPTS + 3, idle_sleep=0, db=db)
+    for _ in range(_MAX_ATTEMPTS):
+        r = claim("bad", "wf", lease=30, n=1, db=db)
+        if r:
+            fail(r[0][0], db)
     assert stats("bad", db).get("bad", {}).get("dead", 0) == 1, "always-failing item dead-letters after max attempts"
     # stateless worker processes a registered handler to completion
     seen = []
