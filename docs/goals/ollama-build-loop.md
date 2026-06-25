@@ -37,3 +37,16 @@ selected from a registry, governed for truth + cost, with receipts. Read `CLAUDE
   can generate.
 - Close a `magic_number_audit` / reinvention-guard finding.
 - Add source-surface seeds or a repair planner for a missing row family.
+
+## Priority deliverable — example use-cases + FULLY FUNCTIONAL pipelines (owner 2026-06-25)
+The portfolio is **AI Done Right** (umbrella IP · brands · standards · shared R&D/security/governance):
+- **Teleon.dev** — runs a capability on the CHEAPEST bounded path that still passes → governs **EFFICIENCY**.
+- **Baltor.ai** — managed, verified, provable context, powered by Teleon → governs **TRUTH**.
+- **Open\*Hubs** — the open STORE both products consume (context · tools · skills · harnesses · specs).
+- **Teleon Observer** — watches AI usage; reviews the SESSION (post) + helps intra-session (while) → the wedge.
+
+For EACH product, every cycle should move toward a **clear example use-case + a runnable end-to-end pipeline**
+(not just registry rows): a named scenario → the composed DAG over real registry components → a runnable demo
+with a measured result (e.g. "X% cheaper than always-frontier", a verified-context answer, an Observer session
+report). Reuse `src/teleon/dag/`, `registry/compose.py`, the demo catalog, and the populated registries the swarm
+produces — don't hand-build what `compose`/`populate` can generate. Keep `serves_truth=false` until verified.
