@@ -27,3 +27,23 @@ is committed to git (versioned, signed, installable, indexed back into pgvector 
 ## The one production gap (queued #16)
 The operational tier is currently `LocalRecordStore` (sqlite/JSONL staging — the canonical first tier). Wiring
 `PostgresRecordStore` + pgvector is the scale move for metadata+vectors. **Code stays in git regardless.**
+
+## Refinement (owner 2026-06-25): BOTH authoritative; git holds EVERYTHING; branches model promotion
+Store every record/codeblock/component in **both** — they play different roles, and git is no longer gated on the
+promotion boundary:
+- **git = the durable, versioned source of truth for EVERYTHING** (candidate AND promoted). Promotion state is a
+  **branch**, not an entry gate: candidates land on `candidates/*` (or a `staged` branch), variations on **feature
+  branches**, and promotion = a reviewed **merge to `main`** (PRs · diff · blame · rollback for free). git already
+  holds our ledgers (`data/dev-intel/*.jsonl` are tracked + auto-committed) — make it deliberate + structured
+  (`records/<registry>/<id>.json`, `codeblocks/<id>.py`).
+- **DB (pgvector) = the FAST, searchable MIRROR** of the same records — rebuildable from git, indexed for semantic +
+  multi-attribute search. The DB is a **derived index**, not the source of truth (so it can be dropped + rebuilt).
+- **Promotion boundary now governs TENANT-VISIBILITY** (what's *served*), **not git ENTRY** — everything is in git
+  from the moment it's created; what's promoted is what's been merged to `main` + flagged servable in the DB.
+
+Two honest caveats: (1) **third-party code is still a POINTER** — git holds OUR record + a handle to their repo,
+never a copy (license + bloat). (2) **git is not a database at billions-scale** — the curated/promoted layer +
+codeblocks + structured ledgers live in git (branchable, sharded if needed); the extreme-volume raw-candidate
+firehose is mirrored in DB/object-store, not one-file-per-row in a single giant repo. "git holds everything" =
+everything that benefits from versioning/branches/review.
+
