@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# ./autonomy — the PERSISTENT self-healing spine. Keeps the Kimi/GLM loops running forever WITHOUT Claude Code:
+#   build = code edits (proof-gated)   ·   swarm = discover→interrogate→enrich (candidates)
+# The supervisor restarts any loop that dies. This is the "constantly making improvements" layer.
+#
+#   ./autonomy            start the supervisor DETACHED (default; survives the terminal)   [alias of bg]
+#   ./autonomy start      start in the FOREGROUND
+#   ./autonomy status     are build + swarm alive?
+#   ./autonomy stop       halt supervisor + build + swarm (sets all STOP flags)
+#   ./autonomy resume     clear all STOP flags
+#   ./autonomy logs       tail the supervisor log
+set -euo pipefail
+cd "$(dirname "$(readlink -f "$0")")"
+source scripts/harness_env.sh >/dev/null 2>&1 || true
+export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}."
+PY="${PYTHON:-python3}"
+SUP="scripts/autonomy_supervisor.py"
+STOP=".agent/AUTONOMY_STOP_REQUESTED"
+LOG="data/dev-intel/autonomy.log"
+
+cmd="${1:-bg}"; shift || true
+case "$cmd" in
+  start)  rm -f "$STOP"; exec "$PY" "$SUP" --supervise "$@" ;;
+  bg|"")  rm -f "$STOP"; mkdir -p data/dev-intel
+          nohup "$PY" "$SUP" --supervise "$@" >>"$LOG" 2>&1 &
+          echo "autonomy supervisor detached (pid $!). './autonomy status' to monitor, './autonomy stop' to halt." ;;
+  status|monitor) exec "$PY" "$SUP" --status ;;
+  stop)   mkdir -p .agent; : > "$STOP"; : > .agent/BUILD_STOP_REQUESTED; : > .agent/SWARM_STOP_REQUESTED
+          echo "stop requested for supervisor + build + swarm (halts after current cycles; state preserved)." ;;
+  resume) rm -f "$STOP" .agent/BUILD_STOP_REQUESTED .agent/SWARM_STOP_REQUESTED; echo "cleared all stop flags." ;;
+  logs)   touch "$LOG"; tail -n 40 -f "$LOG" ;;
+  *) echo "usage: ./autonomy [start|bg|status|stop|resume|logs]"; exit 2 ;;
+esac
