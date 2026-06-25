@@ -101,15 +101,13 @@ def checkpoint_commit(msg: str) -> bool:
 
 
 def revert_failed_cycle(base_sha: str, untracked_before: set[str]) -> None:
-    """Discard the agent's changes: reset tracked files to base, remove ONLY newly-created untracked files."""
+    """Discard the agent's TRACKED changes back to the checkpoint. We deliberately do NOT delete untracked files:
+    with concurrent writers (the swarm, the flywheel, a human, Claude Code) a blanket untracked-clean can destroy
+    unrelated work — it once deleted a file being written alongside a cycle. New untracked files from a red cycle
+    are left for inspection (the next checkpoint absorbs them, or a human removes them). For full isolation, run
+    this loop in a dedicated git worktree."""
     _git("reset", "--hard", base_sha)
-    for rel in sorted(untracked_files() - untracked_before):
-        p = REPO / rel
-        try:
-            if p.is_file():
-                p.unlink()
-        except OSError:
-            pass
+    _ = untracked_before  # kept for signature/back-compat; intentionally NOT used to delete files
 
 
 # ── task selection ──────────────────────────────────────────────────────────────────────────────────--

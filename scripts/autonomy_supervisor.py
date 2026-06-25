@@ -23,9 +23,11 @@ REPO = Path(__file__).resolve().parents[1]
 LOGDIR = REPO / "data" / "dev-intel"
 STOP = REPO / ".agent" / "AUTONOMY_STOP_REQUESTED"
 
+# SAFE persistent daemons only. The swarm is APPEND-ONLY (never touches git) so it runs forever safely alongside
+# other writers. build_loop is intentionally NOT here: it does `git reset --hard` on a red cycle, which is unsafe
+# in a multi-writer tree (it can revert concurrent work). Run build_loop isolated via ./build (supervised) or a
+# future git-worktree; do not add it to the always-on spine until isolated.
 LOOPS = [
-    {"name": "build", "grep": "build_loop.py --supervise", "script": "scripts/build_loop.py",
-     "cmd": [sys.executable, "scripts/build_loop.py", "--supervise"], "log": "build_loop.log"},
     {"name": "swarm", "grep": "bot_swarm.py --supervise", "script": "scripts/bot_swarm.py",
      "cmd": [sys.executable, "scripts/bot_swarm.py", "--supervise"], "log": "bot_swarm.log"},
 ]
@@ -66,7 +68,7 @@ def supervise(interval: int) -> int:
 
 
 def self_test() -> int:
-    assert len(LOOPS) >= 2 and all({"name", "grep", "cmd", "log"} <= set(l) for l in LOOPS)
+    assert len(LOOPS) >= 1 and all({"name", "grep", "cmd", "log"} <= set(l) for l in LOOPS)
     for loop in LOOPS:
         assert (REPO / loop["script"]).exists(), f"child script missing: {loop['script']}"
     # _alive returns a list and does not raise (pgrep present)
