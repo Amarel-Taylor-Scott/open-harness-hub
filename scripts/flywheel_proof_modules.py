@@ -999,7 +999,6 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/bench_token_usage.py", "bench_token_usage"),
     ("scripts/scale_index.py", "scale_index"),
     ("scripts/hybrid_search.py", "hybrid_search"),
-    ("scripts/record_search.py", "record_search"),
     ("scripts/work_queue.py", "work_queue"),
     ("scripts/build_loop.py", "build_loop"),
     ("scripts/worktree_build.py", "worktree_build"),

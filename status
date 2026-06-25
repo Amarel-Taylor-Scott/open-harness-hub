@@ -12,7 +12,7 @@ PY="${PYTHON:-python3}"
 case "${1:-dash}" in
   dash|"")  exec "$PY" scripts/flywheel_status.py ;;
   search)   shift; exec "$PY" scripts/scale_index.py --search "$*" ;;        # SQLite incremental index (scale path)
-  audit)    exec "$PY" scripts/record_search.py --audit ;;
+  audit)    exec "$PY" scripts/scale_index.py --stats ;;                       # consolidated → scale_index (record_search archived)
   reindex)  exec "$PY" scripts/scale_index.py --ingest ;;                     # O(new) incremental, not whole-file
   index-stats) exec "$PY" scripts/scale_index.py --stats ;;
   *) echo "usage: ./status [dash|search <q>|audit|reindex]"; exit 2 ;;
