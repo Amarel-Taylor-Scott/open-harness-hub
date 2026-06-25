@@ -143,6 +143,8 @@ def run_worker(topic: str, fn=None, *, lease: float = 30.0, batch: int = 10, max
 
 def self_test() -> int:
     import tempfile
+    global STOP
+    STOP = Path(tempfile.mkdtemp()) / "no_stop"           # ignore the real QUEUE_STOP flag (subprocess-local in the gate)
     db = Path(tempfile.mkdtemp()) / "q.db"
     assert enqueue("t", {"x": 1}, db) and not enqueue("t", {"x": 1}, db), "idempotent enqueue (dedup)"
     assert enqueue("t", {"x": 2}, db) and enqueue("t", {"x": 3}, db)
