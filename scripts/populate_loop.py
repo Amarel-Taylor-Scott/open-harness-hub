@@ -94,6 +94,7 @@ def variations_for(rec: dict) -> list[dict]:
             "record_id": vid, "kind": "variation", "variant_of": rec["record_id"],
             "variant_axis": r["dimension"], "spec": r["question"], "object_type": rec["object_type"],
             "name": rec["name"], "registry": rec["registry"], "status": "variation_candidate",
+            "searchability_tags": (rec.get("searchability_tags", []) + [r["dimension"]])[:12],
             "provenance": {"derived_from": rec["record_id"], "by": "interrogation_engine", "at": _now()},
             "serves_truth": False,
         })

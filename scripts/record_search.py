@@ -40,10 +40,12 @@ def _rec_text(rec: dict) -> str:
 
 
 def usable(rec: dict) -> bool:
-    """A record is usable only if it can be searched AND composed: name + type + tags, and a source/lineage."""
-    has_core = bool(rec.get("name")) and bool(rec.get("object_type")) and bool(rec.get("searchability_tags"))
-    has_origin = bool(rec.get("source") or rec.get("provenance") or rec.get("variant_of"))
-    return has_core and has_origin
+    """Usable = findable + composable. A variation is searchable via its name + spec (lineage = variant_of); a base
+    record needs tags + a source/provenance."""
+    has_name_type = bool(rec.get("name")) and bool(rec.get("object_type"))
+    if rec.get("kind") == "variation":
+        return has_name_type and bool(rec.get("variant_of"))
+    return has_name_type and bool(rec.get("searchability_tags")) and bool(rec.get("source") or rec.get("provenance"))
 
 
 def _read_records() -> list[dict]:
@@ -66,7 +68,7 @@ def build_index(records: list[dict] | None = None) -> int:
     recs: dict[str, dict] = {}
     for rec in records:
         rid = rec.get("record_id")
-        if not rid:
+        if not rid or not usable(rec):       # index only USABLE records → search returns usable + searchable
             continue
         recs[rid] = {"name": rec.get("name", ""), "type": rec.get("object_type", ""),
                      "registry": rec.get("registry", ""), "kind": rec.get("kind", "record"),
@@ -120,7 +122,7 @@ def self_test() -> int:
     import tempfile
     try:
         INDEX = Path(tempfile.mkdtemp()) / "idx.json"
-        assert build_index(recs) == 3, "bad record (no id? has id but unusable still indexed by id) "
+        assert build_index(recs) == 3, "only the 3 usable records indexed (the empty 'bad' record excluded)"
         hits = search("agent framework", k=5)
         assert hits and hits[0]["record_id"] == "r1", f"search must rank the agent framework first: {hits[:2]}"
         assert any(h["record_id"] == "r2" for h in search("regex email")), "regex record findable"
