@@ -72,6 +72,15 @@ def show() -> None:
     print("produced (the flywheel output):")
     for k, v in counts().items():
         print(f"  {k:16} {v}")
+    try:
+        from scripts.work_queue import stats as _qstats
+        q = _qstats()
+    except Exception:
+        q = {}
+    if q:
+        print("queue (durable orchestration · stateless-resume):")
+        for topic, st in q.items():
+            print(f"  {topic:16} {st}")
     print("recent work log:")
     for lg, lines in worklog().items():
         for ln in lines:
