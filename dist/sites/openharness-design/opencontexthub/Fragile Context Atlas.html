@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="data:,">
+<title>OpenContextHub · Fragile Context Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../shared/oh-tokens.css" />
+<link rel="stylesheet" href="../shared/oh-components.css" />
+<link rel="stylesheet" href="../shared/oh-site.css" />
+<style>
+  /* OpenContextHub · Fragile Context Atlas. Reference context is NOT served truth —
+     Baltor governs context before consumption. This page is a catalog, not an authority. */
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--font-display); -webkit-font-smoothing: antialiased; }
+  .fa-wrap { max-width: 1160px; margin: 0 auto; padding: 0 28px 80px; }
+
+  .fa-top { display: flex; align-items: center; gap: 14px; padding: 20px 0 16px; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20;
+            background: color-mix(in srgb, var(--bg) 90%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .fa-logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 16px; letter-spacing: -.02em; text-decoration: none; color: var(--fg); }
+  .fa-mark { width: 27px; height: 27px; border-radius: 7px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-size: 14px; flex: 0 0 auto; }
+  .fa-logo small { display: block; font-weight: 500; font-size: 11px; color: var(--fg-faint); }
+  .fa-top .sp { flex: 1; }
+  .fa-tag { font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; background: var(--panel); }
+
+  .fa-hero { padding: 38px 0 6px; }
+  .fa-eyebrow { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+  .fa-hero h1 { font-size: 34px; font-weight: 800; letter-spacing: -.03em; line-height: 1.06; margin: 13px 0 0; max-width: 22ch; }
+  .fa-hero p { font-size: 15.5px; line-height: 1.6; color: var(--fg-muted); margin: 14px 0 0; max-width: 66ch; }
+  .fa-hero .pull { font-family: var(--font-mono); font-size: 12.5px; color: var(--fg); background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: var(--r-sm); padding: 12px 15px; margin: 18px 0 0; max-width: 70ch; line-height: 1.5; }
+
+  .fa-sec { margin-top: 42px; }
+  .fa-sec-h { display: flex; align-items: baseline; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+  .fa-sec-h h2 { font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin: 0; }
+  .fa-sec-h .note { margin-left: auto; font-size: 12px; color: var(--fg-muted); }
+
+  /* fragility modes */
+  .fa-modes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  @media (max-width: 900px) { .fa-modes { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 540px) { .fa-modes { grid-template-columns: 1fr; } }
+  .fa-mode { padding: 12px 14px; border-left: 3px solid var(--accent); }
+  .fa-mode .k { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; letter-spacing: .04em; color: var(--accent); }
+  .fa-mode .d { font-size: 12px; line-height: 1.4; color: var(--fg-muted); margin-top: 5px; }
+
+  /* atlas table */
+  .fa-table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-lg); }
+  .fa-table { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 760px; }
+  .fa-table th { text-align: left; font-size: 10px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--fg-faint); padding: 10px 12px; border-bottom: 1px solid var(--line-strong); background: var(--panel); position: sticky; top: 0; }
+  .fa-table td { padding: 11px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .fa-table tr:last-child td { border-bottom: none; }
+  .fa-table .pack { color: var(--fg); font-weight: 600; }
+  .fa-table .mut { color: var(--fg-muted); }
+  .fa-table .mono { font-family: var(--font-mono); font-size: 11px; }
+  .fa-fm { display: inline-block; font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line)); border-radius: 4px; padding: 1px 5px; margin: 0 3px 3px 0; }
+  .fa-demo { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; color: var(--accent); text-decoration: none; white-space: nowrap; }
+  .fa-demo:hover { text-decoration: underline; }
+  .fa-demo.none { color: var(--fg-faint); }
+
+  /* audit offers */
+  .fa-offers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; }
+  @media (max-width: 900px) { .fa-offers { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .fa-offers { grid-template-columns: 1fr; } }
+  .fa-offer { padding: 15px 16px; }
+  .fa-offer .t { font-size: 14px; font-weight: 700; color: var(--fg); }
+  .fa-offer .d { font-size: 12px; line-height: 1.45; color: var(--fg-muted); margin-top: 7px; }
+  .fa-offer .out { font-family: var(--font-mono); font-size: 10px; color: var(--fg-faint); margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--line); }
+
+  .fa-cta { margin-top: 40px; padding: 24px 26px; border: 1px solid color-mix(in srgb, var(--accent) 32%, var(--line)); border-radius: var(--r-lg); background: var(--accent-weak); display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  .fa-cta .t { font-size: 18px; font-weight: 800; letter-spacing: -.02em; }
+  .fa-cta .s { font-size: 13px; color: var(--fg-muted); margin-top: 5px; }
+  .fa-cta .sp { flex: 1; }
+
+  .fa-foot { margin-top: 46px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12px; color: var(--fg-faint); line-height: 1.6; }
+  .fa-foot b { color: var(--fg-muted); font-weight: 600; }
+  .fa-foot a { color: var(--accent); }
+
+  /* framing band: fragility is one of several governance dimensions */
+  .fa-band { padding: 18px 20px; border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: var(--r-lg); background: var(--panel); }
+  .fa-band-h { font-size: 16px; font-weight: 700; letter-spacing: -.01em; color: var(--fg); }
+  .fa-band p { font-size: 13px; line-height: 1.55; color: var(--fg-muted); margin: 8px 0 0; max-width: 80ch; }
+  .fa-band a { color: var(--accent); }
+  .fa-pillars { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .fa-pillars span { font-size: 11.5px; color: var(--fg-muted); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; background: var(--bg-subtle); }
+  .fa-pillars b { color: var(--accent); font-weight: 600; }
+  /* mode cards double as table filters */
+  .fa-mode { cursor: pointer; transition: border-color .12s, background .12s; }
+  .fa-mode:hover { background: var(--bg-subtle); }
+  .fa-mode.on { background: var(--accent-weak); border-left-color: var(--accent); }
+  .fa-filter-note { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); }
+  .fa-filter-clear { font-family: var(--font-mono); font-size: 11px; color: var(--accent); background: none; border: none; cursor: pointer; text-decoration: underline; }
+</style>
+</head>
+<body class="oh dir-s theme-dark oh-site fa" style="--accent:#36a578; --accent-weak:#102a20; --accent-ink:#04130c;">
+<div class="fa-top"><div class="fa-wrap" style="display:flex;align-items:center;gap:14px;padding-top:0;padding-bottom:0;width:100%;box-sizing:border-box;">
+  <a class="fa-logo" href="OpenContextHub Prototype.html"><span class="fa-mark">⬡</span><span>OpenContextHub<small>fragile context atlas</small></span></a>
+  <span class="sp"></span>
+  <span class="fa-tag">Reference context is not served truth</span>
+</div></div>
+
+<div class="fa-wrap">
+  <section class="fa-hero">
+    <div class="fa-eyebrow">Catalog · fragile context packs</div>
+    <h1>The fragile context atlas.</h1>
+    <p>Companies are already putting fragile knowledge into RAG, chatbots, copilots, enterprise search, and agent memory. Most don’t know which parts are stale, conflicting, jurisdiction-specific, source-dependent, or unsafe to serve. This atlas catalogs those fragile context surfaces by domain and failure mode — and links the ones Baltor already governs end-to-end.</p>
+    <div class="pull">The fragile part isn’t always the document. It’s the <b>answer derived from it</b> — “refund window is 30 days” can be true in an old wiki and false in the billing system, a contract override, or a regulated dispute window.</div>
+  </section>
+
+  <section class="fa-sec">
+    <div class="fa-band">
+      <div class="fa-band-h">Fragility is one lens — not the whole engine.</div>
+      <p>Catching stale &amp; conflicting context is one thing Baltor does. It sits beside the rest of the governed-context engine — every served pack is reconciled, hardened, enhanced, optimized, and verified, with receipts and source handles. This atlas tags the fragility; the <a href="../context-enrichment/Baltor%20CFPB%20Guided%20Demo.html">demos</a> show the full pipeline.</p>
+      <div class="fa-pillars">
+        <span><b>⇄ Reconcile</b> conflicts → one answer</span>
+        <span><b>△ Harden</b> fragile facts → refreshable objects</span>
+        <span><b>➕ Enhance</b> with citations &amp; context</span>
+        <span><b>◇ Optimize</b> → token-lean cited packs</span>
+        <span><b>✓ Verify</b> → receipts + provenance</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="fa-sec">
+    <div class="fa-sec-h"><h2>Fragility modes</h2><span class="note">Tap a mode to filter the atlas · one of several governance dimensions</span></div>
+    <div class="fa-modes" id="modes"></div>
+  </section>
+
+  <section class="fa-sec">
+    <div class="fa-sec-h"><h2>The atlas</h2><span class="note" id="atlasNote">22 packs · ▶ = runnable Baltor demo</span></div>
+    <div class="fa-table-wrap"><table class="fa-table" id="atlas"></table></div>
+  </section>
+
+  <section class="fa-sec">
+    <div class="fa-sec-h"><h2>Audit offers</h2><span class="note">A concrete first engagement per category</span></div>
+    <div class="fa-offers" id="offers"></div>
+  </section>
+
+  <div class="fa-cta">
+    <div><div class="t">Run a Fragile Context Audit</div><div class="s">We take a real question your AI answers, show the raw answer, the conflicting sources, the governed answer, and what should be held out.</div></div>
+    <span class="sp"></span>
+    <a class="oh-btn oh-btn--primary" href="../context-enrichment/Baltor Guided Demos.html">See worked examples →</a>
+  </div>
+
+  <div class="fa-foot"><b>How this hub relates to Baltor.</b> OpenContextHub catalogs <b>reference</b> context packs and their fragility — it is <b>not a truth authority</b>. Baltor governs context before consumption: it decomposes a pack into atomic facts, holds out conflicts, tracks freshness, preserves source handles and receipts, and serves only what is supported. See the <a href="../context-enrichment/Baltor Guided Demos.html">Baltor guided demos</a> and the <a href="../context-enrichment/Baltor Federal Register Coverage.html">coverage maps</a>. <b>Not legal, medical, or financial advice.</b></div>
+</div>
+
+<script>
+const MODES = [
+  ['TIME', 'Deadlines, rates, fees, effective dates, SLAs — decay over time.'],
+  ['AUTHORITY', 'Internal SOP vs regulation vs contract vs enforcing system.'],
+  ['JURISDICTION', 'State / country / market-specific rules differ.'],
+  ['CUSTOMER', 'Customer-specific terms, exceptions, negotiated clauses.'],
+  ['SOURCE', 'Blog / wiki / chat note vs the official source.'],
+  ['CONFLICT', 'Two sources disagree on the same fact.'],
+  ['ACTION', 'The answer could trigger a payment, shipment, denial, or legal step.'],
+  ['COMPLIANCE', 'Regulated advice — financial, medical, legal, employment.'],
+  ['PRIVACY', 'Tenant-, customer-, employee-, patient-private context.'],
+  ['MODEL', 'An LLM-derived summary or fact, not independently verified.'],
+  ['FRESHNESS', 'Context decays and needs scheduled re-verification.'],
+];
+document.getElementById('modes').innerHTML = MODES.map(([k,d]) =>
+  `<div class="oh-card fa-mode" data-mode="${k}" role="button" tabindex="0"><div class="k">${k}_FRAGILE</div><div class="d">${d}</div></div>`).join('');
+
+const D = '../context-enrichment/';
+const ATLAS = [
+  ['CFPB Reg E deadline', 'Consumer finance', 'Banks · fintech · support', ['TIME','AUTHORITY','COMPLIANCE'], 'eCFR · 12 CFR 1005', 'CFPB demo', D+'Baltor CFPB Guided Demo.html'],
+  ['Sanctions / OFAC match', 'Sanctions · KYC', 'Banks · payments · trade', ['TIME','SOURCE','ACTION'], 'OFAC SDN (live)', 'Sanctions demo', D+'Baltor Sanctions Guided Demo.html'],
+  ['Credit dispute / reporting window', 'Consumer finance', 'Lenders · bureaus', ['TIME','COMPLIANCE'], 'FCRA / eCFR', '', ''],
+  ['EUDR deadline / supplier compliance', 'Supply chain · ESG', 'Importers · procurement', ['TIME','JURISDICTION'], 'EUR-Lex', 'EUDR demo', D+'Baltor EUDR Guided Demo.html'],
+  ['Refund / billing policy conflict', 'Customer support', 'Support · e-commerce', ['AUTHORITY','CONFLICT','CUSTOMER'], 'Billing system (enforcing)', 'Refund demo', D+'Baltor Refund-Policy Guided Demo.html'],
+  ['HS tariff classification', 'Trade · customs', 'Brokers · importers', ['TIME','JURISDICTION','ACTION'], 'WCO HS', 'Tariff demo', D+'Baltor Tariff Guided Demo.html'],
+  ['Dangerous-goods air shipping', 'Logistics', 'Shippers · freight', ['AUTHORITY','COMPLIANCE','ACTION'], 'IATA DGR', 'DGR demo', D+'Baltor Dangerous-Goods Guided Demo.html'],
+  ['Ocean-freight transit SLA', 'Logistics', 'Freight · quoting', ['AUTHORITY','CUSTOMER','ACTION'], 'Carrier contract', 'Transit demo', D+'Baltor Transit-SLA Guided Demo.html'],
+  ['Marine-fuel sulphur cap', 'Energy · shipping', 'Bunkering · fuel desks', ['TIME','COMPLIANCE'], 'MARPOL Annex VI', 'Marine-fuel demo', D+'Baltor Marine-Fuel Guided Demo.html'],
+  ['Drinking-water lead limit', 'Environment', 'Water utilities', ['TIME','COMPLIANCE'], 'EPA LCRR · 40 CFR 141', 'Water demo', D+'Baltor Water-Safety Guided Demo.html'],
+  ['Freight hours-of-service', 'Operations', 'Carriers · dispatch', ['TIME','COMPLIANCE','ACTION'], 'FMCSA · 49 CFR 395', 'Freight demo', D+'Baltor Freight-Hours Guided Demo.html'],
+  ['Oil reserves booking basis', 'Energy · finance', 'O&G · reserves teams', ['AUTHORITY','COMPLIANCE','ACTION'], 'SEC · 17 CFR 210', 'Reserves demo', D+'Baltor Oil-Reserves Guided Demo.html'],
+  ['FDA dosage limit', 'Healthcare', 'Pharma · labeling', ['TIME','COMPLIANCE','ACTION'], 'FDA · 21 CFR', 'FDA demo', D+'Baltor FDA Guided Demo.html'],
+  ['ICD-11 clinical coding', 'Healthcare', 'Providers · coders', ['TIME','SOURCE'], 'WHO ICD-11', 'ICD demo', D+'Baltor ICD Coding Guided Demo.html'],
+  ['OSHA exposure limit (PEL)', 'Workplace safety', 'EHS · manufacturing', ['TIME','COMPLIANCE'], 'OSHA · 29 CFR 1910', 'OSHA demo', D+'Baltor OSHA Guided Demo.html'],
+  ['GDPR retention / data residency', 'Privacy · legal', 'DPO · legal · platform', ['JURISDICTION','PRIVACY','COMPLIANCE'], 'EUR-Lex · GDPR', '', ''],
+  ['HR wage-deduction / payroll', 'HR · payroll', 'HR · benefits', ['JURISDICTION','COMPLIANCE'], 'State labor law', '', ''],
+  ['Insurance coverage appeal deadline', 'Insurance', 'Carriers · claims', ['TIME','JURISDICTION','CUSTOMER'], 'Policy + state rules', '', ''],
+  ['API deprecation / SDK version', 'Developer tools', 'Dev-rel · API copilots', ['TIME','SOURCE','MODEL'], 'OpenAPI spec + changelog', '', ''],
+  ['Sales approved claims / pricing', 'Sales · marketing', 'RevOps · enablement', ['AUTHORITY','SOURCE','COMPLIANCE'], 'Approved-claims registry', '', ''],
+  ['Legal clause playbook / contract', 'Legal · compliance', 'In-house · firms', ['AUTHORITY','JURISDICTION','CUSTOMER'], 'Current policy + statute', '', ''],
+  ['Enterprise “company brain”', 'Internal knowledge', 'IT · ops · everyone', ['AUTHORITY','SOURCE','PRIVACY','CONFLICT'], 'System of record per fact', '', ''],
+];
+document.getElementById('atlas').innerHTML =
+  '<thead><tr><th>Context pack</th><th>Domain</th><th>Likely buyer</th><th>Fragility</th><th>Source of truth</th><th>Demo</th></tr></thead><tbody>' +
+  ATLAS.map(r => `<tr>
+    <td class="pack">${r[0]}</td><td class="mut">${r[1]}</td><td class="mut">${r[2]}</td>
+    <td>${r[3].map(f=>`<span class="fa-fm">${f.toLowerCase()}</span>`).join('')}</td>
+    <td class="mono mut">${r[4]}</td>
+    <td>${r[6] ? `<a class="fa-demo" href="${r[6]}">▶ ${r[5]}</a>` : '<span class="fa-demo none">backlog</span>'}</td>
+  </tr>`).join('') + '</tbody>';
+
+const OFFERS = [
+  ['Consumer-finance chatbot guardrail audit', 'Does your support/banking bot serve a stale or non-compliant answer? We test real questions against the rule in force.', 'Finance · insurance'],
+  ['Tariff & sanctions freshness audit', 'Retired HS codes, stale sanctions matches, wrong-jurisdiction duty — caught before a shipment hold or penalty.', 'Trade · logistics'],
+  ['Shipping promise vs contract audit', 'Marketing ETAs and SOPs vs the contract and the regulation actually in force.', 'Logistics · ops'],
+  ['Clinical evidence grounding audit', 'Coding, payer-policy and guideline freshness — context governance, not diagnosis.', 'Healthcare'],
+  ['HR / payroll guidance risk audit', 'State-specific wage and leave rules vs the manager script the bot is using.', 'HR · payroll'],
+  ['Enterprise-brain hygiene audit', 'Stale docs, cross-tool contradictions, and tenant-private context leaking into general answers.', 'Enterprise search'],
+  ['Developer-docs deprecation audit', 'Deprecated endpoints and old SDK versions still served by the API copilot.', 'Developer tools'],
+  ['Sales claims governance audit', 'Unapproved claims, old pricing and missing disclosures in the sales copilot.', 'Sales · marketing'],
+  ['Legal context provenance audit', 'Superseded clause playbooks and undated regulatory memos vs the current statute.', 'Legal · compliance'],
+];
+document.getElementById('offers').innerHTML = OFFERS.map(o =>
+  `<div class="oh-card fa-offer"><div class="t">${o[0]}</div><div class="d">${o[1]}</div><div class="out">${o[2]} · output: raw answer · sources · governed answer · held-out · risk</div></div>`).join('');
+
+/* mode cards filter the atlas table */
+let activeMode = null;
+const rows = [...document.querySelectorAll('#atlas tbody tr')];
+function applyFilter() {
+  let shown = 0;
+  rows.forEach((tr, i) => {
+    const tags = ATLAS[i][3];
+    const match = !activeMode || tags.includes(activeMode);
+    tr.style.display = match ? '' : 'none';
+    if (match) shown++;
+  });
+  document.querySelectorAll('.fa-mode').forEach((m) => m.classList.toggle('on', m.dataset.mode === activeMode));
+  document.getElementById('atlasNote').innerHTML = activeMode
+    ? `${shown} of 22 packs · <b style="color:var(--accent)">${activeMode.toLowerCase()}-fragile</b> <button class="fa-filter-clear" id="clearFilter">clear</button>`
+    : '22 packs · ▶ = runnable Baltor demo';
+  const cl = document.getElementById('clearFilter');
+  if (cl) cl.addEventListener('click', () => { activeMode = null; applyFilter(); });
+}
+document.querySelectorAll('.fa-mode').forEach((m) => {
+  const toggle = () => { activeMode = (activeMode === m.dataset.mode) ? null : m.dataset.mode; applyFilter(); };
+  m.addEventListener('click', toggle);
+  m.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+});
+</script>
+</body>
+</html>

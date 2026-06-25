@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="data:,">
+<title>Design Acceptance Scorecard — AI Done Right</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<!-- dogfood: the scorecard is built ON the design system it grades -->
+<link rel="stylesheet" href="shared/oh-tokens.css" />
+<link rel="stylesheet" href="shared/oh-components.css" />
+<link rel="stylesheet" href="shared/oh-site.css" />
+<link rel="stylesheet" href="context-is-everything/cie.css" />
+<style>
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--font-display); -webkit-font-smoothing: antialiased; }
+  /* status palette — semantic, theme-aware (the one place raw color is intentional) */
+  .oh.theme-light { --sc-ok: #1a7f4b; --sc-ok-w: #e4f4ec; --sc-warn: #9a6700; --sc-warn-w: #faf0d8; --sc-bad: #c2362c; --sc-bad-w: #fbe8e6; --sc-na: var(--fg-faint); --sc-na-w: var(--bg-subtle); }
+  .oh.theme-dark  { --sc-ok: #46d08a; --sc-ok-w: #10271c; --sc-warn: #e0a83a; --sc-warn-w: #2a2110; --sc-bad: #f0817a; --sc-bad-w: #2c1614; --sc-na: var(--fg-faint); --sc-na-w: var(--panel-2); }
+
+  .sc-wrap { max-width: 1140px; margin: 0 auto; padding: 40px 32px 80px; }
+
+  /* ---- header ---- */
+  .sc-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 28px; margin-bottom: 8px; }
+  .sc-eyebrow { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+  .sc-top h1 { font-size: 38px; font-weight: 800; letter-spacing: -.025em; margin: 12px 0 0; line-height: 1.05; }
+  .sc-lede { font-size: 15.5px; line-height: 1.6; color: var(--fg-muted); margin: 14px 0 0; max-width: 60ch; }
+  .sc-themebtn { flex: 0 0 auto; }
+
+  /* overall ring */
+  .sc-overall { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .sc-ring { width: 118px; height: 118px; border-radius: 50%; display: grid; place-items: center; position: relative;
+             background: conic-gradient(var(--accent) calc(var(--p) * 1%), var(--line) 0); }
+  .sc-ring::before { content: ""; position: absolute; inset: 9px; border-radius: 50%; background: var(--panel); box-shadow: var(--e1); }
+  .sc-ring .n { position: relative; font-size: 30px; font-weight: 800; letter-spacing: -.03em; }
+  .sc-ring .n small { font-size: 14px; font-weight: 600; color: var(--fg-muted); }
+  .sc-overall .cap { font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--fg-faint); }
+
+  /* ---- scoreboard ---- */
+  .sc-board { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin: 30px 0 14px; }
+  .sc-site { padding: 14px 14px 16px; cursor: pointer; text-align: left; border: 1px solid var(--line); background: var(--panel);
+             border-radius: var(--r-md); transition: border-color .15s, box-shadow .15s, transform .12s; position: relative; }
+  .sc-site:hover { box-shadow: var(--e1); transform: translateY(-1px); }
+  .sc-site.sel { border-color: var(--dot); box-shadow: 0 0 0 1px var(--dot); }
+  .sc-site .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--dot); display: inline-block; }
+  .sc-site .nm { font-size: 13.5px; font-weight: 700; margin-top: 9px; }
+  .sc-site .full { font-family: var(--font-mono); font-size: 9.5px; color: var(--fg-faint); letter-spacing: .02em; text-transform: uppercase; margin-top: 1px; }
+  .sc-site .pct { font-size: 25px; font-weight: 800; letter-spacing: -.03em; margin-top: 10px; line-height: 1; }
+  .sc-bar { height: 5px; border-radius: 3px; background: var(--line); overflow: hidden; margin-top: 8px; }
+  .sc-bar i { display: block; height: 100%; background: var(--dot); border-radius: 3px; }
+  .sc-counts { display: flex; gap: 8px; margin-top: 9px; font-family: var(--font-mono); font-size: 10px; }
+  .sc-counts span { display: inline-flex; align-items: center; gap: 3px; color: var(--fg-muted); }
+  .sc-counts i { width: 6px; height: 6px; border-radius: 50%; }
+
+  .sc-hint { font-size: 12.5px; color: var(--fg-faint); margin: 0 0 26px; }
+  .sc-hint b { color: var(--fg-muted); font-weight: 600; }
+
+  /* ---- legend ---- */
+  .sc-legend { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; padding: 13px 16px; margin-bottom: 30px;
+               border: 1px solid var(--line); border-radius: var(--r-md); background: var(--panel-2); }
+  .sc-key { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--fg-muted); }
+  .sc-key i { width: 11px; height: 11px; border-radius: 50%; flex: 0 0 auto; }
+  .sc-key .lbl { font-weight: 600; color: var(--fg); }
+  .k-ok i { background: var(--sc-ok); } .k-warn i { background: var(--sc-warn); } .k-bad i { background: var(--sc-bad); } .k-na i { background: var(--sc-na); }
+
+  /* ---- dimension + criteria ---- */
+  .sc-dim { margin-top: 34px; }
+  .sc-dim-h { display: flex; align-items: baseline; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--line); margin-bottom: 16px; }
+  .sc-dim-h h2 { font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin: 0; }
+  .sc-dim-h .w { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); }
+
+  .sc-crit { padding: 0; margin-bottom: 12px; overflow: hidden; }
+  .sc-crit-top { display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: start; padding: 17px 19px; cursor: pointer; }
+  .sc-crit-l { min-width: 0; }
+  .sc-crit-name { font-size: 16px; font-weight: 700; letter-spacing: -.01em; display: flex; align-items: center; gap: 10px; }
+  .sc-crit-name .wt { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; color: var(--fg-faint); border: 1px solid var(--line); border-radius: 20px; padding: 2px 8px; }
+  .sc-crit-rule { font-size: 13.5px; line-height: 1.55; color: var(--fg-muted); margin: 7px 0 0; max-width: 74ch; }
+  .sc-chips { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; max-width: 230px; }
+  .sc-chip { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; font-family: var(--font-mono); font-size: 9px; font-weight: 700;
+             border: 1px solid var(--line); position: relative; transition: opacity .15s; cursor: default; }
+  .sc-chip[data-s="pass"]    { background: var(--sc-ok-w);   color: var(--sc-ok);   border-color: color-mix(in srgb, var(--sc-ok) 30%, transparent); }
+  .sc-chip[data-s="partial"] { background: var(--sc-warn-w); color: var(--sc-warn); border-color: color-mix(in srgb, var(--sc-warn) 30%, transparent); }
+  .sc-chip[data-s="fail"]    { background: var(--sc-bad-w);  color: var(--sc-bad);  border-color: color-mix(in srgb, var(--sc-bad) 32%, transparent); }
+  .sc-chip[data-s="na"]      { background: var(--sc-na-w);   color: var(--sc-na); border-style: dashed; }
+  .sc-crit.dimmed .sc-chip:not(.hot) { opacity: .16; }
+  .sc-chip.hot { box-shadow: 0 0 0 2px var(--panel), 0 0 0 3px currentColor; }
+
+  /* expand */
+  .sc-crit-body { display: none; padding: 0 19px 19px; }
+  .sc-crit.open .sc-crit-body { display: block; }
+  .sc-crit.open { box-shadow: var(--e1); }
+  .sc-check { font-family: var(--font-mono); font-size: 12px; line-height: 1.5; color: var(--fg); background: var(--bg-subtle);
+              border: 1px solid var(--line); border-radius: var(--r-sm); padding: 11px 13px; margin: 4px 0 16px; overflow-x: auto; white-space: pre; }
+  .sc-check .c { color: var(--fg-faint); }
+  .sc-notes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 22px; }
+  @media (max-width: 720px) { .sc-notes { grid-template-columns: 1fr; } }
+  .sc-note { display: grid; grid-template-columns: 18px 92px 1fr; gap: 10px; align-items: start; padding: 7px 0; border-top: 1px solid var(--line); font-size: 12.5px; }
+  .sc-note .sd { width: 11px; height: 11px; border-radius: 50%; margin-top: 3px; }
+  .sc-note .sn { font-weight: 700; }
+  .sc-note .sx { color: var(--fg-muted); line-height: 1.45; }
+  .sc-note .sx em { color: var(--fg-faint); font-style: normal; }
+
+  .sc-foot { margin-top: 46px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--fg-faint); line-height: 1.6; }
+  .sc-foot b { color: var(--fg-muted); font-weight: 600; }
+  .sc-caret { color: var(--fg-faint); font-size: 13px; transition: transform .15s; }
+  .sc-crit.open .sc-caret { transform: rotate(90deg); }
+  @media (max-width: 860px) {
+    .sc-board { grid-template-columns: repeat(4, 1fr); }
+    .sc-top { flex-direction: column-reverse; align-items: flex-start; }
+    .sc-crit-top { grid-template-columns: 1fr; }
+    .sc-chips { justify-content: flex-start; max-width: none; }
+  }
+</style>
+</head>
+<body class="oh dir-s theme-light cie oh-site" style="--accent:#2f6fed">
+<div class="sc-wrap" id="app"></div>
+
+<script>
+/* ============================ RUBRIC DATA ============================ */
+const SITES = [
+  { id:'parent', nm:'Parent', full:'AI Done Right', dot:'#2f6fed' },
+  { id:'baltor', nm:'Baltor', full:'Baltor.ai',           dot:'#0e7c86' },
+  { id:'teleon', nm:'Teleon', full:'Teleon.dev',          dot:'#6d5ef0' },
+  { id:'ohh',    nm:'OHH',    full:'OpenHarnessHub',       dot:'#d2542f' },
+  { id:'och',    nm:'OCH',    full:'OpenContextHub',       dot:'#2f8f6b' },
+  { id:'osh',    nm:'OSH',    full:'OpenSkillsHub',        dot:'#2f7d8f' },
+  { id:'oth',    nm:'OTH',    full:'OpenToolsHub',         dot:'#8f6f2f' },
+];
+const SCORE = { pass:1, partial:0.5, fail:0, na:null };
+
+// p = pass, ~ = partial, f = fail, n = n/a   (compact authoring; status+note pairs)
+const DIMS = [
+  { name:'Foundation — tokens', crit:[
+    { id:'c1', name:'Token discipline', w:12,
+      rule:'No raw hex or px used for color in a site stylesheet — every color resolves from a shared token. Hex appears only where tokens are defined.',
+      check:'grep -nE ":\\s*#[0-9a-f]{3,6}" <site>.css   # expect only --token: #hex definitions, never usages',
+      st:{ parent:['p','Product swatches sourced from products.js (ENTITIES accents) at the root; white text on colored CTAs is house convention.'],
+           baltor:['p','ce.css clean — the lone color:#fff became var(--accent-ink).'],
+           teleon:['p','teleon.css: zero raw hex.'],
+           ohh:['p','#04130b removed (inherits --accent-ink); white switch thumb matches the shared .oh-switch literal.'],
+           och:['p','Config-only on makeHub; no bespoke CSS.'], osh:['p','Config-only on makeHub.'], oth:['p','Config-only on makeHub.'] } },
+    { id:'c2', name:'Single-source brand', w:10,
+      rule:'A brand’s name, tagline, accent and glyph live ONLY in products.js. No accent hex or wordmark duplicated inline in JSX/CSS.',
+      check:'grep -rn "accent.*#" <site>/   # expect no inline brand hex outside products.js',
+      st:{ parent:['p','--cie-baltor/--cie-ohh driven from PORTFOLIO.ENTITIES at the root — no duplicated brand hex.'],
+           baltor:['p','Inline accent hex removed; reads BRANDCE + dir-d tokens (this session).'],
+           teleon:['p','BRAND pulled from PORTFOLIO.ENTITIES; one --accent var.'],
+           ohh:['p','Identity pulled from PRODUCTS.'],
+           och:['p','One inline --accent; rest from registry.'], osh:['p','One inline --accent.'], oth:['p','One inline --accent.'] } },
+  ]},
+  { name:'Surface & scale', crit:[
+    { id:'c3', name:'Surface integrity', w:12,
+      rule:'Every card surface resolves to .oh-card. No component re-declares its own border + radius + background panel.',
+      check:'grep -nE "border-radius.*(border|background)" <site>.css   # panels should compose .oh-card',
+      st:{ parent:['p','Product cards compose .oh-card.'], baltor:['p','.ce-* surfaces compose .oh-card.'],
+           teleon:['p','All kit surfaces.'], ohh:['p','.pt-panel is aliased to .oh-card in one rule.'],
+           och:['p','Kit surfaces.'], osh:['p','Kit surfaces.'], oth:['p','Kit surfaces.'] } },
+    { id:'c4', name:'Scale adherence', w:10,
+      rule:'Type and spacing size against the shared --fs-* / --pad-* scale, not raw px. Layout px (grid gaps, widths) is allowed.',
+      check:'grep -nE "font-size:\\s*[0-9]+px" <site>.css   # primary type should use var(--fs-*)',
+      st:{ parent:['p','Heads/body on --fs-*.'], baltor:['p','--fs-* throughout; a few inline UI px only.'],
+           teleon:['p','--fs-* throughout.'], ohh:['~','Mostly --fs-*; some legacy px in proto-* dataviz.'],
+           och:['p','Kit scale.'], osh:['p','Kit scale.'], oth:['p','Kit scale.'] } },
+  ]},
+  { name:'Chrome & primitives', crit:[
+    { id:'c5', name:'Chrome parity', w:10,
+      rule:'Top bar, footer and app shell are the kit components — or a documented in-house equivalent that is fully token/scale driven.',
+      check:'Visual: header, sidebar, footer read identically across sites (only accent differs).',
+      st:{ parent:['~','Bespoke cie chrome (in-house, marketing — documented).'],
+           baltor:['~','In-house AppShell BY DESIGN — keeps the 3-tier mark + account footer; token/scale aligned.'],
+           teleon:['p','Full kit chrome (OhTopBar/OhAppShell/OhFooter).'],
+           ohh:['p','App shell on OhAppShell (grouped nav + Build + credits + sticky topbar via kit slots); marketing on OhTopBar/OhFooter.'],
+           och:['p','makeHub kit chrome.'], osh:['p','makeHub kit chrome.'], oth:['p','makeHub kit chrome.'] } },
+    { id:'c6', name:'Primitive page reuse', w:12,
+      rule:'Auth, contact, billing, usage, settings and audit render from the shared kit (OhAuth / OhContact / OhBilling / OhUsage / OhSettings / OhAuditLog).',
+      check:'grep -n "Oh\\(Auth\\|Billing\\|Usage\\|Settings\\|AuditLog\\)" <site>/*.jsx',
+      st:{ parent:['n','Marketing-only — no app/account pages.'],
+           baltor:['p','Auth, contact, settings, billing, usage, audit + dashboard all kit (this session).'],
+           teleon:['p','All primitive pages from the kit.'],
+           ohh:['p','Settings/Audit on OhSettings/OhAuditLog; auth on OhAuth (this session).'],
+           och:['p','Kit account layer.'], osh:['p','Kit account layer.'], oth:['p','Kit account layer.'] } },
+  ]},
+  { name:'Quality gates', crit:[
+    { id:'c7', name:'Dark-mode cleanliness', w:12,
+      rule:'Every surface is legible in light AND dark. The accent resolves per-theme — no inline accent override that defeats the dark token.',
+      check:'Toggle ☾/☀ on each route; check accent + contrast. grep inline "--accent:#" overrides.',
+      st:{ parent:['p','Cool dark-neutral set; blue signature holds.'],
+           baltor:['p','Auth pages were stuck light-teal in dark — FIXED; dir-d dark token now resolves.'],
+           teleon:['p','Translucent --accent-weak keeps hue both themes.'],
+           ohh:['p','Route-based theme + scheme override.'],
+           och:['p','Kit dark mode.'], osh:['p','Kit dark mode.'], oth:['p','Kit dark mode.'] } },
+    { id:'c8', name:'Zero horizontal overflow', w:8,
+      rule:'No route scrolls sideways at 1280 / 768 / 390 px. Grids collapse; nothing breaks the viewport.',
+      check:'Resize to 390px on every route; document.documentElement.scrollWidth === clientWidth.',
+      st:{ parent:['p','Verified last full sweep.'], baltor:['p','14 routes + new account pages, no overflow.'],
+           teleon:['p','Verified.'], ohh:['p','~43 routes verified last sweep.'],
+           och:['p','Verified.'], osh:['p','Verified.'], oth:['p','Verified.'] } },
+    { id:'c9', name:'Accessibility floor', w:8,
+      rule:'≥44px hit targets, AA text contrast, visible keyboard focus on every interactive element.',
+      check:'Measured contrast ratios per scope (light+dark). Shared :focus-visible ring in oh-components.css.',
+      st:{ parent:['~','Contrast pass done (faint ≥ 3.6:1); shared focus-visible; desktop target-size sweep pending.'],
+           baltor:['~','Contrast pass done; shared focus-visible; target-size sweep pending.'],
+           teleon:['~','Contrast pass done; shared focus-visible; target-size sweep pending.'],
+           ohh:['~','Contrast pass done (faint nudged to AA-large); dense dataviz target sweep pending.'],
+           och:['~','Contrast pass done via shared tokens; target sweep pending.'], osh:['~','Contrast pass done; target sweep pending.'], oth:['~','Contrast pass done; target sweep pending.'] } },
+    { id:'c10', name:'Voice consistency', w:6,
+      rule:'Copy follows the house tone and each brand’s locked lexicon (Baltor: verified / current / lean — never “100% accurate”).',
+      check:'Read hero + CTA + empty states against the brand voice notes in each README.',
+      st:{ parent:['p','Group mission voice consistent.'], baltor:['p','Lexicon locked 2026-05-29; honored.'],
+           teleon:['p','Purpose→proof voice consistent.'], ohh:['p','Ecosystem voice consistent.'],
+           och:['p','Registry voice terse but on-brand.'], osh:['p','On-brand.'], oth:['p','On-brand.'] } },
+  ]},
+];
+
+/* ============================ SCORING ============================ */
+const ALL = DIMS.flatMap(d => d.crit);
+function siteScore(id){
+  let num=0, den=0, pass=0, part=0, fail=0, na=0;
+  ALL.forEach(c=>{ const s=c.st[id][0]; const key={p:'pass','~':'partial',f:'fail',n:'na'}[s];
+    if(key==='na'){ na++; return; } const v=SCORE[key]; num+=v*c.w; den+=c.w;
+    if(key==='pass')pass++; else if(key==='partial')part++; else fail++; });
+  return { pct: den? Math.round(num/den*100):0, pass, part, fail, na };
+}
+const SCORES = Object.fromEntries(SITES.map(s=>[s.id, siteScore(s.id)]));
+const FAMILY = Math.round(SITES.reduce((a,s)=>a+SCORES[s.id].pct,0)/SITES.length);
+const STKEY = {p:'pass','~':'partial',f:'fail',n:'na'};
+const STDOT = { pass:'var(--sc-ok)', partial:'var(--sc-warn)', fail:'var(--sc-bad)', na:'var(--sc-na)' };
+const STAB  = { pass:'PASS', partial:'PART', fail:'FAIL', na:'N/A' };
+
+/* ============================ RENDER ============================ */
+let SEL = null;
+const esc = (s)=> s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+function render(){
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="sc-top">
+      <div>
+        <div class="sc-eyebrow">AI Done Right · Design System</div>
+        <h1>Design Acceptance Scorecard</h1>
+        <p class="sc-lede">The branded-house gate: ten criteria, weighted, scored per site. A design ships when it passes — not when it merely renders. Click any criterion for the rule, the exact check to run, and per-site notes. Click a site to trace it across every criterion. <strong>OCH/OSH/OTH are representative of all 21 config-only <code>makeHub</code> hubs</strong> (9 live + 12 private bench) — built from one engine, they inherit identical kit compliance; the private bench adds only a muted accent + "Private preview" banner.</p>
+        <button class="oh-btn oh-btn--ghost oh-btn--sm sc-themebtn" id="theme" style="margin-top:18px">☾ Toggle theme</button>
+      </div>
+      <div class="sc-overall">
+        <div class="sc-ring" style="--p:${FAMILY}"><span class="n">${FAMILY}<small>%</small></span></div>
+        <span class="cap">family score</span>
+      </div>
+    </div>
+
+    <div class="sc-board">
+      ${SITES.map(s=>{ const sc=SCORES[s.id]; return `
+        <button class="sc-site${SEL===s.id?' sel':''}" data-site="${s.id}" style="--dot:${s.dot}">
+          <span class="dot"></span>
+          <div class="nm">${s.nm}</div>
+          <div class="full">${s.full}</div>
+          <div class="pct">${sc.pct}<span style="font-size:13px">%</span></div>
+          <div class="sc-bar"><i style="width:${sc.pct}%"></i></div>
+          <div class="sc-counts">
+            <span><i style="background:var(--sc-ok)"></i>${sc.pass}</span>
+            <span><i style="background:var(--sc-warn)"></i>${sc.part}</span>
+            <span><i style="background:var(--sc-bad)"></i>${sc.fail}</span>
+          </div>
+        </button>`; }).join('')}
+    </div>
+    <p class="sc-hint">${ SEL ? `Tracing <b>${SITES.find(s=>s.id===SEL).full}</b> — its cell is outlined in each criterion. Click it again to clear.` : `Weighted across 10 criteria. <b>Pass</b> = 1.0 · <b>Partial</b> = 0.5 · <b>Fail</b> = 0 · N/A excluded.` }</p>
+
+    <div class="sc-legend">
+      <span class="sc-key k-ok"><i></i><span class="lbl">Pass</span> meets the rule</span>
+      <span class="sc-key k-warn"><i></i><span class="lbl">Partial</span> on-brand but a known gap</span>
+      <span class="sc-key k-bad"><i></i><span class="lbl">Fail</span> action needed</span>
+      <span class="sc-key k-na"><i></i><span class="lbl">N/A</span> criterion doesn’t apply</span>
+    </div>
+
+    ${DIMS.map(d=>{
+      const dw = d.crit.reduce((a,c)=>a+c.w,0);
+      return `<section class="sc-dim">
+        <div class="sc-dim-h"><h2>${esc(d.name)}</h2><span class="w">${dw} pts</span></div>
+        ${d.crit.map(c=> critCard(c)).join('')}
+      </section>`;
+    }).join('')}
+
+    <div class="sc-foot">
+      <b>How this is used.</b> Run the check in each criterion before accepting a design change; a regression drops the cell to Partial/Fail and the site’s score with it. Statuses reflect the <b>Baltor + OHH → kit migration</b> (this session): Baltor’s account layer + dashboard render via the shared kit, its accent is single-sourced, the dark-mode auth bug is fixed — and OHH now consumes the kit too (app shell via the extended OhAppShell, account pages via Oh* pages, marketing via OhTopBar/OhFooter).<br>
+      <b>Remaining drift:</b> token discipline — the parent’s duplicated <span style="font-family:var(--font-mono)">--cie-*</span> swatches and a few raw <span style="font-family:var(--font-mono)">#fff</span> in <span style="font-family:var(--font-mono)">proto-*</span>/<span style="font-family:var(--font-mono)">cie.css</span> — plus the family-wide accessibility pass. See <span style="font-family:var(--font-mono)">HANDOFF.md §8</span>.
+    </div>`;
+
+  app.querySelectorAll('[data-site]').forEach(b=> b.onclick = ()=>{ SEL = (SEL===b.dataset.site)?null:b.dataset.site; render(); });
+  app.querySelectorAll('.sc-crit-top').forEach(t=> t.onclick = ()=> t.parentElement.classList.toggle('open'));
+  document.getElementById('theme').onclick = (e)=>{ e.stopPropagation(); toggleTheme(); };
+}
+
+function critCard(c){
+  const chips = SITES.map(s=>{ const st=STKEY[c.st[s.id][0]];
+    return `<div class="sc-chip${SEL===s.id?' hot':''}" data-s="${st}" title="${s.full}: ${STAB[st]}">${s.nm}</div>`; }).join('');
+  const notes = SITES.map(s=>{ const [code,note]=c.st[s.id]; const st=STKEY[code];
+    return `<div class="sc-note"><span class="sd" style="background:${STDOT[st]}"></span><span class="sn">${s.nm} <em style="font-weight:500;color:var(--fg-faint)">${STAB[st]}</em></span><span class="sx">${esc(note)}</span></div>`; }).join('');
+  return `<div class="oh-card sc-crit${SEL?' dimmed':''}">
+    <div class="sc-crit-top">
+      <div class="sc-crit-l">
+        <div class="sc-crit-name">${esc(c.name)} <span class="wt">${c.w} pts</span></div>
+        <p class="sc-crit-rule">${esc(c.rule)}</p>
+      </div>
+      <div class="sc-chips">${chips}<span class="sc-caret" style="align-self:center;margin-left:4px">▸</span></div>
+    </div>
+    <div class="sc-crit-body">
+      <div class="sc-check"><span class="c"># check</span>\n${esc(c.check)}</div>
+      <div class="sc-notes">${notes}</div>
+    </div>
+  </div>`;
+}
+
+/* theme toggle — dogfood the kit's mechanism */
+function toggleTheme(){
+  const root = document.body;
+  const dark = root.classList.toggle('theme-dark');
+  root.classList.toggle('theme-light', !dark);
+  try { localStorage.setItem('sc-theme', dark?'dark':'light'); } catch(e){}
+}
+(function initTheme(){
+  let t; try { t = localStorage.getItem('sc-theme'); } catch(e){}
+  if(!t) t = (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark':'light';
+  document.body.classList.toggle('theme-dark', t==='dark');
+  document.body.classList.toggle('theme-light', t!=='dark');
+})();
+render();
+</script>
+</body>
+</html>

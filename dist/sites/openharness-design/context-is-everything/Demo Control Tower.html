@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="data:,">
+<title>AI Done Right · Demo Control Tower</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../shared/oh-tokens.css" />
+<link rel="stylesheet" href="../shared/oh-components.css" />
+<link rel="stylesheet" href="../shared/oh-site.css" />
+<style>
+  /* Demo Control Tower — operator "Start Here" surface for the portfolio.
+     Built on the shared kit; portfolio gold accent marks the group-level surface. */
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--font-display); -webkit-font-smoothing: antialiased; }
+  .oh.dct { --accent: #d6a13b; --accent-weak: color-mix(in srgb, #d6a13b 16%, var(--panel)); --accent-ink: #1a1408; }
+
+  .dct-wrap { max-width: 1180px; margin: 0 auto; padding: 0 28px 80px; }
+
+  /* header */
+  .dct-top { display: flex; align-items: center; gap: 16px; padding: 22px 0 18px; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20;
+             background: color-mix(in srgb, var(--bg) 90%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .dct-logo { display: flex; align-items: center; gap: 11px; font-weight: 800; font-size: 17px; letter-spacing: -.02em; }
+  .dct-mark { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-size: 15px; flex: 0 0 auto; }
+  .dct-logo small { display: block; font-weight: 500; font-size: 11px; color: var(--fg-faint); letter-spacing: .04em; }
+  .dct-top .sp { flex: 1; }
+  .dct-projection { font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted); display: inline-flex; align-items: center; gap: 8px;
+                    border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; background: var(--panel); }
+  .dct-projection i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: 0 0 auto; }
+
+  /* hero */
+  .dct-hero { padding: 40px 0 14px; }
+  .dct-eyebrow { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+  .dct-hero h1 { font-size: 40px; font-weight: 800; letter-spacing: -.03em; line-height: 1.04; margin: 14px 0 0; max-width: 22ch; }
+  .dct-hero p { font-size: 16px; line-height: 1.6; color: var(--fg-muted); margin: 16px 0 0; max-width: 64ch; }
+  .dct-actions { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
+
+  /* recommended path */
+  .dct-path { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0; margin: 34px 0 8px; border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; background: var(--panel); }
+  .dct-step { padding: 14px 14px 16px; border-right: 1px solid var(--line); position: relative; }
+  .dct-step:last-child { border-right: none; }
+  .dct-step .n { font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--accent); }
+  .dct-step .t { font-size: 12.5px; font-weight: 600; color: var(--fg); margin-top: 6px; line-height: 1.3; }
+  .dct-step .d { font-size: 11px; color: var(--fg-faint); margin-top: 3px; line-height: 1.4; }
+
+  /* section */
+  .dct-sec { margin-top: 44px; }
+  .dct-sec-h { display: flex; align-items: baseline; gap: 12px; padding-bottom: 13px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+  .dct-sec-h h2 { font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin: 0; }
+  .dct-sec-h .c { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); }
+  .dct-sec-h .note { margin-left: auto; font-size: 12px; color: var(--fg-muted); }
+
+  /* url cards */
+  .dct-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .dct-grid.two { grid-template-columns: repeat(2, 1fr); }
+  .dct-card { padding: 16px 17px 15px; display: flex; flex-direction: column; gap: 0; min-width: 0; border-left: 3px solid var(--ent, var(--accent)); }
+  .dct-card-h { display: flex; align-items: center; gap: 9px; }
+  .dct-card-glyph { width: 24px; height: 24px; border-radius: 6px; display: grid; place-items: center; font-size: 13px; background: color-mix(in srgb, var(--ent, var(--accent)) 16%, var(--panel)); color: var(--ent, var(--accent)); flex: 0 0 auto; }
+  .dct-card-nm { font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
+  .dct-card-nm small { display: block; font-family: var(--font-mono); font-size: 10.5px; font-weight: 500; color: var(--fg-faint); letter-spacing: .02em; }
+  .dct-ord { margin-left: auto; font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--fg-faint); border: 1px solid var(--line); border-radius: 6px; padding: 2px 7px; }
+  .dct-card-line { font-size: 12.5px; line-height: 1.5; color: var(--fg-muted); margin: 11px 0 0; }
+  .dct-card-owns { font-size: 11.5px; line-height: 1.45; color: var(--fg-faint); margin: 7px 0 0; }
+  .dct-card-owns b { color: var(--fg-muted); font-weight: 600; }
+  .dct-urls { display: flex; flex-direction: column; gap: 5px; margin-top: 13px; }
+  .dct-url { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; }
+  .dct-url .k { color: var(--fg-faint); width: 38px; flex: 0 0 auto; }
+  .dct-url .v { color: var(--fg-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
+  .dct-copy { background: none; border: 1px solid var(--line); color: var(--fg-faint); border-radius: 5px; font-family: var(--font-mono); font-size: 10px; padding: 2px 6px; cursor: pointer; flex: 0 0 auto; }
+  .dct-copy:hover { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+  .dct-card-foot { display: flex; align-items: center; gap: 8px; margin-top: 13px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .dct-open { font-size: 12px; font-weight: 600; color: var(--ent, var(--accent)); text-decoration: none; }
+  .dct-open:hover { text-decoration: underline; }
+
+  /* status chips — never color-only: dot + label */
+  .dct-chip { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+              border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; color: var(--fg-muted); }
+  .dct-chip i { width: 6px; height: 6px; border-radius: 50%; flex: 0 0 auto; }
+  .dct-chip.live { color: var(--success); border-color: color-mix(in srgb, var(--success) 32%, var(--line)); } .dct-chip.live i { background: var(--success); }
+  .dct-chip.demo { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 36%, var(--line)); } .dct-chip.demo i { background: var(--accent); }
+  .dct-chip.preview { color: var(--info, #4d8de6); border-color: color-mix(in srgb, var(--info, #4d8de6) 32%, var(--line)); } .dct-chip.preview i { background: var(--info, #4d8de6); }
+  .dct-chip.internal { color: var(--fg-muted); } .dct-chip.internal i { background: var(--fg-faint); }
+  .dct-chip.planned { color: var(--warning); border-color: color-mix(in srgb, var(--warning) 30%, var(--line)); border-style: dashed; } .dct-chip.planned i { background: var(--warning); }
+  .dct-chip.private { color: var(--ent, var(--fg-muted)); border-color: color-mix(in srgb, var(--ent, var(--fg-faint)) 40%, var(--line)); border-style: dashed; } .dct-chip.private i { background: var(--ent, var(--fg-faint)); }
+
+  /* caveat */
+  .dct-caveat { margin-top: 20px; padding: 14px 17px; border: 1px solid color-mix(in srgb, var(--warning) 30%, var(--line)); border-radius: var(--r-md);
+                background: color-mix(in srgb, var(--warning) 8%, var(--panel)); display: flex; gap: 12px; align-items: flex-start; }
+  .dct-caveat .ic { color: var(--warning); font-size: 15px; flex: 0 0 auto; margin-top: 1px; }
+  .dct-caveat .tx { font-size: 12.5px; line-height: 1.55; color: var(--fg-muted); }
+  .dct-caveat .tx b { color: var(--fg); font-weight: 600; }
+
+  .dct-foot { margin-top: 54px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12px; color: var(--fg-faint); line-height: 1.6; }
+  .dct-foot b { color: var(--fg-muted); font-weight: 600; }
+
+  @media (max-width: 1180px) { .dct-card-glyph { display: none; } .dct-url .k { width: 32px; } }
+  @media (max-width: 1000px) { .dct-grid, .dct-grid.two { grid-template-columns: 1fr 1fr; } .dct-path { grid-template-columns: repeat(2, 1fr); } .dct-step { border-bottom: 1px solid var(--line); } .dct-card-glyph { display: grid; } }
+  @media (max-width: 640px) { .dct-grid, .dct-grid.two { grid-template-columns: 1fr; } .dct-path { grid-template-columns: 1fr; } .dct-hero h1 { font-size: 30px; } }
+</style>
+</head>
+<body class="oh dir-s theme-dark oh-site dct" style="--accent:#d6a13b; --accent-weak:#3a2e16; --accent-ink:#1a1408;">
+<div class="dct-top">
+  <div class="dct-wrap" style="display:flex; align-items:center; gap:16px; padding-top:0; padding-bottom:0; width:100%; box-sizing:border-box;">
+    <span class="dct-logo"><span class="dct-mark">◆</span><span>AI Done Right<small>Demo Control Tower</small></span></span>
+    <span class="sp"></span>
+    <span class="dct-projection"><i></i>Projection-only · reads governed projections, owns no truth</span>
+    <button class="oh-btn oh-btn--primary oh-btn--sm" id="checkAll" style="margin-left:14px;">⟳ Run health check</button>
+  </div>
+</div>
+
+<div class="dct-wrap">
+  <section class="dct-hero">
+    <div class="dct-eyebrow">Start here</div>
+    <h1>One place to review the portfolio, demos, health, and proof.</h1>
+    <p>The operator console for the AI Done Right family — every site, product demo, dashboard, open hub, and shared internal plane, with its local and preview URLs, status, and recommended review order. Nothing here is a source of truth; it links to surfaces that carry their own receipts.</p>
+    <div class="dct-actions">
+      <a class="oh-btn oh-btn--primary" href="../context-enrichment/Context Enrichment Prototype.html#/cases">▶ Run the Baltor CFPB guided demo</a>
+      <a class="oh-btn oh-btn--ghost" href="Context is Everything.html">Open the portfolio site</a>
+    </div>
+  </section>
+
+  <!-- recommended demo path -->
+  <div class="dct-path" id="path"></div>
+  <div class="dct-sec-h" style="border:none; margin-top:6px; padding:0;"><span class="dct-sec-h" style="display:none"></span></div>
+
+  <div id="sections"></div>
+
+  <div class="dct-caveat">
+    <span class="ic">⚠</span>
+    <span class="tx"><b>Preview URLs are temporary.</b> TryCloudflare links are ephemeral tunnels for review — not production hosting. They can rotate or expire between sessions. Treat <span class="mono">localhost</span> as the source surface and the tunnel as a shareable mirror.</span>
+  </div>
+
+  <div class="dct-foot">
+    <b>How to use this page.</b> Follow the recommended path top-left to right. Each card opens a real surface that carries its own evidence — Baltor receipts &amp; source handles, Teleon scorecards &amp; promotion gates, the Inference Gateway's model-invocation receipts. This console only <b>projects</b> status; it never decides truth, promotes a candidate, or serves an answer.<br>
+    <b>Status legend:</b> <span class="dct-chip live"><i></i>live</span> shipping prototype · <span class="dct-chip demo"><i></i>demo</span> guided walkthrough · <span class="dct-chip preview"><i></i>preview</span> behind a temporary tunnel · <span class="dct-chip internal"><i></i>internal</span> not public · <span class="dct-chip planned"><i></i>planned</span> designed, not built.
+  </div>
+</div>
+
+<script>
+/* ---- recommended demo path ---- */
+const PATH = [
+  ['01', 'Portfolio', 'Open AI Done Right — the map.'],
+  ['02', 'Teleon', 'See purpose-defined runtime.'],
+  ['03', 'Baltor', 'See governed context.'],
+  ['04', 'CFPB demo', 'Run the guided proof.'],
+  ['05', 'Receipts', 'Review source handles + receipts.'],
+  ['06', 'Open hubs', 'Context · Skills · Tools · Harness.'],
+  ['07', 'Inference', 'Review model-invocation receipts.'],
+];
+document.getElementById('path').innerHTML = PATH.map(([n,t,d]) =>
+  `<div class="dct-step"><div class="n">${n}</div><div class="t">${t}</div><div class="d">${d}</div></div>`).join('');
+
+/* ---- entities, grouped ---- */
+const L = 'http://localhost'; const CF = 'https://*.trycloudflare.com';
+const G = [
+  { group: 'Portfolio Sites', count: '', note: 'The branded-house marketing + portfolio surfaces.', items: [
+    { nm:'AI Done Right', dom:'aidoneright.dev', ent:'#d6a13b', glyph:'◆', ord:'1', line:'Holding company, portfolio map, and brand architecture.', owns:'Owns: <b>portfolio, research, IP, brand system</b>. Not: product runtime or truth.', local:L+':5170', cf:'cie.trycloudflare.com', href:'Context is Everything.html', status:'live' },
+    { nm:'Teleon.dev', dom:'Teleon.dev', ent:'#6d5ef0', glyph:'⟳', ord:'2', line:'Purpose-defined runtime — capabilities, not code.', owns:'Owns: <b>CapabilityTask, runtime selection, promotion gates</b>. Not: truth.', local:L+':5172', cf:'teleon.trycloudflare.com', href:'../teleon/Teleon Prototype.html', status:'live' },
+    { nm:'Baltor.ai', dom:'Baltor.ai', ent:'#0e7c86', glyph:'◳', ord:'3', line:'Governed context — verified, current, provable.', owns:'Owns: <b>source handles, reconciliation, verification, receipts</b>. Not: runtime.', local:L+':5171', cf:'baltor.trycloudflare.com', href:'../context-enrichment/Context Enrichment Prototype.html', status:'live' },
+  ]},
+  { group: 'Product Demos', count: '', note: 'Guided, click-through proofs. Local-first; labelled demo.', items: [
+    { nm:'Baltor · CFPB Guided Demo', dom:'Reg E error-resolution deadline', ent:'#0e7c86', glyph:'▶', ord:'4', line:'Click “Integrate CFPB data”: 7 stages run, serves “10 business days”, holds out the FAQ “30 days” contradiction, preserves receipts. Plus sanctions / EUDR / refund examples.', owns:'Proves: <b>governed context end-to-end</b>. Answer is governed, not model-decided.', local:L+':5171/cfpb', cf:'baltor.trycloudflare.com/cfpb', href:'../context-enrichment/Baltor Guided Demos.html', status:'demo' },
+    { nm:'Teleon · PurposeTask Control Tower', dom:'cfpb_deadline_verify', ent:'#6d5ef0', glyph:'◈', ord:'5', line:'Baseline vs candidate scorecards, promotion gates, rollback targets, boundary approvals — candidates never appear active until promoted.', owns:'Proves: <b>bounded self-adaptation</b>. Eval-gated, not autonomous.', local:L+':5172/control-tower', cf:'teleon.trycloudflare.com', href:'../teleon/Teleon PurposeTask Control Tower.html', status:'demo' },
+    { nm:'Baltor · Federal Register coverage', dom:'50 CFR titles · rule-change feed', ent:'#0e7c86', glyph:'⚖', ord:'', line:'How governance scales: all 50 CFR titles addressable, 9 with runnable demos, plus a live Federal-Register change feed (pin → watch → reconcile).', owns:'Projection of coverage. The rule in force is the authority — not legal advice.', local:L+':5171/coverage', cf:'baltor.trycloudflare.com/coverage', href:'../context-enrichment/Baltor Federal Register Coverage.html', status:'demo' },
+    { nm:'Baltor · International coverage', dom:'EU · IMO · state/local · contractual', ent:'#0e7c86', glyph:'◐', ord:'', line:'Same pin → watch → reconcile model across EU/IMO/WHO/WCO/Codex/ISO sources, state &amp; local statutes, and contracts.', owns:'Projection of coverage. The source in force is the authority — not legal advice.', local:L+':5171/coverage-intl', cf:'baltor.trycloudflare.com/coverage-intl', href:'../context-enrichment/Baltor International Coverage.html', status:'demo' },
+  ]},
+  { group: 'Dashboards', count: '', note: 'Projection-only. Show evidence + receipts; own no truth.', items: [
+    { nm:'Baltor · Verify rail', dom:'reconciliation queue', ent:'#0e7c86', glyph:'⇄', ord:'', line:'Held-out conflicts, human-in-the-loop decisions, freshness vs live sources.', owns:'Reads governed projections. Does not own truth.', local:L+':5171/#/verify', cf:'baltor.trycloudflare.com/#/verify', href:'../context-enrichment/Context Enrichment Prototype.html#/verify', status:'live' },
+    { nm:'Teleon · Evidence', dom:'promotion + rollback', ent:'#6d5ef0', glyph:'✓', ord:'', line:'What was tried, how it scored, what shipped — and what rolled back.', owns:'Reads governed projections. Does not own truth.', local:L+':5172/#/evidence', cf:'teleon.trycloudflare.com/#/evidence', href:'../teleon/Teleon Prototype.html#/evidence', status:'live' },
+    { nm:'Baltor · Audit log', dom:'signed receipts', ent:'#0e7c86', glyph:'⚖', ord:'', line:'Every serve, verify, reconciliation and export — with the policy it ran under.', owns:'Append-only projection of receipts.', local:L+':5171/#/audit', cf:'baltor.trycloudflare.com/#/audit', href:'../context-enrichment/Context Enrichment Prototype.html#/audit', status:'live' },
+  ]},
+  { group: 'Open Hubs', count: '', note: 'Open supply graphs. Not truth authorities — discovery is not trust.', items: [
+    { nm:'OpenContextHub', dom:'OpenContextHub.io', ent:'#2f8f6b', glyph:'⬡', ord:'6', line:'Open context artifacts, packs, schemas, source-handle examples.', owns:'Reference context is not served truth. Baltor governs before consumption.', local:L+':5173', cf:'och.trycloudflare.com', href:'../opencontexthub/OpenContextHub Prototype.html', status:'live' },
+    { nm:'OpenSkillsHub', dom:'OpenSkillsHub.io', ent:'#7c6bf0', glyph:'◇', ord:'6', line:'Skills, playbooks, SKILL.md packages, reusable agent know-how.', owns:'Discovery is not trust. Similarity is not equivalence.', local:L+':5174', cf:'osh.trycloudflare.com', href:'../openskillshub/OpenSkillsHub Prototype.html', status:'live' },
+    { nm:'OpenToolsHub', dom:'OpenToolsHub.io', ent:'#8f6f2f', glyph:'⚒', ord:'6', line:'Executable tools, APIs, CLIs, adapters, MCP tools, visibility policies.', owns:'Public listing is not public execution. Access is gated.', local:L+':5175', cf:'oth.trycloudflare.com', href:'../opentoolshub/OpenToolsHub Prototype.html', status:'live' },
+    { nm:'OpenSkillToTool', dom:'OpenSkillToTool.io', ent:'#cf5a96', glyph:'⇋', ord:'6', line:'Converts open-ended, context-guided skills into deterministic, typed tools.', owns:'Internal + public. Open-ended skill in, deterministic tool out — eval + provenance carried across.', local:L+':5181', cf:'os2t.trycloudflare.com', href:'../openskilltotool/OpenSkillToTool Prototype.html', status:'live' },
+    { nm:'OpenHarnessHub', dom:'OpenHarnessHub.io', ent:'#d2542f', glyph:'⎔', ord:'6', line:'Harnesses, eval runners, fixtures, rubrics, conformance packs.', owns:'Harnesses prove behavior. Not skills, tools, context, or runtime.', local:L+':5176', cf:'ohh.trycloudflare.com', href:'../openharnesshub/OpenHarnessHub Prototype.html', status:'live' },
+    { nm:'OpenMCPHub', dom:'OpenMCPHub.io', ent:'#5b7cf0', glyph:'⌁', ord:'6', line:'MCP server registry, risk, conformance, install profiles.', owns:'MCP discovery is not trust. Conformance + risk required.', local:L+':5177', cf:'omcp.trycloudflare.com', href:'../openmcphub/OpenMCPHub Prototype.html', status:'live' },
+    { nm:'OpenCompressionHub', dom:'OpenCompressionHub.io', ent:'#9bd61f', glyph:'⊟', ord:'6', line:'Context compression, token budgeting, fidelity benchmarks.', owns:'Token reduction is not success unless fidelity survives.', local:L+':5178', cf:'ocmp.trycloudflare.com', href:'../opencompressionhub/OpenCompressionHub Prototype.html', status:'live' },
+    { nm:'OpenBenchmarkHub', dom:'OpenBenchmarkHub.io', ent:'#e0556a', glyph:'▦', ord:'6', line:'Benchmark cards, metrics, result records, suitability reports.', owns:'Benchmarks are evidence, not authority. Cannot promote alone.', local:L+':5179', cf:'obm.trycloudflare.com', href:'../openbenchmarkhub/OpenBenchmarkHub Prototype.html', status:'live' },
+    { nm:'OpenReviewHub', dom:'OpenReviewHub.io', ent:'#9d4edd', glyph:'⊙', ord:'6', line:'Reviews papers + repos for capability, verifiability, reproducibility.', owns:'A claim is not a capability until it reproduces. Claim → evidence → verdict.', local:L+':5182', cf:'orev.trycloudflare.com', href:'../openreviewhub/OpenReviewHub Prototype.html', status:'live' },
+  ]},
+  { group: 'Private Bench', count: '', note: 'Built on the kit · private until a competitor enters the lane. Muted accent now; opens to its launch color on a one-line status flip.', items: [
+    { nm:'OpenTemplatesHub', dom:'OpenTemplatesHub.io', ent:'#6d6a86', glyph:'⊞', ord:'', line:'Reusable schema · runtime · resource · API-UI · inference · PurposeTask template families.', owns:'Templates generate starting shapes. Harnesses prove the outputs.', local:L+':5183', cf:'', href:'../opentemplateshub/OpenTemplatesHub Prototype.html', status:'private' },
+    { nm:'OpenEndpointHub', dom:'OpenEndpointHub.io', ent:'#5f7585', glyph:'⇄', ord:'', line:'Governed due-diligence on LLM endpoints + gateways: what data may I send where.', owns:'A free endpoint is not a safe endpoint. Data-class + jurisdiction eligibility.', local:L+':5184', cf:'', href:'../openendpointhub/OpenEndpointHub Prototype.html', status:'private' },
+    { nm:'OpenEnvHub', dom:'OpenEnvHub.io', ent:'#5f7a6e', glyph:'⊕', ord:'', line:'Verifiable agent eval environments + reward specs — the task world, not the score.', owns:'The environment makes an eval re-runnable. The score lives in BenchmarkHub.', local:L+':5185', cf:'', href:'../openenvhub/OpenEnvHub Prototype.html', status:'private' },
+    { nm:'OpenSandboxHub', dom:'OpenSandboxHub.io', ent:'#7a6f86', glyph:'⊠', ord:'', line:'Isolated sandbox registry + risk/conformance (E2B · Daytona · agent-sandbox class).', owns:'Untrusted code needs a proven box. Isolation + egress + escape-tested.', local:L+':5186', cf:'', href:'../opensandboxhub/OpenSandboxHub Prototype.html', status:'private' },
+    { nm:'OpenAgentHub', dom:'OpenAgentHub.io', ent:'#7a7460', glyph:'◈', ord:'', line:'Agent-runtime registry — bounded adapters with a run receipt per step.', owns:'Skills are know-how, tools are executables; this is the runtime that runs them.', local:L+':5187', cf:'', href:'../openagenthub/OpenAgentHub Prototype.html', status:'private' },
+    { nm:'OpenReceiptHub', dom:'OpenReceiptHub.io', ent:'#72786b', glyph:'⊡', ord:'', line:'Portable, signed receipts — invocation, serve, run, review, approval — that verify anywhere.', owns:'A screenshot is not proof. Signed, chained, verifiable by anyone.', local:L+':5188', cf:'', href:'../openreceipthub/OpenReceiptHub Prototype.html', status:'private' },
+    { nm:'OpenStateHub', dom:'OpenStateHub.io', ent:'#6c6f86', glyph:'◧', ord:'', line:'Governed, durable agent state — memory, blackboard, graph — versioned + auditable.', owns:'Agent memory shouldn’t be a black box. Working state, not truth packs.', local:L+':5189', cf:'', href:'../openstatehub/OpenStateHub Prototype.html', status:'private' },
+    { nm:'OpenReconciliationHub', dom:'OpenReconciliationHub.io', ent:'#6a7080', glyph:'⇌', ord:'', line:'Open methods for cluster alignment — dedupe, link evidence, surface conflicts.', owns:'Baltor Reconcile stage, opened. Collapse conflicting sources into one answer.', local:L+':5190', cf:'', href:'../openreconciliationhub/OpenReconciliationHub Prototype.html', status:'private' },
+    { nm:'OpenHardeningHub', dom:'OpenHardeningHub.io', ent:'#7a6f6a', glyph:'⊛', ord:'', line:'Open methods for robust object hardening — detect fragile values, refresh over time.', owns:'Baltor Harden stage, opened. Brittle text → self-updating knowledge objects.', local:L+':5191', cf:'', href:'../openhardeninghub/OpenHardeningHub Prototype.html', status:'private' },
+    { nm:'OpenEnrichmentHub', dom:'OpenEnrichmentHub.io', ent:'#6a7a72', glyph:'✦', ord:'', line:'Open methods for context enrichment — metadata, relationships, service-graph links.', owns:'Baltor Enhance stage, opened. Connect the missing connective context.', local:L+':5192', cf:'', href:'../openenrichmenthub/OpenEnrichmentHub Prototype.html', status:'private' },
+    { nm:'OpenOptimizationHub', dom:'OpenOptimizationHub.io', ent:'#76707f', glyph:'⊿', ord:'', line:'Open methods for pack shaping — summarize, structure, rank, fit the task budget.', owns:'Baltor Optimize stage, opened. Reduction is not success unless fidelity survives.', local:L+':5193', cf:'', href:'../openoptimizationhub/OpenOptimizationHub Prototype.html', status:'private' },
+    { nm:'OpenVerificationHub', dom:'OpenVerificationHub.io', ent:'#6f7a80', glyph:'⊨', ord:'', line:'Open methods for verification — cite every claim, prove it by hash, hold out the unprovable.', owns:'Baltor Verify stage, opened. A claim served without a citation is a liability.', local:L+':5194', cf:'', href:'../openverificationhub/OpenVerificationHub Prototype.html', status:'private' },
+  ]},
+  { group: 'Shared Internal Surfaces', count: '', note: 'Internal control planes. Not public domains.', items: [
+    { nm:'Shared Inference Gateway', dom:'LLM plane · model routing', ent:'#c452c4', glyph:'◌', ord:'7', line:'Object-level inference preferences → actual provider/model. Records ModelInvocationReceipts. Fallback is never silent; LLM output is never truth.', owns:'Preference requests intent. Router decides execution. Receipt records reality.', local:L+':5180', cf:'', href:'../inference-gateway/Shared Inference Gateway.html', status:'internal' },
+    { nm:'Shared Template Registry', dom:'schema · runtime · UI templates', ent:'#7e8da3', glyph:'▤', ord:'', line:'Reusable schema, runtime, resource, API/UI, inference-preference and PurposeTask templates.', owns:'Templates generate starting shapes. Harnesses prove they work.', local:L+':5181', cf:'', href:'../template-registry/Shared Template Registry.html', status:'internal' },
+  ]},
+  { group: 'API Health', count: '', note: 'Service liveness — projection only, no payloads.', items: [
+    { nm:'Baltor API', dom:'/v1 · serve · verify', ent:'#0e7c86', glyph:'◳', ord:'', line:'Serving + verification endpoints. Secret refs only — never raw keys.', owns:'Health projection. Authorization: Bearer &lt;ref&gt;.', local:L+':8071/healthz', cf:'', href:'', status:'preview' },
+    { nm:'Teleon API', dom:'/v1 · capabilities · runs', ent:'#6d5ef0', glyph:'⟳', ord:'', line:'CapabilityTask + run endpoints. Promotion is policy-gated.', owns:'Health projection. No candidate is active until promoted.', local:L+':8072/healthz', cf:'', href:'', status:'preview' },
+    { nm:'Inference Gateway API', dom:'/v1 · route · receipts', ent:'#c452c4', glyph:'◌', ord:'', line:'Route decisions + ModelInvocationReceipts. ClawLess is a sandbox candidate, not an LLM endpoint.', owns:'Quarantines shared-key/bypass endpoints.', local:L+':8080/healthz', cf:'', href:'', status:'internal' },
+  ]},
+];
+
+const STATUS_LABEL = { live:'live', demo:'demo', preview:'preview', internal:'internal', planned:'planned', private:'private' };
+function urlRow(k, v) {
+  if (!v) return '';
+  return `<div class="dct-url"><span class="k">${k}</span><span class="v" title="${v}">${v}</span><button class="dct-copy" data-copy="${v}">copy</button></div>`;
+}
+function card(it) {
+  const open = it.href ? `<a class="dct-open" href="${it.href}">Open →</a>` : `<span class="dct-open" style="color:var(--fg-faint)">—</span>`;
+  const ord = it.ord ? `<span class="dct-ord">step ${it.ord}</span>` : '';
+  return `<div class="oh-card dct-card" style="--ent:${it.ent}">
+    <div class="dct-card-h">
+      <span class="dct-card-glyph">${it.glyph}</span>
+      <span class="dct-card-nm">${it.nm}<small>${it.dom}</small></span>
+      ${ord}
+    </div>
+    <div class="dct-card-line">${it.line}</div>
+    <div class="dct-card-owns">${it.owns}</div>
+    <div class="dct-urls">${urlRow('local', it.local)}${urlRow('tunnel', it.cf)}</div>
+    <div class="dct-card-foot">
+      <span class="dct-chip ${it.status}" data-status="${it.status}"><i></i>${STATUS_LABEL[it.status]}</span>
+      <span class="sp" style="flex:1"></span>
+      ${open}
+    </div>
+  </div>`;
+}
+document.getElementById('sections').innerHTML = G.map(sec => `
+  <section class="dct-sec">
+    <div class="dct-sec-h"><h2>${sec.group}</h2><span class="c">${sec.items.length}</span><span class="note">${sec.note}</span></div>
+    <div class="dct-grid${sec.items.length === 2 ? ' two' : ''}">${sec.items.map(card).join('')}</div>
+  </section>`).join('');
+
+/* copy-to-clipboard */
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.dct-copy'); if (!b) return;
+  const v = b.getAttribute('data-copy');
+  navigator.clipboard && navigator.clipboard.writeText(v);
+  const old = b.textContent; b.textContent = '✓'; setTimeout(() => b.textContent = old, 1100);
+});
+
+/* mock health check — animates the status dots, projection-only */
+document.getElementById('checkAll').addEventListener('click', function () {
+  const btn = this; btn.disabled = true; const orig = btn.textContent; btn.textContent = '⟳ Checking…';
+  const chips = [...document.querySelectorAll('.dct-chip[data-status]')];
+  chips.forEach((c, i) => {
+    const dot = c.querySelector('i'); const prev = dot.style.background;
+    setTimeout(() => { dot.style.boxShadow = '0 0 0 3px color-mix(in srgb, currentColor 30%, transparent)'; }, i * 70);
+    setTimeout(() => { dot.style.boxShadow = 'none'; }, i * 70 + 520);
+  });
+  setTimeout(() => { btn.disabled = false; btn.textContent = orig; }, chips.length * 70 + 600);
+});
+</script>
+</body>
+</html>

@@ -45,6 +45,11 @@ env/
 # below. Keep this negation list as the single source of truth for "which dist
 # outputs are products, not scratch" (see docs/codex/no-magic-values.md).
 /dist/*
+# The high-fidelity design SOURCE (port_full_design_to_web.py reads it → web/). NOT scratch — it is the
+# expensive, hand-authored design work the owner depends on, so it is tracked + durable (2026-06-25).
+!/dist/sites/
+/dist/sites/*
+!/dist/sites/openharness-design/
 !/dist/agent-skills/
 !/dist/aibom/
 !/dist/c2pa/

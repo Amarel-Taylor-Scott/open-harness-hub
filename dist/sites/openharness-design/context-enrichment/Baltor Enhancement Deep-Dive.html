@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="data:,">
+<title>Baltor · Enhancement</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../shared/oh-tokens.css" />
+<link rel="stylesheet" href="../shared/oh-components.css" />
+<link rel="stylesheet" href="../shared/oh-site.css" />
+<link rel="stylesheet" href="guided-demo.css" />
+<link rel="stylesheet" href="engine-stagenav.css" />
+<script src="../shared/oh-experiments.js"></script>
+<script src="track.js"></script>
+<style>
+  /* Enhancement — a bare fact becomes a complete, connected, cited context object. Adds
+     citations, relationships, and verified external sources. One stage of the engine. */
+  .en-pick { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 18px; }
+  .en-pick button { font: inherit; font-size: 12px; color: var(--fg-muted); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+  .en-pick button.on { background: var(--accent-weak); color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+
+  /* before → after enrichment */
+  .en-ba { display: grid; grid-template-columns: 1fr 56px 1.2fr; gap: 0; align-items: stretch; }
+  @media (max-width: 820px) { .en-ba { grid-template-columns: 1fr; } }
+  .en-side { padding: 18px 20px; border: 1px solid var(--line); }
+  .en-side.bare { border-radius: var(--r-lg) 0 0 var(--r-lg); }
+  .en-side.rich { border-radius: 0 var(--r-lg) var(--r-lg) 0; border-color: color-mix(in srgb, var(--accent) 36%, var(--line)); background: var(--accent-weak); }
+  @media (max-width: 820px) { .en-side.bare { border-radius: var(--r-lg) var(--r-lg) 0 0; } .en-side.rich { border-radius: 0 0 var(--r-lg) var(--r-lg); } }
+  .en-tag { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--fg-faint); }
+  .en-side.rich .en-tag { color: var(--accent); }
+  .en-claim { font-size: 18px; font-weight: 700; color: var(--fg); margin-top: 9px; line-height: 1.25; overflow-wrap: anywhere; }
+  .en-bare-note { font-size: 12.5px; color: var(--fg-muted); margin-top: 10px; line-height: 1.45; }
+  .en-adds { display: flex; flex-direction: column; gap: 9px; margin-top: 13px; }
+  .en-add { display: grid; grid-template-columns: 18px 1fr; gap: 9px; align-items: start; font-size: 12.5px; line-height: 1.4; }
+  .en-add .ic { color: var(--accent); flex: 0 0 auto; text-align: center; }
+  .en-add .lab { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; color: var(--fg-faint); }
+  .en-add .txt { color: var(--fg); }
+  .en-add .txt .mono { font-family: var(--font-mono); font-size: 11.5px; color: var(--accent); overflow-wrap: anywhere; }
+  .en-vs { display: grid; place-items: center; }
+  .en-vs span { width: 34px; height: 34px; border-radius: 50%; background: var(--panel); border: 1px solid var(--line-strong); display: grid; place-items: center; color: var(--accent); font-size: 15px; }
+  @media (max-width: 820px) { .en-vs { padding: 8px 0; } .en-vs span { transform: rotate(90deg); } }
+
+  /* what enhancement adds — categories */
+  .en-cats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media (max-width: 760px) { .en-cats { grid-template-columns: 1fr; } }
+  .en-cat { padding: 15px 16px; }
+  .en-cat .ci { font-size: 17px; }
+  .en-cat .ct { font-size: 14px; font-weight: 700; color: var(--fg); margin-top: 8px; }
+  .en-cat .cd { font-size: 12px; color: var(--fg-muted); margin-top: 6px; line-height: 1.45; }
+
+  .en-rule { display: flex; align-items: flex-start; gap: 11px; margin-top: 16px; padding: 13px 16px; border: 1px dashed color-mix(in srgb, var(--accent) 32%, var(--line)); border-radius: var(--r-md); background: var(--bg-subtle); }
+  .en-rule .ic { color: var(--accent); font-size: 15px; flex: 0 0 auto; margin-top: 1px; }
+  .en-rule .t { font-size: 13px; line-height: 1.5; color: var(--fg); }
+  .en-rule .t b { font-weight: 700; }
+</style>
+</head>
+<body class="oh dir-d theme-dark oh-site cd" data-page="engine_enhancement">
+<div class="cd-top"><div class="cd-wrap" style="display:flex;align-items:center;gap:14px;padding-top:0;padding-bottom:0;width:100%;box-sizing:border-box;">
+  <a class="cd-logo" href="Baltor Guided Demos.html"><span class="cd-mark">◳</span><span>Baltor<small>enhancement</small></span></a>
+  <span class="sp"></span>
+  <a class="cd-back" href="Baltor Engine.html">← The engine</a>
+  <span class="cd-tag" style="margin-left:14px;">A bare fact, made complete</span>
+</div></div>
+
+<div class="cd-wrap">
+  <section class="cd-hero">
+    <div class="cd-eyebrow">Engine component · enhancement</div>
+    <h1>A fact alone isn’t context. Enhancement makes it complete.</h1>
+    <p>Enhancement is the stage that makes context <b>usable</b>. A reconciled, verified value is correct — but a bare number can’t be defended or acted on. Baltor attaches the citation, the relationships, and any verified external source needed to resolve the question, turning an isolated fact into a connected, cited context object. Pick a fact:</p>
+  </section>
+
+  <div class="en-pick" id="pick"></div>
+
+  <section class="cd-sec" style="margin-top:8px">
+    <div class="cd-sec-h"><h2>Bare fact → enriched object</h2><span class="note">Same answer · made complete &amp; defensible</span></div>
+    <div class="en-ba" id="ba"></div>
+    <div class="en-rule" id="rule"></div>
+  </section>
+
+  <section class="cd-sec">
+    <div class="cd-sec-h"><h2>What enhancement attaches</h2><span class="note">Only verified, sourced additions — never invented</span></div>
+    <div class="en-cats">
+      <div class="oh-card en-cat"><div class="ci">⛓</div><div class="ct">Citations</div><div class="cd">The exact clause, section or list entry the value resolves to — so any answer can be defended to a regulator or auditor.</div></div>
+      <div class="oh-card en-cat"><div class="ci">⬡</div><div class="ct">Relationships</div><div class="cd">Links to related objects — the chapter notes that govern a code, the program behind a sanctions entry, the lane behind an SLA.</div></div>
+      <div class="oh-card en-cat"><div class="ci">⊕</div><div class="ct">Verified external sources</div><div class="cd">When internal sources can’t settle it, an approved external authority is attached to complete the context — sourced, not guessed.</div></div>
+    </div>
+  </section>
+
+  <div class="cd-foot"><b>Enhancement beside the rest.</b> Enrichment only ever adds <b>sourced</b> material — citations, relationships and verified external context — it never invents a fact to fill a gap. The enriched object is then optimized to the task budget and verified before serving. See the <a href="Baltor Engine.html">engine overview</a> for all five stages and the <a href="Baltor Receipts Explorer.html">receipts explorer</a> for how the attached citations become provenance. <b>Not legal, medical, or financial advice</b> — the source in force is the authority.</div>
+</div>
+
+<script src="engine-stagenav.js"></script>
+<script>
+const FACTS = [
+  {
+    label: 'CFPB · Reg E deadline',
+    bare: '10 business days',
+    bareNote: 'Correct — but on its own, an agent can’t cite it, can’t see what governs it, and can’t defend it in an audit.',
+    adds: [
+      ['citation', 'Resolves to <span class="mono">eCFR · 12 CFR 1005.11(c)(1)</span>'],
+      ['relationship', 'Linked to the error-resolution procedure + the 45-day extended-investigation rule'],
+      ['external', 'Cross-checked against the live eCFR text in force'],
+    ],
+    rule: 'Enhancement attaches the <b>governing clause and related rules</b> — it does not restate the value, it makes it defensible.',
+  },
+  {
+    label: 'Tariff · HS code',
+    bare: 'HS 8507.60',
+    bareNote: 'A correct code, but a classifier needs the heading, the chapter notes, and the basis to defend it at customs.',
+    adds: [
+      ['citation', 'Resolves to <span class="mono">WCO HS 2022 · heading 85.07</span>'],
+      ['relationship', 'Linked to chapter 85 notes + the held-out retired code 8507.80'],
+      ['external', 'Cross-checked against the WCO HS edition in force'],
+    ],
+    rule: 'Enhancement attaches the <b>heading, governing notes and basis</b> — duty rate stays unasserted (jurisdiction-specific).',
+  },
+  {
+    label: 'Sanctions · OFAC entry',
+    bare: 'Match — sanctioned',
+    bareNote: 'A match is only actionable with the program, the listing date, and the entry it matched — otherwise it can’t be reviewed.',
+    adds: [
+      ['citation', 'Resolves to <span class="mono">OFAC SDN · entry + program</span>'],
+      ['relationship', 'Linked to the listing date, program metadata, and the held-out internal “no match”'],
+      ['external', 'Cross-checked against the live OFAC SDN list'],
+    ],
+    rule: 'Enhancement attaches the <b>entry, program and listing date</b> — the context a reviewer needs to act and block.',
+  },
+];
+
+let cur = 0;
+document.getElementById('pick').innerHTML = FACTS.map((f, i) =>
+  `<button data-i="${i}"${i===0?' class="on"':''}>${f.label}</button>`).join('');
+
+function render() {
+  const f = FACTS[cur];
+  document.getElementById('ba').innerHTML = `
+    <div class="oh-card en-side bare">
+      <div class="en-tag">Bare fact (after reconcile + verify)</div>
+      <div class="en-claim">${f.bare}</div>
+      <div class="en-bare-note">${f.bareNote}</div>
+    </div>
+    <div class="en-vs"><span>→</span></div>
+    <div class="oh-card en-side rich">
+      <div class="en-tag">Enriched context object</div>
+      <div class="en-claim">${f.bare}</div>
+      <div class="en-adds">${f.adds.map(a => `<div class="en-add"><span class="ic">+</span><div><span class="lab">${a[0]}</span><div class="txt">${a[1]}</div></div></div>`).join('')}</div>
+    </div>`;
+  document.getElementById('rule').innerHTML = `<span class="ic">⊕</span><div class="t">${f.rule}</div>`;
+}
+document.getElementById('pick').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-i]'); if (!b) return;
+  cur = +b.dataset.i;
+  document.querySelectorAll('#pick button').forEach((x,i)=>x.classList.toggle('on', i===cur));
+  render();
+});
+render();
+if (window.mountStageNav) window.mountStageNav('enhancement');
+</script>
+</body>
+</html>

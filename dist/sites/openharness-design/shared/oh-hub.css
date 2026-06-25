@@ -1,0 +1,115 @@
+/* =============================================================================
+   shared/oh-hub.css — styles for the generic Open*Hub registry sites.
+   Used by OpenContextHub / OpenSkillsHub / OpenToolsHub (all via oh-hub.jsx).
+   Builds on oh-site.css + oh-components.css; accent set inline per hub.
+   ============================================================================= */
+
+/* private-first candidate hubs — pre-launch banner */
+.ohub-pribanner { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 9px 24px;
+  background: color-mix(in oklab, var(--accent) 12%, var(--bg-subtle)); border-bottom: 1px solid var(--line);
+  font-size: 12.5px; color: var(--fg-muted); }
+.ohub-pribadge { font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--accent); border: 1px dashed color-mix(in oklab, var(--accent) 55%, transparent); border-radius: var(--r-pill); padding: 3px 10px; white-space: nowrap; }
+.ohub-pritext { line-height: 1.4; }
+
+/* hero proof card */
+.ohub-herocard { padding: 22px; box-shadow: var(--e2); }
+.hhc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.hhc-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--fg-faint); }
+.hhc-name { font-family: var(--font-display); font-size: 19px; font-weight: 800; letter-spacing: -.01em; color: var(--fg); }
+.hhc-by { font-size: 11.5px; color: var(--fg-faint); margin-top: 3px; }
+.hhc-desc { font-size: 13.5px; line-height: 1.55; color: var(--fg-muted); margin: 12px 0 16px; }
+.hhc-foot { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid var(--line); }
+.hhc-foot .mono { font-size: 11px; color: var(--fg-faint); }
+.hhc-score { font-family: var(--font-display); font-size: 16px; font-weight: 800; color: var(--accent); }
+
+/* trust cards (landing) */
+.ohub-trust { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 32px; }
+.ohub-trustcard .ti { font-size: 20px; color: var(--accent); }
+.ohub-trustcard .tt { font-family: var(--font-display); font-size: var(--fs-h3); font-weight: 700; color: var(--fg); margin: 10px 0 5px; }
+.ohub-trustcard .td { font-size: 13px; line-height: 1.5; color: var(--fg-muted); }
+
+/* built-on-open-standards cards (landing) */
+.ohub-standards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 32px; }
+.ohub-std { padding: 15px 17px; border-left: 3px solid var(--accent); }
+.ohub-std .sn { font-size: 13.5px; font-weight: 600; color: var(--accent); letter-spacing: .01em; }
+.ohub-std .sd { font-size: 12.5px; line-height: 1.5; color: var(--fg-muted); margin-top: 7px; }
+
+/* convert workbench (optional cfg.convert) */
+.ohub-convert { display: grid; grid-template-columns: 1fr 84px minmax(0, 1.25fr); gap: 0; align-items: stretch; margin-top: 6px; }
+.ohub-convert > * { min-width: 0; }
+.ohub-cv-out .ohub-code { overflow-x: auto; white-space: pre; max-width: 100%; box-sizing: border-box; }
+.ohub-cv-list { display: flex; flex-direction: column; gap: 7px; margin-top: 4px; }
+.ohub-cv-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; text-align: left; cursor: pointer;
+  padding: 10px 12px; border: 1px solid var(--line); border-left: 3px solid var(--line); border-radius: var(--r-md); background: var(--panel); font: inherit; transition: border-color .12s, background .12s; }
+.ohub-cv-item:hover { background: var(--bg-subtle); }
+.ohub-cv-item.on { border-left-color: var(--accent); background: var(--accent-weak); }
+.ohub-cv-mono { font-size: 12px; color: var(--fg); overflow-wrap: anywhere; }
+.ohub-cv-note { font-size: 12px; color: var(--fg-muted); margin-top: 12px; line-height: 1.5; }
+.ohub-cv-arrow { display: grid; place-items: center; gap: 6px; color: var(--fg-faint); }
+.ohub-cv-arrow span { font-size: 22px; color: var(--accent); }
+.ohub-cv-arrow small { font-size: 10px; }
+.ohub-cv-out { opacity: .55; transition: opacity .3s; }
+.ohub-cv-out.ready { opacity: 1; }
+.ohub-cv-outname { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--fg); margin-bottom: 10px; }
+.ohub-cv-rows { margin-top: 12px; }
+.ohub-cv-row { display: grid; grid-template-columns: 150px 1fr; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 12.5px; }
+.ohub-cv-row:last-child { border-bottom: none; }
+.ohub-cv-row .mk { color: var(--fg-faint); font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .03em; }
+.ohub-cv-row .mv { color: var(--fg); overflow-wrap: anywhere; } .ohub-cv-row .mv.ok { color: var(--success); }
+.ohub-cv-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+@media (max-width: 820px) { .ohub-convert { grid-template-columns: 1fr; } .ohub-cv-arrow { transform: rotate(90deg); padding: 10px 0; } }
+
+/* per-entry provenance & trust block (entry detail rail) */
+.ohub-trustblock .mv.ok { color: var(--success); }
+.ohub-trust-foot { margin-top: 12px; padding-top: 11px; border-top: 1px solid var(--line); font-size: 10.5px; line-height: 1.5; color: var(--fg-faint); overflow-wrap: anywhere; }
+
+/* browse */
+.ohub-browsebar { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; flex-wrap: wrap; }
+.ohub-browsebar .oh-input { min-width: 280px; flex: 1; }
+.ohub-facets { display: flex; gap: 8px; flex-wrap: wrap; }
+.ohub-facet { font-family: inherit; font-size: 12.5px; font-weight: 600; color: var(--fg-muted); background: var(--panel);
+              border: 1px solid var(--line); border-radius: var(--r-pill); padding: 7px 13px; cursor: pointer; transition: color .12s, background .12s, border-color .12s; }
+.ohub-facet:hover { color: var(--fg); border-color: var(--line-strong); }
+.ohub-facet.on { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); }
+.ohub-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.ohub-card { padding: 20px; cursor: pointer; display: flex; flex-direction: column; }
+.ec-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.ec-facet { font-size: 11px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; color: var(--accent); }
+.ec-score { font-size: 11.5px; color: var(--fg-faint); }
+.ohub-card h3 { font-family: var(--font-display); font-size: var(--fs-h3); font-weight: 700; color: var(--fg); margin: 0 0 3px; line-height: 1.25; }
+.ec-by { font-size: 11.5px; color: var(--fg-faint); margin-bottom: 10px; }
+.ec-desc { font-size: 13px; line-height: 1.5; color: var(--fg-muted); margin: 0 0 14px; flex: 1; }
+.ec-foot { font-size: 11px; color: var(--fg-faint); padding-top: 12px; border-top: 1px solid var(--line); }
+
+/* entry detail */
+.ohub-back { display: inline-block; font-size: 13px; color: var(--fg-muted); cursor: pointer; margin-bottom: 16px; }
+.ohub-back:hover { color: var(--accent); }
+.ohub-detail-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 22px; }
+.ohub-detail-head h1 { font-family: var(--font-display); font-size: var(--fs-page-title); font-weight: 800; letter-spacing: -.02em; color: var(--fg); margin: 8px 0 4px; }
+.ohub-detail-head p { font-size: 14.5px; line-height: 1.55; color: var(--fg-muted); margin: 12px 0 14px; max-width: 64ch; }
+.ohub-detail-actions { display: flex; gap: 9px; flex: 0 0 auto; }
+.ohub-trustrow { display: flex; gap: 8px; flex-wrap: wrap; }
+.ohub-install { margin-bottom: 18px; }
+.ohub-code { margin: 0; padding: 14px 16px; font-family: var(--font-mono); font-size: 12.5px; color: var(--fg);
+             background: var(--bg-subtle); border: 1px solid var(--line); border-radius: var(--r-md); overflow-x: auto; }
+.ohub-deps { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* entry detail — two-column: main + metadata rail (fills the right side) */
+.ohub-detail-grid { display: grid; grid-template-columns: 1.7fr 1fr; gap: 16px; align-items: start; }
+.ohub-detail-main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.ohub-detail-rail { display: flex; flex-direction: column; gap: 16px; }
+.ohub-about { font-size: 14px; line-height: 1.6; color: var(--fg-muted); margin: 0; }
+.ohub-meta { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.ohub-meta:last-child { border-bottom: none; }
+.ohub-meta .mk { font-size: 12.5px; color: var(--fg-muted); }
+.ohub-meta .mv { font-size: 12.5px; font-weight: 600; color: var(--fg); }
+
+@media (max-width: 1000px) {
+  .ohub-trust, .ohub-grid, .ohub-standards { grid-template-columns: 1fr 1fr; }
+  .ohub-detail-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  .ohub-trust, .ohub-grid, .ohub-standards { grid-template-columns: 1fr; }
+  .ohub-detail-head { flex-direction: column; }
+}

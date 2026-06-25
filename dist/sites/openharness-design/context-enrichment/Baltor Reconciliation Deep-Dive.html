@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="data:,">
+<title>Baltor · Reconciliation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../shared/oh-tokens.css" />
+<link rel="stylesheet" href="../shared/oh-components.css" />
+<link rel="stylesheet" href="../shared/oh-site.css" />
+<link rel="stylesheet" href="guided-demo.css" />
+<link rel="stylesheet" href="engine-stagenav.css" />
+<script src="../shared/oh-experiments.js"></script>
+<script src="track.js"></script>
+<script src="engine-stagenav.js"></script>
+<style>
+  /* Reconciliation deep-dive — the conflict-resolution core. Two sources disagree; source
+     precedence picks the authority; the loser is held out (never deleted). One engine stage. */
+  .rc-pick { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 18px; }
+  .rc-pick button { font: inherit; font-size: 12px; color: var(--fg-muted); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+  .rc-pick button.on { background: var(--accent-weak); color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+
+  .rc-q { font-size: 15px; color: var(--fg); background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: var(--r-md); padding: 14px 16px; margin-bottom: 20px; line-height: 1.5; }
+  .rc-q b { font-weight: 700; }
+
+  /* the face-off: two sources → verdict */
+  .rc-faceoff { display: grid; grid-template-columns: 1fr 64px 1fr; gap: 0; align-items: stretch; }
+  @media (max-width: 760px) { .rc-faceoff { grid-template-columns: 1fr; } }
+  .rc-side { padding: 18px 20px; border: 1px solid var(--line); }
+  .rc-side.win { border-color: color-mix(in srgb, var(--success) 40%, var(--line)); background: color-mix(in srgb, var(--success) 6%, transparent); border-radius: var(--r-lg) 0 0 var(--r-lg); }
+  .rc-side.lose { border-color: color-mix(in srgb, var(--warning) 34%, var(--line)); background: color-mix(in srgb, var(--warning) 6%, transparent); border-radius: 0 var(--r-lg) var(--r-lg) 0; }
+  @media (max-width: 760px) { .rc-side.win { border-radius: var(--r-lg) var(--r-lg) 0 0; } .rc-side.lose { border-radius: 0 0 var(--r-lg) var(--r-lg); } }
+  .rc-badge { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+  .rc-badge.served { color: var(--success); border: 1px solid color-mix(in srgb, var(--success) 34%, var(--line)); }
+  .rc-badge.held { color: var(--warning); border: 1px solid color-mix(in srgb, var(--warning) 34%, var(--line)); }
+  .rc-claim { font-size: 22px; font-weight: 800; letter-spacing: -.02em; color: var(--fg); margin-top: 12px; line-height: 1.15; overflow-wrap: anywhere; }
+  .rc-side.lose .rc-claim { text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--warning) 60%, transparent); color: var(--fg-muted); }
+  .rc-srcline { font-family: var(--font-mono); font-size: 11.5px; color: var(--fg-muted); margin-top: 11px; overflow-wrap: anywhere; }
+  .rc-srcline .auth { color: var(--accent); }
+  .rc-note { font-size: 12.5px; color: var(--fg-muted); margin-top: 10px; line-height: 1.45; }
+  .rc-vs { display: grid; place-items: center; position: relative; }
+  .rc-vs span { width: 38px; height: 38px; border-radius: 50%; background: var(--panel); border: 1px solid var(--line-strong); display: grid; place-items: center; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--fg-faint); z-index: 1; }
+  @media (max-width: 760px) { .rc-vs { padding: 8px 0; } }
+
+  .rc-rule { display: flex; align-items: flex-start; gap: 12px; margin-top: 16px; padding: 14px 16px; border: 1px dashed color-mix(in srgb, var(--accent) 32%, var(--line)); border-radius: var(--r-md); background: var(--bg-subtle); }
+  .rc-rule .ic { color: var(--accent); font-size: 15px; flex: 0 0 auto; margin-top: 1px; }
+  .rc-rule .t { font-size: 13.5px; line-height: 1.5; color: var(--fg); }
+  .rc-rule .t b { font-weight: 700; }
+  .rc-rule .t .mono { font-family: var(--font-mono); font-size: 12px; color: var(--accent); white-space: nowrap; }
+
+  /* precedence ladder */
+  .rc-ladder { display: flex; flex-direction: column; gap: 0; counter-reset: rung; }
+  .rc-rung { display: grid; grid-template-columns: 30px 1fr auto; gap: 14px; align-items: center; padding: 12px 16px; border: 1px solid var(--line); border-bottom: none; background: var(--panel); }
+  .rc-rung:first-child { border-radius: var(--r-md) var(--r-md) 0 0; }
+  .rc-rung:last-child { border-bottom: 1px solid var(--line); border-radius: 0 0 var(--r-md) var(--r-md); }
+  .rc-rung .rk { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--fg-faint); }
+  .rc-rung .rn { font-size: 13.5px; font-weight: 600; color: var(--fg); }
+  .rc-rung .rd { font-size: 12px; color: var(--fg-muted); margin-top: 2px; line-height: 1.4; }
+  .rc-rung .rt { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--fg-faint); border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; white-space: nowrap; }
+  .rc-rung.hi { background: var(--accent-weak); border-color: color-mix(in srgb, var(--accent) 36%, var(--line)); }
+  .rc-rung.hi .rn { color: var(--accent); }
+  .rc-rung.hi .rt { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+  .rc-rung.dim { opacity: .55; }
+  .rc-strong { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); text-align: center; padding: 7px 0 0; }
+
+  .rc-out { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 4px; }
+  @media (max-width: 620px) { .rc-out { grid-template-columns: 1fr; } }
+  .rc-outcard { padding: 14px 16px; }
+  .rc-outcard .ck { color: var(--success); font-weight: 700; }
+  .rc-outcard .ct { font-size: 13.5px; font-weight: 600; color: var(--fg); margin-top: 6px; }
+  .rc-outcard .cd { font-size: 12px; color: var(--fg-muted); margin-top: 5px; line-height: 1.45; }
+</style>
+</head>
+<body class="oh dir-d theme-dark oh-site cd" data-page="engine_reconciliation">
+<div class="cd-top"><div class="cd-wrap" style="display:flex;align-items:center;gap:14px;padding-top:0;padding-bottom:0;width:100%;box-sizing:border-box;">
+  <a class="cd-logo" href="Baltor Guided Demos.html"><span class="cd-mark">◳</span><span>Baltor<small>reconciliation</small></span></a>
+  <span class="sp"></span>
+  <a class="cd-back" href="Baltor Engine.html">← The engine</a>
+  <span class="cd-tag" style="margin-left:14px;">When two sources disagree</span>
+</div></div>
+
+<div class="cd-wrap">
+  <section class="cd-hero">
+    <div class="cd-eyebrow">Engine component · reconciliation</div>
+    <h1>Two sources disagree. One gets served.</h1>
+    <p>Reconciliation is the stage that makes context <b>correct</b>. When two sources conflict on the same fact, Baltor doesn’t average them or pick the newest — it applies <b>source precedence</b>: the enforcing authority outranks the convenient copy. The winner is served with its citation; the loser is <b>held out</b>, never deleted. Pick a conflict:</p>
+  </section>
+
+  <div class="rc-pick" id="pick"></div>
+  <div class="rc-q" id="q"></div>
+
+  <section class="cd-sec" style="margin-top:8px">
+    <div class="cd-sec-h"><h2>The conflict</h2><span class="note">Same fact · two sources · one authority</span></div>
+    <div class="rc-faceoff" id="faceoff"></div>
+    <div class="rc-rule" id="rule"></div>
+  </section>
+
+  <section class="cd-sec">
+    <div class="cd-sec-h"><h2>Source precedence</h2><span class="note">Higher authority wins · highlighted = this conflict</span></div>
+    <div class="rc-ladder" id="ladder"></div>
+    <div class="rc-strong">stronger authority ↑ &nbsp;·&nbsp; weaker / more convenient ↓</div>
+  </section>
+
+  <section class="cd-sec">
+    <div class="cd-sec-h"><h2>What reconciliation guarantees</h2></div>
+    <div class="rc-out">
+      <div class="oh-card rc-outcard"><div class="ck">✓ One answer</div><div class="ct">No averaging, no “newest wins”</div><div class="cd">The enforcing authority is served — not a blend of conflicting sources or whichever was edited last.</div></div>
+      <div class="oh-card rc-outcard"><div class="ck">✓ Loser held out</div><div class="ct">Surfaced, never deleted</div><div class="cd">The conflicting value is preserved with its handle as a warning — truth is never destroyed, only ranked.</div></div>
+      <div class="oh-card rc-outcard"><div class="ck">✓ Decision recorded</div><div class="ct">Precedence rule + receipt</div><div class="cd">Why this source outranked that one is written into the receipt — the conflict resolution is auditable.</div></div>
+    </div>
+  </section>
+
+  <div class="cd-foot"><b>Reconciliation beside the rest.</b> Picking the authority is one stage — the served fact is then hardened (anchored to a refreshable object), enhanced (citation attached), optimized and verified. Precedence is configurable per corpus, but the default always ranks the <b>enforcing</b> source over the convenient copy. See the <a href="Baltor Guided Demos.html">guided demos</a> for the full pipeline and the <a href="Baltor Receipts Explorer.html">receipts explorer</a> for the recorded decision. <b>Not legal, medical, or financial advice</b> — the source in force is the authority.</div>
+</div>
+
+<script>
+const LADDER = [
+  ['A', 'Regulation / statute in force', 'eCFR, EUR-Lex, the law as enacted', 'authority'],
+  ['B', 'Standard / convention edition', 'WCO HS, IATA DGR, ISO — the edition in force', 'authority'],
+  ['C', 'Signed contract / SLA', 'the enforcing agreement', 'enforcing'],
+  ['D', 'System of record', 'billing, ERP — the operational truth', 'enforcing'],
+  ['E', 'Internal policy / SOP', 'a copy that can lag the source', 'copy'],
+  ['F', 'Marketing / FAQ / wiki', 'convenient, often stale', 'copy'],
+];
+const CONFLICTS = [
+  {
+    label: 'CFPB · Reg E deadline',
+    q: '“What’s the error-resolution deadline?” — the <b>FAQ</b> says 30 days; the <b>regulation</b> says 10 business days.',
+    win: { claim: '10 business days', src: 'eCFR · 12 CFR 1005.11(c)(1)', auth: 'regulation in force', note: 'The enacted rule — the deadline a regulator enforces.' },
+    lose: { claim: '30 days', src: 'Internal FAQ · #q12', note: 'A convenient summary that lagged the rule. Held out, never served.' },
+    rule: 'A <b>regulation in force</b> outranks an <b>internal FAQ</b>. <span class="mono">precedence: A &gt; F</span>',
+    hi: ['A', 'F'],
+  },
+  {
+    label: 'Refund · policy vs billing',
+    q: '“What’s our refund window?” — the <b>help-center wiki</b> says 30 days; the <b>billing system</b> enforces 14.',
+    win: { claim: '14 days', src: 'Billing system · system of record', auth: 'system of record', note: 'What actually executes a refund — the operational truth.' },
+    lose: { claim: '30 days', src: 'Help-center wiki', note: 'An old published figure the system never honored. Held out.' },
+    rule: 'The <b>system of record</b> outranks a <b>published wiki</b>. <span class="mono">precedence: D &gt; F</span>',
+    hi: ['D', 'F'],
+  },
+  {
+    label: 'Tariff · map vs WCO',
+    q: '“What’s the HS code?” — the <b>internal map</b> says 8507.80; the <b>WCO HS 2022</b> edition says 8507.60.',
+    win: { claim: 'HS 8507.60', src: 'WCO HS 2022 · heading 85.07', auth: 'standard edition in force', note: 'The Harmonized System edition currently in force.' },
+    lose: { claim: 'HS 8507.80', src: 'Internal HS map', note: 'A retired sub-heading from a prior edition. Held out.' },
+    rule: 'The <b>standard edition in force</b> outranks an <b>internal map</b>. <span class="mono">precedence: B &gt; E</span>',
+    hi: ['B', 'E'],
+  },
+  {
+    label: 'Transit · marketing vs contract',
+    q: '“What’s the committed transit time?” — the <b>marketing page</b> says 12 days; the <b>carrier contract</b> commits 18–21.',
+    win: { claim: '18–21 days', src: 'Carrier contract · transit guarantee', auth: 'signed contract', note: 'The committed, enforceable SLA.' },
+    lose: { claim: '12 days', src: 'Marketing page', note: 'A best-case figure, never contractually committed. Held out.' },
+    rule: 'A <b>signed contract</b> outranks <b>marketing copy</b>. <span class="mono">precedence: C &gt; F</span>',
+    hi: ['C', 'F'],
+  },
+];
+
+let cur = 0;
+document.getElementById('pick').innerHTML = CONFLICTS.map((c, i) =>
+  `<button data-i="${i}"${i===0?' class="on"':''}>${c.label}</button>`).join('');
+
+function render() {
+  const c = CONFLICTS[cur];
+  document.getElementById('q').innerHTML = c.q;
+  document.getElementById('faceoff').innerHTML = `
+    <div class="rc-side win">
+      <span class="rc-badge served">✓ served</span>
+      <div class="rc-claim">${c.win.claim}</div>
+      <div class="rc-srcline">${c.win.src} · <span class="auth">${c.win.auth}</span></div>
+      <div class="rc-note">${c.win.note}</div>
+    </div>
+    <div class="rc-vs"><span>vs</span></div>
+    <div class="rc-side lose">
+      <span class="rc-badge held">⚠ held out</span>
+      <div class="rc-claim">${c.lose.claim}</div>
+      <div class="rc-srcline">${c.lose.src}</div>
+      <div class="rc-note">${c.lose.note}</div>
+    </div>`;
+  document.getElementById('rule').innerHTML = `<span class="ic">⚖</span><div class="t">${c.rule}</div>`;
+  document.getElementById('ladder').innerHTML = LADDER.map(r => {
+    const on = c.hi.includes(r[0]);
+    const dim = !on;
+    return `<div class="rc-rung${on?' hi':''}${dim?' dim':''}">
+      <span class="rk">${r[0]}</span>
+      <div><div class="rn">${r[1]}</div><div class="rd">${r[2]}</div></div>
+      <span class="rt">${r[3]}</span>
+    </div>`;
+  }).join('');
+}
+document.getElementById('pick').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-i]'); if (!b) return;
+  cur = +b.dataset.i;
+  document.querySelectorAll('#pick button').forEach((x,i)=>x.classList.toggle('on', i===cur));
+  render();
+});
+render();
+if (window.mountStageNav) window.mountStageNav('reconciliation');
+</script>
+</body>
+</html>

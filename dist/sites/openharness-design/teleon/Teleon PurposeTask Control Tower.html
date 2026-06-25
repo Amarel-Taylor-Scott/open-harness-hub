@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="data:,">
+<title>Teleon · PurposeTask Control Tower</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../shared/oh-tokens.css" />
+<link rel="stylesheet" href="../shared/oh-components.css" />
+<link rel="stylesheet" href="../shared/oh-site.css" />
+<style>
+  /* Teleon PurposeTask Control Tower — staff/operator dashboard (projection-only).
+     CapabilityTask stays stable · implementation evolves · evidence decides ·
+     policy gates promotion · humans approve boundary expansion · candidate ≠ active. */
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--font-display); -webkit-font-smoothing: antialiased; }
+  .tc-wrap { max-width: 1180px; margin: 0 auto; padding: 0 28px 80px; }
+
+  .tc-top { display: flex; align-items: center; gap: 16px; padding: 22px 0 18px; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20;
+            background: color-mix(in srgb, var(--bg) 90%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .tc-logo { display: flex; align-items: center; gap: 11px; font-weight: 800; font-size: 16px; letter-spacing: -.02em; }
+  .tc-mark { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-size: 15px; flex: 0 0 auto; }
+  .tc-logo small { display: block; font-weight: 500; font-size: 11px; color: var(--fg-faint); letter-spacing: .04em; }
+  .tc-top .sp { flex: 1; }
+  .tc-tag { font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; background: var(--panel); display: inline-flex; align-items: center; gap: 7px; }
+  .tc-tag i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+
+  .tc-eyebrow { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-top: 34px; }
+  .tc-h1 { font-size: 30px; font-weight: 800; letter-spacing: -.03em; margin: 12px 0 0; }
+  .tc-sub { font-size: 15px; color: var(--fg-muted); margin: 10px 0 0; max-width: 70ch; line-height: 1.55; }
+
+  /* capability task card */
+  .tc-cap { margin-top: 26px; padding: 0; overflow: hidden; }
+  .tc-cap-head { display: flex; align-items: flex-start; gap: 16px; padding: 20px 22px; border-bottom: 1px solid var(--line); }
+  .tc-cap-id { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--fg); }
+  .tc-cap-id small { display: block; font-weight: 400; font-size: 12px; color: var(--fg-muted); margin-top: 4px; font-family: var(--font-display); line-height: 1.4; max-width: 52ch; }
+  .tc-cap-health { margin-left: auto; text-align: right; flex: 0 0 auto; }
+  .tc-cap-contracts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
+  .tc-cc { padding: 14px 22px; border-right: 1px solid var(--line); border-top: 1px solid var(--line); }
+  .tc-cc:nth-child(4n) { border-right: none; }
+  .tc-cc .k { font-size: 10.5px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--fg-faint); }
+  .tc-cc .v { font-family: var(--font-mono); font-size: 12.5px; color: var(--fg); margin-top: 6px; }
+  .tc-cc .v.accent { color: var(--accent); }
+
+  .tc-sec { margin-top: 40px; }
+  .tc-sec-h { display: flex; align-items: baseline; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+  .tc-sec-h h2 { font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin: 0; }
+  .tc-sec-h .note { margin-left: auto; font-size: 12px; color: var(--fg-muted); }
+
+  /* three-column scorecard */
+  .tc-score { width: 100%; border-collapse: collapse; }
+  .tc-score th, .tc-score td { padding: 12px 16px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+  .tc-score thead th { font-size: 11px; font-weight: 700; letter-spacing: .04em; border-bottom: 1px solid var(--line-strong); }
+  .tc-score thead th .col-tag { display: block; font-family: var(--font-mono); font-size: 10px; font-weight: 600; margin-top: 5px; letter-spacing: .03em; }
+  .tc-col-base { color: var(--success); } .tc-col-base .col-tag { color: var(--success); }
+  .tc-col-cand { color: var(--fg-muted); }
+  .tc-rowlabel { font-size: 12.5px; color: var(--fg-muted); width: 26%; }
+  .tc-score td .cell { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 12.5px; color: var(--fg); }
+  .tc-score td.win .cell { color: var(--fg); }
+  .tc-mk { font-size: 13px; } .tc-mk.pass { color: var(--success); } .tc-mk.fail { color: var(--danger); } .tc-mk.warn { color: var(--warning); }
+  .tc-delta { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); }
+  .tc-delta.up { color: var(--success); } .tc-delta.down { color: var(--danger); }
+  .tc-statusrow td { border-bottom: none; padding-top: 16px; }
+  .tc-active { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase;
+               border-radius: 999px; padding: 4px 10px; }
+  .tc-active.on { color: var(--success); border: 1px solid color-mix(in srgb, var(--success) 36%, var(--line)); background: color-mix(in srgb, var(--success) 12%, var(--panel)); }
+  .tc-active.off { color: var(--fg-muted); border: 1px solid var(--line); }
+  .tc-active.blocked { color: var(--warning); border: 1px solid color-mix(in srgb, var(--warning) 36%, var(--line)); background: color-mix(in srgb, var(--warning) 10%, var(--panel)); }
+  .tc-active i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  /* two-up panels */
+  .tc-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 900px) { .tc-grid2 { grid-template-columns: 1fr; } }
+
+  /* promotion gates */
+  .tc-gate { display: flex; align-items: flex-start; gap: 11px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+  .tc-gate:last-child { border-bottom: none; }
+  .tc-gate .mk { font-size: 14px; flex: 0 0 auto; margin-top: 1px; }
+  .tc-gate .mk.pass { color: var(--success); } .tc-gate .mk.block { color: var(--warning); }
+  .tc-gate .t { font-size: 13px; font-weight: 600; }
+  .tc-gate .d { font-size: 12px; color: var(--fg-muted); margin-top: 2px; line-height: 1.4; }
+  .tc-gate-note { font-size: 11.5px; color: var(--fg-faint); margin-top: 12px; line-height: 1.5; }
+
+  /* boundary approval */
+  .tc-ba-row { display: flex; justify-content: space-between; gap: 14px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 12.5px; }
+  .tc-ba-row:last-of-type { border-bottom: none; }
+  .tc-ba-row .l { color: var(--fg-muted); } .tc-ba-row .v { font-family: var(--font-mono); font-size: 12px; color: var(--fg); text-align: right; }
+  .tc-ba-actions { display: flex; gap: 10px; margin-top: 14px; }
+  .tc-ba-pending { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-mono); font-size: 11px; color: var(--warning); margin-top: 13px; }
+  .tc-ba-pending i { width: 7px; height: 7px; border-radius: 50%; background: var(--warning); }
+
+  /* receipts / evidence ledger */
+  .tc-ev { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .tc-ev:last-child { border-bottom: none; }
+  .tc-ev .ic { width: 24px; height: 24px; border-radius: 6px; display: grid; place-items: center; font-size: 12px; background: var(--bg-subtle); color: var(--fg-muted); flex: 0 0 auto; }
+  .tc-ev .ic.promote { color: var(--success); } .tc-ev .ic.rollback { color: var(--danger); } .tc-ev .ic.approve { color: var(--accent); }
+  .tc-ev .tx { font-size: 12.5px; color: var(--fg); flex: 1; }
+  .tc-ev .tx small { color: var(--fg-faint); }
+  .tc-ev .rid { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); }
+  .tc-ev .when { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); flex: 0 0 auto; }
+
+  /* runtime classes */
+  .tc-rt { display: flex; flex-wrap: wrap; gap: 7px; }
+  .tc-rt span { font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted); border: 1px solid var(--line); border-radius: 6px; padding: 4px 9px; }
+  .tc-rt span.on { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); background: var(--accent-weak); }
+  .tc-rt span.cand { color: var(--fg-faint); border-style: dashed; }
+
+  .tc-foot { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12px; color: var(--fg-faint); line-height: 1.6; }
+  .tc-foot b { color: var(--fg-muted); font-weight: 600; }
+  .card-h { font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--fg-faint); margin: 0 0 14px; }
+
+  @media (max-width: 820px) { .tc-cap-contracts { grid-template-columns: 1fr 1fr; } .tc-cc:nth-child(4n) { border-right: 1px solid var(--line); } .tc-cc:nth-child(2n) { border-right: none; }
+    .tc-score { font-size: 11px; } .tc-score th, .tc-score td { padding: 9px 8px; } }
+</style>
+</head>
+<body class="oh dir-s theme-dark oh-site tc" style="--accent:#6d5ef0; --accent-weak:#191633; --accent-ink:#0c0a1a;">
+<div class="tc-top">
+  <div class="tc-wrap" style="display:flex; align-items:center; gap:16px; padding-top:0; padding-bottom:0; width:100%; box-sizing:border-box;">
+    <span class="tc-logo"><span class="tc-mark">⟳</span><span>Teleon · PurposeTask Control Tower<small>staff console</small></span></span>
+    <span class="sp"></span>
+    <span class="tc-tag"><i></i>Projection-only · evidence decides · candidate ≠ active</span>
+  </div>
+</div>
+
+<div class="tc-wrap">
+  <div class="tc-eyebrow">Capability · runtime · evidence · promotion</div>
+  <h1 class="tc-h1">One capability. Stable purpose, evolving implementation.</h1>
+  <p class="tc-sub">The CapabilityTask contract stays fixed; Teleon tries implementations, proves them on evidence, and only a passed policy gate promotes one. Candidates are never active until promoted. Boundary expansion needs a human. This console projects that state — it does not decide it.</p>
+
+  <!-- CapabilityTaskCard -->
+  <div class="oh-card tc-cap">
+    <div class="tc-cap-head">
+      <div class="tc-cap-id">cfpb_deadline_verify
+        <small>Purpose: verify the current Reg E error-resolution deadline, with source-grounded evidence.</small>
+      </div>
+      <div class="tc-cap-health">
+        <span class="tc-active on"><i></i>healthy</span>
+        <div style="font-family:var(--font-mono); font-size:11px; color:var(--fg-faint); margin-top:7px;">last promotion 3d ago · rollback available</div>
+      </div>
+    </div>
+    <div class="tc-cap-contracts">
+      <div class="tc-cc"><div class="k">Input contract</div><div class="v">FactVerificationRequest.v1</div></div>
+      <div class="tc-cc"><div class="k">Output contract</div><div class="v">VerificationResult.v1</div></div>
+      <div class="tc-cc"><div class="k">Active runtime</div><div class="v accent">local-function</div></div>
+      <div class="tc-cc"><div class="k">Boundary approval</div><div class="v">1 pending</div></div>
+    </div>
+  </div>
+
+  <!-- three-column scorecard -->
+  <section class="tc-sec">
+    <div class="tc-sec-h"><h2>Baseline vs candidates</h2><span class="note">Evidence decides promotion — never a single benchmark, never the model itself</span></div>
+    <div class="oh-card oh-card--pad" style="padding:6px 10px;">
+      <table class="tc-score" id="score"></table>
+    </div>
+  </section>
+
+  <div class="tc-grid2">
+    <!-- promotion gates -->
+    <section class="tc-sec" style="margin-top:34px;">
+      <div class="oh-card oh-card--pad">
+        <div class="card-h">Promotion gates · candidate A</div>
+        <div id="gates"></div>
+        <div class="tc-gate-note">All gates must pass for promotion. A benchmark result is evidence, not authority — there is no benchmark-only gate. The model's output is never a gate.</div>
+      </div>
+    </section>
+
+    <!-- boundary approval -->
+    <section class="tc-sec" style="margin-top:34px;">
+      <div class="oh-card oh-card--pad">
+        <div class="card-h">Boundary approval · human-gated</div>
+        <div class="tc-ba-row"><span class="l">Requested expansion</span><span class="v">network egress (browser-worker)</span></div>
+        <div class="tc-ba-row"><span class="l">Reason</span><span class="v">candidate B fallback needs live fetch</span></div>
+        <div class="tc-ba-row"><span class="l">Risk</span><span class="v">medium · egress to eur-lex.europa.eu</span></div>
+        <div class="tc-ba-row"><span class="l">Affected</span><span class="v">cfpb_deadline_verify · 1 capability</span></div>
+        <div class="tc-ba-row"><span class="l">Approver</span><span class="v">ops@teleon.dev</span></div>
+        <div class="tc-ba-pending"><i></i>HumanApprovalReceipt — awaiting decision</div>
+        <div class="tc-ba-actions">
+          <button class="oh-btn oh-btn--primary oh-btn--sm" disabled title="Demo — decision is owner-gated">Approve</button>
+          <button class="oh-btn oh-btn--ghost oh-btn--sm" disabled title="Demo — decision is owner-gated">Decline</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="tc-grid2">
+    <!-- runtime decision -->
+    <section class="tc-sec" style="margin-top:16px;">
+      <div class="oh-card oh-card--pad">
+        <div class="card-h">Runtime decision</div>
+        <p style="font-size:13px; color:var(--fg-muted); line-height:1.55; margin:0 0 13px;">Teleon selected <b style="color:var(--accent)">local-function</b> — deterministic, cheapest, meets the latency target offline. Candidate runtimes stay dashed until promoted.</p>
+        <div class="tc-rt">
+          <span class="on">local-function</span><span>managed venv</span><span>local job</span><span class="cand">worker pool</span>
+          <span class="cand">cloud function</span><span class="cand">kubernetes job</span><span class="cand">queue worker</span>
+          <span class="cand">browser worker</span><span class="cand">gpu worker</span><span class="cand">durable workflow</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- receipts / evidence ledger -->
+    <section class="tc-sec" style="margin-top:16px;">
+      <div class="oh-card oh-card--pad">
+        <div class="card-h">Evidence ledger · recent receipts</div>
+        <div id="ledger"></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="tc-foot">
+    <b>What this console is.</b> A projection of the capability's state — contracts, runtime decision, candidate scorecards, gates, approvals and receipts. <b>What it is not:</b> it does not promote a candidate (the policy gate does), does not decide truth (the model's output is a candidate), and does not expand a boundary (a human signs a HumanApprovalReceipt). Candidates shown here are <b>not active</b> until promoted.
+  </div>
+</div>
+
+<script>
+/* three-column scorecard — Baseline (active) vs Candidate A vs Candidate B */
+const ROWS = [
+  ['Contract validity', ['✓ valid','pass'], ['✓ valid','pass'], ['✓ valid','pass'], ''],
+  ['Source-handle preservation', ['100%','pass'], ['100%','pass'], ['96%','fail'], 'B drops 2 handles'],
+  ['Cost / 1k calls', ['$0.00','pass'], ['$0.00','pass'], ['$1.40','warn'], ''],
+  ['p95 latency', ['180ms','pass'], ['210ms','pass'], ['90ms','pass'], ''],
+  ['Reliability (30d)', ['99.7%','pass'], ['99.8%','pass'], ['98.9%','warn'], ''],
+  ['Red-team', ['pass','pass'], ['pass','pass'], ['pass-with-notes','warn'], ''],
+];
+const HEAD = `<thead><tr>
+  <th class="tc-rowlabel">Metric</th>
+  <th class="tc-col-base">Baseline<span class="col-tag">v12 · ACTIVE</span></th>
+  <th class="tc-col-cand">Candidate A<span class="col-tag">v13-rc · candidate</span></th>
+  <th class="tc-col-cand">Candidate B<span class="col-tag">browser-worker · candidate</span></th>
+</tr></thead>`;
+function mk(cell){ const [v,s]=cell; const sym = s==='pass'?'✓':s==='fail'?'✕':s==='warn'?'⚠':''; return `<div class="cell"><span class="tc-mk ${s}">${sym}</span>${v}</div>`; }
+const body = ROWS.map(r => `<tr>
+  <td class="tc-rowlabel">${r[0]}${r[4]?` <span class="tc-delta down">· ${r[4]}</span>`:''}</td>
+  <td>${mk(r[1])}</td><td>${mk(r[2])}</td><td>${mk(r[3])}</td>
+</tr>`).join('');
+const statusRow = `<tr class="tc-statusrow">
+  <td class="tc-rowlabel">Status</td>
+  <td><span class="tc-active on"><i></i>active · promoted</span></td>
+  <td><span class="tc-active blocked"><i></i>gate: blocked</span></td>
+  <td><span class="tc-active off"><i></i>candidate · not active</span></td>
+</tr>
+<tr><td class="tc-rowlabel">Rollback</td>
+  <td><span class="tc-delta">target: v11</span></td>
+  <td><span class="tc-delta">auto on regress</span></td>
+  <td><span class="tc-delta">n/a</span></td>
+</tr>`;
+document.getElementById('score').innerHTML = HEAD + '<tbody>' + body + statusRow + '</tbody>';
+
+/* promotion gates for candidate A */
+const GATES = [
+  ['pass','Contract validity', 'Input/output conform to the declared v1 contracts.'],
+  ['pass','Source-handle preservation', 'Every served fact keeps its source handle + receipt.'],
+  ['block','Cost & latency budget', 'Within budget — but waiting on the 7-day reliability window.'],
+  ['pass','Red-team', 'No unverified allegation served; held-out warnings preserved.'],
+  ['block','Eval window', 'Needs 7d at ≥99.5% reliability — 4d elapsed. Promotion blocked until met.'],
+];
+document.getElementById('gates').innerHTML = GATES.map(g => `
+  <div class="tc-gate"><span class="mk ${g[0]==='pass'?'pass':'block'}">${g[0]==='pass'?'✓':'◷'}</span>
+    <div><div class="t">${g[1]}</div><div class="d">${g[2]}</div></div></div>`).join('');
+
+/* evidence ledger */
+const LED = [
+  ['promote','▲','Promoted Baseline v12','from v11 · all gates passed','rcpt-9a2f…','3d ago'],
+  ['approve','⚑','Boundary approved · network egress','eur-lex fetch · v10 era','har-7c4e…','8d ago'],
+  ['rollback','▼','Rolled back v9 → v8','reliability regress caught','rcpt-21bd…','12d ago'],
+  ['promote','▲','Promoted Baseline v11','from v10 · all gates passed','rcpt-04be…','15d ago'],
+];
+document.getElementById('ledger').innerHTML = LED.map(e => `
+  <div class="tc-ev"><span class="ic ${e[0]}">${e[1]}</span>
+    <span class="tx">${e[2]} <small>· ${e[3]}</small></span>
+    <span class="rid">${e[4]}</span><span class="when">${e[5]}</span></div>`).join('');
+</script>
+</body>
+</html>

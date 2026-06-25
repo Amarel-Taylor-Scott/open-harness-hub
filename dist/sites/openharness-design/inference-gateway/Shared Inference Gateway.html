@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="data:,">
+<title>Shared Inference Gateway · LLM plane</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../shared/oh-tokens.css" />
+<link rel="stylesheet" href="../shared/oh-components.css" />
+<link rel="stylesheet" href="../shared/oh-site.css" />
+<style>
+  /* Shared Inference Gateway — internal control plane (projection-only).
+     Object-level preference → governed provider graph → ModelInvocationReceipt. */
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--font-display); -webkit-font-smoothing: antialiased; }
+  .ig-wrap { max-width: 1180px; margin: 0 auto; padding: 0 28px 80px; }
+
+  .ig-top { display: flex; align-items: center; gap: 16px; padding: 22px 0 18px; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20;
+            background: color-mix(in srgb, var(--bg) 90%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .ig-logo { display: flex; align-items: center; gap: 11px; font-weight: 800; font-size: 16px; letter-spacing: -.02em; }
+  .ig-mark { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-size: 15px; flex: 0 0 auto; }
+  .ig-logo small { display: block; font-weight: 500; font-size: 11px; color: var(--fg-faint); letter-spacing: .04em; }
+  .ig-top .sp { flex: 1; }
+  .ig-tag { font-family: var(--font-mono); font-size: 11px; color: var(--fg-muted); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; background: var(--panel); }
+  .ig-internal { display: inline-flex; align-items: center; gap: 7px; }
+  .ig-internal i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+
+  .ig-hero { padding: 38px 0 6px; }
+  .ig-eyebrow { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+  .ig-hero h1 { font-size: 34px; font-weight: 800; letter-spacing: -.03em; line-height: 1.07; margin: 13px 0 0; max-width: 24ch; }
+  .ig-hero p { font-size: 15.5px; line-height: 1.6; color: var(--fg-muted); margin: 14px 0 0; max-width: 64ch; }
+
+  /* the law: preference → router → receipt */
+  .ig-law { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 0; align-items: stretch; margin: 30px 0 6px; border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; background: var(--panel); }
+  .ig-law-step { padding: 18px 20px; }
+  .ig-law-step .k { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  .ig-law-step .t { font-size: 15px; font-weight: 700; margin-top: 7px; }
+  .ig-law-step .d { font-size: 12.5px; color: var(--fg-muted); margin-top: 4px; line-height: 1.45; }
+  .ig-law-arrow { display: grid; place-items: center; color: var(--fg-faint); font-size: 18px; padding: 0 4px; }
+
+  .ig-sec { margin-top: 42px; }
+  .ig-sec-h { display: flex; align-items: baseline; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+  .ig-sec-h h2 { font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin: 0; }
+  .ig-sec-h .note { margin-left: auto; font-size: 12px; color: var(--fg-muted); }
+
+  /* provider graph */
+  .ig-graph { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; }
+  .ig-node { padding: 15px 16px; border-left: 3px solid var(--cls, var(--fg-faint)); }
+  .ig-node-h { display: flex; align-items: center; gap: 9px; }
+  .ig-node-nm { font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
+  .ig-node-cls { margin-left: auto; font-family: var(--font-mono); font-size: 9.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--cls, var(--fg-muted)); border: 1px solid color-mix(in srgb, var(--cls, var(--line)) 36%, var(--line)); border-radius: 5px; padding: 2px 6px; }
+  .ig-node-d { font-size: 12px; line-height: 1.45; color: var(--fg-muted); margin-top: 9px; }
+  .ig-node-meta { display: flex; gap: 10px; margin-top: 11px; font-family: var(--font-mono); font-size: 10.5px; color: var(--fg-faint); }
+  .ig-node-meta b { color: var(--fg-muted); font-weight: 600; }
+
+  /* receipt card */
+  .ig-receipt { display: grid; grid-template-columns: 1.3fr 1fr; gap: 0; overflow: hidden; }
+  .ig-receipt-main { padding: 20px 22px; border-right: 1px solid var(--line); }
+  .ig-receipt-side { padding: 20px 22px; background: var(--bg-subtle); }
+  .ig-rcpt-id { font-family: var(--font-mono); font-size: 11px; color: var(--fg-faint); }
+  .ig-rcpt-row { display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .ig-rcpt-row:last-child { border-bottom: none; }
+  .ig-rcpt-row .l { color: var(--fg-muted); }
+  .ig-rcpt-row .v { font-family: var(--font-mono); font-size: 12px; color: var(--fg); text-align: right; }
+  .ig-rcpt-row .v.accent { color: var(--accent); }
+  .ig-side-h { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-faint); margin: 0 0 12px; }
+  .ig-side-h.mt { margin-top: 20px; }
+  .ig-rej { font-family: var(--font-mono); font-size: 11.5px; color: var(--fg-muted); padding: 7px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 10px; }
+  .ig-rej .why { color: var(--fg-faint); }
+  .ig-policy { display: flex; align-items: center; gap: 8px; font-size: 12.5px; padding: 6px 0; }
+  .ig-policy .ck { color: var(--success); font-weight: 700; }
+  .ig-policy .ck.warn { color: var(--warning); }
+
+  .ig-chip { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; color: var(--fg-muted); }
+  .ig-chip i { width: 6px; height: 6px; border-radius: 50%; }
+  .ig-chip.ok { color: var(--success); border-color: color-mix(in srgb, var(--success) 32%, var(--line)); } .ig-chip.ok i { background: var(--success); }
+  .ig-chip.no { color: var(--fg-muted); } .ig-chip.no i { background: var(--fg-faint); }
+  .ig-chip.q { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 34%, var(--line)); } .ig-chip.q i { background: var(--danger); }
+
+  /* tables (route decisions, endpoint intel, secrets) */
+  .ig-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .ig-table th { text-align: left; font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-faint); padding: 8px 12px; border-bottom: 1px solid var(--line); }
+  .ig-table td { padding: 11px 12px; border-bottom: 1px solid var(--line); color: var(--fg); vertical-align: top; }
+  .ig-table tr:last-child td { border-bottom: none; }
+  .ig-table .mono { font-family: var(--font-mono); font-size: 12px; }
+  .ig-table .mut { color: var(--fg-muted); }
+  .ig-cls-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 7px; vertical-align: middle; }
+
+  .ig-caveat { margin-top: 22px; padding: 14px 17px; border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line)); border-radius: var(--r-md);
+               background: var(--accent-weak); display: flex; gap: 12px; align-items: flex-start; }
+  .ig-caveat .ic { color: var(--accent); font-size: 15px; flex: 0 0 auto; margin-top: 1px; }
+  .ig-caveat .tx { font-size: 12.5px; line-height: 1.55; color: var(--fg-muted); } .ig-caveat .tx b { color: var(--fg); font-weight: 600; }
+
+  .ig-foot { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12px; color: var(--fg-faint); line-height: 1.6; }
+  .ig-foot b { color: var(--fg-muted); font-weight: 600; }
+
+  @media (max-width: 1000px) { .ig-graph { grid-template-columns: 1fr 1fr; } .ig-receipt { grid-template-columns: 1fr; } .ig-receipt-main { border-right: none; border-bottom: 1px solid var(--line); }
+    .ig-law { grid-template-columns: 1fr; } .ig-law-arrow { padding: 4px 0; transform: rotate(90deg); } }
+  @media (max-width: 640px) { .ig-graph { grid-template-columns: 1fr; } .ig-hero h1 { font-size: 27px; } .ig-table { font-size: 12px; } }
+</style>
+</head>
+<body class="oh dir-s theme-dark oh-site ig" style="--accent:#c452c4; --accent-weak:#2a142a; --accent-ink:#180a18;">
+<div class="ig-top">
+  <div class="ig-wrap" style="display:flex; align-items:center; gap:16px; padding-top:0; padding-bottom:0; width:100%; box-sizing:border-box;">
+    <span class="ig-logo"><span class="ig-mark">◌</span><span>Shared Inference Gateway<small>LLM plane · internal control plane</small></span></span>
+    <span class="sp"></span>
+    <span class="ig-tag ig-internal"><i></i>Internal · projection-only · LLM output is never truth</span>
+  </div>
+</div>
+
+<div class="ig-wrap">
+  <section class="ig-hero">
+    <div class="ig-eyebrow">Object-level inference · OIPS</div>
+    <h1>Preference requests intent. Router decides execution. Receipt records reality.</h1>
+    <p>Object-level model preferences resolve through a governed provider graph to an actual model — recorded as a <span class="mono">ModelInvocationReceipt</span>. Secrets are references, never values. Fallback is never silent. The model's output is a candidate, never truth.</p>
+  </section>
+
+  <div class="ig-law">
+    <div class="ig-law-step"><div class="k">1 · Preference</div><div class="t">Object requests intent</div><div class="d"><span class="mono">frontier_reasoning</span> — the object asks for a capability class, not a vendor.</div></div>
+    <div class="ig-law-arrow">→</div>
+    <div class="ig-law-step"><div class="k">2 · Router</div><div class="t">Graph decides execution</div><div class="d">Numeric provider graph picks a node under policy; rejected candidates are recorded with a reason.</div></div>
+    <div class="ig-law-arrow">→</div>
+    <div class="ig-law-step"><div class="k">3 · Receipt</div><div class="t">Reality is recorded</div><div class="d">Actual model, fallback, hashes, cost and policy checks — a signed receipt, not a promise.</div></div>
+  </div>
+
+  <!-- provider graph -->
+  <section class="ig-sec">
+    <div class="ig-sec-h"><h2>Model provider graph</h2><span class="note">Classified by trust class · candidates sit behind ports · output never truth</span></div>
+    <div class="ig-graph" id="graph"></div>
+  </section>
+
+  <!-- main receipt -->
+  <section class="ig-sec">
+    <div class="ig-sec-h"><h2>Model invocation receipt</h2><span class="note">The artifact of record for one inference</span></div>
+    <div class="oh-card ig-receipt" id="receipt"></div>
+  </section>
+
+  <!-- route decisions -->
+  <section class="ig-sec">
+    <div class="ig-sec-h"><h2>Recent route decisions</h2><span class="note">Projection of the router log</span></div>
+    <div class="oh-card oh-card--pad" style="padding:6px 6px;"><table class="ig-table" id="routes"></table></div>
+  </section>
+
+  <!-- free / limited endpoint intelligence -->
+  <section class="ig-sec">
+    <div class="ig-sec-h"><h2>Free / limited endpoint intelligence</h2><span class="note">Classification governs use — not popularity</span></div>
+    <div class="oh-card oh-card--pad" style="padding:6px 6px;"><table class="ig-table" id="endpoints"></table></div>
+    <div class="ig-caveat">
+      <span class="ic">◌</span>
+      <span class="tx"><b>ClawLess is a runtime/sandbox candidate, not an LLM endpoint.</b> Shared-key, bypass, and "unlimited" endpoints are <b>quarantined</b> — never routed to. Free official endpoints are prototype candidates behind a port; their output is a candidate, never truth.</span>
+    </div>
+  </section>
+
+  <!-- secrets + redteam -->
+  <section class="ig-sec">
+    <div class="ig-sec-h"><h2>Secret references &amp; red-team status</h2><span class="note">Refs only — never values</span></div>
+    <div class="oh-card oh-card--pad" style="padding:6px 6px;"><table class="ig-table" id="secrets"></table></div>
+  </section>
+
+  <div class="ig-foot">
+    <b>What this plane does.</b> It resolves object-level inference preferences to a governed provider node, records a <b>ModelInvocationReceipt</b> for every call, and quarantines unsafe endpoints. <b>What it does not do:</b> it does not decide truth, promote a candidate, or expose a secret value. The receipt is evidence; Baltor governs truth and Teleon's policy gate governs promotion.
+  </div>
+</div>
+
+<script>
+/* ---- provider graph ---- */
+const CLS = {
+  local:   { c:'#3fa66a', label:'local deterministic' },
+  candidate:{ c:'#c452c4', label:'candidate' },
+  free:    { c:'#4d8de6', label:'prototype · free-limited' },
+  lab:     { c:'#d29922', label:'lab gateway' },
+  quarantine:{ c:'#e0556a', label:'quarantined' },
+  private: { c:'#7e8da3', label:'customer-private' },
+};
+const NODES = [
+  { nm:'model.local_stub@v1', cls:'local', d:'Deterministic local stub — used for offline proof. Reproducible, no network.', meta:[['weight','1.00'],['health','ok']] },
+  { nm:'fireworks.llama-70b', cls:'candidate', d:'Live inference-gateway candidate node, behind a port. Output is a candidate, never truth.', meta:[['weight','0.62'],['health','ok']] },
+  { nm:'openrouter:free', cls:'free', d:'Free official endpoint — prototype candidate. Rate-limited; metadata only on discovery.', meta:[['weight','0.30'],['limit','rpm 20']] },
+  { nm:'gateway-repo.lab', cls:'lab', d:'Lab gateway for evaluation runs. Not a production route.', meta:[['weight','0.10'],['scope','eval']] },
+  { nm:'shared-key.bypass', cls:'quarantine', d:'Shared-key / bypass / "unlimited" endpoint — quarantined. Never routed to.', meta:[['weight','0.00'],['policy','blocked']] },
+  { nm:'tenant.acme-private', cls:'private', d:'Customer-private model. Tenant-scoped; not shared across the plane.', meta:[['weight','—'],['scope','tenant']] },
+];
+document.getElementById('graph').innerHTML = NODES.map(n => `
+  <div class="oh-card ig-node" style="--cls:${CLS[n.cls].c}">
+    <div class="ig-node-h"><span class="ig-node-nm">${n.nm}</span><span class="ig-node-cls">${CLS[n.cls].label}</span></div>
+    <div class="ig-node-d">${n.d}</div>
+    <div class="ig-node-meta">${n.meta.map(([k,v]) => `<span><b>${k}</b> ${v}</span>`).join('')}</div>
+  </div>`).join('');
+
+/* ---- main receipt (offline CFPB proof) ---- */
+const R = {
+  id: 'mir-2f9c41a7e0b3',
+  rows: [
+    ['Requested preference', 'frontier_reasoning', true],
+    ['Resolved class', 'reasoning · offline-proof', false],
+    ['Selected provider node', 'model.local_stub@v1', false],
+    ['Selected model', 'local_stub-reasoning', false],
+    ['Fallback used', 'false', false],
+    ['Input hash', 'sha256:7b41…e092', false],
+    ['Output hash', 'sha256:a18d…44cf', false],
+    ['Token estimate', '1,284 in · 318 out', false],
+    ['Cost estimate', '$0.00 (local)', false],
+    ['Allowed use after route', 'candidate · not truth', true],
+  ],
+  rejected: [
+    ['fireworks.llama-70b', 'offline mode — network disabled'],
+    ['openrouter:free', 'rate class below request'],
+    ['shared-key.bypass', 'quarantined — policy block'],
+  ],
+  policy: [
+    ['Secret refs only (no raw key)', true],
+    ['No quarantined endpoint routed', true],
+    ['Output marked candidate, not truth', true],
+    ['Fallback would be recorded, never silent', true],
+  ],
+};
+document.getElementById('receipt').innerHTML = `
+  <div class="ig-receipt-main">
+    <div class="ig-rcpt-id">receipt ${R.id}</div>
+    <div style="margin-top:12px">
+      ${R.rows.map(([l,v,a]) => `<div class="ig-rcpt-row"><span class="l">${l}</span><span class="v${a?' accent':''}">${v}</span></div>`).join('')}
+    </div>
+  </div>
+  <div class="ig-receipt-side">
+    <div class="ig-side-h">Rejected candidates</div>
+    ${R.rejected.map(([n,why]) => `<div class="ig-rej"><span>${n}</span><span class="why">${why}</span></div>`).join('')}
+    <div class="ig-side-h mt">Policy checks</div>
+    ${R.policy.map(([t,ok]) => `<div class="ig-policy"><span class="ck${ok?'':' warn'}">${ok?'✓':'!'}</span>${t}</div>`).join('')}
+  </div>`;
+
+/* ---- route decisions ---- */
+const ROUTES = [
+  ['12:04:31', 'cfpb_deadline_verify', 'frontier_reasoning', 'model.local_stub@v1', 'no', 'candidate'],
+  ['12:03:58', 'reconcile_eu_reg', 'balanced', 'fireworks.llama-70b', 'no', 'candidate'],
+  ['12:01:12', 'summarize_corpus', 'cheap', 'openrouter:free', 'yes · rate limit → local', 'candidate'],
+  ['11:58:40', 'redteam_probe', 'frontier_reasoning', 'gateway-repo.lab', 'no', 'eval-only'],
+  ['11:55:02', '(blocked)', 'any', 'shared-key.bypass', '— quarantined', 'denied'],
+];
+document.getElementById('routes').innerHTML =
+  '<thead><tr><th>Time</th><th>Object / task</th><th>Preference</th><th>Routed to</th><th>Fallback</th><th>Allowed use</th></tr></thead><tbody>' +
+  ROUTES.map(r => `<tr>
+    <td class="mono mut">${r[0]}</td><td class="mono">${r[1]}</td><td class="mono mut">${r[2]}</td>
+    <td class="mono">${r[3]}</td><td class="mut">${r[4]}</td>
+    <td>${r[5]==='denied' ? '<span class="ig-chip q"><i></i>denied</span>' : r[5]==='eval-only' ? '<span class="ig-chip no"><i></i>eval-only</span>' : '<span class="ig-chip ok"><i></i>candidate</span>'}</td>
+  </tr>`).join('') + '</tbody>';
+
+/* ---- free/limited endpoint intelligence ---- */
+const EP = [
+  ['ClawLess', 'runtime', 'Runtime / sandbox candidate — NOT an LLM endpoint.', 'no'],
+  ['OpenRouter :free', 'free', 'Free official endpoint — prototype candidate, rate-limited.', 'free'],
+  ['Fireworks', 'candidate', 'Live inference-gateway candidate node (paid tier).', 'candidate'],
+  ['Together', 'candidate', 'Paid provider — candidate behind a port.', 'candidate'],
+  ['Discovery listings', 'free', 'Metadata only — not a route until vetted.', 'free'],
+  ['shared-key / bypass / "unlimited"', 'quarantine', 'Quarantined — never routed to.', 'quarantine'],
+];
+document.getElementById('endpoints').innerHTML =
+  '<thead><tr><th>Endpoint</th><th>Classification</th><th>Why</th></tr></thead><tbody>' +
+  EP.map(e => `<tr>
+    <td class="mono">${e[0]}</td>
+    <td><span class="ig-cls-dot" style="background:${CLS[e[3]]?CLS[e[3]].c:'var(--fg-faint)'}"></span>${e[1]}</td>
+    <td class="mut">${e[2]}</td>
+  </tr>`).join('') + '</tbody>';
+
+/* ---- secret refs + redteam ---- */
+const SEC = [
+  ['fireworks_api_key', 'ref://vault/inference/fireworks#v3', 'set', 'passed'],
+  ['openrouter_key', 'ref://vault/inference/openrouter#v1', 'set', 'passed'],
+  ['tenant.acme_private_key', 'ref://vault/tenant/acme#v2', 'set', 'passed'],
+  ['shared_bypass_key', '— (quarantined, not loaded)', 'blocked', 'n/a'],
+];
+document.getElementById('secrets').innerHTML =
+  '<thead><tr><th>Secret</th><th>Reference (never a value)</th><th>Status</th><th>Red-team</th></tr></thead><tbody>' +
+  SEC.map(s => `<tr>
+    <td class="mono">${s[0]}</td><td class="mono mut">${s[1]}</td>
+    <td>${s[2]==='blocked' ? '<span class="ig-chip q"><i></i>blocked</span>' : '<span class="ig-chip ok"><i></i>set</span>'}</td>
+    <td class="mut">${s[3]}</td>
+  </tr>`).join('') + '</tbody>';
+</script>
+</body>
+</html>
