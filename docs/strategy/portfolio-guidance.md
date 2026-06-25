@@ -11,14 +11,14 @@ PROPOSALS — owner-gated.** Where evidence is thin the docs say so; this guidan
 ## The one-sentence portfolio
 
 **Parent brand: "AI Done Right" — tagline *"AI, done right."*** One holding company over three product layers plus
-Teleon Observer (the AI-usage session-review wedge):
+AIDevObserver (the AI-usage session-review wedge):
 
 ```
 AI Done Right  (umbrella IP · brands · standards · shared R&D/security/governance)
 ├── Teleon.dev   — runs your capability on the CHEAPEST bounded path that still passes   → governs EFFICIENCY
 ├── Baltor.ai    — managed, verified, provable context, powered by Teleon                → governs TRUTH
 ├── Open*Hubs    — the open STORE both products consume (context·tools·skills·harnesses·specs)
-└── Teleon Observer — watches AI usage; reviews the SESSION (post) + helps intra-session (while)  → Teleon's wedge
+└── AIDevObserver — watches AI usage; reviews the SESSION (post) + helps intra-session (while)  → Teleon's wedge
 ```
 
 **Moat split (LOCKED):** *Baltor governs what becomes **TRUE**; Teleon governs what becomes **EFFICIENT**.* Both
@@ -113,7 +113,7 @@ the reverse.
 
 ---
 
-## 4 · Teleon Observer — AI session review + intra-session helper (for Claude Code / Cursor / Codex users)
+## 4 · AIDevObserver — AI session review + intra-session helper (for Claude Code / Cursor / Codex users)
 
 > **"Grammarly / Datadog / a compiler-optimizer — for AI usage."** It watches *how* you use AI, **saves the
 > session**, lets you **review it for learning** (post), and **pops up during the session** (while) — *"this already

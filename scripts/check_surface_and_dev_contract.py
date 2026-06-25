@@ -75,7 +75,7 @@ def check() -> int:
 def self_test() -> int:
     spec = _spec()
     assert len(spec["pillars"]) == 5, "exactly 5 brand pillars"
-    assert {p["id"] for p in spec["pillars"]} == {"ai-done-right", "teleon", "teleon-observer", "baltor", "open-star-hubs"}
+    assert {p["id"] for p in spec["pillars"]} == {"ai-done-right", "teleon", "aidevobserver", "baltor", "open-star-hubs"}
     assert all(p.get("canonical_surface") and p.get("capabilities") for p in spec["pillars"]), "each pillar has a surface + capabilities"
     assert isinstance(surface_violations(spec), list) and isinstance(unregistered_seams(), list)
     # synthetic: a pillar pointing at a missing file is flagged

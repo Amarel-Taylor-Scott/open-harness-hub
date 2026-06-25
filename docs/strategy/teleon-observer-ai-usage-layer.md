@@ -1,4 +1,4 @@
-# Teleon Observer — a thin layer that watches AI usage and makes it better
+# AIDevObserver — a thin layer that watches AI usage and makes it better
 
 > The customer-facing wedge for the Teleon engine. A **thin observer** that monitors how a developer/agent uses AI
 > (in VS Code, Claude Code, Codex-in-terminal, …), **saves the session**, lets them **review it for learning**, and

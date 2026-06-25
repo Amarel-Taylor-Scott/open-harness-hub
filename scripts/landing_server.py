@@ -22,7 +22,7 @@ SPEC = REPO / "architecture" / "surface_capability_spec.json"
 SVC = REPO / "dist" / "service-plane-tunnel-urls.json"
 OHD_LOG = REPO / "data" / "dev-intel" / "ohd-tunnel.log"
 #: pillar id → the service-plane target id whose live tunnel is that pillar's app
-PILLAR_APP = {"ai-done-right": "context_is_everything_app", "teleon": "teleon_app", "teleon-observer": None,
+PILLAR_APP = {"ai-done-right": "context_is_everything_app", "teleon": "teleon_app", "aidevobserver": None,
               "baltor": "baltor_app", "open-star-hubs": "harness_hub_app"}
 
 
@@ -63,7 +63,7 @@ def render() -> str:
     extra = []
     if design:
         extra.append(f'<a href="{design}" target="_blank" rel="noopener">Design Portfolio (full fidelity)</a>')
-    for tid, label in [("demo_control_tower", "Demo Control Tower"), ("baltor_admin_demo_server", "Baltor Control Tower")]:
+    for tid, label in [("baltor_admin_demo_server", "Baltor Control Tower")]:
         if svc.get(tid):
             extra.append(f'<a href="{svc[tid]}" target="_blank" rel="noopener">{label}</a>')
     return f"""<!doctype html><html lang=en><head><meta charset=utf-8>
@@ -80,7 +80,7 @@ a.go,.extra a{{display:inline-block;color:#0b0e14;background:#56d4c4;border-radi
 .extra{{margin-top:1.8rem;display:flex;gap:.6rem;flex-wrap:wrap}}.extra a{{background:#161b22;color:#56d4c4;border:1px solid #2a3340}}
 .warn{{color:#e0a458;font-size:.74rem}}.foot{{color:#6b7682;font-size:.78rem;margin-top:2.2rem;border-top:1px solid #21262d;padding-top:1rem}}</style></head>
 <body><h1>AI Done Right</h1><div class=tag>the holding company · every surface, live</div>
-<p class=sub><b>Teleon</b> runs your capability on the cheapest bounded path that still passes (efficiency) · <b>Baltor</b> serves managed, verified, provable context (truth) · <b>Open*Hubs</b> is the open store both consume · <b>Teleon Observer</b> watches AI usage (the wedge).</p>
+<p class=sub><b>Teleon</b> runs your capability on the cheapest bounded path that still passes (efficiency) · <b>Baltor</b> serves managed, verified, provable context (truth) · <b>Open*Hubs</b> is the open store both consume · <b>AIDevObserver</b> watches AI usage (the wedge).</p>
 <div class=grid>{''.join(cards)}</div>
 <div class=extra>{''.join(extra)}</div>
 <p class=foot>Links are read live each load from the running tunnels. TryCloudflare quick tunnels are temporary URLs. serves_truth=false · prototypes + mock data.</p></body></html>"""
@@ -103,7 +103,7 @@ def self_test() -> int:
     h = render()
     assert "AI Done Right" in h and 'class=grid' in h, "renders the branded landing"
     assert isinstance(_live_svc_urls(), dict), "reads live service URLs without raising"
-    assert set(PILLAR_APP) == {"ai-done-right", "teleon", "teleon-observer", "baltor", "open-star-hubs"}, "5 pillars mapped"
+    assert set(PILLAR_APP) == {"ai-done-right", "teleon", "aidevobserver", "baltor", "open-star-hubs"}, "5 pillars mapped"
     print("landing_server self-test: OK (renders branded landing, reads live tunnel URLs, 5 pillars mapped)")
     return 0
 

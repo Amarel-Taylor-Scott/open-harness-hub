@@ -43,7 +43,7 @@ The portfolio is **AI Done Right** (umbrella IP · brands · standards · shared
 - **Teleon.dev** — runs a capability on the CHEAPEST bounded path that still passes → governs **EFFICIENCY**.
 - **Baltor.ai** — managed, verified, provable context, powered by Teleon → governs **TRUTH**.
 - **Open\*Hubs** — the open STORE both products consume (context · tools · skills · harnesses · specs).
-- **Teleon Observer** — watches AI usage; reviews the SESSION (post) + helps intra-session (while) → the wedge.
+- **AIDevObserver** — watches AI usage; reviews the SESSION (post) + helps intra-session (while) → the wedge.
 
 For EACH product, every cycle should move toward a **clear example use-case + a runnable end-to-end pipeline**
 (not just registry rows): a named scenario → the composed DAG over real registry components → a runnable demo
