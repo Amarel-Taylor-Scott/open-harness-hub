@@ -3,8 +3,8 @@
 CHANGE-AUDIT PROTOCOL — before AND after editing a file/symbol, run `PYTHONPATH=. python3 scripts/codegraph.py --audit <path-or-symbol>` and review its STRONG connections: the importers/callers that break if its API changes (ranked by strength = call-sites × resolution-confidence) plus its blast radius. Update the load-bearing neighbors in the SAME change; a high in-strength symbol is shared infrastructure — touch it deliberately.
 
 roots: src, scripts, local_emulators
-file layer: 1698 modules · 2243 import edges
-symbol layer: {'module': 1698, 'function': 6956, 'class': 632, 'method': 1755} · 11401 call edges (all confidently resolved; 5880 ambiguous dropped) · 68 inherits
+file layer: 1717 modules · 2254 import edges
+symbol layer: {'module': 1717, 'function': 7132, 'class': 633, 'method': 1758} · 11678 call edges (all confidently resolved; 5890 ambiguous dropped) · 68 inherits
 
 ## Most load-bearing symbols (weighted call in-degree — change carefully)
   scripts.baltor_admin_demo_server.esc  in-strength 143.0 (16 callers)

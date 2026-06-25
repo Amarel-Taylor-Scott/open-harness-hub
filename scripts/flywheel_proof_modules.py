@@ -1006,4 +1006,5 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_seha_boundary.py", "check_seha_boundary"),
     ("scripts/check_surface_and_dev_contract.py", "check_surface_and_dev_contract"),
     ("scripts/landing_server.py", "landing_server"),
+    ("scripts/check_northstar_design.py", "check_northstar_design"),
 ]

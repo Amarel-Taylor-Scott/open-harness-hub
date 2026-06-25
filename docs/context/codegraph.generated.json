@@ -12,16 +12,16 @@
    "scripts",
    "local_emulators"
   ],
-  "modules": 1698,
-  "import_edges": 2243,
+  "modules": 1717,
+  "import_edges": 2254,
   "symbol_nodes": {
-   "module": 1698,
-   "function": 6956,
-   "class": 632,
-   "method": 1755
+   "module": 1717,
+   "function": 7132,
+   "class": 633,
+   "method": 1758
   },
-  "call_edges": 11401,
-  "ambiguous_calls_dropped": 5880,
+  "call_edges": 11678,
+  "ambiguous_calls_dropped": 5890,
   "inherits_edges": 68
  },
  "most_load_bearing_symbols": [
@@ -1478,6 +1478,11 @@
    "dependents": 8
   },
   {
+   "module": "scripts.flywheel_proof_modules",
+   "path": "scripts/flywheel_proof_modules.py",
+   "dependents": 8
+  },
+  {
    "module": "scripts.foundry.queues",
    "path": "scripts/foundry/queues.py",
    "dependents": 8
@@ -1538,6 +1543,11 @@
    "dependents": 7
   },
   {
+   "module": "scripts._llm_client",
+   "path": "scripts/_llm_client.py",
+   "dependents": 7
+  },
+  {
    "module": "scripts.artifact_graph.conflict_detector",
    "path": "scripts/artifact_graph/conflict_detector.py",
    "dependents": 7
@@ -1545,11 +1555,6 @@
   {
    "module": "scripts.context_graph",
    "path": "scripts/context_graph.py",
-   "dependents": 7
-  },
-  {
-   "module": "scripts.flywheel_proof_modules",
-   "path": "scripts/flywheel_proof_modules.py",
    "dependents": 7
   },
   {
@@ -1908,11 +1913,6 @@
    "dependents": 5
   },
   {
-   "module": "scripts._llm_client",
-   "path": "scripts/_llm_client.py",
-   "dependents": 4
-  },
-  {
    "module": "scripts.api_inference_handler",
    "path": "scripts/api_inference_handler.py",
    "dependents": 4
@@ -1970,6 +1970,11 @@
   {
    "module": "scripts.identity_local_service",
    "path": "scripts/identity_local_service.py",
+   "dependents": 4
+  },
+  {
+   "module": "scripts.interrogation_engine",
+   "path": "scripts/interrogation_engine.py",
    "dependents": 4
   },
   {
@@ -2220,11 +2225,6 @@
   {
    "module": "scripts.discover_tools",
    "path": "scripts/discover_tools.py",
-   "dependents": 3
-  },
-  {
-   "module": "scripts.discovery_pipeline",
-   "path": "scripts/discovery_pipeline.py",
    "dependents": 3
   }
  ],
@@ -2926,6 +2926,12 @@
    "confidence": "exact"
   },
   {
+   "src": "scripts.check_local_blackboard_provider._self_test",
+   "dst": "scripts.check_local_blackboard_provider._observation",
+   "weight": 9,
+   "confidence": "exact"
+  },
+  {
    "src": "scripts.check_local_events_plane._self_test",
    "dst": "scripts.check_local_events_plane._call",
    "weight": 9,
@@ -3161,7 +3167,7 @@
   },
   {
    "src": "scripts.check_local_blackboard_provider._self_test",
-   "dst": "scripts.check_local_blackboard_provider._observation",
+   "dst": "scripts.check_local_blackboard_provider._receipt",
    "weight": 8,
    "confidence": "exact"
   },
@@ -3612,12 +3618,6 @@
   {
    "src": "scripts.check_live_supervisor_spawn_decisions._self_test",
    "dst": "src.baltor.workers.supervisor_watch.step",
-   "weight": 7,
-   "confidence": "exact"
-  },
-  {
-   "src": "scripts.check_local_blackboard_provider._self_test",
-   "dst": "scripts.check_local_blackboard_provider._receipt",
    "weight": 7,
    "confidence": "exact"
   },
@@ -4606,6 +4606,12 @@
    "confidence": "exact"
   },
   {
+   "src": "scripts.interrogation_engine.self_test",
+   "dst": "scripts.interrogation_engine.generate",
+   "weight": 6,
+   "confidence": "exact"
+  },
+  {
    "src": "scripts.mailbox_local_service.do_GET",
    "dst": "scripts.mailbox_local_service._Handler._send",
    "weight": 6,
@@ -4622,16 +4628,10 @@
    "dst": "scripts.multi_model_improvement_loop.focused_context",
    "weight": 6,
    "confidence": "exact"
-  },
-  {
-   "src": "scripts.portfolio_checks.customer_readiness_rubric",
-   "dst": "scripts.portfolio_checks._html",
-   "weight": 6,
-   "confidence": "exact"
   }
  ],
  "overflow": {
-  "call_edges_not_persisted": 11001,
+  "call_edges_not_persisted": 11278,
   "note": "bounded artifact \u2014 full graph is recomputable via scripts/codegraph.py"
  }
 }
