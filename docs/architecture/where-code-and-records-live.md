@@ -47,3 +47,20 @@ codeblocks + structured ledgers live in git (branchable, sharded if needed); the
 firehose is mirrored in DB/object-store, not one-file-per-row in a single giant repo. "git holds everything" =
 everything that benefits from versioning/branches/review.
 
+## Scale to billions: multiple locations, kept consistent by content-addressing + CDC (owner 2026-06-25)
+Storing in several places is fine — make them **consistent by design**, not by hope. **git is the dev-friendly
+authoritative copy** (easy to read, branch, review); every other location is a **derived, rebuildable mirror**.
+- **One canonical `content_hash` per record** = dedup + **idempotent sync** across all locations (git · pgvector ·
+  object-store · leaf shards). Same hash → same record everywhere; a changed hash → a real change to propagate
+  (`record_store.append` already takes an `idem_key`).
+- **CDC log is the sync spine**: each create/update emits a CDC event (the repo's CDC + index-delta discipline); a
+  sync worker propagates git ↔ pgvector ↔ object-store idempotently. **Truth flows git/CDC → mirrors**; never let a
+  mirror diverge silently — reconcile on `content_hash`.
+- **Leaf / sharded scale**: partition by `registry × hash-prefix × time` into **leaf shards** — pgvector shards
+  (HNSW per shard), git sub-trees/branches, object-store key-prefixes. Billions of rows = many small leaves, each
+  independently indexed + synced; queries **scatter/gather** across leaves. No single giant repo or index.
+- **Tiered by access pattern**: hot (pgvector, promoted/recent) · warm (sqlite/JSONL staging) · cold (object-store
+  Parquet, sharded). Which tier + which git branch a record sits in is governed by the promotion boundary
+  (tenant-visibility), not by whether it exists.
+
+
