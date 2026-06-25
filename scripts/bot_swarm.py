@@ -130,8 +130,14 @@ def supervise(interval: int) -> int:
 def self_test() -> int:
     assert set(ROLES) == {"discoverer", "interrogator", "enricher"}
     assert isinstance(_llm("x", "y"), str)                 # offline-safe: no key -> "" (never raises)
-    s = {"cycles": 1, "qi": 3, "discovered": 5, "enriched": 2}
-    _save_state(s); assert _load_state()["qi"] == 3
+    import tempfile
+    global STATE                                           # use a TEMP state path — never pollute the real swarm state
+    _orig = STATE
+    try:
+        STATE = Path(tempfile.mkdtemp()) / "s.json"
+        _save_state({"cycles": 1, "qi": 3, "discovered": 5, "enriched": 2}); assert _load_state()["qi"] == 3
+    finally:
+        STATE = _orig
     assert QUERIES and all(isinstance(x, str) for x in QUERIES)
     rec = {"name": "demo/tool", "object_type": "tool", "source": {"url": ""}, "confidence_score": 0.3,
            "missing_metadata": ["capabilities"]}
