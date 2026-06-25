@@ -1008,4 +1008,5 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/landing_server.py", "landing_server"),
     ("scripts/check_northstar_design.py", "check_northstar_design"),
     ("scripts/aidevobserver_demo_server.py", "aidevobserver_demo_server"),
+    ("scripts/check_context_freshness.py", "check_context_freshness"),
 ]
