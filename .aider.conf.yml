@@ -1,0 +1,40 @@
+# aider → Ollama Cloud lane (GLM 5.2 + Kimi K2.7-code).
+#
+# Architect/editor split mirrors the model_index specializations:
+#   main model    = GLM 5.2          (frontier reasoning — plans the change)
+#   editor-model  = Kimi K2.7-code   (coding-specialized — writes the diff)
+# The API base is the OpenAI-compatible Ollama Cloud endpoint; the KEY comes from the
+# environment (scripts/harness_env.sh exports OPENAI_API_KEY from the gitignored .env) —
+# never hard-code a secret in this checked-in file.
+openai-api-base: "https://ollama.com/v1"
+
+model: openai/glm-5.2
+editor-model: openai/kimi-k2.7-code
+weak-model: openai/kimi-k2.7-code
+
+architect: true
+auto-accept-architect: true
+
+# Repo conventions the model must keep in context every session.
+read:
+  - AGENTS.md
+  - CLAUDE.md
+
+# The proof gate is the test command. auto-test stays OFF for interactive use (the full
+# suite is slow per-edit); the ./build loop runs the gate explicitly each cycle.
+test-cmd: "PYTHONPATH=. python3 scripts/run_proofs.py"
+auto-test: false
+auto-lint: false
+
+git: true
+auto-commits: true
+gitignore: false
+
+# Supply context-window / cost metadata so aider doesn't warn about unknown models.
+model-metadata-file: .aider.model.metadata.json
+
+# Scripted/unattended convenience. (The ./build loop is the safety boundary: branch +
+# proof-gate-before-commit + STOP flag.)
+yes-always: true
+suggest-shell-commands: false
+dark-mode: true

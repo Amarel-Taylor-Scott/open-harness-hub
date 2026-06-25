@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# ./build — the AUTONOMOUS LLM coding loop on the Ollama Cloud lane (GLM 5.2 + Kimi K2.7-code).
+#
+# The open-model replacement for "Claude Code drives the build": each cycle picks a backlog item, drives a
+# coding agent (opencode `run` by default, or aider) to implement it, runs the proof gate, and commits ONLY
+# on green (reverts on red). Safe by construction — see scripts/build_loop.py: never runs on main, checkpoints
+# before editing, the proof gate is the objective arbiter. Separate STOP flag from ./loop and ./enrich, so all
+# three can run at once. Runbook: docs/harness/ollama-coding-harness.md
+#
+#   ./build            start the loop in the FOREGROUND          [Ctrl-C or ./build stop to halt]
+#   ./build bg         start it DETACHED (survives the terminal)
+#   ./build run        run ONE cycle now (foreground)            [add --dry-run to preview without editing]
+#   ./build test       run the offline self-test (no model/git writes)
+#   ./build status     read-only monitor
+#   ./build stop       request a clean stop (after the current cycle)
+#   ./build resume     clear the stop flag
+#   ./build logs       tail the loop log
+#   extra flags pass through, e.g.:  ./build bg --harness aider --architect --max-cycles 20
+set -euo pipefail
+cd "$(dirname "$(readlink -f "$0")")"
+source scripts/harness_env.sh >/dev/null 2>&1 || true
+export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}."
+PY="${PYTHON:-python3}"
+DRIVER="scripts/build_loop.py"
+STOP=".agent/BUILD_STOP_REQUESTED"
+LOG="data/dev-intel/build_loop.log"
+
+cmd="${1:-start}"; shift || true
+case "$cmd" in
+  start|"") rm -f "$STOP"; exec "$PY" "$DRIVER" --supervise "$@" ;;
+  bg)       rm -f "$STOP"; mkdir -p data/dev-intel
+            nohup "$PY" "$DRIVER" --supervise "$@" >>"$LOG" 2>&1 &
+            echo "build loop detached (pid $!). './build status' to monitor, './build stop' to halt." ;;
+  run)      exec "$PY" "$DRIVER" --run "$@" ;;
+  test)     exec "$PY" "$DRIVER" --self-test ;;
+  status|monitor) exec "$PY" "$DRIVER" --status ;;
+  stop)     mkdir -p .agent && : > "$STOP" && echo "stop requested — halts after the current cycle (state preserved). './build resume' to re-enable." ;;
+  resume)   rm -f "$STOP" && echo "stop flag cleared." ;;
+  logs)     touch "$LOG"; tail -n 40 -f "$LOG" ;;
+  *) echo "usage: ./build [start|bg|run|test|status|stop|resume|logs] [--harness opencode|aider --model id --architect --task ... --gate substr --max-cycles N]"; exit 2 ;;
+esac

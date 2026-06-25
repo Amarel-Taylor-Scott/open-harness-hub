@@ -1,0 +1,45 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "ollama-cloud": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama Cloud",
+      "options": {
+        "baseURL": "https://ollama.com/v1",
+        "apiKey": "{env:OLLAMA_API_KEY}"
+      },
+      "models": {
+        "glm-5.2": { "name": "GLM 5.2 (Zhipu via Ollama Cloud)" },
+        "kimi-k2.7-code": { "name": "Kimi K2.7-code (Moonshot via Ollama Cloud)" },
+        "qwen3-coder:480b": { "name": "Qwen3-Coder 480B (via Ollama Cloud)" },
+        "deepseek-v4-pro": { "name": "DeepSeek V4 Pro (via Ollama Cloud)" },
+        "glm-4.7": { "name": "GLM 4.7 (fallback, via Ollama Cloud)" }
+      }
+    }
+  },
+  "model": "ollama-cloud/glm-5.2",
+  "small_model": "ollama-cloud/kimi-k2.7-code",
+  "agent": {
+    "build": {
+      "description": "Autonomous code-writer (Kimi K2.7-code, coding-specialized). Edits files + runs the proof gate. This is the default primary agent.",
+      "mode": "primary",
+      "model": "ollama-cloud/kimi-k2.7-code"
+    },
+    "plan": {
+      "description": "Architect / reasoning (GLM 5.2, frontier). Read-only planning before edits; switch to it for design and review.",
+      "mode": "primary",
+      "model": "ollama-cloud/glm-5.2"
+    }
+  },
+  "permission": {
+    "edit": "allow",
+    "bash": "allow",
+    "webfetch": "allow"
+  },
+  "instructions": [
+    "AGENTS.md",
+    "CLAUDE.md",
+    "docs/codex/baltor-always-in-memory-context.md"
+  ],
+  "autoupdate": false
+}
