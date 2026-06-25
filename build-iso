@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# ./build-iso — the ISOLATED Kimi/GLM code-editor: build_loop in a dedicated git worktree (auto/ollama-build),
+# OUTSIDE the main tree, with its own index — so `git reset --hard` on a red cycle can NEVER touch the shared tree
+# (the swarm, the flywheel, your edits). Safe to run persistently alongside everything else. Merge auto/ollama-build
+# → your branch when you want the changes.
+#
+#   ./build-iso setup       create the worktree (+ .env symlink)
+#   ./build-iso bg          run the isolated build loop DETACHED (persistent)
+#   ./build-iso start       run it in the FOREGROUND
+#   ./build-iso run         ONE isolated cycle
+#   ./build-iso status      worktree branch + commits + ahead/behind main
+#   ./build-iso stop        halt the isolated loop (writes the worktree STOP flag)
+#   ./build-iso teardown    remove the worktree (commits kept on the branch)
+#   extra flags pass through to build_loop, e.g.:  ./build-iso bg --harness aider --architect
+set -euo pipefail
+cd "$(dirname "$(readlink -f "$0")")"
+source scripts/harness_env.sh >/dev/null 2>&1 || true
+export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}."
+PY="${PYTHON:-python3}"
+WB="scripts/worktree_build.py"
+LOG="data/dev-intel/build_iso.log"
+
+cmd="${1:-status}"; shift || true
+case "$cmd" in
+  setup)    exec "$PY" "$WB" --setup ;;
+  run)      exec "$PY" "$WB" --run "$@" ;;
+  start)    exec "$PY" "$WB" --supervise "$@" ;;
+  bg)       mkdir -p data/dev-intel
+            setsid "$PY" "$WB" --supervise "$@" >>"$LOG" 2>&1 </dev/null &
+            echo "isolated build loop detached (pid $!). './build-iso status' to monitor, './build-iso stop' to halt." ;;
+  status|monitor) exec "$PY" "$WB" --status ;;
+  stop)     exec "$PY" "$WB" --stop ;;
+  teardown) exec "$PY" "$WB" --teardown ;;
+  logs)     touch "$LOG"; tail -n 40 -f "$LOG" ;;
+  *) echo "usage: ./build-iso [setup|run|start|bg|status|stop|teardown|logs] [build_loop flags]"; exit 2 ;;
+esac
