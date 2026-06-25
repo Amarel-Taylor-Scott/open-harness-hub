@@ -25,6 +25,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 RECORDS = REPO / "data" / "dev-intel" / "registry_records.jsonl"
+ENRICH = REPO / "data" / "dev-intel" / "record_enrichments.jsonl"
 INDEX = REPO / "data" / "dev-intel" / "hybrid_index.json"
 _WORD = re.compile(r"[a-z0-9]+")
 
@@ -52,20 +53,23 @@ def _toks(s: str) -> list[str]:
     return [t for t in _WORD.findall((s or "").lower()) if len(t) >= 2]
 
 
-def columns(rec: dict) -> dict[str, str]:
-    """Decompose a record into searchable COLUMNS (use_cases/labels/keywords derived from existing fields)."""
+def columns(rec: dict, enrich: dict | None = None) -> dict[str, str]:
+    """Decompose a record into searchable COLUMNS; merge enrich_loop's deterministic+LLM fields when present."""
     name = rec.get("name", "")
     tags = rec.get("searchability_tags", [])
-    enr = (rec.get("enrichment") or {}).get("a", "")
+    inline = (rec.get("enrichment") or {}).get("a", "")
+    ef = (enrich or {}).get("fields", {})
+    uc = (rec.get("capabilities", []) or []) + (ef.get("use_cases") or [])
+    meta = " ".join([inline, ef.get("meta_description", ""), " ".join(ef.get("alternatives") or [])]).strip()
     return {
         "name": name,
         "tags": " ".join(tags),
-        "keywords": " ".join(sorted(set(tags + _toks(name)))),
-        "use_cases": " ".join(rec.get("capabilities", []) or []) + " " + enr,   # capabilities + enrichment = use-cases
+        "keywords": " ".join(sorted(set(tags + _toks(name) + (ef.get("keywords") or [])))),
+        "use_cases": " ".join(uc) + " " + meta,                                 # capabilities + LLM use_cases + meta
         "labels": " ".join([rec.get("object_type", ""), rec.get("registry", ""), rec.get("kind", ""),
-                            rec.get("variant_axis", "")]),
+                            rec.get("variant_axis", "")] + (ef.get("labels") or [])),
         "spec": rec.get("spec", ""),                                            # the variation's intent
-        "enrichment": enr,
+        "enrichment": meta,
     }
 
 
@@ -90,14 +94,28 @@ def _read() -> list[dict]:
     return out
 
 
+def _load_enrich() -> dict:
+    out: dict[str, dict] = {}
+    if ENRICH.exists():
+        for ln in ENRICH.read_text(encoding="utf-8").splitlines():
+            if ln.strip():
+                try:
+                    e = json.loads(ln)
+                    out[e["record_id"]] = e               # last wins (most recent enrichment)
+                except (json.JSONDecodeError, KeyError):
+                    pass
+    return out
+
+
 def build_index(records: list[dict] | None = None) -> int:
     records = _read() if records is None else records
+    enrich = _load_enrich()
     recs: dict[str, dict] = {}
     for rec in records:
         rid = rec.get("record_id")
         if not rid or not rec.get("name"):
             continue
-        cols = columns(rec)
+        cols = columns(rec, enrich.get(rid))
         recs[rid] = {
             "meta": {"name": rec.get("name", ""), "type": rec.get("object_type", ""),
                      "registry": rec.get("registry", ""), "kind": rec.get("kind", "record")},

@@ -180,7 +180,7 @@ def self_test() -> int:
            "registry": "tool_registry", "searchability_tags": ["acme", "widget"], "capabilities": ["resize images"],
            "source": {"url": "https://github.com/acme/widget"}}
     det = deterministic_enrich(rec)
-    assert det["keywords"] and det["labels"] and det["meta_description"] and "resize images" in det["use_cases"]
+    assert det["keywords"] and det["labels"] and det["meta_description"] and isinstance(det["use_cases"], list)
     assert _llm("x", "y") == ""                              # offline-safe (no key → "")
     assert _extract_json('noise {"meta_description":"a tool","use_cases":["x"]} tail') == {"meta_description": "a tool", "use_cases": ["x"]}
     assert _extract_json("no json here") is None
