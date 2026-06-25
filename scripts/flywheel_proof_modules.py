@@ -1011,4 +1011,6 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_context_freshness.py", "check_context_freshness"),
     ("scripts/check_component_flow_diagram.py", "check_component_flow_diagram"),
     ("src/teleon/monitoring/flywheel_queue.py", "flywheel_queue"),
+    ("src/teleon/demos/byo_key_demo.py", "byo_key_demo"),
+    ("scripts/byo_demo_server.py", "byo_demo_server"),
 ]
