@@ -18,7 +18,8 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 CANONICAL = ("CLAUDE.md", "AGENTS.md", "docs/NORTHSTAR.md")
-REF = re.compile(r"\b((?:scripts|src|docs|architecture|web|vocabularies|schemas)/[A-Za-z0-9_./-]+\.(?:py|md|json|jsx|js|css|html))")
+# captures leading ../ or ./ so relative markdown links resolve correctly (not just repo-root code paths)
+REF = re.compile(r"((?:\.\.?/)*(?:scripts|src|docs|architecture|web|vocabularies|schemas)/[A-Za-z0-9_./-]+\.(?:py|md|json|jsx|js|css|html))")
 SUPERSEDED = re.compile(r"superseded[- ]by|^>?\s*deprecated\b|do[- ]not[- ]use", re.I | re.M)
 
 
@@ -40,8 +41,10 @@ def broken_refs(files: list[Path]) -> list[str]:
             if ref in seen or any(c in ref for c in "*{}<>") or ref.endswith("/"):
                 continue
             seen.add(ref)
-            if not (REPO / ref).exists():
-                out.append(f"{f.relative_to(REPO)} → missing {ref}")
+            # valid if it resolves repo-root-relative (code paths in backticks) OR relative to the doc's dir (../ links)
+            if (REPO / ref).exists() or (f.parent / ref).resolve().exists():
+                continue
+            out.append(f"{f.relative_to(REPO)} → missing {ref}")
     return out
 
 
@@ -62,7 +65,6 @@ def check() -> int:
     # goal/plan docs legitimately forward-reference checks/files that are yet to be built — not rot
     report_files = [f for f in _md_files() if "/goals/" not in str(f)]
     allrefs = broken_refs(report_files)
-    sup = unarchived_superseded()
     for b in canon:
         print(f"  [BROKEN · canonical] {b}")
     shown = [b for b in allrefs if b not in canon][:30]
@@ -70,14 +72,14 @@ def check() -> int:
         print(f"  [broken ref] {b}")
     if len(allrefs) - len(canon) > 30:
         print(f"  … +{len(allrefs) - len(canon) - 30} more broken refs")
-    for s in sup[:15]:
-        print(f"  [superseded · archive it] {s}")
-    print(f"context freshness: {len(canon)} canonical-broken · {len(allrefs)} total broken refs · {len(sup)} superseded-not-archived")
+    print(f"context freshness: {len(canon)} canonical-broken · {len(allrefs)} total broken refs "
+          f"(for superseded docs run: scripts/archive_legacy_docs.py --scan)")
     return 1 if canon else 0
 
 
 def self_test() -> int:
     assert REF.search("see `scripts/foo.py`") and not REF.search("just prose with no path")
+    assert REF.search("[x](../architecture/y.md)").group(1) == "../architecture/y.md", "captures relative links"
     assert isinstance(broken_refs(_md_files()[:3]), list) and isinstance(unarchived_superseded(), list)
     canon = broken_refs([REPO / c for c in CANONICAL if (REPO / c).exists()])
     assert canon == [], f"canonical docs reference missing files (fix or update): {canon[:6]}"   # live guard
