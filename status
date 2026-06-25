@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# ./status — one-glance view of the whole autonomous flywheel (daemons · produced · work log · commits),
+# plus registry-record searchability. The "consistently check everything" command.
+#   ./status            the flywheel dashboard
+#   ./status search Q   search the populated registry records
+#   ./status audit      record usability + searchability coverage
+#   ./status reindex    rebuild the record search index
+set -euo pipefail
+cd "$(dirname "$(readlink -f "$0")")"
+export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}."
+PY="${PYTHON:-python3}"
+case "${1:-dash}" in
+  dash|"")  exec "$PY" scripts/flywheel_status.py ;;
+  search)   shift; exec "$PY" scripts/record_search.py --search "$*" ;;
+  audit)    exec "$PY" scripts/record_search.py --audit ;;
+  reindex)  exec "$PY" scripts/record_search.py --index ;;
+  *) echo "usage: ./status [dash|search <q>|audit|reindex]"; exit 2 ;;
+esac
