@@ -70,10 +70,13 @@
   var changeSinks = [];              // fn(key|null)
 
   function pickWeighted(variants) {
-    var total = variants.reduce(function (s, v) { return s + (v.weight > 0 ? v.weight : 0); }, 0) || variants.length;
+    // A/B DISABLED (owner 2026-06-25): always serve the CONTROL (first) variant — one consistent design, no split.
+    // Original weighted-random kept below (commented); restore to re-enable A/B.
+    return variants.length ? variants[0].id : null;
+    /* var total = variants.reduce(function (s, v) { return s + (v.weight > 0 ? v.weight : 0); }, 0) || variants.length;
     var r = Math.random() * total, acc = 0;
     for (var i = 0; i < variants.length; i++) { acc += (variants[i].weight > 0 ? variants[i].weight : 1); if (r <= acc) return variants[i].id; }
-    return variants[variants.length - 1].id;
+    return variants[variants.length - 1].id; */
   }
 
   function notifyChange(key) { changeSinks.forEach(function (fn) { try { fn(key); } catch (e) {} }); }
