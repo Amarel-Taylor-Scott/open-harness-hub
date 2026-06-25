@@ -11,8 +11,8 @@ export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}."
 PY="${PYTHON:-python3}"
 case "${1:-dash}" in
   dash|"")  exec "$PY" scripts/flywheel_status.py ;;
-  search)   shift; exec "$PY" scripts/record_search.py --search "$*" ;;
+  search)   shift; exec "$PY" scripts/hybrid_search.py --search "$*" --explain ;;
   audit)    exec "$PY" scripts/record_search.py --audit ;;
-  reindex)  exec "$PY" scripts/record_search.py --index ;;
+  reindex)  "$PY" scripts/record_search.py --index >/dev/null 2>&1 || true; exec "$PY" scripts/hybrid_search.py --index ;;
   *) echo "usage: ./status [dash|search <q>|audit|reindex]"; exit 2 ;;
 esac
