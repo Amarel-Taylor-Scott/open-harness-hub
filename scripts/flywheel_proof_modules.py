@@ -1005,4 +1005,5 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/worktree_build.py", "worktree_build"),
     ("scripts/flywheel_status.py", "flywheel_status"),
     ("scripts/check_seha_boundary.py", "check_seha_boundary"),
+    ("scripts/check_surface_and_dev_contract.py", "check_surface_and_dev_contract"),
 ]

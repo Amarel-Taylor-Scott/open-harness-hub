@@ -1,0 +1,48 @@
+{
+  "version": "1.0",
+  "updated": "2026-06-25",
+  "principle": "Per-surface capability/feature/function spec for the 5 brand pillars (owner 2026-06-25: ContextIsEverything Group → AI Done Right; the canonical set is AI Done Right · Teleon.dev · Teleon Observer · Baltor · Open*Hubs). Complements architecture/surface_map.json (per-surface WEDGE) + demo_surface_registry.json (demos) — does NOT duplicate them. Each pillar names its BUILT-OUT canonical surface (the rich web/* app, never the basic dist/portfolio-public landing) + its features, so the launchers serve the right thing and check_surface_and_dev_contract.py can verify it exists. serves_truth=false.",
+  "serves_truth": false,
+  "pillars": [
+    {
+      "id": "ai-done-right", "brand": "AI Done Right", "was": "ContextIsEverything Group", "role": "parent / holding brand",
+      "canonical_surface": "web/context-is-everything", "surface_map_id": "ai-done-right",
+      "must_exist": ["web/context-is-everything/index.html", "web/context-is-everything/cie-main.jsx", "web/context-is-everything/Demo Control Tower.html"],
+      "capabilities": ["brand home", "portfolio index → the pillars", "Demo Control Tower (START HERE)", "GTM launch guide"],
+      "status": "built"
+    },
+    {
+      "id": "teleon", "brand": "Teleon.dev", "role": "the purpose-driven, eval-gated, self-adaptive compute runtime",
+      "canonical_surface": "web/teleon", "surface_map_id": "teleon",
+      "must_exist": ["web/teleon/index.html", "web/teleon/teleon-main.jsx", "web/teleon/teleon-live.js", "web/teleon/Teleon PurposeTask Control Tower.html"],
+      "capabilities": ["home", "PurposeTask / CapabilityTask Control Tower", "live runtime view", "program a capability", "evidence ledger / promotion gates"],
+      "status": "built"
+    },
+    {
+      "id": "teleon-observer", "brand": "Teleon Observer", "domain": "teleonobserver.io", "role": "watches AI usage — reviews the SESSION (post) + helps intra-session (while); Teleon's wedge",
+      "canonical_surface": "src/teleon/observer", "surface_map_id": null,
+      "must_exist": ["src/teleon/observer/review.py", "src/teleon/observer/router.py", "src/teleon/observer/session_store.py"],
+      "capabilities": ["upload a session → post-session review report", "intra-session pop-ups / coaching", "session router over typed interventions"],
+      "status": "BACKEND-ONLY — needs its own web surface + VS Code extension (tasks #13, #14)"
+    },
+    {
+      "id": "baltor", "brand": "Baltor.ai", "role": "managed, verified, provable context, powered by Teleon — governs TRUTH",
+      "canonical_surface": "web/baltor", "surface_map_id": "baltor",
+      "must_exist": ["web/baltor/index.html", "web/baltor/ce-main.jsx", "web/baltor/dashboard.html", "web/baltor/Baltor Receipts Explorer.html"],
+      "capabilities": ["home", "ce-app (engine · pipeline · store · shell)", "19 guided demos (CFPB · FDA · OSHA · Sanctions · Tariff · EUDR · …)", "dashboards (ops + dev)", "Receipts Explorer", "review queue", "context governance report", "guided demos index"],
+      "status": "built"
+    },
+    {
+      "id": "open-star-hubs", "brand": "Open*Hubs", "role": "the open STORE both products consume (context · tools · skills · harnesses · specs) + the open CapabilityTask spec (CTS)",
+      "canonical_surface": "web/harness-hub", "surface_map_id": "openharnesshub",
+      "must_exist": ["web/harness-hub/index.html", "web/harness-hub/proto-main.jsx", "web/harness-hub/admin-demo.html", "web/harness-hub/pages/auth.js"],
+      "capabilities": ["home", "login / auth (pages/auth.js)", "store / catalog", "BYO compute", "admin / ops", "publish", "the per-category Open*Hub registries"],
+      "status": "built (one Open*Hubs link on the portfolio index, per owner 2026-06-25)"
+    }
+  ],
+  "serving_rule": "Launchers (launch_service_plane_tunnels / launch_portfolio_trycloudflare) MUST serve each pillar's canonical_surface (the built-out web/* app), NOT the basic dist/portfolio-public landing. See docs/codex/surface-and-development-contract.md.",
+  "also": {
+    "design_portfolio": "dist/sites/openharness-design (3.2MB, gitignored — flag: track it; source-of-record is FULLDESIGNDETAILS)",
+    "teleon_demos": "surface_map_id teleon-demos — the proof surface (descent demos with measured savings)"
+  }
+}
