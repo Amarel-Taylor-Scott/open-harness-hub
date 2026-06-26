@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/registry/RegistryObject.schema.json",
+  "title": "RegistryObject",
+  "schema_version": "2",
+  "description": "The universal THIN WRAPPER every item in every registry inherits — a stable database envelope (id + type, with the version label in METADATA, NEVER in the name or id) around a FLEXIBLE, versionable `component` payload. The wrapper is stable so one universal interface + one dashboard work across every registry; the component is free to change shape and version independently, and multiple versions coexist losslessly via `versions`. Version lives in metadata, never in names/ids (repo law). ANTI-FRAGMENTATION single source. serves_truth=false — a registry object is a pointer/score/shape, never a truth claim.",
+  "type": "object",
+  "required": ["id", "type"],
+  "properties": {
+    "id": {"type": "string", "description": "stable, hash-suffixed id — the version is NEVER in the id"},
+    "type": {"type": "string", "description": "the registry this object belongs to (e.g. model, provider, prompt, validator, benchmark)"},
+    "name": {"type": "string"},
+    "version": {"type": "string", "description": "the CURRENT version label (metadata — e.g. '2026.06' or a content hash). NEVER in the id or name."},
+    "schema": {"type": "string", "const": "RegistryObject", "description": "the wrapper schema NAME — unversioned; schema revisions live in schema_version"},
+    "schema_version": {"type": "string", "description": "which revision of THIS wrapper schema the object conforms to (metadata, not the name)"},
+    "component": {"type": "object", "description": "the FLEXIBLE payload — the actual record content; its shape varies by registry + version and may change freely without breaking the stable wrapper"},
+    "versions": {"type": "array", "description": "lossless version history — multiple component versions coexist; [{version, component, created_at, ...}]", "items": {"type": "object"}},
+    "metrics": {"type": "object", "description": "measured metrics (accuracy, latency, determinism, cost…) — evidence, not authority"},
+    "trust_score": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+    "relationships": {"type": "array", "description": "graph edges (depends_on / related_to / fallback_to)", "items": {"type": "object"}},
+    "provenance": {"type": "object", "description": "source handles + lineage — discovery != trust"}
+  }
+}

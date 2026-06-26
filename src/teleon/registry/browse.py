@@ -72,10 +72,9 @@ def _item(reg: dict, kmap: dict) -> dict:
 
 
 def facets() -> dict:
-    """Every facet dimension + its values, computed from the ontology (no magic lists)."""
-    onto = _ontology()
-    kmap = _kind_map(onto)
-    items = [_item(r, kmap) for r in onto["registries"]]
+    """Every facet dimension + its values, computed from the RECONCILED SPINE (ontology ∪ live catalogs)."""
+    from src.teleon.registry.index import reconciled_index
+    items = reconciled_index()["registries"]
     vals: dict[str, set] = {d: set() for d in FACET_DIMS}
     for it in items:
         for c in it["categories"]:
@@ -93,9 +92,8 @@ def browse(query: str = "", filters: dict | None = None, *, limit: int = 300) ->
     free-text query. With a query it ALSO federates into populated records via search.search_all. Returns the
     filtered items, the federated records, and facet COUNTS. serves_truth=false."""
     filters = {k: v for k, v in (filters or {}).items() if v}
-    onto = _ontology()
-    kmap = _kind_map(onto)
-    items = [_item(r, kmap) for r in onto["registries"]]
+    from src.teleon.registry.index import reconciled_index
+    items = reconciled_index()["registries"]
 
     def match(it: dict) -> bool:
         if filters.get("category") and filters["category"] not in it["categories"]:
@@ -145,7 +143,7 @@ def browse(query: str = "", filters: dict | None = None, *, limit: int = 300) ->
 
 def self_test() -> int:
     f = facets()
-    assert len(f["type"]) >= 100, f"all ~103 registries are browsable types: {len(f['type'])}"
+    assert len(f["type"]) >= 155, f"the reconciled spine (ontology ∪ catalogs) is browsable: {len(f['type'])}"
     assert {"static", "discovery", "meta"} <= set(f["kind"]), f["kind"]
     assert len(f["category"]) >= 5, f["category"]
 
@@ -156,7 +154,7 @@ def self_test() -> int:
 
     # browse default = the full catalog; filtering narrows; facet counts present
     allb = browse()
-    assert allb["count"] >= 100 and allb["facets"]["kind"], allb["count"]
+    assert allb["count"] >= 155 and allb["facets"]["kind"], allb["count"]
     disc = browse(filters={"kind": "discovery"})
     assert 0 < disc["count"] < allb["count"], f"a facet filter narrows: {disc['count']}/{allb['count']}"
     # combine two facets + a query

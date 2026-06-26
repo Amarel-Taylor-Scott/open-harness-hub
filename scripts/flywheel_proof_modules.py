@@ -1025,4 +1025,7 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("src/teleon/synthesis/codeblock_loop.py", "codeblock_loop"),
     ("src/teleon/registry/browse.py", "browse"),
     ("scripts/openhub_browse_server.py", "openhub_browse_server"),
+    ("src/teleon/registry/index.py", "registry_index"),
+    ("scripts/check_registry_reconciliation.py", "check_registry_reconciliation"),
+    ("scripts/registry_api_server.py", "registry_api_server"),
 ]
