@@ -40,13 +40,13 @@ architecture into a production-ready implementation brief:
 9. `architecture/brand.json`
 10. `architecture/company_portfolio_map.json`
 11. `architecture/demo_surface_registry.json`
-12. `dist/sites/openharness-design/START-HERE-CLAUDE-CODE.md`
-13. `dist/sites/openharness-design/README.md`
-14. `dist/sites/openharness-design/CLAUDE-CODE.md`
-15. `dist/sites/openharness-design/HANDOFF.md`
-16. `dist/sites/openharness-design/IMPLEMENTATION-GUIDANCE.md`
-17. `dist/sites/openharness-design/BACKEND-STACK.md`
-18. `dist/sites/openharness-design/Design Acceptance Scorecard.html`
+12. `docs/BIBLE.md` (north star)
+13. `docs/DESIGN-BIBLE.md` (the UI: shared kit `web/<brand>/kit` + the showcase renderer, light theme + Inter)
+14. `docs/INTEGRATION-BIBLE.md` (FE↔BE seams + deploy)
+15. `docs/design/openharness-claude-design/START-HERE.md`
+16. `docs/design/openharness-claude-design/README.md`
+17. `dist/sites/openharness-design/README.md` (the richer reference bundle)
+18. `dist/sites/openharness-design/Design Acceptance Scorecard.html` (the branded-house gate)
 
 Focused proof:
 

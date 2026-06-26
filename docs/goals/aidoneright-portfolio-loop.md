@@ -99,7 +99,12 @@ authorization is missing:
 
 ## Reading Order
 
-Read these first if present:
+Design canonical (read first for brand + UI): `docs/BIBLE.md` (north star), `docs/DESIGN-BIBLE.md` (the shared
+kit `web/<brand>/kit` + the showcase renderer, light theme + Inter), `docs/INTEGRATION-BIBLE.md` (FE↔BE seams +
+deploy), and `docs/design/openharness-claude-design/` (the design handoff). `dist/sites/openharness-design/` is the
+richer reference bundle.
+
+Then read these if present:
 
 - README.md
 - START-HERE-CLAUDE-CODE.md
@@ -113,7 +118,7 @@ Read these first if present:
 - EXPERIMENTS.md
 - products.js
 
-Then inspect shared design/system files if present:
+Then inspect the shared design kit (canonical location `web/<brand>/kit/`; the bundle's legacy layout uses `shared/`):
 
 - shared/oh-tokens.css
 - shared/oh-components.css

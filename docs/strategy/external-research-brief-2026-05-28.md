@@ -6,6 +6,10 @@
   confirmed 2026 source. Addenda: corpus-acquisition-grid-spec.md,
   gap-detection-screen-spec.md.
 -->
+> **Historical snapshot (2026-05-28); current canonical: `docs/BIBLE.md` + `docs/DESIGN-BIBLE.md`.** This is a
+> point-in-time research transcript kept for lineage. Dated regulatory and product facts below are snapshots, not
+> current truth; re-verify against the canonical docs and the live sources before relying on them.
+
 # Open Harness Hub — External Research Brief (2026-05-28)
 
 Three strategic sharpenings: (1) split the lift gate by **durability**

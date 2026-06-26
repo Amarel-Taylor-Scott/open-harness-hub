@@ -1,8 +1,10 @@
 # OpenHarness Zip Integration Review
 
-> Historical alignment note (2026-05-31), kept for lineage. The LIVE design system (5 surfaces, light theme,
-> byte-identical CSS, Inter UI) is now canonical in **`docs/DESIGN-BIBLE.md`** + `scripts/surface_server.py` — read
-> those for current truth; the three-site framing below is the 2026-05-31 record.
+> **Historical snapshot (2026-05-31); current canonical: `docs/BIBLE.md` + `docs/DESIGN-BIBLE.md`.** This dated
+> alignment note is kept for lineage. The live design system is the shared kit (`web/<brand>/kit`) rendered by the
+> showcase (`scripts/showcase/server.py`) over the full `web/<brand>` apps (light theme, Inter); `scripts/surface_server.py`
+> is only a demoted fallback. The three-site framing below is the 2026-05-31 record, not the current structure (the
+> family is now 5 surfaces).
 
 Date: 2026-05-31
 

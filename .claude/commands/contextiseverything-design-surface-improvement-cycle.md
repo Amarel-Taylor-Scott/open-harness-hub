@@ -12,7 +12,7 @@ dead links, expose no secrets/keys/customer-data/private-memory/raw-receipts. ST
 The literal `openharness/` tree referenced by the original spec is NOT in this working copy. The real surfaces are
 **`web/baltor/*.html`** (index, guided-demos, context-stages, reconciliation/optimization/receipts surfaces,
 determinism, inference-plane, temporal-graph, memory, native, hub, how-it-works, dashboard, …) with tokens at
-`web/baltor/styles/oh-tokens.css` and the canonical spec at `docs/design/openharness-claude-design/`. ADAPT here.
+`web/baltor/kit/oh-tokens.css` and the canonical design spec at `docs/DESIGN-BIBLE.md` + `docs/design/openharness-claude-design/`. ADAPT here.
 **No browser tool in the headless loop** → the mandated 1280/390 SCREENSHOT + console verification is NOT possible
 headless; new *visual* surfaces (increment A) are therefore **HELD** in headless runs (mark the reason). Do the
 STATICALLY-verifiable increments (audit/polish/copy-guardrail/link-resolution/token-usage) and run the existing
@@ -21,7 +21,7 @@ check_pipeline_pages_full_stack · check_portfolio_website_discovery · check_po
 check_memory_page_projection_only. (When run WITH a browser session, do the full A/B/C visual increments + screenshots.)
 
 ## POSITIONING (every surface)
-Mission "Context is Everything." Baltor = governed-context engine; value is the FULL engine, pillars as PEERS:
+Parent brand **AI Done Right** ("AI, done right."); "Context is Everything" is the legacy founding thesis, not the display brand. Baltor = governed-context engine; value is the FULL engine, pillars as PEERS:
 Reconciliation · Anti-Fragility/Hardening · Enhancement · Optimization · Verification+Receipts/Provenance. Echo
 **Verified · Current · Efficient · Provable**. Fragility/held-out is ONE lens, never the whole pitch. Teleon =
 purpose-defined eval-gated self-adaptive runtime (CapabilityTask stable, implementation evolves, evidence decides,
@@ -36,7 +36,7 @@ Kubernetes|CI/CD|engineers" / "guaranteed compliance" / legal|medical|financial 
 secrets/keys/customer-data/private-memory.
 
 ## DESIGN SYSTEM (reuse, don't reinvent)
-oh-tokens.css / oh-components.css / oh-site.css; Hanken Grotesk + IBM Plex Mono; `.oh-card`; the `.cd-*` layer in
+oh-tokens.css / oh-components.css / oh-site.css (the shared kit in web/<brand>/kit); Inter (UI) + JetBrains Mono, light theme; `.oh-card`; the `.cd-*` layer in
 context-enrichment/guided-demo.css for Baltor demo pages; additive backwards-compatible shared components; one
 shared experiments engine. Accent ONLY differs per brand (Baltor dir-d teal). Never hardcode color/size — use tokens.
 

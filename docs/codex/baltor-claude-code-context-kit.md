@@ -8,15 +8,19 @@ organization context platform exists.
 For a Claude Code Max handoff, also load:
 
 ```text
+docs/BIBLE.md
+docs/DESIGN-BIBLE.md
+docs/INTEGRATION-BIBLE.md
+docs/design/openharness-claude-design/START-HERE.md
 docs/codex/ai-done-right-family-polish-goal.md
 docs/architecture/service-auth-and-consumption-model.md
-dist/sites/openharness-design/START-HERE-CLAUDE-CODE.md
 dist/sites/openharness-design/README.md
-dist/sites/openharness-design/CLAUDE-CODE.md
-dist/sites/openharness-design/HANDOFF.md
 ```
 
-Those files carry the current AI Done Right family shape, the full Baltor
+Those files carry the current AI Done Right family shape (5 surfaces sharing one
+design system, light theme + Inter), the canonical design handoff
+(`docs/design/openharness-claude-design/` plus the DESIGN and INTEGRATION bibles;
+`dist/sites/openharness-design/` is the richer reference bundle), the full Baltor
 method spine, and the unresolved service-to-service auth work.
 
 ## Path

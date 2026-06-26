@@ -1,5 +1,7 @@
 # Full Codebase Review — 2026-06-09
 
+> Historical snapshot (2026-06-09). Kept for lineage. It describes an earlier state and may name superseded things (for example Hanken Grotesk, surface_server as the renderer, Open Harness Hub as the headline brand). Current canonical: docs/BIBLE.md, docs/CURRENT-STATE.md, and docs/DESIGN-BIBLE.md.
+
 Method: seven parallel read-only explorations (strategy/goals, runtime code,
 scripts/proofs, data model, web surfaces, agent ops, research/evidence) plus
 targeted hand-verification of contested findings. All counts below are

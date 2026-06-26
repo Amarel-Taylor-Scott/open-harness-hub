@@ -1,5 +1,7 @@
 # Claude Code Max Transfer
 
+> Historical snapshot (2026-06-09). Kept for lineage. It describes an earlier state and may name superseded things (for example Hanken Grotesk, surface_server as the renderer, Open Harness Hub as the headline brand). Current canonical: docs/BIBLE.md, docs/CURRENT-STATE.md, and docs/DESIGN-BIBLE.md.
+
 Updated: 2026-06-09
 
 Use this when handing the AI Done Right prototype family to Claude Code Max.

@@ -1,5 +1,7 @@
 # AI Done Right Handoff Freshness
 
+> Historical snapshot (2026-06-09). Kept for lineage. It describes an earlier state and may name superseded things (for example Hanken Grotesk, surface_server as the renderer, Open Harness Hub as the headline brand). Current canonical: docs/BIBLE.md, docs/CURRENT-STATE.md, and docs/DESIGN-BIBLE.md.
+
 Updated: 2026-06-09
 
 This is the tracked handoff freshness page for the AI Done Right prototype

@@ -1,5 +1,7 @@
 # Autonomous Session Ledger
 
+> Historical snapshot (2026-05-26 to 2026-06-12 session ledger). Kept for lineage. It describes an earlier state and may name superseded things (for example Hanken Grotesk, surface_server as the renderer, Open Harness Hub as the headline brand). Current canonical: docs/BIBLE.md, docs/CURRENT-STATE.md, and docs/DESIGN-BIBLE.md.
+
 Runbook: `docs/codex/autonomous-session-runbook.md`
 Goal: `docs/codex/billion-component-goal.md`
 Branch: `feat/scale-goals-and-hygiene`
