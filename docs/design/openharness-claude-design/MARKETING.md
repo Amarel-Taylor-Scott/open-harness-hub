@@ -61,7 +61,7 @@ for site copy, sales decks, and onboarding). When a brand name/tagline changes, 
 - **Closing line:** Define capabilities. Not infrastructure.
 
 ## The open layer
-- **OpenHarnessHub.io** — *Build & monitor governed pipelines.* Hero: **"Power your agents with
+- **OpenHubForAI.io** — *Build & monitor governed pipelines.* Hero: **"Power your agents with
   governed harnesses."** Describe a task; OHH assembles a governed harness — vetted components
   and knowledge packs that measurably lift what your agent can do, mostly deterministic and
   freezable so you add capability without adding cost. Pricing: open spec free forever; vetted

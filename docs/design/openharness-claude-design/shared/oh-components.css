@@ -39,7 +39,7 @@
    Use `.oh-card` for the surface; add `--pad` for default padding and
    `--interactive` for the hover-lift affordance on clickable cards.
    Per-site card classes (.ce-card, .cie-* cards) compose these tokens. */
-/* `.pt-panel` (OHH) is a compatibility alias of the canonical surface. */
+/* `.pt-panel` (OpenHubForAI) is a compatibility alias of the canonical surface. */
 .oh-card,
 .pt-panel {
   border: 1px solid var(--line); background: var(--panel); border-radius: var(--r-lg);
@@ -141,7 +141,7 @@
 
 /* ---- shared interactive + account-layer primitives ----
    Tabs, tables, segmented control, form fields, switch and the settings/billing/
-   usage "setrow". Defined ONCE here; every product (Baltor/OHH/CIE) uses these
+   usage "setrow". Defined ONCE here; every product (Baltor/OpenHubForAI/CIE) uses these
    classes directly so account, billing and usage layouts are identical house-wide. */
 .oh-tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin-bottom: 22px; }
 .oh-tab { padding: 10px 16px; background: transparent; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px;
@@ -168,11 +168,9 @@
 .oh-input { font-family: inherit; font-size: 13.5px; color: var(--fg); background: var(--bg); border: 1px solid var(--line-strong);
             border-radius: var(--r-md); padding: 8px 11px; min-width: 240px; }
 .oh-input:focus { outline: none; border-color: var(--accent); }
-
-.oh-switch { width: 40px; height: 23px; border-radius: 999px; border: none; background: var(--line-strong); position: relative; cursor: pointer; transition: background .15s; padding: 0; }
-.oh-switch i { position: absolute; top: 2px; left: 2px; width: 19px; height: 19px; border-radius: 50%; background: #fff; transition: transform .15s; }
-.oh-switch.on { background: var(--accent); }
-.oh-switch.on i { transform: translateX(17px); }
+/* keyboard users still get a visible ring on inputs (mouse focus keeps the clean border) */
+.oh-input:focus-visible, .oh-field input:focus-visible, .oh-field textarea:focus-visible, .oh-field select:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .oh-setrow { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 15px 0; border-bottom: 1px solid var(--line); }
 .oh-setrow:last-child { border-bottom: none; }

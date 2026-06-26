@@ -13,11 +13,7 @@
 > code/labels. Copy rules: no placeholders ("OpenHubForAI" not "Open*Hubs"), no em or en dashes, no strategy
 > leakage, real sales/marketing copy.
 
-
-
 ## 1. Design tokens — palette, type scale, spacing, radii, shadows, the 5 accents
-
-_source: `web/teleon/kit/oh-tokens.css` (verbatim below; you do not need the repo)_
 
 ```css
 /* ============================================================
@@ -602,8 +598,6 @@ html, body { font-family: var(--font-sans, "Inter", -apple-system, "Segoe UI", s
 
 ## 2. Component styles — buttons, cards, inputs, badges, the atoms
 
-_source: `web/teleon/kit/oh-components.css` (verbatim below; you do not need the repo)_
-
 ```css
 /* ============================================================
    OpenHubForAI — component layer
@@ -646,7 +640,7 @@ _source: `web/teleon/kit/oh-components.css` (verbatim below; you do not need the
    Use `.oh-card` for the surface; add `--pad` for default padding and
    `--interactive` for the hover-lift affordance on clickable cards.
    Per-site card classes (.ce-card, .cie-* cards) compose these tokens. */
-/* `.pt-panel` (OHH) is a compatibility alias of the canonical surface. */
+/* `.pt-panel` (OpenHubForAI) is a compatibility alias of the canonical surface. */
 .oh-card,
 .pt-panel {
   border: 1px solid var(--line); background: var(--panel); border-radius: var(--r-lg);
@@ -748,7 +742,7 @@ _source: `web/teleon/kit/oh-components.css` (verbatim below; you do not need the
 
 /* ---- shared interactive + account-layer primitives ----
    Tabs, tables, segmented control, form fields, switch and the settings/billing/
-   usage "setrow". Defined ONCE here; every product (Baltor/OHH/CIE) uses these
+   usage "setrow". Defined ONCE here; every product (Baltor/OpenHubForAI/CIE) uses these
    classes directly so account, billing and usage layouts are identical house-wide. */
 .oh-tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin-bottom: 22px; }
 .oh-tab { padding: 10px 16px; background: transparent; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px;
@@ -1109,8 +1103,6 @@ _source: `web/teleon/kit/oh-components.css` (verbatim below; you do not need the
 
 ## 3. Layout + site styles — OhTopBar, hero, sections, OhAppShell, and the new OhLayout + OhTable
 
-_source: `web/teleon/kit/oh-site.css` (verbatim below; you do not need the repo)_
-
 ```css
 /* =============================================================================
    shared/oh-site.css — SHARED SITE KIT (chrome + skeletons + primitive pages)
@@ -1250,7 +1242,7 @@ _source: `web/teleon/kit/oh-site.css` (verbatim below; you do not need the repo)
 .ohs-side-foot { display: flex; flex-direction: column; gap: 8px; padding: 12px 8px 4px; border-top: 1px solid var(--line); }
 .ohs-side-foot-row { display: flex; align-items: center; justify-content: space-between; }
 .ohs-main { min-width: 0; }
-/* grouped / collapsible nav (richer sidebars, e.g. OHH) */
+/* grouped / collapsible nav (richer sidebars, e.g. OpenHubForAI) */
 .ohs-side-group { display: flex; flex-direction: column; gap: 3px; }
 .ohs-side-sec { display: flex; align-items: center; justify-content: space-between; width: 100%; background: none; border: 0; cursor: pointer;
                 font-family: inherit; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--fg-faint);
@@ -1616,8 +1608,6 @@ _source: `web/teleon/kit/oh-site.css` (verbatim below; you do not need the repo)
 
 ## 4. The shared kit components — header/footer/sections/pages + the new OhLayout (layout chooser) and OhTable
 
-_source: `web/teleon/kit/oh-site.jsx` (verbatim below; you do not need the repo)_
-
 ```jsx
 /* global React */
 // shared/oh-site.jsx — SHARED SITE KIT (React components + primitive pages).
@@ -1853,7 +1843,8 @@ function OhNavGroup({ grp, isActive }) {
   );
 }
 function OhAppShell({ brand, nav, groups, header, foot, topbar, isActive, route, cta, theme, onToggle, children }) {
-  const active = isActive || ((h) => route === h || route.startsWith(h + '/'));
+  const r = route || '';  // null-safe: OhLayout(variant="sidebar") may omit route
+  const active = isActive || ((h) => r === h || r.startsWith(h + '/'));
   return (
     <div className="ohs-app">
       <aside className="ohs-side">
@@ -1933,10 +1924,12 @@ function OhRollup({ items }) {
 //   'two-col'    -> main content + a sticky `aside` (content with a rail).
 //   'no-sidebar' -> full-width content (marketing, wide tables / browsers).
 function OhLayout({ variant = 'one-col', brand, nav, sidebar, cta, signInHref, theme, onToggle,
-                   footer = true, footerProps, aside, children }) {
+                   footer = true, footerProps, aside, groups, header, foot, isActive, route, children }) {
   if (variant === 'sidebar') {
+    // the logged-in app shell: forward the full OhAppShell surface (route -> active highlight, custom foot/header/groups)
     return (
-      <OhAppShell brand={brand} nav={sidebar} cta={cta} theme={theme} onToggle={onToggle}>{children}</OhAppShell>
+      <OhAppShell brand={brand} nav={sidebar} groups={groups} header={header} foot={foot}
+        isActive={isActive} route={route} cta={cta} theme={theme} onToggle={onToggle}>{children}</OhAppShell>
     );
   }
   const cls = variant === 'two-col' ? 'ohl-two' : variant === 'no-sidebar' ? 'ohl-full' : 'ohl-one';
@@ -2919,8 +2912,6 @@ Object.assign(window, {
 
 ## 5. Portfolio config + per-brand accents
 
-_source: `web/teleon/kit/products.js` (verbatim below; you do not need the repo)_
-
 ```js
 /* =============================================================================
    shared/products.js — Brand & product registry (single source of truth)
@@ -2932,7 +2923,7 @@ _source: `web/teleon/kit/products.js` (verbatim below; you do not need the repo)
        └── OpenHubForAI      ── open funnel · build governed harnesses (free)
 
    These are SEPARATE SITES that share the same underlying design-system
-   engineering. Baltor and OHH are SISTER products (peers) — neither is a parent;
+   engineering. Baltor and OpenHubForAI are SISTER products (peers) — neither is a parent;
    the only company-level brand is "AI Done Right".
 
    Renaming any brand is a ONE-LINE change: edit its `name` (and `wordmark`).
@@ -2953,7 +2944,7 @@ _source: `web/teleon/kit/products.js` (verbatim below; you do not need the repo)
     openHarnessHub: {
       id: 'openharnesshub',
       name: 'OpenHubForAI',          // ← one-line rename point
-      short: 'OHH',
+      short: 'OpenHubForAI',
       kind: 'pipelines',
       tagline: 'Build & monitor governed pipelines',
       blurb: 'Describe a task; assemble a governed, cited pipeline from vetted ' +
@@ -3017,7 +3008,7 @@ _source: `web/teleon/kit/products.js` (verbatim below; you do not need the repo)
       brandScope: '',
       glyph: '◳',
       // sister product — quiet footer link only
-      supportedBy: { name: 'OpenHubForAI', short: 'OHH', url: '../openharnesshub/OpenHarnessHub Prototype.html' },
+      supportedBy: { name: 'OpenHubForAI', short: 'OpenHubForAI', url: '../openharnesshub/OpenHarnessHub Prototype.html' },
     },
   };
 
@@ -3218,8 +3209,6 @@ _source: `web/teleon/kit/products.js` (verbatim below; you do not need the repo)
 
 ## 6a. index.html — the boot skeleton
 
-_source: `web/teleon/index.html` (verbatim below; you do not need the repo)_
-
 ```html
 <!doctype html>
 <!-- GENERATED by scripts/port_full_design_to_web.py from dist/sites/openharness-design/teleon/Teleon Prototype.html — transplanted design (DESIGN-CONTRACT): do not hand-edit; edit the bundle or the port script and re-run. -->
@@ -3264,8 +3253,6 @@ window.OHH_EVENTS_BASE = '/analytics';
 ```
 
 ## 6b. teleon-main.jsx — the full app on the shared kit
-
-_source: `web/teleon/teleon-main.jsx` (verbatim below; you do not need the repo)_
 
 ```jsx
 /* global React, ReactDOM, PRODUCTS, PORTFOLIO,
@@ -3428,7 +3415,7 @@ function Landing({ theme, onToggle }) {
         ['Product', [['How it works', '/'], ['Lifecycle', '/'], ['Pricing', '/pricing'], ['Case studies', '/cases']]],
         ['Developers', [['Docs', '/docs'], ['Library', '/registry']]],
         ['Company', [['About', '/about'], ['Contact', '/contact'], ['Status', '/status'], ['Changelog', '/changelog']]],
-        ['Group', [['AI Done Right ↗', '../context-is-everything/Context is Everything.html'], ['Baltor.ai ↗', '../context-enrichment/Context Enrichment Prototype.html'], ['OpenHarnessHub ↗', '../openharnesshub/OpenHarnessHub Prototype.html']]],
+        ['Group', [['AI Done Right ↗', '../context-is-everything/Context is Everything.html'], ['Baltor.ai ↗', '../context-enrichment/Context Enrichment Prototype.html'], ['OpenHubForAI ↗', '../openharnesshub/OpenHarnessHub Prototype.html']]],
       ]} />
       <OhExperimentsPanel />
     </div>
@@ -3619,7 +3606,7 @@ function MarketingShell({ theme, onToggle, children }) {
         ['Product', [['How it works', '/'], ['Lifecycle', '/'], ['Pricing', '/pricing'], ['Case studies', '/cases']]],
         ['Developers', [['Docs', '/docs'], ['Library', '/registry']]],
         ['Company', [['About', '/about'], ['Contact', '/contact'], ['Status', '/status'], ['Changelog', '/changelog']]],
-        ['Group', [['AI Done Right ↗', '../context-is-everything/Context is Everything.html'], ['Baltor.ai ↗', '../context-enrichment/Context Enrichment Prototype.html'], ['OpenHarnessHub ↗', '../openharnesshub/OpenHarnessHub Prototype.html']]],
+        ['Group', [['AI Done Right ↗', '../context-is-everything/Context is Everything.html'], ['Baltor.ai ↗', '../context-enrichment/Context Enrichment Prototype.html'], ['OpenHubForAI ↗', '../openharnesshub/OpenHarnessHub Prototype.html']]],
       ]} />
     </div>
   );
@@ -3720,8 +3707,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 ```
 
 ## 6c. teleon.css — the surface-specific styles
-
-_source: `web/teleon/teleon.css` (verbatim below; you do not need the repo)_
 
 ```css
 /* =============================================================================

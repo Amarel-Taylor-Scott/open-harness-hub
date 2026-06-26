@@ -237,7 +237,7 @@ function Band() {
         <p>Explore the products that are live today.</p>
         <div className="cie-cta">
           <a className="cie-btn" style={{ background: 'var(--cie-baltor)', color: '#fff' }} href={E('baltor').url}>Visit Baltor.ai →</a>
-          <a className="cie-btn" style={{ background: 'var(--cie-ohh)', color: '#fff' }} href={E('openHarnessHub').url}>Visit OpenHarnessHub →</a>
+          <a className="cie-btn" style={{ background: 'var(--cie-ohh)', color: '#fff' }} href={E('openHarnessHub').url}>Visit OpenHubForAI →</a>
         </div>
       </div>
     </section>

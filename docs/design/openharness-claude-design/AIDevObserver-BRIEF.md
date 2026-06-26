@@ -25,7 +25,7 @@ wasted context (oversized or duplicated), risky commands, and missed cheaper pat
 (accept, reuse, or dismiss). That accept-or-dismiss signal is what makes the product improve over time. Findings are
 suggestions a human reviews, never auto-applied; the tool is read only and stores nothing.
 
-## The logged-in app: `OhLayout variant="sidebar"`, four screens
+## The logged-in app: `OhLayout variant="sidebar"`, five screens
 
 Use `OhLayout variant="sidebar"` (it composes `OhAppShell`) with the AIDevObserver accent: pass `sidebar` = the nav
 (the `[[href, glyph, label], ...]` shape below), plus `brand`, `cta`, `theme`, and `onToggle`. Sidebar nav
@@ -37,6 +37,7 @@ Use `OhLayout variant="sidebar"` (it composes `OhAppShell`) with the AIDevObserv
 | **Sessions** | `/sessions` | the list of reviewed sessions, pick one |
 | **Findings** | `/findings` | all findings across sessions, filter by type, see outcomes |
 | **Settings** | `/settings` | BYO key, mode, interruption budget, editor integrations |
+| **Agentic runs** | `/agentic` | supervise autonomous agent loops: verdict + loop-shape findings + halt alerts |
 
 ### Screen: Review (default) and the FINDING CARD (the core component)
 
@@ -88,7 +89,24 @@ for adversarial):
   **interruption budget** (a small integer, the max live interruptions per session), the **BYO key** field (governed
   copy: "Used only for this request. Never stored or logged."), and the **editor integrations** card with the three
   install lines: the VS Code / Cursor extension, the MCP server (`claude mcp add aidevobserver -- python3
-  scripts/aidevobserver_mcp_server.py`), and the CLI (`python3 -m src.teleon.observer.cli review --latest`).
+  scripts/aidevobserver_mcp_server.py`), the CLI (`python3 -m src.teleon.observer.cli review --latest`), and the
+  live-coaching Claude Code PreToolUse hook (`python3 scripts/aidevobserver_hook.py --install`).
+
+### Screen: Agentic runs (supervise AUTONOMOUS agent loops)
+
+AIDevObserver does not only review HUMAN sessions; it supervises AUTONOMOUS agent loops (a flywheel / worker / any
+agent runner that decides and acts on its own). Design a screen for it:
+
+- **Render:** a list of agentic RUNS (each: goal, iteration count, status, and a VERDICT badge - `clean` /
+  `wasteful` / `stalled_or_runaway`). Selecting a run shows its findings, ranked by confidence, in the FINDING CARD
+  (use a "step #N" locator instead of "message #N").
+- **Loop-shape finding types** (new, agentic-only, on top of reinvention/footgun/waste): `agentic_loop` (thrash -
+  same action repeated), `agentic_repeated_failure` (same error recurs), `agentic_stall` (no progress),
+  `agentic_budget_overrun` (steps/cost ceiling hit), `agentic_goal_drift` (actions diverge from the goal).
+- **Intra-run alert:** when a run is LIVE and the engine returns `recommend_halt: true` (a runaway), surface an
+  ADVISORY banner (never a blocking modal): "This run looks like a runaway (budget exceeded / thrash). Recommend
+  pausing." with Pause / Dismiss. It is a recommendation a human/orchestrator acts on - AIDevObserver never kills a
+  process.
 
 ## The API contract (REAL, captured from the live backend at `/api/observer/...`)
 
@@ -129,6 +147,12 @@ for adversarial):
 `surfaced` is the subset the tool would interrupt with live (capped by the interruption budget).
 
 **`GET /api/observer/sessions`** response: `{ "sessions": [ {"session_id":"...", "path":"...", "mtime": 0, "project":"..."} ], "serves_truth": false }`.
+
+**`POST /api/observer/agentic`** (supervise an agent loop) request: `{ "steps": [ {"action":"...", "ok": true,
+"error":"...", "cost": 0.0, "output":"..."} ], "goal": "...", "budget": {"max_steps": 50, "max_cost": 5.0},
+"monitor": false, "mode": "advisory" }`. Post-run (`monitor:false`) response: `{ "report": [ ...findings +
+loop-shape... ], "loop_signals": [...], "summary": {"steps","failures","findings","verdict"}, "serves_truth": false }`.
+Intra-run (`monitor:true`) response: `{ "alerts": [...], "recommend_halt": false, "mode": "advisory", "step": N, "serves_truth": false }`.
 
 (The `message`/`suggestion` strings from the engine currently contain em dashes; render them, but those are on the
 backend-copy sweep list, so do not copy that punctuation into your own static copy. Follow the copy rules below.)
