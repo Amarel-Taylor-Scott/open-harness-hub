@@ -1,7 +1,8 @@
 # THE BIBLE — AI Done Right · the single north-star reference
 
 > **This file is the bible for development + vision.** If any other doc disagrees with it, this wins — fix or archive
-> the other. `CLAUDE.md` / `AGENTS.md` are the agent operating rules; this is the *what + why + the laws*. Counts here
+> the other. `CLAUDE.md` / `AGENTS.md` are the agent operating rules; this is the *what + why + the laws*; **`docs/DESIGN-BIBLE.md`**
+> is the design/UX counterpart (the look · components · color schemes · design decisions). Counts here
 > are **computed by the named scripts** (never hand-typed — see the No-Magic-Values law); the prose states structure,
 > the scripts state numbers. Last reconciled **2026-06-25**.
 
@@ -202,6 +203,7 @@ Execution / Optimization / Verification). By name:
 | Run the proof gate | `scripts/run_proofs.py` |
 | Search the registry records | `./status search <q>` (`scripts/scale_index.py`) |
 | Federated search across registries | `src/teleon/registry/search.py` |
+| Faceted browse (OpenHubForAI.io — records as the unit, hubs/registries as facets) | `src/teleon/registry/browse.py` + `scripts/openhub_browse_server.py` |
 | Registry menu / populate / compose | `src/teleon/registry/{port,populate,compose}.py` |
 | Run a capability descent | `src/teleon/synthesis/` + `src/teleon/economics/` |
 | BYO-key demos (all surfaces) | `scripts/byo_demo_server.py` + `src/teleon/demos/byo_key_demo.py` |

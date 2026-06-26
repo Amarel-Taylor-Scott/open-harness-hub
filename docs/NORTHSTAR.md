@@ -1,7 +1,7 @@
 # NORTHSTAR — the single current-truth entry point
 
-> One up-to-date doc that supersedes the strategy sprawl. If another doc disagrees with this, this wins; fix or
-> archive the other. Read this + `CLAUDE.md` first. Last reconciled **2026-06-25**.
+> **Superseded by `docs/BIBLE.md`** (the comprehensive vision + laws) + **`docs/DESIGN-BIBLE.md`** (design/UX) — those
+> two are canonical now; read them + `CLAUDE.md` first. This file remains as a quick index. Last reconciled **2026-06-25**.
 
 ## The five brand pillars (single source: `architecture/surface_capability_spec.json`)
 
