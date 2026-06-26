@@ -65,7 +65,7 @@ ROUND1_SYSTEM = ("You are a multi-disciplinary review board member doing diligen
 def round1_user(pack: str) -> str:
     lenses = "\n".join(f"- {k}: {v}" for k, v in PERSONAS.items())
     return ("Review the platform below (Baltor = a context engine; Teleon = a runtime that DESCENDS non-deterministic "
-            "capabilities to cheaper/faster/more-deterministic/more-bounded against user preferences; Open Harness Hub "
+            "capabilities to cheaper/faster/more-deterministic/more-bounded against user preferences; OpenHubForAI "
             "= the open ecosystem). Review it through EACH of these executive lenses:\n" + lenses + "\n\n"
             "For EACH lens, give: the 2 biggest strengths, the 2 most serious risks, and 1 concrete recommendation "
             "(cite files). End with 'TOP PRIORITY:' — your single highest-leverage action across all lenses.\n\n"
