@@ -39,34 +39,9 @@ hand-counted:
 python3 scripts/check_ai_done_right_surface_family.py --self-test
 ```
 
-Parser-safe loop handoff:
-
-```text
-/goal follow the instructions in docs/goals/aidoneright-portfolio-loop.md
-```
-
-Handoff freshness lives in
-[`docs/handoff/handoff-freshness.md`](docs/handoff/handoff-freshness.md) and is
-validated by:
-
-```bash
-python3 scripts/check_handoff_docs_freshness.py --self-test
-```
-
-Production work must also answer service-to-service consumption: API keys,
-service accounts, OAuth/client credentials, workload identity, tenant-scoped
-authorization, and audit receipts. The current architecture brief is
-[`docs/architecture/service-auth-and-consumption-model.md`](docs/architecture/service-auth-and-consumption-model.md).
-
-Local development does not require paid cloud hosting. Use local servers,
-containerized local stacks, and temporary TryCloudflare quick tunnels for
-preview/review. The local tunnel/auth plan is
-[`docs/architecture/local-dev-tunnels-and-auth.md`](docs/architecture/local-dev-tunnels-and-auth.md)
-and is validated by:
-
-```bash
-python3 scripts/check_local_dev_tunnel_auth_runtime.py --self-test
-```
+**Architecture and local development:** backends are reached through same-origin seams (`docs/INTEGRATION-BIBLE.md`);
+service-to-service auth and consumption is `docs/architecture/service-auth-and-consumption-model.md`; local dev needs
+no paid cloud (local servers plus TryCloudflare quick tunnels, `docs/architecture/local-dev-tunnels-and-auth.md`).
 
 ## The open ecosystem layer (OpenHubForAI)
 
