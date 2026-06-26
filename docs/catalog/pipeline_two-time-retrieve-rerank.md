@@ -8,7 +8,7 @@ query using LLM summary of pass-1. Second-pass: retrieve top-K' with
 the refined query. Union, dedupe, cross-encoder rerank. Final
 output ranked candidates.
 
-Verified by Open Harness Hub mining of takanashihumbert "EEDI Qwen-2.5
+Verified by OpenHubForAI mining of takanashihumbert "EEDI Qwen-2.5
 32B AWQ two-time retrieval" (650 votes). The shape generalises to
 any RAG task where the user's first query is under-specified.
 

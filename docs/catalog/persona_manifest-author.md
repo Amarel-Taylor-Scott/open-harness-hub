@@ -1,8 +1,8 @@
-# Open Harness Hub Manifest Author
+# OpenHubForAI Manifest Author
 
 *persona* · `persona/manifest-author` · v0.1.0 · experimental
 
-A persona for AUTHORING Open Harness Hub manifests from external
+A persona for AUTHORING OpenHubForAI manifests from external
 knowledge sources. Reads a structured "knowledge node" (a Wikipedia
 article, a US Code section, an APQC PCF process, a regulatory
 framework chapter, a research-paper abstract, a Product Hunt

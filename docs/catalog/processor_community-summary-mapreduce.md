@@ -6,7 +6,7 @@ Per-community map step (LLM summarizes each Leiden community), then
 reduce step combines partial answers across communities. The core
 primitive of GraphRAG's global-search mode.
 
-Verified by Open Harness Hub clone:
+Verified by OpenHubForAI clone:
 `microsoft/graphrag/packages/graphrag/graphrag/query/structured_search/global_search/`.
 
 | axis | value |

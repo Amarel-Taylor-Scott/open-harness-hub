@@ -9,7 +9,7 @@ vocabulary, (3) embeddings cosine-similarity to confirm prompt
 fidelity to original image. The winning Kaggle shape for the
 Stable Diffusion Image-to-Prompts competition.
 
-Verified by Open Harness Hub mining: leonidkulyk LB 0.45836
+Verified by OpenHubForAI mining: leonidkulyk LB 0.45836
 BLIP+CLIP CLIP-Interrogator (732 votes), inversion Calculating
 Stable Diffusion Prompt Embeddings (617 votes), burhanuddinlatsaheb
 Text-to-Image Generation (570 votes — uses the same BLIP+CLIP

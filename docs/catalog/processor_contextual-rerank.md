@@ -4,7 +4,7 @@
 
 GOVERNED ADAPTER that WRAPS Contextual AI's hosted Rerank engine
 (`POST /v1/rerank`, model `ctxl-rerank-v2-instruct`, +mini / +v1) as an
-Open Harness Hub processor component. This is a thin wrapper over a
+OpenHubForAI processor component. This is a thin wrapper over a
 third-party best-of-breed engine — OHH does NOT rebuild it. Contextual's
 reranker is the first instruction-following reranker: it takes a query,
 a list of candidate documents, and a natural-language instruction, and

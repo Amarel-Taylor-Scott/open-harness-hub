@@ -2,7 +2,7 @@
 
 *pipeline* · `pipeline/cache-assisted-harness-composition` · v0.1.0 · experimental
 
-Uses the Open Harness Hub object database as a trajectory-fragment cache: extract solved fragments, retrieve similar subproblems, compose candidates cheaply, verify them, and fall back to stronger models when needed.
+Uses the OpenHubForAI object database as a trajectory-fragment cache: extract solved fragments, retrieve similar subproblems, compose candidates cheaply, verify them, and fall back to stronger models when needed.
 
 | axis | value |
 |---|---|

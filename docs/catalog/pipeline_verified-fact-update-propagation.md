@@ -18,7 +18,7 @@ Ingests a signed verified fact update from a vetted publisher, updates source-go
 
 ## Task
 
-Propagate vetted source-of-truth updates such as government rule changes into dependent Open Harness Hub pipelines and indexes.
+Propagate vetted source-of-truth updates such as government rule changes into dependent OpenHubForAI pipelines and indexes.
 
 **pipeline_kind:** `research_web.verified_fact_update`
 

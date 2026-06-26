@@ -7,7 +7,7 @@ relevance grader → rewrite-query loop on irrelevant retrieval →
 generate with grounding → answer-support grader → iterate up to
 max_iterations on low support.
 
-Verified by Open Harness Hub deep mining: the LangGraph reference
+Verified by OpenHubForAI deep mining: the LangGraph reference
 implementation at `langchain-ai/langgraph/tutorials/rag/langgraph_self_rag/`
 + Akari Asai's canonical implementation at
 `AkariAsai/self-rag/retrieval_lm/run_short_form.py` (both cloned).

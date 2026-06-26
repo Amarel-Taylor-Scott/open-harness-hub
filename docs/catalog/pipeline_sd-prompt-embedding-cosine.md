@@ -8,7 +8,7 @@ standard scoring approach for prompt-recovery competitions where
 the metric is mean cosine similarity (Σ cos(predicted_embed,
 gold_embed) / N).
 
-Verified by Open Harness Hub mining: inversion Calculating Stable
+Verified by OpenHubForAI mining: inversion Calculating Stable
 Diffusion Prompt Embeddings (617 votes), leonidkulyk BLIP+CLIP (732
 votes — uses sentence-transformer embeddings for scoring).
 

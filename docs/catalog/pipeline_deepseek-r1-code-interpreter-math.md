@@ -9,7 +9,7 @@ feeds back as the answer (or the LLM iterates if execution fails or
 the answer is implausible). Majority-vote across N rollouts is the
 standard ensembling.
 
-Verified by Open Harness Hub mining: itahiro DeepSeek-R1-distill-7B
+Verified by OpenHubForAI mining: itahiro DeepSeek-R1-distill-7B
 (1399 votes), lewtun "Updated Code Interpretation" (1173 votes,
 Lewis Tunstall HF), mbmmurad QwQ-32B-preview optimized inference
 (1097 votes), yekenot DeepSeek-R1-distill-7B-AWQ (1087 votes),

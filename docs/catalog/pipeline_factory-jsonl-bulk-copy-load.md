@@ -18,7 +18,7 @@ Converts validated generated-object JSONL shards into CSV staging files and a ps
 
 ## Task
 
-Bulk-load high-volume generated Open Harness Hub objects into canonical Postgres tables without inflating YAML manifests.
+Bulk-load high-volume generated OpenHubForAI objects into canonical Postgres tables without inflating YAML manifests.
 
 **pipeline_kind:** `serving`
 

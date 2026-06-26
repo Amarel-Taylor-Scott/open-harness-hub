@@ -3,7 +3,7 @@
 *adapter* · `adapter/redis-queue-worker-runtime` · v0.1.0 · experimental
 
 Provider-neutral adapter for a Redis-backed job queue used to dispatch and
-consume asynchronous background jobs in the Open Harness Hub pipeline.
+consume asynchronous background jobs in the OpenHubForAI pipeline.
 
 Supported job families: scan (source surface scan), embed (batch embedding
 execution), eval (benchmark evaluation), price (model pricing lookup), and

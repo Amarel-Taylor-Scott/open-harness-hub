@@ -8,7 +8,7 @@ histopathology (HuBMAP), spine MRI (RSNA Lumbar). Uses timm or
 segmentation-models-pytorch for pre-trained checkpoints; 5-fold
 CV; image augmentation via albumentations.
 
-Verified by Open Harness Hub mining: cdeotte EfficientNetB0 starter
+Verified by OpenHubForAI mining: cdeotte EfficientNetB0 starter
 (1564 votes, HMS Harmful Brain Activity), motono0223 ISIC PyTorch
 baseline (794 votes, EfficientNet + timm), hidngnguyna baseline
 U-Net + EfficientNet (617 votes, HuBMAP), awsaf49 HMS-HBAC KerasCV

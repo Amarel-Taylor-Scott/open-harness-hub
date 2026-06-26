@@ -2,7 +2,7 @@
 
 *pattern* · `pattern/conversational-pipeline-builder` · v0.1.0 · experimental
 
-The headline UX loop for Open Harness Hub: a user pastes a free-text LLM
+The headline UX loop for OpenHubForAI: a user pastes a free-text LLM
 challenge or use-case and the system guides them from raw intent to a
 working, costed, deployable pipeline blueprint. The loop is
 paste → understand → retrieve → assemble → estimate-cost →

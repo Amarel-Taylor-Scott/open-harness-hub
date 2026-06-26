@@ -9,7 +9,7 @@ fine-tune SFTTrainer on (prompt, response_A, response_B) → A/B/tie
 triples. Inference: same loaded model + classifier head over the
 three classes.
 
-Verified by the Open Harness Hub Meta Kaggle deep miner: 3 of 9
+Verified by the OpenHubForAI Meta Kaggle deep miner: 3 of 9
 pulled WSDM-Cup top-voted kernels match this exact stack
 (transformers + peft + bitsandbytes + trl).
 

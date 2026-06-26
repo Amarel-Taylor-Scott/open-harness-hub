@@ -2,7 +2,7 @@
 
 *knowledge-pack* · `knowledge-pack/hybrid-postgres-bigquery-hosting-patterns` · v0.1.0 · experimental
 
-Low-cost hosting patterns for keeping Open Harness Hub product state in Postgres/pgvector while using object storage and BigQuery for cold shards, vector analytics, cost traces, ranking, and trajectory-fragment cache analysis.
+Low-cost hosting patterns for keeping OpenHubForAI product state in Postgres/pgvector while using object storage and BigQuery for cold shards, vector analytics, cost traces, ranking, and trajectory-fragment cache analysis.
 
 | axis | value |
 |---|---|

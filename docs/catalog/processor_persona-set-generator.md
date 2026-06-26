@@ -7,7 +7,7 @@ STORM's multi-perspective curation and by multi-agent debate
 pipelines. Each persona carries a role, an angle, prior knowledge
 cues, and a few biased priors the simulated dialogue can surface.
 
-Verified by Open Harness Hub clone:
+Verified by OpenHubForAI clone:
 `stanford-oval/storm/knowledge_storm/storm_wiki/modules/persona_generator.py`.
 
 | axis | value |

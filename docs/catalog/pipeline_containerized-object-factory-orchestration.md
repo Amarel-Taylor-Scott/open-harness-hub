@@ -18,7 +18,7 @@ Plans and audits a horizontally scalable worker fleet for source discovery, scra
 
 ## Task
 
-Split Open Harness Hub object generation into parallel container worker lanes with source governance, shard leasing, enrichment, validation, promotion, warehouse export, and prompt-prefix cache normalization.
+Split OpenHubForAI object generation into parallel container worker lanes with source governance, shard leasing, enrichment, validation, promotion, warehouse export, and prompt-prefix cache normalization.
 
 **pipeline_kind:** `research_web.object_factory_worker_fleet`
 

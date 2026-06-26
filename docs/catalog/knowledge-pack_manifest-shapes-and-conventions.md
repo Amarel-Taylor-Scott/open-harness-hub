@@ -1,4 +1,4 @@
-# Open Harness Hub manifest shapes, schemas & conventions reference
+# OpenHubForAI manifest shapes, schemas & conventions reference
 
 *knowledge-pack* · `knowledge-pack/manifest-shapes-and-conventions` · v0.1.0 · experimental
 

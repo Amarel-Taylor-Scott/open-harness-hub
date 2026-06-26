@@ -8,7 +8,7 @@ models_pytorch) for medical image segmentation. Standard Kaggle shape:
 / elastic) + Test-Time Augmentation (TTA) at inference (D4 horizontal/
 vertical flip + 90° rotations averaged).
 
-Verified by Open Harness Hub mining: awsaf49 UWMGI Unet Train PyTorch
+Verified by OpenHubForAI mining: awsaf49 UWMGI Unet Train PyTorch
 (1473 votes, UW-Madison GI Tract) + UWMGI 2.5D Infer PyTorch (1092
 votes), hidngnguyna baseline U-Net (617 votes, HuBMAP), corochann
 SEResNeXt (823 votes, Bengali). 5+ kernels.

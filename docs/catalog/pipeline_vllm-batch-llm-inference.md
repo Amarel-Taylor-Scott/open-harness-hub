@@ -8,7 +8,7 @@ Serve many prompts through a single vLLM engine with shared KV cache
 to a fixed-format token grammar — useful for retrieval-rerank
 letter outputs, JSON skeletons, or multiple-choice answers.
 
-Verified by Open Harness Hub mining: jagatkiran Qwen14B-Retrieval-
+Verified by OpenHubForAI mining: jagatkiran Qwen14B-Retrieval-
 Qwen32B-logits-processor-zoo (672 votes, EEDI), aerdem4 Eedi-Qwen32B-
 vllm-with-logits-processor-zoo (594 votes, EEDI), itahiro DeepSeek-
 R1-distill-7B (1399 votes, AIMO 2), mbmmurad QwQ-32B-preview (1097

@@ -7,7 +7,7 @@ blocks, runtime renders the message + executes the code in a
 Jupyter kernel, streams the observation back into the model's
 context, loops until the model emits a `DONE` marker.
 
-Verified by Open Harness Hub mining of the OpenInterpreter clone:
+Verified by OpenHubForAI mining of the OpenInterpreter clone:
 `interpreter/core/respond.py` implements exactly this loop.
 
 | axis | value |

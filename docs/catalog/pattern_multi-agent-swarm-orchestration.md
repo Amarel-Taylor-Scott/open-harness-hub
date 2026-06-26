@@ -9,7 +9,7 @@ worktree, process, or MCP session). Subagents produce structured outputs
 (YAML manifests, JSONL rows, reports, code patches) that the orchestrator
 aggregates, validates, and gates before promotion or merge.
 
-This is the model used to drive Open Harness Hub breadth-factory batches:
+This is the model used to drive OpenHubForAI breadth-factory batches:
 a BREADTH agent fans out to N concurrent workers that each catalog or
 generate a different component family, then the orchestrator collects and
 validates the results. The pattern differs from simple Orchestrator-Workers

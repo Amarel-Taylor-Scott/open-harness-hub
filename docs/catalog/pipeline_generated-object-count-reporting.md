@@ -18,7 +18,7 @@ Separates curated manifest count, staged JSONL rows, and canonical Postgres obje
 
 ## Task
 
-Report Open Harness Hub scale metrics without confusing YAML manifests with generated database objects.
+Report OpenHubForAI scale metrics without confusing YAML manifests with generated database objects.
 
 **pipeline_kind:** `evaluate`
 

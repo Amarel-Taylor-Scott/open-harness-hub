@@ -7,7 +7,7 @@ Lower perplexity = better fit. Used as a baseline for
 prompt-recovery, AI-text-detection, and any task where "fluency
 under a fixed prior" is a useful signal.
 
-Verified by Open Harness Hub mining of itahiro's "Perplexity
+Verified by OpenHubForAI mining of itahiro's "Perplexity
 Baseline [Phi-2, Gemma-7b-it]" (1005 votes) on llm-prompt-recovery.
 
 | axis | value |

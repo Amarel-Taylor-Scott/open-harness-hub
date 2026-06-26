@@ -7,7 +7,7 @@ starting checkpoint, fine-tuned on domain-specific instance
 segmentation / detection task. Classic transfer-learning recipe for
 small-medical-dataset detection (pneumonia, polyps, lesions).
 
-Verified by Open Harness Hub mining: hmendonca Mask-RCNN and COCO
+Verified by OpenHubForAI mining: hmendonca Mask-RCNN and COCO
 transfer learning LB:0.155 (1194 votes, RSNA Pneumonia Detection
 Challenge).
 

@@ -9,7 +9,7 @@ classification, infant cry detection, equipment fault detection.
 Audio-specific augmentation: SpecAugment (frequency + time masking),
 pitch shift, time stretch.
 
-Verified by Open Harness Hub mining: awsaf49 BirdCLEF24 KerasCV
+Verified by OpenHubForAI mining: awsaf49 BirdCLEF24 KerasCV
 starter (659 votes train + 364 votes infer, BirdCLEF 2024) — uses
 mel spectrogram + KerasCV CNN.
 

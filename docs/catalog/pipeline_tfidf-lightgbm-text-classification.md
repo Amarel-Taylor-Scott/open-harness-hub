@@ -7,7 +7,7 @@ classification competitions. Char- and word-ngram TF-IDF feature
 extraction → LightGBM (often stacked with SGDClassifier / MultinomialNB)
 → calibrated probability.
 
-Verified by Open Harness Hub Meta Kaggle deep mining: top kernels of
+Verified by OpenHubForAI Meta Kaggle deep mining: top kernels of
 `llm-detect-ai-generated-text` all use this stack, often as the lead
 baseline before any DeBERTa fine-tune is added.
 

@@ -9,7 +9,7 @@ separate per-sensor branches (1D-CNN + LSTM), then blend predictions
 via weighted average / stacking. Standard for wearable / behavior-
 detection competitions.
 
-Verified by Open Harness Hub mining: hideyukizushi CMI25 IMU+THM/ToF
+Verified by OpenHubForAI mining: hideyukizushi CMI25 IMU+THM/ToF
 TF BlendingModel (625 votes, CMI Detect Behavior with Sensor Data),
 sohier CMI 2025 Demo Submission (875 votes, same competition).
 

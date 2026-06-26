@@ -7,7 +7,7 @@ documents into a graph; build community summaries via Leiden
 clustering; query via local (ego-network), global (map-reduce over
 communities), or DRIFT (primer + follow-up hybrid).
 
-Verified by Open Harness Hub clone:
+Verified by OpenHubForAI clone:
 `microsoft/graphrag/packages/graphrag/graphrag/query/structured_search/`
 contains `local_search/`, `global_search/`, `drift_search/` modules.
 

@@ -2,7 +2,7 @@
 
 *adapter* · `adapter/mcp-server-bridge` · v0.1.0 · experimental
 
-Adapter that exposes Open Harness Hub catalog tools over a Model
+Adapter that exposes OpenHubForAI catalog tools over a Model
 Context Protocol (MCP) server. Wraps any tool registered in the
 catalog's tool registry and surfaces it as an MCP tool definition
 that any MCP-compatible host (Claude Desktop, Claude Code, custom

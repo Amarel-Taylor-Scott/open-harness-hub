@@ -2,7 +2,7 @@
 
 *knowledge-pack* · `knowledge-pack/containerized-worker-orchestration-patterns` · v0.1.0 · experimental
 
-Patterns for horizontally scaling Open Harness Hub object factories with discovery, spidering, repository mining, workflow mining, enrichment, embedding, verification, promotion, warehouse export, and prompt-cache standardization workers.
+Patterns for horizontally scaling OpenHubForAI object factories with discovery, spidering, repository mining, workflow mining, enrichment, embedding, verification, promotion, warehouse export, and prompt-cache standardization workers.
 
 | axis | value |
 |---|---|

@@ -7,7 +7,7 @@ the trajectories + final-state candidates for downstream judging.
 The N candidates can be reviewed by a separate judge processor to
 pick the best.
 
-Verified by Open Harness Hub clone:
+Verified by OpenHubForAI clone:
 `SWE-agent/sweagent/agent/action_sampler.py`.
 
 | axis | value |

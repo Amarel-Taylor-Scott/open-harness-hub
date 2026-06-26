@@ -9,7 +9,7 @@ retrieves by cosine similarity. The dominant Kaggle shape for
 retrieval-style competitions on educational content + curriculum
 matching + semantic search.
 
-Verified by Open Harness Hub mining: yuiwai LECR-stsb-roberta-base
+Verified by OpenHubForAI mining: yuiwai LECR-stsb-roberta-base
 (420 votes, Learning Equality Curriculum Recommendations), yuiwai
 all-MiniLM-L6-v2-tuning (401 votes, LECR), karakasatarik 0.459
 single-model-inference w/ postprocessing (375 votes, LECR),

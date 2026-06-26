@@ -18,7 +18,7 @@ Plans and executes the canonical Postgres/pgvector bootstrap path for generated 
 
 ## Task
 
-Bootstrap a canonical Postgres/pgvector store for generated Open Harness Hub objects and report database-backed object counts.
+Bootstrap a canonical Postgres/pgvector store for generated OpenHubForAI objects and report database-backed object counts.
 
 **pipeline_kind:** `serving`
 

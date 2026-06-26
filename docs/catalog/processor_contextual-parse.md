@@ -3,7 +3,7 @@
 *processor* · `processor/contextual-parse` · v0.1.0 · experimental
 
 GOVERNED ADAPTER that WRAPS Contextual AI's hosted Parse engine
-(`POST /parse`) as an Open Harness Hub processor component. This is a
+(`POST /parse`) as an OpenHubForAI processor component. This is a
 thin wrapper over a third-party best-of-breed engine — OHH does NOT
 rebuild it. Contextual's Parse converts PDF / DOC(X) / PPT(X) / PNG /
 JPG (<300MB, <2000 pages) to clean Markdown or JSON, infers document

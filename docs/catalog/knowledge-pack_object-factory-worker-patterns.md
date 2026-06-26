@@ -2,7 +2,7 @@
 
 *knowledge-pack* · `knowledge-pack/object-factory-worker-patterns` · v0.1.0 · experimental
 
-Reference worker patterns for converting source material into privacy-screened, verified, labeled, deduplicated Open Harness Hub objects.
+Reference worker patterns for converting source material into privacy-screened, verified, labeled, deduplicated OpenHubForAI objects.
 
 | axis | value |
 |---|---|

@@ -8,7 +8,7 @@ optional lung-segmentation crop, convert to PNG / NumPy / NIfTI
 for downstream CNN. Standard Kaggle medical-imaging preprocessing
 pipeline.
 
-Verified by Open Harness Hub mining: allunia Pulmonary DICOM
+Verified by OpenHubForAI mining: allunia Pulmonary DICOM
 Preprocessing (1249 votes, OSIC Pulmonary Fibrosis Progression),
 piantic OSIC Basic EDA (1132 votes — also DICOM preprocessing).
 

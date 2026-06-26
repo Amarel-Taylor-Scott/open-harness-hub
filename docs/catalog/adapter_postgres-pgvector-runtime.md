@@ -2,7 +2,7 @@
 
 *adapter* · `adapter/postgres-pgvector-runtime` · v0.1.0 · experimental
 
-Provider-neutral adapter for the Open Harness Hub canonical Postgres store with
+Provider-neutral adapter for the OpenHubForAI canonical Postgres store with
 pgvector extension enabled. Wraps all read/write paths for the component,
 normalized_object, object_embedding, index_record, source_record,
 component_change_event, and related tables defined in db/postgres/schema.sql.

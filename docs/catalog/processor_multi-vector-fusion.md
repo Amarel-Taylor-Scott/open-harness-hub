@@ -7,7 +7,7 @@ dense + graph + cross-encoder reranker output) via Reciprocal Rank
 Fusion or weighted score blending. Returns a single deduped ranked
 list.
 
-Verified by Open Harness Hub clones: shape appears in
+Verified by OpenHubForAI clones: shape appears in
 `Raudaschl/rag-fusion`, `superlinear-ai/raglite/_search.py`, and
 `microsoft/graphrag/global_search/`.
 

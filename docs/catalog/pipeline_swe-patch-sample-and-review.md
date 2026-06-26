@@ -7,7 +7,7 @@ N action-rollouts (each producing a candidate patch via file-edit + run-
 test loop), then a reviewer model judges the N candidates and picks
 the best patch.
 
-Verified by Open Harness Hub clone: SWE-agent's
+Verified by OpenHubForAI clone: SWE-agent's
 `sweagent/agent/{agents,reviewer,history_processors,action_sampler}.py`
 implements exactly this.
 

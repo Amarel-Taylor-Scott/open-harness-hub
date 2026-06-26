@@ -8,7 +8,7 @@ different branch or task simultaneously without conflicting. A CLI-driven
 harness that spawns N tmux-backed agent sessions, monitors their state, and
 merges or reviews outcomes. Suited for fan-out code tasks: parallel
 refactors, multi-file feature generation, independent test authoring, or
-running this very Open Harness Hub breadth-factory batch.
+running this very OpenHubForAI breadth-factory batch.
 
 Reference/integration contract only; verify the upstream license before
 bundling.

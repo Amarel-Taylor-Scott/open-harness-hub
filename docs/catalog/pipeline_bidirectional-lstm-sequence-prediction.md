@@ -8,7 +8,7 @@ pressure prediction, classic NLP toxic comment classification,
 signal classification, EEG time-series. Often combined with 1D-CNN
 for local feature extraction before recurrent layers.
 
-Verified by Open Harness Hub mining: theoviel Deep Learning Starter
+Verified by OpenHubForAI mining: theoviel Deep Learning Starter
 Simple LSTM (1166 votes, Ventilator Pressure Prediction), tenffe
 finetune of TensorFlow Bidirectional LSTM (668 votes, same comp),
 tanulsingh077 Deep Learning For NLP Zero To Transformers + BERT

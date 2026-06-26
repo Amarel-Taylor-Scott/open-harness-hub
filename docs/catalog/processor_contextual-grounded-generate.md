@@ -3,7 +3,7 @@
 *processor* · `processor/contextual-grounded-generate` · v0.1.0 · experimental
 
 GOVERNED ADAPTER that WRAPS Contextual AI's hosted Grounded Language
-Model (`POST /v1/generate`) as an Open Harness Hub processor component.
+Model (`POST /v1/generate`) as an OpenHubForAI processor component.
 This is a thin wrapper over a third-party best-of-breed engine — OHH
 does NOT rebuild it. The GLM takes `messages[]` plus a `knowledge[]`
 array, prioritizes the supplied retrievals over its parametric memory,

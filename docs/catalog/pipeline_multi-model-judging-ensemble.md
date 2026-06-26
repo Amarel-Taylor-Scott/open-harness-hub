@@ -7,7 +7,7 @@ Gemma-7B / Llama-3-8B), score each model's prediction with a
 perplexity baseline, then majority-vote or weighted-blend for final
 output.
 
-Verified by Open Harness Hub mining of aatiffraz's
+Verified by OpenHubForAI mining of aatiffraz's
 "Prompt Prediction w/ Mixtral/Mistral7B/Gemma/Llama" (640 votes).
 
 | axis | value |

@@ -9,7 +9,7 @@ pre-stage. The dominant CommonLit essay-scoring shape — combines
 the semantic power of a transformer with the gradient-boosted-tree
 stability for the final regression head.
 
-Verified by Open Harness Hub mining: cody11null Tuned DeBERTaV3+LGBM
+Verified by OpenHubForAI mining: cody11null Tuned DeBERTaV3+LGBM
 +autocorrect (803 votes, CommonLit Evaluate Student Summaries),
 tsunotsuno [updated] DeBERTaV3+LGBM with spell autocorrect (519
 votes, same competition). 2-of-top-2 essay-grading kernels use

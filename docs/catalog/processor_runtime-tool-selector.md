@@ -7,7 +7,7 @@ the top-K most likely-relevant tools to expose to the model. Avoids
 overflowing the context window with every tool definition when only
 a few apply.
 
-Verified by Open Harness Hub clone: implemented at
+Verified by OpenHubForAI clone: implemented at
 `pydantic/pydantic-ai/_tool_search.py` (Toolformer-style).
 
 | axis | value |

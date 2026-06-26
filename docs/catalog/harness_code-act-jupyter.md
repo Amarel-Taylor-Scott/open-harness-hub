@@ -9,7 +9,7 @@ next turn. Loop terminates when the model emits a `<final>...
 </final>` block or `max_tool_turns` is reached.
 
 The classic AIMO-2 + ChartQA + math-reasoning shape, verified by
-Open Harness Hub mining: itahiro DeepSeek-R1-distill-7B (1399
+OpenHubForAI mining: itahiro DeepSeek-R1-distill-7B (1399
 votes), lewtun "Updated Code Interpretation" (1173), abdurrafae
 (1001), mbmmurad QwQ-32B (1097).
 

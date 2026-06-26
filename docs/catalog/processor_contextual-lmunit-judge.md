@@ -3,7 +3,7 @@
 *processor* · `processor/contextual-lmunit-judge` · v0.1.0 · experimental
 
 GOVERNED ADAPTER that WRAPS Contextual AI's LMUnit evaluation model
-(`POST /lmunit`) as an Open Harness Hub processor component, selectable
+(`POST /lmunit`) as an OpenHubForAI processor component, selectable
 as the judge model behind OHH's `processor/llm-judge` and the rubric
 tree. This is a thin wrapper over a third-party best-of-breed engine —
 OHH does NOT rebuild it. LMUnit takes {query, response, unit_test}

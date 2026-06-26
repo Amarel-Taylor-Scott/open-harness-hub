@@ -7,7 +7,7 @@ perspectives → run simulated dialogue per persona to curate
 knowledge → outline → parallel-expand each outline section →
 polish into final article.
 
-Verified by Open Harness Hub clone: `stanford-oval/storm` —
+Verified by OpenHubForAI clone: `stanford-oval/storm` —
 `knowledge_storm/storm_wiki/modules/{persona_generator,knowledge_curation,outline_generation,article_generation,article_polish}.py`.
 
 | axis | value |

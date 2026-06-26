@@ -30,7 +30,7 @@ The twelve factors:
  12. Make your agent a stateless reducer — (state, event) -> new state, so
     runs are replayable and testable.
 
-In Open Harness Hub terms these map onto harnesses (own the prompt/model
+In OpenHubForAI terms these map onto harnesses (own the prompt/model
 boundary), tools (structured outputs), pipelines (own the control flow),
 review tickets (contact humans), and replayable run records (stateless
 reducer).

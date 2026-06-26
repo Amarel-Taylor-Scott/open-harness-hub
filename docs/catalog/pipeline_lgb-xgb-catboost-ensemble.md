@@ -7,7 +7,7 @@ CatBoost separately on the same features, blend predictions
 (weighted-mean / rank-mean / stacking). K-fold CV (typically 5-10
 StratifiedKFold) for both training + ensemble weight selection.
 
-Verified by Open Harness Hub mining: yuanzhezhou baseline LGB+XGB+
+Verified by OpenHubForAI mining: yuanzhezhou baseline LGB+XGB+
 CatBoost (1417 votes, Optiver 2023), suvroo Optuna|XGBoost|klib
 (205 votes, PS4E7), jetakow Home Credit 2024 (5098 votes — highest
 vote count in any kernel we've mined!), greysky Home Credit baseline

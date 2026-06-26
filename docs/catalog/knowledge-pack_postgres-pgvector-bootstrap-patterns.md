@@ -2,7 +2,7 @@
 
 *knowledge-pack* · `knowledge-pack/postgres-pgvector-bootstrap-patterns` · v0.1.0 · experimental
 
-Deployment and readiness patterns for using Postgres plus pgvector as the canonical store for generated Open Harness Hub objects.
+Deployment and readiness patterns for using Postgres plus pgvector as the canonical store for generated OpenHubForAI objects.
 
 | axis | value |
 |---|---|

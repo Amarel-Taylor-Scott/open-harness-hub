@@ -2,7 +2,7 @@
 
 *pipeline* · `pipeline/hybrid-postgres-bigquery-hosting-plan` · v0.1.0 · experimental
 
-Builds a low-cost hosting blueprint that keeps hot Open Harness Hub product state in Postgres/pgvector, raw shards in object storage, and cold analytics/vector workloads in BigQuery.
+Builds a low-cost hosting blueprint that keeps hot OpenHubForAI product state in Postgres/pgvector, raw shards in object storage, and cold analytics/vector workloads in BigQuery.
 
 | axis | value |
 |---|---|
