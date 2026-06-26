@@ -41,6 +41,13 @@ DEFAULT_POSTGRES_LOAD_SQL = "dist/sql/factory-load.sql"
 DEFAULT_LOCAL_POSTGRES_DATABASE_URL = "postgresql://open_harness:open_harness_dev@localhost:5432/open_harness_hub"
 MANAGED_POSTGRES_PGVECTOR_URL_PLACEHOLDER = "<managed-postgres-url-with-pgvector>"
 DEFAULT_DATABASE_URL_ENV = "DATABASE_URL"
+# Operational Postgres DSN env vars, checked IN ORDER (single source for the RecordStore + durable
+# fleet-ledger cloud backends — never re-type these names). OH_PG_DSN is the deployment/staging-specific
+# override; DATABASE_URL is the platform default. When neither is set, the libpq PG* environment
+# (PGHOST/PGDATABASE/PGUSER/...) is honored by the driver via an empty DSN.
+OH_PG_DSN_ENV = "OH_PG_DSN"
+POSTGRES_DSN_ENV_VARS: tuple[str, ...] = (OH_PG_DSN_ENV, DEFAULT_DATABASE_URL_ENV)
+LIBPQ_PG_ENV_PREFIX = "PG"  # libpq connection-parameter env prefix (PGHOST/PGPORT/PGUSER/PGDATABASE/...)
 
 # --- Baltor admin-demo runtime settings ------------------------------------
 # The admin demo remains a lightweight script, but its runtime knobs are

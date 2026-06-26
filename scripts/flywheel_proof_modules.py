@@ -1019,6 +1019,13 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("src/teleon/tuning/action_ledger.py", "action_ledger"),
     ("src/teleon/tuning/tuner.py", "tuner"),
     ("src/teleon/storage/git_record_store.py", "git_record_store"),
+    # ── OPERATIONAL CLOUD BACKEND WIRED: PostgresRecordStore (same RecordStore port as LocalRecordStore —
+    #    content-addressed O(1) idempotency via ON CONFLICT, parameterized SQL) replaces _UnwiredCloudStore
+    #    for the operational tier, and PostgresFleetLedger claims with FOR UPDATE SKIP LOCKED + LIMIT 1 so N
+    #    workers claim concurrently WITHOUT serializing (the SQLite BEGIN IMMEDIATE path stays the default).
+    #    Offline: imports + interface parity + parameterization (injection sentinel stays in params) +
+    #    honest refusal without a DSN; live OH_PG_DSN round-trip otherwise skips honestly. serves_truth=false ──
+    ("scripts/check_postgres_record_store.py", "check_postgres_record_store"),
     ("src/teleon/storage/sync_engine.py", "sync_engine"),
     ("src/teleon/infra/scale_ports.py", "scale_ports"),
     ("src/teleon/examples/product_pipelines.py", "product_pipelines"),
