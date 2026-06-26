@@ -14,9 +14,10 @@
 > leakage, real sales/marketing copy.
 
 
-## 1. Design tokens — the color palette, type scale, spacing, radii, shadows, the 5 per-brand accents
 
-_source path in the repo: `web/teleon/kit/oh-tokens.css` (verbatim below; you do not need the repo)_
+## 1. Design tokens — palette, type scale, spacing, radii, shadows, the 5 accents
+
+_source: `web/teleon/kit/oh-tokens.css` (verbatim below; you do not need the repo)_
 
 ```css
 /* ============================================================
@@ -599,9 +600,9 @@ html, body { font-family: var(--font-sans, "Inter", -apple-system, "Segoe UI", s
 
 ```
 
-## 2. Component styles — buttons, cards, inputs, badges, tables, the atoms
+## 2. Component styles — buttons, cards, inputs, badges, the atoms
 
-_source path in the repo: `web/teleon/kit/oh-components.css` (verbatim below; you do not need the repo)_
+_source: `web/teleon/kit/oh-components.css` (verbatim below; you do not need the repo)_
 
 ```css
 /* ============================================================
@@ -1106,9 +1107,9 @@ _source path in the repo: `web/teleon/kit/oh-components.css` (verbatim below; yo
 
 ```
 
-## 3. Layout / site styles — the top bar, hero, sections, the OhAppShell left-sidebar logged-in shell
+## 3. Layout + site styles — OhTopBar, hero, sections, OhAppShell, and the new OhLayout + OhTable
 
-_source path in the repo: `web/teleon/kit/oh-site.css` (verbatim below; you do not need the repo)_
+_source: `web/teleon/kit/oh-site.css` (verbatim below; you do not need the repo)_
 
 ```css
 /* =============================================================================
@@ -1587,11 +1588,35 @@ _source path in the repo: `web/teleon/kit/oh-site.css` (verbatim below; you do n
   .ohs-top-nav { display: none; }
 }
 
+/* ---------- OhLayout: the standardized page skeleton (variant = sidebar | one-col | two-col | no-sidebar) ---------- */
+.ohl { display: flex; flex-direction: column; min-height: 100vh; }
+.ohl-body { flex: 1 0 auto; padding: 56px 0; }
+.ohl-body.ohl-one .ohs-wrap { max-width: 820px; }          /* centered, readable single column */
+/* .ohl-full uses the default .ohs-wrap site width (full width) */
+.ohl-two-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 44px; align-items: start; }
+.ohl-aside { position: sticky; top: 88px; }
+.ohl-empty { padding: 40px; text-align: center; color: var(--fg-muted); border: 1px dashed var(--line); border-radius: var(--r-lg); }
+@media (max-width: 900px) { .ohl-two-grid { grid-template-columns: 1fr; } .ohl-aside { position: static; } }
+
+/* ---------- OhTable: the standardized data table ---------- */
+.ohl-tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--bg); }
+.ohl-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.ohl-table th { text-align: left; padding: 12px 16px; color: var(--fg-muted); font-weight: 600; white-space: nowrap;
+                border-bottom: 1px solid var(--line); background: var(--bg-subtle); }
+.ohl-th-sort { cursor: pointer; user-select: none; }
+.ohl-th-sort:hover { color: var(--fg); }
+.ohl-caret { color: var(--accent); }
+.ohl-table td { padding: 12px 16px; border-bottom: 1px solid var(--line); color: var(--fg); vertical-align: top; }
+.ohl-table tr:last-child td { border-bottom: 0; }
+.ohl-row-click { cursor: pointer; }
+.ohl-row-click:hover td { background: var(--bg-subtle); }
+.ohl-table--dense td, .ohl-table--dense th { padding: 7px 12px; }
+
 ```
 
-## 4. The shared kit components (React) — OhTopBar/OhHero/OhSection/OhFeatures/OhBand/OhFooter/OhAppShell + useHashRoute/navigate
+## 4. The shared kit components — header/footer/sections/pages + the new OhLayout (layout chooser) and OhTable
 
-_source path in the repo: `web/teleon/kit/oh-site.jsx` (verbatim below; you do not need the repo)_
+_source: `web/teleon/kit/oh-site.jsx` (verbatim below; you do not need the repo)_
 
 ```jsx
 /* global React */
@@ -1896,6 +1921,72 @@ function OhRollup({ items }) {
   return (
     <div className="ohs-rollup">
       {items.map(([k, v]) => <div className="oh-card ohs-roll" key={k}><div className="v">{v}</div><div className="k">{k}</div></div>)}
+    </div>
+  );
+}
+
+// ---------- LAYOUT PRIMITIVE: the standardized page skeleton ----------
+// One skeleton for every page. `variant` picks the body layout; it composes the existing OhTopBar / OhAppShell /
+// OhFooter so there is exactly one place a page declares its shape.
+//   'sidebar'    -> the left-sidebar app shell (logged-in app); pass `sidebar` = the OhAppShell nav.
+//   'one-col'    -> centered single readable column (docs, settings, simple forms).
+//   'two-col'    -> main content + a sticky `aside` (content with a rail).
+//   'no-sidebar' -> full-width content (marketing, wide tables / browsers).
+function OhLayout({ variant = 'one-col', brand, nav, sidebar, cta, signInHref, theme, onToggle,
+                   footer = true, footerProps, aside, children }) {
+  if (variant === 'sidebar') {
+    return (
+      <OhAppShell brand={brand} nav={sidebar} cta={cta} theme={theme} onToggle={onToggle}>{children}</OhAppShell>
+    );
+  }
+  const cls = variant === 'two-col' ? 'ohl-two' : variant === 'no-sidebar' ? 'ohl-full' : 'ohl-one';
+  return (
+    <div className="ohl">
+      <OhTopBar brand={brand} nav={nav} cta={cta} signInHref={signInHref} theme={theme} onToggle={onToggle} />
+      <main className={'ohl-body ' + cls}>
+        <div className="ohs-wrap">
+          {variant === 'two-col'
+            ? <div className="ohl-two-grid"><div className="ohl-main">{children}</div><aside className="ohl-aside">{aside}</aside></div>
+            : children}
+        </div>
+      </main>
+      {footer && <OhFooter brand={brand} {...(footerProps || {})} />}
+    </div>
+  );
+}
+
+// ---------- DATA TABLE PRIMITIVE: standardized, optionally sortable, click-through rows ----------
+// cols: [ {key, label, render?(row), width?, align?, sortable?, sortValue?(row)} ]; rows: [obj];
+// rowKey?(row); onRow?(row); empty?; dense?.  Used by the OpenHubForAI record browsers and the AIDevObserver lists.
+function OhTable({ cols, rows, rowKey, onRow, empty = 'No records.', dense }) {
+  const [sort, setSort] = React.useState(null);
+  const sorted = React.useMemo(() => {
+    if (!sort) return rows || [];
+    const c = cols.find((x) => x.key === sort.key);
+    const get = (r) => (c && c.sortValue ? c.sortValue(r) : r[sort.key]);
+    return [...(rows || [])].sort((a, b) => {
+      const av = get(a), bv = get(b);
+      const r = av < bv ? -1 : av > bv ? 1 : 0;
+      return sort.dir === 'desc' ? -r : r;
+    });
+  }, [rows, sort, cols]);
+  const toggle = (key) => setSort((s) => (s && s.key === key ? (s.dir === 'asc' ? { key, dir: 'desc' } : null) : { key, dir: 'asc' }));
+  if (!rows || !rows.length) return <div className="ohl-empty">{empty}</div>;
+  return (
+    <div className="ohl-tablewrap">
+      <table className={'ohl-table' + (dense ? ' ohl-table--dense' : '')}>
+        <thead><tr>{cols.map((c) => (
+          <th key={c.key} style={{ width: c.width, textAlign: c.align }} className={c.sortable ? 'ohl-th-sort' : ''}
+              onClick={c.sortable ? () => toggle(c.key) : undefined}>
+            {c.label}{c.sortable && sort && sort.key === c.key && <span className="ohl-caret">{sort.dir === 'asc' ? ' ▲' : ' ▼'}</span>}
+          </th>
+        ))}</tr></thead>
+        <tbody>{sorted.map((r) => (
+          <tr key={rowKey ? rowKey(r) : r.id} className={onRow ? 'ohl-row-click' : ''} onClick={onRow ? () => onRow(r) : undefined}>
+            {cols.map((c) => <td key={c.key} style={{ textAlign: c.align }}>{c.render ? c.render(r) : r[c.key]}</td>)}
+          </tr>
+        ))}</tbody>
+      </table>
     </div>
   );
 }
@@ -2816,7 +2907,7 @@ function OhCommandK({ commands, placeholder, label }) {
 Object.assign(window, {
   useHashRoute, navigate, useSiteTheme,
   OhLogo, OhThemeToggle, OhTopBar, OhPortfolioMenu, OhHero, OhSection, OhFeatures, OhBand, OhFooter,
-  OhAppShell, OhPageHead, OhRollup,
+  OhAppShell, OhPageHead, OhRollup, OhLayout, OhTable,
   OhAuth, OhContact, OhPricing, OhBilling, OhUsage, OhSettings, OhSwitch,
   OhDashboard, OhApiKeys, OhTeam, OhAuditLog, OhDocs,
   OhOnboarding, OhNotifications, OhStatus, OhChangelog, OhLegal, OhNotFound, OhAbout,
@@ -2826,9 +2917,9 @@ Object.assign(window, {
 
 ```
 
-## 5. Portfolio config + per-brand accents (the 5 surfaces, their accents, cross-links)
+## 5. Portfolio config + per-brand accents
 
-_source path in the repo: `web/teleon/kit/products.js` (verbatim below; you do not need the repo)_
+_source: `web/teleon/kit/products.js` (verbatim below; you do not need the repo)_
 
 ```js
 /* =============================================================================
@@ -3123,11 +3214,11 @@ _source path in the repo: `web/teleon/kit/products.js` (verbatim below; you do n
 
 ```
 
-## 6. A COMPLETE worked example — the Teleon surface (boot + app + app-specific CSS)
+## 6. A COMPLETE worked example — the Teleon surface
 
-## 6a. index.html — the boot skeleton (vendor scripts, kit imports, the babel module, id=root)
+## 6a. index.html — the boot skeleton
 
-_source path in the repo: `web/teleon/index.html` (verbatim below; you do not need the repo)_
+_source: `web/teleon/index.html` (verbatim below; you do not need the repo)_
 
 ```html
 <!doctype html>
@@ -3172,9 +3263,9 @@ window.OHH_EVENTS_BASE = '/analytics';
 
 ```
 
-## 6b. teleon-main.jsx — the full marketing app built on the shared kit
+## 6b. teleon-main.jsx — the full app on the shared kit
 
-_source path in the repo: `web/teleon/teleon-main.jsx` (verbatim below; you do not need the repo)_
+_source: `web/teleon/teleon-main.jsx` (verbatim below; you do not need the repo)_
 
 ```jsx
 /* global React, ReactDOM, PRODUCTS, PORTFOLIO,
@@ -3628,9 +3719,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 
 ```
 
-## 6c. teleon.css — the surface-specific styles layered over the kit
+## 6c. teleon.css — the surface-specific styles
 
-_source path in the repo: `web/teleon/teleon.css` (verbatim below; you do not need the repo)_
+_source: `web/teleon/teleon.css` (verbatim below; you do not need the repo)_
 
 ```css
 /* =============================================================================
