@@ -1,5 +1,9 @@
 # CLAUDE.md - Open Harness Hub Agent Instructions
 
+> **READ `docs/BIBLE.md` FIRST** — the single north-star reference (vision · the 5 pillars · the ~35 Open\*Hub surfaces
+> + 103 registries · assumptions · guardrails · laws · contracts · hooks · tools). This file (CLAUDE.md) is the agent
+> operating layer; the BIBLE is the canonical *what + why*. If they ever disagree, the BIBLE wins.
+
 This file is for Claude Code, Claude desktop/browser agents, and any Claude 4.x/4.8/4.7-style workflow that opens this repository. Follow `AGENTS.md` first; this file adds speed and organization rules for scaling Open Harness Hub.
 
 ## Portfolio (owner-decided 2026-06-06; updated 2026-06-09 — read FIRST)
