@@ -49,10 +49,14 @@ a truth authority — Baltor governs truth, Teleon runs capabilities.
 - **Competitive provider mappings** (`architecture/competitive_provider_mappings.json`): Crusoe/Nscale→Execution
   backend, **Fireworks→live inference-gateway candidate node**, Cursor/Cognition→sandboxed CodegenAgent, etc. — all
   candidates behind ports, output never truth. Market map: `research/companies/_market-map.md`.
-- **AI Done Right design-family proof implemented**: parent + Baltor + Teleon + 21 Open*Hubs
-  (9 live + 12 private bench, full five-stage Baltor method spine) verified by
-  `python3 scripts/check_ai_done_right_surface_family.py --self-test`. Baltor SPA remains on `dir-d` teal +
-  Hanken Grotesk + IBM Plex Mono + the canonical shared card primitive/scale (`web/baltor/styles/*`).
+- **Canonical 5-surface consolidation (2026-06-26)**: the fragmented site systems (dark/Hanken demos +
+  light/Inter showcase + portfolio duplicates) collapsed to ONE config-driven scaffolding
+  (`scripts/surface_server.py`) → **5 surfaces, 5 URLs** — AI Done Right (hub) · Teleon · Baltor · AIDevObserver ·
+  OpenHubForAI — sharing a **byte-identical** light/Inter stylesheet (per-surface accent + copy the only
+  difference), each with `/demo`, OpenHubForAI carrying the faceted `/browse` over the registries.
+  Playwright-verified live (font=Inter, bg=`#faf7f0`, 0 console errors). Full design reference:
+  `docs/DESIGN-BIBLE.md`; enforced by `scripts/check_surface_server.py`. The full hub catalog is still tracked by
+  `python3 scripts/check_ai_done_right_surface_family.py --self-test`.
 - **Sales safety gate** (`src/baltor/sales/claim_guard.py`) + a configurable Chatbot Guardrail Audit
   (`src/baltor/sales/diagnostics/`) — appears-not-illegal, private-first, authorized-inputs-only, draft-only outreach.
 

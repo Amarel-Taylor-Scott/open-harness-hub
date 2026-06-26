@@ -1,5 +1,11 @@
 # Portfolio Web Surface Inventory — Operational web pages, views, routes, and primitives
 
+> **⚠ SUPERSEDED for the LIVE surfaces (2026-06-26).** The live product surfaces are now ONE canonical
+> scaffolding — `scripts/surface_server.py` → **5 surfaces** (AI Done Right · Teleon · Baltor · AIDevObserver ·
+> OpenHubForAI), one byte-identical light/Inter design system, 5 URLs. Current truth: **`docs/DESIGN-BIBLE.md`**
+> (the design reference) + `docs/CURRENT-STATE.md`. This file is kept for lineage as the historical 2026-06-09
+> inventory of the earlier fragmented `web/` + `dist/sites/` surfaces (those fragmented systems are retired).
+
 _Snapshot: 2026-06-09. This is the operational web/runtime inventory built by sweeping the repo (web/,
 websites/, generated `dist/sites/`, scripts/baltor_admin_demo_server.py, scripts/portfolio_lib.py,
 web/baltor/styles/, docs/concepts/). It is not the full AI Done Right design-family catalog. For the current

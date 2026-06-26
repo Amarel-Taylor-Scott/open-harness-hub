@@ -61,7 +61,10 @@ Portal; object = **PurposeTask** (formal synonym **CapabilityTask**). Brand doc:
   context. Consumption flows up; dependency points down. AIDevObserver watches the usage.
 - **Hosting:** Teleon + Baltor deploy same region/private network (low latency) but stay **separable** (separate
   service/data/identity/IaC + a versioned API + graceful local fallback).
-- **One launcher** (`scripts/landing_server.py`) links every live surface; it reads tunnel URLs per request.
+- **One canonical scaffolding** (`scripts/surface_server.py`, owner-decided 2026-06-26): all **5 product surfaces**
+  render from ONE config-driven template + ONE byte-identical stylesheet (light · Inter · per-surface accent only),
+  each on its own URL — AI Done Right is the hub, OpenHubForAI carries the faceted `/browse`, every surface has `/demo`.
+  Cross-surface nav reads `dist/surface-urls.json`. Full design reference: `docs/DESIGN-BIBLE.md`.
 
 ---
 
@@ -173,8 +176,10 @@ Execution / Optimization / Verification). By name:
 4. **Change Verification (warrant before change)** — every change carries a warrant: clear user intent, ≥2 agreeing
    sources, or an established principle. Design/brand/strategy/pricing → NEVER a unilateral single-agent call.
    `docs/codex/change-verification-contract.md`.
-5. **Northstar design** — no placeholders / dummy / orphaned / SIDE designs in any surface; the four products share ONE
-   design system (same layout/HTML/CSS/fonts, differ only in color + copy). Enforced: `scripts/check_northstar_design.py`.
+5. **Northstar design** — no placeholders / dummy / orphaned / SIDE designs in any surface; the **five surfaces** render
+   from ONE canonical scaffolding (`scripts/surface_server.py`) sharing a **byte-identical** stylesheet (light · Inter),
+   differing ONLY by per-surface accent + copy. Reference: `docs/DESIGN-BIBLE.md`. Enforced:
+   `scripts/check_surface_server.py` (byte-identical CSS) + `scripts/check_northstar_design.py`.
 6. **Capability-Gap admission** — build for the NEGATIVE space; a component must lift AND the lift must be structural
    (`scripts/eval/reason_codes.py`, `scripts/eval/durable_gap_harness.py`).
 7. **Code-graph change audit** — before/after editing a `.py`, audit its strong neighbors:
