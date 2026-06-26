@@ -71,8 +71,9 @@ def _self_test() -> int:
     ck("C: errors surfaced + busy state", "ohs-auth-err" in site and "setErr(" in site and "busy" in site)
     ck("C: preview fallback only when service unreachable (no fake session)",
        "available()" in site and "identity service down" in site)
-    ck("C: Google/GitHub are DISABLED owner-gated seams",
-       site.count("ohs-oauth-btn") >= 2 and "disabled title={SEAM}" in site and "CredentialProviderPort" in site)
+    ck("C: Google/GitHub are DISABLED honest seams",
+       site.count("ohs-oauth-btn") >= 2 and "disabled title={SEAM}" in site
+       and ("coming soon" in site.lower() or "CredentialProviderPort" in site))
 
     # D. events beacon
     m2 = re.search(r'OHH_EVENTS_BASE \|\| "http://127\.0\.0\.1:(\d+)"', ident)

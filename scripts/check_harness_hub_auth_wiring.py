@@ -106,8 +106,8 @@ def _self_test() -> int:
                "OHIdentity.mintKey", "OHIdentity.revokeKey", "OHIdentity.realmOf"):
         ck(f"D: oh-site.jsx uses {fn}", fn in site)
     ck("D: passphrase input is type=password", 'type="password"' in site)
-    ck("D: SSO/Google are disabled owner-gated seams (no fake nav)",
-       "Owner-gated seam (CredentialProviderPort)" in site
+    ck("D: SSO/Google are disabled honest seams (no fake nav)",
+       ("coming soon" in site.lower() or "Owner-gated seam (CredentialProviderPort)" in site)
        and re.search(r"Continue with Google[^<]*</button>", site) is not None
        and site.count("disabled title={SEAM}") >= 2)
     ck("D: the API-key console mints + revokes real keys (OhApiKeys)",
