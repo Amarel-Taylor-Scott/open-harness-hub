@@ -68,6 +68,13 @@ surfaces (names stay as section labels). The BACKEND keeps per-hub/registry **da
 datasets/databases) — only the UI/UX is unified. One storefront, many catalogs. (NOT `OpenAIHub.io` — OpenAI
 trademark.) This also retires the OpenHarnessHub-prominence question: with one site, no hub is privileged.
 
+**FLEXIBLE FACETS, not rigid stores (owner 2026-06-25):** the browsable unit is the **RECORD** (a tool, model, prompt,
+skill, dataset…). The hubs + registries become **facets** of one faceted catalog — browse/filter by category (the old
+hub names, as collections), registry type (the 103), kind (static/discovery/meta), layer, and status, plus full-text
+search. A record may sit under **multiple** categories — the rigid one-record-one-hub `maps_to_hub` becomes a PRIMARY
+category, not an exclusive home. Backed by the existing federated search (`src/teleon/registry/search.py`) + `RegistryPort`
+(`src/teleon/registry/port.py`) — do NOT rebuild the search; build the browse UI over it.
+
 **TWO LAYERS — don't conflate them** (this is the count people get wrong):
 
 **Hub = storefront · registry = catalog behind it.** A hub is a *surface* — a branded open storefront with a domain
