@@ -9,13 +9,40 @@ order, then design.
    the SAFE-vs-LOCKED handoff (§11). This is the #1 read; everything else is orientation.
 2. **`scripts/surface_server.py`** — THE live renderer. Its `_CSS_TEMPLATE` constant is the single stylesheet every
    surface ships **byte-identical** (~7959 chars); only the per-surface `--accent` + copy differ. The `render_*`
-   helpers emit the HTML.
+   helpers emit the HTML. (The rewritten `docs/DESIGN-BIBLE.md` makes the full `web/<app>/` apps, served by the
+   showcase, the canonical product; `surface_server.py` is now a lightweight fallback. See the Framework section below.)
 3. **The 5 live URLs** (below) — see it rendered. Or run `python3 scripts/surface_server.py <surface-id>` locally.
 4. **`dist/sites/openharness-design/`** — the richer, high-fidelity REFERENCE bundle the canonical tokens derive
    from (start at `START-HERE-CLAUDE-CODE.md`). This is what you elevate *toward*.
 
 Then: `FAMILY-README.md` + `HANDOFF.md` (next to this file) for family shape, the Baltor method spine, and
 production gaps.
+
+## Framework, kit, and page skeletons (build pages without guessing)
+
+`docs/DESIGN-BIBLE.md` now carries concrete, copy-paste HTML and JSX so you can build a page without inventing an API.
+Read these three, in order:
+
+1. **`docs/DESIGN-BIBLE.md` sections 7, 8, 9.** Section 7 (Page skeletons) has the exact boot HTML, a full marketing
+   page, and a full logged-in `OhAppShell` page, all copy-pasteable. Section 8 (Framework and scaffolding) has the
+   stack (React 18 plus in-browser Babel), the hash-router contract (`useHashRoute()` returns the route,
+   `navigate(to)` sets the hash), and how the showcase serves it. Section 9 (Scaffolding primitives) is the
+   how-to-add-X recipes: a new surface, a new marketing page, a new logged-in view, a new shared component.
+2. **The kit itself.** `web/teleon/kit/oh-site.jsx` is the shared components and hooks (`OhTopBar`, `OhHero`,
+   `OhSection`, `OhFeatures`, `OhBand`, `OhFooter`, `OhAppShell`, `OhPageHead`, `OhRollup`, plus
+   `useHashRoute`/`navigate`/`useSiteTheme`); `web/teleon/kit/oh-tokens.css` is the token palette. The reference app
+   is `web/teleon/index.html` plus `web/teleon/teleon-main.jsx`.
+3. **`docs/INTEGRATION-BIBLE.md`.** The frontend-to-backend seam: a page calls a same-origin path
+   (`/api/<service>/...` or `/registry/...`) and the showcase routes it to the backend, so the page code is the same
+   locally and in the cloud.
+
+**The canonical build stack (per `docs/DESIGN-BIBLE.md` section 1).** The shipped product is the set of full apps
+under `web/<app>/` (`context-is-everything`, `teleon`, `baltor`, `harness-hub`, `aidevobserver`), served by
+`python3 -m scripts.showcase` (the `OH_PRODUCT` env picks `web/<product>/`), over the shared kit in `web/<app>/kit/`
+(`oh-site.jsx`, `oh-tokens.css`, `oh-components.css`, `oh-site.css`, `products.js`). Framework: React 18 plus ReactDOM
+plus in-browser Babel (all vendored at `/vendor/`), JSX as `<script type="text/babel">`, hash routing via the kit.
+Light theme, Inter, one per-brand accent. `scripts/surface_server.py` is a lightweight fallback renderer, not the
+canonical one. The kit top bar has no portfolio dropdown and always shows a `Demo` nav link.
 
 ## The 5 surfaces + accents + live URLs
 
@@ -53,5 +80,5 @@ change propagates to all 5. After any change: `python3 scripts/check_surface_ser
 - **Inter UI + `ui-monospace`** as the canonical fonts (resizing within the scale is fine; changing the type
   *system* needs owner intent).
 
-Full detail for every line above: **`docs/DESIGN-BIBLE.md`** §11. `serves_truth = false` (candidate output, not
+Full detail for every line above: **`docs/DESIGN-BIBLE.md`** §12 (the SAFE-vs-LOCKED handoff). `serves_truth = false` (candidate output, not
 verified truth; a BYO key is used only for the request, never stored or logged).

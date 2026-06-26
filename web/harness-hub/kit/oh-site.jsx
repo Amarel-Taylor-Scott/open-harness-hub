@@ -109,9 +109,11 @@ function OhTopBar({ brand, nav, cta, signInHref, theme, onToggle }) {
   return (
     <header className="ohs-top">
       <OhLogo brand={brand} />
-      <OhPortfolioMenu />
       <span className="ohs-spacer" />
-      {nav && <nav className="ohs-top-nav">{nav.map(([l, h]) => <a key={l} onClick={() => navigate(h)}>{l}</a>)}</nav>}
+      <nav className="ohs-top-nav">
+        {nav && nav.map(([l, h]) => <a key={l} onClick={() => navigate(h)}>{l}</a>)}
+        <a key="__demo" style={{ fontWeight: 600 }} onClick={() => navigate('/demo')}>Demo</a>
+      </nav>
       <div className="ohs-top-r">
         {onToggle && <OhThemeToggle theme={theme} onToggle={onToggle} />}
         {signInHref && <a className="ohs-navlink" onClick={() => navigate(signInHref)}>Sign in</a>}

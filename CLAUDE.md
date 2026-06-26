@@ -40,6 +40,27 @@ cross-service consumption. For local testing without paid cloud, read
 Canonical portfolio architecture remains:
 `docs/strategy/teleon-baltor-openharnesshub-portfolio.md`.
 
+## Surfaces: serve the BUILT-OUT apps, never a basic replacement (read before touching any web surface)
+
+The 5 product surfaces are the full apps in `web/{context-is-everything (AI Done Right), teleon, baltor,
+harness-hub (OpenHubForAI), aidevobserver}`, served by the **showcase** (`OH_PRODUCT=<brand> python3 -m
+scripts.showcase --port N` → `WEB_DIR=web/<OH_PRODUCT>`) over the shared kit (`web/<app>/kit/`), wired to the
+service-plane backends through same-origin **seams** (`/api/identity/`, `/registry/`, `/api/teleon/`,
+`/api/observer/`, …). Design system: `docs/DESIGN-BIBLE.md`. Frontend↔backend + local/cloud: `docs/INTEGRATION-BIBLE.md`.
+Full contract: `docs/codex/surface-and-development-contract.md`.
+
+- **NEVER build a new basic/skinny replacement server for a surface.** Serving a hand-built rich app with a static
+  stub (no backend) is the recurring failure mode — `scripts/surface_server.py` (fallback only) and the deleted
+  `web_app_server.py` were exactly this mistake. Serve the built-out app via the showcase; if a backend call 501s,
+  wire the **seam + a service-plane service**, never stub it.
+- **Before serving/tunneling a surface:** confirm it is the rich built-out app (`du -sh web/<app>`; grep for
+  login/dashboard/control-tower) AND that the backends are wired (Playwright: rich content + **0 console errors**).
+  A page that renders but 501s on its API calls is NOT done.
+- **A new frontend↔backend integration** = a service-plane service + a seam + `fetch('/api/<x>/...')`, never a
+  hardcoded host (`docs/INTEGRATION-BIBLE.md` §4).
+- **Reuse-first:** before building any surface/server/engine, check it already exists (the showcase, the service-plane,
+  the shared kit). "This already exists, don't rebuild it" is the highest-ROI decision.
+
 A holding company owns three product layers. **Teleon** (`teleon.dev`, domain owned) = the purpose-driven,
 eval-gated, self-adaptive compute **runtime SaaS** — it owns PurposeTask/CapabilityTask, runtime selection,
 evidence ledger, promotion/policy gates, boundary approvals, adapters, the assurance dashboard. **Baltor**
