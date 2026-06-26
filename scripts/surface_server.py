@@ -606,18 +606,25 @@ def _make_handler(surface_id: str):
 
 
 def main(argv: list[str]) -> int:
+    import os
     ids = surface_ids()
     positional = [a for a in argv if not a.startswith("--")]
-    surface_id = positional[0] if positional else ""
+    # surface id: a positional arg, else the SURFACE env var (env-only config for containers).
+    surface_id = positional[0] if positional else os.environ.get("SURFACE", "")
     if surface_id not in ids:
-        print("usage: python3 scripts/surface_server.py <surface-id> [--port N]")
+        print("usage: python3 scripts/surface_server.py <surface-id> [--port N]  (or set SURFACE / PORT env)")
         print(f"surface-id must be one of: {', '.join(ids)}")
         return 2
-    port = int(argv[argv.index("--port") + 1]) if "--port" in argv else DEFAULT_PORTS.get(surface_id, 8000)
+    # Cloud-ready binding: --port/--host win, else PORT/HOST env (Cloud Run / Render / Heroku convention),
+    # else the per-surface default. Host defaults to 0.0.0.0 so the same command runs in a container; locally
+    # the TryCloudflare tunnel reaches it on 127.0.0.1 (covered by 0.0.0.0).
+    port = (int(argv[argv.index("--port") + 1]) if "--port" in argv
+            else int(os.environ.get("PORT", DEFAULT_PORTS.get(surface_id, 8000))))
+    host = (argv[argv.index("--host") + 1] if "--host" in argv else os.environ.get("HOST", "0.0.0.0"))
     brand = pillar(surface_id).get("brand", surface_id)
-    print(f"{brand} ({surface_id}) on http://127.0.0.1:{port}  ·  routes: / /demo "
+    print(f"{brand} ({surface_id}) on http://{host}:{port}  ·  routes: / /demo "
           + ("/browse " if surface_id == "open-star-hubs" else "") + "(POST /run)")
-    http.server.ThreadingHTTPServer(("127.0.0.1", port), _make_handler(surface_id)).serve_forever()
+    http.server.ThreadingHTTPServer((host, port), _make_handler(surface_id)).serve_forever()
     return 0
 
 

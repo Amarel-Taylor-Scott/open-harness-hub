@@ -1,5 +1,12 @@
 # Baltor — DESIGN.md
 
+> **Scope note (2026-06-26): this documents the LEGACY `web/baltor` dark "ops console" aesthetic — still the
+> canonical reference for THAT React app (the Baltor SPA), kept verbatim.** The LIVE shipped design is a different,
+> newer system: the 5-surface light theme (Inter UI), rendered **byte-identically** by `scripts/surface_server.py`
+> and documented in **`docs/DESIGN-BIBLE.md`** — read that for the live surfaces. The token tables below are still
+> parsed by `scripts/check_baltor_design_system.py` + `scripts/check_design_tokens.py`, so they stay exactly as-is.
+> `serves_truth = false`.
+
 A single, droppable design-system reference (schema from `VoltAgent/awesome-design-md`, ~87.5k★ —
 verified 2026-06-04). Point any coding agent at this file so agent-generated screens match Baltor's
 shipped aesthetic without a Figma pipeline.

@@ -1,0 +1,39 @@
+# Render blueprint — the 5 AI Done Right surfaces, one web service each (SAME image, only SURFACE + domain differ).
+# Deploy: render.com → New → Blueprint → point at this repo. Map each service to its real domain in the dashboard.
+# The same shape works on Cloud Run / Fly / Railway — set SURFACE + let the platform inject PORT. See docs/architecture/surface-deploy.md.
+services:
+  - type: web
+    name: aidoneright
+    runtime: docker
+    dockerfilePath: ./deploy/surface.Dockerfile
+    envVars:
+      - { key: SURFACE, value: ai-done-right }
+    # domain: aidoneright.dev  (the hub)
+  - type: web
+    name: teleon
+    runtime: docker
+    dockerfilePath: ./deploy/surface.Dockerfile
+    envVars:
+      - { key: SURFACE, value: teleon }
+    # domain: teleon.dev
+  - type: web
+    name: baltor
+    runtime: docker
+    dockerfilePath: ./deploy/surface.Dockerfile
+    envVars:
+      - { key: SURFACE, value: baltor }
+    # domain: baltor.ai
+  - type: web
+    name: aidevobserver
+    runtime: docker
+    dockerfilePath: ./deploy/surface.Dockerfile
+    envVars:
+      - { key: SURFACE, value: aidevobserver }
+    # domain: aidevobserver.dev
+  - type: web
+    name: openhubforai
+    runtime: docker
+    dockerfilePath: ./deploy/surface.Dockerfile
+    envVars:
+      - { key: SURFACE, value: open-star-hubs }
+    # domain: openhubforai.io  (carries the faceted /browse)

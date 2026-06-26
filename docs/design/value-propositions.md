@@ -1,5 +1,9 @@
 # Value propositions — what every surface must say
 
+> Design system (the LIVE surfaces, tokens, components, routes) → **`docs/DESIGN-BIBLE.md`**. This file is the
+> *messaging / value-prop* source; some route names below (e.g. `/preview`, `/flow`, `/c/:slug`) predate the current
+> 5-surface model — see `docs/DESIGN-BIBLE.md` §3 for the live surfaces.
+
 The single source of truth for the product's promise. The `/polish` loop pulls from this to
 make each screen *sell*, not just function. Lead with the proof, not the feature.
 

@@ -5,6 +5,13 @@
 > the designed ports. **Nothing was deleted** (0 surface commits; the 3.2 MB design bundle + `web/` apps are intact),
 > but the pattern must not recur. These rules bind Claude Code, the autonomous loops, and contributors.
 
+> **Update 2026-06-26 (reconcile — the rules below are unchanged):** the canonical BUILT-OUT, shipped surface is now
+> the **standardized 5-surface server `scripts/surface_server.py`** — one config-driven renderer, one byte-identical
+> light-theme stylesheet (accent + copy are the only per-surface variables), enforced by
+> `scripts/check_surface_server.py`. Its full design reference is **`docs/DESIGN-BIBLE.md`**. The `web/` React apps and
+> the `dist/sites/openharness-design/` bundle remain the protected, richer references (rule 1 still applies to them);
+> the surface_server is the live floor a generator must never shadow with a basic regen. `serves_truth = false`.
+
 ## 1. Surface source-of-truth — serve the BUILT-OUT surface, never a basic replacement
 - **Canonical, expensive, protected surfaces (NEVER remove, regress, or shadow with a basic regen):**
   `web/{teleon,baltor,harness-hub,context-is-everything}` (the functional React apps — logins, Control Towers,

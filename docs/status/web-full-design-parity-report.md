@@ -1,5 +1,11 @@
 # PARITY REPORT — full-design transplant into the wired web/ apps
 
+> **Historical snapshot (2026-06-10), kept for lineage — not live status.** This records a point-in-time full-design
+> transplant into the wired `web/` apps + bundle prototypes. For the LIVE shipped surfaces the canonical is now the
+> standardized 5-surface server `scripts/surface_server.py` (one byte-identical light-theme stylesheet, Inter UI)
+> documented in **`docs/DESIGN-BIBLE.md`** — read those for current truth; the body below is the 2026-06-10 record
+> (its "Dark OK" columns describe that earlier transplant, not the current light-theme surfaces). `serves_truth = false`.
+
 Date: 2026-06-10 · Per `dist/sites/openharness-design/DESIGN-CONTRACT.md` Rule 7/9.
 Implementation: `scripts/port_full_design_to_web.py` (deterministic transplant + `--check` drift
 gate) · seams: `scripts/showcase/server.py` · verification: `e2e/full_design_apps.mjs`

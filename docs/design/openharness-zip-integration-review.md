@@ -1,5 +1,9 @@
 # OpenHarness Zip Integration Review
 
+> Historical alignment note (2026-05-31), kept for lineage. The LIVE design system (5 surfaces, light theme,
+> byte-identical CSS, Inter UI) is now canonical in **`docs/DESIGN-BIBLE.md`** + `scripts/surface_server.py` — read
+> those for current truth; the three-site framing below is the 2026-05-31 record.
+
 Date: 2026-05-31
 
 This note records how the `OpenHarness.zip` / Claude Code design export maps
