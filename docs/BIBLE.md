@@ -175,6 +175,10 @@ Execution / Optimization / Verification). By name:
    (`scripts/eval/reason_codes.py`, `scripts/eval/durable_gap_harness.py`).
 7. **Code-graph change audit** — before/after editing a `.py`, audit its strong neighbors:
    `PYTHONPATH=. python3 scripts/codegraph.py --audit <target>`.
+8. **Thin flexible wrappers** — base/universal objects (`ObjectShell`, `RegistryObject`) are a STABLE envelope
+   (id/type) with the **version in METADATA, never the name**, around a flexible `payload`/`component`. Domain records
+   inherit thin-ness via `src/teleon/io/governed_record.mint_record` (envelope + payload; version in `schema_version`).
+   Never put a version in an object/schema NAME. Enforced: `scripts/check_object_wrapper_hygiene.py`.
 
 ---
 

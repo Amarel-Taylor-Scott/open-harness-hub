@@ -1028,4 +1028,5 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("src/teleon/registry/index.py", "registry_index"),
     ("scripts/check_registry_reconciliation.py", "check_registry_reconciliation"),
     ("scripts/registry_api_server.py", "registry_api_server"),
+    ("scripts/check_object_wrapper_hygiene.py", "check_object_wrapper_hygiene"),
 ]
