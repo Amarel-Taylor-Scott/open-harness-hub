@@ -6,7 +6,7 @@ Owner 2026-06-25. A thin stdlib http.server UI laid OVER the existing backend
 One catalog, the registry/record is the unit, hubs are flexible facets. `GET /` serves the browse page
 (a search box + the five facet groups category/type/kind/layer/status with live counts + record cards);
 `GET /browse?query=&category=&type=&kind=&layer=&status=` returns `browse(query, filters)` as JSON.
-Dark family theme (Hanken Grotesk), accent #7aa2ff. serves_truth=false.
+Dark family theme (Hanken Grotesk), accent #3b6fd4. serves_truth=false.
 
   python3 scripts/openhub_browse_server.py [--port 8130]    then tunnel it
   --self-test
@@ -24,8 +24,9 @@ if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
 from src.teleon.registry.browse import FACET_DIMS, browse, facets  # noqa: E402
+from scripts._surface_accents import accent as _acc  # noqa: E402
 
-ACCENT = "#7aa2ff"  # the Open*Hubs family accent (matches byo_demo_server "open-star-hubs")
+ACCENT = _acc("open-star-hubs")  # OpenHubForAI.io accent — single-sourced from surface_capability_spec.json
 
 _CSS = """*{box-sizing:border-box}body{font-family:'Hanken Grotesk',system-ui,sans-serif;background:#0b0e14;color:#e6edf3;margin:0;padding:2rem 1.2rem;line-height:1.5}
 .wrap{max-width:1120px;margin:0 auto}a{color:var(--a);text-decoration:none}

@@ -63,9 +63,9 @@ h1{{font-size:1.7rem;margin:0 0 .2rem}}.tag{{display:inline-block;border:1px sol
 label{{font-size:.85rem;color:#9aa7b4;display:block;margin:.8rem 0 .3rem}}
 select,textarea{{width:100%;box-sizing:border-box;background:#11161d;color:#e6edf3;border:1px solid #21262d;border-radius:9px;padding:.6rem .7rem;font:13px ui-monospace,monospace}}
 textarea{{height:170px;resize:vertical}}
-button{{margin-top:.9rem;color:#0b0e14;background:#7aa2ff;border:0;border-radius:9px;padding:.6rem 1rem;font-weight:700;cursor:pointer}}
+button{{margin-top:.9rem;color:#0b0e14;background:#b25fd6;border:0;border-radius:9px;padding:.6rem 1rem;font-weight:700;cursor:pointer}}
 .report{{margin-top:1.6rem;border:1px solid #21262d;border-radius:12px;background:#11161d;padding:1rem 1.2rem;display:none}}
-.kpi{{display:flex;gap:1.4rem;flex-wrap:wrap;margin:.4rem 0 1rem}}.kpi div{{font-size:1.5rem;font-weight:700;color:#7aa2ff}}.kpi span{{display:block;font-size:.72rem;color:#9aa7b4;font-weight:400}}
+.kpi{{display:flex;gap:1.4rem;flex-wrap:wrap;margin:.4rem 0 1rem}}.kpi div{{font-size:1.5rem;font-weight:700;color:#b25fd6}}.kpi span{{display:block;font-size:.72rem;color:#9aa7b4;font-weight:400}}
 .f{{border-top:1px solid #1b2230;padding:.55rem 0;font-size:.88rem}}.f b{{color:#e0a458}}.gov{{color:#6b7682;font-size:.74rem;margin-top:1rem}}</style></head>
 <body><h1>AIDevObserver</h1><div class=tag>/demo · watches AI usage · reviews the session</div>
 <p class=sub>Load an example AI-coding session (or paste your own transcript), then run the real reviewer. It flags

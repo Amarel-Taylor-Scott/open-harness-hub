@@ -75,7 +75,7 @@ comfort-gated backlog automatically.
 
 1. **Traction — sign 1 design partner + a paid pilot** that exports a package consumed by *their* agent/RAG, with a
    before/after report (stale-context caught, manual-review reduced). The real 90-day bottleneck. ⟦owner GTM⟧
-2. **Founder/team story** — fill section 1 of `docs/strategy/yc-application-draft-2026-06.md`. ⟦owner⟧
+2. **Founder/team story** — fill section 1 of `archive/legacy/docs/strategy/yc-application-draft-2026-06.md`. ⟦owner⟧
 3. **Backends green** — keep the proof gates green (`./loop run`); the loop does this automatically.
 4. **Owner decisions** — ratify raise size, pricing, and the one locked one-liner. ⟦owner⟧
 5. **Deck polish** — name the EU AI Act forcing function explicitly on the "why now" slide; add the customer before/after

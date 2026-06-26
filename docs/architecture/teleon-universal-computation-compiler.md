@@ -3,7 +3,7 @@
 A deep architecture for the reframe: **Teleon is not an agent framework, a workflow builder, or "NL → pipelines." It is a
 universal compiler/runtime that transforms ambiguous capability requests into globally optimized, verified executable
 graphs over an internet-scale registry of computational primitives.** This is the already-ratified *cognitive-work
-compiler* thesis (`docs/strategy/teleon-cognitive-compiler-2026-06.md`), taken to its full conclusion.
+compiler* thesis (`archive/legacy/docs/strategy/teleon-cognitive-compiler-2026-06.md`), taken to its full conclusion.
 
 The north star, stated sharply: **the future is not models getting smarter — it is systems getting better at deciding when
 intelligence is unnecessary.** Teleon's job is to *remove unnecessary intelligence from computation* — to compile a request

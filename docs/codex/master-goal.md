@@ -27,7 +27,7 @@
 > (`architecture/portfolio_dependency_law.json`). Moat split (locked): **Baltor governs what becomes TRUE; Teleon
 > governs what becomes EFFICIENT.** The component registry remains the **substrate**. Canonical:
 > `docs/strategy/teleon-baltor-openharnesshub-portfolio.md`; visual map: `docs/strategy/architecture-map.md`;
-> the 2026-06-21 adversarial review that drove this reconciliation: `docs/strategy/architecture-validation-2026-06.md`.
+> the 2026-06-21 adversarial review that drove this reconciliation: `archive/legacy/docs/strategy/architecture-validation-2026-06.md`.
 
 ## Mission (one sentence)
 

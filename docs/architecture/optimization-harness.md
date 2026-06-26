@@ -58,7 +58,7 @@ improves · latency/cost acceptable · regression suite green · promotion recei
 Proof: `scripts/check_optimization_harness.py` (CFPB pack: dedupe a duplicate Reg E fact, exclude the held-out
 FAQ-30 + a stale fact + an allegation, compress, keep the answer fact + its handle, promote with receipt; and
 reject a candidate that drops the answer fact or leaves a held-out conflict). ADR:
-`docs/adr/0006-optimization-harness-governed-improvement.md`.
+`archive/legacy/docs/adr/0006-optimization-harness-governed-improvement.md`.
 
 ## Generalized: a multi-variant bake-off + consumption-readiness (C43.1)
 

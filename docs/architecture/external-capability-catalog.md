@@ -68,4 +68,4 @@ a pattern). Health: `healthy` · `watch` · `at_risk` · `decayed` · `archived`
 - `check_capability_contract_examples` — every slot has an I/O contract; referenced examples in `schemas/examples/` are valid and grounded in real slots+adapters.
 - `check_flagged_tools_not_reintroduced` — flagged seed names never appear as an adopted adapter; `quarantined_providers` mirrors the seed.
 
-See `repo-replaceability.md` for the swap runbook and `docs/adr/0004-external-capability-catalog-and-repo-replaceability.md`.
+See `repo-replaceability.md` for the swap runbook and `archive/legacy/docs/adr/0004-external-capability-catalog-and-repo-replaceability.md`.

@@ -104,7 +104,7 @@ The demo should support:
   local Markdown/Obsidian/Basic Memory style sync without contacting the
   gateway.
 - Repo-wiki context research:
-  `docs/research/repo-wiki-context-tools.md`. It tracks DeepWiki,
+  `archive/legacy/docs/research/repo-wiki-context-tools.md`. It tracks DeepWiki,
   DeepWiki-Open, OpenDeepWiki, RepoWiki, RepoAgent, CodeWiki, repowise,
   Synthadoc, and local LLM wiki/memory systems as candidate repo-context
   compilers behind the Baltor gateway.
@@ -113,7 +113,7 @@ The demo should support:
   It advertises event-driven sync triggers such as post-commit hooks,
   push/MR webhooks, pipeline artifacts, file watchers, and scheduled polling.
 - Event-driven sync architecture:
-  `docs/architecture/baltor-event-driven-context-sync.md`. It defines push,
+  `archive/legacy/docs/architecture/baltor-event-driven-context-sync.md`. It defines push,
   pull, and hybrid sync modes; trigger normalization; check gates; artifact
   manifests; and worker routing for commits, pushes, edits, pipelines, and
   generated repo-wiki artifacts.

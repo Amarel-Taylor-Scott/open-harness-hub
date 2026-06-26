@@ -82,7 +82,7 @@ plane sits behind an **agnostic port** (`select_X("auto")` + `register_X_adapter
 with zero caller change. On top, a **uniform Component layer** gives every tool one shape —
 `Component.invoke(typed_inputs) → typed_outputs` — and lets a compiled DAG actually **run** on real ports; swapping a
 component in is **proof-gated** by a conformance check; an unwired plane is **honestly unavailable**, never faked. See
-`docs/strategy/component-standardization-and-dag-verification-2026-06.md`. Third-party APIs are components too
+`archive/legacy/docs/strategy/component-standardization-and-dag-verification-2026-06.md`. Third-party APIs are components too
 (`external_api_registry.json`), gated by the **credential plane** + **access policy**.
 
 ## 6. Skills — reusable capability units
@@ -99,7 +99,7 @@ open hub.
 - **Service auth & consumption** — identity types, the consumption matrix, token/key rules. See [Service auth and consumption model](../architecture/service-auth-and-consumption-model.md)
   and [Local dev tunnels and auth](../architecture/local-dev-tunnels-and-auth.md).
 - **North-star architecture** — [North star platform architecture](../architecture/north-star-platform-architecture.md).
-- **Hosting** — agent-automatable deploy (Fly + Cloudflare Workers); `docs/strategy/hosting-decision-matrix.md`.
+- **Hosting** — agent-automatable deploy (Fly + Cloudflare Workers); `archive/legacy/docs/strategy/hosting-decision-matrix.md`.
 
 ## 8. The governance spine (cross-cutting, always on)
 The rules that hold across every layer (full contracts under `docs/codex/`):
@@ -136,7 +136,7 @@ The rules that hold across every layer (full contracts under `docs/codex/`):
 | The compiler (sentence → DAG) | [compiling-capabilities-into-bounded-dags.md](compiling-capabilities-into-bounded-dags.md) |
 | Registries | `architecture/*.json` (tool/planes/ladders/io-contracts/ml/external-api/credentials/access/registry-layers) · [database-backed-component-store](../architecture/database-backed-component-store.md) · [compiled-unit-registry](../architecture/compiled-unit-registry.md) · [external-capability-catalog](../architecture/external-capability-catalog.md) |
 | Context storage & scale | [storage tiers](../architecture/postgres-pgvector-bootstrap.md) · [context catalog](../architecture/database-backed-context-catalog.md) · [context control loop](../architecture/context-control-loop.md) · [100M infra](../architecture/hundred-million-component-infrastructure.md) · [CDC versioning](../architecture/component-cdc-versioning.md) |
-| Tools & uniform invoke | `docs/strategy/component-standardization-and-dag-verification-2026-06.md` · [tool planes](taxonomy.md) |
+| Tools & uniform invoke | `archive/legacy/docs/strategy/component-standardization-and-dag-verification-2026-06.md` · [tool planes](taxonomy.md) |
 | Skills | [Claude Code skills overlap](../research/claude-code-skills.md) |
 | Platform & runtime | [primitive platform backend](../architecture/primitive-platform-backend.md) · [SaaS operating platform](../architecture/saas-operating-platform.md) · [service auth & consumption](../architecture/service-auth-and-consumption-model.md) |
 | Governance | `docs/codex/` (no-magic-values · lossless-distillation · change-verification-contract) |

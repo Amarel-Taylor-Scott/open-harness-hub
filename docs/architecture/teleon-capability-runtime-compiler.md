@@ -87,7 +87,7 @@ The owner's rule is no parallel runtimes/ledgers/registries. The compiler is **g
 
 - **`runtime_binding` (CTS-1)** does the class→backend decision — `bind_allowed(allowed_runtime_classes, …)` with
   cloud-defer-only-after-local-equivalent. The compiler **calls it**; it does not re-derive backends. (Doc:
-  `docs/architecture/cts-1-runtime-class-binding.md`.)
+  `archive/legacy/docs/architecture/cts-1-runtime-class-binding.md`.)
 - **`architecture/*.json` policy files** are the single sources for resources, SLA timeouts, the execution
   matrix, and the image — the compiler **joins** them, exactly as `generate_provider_configs.py` joins ports
   from `local_service_registry.json` rather than typing them.

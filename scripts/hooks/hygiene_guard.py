@@ -42,7 +42,7 @@ def main() -> int:
             if len(nums) >= 20:
                 warns.append(f"no-magic-values: {len(nums)} distinct bare numbers in {rel} — give the load-bearing ones named constants + a unit/rationale")
         elif p.suffix == ".md" and "archive/" not in rel:
-            refs = set(re.findall(r"((?:\.\.?/)*(?:scripts|src|docs|architecture|web)/[A-Za-z0-9_./-]+\.(?:py|md|json|jsx|js))", text))
+            refs = set(re.findall(r"((?:\.\.?/)*(?:archive|scripts|src|docs|architecture|web)/[A-Za-z0-9_./-]+\.(?:py|md|json|jsx|js))(?![A-Za-z])", text))
             broken = [m for m in sorted(refs) if not any(c in m for c in "*{}<>")
                       and not ((repo / m).exists() or (p.parent / m).resolve().exists())]
             for m in broken[:3]:

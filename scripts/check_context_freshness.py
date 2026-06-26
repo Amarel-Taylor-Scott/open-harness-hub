@@ -19,7 +19,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 CANONICAL = ("CLAUDE.md", "AGENTS.md", "docs/NORTHSTAR.md", "docs/BIBLE.md", "docs/DESIGN-BIBLE.md")
 # captures leading ../ or ./ so relative markdown links resolve correctly (not just repo-root code paths)
-REF = re.compile(r"((?:\.\.?/)*(?:scripts|src|docs|architecture|web|vocabularies|schemas)/[A-Za-z0-9_./-]+\.(?:py|md|json|jsx|js|css|html))")
+REF = re.compile(r"((?:\.\.?/)*(?:archive|scripts|src|docs|architecture|web|vocabularies|schemas)/[A-Za-z0-9_./-]+\.(?:py|md|json|jsx|js|css|html))(?![A-Za-z])")
 SUPERSEDED = re.compile(r"superseded[- ]by|^>?\s*deprecated\b|do[- ]not[- ]use", re.I | re.M)
 
 

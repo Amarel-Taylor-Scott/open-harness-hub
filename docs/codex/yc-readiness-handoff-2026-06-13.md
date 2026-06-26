@@ -63,7 +63,7 @@ Full delta: `git diff 6c5f27a0~1..HEAD`. Each item below cites its commit.
    sharpened wedge below): pick **Baltor, product-first**, ONE sentence —
    *"Baltor continuously verifies your AI's context is CORRECT — not just current — against authoritative
    sources, and proves it with a portable receipt."* Demote Teleon / AI-Done-Right / Open*Hubs to "how it's
-   built." Codex spec: reconcile the headline + 50-char line across `docs/strategy/yc-application-draft-2026-06.md`
+   built." Codex spec: reconcile the headline + 50-char line across `archive/legacy/docs/strategy/yc-application-draft-2026-06.md`
    + `…/yc-master-…md`; resolve the open owner-decision in the draft. **Do not change `architecture/brand.json`.**
 2. **Component-count framing.** `1,045` (6 Action-types) vs `2,655` (all components) are different SCOPES, not
    a simple drift — pick which to lead with, mark it `⟦computed⟧` (the draft's convention). Owner call on scope.
@@ -75,7 +75,7 @@ Full delta: `git diff 6c5f27a0~1..HEAD`. Each item below cites its commit.
    "establishes which source is authoritative via publisher/provenance" — update the draft's claim to match
    the built capability (it currently under- or over-states it depending on the doc).
 
-## The sharpened wedge (from this session's web sweep — `docs/research/agent-governance-landscape-2026-06-13.md`)
+## The sharpened wedge (from this session's web sweep — `archive/legacy/docs/research/agent-governance-landscape-2026-06-13.md`)
 The "receipts" white space is now **contested** (Attested Intelligence, Fetch.ai AEVS, Diagrid, NexArt all
 ship tamper-evident *execution* receipts). **None govern TRUTH** (promote/reject a fact + CDC + capability-lift
 on a regulated beachhead). Lead with **"we govern what becomes true, not just sign what happened."** Hard

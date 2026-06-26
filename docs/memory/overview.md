@@ -108,6 +108,6 @@ python3 scripts/check_memory_provider_contract.py --self-test
 - When a live Supermemory impl is wired behind `supermemory_api`/`supermemory_mcp`, its outputs MUST still be
   candidate `MemoryArtifact`s — the contract surface + artifact shape do not change.
 - Catalog the connectors (GDrive/Gmail/Notion/OneDrive/GitHub/Web Crawler) as candidates behind the
-  `SourceAdapterPort` (see `docs/memory/supermemory-candidate.md`).
+  `SourceAdapterPort` (see `archive/legacy/docs/memory/supermemory-candidate.md`).
 - Stand up a `GovernedContextBench` assurance benchmark (source-handle coverage, held-out-leak rate,
   stale-fact-served rate) — the assurance-axis answer to MemoryBench.

@@ -56,10 +56,10 @@ Confirmed (read from `products.js`, don't re-type):
 | **Baltor** | `#0e7c86` (teal) |
 | Hubs (per-hub) | varied muted tones (`#2f8f6b`, `#2f7d8f`, `#8f6f2f`, OpenReviewHub `#9d4edd`, …) |
 
-> **KNOWN DRIFT to fix:** the standalone Python demo servers (`landing_server.py`, `byo_demo_server.py`,
-> `aidevobserver_demo_server.py`, `openhub_browse_server.py`) use *approximate* accents (teal `#56d4c4`, etc.), NOT the
-> `products.js` values. They should read the canonical accents. AIDevObserver + OpenHubForAI.io need a canonical accent
-> ASSIGNED in `products.js` (currently approximated). Tracked design debt.
+> **RESOLVED 2026-06-25:** per-surface accents are now SINGLE-SOURCED in `architecture/surface_capability_spec.json`
+> (`accent` per pillar), read by the standalone servers via `scripts/_surface_accents.py` — no hard-coded hexes.
+> Canonical: AI Done Right `#5a6b87` · Teleon `#6d5ef0` · AIDevObserver `#b25fd6` · Baltor `#0e7c86` · OpenHubForAI.io
+> `#3b6fd4`. (Follow-up: mirror the three assigned accents into `products.js` for the design surfaces too.)
 
 ---
 

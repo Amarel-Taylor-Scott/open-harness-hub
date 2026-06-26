@@ -77,4 +77,4 @@ flow (if→then nesting), real cost, and whether it was model- or deterministica
 No-build (`web/` stays vanilla + ported CSS). No PII, no `_reference/` republish, no faked
 lift numbers (label samples). Don't edit `web/app.js`/`data.js`/`index.html` except for a real
 router/nav fix. Keep the live URL serving the latest `web/` (static — no restart needed).
-Cross-link: [[../design/value-propositions.md]], `web/README.md`, `docs/strategy/acquihire-roadmap.md`.
+Cross-link: [[../design/value-propositions.md]], `web/README.md`, `archive/legacy/docs/strategy/acquihire-roadmap.md`.

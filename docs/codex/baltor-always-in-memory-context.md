@@ -11,7 +11,7 @@ blurred.
 Related pitch artifact:
 
 ```text
-docs/strategy/baltor-medallion-context-positioning.md
+archive/legacy/docs/strategy/baltor-medallion-context-positioning.md
 ```
 
 ## One-Sentence Definition

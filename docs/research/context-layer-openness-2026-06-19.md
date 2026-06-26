@@ -54,4 +54,4 @@ The consistent pattern: **open at the FORMAT/edges, proprietary at the consumpti
 - OKF: `github.com/GoogleCloudPlatform/knowledge-catalog/.../okf/SPEC.md` · cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing/
 - AWS: aws.amazon.com/bedrock/knowledge-bases/ · Databricks: databricks.com/blog/expanded-interoperability-unity-catalog-open-apis · github.com/unitycatalog/unitycatalog · delta.io
 - Azure: learn.microsoft.com/.../onelake-local-mcp · openlineage.io/blog/openlineage-microsoft-purview/ · github.com/microsoft/Purview-ADB-Lineage-Solution-Accelerator
-- Cross-checked against `docs/research/agent-governance-landscape-2026-06-13.md` + `deeprepo-github-intake-2026-06-18.md` (OKF intake). Full verified findings: deep-research run wf_55104597.
+- Cross-checked against `archive/legacy/docs/research/agent-governance-landscape-2026-06-13.md` + `deeprepo-github-intake-2026-06-18.md` (OKF intake). Full verified findings: deep-research run wf_55104597.

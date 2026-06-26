@@ -6,7 +6,7 @@ runs the moment a route is live, and so the result is *defensible* rather than s
 
 This is the direct response to the single honest gap the Contextual competitive verdict flagged:
 OHH's differentiation **is** measured lift + verified corpora, and the **evidence for the lift half
-is currently thin** (`docs/strategy/competitor-contextual-ai.md` — "OHH's measured-lift EVIDENCE
+is currently thin** (`archive/legacy/docs/strategy/competitor-contextual-ai.md` — "OHH's measured-lift EVIDENCE
 is thin (credibility-critical, must not overclaim)", and concrete next step #2: "Publish a
 measured-lift head-to-head on a shared domain … **Do this for real or not at all** —
 overclaiming here is the one self-inflicted risk that would cost more than the win"). The lift
@@ -15,7 +15,7 @@ overclaiming here is the one self-inflicted risk that would cost more than the w
 competitor demo. This doc is the recipe for that number.
 
 It does **not** restate the engine-rigor requirements — those live in
-`docs/strategy/evaluation-methodology-and-rigor.md` (the six diligence-fatal gaps: self-grading,
+`archive/legacy/docs/strategy/evaluation-methodology-and-rigor.md` (the six diligence-fatal gaps: self-grading,
 open-book contamination, the unimplemented fidelity check, n=6/no-CI, the mis-named published
 `lift` field, unverifiable arXiv citations) and are the *preconditions* this protocol depends on.
 This doc adds what that one does not: the **three-arm comparison design** (what we run against
@@ -120,7 +120,7 @@ replicable, both already demoed by Contextual *without* a lift baseline. Either 
 > the negative space Contextual's clean-RAG cannot reach.
 
 **Recommended first instance — the domain where OHH's wedge is sharpest.** The building-/
-occupational-safety PH worked example (`docs/strategy/building-safety-dev-countries-worked-example.md`
+occupational-safety PH worked example (`archive/legacy/docs/strategy/building-safety-dev-countries-worked-example.md`
 + the five runnable pipelines in `catalog/pipelines/building-occupational-safety-ph/`) is "a
 governed domain pipeline over a corpus **exactly** like Contextual's Material-Science agent — but
 deliberately built in the NEGATIVE SPACE Contextual's clean-RAG architecturally cannot reach"
@@ -368,9 +368,9 @@ metrics, real-vs-spec-vs-aspirational):
 
 ## Related (referenced, not duplicated)
 
-- `docs/strategy/competitor-contextual-ai.md` — the verdict this actions; `grounding != lift`,
+- `archive/legacy/docs/strategy/competitor-contextual-ai.md` — the verdict this actions; `grounding != lift`,
   `ingested-public != governed`, "do this for real or not at all," and the thin-evidence flag.
-- `docs/strategy/evaluation-methodology-and-rigor.md` — the six diligence-fatal gaps and the
+- `archive/legacy/docs/strategy/evaluation-methodology-and-rigor.md` — the six diligence-fatal gaps and the
   enforceable publish rule; the **engine preconditions** this protocol depends on (authoritative
   where the two overlap).
 - `scripts/eval/reason_codes.py` · `scripts/eval/durable_gap_harness.py` — the durability axis
@@ -378,7 +378,7 @@ metrics, real-vs-spec-vs-aspirational):
 - `scripts/foundry/measure.py` · `scripts/foundry/model_route.py` — the lift engine and the
   (currently shared-route) model wiring the §5 fix targets.
 - `catalog/processors/eval/llm-judge.yaml` — the judge seam LMUnit wraps into.
-- `docs/strategy/building-safety-dev-countries-worked-example.md` +
+- `archive/legacy/docs/strategy/building-safety-dev-countries-worked-example.md` +
   `catalog/pipelines/building-occupational-safety-ph/` — the recommended first instance (negative
   space, durability 5.0/5.0).
 - `docs/codex/change-verification-contract.md` · `docs/codex/no-magic-values.md` — the honesty

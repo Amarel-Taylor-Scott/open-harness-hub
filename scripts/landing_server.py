@@ -74,10 +74,10 @@ h1{{font-size:2rem;margin:0 0 .25rem;letter-spacing:-.5px}}.tag{{display:inline-
 .sub{{color:#9aa7b4;margin:0 0 2rem;max-width:760px}}
 .grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1rem}}
 .card{{border:1px solid #21262d;border-radius:14px;background:#11161d;padding:1.1rem 1.2rem;display:flex;flex-direction:column}}
-.card h2{{font-size:1.15rem;margin:0 0 .25rem;color:#56d4c4}}.role{{color:#9aa7b4;font-size:.86rem;margin:.1rem 0 .6rem}}
+.card h2{{font-size:1.15rem;margin:0 0 .25rem;color:#5a6b87}}.role{{color:#9aa7b4;font-size:.86rem;margin:.1rem 0 .6rem}}
 .caps{{color:#cdd6e0;font-size:.82rem;margin:0 0 1rem;flex:1}}
-a.go,.extra a{{display:inline-block;color:#0b0e14;background:#56d4c4;border-radius:9px;padding:.5rem .85rem;font-weight:600;text-decoration:none;font-size:.85rem}}
-.extra{{margin-top:1.8rem;display:flex;gap:.6rem;flex-wrap:wrap}}.extra a{{background:#161b22;color:#56d4c4;border:1px solid #2a3340}}
+a.go,.extra a{{display:inline-block;color:#0b0e14;background:#5a6b87;border-radius:9px;padding:.5rem .85rem;font-weight:600;text-decoration:none;font-size:.85rem}}
+.extra{{margin-top:1.8rem;display:flex;gap:.6rem;flex-wrap:wrap}}.extra a{{background:#161b22;color:#5a6b87;border:1px solid #2a3340}}
 .warn{{color:#e0a458;font-size:.74rem}}.foot{{color:#6b7682;font-size:.78rem;margin-top:2.2rem;border-top:1px solid #21262d;padding-top:1rem}}</style></head>
 <body><h1>AI Done Right</h1><div class=tag>the holding company · every surface, live</div>
 <p class=sub><b>Teleon</b> runs your capability on the cheapest bounded path that still passes (efficiency) · <b>Baltor</b> serves managed, verified, provable context (truth) · <b>Open*Hubs</b> is the open store both consume · <b>AIDevObserver</b> watches AI usage (the wedge).</p>

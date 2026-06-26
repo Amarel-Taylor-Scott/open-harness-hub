@@ -78,7 +78,7 @@ Next action:
     source actions, not default retrieval.
 - Updated `docs/codex/baltor-context-control-iteration-plan.md` to include the
   MCP context gateway as an implementation priority.
-- Updated `docs/architecture/llm-trust-layer.md` to clarify that local
+- Updated `archive/legacy/docs/architecture/llm-trust-layer.md` to clarify that local
   `llm.audit.review` downgrades to open-weight review unless frontier/human
   review is explicitly allowed.
 - Fixed `scripts/baltor_admin_demo_server.py` after the status endpoint patch
@@ -277,7 +277,7 @@ Next action:
   - posts a GitLab connector-envelope run;
   - asserts connector export, graph, ACL, retrieval policy, and source handle
     contracts.
-- Added `docs/research/enterprise-context-database-phases.md` summarizing
+- Added `archive/legacy/docs/research/enterprise-context-database-phases.md` summarizing
   public patterns for context database build phases:
   - gateway-first experimentation;
   - shared RAG/agent platforms;
@@ -1534,7 +1534,7 @@ Next action:
 
 ## 2026-06-01 Repo Wiki Context Tool Research
 
-- Added `docs/research/repo-wiki-context-tools.md`.
+- Added `archive/legacy/docs/research/repo-wiki-context-tools.md`.
 - Researched DeepWiki-like repo documentation and code-context tools:
   DeepWiki/Ask Devin, DeepWiki MCP, DeepWiki-Open, OpenDeepWiki, RepoWiki,
   RepoAgent, CodeWiki, repowise, Synthadoc, karpathy-llm-wiki, SwarmVault, and
@@ -1700,7 +1700,7 @@ Next action:
   - Model routing chooses the worker/reviewer tier.
   - Reranking chooses which retrieved candidates enter a context pack and in
     what order.
-- Added `docs/architecture/baltor-reranking-and-lora-rerankers.md`.
+- Added `archive/legacy/docs/architecture/baltor-reranking-and-lora-rerankers.md`.
   - Defines the deterministic -> lexical -> vector -> cross-encoder ->
     LoRA/domain -> LLM judge -> human review reranking ladder.
   - Documents that LoRA/domain rerankers are eval-gated adapter profiles with
@@ -2136,7 +2136,7 @@ Latest proof:
 
 ## 2026-06-01 Event-Driven Sync Contracts
 
-- Added `docs/architecture/baltor-event-driven-context-sync.md`.
+- Added `archive/legacy/docs/architecture/baltor-event-driven-context-sync.md`.
   - Covers push, pull, and push-then-pull sync modes.
   - Defines normalized sync events, check gates, worker routing, and
     `baltor.repo-wiki-artifact-manifest.v1`.

@@ -64,4 +64,4 @@ or legitimately `promotion_eligible`). Everything else is `hold_out`, with the r
 - The reconciler remains the conflict authority; the gate only reads its verdict.
 
 Proof: `scripts/check_verification_gate.py` (the seven owner scenarios + tenant isolation, model grounding,
-deterministic schema-valid receipts, projection-only). ADR: `docs/adr/0005-verification-gate-and-promotion-boundary.md`.
+deterministic schema-valid receipts, projection-only). ADR: `archive/legacy/docs/adr/0005-verification-gate-and-promotion-boundary.md`.

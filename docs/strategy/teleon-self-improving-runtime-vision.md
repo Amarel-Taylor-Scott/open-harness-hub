@@ -181,7 +181,7 @@ This is the headline finding. **The compiler exists** and is faithful to every l
   cloud shape to a BUILT local equivalent**: `cloud-function`→`local_function_emulator`,
   `kubernetes-job`→`local_job_emulator`, `kubernetes-worker`/`queue-worker`/`gpu-worker`/
   `browser-worker`→`local_worker_pool`, `durable-workflow`→`local_job_emulator`, etc.
-  **Capability never blocks on missing cloud** (`docs/architecture/cts-1-runtime-class-binding.md`).
+  **Capability never blocks on missing cloud** (`archive/legacy/docs/architecture/cts-1-runtime-class-binding.md`).
 - The **execution backend selector** (`src/teleon/runtime/execution_backend_selector.py`)
   picks local↔k8s↔cloud-function **by policy/pricebook/health, not code**, with **hard
   guards** keeping browser/GPU/open-ended/control-plane work off generic cloud
@@ -395,7 +395,7 @@ promoted arrangement into a runtime unit.
   `catalog/adapters/` and as catalog rows admitted 2026-06-11 (ledger cont 2): **ktx
   ×3, litellm, zep-graphiti, reducto, exa, firecrawl, recall-ai, deepeval, ijfw ×2,
   hud** — all `experimental`, `candidate`/`wrap` tags, *"lift PENDING stated in every
-  description (discovery ≠ trust)"* (`docs/strategy/yc-context-landscape-2026-06.md`).
+  description (discovery ≠ trust)"* (`archive/legacy/docs/strategy/yc-context-landscape-2026-06.md`).
   Binding targets (Nitric/Score/Temporal/Knative/KEDA/Kratix) are **candidate cards
   only — never imported/executed/reached** (`runtime/capability_binding.py::TARGETS`).
 - **RAG/eval framework primitives** (LangChain/LlamaIndex/Haystack/DSPy; lm-eval/

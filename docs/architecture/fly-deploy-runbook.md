@@ -2,7 +2,7 @@
 
 Status 2026-06-11: BUILT AND SELF-TESTED, NOT YET DEPLOYED (no Fly account yet). Owner
 directive: support Fly.io now, keep switching cheap. Companion decision record:
-`docs/strategy/hosting-decision-matrix.md` (~$40–52/mo expected for this plane).
+`archive/legacy/docs/strategy/hosting-decision-matrix.md` (~$40–52/mo expected for this plane).
 
 ## What exists (all provider-blind pieces are committed and gated)
 

@@ -53,9 +53,9 @@ Added database-backed context docs:
 
 ```text
 docs/codex/baltor-always-in-memory-context.md
-docs/architecture/database-backed-context-catalog.md
+archive/legacy/docs/architecture/database-backed-context-catalog.md
 docs/architecture/baltor-business-object-governance-standard.md
-docs/architecture/baltor-architecture-context-providers.md
+archive/legacy/docs/architecture/baltor-architecture-context-providers.md
 ```
 
 `docs/codex/baltor-always-in-memory-context.md` is the compact canonical
@@ -287,7 +287,7 @@ Architecture modeling, service catalog, repo-wiki, event/API catalog, and
 enterprise architecture tools are now documented as architecture context
 providers. `schemas/context-provider.schema.json` accepts
 `provider_type = architecture_context`, and
-`docs/architecture/baltor-architecture-context-providers.md` defines normalized
+`archive/legacy/docs/architecture/baltor-architecture-context-providers.md` defines normalized
 architecture object types, source handles, pack usage, drift checks, and first
 provider priorities such as IcePanel, Structurizr, LikeC4, Backstage,
 EventCatalog, and repo-wiki/code-context artifacts.

@@ -11,8 +11,8 @@ uses it verbatim and never re-opens it.
 > **Canonical inputs** (read these for depth): `docs/strategy/brand-architecture.md` (identity, LOCKED) ·
 > `docs/strategy/baltor-cloud-cost-pricing-pro-forma.md` (cost + pricing + pro forma, authoritative) ·
 > `docs/strategy/baltor-gtm-fundraising-plan.md` (GTM) · `docs/strategy/context-layer-pmf.md` (TAM/PMF) ·
-> `docs/strategy/competitive-landscape-2026.md` + `competitive-positioning-deep-dive.md` (competition) ·
-> `docs/workers/execution-backend-flexibility.md` (cloud/function toolkit) ·
+> `archive/legacy/docs/strategy/competitive-landscape-2026.md` + `competitive-positioning-deep-dive.md` (competition) ·
+> `archive/legacy/docs/workers/execution-backend-flexibility.md` (cloud/function toolkit) ·
 > `architecture/external_capability_catalog.json` (the swappable-tool surface) ·
 > `prompts/baltor-north-star-continuous-builder.md` (the engineering North Star).
 

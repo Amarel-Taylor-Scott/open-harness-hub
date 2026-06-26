@@ -65,4 +65,4 @@ INGEST (CFPB) → decompose → [artifacts] → Verification Gate (C40) → Opti
   `FragilityMetadata`; the C40 gate's fragile-fact check already enforces it once present.
 
 How to invoke (runtime): `python3 -c "from scripts.runtime.consumption import run_cfpb_to_consumption as r; import json; print(json.dumps(r('demo', now='2026-06-05T00:00:00Z')['response'], indent=2))"`.
-ADR: `docs/adr/0006-optimization-harness-governed-improvement.md` (the gate→optimize→consume ladder).
+ADR: `archive/legacy/docs/adr/0006-optimization-harness-governed-improvement.md` (the gate→optimize→consume ladder).

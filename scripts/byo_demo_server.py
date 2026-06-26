@@ -21,8 +21,9 @@ if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
 from src.teleon.demos.byo_key_demo import DEMOS, run_byo_demo  # noqa: E402
+from scripts._surface_accents import accent as _acc  # noqa: E402
 
-ACCENT = {"aidevobserver": "#c98bdb", "teleon": "#56d4c4", "baltor": "#e0a458", "open-star-hubs": "#7aa2ff"}
+ACCENT = {s: _acc(s) for s in ("aidevobserver", "teleon", "baltor", "open-star-hubs")}
 TITLE = {"aidevobserver": "AIDevObserver", "teleon": "Teleon.dev", "baltor": "Baltor.ai", "open-star-hubs": "Open*Hubs"}
 EXAMPLE = {
     "aidevobserver": "(loads an example AI session — no key needed)",
@@ -49,7 +50,7 @@ def _index() -> str:
         f'<div class="sub">{d["label"]}</div><span class="tag">try it with your key →</span></a>'
         for s, d in DEMOS.items())
     return (f"<!doctype html><meta charset=utf-8><title>Demos — bring your own key</title><style>{_CSS}</style>"
-            f'<div class="wrap" style="--a:#7aa2ff"><h1>Demos — bring your own key</h1>'
+            f'<div class="wrap" style="--a:{_acc("ai-done-right")}"><h1>Demos — bring your own key</h1>'
             f'<p class="sub">Every surface runs with <b>your</b> API key. The key is used only for that one call and '
             f'is never stored or logged.</p><div class="cards">{cards}</div></div>')
 
