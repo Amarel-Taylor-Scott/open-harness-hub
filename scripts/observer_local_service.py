@@ -13,6 +13,8 @@ intake is ``capture.from_transcript``, and zero-install discovery is ``sessions.
         OR      {transcript_path:…} → review_session(from_transcript(path))
   POST /live    {messages:[...],    → route_session(events, mode) → {surfaced, summary}
                  mode?:"advisory"}
+  POST /agentic {steps:[...], goal?, → supervise an autonomous agent loop (post-run review or, with
+                 budget?, monitor?}     monitor:true, intra-run alerts + recommend_halt)
 
 The seam forwards the FULL path (strip=""), so the service answers both the bare paths above AND the
 seam-prefixed ``/api/observer/<path>`` (an internal prefix strip) — so a direct ``curl :PORT/review``
@@ -43,6 +45,7 @@ from src.teleon.observer import review_session            # noqa: E402  governed
 from src.teleon.observer.router import MODES, route_session  # noqa: E402  live spotter router + modes
 from src.teleon.observer.capture import from_transcript   # noqa: E402  transcript JSONL → events
 from src.teleon.observer.sessions import discover_sessions  # noqa: E402  zero-install session discovery
+from src.teleon.observer.agentic import monitor_step, review_agentic_run  # noqa: E402  autonomous agent-loop supervision
 
 SERVICE_ID = "observer_runtime"
 REGISTRY_PATH = REPO_ROOT / "architecture" / "local_service_registry.json"
@@ -131,6 +134,24 @@ def live_report(body: dict) -> tuple[int, dict]:
                  "summary": r["summary"], "governed": r["governed"], "serves_truth": False}
 
 
+def agentic_report(body: dict) -> tuple[int, dict]:
+    """POST /agentic — supervise an AUTONOMOUS agent loop. {steps:[{action,ok?,error?,cost?,output?}], goal?,
+    budget?:{max_steps?,max_cost?}, monitor?:bool, mode?}. monitor=true -> intra-run monitor_step (alerts +
+    recommend_halt); else post-run review_agentic_run. Read-only; never halts a process (recommend only)."""
+    if not isinstance(body, dict):
+        return 400, {"error": "body must be a JSON object", "serves_truth": False}
+    steps = body.get("steps")
+    if not isinstance(steps, list) or not steps:
+        return 400, {"error": "provide steps:[{action, ok?, error?, cost?, output?}, ...]", "serves_truth": False}
+    goal = str(body.get("goal") or "")
+    budget = body.get("budget") if isinstance(body.get("budget"), dict) else {}
+    if body.get("monitor"):
+        out = monitor_step(steps, goal=goal, budget=budget, mode=str(body.get("mode") or "advisory"))
+    else:
+        out = review_agentic_run(steps, goal=goal, budget=budget)
+    return 200, {**out, "service": SERVICE_ID, "serves_truth": False}
+
+
 # --- HTTP surface -----------------------------------------------------------------------------------
 class _Handler(BaseHTTPRequestHandler):
     def _send(self, status: int, payload: dict, headers: dict[str, str] | None = None) -> None:
@@ -166,13 +187,14 @@ class _Handler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:  # noqa: N802
         path = _route_path(urlparse(self.path).path)
-        if path not in ("/review", "/live"):
+        ops = {"/review": review_report, "/live": live_report, "/agentic": agentic_report}
+        if path not in ops:
             return self._send(404, {"error": "unknown path", "serves_truth": False})
         try:
             body = self._read_json()
         except json.JSONDecodeError:
             return self._send(400, {"error": "invalid JSON", "serves_truth": False})
-        return self._send(*(review_report(body) if path == "/review" else live_report(body)))
+        return self._send(*ops[path](body))
 
     def do_OPTIONS(self) -> None:  # noqa: N802
         self._send(200, {"ok": True})
@@ -262,6 +284,18 @@ def _self_test() -> int:
            and sess["serves_truth"] is False)
         st_bad, _ = review_report({})
         ck("a body with neither messages nor transcript → 400", st_bad == 400)
+
+        # in-process: agentic-loop supervision (post-run review + intra-run monitor + empty-steps guard)
+        thrash = [{"action": "pytest", "ok": False, "error": "ImportError"} for _ in range(3)]
+        st_ar, arep = agentic_report({"steps": thrash, "goal": "run tests"})
+        ck("agentic review → 200 governed report with a verdict",
+           st_ar == 200 and arep["serves_truth"] is False and "verdict" in arep.get("summary", {}))
+        st_am, amon = agentic_report({"steps": [{"action": "x"} for _ in range(6)],
+                                      "budget": {"max_steps": 3}, "monitor": True, "mode": "active"})
+        ck("agentic monitor → recommend_halt on a runaway (active mode)",
+           st_am == 200 and amon.get("recommend_halt") is True)
+        st_ae, _ = agentic_report({"steps": []})
+        ck("agentic with no steps → 400", st_ae == 400)
 
         # over the WIRE: ephemeral loopback server, both bare and seam-prefixed paths
         server, thread, port = start_service(port=0)

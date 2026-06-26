@@ -11,5 +11,6 @@ This package is the SAME engine at different points on the WHEN axis (post-sessi
 serves_truth=false; findings are governed CANDIDATES a human triages (discovery != trust).
 """
 from .review import REVIEW_VERSION, review_session
+from .agentic import loop_signals, monitor_step, review_agentic_run
 
-__all__ = ["review_session", "REVIEW_VERSION"]
+__all__ = ["review_session", "REVIEW_VERSION", "review_agentic_run", "monitor_step", "loop_signals"]

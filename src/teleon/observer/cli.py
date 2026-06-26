@@ -22,7 +22,9 @@ import argparse
 import json
 import sys
 from datetime import datetime, timezone
+from pathlib import Path
 
+from .agentic import monitor_step, review_agentic_run
 from .capture import from_transcript
 from .review import review_session
 from .router import MODES, _MODE_CAP, route_session
@@ -108,6 +110,48 @@ def cmd_live(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_agentic(args: argparse.Namespace) -> int:
+    """Supervise an AUTONOMOUS agent loop: post-run review (default) or intra-run monitor (--monitor).
+
+    Steps are a JSON array of {action, ok?, error?, cost?, output?} from --steps FILE or stdin — so any agent
+    runner (the repo's own flywheel included) can hand its loop to AIDevObserver. Read-only; never halts a process."""
+    try:
+        raw = Path(args.steps).read_text(encoding="utf-8") if args.steps else sys.stdin.read()
+        steps = json.loads(raw or "[]")
+    except (OSError, json.JSONDecodeError) as e:
+        print(f"could not read steps JSON ({e}); expected an array of {{action, ok?, error?, cost?, output?}}",
+              file=sys.stderr)
+        return 1
+    if not isinstance(steps, list):
+        print("steps must be a JSON array of loop steps", file=sys.stderr)
+        return 1
+    budget: dict = {}
+    if args.max_steps:
+        budget["max_steps"] = args.max_steps
+    if args.max_cost:
+        budget["max_cost"] = args.max_cost
+    if args.monitor:
+        out = monitor_step(steps, goal=args.goal or "", budget=budget, mode=args.mode)
+        if args.json:
+            print(json.dumps(out, indent=2))
+            return 0
+        print(f"observer agentic monitor  mode={out['mode']}  step={out['step']}  recommend_halt={out['recommend_halt']}")
+        for a in out["alerts"]:
+            print(f"  ! [{a['confidence']:.2f}] {a['type']} @step#{a['message_index']}: {a['message']}")
+        return 0
+    out = review_agentic_run(steps, goal=args.goal or "", budget=budget)
+    if args.json:
+        print(json.dumps(out, indent=2))
+        return 0
+    s = out["summary"]
+    print(f"observer agentic review  verdict={s['verdict']}  ({s['steps']} steps, {s['failures']} failures)")
+    print(f"  {s['findings']} finding(s) ({s['loop_findings']} loop-shape) — by_type {s['by_type']}")
+    print(f"  serves_truth={out['serves_truth']} — governed candidates (a human / the orchestrator policy triages)")
+    for f in out["report"]:
+        print(f"  [{f['confidence']:.2f}] {f['type']} @step#{f['message_index']}: {f['message']}")
+    return 0
+
+
 # --- argparse ---------------------------------------------------------------------------------------------------
 def _add_target(p: argparse.ArgumentParser) -> None:
     g = p.add_mutually_exclusive_group()
@@ -136,6 +180,16 @@ def build_parser() -> argparse.ArgumentParser:
     p_live.add_argument("--mode", choices=LIVE_MODES, default=DEFAULT_LIVE_MODE,
                         help=f"live restraint mode (default: {DEFAULT_LIVE_MODE})")
     p_live.set_defaults(func=cmd_live)
+
+    p_ag = sub.add_parser("agentic", help="supervise an autonomous agent loop (post-run review / intra-run monitor)")
+    p_ag.add_argument("--steps", help="JSON file of loop steps [{action, ok?, error?, cost?, output?}]; omit to read stdin")
+    p_ag.add_argument("--goal", help="the loop's stated objective (enables goal-drift detection)")
+    p_ag.add_argument("--max-steps", type=int, dest="max_steps", help="step-budget ceiling")
+    p_ag.add_argument("--max-cost", type=float, dest="max_cost", help="cost-budget ceiling")
+    p_ag.add_argument("--monitor", action="store_true", help="intra-run: alerts + recommend_halt instead of a full report")
+    p_ag.add_argument("--mode", default="advisory", help="restraint mode for --monitor (advisory|active|enforcing)")
+    p_ag.add_argument("--json", action="store_true")
+    p_ag.set_defaults(func=cmd_agentic)
     return ap
 
 

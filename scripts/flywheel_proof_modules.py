@@ -772,6 +772,8 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_knowledge_graph.py", "check_knowledge_graph"),
     # ── observer.capture + session_store: the capture SEAM (normalize Claude Code/Codex JSONL transcripts -> one event stream, drops thinking + slash-command noise, summarizes tool_use; PROVEN on the real 2847-line session -> 1368 events/34 findings) + the session model (session/event/intervention) with the accept/reject OUTCOME loop (append-only, latest-wins, lossless -> per-type tuning stats = the moat signal); serves_truth=false, read-only/local-first ──
     ("scripts/check_observer_capture_store.py", "check_observer_capture_store"),
+    # ── observer.agentic: AIDevObserver for AUTONOMOUS agent loops — intra-run monitor_step + post-run review_agentic_run over the router engine; deterministic loop-shape signals (thrash/repeated-failure/stall/budget-overrun/goal-drift), recommends (never forces) halt; serves_truth=false, governed candidates ──
+    ("scripts/check_observer_agentic.py", "check_observer_agentic"),
     # ── code_genome_index: DOGFOOD the Code Genome (§9) on src/teleon — AST-fingerprint each module, flag high genome overlap as CANDIDATE internal reinvention (worth review, NOT proven duplication); honest sparse genome over abstract framework code; high-volume->DB; serves_truth=false, candidates only ──
     ("scripts/build_code_genome_index.py", "build_code_genome_index"),
     # ── spotter_surface: the demoable face of the Observer/Spotter subsystem -> self-contained dist/spotter/index.html ('coaching not surveillance', the live taxonomy, a reproducible post-session review embedded, the knowledge-graph engines, funnels to Teleon); ALL counts computed from the live router+registries (no-magic-values); serves_truth=false ──
