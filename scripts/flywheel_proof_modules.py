@@ -1023,4 +1023,6 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("src/teleon/retrieval/learned_vectors.py", "learned_vectors"),
     ("src/teleon/retrieval/pgvector_index.py", "pgvector_index"),
     ("src/teleon/synthesis/codeblock_loop.py", "codeblock_loop"),
+    ("src/teleon/registry/browse.py", "browse"),
+    ("scripts/openhub_browse_server.py", "openhub_browse_server"),
 ]
