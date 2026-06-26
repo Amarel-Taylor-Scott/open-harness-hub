@@ -1,6 +1,6 @@
 # Proof Inventory
 
-**714** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
+**715** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
 
 - `scripts/ingest/context_rot.py`
 - `scripts/ingest/document_decompose.py`
@@ -691,6 +691,7 @@
 - `scripts/flywheel_status.py`
 - `scripts/check_seha_boundary.py`
 - `scripts/check_surface_and_dev_contract.py`
+- `scripts/check_surface_server.py`
 - `scripts/landing_server.py`
 - `scripts/check_northstar_design.py`
 - `scripts/aidevobserver_demo_server.py`
