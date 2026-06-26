@@ -1,0 +1,90 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-26T20:17:55.860120+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "348d0f45-78c4-4914-9262-a77ecbca0db3",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-26T20:17:55.860131+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/wikipedia-page-review",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "End-to-end pipeline that reviews a Wikipedia article against the\ncore content policies and the article-quality rubric. Produces\nper-claim findings with policy citation, severity, and suggested\nedit (tag / rewrite / remove / talk-page-escalate).\n\nUse cases:\n - GA / FA peer review preparation\n - New page patrol (NPP) backlog assist\n - AfC (Articles for Creation) reviewer assistance\n - \"Is my draft ready to publish?\" pre-submission check\n - Cleanup queue triage (which {{citation needed}} articles are\n   fixable, which need rewriting, which need AfD)\n\nArticle text input options:\n - paste raw wikitext\n - paste rendered text\n - (live URL fetch is via the tool/wikipedia-citation-checker\n   companion; this pipeline runs against the supplied text only)\n\nNOT a substitute for human editor review. NOT for making BLP\nremoval decisions \u2014 that's an editor / admin call."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "OpenHubForAI contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../wikipedia-page-review.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/wikipedia-page-review/output/grade",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "grade (number)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/wikipedia-page-review/output/findings",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "findings (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/wikipedia-page-review/output/suggested_edits",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "suggested_edits (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/wikipedia-page-review/output/trace",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "trace (object[])"
+        }
+      }
+    }
+  ]
+}

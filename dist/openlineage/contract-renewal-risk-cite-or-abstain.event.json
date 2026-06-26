@@ -1,0 +1,112 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-26T20:17:55.818018+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "665a2e07-28d3-4c28-b31f-a3a2d9c5d035",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-26T20:17:55.818029+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/contract-renewal-risk-cite-or-abstain",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Surface the renewal-risk clauses in a commercial contract + account\npacket and ground EACH risk finding in a cited clause span or\nrenewal-risk framework entry \u2014 otherwise abstain. High-precision\nlegal/regulated RAG bundle (Bundle B) wired as a governed gate:\n\n - structured-to-prose + PII redaction (account packets carry names);\n - GREP triage for auto-renewal / notice-window / price-escalator /\n   termination-for-convenience / assignment red flags;\n - hybrid retrieval over the contract-law clause library + the\n   renewal-risk framework corpus, fused + cross-encoder reranked;\n - a renewal-risk analyst harness emits one finding per risk with a\n   per-claim citation to the clause or framework span;\n - DETERMINISTIC cite-or-abstain gate: a renewal-risk finding that\n   does not cite a clause/framework span fails citation-coverage and\n   blocks publication, so an unsupported \"this auto-renews in 30 days\"\n   claim cannot ship without the clause behind it.\n\nNegative-space task: base models confidently assert renewal terms\n(\"notice period is 60 days\") that the contract does not contain.\nHere every term must trace to the cited clause or be abstained.\n\nNOT legal advice; descriptive over the provided contract only."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "OpenHubForAI contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../contract-renewal-risk-cite-or-abstain.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/contract-renewal-risk-cite-or-abstain/output/findings",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "findings (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/contract-renewal-risk-cite-or-abstain/output/score",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "score (number)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/contract-renewal-risk-cite-or-abstain/output/citation_coverage",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "citation_coverage (number)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/contract-renewal-risk-cite-or-abstain/output/evidence_gaps",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "evidence_gaps (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/contract-renewal-risk-cite-or-abstain/output/abstained",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "abstained (boolean)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/contract-renewal-risk-cite-or-abstain/output/trace",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "trace (object[])"
+        }
+      }
+    }
+  ]
+}

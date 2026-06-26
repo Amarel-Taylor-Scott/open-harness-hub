@@ -1,6 +1,6 @@
 """examples.product_pipelines — example use-cases as runnable, functional PIPELINES, one+ per product surface.
 
-Each product (Teleon, Baltor, Open*Hubs, AIDevObserver) gets 1-2 example use-cases expressed as a PIPELINE: a
+Each product (Teleon, Baltor, OpenHubForAI, AIDevObserver) gets 1-2 example use-cases expressed as a PIPELINE: a
 named sequence of REAL existing Teleon functions wired so the output of one step feeds the next. Every pipeline
 runs DETERMINISTICALLY + OFFLINE (the DAG descent picks deterministic rungs when no model key is present), or
 returns an HONEST needs-key result where a step genuinely needs an LLM/network (never a fabricated answer).
@@ -8,7 +8,7 @@ serves_truth=false throughout — a pipeline output is a candidate the verificat
 
   Teleon        — the runtime/compiler: descend a DAG to the cheapest viable plan (extraction, search-enrichment).
   Baltor        — governs truth: the provider-directory freshness vertical; verified-source answer (needs a key).
-  Open*Hubs     — the open registry ecosystem: compose a capability from the federation; grow + enrich a record.
+  OpenHubForAI  — the open registry ecosystem: compose a capability from the federation; grow + enrich a record.
   AIDevObserver — post-session review of an AI coding transcript (reinvention + waste, human-triaged candidates).
 
 These reuse existing modules (src.teleon.dag / registry / verticals / observer / demos); nothing here is a new
@@ -28,7 +28,7 @@ if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
 #: the four product surfaces — the single source of the product list (counts are computed, never typed).
-PRODUCTS: tuple[str, ...] = ("Teleon", "Baltor", "Open*Hubs", "AIDevObserver")
+PRODUCTS: tuple[str, ...] = ("Teleon", "Baltor", "OpenHubForAI", "AIDevObserver")
 
 
 # --- the tiny pipeline model (a linear sequence of real-function steps over a shared state) --------------------------
@@ -222,10 +222,10 @@ def baltor_verified_source_answer_pipeline() -> Pipeline:
 
 
 # ====================================================================================================================
-# Open*Hubs — the open registry ecosystem: compose a capability from the federation; grow + enrich a record.
+# OpenHubForAI — the open registry ecosystem: compose a capability from the federation; grow + enrich a record.
 # ====================================================================================================================
 def openhubs_compose_pipeline() -> Pipeline:
-    """Open*Hubs use-case: turn an intent into a candidate tool. Federated-search EVERY open registry for the intent,
+    """OpenHubForAI use-case: turn an intent into a candidate tool. Federated-search EVERY open registry for the intent,
     then compile the hits into a candidate DAG plan across the registries. This is how the open component ecosystem
     becomes a runnable tool. The result is a CANDIDATE plan (the verify gate runs before anything executes)."""
     from src.teleon.registry.search import build_capability
@@ -245,7 +245,7 @@ def openhubs_compose_pipeline() -> Pipeline:
         }}
 
     return Pipeline(
-        name="compose-capability-from-registries", product="Open*Hubs",
+        name="compose-capability-from-registries", product="OpenHubForAI",
         use_case="Federated-search the open registries for an intent and compile the hits into a candidate DAG plan — "
                  "how the open component ecosystem becomes a runnable tool.",
         steps=(
@@ -257,7 +257,7 @@ def openhubs_compose_pipeline() -> Pipeline:
 
 
 def openhubs_populate_enrich_pipeline() -> Pipeline:
-    """Open*Hubs use-case: grow the registry. Turn a discovered repo slug into a governed candidate component RECORD,
+    """OpenHubForAI use-case: grow the registry. Turn a discovered repo slug into a governed candidate component RECORD,
     then ENRICH it (deterministic embedding + keywords + labels + use-cases) so it is searchable on the buffet. Offline +
     deterministic; discovery != trust (the record is a candidate, license-checked before adoption). serves_truth=false."""
     from src.teleon.registry.populate import repo_to_record
@@ -281,7 +281,7 @@ def openhubs_populate_enrich_pipeline() -> Pipeline:
         }}
 
     return Pipeline(
-        name="populate-and-enrich-component", product="Open*Hubs",
+        name="populate-and-enrich-component", product="OpenHubForAI",
         use_case="Turn a discovered repo slug into a governed, enriched candidate registry record (embedding, keywords, "
                  "labels, use-cases) — how a registry grows records offline.",
         steps=(

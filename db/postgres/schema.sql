@@ -1,5 +1,5 @@
 -- ----------------------------------------------------------------------------
--- Open Harness Hub — canonical PostgreSQL schema (v0.1.0)
+-- OpenHubForAI — canonical PostgreSQL schema (v0.1.0)
 --
 -- Maps one row per component, with JSONB body for type-specific fields and
 -- small join tables for the array-valued cross-cutting axes (industry,

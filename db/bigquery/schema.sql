@@ -1,5 +1,5 @@
 -- ----------------------------------------------------------------------------
--- Open Harness Hub — BigQuery schema (v0.1.0)
+-- OpenHubForAI — BigQuery schema (v0.1.0)
 --
 -- BigQuery shape uses native ARRAY + STRUCT (no join tables needed for
 -- industry/capability/modality/tags). Suitable for warehouse-scale

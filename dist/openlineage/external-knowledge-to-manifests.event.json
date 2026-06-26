@@ -1,0 +1,101 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-26T20:17:55.830442+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "602cd31c-f215-4c18-b584-90511a4c1499",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-26T20:17:55.830452+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/external-knowledge-to-manifests",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "The factory pipeline. Walks an external knowledge tree (Wikipedia\ncategory, US Code title, APQC PCF category, NIST framework\nchapter, regulatory corpus, paper-list, etc.), proposes draft\ncatalog manifests per node, validates them, and writes\ncurator-ready drafts to `catalog/_inbox/`.\n\nThis pipeline implements the \"iteratively build a massive index\"\nidea: point it at a knowledge tree and it produces draft\nmanifests at scale, each one schema-validated, each one\nattribution-preserving, each one held back for curator review\nper `catalog/_inbox/` convention (AGENTS.md hard rule).\n\nUse cases:\n - Wikipedia: bulk-ingest a category subtree (e.g., \"Category:Money\n   laundering typologies\" \u2192 knowledge-pack + classifier rules)\n - US Code: ingest a title (e.g., Title 31 \u2014 Money & Finance \u2192\n   N knowledge-pack entries + N GREP rule-packs for detection)\n - APQC PCF: ingest a category (e.g., Category 8 \u2014 Manage Information\n   Technology \u2192 N harnesses + N pipelines for BPO \u2192 AI-assisted)\n - NIST publications: ingest 800-series (e.g., NIST SP 800-53 controls\n   \u2192 N knowledge-pack entries + N rubrics + N rule-packs)\n - Regulatory corpora: EU directives, FDA guidance, OECD frameworks\n - Academic paper-lists: arXiv categories, ICLR / NeurIPS proceedings\n   \u2192 N pattern manifests\n - Product Hunt: top-N launches per period \u2192 N dataset entries\n\nPipeline shape:\n 1. WALK external source (yields nodes)\n 2. PARALLEL: per node, DRAFT manifests (model_targets-bound)\n 3. VALIDATE each draft against its schema\n 4. SELF-REVISE on validation failure (max N attempts)\n 5. WRITE successful drafts to `catalog/_inbox/{type}/{slug}.yaml`\n 6. AUDIT trace + walk-stats + draft-quality distribution\n\nOutput:\n - drafts_emitted: list of (path, type, slug, rubric_score)\n - drafts_failed: list of (node, errors, attempts)\n - vocab_change_requests: aggregated VOCAB-CHANGE-NEEDED flags\n - walk_stats: nodes_walked, nodes_drafted, drafts_per_node_mean\n - audit_trace"
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "OpenHubForAI contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../external-knowledge-to-manifests.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/external-knowledge-to-manifests/output/drafts_emitted",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "drafts_emitted (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/external-knowledge-to-manifests/output/drafts_failed",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "drafts_failed (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/external-knowledge-to-manifests/output/vocab_change_requests",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "vocab_change_requests (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/external-knowledge-to-manifests/output/walk_stats",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "walk_stats (object)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/external-knowledge-to-manifests/output/trace",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "trace (object[])"
+        }
+      }
+    }
+  ]
+}

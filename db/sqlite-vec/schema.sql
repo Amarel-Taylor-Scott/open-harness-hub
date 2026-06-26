@@ -1,5 +1,5 @@
 -- ----------------------------------------------------------------------------
--- Open Harness Hub — SQLite + sqlite-vec (embedded vector search)
+-- OpenHubForAI — SQLite + sqlite-vec (embedded vector search)
 --
 -- sqlite-vec is a SQLite extension that adds native VECTOR columns and
 -- approximate-nearest-neighbor search. Pair with db/sqlite/schema.sql for a

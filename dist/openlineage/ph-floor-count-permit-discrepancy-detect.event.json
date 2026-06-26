@@ -1,0 +1,90 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-26T20:17:55.840917+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "6ec5a350-f92b-477c-ab23-90f30347a4b9",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-26T20:17:55.840932+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/ph-floor-count-permit-discrepancy-detect",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Defensive detection + routing for Philippine building-permit violations,\ngrounded in the PH building-safety source registry\n(data/source-registry/ph-building-safety.json) and the Angeles City collapse\nfixture. Given a building case packet (address, reported as-built floor\ncount, permit-record fields obtained by a human router from the LGU Office\nof the Building Official, PRC license number on the permit, Certificate of\nOccupancy and Fire Safety Inspection Certificate status), the pipeline flags:\napproved-floor-count vs reported-floor-count excess, missing PRC-licensed\nstructural-engineer sign-off, occupied-without-Certificate-of-Occupancy, and\nmissing/expired FSIC \u2014 then routes each flag to the correct authority (OBO,\nDPWH Regional Office, PRC, BFP) with PD 1096 / RA 9514 citations.\n\nThis is a High-precision legal RAG bundle (Bundle B): an exact-id + dense leg\nover the National Building Permit / Occupancy corpus, official-source\nverification of every retrieved clause, per-claim citation coverage, and a\nhard abstain gate. The dispositive as-built floor count is tier-5\n(human-on-site) and the approved floor count is tier-4 (OBO counter record);\nwhen the approved count is not human-verified the pipeline MUST emit\nPERMIT_RECORD_UNVERIFIABLE and route to a human rather than infer a number\nfrom the model. No evasion guidance; detection and routing with citations\nonly; no occupant/worker/owner PII stored."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "OpenHubForAI contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../ph-floor-count-permit-discrepancy-detect.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ph-floor-count-permit-discrepancy-detect/output/flags",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "flags (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ph-floor-count-permit-discrepancy-detect/output/routing_packet",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "routing_packet (object)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ph-floor-count-permit-discrepancy-detect/output/abstained",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "abstained (boolean)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ph-floor-count-permit-discrepancy-detect/output/score",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "score (number)"
+        }
+      }
+    }
+  ]
+}

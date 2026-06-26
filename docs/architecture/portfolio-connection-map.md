@@ -8,7 +8,7 @@
 
 **Amazon strategy:** Each Open*Hub is built as INTERNAL infrastructure that Baltor/Teleon consume first, with the ability to spin it out as a PUBLIC, independently-monetizable Open*Hub.io registry later — the AWS pattern (internal infra -> public revenue stream).
 
-**Dependency law:** Baltor -> Teleon -> OpenHarnessHub/Open*Hubs, NEVER reverse (enforced by check_portfolio_dependency_law). Content flows hub -> core (the core CONSUMES from hubs); a hub never depends on the core.
+**Dependency law:** Baltor -> Teleon -> OpenHarnessHub, NEVER reverse (enforced by check_portfolio_dependency_law). Content flows hub -> core (the core CONSUMES from hubs); a hub never depends on the core.
 
 ```mermaid
 flowchart LR

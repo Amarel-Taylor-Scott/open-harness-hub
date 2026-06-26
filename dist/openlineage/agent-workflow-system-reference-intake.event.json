@@ -1,0 +1,156 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-26T20:17:55.799804+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "7e69e7a6-7787-4ee5-940c-d53d150e9ada",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-26T20:17:55.799816+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/agent-workflow-system-reference-intake",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Safely plan reference intake for agent frameworks, skill marketplaces, and workflow systems, then extract normalized skill/workflow primitives without republishing upstream source files."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "OpenHubForAI contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../agent-workflow-system-reference-intake.yaml"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "knowledge-pack/agent-workflow-system-source-map",
+      "facets": {
+        "schema": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-1-0/SchemaDatasetFacet.json",
+          "fields": [
+            {
+              "name": "agent_workflow_system",
+              "type": "string"
+            },
+            {
+              "name": "skill_marketplace",
+              "type": "string"
+            },
+            {
+              "name": "workflow_schema",
+              "type": "string"
+            },
+            {
+              "name": "agent_eval_dataset",
+              "type": "string"
+            },
+            {
+              "name": "reference_install_policy",
+              "type": "string"
+            }
+          ]
+        },
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "Reference source map for OpenClaw, Claude Code skills, Hermes Agent, CrewAI, LangGraph, AutoGen, Dify, Flowise, n8n, ComfyUI, Kaggle/notebook agent datasets, minimal graph workflow frameworks, and related agent/workflow ecosystems."
+        },
+        "dataSource": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+          "name": "open-harness-hub",
+          "uri": "https://open-harness-hub.dev/knowledge-pack/agent-workflow-system-source-map"
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/agent-workflow-system-reference-intake/output/intake_plans",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "intake_plans (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/agent-workflow-system-reference-intake/output/extracted_manifests",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "extracted_manifests (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/agent-workflow-system-reference-intake/output/candidate_primitives",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "candidate_primitives (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/agent-workflow-system-reference-intake/output/label_records",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "label_records (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/agent-workflow-system-reference-intake/output/dedupe_clusters",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "dedupe_clusters (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/agent-workflow-system-reference-intake/output/review_tickets",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "review_tickets (object[])"
+        }
+      }
+    }
+  ]
+}

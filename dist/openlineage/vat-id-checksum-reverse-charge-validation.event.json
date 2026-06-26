@@ -1,0 +1,101 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-26T20:17:55.835321+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "41395adf-26ea-4211-a741-dcf7e78f8f78",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-26T20:17:55.835331+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/vat-id-checksum-reverse-charge-validation",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Negative-space task: deciding whether an intra-EU B2B invoice was correctly\nissued under the VAT reverse-charge mechanism is a deterministic rule the\nmodel gets wrong because it (a) cannot reliably run the per-country VAT-ID\nchecksum (each member state has its own check-digit algorithm), (b)\nhallucinates whether a reverse-charge note is required, and (c) cannot keep\na country's standard VAT rate straight across a long context. This pipeline\npins the supplier/customer VAT-IDs to a deterministic format+checksum check,\nretrieves the controlling reverse-charge criteria from a governed corpus,\nand verifies the invoice carries the mandatory \"reverse charge\" wording when\nthe conditions hold \u2014 refusing to bless an invoice that fails the formal\ntest rather than fluently approving it.\n\nCapability lift is structural: VAT-ID checksums and the reverse-charge\ndecision are formal rules with a single correct answer, and a deterministic\nchecker beats a stochastic model on them by construction \u2014 the lift survives\nmodel upgrades and costs no model tokens.\n\nBundle: High-precision regulated RAG (taxonomy Bundle B) \u2014 exact-id +\nfield-weighted retrieval over the VAT framework corpus, cite-or-abstain\noutput, and deterministic post-call verification gates."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "OpenHubForAI contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../vat-id-checksum-reverse-charge-validation.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/vat-id-checksum-reverse-charge-validation/output/verdict",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "verdict (string)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/vat-id-checksum-reverse-charge-validation/output/vat_id_checks",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "vat_id_checks (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/vat-id-checksum-reverse-charge-validation/output/reverse_charge_required",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "reverse_charge_required (boolean)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/vat-id-checksum-reverse-charge-validation/output/cited_criteria",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "cited_criteria (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/vat-id-checksum-reverse-charge-validation/output/findings",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "findings (object[])"
+        }
+      }
+    }
+  ]
+}

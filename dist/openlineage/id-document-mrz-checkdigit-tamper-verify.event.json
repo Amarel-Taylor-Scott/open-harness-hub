@@ -1,0 +1,101 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-26T20:17:55.835151+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "b1821421-374a-4669-a110-e0bbf5b17ad2",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-26T20:17:55.835163+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/id-document-mrz-checkdigit-tamper-verify",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Negative-space task: validating a passport/ID Machine-Readable Zone (MRZ)\nhas two parts a bare VLM structurally fails. (1) The ICAO 9303 check digits\nare a deterministic mod-10 weighted (7-3-1) checksum over each field plus a\ncomposite digit \u2014 a model \"reads\" the MRZ but cannot reliably RECOMPUTE the\nchecksums, and will happily declare a forged MRZ valid. (2) Tamper screening\nneeds character-level OCR confidence, font/spacing consistency, and image\nmetadata signals the VLM's lossy vision tokens cannot see. This pipeline\nruns a deterministic OCR pre-pass for the exact MRZ glyphs, recomputes every\nICAO 9303 check digit OUTSIDE the model, screens for tamper indicators, and\nrefuses to pass a document whose MRZ does not self-verify \u2014 instead of\nemitting a fluent but ungrounded \"looks authentic\".\n\nThis is an identity-assurance support tool over a SUBMITTED document image;\nit does NOT do biometric 1:1 face matching or liveness. Capability lift is\nstructural: MRZ check digits are a formal checksum (one correct answer) and\na deterministic recomputation beats a stochastic reader by construction; the\nlift survives model upgrades and costs no model tokens.\n\nBundle: High-precision regulated extraction (taxonomy Bundle B) with a\ndeterministic OCR pre-pass, exact-id/checksum verification, and a tamper\nConditional that halts and routes to human review on any failed indicator."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "OpenHubForAI contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../id-document-mrz-checkdigit-tamper-verify.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/id-document-mrz-checkdigit-tamper-verify/output/verdict",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "verdict (string)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/id-document-mrz-checkdigit-tamper-verify/output/parsed_mrz",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "parsed_mrz (object)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/id-document-mrz-checkdigit-tamper-verify/output/check_digit_results",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "check_digit_results (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/id-document-mrz-checkdigit-tamper-verify/output/tamper_indicators",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "tamper_indicators (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/id-document-mrz-checkdigit-tamper-verify/output/review_ticket",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "review_ticket (object)"
+        }
+      }
+    }
+  ]
+}

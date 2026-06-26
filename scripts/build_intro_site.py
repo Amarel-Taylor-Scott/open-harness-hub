@@ -5,7 +5,7 @@ FOUR self-contained, cross-linked pages (no external resources; branded Hanken G
   index.html  — AI Done Right (PARENT): build AI the EFFICIENT + APPROPRIATE way, made easy. NOT about context.
   baltor.html — Baltor: the engine that makes AI trustworthy (context/truth — this is where 'context' lives).
   teleon.html — Teleon: the runtime that makes any capability efficient (the descent + the document cascade).
-  hubs.html   — the Open*Hubs: the open component registries both products consume.
+  hubs.html   — OpenHubForAI: the open component registries both products consume.
 Every NUMBER is COMPUTED from the registries + the live cascade (no-magic-values). serves_truth=false.
 
   PYTHONPATH=. python3 scripts/build_intro_site.py [--self-test]
@@ -113,7 +113,7 @@ _JS = ("const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersect
 
 
 def _nav(active: str) -> str:
-    links = [("index", "AI Done Right"), ("baltor", "Baltor"), ("teleon", "Teleon"), ("hubs", "Open*Hubs")]
+    links = [("index", "AI Done Right"), ("baltor", "Baltor"), ("teleon", "Teleon"), ("hubs", "OpenHubForAI")]
     brand = f'<a class="brand{" on" if active == "index" else ""}" href="index.html">AI Done Right</a>'
     rest = "".join(f'<a class="{"on" if active == p else ""}" href="{p}.html">{n}</a>' for p, n in links[1:])
     return f'<nav class=nav><div class=wrap>{brand}<span>{rest}</span></div></nav>'
@@ -267,10 +267,10 @@ def page_index(c: dict) -> str:
       brain. Write a capability; it picks the cheapest appropriate path.</p><span class=more>How Teleon works →</span></a>
     <a class=card href="baltor.html"><h4>Baltor</h4><p>The engine that makes AI <b>trustworthy</b> — governs what
       becomes true (provenance, verification, receipts).</p><span class=more>How Baltor works →</span></a>
-    <a class=card href="hubs.html"><h4>{c['hubs']} Open*Hubs</h4><p>Open component registries — tools, skills,
+    <a class=card href="hubs.html"><h4>{c['hubs']} OpenHubForAI hubs</h4><p>Open component registries — tools, skills,
       models, methods — that both products consume.</p><span class=more>See the hubs →</span></a>
   </div>
-  <p style="margin-top:18px" class=mono>Architecture law: Baltor &rarr; Teleon &rarr; Open*Hubs. Never the reverse.</p>
+  <p style="margin-top:18px" class=mono>Architecture law: Baltor &rarr; Teleon &rarr; OpenHarnessHub. Never the reverse.</p>
 </div></section>"""
     return _shell("index", "AI Done Right — build AI the efficient, appropriate way",
                   "AI Done Right makes it easy to build AI the most efficient and appropriate way — the right model, method, and cost for each task.",
@@ -382,11 +382,11 @@ def page_hubs(c: dict) -> str:
         f'<a class=card href="./hubs/{h["slug"]}/index.html"><h4>{h["id"]}</h4>'
         f'<p>{h["kind"]} · <span class=mono>{h["tier"]}</span></p></a>' for h in hubs)
     body = f"""
-<header class="hero hubs"><div class=wrap><span class=tag>The Open*Hubs · open component registries</span>
+<header class="hero hubs"><div class=wrap><span class=tag>OpenHubForAI · open component registries</span>
   <h1>{c['hubs']} open <span style="text-decoration:underline;text-decoration-color:#e9b8f5">component registries</span>.</h1>
   <p class=lead>Tools, skills, models, methods, harnesses, receipts — the open component registries both Baltor and
   Teleon consume. Continuously populated, governed, and verify-gated.</p>
-  <div class=kpis><div class=kpi><b>{c['hubs']}</b><span>Open*Hubs</span></div>
+  <div class=kpis><div class=kpi><b>{c['hubs']}</b><span>OpenHubForAI hubs</span></div>
   <div class=kpi><b>{c['browsers']}</b><span>browsers cataloged</span></div>
   <div class=kpi><b>{c['driving']}</b><span>driving components/models</span></div></div>
 </div></header>
@@ -405,8 +405,8 @@ def page_hubs(c: dict) -> str:
 <section><div class="wrap reveal"><h2>Browse all {c['hubs']}</h2><h3>Every hub, one standardized surface.</h3>
   <p>Each hub renders from the same template (consistent design), with its own engine, settings, and verify gate.</p>
   <div class="grid g3" style="margin-top:16px">{cards}</div></div></section>"""
-    return _shell("hubs", "The Open*Hubs — open component registries",
-                  "The Open*Hubs: open component registries of tools, skills, models, methods both Baltor and Teleon consume.",
+    return _shell("hubs", "OpenHubForAI — open component registries",
+                  "OpenHubForAI: open component registries of tools, skills, models, methods both Baltor and Teleon consume.",
                   "hubs", body)
 
 
@@ -474,7 +474,7 @@ def _self_test() -> int:
     ck("Teleon shows MORE capability TYPES (not just extraction): classify/answer/summarize/translate/route",
        "Not just extraction" in pages["teleon"] and all(w in pages["teleon"] for w in ("Classify", "Translate", "Summarize")))
     print("\n" + ("PASS - build_intro_site: 4 cross-linked animated pages — PARENT (efficient+appropriate, not context), "
-                  "Baltor (trust/context), Teleon (efficiency/descent/cascade), Open*Hubs (component registries); figures computed; "
+                  "Baltor (trust/context), Teleon (efficiency/descent/cascade), OpenHubForAI (component registries); figures computed; "
                   "honest preview caveat." if not fails else f"{len(fails)} FAILURES: {fails}"))
     return 0 if not fails else 1
 

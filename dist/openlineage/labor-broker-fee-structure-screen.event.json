@@ -1,0 +1,79 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-26T20:17:55.833719+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "e6219e32-cc15-4f5c-96d6-58e1716e21de",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-26T20:17:55.833730+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/labor-broker-fee-structure-screen",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "HIGH-PRECISION migrant-worker-protection pipeline. Reads a recruitment\nagreement / labour-broker MOU / manpower-supply contract and extracts its\nfee-and-cost structure, then scores it against the IRIS \"Employer Pays\nPrinciple\" and the ILO general principles on fair recruitment: who bears\nrecruitment fees and related costs (visa, medical, travel, training,\ndocument processing), and whether any cost is passed to \u2014 or recovered\nfrom \u2014 the worker via deduction.\n\nNegative-space task: recruitment contracts bury cost-allocation across\nfee schedules, deduction clauses, \"service charges\", and side letters, in\nmultiple currencies, often with euphemisms (\"mobilisation cost\",\n\"processing charge recoverable from salary\"). A bare model summarising the\ncontract cannot reliably attribute *each cost line to a payer* and flag the\nworker-borne ones \u2014 and that attribution is the entire compliance question.\nThe durable lift is structured, cited cost-line attribution against a fixed\nfair-recruitment standard.\n\nBundle: High-precision legal / regulated RAG (taxonomy Bundle B) \u2014 query\ndecomposition over cost categories, hybrid retrieval against the\ndue-diligence regulatory pack (ILO/IRIS material), cross-encoder rerank,\na faithful pre-model extraction of every cost line, then a cite-or-abstain\njudge that labels each cost line worker-borne / employer-borne / unclear.\nOutput is a fee-allocation scorecard plus a worker-reimbursement exposure\nflag, NOT a legal determination."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "OpenHubForAI contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../labor-broker-fee-structure-screen.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/labor-broker-fee-structure-screen/output/cost_line_scorecard",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "cost_line_scorecard (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/labor-broker-fee-structure-screen/output/worker_borne_exposure",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "worker_borne_exposure (object)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/labor-broker-fee-structure-screen/output/evidence_gaps",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "evidence_gaps (object[])"
+        }
+      }
+    }
+  ]
+}

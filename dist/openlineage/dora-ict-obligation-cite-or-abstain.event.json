@@ -1,0 +1,112 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-26T20:17:55.818497+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "d1243674-5f92-4ea1-8e85-a1785fb25496",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-26T20:17:55.818508+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/dora-ict-obligation-cite-or-abstain",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Answer whether a specific EU DORA (Digital Operational Resilience\nAct) ICT third-party / operational-resilience obligation applies to\na financial entity's stated arrangement, grounded ONLY in cited DORA\nobligation provisions \u2014 otherwise abstain. High-precision regulated\nRAG bundle (Bundle B) wired as a governed gate for a volatile,\nregulation-specific domain a base model has no reliable map of:\n\n - structured-to-prose on the arrangement description;\n - hybrid retrieval over the DORA ICT-resilience obligations corpus,\n   fused + cross-encoder reranked to the controlling article(s);\n - cite-first regulatory persona + statute-clarity harness produces a\n   yes / no / conditional applicability answer with a per-claim\n   citation to the DORA article it rests on;\n - DETERMINISTIC cite-or-abstain gate: an applicability claim with\n   no citation to a retrieved DORA provision fails citation-coverage\n   and blocks publication \u2014 the model may NOT assert \"Article 28\n   requires X\" without the provision behind it.\n\nNegative-space task: DORA is recent, dense, and entity-type\nconditional; base models confidently mis-state which article governs\nICT third-party risk and fabricate article numbers. Grounding every\napplicability claim in a cited provision, or abstaining, is the\ncapability the bare model lacks.\n\nNOT legal advice; descriptive over the cited DORA provisions only."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "OpenHubForAI contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../dora-ict-obligation-cite-or-abstain.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/dora-ict-obligation-cite-or-abstain/output/answer_markdown",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "answer_markdown (string)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/dora-ict-obligation-cite-or-abstain/output/applicability",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "applicability (string)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/dora-ict-obligation-cite-or-abstain/output/findings",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "findings (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/dora-ict-obligation-cite-or-abstain/output/citation_coverage",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "citation_coverage (number)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/dora-ict-obligation-cite-or-abstain/output/abstained",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "abstained (boolean)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/dora-ict-obligation-cite-or-abstain/output/trace",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "trace (object[])"
+        }
+      }
+    }
+  ]
+}

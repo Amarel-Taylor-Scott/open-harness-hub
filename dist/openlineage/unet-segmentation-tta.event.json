@@ -1,0 +1,68 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-26T20:17:55.865090+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "36b6e34d-dceb-4cb5-9d9e-78287533d0f6",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-26T20:17:55.865101+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/unet-segmentation-tta",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "U-Net (often with EfficientNet/ResNet/SEResNeXt encoder via segmentation_\nmodels_pytorch) for medical image segmentation. Standard Kaggle shape:\n5-fold CV + albumentations augmentation (flip / shift / scale / rotate\n/ elastic) + Test-Time Augmentation (TTA) at inference (D4 horizontal/\nvertical flip + 90\u00b0 rotations averaged).\n\nVerified by OpenHubForAI mining: awsaf49 UWMGI Unet Train PyTorch\n(1473 votes, UW-Madison GI Tract) + UWMGI 2.5D Infer PyTorch (1092\nvotes), hidngnguyna baseline U-Net (617 votes, HuBMAP), corochann\nSEResNeXt (823 votes, Bengali). 5+ kernels."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "OpenHubForAI contributors (port)",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../unet-segmentation-tta.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/unet-segmentation-tta/output/predictions_mask",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "predictions_mask (component_id)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/unet-segmentation-tta/output/fold_metrics",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "fold_metrics (object[])"
+        }
+      }
+    }
+  ]
+}

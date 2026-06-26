@@ -1,0 +1,90 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-26T20:17:55.833563+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "3abcb33a-a9cc-4fae-9f2b-8a964cf42c64",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-26T20:17:55.833574+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/modern-slavery-statement-completeness",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "HIGH-PRECISION legal-disclosure pipeline. Reads a company's *published\nmodern-slavery / forced-labour transparency statement* and checks it\nagainst the mandatory reporting criteria of the relevant law, returning a\nper-criterion covered / partial / missing verdict with the exact statement\nspan and the controlling legal citation for each.\n\nNegative-space task: a bare model asked \"is this statement compliant?\"\nproduces a fluent but unreliable yes/no \u2014 it does not reliably enumerate\nthe *specific* mandated criteria (UK MSA \u00a754(5) six areas; AU MSA seven\nmandatory criteria; Canada S-211 \u00a711 report contents; CA SB-657 five\ndisclosure areas), and it hallucinates coverage for criteria the document\nsilently omits. The expensive, durable lift is exact-criterion mapping:\neach required criterion must be located in the text or explicitly marked\nabsent, every verdict tied to a primary-law span. That is precisely what\nthis pipeline freezes into deterministic retrieval + a cite-or-abstain\njudge.\n\nBundle: High-precision legal / regulated RAG (taxonomy Bundle B) \u2014 query\ndecomposition over the multi-criterion checklist, hybrid retrieval against\nthe due-diligence regulatory pack with source-precedence (controlling law\nwins), a checklist evaluator, and a strict cite-every-verdict-or-mark-\nmissing judge. Output is an auditable completeness scorecard, NOT a legal\nopinion; \"missing\" means the criterion was not located in the document,\nnot that the company is non-compliant."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "OpenHubForAI contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../modern-slavery-statement-completeness.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/modern-slavery-statement-completeness/output/criteria_scorecard",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "criteria_scorecard (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/modern-slavery-statement-completeness/output/completeness_score",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "completeness_score (number)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/modern-slavery-statement-completeness/output/missing_criteria",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "missing_criteria (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/modern-slavery-statement-completeness/output/evidence_gaps",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "evidence_gaps (object[])"
+        }
+      }
+    }
+  ]
+}

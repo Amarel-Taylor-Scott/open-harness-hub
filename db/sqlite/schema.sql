@@ -1,5 +1,5 @@
 -- ----------------------------------------------------------------------------
--- Open Harness Hub — SQLite schema (v0.1.0)
+-- OpenHubForAI — SQLite schema (v0.1.0)
 --
 -- Same row model as PostgreSQL but with SQLite-compatible types
 -- (no JSONB → use JSON text; no CHECK on FK; no DOMAIN).

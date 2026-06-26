@@ -1,0 +1,112 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-26T20:17:55.834983+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "b50e0f3d-22b2-4f89-8084-35c36700cc4f",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-26T20:17:55.834996+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/invoice-line-item-reconciliation",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Negative-space task: a bare VLM/LLM can read an invoice and copy out the\nprinted grand total, but it cannot reliably RECOMPUTE the arithmetic that\nproves the total is internally consistent \u2014 line_total = qty \u00d7 unit_price\n(minus line discount), \u03a3 line_totals = subtotal, subtotal \u2212 discounts =\nnet, net \u00d7 vat_rate = vat_amount, net + vat = grand_total. Models drift on\nmulti-row sums, silently \"agree\" with a wrong printed total, and produce a\ndifferent answer on re-run. This pipeline forces the model to do ONLY the\nextraction (each field tied to its source line/cell), then runs the math\nas a DETERMINISTIC verifier outside the model and FAILS the run when the\nprinted total does not reconcile to the recomputed total within tolerance.\n\nCapability lift is structural: the failure is architectural (token-level\narithmetic over many rows is unreliable and non-reproducible), so a\ndeterministic reconciliation gate keeps lifting no matter how the model\nimproves \u2014 and it costs zero model tokens.\n\nBundle: High-precision regulated extraction (taxonomy Bundle B) wired with\nan OCR pre-pass for the character-level field accuracy a VLM blurs, a\ncanonical-schema mapper so heterogeneous invoice layouts become one row\nshape, and post-call deterministic verification gates."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "OpenHubForAI contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../invoice-line-item-reconciliation.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/invoice-line-item-reconciliation/output/line_items",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "line_items (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/invoice-line-item-reconciliation/output/header_totals",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "header_totals (object)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/invoice-line-item-reconciliation/output/reconciliation_verdict",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "reconciliation_verdict (string)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/invoice-line-item-reconciliation/output/failing_equations",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "failing_equations (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/invoice-line-item-reconciliation/output/recomputed_grand_total",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "recomputed_grand_total (integer)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/invoice-line-item-reconciliation/output/review_ticket",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "review_ticket (object)"
+        }
+      }
+    }
+  ]
+}

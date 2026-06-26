@@ -1,0 +1,171 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-26T20:17:55.826251+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "11f1390c-0dc7-4c40-a0bb-37725c7f1bea",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-26T20:17:55.826265+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/ph-covered-transaction-screening",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Decide whether a single Philippine financial transaction is a COVERED\ntransaction (cash threshold) and/or a SUSPICIOUS transaction under the\nAnti-Money Laundering Act (RA 9160 as amended by RA 10365 / 10927 /\n11521), and whether a covered/suspicious-transaction report (CTR/STR)\nis due \u2014 and within what reporting window \u2014 without filing anything.\n\nNegative space: a bare model cannot reliably state the PH covered-\ntransaction cash threshold, the casino threshold, the reporting window\nto AMLC, or which suspicious indicators are enumerated in the law \u2014\nit confabulates US-style $10,000 CTR rules. The threshold facts and\nthe enumerated suspicious-circumstance indicators live in a governed,\ndated Knowledge Corpus; the threshold comparison is a deterministic\nConditional, not a model guess. Output is a decision plus the cited\nindicators and the reporting window, halted to human review if a\nsanctions hit or a high-severity suspicious indicator fires.\n\nReference / educational only \u2014 synthetic transaction inputs; not a\nfiling engine and not legal advice. Bundle: High-precision legal /\nregulated RAG (Bundle B) over a governed AML corpus."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "OpenHubForAI contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../ph-covered-transaction-screening.yaml"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "knowledge-pack/aml-red-flags-extended",
+      "facets": {
+        "schema": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-1-0/SchemaDatasetFacet.json",
+          "fields": [
+            {
+              "name": "rag_doc",
+              "type": "string"
+            }
+          ]
+        },
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "Extended catalog of anti-money-laundering red flags drawn from FATF\nguidance, FinCEN advisories, and Wolfsberg principles. Complements\n`knowledge-pack/fatf-typologies-sample` with finer-grained\nobservable indicators (transaction pattern, behavioral, document,\ngeographic) for use in AML pipelines."
+        },
+        "dataSource": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+          "name": "open-harness-hub",
+          "uri": "https://open-harness-hub.dev/knowledge-pack/aml-red-flags-extended"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "knowledge-pack/high-risk-corridors-and-sectors",
+      "facets": {
+        "schema": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-1-0/SchemaDatasetFacet.json",
+          "fields": [
+            {
+              "name": "rag_doc",
+              "type": "string"
+            },
+            {
+              "name": "classifier_rule",
+              "type": "string"
+            }
+          ]
+        },
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "Composite reference of high-risk geographic corridors and product\nsectors with documented patterns of forced labor, child labor,\nenvironmental harm, or governance opacity. Used by\n`pipeline/supplier-policy-grading` and `pipeline/deep-tier-supplier-\naudit` to up-weight findings when the supplier sources from listed\ncorridors / sectors.\n\nEach entry includes: corridor name + indicative geography + product\nsectors + documented risk categories + citations to the regulatory\nbasis for heightened review (UFLPA WROs, CBP findings list, ILO\ncountry reports, US TVPA Tier rankings).\n\nCategories covered:\n - **Apparel / textile**: Xinjiang (cotton, UFLPA), Sialkot\n   (Pakistan, sports goods), Bangladesh (Ashulia, Narayanganj),\n   Cambodia (Phnom Penh), Vietnam, Myanmar\n - **Electronics / minerals**: DRC (cobalt \u2014 Katanga, Kolwezi,\n   Likasi), Indonesia (tin \u2014 Bangka), Colombia (gold), Peru\n   (gold), Madagascar (mica), India (Jharkhand mica)\n - **Agriculture**: C\u00f4te d'Ivoire + Ghana (cocoa, child labor),\n   Brazil (beef + Amazon deforestation), Paraguay + Argentina\n   (soy, Gran Chaco deforestation), Malaysia + Indonesia\n   (palm oil, RSPO gaps), Uzbekistan (cotton, formerly state-\n   compelled), Turkmenistan (cotton)\n - **Construction / domestic work**: Gulf states (Qatar, Saudi\n   Arabia, UAE, Kuwait, Bahrain \u2014 kafala system), Singapore\n   (migrant construction)\n - **Seafood**: Thailand (Samut Sakhon, Ranong \u2014 fishing vessels),\n   Bangladesh (shrimp), Vietnam\n - **Brick kilns**: India (Bihar, UP), Pakistan (Punjab), Nepal,\n   Cambodia\n - **Carpets / glass / footwear**: Pakistan (Sialkot), India\n   (Bhainsa carpets, Firozabad glass), Bangladesh\n\nComposite educational extracts; supplier mapping requires real-\ntime CBP WRO / UFLPA Entity List checks (which change frequently)."
+        },
+        "dataSource": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+          "name": "open-harness-hub",
+          "uri": "https://open-harness-hub.dev/knowledge-pack/high-risk-corridors-and-sectors"
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ph-covered-transaction-screening/output/is_covered_transaction",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "is_covered_transaction (boolean)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ph-covered-transaction-screening/output/covered_threshold_cited",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "covered_threshold_cited (object)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ph-covered-transaction-screening/output/suspicious_indicators",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "suspicious_indicators (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ph-covered-transaction-screening/output/reporting_obligation",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "reporting_obligation (enum[none, ctr_due, str_due, ctr_and_str_due, halt_sanctions_escalation])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ph-covered-transaction-screening/output/reporting_window_days",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "reporting_window_days (number)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ph-covered-transaction-screening/output/decision_rationale",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "decision_rationale (markdown)"
+        }
+      }
+    }
+  ]
+}

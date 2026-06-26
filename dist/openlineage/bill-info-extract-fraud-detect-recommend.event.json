@@ -1,0 +1,149 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-26T20:17:55.826545+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "75db5701-b78d-4819-b4c1-c6c7118bdb43",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-26T20:17:55.826559+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/bill-info-extract-fraud-detect-recommend",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Photograph \u2192 structured-field extraction (Gemma 4 26B vision) \u2192\ndeterministic business-rule validation \u2192 Gemma 4 26B fraud-detect\ncall against Verbraucherzentrale 10-indicator taxonomy \u2192 action-\nfirst user-language output with critical-tier override on fraud.\n\nVerified port of Sviatoslav Grabovsky's Bill_info AI (Gemma 4 Good\nHackathon, Hugging Face Space at Svityk/bill-info-ai). Eval set:\n28 documents (Reddit-sourced real letters, redacted documents for\nrefusal testing, clear synthetic cases, adversarial edge cases).\nReported metrics: 96% extraction success (27/28), 95.8% field\naccuracy, 100% refusal accuracy on 7 redacted documents, 8.5s\naverage latency, three-level fraud classification (legitimate /\nsuspicious / likely_scam).\n\nImplements 3 design patterns published from this work:\n - pattern/two-stage-extract-then-judge (focused fraud-detect call\n   does not compete with extraction for model attention)\n - pattern/critical-tier-output-override (likely_scam classification\n   overrides every other output component to anti-scam guidance)\n - pattern/refuse-on-redacted (null on redacted fields; user sees\n   'unknown' in their language, never a hallucinated value)"
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "Sviatoslav Grabovsky (Bill_info AI, original)",
+            "type": "MAINTAINER"
+          },
+          {
+            "name": "OpenHubForAI contributors (port + spec)",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../bill-info-extract-fraud-detect-recommend.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/bill-info-extract-fraud-detect-recommend/output/next_24h_action",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "next_24h_action (string)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/bill-info-extract-fraud-detect-recommend/output/urgency_banner",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "urgency_banner (string)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/bill-info-extract-fraud-detect-recommend/output/fraud_classification",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "fraud_classification (string)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/bill-info-extract-fraud-detect-recommend/output/fraud_indicators",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "fraud_indicators (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/bill-info-extract-fraud-detect-recommend/output/extracted_fields",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "extracted_fields (object)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/bill-info-extract-fraud-detect-recommend/output/user_language_explanation",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "user_language_explanation (string)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/bill-info-extract-fraud-detect-recommend/output/recommended_steps",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "recommended_steps (string[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/bill-info-extract-fraud-detect-recommend/output/reply_draft_source_language",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "reply_draft_source_language (string)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/bill-info-extract-fraud-detect-recommend/output/validation_errors",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "validation_errors (object[])"
+        }
+      }
+    }
+  ]
+}

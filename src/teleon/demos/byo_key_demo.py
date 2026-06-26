@@ -69,7 +69,7 @@ DEMOS: dict[str, dict] = {
                "run": lambda i: _run_llm(i, system="You are Baltor. Answer ONLY from the provided source; cite it, or say MISSING.",
                                          default_prompt="What is the maximum legal interest rate? Source: (paste a statute)")},
     "open-star-hubs": {"label": "Suggest reusable components for a task", "needs_key": True,
-                       "run": lambda i: _run_llm(i, system="You are the Open*Hubs store. Suggest reusable components (Knowledge Corpus, If Statement, Action) for the task.",
+                       "run": lambda i: _run_llm(i, system="You are the OpenHubForAI store. Suggest reusable components (Knowledge Corpus, If Statement, Action) for the task.",
                                                  default_prompt="extract renewal + liability clauses from contracts")},
 }
 

@@ -1,0 +1,79 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-26T20:17:55.838911+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "4dac046b-b92c-4463-864d-2e8556bc5826",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-26T20:17:55.838928+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/lgb-xgb-catboost-ensemble",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "The dominant Kaggle tabular-ML shape: train LightGBM + XGBoost +\nCatBoost separately on the same features, blend predictions\n(weighted-mean / rank-mean / stacking). K-fold CV (typically 5-10\nStratifiedKFold) for both training + ensemble weight selection.\n\nVerified by OpenHubForAI mining: yuanzhezhou baseline LGB+XGB+\nCatBoost (1417 votes, Optiver 2023), suvroo Optuna|XGBoost|klib\n(205 votes, PS4E7), jetakow Home Credit 2024 (5098 votes \u2014 highest\nvote count in any kernel we've mined!), greysky Home Credit baseline\n(1397 votes), rohanrao AutoML Grand Prix 1st place (222 votes,\nCatBoost + ensemble). 5+ verified kernels."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "OpenHubForAI contributors (port)",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../lgb-xgb-catboost-ensemble.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/lgb-xgb-catboost-ensemble/output/ensemble_predictions",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "ensemble_predictions (number[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/lgb-xgb-catboost-ensemble/output/fold_metrics",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "fold_metrics (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/lgb-xgb-catboost-ensemble/output/feature_importance",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "feature_importance (object)"
+        }
+      }
+    }
+  ]
+}

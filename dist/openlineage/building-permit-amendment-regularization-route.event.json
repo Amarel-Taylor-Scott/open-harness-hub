@@ -1,0 +1,90 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-26T20:17:55.841385+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "c9f3e005-70e9-4df3-ab6e-bc830fabd2a6",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-26T20:17:55.841395+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/building-permit-amendment-regularization-route",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Detect when reported as-built construction has materially deviated from the\napproved building permit such that a revised/amended permit (a regularization\npath) is legally required, then route the case to the jurisdiction-specific\nauthority with citations. Material-alteration definitions, the\nadded-story/added-use trigger, and the regularization workflow are\njurisdiction-specific and thinly represented online \u2014 exactly the\nlow-digitization valley the national permit/occupancy corpus targets. The\npattern generalizes across PH (PD 1096 / LGU OBO), Indonesia (PBG via SIMBG,\nPP 16/2021), and Nigeria (state building-control agencies, e.g. LASBCA);\nonly the corpus and routing targets change \u2014 the deviation logic and the\nabstain gate are reusable.\n\nAgentic / corrective-RAG bundle (Bundle D): a two-time retrieval refines the\nquery from \"is this a material alteration?\" toward the controlling clause,\nofficial-source verification grades the retrieval, and a corrective human\nescalation fires when the retrieval is weak or the approved scope is not\nhuman-verified (tier-4 OBO/PUPR/state record). The router NEVER infers the\napproved scope from the model; an unverifiable approved scope yields\nPERMIT_RECORD_UNVERIFIABLE. Detection + routing + citations only; no PII; no\nguidance on avoiding permits or inspection."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "OpenHubForAI contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../building-permit-amendment-regularization-route.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/building-permit-amendment-regularization-route/output/amendment_required",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "amendment_required (string)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/building-permit-amendment-regularization-route/output/findings",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "findings (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/building-permit-amendment-regularization-route/output/routing_packet",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "routing_packet (object)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/building-permit-amendment-regularization-route/output/score",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "score (number)"
+        }
+      }
+    }
+  ]
+}

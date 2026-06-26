@@ -1,4 +1,4 @@
--- Open Harness Hub canonical object count report.
+-- OpenHubForAI canonical object count report.
 --
 -- This query intentionally separates curated manifest rows from generated
 -- operational objects. Run after db/postgres/schema.sql and any loader job.

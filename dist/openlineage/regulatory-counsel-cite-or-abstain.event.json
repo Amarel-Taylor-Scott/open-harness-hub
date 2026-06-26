@@ -1,0 +1,101 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-26T20:17:55.818336+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "11427a0f-ebb8-4c84-a64d-b2dc9978f991",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-26T20:17:55.818347+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/regulatory-counsel-cite-or-abstain",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "Answer a regulated entity's compliance question ONLY with answers\nthat trace to a primary statutory/regulatory authority \u2014 otherwise\nabstain. This is the High-precision legal/regulated RAG bundle\n(Bundle B) wired as a hard governed gate, not a rubric suggestion:\n\n - page/structure-aware chunking preserves citable section anchors;\n - hybrid retrieval (field-weighted lexical + dense) over a governed\n   statute/canon corpus, fused + cross-encoder reranked;\n - a cite-first counsel persona + harness emits one finding per\n   sub-question with a per-claim citation;\n - DETERMINISTIC cite-or-abstain gate: every load-bearing sentence\n   must carry a citation marker (citation-coverage) AND the\n   self-consistency hallucination score must stay below threshold \u2014\n   if either fails the pipeline does NOT pass, forcing an abstain /\n   human-review outcome.\n\nThe negative-space task: a base model will fluently answer\n\"does requirement X apply to entity type Y?\" with a plausible but\nfabricated citation. Here the answer is structurally barred from\npublication unless each claim is grounded in a retrieved authority.\n\nNOT legal advice; descriptive; jurisdiction-bound to the cited\nauthorities only."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "OpenHubForAI contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../regulatory-counsel-cite-or-abstain.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/regulatory-counsel-cite-or-abstain/output/answer_markdown",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "answer_markdown (string)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/regulatory-counsel-cite-or-abstain/output/findings",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "findings (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/regulatory-counsel-cite-or-abstain/output/citation_coverage",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "citation_coverage (number)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/regulatory-counsel-cite-or-abstain/output/abstained",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "abstained (boolean)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/regulatory-counsel-cite-or-abstain/output/trace",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "trace (object[])"
+        }
+      }
+    }
+  ]
+}

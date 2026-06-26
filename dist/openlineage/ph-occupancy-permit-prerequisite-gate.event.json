@@ -1,0 +1,90 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2026-06-26T20:17:55.841088+00:00",
+  "producer": "https://open-harness-hub.dev/emitter/openlineage@0.1.0",
+  "schemaURL": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "run": {
+    "runId": "354ab4aa-db97-490c-9d8b-f4b8adbe6136",
+    "facets": {
+      "nominalTime": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+        "nominalStartTime": "2026-06-26T20:17:55.841099+00:00"
+      }
+    }
+  },
+  "job": {
+    "namespace": "open-harness-hub",
+    "name": "pipeline/ph-occupancy-permit-prerequisite-gate",
+    "facets": {
+      "documentation": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+        "description": "A yes/no occupancy-readiness gate for a Philippine building before a\nCertificate of Occupancy (CO) can issue under PD 1096 Sec. 307. It checks\nthat every statutory prerequisite is present and currently valid: the\nFire Safety Inspection Certificate (FSIC) under RA 9514, the licensed\nstructural / architectural sign-off recorded on the building permit, and\nthe final building inspection record \u2014 then returns OCCUPANCY_READY or\nNOT_READY with the specific missing/expired prerequisite and a citation,\nrouting each gap to the responsible authority (OBO, BFP).\n\nHigh-precision legal RAG bundle (Bundle B): a dense + exact-id leg over the\nnational permit/occupancy corpus, official-source verification of each\nretrieved clause, per-claim citation coverage, and a hard abstain. Because\nFSIC status (BFP) and the OBO inspection record are tier-4 (counter-only),\nany prerequisite whose status is not human-verified forces a NOT_READY +\nPERMIT_RECORD_UNVERIFIABLE route to a human \u2014 the gate never infers a\n\"probably issued\" CO. Detection and routing with citations only; no\noccupant PII."
+      },
+      "ownership": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/OwnershipJobFacet.json",
+        "owners": [
+          {
+            "name": "OpenHubForAI contributors",
+            "type": "MAINTAINER"
+          }
+        ]
+      },
+      "sourceCode": {
+        "_producer": "https://open-harness-hub.dev",
+        "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SourceCodeJobFacet.json",
+        "language": "yaml",
+        "source": "catalog/pipelines/.../ph-occupancy-permit-prerequisite-gate.yaml"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ph-occupancy-permit-prerequisite-gate/output/decision",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "decision (string)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ph-occupancy-permit-prerequisite-gate/output/prerequisite_findings",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "prerequisite_findings (object[])"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ph-occupancy-permit-prerequisite-gate/output/routing_packet",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "routing_packet (object)"
+        }
+      }
+    },
+    {
+      "namespace": "open-harness-hub",
+      "name": "pipeline/ph-occupancy-permit-prerequisite-gate/output/score",
+      "facets": {
+        "documentation": {
+          "_producer": "https://open-harness-hub.dev",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "score (number)"
+        }
+      }
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 -- ----------------------------------------------------------------------------
--- Open Harness Hub — DuckDB schema (v0.1.0)
+-- OpenHubForAI — DuckDB schema (v0.1.0)
 --
 -- DuckDB is an embedded analytical (OLAP) database with native JSON,
 -- LIST/STRUCT types, columnar storage, and a vector-search extension

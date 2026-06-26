@@ -48,7 +48,7 @@ graph TD
 - **baltor** [live] — Fully MANAGED, governed context — company-wide / department-wide / initiative-wide. Verified, Current, Provable. 'Models don't fail. Their c
 - **teleon** [live] — Its OWN product (not just Baltor's runtime): program a capability in PLAIN TEXT and Teleon makes it ADAPT to the most EFFICIENT + BOUNDED fo
 - **openharnesshub** [live] — The open STORE + the open CapabilityTask spec (CTS): a shared catalog of reusable components — context, tools, models, steps, DAG components
-- **open-star-hubs** [mixed (9 live + 13 private)] — The STORE, by category — each Open*Hub registers reusable components BOTH Baltor and Teleon consume: models, context, compression, skills, t
+- **open-star-hubs** [mixed (9 live + 13 private)] — The STORE, by category — each OpenHubForAI hub registers reusable components BOTH Baltor and Teleon consume: models, context, compression, s
 - **teleon-demos** [live] — The proof surface — every descent demo with its MEASURED saving vs the expensive default (extraction 47-91%, enrichment 86%), governed (serv
 - **design-bundle** [live] — The high-fidelity design/brand handoff bundle (24+ surfaces, 22 hubs) for Claude Code Max — the single source for the portfolio's UI.
 

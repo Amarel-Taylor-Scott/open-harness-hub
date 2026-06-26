@@ -1,5 +1,5 @@
 // ----------------------------------------------------------------------------
-// Open Harness Hub — Neo4j / Memgraph graph schema (v0.1.0)
+// OpenHubForAI — Neo4j / Memgraph graph schema (v0.1.0)
 //
 // The catalog is naturally a graph:
 //   harness  -- CONSUMES -->  knowledge-pack
