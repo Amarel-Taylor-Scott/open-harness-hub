@@ -1,4 +1,4 @@
-/* global React, ReactDOM, useHashRoute, navigate, StoreCtx, PLanding, PBuild, PResults, PFlow, PRun, PBrowse, PDetail, PDashboard, PNotFound, PPricing, Mark, PFoundry, PImprove, PDashboards, PSettings, PRegistry, PConnect, PAdmin, PCheckout, PWorkers, PSolutions, PSolution, PFreshness, PAttest, PStatus, PActivity, PSources, PRequests, PRequestDetail, PContribute, PKnowledgeEntry, PProvenance, PTrustCenter, PAuditLog, PRoles, PSignin, POnboarding, PUpgrade, PPublish, PPreview, PUseCase */
+/* global React, ReactDOM, useHashRoute, navigate, StoreCtx, PLanding, PBuild, PResults, PFlow, PRun, PBrowse, PDetail, PDashboard, PNotFound, PPricing, Mark, PFoundry, PImprove, PDashboards, PSettings, PRegistry, PConnect, PAdmin, PCheckout, PWorkers, PSolutions, PSolution, PFreshness, PAttest, PStatus, PActivity, PSources, PRequests, PRequestDetail, PContribute, PKnowledgeEntry, PProvenance, PTrustCenter, PAuditLog, PRoles, PSignin, POnboarding, PUpgrade, PPublish, PPreview, PUseCase, PRegistryBrowser */
 // OpenHarnessHub prototype — root app: router, shells, sidebar, command palette, toasts, scheme switcher.
 
 const SCHEMES = [
@@ -6,7 +6,7 @@ const SCHEMES = [
   ['c', '#7c6bf0', 'Violet'], ['d', '#0e7c86', 'Teal'], ['e', '#22c7d6', 'Blueprint'],
   ['f', '#1e6b43', 'Ledger'], ['g', '#39d353', 'Hacker'], ['h', '#1f5fbf', 'Slate'],
 ];
-const MKT_ROUTES = ['/', '/pricing', '/trust', '/signin', '/signup', '/onboarding', '/upgrade', '/preview'];
+const MKT_ROUTES = ['/', '/pricing', '/trust', '/signin', '/signup', '/onboarding', '/upgrade', '/preview', '/registries'];
 
 // ---- app sidebar ----
 const NAV_GROUPS = [
@@ -248,6 +248,7 @@ function App() {
   else if (route === '/onboarding') body = <POnboarding />;
   else if (route === '/upgrade') body = <PUpgrade />;
   else if (route === '/preview') body = <PPreview />;
+  else if (route === '/registries') body = <PRegistryBrowser />;
   else if (route.startsWith('/for/')) body = <PUseCase who={route.slice(5)} />;
   else {
     let page, crumb, bare = false;

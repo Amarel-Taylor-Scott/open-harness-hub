@@ -1,6 +1,7 @@
 /* global React, ReactDOM, PORTFOLIO,
    useHashRoute, navigate, useSiteTheme,
-   OhTopBar, OhHero, OhSection, OhFeatures, OhBand, OhFooter */
+   OhTopBar, OhHero, OhSection, OhFeatures, OhBand, OhFooter,
+   OhLayout, OhTable, OhPageHead, OhRollup, OhThemeToggle */
 // AIDevObserver: review how your team uses AI coding agents.
 // A marketing app built ENTIRELY on the shared site kit (kit/oh-site.*), like the
 // sibling surfaces. Only the brand config + a few product sections are local; all
@@ -309,14 +310,14 @@ function Landing({ theme, onToggle }) {
   return (
     <div className={'oh dir-s theme-' + theme + ' oh-site ado'} style={{ '--accent': ACCENT }}>
       <OhTopBar brand={BRAND} nav={MKT_NAV}
-        cta={{ label: 'Install', href: '/runs' }} theme={theme} onToggle={onToggle} />
+        cta={{ label: 'Open the app', href: '/app' }} theme={theme} onToggle={onToggle} />
       <OhHero
         eyebrow="AI coding session review"
         title={<>See how your team really uses <span className="tint">AI coding agents</span>.</>}
         lede="AIDevObserver reviews how your team uses AI coding agents and turns each session into a clear, ranked report. It flags reinvention, wasted context, risky commands, and cheaper paths you missed, so good habits spread and expensive ones do not."
         ctas={[
           { label: 'See a review →', onClick: () => scrollToId('demo'), primary: true },
-          { label: 'Install the extension', onClick: () => scrollToId('runs') },
+          { label: 'Open the app', onClick: () => navigate('/app') },
         ]}
         aside={<HeroReviewCard />} />
       <SecHow />
@@ -343,15 +344,208 @@ function Landing({ theme, onToggle }) {
   );
 }
 
+/* ===================== the logged-in app (OhLayout variant="sidebar" + OhTable) ===================== */
+// The app is the bulk of the product: pick a local session, review it, read the ranked findings. It rides the
+// SAME shared kit as every sibling surface — the left-sidebar shell is OhLayout(variant="sidebar"), the sessions
+// list is OhTable. It talks to the REAL observer backend over the same-origin seam (/api/observer/*), the exact
+// service scripts/observer_local_service.py exposes. serves_truth=false; read-only; nothing is stored.
+
+const APP_NAV = [
+  ['/app', '◉', 'Review'],
+  ['/app/sessions', '≡', 'Sessions'],
+  ['/app/findings', '⚑', 'Findings'],
+  ['/app/settings', '⚙', 'Settings'],
+];
+
+// settings install lines: the MCP + CLI lines from the marketing page, plus the live-coaching hook.
+const APP_INSTALL = INSTALL_LINES.concat([
+  ['Live coaching during a session (Claude Code PreToolUse hook)', 'python3 scripts/aidevobserver_hook.py --install'],
+]);
+
+function shortId(id) { const s = String(id || ''); return s.length > 14 ? s.slice(0, 8) + '…' + s.slice(-3) : s; }
+function relTime(sec) {
+  if (!sec) return '—';
+  const s = Math.max(0, Date.now() / 1000 - sec);
+  if (s < 60) return 'just now';
+  const m = Math.floor(s / 60); if (m < 60) return m + 'm ago';
+  const h = Math.floor(m / 60); if (h < 24) return h + 'h ago';
+  const d = Math.floor(h / 24); if (d < 30) return d + 'd ago';
+  return new Date(sec * 1000).toLocaleDateString();
+}
+
+// /app → Review (the paste-a-session demo, reused inside the shell)
+function AppReview() {
+  return (
+    <>
+      <OhPageHead eyebrow="Review" title="Review a session"
+        sub="Paste an AI coding session, or load the example. AIDevObserver returns the findings ranked by confidence. Read only — nothing is stored." />
+      <ReviewDemo />
+    </>
+  );
+}
+
+// /app/sessions → the discovered local Claude Code sessions, in an OhTable. Picking one reviews it.
+function AppSessions({ onReview, busyPath }) {
+  const [rows, setRows] = React.useState(null);   // null = loading, [] = none
+  const [err, setErr] = React.useState(false);
+  React.useEffect(() => {
+    let live = true;
+    fetch('/api/observer/sessions')
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((d) => { if (live) setRows(Array.isArray(d.sessions) ? d.sessions : []); })
+      .catch(() => { if (live) { setErr(true); setRows([]); } });
+    return () => { live = false; };
+  }, []);
+  const cols = [
+    { key: 'session_id', label: 'Session', sortable: true, sortValue: (r) => r.session_id,
+      render: (r) => <span className="mono">{shortId(r.session_id)}</span> },
+    { key: 'project', label: 'Project', sortable: true },
+    { key: 'mtime', label: 'Modified', sortable: true, sortValue: (r) => r.mtime, render: (r) => relTime(r.mtime) },
+    { key: '_act', label: '', align: 'right', render: (r) => (
+      <button className="oh-btn oh-btn--ghost oh-btn--sm" disabled={busyPath === r.path}
+        onClick={(e) => { e.stopPropagation(); onReview(r); }}>{busyPath === r.path ? 'Reviewing…' : 'Review →'}</button>) },
+  ];
+  const empty = err
+    ? 'The observer service is not reachable. Start it with: python3 scripts/observer_local_service.py --serve'
+    : 'No local sessions found yet. Start a Claude Code session in this project, or paste one on the Review page.';
+  return (
+    <>
+      <OhPageHead eyebrow="Sessions" title="Local AI coding sessions"
+        sub="AIDevObserver discovers your Claude Code sessions for this project. Pick one to review. Read only — discovery reads file metadata, never the transcript content." />
+      {rows === null ? <div className="ohl-empty">Loading sessions…</div>
+        : <OhTable cols={cols} rows={rows} rowKey={(r) => r.path} onRow={(r) => onReview(r)} empty={empty} />}
+    </>
+  );
+}
+
+// /app/findings → the most recent review's findings, ranked. Honest when the service was unreachable.
+function AppFindings({ report, source, session, error }) {
+  if (error) {
+    return (
+      <>
+        <OhPageHead eyebrow="Findings" title="That session was not reviewed" sub={error} />
+        <div className="ohl-empty">Start the service with <code className="mono">python3 scripts/observer_local_service.py --serve</code>, then try again.</div>
+      </>
+    );
+  }
+  if (!report) {
+    return (
+      <>
+        <OhPageHead eyebrow="Findings" title="No review yet"
+          sub="Run a review from the Sessions page, or paste a session on the Review page." />
+        <div className="ohl-empty">Nothing reviewed yet this session.</div>
+      </>
+    );
+  }
+  const findings = (report.report || []).map(mapServerFinding).sort((a, b) => b.conf - a.conf);
+  const s = report.summary || {};
+  return (
+    <>
+      <OhPageHead eyebrow="Findings" title={session ? ('Review · ' + shortId(session)) : 'Latest review'}
+        sub="Every finding is a governed suggestion you triage. Read only — nothing is stored." />
+      <OhRollup items={[
+        ['Findings', s.findings != null ? s.findings : findings.length],
+        ['Reinventions', s.reinventions != null ? s.reinventions : '—'],
+        ['Waste signals', s.waste_signals != null ? s.waste_signals : '—'],
+        ['Source', source === 'live' ? 'live engine' : 'preview'],
+      ]} />
+      {findings.length
+        ? <div className="ado-findings">{findings.map((f, i) => <FindingRow f={f} key={f.type + '-' + i} />)}</div>
+        : <div className="ohl-empty">No findings — this session looks clean.</div>}
+    </>
+  );
+}
+
+// /app/settings → install everywhere + the trust statements (read-only, nothing stored)
+function AppSettings() {
+  return (
+    <>
+      <OhPageHead eyebrow="Settings" title="Install and connect"
+        sub="Run the same review wherever your team works: an editor extension, the Claude Code MCP server, the CLI, or a live in-session hook. Read only by design." />
+      <div className="ado-installs">
+        {APP_INSTALL.map(([label, cmd]) => <InstallLine label={label} cmd={cmd} key={cmd} />)}
+      </div>
+      <div className="ado-trust" style={{ marginTop: 18 }}>
+        {TRUST.map(([t, d]) => (
+          <div className="oh-card oh-card--pad ado-trust-item" key={t}>
+            <div className="ado-trust-mk" aria-hidden="true">✓</div>
+            <div><div className="ado-trust-t">{t}</div><div className="ado-trust-d">{d}</div></div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function ObserverApp({ route, theme, onToggle }) {
+  const [report, setReport] = React.useState(null);
+  const [source, setSource] = React.useState('live');
+  const [session, setSession] = React.useState(null);
+  const [error, setError] = React.useState(null);
+  const [busyPath, setBusyPath] = React.useState(null);
+
+  // review a DISCOVERED session by its transcript path (the engine reads the file server-side). On an
+  // unreachable backend we stay honest: the transcript is never in the browser, so we report "not reviewed"
+  // rather than inventing findings (the paste demo, which HAS the text, keeps its own preview fallback).
+  const runReview = React.useCallback(async (sess) => {
+    setBusyPath(sess.path); setError(null);
+    try {
+      const res = await fetch('/api/observer/review', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transcript_path: sess.path }),
+      });
+      if (!res.ok) throw new Error('observer backend status ' + res.status);
+      const data = await res.json();
+      setReport(data); setSource('live'); setSession(sess.session_id);
+    } catch (e) {
+      setReport(null);
+      setError('The observer service was not reachable, so this session was not reviewed. Discovery is metadata only — the transcript is never read in the browser.');
+      setSession(sess.session_id);
+    } finally { setBusyPath(null); navigate('/app/findings'); }
+  }, []);
+
+  const sub = (route || '').replace(/^\/app\/?/, '');
+  let screen;
+  if (sub === 'sessions') screen = <AppSessions onReview={runReview} busyPath={busyPath} />;
+  else if (sub === 'findings') screen = <AppFindings report={report} source={source} session={session} error={error} />;
+  else if (sub === 'settings') screen = <AppSettings />;
+  else screen = <AppReview />;
+
+  // exact-match the index route so "Review" is not also active on /app/sessions etc.
+  const isActive = (h) => (h === '/app' ? (route === '/app' || route === '/app/') : (route === h || route.startsWith(h + '/')));
+  const foot = (
+    <>
+      <button className="oh-btn oh-btn--ghost oh-btn--sm" style={{ width: '100%', justifyContent: 'center' }}
+        onClick={() => navigate('/')}>← Back to site</button>
+      <div className="ohs-side-foot-row">
+        <span className="mono" style={{ fontSize: 11, color: 'var(--fg-muted)' }}>Read only</span>
+        {onToggle && <OhThemeToggle theme={theme} onToggle={onToggle} />}
+      </div>
+    </>
+  );
+
+  return (
+    <div className={'oh dir-s theme-' + theme + ' oh-site ado'} style={{ '--accent': ACCENT }}>
+      <OhLayout variant="sidebar" brand={BRAND} sidebar={APP_NAV} route={route} isActive={isActive}
+        foot={foot} theme={theme} onToggle={onToggle}>
+        {screen}
+      </OhLayout>
+    </div>
+  );
+}
+
 /* ===================== root ===================== */
 function App() {
   const route = useHashRoute();
   const [theme, toggle] = useSiteTheme('aidevobserver-theme');
-  // nav + footer links route to /how, /runs, /demo, /trust → scroll the matching section into view
+  const inApp = (route || '').replace(/^\//, '').startsWith('app');
+  // marketing routes (/how, /runs, /demo, /trust) scroll to the section; the app routes (/app…) render the shell
   React.useEffect(() => {
+    if (inApp) { window.scrollTo(0, 0); return; }
     const id = (route || '').replace(/^\//, '');
     if (id) scrollToId(id);
-  }, [route]);
+  }, [route, inApp]);
+  if (inApp) return <ObserverApp route={route} theme={theme} onToggle={toggle} />;
   return <Landing theme={theme} onToggle={toggle} />;
 }
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);

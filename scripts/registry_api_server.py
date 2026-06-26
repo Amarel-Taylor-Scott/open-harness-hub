@@ -10,6 +10,7 @@ The API is read-only and CORS-open so the browse UI can call it from a tunnel. s
   GET /registries                        -> reconciled_index()  (?source=&kind=&status=&has_catalog= filters)
   GET /registries/{id}                   -> one registry's metadata (404 JSON if unknown)
   GET /registries/{id}/records?limit=N   -> the registry's RegistryObject records
+  GET /browse?q=&category=&kind=&layer=&status=  -> faceted browse: {count, items, facets(counts), records}
   GET /search?q=QUERY                    -> {query, hits:[{registry,name}, ...]}  (federated search)
   GET /reconciliation                    -> the ontology∪catalog reconciliation summary
 
@@ -30,6 +31,7 @@ if str(REPO) not in sys.path:
 
 from src.teleon.registry.index import get, reconciled_index, records  # noqa: E402
 from src.teleon.registry.search import search_all  # noqa: E402
+from src.teleon.registry.browse import browse  # noqa: E402  the rich faceted browse (filtered items + facet counts)
 
 DEFAULT_PORT = 8140
 DEFAULT_RECORD_LIMIT = 200
@@ -53,6 +55,7 @@ def _api_index() -> dict:
             "GET /registries": "the reconciled index; filters: ?source=&kind=&status=&has_catalog=",
             "GET /registries/{id}": "one registry's metadata (404 if unknown)",
             "GET /registries/{id}/records?limit=N": "the registry's records, each as RegistryObject (id,name,type)",
+            "GET /browse?q=&category=&kind=&layer=&status=": "faceted browse: filtered items + facet COUNTS + federated records",
             "GET /search?q=QUERY": "federated search across all queryable registries",
             "GET /reconciliation": "the ontology∪catalog reconciliation summary",
         },
@@ -92,6 +95,9 @@ def route(path: str, query: str = "") -> tuple[int, dict]:
         return 200, {"query": q, "hits": search_all(q) if q else [], "serves_truth": False}
     if path == "/registries":
         return 200, _filtered_registries(params)
+    if path == "/browse":
+        flt = {k: params[k] for k in ("category", "type", "kind", "layer", "status") if params.get(k)}
+        return 200, {**browse(params.get("q", ""), flt), "service": "registry_api_server"}
 
     parts = [urllib.parse.unquote(p) for p in path.split("/") if p]
     if parts and parts[0] == "registries":
@@ -182,10 +188,18 @@ def self_test() -> int:
     code, rc = route("/reconciliation")
     assert code == 200 and rc["ontology_types"] == body["reconciliation"]["ontology_types"], rc
 
+    # /browse -> faceted items + facet COUNTS (the rich browse the OpenHubForAI record browser renders)
+    code, br = route("/browse")
+    assert code == 200 and br["count"] >= 155 and br["items"], f"/browse count = {br.get('count')}"
+    assert {"category", "kind", "layer", "status"} <= set(br["facets"]), f"/browse facets = {list(br['facets'])}"
+    assert all({"id", "status", "categories"} <= set(it) for it in br["items"]), "browse items carry id/status/categories"
+    _, brf = route("/browse", "kind=discovery")
+    assert 0 < brf["count"] < br["count"], f"a facet filter narrows browse: {brf['count']}/{br['count']}"
+
     print(f"registry_api_server self-test: OK ({body['count']} registries [ontology "
           f"{rc['ontology_types']} ∪ catalogs {rc['live_catalogs']}, overlap {rc['overlap']}]; "
           f"{len(items)} RegistryObject records for 'component'; {len(sr['hits'])} search hits for 'cost'; "
-          "serves_truth=false)")
+          f"/browse {br['count']} items over {len(br['facets'])} facet dims; serves_truth=false)")
     return 0
 
 

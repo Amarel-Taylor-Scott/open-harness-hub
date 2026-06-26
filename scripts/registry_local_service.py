@@ -64,6 +64,11 @@ if str(REPO_ROOT) not in sys.path:
 # SQLite-WAL append-log behind each jsonl + the on-disk layout constants (SINGLE SOURCE — the
 # rotation/migration suffixes are defined once in scripts._jsonl_store, never re-typed here)
 from scripts._jsonl_store import AppendLog, MIGRATED_SUFFIX, ROTATED_SUFFIX  # noqa: E402
+# PUBLIC faceted projection of the reconciled registry spine — the SAME engine the standalone REST API
+# uses (single source: src.teleon.registry); read-only, truth_authority=False (a registry is a pointer
+# plus a shape, not asserted truth). This is the data the OpenHubForAI record browser reads via the seam.
+from src.teleon.registry.browse import browse as _spine_browse  # noqa: E402
+from src.teleon.registry.index import records as _spine_records  # noqa: E402
 
 SERVICE_ID = "local_openhub_projection_api"
 REGISTRY_PATH = REPO_ROOT / "architecture" / "local_service_registry.json"
@@ -560,6 +565,16 @@ class _Handler(BaseHTTPRequestHandler):
                                     "truth_authority": False, "note": "projection + per-account workspace; never truth"})
         if path == "/api/openhub/catalog":
             return self._send(200, {"hubs": self.store.catalog_counts()})
+        # PUBLIC spine projection: the faceted registry browse the OpenHubForAI record browser reads
+        # (?q=&category=&type=&kind=&layer=&status=). Read-only; truth_authority stays False.
+        if path == "/api/openhub/registries":
+            flt = {k: (qs.get(k) or [""])[0] for k in ("category", "type", "kind", "layer", "status")
+                   if (qs.get(k) or [""])[0]}
+            return self._send(200, {**_spine_browse((qs.get("q") or [""])[0], flt), "truth_authority": False})
+        if path.startswith("/api/openhub/registries/") and path.endswith("/records"):
+            rid = path[len("/api/openhub/registries/"):-len("/records")]
+            return self._send(200, {"registry": rid, "records": _spine_records(rid, limit=50),
+                                    "truth_authority": False})
 
         seg = path.strip("/").split("/")     # api/openhub/<realm>/<action>...
         if len(seg) >= 4 and seg[0] == "api" and seg[1] == "openhub":

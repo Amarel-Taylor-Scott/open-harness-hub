@@ -232,7 +232,8 @@ function OhNavGroup({ grp, isActive }) {
   );
 }
 function OhAppShell({ brand, nav, groups, header, foot, topbar, isActive, route, cta, theme, onToggle, children }) {
-  const active = isActive || ((h) => route === h || route.startsWith(h + '/'));
+  const r = route || '';  // null-safe: OhLayout(variant="sidebar") may omit route
+  const active = isActive || ((h) => r === h || r.startsWith(h + '/'));
   return (
     <div className="ohs-app">
       <aside className="ohs-side">
@@ -312,10 +313,12 @@ function OhRollup({ items }) {
 //   'two-col'    -> main content + a sticky `aside` (content with a rail).
 //   'no-sidebar' -> full-width content (marketing, wide tables / browsers).
 function OhLayout({ variant = 'one-col', brand, nav, sidebar, cta, signInHref, theme, onToggle,
-                   footer = true, footerProps, aside, children }) {
+                   footer = true, footerProps, aside, groups, header, foot, isActive, route, children }) {
   if (variant === 'sidebar') {
+    // the logged-in app shell: forward the full OhAppShell surface (route -> active highlight, custom foot/header/groups)
     return (
-      <OhAppShell brand={brand} nav={sidebar} cta={cta} theme={theme} onToggle={onToggle}>{children}</OhAppShell>
+      <OhAppShell brand={brand} nav={sidebar} groups={groups} header={header} foot={foot}
+        isActive={isActive} route={route} cta={cta} theme={theme} onToggle={onToggle}>{children}</OhAppShell>
     );
   }
   const cls = variant === 'two-col' ? 'ohl-two' : variant === 'no-sidebar' ? 'ohl-full' : 'ohl-one';

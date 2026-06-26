@@ -1,0 +1,41 @@
+/* OpenHubForAI registry browser (proto-registry-browser.jsx) — faceted browse over the reconciled spine.
+   Uses the shared kit tokens (--line/--bg/--fg/--accent…); only the browser-specific layout lives here. */
+.ohb-toolbar { display: flex; align-items: center; gap: 12px; margin: 8px 0 14px; flex-wrap: wrap; }
+.ohb-search { flex: 1 1 320px; min-width: 240px; padding: 9px 13px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--bg); color: var(--fg); font-size: 14px; }
+.ohb-search:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-weak); }
+.ohb-count { color: var(--fg-muted); font-size: 12.5px; white-space: nowrap; }
+.ohb-views { display: inline-flex; border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; }
+.ohb-view { padding: 7px 14px; border: 0; background: var(--bg); color: var(--fg-muted); font-size: 13px; cursor: pointer; }
+.ohb-view.on { background: var(--accent); color: #fff; }
+
+.ohb-chips { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 0 0 14px; }
+.ohb-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--accent-weak); border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line)); border-radius: 999px; font-size: 12.5px; }
+.ohb-chip button { border: 0; background: none; cursor: pointer; color: var(--fg-muted); font-size: 14px; line-height: 1; }
+.ohb-clear { border: 0; background: none; color: var(--accent); cursor: pointer; font-size: 12.5px; }
+
+.ohb-grid { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 22px; align-items: start; }
+@media (max-width: 760px) { .ohb-grid { grid-template-columns: 1fr; } }
+.ohb-rail { position: sticky; top: 84px; display: flex; flex-direction: column; gap: 16px; }
+.ohb-facet-h { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--fg-muted); margin-bottom: 6px; }
+.ohb-facet-v { display: flex; justify-content: space-between; width: 100%; padding: 4px 8px; border: 0; background: none; border-radius: var(--r-sm); cursor: pointer; color: var(--fg); font-size: 13px; text-align: left; }
+.ohb-facet-v:hover { background: var(--bg-subtle); }
+.ohb-facet-v.on { background: var(--accent-weak); color: var(--accent); font-weight: 600; }
+.ohb-facet-n { color: var(--fg-muted); font-size: 11.5px; }
+.ohb-facet-v.on .ohb-facet-n { color: var(--accent); }
+.ohb-facet-more { border: 0; background: none; color: var(--accent); cursor: pointer; font-size: 12px; padding: 4px 8px; text-align: left; }
+
+.ohb-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.ohb-card { text-align: left; cursor: pointer; border: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
+.ohb-card:hover { border-color: var(--accent); }
+.ohb-card-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.ohb-card-id { font-size: 13px; font-weight: 600; }
+.ohb-card-cats { display: flex; gap: 5px; flex-wrap: wrap; }
+.ohb-card-holds { color: var(--fg-muted); font-size: 12.5px; line-height: 1.4; }
+
+.oh-pill--sm { font-size: 11px; padding: 1px 7px; }
+
+.ohb-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 18px; }
+@media (max-width: 560px) { .ohb-meta { grid-template-columns: 1fr; } }
+.ohb-meta-row { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.ohb-meta-k { color: var(--fg-muted); }
+.ohb-meta-v { font-weight: 500; }
