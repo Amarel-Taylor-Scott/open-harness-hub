@@ -9,6 +9,12 @@
 > real. Last reconciled 2026-06-26. `serves_truth = false` (the surfaces render candidate output; only Baltor's
 > governed source answers serve truth).
 
+> **Self-contained handoff.** The full VERBATIM source of everything this doc references (the kit `oh-tokens.css`,
+> `oh-components.css`, `oh-site.css`, `oh-site.jsx`, `products.js`, plus one complete app) is inlined in
+> **`docs/design/openharness-claude-design/DESIGN-ASSETS.md`**. Upload that file alongside this one and
+> `docs/INTEGRATION-BIBLE.md`, and a designer needs nothing else from the repo. Wherever this doc names a source file
+> ("see `oh-tokens.css`", "the `OhAppShell` component"), the actual code is in DESIGN-ASSETS.
+
 **This is a near-rewrite. The prior version named `scripts/surface_server.py` as THE canonical renderer. That is
 SUPERSEDED.** The canonical product is the set of full apps under `web/<app>/`, served by the showcase server over the
 shared kit, with the service-plane backends behind same-origin seams. `scripts/surface_server.py` is now a lightweight

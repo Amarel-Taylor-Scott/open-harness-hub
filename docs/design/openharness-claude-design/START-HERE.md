@@ -1,19 +1,23 @@
 # START HERE — Claude design (AI Done Right · one screen)
 
-You are the designer ("Claude design"). There is **ONE design system, one renderer, one stylesheet.** Read in this
-order, then design.
+You are the designer ("Claude design"). The handoff is **three self-contained files** (uploaded with this one); you
+do not need the repo. There is ONE shared kit: all 5 surfaces import it and differ ONLY by accent and copy. Read in
+this order, then design.
 
 ## Read order (top to bottom)
 
-1. **`docs/DESIGN-BIBLE.md`** — THE design system: tokens · type scale · every component · routes · governance ·
-   the SAFE-vs-LOCKED handoff (§11). This is the #1 read; everything else is orientation.
-2. **`scripts/surface_server.py`** — THE live renderer. Its `_CSS_TEMPLATE` constant is the single stylesheet every
-   surface ships **byte-identical** (~7959 chars); only the per-surface `--accent` + copy differ. The `render_*`
-   helpers emit the HTML. (The rewritten `docs/DESIGN-BIBLE.md` makes the full `web/<app>/` apps, served by the
-   showcase, the canonical product; `surface_server.py` is now a lightweight fallback. See the Framework section below.)
-3. **The 5 live URLs** (below) — see it rendered. Or run `python3 scripts/surface_server.py <surface-id>` locally.
-4. **`dist/sites/openharness-design/`** — the richer, high-fidelity REFERENCE bundle the canonical tokens derive
-   from (start at `START-HERE-CLAUDE-CODE.md`). This is what you elevate *toward*.
+1. **`docs/DESIGN-BIBLE.md`** (the GUIDE): tokens, type scale, every component, the two layouts (marketing top-nav
+   plus the `OhAppShell` left-sidebar logged-in shell), routes, governance, the copy rules, and the SAFE-vs-LOCKED
+   handoff. This is the #1 read.
+2. **`DESIGN-ASSETS.md`** (in this folder, the SOURCE): the full shared kit verbatim (`oh-tokens.css`,
+   `oh-components.css`, `oh-site.css`, `oh-site.jsx`, `products.js`) plus one COMPLETE app (Teleon). When the guide
+   says "see `oh-tokens.css`" or names a component, the actual code is here. This is the thing you edit once and it
+   applies to all 5 surfaces.
+3. **`docs/INTEGRATION-BIBLE.md`**: how a frontend talks to a backend (same-origin seams), local and cloud.
+4. **The 5 live URLs** (below): see it rendered.
+
+The live renderer is the showcase serving the full `web/<brand>/` apps over the shared kit. `scripts/surface_server.py`
+is a demoted fallback; do not design against it.
 
 Then: `FAMILY-README.md` + `HANDOFF.md` (next to this file) for family shape, the Baltor method spine, and
 production gaps.
