@@ -32,7 +32,14 @@ REPO = Path(__file__).resolve().parents[1]
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
-PACK_CHAR_CAP = 900_000         # FULL pack cap — whole repo map+API+graph+knowledge for the big-context lane
+# FULL context in, MAXIMUM tokens out (env-overridable — Kimi-2.7 / GLM-5.2 / qwen3-coder + Claude all carry huge
+# windows, so default big and let the owner push to a 1M-context lane). These are the single source for both lanes.
+PACK_CHAR_CAP = int(os.environ.get("OH_REVIEW_PACK_CHARS", str(900_000)))   # ~225k tokens of whole-repo map+API+graph+knowledge
+# Output is UNCAPPED by default (None -> max_tokens omitted from the request -> the model runs to its OWN maximum).
+# Kimi-2.7 / GLM-5.2 / qwen3-coder + Claude all carry huge windows; set OH_REVIEW_MAX_TOKENS to a positive int only
+# if you deliberately want to cap. This is the single source for the per-call output budget across both lanes.
+_mt_env = os.environ.get("OH_REVIEW_MAX_TOKENS", "").strip()
+REVIEW_MAX_TOKENS = int(_mt_env) if _mt_env.isdigit() and int(_mt_env) > 0 else None
 OUT_DIR = REPO / "docs" / "reviews"
 
 # Provider lanes (all OpenAI-compatible). base_url ends in /v1; the call hits {base_url}/chat/completions.
@@ -154,15 +161,18 @@ REVIEW_USER_TMPL = (
     "=== CONTEXT PACK ===\n{pack}\n=== END PACK ===")
 
 
-def chat(model: str, system: str, user: str, provider: dict, *, max_tokens: int = 8000, timeout: int = 300) -> dict:
+def chat(model: str, system: str, user: str, provider: dict, *, max_tokens: int = REVIEW_MAX_TOKENS, timeout: int = 600) -> dict:
     """One OpenAI-compatible chat call against any provider lane. Captures reasoning-model output (kimi puts its
     text in `reasoning`/`reasoning_content`, content empty). Returns {model,text,usage,finish_reason,error}."""
     url = provider["base_url"].rstrip("/") + "/chat/completions"
-    body = json.dumps({
+    payload = {
         "model": model,
         "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
-        "temperature": 0.3, "max_tokens": max_tokens, "stream": False,
-    }).encode()
+        "temperature": 0.3, "stream": False,
+    }
+    if max_tokens:                 # None / 0 -> omit -> UNCAPPED (the model emits to its own maximum)
+        payload["max_tokens"] = max_tokens
+    body = json.dumps(payload).encode()
     headers = {"Authorization": f"Bearer {provider['key']}", "Content-Type": "application/json", **provider["headers"]}
     try:
         with urllib.request.urlopen(urllib.request.Request(url, data=body, headers=headers), timeout=timeout) as r:

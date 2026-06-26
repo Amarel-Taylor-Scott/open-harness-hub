@@ -129,7 +129,7 @@ def run_round1() -> dict:
         if not prov["key"]:
             print(f"seat {name}: SKIP (no key for {seat['provider']})"); continue
         print(f"seat {name}: calling {seat['model']} (round1, multi-persona) ...", flush=True)
-        res = chat(seat["model"], ROUND1_SYSTEM, round1_user(pack), prov, max_tokens=9000)
+        res = chat(seat["model"], ROUND1_SYSTEM, round1_user(pack), prov)
         if res["error"]:
             print(f"  ERROR: {res['error'][:200]}")
         else:
@@ -161,7 +161,7 @@ def run_round2() -> dict:
         if not prov["key"]:
             print(f"seat {name}: SKIP (no key)"); continue
         print(f"seat {name}: calling {seat['model']} (round2, cross-critique of {list(others)}) ...", flush=True)
-        res = chat(seat["model"], ROUND1_SYSTEM, round2_user(name, others), prov, max_tokens=8000)
+        res = chat(seat["model"], ROUND1_SYSTEM, round2_user(name, others), prov)
         if res["error"]:
             print(f"  ERROR: {res['error'][:200]}")
         else:

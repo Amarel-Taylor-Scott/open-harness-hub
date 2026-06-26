@@ -263,7 +263,7 @@ def _chat(model: str, system: str, user: str) -> dict:
     prov = resolve_provider("ollama")
     if not prov["key"]:
         return {"text": "", "error": "ollama lane not configured (.env OH_LLM_API_KEY)"}
-    return chat(model, system, user, prov, max_tokens=2200)
+    return chat(model, system, user, prov)
 
 
 def record_findings(records: list[dict]) -> int:
