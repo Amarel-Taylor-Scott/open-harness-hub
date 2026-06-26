@@ -1023,6 +1023,9 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_aidevobserver_vscode_ext.py", "check_aidevobserver_vscode_ext"),
     ("scripts/check_aidevobserver_mcp.py", "check_aidevobserver_mcp"),
     ("scripts/check_observer_local_service.py", "check_observer_local_service"),
+    # the LIVE coaching path: a Claude Code PreToolUse hook over the observer router — footguns/reinvention
+    # surfaced as non-blocking notes (read-class calls skipped, malformed events fail open, NEVER blocks); serves_truth=false
+    ("scripts/aidevobserver_hook.py", "aidevobserver_hook"),
     ("src/teleon/retrieval/learned_vectors.py", "learned_vectors"),
     ("src/teleon/retrieval/pgvector_index.py", "pgvector_index"),
     ("src/teleon/synthesis/codeblock_loop.py", "codeblock_loop"),

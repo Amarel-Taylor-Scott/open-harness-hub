@@ -183,6 +183,16 @@ def _self_test() -> int:
             ck("D: /api/status truth_authority=false", status.get("truth_authority") is False)
             sc, body = _get(b + "/api/openhub/opencontexthub/search")
             ck("D: public search returns entries", sc == 200 and len(body.get("entries", [])) >= 1)
+            # the PUBLIC faceted spine projection the OpenHubForAI record browser reads (browse + records)
+            sc, br = _get(b + "/api/openhub/registries")
+            ck("D: public /registries faceted browse (count + facets, truth_authority=false)",
+               sc == 200 and br.get("count", 0) >= 155 and {"category", "kind", "layer", "status"} <= set(br.get("facets", {}))
+               and br.get("truth_authority") is False)
+            sc, brf = _get(b + "/api/openhub/registries?kind=static")
+            ck("D: a facet filter narrows the public browse", sc == 200 and 0 < brf.get("count", 0) < br["count"])
+            sc, recs = _get(b + "/api/openhub/registries/access_policy/records")
+            ck("D: public registry records drill-in (RegistryObjects)",
+               sc == 200 and isinstance(recs.get("records"), list) and recs.get("truth_authority") is False)
             sc, _ = _get(b + "/api/openhub/opencontexthub/workspace")          # no session
             ck("D: workspace FAILS CLOSED without a session", sc == 401)
             sc, _ = _get(b + "/api/openhub/opencontexthub/workspace?session_id=bogus")
