@@ -1,3 +1,5 @@
+> Superseded by `docs/BIBLE.md`. Kept as the dated 2026-06-09 codebase-review snapshot.
+
 # Full Codebase Review — 2026-06-09
 
 > Historical snapshot (2026-06-09). Kept for lineage. It describes an earlier state and may name superseded things (for example Hanken Grotesk, surface_server as the renderer, Open Harness Hub as the headline brand). Current canonical: docs/BIBLE.md, docs/CURRENT-STATE.md, and docs/DESIGN-BIBLE.md.

@@ -28,7 +28,7 @@ a truth authority — Baltor governs truth, Teleon runs capabilities.
   those are the machine-generated maturity/opportunity reports.
 - **Every web surface (pages · views · routes · primitives):** the full itemized inventory of all sites — the Baltor
   SPA + the admin page/API routes, the portfolio_lib static launch sites, the OpenHubForAI app, plus the UI design-system and
-  product primitives, each with status + gaps — lives in `docs/DESIGN-BIBLE.md` (canonical; the 2026-06-09 snapshot is `docs/portfolio-web-surface-inventory.md`). The
+  product primitives, each with status + gaps — lives in `docs/DESIGN-BIBLE.md` (canonical; the 2026-06-09 snapshot is archived at `archive/legacy/docs/portfolio-web-surface-inventory.md`). The
   orientation stays here; the exhaustive page/view/route enumeration lives there.
 
 ## 3. Built recently (this period)

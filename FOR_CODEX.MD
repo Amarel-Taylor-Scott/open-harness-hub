@@ -194,6 +194,6 @@ This repo runs a multi-model review board: `scripts/context_pack_builder.py` bui
   `Open*Hubs are registries` boundary phrase that `check_handoff_docs_freshness` requires verbatim.
 - **Generated-doc sources** still carry old brand strings in DATA/scripts (see §6, last bullet) - flag the source,
   not the generated output.
-- **Two self-marked historical snapshots** (`docs/portfolio-web-surface-inventory.md`,
-  `docs/codex/codebase-review-2026-06-09.md`) are kept in the live tree with explicit "SUPERSEDED / snapshot"
-  headers; they can later move to `archive/legacy/`.
+- **Two historical snapshots** were moved to `archive/legacy/docs/` (lossless, recorded in
+  `archive/legacy/_manifest.jsonl`): the 2026-06-09 surface inventory + codebase review. The live surface
+  map is `docs/DESIGN-BIBLE.md`.

@@ -1,3 +1,5 @@
+> Superseded by `docs/DESIGN-BIBLE.md` (the live surface map). Kept as the dated 2026-06-09 inventory snapshot.
+
 # Portfolio Web Surface Inventory — Operational web pages, views, routes, and primitives
 
 > **⚠ SUPERSEDED for the LIVE surfaces (2026-06-26).** The live product surfaces are now ONE canonical
