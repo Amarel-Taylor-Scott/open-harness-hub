@@ -1,4 +1,4 @@
-"""Gradio playground for the Open Harness Hub.
+"""Gradio playground for the OpenHubForAI.
 
 Loads pipelines from `catalog/` and runs them step-by-step on user
 input. Without a model adapter configured, runs in simulate mode so
@@ -114,8 +114,8 @@ def run_handler(pipeline_id: str, inputs_text: str, simulate: bool) -> tuple[str
 
 
 def build_app() -> gr.Blocks:
-    with gr.Blocks(title="Open Harness Hub — Playground", theme=gr.themes.Soft()) as app:
-        gr.Markdown("# Open Harness Hub — Playground")
+    with gr.Blocks(title="OpenHubForAI — Playground", theme=gr.themes.Soft()) as app:
+        gr.Markdown("# OpenHubForAI — Playground")
         gr.Markdown(
             "Pick a pipeline, edit the sample inputs, and run. Without a model "
             "configured (set `OH_MODEL` env var), this runs in **simulate mode** — "

@@ -1,4 +1,4 @@
-"""Open Harness Hub — platform-action processor implementations.
+"""OpenHubForAI — platform-action processor implementations.
 
 This package holds the Python implementations of the deterministic
 "Platform actions (on-platform)" bucket processors declared in

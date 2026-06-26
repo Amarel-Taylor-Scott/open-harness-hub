@@ -1,4 +1,4 @@
-"""Open Harness Hub — runnable showcase pipelines that COMPOSE the real processors.
+"""OpenHubForAI — runnable showcase pipelines that COMPOSE the real processors.
 
 Each module here chains the actual `scripts/processors/**/run()` callables end-to-end
 into a governed flow for a real scenario, and self-tests the whole composition. These

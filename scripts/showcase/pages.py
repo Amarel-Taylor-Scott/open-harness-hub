@@ -3,7 +3,7 @@ from __future__ import annotations
 
 HTML = """<!doctype html><html lang=en><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
-<title>Open Harness Hub — paste a task, get a flow</title>
+<title>OpenHubForAI — paste a task, get a flow</title>
 <style>
 :root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--fg:#e6edf3;--mut:#8b949e;--acc:#fb7714;--good:#3fb950}
 *{box-sizing:border-box}body{margin:0;font:15px/1.55 -apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--fg)}
@@ -59,7 +59,7 @@ a{color:var(--acc)}
 .node.op .nn{font-size:16px;margin-top:0}
 .node.op .pl{color:var(--nc)}
 </style></head><body>
-<header><h1>Open Harness Hub <span style="color:var(--acc)">·</span> paste a task, get a flow</h1>
+<header><h1>OpenHubForAI <span style="color:var(--acc)">·</span> paste a task, get a flow</h1>
 <div style="margin:6px 0 2px;font-size:13.5px"><a href="/" style="color:var(--acc);font-weight:600;margin-right:14px;text-decoration:none">Build a flow</a><a href="/browse" style="color:var(--acc);font-weight:600;text-decoration:none">Browse components →</a></div>
 <div class=sub>Describe a task in plain language. The builder hybrid-searches the component registry and assembles a costed, deployable pipeline of existing components.</div></header>
 <main>
@@ -127,7 +127,7 @@ function render(r){let h='';
  if(un.length||ov.length){h+='<div class=dropped>'+un.map(u=>'⚠ under-matched: '+esc(u)).concat(ov.map(o=>'⚠ over-matched: '+esc(o))).join('<br>')+'</div>';}
  h+='</div>';
  var et=encodeURIComponent(r.task);
- h+='<div class=card><h3>Export &amp; standardize</h3><a href="/api/export?format=yaml&task='+et+TQ+'">⬇ Open Harness Hub pipeline (YAML)</a> · <a href="/api/export?format=json&task='+et+TQ+'">JSON</a><div class=muted style=margin-top:6px>Standard catalog format — round-trips into the registry as a reusable component. Per-component exports (MCP · Croissant · HF card · SPDX · lm-eval · …) via scripts/emit/.</div></div>';
+ h+='<div class=card><h3>Export &amp; standardize</h3><a href="/api/export?format=yaml&task='+et+TQ+'">⬇ OpenHubForAI pipeline (YAML)</a> · <a href="/api/export?format=json&task='+et+TQ+'">JSON</a><div class=muted style=margin-top:6px>Standard catalog format — round-trips into the registry as a reusable component. Per-component exports (MCP · Croissant · HF card · SPDX · lm-eval · …) via scripts/emit/.</div></div>';
  h+='<div class=card><h3>Cost profile (per task)</h3><div class=costs>';
  ['cheap','balanced','quality'].forEach(k=>{h+='<div class=cost><b>'+k+'</b><br>$'+esc(r.cost[k].per_task_usd)+'<br><span class=muted>'+esc(r.cost[k].how)+'</span></div>'});
  h+='</div><div class=muted style=margin-top:8px>'+esc(r.cost.note)+'</div></div>';
@@ -139,7 +139,7 @@ go.onclick=build;health();loadMeta();
 
 BROWSE_HTML = """<!doctype html><html lang=en><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
-<title>Open Harness Hub — browse components</title>
+<title>OpenHubForAI — browse components</title>
 <style>
 :root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--fg:#e6edf3;--mut:#8b949e;--acc:#fb7714;--good:#3fb950}
 *{box-sizing:border-box}body{margin:0;font:15px/1.55 -apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--fg)}
@@ -156,7 +156,7 @@ input{width:100%;background:var(--panel);color:var(--fg);border:1px solid var(--
 .badge{display:inline-block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--acc);border:1px solid var(--line);border-radius:5px;padding:1px 6px;margin-right:8px}
 .nm{font-weight:600}.cid{color:var(--mut);font-size:12px}.ds{color:var(--mut);font-size:13px;margin-top:3px}
 </style></head><body>
-<header><h1>Open Harness Hub <span style="color:var(--acc)">·</span> browse components</h1>
+<header><h1>OpenHubForAI <span style="color:var(--acc)">·</span> browse components</h1>
 <div class=nav><a href="/">← Build a flow</a><a href="/browse">Browse</a></div>
 <div class=sub id=count>loading…</div></header>
 <main>

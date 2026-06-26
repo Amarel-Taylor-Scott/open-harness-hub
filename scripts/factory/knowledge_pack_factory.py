@@ -186,7 +186,7 @@ def build_manifest(candidate: dict, valid: set[str]) -> tuple[dict, list[dict], 
             f"Grounded in {candidate.get('public_source', 'an authoritative source')} via {retrieval} retrieval. "
             f"Lift: {candidate.get('lift_rationale', '').strip()}"
         ),
-        "authors": [{"name": "Open Harness Hub capability-gap factory"}],
+        "authors": [{"name": "OpenHubForAI capability-gap factory"}],
         "license": "CC-BY-4.0",
         "industry": _industries(candidate, valid),
         "capability": ["retrieval", "verification"],

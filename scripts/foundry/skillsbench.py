@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""SkillsBench bridge — interop between Open Harness Hub **Action** components and
+"""SkillsBench bridge — interop between OpenHubForAI **Action** components and
 BenchFlow **SkillsBench** skills (the Kaggle "Skill Lift" benchmark; arXiv:2602.12670).
 
 Why this exists: SkillsBench is the field's external, third-party operationalisation of
@@ -13,7 +13,7 @@ asserted (see docs/strategy/skillsbench-alignment.md).
 
 Two directions, both stdlib-only:
 
-  EXPORT  `action_to_skill(component)`  — an Open Harness Hub Action (harness / processor /
+  EXPORT  `action_to_skill(component)`  — an OpenHubForAI Action (harness / processor /
           persona / tool / rubric) → a SkillsBench `skills/<slug>/SKILL.md` (+ scripts/,
           references/) bundle. Makes our catalog submittable to Skill Lift and
           interoperable with the SkillsBench ecosystem. The procedure is *derived*, not

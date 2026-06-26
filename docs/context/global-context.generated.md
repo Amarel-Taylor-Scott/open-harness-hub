@@ -55,9 +55,9 @@ Registry inventory (the SELECTION SUBSTRATE the runtime descends against):
   identity_realm_registry.json: 25 rows
 
 ## Thesis (from CLAUDE.md head)
-# CLAUDE.md - Open Harness Hub Agent Instructions
+# CLAUDE.md - OpenHubForAI Agent Instructions
 
-This file is for Claude Code, Claude desktop/browser agents, and any Claude 4.x/4.8/4.7-style workflow that opens this repository. Follow `AGENTS.md` first; this file adds speed and organization rules for scaling Open Harness Hub.
+This file is for Claude Code, Claude desktop/browser agents, and any Claude 4.x/4.8/4.7-style workflow that opens this repository. Follow `AGENTS.md` first; this file adds speed and organization rules for scaling OpenHubForAI.
 
 ## Portfolio (owner-decided 2026-06-06; updated 2026-06-09 — read FIRST)
 

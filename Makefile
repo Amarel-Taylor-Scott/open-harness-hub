@@ -1,4 +1,4 @@
-# Open Harness Hub — dev shortcuts. Local runs need ZERO services (sqlite); the same
+# OpenHubForAI — dev shortcuts. Local runs need ZERO services (sqlite); the same
 # commands run in cloud against Postgres+Redis purely by env (see .env.example).
 .PHONY: help bootstrap test e2e foundry worker demand scrape ingest freshness ingest-health ingest-promote ingest-loop dev-up dev-down
 

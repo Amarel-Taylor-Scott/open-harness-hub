@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Launch BOTH Open Harness Hub products on the shared backend, each pinned to its brand and fronted
+# Launch BOTH OpenHubForAI products on the shared backend, each pinned to its brand and fronted
 # by its OWN persistent trycloudflare.com tunnel (the two-services model — see
 # docs/strategy/two-services-shared-infrastructure.md):
-#   • Open Harness Hub    (build / monitor pipelines)  → :8000 → dist/showcase-share-url-harness-hub.txt
+#   • OpenHubForAI    (build / monitor pipelines)  → :8000 → dist/showcase-share-url-harness-hub.txt
 #   • Baltor   (content refinery / verified context)    → :8001 → dist/showcase-share-url-baltor.txt
 # Same code, same catalog, same token — two surfaces. OH_PRODUCT pins the brand (injected into
 # index.html by the server). Tunnels are left running on exit so their public URLs stay STABLE across
@@ -75,7 +75,7 @@ bring_up_tunnel 8001 baltor
 
 say ""
 say "═══════════════════════════════════════════════════════════════"
-say "  Open Harness Hub    →  $(cat dist/showcase-share-url-harness-hub.txt 2>/dev/null)"
+say "  OpenHubForAI    →  $(cat dist/showcase-share-url-harness-hub.txt 2>/dev/null)"
 say "  Baltor  →  $(cat dist/showcase-share-url-baltor.txt 2>/dev/null)"
 say "  shared backend · stable tunnels · stop tunnels: pkill -f 'cloudflared tunnel'"
 say "═══════════════════════════════════════════════════════════════"

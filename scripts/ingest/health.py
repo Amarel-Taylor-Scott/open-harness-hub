@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""scripts.ingest.health — Source health check for the Open Harness Hub corpus.
+"""scripts.ingest.health — Source health check for the OpenHubForAI corpus.
 
 Answers the operational question: are our official/government source URLs reachable
 and still producing parseable facts?  This is a lightweight pre-flight and monitoring

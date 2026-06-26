@@ -279,7 +279,7 @@ fundraising.
 ## 2026-05-31 — Three-site integration pass and OpenHarness.zip design check
 
 **Context:** active goal expanded from Baltor-only to all three websites:
-Context is Everything, Baltor, and Open Harness Hub. User also asked the goal to
+Context is Everything, Baltor, and OpenHubForAI. User also asked the goal to
 consider `OpenHarness.zip` / Claude Code design exports.
 
 **Evidence inspected:**
@@ -293,10 +293,10 @@ consider `OpenHarness.zip` / Claude Code design exports.
 - Aligned Baltor landing metadata and overview copy around verified context
   control: source sync, versioning, fact verification, reconciliation, serving
   packages, and audit history.
-- Added Baltor header access to `/admin-demo/` and Open Harness Hub.
+- Added Baltor header access to `/admin-demo/` and OpenHubForAI.
 - Made `/admin-demo` serve from the canonical demo bundle even when the Baltor
   or parent product server is running.
-- Updated Open Harness Hub hero/nav copy to position OHH as the open builder
+- Updated OpenHubForAI hero/nav copy to position OHH as the open builder
   funnel that can consume Baltor verified context.
 - Sharpened Context is Everything landing copy around the parent platform story:
   trusted context, governed workflows, and proof.
@@ -353,17 +353,17 @@ continue improving visual hierarchy across all three sites.
 
 **Context:** continued the three-site integration objective after adding the GTM
 launch guide. The immediate need was discoverability and consistency across
-Context is Everything, Baltor, Open Harness Hub, and the Baltor admin demo.
+Context is Everything, Baltor, OpenHubForAI, and the Baltor admin demo.
 
 **Done this pass:**
-- Added launch-guide navigation from Baltor, Open Harness Hub, and the Baltor
+- Added launch-guide navigation from Baltor, OpenHubForAI, and the Baltor
   admin demo.
 - Added a MkDocs strategy pointer at `docs/strategy/gtm-launch-guide.md` and
   wired it into `mkdocs.yml`.
 - Removed the remaining parent-site compression-era flow label, changing it to
   `Verify · Reconcile · Serve`.
 - Updated the parent-site footer from `provable` to `traceable`.
-- Changed the admin demo nav label from `Open Harness Hub` to `Product home` so
+- Changed the admin demo nav label from `OpenHubForAI` to `Product home` so
   the same demo bundle works under multiple product servers without misleading
   users.
 
@@ -724,7 +724,7 @@ the requested long-run operating loop.
 
 **Done this pass:**
 - Rewrote `.codex/prompts/goal.md` as a three-site autonomous build command
-  covering Baltor, Open Harness Hub, and Context Is Everything.
+  covering Baltor, OpenHubForAI, and Context Is Everything.
 - Added explicit coverage for `OpenHarness.zip` design files from Claude Code.
 - Expanded the loop with a `RESEARCH` phase for changed facts, competitors,
   cloud/model pricing, and deployment best practices.

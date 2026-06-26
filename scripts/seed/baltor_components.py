@@ -16,7 +16,7 @@ from __future__ import annotations
 from scripts.seed.component_seed import processor, write_batch
 
 DOC = "docs/strategy/context-enrichment-service.md"
-LABEL = "Open Harness Hub — Baltor"
+LABEL = "OpenHubForAI — Baltor"
 
 # COMPRESSION TIER — structural flavor (the learned flavor is retrieval/llmlingua-compress).
 COMPRESSION = [

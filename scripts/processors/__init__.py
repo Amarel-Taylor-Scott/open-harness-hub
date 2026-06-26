@@ -1,4 +1,4 @@
-"""Open Harness Hub — processor implementations.
+"""OpenHubForAI — processor implementations.
 
 This package holds the Python implementations of the deterministic
 runtime processors declared in `catalog/processors/`. Each processor

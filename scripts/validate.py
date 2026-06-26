@@ -535,7 +535,7 @@ def collect_release_drift_warnings(known_ids: set[str]) -> list[str]:
 
 
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Validate Open Harness Hub manifests.")
+    parser = argparse.ArgumentParser(description="Validate OpenHubForAI manifests.")
     parser.add_argument(
         "paths",
         nargs="*",

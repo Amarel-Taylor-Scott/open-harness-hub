@@ -1,4 +1,4 @@
-"""Open Harness Hub — response/prompt cache processors (Baltor consumption tier).
+"""OpenHubForAI — response/prompt cache processors (Baltor consumption tier).
 
 This package holds the deterministic implementations behind the
 `catalog/processors/cache/` manifests — the cache lane of the context layer

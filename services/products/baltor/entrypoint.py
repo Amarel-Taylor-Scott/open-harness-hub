@@ -1,7 +1,7 @@
 """Baltor — product service (request tier). Serves web/baltor/ +
 the Baltor API (and, when built, the MCP serve endpoints for the content tiers + governed corpora).
 
-Same shared backend as Open Harness Hub; this door differs only by OH_PRODUCT (front-end folder +
+Same shared backend as OpenHubForAI; this door differs only by OH_PRODUCT (front-end folder +
 brand). Thin by design: pin the product, wire telemetry, hand off to the shared server.
 
     python -m services.products.baltor.entrypoint --port 8001

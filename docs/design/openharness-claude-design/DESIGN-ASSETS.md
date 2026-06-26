@@ -21,7 +21,7 @@ _source: `web/teleon/kit/oh-tokens.css` (verbatim below; you do not need the rep
 
 ```css
 /* ============================================================
-   Open Harness Hub — design tokens
+   OpenHubForAI — design tokens
    One component layer (oh-components.css) consumes these vars.
    Six scopes: {dir-a | dir-b | dir-d} × {theme-light | theme-dark}.
    Primitive-legend hues stay close to the shipped identity; only the
@@ -606,7 +606,7 @@ _source: `web/teleon/kit/oh-components.css` (verbatim below; you do not need the
 
 ```css
 /* ============================================================
-   Open Harness Hub — component layer
+   OpenHubForAI — component layer
    Every atom designed once; all values come from oh-tokens.css.
    Artifact roots are sized to the artboard via inline width/height
    from app.jsx; these styles fill that frame.
@@ -2929,7 +2929,7 @@ _source: `web/teleon/kit/products.js` (verbatim below; you do not need the repo)
 
      AI Done Right          ── company / mission (parent site)
        ├── Baltor.ai             ── paid SaaS · context assurance (the moat)
-       └── Open Harness Hub      ── open funnel · build governed harnesses (free)
+       └── OpenHubForAI      ── open funnel · build governed harnesses (free)
 
    These are SEPARATE SITES that share the same underlying design-system
    engineering. Baltor and OHH are SISTER products (peers) — neither is a parent;
@@ -2952,7 +2952,7 @@ _source: `web/teleon/kit/products.js` (verbatim below; you do not need the repo)
     // ---- Product 1: bounded build-a-pipeline product -----------------------
     openHarnessHub: {
       id: 'openharnesshub',
-      name: 'Open Harness Hub',          // ← one-line rename point
+      name: 'OpenHubForAI',          // ← one-line rename point
       short: 'OHH',
       kind: 'pipelines',
       tagline: 'Build & monitor governed pipelines',
@@ -2967,7 +2967,7 @@ _source: `web/teleon/kit/products.js` (verbatim below; you do not need the repo)
 
     // ---- Standalone brand: Baltor.ai (the paid context-assurance SaaS) -----
     // Under the company mission "AI Done Right". Own house direction
-    // (dir-d teal). Open Harness Hub is its SISTER product (free funnel), shown
+    // (dir-d teal). OpenHubForAI is its SISTER product (free funnel), shown
     // only as a small footer link — never a switcher or a parent.
     contextEnrichment: {
       id: 'baltor',
@@ -3017,7 +3017,7 @@ _source: `web/teleon/kit/products.js` (verbatim below; you do not need the repo)
       brandScope: '',
       glyph: '◳',
       // sister product — quiet footer link only
-      supportedBy: { name: 'Open Harness Hub', short: 'OHH', url: '../openharnesshub/OpenHarnessHub Prototype.html' },
+      supportedBy: { name: 'OpenHubForAI', short: 'OHH', url: '../openharnesshub/OpenHarnessHub Prototype.html' },
     },
   };
 

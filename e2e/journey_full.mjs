@@ -41,7 +41,7 @@ async function stage(label, fn) {
 await stage('landing', async () => {
   await page.goto(OHH + '/', { waitUntil: 'load', timeout: 20000 });
   await page.waitForTimeout(1200);
-  return 'Open Harness Hub landing — the value proposition';
+  return 'OpenHubForAI landing — the value proposition';
 });
 
 // 2 ─ REGISTER
@@ -182,7 +182,7 @@ const report = {
 saveJSON('reports', 'journey-full-report.json', report);
 saveText('reports', 'journey-full-report.md', [
   `# Full user journey (E2E) — ${report.generated_at}`, '',
-  `**Arc:** ${report.arc}`, `**Surfaces:** Open Harness Hub (${OHH}) + Baltor (${BALTOR}) · real account, real session, real key`, '',
+  `**Arc:** ${report.arc}`, `**Surfaces:** OpenHubForAI (${OHH}) + Baltor (${BALTOR}) · real account, real session, real key`, '',
   '| # | stage | detail |', '|---|---|---|',
   ...stages.map((s) => `| ${s.n} | ${s.label} | ${s.detail} |`),
   '', `Video: \`artifacts/e2e/${report.video}\` · Stills: \`artifacts/e2e/screenshots/journey-*.png\``,

@@ -2,7 +2,7 @@
 
 > CANDIDATE · serves_truth=false · CEO/COO/CTO/CFO/YC lenses
 
-# Executive Review — Baltor / Teleon / Open Harness Hub
+# Executive Review — Baltor / Teleon / OpenHubForAI
 
 ---
 

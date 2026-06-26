@@ -11,7 +11,7 @@ from __future__ import annotations
 from scripts.seed.component_seed import processor, write_batch
 
 DOC = "docs/concepts/component-taxonomy-and-stages.md"
-LABEL = "Open Harness Hub action-bucket taxonomy"
+LABEL = "OpenHubForAI action-bucket taxonomy"
 
 # DELIVER / EMIT — all OUTBOUND actions (the result leaves the platform). (slug, name, process_kind,
 # capability, deterministic, side_effects, inputs, outputs, description)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build vector indexes for the Open Harness Hub catalog.
+"""Build vector indexes for the OpenHubForAI catalog.
 
 Emits two JSONL streams under db/vector/:
 

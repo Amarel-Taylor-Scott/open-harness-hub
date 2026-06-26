@@ -162,7 +162,7 @@ def _task_object(
             "source_url": source_url,
             "publisher": publisher,
             "license": license_value,
-            "collected_by": "Open Harness Hub task marketplace intake",
+            "collected_by": "OpenHubForAI task marketplace intake",
             "collection_method": str(record.get("source_type") or "metadata_or_user_export"),
         },
     }

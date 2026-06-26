@@ -1,6 +1,6 @@
 # Archive Candidate Ledger
 
-This ledger defines how Baltor/Open Harness Hub should identify, review, and
+This ledger defines how Baltor/OpenHubForAI should identify, review, and
 approve stale or rotted context without losing provenance. It is a decision
 surface, not an instruction to move files.
 

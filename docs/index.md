@@ -1,4 +1,4 @@
-# Open Harness Hub - single-page catalog index
+# OpenHubForAI - single-page catalog index
 
 Auto-generated from `scripts/build_index_page.py` against 505 live components. Run that script to refresh after any catalog change.
 

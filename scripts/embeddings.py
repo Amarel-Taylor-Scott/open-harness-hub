@@ -1,4 +1,4 @@
-"""Flexible, config-driven embedding provider for Open Harness Hub.
+"""Flexible, config-driven embedding provider for OpenHubForAI.
 
 ONE place that resolves *which backend, which model, which dimension* so the
 whole fleet (vector-store build, pgvector load, daily embedding batch, readiness

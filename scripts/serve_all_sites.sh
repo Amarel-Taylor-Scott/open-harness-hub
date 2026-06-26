@@ -5,7 +5,7 @@
 #
 #   Context is Everything   (parent / mission landing)  → :8002 → web/context-is-everything
 #   Baltor                  (verified-context SaaS)      → :8001 → web/baltor
-#   Open Harness Hub        (open builder funnel)        → :8000 → web/harness-hub
+#   OpenHubForAI        (open builder funnel)        → :8000 → web/harness-hub
 #
 # Same code, same catalog, same access token — three surfaces. OH_PRODUCT pins which web/<product>/
 # folder the shared server serves. Tunnels + servers are detached (setsid/disown) so their public URLs
@@ -23,7 +23,7 @@ say(){ printf '%s\n' "$*"; }
 
 # --- the three sites: "product port slug brand-marker" (brand-marker = string that must appear at /) ---
 SITES=(
-  "harness-hub 8000 harness-hub Open Harness Hub"
+  "harness-hub 8000 harness-hub OpenHubForAI"
   "baltor 8001 baltor Baltor"
   "context-is-everything 8002 context-is-everything Context is Everything"
 )

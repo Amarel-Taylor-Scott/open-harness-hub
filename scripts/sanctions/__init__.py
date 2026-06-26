@@ -1,4 +1,4 @@
-"""Open Harness Hub — the SANCTIONS BEACHHEAD (the verified-context wedge, made real).
+"""OpenHubForAI — the SANCTIONS BEACHHEAD (the verified-context wedge, made real).
 
 This package is the first concrete instance of the north-star wedge
 (``docs/codex/north-star.md``, ``docs/strategy/positioning-v2.md``): *"we verify

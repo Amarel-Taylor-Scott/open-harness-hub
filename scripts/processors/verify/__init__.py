@@ -1,4 +1,4 @@
-"""Open Harness Hub — verification processors (Baltor + lift gate).
+"""OpenHubForAI — verification processors (Baltor + lift gate).
 
 Implementations of the `verify.*` processors declared under
 `catalog/processors/verify/`. Each manifest's `implementations[].path`

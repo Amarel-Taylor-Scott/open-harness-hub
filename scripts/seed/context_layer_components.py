@@ -15,7 +15,7 @@ from __future__ import annotations
 from scripts.seed.component_seed import processor, write_batch
 
 DOC = "docs/strategy/context-layer-pmf.md"
-LABEL = "Open Harness Hub context-layer taxonomy"
+LABEL = "OpenHubForAI context-layer taxonomy"
 
 # MEMORY — persist what was LEARNED across sessions (not raw history). (catalog/processors/memory/)
 MEMORY = [

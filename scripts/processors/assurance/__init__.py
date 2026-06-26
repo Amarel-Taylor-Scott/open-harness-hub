@@ -1,4 +1,4 @@
-"""Open Harness Hub — corpus-assurance processors (verified-corpus-commons wedge).
+"""OpenHubForAI — corpus-assurance processors (verified-corpus-commons wedge).
 
 Implementations of the `assurance.*` processors that back the **context
 assurance** differentiator (see `docs/strategy/oracle-corpus-and-tooling-map.md`

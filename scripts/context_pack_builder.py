@@ -316,7 +316,7 @@ def build_pack(focus: list[str] | None = None, *, full: bool = False, cap: int |
     focus = focus or DEFAULT_FOCUS
     cap = cap if cap is not None else (FULL_PACK_CAP if full else PACK_CHAR_CAP)
     g, r, l = global_context(), regional_digest(), local_full(focus)
-    head = ("# NON-FRAGILE CONTEXT PACK — Open Harness Hub (generated, current, source-handled)\n"
+    head = ("# NON-FRAGILE CONTEXT PACK — OpenHubForAI (generated, current, source-handled)\n"
             "Scopes: GLOBAL (whole-system map)" + (" -> FULL TREE -> FULL src/ API" if full else "") +
             " -> REGIONAL (subsystem API) -> LOCAL (focus files in full). Generated from live code: absence of a "
             "symbol here means it does not exist.\n\n")

@@ -1,4 +1,4 @@
-"""Export a built flow as a portable Open Harness Hub *pipeline* component."""
+"""Export a built flow as a portable OpenHubForAI *pipeline* component."""
 from __future__ import annotations
 
 import re
@@ -36,8 +36,8 @@ def export_flow(result: dict) -> dict:
         "type": "pipeline",
         "version": "0.1.0",
         "name": f"Assembled flow: {task[:56]}",
-        "description": f"Auto-assembled by the Open Harness Hub builder for: {task}",
-        "authors": [{"name": "Open Harness Hub builder"}],
+        "description": f"Auto-assembled by the OpenHubForAI builder for: {task}",
+        "authors": [{"name": "OpenHubForAI builder"}],
         "license": "MIT",
         "industry": ["cross_industry"],
         "capability": ["reasoning", "retrieval"],

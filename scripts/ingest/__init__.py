@@ -1,4 +1,4 @@
-"""Open Harness Hub — corpus-ingestion tools.
+"""OpenHubForAI — corpus-ingestion tools.
 
 Feed official / government sources into the governed corpus, and watch them for updates
 (change-data-capture). These build ON TOP of `scripts.foundry` (no reinvention): the

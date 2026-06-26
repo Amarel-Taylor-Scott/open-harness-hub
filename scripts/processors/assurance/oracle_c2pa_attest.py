@@ -69,7 +69,7 @@ Public API:
     from scripts.processors.assurance.oracle_c2pa_attest import run, verify_by_hash
     res = run(corpus_version={"corpus_id": "ph-building-safety", "version": "2026.05.29",
                               "body": "...corpus bytes/text..."},
-              signer={"id": "oracle:ohh", "name": "Open Harness Hub Oracle"},
+              signer={"id": "oracle:ohh", "name": "OpenHubForAI Oracle"},
               covered_source_records=[...], assurance_verdicts={...}, as_of="2026-05-29T00:00:00Z")
     # -> {"manifest": {...C2PA-shaped...}, "content_hash": "sha256:...",
     #     "attestation_id": "...", "attestation_record": {...}, "attestation_hash": "sha256:...",
@@ -495,7 +495,7 @@ def _self_test() -> int:
         "body": "Occupancy permit is required before a building may be lawfully occupied. "
                 "Fire safety inspection certificate (FSIC) must precede the occupancy permit.",
     }
-    signer = {"id": "oracle:ohh", "name": "Open Harness Hub Oracle", "org": "OHH"}
+    signer = {"id": "oracle:ohh", "name": "OpenHubForAI Oracle", "org": "OHH"}
     sources = [
         {"source_id": "ph-dpwh", "text": "National Building Code of the Philippines (PD 1096)."},
         {"source_id": "ph-bfp", "text": "RA 9514 Fire Code — FSIC issuance."},

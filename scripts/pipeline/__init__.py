@@ -1,4 +1,4 @@
-"""Open Harness Hub — the verified-context PIPELINE package (the north-star payoff).
+"""OpenHubForAI — the verified-context PIPELINE package (the north-star payoff).
 
 This package is the one place where the four shipped milestones of the
 verified-context wave (``docs/codex/north-star.md``) are TIED TOGETHER into a

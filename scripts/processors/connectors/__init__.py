@@ -1,4 +1,4 @@
-"""Open Harness Hub — MCP connector processors (external context intake).
+"""OpenHubForAI — MCP connector processors (external context intake).
 
 This package holds the implementations behind the `catalog/processors/connectors/`
 manifests: permission-aware, READ-ONLY connectors that pull external context

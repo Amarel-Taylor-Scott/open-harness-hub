@@ -1,4 +1,4 @@
-"""Open Harness Hub — the open-funnel developer CLI (``oh-baltor``).
+"""OpenHubForAI — the open-funnel developer CLI (``oh-baltor``).
 
 This package is **M5 of the north-star wave** (``docs/codex/north-star.md`` §"The
 execution sequence" — *"Open funnel polish … a dev installs, builds a governed

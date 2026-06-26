@@ -106,7 +106,7 @@ def build_context_pack() -> tuple[str, list[dict]]:
         from scripts.context_pack_builder import build_pack
         return build_pack(full=True)   # the big-context Ollama lane gets the FULL repo map + entire src/ API
     except Exception:  # noqa: BLE001 — degrade to the legacy heads pack rather than fail a review
-        parts = ["# Context pack — Open Harness Hub (Teleon + Baltor)\n", _repo_shape() + "\n"]
+        parts = ["# Context pack — OpenHubForAI (Teleon + Baltor)\n", _repo_shape() + "\n"]
         manifest, total = [], 0
         for rel, cap in PACK_SOURCES:
             p = REPO / rel
@@ -151,7 +151,7 @@ REVIEW_USER_TMPL = (
     "Below is a bounded digest of a two-product AI platform: Baltor (a context engine: ingest -> reconcile -> harden "
     "-> enrich -> compress -> serve) and Teleon (a runtime that takes a plain non-deterministic capability and "
     "DESCENDS it to cheaper/faster/more-deterministic/more-bounded against user preferences, using registries of "
-    "models/context/harnesses/skills as the selection substrate). Open Harness Hub is the open ecosystem.\n\n"
+    "models/context/harnesses/skills as the selection substrate). OpenHubForAI is the open ecosystem.\n\n"
     "Review it and answer each with concrete, file-cited points:\n"
     "1. ARCHITECTURE: biggest strengths and the 3 most serious risks/weaknesses.\n"
     "2. PRODUCT-MARKET FIT: is the wedge real and defensible? who buys this, why now, what would kill it?\n"

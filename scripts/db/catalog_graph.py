@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Codegraph-style query layer over the Open Harness Hub component graph.
+"""Codegraph-style query layer over the OpenHubForAI component graph.
 
 CodeGraph (github.com/colbymchenry/codegraph) pre-indexes a CODE knowledge
 graph (symbols + calls/imports/inheritance) into SQLite+FTS5 and serves agents

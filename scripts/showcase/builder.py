@@ -69,7 +69,7 @@ def orchestrate(task: str, candidates: list[dict], route) -> tuple[list[dict], l
 
     listing = "\n".join(f"- {c['id']} [{c['type']}] {c['name']}" for c in floored)
     system = (
-        "You are the Open Harness Hub orchestrator. From the CANDIDATES, keep ONLY components "
+        "You are the OpenHubForAI orchestrator. From the CANDIDATES, keep ONLY components "
         "genuinely relevant to the user's task and DROP off-domain ones (wrong industry, modality, "
         "or purpose). Build ONE coherent pipeline: at most one persona, one model harness, one "
         "backbone pipeline, 1-2 knowledge corpora, 1-2 if-statements, 1-2 actions, one rubric. "
@@ -461,7 +461,7 @@ def llm_narrative(task: str, kept: list[dict], cost: dict) -> tuple[str, bool]:
     if not route.health() or not kept:
         return deterministic_narrative(task, kept, cost), False
     comp_lines = "\n".join(f"- [{s.get('stage', '')}] {s['type']}/{s['id'].split('/')[-1]}: {s['role']}" for s in kept)
-    system = ("You are the Open Harness Hub builder. In 4-6 sentences, explain the assembled "
+    system = ("You are the OpenHubForAI builder. In 4-6 sentences, explain the assembled "
               "pipeline of these EXISTING components for the task: the flow from input through "
               "persona, retrieval, deterministic rules, tools, the model harness, to evaluation; "
               "why rules/retrieval run before the model to cut cost; and how to swap the model. "

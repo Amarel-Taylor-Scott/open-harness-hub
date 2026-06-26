@@ -1,4 +1,4 @@
-"""Open Harness Hub — clinical decision-SUPPORT processors (DEFENSIVE only).
+"""OpenHubForAI — clinical decision-SUPPORT processors (DEFENSIVE only).
 
 This package holds the implementations behind the `catalog/processors/clinical/`
 manifests. Shared, non-negotiable stance (each module enforces it structurally):

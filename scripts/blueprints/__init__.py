@@ -1,1 +1,1 @@
-"""Blueprint planning helpers for Open Harness Hub."""
+"""Blueprint planning helpers for OpenHubForAI."""

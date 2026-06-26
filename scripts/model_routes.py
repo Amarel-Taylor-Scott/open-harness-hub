@@ -1,4 +1,4 @@
-"""Provider-neutral chat/LLM route for Open Harness Hub — local now, cloud later.
+"""Provider-neutral chat/LLM route for OpenHubForAI — local now, cloud later.
 
 The text-generation sibling of ``scripts/embeddings.py``: ONE resolver, env-
 driven, so builder polish / explanations / labeling run on a **local Gemma via

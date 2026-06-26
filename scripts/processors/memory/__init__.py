@@ -1,4 +1,4 @@
-"""Open Harness Hub — governed memory processors (Baltor context layer).
+"""OpenHubForAI — governed memory processors (Baltor context layer).
 
 This package holds the deterministic implementations behind the
 `catalog/processors/memory/` manifests — the memory lane of the context layer

@@ -130,7 +130,7 @@ def build(c: tuple) -> dict:
         "description": f"{why}\n\nRetrieval/prompt taxonomy step {step} (see {TAXO}). One swappable "
                        f"method-component for the governed-model-call recipe; lift is measured at the "
                        f"pipeline level, not on this component.",
-        "authors": [{"name": "Open Harness Hub contributors"}],
+        "authors": [{"name": "OpenHubForAI contributors"}],
         "license": "MIT",
         "industry": ["cross_industry", "ai"],
         "capability": cap,

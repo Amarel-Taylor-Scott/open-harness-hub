@@ -1,4 +1,4 @@
-"""Policy-aware model route selection for Baltor and Open Harness Hub.
+"""Policy-aware model route selection for Baltor and OpenHubForAI.
 
 CANONICAL LAYER: `src/teleon/inference` (OIPS) owns provider-ordering truth (the numeric preference
 graph). This Baltor-era gateway + `scripts/llm_gateway` are the legacy route-selection path during the

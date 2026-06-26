@@ -277,7 +277,7 @@ def build_row_families(seeds: list[dict[str, Any]], excluded_scopes: list[str] |
             "source_record_id": source_record_id,
             "source_url": "",
             "archive_url": "",
-            "publisher": "Open Harness Hub contributors",
+            "publisher": "OpenHubForAI contributors",
             "license": "CC-BY-4.0",
             "trust_tier": "synthetic_seed",
             "privacy_boundary": "public",

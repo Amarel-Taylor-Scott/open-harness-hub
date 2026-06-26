@@ -98,7 +98,7 @@ def _source_record(job: dict[str, Any], now: str) -> dict[str, Any]:
         "source_type": "api_record",
         "source_url": "",
         "archive_url": "",
-        "publisher": "Open Harness Hub public-source blueprint catalog",
+        "publisher": "OpenHubForAI public-source blueprint catalog",
         "license": "CC-BY-4.0",
         "trust_tier": str(policy.get("trust_tier") or "official_or_public"),
         "privacy_boundary": str(policy.get("privacy_boundary") or "public"),

@@ -1,4 +1,4 @@
-"""Open Harness Hub — deliver / emit (outbound) processors.
+"""OpenHubForAI — deliver / emit (outbound) processors.
 
 This package holds the implementations behind the `catalog/processors/deliver/`
 manifests — the outbound bucket: hand the validated result back, post it,

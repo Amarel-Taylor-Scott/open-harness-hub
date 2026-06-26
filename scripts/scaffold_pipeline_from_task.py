@@ -330,7 +330,7 @@ def make_draft_pipeline(task: str, grouped: dict) -> dict:
         "version": "0.1.0",
         "name": f"DRAFT: {task[:60]}",
         "description": f"Auto-scaffolded by scripts/scaffold_pipeline_from_task.py from task: {task!r}",
-        "authors": [{"name": "Open Harness Hub contributors"}],
+        "authors": [{"name": "OpenHubForAI contributors"}],
         "license": "MIT",
         "industry": ["compliance"],
         "capability": ["evaluation", "extraction"],

@@ -573,7 +573,7 @@ def run(
     request: Any = None,
     min_independent: int = DEFAULT_MIN_INDEPENDENT,
     corpus_id: str = "ohh-verified-context",
-    title: str = "Open Harness Hub — verified context",
+    title: str = "OpenHubForAI — verified context",
     bus=None,
 ) -> dict[str, Any]:
     """Run the verified-context flow: ingest → assure → serve, fully governed.
@@ -771,7 +771,7 @@ def _selftest() -> None:
     # The negotiated tier is one of the real tiers, with the measured machinery.
     assert served["negotiation"]["tier"] in TIER_ORDER
     # The llms.txt is a real, well-formed surface that carries the served claims.
-    assert served["llms_txt"].startswith("# Open Harness Hub"), "served llms.txt must carry the H1 title"
+    assert served["llms_txt"].startswith("# OpenHubForAI"), "served llms.txt must carry the H1 title"
     assert "## Verified claims" in served["llms_txt"], "served surface must bucket the verified claims"
     assert "Northwind Trading LLC is LISTED" in served["llms_txt"], "the verified current claim must be served"
     # The descriptor carries the corpus provenance (anchored to the list it was verified against).

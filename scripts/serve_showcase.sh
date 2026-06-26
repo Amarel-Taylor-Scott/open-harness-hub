@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run the Open Harness Hub paste-to-flow showcase locally with Gemma intelligence
+# Run the OpenHubForAI paste-to-flow showcase locally with Gemma intelligence
 # and a public trycloudflare.com URL you can send to someone to test.
 #
 #   bash scripts/serve_showcase.sh                 # auto-detect a local Gemma, open a tunnel

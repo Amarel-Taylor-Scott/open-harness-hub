@@ -568,7 +568,7 @@ const base = await ohhBase();
 const tBase = await teleonBase();
 const SURFACES = familySurfaces();
 const JOURNEYS = [
-  { id: 'journey-1-openharnesshub', title: `Open Harness Hub — ${base.public ? 'PUBLIC URL' : 'local'}: landing → live build → live registry → sign-up → live canvas + export close-up → configuration`, fn: (p, h) => ohhJourney(p, h, base) },
+  { id: 'journey-1-openharnesshub', title: `OpenHubForAI — ${base.public ? 'PUBLIC URL' : 'local'}: landing → live build → live registry → sign-up → live canvas + export close-up → configuration`, fn: (p, h) => ohhJourney(p, h, base) },
   { id: 'journey-2-baltor', title: 'Baltor — landing → sign-up → console → emulated billing → LIVE pipeline + receipt close-up', fn: baltorJourney },
   { id: 'journey-3-aidoneright', title: 'AI Done Right — parent, the Demo Control Tower (live health), into a guided demo', fn: parentJourney },
   { id: 'journey-4-teleon', title: `Teleon — ${tBase.public ? 'PUBLIC URL' : 'local'}: sign-up → MODEL-BUILT capability (receipt close-up) → REAL key lifecycle`, fn: (p, h) => teleonJourney(p, h, tBase) },

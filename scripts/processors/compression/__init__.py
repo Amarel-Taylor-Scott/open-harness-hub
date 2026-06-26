@@ -1,4 +1,4 @@
-"""Open Harness Hub — context-compression processors (Baltor enrichment tier).
+"""OpenHubForAI — context-compression processors (Baltor enrichment tier).
 
 This package holds the deterministic implementations behind the
 `catalog/processors/compression/` manifests — the *Compressed* tier of the

@@ -814,7 +814,7 @@ def run(
 # compressed in tokens, so tier negotiation has a real choice to make.
 _SAMPLE_CORPUS: dict[str, Any] = {
     "corpus_id": "ohh-serve-demo",
-    "title": "Open Harness Hub — serving demo corpus",
+    "title": "OpenHubForAI — serving demo corpus",
     "summary": "A tiny governed corpus used to prove the Baltor serving surfaces.",
     "license": "MIT",
     "provenance": {
@@ -911,7 +911,7 @@ def _selftest() -> None:
     lines = text.splitlines()
 
     # H1 with the title is REQUIRED and must be the first line.
-    assert lines[0] == "# Open Harness Hub — serving demo corpus", \
+    assert lines[0] == "# OpenHubForAI — serving demo corpus", \
         f"llms.txt must open with the H1 title, got {lines[0]!r}"
     # Blockquote summary present.
     assert any(ln.startswith("> ") and "tiny governed corpus" in ln for ln in lines), \
@@ -936,7 +936,7 @@ def _selftest() -> None:
 
     # ── (1b) emit_llms_txt(full=True) — llms-full.txt inlines content. ──
     full_text = emit_llms_txt(_SAMPLE_CORPUS, full=True)
-    assert "# Open Harness Hub — serving demo corpus" in full_text
+    assert "# OpenHubForAI — serving demo corpus" in full_text
     assert "def plan_budget(" in full_text, "llms-full.txt must inline document content"
     assert "~~~~" in full_text, "llms-full.txt must fence inlined content"
     # full is strictly larger than links-only (it adds the bodies).
@@ -1048,7 +1048,7 @@ def _selftest() -> None:
     for key in ("corpus_id", "llms_txt", "negotiation", "descriptor", "provenance", "seams", "runtime"):
         assert key in out, f"run() result missing {key!r}"
     assert out["corpus_id"] == "ohh-serve-demo"
-    assert out["llms_txt"].startswith("# Open Harness Hub"), "run() must carry the llms.txt surface"
+    assert out["llms_txt"].startswith("# OpenHubForAI"), "run() must carry the llms.txt surface"
     assert out["negotiation"]["tier"] in DERIVED_TIERS, "run() negotiation must honor the budget"
     assert out["descriptor"]["serverInfo"]["corpusId"] == "ohh-serve-demo"
 

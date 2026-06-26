@@ -17,7 +17,7 @@ from pathlib import Path
 import yaml
 
 REPO = Path(__file__).resolve().parents[2]
-STD_AUTHOR = "Open Harness Hub contributors"
+STD_AUTHOR = "OpenHubForAI contributors"
 STD_DATE = "2026-05-29"
 
 
@@ -44,7 +44,7 @@ def processor(slug: str, name: str, process_kind: str, capability: list[str], de
         "created": STD_DATE,
         "updated": STD_DATE,
         # standardized provenance: spec-level, authored in-repo from a named taxonomy/spec
-        "attribution": {"source_kind": "manual", "author": source_label or "Open Harness Hub taxonomy", "license": "MIT"},
+        "attribution": {"source_kind": "manual", "author": source_label or "OpenHubForAI taxonomy", "license": "MIT"},
         "process_kind": process_kind,
         "deterministic": deterministic,
         "idempotent": True,

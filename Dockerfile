@@ -1,4 +1,4 @@
-# Open Harness Hub — ONE image, two+ roles (web tier vs. foundry worker vs. cron).
+# OpenHubForAI — ONE image, two+ roles (web tier vs. foundry worker vs. cron).
 # The web/API tier is request/response; the worker pulls partition jobs off the queue and
 # runs the evidence-driven foundry; cron fires the daily factory. See
 # docs/architecture/cloud-architecture.md. Override the command per service (render.yaml / K8s).

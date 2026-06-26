@@ -937,7 +937,7 @@
       "id": "processor/action-sampler-multi-rollout",
       "type": "processor",
       "name": "Action sampler \u2014 N parallel rollouts",
-      "description": "Sample N independent action trajectories for an agent task; return\nthe trajectories + final-state candidates for downstream judging.\nThe N candidates can be reviewed by a separate judge processor to\npick the best.\n\nVerified by Open Harness Hub clone:\n`SWE-agent/sweagent/agent/action_sampler.py`.",
+      "description": "Sample N independent action trajectories for an agent task; return\nthe trajectories + final-state candidates for downstream judging.\nThe N candidates can be reviewed by a separate judge processor to\npick the best.\n\nVerified by OpenHubForAI clone:\n`SWE-agent/sweagent/agent/action_sampler.py`.",
       "version": "0.1.0",
       "industry": [
         "ai",
@@ -1722,7 +1722,7 @@
       "id": "pipeline/deberta-finetune-classification",
       "type": "pattern",
       "name": "DeBERTa-v3-large fine-tune for closed-set classification",
-      "description": "DeBERTa-v3-large fine-tuning shape used as the heavy half of nearly\nevery top Kaggle LLM-classification submission since 2023. Combined\nwith `pipeline/tfidf-lightgbm-text-classification` as a stacked\nensemble for the final leaderboard score.\n\nVerified by Open Harness Hub Meta Kaggle deep mining: top kernels\nacross `llm-detect-ai-generated-text`, `llm-classification-finetuning`,\n`h2oai-predict-the-llm` use this exact stack.",
+      "description": "DeBERTa-v3-large fine-tuning shape used as the heavy half of nearly\nevery top Kaggle LLM-classification submission since 2023. Combined\nwith `pipeline/tfidf-lightgbm-text-classification` as a stacked\nensemble for the final leaderboard score.\n\nVerified by OpenHubForAI Meta Kaggle deep mining: top kernels\nacross `llm-detect-ai-generated-text`, `llm-classification-finetuning`,\n`h2oai-predict-the-llm` use this exact stack.",
       "version": "0.1.0",
       "industry": [
         "ai",
@@ -1752,7 +1752,7 @@
       "id": "pipeline/lora-qlora-pairwise-pref-finetune",
       "type": "pattern",
       "name": "LoRA + QLoRA pairwise-preference fine-tune (Gemma-2-9b 4-bit)",
-      "description": "Production-verified fine-tune shape for the LMSYS / WSDM Chatbot\nArena class of pairwise-preference competitions. Load Gemma-2-9b\nwith 4-bit BitsAndBytes quantization, attach a PEFT LoRA adapter,\nfine-tune SFTTrainer on (prompt, response_A, response_B) \u2192 A/B/tie\ntriples. Inference: same loaded model + classifier head over the\nthree classes.\n\nVerified by the Open Harness Hub Meta Kaggle deep miner: 3 of 9\npulled WSDM-Cup top-voted kernels match this exact stack\n(transformers + peft + bitsandbytes + trl).",
+      "description": "Production-verified fine-tune shape for the LMSYS / WSDM Chatbot\nArena class of pairwise-preference competitions. Load Gemma-2-9b\nwith 4-bit BitsAndBytes quantization, attach a PEFT LoRA adapter,\nfine-tune SFTTrainer on (prompt, response_A, response_B) \u2192 A/B/tie\ntriples. Inference: same loaded model + classifier head over the\nthree classes.\n\nVerified by the OpenHubForAI Meta Kaggle deep miner: 3 of 9\npulled WSDM-Cup top-voted kernels match this exact stack\n(transformers + peft + bitsandbytes + trl).",
       "version": "0.1.0",
       "industry": [
         "ai",
@@ -1783,7 +1783,7 @@
       "id": "pipeline/tfidf-lightgbm-text-classification",
       "type": "pattern",
       "name": "TF-IDF + LightGBM text classification",
-      "description": "The non-LLM baseline that consistently wins or co-wins Kaggle text-\nclassification competitions. Char- and word-ngram TF-IDF feature\nextraction \u2192 LightGBM (often stacked with SGDClassifier / MultinomialNB)\n\u2192 calibrated probability.\n\nVerified by Open Harness Hub Meta Kaggle deep mining: top kernels of\n`llm-detect-ai-generated-text` all use this stack, often as the lead\nbaseline before any DeBERTa fine-tune is added.",
+      "description": "The non-LLM baseline that consistently wins or co-wins Kaggle text-\nclassification competitions. Char- and word-ngram TF-IDF feature\nextraction \u2192 LightGBM (often stacked with SGDClassifier / MultinomialNB)\n\u2192 calibrated probability.\n\nVerified by OpenHubForAI Meta Kaggle deep mining: top kernels of\n`llm-detect-ai-generated-text` all use this stack, often as the lead\nbaseline before any DeBERTa fine-tune is added.",
       "version": "0.1.0",
       "industry": [
         "ai",
@@ -1897,7 +1897,7 @@
       "id": "pipeline/code-act-jupyter-loop",
       "type": "pipeline",
       "name": "Code-act Jupyter loop",
-      "description": "The OpenInterpreter pattern: model emits Python code in fenced\nblocks, runtime renders the message + executes the code in a\nJupyter kernel, streams the observation back into the model's\ncontext, loops until the model emits a `DONE` marker.\n\nVerified by Open Harness Hub mining of the OpenInterpreter clone:\n`interpreter/core/respond.py` implements exactly this loop.",
+      "description": "The OpenInterpreter pattern: model emits Python code in fenced\nblocks, runtime renders the message + executes the code in a\nJupyter kernel, streams the observation back into the model's\ncontext, loops until the model emits a `DONE` marker.\n\nVerified by OpenHubForAI mining of the OpenInterpreter clone:\n`interpreter/core/respond.py` implements exactly this loop.",
       "version": "0.1.0",
       "industry": [
         "ai",
@@ -1978,7 +1978,7 @@
       "id": "pipeline/deep-research-supervisor-workers",
       "type": "pipeline",
       "name": "Deep research: supervisor + parallel workers",
-      "description": "LangChain's open_deep_research pattern. A supervisor LLM decomposes\nthe user query into research briefs and dispatches N parallel\nresearcher subagents (each gets its own context + tools), then\ncompresses and writes the final report.\n\nVerified by Open Harness Hub clone:\n`langchain-ai/open_deep_research/src/open_deep_research/deep_researcher.py`\n(~700 LOC) + `prompts.py`.",
+      "description": "LangChain's open_deep_research pattern. A supervisor LLM decomposes\nthe user query into research briefs and dispatches N parallel\nresearcher subagents (each gets its own context + tools), then\ncompresses and writes the final report.\n\nVerified by OpenHubForAI clone:\n`langchain-ai/open_deep_research/src/open_deep_research/deep_researcher.py`\n(~700 LOC) + `prompts.py`.",
       "version": "0.1.0",
       "industry": [
         "ai",
@@ -2199,7 +2199,7 @@
       "id": "pipeline/knowledge-graph-from-corpus",
       "type": "pipeline",
       "name": "GraphRAG: knowledge-graph from corpus + global/local query",
-      "description": "Microsoft GraphRAG pattern. Extract entities + relationships from\ndocuments into a graph; build community summaries via Leiden\nclustering; query via local (ego-network), global (map-reduce over\ncommunities), or DRIFT (primer + follow-up hybrid).\n\nVerified by Open Harness Hub clone:\n`microsoft/graphrag/packages/graphrag/graphrag/query/structured_search/`\ncontains `local_search/`, `global_search/`, `drift_search/` modules.",
+      "description": "Microsoft GraphRAG pattern. Extract entities + relationships from\ndocuments into a graph; build community summaries via Leiden\nclustering; query via local (ego-network), global (map-reduce over\ncommunities), or DRIFT (primer + follow-up hybrid).\n\nVerified by OpenHubForAI clone:\n`microsoft/graphrag/packages/graphrag/graphrag/query/structured_search/`\ncontains `local_search/`, `global_search/`, `drift_search/` modules.",
       "version": "0.1.0",
       "industry": [
         "ai",
@@ -2238,7 +2238,7 @@
       "id": "pipeline/large-model-faiss-rag",
       "type": "pipeline",
       "name": "Large-model FAISS RAG (Platypus2-70b style)",
-      "description": "Use a large (70B-class) instruction-tuned model with FAISS-indexed\nWikipedia retrieval. The \"go big or go home\" Kaggle pattern that\nwins multi-choice-with-context competitions.\n\nVerified by Open Harness Hub mining of simjeg's \"Platypus2-70B with\nWikipedia RAG\" (1248 votes) on kaggle-llm-science-exam.",
+      "description": "Use a large (70B-class) instruction-tuned model with FAISS-indexed\nWikipedia retrieval. The \"go big or go home\" Kaggle pattern that\nwins multi-choice-with-context competitions.\n\nVerified by OpenHubForAI mining of simjeg's \"Platypus2-70B with\nWikipedia RAG\" (1248 votes) on kaggle-llm-science-exam.",
       "version": "0.1.0",
       "industry": [
         "ai",
@@ -2275,7 +2275,7 @@
       "id": "pipeline/llm-judge-essay-grading",
       "type": "pipeline",
       "name": "LLM-judge essay grading (with adversarial prompt prefix)",
-      "description": "Run a frontier LLM as judge on candidate essays, using a few-shot\nprompt with adversarial prefix patterns to discourage gaming. The\n\"you can't please them all\" pattern: grade strictly, refuse to\ninflate scores under social-engineering pressure.\n\nVerified by Open Harness Hub mining of richolson's \"Mash It Up\" (561\nvotes), \"Add It Up!\" (333 votes), and jiprud's \"Essays - simple\nsubmission\" (484 votes) on llms-you-cant-please-them-all.",
+      "description": "Run a frontier LLM as judge on candidate essays, using a few-shot\nprompt with adversarial prefix patterns to discourage gaming. The\n\"you can't please them all\" pattern: grade strictly, refuse to\ninflate scores under social-engineering pressure.\n\nVerified by OpenHubForAI mining of richolson's \"Mash It Up\" (561\nvotes), \"Add It Up!\" (333 votes), and jiprud's \"Essays - simple\nsubmission\" (484 votes) on llms-you-cant-please-them-all.",
       "version": "0.1.0",
       "industry": [
         "ai",
@@ -2311,7 +2311,7 @@
       "id": "pipeline/multi-agent-debate-with-judge",
       "type": "pipeline",
       "name": "Multi-agent debate with judge",
-      "description": "Two or more debater personas argue different sides of a question\nacross N rounds. A judge persona scores the final positions. Used\nfor hard reasoning tasks where stress-testing improves accuracy.\n\nVerified by Open Harness Hub clone:\n`microsoft/autogen` implements the group-chat round-table pattern.",
+      "description": "Two or more debater personas argue different sides of a question\nacross N rounds. A judge persona scores the final positions. Used\nfor hard reasoning tasks where stress-testing improves accuracy.\n\nVerified by OpenHubForAI clone:\n`microsoft/autogen` implements the group-chat round-table pattern.",
       "version": "0.1.0",
       "industry": [
         "ai"
@@ -2386,7 +2386,7 @@
       "id": "pipeline/multi-model-judging-ensemble",
       "type": "pipeline",
       "name": "Multi-model judging ensemble",
-      "description": "Run inference across N different LLMs (e.g. Mixtral / Mistral-7B /\nGemma-7B / Llama-3-8B), score each model's prediction with a\nperplexity baseline, then majority-vote or weighted-blend for final\noutput.\n\nVerified by Open Harness Hub mining of aatiffraz's\n\"Prompt Prediction w/ Mixtral/Mistral7B/Gemma/Llama\" (640 votes).",
+      "description": "Run inference across N different LLMs (e.g. Mixtral / Mistral-7B /\nGemma-7B / Llama-3-8B), score each model's prediction with a\nperplexity baseline, then majority-vote or weighted-blend for final\noutput.\n\nVerified by OpenHubForAI mining of aatiffraz's\n\"Prompt Prediction w/ Mixtral/Mistral7B/Gemma/Llama\" (640 votes).",
       "version": "0.1.0",
       "industry": [
         "ai"
@@ -2420,7 +2420,7 @@
       "id": "pipeline/perplexity-baseline-scoring",
       "type": "pipeline",
       "name": "Perplexity-baseline scoring",
-      "description": "Score candidate answers by their perplexity under a reference LLM.\nLower perplexity = better fit. Used as a baseline for\nprompt-recovery, AI-text-detection, and any task where \"fluency\nunder a fixed prior\" is a useful signal.\n\nVerified by Open Harness Hub mining of itahiro's \"Perplexity\nBaseline [Phi-2, Gemma-7b-it]\" (1005 votes) on llm-prompt-recovery.",
+      "description": "Score candidate answers by their perplexity under a reference LLM.\nLower perplexity = better fit. Used as a baseline for\nprompt-recovery, AI-text-detection, and any task where \"fluency\nunder a fixed prior\" is a useful signal.\n\nVerified by OpenHubForAI mining of itahiro's \"Perplexity\nBaseline [Phi-2, Gemma-7b-it]\" (1005 votes) on llm-prompt-recovery.",
       "version": "0.1.0",
       "industry": [
         "ai"
@@ -2566,7 +2566,7 @@
       "id": "pipeline/self-rag-grade-and-revise",
       "type": "pipeline",
       "name": "Self-RAG: grade-and-revise (concrete implementation)",
-      "description": "Concrete pipeline implementing `pattern/self-rag`. Retrieve \u2192 per-doc\nrelevance grader \u2192 rewrite-query loop on irrelevant retrieval \u2192\ngenerate with grounding \u2192 answer-support grader \u2192 iterate up to\nmax_iterations on low support.\n\nVerified by Open Harness Hub deep mining: the LangGraph reference\nimplementation at `langchain-ai/langgraph/tutorials/rag/langgraph_self_rag/`\n+ Akari Asai's canonical implementation at\n`AkariAsai/self-rag/retrieval_lm/run_short_form.py` (both cloned).",
+      "description": "Concrete pipeline implementing `pattern/self-rag`. Retrieve \u2192 per-doc\nrelevance grader \u2192 rewrite-query loop on irrelevant retrieval \u2192\ngenerate with grounding \u2192 answer-support grader \u2192 iterate up to\nmax_iterations on low support.\n\nVerified by OpenHubForAI deep mining: the LangGraph reference\nimplementation at `langchain-ai/langgraph/tutorials/rag/langgraph_self_rag/`\n+ Akari Asai's canonical implementation at\n`AkariAsai/self-rag/retrieval_lm/run_short_form.py` (both cloned).",
       "version": "0.1.0",
       "industry": [
         "ai",
@@ -2606,7 +2606,7 @@
       "id": "pipeline/storm-persona-curation-article",
       "type": "pipeline",
       "name": "STORM: persona-curation + outline-fanout article",
-      "description": "Stanford OVAL's STORM pattern. Generate N personas with different\nperspectives \u2192 run simulated dialogue per persona to curate\nknowledge \u2192 outline \u2192 parallel-expand each outline section \u2192\npolish into final article.\n\nVerified by Open Harness Hub clone: `stanford-oval/storm` \u2014\n`knowledge_storm/storm_wiki/modules/{persona_generator,knowledge_curation,outline_generation,article_generation,article_polish}.py`.",
+      "description": "Stanford OVAL's STORM pattern. Generate N personas with different\nperspectives \u2192 run simulated dialogue per persona to curate\nknowledge \u2192 outline \u2192 parallel-expand each outline section \u2192\npolish into final article.\n\nVerified by OpenHubForAI clone: `stanford-oval/storm` \u2014\n`knowledge_storm/storm_wiki/modules/{persona_generator,knowledge_curation,outline_generation,article_generation,article_polish}.py`.",
       "version": "0.1.0",
       "industry": [
         "ai",
@@ -2688,7 +2688,7 @@
       "id": "pipeline/swe-patch-sample-and-review",
       "type": "pipeline",
       "name": "SWE-agent: sample N patches + reviewer judges",
-      "description": "The princeton-nlp/SWE-agent pattern. Given a bug report + repo: sample\nN action-rollouts (each producing a candidate patch via file-edit + run-\ntest loop), then a reviewer model judges the N candidates and picks\nthe best patch.\n\nVerified by Open Harness Hub clone: SWE-agent's\n`sweagent/agent/{agents,reviewer,history_processors,action_sampler}.py`\nimplements exactly this.",
+      "description": "The princeton-nlp/SWE-agent pattern. Given a bug report + repo: sample\nN action-rollouts (each producing a candidate patch via file-edit + run-\ntest loop), then a reviewer model judges the N candidates and picks\nthe best patch.\n\nVerified by OpenHubForAI clone: SWE-agent's\n`sweagent/agent/{agents,reviewer,history_processors,action_sampler}.py`\nimplements exactly this.",
       "version": "0.1.0",
       "industry": [
         "ai",
@@ -2727,7 +2727,7 @@
       "id": "pipeline/synthetic-data-gen-with-teacher-llm",
       "type": "pipeline",
       "name": "Synthetic-data generation with teacher LLM",
-      "description": "Use a teacher LLM to generate (input, output) training pairs for a\ndownstream student fine-tune. Includes filtering for diversity +\ndifficulty + safety. The pattern that won the prompt-recovery class\nof competitions.\n\nVerified by Open Harness Hub mining of wlifferth's \"Starter Notebook:\nGenerating More Data With Gemma\" (1820 votes) on llm-prompt-recovery.",
+      "description": "Use a teacher LLM to generate (input, output) training pairs for a\ndownstream student fine-tune. Includes filtering for diversity +\ndifficulty + safety. The pattern that won the prompt-recovery class\nof competitions.\n\nVerified by OpenHubForAI mining of wlifferth's \"Starter Notebook:\nGenerating More Data With Gemma\" (1820 votes) on llm-prompt-recovery.",
       "version": "0.1.0",
       "industry": [
         "ai"
@@ -2761,7 +2761,7 @@
       "id": "pipeline/twenty-questions-agent",
       "type": "pipeline",
       "name": "20-questions agent (Akinator-style)",
-      "description": "An agent that plays 20 Questions \u2014 asks yes/no questions to narrow\ndown a hidden concept. Uses a candidate set + binary-search-style\nquestion generation. The classic agent-game pattern with a clear\nwin condition.\n\nVerified by Open Harness Hub mining of ryanholbrook's \"LLM 20\nQuestions Starter Notebook\" (1420 votes) + cdeotte's \"Starter Code\nfor Llama 8B LLM\" (447 votes).",
+      "description": "An agent that plays 20 Questions \u2014 asks yes/no questions to narrow\ndown a hidden concept. Uses a candidate set + binary-search-style\nquestion generation. The classic agent-game pattern with a clear\nwin condition.\n\nVerified by OpenHubForAI mining of ryanholbrook's \"LLM 20\nQuestions Starter Notebook\" (1420 votes) + cdeotte's \"Starter Code\nfor Llama 8B LLM\" (447 votes).",
       "version": "0.1.0",
       "industry": [
         "ai",
@@ -2830,7 +2830,7 @@
       "id": "processor/community-summary-mapreduce",
       "type": "processor",
       "name": "Community-summary map-reduce (GraphRAG global)",
-      "description": "Per-community map step (LLM summarizes each Leiden community), then\nreduce step combines partial answers across communities. The core\nprimitive of GraphRAG's global-search mode.\n\nVerified by Open Harness Hub clone:\n`microsoft/graphrag/packages/graphrag/graphrag/query/structured_search/global_search/`.",
+      "description": "Per-community map step (LLM summarizes each Leiden community), then\nreduce step combines partial answers across communities. The core\nprimitive of GraphRAG's global-search mode.\n\nVerified by OpenHubForAI clone:\n`microsoft/graphrag/packages/graphrag/graphrag/query/structured_search/global_search/`.",
       "version": "0.1.0",
       "industry": [
         "ai",
@@ -4478,7 +4478,7 @@
       "id": "processor/document-grader",
       "type": "processor",
       "name": "Per-document relevance grader (Self-RAG)",
-      "description": "Score each retrieved document for relevance to the user query. Emits\nper-doc grade \u2208 {relevant, irrelevant, ambiguous} with a confidence\nscore. Used by Self-RAG and CRAG to filter or trigger fallback.\n\nVerified by Open Harness Hub clone: pattern shows up in Self-RAG's\nreflection-token approach and is the canonical first step of\nCorrective-RAG.",
+      "description": "Score each retrieved document for relevance to the user query. Emits\nper-doc grade \u2208 {relevant, irrelevant, ambiguous} with a confidence\nscore. Used by Self-RAG and CRAG to filter or trigger fallback.\n\nVerified by OpenHubForAI clone: pattern shows up in Self-RAG's\nreflection-token approach and is the canonical first step of\nCorrective-RAG.",
       "version": "0.1.0",
       "industry": [
         "ai",
@@ -4658,7 +4658,7 @@
       "id": "processor/multi-vector-fusion",
       "type": "processor",
       "name": "Multi-vector / multi-query fusion (RRF + weighted)",
-      "description": "Fuse N ranked candidate lists from independent retrievers (sparse +\ndense + graph + cross-encoder reranker output) via Reciprocal Rank\nFusion or weighted score blending. Returns a single deduped ranked\nlist.\n\nVerified by Open Harness Hub clones: shape appears in\n`Raudaschl/rag-fusion`, `superlinear-ai/raglite/_search.py`, and\n`microsoft/graphrag/global_search/`.",
+      "description": "Fuse N ranked candidate lists from independent retrievers (sparse +\ndense + graph + cross-encoder reranker output) via Reciprocal Rank\nFusion or weighted score blending. Returns a single deduped ranked\nlist.\n\nVerified by OpenHubForAI clones: shape appears in\n`Raudaschl/rag-fusion`, `superlinear-ai/raglite/_search.py`, and\n`microsoft/graphrag/global_search/`.",
       "version": "0.1.0",
       "industry": [
         "ai",
@@ -4811,7 +4811,7 @@
       "id": "processor/runtime-tool-selector",
       "type": "processor",
       "name": "Runtime tool selector (Toolformer / pydantic-ai)",
-      "description": "Given a user query + a large registry of tools, semantically select\nthe top-K most likely-relevant tools to expose to the model. Avoids\noverflowing the context window with every tool definition when only\na few apply.\n\nVerified by Open Harness Hub clone: implemented at\n`pydantic/pydantic-ai/_tool_search.py` (Toolformer-style).",
+      "description": "Given a user query + a large registry of tools, semantically select\nthe top-K most likely-relevant tools to expose to the model. Avoids\noverflowing the context window with every tool definition when only\na few apply.\n\nVerified by OpenHubForAI clone: implemented at\n`pydantic/pydantic-ai/_tool_search.py` (Toolformer-style).",
       "version": "0.1.0",
       "industry": [
         "ai",

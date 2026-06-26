@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""oh-hub — Open Harness Hub command-line interface.
+"""oh-hub — OpenHubForAI command-line interface.
 
 Ergonomic catalog access for humans + AI agents (Claude Code / Cursor /
 Aider / etc).
@@ -357,7 +357,7 @@ def cmd_emit(args, catalog):
 def main() -> int:
     parser = argparse.ArgumentParser(
         prog="oh-hub",
-        description="Open Harness Hub command-line interface.",
+        description="OpenHubForAI command-line interface.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )

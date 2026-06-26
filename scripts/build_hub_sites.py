@@ -132,7 +132,7 @@ def _write_index(out_dir: Path, hub_ids: list[str], profs: dict | None = None) -
         ".card{display:block;border:1px solid #e6e8ef;border-radius:14px;padding:18px;background:#fff;text-decoration:none;color:inherit}"
         ".card h3{margin:0 0 4px;font-size:16px}.card p{margin:0;font-size:13px;color:#6b7280}"
         ".card .uc{display:block;margin-top:8px;font-size:12px;color:#9aa0ad}"
-        f"</style></head><body><div class=wrap><div class=tag>Open Harness Hub</div><h1>The Open*Hubs ({len(hub_ids)})</h1>"
+        f"</style></head><body><div class=wrap><div class=tag>OpenHubForAI</div><h1>The Open*Hubs ({len(hub_ids)})</h1>"
         "<p style='color:#6b7280;max-width:640px'>The open ecosystem both Teleon and Baltor consume. Each hub is "
         f"continuously populated (discover · generate · intake), governed, and verify-gated.</p><div class=grid>{cards}</div></div></body></html>\n")
     (out_dir / "index.html").write_text(htmlx, encoding="utf-8")

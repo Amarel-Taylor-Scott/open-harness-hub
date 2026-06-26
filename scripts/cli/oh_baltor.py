@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""``oh-baltor`` — the Open Harness Hub open-funnel developer CLI (M5).
+"""``oh-baltor`` — the OpenHubForAI open-funnel developer CLI (M5).
 
 The no-account, works-with-the-agent-you-already-run surface. This is the
 **open funnel + consumption surface** for verified corpora described in the
@@ -376,7 +376,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog=PROG,
         description=(
-            "Open Harness Hub open-funnel CLI — emit verified-corpus consumption "
+            "OpenHubForAI open-funnel CLI — emit verified-corpus consumption "
             "surfaces (serve), corroborate a claim (verify), or show token/fidelity "
             "tiers (tiers). Offline, no account; reads small JSON, writes stdout. "
             "Live MCP wire + live source fetch + metering are SEAMS (see --help)."

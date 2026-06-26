@@ -106,9 +106,20 @@ def _self_test() -> int:
         ck("FAILED attempts are retained (lossless negatives)", any(r["outcome"] == "failed" and not r["success"] for r in recs))
         ck("the durable JSONL mirror still exists on disk", Path(store.path).exists())
 
-    # ── 5. SWAP: cloud backends are unwired-but-named (never a silent fallback) ──
-    ck("the postgres backend names its target + refuses (not silently local)", _raises(rs.PostgresRecordStore, NotImplementedError))
-    ck("the warehouse backend names its target + refuses (not silently local)", _raises(rs.WarehouseRecordStore, NotImplementedError))
+    # ── 5. SWAP: the OPERATIONAL cloud backend is WIRED (PostgresRecordStore — refuses w/o a DSN, never
+    #     silently local; full proof in scripts/check_postgres_record_store.py); history stays the named
+    #     unwired warehouse swap. Clear the PG env first so the refusal is deterministic on any host. ──
+    _saved_pg = {k: os.environ.pop(k, None) for k in list(os.environ)
+                 if k in ("OH_PG_DSN", "DATABASE_URL") or k.startswith("PG")}
+    try:
+        ck("the postgres backend is WIRED but refuses without a DSN (never silently local)",
+           _raises(lambda: rs.PostgresRecordStore("component_candidates"), rs.StorageError))
+    finally:
+        for _k, _v in _saved_pg.items():
+            if _v is not None:
+                os.environ[_k] = _v
+    ck("the warehouse backend names its target + refuses (the documented unwired swap)",
+       _raises(rs.WarehouseRecordStore, NotImplementedError))
 
     print("\n" + (f"PASS - long-lived streams store to SCALE: one backend-swappable append-only port governed by a "
                   f"single-source tier policy (config->json / operational->postgres / history->warehouse), "

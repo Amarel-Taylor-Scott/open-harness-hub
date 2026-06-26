@@ -135,7 +135,7 @@ def propose(cluster: str, n: int, route) -> list[dict]:
     if not route.health():
         return []
     system = (
-        "You are the Open Harness Hub capability-gap scout. Propose KNOWLEDGE-PACK "
+        "You are the OpenHubForAI capability-gap scout. Propose KNOWLEDGE-PACK "
         "opportunities: domains where an LLM CANNOT answer reliably alone (long-tail / "
         "fast-changing / exact-identifier / jurisdiction-specific facts) and a grounded "
         "pack would fix it. AVOID anything a frontier model already does well zero-shot. "

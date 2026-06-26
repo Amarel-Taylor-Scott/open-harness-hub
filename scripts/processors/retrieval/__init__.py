@@ -1,4 +1,4 @@
-"""Open Harness Hub — retrieval / prompt-assembly processors (taxonomy steps R0–R6).
+"""OpenHubForAI — retrieval / prompt-assembly processors (taxonomy steps R0–R6).
 
 This package holds the implementations behind the `catalog/processors/retrieval/`
 manifests — the swappable method-components of the governed retrieval pipeline

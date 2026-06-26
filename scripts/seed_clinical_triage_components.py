@@ -73,7 +73,7 @@ def build(c: tuple) -> dict:
         "version": "0.1.0",
         "name": name,
         "description": why + "\n\n" + TAXO_NOTE,
-        "authors": [{"name": "Open Harness Hub contributors"}],
+        "authors": [{"name": "OpenHubForAI contributors"}],
         "license": "MIT",
         "industry": ["healthcare"],
         "capability": cap,
