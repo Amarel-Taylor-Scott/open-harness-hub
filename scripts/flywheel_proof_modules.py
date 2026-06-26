@@ -1022,6 +1022,7 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("src/teleon/examples/product_pipelines.py", "product_pipelines"),
     ("scripts/check_aidevobserver_vscode_ext.py", "check_aidevobserver_vscode_ext"),
     ("scripts/check_aidevobserver_mcp.py", "check_aidevobserver_mcp"),
+    ("scripts/check_observer_local_service.py", "check_observer_local_service"),
     ("src/teleon/retrieval/learned_vectors.py", "learned_vectors"),
     ("src/teleon/retrieval/pgvector_index.py", "pgvector_index"),
     ("src/teleon/synthesis/codeblock_loop.py", "codeblock_loop"),

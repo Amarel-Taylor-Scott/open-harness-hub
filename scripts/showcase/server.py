@@ -125,6 +125,9 @@ def _seam_proxies() -> list[tuple[str, str, str]]:
     teleon_runtime = _local_service_port("teleon_local_runtime")
     if teleon_runtime:
         table.append(("/api/teleon/", "", _seam_base("OH_SEAM_TELEON_RUNTIME_BASE", teleon_runtime)))
+    observer = _local_service_port("observer_runtime")
+    if observer:  # AIDevObserver session-review backend (review/live/sessions over the observer engine)
+        table.append(("/api/observer/", "", _seam_base("OH_SEAM_OBSERVER_BASE", observer)))
     live_ops = _local_service_port("baltor_admin_demo_server")
     if live_ops:
         live_ops_base = _seam_base("OH_SEAM_LIVEOPS_BASE", live_ops)

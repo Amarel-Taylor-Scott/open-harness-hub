@@ -1046,6 +1046,45 @@
       "trycloudflare_required": false,
       "status": "active_local",
       "notes": "Visible inbox over dist/email-outbox (email PORT renders here, honestly does not send). The verify link completes the REAL verify_identifier onboarding step via the identity service. Delivery emulated; registration/verify real."
+    },
+    {
+      "service_id": "observer_runtime",
+      "display_name": "AIDevObserver session-review backend (review/live/sessions over the observer engine)",
+      "owner": "teleon",
+      "port": 9431,
+      "process_group": "observer_runtime",
+      "env": {},
+      "purpose": "AIDevObserver session-review backend (review/live/sessions over the observer engine)",
+      "start_command": [
+        "python3",
+        "scripts/observer_local_service.py",
+        "--serve"
+      ],
+      "stop_command": null,
+      "health_url": "http://127.0.0.1:9431/health",
+      "ready_url": "http://127.0.0.1:9431/health",
+      "public_routes": [
+        "/health",
+        "/sessions",
+        "/review",
+        "/live"
+      ],
+      "private_routes": [],
+      "env_file": null,
+      "allowed_consumers": [
+        "browser_user",
+        "aidevobserver_app",
+        "all_local_surfaces"
+      ],
+      "auth_mode": "anonymous_demo_read",
+      "data_classes": [
+        "session_review_no_secrets"
+      ],
+      "logs_path": "dist/local-services/observer_runtime.log",
+      "screenshot_required": false,
+      "trycloudflare_required": false,
+      "status": "active_local",
+      "notes": "Thin HTTP front-end over the EXISTING observer engine (src/teleon/observer): review_session (governed post-session report), route_session (live spotter), from_transcript, discover_sessions. The web/aidevobserver showcase reaches it same-origin through the /api/observer/ seam in scripts/showcase/server.py (strip=\"\", mirrors teleon_local_runtime). serves_truth=false; read-only; stores nothing; synthetic/public session text only."
     }
   ]
 }

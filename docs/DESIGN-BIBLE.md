@@ -1,478 +1,536 @@
-# THE DESIGN BIBLE — AI Done Right · the single, designer-ready design-system reference
+# THE DESIGN BIBLE: AI Done Right, the single designer-ready product-design reference
 
-> The visual/UX counterpart to `docs/BIBLE.md` (the *what + why + laws*). This is the **how it looks + how it's
-> built**, detailed enough to hand to a designer (human or Claude-acting-as-designer) so they can understand,
-> reproduce, and extend the system. Every value here is **quoted from the source code** — never re-hardcode a hex
-> (No-Magic-Values applies to design too); the file the value lives in is named in-line. This doc is one of the **5
-> CANONICAL docs** tracked by `scripts/check_context_freshness.py`
-> (`CLAUDE.md · AGENTS.md · docs/NORTHSTAR.md · docs/BIBLE.md · docs/DESIGN-BIBLE.md`) — keep its file references real.
-> Last reconciled **2026-06-26**. `serves_truth = false` (the surfaces render candidate output; only Baltor's governed
-> source answers serve truth).
+> The visual and UX counterpart to `docs/BIBLE.md` (the what, why, and laws). This is the "how it looks and how it is
+> built", detailed enough to hand to a designer (a human or Claude acting as designer) so they can understand,
+> reproduce, and extend the product, especially the logged-in AIDevObserver app. Every value here is quoted from the
+> source code (No Magic Values applies to design too): never re-hardcode a token, and the file the value lives in is
+> named in line. This doc is one of the five CANONICAL docs tracked by `scripts/check_context_freshness.py`
+> (`CLAUDE.md`, `AGENTS.md`, `docs/NORTHSTAR.md`, `docs/BIBLE.md`, `docs/DESIGN-BIBLE.md`), so keep its file references
+> real. Last reconciled 2026-06-26. `serves_truth = false` (the surfaces render candidate output; only Baltor's
+> governed source answers serve truth).
 
-**Single sources this doc is generated from (read these, don't trust the prose over the code):**
+**This is a near-rewrite. The prior version named `scripts/surface_server.py` as THE canonical renderer. That is
+SUPERSEDED.** The canonical product is the set of full apps under `web/<app>/`, served by the showcase server over the
+shared kit, with the service-plane backends behind same-origin seams. `scripts/surface_server.py` is now a lightweight
+fallback only (see the one-line note in section 1). The reconciliation is recorded inside this section so the
+contradiction is closed, not orphaned.
+
+**Single sources this doc is generated from (read these; do not trust the prose over the code):**
 
 | Source file | What it is |
 |---|---|
-| `scripts/surface_server.py` | THE canonical renderer. Its `_CSS_TEMPLATE` constant is the live stylesheet every surface ships **byte-identical** (7959 chars rendered). One handler, all routes, all 5 surfaces. |
-| `scripts/check_surface_server.py` | The enforcement — **122 assertions** (computed, run it): byte-identical CSS, nav links all 5, governed `/demo` + `/run`, faceted `/browse`, hub index, `serves_truth=false`. |
-| `architecture/surface_capability_spec.json` | `pillars[]` = the 5 surfaces (id · accent · brand · role · capabilities). The config the renderer reads. |
-| `scripts/_surface_accents.py` | `accent(id)` — the per-surface hex, read from the spec (no hard-coded hex in the server). |
-| `src/teleon/demos/byo_key_demo.py` | `DEMOS` (label · needs_key · runner) + `run_byo_demo` — the governed BYO-key plane. |
-| `scripts/byo_demo_server.py` | `EXAMPLE` — the per-surface demo example prompts (reused, not re-invented). |
-| `src/teleon/registry/browse.py` | `FACET_DIMS` + `browse()` — the faceted catalog the `/browse` route renders. |
-| `dist/surface-urls.json` | The public/tunnel URL per surface (cross-surface nav reads it; robust if absent). |
-| `dist/sites/openharness-design/shared/oh-tokens.css` | The high-fidelity bundle the canonical mirrors (dir-a · theme-light palette). |
+| `scripts/showcase/server.py` | THE canonical renderer. `python3 -m scripts.showcase` serves `web/<OH_PRODUCT>/` (the full app) and proxies the service plane behind same-origin seams. `WEB_DIR = web/<OH_PRODUCT>`. |
+| `web/teleon/kit/oh-tokens.css` | The token palette (radii, fonts, neutrals, accent, semantic colors, primitive hues) for every scope. The shipped family scope is `.oh.dir-s.theme-light`. |
+| `web/teleon/kit/oh-components.css` | The component layer and the canonical type, spacing, and chrome scale (`--fs-*`, `--pad-*`, `--maxw-site`). Atoms: `.oh-btn`, `.oh-card`, `.oh-badge`, `.oh-table`, `.oh-field`, `.oh-input`. |
+| `web/teleon/kit/oh-site.css` | The site and app layout CSS: top bar, hero, sections, footer, and the logged-in app shell (`.ohs-app`, `.ohs-side`, `.ohs-main`, `.ohs-topbar`). |
+| `web/teleon/kit/oh-site.jsx` | The shared kit React components: `OhTopBar`, `OhHero`, `OhSection`, `OhFeatures`, `OhBand`, `OhFooter`, `OhAppShell`, `OhPageHead`, `OhRollup`, plus hooks (`useHashRoute`, `navigate`, `useSiteTheme`). |
+| `web/teleon/kit/products.js` | The brand and product registry (single source). `PORTFOLIO.ENTITIES.<id>.accent` is the per-brand accent for Teleon, Baltor, and AIDevObserver. |
+| `architecture/surface_capability_spec.json` | `pillars[]`: id, accent, brand, role, and `canonical_surface` per surface; the `serving_rule`. Source of the AI Done Right (`#5a6b87`) and OpenHubForAI (`#3b6fd4`) accents. |
+| `architecture/local_service_registry.json` + `architecture/identity_realm_registry.json` | The single source of local service ports the showcase reads to build the `/api/*` and `/registry/` seams. |
+| `docs/concepts/component-taxonomy-and-stages.md` | The seven primitives (Input, Knowledge Corpus, If Statement, Action, Loop, Stop/End, Output). |
+| `docs/standards/DESIGN.md` + `docs/standards/design-principles.md` | The existing design standards this bible extends. |
 
 ---
 
-## 1. The one design law
+## 1. The one design law and the canonical stack
 
-**ONE design system. Every surface ships BYTE-IDENTICAL CSS. The accent color and the copy are the ONLY per-surface
-variables.**
+**ONE design system. Every surface composes the SAME shared kit. The accent color and the copy are the only
+per-surface variables.**
 
-The standardization point is `surface_css(accent)` in `scripts/surface_server.py`: it takes the single
-`_CSS_TEMPLATE` constant and replaces the one `__ACCENT__` token with the surface's hex. The token appears **exactly
-once**, so the rendered stylesheet is identical across all five surfaces except that one value.
+The standardization point is stated in the code itself. `web/teleon/kit/oh-components.css` declares the scale as
+"ONE type/space/chrome scale shared by every site. Sites differ ONLY by accent color (token scope). Padding, font
+sizes, chrome dimensions and the display face are identical everywhere." A surface is therefore never styled from
+scratch. It sets a root scope class and overrides one value:
 
-- Rendered stylesheet length: **7959 chars**, identical on every surface (`_CSS_TEMPLATE` is 7962 chars including the
-  10-char `__ACCENT__` placeholder; a 7-char hex → 7962 − 10 + 7 = **7959**).
-- `scripts/check_surface_server.py` proves it (run `python3 scripts/check_surface_server.py --self-test` → **122
-  assertions PASS**). The load-bearing assertions:
-  - `len({css.replace(accent,"__ACCENT__") for each surface}) == 1` — strip the accent and all 5 stylesheets collapse to one string;
-  - that one string `== _CSS_TEMPLATE` (the canonical template, no drift);
-  - `css.count(accent) == 1` per surface (the accent is the *only* difference);
-  - all 5 accents distinct; `font-family:"Inter"` present; the canonical token block present.
+```jsx
+<div className={'oh dir-s theme-' + theme + ' oh-site tln'} style={{ '--accent': ACCENT }}>
+```
 
-**Consequence for a designer:** you never style a surface. You edit `_CSS_TEMPLATE` once and the change propagates to
-all 5. There are no per-surface stylesheets, overrides, or forks — by law.
+That single line (from `web/teleon/teleon-main.jsx`, mirrored in `web/aidevobserver/aidevobserver-main.jsx`) is the
+whole per-surface contract: the `oh dir-s theme-light oh-site` scope pulls in the shared tokens and components, and
+`--accent` is the one brand variable.
+
+### The canonical stack (four layers)
+
+1. **The apps.** Five full front-end apps live under `web/<app>/`: `context-is-everything` (AI Done Right),
+   `teleon`, `baltor`, `harness-hub` (OpenHubForAI), and `aidevobserver`. Each app is its own entry HTML plus a small
+   brand main file (for example `web/teleon/index.html` + `web/teleon/teleon-main.jsx` + `web/teleon/teleon.css`).
+2. **The showcase server.** `scripts/showcase/server.py` is the renderer. `OH_PRODUCT` picks the folder and
+   `WEB_DIR = web/<OH_PRODUCT>` is served at the origin root. Run it with `python3 -m scripts.showcase --port <N>`.
+3. **The shared kit.** Every app loads the same files from its `kit/` folder: `oh-tokens.css`, `oh-components.css`,
+   `oh-site.css`, `oh-site.jsx`, and `products.js` (plus `oh-identity.js`, `oh-registry.js`, `cases.js`,
+   `oh-experiments.js`). Chrome and primitive pages come from the kit; only brand config and a few bespoke pieces are
+   local to the app.
+4. **The service plane.** The showcase proxies same-origin seams (`/api/*`, `/registry/`, `/analytics/`) to the local
+   service backends, with ports read from `architecture/local_service_registry.json` and
+   `architecture/identity_realm_registry.json`. The front-end declares the bases it expects:
+   `window.OHH_IDENTITY_BASE = ''`, `window.OHH_REGISTRY_BASE = '/registry'`, `window.OHH_EVENTS_BASE = '/analytics'`.
+
+### Reconciliation (the contradiction, closed)
+
+- **Superseded:** the prior bible documented `scripts/surface_server.py` as THE canonical renderer, with a
+  byte-identical `_CSS_TEMPLATE` and a fixed `dir-a.theme-light` palette (`--bg #faf7f0`). That described a thin
+  standalone renderer, not the shipped product.
+- **Canonical now:** the shipped product is the full app in `web/<app>/`, served by `python3 -m scripts.showcase`
+  over the shared kit, with the service plane behind seams. The real palette is `web/<app>/kit/oh-tokens.css`,
+  `.oh.dir-s.theme-light` (`--bg #fafaf8`), with the accent overridden per brand. The same conclusion is encoded in
+  `architecture/surface_capability_spec.json`, whose `serving_rule` reads: "Launchers MUST serve each pillar's
+  `canonical_surface` (the built-out `web/*` app)", and whose `canonical_surface` fields point at `web/context-is-everything`,
+  `web/teleon`, `web/baltor`, and `web/harness-hub`.
+- **`scripts/surface_server.py` is a lightweight FALLBACK only.** It can render a minimal standalone surface when the
+  full app or the service plane is not available. It is not canonical and a designer never edits it to change the look.
 
 ---
 
-## 2. The canonical decision + reconciliation
+## 2. The five surfaces
 
-**Owner-decided 2026-06-26: one design system — LIGHT theme, Inter UI font (+ `ui-monospace` for code/labels/eyebrows),
-rendered by one config-driven server.** This **supersedes** the prior "Hanken Grotesk / `oh-site.jsx`" canonical.
+The family is one holding brand (AI Done Right) over four products. Each surface is a full app served by the showcase
+with its own `OH_PRODUCT`. Accents come from `web/<app>/kit/products.js` (Teleon, Baltor, AIDevObserver) and from
+`architecture/surface_capability_spec.json` (AI Done Right, OpenHubForAI). Roles below are written in clean product
+copy (the raw spec strings are paraphrased per the copy rules in section 8).
 
-Reconciliation (explicit, so the contradiction is closed, not orphaned):
-
-- **Superseded:** the earlier DESIGN-BIBLE described a multi-theme React bundle (`oh-site.jsx` + `products.js`, light +
-  dark, 8 design directions A–H + S) and named **Hanken Grotesk** as the UI font. "Hanken Grotesk" was only ever a
-  *display* font in two bundle directions (`dir-d`, `dir-s`); the bundle's UI sans has always been **Inter**
-  (`--font-sans: "Inter", …` in `oh-tokens.css`). The live renderer resolves that to a single answer: **Inter UI**.
-- **Canonical now:** `scripts/surface_server.py` renders all 5 surfaces from one `_CSS_TEMPLATE`. Its tokens mirror the
-  high-fidelity bundle's **`dir-a` · `theme-light`** palette (warm paper) from
-  `dist/sites/openharness-design/shared/oh-tokens.css`. The bundle remains the canonical *source of record* for the
-  richer component library; the server is the canonical *renderer* for the 5 shipped surfaces.
-- **Warrant:** clear owner intent (2026-06-26) for one standardized server; corroborated by the bundle's own
-  `--font-sans: Inter` and `dir-a.theme-light` neutrals. Design/brand changes require owner intent — this carries it.
-
----
-
-## 3. The 5 surfaces
-
-Read from `architecture/surface_capability_spec.json` (`pillars[]`); accent via `scripts/_surface_accents.py`.
-
-| id | brand (rendered) | accent | role | routes served |
+| Brand | `OH_PRODUCT` / web dir | Accent | Role | Primary backend seam |
 |---|---|---|---|---|
-| `ai-done-right` | **AI Done Right** | `#5a6b87` | parent / holding brand — the **portfolio HUB / index** | `/` (hub index) · `/demo` (pick-a-surface) |
-| `teleon` | **Teleon.dev** | `#6d5ef0` | purpose-driven, eval-gated, self-adaptive compute runtime | `/` · `/demo` (BYO key) · `POST /run` |
-| `baltor` | **Baltor.ai** | `#0e7c86` | managed, verified, provable context, powered by Teleon — governs TRUTH | `/` · `/demo` (BYO key) · `POST /run` |
-| `aidevobserver` | **AIDevObserver** | `#b25fd6` | watches AI USAGE — reviews the SESSION (post) + helps intra-session | `/` · `/demo` (**no key**) · `POST /run` |
-| `open-star-hubs` | **Open\*Hubs** | `#3b6fd4` | the open STORE both products consume + the open CapabilityTask spec (CTS) | `/` · `/demo` (BYO key) · **`/browse`** · `POST /run` |
+| AI Done Right | `context-is-everything` | `#5a6b87` (slate blue) | Parent holding brand. The portfolio home that introduces the family. | identity, registry, analytics (marketing and portfolio) |
+| Teleon | `teleon` | `#6d5ef0` (indigo) | The purpose-driven, eval-gated, self-adaptive compute runtime. | `/api/teleon/` (`teleon_local_runtime`) |
+| Baltor | `baltor` | `#0e7c86` (teal) | Managed, verified, provable context, powered by Teleon (governs truth). | the live-ops family (`/api/demo/`, `/api/context/`, `/api/pipeline/`, `/api/runtime/`) via `baltor_admin_demo_server` |
+| AIDevObserver | `aidevobserver` | `#b25fd6` (orchid) | Reviews how a team uses AI coding agents and turns each session into a clear, ranked report. | identity, registry, analytics (review engine: `src/teleon/observer`) |
+| OpenHubForAI | `harness-hub` | `#3b6fd4` (royal blue) | The open store of context, tools, skills, and harnesses that both products consume, plus the open CapabilityTask spec. | `/registry/` (`local_openhub_projection_api`) plus `/api/components` and `/api/primitives` |
 
-Notes: `ai-done-right` is the parent — its home is the **portfolio index** (a card per other surface) and it has no
-BYO demo panel of its own (its `/demo` is a "pick a surface" index). Only `open-star-hubs` serves `/browse` (the
-faceted registry catalog); the other four 404 on `/browse`. Domain mapping in §10.
+Notes. The `aidevobserver` accent (`#b25fd6`) lives only in `web/aidevobserver/kit/products.js`, the build-out target.
+The teal `#0e7c86` doubles as the family's `--verified` color (the "verified" read). Every surface shares the
+identity, registry, and analytics seams; the table lists each surface's distinctive backend.
 
 ---
 
-## 4. Color system — the full token palette
+## 3. The seven primitives in the product UI
 
-The complete `:root` palette from `_CSS_TEMPLATE` (in `scripts/surface_server.py`). These mirror `oh-tokens.css`
-`.oh.dir-a.theme-light` (warm editorial "paper"). Every visual value is a `var(--token)` reference — there are **no
-raw hexes outside `:root`** except the injected accent.
+Everything a pipeline does reduces to seven primitives (single source: `docs/concepts/component-taxonomy-and-stages.md`,
+backed by `scripts/primitives/base.py`). They are the product's core vocabulary, so the UI names and colors them
+consistently. Use the product label in user-facing copy, never the internal schema `type`.
 
-| Token | Value | Meaning | Where used |
+| # | Primitive | What it is | Legend hue (token, `.oh.theme-light`) |
 |---|---|---|---|
-| `--bg` | `#faf7f0` | warm paper page background | `body` background; the nav's translucent layer `rgba(250,247,240,.82)` is this color |
-| `--bg-subtle` | `#f3eee2` | one step down from `--bg` | nav-link hover, output panel `.out`, chips `.chip`, focus-ring glow |
-| `--surface` | `#fffdf8` | raised card/panel paper (near-white) | `.card`, `.panel`, `.rec`, `.pill`, `.eyebrow`, active nav-link |
-| `--fg` | `#1c1b19` | primary ink (near-black, warm) | `body` text, headings, `.nav-brand`, `.rid` |
-| `--fg-muted` | `#6b675e` | secondary text | ledes, card body, `.role`, labels, nav-link rest, `.holds` |
-| `--fg-faint` | `#868074` | tertiary / metadata text | `.note`, `.footer`, `.facet h3`, `.fmore`, `.fv .ct`, badge text default |
-| `--border` | `#e7e0d2` | hairline divider / outline | all `1px solid var(--border)` borders, nav bottom, footer top |
-| `--accent` | **per-surface** (`__ACCENT__`) | the one brand variable | links, `.btn-accent`, `.nav-dot`, active states, hover borders, eyebrow text, `.idx`, `.arrow` |
-| `--accent-ink` | `#ffffff` | text/ink ON the accent fill | `.btn-accent` label text |
+| 1 | **Input** | The payload to work on. | `--p-input` `#5b6470` |
+| 2 | **Knowledge Corpus** | A store of facts, queried by a trigger. | `--p-knowledge` `#1a7f37` |
+| 3 | **If Statement** | The condition (the IF), kept separate from the THEN. | `--p-conditional` `#9a6700` |
+| 4 | **Action** | Anything that does something (the THEN): a persona, tool, processor, harness, or rubric. | `--p-action` `#c2410c` |
+| 5 | **Loop** | Control flow and iteration over sub-steps. | `--p-loop` `#6e40c9` |
+| 6 | **Stop / End** | Halt early on a guard or terminal condition. | `--p-stop` `#cf222e` |
+| 7 | **Output** | Finalize the result and the trace. | `--p-output` `#0969da` |
 
-The **five accents** (single source: `architecture/surface_capability_spec.json` → `scripts/_surface_accents.py`):
+Where they show up:
 
-| Surface | `--accent` | hue |
+- **The legend and pipeline nodes.** The seven hues (`--p-*` in `web/teleon/kit/oh-tokens.css`) color the node chips
+  and the legend in any pipeline or flow view. The light-theme set is darkened for AA contrast on paper.
+- **The OpenHubForAI store.** The showcase serves `/api/primitives` (from `scripts/primitives`) and `/api/components`,
+  so the browse and store views group catalog components under their primitive.
+- **Product copy.** Say "Knowledge Corpus" (not "knowledge pack"), "If Statement" (not "rule pack"), and "Action"
+  (a persona, tool, processor, harness, or rubric is an Action). Version lives in metadata, never in a name or ID.
+
+---
+
+## 4. Tokens
+
+The real token palette is `web/<app>/kit/oh-tokens.css`. The file defines six-plus scopes (`dir-a` through `dir-s`,
+each with `theme-light` and `theme-dark`). The family ships the synthesis scope `.oh.dir-s.theme-light` (the "Harness
+House Style", light theme): it is the scope the live new apps render (`oh dir-s theme-light` in
+`web/teleon/teleon-main.jsx` and `web/aidevobserver/aidevobserver-main.jsx`). The accent is then overridden per brand
+inline. All values below are quoted from `.oh.dir-s.theme-light` (and the shared `.oh` block).
+
+### Neutrals, accent, and semantic colors (`.oh.dir-s.theme-light`)
+
+| Token | Value | Meaning |
 |---|---|---|
-| AI Done Right | `#5a6b87` | slate blue |
-| Teleon.dev | `#6d5ef0` | indigo |
-| Baltor.ai | `#0e7c86` | teal (the "verified/moat" color) |
-| AIDevObserver | `#b25fd6` | orchid / violet |
-| Open\*Hubs | `#3b6fd4` | royal blue |
+| `--bg` | `#fafaf8` | page background (warm near-white) |
+| `--bg-subtle` | `#f1f0ec` | one step down: hovers, code wells, inset fields |
+| `--panel` | `#ffffff` | raised card and panel surface |
+| `--panel-2` | `#f8f7f3` | secondary panel fill |
+| `--line` | `#e7e5dd` | hairline border and divider |
+| `--line-strong` | `#d5d2c7` | stronger border (inputs, emphasis) |
+| `--fg` | `#161513` | primary ink |
+| `--fg-muted` | `#66635b` | secondary text (ledes, body, labels) |
+| `--fg-faint` | `#868277` | tertiary and metadata text |
+| `--accent` | per brand (overridden inline) | the one brand variable; default in scope is `#d6553a` |
+| `--accent-ink` | `#ffffff` | text and ink on an accent fill |
+| `--accent-weak` | `#fbede7` | accent tint for the active sidebar item and soft fills |
+| `--success` | `#1a7f37` | success |
+| `--warning` | `#9a6700` | warning |
+| `--danger` | `#c0392b` | danger |
+| `--info` | `#1f6fb2` | info |
+| `--verified` | `#0e7c86` | the verified read (also Baltor's brand teal) |
 
-Color rule for a designer: spend the accent on *intent* (primary action, the active item, the brand dot, a focused
-field). Everything structural is a neutral token. Contrast: all accents are AA on `--surface`/`--bg`; `--accent-ink`
-(white) is the only thing placed on an accent fill.
+Tinted derivations track the accent with `color-mix`, not parallel literals, for example
+`color-mix(in srgb, var(--accent) 35%, var(--line))` for an accent-tinted border. Spend the accent on intent (the
+primary action, the active item, the brand mark, a focused field); everything structural is a neutral token.
 
----
+### Type scale (shared `.oh`, in `web/teleon/kit/oh-components.css`)
 
-## 5. Typography
+The UI font is **Inter** (`--font-sans: "Inter", -apple-system, "Segoe UI", system-ui, sans-serif`). The display face
+in `dir-s` is **Hanken Grotesk** (`--font-display: "Hanken Grotesk", "Inter", sans-serif`). Mono is
+`--font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace`. Light theme. The reference entry HTML
+`web/aidevobserver/index.html` loads all three from Google Fonts (`Inter`, `Hanken Grotesk`, `JetBrains Mono`,
+weights 400 to 800).
 
-**Inter** is the UI font; **`ui-monospace`** is the code/label/eyebrow font. No serif, no display face in the live
-renderer.
+| Token | Value | Role |
+|---|---|---|
+| `--fs-h1` | `clamp(34px, 4.6vw, 52px)` | hero H1 (line-height 1.05, letter-spacing -.03em, display face) |
+| `--fs-h2` | `clamp(26px, 3.2vw, 34px)` | section H2 and band H2 |
+| `--fs-h3` | `19px` | feature and card H3 / H4 |
+| `--fs-page-title` | `30px` | logged-in page title (`.ohs-pagehead h1`) |
+| `--fs-lead` | `18px` (`--lh-lead 1.58`) | hero lede |
+| `--fs-body` | `15px` (`--lh-body 1.6`) | body and section copy |
+| `--fs-eyebrow` | `11px` (`--ls-eyebrow .14em`) | uppercase kicker above a title |
+| `--fs-small` | `13px` | small print |
 
-- **Loading** (`_GOOGLE_FONTS` in `surface_server.py`, in every page `<head>`):
-  ```html
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  ```
-  Five weights are loaded: **400, 500, 600, 700, 800**.
-- **Body stack:** `font-family:"Inter",-apple-system,"Segoe UI",system-ui,sans-serif` with `line-height:1.6`,
-  `-webkit-font-smoothing:antialiased`, `text-rendering:optimizeLegibility`.
-- **Mono stack:** `.mono` / `.mono-in` / eyebrows / counts use
-  `font-family:ui-monospace,SFMono-Regular,monospace` (system mono — nothing to download).
-
-**The type scale** (every size is pulled verbatim from `_CSS_TEMPLATE`):
-
-| Role | Selector | Size | Weight / tracking |
-|---|---|---|---|
-| Hero H1 | `.hero h1` | `clamp(2.3rem,5.2vw,3.7rem)` | 800 · `letter-spacing:-.028em` · `line-height:1.04` |
-| Lede | `.hero .lede` | `clamp(1.05rem,2vw,1.3rem)` | `--fg-muted` · `max-width:46ch` |
-| Section H2 | `.section-head h2` | `1.55rem` | 700 · `-.02em` |
-| Card H3 | `.card h3` | `1.1rem` | `-.01em` · `line-height:1.25` |
-| Nav brand | `.nav-brand` | `1.02rem` | 800 · `-.01em` |
-| Body | `body` | `1rem` (browser default) | 400 · `line-height:1.6` |
-| Button | `.btn` | `.96rem` | 600 |
-| Card body | `.card p` / `.card .role` | `.93rem` | `--fg-muted` |
-| Nav link · card arrow | `.nav-link` / `.card .arrow` | `.88rem` | 500 / 600 |
-| Record id · facet value | `.rid` / `.fv` | `.86rem` | `.rid` mono 700 |
-| Footer | `.footer` | `.85rem` | `--fg-faint` |
-| Label | `label` | `.82rem` | 600 · `--fg-muted` |
-| Pill | `.pill` | `.78rem` | `--fg-muted` |
-| Note (governance) | `.note` | `.77rem` | `--fg-faint` |
-| Footer truth line | `.foot-truth` | `.76rem` | mono |
-| Facet count | `.fv .ct` | `.74rem` | mono · `--fg-faint` |
-| Eyebrow · card index | `.eyebrow` / `.card .idx` | `.72rem` | mono · UPPER `.16em` / lower `.03em` · `--accent` |
-| Facet group head | `.facet h3` | `.71rem` | UPPER · `.09em` · `--fg-faint` |
-| Badge | `.badge` | `.63rem` | UPPER · `.05em` |
-| Inputs | `input,textarea` | `14px "Inter"` | — |
-| Mono input | `.mono-in` | `13px` | mono |
-| Output block | `.out` | `12.5px` | mono |
-
----
-
-## 6. Spacing · radii · shadows · layout
-
-All from `_CSS_TEMPLATE` `:root` + layout rules.
+### Radii, spacing, shadows, chrome (shared `.oh` and `dir-s`)
 
 | Token | Value | Use |
 |---|---|---|
-| `--r-sm` | `8px` | buttons, nav-link, inputs, small chips/facet rows |
-| `--r-md` | `12px` | cards, record cards, output block |
-| `--r-lg` | `18px` | the demo `.panel` |
-| `--maxw` | `1080px` | the page container width |
-| `--shadow-sm` | `0 1px 2px rgba(60,40,20,.05)` | resting cards/panels/buttons (warm-brown shadow, not gray) |
-| `--shadow-md` | `0 14px 38px rgba(60,40,20,.12)` | hover lift on cards + accent button |
+| `--r-sm` | `6px` | inputs, small chips |
+| `--r-md` | `9px` | buttons, sidebar links, most cards |
+| `--r-lg` | `12px` | the `.oh-card` surface |
+| `--r-pill` | `999px` | pills, segmented controls, switches |
+| `--pad-card` | `22px` | `.oh-card--pad` padding |
+| `--pad-panel` | `28px` | panel padding |
+| `--maxw-site` | `1120px` | marketing content width |
+| `--w-sidebar` | `240px` | sidebar scaffold width (the app shell grid uses `248px`) |
+| `--h-topbar` | `64px` | marketing top bar height |
+| `--e1` | `0 1px 2px rgba(40,30,20,.05)` | resting card shadow (warm-brown, not gray) |
+| `--e2` | `0 12px 34px rgba(40,30,20,.11)` | hover lift and raised aside cards |
+| `--ease` | `cubic-bezier(.2,.8,.2,1)` | the shared transition curve |
 
-- **Container:** `.wrap { max-width:var(--maxw); margin:0 auto; padding:0 1.4rem }` — every section centers in 1080px.
-- **Card grid:** `.cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(252px,1fr)); gap:1rem }` —
-  responsive auto-fill; cards reflow with the viewport, no media query needed.
-- **Record grid (browse):** `.reclist { … minmax(244px,1fr); gap:.85rem }`.
-- **Pill radius** (`999px`) is inline on pills/chips/badges/eyebrow (fully round) — not tokenized.
-- **Responsive** (`@media(max-width:760px)`): `.browse-layout` collapses to one column; `.facets` un-sticks
-  (`position:static`); `.hero` padding tightens to `3.1rem 0 2rem`.
+### The five accents (single source per surface)
 
-> Note: the bundle (`oh-tokens.css` dir-a) uses radii `6/9/12px` and `--e2: 0 10px 30px /.10`; the renderer retunes to
-> `8/12/18px` and `--shadow-md: 0 14px 38px /.12`. The neutrals + `--shadow-sm` match exactly; the radii/`--surface`
-> (`#fffdf8` vs panel `#ffffff`)/`--shadow-md` are intentional renderer tunings — see §11 (drift open-item).
+| Surface | `--accent` | Source |
+|---|---|---|
+| AI Done Right | `#5a6b87` | `architecture/surface_capability_spec.json` |
+| Teleon | `#6d5ef0` | `web/teleon/kit/products.js` (`PORTFOLIO.ENTITIES.teleon.accent`) |
+| Baltor | `#0e7c86` | `web/baltor/kit/products.js` (`PORTFOLIO.ENTITIES.baltor.accent`) |
+| AIDevObserver | `#b25fd6` | `web/aidevobserver/kit/products.js` (`PORTFOLIO.ENTITIES.aidevobserver.accent`) |
+| OpenHubForAI | `#3b6fd4` | `architecture/surface_capability_spec.json` |
 
----
-
-## 7. Components
-
-Documented from the real classes in `_CSS_TEMPLATE` and the render functions in `surface_server.py`. Each: structure,
-classes, intent, snippet.
-
-### 7.1 Sticky top nav — `nav(current_id)`
-Brand (with accent dot) on the left; the 5 surface links on the right; the current surface link is `.active`.
-Translucent, blurred, sticky. Classes: `.nav` (`position:sticky; top:0; z-index:50; background:rgba(250,247,240,.82);
-backdrop-filter:saturate(180%) blur(12px)`), `.nav-inner`, `.nav-brand`, `.nav-dot` (`11px` accent square,
-`border-radius:3px`), `.nav-links`, `.nav-link`, `.nav-link.active` (accent text on `--surface` with a `--border`).
-```html
-<nav class="nav"><div class="nav-inner">
-  <a class="nav-brand" href="/"><span class="nav-dot"></span>Teleon.dev</a>
-  <div class="nav-links">
-    <a class="nav-link" href="https://…/">AI Done Right</a>
-    <a class="nav-link active" href="/">Teleon.dev</a>
-    <a class="nav-link" href="https://…/">Baltor.ai</a> … (all 5)
-  </div>
-</div></nav>
-```
-Intent: identical chrome on every surface; the accent dot + active link are the only brand tells.
-
-### 7.2 Eyebrow — `.eyebrow`
-A small uppercase mono kicker above the H1. Pill-shaped, `--surface` fill, `--border`, accent text. Intent: orient the
-visitor (route/brand) without competing with the H1.
-```html
-<span class="eyebrow">/demo · bring your own key</span>
-```
-
-### 7.3 Hero — `_hero(eyebrow, h1, lede, cta, pills)`
-Eyebrow → H1 → lede → CTA row (→ optional pills). Classes: `.hero`, `.hero h1`, `.hero .lede`, `.cta-row`.
-```html
-<header class="hero"><div class="wrap">
-  <span class="eyebrow">AI Done Right</span>
-  <h1>Teleon.dev</h1>
-  <p class="lede">the purpose-driven, eval-gated, self-adaptive compute runtime</p>
-  <div class="cta-row">
-    <a class="btn btn-accent" href="/demo">Try the live demo →</a>
-    <a class="btn btn-ghost" href="#capabilities">What it does ↓</a>
-  </div>
-</div></header>
-```
-
-### 7.4 Pills / chips — `.pills`/`.pill`, `.chips`/`.chip`
-`.pill` = capability tags under the hub hero (`--surface` + `--border`, round). `.chip` = compact tags inside
-record cards + active-filter removers (`--bg-subtle` fill). Intent: scannable metadata, never a primary action.
-```html
-<div class="pills"><span class="pill">Portfolio index → the pillars</span> …</div>
-```
-
-### 7.5 Buttons — `.btn`, `.btn-accent`, `.btn-ghost`
-`.btn` = base (inline-flex, 600, `--r-sm`, lift on hover `translateY(-1px)`). `.btn-accent` = primary (accent fill,
-`--accent-ink` text, `--shadow-sm` → `--shadow-md` on hover). `.btn-ghost` = secondary (`--surface` fill, `--border`).
-One accent button per view, max.
-```html
-<a class="btn btn-accent" href="/browse">Browse the catalog →</a>
-<a class="btn btn-ghost" href="#capabilities">What it does ↓</a>
-```
-
-### 7.6 Card grid — `_section` + `.cards`/`.card`
-Auto-fill grid of cards. A card has a mono `.idx` kicker (accent), an `h3`, a body `p` / `.role`, and (when it's a
-link) an `.arrow`. `a.card:hover` lifts (`translateY(-2px)`) and borders go accent. Two uses: portfolio surface
-cards (`.card.surface-card`, hub home) and capability cards (`.idx` = `01`, `02`, …).
-```html
-<a class="card surface-card" href="https://…/">
-  <div class="idx">teleon</div>
-  <h3>Teleon.dev</h3>
-  <p class="role">the purpose-driven, eval-gated, self-adaptive compute runtime</p>
-  <span class="arrow">Visit Teleon.dev →</span>
-</a>
-```
-
-### 7.7 BYO-key demo form — `render_demo` + `.panel`/`.field`/`.out`
-A single `.panel` card: optional key field (password input, only when `needs_key`), a prompt `textarea` (pre-filled
-from `EXAMPLE`), the governance `.note`, the accent run button, and a hidden `.out` block that reveals the JSON
-result. Focus states ring the accent (`box-shadow:0 0 0 3px var(--bg-subtle)`). The `_RUN_JS` posts
-`{demo,byo_key,inputs}` to `/run` and renders the JSON.
-```html
-<div class="panel">
-  <div class="field"><label>Your API key (required)</label>
-    <input class="mono-in" id="key" type="password" autocomplete="off" placeholder="sk-… or your provider key"></div>
-  <div class="field"><label>Prompt</label>
-    <textarea class="mono-in" id="prompt">summarize server logs into a cited incident report</textarea></div>
-  <p class="note">Used only for this request · never stored · never logged. Only a redacted status (sk-…1234) is ever shown.</p>
-  <button class="btn btn-accent" onclick="run()">Run with my key →</button>
-  <div class="out" id="out"></div>
-</div>
-```
-The AIDevObserver demo omits the key field (`needs_key:false`) and shows the no-key note instead.
-
-### 7.8 Browse facet sidebar + record cards — `render_browse` (open-star-hubs only)
-Two-column `.browse-layout` (`248px 1fr`): a sticky `.facets` aside on the left, a `.reclist` grid of `.rec` cards on
-the right. A search `.search-row` and `.active-filters` chips sit above. Each `.facet` group lists `.fv` rows
-(value + mono `.ct` count); the selected value is `.fv.on` (accent). Up to 15 values per group, then `.fmore`
-("+N more"). Each `.rec` card: a mono `.rid`, a status `.badge`, a `.holds` line, and category `.chip`s.
-```html
-<div class="browse-layout">
-  <aside class="facets">
-    <div class="facet"><h3>Category</h3>
-      <div class="fvals">
-        <a class="fv" href="/browse?category=…"><span>tools</span><span class="ct">42</span></a>
-        <a class="fv on" href="/browse"><span>context</span><span class="ct">7</span></a>
-      </div>
-      <div class="fmore">+12 more</div>
-    </div> … (category · type · kind · layer · status)
-  </aside>
-  <section><div class="reclist">
-    <div class="rec"><div class="rec-head">
-      <span class="rid">component</span><span class="badge">active</span></div>
-      <div class="holds">what this registry holds…</div>
-      <div class="chips"><span class="chip">tools</span></div>
-    </div> …
-  </div></section>
-</div>
-```
-Facet dimensions (single source `src/teleon/registry/browse.py` → `FACET_DIMS`):
-**category · type · kind · layer · status**. Counts are computed by `browse()` — never typed.
-
-### 7.9 Governance footer — `footer(current_id)`
-A parent line, the 5 cross-surface links, and the mono **truth line**. Present on every page. Classes: `.footer`,
-`.foot-links`, `.foot-truth.mono`.
-```html
-<footer class="footer"><div class="wrap">
-  <div>AI Done Right — one standardized surface server · five product surfaces, one design system.</div>
-  <div class="foot-links"><a href="…">AI Done Right</a> … (all 5)</div>
-  <div class="foot-truth mono">serves_truth = false · candidate output, not verified truth ·
-    a BYO key is used only for the request, never stored or logged.</div>
-</div></footer>
-```
+Contrast: every accent is AA on `--panel` and `--bg`; `--accent-ink` (white) is the only thing placed on an accent
+fill.
 
 ---
 
-## 8. Routes + layout per surface
+## 5. The shared kit components
 
-One handler — `handle_get(surface_id, path, query)` — serves every surface (socket-free, so the proof drives it
-directly):
+Documented from the real components in `web/teleon/kit/oh-site.jsx` and the classes in `oh-site.css` and
+`oh-components.css`. Two atoms underpin everything: the button and the card.
 
-| Route | Status | Renders | Notes |
+### Atoms: button and card (`oh-components.css`)
+
+```jsx
+<button className="oh-btn oh-btn--primary">Start free</button>   {/* accent fill, --accent-ink text */}
+<button className="oh-btn oh-btn--ghost">See how it works</button> {/* transparent, --line border */}
+<button className="oh-btn oh-btn--primary oh-btn--sm">Install</button> {/* compact: 7px 12px, 13px */}
+
+<div className="oh-card oh-card--pad">…</div>            {/* --panel surface, --line border, --r-lg, 22px pad */}
+<div className="oh-card oh-card--pad oh-card--interactive">…</div> {/* adds hover lift to --e2 + accent border */}
+```
+
+`.oh-btn` is `font-size 14px / weight 650`, `border-radius var(--r-md)`, `padding 10px 18px`, `inline-flex` with
+`gap 8px`. `.oh-card` is `1px solid var(--line)`, `background var(--panel)`, `border-radius var(--r-lg)`. Use one
+primary button per view. Status reads use `.oh-badge` with a variant: `--verified` (teal), `--warn` (amber),
+`--danger` (red), `--muted` / `--stable` (gray), `--sm` for the compact size.
+
+### 5.1 `OhTopBar` (marketing chrome)
+
+`<header className="ohs-top">`: the brand logo (`OhLogo`, an accent mark plus the name), the portfolio switcher
+(`OhPortfolioMenu`), a spacer, the nav links, then the right cluster (theme toggle, optional Sign in, a primary CTA).
+Props: `brand, nav, cta, signInHref, theme, onToggle`.
+
+```jsx
+<OhTopBar brand={BRAND} nav={MKT_NAV} cta={{ label: 'Install', href: '/runs' }}
+  theme={theme} onToggle={onToggle} />
+```
+
+### 5.2 `OhHero`
+
+`<section className="ohs-hero">` with `.ohs-wrap` (adds `.ohs-hero-grid`, a `1.08fr .92fr` two-column grid, when an
+`aside` is given): an eyebrow, an `<h1>` (a `.tint` span inside the title is colored with the accent), a `.lede`, a
+`.ohs-cta` button row, and the optional aside card. Props: `eyebrow, title, lede, ctas, aside`.
+
+```jsx
+<OhHero eyebrow="AI coding session review"
+  title={<>See how your team really uses <span className="tint">AI coding agents</span>.</>}
+  lede="AIDevObserver turns each session into a clear, ranked report."
+  ctas={[{ label: 'See a review', onClick: () => scrollToId('demo'), primary: true },
+         { label: 'Install the extension', onClick: () => scrollToId('runs') }]}
+  aside={<HeroReviewCard />} />
+```
+
+### 5.3 `OhSection`
+
+`<section className="ohs-section" id={id}>` with `.ohs-wrap`: an `.ohs-section-label` kicker, an `<h2>`, an
+`.ohs-body` lede, and `children`. The `id` lets in-page nav scroll to it. Props: `label, title, body, children, id`.
+
+```jsx
+<OhSection id="how" label="How it works" title="A session goes in. A clear, ranked report comes out."
+  body={<>It flags reinvention, wasted context, risky commands, and missed cheaper paths.</>}>
+  <OhFeatures items={HOW} />
+</OhSection>
+```
+
+### 5.4 `OhFeatures`
+
+A `.ohs-grid-3` of `.oh-card.ohs-feature` cards, each a `.fi` glyph, an `<h4>`, and a `<p>`. Props: `items` as
+`[[glyph, title, desc], ...]`.
+
+```jsx
+<OhFeatures items={[
+  ['◉', 'Every session becomes a report', 'A short, ranked report you can read in under a minute.'],
+  ['⚑', 'It flags what actually costs you', 'Reinvention, wasted context, risky commands, missed cheaper paths.'],
+  ['↑', 'Ranked by confidence', 'High-confidence findings rise; low-signal noise drops away.'],
+]} />
+```
+
+### 5.5 `OhBand`
+
+A full-width call-to-action band: `<section className="ohs-band">` with an `<h2>`, an optional `<p>`, and a
+`.ohs-cta` button row. Props: `title, sub, ctas`.
+
+```jsx
+<OhBand title="Make every AI coding session count."
+  sub="Turn raw agent sessions into reports your team actually learns from."
+  ctas={[{ label: 'Install the extension', href: '/runs', primary: true },
+         { label: 'See a review', href: '/demo' }]} />
+```
+
+### 5.6 `OhFooter`
+
+`<footer className="ohs-foot">` with `.ohs-foot-grid`: the brand mark and an `.ohs-foot-tag` tagline on the left, then
+`.ohs-foot-cols` of `.ohs-foot-col` link columns. Props: `brand, tagline, cols` as `[[heading, [[label, href], ...]], ...]`.
+
+```jsx
+<OhFooter brand={BRAND} tagline="AI coding session review, part of AI Done Right" cols={[
+  ['Product', [['How it works', '/how'], ['Where it runs', '/runs'], ['Trust', '/trust']]],
+  ['Family', [['AI Done Right', '../context-is-everything/index.html'], ['Teleon', '../teleon/index.html']]],
+]} />
+```
+
+### 5.7 `OhAppShell` (logged-in chrome): see section 6b
+
+### 5.8 `OhPageHead` and `OhRollup` (logged-in page atoms)
+
+`OhPageHead` is the in-app page header: `.ohs-pagehead` with an eyebrow, an `<h1>` (`--fs-page-title`), a `<p>` sub,
+and an `.ohs-pagehead-actions` slot. `OhRollup` is a row of stat cards: `.ohs-rollup` of `.oh-card.ohs-roll`, each a
+`.v` value over a `.k` label. Props: `OhPageHead({ eyebrow, title, sub, actions })`, `OhRollup({ items })` where
+items are `[[label, value], ...]`.
+
+```jsx
+<OhPageHead eyebrow="Workspace" title="Sessions"
+  sub="Each AI coding session, reviewed and ranked." actions={<button className="oh-btn oh-btn--primary">Review latest</button>} />
+<OhRollup items={[['Sessions, 30d', 128], ['High findings', 14], ['Avg confidence', '0.91']]} />
+```
+
+### Cards, pills, table, fields
+
+`.oh-card` is the one surface for every card and panel. `.oh-table` is the data table (uppercase 11px headers,
+12px cell padding, `--line` row borders). `.oh-field` wraps a labeled input; `.oh-input` is a standalone input; both
+focus to an accent border. `.oh-segment` is a pill-shaped segmented control. `.oh-kbd` renders a keyboard hint
+(for example the `Command K` palette). Build new pieces from these tokens, never raw hexes.
+
+---
+
+## 6. Layout: two layouts, one family
+
+Both layouts use the same kit, the same tokens, and the same accent. They differ only in chrome: marketing pages have
+a top nav; logged-in pages have a left sidebar.
+
+### 6a. Marketing and home pages (the public pattern)
+
+Top nav, hero, sections, cards, band, footer. This is `web/teleon/index.html` plus `web/teleon/teleon-main.jsx`
+(`Landing`), and `web/aidevobserver/aidevobserver-main.jsx` (`Landing`). The structure:
+
+```jsx
+<div className={'oh dir-s theme-' + theme + ' oh-site tln'} style={{ '--accent': ACCENT }}>
+  <OhTopBar brand={BRAND} nav={MKT_NAV} cta={{ label: 'Start free', href: '/signup' }} theme={theme} onToggle={onToggle} />
+  <OhHero eyebrow={…} title={…} lede={…} ctas={[…]} aside={<HeroCard />} />
+  <OhSection id="how" label="How it works" title={…} body={…}><OhFeatures items={…} /></OhSection>
+  {/* more sections */}
+  <OhBand title={…} sub={…} ctas={[…]} />
+  <OhFooter brand={BRAND} tagline={…} cols={[…]} />
+</div>
+```
+
+`.ohs-hero` is `padding 76px 0 60px` with a bottom `--line`. The hero H1 is `--fs-h1` in the display face; the lede is
+`--fs-lead`, `--fg-muted`, capped at `60ch`. Content centers in `--maxw-site` (1120px). On narrow screens the hero
+grid collapses to one column and the H1 drops to `40px`.
+
+### 6b. Logged-in and app pages (the left-sidebar pattern)
+
+A left sidebar plus a content area, the Control Tower and dashboard pattern. The canonical implementation is the kit's
+`OhAppShell` (`web/teleon/kit/oh-site.jsx`), which `web/teleon/teleon-main.jsx` uses for its logged-in routes
+(`APP_NAV`). Existing logged-in surfaces in the same family: the Teleon Control Tower
+(`web/teleon/Teleon PurposeTask Control Tower.html`), the Baltor dashboards (`web/baltor/dashboard.html` and the
+guided demos), and the OpenHubForAI admin demo (`web/harness-hub/admin-demo.html`).
+
+```jsx
+<OhAppShell brand={BRAND} nav={APP_NAV} route={route} cta={{ label: '+ New run', href: '/runs' }}
+  theme={theme} onToggle={onToggle}
+  header={<button className="ohs-side-search">Search… <span className="oh-kbd">⌘K</span></button>}>
+  {page}
+</OhAppShell>
+```
+
+The shell renders as a CSS grid:
+
+```css
+.ohs-app  { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
+.ohs-side { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; padding: 22px 16px; }
+.ohs-main { /* the content area */ }
+```
+
+- **The left sidebar (`.ohs-side`).** Top to bottom: `.ohs-side-top` (the brand logo), an optional `header` slot (the
+  search and Command K trigger), `.ohs-side-nav` (the nav links), and `.ohs-side-foot` (a primary CTA, a Settings
+  link, and the theme toggle). The sidebar is `position: sticky; height: 100vh`, so it stays put while the content
+  scrolls.
+- **The nav links (`.ohs-side-link`).** Each is `[href, glyph, label]`. A `.g` glyph sits left of the label. The
+  active link gets `.on`, which fills it with `--accent-weak` and colors it `--accent`. Pass `nav` as a flat
+  `[[href, glyph, label], ...]` list, or `groups` (collapsible `OhNavGroup` sections) for a longer app.
+- **The content area (`.ohs-main`).** Holds an optional sticky `.ohs-topbar` (height 54px, for an account or context
+  bar), an honest preview banner, then the page. Pages open with `OhPageHead`, often an `OhRollup`, then `.oh-card`
+  content.
+- **The top bar with account.** The in-app `.ohs-topbar` is the place for account context (workspace name, the
+  signed-in user, environment). The marketing top bar carries Sign in and the CTA instead.
+- **Consistency with marketing.** Same scope (`oh dir-s theme-light`), same tokens, same accent, same type scale,
+  same `.oh-card` and `.oh-btn` atoms. A logged-in page is the marketing design with the chrome swapped from a top
+  nav to a left sidebar, nothing more.
+- **Responsive.** Below the kit breakpoint the grid becomes one column and the sidebar un-sticks to a horizontal row
+  (`.ohs-side { position: static; flex-direction: row; flex-wrap: wrap; }`).
+
+---
+
+## 7. Consistency rules
+
+These are the family invariants. Hold them on every surface.
+
+- **One shared kit, everywhere.** Every surface loads the same `kit/` files (`oh-tokens.css`, `oh-components.css`,
+  `oh-site.css`, `oh-site.jsx`, `products.js`). Chrome and primitive pages come from the kit. Do not fork the kit per
+  surface.
+- **One marketing layout.** Every home page is top nav, hero, sections, cards, band, footer, built from `OhTopBar`,
+  `OhHero`, `OhSection`, `OhFeatures`, `OhBand`, `OhFooter`.
+- **One logged-in shell.** Every app page uses the `OhAppShell` left-sidebar shell with `OhPageHead`, `OhRollup`, and
+  `.oh-card` content.
+- **Differ only by accent and copy.** The per-surface variables are `--accent` (one inline override) and the brand
+  copy (`products.js` plus the app's section text). Nothing else changes between surfaces.
+- **Bespoke pieces compose tokens.** When a surface needs a piece the kit lacks (for example AIDevObserver's findings
+  list), add a small scoped stylesheet (`web/<app>/<app>.css`) that builds only from `var(--token)` values and
+  `color-mix` off `--accent`. Never introduce a raw hex or a parallel scale.
+
+---
+
+## 8. Copy rules (hard rules)
+
+These are owner design rules. They are not suggestions. They extend `docs/standards/DESIGN.md` and
+`docs/standards/design-principles.md`. Follow them in product copy and in this bible's own prose.
+
+1. **No placeholders.** Write the real name and the real words. Write "OpenHubForAI", never "Open*Hubs". Write
+   "AIDevObserver", "AI Done Right", "Teleon", "Baltor". No "Lorem ipsum", no "TODO", no "coming soon", no "[brand]".
+   Every visible string ships as final copy.
+   - Wrong: "Open*Hubs, coming soon." Right: "OpenHubForAI: the open store both products consume."
+2. **No em dashes or en dashes, anywhere.** Do not use the long dash or the medium dash in any copy or in this doc.
+   Use a comma, a period, parentheses, or a colon instead. (Regular hyphens inside words like "left-sidebar" and
+   "logged-in" are fine; the middot separator is fine.)
+   - Wrong: "One review, wherever your team works, post session." with a long dash between clauses. Right: "One review,
+     wherever your team already works."
+3. **No strategy leakage in public copy.** Public copy never says "moat", "wedge", "private bench", "win one
+   vertical", or names a competitor as a target, and never states pricing or competitive strategy as positioning. Sell
+   the product and its value, not the business plan.
+   - Wrong: "Our wedge into the agent market." Right: "Reviews how your team uses AI coding agents and turns each
+     session into a clear, ranked report."
+4. **Real, confident sales and marketing copy.** Lead with the outcome for the customer. Be specific and plain.
+   AIDevObserver's live copy is the reference: "See how your team really uses AI coding agents", "A session goes in. A
+   clear, ranked report comes out.", "Findings are suggestions a person triages."
+
+---
+
+## 9. Claude Design handoff: build out the AIDevObserver product design
+
+AIDevObserver (`web/aidevobserver/`, accent `#b25fd6`) currently ships the marketing app
+(`aidevobserver-main.jsx` renders `Landing` only). The build-out is the **logged-in app**: the left-sidebar shell and
+its views. The review engine backend is `src/teleon/observer`; this handoff is the front-end design.
+
+### The logged-in app shell (left sidebar)
+
+Use `OhAppShell` with the AIDevObserver accent. Sidebar nav (the `[href, glyph, label]` shape used by `APP_NAV` in
+`web/teleon/teleon-main.jsx`):
+
+| Route | Glyph idea | Label | View |
 |---|---|---|---|
-| `GET /` | 200 | `render_home` | `ai-done-right` → portfolio index; others → hero + capability cards (+ a "browse" section for `open-star-hubs`) |
-| `GET /demo` | 200 | `render_demo` | parent → "pick a surface" index; product surfaces → the BYO-key panel |
-| `GET /browse` | 200 / 404 | `render_browse` | **`open-star-hubs` only**; every other surface → 404 |
-| `GET /browse?<facet>=<v>` | 200 | filtered browse | facet filters parsed from the query string; counts recompute |
-| `GET /favicon.ico` | **204** | empty | avoids a console 404 on every page |
-| `POST /run` | 200 (JSON) | `_run_request` → `run_byo_demo` | the governed demo runner; any error is a JSON result, never a 500 |
-| anything else | 404 | `render_404` | a styled 404 hero with a Home button |
+| `/sessions` | `▤` | Sessions | The list of reviewed AI coding sessions (an `OhRollup` plus an `.oh-table`: session, surface, duration, top finding, confidence). |
+| `/review` | `◉` | Review report | The full ranked report for one session: a summary card, then the ranked findings. |
+| `/findings` | `⚑` | Findings | Findings across sessions, filterable by type and severity, each with a confidence bar. |
+| `/settings` | `⚙` | Settings | Surfaces (VS Code, Cursor, Claude Code MCP, CLI), what is reviewed, retention. |
 
-**Per-surface home layout.** `ai-done-right` home = the **hub portfolio index**: hero ("The portfolio") + a
-`surface-card` per other surface (id · brand · role · "Visit →"). The four product surfaces = hero (brand + role +
-CTAs) → numbered capability cards (`Capabilities`). `open-star-hubs` additionally gets a "Browse every record" section
-linking `/browse`. **Page assembly:** `page() = <!doctype> + <head>(title, Inter link, <style>surface_css(accent))
-+ nav() + body + footer()`.
+### The review-report view (ranked findings plus confidence)
 
-Responsive: the 1080px container is fluid; card/record grids auto-fill; the browse layout and hero collapse at
-`max-width:760px` (§6). The nav wraps its links (`flex-wrap:wrap`) on narrow screens.
+Reuse the bespoke pieces already in `web/aidevobserver/aidevobserver.css`: `.ado-finding` (a finding row with a
+`sev-high` / `sev-medium` severity dot and accent border tint) and `.ado-conf` (the confidence bar plus percent).
+The marketing demo (`ReviewDemo`, `FindingRow`, `ConfBar`) already renders exactly this; lift it into the logged-in
+view inside `OhAppShell`:
 
----
-
-## 9. Governance in the UI
-
-The design encodes the repo's truth/safety laws as visible UI — not just backend behavior:
-
-- **`serves_truth = false`** on every page (the mono footer truth line; asserted on home + demo + browse by
-  `check_surface_server.py`). The surfaces render *candidate* output; only Baltor's governed source answers serve
-  truth.
-- **BYO key is never stored or echoed.** `run_byo_demo` puts the key in a **transient** env scope
-  (`OH_LLM_API_KEY`) for one call, then restores it; the result returns only a **redacted** status
-  (`redact()` → `sk-…1234`). The proof injects `sk-secret-LEAK1234` and asserts the raw key never appears in the JSON.
-  The UI mirrors this in the `.note`: *"Used only for this request · never stored · never logged."*
-- **Honest-unavailable, no fake green.** A key-needing demo with no key returns `{"ok":false,"status":"needs_key"}`
-  (not a fabricated answer). No reachable LLM lane → an honest "would call YOUR model…" note.
-- **Candidate framing in browse.** Records carry a status `.badge`; the browse subhead states `serves_truth=false`;
-  the unit is the record, hubs are facets (a record can sit under several categories).
-
----
-
-## 10. Build + serve path
-
-```bash
-python3 scripts/surface_server.py <surface-id> [--port N]
-# surface-id ∈ ai-done-right · teleon · baltor · aidevobserver · open-star-hubs
+```jsx
+function ReviewReport({ session }) {
+  const ranked = session.findings.slice().sort((a, b) => b.conf - a.conf);
+  return (
+    <div className="ohs-page">
+      <OhPageHead eyebrow="Session review" title={session.title}
+        sub="Findings ranked by confidence. Suggestions a person triages, never gates." />
+      <OhRollup items={[['Findings', ranked.length], ['High severity', ranked.filter(f => f.sev === 'high').length],
+        ['Top confidence', Math.round(ranked[0].conf * 100) + '%']]} />
+      <div className="oh-card oh-card--pad">
+        <div className="ado-findings">{ranked.map(f => <FindingRow f={f} key={f.type} />)}</div>
+      </div>
+    </div>
+  );
+}
 ```
 
-Default local ports (`DEFAULT_PORTS`): `ai-done-right 8001 · teleon 8002 · aidevobserver 8003 · baltor 8004 ·
-open-star-hubs 8005`. Cross-surface nav reads `dist/surface-urls.json` (the launcher writes the public URLs there);
-if a target URL is absent it falls back to `http://localhost:<default-port>/`. A link to the current surface is always
-same-origin `/`.
+Findings rank by confidence (high first), so the most useful finding is the first one read. Keep the four finding
+types from the live app: Risky command, Reinvention, Wasted context, Missed cheaper path. Hold the product promise in
+the copy: read-only, suggestions not gates, nothing stored.
 
-| Surface | Production domain | Ephemeral (TryCloudflare quick tunnel) |
-|---|---|---|
-| AI Done Right | `aidoneright.dev` | written to `dist/surface-urls.json` per run (rotates) |
-| Teleon.dev | `teleon.dev` | ″ |
-| Baltor.ai | `baltor.ai` | ″ |
-| AIDevObserver | `aidevobserver.io` | ″ |
-| Open\*Hubs | `openhubforai.io` | ″ |
+### Safe to change vs locked
 
-TryCloudflare URLs are **ephemeral** (they change every launch — `dist/surface-urls.json` is the live record);
-production uses the stable domains above.
+| Safe to change | Locked (do not break) |
+|---|---|
+| The AIDevObserver accent (`#b25fd6` in `web/aidevobserver/kit/products.js`). | The shared kit: `oh-tokens.css`, `oh-components.css`, `oh-site.css`, `oh-site.jsx`, `products.js`. Edit per-app files, never the kit, to change one surface. |
+| Brand copy and section text in `aidevobserver-main.jsx`. | The two-layout family: marketing is top nav plus hero; logged-in is the `OhAppShell` left sidebar. Do not invent a third chrome. |
+| Add a bespoke, token-built piece in `web/aidevobserver/aidevobserver.css` (a new card, a chart). | The copy rules in section 8 (no placeholders, no em or en dashes, no strategy leakage). |
+| New app pages and routes for the logged-in views above. | The accent-only per-surface rule: never add a per-surface fork of the kit or a parallel token scale. |
 
----
+### Read order for the designer
 
-## 11. Handoff to a designer ("Claude design")
-
-You can change the look of all 5 surfaces from a handful of single-source files. Edit once, it propagates.
-
-### SAFE to change (single-source — propagates to all 5)
-| To change… | Edit… | Effect |
-|---|---|---|
-| A surface's **accent** | `architecture/surface_capability_spec.json` → `pillars[].accent` (read by `_surface_accents.py`) | the one per-surface color; nothing else moves |
-| A surface's **copy** (brand · role · capabilities) | `architecture/surface_capability_spec.json` | hero/cards/nav/footer text |
-| **Demo copy** (label · example prompt · needs_key) | `src/teleon/demos/byo_key_demo.py` (`DEMOS`) + `scripts/byo_demo_server.py` (`EXAMPLE`) | the `/demo` panels |
-| **Type scale, spacing, color tokens, component CSS** | `_CSS_TEMPLATE` in `scripts/surface_server.py` (ONE place) | every surface, identically |
-| **Add a component** | add its CSS to `_CSS_TEMPLATE` **and** emit its HTML in the relevant `render_*`/helper | propagates to all 5 |
-
-**How to extend a component (the pattern):** (1) add the rule(s) to `_CSS_TEMPLATE` using existing tokens
-(`var(--surface)`, `var(--border)`, `var(--r-md)`, `var(--accent)`, `var(--shadow-sm)`) — do **not** introduce raw
-hexes; (2) emit the markup in the matching render function (`_hero`, `_section`, `render_demo`, `render_browse`, …);
-(3) re-run `python3 scripts/check_surface_server.py --self-test` — it re-derives the byte-identical-CSS invariant and
-re-counts assertions; (4) if you add a new token, give it a unit/rationale and consider an assertion for it. Because
-`_CSS_TEMPLATE` is one string shared by all surfaces, a new component is automatically consistent — that *is* the
-single-source rule.
-
-### LOCKED (do not break — owner law)
-- The **byte-identical-CSS law**: accent + copy are the only per-surface variables. Never add a per-surface stylesheet,
-  inline style that varies by surface, or a second `__ACCENT__`-like token. (`check_surface_server.py` will fail.)
-- The **5-surface model** (the `pillars[]` set) and which surface owns `/browse` (`open-star-hubs`).
-- The **governance footer** + `serves_truth=false` + the never-store/never-echo BYO-key contract.
-- **Inter UI + `ui-monospace`** as the canonical fonts (changing the type *system* is a design decision requiring
-  owner intent; resizing within the scale is safe).
-
-### Open item (flag for a future drift-check)
-`_CSS_TEMPLATE` **mirrors `oh-tokens.css` (`dir-a.theme-light`) by hand.** The neutrals
-(`--bg #faf7f0`, `--bg-subtle #f3eee2`, `--fg #1c1b19`, `--fg-muted`, `--fg-faint`, `--border #e7e0d2`,
-`--accent-ink #ffffff`, `--shadow-sm`) match exactly; the **radii** (`8/12/18` vs the bundle's `6/9/12`),
-**`--surface`** (`#fffdf8` vs the bundle's `--panel #ffffff`), and **`--shadow-md`** (`0 14px 38px /.12` vs the
-bundle's `--e2 0 10px 30px /.10`) are renderer-specific tunings. Nothing currently pins the two. **Recommended:** add a
-drift-check (e.g. extend `check_surface_server.py`) that parses both files and asserts the shared tokens stay equal,
-flagging intended divergences — so the mirror can't silently rot.
+1. This doc, sections 1, 2, 6, 7, 8 (the stack, the surfaces, the two layouts, consistency, copy rules).
+2. `web/aidevobserver/aidevobserver-main.jsx` and `web/aidevobserver/aidevobserver.css` (the existing marketing app and
+   its bespoke pieces).
+3. `web/teleon/teleon-main.jsx` (the reference for the `OhAppShell` left-sidebar logged-in app: `App`, `APP_NAV`).
+4. `web/teleon/kit/oh-site.jsx` (the kit components and `OhAppShell`) and `web/teleon/kit/oh-tokens.css` (the tokens).
+5. `web/harness-hub/admin-demo.html` and `web/teleon/Teleon PurposeTask Control Tower.html` (existing logged-in
+   dashboards in the family).
 
 ---
 
-## 12. Evidence — the 5 live surfaces, verified
-
-Two layers of evidence back this design system:
-
-**Deterministic proof (always-on):** `python3 scripts/check_surface_server.py --self-test` →
-**PASS, 122 assertions.** It proves, without a socket: all 5 homes are 200 HTML; the CSS is byte-identical except the
-single accent and equals `_CSS_TEMPLATE`; Inter is loaded; the canonical token block is present; each nav links all 5;
-`/demo` carries the governed "never stored" copy and shows a key field iff `needs_key`; `POST /run` is honest with no
-key and redacts a real key (raw key never leaks); `/browse` renders facet groups with computed counts (and other
-surfaces 404); the hub renders a portfolio card per surface; `serves_truth = false` everywhere; favicon is 204.
-
-**Live render verification (Playwright):** each surface served (`surface_server.py <id> --port N`) and loaded in a real
-browser — the expected values below are all code-grounded:
-
-| Surface | computed `body` background | resolved UI font | `--accent` | console errors |
-|---|---|---|---|---|
-| AI Done Right | `#faf7f0` | Inter | `#5a6b87` | 0 |
-| Teleon.dev | `#faf7f0` | Inter | `#6d5ef0` | 0 |
-| Baltor.ai | `#faf7f0` | Inter | `#0e7c86` | 0 |
-| AIDevObserver | `#faf7f0` | Inter | `#b25fd6` | 0 |
-| Open\*Hubs | `#faf7f0` | Inter | `#3b6fd4` | 0 |
-
-(Background `#faf7f0` = `--bg`; font = the loaded Inter face; accents = `_surface_accents`. The 0-console-errors result
-is supported by the 204 favicon and the self-contained inline `<style>` — no missing assets beyond the Google-Fonts
-link.) `serves_truth = false`.
-
----
-
-## Appendix — file map (everything this doc references)
+## Appendix: file map
 
 | Concern | File |
 |---|---|
-| Canonical renderer + `_CSS_TEMPLATE` | `scripts/surface_server.py` |
-| Enforcement (122 assertions) | `scripts/check_surface_server.py` |
-| 5 surfaces config (id · accent · brand · role · caps) | `architecture/surface_capability_spec.json` |
-| Per-surface accent accessor | `scripts/_surface_accents.py` |
-| BYO-key demo plane (`DEMOS`, `run_byo_demo`, redact) | `src/teleon/demos/byo_key_demo.py` |
-| Demo example prompts (`EXAMPLE`) | `scripts/byo_demo_server.py` |
-| Faceted browse (`FACET_DIMS`, `browse`) | `src/teleon/registry/browse.py` |
-| Cross-surface URLs | `dist/surface-urls.json` |
-| High-fidelity bundle tokens (mirrored) | `dist/sites/openharness-design/shared/oh-tokens.css` |
-| Context-freshness (this is 1 of the 5 canonical docs) | `scripts/check_context_freshness.py` |
+| Canonical renderer (`OH_PRODUCT`, `WEB_DIR`, seams) | `scripts/showcase/server.py` (run `python3 -m scripts.showcase`) |
+| Lightweight fallback renderer (not canonical) | `scripts/surface_server.py` |
+| Tokens (palette, fonts, primitive hues) | `web/teleon/kit/oh-tokens.css` |
+| Components and type scale | `web/teleon/kit/oh-components.css` |
+| Site and app-shell layout CSS | `web/teleon/kit/oh-site.css` |
+| Shared kit React components and hooks | `web/teleon/kit/oh-site.jsx` |
+| Brand and product registry (accents) | `web/teleon/kit/products.js`, `web/aidevobserver/kit/products.js` |
+| Surface spec (id, accent, brand, role, canonical_surface) | `architecture/surface_capability_spec.json` |
+| Service-plane ports | `architecture/local_service_registry.json`, `architecture/identity_realm_registry.json` |
+| The seven primitives | `docs/concepts/component-taxonomy-and-stages.md` |
+| Existing design standards | `docs/standards/DESIGN.md`, `docs/standards/design-principles.md` |
+| Teleon marketing app | `web/teleon/index.html`, `web/teleon/teleon-main.jsx`, `web/teleon/teleon.css` |
+| AIDevObserver app (build-out target) | `web/aidevobserver/index.html`, `web/aidevobserver/aidevobserver-main.jsx`, `web/aidevobserver/aidevobserver.css` |
+| Logged-in dashboard references | `web/harness-hub/admin-demo.html`, `web/baltor/dashboard.html` |
+| Context-freshness guard (this is 1 of the 5 canonical docs) | `scripts/check_context_freshness.py` |
