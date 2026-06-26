@@ -1,0 +1,61 @@
+{
+  "name": "aidevobserver",
+  "displayName": "AIDevObserver",
+  "description": "Review the active AI-session transcript for reinvention / waste findings via the AI Done Right byo_demo_server (bring your own key, used transiently).",
+  "version": "0.1.0",
+  "publisher": "ai-done-right",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Other",
+    "Machine Learning"
+  ],
+  "keywords": [
+    "ai",
+    "observer",
+    "session review",
+    "reinvention",
+    "teleon"
+  ],
+  "activationEvents": [
+    "onCommand:aidevobserver.reviewSession"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "aidevobserver.reviewSession",
+        "title": "AIDevObserver: Review Session",
+        "category": "AIDevObserver"
+      }
+    ],
+    "configuration": {
+      "title": "AIDevObserver",
+      "properties": {
+        "aidevobserver.apiKey": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Bring-your-own API key. Sent as `byo_key` with each review request and used transiently by the endpoint for that one call only. The extension does not persist or log it beyond this VS Code setting.",
+          "scope": "machine-overridable"
+        },
+        "aidevobserver.endpoint": {
+          "type": "string",
+          "default": "http://localhost:8120/run",
+          "description": "URL of the byo_demo_server /run endpoint that receives the {demo, byo_key, inputs} payload and returns the review JSON."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^18.19.0",
+    "@types/vscode": "^1.75.0",
+    "typescript": "^5.4.0"
+  }
+}

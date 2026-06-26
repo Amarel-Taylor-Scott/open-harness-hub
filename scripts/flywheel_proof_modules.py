@@ -1018,4 +1018,9 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("src/teleon/storage/git_record_store.py", "git_record_store"),
     ("src/teleon/storage/sync_engine.py", "sync_engine"),
     ("src/teleon/infra/scale_ports.py", "scale_ports"),
+    ("src/teleon/examples/product_pipelines.py", "product_pipelines"),
+    ("scripts/check_aidevobserver_vscode_ext.py", "check_aidevobserver_vscode_ext"),
+    ("src/teleon/retrieval/learned_vectors.py", "learned_vectors"),
+    ("src/teleon/retrieval/pgvector_index.py", "pgvector_index"),
+    ("src/teleon/synthesis/codeblock_loop.py", "codeblock_loop"),
 ]
