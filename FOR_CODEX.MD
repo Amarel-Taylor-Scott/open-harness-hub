@@ -106,7 +106,7 @@ What to flag (with `file:line`):
 - **A claim that names a file, flag, function, or count that no longer matches reality.** A memory/doc that says
   "X lives in `path`" or "the flag is `--y`" is a claim about a PAST state - re-verify it before trusting it. This
   is the highest-value rot to find.
-- The known generated-doc-source rot (recorded, not yet fixed): old brand strings live in DATA/scripts, not the
+- The known generated-doc-source rot (RESOLVED this session — fixed at source + regenerated): old brand strings live in DATA/scripts, not the
   generated output - `catalog/**/*.yaml` provenance strings, `scripts/emit/*`, `scripts/build_index_page.py`, and
   the `LOCKED_BRANDS` constant in `scripts/check_prelaunch.py`. Fixing the generated `.md` directly would be wrong;
   flag the SOURCE.
@@ -182,17 +182,18 @@ it names (§8). Format each as:
 This repo runs a multi-model review board: `scripts/context_pack_builder.py` builds the whole-repo context pack and
 `scripts/external_review.py` / `scripts/panel_review.py` drive lens-based cross-review. A GPT-5.6 Codex pass is one lane.
 
-## 11. Known in-flight (so you do not over-report)
+## 11. Recently landed + intentional keeps (so you do not over-report)
 
-- **Brand de-rot is in progress.** The open ecosystem was renamed from "Open Harness Hub" / "OpenHarnessHub" and the
+- **Recently landed (this session):** the multi-model review board (Claude + Kimi-2.7 + GLM-5.2, uncapped, `docs/reviews/panel/`); AIDevObserver supervision of autonomous agent loops (`src/teleon/observer/agentic.py`, `POST /api/observer/agentic`); a real `PostgresRecordStore` + `FOR UPDATE SKIP LOCKED` fleet-ledger claim (staging-verify with `OH_PG_DSN`).
+- **Brand de-rot is complete.** The open ecosystem was renamed from "Open Harness Hub" / "OpenHarnessHub" and the
   placeholder "Open\*Hubs" to **OpenHubForAI**; the parent from "ContextIsEverything" to **AI Done Right**. The
   CANONICAL names are in §1 and `docs/BIBLE.md`. **Intentionally kept (NOT rot):** (a) the dependency-law direction
   tokens `Baltor -> Teleon -> OpenHarnessHub` (matching `architecture/portfolio_dependency_law.json`); (b) the
   individual method-spine / harness registries (OpenHarnessHub as a named registry, OpenReconciliationHub,
   OpenContextHub, OpenSkillsHub, ...) - those live UNDER OpenHubForAI and are real names; (c) `OpenHarnessHub
   Prototype.html` filenames; (d) "ContextIsEverything" where framed as the legacy founding thesis; (e) the
-  `Open*Hubs are registries` boundary phrase that `check_handoff_docs_freshness` requires verbatim.
-- **Generated-doc sources** still carry old brand strings in DATA/scripts (see §6, last bullet) - flag the source,
+  `OpenHubForAI registries are discovery surfaces` boundary phrase that `check_handoff_docs_freshness` requires verbatim.
+- **Generated-doc sources were fixed at SOURCE + regenerated** this session (see §6) — the source-not-output principle held;
   not the generated output.
 - **Two historical snapshots** were moved to `archive/legacy/docs/` (lossless, recorded in
   `archive/legacy/_manifest.jsonl`): the 2026-06-09 surface inventory + codebase review. The live surface
