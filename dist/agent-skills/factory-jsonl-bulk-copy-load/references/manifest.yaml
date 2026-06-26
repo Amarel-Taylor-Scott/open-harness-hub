@@ -1,0 +1,73 @@
+id: "pipeline/factory-jsonl-bulk-copy-load"
+type: pipeline
+version: "0.1.0"
+name: "Factory JSONL bulk COPY load"
+description: "Converts validated generated-object JSONL shards into CSV staging files and a psql bulk load script for canonical Postgres storage."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "retrieval", "serving", "evaluation"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["postgres", "bulk-load", "csv", "jsonl", "million-primitives"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Bulk-load high-volume generated OpenHubForAI objects into canonical Postgres tables without inflating YAML manifests."
+pipeline_kind: "serving"
+inputs:
+  - name: "validated_jsonl_shards"
+    type: "array"
+  - name: "database_url"
+    type: "string"
+outputs:
+  - name: "bulk_load_manifest"
+    type: "json"
+  - name: "object_count_report"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/bulk-generated-object-load-patterns"
+    - "knowledge-pack/postgres-pgvector-bootstrap-patterns"
+steps:
+  - id: "privacy-and-source-gate"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      reason: "Bulk loads require source governance and privacy boundary checks before export."
+  - id: "export-bulk-copy"
+    kind: "tool"
+    ref: "tool/factory-jsonl-bulk-copy-loader"
+    inputs:
+      output_dir: "dist/bulk/factory-load"
+  - id: "count-staged-rows"
+    kind: "tool"
+    ref: "tool/object-count-report-generator"
+    inputs:
+      output: "dist/reports/object-count-report.json"
+  - id: "count-canonical-rows"
+    kind: "tool"
+    ref: "tool/postgres-object-count-sql"
+    inputs:
+      sql_path: "db/postgres/object_count_report.sql"
+    when: "database_url is present"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.bulk_load_manifest.load_sql"
+    op: "is_truthy"
+    value: true
+    severity: "critical"
+    label: "Bulk load SQL was emitted."
+  - kind: "semantic"
+    target: "$.bulk_load_manifest"
+    must_cover:
+      - "CSV staging files"
+      - "psql copy"
+      - "upsert into canonical Postgres tables"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Bulk manifest documents the load path."

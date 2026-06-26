@@ -1,0 +1,195 @@
+id: "pipeline/beneficial-owner-sanctions-chain-screening"
+type: pipeline
+version: "0.1.0"
+name: "Beneficial-owner sanctions-chain screening (50%/control)"
+description: |
+  Resolve the ownership / control chain of a corporate counterparty and
+  decide whether a sanctioned or politically-exposed ultimate beneficial
+  owner (UBO) sits behind it — applying the aggregated-ownership and
+  control tests used in sanctions compliance (e.g. OFAC's 50 Percent
+  Rule and control-based designation) — and produce a cited yes/no with
+  the traversed chain.
+
+  Negative space: a bare model cannot walk a corporate ownership graph,
+  cannot apply the aggregated-50%/control test, and cannot tell you
+  WHICH intermediate entity is the sanctioned node — it has no registry
+  access and confabulates ownership. The chain comes from a registry
+  lookup tool + entity linking; each hop is screened deterministically;
+  the model only narrates the resolved chain and applies the
+  control/ownership test against retrieved framework text, citing each
+  conclusion. Indirect ownership through a sanctioned parent makes the
+  counterparty blocked even when the counterparty itself is not listed —
+  the exact reasoning step base models miss.
+
+  Reference / educational only — registry results and chains are
+  synthetic / governed snapshots; not legal advice. Bundle: High-
+  precision legal / regulated RAG over a sanctions-ownership corpus.
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["finance", "finance.kyc", "trade.sanctions"]
+capability: ["retrieval", "verification", "extraction", "safety_gating"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "volatile"
+tags: ["sanctions", "beneficial-ownership", "ubo", "ofac-50-percent-rule", "ownership-chain", "negative-space"]
+created: "2026-05-29"
+updated: "2026-05-29"
+
+task: |
+  Given a corporate counterparty (name + jurisdiction), resolve its
+  ownership/control chain, screen every node against sanctions/PEP
+  lists, apply the aggregated-ownership (≥50%) and control tests, and
+  decide whether the counterparty is blocked/high-risk by virtue of a
+  sanctioned UBO — emitting a yes/no with the cited chain and the
+  controlling node. Halt to escalation on any sanctioned node.
+pipeline_kind: "research_entity"
+
+inputs:
+  - name: "counterparty"
+    type: "object"
+    schema: "company_name, jurisdiction_code, company_number"
+  - name: "known_ownership"
+    type: "object[]"
+    schema: "parent_name, child_name, ownership_pct, control_basis"
+
+outputs:
+  - name: "blocked_by_ubo"
+    type: "boolean"
+  - name: "ownership_chain"
+    type: "object[]"
+  - name: "controlling_sanctioned_node"
+    type: "object"
+  - name: "aggregated_ownership_pct"
+    type: "number"
+  - name: "disposition"
+    type: "enum[clear, blocked_50_percent, blocked_control, enhanced_due_diligence, insufficient_data]"
+  - name: "chain_rationale"
+    type: "markdown"
+
+defaults:
+  persona: "persona/trade-compliance-officer"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/sanctions-ownership-chain-frameworks"
+    - "knowledge-pack/sanctions-list-shape"
+  rule_packs:
+    - "rule-pack/financial-pii-en"
+    - "rule-pack/sanctions-screening"
+
+steps:
+  # Registry lookup → the ownership chain (the FACTS the model lacks)
+  - id: "registry_lookup"
+    kind: "tool"
+    ref: "tool/opencorporates-lookup"
+    inputs:
+      company_name: "$.inputs.counterparty.company_name"
+      jurisdiction_code: "$.inputs.counterparty.jurisdiction_code"
+      include_officers: true
+
+  # Entity linking across registry results + known ownership → canonical nodes/edges
+  - id: "link_entities"
+    kind: "tool"
+    ref: "tool/entity-recognition-linker"
+    inputs:
+      text: "$.inputs.counterparty.company_name"
+      record: "$.steps.registry_lookup.output"
+      entity_types: ["organization", "person"]
+      linker_indexes: ["corporate_registry", "sanctions_entities"]
+
+  - id: "canonicalize_owner_names"
+    kind: "processor"
+    ref: "processor/name-canonicalize"
+    inputs:
+      name: "$.inputs.counterparty.company_name"
+
+  # Screen the counterparty itself
+  - id: "screen_counterparty"
+    kind: "tool"
+    ref: "tool/sanctions-check"
+    inputs:
+      normalized_name: "$.steps.canonicalize_owner_names.output.canonical_name"
+      lists: ["ofac_sdn", "un_consolidated", "eu_consolidated"]
+      threshold: 0.92
+
+  # Screen every linked owner/officer node (the indirect-ownership path)
+  - id: "screen_chain_nodes"
+    kind: "tool"
+    ref: "tool/sanctions-check"
+    inputs:
+      normalized_name: "$.steps.link_entities.output.canonical_entities"
+      lists: ["ofac_sdn", "un_consolidated", "eu_consolidated", "institution_pep"]
+      threshold: 0.92
+
+  # R1: the aggregated-ownership / control framework text (50% rule, control basis)
+  - id: "retrieve_framework"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/sanctions-ownership-chain-frameworks"
+    inputs:
+      query: "aggregated ownership fifty percent rule control test indirect ownership blocked entity"
+      top_k: 8
+
+  # Action: Model Call — narrate chain + APPLY the 50%/control test against retrieved text; cite-or-abstain
+  - id: "apply_ownership_test"
+    kind: "harness"
+    ref: "harness/sanctions-ownership-chain-review"
+    inputs:
+      packet: "$.inputs.counterparty.company_name"
+      context:
+        - "$.steps.retrieve_framework.output.docs"
+        - "$.steps.screen_counterparty.output.matches"
+        - "$.steps.screen_chain_nodes.output.matches"
+      evidence:
+        - "$.steps.registry_lookup.output.results"
+        - "$.steps.link_entities.output.canonical_entities"
+        - "$.inputs.known_ownership"
+
+  - id: "calibrate_severity"
+    kind: "processor"
+    ref: "processor/severity-calibrator"
+    inputs:
+      trace: "$.steps.apply_ownership_test.output"
+      config: {}
+
+  - id: "check_citations"
+    kind: "processor"
+    ref: "processor/citation-span-checker"
+    inputs:
+      trace: "$.steps.calibrate_severity.output.result"
+      config: {}
+
+  # Stop / End: any sanctioned node in the chain halts to escalation
+  - id: "escalate"
+    kind: "processor"
+    ref: "processor/escalate-human-review"
+    when: "$.steps.screen_counterparty.output.matches != [] || $.steps.screen_chain_nodes.output.matches != []"
+    inputs:
+      case_id: "$.inputs.counterparty.company_number"
+      reason: "Sanctioned or PEP node detected in beneficial-ownership chain — blocking determination requires analyst confirmation"
+      severity: "critical"
+      payload: "$.steps.calibrate_severity.output.result"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "beneficial-owner-sanctions-chain-screening"
+      applied_layers: ["sanctions", "rag", "harness", "severity"]
+
+success_criteria:
+  - rubric: "rubric/sanctions-ownership-chain-quality-v1"
+    threshold: 0.78
+  - kind: "deterministic"
+    target: "$.steps.check_citations.output.result.pass"
+    op: "=="
+    value: true
+    severity: "critical"
+    label: "Every ownership/control conclusion traces to a retrieved framework span."
+  - kind: "deterministic"
+    target: "$.outputs.blocked_by_ubo"
+    op: "in"
+    value: [true, false]
+    severity: "high"
+    label: "A boolean blocked-by-UBO decision is produced."

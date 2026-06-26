@@ -55,7 +55,7 @@ def spdx_element(manifest: dict) -> dict:
             "processor":        "library",
         }.get(t, "other"),
         "homepage":   f"https://open-harness-hub.dev/{manifest['type']}/{slug_only(manifest['id'])}",
-        "supplier":   "Open Harness Hub contributors",
+        "supplier":   "OpenHubForAI contributors",
         "license_declared": spdx_license_url(manifest.get("license")),
         "extension": [{
             "@type":  "spdx:extension_ExtensionElement",
@@ -94,7 +94,7 @@ def main() -> int:
             {
                 "@type":  "spdx:core_SpdxDocument",
                 "spdxId": f"{NS}document/{uuid.uuid4()}",
-                "name":   "Open Harness Hub catalog",
+                "name":   "OpenHubForAI catalog",
                 "comment": f"SPDX 3.0 catalog release. Element count: {len(elements)}.",
                 "creationInfo": creation_info,
                 "element":      [e["spdxId"] for e in elements],

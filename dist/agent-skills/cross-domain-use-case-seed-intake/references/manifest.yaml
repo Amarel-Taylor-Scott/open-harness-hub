@@ -1,0 +1,92 @@
+id: "pipeline/cross-domain-use-case-seed-intake"
+type: pipeline
+version: "0.1.0"
+name: "Cross-domain use case seed intake"
+description: "Normalizes banking-law, jurisdictional-law, moderation, creative, brainstorming, competition-analysis, and geographic-analysis seeds into candidate primitives while excluding insurance scope."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["finance", "legal", "media", "creative", "government", "cross_industry"]
+capability: ["planning", "retrieval", "generation", "verification", "governance"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.product"
+tags: ["use-case-seeds", "banking", "laws", "moderation", "creative", "geography", "competition-analysis"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Convert broad use-case seed surfaces into normalized candidate primitives with governance, entity linking, dedupe, indexing, and review routing."
+pipeline_kind: "research_web.cross_domain_use_case_seed_intake"
+inputs:
+  - name: "seed"
+    type: "json"
+  - name: "excluded_scopes"
+    type: "array"
+outputs:
+  - name: "normalized_object"
+    type: "json"
+  - name: "entities"
+    type: "array"
+  - name: "dedupe_cluster"
+    type: "json"
+  - name: "index_records"
+    type: "array"
+  - name: "review_tickets"
+    type: "array"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/cross-domain-use-case-seeds"
+steps:
+  - id: "govern-use-case-seed"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record: "$.inputs.seed"
+      source_policy:
+        require_license: true
+        excluded_scopes: "$.inputs.excluded_scopes"
+  - id: "normalize-seed"
+    kind: "tool"
+    ref: "tool/use-case-seed-normalizer"
+    inputs:
+      seed: "$.inputs.seed"
+      excluded_scopes: "$.inputs.excluded_scopes"
+  - id: "link-seed-entities"
+    kind: "tool"
+    ref: "tool/entity-recognition-linker"
+    inputs:
+      text: "$.steps.normalize-seed.normalized_object"
+      entity_types: ["agency", "jurisdiction", "law", "platform", "competitor", "place", "modality"]
+  - id: "dedupe-seed"
+    kind: "tool"
+    ref: "tool/fuzzy-dedupe-clusterer"
+    inputs:
+      candidate_records:
+        - "$.steps.normalize-seed.normalized_object"
+      match_features: ["domain", "task", "risk_tier", "jurisdiction", "excluded_scope"]
+  - id: "emit-seed-index"
+    kind: "tool"
+    ref: "tool/index-record-emitter"
+    inputs:
+      normalized_objects:
+        - "$.steps.normalize-seed.normalized_object"
+      emit: ["keyword", "vector", "graph", "facet", "freshness", "quality"]
+success_criteria:
+  - kind: "semantic"
+    target: "$.normalized_object"
+    must_cover:
+      - "domain"
+      - "risk tier"
+      - "excluded scope"
+      - "candidate primitive"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Use-case seed is normalized into a candidate primitive without excluded scope."
+  - kind: "deterministic"
+    target: "$.index_records"
+    op: "is_truthy"
+    value: true
+    severity: "medium"
+    label: "Use-case seed is indexed for retrieval."

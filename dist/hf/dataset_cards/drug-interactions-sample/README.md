@@ -23,7 +23,7 @@ pretty_name: Drug-drug interactions (sample, educational)
 
 # Drug-drug interactions (sample, educational)
 
-<!-- Generated from Open Harness Hub manifest `knowledge-pack/drug-interactions-sample` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
+<!-- Generated from OpenHubForAI manifest `knowledge-pack/drug-interactions-sample` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
 
 ## Dataset description
 
@@ -62,11 +62,11 @@ A Croissant 1.0 JSON-LD record is emitted at `dist/croissant/drug-interactions-s
 ```bibtex
 @misc{drug-interactions-sample_open_harness_hub,
   title  = {Drug-drug interactions (sample, educational)},
-  author = {Open Harness Hub contributors},
+  author = {OpenHubForAI contributors},
   url    = {https://open-harness-hub.dev/knowledge-pack/drug-interactions-sample},
   version= {0.1.0},
   year   = {2026}
 }
 ```
 
-License: `CC-BY-4.0`. Hub artifact: `knowledge-pack/drug-interactions-sample`.
+License: `CC-BY-4.0`. Hub component: `knowledge-pack/drug-interactions-sample`.

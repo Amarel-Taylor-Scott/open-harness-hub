@@ -1,0 +1,79 @@
+id: "pipeline/component-store-candidate-load-plan"
+type: pipeline
+version: "0.1.0"
+name: "Component store candidate load plan"
+description: "Creates CSV and SQL load bundles that place generated components and subcomponents into Postgres candidate tables while preserving review gates and source provenance."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "serving", "verification"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "subcomponents", "postgres", "bulk-load", "candidate-store", "review-gate"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Create a review-gated Postgres load plan for generated component and subcomponent candidates."
+pipeline_kind: "research_web.component_store_candidate_load_plan"
+inputs:
+  - name: "component_store_plan"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "component_store_load_plan"
+    type: "json"
+  - name: "component_candidates_csv"
+    type: "csv"
+  - name: "subcomponent_candidates_csv"
+    type: "csv"
+  - name: "load_sql"
+    type: "sql"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/component-store-load-patterns"
+steps:
+  - id: "load-component-store-checks"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/component-store-load-patterns"
+    inputs:
+      query: "component candidate subcomponent candidate source provenance review gated load order"
+      top_k: 20
+  - id: "plan-component-store-load"
+    kind: "tool"
+    ref: "tool/component-store-load-planner"
+    inputs:
+      component_store_plan: "$.inputs.component_store_plan"
+      output_dir: "$.inputs.output_dir"
+  - id: "audit-staged-vs-committed"
+    kind: "tool"
+    ref: "tool/staged-vs-committed-load-auditor"
+    inputs:
+      reason: "After psql execution, compare candidate table counts with planned counts before claiming database-backed scale."
+success_criteria:
+  - kind: "deterministic"
+    target: "$.component_store_load_plan.component_candidate_count"
+    op: ">"
+    value: 0
+    severity: "high"
+    label: "Component candidate rows are exported."
+  - kind: "deterministic"
+    target: "$.component_store_load_plan.subcomponent_candidate_count"
+    op: ">"
+    value: "$.component_store_load_plan.component_candidate_count"
+    severity: "medium"
+    label: "Subcomponent candidate rows are exported separately."
+  - kind: "semantic"
+    target: "$.component_store_load_plan"
+    must_cover:
+      - "candidate tables"
+      - "review gated promotion"
+      - "source provenance"
+      - "side effect free load plan"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Load plan preserves the database-first architecture."

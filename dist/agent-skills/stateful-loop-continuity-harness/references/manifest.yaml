@@ -1,0 +1,48 @@
+id: "harness/stateful-loop-continuity-harness"
+type: harness
+version: "0.1.0"
+name: "Stateful loop continuity harness"
+description: "Harness pattern for simple recurring agent execution that re-reads instruction files, updates durable state files, and stops only when explicit completion, budget, or blocked criteria are met."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "evaluation", "serving"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "dated"
+tags: ["agentic-harness", "state-loop", "prompt-loop", "long-running-agents"]
+created: "2026-05-25"
+updated: "2026-05-25"
+kind: "utility_surface"
+tier: "secondary"
+applied_layers: ["tools", "privacy", "heuristic"]
+knowledge_packs:
+  - id: "orchestration_patterns"
+    label: "Agentic orchestration harness patterns"
+    kind: "knowledge_pack"
+    types: ["orchestration_pattern", "long_running_agent_control"]
+    required: true
+    trust_boundary: "local"
+    freshness: "dated"
+model_targets:
+  - id: "none"
+    label: "No direct model target"
+    transport: "none"
+    role: "Wraps repeated invocations of an external coding agent."
+    capabilities: ["state_file_updates", "loop_control", "log_capture"]
+    required: false
+    default: true
+    trust_boundary: "local"
+model_io:
+  input: "PROMPT.md, STATE.md, TODO.md, logs, stop criteria"
+  output: "updated durable state and next-loop decision"
+  transport: "none"
+input_verification: ["instruction file exists", "state file exists", "stop criteria are explicit"]
+output_verification: ["state file changed or stop reason recorded", "destructive actions require approval", "logs are retained"]
+privacy_boundaries:
+  raw_input: "Loop state remains local by default."
+  derived_output: "Summaries can be published only after removing secrets and local-only notes."
+  external_calls: "No external calls are required by the harness itself."
+contributes_to: ["pipeline/agentic-orchestration-harness-intake"]

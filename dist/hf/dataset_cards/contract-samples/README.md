@@ -22,7 +22,7 @@ pretty_name: Synthetic commercial contract samples (3 cases)
 
 # Synthetic commercial contract samples (3 cases)
 
-<!-- Generated from Open Harness Hub manifest `dataset/contract-samples` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
+<!-- Generated from OpenHubForAI manifest `dataset/contract-samples` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
 
 ## Dataset description
 
@@ -54,7 +54,7 @@ Cases:
 ## Provenance
 
 - **origin**: Fully synthetic — no real contract data
-- **collected_by**: Open Harness Hub contributors
+- **collected_by**: OpenHubForAI contributors
 - **collected_through**: 2026-05-20
 - **license**: MIT
 - **anonymization**: fully synthetic; no real entities
@@ -68,11 +68,11 @@ A Croissant 1.0 JSON-LD record is emitted at `dist/croissant/contract-samples.cr
 ```bibtex
 @misc{contract-samples_open_harness_hub,
   title  = {Synthetic commercial contract samples (3 cases)},
-  author = {Open Harness Hub contributors},
+  author = {OpenHubForAI contributors},
   url    = {https://open-harness-hub.dev/dataset/contract-samples},
   version= {0.1.0},
   year   = {2026}
 }
 ```
 
-License: `MIT`. Hub artifact: `dataset/contract-samples`.
+License: `MIT`. Hub component: `dataset/contract-samples`.

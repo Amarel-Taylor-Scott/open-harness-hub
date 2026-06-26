@@ -22,14 +22,14 @@ pretty_name: Supplier disclosure pack schema (canonical input shape)
 
 # Supplier disclosure pack schema (canonical input shape)
 
-<!-- Generated from Open Harness Hub manifest `dataset/supplier-disclosure-pack-schema` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
+<!-- Generated from OpenHubForAI manifest `dataset/supplier-disclosure-pack-schema` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
 
 ## Dataset description
 
 Canonical input shape that `pipeline/supplier-policy-grading` and
 `pipeline/deep-tier-supplier-audit` accept as the supplier
 disclosure pack. Records the JSON Schema of the supplier-submitted
-artifact so compliance teams can prepare their data once and feed
+component so compliance teams can prepare their data once and feed
 it into any pipeline in the ESG vertical.
 
 The pack covers: supplier identity + tier + UBO + geography + sector
@@ -54,7 +54,7 @@ Includes 3 sample disclosure packs for testing:
 ## Provenance
 
 - **origin**: Composite synthetic disclosures (not real suppliers)
-- **collected_by**: Open Harness Hub contributors
+- **collected_by**: OpenHubForAI contributors
 - **collected_through**: 2026-05-19
 - **license**: MIT
 - **anonymization**: fully synthetic — no real-supplier data
@@ -68,11 +68,11 @@ A Croissant 1.0 JSON-LD record is emitted at `dist/croissant/supplier-disclosure
 ```bibtex
 @misc{supplier-disclosure-pack-schema_open_harness_hub,
   title  = {Supplier disclosure pack schema (canonical input shape)},
-  author = {Open Harness Hub contributors},
+  author = {OpenHubForAI contributors},
   url    = {https://open-harness-hub.dev/dataset/supplier-disclosure-pack-schema},
   version= {0.1.0},
   year   = {2026}
 }
 ```
 
-License: `MIT`. Hub artifact: `dataset/supplier-disclosure-pack-schema`.
+License: `MIT`. Hub component: `dataset/supplier-disclosure-pack-schema`.

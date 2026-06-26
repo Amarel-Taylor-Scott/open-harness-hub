@@ -1,0 +1,72 @@
+id: "pipeline/vendor-onboarding-risk-review"
+type: pipeline
+version: "0.1.0"
+name: "Vendor Onboarding Risk review pipeline"
+description: "End-to-end vendor onboarding risk review with redaction, grep triage, RAG grounding, harness review, rubric scoring, and audit trace."
+authors: [{ name: "OpenHubForAI contributors" }]
+license: "MIT"
+industry: ["procurement.vendor_risk", "compliance"]
+capability: ["evaluation", "extraction", "retrieval", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "stable"
+tags: ["vendor-onboarding-risk", "use-case-expansion"]
+created: "2026-05-24"
+updated: "2026-05-24"
+task: "Review vendor onboarding packets for sanctions, security, privacy, financial, insurance, and concentration risk."
+pipeline_kind: "review"
+inputs:
+  - name: "packet"
+    type: "string|object"
+outputs:
+  - name: "findings"
+    type: "object[]"
+  - name: "score"
+    type: "number"
+  - name: "evidence_gaps"
+    type: "object[]"
+defaults:
+  persona: "persona/vendor-risk-analyst"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs: ["knowledge-pack/vendor-onboarding-risk-frameworks"]
+  rule_packs: ["rule-pack/grep-vendor-onboarding-risk-flags", "rule-pack/rag-vendor-onboarding-risk-retrieval-policy"]
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.packet" }
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+  - id: "grep_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-vendor-onboarding-risk-flags"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+  - id: "retrieve_context"
+    kind: "rule_pack"
+    ref: "rule-pack/rag-vendor-onboarding-risk-retrieval-policy"
+    inputs: { query: "$.steps.grep_flags.output.fired", corpus: "knowledge-pack/vendor-onboarding-risk-frameworks", top_k: 8 }
+  - id: "review_harness"
+    kind: "harness"
+    ref: "harness/vendor-onboarding-risk-review"
+    inputs:
+      packet: "$.steps.redact_pii.output.text"
+      context: "$.steps.retrieve_context.output.passages"
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.review_harness.output.findings"
+      rubric_ref: "rubric/vendor-onboarding-risk-quality-v1"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "vendor-onboarding-risk-review"
+      applied_layers: ["privacy", "grep", "rag", "harness", "judge"]
+success_criteria:
+  - rubric: "rubric/vendor-onboarding-risk-quality-v1"
+    threshold: 0.65

@@ -1,0 +1,214 @@
+id: "pipeline/building-permit-amendment-regularization-route"
+type: pipeline
+version: "0.1.0"
+name: "Building-permit amendment / regularization router (PH·ID·NG)"
+description: |
+  Detect when reported as-built construction has materially deviated from the
+  approved building permit such that a revised/amended permit (a regularization
+  path) is legally required, then route the case to the jurisdiction-specific
+  authority with citations. Material-alteration definitions, the
+  added-story/added-use trigger, and the regularization workflow are
+  jurisdiction-specific and thinly represented online — exactly the
+  low-digitization valley the national permit/occupancy corpus targets. The
+  pattern generalizes across PH (PD 1096 / LGU OBO), Indonesia (PBG via SIMBG,
+  PP 16/2021), and Nigeria (state building-control agencies, e.g. LASBCA);
+  only the corpus and routing targets change — the deviation logic and the
+  abstain gate are reusable.
+
+  Agentic / corrective-RAG bundle (Bundle D): a two-time retrieval refines the
+  query from "is this a material alteration?" toward the controlling clause,
+  official-source verification grades the retrieval, and a corrective human
+  escalation fires when the retrieval is weak or the approved scope is not
+  human-verified (tier-4 OBO/PUPR/state record). The router NEVER infers the
+  approved scope from the model; an unverifiable approved scope yields
+  PERMIT_RECORD_UNVERIFIABLE. Detection + routing + citations only; no PII; no
+  guidance on avoiding permits or inspection.
+authors: [{ name: "OpenHubForAI contributors" }]
+license: "MIT"
+industry: ["construction.permitting", "government.permitting", "infrastructure"]
+capability: ["extraction", "retrieval", "verification", "routing"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+lifecycle_position: "api.review"
+freshness: "volatile"
+eu_ai_act_risk: "high_risk"
+tags: ["building-safety", "philippines", "indonesia", "nigeria", "permit-amendment", "regularization", "material-alteration", "agentic-rag", "negative-space"]
+created: "2026-05-29"
+updated: "2026-05-29"
+attribution:
+  source_url: "https://unhabitat.org"
+  source_kind: "other"
+  author: "PD 1096 IRR (PH) + PP 16/2021 PBG (ID) + state building-control acts (NG) + UN-Habitat (public); per data/source-registry/ph-building-safety.json"
+  license: "see-source"
+task: "Given a building case packet, detect whether the reported as-built deviates from the approved permit enough to require a revised/amended permit (regularization), and route the case to the jurisdiction-specific authority (PH OBO/DPWH, ID Dinas PUPR/SIMBG, NG state building-control) with citations; abstain to a human when the approved scope is not human-verified or retrieval is weak."
+pipeline_kind: "agent_loop"
+inputs:
+  - name: "case_packet"
+    type: "string|object"
+    schema: "jurisdiction {PH|ID|NG, sub_national}, approved_scope (nullable; human-router), reported_as_built {floors, use, footprint_change}, permit_no, deviation_description"
+outputs:
+  - name: "amendment_required"
+    type: "string"
+    schema: "REQUIRED | NOT_REQUIRED | UNVERIFIABLE"
+  - name: "findings"
+    type: "object[]"
+    schema: "{code, deviation, citation, route_to, severity}"
+  - name: "routing_packet"
+    type: "object"
+  - name: "score"
+    type: "number"
+defaults:
+  persona: "persona/permit-review-analyst"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/national-building-permit-and-occupancy-procedures-low-digitization"
+    - "knowledge-pack/municipal-permit-review-frameworks"
+  rule_packs:
+    - "rule-pack/grep-municipal-permit-review-flags"
+    - "rule-pack/hybrid-retrieval-policy"
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.case_packet" }
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+  - id: "injection_gate"
+    kind: "processor"
+    ref: "processor/prompt-injection-detector"
+    inputs:
+      text: "$.steps.redact_pii.output.text"
+      source: "user"
+  - id: "normalize_evidence"
+    kind: "processor"
+    ref: "processor/packet-evidence-normalizer"
+    inputs: { trace: "$.steps.redact_pii.output", config: {} }
+  # ── Conditional (IF): deterministic deviation / mismatch signals ───
+  - id: "grep_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-municipal-permit-review-flags"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+  # ── R0+R1 corrective retrieval: refine "material alteration?" query ─
+  - id: "retrieve_material_alteration"
+    kind: "processor"
+    ref: "processor/two-time-retrieval"
+    inputs:
+      query: "$.steps.grep_flags.output.fired"
+      corpus_ref: "knowledge-pack/national-building-permit-and-occupancy-procedures-low-digitization"
+      first_pass_k: 12
+      second_pass_k: 8
+  # ── Corrective gate: grade retrieval against authoritative sources ─
+  - id: "verify_sources"
+    kind: "processor"
+    ref: "processor/official-sources-checker"
+    inputs:
+      candidates: "$.steps.retrieve_material_alteration.output.candidates"
+      jurisdiction_hint: "$.inputs.case_packet.jurisdiction.country"
+      freshness_window_days: 365
+      allowlist_pack_ref: "rule-pack/hybrid-retrieval-policy"
+  # ── Action (model call): decide REQUIRED / NOT_REQUIRED w/ citations ─
+  - id: "decide_harness"
+    kind: "harness"
+    ref: "harness/municipal-permit-review-review"
+    inputs:
+      packet: "$.steps.redact_pii.output.text"
+      context: "$.steps.verify_sources.output.accepted"
+      refined_query: "$.steps.retrieve_material_alteration.output.refined_query"
+      evidence: "$.steps.normalize_evidence.output.result"
+  - id: "calibrate_severity"
+    kind: "processor"
+    ref: "processor/severity-calibrator"
+    inputs: { trace: "$.steps.decide_harness.output", config: {} }
+  - id: "citation_coverage"
+    kind: "processor"
+    ref: "processor/citation-coverage"
+    inputs: { response_markdown: "$.steps.calibrate_severity.output.result" }
+  # ── Action: route to jurisdiction-specific authority ───────────────
+  - id: "route_owner"
+    kind: "processor"
+    ref: "processor/remediation-owner-router"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+  # ── Loop/corrective Stop-End: weak retrieval OR unverifiable scope ─
+  - id: "escalate_human"
+    kind: "processor"
+    ref: "processor/escalate-human-review"
+    inputs:
+      case_id: "$.steps.normalize_evidence.output.result.case_id"
+      reason: "Corrective gate: retrieved clauses are not authoritative/jurisdiction-matched, or the approved scope is tier-4 (OBO/PUPR/state counter) and not human-verified — route to the jurisdiction authority; never infer the approved scope from the model."
+      severity: "high"
+      payload: "$.steps.route_owner.output.result"
+  - id: "redaction_audit"
+    kind: "processor"
+    ref: "processor/packet-redaction-audit"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.calibrate_severity.output.result"
+      rubric_ref: "rubric/municipal-permit-review-quality-v1"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "building-permit-amendment-regularization-route"
+      applied_layers: ["privacy", "heuristic", "grep", "rag", "official_sources", "persona", "classifier"]
+success_criteria:
+  - rubric: "rubric/municipal-permit-review-quality-v1"
+    threshold: 0.66
+  - kind: "deterministic"
+    target: "$.steps.injection_gate.output.allow"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "case packet passed injection screen before retrieval"
+  - kind: "deterministic"
+    target: "$.steps.citation_coverage.output.passes"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "the amendment-required decision cites the controlling clause"
+  - kind: "deterministic"
+    target: "$.steps.redaction_audit.output.result.pass"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "no owner/occupant PII leaks into the routing packet"
+worked_example:
+  input:
+    jurisdiction: { country: "PH", sub_national: "Cebu City, Region VII" }
+    permit_no: "CEB-BP-redacted"
+    approved_scope: { floors: 4, use: "residential" }
+    reported_as_built: { floors: 5, use: "residential + ground-floor commercial", footprint_change: "rear extension ~30 sqm" }
+    deviation_description: "Added 5th floor and converted ground floor to commercial; rear extension beyond approved footprint."
+  expected_output:
+    amendment_required: "REQUIRED"
+    findings:
+      - code: "MATERIAL_ALTERATION_ADDED_STORY"
+        deviation: "approved 4 floors, reported 5"
+        citation: "PD 1096 IRR — material alteration / additional story requires a revised building permit [verify rule/section + IRR version]"
+        route_to: "Cebu City Office of the Building Official; DPWH Regional Office VII"
+        severity: "critical"
+      - code: "USE_RECLASSIFICATION"
+        deviation: "residential → mixed residential/commercial ground floor"
+        citation: "PD 1096 occupancy classification change requires permit amendment [verify section]"
+        route_to: "Cebu City OBO"
+        severity: "high"
+      - code: "FOOTPRINT_EXTENSION_BEYOND_APPROVED"
+        deviation: "~30 sqm rear extension"
+        citation: "PD 1096 IRR setback / footprint provisions [verify]"
+        route_to: "Cebu City OBO"
+        severity: "high"
+    routing_packet:
+      escalated_to_human: true
+      escalation_reason: "approved scope is tier-4 (OBO counter); confirm the approved permit before finalizing the regularization route."
+      disclosure: "Clause numbers flagged [verify]; generalizes to ID (PBG/SIMBG, PP 16/2021) and NG (state building-control, e.g. LASBCA) by swapping the corpus and routing target only."
+    metadata:
+      jurisdiction: "PH × construction-building-safety (generalizes to ID, NG)"
+      lift_reasons: ["no_addressable_source", "volatile_fact", "sparse_data", "accountability_or_license"]
+      durability_class: "structural"
+      source_registry: "data/source-registry/ph-building-safety.json"
+      safety_stance: "detection + routing + citations only; abstain on unverifiable approved scope; no PII; no evasion guidance"

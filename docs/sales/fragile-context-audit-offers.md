@@ -2,7 +2,7 @@
 
 > GENERATED from `architecture/fragile_context_atlas.json` by `python3 scripts/check_fragile_context_audit_offers.py --emit`. Do not hand-edit — edit the atlas and regenerate; the proof asserts this file is in lock-step with the registry.
 
-A **Fragile Context Audit** is a *diagnostic*, not a verdict. It shows where a team's own AI surface (a support chatbot, a RAG index, agent memory, enterprise search, a workflow agent) is serving a fragile answer — one that is stale, conflicting, jurisdiction-specific, or sourced from the wrong authority — and what the source-of-record answer is instead. It is **proof-first selling**: the Open\*Hub surfaces attract, the diagnostic proves, an evidence pack converts. Every output is a **draft** in "appears / requires review" language; nothing here is a legal conclusion or legal advice.
+A **Fragile Context Audit** is a *diagnostic*, not a verdict. It shows where a team's own AI surface (a support chatbot, a RAG index, agent memory, enterprise search, a workflow agent) is serving a fragile answer — one that is stale, conflicting, jurisdiction-specific, or sourced from the wrong authority — and what the source-of-record answer is instead. It is **proof-first selling**: the OpenHubForAI surfaces attract, the diagnostic proves, an evidence pack converts. Every output is a **draft** in "appears / requires review" language; nothing here is a legal conclusion or legal advice.
 
 ## How an audit runs (reuses the sales subsystem — no new pipeline)
 

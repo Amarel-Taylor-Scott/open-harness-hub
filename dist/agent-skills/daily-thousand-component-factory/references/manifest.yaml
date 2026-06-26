@@ -1,0 +1,91 @@
+id: "pipeline/daily-thousand-component-factory"
+type: pipeline
+version: "0.1.0"
+name: "Daily thousand component factory"
+description: "Generates 1,000 searchable, label-rich, database-backed component candidates per run, ready for dedupe, approval, promotion, and CDC gates."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["generation", "retrieval", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.scale"
+tags: ["components", "daily-factory", "database-backed", "source-surfaces", "pgvector", "review-gate"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Create a daily-scale batch of database-backed component candidates that can be searched, filtered, customized, reviewed, promoted, and wired into pipeline templates."
+pipeline_kind: "research_web.daily_thousand_component_factory"
+inputs:
+  - name: "output_dir"
+    type: "string"
+  - name: "target_count"
+    type: "integer"
+  - name: "matrix"
+    type: "string"
+outputs:
+  - name: "daily_component_seeds"
+    type: "jsonl"
+  - name: "normalized_objects"
+    type: "jsonl"
+  - name: "labels"
+    type: "jsonl"
+  - name: "dimensions"
+    type: "jsonl"
+  - name: "entities"
+    type: "jsonl"
+  - name: "index_records"
+    type: "jsonl"
+  - name: "review_tickets"
+    type: "jsonl"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/daily-thousand-component-factory-patterns"
+steps:
+  - id: "load-daily-factory-checks"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/daily-thousand-component-factory-patterns"
+    inputs:
+      query: "daily thousand component database backed source surface rows labels indexes"
+      top_k: 20
+  - id: "generate-daily-component-candidates"
+    kind: "tool"
+    ref: "tool/daily-thousand-component-seed-generator"
+    inputs:
+      output_dir: "$.inputs.output_dir"
+      target_count: "$.inputs.target_count"
+      matrix: "$.inputs.matrix"
+  - id: "bulk-load-ready-rows"
+    kind: "tool"
+    ref: "tool/factory-jsonl-bulk-copy-loader"
+    inputs:
+      row_family_paths: "$.steps.generate-daily-component-candidates.output.row_family_paths"
+      dry_run: true
+success_criteria:
+  - kind: "deterministic"
+    target: "$.generate-daily-component-candidates.seed_count"
+    op: ">="
+    value: 1000
+    severity: "high"
+    label: "At least 1,000 database-backed candidate components are produced."
+  - kind: "deterministic"
+    target: "$.generate-daily-component-candidates.row_counts.index_record"
+    op: ">="
+    value: 5000
+    severity: "high"
+    label: "Search records are produced for keyword, vector, graph, facet, and quality search."
+  - kind: "semantic"
+    target: "$.generate-daily-component-candidates"
+    must_cover:
+      - "database-backed"
+      - "searchable"
+      - "customizable"
+      - "review-gated"
+      - "not one YAML file per component"
+      - "named source-surface matrix"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Daily generation follows the scalable component store strategy."

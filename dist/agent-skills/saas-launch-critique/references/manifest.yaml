@@ -1,0 +1,118 @@
+id: "pipeline/saas-launch-critique"
+type: pipeline
+version: "0.1.0"
+name: "SaaS / micro-SaaS / AI-app launch critique"
+description: |
+  End-to-end pipeline that reviews a SaaS product launch (landing
+  page + tagline + pricing + demo materials + GTM claims) against
+  corpus-norm anti-patterns and the saas-launch-quality-v1 rubric.
+
+  Use cases:
+   - Pre-Product-Hunt launch readiness review
+   - Pre-Show-HN sanity check
+   - "Why isn't my landing page converting" diagnostic
+   - Investor pitch landing-page review
+   - Periodic re-review of a live SaaS landing page
+
+  Output:
+   - per-aspect findings (tagline, ICP, value-prop, pricing, social
+     proof, demo, competitive, onboarding, AI-specific)
+   - severity per finding + launch-day-blocker flag
+   - suggested rewrite per finding
+   - anti-pattern hit list
+   - rubric score (rubric/saas-launch-quality-v1)
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry:   ["software", "creative", "cross_industry"]
+capability: ["evaluation", "extraction", "reasoning"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.grading"
+tags: ["saas", "launch", "product-hunt", "show-hn", "indiehackers", "marketing", "review"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+task: |
+  Given a SaaS product's landing-page copy, tagline, pricing copy,
+  demo URL, and product category, produce a per-aspect launch-
+  readiness review with anti-pattern flags, suggested rewrites, and
+  a rubric grade against `rubric/saas-launch-quality-v1`.
+pipeline_kind: "grading"
+
+inputs:
+  - name: "landing_page_text"
+    type: "string"
+  - name: "tagline"
+    type: "string"
+  - name: "pricing_text"
+    type: "string"
+  - name: "demo_url"
+    type: "string"
+  - name: "product_category"
+    type: "string"
+outputs:
+  - name: "grade"
+    type: "number"
+  - name: "findings"
+    type: "object[]"
+  - name: "suggested_rewrites"
+    type: "object[]"
+  - name: "trace"
+    type: "object[]"
+
+defaults:
+  persona: "persona/saas-launch-critic"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/grep-saas-launch-antipatterns"
+
+steps:
+  - id: "normalize"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs:
+      data: "$.inputs.landing_page_text"
+
+  - id: "grep_antipatterns"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-saas-launch-antipatterns"
+    inputs:
+      text: "$.steps.normalize.output.prose"
+
+  - id: "rag_playbook"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.steps.grep_antipatterns.output.hits"
+      corpus: "knowledge-pack/saas-launch-best-practices"
+      top_k: 10
+
+  - id: "review"
+    kind: "harness"
+    ref: "harness/saas-launch-review"
+    inputs:
+      landing_page_text: "$.steps.normalize.output.prose"
+      tagline: "$.inputs.tagline"
+      pricing_text: "$.inputs.pricing_text"
+      demo_url: "$.inputs.demo_url"
+      product_category: "$.inputs.product_category"
+
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.review.output"
+      rubric_ref: "rubric/saas-launch-quality-v1"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "saas-launch-critique"
+      applied_layers: ["persona", "grep", "rag", "judge"]
+
+success_criteria:
+  - rubric:    "rubric/saas-launch-quality-v1"
+    threshold: 0.7

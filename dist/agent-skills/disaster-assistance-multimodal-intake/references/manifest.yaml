@@ -1,0 +1,64 @@
+id: "harness/disaster-assistance-multimodal-intake"
+type: harness
+version: "0.1.0"
+name: "Disaster assistance multimodal intake harness"
+description: "Multi-model harness for disaster assistance intake that routes forms, narratives, damage images, geospatial incident boundaries, official rules, duplicate signals, and evidence gaps to reviewable eligibility packets."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["humanitarian.disaster", "government.benefits"]
+capability: ["governance", "retrieval", "verification", "evaluation"]
+modality: ["text", "image", "structured", "spatial", "multimodal"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+tags: ["multimodal", "disaster-assistance", "eligibility", "geospatial", "human-review"]
+created: "2026-05-25"
+updated: "2026-05-25"
+kind: "model_harness"
+tier: "primary"
+applied_layers: ["tools", "official_sources", "rag", "classifier", "privacy"]
+knowledge_packs:
+  - id: "public_service_patterns"
+    label: "Multimodal public service patterns"
+    kind: "knowledge_pack"
+    types: ["multimodal_harness_pattern", "public_service_workflow_pattern"]
+    required: true
+    trust_boundary: "local"
+    freshness: "dated"
+model_targets:
+  - id: "cheap_text_reasoner"
+    label: "Cheap text policy reasoner"
+    transport: "openai_compatible"
+    role: "Summarizes eligibility rules and evidence gaps."
+    capabilities: ["text_generation", "reasoning", "summarization"]
+    required: false
+    default: true
+    trust_boundary: "mixed"
+  - id: "vision_damage_classifier"
+    label: "Vision damage classifier"
+    transport: "openai_compatible"
+    role: "Classifies synthetic or user-provided damage images into reviewable observations."
+    capabilities: ["vision", "classification"]
+    required: false
+    default: false
+    trust_boundary: "mixed"
+  - id: "local_guard_model"
+    label: "Local privacy and duplicate-signal guard"
+    transport: "ollama"
+    role: "Keeps raw applicant evidence local when configured."
+    capabilities: ["classification", "redaction"]
+    required: false
+    default: false
+    trust_boundary: "local"
+model_io:
+  input: "application form, applicant narrative, damage photos, location, official program rules, prior-claim signals"
+  output: "eligibility packet, cited rule matches, damage observations, duplicate flags, evidence gaps, review ticket"
+  transport: "openai_compatible"
+input_verification: ["redact personal identifiers before hosted calls", "verify incident boundary source freshness", "separate applicant claims from official facts"]
+output_verification: ["high-impact denial or fraud flags require human review", "official-rule citations are attached", "damage image observations include confidence and uncertainty"]
+privacy_boundaries:
+  raw_input: "Applicant evidence can contain sensitive personal and location data; default to local processing or explicit tenant approval."
+  derived_output: "Eligibility packets require role-based access and redaction before analytics or publication."
+  external_calls: "Hosted vision or text models require explicit routing policy and redaction."
+contributes_to: ["pipeline/multimodal-public-service-harness-intake"]

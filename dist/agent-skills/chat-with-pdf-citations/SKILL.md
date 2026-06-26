@@ -51,7 +51,7 @@ passages via hybrid retrieval + rerank, then produce a cited answer.
 
 ## Provenance
 
-- Hub artifact: `pipeline/chat-with-pdf-citations` v0.1.0
+- Hub component: `pipeline/chat-with-pdf-citations` v0.1.0
 - License: `MIT`
 - Industry: cross_industry
 - Full source manifest: see `references/manifest.yaml`

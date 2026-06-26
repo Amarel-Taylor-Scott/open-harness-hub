@@ -1,0 +1,108 @@
+id: "pipeline/source-surface-execution-summary"
+type: pipeline
+version: "0.1.0"
+name: "Source surface execution summary"
+description: "Aggregates source-surface factory run progress across partitions, jobs, replay records, generated rows, promotion decisions, review tickets, and load readiness."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["government", "software", "media", "construction", "energy", "finance", "healthcare", "cross_industry"]
+capability: ["governance", "evaluation", "retrieval", "routing", "serving"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["source-surfaces", "execution-summary", "object-counts", "multi-day-runs", "load-readiness"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Report source-surface object-factory progress and load readiness without confusing generated row counts with curated YAML manifest counts."
+pipeline_kind: "research_web.source_surface_execution_summary"
+inputs:
+  - name: "partitions_jsonl"
+    type: "string"
+  - name: "jobs_jsonl"
+    type: "string"
+  - name: "replay_records_jsonl"
+    type: "string"
+  - name: "row_dir"
+    type: "string"
+  - name: "load_plan_manifest"
+    type: "string"
+  - name: "output"
+    type: "string"
+outputs:
+  - name: "execution_summary"
+    type: "json"
+  - name: "generated_row_total"
+    type: "integer"
+  - name: "normalized_object_count"
+    type: "integer"
+  - name: "review_ticket_count"
+    type: "integer"
+  - name: "load_readiness"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/source-surface-execution-summary-patterns"
+    - "knowledge-pack/source-surface-partition-patterns"
+steps:
+  - id: "govern-summary-inputs"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record:
+        source_type: "object_factory_execution_metadata"
+        license: "CC-BY-4.0"
+        privacy_boundary: "public_metadata_only"
+      source_policy:
+        require_license: true
+        forbid_private_source_bodies: true
+        require_redaction_before_external_model: true
+        excluded_scopes: ["insurance"]
+  - id: "summarize-source-surface-execution"
+    kind: "tool"
+    ref: "tool/source-surface-execution-summary-reporter"
+    inputs:
+      partitions_jsonl: "$.inputs.partitions_jsonl"
+      jobs_jsonl: "$.inputs.jobs_jsonl"
+      replay_records_jsonl: "$.inputs.replay_records_jsonl"
+      row_dir: "$.inputs.row_dir"
+      load_plan_manifest: "$.inputs.load_plan_manifest"
+      output: "$.inputs.output"
+      run_id: "$.inputs.run_id"
+  - id: "route-review-attention"
+    kind: "tool"
+    ref: "tool/object-factory-job-router"
+    inputs:
+      review_ticket_count: "$.steps.summarize-source-surface-execution.review.total_review_tickets"
+      load_readiness: "$.steps.summarize-source-surface-execution.load_readiness"
+      route_to:
+        preflight_failures: "curator.ops.preflight"
+        review_heavy_runs: "curator.domain_review"
+        load_ready_runs: "ops.postgres_load"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.load_readiness.preflight_ok"
+    op: "=="
+    value: true
+    severity: "critical"
+    label: "Summary reports a preflight-clean run."
+  - kind: "deterministic"
+    target: "$.generated_row_total"
+    op: ">"
+    value: 0
+    severity: "high"
+    label: "Summary reports generated staged rows."
+  - kind: "semantic"
+    target: "$.execution_summary"
+    must_cover:
+      - "manifest count is separate from generated object rows"
+      - "review tickets"
+      - "promotion holds"
+      - "bulk load readiness"
+      - "insurance scope excluded"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Summary preserves the operational safety context for multi-day runs."

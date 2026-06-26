@@ -1,0 +1,109 @@
+id: "pipeline/source-surfaces-to-scan-partitions"
+type: pipeline
+version: "0.1.0"
+name: "Source surfaces to scan partitions"
+description: "Turns high-value source-surface backlog rows into resumable partitions, public-source blueprints, and queue-ready scan jobs for the object factory."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["government", "software", "media", "construction", "energy", "finance", "healthcare", "cross_industry"]
+capability: ["retrieval", "extraction", "governance", "routing", "evaluation"]
+modality: ["text", "structured", "image"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "pre_api.ingest"
+tags: ["source-surfaces", "partitions", "public-source-blueprints", "container-workers", "million-objects"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Plan additive source-surface scan partitions and route them into public-source scan jobs without storing raw source bodies in the public catalog."
+pipeline_kind: "research_web.source_surface_partitioning"
+inputs:
+  - name: "source_surfaces"
+    type: "array"
+  - name: "output_dir"
+    type: "string"
+  - name: "run_id"
+    type: "string"
+  - name: "max_sources_per_partition"
+    type: "integer"
+  - name: "scan_policy"
+    type: "object"
+outputs:
+  - name: "source_surface_scan_partitions"
+    type: "jsonl"
+  - name: "public_source_blueprints"
+    type: "jsonl"
+  - name: "scan_jobs"
+    type: "jsonl"
+  - name: "reviewable_schedule_summary"
+    type: "jsonl"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/source-surface-partition-patterns"
+    - "knowledge-pack/public-source-scan-job-patterns"
+steps:
+  - id: "govern-source-surface-backlog"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record:
+        source_type: "source_surface_backlog"
+        license: "CC-BY-4.0"
+        privacy_boundary: "public"
+      source_policy:
+        excluded_scopes: ["insurance"]
+        require_license: true
+        forbid_private_source_bodies: true
+        require_redaction_before_external_model: true
+  - id: "plan-source-surface-partitions"
+    kind: "tool"
+    ref: "tool/source-surface-partition-planner"
+    inputs:
+      source_surfaces: "$.inputs.source_surfaces"
+      output_dir: "$.inputs.output_dir"
+      run_id: "$.inputs.run_id"
+      max_sources_per_partition: "$.inputs.max_sources_per_partition"
+  - id: "emit-public-source-scan-jobs"
+    kind: "tool"
+    ref: "tool/public-source-scan-job-emitter"
+    inputs:
+      blueprints: "$.steps.plan-source-surface-partitions.public_source_blueprints"
+      output_dir: "$.inputs.output_dir"
+      tenant_id: "tenant-public-catalog"
+      scan_policy: "$.inputs.scan_policy"
+      excluded_scopes: ["insurance"]
+  - id: "route-jobs-to-container-workers"
+    kind: "tool"
+    ref: "tool/object-factory-job-router"
+    inputs:
+      job_manifest: "$.steps.emit-public-source-scan-jobs.files"
+      worker_registry:
+        source_discovery: "container.worker.discovery"
+        source_snapshot: "container.worker.snapshot"
+        page_to_markdown: "container.worker.markdown"
+        source_ingest: "container.worker.ingest"
+        entity_linking: "container.worker.entity_linking"
+        fuzzy_dedupe: "container.worker.dedupe"
+        dedupe_index: "container.worker.index"
+        publish_review: "container.worker.review"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.partition_count"
+    op: ">"
+    value: 0
+    severity: "high"
+    label: "At least one resumable source-surface scan partition is emitted."
+  - kind: "semantic"
+    target: "$.source_surface_scan_partitions"
+    must_cover:
+      - "source governance"
+      - "resume cursor"
+      - "entity linking"
+      - "fuzzy dedupe"
+      - "index record"
+      - "review routing"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Partitions carry the full additive object-factory lifecycle."

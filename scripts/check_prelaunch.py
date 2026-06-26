@@ -38,7 +38,7 @@ _API_KEYS = (
 #: LOCKED brand set (memory: brand-architecture-and-naming; parent tagline "AI Done Right" per
 #: architecture/brand.json — superseded "Context is Everything" preserved there as the rollback target) —
 #: at least one must appear in demo copy.
-LOCKED_BRANDS = ("AI Done Right", "Baltor", "Open Harness Hub")
+LOCKED_BRANDS = ("AI Done Right", "Baltor", "OpenHubForAI")
 #: naming that must NOT appear in NEW user-facing demo copy (flagged tools + retired product terms).
 BLOCKED_IN_DEMO_COPY = ("Synapse AI", "Microsoft Conductor")
 #: internal trees a human should de-track (NOT publish) before going public — listed, never deleted.

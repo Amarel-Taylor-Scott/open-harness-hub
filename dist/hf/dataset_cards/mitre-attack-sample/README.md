@@ -21,7 +21,7 @@ pretty_name: MITRE ATT&CK techniques (sample)
 
 # MITRE ATT&CK techniques (sample)
 
-<!-- Generated from Open Harness Hub manifest `knowledge-pack/mitre-attack-sample` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
+<!-- Generated from OpenHubForAI manifest `knowledge-pack/mitre-attack-sample` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
 
 ## Dataset description
 
@@ -60,11 +60,11 @@ A Croissant 1.0 JSON-LD record is emitted at `dist/croissant/mitre-attack-sample
 ```bibtex
 @misc{mitre-attack-sample_open_harness_hub,
   title  = {MITRE ATT&CK techniques (sample)},
-  author = {Open Harness Hub contributors},
+  author = {OpenHubForAI contributors},
   url    = {https://open-harness-hub.dev/knowledge-pack/mitre-attack-sample},
   version= {0.1.0},
   year   = {2026}
 }
 ```
 
-License: `CC-BY-4.0`. Hub artifact: `knowledge-pack/mitre-attack-sample`.
+License: `CC-BY-4.0`. Hub component: `knowledge-pack/mitre-attack-sample`.

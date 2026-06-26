@@ -1,0 +1,181 @@
+id: "pipeline/ofac-un-cross-list-fuzzy-screening"
+type: pipeline
+version: "0.1.0"
+name: "OFAC / UN cross-list sanctions screening with fuzzy match"
+description: |
+  Screen a counterparty (person or entity) name against multiple
+  sanctions lists at once — OFAC SDN, UN Consolidated, EU Consolidated,
+  and an institution PEP list — using deterministic fuzzy matching
+  (name canonicalization + Jaro-Winkler ≥ threshold) so that
+  transliteration, honorific, and word-order variants are caught, and
+  every hit carries its source list, program, and listing date.
+
+  Negative space: a bare model cannot answer "is NAME on a sanctions
+  list" — it hallucinates list membership, cannot apply a calibrated
+  fuzz threshold, and gives no provenance. Screening MUST be a
+  deterministic match against a governed list snapshot, with the model
+  used only to summarize and explain matches (cite-or-abstain), never
+  to decide membership. Cross-list reconciliation flags a name that
+  hits one list but not another (a coverage gap), and clusters
+  near-duplicate hits across lists so an analyst sees one entity, not
+  four rows.
+
+  Reference / educational only — list contents are governed snapshots,
+  inputs are synthetic. Bundle: High-precision legal / regulated RAG
+  (exact-id + fuzzy leg; source-precedence; cite-or-abstain).
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["finance", "finance.aml", "finance.kyc", "trade.sanctions"]
+capability: ["verification", "safety_gating", "extraction", "classification"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "volatile"
+tags: ["sanctions", "ofac-sdn", "un-consolidated", "fuzzy-match", "jaro-winkler", "cross-list", "negative-space"]
+created: "2026-05-29"
+updated: "2026-05-29"
+
+task: |
+  Given a counterparty name (and optional aliases), screen it across
+  OFAC SDN, UN Consolidated, EU Consolidated, and an institution PEP
+  list with deterministic fuzzy matching; cluster near-duplicate hits
+  across lists into one entity; flag cross-list coverage gaps; and emit
+  a yes/no sanctions-hit decision with each hit's source list, program,
+  listing date, and match score. Halt to escalation on any hit.
+pipeline_kind: "classify"
+
+inputs:
+  - name: "counterparty"
+    type: "object"
+    schema: "name, aliases[], entity_type, country_iso2"
+  - name: "screening_context"
+    type: "object"
+    schema: "purpose, channel, related_account_ref"
+
+outputs:
+  - name: "sanctions_hit"
+    type: "boolean"
+  - name: "matches"
+    type: "object[]"
+  - name: "clustered_entities"
+    type: "object[]"
+  - name: "cross_list_gaps"
+    type: "object[]"
+  - name: "disposition"
+    type: "enum[clear, halt_and_escalate, enhanced_due_diligence]"
+  - name: "match_rationale"
+    type: "markdown"
+
+defaults:
+  persona: "persona/aml-analyst"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/sanctions-list-shape"
+  rule_packs:
+    - "rule-pack/financial-pii-en"
+    - "rule-pack/sanctions-screening"
+
+steps:
+  # R5 pre-normalize: canonicalize the primary name (transliterate, fold case, strip honorifics)
+  - id: "canonicalize_name"
+    kind: "processor"
+    ref: "processor/name-canonicalize"
+    inputs:
+      name: "$.inputs.counterparty.name"
+
+  - id: "normalize_country"
+    kind: "processor"
+    ref: "processor/iso-country-normalize"
+    inputs:
+      value: "$.inputs.counterparty.country_iso2"
+
+  # Deterministic cross-list fuzzy match (the membership decision — NOT the model)
+  - id: "cross_list_screen"
+    kind: "tool"
+    ref: "tool/sanctions-check"
+    inputs:
+      normalized_name: "$.steps.canonicalize_name.output.canonical_name"
+      lists: ["ofac_sdn", "un_consolidated", "eu_consolidated", "institution_pep"]
+      threshold: 0.90
+
+  # Deterministic policy: which match severity → which action (freezable Conditional)
+  - id: "apply_screening_policy"
+    kind: "rule_pack"
+    ref: "rule-pack/sanctions-screening"
+    inputs:
+      entity:
+        normalized_name: "$.steps.canonicalize_name.output.canonical_name"
+      matches: "$.steps.cross_list_screen.output.matches"
+
+  # R3/R5: cluster near-duplicate hits across lists into one entity; surface review pairs
+  - id: "cluster_hits"
+    kind: "tool"
+    ref: "tool/fuzzy-dedupe-clusterer"
+    inputs:
+      candidate_records: "$.steps.cross_list_screen.output.matches"
+      thresholds: { name: 0.90 }
+      match_features: ["name", "program", "source_list"]
+
+  # R1: list-shape reference so the model can explain match fields / coverage with provenance
+  - id: "retrieve_list_shape"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/sanctions-list-shape"
+    inputs:
+      query: "sanctions list match fields program listing date alias cross-list coverage"
+      top_k: 6
+
+  # Action: Model Call — summarize/explain matches + cross-list gaps; cite-or-abstain; does NOT decide membership
+  - id: "explain_matches"
+    kind: "harness"
+    ref: "harness/aml-investigation"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Summarize the deterministic sanctions matches and clustered entities. For each hit, state the source list, program, listing date, and match score. Identify cross-list coverage gaps (hit on one list, absent on another). Do NOT decide list membership yourself — use only the provided match results. Recommend clear, enhanced_due_diligence, or halt_and_escalate consistent with the screening policy. Cite each match field to the list-shape reference or abstain."}]
+      context:
+        - "$.steps.cross_list_screen.output.matches"
+        - "$.steps.apply_screening_policy.output.fired"
+        - "$.steps.cluster_hits.output.clusters"
+        - "$.steps.retrieve_list_shape.output.docs"
+
+  - id: "check_citations"
+    kind: "processor"
+    ref: "processor/citation-span-checker"
+    inputs:
+      trace: "$.steps.explain_matches.output"
+      config: {}
+
+  # Stop / End: any hit halts to escalation
+  - id: "escalate"
+    kind: "processor"
+    ref: "processor/escalate-human-review"
+    when: "$.steps.cross_list_screen.output.matches != []"
+    inputs:
+      case_id: "$.inputs.screening_context.related_account_ref"
+      reason: "Cross-list sanctions/PEP fuzzy match — analyst confirmation required before clearing counterparty"
+      severity: "critical"
+      payload: "$.steps.explain_matches.output"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "ofac-un-cross-list-fuzzy-screening"
+      applied_layers: ["privacy", "sanctions", "heuristic", "rag", "harness"]
+
+success_criteria:
+  - rubric: "rubric/aml-investigation-v1"
+    threshold: 0.78
+  - kind: "deterministic"
+    target: "$.steps.check_citations.output.result.pass"
+    op: "=="
+    value: true
+    severity: "critical"
+    label: "Every reported match field traces to a retrieved list-shape reference span."
+  - kind: "deterministic"
+    target: "$.outputs.sanctions_hit"
+    op: "in"
+    value: [true, false]
+    severity: "critical"
+    label: "A boolean sanctions-hit decision is produced from the deterministic match, not the model."

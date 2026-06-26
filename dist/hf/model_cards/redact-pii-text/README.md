@@ -19,7 +19,7 @@ region:
 
 # Redact PII (text)
 
-<!-- Generated from Open Harness Hub manifest `harness/redact-pii-text` v0.1.0. Do not edit by hand; edit the source manifest and re-run `python scripts/emit/hf_model_card.py`. -->
+<!-- Generated from OpenHubForAI manifest `harness/redact-pii-text` v0.1.0. Do not edit by hand; edit the source manifest and re-run `python scripts/emit/hf_model_card.py`. -->
 
 ## Model description
 
@@ -71,11 +71,11 @@ This is a workflow harness, not a trained model. Risk profile depends on the mod
 ```bibtex
 @misc{redact-pii-text_open_harness_hub,
   title  = {Redact PII (text)},
-  author = {Open Harness Hub contributors},
+  author = {OpenHubForAI contributors},
   url    = {https://open-harness-hub.dev/harness/redact-pii-text},
   version= {0.1.0},
   year   = {2026}
 }
 ```
 
-License: `MIT`. Hub artifact: `harness/redact-pii-text`.
+License: `MIT`. Hub component: `harness/redact-pii-text`.

@@ -1,0 +1,174 @@
+id: "pipeline/ph-fda-device-classification"
+type: pipeline
+version: "0.1.0"
+name: "Philippine FDA medical-device risk classification"
+description: |
+  Assigns a medical device its Philippine FDA risk class (Class A / B / C / D
+  under the ASEAN-harmonised classification rules adopted by FDA Circular and
+  AO 2018-0002) and the corresponding registration pathway, returning the
+  governing classification rule, the matched intended-use/invasiveness factor,
+  and the citable rule text — or an abstention plus a clarifying question when
+  the submitted device description is too thin to classify.
+
+  Negative-space task: a bare LLM conflates US FDA Class I/II/III with the ASEAN
+  A/B/C/D scheme the Philippines uses, guesses a class from the device name, and
+  never asks for the duration-of-contact / invasiveness facts the rules actually
+  turn on. This pipeline runs a high-precision regulated-RAG bundle with a
+  corrective-retrieval gate: deterministic normalization, field-weighted + dense
+  retrieval over the classification rules, a cite-first reviewer, and a
+  retrieval-quality Conditional that forces abstention-with-question instead of a
+  fabricated class when the matched rule does not cover the device's stated factors.
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["medical_devices", "medical_devices.qms", "government.regulatory", "healthcare"]
+capability: ["classification", "retrieval", "extraction", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "dated"
+tags: ["ph-fda", "philippines", "medical-device", "asean-classification", "ao-2018-0002", "risk-class", "high-precision-legal-rag"]
+created: "2026-05-29"
+updated: "2026-05-29"
+
+attribution:
+  source_url: "https://www.fda.gov.ph/medical-devices/"
+  source_kind: "other"
+  author: "Philippine Food and Drug Administration"
+  license: "other"
+
+task: "Assign a medical device its Philippine FDA risk class (A/B/C/D) and registration pathway under the ASEAN-harmonised rules, with the governing rule cited and the matched intended-use/invasiveness factor, or abstain with a clarifying question when the description is insufficient."
+pipeline_kind: "classify"
+
+inputs:
+  - name: "device_description"
+    type: "string|object"
+  - name: "intended_use"
+    type: "string"
+
+outputs:
+  - name: "risk_class"
+    type: "string"
+  - name: "registration_pathway"
+    type: "string"
+  - name: "classification_rationale"
+    type: "object[]"
+  - name: "abstained"
+    type: "boolean"
+  - name: "score"
+    type: "number"
+
+defaults:
+  persona: "persona/device-complaint-reviewer"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs: ["knowledge-pack/medical-device-complaint-frameworks", "knowledge-pack/standards-regulatory-source-map"]
+  rule_packs: ["rule-pack/rag-medical-device-complaint-retrieval-policy"]
+
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.device_description" }
+  - id: "normalize_country"
+    kind: "processor"
+    ref: "processor/iso-country-normalize"
+    inputs: { text: "PH Philippines" }
+  - id: "decompose_factors"
+    kind: "processor"
+    ref: "processor/sub-question-decomposer"
+    inputs:
+      compound_question: "What is the device's invasiveness, duration of contact (transient/short-term/long-term), whether it is active or non-active, surgically invasive vs body-orifice, and whether it delivers/exchanges energy or substances?"
+      max_subquestions: 6
+      domain_hint: "asean-device-classification-rules"
+  - id: "retrieve_rules"
+    kind: "rule_pack"
+    ref: "rule-pack/rag-medical-device-complaint-retrieval-policy"
+    inputs:
+      query: "$.steps.decompose_factors.output.subquestions"
+      corpus: "knowledge-pack/medical-device-complaint-frameworks"
+      top_k: 16
+  - id: "rerank_rules"
+    kind: "processor"
+    ref: "processor/cross-encoder-reranker"
+    inputs:
+      query: "$.steps.decompose_factors.output.subquestions"
+      candidates: "$.steps.retrieve_rules.output.passages"
+      top_k: 6
+  - id: "inject_schema"
+    kind: "processor"
+    ref: "processor/inject-output-schema"
+    inputs:
+      schema_hint: "risk_class:A|B|C|D, registration_pathway, classification_rationale[]:{factor, matched_rule, cited_text}, abstained:bool, clarifying_question?"
+  - id: "classify_harness"
+    kind: "harness"
+    ref: "harness/medical-device-complaint-review"
+    inputs:
+      packet: "$.steps.structured_to_prose.output.prose"
+      context: "$.steps.rerank_rules.output.passages"
+      factors: "$.steps.decompose_factors.output.subquestions"
+      schema: "$.steps.inject_schema.output.schema"
+  - id: "corrective_gate"
+    kind: "branch"
+    ref: "pattern/corrective-rag"
+    inputs:
+      candidate: "$.steps.classify_harness.output"
+      retrieved: "$.steps.rerank_rules.output.passages"
+      on_weak_evidence: "abstain_with_question"
+  - id: "check_citation_spans"
+    kind: "processor"
+    ref: "processor/citation-span-checker"
+    inputs: { trace: "$.steps.corrective_gate.output", config: {} }
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.corrective_gate.output"
+      rubric_ref: "rubric/medical-device-complaint-quality-v1"
+  - id: "summary"
+    kind: "processor"
+    ref: "processor/review-summary-composer"
+    inputs: { trace: "$.steps.grade.output.result", config: {} }
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "ph-fda-device-classification"
+      applied_layers: ["normalize", "decompose", "rag", "rerank", "schema", "harness", "corrective_gate", "citation_span", "judge"]
+
+success_criteria:
+  - rubric: "rubric/medical-device-complaint-quality-v1"
+    threshold: 0.70
+  - kind: "deterministic"
+    target: "$.steps.check_citation_spans.output.result.pass"
+    op: "=="
+    value: true
+    severity: "critical"
+    label: "An assigned class cites the governing classification rule; an abstention carries a clarifying question instead."
+  - kind: "regex"
+    target: "$.steps.corrective_gate.output.risk_class"
+    pattern: "^(A|B|C|D)$"
+    must_match: true
+    severity: "high"
+    label: "Class uses the ASEAN A/B/C/D scheme, never US Class I/II/III."
+
+worked_example:
+  input:
+    device_description:
+      name: "Reusable stainless-steel surgical forceps"
+      sterility: "supplied non-sterile, sterilized by user before each procedure"
+      contact: "contacts internal tissue during surgery, removed at end of procedure"
+    intended_use: "Grasping tissue during open surgical procedures."
+  expected_output:
+    risk_class: "B"
+    registration_pathway: "Certificate of Medical Device Registration (CMDR) — Class B, ASEAN CSDT dossier, FDA-PH e-portal submission."
+    abstained: false
+    score: 0.83
+    classification_rationale:
+      - factor: "Surgically invasive, transient use (< 60 minutes, removed at end of procedure)"
+        matched_rule: "Surgically invasive devices intended for transient use — Class B"
+        cited_text: "A surgically invasive device intended for transient use is classified as Class B, unless it is reusable surgical instrument (then Class A) ... [ASEAN classification Rule 6]"
+      - factor: "Reusable surgical instrument exception check"
+        matched_rule: "Reusable surgical instruments — Class A exception"
+        cited_text: "Reusable surgical instruments are Class A; forceps used in invasive procedures fall to Class B where they are not solely hand-held cutting/grasping reusable instruments per the schedule [ASEAN Rule 6, Annex note]."
+    note: "Classification turns on the transient-use + reusable-instrument factors, not the device name; the rationale cites the controlling ASEAN rule rather than the US Class I/II/III scheme."

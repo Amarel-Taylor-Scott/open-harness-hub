@@ -55,7 +55,7 @@ to the relevant ACR / Fleischner / RADS guideline.
 
 ## Provenance
 
-- Hub artifact: `pipeline/radiology-report-grading` v0.1.0
+- Hub component: `pipeline/radiology-report-grading` v0.1.0
 - License: `MIT`
 - Industry: healthcare, healthcare.radiology
 - Full source manifest: see `references/manifest.yaml`

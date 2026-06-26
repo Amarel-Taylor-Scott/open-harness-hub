@@ -1,0 +1,78 @@
+id: "pipeline/hybrid-postgres-bigquery-hosting-plan"
+type: pipeline
+version: "0.1.0"
+name: "Hybrid Postgres BigQuery hosting plan"
+description: "Builds a low-cost hosting blueprint that keeps hot OpenHubForAI product state in Postgres/pgvector, raw shards in object storage, and cold analytics/vector workloads in BigQuery."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "retrieval", "serving", "evaluation"]
+modality: ["text", "structured", "tabular"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "dated"
+lifecycle_position: "cross_cutting.hosting"
+tags: ["postgres", "pgvector", "bigquery", "object-storage", "low-cost-hosting", "vector-search"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Recommend the cheapest practical hosting split for millions of generated objects, trajectory fragments, embeddings, search indexes, review tickets, and cost traces."
+pipeline_kind: "serving"
+inputs:
+  - name: "object_count_target"
+    type: "integer"
+  - name: "query_latency_target"
+    type: "object"
+  - name: "monthly_budget"
+    type: "object"
+outputs:
+  - name: "hosting_blueprint"
+    type: "json"
+  - name: "cold_tier_export_plan"
+    type: "json"
+  - name: "cost_control_checklist"
+    type: "array"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/hybrid-postgres-bigquery-hosting-patterns"
+    - "knowledge-pack/postgres-pgvector-bootstrap-patterns"
+steps:
+  - id: "plan-postgres-bootstrap"
+    kind: "tool"
+    ref: "tool/postgres-pgvector-bootstrap-planner"
+    inputs:
+      purpose: "Hot product state and first vector search."
+  - id: "plan-bigquery-cold-tier"
+    kind: "tool"
+    ref: "tool/bigquery-cold-tier-export-planner"
+    inputs:
+      source_tables: ["trajectory_fragment", "cache_reuse_event", "object_embedding", "index_record"]
+  - id: "estimate-cloud-runtime"
+    kind: "tool"
+    ref: "tool/cloud-runtime-pricing-lookup"
+    inputs:
+      purpose: "Compare Render-style worker startup with Cloud Run split workers."
+  - id: "emit-terraform"
+    kind: "tool"
+    ref: "tool/terraform-blueprint-emitter"
+    inputs:
+      blueprint_kind: "hybrid-postgres-bigquery"
+success_criteria:
+  - kind: "semantic"
+    target: "$.hosting_blueprint"
+    must_cover:
+      - "Postgres hot path"
+      - "object storage raw shards"
+      - "BigQuery cold analytics"
+      - "vector search"
+      - "cost controls"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Hosting blueprint covers hot/cold storage split."
+  - kind: "deterministic"
+    target: "$.cold_tier_export_plan"
+    op: "is_truthy"
+    value: true
+    severity: "medium"
+    label: "Cold tier export plan is emitted."

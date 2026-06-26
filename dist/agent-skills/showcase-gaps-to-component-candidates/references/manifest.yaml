@@ -1,0 +1,79 @@
+id: "pipeline/showcase-gaps-to-component-candidates"
+type: pipeline
+version: "0.1.0"
+name: "Showcase gaps to component candidates"
+description: "Feeds partial or missing showcase template coverage requests back into the component factory as targeted database-backed candidate rows."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["generation", "planning", "retrieval", "governance"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.product"
+tags: ["showcase-pipelines", "coverage", "component-candidates", "gap-analysis", "daily-factory"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Convert showcase coverage gaps into targeted candidate components so the daily pipeline demos improve automatically over time."
+pipeline_kind: "research_web.showcase_gaps_to_component_candidates"
+inputs:
+  - name: "missing_requests"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "gap_component_seeds"
+    type: "jsonl"
+  - name: "normalized_objects"
+    type: "jsonl"
+  - name: "labels"
+    type: "jsonl"
+  - name: "entities"
+    type: "jsonl"
+  - name: "index_records"
+    type: "jsonl"
+  - name: "review_tickets"
+    type: "jsonl"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/showcase-gap-component-patterns"
+    - "knowledge-pack/showcase-candidate-coverage-patterns"
+steps:
+  - id: "load-gap-generation-checks"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/showcase-gap-component-patterns"
+    inputs:
+      query: "showcase gap component seed row families review boundary"
+      top_k: 20
+  - id: "generate-gap-component-rows"
+    kind: "tool"
+    ref: "tool/showcase-gap-component-seed-generator"
+    inputs:
+      missing_requests: "$.inputs.missing_requests"
+      output_dir: "$.inputs.output_dir"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.generate-gap-component-rows.seed_count"
+    op: ">="
+    value: 1
+    severity: "medium"
+    label: "At least one targeted component candidate is generated when coverage gaps exist."
+  - kind: "deterministic"
+    target: "$.generate-gap-component-rows.row_counts.index_record"
+    op: ">="
+    value: 5
+    severity: "medium"
+    label: "Gap-derived candidates are searchable."
+  - kind: "semantic"
+    target: "$.generate-gap-component-rows"
+    must_cover:
+      - "showcase coverage"
+      - "targeted component candidate"
+      - "review-gated"
+      - "database-backed"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Gap-derived components preserve the daily factory review boundary."

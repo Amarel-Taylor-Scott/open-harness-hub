@@ -1,0 +1,65 @@
+id: "pipeline/recursive-encoded-payload-triage"
+type: pipeline
+version: "0.1.0"
+name: "Recursive encoded payload triage"
+description: "Pre-LLM guardrail pipeline that recursively sanitizes encoded spans, routes checks through an edge micro-model, and escalates uncertain or high-risk decoded content."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "security.defensive", "media", "cross_industry"]
+capability: ["safety_gating", "classification", "routing", "evaluation"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "pre_api.safety"
+tags: ["guardrails", "encoding", "edge-ai", "semantic-gap", "micro-model"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Decide whether a prompt or tool request containing possible encoded spans can be safely routed to an edge AI model."
+pipeline_kind: "edge_ai.recursive_encoded_payload_triage"
+inputs:
+  - name: "prompt_packet"
+    type: "object"
+  - name: "device_profile"
+    type: "object"
+  - name: "policy"
+    type: "object"
+outputs:
+  - name: "route"
+    type: "string"
+  - name: "decoded_segment_evidence"
+    type: "array"
+  - name: "escalation_reason"
+    type: "string"
+  - name: "audit_ref"
+    type: "string"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/edge-ai-semantic-gap-guardrail-patterns"
+steps:
+  - id: "sanitize-encoded-spans"
+    kind: "tool"
+    ref: "tool/recursive-encoding-sanitizer"
+    inputs:
+      text: "$.inputs.prompt_packet.text"
+      max_depth: "$.inputs.policy.max_decode_depth"
+      max_decoded_bytes: "$.inputs.policy.max_decoded_bytes"
+      encodings: "$.inputs.policy.encodings"
+  - id: "route-edge-authorization"
+    kind: "tool"
+    ref: "tool/edge-micro-model-authorization-router"
+    inputs:
+      candidate_action: "$.inputs.prompt_packet.action"
+      decoded_segments: "$.steps.sanitize-encoded-spans.decoded_segments"
+      device_profile: "$.inputs.device_profile"
+      policy: "$.inputs.policy"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "recursive-encoded-payload-triage"
+      applied_layers: ["recursive_decode", "micro_model_authorization", "main_model_escalation_if_needed"]
+success_criteria:
+  - rubric: "rubric/edge-ai-guardrail-quality-v1"
+    threshold: 0.80

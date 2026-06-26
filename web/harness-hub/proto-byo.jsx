@@ -20,7 +20,7 @@ function PRegistry() {
         <span className="plus">+</span>
         <div className="seg"><span className="v">34</span><span className="k">governed, filling gaps</span></div>
         <span className="covbar"><span className="priv" style={{ width: '26%' }} /><span className="pub" style={{ width: '74%' }} /></span>
-        <span style={{ fontSize: 11.5, color: 'var(--fg-muted)' }}>26% your IP · 74% from OpenHarnessHub</span>
+        <span style={{ fontSize: 11.5, color: 'var(--fg-muted)' }}>26% your IP · 74% from OpenHubForAI</span>
       </div>
       <div className="pt-toolbar">
         <button className="oh-btn oh-btn--primary oh-btn--sm" onClick={() => toast('New component — pick a primitive')}>+ New component</button>
@@ -60,7 +60,7 @@ function PConnect() {
   const [boundary, setBoundary] = React.useState('gapfill');
   return (
     <div className="pt-page wide pt-view">
-      <div className="pt-page-head"><h1>Connect — local-first, bridged by MCP</h1><div className="sub">Keep proprietary context in your environment. Your agents source it locally and call OpenHarnessHub over MCP to fill the gaps — only queries &amp; governed components cross the line, never your data.</div></div>
+      <div className="pt-page-head"><h1>Connect — local-first, bridged by MCP</h1><div className="sub">Keep proprietary context in your environment. Your agents source it locally and call OpenHubForAI over MCP to fill the gaps — only queries &amp; governed components cross the line, never your data.</div></div>
 
       <div className="pt-bridge">
         <div className="pt-zone private">
@@ -77,7 +77,7 @@ function PConnect() {
           <span className="pt-bridge-arrow"><span className="a">fill gaps →</span><span>← components</span></span>
         </div>
         <div className="pt-zone governed">
-          <div className="zh">OpenHarnessHub<span className="tag">governed</span></div>
+          <div className="zh">OpenHubForAI<span className="tag">governed</span></div>
           <div className="zsub">Vetted catalog · lift-gated · provenance</div>
           <div className="pt-mcpnode"><span className="ic">⚡</span><span className="nm">Governed components<small>1,284 promoted · ▲ measured lift</small></span></div>
           <div className="pt-mcpnode"><span className="ic">⛁</span><span className="nm">Knowledge corpora<small>CSDDD · OFAC · GxP · ✔ sourced</small></span></div>
@@ -100,7 +100,7 @@ function PConnect() {
 
       <div className="pt-dash-grid">
         <div className="pt-panel">
-          <div className="oh-cc-id mono" style={{ marginBottom: 4 }}>OpenHarnessHub as an MCP server</div>
+          <div className="oh-cc-id mono" style={{ marginBottom: 4 }}>OpenHubForAI as an MCP server</div>
           <p style={{ fontSize: 12.5, color: 'var(--fg-muted)', margin: '0 0 12px', lineHeight: 1.5 }}>Point your own agent here to pull governed components &amp; knowledge into local flows.</p>
           <div className="pt-codeblock">{`{
   "mcpServers": {
@@ -114,7 +114,7 @@ function PConnect() {
         </div>
         <div className="pt-panel">
           <div className="oh-cc-id mono" style={{ marginBottom: 4 }}>Your sources as MCP servers</div>
-          <p style={{ fontSize: 12.5, color: 'var(--fg-muted)', margin: '0 0 8px', lineHeight: 1.5 }}>Register local servers OpenHarnessHub agents query to ground answers — data stays local.</p>
+          <p style={{ fontSize: 12.5, color: 'var(--fg-muted)', margin: '0 0 8px', lineHeight: 1.5 }}>Register local servers OpenHubForAI agents query to ground answers — data stays local.</p>
           <div className="pt-srv"><span className="dot" style={{ background: 'var(--success)' }} /><span className="nm">Filesystem · SOPs<small>mcp://local/files</small></span><span className="pt-priv-badge priv">local-only</span></div>
           <div className="pt-srv"><span className="dot" style={{ background: 'var(--success)' }} /><span className="nm">Private pgvector<small>mcp://local/vector</small></span><span className="pt-priv-badge priv">local-only</span></div>
           <div className="pt-srv"><span className="dot" style={{ background: 'var(--warning)' }} /><span className="nm">Internal ERP API<small>mcp://local/erp · auth required</small></span><span className="oh-badge mono">configure</span></div>

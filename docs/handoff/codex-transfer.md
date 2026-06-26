@@ -33,7 +33,7 @@ network LLM calls, fake URLs, or overclaims.
 - AI Done Right is the parent/platform brand.
 - Baltor governs context/truth.
 - Teleon runs capabilities.
-- Open*Hubs are registries/discovery surfaces only.
+- OpenHubForAI registries are discovery surfaces only.
 - Discovery is not trust.
 - Output is not truth.
 - Dashboards are projection-only.

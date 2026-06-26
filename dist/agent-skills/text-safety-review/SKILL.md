@@ -58,7 +58,7 @@ Designed to produce cited, bounded, citation-first responses.
 
 ## Provenance
 
-- Hub artifact: `harness/text-safety-review` v0.1.0
+- Hub component: `harness/text-safety-review` v0.1.0
 - License: `MIT`
 - Lifecycle: `beta`
 - Full source manifest: see `references/manifest.yaml`

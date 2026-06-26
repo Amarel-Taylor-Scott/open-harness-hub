@@ -13,7 +13,7 @@ query using LLM summary of pass-1. Second-pass: retrieve top-K' with
 the refined query. Union, dedupe, cross-encoder rerank. Final
 output ranked candidates.
 
-Verified by Open Harness Hub mining of takanashihumbert "EEDI Qwen-2.5
+Verified by OpenHubForAI mining of takanashihumbert "EEDI Qwen-2.5
 32B AWQ two-time retrieval" (650 votes). The shape generalises to
 any RAG task where the user's first query is under-specified.
 
@@ -35,7 +35,7 @@ between passes and cross-encoder rerank at the end.
 
 ## Provenance
 
-- Hub artifact: `pipeline/two-time-retrieve-rerank` v0.1.0
+- Hub component: `pipeline/two-time-retrieve-rerank` v0.1.0
 - License: `MIT`
 - Industry: ai, education, scientific_research
 - Full source manifest: see `references/manifest.yaml`

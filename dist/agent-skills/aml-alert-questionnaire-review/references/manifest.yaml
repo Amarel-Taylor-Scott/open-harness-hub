@@ -1,0 +1,116 @@
+id: "pipeline/aml-alert-questionnaire-review"
+type: pipeline
+version: "0.1.0"
+name: "AML alert questionnaire review"
+description: "Review a system-generated AML alert by retrieving procedure knowledge objects, asking required analyst questions, collecting evidence, and producing a cited disposition recommendation."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["finance", "finance.aml", "finance.kyc"]
+capability: ["retrieval", "verification", "classification", "governance", "evaluation"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.alert_review"
+tags: ["aml", "alert-review", "analyst-questionnaire", "procedure-objects", "case-management"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Walk a generated AML alert through an institution-approved question set and evidence checklist before close, monitor, EDD, or SAR-style draft routing."
+pipeline_kind: "finance_aml.alert_questionnaire_review"
+
+inputs:
+  - name: "alert_id"
+    type: "string"
+  - name: "alert_payload"
+    type: "object"
+  - name: "customer_profile"
+    type: "object"
+  - name: "transactions"
+    type: "TransactionEdge[]"
+  - name: "case_history"
+    type: "object[]"
+outputs:
+  - name: "answered_questions"
+    type: "object[]"
+  - name: "missing_evidence"
+    type: "object[]"
+  - name: "typology_matches"
+    type: "TypologyMatch[]"
+  - name: "disposition_recommendation"
+    type: "enum[close, monitor, enhanced_due_diligence, sar_style_draft, sanctions_escalation]"
+  - name: "analyst_narrative_draft"
+    type: "markdown"
+
+defaults:
+  persona: "persona/aml-analyst"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/procedure-knowledge-object-patterns"
+    - "knowledge-pack/aml-red-flags-extended"
+    - "knowledge-pack/fatf-typologies-sample"
+  rule_packs:
+    - "rule-pack/financial-pii-en"
+    - "rule-pack/sanctions-screening"
+    - "rule-pack/aml-typologies-fatf"
+
+steps:
+  - id: "redact_alert_text"
+    kind: "harness"
+    ref: "harness/redact-pii-text"
+    inputs:
+      text: "$.inputs.alert_payload.narrative"
+
+  - id: "retrieve_questions"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/procedure-knowledge-object-patterns"
+    inputs:
+      query: "AML alert review sanctions customer profile transaction pattern source of funds closeout escalation"
+      top_k: 20
+
+  - id: "sanctions_screen"
+    kind: "tool"
+    ref: "tool/sanctions-check"
+    inputs:
+      normalized_name: "$.inputs.customer_profile.normalized_name"
+      lists: ["ofac_sdn", "un_consolidated", "eu_consolidated"]
+      threshold: 0.92
+
+  - id: "graph_query"
+    kind: "tool"
+    ref: "tool/transaction-graph-query"
+    inputs:
+      seed_account: "$.inputs.customer_profile.account_id"
+      direction: "both"
+      max_hops: 2
+      time_window_days: 90
+
+  - id: "retrieve_typologies"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/aml-red-flags-extended"
+    inputs:
+      query: "$.steps.redact_alert_text.output.redacted_text"
+      top_k: 8
+
+  - id: "draft_disposition"
+    kind: "harness"
+    ref: "harness/aml-investigation"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Answer the required AML alert review questions with evidence. Recommend close, monitor, enhanced due diligence, SAR-style draft, or sanctions escalation. Do not assert intent."}]
+      context:
+        - "$.steps.retrieve_questions.output.docs"
+        - "$.steps.sanctions_screen.output.matches"
+        - "$.steps.graph_query.output"
+        - "$.steps.retrieve_typologies.output.docs"
+        - "$.inputs.case_history"
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.outputs.answered_questions"
+    op: "is_truthy"
+    value: true
+    label: "Required analyst questions are answered or explicitly marked missing evidence."
+  - rubric: "rubric/aml-investigation-v1"
+    threshold: 0.80

@@ -1,0 +1,90 @@
+id: "pipeline/daily-showcase-pipeline-factory"
+type: pipeline
+version: "0.1.0"
+name: "Daily showcase pipeline factory"
+description: "Creates 5 to 25 preconfigured, review-ready showcase pipeline templates per day and prepares them for Postgres component-template loading."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["planning", "routing", "evaluation", "governance"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.product"
+tags: ["showcase-pipelines", "daily-factory", "component-templates", "postgres", "review-gate"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Generate daily off-the-shelf pipeline templates that prove how database-backed component candidates become usable product workflows."
+pipeline_kind: "research_web.daily_showcase_pipeline_factory"
+inputs:
+  - name: "scenario_path"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+  - name: "count"
+    type: "integer"
+  - name: "run_id"
+    type: "string"
+outputs:
+  - name: "showcase_templates"
+    type: "json"
+  - name: "component_template_load_plan"
+    type: "json"
+  - name: "component_pipeline_templates_csv"
+    type: "csv"
+  - name: "component_pipeline_template_steps_csv"
+    type: "csv"
+  - name: "load_sql"
+    type: "sql"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/daily-showcase-pipeline-patterns"
+    - "knowledge-pack/component-template-load-patterns"
+steps:
+  - id: "load-showcase-scenarios"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/daily-showcase-pipeline-patterns"
+    inputs:
+      query: "daily showcase pipeline scenario cost profile deployment target review gates"
+      top_k: 25
+  - id: "generate-showcase-templates"
+    kind: "tool"
+    ref: "tool/daily-showcase-pipeline-generator"
+    inputs:
+      scenario_path: "$.inputs.scenario_path"
+      output_dir: "$.inputs.output_dir"
+      count: "$.inputs.count"
+      run_id: "$.inputs.run_id"
+  - id: "load-plan-review"
+    kind: "tool"
+    ref: "tool/component-template-load-planner"
+    inputs:
+      reason: "The generator already emits a component-template load plan; this step records the required review boundary before tenant-visible publication."
+success_criteria:
+  - kind: "deterministic"
+    target: "$.generate-showcase-templates.showcase_template_count"
+    op: ">="
+    value: 5
+    severity: "high"
+    label: "At least five daily showcase templates are generated."
+  - kind: "deterministic"
+    target: "$.generate-showcase-templates.showcase_template_count"
+    op: "<="
+    value: 25
+    severity: "high"
+    label: "Daily showcase template count stays within the planned operating range."
+  - kind: "semantic"
+    target: "$.generate-showcase-templates"
+    must_cover:
+      - "pre-LLM"
+      - "LLM"
+      - "post-LLM"
+      - "review gate"
+      - "cost profile"
+      - "deployment target"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Showcase templates prove complete usable pipeline paths."

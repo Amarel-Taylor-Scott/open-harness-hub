@@ -13,7 +13,7 @@ blocks, runtime renders the message + executes the code in a
 Jupyter kernel, streams the observation back into the model's
 context, loops until the model emits a `DONE` marker.
 
-Verified by Open Harness Hub mining of the OpenInterpreter clone:
+Verified by OpenHubForAI mining of the OpenInterpreter clone:
 `interpreter/core/respond.py` implements exactly this loop.
 
 ## Task
@@ -36,7 +36,7 @@ declares the task done or max_iterations is hit.
 
 ## Provenance
 
-- Hub artifact: `pipeline/code-act-jupyter-loop` v0.1.0
+- Hub component: `pipeline/code-act-jupyter-loop` v0.1.0
 - License: `MIT`
 - Industry: ai, software
 - Full source manifest: see `references/manifest.yaml`

@@ -1,0 +1,102 @@
+id: "pipeline/embedding-execution-plan"
+type: pipeline
+version: "0.1.0"
+name: "Embedding execution plan"
+description: "Plans embedding batches from staged object_embedding rows, routes them by local or external model profile, estimates cost where possible, and emits completion stubs for later vector readiness audits."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "embedding", "governance", "evaluation", "serving"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["embeddings", "pgvector", "batching", "cost-estimation", "audit", "vector-search"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Turn staged object_embedding rows into auditable embedding execution batches without calling embedding providers."
+pipeline_kind: "research_web.embedding_execution_plan"
+inputs:
+  - name: "object_embeddings_jsonl"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+  - name: "default_profile"
+    type: "string"
+  - name: "model_profiles_json"
+    type: "string"
+outputs:
+  - name: "embedding_execution_plan"
+    type: "json"
+  - name: "embedding_batches"
+    type: "jsonl"
+  - name: "embedding_completion_stubs"
+    type: "jsonl"
+  - name: "cost_by_profile"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/embedding-execution-patterns"
+steps:
+  - id: "govern-embedding-inputs"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record:
+        source_type: "object_embedding_work_items"
+        license: "CC-BY-4.0"
+        privacy_boundary: "metadata_and_embedding_text"
+      source_policy:
+        require_redaction_before_external_model: true
+        forbid_private_source_bodies: true
+        excluded_scopes: ["insurance"]
+  - id: "lookup-embedding-pricing"
+    kind: "tool"
+    ref: "tool/model-pricing-lookup"
+    inputs:
+      provider: "$.inputs.provider"
+      model: "$.inputs.model"
+      usage_shape:
+        input_tokens: "$.steps.plan-embedding-batches.cost_by_profile.estimated_tokens"
+    when: "external embedding profile is selected"
+  - id: "plan-embedding-batches"
+    kind: "tool"
+    ref: "tool/embedding-execution-planner"
+    inputs:
+      object_embeddings_jsonl: "$.inputs.object_embeddings_jsonl"
+      output_dir: "$.inputs.output_dir"
+      run_id: "$.inputs.run_id"
+      default_profile: "$.inputs.default_profile"
+      model_profiles_json: "$.inputs.model_profiles_json"
+  - id: "route-to-vector-store"
+    kind: "tool"
+    ref: "tool/postgres-load-execution-planner"
+    inputs:
+      reason: "Embedding completion rows should later update object_embedding vectors in Postgres/pgvector and feed staged-versus-committed audit counts."
+success_criteria:
+  - kind: "deterministic"
+    target: "$.embedding_execution_plan.input_embedding_rows"
+    op: ">"
+    value: 0
+    severity: "high"
+    label: "Embedding work items are present."
+  - kind: "deterministic"
+    target: "$.embedding_execution_plan.planned_completion_rows"
+    op: "=="
+    value: "$.embedding_execution_plan.input_embedding_rows"
+    severity: "high"
+    label: "Each staged embedding work item has a completion stub."
+  - kind: "semantic"
+    target: "$.embedding_execution_plan"
+    must_cover:
+      - "local embedding profile"
+      - "external pricing snapshot required"
+      - "batch id"
+      - "text hash"
+      - "vector stored false before execution"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Plan preserves auditability before vectors are generated."

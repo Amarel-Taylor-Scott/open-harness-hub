@@ -1,0 +1,98 @@
+id: "pipeline/postgres-load-execution-and-audit"
+type: pipeline
+version: "0.1.0"
+name: "Postgres load execution and audit"
+description: "Creates a side-effect-free command plan to initialize Postgres/pgvector, apply a generated bulk load, export committed counts, and audit staged versus committed object rows."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "retrieval", "serving", "evaluation", "verification"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["postgres", "pgvector", "load-execution", "object-counts", "audit", "render"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Plan execution of a generated object-factory load.sql against Postgres and the follow-up committed-count audit."
+pipeline_kind: "research_web.postgres_load_execution"
+inputs:
+  - name: "load_plan_manifest"
+    type: "string"
+  - name: "execution_summary"
+    type: "string"
+  - name: "target"
+    type: "string"
+  - name: "output"
+    type: "string"
+outputs:
+  - name: "execution_plan"
+    type: "json"
+  - name: "commands"
+    type: "array"
+  - name: "committed_counts_output"
+    type: "string"
+  - name: "load_audit_output"
+    type: "string"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/postgres-load-execution-patterns"
+    - "knowledge-pack/staged-vs-committed-load-audit-patterns"
+steps:
+  - id: "govern-load-execution-plan"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record:
+        source_type: "postgres_load_execution_metadata"
+        license: "MIT"
+        privacy_boundary: "local_commands_only"
+      source_policy:
+        forbid_private_source_bodies: true
+        require_redaction_before_external_model: true
+        excluded_scopes: ["insurance"]
+  - id: "emit-execution-plan"
+    kind: "tool"
+    ref: "tool/postgres-load-execution-planner"
+    inputs:
+      load_plan_manifest: "$.inputs.load_plan_manifest"
+      execution_summary: "$.inputs.execution_summary"
+      target: "$.inputs.target"
+      output: "$.inputs.output"
+      run_id: "$.inputs.run_id"
+  - id: "convert-counts-after-psql"
+    kind: "tool"
+    ref: "tool/psql-csv-count-json-converter"
+    inputs:
+      csv_stdin: "$.steps.emit-execution-plan.psql_count_csv"
+      output: "$.steps.emit-execution-plan.files.committed_counts_output"
+    when: "psql count CSV is available"
+  - id: "audit-after-load"
+    kind: "tool"
+    ref: "tool/staged-vs-committed-load-auditor"
+    inputs:
+      load_plan_manifest: "$.inputs.load_plan_manifest"
+      committed_counts: "$.steps.emit-execution-plan.files.committed_counts_output"
+      execution_summary: "$.inputs.execution_summary"
+      output: "$.steps.emit-execution-plan.files.load_audit_output"
+    when: "committed count JSON is available"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.execution_plan.readiness.preflight_ok"
+    op: "=="
+    value: true
+    severity: "critical"
+    label: "Execution plan starts from a preflight-clean load plan."
+  - kind: "semantic"
+    target: "$.execution_plan.commands"
+    must_cover:
+      - "initialize schema"
+      - "apply bulk load"
+      - "count canonical rows"
+      - "audit staged versus committed"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Execution plan covers load and proof steps."

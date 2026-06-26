@@ -78,7 +78,7 @@ def render_offers_doc(atlas: dict, tax: dict) -> str:
     w("A **Fragile Context Audit** is a *diagnostic*, not a verdict. It shows where a team's own AI surface "
       "(a support chatbot, a RAG index, agent memory, enterprise search, a workflow agent) is serving a fragile "
       "answer — one that is stale, conflicting, jurisdiction-specific, or sourced from the wrong authority — and "
-      "what the source-of-record answer is instead. It is **proof-first selling**: the Open\\*Hub surfaces attract, "
+      "what the source-of-record answer is instead. It is **proof-first selling**: the OpenHubForAI surfaces attract, "
       "the diagnostic proves, an evidence pack converts. Every output is a **draft** in "
       "\"appears / requires review\" language; nothing here is a legal conclusion or legal advice.")
     w("")

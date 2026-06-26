@@ -29,7 +29,7 @@ pretty_name: ACR Appropriateness Criteria + Fleischner + ACR RADS rubrics
 
 # ACR Appropriateness Criteria + Fleischner + ACR RADS rubrics
 
-<!-- Generated from Open Harness Hub manifest `knowledge-pack/radiology-acrac-fleischner` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
+<!-- Generated from OpenHubForAI manifest `knowledge-pack/radiology-acrac-fleischner` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
 
 ## Dataset description
 
@@ -89,11 +89,11 @@ A Croissant 1.0 JSON-LD record is emitted at `dist/croissant/radiology-acrac-fle
 ```bibtex
 @misc{radiology-acrac-fleischner_open_harness_hub,
   title  = {ACR Appropriateness Criteria + Fleischner + ACR RADS rubrics},
-  author = {Open Harness Hub contributors},
+  author = {OpenHubForAI contributors},
   url    = {https://open-harness-hub.dev/knowledge-pack/radiology-acrac-fleischner},
   version= {0.1.0},
   year   = {2026}
 }
 ```
 
-License: `CC-BY-4.0`. Hub artifact: `knowledge-pack/radiology-acrac-fleischner`.
+License: `CC-BY-4.0`. Hub component: `knowledge-pack/radiology-acrac-fleischner`.

@@ -42,7 +42,7 @@ for each step) → CRITIQUE (LLM checks output against goal + flags failures)
 
 ## Provenance
 
-- Hub artifact: `pipeline/plan-execute-critic-loop` v0.1.0
+- Hub component: `pipeline/plan-execute-critic-loop` v0.1.0
 - License: `MIT`
 - Industry: cross_industry
 - Full source manifest: see `references/manifest.yaml`

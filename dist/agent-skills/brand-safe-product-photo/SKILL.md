@@ -40,7 +40,7 @@ brand-safety rules and produces verifiable lens physics.
 
 ## Provenance
 
-- Hub artifact: `pipeline/brand-safe-product-photo` v0.1.0
+- Hub component: `pipeline/brand-safe-product-photo` v0.1.0
 - License: `MIT`
 - Industry: creative, retail
 - Full source manifest: see `references/manifest.yaml`

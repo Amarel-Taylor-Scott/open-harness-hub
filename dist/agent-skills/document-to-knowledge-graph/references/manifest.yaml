@@ -1,0 +1,79 @@
+id: "pipeline/document-to-knowledge-graph"
+type: pipeline
+version: "0.1.0"
+name: "Document to knowledge graph (nodes + edges with source anchors)"
+description: "Take any source document (contract, SOP, regulatory framework, supply-chain disclosure) and produce a typed knowledge graph with source-anchored nodes + edges. Implements the concept-graph-from-text pattern with three concrete node-type sets: contract-clauses, sop-steps, supply-chain-entities."
+authors: [{ name: "OpenHubForAI contributors" }]
+license: "MIT"
+industry: ["legal", "compliance", "supply_chain", "research"]
+capability: ["extraction", "retrieval"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+tags: ["knowledge-graph", "extraction", "nodes-edges", "concept-graph"]
+created: "2026-05-22"
+updated: "2026-05-22"
+
+attribution:
+  source_url: "https://github.com/Amarel-Taylor-Scott/open-harness-hub"
+  source_kind: "other"
+  author: "OpenHubForAI contributors"
+  license: "MIT"
+
+task: "Extract a typed knowledge graph from a source document."
+pipeline_kind: "synthesis"
+
+inputs:
+  - name: "document_packet"
+    type: "string|object"
+  - name: "domain"
+    type: "string"
+
+outputs:
+  - name: "nodes"
+    type: "object[]"
+  - name: "edges"
+    type: "object[]"
+  - name: "unanchored_count"
+    type: "integer"
+
+defaults:
+  persona: "persona/local-first-research-tutor"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs: ["knowledge-pack/citemind-architecture-reference"]
+
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.document_packet" }
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+  - id: "page_chunk"
+    kind: "processor"
+    ref: "processor/page-aware-chunker"
+    inputs: { pages: "$.steps.redact_pii.output.text", target_tokens: 800, overlap: 120 }
+  - id: "concept_graph"
+    kind: "processor"
+    ref: "processor/concept-graph-extractor"
+    inputs:
+      wiki_pages: "$.steps.page_chunk.output.chunks"
+      node_types: ["clause", "step", "entity", "person", "obligation", "right", "deadline"]
+      edge_types: ["depends_on", "cross_references", "supersedes", "applies_to", "defined_in", "obligates", "permits"]
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "document-to-knowledge-graph"
+      applied_layers: ["pii_redact", "page_chunk", "graph_extract"]
+
+success_criteria:
+  - kind: deterministic
+    target: "$.steps.concept_graph.output.unanchored_count"
+    op: "<="
+    value: 5
+    severity: "high"
+    label: "At most 5 nodes lack a source anchor"

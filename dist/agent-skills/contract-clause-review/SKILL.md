@@ -46,7 +46,7 @@ rubric.
 
 ## Provenance
 
-- Hub artifact: `pipeline/contract-clause-review` v0.1.0
+- Hub component: `pipeline/contract-clause-review` v0.1.0
 - License: `MIT`
 - Industry: legal, legal.contract, legal.compliance
 - Full source manifest: see `references/manifest.yaml`

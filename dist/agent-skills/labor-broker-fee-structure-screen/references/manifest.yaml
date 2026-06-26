@@ -1,0 +1,267 @@
+id: "pipeline/labor-broker-fee-structure-screen"
+type: pipeline
+version: "0.1.0"
+name: "Labour-broker fee-structure screen (IRIS Employer-Pays Principle)"
+description: |
+  HIGH-PRECISION migrant-worker-protection pipeline. Reads a recruitment
+  agreement / labour-broker MOU / manpower-supply contract and extracts its
+  fee-and-cost structure, then scores it against the IRIS "Employer Pays
+  Principle" and the ILO general principles on fair recruitment: who bears
+  recruitment fees and related costs (visa, medical, travel, training,
+  document processing), and whether any cost is passed to — or recovered
+  from — the worker via deduction.
+
+  Negative-space task: recruitment contracts bury cost-allocation across
+  fee schedules, deduction clauses, "service charges", and side letters, in
+  multiple currencies, often with euphemisms ("mobilisation cost",
+  "processing charge recoverable from salary"). A bare model summarising the
+  contract cannot reliably attribute *each cost line to a payer* and flag the
+  worker-borne ones — and that attribution is the entire compliance question.
+  The durable lift is structured, cited cost-line attribution against a fixed
+  fair-recruitment standard.
+
+  Bundle: High-precision legal / regulated RAG (taxonomy Bundle B) — query
+  decomposition over cost categories, hybrid retrieval against the
+  due-diligence regulatory pack (ILO/IRIS material), cross-encoder rerank,
+  a faithful pre-model extraction of every cost line, then a cite-or-abstain
+  judge that labels each cost line worker-borne / employer-borne / unclear.
+  Output is a fee-allocation scorecard plus a worker-reimbursement exposure
+  flag, NOT a legal determination.
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["esg.modern_slavery", "supply_chain.due_diligence", "legal.immigration", "humanitarian.trafficking"]
+capability: ["extraction", "retrieval", "verification", "evaluation"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "stable"
+tags: ["anti-trafficking", "forced-labor", "recruitment-fees", "iris", "employer-pays", "ilo", "migrant-workers"]
+created: "2026-05-29"
+updated: "2026-05-29"
+
+attribution:
+  source_url: "https://www.ilo.org/publications/general-principles-and-operational-guidelines-fair-recruitment-and-definition"
+  source_kind: "other"
+  author: "ILO General Principles and Operational Guidelines for Fair Recruitment; IRIS Standard (Employer Pays Principle); ILO Hard to See, Harder to Count (11 indicators)"
+  license: "public-resource"
+  notes: |
+    Extracts and labels recruitment-contract cost lines against the
+    Employer-Pays Principle. NOT a legal determination; surfaces a cited
+    fee-allocation scorecard and worker-reimbursement exposure for review.
+
+task: "Extract the cost lines from a recruitment / labour-broker contract and score each against the IRIS Employer-Pays Principle (employer-borne | worker-borne | unclear), citing the contract clause and the fair-recruitment standard."
+pipeline_kind: "extract"
+
+inputs:
+  - name: "contract_packet"
+    type: "string|object"
+    description: "{ contract_text: string, principal_employer: string, recruitment_agency: string, origin_country: string, destination_country: string, currency: string }"
+
+outputs:
+  - name: "cost_line_scorecard"
+    type: "object[]"
+    description: "Each: {cost_category, amount, currency, payer (employer|worker|unclear), recovered_via_deduction (bool), contract_clause_span, iris_ilo_citation}"
+  - name: "worker_borne_exposure"
+    type: "object"
+    description: "{any_worker_borne: bool, total_worker_borne_estimate, reimbursement_recommended: bool}"
+  - name: "evidence_gaps"
+    type: "object[]"
+
+defaults:
+  persona: "persona/esg-auditor"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs: ["knowledge-pack/csddd-and-forced-labor-indicators"]
+  rule_packs:
+    - "rule-pack/grep-apparel-forced-labor-trace-flags"
+    - "rule-pack/hybrid-retrieval-policy"
+
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.contract_packet" }
+
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+
+  - id: "normalize_country"
+    kind: "processor"
+    ref: "processor/iso-country-normalize"
+    inputs:
+      origin: "$.inputs.contract_packet"
+      destination: "$.inputs.contract_packet"
+
+  - id: "decompose_cost_categories"
+    kind: "processor"
+    ref: "processor/sub-question-decomposer"
+    inputs:
+      question: "Who bears each recruitment cost category (recruitment fee, visa, medical, travel, training, document processing, service charge) and is any recovered from the worker?"
+      context: "$.steps.redact_pii.output.text"
+
+  - id: "grep_fee_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-apparel-forced-labor-trace-flags"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+
+  - id: "extract_cost_lines"
+    kind: "processor"
+    ref: "processor/faithful-extract-before-model"
+    inputs:
+      text: "$.steps.redact_pii.output.text"
+      fields: ["recruitment_fee", "visa_cost", "medical_cost", "travel_cost", "training_cost", "document_processing_cost", "service_charge", "deduction_clauses", "currency"]
+
+  - id: "retrieve_fair_recruitment"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.steps.decompose_cost_categories.output.sub_questions"
+      corpus: "knowledge-pack/csddd-and-forced-labor-indicators"
+      top_k: 12
+
+  - id: "rerank_standard"
+    kind: "processor"
+    ref: "processor/cross-encoder-reranker"
+    inputs:
+      query: "$.steps.decompose_cost_categories.output.sub_questions"
+      passages: "$.steps.retrieve_fair_recruitment.output.passages"
+      top_k: 6
+
+  - id: "score_allocation"
+    kind: "harness"
+    ref: "harness/apparel-forced-labor-trace-review"
+    inputs:
+      packet: "$.steps.extract_cost_lines.output.result"
+      context: "$.steps.rerank_standard.output.passages"
+      evidence: "$.steps.grep_fee_flags.output.fired"
+
+  - id: "calibrate_severity"
+    kind: "processor"
+    ref: "processor/severity-calibrator"
+    inputs: { trace: "$.steps.score_allocation.output", config: {} }
+
+  - id: "extract_evidence_gaps"
+    kind: "processor"
+    ref: "processor/evidence-gap-extractor"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+
+  - id: "check_citations"
+    kind: "processor"
+    ref: "processor/citation-span-checker"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.calibrate_severity.output.result"
+      rubric_ref: "rubric/apparel-forced-labor-trace-quality-v1"
+
+  - id: "redaction_audit"
+    kind: "processor"
+    ref: "processor/packet-redaction-audit"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+
+  - id: "summary"
+    kind: "processor"
+    ref: "processor/review-summary-composer"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "labor-broker-fee-structure-screen"
+      applied_layers: ["privacy", "grep", "rag", "harness", "heuristic"]
+
+success_criteria:
+  - rubric: "rubric/apparel-forced-labor-trace-quality-v1"
+    threshold: 0.70
+  - kind: "deterministic"
+    target: "$.steps.check_citations.output.result.pass"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "every cost-line verdict cites the contract clause"
+  - kind: "deterministic"
+    target: "$.steps.redaction_audit.output.result.pass"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "redaction audit passes"
+
+related_patterns:
+  - "pattern/two-stage-retrieve-rerank"
+  - "pattern/refuse-on-redacted"
+
+examples:
+  - name: "Manpower-supply contract with worker-deducted processing charge"
+    input:
+      contract_packet:
+        contract_text: >
+          Manpower Supply Agreement. The Principal (destination employer)
+          shall bear the cost of return airfare and the employment visa.
+          The Agency shall arrange pre-departure medical examination; the
+          cost thereof (USD 90) is recoverable from the worker's first month
+          salary. A one-time documentation and processing charge of USD 600
+          shall be collected from each deployed worker prior to departure.
+          Training costs at the Agency's centre (USD 150) are borne by the
+          worker. Accommodation at destination provided free by the Principal.
+        principal_employer: "[Destination Co.]"
+        recruitment_agency: "[Origin Agency]"
+        origin_country: "Nepal"
+        destination_country: "United Arab Emirates"
+        currency: "USD"
+    expected_output:
+      cost_line_scorecard:
+        - cost_category: "travel_airfare"
+          amount: null
+          currency: "USD"
+          payer: "employer"
+          recovered_via_deduction: false
+          contract_clause_span: "shall bear the cost of return airfare"
+          iris_ilo_citation: "IRIS Employer-Pays Principle — no worker-paid recruitment costs; travel is an employer cost"
+        - cost_category: "employment_visa"
+          amount: null
+          currency: "USD"
+          payer: "employer"
+          recovered_via_deduction: false
+          contract_clause_span: "and the employment visa"
+          iris_ilo_citation: "IRIS Employer-Pays Principle"
+        - cost_category: "medical_exam"
+          amount: 90
+          currency: "USD"
+          payer: "worker"
+          recovered_via_deduction: true
+          contract_clause_span: "cost thereof (USD 90) is recoverable from the worker's first month salary"
+          iris_ilo_citation: "ILO Hard to See, Harder to Count — Indicator: wage deductions / IRIS Employer-Pays Principle violated"
+        - cost_category: "documentation_processing_charge"
+          amount: 600
+          currency: "USD"
+          payer: "worker"
+          recovered_via_deduction: false
+          contract_clause_span: "one-time documentation and processing charge of USD 600 shall be collected from each deployed worker"
+          iris_ilo_citation: "IRIS Employer-Pays Principle violated — worker-paid recruitment fee"
+        - cost_category: "training"
+          amount: 150
+          currency: "USD"
+          payer: "worker"
+          recovered_via_deduction: false
+          contract_clause_span: "Training costs at the Agency's centre (USD 150) are borne by the worker"
+          iris_ilo_citation: "ILO General Principles for Fair Recruitment — training is a recruitment-related cost not chargeable to workers"
+      worker_borne_exposure:
+        any_worker_borne: true
+        total_worker_borne_estimate: "USD 840 per worker (90 + 600 + 150)"
+        reimbursement_recommended: true
+      evidence_gaps:
+        - field: "side_letters"
+          note: "Contract references a fee schedule and processing charge but no annexes are provided; reviewer should request all annexes/side letters before finalising the exposure estimate."
+      notes: >
+        Three worker-borne cost lines (medical, processing charge, training)
+        plus a salary deduction breach the Employer-Pays Principle; airfare and
+        visa correctly employer-borne. Each verdict cites the contract clause
+        and the fair-recruitment standard. Output is a cited scorecard for a
+        reviewer, not a legal determination.

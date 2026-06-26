@@ -1,0 +1,102 @@
+id: "pipeline/multimodal-generation-blueprint"
+type: pipeline
+version: "0.1.0"
+name: "Multimodal generation blueprint"
+description: "Plan, route, generate, store, safety-screen, and cost-estimate image, video, audio, music, document, or 3D generation workflows."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "media", "cross_industry"]
+capability: ["generation", "evaluation", "planning", "governance"]
+modality: ["image", "video", "audio", "music", "text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.composition"
+tags: ["multimodal", "image-generation", "video-generation", "music-generation", "asset-store", "safety"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Generate a deployable multimodal media pipeline with provider routing, cost estimate, asset storage, safety screening, and provenance."
+pipeline_kind: "generate_media.multimodal_blueprint"
+
+inputs:
+  - name: "media_request"
+    type: "object"
+  - name: "provider_registry"
+    type: "object[]"
+  - name: "budget"
+    type: "object"
+  - name: "policy"
+    type: "object"
+outputs:
+  - name: "generation_plan"
+    type: "object"
+  - name: "asset_refs"
+    type: "object[]"
+  - name: "safety_report"
+    type: "object"
+  - name: "cost_estimate"
+    type: "object"
+  - name: "provenance"
+    type: "object"
+
+steps:
+  - id: "route_generation"
+    kind: "tool"
+    ref: "tool/generative-media-router"
+    inputs:
+      request: "$.inputs.media_request"
+      provider_registry: "$.inputs.provider_registry"
+      budget: "$.inputs.budget"
+      deployment_boundary: "$.inputs.policy.trust_boundary"
+
+  - id: "estimate_runtime_pricing"
+    kind: "tool"
+    ref: "tool/cloud-runtime-pricing-lookup"
+    inputs:
+      cloud: "$.inputs.policy.cloud"
+      region: "$.inputs.policy.region"
+      resources:
+        modality: "$.inputs.media_request.modality"
+        duration_seconds: "$.inputs.media_request.duration_seconds"
+        resolution: "$.inputs.media_request.resolution"
+
+  - id: "store_asset"
+    kind: "tool"
+    ref: "tool/multimodal-asset-store"
+    inputs:
+      operation: "put"
+      metadata:
+        media_type: "$.inputs.media_request.modality"
+        prompt: "$.inputs.media_request.prompt"
+        provider: "$.steps.route_generation.output.selected_provider"
+        model: "$.steps.route_generation.output.selected_model"
+
+  - id: "screen_asset"
+    kind: "tool"
+    ref: "tool/multimodal-safety-screen"
+    inputs:
+      asset_ref: "$.steps.store_asset.output.asset_ref"
+      media_type: "$.inputs.media_request.modality"
+      policy: "$.inputs.policy"
+      checks: "$.steps.route_generation.output.safety_requirements"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "multimodal-generation-blueprint"
+      applied_layers: ["media_route", "runtime_pricing", "asset_store", "safety_screen", "provenance"]
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.outputs.generation_plan"
+    op: "is_truthy"
+    value: true
+    label: "A generation plan is produced."
+  - kind: "deterministic"
+    target: "$.outputs.safety_report"
+    op: "is_truthy"
+    value: true
+    label: "A media safety report is produced."

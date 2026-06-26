@@ -1,0 +1,186 @@
+id: "pipeline/object-factory-worker-fleet"
+type: pipeline
+version: "0.1.0"
+name: "Object factory worker fleet"
+description: "Routes source material through dedicated workers for markdown conversion, sensitive-data screening, LLM polishing, verification, labeling, dedupe, indexing, cost metering, and publish review."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["extraction", "summarization", "verification", "anonymization", "routing", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.factory"
+tags: ["object-factory", "workers", "llm-routing", "privacy", "markdown", "dedupe", "indexing"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Convert governed source material into privacy-screened, polished, verified, labeled, deduplicated, and reviewable candidate primitives using dedicated workers and provider-neutral model routing."
+pipeline_kind: "research_web.object_factory_worker_fleet"
+
+inputs:
+  - name: "source_record"
+    type: "object"
+    schema: "schemas/source-record.schema.json"
+  - name: "snapshot_pointer"
+    type: "string"
+  - name: "worker_registry"
+    type: "object[]"
+  - name: "adapter_registry"
+    type: "object[]"
+  - name: "tenant_policy"
+    type: "object"
+  - name: "cost_policy"
+    type: "object"
+outputs:
+  - name: "candidate_objects"
+    type: "object[]"
+  - name: "published_component_refs"
+    type: "string[]"
+  - name: "index_records"
+    type: "object"
+  - name: "review_tickets"
+    type: "object[]"
+  - name: "cost_estimate"
+    type: "object"
+
+defaults:
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/object-factory-worker-patterns"
+    - "knowledge-pack/hybrid-label-dimension-taxonomy"
+  rule_packs:
+    - "rule-pack/grep-prompt-injection-heuristics"
+
+steps:
+  - id: "load_worker_patterns"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/object-factory-worker-patterns"
+    inputs:
+      query: "object factory workers privacy markdown llm polishing verification dedupe indexing"
+      top_k: 20
+
+  - id: "route_conversion_job"
+    kind: "tool"
+    ref: "tool/object-factory-job-router"
+    inputs:
+      job:
+        job_type: "page_to_markdown"
+        source_record_id: "$.inputs.source_record.id"
+        tenant_id: "$.inputs.tenant_policy.tenant_id"
+        inputs:
+          snapshot_pointer: "$.inputs.snapshot_pointer"
+        policy: "$.inputs.tenant_policy"
+      worker_registry: "$.inputs.worker_registry"
+      trust_policy: "$.inputs.tenant_policy"
+      cost_policy: "$.inputs.cost_policy"
+
+  - id: "convert_page_to_markdown"
+    kind: "tool"
+    ref: "tool/page-to-markdown-converter"
+    inputs:
+      source_record: "$.inputs.source_record"
+      snapshot_pointer: "$.inputs.snapshot_pointer"
+      conversion_policy:
+        preserve_tables: true
+        emit_source_spans: true
+        retain_links: true
+
+  - id: "extract_digest_candidates"
+    kind: "tool"
+    ref: "tool/normalized-object-extractor"
+    inputs:
+      source_record: "$.inputs.source_record"
+      source_content:
+        markdown_pointer: "$.steps.convert_page_to_markdown.output.markdown_pointer"
+        source_spans: "$.steps.convert_page_to_markdown.output.source_spans"
+      extraction_targets: ["task", "fact", "question", "checklist_item", "decision_gate", "tool_requirement", "failure_mode"]
+
+  - id: "screen_sensitive_data"
+    kind: "tool"
+    ref: "tool/sensitive-data-object-gate"
+    inputs:
+      source_record: "$.inputs.source_record"
+      markdown_pointer: "$.steps.convert_page_to_markdown.output.markdown_pointer"
+      candidate_objects: "$.steps.extract_digest_candidates.output.normalized_objects"
+      tenant_policy: "$.inputs.tenant_policy"
+      publication_policy:
+        public_catalog: true
+        redact_before_external_model: true
+
+  - id: "route_polish_model"
+    kind: "tool"
+    ref: "tool/model-capability-router"
+    inputs:
+      task:
+        task_type: "schema_polish_and_verify"
+        modality: ["text", "structured"]
+        quality_tier: "cheap"
+        schema_strictness: "json"
+      adapter_registry: "$.inputs.adapter_registry"
+      cost_policy: "$.inputs.cost_policy"
+      trust_policy:
+        prefer_local_for_sensitive_data: true
+        allowed_boundaries: "$.inputs.tenant_policy.allowed_model_boundaries"
+
+  - id: "polish_and_verify"
+    kind: "tool"
+    ref: "tool/llm-polish-verify-worker"
+    inputs:
+      candidate_objects: "$.steps.screen_sensitive_data.output.redacted_objects"
+      target_schema:
+        schema_ref: "schemas/normalized-object-record.schema.json"
+      source_spans: "$.steps.convert_page_to_markdown.output.source_spans"
+      model_route: "$.steps.route_polish_model.output"
+      polish_policy:
+        forbid_uncited_facts: true
+        preserve_source_span_refs: true
+        emit_review_ticket_on_uncertainty: true
+
+  - id: "assign_labels_dimensions"
+    kind: "tool"
+    ref: "tool/hierarchical-label-dimensioner"
+    inputs:
+      subjects: "$.steps.polish_and_verify.output.polished_objects"
+      label_taxonomy: "knowledge-pack/hybrid-label-dimension-taxonomy"
+      dimension_definitions: "knowledge-pack/hybrid-label-dimension-taxonomy"
+      tenant_label_set: "$.inputs.tenant_policy.label_set"
+
+  - id: "dedupe_candidates"
+    kind: "tool"
+    ref: "tool/fuzzy-dedupe-clusterer"
+    inputs:
+      normalized_objects: "$.steps.polish_and_verify.output.polished_objects"
+      entity_refs: "$.steps.assign_labels_dimensions.output.entity_mentions"
+      strategies: ["exact_id", "normalized_text", "simhash", "trigram", "vector", "entity_overlap"]
+
+  - id: "emit_index_records"
+    kind: "tool"
+    ref: "tool/index-record-emitter"
+    inputs:
+      normalized_objects: "$.steps.polish_and_verify.output.polished_objects"
+      canonical_entities: "$.steps.assign_labels_dimensions.output.entity_mentions"
+      dedupe_clusters: "$.steps.dedupe_candidates.output.dedupe_clusters"
+      emit: ["keyword", "vector", "graph", "facet", "quality", "freshness", "cost"]
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "object-factory-worker-fleet"
+      applied_layers: ["source_governance", "markdown_conversion", "privacy_gate", "model_routing", "verification", "labels", "dedupe", "indexing"]
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.outputs.candidate_objects"
+    op: "is_truthy"
+    value: true
+    label: "Pipeline emits candidate objects or review tickets."
+  - kind: "deterministic"
+    target: "$.outputs.review_tickets"
+    op: "!="
+    value: null
+    label: "Review ticket output is explicit even when empty."
+

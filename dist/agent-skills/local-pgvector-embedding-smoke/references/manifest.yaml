@@ -1,0 +1,70 @@
+id: "pipeline/local-pgvector-embedding-smoke"
+type: pipeline
+version: "0.1.0"
+name: "Local pgvector embedding smoke"
+description: "Builds a side-effect-free operator plan for smoke testing embedding load SQL against the local Docker pgvector database."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["embedding", "retrieval", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["embeddings", "vector-search", "pgvector", "postgres", "docker", "daily-factory", "smoke-test"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Emit a reviewed local pgvector smoke execution plan for embedding load SQL and committed-count audits."
+pipeline_kind: "research_web.local_pgvector_embedding_smoke"
+inputs:
+  - name: "pgvector_load_plan_summary"
+    type: "string"
+  - name: "embedding_execution_plan"
+    type: "string"
+  - name: "vector_readiness_summary"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "local_pgvector_embedding_smoke_plan"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/local-pgvector-embedding-smoke-patterns"
+steps:
+  - id: "load-local-pgvector-smoke-checks"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/local-pgvector-embedding-smoke-patterns"
+    inputs:
+      query: "local docker pgvector embedding smoke committed count audit"
+      top_k: 20
+  - id: "plan-local-pgvector-embedding-smoke"
+    kind: "tool"
+    ref: "tool/local-pgvector-embedding-smoke-planner"
+    inputs:
+      pgvector_load_plan_summary: "$.inputs.pgvector_load_plan_summary"
+      embedding_execution_plan: "$.inputs.embedding_execution_plan"
+      vector_readiness_summary: "$.inputs.vector_readiness_summary"
+      output_dir: "$.inputs.output_dir"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.plan-local-pgvector-embedding-smoke.readiness.safe_to_smoke_apply"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "The local smoke plan is safe to apply after operator review."
+  - kind: "semantic"
+    target: "$.plan-local-pgvector-embedding-smoke"
+    must_cover:
+      - "Docker"
+      - "pgvector"
+      - "schema"
+      - "load SQL"
+      - "committed counts"
+      - "side-effect free"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "The local smoke execution boundary is explicit."

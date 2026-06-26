@@ -32,7 +32,7 @@ calibrated confidence.
 
 ## Provenance
 
-- Hub artifact: `pipeline/verify-claim-against-corpus` v0.1.0
+- Hub component: `pipeline/verify-claim-against-corpus` v0.1.0
 - License: `MIT`
 - Industry: cross_industry, media
 - Full source manifest: see `references/manifest.yaml`

@@ -27,7 +27,7 @@ region:
 
 # Code-Act Jupyter (tool-augmented reasoning via sandboxed Python)
 
-<!-- Generated from Open Harness Hub manifest `harness/code-act-jupyter` v0.1.0. Do not edit by hand; edit the source manifest and re-run `python scripts/emit/hf_model_card.py`. -->
+<!-- Generated from OpenHubForAI manifest `harness/code-act-jupyter` v0.1.0. Do not edit by hand; edit the source manifest and re-run `python scripts/emit/hf_model_card.py`. -->
 
 ## Model description
 
@@ -38,7 +38,7 @@ next turn. Loop terminates when the model emits a `<final>...
 </final>` block or `max_tool_turns` is reached.
 
 The classic AIMO-2 + ChartQA + math-reasoning shape, verified by
-Open Harness Hub mining: itahiro DeepSeek-R1-distill-7B (1399
+OpenHubForAI mining: itahiro DeepSeek-R1-distill-7B (1399
 votes), lewtun "Updated Code Interpretation" (1173), abdurrafae
 (1001), mbmmurad QwQ-32B (1097).
 
@@ -91,11 +91,11 @@ This is a workflow harness, not a trained model. Risk profile depends on the mod
 ```bibtex
 @misc{code-act-jupyter_open_harness_hub,
   title  = {Code-Act Jupyter (tool-augmented reasoning via sandboxed Python)},
-  author = {Open Harness Hub contributors},
+  author = {OpenHubForAI contributors},
   url    = {https://open-harness-hub.dev/harness/code-act-jupyter},
   version= {0.1.0},
   year   = {2026}
 }
 ```
 
-License: `MIT`. Hub artifact: `harness/code-act-jupyter`.
+License: `MIT`. Hub component: `harness/code-act-jupyter`.

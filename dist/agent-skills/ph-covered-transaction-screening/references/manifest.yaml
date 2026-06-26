@@ -1,0 +1,188 @@
+id: "pipeline/ph-covered-transaction-screening"
+type: pipeline
+version: "0.1.0"
+name: "PH AMLA covered / suspicious transaction screening"
+description: |
+  Decide whether a single Philippine financial transaction is a COVERED
+  transaction (cash threshold) and/or a SUSPICIOUS transaction under the
+  Anti-Money Laundering Act (RA 9160 as amended by RA 10365 / 10927 /
+  11521), and whether a covered/suspicious-transaction report (CTR/STR)
+  is due — and within what reporting window — without filing anything.
+
+  Negative space: a bare model cannot reliably state the PH covered-
+  transaction cash threshold, the casino threshold, the reporting window
+  to AMLC, or which suspicious indicators are enumerated in the law —
+  it confabulates US-style $10,000 CTR rules. The threshold facts and
+  the enumerated suspicious-circumstance indicators live in a governed,
+  dated Knowledge Corpus; the threshold comparison is a deterministic
+  Conditional, not a model guess. Output is a decision plus the cited
+  indicators and the reporting window, halted to human review if a
+  sanctions hit or a high-severity suspicious indicator fires.
+
+  Reference / educational only — synthetic transaction inputs; not a
+  filing engine and not legal advice. Bundle: High-precision legal /
+  regulated RAG (Bundle B) over a governed AML corpus.
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["finance", "finance.aml", "finance.kyc"]
+capability: ["classification", "verification", "retrieval", "safety_gating"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "cross_cutting.alert_review"
+freshness: "volatile"
+tags: ["ph-aml", "amla", "ra-9160", "covered-transaction", "ctr", "str", "negative-space", "bundle-b"]
+created: "2026-05-29"
+updated: "2026-05-29"
+
+task: |
+  Given one PH transaction (amount in PHP, channel, customer profile,
+  counterparty), determine: (1) is it a covered transaction by the
+  applicable cash threshold; (2) does it match an enumerated suspicious
+  circumstance; (3) is a CTR and/or STR due and by when — emitting a
+  yes/no decision with cited threshold and indicator references. Halt
+  to human review on any sanctions hit or high-severity indicator.
+pipeline_kind: "classify"
+
+inputs:
+  - name: "transaction"
+    type: "object"
+    schema: "amount_php, channel, value_date, narrative"
+  - name: "customer_profile"
+    type: "object"
+    schema: "normalized_name, customer_type, occupation, expected_activity"
+  - name: "counterparty"
+    type: "object"
+    schema: "normalized_name, country_iso2, account_ref"
+
+outputs:
+  - name: "is_covered_transaction"
+    type: "boolean"
+  - name: "covered_threshold_cited"
+    type: "object"
+  - name: "suspicious_indicators"
+    type: "object[]"
+  - name: "reporting_obligation"
+    type: "enum[none, ctr_due, str_due, ctr_and_str_due, halt_sanctions_escalation]"
+  - name: "reporting_window_days"
+    type: "number"
+  - name: "decision_rationale"
+    type: "markdown"
+
+defaults:
+  persona: "persona/aml-analyst"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/aml-red-flags-extended"
+    - "knowledge-pack/high-risk-corridors-and-sectors"
+  rule_packs:
+    - "rule-pack/financial-pii-en"
+    - "rule-pack/sanctions-screening"
+    - "rule-pack/aml-typologies-fatf"
+
+steps:
+  - id: "redact_pii"
+    kind: "harness"
+    ref: "harness/redact-pii-text"
+    inputs:
+      text: "$.inputs.transaction.narrative"
+
+  - id: "normalize_country"
+    kind: "processor"
+    ref: "processor/iso-country-normalize"
+    inputs:
+      value: "$.inputs.counterparty.country_iso2"
+
+  - id: "canonicalize_customer"
+    kind: "processor"
+    ref: "processor/name-canonicalize"
+    inputs:
+      name: "$.inputs.customer_profile.normalized_name"
+
+  # Conditional gate (P5/Trigger): sanctions-first — a hit short-circuits to escalation
+  - id: "sanctions_screen"
+    kind: "tool"
+    ref: "tool/sanctions-check"
+    inputs:
+      normalized_name: "$.steps.canonicalize_customer.output.canonical_name"
+      lists: ["ofac_sdn", "un_consolidated", "eu_consolidated", "institution_pep"]
+      threshold: 0.92
+
+  # R1 Knowledge retrieval — enumerated suspicious circumstances + thresholds (governed corpus)
+  - id: "retrieve_indicators"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/aml-red-flags-extended"
+    inputs:
+      query: "$.steps.redact_pii.output.redacted_text"
+      top_k: 8
+
+  - id: "retrieve_corridor_risk"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/high-risk-corridors-and-sectors"
+    inputs:
+      query: "$.steps.normalize_country.output.iso_country_name"
+      top_k: 4
+
+  # Deterministic typology scoring (freezable Conditional, no model tokens)
+  - id: "typology_score"
+    kind: "rule_pack"
+    ref: "rule-pack/aml-typologies-fatf"
+    inputs:
+      text: "$.steps.redact_pii.output.redacted_text"
+
+  # Action: Model Call — covered/suspicious determination, cite-or-abstain, threshold from corpus not memory
+  - id: "determine"
+    kind: "harness"
+    ref: "harness/aml-investigation"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Using ONLY the retrieved PH AMLA threshold and suspicious-circumstance references, decide: (1) is this a covered transaction by the applicable cash threshold; (2) which enumerated suspicious indicators match; (3) is a CTR and/or STR due and the reporting window in days. Cite every threshold and indicator to a retrieved reference or abstain. Do not assert intent. If a sanctions hit is present, recommend halt_sanctions_escalation."}]
+      context:
+        - "$.steps.sanctions_screen.output.matches"
+        - "$.steps.retrieve_indicators.output.docs"
+        - "$.steps.retrieve_corridor_risk.output.docs"
+        - "$.steps.typology_score.output.fired"
+        - "$.inputs.transaction"
+
+  # Post: deterministic citation-span check (every cited threshold/indicator must trace)
+  - id: "check_citations"
+    kind: "processor"
+    ref: "processor/citation-span-checker"
+    inputs:
+      trace: "$.steps.determine.output"
+      config: {}
+
+  # Stop / End guard → human review on sanctions hit OR high-severity indicator
+  - id: "escalate"
+    kind: "processor"
+    ref: "processor/escalate-human-review"
+    when: "$.steps.sanctions_screen.output.matches != [] || $.steps.typology_score.output.max_severity == 'high'"
+    inputs:
+      case_id: "$.inputs.transaction.value_date"
+      reason: "Sanctions hit or high-severity AML suspicious indicator on PH covered/suspicious transaction screen"
+      severity: "high"
+      payload: "$.steps.determine.output"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "ph-covered-transaction-screening"
+      applied_layers: ["privacy", "sanctions", "rag", "heuristic", "harness"]
+
+success_criteria:
+  - rubric: "rubric/aml-investigation-v1"
+    threshold: 0.80
+  - kind: "deterministic"
+    target: "$.steps.check_citations.output.result.pass"
+    op: "=="
+    value: true
+    severity: "critical"
+    label: "Every cited threshold and suspicious indicator traces to a retrieved reference span."
+  - kind: "deterministic"
+    target: "$.outputs.is_covered_transaction"
+    op: "in"
+    value: [true, false]
+    severity: "high"
+    label: "A boolean covered-transaction decision is produced."

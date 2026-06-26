@@ -1,0 +1,183 @@
+id: "pipeline/cfr-amendment-tracking-drift"
+type: pipeline
+version: "0.1.0"
+name: "US CFR amendment tracking and citation-drift detection"
+description: |
+  Watches a set of tracked Code of Federal Regulations sections, detects when a
+  Federal Register final rule amends them, snapshots the authoritative text,
+  computes a content-hash diff against the last known version, and emits
+  change-data-capture events plus review tickets for every downstream component
+  that cites the changed section.
+
+  Negative-space task: a bare LLM has a frozen, undated view of the CFR — it
+  cannot tell you that a section was amended last week, what the new effective
+  date is, or which of your knowledge corpora now cite stale text. It confidently
+  recites a superseded paragraph. This pipeline grounds every fact in the Federal
+  Register API (authoritative effective date + html_url), preserves an immutable
+  capture via the web archive, diffs by content hash so formatting-only edits do
+  not raise false amendments, and routes real amendments to CDC + review — the
+  source-document-to-persistent-knowledge-layer pattern applied to volatile law.
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["government.regulatory", "legal.compliance", "cross_industry"]
+capability: ["retrieval", "verification", "governance", "tool_use"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+lifecycle_position: "cross_cutting.versioning"
+freshness: "volatile"
+tags: ["cfr", "ecfr", "federal-register", "amendment-tracking", "cdc", "citation-drift", "source-of-truth"]
+created: "2026-05-29"
+updated: "2026-05-29"
+
+attribution:
+  source_url: "https://www.federalregister.gov/developers/documentation/api/v1"
+  source_kind: "other"
+  author: "Office of the Federal Register / GPO"
+  license: "public-domain"
+
+task: "Detect Federal Register amendments to tracked CFR sections, snapshot and content-hash the authoritative text, and emit CDC events plus review tickets for every downstream component that cites a changed section."
+pipeline_kind: "research_web.verified_fact_update"
+
+inputs:
+  - name: "tracked_sections"
+    type: "object[]"
+  - name: "known_versions"
+    type: "object"
+  - name: "dependency_index"
+    type: "object"
+
+outputs:
+  - name: "detected_amendments"
+    type: "object[]"
+  - name: "affected_components"
+    type: "array"
+  - name: "change_events"
+    type: "array"
+  - name: "review_tickets"
+    type: "array"
+
+defaults:
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs: ["knowledge-pack/standards-regulatory-source-map", "knowledge-pack/legal-interpretation-canons"]
+
+steps:
+  - id: "fetch_federal_register"
+    kind: "tool"
+    ref: "tool/federal-register-api"
+    inputs:
+      term: "$.inputs.tracked_sections[*].cfr_citation"
+      document_types: ["RULE"]
+      publication_date_gte: "$.inputs.known_versions.last_checked_date"
+      fields: ["title", "effective_on", "html_url", "agencies", "cfr_references", "publication_date"]
+      per_page: 50
+  - id: "normalize_effective_dates"
+    kind: "processor"
+    ref: "processor/date-parse-multiformat"
+    inputs:
+      date_text: "$.steps.fetch_federal_register.output.results[*].effective_on"
+      tz_hint: "America/New_York"
+  - id: "snapshot_authoritative_text"
+    kind: "tool"
+    ref: "tool/web-archive-snapshot-request"
+    inputs:
+      url: "$.steps.fetch_federal_register.output.results[*].html_url"
+      capture_policy: "on_change"
+      requester: "cfr-amendment-tracking-drift"
+  - id: "diff_against_known"
+    kind: "loop"
+    ref: "pattern/source-document-to-persistent-knowledge-layer"
+    inputs:
+      candidate_documents: "$.steps.fetch_federal_register.output.results"
+      known_versions: "$.inputs.known_versions"
+      capture: "$.steps.snapshot_authoritative_text.output"
+    when: "$.steps.fetch_federal_register.output.count > 0"
+  - id: "verify_official_source"
+    kind: "processor"
+    ref: "processor/official-sources-checker"
+    inputs:
+      candidates: "$.steps.diff_against_known.output.changed_documents"
+      jurisdiction_hint: "US-federal"
+      freshness_window_days: 30
+      allowlist_pack_ref: "rule-pack/web-search-allowlist-default"
+  - id: "propagate_cdc"
+    kind: "tool"
+    ref: "tool/component-cdc-planner"
+    inputs:
+      previous_versions_path: "$.inputs.known_versions.versions_path"
+      new_versions_path: "$.steps.diff_against_known.output.new_versions_path"
+      output_dir: "dist/cfr-amendment-tracking"
+      actor_type: "worker"
+      actor_ref: "cfr-amendment-tracking-drift"
+  - id: "route_review"
+    kind: "processor"
+    ref: "processor/escalate-human-review"
+    inputs:
+      trace: "$.steps.propagate_cdc.output"
+      config: { escalate_when: "effective_date_within_days < 60 or content_hash_changed" }
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "cfr-amendment-tracking-drift"
+      applied_layers: ["federal_register_api", "date_normalize", "web_archive", "content_hash_diff", "official_sources", "cdc", "review_routing"]
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.affected_components"
+    op: "!="
+    value: null
+    severity: "high"
+    label: "Affected component list is explicit even when empty (no silent drift)."
+  - kind: "deterministic"
+    target: "$.steps.verify_official_source.output.summary.all_primary"
+    op: "=="
+    value: true
+    severity: "critical"
+    label: "Every detected amendment is sourced from a primary federal authority."
+  - kind: "deterministic"
+    target: "$.change_events"
+    op: "!="
+    value: null
+    severity: "high"
+    label: "Change-event output is explicit even when no amendment was found."
+
+worked_example:
+  input:
+    tracked_sections:
+      - cfr_citation: "21 CFR 820.30"
+        topic: "Quality system regulation — design controls"
+      - cfr_citation: "40 CFR 60.18"
+        topic: "Clean Air Act — general control device requirements"
+    known_versions:
+      last_checked_date: "2026-04-01"
+      versions_path: "data/cfr-tracking/known-versions-2026-04-01.jsonl"
+      versions:
+        - cfr_citation: "21 CFR 820.30"
+          content_hash: "sha256:a1b2c3"
+          effective_on: "1996-06-01"
+    dependency_index:
+      "21 CFR 820.30": ["knowledge-pack/gxp-21-cfr-11-guidelines", "knowledge-pack/medical-device-complaint-frameworks"]
+  expected_output:
+    detected_amendments:
+      - cfr_citation: "21 CFR 820.30"
+        federal_register_title: "Medical Devices; Quality System Regulation Amendments (Harmonization with ISO 13485)"
+        html_url: "https://www.federalregister.gov/documents/2024/02/02/..."
+        effective_on: "2026-02-02"
+        agencies: ["food-and-drug-administration"]
+        previous_content_hash: "sha256:a1b2c3"
+        new_content_hash: "sha256:9f8e7d"
+        change_type: "amended"
+        archive_capture_url: "https://web.archive.org/web/2026.../federalregister.gov/..."
+    affected_components:
+      - "knowledge-pack/gxp-21-cfr-11-guidelines"
+      - "knowledge-pack/medical-device-complaint-frameworks"
+    change_events:
+      - component_id: "knowledge-pack/gxp-21-cfr-11-guidelines"
+        change_type: "source_refresh"
+        reason: "Cited section 21 CFR 820.30 amended; effective 2026-02-02."
+    review_tickets:
+      - subject: "knowledge-pack/gxp-21-cfr-11-guidelines"
+        risk: "high"
+        reason: "Effective date within 60 days and content hash changed — re-extract before next publish."

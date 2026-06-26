@@ -24,7 +24,7 @@ pretty_name: AML red flags (extended)
 
 # AML red flags (extended)
 
-<!-- Generated from Open Harness Hub manifest `knowledge-pack/aml-red-flags-extended` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
+<!-- Generated from OpenHubForAI manifest `knowledge-pack/aml-red-flags-extended` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
 
 ## Dataset description
 
@@ -64,11 +64,11 @@ A Croissant 1.0 JSON-LD record is emitted at `dist/croissant/aml-red-flags-exten
 ```bibtex
 @misc{aml-red-flags-extended_open_harness_hub,
   title  = {AML red flags (extended)},
-  author = {Open Harness Hub contributors},
+  author = {OpenHubForAI contributors},
   url    = {https://open-harness-hub.dev/knowledge-pack/aml-red-flags-extended},
   version= {0.1.0},
   year   = {2026}
 }
 ```
 
-License: `CC-BY-4.0`. Hub artifact: `knowledge-pack/aml-red-flags-extended`.
+License: `CC-BY-4.0`. Hub component: `knowledge-pack/aml-red-flags-extended`.

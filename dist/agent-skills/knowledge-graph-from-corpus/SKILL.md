@@ -12,7 +12,7 @@ documents into a graph; build community summaries via Leiden
 clustering; query via local (ego-network), global (map-reduce over
 communities), or DRIFT (primer + follow-up hybrid).
 
-Verified by Open Harness Hub clone:
+Verified by OpenHubForAI clone:
 `microsoft/graphrag/packages/graphrag/graphrag/query/structured_search/`
 contains `local_search/`, `global_search/`, `drift_search/` modules.
 
@@ -42,7 +42,7 @@ community summaries); answer queries via local / global / DRIFT search.
 
 ## Provenance
 
-- Hub artifact: `pipeline/knowledge-graph-from-corpus` v0.1.0
+- Hub component: `pipeline/knowledge-graph-from-corpus` v0.1.0
 - License: `MIT`
 - Industry: ai, cross_industry
 - Full source manifest: see `references/manifest.yaml`

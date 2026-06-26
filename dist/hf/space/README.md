@@ -1,5 +1,5 @@
 ---
-title: Open Harness Hub Playground
+title: OpenHubForAI Playground
 emoji: 🧩
 colorFrom: blue
 colorTo: gray
@@ -8,13 +8,12 @@ sdk_version: 4.40.0
 app_file: app.py
 pinned: false
 license: mit
-short_description: Browse and run harnesses + pipelines from the Open Harness Hub
-  catalog.
+short_description: Browse and run harnesses + pipelines from the OpenHubForAI catalog.
 ---
 
-# Open Harness Hub — Playground
+# OpenHubForAI — Playground
 
-Pick any pipeline from the [Open Harness Hub](https://github.com/TaylorAmarelTech/open-harness-hub)
+Pick any pipeline from the [OpenHubForAI](https://github.com/TaylorAmarelTech/open-harness-hub)
 catalog, plug in sample data, and watch the DAG execute step-by-step.
 This Space reads pipelines directly from the catalog at runtime.
 
@@ -22,20 +21,21 @@ This Space reads pipelines directly from the catalog at runtime.
 
 Snapshot at last Space build (auto-updated by CI):
 
-- **adapter**: 9
-- **benchmark**: 1
-- **dataset**: 3
-- **harness**: 5
-- **knowledge-pack**: 19
-- **pattern**: 22
-- **persona**: 13
-- **pipeline**: 36
-- **processor**: 39
-- **rubric**: 11
-- **rule-pack**: 20
-- **tool**: 6
+- **adapter**: 33
+- **benchmark**: 111
+- **dataset**: 205
+- **harness**: 195
+- **knowledge-pack**: 427
+- **logic-pack**: 2
+- **pattern**: 59
+- **persona**: 233
+- **pipeline**: 417
+- **processor**: 176
+- **rubric**: 245
+- **rule-pack**: 402
+- **tool**: 173
 
-**Total artifacts**: 184.
+**Total components**: 2678.
 
 ## Run locally
 

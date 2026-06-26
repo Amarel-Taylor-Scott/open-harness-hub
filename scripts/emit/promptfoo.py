@@ -127,7 +127,7 @@ def render(benchmark: dict, catalog: dict) -> str:
 
     yaml_out = yaml.safe_dump(config, sort_keys=False, allow_unicode=True, width=120)
     header = (
-        f"# Auto-generated from Open Harness Hub `{benchmark['id']}` "
+        f"# Auto-generated from OpenHubForAI `{benchmark['id']}` "
         f"v{benchmark.get('version','0.0.0')}.\n"
         f"# Re-run `python scripts/emit/promptfoo.py` after editing the source manifest.\n"
     )

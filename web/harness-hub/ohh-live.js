@@ -53,7 +53,7 @@
     return {
       slug: it.id, id: it.id, primitive: KIND[type] || "action", type: type,
       name: it.name, desc: it.desc, kind: kind,
-      owner: "free", // the open OpenHarnessHub catalog — every live row is the free registry
+      owner: "free", // the open OpenHubForAI catalog — every live row is the free registry
       modality: it.modality || "text",
       industry: it.industry || ((it.labels && it.labels[0]) || ""),
       license: it.license, lifecycle: it.lifecycle || "experimental",

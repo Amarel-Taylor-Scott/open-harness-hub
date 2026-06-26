@@ -15,7 +15,7 @@ Two-stage retrieval pipeline that won EEDI Mining Misconceptions:
    reranks among a fixed candidate set, never hallucinates an unseen
    ID. Optionally two-time retrieval first to refine the query.
 
-Verified by Open Harness Hub mining: jagatkiran Qwen14B-Retrieval-
+Verified by OpenHubForAI mining: jagatkiran Qwen14B-Retrieval-
 Qwen32B-logits-processor-zoo (672 votes, EEDI), aerdem4 Eedi-Qwen32B-
 vllm-with-logits-processor-zoo (594 votes, EEDI), takanashihumbert
 Eedi-Qwen-2.5-32B-AWQ-two-time-retrieval (650 votes), anhvth226 EEDI-
@@ -42,7 +42,7 @@ retrieve the top-25 candidates via embedding, then constrain a Qwen-
 
 ## Provenance
 
-- Hub artifact: `pipeline/qwen-vllm-rerank-eedi` v0.1.0
+- Hub component: `pipeline/qwen-vllm-rerank-eedi` v0.1.0
 - License: `MIT`
 - Industry: ai, education
 - Full source manifest: see `references/manifest.yaml`

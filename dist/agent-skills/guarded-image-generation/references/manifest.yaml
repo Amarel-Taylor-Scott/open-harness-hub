@@ -1,0 +1,95 @@
+id: "pipeline/guarded-image-generation"
+type: pipeline
+version: "0.1.0"
+name: "Guarded image generation (screen → generate → filter → select)"
+description: |
+  End-to-end image generation with safety and quality guards composed from
+  existing components — the multi-component shape a registry can propose that a
+  blank-canvas builder cannot: screen the prompt, generate with a local model,
+  filter illicit content, reject anatomical distortions (6 fingers, extra
+  limbs), and keep only images above an aesthetic/technical bar.
+
+  Capability lift: a raw text-to-image model has no prompt policy, no content
+  filter, and no distortion check. This pipeline adds all three around it, so
+  the delivered image is safe, anatomically sane, and the best of N candidates.
+  Swap the generator via the adapter (Flux/SDXL/hosted) without changing the guards.
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["media", "security", "cross_industry"]
+capability: ["image_synthesis", "safety_gating", "evaluation"]
+modality: ["image", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+tags: ["image-generation", "safety", "nsfw", "anatomy", "quality", "showcase", "composition"]
+created: "2026-05-27"
+updated: "2026-05-27"
+
+task: |
+  Given an image prompt (and optional style/rules), generate candidate images,
+  block illicit prompts/outputs, reject anatomically distorted results, and
+  return the highest-quality safe image with a safety/quality trace.
+pipeline_kind: "generate_image"
+
+inputs:
+  - name: "prompt"
+    type: "string"
+  - name: "n_candidates"
+    type: "integer"
+  - name: "style_pack"
+    type: "component_id"
+outputs:
+  - name: "image"
+    type: "object"
+  - name: "safety_report"
+    type: "object"
+  - name: "trace"
+    type: "object[]"
+
+defaults:
+  model_adapter: "adapter/flux-1-schnell-local"
+
+steps:
+  - id: "screen_prompt"
+    kind: "tool"
+    ref: "tool/image-prompt-safety-screen"
+    inputs:
+      prompt: "$.inputs.prompt"
+
+  - id: "generate"
+    kind: "adapter"
+    ref: "adapter/flux-1-schnell-local"
+    inputs:
+      prompt: "$.steps.screen_prompt.output.rewritten_prompt"
+      n: "$.inputs.n_candidates"
+    when: "$.steps.screen_prompt.output.allow == true"
+
+  - id: "filter_nsfw"
+    kind: "tool"
+    ref: "tool/nudenet-nsfw-image-filter"
+    inputs:
+      image: "$.steps.generate.output.images"
+
+  - id: "filter_anatomy"
+    kind: "tool"
+    ref: "tool/malformed-anatomy-detector"
+    inputs:
+      image: "$.steps.filter_nsfw.output.safe_images"
+
+  - id: "select_best"
+    kind: "tool"
+    ref: "tool/image-aesthetic-quality-scorer"
+    inputs:
+      image: "$.steps.filter_anatomy.output.passing_images"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "guarded-image-generation"
+      applied_layers: ["prompt-screen", "generate", "nsfw-filter", "anatomy-filter", "quality-select"]
+
+success_criteria:
+  - rubric: "rubric/generated-image-safety-quality"
+    threshold: 0.8

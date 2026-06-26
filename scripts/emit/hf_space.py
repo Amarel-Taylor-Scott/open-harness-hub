@@ -22,7 +22,7 @@ from scripts.emit._lib import DIST, load_catalog  # noqa: E402
 
 
 SPACE_FRONT = {
-    "title":       "Open Harness Hub Playground",
+    "title":       "OpenHubForAI Playground",
     "emoji":       "🧩",
     "colorFrom":   "blue",
     "colorTo":     "gray",
@@ -31,7 +31,7 @@ SPACE_FRONT = {
     "app_file":    "app.py",
     "pinned":      False,
     "license":     "mit",
-    "short_description": "Browse and run harnesses + pipelines from the Open Harness Hub catalog.",
+    "short_description": "Browse and run harnesses + pipelines from the OpenHubForAI catalog.",
 }
 
 
@@ -55,9 +55,9 @@ def render() -> str:
 {front_yaml}
 ---
 
-# Open Harness Hub — Playground
+# OpenHubForAI — Playground
 
-Pick any pipeline from the [Open Harness Hub](https://github.com/TaylorAmarelTech/open-harness-hub)
+Pick any pipeline from the [OpenHubForAI](https://github.com/TaylorAmarelTech/open-harness-hub)
 catalog, plug in sample data, and watch the DAG execute step-by-step.
 This Space reads pipelines directly from the catalog at runtime.
 

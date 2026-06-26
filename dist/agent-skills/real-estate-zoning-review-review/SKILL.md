@@ -1,0 +1,53 @@
+---
+name: real-estate-zoning-review-review
+description: Review real-estate zoning packets for permitted use, variances, nonconforming
+  status, parking, and permit conditions.
+when_to_use: 'Pipeline kind: review.'
+---
+
+# Real Estate Zoning Review review pipeline
+
+Benchmarkable real estate zoning review review pipeline with normalization, grep, RAG, harness review, severity calibration, evidence gaps, and risk-register output.
+
+## Task
+
+Review real-estate zoning packets for permitted use, variances, nonconforming status, parking, and permit conditions.
+
+## Steps
+
+1. **structured_to_prose** — `processor` → `processor/structured-to-prose`
+2. **redact_pii** — `processor` → `processor/redact-pii-text`
+3. **normalize_evidence** — `processor` → `processor/packet-evidence-normalizer`
+4. **grep_flags** — `rule_pack` → `rule-pack/grep-real-estate-zoning-review-flags`
+5. **retrieve_context** — `rule_pack` → `rule-pack/rag-real-estate-zoning-review-retrieval-policy`
+6. **control_matrix** — `processor` → `processor/control-matrix-builder`
+7. **review_harness** — `harness` → `harness/real-estate-zoning-review-review`
+8. **dedupe_findings** — `processor` → `processor/finding-deduplicator`
+9. **calibrate_severity** — `processor` → `processor/severity-calibrator`
+10. **extract_evidence_gaps** — `processor` → `processor/evidence-gap-extractor`
+11. **route_owners** — `processor` → `processor/remediation-owner-router`
+12. **check_citations** — `processor` → `processor/citation-span-checker`
+13. **grade** — `processor` → `processor/llm-judge`
+14. **redaction_audit** — `processor` → `processor/packet-redaction-audit`
+15. **risk_register** — `processor` → `processor/risk-register-updater`
+16. **summary** — `processor` → `processor/review-summary-composer`
+
+## Defaults
+
+- **persona**: persona/zoning-diligence-reviewer
+- **model_adapter**: adapter/ollama-default
+- **knowledge_packs**: `knowledge-pack/real-estate-zoning-review-frameworks`
+- **rule_packs**: `rule-pack/grep-real-estate-zoning-review-flags`, `rule-pack/rag-real-estate-zoning-review-retrieval-policy`
+
+## Success criteria
+
+- rubric `rubric/real-estate-zoning-review-quality-v1` threshold 0.7
+- deterministic `$.steps.redaction_audit.output.result.pass` == `True`
+- deterministic `$.steps.check_citations.output.result.pass` == `True`
+
+## Provenance
+
+- Hub component: `pipeline/real-estate-zoning-review-review` v0.1.0
+- License: `MIT`
+- Industry: real_estate.due_diligence, government.permitting
+- Full source manifest: see `references/manifest.yaml`

@@ -82,7 +82,7 @@ def render(manifest: dict, manifest_path: Path) -> str:
         "",
         f"# {manifest.get('name', slug)}",
         "",
-        f"<!-- Generated from Open Harness Hub manifest `{manifest['id']}` v{manifest.get('version','0.0.0')}. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->",
+        f"<!-- Generated from OpenHubForAI manifest `{manifest['id']}` v{manifest.get('version','0.0.0')}. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->",
         "",
         "## Dataset description",
         "",
@@ -136,7 +136,7 @@ def render(manifest: dict, manifest_path: Path) -> str:
     body.append("```bibtex")
     body.append(f"@misc{{{slug}_open_harness_hub,")
     body.append(f"  title  = {{{manifest.get('name', slug)}}},")
-    body.append(f"  author = {{Open Harness Hub contributors}},")
+    body.append(f"  author = {{OpenHubForAI contributors}},")
     body.append(f"  url    = {{https://open-harness-hub.dev/{manifest['type']}/{slug}}},")
     body.append(f"  version= {{{manifest.get('version', '0.1.0')}}},")
     body.append(f"  year   = {{2026}}")

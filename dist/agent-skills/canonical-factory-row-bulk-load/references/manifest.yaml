@@ -1,0 +1,91 @@
+id: "pipeline/canonical-factory-row-bulk-load"
+type: pipeline
+version: "0.1.0"
+name: "Canonical factory row bulk load"
+description: "Runs source governance, local relationship preflight, CSV bulk export, and object count reporting for generated-object rows that cover entities, dedupe, labels, dimensions, embeddings, review tickets, and index records."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "finance.aml", "cross_industry"]
+capability: ["governance", "retrieval", "evaluation", "serving"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["postgres", "pgvector", "bulk-load", "entity-resolution", "dedupe", "million-primitives"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Prepare high-volume generated-object shards for canonical Postgres storage with relationship checks before psql bulk loading."
+pipeline_kind: "serving"
+inputs:
+  - name: "factory_jsonl_shards"
+    type: "object"
+  - name: "database_url"
+    type: "string"
+outputs:
+  - name: "relationship_preflight_report"
+    type: "json"
+  - name: "bulk_load_manifest"
+    type: "json"
+  - name: "object_count_report"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/canonical-factory-row-patterns"
+    - "knowledge-pack/bulk-generated-object-load-patterns"
+steps:
+  - id: "source-governance"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      reason: "Generated rows must preserve source, license, trust, freshness, and privacy boundaries before database load."
+  - id: "relationship-preflight"
+    kind: "tool"
+    ref: "tool/factory-jsonl-relationship-preflight"
+    inputs:
+      source_records: "catalog/knowledge-packs/data/canonical-factory-row-patterns/source-records.jsonl"
+      normalized_objects: "catalog/knowledge-packs/data/canonical-factory-row-patterns/normalized-objects.jsonl"
+      canonical_entities: "catalog/knowledge-packs/data/canonical-factory-row-patterns/canonical-entities.jsonl"
+      object_entity_refs: "catalog/knowledge-packs/data/canonical-factory-row-patterns/object-entity-refs.jsonl"
+      dedupe_clusters: "catalog/knowledge-packs/data/canonical-factory-row-patterns/dedupe-clusters.jsonl"
+      review_tickets: "catalog/knowledge-packs/data/canonical-factory-row-patterns/review-tickets.jsonl"
+      label_assignments: "catalog/knowledge-packs/data/canonical-factory-row-patterns/label-assignments.jsonl"
+      dimension_values: "catalog/knowledge-packs/data/canonical-factory-row-patterns/dimension-values.jsonl"
+      object_embeddings: "catalog/knowledge-packs/data/canonical-factory-row-patterns/object-embeddings.jsonl"
+  - id: "bulk-copy-export"
+    kind: "tool"
+    ref: "tool/factory-jsonl-bulk-copy-loader"
+    inputs:
+      output_dir: "dist/bulk/canonical-factory-rows"
+  - id: "count-staged-and-canonical"
+    kind: "tool"
+    ref: "tool/object-count-report-generator"
+    inputs:
+      output: "dist/reports/object-count-report.json"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.relationship_preflight_report.ok"
+    op: "=="
+    value: true
+    severity: "critical"
+    label: "Local shard relationships are internally consistent."
+  - kind: "deterministic"
+    target: "$.bulk_load_manifest.load_sql"
+    op: "is_truthy"
+    value: true
+    severity: "critical"
+    label: "Bulk load SQL was emitted."
+  - kind: "semantic"
+    target: "$.bulk_load_manifest"
+    must_cover:
+      - "source governance"
+      - "dedupe clusters"
+      - "entity references"
+      - "labels and dimensions"
+      - "review tickets"
+      - "index records"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Bulk path covers canonical generated-object row families."

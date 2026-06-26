@@ -88,7 +88,7 @@ function PAttest() {
         <div className="pt-cert">
           <div className="pt-seal">✓</div>
           <h3>Provenance attestation</h3>
-          <div className="by">Verified by OpenHarnessHub</div>
+          <div className="by">Verified by OpenHubForAI</div>
           <div className="crow"><span className="k">Flow</span><span className="v">csddd-grade</span></div>
           <div className="crow"><span className="k">Sourced as of</span><span className="v">2026-05-28</span></div>
           <div className="crow"><span className="k">Valid through</span><span className="v">2026-08-26</span></div>

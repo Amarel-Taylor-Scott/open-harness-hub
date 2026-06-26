@@ -41,7 +41,7 @@ cited; PII is redacted before any external call.
 
 ## Provenance
 
-- Hub artifact: `pipeline/research-entity` v0.1.0
+- Hub component: `pipeline/research-entity` v0.1.0
 - License: `MIT`
 - Industry: cross_industry
 - Full source manifest: see `references/manifest.yaml`

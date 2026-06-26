@@ -1,0 +1,255 @@
+id: "pipeline/modern-slavery-statement-completeness"
+type: pipeline
+version: "0.1.0"
+name: "Modern-slavery statement completeness screen (UK MSA §54 / AU MSA / Canada S-211 / CA SB-657)"
+description: |
+  HIGH-PRECISION legal-disclosure pipeline. Reads a company's *published
+  modern-slavery / forced-labour transparency statement* and checks it
+  against the mandatory reporting criteria of the relevant law, returning a
+  per-criterion covered / partial / missing verdict with the exact statement
+  span and the controlling legal citation for each.
+
+  Negative-space task: a bare model asked "is this statement compliant?"
+  produces a fluent but unreliable yes/no — it does not reliably enumerate
+  the *specific* mandated criteria (UK MSA §54(5) six areas; AU MSA seven
+  mandatory criteria; Canada S-211 §11 report contents; CA SB-657 five
+  disclosure areas), and it hallucinates coverage for criteria the document
+  silently omits. The expensive, durable lift is exact-criterion mapping:
+  each required criterion must be located in the text or explicitly marked
+  absent, every verdict tied to a primary-law span. That is precisely what
+  this pipeline freezes into deterministic retrieval + a cite-or-abstain
+  judge.
+
+  Bundle: High-precision legal / regulated RAG (taxonomy Bundle B) — query
+  decomposition over the multi-criterion checklist, hybrid retrieval against
+  the due-diligence regulatory pack with source-precedence (controlling law
+  wins), a checklist evaluator, and a strict cite-every-verdict-or-mark-
+  missing judge. Output is an auditable completeness scorecard, NOT a legal
+  opinion; "missing" means the criterion was not located in the document,
+  not that the company is non-compliant.
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["esg.modern_slavery", "esg.csddd", "legal.compliance", "supply_chain.due_diligence"]
+capability: ["extraction", "retrieval", "verification", "evaluation"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "stable"
+tags: ["anti-trafficking", "modern-slavery", "msa", "s-211", "sb-657", "disclosure-completeness", "legal-rag"]
+created: "2026-05-29"
+updated: "2026-05-29"
+
+attribution:
+  source_url: "https://www.legislation.gov.uk/ukpga/2015/30/section/54"
+  source_kind: "other"
+  author: "UK Modern Slavery Act 2015 §54; Australia Modern Slavery Act 2018; Canada Fighting Against Forced Labour Act (S-211) 2024; California SB 657 (2010) — composite educational extracts"
+  license: "public-resource"
+  notes: |
+    Checks a transparency statement for completeness against published
+    mandatory reporting criteria. NOT a legal compliance opinion; surfaces
+    a per-criterion coverage scorecard for a compliance reviewer.
+
+task: "Score a published modern-slavery statement for completeness against the mandatory reporting criteria of the controlling law (covered | partial | missing), citing the statement span and the legal criterion for each."
+pipeline_kind: "evaluate"
+
+inputs:
+  - name: "statement_packet"
+    type: "string|object"
+    description: "{ statement_text: string, reporting_entity: string, governing_law: string (e.g. 'UK MSA 2015 s54' | 'AU MSA 2018' | 'CA SB-657' | 'Canada S-211'), reporting_period: string }"
+
+outputs:
+  - name: "criteria_scorecard"
+    type: "object[]"
+    description: "Each: {criterion_id, legal_citation, verdict (covered|partial|missing), statement_span|null, rationale}"
+  - name: "completeness_score"
+    type: "number"
+    description: "Share of mandatory criteria with a covered verdict."
+  - name: "missing_criteria"
+    type: "object[]"
+  - name: "evidence_gaps"
+    type: "object[]"
+
+defaults:
+  persona: "persona/esg-auditor"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs: ["knowledge-pack/csddd-and-forced-labor-indicators"]
+  rule_packs:
+    - "rule-pack/grep-apparel-forced-labor-trace-flags"
+    - "rule-pack/hybrid-retrieval-policy"
+
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.statement_packet" }
+
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+
+  - id: "decompose_criteria"
+    kind: "processor"
+    ref: "processor/sub-question-decomposer"
+    inputs:
+      question: "Which mandatory reporting criteria of the governing law are covered by this statement?"
+      context: "$.steps.redact_pii.output.text"
+
+  - id: "grep_disclosure_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-apparel-forced-labor-trace-flags"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+
+  - id: "retrieve_legal_criteria"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.steps.decompose_criteria.output.sub_questions"
+      corpus: "knowledge-pack/csddd-and-forced-labor-indicators"
+      top_k: 14
+
+  - id: "rerank_criteria"
+    kind: "processor"
+    ref: "processor/cross-encoder-reranker"
+    inputs:
+      query: "$.steps.decompose_criteria.output.sub_questions"
+      passages: "$.steps.retrieve_legal_criteria.output.passages"
+      top_k: 6
+
+  - id: "checklist_evaluate"
+    kind: "processor"
+    ref: "processor/checklist-evaluator"
+    inputs:
+      candidate: "$.steps.redact_pii.output.text"
+      criteria: "$.steps.rerank_criteria.output.passages"
+
+  - id: "grade_completeness"
+    kind: "harness"
+    ref: "harness/esg-disclosure-grading"
+    inputs:
+      packet: "$.steps.redact_pii.output.text"
+      context: "$.steps.rerank_criteria.output.passages"
+      checklist: "$.steps.checklist_evaluate.output.result"
+
+  - id: "extract_evidence_gaps"
+    kind: "processor"
+    ref: "processor/evidence-gap-extractor"
+    inputs: { trace: "$.steps.grade_completeness.output", config: {} }
+
+  - id: "check_citations"
+    kind: "processor"
+    ref: "processor/citation-span-checker"
+    inputs: { trace: "$.steps.grade_completeness.output", config: {} }
+
+  - id: "citation_coverage"
+    kind: "processor"
+    ref: "processor/citation-coverage"
+    inputs: { trace: "$.steps.grade_completeness.output", config: {} }
+
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.grade_completeness.output"
+      rubric_ref: "rubric/esg-gov-v1"
+
+  - id: "redaction_audit"
+    kind: "processor"
+    ref: "processor/packet-redaction-audit"
+    inputs: { trace: "$.steps.grade_completeness.output", config: {} }
+
+  - id: "summary"
+    kind: "processor"
+    ref: "processor/review-summary-composer"
+    inputs: { trace: "$.steps.grade_completeness.output", config: {} }
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "modern-slavery-statement-completeness"
+      applied_layers: ["privacy", "grep", "rag", "harness", "heuristic"]
+
+success_criteria:
+  - rubric: "rubric/esg-gov-v1"
+    threshold: 0.70
+  - kind: "deterministic"
+    target: "$.steps.check_citations.output.result.pass"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "every covered/partial verdict cites a statement span"
+  - kind: "deterministic"
+    target: "$.steps.citation_coverage.output.result.pass"
+    op: "=="
+    value: true
+    severity: "medium"
+    label: "all mandatory criteria are accounted for (covered, partial, or explicitly missing)"
+
+related_patterns:
+  - "pattern/two-stage-retrieve-rerank"
+  - "pattern/refuse-on-redacted"
+
+examples:
+  - name: "UK MSA s54 statement — strong on policy, silent on training"
+    input:
+      statement_packet:
+        statement_text: >
+          [Company] Modern Slavery Statement FY2025. This statement is made
+          pursuant to section 54 of the Modern Slavery Act 2015. Our business
+          and supply chains: we are a UK apparel retailer sourcing from 240
+          tier-1 suppliers across 14 countries. Policies: we maintain a Code
+          of Conduct prohibiting forced and child labour, approved by the
+          Board. Due diligence: we conduct annual third-party social audits
+          of all tier-1 sites and operate a confidential worker grievance
+          line. Risk assessment: we identify higher-risk categories using the
+          Global Slavery Index. This statement was approved by the Board of
+          Directors on 12 March 2026 and signed by the CEO.
+        reporting_entity: "[Company] plc"
+        governing_law: "UK MSA 2015 s54"
+        reporting_period: "FY2025"
+    expected_output:
+      completeness_score: 0.83
+      criteria_scorecard:
+        - criterion_id: "uk_msa_s54_5_a_org_structure"
+          legal_citation: "UK Modern Slavery Act 2015 §54(5)(a) — organisation structure, business and supply chains"
+          verdict: "covered"
+          statement_span: "UK apparel retailer sourcing from 240 tier-1 suppliers across 14 countries"
+          rationale: "Structure and supply-chain footprint disclosed."
+        - criterion_id: "uk_msa_s54_5_b_policies"
+          legal_citation: "UK Modern Slavery Act 2015 §54(5)(b) — policies in relation to slavery and human trafficking"
+          verdict: "covered"
+          statement_span: "Code of Conduct prohibiting forced and child labour, approved by the Board"
+          rationale: "Board-approved policy disclosed."
+        - criterion_id: "uk_msa_s54_5_c_due_diligence"
+          legal_citation: "UK Modern Slavery Act 2015 §54(5)(c) — due diligence processes"
+          verdict: "covered"
+          statement_span: "annual third-party social audits of all tier-1 sites and ... worker grievance line"
+          rationale: "Due-diligence processes disclosed."
+        - criterion_id: "uk_msa_s54_5_d_risk_assessment"
+          legal_citation: "UK Modern Slavery Act 2015 §54(5)(d) — risk assessment and management"
+          verdict: "covered"
+          statement_span: "identify higher-risk categories using the Global Slavery Index"
+          rationale: "Risk-assessment method disclosed."
+        - criterion_id: "uk_msa_s54_5_e_kpis_effectiveness"
+          legal_citation: "UK Modern Slavery Act 2015 §54(5)(e) — effectiveness measured against performance indicators"
+          verdict: "partial"
+          statement_span: "annual third-party social audits of all tier-1 sites"
+          rationale: "Audits imply measurement but no KPIs or effectiveness metrics are stated."
+        - criterion_id: "uk_msa_s54_5_f_training"
+          legal_citation: "UK Modern Slavery Act 2015 §54(5)(f) — training about slavery and human trafficking"
+          verdict: "missing"
+          statement_span: null
+          rationale: "No mention of staff or supplier training was located in the statement."
+      missing_criteria:
+        - criterion_id: "uk_msa_s54_5_f_training"
+          legal_citation: "UK Modern Slavery Act 2015 §54(5)(f)"
+      evidence_gaps:
+        - field: "effectiveness_kpis"
+          note: "Statement describes audits but provides no performance indicators; reviewer should confirm whether KPIs exist elsewhere."
+      notes: >
+        Six §54(5) criteria enumerated; four covered, one partial (no KPIs),
+        one missing (training). "Missing" = not located in the document, not a
+        compliance determination. Every verdict cites a primary-law criterion.

@@ -127,7 +127,7 @@ def _self_test() -> int:
         "AI Done Right",
         "Baltor governs context",
         "Teleon runs capabilities",
-        "Open*Hubs are registries",
+        "OpenHubForAI registries are discovery surfaces",
         "Discovery is not trust",
         "Output is not truth",
         "Dashboards are projection-only",

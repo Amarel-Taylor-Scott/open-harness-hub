@@ -1,0 +1,68 @@
+id: "pipeline/generated-object-count-reporting"
+type: pipeline
+version: "0.1.0"
+name: "Generated object count reporting"
+description: "Separates curated manifest count, staged JSONL rows, and canonical Postgres object rows before reporting progress toward million-object scale."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "retrieval", "evaluation", "serving"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["object-counts", "postgres", "pgvector", "jsonl", "million-primitives"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Report OpenHubForAI scale metrics without confusing YAML manifests with generated database objects."
+pipeline_kind: "evaluate"
+inputs:
+  - name: "catalog_id_index"
+    type: "json"
+  - name: "staged_jsonl_shards"
+    type: "array"
+  - name: "database_url"
+    type: "string"
+outputs:
+  - name: "object_count_report"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/object-count-db-bootstrap-patterns"
+steps:
+  - id: "count-staged-jsonl"
+    kind: "tool"
+    ref: "tool/object-count-report-generator"
+    inputs:
+      catalog_id_index: "dist/catalog-component-ids.json"
+      output: "dist/reports/object-count-report.json"
+  - id: "count-canonical-postgres"
+    kind: "tool"
+    ref: "tool/postgres-object-count-sql"
+    inputs:
+      sql_path: "db/postgres/object_count_report.sql"
+    when: "database_url is present"
+  - id: "route-missing-db-review"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      reason: "Canonical Postgres count missing; report staged JSONL count as non-authoritative."
+    when: "database_url is absent"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.object_count_report.catalog.manifest_count"
+    op: ">"
+    value: 0
+    severity: "critical"
+    label: "Manifest count is reported."
+  - kind: "semantic"
+    target: "$.object_count_report"
+    must_cover:
+      - "curated manifest count is not the same as generated object row count"
+      - "canonical generated objects are stored in Postgres and pgvector"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Report explains the metric boundary."

@@ -1,0 +1,72 @@
+id: "pipeline/data-quality-incident-review"
+type: pipeline
+version: "0.1.0"
+name: "Data Quality Incident review pipeline"
+description: "End-to-end data quality incident review with redaction, grep triage, RAG grounding, harness review, rubric scoring, and audit trace."
+authors: [{ name: "OpenHubForAI contributors" }]
+license: "MIT"
+industry: ["data_governance", "data_governance.quality"]
+capability: ["evaluation", "extraction", "retrieval", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "stable"
+tags: ["data-quality-incident", "use-case-expansion"]
+created: "2026-05-24"
+updated: "2026-05-24"
+task: "Review data quality incidents for lineage, blast radius, root cause, remediation, and consumer communication."
+pipeline_kind: "review"
+inputs:
+  - name: "packet"
+    type: "string|object"
+outputs:
+  - name: "findings"
+    type: "object[]"
+  - name: "score"
+    type: "number"
+  - name: "evidence_gaps"
+    type: "object[]"
+defaults:
+  persona: "persona/data-quality-incident-reviewer"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs: ["knowledge-pack/data-quality-incident-frameworks"]
+  rule_packs: ["rule-pack/grep-data-quality-incident-flags", "rule-pack/rag-data-quality-incident-retrieval-policy"]
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.packet" }
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+  - id: "grep_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-data-quality-incident-flags"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+  - id: "retrieve_context"
+    kind: "rule_pack"
+    ref: "rule-pack/rag-data-quality-incident-retrieval-policy"
+    inputs: { query: "$.steps.grep_flags.output.fired", corpus: "knowledge-pack/data-quality-incident-frameworks", top_k: 8 }
+  - id: "review_harness"
+    kind: "harness"
+    ref: "harness/data-quality-incident-review"
+    inputs:
+      packet: "$.steps.redact_pii.output.text"
+      context: "$.steps.retrieve_context.output.passages"
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.review_harness.output.findings"
+      rubric_ref: "rubric/data-quality-incident-quality-v1"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "data-quality-incident-review"
+      applied_layers: ["privacy", "grep", "rag", "harness", "judge"]
+success_criteria:
+  - rubric: "rubric/data-quality-incident-quality-v1"
+    threshold: 0.65

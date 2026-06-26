@@ -4,7 +4,7 @@
 
 **The spine:** help people use AI better — move each unit of work *unbounded & inefficient → most-bounded & most-efficient*, on context kept *true / current / provable*, defined by *capability*, getting *smarter over time*.
 
-**Shape:** 2 core products (Baltor, Teleon) consume content from **22 Open\*Hubs** (9 live + 13 private-bench).
+**Shape:** 2 core products (Baltor, Teleon) consume content from **22 OpenHubForAI registries** (9 live + 13 private-bench).
 
 **Amazon strategy:** Each Open*Hub is built as INTERNAL infrastructure that Baltor/Teleon consume first, with the ability to spin it out as a PUBLIC, independently-monetizable Open*Hub.io registry later — the AWS pattern (internal infra -> public revenue stream).
 
@@ -18,7 +18,7 @@ flowchart LR
   parent --> baltor
   parent --> teleon
   baltor -. depends on .-> teleon
-  subgraph live["Live Open*Hubs (9) — dual-use"]
+  subgraph live["Live OpenHubForAI registries (9) — dual-use"]
     OpenContextHub
     OpenSkillsHub
     OpenToolsHub
@@ -29,7 +29,7 @@ flowchart LR
     OpenBenchmarkHub
     OpenReviewHub
   end
-  subgraph private_bench["Private-bench Open*Hubs (13) — internal-first"]
+  subgraph private_bench["Private-bench OpenHubForAI registries (13) — internal-first"]
     OpenTemplatesHub
     OpenEndpointHub
     OpenEnvironmentHub
@@ -75,7 +75,7 @@ flowchart LR
 ```
 
 
-## Live Open\*Hubs (dual-use: open registry + internal infra)
+## Live OpenHubForAI registries (dual-use: open registry + internal infra)
 
 | Hub | Provides | Consumed by | Amazon stage |
 |---|---|---|---|
@@ -89,7 +89,7 @@ flowchart LR
 | OpenBenchmarkHub | benchmark evidence (not authority) | both | dual-use: already a live open registry AND internal infra the core consumes |
 | OpenReviewHub | capability/reproducibility review | both | dual-use: already a live open registry AND internal infra the core consumes |
 
-## Private-bench Open\*Hubs (internal-first; public-revenue candidates)
+## Private-bench OpenHubForAI registries (internal-first; public-revenue candidates)
 
 | Hub | Provides | Consumed by | Amazon stage |
 |---|---|---|---|

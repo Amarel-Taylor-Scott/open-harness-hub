@@ -45,7 +45,7 @@
   "@type": "sc:Dataset",
   "@id": "https://open-harness-hub.dev/knowledge-pack/manifest-shapes-and-conventions",
   "conformsTo": "http://mlcommons.org/croissant/1.0",
-  "name": "Open Harness Hub manifest shapes, schemas & conventions reference",
+  "name": "OpenHubForAI manifest shapes, schemas & conventions reference",
   "description": "In-catalog reference pack distilling the OHH manifest shapes for\nuse by `persona/manifest-author` and `harness/draft-manifest-\nauthor` when generating draft manifests from external knowledge\ntrees.\n\nContents:\n - **Schema summaries**: one-page distillation of each of the 14\n   component schemas under `schemas/*.schema.json` — required\n   fields, optional fields, validation gotchas.\n - **Envelope conventions**: id format, slug rules, semver,\n   license defaults, lifecycle progression, attribution.\n - **Vocabularies in-context**: industries (52+ top-level with\n   sub-industries), capabilities (~25), modalities (7), leaf-\n   types (40+), lifecycle (4), lifecycle-position (12+).\n - **Pattern library**: 20+ \"canonical example\" snippets — one\n   well-formed harness, pipeline, rule-pack (each family), tool,\n   rubric, etc. — to ground few-shot generation.\n - **Hard rules from AGENTS.md + SPEC.md §5**:\n   · Pipeline never wires raw rule packs to a model.\n   · Volatile facts go in tools/knowledge packs, not personas.\n   · Every harness declares model_targets (even if `none`).\n   · Privacy boundaries travel with the component.\n   · Reproducibility is first-class.\n   · Industry-specific concepts as leaf instances, not top-level.\n - **Curator-review etiquette**: drafts go to `catalog/_inbox/`;\n   curator promotes to live `catalog/{type}/` after review.\n - **Anti-patterns to avoid**: slug-collision, attribution-\n   stripping, vocabulary-explosion, missing-required-field,\n   placeholder text (\"TODO\", \"FIXME\", \"lorem ipsum\") in shipped\n   manifests.\n\nIntended consumers:\n - `harness/draft-manifest-author` (in-context schema reference)\n - `persona/manifest-author` (system-prompt grounding)\n - Human contributors (browsable doc page)\n\nThis pack must be REGENERATED whenever schemas/ or vocabularies/\nchange. The CI workflow `validate.yml` should add a check that\nthis pack's version matches schemas/*.schema.json + vocabularies/\nhashes (TODO; tracked in repo issues).",
   "version": "0.1.0",
   "license": "https://spdx.org/licenses/MIT.html",
@@ -53,7 +53,7 @@
   "creator": [
     {
       "@type": "sc:Person",
-      "name": "Open Harness Hub contributors"
+      "name": "OpenHubForAI contributors"
     }
   ],
   "datePublished": "2026-05-24",

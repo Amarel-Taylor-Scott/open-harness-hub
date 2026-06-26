@@ -1,0 +1,203 @@
+id: "pipeline/gemma4-trafficking-ugc-triage"
+type: pipeline
+version: "0.1.0"
+name: "Gemma-4 human-trafficking signal triage (UGC platforms)"
+description: |
+  DEFENSIVE Trust + Safety pipeline. Reviews user-generated content
+  (job posts, classifieds, escort listings, immigration forums,
+  dating-app messages) for human-trafficking RECRUITMENT and
+  SOLICITATION signals using the Polaris Project + ILO indicator
+  taxonomies, then escalates flagged posts to a human moderator queue
+  with extracted indicators, a structured statement of reasons, and
+  (when criteria met) a Polaris-hotline referral packet.
+
+  CSAM suspicion always routes to the NCMEC-referral path WITHOUT
+  model classification of suspected CSAM material, via
+  `pattern/critical-tier-output-override`. The model never describes,
+  scores, or labels suspected CSAM.
+
+  Built around the existing Gemma-4 26B vision adapter so a single
+  multimodal call can read both the post text and any attached
+  imagery; falls back to text-only Gemma-4 when no media is attached.
+
+  Composes three already-published patterns:
+    - pattern/two-stage-extract-then-judge — stage 1 extracts every
+      relevant field (advertised service, claimed identity, control
+      markers, transit cues, contact pathway, attached image
+      semantics); stage 2 (the classifier rule pack) judges the
+      extracted JSON against the Polaris typology.
+    - pattern/refuse-on-redacted — return null over hallucination on
+      missing/redacted fields. Posts with no signal short-circuit to
+      "allow" without invented findings.
+    - pattern/critical-tier-output-override — minor-age dispute OR
+      victim-disclosure OR CSAM-suspicion forces a deterministic
+      output structure (NCMEC route or trained-reviewer queue),
+      overriding any other classifier confidence.
+
+  Output is decision + severity + extracted indicators + statement of
+  reasons + (optional) Polaris/NCMEC referral packets. NEVER
+  auto-action on a single hit; >=2 co-occurring indicators OR any
+  critical-tier rule are the escalation thresholds.
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["compliance", "media", "humanitarian", "humanitarian.trafficking"]
+capability: ["safety_gating", "classification", "extraction", "evaluation"]
+modality: ["text", "image"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+tags: ["trust-and-safety", "trafficking", "anti-trafficking", "polaris", "ilo", "gemma-4", "ugc", "moderation"]
+created: "2026-05-22"
+updated: "2026-05-22"
+
+attribution:
+  source_url: "https://polarisproject.org/the-typology-of-modern-slavery/"
+  source_kind: "other"
+  author: "Polaris Project (typology); ILO (forced-labor indicator framework); UNODC (Global Report on Trafficking in Persons)"
+  license: "public-resource"
+  notes: |
+    Pipeline composes publicly-published NGO/UN indicator taxonomies
+    for moderator-queue triage. NOT a determination engine. NOT a
+    CSAM classifier (CSAM-suspicion routes keyword-only to NCMEC).
+
+task: "Triage user-generated content for trafficking signals → allow / restrict / escalate / NCMEC-route."
+pipeline_kind: "review"
+
+inputs:
+  - name: "content_packet"
+    type: "object"
+    description: "{ text: string, images: string[]|null, platform: string, post_id: string, locale: string }"
+
+outputs:
+  - name: "decision"
+    type: "string"
+    description: "allow | restrict | escalate-to-human-reviewer | route-to-ncmec | route-to-polaris-hotline"
+  - name: "severity"
+    type: "integer"
+    description: "0..4 — 0 allow, 4 critical (matches platform-moderation severity-to-action map)"
+  - name: "extracted_indicators"
+    type: "object[]"
+    description: "Each indicator: {category, rule_id, evidence_spans, confidence}"
+  - name: "statement_of_reasons"
+    type: "object"
+    description: "EU DSA Art 17 statement of reasons. Always emitted on restrict/escalate/route."
+  - name: "referral_packet"
+    type: "object|null"
+    description: "Polaris (text only) or NCMEC (18 USC 2258A) — assembled WITHOUT model classification of suspected CSAM."
+
+defaults:
+  persona: "persona/trust-and-safety-reviewer"
+  model_adapter: "adapter/gemma-4-26b-vision"
+  rule_packs:
+    - "rule-pack/grep-human-trafficking-ugc-flags"
+    - "rule-pack/classifier-trafficking-signal"
+    - "rule-pack/grep-platform-moderation-flags"
+  knowledge_packs:
+    - "knowledge-pack/platform-content-policy-frameworks"
+
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.content_packet" }
+
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+
+  - id: "grep_csam_route"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-platform-moderation-flags"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+    notes: |
+      Runs FIRST so any CSAM-referral hit short-circuits the pipeline
+      via critical-tier-output-override BEFORE the model sees the post.
+
+  - id: "grep_trafficking_signals"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-human-trafficking-ugc-flags"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+
+  - id: "stage1_extract_fields"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.redact_pii.output.text"
+      rubric_ref: "rubric/platform-moderation-quality-v1"
+    notes: |
+      Implements stage-1 of `pattern/two-stage-extract-then-judge`:
+      single extraction call lifting advertised_service, claimed_identity,
+      control_markers, transit_cues, contact_pathway, third_party
+      management signals, and image semantics. Uses the platform-
+      moderation rubric only to enforce evidence-citation discipline
+      during extraction; the typology judgment happens in stage 2.
+
+  - id: "stage2_typology_judge"
+    kind: "rule_pack"
+    ref: "rule-pack/classifier-trafficking-signal"
+    inputs:
+      extracted_json: "$.steps.stage1_extract_fields.output"
+      grep_hits:
+        - "$.steps.grep_trafficking_signals.output.fired"
+        - "$.steps.grep_csam_route.output.fired"
+
+  - id: "rag_policy_clause"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.steps.stage2_typology_judge.output.fired_categories"
+      corpus: "knowledge-pack/platform-content-policy-frameworks"
+      top_k: 6
+
+  - id: "judge_overall"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.stage2_typology_judge.output"
+      rubric_ref: "rubric/platform-moderation-quality-v1"
+
+  - id: "assemble_referral_packet"
+    kind: "processor"
+    ref: "processor/json-schema-repair"
+    inputs:
+      candidate:
+        indicators: "$.steps.stage2_typology_judge.output"
+        policy_clauses: "$.steps.rag_policy_clause.output"
+        csam_keyword_fired: "$.steps.grep_csam_route.output.fired"
+    notes: |
+      Assembly is keyword-routed. When `csam_keyword_fired` includes
+      any `ts.csam.*` category the packet is built from the 18 USC
+      2258A required-field schema WITHOUT model classification of the
+      suspected material — `processor/json-schema-repair` coerces the
+      pre-assembled keyword-derived packet into the schema, the model
+      is never shown suspected content. Otherwise the packet contains
+      the post text + extracted indicators + locale + contact-pathway
+      for routing to the human moderator queue (or jurisdiction-
+      specific hotline, e.g. Polaris in the US).
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "gemma4-trafficking-ugc-triage"
+      applied_layers:
+        - "persona"
+        - "pii_redact"
+        - "grep_csam_route"
+        - "grep_trafficking_signals"
+        - "stage1_extract"
+        - "stage2_typology_judge"
+        - "rag_policy"
+        - "judge"
+
+success_criteria:
+  - rubric: "rubric/platform-moderation-quality-v1"
+    threshold: 0.7
+
+related_patterns:
+  - "pattern/two-stage-extract-then-judge"
+  - "pattern/critical-tier-output-override"
+  - "pattern/refuse-on-redacted"
+  - "pattern/concept-graph-from-text"

@@ -17,7 +17,7 @@ pretty_name: Clinical guidelines (sample chunks)
 
 # Clinical guidelines (sample chunks)
 
-<!-- Generated from Open Harness Hub manifest `knowledge-pack/clinical-guidelines-sample` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
+<!-- Generated from OpenHubForAI manifest `knowledge-pack/clinical-guidelines-sample` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
 
 ## Dataset description
 
@@ -58,11 +58,11 @@ A Croissant 1.0 JSON-LD record is emitted at `dist/croissant/clinical-guidelines
 ```bibtex
 @misc{clinical-guidelines-sample_open_harness_hub,
   title  = {Clinical guidelines (sample chunks)},
-  author = {Open Harness Hub contributors},
+  author = {OpenHubForAI contributors},
   url    = {https://open-harness-hub.dev/knowledge-pack/clinical-guidelines-sample},
   version= {0.1.0},
   year   = {2026}
 }
 ```
 
-License: `CC-BY-4.0`. Hub artifact: `knowledge-pack/clinical-guidelines-sample`.
+License: `CC-BY-4.0`. Hub component: `knowledge-pack/clinical-guidelines-sample`.

@@ -126,7 +126,7 @@ def main() -> int:
             "component": {
                 "type":    "application",
                 "bom-ref": "ohh:catalog",
-                "name":    "Open Harness Hub catalog",
+                "name":    "OpenHubForAI catalog",
                 "version": "0.1.0",
             },
             "properties": [

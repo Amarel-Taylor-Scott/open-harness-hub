@@ -1,0 +1,78 @@
+id: "pipeline/partition-registry-replay-audit"
+type: pipeline
+version: "0.1.0"
+name: "Partition registry replay audit"
+description: "Build a registry of partition manifests and replay their index deltas to prove additive ingestion can update affected index state without rebuilding the whole catalog."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "evaluation", "governance", "serving"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.indexing"
+tags: ["partition", "index-delta", "replay", "registry", "incremental-build", "million-primitives"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Build or refresh a partition registry, replay index deltas, and emit a report that catches duplicate deltas, missing files, content-hash mismatches, and unsupported operations."
+pipeline_kind: "research_web.partition_registry_replay_audit"
+
+inputs:
+  - name: "manifest_paths"
+    type: "string[]"
+  - name: "manifest_dirs"
+    type: "string[]"
+  - name: "registry_output"
+    type: "string"
+  - name: "replay_report_output"
+    type: "string"
+outputs:
+  - name: "partition_registry"
+    type: "object"
+    schema: "schemas/partition-registry.schema.json"
+  - name: "replay_report"
+    type: "object"
+    schema: "schemas/replay-report.schema.json"
+
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/partition-replay-audit-patterns"
+
+steps:
+  - id: "load_replay_audit_patterns"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/partition-replay-audit-patterns"
+    inputs:
+      query: "partition registry replay audit idempotency content hash duplicate delta"
+      top_k: 10
+
+  - id: "build_registry_and_replay"
+    kind: "tool"
+    ref: "tool/partition-registry-replay-verifier"
+    inputs:
+      manifest_paths: "$.inputs.manifest_paths"
+      manifest_dirs: "$.inputs.manifest_dirs"
+      registry_output: "$.inputs.registry_output"
+      replay_report_output: "$.inputs.replay_report_output"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "partition-registry-replay-audit"
+      applied_layers: ["partition_registry", "index_delta_replay", "idempotency", "content_hash", "incremental_build"]
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.outputs.replay_report.ok"
+    op: "=="
+    value: true
+    label: "Replay report has no errors."
+  - kind: "deterministic"
+    target: "$.outputs.partition_registry.partition_count"
+    op: ">="
+    value: 1
+    label: "At least one partition is registered."

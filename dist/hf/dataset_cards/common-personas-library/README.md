@@ -19,7 +19,7 @@ pretty_name: Common personas / system-prompt library
 
 # Common personas / system-prompt library
 
-<!-- Generated from Open Harness Hub manifest `knowledge-pack/common-personas-library` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
+<!-- Generated from OpenHubForAI manifest `knowledge-pack/common-personas-library` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
 
 ## Dataset description
 
@@ -47,7 +47,7 @@ rewriter. Each row is a self-contained system prompt the
 
 ## Provenance
 
-- **sources**: Composed by Open Harness Hub contributors. Public domain.
+- **sources**: Composed by OpenHubForAI contributors. Public domain.
 - **collected_through**: 2026-04-30
 
 ## Croissant
@@ -59,11 +59,11 @@ A Croissant 1.0 JSON-LD record is emitted at `dist/croissant/common-personas-lib
 ```bibtex
 @misc{common-personas-library_open_harness_hub,
   title  = {Common personas / system-prompt library},
-  author = {Open Harness Hub contributors},
+  author = {OpenHubForAI contributors},
   url    = {https://open-harness-hub.dev/knowledge-pack/common-personas-library},
   version= {0.1.0},
   year   = {2026}
 }
 ```
 
-License: `CC0-1.0`. Hub artifact: `knowledge-pack/common-personas-library`.
+License: `CC0-1.0`. Hub component: `knowledge-pack/common-personas-library`.

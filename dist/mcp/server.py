@@ -1,4 +1,4 @@
-"""Open Harness Hub — MCP server stub (auto-generated).
+"""OpenHubForAI — MCP server stub (auto-generated).
 
 Run:
   pip install mcp
@@ -12097,7 +12097,7 @@ TOOLS: list[dict] = [
     {
         "name": "claude-squad-parallel-agents",
         "title": "Claude Squad parallel-agent harness",
-        "description": "Launch and coordinate multiple Claude Code agents in parallel using Git\nworktrees so each agent has an isolated working tree and can operate on a\ndifferent branch or task simultaneously without conflicting. A CLI-driven\nharness that spawns N tmux-backed agent sessions, monitors their state, and\nmerges or reviews outcomes. Suited for fan-out code tasks: parallel\nrefactors, multi-file feature generation, independent test authoring, or\nrunning this very Open Harness Hub breadth-factory batch.\n\nReference/integration contract only; verify the upstream license before\nbundling.",
+        "description": "Launch and coordinate multiple Claude Code agents in parallel using Git\nworktrees so each agent has an isolated working tree and can operate on a\ndifferent branch or task simultaneously without conflicting. A CLI-driven\nharness that spawns N tmux-backed agent sessions, monitors their state, and\nmerges or reviews outcomes. Suited for fan-out code tasks: parallel\nrefactors, multi-file feature generation, independent test authoring, or\nrunning this very OpenHubForAI breadth-factory batch.\n\nReference/integration contract only; verify the upstream license before\nbundling.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -14392,7 +14392,7 @@ TOOLS: list[dict] = [
     {
         "name": "action-sampler-multi-rollout",
         "title": "Action sampler \u2014 N parallel rollouts",
-        "description": "Sample N independent action trajectories for an agent task; return\nthe trajectories + final-state candidates for downstream judging.\nThe N candidates can be reviewed by a separate judge processor to\npick the best.\n\nVerified by Open Harness Hub clone:\n`SWE-agent/sweagent/agent/action_sampler.py`.",
+        "description": "Sample N independent action trajectories for an agent task; return\nthe trajectories + final-state candidates for downstream judging.\nThe N candidates can be reviewed by a separate judge processor to\npick the best.\n\nVerified by OpenHubForAI clone:\n`SWE-agent/sweagent/agent/action_sampler.py`.",
         "inputSchema": {
             "type": "object",
             "additionalProperties": false
@@ -14722,7 +14722,7 @@ TOOLS: list[dict] = [
     {
         "name": "runtime-tool-selector",
         "title": "Runtime tool selector (Toolformer / pydantic-ai)",
-        "description": "Given a user query + a large registry of tools, semantically select\nthe top-K most likely-relevant tools to expose to the model. Avoids\noverflowing the context window with every tool definition when only\na few apply.\n\nVerified by Open Harness Hub clone: implemented at\n`pydantic/pydantic-ai/_tool_search.py` (Toolformer-style).",
+        "description": "Given a user query + a large registry of tools, semantically select\nthe top-K most likely-relevant tools to expose to the model. Avoids\noverflowing the context window with every tool definition when only\na few apply.\n\nVerified by OpenHubForAI clone: implemented at\n`pydantic/pydantic-ai/_tool_search.py` (Toolformer-style).",
         "inputSchema": {
             "type": "object",
             "additionalProperties": false
@@ -14748,7 +14748,7 @@ TOOLS: list[dict] = [
     {
         "name": "persona-set-generator",
         "title": "Persona-set generator (STORM)",
-        "description": "Spawn N personas with distinct perspectives on a topic. Used by\nSTORM's multi-perspective curation and by multi-agent debate\npipelines. Each persona carries a role, an angle, prior knowledge\ncues, and a few biased priors the simulated dialogue can surface.\n\nVerified by Open Harness Hub clone:\n`stanford-oval/storm/knowledge_storm/storm_wiki/modules/persona_generator.py`.",
+        "description": "Spawn N personas with distinct perspectives on a topic. Used by\nSTORM's multi-perspective curation and by multi-agent debate\npipelines. Each persona carries a role, an angle, prior knowledge\ncues, and a few biased priors the simulated dialogue can surface.\n\nVerified by OpenHubForAI clone:\n`stanford-oval/storm/knowledge_storm/storm_wiki/modules/persona_generator.py`.",
         "inputSchema": {
             "type": "object",
             "additionalProperties": false
@@ -14895,6 +14895,30 @@ TOOLS: list[dict] = [
             "ohh:capability": [
                 "retrieval",
                 "reasoning"
+            ],
+            "ohh:trustBoundary": "local"
+        }
+    },
+    {
+        "name": "usage-gated-compress",
+        "title": "Usage-gated compression (prediction-error retention)",
+        "description": "Prediction-error-gated context retention (the Friston move) \u2014 keep a usage prior learned from past turns and spend token fidelity only on surprising or load-bearing context (utility + volatility + recency), compressing the predictable, re-read-as-ritual remainder to FULL/SUMMARY/HANDLE_ONLY tiers under a budget. Cross-turn + model-external (unlike H2O's attention gate or LLMLingua's per-prompt perplexity) and it cuts PREFILL re-read cost. Lossless \u2014 paged-out items keep a rehydratable handle; a prediction miss re-promotes them.",
+        "inputSchema": {
+            "type": "object",
+            "additionalProperties": false
+        },
+        "annotations": {
+            "readOnlyHint": true
+        },
+        "_meta": {
+            "ohh:componentId": "processor/usage-gated-compress",
+            "ohh:version": "0.1.0",
+            "ohh:license": "MIT",
+            "ohh:industry": [
+                "cross_industry"
+            ],
+            "ohh:capability": [
+                "summarization"
             ],
             "ohh:trustBoundary": "local"
         }
@@ -15837,7 +15861,7 @@ TOOLS: list[dict] = [
     {
         "name": "document-grader",
         "title": "Per-document relevance grader (Self-RAG)",
-        "description": "Score each retrieved document for relevance to the user query. Emits\nper-doc grade \u2208 {relevant, irrelevant, ambiguous} with a confidence\nscore. Used by Self-RAG and CRAG to filter or trigger fallback.\n\nVerified by Open Harness Hub clone: pattern shows up in Self-RAG's\nreflection-token approach and is the canonical first step of\nCorrective-RAG.",
+        "description": "Score each retrieved document for relevance to the user query. Emits\nper-doc grade \u2208 {relevant, irrelevant, ambiguous} with a confidence\nscore. Used by Self-RAG and CRAG to filter or trigger fallback.\n\nVerified by OpenHubForAI clone: pattern shows up in Self-RAG's\nreflection-token approach and is the canonical first step of\nCorrective-RAG.",
         "inputSchema": {
             "type": "object",
             "additionalProperties": false
@@ -16439,6 +16463,233 @@ TOOLS: list[dict] = [
         }
     },
     {
+        "name": "oracle-c2pa-attest",
+        "title": "Oracle C2PA attest (bind C2PA signed provenance + attestation-registry hash so an agent verifies a corpus by hash)",
+        "description": "CONTEXT-ASSURANCE component. Binds C2PA signed provenance to a governed corpus\nobject and records an attestation in a hash-addressed registry, so that a\ndownstream agent can verify a corpus BY HASH and see WHO certified it and WHEN.\nThis is the signed-provenance axis of context assurance.\n\nWHAT C2PA GIVES, AND WHAT IT DOES NOT (honest framing): C2PA is a signed\nprovenance standard \u2014 it binds ORIGIN (who produced / signed this content,\nusing a certificate-backed signature) into a tamper-evident manifest. C2PA\nattests origin, NOT correctness. This processor therefore does TWO things and\nis explicit that they are different:\n  1. C2PA signing \u2014 produce a C2PA manifest over the corpus object's\n     content_hash and origin metadata, signed by the certifying party\n     (\"oracle\"); this proves origin and tamper-evidence.\n  2. Attestation registry \u2014 record an attestation row keyed by the corpus\n     content_hash: who certified it, against which authoritative\n     source_record(s) it was checked (the freshness / integrity / reconcile\n     verdicts), and when. An agent then verifies a corpus by presenting its\n     hash and reading back the attestation: identity of the certifier PLUS the\n     assurance verdicts the certification covered.\n\nREGULATORY CONTEXT: EU AI Act Article 50 (applicable 2026-08-02) requires\nmachine-readable disclosure of AI-generated/manipulated content. A C2PA\nmanifest is a machine-readable provenance carrier that supports such\ndisclosure. This component records that binding; it does not itself adjudicate\nlegal compliance.\n\nGOVERNANCE (honest framing): this is a governed DEFINITION of a signing +\nattestation binding, not a measured-lift claim. It describes the inputs\n(corpus content_hash, certifier identity, the source_record(s) and verdicts\nthe attestation covers), the signed artifact (C2PA manifest), and the\nhash-addressed registry record. It does NOT assert a populated metric, and it\nexplicitly does NOT claim that a signature proves the corpus is correct \u2014 only\nthat origin and the recorded assurance verdicts are verifiable by hash.",
+        "inputSchema": {
+            "type": "object",
+            "additionalProperties": false
+        },
+        "annotations": {
+            "readOnlyHint": false
+        },
+        "_meta": {
+            "ohh:componentId": "processor/oracle-c2pa-attest",
+            "ohh:version": "0.1.0",
+            "ohh:license": "Apache-2.0",
+            "ohh:industry": [
+                "cross_industry",
+                "ai",
+                "media",
+                "government.regulatory"
+            ],
+            "ohh:capability": [
+                "verification",
+                "governance"
+            ],
+            "ohh:trustBoundary": "hub"
+        }
+    },
+    {
+        "name": "claim-refute",
+        "title": "Claim refute (adversarially try to refute a claim; default to refuted-if-uncertain)",
+        "description": "CONTEXT-ASSURANCE component. The SKEPTIC: instead of asking \"can I find support\nfor this claim\", it adversarially tries to REFUTE the claim, and DEFAULTS TO\nrefuted-if-uncertain. The burden of proof sits on the claim, not on the doubter.\nThis encodes the contract rule that no agent grades its own work\n(docs/codex/change-verification-contract.md, \"the verifier's duty\"): the\nrefuter is a distinct adversarial step, separate from whatever produced the\nclaim.\n\nWHY THIS AXIS: a confirmation-seeking verifier rewards plausible-sounding\noutput and is exactly how confident-but-wrong answers survive review. Inverting\nthe objective \u2014 actively search the governed evidence for a reason the claim is\nFALSE, stale, or unsupported, and treat \"no decisive support found\" as a\nrefutation rather than a pass \u2014 is the structural defense a faithfulness check\ndoes not provide.\n\nProcedure (deterministic over governed inputs):\n  1. Enumerate refutation grounds against the claim, each backed by a\n     source_record (see schemas/source-record.schema.json):\n       - direct_contradiction \u2014 an authority asserts the opposite;\n       - superseded \u2014 a later authoritative version replaced the basis;\n       - unsupported \u2014 no governed source actually supports the claim;\n       - out_of_scope \u2014 the cited source does not cover the asserted field.\n  2. Apply the burden-of-proof rule: the claim is UPHELD only when governed\n     evidence affirmatively supports it AND no refutation ground stands. If\n     support is absent, weak, or uncertain, the verdict is REFUTED \u2014 the\n     default is not \"benefit of the doubt\".\n  3. Emit a verdict: upheld | refuted | refuted_uncertain, with the warrant\n     (the strongest refutation ground and its source, or the affirmative\n     support that survived). A refuted or refuted_uncertain verdict on a\n     gating field opens a review_ticket / blocks promotion rather than serving\n     the claim.\n\nThis processor adjudicates over evidence already gathered (e.g. by\nprocessor/web-search-verify and processor/authority-fetch-diff) and is itself a\nlocal, read-only, deterministic decision \u2014 it makes no external calls.\n\nGOVERNANCE (honest framing): this is a governed DEFINITION of an adversarial\nrefutation policy, not a measured-lift claim. It describes the refutation\ngrounds, the refuted-if-uncertain default, and the deterministic warrant per\nverdict. It does NOT assert a populated refutation or error-catch number, and\nit does NOT manufacture grounds it cannot tie to a governed source.",
+        "inputSchema": {
+            "type": "object",
+            "additionalProperties": false
+        },
+        "annotations": {
+            "readOnlyHint": true
+        },
+        "_meta": {
+            "ohh:componentId": "processor/claim-refute",
+            "ohh:version": "0.1.0",
+            "ohh:license": "Apache-2.0",
+            "ohh:industry": [
+                "cross_industry",
+                "ai",
+                "government.regulatory",
+                "legal.compliance"
+            ],
+            "ohh:capability": [
+                "verification",
+                "safety",
+                "governance"
+            ],
+            "ohh:trustBoundary": "hub"
+        }
+    },
+    {
+        "name": "corpus-integrity-check",
+        "title": "Corpus integrity check (detect an internal doc that contradicts or claims to supersede the authoritative source)",
+        "description": "CONTEXT-ASSURANCE component. Detects an internal corpus document that\nCONTRADICTS the registered authoritative source, or that asserts authority it\ndoes not have (\"this policy supersedes \u2026\", \"effective immediately, overrides\n\u2026\"). This is the adversarial-integrity axis of context assurance.\n\nTHREAT MODEL (the 8-of-12 fake-policy attack): published corpus-poisoning\nresearch (BadRAG / TrojanRAG) demonstrates that a planted document can be\ncited by a majority of RAG systems as authoritative even though no\nauthoritative publisher ever issued it. Faithfulness-only evaluation does not\ncatch this: the answer faithfully reflects the corpus; the corpus is the\nattack. This processor checks the document AGAINST the authoritative\nsource_record rather than trusting the corpus as ground truth.\n\nChecks performed (deterministic over governed inputs):\n  1. Provenance binding \u2014 does the candidate document trace to a registered\n     authoritative source_record (publisher, content_hash, effective_date)?\n     An unbound document claiming authority is the primary red flag.\n  2. Supersession assertion \u2014 does the document text claim to supersede /\n     override / replace policy without a binding to an authoritative\n     publisher record that grants that authority?\n  3. Contradiction detection \u2014 does the document state a fact that directly\n     conflicts with the current authoritative source on the same field?\n  4. Verdict \u2014 pass | contradiction | unauthorized_supersession |\n     unverified_provenance, each carrying the deterministic warrant (which\n     source_record, which field, what conflict) plus a review_ticket when the\n     finding warrants human adjudication.\n\nGOVERNANCE (honest framing): this is a governed DEFINITION of an integrity\ncheck, not a measured-lift claim. It describes the threat (poisoned /\nauthority-spoofing corpus documents) and the deterministic checks against\ngoverned provenance that flag it. It does NOT assert a populated detection\nrate. The implementation is built by the code lane at the path below.",
+        "inputSchema": {
+            "type": "object",
+            "additionalProperties": false
+        },
+        "annotations": {
+            "readOnlyHint": true
+        },
+        "_meta": {
+            "ohh:componentId": "processor/corpus-integrity-check",
+            "ohh:version": "0.1.0",
+            "ohh:license": "Apache-2.0",
+            "ohh:industry": [
+                "cross_industry",
+                "ai",
+                "government.regulatory",
+                "finance"
+            ],
+            "ohh:capability": [
+                "verification",
+                "safety",
+                "governance"
+            ],
+            "ohh:trustBoundary": "hub"
+        }
+    },
+    {
+        "name": "corpus-freshness-diff",
+        "title": "Corpus freshness diff (watch an authoritative source for change; flag stale internal context)",
+        "description": "CONTEXT-ASSURANCE component. Watches a registered authoritative source for\nchange and flags internal corpus context that has gone STALE relative to it.\nThis is the freshness axis of context assurance: a corpus can be perfectly\nfaithful to what was indexed and still be wrong because the world moved.\n\nGiven a source_record describing the authoritative origin (publisher,\nsource_url, effective_date, content_hash \u2014 see schemas/source-record.schema.json)\nand the internal corpus snapshot derived from it, this processor:\n  1. Re-fetches or re-reads the authoritative source and computes its current\n     content_hash and effective_date.\n  2. Compares against the content_hash / effective_date captured when the\n     internal context was last derived.\n  3. Emits a freshness verdict per derived object: current | stale | unknown,\n     with the observed source change (hash delta, date delta) as the warrant.\n  4. Raises a staleness flag (and optional review_ticket) when the\n     authoritative source has changed but the internal context has not been\n     re-derived inside its declared freshness window.\n\nWORKED DEMO (the stale wire-transfer-limit failure): a bank's internal RAG\ncorpus encodes a daily wire-transfer limit. The authoritative limit is\npublished by the institution and changes; the internal index is rebuilt\nmonthly-or-less, so an agent answers with the old limit. This processor\nwatches the authoritative source, detects the content_hash / effective_date\nchange, and flags the internal context as STALE before the agent serves it.\n\nGOVERNANCE (honest framing): this is a governed DEFINITION of a freshness\ncheck, not a measured-lift claim. It describes WHAT is watched (a registered\nauthoritative source_record), WHEN context is considered stale (source changed\noutside the declared freshness window), and the deterministic warrant for each\nverdict (observed hash / effective_date deltas). It does not assert a populated\nlift number. The differentiator versus faithfulness-only RAG evaluation is\nthat faithfulness asks \"did the answer match the corpus\"; freshness-diff asks\n\"is the corpus still TRUE and current relative to its authoritative origin\".",
+        "inputSchema": {
+            "type": "object",
+            "additionalProperties": false
+        },
+        "annotations": {
+            "readOnlyHint": false
+        },
+        "_meta": {
+            "ohh:componentId": "processor/corpus-freshness-diff",
+            "ohh:version": "0.1.0",
+            "ohh:license": "Apache-2.0",
+            "ohh:industry": [
+                "cross_industry",
+                "finance",
+                "government.regulatory",
+                "ai"
+            ],
+            "ohh:capability": [
+                "verification",
+                "governance"
+            ],
+            "ohh:trustBoundary": "external"
+        }
+    },
+    {
+        "name": "authority-fetch-diff",
+        "title": "Authority fetch diff (fetch the cited authoritative URL and diff it against the internal claim)",
+        "description": "CONTEXT-ASSURANCE component. A BROWSER / HTTP tool: it FETCHES the cited\nauthoritative source at its URL and DIFFS the fetched content against the\ninternal claim that cites it, to detect that the claim is STALE (the authority\nchanged) or CONTRADICTED (the authority never said it). Where\nprocessor/corpus-freshness-diff watches a registered source by hash over time,\nthis tool performs the on-demand point check at verification time: \"go read the\npage the answer cites, right now, and see whether it still supports the claim\".\n\nEXTERNAL BY CONSTRUCTION (honest framing): this tool dereferences an external\nURL, so it declares trust_boundary external and side_effects external_call. The\nURL fetched is the one CITED by the claim or carried on its source_record \u2014 the\nmanifest does not embed any specific authoritative URL. Fetch policy (allowed\nschemes/hosts, redirect and size limits, timeout, robots posture) is governed\nruntime configuration, not baked in here.\n\nProcedure (over governed inputs):\n  1. Resolve the cited authoritative URL from the claim's source_record\n     (publisher, source_url, prior content_hash / effective_date \u2014 see\n     schemas/source-record.schema.json).\n  2. Fetch the live content under the governed fetch policy and compute its\n     current content_hash and, where the source exposes one, its effective_date.\n  3. Diff against the claim:\n       - freshness \u2014 compare the live content_hash / effective_date to the\n         value recorded when the claim was derived; a change outside the\n         declared window means the claim may be stale.\n       - support \u2014 check whether the live content still asserts the field the\n         claim relies on, or contradicts it. Stance is one of:\n         supports | contradicts | not_found | unreachable.\n  4. Emit a diff verdict with the warrant (observed hash / date deltas, the\n     fetched snippet bound to the field) and open a review_ticket when the\n     live authority is stale-relative, contradicts the claim, no longer\n     contains the cited field (not_found), or is unreachable.\n\nHONEST ABOUT LIMITS: a fetched page reflects what the authority publishes at\nfetch time; transient unavailability or a moved URL yields unreachable /\nnot_found rather than a silent pass \u2014 the tool defaults to flagging, never to\nassuming the claim is fine. It establishes agreement with ONE cited authority;\nbreadth across independent sources is the job of\nprocessor/multi-source-corroborate.\n\nGOVERNANCE (honest framing): this is a governed DEFINITION of a fetch-and-diff\ntool, not a measured-lift claim. It describes what is fetched (the cited URL),\nthe freshness and support diffs, and the deterministic warrant per verdict. It\ndoes NOT assert a populated detection number and does NOT invent authoritative\nURLs \u2014 the URL comes from the claim's own citation.",
+        "inputSchema": {
+            "type": "object",
+            "additionalProperties": false
+        },
+        "annotations": {
+            "readOnlyHint": false
+        },
+        "_meta": {
+            "ohh:componentId": "processor/authority-fetch-diff",
+            "ohh:version": "0.1.0",
+            "ohh:license": "Apache-2.0",
+            "ohh:industry": [
+                "cross_industry",
+                "ai",
+                "government.regulatory",
+                "finance"
+            ],
+            "ohh:capability": [
+                "verification",
+                "governance"
+            ],
+            "ohh:trustBoundary": "external"
+        }
+    },
+    {
+        "name": "multi-source-corroborate",
+        "title": "Multi-source corroborate (a claim is corroborated only when >= N independent sources agree)",
+        "description": "CONTEXT-ASSURANCE component. Decides whether a claim is CORROBORATED by\nrequiring that at least N INDEPENDENT sources agree on it. A claim supported by\none source \u2014 or supported by several sources that share a single origin \u2014 is\nNOT corroborated; a claim that any source contradicts is flagged. This is the\nruntime form of the change-verification contract (docs/codex/\nchange-verification-contract.md): >= 2 independent agreeing sources, where one\nsource \u2014 or one agent's assertion \u2014 is not corroboration.\n\nWHY THIS IS THE MOAT, NOT FAITHFULNESS: faithfulness-only RAG evaluation asks\n\"did the answer match the retrieved context\". That passes even when the context\nitself is a single unverified document (or a planted one \u2014 see\nprocessor/corpus-integrity-check). This processor instead asks \"do enough\nINDEPENDENT sources agree that this claim is TRUE\", which is the job a\nfaithfulness check structurally cannot do.\n\nProcedure (deterministic over governed inputs):\n  1. Group the supporting and contradicting evidence by the claim each piece\n     asserts, every piece carrying its source_record (publisher, origin,\n     content_hash \u2014 see schemas/source-record.schema.json).\n  2. Collapse non-independence \u2014 evidence that traces to the SAME origin\n     (same publisher, syndication root, or mirror) counts once, so a single\n     story republished N times cannot manufacture corroboration. Independence\n     is judged from governed provenance, not from text similarity.\n  3. Count independent agreement against the declared threshold N (a governed\n     parameter, default >= 2; a domain may raise it). Emit a corroboration\n     verdict: corroborated | single_source | insufficient_independent |\n     contradicted, each carrying the warrant (which independent sources agreed\n     or disagreed, and on which field).\n  4. Open a review_ticket when the verdict is single_source, contradicted, or\n     insufficient_independent on a field declared must-verify.\n\nThis processor does NOT itself fetch the web; it adjudicates evidence already\ngathered (e.g. by processor/web-search-verify and processor/authority-fetch-diff,\nwhich run under their own external trust boundary). It is therefore a local\nread-only decision over governed inputs.\n\nGOVERNANCE (honest framing): this is a governed DEFINITION of an independent-\ncorroboration rule, not a measured-lift claim. It describes the independence\ntest, the threshold N, and the deterministic verdicts and warrants. It does NOT\nassert a populated agreement rate or detection number. The implementation is\nbuilt by the code lane at the path below.",
+        "inputSchema": {
+            "type": "object",
+            "additionalProperties": false
+        },
+        "annotations": {
+            "readOnlyHint": true
+        },
+        "_meta": {
+            "ohh:componentId": "processor/multi-source-corroborate",
+            "ohh:version": "0.1.0",
+            "ohh:license": "Apache-2.0",
+            "ohh:industry": [
+                "cross_industry",
+                "ai",
+                "media.factcheck",
+                "government.regulatory"
+            ],
+            "ohh:capability": [
+                "verification",
+                "governance"
+            ],
+            "ohh:trustBoundary": "hub"
+        }
+    },
+    {
+        "name": "source-citation-trace",
+        "title": "Source citation trace (trace every claim in an answer to a cited source; flag unsupported claims)",
+        "description": "CONTEXT-ASSURANCE component. Decomposes a generated answer into its individual\nCLAIMS and traces each one to a CITED source, flagging any claim that no cited\nsource supports. It is the attribution-coverage axis: an answer can read fluent\nand even cite documents while still containing sentences that the cited\ndocuments never support (the dangling-citation / unsupported-claim failure).\n\nWHY THIS AXIS: faithfulness scored at the whole-answer level can pass while a\nminority of load-bearing sentences are uncited or mis-cited. Tracing at the\nper-claim grain makes attribution auditable: every asserted fact must point at\na source span, and the gaps are named rather than averaged away.\n\nProcedure (deterministic over governed inputs):\n  1. Segment the answer into atomic claims (one assertion each), preserving the\n     inline citation markers the answer attached to each claim.\n  2. Resolve each cited marker to a governed source span \u2014 the cited\n     source_record and the specific passage relied on (publisher, source_url,\n     content_hash, span offsets \u2014 see schemas/source-record.schema.json).\n  3. Score support per claim:\n       - supported \u2014 a resolved cited span asserts the claim;\n       - unsupported \u2014 the claim carries no citation, or its citation resolves\n         to a span that does not assert it (mis-citation);\n       - uncited \u2014 the claim has no citation marker at all.\n  4. Emit per-claim trace rows (claim text -> source span -> support status),\n     a citation-coverage summary (supported vs unsupported vs uncited counts),\n     and a review_ticket when any claim on a declared must-cite field is\n     unsupported or uncited.\n\nThis processor checks ATTRIBUTION \u2014 that each claim is tied to the source it\ncites. It does not by itself establish that the cited source is TRUE or current;\ntruth/independence is the job of processor/multi-source-corroborate and\nprocessor/claim-refute, and freshness/contradiction of the cited authority is\nthe job of processor/authority-fetch-diff. It is a local, read-only,\ndeterministic decision over the answer and its citations; it makes no external\ncalls.\n\nGOVERNANCE (honest framing): this is a governed DEFINITION of a per-claim\ncitation-trace policy, not a measured-lift claim. It describes the claim\nsegmentation, the citation-to-source-span resolution, the support statuses, and\nthe deterministic warrant (which span did or did not support each claim). It\ndoes NOT assert a populated coverage or hallucination-rate number.",
+        "inputSchema": {
+            "type": "object",
+            "additionalProperties": false
+        },
+        "annotations": {
+            "readOnlyHint": true
+        },
+        "_meta": {
+            "ohh:componentId": "processor/source-citation-trace",
+            "ohh:version": "0.1.0",
+            "ohh:license": "Apache-2.0",
+            "ohh:industry": [
+                "cross_industry",
+                "ai",
+                "media.factcheck",
+                "legal.compliance"
+            ],
+            "ohh:capability": [
+                "verification",
+                "governance"
+            ],
+            "ohh:trustBoundary": "hub"
+        }
+    },
+    {
+        "name": "cross-source-reconcile",
+        "title": "Cross-source reconcile (conflicting authorities \u2014 reconcile, then escalate to a human)",
+        "description": "CONTEXT-ASSURANCE component. When two or more REGISTERED authoritative\nsources disagree on the same fact, this processor reconciles them by governed\nprecedence rules and, when reconciliation is not deterministic, escalates to a\nhuman adjudicator rather than silently picking one. This is the\nconflicting-authority axis of context assurance.\n\nWORKED PROBLEM (agri-food double-submission): the same consignment / record is\nsubmitted to two authoritative systems and the two systems hold conflicting\nvalues for the same field (quantity, grade, certificate status). A naive RAG\npipeline retrieves whichever source ranks higher and serves a confidently\nwrong answer. This processor surfaces the conflict explicitly and routes it.\n\nReconciliation procedure (deterministic over governed inputs):\n  1. Align \u2014 group competing claims by the field they assert, each claim\n     carrying its source_record (publisher, trust_tier, effective_date,\n     content_hash \u2014 see schemas/source-record.schema.json).\n  2. Apply precedence \u2014 governed, declared precedence rules only:\n     higher trust_tier wins; on equal tier, the later effective_date wins;\n     precedence is data, not an LLM guess.\n  3. Resolve or escalate \u2014 if precedence yields a single winner, emit a\n     reconciled value WITH its warrant (which source won and why). If\n     precedence is ambiguous (equal tier and equal/unknown effective_date, or\n     a declared must-escalate field), emit no winner and open a review_ticket\n     routing the conflict to a human adjudicator (escalate.human path).\n\nGOVERNANCE (honest framing): this is a governed DEFINITION of a reconciliation\n+ escalation policy, not a measured-lift claim. It describes the conflict\nobject, the deterministic precedence rules, and the human-escalation boundary.\nIt does NOT assert a populated accuracy number. The differentiator versus\nfaithfulness-only retrieval is that the conflict between authorities is made\nexplicit and adjudicated under governance rather than hidden by ranking.",
+        "inputSchema": {
+            "type": "object",
+            "additionalProperties": false
+        },
+        "annotations": {
+            "readOnlyHint": false
+        },
+        "_meta": {
+            "ohh:componentId": "processor/cross-source-reconcile",
+            "ohh:version": "0.1.0",
+            "ohh:license": "Apache-2.0",
+            "ohh:industry": [
+                "cross_industry",
+                "agriculture",
+                "government.regulatory",
+                "supply_chain"
+            ],
+            "ohh:capability": [
+                "verification",
+                "governance",
+                "routing"
+            ],
+            "ohh:trustBoundary": "hub"
+        }
+    },
+    {
         "name": "self-refine-critique",
         "title": "Self-Refine critique loop",
         "description": "Critique-and-revise loop (Madaan et al. 2023). The same model first\ndrafts an answer, then critiques its own draft against a rubric,\nthen revises. Iterates up to `max_iterations`. Useful when a single\npass produces verbose or weakly-grounded output.",
@@ -16485,6 +16736,111 @@ TOOLS: list[dict] = [
                 "retrieval"
             ],
             "ohh:trustBoundary": "local"
+        }
+    },
+    {
+        "name": "contextual-parse",
+        "title": "Contextual AI Parse adapter (hosted document understanding \u2192 markdown + hierarchy)",
+        "description": "GOVERNED ADAPTER that WRAPS Contextual AI's hosted Parse engine\n(`POST /parse`) as an OpenHubForAI processor component. This is a\nthin wrapper over a third-party best-of-breed engine \u2014 OHH does NOT\nrebuild it. Contextual's Parse converts PDF / DOC(X) / PPT(X) / PNG /\nJPG (<300MB, <2000 pages) to clean Markdown or JSON, infers document\nhierarchy, and attaches positional metadata to each chunk\n(`parse_mode`, `enable_document_hierarchy`, `enable_split_tables`).\nOn OmniDocBench it scores 87.0 \u2014 a stronger document-understanding\nengine than OHH's local OCR/extract stand-ins.\n\nWRAP, NOT REPLACE \u2014 what OHH adds ON TOP of the external engine:\n  - PROVENANCE: every parsed chunk is bound to its source_record with\n    a content hash, so a downstream Knowledge Corpus carries where\n    each fact came from \u2014 Contextual returns text + hierarchy, but the\n    governed source binding is OHH's.\n  - MEASURED-LIFT ADMISSION: this adapter is admitted into a pipeline\n    only when paired measurement (`scripts/foundry/measure.py`) shows\n    `pipeline_score - bare_model_score > 0` AND the lift is structural\n    (`scripts/eval/reason_codes.py`); it is not admitted by vendor fiat.\n  - COMPOSITION: it slots into the seven-primitive grammar as a pre-API\n    Input/ingest step, interchangeable at the schema boundary with the\n    local-first path below.\n\nDETERMINISTIC / LOCAL FALLBACK: when no Contextual credentials are\nconfigured (or for offline / no-cloud negative-space runs), the\npipeline falls back to the local-first ingest processor\n`processor/doc-to-markdown-rag-ingest` (PyMuPDF / python-docx /\nhtml2text). The hosted path is higher-accuracy; the local path is the\nno-cloud default \u2014 complementary, not exclusive.\n\nHosted engine, external trust boundary, external_call side effect:\nrouted to the external-metered worker pool (see\ndocs/architecture/component-execution-and-runtime-routing.md). Requires\na Contextual AI API key. Cost (Contextual list pricing, 2026): $3 per\n1k pages text, $40 per 1k pages multimodal \u2014 metered per call.",
+        "inputSchema": {
+            "type": "object",
+            "additionalProperties": false
+        },
+        "annotations": {
+            "readOnlyHint": false
+        },
+        "_meta": {
+            "ohh:componentId": "processor/contextual-parse",
+            "ohh:version": "0.1.0",
+            "ohh:license": "proprietary-saas-wrapped",
+            "ohh:industry": [
+                "ai",
+                "cross_industry"
+            ],
+            "ohh:capability": [
+                "extraction",
+                "format_conversion",
+                "retrieval"
+            ],
+            "ohh:trustBoundary": "external"
+        }
+    },
+    {
+        "name": "contextual-grounded-generate",
+        "title": "Contextual AI Grounded Generate adapter (GLM \u2014 grounded LLM with inline attributions)",
+        "description": "GOVERNED ADAPTER that WRAPS Contextual AI's hosted Grounded Language\nModel (`POST /v1/generate`) as an OpenHubForAI processor component.\nThis is a thin wrapper over a third-party best-of-breed engine \u2014 OHH\ndoes NOT rebuild it. The GLM takes `messages[]` plus a `knowledge[]`\narray, prioritizes the supplied retrievals over its parametric memory,\nemits inline attributions, and supports `avoid_commentary`. It scores\n88% on Google's FACTS grounding benchmark (vs Gemini 2.0 Flash 84.6%,\nClaude 3.5 Sonnet 79.4%, GPT-4o 78.8%) \u2014 a strong grounded-generation\nengine.\n\nWRAP, NOT REPLACE \u2014 and a precise distinction OHH leads with:\ngrounding != lift. Contextual's GLM produces answers FAITHFUL to the\nretrieved documents (grounding). It does NOT measure, and does not\nclaim, the accuracy LIFT a component-over-a-corpus adds versus the same\nbare model. What OHH adds ON TOP of the external engine:\n  - PROVENANCE: the `knowledge[]` this adapter is fed comes from a\n    GOVERNED corpus (signed publisher / verified source / freshness-\n    tracked), so \"grounded\" means grounded in provenance-carrying\n    content \u2014 not merely faithful to whatever was ingested.\n  - MEASURED-LIFT ADMISSION: admitted only when paired measurement\n    (`scripts/foundry/measure.py`) shows a positive, STRUCTURAL lift\n    (`scripts/eval/reason_codes.py`) from a SEPARATE evaluator \u2014 never\n    by the vendor's model-vs-model factuality number alone.\n  - COMPOSITION: slots into the seven-primitive grammar as an API-stage\n    Action, interchangeable at the schema boundary with OHH's\n    deterministic anti-hallucination pre-pass + governed-source path.\n\nDETERMINISTIC / LOCAL FALLBACK: when no Contextual credentials are\nconfigured, the pipeline falls back to\n`processor/faithful-extract-before-model` \u2014 OHH's deterministic\nextract-before-model anti-hallucination pre-pass that injects\nmachine-readable facts verbatim before any local model call. The hosted\nGLM is a stronger grounded generator; the local path guarantees zero\nhallucination on extractable fields offline.\n\nHosted engine, external trust boundary, external_call side effect:\nrouted to the external-metered worker pool (see\ndocs/architecture/component-execution-and-runtime-routing.md). Requires\na Contextual AI API key. Cost (Contextual list pricing, 2026): $3 per M\ninput tokens / $15 per M output tokens \u2014 metered per call.",
+        "inputSchema": {
+            "type": "object",
+            "additionalProperties": false
+        },
+        "annotations": {
+            "readOnlyHint": false
+        },
+        "_meta": {
+            "ohh:componentId": "processor/contextual-grounded-generate",
+            "ohh:version": "0.1.0",
+            "ohh:license": "proprietary-saas-wrapped",
+            "ohh:industry": [
+                "ai",
+                "cross_industry"
+            ],
+            "ohh:capability": [
+                "generation",
+                "retrieval",
+                "verification"
+            ],
+            "ohh:trustBoundary": "external"
+        }
+    },
+    {
+        "name": "contextual-rerank",
+        "title": "Contextual AI Rerank adapter (ctxl-rerank-v2-instruct \u2014 instruction-following reranker)",
+        "description": "GOVERNED ADAPTER that WRAPS Contextual AI's hosted Rerank engine\n(`POST /v1/rerank`, model `ctxl-rerank-v2-instruct`, +mini / +v1) as an\nOpenHubForAI processor component. This is a thin wrapper over a\nthird-party best-of-breed engine \u2014 OHH does NOT rebuild it. Contextual's\nreranker is the first instruction-following reranker: it takes a query,\na list of candidate documents, and a natural-language instruction, and\nreturns each candidate's index + relevance score (0-1). It is SOTA on\nBEIR (61.2) and is a clearly stronger engine than OHH's local-Gemma\nreranker.\n\nWRAP, NOT REPLACE \u2014 what OHH adds ON TOP of the external engine:\n  - PROVENANCE: reranked candidates retain their source_record binding\n    and content hash, so the ordering that reaches the model is auditable\n    back to governed sources.\n  - MEASURED-LIFT ADMISSION: admitted into a pipeline only when paired\n    measurement (`scripts/foundry/measure.py`) shows a positive,\n    STRUCTURAL lift (`scripts/eval/reason_codes.py`) over the bare model\n    \u2014 never by vendor benchmark alone. Contextual publishes engine-vs-\n    engine BEIR numbers; OHH measures the lift the component adds in a\n    pipeline.\n  - COMPOSITION: slots into the seven-primitive grammar as a post-\n    retrieval Action, interchangeable at the schema boundary with the\n    local rerank path and OHH's broader retrieval family (BM25 / dense /\n    hybrid / RRF fusion / MMR / GraphRAG).\n\nDETERMINISTIC / LOCAL FALLBACK: when no Contextual credentials are\nconfigured, the pipeline falls back to `processor/gemma-reranker`\n(local Gemma via Ollama, with a deterministic BM25-order fallback that\ntags results `simulated: true`). The hosted engine is stronger; the\nlocal path keeps the pipeline shape exercisable offline.\n\nHosted engine, external trust boundary, external_call side effect:\nrouted to the external-metered worker pool (see\ndocs/architecture/component-execution-and-runtime-routing.md). Requires\na Contextual AI API key. Cost (Contextual list pricing, 2026): $0.05 per\nM tokens (instruct) / $0.02 per M tokens (mini) \u2014 metered per call.",
+        "inputSchema": {
+            "type": "object",
+            "additionalProperties": false
+        },
+        "annotations": {
+            "readOnlyHint": false
+        },
+        "_meta": {
+            "ohh:componentId": "processor/contextual-rerank",
+            "ohh:version": "0.1.0",
+            "ohh:license": "proprietary-saas-wrapped",
+            "ohh:industry": [
+                "ai",
+                "cross_industry"
+            ],
+            "ohh:capability": [
+                "reranking",
+                "retrieval"
+            ],
+            "ohh:trustBoundary": "external"
+        }
+    },
+    {
+        "name": "contextual-lmunit-judge",
+        "title": "Contextual AI LMUnit adapter (natural-language unit-test judge \u2192 1-5 score)",
+        "description": "GOVERNED ADAPTER that WRAPS Contextual AI's LMUnit evaluation model\n(`POST /lmunit`) as an OpenHubForAI processor component, selectable\nas the judge model behind OHH's `processor/llm-judge` and the rubric\ntree. This is a thin wrapper over a third-party best-of-breed engine \u2014\nOHH does NOT rebuild it. LMUnit takes {query, response, unit_test}\n(<=7000 tokens) and returns a continuous 1-5 score for that natural-\nlanguage unit test. It beats GPT-4o / Claude 3.5 as a judge on scoring\nunit tests (RewardBench2 82.1% top-2, RewardBench 93.5% top-5, SOTA on\nFLASK / BigGenBench) and is the highest-value wrap of the four:\nContextual open-sourced it in Jul 2025 (`ContextualAI/LMUnit`;\n`LMUnit-llama3.1-70b`, `LMUnit-qwen2.5-72b` on Hugging Face;\narXiv:2412.13091), so it can run hosted OR self-hosted.\n\nWRAP, NOT REPLACE \u2014 and the distinction OHH leads with: LMUnit grades\nANSWER QUALITY (it is the judge); it does NOT measure the LIFT a\npipeline-over-a-corpus adds versus the same bare model, and it carries\nno will-it-survive-the-next-model durability axis. What OHH adds ON TOP:\n  - LMUnit is the JUDGE MODEL, not the gate. OHH's two-axis admission\n    gate (`scripts/foundry/measure.py` paired pipeline-vs-bare +\n    `scripts/eval/reason_codes.py` durability_class) sits ABOVE it; the\n    judge's 1-5 score is an input to that gate, not a substitute for it.\n  - PER-DOMAIN RUBRICS: OHH's ~230 scored rubrics + verify family supply\n    the domain-specific unit tests LMUnit scores; LMUnit is one general\n    judge, the rubrics are the governed criteria.\n  - PROVENANCE & COMPOSITION: scores attach to the governed pipeline run\n    and slot into the seven-primitive grammar as a post-API evaluation\n    Action.\n\nDETERMINISTIC / LOCAL FALLBACK: when no Contextual credentials are\nconfigured, the pipeline falls back to `processor/llm-judge` (generic\nLLM-as-judge over local/frontier model targets, with deterministic\nfallback). LMUnit is a stronger judge engine; the local judge keeps\nevaluation runnable offline.\n\nHosted engine, external trust boundary, external_call side effect:\nrouted to the external-metered worker pool (see\ndocs/architecture/component-execution-and-runtime-routing.md). Requires\na Contextual AI API key for the hosted path (the open weights can run\non the local model tier). Cost (Contextual list pricing, 2026): $3 per\nM input tokens \u2014 metered per call.",
+        "inputSchema": {
+            "type": "object",
+            "additionalProperties": false
+        },
+        "annotations": {
+            "readOnlyHint": false
+        },
+        "_meta": {
+            "ohh:componentId": "processor/contextual-lmunit-judge",
+            "ohh:version": "0.1.0",
+            "ohh:license": "proprietary-saas-wrapped",
+            "ohh:industry": [
+                "ai",
+                "cross_industry"
+            ],
+            "ohh:capability": [
+                "evaluation"
+            ],
+            "ohh:trustBoundary": "external"
         }
     },
     {
@@ -16917,7 +17273,7 @@ TOOLS: list[dict] = [
     {
         "name": "community-summary-mapreduce",
         "title": "Community-summary map-reduce (GraphRAG global)",
-        "description": "Per-community map step (LLM summarizes each Leiden community), then\nreduce step combines partial answers across communities. The core\nprimitive of GraphRAG's global-search mode.\n\nVerified by Open Harness Hub clone:\n`microsoft/graphrag/packages/graphrag/graphrag/query/structured_search/global_search/`.",
+        "description": "Per-community map step (LLM summarizes each Leiden community), then\nreduce step combines partial answers across communities. The core\nprimitive of GraphRAG's global-search mode.\n\nVerified by OpenHubForAI clone:\n`microsoft/graphrag/packages/graphrag/graphrag/query/structured_search/global_search/`.",
         "inputSchema": {
             "type": "object",
             "additionalProperties": false
@@ -16943,7 +17299,7 @@ TOOLS: list[dict] = [
     {
         "name": "multi-vector-fusion",
         "title": "Multi-vector / multi-query fusion (RRF + weighted)",
-        "description": "Fuse N ranked candidate lists from independent retrievers (sparse +\ndense + graph + cross-encoder reranker output) via Reciprocal Rank\nFusion or weighted score blending. Returns a single deduped ranked\nlist.\n\nVerified by Open Harness Hub clones: shape appears in\n`Raudaschl/rag-fusion`, `superlinear-ai/raglite/_search.py`, and\n`microsoft/graphrag/global_search/`.",
+        "description": "Fuse N ranked candidate lists from independent retrievers (sparse +\ndense + graph + cross-encoder reranker output) via Reciprocal Rank\nFusion or weighted score blending. Returns a single deduped ranked\nlist.\n\nVerified by OpenHubForAI clones: shape appears in\n`Raudaschl/rag-fusion`, `superlinear-ai/raglite/_search.py`, and\n`microsoft/graphrag/global_search/`.",
         "inputSchema": {
             "type": "object",
             "additionalProperties": false
@@ -18679,6 +19035,12 @@ async def _run_two_time_retrieval(args: dict[str, Any]) -> Any:
     return {'received': args, 'tool': 'two-time-retrieval', 'status': 'stub'}
 
 
+async def _run_usage_gated_compress(args: dict[str, Any]) -> Any:
+    """Usage-gated compression (prediction-error retention) — Prediction-error-gated context retention (the Friston move) — keep a usage prior learned from past turns and spend token fidelity only on surprising or load-bearing context (utility + volatility + recency), compressing the predictable, re-read-as-ritual remainder to FULL/SUMMARY/HANDLE_ONLY tiers under a budget. Cross-turn + model-external (unlike H2O's attention gate or LLMLingua's per-prompt perplexity) and it cuts PREFILL re-read cost. Lossless — paged-out items keep a rehydratable handle; a prediction miss re-promotes them."""
+    # TODO: implement 'processor/usage-gated-compress'
+    return {'received': args, 'tool': 'usage-gated-compress', 'status': 'stub'}
+
+
 async def _run_structural_compress(args: dict[str, Any]) -> Any:
     """Structural compression (Tree-sitter) — Strip function/method bodies, keep signatures + structure (Repomix / Tree-sitter style) — ~70% token reduction on code, structure-lossless. The 'compressed' tier's structural flavor; pairs with the learned flavor (retrieval/llmlingua-compress). Ships a measured fidelity delta (verify/compression-fidelity-check)."""
     # TODO: implement 'processor/structural-compress'
@@ -19045,6 +19407,54 @@ async def _run_mcp_confluence_connector(args: dict[str, Any]) -> Any:
     return {'received': args, 'tool': 'mcp-confluence-connector', 'status': 'stub'}
 
 
+async def _run_oracle_c2pa_attest(args: dict[str, Any]) -> Any:
+    """Oracle C2PA attest (bind C2PA signed provenance + attestation-registry hash so an agent verifies a corpus by hash) — CONTEXT-ASSURANCE component. Binds C2PA signed provenance to a governed corpus"""
+    # TODO: implement 'processor/oracle-c2pa-attest'
+    return {'received': args, 'tool': 'oracle-c2pa-attest', 'status': 'stub'}
+
+
+async def _run_claim_refute(args: dict[str, Any]) -> Any:
+    """Claim refute (adversarially try to refute a claim; default to refuted-if-uncertain) — CONTEXT-ASSURANCE component. The SKEPTIC: instead of asking "can I find support"""
+    # TODO: implement 'processor/claim-refute'
+    return {'received': args, 'tool': 'claim-refute', 'status': 'stub'}
+
+
+async def _run_corpus_integrity_check(args: dict[str, Any]) -> Any:
+    """Corpus integrity check (detect an internal doc that contradicts or claims to supersede the authoritative source) — CONTEXT-ASSURANCE component. Detects an internal corpus document that"""
+    # TODO: implement 'processor/corpus-integrity-check'
+    return {'received': args, 'tool': 'corpus-integrity-check', 'status': 'stub'}
+
+
+async def _run_corpus_freshness_diff(args: dict[str, Any]) -> Any:
+    """Corpus freshness diff (watch an authoritative source for change; flag stale internal context) — CONTEXT-ASSURANCE component. Watches a registered authoritative source for"""
+    # TODO: implement 'processor/corpus-freshness-diff'
+    return {'received': args, 'tool': 'corpus-freshness-diff', 'status': 'stub'}
+
+
+async def _run_authority_fetch_diff(args: dict[str, Any]) -> Any:
+    """Authority fetch diff (fetch the cited authoritative URL and diff it against the internal claim) — CONTEXT-ASSURANCE component. A BROWSER / HTTP tool: it FETCHES the cited"""
+    # TODO: implement 'processor/authority-fetch-diff'
+    return {'received': args, 'tool': 'authority-fetch-diff', 'status': 'stub'}
+
+
+async def _run_multi_source_corroborate(args: dict[str, Any]) -> Any:
+    """Multi-source corroborate (a claim is corroborated only when >= N independent sources agree) — CONTEXT-ASSURANCE component. Decides whether a claim is CORROBORATED by"""
+    # TODO: implement 'processor/multi-source-corroborate'
+    return {'received': args, 'tool': 'multi-source-corroborate', 'status': 'stub'}
+
+
+async def _run_source_citation_trace(args: dict[str, Any]) -> Any:
+    """Source citation trace (trace every claim in an answer to a cited source; flag unsupported claims) — CONTEXT-ASSURANCE component. Decomposes a generated answer into its individual"""
+    # TODO: implement 'processor/source-citation-trace'
+    return {'received': args, 'tool': 'source-citation-trace', 'status': 'stub'}
+
+
+async def _run_cross_source_reconcile(args: dict[str, Any]) -> Any:
+    """Cross-source reconcile (conflicting authorities — reconcile, then escalate to a human) — CONTEXT-ASSURANCE component. When two or more REGISTERED authoritative"""
+    # TODO: implement 'processor/cross-source-reconcile'
+    return {'received': args, 'tool': 'cross-source-reconcile', 'status': 'stub'}
+
+
 async def _run_self_refine_critique(args: dict[str, Any]) -> Any:
     """Self-Refine critique loop — Critique-and-revise loop (Madaan et al. 2023). The same model first"""
     # TODO: implement 'processor/self-refine-critique'
@@ -19055,6 +19465,30 @@ async def _run_context_window_packer(args: dict[str, Any]) -> Any:
     """Context-window packer (Lost-in-the-middle aware) — Reorganize retrieved chunks into the model's context window so the"""
     # TODO: implement 'processor/context-window-packer'
     return {'received': args, 'tool': 'context-window-packer', 'status': 'stub'}
+
+
+async def _run_contextual_parse(args: dict[str, Any]) -> Any:
+    """Contextual AI Parse adapter (hosted document understanding → markdown + hierarchy) — GOVERNED ADAPTER that WRAPS Contextual AI's hosted Parse engine"""
+    # TODO: implement 'processor/contextual-parse'
+    return {'received': args, 'tool': 'contextual-parse', 'status': 'stub'}
+
+
+async def _run_contextual_grounded_generate(args: dict[str, Any]) -> Any:
+    """Contextual AI Grounded Generate adapter (GLM — grounded LLM with inline attributions) — GOVERNED ADAPTER that WRAPS Contextual AI's hosted Grounded Language"""
+    # TODO: implement 'processor/contextual-grounded-generate'
+    return {'received': args, 'tool': 'contextual-grounded-generate', 'status': 'stub'}
+
+
+async def _run_contextual_rerank(args: dict[str, Any]) -> Any:
+    """Contextual AI Rerank adapter (ctxl-rerank-v2-instruct — instruction-following reranker) — GOVERNED ADAPTER that WRAPS Contextual AI's hosted Rerank engine"""
+    # TODO: implement 'processor/contextual-rerank'
+    return {'received': args, 'tool': 'contextual-rerank', 'status': 'stub'}
+
+
+async def _run_contextual_lmunit_judge(args: dict[str, Any]) -> Any:
+    """Contextual AI LMUnit adapter (natural-language unit-test judge → 1-5 score) — GOVERNED ADAPTER that WRAPS Contextual AI's LMUnit evaluation model"""
+    # TODO: implement 'processor/contextual-lmunit-judge'
+    return {'received': args, 'tool': 'contextual-lmunit-judge', 'status': 'stub'}
 
 
 async def _run_nsfw_image_classifier(args: dict[str, Any]) -> Any:
@@ -19478,6 +19912,7 @@ HANDLERS = {
     'sub-question-decomposer': _run_sub_question_decomposer,
     'hyde-query-expander': _run_hyde_query_expander,
     'two-time-retrieval': _run_two_time_retrieval,
+    'usage-gated-compress': _run_usage_gated_compress,
     'structural-compress': _run_structural_compress,
     'inject-output-schema': _run_inject_output_schema,
     'inject-datetime-locale': _run_inject_datetime_locale,
@@ -19539,8 +19974,20 @@ HANDLERS = {
     'mcp-postgres-connector': _run_mcp_postgres_connector,
     'mcp-gitlab-connector': _run_mcp_gitlab_connector,
     'mcp-confluence-connector': _run_mcp_confluence_connector,
+    'oracle-c2pa-attest': _run_oracle_c2pa_attest,
+    'claim-refute': _run_claim_refute,
+    'corpus-integrity-check': _run_corpus_integrity_check,
+    'corpus-freshness-diff': _run_corpus_freshness_diff,
+    'authority-fetch-diff': _run_authority_fetch_diff,
+    'multi-source-corroborate': _run_multi_source_corroborate,
+    'source-citation-trace': _run_source_citation_trace,
+    'cross-source-reconcile': _run_cross_source_reconcile,
     'self-refine-critique': _run_self_refine_critique,
     'context-window-packer': _run_context_window_packer,
+    'contextual-parse': _run_contextual_parse,
+    'contextual-grounded-generate': _run_contextual_grounded_generate,
+    'contextual-rerank': _run_contextual_rerank,
+    'contextual-lmunit-judge': _run_contextual_lmunit_judge,
     'nsfw-image-classifier': _run_nsfw_image_classifier,
     'prompt-injection-detector': _run_prompt_injection_detector,
     'cost-meter': _run_cost_meter,

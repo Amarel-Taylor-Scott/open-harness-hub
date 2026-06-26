@@ -1,5 +1,5 @@
 /* global React, ReactDOM, useHashRoute, navigate, StoreCtx, PLanding, PBuild, PResults, PFlow, PRun, PBrowse, PDetail, PDashboard, PNotFound, PPricing, Mark, PFoundry, PImprove, PDashboards, PSettings, PRegistry, PConnect, PAdmin, PCheckout, PWorkers, PSolutions, PSolution, PFreshness, PAttest, PStatus, PActivity, PSources, PRequests, PRequestDetail, PContribute, PKnowledgeEntry, PProvenance, PTrustCenter, PAuditLog, PRoles, PSignin, POnboarding, PUpgrade, PPublish, PPreview, PUseCase, PRegistryBrowser */
-// OpenHarnessHub prototype — root app: router, shells, sidebar, command palette, toasts, scheme switcher.
+// OpenHubForAI prototype — root app: router, shells, sidebar, command palette, toasts, scheme switcher.
 
 const SCHEMES = [
   ['s', '#d6553a', 'House'], ['a', '#b8501f', 'Editorial'], ['b', '#2563eb', 'Mono'],
@@ -18,7 +18,7 @@ const NAV_GROUPS = [
   ['Account', [['Pricing', '/pricing', '$'], ['Settings', '/settings', '⚙'], ['Admin', '/admin', '⛨']]],
 ];
 // ---- OHH brand for the kit chrome ----
-const OHH_BRAND = { name: 'OpenHarnessHub', tld: '.io', glyph: '⎔', accent: 'var(--accent)' };
+const OHH_BRAND = { name: 'OpenHubForAI', realm: 'openharnesshub', tld: '.io', glyph: '⎔', accent: 'var(--accent)' };
 const OHH_GROUPS = NAV_GROUPS.map(([label, items]) => ({ label, items: items.map(([lb, p, ic]) => [p, ic, lb]), defaultOpen: ['Explore', 'Workspace'].includes(label) }));
 function ohhActive(route) {
   return (p) => route === p || (p === '/build' && route === '/results') || (p === '/components' && route.startsWith('/c/')) || (p === '/run' && route === '/flow') || (p === '/requests' && route.startsWith('/requests'));

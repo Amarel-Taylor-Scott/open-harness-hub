@@ -206,7 +206,7 @@ def write_skill(skill_dir: Path, body: str, manifest_path: Path) -> None:
 
 
 MARKETPLACE_README = dedent("""\
-    # Open Harness Hub — Agent Skills bundle
+    # OpenHubForAI — Agent Skills bundle
 
     This directory is the **Agent Skills export** of every harness and
     pipeline in the hub. Agent Skills is an open standard (agentskills.io)
@@ -278,11 +278,11 @@ def main() -> int:
     cp_dir.mkdir(parents=True, exist_ok=True)
     marketplace = {
         "name":        "open-harness-hub",
-        "description": "Harnesses + pipelines from the Open Harness Hub.",
+        "description": "Harnesses + pipelines from OpenHubForAI.",
         "plugins": [
             {
                 "name":        "open-harness-hub-skills",
-                "description": "Bundle of harness + pipeline skills emitted from the Open Harness Hub catalog.",
+                "description": "Bundle of harness + pipeline skills emitted from the OpenHubForAI catalog.",
                 "source":      ".",
                 "skills":      [f"{slug}/SKILL.md" for _, slug, _ in written],
             }

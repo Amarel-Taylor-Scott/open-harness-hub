@@ -14,7 +14,7 @@ delivering lower perplexity drop than naive nf4. The de-facto
 Kaggle pattern when you need 32B+ in 24GB of VRAM AND care about
 quality (vs bitsandbytes when you care about LoRA training).
 
-Verified by Open Harness Hub mining across 7 of 35 kernels:
+Verified by OpenHubForAI mining across 7 of 35 kernels:
 takanashihumbert EEDI-Qwen-2.5-32B-AWQ (650), yekenot AIMO-2-DeepSeek-
 R1-distill-7B-awq (1087), mbmmurad QwQ-32B-AWQ (1097), aerdem4 EEDI-
 Qwen32B-vLLM (594), jagatkiran Qwen14B + Qwen32B-AWQ (672), itahiro
@@ -39,7 +39,7 @@ logprobs. Drop-in alternative to bitsandbytes nf4.
 
 ## Provenance
 
-- Hub artifact: `pipeline/awq-quantized-inference` v0.1.0
+- Hub component: `pipeline/awq-quantized-inference` v0.1.0
 - License: `MIT`
 - Industry: ai
 - Full source manifest: see `references/manifest.yaml`

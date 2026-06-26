@@ -1,0 +1,251 @@
+id: "pipeline/clinical-dictation-soap-cite-or-abstain"
+type: pipeline
+version: "0.1.0"
+name: "Clinical dictation -> SOAP note (cite-or-abstain)"
+description: |
+  Turn a clinician's free-text dictation into a structured SOAP note
+  (Subjective / Objective / Assessment / Plan) in which every
+  Assessment and Plan claim is grounded in a cited guideline span or
+  in the dictation itself — otherwise abstain on that claim. This is
+  the High-precision clinical RAG bundle (Bundle B) wired as a
+  governed gate:
+
+   - PHI redaction (HIPAA) on the raw dictation before anything else;
+   - clinical acronym-sense disambiguation corpus resolves ambiguous
+     dictated abbreviations ("MS" = mitral stenosis vs multiple
+     sclerosis) against context BEFORE retrieval, the dominant error
+     source in dictation;
+   - hybrid retrieval over the clinical guidelines corpus, fused +
+     cross-encoder reranked;
+   - clinical-reasoner persona + clinical decision-support harness
+     drafts the SOAP note with a citation on each A/P claim;
+   - DETERMINISTIC cite-or-abstain gate: an Assessment/Plan line with
+     no citation fails citation-coverage and blocks publication —
+     the model may NOT invent a guideline-backed recommendation.
+
+  Negative-space task: dictation transcription tools paraphrase a
+  recommendation into the note that the clinician never said and no
+  guideline supports. Here unsupported A/P content is structurally
+  barred; clinical red-flags also gate for escalation.
+
+  Decision-support DRAFT for clinician review; NOT autonomous medical
+  advice. Synthetic dictation only.
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry:   ["healthcare", "healthcare.clinical"]
+capability: ["extraction", "retrieval", "verification", "evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "stable"
+tags: ["knowledge-grounded-qa", "cite-or-abstain", "bundle-b", "clinical", "soap", "dictation"]
+created: "2026-05-29"
+updated: "2026-05-29"
+
+attribution:
+  source_url: "https://www.ncbi.nlm.nih.gov/books/NBK482263/"
+  source_kind: "other"
+  author: "SOAP-note structure (public clinical-documentation standard) + composite clinical guideline samples"
+  license: "CC-BY-4.0"
+
+task: |
+  Given a clinician's free-text dictation, produce a structured SOAP
+  note where every Assessment and Plan claim cites the guideline span
+  or dictated finding that grounds it, with ambiguous acronyms
+  disambiguated against context, or abstain on that claim. Publication
+  is blocked unless citation coverage and the hallucination score
+  clear threshold.
+pipeline_kind: "extract"
+
+examples:
+  - name: "Dictation -> SOAP with acronym disambiguation + cited A/P, abstain on unsupported claim"
+    input:
+      dictation: >
+        52 yo F here for f/u of HTN. Reports good adherence to
+        lisinopril, no cough. Home BP log averages 148/92. Denies chest
+        pain, SOB. Exam: BP 150/94 in clinic, otherwise unremarkable.
+        Hx notable for MS — well controlled, no recent flares. Plan to
+        intensify antihypertensive therapy.
+      encounter_type: "office-follow-up"
+      specialty: "internal-medicine"
+    expected_output:
+      abstained: false
+      citation_coverage: 1.0
+      soap_note:
+        subjective: "52 yo F, follow-up of hypertension; good lisinopril adherence, no cough; home BP averaging 148/92; denies chest pain or shortness of breath."
+        objective: "Clinic BP 150/94; exam otherwise unremarkable."
+        assessment:
+          - claim: "Uncontrolled stage 2 hypertension (in-clinic and home readings above goal)."
+            citation: "[guideline-1] BP threshold for stage 2 (retrieved guideline span)"
+          - claim: "History of multiple sclerosis, currently stable."
+            citation: "[dictation] 'Hx notable for MS — well controlled, no recent flares'"
+        plan:
+          - claim: "Intensify antihypertensive therapy; recheck BP and basic metabolic panel before further titration."
+            citation: "[guideline-1] uncontrolled-HTN management step (retrieved guideline span)"
+      findings:
+        - type: "acronym_disambiguation"
+          token: "MS"
+          resolved_sense: "multiple sclerosis"
+          rationale: "Context 'well controlled, no recent flares' matches the demyelinating-disease sense, not mitral stenosis."
+          citation: "[acronym-corpus] MS sense set"
+        - type: "acronym_disambiguation"
+          token: "SOB"
+          resolved_sense: "shortness of breath"
+          citation: "[acronym-corpus] SOB sense set"
+      abstained_claims:
+        - drafted_claim: "Start statin for cardiovascular risk reduction."
+          reason: "No lipid panel, ASCVD risk, or guideline span retrieved to support a statin recommendation; omitted rather than fabricated."
+      notes: >
+        Every Assessment/Plan line cites a guideline span or the
+        dictation, so citation-coverage passes and the note is
+        published as a clinician-review draft. The unsupported statin
+        recommendation is abstained (dropped to abstained_claims) by the
+        cite-or-abstain gate rather than asserted.
+
+inputs:
+  - name: "dictation"
+    type: "string"
+  - name: "encounter_type"
+    type: "string"
+  - name: "specialty"
+    type: "string"
+outputs:
+  - name: "soap_note"
+    type: "object"
+  - name: "findings"
+    type: "object[]"
+  - name: "citation_coverage"
+    type: "number"
+  - name: "abstained_claims"
+    type: "object[]"
+  - name: "trace"
+    type: "object[]"
+
+defaults:
+  persona: "persona/clinical-reasoner"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/clinical-acronym-sense-disambiguation"
+    - "knowledge-pack/clinical-guidelines-sample"
+  rule_packs:
+    - "rule-pack/phi-hipaa-en"
+    - "rule-pack/clinical-red-flags"
+    - "rule-pack/hybrid-retrieval-policy"
+
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs:
+      data: "$.inputs.dictation"
+
+  - id: "redact_phi"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs:
+      text: "$.steps.structured_to_prose.output.prose"
+
+  - id: "disambiguate_acronyms"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.steps.redact_phi.output.text"
+      corpus: "knowledge-pack/clinical-acronym-sense-disambiguation"
+      top_k: 6
+
+  - id: "red_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/clinical-red-flags"
+    inputs:
+      text: "$.steps.redact_phi.output.text"
+
+  - id: "retrieve_guidelines"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.steps.redact_phi.output.text"
+      corpus: "knowledge-pack/clinical-guidelines-sample"
+      top_k: 10
+
+  - id: "rerank"
+    kind: "processor"
+    ref: "processor/cross-encoder-reranker"
+    inputs:
+      query: "$.steps.redact_phi.output.text"
+      passages: "$.steps.retrieve_guidelines.output.passages"
+      top_k: 5
+
+  - id: "draft_soap"
+    kind: "harness"
+    ref: "harness/clinical-decision-support"
+    inputs:
+      dictation: "$.steps.redact_phi.output.text"
+      acronym_senses: "$.steps.disambiguate_acronyms.output.passages"
+      context: "$.steps.rerank.output.passages"
+      red_flags: "$.steps.red_flags.output.fired"
+
+  - id: "citation_coverage"
+    kind: "processor"
+    ref: "processor/citation-coverage"
+    inputs:
+      response_markdown: "$.steps.draft_soap.output"
+
+  - id: "hallucination_check"
+    kind: "processor"
+    ref: "processor/hallucination-scorer"
+    inputs:
+      response: "$.steps.draft_soap.output"
+      prompt: "$.steps.redact_phi.output.text"
+      n_samples: 5
+
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.draft_soap.output"
+      rubric_ref: "rubric/clinical-grounded-response-v1"
+
+  - id: "redaction_audit"
+    kind: "processor"
+    ref: "processor/packet-redaction-audit"
+    inputs:
+      trace: "$.steps.draft_soap.output"
+      config: {}
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "clinical-dictation-soap-cite-or-abstain"
+      applied_layers: ["phi", "acronym_disambig", "red_flags", "rag", "rerank", "harness", "citation_coverage", "hallucination", "judge", "redaction_audit"]
+
+success_criteria:
+  - rubric: "rubric/clinical-grounded-response-v1"
+    threshold: 0.7
+    label: "SOAP note grounded + scored to rubric"
+  - kind: "deterministic"
+    target: "$.steps.citation_coverage.output.passes"
+    op: "=="
+    value: true
+    severity: "critical"
+    label: "every Assessment/Plan claim is cited (else abstain on that claim)"
+  - kind: "deterministic"
+    target: "$.steps.citation_coverage.output.coverage"
+    op: ">="
+    value: 0.9
+    severity: "critical"
+    label: "citation coverage >= 0.9"
+  - kind: "deterministic"
+    target: "$.steps.hallucination_check.output.overall_score"
+    op: "<="
+    value: 0.2
+    severity: "high"
+    label: "self-consistency hallucination score <= 0.2"
+  - kind: "deterministic"
+    target: "$.steps.redaction_audit.output.result.pass"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "PHI redaction audit passes before any output"

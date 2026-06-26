@@ -4,7 +4,7 @@ description: 'Harness that wraps a model call with a Python execution loop. The 
   emits `<code>...</code>` blocks; the harness runs them in a sandboxed Jupyter kernel;
   stdout / stderr / repr feed back into the next turn. Loop terminates when the model
   emits a `<final>... </final>` block or `max_tool_turns` is reached. The classic
-  AIMO-2 + ChartQA + math-reasoning shape, verified by Open Harness Hub mining: itahiro
+  AIMO-2 + ChartQA + math-reasoning shape, verified by OpenHubForAI mining: itahiro
   DeepSeek-R1-distill-7B (1399 votes), lewtun "Updated Code Interpretation" (1173),
   abdurrafae (1001), mbmmurad QwQ-32B (1097).'
 when_to_use: Use when the user needs reasoning. Use when the user needs tool_use.
@@ -21,7 +21,7 @@ next turn. Loop terminates when the model emits a `<final>...
 </final>` block or `max_tool_turns` is reached.
 
 The classic AIMO-2 + ChartQA + math-reasoning shape, verified by
-Open Harness Hub mining: itahiro DeepSeek-R1-distill-7B (1399
+OpenHubForAI mining: itahiro DeepSeek-R1-distill-7B (1399
 votes), lewtun "Updated Code Interpretation" (1173), abdurrafae
 (1001), mbmmurad QwQ-32B (1097).
 
@@ -64,7 +64,7 @@ votes), lewtun "Updated Code Interpretation" (1173), abdurrafae
 
 ## Provenance
 
-- Hub artifact: `harness/code-act-jupyter` v0.1.0
+- Hub component: `harness/code-act-jupyter` v0.1.0
 - License: `MIT`
 - Lifecycle: `beta`
 - Full source manifest: see `references/manifest.yaml`

@@ -81,7 +81,7 @@ def render(benchmark: dict, catalog: dict) -> str:
 
     yaml_out = yaml.safe_dump(task, sort_keys=False, allow_unicode=True, width=120)
     header = (
-        f"# Auto-generated from Open Harness Hub manifest `{benchmark['id']}` v{benchmark.get('version','0.0.0')}.\n"
+        f"# Auto-generated from OpenHubForAI manifest `{benchmark['id']}` v{benchmark.get('version','0.0.0')}.\n"
         f"# Edit the source manifest at catalog/benchmarks/{slug}.yaml and re-run\n"
         f"# `python scripts/emit/lm_eval_harness.py`.\n"
     )

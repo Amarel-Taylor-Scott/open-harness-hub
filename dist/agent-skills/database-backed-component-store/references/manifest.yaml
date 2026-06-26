@@ -1,0 +1,87 @@
+id: "pipeline/database-backed-component-store"
+type: pipeline
+version: "0.1.0"
+name: "Database-backed component store"
+description: "Routes generated factory rows into a Postgres-first component and subcomponent store plan, preserving source governance, dedupe, indexing, review, and search readiness gates."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "retrieval", "serving", "verification"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "subcomponents", "postgres", "pgvector", "database-first", "object-factory"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Plan canonical database rows for active components and subcomponents from governed factory output."
+pipeline_kind: "research_web.database_backed_component_store"
+inputs:
+  - name: "row_dir"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "component_store_plan"
+    type: "json"
+  - name: "component_candidates"
+    type: "jsonl"
+  - name: "subcomponent_candidates"
+    type: "jsonl"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/database-component-store-patterns"
+steps:
+  - id: "govern-source-rows"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_policy:
+        require_license: true
+        require_content_hash: true
+        forbid_private_source_bodies: true
+        excluded_scopes: ["insurance"]
+  - id: "plan-component-store"
+    kind: "tool"
+    ref: "tool/component-store-planner"
+    inputs:
+      row_dir: "$.inputs.row_dir"
+      output_dir: "$.inputs.output_dir"
+      run_id: "$.inputs.run_id"
+  - id: "preflight-relationships"
+    kind: "tool"
+    ref: "tool/factory-jsonl-relationship-preflight"
+    inputs:
+      reason: "Component candidates, subcomponents, source records, labels, dimensions, entity links, and review routes must stay joinable before database load."
+  - id: "route-review"
+    kind: "tool"
+    ref: "tool/object-factory-job-router"
+    inputs:
+      reason: "High-risk or low-confidence components and subcomponents should route to review before public export."
+success_criteria:
+  - kind: "deterministic"
+    target: "$.component_store_plan.component_candidate_count"
+    op: ">"
+    value: 0
+    severity: "high"
+    label: "Component candidates are planned."
+  - kind: "deterministic"
+    target: "$.component_store_plan.subcomponent_candidate_count"
+    op: ">"
+    value: "$.component_store_plan.component_candidate_count"
+    severity: "medium"
+    label: "Subcomponents are tracked separately from parent components."
+  - kind: "semantic"
+    target: "$.component_store_plan"
+    must_cover:
+      - "database backed components"
+      - "subcomponents"
+      - "source governance"
+      - "review route"
+      - "repository files are seed or export definitions"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Plan follows the north-star architecture."

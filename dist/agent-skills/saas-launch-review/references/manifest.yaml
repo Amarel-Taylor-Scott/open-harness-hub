@@ -1,0 +1,91 @@
+id: "harness/saas-launch-review"
+type: harness
+version: "0.1.0"
+name: "SaaS launch landing-page review harness"
+description: |
+  Wraps the SaaS launch review flow as a reusable harness. Reviews
+  landing-page copy + tagline + pricing + demo materials against
+  corpus norms and anti-pattern rules; produces per-aspect findings
+  with severity, observation, corpus norm, and suggested rewrite.
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry:   ["software", "creative", "cross_industry"]
+capability: ["evaluation", "extraction", "reasoning"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["saas", "launch", "product-hunt", "harness"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+kind: "model_harness"
+tier: "primary"
+applied_layers: [persona, grep, rag, tools]
+consumes: [grep_rule, rag_doc, persona_block, response_policy]
+emits: [reasoning_step, context_snippet, extracted_fact]
+logic_paths:
+  - id: "review_saas_launch"
+    label: "landing page → anti-pattern flags → corpus-norm RAG → per-aspect grade + rewrites"
+    entrypoints: ["/api/saas/launch-review"]
+    steps:
+      - "extract tagline + ICP + feature list + pricing + demo info"
+      - "fire SaaS-launch anti-pattern GREP pack"
+      - "RAG against SaaS launch best-practices pack per aspect"
+      - "judge per saas-launch-quality-v1 rubric"
+      - "propose per-finding rewrites"
+      - "emit audit trace"
+    consumes: [grep_rule, rag_doc, persona_block, response_policy]
+    emits: [reasoning_step, context_snippet, extracted_fact]
+    model_call: "required"
+    verification:
+      - "every finding has aspect + severity + suggested rewrite"
+      - "every rewrite is at most 1 sentence longer than the original"
+      - "launch-day-blocker findings explicitly flagged"
+knowledge_packs:
+  - id: "saas_launch_playbook"
+    label: "SaaS / micro-SaaS / AI-app launch playbook reference"
+    kind: knowledge_pack
+    types: [rag_doc, citation_edge]
+    required: true
+    trust_boundary: "local"
+    freshness: "dated"
+logic_packs:
+  - id: "persona_default"
+    label: "SaaS Launch Critic persona"
+    kind: logic_pack
+    types: [persona_block]
+    required: true
+model_io:
+  input:  "{landing_page_text: string, tagline: string, pricing_text: string, demo_url: string, product_category: string}"
+  output: "{grade: number, findings: object[], suggested_rewrites: object[]}"
+model_targets:
+  - id: "local_ollama"
+    label: "Local Ollama"
+    transport: "ollama"
+    role: "Default local review."
+    capabilities: [text_generation, chat]
+    required: false
+    default: true
+    trust_boundary: "local"
+  - id: "anthropic_judge"
+    label: "Anthropic Claude Sonnet"
+    transport: "anthropic"
+    role: "Optional frontier judge for high-stakes / enterprise launches."
+    capabilities: [text_generation, chat, long_context]
+    required: false
+    default: false
+    trust_boundary: "external"
+input_verification:
+  - "reject input larger than 256 KB"
+output_verification:
+  - "every finding has aspect / severity / suggested-rewrite"
+  - "rubric/saas-launch-quality-v1 score recorded"
+  - "no founder-shaming language in findings"
+privacy_boundaries:
+  raw_input:      "stays local; landing-page text is public"
+  derived_output: "may sync to hub"
+  external_calls: "only on explicit user opt-in"
+contributes_to:
+  - "pipeline/saas-launch-critique"

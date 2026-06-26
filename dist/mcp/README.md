@@ -1,4 +1,4 @@
-# Open Harness Hub — MCP server
+# OpenHubForAI — MCP server
 
 Auto-generated from the hub's `tool/*` and `processor/*` manifests.
 Re-run `python scripts/emit/mcp_server.py` to rebuild.

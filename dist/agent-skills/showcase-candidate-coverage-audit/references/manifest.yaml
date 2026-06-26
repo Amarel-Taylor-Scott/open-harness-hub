@@ -1,0 +1,76 @@
+id: "pipeline/showcase-candidate-coverage-audit"
+type: pipeline
+version: "0.1.0"
+name: "Showcase candidate coverage audit"
+description: "Compares daily showcase pipeline templates with staged component candidates and emits missing-component generation requests for weak template steps."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["planning", "retrieval", "evaluation", "governance"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.product"
+tags: ["showcase-pipelines", "coverage", "component-candidates", "gap-analysis", "daily-factory"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Audit whether generated showcase pipelines have enough staged component candidates to become credible off-the-shelf product templates."
+pipeline_kind: "research_web.showcase_candidate_coverage_audit"
+inputs:
+  - name: "template_dir"
+    type: "string"
+  - name: "normalized_objects"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "coverage_rows"
+    type: "jsonl"
+  - name: "missing_component_requests"
+    type: "jsonl"
+  - name: "coverage_summary"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/showcase-candidate-coverage-patterns"
+steps:
+  - id: "load-coverage-checks"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/showcase-candidate-coverage-patterns"
+    inputs:
+      query: "showcase pipeline template step coverage missing component generation request"
+      top_k: 20
+  - id: "score-showcase-coverage"
+    kind: "tool"
+    ref: "tool/showcase-candidate-coverage-reporter"
+    inputs:
+      template_dir: "$.inputs.template_dir"
+      normalized_objects: "$.inputs.normalized_objects"
+      output_dir: "$.inputs.output_dir"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.score-showcase-coverage.template_count"
+    op: ">="
+    value: 5
+    severity: "high"
+    label: "Daily showcase templates are included in coverage scoring."
+  - kind: "deterministic"
+    target: "$.score-showcase-coverage.candidate_count"
+    op: ">="
+    value: 1000
+    severity: "high"
+    label: "Coverage is scored against a meaningful staged candidate pool."
+  - kind: "semantic"
+    target: "$.score-showcase-coverage"
+    must_cover:
+      - "covered"
+      - "partial"
+      - "missing"
+      - "generation requests"
+      - "no promotion side effect"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Coverage report preserves review and generation boundaries."

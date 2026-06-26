@@ -1,0 +1,92 @@
+id: "pipeline/dedupe-resolution-plan"
+type: pipeline
+version: "0.1.0"
+name: "Dedupe resolution plan"
+description: "Creates CSV, JSONL, and SQL load bundles that resolve dedupe clusters separately from content approval and active component promotion."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["evaluation", "governance", "routing", "verification"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "dedupe", "entity-resolution", "review-gate", "postgres", "quality-index"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Create a review-gated Postgres load plan for dedupe resolutions, quality index rows, review tickets, and candidate dedupe review updates."
+pipeline_kind: "research_web.dedupe_resolution_plan"
+inputs:
+  - name: "dedupe_clusters_path"
+    type: "string"
+  - name: "normalized_objects_path"
+    type: "string"
+  - name: "component_candidates_path"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "dedupe_resolution_plan"
+    type: "json"
+  - name: "dedupe_resolutions_jsonl"
+    type: "jsonl"
+  - name: "dedupe_resolutions_csv"
+    type: "csv"
+  - name: "dedupe_index_records_csv"
+    type: "csv"
+  - name: "dedupe_review_tickets_csv"
+    type: "csv"
+  - name: "candidate_dedupe_review_updates_csv"
+    type: "csv"
+  - name: "load_sql"
+    type: "sql"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/dedupe-resolution-patterns"
+steps:
+  - id: "load-dedupe-resolution-checks"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/dedupe-resolution-patterns"
+    inputs:
+      query: "dedupe resolution singleton merge review content approval boundary postgres load"
+      top_k: 20
+  - id: "plan-dedupe-resolution"
+    kind: "tool"
+    ref: "tool/dedupe-resolution-planner"
+    inputs:
+      dedupe_clusters_path: "$.inputs.dedupe_clusters_path"
+      normalized_objects_path: "$.inputs.normalized_objects_path"
+      component_candidates_path: "$.inputs.component_candidates_path"
+      output_dir: "$.inputs.output_dir"
+  - id: "audit-staged-vs-committed"
+    kind: "tool"
+    ref: "tool/staged-vs-committed-load-auditor"
+    inputs:
+      reason: "After psql execution, compare dedupe resolution, review ticket, index, and candidate update counts with planned counts."
+success_criteria:
+  - kind: "deterministic"
+    target: "$.dedupe_resolution_plan.dedupe_resolution_count"
+    op: ">"
+    value: 0
+    severity: "high"
+    label: "Dedupe resolution decisions are exported."
+  - kind: "deterministic"
+    target: "$.dedupe_resolution_plan.candidate_dedupe_update_count"
+    op: ">"
+    value: 0
+    severity: "medium"
+    label: "Candidate dedupe review updates are exported."
+  - kind: "semantic"
+    target: "$.dedupe_resolution_plan"
+    must_cover:
+      - "dedupe resolution"
+      - "content approval remains separate"
+      - "quality index records"
+      - "review tickets"
+      - "candidate updates"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Dedupe resolution preserves review-gated publication flow."

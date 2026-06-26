@@ -13,7 +13,7 @@ graph TD
   end
   subgraph OPEN["Open ecosystem = the STORE (both products consume)"]
     OHH["OpenHarnessHub + CapabilityTask Spec (open)"]
-    HUBS["22 Open*Hubs — the component store<br/>context · tools · models · steps · DAG · reconciliation/robustness/enrichment rules · modules<br/>9 live · 13 private-bench"]
+    HUBS["22 OpenHubForAI registries — the component store<br/>context · tools · models · steps · DAG · reconciliation/robustness/enrichment rules · modules<br/>9 live · 13 private-bench"]
   end
   SRC[("public / regulated sources")]
   AGENTS(("AI agents"))
@@ -36,9 +36,9 @@ graph TD
 1. **AI Done Right** — parent / holding brand (the *promise*, not a product; owns no runtime/customer data).
 2. **Baltor** (its own product) — **fully managed governed context**, company / department / initiative-wide (Verified · Current · Provable; receipts + CDC; first wedge = compliance / AML / sanctions). Governs what becomes TRUE. *Powered by Teleon.*
 3. **Teleon** (its own product + the runtime) — **program a capability in plain text**; it adapts to the most **efficient + bounded** form within your guardrails (the descent), receipt-backed. Governs what becomes EFFICIENT.
-4. **OpenHarnessHub + the 22 Open\*Hubs = the STORE** — a shared catalog of reusable components (context, tools, models, steps, DAG components, reconciliation/robustness/enrichment rules, predefined modules) that **both Baltor and Teleon consume**. **Code-import law (enforced): Baltor → Teleon → OpenHarnessHub, never the reverse; the store is consumed at the content level by both.**
+4. **OpenHarnessHub + the 22 OpenHubForAI registries = the STORE** — a shared catalog of reusable components (context, tools, models, steps, DAG components, reconciliation/robustness/enrichment rules, predefined modules) that **both Baltor and Teleon consume**. **Code-import law (enforced): Baltor → Teleon → OpenHarnessHub, never the reverse; the store is consumed at the content level by both.**
 
-### Open\*Hub roster (9 live · 13 private-bench = 22)
+### OpenHubForAI roster (9 live · 13 private-bench = 22)
 - **Live:** OpenContextHub, OpenSkillsHub, OpenToolsHub, OpenSkillToTool, OpenHarnessHub, OpenMCPHub, OpenCompressionHub, OpenBenchmarkHub, OpenReviewHub
 - **Private-bench:** OpenTemplatesHub, OpenEndpointHub, OpenEnvironmentHub, OpenSandboxHub, OpenAgentHub, OpenReceiptHub, OpenStateHub, OpenRoutingHub, OpenReconciliationHub, OpenHardeningHub, OpenEnrichmentHub, OpenOptimizationHub, OpenVerificationHub
 

@@ -1,0 +1,94 @@
+id: "pipeline/content-approval-plan"
+type: pipeline
+version: "0.1.0"
+name: "Content approval plan"
+description: "Creates CSV, JSONL, and SQL load bundles that approve or route dedupe-resolved component candidates before active promotion."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["evaluation", "governance", "routing", "verification"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "content-approval", "promotion", "review-gate", "postgres", "quality-index"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Create a review-gated Postgres load plan for content approval decisions and derived promotion decisions."
+pipeline_kind: "research_web.content_approval_plan"
+inputs:
+  - name: "component_candidates_path"
+    type: "string"
+  - name: "normalized_objects_path"
+    type: "string"
+  - name: "dedupe_resolutions_path"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "content_approval_plan"
+    type: "json"
+  - name: "content_approval_decisions_jsonl"
+    type: "jsonl"
+  - name: "content_promotion_decisions_jsonl"
+    type: "jsonl"
+  - name: "content_approval_decisions_csv"
+    type: "csv"
+  - name: "content_promotion_decisions_csv"
+    type: "csv"
+  - name: "content_approval_index_records_csv"
+    type: "csv"
+  - name: "content_approval_review_tickets_csv"
+    type: "csv"
+  - name: "load_sql"
+    type: "sql"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/content-approval-patterns"
+steps:
+  - id: "load-content-approval-checks"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/content-approval-patterns"
+    inputs:
+      query: "content approval dedupe resolved promotion decision review gate postgres load"
+      top_k: 20
+  - id: "plan-content-approval"
+    kind: "tool"
+    ref: "tool/content-approval-planner"
+    inputs:
+      component_candidates_path: "$.inputs.component_candidates_path"
+      normalized_objects_path: "$.inputs.normalized_objects_path"
+      dedupe_resolutions_path: "$.inputs.dedupe_resolutions_path"
+      output_dir: "$.inputs.output_dir"
+  - id: "audit-staged-vs-committed"
+    kind: "tool"
+    ref: "tool/staged-vs-committed-load-auditor"
+    inputs:
+      reason: "After psql execution, compare content approval, promotion decision, review ticket, and index counts with planned counts."
+success_criteria:
+  - kind: "deterministic"
+    target: "$.content_approval_plan.content_approval_count"
+    op: ">"
+    value: 0
+    severity: "high"
+    label: "Content approval decisions are exported."
+  - kind: "deterministic"
+    target: "$.content_approval_plan.promotion_decision_count"
+    op: ">"
+    value: 0
+    severity: "medium"
+    label: "Derived promotion decisions are exported."
+  - kind: "semantic"
+    target: "$.content_approval_plan"
+    must_cover:
+      - "content approval"
+      - "dedupe clearance"
+      - "promotion decisions"
+      - "review tickets"
+      - "quality index rows"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Content approval preserves review-gated promotion flow."

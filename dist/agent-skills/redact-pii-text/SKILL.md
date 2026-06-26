@@ -42,7 +42,7 @@ No model call by default.
 
 ## Provenance
 
-- Hub artifact: `harness/redact-pii-text` v0.1.0
+- Hub component: `harness/redact-pii-text` v0.1.0
 - License: `MIT`
 - Lifecycle: `stable`
 - Full source manifest: see `references/manifest.yaml`

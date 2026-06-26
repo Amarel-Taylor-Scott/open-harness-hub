@@ -1,0 +1,103 @@
+id: "pipeline/recommend-pipeline-from-prompt"
+type: pipeline
+version: "0.1.0"
+name: "Recommend an OHH pipeline (or harness / tool / etc.) from a free-text task prompt"
+description: |
+  Given a user's natural-language task description, return the best
+  catalog components to use, ranked with rationale and a usage hint.
+
+  Three-stage shape:
+   1. `processor/catalog-search`   — BM25 + tag Jaccard → top 30
+   2. `processor/gemma-reranker`   — Gemma 4 (or any LLM) → top 5
+   3. `processor/pipeline-recommender` — composition sketch
+
+  Use cases:
+   - User typing "I need to grade an ESG supplier disclosure" → returns
+     `pipeline/supplier-policy-grading` + `harness/esg-disclosure-grading`
+   - User typing "I want to review a Wikipedia article for NPOV" →
+     returns `pipeline/wikipedia-page-review`
+   - Codex orchestrator deciding which existing pipeline to invoke
+     before falling back to factory drafting
+
+  Output: ranked candidates with per-candidate score + reason,
+  recommendation paragraph, composition hints (how to actually use
+  the top recommendation).
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry:   ["software", "ai", "cross_industry"]
+capability: ["retrieval", "reranking", "reasoning"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "cross_cutting.composition"
+tags: ["recommender", "meta", "pipeline-recommendation", "gemma", "post-rag"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+task: |
+  Given a free-text task prompt, return the best OHH catalog component(s)
+  to use to accomplish the task, with per-candidate rationale and a
+  composition hint for the top match.
+pipeline_kind: "recommendation"
+
+inputs:
+  - name: "prompt"
+    type: "string"
+  - name: "retrieval_top_k"
+    type: "integer"
+  - name: "rerank_top_k"
+    type: "integer"
+  - name: "types_filter"
+    type: "string[]"
+outputs:
+  - name: "ranked_candidates"
+    type: "object[]"
+  - name: "recommendation"
+    type: "string"
+  - name: "composition_sketch"
+    type: "object"
+  - name: "trace"
+    type: "object[]"
+
+defaults:
+  model_adapter: "adapter/ollama-default"
+
+steps:
+  - id: "search"
+    kind: "processor"
+    ref: "processor/catalog-search"
+    inputs:
+      prompt: "$.inputs.prompt"
+      top_k: "$.inputs.retrieval_top_k"
+      types_filter: "$.inputs.types_filter"
+
+  - id: "rerank"
+    kind: "processor"
+    ref: "processor/gemma-reranker"
+    inputs:
+      prompt: "$.inputs.prompt"
+      candidates: "$.steps.search.output.candidates"
+      top_k: "$.inputs.rerank_top_k"
+
+  - id: "recommend"
+    kind: "processor"
+    ref: "processor/pipeline-recommender"
+    inputs:
+      prompt: "$.inputs.prompt"
+      retrieval_top_k: "$.inputs.retrieval_top_k"
+      rerank_top_k: "$.inputs.rerank_top_k"
+      types_filter: "$.inputs.types_filter"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "recommend-pipeline-from-prompt"
+      applied_layers: ["search", "rerank", "composition_sketch"]
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.outputs.ranked_candidates"
+    op: "is_truthy"
+    value: true

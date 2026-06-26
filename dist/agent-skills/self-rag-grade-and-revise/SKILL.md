@@ -13,7 +13,7 @@ relevance grader → rewrite-query loop on irrelevant retrieval →
 generate with grounding → answer-support grader → iterate up to
 max_iterations on low support.
 
-Verified by Open Harness Hub deep mining: the LangGraph reference
+Verified by OpenHubForAI deep mining: the LangGraph reference
 implementation at `langchain-ai/langgraph/tutorials/rag/langgraph_self_rag/`
 + Akari Asai's canonical implementation at
 `AkariAsai/self-rag/retrieval_lm/run_short_form.py` (both cloned).
@@ -46,7 +46,7 @@ support, bounded iteration on failure.
 
 ## Provenance
 
-- Hub artifact: `pipeline/self-rag-grade-and-revise` v0.1.0
+- Hub component: `pipeline/self-rag-grade-and-revise` v0.1.0
 - License: `MIT`
 - Industry: ai, cross_industry
 - Full source manifest: see `references/manifest.yaml`

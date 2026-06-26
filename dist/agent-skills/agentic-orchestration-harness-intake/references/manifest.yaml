@@ -1,0 +1,85 @@
+id: "pipeline/agentic-orchestration-harness-intake"
+type: pipeline
+version: "0.1.0"
+name: "Agentic orchestration harness intake"
+description: "Normalizes long-running agent orchestration patterns into reusable harness manifests, generated database rows, budget controls, and review tickets."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "evaluation", "serving"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "dated"
+lifecycle_position: "cross_cutting.orchestration"
+tags: ["agentic-harness", "goal-runtime", "campaign-state", "meta-harness", "long-running-agents"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Convert agentic orchestration landscape notes into reusable harness patterns and generated rows for the million-object factory."
+pipeline_kind: "agent_loop"
+inputs:
+  - name: "orchestration_landscape_notes"
+    type: "markdown"
+  - name: "verification_policy"
+    type: "object"
+outputs:
+  - name: "harness_manifests"
+    type: "array"
+  - name: "generated_row_shards"
+    type: "object"
+  - name: "campaign_state"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/agentic-orchestration-harness-patterns"
+steps:
+  - id: "persistent-goal-runtime"
+    kind: "harness"
+    ref: "harness/persistent-goal-runtime-supervisor"
+    inputs:
+      purpose: "Track first-class goal runtime requirements and completion audit behavior."
+  - id: "stateful-loop-baseline"
+    kind: "harness"
+    ref: "harness/stateful-loop-continuity-harness"
+    inputs:
+      purpose: "Capture the model-agnostic loop baseline and durable state-file pattern."
+  - id: "campaign-orchestration"
+    kind: "harness"
+    ref: "harness/campaign-worktree-orchestrator"
+    inputs:
+      purpose: "Capture multi-agent worktree isolation, campaign state, and merge policy."
+  - id: "meta-harness-evolution"
+    kind: "harness"
+    ref: "harness/meta-harness-evolver"
+    inputs:
+      purpose: "Capture harness improvement loops with benchmarks and review tickets."
+  - id: "record-campaign-state"
+    kind: "tool"
+    ref: "tool/agent-campaign-state-recorder"
+    inputs:
+      campaign_id: "campaign/open-harness-agentic-orchestration"
+  - id: "guard-budget"
+    kind: "tool"
+    ref: "tool/agent-harness-budget-guard"
+    inputs:
+      goal_id: "goal/scale-open-harness-hub"
+success_criteria:
+  - kind: "semantic"
+    target: "$.harness_manifests"
+    must_cover:
+      - "persistent goal runtime"
+      - "stateful loop continuity"
+      - "campaign worktree orchestration"
+      - "meta-harness evolution"
+      - "budget and permission guardrails"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Agentic orchestration harness families are covered."
+  - kind: "deterministic"
+    target: "$.campaign_state"
+    op: "is_truthy"
+    value: true
+    severity: "medium"
+    label: "Campaign state is emitted."

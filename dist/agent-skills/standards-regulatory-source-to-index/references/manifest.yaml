@@ -1,0 +1,94 @@
+id: "pipeline/standards-regulatory-source-to-index"
+type: pipeline
+version: "0.1.0"
+name: "Standards regulatory source to index"
+description: "Prioritize standards and regulatory source surfaces, route governance, link entities, dedupe extracted objects, and emit source-backed index records for procedure and fact factories."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "government", "legal", "healthcare.public_health", "finance", "software.devops", "cross_industry"]
+capability: ["retrieval", "verification", "governance", "planning", "extraction"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.discovery"
+tags: ["standards", "regulations", "source-surfaces", "entity-resolution", "dedupe", "indexing"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Turn prioritized standards and regulatory surfaces into governed, entity-linked, deduplicated, index-ready source and object records."
+pipeline_kind: "research_web.standards_regulatory_source_index_build"
+
+inputs:
+  - name: "source_family_filter"
+    type: "string[]"
+  - name: "priority_weights"
+    type: "object"
+  - name: "tenant_policy"
+    type: "object"
+outputs:
+  - name: "ranked_sources"
+    type: "object[]"
+  - name: "source_records"
+    type: "object[]"
+  - name: "canonical_entities"
+    type: "object[]"
+  - name: "dedupe_clusters"
+    type: "object[]"
+  - name: "index_records"
+    type: "object"
+  - name: "review_tickets"
+    type: "object[]"
+
+defaults:
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/standards-regulatory-source-map"
+  rule_packs:
+    - "rule-pack/grep-prompt-injection-heuristics"
+
+steps:
+  - id: "load_source_map"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/standards-regulatory-source-map"
+    inputs:
+      query: "$.inputs.source_family_filter"
+      top_k: 100
+
+  - id: "prioritize_sources"
+    kind: "tool"
+    ref: "tool/source-surface-prioritizer"
+    inputs:
+      source_surfaces: "$.steps.load_source_map.output.docs"
+      priority_weights: "$.inputs.priority_weights"
+      constraints:
+        require_public_or_verified_sources: true
+        avoid_pii: true
+
+  - id: "governance_entity_dedupe_index"
+    kind: "pipeline"
+    ref: "pipeline/source-governance-entity-dedupe-index"
+    inputs:
+      source_records: "$.steps.prioritize_sources.output.ranked_sources"
+      candidate_objects: "$.steps.prioritize_sources.output.next_batches"
+      tenant_policy: "$.inputs.tenant_policy"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "standards-regulatory-source-to-index"
+      applied_layers: ["source_map", "surface_prioritization", "governance_entity_dedupe_index"]
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.outputs.ranked_sources"
+    op: "is_truthy"
+    value: true
+    label: "Standards and regulatory source surfaces are ranked for factory ingestion."
+  - kind: "deterministic"
+    target: "$.outputs.index_records"
+    op: "is_truthy"
+    value: true
+    label: "Index records are emitted or queued for review."

@@ -19,7 +19,7 @@ def main() -> int:
     catalog = load_catalog()
     out = []
 
-    out.append("# Open Harness Hub - single-page catalog index")
+    out.append("# OpenHubForAI - single-page catalog index")
     out.append("")
     out.append(f"Auto-generated from `scripts/build_index_page.py` against {len(catalog)} live components. Run that script to refresh after any catalog change.")
     out.append("")

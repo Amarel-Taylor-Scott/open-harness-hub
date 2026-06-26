@@ -177,7 +177,7 @@ def render_one(manifest_path: Path, manifest: dict) -> dict[str, Any]:
             c["email"] = a["email"]
         creators.append(c)
     if not creators:
-        creators = [{"@type": "sc:Person", "name": "Open Harness Hub contributors"}]
+        creators = [{"@type": "sc:Person", "name": "OpenHubForAI contributors"}]
 
     out: dict[str, Any] = {
         "@context":     CONTEXT,

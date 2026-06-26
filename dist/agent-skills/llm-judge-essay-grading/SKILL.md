@@ -13,7 +13,7 @@ prompt with adversarial prefix patterns to discourage gaming. The
 "you can't please them all" pattern: grade strictly, refuse to
 inflate scores under social-engineering pressure.
 
-Verified by Open Harness Hub mining of richolson's "Mash It Up" (561
+Verified by OpenHubForAI mining of richolson's "Mash It Up" (561
 votes), "Add It Up!" (333 votes), and jiprud's "Essays - simple
 submission" (484 votes) on llms-you-cant-please-them-all.
 
@@ -38,7 +38,7 @@ trying to inflate the score.
 
 ## Provenance
 
-- Hub artifact: `pipeline/llm-judge-essay-grading` v0.1.0
+- Hub component: `pipeline/llm-judge-essay-grading` v0.1.0
 - License: `MIT`
 - Industry: ai, education
 - Full source manifest: see `references/manifest.yaml`

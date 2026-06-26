@@ -1,0 +1,232 @@
+id: "pipeline/dora-ict-obligation-cite-or-abstain"
+type: pipeline
+version: "0.1.0"
+name: "EU DORA ICT third-party obligation answer (cite-or-abstain)"
+description: |
+  Answer whether a specific EU DORA (Digital Operational Resilience
+  Act) ICT third-party / operational-resilience obligation applies to
+  a financial entity's stated arrangement, grounded ONLY in cited DORA
+  obligation provisions — otherwise abstain. High-precision regulated
+  RAG bundle (Bundle B) wired as a governed gate for a volatile,
+  regulation-specific domain a base model has no reliable map of:
+
+   - structured-to-prose on the arrangement description;
+   - hybrid retrieval over the DORA ICT-resilience obligations corpus,
+     fused + cross-encoder reranked to the controlling article(s);
+   - cite-first regulatory persona + statute-clarity harness produces a
+     yes / no / conditional applicability answer with a per-claim
+     citation to the DORA article it rests on;
+   - DETERMINISTIC cite-or-abstain gate: an applicability claim with
+     no citation to a retrieved DORA provision fails citation-coverage
+     and blocks publication — the model may NOT assert "Article 28
+     requires X" without the provision behind it.
+
+  Negative-space task: DORA is recent, dense, and entity-type
+  conditional; base models confidently mis-state which article governs
+  ICT third-party risk and fabricate article numbers. Grounding every
+  applicability claim in a cited provision, or abstaining, is the
+  capability the bare model lacks.
+
+  NOT legal advice; descriptive over the cited DORA provisions only.
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry:   ["legal", "legal.compliance", "finance", "compliance"]
+capability: ["retrieval", "extraction", "verification", "evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "stable"
+tags: ["knowledge-grounded-qa", "cite-or-abstain", "bundle-b", "dora", "ict-resilience", "regulatory"]
+created: "2026-05-29"
+updated: "2026-05-29"
+
+attribution:
+  source_url: "https://eur-lex.europa.eu/eli/reg/2022/2554/oj"
+  source_kind: "other"
+  author: "Regulation (EU) 2022/2554 (DORA) — ICT-resilience obligations corpus (composite)"
+  license: "CC-BY-4.0"
+
+task: |
+  Given a financial entity's ICT arrangement description plus an
+  applicability question, answer whether the specified DORA ICT
+  third-party / operational-resilience obligation applies, grounding
+  each applicability claim in a cited DORA provision, or abstain.
+  Publication is blocked unless citation coverage and the
+  hallucination score clear threshold.
+pipeline_kind: "rag_pack"
+
+examples:
+  - name: "Applicability answer grounded in cited DORA provisions"
+    input:
+      arrangement: >
+        A bank outsources the hosting and run of its core banking
+        platform to a single cloud provider. There is no tested exit
+        plan and no alternative provider identified. Management asks
+        whether DORA imposes specific obligations on this arrangement.
+      entity_type: "credit-institution"
+      question: "Does DORA's ICT third-party risk framework treat this as supporting a critical or important function, and what does that require?"
+    expected_output:
+      abstained: false
+      applicability: "applies-conditional"
+      citation_coverage: 1.0
+      answer_markdown: >
+        Hosting and running the core banking platform supports a
+        critical or important function, which brings the arrangement
+        within DORA's ICT third-party risk requirements [1]. That
+        triggers contractual content requirements and the need for an
+        exit strategy for the ICT service supporting that function [2];
+        the absence of a tested exit plan and of an alternative provider
+        is a concentration-risk gap to remediate [1].
+      findings:
+        - claim: "Running the core banking platform supports a critical or important function under DORA's ICT third-party framework."
+          citation: "[1] DORA ICT third-party risk — critical/important function provision (retrieved)"
+          supported: true
+        - claim: "An exit strategy is required for ICT services supporting a critical or important function."
+          citation: "[2] DORA exit-strategy obligation (retrieved)"
+          supported: true
+      notes: >
+        Each applicability claim cites a retrieved DORA provision, so
+        citation-coverage passes and the answer is published. Article
+        numbers asserted without a retrieved span would fail the gate.
+  - name: "Abstain: question outside the retrieved DORA provisions"
+    input:
+      arrangement: "The bank uses an internal-only spreadsheet macro maintained by its own staff."
+      entity_type: "credit-institution"
+      question: "Does DORA's ICT third-party register require us to register this internal macro as an outsourced ICT service?"
+    expected_output:
+      abstained: true
+      applicability: "unknown"
+      citation_coverage: 0.0
+      answer_markdown: >
+        ABSTAIN — the retrieved DORA provisions do not resolve whether a
+        purely internal, in-house tool falls within the ICT third-party
+        register for your facts. Routed to review; no article is cited
+        for an answer the corpus does not support.
+      findings: []
+      notes: >
+        No retrieved provision supports an applicability claim for an
+        internal tool, so citation-coverage fails and the
+        cite-or-abstain gate blocks a fabricated article citation.
+
+inputs:
+  - name: "arrangement"
+    type: "string"
+  - name: "entity_type"
+    type: "string"
+  - name: "question"
+    type: "string"
+outputs:
+  - name: "answer_markdown"
+    type: "string"
+  - name: "applicability"
+    type: "string"
+  - name: "findings"
+    type: "object[]"
+  - name: "citation_coverage"
+    type: "number"
+  - name: "abstained"
+    type: "boolean"
+  - name: "trace"
+    type: "object[]"
+
+defaults:
+  persona: "persona/bureaucracy-translator-cite-first"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/eu-dora-ict-resilience-obligations"
+    - "knowledge-pack/statute-citation-and-crossref-grounding"
+  rule_packs:
+    - "rule-pack/grep-statute-ambiguity-flags"
+    - "rule-pack/hybrid-retrieval-policy"
+
+steps:
+  - id: "normalize"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs:
+      data: "$.inputs.arrangement"
+
+  - id: "grep_terms"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-statute-ambiguity-flags"
+    inputs:
+      text: "$.steps.normalize.output.prose"
+
+  - id: "retrieve_provisions"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.inputs.question"
+      corpus: "knowledge-pack/eu-dora-ict-resilience-obligations"
+      top_k: 12
+
+  - id: "rerank"
+    kind: "processor"
+    ref: "processor/cross-encoder-reranker"
+    inputs:
+      query: "$.inputs.question"
+      passages: "$.steps.retrieve_provisions.output.passages"
+      top_k: 5
+
+  - id: "answer"
+    kind: "harness"
+    ref: "harness/statute-clarity-review"
+    inputs:
+      statute_text: "$.steps.normalize.output.prose"
+      jurisdiction: "EU"
+      statute_type: "$.inputs.entity_type"
+      context: "$.steps.rerank.output.passages"
+      question: "$.inputs.question"
+
+  - id: "citation_coverage"
+    kind: "processor"
+    ref: "processor/citation-coverage"
+    inputs:
+      response_markdown: "$.steps.answer.output"
+
+  - id: "hallucination_check"
+    kind: "processor"
+    ref: "processor/hallucination-scorer"
+    inputs:
+      response: "$.steps.answer.output"
+      prompt: "$.inputs.question"
+      n_samples: 5
+
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.answer.output"
+      rubric_ref: "rubric/statute-clarity-v1"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "dora-ict-obligation-cite-or-abstain"
+      applied_layers: ["persona", "grep", "rag", "rerank", "harness", "citation_coverage", "hallucination", "judge"]
+
+success_criteria:
+  - rubric: "rubric/statute-clarity-v1"
+    threshold: 0.7
+    label: "applicability answer grounded + scored to rubric"
+  - kind: "deterministic"
+    target: "$.steps.citation_coverage.output.passes"
+    op: "=="
+    value: true
+    severity: "critical"
+    label: "every applicability claim cites a DORA provision (else abstain)"
+  - kind: "deterministic"
+    target: "$.steps.citation_coverage.output.coverage"
+    op: ">="
+    value: 0.95
+    severity: "critical"
+    label: "citation coverage >= 0.95"
+  - kind: "deterministic"
+    target: "$.steps.hallucination_check.output.overall_score"
+    op: "<="
+    value: 0.15
+    severity: "high"
+    label: "self-consistency hallucination score <= 0.15"

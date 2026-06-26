@@ -1,0 +1,72 @@
+id: "pipeline/prd-readiness-review-review"
+type: pipeline
+version: "0.1.0"
+name: "PRD Readiness Review review pipeline"
+description: "End-to-end prd readiness review review with redaction, grep triage, RAG grounding, harness review, rubric scoring, and audit trace."
+authors: [{ name: "OpenHubForAI contributors" }]
+license: "MIT"
+industry: ["product_management", "product_management.prd"]
+capability: ["evaluation", "extraction", "retrieval", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "stable"
+tags: ["prd-readiness-review", "use-case-expansion"]
+created: "2026-05-24"
+updated: "2026-05-24"
+task: "Review product requirements documents for problem clarity, measurable outcomes, dependencies, risks, and launch readiness."
+pipeline_kind: "review"
+inputs:
+  - name: "packet"
+    type: "string|object"
+outputs:
+  - name: "findings"
+    type: "object[]"
+  - name: "score"
+    type: "number"
+  - name: "evidence_gaps"
+    type: "object[]"
+defaults:
+  persona: "persona/prd-readiness-reviewer"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs: ["knowledge-pack/prd-readiness-review-frameworks"]
+  rule_packs: ["rule-pack/grep-prd-readiness-review-flags", "rule-pack/rag-prd-readiness-review-retrieval-policy"]
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.packet" }
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+  - id: "grep_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prd-readiness-review-flags"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+  - id: "retrieve_context"
+    kind: "rule_pack"
+    ref: "rule-pack/rag-prd-readiness-review-retrieval-policy"
+    inputs: { query: "$.steps.grep_flags.output.fired", corpus: "knowledge-pack/prd-readiness-review-frameworks", top_k: 8 }
+  - id: "review_harness"
+    kind: "harness"
+    ref: "harness/prd-readiness-review-review"
+    inputs:
+      packet: "$.steps.redact_pii.output.text"
+      context: "$.steps.retrieve_context.output.passages"
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.review_harness.output.findings"
+      rubric_ref: "rubric/prd-readiness-review-quality-v1"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "prd-readiness-review-review"
+      applied_layers: ["privacy", "grep", "rag", "harness", "judge"]
+success_criteria:
+  - rubric: "rubric/prd-readiness-review-quality-v1"
+    threshold: 0.65

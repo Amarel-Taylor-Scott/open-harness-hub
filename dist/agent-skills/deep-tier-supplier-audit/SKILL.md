@@ -49,7 +49,7 @@ report.
 
 ## Provenance
 
-- Hub artifact: `pipeline/deep-tier-supplier-audit` v0.1.0
+- Hub component: `pipeline/deep-tier-supplier-audit` v0.1.0
 - License: `MIT`
 - Industry: esg, supply_chain, compliance
 - Full source manifest: see `references/manifest.yaml`

@@ -68,7 +68,7 @@ def render_mermaid(d: dict) -> str:
         "  end",
         '  subgraph OPEN["Open ecosystem = the STORE (both products consume)"]',
         '    OHH["OpenHarnessHub + CapabilityTask Spec (open)"]',
-        f'    HUBS["22 Open*Hubs — the component store<br/>context · tools · models · steps · DAG · reconciliation/robustness/enrichment rules · modules<br/>{lh} live · {ph} private-bench"]',
+        f'    HUBS["22 OpenHubForAI registries — the component store<br/>context · tools · models · steps · DAG · reconciliation/robustness/enrichment rules · modules<br/>{lh} live · {ph} private-bench"]',
         "  end",
         '  SRC[("public / regulated sources")]',
         '  AGENTS(("AI agents"))',
@@ -104,11 +104,11 @@ def render_doc(d: dict, validation: str = "") -> str:
          "becomes TRUE. *Powered by Teleon.*",
          "3. **Teleon** (its own product + the runtime) — **program a capability in plain text**; it adapts to the most "
          "**efficient + bounded** form within your guardrails (the descent), receipt-backed. Governs what becomes EFFICIENT.",
-         "4. **OpenHarnessHub + the 22 Open\\*Hubs = the STORE** — a shared catalog of reusable components (context, "
+         "4. **OpenHarnessHub + the 22 OpenHubForAI registries = the STORE** — a shared catalog of reusable components (context, "
          "tools, models, steps, DAG components, reconciliation/robustness/enrichment rules, predefined modules) that "
          "**both Baltor and Teleon consume**. **Code-import law (enforced): Baltor → Teleon → OpenHarnessHub, never the "
          "reverse; the store is consumed at the content level by both.**", "",
-         f"### Open\\*Hub roster ({len(d['live_hubs'])} live · {len(d['private_hubs'])} private-bench = {len(d['live_hubs'])+len(d['private_hubs'])})",
+         f"### OpenHubForAI roster ({len(d['live_hubs'])} live · {len(d['private_hubs'])} private-bench = {len(d['live_hubs'])+len(d['private_hubs'])})",
          f"- **Live:** {live}", f"- **Private-bench:** {private}", "",
          "## Surfaces", ""]
     for sid, s in d["surf"].items():
@@ -167,7 +167,7 @@ def render_html(d: dict) -> str:
         'cheapest <b>bounded</b> form within your <b>guardrails</b> (the descent), receipt-backed. Governs what becomes '
         '<b>EFFICIENT</b>. The descent brain is the moat.</p></div>',
         '<div class="flow">▼ consumes · ▲ feed substrate / supply components to both</div>',
-        '<div class="band"><span class="tag">open ecosystem · the STORE</span><h2>OpenHarnessHub + 22 Open*Hubs — the component store</h2>'
+        '<div class="band"><span class="tag">open ecosystem · the STORE</span><h2>OpenHarnessHub + 22 OpenHubForAI registries — the component store</h2>'
         '<p>A shared store of reusable components <b>both Baltor and Teleon consume</b>: context · tools · models · steps · '
         'DAG components · reconciliation / robustness / enrichment rules · predefined modules (run on Teleon OR custom '
         f'compute) · the open CapabilityTask Spec ({len(d["live_hubs"])} live · {len(d["private_hubs"])} private-bench).</p>'
@@ -205,9 +205,9 @@ def _self_test() -> int:
     mer = render_mermaid(d)
     ck("mermaid honors the dependency law (Baltor→Teleon→OHH)", "BAL -->|consumes as a tenant| TEL" in mer and "TEL -->|consumes| OHH" in mer)
     doc = render_doc(d, "VALIDATION-HERE")
-    ck("doc embeds the diagram + roster + the validation slot", "```mermaid" in doc and "Open\\*Hub roster" in doc and "VALIDATION-HERE" in doc)
+    ck("doc embeds the diagram + roster + the validation slot", "```mermaid" in doc and "OpenHubForAI roster" in doc and "VALIDATION-HERE" in doc)
     page = render_html(d)
-    ck("html is self-contained + layered (parent→baltor→teleon→open)", "<style>" in page and "Baltor — managed governed context" in page and "22 Open*Hubs" in page and "http" not in page.split("note")[0])
+    ck("html is self-contained + layered (parent→baltor→teleon→open)", "<style>" in page and "Baltor — managed governed context" in page and "22 OpenHubForAI registries" in page and "http" not in page.split("note")[0])
     import tempfile
     global HTML_OUT, DOC_OUT
     _h, _d = HTML_OUT, DOC_OUT

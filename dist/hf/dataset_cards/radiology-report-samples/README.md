@@ -22,7 +22,7 @@ pretty_name: Synthetic radiology report samples (3 cases, fully synthetic)
 
 # Synthetic radiology report samples (3 cases, fully synthetic)
 
-<!-- Generated from Open Harness Hub manifest `dataset/radiology-report-samples` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
+<!-- Generated from OpenHubForAI manifest `dataset/radiology-report-samples` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
 
 ## Dataset description
 
@@ -53,7 +53,7 @@ Cases:
 ## Provenance
 
 - **origin**: Fully synthetic — no real radiology data
-- **collected_by**: Open Harness Hub contributors
+- **collected_by**: OpenHubForAI contributors
 - **collected_through**: 2026-05-20
 - **license**: MIT
 - **anonymization**: fully synthetic; no real patient or facility info
@@ -67,11 +67,11 @@ A Croissant 1.0 JSON-LD record is emitted at `dist/croissant/radiology-report-sa
 ```bibtex
 @misc{radiology-report-samples_open_harness_hub,
   title  = {Synthetic radiology report samples (3 cases, fully synthetic)},
-  author = {Open Harness Hub contributors},
+  author = {OpenHubForAI contributors},
   url    = {https://open-harness-hub.dev/dataset/radiology-report-samples},
   version= {0.1.0},
   year   = {2026}
 }
 ```
 
-License: `MIT`. Hub artifact: `dataset/radiology-report-samples`.
+License: `MIT`. Hub component: `dataset/radiology-report-samples`.

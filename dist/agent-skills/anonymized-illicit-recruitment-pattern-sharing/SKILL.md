@@ -59,7 +59,7 @@ org's compliance team.
 
 ## Provenance
 
-- Hub artifact: `pipeline/anonymized-illicit-recruitment-pattern-sharing` v0.1.0
+- Hub component: `pipeline/anonymized-illicit-recruitment-pattern-sharing` v0.1.0
 - License: `MIT`
 - Industry: esg, supply_chain, compliance
 - Full source manifest: see `references/manifest.yaml`

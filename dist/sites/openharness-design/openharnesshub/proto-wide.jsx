@@ -184,7 +184,7 @@ function PRoles() {
 function PSignin() {
   const { OhAuth } = window;
   const mode = (window.location.hash || '').includes('signup') ? 'signup' : 'signin';
-  return <OhAuth brand={{ name: 'OpenHarnessHub', tld: '.io', glyph: '⎔', accent: 'var(--accent)' }} mode={mode} />;
+  return <OhAuth brand={{ name: 'OpenHubForAI', realm: 'openharnesshub', tld: '.io', glyph: '⎔', accent: 'var(--accent)' }} mode={mode} />;
 }
 function POnboarding() {
   const { task, setTask, setLoggedIn } = React.useContext(StoreCtx);

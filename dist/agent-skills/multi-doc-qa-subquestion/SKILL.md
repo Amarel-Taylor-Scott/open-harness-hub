@@ -45,7 +45,7 @@ aggregate into a single cited synthesis.
 
 ## Provenance
 
-- Hub artifact: `pipeline/multi-doc-qa-subquestion` v0.1.0
+- Hub component: `pipeline/multi-doc-qa-subquestion` v0.1.0
 - License: `MIT`
 - Industry: cross_industry
 - Full source manifest: see `references/manifest.yaml`

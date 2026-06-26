@@ -12,7 +12,7 @@ function PUseCase({ who }) {
   const { OhTopBar } = window;
   return (
     <div className="pt-mkt pt-view">
-      <OhTopBar brand={{ name: 'OpenHarnessHub', tld: '.io', glyph: '⎔', accent: 'var(--accent)' }}
+      <OhTopBar brand={{ name: 'OpenHubForAI', realm: 'openharnesshub', tld: '.io', glyph: '⎔', accent: 'var(--accent)' }}
         nav={[['Governments', '/for/governments'], ['Builders', '/for/builders'], ['Lawyers', '/for/lawyers'], ['Regulators', '/for/regulators']]}
         cta={{ label: 'Start free', href: '/signup' }} signInHref="/signin" />
       <div className="pt-mkt-body">

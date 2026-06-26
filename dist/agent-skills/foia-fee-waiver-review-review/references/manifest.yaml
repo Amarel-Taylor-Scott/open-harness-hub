@@ -1,0 +1,118 @@
+id: "pipeline/foia-fee-waiver-review-review"
+type: pipeline
+version: "0.1.0"
+name: "FOIA Fee Waiver Review review pipeline"
+description: "Benchmarkable foia fee waiver review review pipeline with normalization, grep, RAG, control matrix, severity calibration, citation checks, and summary output."
+authors: [{ name: "OpenHubForAI contributors" }]
+license: "MIT"
+industry: ["government.foia", "legal.compliance"]
+capability: ["evaluation", "extraction", "retrieval", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "stable"
+tags: ["foia-fee-waiver-review", "expansion-v7"]
+created: "2026-05-24"
+updated: "2026-05-24"
+task: "Review fee-waiver packets for public-interest basis, commercial interest, requester category, search burden, and appeal readiness."
+pipeline_kind: "review"
+inputs:
+  - name: "packet"
+    type: "string|object"
+outputs:
+  - name: "findings"
+    type: "object[]"
+  - name: "score"
+    type: "number"
+  - name: "evidence_gaps"
+    type: "object[]"
+  - name: "risk_register_updates"
+    type: "object[]"
+defaults:
+  persona: "persona/foia-fee-waiver-reviewer"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs: ["knowledge-pack/foia-fee-waiver-review-frameworks"]
+  rule_packs: ["rule-pack/grep-foia-fee-waiver-review-flags", "rule-pack/rag-foia-fee-waiver-review-retrieval-policy"]
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.packet" }
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+  - id: "normalize_evidence"
+    kind: "processor"
+    ref: "processor/packet-evidence-normalizer"
+    inputs: { trace: "$.steps.redact_pii.output", config: {} }
+  - id: "grep_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-foia-fee-waiver-review-flags"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+  - id: "retrieve_context"
+    kind: "rule_pack"
+    ref: "rule-pack/rag-foia-fee-waiver-review-retrieval-policy"
+    inputs: { query: "$.steps.grep_flags.output.fired", corpus: "knowledge-pack/foia-fee-waiver-review-frameworks", top_k: 12 }
+  - id: "control_matrix"
+    kind: "processor"
+    ref: "processor/control-matrix-builder"
+    inputs: { trace: "$.steps.retrieve_context.output", config: {} }
+  - id: "review_harness"
+    kind: "harness"
+    ref: "harness/foia-fee-waiver-review-review"
+    inputs:
+      packet: "$.steps.redact_pii.output.text"
+      context: "$.steps.retrieve_context.output.passages"
+      evidence: "$.steps.normalize_evidence.output.result"
+      controls: "$.steps.control_matrix.output.result"
+  - id: "dedupe_findings"
+    kind: "processor"
+    ref: "processor/finding-deduplicator"
+    inputs: { trace: "$.steps.review_harness.output", config: {} }
+  - id: "calibrate_severity"
+    kind: "processor"
+    ref: "processor/severity-calibrator"
+    inputs: { trace: "$.steps.dedupe_findings.output.result", config: {} }
+  - id: "extract_evidence_gaps"
+    kind: "processor"
+    ref: "processor/evidence-gap-extractor"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+  - id: "route_owners"
+    kind: "processor"
+    ref: "processor/remediation-owner-router"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+  - id: "check_citations"
+    kind: "processor"
+    ref: "processor/citation-span-checker"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.calibrate_severity.output.result"
+      rubric_ref: "rubric/foia-fee-waiver-review-quality-v1"
+  - id: "redaction_audit"
+    kind: "processor"
+    ref: "processor/packet-redaction-audit"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+  - id: "summary"
+    kind: "processor"
+    ref: "processor/review-summary-composer"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+success_criteria:
+  - rubric: "rubric/foia-fee-waiver-review-quality-v1"
+    threshold: 0.70
+  - kind: "deterministic"
+    target: "$.steps.redaction_audit.output.result.pass"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "redaction audit passes"
+  - kind: "deterministic"
+    target: "$.steps.check_citations.output.result.pass"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "citation span check passes"

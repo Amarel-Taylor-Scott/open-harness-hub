@@ -48,7 +48,7 @@ the intent is sensitive (refund > $X, legal, escalation, threat).
 
 ## Provenance
 
-- Hub artifact: `pipeline/email-triage-and-draft` v0.1.0
+- Hub component: `pipeline/email-triage-and-draft` v0.1.0
 - License: `MIT`
 - Industry: retail, retail.support, cross_industry
 - Full source manifest: see `references/manifest.yaml`

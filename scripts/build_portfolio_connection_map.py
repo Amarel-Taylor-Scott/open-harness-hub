@@ -46,7 +46,7 @@ def _mermaid(m: dict) -> str:
     lines = ["flowchart LR", "  parent([AI Done Right]):::parent",
              "  baltor[Baltor]:::core", "  teleon[Teleon]:::core",
              "  parent --> baltor", "  parent --> teleon", "  baltor -. depends on .-> teleon"]
-    for tier, label in (("live", "Live Open*Hubs (9) — dual-use"), ("private_bench", "Private-bench Open*Hubs (13) — internal-first")):
+    for tier, label in (("live", "Live OpenHubForAI registries (9) — dual-use"), ("private_bench", "Private-bench OpenHubForAI registries (13) — internal-first")):
         lines.append(f"  subgraph {tier}[\"{label}\"]")
         for h in m["hubs"]:
             if h["tier"] == tier:
@@ -72,13 +72,13 @@ def render() -> str:
     out.append("**The spine:** help people use AI better — move each unit of work *unbounded & inefficient → "
                "most-bounded & most-efficient*, on context kept *true / current / provable*, defined by *capability*, "
                "getting *smarter over time*.\n")
-    out.append(f"**Shape:** 2 core products (Baltor, Teleon) consume content from **{len(m['hubs'])} Open\\*Hubs** "
+    out.append(f"**Shape:** 2 core products (Baltor, Teleon) consume content from **{len(m['hubs'])} OpenHubForAI registries** "
                f"({len(live)} live + {len(bench)} private-bench).\n")
     out.append("**Amazon strategy:** " + m["amazon_strategy"]["principle"] + "\n")
     out.append("**Dependency law:** " + m["dependency_law"] + "\n")
     out.append("```mermaid\n" + _mermaid(m) + "\n```\n")
-    for title, rows in (("Live Open\\*Hubs (dual-use: open registry + internal infra)", live),
-                        ("Private-bench Open\\*Hubs (internal-first; public-revenue candidates)", bench)):
+    for title, rows in (("Live OpenHubForAI registries (dual-use: open registry + internal infra)", live),
+                        ("Private-bench OpenHubForAI registries (internal-first; public-revenue candidates)", bench)):
         out.append(f"\n## {title}\n")
         out.append("| Hub | Provides | Consumed by | Amazon stage |\n|---|---|---|---|")
         for h in rows:

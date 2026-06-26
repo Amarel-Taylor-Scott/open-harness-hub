@@ -15,7 +15,7 @@ feeds back as the answer (or the LLM iterates if execution fails or
 the answer is implausible). Majority-vote across N rollouts is the
 standard ensembling.
 
-Verified by Open Harness Hub mining: itahiro DeepSeek-R1-distill-7B
+Verified by OpenHubForAI mining: itahiro DeepSeek-R1-distill-7B
 (1399 votes), lewtun "Updated Code Interpretation" (1173 votes,
 Lewis Tunstall HF), mbmmurad QwQ-32B-preview optimized inference
 (1097 votes), yekenot DeepSeek-R1-distill-7B-AWQ (1087 votes),
@@ -43,7 +43,7 @@ N times with diverse sampling; majority-vote the parsed answers.
 
 ## Provenance
 
-- Hub artifact: `pipeline/deepseek-r1-code-interpreter-math` v0.1.0
+- Hub component: `pipeline/deepseek-r1-code-interpreter-math` v0.1.0
 - License: `MIT`
 - Industry: ai, scientific_research, education
 - Full source manifest: see `references/manifest.yaml`

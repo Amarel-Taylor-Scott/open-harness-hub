@@ -1,0 +1,64 @@
+id: "harness/food-quality-multimodal-hold-release"
+type: harness
+version: "0.1.0"
+name: "Food quality multimodal hold-release harness"
+description: "Multi-model harness for food quality and safety triage that routes product photos, label OCR, lot codes, temperature logs, supplier records, complaint narratives, inspection notes, and recall or hold-release rules."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["food.safety", "food_safety", "logistics.cold_chain"]
+capability: ["governance", "retrieval", "verification", "evaluation"]
+modality: ["text", "image", "structured", "tabular", "timeseries", "multimodal"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+tags: ["multimodal", "food-quality", "hold-release", "label-ocr", "temperature-log", "recall"]
+created: "2026-05-25"
+updated: "2026-05-25"
+kind: "model_harness"
+tier: "primary"
+applied_layers: ["tools", "official_sources", "rag", "classifier", "privacy"]
+knowledge_packs:
+  - id: "public_service_patterns"
+    label: "Multimodal public service patterns"
+    kind: "knowledge_pack"
+    types: ["multimodal_harness_pattern", "public_service_workflow_pattern"]
+    required: true
+    trust_boundary: "local"
+    freshness: "dated"
+model_targets:
+  - id: "label_ocr_model"
+    label: "Label OCR and lot parser"
+    transport: "openai_compatible"
+    role: "Reads product labels and lot codes from images."
+    capabilities: ["vision", "ocr", "classification"]
+    required: false
+    default: false
+    trust_boundary: "mixed"
+  - id: "temperature_log_checker"
+    label: "Temperature log checker"
+    transport: "callable"
+    role: "Checks time-series temperature excursions deterministically."
+    capabilities: ["timeseries_validation", "threshold_checking"]
+    required: true
+    default: true
+    trust_boundary: "local"
+  - id: "quality_disposition_model"
+    label: "Quality disposition draft model"
+    transport: "ollama"
+    role: "Drafts hold, release, escalation, or recall-review recommendations from verified evidence."
+    capabilities: ["reasoning", "summarization"]
+    required: false
+    default: true
+    trust_boundary: "local"
+model_io:
+  input: "complaint narrative, product image, label text, lot code, temperature log, supplier record, inspection checklist"
+  output: "quality disposition packet, lot match confidence, excursion findings, recall/hold recommendation, review ticket"
+  transport: "callable"
+input_verification: ["separate complaint claims from verified records", "validate lot-code parse confidence", "check temperature-log integrity"]
+output_verification: ["release after hold requires human review", "allergen or foreign-material flags are escalated", "temperature excursion findings cite raw log rows"]
+privacy_boundaries:
+  raw_input: "Supplier records and complaint details remain tenant-scoped."
+  derived_output: "Disposition packets may contain commercially sensitive data and require review before sharing."
+  external_calls: "Hosted OCR or vision models require redaction and approved routing."
+contributes_to: ["pipeline/multimodal-public-service-harness-intake"]

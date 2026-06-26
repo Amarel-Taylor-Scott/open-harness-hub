@@ -27,7 +27,7 @@ pretty_name: Global supply-chain due-diligence regulatory pack
 
 # Global supply-chain due-diligence regulatory pack
 
-<!-- Generated from Open Harness Hub manifest `knowledge-pack/csddd-and-forced-labor-indicators` v0.2.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
+<!-- Generated from OpenHubForAI manifest `knowledge-pack/csddd-and-forced-labor-indicators` v0.2.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
 
 ## Dataset description
 
@@ -108,11 +108,11 @@ A Croissant 1.0 JSON-LD record is emitted at `dist/croissant/csddd-and-forced-la
 ```bibtex
 @misc{csddd-and-forced-labor-indicators_open_harness_hub,
   title  = {Global supply-chain due-diligence regulatory pack},
-  author = {Open Harness Hub contributors},
+  author = {OpenHubForAI contributors},
   url    = {https://open-harness-hub.dev/knowledge-pack/csddd-and-forced-labor-indicators},
   version= {0.2.0},
   year   = {2026}
 }
 ```
 
-License: `CC-BY-4.0`. Hub artifact: `knowledge-pack/csddd-and-forced-labor-indicators`.
+License: `CC-BY-4.0`. Hub component: `knowledge-pack/csddd-and-forced-labor-indicators`.

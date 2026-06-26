@@ -1,0 +1,103 @@
+id: "pipeline/daily-component-production-run"
+type: pipeline
+version: "0.1.0"
+name: "Daily component production run"
+description: "Executes the daily factory path for 1,000 to 5,000 component candidates, 5 to 25 showcase pipelines, coverage scoring, gap backfill, and staged load audit."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["generation", "planning", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.scale"
+tags: ["components", "daily-factory", "production-run", "showcase-pipelines", "load-audit", "pgvector"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Run one repeatable daily production pass that expands database-backed component candidates and product-ready showcase pipeline templates."
+pipeline_kind: "research_web.daily_component_production_run"
+inputs:
+  - name: "run_date"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+  - name: "target_count"
+    type: "integer"
+  - name: "matrix"
+    type: "string"
+  - name: "showcase_count"
+    type: "integer"
+outputs:
+  - name: "daily_production_summary"
+    type: "json"
+  - name: "component_candidate_rows"
+    type: "jsonl"
+  - name: "showcase_pipeline_templates"
+    type: "json"
+  - name: "coverage_report"
+    type: "json"
+  - name: "gap_component_rows"
+    type: "jsonl"
+  - name: "staged_load_audit"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/daily-production-run-patterns"
+    - "knowledge-pack/daily-showcase-pipeline-patterns"
+    - "knowledge-pack/showcase-candidate-coverage-patterns"
+    - "knowledge-pack/showcase-gap-component-patterns"
+steps:
+  - id: "load-production-run-checks"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/daily-production-run-patterns"
+    inputs:
+      query: "daily component production run checks load audit coverage gap fill"
+      top_k: 20
+  - id: "run-daily-production"
+    kind: "tool"
+    ref: "tool/daily-production-runner"
+    inputs:
+      run_date: "$.inputs.run_date"
+      output_dir: "$.inputs.output_dir"
+      target_count: "$.inputs.target_count"
+      matrix: "$.inputs.matrix"
+      showcase_count: "$.inputs.showcase_count"
+  - id: "daily-closeout-review"
+    kind: "tool"
+    ref: "tool/daily-partition-load-auditor"
+    inputs:
+      reason: "The production runner emits the staged load audit; this step records the review boundary before SQL is applied."
+success_criteria:
+  - kind: "deterministic"
+    target: "$.run-daily-production.generated.component_candidates"
+    op: ">="
+    value: 1000
+    severity: "high"
+    label: "Daily component candidate volume meets the minimum target."
+  - kind: "deterministic"
+    target: "$.run-daily-production.generated.showcase_templates"
+    op: ">="
+    value: 5
+    severity: "high"
+    label: "Daily showcase pipeline volume meets the minimum target."
+  - kind: "deterministic"
+    target: "$.run-daily-production.load_audit.audit_status"
+    op: "=="
+    value: "staged_only"
+    severity: "high"
+    label: "The daily load audit remains side-effect free until operator approval."
+  - kind: "semantic"
+    target: "$.run-daily-production"
+    must_cover:
+      - "component candidates"
+      - "showcase pipelines"
+      - "coverage"
+      - "gap fill"
+      - "load audit"
+      - "review gate"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "The daily run summary covers the full factory loop."

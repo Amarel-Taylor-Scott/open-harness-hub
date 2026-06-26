@@ -1,0 +1,107 @@
+id: "pipeline/expert-email-grounded-knowledge-verification"
+type: pipeline
+version: "0.1.0"
+name: "Expert email and grounded knowledge verification"
+description: "Routes high-risk knowledge objects through source governance, grounded search, multi-model verification, consented expert email review, inbound response digestion, dedupe, indexing, and review-ticket routing."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "government", "humanitarian", "legal", "healthcare", "cross_industry"]
+capability: ["verification", "retrieval", "evaluation", "governance", "routing"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "pre_api.governance"
+tags: ["expert-review", "email", "grounded-search", "multi-model-verification", "knowledge-object", "review-ticket"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Verify a high-risk knowledge object using consented expert email review, grounded search, multiple model reviewers, source conflict checks, and indexed review evidence."
+pipeline_kind: "research_web.verified_knowledge_object_review"
+inputs:
+  - name: "knowledge_object"
+    type: "json"
+  - name: "inbound_message"
+    type: "json"
+  - name: "reviewer_pool_ref"
+    type: "string"
+  - name: "risk_policy"
+    type: "object"
+outputs:
+  - name: "verification_packet"
+    type: "json"
+  - name: "expert_review_campaign"
+    type: "json"
+  - name: "normalized_evidence_objects"
+    type: "array"
+  - name: "review_tickets"
+    type: "array"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/expert-email-grounded-verification-patterns"
+steps:
+  - id: "govern-knowledge-object"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record: "$.inputs.knowledge_object"
+      source_policy: "$.inputs.risk_policy.source_policy"
+  - id: "run-grounded-multimodel-gate"
+    kind: "tool"
+    ref: "tool/grounded-multimodel-verification-gate"
+    inputs:
+      knowledge_object: "$.inputs.knowledge_object"
+      risk_policy: "$.inputs.risk_policy"
+      grounded_search_providers: ["google_grounded_search", "official_source_search"]
+      model_reviewers: "$.inputs.risk_policy.model_reviewers"
+  - id: "create-expert-review-campaign"
+    kind: "tool"
+    ref: "tool/expert-email-review-campaign-manager"
+    inputs:
+      knowledge_object: "$.inputs.knowledge_object"
+      question_template: "Does this context fact make sense to you, and how important is it relative to the alternatives?"
+      reviewer_pool_ref: "$.inputs.reviewer_pool_ref"
+      contact_policy:
+        require_opt_in: true
+        suppress_unsubscribed: true
+        no_public_personal_email_publication: true
+  - id: "digest-inbound-review"
+    kind: "tool"
+    ref: "tool/inbound-email-review-digester"
+    inputs:
+      inbound_message: "$.inputs.inbound_message"
+      campaign: "$.steps.create-expert-review-campaign"
+      digest_policy:
+        strip_quoted_text: true
+        emit_raw_body: false
+  - id: "dedupe-evidence"
+    kind: "tool"
+    ref: "tool/fuzzy-dedupe-clusterer"
+    inputs:
+      candidate_records: "$.steps.digest-inbound-review.normalized_objects"
+      match_features: ["source_hash", "knowledge_object_id", "reviewer_role", "claim"]
+  - id: "emit-review-index"
+    kind: "tool"
+    ref: "tool/index-record-emitter"
+    inputs:
+      normalized_objects: "$.steps.dedupe-evidence.canonical_records"
+      emit: ["keyword", "vector", "graph", "facet", "freshness", "quality"]
+success_criteria:
+  - kind: "semantic"
+    target: "$.verification_packet"
+    must_cover:
+      - "grounded search"
+      - "multiple model reviewers"
+      - "expert email review"
+      - "source conflicts"
+      - "review tickets"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "High-risk knowledge object has multi-channel verification evidence."
+  - kind: "deterministic"
+    target: "$.review_tickets"
+    op: "is_truthy"
+    value: true
+    severity: "medium"
+    label: "Unresolved or high-risk verification issues route to review."

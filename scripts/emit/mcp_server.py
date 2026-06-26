@@ -111,7 +111,7 @@ def to_mcp_tool(manifest: dict) -> dict:
     return tool
 
 
-PYTHON_STUB = '''"""Open Harness Hub — MCP server stub (auto-generated).
+PYTHON_STUB = '''"""OpenHubForAI — MCP server stub (auto-generated).
 
 Run:
   pip install mcp
@@ -184,7 +184,7 @@ if __name__ == "__main__":
 '''
 
 TS_STUB = '''/**
- * Open Harness Hub — MCP server stub (auto-generated).
+ * OpenHubForAI — MCP server stub (auto-generated).
  *
  * Run:
  *   npm install @modelcontextprotocol/sdk
@@ -280,7 +280,7 @@ def render_ts_server(tools: list[dict]) -> str:
     )
 
 
-README = """# Open Harness Hub — MCP server
+README = """# OpenHubForAI — MCP server
 
 Auto-generated from the hub's `tool/*` and `processor/*` manifests.
 Re-run `python scripts/emit/mcp_server.py` to rebuild.

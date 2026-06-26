@@ -23,7 +23,7 @@ pretty_name: SPDX licenses (summary)
 
 # SPDX licenses (summary)
 
-<!-- Generated from Open Harness Hub manifest `knowledge-pack/spdx-licenses-summary` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
+<!-- Generated from OpenHubForAI manifest `knowledge-pack/spdx-licenses-summary` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
 
 ## Dataset description
 
@@ -63,11 +63,11 @@ A Croissant 1.0 JSON-LD record is emitted at `dist/croissant/spdx-licenses-summa
 ```bibtex
 @misc{spdx-licenses-summary_open_harness_hub,
   title  = {SPDX licenses (summary)},
-  author = {Open Harness Hub contributors},
+  author = {OpenHubForAI contributors},
   url    = {https://open-harness-hub.dev/knowledge-pack/spdx-licenses-summary},
   version= {0.1.0},
   year   = {2026}
 }
 ```
 
-License: `CC0-1.0`. Hub artifact: `knowledge-pack/spdx-licenses-summary`.
+License: `CC0-1.0`. Hub component: `knowledge-pack/spdx-licenses-summary`.

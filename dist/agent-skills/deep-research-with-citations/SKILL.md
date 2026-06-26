@@ -52,7 +52,7 @@ allowlisted sources, (4) verify each source's relevance + credibility,
 
 ## Provenance
 
-- Hub artifact: `pipeline/deep-research-with-citations` v0.1.0
+- Hub component: `pipeline/deep-research-with-citations` v0.1.0
 - License: `MIT`
 - Industry: cross_industry, media
 - Full source manifest: see `references/manifest.yaml`

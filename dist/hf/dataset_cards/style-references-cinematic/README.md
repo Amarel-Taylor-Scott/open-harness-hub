@@ -19,7 +19,7 @@ pretty_name: Cinematic style references
 
 # Cinematic style references
 
-<!-- Generated from Open Harness Hub manifest `knowledge-pack/style-references-cinematic` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
+<!-- Generated from OpenHubForAI manifest `knowledge-pack/style-references-cinematic` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
 
 ## Dataset description
 
@@ -59,11 +59,11 @@ A Croissant 1.0 JSON-LD record is emitted at `dist/croissant/style-references-ci
 ```bibtex
 @misc{style-references-cinematic_open_harness_hub,
   title  = {Cinematic style references},
-  author = {Open Harness Hub contributors},
+  author = {OpenHubForAI contributors},
   url    = {https://open-harness-hub.dev/knowledge-pack/style-references-cinematic},
   version= {0.1.0},
   year   = {2026}
 }
 ```
 
-License: `CC-BY-4.0`. Hub artifact: `knowledge-pack/style-references-cinematic`.
+License: `CC-BY-4.0`. Hub component: `knowledge-pack/style-references-cinematic`.

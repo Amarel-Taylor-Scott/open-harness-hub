@@ -1,4 +1,4 @@
-"""Single source of truth for shared constants across Open Harness Hub scripts.
+"""Single source of truth for shared constants across the AI Done Right portfolio scripts.
 
 Per `docs/codex/no-magic-values.md`: any value used in more than one place gets
 ONE definition here and is imported everywhere else — never re-typed as a

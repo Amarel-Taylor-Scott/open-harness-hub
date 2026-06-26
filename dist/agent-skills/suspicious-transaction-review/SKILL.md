@@ -42,7 +42,7 @@ and a SAR-style narrative draft for BSA officer review.
 
 ## Provenance
 
-- Hub artifact: `pipeline/suspicious-transaction-review` v0.1.0
+- Hub component: `pipeline/suspicious-transaction-review` v0.1.0
 - License: `MIT`
 - Industry: finance, finance.aml
 - Full source manifest: see `references/manifest.yaml`

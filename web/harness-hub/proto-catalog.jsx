@@ -25,7 +25,7 @@ function PBrowse({ kind = 'component' }) {
   const cnt = (key, val) => pool.filter((c) => c[key] === val).length;
   const modCnt = (m) => kindPool.filter((c) => c.modality === m).length;
   const toggle = (set) => (k) => set((s) => ({ ...s, [k]: !s[k] }));
-  const OWN = [['free', 'Free · OpenHarnessHub'], ['premium', 'Premium · OHH (subscription)'], ['community-free', 'Community · free'], ['community-paid', 'Community · paid']];
+  const OWN = [['free', 'Free · OpenHubForAI'], ['premium', 'Premium · OpenHubForAI (subscription)'], ['community-free', 'Community · free'], ['community-paid', 'Community · paid']];
   return (
     <div className="pt-page wide pt-view">
       <div className="pt-page-head">

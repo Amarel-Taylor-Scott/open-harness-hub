@@ -44,7 +44,7 @@ def render(pipeline: dict, catalog: dict) -> dict:
     return {
         "claim_generator":      f"open_harness_hub/{slug}@{pipeline.get('version','0.0.0')}",
         "claim_generator_info": [
-            {"name":    "Open Harness Hub",
+            {"name":    "OpenHubForAI",
              "version": "0.1.0"}
         ],
         "title":      pipeline.get("name", slug),

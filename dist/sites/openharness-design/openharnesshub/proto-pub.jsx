@@ -47,7 +47,7 @@ function PPublish() {
 
           <div className="pt-panel" style={{ marginTop: 14 }}>
             <div className="oh-cc-id mono" style={{ marginBottom: 4 }}>local agent → ecosystem</div>
-            <p style={{ fontSize: 12.5, color: 'var(--fg-muted)', margin: '0 0 8px', lineHeight: 1.5 }}>Configure how your Local Agent communicates with the OpenHarnessHub agent when publishing. Private data never leaves; only the fact/page/repo you choose, plus its provenance.</p>
+            <p style={{ fontSize: 12.5, color: 'var(--fg-muted)', margin: '0 0 8px', lineHeight: 1.5 }}>Configure how your Local Agent communicates with the OpenHubForAI agent when publishing. Private data never leaves; only the fact/page/repo you choose, plus its provenance.</p>
             <div className="pt-setting-row"><div className="info"><div className="t">Let my Local Agent publish</div><div className="d">via MCP · <a style={{ color: 'var(--accent)', cursor: 'pointer' }} onClick={() => navigate('/connect')}>manage the bridge →</a></div></div><PubToggle on={agentPublish} onClick={() => setAgentPublish((v) => !v)} /></div>
             {agentPublish && <div className="pt-setting-row"><div className="info"><div className="t">Before it goes public</div><div className="d">Auto-publish vs hold for your review.</div></div>
               <div className="pt-seg">{[['manual', 'Review first'], ['auto', 'Auto-publish']].map(([k, lb]) => <button key={k} className={review === k ? 'on' : ''} onClick={() => setReview(k)}>{lb}</button>)}</div></div>}

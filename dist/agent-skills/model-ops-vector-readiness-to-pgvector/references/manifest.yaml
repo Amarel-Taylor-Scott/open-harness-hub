@@ -1,0 +1,97 @@
+id: "pipeline/model-ops-vector-readiness-to-pgvector"
+type: pipeline
+version: "0.1.0"
+name: "Model ops vector readiness to pgvector"
+description: "Plans embeddings, runs a local deterministic embedding worker, emits pgvector load SQL, and audits committed-load readiness for a staged model-ops daily run."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["embedding", "retrieval", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.model_ops"
+tags: ["components", "model-ops", "embeddings", "pgvector", "vector-search", "load-audit"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Move a staged model-ops daily run from embedding work rows to pgvector-ready load SQL and a committed-load audit, without applying SQL or marking vector search product-ready."
+pipeline_kind: "research_web.model_ops_vector_readiness_to_pgvector"
+inputs:
+  - name: "object_embeddings_jsonl"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+  - name: "run_id"
+    type: "string"
+outputs:
+  - name: "embedding_execution_plan"
+    type: "json"
+  - name: "stored_vector_rows"
+    type: "jsonl"
+  - name: "pgvector_load_sql"
+    type: "sql"
+  - name: "embedding_committed_load_audit"
+    type: "json"
+steps:
+  - id: "plan-embedding-execution"
+    kind: "tool"
+    ref: "tool/embedding-execution-planner"
+    inputs:
+      object_embeddings_jsonl: "$.inputs.object_embeddings_jsonl"
+      output_dir: "$.inputs.output_dir/embedding-plan"
+      run_id: "$.inputs.run_id-embedding-plan"
+      default_profile: "local-bge-small-en"
+      max_items_per_batch: 128
+  - id: "run-local-hash-worker"
+    kind: "tool"
+    ref: "tool/local-hash-embedding-worker"
+    inputs:
+      embedding_plan: "$.plan-embedding-execution.files.manifest"
+      output_dir: "$.inputs.output_dir/local-hash-embedding-worker"
+      run_id: "$.inputs.run_id-local-hash-worker"
+      limit: 1000
+  - id: "plan-pgvector-load"
+    kind: "tool"
+    ref: "tool/pgvector-embedding-load-planner"
+    inputs:
+      stored_vectors_jsonl: "$.run-local-hash-worker.files.stored_vector_rows"
+      source_embedding_rows_jsonl: "$.inputs.object_embeddings_jsonl"
+      output_dir: "$.inputs.output_dir/pgvector-load-plan"
+      run_id: "$.inputs.run_id-pgvector-load"
+  - id: "audit-committed-load"
+    kind: "tool"
+    ref: "tool/embedding-committed-load-auditor"
+    inputs:
+      embedding_execution_plan: "$.plan-embedding-execution.files.manifest"
+      vector_readiness_summary: "$.run-local-hash-worker.vector_readiness.files.summary"
+      pgvector_load_plan_summary: "$.plan-pgvector-load.files.summary"
+      output: "$.inputs.output_dir/embedding-committed-load-audit.json"
+      run_id: "$.inputs.run_id-committed-load-audit"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.plan-embedding-execution.planned_completion_rows"
+    op: ">="
+    value: 1000
+    severity: "high"
+    label: "The pipeline plans at least 1,000 embedding completion rows."
+  - kind: "deterministic"
+    target: "$.run-local-hash-worker.vector_readiness.readiness_status"
+    op: "=="
+    value: "ready"
+    severity: "high"
+    label: "The local worker produces vector-readiness evidence for every sampled row."
+  - kind: "deterministic"
+    target: "$.plan-pgvector-load.rejected_rows"
+    op: "=="
+    value: 0
+    severity: "high"
+    label: "The pgvector load planner rejects no stored vectors."
+  - kind: "deterministic"
+    target: "$.audit-committed-load.audit_status"
+    op: "=="
+    value: "load_planned_not_committed"
+    severity: "medium"
+    label: "The audit correctly prevents product-ready vector search without committed Postgres counts."

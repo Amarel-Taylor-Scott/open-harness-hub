@@ -1,0 +1,109 @@
+id: "pipeline/hybrid-label-vector-index"
+type: pipeline
+version: "0.1.0"
+name: "Hybrid label vector index"
+description: "Combine pgvector-style embeddings with hierarchical labels, schema.org-style labels, tenant custom labels, entity links, and model-generated dimensions for flexible hybrid search."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "classification", "reranking", "routing", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.indexing"
+tags: ["hybrid-search", "pgvector", "labels", "dimensions", "schema-org", "model-routing"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Emit hybrid search records by labeling and dimensioning catalog/source objects, routing model-generated label work through a provider-neutral model router, and combining labels with vector/graph index records."
+pipeline_kind: "research_web.hybrid_label_vector_index"
+
+inputs:
+  - name: "subjects"
+    type: "object[]"
+  - name: "adapter_registry"
+    type: "object[]"
+  - name: "tenant_label_set"
+    type: "object"
+  - name: "cost_policy"
+    type: "object"
+outputs:
+  - name: "label_records"
+    type: "object[]"
+  - name: "dimension_records"
+    type: "object[]"
+  - name: "model_route_records"
+    type: "object[]"
+  - name: "index_records"
+    type: "object"
+  - name: "review_tickets"
+    type: "object[]"
+
+defaults:
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/hybrid-label-dimension-taxonomy"
+  rule_packs:
+    - "rule-pack/grep-prompt-injection-heuristics"
+
+steps:
+  - id: "load_label_taxonomy"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/hybrid-label-dimension-taxonomy"
+    inputs:
+      query: "hierarchical schema.org generated dimensions hybrid search labels"
+      top_k: 50
+
+  - id: "route_label_model"
+    kind: "tool"
+    ref: "tool/model-capability-router"
+    inputs:
+      task:
+        task_type: "label_and_dimension"
+        modality: ["text", "structured"]
+        quality_tier: "cheap"
+        schema_strictness: "json"
+      adapter_registry: "$.inputs.adapter_registry"
+      cost_policy: "$.inputs.cost_policy"
+      trust_policy:
+        prefer_local_for_sensitive_data: true
+        allowed_boundaries: ["local", "hub", "external", "mixed"]
+
+  - id: "assign_labels_dimensions"
+    kind: "tool"
+    ref: "tool/hierarchical-label-dimensioner"
+    inputs:
+      subjects: "$.inputs.subjects"
+      label_taxonomy: "$.steps.load_label_taxonomy.output.docs"
+      dimension_definitions: "$.steps.load_label_taxonomy.output.docs"
+      model_route: "$.steps.route_label_model.output"
+      tenant_label_set: "$.inputs.tenant_label_set"
+
+  - id: "emit_hybrid_index_records"
+    kind: "tool"
+    ref: "tool/index-record-emitter"
+    inputs:
+      normalized_objects: "$.inputs.subjects"
+      canonical_entities: []
+      emit: ["keyword", "vector", "graph", "facet", "quality", "freshness"]
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "hybrid-label-vector-index"
+      applied_layers: ["label_taxonomy", "model_routing", "label_dimension_assignment", "hybrid_index_emission"]
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.outputs.label_records"
+    op: "is_truthy"
+    value: true
+    label: "Label records are produced or queued for review."
+  - kind: "deterministic"
+    target: "$.outputs.dimension_records"
+    op: "is_truthy"
+    value: true
+    label: "Dimension records are produced or queued for review."

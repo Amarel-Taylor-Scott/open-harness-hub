@@ -68,7 +68,7 @@ draft and a structured risk score; never a SAR filing.
 
 ## Provenance
 
-- Hub artifact: `harness/aml-investigation` v0.1.0
+- Hub component: `harness/aml-investigation` v0.1.0
 - License: `MIT`
 - Lifecycle: `experimental`
 - Full source manifest: see `references/manifest.yaml`

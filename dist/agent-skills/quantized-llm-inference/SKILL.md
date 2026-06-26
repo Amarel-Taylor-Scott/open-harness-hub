@@ -34,7 +34,7 @@ defined chat template + generation kwargs.
 
 ## Provenance
 
-- Hub artifact: `pipeline/quantized-llm-inference` v0.1.0
+- Hub component: `pipeline/quantized-llm-inference` v0.1.0
 - License: `MIT`
 - Industry: ai, cross_industry
 - Full source manifest: see `references/manifest.yaml`

@@ -49,7 +49,7 @@ diff verdict (approve / request-changes / block).
 
 ## Provenance
 
-- Hub artifact: `pipeline/code-review-with-risk-score` v0.1.0
+- Hub component: `pipeline/code-review-with-risk-score` v0.1.0
 - License: `MIT`
 - Industry: software, software.codereview, security
 - Full source manifest: see `references/manifest.yaml`

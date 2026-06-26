@@ -75,7 +75,7 @@ official-source verify, schema-validate, iterative-revise, audit, deliver.
 
 ## Provenance
 
-- Hub artifact: `pipeline/everything-research-pipeline` v0.1.0
+- Hub component: `pipeline/everything-research-pipeline` v0.1.0
 - License: `MIT`
 - Industry: cross_industry
 - Full source manifest: see `references/manifest.yaml`

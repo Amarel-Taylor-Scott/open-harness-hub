@@ -1,0 +1,99 @@
+id: "pipeline/public-source-rows-to-load-plan"
+type: pipeline
+version: "0.1.0"
+name: "Public source rows to load plan"
+description: "Turns public-source replay row families into a relationship-preflighted, promotion-scored, review-routed, bulk-load-ready Postgres and pgvector load plan."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["government", "software", "media", "construction", "energy", "finance", "healthcare", "cross_industry"]
+capability: ["governance", "evaluation", "retrieval", "routing", "serving", "embedding"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["public-sources", "bulk-load", "promotion-scoring", "postgres", "pgvector", "review-gates"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Create a safe additive load plan for public-source generated objects after replay row emission."
+pipeline_kind: "research_web.public_source_load_plan"
+inputs:
+  - name: "row_dir"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+  - name: "load_sql_name"
+    type: "string"
+outputs:
+  - name: "preflight_report"
+    type: "json"
+  - name: "promotion_summary"
+    type: "json"
+  - name: "bulk_manifest"
+    type: "json"
+  - name: "load_plan_manifest"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/public-source-load-plan-patterns"
+    - "knowledge-pack/public-source-replay-row-patterns"
+steps:
+  - id: "govern-public-source-load"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record:
+        source_type: "public_source_replay_row_family"
+        license: "CC-BY-4.0"
+        privacy_boundary: "public_metadata_only"
+      source_policy:
+        require_license: true
+        forbid_private_source_bodies: true
+        require_redaction_before_external_model: true
+        excluded_scopes: ["insurance"]
+  - id: "emit-load-plan"
+    kind: "tool"
+    ref: "tool/public-source-load-plan-emitter"
+    inputs:
+      row_dir: "$.inputs.row_dir"
+      output_dir: "$.inputs.output_dir"
+      load_sql_name: "$.inputs.load_sql_name"
+  - id: "bulk-copy-contract"
+    kind: "tool"
+    ref: "tool/factory-jsonl-bulk-copy-loader"
+    inputs:
+      manifest: "$.steps.emit-load-plan.bulk_manifest"
+  - id: "route-review-holds"
+    kind: "tool"
+    ref: "tool/candidate-primitive-promotion-scorer"
+    inputs:
+      promotion_summary: "$.steps.emit-load-plan.promotion_summary"
+      review_policy:
+        high_risk_sources_require_review: true
+        volatile_public_facts_require_review: true
+        excluded_scopes: ["insurance"]
+success_criteria:
+  - kind: "deterministic"
+    target: "$.preflight_report.ok"
+    op: "=="
+    value: true
+    severity: "critical"
+    label: "Relationship preflight passes before load export."
+  - kind: "deterministic"
+    target: "$.bulk_manifest.ok"
+    op: "=="
+    value: true
+    severity: "critical"
+    label: "Bulk load manifest and SQL are emitted."
+  - kind: "semantic"
+    target: "$.promotion_summary"
+    must_cover:
+      - "promotion decisions"
+      - "review tickets"
+      - "index records"
+      - "hold before promotion"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Promotion output preserves review-gated publication."

@@ -1,0 +1,117 @@
+id: "pipeline/esg-pillar-deep-dive"
+type: pipeline
+version: "0.1.0"
+name: "ESG single-pillar (E / S / G) deep-dive disclosure review"
+description: |
+  End-to-end pipeline reviewing ONE ESG pillar (Environmental,
+  Social, or Governance) of a sustainability disclosure at SASB-
+  industry + ISSB + TCFD + GRI depth, with greenwashing-pattern
+  scan and framework-coded findings.
+
+  Complements:
+   - `pipeline/supplier-policy-grading` — regulatory enforcement
+     (CSDDD/UFLPA E+S+G grading)
+   - `pipeline/esg-disclosure-grading` (via harness/esg-disclosure-
+     grading) — combined ESG voluntary disclosure grading
+
+  This pipeline is for going DEEP on ONE pillar at a time —
+  appropriate when an analyst, investor, or auditor wants pillar-
+  level detail rather than a roll-up.
+
+  Outputs:
+   - per-topic disclosure status (disclosed / incomplete / not-
+     material / missing) with SASB/ISSB/GRI/TCFD code citations
+   - greenwashing-flag list with severity
+   - double-materiality coverage table
+   - target rigour assessment (SBTi check for climate)
+   - assurance level + auditor
+   - rubric score (rubric/esg-pillar-depth-v1)
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry:   ["esg", "esg.csrd", "sustainability", "climate", "compliance"]
+capability: ["evaluation", "extraction", "verification"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.grading"
+tags: ["esg", "sasb", "gri", "tcfd", "issb", "sbti", "greenwashing", "deep-dive"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+task: |
+  Given a sustainability disclosure and a target pillar (E, S, or G),
+  produce a SASB-industry-specific, ISSB/GRI/TCFD-aligned, framework-
+  coded review with greenwashing-pattern scan and a rubric grade
+  against `rubric/esg-pillar-depth-v1`.
+pipeline_kind: "grading"
+
+inputs:
+  - name: "disclosure_text"
+    type: "string"
+  - name: "pillar"
+    type: "string"
+  - name: "company_industry_hint"
+    type: "string"
+outputs:
+  - name: "grade"
+    type: "number"
+  - name: "findings"
+    type: "object[]"
+  - name: "suggested_fixes"
+    type: "object[]"
+  - name: "trace"
+    type: "object[]"
+
+defaults:
+  persona: "persona/esg-pillar-analyst"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/grep-greenwashing-flags"
+
+steps:
+  - id: "normalize"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs:
+      data: "$.inputs.disclosure_text"
+
+  - id: "grep_greenwashing"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-greenwashing-flags"
+    inputs:
+      text: "$.steps.normalize.output.prose"
+
+  - id: "rag_esg_frameworks"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.inputs.company_industry_hint"
+      corpus: "knowledge-pack/sasb-gri-tcfd-issb-standards"
+      top_k: 12
+
+  - id: "review"
+    kind: "harness"
+    ref: "harness/esg-pillar-review"
+    inputs:
+      disclosure_text: "$.steps.normalize.output.prose"
+      pillar: "$.inputs.pillar"
+      company_industry_hint: "$.inputs.company_industry_hint"
+
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.review.output"
+      rubric_ref: "rubric/esg-pillar-depth-v1"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "esg-pillar-deep-dive"
+      applied_layers: ["persona", "grep", "rag", "judge"]
+
+success_criteria:
+  - rubric:    "rubric/esg-pillar-depth-v1"
+    threshold: 0.7

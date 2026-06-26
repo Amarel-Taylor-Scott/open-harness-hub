@@ -13,7 +13,7 @@ down a hidden concept. Uses a candidate set + binary-search-style
 question generation. The classic agent-game pattern with a clear
 win condition.
 
-Verified by Open Harness Hub mining of ryanholbrook's "LLM 20
+Verified by OpenHubForAI mining of ryanholbrook's "LLM 20
 Questions Starter Notebook" (1420 votes) + cdeotte's "Starter Code
 for Llama 8B LLM" (447 votes).
 
@@ -36,7 +36,7 @@ target. Track candidate set and use binary-search question selection.
 
 ## Provenance
 
-- Hub artifact: `pipeline/twenty-questions-agent` v0.1.0
+- Hub component: `pipeline/twenty-questions-agent` v0.1.0
 - License: `MIT`
 - Industry: ai, education
 - Full source manifest: see `references/manifest.yaml`

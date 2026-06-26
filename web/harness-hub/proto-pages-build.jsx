@@ -39,7 +39,7 @@ const PLACEHOLDER_BY_MOD = {
 function PLanding() {
   const { task, setTask, loggedIn } = React.useContext(StoreCtx);
   const { OhTopBar, OhFooter } = window;
-  const brand = { name: 'OpenHarnessHub', tld: '.io', glyph: '⎔', accent: 'var(--accent)' };
+  const brand = { name: 'OpenHubForAI', realm: 'openharnesshub', tld: '.io', glyph: '⎔', accent: 'var(--accent)' };
   const [hint, setHint] = React.useState('');
   const [exMod, setExMod] = React.useState('text');
   const [heroV, hero] = window.useExperiment('ohh_hero', ['A', 'B']);
@@ -100,7 +100,7 @@ function PLanding() {
         <section className="pt-mkt-sec ohh-standards-sec" style={{ maxWidth: 'var(--maxw-site, 1100px)', margin: '0 auto', padding: '8px 28px 12px', boxSizing: 'border-box' }}>
           <div className="pt-sec-eyebrow" style={{ fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--accent)' }}>Open standards</div>
           <h2 style={{ fontSize: 'var(--fs-h2, 30px)', fontWeight: 800, letterSpacing: '-.02em', margin: '10px 0 0' }}>Built on the open supply-chain stack.</h2>
-          <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--fg-muted)', margin: '10px 0 0', maxWidth: '74ch' }}>OpenHarnessHub doesn’t reinvent trust — it applies the same Linux Foundation / OpenSSF / OWASP standards that secure software supply chains to harnesses and eval packs. Provenance, signing, risk and a bill-of-materials are open and verifiable.</p>
+          <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--fg-muted)', margin: '10px 0 0', maxWidth: '74ch' }}>OpenHubForAI doesn’t reinvent trust — it applies the same Linux Foundation / OpenSSF / OWASP standards that secure software supply chains to harnesses and eval packs. Provenance, signing, risk and a bill-of-materials are open and verifiable.</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginTop: 20 }} className="ohh-std-grid">
             {[
               ['Sigstore', 'keyless signing + transparency log — every harness’s signed receipt'],
@@ -453,7 +453,7 @@ function PPreview() {
   const POL = { always: 'Always', default: 'Default', optional: 'Optional' };
   return (
     <div className="pt-mkt pt-view">
-      <window.OhTopBar brand={{ name: 'OpenHarnessHub', tld: '.io', glyph: '⎔', accent: 'var(--accent)' }}
+      <window.OhTopBar brand={{ name: 'OpenHubForAI', realm: 'openharnesshub', tld: '.io', glyph: '⎔', accent: 'var(--accent)' }}
         cta={{ label: 'Start free', href: '/signup' }} signInHref="/signin" />
       <div className="pt-mkt-body">
         <div className="pt-pv">

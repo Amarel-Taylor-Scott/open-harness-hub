@@ -1,0 +1,105 @@
+id: "pipeline/immigration-case-intake-review"
+type: pipeline
+version: "0.1.0"
+name: "Immigration Case Intake review pipeline"
+description: "Expanded immigration case intake review pipeline with evidence normalization, grep, RAG, harness review, severity calibration, and audit output."
+authors: [{ name: "OpenHubForAI contributors" }]
+license: "MIT"
+industry: ["legal.immigration"]
+capability: ["evaluation", "extraction", "retrieval", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "stable"
+tags: ["immigration-case-intake", "expansion-v3"]
+created: "2026-05-24"
+updated: "2026-05-24"
+task: "Review immigration intake packets for eligibility evidence, deadline risk, translation, and missing documents."
+pipeline_kind: "review"
+inputs:
+  - name: "packet"
+    type: "string|object"
+outputs:
+  - name: "findings"
+    type: "object[]"
+  - name: "score"
+    type: "number"
+  - name: "evidence_gaps"
+    type: "object[]"
+  - name: "risk_register_updates"
+    type: "object[]"
+defaults:
+  persona: "persona/immigration-intake-reviewer"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs: ["knowledge-pack/immigration-case-intake-frameworks"]
+  rule_packs: ["rule-pack/grep-immigration-case-intake-flags", "rule-pack/rag-immigration-case-intake-retrieval-policy"]
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.packet" }
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+  - id: "normalize_evidence"
+    kind: "processor"
+    ref: "processor/packet-evidence-normalizer"
+    inputs: { trace: "$.steps.redact_pii.output", config: {} }
+  - id: "grep_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-immigration-case-intake-flags"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+  - id: "retrieve_context"
+    kind: "rule_pack"
+    ref: "rule-pack/rag-immigration-case-intake-retrieval-policy"
+    inputs: { query: "$.steps.grep_flags.output.fired", corpus: "knowledge-pack/immigration-case-intake-frameworks", top_k: 10 }
+  - id: "review_harness"
+    kind: "harness"
+    ref: "harness/immigration-case-intake-review"
+    inputs:
+      packet: "$.steps.redact_pii.output.text"
+      context: "$.steps.retrieve_context.output.passages"
+      evidence: "$.steps.normalize_evidence.output.result"
+  - id: "dedupe_findings"
+    kind: "processor"
+    ref: "processor/finding-deduplicator"
+    inputs: { trace: "$.steps.review_harness.output", config: {} }
+  - id: "calibrate_severity"
+    kind: "processor"
+    ref: "processor/severity-calibrator"
+    inputs: { trace: "$.steps.dedupe_findings.output.result", config: {} }
+  - id: "extract_evidence_gaps"
+    kind: "processor"
+    ref: "processor/evidence-gap-extractor"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.calibrate_severity.output.result"
+      rubric_ref: "rubric/immigration-case-intake-quality-v1"
+  - id: "redaction_audit"
+    kind: "processor"
+    ref: "processor/packet-redaction-audit"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+  - id: "risk_register"
+    kind: "processor"
+    ref: "processor/risk-register-updater"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "immigration-case-intake-review"
+      applied_layers: ["privacy", "evidence_normalize", "grep", "rag", "harness", "dedupe", "severity", "judge", "redaction_audit"]
+success_criteria:
+  - rubric: "rubric/immigration-case-intake-quality-v1"
+    threshold: 0.68
+  - kind: "deterministic"
+    target: "$.steps.redaction_audit.output.result.pass"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "publication redaction audit passes"

@@ -1,0 +1,134 @@
+id: "pipeline/use-case-seeds-to-label-dimension-rows"
+type: pipeline
+version: "0.1.0"
+name: "Use case seeds to label and dimension rows"
+description: "Exports broad use-case seeds into candidate primitive rows, flexible hierarchy labels, dimensions, canonical entities, object_entity_refs, object_embedding stubs, dedupe clusters, review tickets, and index records for Postgres/pgvector loading."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "finance", "legal", "media", "creative", "energy", "healthcare", "cross_industry"]
+capability: ["classification", "extraction", "retrieval", "routing", "governance"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.product"
+tags: ["use-case-seeds", "label-records", "dimension-records", "entity-refs", "object-embeddings", "jsonl", "bulk-load", "hybrid-search"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Convert cross-domain use-case seeds into loadable candidate primitive, label, dimension, dedupe, review, and index JSONL row families while excluding insurance scope."
+pipeline_kind: "research_web.use_case_seed_label_dimension_rows"
+inputs:
+  - name: "seeds"
+    type: "array"
+  - name: "excluded_scopes"
+    type: "array"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "row_counts"
+    type: "json"
+  - name: "jsonl_files"
+    type: "array"
+  - name: "bulk_load_plan"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/cross-domain-use-case-seeds"
+    - "knowledge-pack/use-case-seed-row-patterns"
+    - "knowledge-pack/use-case-seed-entity-ref-patterns"
+    - "knowledge-pack/use-case-seed-embedding-bucket-patterns"
+    - "knowledge-pack/flexible-hierarchy-label-patterns"
+steps:
+  - id: "govern-use-case-seeds"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record:
+        source_type: "synthetic_use_case_seed_batch"
+        license: "CC-BY-4.0"
+        privacy_boundary: "public"
+      source_policy:
+        excluded_scopes: "$.inputs.excluded_scopes"
+        require_license: true
+  - id: "export-seed-row-families"
+    kind: "tool"
+    ref: "tool/use-case-seed-row-exporter"
+    inputs:
+      seeds: "$.inputs.seeds"
+      output_dir: "$.inputs.output_dir"
+      excluded_scopes: "$.inputs.excluded_scopes"
+  - id: "link-seed-entities"
+    kind: "tool"
+    ref: "tool/entity-recognition-linker"
+    inputs:
+      text: "$.inputs.seeds"
+      entity_types: ["agency", "jurisdiction", "law", "platform", "competitor", "place", "vertical", "workflow"]
+  - id: "preflight-row-relationships"
+    kind: "tool"
+    ref: "tool/factory-jsonl-relationship-preflight"
+    inputs:
+      source_records:
+        - "$.steps.export-seed-row-families.row_family_paths.source_record"
+      normalized_objects:
+        - "$.steps.export-seed-row-families.row_family_paths.normalized_object"
+      canonical_entities:
+        - "$.steps.export-seed-row-families.row_family_paths.canonical_entity"
+      object_entity_refs:
+        - "$.steps.export-seed-row-families.row_family_paths.object_entity_ref"
+      dedupe_clusters:
+        - "$.steps.export-seed-row-families.row_family_paths.dedupe_cluster"
+      review_tickets:
+        - "$.steps.export-seed-row-families.row_family_paths.review_ticket"
+      label_assignments:
+        - "$.steps.export-seed-row-families.row_family_paths.label_assignment"
+      dimension_values:
+        - "$.steps.export-seed-row-families.row_family_paths.dimension_value"
+      object_embeddings:
+        - "$.steps.export-seed-row-families.row_family_paths.object_embedding"
+  - id: "prepare-bulk-copy"
+    kind: "tool"
+    ref: "tool/factory-jsonl-bulk-copy-loader"
+    inputs:
+      source_records:
+        - "$.steps.export-seed-row-families.row_family_paths.source_record"
+      normalized_objects:
+        - "$.steps.export-seed-row-families.row_family_paths.normalized_object"
+      canonical_entities:
+        - "$.steps.export-seed-row-families.row_family_paths.canonical_entity"
+      object_entity_refs:
+        - "$.steps.export-seed-row-families.row_family_paths.object_entity_ref"
+      dedupe_clusters:
+        - "$.steps.export-seed-row-families.row_family_paths.dedupe_cluster"
+      review_tickets:
+        - "$.steps.export-seed-row-families.row_family_paths.review_ticket"
+      label_assignments:
+        - "$.steps.export-seed-row-families.row_family_paths.label_assignment"
+      dimension_values:
+        - "$.steps.export-seed-row-families.row_family_paths.dimension_value"
+      object_embeddings:
+        - "$.steps.export-seed-row-families.row_family_paths.object_embedding"
+      index_records:
+        - "$.steps.export-seed-row-families.row_family_paths.index_record"
+success_criteria:
+  - kind: "semantic"
+    target: "$.row_counts"
+    must_cover:
+      - "normalized_object"
+      - "label_assignment"
+      - "dimension_value"
+      - "canonical_entity"
+      - "object_entity_ref"
+      - "object_embedding"
+      - "review_ticket"
+      - "index_record"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Use-case seeds are emitted as candidate primitive, label, dimension, review, and index rows."
+  - kind: "deterministic"
+    target: "$.bulk_load_plan"
+    op: "is_truthy"
+    value: true
+    severity: "medium"
+    label: "Bulk-load plan is prepared."

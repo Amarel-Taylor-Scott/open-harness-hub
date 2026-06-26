@@ -1,0 +1,95 @@
+id: "pipeline/specialized-model-signal-intake"
+type: pipeline
+version: "0.1.0"
+name: "Specialized model signal intake"
+description: "Mines task-specific model cards, model organizations, datasets, and leaderboards into governed candidate knowledge objects and pipeline primitives."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["healthcare", "finance", "legal", "software.devops", "media", "security", "privacy", "government", "cross_industry"]
+capability: ["classification", "extraction", "retrieval", "evaluation", "routing", "governance", "embedding"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "pre_api.ingest"
+tags: ["huggingface", "model-cards", "specialized-models", "fine-tuning", "knowledge-objects", "evaluation"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Turn public task-specific model context into reusable knowledge objects, eval seeds, label schemas, model replacement routes, and review tickets."
+pipeline_kind: "research_web.specialized_model_signal_intake"
+inputs:
+  - name: "model_cards"
+    type: "array"
+  - name: "model_orgs"
+    type: "array"
+  - name: "excluded_scopes"
+    type: "array"
+outputs:
+  - name: "candidate_primitives"
+    type: "array"
+  - name: "model_signal_records"
+    type: "array"
+  - name: "review_tickets"
+    type: "array"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/specialized-model-signal-surfaces"
+steps:
+  - id: "govern-model-sources"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record:
+        source_type: "model_card_batch"
+        license: "source_specific"
+        privacy_boundary: "public_metadata_only"
+      source_policy:
+        require_license: true
+        forbid_private_source_bodies: true
+        require_attribution: true
+        excluded_scopes: "$.inputs.excluded_scopes"
+  - id: "normalize-model-cards"
+    kind: "tool"
+    ref: "tool/specialized-model-card-normalizer"
+    inputs:
+      model_cards: "$.inputs.model_cards"
+      excluded_scopes: "$.inputs.excluded_scopes"
+      normalization_policy:
+        extract_task_shape: true
+        extract_label_schema: true
+        extract_training_context: true
+        extract_eval_context: true
+        extract_limitations: true
+        emit_replacement_routes: true
+  - id: "link-model-signal-entities"
+    kind: "tool"
+    ref: "tool/entity-recognition-linker"
+    inputs:
+      text: "$.steps.normalize-model-cards.candidate_primitives"
+      entity_types: ["source", "workflow", "concept", "organization", "dataset", "model"]
+  - id: "dedupe-model-signal-primitives"
+    kind: "tool"
+    ref: "tool/fuzzy-dedupe-clusterer"
+    inputs:
+      candidate_records: "$.steps.normalize-model-cards.candidate_primitives"
+      match_features: ["source_model_id", "task_shape", "labels_or_outputs", "datasets", "metrics", "limitations"]
+  - id: "emit-model-signal-index-records"
+    kind: "tool"
+    ref: "tool/index-record-emitter"
+    inputs:
+      normalized_objects: "$.steps.normalize-model-cards.candidate_primitives"
+      emit: ["keyword", "vector", "graph", "facet", "quality"]
+success_criteria:
+  - kind: "semantic"
+    target: "$.candidate_primitives"
+    must_cover:
+      - "task definition"
+      - "label schema"
+      - "training context"
+      - "evaluation harness"
+      - "model replacement route"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Task-specific model context becomes reusable pipeline primitive context."

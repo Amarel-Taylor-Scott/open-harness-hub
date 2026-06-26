@@ -1,0 +1,72 @@
+id: "pipeline/auto-warranty-triage-review"
+type: pipeline
+version: "0.1.0"
+name: "Auto Warranty Triage review pipeline"
+description: "End-to-end auto warranty triage review with redaction, grep triage, RAG grounding, harness review, rubric scoring, and audit trace."
+authors: [{ name: "OpenHubForAI contributors" }]
+license: "MIT"
+industry: ["automotive", "automotive.warranty"]
+capability: ["evaluation", "extraction", "retrieval", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "stable"
+tags: ["auto-warranty-triage", "use-case-expansion"]
+created: "2026-05-24"
+updated: "2026-05-24"
+task: "Review warranty claims for coverage, repeat repair, field-quality signal, and fraud/evidence gaps."
+pipeline_kind: "review"
+inputs:
+  - name: "packet"
+    type: "string|object"
+outputs:
+  - name: "findings"
+    type: "object[]"
+  - name: "score"
+    type: "number"
+  - name: "evidence_gaps"
+    type: "object[]"
+defaults:
+  persona: "persona/auto-warranty-analyst"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs: ["knowledge-pack/auto-warranty-triage-frameworks"]
+  rule_packs: ["rule-pack/grep-auto-warranty-triage-flags", "rule-pack/rag-auto-warranty-triage-retrieval-policy"]
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.packet" }
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+  - id: "grep_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-auto-warranty-triage-flags"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+  - id: "retrieve_context"
+    kind: "rule_pack"
+    ref: "rule-pack/rag-auto-warranty-triage-retrieval-policy"
+    inputs: { query: "$.steps.grep_flags.output.fired", corpus: "knowledge-pack/auto-warranty-triage-frameworks", top_k: 8 }
+  - id: "review_harness"
+    kind: "harness"
+    ref: "harness/auto-warranty-triage-review"
+    inputs:
+      packet: "$.steps.redact_pii.output.text"
+      context: "$.steps.retrieve_context.output.passages"
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.review_harness.output.findings"
+      rubric_ref: "rubric/auto-warranty-triage-quality-v1"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "auto-warranty-triage-review"
+      applied_layers: ["privacy", "grep", "rag", "harness", "judge"]
+success_criteria:
+  - rubric: "rubric/auto-warranty-triage-quality-v1"
+    threshold: 0.65

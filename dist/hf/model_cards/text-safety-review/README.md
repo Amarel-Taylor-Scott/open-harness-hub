@@ -23,7 +23,7 @@ region:
 
 # Text Safety Review
 
-<!-- Generated from Open Harness Hub manifest `harness/text-safety-review` v0.1.0. Do not edit by hand; edit the source manifest and re-run `python scripts/emit/hf_model_card.py`. -->
+<!-- Generated from OpenHubForAI manifest `harness/text-safety-review` v0.1.0. Do not edit by hand; edit the source manifest and re-run `python scripts/emit/hf_model_card.py`. -->
 
 ## Model description
 
@@ -86,11 +86,11 @@ This is a workflow harness, not a trained model. Risk profile depends on the mod
 ```bibtex
 @misc{text-safety-review_open_harness_hub,
   title  = {Text Safety Review},
-  author = {Open Harness Hub contributors},
+  author = {OpenHubForAI contributors},
   url    = {https://open-harness-hub.dev/harness/text-safety-review},
   version= {0.1.0},
   year   = {2026}
 }
 ```
 
-License: `MIT`. Hub artifact: `harness/text-safety-review`.
+License: `MIT`. Hub component: `harness/text-safety-review`.

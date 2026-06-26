@@ -1,0 +1,79 @@
+id: "pipeline/partitioned-jsonl-to-index-delta"
+type: pipeline
+version: "0.1.0"
+name: "Partitioned JSONL to index delta"
+description: "Convert high-volume normalized-object JSONL shards into partition manifests and append-only index deltas for keyword, vector, graph, facet, quality, freshness, and cost stores."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "governance", "serving", "format_conversion"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.indexing"
+tags: ["partition", "index-delta", "jsonl", "incremental-build", "million-primitives"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Emit replayable partition manifests and index deltas from normalized object JSONL shards so large-scale ingestion can update search/vector/graph stores without rebuilding the whole catalog."
+pipeline_kind: "research_web.partitioned_jsonl_to_index_delta"
+
+inputs:
+  - name: "input_path"
+    type: "string"
+  - name: "partition_id"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+  - name: "emit"
+    type: "string[]"
+outputs:
+  - name: "partition_manifest"
+    type: "object"
+    schema: "schemas/partition-manifest.schema.json"
+  - name: "index_deltas"
+    type: "object[]"
+    schema: "schemas/index-delta-record.schema.json"
+
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/partitioned-index-delta-patterns"
+
+steps:
+  - id: "load_partition_patterns"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/partitioned-index-delta-patterns"
+    inputs:
+      query: "partition manifests index delta JSONL replay idempotent upsert"
+      top_k: 10
+
+  - id: "emit_partition_delta"
+    kind: "tool"
+    ref: "tool/partition-index-delta-emitter"
+    inputs:
+      input_path: "$.inputs.input_path"
+      partition_id: "$.inputs.partition_id"
+      output_dir: "$.inputs.output_dir"
+      emit: "$.inputs.emit"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "partitioned-jsonl-to-index-delta"
+      applied_layers: ["partition_manifest", "index_delta", "idempotent_upsert", "incremental_build"]
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.outputs.partition_manifest"
+    op: "is_truthy"
+    value: true
+    label: "Partition manifest is emitted."
+  - kind: "deterministic"
+    target: "$.outputs.index_deltas"
+    op: "is_truthy"
+    value: true
+    label: "Index delta records are emitted or the empty partition is explicit."
+

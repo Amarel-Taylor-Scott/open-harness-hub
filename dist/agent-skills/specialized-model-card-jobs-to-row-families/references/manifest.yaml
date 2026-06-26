@@ -1,0 +1,102 @@
+id: "pipeline/specialized-model-card-jobs-to-row-families"
+type: pipeline
+version: "0.1.0"
+name: "Specialized model-card jobs to row families"
+description: "Converts specialized model-card scan jobs into schema-shaped JSONL row families, runs relationship preflight, and prepares the shards for Postgres/pgvector bulk loading."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["healthcare", "finance", "legal", "software.devops", "media", "security", "privacy", "government", "cross_industry"]
+capability: ["extraction", "classification", "retrieval", "evaluation", "routing", "governance", "embedding"]
+modality: ["structured", "text", "image"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.factory"
+tags: ["huggingface", "model-cards", "row-families", "jsonl", "relationship-preflight", "pgvector"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Emit canonical row-family JSONL from specialized model-card scan jobs and verify relational integrity before bulk load."
+pipeline_kind: "research_web.specialized_model_card_row_families"
+inputs:
+  - name: "scan_jobs"
+    type: "array"
+  - name: "output_dir"
+    type: "string"
+  - name: "excluded_scopes"
+    type: "array"
+outputs:
+  - name: "row_counts"
+    type: "json"
+  - name: "row_family_paths"
+    type: "json"
+  - name: "preflight_report"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/specialized-model-card-scan-job-patterns"
+    - "knowledge-pack/specialized-model-card-row-patterns"
+steps:
+  - id: "govern-model-card-scan-jobs"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record:
+        source_type: "specialized_model_card_scan_job_batch"
+        license: "source_specific"
+        privacy_boundary: "public_model_metadata_only"
+      source_policy:
+        require_license: true
+        forbid_private_source_bodies: true
+        forbid_model_weight_download: true
+        require_redaction_before_external_model: true
+        excluded_scopes: "$.inputs.excluded_scopes"
+  - id: "emit-row-families"
+    kind: "tool"
+    ref: "tool/specialized-model-card-row-emitter"
+    inputs:
+      jobs: "$.inputs.scan_jobs"
+      output_dir: "$.inputs.output_dir"
+      excluded_scopes: "$.inputs.excluded_scopes"
+  - id: "preflight-row-relationships"
+    kind: "tool"
+    ref: "tool/factory-jsonl-relationship-preflight"
+    inputs:
+      source_records:
+        - "$.steps.emit-row-families.row_family_paths.source_record"
+      normalized_objects:
+        - "$.steps.emit-row-families.row_family_paths.normalized_object"
+      canonical_entities:
+        - "$.steps.emit-row-families.row_family_paths.canonical_entity"
+      object_entity_refs:
+        - "$.steps.emit-row-families.row_family_paths.object_entity_ref"
+      dedupe_clusters:
+        - "$.steps.emit-row-families.row_family_paths.dedupe_cluster"
+      review_tickets:
+        - "$.steps.emit-row-families.row_family_paths.review_ticket"
+      label_assignments:
+        - "$.steps.emit-row-families.row_family_paths.label_assignment"
+      dimension_values:
+        - "$.steps.emit-row-families.row_family_paths.dimension_value"
+      object_embeddings:
+        - "$.steps.emit-row-families.row_family_paths.object_embedding"
+success_criteria:
+  - kind: "semantic"
+    target: "$.row_counts"
+    must_cover:
+      - "source_record"
+      - "normalized_object"
+      - "canonical_entity"
+      - "dedupe_cluster"
+      - "index_record"
+      - "review_ticket"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Specialized model-card output covers canonical object-factory row families."
+  - kind: "deterministic"
+    target: "$.preflight_report.ok"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "Relationship preflight passes before bulk load."

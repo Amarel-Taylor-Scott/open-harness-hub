@@ -1,0 +1,91 @@
+id: "pipeline/component-cdc-versioning"
+type: pipeline
+version: "0.1.0"
+name: "Component CDC versioning"
+description: "Compare component version rows, compute canonical hashes, record immutable change events, emit freshness and graph index records, and route risky updates to review."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "verification", "retrieval", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.versioning"
+tags: ["components", "cdc", "versioning", "hashing", "review-queue", "postgres", "pgvector"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Create immutable component change records and derived index/review rows whenever a component definition or source-backed fact changes."
+pipeline_kind: "research_web.component_cdc_versioning"
+
+inputs:
+  - name: "previous_versions_path"
+    type: "string"
+  - name: "new_versions_path"
+    type: "string"
+  - name: "actor"
+    type: "object"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "component_change_events"
+    type: "jsonl"
+  - name: "index_records"
+    type: "jsonl"
+  - name: "review_tickets"
+    type: "jsonl"
+  - name: "load_sql"
+    type: "sql"
+
+defaults:
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/component-cdc-versioning-patterns"
+  rule_packs:
+    - "rule-pack/grep-prompt-injection-heuristics"
+
+steps:
+  - id: "route_source_governance"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record: "$.inputs.actor"
+      policy: "component_version_cdc"
+
+  - id: "plan_change_events"
+    kind: "tool"
+    ref: "tool/component-cdc-planner"
+    inputs:
+      previous_versions_path: "$.inputs.previous_versions_path"
+      new_versions_path: "$.inputs.new_versions_path"
+      output_dir: "$.inputs.output_dir"
+      actor_type: "$.inputs.actor.type"
+      actor_ref: "$.inputs.actor.ref"
+
+  - id: "emit_index_deltas"
+    kind: "tool"
+    ref: "tool/index-record-emitter"
+    inputs:
+      records: "$.steps.plan_change_events.output.index_records"
+      index_kinds: ["freshness", "keyword", "graph", "quality"]
+
+  - id: "route_review"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      review_tickets: "$.steps.plan_change_events.output.review_tickets"
+      policy: "component_change_review"
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.outputs.component_change_events"
+    op: "is_truthy"
+    value: true
+    label: "Each new or changed component version has a hashable change event."
+  - kind: "deterministic"
+    target: "$.outputs.index_records"
+    op: "is_truthy"
+    value: true
+    label: "Search and freshness indexes can be updated from the change plan."

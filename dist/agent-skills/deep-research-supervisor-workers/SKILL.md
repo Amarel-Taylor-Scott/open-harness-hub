@@ -12,7 +12,7 @@ the user query into research briefs and dispatches N parallel
 researcher subagents (each gets its own context + tools), then
 compresses and writes the final report.
 
-Verified by Open Harness Hub clone:
+Verified by OpenHubForAI clone:
 `langchain-ai/open_deep_research/src/open_deep_research/deep_researcher.py`
 (~700 LOC) + `prompts.py`.
 
@@ -45,7 +45,7 @@ report with citations.
 
 ## Provenance
 
-- Hub artifact: `pipeline/deep-research-supervisor-workers` v0.1.0
+- Hub component: `pipeline/deep-research-supervisor-workers` v0.1.0
 - License: `MIT`
 - Industry: ai, media, cross_industry
 - Full source manifest: see `references/manifest.yaml`

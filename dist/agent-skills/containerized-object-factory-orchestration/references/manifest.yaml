@@ -1,0 +1,118 @@
+id: "pipeline/containerized-object-factory-orchestration"
+type: pipeline
+version: "0.1.0"
+name: "Containerized object factory orchestration"
+description: "Plans and audits a horizontally scalable worker fleet for source discovery, scraping, spidering, repository/workflow mining, enrichment, embedding, verification, promotion, warehouse export, and prompt-prefix cache savings."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "retrieval", "extraction", "verification", "routing", "serving"]
+modality: ["text", "structured", "code", "image", "tabular"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.factory"
+tags: ["container-workers", "object-factory", "parallelism", "queues", "prompt-cache", "cost-savings"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Split OpenHubForAI object generation into parallel container worker lanes with source governance, shard leasing, enrichment, validation, promotion, warehouse export, and prompt-prefix cache normalization."
+pipeline_kind: "research_web.object_factory_worker_fleet"
+inputs:
+  - name: "source_surfaces"
+    type: "array"
+  - name: "worker_registry"
+    type: "array"
+  - name: "queue_policy"
+    type: "object"
+  - name: "cost_policy"
+    type: "object"
+  - name: "trust_policy"
+    type: "object"
+outputs:
+  - name: "shard_plan"
+    type: "json"
+  - name: "queue_lanes"
+    type: "json"
+  - name: "prompt_cache_profile"
+    type: "json"
+  - name: "merge_audit"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/containerized-worker-orchestration-patterns"
+    - "knowledge-pack/hybrid-postgres-bigquery-hosting-patterns"
+    - "knowledge-pack/trajectory-fragment-cache-patterns"
+steps:
+  - id: "source-governance"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      reason: "Discovery and spider workers must know whether sources can be fetched, stored, transformed, indexed, or published."
+  - id: "plan-shards"
+    kind: "tool"
+    ref: "tool/container-worker-shard-planner"
+    inputs:
+      source_surfaces: "$.inputs.source_surfaces"
+      worker_registry: "$.inputs.worker_registry"
+      queue_policy: "$.inputs.queue_policy"
+      cost_policy: "$.inputs.cost_policy"
+      trust_policy: "$.inputs.trust_policy"
+  - id: "route-worker-jobs"
+    kind: "tool"
+    ref: "tool/object-factory-job-router"
+    inputs:
+      worker_registry: "$.inputs.worker_registry"
+      cost_policy: "$.inputs.cost_policy"
+      trust_policy: "$.inputs.trust_policy"
+  - id: "normalize-prompt-prefix"
+    kind: "tool"
+    ref: "tool/prompt-prefix-cache-normalizer"
+    inputs:
+      harness_id: "pipeline/object-factory-worker-fleet"
+      system_prompt: "OpenHubForAI object-factory worker"
+  - id: "export-cold-tier-plan"
+    kind: "tool"
+    ref: "tool/bigquery-cold-tier-export-planner"
+    inputs:
+      source_tables: ["partition_manifest", "index_delta", "trajectory_fragment", "cache_reuse_event"]
+      include_vector_indexes: true
+  - id: "merge-audit"
+    kind: "tool"
+    ref: "tool/worker-output-merge-auditor"
+    inputs:
+      partition_manifests: "$.steps.plan-shards.output.partition_manifests"
+      merge_policy:
+        require_source_governance: true
+        require_review_ticket_for_uncertain_rows: true
+        require_index_records: true
+success_criteria:
+  - kind: "semantic"
+    target: "$.shard_plan"
+    must_cover:
+      - "discovery workers"
+      - "spider workers"
+      - "parallel enrichment"
+      - "merge audit"
+      - "warehouse export"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Shard plan covers containerized parallel worker lanes."
+  - kind: "semantic"
+    target: "$.prompt_cache_profile"
+    must_cover:
+      - "stable prompt prefix"
+      - "schema block"
+      - "tool signatures"
+      - "variable content late"
+      - "cost savings"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Prompt profile supports prefix caching and fragment reuse."
+  - kind: "deterministic"
+    target: "$.merge_audit"
+    op: "is_truthy"
+    value: true
+    severity: "critical"
+    label: "Merge audit is emitted before canonical load."

@@ -1,0 +1,72 @@
+id: "pipeline/legal-ip-trademark-review"
+type: pipeline
+version: "0.1.0"
+name: "Legal IP Trademark review pipeline"
+description: "End-to-end legal ip trademark review with redaction, grep triage, RAG grounding, rubric scoring, and audit trace output."
+authors: [{ name: "OpenHubForAI contributors" }]
+license: "MIT"
+industry: ["legal", "legal.ip"]
+capability: ["evaluation", "extraction", "retrieval", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "stable"
+tags: ["legal-ip-trademark", "synthetic-expansion"]
+created: "2026-05-24"
+updated: "2026-05-24"
+task: "Review trademark clearance notes for confusion risk, goods/services proximity, descriptiveness, and evidence gaps."
+pipeline_kind: "review"
+inputs:
+  - name: "packet"
+    type: "string|object"
+outputs:
+  - name: "findings"
+    type: "object[]"
+  - name: "score"
+    type: "number"
+  - name: "evidence_gaps"
+    type: "object[]"
+defaults:
+  persona: "persona/trademark-clearance-counsel"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs: ["knowledge-pack/legal-ip-trademark-frameworks"]
+  rule_packs: ["rule-pack/grep-legal-ip-trademark-flags", "rule-pack/rag-legal-ip-trademark-retrieval-policy"]
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.packet" }
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+  - id: "grep_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-legal-ip-trademark-flags"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+  - id: "retrieve_context"
+    kind: "rule_pack"
+    ref: "rule-pack/rag-legal-ip-trademark-retrieval-policy"
+    inputs: { query: "$.steps.grep_flags.output.fired", corpus: "knowledge-pack/legal-ip-trademark-frameworks", top_k: 8 }
+  - id: "review_harness"
+    kind: "harness"
+    ref: "harness/legal-ip-trademark-review"
+    inputs:
+      packet: "$.steps.redact_pii.output.text"
+      context: "$.steps.retrieve_context.output.passages"
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.review_harness.output.findings"
+      rubric_ref: "rubric/legal-ip-trademark-quality-v1"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "legal-ip-trademark-review"
+      applied_layers: ["privacy", "grep", "rag", "harness", "judge"]
+success_criteria:
+  - rubric: "rubric/legal-ip-trademark-quality-v1"
+    threshold: 0.65

@@ -1,0 +1,151 @@
+id: "pipeline/external-knowledge-to-manifests"
+type: pipeline
+version: "0.1.0"
+name: "External knowledge tree → OHH draft manifests (factory pipeline)"
+description: |
+  The factory pipeline. Walks an external knowledge tree (Wikipedia
+  category, US Code title, APQC PCF category, NIST framework
+  chapter, regulatory corpus, paper-list, etc.), proposes draft
+  catalog manifests per node, validates them, and writes
+  curator-ready drafts to `catalog/_inbox/`.
+
+  This pipeline implements the "iteratively build a massive index"
+  idea: point it at a knowledge tree and it produces draft
+  manifests at scale, each one schema-validated, each one
+  attribution-preserving, each one held back for curator review
+  per `catalog/_inbox/` convention (AGENTS.md hard rule).
+
+  Use cases:
+   - Wikipedia: bulk-ingest a category subtree (e.g., "Category:Money
+     laundering typologies" → knowledge-pack + classifier rules)
+   - US Code: ingest a title (e.g., Title 31 — Money & Finance →
+     N knowledge-pack entries + N GREP rule-packs for detection)
+   - APQC PCF: ingest a category (e.g., Category 8 — Manage Information
+     Technology → N harnesses + N pipelines for BPO → AI-assisted)
+   - NIST publications: ingest 800-series (e.g., NIST SP 800-53 controls
+     → N knowledge-pack entries + N rubrics + N rule-packs)
+   - Regulatory corpora: EU directives, FDA guidance, OECD frameworks
+   - Academic paper-lists: arXiv categories, ICLR / NeurIPS proceedings
+     → N pattern manifests
+   - Product Hunt: top-N launches per period → N dataset entries
+
+  Pipeline shape:
+   1. WALK external source (yields nodes)
+   2. PARALLEL: per node, DRAFT manifests (model_targets-bound)
+   3. VALIDATE each draft against its schema
+   4. SELF-REVISE on validation failure (max N attempts)
+   5. WRITE successful drafts to `catalog/_inbox/{type}/{slug}.yaml`
+   6. AUDIT trace + walk-stats + draft-quality distribution
+
+  Output:
+   - drafts_emitted: list of (path, type, slug, rubric_score)
+   - drafts_failed: list of (node, errors, attempts)
+   - vocab_change_requests: aggregated VOCAB-CHANGE-NEEDED flags
+   - walk_stats: nodes_walked, nodes_drafted, drafts_per_node_mean
+   - audit_trace
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry:   ["software", "software.docs", "ai", "cross_industry"]
+capability: ["generation", "extraction", "verification", "classification", "reasoning"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "cross_cutting.composition"
+tags: ["meta", "manifest-author", "ingestion", "factory", "scale", "curator-queue"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+task: |
+  Given an external knowledge source (walker_kind + walker_inputs),
+  walk it, propose OHH draft manifests per node, validate, self-
+  revise on failure, and write curator-ready drafts to
+  `catalog/_inbox/`.
+pipeline_kind: "ingest"
+
+inputs:
+  - name: "walker_kind"
+    type: "string"
+  - name: "walker_inputs"
+    type: "object"
+  - name: "source_kind"
+    type: "string"
+  - name: "source_license"
+    type: "string"
+  - name: "max_revisions_per_node"
+    type: "integer"
+  - name: "max_parallel"
+    type: "integer"
+outputs:
+  - name: "drafts_emitted"
+    type: "object[]"
+  - name: "drafts_failed"
+    type: "object[]"
+  - name: "vocab_change_requests"
+    type: "object[]"
+  - name: "walk_stats"
+    type: "object"
+  - name: "trace"
+    type: "object[]"
+
+defaults:
+  persona: "persona/manifest-author"
+  model_adapter: "adapter/ollama-default"
+
+steps:
+  - id: "walk"
+    kind: "processor"
+    ref: "processor/wikipedia-category-walker"
+    inputs:
+      root_category: "$.inputs.walker_inputs.root_category"
+      max_depth: "$.inputs.walker_inputs.max_depth"
+      max_nodes: "$.inputs.walker_inputs.max_nodes"
+      language_edition: "$.inputs.walker_inputs.language_edition"
+      revision_freeze_ts: "$.inputs.walker_inputs.revision_freeze_ts"
+
+  - id: "rag_manifest_shapes"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.steps.walk.output.nodes"
+      corpus: "knowledge-pack/manifest-shapes-and-conventions"
+      top_k: 12
+
+  - id: "draft"
+    kind: "harness"
+    ref: "harness/draft-manifest-author"
+    inputs:
+      knowledge_node: "$.steps.walk.output.nodes"
+      source_kind: "$.inputs.source_kind"
+      source_url: "$.steps.walk.output.nodes.canonical_url"
+      source_license: "$.inputs.source_license"
+      max_revisions: "$.inputs.max_revisions_per_node"
+
+  - id: "emit_drafts"
+    kind: "processor"
+    ref: "processor/draft-manifest-yaml-emitter"
+    inputs:
+      draft_manifest: "$.steps.draft.output.drafts_emitted"
+      target_type: "$.steps.draft.output.drafts_emitted.type"
+      target_slug: "$.steps.draft.output.drafts_emitted.slug"
+      overwrite_inbox: false
+
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.draft.output"
+      rubric_ref: "rubric/draft-manifest-quality-v1"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "external-knowledge-to-manifests"
+      applied_layers: ["walker", "persona", "rag", "draft", "validate", "judge"]
+
+success_criteria:
+  - rubric:    "rubric/draft-manifest-quality-v1"
+    threshold: 0.7
+on_error:
+  default: "write nodes_walked + drafts_failed report to catalog/_inbox/_failed/"

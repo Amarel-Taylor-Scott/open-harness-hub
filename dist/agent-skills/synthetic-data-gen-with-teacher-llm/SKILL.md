@@ -12,7 +12,7 @@ downstream student fine-tune. Includes filtering for diversity +
 difficulty + safety. The pattern that won the prompt-recovery class
 of competitions.
 
-Verified by Open Harness Hub mining of wlifferth's "Starter Notebook:
+Verified by OpenHubForAI mining of wlifferth's "Starter Notebook:
 Generating More Data With Gemma" (1820 votes) on llm-prompt-recovery.
 
 ## Task
@@ -36,7 +36,7 @@ ready JSONL.
 
 ## Provenance
 
-- Hub artifact: `pipeline/synthetic-data-gen-with-teacher-llm` v0.1.0
+- Hub component: `pipeline/synthetic-data-gen-with-teacher-llm` v0.1.0
 - License: `MIT`
 - Industry: ai
 - Full source manifest: see `references/manifest.yaml`

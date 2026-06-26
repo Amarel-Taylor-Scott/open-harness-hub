@@ -23,7 +23,7 @@ region:
 
 # Clinical Decision Support
 
-<!-- Generated from Open Harness Hub manifest `harness/clinical-decision-support` v0.1.0. Do not edit by hand; edit the source manifest and re-run `python scripts/emit/hf_model_card.py`. -->
+<!-- Generated from OpenHubForAI manifest `harness/clinical-decision-support` v0.1.0. Do not edit by hand; edit the source manifest and re-run `python scripts/emit/hf_model_card.py`. -->
 
 ## Model description
 
@@ -91,11 +91,11 @@ This is a workflow harness, not a trained model. Risk profile depends on the mod
 ```bibtex
 @misc{clinical-decision-support_open_harness_hub,
   title  = {Clinical Decision Support},
-  author = {Open Harness Hub contributors},
+  author = {OpenHubForAI contributors},
   url    = {https://open-harness-hub.dev/harness/clinical-decision-support},
   version= {0.1.0},
   year   = {2026}
 }
 ```
 
-License: `MIT`. Hub artifact: `harness/clinical-decision-support`.
+License: `MIT`. Hub component: `harness/clinical-decision-support`.

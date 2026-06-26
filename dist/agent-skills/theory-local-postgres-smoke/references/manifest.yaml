@@ -1,0 +1,58 @@
+id: "pipeline/theory-local-postgres-smoke"
+type: pipeline
+version: "0.1.0"
+name: "Theory local Postgres smoke"
+description: "Creates an operator-reviewed local pgvector execution plan for loading theory-derived component candidates and vectors, then rerunning committed-count audits."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "security.defensive", "cross_industry"]
+capability: ["governance", "embedding", "planning", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "cross_cutting.storage"
+tags: ["theory-to-components", "postgres", "pgvector", "committed-load-audit", "operator-review"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Bridge theory-derived staged rows and vectors into reviewed local Postgres smoke commands."
+pipeline_kind: "research_web.theory_local_postgres_smoke"
+inputs:
+  - name: "theory_batch_summary"
+    type: "json"
+  - name: "theory_load_audit_summary"
+    type: "json"
+  - name: "pgvector_load_plan_summary"
+    type: "json"
+outputs:
+  - name: "local_postgres_smoke_plan"
+    type: "json"
+  - name: "operator_commands"
+    type: "array"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/theory-to-component-patterns"
+steps:
+  - id: "build-local-postgres-smoke-plan"
+    kind: "tool"
+    ref: "tool/theory-local-postgres-smoke-planner"
+    inputs:
+      theory_batch_summary: "$.inputs.theory_batch_summary"
+      theory_load_audit_summary: "$.inputs.theory_load_audit_summary"
+      pgvector_load_plan_summary: "$.inputs.pgvector_load_plan_summary"
+      embedding_execution_plan: "$.inputs.embedding_execution_plan"
+      vector_readiness_summary: "$.inputs.vector_readiness_summary"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "theory-local-postgres-smoke"
+      applied_layers: ["candidate_sql_review", "vector_sql_review", "committed_count_export", "post_load_audits"]
+success_criteria:
+  - kind: "deterministic"
+    target: "$.steps.build-local-postgres-smoke-plan.readiness.safe_to_apply_locally"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "Theory batch candidate rows and vectors are safe to apply to the reviewed local pgvector target."

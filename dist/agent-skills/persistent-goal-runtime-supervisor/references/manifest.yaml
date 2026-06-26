@@ -1,0 +1,48 @@
+id: "harness/persistent-goal-runtime-supervisor"
+type: harness
+version: "0.1.0"
+name: "Persistent goal runtime supervisor"
+description: "Harness pattern for long-running coding-agent work where a durable goal object, completion audit, budget guard, and checkpoint log survive ordinary chat compaction and terminal restarts."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "evaluation", "serving"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "dated"
+tags: ["agentic-harness", "goal-runtime", "codex", "long-running-agents"]
+created: "2026-05-25"
+updated: "2026-05-25"
+kind: "utility_surface"
+tier: "primary"
+applied_layers: ["tools", "privacy", "heuristic"]
+knowledge_packs:
+  - id: "orchestration_patterns"
+    label: "Agentic orchestration harness patterns"
+    kind: "knowledge_pack"
+    types: ["orchestration_pattern", "long_running_agent_control"]
+    required: true
+    trust_boundary: "local"
+    freshness: "dated"
+model_targets:
+  - id: "none"
+    label: "No direct model target"
+    transport: "none"
+    role: "Supervises a separate coding agent runtime."
+    capabilities: ["state_management", "budget_guarding", "completion_audit"]
+    required: false
+    default: true
+    trust_boundary: "local"
+model_io:
+  input: "goal object, current state, budget envelope, completion criteria, evidence log"
+  output: "continue/stop/escalate decision plus checkpoint update"
+  transport: "none"
+input_verification: ["goal has explicit completion criteria", "budget envelope is present", "state checkpoint is durable"]
+output_verification: ["completion is proven by evidence", "blocked state follows repeated-blocker policy", "budget guard passes before continuation"]
+privacy_boundaries:
+  raw_input: "Goal state may include repository paths and operational details; keep local unless deployment explicitly exports traces."
+  derived_output: "Checkpoint summaries may be shared after redacting secrets, file-system-sensitive paths, and private user notes."
+  external_calls: "No external calls are required by the harness itself."
+contributes_to: ["pipeline/agentic-orchestration-harness-intake"]

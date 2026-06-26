@@ -1,0 +1,106 @@
+id: "pipeline/use-case-seeds-to-entity-ref-rows"
+type: pipeline
+version: "0.1.0"
+name: "Use case seeds to entity ref rows"
+description: "Promotes cross-domain use-case seed domains, flexible label paths, inputs, outputs, required stages, and risk tiers into canonical entity and object_entity_ref rows for graph search and comparison blocking."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "finance", "legal", "media", "creative", "energy", "healthcare", "cross_industry"]
+capability: ["extraction", "retrieval", "classification", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.product"
+tags: ["use-case-seeds", "entity-resolution", "object-entity-refs", "graph-search", "comparison-blocking", "hybrid-search"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Convert cross-domain use-case seed metadata into canonical entity and object_entity_ref rows that can drive graph search, blocking, dedupe, and pipeline assembly."
+pipeline_kind: "research_web.use_case_seed_entity_ref_rows"
+inputs:
+  - name: "seeds"
+    type: "array"
+  - name: "excluded_scopes"
+    type: "array"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "canonical_entities"
+    type: "jsonl"
+  - name: "object_entity_refs"
+    type: "jsonl"
+  - name: "graph_index_records"
+    type: "jsonl"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/cross-domain-use-case-seeds"
+    - "knowledge-pack/use-case-seed-entity-ref-patterns"
+    - "knowledge-pack/flexible-hierarchy-label-patterns"
+steps:
+  - id: "govern-use-case-seeds"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record:
+        source_type: "synthetic_use_case_seed_batch"
+        license: "CC-BY-4.0"
+        privacy_boundary: "public"
+      source_policy:
+        excluded_scopes: "$.inputs.excluded_scopes"
+        require_license: true
+  - id: "export-entity-ref-rows"
+    kind: "tool"
+    ref: "tool/use-case-seed-entity-ref-exporter"
+    inputs:
+      seeds: "$.inputs.seeds"
+      output_dir: "$.inputs.output_dir"
+      excluded_scopes: "$.inputs.excluded_scopes"
+  - id: "preflight-entity-relationships"
+    kind: "tool"
+    ref: "tool/factory-jsonl-relationship-preflight"
+    inputs:
+      source_records:
+        - "$.steps.export-entity-ref-rows.row_family_paths.source_record"
+      normalized_objects:
+        - "$.steps.export-entity-ref-rows.row_family_paths.normalized_object"
+      canonical_entities:
+        - "$.steps.export-entity-ref-rows.row_family_paths.canonical_entity"
+      object_entity_refs:
+        - "$.steps.export-entity-ref-rows.row_family_paths.object_entity_ref"
+      dedupe_clusters:
+        - "$.steps.export-entity-ref-rows.row_family_paths.dedupe_cluster"
+  - id: "prepare-bulk-copy"
+    kind: "tool"
+    ref: "tool/factory-jsonl-bulk-copy-loader"
+    inputs:
+      source_records:
+        - "$.steps.export-entity-ref-rows.row_family_paths.source_record"
+      normalized_objects:
+        - "$.steps.export-entity-ref-rows.row_family_paths.normalized_object"
+      canonical_entities:
+        - "$.steps.export-entity-ref-rows.row_family_paths.canonical_entity"
+      object_entity_refs:
+        - "$.steps.export-entity-ref-rows.row_family_paths.object_entity_ref"
+      dedupe_clusters:
+        - "$.steps.export-entity-ref-rows.row_family_paths.dedupe_cluster"
+      index_records:
+        - "$.steps.export-entity-ref-rows.row_family_paths.index_record"
+success_criteria:
+  - kind: "semantic"
+    target: "$.row_counts"
+    must_cover:
+      - "canonical_entity"
+      - "object_entity_ref"
+      - "graph index records"
+      - "comparison blocking"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Use-case seed metadata is available as graph-addressable entity rows."
+  - kind: "deterministic"
+    target: "$.row_counts.object_entity_ref"
+    op: ">"
+    value: 0
+    severity: "high"
+    label: "At least one object_entity_ref row is emitted."

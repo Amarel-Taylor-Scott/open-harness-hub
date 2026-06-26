@@ -22,7 +22,7 @@ pretty_name: ISO 3166 country codes (sample)
 
 # ISO 3166 country codes (sample)
 
-<!-- Generated from Open Harness Hub manifest `knowledge-pack/iso-country-codes` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
+<!-- Generated from OpenHubForAI manifest `knowledge-pack/iso-country-codes` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
 
 ## Dataset description
 
@@ -61,11 +61,11 @@ A Croissant 1.0 JSON-LD record is emitted at `dist/croissant/iso-country-codes.c
 ```bibtex
 @misc{iso-country-codes_open_harness_hub,
   title  = {ISO 3166 country codes (sample)},
-  author = {Open Harness Hub contributors},
+  author = {OpenHubForAI contributors},
   url    = {https://open-harness-hub.dev/knowledge-pack/iso-country-codes},
   version= {0.1.0},
   year   = {2026}
 }
 ```
 
-License: `CC0-1.0`. Hub artifact: `knowledge-pack/iso-country-codes`.
+License: `CC0-1.0`. Hub component: `knowledge-pack/iso-country-codes`.

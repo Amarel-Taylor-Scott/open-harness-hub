@@ -1,0 +1,95 @@
+id: "pipeline/specialized-model-card-rows-to-load-plan"
+type: pipeline
+version: "0.1.0"
+name: "Specialized model-card rows to load plan"
+description: "Preflights specialized model-card row families, scores promotion readiness, emits review tickets and quality index rows, and exports a Postgres/pgvector bulk-load package."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["healthcare", "finance", "legal", "software.devops", "media", "security", "privacy", "government", "cross_industry"]
+capability: ["governance", "evaluation", "retrieval", "routing", "serving", "embedding"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["huggingface", "model-cards", "bulk-load", "promotion-scoring", "postgres", "pgvector", "review-routing"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Create a review-gated Postgres/pgvector load plan from specialized model-card row families."
+pipeline_kind: "research_web.specialized_model_card_load_plan"
+inputs:
+  - name: "row_dir"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+  - name: "load_sql_name"
+    type: "string"
+outputs:
+  - name: "preflight_report"
+    type: "json"
+  - name: "promotion_summary"
+    type: "json"
+  - name: "bulk_manifest"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/specialized-model-card-row-patterns"
+    - "knowledge-pack/specialized-model-card-load-plan-patterns"
+steps:
+  - id: "govern-load-plan-inputs"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record:
+        source_type: "specialized_model_card_row_family_batch"
+        license: "source_specific"
+        privacy_boundary: "public_model_metadata_only"
+      source_policy:
+        require_license: true
+        forbid_private_source_bodies: true
+        forbid_model_weight_download: true
+        require_redaction_before_external_model: true
+        excluded_scopes: ["insurance"]
+  - id: "emit-load-plan"
+    kind: "tool"
+    ref: "tool/specialized-model-card-load-plan-emitter"
+    inputs:
+      row_dir: "$.inputs.row_dir"
+      output_dir: "$.inputs.output_dir"
+      load_sql_name: "$.inputs.load_sql_name"
+  - id: "route-load-review"
+    kind: "tool"
+    ref: "tool/object-factory-job-router"
+    inputs:
+      job_manifest: "$.steps.emit-load-plan.promotion_summary.paths"
+      worker_registry:
+        promotion_decision: "container.worker.promotion_review"
+        bulk_load: "container.worker.postgres_bulk_load"
+        embedding_backfill: "container.worker.embedding_backfill"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.preflight_report.ok"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "Relationship preflight passes before bulk load."
+  - kind: "deterministic"
+    target: "$.promotion_summary.promotion_decisions"
+    op: ">"
+    value: 0
+    severity: "high"
+    label: "Promotion decisions are emitted."
+  - kind: "semantic"
+    target: "$.bulk_manifest"
+    must_cover:
+      - "load_sql"
+      - "csv_paths"
+      - "source_record"
+      - "normalized_object"
+      - "promotion_decision"
+      - "index_record"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Bulk load manifest covers the database import package."

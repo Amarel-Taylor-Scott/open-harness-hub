@@ -42,7 +42,7 @@ escalation and ICD-10 code candidates.
 
 ## Provenance
 
-- Hub artifact: `pipeline/differential-diagnosis` v0.1.0
+- Hub component: `pipeline/differential-diagnosis` v0.1.0
 - License: `MIT`
 - Industry: healthcare, healthcare.clinical
 - Full source manifest: see `references/manifest.yaml`

@@ -24,13 +24,13 @@ def render(manifest: dict, catalog: dict) -> str:
     sections: list[str] = []
     sections.append(f"# Annex IV technical documentation — {name}")
     sections.append("")
-    sections.append(f"> Generated from Open Harness Hub manifest `{manifest['id']}` v{manifest.get('version','0.0.0')}. EU AI Act Regulation 2024/1689, Annex IV.")
+    sections.append(f"> Generated from OpenHubForAI manifest `{manifest['id']}` v{manifest.get('version','0.0.0')}. EU AI Act Regulation 2024/1689, Annex IV.")
     sections.append("")
 
     sections.append("## 1. General description of the AI system")
     sections.append("")
     sections.append(f"- **Name**: {name}")
-    sections.append(f"- **Provider**: {(manifest.get('authors') or [{'name':'Open Harness Hub contributors'}])[0]['name']}")
+    sections.append(f"- **Provider**: {(manifest.get('authors') or [{'name':'OpenHubForAI contributors'}])[0]['name']}")
     sections.append(f"- **Intended purpose**: {manifest.get('description','').strip()}")
     sections.append(f"- **Version**: {manifest.get('version','0.0.0')}")
     sections.append(f"- **EU AI Act risk classification**: `{manifest.get('eu_ai_act_risk', 'high_risk')}`")

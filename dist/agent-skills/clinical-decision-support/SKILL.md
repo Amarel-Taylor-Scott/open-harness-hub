@@ -65,7 +65,7 @@ support framing; never a substitute for a licensed clinician.
 
 ## Provenance
 
-- Hub artifact: `harness/clinical-decision-support` v0.1.0
+- Hub component: `harness/clinical-decision-support` v0.1.0
 - License: `MIT`
 - Lifecycle: `experimental`
 - Full source manifest: see `references/manifest.yaml`

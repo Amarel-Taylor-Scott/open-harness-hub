@@ -1,0 +1,69 @@
+id: "pipeline/codegraph-assisted-code-review"
+type: pipeline
+version: "0.1.0"
+name: "CodeGraph-assisted code review (DevOps)"
+description: |
+  Seed pipeline for the DevOps section. Given the changed symbols in a pull
+  request, pull their dependents from a local code knowledge graph (so the
+  reviewer/agent sees blast radius without reading the whole repo), then persist
+  that review context to durable memory keyed by the PR so it survives across
+  commits and sessions.
+
+  Composes two catalogued open-source tools — tool/codegraph-code-graph-query
+  and tool/agentmemory-persistent-memory — and is intentionally minimal: extend
+  it with a review harness (LLM risk summary) and a rubric/benchmark. Token-
+  efficient by construction (pairs with pattern/input-token-compression and
+  pattern/twelve-factor-agent).
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry:   ["ai", "software.devops", "cross_industry"]
+capability: ["retrieval", "memory", "governance"]
+modality:   ["code", "text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+tags: ["devops", "code-review", "codegraph", "agentmemory", "ci-cd", "blast-radius"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "From the changed symbols in a pull request, retrieve their dependents from a local code graph and persist the review context to durable memory keyed by the PR."
+pipeline_kind: "devops.code_review_assist"
+inputs:
+  - name: "changed_symbols"
+    type: "string"
+  - name: "pr_id"
+    type: "string"
+outputs:
+  - name: "review_context"
+    type: "json"
+steps:
+  - id: "retrieve-impacted-symbols"
+    kind: "tool"
+    ref: "tool/codegraph-code-graph-query"
+    inputs:
+      query: "$.inputs.changed_symbols"
+      relation: "callers"
+      max_results: 50
+  - id: "persist-review-context"
+    kind: "tool"
+    ref: "tool/agentmemory-persistent-memory"
+    inputs:
+      op: "store"
+      namespace: "$.inputs.pr_id"
+      content: "$.retrieve-impacted-symbols.results"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.retrieve-impacted-symbols.results"
+    op: "is_truthy"
+    value: true
+    severity: "high"
+    label: "The code graph returned impacted symbols for the changed code."
+  - kind: "semantic"
+    target: "$.persist-review-context"
+    must_cover:
+      - "review context"
+      - "persisted"
+      - "pull request"
+    similarity_threshold: 0.5
+    severity: "low"
+    label: "Review context is persisted to durable memory for the PR."

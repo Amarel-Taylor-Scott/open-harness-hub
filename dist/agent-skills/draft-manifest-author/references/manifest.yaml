@@ -1,0 +1,99 @@
+id: "harness/draft-manifest-author"
+type: harness
+version: "0.1.0"
+name: "Draft-manifest authoring harness (knowledge-node → manifest)"
+description: |
+  Wraps the manifest-authoring flow as a reusable harness. Reads a
+  structured knowledge node (from any walker: Wikipedia / USC /
+  APQC PCF / NIST framework / etc.), drafts one or more catalog
+  manifests, runs them through the YAML emitter + validator loop,
+  and produces ready-for-curator-review drafts in `catalog/_inbox/`.
+
+  Includes self-revise loop: on validation failure, the harness
+  receives the structured error report and revises the draft up to
+  N_max_revisions times before failing the node.
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry:   ["software", "software.docs", "ai", "cross_industry"]
+capability: ["generation", "extraction", "verification", "classification", "reasoning"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "volatile"
+tags: ["meta", "manifest-author", "harness", "ingestion", "self-revise"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+kind: "model_harness"
+tier: "primary"
+applied_layers: [persona, rag, tools]
+consumes: [persona_block, rag_doc, response_policy]
+emits: [reasoning_step, context_snippet, extracted_fact]
+logic_paths:
+  - id: "draft_manifests_from_node"
+    label: "knowledge node → proposed manifest types → draft YAML → validate → revise loop → write _inbox"
+    entrypoints: ["/api/meta/draft-manifest"]
+    steps:
+      - "classify node into proposed manifest target types (1-3)"
+      - "RAG against manifest-shapes-and-conventions pack for canonical examples"
+      - "draft each proposed manifest as a Python dict"
+      - "self-grade against draft-manifest-quality-v1 rubric"
+      - "emit each draft via draft-manifest-yaml-emitter"
+      - "on validation failure: revise (max 3 attempts) using the structured error report"
+      - "on success: write to catalog/_inbox/; emit audit trace"
+    consumes: [persona_block, rag_doc, response_policy]
+    emits: [reasoning_step, context_snippet, extracted_fact]
+    model_call: "required"
+    verification:
+      - "every emitted draft validates against its schema"
+      - "every draft has attribution if node is from external source"
+      - "no draft has slug collision with live catalog"
+      - "no draft uses VOCAB-CHANGE-NEEDED values without flagging"
+knowledge_packs:
+  - id: "manifest_shapes"
+    label: "OHH manifest shapes, schemas & conventions reference"
+    kind: knowledge_pack
+    types: [rag_doc, citation_edge]
+    required: true
+    trust_boundary: "local"
+    freshness: "volatile"
+logic_packs:
+  - id: "persona_default"
+    label: "Manifest Author persona"
+    kind: logic_pack
+    types: [persona_block]
+    required: true
+model_io:
+  input:  "{knowledge_node: object, source_kind: string, source_url: string, source_license: string, max_revisions: integer}"
+  output: "{drafts_emitted: object[], drafts_failed: object[], vocab_change_requests: object[]}"
+model_targets:
+  - id: "local_ollama"
+    label: "Local Ollama"
+    transport: "ollama"
+    role: "Default local drafting."
+    capabilities: [text_generation, chat, structured_json]
+    required: false
+    default: true
+    trust_boundary: "local"
+  - id: "anthropic_judge"
+    label: "Anthropic Claude Sonnet"
+    transport: "anthropic"
+    role: "Optional frontier-class drafter for complex multi-manifest nodes."
+    capabilities: [text_generation, chat, long_context, structured_json]
+    required: false
+    default: false
+    trust_boundary: "external"
+input_verification:
+  - "reject input larger than 256 KB per node"
+  - "require source_url + source_license when source_kind != local"
+output_verification:
+  - "every draft passed schema validation OR is in drafts_failed with structured errors"
+  - "no draft promoted to live catalog (only _inbox/ writes)"
+  - "vocab_change_requests list populated when new vocab values needed"
+privacy_boundaries:
+  raw_input:      "stays local; source content is usually public"
+  derived_output: "draft manifests stay in _inbox/ until curator promotes"
+  external_calls: "only if model_target.trust_boundary == external AND user opted in"
+contributes_to:
+  - "pipeline/external-knowledge-to-manifests"

@@ -1,0 +1,117 @@
+id: "pipeline/resumable-object-comparison-job"
+type: pipeline
+version: "0.1.0"
+name: "Resumable object comparison job"
+description: "Plans blocked knowledge-object pairwise comparison leaves from normalized objects plus optional labels, dimensions, entity refs, and embedding buckets, compares leaf shards, emits checkpoints, and resumes without recomparing completed pairs."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "government", "cross_industry"]
+capability: ["retrieval", "governance", "evaluation", "routing"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.product"
+tags: ["pairwise-comparison", "blocking", "checkpointing", "dedupe", "resumable-workers", "entity-refs", "embedding-buckets"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Compare large sets of knowledge objects using blocking, leaf shards, and checkpoints so workers can resume record-by-record comparisons across runs."
+pipeline_kind: "research_web.resumable_object_comparison"
+inputs:
+  - name: "records"
+    type: "array"
+  - name: "block_fields"
+    type: "array"
+  - name: "block_mode"
+    type: "string"
+  - name: "labels"
+    type: "array"
+  - name: "dimensions"
+    type: "array"
+  - name: "entity_refs"
+    type: "array"
+  - name: "embeddings"
+    type: "array"
+  - name: "leaf_size"
+    type: "integer"
+  - name: "checkpoint_path"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "comparison_job"
+    type: "json"
+  - name: "comparison_leaves"
+    type: "array"
+  - name: "comparison_results"
+    type: "array"
+  - name: "checkpoints"
+    type: "array"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/object-comparison-job-patterns"
+    - "knowledge-pack/hybrid-comparison-blocking-patterns"
+steps:
+  - id: "govern-record-set"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record:
+        source_type: "normalized_object_batch"
+        privacy_boundary: "mixed"
+      source_policy:
+        require_privacy_boundary: true
+        keep_tenant_private_records_partitioned: true
+  - id: "plan-blocked-leaves"
+    kind: "tool"
+    ref: "tool/object-comparison-block-planner"
+    inputs:
+      records: "$.inputs.records"
+      block_fields: "$.inputs.block_fields"
+      block_mode: "$.inputs.block_mode"
+      labels: "$.inputs.labels"
+      dimensions: "$.inputs.dimensions"
+      entity_refs: "$.inputs.entity_refs"
+      embeddings: "$.inputs.embeddings"
+      leaf_size: "$.inputs.leaf_size"
+      checkpoint_path: "$.inputs.checkpoint_path"
+      output_dir: "$.inputs.output_dir"
+  - id: "compare-one-leaf"
+    kind: "tool"
+    ref: "tool/object-comparison-leaf-worker"
+    inputs:
+      records: "$.inputs.records"
+      leaf: "$.steps.plan-blocked-leaves.leaves[0]"
+      threshold: 0.82
+  - id: "dedupe-comparison-candidates"
+    kind: "tool"
+    ref: "tool/fuzzy-dedupe-clusterer"
+    inputs:
+      candidate_records: "$.steps.compare-one-leaf.comparison_results"
+      match_features: ["pair_key", "decision", "score"]
+  - id: "emit-comparison-index"
+    kind: "tool"
+    ref: "tool/index-record-emitter"
+    inputs:
+      normalized_objects: "$.steps.compare-one-leaf.comparison_results"
+      emit: ["keyword", "vector", "graph", "facet", "quality"]
+success_criteria:
+  - kind: "semantic"
+    target: "$.comparison_job"
+    must_cover:
+      - "block_fields"
+      - "block_mode"
+      - "leaf_count"
+      - "remaining_pair_count"
+      - "skipped_completed_pair_count"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Comparison job is blocked, leaf-sharded, and resumable."
+  - kind: "deterministic"
+    target: "$.checkpoints"
+    op: "is_truthy"
+    value: true
+    severity: "medium"
+    label: "Completed pair checkpoints are emitted."

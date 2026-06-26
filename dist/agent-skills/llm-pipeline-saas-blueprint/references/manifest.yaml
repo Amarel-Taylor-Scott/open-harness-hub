@@ -1,0 +1,200 @@
+id: "pipeline/llm-pipeline-saas-blueprint"
+type: pipeline
+version: "0.1.0"
+name: "LLM pipeline SaaS blueprint generator"
+description: "Convert a free-text LLM task request into costed pipeline options, retrieval/runtime tool choices, deployment blueprints, Terraform/runtime skeletons, evaluation components, and MCP setup plans."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["planning", "generation", "evaluation", "tool_use"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.composition"
+tags: ["saas", "pipeline-generation", "pricing", "terraform", "mcp", "blueprint", "browser", "embeddings"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Generate costed LLM pipeline options and deployable blueprints from a user's natural-language task, hosting constraints, and budget."
+pipeline_kind: "meta_build.costed_blueprint"
+
+inputs:
+  - name: "task_prompt"
+    type: "string"
+  - name: "hosting_environment"
+    type: "object"
+  - name: "budget"
+    type: "object"
+  - name: "constraints"
+    type: "object"
+  - name: "setup_mode"
+    type: "string"
+  - name: "discovery_preferences"
+    type: "object"
+
+outputs:
+  - name: "options"
+    type: "object[]"
+  - name: "cost_estimate"
+    type: "object"
+  - name: "pipeline_manifest"
+    type: "object"
+  - name: "terraform_files"
+    type: "object[]"
+  - name: "mcp_setup_plan"
+    type: "object"
+  - name: "evaluation_plan"
+    type: "object"
+  - name: "tooling_plan"
+    type: "object"
+
+defaults:
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/llm-pipeline-saas-blueprints"
+    - "knowledge-pack/pipeline-generation-scenarios"
+  rule_packs:
+    - "rule-pack/hybrid-retrieval-policy"
+
+steps:
+  - id: "catalog_recommendation"
+    kind: "pipeline"
+    ref: "pipeline/recommend-pipeline-from-prompt"
+    inputs:
+      prompt: "$.inputs.task_prompt"
+      retrieval_top_k: 30
+      rerank_top_k: 8
+      types_filter: ["pipeline", "harness", "rule-pack", "knowledge-pack", "processor", "tool", "adapter", "benchmark", "rubric"]
+
+  - id: "model_pricing"
+    kind: "tool"
+    ref: "tool/model-pricing-lookup"
+    inputs:
+      provider: "$.inputs.hosting_environment.preferred_provider"
+      region: "$.inputs.hosting_environment.region"
+      usage_shape: "$.inputs.budget.usage_shape"
+
+  - id: "semantic_catalog_search"
+    kind: "tool"
+    ref: "tool/embedding-index-search"
+    inputs:
+      query: "$.inputs.task_prompt"
+      index: "catalog"
+      top_k: 20
+      filters:
+        types: ["pipeline", "harness", "rule-pack", "knowledge-pack", "tool", "adapter", "rubric", "benchmark"]
+
+  - id: "search_provider_selection"
+    kind: "tool"
+    ref: "tool/search-provider-router"
+    when: "$.inputs.discovery_preferences.allow_search == true"
+    inputs:
+      query: "$.inputs.task_prompt"
+      requirements: "$.inputs.discovery_preferences.search_requirements"
+      provider_registry: "$.inputs.discovery_preferences.search_providers"
+      fallback_policy: "$.inputs.discovery_preferences.search_fallback_policy"
+
+  - id: "fresh_web_search"
+    kind: "tool"
+    ref: "tool/web-search"
+    when: "$.inputs.discovery_preferences.allow_public_web == true"
+    inputs:
+      query: "$.inputs.task_prompt"
+      max_results: 10
+
+  - id: "custom_cloud_search"
+    kind: "tool"
+    ref: "tool/cloud-search-function-adapter"
+    when: "$.steps.search_provider_selection.output.provider_kind == 'cloud_function'"
+    inputs:
+      endpoint: "$.steps.search_provider_selection.output.normalized_request.endpoint"
+      auth_ref: "$.steps.search_provider_selection.output.normalized_request.auth_ref"
+      request: "$.steps.search_provider_selection.output.normalized_request"
+
+  - id: "containerized_search_runtime"
+    kind: "tool"
+    ref: "tool/containerized-search-runtime"
+    when: "$.steps.search_provider_selection.output.provider_kind == 'container'"
+    inputs:
+      image: "$.steps.search_provider_selection.output.normalized_request.image"
+      mode: "$.steps.search_provider_selection.output.normalized_request.mode"
+      resources: "$.steps.search_provider_selection.output.normalized_request.resources"
+      storage: "$.steps.search_provider_selection.output.normalized_request.storage"
+      network_policy: "$.steps.search_provider_selection.output.normalized_request.network_policy"
+      secrets: "$.steps.search_provider_selection.output.normalized_request.secrets"
+      runtime_target: "$.inputs.hosting_environment.container_runtime"
+
+  - id: "search_normalization"
+    kind: "tool"
+    ref: "tool/search-result-normalizer"
+    when: "$.inputs.discovery_preferences.allow_search == true"
+    inputs:
+      provider: "$.steps.search_provider_selection.output.selected_provider"
+      raw_response: "$.steps.custom_cloud_search.output.raw_response"
+      normalize_for: "rag"
+
+  - id: "browser_research"
+    kind: "tool"
+    ref: "tool/browser-research-session"
+    when: "$.inputs.discovery_preferences.requires_rendered_pages == true"
+    inputs:
+      query: "$.inputs.task_prompt"
+      max_pages: 5
+      allowed_domains: "$.inputs.discovery_preferences.allowed_domains"
+      capture_screenshots: false
+
+  - id: "browser_local_llm_profile"
+    kind: "tool"
+    ref: "tool/browser-local-llm-runner"
+    when: "$.inputs.discovery_preferences.allow_browser_local_runtime == true"
+    inputs:
+      task_class: "$.steps.catalog_recommendation.output.task_class"
+      device_profile: "$.inputs.hosting_environment.client_device_profile"
+      max_latency_ms: "$.inputs.constraints.max_latency_ms"
+
+  - id: "runtime_pricing"
+    kind: "tool"
+    ref: "tool/cloud-runtime-pricing-lookup"
+    inputs:
+      cloud: "$.inputs.hosting_environment.cloud"
+      region: "$.inputs.hosting_environment.region"
+      resources: "$.inputs.hosting_environment.resources"
+
+  - id: "cost_gate"
+    kind: "processor"
+    ref: "processor/cost-ceiling-gate"
+    inputs:
+      expected_input_tokens: "$.inputs.budget.expected_input_tokens"
+      expected_output_tokens: "$.inputs.budget.expected_output_tokens"
+      adapter_ref: "$.defaults.model_adapter"
+      budget_usd: "$.inputs.budget.max_usd"
+
+  - id: "terraform_blueprint"
+    kind: "tool"
+    ref: "tool/terraform-blueprint-emitter"
+    inputs:
+      deployment_plan: "$.steps.catalog_recommendation.output.composition_sketch"
+      cloud: "$.inputs.hosting_environment.cloud"
+      region: "$.inputs.hosting_environment.region"
+      include_mcp_plan: true
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "llm-pipeline-saas-blueprint"
+      applied_layers: ["catalog_search", "semantic_search", "search_router", "search_normalizer", "cloud_search_function", "containerized_search_runtime", "web_search", "browser_research", "browser_local_llm_profile", "pricing_lookup", "cost_gate", "terraform_blueprint", "mcp_plan"]
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.outputs.options"
+    op: "is_truthy"
+    value: true
+    label: "At least one pipeline option is produced."
+  - kind: "deterministic"
+    target: "$.outputs.cost_estimate"
+    op: "is_truthy"
+    value: true
+    label: "A cost estimate is produced from active pricing snapshots or explicit assumptions."

@@ -16,7 +16,7 @@ pretty_name: Lens physics primers
 
 # Lens physics primers
 
-<!-- Generated from Open Harness Hub manifest `knowledge-pack/lens-physics-primers` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
+<!-- Generated from OpenHubForAI manifest `knowledge-pack/lens-physics-primers` v0.1.0. Edit the source manifest and re-run `python scripts/emit/hf_dataset_card.py`. -->
 
 ## Dataset description
 
@@ -54,11 +54,11 @@ A Croissant 1.0 JSON-LD record is emitted at `dist/croissant/lens-physics-primer
 ```bibtex
 @misc{lens-physics-primers_open_harness_hub,
   title  = {Lens physics primers},
-  author = {Open Harness Hub contributors},
+  author = {OpenHubForAI contributors},
   url    = {https://open-harness-hub.dev/knowledge-pack/lens-physics-primers},
   version= {0.1.0},
   year   = {2026}
 }
 ```
 
-License: `MIT`. Hub artifact: `knowledge-pack/lens-physics-primers`.
+License: `MIT`. Hub component: `knowledge-pack/lens-physics-primers`.

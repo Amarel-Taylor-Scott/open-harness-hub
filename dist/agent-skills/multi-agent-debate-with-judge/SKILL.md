@@ -11,7 +11,7 @@ Two or more debater personas argue different sides of a question
 across N rounds. A judge persona scores the final positions. Used
 for hard reasoning tasks where stress-testing improves accuracy.
 
-Verified by Open Harness Hub clone:
+Verified by OpenHubForAI clone:
 `microsoft/autogen` implements the group-chat round-table pattern.
 
 ## Task
@@ -35,7 +35,7 @@ judge scores final positions and outputs verdict + transcripts.
 
 ## Provenance
 
-- Hub artifact: `pipeline/multi-agent-debate-with-judge` v0.1.0
+- Hub component: `pipeline/multi-agent-debate-with-judge` v0.1.0
 - License: `MIT`
 - Industry: ai
 - Full source manifest: see `references/manifest.yaml`

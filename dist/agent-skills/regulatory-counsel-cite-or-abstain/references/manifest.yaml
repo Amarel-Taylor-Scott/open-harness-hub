@@ -1,0 +1,229 @@
+id: "pipeline/regulatory-counsel-cite-or-abstain"
+type: pipeline
+version: "0.1.0"
+name: "Cite-first regulatory counsel (cite-or-abstain)"
+description: |
+  Answer a regulated entity's compliance question ONLY with answers
+  that trace to a primary statutory/regulatory authority — otherwise
+  abstain. This is the High-precision legal/regulated RAG bundle
+  (Bundle B) wired as a hard governed gate, not a rubric suggestion:
+
+   - page/structure-aware chunking preserves citable section anchors;
+   - hybrid retrieval (field-weighted lexical + dense) over a governed
+     statute/canon corpus, fused + cross-encoder reranked;
+   - a cite-first counsel persona + harness emits one finding per
+     sub-question with a per-claim citation;
+   - DETERMINISTIC cite-or-abstain gate: every load-bearing sentence
+     must carry a citation marker (citation-coverage) AND the
+     self-consistency hallucination score must stay below threshold —
+     if either fails the pipeline does NOT pass, forcing an abstain /
+     human-review outcome.
+
+  The negative-space task: a base model will fluently answer
+  "does requirement X apply to entity type Y?" with a plausible but
+  fabricated citation. Here the answer is structurally barred from
+  publication unless each claim is grounded in a retrieved authority.
+
+  NOT legal advice; descriptive; jurisdiction-bound to the cited
+  authorities only.
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry:   ["legal", "legal.compliance", "government", "government.regulatory"]
+capability: ["retrieval", "extraction", "verification", "evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "stable"
+tags: ["knowledge-grounded-qa", "cite-or-abstain", "bundle-b", "regulatory", "rag"]
+created: "2026-05-29"
+updated: "2026-05-29"
+
+attribution:
+  source_url: "https://www.law.cornell.edu/cfr/text"
+  source_kind: "other"
+  author: "Composite of primary statutory/regulatory authorities + legal interpretation canons"
+  license: "CC-BY-4.0"
+
+task: |
+  Given a regulated entity's compliance question (entity type +
+  jurisdiction + question), retrieve the controlling statutory /
+  regulatory authority and return a per-sub-question answer in which
+  EVERY load-bearing claim carries a citation to a retrieved
+  authority, or abstain. Publication is blocked unless citation
+  coverage clears threshold and the hallucination score is low.
+pipeline_kind: "rag_pack"
+
+examples:
+  - name: "Supported: applicability question grounded in a retrieved authority"
+    input:
+      question: "Our company processes payment-card data for ~9,000 transactions a year. Are we required to complete a full on-site PCI DSS assessment, or can we self-assess?"
+      entity_type: "merchant"
+      jurisdiction: "US"
+    expected_output:
+      abstained: false
+      citation_coverage: 1.0
+      answer_markdown: >
+        Based on the retrieved validation criteria, a merchant at your
+        transaction volume is in a lower validation tier and may
+        self-assess via the applicable Self-Assessment Questionnaire
+        rather than an on-site assessment [1]; an Attestation of
+        Compliance is still required [1]. The annual transaction count
+        is the determinant, so confirm the count is measured per card
+        brand [2].
+      findings:
+        - claim: "Your volume falls in a self-assessment validation tier (SAQ), not mandatory on-site assessment."
+          citation: "[1] PCI DSS validation-tier criteria (retrieved authority span)"
+          supported: true
+        - claim: "An Attestation of Compliance must still be submitted."
+          citation: "[1] PCI DSS validation-tier criteria (retrieved authority span)"
+          supported: true
+        - claim: "Transaction count is measured per card brand."
+          citation: "[2] PCI DSS counting guidance (retrieved authority span)"
+          supported: true
+      notes: >
+        Every load-bearing claim cites a retrieved authority span, so
+        citation-coverage passes and the answer is published.
+  - name: "Abstain: corpus does not support a confident answer"
+    input:
+      question: "Does our merchant agreement let us store the full card-verification code (CVV2) after authorization if we encrypt it?"
+      entity_type: "merchant"
+      jurisdiction: "US"
+    expected_output:
+      abstained: true
+      citation_coverage: 0.0
+      answer_markdown: >
+        ABSTAIN — the governed corpus does not contain a provision that
+        resolves whether encrypted post-authorization CVV2 storage is
+        permitted for your arrangement. Routed to human review; no
+        ungrounded answer is published.
+      findings: []
+      notes: >
+        No retrieved span supports an applicability claim, so
+        citation-coverage fails (passes=false) and the cite-or-abstain
+        gate blocks publication — the model does NOT fabricate a rule.
+
+inputs:
+  - name: "question"
+    type: "string"
+  - name: "entity_type"
+    type: "string"
+  - name: "jurisdiction"
+    type: "string"
+outputs:
+  - name: "answer_markdown"
+    type: "string"
+  - name: "findings"
+    type: "object[]"
+  - name: "citation_coverage"
+    type: "number"
+  - name: "abstained"
+    type: "boolean"
+  - name: "trace"
+    type: "object[]"
+
+defaults:
+  persona: "persona/bureaucracy-translator-cite-first"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/statute-citation-and-crossref-grounding"
+    - "knowledge-pack/legal-interpretation-canons"
+  rule_packs:
+    - "rule-pack/grep-statute-ambiguity-flags"
+    - "rule-pack/hybrid-retrieval-policy"
+
+steps:
+  - id: "normalize"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs:
+      data: "$.inputs.question"
+
+  - id: "chunk_authorities"
+    kind: "chunker"
+    ref: "processor/page-aware-chunker"
+    inputs:
+      text: "$.steps.normalize.output.prose"
+
+  - id: "grep_ambiguity"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-statute-ambiguity-flags"
+    inputs:
+      text: "$.steps.normalize.output.prose"
+
+  - id: "retrieve_authorities"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.steps.normalize.output.prose"
+      corpus: "knowledge-pack/statute-citation-and-crossref-grounding"
+      top_k: 10
+
+  - id: "rerank"
+    kind: "processor"
+    ref: "processor/cross-encoder-reranker"
+    inputs:
+      query: "$.steps.normalize.output.prose"
+      passages: "$.steps.retrieve_authorities.output.passages"
+      top_k: 5
+
+  - id: "counsel"
+    kind: "harness"
+    ref: "harness/statute-clarity-review"
+    inputs:
+      statute_text: "$.steps.normalize.output.prose"
+      jurisdiction: "$.inputs.jurisdiction"
+      statute_type: "$.inputs.entity_type"
+      context: "$.steps.rerank.output.passages"
+
+  - id: "citation_coverage"
+    kind: "processor"
+    ref: "processor/citation-coverage"
+    inputs:
+      response_markdown: "$.steps.counsel.output"
+
+  - id: "hallucination_check"
+    kind: "processor"
+    ref: "processor/hallucination-scorer"
+    inputs:
+      response: "$.steps.counsel.output"
+      prompt: "$.steps.normalize.output.prose"
+      n_samples: 5
+
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.counsel.output"
+      rubric_ref: "rubric/statute-clarity-v1"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "regulatory-counsel-cite-or-abstain"
+      applied_layers: ["persona", "chunk", "grep", "rag", "rerank", "harness", "citation_coverage", "hallucination", "judge"]
+
+success_criteria:
+  - rubric: "rubric/statute-clarity-v1"
+    threshold: 0.7
+    label: "answer grounded + drafted to rubric"
+  - kind: "deterministic"
+    target: "$.steps.citation_coverage.output.passes"
+    op: "=="
+    value: true
+    severity: "critical"
+    label: "every load-bearing claim is cited (else abstain)"
+  - kind: "deterministic"
+    target: "$.steps.citation_coverage.output.coverage"
+    op: ">="
+    value: 0.95
+    severity: "critical"
+    label: "citation coverage >= 0.95"
+  - kind: "deterministic"
+    target: "$.steps.hallucination_check.output.overall_score"
+    op: "<="
+    value: 0.2
+    severity: "high"
+    label: "self-consistency hallucination score <= 0.2"

@@ -1,0 +1,69 @@
+id: "pipeline/embedding-committed-load-audit"
+type: pipeline
+version: "0.1.0"
+name: "Embedding committed load audit"
+description: "Compares planned embeddings, stored vectors, pgvector load evidence, and Postgres committed counts to gate vector search readiness."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["embedding", "retrieval", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["embeddings", "vector-search", "pgvector", "postgres", "daily-factory", "readiness-audit"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Gate tenant-visible vector search on committed Postgres object_embedding counts after embedding load planning."
+pipeline_kind: "research_web.embedding_committed_load_audit"
+inputs:
+  - name: "embedding_execution_plan"
+    type: "string"
+  - name: "vector_readiness_summary"
+    type: "string"
+  - name: "pgvector_load_plan_summary"
+    type: "string"
+  - name: "committed_counts"
+    type: "string"
+outputs:
+  - name: "embedding_committed_load_audit"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/embedding-committed-load-audit-patterns"
+steps:
+  - id: "load-embedding-commit-checks"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/embedding-committed-load-audit-patterns"
+    inputs:
+      query: "embedding committed counts vector search product readiness"
+      top_k: 20
+  - id: "audit-embedding-committed-load"
+    kind: "tool"
+    ref: "tool/embedding-committed-load-auditor"
+    inputs:
+      embedding_execution_plan: "$.inputs.embedding_execution_plan"
+      vector_readiness_summary: "$.inputs.vector_readiness_summary"
+      pgvector_load_plan_summary: "$.inputs.pgvector_load_plan_summary"
+      committed_counts: "$.inputs.committed_counts"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.audit-embedding-committed-load.audit_status"
+    op: "in"
+    value: ["verified", "load_planned_not_committed"]
+    severity: "high"
+    label: "The audit distinguishes verified and not-yet-committed states."
+  - kind: "semantic"
+    target: "$.audit-embedding-committed-load"
+    must_cover:
+      - "planned"
+      - "stored"
+      - "pgvector"
+      - "committed counts"
+      - "product-ready"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "The readiness gate is explicit."

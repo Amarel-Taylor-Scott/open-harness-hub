@@ -1,0 +1,123 @@
+id: "pipeline/local-blueprint-records-to-postgres-jsonl"
+type: pipeline
+version: "0.1.0"
+name: "Local blueprint records to Postgres JSONL"
+description: "Exports local sentence-to-pipeline demo output records into canonical JSONL row families and prepares them for the existing Postgres bulk-copy loader."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["format_conversion", "retrieval", "governance", "planning"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.product"
+tags: ["local-demo", "postgres", "pgvector", "jsonl", "bulk-load", "blueprint-records"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Convert a local sentence-to-pipeline run into canonical source, object, entity, dedupe, review, and index JSONL shards that can be loaded into Postgres/pgvector."
+pipeline_kind: "meta_build.local_blueprint_persistence"
+inputs:
+  - name: "prompt"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+  - name: "cost_policy"
+    type: "object"
+outputs:
+  - name: "row_counts"
+    type: "json"
+  - name: "jsonl_files"
+    type: "array"
+  - name: "bulk_load_plan"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/local-blueprint-record-persistence-patterns"
+    - "knowledge-pack/local-blueprint-output-record-patterns"
+steps:
+  - id: "govern-source-prompt"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record:
+        source_type: "user_prompt"
+        trust_tier: "user_private_source"
+        license: "tenant-private"
+        privacy_boundary: "tenant"
+  - id: "run-local-demo"
+    kind: "tool"
+    ref: "tool/sentence-to-pipeline-blueprint-runner"
+    inputs:
+      prompt: "$.inputs.prompt"
+      simulate: true
+      cost_policy: "$.inputs.cost_policy"
+  - id: "emit-output-records"
+    kind: "pipeline"
+    ref: "pipeline/local-sentence-blueprint-output-records"
+    inputs:
+      prompt: "$.inputs.prompt"
+      cost_policy: "$.inputs.cost_policy"
+  - id: "export-jsonl-row-families"
+    kind: "tool"
+    ref: "tool/blueprint-record-jsonl-exporter"
+    inputs:
+      prompt: "$.inputs.prompt"
+      run_output: "$.steps.run-local-demo"
+      output_dir: "$.inputs.output_dir"
+      include_private_prompt: false
+  - id: "preflight-row-relationships"
+    kind: "tool"
+    ref: "tool/factory-jsonl-relationship-preflight"
+    inputs:
+      source_records:
+        - "$.steps.export-jsonl-row-families.row_family_paths.source_record"
+      normalized_objects:
+        - "$.steps.export-jsonl-row-families.row_family_paths.normalized_object"
+      canonical_entities:
+        - "$.steps.export-jsonl-row-families.row_family_paths.canonical_entity"
+      object_entity_refs:
+        - "$.steps.export-jsonl-row-families.row_family_paths.object_entity_ref"
+      dedupe_clusters:
+        - "$.steps.export-jsonl-row-families.row_family_paths.dedupe_cluster"
+      review_tickets:
+        - "$.steps.export-jsonl-row-families.row_family_paths.review_ticket"
+  - id: "prepare-bulk-copy"
+    kind: "tool"
+    ref: "tool/factory-jsonl-bulk-copy-loader"
+    inputs:
+      source_records:
+        - "$.steps.export-jsonl-row-families.row_family_paths.source_record"
+      normalized_objects:
+        - "$.steps.export-jsonl-row-families.row_family_paths.normalized_object"
+      canonical_entities:
+        - "$.steps.export-jsonl-row-families.row_family_paths.canonical_entity"
+      object_entity_refs:
+        - "$.steps.export-jsonl-row-families.row_family_paths.object_entity_ref"
+      dedupe_clusters:
+        - "$.steps.export-jsonl-row-families.row_family_paths.dedupe_cluster"
+      review_tickets:
+        - "$.steps.export-jsonl-row-families.row_family_paths.review_ticket"
+      index_records:
+        - "$.steps.export-jsonl-row-families.row_family_paths.index_record"
+success_criteria:
+  - kind: "semantic"
+    target: "$.row_counts"
+    must_cover:
+      - "source_record"
+      - "normalized_object"
+      - "canonical_entity"
+      - "dedupe_cluster"
+      - "review_ticket"
+      - "index_record"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Local demo output is mapped to canonical row families."
+  - kind: "deterministic"
+    target: "$.jsonl_files"
+    op: "is_truthy"
+    value: true
+    severity: "medium"
+    label: "JSONL shard files are emitted."

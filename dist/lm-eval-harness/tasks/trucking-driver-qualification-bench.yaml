@@ -1,0 +1,65 @@
+# Auto-generated from OpenHubForAI manifest `benchmark/trucking-driver-qualification-bench` v0.1.0.
+# Edit the source manifest at catalog/benchmarks/trucking-driver-qualification-bench.yaml and re-run
+# `python scripts/emit/lm_eval_harness.py`.
+task: trucking-driver-qualification-bench
+tag:
+- evaluation
+- expansion-v7
+- trucking-driver-qualification
+- verification
+description: Synthetic benchmark for trucking driver qualification review quality, evidence grounding, citation checks, and
+  redaction safety.
+dataset_path: open-harness-hub/trucking-driver-qualification-samples
+dataset_name: null
+output_type: generate_until
+training_split: train
+validation_split: val
+test_split: test
+doc_to_text: '# Persona: persona/driver-qualification-reviewer
+
+
+  {{prompt}}'
+doc_to_target: '{{ideal}}'
+generation_kwargs:
+  max_gen_toks: 512
+  temperature: 0.0
+  top_p: 1.0
+  until:
+  - '
+
+
+    '
+metric_list:
+- metric: coverage
+  aggregation: mean
+  higher_is_better: true
+- metric: grounding
+  aggregation: mean
+  higher_is_better: true
+- metric: gap_handling
+  aggregation: mean
+  higher_is_better: true
+- metric: severity
+  aggregation: mean
+  higher_is_better: true
+- metric: remediation
+  aggregation: mean
+  higher_is_better: true
+- metric: audit
+  aggregation: mean
+  higher_is_better: true
+- metric: weighted_rubric_score
+  aggregation: mean
+  higher_is_better: true
+num_fewshot: 0
+metadata:
+  version: 0.1.0
+  open_harness_hub_id: benchmark/trucking-driver-qualification-bench
+  rubric: rubric/trucking-driver-qualification-quality-v1
+  pipeline: pipeline/trucking-driver-qualification-review
+  reproducibility:
+    commit_sha: worktree-generated-2026-05-24
+    dataset_version: 0.1.0
+    run_date: '2026-05-24'
+    hardware: local-dev
+    seed: 31

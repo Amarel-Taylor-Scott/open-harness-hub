@@ -1,0 +1,78 @@
+id: "pipeline/factory-jsonl-to-postgres-store"
+type: pipeline
+version: "0.1.0"
+name: "Factory JSONL to Postgres store"
+description: "Move validated object-factory JSONL outputs into the canonical Postgres and pgvector-backed operational store through deterministic upsert SQL."
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "retrieval", "serving", "evaluation"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["postgres", "pgvector", "jsonl", "canonical-store", "object-factory", "million-primitives"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Emit reviewable Postgres upsert SQL from validated object-factory JSONL shards so generated objects are stored canonically rather than left only as files."
+pipeline_kind: "research_web.factory_jsonl_to_postgres_store"
+
+inputs:
+  - name: "source_records"
+    type: "string[]"
+  - name: "normalized_objects"
+    type: "string[]"
+  - name: "promotion_decisions"
+    type: "string[]"
+  - name: "index_records"
+    type: "string[]"
+  - name: "partition_manifests"
+    type: "string[]"
+  - name: "index_deltas"
+    type: "string[]"
+  - name: "output"
+    type: "string"
+outputs:
+  - name: "sql_load_file"
+    type: "string"
+
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/generated-object-storage-patterns"
+
+steps:
+  - id: "load_storage_patterns"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/generated-object-storage-patterns"
+    inputs:
+      query: "jsonl postgres pgvector canonical store generated objects"
+      top_k: 10
+
+  - id: "emit_postgres_upserts"
+    kind: "tool"
+    ref: "tool/factory-jsonl-postgres-loader"
+    inputs:
+      source_records: "$.inputs.source_records"
+      normalized_objects: "$.inputs.normalized_objects"
+      promotion_decisions: "$.inputs.promotion_decisions"
+      index_records: "$.inputs.index_records"
+      partition_manifests: "$.inputs.partition_manifests"
+      index_deltas: "$.inputs.index_deltas"
+      output: "$.inputs.output"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "factory-jsonl-to-postgres-store"
+      applied_layers: ["source_governance", "canonical_postgres_store", "pgvector_ready", "idempotent_upsert", "reviewable_sql"]
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.outputs.sql_load_file"
+    op: "is_truthy"
+    value: true
+    label: "Postgres load SQL is emitted."
