@@ -63,7 +63,8 @@ def render() -> str:
     extra = []
     if design:
         extra.append(f'<a href="{design}" target="_blank" rel="noopener">Design Portfolio (full fidelity)</a>')
-    for tid, label in [("byo_demos", "Demos · bring your own key"), ("baltor_admin_demo_server", "Baltor Control Tower")]:
+    for tid, label in [("byo_demos", "Demos · bring your own key"), ("registry_api", "Registry REST API (programmatic)"),
+                       ("baltor_admin_demo_server", "Baltor Control Tower")]:
         if svc.get(tid):
             extra.append(f'<a href="{svc[tid]}" target="_blank" rel="noopener">{label}</a>')
     return f"""<!doctype html><html lang=en><head><meta charset=utf-8>
