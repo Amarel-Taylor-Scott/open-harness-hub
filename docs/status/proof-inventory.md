@@ -1,6 +1,6 @@
 # Proof Inventory
 
-**673** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
+**702** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
 
 - `scripts/ingest/context_rot.py`
 - `scripts/ingest/document_decompose.py`
@@ -675,3 +675,32 @@
 - `scripts/build_hub_sites.py`
 - `scripts/scaffold_hub.py`
 - `scripts/hub_engine_runner.py`
+- `scripts/interrogation_engine.py`
+- `scripts/kickstart.py`
+- `scripts/seed_ingest.py`
+- `scripts/bot_swarm.py`
+- `scripts/populate_loop.py`
+- `scripts/enrich_loop.py`
+- `scripts/codeblock_enrich.py`
+- `scripts/bench_token_usage.py`
+- `scripts/scale_index.py`
+- `scripts/hybrid_search.py`
+- `scripts/work_queue.py`
+- `scripts/build_loop.py`
+- `scripts/worktree_build.py`
+- `scripts/flywheel_status.py`
+- `scripts/check_seha_boundary.py`
+- `scripts/check_surface_and_dev_contract.py`
+- `scripts/landing_server.py`
+- `scripts/check_northstar_design.py`
+- `scripts/aidevobserver_demo_server.py`
+- `scripts/check_context_freshness.py`
+- `scripts/check_component_flow_diagram.py`
+- `src/teleon/monitoring/flywheel_queue.py`
+- `src/teleon/demos/byo_key_demo.py`
+- `scripts/byo_demo_server.py`
+- `src/teleon/tuning/action_ledger.py`
+- `src/teleon/tuning/tuner.py`
+- `src/teleon/storage/git_record_store.py`
+- `src/teleon/storage/sync_engine.py`
+- `src/teleon/infra/scale_ports.py`
