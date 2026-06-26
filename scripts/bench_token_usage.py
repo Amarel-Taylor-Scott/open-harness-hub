@@ -122,6 +122,48 @@ def compare(scenario: dict, trials: int, costs: dict, call=_real_call) -> dict:
             "serves_truth": False, "ts": time.strftime("%Y-%m-%dT%H:%M:%S")}
 
 
+#: build-an-APP scenarios — a whole app is a SEQUENCE of capability steps; with hubs, each step reuses a component.
+APPS = [
+    {"id": "doc_to_schema_app", "steps": ["pipeline_steps", "json_schema", "regex_email"]},
+    {"id": "log_report_app", "steps": ["json_schema", "pipeline_steps"]},
+]
+
+
+def build_app(app: dict, trials: int, costs: dict, call=_real_call) -> dict:
+    """Build a whole app (a sequence of capability steps) WITH hubs (reuse components) vs WITHOUT (from scratch),
+    summing REAL token usage across every step → the cumulative wedge for an end-to-end build. serves_truth=false."""
+    by_id = {s["id"]: s for s in SCENARIOS}
+    steps = [by_id[sid] for sid in app["steps"] if sid in by_id]
+    arms = {"without_hubs": {"tokens": 0.0, "cost": 0.0, "passed": 0.0},
+            "with_hubs": {"tokens": 0.0, "cost": 0.0, "passed": 0.0}}
+    for s in steps:
+        c = compare(s, trials, costs, call)
+        for dst, src in (("without_hubs", "bare"), ("with_hubs", "teleon")):
+            arms[dst]["tokens"] += c["arms"][src]["avg_tokens"]
+            arms[dst]["cost"] += c["arms"][src]["avg_cost_usd"]
+            arms[dst]["passed"] += c["arms"][src]["pass_rate"]
+    n = len(steps) or 1
+    for arm in arms.values():
+        arm["pass_rate"] = round(arm.pop("passed") / n, 3)
+        arm["cost"] = round(arm["cost"], 6)
+    pct = lambda lo, hi: round((hi - lo) / hi * 100, 1) if hi else 0.0  # noqa: E731
+    return {"app": app["id"], "steps": len(steps), "trials": trials, "arms": arms,
+            "tokens_saved_pct": pct(arms["with_hubs"]["tokens"], arms["without_hubs"]["tokens"]),
+            "cost_saved_pct": pct(arms["with_hubs"]["cost"], arms["without_hubs"]["cost"]),
+            "serves_truth": False, "ts": time.strftime("%Y-%m-%dT%H:%M:%S")}
+
+
+def run_apps(app_id: str | None, trials: int) -> dict:
+    costs = model_costs()
+    apps = [a for a in APPS if not app_id or a["id"] == app_id]
+    results = [build_app(a, trials, costs) for a in apps]
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    with OUT.open("a", encoding="utf-8") as fh:
+        for r in results:
+            fh.write(json.dumps(r) + "\n")
+    return {"apps": len(results), "results": results}
+
+
 def run(scenario_id: str | None, trials: int) -> dict:
     costs = model_costs()
     scens = [s for s in SCENARIOS if not scenario_id or s["id"] == scenario_id]
@@ -154,7 +196,19 @@ def self_test() -> int:
         return {"text": "[1,2,3]", "usage": {"prompt_tokens": 30, "completion_tokens": 10}}
     esc = run_arm(SCENARIOS[2], "teleon", costs, call=fake_fail_then_ok)
     assert esc["calls"] == 2 and esc["passed"], esc
-    print("bench_token_usage self-test: OK (cost map, tokens/cost/reliability math, scaffold savings, escalation)")
+    # build-an-app: cumulative tokens WITH hubs << WITHOUT across a whole multi-step app
+    def fake_app(model, system, user):
+        scaffold = "compose" in system.lower() or "scaffold" in system.lower()
+        usage = {"prompt_tokens": 40, "completion_tokens": 20} if scaffold else {"prompt_tokens": 120, "completion_tokens": 200}
+        text = ('["ingest","extract","validate"]' if "JSON array" in user
+                else '{"name":"user","type":"object","fields":[]}' if "JSON object" in user
+                else r"[\w.+-]+@[\w-]+\.[\w.-]+")
+        return {"text": text, "usage": usage}
+    app_res = build_app(APPS[0], 2, costs, call=fake_app)
+    assert app_res["steps"] == 3, app_res["steps"]
+    assert app_res["arms"]["with_hubs"]["tokens"] < app_res["arms"]["without_hubs"]["tokens"], app_res["arms"]
+    assert app_res["tokens_saved_pct"] > 70 and app_res["arms"]["with_hubs"]["pass_rate"] == 1.0, app_res
+    print("bench_token_usage self-test: OK (per-capability + build-an-app with/without hubs, escalation, math)")
     return 0
 
 
@@ -172,7 +226,13 @@ def main(argv: list[str]) -> int:
                   f"reliability Δ{r['reliability_delta']:+}  (bare {r['arms']['bare']['avg_tokens']:.0f} tok → "
                   f"teleon {r['arms']['teleon']['avg_tokens']:.0f} tok)")
         return 0
-    print("usage: bench_token_usage.py --self-test | --run [--scenario id --trials N]")
+    if "--apps" in argv:
+        res = run_apps(opt("--app"), int(opt("--trials", "3")))
+        for r in res["results"]:
+            print(f"  [{r['app']}] {r['steps']} steps · tokens -{r['tokens_saved_pct']}% · cost -{r['cost_saved_pct']}%  "
+                  f"(without-hubs {r['arms']['without_hubs']['tokens']:.0f} tok → with-hubs {r['arms']['with_hubs']['tokens']:.0f} tok)")
+        return 0
+    print("usage: bench_token_usage.py --self-test | --run [--scenario id] | --apps [--app id] [--trials N]")
     return 0
 
 
