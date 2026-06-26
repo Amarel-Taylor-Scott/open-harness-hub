@@ -10,7 +10,9 @@
 OpenHubForAI lets anyone browse **every record in the family** in multiple visually styled ways, with filters and
 search. There are **242 registry records today** and the number grows. Build it in the shared kit (accent `#3b6fd4`).
 A basic faceted browse already exists at `scripts/openhub_browse_server.py` (older, dark, superseded); rebuild it rich
-in the kit with several layouts.
+in the kit with several layouts. Wrap every record browser in `OhLayout variant="no-sidebar"` (full-width content with
+the top nav and footer, the right shape for wide tables and browsers), and render the faceted table browser with
+`OhTable` (the standardized data table).
 
 ## The data (real, from the reconciled spine)
 
@@ -31,9 +33,10 @@ in the kit with several layouts.
 ## The browse layouts (build several; variety is the point)
 
 1. **Faceted table browser (the default).** A left facet sidebar (the 5 dimensions; each value is a checkbox with its
-   live count) plus a main TABLE of records (sortable columns: name, type, status, category, layer), a search box, and
-   pagination or virtualization (242 rows now, design for thousands). Multi-select facets combine: AND across
-   dimensions, OR within a dimension. Counts update as filters change. This is the visually styled table browser.
+   live count) plus a main `OhTable` of records (`cols`: name, type, status, category, layer, all `sortable`; `onRow`
+   opens the record detail), a search box, and pagination or virtualization (242 rows now, design for thousands).
+   Multi-select facets combine: AND across dimensions, OR within a dimension. Counts update as filters change. This is
+   the visually styled table browser.
 2. **Card grid (alternate view).** The same filtered records as cards (name, type, a status badge, the categories),
    for visual scanning. A view toggle switches table and cards.
 3. **Browse-by-area landing.** A directory that lets a user enter the records by area: by **Category** (6 tiles with
@@ -81,6 +84,7 @@ populated, error (the message plus retry).
 ## Acceptance checklist (this is "done")
 
 - [ ] The faceted table browser: facet sidebar with live counts, sortable table, search, and pagination, over the real 242-record spine.
+- [ ] Built with OhLayout (no-sidebar) + OhTable.
 - [ ] The card-grid alternate view, with a table/cards toggle.
 - [ ] The browse-by-area landing (category, status, layer, kind, all registries).
 - [ ] The record-detail view (the `RegistryObject` plus its `component` and cross-references).

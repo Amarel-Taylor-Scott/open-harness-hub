@@ -332,6 +332,32 @@ items are `[[label, value], ...]`.
 <OhRollup items={[['Sessions, 30d', 128], ['High findings', 14], ['Avg confidence', '0.91']]} />
 ```
 
+### 5.9 `OhLayout` (the formal layout chooser)
+
+The one standardized page skeleton: every page declares its shape through `OhLayout`, which composes the existing
+`OhTopBar` / `OhAppShell` / `OhFooter` (it does not replace them). The `variant` prop is the chooser (`'sidebar'`,
+`'one-col'`, `'two-col'`, `'no-sidebar'`; see section 6). Props:
+`OhLayout({ variant, brand, nav, sidebar, cta, signInHref, theme, onToggle, footer = true, footerProps, aside, children })`.
+
+```jsx
+<OhLayout variant="no-sidebar" brand={BRAND} nav={MKT_NAV} cta={{ label: 'Start free', href: '/signup' }}
+  theme={theme} onToggle={onToggle}>{page}</OhLayout>
+```
+
+### 5.10 `OhTable` (the standardized data table)
+
+The standardized data table: a column spec plus a rows array, with optional sortable headers and click-through rows.
+`cols` is `[{ key, label, render?(row), width?, align?, sortable?, sortValue?(row) }]`; `rows` is an array; `rowKey?(row)`
+defaults to `row.id`; `onRow?(row)` makes rows click-through; `empty` is the empty-state text (rendered when there are
+no rows); `dense` tightens the padding. A `sortable` header toggles asc, desc, off. Props:
+`OhTable({ cols, rows, rowKey, onRow, empty = 'No records.', dense })`.
+
+```jsx
+<OhTable cols={[{ key: 'name', label: 'Name', sortable: true },
+                { key: 'status', label: 'Status', render: r => <span className="oh-badge oh-badge--sm">{r.status}</span> }]}
+  rows={records} rowKey={r => r.id} onRow={r => navigate('/browse/' + r.id)} empty="No records." />
+```
+
 ### Cards, pills, table, fields
 
 `.oh-card` is the one surface for every card and panel. `.oh-table` is the data table (uppercase 11px headers,
@@ -344,7 +370,34 @@ focus to an accent border. `.oh-segment` is a pill-shaped segmented control. `.o
 ## 6. Layout: two layouts, one family
 
 Both layouts use the same kit, the same tokens, and the same accent. They differ only in chrome: marketing pages have
-a top nav; logged-in pages have a left sidebar.
+a top nav; logged-in pages have a left sidebar. `OhLayout` is the one chooser that unifies them: a page declares its
+shape by picking a `variant`, and `OhLayout` composes the right chrome.
+
+### `OhLayout`: the formal layout chooser (unifies both layouts)
+
+`OhLayout` (`web/teleon/kit/oh-site.jsx`) is the ONE standardized page skeleton. Every page declares its shape through
+it, and it composes the existing `OhTopBar`, `OhAppShell`, and `OhFooter` (it does not replace them). The `variant`
+prop picks the body. The non-sidebar variants render `<OhTopBar/>`, a `.ohl-body` main, and `<OhFooter/>`; the layout
+CSS is the `.ohl*` block in `web/teleon/kit/oh-site.css`.
+
+| `variant` | Shape | Use for |
+|---|---|---|
+| `'sidebar'` | the left-sidebar logged-in app shell (delegates to `OhAppShell`; pass `sidebar` = the app nav, shape `[[href, glyph, label], ...]`) | the logged-in app |
+| `'one-col'` | a centered readable single column (max-width 820px) with the top nav and footer | docs, settings, simple forms |
+| `'two-col'` | main content (`children`) plus a sticky right `aside` (pass `aside`) | content with a rail |
+| `'no-sidebar'` | full-width content (the default site width) with the top nav and footer | marketing, wide tables and browsers |
+
+Full prop signature: `OhLayout({ variant, brand, nav, sidebar, cta, signInHref, theme, onToggle, footer = true, footerProps, aside, children })`.
+
+```jsx
+// a sidebar-variant page (the logged-in app): pass the app nav as `sidebar`
+<OhLayout variant="sidebar" brand={BRAND} sidebar={APP_NAV} cta={{ label: '+ New run', href: '/runs' }}
+  theme={theme} onToggle={onToggle}>{page}</OhLayout>
+
+// a no-sidebar-variant page (marketing or a wide browser): pass the marketing nav as `nav`
+<OhLayout variant="no-sidebar" brand={BRAND} nav={MKT_NAV} cta={{ label: 'Start free', href: '/signup' }}
+  theme={theme} onToggle={onToggle}>{page}</OhLayout>
+```
 
 ### 6a. Marketing and home pages (the public pattern)
 

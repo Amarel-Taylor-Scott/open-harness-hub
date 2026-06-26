@@ -9,10 +9,13 @@
 
 1. **Marketing home** (`/`): already exists at `web/aidevobserver/aidevobserver-main.jsx`; elevate it.
 2. **The demo** (`/demo`): a working "paste a session, get a review" page.
-3. **THE MAIN BUILD: the logged-in app** using `OhAppShell` (the left-sidebar shell). This is the bulk of the work.
+3. **THE MAIN BUILD: the logged-in app** using `OhLayout variant="sidebar"` (the left-sidebar shell, which composes
+   `OhAppShell`). This is the bulk of the work.
 
-Everything uses the shared kit (`OhTopBar`, `OhAppShell`, the card/button/pill atoms). You differ from the other 4
-surfaces ONLY by the accent (`#b25fd6`) and the copy. Do not invent a new CSS system.
+Everything uses the shared kit through `OhLayout` (the one page skeleton): the marketing home and the demo use
+`OhLayout variant="no-sidebar"`, and the logged-in app uses `OhLayout variant="sidebar"`; the card/button/pill atoms
+and `OhTable` (the standardized data table) come from the same kit. You differ from the other 4 surfaces ONLY by the
+accent (`#b25fd6`) and the copy. Do not invent a new CSS system.
 
 ## The product in one paragraph (for the copy)
 
@@ -22,9 +25,11 @@ wasted context (oversized or duplicated), risky commands, and missed cheaper pat
 (accept, reuse, or dismiss). That accept-or-dismiss signal is what makes the product improve over time. Findings are
 suggestions a human reviews, never auto-applied; the tool is read only and stores nothing.
 
-## The logged-in app: `OhAppShell` left sidebar, four screens
+## The logged-in app: `OhLayout variant="sidebar"`, four screens
 
-Sidebar nav (the `OhAppShell` items, glyph + label):
+Use `OhLayout variant="sidebar"` (it composes `OhAppShell`) with the AIDevObserver accent: pass `sidebar` = the nav
+(the `[[href, glyph, label], ...]` shape below), plus `brand`, `cta`, `theme`, and `onToggle`. Sidebar nav
+(glyph + label):
 
 | Sidebar item | Route | Job |
 |---|---|---|
@@ -66,16 +71,16 @@ for adversarial):
 ### Screen: Sessions
 
 - **Data:** `GET /api/observer/sessions` returns `{ "sessions": [ {session_id, path, mtime, project} ] }`.
-- **Render:** a list or table; each row shows `project`, a short `session_id`, a relative time (from `mtime`), and the
-  finding count once reviewed. Clicking a row opens Review for that session. Do not show full `path` (it is a local
-  filesystem path); show `project` + the short id.
+- **Render:** an `OhTable` with `cols` = project, session id (short), time (relative, from `mtime`), and finding
+  count (once reviewed). Set `onRow` to open Review for that session (`onRow` makes the rows click-through). Do not
+  show the full `path` (it is a local filesystem path); show `project` plus the short id.
 - **States:** empty ("No sessions yet. Connect your editor or paste a transcript on the demo."), loading, populated.
 
 ### Screen: Findings (cross-session)
 
 - **Job:** one place to filter findings by type and see the accept/dismiss outcomes.
-- **Render:** a filterable table (columns: type, confidence, message, session, outcome). The outcome column is the
-  signal the product learns from.
+- **Render:** a filterable `OhTable` with `cols` = type, confidence, message, session, outcome. The outcome column is
+  the signal the product learns from.
 
 ### Screen: Settings
 
@@ -145,6 +150,7 @@ Use this example session (it produces the payload above):
 ## Acceptance checklist (this is "done")
 
 - [ ] The `OhAppShell` left-sidebar shell with all 4 screens (Review, Sessions, Findings, Settings), in the shared kit, accent `#b25fd6`.
+- [ ] Uses OhLayout (sidebar) for the app and OhTable for the Sessions/Findings lists.
 - [ ] The finding card renders the real `/review` payload (every field: type chip, confidence, message, evidence, suggestion, source_ref chips), not placeholder text.
 - [ ] Accept / Reuse / Dismiss actions on every finding (the `outcome`).
 - [ ] Empty, loading, and error states for Review and Sessions.
