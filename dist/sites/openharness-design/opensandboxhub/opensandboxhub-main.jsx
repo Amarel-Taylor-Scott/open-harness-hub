@@ -1,6 +1,6 @@
 /* global React, ReactDOM, PORTFOLIO, makeHub */
 // OpenSandboxHub.io — isolated sandbox registry + risk/conformance.
-// PRIVATE-FIRST candidate: opens publicly when a competitor enters the lane.
+// PRIVATE-FIRST candidate: opens publicly when a it enters private preview.
 // The OpenMCPHub "discovery is not trust" pattern, applied to the RUNTIMES that
 // execute agent code (E2B / Daytona / agent-sandbox class). Distinct from
 // OpenEnvHub (the task world) — a sandbox is the ISOLATION the code runs inside.

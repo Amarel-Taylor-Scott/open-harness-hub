@@ -1,6 +1,6 @@
 /* global React, ReactDOM, PORTFOLIO, makeHub */
 // OpenStateHub.io — governed, durable agent state. Built on the shared hub module.
-// PRIVATE-FIRST candidate: opens publicly when a competitor enters the lane.
+// PRIVATE-FIRST candidate: opens publicly when a it enters private preview.
 // Distinct from OpenContextHub (governed TRUTH packs an agent reads) — this is the
 // durable WORKING STATE an agent writes: memory, blackboard, graph. Drawn from the
 // persistent agent-state spine (blackboard · mem0 / letta / graphiti class).

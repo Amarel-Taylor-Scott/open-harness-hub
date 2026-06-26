@@ -1,6 +1,6 @@
 /* global React, ReactDOM, PORTFOLIO, makeHub */
 // OpenEndpointHub.io — governed due-diligence on LLM endpoints + gateways.
-// PRIVATE-FIRST candidate: opens publicly when a competitor enters the lane.
+// PRIVATE-FIRST candidate: opens publicly when a it enters private preview.
 // Drawn from the endpoint registries + free_endpoint_intel. Distinct from
 // OpenMCPHub (MCP servers) — this is the model ENDPOINTS themselves and the
 // question "what data may I send where": data-class & jurisdiction eligibility.

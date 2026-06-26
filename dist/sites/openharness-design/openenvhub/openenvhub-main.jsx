@@ -1,6 +1,6 @@
 /* global React, ReactDOM, PORTFOLIO, makeHub */
 // OpenEnvHub.io — verifiable agent eval environments + reward specs.
-// PRIVATE-FIRST candidate: opens publicly when a competitor enters the lane.
+// PRIVATE-FIRST candidate: opens publicly when a it enters private preview.
 // Drawn from the Environment + Reward Spine. Distinct from OpenBenchmarkHub
 // (definitions + result records) — an environment is the TASK WORLD a candidate
 // is run against, with a reward spec; the score is downstream.

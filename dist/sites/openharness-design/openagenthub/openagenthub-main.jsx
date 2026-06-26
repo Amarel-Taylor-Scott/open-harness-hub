@@ -1,6 +1,6 @@
 /* global React, ReactDOM, PORTFOLIO, makeHub */
 // OpenAgentHub.io — agent-runtime registry (bounded adapters + run receipts).
-// PRIVATE-FIRST candidate: opens publicly when a competitor enters the lane.
+// PRIVATE-FIRST candidate: opens publicly when a it enters private preview.
 // Drawn from the agent_runtime_catalog + teleon. Distinct from OpenSkillsHub
 // (know-how) and OpenToolsHub (executables) — this is the RUNTIME an agent runs
 // in: a bounded adapter that emits run receipts. The thing that runs the agent.

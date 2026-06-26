@@ -169,7 +169,7 @@
       blurb: 'Reviews papers and repos for capability, verifiability and reproducibility — a claim is not a capability until it reproduces.',
       accent: '#9d4edd', glyph: '⊙', url: '../openreviewhub/OpenReviewHub Prototype.html', status: 'live',
     },
-    // ── Private bench — built on the kit, private until a competitor enters the lane ──
+    // ── Private preview — built on the kit, in private preview ──
     // Each: drawn from a real modular component, distinct from the 9 live hubs, with an
     // open_trigger + a future (public) accent. status:'private' → muted accent now; the
     // saturated futureAccent is adopted when the hub is opened. discovery ≠ trust.
@@ -269,7 +269,7 @@
   const LAYERS = [
     { id: 'product', label: 'Products', sub: 'governed products you run', items: ['baltor', 'teleon'] },
     { id: 'open', label: 'Open resources', sub: 'context · skills · tools · skill→tool · mcp · compression · benchmark · review · harnesses', items: ['openContextHub', 'openSkillsHub', 'openToolsHub', 'openSkillToTool', 'openMCPHub', 'openCompressionHub', 'openBenchmarkHub', 'openReviewHub', 'openHarnessHub'] },
-    { id: 'candidate', label: 'Private bench', sub: 'built on the kit · private until a competitor enters the lane', items: ['openTemplatesHub', 'openEndpointHub', 'openEnvironmentHub', 'openSandboxHub', 'openAgentHub', 'openReceiptHub', 'openStateHub', 'openRoutingHub', 'openReconciliationHub', 'openHardeningHub', 'openEnrichmentHub', 'openOptimizationHub', 'openVerificationHub'] },
+    { id: 'candidate', label: 'Private preview', sub: 'built on the kit · in private preview', items: ['openTemplatesHub', 'openEndpointHub', 'openEnvironmentHub', 'openSandboxHub', 'openAgentHub', 'openReceiptHub', 'openStateHub', 'openRoutingHub', 'openReconciliationHub', 'openHardeningHub', 'openEnrichmentHub', 'openOptimizationHub', 'openVerificationHub'] },
   ];
   // key relationships (ports) — how value flows between entities
   const PORTS = [

@@ -64,6 +64,15 @@ Portal; object = **PurposeTask** (formal synonym **CapabilityTask**). Brand doc:
 
 **TWO LAYERS — don't conflate them** (this is the count people get wrong):
 
+**Hub = storefront · registry = catalog behind it.** A hub is a *surface* — a branded open storefront with a domain
+(`opentoolshub.io`), a one-liner, and a `substrate` (the registries + code that stock it); it is the *presentation*
+layer. A registry is a *typed catalog* — one named index of a single object TYPE (`capability` holds the action
+ontology; `model` holds models). Each registry entry carries a **`maps_to_hub`** field, so MANY registries roll up
+into ONE hub. You **query registries** (via `RegistryPort`); you **browse hubs**. Registry **kinds** (single-sourced
+in the ontology): **static** (curated + indexed), **discovery** (crawls the world for new components), **meta**
+(pointer-only — indexes *where* external registries live; pointer ≠ copy, discovery ≠ trust). The `maps_to_hub` link
+is the ONLY explicit hub↔registry binding, and nothing yet enforces it stays valid — a candidate contract.
+
 **(a) The Open\*Hub SURFACES** — the storefronts. ~35 are named across the design + data (sources:
 `architecture/hub_profiles.json` = 28 detailed profiles; `architecture/candidate_open_hubs.json` = 9 existing + 16
 candidates; family count computed by `scripts/check_ai_done_right_surface_family.py`). By name: OpenAgentHub ·
@@ -158,7 +167,8 @@ Execution / Optimization / Verification). By name:
 ## 9. Contracts + hooks (anti-regression — how the laws are enforced)
 
 - **The gate** — `PYTHONPATH=. python3 scripts/run_proofs.py` runs every registered `--self-test` (count computed from
-  `scripts/flywheel_proof_modules.py`; **702 green** as of 2026-06-25). Registry of every proof:
+  `scripts/flywheel_proof_modules.py`; run the gate for the LIVE green count — never hand-type it here, per the
+  No-Magic-Values law this very file declares). Registry of every proof:
   `scripts/flywheel_proof_modules.py`. The NO-OP trap: `flywheel_proof_modules.py` is a LIST, not a runner — always
   run `run_proofs.py`.
 - **Surface contracts** — `check_surface_and_dev_contract` (built-out surfaces exist) + `check_northstar_design`

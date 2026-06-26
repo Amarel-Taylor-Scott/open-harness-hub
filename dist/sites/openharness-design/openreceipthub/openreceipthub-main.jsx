@@ -1,6 +1,6 @@
 /* global React, ReactDOM, PORTFOLIO, makeHub */
 // OpenReceiptHub.io — portable, signed receipts. Built on the shared hub module.
-// PRIVATE-FIRST candidate: opens publicly when a competitor enters the lane.
+// PRIVATE-FIRST candidate: opens publicly when a it enters private preview.
 // The attestation face of the family — complements OpenReviewHub (a review is a
 // VERDICT; a receipt is a portable ATTESTATION of what happened). Drawn from the
 // receipt + AI-BOM / provenance spine (Sigstore · in-toto · CycloneDX · C2PA).

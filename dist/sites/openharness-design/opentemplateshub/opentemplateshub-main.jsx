@@ -1,6 +1,6 @@
 /* global React, ReactDOM, PORTFOLIO, makeHub */
 // OpenTemplatesHub.io — reusable template families. Built on the shared hub module.
-// PRIVATE-FIRST candidate: opens publicly when a competitor enters the lane.
+// PRIVATE-FIRST candidate: opens publicly when a it enters private preview.
 // Drawn from the Shared Template Registry. "Templates generate starting shapes;
 // harnesses prove the generated outputs work." Distinct from OpenHarnessHub
 // (a harness PROVES an output) — a template is the SHAPE you instantiate.
