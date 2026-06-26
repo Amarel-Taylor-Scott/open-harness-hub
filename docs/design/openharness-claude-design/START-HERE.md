@@ -6,14 +6,14 @@ this order, then design.
 
 ## Read order (top to bottom)
 
-1. **`docs/DESIGN-BIBLE.md`** (the GUIDE): tokens, type scale, every component, the two layouts (marketing top-nav
+1. **`DESIGN-BIBLE.md`** (the GUIDE): tokens, type scale, every component, the two layouts (marketing top-nav
    plus the `OhAppShell` left-sidebar logged-in shell), routes, governance, the copy rules, and the SAFE-vs-LOCKED
    handoff. This is the #1 read.
 2. **`DESIGN-ASSETS.md`** (in this folder, the SOURCE): the full shared kit verbatim (`oh-tokens.css`,
    `oh-components.css`, `oh-site.css`, `oh-site.jsx`, `products.js`) plus one COMPLETE app (Teleon). When the guide
    says "see `oh-tokens.css`" or names a component, the actual code is here. This is the thing you edit once and it
    applies to all 5 surfaces.
-3. **`docs/INTEGRATION-BIBLE.md`**: how a frontend talks to a backend (same-origin seams), local and cloud.
+3. **`INTEGRATION-BIBLE.md`**: how a frontend talks to a backend (same-origin seams), local and cloud.
 4. **The 5 live URLs** (below): see it rendered.
 
 The live renderer is the showcase serving the full `web/<brand>/` apps over the shared kit. `scripts/surface_server.py`
@@ -24,10 +24,10 @@ production gaps.
 
 ## Framework, kit, and page skeletons (build pages without guessing)
 
-`docs/DESIGN-BIBLE.md` now carries concrete, copy-paste HTML and JSX so you can build a page without inventing an API.
+`DESIGN-BIBLE.md` now carries concrete, copy-paste HTML and JSX so you can build a page without inventing an API.
 Read these three, in order:
 
-1. **`docs/DESIGN-BIBLE.md` sections 7, 8, 9.** Section 7 (Page skeletons) has the exact boot HTML, a full marketing
+1. **`DESIGN-BIBLE.md` sections 7, 8, 9.** Section 7 (Page skeletons) has the exact boot HTML, a full marketing
    page, and a full logged-in `OhAppShell` page, all copy-pasteable. Section 8 (Framework and scaffolding) has the
    stack (React 18 plus in-browser Babel), the hash-router contract (`useHashRoute()` returns the route,
    `navigate(to)` sets the hash), and how the showcase serves it. Section 9 (Scaffolding primitives) is the
@@ -36,11 +36,11 @@ Read these three, in order:
    `OhSection`, `OhFeatures`, `OhBand`, `OhFooter`, `OhAppShell`, `OhPageHead`, `OhRollup`, plus
    `useHashRoute`/`navigate`/`useSiteTheme`); `web/teleon/kit/oh-tokens.css` is the token palette. The reference app
    is `web/teleon/index.html` plus `web/teleon/teleon-main.jsx`.
-3. **`docs/INTEGRATION-BIBLE.md`.** The frontend-to-backend seam: a page calls a same-origin path
+3. **`INTEGRATION-BIBLE.md`.** The frontend-to-backend seam: a page calls a same-origin path
    (`/api/<service>/...` or `/registry/...`) and the showcase routes it to the backend, so the page code is the same
    locally and in the cloud.
 
-**The canonical build stack (per `docs/DESIGN-BIBLE.md` section 1).** The shipped product is the set of full apps
+**The canonical build stack (per `DESIGN-BIBLE.md` section 1).** The shipped product is the set of full apps
 under `web/<app>/` (`context-is-everything`, `teleon`, `baltor`, `harness-hub`, `aidevobserver`), served by
 `python3 -m scripts.showcase` (the `OH_PRODUCT` env picks `web/<product>/`), over the shared kit in `web/<app>/kit/`
 (`oh-site.jsx`, `oh-tokens.css`, `oh-components.css`, `oh-site.css`, `products.js`). Framework: React 18 plus ReactDOM
@@ -84,5 +84,5 @@ change propagates to all 5. After any change: `python3 scripts/check_surface_ser
 - **Inter UI + `ui-monospace`** as the canonical fonts (resizing within the scale is fine; changing the type
   *system* needs owner intent).
 
-Full detail for every line above: **`docs/DESIGN-BIBLE.md`** §12 (the SAFE-vs-LOCKED handoff). `serves_truth = false` (candidate output, not
+Full detail for every line above: **`DESIGN-BIBLE.md`** §12 (the SAFE-vs-LOCKED handoff). `serves_truth = false` (candidate output, not
 verified truth; a BYO key is used only for the request, never stored or logged).

@@ -1,6 +1,6 @@
 # AI Done Right — Tracked Design Handoff (current · reconciled 2026-06-26)
 
-> **Read `docs/DESIGN-BIBLE.md` FIRST** — the single, designer-ready reference for the LIVE design system
+> **Read `DESIGN-BIBLE.md` FIRST** — the single, designer-ready reference for the LIVE design system
 > (tokens · type scale · every component · routes · governance · the SAFE-vs-LOCKED designer handoff, 478 lines).
 > This file is the **family + production handoff**: the family shape, the Baltor method spine, service-to-service
 > auth, and the production gaps. The companion orientation next to it is `FAMILY-README.md`. If any of these
@@ -18,7 +18,7 @@ aspirational REFERENCE the canonical tokens derive from is the high-fidelity bun
 
 **The designer's job:** *elevate the live `surface_server` pages toward the richness of the
 `dist/sites/openharness-design/` bundle — WHILE keeping the byte-identical-CSS law.* You never style one surface; you
-edit `_CSS_TEMPLATE` once and it propagates to all 5. Full SAFE-vs-LOCKED map: `docs/DESIGN-BIBLE.md` §11.
+edit `_CSS_TEMPLATE` once and it propagates to all 5. Full SAFE-vs-LOCKED map: `DESIGN-BIBLE.md` §11.
 
 ### The 5 surfaces (single source: `architecture/surface_capability_spec.json` → `scripts/_surface_accents.py`)
 
@@ -32,11 +32,11 @@ edit `_CSS_TEMPLATE` once and it propagates to all 5. Full SAFE-vs-LOCKED map: `
 
 > TryCloudflare URLs are **ephemeral** — they rotate on every launch. The live record is always `dist/surface-urls.json`;
 > production uses the stable domains (`aidoneright.dev` · `teleon.dev` · `baltor.ai` · `aidevobserver.io` ·
-> `openhubforai.io`). See `docs/DESIGN-BIBLE.md` §10.
+> `openhubforai.io`). See `DESIGN-BIBLE.md` §10.
 
 ## Read order (Claude design / Claude Code Max)
 
-1. **`docs/DESIGN-BIBLE.md`** — the design system (tokens, type, components, routes, governance, SAFE-vs-LOCKED).
+1. **`DESIGN-BIBLE.md`** — the design system (tokens, type, components, routes, governance, SAFE-vs-LOCKED).
 2. **`scripts/surface_server.py`** — THE live renderer (`_CSS_TEMPLATE` + the `render_*` helpers).
 3. The **5 live URLs** above (or run `python3 scripts/surface_server.py <surface-id>` locally).
 4. **`dist/sites/openharness-design/`** — the richer bundle to elevate toward, and the source of the production React
