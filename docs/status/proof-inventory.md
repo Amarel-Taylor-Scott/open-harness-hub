@@ -1,6 +1,6 @@
 # Proof Inventory
 
-**713** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
+**714** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
 
 - `scripts/ingest/context_rot.py`
 - `scripts/ingest/document_decompose.py`
@@ -706,6 +706,7 @@
 - `src/teleon/infra/scale_ports.py`
 - `src/teleon/examples/product_pipelines.py`
 - `scripts/check_aidevobserver_vscode_ext.py`
+- `scripts/check_aidevobserver_mcp.py`
 - `src/teleon/retrieval/learned_vectors.py`
 - `src/teleon/retrieval/pgvector_index.py`
 - `src/teleon/synthesis/codeblock_loop.py`

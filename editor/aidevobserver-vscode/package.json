@@ -1,12 +1,12 @@
 {
   "name": "aidevobserver",
   "displayName": "AIDevObserver",
-  "description": "Review the active AI-session transcript for reinvention / waste findings via the AI Done Right byo_demo_server (bring your own key, used transiently).",
+  "description": "Review your AI coding session for reinvention / waste — a thin editor surface over the Teleon Observer CLI. Governed candidates (serves_truth=false), read-only. Works in VS Code and Cursor.",
   "version": "0.1.0",
   "publisher": "ai-done-right",
   "license": "MIT",
   "engines": {
-    "vscode": "^1.75.0"
+    "vscode": "^1.80.0"
   },
   "categories": [
     "Other",
@@ -17,10 +17,13 @@
     "observer",
     "session review",
     "reinvention",
-    "teleon"
+    "teleon",
+    "cursor"
   ],
   "activationEvents": [
-    "onCommand:aidevobserver.reviewSession"
+    "onCommand:aidevobserver.reviewSession",
+    "onCommand:aidevobserver.liveCheck",
+    "onCommand:aidevobserver.listSessions"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -29,21 +32,46 @@
         "command": "aidevobserver.reviewSession",
         "title": "AIDevObserver: Review Session",
         "category": "AIDevObserver"
+      },
+      {
+        "command": "aidevobserver.liveCheck",
+        "title": "Live Check",
+        "category": "AIDevObserver"
+      },
+      {
+        "command": "aidevobserver.listSessions",
+        "title": "List Sessions",
+        "category": "AIDevObserver"
       }
     ],
     "configuration": {
       "title": "AIDevObserver",
       "properties": {
+        "aidevobserver.pythonPath": {
+          "type": "string",
+          "default": "python3",
+          "description": "Python interpreter used to run the Teleon Observer CLI (`<python> -m src.teleon.observer.cli ...`)."
+        },
+        "aidevobserver.cliCwd": {
+          "type": "string",
+          "default": "",
+          "description": "Working directory the observer CLI runs in. Empty = the first workspace folder, so the CLI discovers THAT project's Claude sessions."
+        },
+        "aidevobserver.autoReviewOnFocus": {
+          "type": "boolean",
+          "default": false,
+          "description": "When the editor regains focus, silently refresh the status-bar finding count for the latest session."
+        },
         "aidevobserver.apiKey": {
           "type": "string",
           "default": "",
-          "markdownDescription": "Bring-your-own API key. Sent as `byo_key` with each review request and used transiently by the endpoint for that one call only. The extension does not persist or log it beyond this VS Code setting.",
+          "markdownDescription": "Bring-your-own API key for the optional remote backend. Used only when no workspace folder is open: it is sent as `byo_key` with the `/run` request and used transiently by the endpoint for that one call. The extension does not persist or log it beyond this VS Code setting.",
           "scope": "machine-overridable"
         },
         "aidevobserver.endpoint": {
           "type": "string",
           "default": "http://localhost:8120/run",
-          "description": "URL of the byo_demo_server /run endpoint that receives the {demo, byo_key, inputs} payload and returns the review JSON."
+          "description": "URL of the byo_demo_server /run endpoint used as a fallback (no workspace folder open) to review the active editor's transcript via {demo, byo_key, inputs}."
         }
       }
     }
@@ -55,7 +83,7 @@
   },
   "devDependencies": {
     "@types/node": "^18.19.0",
-    "@types/vscode": "^1.75.0",
+    "@types/vscode": "^1.80.0",
     "typescript": "^5.4.0"
   }
 }
